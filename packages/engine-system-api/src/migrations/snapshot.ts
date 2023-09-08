@@ -4,6 +4,10 @@ CREATE DOMAIN "event_data_type" AS "text"
 	CONSTRAINT "event_data_type_check" CHECK ((VALUE = ANY (ARRAY['create'::"text", 'update'::"text", 'delete'::"text"])));
 CREATE DOMAIN "event_type" AS "text"
 	CONSTRAINT "event_type_check" CHECK ((VALUE = ANY (ARRAY['init'::"text", 'create'::"text", 'update'::"text", 'delete'::"text", 'run_migration'::"text"])));
+CREATE TYPE "schema_migration_type" AS ENUM (
+    'schema',
+    'content'
+);
 CREATE FUNCTION "trigger_event"() RETURNS "trigger"
     LANGUAGE "plpgsql"
     AS $$
@@ -116,8 +120,9 @@ CREATE TABLE "schema_migration" (
     "version" character varying(20) NOT NULL,
     "name" character varying(255) NOT NULL,
     "migration" "json" NOT NULL,
-    "checksum" character(32) NOT NULL,
-    "executed_at" timestamp with time zone DEFAULT "now"() NOT NULL
+    "checksum" character(32),
+    "executed_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "type" "schema_migration_type" DEFAULT 'schema'::"schema_migration_type" NOT NULL
 );
 CREATE SEQUENCE "schema_migration_id_seq"
     AS integer

@@ -12,7 +12,8 @@ import { logger } from '@contember/logger'
 import {
 	SchemaDatabaseMetadataResolverStore,
 	MigrationsDatabaseMetadataResolverStoreFactory,
-} from '../metadata/SchemaDatabaseMetadataResolverStore'
+} from '../metadata'
+import { MigrationInput } from './MigrationInput'
 
 export class ProjectMigrator {
 	constructor(
@@ -25,7 +26,7 @@ export class ProjectMigrator {
 	public async migrate(
 		db: DatabaseContext,
 		stages: Stage[],
-		migrationsToExecute: readonly Migration[],
+		migrationsToExecute: readonly MigrationInput[],
 		{ ignoreOrder = false, skipExecuted = false }: {
 			ignoreOrder?: boolean
 			skipExecuted?: boolean
@@ -42,19 +43,24 @@ export class ProjectMigrator {
 		const metadataStore = this.migrationsDatabaseMetadataResolverStoreFactory.create(db)
 
 		for (const migration of sorted) {
-			const formatVersion = migration.formatVersion
 
-			for (const modification of migration.modifications) {
-				[schema] = await this.applyModification(
-					db.client,
-					stages,
-					schema,
-					modification,
-					formatVersion,
-					migration.version,
-					db.client.schema,
-					metadataStore,
-				)
+			if (migration.type === 'schema') {
+				const formatVersion = migration.formatVersion
+
+				for (const modification of migration.modifications) {
+					[schema] = await this.applyModification(
+						db.client,
+						stages,
+						schema,
+						modification,
+						formatVersion,
+						migration.version,
+						db.client.schema,
+						metadataStore,
+					)
+				}
+			} else if (migration.type === 'content') {
+				throw new Error('not implemented')
 			}
 			await db.commandBus.execute(new SaveMigrationCommand(migration))
 		}
@@ -64,45 +70,49 @@ export class ProjectMigrator {
 		db: DatabaseContext,
 		schema: Schema,
 		version: string,
-		migrationsToExecute: readonly Migration[],
+		migrationsToExecute: readonly MigrationInput[],
 		{ ignoreOrder, skipExecuted }: {
 			ignoreOrder: boolean
 			skipExecuted: boolean
 		},
-	): Promise<readonly Migration[]> {
+	): Promise<readonly MigrationInput[]> {
 		const executedMigrations = await this.executedMigrationsResolver.getMigrations(db)
-		const toExecute = []
+		const toExecute: MigrationInput[] = []
 		let skippedErrors: SchemaValidatorSkippedErrors[] = []
 		for (const migration of migrationsToExecute) {
 			const executedMigration = executedMigrations.find(it => it.version === migration.version)
 			if (executedMigration) {
-				if (skipExecuted && executedMigration.checksum === calculateMigrationChecksum(migration)) {
+				if (skipExecuted && (migration.type !== 'schema' || executedMigration.checksum === calculateMigrationChecksum(migration))) {
 					continue
 				} else {
 					throw new AlreadyExecutedMigrationError(migration.version, `Migration is already executed`)
 				}
 			}
+
 			if (migration.version < version && !ignoreOrder) {
 				throw new MustFollowLatestMigrationError(migration.version, `Must follow latest executed migration ${version}`)
 			}
-			const described = this.migrationDescriber.describeModifications(schema, migration)
-			if (described.length === 0) {
-				continue
+			if (migration.type === 'schema') {
+				const described = this.migrationDescriber.describeModifications(schema, migration)
+				if (described.length === 0) {
+					continue
+				}
+				const latestModification = described[described.length - 1]
+				schema = latestModification.schema
+				skippedErrors = [
+					...skippedErrors.filter(it => it.skipUntil && MigrationVersionHelper.extractVersion(it.skipUntil) >= migration.version),
+					...migration.skippedErrors ?? [],
+				]
+				const errors = SchemaValidator.validate(schema, skippedErrors)
+				if (errors.length > 0) {
+					throw new InvalidSchemaError(
+						migration.version,
+						'Migration generates invalid schema: \n' +
+						errors.map(it => `${it.path.join('.')}: [${it.code}] ${it.message}`).join('\n'),
+					)
+				}
 			}
-			const latestModification = described[described.length - 1]
-			schema = latestModification.schema
-			skippedErrors = [
-				...skippedErrors.filter(it => it.skipUntil && MigrationVersionHelper.extractVersion(it.skipUntil) >= migration.version),
-				...migration.skippedErrors ?? [],
-			]
-			const errors = SchemaValidator.validate(schema, skippedErrors)
-			if (errors.length > 0) {
-				throw new InvalidSchemaError(
-					migration.version,
-					'Migration generates invalid schema: \n' +
-					errors.map(it => `${it.path.join('.')}: [${it.code}] ${it.message}`).join('\n'),
-				)
-			}
+
 			toExecute.push(migration)
 		}
 		// intentionally not using skippedErrors here

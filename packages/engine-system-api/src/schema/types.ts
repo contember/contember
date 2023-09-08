@@ -19,6 +19,13 @@ export type Scalars = {
 	PrimaryKey: { input: any; output: any }
 }
 
+export type ContentMigration = {
+	readonly checkMutationResult?: InputMaybe<Scalars['Boolean']['input']>
+	readonly query: Scalars['String']['input']
+	readonly stage?: InputMaybe<Scalars['String']['input']>
+	readonly variables?: InputMaybe<Scalars['Json']['input']>
+}
+
 export type CreateEvent = Event & {
 	readonly __typename?: 'CreateEvent'
 	readonly appliedAt: Scalars['DateTime']['output']
@@ -106,10 +113,10 @@ export enum EventsOrder {
 
 export type ExecutedMigration = {
 	readonly __typename?: 'ExecutedMigration'
-	readonly checksum: Scalars['String']['output']
+	readonly checksum?: Maybe<Scalars['String']['output']>
 	readonly executedAt: Scalars['DateTime']['output']
-	readonly formatVersion: Scalars['Int']['output']
-	readonly modifications: ReadonlyArray<Scalars['Json']['output']>
+	readonly formatVersion?: Maybe<Scalars['Int']['output']>
+	readonly modifications?: Maybe<ReadonlyArray<Scalars['Json']['output']>>
 	readonly name: Scalars['String']['output']
 	readonly version: Scalars['String']['output']
 }
@@ -123,6 +130,8 @@ export type MigrateError = {
 
 export enum MigrateErrorCode {
 	AlreadyExecuted = 'ALREADY_EXECUTED',
+	ContentMigrationFailed = 'CONTENT_MIGRATION_FAILED',
+	ContentMigrationNotSuccessful = 'CONTENT_MIGRATION_NOT_SUCCESSFUL',
 	InvalidFormat = 'INVALID_FORMAT',
 	InvalidSchema = 'INVALID_SCHEMA',
 	MigrationFailed = 'MIGRATION_FAILED',
@@ -144,10 +153,16 @@ export type MigrateResult = {
 }
 
 export type Migration = {
-	readonly formatVersion: Scalars['Int']['input']
-	readonly modifications: ReadonlyArray<Scalars['Json']['input']>
+	readonly contentMigration?: InputMaybe<ReadonlyArray<ContentMigration>>
+	/** @deprecated Use schemaMigration with SCHEMA type */
+	readonly formatVersion?: InputMaybe<Scalars['Int']['input']>
+	/** @deprecated Use schemaMigration with SCHEMA type */
+	readonly modifications?: InputMaybe<ReadonlyArray<Scalars['Json']['input']>>
 	readonly name: Scalars['String']['input']
+	readonly schemaMigration?: InputMaybe<SchemaMigration>
+	/** @deprecated Use schemaMigration with SCHEMA type */
 	readonly skippedErrors?: InputMaybe<ReadonlyArray<MigrationSkippedError>>
+	readonly type?: InputMaybe<MigrationType>
 	readonly version: Scalars['String']['input']
 }
 
@@ -196,6 +211,11 @@ export type MigrationSkippedError = {
 	readonly path?: InputMaybe<Scalars['String']['input']>
 }
 
+export enum MigrationType {
+	Content = 'CONTENT',
+	Schema = 'SCHEMA'
+}
+
 export type Mutation = {
 	readonly __typename?: 'Mutation'
 	readonly forceMigrate: MigrateResponse
@@ -241,6 +261,12 @@ export type QueryEventsArgs = {
 
 export type QueryExecutedMigrationsArgs = {
 	version?: InputMaybe<Scalars['String']['input']>
+}
+
+export type SchemaMigration = {
+	readonly formatVersion: Scalars['Int']['input']
+	readonly modifications: ReadonlyArray<Scalars['Json']['input']>
+	readonly skippedErrors?: InputMaybe<ReadonlyArray<MigrationSkippedError>>
 }
 
 export type Stage = {
@@ -347,6 +373,7 @@ export type ResolversInterfaceTypes<RefType extends Record<string, unknown>> = {
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
 	Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>
+	ContentMigration: ContentMigration
 	CreateEvent: ResolverTypeWrapper<CreateEvent>
 	DateTime: ResolverTypeWrapper<Scalars['DateTime']['output']>
 	DeleteEvent: ResolverTypeWrapper<DeleteEvent>
@@ -373,9 +400,11 @@ export type ResolversTypes = {
 	MigrationModifyErrorCode: MigrationModifyErrorCode
 	MigrationModifyResponse: ResolverTypeWrapper<MigrationModifyResponse>
 	MigrationSkippedError: MigrationSkippedError
+	MigrationType: MigrationType
 	Mutation: ResolverTypeWrapper<{}>
 	PrimaryKey: ResolverTypeWrapper<Scalars['PrimaryKey']['output']>
 	Query: ResolverTypeWrapper<{}>
+	SchemaMigration: SchemaMigration
 	Stage: ResolverTypeWrapper<Stage>
 	String: ResolverTypeWrapper<Scalars['String']['output']>
 	TruncateResponse: ResolverTypeWrapper<TruncateResponse>
@@ -385,6 +414,7 @@ export type ResolversTypes = {
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
 	Boolean: Scalars['Boolean']['output']
+	ContentMigration: ContentMigration
 	CreateEvent: CreateEvent
 	DateTime: Scalars['DateTime']['output']
 	DeleteEvent: DeleteEvent
@@ -409,6 +439,7 @@ export type ResolversParentTypes = {
 	Mutation: {}
 	PrimaryKey: Scalars['PrimaryKey']['output']
 	Query: {}
+	SchemaMigration: SchemaMigration
 	Stage: Stage
 	String: Scalars['String']['output']
 	TruncateResponse: TruncateResponse
@@ -464,10 +495,10 @@ export type EventResolvers<ContextType = any, ParentType extends ResolversParent
 }
 
 export type ExecutedMigrationResolvers<ContextType = any, ParentType extends ResolversParentTypes['ExecutedMigration'] = ResolversParentTypes['ExecutedMigration']> = {
-	checksum?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	checksum?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
 	executedAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
-	formatVersion?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
-	modifications?: Resolver<ReadonlyArray<ResolversTypes['Json']>, ParentType, ContextType>
+	formatVersion?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>
+	modifications?: Resolver<Maybe<ReadonlyArray<ResolversTypes['Json']>>, ParentType, ContextType>
 	name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	version?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>

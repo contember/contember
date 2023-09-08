@@ -102,6 +102,7 @@ export const executeDbTest = async (test: Test) => {
 			throw new Error()
 		}
 		await systemContainer.projectMigrator.migrate(db, [stage], [{
+			type: 'schema',
 			version: '2019-01-01-100000',
 			name: '2019-01-01-100000-init',
 			formatVersion: VERSION_LATEST,

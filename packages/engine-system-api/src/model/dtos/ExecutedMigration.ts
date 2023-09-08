@@ -9,7 +9,9 @@ export class ExecutedMigration implements Migration {
 		public readonly formatVersion: number,
 		public readonly modifications: Migration.Modification[],
 		public readonly executedAt: Date,
-		public readonly checksum: string,
+		public readonly checksum: string | null,
+		public readonly type: 'schema' | 'content',
+
 	) {
 		this.version = MigrationVersionHelper.extractVersion(name)
 	}

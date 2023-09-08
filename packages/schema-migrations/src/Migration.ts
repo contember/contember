@@ -5,7 +5,7 @@ export interface MigrationInfo {
 	readonly version: string // YYYY-MM-DD-HHIISS
 	readonly name: string // version-label
 	readonly formatVersion: number
-	readonly skippedErrors?: SchemaValidatorSkippedErrors[]
+	readonly skippedErrors?: readonly SchemaValidatorSkippedErrors[]
 }
 
 interface Migration extends MigrationInfo {

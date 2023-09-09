@@ -1,7 +1,7 @@
 import { useClassNameFactory, useComposeRef } from '@contember/react-utils'
 import { ComponentClassNameProps, flatClassNameList } from '@contember/utilities'
 import { PencilIcon, Trash2Icon } from 'lucide-react'
-import { MouseEvent as ReactMouseEvent, ReactNode, memo, useCallback, useMemo, useRef, useState } from 'react'
+import { MouseEvent as ReactMouseEvent, ReactNode, memo, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { HTMLDivElementProps } from '../../types'
 import { Box, BoxOwnProps } from '../Box'

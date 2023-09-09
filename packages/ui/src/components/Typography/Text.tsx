@@ -1,7 +1,6 @@
 import { useClassName } from '@contember/react-utils'
-import { ComponentClassNameProps, PolymorphicComponent, assert } from '@contember/utilities'
+import { ComponentClassNameProps, PolymorphicComponent } from '@contember/utilities'
 import { ReactNode, forwardRef, memo } from 'react'
-import { HTMLSpanElementProps } from '../../types'
 
 export interface TextOwnProps<Translate extends Function = Function> extends ComponentClassNameProps {
 	children?: ReactNode

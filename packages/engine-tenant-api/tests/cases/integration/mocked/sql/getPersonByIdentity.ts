@@ -3,7 +3,7 @@ import { SQL } from '../../../../src/tags'
 
 export const getPersonByIdentity = (args: {
 	identityId: string
-	response: null | { personId: string; password: string; roles: string[]; email: string; otpUri?: string }
+	response: null | { personId: string; password: string; roles: string[]; email: string; name?: string; otpUri?: string }
 }): ExpectedQuery => ({
 	sql: SQL`SELECT "person"."id", "person"."password_hash", "person"."otp_uri", "person"."otp_activated_at", "person"."identity_id", "person"."email", "person"."name", "person"."disabled_at", "identity"."roles"
 	         FROM "tenant"."person"
@@ -19,9 +19,10 @@ export const getPersonByIdentity = (args: {
 					identity_id: args.identityId,
 					roles: args.response.roles,
 					email: args.response.email,
+					name: args.response.name,
 					otp_uri: args.response.otpUri,
 				},
-			  ]
+			]
 			: [],
 	},
 })

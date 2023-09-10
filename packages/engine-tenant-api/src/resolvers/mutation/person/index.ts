@@ -1,3 +1,4 @@
+export * from './ChangeProfileMutationResolver'
 export * from './ChangePasswordMutationResolver'
 export * from './IDPMutationResolver'
 export * from './InviteMutationResolver'

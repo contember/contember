@@ -1,3 +1,6 @@
+import { } from '../../schema'
+import { ChangeProfileCommand } from '../commands/person/ChangeProfileCommand'
+import { Response, ResponseOk } from '../utils/Response'
 import { PersonQuery, PersonRow } from '../queries'
 import { DatabaseContext } from '../utils'
 
@@ -9,6 +12,15 @@ class PersonManager {
 		)
 	}
 
+	async changeMyProfile(dbContext: DatabaseContext, person: PersonRow, email?: string, name?: string | null): Promise<PersonManager.ProfileChangeResponse> {
+		await dbContext.commandBus.execute(new ChangeProfileCommand(person.id, email, name))
+		return new ResponseOk(null)
+	}
+
+}
+
+namespace PersonManager {
+	export type ProfileChangeResponse = Response<null, null>
 }
 
 export { PersonManager }

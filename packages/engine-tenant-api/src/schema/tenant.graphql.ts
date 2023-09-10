@@ -25,6 +25,7 @@ const schema: DocumentNode = gql`
 		signIn(email: String!, password: String!, expiration: Int, otpToken: String): SignInResponse
 		createSessionToken(email: String, personId: String, expiration: Int): CreateSessionTokenResponse
 		signOut(all: Boolean): SignOutResponse
+		changeMyProfile(email: String, name: String): ChangeMyProfileResponse
 		changePassword(personId: String!, password: String!): ChangePasswordResponse
 		changeMyPassword(currentPassword: String!, newPassword: String!): ChangeMyPasswordResponse
 
@@ -200,6 +201,23 @@ const schema: DocumentNode = gql`
 	enum SignOutErrorCode {
 		NOT_A_PERSON,
 		NOT_POSSIBLE_SIGN_OUT_WITH_PERMANENT_API_KEY
+	}
+
+	# === changeProfile ===
+
+	type ChangeMyProfileResponse {
+		ok: Boolean!
+		error: ChangeMyProfileError
+	}
+
+	type ChangeMyProfileError {
+		code: ChangeMyProfileErrorCode!
+		developerMessage: String!
+	}
+
+	enum ChangeMyProfileErrorCode {
+		NOT_A_PERSON
+		INVALID_EMAIL_FORMAT
 	}
 
 	# === changePassword ===

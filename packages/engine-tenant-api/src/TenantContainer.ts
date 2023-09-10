@@ -39,6 +39,7 @@ import {
 import {
 	AddIDPMutationResolver,
 	AddProjectMemberMutationResolver,
+	ChangeProfileMutationResolver,
 	ChangePasswordMutationResolver,
 	CreateApiKeyMutationResolver,
 	CreateProjectMutationResolver,
@@ -104,7 +105,7 @@ export interface TenantContainerArgs {
 export class TenantContainerFactory {
 	constructor(
 		private readonly providers: Omit<Providers, 'encrypt' | 'decrypt'>,
-	) {}
+	) { }
 
 	create(args: TenantContainerArgs): TenantContainer {
 		return this.createBuilder(args)
@@ -134,7 +135,7 @@ export class TenantContainerFactory {
 				args.projectSchemaResolver)
 			.addService('templateRenderer', () =>
 				new TemplateRenderer())
-			.addService('accessEvaluator', ({}) =>
+			.addService('accessEvaluator', ({ }) =>
 				new AccessEvaluator.PermissionEvaluator(new PermissionsFactory().create()))
 			.addService('authorizator', ({ accessEvaluator }) =>
 				new Authorizator.Default(accessEvaluator))
@@ -208,10 +209,12 @@ export class TenantContainerFactory {
 				new ProjectMembersQueryResolver(projectManager, projectMemberManager))
 			.addService('signUpMutationResolver', ({ signUpManager, apiKeyManager }) =>
 				new SignUpMutationResolver(signUpManager, apiKeyManager))
-			.addService('signInMutationResolver', ({ signInManager, signInResponseFactory  }) =>
+			.addService('signInMutationResolver', ({ signInManager, signInResponseFactory }) =>
 				new SignInMutationResolver(signInManager, signInResponseFactory))
 			.addService('signOutMutationResolver', ({ apiKeyManager }) =>
 				new SignOutMutationResolver(apiKeyManager))
+			.addService('changeProfileMutationResolver', ({ personManager }) =>
+				new ChangeProfileMutationResolver(personManager))
 			.addService('changePasswordMutationResolver', ({ passwordChangeManager }) =>
 				new ChangePasswordMutationResolver(passwordChangeManager))
 			.addService('resetPasswordMutationResolver', ({ passwordResetManager, permissionContextFactory }) =>

@@ -33,6 +33,15 @@ export interface ForeignKeyConstraintMetadata {
 	fromColumn: string
 	toTable: string
 	toColumn: string
+	deleteAction: ForeignKeyDeleteAction
+}
+
+export enum ForeignKeyDeleteAction {
+	noaction = 'a',
+	restrict = 'r',
+	cascade = 'c',
+	setnull = 'n',
+	setdefault = 'd'
 }
 
 export interface SchemaDatabaseMetadata {

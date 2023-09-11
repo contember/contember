@@ -211,7 +211,7 @@ export class DeleteExecutor {
 			return
 		}
 
-		this.processDeleteResult(state, mapper, entity, result, orphanRemovals)
+		await this.processDeleteResult(state, mapper, entity, result, orphanRemovals)
 	}
 
 

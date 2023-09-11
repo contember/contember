@@ -3,6 +3,7 @@ import {
 	IndexMetadata,
 	SchemaDatabaseMetadata,
 	UniqueConstraintMetadata,
+	ForeignKeyDeleteAction,
 } from '@contember/schema-utils'
 import { DatabaseContext } from '../database'
 import { Connection } from '@contember/database'
@@ -21,6 +22,7 @@ export class SchemaDatabaseMetadataResolver {
 				toColumn: it.target_columns[0],
 				fromTable: it.table_name,
 				toTable: it.target_table,
+				deleteAction: it.delete_action ?? ForeignKeyDeleteAction.noaction,
 			}))
 		const uniqueConstraints = constraintRows
 			.filter((it): it is UniqueConstraintsRow => it.type === ConstraintTypes.unique)
@@ -54,7 +56,8 @@ export class SchemaDatabaseMetadataResolver {
                 JSONB_AGG(DISTINCT pg_attribute_target.attname)
                 FILTER ( WHERE pg_attribute_target.attname IS NOT NULL) AS target_columns,
                 BOOL_OR(condeferrable),
-                BOOL_OR(condeferred)
+                BOOL_OR(condeferred),
+                MAX(confdeltype) AS delete_action
             FROM pg_constraint
             JOIN pg_class
                 ON pg_constraint.conrelid = pg_class.oid
@@ -116,6 +119,7 @@ type ForeignKeyConstraintsRow = {
 	type: ConstraintTypes.foreignKey
 	deferrable: boolean
 	deferred: boolean
+	delete_action: ForeignKeyDeleteAction | null
 }
 type UniqueConstraintsRow = {
 	constraint_name: string

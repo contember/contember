@@ -17,6 +17,7 @@ import _20220208132600fnsearchpath from './2022-02-08-132600-fn-search-path'
 import _20220208140500dropdeadcode from './2022-02-08-140500-drop-deadcode'
 import _20220208144400dynamicstageschema from './2022-02-08-144400-dynamic-stage-schema'
 import _20221003110000tableondelete from './2022-10-03-110000-table-on-delete'
+import _20230911174000fixondelete from './2023-09-11-174000-fix-on-delete'
 import snapshot from './snapshot'
 
 import { Client, Connection, createDatabaseIfNotExists, DatabaseConfig } from '@contember/database'
@@ -46,6 +47,7 @@ const migrations = {
 	'2022-02-08-140500-drop-deadcode': _20220208140500dropdeadcode,
 	'2022-02-08-144400-dynamic-stage-schema': _20220208144400dynamicstageschema,
 	'2022-10-03-110000-table-on-delete': _20221003110000tableondelete,
+	'2023-09-11-174000-fix-on-delete': _20230911174000fixondelete,
 }
 
 

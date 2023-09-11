@@ -19,11 +19,13 @@ export class UpdateRelationOnDeleteModificationHandler implements ModificationHa
 	) {}
 
 	public createSql(builder: MigrationBuilder, { databaseMetadata, invalidateDatabaseMetadata }: ModificationHandlerCreateSqlOptions): void {
-		const entity = this.schema.model.entities[this.data.entityName]
+		const updatedSchema = this.getSchemaUpdater()({ schema: this.schema })
+		const entity = updatedSchema.model.entities[this.data.entityName]
 		if (entity.view) {
 			return
 		}
-		acceptRelationTypeVisitor(this.schema.model, entity, this.data.fieldName, {
+
+		acceptRelationTypeVisitor(updatedSchema.model, entity, this.data.fieldName, {
 			visitManyHasOne: ({ entity, relation, targetEntity }) => {
 				addForeignKeyConstraint({ builder, entity, targetEntity, relation, recreate: true, databaseMetadata, invalidateDatabaseMetadata })
 			},

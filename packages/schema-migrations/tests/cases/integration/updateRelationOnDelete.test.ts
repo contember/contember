@@ -31,5 +31,5 @@ testMigrations('update relation ondelete to cascade', {
 		},
 	],
 	sql: SQL`ALTER TABLE "post" DROP CONSTRAINT "fk_post_category_id_category_id"; 
-ALTER TABLE "post" ADD FOREIGN KEY ("category_id") REFERENCES "category"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;`,
+ALTER TABLE "post" ADD FOREIGN KEY ("category_id") REFERENCES "category"("id") ON DELETE CASCADE DEFERRABLE INITIALLY IMMEDIATE;`,
 })

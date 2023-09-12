@@ -1,5 +1,4 @@
-import { expectTypeOf } from 'expect-type'
-import { describe, test } from 'vitest'
+import { describe, expectTypeOf, test } from 'vitest'
 import * as Types from '../../src/types'
 
 describe('@contember/utilities', () => {

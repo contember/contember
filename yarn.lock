@@ -9941,13 +9941,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expect-type@npm:^0.16.0":
-  version: 0.16.0
-  resolution: "expect-type@npm:0.16.0"
-  checksum: c1339e56fa1c997b104cc172579ace68fce4d4593421a5a5e85cbb26e280950d583c1e59064af6f1467743a1365aebfb5ddcdf220b94bee1895958c29081abb9
-  languageName: node
-  linkType: hard
-
 "express@npm:^4.17.3":
   version: 4.18.2
   resolution: "express@npm:4.18.2"
@@ -14824,7 +14817,6 @@ __metadata:
     eslint-plugin-prettier: ^4.2.1
     eslint-plugin-react: ^7.32.2
     eslint-plugin-react-hooks: ^4.6.0
-    expect-type: ^0.16.0
     fast-glob: ^3.2.12
     jsdom: ^21.0.0
     json5: ^2.2.3

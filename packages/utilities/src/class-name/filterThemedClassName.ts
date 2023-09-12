@@ -1,4 +1,5 @@
 import { KebabCase } from 'type-fest'
+import { deprecate } from '../deprecate'
 import { isColorSchemeClassName } from './colorSchemeClassName'
 import { THEME_CLASS_NAME_REG_EXP } from './constants'
 import { flatClassNameList } from './flatClassNameList'
@@ -29,6 +30,7 @@ export function filterThemedClassName(
 			const state = match.groups!.state as `:${KebabCase<string>}`
 
 			if (state) {
+				deprecate('1.3.0', true, 'State themes are deprecated.', null)
 				stateThemes[state] = stateThemes[state] ?? { content: undefined, controls: undefined }
 
 				if (!scope) {

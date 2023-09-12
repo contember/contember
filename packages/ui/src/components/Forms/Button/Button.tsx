@@ -1,7 +1,6 @@
 import { ColorSchemeContext, useClassNameFactory, useColorScheme } from '@contember/react-utils'
-import { colorSchemeClassName, contentThemeClassName, controlsThemeClassName, dataAttribute, deprecate, fallback } from '@contember/utilities'
+import { colorSchemeClassName, controlsThemeClassName, dataAttribute, deprecate, fallback, isDefined } from '@contember/utilities'
 import { createElement, forwardRef, memo } from 'react'
-import type { HTMLButtonElementProps } from '../../../types'
 import { Spinner } from '../../Spinner/Spinner'
 import { Text } from '../../Typography'
 import { AnchorButtonProps, BaseButtonProps, ButtonProps } from './Types'
@@ -89,6 +88,7 @@ Button.displayName = 'Interface.Button'
 
 export const BaseButton = memo(forwardRef<any, BaseButtonProps>(({
 	Component,
+	accent = 'theme',
 	active,
 	align,
 	bland,
@@ -130,7 +130,7 @@ export const BaseButton = memo(forwardRef<any, BaseButtonProps>(({
 	padding = fallback(padding, flow === 'generous' || flow === 'generousBlock', 'padding')
 
 	deprecate('1.3.0', typeof elevated !== 'boolean', '`elevate` prop', '`elevate` prop')
-	elevated = fallback(elevated, typeof elevation !== 'boolean', elevation === 'default' ? true : false)
+	elevated = fallback(elevated, elevation === 'default', true)
 
 	deprecate('1.3.0', justification !== undefined, '`justification` prop', '`justify` prop')
 	justify = fallback(justify, justification !== undefined, ({ default: 'center', justifyStart: 'start', justifyCenter: 'center', justifyEnd: 'end' } as const)[justification ?? 'default'])
@@ -146,17 +146,16 @@ export const BaseButton = memo(forwardRef<any, BaseButtonProps>(({
 		rest['tabIndex'] = -1
 	}
 
-	const themeIntent = !disabled ? intent : 'default'
 	const className = useClassNameFactory(componentClassName)
 	const colorScheme = useColorScheme()
 	const scheme = schemeProp ?? colorScheme
 
 	return createElement(Component, {
 		...rest,
+		'data-accent': dataAttribute(accent),
 		'data-active': dataAttribute(active),
 		'data-align': dataAttribute(align),
-		// TODO: deprecated since v1.3.0
-		'data-bland': dataAttribute(bland),
+		'data-bland': dataAttribute(bland), // TODO: deprecated since v1.3.0
 		'data-border-radius': dataAttribute(borderRadius),
 		'data-disabled': dataAttribute(disabled),
 		'data-display': dataAttribute(display),
@@ -172,8 +171,7 @@ export const BaseButton = memo(forwardRef<any, BaseButtonProps>(({
 		'data-square': dataAttribute(square),
 		disabled,
 		'className': className(null, [
-			contentThemeClassName(distinction === 'default' ? null : themeIntent),
-			controlsThemeClassName(themeIntent),
+			controlsThemeClassName(intent),
 			colorSchemeClassName(scheme),
 			classNameProp,
 		]),

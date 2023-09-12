@@ -1,7 +1,5 @@
 import { EntityAccessor, useEntity, useMutationState } from '@contember/binding'
-import { useColorScheme } from '@contember/react-utils'
 import { Button, ButtonProps } from '@contember/ui'
-import { colorSchemeClassName, controlsThemeClassName, listClassName } from '@contember/utilities'
 import { Trash2Icon } from 'lucide-react'
 import { ReactNode, memo, useCallback } from 'react'
 import { usePersistWithFeedback } from '../../../ui'
@@ -24,22 +22,20 @@ export type DeleteEntityButtonProps =
  * @group Action buttons
  */
 export const DeleteEntityButton = memo((props: DeleteEntityButtonProps) => {
-	const { children, immediatePersist, className, ...rest } = props
+	const { children, immediatePersist, ...rest } = props
 	const parentEntity = useEntity()
 	const triggerPersist = usePersistWithFeedback()
 	const isMutating = useMutationState()
 	const onClick = useCallback(() => {
-		if (props.immediatePersist && !confirm('Really?')) {
+		if (immediatePersist && !confirm('Really?')) {
 			return
 		}
 		parentEntity.deleteEntity()
 
-		if (props.immediatePersist && triggerPersist) {
+		if (immediatePersist && triggerPersist) {
 			triggerPersist().catch(() => { })
 		}
-	}, [triggerPersist, props.immediatePersist, parentEntity])
-
-	const colorScheme = useColorScheme()
+	}, [triggerPersist, immediatePersist, parentEntity])
 
 	if (!(parentEntity instanceof EntityAccessor)) {
 		return null
@@ -48,15 +44,12 @@ export const DeleteEntityButton = memo((props: DeleteEntityButtonProps) => {
 	return (
 		<Button
 			square
+			accent="strong"
 			borderRadius="full"
 			distinction="seamless"
 			size="small"
 			{...rest}
-			className={listClassName([
-				controlsThemeClassName('danger', ':hover'),
-				colorSchemeClassName(colorScheme),
-				className,
-			])}
+			intent="danger"
 			disabled={isMutating || rest.disabled}
 			onClick={onClick}
 		>

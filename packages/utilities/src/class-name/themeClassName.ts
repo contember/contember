@@ -1,4 +1,6 @@
 import { KebabCase } from 'type-fest'
+import { isDefined } from '../assert-types'
+import { deprecate } from '../deprecate'
 import { ThemeContentClassName, ThemeControlsClassName } from './types'
 
 /**
@@ -7,7 +9,6 @@ import { ThemeContentClassName, ThemeControlsClassName } from './types'
  * IMPORTANT: Make sure to use color scheme class in combination with theme class names.
  *
  * @param contentTheme - Theme name basis for content
- * @param state - State of the theme starting with a ":", e.g. `":hover"`, `":focus"`, `":active"`, `":focus-visible"`
  * @returns A content theme class name
  *
  * @see {@link controlsThemeClassName}
@@ -18,9 +19,7 @@ import { ThemeContentClassName, ThemeControlsClassName } from './types'
  * const colorScheme = colorSchemeClassName('system')
  * //  ^ 'scheme-system'
  * const contentThemeClassName = contentThemeClassName('default')
- * //  ^ 'theme-default-content:hover'
- * const dangerOnMouseOverTheme = controlsThemeClassName('danger', ':hover')
- * //  ^ 'theme-danger-controls:hover'
+ * //  ^ 'theme-default-content'
  *
  * return (
  * 	<div className={`${colorScheme} ${contentThemeClassName}`}>
@@ -36,6 +35,8 @@ export function contentThemeClassName<
 	theme: ContentTheme | null | undefined,
 	state?: State | null | undefined,
 ) {
+	deprecate('1.3.0', isDefined(state), '`state` argument', null)
+
 	return theme ? `theme-${theme}-content${state ?? ''}` as ThemeContentClassName<ContentTheme, State> : undefined
 }
 
@@ -45,7 +46,6 @@ export function contentThemeClassName<
  * IMPORTANT: Make sure to use color scheme class in combination with theme class names.
  *
  * @param theme - Theme name basis for controls
- * @param state - State of the theme starting with a ":", e.g. `":hover"`, `":focus"`, `":active"`, `":focus-visible"`
  * @returns A controls theme class name
  *
  * @see {@link contentThemeClassName}
@@ -56,9 +56,7 @@ export function contentThemeClassName<
  * const colorScheme = colorSchemeClassName('system')
  * //  ^ 'scheme-system'
  * const contentThemeClassName = contentThemeClassName('default')
- * //  ^ 'theme-default-content:hover'
- * const dangerOnMouseOverTheme = controlsThemeClassName('danger', ':hover')
- * //  ^ 'theme-danger-controls:hover'
+ * //  ^ 'theme-default-content'
  *
  * return (
  * 	<div className={`${colorScheme} ${contentThemeClassName}`}>
@@ -74,6 +72,8 @@ export function controlsThemeClassName<
 	theme: ControlsTheme | null | undefined,
 	state?: State | null | undefined,
 ) {
+	deprecate('1.3.0', isDefined(state), '`state` argument', null)
+
 	return theme ? `theme-${theme}-controls${state ?? ''}` as ThemeControlsClassName<ControlsTheme, State> : undefined
 }
 
@@ -83,7 +83,6 @@ export function controlsThemeClassName<
  * IMPORTANT: Make sure to use color scheme class in combination with theme class names.
  *
  * @param theme - Theme name basis for content and controls
- * @param state - State of the theme starting with a ":", e.g. `":hover"`, `":focus"`, `":active"`, `":focus-visible"`
  * @returns A tuple with a content theme class name and a controls theme class name
  *
  * @see {@link contentThemeClassName}
@@ -106,9 +105,11 @@ export function themeClassName<
 	Theme extends KebabCase<string> = KebabCase<string>,
 	State extends `:${KebabCase<string>}` | null | undefined = undefined,
 >(
-		theme: Theme | null | undefined,
-		state?: State | null | undefined,
+	theme: Theme | null | undefined,
+	state?: State | null | undefined,
 ) {
+	deprecate('1.3.0', isDefined(state), '`state` argument', null)
+
 	return [
 		contentThemeClassName(theme, state),
 		controlsThemeClassName(theme, state),

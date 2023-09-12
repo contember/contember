@@ -3,15 +3,8 @@ import { ArrowLeftIcon, ArrowRightIcon } from 'lucide-react'
 import { Fragment, useState } from 'react'
 import { SlotSources } from '../components/Slots'
 
-const options = [
-	{ value: 'small', label: 'small' },
-	{ value: 'medium', label: 'medium' },
-	{ value: 'large', label: 'large' },
-]
-
 export default () => {
 	const [size, setSize] = useState<'small' | 'medium' | 'large'>('medium')
-	const [v, setV] = useState(2)
 
 	return (
 		<>
@@ -51,24 +44,6 @@ export default () => {
 						</Wrapper>
 						Lorem ipsum
 					</div>
-
-					{/* <div>
-						<Wrapper>
-							<div className="cui-view" data-pressable data-background-color data-padding>Default</div>
-							<TextInput placeholder="Enter text..." name="name" />
-							<div className="cui-view" data-pressable data-background-color data-padding data-elevated>Elevated</div>
-							<div className="cui-view" data-pressable data-background-color data-padding data-pressed>Default</div>
-							<div className="cui-view" data-pressable data-background-color data-padding>Go <ArrowRightIcon /></div>
-							<div className="cui-view" data-pressable data-background-color data-padding data-disabled>Default</div>
-							<div className="cui-view" data-pressable data-background-color data-padding data-square>+</div>
-							<div className="cui-view" data-pressable data-background-color data-padding data-border-radius={false}><ArrowLeftIcon /></div>
-							<div className="cui-view" data-pressable data-background-color data-padding><ArrowLeftIcon /></div>
-							<div className="cui-view" data-pressable data-background-color data-padding data-square><ArrowRightIcon /></div>
-							<div className="cui-view" data-pressable data-background-color data-padding data-border-radius="gutter"><ArrowRightIcon /></div>
-							<div className="cui-view" data-pressable data-background-color data-padding data-border-radius="full"><ArrowRightIcon /></div>
-						</Wrapper>
-						data-Lorem ipsum
-					</div> */}
 
 					<div>
 						<Wrapper>

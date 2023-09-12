@@ -38,6 +38,7 @@ import { NamedExoticComponent } from 'react';
 import { Narrow } from '@contember/utilities';
 import { NestedClassName } from '@contember/utilities';
 import { NonOptional } from '@contember/utilities';
+import { Placement } from '@popperjs/core';
 import { PointerEventHandler } from 'react';
 import { PolymorphicComponent } from '@contember/utilities';
 import { PolymorphicComponentPropsWithRef } from '@contember/utilities';
@@ -693,14 +694,14 @@ export interface DividerOwnProps extends ComponentClassNameProps {
 export type DividerProps = Omit<HTMLDivElementProps, keyof DividerOwnProps> & DividerOwnProps;
 
 // @public (undocumented)
-export const Dropdown: MemoExoticComponent<(props: DropdownProps) => JSX_2.Element>;
+export const Dropdown: MemoExoticComponent<({ alignment, placement, ...props }: DropdownProps) => JSX_2.Element>;
 
 // @public (undocumented)
 export type DropdownAlignment = Default | 'center' | 'start' | 'end' | 'top' | 'right';
 
 // @public (undocumented)
 export interface DropdownProps {
-    // (undocumented)
+    // @deprecated (undocumented)
     alignment?: DropdownAlignment;
     // (undocumented)
     buttonProps?: ButtonProps;
@@ -710,6 +711,8 @@ export interface DropdownProps {
     contentContainer?: HTMLElement;
     // (undocumented)
     onDismiss?: () => void;
+    // (undocumented)
+    placement?: Placement;
     // (undocumented)
     renderContent?: (props: DropdownRenderProps) => ReactNode;
     // (undocumented)

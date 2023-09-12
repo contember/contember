@@ -1,5 +1,6 @@
 import { useClassNameFactory, useCloseOnClickOutside, useCloseOnEscape, useColorScheme, useId } from '@contember/react-utils'
-import { assertNever, colorSchemeClassName } from '@contember/utilities'
+import { assertNever, colorSchemeClassName, deprecate } from '@contember/utilities'
+import { Placement } from '@popperjs/core'
 import {
 	MouseEventHandler,
 	ReactElement,
@@ -31,7 +32,9 @@ export interface DropdownProps {
 	}) => ReactNode
 	renderContent?: (props: DropdownRenderProps) => ReactNode
 	buttonProps?: ButtonProps
+	/** @deprecated Use `placement` instead */
 	alignment?: DropdownAlignment
+	placement?: Placement
 	strategy?: 'absolute' | 'fixed'
 	contentContainer?: HTMLElement
 	children?: ReactElement | ((props: DropdownRenderProps) => ReactNode)
@@ -60,7 +63,11 @@ const noop = () => { }
 /**
  * @group UI
  */
-export const Dropdown = memo((props: DropdownProps) => {
+export const Dropdown = memo(({
+	alignment,
+	placement,
+	...props
+}: DropdownProps) => {
 	const [isOpen, setIsOpen] = useState(false)
 	const [isTransitioning, setIsTransitioning] = useState(false)
 
@@ -70,7 +77,9 @@ export const Dropdown = memo((props: DropdownProps) => {
 	const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null)
 	const [popperElement, setPopperElement] = useState<HTMLElement | null>(null)
 
-	const placement = alignmentToPlacement(props.alignment)
+	deprecate('1.4.0', alignment !== undefined, '`alignment` prop', '`placement` prop')
+	placement = placement ?? (alignment ? alignmentToPlacement(alignment) : undefined)
+
 	const { styles, attributes, forceUpdate, update } = usePopper(
 		isActive ? referenceElement : null,
 		isActive ? popperElement : null,

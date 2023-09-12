@@ -9,6 +9,7 @@ export interface DividerOwnProps extends ComponentClassNameProps {
 	 * A divider adds gap between siblings by default. Set to `false` to disable this behavior or change the gap size with the `gap` prop.
 	 */
 	gap?: StackOwnProps['gap']
+	padding?: StackOwnProps['gap']
 }
 
 export type DividerProps = Omit<HTMLDivElementProps, keyof DividerOwnProps> & DividerOwnProps
@@ -33,10 +34,11 @@ export type DividerProps = Omit<HTMLDivElementProps, keyof DividerOwnProps> & Di
  * ```
  *
  */
-export const Divider = memo(({ className, componentClassName = 'divider', gap = true, ...rest }: DividerProps) => {
+export const Divider = memo(({ className, componentClassName = 'divider', gap = true, padding, ...rest }: DividerProps) => {
 	return (
 		<div
 			data-gap={dataAttribute(gap)}
+			data-padding={dataAttribute(padding)}
 			className={useClassName(componentClassName, className)}
 			{...rest}
 		/>

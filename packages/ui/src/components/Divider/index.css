@@ -1,23 +1,24 @@
 :where(.cui-divider) {
 	--cui-divider-margin: 0px;
+	--cui-divider-padding: 0px;
 	align-self: stretch;
 	background-color: rgba(var(--cui-color--rgb-100), var(--cui-opacity--low));
 	margin-bottom: calc(var(--cui-divider-margin) - 0.5px);
 	margin-top: calc(var(--cui-divider-margin) - 0.5px);
 	min-height: 1px;
 	min-width: 1px;
-	margin-left: -0.5px;
-	margin-right: -0.5px;
+	margin-left: var(--cui-divider-padding);
+	margin-right: var(--cui-divider-padding);
 	position: relative;
 	z-index: 1;
 }
 
 :where([data-direction="horizontal"] > .cui-divider),
 :where(.view-horizontal > .cui-divider) {
-	margin-bottom: -0.5px;
+	margin-bottom: var(--cui-divider-padding);
 	margin-left: calc(var(--cui-divider-margin) - 0.5px);
 	margin-right: calc(var(--cui-divider-margin) - 0.5px);
-	margin-top: -0.5px;
+	margin-top: var(--cui-divider-padding);
 }
 
 :where(.cui-divider[data-gap]) { --cui-divider-margin: var(--cui-padding) }
@@ -27,3 +28,11 @@
 :where(.cui-divider[data-gap="padding"]) { --cui-divider-margin: var(--cui-padding) }
 :where(.cui-divider[data-gap="large"]) { --cui-divider-margin: calc(1.5 * var(--cui-padding)) }
 :where(.cui-divider[data-gap="larger"]) { --cui-divider-margin: calc(3 * var(--cui-padding)) }
+
+:where(.cui-divider[data-padding]) { --cui-divider-padding: var(--cui-padding) }
+:where(.cui-divider[data-padding="gap"]) { --cui-divider-padding: var(--cui-gap) }
+:where(.cui-divider[data-padding="double"]) { --cui-divider-padding: var(--cui-double-gap) }
+:where(.cui-divider[data-padding="gutter"]) { --cui-divider-padding: var(--cui-gutter) }
+:where(.cui-divider[data-padding="padding"]) { --cui-divider-padding: var(--cui-padding) }
+:where(.cui-divider[data-padding="large"]) { --cui-divider-padding: calc(1.5 * var(--cui-padding)) }
+:where(.cui-divider[data-padding="larger"]) { --cui-divider-padding: calc(3 * var(--cui-padding)) }

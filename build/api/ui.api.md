@@ -277,6 +277,8 @@ export interface ButtonListProps extends ComponentClassNameProps, DeprecatedButt
 // @public (undocumented)
 export interface ButtonOwnProps extends DeprecatedButtonOwnProps, ComponentClassNameProps {
     // (undocumented)
+    accent?: false | 'strong' | 'theme';
+    // (undocumented)
     active?: boolean;
     // (undocumented)
     align?: 'start' | 'center' | 'end' | 'stretch';

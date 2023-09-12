@@ -98,6 +98,18 @@ export interface ActiveSectionTabsMap {
     [id: string]: ActiveSectionTabProps;
 }
 
+// @internal
+export const AddColumnAfterIcon: LucideIcon;
+
+// @internal
+export const AddColumnBeforeIcon: LucideIcon;
+
+// @internal
+export const AddRowAboveIcon: LucideIcon;
+
+// @internal
+export const AddRowBelowIcon: LucideIcon;
+
 // @public (undocumented)
 export const Aether: MemoExoticComponent<({ children, className, ...divProps }: AetherProps) => JSX_2.Element>;
 

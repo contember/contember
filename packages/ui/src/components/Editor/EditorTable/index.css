@@ -1,330 +1,187 @@
 :where(.cui-editorTable) {
+	--cui-editorTable--control-size: 0em;
 	display: grid;
-	grid-template-rows: 3.5em repeat(calc(var(--cui-editorTable-rowCount, 0)), 0.0625em auto) 0.0625em 1em;
-	grid-template-columns: 3.5em repeat(calc(var(--cui-editorTable-columnCount, 0)), 0.0625em 1fr) 0.0625em 1em;
-	margin: -3.5em -1em -1em -3.5em;
+	grid-template-rows: var(--cui-editorTable--control-size) repeat(calc(var(--cui-editorTable-rowCount, 0)), 1px auto) 1px;
+	grid-template-columns: repeat(calc(var(--cui-editorTable-columnCount, 0)), 1px 1fr) 1px var(--cui-editorTable--control-size);
+	margin-top: calc(-1 * var(--cui-editorTable--control-size));
+	margin-right: calc(-1 * var(--cui-editorTable--control-size));;
+	position: relative;
+}
+
+:where(.cui-editorTable.is-selected) {
+	--cui-editorTable--control-size: var(--cui-padding);
+	z-index: 1;
+	position: relative;
 }
 
 :where(.cui-editorTable-rowControls),
+:where(.cui-editorTable-rowLineControls),
+:where(.cui-editorTable-columnLineControls),
 :where(.cui-editorTable-columnControls),
-:where(.cui-editorTable-body),
-:where(.cui-editorTable-row),
-:where(.cui-editorTable-stub) {
+:where(.cui-editorTable-row) {
 	display: contents;
 }
 
-:where(.cui-editorTable-rowControls-item) {
+:where(.cui-editorTable-rowControls-before),
+:where(.cui-editorTable-rowControls-after) {
 	grid-row: calc(2 * var(--cui-editorTable-row, 0) + 3) / span 1;
-	grid-column: 1/span 1;
-	place-self: center end;
-	width: 1em;
-	height: 100%;
 }
 
-:where(.cui-editorTable-rowControls-item-first) {
-	border-top-left-radius: 0.5em;
-}
-
-:where(.cui-editorTable-rowControls-item-last) {
-	border-bottom-left-radius: 0.5em;
-}
-
-:where(.cui-editorTable-rowControls-item:hover + * + .cui-editorTable-rowControls-line),
-:where(.cui-editorTable-rowControls-item:hover + * + * + * + * + * + .cui-editorTable-rowControls-line) {
-	background-color: #ff6361;
-	z-index: 1;
-}
-
-:where(.cui-editorTable-rowControls-item:hover + * + .cui-editorTable-rowControls-line) {
-	transform: translateY(150%) scaleY(2);
-}
-
-:where(.cui-editorTable-rowControls-item:hover + * + * + * + * + * + .cui-editorTable-rowControls-line) {
-	transform: translateY(-150%) scaleY(2);
-}
-
-:where(.cui-editorTable-rowControls-more) {
-	grid-row: calc(2 * var(--cui-editorTable-row, 0) + 3) / span 1;
-	grid-column: 1/span 1;
-	place-self: center start;
-}
-
-:where(.cui-editorTable-rowControls-line) {
+:where(.cui-editorTable-rowLineControls-before),
+:where(.cui-editorTable-rowLineControls),
+:where(.cui-editorTable-rowLineControls-after) {
 	grid-row: calc(2 * var(--cui-editorTable-row, 0) + 2) / span 1;
+}
+
+:where(.cui-editorTable-rowControls-before),
+:where(.cui-editorTable-rowLineControls-before) {
+	grid-column: 1/span 1;
+}
+
+:where(.cui-editorTable-rowControls-after),
+:where(.cui-editorTable-rowLineControls-after) {
+	grid-column: -2/span 1;
+}
+
+:where(.cui-editorTable-rowControls-before),
+:where(.cui-editorTable-rowControls-after) {
+	justify-content: center;
+	align-items: center;
+	display: flex;
+	opacity: 0;
+	position: relative;
+	visibility: hidden;
+}
+
+:where(.cui-editorTable-columnLineControls-line),
+:where(.cui-editorTable-columnLineControls-line-inner),
+:where(.cui-editorTable-rowLineControls-line),
+:where(.cui-editorTable-rowLineControls-line-inner) {
+	align-items: center;
+	justify-content: center;
+	display: flex;
+	flex-direction: column;
+}
+
+:where(.cui-editorTable-columnLineControls-line),
+:where(.cui-editorTable-rowLineControls-line) {
+	background: rgba(var(--cui-color--rgb-50), var(--cui-opacity--low));
+	position: relative;
+}
+
+:where(.cui-editorTable-columnLineControls-line) {
+	grid-column: calc(2 * var(--cui-editorTable-column, 0) + 1) / span 1;
+	grid-row: 2/-2;
+}
+:where(.cui-editorTable-rowLineControls-line) {
 	grid-column: 2/-2;
-	background: #E0E0E0;
-}
-
-:where(.cui-editorTable-rowControls-add) {
 	grid-row: calc(2 * var(--cui-editorTable-row, 0) + 2) / span 1;
-	grid-column: 1/span 1;
 }
 
-:where(.cui-editorTable-rowControls-add:hover + .cui-editorTable-rowControls-line) {
-	transform: scaleY(4);
+:where(.cui-editorTable-columnLineControls-line-inner),
+:where(.cui-editorTable-rowLineControls-line-inner) {
+	cursor: pointer;
+	height: 0.5rem;
 }
 
-:where(.cui-editorTable-columnControls-item) {
-	grid-row: 1/span 1;
-	grid-column: calc(2 * var(--cui-editorTable-column, 0) + 3) / span 1;
-	justify-self: center;
-	place-self: end center;
-	height: 1em;
+:where(.cui-editorTable-columnLineControls-line-inner)::before,
+:where(.cui-editorTable-rowLineControls-line-inner)::before {
+	content: "";
+	border-radius: 2px;
+	display: block;
+	position: absolute;
+}
+:where(.cui-editorTable-columnLineControls-line-inner)::before {
+	height: 100%;
+	width: 2px;
+}
+:where(.cui-editorTable-rowLineControls-line-inner)::before {
+	height: 2px;
 	width: 100%;
 }
 
-:where(.cui-editorTable-columnControls-item-first) {
-	border-top-left-radius: 0.5em;
+:where(.cui-editorTable[data-hover] .cui-editorTable-columnLineControls-line-inner:hover)::before,
+:where(.cui-editorTable[data-hover] .cui-editorTable-rowLineControls-line-inner:hover)::before {
+	background-color: rgb(var(--cui-background-color--controls-rgb-50));
 }
 
-:where(.cui-editorTable-columnControls-item-last) {
-	border-top-right-radius: 0.5em;
-}
-
-:where(.cui-editorTable-columnControls-item:hover + * + .cui-editorTable-columnControls-line),
-:where(.cui-editorTable-columnControls-item:hover + * + * + * + * + * + .cui-editorTable-columnControls-line) {
-	background-color: #ff6361;
-	z-index: 1;
-}
-
-:where(.cui-editorTable-columnControls-item:hover + * + .cui-editorTable-columnControls-line) {
-	transform: translateX(150%) scaleX(2);
-}
-
-:where(.cui-editorTable-columnControls-item:hover + * + * + * + * + * + .cui-editorTable-columnControls-line) {
-	transform: translateX(-150%) scaleX(2);
-}
-
-:where(.cui-editorTable-columnControls-more) {
+:where(.cui-editorTable-columnControls) {
 	grid-row: 1/span 1;
 	grid-column: calc(2 * var(--cui-editorTable-column, 0) + 3) / span 1;
 	justify-self: center;
 	place-self: center;
 }
 
-:where(.cui-editorTable-columnControls-line) {
-	grid-row: 2/-2;
-	grid-column: calc(2 * var(--cui-editorTable-column, 0) + 2) / span 1;
-	background: #E0E0E0;
-}
-
-:where(.cui-editorTable-columnControls-add) {
-	grid-row: 1/span 1;
-	grid-column: calc(2 * var(--cui-editorTable-column, 0) + 2) / span 1;
-}
-
-:where(.cui-editorTable-columnControls-add:hover + .cui-editorTable-columnControls-line) {
-	transform: scaleX(4);
-}
-
-:where(.cui-editorTable-rowControls-item:hover),
-:where(.cui-editorTable-columnControls-item:hover) {
-	background-color: #ff6361;
-	color: #FFFFFF;
-}
-
-:where(.cui-editorTable-rowControls-item > * > *),
-:where(.cui-editorTable-columnControls-item > * > *) {
-	font-size: 0.5em;
-}
-
-:where(.cui-editorTable-rowControls-line),
-:where(.cui-editorTable-columnControls-line) {
-	transition-property: background-color, transform;
-	transition-duration: 0.2s, 0.1s;
-}
-
-:where(.cui-editorTable-rowControls-add),
-:where(.cui-editorTable-columnControls-add) {
-	justify-self: center;
-	align-self: center;
-}
-
-:where(.cui-editorTable-rowControls-add > *),
-:where(.cui-editorTable-columnControls-add > *) {
-	transition: transform 0.2s;
-	transform: scale(0.4);
-}
-
-:where(.cui-editorTable-rowControls-add:hover > *),
-:where(.cui-editorTable-columnControls-add:hover > *) {
-	transform: scale(1);
-}
-
-:where(.cui-editorTable-rowControls-add:hover + .cui-editorTable-rowControls-line),
-:where(.cui-editorTable-rowControls-add:hover + .cui-editorTable-columnControls-line),
-:where(.cui-editorTable-columnControls-add:hover + .cui-editorTable-rowControls-line),
-:where(.cui-editorTable-columnControls-add:hover + .cui-editorTable-columnControls-line) {
-	background-color: #6bbdf0;
-	z-index: 1;
-}
-
-:where(.cui-editorTable-rowControls-add > *),
-:where(.cui-editorTable-rowControls-more > *),
-:where(.cui-editorTable-columnControls-add > *),
-:where(.cui-editorTable-columnControls-more > *),
-:where(.cui-editorTable-handle > *),
-:where(.cui-editorTable-remove > *) {
-	transition: transform 0.2s;
-	transform: scale(0.4);
-}
-
-:where(.cui-editorTable-rowControls-add:hover > *),
-:where(.cui-editorTable-rowControls-more:hover > *),
-:where(.cui-editorTable-columnControls-add:hover > *),
-:where(.cui-editorTable-columnControls-more:hover > *),
-:where(.cui-editorTable-handle:hover > *),
-:where(.cui-editorTable-remove:hover > *) {
-	transform: scale(1);
-}
-
 :where(.cui-editorTable-handle) {
 	grid-area: 1/1/span 1/span 1;
 }
 
-:where(.cui-editorTable-remove) {
-	grid-area: 1/-2/span 1/span 1;
-	align-self: center;
-	padding-left: 0.6em;
-	width: 1.5em;
-}
-
 :where(.cui-editorTable-cell) {
-	padding: 0.125em 0.375em;
+	padding: calc(var(--cui-gap) / 2) var(--cui-double-gap);
 }
 
-:where(.cui-editorTable-cell.view-justify-start) {
-	text-align: left;
-}
-
-:where(.cui-editorTable-cell.view-justify-center) {
-	text-align: center;
-}
-
-:where(.cui-editorTable-cell.view-justify-end) {
-	text-align: right;
-}
-
-:where(.cui-editorTable-cell > p) {
-	margin: 0;
-}
-
-:where(.cui-editorTable-cell > p + p) {
-	margin-top: 0.5em;
-}
+:where(.cui-editorTable-cell.view-justify-start) { text-align: left }
+:where(.cui-editorTable-cell.view-justify-center) { text-align: center }
+:where(.cui-editorTable-cell.view-justify-end) { text-align: right }
+:where(.cui-editorTable-cell > p) { margin: 0 }
+:where(.cui-editorTable-cell > p + p) { margin-top: 0.5em }
 
 :where(.cui-editorTable-cell.view-headerScope-row),
 :where(.cui-editorTable-row.view-headerScope-table .cui-editorTable-cell) {
 	font-weight: 700;
-	background: #F9F9F9;
-}
-
-:where(.cui-editorTable-appendRow) {
-	grid-row: -2/span 1;
-	grid-column: 2/-2;
-	border-bottom-left-radius: 0.5em;
-	border-bottom-right-radius: 0.5em;
-}
-
-:where(.cui-editorTable-appendColumn) {
-	grid-row: 2/-2;
-	grid-column: -2/span 1;
-	border-top-right-radius: 0.5em;
-	border-bottom-right-radius: 0.5em;
-}
-
-:where(.cui-editorTable-appendRow),
-:where(.cui-editorTable-appendColumn),
-:where(.cui-editorTable-rowControls-item),
-:where(.cui-editorTable-columnControls-item) {
-	border: none;
-	background: #F4F4F4;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	color: #525252;
-	cursor: pointer;
-	padding: 0;
-}
-
-:where(.cui-editorTable-appendRow),
-:where(.cui-editorTable-appendRow > *),
-:where(.cui-editorTable-appendColumn),
-:where(.cui-editorTable-appendColumn > *),
-:where(.cui-editorTable-rowControls-item),
-:where(.cui-editorTable-rowControls-item > *),
-:where(.cui-editorTable-columnControls-item),
-:where(.cui-editorTable-columnControls-item > *) {
-	transition-property: background-color, color;
-	transition-duration: 0.2s;
-	transition-timing-function: ease-in-out;
-}
-
-:where(.cui-editorTable-appendRow),
-:where(.cui-editorTable-appendColumn) {
-	font-size: 0.6em;
-}
-
-:where(.cui-editorTable-appendRow:hover),
-:where(.cui-editorTable-appendColumn:hover) {
-	background-color: #6bbdf0;
-}
-
-:where(.cui-editorTable-appendRow:hover > *),
-:where(.cui-editorTable-appendColumn:hover > *) {
-	color: #FFFFFF;
+	background: rgba(var(--cui-color--rgb-100), var(--cui-opacity--lower));
 }
 
 :where(.cui-editorTable-handle:hover > *) {
 	transform: scale(1);
 }
+:where(.cui-editorTable-remove) {
+	grid-row: 1/1;
+	grid-column: -2/span 1;
+	position: relative;
+}
+:where(.cui-editorTable-remove > .cui-button) {
+	position: absolute;
+	right: calc(-1 * var(--cui-gap));
+	top: calc(-1 * var(--cui-gap));
+	transform: translateY(calc(-1 * var(--cui-gutter)));
+	transition-duration: var(--cui-transition-duration--immediate);
+	transition-property: opacity, visibility, pointer-events, transform;
+	visibility: hidden;
+}
 
-:where(.cui-editorTable-rowControls-add),
-:where(.cui-editorTable-rowControls-item),
-:where(.cui-editorTable-rowControls-more),
-:where(.cui-editorTable-columnControls-add),
-:where(.cui-editorTable-columnControls-item),
-:where(.cui-editorTable-columnControls-more),
+:where(.cui-editorTable:not(.is-selected):hover .cui-editorTable-remove > .cui-button) {
+	opacity: 1;
+	transform: translateX(0);
+	visibility: visible;
+}
+
+:where(.cui-editorTable-lineAddButton) {
+	position: absolute;
+	pointer-events: none;
+}
+
+:where(.cui-editorTable-lineAddButton),
+:where(.cui-editorTable-columnControls),
+:where(.cui-editorTable-rowControls-after),
+:where(.cui-editorTable-rowControls-before),
 :where(.cui-editorTable-appendRow),
 :where(.cui-editorTable-appendColumn),
-:where(.cui-editorTable-handle),
-:where(.cui-editorTable-remove) {
-	transition-property: visibility, opacity;
-	transition-duration: 0.2s;
+:where(.cui-editorTable-handle) {
+	transition-property: opacity;
+	transition-duration: var(--cui-transition-duration--immediate);
 	visibility: hidden;
 	opacity: 0;
 }
 
-:where(.cui-editorTable.is-selected .cui-editorTable-rowControls-add),
-:where(.cui-editorTable.is-selected .cui-editorTable-rowControls-item),
-:where(.cui-editorTable.is-selected .cui-editorTable-rowControls-more),
-:where(.cui-editorTable.is-selected .cui-editorTable-columnControls-add),
-:where(.cui-editorTable.is-selected .cui-editorTable-columnControls-item),
-:where(.cui-editorTable.is-selected .cui-editorTable-columnControls-more),
+:where(.cui-editorTable-rowLineControls-line-inner:hover .cui-editorTable-lineAddButton),
+:where(.cui-editorTable-columnLineControls-line-inner:hover .cui-editorTable-lineAddButton),
+:where(.cui-editorTable.is-selected .cui-editorTable-columnControls),
+:where(.cui-editorTable.is-selected .cui-editorTable-rowControls-after),
+:where(.cui-editorTable.is-selected .cui-editorTable-rowControls-before),
 :where(.cui-editorTable.is-selected .cui-editorTable-appendRow),
 :where(.cui-editorTable.is-selected .cui-editorTable-appendColumn),
-:where(.cui-editorTable.is-selected .cui-editorTable-handle),
-:where(.cui-editorTable.is-selected .cui-editorTable-remove),
-:where(.cui-editorTable.is-focused .cui-editorTable-rowControls-add),
-:where(.cui-editorTable.is-focused .cui-editorTable-rowControls-item),
-:where(.cui-editorTable.is-focused .cui-editorTable-rowControls-more),
-:where(.cui-editorTable.is-focused .cui-editorTable-columnControls-add),
-:where(.cui-editorTable.is-focused .cui-editorTable-columnControls-item),
-:where(.cui-editorTable.is-focused .cui-editorTable-columnControls-more),
-:where(.cui-editorTable.is-focused .cui-editorTable-appendRow),
-:where(.cui-editorTable.is-focused .cui-editorTable-appendColumn),
-:where(.cui-editorTable.is-focused .cui-editorTable-handle),
-:where(.cui-editorTable.is-focused .cui-editorTable-remove),
-:where(.cui-editorTable:hover .cui-editorTable-rowControls-add),
-:where(.cui-editorTable:hover .cui-editorTable-rowControls-item),
-:where(.cui-editorTable:hover .cui-editorTable-rowControls-more),
-:where(.cui-editorTable:hover .cui-editorTable-columnControls-add),
-:where(.cui-editorTable:hover .cui-editorTable-columnControls-item),
-:where(.cui-editorTable:hover .cui-editorTable-columnControls-more),
-:where(.cui-editorTable:hover .cui-editorTable-appendRow),
-:where(.cui-editorTable:hover .cui-editorTable-appendColumn),
-:where(.cui-editorTable:hover .cui-editorTable-handle),
-:where(.cui-editorTable:hover .cui-editorTable-remove) {
+:where(.cui-editorTable.is-selected .cui-editorTable-handle) {
 	opacity: 1;
 	visibility: visible;
 }

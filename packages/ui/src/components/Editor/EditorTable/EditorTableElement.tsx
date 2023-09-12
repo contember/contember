@@ -1,9 +1,21 @@
 import { useClassNameFactory } from '@contember/react-utils'
-import { CSSProperties, Fragment, memo, ReactNode } from 'react'
-import { Icon } from '../../../deprecated/Icon'
+import { dataAttribute, range } from '@contember/utilities'
+import {
+	AlignCenterIcon,
+	AlignLeftIcon,
+	AlignRightIcon,
+	HeadingIcon,
+	MoreHorizontalIcon,
+	MoreVerticalIcon,
+	Trash2Icon,
+	TrashIcon,
+} from 'lucide-react'
+import { CSSProperties, Fragment, memo, MouseEvent, ReactNode, useCallback, useEffect, useRef, useState } from 'react'
 import { toStateClass } from '../../../utils'
-import { Dropdown } from '../../Dropdown/Dropdown'
-import { Button, ButtonGroup } from '../../Forms'
+import { Divider } from '../../Divider'
+import { Dropdown } from '../../Dropdown'
+import { Button, ButtonGroup, ButtonProps } from '../../Forms'
+import { AddColumnAfterIcon, AddColumnBeforeIcon, AddRowAboveIcon, AddRowBelowIcon } from '../../LucideIcons'
 
 export interface EditorTableElementProps {
 	rowCount: number
@@ -14,7 +26,6 @@ export interface EditorTableElementProps {
 	toggleColumnHeaderScope: (index: number, scope: 'row') => void // Only a few ops supported for now
 	justifyColumn: (index: number, direction: 'start' | 'center' | 'end' | undefined) => void
 	deleteTable: () => void
-	//selectTable: () => void
 	isSelected: boolean
 	isFocused: boolean
 	children: ReactNode
@@ -29,15 +40,16 @@ export const EditorTableElement = memo(function EditorTableElement({
 	toggleColumnHeaderScope,
 	justifyColumn,
 	deleteTable,
-	//selectTable,
 	isSelected,
 	isFocused,
 	children,
 }: EditorTableElementProps) {
 	const componentClassName = useClassNameFactory('editorTable')
+	const [hover, onMouseMoveCapture] = useHoverOnSlowMove()
 
 	return (
 		<div
+			data-hover={dataAttribute(hover)}
 			className={componentClassName(null, [toStateClass('focused', isFocused), toStateClass('selected', isSelected)])}
 			style={
 				{
@@ -45,160 +57,180 @@ export const EditorTableElement = memo(function EditorTableElement({
 					['--cui-editorTable-columnCount']: columnCount,
 				} as CSSProperties
 			}
+			onMouseMoveCapture={onMouseMoveCapture}
 		>
-			<div className={componentClassName('handle')} contentEditable={false}>
-				{/*<Button onClick={selectTable} square borderRadius="full" size="small" distinction="seamless">*/}
-				{/*	<Icon blueprintIcon="selection" />*/}
-				{/*</Button>*/}
-			</div>
+			{range(0, columnCount).map(columnNumber => (
+				<Fragment key={columnNumber}>
+					<div
+						contentEditable={false}
+						className={componentClassName('columnLineControls')}
+						style={{ ['--cui-editorTable-column']: columnNumber } as CSSProperties}
+					>
+						<div className={componentClassName('columnLineControls-before')} />
+						<div className={componentClassName('columnLineControls-line')} onClick={() => extendTable('column', columnNumber)}>
+							<div className={componentClassName('columnLineControls-line-inner')} />
+						</div>
+					</div>
+
+					{columnNumber < columnCount && (
+						<div
+							className={componentClassName('columnControls')}
+							contentEditable={false}
+							style={{ ['--cui-editorTable-column']: columnNumber } as CSSProperties}
+						>
+							<Dropdown
+								buttonProps={moreHorizontalButtonProps}
+								styledContent={false}
+							>
+								<ButtonGroup display="block">
+									{columnNumber === 0 && (
+										<>
+											<Button {...commonButtonProps} onClick={() => toggleColumnHeaderScope(columnNumber, 'row')}>
+												<HeadingIcon scale={0.75} />
+											</Button>
+											<Divider gap={false} padding="gap" />
+										</>
+									)}
+									<Button {...commonButtonProps} onClick={() => justifyColumn(columnNumber, 'start')}>
+										<AlignLeftIcon scale={0.75} />
+									</Button>
+									<Button {...commonButtonProps} onClick={() => justifyColumn(columnNumber, 'center')}>
+										<AlignCenterIcon scale={0.75} />
+									</Button>
+									<Button {...commonButtonProps} onClick={() => justifyColumn(columnNumber, 'end')}>
+										<AlignRightIcon scale={0.75} />
+									</Button>
+
+									<Divider gap={false} padding="gap" />
+
+									<Button {...commonButtonProps} onClick={() => extendTable('column', columnNumber)}>
+										<AddColumnBeforeIcon />
+									</Button>
+									<Button {...commonButtonProps} onClick={() => extendTable('column', columnNumber + 1)}>
+										<AddColumnAfterIcon />
+									</Button>
+
+
+									<Divider gap={false} padding="gap" />
+
+									<Button {...commonButtonProps} intent="danger" onClick={() => shrinkTable('column', columnNumber)}>
+										<TrashIcon scale={0.75} />
+									</Button>
+								</ButtonGroup>
+							</Dropdown>
+						</div>
+					)}
+				</Fragment>
+			))}
+
 			<div className={componentClassName('remove')} contentEditable={false}>
-				<Button onClick={deleteTable} square borderRadius="full" size="small" distinction="seamless">
-					<Icon blueprintIcon="trash" />
-				</Button>
+				{!isSelected && (
+					<Button {...commonButtonProps} onClick={deleteTable} intent="danger">
+						<Trash2Icon />
+					</Button>
+				)}
 			</div>
-			<div className={componentClassName('columnControls')} contentEditable={false}>
-				{Array.from({ length: columnCount + 1 }, (_, columnNumber) => {
-					const columnStyle = { ['--cui-editorTable-column']: columnNumber } as CSSProperties
-					return (
-						<Fragment key={columnNumber}>
-							{columnNumber < columnCount ? (
+
+			{range(0, rowCount).map(rowNumber => (
+				<Fragment key={rowNumber}>
+					<div
+						className={componentClassName('rowLineControls')}
+						contentEditable={false}
+						style={{ ['--cui-editorTable-row']: rowNumber } as CSSProperties}
+					>
+						<div className={componentClassName('rowLineControls-line')} onClick={() => extendTable('row', rowNumber)}>
+							<div className={componentClassName('rowLineControls-line-inner')} />
+						</div>
+						<div className={componentClassName('rowLineControls-after')} />
+					</div>
+
+					{rowNumber < rowCount && (
+						<div
+							className={componentClassName('rowControls')}
+							contentEditable={false}
+							style={{ ['--cui-editorTable-row']: rowNumber } as CSSProperties}
+						>
+							<div className={componentClassName('rowControls-after')}>
 								<Dropdown
-									buttonProps={{
-										borderRadius: 'full',
-										children: <Icon blueprintIcon="more" />,
-										className: componentClassName('columnControls-more'),
-										distinction: 'seamless',
-										size: 'small',
-										square: true,
-										style: columnStyle,
-									}}
+									buttonProps={moreVerticalButtonProps}
 									styledContent={false}
+									placement="left"
 								>
 									<ButtonGroup display="block">
-										{columnNumber === 0 && (
-											<Button square borderRadius="full" size="small" onClick={() => toggleColumnHeaderScope(columnNumber, 'row')}>
-												<Icon blueprintIcon="header" size="small" />
-											</Button>
+										{rowNumber === 0 && (
+											<>
+												<Button {...commonButtonProps} onClick={() => toggleRowHeaderScope(rowNumber, 'table')}>
+													<HeadingIcon scale={0.75} />
+												</Button>
+												<Divider gap={false} padding="gap" />
+											</>
 										)}
-										<Button square borderRadius="full" size="small" onClick={() => justifyColumn(columnNumber, 'start')}>
-											<Icon blueprintIcon="align-left" size="small" />
+										<Button {...commonButtonProps} onClick={() => extendTable('row', rowNumber)}>
+											<AddRowAboveIcon />
 										</Button>
-										<Button square borderRadius="full" size="small" onClick={() => justifyColumn(columnNumber, 'center')}>
-											<Icon blueprintIcon="align-center" size="small" />
+										<Button {...commonButtonProps} onClick={() => extendTable('row', rowNumber + 1)}>
+											<AddRowBelowIcon />
 										</Button>
-										<Button square borderRadius="full" size="small" onClick={() => justifyColumn(columnNumber, 'end')}>
-											<Icon blueprintIcon="align-right" size="small" />
+
+										<Divider gap={false} padding="gap" />
+										<Button
+											{...commonButtonProps}
+											intent="danger"
+											onClick={() => shrinkTable('row', rowNumber)}
+										>
+											<TrashIcon scale={0.8} />
 										</Button>
 									</ButtonGroup>
 								</Dropdown>
-							) : (
-								<span className={componentClassName('stub')} />
-							)}
-							{columnNumber < columnCount ? (
-								<button
-									type="button"
-									onClick={() => shrinkTable('column', columnNumber)}
-									className={componentClassName('columnControls-item', [
-										columnNumber === 0 && componentClassName('columnControls-item-first'),
-										columnNumber === columnCount - 1 && componentClassName('columnControls-item-last'),
-									])}
-									style={columnStyle}
-								>
-									<Icon blueprintIcon="trash" />
-								</button>
-							) : (
-								<span className={componentClassName('stub')} />
-							)}
-							<Button
-								onClick={() => extendTable('column', columnNumber)}
-								className={componentClassName('columnControls-add')}
-								square
-								borderRadius="full"
-								size="small"
-								distinction="seamless"
-								style={columnStyle}
-							>
-								<Icon blueprintIcon="plus" />
-							</Button>
-							<div className={componentClassName('columnControls-line')} style={columnStyle} />
-						</Fragment>
-					)
-				})}
-			</div>
-			<div className={componentClassName('rowControls')} contentEditable={false}>
-				{Array.from({ length: rowCount + 1 }, (_, rowNumber) => {
-					const rowStyle = { ['--cui-editorTable-row']: rowNumber } as CSSProperties
-					return (
-						<Fragment key={rowNumber}>
-							{rowNumber < rowCount && rowNumber === 0 ? (
-								<Dropdown
-									buttonProps={{
-										borderRadius: 'full',
-										children: <Icon blueprintIcon="more" />,
-										className: componentClassName('rowControls-more'),
-										distinction: 'seamless',
-										size: 'small',
-										square: true,
-										style: rowStyle,
-									}}
-									styledContent={false}
-									alignment="right"
-								>
-									<Button square borderRadius="full" size="small" onClick={() => toggleRowHeaderScope(rowNumber, 'table')}>
-										<Icon blueprintIcon="header" size="small" />
-									</Button>
-								</Dropdown>
-							) : (
-								<span className={componentClassName('stub')} />
-							)}
-							{rowNumber < rowCount ? (
-								<button
-									type="button"
-									onClick={() => shrinkTable('row', rowNumber)}
-									className={componentClassName('rowControls-item', [
-										rowNumber === 0 && componentClassName('rowControls-item-first'),
-										rowNumber === rowCount - 1 && componentClassName('rowControls-item-last'),
-									])}
-									style={rowStyle}
-								>
-									<Icon blueprintIcon="trash" />
-								</button>
-							) : (
-								<span className={componentClassName('stub')} />
-							)}
-							<Button
-								onClick={() => extendTable('row', rowNumber)}
-								className={componentClassName('rowControls-add')}
-								square
-								borderRadius="full"
-								size="small"
-								distinction="seamless"
-								style={rowStyle}
-							>
-								<Icon blueprintIcon="plus" />
-							</Button>
-							<div className={componentClassName('rowControls-line')} style={rowStyle} />
-						</Fragment>
-					)
-				})}
-			</div>
-			<button
-				type="button"
-				className={componentClassName('appendColumn')}
-				onClick={() => extendTable('column')}
-				contentEditable={false}
-			>
-				<Icon blueprintIcon="plus" />
-			</button>
-			<button
-				type="button"
-				className={componentClassName('appendRow')}
-				onClick={() => extendTable('row')}
-				contentEditable={false}
-			>
-				<Icon blueprintIcon="plus" />
-			</button>
+							</div>
+						</div>
+					)}
+				</Fragment>
+			))}
 			{children}
-		</div>
+		</div >
 	)
 })
+
+function useHoverOnSlowMove(maxDistanceChange: number = 4) {
+	const timeoutId = useRef<ReturnType<typeof setTimeout> | undefined>()
+	const [hoverActive, setHoverActive] = useState(true)
+
+	useEffect(() => () => {
+		clearTimeout(timeoutId.current)
+	}, [])
+
+	const onMouseMoveCapture = useCallback((event: MouseEvent<HTMLDivElement>) => {
+		const distance = Math.sqrt(event.movementX ** 2 + event.movementY ** 2)
+
+		if (distance > maxDistanceChange) {
+			clearTimeout(timeoutId.current)
+			setHoverActive(false)
+			timeoutId.current = setTimeout(() => setHoverActive(true), 300)
+		}
+	}, [maxDistanceChange])
+
+	return [hoverActive, onMouseMoveCapture] as const
+}
+
+const commonButtonProps: ButtonProps = {
+	borderRadius: 'full',
+	padding: 'gap',
+	square: true,
+} as const
+
+const moreVerticalButtonProps: ButtonProps = {
+	...commonButtonProps,
+	accent: false,
+	children: <MoreVerticalIcon />,
+	distinction: 'seamless',
+	size: 'small',
+} as const
+
+const moreHorizontalButtonProps: ButtonProps = {
+	...commonButtonProps,
+	accent: false,
+	children: <MoreHorizontalIcon />,
+	distinction: 'seamless',
+	size: 'small',
+} as const

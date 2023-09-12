@@ -1,25 +1,26 @@
 import {
 	Editor,
-	Node as SlateNode,
+	Element,
 	NodeEntry,
-	Path as SlatePath,
 	Point,
+	Node as SlateNode,
+	Path as SlatePath,
 	Range as SlateRange,
 	Text,
 	Transforms,
-	Element,
 } from 'slate'
 import { ContemberEditor } from '../../../ContemberEditor'
-import { isTableCellElement, TableCellElement, tableCellElementPlugin } from './TableCellElement'
+import { TableCellElement, isTableCellElement, tableCellElementPlugin } from './TableCellElement'
 import {
+	TableElement,
 	getTableElementColumnCount,
 	getTableElementRowCount,
 	isTableElement,
-	TableElement,
 	tableElementPlugin,
 } from './TableElement'
-import { isTableRowElement, tableRowElementPlugin } from './TableRowElement'
 import { getTableCellCoordinates, selectTableCellContents } from './TableElementSelection'
+import { TableModifications } from './TableModifications'
+import { isTableRowElement, tableRowElementPlugin } from './TableRowElement'
 
 export const withTables = <E extends Editor>(editor: E): E => {
 	const {
@@ -118,7 +119,9 @@ export const withTables = <E extends Editor>(editor: E): E => {
 					event.key === 'ArrowUp' ||
 					event.key === 'ArrowRight' ||
 					event.key === 'ArrowDown' ||
-					event.key === 'ArrowLeft'
+					event.key === 'ArrowLeft' ||
+					event.key === 'Enter' ||
+					event.key === 'Backspace'
 				)
 			) {
 				return onKeyDown(event)
@@ -278,6 +281,60 @@ export const withTables = <E extends Editor>(editor: E): E => {
 						})
 					}
 					return moveSelectionAfterTable()
+				}
+			} else if (event.ctrlKey || event.metaKey) {
+				if (event.key === 'Backspace') {
+					event.preventDefault()
+
+					if (event.altKey) {
+						TableModifications.deleteTableColumn(editor, tableElement, columnIndex)
+
+						if (columnCount > 1) {
+							const columnBefore = Editor.start(editor, [...tablePath, rowIndex, Math.max(0, columnIndex - 1)])
+
+							return Transforms.select(editor, columnBefore)
+						} else {
+							return moveSelectionBeforeTable()
+						}
+					} else {
+						TableModifications.deleteTableRow(editor, tableElement, rowIndex)
+
+						if (rowCount > 1) {
+							const rowAbove = Editor.start(editor, [...tablePath, Math.max(0, rowIndex - 1), columnIndex])
+
+							return Transforms.select(editor, rowAbove)
+						} else {
+							return moveSelectionBeforeTable()
+						}
+					}
+				} else if (event.key === 'Enter') {
+					event.preventDefault()
+
+					if (event.altKey) {
+						if (event.shiftKey) {
+							TableModifications.addTableColumn(editor, tableElement, columnIndex)
+							const columnBefore = Editor.start(editor, [...tablePath, rowIndex, Math.max(0, columnIndex)])
+
+							return Transforms.select(editor, columnBefore)
+						} else {
+							TableModifications.addTableColumn(editor, tableElement, columnIndex + 1)
+							const columnAfter = Editor.start(editor, [...tablePath, rowIndex, columnIndex + 1])
+
+							return Transforms.select(editor, columnAfter)
+						}
+					} else {
+						if (event.shiftKey) {
+							TableModifications.addTableRow(editor, tableElement, rowIndex)
+							const rowAbove = Editor.start(editor, [...tablePath, Math.max(0, rowIndex), columnIndex])
+
+							return Transforms.select(editor, rowAbove)
+						} else {
+							TableModifications.addTableRow(editor, tableElement, rowIndex + 1)
+							const rowBelowStat = Editor.start(editor, [...tablePath, rowIndex + 1, columnIndex])
+
+							return Transforms.select(editor, rowBelowStat)
+						}
+					}
 				}
 			}
 			onKeyDown(event)

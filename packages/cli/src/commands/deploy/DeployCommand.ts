@@ -79,7 +79,9 @@ export class DeployCommand extends Command<Args, Options> {
 
 		const projectAdminDistDir = `${project.adminDir}/dist`
 
-		if (adminEndpoint && input.getOption('no-admin') !== true && !(await pathExists(`${projectAdminDistDir}/index.html`))) {
+		const noAdmin = input.getOption('no-admin') === true
+
+		if (adminEndpoint && !noAdmin && !(await pathExists(`${projectAdminDistDir}/index.html`))) {
 			throw `Missing ${projectAdminDistDir}/index.html. Please build admin before deploying.`
 		}
 
@@ -108,7 +110,7 @@ export class DeployCommand extends Command<Args, Options> {
 				}
 				console.log('Following migrations will be executed:')
 				console.log(status.migrationsToExecute.length ? status.migrationsToExecute.map(it => it.name).join(' ') : 'none')
-				console.log(adminEndpoint ? 'Admin will be deployed.' : 'Admin will NOT be deployed.')
+				console.log(adminEndpoint && !noAdmin ? 'Admin will be deployed.' : 'Admin will NOT be deployed.')
 				console.log('(to skip this dialog, you can pass --yes option)')
 				console.log('')
 				const { ok } = await prompts({
@@ -134,7 +136,7 @@ export class DeployCommand extends Command<Args, Options> {
 			}
 		}
 
-		if (adminEndpoint && input.getOption('no-admin') !== true) {
+		if (adminEndpoint && !noAdmin) {
 			console.log('Deploying admin...')
 
 			const client = AdminClient.create(adminEndpoint, apiToken)

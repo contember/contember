@@ -249,6 +249,17 @@
 	stroke: none;
 }
 
+:where([data-overrides-lucide-icons] .lucide[scale^="0.0"]) { --cui-scale: 0.0 }
+:where([data-overrides-lucide-icons] .lucide[scale^="0.1"]) { --cui-scale: 0.1 }
+:where([data-overrides-lucide-icons] .lucide[scale^="0.2"]) { --cui-scale: 0.2 }
+:where([data-overrides-lucide-icons] .lucide[scale^="0.3"]) { --cui-scale: 0.3 }
+:where([data-overrides-lucide-icons] .lucide[scale^="0.4"]) { --cui-scale: 0.4 }
+:where([data-overrides-lucide-icons] .lucide[scale^="0.5"]) { --cui-scale: 0.5 }
+:where([data-overrides-lucide-icons] .lucide[scale^="0.6"]) { --cui-scale: 0.6 }
+:where([data-overrides-lucide-icons] .lucide[scale^="0.7"]) { --cui-scale: 0.7 }
+:where([data-overrides-lucide-icons] .lucide[scale^="0.8"]) { --cui-scale: 0.8 }
+:where([data-overrides-lucide-icons] .lucide[scale^="0.9"]) { --cui-scale: 0.9 }
+
 :where([data-overrides-lucide-icons] .lucide[scale="1"]) { --cui-scale: 1 }
 :where([data-overrides-lucide-icons] .lucide[scale^="1.0"]) { --cui-scale: 1.0 }
 :where([data-overrides-lucide-icons] .lucide[scale^="1.1"]) { --cui-scale: 1.1 }

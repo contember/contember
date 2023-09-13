@@ -17,9 +17,13 @@
 	min-width: min(100%, var(--panel-min-width, 0px));
 	opacity: 1;
 	transform: translateZ(0px); /* Fixes Safari drawing scroll bar below */
+}
+
+:where(.cui-layout-panel[data-transitioning]) {
+	overflow: hidden;
 	transition-duration: var(--cui-transition-duration);
-	transition-property: transform, opacity;
-	transition-timing-function: ease-in;
+	transition-property: transform, opacity, max-width, min-width, flex-basis;
+	transition-timing-function: ease-in-out;
 }
 
 :where([data-suppress-focus-ring] .cui-layout-panel) {
@@ -34,10 +38,14 @@
 	flex-grow: 1;
 	flex-shrink: 1;
 	gap: var(--cui-padding--panel-vertical);
+	height: var(--transitioning-height);
+	inset: 0px;
 	overflow: auto;
 	overscroll-behavior: none;
+	position: absolute;
 	scroll-padding-bottom: var(--panel-footer-height);
 	scroll-padding-top: var(--panel-header-height);
+	width: var(--transitioning-width);
 }
 
 :where(.cui-layout-panel-content > .cui-layout-panel-content-inner) {
@@ -76,14 +84,17 @@
 }
 
 :where(.cui-layout-panel[data-behavior="modal"]) {
-	background: rgba(0, 0, 0, 0.2);
 	z-index: 4;
 }
 
-:where(
-	.cui-layout-panel[data-behavior="modal"][data-visibility="visible"]
-) {
+:where(.cui-layout-panel[data-behavior="modal"][data-visibility="hidden"]) {
+	pointer-events: none;
+	transform: translate(0px, 100vh);
+}
+
+:where(.cui-layout-panel[data-behavior="modal"][data-visibility="visible"]) {
 	pointer-events: all;
+	transform: translate(0px, 0px);
 }
 
 :where(
@@ -101,21 +112,12 @@
 	pointer-events: none;
 }
 
-:where(
-	.cui-layout-panel,
-):where(
-	[data-visibility="hidden"],
-	[data-visibility="will-become-hidden"],
-) {
+:where(.cui-layout-panel[data-visibility="hidden"]) {
 	pointer-events: none;
 	opacity: 0;
 }
 
-:where(
-	.cui-layout-panel,
-):where(
-	[data-visibility="hidden"]
-) {
+:where(.cui-layout-panel[data-visibility="hidden"]:not([data-transitioning])) {
 	visibility: hidden;
 	content-visibility: hidden;
 }
@@ -127,7 +129,7 @@
 	[data-behavior="static"],
 ):where(
 	[data-visibility="hidden"],
-	[data-visibility="will-become-hidden"],
+	/* [data-transitioning="hidden"], */
 ) {
 	flex-basis: 0px;
 	max-width: 0px;
@@ -181,9 +183,6 @@
 	flex: 1;
 	min-height: 0px;
 	min-width: 0px;
-	transition-property: transform, opacity;
-	transition-timing-function: ease-in;
-	transition-duration: var(--cui-transition-duration);
 }
 
 :where(.cui-layout-panel-footer) {
@@ -228,4 +227,18 @@
 	flex-direction: column;
 	gap: var(--cui-gutter);
 	flex: 1;
+}
+
+:where(
+	.cui-layout-panel-header:not([data-behavior="modal"]) > .cui-layout-panel-header-content,
+	.cui-layout-panel-body:not([data-behavior="modal"]) > .cui-layout-panel-body-content,
+	.cui-layout-panel-footer:not([data-behavior="modal"]) > .cui-layout-panel-footer-content,
+) {
+	margin: auto;
+	max-width: var(--panel-max-width);
+	min-width: min(
+		calc(100% - 2 * var(--cui-padding--panel-horizontal)),
+		var(--panel-min-width),
+	);
+	width: 100%;
 }

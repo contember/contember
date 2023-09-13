@@ -6,6 +6,7 @@ import { NotModifiedChecker } from './NotModifiedChecker'
 import { ContentGraphQLContextFactory } from './ContentGraphQLContextFactory'
 import { ContentQueryHandler, ContentQueryHandlerFactory } from './ContentQueryHandlerFactory'
 import { GraphQLSchema } from 'graphql'
+import { GraphQLKoaState } from '../graphql'
 
 const debugHeader = 'x-contember-debug'
 
@@ -103,6 +104,10 @@ export class ContentApiControllerFactory {
 					request: koa.request,
 					response: koa.response,
 					createContext: ({ operation }) => {
+						(koa.state as GraphQLKoaState).graphql = {
+							operationName: operation,
+						}
+
 						const connection = operation === 'query' ? projectContainer.readConnection : projectContainer.connection
 						const contentDatabase = connection.createClient(stage.schema, { module: 'content' })
 
@@ -114,7 +119,6 @@ export class ContentApiControllerFactory {
 							schemaDatabaseMetadata,
 							schema,
 							timer,
-							koaContext: koa,
 							requestDebug,
 							systemSchema: projectContainer.systemDatabaseContextFactory.schemaName,
 							stage,

@@ -1,16 +1,13 @@
 import { Identity, SystemContainer } from '@contember/engine-system-api'
 import { SystemGraphQLContext } from './SystemGraphQLHandlerFactory'
 import { AuthResult } from '../common'
-import { KoaContext } from '../application'
-import { GraphQLKoaState } from '../graphql'
 import { Acl } from '@contember/schema'
 import { ProjectContainer } from '../project'
 
 export class SystemGraphQLContextFactory {
-	public async create({ authResult, memberships, koaContext, projectContainer, systemContainer, onClearCache }: {
+	public async create({ authResult, memberships,  projectContainer, systemContainer, onClearCache }: {
 		authResult: AuthResult
 		memberships: readonly Acl.Membership[]
-		koaContext: KoaContext<GraphQLKoaState>
 		projectContainer: ProjectContainer
 		systemContainer: SystemContainer
 		onClearCache: () => void
@@ -31,7 +28,6 @@ export class SystemGraphQLContextFactory {
 		return {
 			...systemContext,
 			onClearCache,
-			koaContext,
 		}
 	}
 }

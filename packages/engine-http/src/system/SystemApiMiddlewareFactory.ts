@@ -2,6 +2,7 @@ import { HttpController } from '../application'
 import { ProjectContextResolver } from '../project-common'
 import { HttpErrorResponse } from '../common'
 import { SystemGraphQLContextFactory } from './SystemGraphQLContextFactory'
+import { GraphQLKoaState } from '../graphql'
 
 
 export class SystemApiMiddlewareFactory {
@@ -48,7 +49,6 @@ export class SystemApiMiddlewareFactory {
 				const graphqlContext = await this.systemGraphqlContextFactory.create({
 					authResult,
 					memberships,
-					koaContext: koa,
 					projectContainer,
 					systemContainer: projectGroup.systemContainer,
 					onClearCache: () => {
@@ -60,7 +60,13 @@ export class SystemApiMiddlewareFactory {
 				await timer('GraphQL', () => handler({
 					request: koa.request,
 					response: koa.response,
-					createContext: () => graphqlContext,
+					createContext: ({ operation }) => {
+						(koa.state as GraphQLKoaState).graphql = {
+							operationName: operation,
+						}
+
+						return graphqlContext
+					},
 				}))
 				logger.debug('System query finished')
 			})

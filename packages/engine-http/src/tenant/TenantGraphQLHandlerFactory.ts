@@ -1,14 +1,8 @@
 import { makeExecutableSchema } from '@graphql-tools/schema'
 import { Schema, TenantResolverContext, typeDefs } from '@contember/engine-tenant-api'
-import { KoaContext } from '../application'
-import {
-	createGraphQLQueryHandler,
-	createGraphqlRequestInfoProviderListener,
-	GraphQLKoaState,
-	GraphQLQueryHandler,
-} from '../graphql'
+import { createGraphQLQueryHandler, GraphQLQueryHandler } from '../graphql'
 
-export type TenantGraphQLContext = TenantResolverContext & { identityId: string; koaContext: KoaContext<GraphQLKoaState> }
+export type TenantGraphQLContext = TenantResolverContext & { identityId: string }
 
 export type TenantGraphQLHandler = GraphQLQueryHandler<TenantGraphQLContext>
 
@@ -24,9 +18,7 @@ export class TenantGraphQLHandlerFactory {
 		})
 		return createGraphQLQueryHandler<TenantGraphQLContext>({
 			schema,
-			listeners: [
-				createGraphqlRequestInfoProviderListener(),
-			],
+			listeners: [],
 		})
 	}
 }

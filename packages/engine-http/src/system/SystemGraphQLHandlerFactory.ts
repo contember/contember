@@ -1,22 +1,10 @@
 import { devTypeDefs, ResolverFactory, SystemResolverContext, typeDefs } from '@contember/engine-system-api'
-import {
-	createDbQueriesListener,
-	createGraphQLQueryHandler,
-	createGraphqlRequestInfoProviderListener,
-	GraphQLKoaState,
-	GraphQLListener,
-	GraphQLQueryHandler,
-} from '../graphql'
-import { KoaContext } from '../application'
+import { createDbQueriesListener, createGraphQLQueryHandler, GraphQLListener, GraphQLQueryHandler } from '../graphql'
 import { DocumentNode } from 'graphql'
 import { mergeTypeDefs } from '@graphql-tools/merge'
 import { makeExecutableSchema } from '@graphql-tools/schema'
 
-type KoaState =
-	& GraphQLKoaState
-
 export type SystemGraphQLContext = SystemResolverContext & {
-	koaContext: KoaContext<KoaState>
 	onClearCache: () => void
 }
 
@@ -40,9 +28,7 @@ export class SystemGraphQLHandlerFactory {
 			resolvers,
 		})
 
-		const listeners: GraphQLListener<SystemGraphQLContext>[] = [
-			createGraphqlRequestInfoProviderListener(),
-		]
+		const listeners: GraphQLListener<SystemGraphQLContext>[] = []
 		if (this.debugMode) {
 			listeners.push({
 				onResponse: ({ context }) => {

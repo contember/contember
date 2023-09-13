@@ -4,3 +4,9 @@
 	content: var(--cui-editorParagraph-counter-prefix, "(") counter(cui-editorParagraph-counter) var(--cui-editorParagraph-counter-suffix, ")");
 	counter-increment: cui-editorParagraph-counter;
 }
+
+/* <Safari.workaround render-bug> */
+:where(.cui-editorParagraph [data-slate-placeholder="true"]) {
+	display: inline !important;
+}
+/* </Safari.workaround render-bug> */

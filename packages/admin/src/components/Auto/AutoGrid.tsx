@@ -42,7 +42,7 @@ const createDataGridColumns = (
 		<GenericCell key="action" shrunk>
 			<Stack horizontal>
 				{createEditLinkTarget && (
-					<LinkButton to={createEditLinkTarget(entityName)} distinction="seamless" size="small">
+					<LinkButton accent="strong" to={createEditLinkTarget(entityName)} distinction="seamless" size="small">
 						edit
 					</LinkButton>
 				)}

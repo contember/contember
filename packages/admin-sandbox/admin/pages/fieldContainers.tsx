@@ -1,5 +1,5 @@
 import { Button, ButtonGroup, Divider, FieldContainer, Label, Stack, TextInput } from '@contember/ui'
-import { AlignCenterHorizontalIcon, AlignCenterVerticalIcon, AlignEndHorizontalIcon, AlignEndVerticalIcon, AlignStartHorizontalIcon, AlignStartVerticalIcon, ColumnsIcon, RowsIcon, StretchHorizontalIcon } from 'lucide-react'
+import { AlignCenterVerticalIcon, AlignEndVerticalIcon, AlignStartVerticalIcon, ColumnsIcon, RowsIcon, StretchHorizontalIcon } from 'lucide-react'
 import { useState } from 'react'
 import { SlotSources } from '../components/Slots'
 

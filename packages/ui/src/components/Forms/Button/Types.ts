@@ -19,6 +19,7 @@ export interface AnchorBasedProps extends Omit<HTMLAnchorElementProps, 'ref' | '
 }
 
 export interface ButtonOwnProps extends DeprecatedButtonOwnProps, ComponentClassNameProps {
+	accent?: false | 'strong' | 'theme'
 	active?: boolean
 	align?: 'start' | 'center' | 'end' | 'stretch'
 	borderRadius?: Exclude<StackOwnProps['gap'], 'large' | 'larger'> | 'full'
@@ -88,7 +89,7 @@ export type ButtonGroupOrientation = Default | 'horizontal' | 'vertical'
 export type DeprecatedButtonDefault = Default
 /** @deprecated No alternative */
 export interface DeprecatedButtonOwnProps {
-	/** @deprecated Use `distinction` instead to suppress button visuals */
+	/** @deprecated Use `distinction`, `theme` or `accent={false}` props instead to suppress button visuals */
 	bland?: boolean
 	/** @deprecated Use `elevated` instead */
 	elevation?: ButtonElevation

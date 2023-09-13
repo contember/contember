@@ -1,56 +1,81 @@
 :where(.cui-button) {
-	--cui-line-height: var(--cui-line-height--controls);
+	----background-color-opacity--disabled: 0;
+	----background-color-opacity--highlighted: var(--cui-opacity--low);
+	----background-color-opacity--pressed: var(--cui-opacity--low);
+	----background-color-opacity: 0;
+	----background-color-rgb--disabled: var(----background-color-rgb);
+	----background-color-rgb--highlighted: var(--cui-background-color--toned-controls-rgb-50);
+	----background-color-rgb--pressed: var(--cui-color--accent-rgb-75);
+	----background-color-rgb: var(--cui-background-color--rgb-50);
+	----border-color-opacity--disabled: var(--cui-opacity--lower);
+	----border-color-opacity--highlighted: var(--cui-opacity--medium);
+	----border-color-opacity--pressed: var(--cui-opacity--high);
+	----border-color-opacity: var(--cui-opacity--low);
+	----border-color-rgb--disabled: var(----border-color-rgb);
+	----border-color-rgb--highlighted: var(--cui-color--accent-rgb-50);
+	----border-color-rgb--pressed: var(--cui-color--accent-rgb-50);
+	----border-color-rgb: var(--cui-color--rgb-50);
+	----box-shadow--bottom-inner-darken: inset 0 -2px 0 -1px rgba(var(----color-rgb), 0.1);
+	----box-shadow--elevated: 0 0 2px 1px rgba(var(----box-shadow-color-rgb--elevated), 0.125), 0 1px 1em 4px rgba(var(----box-shadow-color-rgb--elevated), 0.25);
+	----box-shadow--pressed: inset 0 1px 5em 1px rgba(var(----box-shadow-color-rgb--pressed), 0.125), inset 0 1px 4px 0px rgba(var(----box-shadow-color-rgb--pressed), 0.125);
+	----box-shadow--top-inner-lighten: inset 0 1px 0 0px rgba(var(--cui-background-color--rgb-100), 0.1);
+	----box-shadow-color-rgb--elevated: var(--cui-theme-content--rgb-500);
+	----box-shadow-color-rgb--pressed: var(----border-color-rgb--pressed);
+	----color-opacity--disabled: var(--cui-opacity--low);
+	----color-opacity--highlighted: 1;
+	----color-opacity--pressed: 1;
+	----color-opacity: 1;
+	----color-rgb--disabled: var(--cui-color--rgb-50);
+	----color-rgb--highlighted: var(--cui-color--accent-rgb-50);
+	----color-rgb--pressed: var(--cui-color--accent-rgb-25);
+	----color-rgb: var(--cui-color--rgb-50);
 	--cui-button--align-items: center;
-	--cui-button--justify-content: center;
-	--cui-button--background-color--disabled: rgba(var(--cui-background-color--toned-controls-rgb-75), var(--cui-opacity--lower));
-	--cui-button--background-color--highlighted: rgba(var(--cui-background-color--toned-controls-rgb-75), var(--cui-opacity--low));
-	--cui-button--background-color--pressed: rgba(var(--cui-background-color--toned-controls-rgb-75), var(--cui-opacity--medium));
-	--cui-button--background-color: rgb(var(--cui-background-color--rgb-75));
-	--cui-button--border-color--disabled: rgba(var(--cui-color--rgb-50), var(--cui-opacity--lower));
-	--cui-button--border-color--highlighted: rgba(var(--cui-color--accent-rgb-50), var(--cui-opacity--medium));
-	--cui-button--border-color--pressed: rgb(var(--cui-color--accent-rgb-50));
-	--cui-button--border-color: rgba(var(--cui-color--rgb-50), var(--cui-opacity--lower));
+	--cui-button--background-color--disabled: rgba(var(----background-color-rgb--disabled), var(----background-color-opacity--disabled));
+	--cui-button--background-color--highlighted: rgba(var(----background-color-rgb--highlighted), var(----background-color-opacity--highlighted));
+	--cui-button--background-color--pressed: rgba(var(----background-color-rgb--pressed), var(----background-color-opacity--pressed));
+	--cui-button--background-color: rgba(var(----background-color-rgb), var(----background-color-opacity));
+	--cui-button--border-color--disabled: rgb(var(----border-color-rgb--disabled), var(----border-color-opacity--disabled));
+	--cui-button--border-color--highlighted: rgba(var(----border-color-rgb--highlighted), var(----border-color-opacity--highlighted));
+	--cui-button--border-color--pressed: rgb(var(----border-color-rgb--pressed), var(----border-color-opacity--pressed));
+	--cui-button--border-color: rgba(var(----border-color-rgb), var(----border-color-opacity));
 	--cui-button--border-radius: 0px;
 	--cui-button--border-width: var(--cui-border-width, 1px);
-	--cui-button--box-shadow--disabled: 0 0 transparent;
-	--cui-button--box-shadow--highlighted: var(--cui-button--box-shadow-dark-edge-bottom);
-	--cui-button--box-shadow--pressed: 0 0 transparent;
-	--cui-button--box-shadow-dark-edge-bottom: inset 0 -2px 0 -1px rgba(var(--cui-theme-content--rgb-0), 0.1);
-	--cui-button--box-shadow-dark-edge-top: inset 0 1px 0 1px rgba(var(--cui-theme-content--rgb-0), 0.5);
-	--cui-button--box-shadow-shadow-below: 0 0 transparent;
-	--cui-button--box-shadow: var(--cui-button--box-shadow-shadow-below), var(--cui-button--box-shadow-dark-edge-bottom);
-	--cui-button--color--disabled: rgba(var(--cui-color--accent-rgb-50), var(--cui-opacity--low));
-	--cui-button--color--highlighted: rgb(var(--cui-color--accent-rgb-75));
-	--cui-button--color--pressed: rgb(var(--cui-color--toned-controls-rgb-100));
-	--cui-button--color-rgb: var(--cui-color--accent-rgb-50);
-	--cui-button--color: rgb(var(--cui-button--color-rgb));
+	--cui-button--box-shadow--highlighted: var(--cui-button--box-shadow-below--highlighted, 0 0 transparent), var(--cui-button--box-shadow-border-bottom--highlighted, var(----box-shadow--bottom-inner-darken)), var(--cui-button--box-shadow-border-top--highlighted, var(----box-shadow--top-inner-lighten)), var(--cui-button--box-shadow-above--highlighted, 0 0 transparent);
+	--cui-button--box-shadow--pressed: var(--cui-button--box-shadow-below--pressed, 0 0 transparent), var(--cui-button--box-shadow-border-bottom--pressed, 0 0 transparent), var(--cui-button--box-shadow-border-top--pressed, 0 0 transparent), var(--cui-button--box-shadow-above--pressed, var(----box-shadow--pressed));
+	--cui-button--box-shadow: var(--cui-button--box-shadow-below, 0 0 transparent), var(--cui-button--box-shadow-border-bottom, 0 0 transparent), var(--cui-button--box-shadow-border-top, 0 0 transparent), var(--cui-button--box-shadow-above, 0 0 transparent);
+	--cui-button--color--disabled: rgba(var(----color-rgb--disabled), var(----color-opacity--disabled));
+	--cui-button--color--highlighted: rgba(var(----color-rgb--highlighted), var(----color-opacity--highlighted));
+	--cui-button--color--pressed: rgba(var(----color-rgb--pressed), var(----color-opacity--pressed));
+	--cui-button--color: rgba(var(----color-rgb), var(----color-opacity));
 	--cui-button--height: var(--cui-size--controls);
-	--cui-button--inset: 0px;
 	--cui-button--inset-horizontal: var(--cui-button--inset);
-	--cui-button--inset-vertical: var(--cui-button--inset);
-	--cui-button--inset-optical: calc((var(--cui-button--border-radius)) * var(--cui-border-radius-optical-grow));
 	--cui-button--inset-optical-horizontal: var(--cui-button--inset-optical);
 	--cui-button--inset-optical-vertical: var(--cui-button--inset-optical);
+	--cui-button--inset-optical: calc((var(--cui-button--border-radius)) * var(--cui-border-radius-optical-grow));
+	--cui-button--inset-vertical: var(--cui-button--inset);
+	--cui-button--inset: 0px;
+	--cui-button--justify-content: center;
 	--cui-button--label-font-size: var(--cui-font-size--label);
 	--cui-button--line-height: var(--cui-line-height--controls);
-	--cui-button--padding: 0px;
 	--cui-button--padding-horizontal: var(--cui-button--padding);
 	--cui-button--padding-vertical: var(--cui-button--padding);
+	--cui-button--padding: 0px;
 	--cui-button--size-horizontal: 1;
 	--cui-button--size-vertical: 1;
+	--cui-line-height: var(--cui-line-height--controls);
 	align-items: center;
-	justify-content: center;
 	background: transparent;
 	border-color: var(--cui-button--border-color);
 	border-radius: var(--cui-button--border-radius);
-	border-style: solid;
+	border-style: var(--cui-button--border-style, solid);
 	border-width: 0px;
-	color: rgb(var(--cui-color--accent-rgb-50));
+	color: inherit;
 	display: inline-flex;
 	font-family: inherit;
 	font-size: var(--cui-button--label-font-size);
 	font-weight: 600;
 	gap: var(--cui-gap);
+	justify-content: center;
 	line-height: var(--cui-button--line-height);
 	margin: 0px;
 	outline: none;
@@ -60,6 +85,13 @@
 	text-decoration: none;
 	user-select: none;
 	vertical-align: baseline;
+}
+:where(.cui-button[data-accent="strong"]) {
+	----color-rgb: var(--cui-color--strong-rgb-50);
+}
+:where(.cui-button[data-accent="theme"]) {
+	----box-shadow-color-rgb--elevated: var(--cui-theme-controls--rgb-300);
+	----color-rgb: var(--cui-color--accent-rgb-50);
 }
 
 :where(.cui-button:focus) {
@@ -105,16 +137,6 @@
 :where(.cui-button[data-justify="space-between"]) { --cui-button--justify-content: space-between }
 :where(.cui-button[data-justify="space-evenly"]) { --cui-button--justify-content: space-evenly }
 
-:where(.cui-button[data-distinction="seamless"]) {
-	--cui-button--background-color--highlighted: transparent;
-	--cui-button--background-color: transparent;
-	--cui-button--box-shadow--highlighted: 0 0 transparent;
-	--cui-button--box-shadow: var(--cui-button--box-shadow-shadow-below);
-	--cui-button--color-rgb: var(--cui-color--accent-rgb-50);
-	--cui-button--border-width: 0px;
-	--cui-button--color--highlighted: rgb(var(--cui-color--accent-rgb-75));
-}
-
 :where(.cui-button[data-padding]) { --cui-button--padding: calc(2.25 * var(--cui-gap)) }
 :where(.cui-button[data-padding="gap"]) { --cui-button--padding: calc(var(--cui-gap)) }
 :where(.cui-button[data-padding="double"]) { --cui-button--padding: calc(var(--cui-double-gap)) }
@@ -142,50 +164,114 @@
 	--cui-button--size-vertical: 2;
 }
 
+:where(.cui-button[data-distinction="seamless"]) {
+	----background-color-opacity--disabled: 0;
+	----background-color-opacity: 0;
+	----background-color-rgb--highlighted: var(--cui-background-color--toned-controls-rgb-50);
+	----color-rgb: var(--cui-color--rgb-50);
+	--cui-button--border-width: 0px;
+	--cui-button--box-shadow-border-bottom--highlighted: 0 0 transparent;
+	--cui-button--box-shadow-border-top--highlighted: 0 0 transparent;
+	--cui-button--color-rgb--highlighted: var(--cui-color--accent-rgb-50);
+}
+:where(.cui-button[data-distinction="seamless"][data-accent="strong"]) {
+	----color-rgb: var(--cui-color--strong-rgb-50);
+}
+:where(.cui-button[data-distinction="seamless"][data-accent="theme"]) {
+	----color-rgb: var(--cui-color--accent-rgb-50);
+}
+
 :where(.cui-button[data-distinction="inverse"]) {
-	--cui-button--background-color--highlighted: rgb(var(--cui-background-color--controls-inverse-rgb-75));
-	--cui-button--background-color--pressed: rgb(var(--cui-background-color--controls-inverse-rgb-100));
-	--cui-button--background-color: rgb(var(--cui-background-color--controls-inverse-rgb-50));
-	--cui-button--border-color--pressed: rgb(var(--cui-background-color--controls-inverse-rgb-75));
-	--cui-button--color--highlighted: rgb(var(--cui-color--controls-inverse-rgb-75));
-	--cui-button--color--pressed: rgb(var(--cui-color--controls-inverse-rgb-75));
-	--cui-button--color-rgb: var(--cui-color--controls-inverse-rgb-50);
+	----background-color-opacity--disabled: var(--cui-opacity--lower);
+	----background-color-opacity--highlighted: 1;
+	----background-color-opacity--pressed: 1;
+	----background-color-opacity: 1;
+	----background-color-rgb--disabled: var(--cui-background-color--content-inverse-rgb-100);
+	----background-color-rgb--pressed: var(--cui-background-color--controls-inverse-rgb-50);
+	----background-color-rgb--highlighted: var(--cui-background-color--controls-inverse-rgb-25);
+	----background-color-rgb: var(--cui-background-color--content-inverse-rgb-0);
+	----border-color-rgb: var(----background-color-rgb);
+	----color-rgb--pressed: var(--cui-color--controls-inverse-rgb-50);
+	----color-rgb--highlighted: var(--cui-color--controls-inverse-rgb-25);
+	----color-rgb: var(--cui-color--content-inverse-rgb-0);
+}
+:where(.cui-button[data-distinction="inverse"][data-accent="strong"]) {
+	----background-color-rgb--disabled: var(--cui-background-color--content-inverse-rgb-100);
+	----color-rgb: var(--cui-color--content-inverse-rgb-25);
+}
+:where(.cui-button[data-distinction="inverse"][data-accent="theme"]) {
+	----background-color-rgb: var(--cui-background-color--controls-inverse-rgb-0);
+	----color-rgb: var(--cui-color--controls-inverse-rgb-0);
 }
 
 :where(.cui-button[data-distinction="primary"]) {
-	--cui-button--background-color--highlighted: rgb(var(--cui-background-color--controls-rgb-75));
-	--cui-button--background-color--pressed: rgb(var(--cui-background-color--controls-rgb-100));
-	--cui-button--background-color: rgb(var(--cui-background-color--controls-rgb-50));
-	--cui-button--border-color--pressed: rgb(var(--cui-background-color--controls-rgb-0));
-	--cui-button--border-width: 0px;
-	--cui-button--color--highlighted: rgb(var(--cui-color--controls-rgb-75));
-	--cui-button--color--pressed: rgb(var(--cui-color--controls-rgb-100));
-	--cui-button--color-rgb: var(--cui-color--controls-rgb-50);
+	----background-color-opacity--disabled: var(--cui-opacity--lower);
+	----background-color-opacity--highlighted: 1;
+	----background-color-opacity--pressed: 1;
+	----background-color-opacity: 1;
+	----background-color-rgb--disabled: var(--cui-background-color--content-rgb-100);
+	----background-color-rgb--highlighted: var(--cui-background-color--controls-rgb-100);
+	----background-color-rgb--pressed: var(--cui-background-color--controls-rgb-25);
+	----background-color-rgb: var(--cui-background-color--content-rgb-25);
+	----border-color-rgb--highlighted: var(--cui-background-color--controls-rgb-100);
+	----border-color-rgb--pressed: var(--cui-background-color--controls-rgb-0);
+	----border-color-rgb: var(----background-color-rgb);
+	----color-rgb--highlighted: var(--cui-color--controls-rgb-25);
+	----color-rgb--pressed: var(--cui-color--controls-rgb-100);
+	----color-rgb: var(--cui-color--content-rgb-50);
+	----box-shadow-color-rgb--pressed: var(--cui-background-color--controls-rgb-0);
+}
+:where(.cui-button[data-distinction="primary"][data-accent="strong"]) {
+	----background-color-rgb: var(--cui-background-color--content-rgb-75);
+}
+:where(.cui-button[data-distinction="primary"][data-accent="theme"]) {
+	----background-color-rgb: var(--cui-background-color--controls-rgb-75);
+	----color-rgb: var(--cui-color--controls-rgb-50);
 }
 
 :where(.cui-button[data-distinction="toned"]) {
-	--cui-button--background-color--highlighted: rgba(var(--cui-background-color--toned-controls-rgb-50), var(--cui-opacity--low));
-	--cui-button--background-color--pressed: rgba(var(--cui-background-color--toned-controls-rgb-50), var(--cui-opacity--medium));
-	--cui-button--background-color: rgba(var(--cui-background-color--toned-controls-rgb-50), var(--cui-opacity--lower));
-	--cui-button--border-color--pressed: rgb(var(--cui-color--toned-controls-rgb-100));
+	----background-color-opacity--disabled: var(--cui-opacity--lower);
+	----background-color-opacity: var(--cui-opacity--lower);
+	----background-color-rgb--disabled: var(--cui-background-color--toned-rgb-50);
+	----background-color-rgb--highlighted: var(--cui-background-color--toned-controls-rgb-50);
+	----background-color-rgb--pressed: var(--cui-background-color--toned-controls-rgb-50);
+	----background-color-rgb: var(--cui-background-color--toned-rgb-50);
+	----border-color-opacity: 0;
+	----border-color-rgb: var(--color-rgb);
+	----color--highlighted-rgb: var(--cui-color--toned-controls-rgb-75);
+	----color-rgb: var(--cui-color--toned-rgb-50);
 	--cui-button--border-width: 0px;
-	--cui-button--box-shadow--highlighted: 0 0 transparent;
-	--cui-button--box-shadow: var(--cui-button--box-shadow-shadow-below);
-	--cui-button--color--highlighted: rgb(var(--cui-color--toned-controls-rgb-75));
-	--cui-button--color-rgb: var(--cui-color--toned-controls-rgb-50);
+	--cui-button--box-shadow-border-bottom--highlighted: 0 0 transparent;
+	--cui-button--box-shadow-border-top--highlighted: 0 0 transparent;
+}
+:where(.cui-button[data-distinction="toned"][data-accent="strong"]) {
+	----color-rgb: var(--cui-color--strong-rgb-50);
+}
+:where(.cui-button[data-distinction="toned"][data-accent="theme"]) {
+	----background-color-rgb: var(--cui-background-color--toned-controls-rgb-50);
+	----color-rgb: var(--cui-color--toned-controls-rgb-50);
 }
 
 :where(.cui-button[data-distinction="outlined"]) {
-	--cui-button--background-color--disabled: transparent;
-	--cui-button--background-color--highlighted: transparent;
-	--cui-button--background-color: transparent;
-	--cui-button--border-color--highlighted: rgb(var(--cui-color--accent-rgb-75));
-	--cui-button--border-color--pressed: rgb(var(--cui-color--accent-rgb-100));
-	--cui-button--border-color: rgb(var(--cui-color--accent-rgb-50));
+	----background-color-rgb--disabled: transparent;
+	----background-color-rgb--highlighted: var(--cui-background-color--toned-controls-rgb-50);
+	----background-color-rgb: transparent;
+	----border-color-rgb--highlighted: var(--cui-color--accent-rgb-50);
+	----border-color-rgb: var(--cui-color--rgb-50);
+	----color-rgb--highlighted: var(--cui-color--accent-rgb-50);
+	----color-rgb: var(--cui-color--rgb-50);
 	--cui-button--border-width: var(--cui-border-width--controls, 2px);;
-	--cui-button--box-shadow--highlighted: 0 0 transparent;
-	--cui-button--color--highlighted: rgb(var(--cui-color--accent-rgb-75));
-	--cui-button--color-rgb: var(--cui-color--accent-rgb-50);
+	--cui-button--box-shadow-border-bottom--highlighted: 0 0 transparent;
+	--cui-button--box-shadow-border-top--highlighted: 0 0 transparent;
+}
+:where(.cui-button[data-distinction="outlined"][data-accent="strong"]) {
+	----border-color-rgb: var(--cui-color--strong-rgb-50);
+	----color-rgb: var(--cui-color--strong-rgb-50);
+}
+:where(.cui-button[data-distinction="outlined"][data-accent="theme"]) {
+	----border-color-rgb--disabled: var(--cui-color--rgb-50);
+	----border-color-rgb: var(--cui-color--accent-rgb-50);
+	----color-rgb: var(--cui-color--accent-rgb-50);
 }
 
 /* TODO: deprecated since v1.3.0 */
@@ -194,15 +280,8 @@
 }
 
 :where(.cui-button[data-elevated]) {
-	--cui-button--box-shadow-shadow-below:
-	0 0 1px rgba(var(--cui-button--color-rgb), 0.25),
-	0 1px 1em rgba(var(--cui-button--color-rgb), 0.25);
-}
-
-:where(.cui-button[data-distinction="primary"][data-elevated]) {
-	--cui-button--box-shadow-shadow-below:
-	0 0 1px rgba(var(--cui-background-color--controls-rgb-50), 0.25),
-	0 1px 1em rgba(var(--cui-background-color--controls-rgb-50), 0.25);
+	--cui-button--box-shadow-below--highlighted: var(----box-shadow--elevated);
+	--cui-button--box-shadow-below: var(----box-shadow--elevated);
 }
 
 :where(.cui-button > .cui-button-content) {
@@ -225,33 +304,55 @@
 	align-items: var(--cui-button--align-items);
 	background: var(--cui-button--background-color);
 	border-color: inherit;
+	border-radius: inherit;
 	border-style: inherit;
 	border-width: var(--cui-button--border-width);
-	box-sizing: content-box;
 	box-shadow: var(--cui-button--box-shadow);
-	border-radius: inherit;
+	box-sizing: content-box;
 	color: var(--cui-button--color);
-	justify-content: var(--cui-button--justify-content);
 	display: flex;
 	flex: 1;
 	gap: inherit;
-	overflow: hidden;
-	outline: none;
+	justify-content: var(--cui-button--justify-content);
+	line-height: var(--cui-line-height);
 	margin: var(--cui-button-content--inset-vertical) var(--cui-button-content--inset-horizontal);
-	min-width: calc(var(--cui-line-height) * 1em);
-	min-height: calc(var(--cui-line-height) * 1em);
+	outline: none;
+	overflow: hidden;
 	padding: var(--cui-button-content--padding-vertical) var(--cui-button-content--padding-horizontal);
 	text-overflow: ellipsis;
 	transition-duration: var(--cui-transition-duration--fast);
-	transition-property: box-shadow, color, background, opacity, border-color;
+	transition-property: box-shadow, border-color, color, background-color, opacity, border-color;
 	transition-timing-function: ease-in-out;
 	vertical-align: middle;
 	white-space: nowrap;
 }
 
+/* <Firefox.workaround https://caniuse.com/?search=lh%20unit> */
+:where(.cui-button > .cui-button-content) {
+	min-height: calc(var(--cui-line-height) * 1em);
+	min-width: calc(var(--cui-line-height) * 1em);
+}
+/* </Firefox.workaround> */
+
+@supports (line-height: 1lh) {
+	:where(.cui-button > .cui-button-content) {
+		min-height: 1lh;
+		min-width: 1lh;
+	}
+}
+
+/* <Firefox.workaround https://caniuse.com/?search=lh%20unit> */
 :where(.cui-button[data-square] > .cui-button-content) {
-	max-width: calc(var(--cui-line-height) * 1em);
 	max-height: calc(var(--cui-line-height) * 1em);
+	max-width: calc(var(--cui-line-height) * 1em);
+}
+/* </Firefox.workaround> */
+
+@supports (line-height: 1lh) {
+	:where(.cui-button[data-square] > .cui-button-content) {
+		max-height: 1lh;
+		max-width: 1lh;
+	}
 }
 
 :where(.cui-button:not([disabled]):hover > .cui-button-content) {
@@ -271,17 +372,16 @@
 
 :where(.cui-button:focus:focus-visible:not([disabled]) > .cui-button-content) {
 	background: var(--cui-button--background-color--highlighted);
-	box-shadow: var(--cui-button--box-shadow--highlighted);
+	border-color: var(--cui-button--border-color--highlighted);
 	color: var(--cui-button--color--highlighted);
 }
 
-:where(.cui-button[data-focus-ring]:focus:focus-visible:not([disabled]) > .cui-button-content) {
-	box-shadow: var(--cui-button--box-shadow--highlighted), var(--cui-box-shadow--controls-focus-ring);
-}
-
+:where(.cui-button[data-focus-ring]:focus:focus-visible:not([disabled]) > .cui-button-content),
 :where(.cui-button[data-focus-ring]:active:focus:focus-visible > .cui-button-content),
 :where(.cui-button[data-focus-ring][data-active]:focus:focus-visible > .cui-button-content) {
-	box-shadow: var(--cui-button--box-shadow--pressed), var(--cui-box-shadow--controls-focus-ring);
+	outline-color: rgb(var(--cui-color--accent-rgb-50));
+	outline-offset: 4px;
+	outline-style: auto;
 }
 
 :where(.cui-button-list),
@@ -325,16 +425,15 @@
 :where(.cui-button-group > .cui-button[data-inset]) {
 	--cui-button--inset: 0px;
 }
-:where(.cui-button-group > .cui-button[data-distinction="outlined"]) {
-	--cui-button--border-color--disabled: rgb(var(--cui-color--accent-rgb-50));
-	--cui-button--border-color--pressed: rgb(var(--cui-color--accent-rgb-50));
+:where(.cui-button-group > .cui-button) {
+	----border-color-opacity--disabled: var(--cui-opacity--low);
 }
-:where(.cui-button-group > .cui-button[data-distinction="default"]) {
-	--cui-button--box-shadow--disabled: var(--cui-button--box-shadow-shadow-below), var(--cui-button--box-shadow-dark-edge-bottom);
-}
+
+:where(.cui-button-group > .cui-button[data-distinction="inverse"]),
 :where(.cui-button-group > .cui-button[data-distinction="primary"]) {
-	--cui-button--background-color--disabled: rgb(var(--cui-background-color--controls-rgb-75));
-	--cui-button--color--disabled: rgba(var(--cui-color--controls-rgb-100), var(--cui-opacity--low));
+	----background-color-opacity--disabled: var(----background-color-opacity);
+	----background-color-rgb--disabled: var(----background-color-rgb);
+	----color-rgb--disabled: var(----color-rgb);
 }
 
 /* TODO: Should be removed with deprecated code */
@@ -396,19 +495,14 @@
 :where(.cui-button-group[data-inset="padding"]),
 :where(.cui-button-list[data-inset="padding"]) { --cui-view--inset: var(--cui-padding) }
 
-:where(.cui-button-group[data-focus-ring]:focus-within) {
-	box-shadow: var(--cui-box-shadow--controls-focus-ring);
-	z-index: 1;
-}
-
 :where(.cui-button[disabled]) {
 	--cui-button--background-color--highlighted: var(--cui-button--background-color--disabled);
 	--cui-button--background-color--pressed: var(--cui-button--background-color--disabled);
 	--cui-button--background-color: var(--cui-button--background-color--disabled);
 	--cui-button--border-color: var(--cui-button--border-color--disabled);
+	--cui-button--box-shadow--pressed: none;
 	--cui-button--box-shadow--highlighted: none;
-	--cui-button--box-shadow-pressed: none;
-	--cui-button--box-shadow: var(--cui-button--box-shadow--disabled);
+	--cui-button--box-shadow: none;
 	--cui-button--color--highlighted: var(--cui-button--color--disabled);
 	--cui-button--color--pressed: var(--cui-button--color--disabled);
 	--cui-button--color: var(--cui-button--color--disabled);

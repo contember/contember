@@ -1,4 +1,3 @@
-import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
 import { SchemaUpdater, updateEntity, updateField, updateModel } from '../utils/schemaUpdateUtils'
 import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler'
@@ -8,7 +7,7 @@ import { updateRelations } from '../utils/diffUtils'
 export class EnableOrphanRemovalModificationHandler implements ModificationHandler<EnableOrphanRemovalModificationData> {
 	constructor(private readonly data: EnableOrphanRemovalModificationData, private readonly schema: Schema) {}
 
-	public createSql(builder: MigrationBuilder): void {}
+	public createSql(): void {}
 
 	public getSchemaUpdater(): SchemaUpdater {
 		const { entityName, fieldName } = this.data

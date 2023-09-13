@@ -1,7 +1,18 @@
+/* <Firefox.workaround https://caniuse.com/?search=lh%20unit> */
 :where(.cui-text),
 :where(.cui-text)::after,
 :where(.cui-text)::before {
-	----leading-trim: calc((1lh - 1em) / 2);
+	----1lh: calc(1em * var(--cui-line-height));
+	----leading-trim: calc((var(----1lh) - 1em) / 2);
+}
+/* </Firefox.workaround> */
+
+@supports (line-height: 1lh) {
+	:where(.cui-text),
+	:where(.cui-text)::after,
+	:where(.cui-text)::before {
+		----leading-trim: calc((1lh - 1em) / 2);
+	}
 }
 
 :where(.cui-text)::after,

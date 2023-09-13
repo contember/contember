@@ -1,4 +1,3 @@
-import { MigrationBuilder } from '@contember/database-migrations'
 import { Schema, Settings } from '@contember/schema'
 import { SchemaUpdater } from '../utils/schemaUpdateUtils'
 import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler'
@@ -10,7 +9,7 @@ export class UpdateSettingsModificationHandler implements ModificationHandler<Up
 	) {
 	}
 
-	public createSql(builder: MigrationBuilder): void {
+	public createSql(): void {
 	}
 
 	public getSchemaUpdater(): SchemaUpdater {

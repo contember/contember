@@ -1,8 +1,9 @@
+import { EntityId } from '@contember/binding'
+import { useChildrenAsLabel } from '@contember/react-utils'
+import { Button, DialogModal, Heading } from '@contember/ui'
+import { ComponentType, ReactNode, useCallback, useMemo, useState } from 'react'
 import { MessageFormatter } from '../../../../../i18n'
 import { UploadDictionary } from '../../uploadDictionary'
-import { ComponentType, ReactNode, useCallback, useMemo, useState } from 'react'
-import { EntityId } from '@contember/binding'
-import { Button, DialogModal, Heading, useChildrenAsLabel } from '@contember/ui'
 import { EntityConnector } from '../hooks/useConnectSelectedEntities'
 
 export type SelectFileDialogProps =

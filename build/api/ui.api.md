@@ -3113,7 +3113,7 @@ export const useCheckboxInput: <E extends HTMLInputElement>(props: ControlProps<
     indeterminate?: boolean | undefined;
 };
 
-// @public (undocumented)
+// @public @deprecated (undocumented)
 export function useChildrenAsLabel(children: ReactNode): string | undefined;
 
 // @public (undocumented)

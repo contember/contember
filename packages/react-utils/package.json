@@ -25,7 +25,8 @@
 		"build:js:dev": "NODE_ENV=development vite build --mode development",
 		"build:js:prod": "vite build --mode production",
 		"ae:build": "api-extractor run --local",
-		"ae:test": "api-extractor run"
+		"ae:test": "api-extractor run",
+		"test": "vitest --environment jsdom"
 	},
 	"peerDependencies": {
 		"react": "^17 || ^18"

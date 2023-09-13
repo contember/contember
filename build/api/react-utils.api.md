@@ -72,6 +72,9 @@ export const emptyArray: any[];
 // @public (undocumented)
 export const emptyObject: Readonly<{}>;
 
+// @public
+export function getChildrenAsLabel(node: ReactNode): string | undefined;
+
 // @public (undocumented)
 export const GlobalClassNamePrefixContext: Context<string>;
 
@@ -158,6 +161,9 @@ export const useArrayMapMemo: <Item, OutputItem>(items: Item[], map: (value: Ite
 
 // @public (undocumented)
 export const useAutoHeightTextArea: (textAreaRef: RefObjectOrElement<HTMLTextAreaElement>, value: string, minRows: number, maxRows: number) => void;
+
+// @public
+export function useChildrenAsLabel(node: ReactNode): string | undefined;
 
 // @public
 export function useClassName(componentClassName: NestedClassName, additionalClassName?: NestedClassName, prefixOverride?: string | null | undefined): string;

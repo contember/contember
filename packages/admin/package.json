@@ -98,7 +98,6 @@
 		"@types/react-dom": "^18",
 		"@types/react-test-renderer": "^18",
 		"csstype": "3.0.8",
-		"jsdom": "^18.0.0",
 		"node-fetch": "^2.6.5",
 		"pg": "^8.7.3",
 		"playwright": "1.32.3",

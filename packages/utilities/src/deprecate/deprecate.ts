@@ -24,7 +24,7 @@ export function deprecate(removal: SemverString, condition: boolean, deprecated:
 			if (shouldThrow) {
 				throw new Error(`Support for ${deprecated} was planned to be removed in the ${removal} release.${replacement ? ` Replace it with ${replacement} instead.` : 'Remove it.'}`)
 			} else {
-				console.warn(`Use of ${deprecated} is deprecated and might be removed in the next release.${replacement ? ` Use ${replacement} instead.` : 'There is no replacement.'}`)
+				console.warn(`Use of ${deprecated} is deprecated and might be removed in the next release.${replacement ? ` Use ${replacement} instead.` : ' There is no replacement.'}`)
 			}
 		}
 	}

@@ -1,4 +1,4 @@
-import { Component, SugaredRelativeSingleField } from '@contember/binding'
+import { Component, SugaredRelativeSingleField } from '@contember/react-binding'
 import type { FieldContainerProps } from '@contember/ui'
 import { FunctionComponent, ReactNode, useMemo } from 'react'
 import { ChoiceFieldData, NormalizedStaticOption, SelectFieldInner, StaticSingleChoiceField } from '../fields'

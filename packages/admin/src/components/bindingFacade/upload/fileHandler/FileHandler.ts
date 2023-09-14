@@ -1,4 +1,4 @@
-import { EntityAccessor, Environment } from '@contember/binding'
+import { EntityAccessor, Environment } from '@contember/react-binding'
 import { ReactElement } from 'react'
 import { AccessorErrorsHolder } from '../../errors'
 import { AcceptFileOptions, FullFileKind } from '../fileKinds'

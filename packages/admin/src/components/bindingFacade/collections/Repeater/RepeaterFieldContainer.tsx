@@ -1,4 +1,4 @@
-import type { EntityAccessor, EntityListAccessor } from '@contember/binding'
+import type { EntityAccessor, EntityListAccessor } from '@contember/react-binding'
 import { FieldContainer, FieldContainerOwnProps } from '@contember/ui'
 import { deprecate, fallback, isDefined } from '@contember/utilities'
 import { ReactNode, memo } from 'react'

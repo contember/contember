@@ -1,4 +1,4 @@
-import { BindingError, Environment } from '@contember/binding'
+import { BindingError, Environment } from '@contember/react-binding'
 import type { ComponentType, ReactElement, ReactNode } from 'react'
 import type { DataGridCellPublicProps } from './DataGridCellPublicProps'
 import type { DataGridColumnKey } from './DataGridColumnKey'

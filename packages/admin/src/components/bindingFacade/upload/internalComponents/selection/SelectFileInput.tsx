@@ -1,4 +1,4 @@
-import { AccessorTree, Component, EntityAccessor, EntityId, useAccessorTreeState } from '@contember/binding'
+import { AccessorTree, Component, EntityAccessor, EntityId, useAccessorTreeState } from '@contember/react-binding'
 import { Button, useDialog } from '@contember/ui'
 import { ComponentType, MouseEventHandler, ReactNode, useCallback } from 'react'
 import { MessageFormatter } from '../../../../../i18n'

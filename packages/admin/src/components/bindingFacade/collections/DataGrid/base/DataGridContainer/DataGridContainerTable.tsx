@@ -1,4 +1,4 @@
-import { Entity, EntityId } from '@contember/binding'
+import { Entity, EntityId } from '@contember/react-binding'
 import { useClassName } from '@contember/react-utils'
 import { Table, TableCell, TableRow } from '@contember/ui'
 import { memo, useMemo } from 'react'

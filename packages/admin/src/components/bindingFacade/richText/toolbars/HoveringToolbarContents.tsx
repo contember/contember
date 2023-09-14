@@ -1,4 +1,4 @@
-import { Entity, useEnvironment, VariableInputTransformer } from '@contember/binding'
+import { Entity, useEnvironment, VariableInputTransformer } from '@contember/react-binding'
 import { EditorToolbar, EditorToolbarProps, ToolbarGroup, useDialog } from '@contember/ui'
 import { memo, MouseEvent as ReactMouseEvent } from 'react'
 import { Transforms } from 'slate'

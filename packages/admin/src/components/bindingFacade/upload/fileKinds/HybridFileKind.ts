@@ -1,6 +1,6 @@
 import { ReactNode } from 'react'
 import { FullFileKind } from './FullFileKind'
-import { EntityAccessor, SugaredFieldProps } from '@contember/binding'
+import { EntityAccessor, SugaredFieldProps } from '@contember/react-binding'
 import { SelectFileInputSelectionComponentProps } from '../internalComponents/selection/SelectFileInput'
 
 export type DiscriminatedFileKindsProps<SFExtraProps extends {} = {}> =

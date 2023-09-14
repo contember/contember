@@ -1,4 +1,4 @@
-import { EntityAccessor, useMutationState } from '@contember/binding'
+import { EntityAccessor, useMutationState } from '@contember/react-binding'
 import { useClassName } from '@contember/react-utils'
 import { Button, ButtonProps, IconProps, Text } from '@contember/ui'
 import { PlusCircleIcon } from 'lucide-react'

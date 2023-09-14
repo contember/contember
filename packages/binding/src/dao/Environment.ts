@@ -1,4 +1,3 @@
-import type { ReactNode } from 'react'
 import { BindingError } from '../BindingError'
 import type { Filter } from '../treeParameters'
 import equal from 'fast-deep-equal/es6/index.js'
@@ -243,7 +242,12 @@ class Environment {
 namespace Environment {
 	export type Name = string
 
-	export type Value = ReactNode | GraphQlLiteral | Filter
+	export type ReactElementLike = {
+		type: any
+		props: any
+	}
+
+	export type Value = string | number | boolean | undefined | GraphQlLiteral | Filter | ReactElementLike
 
 	export type ResolvedValue = Value
 

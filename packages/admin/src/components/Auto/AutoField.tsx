@@ -1,4 +1,4 @@
-import { Component, Field, Schema } from '@contember/binding'
+import { Component, Field, Schema } from '@contember/react-binding'
 import { CheckboxField, DateField, DateTimeField, FloatField, MultiSelectField, NumberField, SelectField, TextareaField, TextField } from '../bindingFacade'
 import { getHumanFriendlyField, resolveConnectingEntity, resolveSortableBy } from './utils'
 import { AutoFields } from './AutoFields'

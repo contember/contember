@@ -1,4 +1,4 @@
-import { Environment, EnvironmentContext, EnvironmentExtensionProvider } from '@contember/binding'
+import { Environment, EnvironmentContext, EnvironmentExtensionProvider } from '@contember/react-binding'
 import { ContemberClient, ContemberClientProps } from '@contember/react-client'
 import { Providers as InterfaceProviders, ProvidersProps } from '@contember/ui'
 import { ComponentType, PropsWithChildren, ReactNode } from 'react'

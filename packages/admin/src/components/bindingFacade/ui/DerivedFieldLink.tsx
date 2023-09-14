@@ -1,4 +1,4 @@
-import { Component, FieldValue, SugaredField, SugaredRelativeSingleField, useDerivedField } from '@contember/binding'
+import { Component, FieldValue, SugaredField, SugaredRelativeSingleField, useDerivedField } from '@contember/react-binding'
 import type { FunctionComponent } from 'react'
 
 export interface DerivedFieldLinkProps<SourcePersisted extends FieldValue = FieldValue> {

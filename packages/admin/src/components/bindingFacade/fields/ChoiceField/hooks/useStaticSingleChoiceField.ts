@@ -1,5 +1,5 @@
 import { ChoiceFieldData } from '../ChoiceFieldData'
-import { FieldValue, useEnvironment, useField, VariableInputTransformer } from '@contember/binding'
+import { FieldValue, useEnvironment, useField, VariableInputTransformer } from '@contember/react-binding'
 import { useCallback, useMemo, useState } from 'react'
 import { OptionallyVariableStaticOption, StaticSingleChoiceFieldProps } from '../StaticSingleChoiceField'
 import { useAccessorErrors } from '../../../errors'

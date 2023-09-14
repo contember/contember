@@ -1,4 +1,4 @@
-import { Component } from '@contember/binding'
+import { Component } from '@contember/react-binding'
 import type { ReactElement } from 'react'
 import { LayoutRenderer, LayoutRendererProps } from '../LayoutRenderer'
 import { ImmutableEntityListRenderer, ImmutableEntityListRendererProps } from '../listRenderers'

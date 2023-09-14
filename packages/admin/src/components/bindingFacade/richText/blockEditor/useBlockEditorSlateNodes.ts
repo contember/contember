@@ -4,7 +4,7 @@ import {
 	EntityId,
 	SugaredFieldProps,
 	useDesugaredRelativeSingleField,
-} from '@contember/binding'
+} from '@contember/react-binding'
 import { Descendant, Editor, Element as SlateElement, PathRef } from 'slate'
 
 export interface UseBlockEditorSlateNodesOptions {

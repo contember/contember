@@ -1,7 +1,7 @@
 import { ReactNode, useEffect, useState } from 'react'
 import { DataGridState, DataGridStateMethods } from './DataGridState'
 import { renderGrid } from '../grid/renderGrid'
-import { TreeRootId, useEnvironment, useExtendTree } from '@contember/binding'
+import { TreeRootId, useEnvironment, useExtendTree } from '@contember/react-binding'
 
 export const useDataGridDisplayedState = (stateMethods: DataGridStateMethods, desiredState: DataGridState, tile?: ReactNode): {
 	gridState: DataGridState | undefined

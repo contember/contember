@@ -1,8 +1,8 @@
 import { useMemo } from 'react'
-import { SugaredQualifiedEntityList, TreeRootId, useEntityListSubTree } from '@contember/binding'
+import { EntityAccessor, SugaredQualifiedEntityList, TreeRootId, useEntityListSubTree } from '@contember/react-binding'
 import { DesugaredOptionPath } from './useDesugaredOptionPath'
 
-export const useTopLevelOptionAccessors = (desugaredOptionPath: DesugaredOptionPath, treeRootId: TreeRootId | undefined) => {
+export const useTopLevelOptionAccessors = (desugaredOptionPath: DesugaredOptionPath, treeRootId: TreeRootId | undefined): EntityAccessor[] => {
 	const entityList = useMemo<SugaredQualifiedEntityList>(
 		() => ({ entities: desugaredOptionPath, ...desugaredOptionPath }),
 		[desugaredOptionPath],

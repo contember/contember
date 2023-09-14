@@ -10,7 +10,7 @@ import {
 	SugaredFieldProps,
 	useMutationState,
 	useSortedEntities,
-} from '@contember/binding'
+} from '@contember/react-binding'
 import { RepeaterItemContainerProps } from '@contember/ui'
 import { ComponentType, Fragment, ReactElement, ReactNode, useCallback } from 'react'
 import type { SortEndHandler } from 'react-sortable-hoc'

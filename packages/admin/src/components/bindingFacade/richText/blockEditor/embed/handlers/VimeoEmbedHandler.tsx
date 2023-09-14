@@ -1,4 +1,4 @@
-import { SugaredField, SugaredFieldProps, useField } from '@contember/binding'
+import { SugaredField, SugaredFieldProps, useField } from '@contember/react-binding'
 import { memo, ReactNode } from 'react'
 import type { SugaredDiscriminateBy } from '../../../../discrimination'
 import type { EmbedHandler, PopulateEmbedDataOptions } from '../core'

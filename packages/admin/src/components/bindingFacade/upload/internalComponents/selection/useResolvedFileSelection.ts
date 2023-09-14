@@ -2,7 +2,7 @@ import { DiscriminatedFileKindsProps, HybridFileKindProps, SingleKindFileProps }
 import { useMemo } from 'react'
 import { fileKindTemplateAnalyzer } from '../../fileKinds/fileKindTemplateAnalyzer'
 import { FileKindProps } from '../../fileKinds'
-import { EntityAccessor, Environment, useEnvironment, VariableInputTransformer } from '@contember/binding'
+import { EntityAccessor, Environment, useEnvironment, VariableInputTransformer } from '@contember/react-binding'
 import { ResolvedFileSelectionComponent } from './SelectFileDialog'
 import { useObjectMemo } from '@contember/react-utils'
 import { getResolvedSingleKindFileSelection } from './useResolvedSingleKindFileSelection'

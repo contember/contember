@@ -1,4 +1,4 @@
-import { Component } from '@contember/binding'
+import { Component } from '@contember/react-binding'
 import type { ReactElement } from 'react'
 import { FileKind } from '../FileKind'
 import { getStockVideoFileKind, StockVideoFileKindProps } from '../factories/getStockVideoFileKind'

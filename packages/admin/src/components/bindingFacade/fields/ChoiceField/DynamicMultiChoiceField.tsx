@@ -1,4 +1,4 @@
-import { Component, EntityAccessor, HasMany, HasManyProps, HasOne, SugaredField } from '@contember/binding'
+import { Component, EntityAccessor, HasMany, HasManyProps, HasOne, SugaredField } from '@contember/react-binding'
 import type { FunctionComponent } from 'react'
 import type { ChoiceFieldData } from './ChoiceFieldData'
 import { DynamicMultipleChoiceFieldProps, useDynamicMultipleChoiceField } from './hooks/useDynamicMultipleChoiceField'

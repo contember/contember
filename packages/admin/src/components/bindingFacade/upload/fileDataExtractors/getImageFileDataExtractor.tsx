@@ -1,5 +1,5 @@
-import type { SugaredFieldProps } from '@contember/binding'
-import { SugaredField } from '@contember/binding'
+import type { SugaredFieldProps } from '@contember/react-binding'
+import { SugaredField } from '@contember/react-binding'
 import { FileDataExtractor } from './FileDataExtractor'
 
 export interface ImageFileDataExtractorProps {

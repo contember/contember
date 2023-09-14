@@ -1,4 +1,4 @@
-import { Component, QueryLanguage, SugaredField, SugaredFieldProps, wrapFilterInHasOnes } from '@contember/binding'
+import { Component, QueryLanguage, SugaredField, SugaredFieldProps, wrapFilterInHasOnes } from '@contember/react-binding'
 import { GraphQlLiteral, Input } from '@contember/client'
 import { Checkbox, FieldContainer, Stack } from '@contember/ui'
 import { ReactNode, useMemo } from 'react'

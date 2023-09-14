@@ -1,4 +1,4 @@
-import type { EntityAccessor, EntityListAccessor, FieldAccessor } from '@contember/binding'
+import type { EntityAccessor, EntityListAccessor, FieldAccessor } from '@contember/react-binding'
 import { ErrorList, ErrorListProps } from '@contember/ui'
 import type { ReactElement } from 'react'
 import { useAccessorErrors } from './useAccessorErrors'

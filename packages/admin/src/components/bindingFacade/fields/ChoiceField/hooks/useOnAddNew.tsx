@@ -4,7 +4,7 @@ import {
 	EntityAccessor,
 	useAccessorTreeState,
 	useGetEntityListSubTree,
-} from '@contember/binding'
+} from '@contember/react-binding'
 import { Button, Stack, useDialog } from '@contember/ui'
 import { useMemo } from 'react'
 import { useMessageFormatter } from '../../../../../i18n'

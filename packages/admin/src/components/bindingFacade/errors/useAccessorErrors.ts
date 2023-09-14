@@ -1,4 +1,4 @@
-import type { ErrorAccessor } from '@contember/binding'
+import type { ErrorAccessor } from '@contember/react-binding'
 import { assertNever } from '@contember/utilities'
 import { useCallback, useMemo } from 'react'
 import { useMessageFormatter } from '../../../i18n'

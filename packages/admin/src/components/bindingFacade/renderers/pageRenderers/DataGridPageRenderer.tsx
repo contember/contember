@@ -1,4 +1,4 @@
-import { Component } from '@contember/binding'
+import { Component } from '@contember/react-binding'
 import { DataGridContainer, DataGridContainerProps } from '../../collections'
 import { LayoutRenderer, LayoutRendererProps } from '../LayoutRenderer'
 

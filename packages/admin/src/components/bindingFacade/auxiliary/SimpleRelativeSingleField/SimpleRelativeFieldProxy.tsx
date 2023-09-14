@@ -1,4 +1,4 @@
-import { SugaredRelativeSingleField, useEnvironment, useField, useMutationState } from '@contember/binding'
+import { SugaredRelativeSingleField, useEnvironment, useField, useMutationState } from '@contember/react-binding'
 import { FieldContainer, FieldContainerProps } from '@contember/ui'
 import { NonOptional } from '@contember/utilities'
 import { CSSProperties, ReactNode, memo, useMemo } from 'react'

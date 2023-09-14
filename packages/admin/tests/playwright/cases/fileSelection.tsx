@@ -1,4 +1,4 @@
-import { Component, EntityAccessor, EntityId, Field, StaticRender, useEntity } from '@contember/binding'
+import { Component, EntityAccessor, EntityId, Field, StaticRender, useEntity } from '@contember/react-binding'
 import { Card, LinkCardProps } from '@contember/ui'
 import { useCallback, useMemo } from 'react'
 import { CreatePage, DataGrid, EditPage, FileSelectionProps, GenericCell, ImageUploadField, Layout, TextCell } from '../../../src'

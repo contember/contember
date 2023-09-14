@@ -1,4 +1,4 @@
-import { Component, SugaredField, SugaredFieldProps, useField } from '@contember/binding'
+import { Component, SugaredField, SugaredFieldProps, useField } from '@contember/react-binding'
 import type { FunctionComponent } from 'react'
 import { HTMLAnchorElementProps } from '@contember/ui'
 

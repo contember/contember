@@ -1,5 +1,5 @@
 import { ReactElement } from 'react'
-import { EntityListSubTree, Environment, Field, Filter } from '@contember/binding'
+import { EntityListSubTree, Environment, Field, Filter } from '@contember/react-binding'
 import { BaseDynamicChoiceField } from './BaseDynamicChoiceField'
 import { getDesugaredEntityList, getDesugaredFieldList } from './hooks/useDesugaredOptionPath'
 

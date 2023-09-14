@@ -4,7 +4,7 @@ import {
 	QueryLanguage,
 	SugaredRelativeSingleField,
 	wrapFilterInHasOnes,
-} from '@contember/binding'
+} from '@contember/react-binding'
 import { Checkbox, FieldContainer, Stack } from '@contember/ui'
 import type { FunctionComponent, ReactNode } from 'react'
 import { useMessageFormatter } from '../../../../../i18n'

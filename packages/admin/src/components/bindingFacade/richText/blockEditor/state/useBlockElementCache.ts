@@ -4,7 +4,7 @@ import {
 	SugaredRelativeEntityList,
 	useDesugaredRelativeSingleField,
 	useEntityBeforeUpdate,
-} from '@contember/binding'
+} from '@contember/react-binding'
 import { useCallback, useState } from 'react'
 import { Editor, Element as SlateElement } from 'slate'
 

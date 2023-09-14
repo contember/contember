@@ -1,5 +1,5 @@
-import type { FieldAccessor, FieldValue } from '@contember/binding'
-import { useEntityBeforePersist } from '@contember/binding'
+import type { FieldAccessor, FieldValue } from '@contember/react-binding'
+import { useEntityBeforePersist } from '@contember/react-binding'
 import type { ControlProps, NonOptionalControlProps } from '@contember/ui'
 import { Ref, useCallback, useEffect, useRef, useState } from 'react'
 import type { SimpleRelativeSingleFieldMetadata } from '../auxiliary'

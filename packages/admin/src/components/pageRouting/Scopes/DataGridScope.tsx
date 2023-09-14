@@ -1,4 +1,4 @@
-import { DataBindingProvider, DataBindingProviderStateComponent } from '@contember/binding'
+import { DataBindingProvider, DataBindingProviderStateComponent } from '@contember/react-binding'
 import { PropsWithChildren } from 'react'
 import { DataGrid, DataGridProps, FeedbackRenderer } from '../../bindingFacade'
 import { scopeComponent } from './scopeComponent'

@@ -1,4 +1,4 @@
-import { Component, SugaredField, SugaredFieldProps, useField } from '@contember/binding'
+import { Component, SugaredField, SugaredFieldProps, useField } from '@contember/react-binding'
 import { FieldContainer, FieldContainerProps } from '@contember/ui'
 import * as Leaflet from 'leaflet'
 import { FunctionComponent, useCallback, useEffect, useState } from 'react'

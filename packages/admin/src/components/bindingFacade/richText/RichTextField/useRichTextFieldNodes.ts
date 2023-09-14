@@ -1,4 +1,4 @@
-import { BindingError, FieldAccessor } from '@contember/binding'
+import { BindingError, FieldAccessor } from '@contember/react-binding'
 import { Descendant, Editor } from 'slate'
 
 export interface UseRichTextFieldEditorNodeOptions {

@@ -5,7 +5,7 @@ import {
 	SugaredRelativeSingleEntity,
 	useEntity,
 	wrapFilterInHasOnes,
-} from '@contember/binding'
+} from '@contember/react-binding'
 import type { FunctionComponent } from 'react'
 import { DataGridColumn, DataGridColumnPublicProps } from '../base'
 import { renderDynamicChoiceFieldStatic } from '../../../fields/ChoiceField/renderDynamicChoiceFieldStatic'

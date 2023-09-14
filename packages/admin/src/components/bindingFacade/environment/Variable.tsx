@@ -1,4 +1,4 @@
-import { Environment, useEnvironment } from '@contember/binding'
+import { Environment, useEnvironment } from '@contember/react-binding'
 import { memo, ReactElement, ReactNode, useMemo } from 'react'
 
 export interface VariableProps {

@@ -1,4 +1,4 @@
-import { Environment, Filter, QueryLanguage } from '@contember/binding'
+import { Environment, Filter, QueryLanguage } from '@contember/react-binding'
 import type { DataGridColumnProps } from './DataGridColumn'
 import type { DataGridFilterArtifact } from './DataGridFilterArtifact'
 

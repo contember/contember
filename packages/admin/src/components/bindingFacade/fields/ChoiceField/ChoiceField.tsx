@@ -1,4 +1,4 @@
-import { Component, EntityAccessor, FieldValue } from '@contember/binding'
+import { Component, EntityAccessor, FieldValue } from '@contember/react-binding'
 import type { FunctionComponent } from 'react'
 import type { ChoiceFieldData } from './ChoiceFieldData'
 import { StaticSingleChoiceField, StaticSingleChoiceFieldProps } from './StaticSingleChoiceField'

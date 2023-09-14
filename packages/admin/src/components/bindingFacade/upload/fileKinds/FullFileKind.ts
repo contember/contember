@@ -1,4 +1,4 @@
-import type { AsyncBatchUpdatesOptions } from '@contember/binding'
+import type { AsyncBatchUpdatesOptions } from '@contember/react-binding'
 import type { FileUploader, FileUploadError } from '@contember/client'
 import type { ReactNode } from 'react'
 import type { FileDataExtractor } from '../fileDataExtractors'

@@ -1,4 +1,4 @@
-import { EntityAccessor, EntityId, EntityListBaseProps, EntityName, Filter } from '@contember/binding'
+import { EntityAccessor, EntityId, EntityListBaseProps, EntityName, Filter } from '@contember/react-binding'
 import { ComponentType, ReactNode } from 'react'
 import { EmptyMessageProps } from '../../../helpers'
 import type { GridPagingAction } from '../../paging'

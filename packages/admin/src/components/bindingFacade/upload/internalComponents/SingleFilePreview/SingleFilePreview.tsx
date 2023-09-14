@@ -1,4 +1,4 @@
-import { BindingError, Entity } from '@contember/binding'
+import { BindingError, Entity } from '@contember/react-binding'
 import type { FileId, SingleFileUploadState } from '@contember/react-client'
 import { ActionableBox, Box, toEnumViewClass } from '@contember/ui'
 import { ReactElement, memo, useMemo } from 'react'

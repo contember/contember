@@ -6,7 +6,7 @@ import {
 	QueryLanguage,
 	useEntity,
 	useMutationState,
-} from '@contember/binding'
+} from '@contember/react-binding'
 import { EditorCanvas, EditorCanvasDistinction, FieldContainer, FieldContainerProps } from '@contember/ui'
 import { FunctionComponent, useCallback, useMemo, useState } from 'react'
 import { Descendant, Editor, Element as SlateElement, Node as SlateNode, NodeEntry, Transforms } from 'slate'

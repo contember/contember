@@ -1,4 +1,4 @@
-import type { EntityAccessor, EntityId } from '@contember/binding'
+import type { EntityAccessor, EntityId } from '@contember/react-binding'
 import type { IconSourceSpecification } from '@contember/ui'
 import type { FunctionComponent, ReactNode } from 'react'
 import type { Range as SlateRange } from 'slate'

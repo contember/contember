@@ -1,4 +1,4 @@
-import { SugaredFieldProps, useGetEntityByKey, useMutationState } from '@contember/binding'
+import { SugaredFieldProps, useGetEntityByKey, useMutationState } from '@contember/react-binding'
 import type { FileId } from '@contember/react-client'
 import { useFileUpload } from '@contember/react-client'
 import { FunctionComponent, ReactNode, useCallback, useMemo } from 'react'

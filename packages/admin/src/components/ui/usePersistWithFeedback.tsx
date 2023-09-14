@@ -1,4 +1,4 @@
-import { ErrorPersistResult, PersistOptions, SuccessfulPersistResult, usePersist } from '@contember/binding'
+import { ErrorPersistResult, PersistOptions, SuccessfulPersistResult, usePersist } from '@contember/react-binding'
 import { useShowToast } from '@contember/ui'
 import { useCallback } from 'react'
 import { useMessageFormatter } from '../../i18n'

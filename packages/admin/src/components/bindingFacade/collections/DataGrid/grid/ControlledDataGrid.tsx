@@ -1,4 +1,4 @@
-import { Component, SugaredQualifiedEntityList, useEnvironment } from '@contember/binding'
+import { Component, SugaredQualifiedEntityList, useEnvironment } from '@contember/react-binding'
 import { SpinnerContainer } from '@contember/ui'
 import { ComponentType, ReactElement, ReactNode, useMemo } from 'react'
 import type { DataGridContainerProps, DataGridContainerPublicProps } from '../base'

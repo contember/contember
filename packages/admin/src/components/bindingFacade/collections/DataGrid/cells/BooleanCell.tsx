@@ -1,4 +1,4 @@
-import { Component, QueryLanguage, wrapFilterInHasOnes } from '@contember/binding'
+import { Component, QueryLanguage, wrapFilterInHasOnes } from '@contember/react-binding'
 import type { Input } from '@contember/client'
 import { Checkbox, FieldContainer, Stack } from '@contember/ui'
 import type { FunctionComponent } from 'react'

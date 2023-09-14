@@ -1,7 +1,7 @@
 import { useDesugaredOptionPath } from './useDesugaredOptionPath'
 import { useNormalizedOptions } from './useNormalizedOptions'
 import { BaseDynamicChoiceField } from '../BaseDynamicChoiceField'
-import { EntityAccessor } from '@contember/binding'
+import { EntityAccessor } from '@contember/react-binding'
 
 export const useCurrentValues = (
 	optionProps: BaseDynamicChoiceField,

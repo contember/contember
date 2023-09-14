@@ -4,7 +4,7 @@ import {
 	useDesugaredRelativeSingleEntity,
 	useEntityList,
 	useSortedEntities,
-} from '@contember/binding'
+} from '@contember/react-binding'
 import { useCallback, useMemo } from 'react'
 import type { ChoiceFieldData } from '../ChoiceFieldData'
 import { useSelectOptions } from './useSelectOptions'

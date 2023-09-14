@@ -5,7 +5,7 @@ import {
 	SugaredRelativeSingleField,
 	useDerivedField,
 	useEnvironment,
-} from '@contember/binding'
+} from '@contember/react-binding'
 import { ControlProps, SlugInput } from '@contember/ui'
 import slugify from '@sindresorhus/slugify'
 import { useCallback, useMemo } from 'react'

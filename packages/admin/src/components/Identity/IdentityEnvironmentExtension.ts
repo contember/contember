@@ -1,4 +1,4 @@
-import { BindingError, Environment } from '@contember/binding'
+import { BindingError, Environment } from '@contember/react-binding'
 import { Identity } from './IdentityProvider'
 
 export const identityEnvironmentExtension = Environment.createExtension((state: Identity | null | undefined) => {

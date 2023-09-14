@@ -5,7 +5,7 @@ import {
 	QueryLanguage,
 	SugarableRelativeSingleField,
 	useEntity, useEnvironment,
-} from '@contember/binding'
+} from '@contember/react-binding'
 import { ReactElement, ReactNode, useMemo } from 'react'
 import { FieldFallbackView, FieldFallbackViewPublicProps } from './FieldFallbackView'
 

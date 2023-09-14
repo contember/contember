@@ -1,4 +1,4 @@
-import { Filter, QueryLanguage, useEnvironment } from '@contember/binding'
+import { Filter, QueryLanguage, useEnvironment } from '@contember/react-binding'
 import { useSessionStorageState } from '@contember/react-utils'
 import { useMemo } from 'react'
 import { DataGridProps } from '../grid'

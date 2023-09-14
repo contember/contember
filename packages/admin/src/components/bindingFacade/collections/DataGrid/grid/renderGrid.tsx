@@ -1,4 +1,4 @@
-import { EntityListSubTree, Environment, TreeRootId } from '@contember/binding'
+import { EntityListSubTree, Environment, TreeRootId } from '@contember/react-binding'
 import { ComponentType, Fragment, ReactElement } from 'react'
 import {
 	DataGridContainer,

@@ -1,4 +1,4 @@
-import type { Environment, Filter } from '@contember/binding'
+import type { Environment, Filter } from '@contember/react-binding'
 import { DataGridColumns, DataGridFilterArtifactStore, getColumnFilter } from '../base'
 
 export const collectFilters = (

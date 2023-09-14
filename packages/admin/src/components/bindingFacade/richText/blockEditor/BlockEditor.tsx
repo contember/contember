@@ -10,7 +10,7 @@ import {
 	useDesugaredRelativeSingleField,
 	useEnvironment,
 	VariableInputTransformer,
-} from '@contember/binding'
+} from '@contember/react-binding'
 import { emptyArray, noop, useReferentiallyStableCallback } from '@contember/react-utils'
 import { EditorCanvas, EditorCanvasSize, FieldContainer, Scheme } from '@contember/ui'
 import { Fragment, FunctionComponent, ReactElement, ReactNode, useCallback, useLayoutEffect, useMemo, useState } from 'react'

@@ -1,4 +1,4 @@
-import { Component, QueryLanguage, SugaredQualifiedEntityList } from '@contember/binding'
+import { Component, QueryLanguage, SugaredQualifiedEntityList } from '@contember/react-binding'
 import { ComponentType, ReactElement, ReactNode } from 'react'
 import { DataGridContainerProps, DataGridContainerPublicProps, DataGridState, DATA_GRID_DEFAULT_ITEMS_PER_PAGE, useDataGrid } from '../base'
 import { extractDataGridColumns } from '../structure'

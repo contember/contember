@@ -1,4 +1,4 @@
-import { Component, EntityAccessor, EntityId, EntitySubTree } from '@contember/binding'
+import { Component, EntityAccessor, EntityId, EntitySubTree } from '@contember/react-binding'
 import { NotFoundWrapper } from '../pageRouting'
 import { AutoFields } from './AutoFields'
 import { RoutingLinkTarget } from '../../routing'

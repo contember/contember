@@ -1,4 +1,4 @@
-import { Component, useEnvironment } from '@contember/binding'
+import { Component, useEnvironment } from '@contember/react-binding'
 import { BareUploadField } from './BareUploadField'
 import { useResolvedSingleKindFileSelection } from './selection/useResolvedSingleKindFileSelection'
 import { createEntityConnectorFactory } from '../fileHandler/utils/createEntityConnector'

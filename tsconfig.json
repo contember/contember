@@ -12,6 +12,7 @@
 		{ "path": "./packages/client" },
 		{ "path": "./packages/interface-tester" },
 		{ "path": "./packages/layout" },
+		{ "path": "./packages/react-binding" },
 		{ "path": "./packages/react-client" },
 		{ "path": "./packages/react-multipass-rendering" },
 		{ "path": "./packages/react-utils" },

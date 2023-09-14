@@ -1,4 +1,4 @@
-import { Component, QueryLanguage, Schema } from '@contember/binding'
+import { Component, QueryLanguage, Schema } from '@contember/react-binding'
 import { Stack } from '@contember/ui'
 import { LinkButton, RoutingLinkTarget } from '../../routing'
 import { DataGrid, DataGridContainerPublicProps, DataGridProps, DeleteEntityButton, GenericCell } from '../bindingFacade'

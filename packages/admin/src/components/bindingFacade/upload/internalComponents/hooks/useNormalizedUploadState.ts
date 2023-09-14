@@ -1,4 +1,4 @@
-import { EntityAccessor, useBindingOperations, useMutationState } from '@contember/binding'
+import { EntityAccessor, useBindingOperations, useMutationState } from '@contember/react-binding'
 import { FileUploadError } from '@contember/client'
 import type {
 	FileId,

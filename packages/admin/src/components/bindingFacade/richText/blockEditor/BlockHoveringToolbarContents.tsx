@@ -1,4 +1,4 @@
-import { BindingError, Environment, useEnvironment, VariableInputTransformer } from '@contember/binding'
+import { BindingError, Environment, useEnvironment, VariableInputTransformer } from '@contember/react-binding'
 import { EditorToolbar, EditorToolbarProps, IconSourceSpecification, ToolbarGroup } from '@contember/ui'
 import { memo, MouseEvent as ReactMouseEvent, useMemo } from 'react'
 import { useSlateStatic } from 'slate-react'

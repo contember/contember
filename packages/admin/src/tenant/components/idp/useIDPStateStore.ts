@@ -1,4 +1,4 @@
-import { JsonValue } from '@contember/binding'
+import { JsonValue } from '@contember/react-binding'
 import { useCallback } from 'react'
 
 export type IDPState = { provider: string, sessionData: JsonValue }

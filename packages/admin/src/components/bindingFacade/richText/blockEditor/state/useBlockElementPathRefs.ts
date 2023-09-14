@@ -5,7 +5,7 @@ import {
 	SugaredRelativeEntityList,
 	useDesugaredRelativeEntityList,
 	useEntityPersistSuccess,
-} from '@contember/binding'
+} from '@contember/react-binding'
 
 export type BlockElementPathRefs = Map<EntityId, PathRef>
 export const useBlockElementPathRefs = ({ editor, blockList }: {

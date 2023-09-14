@@ -1,4 +1,4 @@
-import { BindingError, EntityAccessor, Environment, QueryLanguage } from '@contember/binding'
+import { BindingError, EntityAccessor, Environment, QueryLanguage } from '@contember/react-binding'
 import { EntityConnectorFactory } from '../../internalComponents/hooks/useConnectSelectedEntities'
 
 export const createEntityConnectorFactory = (env: Environment, ...baseEntity: (string | undefined)[]): EntityConnectorFactory => {

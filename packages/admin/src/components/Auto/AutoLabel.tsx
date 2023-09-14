@@ -1,4 +1,4 @@
-import { Component, Field } from '@contember/binding'
+import { Component, Field } from '@contember/react-binding'
 import { Link, RoutingLinkTarget } from '../../routing'
 import { formatString } from './utils'
 

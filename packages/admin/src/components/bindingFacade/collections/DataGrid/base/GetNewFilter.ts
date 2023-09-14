@@ -1,4 +1,4 @@
-import type { Environment, SugaredFilter } from '@contember/binding'
+import type { Environment, SugaredFilter } from '@contember/react-binding'
 import type { DataGridFilterArtifact } from './DataGridFilterArtifact'
 
 export interface GetNewFilterOptions<FA extends DataGridFilterArtifact = DataGridFilterArtifact> {

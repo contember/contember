@@ -1,4 +1,4 @@
-import { Component, Field, FieldBasicProps } from '@contember/binding'
+import { Component, Field, FieldBasicProps } from '@contember/react-binding'
 import { ReactNode } from 'react'
 
 export type HiddenFieldProps =

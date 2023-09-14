@@ -1,4 +1,4 @@
-import { BindingError } from '@contember/binding'
+import { BindingError } from '@contember/react-binding'
 import * as Slate from 'slate'
 import { Descendant, Editor, Element as SlateElement, Node as SlateNode } from 'slate'
 import { CreateEditorPublicOptions, initializeEditor } from '../../editorFactory'

@@ -1,8 +1,8 @@
-import { EntityId } from '@contember/binding'
+import { EntityId } from '@contember/react-binding'
+import { MessageFormatter } from '@contember/react-i18n'
 import { useChildrenAsLabel } from '@contember/react-utils'
 import { Button, DialogModal, Heading } from '@contember/ui'
 import { ComponentType, ReactNode, useCallback, useMemo, useState } from 'react'
-import { MessageFormatter } from '../../../../../i18n'
 import { UploadDictionary } from '../../uploadDictionary'
 import { EntityConnector } from '../hooks/useConnectSelectedEntities'
 

@@ -1,5 +1,5 @@
 import { BaseDynamicChoiceField } from '../BaseDynamicChoiceField'
-import { EntityAccessor, Filter, TreeRootId, useEnvironment, useExtendTree, useTreeRootId } from '@contember/binding'
+import { EntityAccessor, Filter, TreeRootId, useEnvironment, useExtendTree, useTreeRootId } from '@contember/react-binding'
 import { ChoiceFieldData } from '../ChoiceFieldData'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useDesugaredOptionPath } from './useDesugaredOptionPath'

@@ -1,4 +1,4 @@
-import { BindingError } from '@contember/binding'
+import { BindingError } from '@contember/react-binding'
 import type { SingleFileUploadState } from '@contember/react-client'
 import { ErrorList, FilePreview, Message, UploadProgress } from '@contember/ui'
 import { ReactNode, useEffect, useRef, useState } from 'react'

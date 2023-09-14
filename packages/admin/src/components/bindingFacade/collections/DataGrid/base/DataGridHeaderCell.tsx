@@ -1,4 +1,4 @@
-import type { Environment } from '@contember/binding'
+import type { Environment } from '@contember/react-binding'
 import { ActionableBox, Box, Dropdown, DropdownProps, Justification, TableHeaderCell } from '@contember/ui'
 import { ChevronDownIcon, ChevronUpIcon, FilterIcon } from 'lucide-react'
 import { ComponentType, ReactElement, ReactNode, createElement, useMemo } from 'react'

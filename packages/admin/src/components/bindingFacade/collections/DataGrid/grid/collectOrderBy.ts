@@ -1,4 +1,4 @@
-import type { Environment, OrderBy } from '@contember/binding'
+import type { Environment, OrderBy } from '@contember/react-binding'
 import { DataGridColumns, DataGridOrderDirectionStore, getColumnOrderBy } from '../base'
 
 export const collectOrderBy = (

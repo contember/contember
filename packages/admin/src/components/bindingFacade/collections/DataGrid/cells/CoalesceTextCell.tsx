@@ -1,4 +1,4 @@
-import { Component, FieldValue, Filter, QueryLanguage, wrapFilterInHasOnes } from '@contember/binding'
+import { Component, FieldValue, Filter, QueryLanguage, wrapFilterInHasOnes } from '@contember/react-binding'
 import { Stack } from '@contember/ui'
 import { FC, ReactElement } from 'react'
 import { CoalesceFieldView, CoalesceFieldViewProps, FieldFallbackViewPublicProps } from '../../../fieldViews'

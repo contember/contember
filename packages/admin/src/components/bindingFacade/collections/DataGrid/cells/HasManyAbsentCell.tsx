@@ -5,7 +5,7 @@ import {
 	QueryLanguage,
 	SugaredRelativeEntityList,
 	wrapFilterInHasOnes,
-} from '@contember/binding'
+} from '@contember/react-binding'
 import { Checkbox, FieldContainer } from '@contember/ui'
 import type { ComponentType, FunctionComponent, ReactElement, ReactNode } from 'react'
 import type { FieldFallbackViewPublicProps } from '../../../fieldViews'

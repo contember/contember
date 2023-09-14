@@ -1,4 +1,4 @@
-import { Component } from '@contember/binding'
+import { Component } from '@contember/react-binding'
 import type { FunctionComponent } from 'react'
 import { DataGridColumn, DataGridColumnPublicProps } from '../base'
 

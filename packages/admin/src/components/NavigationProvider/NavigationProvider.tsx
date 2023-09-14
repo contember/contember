@@ -1,7 +1,7 @@
 import { NavigationContext } from '@contember/ui'
 import { ReactNode } from 'react'
 import { isRoutingLinkTarget, PageNotFound, parseLinkTarget, useRoutingLinkFactory } from '../../routing'
-import { useEnvironment } from '@contember/binding'
+import { useEnvironment } from '@contember/react-binding'
 
 export interface NavigationProviderProps {
 	children?: ReactNode

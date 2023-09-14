@@ -6,7 +6,7 @@ import {
 	useAccessorUpdateSubscription,
 	useEntity,
 	useEnvironment,
-} from '@contember/binding'
+} from '@contember/react-binding'
 import { useCallback, useMemo } from 'react'
 import { BaseDynamicChoiceField, BaseDynamicChoiceFieldOptions } from '../BaseDynamicChoiceField'
 import type { ChoiceFieldData } from '../ChoiceFieldData'

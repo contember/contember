@@ -1,4 +1,4 @@
-import { BindingError } from '@contember/binding'
+import { BindingError } from '@contember/react-binding'
 
 export interface ContentOutletProps {
 	placeholder?: string

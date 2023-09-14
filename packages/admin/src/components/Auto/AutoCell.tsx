@@ -1,4 +1,4 @@
-import { Component, HasOne, PRIMARY_KEY_NAME, Schema, useEntityPersistSuccess } from '@contember/binding'
+import { Component, HasOne, PRIMARY_KEY_NAME, Schema, useEntityPersistSuccess } from '@contember/react-binding'
 import {
 	BooleanCell,
 	CheckboxField,

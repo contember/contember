@@ -1,4 +1,4 @@
-import { Environment, OrderBy, QueryLanguage } from '@contember/binding'
+import { Environment, OrderBy, QueryLanguage } from '@contember/react-binding'
 import type { DataGridColumns } from './DataGridColumn'
 import type { DataGridColumnKey } from './DataGridColumnKey'
 import type { DataGridOrderDirection } from './DataGridOrderDirection'

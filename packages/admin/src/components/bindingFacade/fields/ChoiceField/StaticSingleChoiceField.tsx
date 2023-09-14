@@ -4,7 +4,7 @@ import {
 	FieldValue,
 	OptionallyVariableFieldValue,
 	SugaredRelativeSingleField,
-} from '@contember/binding'
+} from '@contember/react-binding'
 import { FunctionComponent, ReactNode } from 'react'
 import type { ChoiceFieldData } from './ChoiceFieldData'
 import { useStaticSingleChoiceField } from './hooks/useStaticSingleChoiceField'

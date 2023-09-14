@@ -7,7 +7,7 @@ import {
 	SugaredRelativeSingleEntity,
 	useEntityList,
 	wrapFilterInHasOnes,
-} from '@contember/binding'
+} from '@contember/react-binding'
 import { Fragment, FunctionComponent, ReactElement, ReactNode, useMemo } from 'react'
 import { BaseDynamicChoiceField } from '../../../fields'
 import { renderDynamicChoiceFieldStatic } from '../../../fields/ChoiceField/renderDynamicChoiceFieldStatic'

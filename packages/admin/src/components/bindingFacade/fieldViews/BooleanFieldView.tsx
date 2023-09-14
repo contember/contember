@@ -1,4 +1,4 @@
-import { Component, SugaredField, SugaredFieldProps, useField } from '@contember/binding'
+import { Component, SugaredField, SugaredFieldProps, useField } from '@contember/react-binding'
 import type { FunctionComponent, ReactNode } from 'react'
 import { useMessageFormatter } from '../../../i18n'
 import { FieldFallbackView, FieldFallbackViewPublicProps } from './FieldFallbackView'

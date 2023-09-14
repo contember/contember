@@ -1,4 +1,4 @@
-import { PRIMARY_KEY_NAME, Schema, SchemaColumnType, SchemaEntity, SchemaRelation } from '@contember/binding'
+import { PRIMARY_KEY_NAME, Schema, SchemaColumnType, SchemaEntity, SchemaRelation } from '@contember/react-binding'
 
 export const getHumanFriendlyField = (entitySchema: SchemaEntity) => {
 	for (const field of ['name', 'title', 'heading', 'label', 'caption', 'slug', 'code', 'description']) {

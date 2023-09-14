@@ -1,4 +1,4 @@
-import { DataBindingProvider, DataBindingProviderStateComponent, EntitySubTree, EntitySubTreeAdditionalProps, SugaredQualifiedSingleEntity } from '@contember/binding'
+import { DataBindingProvider, DataBindingProviderStateComponent, EntitySubTree, EntitySubTreeAdditionalProps, SugaredQualifiedSingleEntity } from '@contember/react-binding'
 import { ReactNode } from 'react'
 import { FeedbackRenderer } from '../../bindingFacade'
 import { NotFoundBoundary } from './NotFoundBoundary'

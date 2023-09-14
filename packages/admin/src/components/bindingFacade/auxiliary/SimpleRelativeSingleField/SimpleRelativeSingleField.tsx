@@ -1,4 +1,4 @@
-import { Component, Environment, Field, FieldAccessor, FieldValue } from '@contember/binding'
+import { Component, Environment, Field, FieldAccessor, FieldValue } from '@contember/react-binding'
 import type { NamedExoticComponent, ReactNode } from 'react'
 import { SimpleRelativeSingleFieldProxy, SimpleRelativeSingleFieldProxyExcludeHandledProps, SimpleRelativeSingleFieldProxyProps } from './SimpleRelativeFieldProxy'
 

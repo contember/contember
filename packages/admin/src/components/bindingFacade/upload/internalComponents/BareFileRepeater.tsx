@@ -1,4 +1,4 @@
-import { Component, SugaredFieldProps, SugaredRelativeEntityList } from '@contember/binding'
+import { Component, SugaredFieldProps, SugaredRelativeEntityList } from '@contember/react-binding'
 import type { ComponentType } from 'react'
 import { Repeater } from '../../collections'
 import {

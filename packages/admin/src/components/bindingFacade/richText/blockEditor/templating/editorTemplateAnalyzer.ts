@@ -1,4 +1,4 @@
-import type { Environment } from '@contember/binding'
+import type { Environment } from '@contember/react-binding'
 import { ChildrenAnalyzer, Leaf } from '@contember/react-multipass-rendering'
 import type { ReactNode } from 'react'
 import { ContentOutlet, ContentOutletProps } from './ContentOutlet'

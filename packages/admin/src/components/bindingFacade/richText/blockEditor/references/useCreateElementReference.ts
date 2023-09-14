@@ -8,7 +8,7 @@ import {
 	SugaredFieldProps,
 	SugaredRelativeEntityList,
 	useBindingOperations,
-} from '@contember/binding'
+} from '@contember/react-binding'
 import { MutableRefObject, useCallback } from 'react'
 import { useGetReferenceEntityList } from './useGetReferenceEntityList'
 

@@ -1,7 +1,7 @@
 import { ChoiceFieldData } from '../ChoiceFieldData'
 import { useMemo } from 'react'
 import { BaseDynamicChoiceField } from '../BaseDynamicChoiceField'
-import { Entity, EntityAccessor } from '@contember/binding'
+import { Entity, EntityAccessor } from '@contember/react-binding'
 import { DesugaredOptionPath } from './useDesugaredOptionPath'
 import { useSearchFields } from './useSearchFields'
 

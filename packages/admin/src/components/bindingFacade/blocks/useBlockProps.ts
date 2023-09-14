@@ -1,4 +1,4 @@
-import { useEnvironment } from '@contember/binding'
+import { useEnvironment } from '@contember/react-binding'
 import { ReactNode, useMemo } from 'react'
 import type { BlockProps } from './Block'
 import { blockAnalyzer } from './blockAnalyzer'

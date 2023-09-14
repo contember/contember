@@ -1,3 +1,3 @@
-import type { OptionallyVariableFieldValue } from '@contember/binding'
+import type { OptionallyVariableFieldValue } from '@contember/react-binding'
 
 export type SugaredDiscriminateBy = OptionallyVariableFieldValue

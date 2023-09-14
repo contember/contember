@@ -1,4 +1,4 @@
-import type { Environment } from '@contember/binding'
+import type { Environment } from '@contember/react-binding'
 import { Box, Button, ButtonGroup, Dropdown, DropdownProps, Table, TableCell, TableHeaderCell, TableRow, Text } from '@contember/ui'
 import { FilterIcon, PlusCircleIcon, Trash2Icon } from 'lucide-react'
 import { Fragment, ReactElement, createElement, useMemo } from 'react'

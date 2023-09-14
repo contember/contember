@@ -1,4 +1,4 @@
-import { Component, Entity, EntityAccessor, EntityListAccessor } from '@contember/binding'
+import { Component, Entity, EntityAccessor, EntityListAccessor } from '@contember/react-binding'
 import { Table, TableCell, TableProps, TableRow, TableRowProps } from '@contember/ui'
 import { ReactElement, ReactNode, memo } from 'react'
 import { DeleteEntityButton, EmptyMessage, EmptyMessageOuterProps } from '../../collections'

@@ -1,4 +1,4 @@
-import { EntityAccessor, SugaredRelativeEntityList, useEntityList, useSortedEntities } from '@contember/binding'
+import { EntityAccessor, SugaredRelativeEntityList, useEntityList, useSortedEntities } from '@contember/react-binding'
 import { useCallback } from 'react'
 import { BaseDynamicChoiceField } from '../BaseDynamicChoiceField'
 import type { ChoiceFieldData } from '../ChoiceFieldData'

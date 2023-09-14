@@ -1,5 +1,5 @@
 import { BaseDynamicChoiceField } from '../BaseDynamicChoiceField'
-import { EntityId, Filter, TreeRootId, useEnvironment, useExtendTree } from '@contember/binding'
+import { EntityAccessor, EntityId, Filter, TreeRootId, useEnvironment, useExtendTree } from '@contember/react-binding'
 import { useDesugaredOptionPath } from './useDesugaredOptionPath'
 import { useEffect, useMemo, useState } from 'react'
 import { useTopLevelOptionAccessors } from './useTopLevelOptionAccessor'
@@ -8,7 +8,7 @@ import { renderDynamicChoiceFieldStatic } from '../renderDynamicChoiceFieldStati
 export const useCurrentlyChosenEntities = (
 	optionProps: BaseDynamicChoiceField,
 	ids: EntityId[],
-) => {
+): EntityAccessor[] => {
 	const filter = useMemo(() => ({
 		id: { in: ids },
 	}), [ids])

@@ -1,4 +1,4 @@
-import { EntityAccessor, useEntity } from '@contember/binding'
+import { EntityAccessor, useEntity } from '@contember/react-binding'
 import { ComponentType, memo, ReactNode, useMemo } from 'react'
 import { InnerRoutingLinkProps, Link, RequestState } from '../../../routing'
 

@@ -14,7 +14,7 @@ import {
 	SugaredQualifiedEntityList,
 	SugaredQualifiedFieldList,
 	useEnvironment,
-} from '@contember/binding'
+} from '@contember/react-binding'
 
 export type DesugaredOptionPath = QualifiedFieldList | QualifiedEntityList;
 

@@ -1,4 +1,4 @@
-import { Component } from '@contember/binding'
+import { Component } from '@contember/react-binding'
 import type { FieldErrors, RadioProps } from '@contember/ui'
 import { FieldContainer, FieldContainerProps, Radio } from '@contember/ui'
 import type { FunctionComponent } from 'react'

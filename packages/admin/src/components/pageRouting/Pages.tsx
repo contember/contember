@@ -2,7 +2,7 @@ import {
 	DataBindingStateComponentProps,
 	EnvironmentContext,
 	useEnvironment,
-} from '@contember/binding'
+} from '@contember/react-binding'
 import { EmptyStateContainer, Message, SpinnerOverlay } from '@contember/ui'
 import {
 	ComponentType,

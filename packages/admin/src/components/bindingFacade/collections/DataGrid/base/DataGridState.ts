@@ -1,4 +1,4 @@
-import { Filter, OrderBy, QualifiedEntityList } from '@contember/binding'
+import { Filter, OrderBy, QualifiedEntityList } from '@contember/react-binding'
 import type { DispatchChangePage, GridPagingState } from '../paging'
 import type { DataGridColumns } from './DataGridColumn'
 import type { DataGridFilterArtifactStore } from './DataGridFilterArtifactStore'

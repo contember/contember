@@ -1,4 +1,4 @@
-import { Component, SugaredFieldProps, SugaredRelativeEntityList, useEnvironment } from '@contember/binding'
+import { Component, SugaredFieldProps, SugaredRelativeEntityList, useEnvironment } from '@contember/react-binding'
 import { useResolvedSingleKindFileSelection } from './selection/useResolvedSingleKindFileSelection'
 import { createEntityConnectorFactory } from '../fileHandler/utils/createEntityConnector'
 import { isEmptyByUrlField, SingleKindFileHandler, useSingleKindFileHandler } from '../fileHandler'

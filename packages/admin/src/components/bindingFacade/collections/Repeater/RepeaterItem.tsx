@@ -1,4 +1,4 @@
-import { BindingError, RemovalType } from '@contember/binding'
+import { BindingError, RemovalType } from '@contember/react-binding'
 import { RepeaterItemContainer, RepeaterItemContainerProps } from '@contember/ui'
 import { ReactNode, forwardRef, memo } from 'react'
 import { DeleteEntityButton } from '../helpers'

@@ -1,4 +1,4 @@
-import { SugaredRelativeSingleField, useField } from '@contember/binding'
+import { SugaredRelativeSingleField, useField } from '@contember/react-binding'
 import { memo } from 'react'
 import { getDiscriminatedBlock, NormalizedBlocks } from '../../blocks'
 import { RepeaterItem, RepeaterItemProps } from '../Repeater'

@@ -6,7 +6,7 @@ import {
 	HasOne,
 	StaticRenderProvider,
 	SugaredRelativeSingleEntity,
-} from '@contember/binding'
+} from '@contember/react-binding'
 import { PureComponent, ReactElement, ReactNode, ReactNodeArray } from 'react'
 import { LabelMiddleware, LabelMiddlewareProvider } from './LabelMiddleware'
 

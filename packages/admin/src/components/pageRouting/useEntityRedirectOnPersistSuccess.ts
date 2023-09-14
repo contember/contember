@@ -1,5 +1,5 @@
-import type { EntityAccessor, EntityId, PersistSuccessOptions } from '@contember/binding'
-import { useEnvironment } from '@contember/binding'
+import type { EntityAccessor, EntityId, PersistSuccessOptions } from '@contember/react-binding'
+import { useEnvironment } from '@contember/react-binding'
 import { useMemo } from 'react'
 import {
 	createBindingLinkParametersResolver,

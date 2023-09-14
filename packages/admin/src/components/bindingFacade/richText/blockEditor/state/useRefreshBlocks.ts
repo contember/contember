@@ -3,7 +3,7 @@ import {
 	EntityAccessor, EntityId, EntityListAccessor, SugaredFieldProps, SugaredRelativeEntityList,
 	useDesugaredRelativeEntityList, useDesugaredRelativeSingleField,
 	useEntityBeforePersist,
-} from '@contember/binding'
+} from '@contember/react-binding'
 import { Descendant, Editor, Element as SlateElement, Element } from 'slate'
 import { isElementWithReference } from '../elements'
 import { useGetParentEntityRef } from '../useGetParentEntityRef'

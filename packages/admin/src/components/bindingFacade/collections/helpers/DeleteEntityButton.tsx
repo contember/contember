@@ -1,4 +1,4 @@
-import { EntityAccessor, useEntity, useMutationState } from '@contember/binding'
+import { EntityAccessor, useEntity, useMutationState } from '@contember/react-binding'
 import { Button, ButtonProps } from '@contember/ui'
 import { Trash2Icon } from 'lucide-react'
 import { ReactNode, memo, useCallback } from 'react'

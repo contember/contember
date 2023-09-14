@@ -1,4 +1,4 @@
-import { Component, QueryLanguage, wrapFilterInHasOnes } from '@contember/binding'
+import { Component, QueryLanguage, wrapFilterInHasOnes } from '@contember/react-binding'
 import type { Input } from '@contember/client'
 import { DateInput, FieldContainer, Stack, toDateString } from '@contember/ui'
 import { FunctionComponent, ReactNode, forwardRef, memo, useCallback } from 'react'

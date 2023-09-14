@@ -9,7 +9,7 @@ import {
 	SugaredField,
 	SugaredFieldProps,
 	VariableInputTransformer,
-} from '@contember/binding'
+} from '@contember/react-binding'
 import { resolveAcceptingSingleKind } from './utils/resolveAccept'
 import { resolveAllAcceptedMimes } from './utils/resolveAllAcceptedMimes'
 import { Fragment, ReactElement } from 'react'

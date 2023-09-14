@@ -6,7 +6,7 @@ import {
 	SugaredQualifiedEntityList,
 	SugaredQualifiedFieldList,
 	SugaredRelativeSingleField,
-} from '@contember/binding'
+} from '@contember/react-binding'
 import { ReactElement, ReactNode } from 'react'
 import { ChoiceFieldData } from './ChoiceFieldData'
 import { SelectFuseOptionsProps } from './hooks/useFuseFilteredOptions'

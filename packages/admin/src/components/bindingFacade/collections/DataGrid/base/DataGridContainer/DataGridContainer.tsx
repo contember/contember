@@ -1,4 +1,4 @@
-import { Component } from '@contember/binding'
+import { Component } from '@contember/react-binding'
 import { useClassName } from '@contember/react-utils'
 import { Stack } from '@contember/ui'
 import { FunctionComponent } from 'react'

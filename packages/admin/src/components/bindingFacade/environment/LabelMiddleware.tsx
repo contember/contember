@@ -1,5 +1,5 @@
 import { createContext, ReactChild, ReactNode, useCallback, useContext } from 'react'
-import { Environment, useEnvironment } from '@contember/binding'
+import { Environment, useEnvironment } from '@contember/react-binding'
 
 export type LabelMiddleware = (label: ReactNode, environment: Environment) => ReactNode
 

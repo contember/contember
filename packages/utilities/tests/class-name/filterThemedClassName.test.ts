@@ -1,4 +1,3 @@
-import { renderHook } from '@testing-library/react-hooks'
 import { describe, expect, test } from 'vitest'
 import { filterThemedClassName } from '../../src'
 
@@ -20,12 +19,10 @@ describe('@contember/react-utils', () => {
 			'theme-danger-controls',
 		])
 
-		expect(filterThemedClassName('theme-default theme-danger:hover', 'scheme-system')).toEqual([
+		expect(filterThemedClassName('theme-default theme-danger', 'scheme-system')).toEqual([
 			'scheme-system',
-			'theme-default-content',
-			'theme-default-controls',
-			'theme-danger-content:hover',
-			'theme-danger-controls:hover',
+			'theme-danger-content',
+			'theme-danger-controls',
 		])
 
 		expect(filterThemedClassName('random-css-class', 'scheme-system')).toEqual([

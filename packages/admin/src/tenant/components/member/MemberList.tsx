@@ -1,6 +1,6 @@
 import { Button, SpinnerContainer, Table, TableCell, TableRow } from '@contember/ui'
 import { ComponentType, memo } from 'react'
-import { EmptyMessage } from '../../../components'
+import { EmptyMessage } from '@contember/react-binding-ui'
 import { ListMembersMemberType, MemberIdentity, useListMembersQuery } from '../../queries'
 import { RoutingLinkTarget, LinkButton } from '../../../routing'
 import { RoleRendererFactory, useRoleRenderer } from './RoleRenderer'

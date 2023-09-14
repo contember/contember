@@ -1,0 +1,13 @@
+{
+	"extends": "../../../tsconfig.settings.json",
+	"compilerOptions": {
+		"outDir": "../dist/types"
+	},
+	"references": [
+		{ "path": "../../react-binding/src" },
+		{ "path": "../../react-binding-ui/src" },
+		{ "path": "../../react-choice-field/src" },
+		{ "path": "../../react-i18n/src" },
+		{ "path": "../../ui/src" },
+	]
+}

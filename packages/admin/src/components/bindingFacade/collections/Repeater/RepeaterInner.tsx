@@ -14,7 +14,7 @@ import {
 import { RepeaterItemContainerProps } from '@contember/ui'
 import { ComponentType, Fragment, ReactElement, ReactNode, useCallback } from 'react'
 import type { SortEndHandler } from 'react-sortable-hoc'
-import { useMessageFormatter } from '../../../../i18n'
+import { useMessageFormatter } from '@contember/react-i18n'
 import { shouldCancelStart } from '../../helpers/shouldCancelStart'
 import {
 	RepeaterCreateNewEntity,
@@ -27,6 +27,7 @@ import { SortableRepeaterContainer } from './SortableRepeaterContainer'
 import { SortableRepeaterItem } from './SortableRepeaterItem'
 import { SortableRepeaterItemHandle } from './SortableRepeaterItemHandle'
 import { repeaterDictionary } from './repeaterDictionary'
+import { shouldCancelStart } from '@contember/react-binding-ui'
 
 // TODO alt content for collapsing
 export interface RepeaterInnerProps<ContainerExtraProps, ItemExtraProps>

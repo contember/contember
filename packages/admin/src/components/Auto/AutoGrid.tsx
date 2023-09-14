@@ -1,19 +1,14 @@
-import { Component, QueryLanguage, Schema } from '@contember/react-binding'
+import { Component, QueryLanguage, Schema, SugaredQualifiedEntityList } from '@contember/react-binding'
+import { DeleteEntityButton } from '@contember/react-binding-ui'
+import { DataGrid, DataGridContainerPublicProps, GenericCell } from '@contember/react-datagrid-ui'
 import { Stack } from '@contember/ui'
 import { LinkButton, RoutingLinkTarget } from '../../routing'
-import {
-	DataGrid,
-	DataGridContainerPublicProps,
-	DataGridProps,
-	DeleteEntityButton,
-	GenericCell,
-} from '../bindingFacade'
 import { AutoCell } from './AutoCell'
 
 export type AutoGridProps =
 	& DataGridContainerPublicProps
 	& {
-		entities: DataGridProps<{}>['entities']
+		entities: SugaredQualifiedEntityList['entities']
 		createViewLinkTarget?: (entity: string) => RoutingLinkTarget
 		createEditLinkTarget?: (entity: string) => RoutingLinkTarget
 	}

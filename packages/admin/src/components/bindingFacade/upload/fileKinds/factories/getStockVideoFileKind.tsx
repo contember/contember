@@ -1,5 +1,5 @@
 import type { S3FileUploader } from '@contember/client'
-import { VideoFieldView } from '../../../fieldViews'
+import { VideoFieldView } from '@contember/react-binding-ui'
 import { defaultUploader } from '../../defaultUploader'
 import type { FileDataExtractor, VideoFileDataExtractorProps } from '../../fileDataExtractors'
 import {

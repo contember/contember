@@ -1,5 +1,5 @@
 import type { S3FileUploader } from '@contember/client'
-import { FileUrlFieldView } from '../../../fieldViews'
+import { FileUrlFieldView } from '@contember/react-binding-ui'
 import { defaultUploader } from '../../defaultUploader'
 import type { AudioFileDataExtractorProps, FileDataExtractor } from '../../fileDataExtractors'
 import {

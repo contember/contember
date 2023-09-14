@@ -2,7 +2,7 @@ import { Environment, EnvironmentContext, EnvironmentExtensionProvider } from '@
 import { ContemberClient, ContemberClientProps } from '@contember/react-client'
 import { Providers as InterfaceProviders, ProvidersProps } from '@contember/ui'
 import { ComponentType, PropsWithChildren, ReactNode } from 'react'
-import { I18nProvider, MessageDictionaryByLocaleCode } from '../i18n'
+import { I18nProvider, MessageDictionaryByLocaleCode } from '@contember/react-i18n'
 import { RequestProvider, RouteMap, RoutingContext, RoutingContextValue, SelectedDimension } from '../routing'
 import { OutdatedApplicationChecker } from './Application/OutdatedApplicationChecker'
 import { ApplicationDevBar } from './Dev/DevBar'

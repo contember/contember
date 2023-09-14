@@ -1,17 +1,13 @@
 import { DataBindingProvider } from '@contember/react-binding'
 import { ReactNode } from 'react'
 import {
-	createDataGrid,
-	createDataGridRenderer,
-	DataGridColumnPublicProps,
-	DataGridContainerPublicProps,
 	DataGridPageRenderer,
-	DataGridProps,
 	FeedbackRenderer,
 	LayoutRendererProps,
 } from '../../bindingFacade'
 import { pageComponent } from './pageComponent'
 import { ContainerSpinner } from '@contember/ui'
+import { DataGridProps, DataGridContainerPublicProps, createDataGrid, createDataGridRenderer, DataGridColumnPublicProps } from '@contember/react-datagrid-ui'
 
 export type DataGridPageProps =
 	& DataGridProps<DataGridContainerPublicProps>

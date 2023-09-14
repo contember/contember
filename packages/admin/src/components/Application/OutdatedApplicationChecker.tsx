@@ -1,7 +1,7 @@
 import { useIsMounted } from '@contember/react-utils'
 import { Button, Heading, Stack, useDialog } from '@contember/ui'
 import { ComponentType, useCallback, useEffect, useRef, useState } from 'react'
-import { useMessageFormatter } from '../../i18n'
+import { useMessageFormatter } from '@contember/react-i18n'
 import { outdatedApplicationDictionary } from './outdatedApplicationDictionary'
 
 const postponeTimeoutMs = 60_000 * 5

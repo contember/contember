@@ -8,21 +8,28 @@ COPY .yarn																						./.yarn
 COPY ee/admin-server/package.json											./ee/admin-server/package.json
 
 # Community Edition
-COPY packages/admin/package.json											./packages/admin/package.json
-COPY packages/admin-i18n/package.json									./packages/admin-i18n/package.json
-COPY packages/admin-sandbox/package.json							./packages/admin-sandbox/package.json
-COPY packages/binding/package.json										./packages/binding/package.json
-COPY packages/brand/package.json											./packages/brand/package.json
-COPY packages/client/package.json											./packages/client/package.json
-COPY packages/interface-tester/package.json						./packages/interface-tester/package.json
-COPY packages/layout/package.json											./packages/layout/package.json
-COPY packages/react-client/package.json								./packages/react-client/package.json
-COPY packages/react-multipass-rendering/package.json	./packages/react-multipass-rendering/package.json
-COPY packages/react-utils/package.json								./packages/react-utils/package.json
-COPY packages/ui/package.json													./packages/ui/package.json
-COPY packages/utilities/package.json									./packages/utilities/package.json
-COPY packages/vimeo-file-uploader/package.json				./packages/vimeo-file-uploader/package.json
-COPY packages/vite-plugin/package.json								./packages/vite-plugin/package.json
+COPY packages/admin/package.json ./packages/admin/package.json
+COPY packages/admin-i18n/package.json ./packages/admin-i18n/package.json
+COPY packages/admin-sandbox/package.json ./packages/admin-sandbox/package.json
+COPY packages/binding/package.json ./packages/binding/package.json
+COPY packages/brand/package.json ./packages/brand/package.json
+COPY packages/client/package.json ./packages/client/package.json
+COPY packages/interface-tester/package.json ./packages/interface-tester/package.json
+COPY packages/layout/package.json ./packages/layout/package.json
+COPY packages/react-binding/package.json ./packages/react-binding/package.json
+COPY packages/react-binding-ui/package.json ./packages/react-binding-ui/package.json
+COPY packages/react-client/package.json ./packages/react-client/package.json
+COPY packages/react-choice-field/package.json ./packages/react-choice-field/package.json
+COPY packages/react-choice-field-ui/package.json ./packages/react-choice-field-ui/package.json
+COPY packages/react-datagrid/package.json ./packages/react-datagrid/package.json
+COPY packages/react-datagrid-ui/package.json ./packages/react-datagrid-ui/package.json
+COPY packages/react-i18n/package.json ./packages/react-i18n/package.json
+COPY packages/react-multipass-rendering/package.json ./packages/react-multipass-rendering/package.json
+COPY packages/react-utils/package.json ./packages/react-utils/package.json
+COPY packages/ui/package.json ./packages/ui/package.json
+COPY packages/utilities/package.json ./packages/utilities/package.json
+COPY packages/vimeo-file-uploader/package.json ./packages/vimeo-file-uploader/package.json
+COPY packages/vite-plugin/package.json ./packages/vite-plugin/package.json
 
 RUN yarn install
 

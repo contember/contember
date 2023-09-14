@@ -1,8 +1,8 @@
 import { Component, SugaredRelativeSingleField } from '@contember/react-binding'
 import type { FieldContainerProps } from '@contember/ui'
 import { FunctionComponent, ReactNode, useMemo } from 'react'
-import { ChoiceFieldData, NormalizedStaticOption, SelectFieldInner, StaticSingleChoiceField } from '../fields'
-import { useStaticSingleChoiceField } from '../fields/ChoiceField/hooks/useStaticSingleChoiceField'
+import { ChoiceFieldData, NormalizedStaticOption, SelectFieldInner, StaticSingleChoiceField } from '@contember/react-choice-field-ui'
+import { useStaticSingleChoiceField } from '../../../../../react-choice-field/src/hooks/useStaticSingleChoiceField'
 import { useNormalizedBlocks } from './useNormalizedBlocks'
 
 export type DiscriminatedBlocksProps =

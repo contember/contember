@@ -1,6 +1,6 @@
 import { AnchorButton, ButtonList } from '@contember/ui'
+import { EmptyMessage } from '@contember/react-binding-ui'
 import { MiscPageLayout } from '../MiscPageLayout'
-import { EmptyMessage } from '../bindingFacade'
 
 export interface Project {
 	slug: string

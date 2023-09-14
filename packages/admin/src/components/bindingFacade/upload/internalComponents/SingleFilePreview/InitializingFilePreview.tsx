@@ -1,5 +1,5 @@
 import { FilePreview, UploadProgress } from '@contember/ui'
-import type { MessageFormatter } from '../../../../../i18n'
+import type { MessageFormatter } from '@contember/react-i18n'
 import type { UploadDictionary } from '../../uploadDictionary'
 
 export interface InitializingFilePreviewProps {

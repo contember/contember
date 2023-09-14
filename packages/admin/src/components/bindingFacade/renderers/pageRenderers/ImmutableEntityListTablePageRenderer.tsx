@@ -1,7 +1,7 @@
 import { Component, Entity, EntityAccessor, EntityListAccessor } from '@contember/react-binding'
 import { Table, TableCell, TableProps, TableRow, TableRowProps } from '@contember/ui'
 import { ReactElement, ReactNode, memo } from 'react'
-import { DeleteEntityButton, EmptyMessage, EmptyMessageOuterProps } from '../../collections'
+import { DeleteEntityButton, EmptyMessage, EmptyMessageOuterProps } from '@contember/react-binding-ui'
 import { LayoutRenderer, LayoutRendererProps } from '../LayoutRenderer'
 
 export type ImmutableEntityListTablePageRendererProps<ContainerExtraProps, ItemExtraProps> =

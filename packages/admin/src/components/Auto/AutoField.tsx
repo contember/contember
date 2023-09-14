@@ -1,5 +1,6 @@
 import { Component, Field, Schema } from '@contember/react-binding'
-import { CheckboxField, DateField, DateTimeField, FloatField, MultiSelectField, NumberField, SelectField, TextareaField, TextField } from '../bindingFacade'
+import { SelectField, MultiSelectField } from '@contember/react-choice-field-ui'
+import { CheckboxField, DateField, DateTimeField, FloatField, NumberField, TextareaField, TextField } from '../bindingFacade'
 import { getHumanFriendlyField, resolveConnectingEntity, resolveSortableBy } from './utils'
 import { AutoFields } from './AutoFields'
 import { RoutingLinkTarget } from '../../routing'

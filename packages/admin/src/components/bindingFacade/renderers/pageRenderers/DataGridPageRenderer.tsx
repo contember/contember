@@ -1,5 +1,5 @@
 import { Component } from '@contember/react-binding'
-import { DataGridContainer, DataGridContainerProps } from '../../collections'
+import { DataGridContainer, DataGridContainerProps } from '@contember/react-datagrid-ui'
 import { LayoutRenderer, LayoutRendererProps } from '../LayoutRenderer'
 
 export type DataGridPageRendererProps =

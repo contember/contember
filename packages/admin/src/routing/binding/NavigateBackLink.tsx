@@ -2,7 +2,7 @@ import { AnchorButton, Button, Stack, VisuallyHidden } from '@contember/ui'
 import { assert, isNonEmptyTrimmedString } from '@contember/utilities'
 import { ArrowLeftIcon } from 'lucide-react'
 import { ReactNode, memo, useMemo } from 'react'
-import { useMessageFormatter } from '../../i18n'
+import { useMessageFormatter } from '@contember/react-i18n'
 import { Link, LinkProps } from './Link'
 
 export const navigationBackLinkDictionary = {

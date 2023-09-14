@@ -1,9 +1,8 @@
-import { SugaredRelativeSingleField, useEnvironment, useField, useMutationState } from '@contember/react-binding'
+import { SugaredRelativeSingleField, useEnvironment, useField, useMutationState, useLabelMiddleware } from '@contember/react-binding'
 import { FieldContainer, FieldContainerProps } from '@contember/ui'
 import { NonOptional } from '@contember/utilities'
 import { CSSProperties, ReactNode, memo, useMemo } from 'react'
-import { useLabelMiddleware } from '../../environment/LabelMiddleware'
-import { useAccessorErrors } from '../../errors'
+import { useAccessorErrors } from '@contember/react-binding-ui'
 import type { SimpleRelativeSingleFieldMetadata } from './SimpleRelativeSingleField'
 
 // Props that are handled by the FieldContainer:
@@ -85,7 +84,7 @@ export const SimpleRelativeSingleFieldProxy = memo(
 		const useFieldProps: SugaredRelativeSingleField = { defaultValue, field: fieldName, isNonbearing, onBeforeUpdate, onInitialize, onUpdate }
 
 		const field = useField(useFieldProps)
-		const fieldErrors = useAccessorErrors(field)
+		const fieldErrors = useAccessorErrors(field.errors?.errors)
 
 		const combinedErrors = !suppressErrors ? combineErrorMessages(errors, fieldErrors) : undefined
 

@@ -1,25 +1,29 @@
 import { Component, HasOne, PRIMARY_KEY_NAME, Schema, useEntityPersistSuccess } from '@contember/react-binding'
 import {
-	BooleanCell,
 	CheckboxField,
-	DateCell,
 	DateField,
 	DateTimeField,
+	NumberField,
+	TextareaField,
+	TextField,
+} from '../bindingFacade'
+import {
+	BooleanCell,
+	DateCell,
 	EnumCell,
 	HasManySelectCell,
 	HasOneSelectCell,
 	NumberCell,
-	NumberField,
-	SelectField,
-	TextareaField,
 	TextCell,
-	TextField,
-} from '../bindingFacade'
+} from '@contember/react-datagrid-ui'
+import {
+	SelectField,
+} from '@contember/react-choice-field-ui'
 import { formatString, getHumanFriendlyField, resolveConnectingEntity, resolveSortableBy } from './utils'
 import { MouseEvent, ReactNode, useCallback, useRef, useState } from 'react'
 import { RoutingLinkTarget } from '../../routing'
-import { dateToStringWithoutTimezone } from '../../utils'
 import { AutoLabel } from './AutoLabel'
+import { dateToStringWithoutTimezone } from '@contember/react-binding-ui'
 
 export type AutoCellProps = {
 	schema: Schema

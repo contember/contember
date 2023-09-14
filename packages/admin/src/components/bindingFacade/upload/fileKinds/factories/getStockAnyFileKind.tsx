@@ -1,5 +1,5 @@
 import type { S3FileUploader } from '@contember/client'
-import { FileUrlFieldView } from '../../../fieldViews'
+import { FileUrlFieldView } from '@contember/react-binding-ui'
 import { defaultUploader } from '../../defaultUploader'
 import { FileDataExtractor, getFileUrlDataExtractor, getGenericFileMetadataExtractor } from '../../fileDataExtractors'
 import { FullFileKind, RenderFilePreviewOptions } from '../FullFileKind'

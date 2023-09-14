@@ -186,10 +186,12 @@
 	----background-color-opacity--highlighted: 1;
 	----background-color-opacity--pressed: 1;
 	----background-color-opacity: 1;
-	----background-color-rgb--disabled: var(--cui-background-color--content-inverse-rgb-100);
+	----background-color-rgb--disabled: var(--cui-background-color--toned-rgb-50);
 	----background-color-rgb--pressed: var(--cui-background-color--controls-inverse-rgb-50);
 	----background-color-rgb--highlighted: var(--cui-background-color--controls-inverse-rgb-25);
 	----background-color-rgb: var(--cui-background-color--content-inverse-rgb-0);
+	----border-color-opacity--disabled: 0;
+	----border-color-rgb--disabled: var(--cui-background-color--toned-rgb-50);
 	----border-color-rgb: var(----background-color-rgb);
 	----color-rgb--pressed: var(--cui-color--controls-inverse-rgb-50);
 	----color-rgb--highlighted: var(--cui-color--controls-inverse-rgb-25);
@@ -209,10 +211,12 @@
 	----background-color-opacity--highlighted: 1;
 	----background-color-opacity--pressed: 1;
 	----background-color-opacity: 1;
-	----background-color-rgb--disabled: var(--cui-background-color--content-rgb-100);
+	----background-color-rgb--disabled: var(--cui-background-color--toned-rgb-50);
 	----background-color-rgb--highlighted: var(--cui-background-color--controls-rgb-100);
 	----background-color-rgb--pressed: var(--cui-background-color--controls-rgb-25);
 	----background-color-rgb: var(--cui-background-color--content-rgb-25);
+	----border-color-opacity--disabled: 0;
+	----border-color-rgb--disabled: var(--cui-background-color--toned-rgb-50);
 	----border-color-rgb--highlighted: var(--cui-background-color--controls-rgb-100);
 	----border-color-rgb--pressed: var(--cui-background-color--controls-rgb-0);
 	----border-color-rgb: var(----background-color-rgb);

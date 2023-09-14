@@ -1,11 +1,24 @@
 import { useBlockElementCache } from './useBlockElementCache'
-import { Editor } from 'slate'
-import { SugaredFieldProps, SugaredRelativeEntityList, useEntityList, useSortedEntities } from '@contember/binding'
+import { Descendant, Editor } from 'slate'
+import {
+	EntityAccessor,
+	SugaredFieldProps,
+	SugaredRelativeEntityList,
+	useEntityList,
+	useSortedEntities,
+} from '@contember/react-binding'
 import { useBlockElementPathRefs } from './useBlockElementPathRefs'
 import { useBlockEditorOnChange } from './useBlockEditorOnChange'
-import { useRef } from 'react'
+import { MutableRefObject, useRef } from 'react'
 import { useBlockEditorSlateNodes } from '../useBlockEditorSlateNodes'
 import { useRefreshBlocks } from './useRefreshBlocks'
+
+export interface useBlockEditorStateResult {
+	onChange: () => void
+	nodes: Descendant[]
+	sortedBlocksRef: MutableRefObject<EntityAccessor[]>
+	refreshBlocks: () => void
+}
 
 export const useBlockEditorState = ({ editor, blockList, sortableBy, contentField, monolithicReferencesMode, referencesField }: {
 	editor: Editor,
@@ -14,7 +27,7 @@ export const useBlockEditorState = ({ editor, blockList, sortableBy, contentFiel
 	contentField: SugaredFieldProps['field']
 	referencesField?: SugaredRelativeEntityList | string
 	monolithicReferencesMode?: boolean
-}) => {
+}): useBlockEditorStateResult => {
 	const { entities: sortedBlocks } = useSortedEntities(useEntityList(blockList), sortableBy)
 	const sortedBlocksRef = useRef(sortedBlocks)
 	sortedBlocksRef.current = sortedBlocks

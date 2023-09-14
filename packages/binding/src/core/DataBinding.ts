@@ -1,5 +1,4 @@
 import type { GraphQlClient, GraphQlClientFailedRequestMetadata, TreeFilter } from '@contember/client'
-import type { ReactNode } from 'react'
 import {
 	AsyncBatchUpdatesOptions,
 	BatchUpdatesOptions,
@@ -27,7 +26,6 @@ import { DirtinessTracker } from './DirtinessTracker'
 import { EventManager } from './EventManager'
 import { createBatchUpdatesOptions } from './factories'
 import { MarkerMerger } from './MarkerMerger'
-import { MarkerTreeGenerator } from './MarkerTreeGenerator'
 import { MutationGenerator, SubMutationOperation } from './MutationGenerator'
 import { QueryGenerator } from './QueryGenerator'
 import { StateIterator } from './state'
@@ -38,11 +36,11 @@ import { TreeStore } from './TreeStore'
 import type { UpdateMetadata } from './UpdateMetadata'
 import { getCombinedSignal } from './utils'
 
-export class DataBinding {
+export class DataBinding<Node> {
 	private readonly accessorErrorManager: AccessorErrorManager
 	private readonly batchUpdatesOptions: BatchUpdatesOptions
 	private readonly asyncBatchUpdatesOptions: AsyncBatchUpdatesOptions
-	private readonly bindingOperations: BindingOperations
+	private readonly bindingOperations: BindingOperations<Node>
 	private readonly config: Config
 	private readonly dirtinessTracker: DirtinessTracker
 	private readonly eventManager: EventManager
@@ -61,9 +59,11 @@ export class DataBinding {
 		private readonly tenantApiClient: GraphQlClient,
 		private readonly treeStore: TreeStore,
 		private readonly environment: Environment,
-		private readonly onUpdate: (newData: TreeRootAccessor, binding: DataBinding) => void,
-		private readonly onError: (error: RequestError, binding: DataBinding) => void,
-		private readonly onPersistSuccess: (result: SuccessfulPersistResult, binding: DataBinding) => void,
+		private readonly createMarkerTree: (node: Node, environment: Environment) => MarkerTreeRoot,
+		private readonly batchedUpdates: (callback: () => any) => void,
+		private readonly onUpdate: (newData: TreeRootAccessor<Node>, binding: DataBinding<Node>) => void,
+		private readonly onError: (error: RequestError, binding: DataBinding<Node>) => void,
+		private readonly onPersistSuccess: (result: SuccessfulPersistResult, binding: DataBinding<Node>) => void,
 		private readonly options: {
 			skipStateUpdateAfterPersist: boolean
 		},
@@ -84,6 +84,7 @@ export class DataBinding {
 			this.dirtinessTracker,
 			this.resolvedOnUpdate,
 			this.treeStore,
+			this.batchedUpdates,
 		)
 		this.accessorErrorManager = new AccessorErrorManager(this.eventManager, this.treeStore)
 		this.stateInitializer = new StateInitializer(
@@ -95,7 +96,7 @@ export class DataBinding {
 		this.treeAugmenter = new TreeAugmenter(this.eventManager, this.stateInitializer, this.treeStore, options.skipStateUpdateAfterPersist)
 
 		// TODO move this elsewhere
-		this.bindingOperations = Object.freeze<BindingOperations>({
+		this.bindingOperations = Object.freeze<BindingOperations<Node>>({
 			...this.asyncBatchUpdatesOptions,
 			getTreeFilters: (): TreeFilter[] => {
 				const generator = new TreeFilterGenerator(this.treeStore)
@@ -240,7 +241,7 @@ export class DataBinding {
 	}
 
 	private resolvedOnUpdate = ({ isMutating }: UpdateMetadata) => {
-		this.onUpdate(new TreeRootAccessor(this.dirtinessTracker.hasChanges(), isMutating, this.bindingOperations), this)
+		this.onUpdate(new TreeRootAccessor<Node>(this.dirtinessTracker.hasChanges(), isMutating, this.bindingOperations), this)
 	}
 
 	// This is currently useless but potentially future-compatible
@@ -250,18 +251,18 @@ export class DataBinding {
 
 	private pendingExtensions: Set<{
 		markerTreeRoot: MarkerTreeRoot
-		newFragment: ReactNode
+		newFragment: Node
 		newTreeRootId: TreeRootId | undefined
 		options: ExtendTreeOptions
 		reject: () => void
 		resolve: (newRootId: TreeRootId | undefined) => void
 	}> = new Set()
 
-	public async extendTree(newFragment: ReactNode, options: ExtendTreeOptions = {}): Promise<TreeRootId | undefined> {
+	public async extendTree(newFragment: Node, options: ExtendTreeOptions = {}): Promise<TreeRootId | undefined> {
 		if (options.signal?.aborted) {
 			return Promise.reject(DataBindingExtendAborted)
 		}
-		const markerTreeRoot = new MarkerTreeGenerator(newFragment, options.environment ?? this.environment).generate()
+		const markerTreeRoot =  this.createMarkerTree(newFragment, options.environment ?? this.environment)
 
 		if (this.treeStore.effectivelyHasTreeRoot(markerTreeRoot)) {
 			// This isn't perfectly accurate as theoretically, we could already have all the data necessary but this

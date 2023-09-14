@@ -81,6 +81,11 @@ export function controlsThemeClassName<ControlsTheme extends KebabCase<string> =
 export function dataAttribute(value: unknown): string | true | undefined;
 
 // @public (undocumented)
+export const dateToStringWithoutTimezone: (date: Date, { includeTime }?: {
+    includeTime?: boolean | undefined;
+}) => string;
+
+// @public (undocumented)
 export function deduplicateClassName(classNameArray: string[]): string[];
 
 // @public (undocumented)
@@ -316,6 +321,11 @@ export type SemverString = `${number}.${number}.${number}`;
 
 // @public (undocumented)
 export function setHasOneOf<T>(set: Set<T>, values: T[]): boolean;
+
+// @public (undocumented)
+export const shouldCancelStart: (event: {
+    target?: unknown;
+}) => boolean;
 
 export { Simplify }
 

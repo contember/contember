@@ -1,0 +1,53 @@
+{
+	"name": "@contember/react-auto",
+	"license": "Apache-2.0",
+	"version": "0.0.0",
+	"private": true,
+	"type": "module",
+	"sideEffects": false,
+	"main": "./dist/production/index.js",
+	"exports": {
+		".": {
+			"import": {
+				"development": "./dist/development/index.js",
+				"production": "./dist/production/index.js",
+				"default": "./dist/production/index.js"
+			}
+		}
+	},
+	"files": [
+		"dist/",
+		"src/"
+	],
+	"typings": "./dist/types/index.d.ts",
+	"scripts": {
+		"build": "yarn build:js:dev && yarn build:js:prod",
+		"build:js:dev": "vite build --mode development",
+		"build:js:prod": "vite build --mode production",
+		"ae:build": "api-extractor run --local",
+		"ae:test": "api-extractor run",
+		"test": "echo \"No tests\""
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/contember/interface.git",
+		"directory": "packages/react-auto"
+	},
+	"dependencies": {
+		"@contember/react-binding": "workspace:*",
+		"@contember/react-binding-ui": "workspace:*",
+		"@contember/react-choice-field-ui": "workspace:*",
+		"@contember/react-datagrid-ui": "workspace:*",
+		"@contember/react-form-fields-ui": "workspace:*",
+		"@contember/ui": "workspace:*",
+		"@contember/utilities": "workspace:*"
+	},
+	"peerDependencies": {
+		"react": "^17 || ^18",
+		"react-dom": "^17 || ^18"
+	},
+	"devDependencies": {
+		"react": "^18",
+		"react-dom": "^18"
+	}
+}

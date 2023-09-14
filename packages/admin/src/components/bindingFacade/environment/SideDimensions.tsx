@@ -6,9 +6,9 @@ import {
 	HasOne,
 	StaticRenderProvider,
 	SugaredRelativeSingleEntity,
-} from '@contember/binding'
+} from '@contember/react-binding'
 import { PureComponent, ReactElement, ReactNode, ReactNodeArray } from 'react'
-import { LabelMiddleware, LabelMiddlewareProvider } from './LabelMiddleware'
+import { LabelMiddleware, LabelMiddlewareProvider } from '@contember/react-binding'
 
 type EnforceSubtypeRelation<Sub extends Super, Super> = never
 

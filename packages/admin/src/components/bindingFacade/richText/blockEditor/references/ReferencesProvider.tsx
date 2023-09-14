@@ -1,5 +1,5 @@
 import { createContext, FC, ReactNode } from 'react'
-import { BindingError } from '@contember/binding'
+import { BindingError } from '@contember/react-binding'
 import { GetReferencedEntity } from './useGetReferencedEntity'
 
 export const ReferencesContext = createContext<GetReferencedEntity>(() => {

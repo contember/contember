@@ -1,4 +1,4 @@
-import { Component } from '@contember/binding'
+import { Component } from '@contember/react-binding'
 import type { ReactNode } from 'react'
 import { ReactElement } from 'react'
 import type { FileInputPublicProps } from '../../internalComponents'

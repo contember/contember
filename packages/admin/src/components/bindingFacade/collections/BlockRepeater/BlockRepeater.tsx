@@ -1,4 +1,4 @@
-import { Component, SugaredFieldProps } from '@contember/binding'
+import { Component, SugaredFieldProps } from '@contember/react-binding'
 import type { FunctionComponent } from 'react'
 import { DiscriminatedBlocks, useNormalizedBlocks } from '../../blocks'
 import { Repeater, RepeaterProps } from '../Repeater'

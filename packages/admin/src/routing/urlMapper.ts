@@ -1,6 +1,6 @@
 import * as pathToRegexp from 'path-to-regexp'
 import { MatchFunction, PathFunction } from 'path-to-regexp'
-import { Environment } from '@contember/binding'
+import { Environment } from '@contember/react-binding'
 import { RoutingContextValue } from './RoutingContext'
 import { RequestState } from './types'
 

@@ -3,7 +3,7 @@ import {
 	EntitySubTree,
 	EntitySubTreeAdditionalProps,
 	SugaredQualifiedSingleEntity,
-} from '@contember/binding'
+} from '@contember/react-binding'
 import { ReactNode } from 'react'
 import { FeedbackRenderer, LayoutRenderer, LayoutRendererProps } from '../../bindingFacade'
 import { pageComponent } from './pageComponent'

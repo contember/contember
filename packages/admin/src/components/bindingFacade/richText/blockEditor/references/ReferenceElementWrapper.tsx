@@ -1,6 +1,6 @@
 import { FC, ReactNode } from 'react'
 import { ElementWithReference } from '../elements'
-import { AccessorProvider } from '@contember/binding'
+import { AccessorProvider } from '@contember/react-binding'
 import { useReferencedEntity } from './useReferencedEntity'
 import { ReactEditor, useSlateStatic } from 'slate-react'
 

@@ -1,4 +1,4 @@
-import { Component, Field, useEnvironment } from '@contember/binding'
+import { Component, Field, useEnvironment } from '@contember/react-binding'
 import { AnchorHTMLAttributes, useMemo } from 'react'
 import { RoutingLink, RoutingLinkProps } from '../RoutingLink'
 import { RoutingParameter } from '../RoutingParameter'

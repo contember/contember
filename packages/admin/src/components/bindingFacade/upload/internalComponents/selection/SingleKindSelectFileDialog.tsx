@@ -1,4 +1,4 @@
-import { DeferredSubTrees, EntityAccessor } from '@contember/binding'
+import { DeferredSubTrees, EntityAccessor } from '@contember/react-binding'
 import { ComponentType, useCallback } from 'react'
 import { EntityConnectorFactory } from '../hooks/useConnectSelectedEntities'
 import { FileSelectionProps } from './SelectFileInput'

@@ -7,7 +7,7 @@ import {
 	QueryLanguage,
 	SugaredQualifiedFieldList,
 	useEnvironment,
-} from '@contember/binding'
+} from '@contember/react-binding'
 import { Spinner } from '@contember/ui'
 import { memo, useMemo } from 'react'
 import { DimensionsRenderer, DimensionsRendererProps } from './DimensionsRenderer'

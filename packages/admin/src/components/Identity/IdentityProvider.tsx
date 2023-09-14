@@ -1,12 +1,12 @@
-import { EnvironmentExtensionProvider } from '@contember/binding'
 import { useSessionToken } from '@contember/react-client'
 import { Message, SpinnerContainer } from '@contember/ui'
 import { ReactNode, createContext, useCallback, useEffect, useMemo, useState } from 'react'
 import { useFetchMe } from '../../tenant'
 import { MiscPageLayout } from '../MiscPageLayout'
-import { identityEnvironmentExtension } from './IdentityEnvironmentExtension'
 import { InvalidIdentityFallback } from './InvalidIdentityFallback'
 import { useLogout } from './useLogout'
+import { EnvironmentExtensionProvider } from '@contember/react-binding'
+import { identityEnvironmentExtension } from './IdentityEnvironmentExtension'
 
 export interface Identity {
 	id: string

@@ -1,4 +1,4 @@
-import { BindingError } from '@contember/binding'
+import { BindingError } from '@contember/react-binding'
 import type { SerializableEditorNode } from '../../baseEditor'
 import { Editor as SlateEditor, Element as SlateElement } from 'slate'
 

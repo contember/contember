@@ -1,6 +1,6 @@
-import type { EntityAccessor, Environment } from '@contember/binding'
+import type { EntityAccessor, Environment } from '@contember/react-binding'
 import type { ReactNode } from 'react'
-import { AccessorErrorsHolder } from '../../errors'
+import { AccessorErrorsHolder } from '@contember/react-binding-ui'
 
 export interface FileDataExtractorPopulateFieldsOptions<
 	ExtractedData = unknown,

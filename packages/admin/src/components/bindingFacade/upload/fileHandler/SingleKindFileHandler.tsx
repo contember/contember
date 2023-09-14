@@ -1,6 +1,6 @@
 import { AcceptedFile, FileHandler, ResolvedFileEntity } from './FileHandler'
 import { resolveAcceptingSingleKind } from './utils/resolveAccept'
-import { EntityAccessor, Environment, SugaredFieldProps } from '@contember/binding'
+import { EntityAccessor, Environment, SugaredFieldProps } from '@contember/react-binding'
 import { ReactElement } from 'react'
 import { disconnectAtBase } from './utils/disconnectAtBase'
 import { staticRenderFileKind } from './utils/staticRenderFileKind'

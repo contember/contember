@@ -2,7 +2,7 @@ import type { GraphQlClient } from '@contember/client'
 import { GraphQlClientVariables } from '@contember/client'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { QueryRequestObject, QueryRequestState } from './requestState'
-import { JsonValue } from '@contember/binding'
+import { JsonValue } from '@contember/react-binding'
 
 const useJsonMemo = <V extends JsonValue>(value: V): V => {
 	const json = useMemo(() => JSON.stringify(value), [value])

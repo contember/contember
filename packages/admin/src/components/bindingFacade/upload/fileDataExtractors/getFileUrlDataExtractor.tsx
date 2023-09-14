@@ -1,5 +1,5 @@
-import type { SugaredFieldProps } from '@contember/binding'
-import { QueryLanguage, SugaredField } from '@contember/binding'
+import type { SugaredFieldProps } from '@contember/react-binding'
+import { QueryLanguage, SugaredField } from '@contember/react-binding'
 import type { S3FileUploader } from '@contember/client'
 import { FileDataExtractor } from './FileDataExtractor'
 

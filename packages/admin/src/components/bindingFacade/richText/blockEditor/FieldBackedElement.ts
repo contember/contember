@@ -1,4 +1,4 @@
-import { SugarableRelativeSingleField } from '@contember/binding'
+import { SugarableRelativeSingleField } from '@contember/react-binding'
 import { EditorCanvasDistinction, Size } from '@contember/ui'
 import { ReactNode } from 'react'
 

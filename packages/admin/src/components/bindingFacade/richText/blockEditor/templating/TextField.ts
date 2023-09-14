@@ -1,4 +1,4 @@
-import { BindingError, Component, SugaredRelativeSingleField } from '@contember/binding'
+import { BindingError, Component, SugaredRelativeSingleField } from '@contember/react-binding'
 import type { FunctionComponent } from 'react'
 import type { BaseTextField } from './BaseTextField'
 

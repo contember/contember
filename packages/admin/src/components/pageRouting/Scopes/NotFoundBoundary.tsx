@@ -1,4 +1,4 @@
-import { Component, useEntity } from '@contember/binding'
+import { Component, useEntity } from '@contember/react-binding'
 import { EmptyStateContainer, Message } from '@contember/ui'
 import { SearchX } from 'lucide-react'
 import { ReactNode } from 'react'

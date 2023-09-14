@@ -1,4 +1,4 @@
-import type { EntityAccessor, Environment } from '@contember/binding'
+import type { EntityAccessor, Environment } from '@contember/react-binding'
 import type { ReactNode } from 'react'
 import type { NormalizedDiscriminatedData, SugaredDiscriminateBy } from '../../../../discrimination'
 

@@ -4,9 +4,6 @@
 		"outDir": "../dist/types"
 	},
 	"references": [
-		{ "path": "../../client/src" },
-		{ "path": "../../react-client/src" },
-		{ "path": "../../react-multipass-rendering/src" },
-		{ "path": "../../react-utils/src" }
+		{ "path": "../../client/src" }
 	]
 }

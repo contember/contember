@@ -1,8 +1,8 @@
 import { Button, FieldContainer, FieldContainerProps, FieldErrors, FileDropZone, Stack } from '@contember/ui'
 import { ReactNode } from 'react'
 import type { DropzoneState } from 'react-dropzone'
-import type { MessageFormatter } from '../../../../i18n'
-import type { AddEntityButtonProps } from '../../collections'
+import type { MessageFormatter } from '@contember/react-i18n'
+import type { AddEntityButtonProps } from '@contember/react-binding-ui'
 import type { UploadDictionary } from '../uploadDictionary'
 import { SelectFileInput, SelectFileInputProps, SelectFileInputPublicProps } from './selection/SelectFileInput'
 

@@ -1,4 +1,4 @@
-import type { EntityAccessor, FieldValue } from '@contember/binding'
+import type { EntityAccessor, FieldValue } from '@contember/react-binding'
 import type * as Slate from 'slate'
 import { Editor } from 'slate'
 

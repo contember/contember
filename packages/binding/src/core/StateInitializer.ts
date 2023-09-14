@@ -61,7 +61,7 @@ export class StateInitializer {
 		if (tree instanceof EntityListSubTreeMarker) {
 			const persistedEntityIds: Set<EntityId> = persistedRootData instanceof Set ? persistedRootData : new Set()
 			subTreeState = this.initializeEntityListState(
-				{ marker: tree, parent: undefined },
+				{ type: 'subTree', marker: tree, parent: undefined },
 				tree.entityName,
 				persistedEntityIds,
 			)
@@ -460,7 +460,7 @@ export class StateInitializer {
 		parent.children.set(
 			field.placeholderName,
 			this.initializeEntityListState(
-				{ marker: field, parent },
+				{ type: 'hasMany', marker: field, parent },
 				this.getRelationTargetEntityName(parent, field),
 				persistedEntityIds,
 			),

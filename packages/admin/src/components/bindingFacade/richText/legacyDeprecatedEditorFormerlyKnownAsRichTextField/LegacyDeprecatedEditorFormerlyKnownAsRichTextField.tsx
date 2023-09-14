@@ -6,12 +6,12 @@ import {
 	QueryLanguage,
 	useEntity,
 	useMutationState,
-} from '@contember/binding'
+} from '@contember/react-binding'
 import { EditorCanvas, FieldContainer, FieldContainerProps } from '@contember/ui'
 import { FunctionComponent, useCallback, useMemo, useState } from 'react'
 import { Descendant, Node as SlateNode } from 'slate'
 import { Editable, Slate } from 'slate-react'
-import { useAccessorErrors } from '../../errors'
+import { useAccessorErrors } from '@contember/react-binding-ui'
 import { createEditor, CreateEditorPublicOptions } from '../editorFactory'
 import { paragraphElementType } from '../plugins'
 import { RichEditor } from '../RichEditor'
@@ -86,7 +86,7 @@ export const LegacyDeprecatedEditorFormerlyKnownAsRichTextField: FunctionCompone
 					labelPosition={props.labelPosition}
 					description={props.description}
 					useLabelElement={props.useLabelElement}
-					errors={useAccessorErrors(fieldAccessor)}
+					errors={useAccessorErrors(fieldAccessor.errors?.errors)}
 				>
 					<Slate editor={editor} value={valueNodes} onChange={onChange}>
 						<EditorCanvas

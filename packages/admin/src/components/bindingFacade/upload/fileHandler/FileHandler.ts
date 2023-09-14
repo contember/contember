@@ -1,6 +1,6 @@
-import { EntityAccessor, Environment } from '@contember/binding'
+import { EntityAccessor, Environment } from '@contember/react-binding'
 import { ReactElement } from 'react'
-import { AccessorErrorsHolder } from '../../errors'
+import { AccessorErrorsHolder } from '@contember/react-binding-ui'
 import { AcceptFileOptions, FullFileKind } from '../fileKinds'
 
 export interface AcceptedFile<AcceptArtifacts = any> {

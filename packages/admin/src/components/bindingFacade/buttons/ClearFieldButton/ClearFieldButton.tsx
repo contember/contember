@@ -1,4 +1,4 @@
-import { SimpleRelativeSingleField, SimpleRelativeSingleFieldProps } from '../../auxiliary'
+import { SimpleRelativeSingleField, SimpleRelativeSingleFieldProps } from '@contember/react-form-fields-ui'
 import { ClearFieldButtonInner, ClearFieldButtonInnerPublicProps } from './ClearFieldButtonInner'
 
 export type ClearFieldButtonProps =

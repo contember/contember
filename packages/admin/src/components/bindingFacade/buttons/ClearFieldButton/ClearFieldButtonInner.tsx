@@ -1,4 +1,4 @@
-import type { FieldAccessor } from '@contember/binding'
+import type { FieldAccessor } from '@contember/react-binding'
 import { Button, ButtonProps, Icon } from '@contember/ui'
 import { useCallback } from 'react'
 

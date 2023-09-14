@@ -1,6 +1,5 @@
-import { NonOptionalUseInputClassNameProps, VisuallyDependentControlProps, useInputClassName } from '@contember/ui'
-import { SimpleRelativeSingleField, SimpleRelativeSingleFieldProps } from '../auxiliary'
-import { FieldValueFormatter } from '../fields/useFieldControl'
+import { NonOptionalUseInputClassNameProps, useInputClassName, VisuallyDependentControlProps } from '@contember/ui'
+import { FieldValueFormatter, SimpleRelativeSingleField, SimpleRelativeSingleFieldProps } from '@contember/react-form-fields-ui'
 
 export type DisplayTextFieldProps =
 	& Omit<SimpleRelativeSingleFieldProps, 'defaultValue'>

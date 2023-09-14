@@ -5,7 +5,7 @@ import {
 	EntityListAccessor,
 	SugaredRelativeEntityList,
 	useEntityList,
-} from '@contember/binding'
+} from '@contember/react-binding'
 import { MutableRefObject, useCallback } from 'react'
 import { useConstantValueInvariant } from '@contember/react-utils'
 

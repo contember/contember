@@ -11,6 +11,7 @@ import {
 	SugaredFilter,
 	useCurrentRequest,
 } from '@contember/admin'
+import { createStudioLinkComponent } from '../components/StudioEntityLink'
 
 export default function StudioGrid() {
 	const request = useCurrentRequest()!
@@ -18,8 +19,7 @@ export default function StudioGrid() {
 	const entity = request.parameters.entity as string
 	const id = request.parameters.id as EntityId | undefined
 
-	const createViewLinkTarget = (entity: string) => ({ pageName: 'studioGrid', parameters: { project, entity, id: new RoutingParameter('entity.id') } })
-	const createEditLinkTarget = (entity: string) => ({ pageName: 'studioForm', parameters: { project, entity, id: new RoutingParameter('entity.id') } })
+	const LinkComponent = createStudioLinkComponent(project)
 
 	const actions = (
 		<>
@@ -37,7 +37,7 @@ export default function StudioGrid() {
 	return (
 		<DataBindingProvider stateComponent={FeedbackRenderer}>
 			<LayoutRenderer title={<Heading depth={1}>List {entity}</Heading>} actions={actions} pageContentLayout="stretch">
-				<AutoGrid entities={entities} createViewLinkTarget={createViewLinkTarget} createEditLinkTarget={createEditLinkTarget} />
+				<AutoGrid entities={entities} LinkComponent={LinkComponent} />
 			</LayoutRenderer>
 		</DataBindingProvider>
 	)

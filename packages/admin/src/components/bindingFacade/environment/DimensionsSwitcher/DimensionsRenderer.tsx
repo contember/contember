@@ -1,4 +1,4 @@
-import { Entity, EntityAccessor, EntityListAccessor, useEnvironment } from '@contember/binding'
+import { Entity, EntityAccessor, EntityListAccessor, useEnvironment } from '@contember/react-binding'
 import { emptyArray } from '@contember/react-utils'
 import { AnchorButton, ButtonGroup, ButtonProps, Checkbox, Dropdown, DropdownProps, FieldContainer, Stack } from '@contember/ui'
 import { ReactNode, useCallback, useEffect, useMemo } from 'react'

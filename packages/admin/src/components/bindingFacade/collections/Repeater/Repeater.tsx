@@ -1,4 +1,4 @@
-import { BindingError, Component, HasMany, SugaredRelativeEntityList, useEntityList } from '@contember/binding'
+import { BindingError, Component, HasMany, SugaredRelativeEntityList, useEntityList } from '@contember/react-binding'
 import type { ReactElement } from 'react'
 import { RepeaterInner, RepeaterInnerProps } from './RepeaterInner'
 

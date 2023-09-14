@@ -1,5 +1,5 @@
-import type { SugaredFieldProps, SugaredRelativeEntityList } from '@contember/binding'
-import { Component } from '@contember/binding'
+import type { SugaredFieldProps, SugaredRelativeEntityList } from '@contember/react-binding'
+import { Component } from '@contember/react-binding'
 import type { ReactNode } from 'react'
 import { ReactElement } from 'react'
 import { BareFileRepeater, FileInputPublicProps, useFileSelection } from '../../internalComponents'

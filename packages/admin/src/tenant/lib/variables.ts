@@ -1,4 +1,4 @@
-import { JsonValue } from '@contember/binding'
+import { JsonValue } from '@contember/react-binding'
 
 export interface GQLVariableType<Value = any, Required extends boolean = boolean> {
 	graphQlType: string

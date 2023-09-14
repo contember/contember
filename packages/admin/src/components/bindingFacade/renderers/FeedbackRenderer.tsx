@@ -1,4 +1,4 @@
-import type { AccessorTreeState } from '@contember/binding'
+import type { AccessorTreeState } from '@contember/react-binding'
 import { Message, SpinnerOverlay } from '@contember/ui'
 import { ReactNode, useEffect } from 'react'
 

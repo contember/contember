@@ -1,4 +1,4 @@
-import { BindingError, EntityAccessor, useEntity, useHasEntity } from '@contember/binding'
+import { BindingError, EntityAccessor, useEntity, useHasEntity } from '@contember/react-binding'
 import { useMemo } from 'react'
 import { RoutingParameterResolver } from '../types'
 import { PageNotFound } from '../urlMapper'

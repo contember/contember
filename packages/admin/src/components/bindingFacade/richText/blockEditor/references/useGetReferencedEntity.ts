@@ -1,5 +1,5 @@
 import { Path } from 'slate'
-import { EntityAccessor, EntityId } from '@contember/binding'
+import { EntityAccessor, EntityId } from '@contember/react-binding'
 import { ReferencesOptions, useGetReferenceEntityList } from './useGetReferenceEntityList'
 import { useCallback } from 'react'
 

@@ -1,4 +1,4 @@
-import { BindingError, Environment } from '@contember/binding'
+import { BindingError, Environment } from '@contember/react-binding'
 import { assertNever } from '@contember/utilities'
 import type { ReactNode } from 'react'
 import type { ContentOutletProps } from './ContentOutlet'

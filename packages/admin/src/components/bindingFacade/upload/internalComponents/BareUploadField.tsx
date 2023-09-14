@@ -1,6 +1,6 @@
-import { Component, EntityAccessor, useEntity } from '@contember/binding'
+import { Component, EntityAccessor, useEntity } from '@contember/react-binding'
 import { useCallback, useEffect, useMemo } from 'react'
-import { useMessageFormatter } from '../../../../i18n'
+import { useMessageFormatter } from '@contember/react-i18n'
 import { uploadDictionary } from '../uploadDictionary'
 import type { FileInputPublicProps } from './FileInput'
 import { FileInput } from './FileInput'
@@ -9,7 +9,7 @@ import { useNormalizedUploadState } from './hooks/useNormalizedUploadState'
 import { useConnectSelectedEntities } from './hooks/useConnectSelectedEntities'
 import { useFileUpload } from '@contember/react-client'
 import { FileHandler } from '../fileHandler'
-import { useAccessorErrorFormatter } from '../../errors'
+import { useAccessorErrorFormatter } from '@contember/react-binding-ui'
 import { ResolvedFileSelectionComponent } from './selection'
 
 export type BareUploadFieldProps =

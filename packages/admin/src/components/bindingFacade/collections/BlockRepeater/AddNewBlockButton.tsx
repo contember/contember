@@ -1,6 +1,6 @@
 import { Dropdown, DropdownProps, FieldContainer, Icon } from '@contember/ui'
 import { memo, useMemo } from 'react'
-import { useMessageFormatter } from '../../../../i18n'
+import { useMessageFormatter } from '@contember/react-i18n'
 import { AddNewBlockButtonInner, AddNewBlockButtonInnerProps } from './AddNewBlockButtonInner'
 import { blockRepeaterDictionary } from './Dictionary'
 

@@ -75,9 +75,13 @@ export class TreeParameterMerger {
 		fresh: QualifiedSingleEntity | UnconstrainedQualifiedSingleEntity,
 	): QualifiedSingleEntity | UnconstrainedQualifiedSingleEntity {
 		if (original.isCreating) {
+			if (!fresh.isCreating) {
+				throw new BindingError()
+			}
 			return {
 				// Encoded within the placeholder
 				isCreating: original.isCreating,
+				isUnpersisted: original.isUnpersisted && fresh.isUnpersisted,
 				entityName: original.entityName,
 
 				// Not encoded within the placeholder
@@ -120,9 +124,13 @@ export class TreeParameterMerger {
 		}
 
 		if (original.isCreating) {
+			if (!fresh.isCreating) {
+				throw new BindingError()
+			}
 			return {
 				// Encoded within the placeholder
 				isCreating: original.isCreating,
+				isUnpersisted: original.isUnpersisted && fresh.isUnpersisted,
 				entityName: original.entityName,
 
 				// Not encoded within the placeholder

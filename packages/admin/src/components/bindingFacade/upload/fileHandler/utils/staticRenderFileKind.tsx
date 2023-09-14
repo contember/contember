@@ -1,5 +1,5 @@
-import type { Environment } from '@contember/binding'
-import { HasOne } from '@contember/binding'
+import type { Environment } from '@contember/react-binding'
+import { HasOne } from '@contember/react-binding'
 import { Fragment, ReactElement, ReactNode } from 'react'
 import { FullFileKind } from '../../fileKinds'
 

@@ -11,6 +11,7 @@ import {
 	useCurrentRequest,
 	useOnPersistSuccess,
 } from '@contember/admin'
+import { createStudioLinkComponent } from '../components/StudioEntityLink'
 
 export default function StudioForm() {
 	const request = useCurrentRequest()!
@@ -21,7 +22,7 @@ export default function StudioForm() {
 
 	const redirectOnSuccess = { pageName: 'studioForm', parameters: { project, entity, id: new RoutingParameter('entity.id') } }
 	const onCreateSuccess = useOnPersistSuccess({ redirectOnSuccess })
-	const createEditLink = (entity: string) => ({ pageName: 'studioForm', parameters: { project, entity, id: new RoutingParameter('entity.id') } })
+	const LinkComponent = createStudioLinkComponent(project)
 
 	const actions = (
 		<>
@@ -33,7 +34,7 @@ export default function StudioForm() {
 	return (
 		<DataBindingProvider stateComponent={FeedbackRenderer}>
 			<LayoutRenderer title={<Heading depth={1}>{title}</Heading>} actions={actions}>
-				<AutoForm entity={entity} id={id} onCreateSuccess={onCreateSuccess} createEditLink={createEditLink} />
+				<AutoForm entity={entity} id={id} onCreateSuccess={onCreateSuccess} LinkComponent={LinkComponent} />
 			</LayoutRenderer>
 		</DataBindingProvider>
 	)

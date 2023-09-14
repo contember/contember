@@ -20,6 +20,7 @@ test('select or create', async ({ page }) => {
 	await page.locator('.cui-selectCreateNewWrapper-button > button').click()
 	await page.waitForSelector('input#pw-locale-code')
 	await page.locator('input#pw-locale-code').fill('en')
+	await page.waitForTimeout(200)
 	expect(await page.screenshot({ animations: 'disabled' })).toMatchSnapshot('02-opened-dialog.png')
 
 

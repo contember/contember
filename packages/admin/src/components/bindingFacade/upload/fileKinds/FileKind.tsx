@@ -1,4 +1,4 @@
-import { BindingError } from '@contember/binding'
+import { BindingError } from '@contember/react-binding'
 import type { ReactElement } from 'react'
 import { SugaredDiscriminateBy } from '../../discrimination'
 import { SelectFileInputSelectionComponentProps } from '../internalComponents/selection/SelectFileInput'

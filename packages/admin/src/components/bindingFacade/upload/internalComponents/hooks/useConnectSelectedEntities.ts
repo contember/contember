@@ -1,4 +1,4 @@
-import { EntityAccessor } from '@contember/binding'
+import { EntityAccessor } from '@contember/react-binding'
 import { useCallback } from 'react'
 import { unstable_batchedUpdates } from 'react-dom'
 

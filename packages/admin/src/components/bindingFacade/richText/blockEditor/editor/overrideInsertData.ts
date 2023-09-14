@@ -1,4 +1,4 @@
-import type { FieldValue, RelativeSingleField } from '@contember/binding'
+import type { FieldValue, RelativeSingleField } from '@contember/react-binding'
 import { Descendant, Element as SlateElement, Node as SlateNode, Text } from 'slate'
 import type { ResolvedDiscriminatedDatum } from '../../../discrimination'
 import { ReferenceElement, referenceElementType } from '../elements'

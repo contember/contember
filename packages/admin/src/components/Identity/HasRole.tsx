@@ -1,4 +1,4 @@
-import { Component } from '@contember/binding'
+import { Component } from '@contember/react-binding'
 import { ReactNode } from 'react'
 import { identityEnvironmentExtension } from './IdentityEnvironmentExtension'
 import { useProjectUserRoles } from '../../acl'

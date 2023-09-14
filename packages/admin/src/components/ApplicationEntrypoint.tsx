@@ -1,14 +1,15 @@
-import { Environment, EnvironmentContext, EnvironmentExtensionProvider } from '@contember/binding'
+import { Environment, EnvironmentContext, EnvironmentExtensionProvider } from '@contember/react-binding'
 import { ContemberClient, ContemberClientProps } from '@contember/react-client'
 import { Providers as InterfaceProviders, ProvidersProps } from '@contember/ui'
 import { ComponentType, PropsWithChildren, ReactNode } from 'react'
-import { I18nProvider, MessageDictionaryByLocaleCode } from '../i18n'
+import { I18nProvider, MessageDictionaryByLocaleCode } from '@contember/react-i18n'
 import { RequestProvider, RouteMap, RoutingContext, RoutingContextValue, SelectedDimension } from '../routing'
 import { OutdatedApplicationChecker } from './Application/OutdatedApplicationChecker'
 import { ApplicationDevBar } from './Dev/DevBar'
 import { IdentityProvider } from './Identity'
 import { NavigationProvider } from './NavigationProvider'
 import { projectEnvironmentExtension } from './Project'
+import { DataGridPageNameKeyProvider } from './DataGridPageNameKeyProvider'
 
 export interface ApplicationEntrypointProps extends ContemberClientProps, Omit<ProvidersProps, 'children'> {
 	basePath?: string
@@ -67,15 +68,17 @@ export const ApplicationEntrypoint = (props: ApplicationEntrypointProps) => {
 							stage={props.stage}
 						>
 							<EnvironmentExtensionProvider extension={projectEnvironmentExtension} state={projectSlug ?? null}>
-								<NavigationProvider>
-									<IdentityProvider onInvalidIdentity={props.onInvalidIdentity}>
-										<Providers portalProviderProps={props.portalProviderProps} styleProviderProps={props.styleProviderProps}>
-											<OutdatedApplicationChecker />
-											{props.children}
-											<ApplicationDevBar panels={props.devBarPanels} />
-										</Providers>
-									</IdentityProvider>
-								</NavigationProvider>
+								<DataGridPageNameKeyProvider>
+									<NavigationProvider>
+										<IdentityProvider onInvalidIdentity={props.onInvalidIdentity}>
+											<Providers portalProviderProps={props.portalProviderProps} styleProviderProps={props.styleProviderProps}>
+												<OutdatedApplicationChecker />
+												{props.children}
+												<ApplicationDevBar panels={props.devBarPanels} />
+											</Providers>
+										</IdentityProvider>
+									</NavigationProvider>
+								</DataGridPageNameKeyProvider>
 							</EnvironmentExtensionProvider>
 						</ContemberClient>
 					</RequestProvider>

@@ -1,4 +1,4 @@
-import { BindingError, Entity, RelativeSingleField, useEntity } from '@contember/binding'
+import { BindingError, Entity, RelativeSingleField, useEntity } from '@contember/react-binding'
 import { ActionableBox, Box, EditorPlaceholder, FieldSet } from '@contember/ui'
 import { memo, MouseEvent as ReactMouseEvent, ReactNode, useCallback } from 'react'
 import { Transforms } from 'slate'

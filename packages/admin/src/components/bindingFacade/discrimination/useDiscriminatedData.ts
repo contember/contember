@@ -1,4 +1,4 @@
-import { useEnvironment, VariableInputTransformer } from '@contember/binding'
+import { useEnvironment, VariableInputTransformer } from '@contember/react-binding'
 import { useMemo } from 'react'
 import type { DiscriminatedDatum } from './DiscriminatedDatum'
 import type { NormalizedDiscriminatedData } from './NormalizedDiscriminatedData'

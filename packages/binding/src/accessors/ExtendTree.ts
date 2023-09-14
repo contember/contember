@@ -1,4 +1,3 @@
-import type { ReactNode } from 'react'
 import type { Environment } from '../dao'
 import type { TreeRootId } from '../treeParameters'
 
@@ -7,4 +6,4 @@ export interface ExtendTreeOptions {
 	environment?: Environment
 }
 
-export type ExtendTree = (newFragment: ReactNode, options?: ExtendTreeOptions) => Promise<TreeRootId | undefined>
+export type ExtendTree<Node> = (newFragment: Node, options?: ExtendTreeOptions) => Promise<TreeRootId | undefined>

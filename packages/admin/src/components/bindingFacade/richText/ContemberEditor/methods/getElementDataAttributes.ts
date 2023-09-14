@@ -1,4 +1,4 @@
-import type { Scalar } from '@contember/binding'
+import type { Scalar } from '@contember/react-binding'
 import { Element as SlateElement } from 'slate'
 
 export interface ElementDataAttributes {

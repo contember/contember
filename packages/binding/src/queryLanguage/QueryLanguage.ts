@@ -1,4 +1,3 @@
-import { emptyObject } from '@contember/react-utils'
 import { TreeParameterMerger, VariableInputTransformer } from '../core'
 import type { Environment } from '../dao'
 import {
@@ -52,6 +51,8 @@ import {
 import { Parser } from './Parser'
 import { GraphQlLiteral } from '@contember/client'
 import { ParsedHasManyRelation, ParsedHasOneRelation } from './ParserResults'
+
+const emptyObject = Object.freeze({})
 
 export class QueryLanguage {
 
@@ -396,6 +397,7 @@ export class QueryLanguage {
 
 		return {
 			isCreating: true,
+			isUnpersisted: unsugarableEntityList.isUnpersisted ?? false,
 			isNonbearing: unsugarableEntityList.isNonbearing ?? EntityCreationParametersDefaults.isNonbearing,
 			// forceCreation: unsugarableEntityList.forceCreation ?? EntityCreationParametersDefaults.forceCreation,
 			setOnCreate: unsugarableEntityList.setOnCreate
@@ -437,6 +439,7 @@ export class QueryLanguage {
 
 		return {
 			isCreating: true,
+			isUnpersisted: unsugarableSingleEntity.isUnpersisted ?? false,
 			isNonbearing: unsugarableSingleEntity.isNonbearing ?? EntityCreationParametersDefaults.isNonbearing,
 			// forceCreation: unsugarableSingleEntity.forceCreation ?? EntityCreationParametersDefaults.forceCreation,
 			setOnCreate: unsugarableSingleEntity.setOnCreate

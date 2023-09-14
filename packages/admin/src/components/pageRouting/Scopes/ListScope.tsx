@@ -1,4 +1,4 @@
-import { DataBindingProvider, DataBindingProviderStateComponent, EntityListSubTree, EntityListSubTreeAdditionalProps, SugaredQualifiedEntityList } from '@contember/binding'
+import { DataBindingProvider, DataBindingProviderStateComponent, EntityListSubTree, EntityListSubTreeAdditionalProps, SugaredQualifiedEntityList } from '@contember/react-binding'
 import { ReactNode } from 'react'
 import { FeedbackRenderer, ImmutableEntityListRenderer, ImmutableEntityListRendererProps } from '../../bindingFacade'
 import { scopeComponent } from './scopeComponent'

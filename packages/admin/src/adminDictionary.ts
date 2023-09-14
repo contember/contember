@@ -1,16 +1,13 @@
 import type {
 	BlockRepeaterDictionary,
-	ChoiceFieldDictionary,
-	DataGridCellsDictionary,
-	DataGridDictionary,
 	EditorDictionary,
-	ErrorCodeDictionary,
-	FieldViewDictionary,
 	OutdatedApplicationDictionary,
-	PersistFeedbackDictionary,
 	RepeaterDictionary,
 	UploadDictionary,
 } from './components'
+import { DataGridCellsDictionary, DataGridDictionary } from '@contember/react-datagrid-ui'
+import { ErrorCodeDictionary, FieldViewDictionary, PersistFeedbackDictionary } from '@contember/react-binding-ui'
+import { ChoiceFieldDictionary } from '@contember/react-choice-field-ui'
 
 // This isn't in i18n in order to avoid unnecessary circular imports.
 

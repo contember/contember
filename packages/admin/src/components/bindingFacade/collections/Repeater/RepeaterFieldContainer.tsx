@@ -1,10 +1,15 @@
-import type { EntityAccessor, EntityListAccessor } from '@contember/binding'
+import type { EntityAccessor, EntityListAccessor } from '@contember/react-binding'
 import { FieldContainer, FieldContainerOwnProps } from '@contember/ui'
 import { deprecate, fallback, isDefined } from '@contember/utilities'
 import { ReactNode, memo } from 'react'
-import type { MessageFormatter } from '../../../../i18n'
-import { AccessorErrors } from '../../errors'
-import { AddEntityButtonProps, CreateNewEntityButton, EmptyMessage, EmptyMessageOuterProps } from '../helpers'
+import type { MessageFormatter } from '@contember/react-i18n'
+import {
+	AccessorErrors,
+	AddEntityButtonProps,
+	CreateNewEntityButton,
+	EmptyMessage,
+	EmptyMessageOuterProps,
+} from '@contember/react-binding-ui'
 import type { RepeaterDictionary } from './repeaterDictionary'
 
 export type RepeaterFieldContainerPublicProps =

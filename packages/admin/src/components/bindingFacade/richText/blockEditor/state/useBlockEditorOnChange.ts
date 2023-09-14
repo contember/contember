@@ -6,7 +6,7 @@ import {
 	SugaredRelativeEntityList,
 	useDesugaredRelativeEntityList,
 	useDesugaredRelativeSingleField,
-} from '@contember/binding'
+} from '@contember/react-binding'
 import { assertNever } from '@contember/utilities'
 import { MutableRefObject, useCallback } from 'react'
 import { Editor, Element, Operation } from 'slate'

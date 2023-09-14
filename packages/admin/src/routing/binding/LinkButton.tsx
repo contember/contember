@@ -1,7 +1,7 @@
 import { AnchorButton, AnchorButtonProps } from '@contember/ui'
 import type { LinkProps } from './Link'
 import { Link } from './Link'
-import { Component } from '@contember/binding'
+import { Component } from '@contember/react-binding'
 
 export type LinkButtonProps = LinkProps & AnchorButtonProps
 

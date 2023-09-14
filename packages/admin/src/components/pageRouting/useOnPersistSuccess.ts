@@ -1,4 +1,4 @@
-import { QueryLanguage, UnsugarableSingleEntityEventListeners } from '@contember/binding'
+import { QueryLanguage, UnsugarableSingleEntityEventListeners } from '@contember/react-binding'
 import { RedirectOnSuccessTarget, useEntityRedirectOnPersistSuccess } from './useEntityRedirectOnPersistSuccess'
 import { useMemo } from 'react'
 

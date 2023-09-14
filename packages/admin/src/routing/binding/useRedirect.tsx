@@ -3,7 +3,7 @@ import { useBindingLinkParametersResolver } from './useBindingLinkParametersReso
 import { useRoutingLinkFactory } from '../useRoutingLink'
 import { RequestParameters, RoutingLinkTarget } from '../types'
 import { parseLinkTarget } from './LinkLanguage'
-import { useEnvironment } from '@contember/binding'
+import { useEnvironment } from '@contember/react-binding'
 
 export const useRedirect = () => {
 	const parametersResolver = useBindingLinkParametersResolver()

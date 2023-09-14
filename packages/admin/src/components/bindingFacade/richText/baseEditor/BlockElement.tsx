@@ -1,7 +1,7 @@
 import { EditorBlockBoundary } from '@contember/ui'
 import { memo } from 'react'
 import { ReactEditor, RenderElementProps, useSlateStatic } from 'slate-react'
-import { useMessageFormatter } from '../../../../i18n'
+import { useMessageFormatter } from '@contember/react-i18n'
 import { ContemberEditor } from '../ContemberEditor'
 import { editorDictionary } from './editorDictionary'
 

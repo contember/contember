@@ -1,11 +1,11 @@
-import { useEntityKey, useGetEntityByKey } from '@contember/binding'
+import { EntityAccessor, useEntityKey, useGetEntityByKey } from '@contember/react-binding'
 import { useEffect, useRef, useState } from 'react'
 
 export const useGetParentEntityRef = () => {
 	const key = useEntityKey()
 	const getEntity = useGetEntityByKey()
 	const [initialGetter] = useState(() => () => getEntity(key))
-	const ref = useRef(initialGetter)
+	const ref = useRef<() => EntityAccessor>(initialGetter)
 	useEffect(() => {
 		ref.current = () => getEntity(key)
 	}, [getEntity, key])

@@ -1,5 +1,5 @@
-import type { Environment } from '@contember/binding'
-import { BindingError, useEnvironment, VariableInputTransformer } from '@contember/binding'
+import type { Environment } from '@contember/react-binding'
+import { BindingError, useEnvironment, VariableInputTransformer } from '@contember/react-binding'
 import type { NormalizedDiscriminatedData } from '../../discrimination'
 import {
 	DiscriminatedFileKindsProps,

@@ -1,4 +1,4 @@
-import { FieldAccessor, FieldValue } from '@contember/binding'
+import { FieldAccessor, FieldValue } from '@contember/react-binding'
 import type { NormalizedDiscriminatedData } from './NormalizedDiscriminatedData'
 import type { ResolvedDiscriminatedDatum } from './ResolvedDiscriminatedDatum'
 

@@ -1,7 +1,7 @@
-import { BindingError, RemovalType } from '@contember/binding'
+import { BindingError, RemovalType } from '@contember/react-binding'
 import { RepeaterItemContainer, RepeaterItemContainerProps } from '@contember/ui'
 import { ReactNode, forwardRef, memo } from 'react'
-import { DeleteEntityButton } from '../helpers'
+import { DeleteEntityButton } from '@contember/react-binding-ui'
 import { RepeaterCreateNewEntity } from './RepeaterFieldContainer'
 
 export type RepeaterItemOwnProps = {

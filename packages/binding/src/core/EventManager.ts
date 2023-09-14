@@ -1,4 +1,3 @@
-import * as ReactDOM from 'react-dom'
 import type {
 	AsyncBatchUpdatesOptions,
 	BatchUpdatesOptions,
@@ -52,6 +51,7 @@ export class EventManager {
 		private readonly dirtinessTracker: DirtinessTracker,
 		private readonly onUpdate: (metadata: UpdateMetadata) => void,
 		private readonly treeStore: TreeStore,
+		private readonly batchedUpdates: (callback: () => any) => void,
 	) {}
 
 	public async persistOperation(operation: () => Promise<SuccessfulPersistResult>): Promise<SuccessfulPersistResult> {
@@ -126,7 +126,7 @@ export class EventManager {
 			return
 		}
 
-		ReactDOM.unstable_batchedUpdates(() => {
+		this.batchedUpdates(() => {
 			this.isFrozenWhileUpdating = true
 			this.triggerBeforeFlushEvents()
 			this.onUpdate(newMetadata)
@@ -226,7 +226,10 @@ export class EventManager {
 
 				if (parent === undefined) {
 					this.rootsWithPendingUpdates.add(justUpdated)
-					this.dirtinessTracker.increaseBy(changesDelta)
+
+					if (!(justUpdated.blueprint.type === 'subTree' && justUpdated.blueprint.marker.parameters.isCreating && justUpdated.blueprint.marker.parameters.isUnpersisted)) {
+						this.dirtinessTracker.increaseBy(changesDelta)
+					}
 				} else {
 					if (!parent.childrenWithPendingUpdates) {
 						parent.childrenWithPendingUpdates = new Set()

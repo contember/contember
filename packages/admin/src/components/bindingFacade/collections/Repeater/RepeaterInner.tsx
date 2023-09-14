@@ -10,12 +10,11 @@ import {
 	SugaredFieldProps,
 	useMutationState,
 	useSortedEntities,
-} from '@contember/binding'
+} from '@contember/react-binding'
 import { RepeaterItemContainerProps } from '@contember/ui'
 import { ComponentType, Fragment, ReactElement, ReactNode, useCallback } from 'react'
 import type { SortEndHandler } from 'react-sortable-hoc'
-import { useMessageFormatter } from '../../../../i18n'
-import { shouldCancelStart } from '../../helpers/shouldCancelStart'
+import { useMessageFormatter } from '@contember/react-i18n'
 import {
 	RepeaterCreateNewEntity,
 	RepeaterFieldContainer,
@@ -27,6 +26,7 @@ import { SortableRepeaterContainer } from './SortableRepeaterContainer'
 import { SortableRepeaterItem } from './SortableRepeaterItem'
 import { SortableRepeaterItemHandle } from './SortableRepeaterItemHandle'
 import { repeaterDictionary } from './repeaterDictionary'
+import { shouldCancelStart } from '@contember/utilities'
 
 // TODO alt content for collapsing
 export interface RepeaterInnerProps<ContainerExtraProps, ItemExtraProps>

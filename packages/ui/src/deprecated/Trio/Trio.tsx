@@ -1,7 +1,9 @@
 import { useClassNameFactory } from '@contember/react-utils'
+import { deprecate } from '@contember/utilities'
 import type { ReactNode } from 'react'
 import { toViewClass } from '../../utils'
 
+/** @deprecated No alternative since 1.4.0 */
 export function Trio({
 	className,
 	column,
@@ -17,6 +19,8 @@ export function Trio({
 	end?: ReactNode
 	clickThroughSpace?: boolean
 }) {
+	deprecate('1.4.0', true, 'Trio', null)
+
 	const componentClassName = useClassNameFactory('trio')
 
 	if (!start && !center && !end) {

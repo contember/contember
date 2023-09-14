@@ -1,5 +1,5 @@
 import { useColorScheme } from '@contember/react-utils'
-import { colorSchemeClassName, contentThemeClassName, controlsThemeClassName, listClassName, themeClassName } from '@contember/utilities'
+import { colorSchemeClassName, contentThemeClassName, controlsThemeClassName, listClassName } from '@contember/utilities'
 import { toEnumStateClass, toEnumViewClass, toStateClass } from '../../../utils'
 import { NonOptionalVisuallyDependentControlProps } from '../Types'
 import { VisuallyDependentControlProps } from '../Types/ControlProps'

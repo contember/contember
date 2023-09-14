@@ -1,7 +1,7 @@
 import { useClassNameFactory } from '@contember/react-utils'
 import { MouseEventHandler, ReactNode, forwardRef, memo } from 'react'
+import { Icon, IconSourceSpecification } from '../../deprecated/Icon'
 import { toViewClass } from '../../utils'
-import { Icon, IconSourceSpecification } from '../Icon'
 
 export type ToolbarButtonLayout = 'grid' | 'list'
 

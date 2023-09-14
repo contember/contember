@@ -1,5 +1,5 @@
 import { useClassName } from '@contember/react-utils'
-import { dataAttribute } from '@contember/utilities'
+import { dataAttribute, deprecate, isDefined } from '@contember/utilities'
 import { forwardRef, memo } from 'react'
 import { toViewClass } from '../../../utils'
 import { useTextBasedInput } from '../Hooks'
@@ -16,6 +16,8 @@ export const TimeInput = memo(forwardRef<HTMLInputElement, TimeInputProps>(({
 	withTopToolbar,
 	...outerProps
 }, forwardedRed) => {
+	deprecate('1.4.0', isDefined(withTopToolbar), '`withTopToolbar` prop', null)
+
 	outerProps.max && assertTimeString(outerProps.max)
 	outerProps.min && assertTimeString(outerProps.min)
 	outerProps.value && assertTimeString(outerProps.value)

@@ -1,9 +1,11 @@
 import { useClassNameFactory } from '@contember/react-utils'
+import { deprecate } from '@contember/utilities'
 import { ReactNode, memo } from 'react'
-import { LayoutPageStickyContainer } from '../../deprecated/Layout/LayoutPageStickyContainer'
-import type { ThemeScheme } from '../../deprecated/Layout/Types'
-import { ButtonList } from '../Forms'
+import { ButtonList } from '../../components/Forms'
+import { LayoutPageStickyContainer } from '../Layout/LayoutPageStickyContainer'
+import type { ThemeScheme } from '../Layout/Types'
 
+/** @deprecated No alternative since 1.4.0 */
 export interface TitleBarProps extends ThemeScheme {
 	after?: ReactNode
 	navigation?: ReactNode // This can contain any number of buttons but only buttons
@@ -13,8 +15,11 @@ export interface TitleBarProps extends ThemeScheme {
 
 /**
  * @group UI
+ * @deprecated No alternative since 1.4.0
  */
 export const TitleBar = memo(({ after, navigation, children, actions, ...props }: TitleBarProps) => {
+	deprecate('1.4.0', true, 'TitleBar', null)
+
 	const componentClassName = useClassNameFactory('titleBar')
 
 	return (

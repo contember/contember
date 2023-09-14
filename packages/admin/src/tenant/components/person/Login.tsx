@@ -1,6 +1,6 @@
 import { getTenantErrorMessage } from '@contember/client'
 import { useSetSessionToken } from '@contember/react-client'
-import { Button, ErrorList, FieldContainer, FieldError, Stack, TextInput } from '@contember/ui'
+import { Button, EmailInput, ErrorList, FieldContainer, FieldError, PasswordInput, Stack, TextInput } from '@contember/ui'
 import { useCallback, useState } from 'react'
 import { Link, RoutingLinkTarget } from '../../../routing'
 import { useForm, useSignIn } from '../../index'
@@ -49,18 +49,16 @@ export const Login = ({ onLogin, resetLink }: LoginProps) => {
 			<Stack gap="large">
 				<ErrorList errors={errors} />
 				<FieldContainer label="Email">
-					<TextInput
+					<EmailInput
 						{...register('email')}
 						autoComplete="username"
-						type="email"
 						autoFocus={!otpRequired}
 						disabled={otpRequired}
 					/>
 				</FieldContainer>
 				<FieldContainer label="Password">
-					<TextInput
+					<PasswordInput
 						{...register('password')}
-						type="password"
 						autoComplete="current-password"
 						disabled={otpRequired}
 					/>

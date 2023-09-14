@@ -1,31 +1,29 @@
 import { useClassName } from '@contember/react-utils'
+import { deprecate } from '@contember/utilities'
 import { ReactNode, memo } from 'react'
-import type { Size } from '../../types'
+import { Size } from '../../types'
 import { toEnumViewClass } from '../../utils'
 
-export interface LogoSymbolProps {
+export interface LogoLabelProps {
 	className?: string
 	children: ReactNode
 	size?: Size | number
 }
 
-// TODO: repeated IDS
-
 /**
  * @group UI
+ * @deprecated No alternative since 1.4.0
  */
-export const LogoSymbol = memo(({ className, children, size }: LogoSymbolProps) => {
+export const LogoLabel = memo(({ className, children, size }: LogoLabelProps) => {
+	deprecate('1.4.0', true, 'LogoLabel', null)
+
 	return (
 		<div
-			className={useClassName('logo-symbol', [
+			className={useClassName('logo-label', [
 				typeof size === 'string' ? toEnumViewClass(size) : undefined,
 				className,
 			])}
 			style={typeof size === 'number' ? { fontSize: `${size >= 0 ? size : 1}em` } : undefined}
-		>
-			{children}
-		</div>
+		>{children}</div>
 	)
 })
-
-LogoSymbol.displayName = 'LogoSymbol'

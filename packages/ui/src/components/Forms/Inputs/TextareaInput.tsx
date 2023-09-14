@@ -1,38 +1,25 @@
 import { useAutoHeightTextArea, useClassName, useComposeRef } from '@contember/react-utils'
-import { dataAttribute, deprecate, isDefined } from '@contember/utilities'
+import { dataAttribute } from '@contember/utilities'
 import { AllHTMLAttributes, ForwardedRef, forwardRef, memo, useRef } from 'react'
-import { toViewClass } from '../../../utils'
 import { useTextBasedInput } from '../Hooks'
 import type { ControlProps, ControlPropsKeys } from '../Types'
 
 export interface UnderlyingElementProps extends Omit<AllHTMLAttributes<HTMLTextAreaElement>, ControlPropsKeys<string> | 'rows'> { }
 
-/** @deprecated Use `TextareaInputOwnProps` instead */
-export interface DeprecatedTextareaInputOwnProps {
-	/** @deprecated No alternative */
-	cacheMeasurements?: boolean
-	/** @deprecated No alternative */
-	onHeightChange?: (height: number, ...args: any[]) => void
-}
-
 export type TextareaInputOwnProps =
-	& {
-		withTopToolbar?: boolean
+	| {
+		maxRows?: number
+		minRows?: number
+		rows?: never
 	}
-	& (
-		| {
-			maxRows?: number
-			minRows?: number
-			rows?: never
-		}
-		| {
-			maxRows?: never
-			minRows?: never
-			rows?: number
-		}
-	)
+	| {
+		maxRows?: never
+		minRows?: never
+		rows?: number
+	}
 
-export type TextareaInputProps = ControlProps<string> & TextareaInputOwnProps & DeprecatedTextareaInputOwnProps & {
+
+export type TextareaInputProps = ControlProps<string> & TextareaInputOwnProps & {
 	focusRing?: boolean
 }
 
@@ -40,20 +27,14 @@ export type TextareaInputProps = ControlProps<string> & TextareaInputOwnProps & 
  * @group Forms UI
  */
 export const TextareaInput = memo(forwardRef(({
-	cacheMeasurements,
-	onHeightChange,
 	className,
 	focusRing = true,
 	maxRows,
 	minRows,
 	rows,
 	style,
-	withTopToolbar,
 	...outerProps
 }: TextareaInputProps & UnderlyingElementProps, forwardedRef: ForwardedRef<HTMLTextAreaElement>) => {
-	deprecate('1.3.0', isDefined(onHeightChange), '`TextareaInput.onHeightChange` prop', null)
-	deprecate('1.3.0', isDefined(cacheMeasurements), '`TextareaInput.cacheMeasurements` prop', null)
-
 	if (typeof rows === 'number' && (typeof minRows === 'number' || typeof maxRows === 'number')) {
 		throw new Error('TextareaInput: `rows` prop cannot be used with `minRows` or `maxRows` simultaneously')
 	}
@@ -69,12 +50,9 @@ export const TextareaInput = memo(forwardRef(({
 		throw new Error('TextareaInput: `maxRows` prop cannot be less than 1')
 	}
 
-	const { value, ref, ...props } = useTextBasedInput<HTMLTextAreaElement>({
+	const { value, ref: _INTENTIONALLY_OMITTED_REF_, ...props } = useTextBasedInput<HTMLTextAreaElement>({
 		...outerProps,
-		className: useClassName('textarea-input', [
-			toViewClass('withTopToolbar', withTopToolbar),
-			className,
-		]),
+		className: useClassName('textarea-input', className),
 	}, forwardedRef)
 
 	const innerRef = useRef<HTMLTextAreaElement>(null)

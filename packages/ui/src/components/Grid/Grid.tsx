@@ -1,7 +1,6 @@
 import { useClassName } from '@contember/react-utils'
 import { CSSProperties, forwardRef, memo, useMemo } from 'react'
 import { HTMLDivElementProps } from '../../types'
-import { useFallbackRef } from '../../utils'
 
 export interface GridOwnProps {
 	columnWidth: number
@@ -25,7 +24,6 @@ export const Grid = memo(forwardRef<HTMLDivElement, GridProps>(({
 		throw new Error('Column width must be a non-negative number')
 	}
 
-	const ref = useFallbackRef(forwardedRef)
 	const style: CSSProperties | undefined = useMemo(() => columnWidth ? ({
 		['--cui-grid-column-width' as any]: `${columnWidth}px`,
 		...styleProp,
@@ -33,7 +31,7 @@ export const Grid = memo(forwardRef<HTMLDivElement, GridProps>(({
 
 	return (
 		<div
-			ref={ref}
+			ref={forwardedRef}
 			className={useClassName('grid', className)}
 			style={style}
 			{...rest}

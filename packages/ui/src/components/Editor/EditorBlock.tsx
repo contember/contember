@@ -1,9 +1,11 @@
 import { useClassNameFactory } from '@contember/react-utils'
-import { forwardRef, memo, ReactNode } from 'react'
+import { deprecate, isDefined } from '@contember/utilities'
+import { ReactNode, forwardRef, memo } from 'react'
 
 export interface EditorBlockProps {
 	children?: ReactNode
 	dragHandle?: ReactNode
+	/** @deprecated Unused prop, no alternative since 1.4.0 */
 	dragLine?: boolean
 	isDragged?: boolean
 }
@@ -15,6 +17,7 @@ export const EditorBlock = memo(forwardRef<HTMLDivElement, EditorBlockProps>(({
 	isDragged,
 }, ref) => {
 	const componentClassName = useClassNameFactory('editorBlock')
+	deprecate('1.4.0', isDefined(dragLine), '`dragLine` prop', null)
 
 	return (
 		<div className={componentClassName('', isDragged && 'is-dragged')} ref={ref}>

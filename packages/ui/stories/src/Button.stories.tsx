@@ -1,22 +1,20 @@
 import type { ComponentMeta, ComponentStory } from '@storybook/react'
-import { AnchorButton, Button, ButtonElevation, ButtonFlow, ButtonProps, Intent, Justification, Scheme, Size } from '../../src'
+import { AnchorButton, Button, ButtonProps, Intent, Justification, Scheme, Size } from '../../src'
 import { booleanControl, enumControl } from './Helpers'
 
 const intents: Intent[] = ['default', 'primary', 'secondary', 'tertiary', 'positive', 'success', 'warn', 'danger']
 const schemes: Scheme[] = ['system', 'light', 'dark']
 const sizes: Size[] = ['default', 'small', 'large']
-const flows: ButtonFlow[] = ['default', 'circular', 'squarish', 'generous', 'block', 'generousBlock']
-const distinctions: ButtonProps['distinction'][] = ['default', 'primary', 'toned', 'outlined', 'seamless']
+const distinctions: ButtonProps['distinction'][] = ['primary', 'toned', 'outlined', 'seamless']
 const justifications: Justification[] = ['default', 'justifyStart', 'justifyCenter', 'justifyEnd']
-const buttonElevations: ButtonElevation[] = ['default', 'none']
 
 export default {
 	title: 'Forms/Button',
 	component: Button,
 	decorators: [
 		Story => <>
-      <p style={{ flex: '1 1 100%' }}>This is a text with normal weight that is not clickable. And here&apos;s some <a href="#">link</a> that is clickable. Buttons should have enough clickable visual affordance event when seamless.</p>
-      <Story />
+			<p style={{ flex: '1 1 100%' }}>This is a text with normal weight that is not clickable. And here&apos;s some <a href="#">link</a> that is clickable. Buttons should have enough clickable visual affordance event when seamless.</p>
+			<Story />
 		</>,
 	],
 	/**
@@ -36,41 +34,37 @@ export default {
 		active: booleanControl(false),
 		disabled: booleanControl(false),
 		distinction: enumControl(distinctions, 'inline-radio', 'default'),
-		flow: enumControl(flows, 'select', 'default'),
 		intent: enumControl(intents, 'select', 'default'),
 		justification: enumControl(justifications, 'inline-radio', 'default'),
 		loading: booleanControl(false),
 		scheme: enumControl(schemes, 'select', undefined),
 		size: enumControl(sizes, 'inline-radio', 'default'),
-		elevation: enumControl(buttonElevations, 'inline-radio', 'default'),
 	},
 } as ComponentMeta<typeof Button>
 
 const Template: ComponentStory<typeof Button> = args => <>
-  <Button {...args}>Default</Button>
-  <AnchorButton
-    href="#"
-    size={args.size}
-    flow={args.flow}
-    intent={args.intent}
-    distinction={args.distinction}
+	<Button {...args}>Default</Button>
+	<AnchorButton
+		href="#"
+		size={args.size}
+		intent={args.intent}
+		distinction={args.distinction}
 		disabled={args.disabled}
-    active={args.active}
-    loading={args.loading}
-    scheme={args.scheme}
-    justification={args.justification}
-  >Anchor</AnchorButton>
+		active={args.active}
+		loading={args.loading}
+		scheme={args.scheme}
+	>Anchor</AnchorButton>
 
-  <p style={{ flex: '1 1 100%' }}><strong>Important:</strong> If you use intent, without the scheme, the system preferred scheme is used:</p>
+	<p style={{ flex: '1 1 100%' }}><strong>Important:</strong> If you use intent, without the scheme, the system preferred scheme is used:</p>
 
-  <Button {...args} intent="primary">Primary</Button>
-  <Button {...args} intent="primary">Primary with a verry very long title even for lorem ipsum</Button>
-  <Button {...args} intent="secondary">Secondary</Button>
-  <Button {...args} intent="tertiary">Tertiary</Button>
-  <Button {...args} intent="positive">Positive</Button>
-  <Button {...args} intent="success">Success</Button>
-  <Button {...args} intent="warn">Warn</Button>
-  <Button {...args} intent="danger">Danger</Button>
+	<Button {...args} intent="primary">Primary</Button>
+	<Button {...args} intent="primary">Primary with a verry very long title even for lorem ipsum</Button>
+	<Button {...args} intent="secondary">Secondary</Button>
+	<Button {...args} intent="tertiary">Tertiary</Button>
+	<Button {...args} intent="positive">Positive</Button>
+	<Button {...args} intent="success">Success</Button>
+	<Button {...args} intent="warn">Warn</Button>
+	<Button {...args} intent="danger">Danger</Button>
 </>
 
 export const Default = Template.bind({})

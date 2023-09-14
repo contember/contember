@@ -1,11 +1,8 @@
 import { useClassName } from '@contember/react-utils'
-import { ComponentClassNameProps, dataAttribute, deprecate, fallback } from '@contember/utilities'
+import { ComponentClassNameProps, dataAttribute } from '@contember/utilities'
 import { memo } from 'react'
-import { HTMLDivElementProps, Size } from '../../types'
+import { HTMLDivElementProps } from '../../types'
 import { StackOwnProps } from '../Stack'
-
-/** @deprecated Use other prop values */
-export type DeprecatedDividerSize = Size | 'xlarge' | 'none'
 
 export interface DividerOwnProps extends ComponentClassNameProps {
 	/**
@@ -14,15 +11,7 @@ export interface DividerOwnProps extends ComponentClassNameProps {
 	gap?: StackOwnProps['gap']
 }
 
-/** @deprecated Use `DividerOwnProps` instead */
-export interface DeprecatedDividerProps {
-	gap?: DividerOwnProps['gap'] | DeprecatedDividerSize
-}
-
-export type DividerProps =
-	& Omit<HTMLDivElementProps, keyof DividerOwnProps | keyof DeprecatedDividerProps>
-	& Omit<DividerOwnProps, keyof DeprecatedDividerProps>
-	& DeprecatedDividerProps
+export type DividerProps = Omit<HTMLDivElementProps, keyof DividerOwnProps> & DividerOwnProps
 
 /**
  * @group UI
@@ -45,18 +34,6 @@ export type DividerProps =
  *
  */
 export const Divider = memo(({ className, componentClassName = 'divider', gap = true, ...rest }: DividerProps) => {
-	deprecate('1.3.0', gap === 'none', '`gap="none"`', '`gap={false}`')
-	gap = fallback(gap, gap === 'none', false)
-
-	deprecate('1.3.0', gap === 'small', '`gap="small"`', '`gap="gap"`')
-	gap = fallback(gap, gap === 'small', 'gap')
-
-	deprecate('1.3.0', gap === 'xlarge', '`gap="xlarge"`', '`gap="larger"`')
-	gap = fallback(gap, gap === 'xlarge', 'larger')
-
-	deprecate('1.3.0', gap === 'default', '`gap="default"`', 'omit the `gap` prop')
-	gap = fallback(gap, gap === 'default', true)
-
 	return (
 		<div
 			data-gap={dataAttribute(gap)}

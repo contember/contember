@@ -278,11 +278,6 @@
 	----color-rgb: var(--cui-color--accent-rgb-50);
 }
 
-/* TODO: deprecated since v1.3.0 */
-:where(.cui-button[data-bland]) {
-	opacity: var(--cui-opacity--high);
-}
-
 :where(.cui-button[data-elevated]) {
 	--cui-button--box-shadow-below--highlighted: var(----box-shadow--elevated);
 	--cui-button--box-shadow-below: var(----box-shadow--elevated);
@@ -438,12 +433,6 @@
 	----background-color-opacity--disabled: var(----background-color-opacity);
 	----background-color-rgb--disabled: var(----background-color-rgb);
 	----color-rgb--disabled: var(----color-rgb);
-}
-
-/* TODO: Should be removed with deprecated code */
-:where(.cui-button-group.view-isTopToolbar > *) {
-	border-bottom-left-radius: 0;
-	border-bottom-right-radius: 0;
 }
 
 :where(.cui-button-group[data-direction="horizontal"] > :not(:first-child):not(:last-child)) {

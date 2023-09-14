@@ -1,6 +1,6 @@
 import { useClassName } from '@contember/react-utils'
-import { dataAttribute } from '@contember/utilities'
-import { forwardRef, memo, Ref } from 'react'
+import { dataAttribute, deprecate, isDefined } from '@contember/utilities'
+import { Ref, forwardRef, memo } from 'react'
 import { HTMLInputElementProps } from '../../../types'
 import { toViewClass } from '../../../utils'
 import { useTextBasedInput } from '../Hooks'
@@ -52,6 +52,8 @@ export const DateTimeInput = memo(
 		withTopToolbar,
 		...outerProps
 	}: DateTimeInputProps, forwardedRef: Ref<HTMLInputElement>) => {
+		deprecate('1.4.0', isDefined(withTopToolbar), '`withTopToolbar` prop', null)
+
 		const props = useTextBasedInput<HTMLInputElement>({
 			...outerProps,
 			className: useClassName(['text-input', 'datetime-input'], [

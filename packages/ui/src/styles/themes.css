@@ -392,13 +392,7 @@
 /*** Color themes ***/
 
 :where(.theme-accent),
-:where(.theme-accent\:hover:hover),
-:where(.theme-accent\:active:active),
-:where(.theme-accent\:focus:focus),
-:where(.theme-accent-content),
-:where(.theme-accent-content\:hover:hover),
-:where(.theme-accent-content\:active:active),
-:where(.theme-accent-content\:focus:focus) {
+:where(.theme-accent-content) {
 	--cui-theme-content--rgb-1000: var(--cui-theme-accent--rgb-1000);
 	--cui-theme-content--rgb-975: var(--cui-theme-accent--rgb-975);
 	--cui-theme-content--rgb-950: var(--cui-theme-accent--rgb-950);
@@ -443,13 +437,7 @@
 }
 
 :where(.theme-accent),
-:where(.theme-accent\:hover:hover),
-:where(.theme-accent\:active:active),
-:where(.theme-accent\:focus:focus),
-:where(.theme-accent-controls),
-:where(.theme-accent-controls\:hover:hover),
-:where(.theme-accent-controls\:active:active),
-:where(.theme-accent-controls\:focus:focus) {
+:where(.theme-accent-controls) {
 	--cui-theme-controls--rgb-1000: var(--cui-theme-accent--rgb-1000);
 	--cui-theme-controls--rgb-975: var(--cui-theme-accent--rgb-975);
 	--cui-theme-controls--rgb-950: var(--cui-theme-accent--rgb-950);
@@ -496,13 +484,7 @@
 /** #000067 **/
 
 :where(.theme-primary),
-:where(.theme-primary\:hover:hover),
-:where(.theme-primary\:active:active),
-:where(.theme-primary\:focus:focus),
-:where(.theme-primary-content),
-:where(.theme-primary-content\:hover:hover),
-:where(.theme-primary-content\:active:active),
-:where(.theme-primary-content\:focus:focus) {
+:where(.theme-primary-content) {
 	--cui-theme-content--rgb-1000: var(--cui-theme-primary--rgb-1000);
 	--cui-theme-content--rgb-975: var(--cui-theme-primary--rgb-975);
 	--cui-theme-content--rgb-950: var(--cui-theme-primary--rgb-950);
@@ -547,13 +529,7 @@
 }
 
 :where(.theme-primary),
-:where(.theme-primary\:hover:hover),
-:where(.theme-primary\:active:active),
-:where(.theme-primary\:focus:focus),
-:where(.theme-primary-controls),
-:where(.theme-primary-controls\:hover:hover),
-:where(.theme-primary-controls\:active:active),
-:where(.theme-primary-controls\:focus:focus) {
+:where(.theme-primary-controls) {
 	--cui-theme-controls--rgb-1000: var(--cui-theme-primary--rgb-1000);
 	--cui-theme-controls--rgb-975: var(--cui-theme-primary--rgb-975);
 	--cui-theme-controls--rgb-950: var(--cui-theme-primary--rgb-950);
@@ -600,13 +576,7 @@
 /** #3DA9EB **/
 
 :where(.theme-secondary),
-:where(.theme-secondary\:hover:hover),
-:where(.theme-secondary\:active:active),
-:where(.theme-secondary\:focus:focus),
-:where(.theme-secondary-content),
-:where(.theme-secondary-content\:hover:hover),
-:where(.theme-secondary-content\:active:active),
-:where(.theme-secondary-content\:focus:focus) {
+:where(.theme-secondary-content) {
 	--cui-theme-content--rgb-1000: var(--cui-theme-secondary--rgb-1000);
 	--cui-theme-content--rgb-975: var(--cui-theme-secondary--rgb-975);
 	--cui-theme-content--rgb-950: var(--cui-theme-secondary--rgb-950);
@@ -651,13 +621,7 @@
 }
 
 :where(.theme-secondary),
-:where(.theme-secondary\:hover:hover),
-:where(.theme-secondary\:active:active),
-:where(.theme-secondary\:focus:focus),
-:where(.theme-secondary-controls),
-:where(.theme-secondary-controls\:hover:hover),
-:where(.theme-secondary-controls\:active:active),
-:where(.theme-secondary-controls\:focus:focus) {
+:where(.theme-secondary-controls) {
 	--cui-theme-controls--rgb-1000: var(--cui-theme-secondary--rgb-1000);
 	--cui-theme-controls--rgb-975: var(--cui-theme-secondary--rgb-975);
 	--cui-theme-controls--rgb-950: var(--cui-theme-secondary--rgb-950);
@@ -704,13 +668,7 @@
 /** #AE65FF **/
 
 :where(.theme-tertiary),
-:where(.theme-tertiary\:hover:hover),
-:where(.theme-tertiary\:active:active),
-:where(.theme-tertiary\:focus:focus),
-:where(.theme-tertiary-content),
-:where(.theme-tertiary-content\:hover:hover),
-:where(.theme-tertiary-content\:active:active),
-:where(.theme-tertiary-content\:focus:focus) {
+:where(.theme-tertiary-content) {
 	--cui-theme-content--rgb-1000: var(--cui-theme-tertiary--rgb-1000);
 	--cui-theme-content--rgb-975: var(--cui-theme-tertiary--rgb-975);
 	--cui-theme-content--rgb-950: var(--cui-theme-tertiary--rgb-950);
@@ -755,13 +713,7 @@
 }
 
 :where(.theme-tertiary),
-:where(.theme-tertiary\:hover:hover),
-:where(.theme-tertiary\:active:active),
-:where(.theme-tertiary\:focus:focus),
-:where(.theme-tertiary-controls),
-:where(.theme-tertiary-controls\:hover:hover),
-:where(.theme-tertiary-controls\:active:active),
-:where(.theme-tertiary-controls\:focus:focus) {
+:where(.theme-tertiary-controls) {
 	--cui-theme-controls--rgb-1000: var(--cui-theme-tertiary--rgb-1000);
 	--cui-theme-controls--rgb-975: var(--cui-theme-tertiary--rgb-975);
 	--cui-theme-controls--rgb-950: var(--cui-theme-tertiary--rgb-950);
@@ -808,13 +760,7 @@
 /** #006AFF **/
 
 :where(.theme-positive),
-:where(.theme-positive\:hover:hover),
-:where(.theme-positive\:active:active),
-:where(.theme-positive\:focus:focus),
-:where(.theme-positive-content),
-:where(.theme-positive-content\:hover:hover),
-:where(.theme-positive-content\:active:active),
-:where(.theme-positive-content\:focus:focus) {
+:where(.theme-positive-content) {
 	--cui-theme-content--rgb-1000: var(--cui-theme-positive--rgb-1000);
 	--cui-theme-content--rgb-975: var(--cui-theme-positive--rgb-975);
 	--cui-theme-content--rgb-950: var(--cui-theme-positive--rgb-950);
@@ -859,13 +805,7 @@
 }
 
 :where(.theme-positive),
-:where(.theme-positive\:hover:hover),
-:where(.theme-positive\:active:active),
-:where(.theme-positive\:focus:focus),
-:where(.theme-positive-controls),
-:where(.theme-positive-controls\:hover:hover),
-:where(.theme-positive-controls\:active:active),
-:where(.theme-positive-controls\:focus:focus) {
+:where(.theme-positive-controls) {
 	--cui-theme-controls--rgb-1000: var(--cui-theme-positive--rgb-1000);
 	--cui-theme-controls--rgb-975: var(--cui-theme-positive--rgb-975);
 	--cui-theme-controls--rgb-950: var(--cui-theme-positive--rgb-950);
@@ -912,13 +852,7 @@
 /** #6EBB00 **/
 
 :where(.theme-success),
-:where(.theme-success\:hover:hover),
-:where(.theme-success\:active:active),
-:where(.theme-success\:focus:focus),
-:where(.theme-success-content),
-:where(.theme-success-content\:hover:hover),
-:where(.theme-success-content\:active:active),
-:where(.theme-success-content\:focus:focus) {
+:where(.theme-success-content) {
 	--cui-theme-content--rgb-1000: var(--cui-theme-success--rgb-1000);
 	--cui-theme-content--rgb-975: var(--cui-theme-success--rgb-975);
 	--cui-theme-content--rgb-950: var(--cui-theme-success--rgb-950);
@@ -963,13 +897,7 @@
 }
 
 :where(.theme-success),
-:where(.theme-success\:hover:hover),
-:where(.theme-success\:active:active),
-:where(.theme-success\:focus:focus),
-:where(.theme-success-controls),
-:where(.theme-success-controls\:hover:hover),
-:where(.theme-success-controls\:active:active),
-:where(.theme-success-controls\:focus:focus) {
+:where(.theme-success-controls) {
 	--cui-theme-controls--rgb-1000: var(--cui-theme-success--rgb-1000);
 	--cui-theme-controls--rgb-975: var(--cui-theme-success--rgb-975);
 	--cui-theme-controls--rgb-950: var(--cui-theme-success--rgb-950);
@@ -1016,13 +944,7 @@
 /** #FF6600 **/
 
 :where(.theme-warn),
-:where(.theme-warn\:hover:hover),
-:where(.theme-warn\:active:active),
-:where(.theme-warn\:focus:focus),
-:where(.theme-warn-content),
-:where(.theme-warn-content\:hover:hover),
-:where(.theme-warn-content\:active:active),
-:where(.theme-warn-content\:focus:focus) {
+:where(.theme-warn-content) {
 	--cui-theme-content--rgb-1000: var(--cui-theme-warn--rgb-1000);
 	--cui-theme-content--rgb-975: var(--cui-theme-warn--rgb-975);
 	--cui-theme-content--rgb-950: var(--cui-theme-warn--rgb-950);
@@ -1067,13 +989,7 @@
 }
 
 :where(.theme-warn),
-:where(.theme-warn\:hover:hover),
-:where(.theme-warn\:active:active),
-:where(.theme-warn\:focus:focus),
-:where(.theme-warn-controls),
-:where(.theme-warn-controls\:hover:hover),
-:where(.theme-warn-controls\:active:active),
-:where(.theme-warn-controls\:focus:focus) {
+:where(.theme-warn-controls) {
 	--cui-theme-controls--rgb-1000: var(--cui-theme-warn--rgb-1000);
 	--cui-theme-controls--rgb-975: var(--cui-theme-warn--rgb-975);
 	--cui-theme-controls--rgb-950: var(--cui-theme-warn--rgb-950);
@@ -1120,13 +1036,7 @@
 /** #FF0000 **/
 
 :where(.theme-danger),
-:where(.theme-danger\:hover:hover),
-:where(.theme-danger\:active:active),
-:where(.theme-danger\:focus:focus),
-:where(.theme-danger-content),
-:where(.theme-danger-content\:hover:hover),
-:where(.theme-danger-content\:active:active),
-:where(.theme-danger-content\:focus:focus) {
+:where(.theme-danger-content) {
 	--cui-theme-content--rgb-1000: var(--cui-theme-danger--rgb-1000);
 	--cui-theme-content--rgb-975: var(--cui-theme-danger--rgb-975);
 	--cui-theme-content--rgb-950: var(--cui-theme-danger--rgb-950);
@@ -1171,13 +1081,7 @@
 }
 
 :where(.theme-danger),
-:where(.theme-danger\:hover:hover),
-:where(.theme-danger\:active:active),
-:where(.theme-danger\:focus:focus),
-:where(.theme-danger-controls),
-:where(.theme-danger-controls\:hover:hover),
-:where(.theme-danger-controls\:active:active),
-:where(.theme-danger-controls\:focus:focus) {
+:where(.theme-danger-controls) {
 	--cui-theme-controls--rgb-1000: var(--cui-theme-danger--rgb-1000);
 	--cui-theme-controls--rgb-975: var(--cui-theme-danger--rgb-975);
 	--cui-theme-controls--rgb-950: var(--cui-theme-danger--rgb-950);
@@ -1224,13 +1128,7 @@
 /** #999999 **/
 
 :where(.theme-default),
-:where(.theme-default\:hover:hover),
-:where(.theme-default\:active:active),
-:where(.theme-default\:focus:focus),
-:where(.theme-default-content),
-:where(.theme-default-content\:hover:hover),
-:where(.theme-default-content\:active:active),
-:where(.theme-default-content\:focus:focus) {
+:where(.theme-default-content) {
 	--cui-theme-content--rgb-1000: var(--cui-theme-default--rgb-1000);
 	--cui-theme-content--rgb-975: var(--cui-theme-default--rgb-975);
 	--cui-theme-content--rgb-950: var(--cui-theme-default--rgb-950);
@@ -1275,13 +1173,7 @@
 }
 
 :where(.theme-default),
-:where(.theme-default\:hover:hover),
-:where(.theme-default\:active:active),
-:where(.theme-default\:focus:focus),
-:where(.theme-default-controls),
-:where(.theme-default-controls\:hover:hover),
-:where(.theme-default-controls\:active:active),
-:where(.theme-default-controls\:focus:focus) {
+:where(.theme-default-controls) {
 	--cui-theme-controls--rgb-1000: var(--cui-theme-default--rgb-1000);
 	--cui-theme-controls--rgb-975: var(--cui-theme-default--rgb-975);
 	--cui-theme-controls--rgb-950: var(--cui-theme-default--rgb-950);

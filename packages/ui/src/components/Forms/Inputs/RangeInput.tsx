@@ -1,10 +1,9 @@
 import { useClassName } from '@contember/react-utils'
-import { dataAttribute } from '@contember/utilities'
+import { dataAttribute, deprecate, isDefined } from '@contember/utilities'
 import { forwardRef, memo } from 'react'
 import { toViewClass } from '../../../utils'
 import { useTextBasedInput } from '../Hooks'
 import type { RangeInputProps } from './Types'
-
 /**
  * @group Forms UI
  */
@@ -14,6 +13,8 @@ export const RangeInput = memo(forwardRef<HTMLInputElement, RangeInputProps>(({
 	withTopToolbar,
 	...outerProps
 }, forwardedRed) => {
+	deprecate('1.4.0', isDefined(withTopToolbar), '`withTopToolbar` prop', null)
+
 	const props = useTextBasedInput<HTMLInputElement>({
 		...outerProps,
 		className: useClassName(['text-input', 'range-input'], [

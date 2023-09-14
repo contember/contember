@@ -24,17 +24,6 @@ export const focusScopeDictionary = {
 	},
 }
 
-// TODO: Remove when Formatter is moved out of Admin
-function TEMPORARY_fallbackFormatter(key:
-	| 'focusScope.pressToSkipToLastLabel'
-	| 'focusScope.pressToSkipToFirstLabel',
-): string {
-	return {
-		'focusScope.pressToSkipToLastLabel': focusScopeDictionary.focusScope.pressToSkipToLastLabel,
-		'focusScope.pressToSkipToFirstLabel': focusScopeDictionary.focusScope.pressToSkipToFirstLabel,
-	}[key]
-}
-
 const siblingMatch: Record<TabbingDirection, 'nextElementSibling' | 'previousElementSibling'> = {
 	[tabbingDirection.FORWARDS]: 'nextElementSibling',
 	[tabbingDirection.BACKWARDS]: 'previousElementSibling',
@@ -89,10 +78,7 @@ export function FocusScope({
 	pressToSkipToLastLabel,
 	pressToSkipToFirstLabel,
 }: FocusScopeProps) {
-	// TODO: Restore when Formatter is moved out of Admin and formatting works
-	// const formatter = useMessageFormatter(focusScopeDictionary)
-	const formatter = TEMPORARY_fallbackFormatter
-
+	const formatter = useMessageFormatter(focusScopeDictionary)
 	const activeRef = useUpdatedRef(active)
 	const lastRef = useRef<HTMLButtonElement>(null)
 	const firstRef = useRef<HTMLButtonElement>(null)

@@ -15,7 +15,6 @@ const Template: ComponentStory<typeof Box> = (args: any) => <Box {...args} />
 
 export const Simple = Template.bind({})
 Simple.args = {
-	heading: 'Lorem ipsum',
 	actions: <Button>Hi!</Button>,
 	children: <>
 		<Block />

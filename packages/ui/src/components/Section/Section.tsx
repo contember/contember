@@ -1,5 +1,5 @@
-import { useClassNameFactory } from '@contember/react-utils'
-import { forwardRef, memo, ReactNode, useLayoutEffect, useRef } from 'react'
+import { useClassNameFactory, useId } from '@contember/react-utils'
+import { ReactNode, forwardRef, memo, useLayoutEffect, useRef } from 'react'
 import type { HTMLDivElementProps } from '../../types'
 import { Message } from '../Message'
 import { useSectionTabsRegistration } from '../SectionTabs'
@@ -17,8 +17,6 @@ export interface SectionOwnProps {
 export type SectionProps =
 	& SectionOwnProps
 	& HTMLDivElementProps
-
-const randomId = () => (Math.random() + 1).toString(36).substring(7)
 
 /**
  * The `Section` component defines a section on page. It automatically generates sub-menu for quick navigation on the page.
@@ -40,9 +38,10 @@ export const Section = memo(forwardRef<HTMLElement, SectionProps>(({
 	...divProps
 }: SectionProps, ref) => {
 	const componentClassName = useClassNameFactory('section')
+	const _id = useId()
 
 	const [registerTab, unregisterTab] = useSectionTabsRegistration()
-	const sectionId = useRef<string>(id ? `section-${id}` : 'section-' + randomId())
+	const sectionId = useRef<string>(id ? `section-${id}` : 'section-' + _id)
 
 	useLayoutEffect(() => {
 		if (!heading || !showTab) {

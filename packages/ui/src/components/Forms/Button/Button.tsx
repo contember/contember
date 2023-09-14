@@ -1,5 +1,5 @@
 import { ColorSchemeContext, useClassNameFactory, useColorScheme } from '@contember/react-utils'
-import { colorSchemeClassName, controlsThemeClassName, dataAttribute, deprecate, fallback, isDefined } from '@contember/utilities'
+import { colorSchemeClassName, controlsThemeClassName, dataAttribute } from '@contember/utilities'
 import { createElement, forwardRef, memo } from 'react'
 import { Spinner } from '../../Spinner/Spinner'
 import { Text } from '../../Typography'
@@ -76,7 +76,7 @@ AnchorButton.displayName = 'Interface.AnchorButton'
  * ```
  *
  * @example
- * Change physical size of the button withoud changing the visual with `inset` prop:
+ * Change physical size of the button without changing the visual with `inset` prop:
  * ```tsx
  * <Button distinction="seamless" inset>Inset</Button>
  * ```
@@ -91,7 +91,6 @@ export const BaseButton = memo(forwardRef<any, BaseButtonProps>(({
 	accent = 'theme',
 	active,
 	align,
-	bland,
 	borderRadius = true,
 	className: classNameProp,
 	componentClassName = 'button',
@@ -100,12 +99,9 @@ export const BaseButton = memo(forwardRef<any, BaseButtonProps>(({
 	disabled,
 	distinction,
 	elevated = false,
-	elevation,
-	flow,
 	focusRing = true,
 	intent,
 	type,
-	justification,
 	justify = 'center',
 	loading,
 	inset,
@@ -115,32 +111,6 @@ export const BaseButton = memo(forwardRef<any, BaseButtonProps>(({
 	square = false,
 	...rest
 }, ref) => {
-	// TODO: deprecated since v1.3.0
-	deprecate('1.3.0', bland !== undefined, '`bland` prop', '`distinction` prop')
-
-	deprecate('1.3.0', flow === 'squarish', 'flow="squarish"', '`square={true}`')
-	deprecate('1.3.0', flow === 'circular', 'flow="circular"', '`square={true} borderRadius="full"`')
-	square = fallback(square, flow === 'squarish' || flow === 'circular', true)
-	borderRadius = fallback(borderRadius, flow === 'circular', 'full')
-	deprecate('1.3.0', flow === 'default', '`flow="default"`', 'omitted `flow` prop')
-	deprecate('1.3.0', flow === 'block', '`flow="block"`', '`display="block"`')
-	deprecate('1.3.0', flow === 'generous', '`flow="generous"`', '`padding="large"`')
-	deprecate('1.3.0', flow === 'generousBlock', '`flow="generousBlock"`', '`display="block" padding="large"`')
-	display = fallback(display, flow === 'block' || flow === 'generousBlock', 'block')
-	padding = fallback(padding, flow === 'generous' || flow === 'generousBlock', 'padding')
-
-	deprecate('1.3.0', typeof elevated !== 'boolean', '`elevate` prop', '`elevate` prop')
-	elevated = fallback(elevated, elevation === 'default', true)
-
-	deprecate('1.3.0', justification !== undefined, '`justification` prop', '`justify` prop')
-	justify = fallback(justify, justification !== undefined, ({ default: 'center', justifyStart: 'start', justifyCenter: 'center', justifyEnd: 'end' } as const)[justification ?? 'default'])
-
-	deprecate('1.3.0', padding === 'small', 'padding="small"', 'padding="gap"')
-	padding = fallback(padding, padding === 'small', 'gap')
-
-	deprecate('1.3.0', distinction === 'default', '`distinction="default"`', 'omitted `distinction` prop')
-	distinction = fallback(distinction, distinction === 'default', undefined)
-
 	if (disabled === true) {
 		rest['aria-disabled'] = true
 		rest['tabIndex'] = -1
@@ -155,7 +125,6 @@ export const BaseButton = memo(forwardRef<any, BaseButtonProps>(({
 		'data-accent': dataAttribute(accent),
 		'data-active': dataAttribute(active),
 		'data-align': dataAttribute(align),
-		'data-bland': dataAttribute(bland), // TODO: deprecated since v1.3.0
 		'data-border-radius': dataAttribute(borderRadius),
 		'data-disabled': dataAttribute(disabled),
 		'data-display': dataAttribute(display),

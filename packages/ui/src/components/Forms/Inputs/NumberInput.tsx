@@ -1,5 +1,5 @@
 import { useClassName } from '@contember/react-utils'
-import { dataAttribute } from '@contember/utilities'
+import { dataAttribute, deprecate, isDefined } from '@contember/utilities'
 import { forwardRef, memo, useCallback } from 'react'
 import { mergeProps } from 'react-aria'
 import { toViewClass } from '../../../utils'
@@ -20,6 +20,8 @@ export const NumberInput = memo(forwardRef<HTMLInputElement, NumberInputProps>((
 	withTopToolbar,
 	...outerProps
 }, forwardedRed) => {
+	deprecate('1.4.0', isDefined(withTopToolbar), '`withTopToolbar` prop', null)
+
 	const props = useTextBasedInput<HTMLInputElement>({
 		...outerProps,
 		className: useClassName(['text-input', 'number-input'], [

@@ -3,8 +3,7 @@ import { ComponentClassNameProps, flatClassNameList } from '@contember/utilities
 import { PencilIcon, Trash2Icon } from 'lucide-react'
 import { MouseEvent as ReactMouseEvent, ReactNode, memo, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { HTMLDivElementProps } from '../../types'
-import { Box, BoxOwnProps } from '../Box'
+import { Box, BoxHeaderProps, BoxProps } from '../Box'
 import { Dropdown, DropdownProps } from '../Dropdown/Dropdown'
 import { Button, ButtonOwnProps } from '../Forms'
 
@@ -14,15 +13,17 @@ export interface ActionableBoxOwnProps extends ComponentClassNameProps {
 	children: ReactNode
 }
 
-export interface ActionableBoxProps
-	extends Omit<HTMLDivElementProps, keyof ActionableBoxOwnProps | keyof BoxOwnProps>,
-	Omit<BoxOwnProps, keyof ActionableBoxOwnProps>,
-	ActionableBoxOwnProps { }
+export type ActionableBoxProps =
+	& Omit<BoxProps, keyof ActionableBoxOwnProps>
+	& ActionableBoxOwnProps
 
 /**
  * @group UI
  */
 export const ActionableBox = memo<ActionableBoxProps>(({
+	actions,
+	label,
+	header,
 	children,
 	editContents,
 	className: classNameProp,
@@ -40,9 +41,12 @@ export const ActionableBox = memo<ActionableBoxProps>(({
 		return <>{children}</>
 	}
 
+	const boxHeaderProps: BoxHeaderProps = header ? { header } : { actions, label }
+
 	return (
 		<Box
 			{...rest}
+			{...boxHeaderProps}
 			ref={composeRef}
 			className={className(null, classNameProp)}
 			componentClassName={boxComponentClassName}

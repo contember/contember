@@ -11,8 +11,6 @@
 @import "./Box/index.css";
 @import "./Typography/index.css";
 @import "./Anchor/index.css";
-@import "./Logo/index.css";
-@import "./Icon/index.css";
 @import "./Forms/index.css";
 @import "./Dropdown/index.css";
 
@@ -20,7 +18,6 @@
 @import "./Aether/index.css";
 @import "./ActionableBox/index.css";
 
-@import "./Trio/index.css";
 @import "./ProgressBar/index.css";
 @import "./Tag/index.css";
 @import "./Card/index.css";
@@ -30,7 +27,6 @@
 @import "./Message/index.css";
 @import "./EmptyStateContainer/index.css";
 @import "./RepeaterItemContainer/index.css";
-@import "./SeamlessDropdown/index.css";
 @import "./Section/index.css";
 @import "./SectionTabs/index.css";
 @import "./Tabs/index.css";
@@ -39,7 +35,6 @@
 /* Composite components */
 @import "./Dialog/index.css";
 @import "./Toaster/index.css";
-@import "./TitleBar/index.css";
 @import "./Table/index.css";
 @import "./SpinnerContainer/index.css";
 @import "./ContentStatus/index.css";
@@ -49,7 +44,6 @@
 @import "./DimensionSwitcher/index.css";
 @import "./ErrorList/index.css";
 @import "./HoveringToolbar/index.css";
-@import "./UserMiniControl/index.css";
 @import "./Menu/index.css";
 
 /* Complex components */

@@ -6,7 +6,7 @@ const dummyInput = (
 )
 
 const paddings = ['gap', 'gutter', 'padding'] satisfies ButtonProps['padding'][]
-const buttonDistinctions: ButtonProps['distinction'][] = ['seamless', 'default', 'outlined', 'primary', 'toned']
+const buttonDistinctions: ButtonProps['distinction'][] = ['seamless', undefined, 'outlined', 'primary', 'toned']
 const intent: Intent = 'danger'
 
 export default function () {
@@ -27,7 +27,7 @@ export default function () {
 								return (
 									<RepeaterItemContainer
 										key={distinction}
-										label={distinction}
+										label={distinction ?? 'default'}
 										actions={<>
 											<Button square borderRadius={false} {...buttonProps}><Trash2Icon /></Button>
 											<Button square borderRadius {...buttonProps}><Trash2Icon /></Button>

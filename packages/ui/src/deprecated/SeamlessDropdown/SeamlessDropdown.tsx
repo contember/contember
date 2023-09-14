@@ -1,11 +1,14 @@
-import { useClassNameFactory } from '@contember/react-utils'
+import { useClassNameFactory, useCloseOnClickOutside, useCloseOnEscape } from '@contember/react-utils'
+import { deprecate } from '@contember/utilities'
 import { ReactNode, useCallback, useMemo, useState } from 'react'
-import { useCloseOnClickOutside, useCloseOnEscape } from '../../auxiliary'
+import { Stack } from '../../components'
 import { Default } from '../../types'
 import { toEnumViewClass, toViewClass } from '../../utils'
-import { Stack } from '../Stack'
 
+/** @deprecated No alternative since 1.4.0 */
 export type SeamlessDropdownDirection = Default | 'down' | 'up'
+
+/** @deprecated No alternative since 1.4.0 */
 export interface SeamlessDropdownProps {
 	label: ReactNode
 	children?: ReactNode
@@ -15,7 +18,10 @@ export interface SeamlessDropdownProps {
 	direction?: SeamlessDropdownDirection
 }
 
+/** @deprecated Use `Dropdown` instead since 1.4.0 */
 export function SeamlessDropdown({ direction = 'down', label, children, hoverable, caret, inline }: SeamlessDropdownProps) {
+	deprecate('1.4.0', true, 'SeamlessDropdown', null)
+
 	const componentClassName = useClassNameFactory('seamlessDropdown')
 	const [open, setOpen] = useState(false)
 

@@ -32,10 +32,6 @@ import { shouldCancelStart } from '@contember/utilities'
 export interface RepeaterInnerProps<ContainerExtraProps, ItemExtraProps>
 	extends RepeaterFieldContainerPublicProps {
 	accessor: EntityListAccessor
-	/**
-	 * @deprecated Use label instead
-	 */
-	boxLabel?: ReactNode
 	label: ReactNode
 	children?: ReactNode
 
@@ -92,7 +88,7 @@ export const RepeaterInner = Component<RepeaterInnerProps<any, any>, NonStaticPr
 		)
 
 		const removalType: RemovalType = props.removalType ?? 'delete'
-		const label = props.label ?? props.boxLabel
+		const label = props.label
 
 		if (props.sortableBy === undefined) {
 			return (

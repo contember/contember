@@ -13,16 +13,20 @@ import type { IconSize } from '../../types'
 import { toEnumViewClass, toViewClass } from '../../utils'
 import * as ContemberIcons from './contemberIcons'
 
-// To be potentially extended later
+/** @deprecated Use of `Icon` and related code is discouraged and might be removed in the future */
 export type BlueprintIconName = BPIconName
+
+/** @deprecated Use of `Icon` and related code is discouraged and might be removed in the future */
 export type ContemberIconName = keyof typeof ContemberIcons
 
+/** @deprecated Use of `Icon` and related code is discouraged and might be removed in the future */
 export interface IconSourceSpecification {
 	blueprintIcon?: BlueprintIconName
 	contemberIcon?: ContemberIconName
 	customIcon?: ReactElement | string[]
 }
 
+/** @deprecated Use of `Icon` and related code is discouraged and might be removed in the future */
 export interface IconProps extends IconSourceSpecification {
 	title?: string
 	size?: IconSize
@@ -40,6 +44,7 @@ const renderSvgPaths = (pathStrings: string[] | undefined): JSX.Element[] | null
 
 /**
  * @group UI
+ * @deprecated Use of `Icon` and related code is discouraged and might be removed in the future
  */
 export const Icon = memo(forwardRef<HTMLElement, IconProps>(function Icon(props, ref) {
 	const componentClassName = useClassNameFactory('icon')

@@ -1,8 +1,8 @@
 import { useClassNameFactory } from '@contember/react-utils'
 import { dataAttribute, isNumber } from '@contember/utilities'
+import { GripVerticalIcon } from 'lucide-react'
 import { ComponentType, ReactNode, forwardRef, memo } from 'react'
 import { Box, BoxProps } from '../Box'
-import { Icon } from '../Icon'
 import { Label } from '../Typography/Label'
 
 export type RepeaterItemContainerOwnProps = {
@@ -36,7 +36,7 @@ export const RepeaterItemContainer = memo(forwardRef<HTMLDivElement, RepeaterIte
 			{Handle && (
 				<div className={className('handle')}>
 					<Handle>
-						<Icon blueprintIcon="drag-handle-vertical" />
+						<GripVerticalIcon />
 					</Handle>
 				</div>
 			)}

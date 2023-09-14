@@ -1,10 +1,10 @@
 import { ColorSchemeProvider, ContainerWidthContext, useClassNameFactory, useElementSize } from '@contember/react-utils'
 import { colorSchemeClassName, contentThemeClassName, controlsThemeClassName } from '@contember/utilities'
+import { MenuIcon, XIcon } from 'lucide-react'
 import { ReactNode, memo, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { NavigationContext } from '../../Navigation'
 import { DialogProvider, Divider, Spacer } from '../../components'
 import { Button } from '../../components/Forms'
-import { Icon } from '../../components/Icon'
 import { PortalProvider } from '../../components/Portal'
 import { PreventCloseContext } from '../../components/PreventCloseContext'
 import { Stack } from '../../components/Stack'
@@ -186,7 +186,7 @@ export const LayoutChrome = memo(({
 												<Spacer grow />
 												<Button id="cui-menu-button" distinction="seamless" className={componentClassName('navigation-button')} onClick={toggleCollapsed}>
 													<span className={componentClassName('menu-button-label')}>Menu</span>
-													<Icon blueprintIcon={collapsed ? 'menu' : 'cross'} />
+													{collapsed ? <MenuIcon /> : <XIcon />}
 												</Button>
 											</div>
 										</div>

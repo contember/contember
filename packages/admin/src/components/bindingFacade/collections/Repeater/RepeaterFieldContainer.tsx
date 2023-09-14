@@ -1,8 +1,4 @@
 import type { EntityAccessor, EntityListAccessor } from '@contember/react-binding'
-import { FieldContainer, FieldContainerOwnProps } from '@contember/ui'
-import { deprecate, fallback, isDefined } from '@contember/utilities'
-import { ReactNode, memo } from 'react'
-import type { MessageFormatter } from '@contember/react-i18n'
 import {
 	AccessorErrors,
 	AddEntityButtonProps,
@@ -10,6 +6,9 @@ import {
 	EmptyMessage,
 	EmptyMessageOuterProps,
 } from '@contember/react-binding-ui'
+import type { MessageFormatter } from '@contember/react-i18n'
+import { FieldContainer, FieldContainerOwnProps } from '@contember/ui'
+import { memo } from 'react'
 import type { RepeaterDictionary } from './repeaterDictionary'
 
 export type RepeaterFieldContainerPublicProps =
@@ -26,10 +25,6 @@ export interface RepeaterFieldContainerPrivateProps extends Omit<FieldContainerO
 	entities: EntityAccessor[]
 	formatMessage: MessageFormatter<RepeaterDictionary>
 	isEmpty: boolean
-	/**
-	 * @deprecated Use label instead
-	 */
-	boxLabel?: ReactNode
 	createNewEntity: RepeaterCreateNewEntity
 }
 
@@ -41,7 +36,6 @@ export const RepeaterFieldContainer = memo(
 	({
 		accessor,
 		addButtonText,
-		boxLabel,
 		children,
 		createNewEntity,
 		addButtonComponent: AddButton = CreateNewEntityButton,
@@ -55,9 +49,6 @@ export const RepeaterFieldContainer = memo(
 		label,
 		...rest
 	}: RepeaterFieldContainerProps) => {
-		deprecate('1.3.0', isDefined(boxLabel), '`boxLabel` prop', '`label` prop')
-		label = fallback(label, isDefined(boxLabel), boxLabel)
-
 		return (
 			<FieldContainer
 				label={label}

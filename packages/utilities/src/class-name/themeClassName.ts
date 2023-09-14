@@ -1,6 +1,4 @@
 import { KebabCase } from 'type-fest'
-import { isDefined } from '../assert-types'
-import { deprecate } from '../deprecate'
 import { ThemeContentClassName, ThemeControlsClassName } from './types'
 
 /**
@@ -30,14 +28,8 @@ import { ThemeContentClassName, ThemeControlsClassName } from './types'
  */
 export function contentThemeClassName<
 	ContentTheme extends KebabCase<string> = KebabCase<string>,
-	State extends `:${KebabCase<string>}` | null | undefined = undefined,
->(
-	theme: ContentTheme | null | undefined,
-	state?: State | null | undefined,
-) {
-	deprecate('1.3.0', isDefined(state), '`state` argument', null)
-
-	return theme ? `theme-${theme}-content${state ?? ''}` as ThemeContentClassName<ContentTheme, State> : undefined
+>(theme: ContentTheme | null | undefined) {
+	return theme ? `theme-${theme}-content` as ThemeContentClassName<ContentTheme> : undefined
 }
 
 /**
@@ -67,14 +59,10 @@ export function contentThemeClassName<
  */
 export function controlsThemeClassName<
 	ControlsTheme extends KebabCase<string> = KebabCase<string>,
-	State extends `:${KebabCase<string>}` | null | undefined = undefined,
 >(
 	theme: ControlsTheme | null | undefined,
-	state?: State | null | undefined,
 ) {
-	deprecate('1.3.0', isDefined(state), '`state` argument', null)
-
-	return theme ? `theme-${theme}-controls${state ?? ''}` as ThemeControlsClassName<ControlsTheme, State> : undefined
+	return theme ? `theme-${theme}-controls` as ThemeControlsClassName<ControlsTheme> : undefined
 }
 
 /**
@@ -103,15 +91,11 @@ export function controlsThemeClassName<
  */
 export function themeClassName<
 	Theme extends KebabCase<string> = KebabCase<string>,
-	State extends `:${KebabCase<string>}` | null | undefined = undefined,
 >(
 	theme: Theme | null | undefined,
-	state?: State | null | undefined,
 ) {
-	deprecate('1.3.0', isDefined(state), '`state` argument', null)
-
 	return [
-		contentThemeClassName(theme, state),
-		controlsThemeClassName(theme, state),
+		contentThemeClassName(theme),
+		controlsThemeClassName(theme),
 	] as const
 }

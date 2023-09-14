@@ -10,7 +10,7 @@ export interface StateClassNameOptions {
  * Combines a state map of class names into a single string
  *
  * @example
- * stateClassName({ foo: true, bar: false, baz: 1 }) // => 'foo baz-1'
+ * `stateClassName({ foo: true, bar: false, baz: 1 }) // => 'foo baz-1'`
  *
  * @param state - State map object with class names as keys and literals as values.
  * @param options - Options object

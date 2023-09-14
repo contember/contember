@@ -1,10 +1,19 @@
 import { useClassNameFactory } from '@contember/react-utils'
+import { deprecate } from '@contember/utilities'
 
+/**
+ * @deprecated No alternative since 1.4.0
+ */
 interface ContemberLogoImage {
 	withLabel?: boolean
 }
 
+/**
+ * @deprecated Use `import { Identity2023 } from '@contember/brand'` instead since 1.4.0
+ */
 export const ContemberLogoImage = ({ withLabel }: ContemberLogoImage) => {
+	deprecate('1.4.0', true, 'ContemberLogoImage', null)
+
 	const componentClassName = useClassNameFactory('contember-logo-image')
 
 	return (

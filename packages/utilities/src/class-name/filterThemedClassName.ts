@@ -1,5 +1,4 @@
 import { KebabCase } from 'type-fest'
-import { deprecate } from '../deprecate'
 import { isColorSchemeClassName } from './colorSchemeClassName'
 import { THEME_CLASS_NAME_REG_EXP } from './constants'
 import { flatClassNameList } from './flatClassNameList'
@@ -13,7 +12,6 @@ export function filterThemedClassName(
 	defaultColorSchemeContext: ColorSchemeClassName,
 ) {
 	const theme: ThemeConfig = { content: undefined, controls: undefined }
-	const stateThemes: Record<string, ThemeConfig> = {}
 	let colorScheme: ColorSchemeClassName | undefined = undefined
 
 	const flatClassName = flatClassNameList(nestedClassName).map(className => {
@@ -27,33 +25,16 @@ export function filterThemedClassName(
 		if (match) {
 			const name = match.groups!.name as KebabCase<string>
 			const scope = match.groups!.scope as KebabCase<string>
-			const state = match.groups!.state as `:${KebabCase<string>}`
 
-			if (state) {
-				deprecate('1.3.0', true, 'State themes are deprecated.', null)
-				stateThemes[state] = stateThemes[state] ?? { content: undefined, controls: undefined }
-
-				if (!scope) {
-					stateThemes[state].content = name
-					stateThemes[state].controls = name
-				} else if (scope === 'content') {
-					stateThemes[state].content = name
-				} else if (scope === 'controls') {
-					stateThemes[state].controls = name
-				} else {
-					throw new Error(`Unknown theme scope: ${scope}`)
-				}
+			if (!scope) {
+				theme.content = name
+				theme.controls = name
+			} else if (scope === 'content') {
+				theme.content = name
+			} else if (scope === 'controls') {
+				theme.controls = name
 			} else {
-				if (!scope) {
-					theme.content = name
-					theme.controls = name
-				} else if (scope === 'content') {
-					theme.content = name
-				} else if (scope === 'controls') {
-					theme.controls = name
-				} else {
-					throw new Error(`Unknown theme scope: ${scope}`)
-				}
+				throw new Error(`Unknown theme scope: ${scope}`)
 			}
 
 			return undefined
@@ -68,15 +49,6 @@ export function filterThemedClassName(
 	const controls = controlsThemeClassName(theme.controls)
 
 	themeClassNames.push(content, controls)
-
-	for (const state in stateThemes) {
-		const { content, controls } = stateThemes[state]
-
-		const contentClassName = contentThemeClassName(content, state as `:${KebabCase<string>}`)
-		const controlsClassName = controlsThemeClassName(controls, state as `:${KebabCase<string>}`)
-
-		themeClassNames.push(contentClassName, controlsClassName)
-	}
 
 	const flatThemedClassName = flatClassNameList(themeClassNames)
 

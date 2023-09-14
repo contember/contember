@@ -1,5 +1,5 @@
 import { useClassNameFactory, useColorScheme, useElementSize } from '@contember/react-utils'
-import { ComponentClassNameProps, colorSchemeClassName, controlsThemeClassName, dataAttribute, deprecate, fallback, omit, px, themeClassName } from '@contember/utilities'
+import { ComponentClassNameProps, colorSchemeClassName, controlsThemeClassName, dataAttribute, omit, px, themeClassName } from '@contember/utilities'
 import { CSSProperties, ReactNode, memo, useMemo, useRef } from 'react'
 import type { Size } from '../../../types'
 import { ErrorList, ErrorListProps } from '../../ErrorList/ErrorList'
@@ -76,19 +76,7 @@ export interface FieldContainerOwnProps extends ComponentClassNameProps {
 	style?: CSSProperties
 }
 
-/** @deprecated Use `FieldContainerOwnProps` instead */
-export interface DeprecatedFieldContainerProps {
-	/** @deprecated Use combination of `horizontal` and `reverse` props instead */
-	direction?: StackProps['direction']
-	/** @deprecated No alternative */
-	width?: 'column' | 'fluid' | 'none'
-}
-
-export interface FieldContainerProps extends
-	ErrorListProps,
-	DeprecatedFieldContainerProps,
-	FieldContainerOwnProps {
-}
+export interface FieldContainerProps extends ErrorListProps, FieldContainerOwnProps { }
 
 /**
  * The `FieldContainer` component is a container that can be used to wrap inputs to form a labeled field.
@@ -169,7 +157,6 @@ export const FieldContainer = memo(
 		componentClassName = 'field-container',
 		description,
 		errors,
-		direction,
 		display = 'block',
 		footer,
 		evenly,
@@ -183,18 +170,8 @@ export const FieldContainer = memo(
 		size,
 		style,
 		useLabelElement = true,
-		width = 'column',
 		...props
 	}: FieldContainerProps) => {
-		deprecate('1.3.0', labelPosition === 'labelInlineLeft', '`labelPosition="labelInlineLeft"`', '`labelPosition="left" display="inline"`')
-		deprecate('1.3.0', labelPosition === 'labelInlineRight', '`labelPosition="labelInlineRight"`', '`labelPosition="right" display="inline"`')
-		deprecate('1.3.0', labelPosition === 'labelLeft', '`labelPosition="labelLeft"`', '`labelPosition="left"`')
-		deprecate('1.3.0', labelPosition === 'labelRight', '`labelPosition="labelRight"`', '`labelPosition="right"`')
-
-		display = fallback(display, labelPosition === 'labelInlineLeft' || labelPosition === 'labelInlineRight', 'inline')
-		labelPosition = fallback(labelPosition, labelPosition === 'labelInlineLeft' || labelPosition === 'labelLeft', 'left')
-		labelPosition = fallback(labelPosition, labelPosition === 'labelInlineRight' || labelPosition === 'labelRight', 'right')
-
 		const LabelElement = useLabelElement ? 'label' : 'div'
 		const className = useClassNameFactory(componentClassName)
 
@@ -240,7 +217,6 @@ export const FieldContainer = memo(
 							<Stack
 								ref={bodyContentRef}
 								className={className('body-content')}
-								direction={direction}
 								horizontal={horizontal}
 								evenly={evenly}
 								reverse={reverse}

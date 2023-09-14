@@ -1,8 +1,7 @@
 import { useClassNameFactory, useColorScheme } from '@contember/react-utils'
-import { colorSchemeClassName, dataAttribute, themeClassName } from '@contember/utilities'
+import { colorSchemeClassName, dataAttribute, deprecate, isDefined, themeClassName } from '@contember/utilities'
 import { ReactNode, forwardRef, memo } from 'react'
 import { TextInput, TextInputProps } from '../Inputs'
-
 export type SlugInputProps =
 	& TextInputProps
 	& {
@@ -21,8 +20,11 @@ export const SlugInput = memo(forwardRef<HTMLInputElement, SlugInputProps>(({
 	overlay,
 	focusRing = true,
 	onOverlayClick,
+	withTopToolbar,
 	...textInputProps
 }, ref) => {
+	deprecate('1.4.0', isDefined(withTopToolbar), '`withTopToolbar` prop', null)
+
 	const componentClassName = useClassNameFactory('slug-input')
 	const intent = textInputProps.validationState === 'invalid' ? 'danger' : undefined
 

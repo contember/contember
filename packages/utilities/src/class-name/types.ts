@@ -9,9 +9,5 @@ export interface ComponentClassNameProps {
 }
 
 export type ColorSchemeClassName<T extends KebabCase<string> = KebabCase<string>> = `scheme-${T}`
-export type ThemeContentClassName<T extends KebabCase<string> = KebabCase<string>, S extends `:${KebabCase<string>}` | null | undefined = undefined> = S extends string
-	? `theme-${T}-content${S}`
-	: `theme-${T}-content`
-export type ThemeControlsClassName<T extends KebabCase<string> = KebabCase<string>, S extends `:${KebabCase<string>}` | null | undefined = undefined> = S extends string
-	? `theme-${T}-controls${S}`
-	: `theme-${T}-controls`
+export type ThemeContentClassName<T extends KebabCase<string> = KebabCase<string>> = `theme-${T}-content`
+export type ThemeControlsClassName<T extends KebabCase<string> = KebabCase<string>> = `theme-${T}-controls`

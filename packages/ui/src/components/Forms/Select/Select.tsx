@@ -24,10 +24,6 @@ export type HTMLReactSelectElementWithKey<V> = SelectInstance<SelectOptionWithKe
 
 export type SelectProps<V, NN extends boolean> = Omit<ControlProps<V, NN>, 'type' | 'style' | keyof ControlConstraintProps<any>> & {
 	options: SelectOption<Narrow<V>>[]
-	/**
-	 * @deprecated No need for React Select component.
-	 */
-	rows?: never
 	isSearchable?: ComponentProps<ReactSelect>['isSearchable']
 	styles?: StylesConfig<any, boolean, never>
 }
@@ -59,7 +55,6 @@ export const SelectComponent = <V, NN extends boolean>({
 	placeholder,
 	readOnly,
 	required,
-	rows,
 	scheme,
 	size,
 	styles,

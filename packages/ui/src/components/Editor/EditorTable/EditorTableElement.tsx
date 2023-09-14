@@ -1,9 +1,9 @@
 import { useClassNameFactory } from '@contember/react-utils'
 import { CSSProperties, Fragment, memo, ReactNode } from 'react'
+import { Icon } from '../../../deprecated/Icon'
 import { toStateClass } from '../../../utils'
 import { Dropdown } from '../../Dropdown/Dropdown'
 import { Button, ButtonGroup } from '../../Forms'
-import { Icon } from '../../Icon'
 
 export interface EditorTableElementProps {
 	rowCount: number

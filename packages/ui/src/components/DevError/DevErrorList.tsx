@@ -1,6 +1,6 @@
 import { useClassNameFactory } from '@contember/react-utils'
+import { ArrowLeftIcon, ArrowRightIcon, XIcon } from 'lucide-react'
 import { Button, ButtonGroup } from '../Forms'
-import { Icon } from '../Icon'
 import { DevErrorInner } from './DevErrorInner'
 import { ProcessedError } from './types'
 
@@ -39,17 +39,17 @@ export function DevErrorList({
 								</p>
 								<ButtonGroup size="small">
 									<Button distinction="outlined" size="small" onClick={onPrevious}>
-										<Icon blueprintIcon="arrow-left" />{' '}
+										<ArrowLeftIcon />
 									</Button>
 									<Button distinction="outlined" size="small" onClick={onNext}>
-										<Icon blueprintIcon="arrow-right" />{' '}
+										<ArrowRightIcon />
 									</Button>
 								</ButtonGroup>
 							</div>
 						) : null}
 						<div className={componentClassName('close')}>
 							<Button distinction="outlined" size="small" onClick={onClose}>
-								<Icon blueprintIcon="cross" />{' '}
+								<XIcon />
 							</Button>
 						</div>
 					</div>

@@ -1,20 +1,19 @@
 import { EntityAccessor, useLabelMiddleware } from '@contember/react-binding'
+import { useAccessorErrors } from '@contember/react-binding-ui'
+import { BaseDynamicChoiceField, ChoiceFieldSingleOption, DynamicMultiChoiceFieldRendererProps } from '@contember/react-choice-field'
 import {
 	FieldContainer,
 	FieldContainerProps,
-	getPortalRoot,
 	PublicCommonReactSelectStylesProps,
 	SelectCreateNewWrapper,
 	usePortalProvider,
 } from '@contember/ui'
-import { memo, MouseEventHandler, ReactElement, useCallback } from 'react'
+import { shouldCancelStart } from '@contember/utilities'
+import { MouseEventHandler, ReactElement, memo, useCallback } from 'react'
 import type { MultiValueGenericProps, MultiValueProps, Props as SelectProps } from 'react-select'
 import Select, { ActionMeta, components } from 'react-select'
-import { SortableContainer, SortableContainerProps, SortableElement, SortableHandle, SortEndHandler } from 'react-sortable-hoc'
-import { BaseDynamicChoiceField, ChoiceFieldSingleOption, DynamicMultiChoiceFieldRendererProps } from '@contember/react-choice-field'
+import { SortEndHandler, SortableContainer, SortableContainerProps, SortableElement, SortableHandle } from 'react-sortable-hoc'
 import { useCommonReactSelectProps } from '../../hooks/useCommonReactSelectProps'
-import { useAccessorErrors } from '@contember/react-binding-ui'
-import { shouldCancelStart } from '@contember/utilities'
 import { useOpenCreateNewDialog } from '../../hooks/useOpenCreateNewDialog'
 
 
@@ -22,12 +21,10 @@ export type MultiSelectFieldRendererPublicProps =
 	& Pick<
 		FieldContainerProps,
 		| 'description'
-		| 'direction'
 		| 'gap'
 		| 'label'
 		| 'labelDescription'
 		| 'labelPosition'
-		| 'width'
 		| 'required'
 		| 'size'
 		| 'useLabelElement'
@@ -76,7 +73,7 @@ export const MultiSelectFieldInner = memo(({
 	onMove,
 	onSearch,
 	isLoading,
-	createNewForm,
+	createNewForm: _INTENTIONALLY_OMITTED_createNewForm,
 	onAddNew,
 	...props
 }: MultiSelectFieldInnerProps) => {

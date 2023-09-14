@@ -1,4 +1,5 @@
 import { useClassNameFactory } from '@contember/react-utils'
+import { deprecate } from '@contember/utilities'
 import { AllHTMLAttributes, DetailedHTMLProps, InputHTMLAttributes, forwardRef, memo, useCallback } from 'react'
 import { mergeProps, useFocusRing, useHover } from 'react-aria'
 import { toStateClass } from '../../../utils'
@@ -8,16 +9,22 @@ import { CheckboxButton as DefaultCheckboxButton } from './CheckboxButton'
 
 export interface RestHTMLCheckboxProps extends Omit<AllHTMLAttributes<HTMLInputElement>, ControlPropsKeys<boolean> | 'checked' | 'children'> { }
 
-export type CheckboxOwnProps = ControlProps<boolean> & {
+export type CheckboxOwnProps = Omit<ControlProps<boolean>, 'min' | 'max'> & {
 	CheckboxButtonComponent?: typeof DefaultCheckboxButton
-	/**
-	 * @deprecated Add `<Label>` next to it or wrap with `<FieldContainer>`
-	 *
-	 */
-	children?: never
 }
 
-export type CheckboxProps = CheckboxOwnProps & RestHTMLCheckboxProps
+/** @deprecated No alternative since 1.4.0 */
+export type DeprecatedCheckboxProps = {
+	/** @deprecated No use for boolean checkboxes, no alternative since 1.4.0 */
+	min?: ControlProps<boolean>['min']
+	/** @deprecated No use for boolean checkboxes, no alternative since 1.4.0 */
+	max?: ControlProps<boolean>['max']
+}
+
+export type CheckboxProps =
+	& Omit<RestHTMLCheckboxProps, keyof CheckboxOwnProps | keyof DeprecatedCheckboxProps>
+	& Omit<CheckboxOwnProps, keyof RestHTMLCheckboxProps>
+	& DeprecatedCheckboxProps
 
 /**
  * To add label to checkbox, use `Label` component next to it or wrap with `FieldContainer` or other way to display label next to Checkbox.
@@ -33,22 +40,17 @@ export type CheckboxProps = CheckboxOwnProps & RestHTMLCheckboxProps
  */
 export const Checkbox = memo(forwardRef<HTMLInputElement, CheckboxProps>(({
 	CheckboxButtonComponent,
-	// NOTE: Children are not allowed on Checkbox
-	children: INTENTIONALLY_UNUSED_CHILDREN,
 	max,
 	min,
 	onChange,
 	value,
 	...outerProps
 }, forwardedRef) => {
-	if (import.meta.env.DEV && INTENTIONALLY_UNUSED_CHILDREN) {
-		console.warn('[UNUSED CHILDREN] Add `<Label>` next to it or wrap with '
-			+ '`<FieldContainer display="inline" label={label} labelPosition="right"><Checkbox {...} /></FieldContainer>` '
-			+ 'or other way to display label next to Checkbox.')
-	}
-
 	const componentClassName = useClassNameFactory('checkbox')
 	const notNull = outerProps.notNull
+
+	deprecate('1.4.0', min !== undefined, '`min` prop', null)
+	deprecate('1.4.0', max !== undefined, '`max` prop', null)
 
 	const onChangeRotateState = useCallback((next?: boolean | null) => {
 		if (!notNull) {

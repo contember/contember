@@ -7,7 +7,6 @@
 import { ComponentClassNameProps } from '@contember/utilities';
 import { ComponentProps } from 'react';
 import { ComponentType } from 'react';
-import { ContainerWidthContextType } from '@contember/react-utils';
 import { Context } from 'react';
 import { CSSProperties } from 'react';
 import { ElementType } from 'react';
@@ -29,8 +28,6 @@ import { RefAttributes } from 'react';
 import { RefObject } from 'react';
 import { RequiredDeepPlainObject } from '@contember/utilities';
 import { StackOwnProps } from '@contember/ui';
-import { useContainerWidth } from '@contember/react-utils';
-import { useDocumentTitle as useDocumentTitle_2 } from '@contember/react-utils';
 
 // @public (undocumented)
 const ActiveSlotPortalsContext: Context<ActiveSlotPortalsContextType>;
@@ -541,12 +538,6 @@ const isOneOfPanelBehaviors: (value: unknown) => value is "static" | "collapsibl
 // @public (undocumented)
 const isOneOfPanelVisibilities: (value: unknown) => value is "visible" | "hidden";
 
-// @public @deprecated (undocumented)
-const LayoutContainerWidthContext: Context<number | null | undefined>;
-
-// @public @deprecated (undocumented)
-type LayoutContainerWidthContextType = ContainerWidthContextType;
-
 // @public (undocumented)
 export const LayoutKit: {
     ContentPanelMain: (<C extends ElementType<any> = "section">(props: PolymorphicComponentPropsWithRef<C, OwnContentPanelProps>) => ReactElement<any, string | JSXElementConstructor<any>> | null) & {
@@ -573,10 +564,6 @@ const LayoutPanelContext: Context<PanelState>;
 
 declare namespace LayoutPrimitives {
     export {
-        LayoutContainerWidthContextType,
-        LayoutContainerWidthContext,
-        useLayoutContainerWidth,
-        useDocumentTitle,
         PanelWidthContextType,
         PanelWidthContext,
         usePanelWidthContext,
@@ -880,7 +867,6 @@ type RegistryContextType<T extends Record<string, unknown>> = {
 // @public (undocumented)
 type RenderToSlotPortalContextType = {
     getTarget: undefined | ((slot: string) => HTMLElement | null | undefined);
-    createSlotPortal?: never;
     registerSlotSource: undefined | ((id: string, slot: string) => void);
     unregisterSlotSource: undefined | ((id: string, slot: string) => void);
 };
@@ -1065,7 +1051,6 @@ declare namespace Slots {
         Target,
         useHasActiveSlotsFactory,
         useSlotTargetsFactory,
-        useTargetsIfActiveFactory,
         SlotsRefMap,
         RegisterSlotTarget,
         UnregisterSlotTarget,
@@ -1202,9 +1187,6 @@ function useDirectiveLifecycle<T extends RequiredDeepPlainObject, K extends keyo
 // @public (undocumented)
 function useDirectives<T extends RequiredDeepPlainObject>(): T;
 
-// @public @deprecated (undocumented)
-const useDocumentTitle: typeof useDocumentTitle_2;
-
 // @public (undocumented)
 export function useElementInsetCustomProperties(elementRef: RefObject<HTMLElement>, prefix?: string): CSSProperties | undefined;
 
@@ -1216,9 +1198,6 @@ const useGetLayoutPanelsStateContext: () => GetLayoutPanelsStateContextType;
 
 // @public (undocumented)
 function useHasActiveSlotsFactory<T extends SlotTargetComponentsRecord<string>>(SlotTargets: T): (...slots: ReadonlyArray<keyof T & string>) => boolean;
-
-// @public @deprecated (undocumented)
-const useLayoutContainerWidth: typeof useContainerWidth;
 
 // @public (undocumented)
 const useLayoutPanelContext: () => PanelState;
@@ -1242,11 +1221,6 @@ const useSetLayoutPanelsStateContext: () => SetLayoutPanelsStateContextType;
 function useSlotTargetsFactory<R extends SlotTargetComponentsRecord<string>>(SlotTargets: R): <T>(slots: ReadonlyArray<keyof R & string>, override?: T | undefined) => NonNullable<T> | FunctionComponentElement<    {
 children?: ReactNode;
 }> | null;
-
-// @public @deprecated
-function useTargetsIfActiveFactory<R extends SlotTargetComponentsRecord<string>>(SlotTargets: R): <T>(slots: readonly (keyof R & string)[], override?: T | undefined) => FunctionComponentElement<    {
-children?: ReactNode;
-}> | NonNullable<T> | null;
 
 // @public (undocumented)
 const useTargetsRegistryContext: () => SlotTargetsRegistryContextType;

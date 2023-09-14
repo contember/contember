@@ -178,6 +178,20 @@ export function useClassName(componentClassName: NestedClassName, additionalClas
 export function useClassNameFactory(componentClassName: NestedClassName, glue?: string | null, prefixOverride?: string | null | undefined): (suffix?: string | null | undefined, additionalClassName?: NestedClassName) => string;
 
 // @public (undocumented)
+export const useCloseOnClickOutside: ({ isOpen, close, contents, outside }: {
+    isOpen: boolean;
+    close: () => void;
+    contents: (Node | null)[];
+    outside?: HTMLElement | null | undefined;
+}) => void;
+
+// @public (undocumented)
+export const useCloseOnEscape: ({ isOpen, close }: {
+    isOpen: boolean;
+    close: () => void;
+}) => void;
+
+// @public (undocumented)
 export const useColorScheme: () => string;
 
 // @public

@@ -781,7 +781,7 @@ export interface CustomMarkPlugin {
 }
 
 // @public (undocumented)
-export const DataGridPage: PageComponent<({ children, rendererProps, pageName, ...dataGridProps }: DataGridPageProps) => JSX.Element>;
+export const DataGridPage: PageComponent<({ children, rendererProps, pageName: _INTENTIONALLY_OMITTED_pageName, ...dataGridProps }: DataGridPageProps) => JSX.Element>;
 
 // @public (undocumented)
 export type DataGridPageProps = DataGridProps<DataGridContainerPublicProps> & {
@@ -2826,14 +2826,12 @@ export const repeaterDictionary: {
 };
 
 // @public (undocumented)
-export const RepeaterFieldContainer: React.MemoExoticComponent<({ accessor, addButtonText, boxLabel, children, createNewEntity, addButtonComponent: AddButton, addButtonComponentExtraProps, addButtonProps, emptyMessage, emptyMessageComponent, enableAddingNew, formatMessage, isEmpty, label, ...rest }: RepeaterFieldContainerProps) => JSX.Element>;
+export const RepeaterFieldContainer: React.MemoExoticComponent<({ accessor, addButtonText, children, createNewEntity, addButtonComponent: AddButton, addButtonComponentExtraProps, addButtonProps, emptyMessage, emptyMessageComponent, enableAddingNew, formatMessage, isEmpty, label, ...rest }: RepeaterFieldContainerProps) => JSX.Element>;
 
 // @public (undocumented)
 export interface RepeaterFieldContainerPrivateProps extends Omit<FieldContainerOwnProps, 'useLabelElement'> {
     // (undocumented)
     accessor: EntityListAccessor;
-    // @deprecated (undocumented)
-    boxLabel?: ReactNode;
     // (undocumented)
     createNewEntity: RepeaterCreateNewEntity;
     // (undocumented)
@@ -2862,8 +2860,6 @@ export const RepeaterInner: (<ContainerExtraProps, ItemExtraProps>(props: Repeat
 export interface RepeaterInnerProps<ContainerExtraProps, ItemExtraProps> extends RepeaterFieldContainerPublicProps {
     // (undocumented)
     accessor: EntityListAccessor;
-    // @deprecated (undocumented)
-    boxLabel?: ReactNode;
     // (undocumented)
     children?: ReactNode;
     // (undocumented)

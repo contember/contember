@@ -72,10 +72,10 @@ export interface ComponentClassNameProps {
 }
 
 // @public
-export function contentThemeClassName<ContentTheme extends KebabCase<string> = KebabCase<string>, State extends `:${KebabCase<string>}` | null | undefined = undefined>(theme: ContentTheme | null | undefined, state?: State | null | undefined): ThemeContentClassName<ContentTheme, State> | undefined;
+export function contentThemeClassName<ContentTheme extends KebabCase<string> = KebabCase<string>>(theme: ContentTheme | null | undefined): `theme-${ContentTheme}-content` | undefined;
 
 // @public
-export function controlsThemeClassName<ControlsTheme extends KebabCase<string> = KebabCase<string>, State extends `:${KebabCase<string>}` | null | undefined = undefined>(theme: ControlsTheme | null | undefined, state?: State | null | undefined): ThemeControlsClassName<ControlsTheme, State> | undefined;
+export function controlsThemeClassName<ControlsTheme extends KebabCase<string> = KebabCase<string>>(theme: ControlsTheme | null | undefined): `theme-${ControlsTheme}-controls` | undefined;
 
 // @public (undocumented)
 export function dataAttribute(value: unknown): string | true | undefined;
@@ -338,9 +338,6 @@ export { Simplify }
 // @public (undocumented)
 export type SlugString = Opaque<string, 'SlugString'>;
 
-// Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
-// Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
-// Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
 // Warning: (tsdoc-param-tag-with-invalid-name) The @param block should be followed by a valid parameter name: The identifier cannot non-word characters
 // Warning: (tsdoc-param-tag-with-invalid-name) The @param block should be followed by a valid parameter name: The identifier cannot non-word characters
 //
@@ -377,7 +374,7 @@ export function svgSizeProps(width: number, height?: number, crop?: number): Svg
 export const THEME_CLASS_NAME_REG_EXP: RegExp;
 
 // @public
-export function themeClassName<Theme extends KebabCase<string> = KebabCase<string>, State extends `:${KebabCase<string>}` | null | undefined = undefined>(theme: Theme | null | undefined, state?: State | null | undefined): readonly [ThemeContentClassName<Theme, State> | undefined, ThemeControlsClassName<Theme, State> | undefined];
+export function themeClassName<Theme extends KebabCase<string> = KebabCase<string>>(theme: Theme | null | undefined): readonly [`theme-${Theme}-content` | undefined, `theme-${Theme}-controls` | undefined];
 
 // @public (undocumented)
 export type ThemeConfig = {
@@ -386,10 +383,10 @@ export type ThemeConfig = {
 };
 
 // @public (undocumented)
-export type ThemeContentClassName<T extends KebabCase<string> = KebabCase<string>, S extends `:${KebabCase<string>}` | null | undefined = undefined> = S extends string ? `theme-${T}-content${S}` : `theme-${T}-content`;
+export type ThemeContentClassName<T extends KebabCase<string> = KebabCase<string>> = `theme-${T}-content`;
 
 // @public (undocumented)
-export type ThemeControlsClassName<T extends KebabCase<string> = KebabCase<string>, S extends `:${KebabCase<string>}` | null | undefined = undefined> = S extends string ? `theme-${T}-controls${S}` : `theme-${T}-controls`;
+export type ThemeControlsClassName<T extends KebabCase<string> = KebabCase<string>> = `theme-${T}-controls`;
 
 // @public (undocumented)
 export function toKebabCase(value: string): string;

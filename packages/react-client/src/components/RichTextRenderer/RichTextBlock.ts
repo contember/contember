@@ -1,1 +1,1 @@
-export type RichTextBlock = Record<string, unknown>
+export type RichTextBlock = Readonly<Record<string, unknown>>

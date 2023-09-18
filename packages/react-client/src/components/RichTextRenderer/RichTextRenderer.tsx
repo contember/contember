@@ -14,18 +14,18 @@ import { RichTextRenderMetadataContext } from './RichTextRenderMetadataContext'
 import type { RootEditorNode } from './RootEditorNode'
 
 export interface RichTextRendererFieldProps {
-	source: string | null
+	readonly source: string | null
 }
 
 export interface RichTextRendererBlockProps<
 	CustomElements extends RichTextElement = never,
 	CustomLeaves extends RichTextLeaf = never,
 > {
-	blocks: RichTextBlock[]
-	referenceRenderers?: Record<string, ReferenceRenderer<any, CustomElements, CustomLeaves>>
-	sourceField?: string
-	referencesField?: string
-	referenceDiscriminationField?: string
+	readonly blocks: RichTextBlock[]
+	readonly referenceRenderers?: Record<string, ReferenceRenderer<any, CustomElements, CustomLeaves>>
+	readonly sourceField?: string
+	readonly referencesField?: string
+	readonly referenceDiscriminationField?: string
 }
 
 export type RichTextRendererProps<
@@ -60,9 +60,9 @@ export const RichTextRenderer = memo(function RichTextRenderer<
 					content: sourceProps.source
 						? deserialize(sourceProps.source)
 						: {
-								formatVersion: 0,
-								children: [],
-						  },
+							formatVersion: 0,
+							children: [],
+						},
 					id: undefined,
 					referencesField: undefined,
 					referenceDiscriminationField: undefined,
@@ -80,10 +80,10 @@ export const RichTextRenderer = memo(function RichTextRenderer<
 				if (!(sourceField in block)) {
 					throw new RichTextRendererError(
 						`Found a block without a '${sourceField}' field. ` +
-							(sourceProps.sourceField === undefined
-								? `The 'sourceField' prop has not been supplied, and so '${sourceField}' was used as a default.`
-								: `That is what the 'sourceField' prop has been set to, and so either this is a typo, ` +
-								  `or the data supplied is invalid.`),
+						(sourceProps.sourceField === undefined
+							? `The 'sourceField' prop has not been supplied, and so '${sourceField}' was used as a default.`
+							: `That is what the 'sourceField' prop has been set to, and so either this is a typo, ` +
+							`or the data supplied is invalid.`),
 					)
 				}
 				const source = block[sourceField]
@@ -94,8 +94,8 @@ export const RichTextRenderer = memo(function RichTextRenderer<
 				if (sourceProps.referencesField !== undefined && !(referencesField in block)) {
 					throw new RichTextRendererError(
 						`The 'referencesField' prop is set to '${referencesField}' but a block without such field ` +
-							`has been encountered. Unless this is just a typo, ` +
-							`if you do not wish to use references, avoid supplying the 'referencesField' prop.`,
+						`has been encountered. Unless this is just a typo, ` +
+						`if you do not wish to use references, avoid supplying the 'referencesField' prop.`,
 					)
 				}
 				const references = block[referencesField]
@@ -114,11 +114,11 @@ export const RichTextRenderer = memo(function RichTextRenderer<
 						if (!(referenceDiscriminationField in reference)) {
 							throw new RichTextRendererError(
 								`Found a reference without a '${referenceDiscriminationField}' field. ` +
-									(sourceProps.referenceDiscriminationField === undefined
-										? `The 'referenceDiscriminationField' prop has not been supplied, ` +
-										  `and so '${referenceDiscriminationField}' was used as a default.`
-										: `That is what the 'referenceDiscriminationField' prop has been set to, ` +
-										  `and so either this is a typo, or the data supplied is invalid.`),
+								(sourceProps.referenceDiscriminationField === undefined
+									? `The 'referenceDiscriminationField' prop has not been supplied, ` +
+									`and so '${referenceDiscriminationField}' was used as a default.`
+									: `That is what the 'referenceDiscriminationField' prop has been set to, ` +
+									`and so either this is a typo, or the data supplied is invalid.`),
 							)
 						}
 						normalizedReferences.set(reference.id, reference)
@@ -152,12 +152,12 @@ export const RichTextRenderer = memo(function RichTextRenderer<
 				>
 					{createElement(
 						renderBlock, {
-							block,
-						}, renderChildren(block.content.children, {
-							renderLeaf,
-							renderElement,
-							attributeNamePrefix,
-						}),
+						block,
+					}, renderChildren(block.content.children, {
+						renderLeaf,
+						renderElement,
+						attributeNamePrefix,
+					}),
 					)}
 				</RichTextRenderMetadataContext.Provider>
 			))}

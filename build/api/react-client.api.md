@@ -196,7 +196,7 @@ export interface RichTextAnchorElement<CustomElements extends RichTextElement = 
 }
 
 // @public (undocumented)
-export type RichTextBlock = Record<string, unknown>;
+export type RichTextBlock = Readonly<Record<string, unknown>>;
 
 // @public (undocumented)
 export interface RichTextBoldLeaf extends RichTextLeaf {
@@ -312,7 +312,7 @@ export const RichTextRenderer: <CustomElements extends RichTextElement<never, ne
 // @public (undocumented)
 export interface RichTextRendererBlockProps<CustomElements extends RichTextElement = never, CustomLeaves extends RichTextLeaf = never> {
     // (undocumented)
-    blocks: RichTextBlock[];
+    blocks: readonly RichTextBlock[];
     // (undocumented)
     referenceDiscriminationField?: string;
     // (undocumented)

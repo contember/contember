@@ -14,18 +14,18 @@ import { RichTextRenderMetadataContext } from './RichTextRenderMetadataContext'
 import type { RootEditorNode } from './RootEditorNode'
 
 export interface RichTextRendererFieldProps {
-	readonly source: string | null
+	source: string | null
 }
 
 export interface RichTextRendererBlockProps<
 	CustomElements extends RichTextElement = never,
 	CustomLeaves extends RichTextLeaf = never,
 > {
-	readonly blocks: RichTextBlock[]
-	readonly referenceRenderers?: Record<string, ReferenceRenderer<any, CustomElements, CustomLeaves>>
-	readonly sourceField?: string
-	readonly referencesField?: string
-	readonly referenceDiscriminationField?: string
+	blocks: readonly RichTextBlock[]
+	referenceRenderers?: Record<string, ReferenceRenderer<any, CustomElements, CustomLeaves>>
+	sourceField?: string
+	referencesField?: string
+	referenceDiscriminationField?: string
 }
 
 export type RichTextRendererProps<

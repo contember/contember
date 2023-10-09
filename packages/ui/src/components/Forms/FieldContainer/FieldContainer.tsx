@@ -218,10 +218,12 @@ export const FieldContainer = memo(
 					colorSchemeClassName(useColorScheme()),
 					classNameProp,
 				])}
-				style={useMemo(() => ({
-					'--cui-field-container--body-content-height': px(height),
-					...style,
-				}), [height, style])}
+				style={useMemo(() => labelPosition === 'left' || labelPosition === 'right'
+					? ({
+						'--cui-field-container--body-content-height': px(height),
+						...style,
+					})
+					: style, [height, labelPosition, style])}
 			>
 				{(label || labelDescription) && (
 					<span className={className('header')}>

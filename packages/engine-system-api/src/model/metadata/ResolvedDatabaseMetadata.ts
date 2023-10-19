@@ -25,6 +25,10 @@ export class ResolvedDatabaseMetadata implements SchemaDatabaseMetadata {
 	) {
 	}
 
+	getAllUniqueConstraints(): UniqueConstraintMetadata[] {
+		return this.uniqueConstraints
+	}
+
 	getUniqueConstraint(tableName: string, constraintName: string): UniqueConstraintMetadata | null {
 		return this.uniqueConstraints.find(it => it.tableName === tableName && it.constraintName === constraintName) ?? null
 	}

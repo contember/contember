@@ -26,7 +26,7 @@ export function MenuItem<T = unknown>({ children, componentClassName = 'menu-ite
 	const menuId = useMenuId()
 	const [expanded, setExpanded] = useSessionStorageState<boolean>(
 		`menu-${menuId}-${menuItemId}`,
-		val => val ?? (props.expandedByDefault || depth === 0 || !label),
+		val => val ?? props.expandedByDefault ?? (depth === 0 || !label),
 	)
 
 	const className = useClassNameFactory(componentClassName)

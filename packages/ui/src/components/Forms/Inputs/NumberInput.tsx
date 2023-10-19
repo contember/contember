@@ -32,11 +32,13 @@ export const NumberInput = memo(forwardRef<HTMLInputElement, NumberInputProps>((
 		onChange: useCallback((value?: string | null) => {
 			value = typeof value === 'string' && value.trim() !== ''
 				? (value)
-					.replace(/[^\d]/g, '')
-					.replace(/^0*(?=\d)/, '')
+					.trim()
+					.replace(/[^0-9-]|(?<!^)-/g, '')
+					.replace(/^(-?)0+/, (match, p1) => p1 === '-' ? '-0' : '')
 				: null
 
-			onChange?.(value ? parseInt(value) : null)
+			const int = value ? parseInt(value, 10) : null
+			onChange?.(int === null || isNaN(int) ? null : int)
 		}, [onChange]),
 		value: value?.toString(10),
 	}, forwardedRed)

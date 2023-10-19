@@ -35,8 +35,8 @@ export const FloatInput = memo(forwardRef<HTMLInputElement, FloatInputProps>(({
 				? (value)
 					.replaceAll(',', '.')
 					.replace(/[^\d.-]/g, '')
-					.replace(/^(\d+\.\d+|\d+).*/, '$1')
-					.replace(/^0*(?=\d)/, '')
+					.replace(/^(-?\d+\.\d+|\d+).*/, '$1')
+					.replace(/^(-?)0+/, (match, p1) => p1 === '-' ? '-0' : '')
 				: ''
 
 			if (number.current !== value) {

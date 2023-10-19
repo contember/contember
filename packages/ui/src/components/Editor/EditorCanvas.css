@@ -23,10 +23,6 @@
 	box-shadow: var(--cui-box-shadow--controls-focus-ring);
 }
 
-:where(.cui-editorCanvas.view-hovering-toolbar *[contenteditable=true]) {
-	padding-bottom: calc(56px + 10 * var(--cui-gap));
-}
-
 :where(.cui-editorCanvas-canvas > [class^=cui-editor]) {
 	padding-bottom: 0;
 	padding-left: var(--cui-editor-canvas--padding-element-left);
@@ -45,6 +41,10 @@
 	gap: var(--cui-editor-blocks-gap);
 	padding-bottom: var(--cui-editor-canvas--padding-element-bottom);
 	padding-top: var(--cui-editor-canvas--padding-element-top);
+}
+
+:where(.cui-editorCanvas.view-hovering-toolbar *[contenteditable=true]) {
+	padding-bottom: calc(56px + 10 * var(--cui-gap));
 }
 
 :where(.cui-editorCanvas-canvas) {

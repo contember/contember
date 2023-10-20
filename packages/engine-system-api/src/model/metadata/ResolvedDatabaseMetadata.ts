@@ -9,8 +9,12 @@ import {
 } from '@contember/schema-utils'
 
 const stringArrayEquals = (colA: string[], colB: string[]) => {
-	return colA.length === colB.length
-		&& colA.every((it, index) => it === colB[index])
+	if (colA.length !== colB.length) {
+		return false
+	}
+	const a = [...colA].sort()
+	const b = [...colB].sort()
+	return a.every((it, index) => it === b[index])
 }
 
 export class ResolvedDatabaseMetadata implements SchemaDatabaseMetadata {
@@ -19,6 +23,10 @@ export class ResolvedDatabaseMetadata implements SchemaDatabaseMetadata {
 		private readonly uniqueConstraints: UniqueConstraintMetadata[],
 		private readonly indexes: IndexMetadata[],
 	) {
+	}
+
+	getAllUniqueConstraints(): UniqueConstraintMetadata[] {
+		return this.uniqueConstraints
 	}
 
 	getUniqueConstraint(tableName: string, constraintName: string): UniqueConstraintMetadata | null {

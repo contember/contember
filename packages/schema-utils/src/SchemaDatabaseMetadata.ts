@@ -45,6 +45,8 @@ export enum ForeignKeyDeleteAction {
 }
 
 export interface SchemaDatabaseMetadata {
+	getAllUniqueConstraints(): UniqueConstraintMetadata[]
+
 	getUniqueConstraint(tableName: string, constraintName: string): UniqueConstraintMetadata | null
 
 	getForeignKeyConstraint(tableName: string, constraintName: string): ForeignKeyConstraintMetadata | null
@@ -58,6 +60,9 @@ export interface SchemaDatabaseMetadata {
 
 
 export const dummySchemaDatabaseMetadata: SchemaDatabaseMetadata = {
+	getAllUniqueConstraints(): UniqueConstraintMetadata[] {
+		return []
+	},
 	getForeignKeyConstraint(): ForeignKeyConstraintMetadata | null {
 		return null
 	}, getUniqueConstraint(): UniqueConstraintMetadata | null {

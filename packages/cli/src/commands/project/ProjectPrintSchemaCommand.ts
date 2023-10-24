@@ -9,7 +9,7 @@ import {
 	PermissionFactory,
 	Authorizator,
 } from '@contember/engine-content-api'
-import { DocumentNode, printSchema } from 'graphql'
+import { DocumentNode, GraphQLSchema, printSchema } from 'graphql'
 import { mergeSchemas } from '@graphql-tools/schema'
 import { loadSchema } from '../../utils/project/loadSchema'
 import { normalizeSchema } from '@contember/schema-utils'
@@ -74,8 +74,7 @@ export class ProjectPrintSchemaCommand extends Command<Args, Options> {
 			const introspectionSchemaFactory = new IntrospectionSchemaDefinitionFactory(introspection)
 			const introspectionSchema = introspectionSchemaFactory.create()
 			const gqlSchema = mergeSchemas({
-				schemas: [contentSchema],
-				typeDefs: introspectionSchema.typeDefs as DocumentNode,
+				schemas: [contentSchema, introspectionSchema],
 			})
 			gqlSchema.description = '' // this enforces schema definition print
 			const printedSchema = printSchema(gqlSchema).replace('""""""\n', '') // remove empty comment

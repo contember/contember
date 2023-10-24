@@ -1,10 +1,11 @@
 import {
-	GraphQLFieldConfig,
 	GraphQLBoolean,
+	GraphQLFieldConfig,
+	GraphQLInputObjectType,
 	GraphQLNonNull,
-	GraphQLObjectType,
-	GraphQLSchema,
-	GraphQLString, GraphQLInputObjectType,
+	GraphQLObjectType, GraphQLSchema,
+	GraphQLSchemaConfig,
+	GraphQLString,
 } from 'graphql'
 import { Model } from '@contember/schema'
 import { MutationProvider } from './MutationProvider'
@@ -23,6 +24,10 @@ export class GraphQlSchemaBuilder {
 	) {}
 
 	public build(): GraphQLSchema {
+		return new GraphQLSchema(this.buildConfig())
+	}
+
+	public buildConfig(): GraphQLSchemaConfig {
 		const queries = new Map<string, GraphQLFieldConfig<any, Context, any>>()
 		const mutations = new Map<string, GraphQLFieldConfig<any, Context, any>>()
 		for (const entity of Object.values(this.schema.entities)) {
@@ -41,11 +46,12 @@ export class GraphQlSchemaBuilder {
 		}
 
 		if (queries.size > 0) {
+			const queryTransactionType = new GraphQLObjectType({
+				name: 'QueryTransaction',
+				fields: Object.fromEntries(queries),
+			})
 			queries.set('transaction', {
-				type: new GraphQLObjectType({
-					name: 'QueryTransaction',
-					fields: Object.fromEntries(queries),
-				}),
+				type: queryTransactionType,
 				resolve: async (parent, args, context: Context, info) => {
 					return context.timer(`GraphQL.query.${info.fieldName}`, () =>
 						context.executionContainer.readResolver.resolveTransaction(info),
@@ -54,37 +60,39 @@ export class GraphQlSchemaBuilder {
 			})
 		}
 		const queryObjectType = new GraphQLObjectType({
-			name: 'Query',
+			name: 'QueryPortal',
 			fields: () => Object.fromEntries(queries),
 		})
 		if (mutations.size > 0) {
+			const mutationTransactionOptions = new GraphQLInputObjectType({
+				name: 'MutationTransactionOptions',
+				fields: {
+					deferForeignKeyConstraints: { type: GraphQLBoolean },
+				},
+			})
+			const mutationTransactionType = new GraphQLObjectType({
+				name: 'MutationTransaction',
+				fields: {
+					ok: { type: new GraphQLNonNull(GraphQLBoolean) },
+					errorMessage: { type: GraphQLString },
+					errors: { type: this.resultSchemaTypeProvider.errorListResultType },
+					validation: {
+						type: new GraphQLNonNull(this.resultSchemaTypeProvider.validationResultType),
+					},
+					...Object.fromEntries(mutations),
+					query: {
+						type: queryObjectType,
+					},
+				},
+			})
 			mutations.set('transaction', {
 				args: {
 					options: {
-						type: new GraphQLInputObjectType({
-							name: 'MutationTransactionOptions',
-							fields: {
-								deferForeignKeyConstraints: { type: GraphQLBoolean },
-							},
-						}),
+						type: mutationTransactionOptions,
 					},
 				},
 				type: new GraphQLNonNull(
-					new GraphQLObjectType({
-						name: 'MutationTransaction',
-						fields: {
-							ok: { type: new GraphQLNonNull(GraphQLBoolean) },
-							errorMessage: { type: GraphQLString },
-							errors: { type: this.resultSchemaTypeProvider.errorListResultType },
-							validation: {
-								type: new GraphQLNonNull(this.resultSchemaTypeProvider.validationResultType),
-							},
-							...Object.fromEntries(mutations),
-							query: {
-								type: queryObjectType,
-							},
-						},
-					}),
+					mutationTransactionType,
 				),
 				resolve: async (parent, args: { options?: { deferForeignKeyConstraints?: boolean } }, context: Context, info) => {
 					return context.timer(`GraphQL.mutation.${info.fieldName}`, () =>
@@ -99,28 +107,33 @@ export class GraphQlSchemaBuilder {
 				resolve: (parent, args, context: Context, info) => context.executionContainer.readResolver.resolveQuery(info),
 			})
 		}
-		queries.set('_info', {
-			type: new GraphQLObjectType({
-				name: 'Info',
-				fields: () => ({
-					description: { type: GraphQLString },
-				}),
+		const infoType = new GraphQLObjectType({
+			name: 'Info',
+			fields: () => ({
+				description: { type: GraphQLString },
 			}),
+		})
+		queries.set('_info', {
+			type: infoType,
 			resolve: () => ({
 				description: 'TODO',
 			}),
 		})
 
-		return new GraphQLSchema({
-			query: queryObjectType,
+
+		return {
+			query: new GraphQLObjectType({
+				name: 'Query',
+				fields: () => Object.fromEntries(queries),
+			}),
 			...(mutations.size > 0
 				? {
 					mutation: new GraphQLObjectType({
 						name: 'Mutation',
 						fields: () => Object.fromEntries(mutations),
 					}),
-				  }
+				}
 				: {}),
-		})
+		}
 	}
 }

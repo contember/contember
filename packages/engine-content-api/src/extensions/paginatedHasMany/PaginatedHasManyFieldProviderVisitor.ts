@@ -1,13 +1,20 @@
 import { Model } from '@contember/schema'
-import { FieldMap } from '../EntityFieldsProvider'
-import { PaginatedHasManyFieldProviderExtension } from './PaginatedHasManyFieldProvider'
+import { PaginatedHasManyFieldProvider, PaginatedHasManyFieldProviderExtension } from './PaginatedHasManyFieldProvider'
 import { capitalizeFirstLetter } from '../../utils'
 import { PaginatedFieldConfigFactory } from '../../schema/PaginatedFieldConfigFactory'
 import { aliasAwareResolver } from '../../schema'
+import { GraphQLFieldConfig } from 'graphql'
+
+type Result = [
+	string,
+	GraphQLFieldConfig<any, any> & {
+		extensions: PaginatedHasManyFieldProviderExtension
+	}
+]
 
 export class PaginatedHasManyFieldProviderVisitor implements
-	Model.ColumnVisitor<FieldMap<PaginatedHasManyFieldProviderExtension>>,
-	Model.RelationByTypeVisitor<FieldMap<PaginatedHasManyFieldProviderExtension>> {
+	Model.ColumnVisitor<Result[]>,
+	Model.RelationByTypeVisitor<Result[]> {
 
 	constructor(private readonly paginatedFieldFactory: PaginatedFieldConfigFactory) {}
 
@@ -23,31 +30,35 @@ export class PaginatedHasManyFieldProviderVisitor implements
 		return this.createField(targetEntity, relation)
 	}
 
-	private createField(entity: Model.Entity, relation: Model.Relation): FieldMap<PaginatedHasManyFieldProviderExtension> {
-		return {
-			[`paginate${capitalizeFirstLetter(relation.name)}`]: {
-				...this.paginatedFieldFactory.createFieldConfig(entity),
-				extensions: {
-					relationName: relation.name,
+	private createField(entity: Model.Entity, relation: Model.Relation): Result[] {
+		return [
+			[
+				`paginate${capitalizeFirstLetter(relation.name)}`,
+				{
+					...this.paginatedFieldFactory.createFieldConfig(entity),
+					extensions: {
+						relationName: relation.name,
+						extensionKey: PaginatedHasManyFieldProvider.extensionName,
+					},
+					resolve: aliasAwareResolver,
 				},
-				resolve: aliasAwareResolver,
-			},
-		}
+			],
+		]
 	}
 
 	visitColumn() {
-		return {}
+		return []
 	}
 
 	visitManyHasOne() {
-		return {}
+		return []
 	}
 
 	visitOneHasOneInverse() {
-		return {}
+		return []
 	}
 
 	visitOneHasOneOwning() {
-		return {}
+		return []
 	}
 }

@@ -8,11 +8,14 @@ export class PaginatedHasManyFieldProvider implements EntityFieldsProvider<Pagin
 
 	constructor(private readonly schema: Model.Schema, private readonly visitor: PaginatedHasManyFieldProviderVisitor) {}
 
-	getFields(entity: Model.Entity, fields: string[]): FieldMap<PaginatedHasManyFieldProviderExtension> {
-		return fields.reduce(
-			(result, field) => ({ ...result, ...acceptFieldVisitor(this.schema, entity, field, this.visitor) }),
-			{},
-		)
+	getFields(entity: Model.Entity, accessibleFields: Model.AnyField[]): FieldMap<PaginatedHasManyFieldProviderExtension> {
+		const fields: FieldMap<PaginatedHasManyFieldProviderExtension> = {}
+		for (const field of accessibleFields) {
+			for (const [name, fieldConfig] of acceptFieldVisitor(this.schema, entity, field, this.visitor)) {
+				fields[name] = fieldConfig
+			}
+		}
+		return fields
 	}
 }
 

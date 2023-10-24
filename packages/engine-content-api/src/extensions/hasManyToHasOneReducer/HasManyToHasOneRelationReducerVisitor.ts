@@ -1,21 +1,22 @@
 import { GraphQLInputObjectType, GraphQLNonNull } from 'graphql'
 import { Acl, Model } from '@contember/schema'
-import {
-	aliasAwareResolver,
-	EntityTypeProvider,
-	FieldAccessVisitor,
-	GqlTypeName,
-	WhereTypeProvider,
-} from '../../schema'
+import { aliasAwareResolver, EntityTypeProvider, FieldAccessVisitor, GqlTypeName, WhereTypeProvider } from '../../schema'
 import { acceptFieldVisitor } from '@contember/schema-utils'
 import { Authorizator } from '../../acl'
 import { getFieldsForUniqueWhere } from '../../utils'
-import { HasManyToHasOneReducerExtension } from './HasManyToHasOneReducer'
-import { FieldMap } from '../EntityFieldsProvider'
+import { HasManyToHasOneReducer, HasManyToHasOneReducerExtension } from './HasManyToHasOneReducer'
+import { GraphQLFieldConfig } from 'graphql'
+
+type Result = [
+	string,
+	GraphQLFieldConfig<any, any> & {
+		extensions: HasManyToHasOneReducerExtension
+	}
+]
 
 export class HasManyToHasOneRelationReducerFieldVisitor implements
-	Model.ColumnVisitor<FieldMap<HasManyToHasOneReducerExtension>>,
-	Model.RelationByTypeVisitor<FieldMap<HasManyToHasOneReducerExtension>> {
+	Model.ColumnVisitor<Result[]>,
+	Model.RelationByTypeVisitor<Result[]> {
 
 	constructor(
 		private readonly schema: Model.Schema,
@@ -25,32 +26,32 @@ export class HasManyToHasOneRelationReducerFieldVisitor implements
 	) {}
 
 	public visitColumn() {
-		return {}
+		return []
 	}
 
 	public visitOneHasOneOwning() {
-		return {}
+		return []
 	}
 
 	public visitOneHasOneInverse() {
-		return {}
+		return []
 	}
 
 	public visitManyHasOne() {
-		return {}
+		return []
 	}
 
 	public visitManyHasManyInverse() {
-		return {}
+		return []
 	}
 
 	public visitManyHasManyOwning() {
-		return {}
+		return []
 	}
 
 	public visitOneHasMany({ entity, targetEntity, targetRelation, relation }: Model.OneHasManyContext) {
 		if (!targetRelation) {
-			return {}
+			return []
 		}
 		const uniqueConstraints = getFieldsForUniqueWhere(this.schema, targetEntity)
 		const composedUnique = uniqueConstraints
@@ -63,6 +64,8 @@ export class HasManyToHasOneRelationReducerFieldVisitor implements
 			.map(fields => fields[0])
 			.filter(it => it !== targetRelation.name)
 
+
+		const existing = new Set<string>()
 		return [...composedUnique, ...singleUnique]
 			.filter(field =>
 				acceptFieldVisitor(
@@ -72,7 +75,11 @@ export class HasManyToHasOneRelationReducerFieldVisitor implements
 					new FieldAccessVisitor(Acl.Operation.read, this.authorizator),
 				),
 			)
-			.reduce<FieldMap<HasManyToHasOneReducerExtension>>((fields, fieldName) => {
+			.map<Result | null>(fieldName => {
+				if (existing.has(fieldName)) {
+					return null
+				}
+				existing.add(fieldName)
 				const graphQlName = relation.name + GqlTypeName`By${fieldName}`
 				const uniqueWhere: GraphQLInputObjectType = new GraphQLInputObjectType({
 					//todo this can be simplified to ${targetEntity.name}By${fieldName}, but singleton must be used
@@ -84,12 +91,13 @@ export class HasManyToHasOneRelationReducerFieldVisitor implements
 
 				const entityType = this.entityTypeProvider.getEntity(targetEntity.name)
 
-				return {
-					...fields,
-					[graphQlName]: {
+				return [
+					graphQlName,
+					{
 						type: entityType,
 						extensions: {
 							relationName: relation.name,
+							extensionKey: HasManyToHasOneReducer.extensionName,
 						},
 						args: {
 							by: { type: new GraphQLNonNull(uniqueWhere) },
@@ -97,7 +105,8 @@ export class HasManyToHasOneRelationReducerFieldVisitor implements
 						},
 						resolve: aliasAwareResolver,
 					},
-				}
-			}, {})
+				]
+			})
+			.filter((it): it is Result => it !== null)
 	}
 }

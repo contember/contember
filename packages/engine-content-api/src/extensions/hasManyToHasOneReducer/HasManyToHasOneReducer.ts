@@ -11,11 +11,18 @@ export class HasManyToHasOneReducer implements EntityFieldsProvider<HasManyToHas
 		private readonly visitor: HasManyToHasOneRelationReducerFieldVisitor,
 	) {}
 
-	getFields(entity: Model.Entity, fields: string[]): FieldMap<HasManyToHasOneReducerExtension> {
-		return fields.reduce(
-			(result, field) => ({ ...result, ...acceptFieldVisitor(this.schema, entity, field, this.visitor) }),
-			{},
-		)
+	getFields(entity: Model.Entity, accessibleFields: Model.AnyField[]): FieldMap<HasManyToHasOneReducerExtension> {
+		const fieldMap: FieldMap<HasManyToHasOneReducerExtension> = {}
+		for (const field of accessibleFields) {
+			if (field.type !== Model.RelationType.OneHasMany) {
+				continue
+			}
+
+			for (const [name, resultField] of acceptFieldVisitor(this.schema, entity, field, this.visitor)) {
+				fieldMap[name] = resultField
+			}
+		}
+		return fieldMap
 	}
 }
 

@@ -46,7 +46,8 @@ export class EntityTypeProvider {
 		private readonly columnTypeResolver: ColumnTypeResolver,
 		private readonly whereTypeProvider: WhereTypeProvider,
 		private readonly orderByTypeProvider: OrderByTypeProvider,
-	) {}
+	) {
+	}
 
 	public registerEntityFieldProvider(key: string, provider: EntityFieldsProvider): void {
 		this.entityFieldProviders[key] = provider
@@ -76,19 +77,16 @@ export class EntityTypeProvider {
 	private getEntityFields(entityName: string) {
 		const entity = getEntityFromSchema(this.schema, entityName)
 		const accessVisitor = new FieldAccessVisitor(Acl.Operation.read, this.authorizator)
-		const accessibleFields = Object.keys(entity.fields).filter(fieldName =>
-			acceptFieldVisitor(this.schema, entity, fieldName, accessVisitor),
+		const accessibleFields = Object.values(entity.fields).filter(field =>
+			acceptFieldVisitor(this.schema, entity, field.name, accessVisitor),
 		)
-		const metaFields: { [field: string]: GraphQLFieldConfig<any, any> } = accessibleFields.reduce(
-			(result, fieldName) => ({
-				...result,
-				[fieldName]: {
-					type: this.fieldMeta,
-					resolve: aliasAwareResolver,
-				},
-			}),
-			{},
-		)
+		const metaFields: { [field: string]: GraphQLFieldConfig<any, any> } = {}
+		for (const field of accessibleFields) {
+			metaFields[field.name] = {
+				type: this.fieldMeta,
+				resolve: aliasAwareResolver,
+			}
+		}
 
 		const metaField = {
 			type: new GraphQLObjectType({
@@ -98,36 +96,29 @@ export class EntityTypeProvider {
 			resolve: aliasAwareResolver,
 		}
 
-		const fields: { [field: string]: GraphQLFieldConfig<any, any> } = accessibleFields.reduce(
-			(result, fieldName) => {
-				const fieldTypeVisitor = new FieldTypeVisitor(this.columnTypeResolver, this, this.authorizator)
-				const type: GraphQLOutputType = acceptFieldVisitor(this.schema, entity, fieldName, fieldTypeVisitor)
+		let fields: { [field: string]: GraphQLFieldConfig<any, any> } = {
+			_meta: metaField,
+		}
 
-				const fieldArgsVisitor = new FieldArgsVisitor(this.whereTypeProvider, this.orderByTypeProvider)
-				return {
-					...result,
-					[fieldName]: {
-						type,
-						args: acceptFieldVisitor(this.schema, entity, fieldName, fieldArgsVisitor),
-						resolve: aliasAwareResolver,
-					},
-				}
-			},
-			{
-				_meta: metaField,
-			},
-		)
+		for (const field of accessibleFields) {
+			const fieldTypeVisitor = new FieldTypeVisitor(this.columnTypeResolver, this, this.authorizator)
+			const type: GraphQLOutputType = acceptFieldVisitor(this.schema, entity, field.name, fieldTypeVisitor)
 
-		return Object.entries(this.entityFieldProviders)
-			.map(([key, provider]) =>
-				Object.entries(provider.getFields(entity, accessibleFields))
-					.map(([fieldName, fieldConfig]): [string, GraphQLFieldConfig<any, any>] => [
-						fieldName,
-						{ ...fieldConfig, extensions: { ...(fieldConfig.extensions || {}), extensionKey: key } },
-					])
-					.reduce((result, [name, value]) => ({ ...result, [name]: value }), {}),
-			)
-			.reduce((result, providerFields) => ({ ...result, ...providerFields }), fields)
+			const fieldArgsVisitor = new FieldArgsVisitor(this.whereTypeProvider, this.orderByTypeProvider)
+			fields[field.name] = {
+				type,
+				args: acceptFieldVisitor(this.schema, entity, field.name, fieldArgsVisitor),
+				resolve: aliasAwareResolver,
+			}
+		}
+
+		for (const [key, provider] of Object.entries(this.entityFieldProviders)) {
+			fields = {
+				...fields,
+				...provider.getFields(entity, accessibleFields),
+			}
+		}
+		return fields
 	}
 
 	private createConnection(entityName: string) {

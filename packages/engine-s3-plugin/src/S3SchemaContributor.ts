@@ -4,11 +4,12 @@ import {
 	GraphQLNonNull,
 	GraphQLObjectType,
 	GraphQLSchema,
+	GraphQLSchemaConfig,
 	GraphQLString,
 } from 'graphql'
 import { S3Service, S3ServiceFactory } from './S3Service'
 import { resolveS3Config, S3Config } from './Config'
-import { GraphQLSchemaContributor, Providers, GraphQLSchemaContributorContext } from '@contember/engine-plugins'
+import { GraphQLSchemaContributor, GraphQLSchemaContributorContext, Providers } from '@contember/engine-plugins'
 import * as types from './S3SchemaTypes'
 import { S3Acl, S3GenerateSignedUploadInput, S3SignedRead, S3SignedUpload } from './S3SchemaTypes'
 import { S3ObjectAuthorizator } from './S3ObjectAuthorizator'
@@ -39,7 +40,7 @@ export class S3SchemaContributor implements GraphQLSchemaContributor {
 		private readonly providers: Providers,
 	) {}
 
-	createSchema(context: GraphQLSchemaContributorContext): GraphQLSchema | undefined {
+	createSchema(context: GraphQLSchemaContributorContext): GraphQLSchemaConfig | undefined {
 		if (!this.s3Config) {
 			return undefined
 		}
@@ -69,7 +70,7 @@ export class S3SchemaContributor implements GraphQLSchemaContributor {
 			generateUploadUrl: uploadMutation as GraphQLFieldConfig<any, any, any>,
 			generateReadUrl: readMutation,
 		}
-		return new GraphQLSchema({
+		return {
 			mutation: new GraphQLObjectType({
 				name: 'Mutation',
 				fields: () => mutation,
@@ -82,7 +83,7 @@ export class S3SchemaContributor implements GraphQLSchemaContributor {
 					},
 				}),
 			}),
-		})
+		}
 	}
 
 	private createReadMutation(s3: S3Service): GraphQLFieldConfig<any, any, any> {

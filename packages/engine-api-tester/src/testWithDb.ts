@@ -23,7 +23,7 @@ import {
 	SystemMigrationsRunner,
 } from '@contember/engine-system-api'
 import { createConnection, dbCredentials, recreateDatabase } from './dbUtils'
-import { graphql } from 'graphql'
+import { GraphQLSchema, graphql } from 'graphql'
 
 type DatabaseExpectation = Record<string, Record<string, any>[]>
 type Test = {

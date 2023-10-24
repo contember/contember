@@ -114,6 +114,30 @@ describe('GraphQL schema builder', () => {
 		})
 	})
 
+	it('read only', async () => {
+		await testSchema({
+			schema: builder =>
+				builder.entity('Test', e =>
+					e
+						.column('a', c => c.type(Model.ColumnType.String))
+						.column('b', c => c.type(Model.ColumnType.String)),
+				),
+			permissions: () => ({
+				Test: {
+					predicates: {},
+					operations: {
+						read: {
+							id: true,
+							a: true,
+							b: true,
+						},
+					},
+				},
+			}),
+			graphQlSchemaFile: 'schema-read-only.gql',
+		})
+	})
+
 
 	it('conditionally restricted read of some fields', async () => {
 		await testSchema({

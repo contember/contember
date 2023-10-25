@@ -3,10 +3,10 @@ import { calculateMigrationChecksum } from '@contember/schema-migrations'
 import { Command } from '../Command'
 import { MigrationInput } from '../../migrations/MigrationInput'
 
-export class SaveMigrationCommand implements Command<void> {
+export class SaveMigrationCommand implements Command<number> {
 	constructor(private readonly migration: MigrationInput) {}
 
-	public async execute({ db }: Command.Args): Promise<void> {
+	public async execute({ db }: Command.Args): Promise<number> {
 		const { type, ...migrationData } = this.migration
 		const values: QueryBuilder.Values = {
 			version: this.migration.version,
@@ -16,9 +16,12 @@ export class SaveMigrationCommand implements Command<void> {
 			checksum: this.migration.type === 'schema' ? calculateMigrationChecksum(this.migration) : null,
 		}
 
-		await InsertBuilder.create()
+		const result = await InsertBuilder.create()
 			.into('schema_migration')
 			.values(values)
+			.returning<{id: number}>('id')
 			.execute(db)
+
+		return result[0].id
 	}
 }

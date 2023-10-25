@@ -7,6 +7,7 @@ import {
 	SchemaMigrator,
 } from '@contember/schema-migrations'
 import {
+	ContentQueryExecutor,
 	EventResponseBuilder,
 	ExecutedMigrationsResolver,
 	IdentityFetcher,
@@ -46,6 +47,7 @@ export class SystemContainerFactory {
 	constructor(
 		private readonly providers: UuidProvider,
 		private readonly modificationHandlerFactory: ModificationHandlerFactory,
+		private readonly contentQueryExecutor: ContentQueryExecutor,
 	) {
 	}
 
@@ -86,7 +88,7 @@ export class SystemContainerFactory {
 			.addService('migrationsDatabaseMetadataResolverStoreFactory', ({ databaseMetadataResolver }) =>
 				new MigrationsDatabaseMetadataResolverStoreFactory(databaseMetadataResolver))
 			.addService('projectMigrator', ({ migrationDescriber, schemaVersionBuilder, executedMigrationsResolver, migrationsDatabaseMetadataResolverStoreFactory }) =>
-				new ProjectMigrator(migrationDescriber, schemaVersionBuilder, executedMigrationsResolver, migrationsDatabaseMetadataResolverStoreFactory))
+				new ProjectMigrator(migrationDescriber, schemaVersionBuilder, executedMigrationsResolver, migrationsDatabaseMetadataResolverStoreFactory, this.contentQueryExecutor))
 			.addService('projectTruncateExecutor', () =>
 				new ProjectTruncateExecutor())
 			.addService('migrationAlterer', () =>

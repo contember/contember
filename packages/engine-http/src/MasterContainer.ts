@@ -34,6 +34,7 @@ import { homepageController, playgroundController } from './misc'
 import { Plugin } from './plugin/Plugin'
 import { Application } from './application/application'
 import { ApplicationWorkerManager } from './workers/ApplicationWorkerManager'
+import { ContentQueryExecutorImpl } from './system/ContentQueryExecutor'
 
 export interface MasterContainer {
 	initializer: Initializer
@@ -93,12 +94,14 @@ export class MasterContainerFactory {
 				new TenantContainerFactory(providers))
 			.addService('modificationHandlerFactory', () =>
 				new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap))
-			.addService('systemContainerFactory', ({ providers, modificationHandlerFactory }) =>
-				new SystemContainerFactory(providers, modificationHandlerFactory))
 			.addService('executionContainerFactory', ({ providers }) =>
 				new ExecutionContainerFactory(providers))
 			.addService('graphQlSchemaBuilderFactory', () =>
 				new GraphQlSchemaBuilderFactory())
+			.addService('contentQueryExecutor', ({ executionContainerFactory, graphQlSchemaBuilderFactory }) =>
+				new ContentQueryExecutorImpl(executionContainerFactory, graphQlSchemaBuilderFactory))
+			.addService('systemContainerFactory', ({ providers, modificationHandlerFactory, contentQueryExecutor }) =>
+				new SystemContainerFactory(providers, modificationHandlerFactory, contentQueryExecutor))
 			.addService('contentPermissionFactory', ({}) =>
 				new PermissionFactory())
 			.addService('databaseMetadataResolver', () =>

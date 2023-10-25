@@ -7,10 +7,11 @@ import { DatabaseContext } from '../database'
 import { ExecutedMigrationsResolver } from './ExecutedMigrationsResolver'
 import { MigrateErrorCode } from '../../schema'
 import { SchemaVersionBuilder } from './SchemaVersionBuilder'
-import { SchemaValidator, SchemaValidatorSkippedErrors } from '@contember/schema-utils'
+import { SchemaDatabaseMetadata, SchemaValidator, SchemaValidatorSkippedErrors } from '@contember/schema-utils'
 import { logger } from '@contember/logger'
 import { MigrationsDatabaseMetadataResolverStoreFactory, SchemaDatabaseMetadataResolverStore } from '../metadata'
-import { MigrationInput } from './MigrationInput'
+import { ContentMigrationQuery, MigrationInput } from './MigrationInput'
+import { ContentQueryExecutor } from '../dependencies'
 
 export class ProjectMigrator {
 	constructor(
@@ -18,6 +19,7 @@ export class ProjectMigrator {
 		private readonly schemaVersionBuilder: SchemaVersionBuilder,
 		private readonly executedMigrationsResolver: ExecutedMigrationsResolver,
 		private readonly migrationsDatabaseMetadataResolverStoreFactory: MigrationsDatabaseMetadataResolverStoreFactory,
+		private readonly contentQueryExecutor: ContentQueryExecutor,
 	) {}
 
 	public async migrate({ db, project, identity, options: { ignoreOrder = false, skipExecuted = false }, migrationsToExecute, stages }: {
@@ -59,9 +61,56 @@ export class ProjectMigrator {
 					)
 				}
 			} else if (migration.type === 'content') {
-				throw new Error('not implemented')
+				const schemaWithId = {
+					...schema,
+					id,
+				}
+				for (const query of migration.queries) {
+					await this.executeContentMigration({
+						version: migration.version,
+						query,
+						db,
+						schema: schemaWithId,
+						stages,
+						schemaDatabaseMetadata: await metadataStore.getMetadata(db.client.schema),
+						identity,
+						project,
+					})
+				}
+
 			}
-			await db.commandBus.execute(new SaveMigrationCommand(migration))
+			id = await db.commandBus.execute(new SaveMigrationCommand(migration))
+		}
+	}
+
+	private async executeContentMigration({ query, stages, version, ...ctx }: {
+		version: string
+		db: DatabaseContext
+		query: ContentMigrationQuery
+		stages: Stage[]
+		schema: Schema & { id: number }
+		project: { slug: string; systemSchema: string }
+		identity: { id: string }
+		schemaDatabaseMetadata: SchemaDatabaseMetadata
+	}) {
+		const queryStages = query.stage ? stages.filter(it => it.slug === query.stage) : stages
+		for (const stage of queryStages) {
+			const response = await this.contentQueryExecutor.execute({
+				stage,
+				...ctx,
+			}, query)
+
+			if (!response.ok) {
+				throw new FailedContentMigrationError(version, response.errors.join(', '))
+			}
+			if (query.checkMutationResult !== false) {
+				for (const [key, value] of Object.entries(response.result.data ?? {})) {
+					if (typeof value === 'object' && value !== null && 'ok' in value && !value.ok) {
+						const errorDetails = 'errorMessage' in value ? value.errorMessage : 'No details available. Please fetch errorMessage field.'
+						throw new NotSuccessfulContentMigrationError(version, `Mutation ${key} failed: ${errorDetails}`)
+					}
+				}
+			}
 		}
 	}
 
@@ -188,4 +237,12 @@ export class MigrationFailedError extends MigrationError {
 
 export class InvalidSchemaError extends MigrationError {
 	code = MigrateErrorCode.InvalidSchema
+}
+
+export class FailedContentMigrationError extends MigrationError {
+	code = MigrateErrorCode.ContentMigrationFailed
+}
+
+export class NotSuccessfulContentMigrationError extends MigrationError {
+	code = MigrateErrorCode.ContentMigrationNotSuccessful
 }

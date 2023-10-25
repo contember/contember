@@ -53,7 +53,11 @@ export const executeDbTest = async (test: Test) => {
 	const providers = { uuid: uuidGenerator, now: () => new Date('2019-09-04 12:00') }
 
 	const modificationHandlerFactory = new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap)
-	const systemContainerFactory = new SystemContainerFactory(providers, modificationHandlerFactory)
+	const systemContainerFactory = new SystemContainerFactory(providers, modificationHandlerFactory, {
+		execute: () => {
+			throw new Error('not implemented')
+		},
+	})
 	let systemContainerBuilder = systemContainerFactory.createBuilder({
 		identityFetcher: {
 			fetchIdentities: () => {

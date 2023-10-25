@@ -152,9 +152,9 @@ export class ProjectContainerFactory {
 			.addService('databaseMetadataResolver', () =>
 				new DatabaseMetadataResolver())
 			.addService('systemMigrationsRunner', ({ systemDatabaseContextFactory, project, systemSchemaName, systemMigrationGroups, databaseMetadataResolver }) =>
-				new SystemMigrationsRunner(systemDatabaseContextFactory, project, systemSchemaName, this.schemaVersionBuilder, systemMigrationGroups, databaseMetadataResolver))
-			.addService('projectInitializer', ({ systemMigrationsRunner, systemDatabaseContext, project }) =>
-				new ProjectInitializer(new StageCreator(), systemMigrationsRunner, systemDatabaseContext, project))
+				new SystemMigrationsRunner(systemDatabaseContextFactory, { ...project, systemSchema: systemSchemaName }, this.schemaVersionBuilder, systemMigrationGroups, databaseMetadataResolver))
+			.addService('projectInitializer', ({ systemMigrationsRunner, systemDatabaseContext, project, systemSchemaName }) =>
+				new ProjectInitializer(new StageCreator(), systemMigrationsRunner, systemDatabaseContext, { ...project, systemSchema: systemSchemaName }))
 			.addService('projectDatabaseMetadataResolver', ({ databaseMetadataResolver }) =>
 				new ProjectDatabaseMetadataResolver(databaseMetadataResolver))
 	}

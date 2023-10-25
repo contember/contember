@@ -61,7 +61,6 @@ export class SystemMigrationsRunner {
 	constructor(
 		private readonly databaseContextFactory: DatabaseContextFactory,
 		private readonly project: ProjectConfig & { db: DatabaseConfig },
-		private readonly schema: string,
 		private readonly schemaVersionBuilder: SchemaVersionBuilder,
 		private readonly migrationGroups: Record<string, MigrationGroup<unknown>>,
 		private readonly databaseMetadataResolver: DatabaseMetadataResolver,
@@ -89,7 +88,7 @@ export class SystemMigrationsRunner {
 					]),
 				),
 			)
-			const migrationsRunner = new DbMigrationsRunner(connection, this.schema, migrationResolver)
+			const migrationsRunner = new DbMigrationsRunner(connection, this.project.systemSchema, migrationResolver)
 			await migrationsRunner.migrate(message => logger.warn(message), {
 				project: this.project,
 				schemaResolver,

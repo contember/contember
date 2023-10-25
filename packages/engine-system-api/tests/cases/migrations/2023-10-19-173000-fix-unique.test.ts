@@ -54,6 +54,7 @@ test('unique fix test', async () => {
 					name: 'prod',
 				},
 			],
+			systemSchema: 'system',
 		},
 	})
 	assert.equal(

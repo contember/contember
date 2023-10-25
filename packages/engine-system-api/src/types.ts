@@ -1,6 +1,7 @@
 export interface ProjectConfig {
 	slug: string
 	stages: StageConfig[]
+	systemSchema: string
 	directory?: string
 }
 

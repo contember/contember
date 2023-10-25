@@ -22,11 +22,16 @@ export class SchemaVersionBuilder {
 		}
 
 		const schema = newMigrations.reduce(
-			(schema, migration) => ({
-				...this.schemaMigrator.applyModifications(schema, migration.modifications, migration.formatVersion),
-				version: migration.version,
-				id: migration.id,
-			}),
+			(schema, migration) => {
+				if (migration.type !== 'schema') {
+					return schema
+				}
+				return ({
+					...this.schemaMigrator.applyModifications(schema, migration.modifications, migration.formatVersion),
+					version: migration.version,
+					id: migration.id,
+				})
+			},
 			after?.notNormalized ?? emptyVersionedSchema.notNormalized,
 		)
 		const normalized = normalizeSchema(schema)

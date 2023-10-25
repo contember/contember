@@ -1,4 +1,4 @@
-import { SystemContainerFactory } from '@contember/engine-system-api'
+import { SchemaDatabaseMetadataResolver, SystemContainerFactory } from '@contember/engine-system-api'
 import { TenantContainerFactory } from '@contember/engine-tenant-api'
 import { Builder } from '@contember/dic'
 import { ServerConfig } from './config/config'
@@ -11,7 +11,7 @@ import { TenantConfigResolver } from './config/tenantConfigResolver'
 import { ProjectGroupContainerFactory } from './projectGroup/ProjectGroupContainer'
 import { ProjectGroupResolver, SingleProjectGroupResolver } from './projectGroup/ProjectGroupResolver'
 import { Logger } from '@contember/logger'
-import { ExecutionContainerFactory } from '@contember/engine-content-api'
+import { ExecutionContainerFactory, GraphQlSchemaBuilderFactory, PermissionFactory } from '@contember/engine-content-api'
 import { createProviders, Providers } from './providers'
 import { TenantApiMiddlewareFactory, TenantGraphQLContextFactory, TenantGraphQLHandlerFactory } from './tenant'
 import { SystemApiMiddlewareFactory, SystemGraphQLContextFactory, SystemGraphQLHandlerFactory } from './system'
@@ -96,8 +96,16 @@ export class MasterContainerFactory {
 				new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap))
 			.addService('systemContainerFactory', ({ providers, modificationHandlerFactory }) =>
 				new SystemContainerFactory(providers, modificationHandlerFactory))
-			.addService('projectContainerFactoryFactory', ({ debugMode, plugins, providers, serverConfig }) =>
-				new ProjectContainerFactoryFactory(debugMode, plugins, providers, serverConfig))
+			.addService('executionContainerFactory', ({ providers }) =>
+				new ExecutionContainerFactory(providers))
+			.addService('graphQlSchemaBuilderFactory', () =>
+				new GraphQlSchemaBuilderFactory())
+			.addService('contentPermissionFactory', ({}) =>
+				new PermissionFactory())
+			.addService('databaseMetadataResolver', () =>
+				new SchemaDatabaseMetadataResolver())
+			.addService('projectContainerFactoryFactory', ({ plugins, providers, serverConfig, graphQlSchemaBuilderFactory, contentPermissionFactory, databaseMetadataResolver }) =>
+				new ProjectContainerFactoryFactory(plugins, providers, serverConfig, graphQlSchemaBuilderFactory, contentPermissionFactory, databaseMetadataResolver))
 			.addService('tenantGraphQLHandlerFactory', () =>
 				new TenantGraphQLHandlerFactory())
 			.addService('systemGraphQLHandlerFactory', ({ debugMode }) =>
@@ -112,8 +120,6 @@ export class MasterContainerFactory {
 				new SingleProjectGroupResolver(projectGroupContainer))
 			.addService('notModifiedChecker', () =>
 				new NotModifiedChecker())
-			.addService('executionContainerFactory', ({ providers }) =>
-				new ExecutionContainerFactory(providers))
 			.addService('contentGraphqlContextFactory', ({ providers, executionContainerFactory }) =>
 				new ContentGraphQLContextFactory(providers, executionContainerFactory))
 			.addService('contentQueryHandlerFactory', ({ debugMode }) =>

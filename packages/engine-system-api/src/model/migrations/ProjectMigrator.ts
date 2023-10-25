@@ -9,10 +9,7 @@ import { MigrateErrorCode } from '../../schema'
 import { SchemaVersionBuilder } from './SchemaVersionBuilder'
 import { SchemaValidator, SchemaValidatorSkippedErrors } from '@contember/schema-utils'
 import { logger } from '@contember/logger'
-import {
-	SchemaDatabaseMetadataResolverStore,
-	MigrationsDatabaseMetadataResolverStoreFactory,
-} from '../metadata'
+import { MigrationsDatabaseMetadataResolverStoreFactory, SchemaDatabaseMetadataResolverStore } from '../metadata'
 import { MigrationInput } from './MigrationInput'
 
 export class ProjectMigrator {
@@ -23,15 +20,17 @@ export class ProjectMigrator {
 		private readonly migrationsDatabaseMetadataResolverStoreFactory: MigrationsDatabaseMetadataResolverStoreFactory,
 	) {}
 
-	public async migrate(
-		db: DatabaseContext,
-		stages: Stage[],
-		migrationsToExecute: readonly MigrationInput[],
-		{ ignoreOrder = false, skipExecuted = false }: {
+	public async migrate({ db, project, identity, options: { ignoreOrder = false, skipExecuted = false }, migrationsToExecute, stages }: {
+		db: DatabaseContext
+		project: { slug: string; systemSchema: string }
+		identity: { id: string }
+		stages: Stage[]
+		migrationsToExecute: readonly MigrationInput[]
+		options: {
 			ignoreOrder?: boolean
 			skipExecuted?: boolean
-		},
-	) {
+		}
+	}) {
 		if (migrationsToExecute.length === 0) {
 			return
 		}

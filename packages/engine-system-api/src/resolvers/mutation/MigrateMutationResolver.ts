@@ -38,9 +38,16 @@ export class MigrateMutationResolver implements MutationResolver<'migrate'> {
 				await context.requireAccess(AuthorizationActions.PROJECT_MIGRATE, stage.slug)
 			}
 			try {
-				await this.projectMigrator.migrate(trx, stages, migrations, {
-					ignoreOrder: force,
-					skipExecuted: true,
+				await this.projectMigrator.migrate({
+					db: trx,
+					project: context.project,
+					identity: context.identity,
+					stages,
+					migrationsToExecute: migrations,
+					options: {
+						ignoreOrder: force,
+						skipExecuted: true,
+					},
 				})
 			} catch (e) {
 				if (e instanceof MigrationError) {

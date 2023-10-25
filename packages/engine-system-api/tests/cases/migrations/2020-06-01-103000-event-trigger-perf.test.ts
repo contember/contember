@@ -13,6 +13,7 @@ test('event-trigger-performance sql', async () => {
 		databaseMetadataResolver: () => Promise.resolve(emptyDatabaseMetadata),
 		project: {
 			slug: 'test',
+			systemSchema: 'system',
 			stages: [
 				{
 					slug: 'prod',

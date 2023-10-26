@@ -1052,7 +1052,7 @@ export const SidebarRightSlotTargets: Readonly<Readonly<{
     };
 }>>;
 
-// @public (undocumented)
+// @public @deprecated (undocumented)
 type SlotComponentsRecords<K extends string> = Readonly<{
     readonly [P in PascalCase<K>]: ComponentType;
 }>;
@@ -1215,7 +1215,7 @@ export function useElementInsets(elementRef: RefObject<HTMLElement>): ContainerI
 const useGetLayoutPanelsStateContext: () => GetLayoutPanelsStateContextType;
 
 // @public (undocumented)
-function useHasActiveSlotsFactory<T extends SlotComponentsRecords<string>>(SlotTargets: T): (...slots: ReadonlyArray<keyof T & string>) => boolean;
+function useHasActiveSlotsFactory<T extends SlotTargetComponentsRecord<string>>(SlotTargets: T): (...slots: ReadonlyArray<keyof T & string>) => boolean;
 
 // @public @deprecated (undocumented)
 const useLayoutContainerWidth: typeof useContainerWidth;
@@ -1239,12 +1239,12 @@ export const useSafeAreaInsetsContext: () => ContainerInsets;
 const useSetLayoutPanelsStateContext: () => SetLayoutPanelsStateContextType;
 
 // @public
-function useSlotTargetsFactory<R extends SlotComponentsRecords<string>>(SlotTargets: R): <T>(slots: ReadonlyArray<keyof R & string>, override?: T | undefined) => NonNullable<T> | FunctionComponentElement<    {
+function useSlotTargetsFactory<R extends SlotTargetComponentsRecord<string>>(SlotTargets: R): <T>(slots: ReadonlyArray<keyof R & string>, override?: T | undefined) => NonNullable<T> | FunctionComponentElement<    {
 children?: ReactNode;
 }> | null;
 
 // @public @deprecated
-function useTargetsIfActiveFactory<R extends SlotComponentsRecords<string>>(SlotTargets: R): <T>(slots: readonly (keyof R & string)[], override?: T | undefined) => FunctionComponentElement<    {
+function useTargetsIfActiveFactory<R extends SlotTargetComponentsRecord<string>>(SlotTargets: R): <T>(slots: readonly (keyof R & string)[], override?: T | undefined) => FunctionComponentElement<    {
 children?: ReactNode;
 }> | NonNullable<T> | null;
 

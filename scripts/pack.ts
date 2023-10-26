@@ -42,7 +42,7 @@ import { join } from 'path'
 			throw e
 		}
 
-		await bumpVersion(dir, LOCAL_REF)
+		await bumpVersion(dir, outDirPath, LOCAL_REF)
 		await npmPack(dir, outDirPath)
 
 		try {
@@ -58,8 +58,8 @@ import { join } from 'path'
 	process.exit(1)
 })
 
-async function bumpVersion(directory: string, localRef: string) {
-	console.log(`Bumping version for ${directory} ...`)
+async function bumpVersion(directory: string, targetDirectory: string, localRef: string) {
+	console.log(`Bumping version for ${directory} to ${targetDirectory} ...`)
 	const packageJsonPath = join(directory, 'package.json')
 
 	const packageJsonContent = await fs.readFile(packageJsonPath, 'utf8')
@@ -80,7 +80,7 @@ async function bumpVersion(directory: string, localRef: string) {
 		if (packageJson[dependencyType]) {
 			for (const dependencyName of Object.keys(packageJson[dependencyType])) {
 				if (dependencyName.startsWith('@contember/') && packageJson[dependencyType][dependencyName].startsWith('workspace:')) {
-					packageJson[dependencyType][dependencyName] = localRef
+					packageJson[dependencyType][dependencyName] = asLocalTgzPath(targetDirectory, dependencyName, localRef)
 				}
 			}
 		}
@@ -88,6 +88,10 @@ async function bumpVersion(directory: string, localRef: string) {
 
 	await fs.writeFile(packageJsonPath, JSON.stringify(packageJson, null, 2))
 	console.log(`Version bumped successfully for ${directory}!`)
+}
+
+function asLocalTgzPath(targetDirectory: string, dependencyName: string, version: string) {
+	return `file:${targetDirectory}/${dependencyName.substring(1).replace(/[^\w]/, '-')}-${version}.tgz`
 }
 
 async function npmPack(directory: string, destinationPath: string) {

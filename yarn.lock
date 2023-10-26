@@ -763,6 +763,7 @@ __metadata:
     "@contember/config-loader": "workspace:*"
     "@contember/database": "workspace:*"
     "@contember/dic": "workspace:*"
+    "@contember/engine-common": "workspace:*"
     "@contember/engine-content-api": "workspace:*"
     "@contember/schema": "workspace:*"
     "@contember/schema-migrations": "workspace:*"

@@ -2,17 +2,12 @@ import { useLayoutEffect, useRef } from 'react'
 import { useReferentiallyStableCallback } from '../referentiallyStable'
 import { useOnWindowResize } from './useOnWindowResize'
 
-function intendedFlushOfCSSChangesToCauseImmediateReflow(element: HTMLElement) {
-	element.offsetHeight
-}
-
 function addClassName(
 	className: string,
 	element: HTMLElement,
 ) {
 	if (element.classList.contains(className)) {
 		element.classList.remove(className)
-		intendedFlushOfCSSChangesToCauseImmediateReflow(element)
 	}
 }
 
@@ -22,7 +17,6 @@ function removeClassName(
 ) {
 	if (!element.classList.contains(className)) {
 		element.classList.add(className)
-		intendedFlushOfCSSChangesToCauseImmediateReflow(element)
 	}
 }
 

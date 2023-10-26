@@ -67,6 +67,12 @@ export type DebugMethod = (...parameters: any[]) => void;
 export const DEFAULT_COLOR_SCHEME = "system";
 
 // @public (undocumented)
+export type ElementSize = {
+    height: number;
+    width: number;
+};
+
+// @public (undocumented)
 export const emptyArray: any[];
 
 // @public (undocumented)

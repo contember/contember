@@ -1,5 +1,5 @@
 import { useOnElementResize, useReferentiallyStableCallback, useScopedConsoleRef } from '@contember/react-utils'
-import { assert, getSizeFromResizeObserverEntryFactory, isHTMLElement, pick } from '@contember/utilities'
+import { assert, getElementDimensions, getSizeFromResizeObserverEntryFactory, isHTMLElement, pick } from '@contember/utilities'
 import { CSSProperties, RefObject, useEffect, useMemo, useState } from 'react'
 import { useContainerInsetsContext } from './Contexts'
 import { getElementInsets } from './Helpers'
@@ -14,28 +14,23 @@ export function useElementInsets(elementRef: RefObject<HTMLElement>) {
 	const containerInsets = useContainerInsetsContext()
 	const [containerOffsets, setContainerOffsets] = useState<ContainerOffsets>()
 
-	const updateContainerOffsets = useReferentiallyStableCallback((dimensions?: ReturnType<typeof dimensionsFromEntry>) => {
+	const updateContainerOffsets = useReferentiallyStableCallback(async (dimensions?: ReturnType<typeof dimensionsFromEntry>) => {
 		if (elementRef.current) {
-			const { width, height } = dimensions ?? {
-				width: elementRef.current?.offsetWidth,
-				height: elementRef.current?.offsetHeight,
-			}
+			dimensions = dimensions ?? await getElementDimensions(elementRef.current)
+
+			const { width, height } = dimensions
 
 			if (height && width) {
 				const element = logged('element', elementRef.current)
 				const parentElement = logged('parentElement', element.parentElement)
 
 				if (parentElement) {
-					log('window', pick(window, ['innerWidth', 'innerHeight', 'scrollX', 'scrollY']))
-					log('parentElement', parentElement, pick(parentElement, ['offsetWidth', 'offsetHeight', 'offsetLeft', 'offsetTop']))
-					log('element', element, pick(element, ['offsetWidth', 'offsetHeight', 'offsetLeft', 'offsetTop']))
-
-					const parentProps = logged('Parent props:', pickLayoutProperties(parentElement))
-					const elementProps = logged('elementProps', pickLayoutProperties(element, parentProps.position as CSSProperties['position']))
+					const parentProps = logged('Parent props:', await pickLayoutProperties(parentElement))
+					const elementProps = logged('elementProps', await pickLayoutProperties(element, parentProps.position as CSSProperties['position']))
 
 					if (parentProps.display === 'flex') {
-						const previous = logged('Previous element sibling with layout:', getPreviousElementSiblingWithLayout(element))
-						const next = logged('Next element sibling with layout:', getNextElementSiblingWithLayout(element))
+						const previous = logged('Previous element sibling with layout:', await getPreviousElementSiblingWithLayout(element))
+						const next = logged('Next element sibling with layout:', await getNextElementSiblingWithLayout(element))
 
 						let offsets = logged('calculated offsets', parentProps.position === 'static' ? {
 							offsetBottom: Math.max(0, parentProps.scrollHeight - (parentProps.offsetTop - elementProps.offsetTop) - elementProps.offsetHeight),
@@ -113,56 +108,52 @@ export function useElementInsets(elementRef: RefObject<HTMLElement>) {
 	return logged('elementInsets', elementInsets)
 }
 
-function getPreviousElementSiblingWithLayout(element: HTMLElement): HTMLElement | null {
+async function getPreviousElementSiblingWithLayout(element: HTMLElement): Promise<HTMLElement | null> {
 	const sibling = element.previousElementSibling
 
 	if (sibling) {
 		assert('sibling is isHTMLElement', sibling, isHTMLElement)
 
-		const { offsetWidth, offsetHeight } = sibling
+		const { width, height } = await getElementDimensions(sibling)
 
-		if (offsetWidth && offsetHeight && sibling.offsetParent) {
+		if (width && height && sibling.offsetParent) {
 			return sibling
 		} else {
-			return getPreviousElementSiblingWithLayout(sibling)
+			return await getPreviousElementSiblingWithLayout(sibling)
 		}
 	} else {
 		return null
 	}
 }
 
-function getNextElementSiblingWithLayout(element: HTMLElement): HTMLElement | null {
+async function getNextElementSiblingWithLayout(element: HTMLElement): Promise<HTMLElement | null> {
 	const sibling = element.nextElementSibling
 
 	if (sibling) {
 		assert('sibling is isHTMLElement', sibling, isHTMLElement)
 
-		const { offsetWidth, offsetHeight } = sibling
+		const { width, height } = await getElementDimensions(sibling)
 
-		if (offsetWidth && offsetHeight && sibling.offsetParent) {
+		if (width && height && sibling.offsetParent) {
 			return sibling
 		} else {
-			return getNextElementSiblingWithLayout(sibling)
+			return await getNextElementSiblingWithLayout(sibling)
 		}
 	} else {
 		return null
 	}
 }
 
-function pickLayoutProperties(element: HTMLElement, parentPosition?: CSSProperties['position']) {
-	const { display, flexDirection, position } = getComputedStyle(element)
+async function pickLayoutProperties(element: HTMLElement, parentPosition?: CSSProperties['position']) {
+	const { display, flexDirection, position } = await getComputedStyle(element)
 
 	return {
 		display,
 		flexDirection,
 		position,
-		...(position === 'sticky' && (!parentPosition || parentPosition === 'static') ? stickyPositionOffsets(element) : pick(element, [
-			'offsetHeight',
-			'offsetLeft',
-			'offsetParent',
-			'offsetTop',
-			'offsetWidth',
-		])),
+		...(position === 'sticky' && (!parentPosition || parentPosition === 'static')
+			? await getStickyElementOffsets(element)
+			: await getElementOffsets(element)),
 		...pick(element, [
 			'scrollHeight',
 			'scrollWidth',
@@ -170,14 +161,25 @@ function pickLayoutProperties(element: HTMLElement, parentPosition?: CSSProperti
 	}
 }
 
-function stickyPositionOffsets(element: HTMLElement) {
-	const properties = pick(element, [
-		'offsetHeight',
-		'offsetLeft',
-		'offsetParent',
-		'offsetTop',
-		'offsetWidth',
-	])
+async function getElementOffsets(element: HTMLElement) {
+	const {
+		height: offsetHeight,
+		left: offsetLeft,
+		top: offsetTop,
+		width: offsetWidth,
+	} = await element.getBoundingClientRect()
+
+	return {
+		offsetHeight,
+		offsetLeft,
+		offsetTop,
+		offsetWidth,
+		offsetParent: element.offsetParent,
+	}
+}
+
+async function getStickyElementOffsets(element: HTMLElement) {
+	const properties = await getElementOffsets(element)
 
 	return {
 		...properties,

@@ -118,7 +118,7 @@ export class RelationFetcher {
 
 		const joiningColumns = this.resolveJoiningColumns({ relationType: relationContext.type, joiningTable: owningRelation.joiningTable })
 
-		const qb = this.buildJunctionQb(owningRelation, ids, joiningColumns, relationContext.targetEntity, { filter }, [
+		const qb = this.buildJunctionQb(owningRelation, ids, joiningColumns, relationContext.targetEntity, relationContext.entity, { filter }, [
 			...relationPath,
 			relationContext,
 		])
@@ -146,13 +146,14 @@ export class RelationFetcher {
 		const joiningColumns = this.resolveJoiningColumns({ relationType: relationContext.type, joiningTable: owningRelation.joiningTable })
 		const defaultOrderBy = relationContext.relation.orderBy
 		const objectNode = OrderByHelper.appendDefaultOrderBy(relationContext.targetEntity, field, defaultOrderBy)
-		const { targetEntity } = relationContext
+		const { targetEntity, entity } = relationContext
 		const junctionValues = await this.fetchJunction(
 			mapper.db,
 			owningRelation,
 			ids,
 			joiningColumns,
 			targetEntity,
+			entity,
 			objectNode,
 			[...relationPath, relationContext],
 		)
@@ -219,11 +220,12 @@ export class RelationFetcher {
 		values: Input.PrimaryValue[],
 		column: JoiningColumns,
 		targetEntity: Model.Entity,
+		sourceEntity: Model.Entity,
 		object: ObjectNode<Input.ListQueryInput>,
 		relationPath: Model.AnyRelationContext[],
 	): Promise<Record<string, Value.AtomicValue>[]> {
 		const joiningTable = relation.joiningTable
-		const qb = this.buildJunctionQb(relation, values, column, targetEntity, object.args, relationPath)
+		const qb = this.buildJunctionQb(relation, values, column, targetEntity, sourceEntity, object.args, relationPath)
 			.select(['junction_', joiningTable.inverseJoiningColumn.columnName])
 			.select(['junction_', joiningTable.joiningColumn.columnName])
 		const wrapper = new LimitByGroupWrapper(
@@ -252,15 +254,17 @@ export class RelationFetcher {
 		ids: Input.PrimaryValue[],
 		column: JoiningColumns,
 		targetEntity: Model.Entity,
+		sourceEntity: Model.Entity,
 		objectArgs: Input.ListQueryInput,
 		relationPath: Model.AnyRelationContext[],
 	): SelectBuilder {
 		const joiningTable = relation.joiningTable
 
 		const whereColumn = column.sourceColumn.columnName
+		const primaryColumn = sourceEntity.fields[sourceEntity.primary] as Model.AnyColumn
 		let qb = SelectBuilder.create()
 			.from(joiningTable.tableName, 'junction_')
-			.where(clause => clause.in(['junction_', whereColumn], ids))
+			.where(clause => clause.in(['junction_', whereColumn], ids, primaryColumn.columnType))
 
 		const where = this.predicateInjector.inject(targetEntity, objectArgs.filter || {}, relationPath[relationPath.length - 1])
 		const hasWhere = where && Object.keys(where).length > 0

@@ -138,6 +138,7 @@ export type ChangeMyProfileError = {
 }
 
 export type ChangeMyProfileErrorCode =
+  | 'EMAIL_ALREADY_EXISTS'
   | 'INVALID_EMAIL_FORMAT'
   | 'NOT_A_PERSON'
 

@@ -218,6 +218,7 @@ const schema: DocumentNode = gql`
 	enum ChangeMyProfileErrorCode {
 		NOT_A_PERSON
 		INVALID_EMAIL_FORMAT
+		EMAIL_ALREADY_EXISTS
 	}
 
 	# === changePassword ===

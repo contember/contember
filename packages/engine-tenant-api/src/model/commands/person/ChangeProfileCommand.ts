@@ -1,25 +1,18 @@
 import { Command } from '../Command'
 import { UpdateBuilder } from '@contember/database'
 
+export type ChangeProfileData = {
+	readonly email?: string
+	readonly name?: string | null
+}
+
 export class ChangeProfileCommand implements Command<void> {
-	constructor(private readonly personId: string, private readonly email?: string, private readonly name?: string | null) { }
+	constructor(private readonly personId: string, private readonly data: ChangeProfileData) { }
 
 	async execute({ db }: Command.Args): Promise<void> {
-		const data: {
-			email?: string
-			name?: string | null
-		} = {}
-
-		if (this.email !== undefined) {
-			data.email = this.email
-		}
-		if (this.name !== undefined) {
-			data.name = this.name
-		}
-
 		await UpdateBuilder.create()
 			.table('person')
-			.values(data)
+			.values(this.data)
 			.where({
 				id: this.personId,
 			})

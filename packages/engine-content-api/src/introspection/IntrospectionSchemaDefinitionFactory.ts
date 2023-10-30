@@ -5,6 +5,7 @@ import { JSONType } from '@contember/graphql-utils'
 import {
 	GraphQLBoolean,
 	GraphQLEnumType,
+	GraphQLFieldResolver,
 	GraphQLInt,
 	GraphQLInterfaceType,
 	GraphQLList,
@@ -176,6 +177,24 @@ const _Schema = new GraphQLObjectType({
 })
 
 
+const createSchemaConfig = (resolver?: GraphQLFieldResolver<any, any>): GraphQLSchemaConfig => {
+	return {
+		query: new GraphQLObjectType({
+			name: 'Query',
+			fields: {
+				schema: {
+					type: _Schema,
+					resolve: resolver,
+				},
+			},
+		}),
+		types: [_Column, _Relation],
+	}
+}
+
+
+export default new GraphQLSchema(createSchemaConfig())
+
 export class IntrospectionSchemaDefinitionFactory {
 	constructor(private readonly introspectionSchemaFactory: IntrospectionSchemaFactory) {}
 
@@ -184,19 +203,8 @@ export class IntrospectionSchemaDefinitionFactory {
 	}
 
 	public createConfig(): GraphQLSchemaConfig {
-		return {
-			query: new GraphQLObjectType({
-				name: 'Query',
-				fields: {
-					schema: {
-						type: _Schema,
-						resolve: (): ContentSchema._Schema => {
-							return this.introspectionSchemaFactory.create()
-						},
-					},
-				},
-			}),
-			types: [_Column, _Relation],
-		}
+		return createSchemaConfig((): ContentSchema._Schema => {
+			return this.introspectionSchemaFactory.create()
+		})
 	}
 }

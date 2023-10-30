@@ -1,4 +1,3 @@
-export { default as ContentSchema } from './content-schema.graphql'
 export * as ContentSchemaTypes from './content-schema.types'
-export * from './IntrospectionSchemaDefinitionFactory'
+export { IntrospectionSchemaDefinitionFactory, default as ContentSchema } from './IntrospectionSchemaDefinitionFactory'
 export * from './IntrospectionSchemaFactory'

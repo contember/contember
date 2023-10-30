@@ -8,10 +8,12 @@ import {
 	AppleProvider,
 	DatabaseContext,
 	DatabaseContextFactory,
+	EmailValidator,
 	FacebookProvider,
 	Identity,
 	IdentityFactory,
 	IDPHandlerRegistry,
+	IDPManager,
 	IDPSignInManager,
 	InviteManager,
 	MailTemplateManager,
@@ -23,6 +25,8 @@ import {
 	PasswordResetManager,
 	PermissionContextFactory,
 	PermissionsFactory,
+	PersonAccessManager,
+	PersonManager,
 	ProjectInitializer,
 	ProjectManager,
 	ProjectMemberManager,
@@ -34,12 +38,12 @@ import {
 	SignInManager,
 	SignUpManager,
 	UserMailer,
-	PersonAccessManager,
 } from './model'
 import {
 	AddIDPMutationResolver,
 	AddProjectMemberMutationResolver,
 	ChangePasswordMutationResolver,
+	ChangeProfileMutationResolver,
 	CreateApiKeyMutationResolver,
 	CreateProjectMutationResolver,
 	DisableApiKeyMutationResolver,
@@ -70,12 +74,10 @@ import * as Schema from './schema'
 import { createMailer, MailerOptions, TemplateRenderer } from './utils'
 import { IdentityFetcher } from './bridges/system/IdentityFetcher'
 import { SignInResponseFactory } from './resolvers/responseHelpers/SignInResponseFactory'
-import { IDPManager } from './model/service/idp/IDPManager'
 import { IDPQueryResolver } from './resolvers/query/IDPQueryResolver'
 import { UpdateIDPMutationResolver } from './resolvers/mutation/idp/UpdateIDPMutationResolver'
 import { TenantCredentials, TenantMigrationsRunner } from './migrations'
 import { DisablePersonMutationResolver } from './resolvers/mutation/person/DisablePersonMutationResolver'
-import { PersonManager } from './model/service/PersonManager'
 
 export interface TenantContainer {
 	projectMemberManager: ProjectMemberManager
@@ -104,7 +106,7 @@ export interface TenantContainerArgs {
 export class TenantContainerFactory {
 	constructor(
 		private readonly providers: Omit<Providers, 'encrypt' | 'decrypt'>,
-	) {}
+	) { }
 
 	create(args: TenantContainerArgs): TenantContainer {
 		return this.createBuilder(args)
@@ -134,7 +136,7 @@ export class TenantContainerFactory {
 				args.projectSchemaResolver)
 			.addService('templateRenderer', () =>
 				new TemplateRenderer())
-			.addService('accessEvaluator', ({}) =>
+			.addService('accessEvaluator', ({ }) =>
 				new AccessEvaluator.PermissionEvaluator(new PermissionsFactory().create()))
 			.addService('authorizator', ({ accessEvaluator }) =>
 				new Authorizator.Default(accessEvaluator))
@@ -144,8 +146,10 @@ export class TenantContainerFactory {
 				new ApiKeyService())
 			.addService('apiKeyManager', ({ apiKeyService }) =>
 				new ApiKeyManager(apiKeyService))
-			.addService('signUpManager', () =>
-				new SignUpManager())
+			.addService('emailValidator', () =>
+				new EmailValidator())
+			.addService('signUpManager', ({ emailValidator }) =>
+				new SignUpManager(emailValidator))
 			.addService('passwordChangeManager', ({ providers }) =>
 				new PasswordChangeManager(providers))
 			.addService('projectMemberManager', () =>
@@ -162,8 +166,8 @@ export class TenantContainerFactory {
 				new ProjectManager(secretManager, args.projectInitializer, apiKeyService))
 			.addService('personAccessManager', ({ apiKeyManager }) =>
 				new PersonAccessManager(apiKeyManager))
-			.addService('personManager', () =>
-				new PersonManager())
+			.addService('personManager', ({ emailValidator }) =>
+				new PersonManager(emailValidator))
 			.addService('passwordResetManager', ({ userMailer, projectManager }) =>
 				new PasswordResetManager(userMailer, projectManager))
 			.addService('idpRegistry', () => {
@@ -208,10 +212,12 @@ export class TenantContainerFactory {
 				new ProjectMembersQueryResolver(projectManager, projectMemberManager))
 			.addService('signUpMutationResolver', ({ signUpManager, apiKeyManager }) =>
 				new SignUpMutationResolver(signUpManager, apiKeyManager))
-			.addService('signInMutationResolver', ({ signInManager, signInResponseFactory  }) =>
+			.addService('signInMutationResolver', ({ signInManager, signInResponseFactory }) =>
 				new SignInMutationResolver(signInManager, signInResponseFactory))
 			.addService('signOutMutationResolver', ({ apiKeyManager }) =>
 				new SignOutMutationResolver(apiKeyManager))
+			.addService('changeProfileMutationResolver', ({ personManager }) =>
+				new ChangeProfileMutationResolver(personManager))
 			.addService('changePasswordMutationResolver', ({ passwordChangeManager }) =>
 				new ChangePasswordMutationResolver(passwordChangeManager))
 			.addService('resetPasswordMutationResolver', ({ passwordResetManager, permissionContextFactory }) =>

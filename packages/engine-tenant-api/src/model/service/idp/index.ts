@@ -1,6 +1,7 @@
 export * from './IdentityProviderHandler'
 export * from './IdentityProviderNotFoundError'
 export * from './IDPHandlerRegistry'
+export * from './IDPManager'
 export * from './IDPResponseError'
 export * from './IDPValidationError'
 export * from './InvalidIDPConfigurationError'

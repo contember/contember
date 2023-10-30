@@ -6,7 +6,7 @@ import { getPasswordWeaknessMessage } from '../utils/password'
 import { Response, ResponseError, ResponseOk } from '../utils/Response'
 import { DatabaseContext } from '../utils'
 import { MaybePassword } from '../dtos'
-import { validateEmail } from '../utils/email'
+import { EmailValidator } from './EmailValidator'
 
 type SignUpUser = {
 	email: string
@@ -16,12 +16,15 @@ type SignUpUser = {
 }
 
 export class SignUpManager {
+	constructor(
+		private readonly emailValidator: EmailValidator,
+	) {
+	}
+
 	async signUp(dbContext: DatabaseContext, { email, password, roles = [] }: SignUpUser): Promise<SignUpResponse> {
-		if (!validateEmail(email.trim())) {
-			return new ResponseError('INVALID_EMAIL_FORMAT', 'E-mail address is not in a valid format')
-		}
-		if (await this.isEmailAlreadyUsed(dbContext, email)) {
-			return new ResponseError('EMAIL_ALREADY_EXISTS', `User with email ${email} already exists`)
+		const validationError = await this.emailValidator.validateEmail(dbContext, email)
+		if (validationError !== null) {
+			return validationError
 		}
 		const plainPassword = password.getPlain()
 		const weakPassword = plainPassword ? getPasswordWeaknessMessage(plainPassword) : null
@@ -33,11 +36,6 @@ export class SignUpManager {
 			return await db.commandBus.execute(new CreatePersonCommand({ identityId, email, password }))
 		})
 		return new ResponseOk(new SignUpResult(person))
-	}
-
-	private async isEmailAlreadyUsed(dbContext: DatabaseContext, email: string): Promise<boolean> {
-		const personOrNull = await dbContext.queryHandler.fetch(PersonQuery.byEmail(email))
-		return personOrNull !== null
 	}
 }
 

@@ -131,6 +131,23 @@ export type ChangeMyPasswordResponse = {
 	readonly ok: Scalars['Boolean']
 }
 
+export type ChangeMyProfileError = {
+	readonly __typename?: 'ChangeMyProfileError'
+	readonly code: ChangeMyProfileErrorCode
+	readonly developerMessage: Scalars['String']
+}
+
+export type ChangeMyProfileErrorCode =
+  | 'EMAIL_ALREADY_EXISTS'
+  | 'INVALID_EMAIL_FORMAT'
+  | 'NOT_A_PERSON'
+
+export type ChangeMyProfileResponse = {
+	readonly __typename?: 'ChangeMyProfileResponse'
+	readonly error?: Maybe<ChangeMyProfileError>
+	readonly ok: Scalars['Boolean']
+}
+
 export type ChangePasswordError = {
 	readonly __typename?: 'ChangePasswordError'
 	readonly code: ChangePasswordErrorCode
@@ -550,6 +567,7 @@ export type Mutation = {
 	readonly addProjectMailTemplate?: Maybe<AddMailTemplateResponse>
 	readonly addProjectMember?: Maybe<AddProjectMemberResponse>
 	readonly changeMyPassword?: Maybe<ChangeMyPasswordResponse>
+	readonly changeMyProfile?: Maybe<ChangeMyProfileResponse>
 	readonly changePassword?: Maybe<ChangePasswordResponse>
 	readonly confirmOtp?: Maybe<ConfirmOtpResponse>
 	readonly createApiKey?: Maybe<CreateApiKeyResponse>
@@ -617,6 +635,12 @@ export type MutationAddProjectMemberArgs = {
 export type MutationChangeMyPasswordArgs = {
 	currentPassword: Scalars['String']
 	newPassword: Scalars['String']
+}
+
+
+export type MutationChangeMyProfileArgs = {
+	email?: InputMaybe<Scalars['String']>
+	name?: InputMaybe<Scalars['String']>
 }
 
 
@@ -1289,6 +1313,9 @@ export type ResolversTypes = {
 	ChangeMyPasswordError: ResolverTypeWrapper<ChangeMyPasswordError>
 	ChangeMyPasswordErrorCode: ChangeMyPasswordErrorCode
 	ChangeMyPasswordResponse: ResolverTypeWrapper<ChangeMyPasswordResponse>
+	ChangeMyProfileError: ResolverTypeWrapper<ChangeMyProfileError>
+	ChangeMyProfileErrorCode: ChangeMyProfileErrorCode
+	ChangeMyProfileResponse: ResolverTypeWrapper<ChangeMyProfileResponse>
 	ChangePasswordError: ResolverTypeWrapper<ChangePasswordError>
 	ChangePasswordErrorCode: ChangePasswordErrorCode
 	ChangePasswordResponse: ResolverTypeWrapper<ChangePasswordResponse>
@@ -1435,6 +1462,8 @@ export type ResolversParentTypes = {
 	Boolean: Scalars['Boolean']
 	ChangeMyPasswordError: ChangeMyPasswordError
 	ChangeMyPasswordResponse: ChangeMyPasswordResponse
+	ChangeMyProfileError: ChangeMyProfileError
+	ChangeMyProfileResponse: ChangeMyProfileResponse
 	ChangePasswordError: ChangePasswordError
 	ChangePasswordResponse: ChangePasswordResponse
 	CheckResetPasswordTokenResult: CheckResetPasswordTokenResult
@@ -1615,6 +1644,18 @@ export type ChangeMyPasswordErrorResolvers<ContextType = any, ParentType extends
 
 export type ChangeMyPasswordResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['ChangeMyPasswordResponse'] = ResolversParentTypes['ChangeMyPasswordResponse']> = {
 	error?: Resolver<Maybe<ResolversTypes['ChangeMyPasswordError']>, ParentType, ContextType>
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type ChangeMyProfileErrorResolvers<ContextType = any, ParentType extends ResolversParentTypes['ChangeMyProfileError'] = ResolversParentTypes['ChangeMyProfileError']> = {
+	code?: Resolver<ResolversTypes['ChangeMyProfileErrorCode'], ParentType, ContextType>
+	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type ChangeMyProfileResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['ChangeMyProfileResponse'] = ResolversParentTypes['ChangeMyProfileResponse']> = {
+	error?: Resolver<Maybe<ResolversTypes['ChangeMyProfileError']>, ParentType, ContextType>
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
@@ -1903,6 +1944,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 	addProjectMailTemplate?: Resolver<Maybe<ResolversTypes['AddMailTemplateResponse']>, ParentType, ContextType, RequireFields<MutationAddProjectMailTemplateArgs, 'template'>>
 	addProjectMember?: Resolver<Maybe<ResolversTypes['AddProjectMemberResponse']>, ParentType, ContextType, RequireFields<MutationAddProjectMemberArgs, 'identityId' | 'memberships' | 'projectSlug'>>
 	changeMyPassword?: Resolver<Maybe<ResolversTypes['ChangeMyPasswordResponse']>, ParentType, ContextType, RequireFields<MutationChangeMyPasswordArgs, 'currentPassword' | 'newPassword'>>
+	changeMyProfile?: Resolver<Maybe<ResolversTypes['ChangeMyProfileResponse']>, ParentType, ContextType, Partial<MutationChangeMyProfileArgs>>
 	changePassword?: Resolver<Maybe<ResolversTypes['ChangePasswordResponse']>, ParentType, ContextType, RequireFields<MutationChangePasswordArgs, 'password' | 'personId'>>
 	confirmOtp?: Resolver<Maybe<ResolversTypes['ConfirmOtpResponse']>, ParentType, ContextType, RequireFields<MutationConfirmOtpArgs, 'otpToken'>>
 	createApiKey?: Resolver<Maybe<ResolversTypes['CreateApiKeyResponse']>, ParentType, ContextType, RequireFields<MutationCreateApiKeyArgs, 'description' | 'memberships' | 'projectSlug'>>
@@ -2215,6 +2257,8 @@ export type Resolvers<ContextType = any> = {
 	ApiKeyWithToken?: ApiKeyWithTokenResolvers<ContextType>
 	ChangeMyPasswordError?: ChangeMyPasswordErrorResolvers<ContextType>
 	ChangeMyPasswordResponse?: ChangeMyPasswordResponseResolvers<ContextType>
+	ChangeMyProfileError?: ChangeMyProfileErrorResolvers<ContextType>
+	ChangeMyProfileResponse?: ChangeMyProfileResponseResolvers<ContextType>
 	ChangePasswordError?: ChangePasswordErrorResolvers<ContextType>
 	ChangePasswordResponse?: ChangePasswordResponseResolvers<ContextType>
 	CheckResetPasswordTokenResult?: CheckResetPasswordTokenResultResolvers<ContextType>

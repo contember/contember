@@ -26,6 +26,7 @@ class PermissionsFactory {
 		permissions.allow(TenantRole.LOGIN, PermissionActions.PERSON_SIGN_IN_IDP)
 
 		permissions.allow(TenantRole.PERSON, PermissionActions.PERSON_CHANGE_MY_PASSWORD)
+		permissions.allow(TenantRole.PERSON, PermissionActions.PERSON_CHANGE_MY_PROFILE)
 		permissions.allow(TenantRole.PERSON, PermissionActions.PERSON_SIGN_OUT)
 		permissions.allow(TenantRole.PERSON, PermissionActions.PERSON_SETUP_OTP)
 

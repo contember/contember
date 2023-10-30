@@ -194,3 +194,48 @@ test('Posts with paginated tags (many has many owning)', async () => {
 })
 
 
+test('large number of posts - use array', async () => {
+	const ids = Array.from({ length: 1000 }).map((it, index) => testUuid(index + 1))
+	await execute({
+		schema: new SchemaBuilder()
+			.entity('Post', entity => entity.manyHasMany('tags', relation => relation.target('Tag')))
+			.entity('Tag', entity => entity.column('name'))
+			.buildSchema(),
+		query: GQL`
+        query {
+          listPost {
+            id
+            tags {
+				name
+            }
+          }
+        }
+			`,
+		executes: [
+			{
+				sql: SQL`select "root_"."id" as "root_id",
+					         "root_"."id" as "root_id"
+				         from "public"."post" as "root_"`,
+				response: {
+					rows: ids.map(id => ({ root_id: id })),
+				},
+			},
+			{
+				sql: SQL`select "junction_"."tag_id", "junction_"."post_id"  from "public"."post_tags" as "junction_"  where "junction_"."post_id" = any(?::uuid[])`,
+				parameters: [ids],
+				response: {
+					rows: [],
+				},
+			},
+		],
+		return: {
+			data: {
+				listPost: ids.map(id => ({
+					id,
+					tags: [],
+				})),
+			},
+		},
+	})
+})
+

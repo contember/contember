@@ -17,7 +17,7 @@
   },
   "devDependencies": {
     "@contember/engine-system-api": "workspace:*",
-    "@graphql-tools/schema": "^8.3.5",
+    "@graphql-tools/schema": "^10.0.0",
     "@types/node": "^18",
     "graphql-ts-client-codegen": "^3.1.14"
   }

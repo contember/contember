@@ -2,7 +2,7 @@ import { GraphQLFieldConfig } from 'graphql'
 import { Model } from '@contember/schema'
 
 export interface EntityFieldsProvider<ExtensionArg extends object = {}> {
-	getFields(entity: Model.Entity, accessibleFields: string[]): FieldMap<ExtensionArg>
+	getFields(entity: Model.Entity, accessibleFields: Model.AnyField[]): FieldMap<ExtensionArg>
 }
 
 export type FieldMap<ExtensionArg extends object> = {

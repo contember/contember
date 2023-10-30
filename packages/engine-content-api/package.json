@@ -20,9 +20,7 @@
     "@contember/schema": "workspace:*",
     "@contember/schema-definition": "workspace:*",
     "@contember/schema-utils": "workspace:*",
-    "@graphql-tools/schema": "^8.3.5",
-    "fast-deep-equal": "^3.1.3",
-    "graphql-tag": "^2.12.5"
+    "fast-deep-equal": "^3.1.3"
   },
   "devDependencies": {
     "@contember/database-tester": "workspace:*",

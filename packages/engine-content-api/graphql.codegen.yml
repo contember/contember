@@ -1,5 +1,5 @@
 schema:
-  - "./src/introspection/content-schema.graphql.ts"
+  - "./src/introspection/IntrospectionSchemaDefinitionFactory.ts"
 documents: []
 config:
   immutableTypes: "1"

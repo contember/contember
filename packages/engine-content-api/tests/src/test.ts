@@ -1,8 +1,8 @@
 import { Acl, Model, Schema, Validation } from '@contember/schema'
 import { Authorizator, GraphQlSchemaBuilderFactory, ExecutionContainerFactory } from '../../src'
-import { AllowAllPermissionFactory, dummySchemaDatabaseMetadata, emptySchema } from '@contember/schema-utils'
+import { AllowAllPermissionFactory, emptySchema } from '@contember/schema-utils'
 import { executeGraphQlTest } from './testGraphql'
-import { Client } from '@contember/database'
+import { Client, emptyDatabaseMetadata } from '@contember/database'
 import { createConnectionMock } from '@contember/database-tester'
 import { createUuidGenerator } from '@contember/engine-api-tester'
 import { SQL } from './tags'
@@ -111,7 +111,7 @@ export const execute = async (test: Test) => {
 					systemSchema: 'system',
 					stage: { id: '00000000-0000-0000-0000-000000000000', slug: 'live' },
 					project: { slug: 'test' },
-					schemaDatabaseMetadata: dummySchemaDatabaseMetadata,
+					schemaDatabaseMetadata: emptyDatabaseMetadata,
 				}),
 			timer: (label: any, cb: any) => cb(),
 		},

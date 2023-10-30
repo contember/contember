@@ -1,13 +1,13 @@
 import { MigrationArgs, MigrationBuilder } from '@contember/database-migrations'
-import { wrapIdentifier } from '@contember/database'
+import { DatabaseMetadata, ForeignKeyDeleteAction, wrapIdentifier } from '@contember/database'
 import { SystemMigrationArgs } from './types'
-import { acceptFieldVisitor, ForeignKeyDeleteAction, SchemaDatabaseMetadata } from '@contember/schema-utils'
+import { acceptFieldVisitor } from '@contember/schema-utils'
 import { Model } from '@contember/schema'
 
 export default async function (builder: MigrationBuilder, args: MigrationArgs<SystemMigrationArgs>) {
 	const schema = await args.schemaResolver(args.connection)
 	const stages = (await args.connection.query<{schema: string}>('SELECT schema FROM stage')).rows
-	const metadataByStage: Record<string, SchemaDatabaseMetadata> = {}
+	const metadataByStage: Record<string, DatabaseMetadata> = {}
 
 	for (const entity of Object.values(schema.model.entities)) {
 		for (const field of Object.values(entity.fields)) {

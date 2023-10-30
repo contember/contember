@@ -1,17 +1,17 @@
-import { DatabaseContext, SchemaDatabaseMetadataResolver } from '@contember/engine-system-api'
+import { DatabaseMetadata, DatabaseMetadataResolver } from '@contember/database'
+import { DatabaseContext } from '@contember/engine-system-api'
 import { Schema } from '@contember/schema'
-import { SchemaDatabaseMetadata } from '@contember/schema-utils'
 
 export class ProjectDatabaseMetadataResolver {
 
-	private cache: WeakMap<Schema, Map<string, SchemaDatabaseMetadata>> = new WeakMap()
+	private cache: WeakMap<Schema, Map<string, DatabaseMetadata>> = new WeakMap()
 
 	constructor(
-		private resolver: SchemaDatabaseMetadataResolver,
+		private resolver: DatabaseMetadataResolver,
 	) {
 	}
 
-	async resolveDatabaseMetadata(db: DatabaseContext, schema: Schema, stageSchema: string): Promise<SchemaDatabaseMetadata> {
+	async resolveDatabaseMetadata(db: DatabaseContext, schema: Schema, stageSchema: string): Promise<DatabaseMetadata> {
 		let schemaCache = this.cache.get(schema)
 		if (!schemaCache) {
 			schemaCache = new Map()
@@ -21,7 +21,7 @@ export class ProjectDatabaseMetadataResolver {
 		if (cachedMeta) {
 			return cachedMeta
 		}
-		const metadata = await this.resolver.resolveMetadata(db, stageSchema)
+		const metadata = await this.resolver.resolveMetadata(db.client, stageSchema)
 		schemaCache.set(stageSchema, metadata)
 
 		return metadata

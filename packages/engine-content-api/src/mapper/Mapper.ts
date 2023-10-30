@@ -1,5 +1,5 @@
 import { Input, Model } from '@contember/schema'
-import { acceptFieldVisitor, getColumnName, SchemaDatabaseMetadata } from '@contember/schema-utils'
+import { acceptFieldVisitor, getColumnName } from '@contember/schema-utils'
 import {
 	OrderByHelper,
 	PathFactory,
@@ -10,7 +10,7 @@ import {
 	SelectResultObject,
 	WhereBuilder,
 } from './select'
-import { Client, Connection, ConstraintHelper, SelectBuilder } from '@contember/database'
+import { Client, Connection, ConstraintHelper, DatabaseMetadata, SelectBuilder } from '@contember/database'
 import { PredicatesInjector } from '../acl'
 import { JunctionTableManager } from './JunctionTableManager'
 import { DeletedEntitiesStorage, DeleteExecutor } from './delete'
@@ -38,7 +38,7 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		public readonly identityId: string,
 		public readonly transactionId: string,
 		private readonly schema: Model.Schema,
-		private readonly schemaDatabaseMetadata: SchemaDatabaseMetadata,
+		private readonly schemaDatabaseMetadata: DatabaseMetadata,
 		private readonly predicatesInjector: PredicatesInjector,
 		private readonly selectBuilderFactory: SelectBuilderFactory,
 		private readonly uniqueWhereExpander: UniqueWhereExpander,

@@ -27,8 +27,8 @@ import {
 } from './mapper'
 import { Builder } from '@contember/dic'
 import { Acl, Model, Schema } from '@contember/schema'
-import { Client, SelectBuilder as DbSelectBuilder } from '@contember/database'
-import { Providers, SchemaDatabaseMetadata } from '@contember/schema-utils'
+import { Client, DatabaseMetadata, SelectBuilder as DbSelectBuilder } from '@contember/database'
+import { Providers } from '@contember/schema-utils'
 import { PaginatedHasManyExecutionHandler } from './extensions/paginatedHasMany/PaginatedHasManyExecutionHandler'
 import { PaginatedHasManyFieldProvider } from './extensions/paginatedHasMany/PaginatedHasManyFieldProvider'
 import { WhereOptimizer } from './mapper/select/optimizer/WhereOptimizer'
@@ -44,7 +44,7 @@ import {
 
 export type ExecutionContainerArgs = {
 	schema: Schema & { id: number }
-	schemaDatabaseMetadata: SchemaDatabaseMetadata
+	schemaDatabaseMetadata: DatabaseMetadata
 	db: Client
 	identityId: string
 	identityVariables: Acl.VariablesMap

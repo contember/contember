@@ -6,9 +6,9 @@ import { DeleteExecutor } from './delete'
 import { Updater } from './update'
 import { Inserter } from './insert'
 import { Model } from '@contember/schema'
-import { Client, Connection } from '@contember/database'
+import { Client, Connection, DatabaseMetadata } from '@contember/database'
 import { Mapper } from './Mapper'
-import { Providers, SchemaDatabaseMetadata } from '@contember/schema-utils'
+import { Providers } from '@contember/schema-utils'
 
 export type MapperFactoryHook = (mapper: Mapper) => void
 
@@ -20,7 +20,7 @@ export class MapperFactory {
 		private readonly db: Client,
 		private readonly identityId: string,
 		private readonly schema: Model.Schema,
-		private readonly schemaDatabaseMetadata: SchemaDatabaseMetadata,
+		private readonly schemaDatabaseMetadata: DatabaseMetadata,
 		private readonly predicatesInjector: PredicatesInjector,
 		private readonly selectBuilderFactory: SelectBuilderFactory,
 		private readonly uniqueWhereExpander: UniqueWhereExpander,

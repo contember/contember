@@ -12,6 +12,7 @@
     "test": "vitest --dir ./tests/cases"
   },
   "dependencies": {
+    "@contember/database": "workspace:*",
     "@contember/database-migrations": "workspace:*",
     "@contember/engine-common": "workspace:*",
     "@contember/schema": "workspace:*",

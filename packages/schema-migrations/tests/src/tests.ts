@@ -2,7 +2,8 @@ import { Migration, ModificationHandlerFactory, SchemaDiffer, SchemaMigrator, VE
 import { Schema } from '@contember/schema'
 import { createMigrationBuilder } from '@contember/database-migrations'
 import { assert, describe, it } from 'vitest'
-import { dummySchemaDatabaseMetadata, emptySchema } from '@contember/schema-utils'
+import { emptySchema } from '@contember/schema-utils'
+import { emptyDatabaseMetadata } from '@contember/database'
 
 const modificationFactory = new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap)
 const schemaMigrator = new SchemaMigrator(modificationFactory)
@@ -70,7 +71,7 @@ export function testGenerateSql(original: Partial<Schema>, diff: Migration.Modif
 		})
 		modificationHandler.createSql(builder, {
 			systemSchema: 'system',
-			databaseMetadata: dummySchemaDatabaseMetadata,
+			databaseMetadata: emptyDatabaseMetadata,
 			invalidateDatabaseMetadata: () => null,
 		})
 		schema = modificationHandler.getSchemaUpdater()({ schema })

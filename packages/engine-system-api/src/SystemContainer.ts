@@ -14,7 +14,7 @@ import {
 	MigrationsDatabaseMetadataResolverStoreFactory,
 	PermissionsFactory,
 	ProjectMigrator,
-	ProjectTruncateExecutor, SchemaDatabaseMetadataResolver,
+	ProjectTruncateExecutor,
 	SchemaVersionBuilder,
 } from './model'
 import { UuidProvider } from './utils'
@@ -29,6 +29,7 @@ import {
 	TruncateMutationResolver,
 } from './resolvers'
 import { EventOldValuesResolver } from './resolvers/types'
+import { DatabaseMetadataResolver } from '@contember/database'
 
 export interface SystemContainer {
 	systemResolversFactory: ResolverFactory
@@ -81,7 +82,7 @@ export class SystemContainerFactory {
 			.addService('migrationDescriber', ({ modificationHandlerFactory }) =>
 				new MigrationDescriber(modificationHandlerFactory))
 			.addService('databaseMetadataResolver', () =>
-				new SchemaDatabaseMetadataResolver())
+				new DatabaseMetadataResolver())
 			.addService('migrationsDatabaseMetadataResolverStoreFactory', ({ databaseMetadataResolver }) =>
 				new MigrationsDatabaseMetadataResolverStoreFactory(databaseMetadataResolver))
 			.addService('projectMigrator', ({ migrationDescriber, schemaVersionBuilder, executedMigrationsResolver, migrationsDatabaseMetadataResolverStoreFactory }) =>

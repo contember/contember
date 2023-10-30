@@ -17,14 +17,13 @@ import { ValidationResolver } from './ValidationResolver'
 import { GraphQLResolveInfo } from 'graphql'
 import { GraphQlQueryAstFactory } from './GraphQlQueryAstFactory'
 import { ImplementationException } from '../exception'
-import { retryTransaction } from '@contember/database'
+import { DatabaseMetadata, retryTransaction } from '@contember/database'
 import { Operation, readOperationMeta } from '../schema'
 import { assertNever } from '../utils'
 import { InputPreValidator } from '../input-validation'
 import { ObjectNode } from '../inputProcessing'
 import { executeReadOperations } from './ReadHelpers'
 import { logger } from '@contember/logger'
-import { SchemaDatabaseMetadata } from '@contember/schema-utils'
 
 type WithoutNode<T extends { node: any }> = Pick<T, Exclude<keyof T, 'node'>>
 
@@ -39,7 +38,7 @@ export class MutationResolver {
 		private readonly mapperFactory: MapperFactory,
 		private readonly inputValidator: InputPreValidator,
 		private readonly graphqlQueryAstFactory: GraphQlQueryAstFactory,
-		private readonly schemaDatabaseMetadata: SchemaDatabaseMetadata,
+		private readonly schemaDatabaseMetadata: DatabaseMetadata,
 	) {}
 
 	public async resolveTransaction(info: GraphQLResolveInfo, options: TransactionOptions): Promise<Result.TransactionResult> {

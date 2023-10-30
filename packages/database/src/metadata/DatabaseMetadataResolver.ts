@@ -1,18 +1,13 @@
-import {
-	ForeignKeyConstraintMetadata,
-	IndexMetadata,
-	SchemaDatabaseMetadata,
-	UniqueConstraintMetadata,
-	ForeignKeyDeleteAction,
-	createSchemaDatabaseMetadata,
-} from '@contember/schema-utils'
-import { DatabaseContext } from '../database'
-import { Connection } from '@contember/database'
+import { Connection } from '../client'
+import { createDatabaseMetadata, DatabaseMetadata } from './DatabaseMetadata'
+import { ForeignKeyConstraintMetadata, ForeignKeyDeleteAction } from './ForeignKeyConstraintMetadata'
+import { UniqueConstraintMetadata } from './UniqueConstraintMetadata'
+import { IndexMetadata } from './IndexMetadata'
 
-export class SchemaDatabaseMetadataResolver {
-	async resolveMetadata(db: DatabaseContext, contentSchema: string): Promise<SchemaDatabaseMetadata> {
-		const constraintRows = await this.fetchConstraints(db.client, contentSchema)
-		const indexRows = await this.fetchIndexes(db.client, contentSchema)
+export class DatabaseMetadataResolver {
+	async resolveMetadata(db: Connection.Queryable, contentSchema: string): Promise<DatabaseMetadata> {
+		const constraintRows = await this.fetchConstraints(db, contentSchema)
+		const indexRows = await this.fetchIndexes(db, contentSchema)
 
 		const fkConstraints = constraintRows
 			.filter((it): it is ForeignKeyConstraintsRow => it.type === ConstraintTypes.foreignKey)
@@ -38,7 +33,7 @@ export class SchemaDatabaseMetadataResolver {
 				columnNames: it.columns,
 			}))
 
-		return createSchemaDatabaseMetadata({
+		return createDatabaseMetadata({
 			foreignKeys: fkConstraints,
 			uniqueConstraints: uniqueConstraints,
 			indexes,

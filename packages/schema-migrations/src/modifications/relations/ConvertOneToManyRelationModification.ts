@@ -44,10 +44,11 @@ export class ConvertOneToManyRelationModificationHandler implements Modification
 		const columnNameId = wrapIdentifier(columnName)
 		builder.sql(`CREATE INDEX ON ${tableNameId} (${columnNameId})`)
 
-		const uniqueConstraintNames = options.databaseMetadata.getUniqueConstraintNames({
+		const uniqueConstraintNames = options.databaseMetadata.uniqueConstraints.filter({
 			tableName: entity.tableName,
-			columnNames: [relation.joiningColumn.columnName],
-		})
+			columnNames: [columnName],
+		}).getNames()
+
 		for (const name of uniqueConstraintNames) {
 			builder.sql(`ALTER TABLE ${wrapIdentifier(entity.tableName)} DROP CONSTRAINT ${wrapIdentifier(name)}`)
 		}

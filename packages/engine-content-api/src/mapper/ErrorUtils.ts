@@ -23,7 +23,7 @@ type UniqueConstraintResult = {
 const getEntityByTableName = (model: Model.Schema, tableName: string) => Object.values(model.entities).find(it => it.tableName === tableName)
 
 const findUniqueConstraint = (model: Model.Schema, databaseMetadata: SchemaDatabaseMetadata, tableName: string, constraintName: string): UniqueConstraintResult | null => {
-	const constraint = databaseMetadata.getUniqueConstraint(tableName, constraintName)
+	const constraint = databaseMetadata.uniqueConstraints.filter({ tableName, constraintName }).first()
 	if (!constraint) {
 		return null
 	}
@@ -51,7 +51,7 @@ type RelationInfo = {
 }
 
 const findForeignConstraint = (model: Model.Schema, databaseMetadata: SchemaDatabaseMetadata, tableName: string, constraintName: string): RelationInfo | null => {
-	const constraint = databaseMetadata.getForeignKeyConstraint(tableName, constraintName)
+	const constraint = databaseMetadata.foreignKeys.filter({ fromTable: tableName, constraintName }).first()
 	if (!constraint) {
 		return null
 	}

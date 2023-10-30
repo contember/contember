@@ -37,28 +37,25 @@ export default async function (builder: MigrationBuilder, args: MigrationArgs<Sy
 			for (const stage of stages) {
 				const databaseMetadata = metadataByStage[stage.schema] ??= await args.databaseMetadataResolver(args.connection, stage.schema)
 
-				const fkNames = databaseMetadata.getForeignKeyConstraintNames({
+				const fks = databaseMetadata.foreignKeys.filter({
 					fromTable: entity.tableName,
 					fromColumn: relation.joiningColumn.columnName,
 					toTable: targetEntity.tableName,
 					toColumn: targetEntity.primaryColumn,
-				})
+				}).toArray()
 
-				if (fkNames.every(it => {
-					const constraint = databaseMetadata.getForeignKeyConstraint(entity.tableName, it)
-					const dbConstraintFlag = ({
-						[Model.OnDelete.setNull]: ForeignKeyDeleteAction.setnull,
-						[Model.OnDelete.cascade]: ForeignKeyDeleteAction.cascade,
-						[Model.OnDelete.restrict]: ForeignKeyDeleteAction.restrict,
-					} as const)[relation.joiningColumn.onDelete]
+				const dbConstraintFlag = ({
+					[Model.OnDelete.setNull]: ForeignKeyDeleteAction.setnull,
+					[Model.OnDelete.cascade]: ForeignKeyDeleteAction.cascade,
+					[Model.OnDelete.restrict]: ForeignKeyDeleteAction.restrict,
+				} as const)[relation.joiningColumn.onDelete]
 
-					return constraint && constraint.deleteAction === dbConstraintFlag
-				})) {
+				if (fks.every(it => it.deleteAction === dbConstraintFlag)) {
 					continue
 				}
 
-				for (const name of fkNames) {
-					builder.sql(`ALTER TABLE ${wrapIdentifier(stage.schema)}.${wrapIdentifier(entity.tableName)} DROP CONSTRAINT ${wrapIdentifier(name)}`)
+				for (const fk of fks) {
+					builder.sql(`ALTER TABLE ${wrapIdentifier(stage.schema)}.${wrapIdentifier(entity.tableName)} DROP CONSTRAINT ${wrapIdentifier(fk.constraintName)}`)
 				}
 
 				const onDelete = ({

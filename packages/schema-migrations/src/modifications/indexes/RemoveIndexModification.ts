@@ -27,7 +27,7 @@ export class RemoveIndexModificationHandler implements ModificationHandler<Remov
 			model: this.schema.model,
 		})
 
-		const indexNames = databaseMetadata.getIndexNames({ tableName: entity.tableName, columnNames: columns })
+		const indexNames = databaseMetadata.indexes.filter({ tableName: entity.tableName, columnNames: columns }).getNames()
 
 		for (const name of indexNames) {
 			builder.sql(`DROP INDEX ${wrapIdentifier(name)}`)

@@ -29,7 +29,7 @@ export class RemoveUniqueConstraintModificationHandler implements ModificationHa
 			model: this.schema.model,
 		})
 
-		const constraintNames = databaseMetadata.getUniqueConstraintNames({ tableName: entity.tableName, columnNames: columns })
+		const constraintNames = databaseMetadata.uniqueConstraints.filter({ tableName: entity.tableName, columnNames: columns }).getNames()
 
 		for (const name of constraintNames) {
 			builder.sql(`ALTER TABLE ${wrapIdentifier(entity.tableName)} DROP CONSTRAINT ${wrapIdentifier(name)}`)

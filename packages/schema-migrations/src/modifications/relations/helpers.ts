@@ -13,14 +13,14 @@ export const addForeignKeyConstraint = ({ builder, entity, relation, targetEntit
 	invalidateDatabaseMetadata: () => void
 }) => {
 	if (recreate) {
-		const fkNames = databaseMetadata.getForeignKeyConstraintNames(
+		const fkNames = databaseMetadata.foreignKeys.filter(
 			{
 				fromTable: entity.tableName,
 				fromColumn: relation.joiningColumn.columnName,
 				toTable: targetEntity.tableName,
 				toColumn: targetEntity.primaryColumn,
 			},
-		)
+		).getNames()
 		for (const name of fkNames) {
 			builder.sql(`ALTER TABLE ${wrapIdentifier(entity.tableName)} DROP CONSTRAINT ${wrapIdentifier(name)}`)
 		}

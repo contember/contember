@@ -4,10 +4,10 @@ import {
 	SchemaDatabaseMetadata,
 	UniqueConstraintMetadata,
 	ForeignKeyDeleteAction,
+	createSchemaDatabaseMetadata,
 } from '@contember/schema-utils'
 import { DatabaseContext } from '../database'
 import { Connection } from '@contember/database'
-import { ResolvedDatabaseMetadata } from './ResolvedDatabaseMetadata'
 
 export class SchemaDatabaseMetadataResolver {
 	async resolveMetadata(db: DatabaseContext, contentSchema: string): Promise<SchemaDatabaseMetadata> {
@@ -38,11 +38,11 @@ export class SchemaDatabaseMetadataResolver {
 				columnNames: it.columns,
 			}))
 
-		return new ResolvedDatabaseMetadata(
-			fkConstraints,
-			uniqueConstraints,
+		return createSchemaDatabaseMetadata({
+			foreignKeys: fkConstraints,
+			uniqueConstraints: uniqueConstraints,
 			indexes,
-		)
+		})
 	}
 
 	private async fetchConstraints(connection: Connection.Queryable, schema: string): Promise<ConstraintsRow[]> {

@@ -29,7 +29,7 @@ export default async function (builder: MigrationBuilder, args: MigrationArgs<Sy
 		for (const stage of stages) {
 			const databaseMetadata = metadataByStage[stage.schema] ??= await args.databaseMetadataResolver(args.connection, stage.schema)
 
-			const existingUniqueConstraints = databaseMetadata.getAllUniqueConstraints().filter(it => it.tableName === entity.tableName)
+			const existingUniqueConstraints = databaseMetadata.uniqueConstraints.filter({ tableName: entity.tableName }).toArray()
 			for (const constraint of existingUniqueConstraints) {
 				if (constraint.columnNames.length === 1 || expectedUnique.some(it => stringArrayEquals(it, constraint.columnNames))) {
 					continue

@@ -40,12 +40,12 @@ export default async function (builder: MigrationBuilder, args: MigrationArgs<Sy
 			for (const stage of stages) {
 				const databaseMetadata = metadataByStage[stage.schema] ??= await args.databaseMetadataResolver(args.connection, stage.schema)
 
-				const fkNames = databaseMetadata.getForeignKeyConstraintNames({
+				const fkNames = databaseMetadata.foreignKeys.filter({
 					fromTable: entity.tableName,
 					fromColumn: relation.joiningColumn.columnName,
 					toTable: targetEntity.tableName,
 					toColumn: targetEntity.primaryColumn,
-				})
+				}).getNames()
 				for (const name of fkNames) {
 					builder.sql(`ALTER TABLE ${wrapIdentifier(stage.schema)}.${wrapIdentifier(entity.tableName)} DROP CONSTRAINT ${wrapIdentifier(name)}`)
 				}

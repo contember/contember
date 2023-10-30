@@ -1,19 +1,18 @@
-import { Acl, Input, Model } from '@contember/schema'
+import { Acl, Input, Model, Settings } from '@contember/schema'
 import { Mapper } from '../../Mapper'
 import { RelationFetcher } from '../RelationFetcher'
 import { SelectExecutionHandlerContext } from '../SelectExecutionHandler'
 import { PredicateFactory } from '../../../acl'
-import { WhereBuilder } from '../WhereBuilder'
+import { Literal, wrapIdentifier } from '@contember/database'
 
 export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVisitor<void> {
 	constructor(
-		private readonly schema: Model.Schema,
 		private readonly relationFetcher: RelationFetcher,
 		private readonly predicateFactory: PredicateFactory,
-		private readonly whereBuilder: WhereBuilder,
 		private readonly mapper: Mapper,
 		private readonly executionContext: SelectExecutionHandlerContext,
 		private readonly relationPath: Model.AnyRelationContext[],
+		private readonly settings: Settings.ContentSettings,
 	) {}
 
 	visitColumn({ entity, column }: Model.ColumnContext): void {
@@ -21,8 +20,13 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 		const tableAlias = columnPath.back().alias
 		const columnAlias = columnPath.alias
 
+		let selectFrom = wrapIdentifier(tableAlias) + '.' + wrapIdentifier(column.columnName)
+		if (column.type === Model.ColumnType.Date && this.settings.shortDateResponse) {
+			selectFrom += '::text'
+		}
+
 		this.executionContext.addColumn({
-			query: qb => qb.select([tableAlias, column.columnName], columnAlias),
+			query: qb => qb.select(new Literal(selectFrom), columnAlias),
 			predicate: this.getRequiredPredicate(entity, column),
 		})
 	}

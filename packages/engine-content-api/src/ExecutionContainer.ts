@@ -107,13 +107,20 @@ export class ExecutionContainerFactory {
 			.addService('whereOptimized', ({ schema }) =>
 				new WhereOptimizer(schema.model, new ConditionOptimizer()))
 			.addService('whereBuilder', ({ joinBuilder, conditionBuilder, pathFactory, whereOptimized, schema }) =>
-				new WhereBuilder(schema.model, joinBuilder, conditionBuilder, pathFactory, whereOptimized, schema.settings.useExistsInHasManyFilter === true))
+				new WhereBuilder(
+					schema.model,
+					joinBuilder,
+					conditionBuilder,
+					pathFactory,
+					whereOptimized,
+					(schema.settings.content?.useExistsInHasManyFilter ?? schema.settings.useExistsInHasManyFilter) === true,
+				))
 			.addService('orderByBuilder', ({ joinBuilder, schema }) =>
 				new OrderByBuilder(schema.model, joinBuilder))
 			.addService('relationFetcher', ({ whereBuilder, orderByBuilder, predicatesInjector, pathFactory }) =>
 				new RelationFetcher(whereBuilder, orderByBuilder, predicatesInjector, pathFactory))
-			.addService('fieldsVisitorFactory', ({ relationFetcher, predicateFactory, whereBuilder, schema }) =>
-				new FieldsVisitorFactory(schema.model, relationFetcher, predicateFactory, whereBuilder))
+			.addService('fieldsVisitorFactory', ({ relationFetcher, predicateFactory, schema }) =>
+				new FieldsVisitorFactory(relationFetcher, predicateFactory, schema.settings.content ?? {}))
 			.addService('metaHandler', ({ whereBuilder, predicateFactory }) =>
 				new MetaHandler(whereBuilder, predicateFactory))
 			.addService('uniqueWhereExpander', ({ schema }) =>

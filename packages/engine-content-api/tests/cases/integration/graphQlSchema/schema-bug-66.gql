@@ -431,7 +431,7 @@ type Mutation {
   updateFrontPage(by: FrontPageUniqueWhere!, filter: FrontPageWhere, data: FrontPageUpdateInput!): FrontPageUpdateResult!
   upsertFrontPage(by: FrontPageUniqueWhere!, filter: FrontPageWhere, update: FrontPageUpdateInput!, create: FrontPageCreateInput!): FrontPageUpsertResult!
   transaction(options: MutationTransactionOptions): MutationTransaction!
-  query: QueryPortal!
+  query: Query!
 }
 
 type VideoCreateResult implements MutationResult {
@@ -532,22 +532,7 @@ type MutationTransaction {
   deleteFrontPage(by: FrontPageUniqueWhere!, filter: FrontPageWhere): FrontPageDeleteResult!
   updateFrontPage(by: FrontPageUniqueWhere!, filter: FrontPageWhere, data: FrontPageUpdateInput!): FrontPageUpdateResult!
   upsertFrontPage(by: FrontPageUniqueWhere!, filter: FrontPageWhere, update: FrontPageUpdateInput!, create: FrontPageCreateInput!): FrontPageUpsertResult!
-  query: QueryPortal
-}
-
-type QueryPortal {
-  getVideo(by: VideoUniqueWhere!, filter: VideoWhere): Video
-  listVideo(filter: VideoWhere, orderBy: [VideoOrderBy!], offset: Int, limit: Int): [Video!]!
-  paginateVideo(filter: VideoWhere, orderBy: [VideoOrderBy!], skip: Int, first: Int): VideoConnection!
-  validateCreateVideo(data: VideoCreateInput!): _ValidationResult!
-  validateUpdateVideo(by: VideoUniqueWhere!, data: VideoUpdateInput!): _ValidationResult!
-  getFrontPage(by: FrontPageUniqueWhere!, filter: FrontPageWhere): FrontPage
-  listFrontPage(filter: FrontPageWhere, orderBy: [FrontPageOrderBy!], offset: Int, limit: Int): [FrontPage!]!
-  paginateFrontPage(filter: FrontPageWhere, orderBy: [FrontPageOrderBy!], skip: Int, first: Int): FrontPageConnection!
-  validateCreateFrontPage(data: FrontPageCreateInput!): _ValidationResult!
-  validateUpdateFrontPage(by: FrontPageUniqueWhere!, data: FrontPageUpdateInput!): _ValidationResult!
-  transaction: QueryTransaction
-  _info: Info
+  query: Query
 }
 
 input MutationTransactionOptions {

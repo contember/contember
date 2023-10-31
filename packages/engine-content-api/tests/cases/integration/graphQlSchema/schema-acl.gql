@@ -155,7 +155,7 @@ type Mutation {
   updateTest(by: TestUniqueWhere!, filter: TestWhere, data: TestUpdateInput!): TestUpdateResult!
   upsertTest(by: TestUniqueWhere!, filter: TestWhere, update: TestUpdateInput!, create: TestCreateInput!): TestUpsertResult!
   transaction(options: MutationTransactionOptions): MutationTransaction!
-  query: QueryPortal!
+  query: Query!
 }
 
 type TestCreateResult implements MutationResult {
@@ -213,17 +213,7 @@ type MutationTransaction {
   createTest(data: TestCreateInput!): TestCreateResult!
   updateTest(by: TestUniqueWhere!, filter: TestWhere, data: TestUpdateInput!): TestUpdateResult!
   upsertTest(by: TestUniqueWhere!, filter: TestWhere, update: TestUpdateInput!, create: TestCreateInput!): TestUpsertResult!
-  query: QueryPortal
-}
-
-type QueryPortal {
-  getTest(by: TestUniqueWhere!, filter: TestWhere): Test
-  listTest(filter: TestWhere, orderBy: [TestOrderBy!], offset: Int, limit: Int): [Test!]!
-  paginateTest(filter: TestWhere, orderBy: [TestOrderBy!], skip: Int, first: Int): TestConnection!
-  validateCreateTest(data: TestCreateInput!): _ValidationResult!
-  validateUpdateTest(by: TestUniqueWhere!, data: TestUpdateInput!): _ValidationResult!
-  transaction: QueryTransaction
-  _info: Info
+  query: Query
 }
 
 input MutationTransactionOptions {

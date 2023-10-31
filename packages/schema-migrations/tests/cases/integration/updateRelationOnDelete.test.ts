@@ -2,6 +2,7 @@ import { testMigrations } from '../../src/tests'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
 import { SQL } from '../../src/tags'
+import { ForeignKeyDeleteAction, createDatabaseMetadata } from '@contember/database'
 
 testMigrations('update relation ondelete to cascade', {
 	original: {
@@ -32,4 +33,18 @@ testMigrations('update relation ondelete to cascade', {
 	],
 	sql: SQL`ALTER TABLE "post" DROP CONSTRAINT "fk_post_category_id_category_id"; 
 ALTER TABLE "post" ADD FOREIGN KEY ("category_id") REFERENCES "category"("id") ON DELETE CASCADE DEFERRABLE INITIALLY IMMEDIATE;`,
+	databaseMetadata: createDatabaseMetadata({
+		foreignKeys: [
+			{
+				constraintName: 'fk_post_category_id_category_id',
+				deleteAction: ForeignKeyDeleteAction.cascade,
+				fromColumn: 'category_id',
+				fromTable: 'post',
+				toColumn: 'id',
+				toTable: 'category',
+			},
+		],
+		indexes: [],
+		uniqueConstraints: [],
+	}),
 })

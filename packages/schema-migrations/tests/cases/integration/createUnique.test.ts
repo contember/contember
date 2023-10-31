@@ -2,6 +2,7 @@ import { c, createSchema } from '@contember/schema-definition'
 import { SQL } from '../../src/tags'
 import { testMigrations } from '../../src/tests'
 import { createUniqueConstraintModification, removeUniqueConstraintModification } from '../../../src'
+import { createDatabaseMetadata } from '@contember/database'
 
 testMigrations('create unique (immediate)', {
 	original: createSchema({
@@ -102,7 +103,15 @@ testMigrations('change unique timing', {
 	],
 	sql: SQL`ALTER TABLE "author" DROP CONSTRAINT "uniq_author_email"; 
 ALTER TABLE "author" ADD UNIQUE ("email") DEFERRABLE;`,
-
+	databaseMetadata: createDatabaseMetadata({
+		foreignKeys: [],
+		indexes: [],
+		uniqueConstraints: [{
+			constraintName: 'uniq_author_email',
+			columnNames: ['email'],
+			tableName: 'author',
+		}],
+	}),
 })
 
 

@@ -2,6 +2,7 @@ import { testMigrations } from '../../src/tests'
 import { Model } from '@contember/schema'
 import { SQL } from '../../src/tags'
 import { SchemaBuilder } from '@contember/schema-definition'
+import { createDatabaseMetadata, ForeignKeyDeleteAction } from '@contember/database'
 
 testMigrations('create inverse side relation (post with locales)', {
 	original: {
@@ -65,4 +66,18 @@ testMigrations('create inverse side relation together with changing onDelete beh
 		},
 	],
 	sql: SQL`ALTER TABLE "post_locale" DROP CONSTRAINT "fk_post_locale_post_id_post_id"; ALTER TABLE "post_locale" ADD FOREIGN KEY ("post_id") REFERENCES "post"("id") ON DELETE CASCADE DEFERRABLE INITIALLY IMMEDIATE;`,
+	databaseMetadata: createDatabaseMetadata({
+		foreignKeys: [
+			{
+				constraintName: 'fk_post_locale_post_id_post_id',
+				deleteAction: ForeignKeyDeleteAction.cascade,
+				fromColumn: 'post_id',
+				fromTable: 'post_locale',
+				toColumn: 'id',
+				toTable: 'post',
+			},
+		],
+		indexes: [],
+		uniqueConstraints: [],
+	}),
 })

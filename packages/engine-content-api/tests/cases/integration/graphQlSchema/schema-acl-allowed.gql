@@ -311,7 +311,7 @@ type Mutation {
   updateRoot(by: RootUniqueWhere!, filter: RootWhere, data: RootUpdateInput!): RootUpdateResult!
   upsertRoot(by: RootUniqueWhere!, filter: RootWhere, update: RootUpdateInput!, create: RootCreateInput!): RootUpsertResult!
   transaction(options: MutationTransactionOptions): MutationTransaction!
-  query: QueryPortal!
+  query: Query!
 }
 
 type OneHasManyEntityCreateResult implements MutationResult {
@@ -412,22 +412,7 @@ type MutationTransaction {
   deleteRoot(by: RootUniqueWhere!, filter: RootWhere): RootDeleteResult!
   updateRoot(by: RootUniqueWhere!, filter: RootWhere, data: RootUpdateInput!): RootUpdateResult!
   upsertRoot(by: RootUniqueWhere!, filter: RootWhere, update: RootUpdateInput!, create: RootCreateInput!): RootUpsertResult!
-  query: QueryPortal
-}
-
-type QueryPortal {
-  getOneHasManyEntity(by: OneHasManyEntityUniqueWhere!, filter: OneHasManyEntityWhere): OneHasManyEntity
-  listOneHasManyEntity(filter: OneHasManyEntityWhere, orderBy: [OneHasManyEntityOrderBy!], offset: Int, limit: Int): [OneHasManyEntity!]!
-  paginateOneHasManyEntity(filter: OneHasManyEntityWhere, orderBy: [OneHasManyEntityOrderBy!], skip: Int, first: Int): OneHasManyEntityConnection!
-  validateCreateOneHasManyEntity(data: OneHasManyEntityCreateInput!): _ValidationResult!
-  validateUpdateOneHasManyEntity(by: OneHasManyEntityUniqueWhere!, data: OneHasManyEntityUpdateInput!): _ValidationResult!
-  getRoot(by: RootUniqueWhere!, filter: RootWhere): Root
-  listRoot(filter: RootWhere, orderBy: [RootOrderBy!], offset: Int, limit: Int): [Root!]!
-  paginateRoot(filter: RootWhere, orderBy: [RootOrderBy!], skip: Int, first: Int): RootConnection!
-  validateCreateRoot(data: RootCreateInput!): _ValidationResult!
-  validateUpdateRoot(by: RootUniqueWhere!, data: RootUpdateInput!): _ValidationResult!
-  transaction: QueryTransaction
-  _info: Info
+  query: Query
 }
 
 input MutationTransactionOptions {

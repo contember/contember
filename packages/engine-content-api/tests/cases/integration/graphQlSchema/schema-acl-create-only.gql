@@ -158,7 +158,7 @@ type Mutation {
   createPostLocale(data: PostLocaleCreateInput!): PostLocaleCreateResult!
   createCategory(data: CategoryCreateInput!): CategoryCreateResult!
   transaction(options: MutationTransactionOptions): MutationTransaction!
-  query: QueryPortal!
+  query: Query!
 }
 
 type AuthorCreateResult implements MutationResult {
@@ -221,16 +221,7 @@ type MutationTransaction {
   createPost(data: PostCreateInput!): PostCreateResult!
   createPostLocale(data: PostLocaleCreateInput!): PostLocaleCreateResult!
   createCategory(data: CategoryCreateInput!): CategoryCreateResult!
-  query: QueryPortal
-}
-
-type QueryPortal {
-  validateCreateAuthor(data: AuthorCreateInput!): _ValidationResult!
-  validateCreatePost(data: PostCreateInput!): _ValidationResult!
-  validateCreatePostLocale(data: PostLocaleCreateInput!): _ValidationResult!
-  validateCreateCategory(data: CategoryCreateInput!): _ValidationResult!
-  transaction: QueryTransaction
-  _info: Info
+  query: Query
 }
 
 input MutationTransactionOptions {

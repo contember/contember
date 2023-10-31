@@ -1,4 +1,5 @@
 import { useExpectSameValueReference, useOnWindowResize, useReferentiallyStableCallback } from '@contember/react-utils'
+import { getElementDimensionsCallback } from '@contember/utilities'
 import deepEqual from 'fast-deep-equal/es6/index.js'
 import { ReactNode, memo, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { SafeAreaInsetsContext, useContainerInsetsContext } from './Contexts'
@@ -28,16 +29,20 @@ export const SafeAreaInsetsProvider = memo(({ children, insets: insetsProp }: Sa
 	const [rects, setRects] = useState(getInitialScreenRectsState())
 	const nativeInsetsElementRef = useRef<HTMLDivElement>(null)
 
+	const maybeSetNewRects = useReferentiallyStableCallback((safeArea: DOMRectReadOnly) => {
+		const next = {
+			screen: getScreenInnerBoundingRect(),
+			safeArea,
+		}
+
+		if (!deepEqual(next, rects)) {
+			setRects(next)
+		}
+	})
+
 	const getNativeInsets = useReferentiallyStableCallback(() => {
 		if (nativeInsetsElementRef.current) {
-			const next = {
-				screen: getScreenInnerBoundingRect(),
-				safeArea: nativeInsetsElementRef.current.getBoundingClientRect(),
-			}
-
-			if (!deepEqual(next, rects)) {
-				setRects(next)
-			}
+			getElementDimensionsCallback(nativeInsetsElementRef.current, maybeSetNewRects)
 		}
 	})
 

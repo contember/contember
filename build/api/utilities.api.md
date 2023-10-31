@@ -115,6 +115,12 @@ export function filterThemedClassName(nestedClassName: NestedClassName, defaultC
 // @public (undocumented)
 export function flatClassNameList(className: NestedClassName): string[];
 
+// @public
+export function getElementDimensions(element: HTMLElement): Promise<DOMRectReadOnly>;
+
+// @public
+export function getElementDimensionsCallback(element: HTMLElement, callback: (dimensions: DOMRectReadOnly) => void): void;
+
 // @public (undocumented)
 export function getMatchingParentElement(element: HTMLElement | null, predicate: (element: HTMLElement | null) => boolean | Promise<boolean>): HTMLElement;
 

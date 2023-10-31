@@ -1,4 +1,4 @@
-import { assert } from '@contember/utilities'
+import { assert, getElementDimensions } from '@contember/utilities'
 import { useLayoutEffect, useMemo, useState } from 'react'
 import { useScopedConsoleRef } from '../debug-context'
 import { useReferentiallyStableCallback } from '../referentiallyStable'
@@ -37,9 +37,7 @@ export function useScrollOffsets(refOrElement: RefObjectOrElement<HTMLElement | 
 		const maybeScrollContent = unwrapRefValue(refOrElement) ?? document
 
 		if (maybeScrollContent) {
-			updateScrollOffsetsState(
-				getElementScrollOffsets(maybeScrollContent),
-			)
+			getElementScrollOffsets(maybeScrollContent).then(updateScrollOffsetsState)
 		}
 	})
 
@@ -69,14 +67,15 @@ function getIntrinsicScrollContainer(element: HTMLElement | Document): HTMLEleme
 	}
 }
 
-function getElementScrollOffsets(element: HTMLElement | Document): Offsets {
+async function getElementScrollOffsets(element: HTMLElement | Document): Promise<Offsets> {
 	const isIntrinsicScrolling = isIntrinsicScrollElement(element)
 	const scrollContainer = getIntrinsicScrollContainer(element)
 
 	const { scrollLeft, scrollTop, scrollHeight, scrollWidth } = scrollContainer
+	const { height: scrollContainerHeight, width: scrollContainerWidth } = await getElementDimensions(scrollContainer)
 
-	const height = isIntrinsicScrolling ? window.innerHeight : scrollContainer.offsetHeight
-	const width = isIntrinsicScrolling ? window.innerWidth : scrollContainer.offsetWidth
+	const height = isIntrinsicScrolling ? window.innerHeight : scrollContainerHeight
+	const width = isIntrinsicScrolling ? window.innerWidth : scrollContainerWidth
 
 	const left = Math.round(scrollLeft)
 	const top = Math.round(scrollTop)

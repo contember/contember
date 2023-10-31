@@ -9,7 +9,7 @@ export const useAutoHeightTextArea = (
 	minRows: number,
 	maxRows: number,
 ) => {
-	const measure = useCallback((ref: HTMLTextAreaElement | null, minRows: number, maxRows: number, value: string) => {
+	const measure = useCallback(async (ref: HTMLTextAreaElement | null, minRows: number, maxRows: number) => {
 		if (ref) {
 			const rowsAttribute = ref.rows
 
@@ -23,13 +23,13 @@ export const useAutoHeightTextArea = (
 				let maxHeight: number
 
 				ref.rows = minRows
-				minHeight = ref.offsetHeight
+				minHeight = await ref.getBoundingClientRect().height
 
 				if (maxRows === Infinity) {
 					maxHeight = Infinity
 				} else {
 					ref.rows = maxRows
-					maxHeight = ref.offsetHeight
+					maxHeight = await ref.getBoundingClientRect().height
 				}
 
 				ref.style.height = px(height)
@@ -42,10 +42,10 @@ export const useAutoHeightTextArea = (
 	}, [])
 
 	useOnElementResize(textAreaRef, () => {
-		measure(unwrapRefValue(textAreaRef), minRows, maxRows, value)
+		measure(unwrapRefValue(textAreaRef), minRows, maxRows)
 	})
 
 	useLayoutEffect(() => {
-		measure(unwrapRefValue(textAreaRef), minRows, maxRows, value)
+		measure(unwrapRefValue(textAreaRef), minRows, maxRows)
 	}, [maxRows, measure, minRows, textAreaRef, value])
 }

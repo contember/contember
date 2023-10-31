@@ -1,4 +1,4 @@
-import migration from '../../../src/migrations/2022-10-03-110000-table-on-delete'
+import migration from '../../../src/migrations/2023-09-11-174000-fix-on-delete'
 import { createMigrationBuilder } from '@contember/database-migrations'
 import { assert, test } from 'vitest'
 import { SchemaBuilder } from '@contember/schema-definition'
@@ -25,7 +25,7 @@ test('table-on-delete test', async () => {
 				fromTable: 'post',
 				toColumn: 'id',
 				toTable: 'author',
-				deleteAction: ForeignKeyDeleteAction.restrict,
+				deleteAction: ForeignKeyDeleteAction.cascade,
 			}],
 		})),
 		schemaResolver: () => Promise.resolve(({ ...emptySchema, model: new SchemaBuilder()
@@ -52,6 +52,51 @@ ALTER TABLE "stage_live"."post"
 					REFERENCES "stage_live"."author" ("id") ON DELETE SET NULL DEFERRABLE INITIALLY IMMEDIATE
 				;
 `,
+	)
+})
+
+
+test('table-on-delete test valid', async () => {
+	const builder = createMigrationBuilder()
+	const connection = createConnectionMock([{
+		sql: 'select schema from stage',
+		response: { rows: [{ schema: 'stage_live' }] },
+	}])
+	await migration(builder, {
+		connection: connection,
+		databaseMetadataResolver: () => Promise.resolve(createDatabaseMetadata({
+			indexes: [],
+			uniqueConstraints: [],
+			foreignKeys: [{
+				constraintName: 'fk_post_author_id_author_id',
+				fromColumn: 'author_id',
+				fromTable: 'post',
+				toColumn: 'id',
+				toTable: 'author',
+				deleteAction: ForeignKeyDeleteAction.setnull,
+			}],
+		})),
+		schemaResolver: () => Promise.resolve(({
+			...emptySchema, model: new SchemaBuilder()
+				.entity('Post', entity =>
+					entity.manyHasOne('author', relation => relation.target('Author').onDelete(Model.OnDelete.setNull)),
+				)
+				.entity('Author', entity => entity)
+				.buildSchema(),
+		})),
+		project: {
+			slug: 'test',
+			stages: [
+				{
+					slug: 'prod',
+					name: 'prod',
+				},
+			],
+		},
+	})
+	assert.equal(
+		builder.getSql(),
+		`\n`,
 	)
 })
 

@@ -41,7 +41,7 @@ export class DispatchWorkerSupervisor implements Runnable {
 		})
 
 		const refreshProjectWorker = async (container: ProjectContainer, isReloading: boolean) => {
-			const db = container.systemDatabaseContextFactory.create()
+			const db = container.systemDatabaseContext
 			const current = running.get(container.project.slug)
 			if (current && current.container === container) {
 				return

@@ -72,8 +72,8 @@ export const executeDbTest = async (test: Test) => {
 	await connection.end()
 
 	const projectConnection = createConnection(projectDbCredentials)
-	const databaseContextFactory = new DatabaseContextFactory('system', projectConnection, providers)
-	const db = databaseContextFactory.create()
+	const databaseContextFactory = new DatabaseContextFactory('system', providers)
+	const db = databaseContextFactory.create(projectConnection)
 
 	const projectConfigWithDb = {
 		slug: 'test',
@@ -91,7 +91,7 @@ export const executeDbTest = async (test: Test) => {
 		} as unknown as SchemaDatabaseMetadataResolver,
 	)
 	const stageCreator = new StageCreator()
-	const projectInitializer = new ProjectInitializer(stageCreator, systemMigrationsRunner, databaseContextFactory, projectConfigWithDb)
+	const projectInitializer = new ProjectInitializer(stageCreator, systemMigrationsRunner, db, projectConfigWithDb)
 
 	await projectInitializer.initialize(createLogger(new NullLoggerHandler()))
 

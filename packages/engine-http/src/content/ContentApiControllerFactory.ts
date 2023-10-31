@@ -31,7 +31,7 @@ export class ContentApiControllerFactory {
 				project: project.slug,
 			})
 
-			const systemDatabase = projectContainer.systemDatabaseContextFactory.create()
+			const systemDatabase = projectContainer.systemReadDatabaseContext
 			const stage = await systemDatabase.queryHandler.fetch(new StageBySlugQuery(params.stageSlug))
 			if (!stage) {
 				return new HttpErrorResponse(404, `Stage ${params.stageSlug} NOT found`)

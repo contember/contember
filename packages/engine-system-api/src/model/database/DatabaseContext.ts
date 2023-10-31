@@ -15,12 +15,11 @@ export interface DatabaseContext<ConnectionType extends Connection.ConnectionLik
 export class DatabaseContextFactory {
 	constructor(
 		public readonly schemaName: string,
-		private readonly connection: Connection,
 		private readonly providers: UuidProvider,
 	) {}
 
-	public create(connection?: Connection.ConnectionLike): DatabaseContext {
-		const client = new Client(connection ?? this.connection, this.schemaName, { module: 'system' })
+	public create(connection: Connection.ConnectionLike): DatabaseContext {
+		const client = new Client(connection, this.schemaName, { module: 'system' })
 		return createDatabaseContext(client, this.providers)
 	}
 }

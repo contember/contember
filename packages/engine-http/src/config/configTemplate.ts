@@ -27,6 +27,14 @@ export const configTemplate: any = {
 			password: `%tenant.env.DB_PASSWORD%`,
 			database: `%tenant.env.DB_NAME%`,
 			...createDbConfigTemplate('tenant.env.DB'),
+			read: {
+				host: `%?tenant.env.DB_READ_HOST%`,
+				port: `%?tenant.env.DB_READ_PORT::number%`,
+				user: `%?tenant.env.DB_READ_USER%`,
+				password: `%?tenant.env.DB_READ_PASSWORD%`,
+				database: `%?tenant.env.DB_READ_NAME%`,
+				...createDbConfigTemplate('tenant.env.DB_READ'),
+			},
 		},
 		mailer: {
 			from: '%?tenant.env.MAILER_FROM%',

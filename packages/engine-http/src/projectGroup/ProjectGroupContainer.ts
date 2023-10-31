@@ -30,7 +30,6 @@ export interface ProjectGroupContainer {
 	projectInitializer: ProjectInitializerInterface
 
 	tenantContainer: TenantContainer
-	tenantDatabase: DatabaseContext
 	tenantGraphQLHandler: TenantGraphQLHandler
 
 	systemContainer: SystemContainer
@@ -69,11 +68,24 @@ export class ProjectGroupContainerFactory {
 				config.db)
 			.addService('tenantConnection', ({ tenantDbCredentials, logger }): Connection.ConnectionType =>
 				Connection.create(tenantDbCredentials, err => logger.error(err)))
+			.addService('tenantReadConnection', ({ tenantDbCredentials, logger, tenantConnection }) => {
+				if (!tenantDbCredentials.read) {
+					return tenantConnection
+				}
+				return Connection.create({
+					...tenantDbCredentials,
+					...tenantDbCredentials.read,
+					pool: {
+						...tenantDbCredentials.pool,
+						...tenantDbCredentials.read.pool,
+					},
+				}, err => logger.error(err))
+			})
 			.addService('projectSchemaResolver', () =>
 				new ProjectSchemaResolverProxy())
 			.addService('projectInitializer', () =>
 				new ProjectInitializerProxy())
-			.addService('tenantContainer', ({ tenantConnection, tenantDbCredentials, projectSchemaResolver, projectInitializer }) => {
+			.addService('tenantContainer', ({ tenantConnection, tenantReadConnection, tenantDbCredentials, projectSchemaResolver, projectInitializer }) => {
 				const encryptionKey = config.secrets.encryptionKey
 					? createSecretKey(Buffer.from(config.secrets.encryptionKey, 'hex'))
 					: undefined
@@ -81,6 +93,7 @@ export class ProjectGroupContainerFactory {
 				const cryptoWrapper = new CryptoWrapper(encryptionKey)
 				return this.tenantContainerFactory.create({
 					connection: tenantConnection,
+					readConnection: tenantReadConnection,
 					dbCredentials: tenantDbCredentials,
 					mailOptions: config.mailer,
 					tenantCredentials: config.credentials,
@@ -94,6 +107,8 @@ export class ProjectGroupContainerFactory {
 			})
 			.addService('tenantDatabase', ({ tenantContainer }) =>
 				tenantContainer.databaseContext)
+			.addService('tenantReadDatabase', ({ tenantContainer }) =>
+				tenantContainer.readDatabaseContext)
 			.addService('identityFetcher', ({ tenantContainer: { identityFetcher } }) =>
 				identityFetcher)
 			.addService('systemContainer', ({ identityFetcher }) =>
@@ -104,12 +119,14 @@ export class ProjectGroupContainerFactory {
 				this.projectContainerFactoryFactory.create(schemaVersionBuilder, logger))
 			.addService('tenantProjectManager', ({ tenantContainer }) =>
 				tenantContainer.projectManager)
-			.addService('projectContainerResolver', ({ projectContainerFactory, tenantProjectManager, tenantContainer }) =>
+			.addService('tenantProjectMemberManager', ({ tenantContainer }) =>
+				tenantContainer.projectMemberManager)
+			.addService('projectContainerResolver', ({ projectContainerFactory, tenantProjectManager, tenantReadDatabase }) =>
 				new ProjectContainerResolver(
 					projectContainerFactory,
 					this.projectConfigResolver,
 					tenantProjectManager,
-					tenantContainer.databaseContext,
+					tenantReadDatabase,
 					config,
 				))
 
@@ -123,10 +140,10 @@ export class ProjectGroupContainerFactory {
 				this.tenantGraphQLHandlerFactory.create(tenantContainer.resolvers))
 			.addService('systemGraphQLHandler', ({ systemContainer }) =>
 				this.systemGraphQLHandlerFactory.create(systemContainer.systemResolversFactory))
-			.addService('authenticator', ({ tenantDatabase, tenantContainer }) =>
-				new Authenticator(tenantDatabase, tenantContainer.apiKeyManager))
-			.addService('projectMembershipResolver', ({ tenantContainer }) =>
-				new ProjectMembershipResolver(this.debug, new ProjectMembershipFetcher(tenantContainer.projectMemberManager, tenantContainer.databaseContext)))
+			.addService('authenticator', ({ tenantDatabase, tenantReadDatabase, tenantContainer }) =>
+				new Authenticator(tenantDatabase, tenantReadDatabase, tenantContainer.apiKeyManager))
+			.addService('projectMembershipResolver', ({ tenantProjectMemberManager, tenantReadDatabase }) =>
+				new ProjectMembershipResolver(this.debug, new ProjectMembershipFetcher(tenantProjectMemberManager, tenantReadDatabase)))
 			.build()
 			.pick(
 				'projectContainerResolver',
@@ -135,7 +152,6 @@ export class ProjectGroupContainerFactory {
 				'systemContainer',
 				'systemGraphQLHandler',
 				'tenantContainer',
-				'tenantDatabase',
 				'authenticator',
 				'projectMembershipResolver',
 				'tenantGraphQLHandler',

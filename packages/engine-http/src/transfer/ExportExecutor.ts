@@ -32,7 +32,7 @@ export class ExportExecutor {
 	async* export(request: ExportRequest, projectContainers: Record<string, ProjectContainer>): AsyncIterable<Command> {
 		for (const project of request.projects) {
 			const projectContainer = projectContainers[project.slug]
-			const systemContext = projectContainer.systemDatabaseContextFactory.create()
+			const systemContext = projectContainer.systemDatabaseContext
 
 			if (project.system) {
 				const systemMapping = this.systemSchemaTransferMappingFactory.build()

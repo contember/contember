@@ -1,10 +1,9 @@
 import { SystemMigrationsRunner } from '../migrations'
 import { DatabaseContextFactory, emptyVersionedSchema, SchemaVersionBuilder } from '../model'
-import { Connection } from '@contember/database'
 import { createLogger, PrettyPrintLoggerHandler } from '@contember/logger'
 
 
-import { SchemaDatabaseMetadataResolver } from '../model/metadata/SchemaDatabaseMetadataResolver'
+import { SchemaDatabaseMetadataResolver } from '../model'
 import { dummySchemaDatabaseMetadata } from '@contember/schema-utils';
 
 (async () => {
@@ -15,10 +14,8 @@ import { dummySchemaDatabaseMetadata } from '@contember/schema-utils';
 		user: process.env.PGUSER as string,
 		port: process.env.PGPORT ? Number(process.env.PGPORT) : 5432,
 	}
-	// eslint-disable-next-line no-console
-	const connection = Connection.createSingle(dbConfig, err => console.error(err))
 	const migrationsRunner = new SystemMigrationsRunner(
-		new DatabaseContextFactory('system', connection, {
+		new DatabaseContextFactory('system', {
 			uuid: () => {
 				throw new Error()
 			},

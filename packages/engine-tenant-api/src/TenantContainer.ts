@@ -7,7 +7,6 @@ import {
 	ApiKeyService,
 	AppleProvider,
 	DatabaseContext,
-	DatabaseContextFactory,
 	EmailValidator,
 	FacebookProvider,
 	Identity,
@@ -89,12 +88,15 @@ export interface TenantContainer {
 	authorizator: Authorizator<Identity>
 	identityFetcher: IdentityFetcher
 	databaseContext: DatabaseContext
+	readDatabaseContext: DatabaseContext
 	migrationsRunner: TenantMigrationsRunner
 	connection: Connection.ConnectionType
+	readConnection: Connection.ConnectionType
 }
 
 export interface TenantContainerArgs {
 	connection: Connection.ConnectionType
+	readConnection: Connection.ConnectionType
 	dbCredentials: DatabaseConfig
 	mailOptions: MailerOptions
 	projectSchemaResolver: ProjectSchemaResolver
@@ -121,8 +123,10 @@ export class TenantContainerFactory {
 				'resolverContextFactory',
 				'identityFetcher',
 				'databaseContext',
+				'readDatabaseContext',
 				'migrationsRunner',
 				'connection',
+				'readConnection',
 			)
 	}
 
@@ -264,8 +268,12 @@ export class TenantContainerFactory {
 				new ResolverFactory(container).create())
 			.addService('connection', () =>
 				args.connection)
+			.addService('readConnection', () =>
+				args.readConnection)
 			.addService('databaseContext', ({ connection, providers }) =>
-				new DatabaseContextFactory(connection, providers).create())
+				new DatabaseContext(connection.createClient('tenant', { module: 'tenant' }), providers))
+			.addService('readDatabaseContext', ({ readConnection, providers }) =>
+				new DatabaseContext(readConnection.createClient('tenant', { module: 'tenant' }), providers))
 			.addService('identityFetcher', ({ databaseContext }) =>
 				new IdentityFetcher(databaseContext.client))
 			.addService('migrationsRunner', ({ providers }) =>

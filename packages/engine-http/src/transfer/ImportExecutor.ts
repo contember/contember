@@ -100,7 +100,7 @@ export class ImportExecutor {
 	private async importContentSchemaBegin(groupContainer: ProjectGroupContainer, authResult: AuthResult, it: CommandIterator<'importContentSchemaBegin'>) {
 		const [options] = it.commandArgs
 		const projectContainer = await this.createProjectContainer(groupContainer, options.project)
-		const systemDatabaseContext = projectContainer.systemDatabaseContextFactory.create()
+		const systemDatabaseContext = projectContainer.systemDatabaseContext
 		const stage = await this.fetchStageBySlug(systemDatabaseContext, options.project, options.stage)
 
 		const contentSchema = await projectContainer.contentSchemaResolver.getSchema(systemDatabaseContext, stage.slug)
@@ -143,7 +143,7 @@ export class ImportExecutor {
 		}
 
 		await this.requireImportAccess(groupContainer, schema, authResult, options.project, 'system')
-		const systemDatabaseContext = projectContainer.systemDatabaseContextFactory.create()
+		const systemDatabaseContext = projectContainer.systemDatabaseContext
 		const mapping = this.systemSchemaTransferMappingFactory.build()
 
 		return await systemDatabaseContext.client.transaction(async db => {

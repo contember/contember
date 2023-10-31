@@ -19,7 +19,7 @@ const tenantConfig = {
 		read: { host: 'c0.cluster-ro-abc.eu-west-1.rds.amazonaws.com' },
 	},
 }
-it('resolves tenant config config', () => {
+it('resolves tenant config', () => {
 	const tenantResolver = createTenantConfigResolver(env, configTemplate.tenant)
 	const resolvedTenantConfig = tenantResolver('test', tenantConfig)
 	assert.deepEqual(resolvedTenantConfig, {
@@ -31,11 +31,14 @@ it('resolves tenant config config', () => {
 			database: 'p_test_e',
 			connectionTimeoutMs: 5000,
 			pool: { maxConnections: 1000, maxConnecting: 10, idleTimeoutMs: 60000 },
-			read: { host: 'c0.cluster-ro-abc.eu-west-1.rds.amazonaws.com' },
+			read: {
+				host: 'c0.cluster-ro-abc.eu-west-1.rds.amazonaws.com',
+				pool: {},
+			},
 		}, mailer: {}, credentials: {}, secrets: {},
 	})
 })
-it('resolves project config config', () => {
+it('resolves project config', () => {
 	const tenantResolver = createTenantConfigResolver(env, configTemplate.tenant)
 	const resolvedTenantConfig = tenantResolver('test', tenantConfig)
 
@@ -59,7 +62,10 @@ it('resolves project config config', () => {
 			database: 'p_test_e',
 			connectionTimeoutMs: 5000,
 			pool: { maxConnections: 1000, maxConnecting: 10, idleTimeoutMs: 60000 },
-			read: { host: 'c0.cluster-ro-abc.eu-west-1.rds.amazonaws.com' },
+			read: {
+				host: 'c0.cluster-ro-abc.eu-west-1.rds.amazonaws.com',
+				pool: {},
+			},
 			useTenantDb: true,
 			systemSchema: 'system_test_e',
 		},

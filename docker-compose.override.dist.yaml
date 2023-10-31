@@ -5,3 +5,55 @@ services:
   api:
     ports:
       - 127.0.0.1:7000:4000
+
+#---- project groups
+#services:
+#  api:
+#    environment:
+#       CONTEMBER_PROJECT_GROUP_DOMAIN_MAPPING: '^api-([^.]+)\..+'
+#       CONTEMBER_PROJECT_GROUP_CONFIG_HEADER: 'X-Contember-Project-Group-Config'
+#       CONTEMBER_PROJECT_GROUP_CONFIG_ENCRYPTION_KEY: '0000000000000000000000000000000000000000000000000000000000000000'
+
+# --- replicas setup
+#services:
+#  db:
+#    image: bitnami/postgresql:14
+#    restart: unless-stopped
+#    environment:
+#      POSTGRESQL_USERNAME: contember
+#      POSTGRESQL_PASSWORD: contember
+#      POSTGRESQL_DATABASE: contember
+#      POSTGRESQL_REPLICATION_MODE: master
+#      POSTGRESQL_REPLICATION_USER: contember_repl
+#      POSTGRESQL_REPLICATION_PASSWORD: contember_repl
+#      POSTGRESQL_PGAUDIT_LOG: READ,WRITE
+#    volumes:
+#      - pgsql-data:/var/lib/postgresql/data
+#    healthcheck:
+#      test: [ 'CMD-SHELL', 'pg_isready -U contember' ]
+#      interval: 5s
+#      timeout: 5s
+#      retries: 10
+#
+#  db_replica:
+#    image: bitnami/postgresql:14
+#    restart: unless-stopped
+#    environment:
+#      POSTGRESQL_USERNAME: contember
+#      POSTGRESQL_PASSWORD: contember
+#      POSTGRESQL_MASTER_HOST: db
+#      POSTGRESQL_MASTER_PORT_NUMBER: 5432
+#      POSTGRESQL_REPLICATION_MODE: slave
+#      POSTGRESQL_REPLICATION_USER: contember_repl
+#      POSTGRESQL_REPLICATION_PASSWORD: contember_repl
+#      POSTGRESQL_PGAUDIT_LOG: READ,WRITE
+#    ports:
+#      - "5433:5432"
+#    volumes:
+#      - pgsql-read-data:/var/lib/postgresql/data
+#    depends_on:
+#      - db
+#  api:
+#      DEFAULT_DB_READ_HOST: 'db_replica'
+#volumes:
+#  pgsql-read-data: ~

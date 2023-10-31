@@ -44,7 +44,7 @@ export class ExportApiControllerFactory {
 					throw new HttpErrorResponse(400, `Project ${project.slug} NOT found`)
 				}
 
-				const systemContext = projectContainer.systemDatabaseContextFactory.create()
+				const systemContext = projectContainer.systemReadDatabaseContext
 				const schema = await projectContainer.contentSchemaResolver.getSchema(systemContext, project.slug)
 				const { effective: memberships } = await timer('MembershipFetch', () => projectGroup.projectMembershipResolver.resolveMemberships({
 					request: { get: () => '' },

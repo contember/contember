@@ -12,7 +12,7 @@ export class ProjectSchemaResolver implements ProjectSchemaResolverInterface {
 		if (!container) {
 			return undefined
 		}
-		const db = container.systemDatabaseContextFactory.create()
+		const db = container.systemReadDatabaseContext
 		return container.contentSchemaResolver.getSchema(db)
 	}
 }

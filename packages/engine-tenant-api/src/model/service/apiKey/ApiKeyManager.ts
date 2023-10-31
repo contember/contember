@@ -21,9 +21,10 @@ export class ApiKeyManager {
 
 	async verifyAndProlong(
 		dbContext: DatabaseContext,
+		readDbContext: DatabaseContext,
 		token: string,
 	): Promise<VerifyResponse> {
-		const apiKeyRow = await dbContext.queryHandler.fetch(new ApiKeyByTokenQuery(token))
+		const apiKeyRow = await readDbContext.queryHandler.fetch(new ApiKeyByTokenQuery(token))
 		if (apiKeyRow === null) {
 			return new ResponseError(VerifyErrorCode.NOT_FOUND, 'API key was not found')
 		}
@@ -42,7 +43,12 @@ export class ApiKeyManager {
 
 		setImmediate(async () => {
 			await dbContext.commandBus.execute(
-				new ProlongApiKeyCommand(apiKeyRow.id, apiKeyRow.type, apiKeyRow.expiration || undefined),
+				new ProlongApiKeyCommand(
+					apiKeyRow.id,
+					apiKeyRow.type,
+					apiKeyRow.expiration,
+					apiKeyRow.expires_at,
+				),
 			)
 		})
 

@@ -2,8 +2,10 @@ import {
 	GraphQLBoolean,
 	GraphQLFieldConfig,
 	GraphQLInputObjectType,
+	GraphQLNamedType,
 	GraphQLNonNull,
-	GraphQLObjectType, GraphQLSchema,
+	GraphQLObjectType,
+	GraphQLSchema,
 	GraphQLSchemaConfig,
 	GraphQLString,
 } from 'graphql'
@@ -14,6 +16,12 @@ import { ValidationQueriesProvider } from './ValidationQueriesProvider'
 import { Context } from '../types'
 import { ResultSchemaTypeProvider } from './ResultSchemaTypeProvider'
 
+type BuildArgs = {
+	queries?: Map<string, GraphQLFieldConfig<any, Context, any>>
+	mutations?: Map<string, GraphQLFieldConfig<any, Context, any>>
+	types?: GraphQLNamedType[]
+}
+
 export class GraphQlSchemaBuilder {
 	constructor(
 		private readonly schema: Model.Schema,
@@ -23,13 +31,13 @@ export class GraphQlSchemaBuilder {
 		private readonly resultSchemaTypeProvider: ResultSchemaTypeProvider,
 	) {}
 
-	public build(): GraphQLSchema {
-		return new GraphQLSchema(this.buildConfig())
+	public build(args: BuildArgs = {}): GraphQLSchema {
+		return new GraphQLSchema(this.buildConfig(args))
 	}
 
-	public buildConfig(): GraphQLSchemaConfig {
-		const queries = new Map<string, GraphQLFieldConfig<any, Context, any>>()
-		const mutations = new Map<string, GraphQLFieldConfig<any, Context, any>>()
+	private buildConfig(args: BuildArgs): GraphQLSchemaConfig {
+		const queries = new Map<string, GraphQLFieldConfig<any, Context, any>>(args.queries)
+		const mutations = new Map<string, GraphQLFieldConfig<any, Context, any>>(args.mutations)
 		for (const entity of Object.values(this.schema.entities)) {
 			const queryFields = this.queryProvider.getQueries(entity)
 			for (const name in queryFields) {
@@ -60,7 +68,7 @@ export class GraphQlSchemaBuilder {
 			})
 		}
 		const queryObjectType = new GraphQLObjectType({
-			name: 'QueryPortal',
+			name: 'Query',
 			fields: () => Object.fromEntries(queries),
 		})
 		if (mutations.size > 0) {
@@ -122,10 +130,8 @@ export class GraphQlSchemaBuilder {
 
 
 		return {
-			query: new GraphQLObjectType({
-				name: 'Query',
-				fields: () => Object.fromEntries(queries),
-			}),
+			query: queryObjectType,
+			types: args.types,
 			...(mutations.size > 0
 				? {
 					mutation: new GraphQLObjectType({

@@ -1,5 +1,6 @@
 import {
 	Authorizator,
+	Context,
 	EntityRulesResolver,
 	GraphQlSchemaBuilderFactory,
 	IntrospectionSchemaDefinitionFactory,
@@ -7,7 +8,7 @@ import {
 	PermissionFactory,
 } from '@contember/engine-content-api'
 import { Acl, Schema } from '@contember/schema'
-import { GraphQLFieldConfigMap, GraphQLNamedType, GraphQLObjectType, GraphQLSchema } from 'graphql'
+import { GraphQLFieldConfig, GraphQLNamedType, GraphQLSchema } from 'graphql'
 import { GraphQLSchemaContributor } from './GraphQLSchemaContributor'
 import { Identity } from './Identity'
 import { ContentApiSpecificCache } from './ContentApiSpecificCache'
@@ -34,54 +35,45 @@ export class GraphQlSchemaFactory {
 
 			const authorizator = new Authorizator(permissions, schema.acl.customPrimary ?? false)
 			const dataSchemaBuilder = this.graphqlSchemaBuilderFactory.create(schema.model, authorizator)
-			const contentSchemaFactory = new IntrospectionSchemaDefinitionFactory(
+			const introspectionSchemaFactory = new IntrospectionSchemaDefinitionFactory(
 				new IntrospectionSchemaFactory(
 					schema.model,
 					new EntityRulesResolver(schema.validation, schema.model),
 					authorizator,
 				),
 			)
-			const dataSchema = dataSchemaBuilder.buildConfig()
-			const contentSchema = contentSchemaFactory.createConfig()
+			const introspectionSchema = introspectionSchemaFactory.createConfig()
 
 			const otherSchemas = this.schemaContributors
 				.map(it => it.createSchema({ schema, identity }))
 				.filter(<T>(it: T | undefined): it is T => it !== undefined)
 
-			const queries: GraphQLFieldConfigMap<any, any> = {}
-			const mutations: GraphQLFieldConfigMap<any, any> = {}
+			const queries = new Map<string, GraphQLFieldConfig<any, Context, any>>()
+			const mutations = new Map<string, GraphQLFieldConfig<any, Context, any>>()
 			const types: GraphQLNamedType[] = []
 
-			for (const schema of [dataSchema, contentSchema, ...otherSchemas]) {
+			for (const schema of [introspectionSchema, ...otherSchemas]) {
 				if (schema instanceof GraphQLSchema) {
 					for (const [field, config] of Object.entries(schema.getQueryType()?.toConfig().fields ?? {})) {
-						queries[field] = config
+						queries.set(field, config)
 					}
 					for (const [field, config] of Object.entries(schema.getQueryType()?.toConfig().fields ?? {})) {
-						mutations[field] = config
+						mutations.set(field, config)
 					}
 				} else {
 					for (const [field, config] of Object.entries(schema.query?.toConfig().fields ?? {})) {
-						queries[field] = config
+						queries.set(field, config)
 					}
 					for (const [field, config] of Object.entries(schema.mutation?.toConfig().fields ?? {})) {
-						mutations[field] = config
+						mutations.set(field, config)
 					}
 					types.push(...(schema.types ?? []))
 				}
 			}
 
-			const graphQlSchema = new GraphQLSchema({
-				query: new GraphQLObjectType({
-					name: 'Query',
-					fields: queries,
-				}),
-				...(Object.keys(mutations).length > 0 ? {
-					mutation: new GraphQLObjectType({
-						name: 'Mutation',
-						fields: mutations,
-					}),
-				} : {}),
+			const graphQlSchema = dataSchemaBuilder.build({
+				mutations,
+				queries,
 				types,
 			})
 

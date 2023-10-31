@@ -152,7 +152,7 @@ type Mutation {
   updateAuthor(by: AuthorUniqueWhere!, filter: AuthorWhere, data: AuthorUpdateInput!): AuthorUpdateResult!
   upsertAuthor(by: AuthorUniqueWhere!, filter: AuthorWhere, update: AuthorUpdateInput!, create: AuthorCreateInput!): AuthorUpsertResult!
   transaction(options: MutationTransactionOptions): MutationTransaction!
-  query: QueryPortal!
+  query: Query!
 }
 
 type AuthorCreateResult implements MutationResult {
@@ -218,17 +218,7 @@ type MutationTransaction {
   deleteAuthor(by: AuthorUniqueWhere!, filter: AuthorWhere): AuthorDeleteResult!
   updateAuthor(by: AuthorUniqueWhere!, filter: AuthorWhere, data: AuthorUpdateInput!): AuthorUpdateResult!
   upsertAuthor(by: AuthorUniqueWhere!, filter: AuthorWhere, update: AuthorUpdateInput!, create: AuthorCreateInput!): AuthorUpsertResult!
-  query: QueryPortal
-}
-
-type QueryPortal {
-  getAuthor(by: AuthorUniqueWhere!, filter: AuthorWhere): Author
-  listAuthor(filter: AuthorWhere, orderBy: [AuthorOrderBy!], offset: Int, limit: Int): [Author!]!
-  paginateAuthor(filter: AuthorWhere, orderBy: [AuthorOrderBy!], skip: Int, first: Int): AuthorConnection!
-  validateCreateAuthor(data: AuthorCreateInput!): _ValidationResult!
-  validateUpdateAuthor(by: AuthorUniqueWhere!, data: AuthorUpdateInput!): _ValidationResult!
-  transaction: QueryTransaction
-  _info: Info
+  query: Query
 }
 
 input MutationTransactionOptions {

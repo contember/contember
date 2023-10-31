@@ -16,40 +16,37 @@ export function useOnElementResize(
 
 	useLayoutEffect(() => {
 		const element = unwrapRefValue(refOrElement)
+		if (!element) {
+			return
+		}
+		if (!(element instanceof HTMLElement)) {
+			throw new Error('Exhaustive error: Expecting element to be instance of HTMLElement')
+		}
 
-		if (element) {
-			if (element instanceof HTMLElement) {
-				let timeoutID: number | undefined = undefined
+		let timeoutID: number | undefined = undefined
 
-				function debouncedOnChange([entry]: ResizeObserverEntry[]) {
-					const timeStamp = Date.now()
-					const delta = timeStamp - lastTimeStamp.current
+		function debouncedOnChange([entry]: ResizeObserverEntry[]) {
+			const timeStamp = Date.now()
+			const delta = timeStamp - lastTimeStamp.current
 
-					if (delta > timeout) {
-						scopedConsoleRef.current.warned('element.resize:immediate', null)
-						callbackRef.current(entry)
-						lastTimeStamp.current = timeStamp
-					} else {
-						clearTimeout(timeoutID)
-						timeoutID = setTimeout(() => {
-							scopedConsoleRef.current.warned('element.resize:debounced', null)
-							callbackRef.current(entry)
-							lastTimeStamp.current = timeStamp
-						}, timeout)
-					}
-				}
+			clearTimeout(timeoutID)
+			const timeoutFinal = delta > timeout ? 0 : timeout
 
-				const resizeObserver = new ResizeObserver(debouncedOnChange)
+			timeoutID = setTimeout(() => {
+				const message = timeoutFinal > 0 ? 'element.resize:debounced' : 'element.resize:immediate'
+				scopedConsoleRef.current.warned(message, null)
+				callbackRef.current(entry)
+				lastTimeStamp.current = timeStamp
+			}, timeoutFinal)
+		}
 
-				resizeObserver.observe(element, { box })
+		const resizeObserver = new ResizeObserver(debouncedOnChange)
 
-				return () => {
-					clearTimeout(timeoutID)
-					resizeObserver.unobserve(element)
-				}
-			} else {
-				throw new Error('Exhaustive error: Expecting element to be instance of HTMLElement')
-			}
+		resizeObserver.observe(element, { box })
+
+		return () => {
+			clearTimeout(timeoutID)
+			resizeObserver.unobserve(element)
 		}
 	}, [box, refOrElement, scopedConsoleRef, timeout])
 }

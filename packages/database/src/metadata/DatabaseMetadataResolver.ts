@@ -18,6 +18,8 @@ export class DatabaseMetadataResolver {
 				fromTable: it.table_name,
 				toTable: it.target_table,
 				deleteAction: it.delete_action ?? ForeignKeyDeleteAction.noaction,
+				deferred: it.deferred,
+				deferrable: it.deferrable,
 			}))
 		const uniqueConstraints = constraintRows
 			.filter((it): it is UniqueConstraintsRow => it.type === ConstraintTypes.unique)
@@ -25,6 +27,8 @@ export class DatabaseMetadataResolver {
 				constraintName: it.constraint_name,
 				tableName: it.table_name,
 				columnNames: it.columns,
+				deferred: it.deferred,
+				deferrable: it.deferrable,
 			}))
 		const indexes = indexRows
 			.map((it): IndexMetadata => ({
@@ -50,8 +54,8 @@ export class DatabaseMetadataResolver {
                 MAX(pg_constraint_table.relname) AS target_table,
                 JSONB_AGG(DISTINCT pg_attribute_target.attname)
                 FILTER ( WHERE pg_attribute_target.attname IS NOT NULL) AS target_columns,
-                BOOL_OR(condeferrable),
-                BOOL_OR(condeferred),
+                BOOL_OR(condeferrable) as deferrable,
+                BOOL_OR(condeferred) as deferred,
                 MAX(confdeltype) AS delete_action
             FROM pg_constraint
             JOIN pg_class

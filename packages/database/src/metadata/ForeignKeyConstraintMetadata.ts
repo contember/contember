@@ -5,6 +5,8 @@ export interface ForeignKeyConstraintMetadata {
 	toTable: string
 	toColumn: string
 	deleteAction: ForeignKeyDeleteAction
+	deferred: boolean
+	deferrable: boolean
 }
 
 export enum ForeignKeyDeleteAction {
@@ -15,13 +17,7 @@ export enum ForeignKeyDeleteAction {
 	setdefault = 'd'
 }
 
-export interface ForeignKeyFilter {
-	fromTable?: string
-	fromColumn?: string
-	toTable?: string
-	toColumn?: string
-	constraintName?: string
-}
+export type ForeignKeyFilter = Partial<ForeignKeyConstraintMetadata>
 
 export class ForeignKeyConstraintMetadataSet {
 	constructor(
@@ -56,6 +52,15 @@ export class ForeignKeyConstraintMetadataSet {
 				return false
 			}
 			if (filter.constraintName !== undefined && it.constraintName !== filter.constraintName) {
+				return false
+			}
+			if (filter.deferred !== undefined && it.deferred !== filter.deferred) {
+				return false
+			}
+			if (filter.deferrable !== undefined && it.deferrable !== filter.deferrable) {
+				return false
+			}
+			if (filter.deleteAction !== undefined && it.deleteAction !== filter.deleteAction) {
 				return false
 			}
 			return true

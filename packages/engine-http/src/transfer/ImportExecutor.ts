@@ -118,7 +118,8 @@ export class ImportExecutor {
 			await this.lockTables(db, options.tables)
 			await this.truncateTables(db, options.tables)
 
-			const constraintHelper = new ConstraintHelper(db)
+			const metadata = await projectContainer.databaseMetadataResolver.resolveMetadata(db, db.schema)
+			const constraintHelper = new ConstraintHelper(db, metadata)
 			await constraintHelper.setConstraintsDeferred('foreignKey')
 
 			const result = await this.match(await it.next(), {
@@ -149,7 +150,8 @@ export class ImportExecutor {
 		return await systemDatabaseContext.client.transaction(async db => {
 			await this.truncateTables(db, options.tables)
 
-			const constraintHelper = new ConstraintHelper(db)
+			const metadata = await projectContainer.databaseMetadataResolver.resolveMetadata(db, db.schema)
+			const constraintHelper = new ConstraintHelper(db, metadata)
 			await constraintHelper.setConstraintsDeferred('foreignKey')
 
 			return await this.match(await it.next(), {

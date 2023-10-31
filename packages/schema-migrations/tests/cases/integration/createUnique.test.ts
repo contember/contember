@@ -110,6 +110,8 @@ ALTER TABLE "author" ADD UNIQUE ("email") DEFERRABLE;`,
 			constraintName: 'uniq_author_email',
 			columnNames: ['email'],
 			tableName: 'author',
+			deferred: false,
+			deferrable: false,
 		}],
 	}),
 })

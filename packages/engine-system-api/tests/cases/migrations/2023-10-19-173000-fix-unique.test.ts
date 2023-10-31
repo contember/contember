@@ -36,13 +36,12 @@ test('unique fix test', async () => {
 			foreignKeys: [],
 			indexes: [],
 			uniqueConstraints: [
-				{ constraintName: 'valid1', tableName: 'foo', columnNames: ['col_a', 'col_b'] },
-				{ constraintName: 'valid2', tableName: 'foo', columnNames: ['col_b', 'many_has_one_bar_id'] },
-				{ constraintName: 'valid3', tableName: 'foo', columnNames: ['single_col_unique'] },
-				{ constraintName: 'valid4', tableName: 'foo', columnNames: ['has_one_bar_id'] },
-
-				{ constraintName: 'invalid1', tableName: 'foo', columnNames: ['col_a', 'col_c'] },
-				{ constraintName: 'invalid2', tableName: 'foo', columnNames: ['col_c', 'many_has_one_bar_id'] },
+				{ constraintName: 'valid1', tableName: 'foo', columnNames: ['col_a', 'col_b'], deferrable: false, deferred: false },
+				{ constraintName: 'valid2', tableName: 'foo', columnNames: ['col_b', 'many_has_one_bar_id'], deferrable: false, deferred: false },
+				{ constraintName: 'valid3', tableName: 'foo', columnNames: ['single_col_unique'], deferrable: false, deferred: false },
+				{ constraintName: 'valid4', tableName: 'foo', columnNames: ['has_one_bar_id'], deferrable: false, deferred: false },
+				{ constraintName: 'invalid1', tableName: 'foo', columnNames: ['col_a', 'col_c'], deferrable: false, deferred: false },
+				{ constraintName: 'invalid2', tableName: 'foo', columnNames: ['col_c', 'many_has_one_bar_id'], deferrable: false, deferred: false },
 
 			],
 		})),

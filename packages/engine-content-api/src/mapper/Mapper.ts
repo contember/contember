@@ -49,7 +49,7 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		private readonly inserter: Inserter,
 		private readonly pathFactory: PathFactory,
 	) {
-		this.constraintHelper = new ConstraintHelper(db)
+		this.constraintHelper = new ConstraintHelper(db, this.schemaDatabaseMetadata)
 		this.eventManager = new EventManager(this)
 	}
 

@@ -26,6 +26,8 @@ test('table-on-delete test', async () => {
 				toColumn: 'id',
 				toTable: 'author',
 				deleteAction: ForeignKeyDeleteAction.restrict,
+				deferrable: false,
+				deferred: false,
 			}],
 		})),
 		schemaResolver: () => Promise.resolve(({ ...emptySchema, model: new SchemaBuilder()

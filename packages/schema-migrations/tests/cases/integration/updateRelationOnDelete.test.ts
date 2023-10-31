@@ -42,6 +42,8 @@ ALTER TABLE "post" ADD FOREIGN KEY ("category_id") REFERENCES "category"("id") O
 				fromTable: 'post',
 				toColumn: 'id',
 				toTable: 'category',
+				deferred: false,
+				deferrable: false,
 			},
 		],
 		indexes: [],

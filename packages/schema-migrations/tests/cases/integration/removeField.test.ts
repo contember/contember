@@ -75,6 +75,8 @@ testMigrations('remove relation (one has many)', {
 			constraintName: 'uniq_post_locale_post_id_locale',
 			columnNames: ['post_id', 'locale'],
 			tableName: 'post_locale',
+			deferrable: false,
+			deferred: false,
 		}],
 	}),
 })

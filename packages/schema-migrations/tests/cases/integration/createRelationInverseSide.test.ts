@@ -75,6 +75,8 @@ testMigrations('create inverse side relation together with changing onDelete beh
 				fromTable: 'post_locale',
 				toColumn: 'id',
 				toTable: 'post',
+				deferred: false,
+				deferrable: false,
 			},
 		],
 		indexes: [],

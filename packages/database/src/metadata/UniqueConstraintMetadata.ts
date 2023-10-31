@@ -4,13 +4,11 @@ export interface UniqueConstraintMetadata {
 	constraintName: string
 	tableName: string
 	columnNames: string[]
+	deferrable: boolean
+	deferred: boolean
 }
 
-export interface UniqueConstraintFilter {
-	tableName?: string
-	constraintName?: string
-	columnNames?: string[]
-}
+export type UniqueConstraintFilter = Partial<UniqueConstraintMetadata>
 
 export class UniqueConstraintMetadataSet {
 	constructor(
@@ -39,6 +37,12 @@ export class UniqueConstraintMetadataSet {
 				return false
 			}
 			if (filter.columnNames !== undefined && !stringArrayEquals(it.columnNames, filter.columnNames)) {
+				return false
+			}
+			if (filter.deferrable !== undefined && it.deferrable !== filter.deferrable) {
+				return false
+			}
+			if (filter.deferred !== undefined && it.deferred !== filter.deferred) {
 				return false
 			}
 			return true

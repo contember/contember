@@ -39,6 +39,8 @@ testMigrations('convert one has one to many has one relation without inverse sid
 			constraintName: 'uniq_post_image_id',
 			columnNames: ['image_id'],
 			tableName: 'post',
+			deferred: false,
+			deferrable: false,
 		}],
 	}),
 })
@@ -80,6 +82,8 @@ testMigrations('convert one has one to many has one relation with inverse side',
 			constraintName: 'uniq_post_image_id',
 			columnNames: ['image_id'],
 			tableName: 'post',
+			deferred: false,
+			deferrable: false,
 		}],
 	}),
 })

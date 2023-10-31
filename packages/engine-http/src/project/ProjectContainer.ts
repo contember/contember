@@ -36,6 +36,7 @@ export interface ProjectContainer {
 	contentSchemaResolver: ContentSchemaResolver
 	projectInitializer: ProjectInitializer
 	projectDatabaseMetadataResolver: ProjectDatabaseMetadataResolver
+	databaseMetadataResolver: DatabaseMetadataResolver
 }
 
 export class ProjectContainerFactoryFactory {
@@ -88,6 +89,7 @@ export class ProjectContainerFactory {
 				'projectInitializer',
 				'logger',
 				'projectDatabaseMetadataResolver',
+				'databaseMetadataResolver',
 			)
 	}
 

@@ -6,11 +6,7 @@ export interface IndexMetadata {
 	columnNames: string[]
 }
 
-export interface IndexFilter {
-	tableName?: string
-	indexName?: string
-	columnNames?: string[]
-}
+export type IndexFilter = Partial<IndexMetadata>
 
 export class IndexMetadataSet {
 	constructor(

@@ -1,10 +1,13 @@
 import {
-	GraphQLFieldConfig,
 	GraphQLBoolean,
+	GraphQLFieldConfig,
+	GraphQLInputObjectType,
+	GraphQLNamedType,
 	GraphQLNonNull,
 	GraphQLObjectType,
 	GraphQLSchema,
-	GraphQLString, GraphQLInputObjectType,
+	GraphQLSchemaConfig,
+	GraphQLString,
 } from 'graphql'
 import { Model } from '@contember/schema'
 import { MutationProvider } from './MutationProvider'
@@ -12,6 +15,12 @@ import { QueryProvider } from './QueryProvider'
 import { ValidationQueriesProvider } from './ValidationQueriesProvider'
 import { Context } from '../types'
 import { ResultSchemaTypeProvider } from './ResultSchemaTypeProvider'
+
+type BuildArgs = {
+	queries?: Map<string, GraphQLFieldConfig<any, Context, any>>
+	mutations?: Map<string, GraphQLFieldConfig<any, Context, any>>
+	types?: GraphQLNamedType[]
+}
 
 export class GraphQlSchemaBuilder {
 	constructor(
@@ -22,9 +31,13 @@ export class GraphQlSchemaBuilder {
 		private readonly resultSchemaTypeProvider: ResultSchemaTypeProvider,
 	) {}
 
-	public build(): GraphQLSchema {
-		const queries = new Map<string, GraphQLFieldConfig<any, Context, any>>()
-		const mutations = new Map<string, GraphQLFieldConfig<any, Context, any>>()
+	public build(args: BuildArgs = {}): GraphQLSchema {
+		return new GraphQLSchema(this.buildConfig(args))
+	}
+
+	private buildConfig(args: BuildArgs): GraphQLSchemaConfig {
+		const queries = new Map<string, GraphQLFieldConfig<any, Context, any>>(args.queries)
+		const mutations = new Map<string, GraphQLFieldConfig<any, Context, any>>(args.mutations)
 		for (const entity of Object.values(this.schema.entities)) {
 			const queryFields = this.queryProvider.getQueries(entity)
 			for (const name in queryFields) {
@@ -41,11 +54,12 @@ export class GraphQlSchemaBuilder {
 		}
 
 		if (queries.size > 0) {
+			const queryTransactionType = new GraphQLObjectType({
+				name: 'QueryTransaction',
+				fields: Object.fromEntries(queries),
+			})
 			queries.set('transaction', {
-				type: new GraphQLObjectType({
-					name: 'QueryTransaction',
-					fields: Object.fromEntries(queries),
-				}),
+				type: queryTransactionType,
 				resolve: async (parent, args, context: Context, info) => {
 					return context.timer(`GraphQL.query.${info.fieldName}`, () =>
 						context.executionContainer.readResolver.resolveTransaction(info),
@@ -58,33 +72,35 @@ export class GraphQlSchemaBuilder {
 			fields: () => Object.fromEntries(queries),
 		})
 		if (mutations.size > 0) {
+			const mutationTransactionOptions = new GraphQLInputObjectType({
+				name: 'MutationTransactionOptions',
+				fields: {
+					deferForeignKeyConstraints: { type: GraphQLBoolean },
+				},
+			})
+			const mutationTransactionType = new GraphQLObjectType({
+				name: 'MutationTransaction',
+				fields: {
+					ok: { type: new GraphQLNonNull(GraphQLBoolean) },
+					errorMessage: { type: GraphQLString },
+					errors: { type: this.resultSchemaTypeProvider.errorListResultType },
+					validation: {
+						type: new GraphQLNonNull(this.resultSchemaTypeProvider.validationResultType),
+					},
+					...Object.fromEntries(mutations),
+					query: {
+						type: queryObjectType,
+					},
+				},
+			})
 			mutations.set('transaction', {
 				args: {
 					options: {
-						type: new GraphQLInputObjectType({
-							name: 'MutationTransactionOptions',
-							fields: {
-								deferForeignKeyConstraints: { type: GraphQLBoolean },
-							},
-						}),
+						type: mutationTransactionOptions,
 					},
 				},
 				type: new GraphQLNonNull(
-					new GraphQLObjectType({
-						name: 'MutationTransaction',
-						fields: {
-							ok: { type: new GraphQLNonNull(GraphQLBoolean) },
-							errorMessage: { type: GraphQLString },
-							errors: { type: this.resultSchemaTypeProvider.errorListResultType },
-							validation: {
-								type: new GraphQLNonNull(this.resultSchemaTypeProvider.validationResultType),
-							},
-							...Object.fromEntries(mutations),
-							query: {
-								type: queryObjectType,
-							},
-						},
-					}),
+					mutationTransactionType,
 				),
 				resolve: async (parent, args: { options?: { deferForeignKeyConstraints?: boolean } }, context: Context, info) => {
 					return context.timer(`GraphQL.mutation.${info.fieldName}`, () =>
@@ -99,28 +115,31 @@ export class GraphQlSchemaBuilder {
 				resolve: (parent, args, context: Context, info) => context.executionContainer.readResolver.resolveQuery(info),
 			})
 		}
-		queries.set('_info', {
-			type: new GraphQLObjectType({
-				name: 'Info',
-				fields: () => ({
-					description: { type: GraphQLString },
-				}),
+		const infoType = new GraphQLObjectType({
+			name: 'Info',
+			fields: () => ({
+				description: { type: GraphQLString },
 			}),
+		})
+		queries.set('_info', {
+			type: infoType,
 			resolve: () => ({
 				description: 'TODO',
 			}),
 		})
 
-		return new GraphQLSchema({
+
+		return {
 			query: queryObjectType,
+			types: args.types,
 			...(mutations.size > 0
 				? {
 					mutation: new GraphQLObjectType({
 						name: 'Mutation',
 						fields: () => Object.fromEntries(mutations),
 					}),
-				  }
+				}
 				: {}),
-		})
+		}
 	}
 }

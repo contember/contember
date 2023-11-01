@@ -5,7 +5,7 @@ import {
 	GraphQLList,
 	GraphQLNonNull,
 	GraphQLObjectType,
-	GraphQLSchema,
+	GraphQLSchemaConfig,
 	GraphQLString,
 } from 'graphql'
 import { VimeoService, VimeoServiceFactory } from './VimeoService'
@@ -22,7 +22,7 @@ export class VimeoSchemaContributor implements GraphQLSchemaContributor {
 		private readonly vimeoServiceFactory: VimeoServiceFactory,
 	) {}
 
-	createSchema(context: GraphQLSchemaContributorContext): GraphQLSchema | undefined {
+	createSchema(context: GraphQLSchemaContributorContext): GraphQLSchemaConfig | undefined {
 		if (!this.vimeoConfig) {
 			return undefined
 		}
@@ -41,7 +41,7 @@ export class VimeoSchemaContributor implements GraphQLSchemaContributor {
 		const mutation = {
 			generateVimeoUploadUrl: uploadMutation as GraphQLFieldConfig<any, any, any>,
 		}
-		return new GraphQLSchema({
+		return {
 			mutation: new GraphQLObjectType({
 				name: 'Mutation',
 				fields: () => mutation,
@@ -54,7 +54,7 @@ export class VimeoSchemaContributor implements GraphQLSchemaContributor {
 					},
 				}),
 			}),
-		})
+		}
 	}
 
 	private createMutation(vimeoService: VimeoService): GraphQLFieldConfig<any, any, any> {

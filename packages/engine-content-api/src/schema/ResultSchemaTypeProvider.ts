@@ -12,23 +12,32 @@ import {
 } from 'graphql'
 
 export class ResultSchemaTypeProvider {
+	private fieldPathFragmentType = new GraphQLObjectType({
+		name: '_FieldPathFragment',
+		fields: {
+			field: { type: new GraphQLNonNull(GraphQLString) },
+		},
+	})
+	private indexPathFragmentType = new GraphQLObjectType({
+		name: '_IndexPathFragment',
+		fields: {
+			index: { type: new GraphQLNonNull(GraphQLInt) },
+			alias: { type: GraphQLString },
+		},
+	})
 	private pathFragmentType = new GraphQLUnionType({
 		name: '_PathFragment',
 		types: () => [
-			new GraphQLObjectType({
-				name: '_FieldPathFragment',
-				fields: {
-					field: { type: new GraphQLNonNull(GraphQLString) },
-				},
-			}),
-			new GraphQLObjectType({
-				name: '_IndexPathFragment',
-				fields: {
-					index: { type: new GraphQLNonNull(GraphQLInt) },
-					alias: { type: GraphQLString },
-				},
-			}),
+			this.fieldPathFragmentType,
+			this.indexPathFragmentType,
 		],
+	})
+
+	private validationMessageType = new GraphQLObjectType({
+		name: '_ValidationMessage',
+		fields: {
+			text: { type: new GraphQLNonNull(GraphQLString) },
+		},
 	})
 	private validationErrorType = new GraphQLObjectType({
 		name: '_ValidationError',
@@ -37,14 +46,7 @@ export class ResultSchemaTypeProvider {
 				type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(this.pathFragmentType))),
 			},
 			message: {
-				type: new GraphQLNonNull(
-					new GraphQLObjectType({
-						name: '_ValidationMessage',
-						fields: {
-							text: { type: new GraphQLNonNull(GraphQLString) },
-						},
-					}),
-				),
+				type: new GraphQLNonNull(this.validationMessageType),
 			},
 		},
 	})
@@ -56,6 +58,11 @@ export class ResultSchemaTypeProvider {
 				type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(this.validationErrorType))),
 			},
 		},
+	})
+
+	private mutationErrorType = new GraphQLEnumType({
+		name: '_MutationErrorType',
+		values: Object.values(Result.ExecutionErrorType).reduce((acc, type) => ({ ...acc, [type]: {} }), {}),
 	})
 
 	public errorResultType = new GraphQLObjectType({
@@ -71,12 +78,7 @@ export class ResultSchemaTypeProvider {
 				),
 			},
 			type: {
-				type: new GraphQLNonNull(
-					new GraphQLEnumType({
-						name: '_MutationErrorType',
-						values: Object.values(Result.ExecutionErrorType).reduce((acc, type) => ({ ...acc, [type]: {} }), {}),
-					}),
-				),
+				type: new GraphQLNonNull(this.mutationErrorType),
 			},
 			message: { type: GraphQLString },
 		},

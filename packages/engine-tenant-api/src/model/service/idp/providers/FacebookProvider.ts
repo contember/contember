@@ -4,7 +4,7 @@ import { IdentityProviderHandler, IDPClaim, InitIDPAuthResult } from '../Identit
 import { IDPValidationError } from '../IDPValidationError'
 import { InvalidIDPConfigurationError } from '../InvalidIDPConfigurationError'
 import { catchTypesafe } from './helpers'
-import { BaseOIDCConfiguration, OIDCInitData, OIDCResponseData } from './OIDCTypes'
+import { BaseOIDCConfiguration, OIDCConfiguration, OIDCInitData, OIDCResponseData } from './OIDCTypes'
 import { handleOIDCResponse, initOIDCAuth } from './OIDCHelpers'
 import { createHmac } from 'node:crypto'
 import { IDPResponseError } from '../IDPResponseError'
@@ -113,6 +113,10 @@ export class FacebookProvider implements IdentityProviderHandler<FacebookConfigu
 				email: apiData.email,
 			}
 		}
+	}
+
+	getPublicConfiguration({ clientSecret, ...config }: FacebookConfiguration): Partial<FacebookConfiguration> {
+		return config
 	}
 
 	private async createOIDCClient(configuration: FacebookConfiguration): Promise<Client> {

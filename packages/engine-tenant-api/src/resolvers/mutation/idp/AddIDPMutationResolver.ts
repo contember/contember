@@ -20,6 +20,7 @@ export class AddIDPMutationResolver implements MutationResolvers {
 			options: {
 				autoSignUp: args.options?.autoSignUp ?? false,
 				exclusive: args.options?.exclusive ?? false,
+				initReturnsConfig: args.options?.initReturnsConfig ?? false,
 			},
 		})
 		if (!result.ok) {

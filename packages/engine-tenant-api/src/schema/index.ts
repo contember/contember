@@ -396,6 +396,7 @@ export type EnableIdpResponse = {
 export type IdpOptions = {
 	readonly autoSignUp?: InputMaybe<Scalars['Boolean']>
 	readonly exclusive?: InputMaybe<Scalars['Boolean']>
+	readonly initReturnsConfig?: InputMaybe<Scalars['Boolean']>
 }
 
 export type IdpOptionsOutput = {
@@ -464,6 +465,7 @@ export type InitSignInIdpResponse = {
 export type InitSignInIdpResult = {
 	readonly __typename?: 'InitSignInIDPResult'
 	readonly authUrl: Scalars['String']
+	readonly idpConfiguration?: Maybe<Scalars['Json']>
 	readonly sessionData: Scalars['Json']
 }
 
@@ -814,6 +816,7 @@ export type MutationUnmanagedInviteArgs = {
 export type MutationUpdateIdpArgs = {
 	configuration?: InputMaybe<Scalars['Json']>
 	identityProvider: Scalars['String']
+	mergeConfiguration?: InputMaybe<Scalars['Boolean']>
 	options?: InputMaybe<IdpOptions>
 	type?: InputMaybe<Scalars['String']>
 }
@@ -1894,6 +1897,7 @@ export type InitSignInIdpResponseResolvers<ContextType = any, ParentType extends
 
 export type InitSignInIdpResultResolvers<ContextType = any, ParentType extends ResolversParentTypes['InitSignInIDPResult'] = ResolversParentTypes['InitSignInIDPResult']> = {
 	authUrl?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	idpConfiguration?: Resolver<Maybe<ResolversTypes['Json']>, ParentType, ContextType>
 	sessionData?: Resolver<ResolversTypes['Json'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }

@@ -45,7 +45,7 @@ const schema: DocumentNode = gql`
 
 		# IDP management
 		addIDP(identityProvider: String!, type: String!, configuration: Json!, options: IDPOptions): AddIDPResponse
-		updateIDP(identityProvider: String!, type: String, configuration: Json, options: IDPOptions): UpdateIDPResponse
+		updateIDP(identityProvider: String!, type: String, configuration: Json, options: IDPOptions, mergeConfiguration: Boolean): UpdateIDPResponse
 		disableIDP(identityProvider: String!): DisableIDPResponse
 		enableIDP(identityProvider: String!): EnableIDPResponse
 
@@ -270,6 +270,7 @@ const schema: DocumentNode = gql`
 	type InitSignInIDPResult {
 		authUrl: String!
 		sessionData: Json!
+		idpConfiguration: Json
 	}
 
 	type InitSignInIDPError {
@@ -385,11 +386,13 @@ const schema: DocumentNode = gql`
 	type IDPOptionsOutput {
 		autoSignUp: Boolean!
 		exclusive: Boolean!
+		initReturnsConfig: Boolean!
 	}
 
 	input IDPOptions {
 		autoSignUp: Boolean
 		exclusive: Boolean
+		initReturnsConfig: Boolean
 	}
 
 

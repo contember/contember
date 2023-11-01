@@ -9,14 +9,15 @@ export class UpdateIdpCommand implements Command<void> {
 	) {
 	}
 
-	async execute({ db, providers }: Command.Args): Promise<void> {
-		const { configuration, options: { autoSignUp, exclusive } = {} } = this.data
+	async execute({ db }: Command.Args): Promise<void> {
+		const { configuration, options: { autoSignUp, exclusive, initReturnsConfig } = {} } = this.data
 		await UpdateBuilder.create()
 			.table('identity_provider')
 			.values({
 				configuration,
 				auto_sign_up: autoSignUp,
 				exclusive,
+				init_returns_config: initReturnsConfig,
 			})
 			.where({
 				id: this.id,

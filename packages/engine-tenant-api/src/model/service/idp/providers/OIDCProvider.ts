@@ -28,6 +28,10 @@ export class OIDCProvider implements IdentityProviderHandler<OIDCConfiguration> 
 	}
 
 
+	getPublicConfiguration({ clientSecret, ...config }: OIDCConfiguration): Partial<OIDCConfiguration> {
+		return config
+	}
+
 	private async createOIDCClient(configuration: OIDCConfiguration): Promise<Client> {
 		this.issuerCache[configuration.url] ??= await Issuer.discover(configuration.url)
 

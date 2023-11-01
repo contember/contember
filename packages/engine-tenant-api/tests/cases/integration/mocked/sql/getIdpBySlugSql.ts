@@ -6,7 +6,7 @@ export const getIdpBySlugSql = (args: {
 	slug: string
 	response: null | IdentityProviderRow
 }): ExpectedQuery => ({
-	sql: SQL`select "id", "slug", "type", "configuration", "disabled_at" as "disabledAt", "auto_sign_up" as "autoSignUp", "exclusive"
+	sql: SQL`select "id", "slug", "type", "configuration", "disabled_at" as "disabledAt", "auto_sign_up" as "autoSignUp", "exclusive", "init_returns_config" as "initReturnsConfig"
 		from "tenant"."identity_provider"
 		where "slug" = ?`,
 	parameters: [args.slug],

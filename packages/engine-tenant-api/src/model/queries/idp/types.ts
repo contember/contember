@@ -8,6 +8,7 @@ export type IdentityProviderRow = {
 	configuration: Record<string, unknown>
 	autoSignUp: boolean
 	exclusive: boolean
+	initReturnsConfig: boolean
 }
 
 export type IdentityProviderDto =

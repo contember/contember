@@ -1,19 +1,17 @@
 import { Model } from '@contember/schema'
 import { EntityConstructor, FieldsDefinition } from './types'
-import { EntityRegistry, EnumRegistry } from './internal'
-import { NamingConventions } from '@contember/schema-utils'
+import { EntityRegistry } from './internal'
 import { createMetadataStore, DecoratorFunction } from '../../utils'
+import { CommonContext } from './context'
 
-interface EntityExtensionArgs {
-	entity: Model.Entity
-	definition: FieldsDefinition
-	conventions: NamingConventions
-	enumRegistry: EnumRegistry
-	entityRegistry: EntityRegistry
-
-	/** @deprecated use entityRegistry */
-	registry: EntityRegistry
-}
+export type EntityExtensionArgs =
+	& {
+		entity: Model.Entity
+		definition: FieldsDefinition
+		/** @deprecated use entityRegistry */
+		registry: EntityRegistry
+	}
+	& CommonContext
 
 const entityExtensionsStore = createMetadataStore<EntityExtension[]>([])
 

@@ -8,13 +8,17 @@ import { EntityRegistry } from './EntityRegistry'
 import { EnumRegistry } from './EnumRegistry'
 import { ColumnDefinition } from '../fieldDefinitions'
 import { applyEntityExtensions } from '../extensions'
+import { StrictOptions, StrictDefinitionValidator } from '../../../strict'
 
 export class SchemaBuilder {
 	private entityRegistry = new EntityRegistry()
 
 	private enumRegistry = new EnumRegistry()
 
-	constructor(private readonly conventions: NamingConventions) {}
+	constructor(
+		private readonly conventions: NamingConventions,
+		private readonly strictDefinitionValidator: StrictDefinitionValidator = new StrictDefinitionValidator({}),
+	) {}
 
 	public addEntity(name: string, entity: EntityConstructor): void {
 		this.entityRegistry.register(name, entity)
@@ -47,6 +51,7 @@ export class SchemaBuilder {
 							conventions: this.conventions,
 							enumRegistry: this.enumRegistry,
 							entityRegistry: this.entityRegistry,
+							strictDefinitionValidator: this.strictDefinitionValidator,
 						})
 					})
 					.reduce<Model.Entity['fields']>((acc, field) => {
@@ -67,6 +72,7 @@ export class SchemaBuilder {
 				entityRegistry: this.entityRegistry,
 				conventions: this.conventions,
 				enumRegistry: this.enumRegistry,
+				strictDefinitionValidator: this.strictDefinitionValidator,
 			})
 		})
 

@@ -97,3 +97,26 @@ test('basic createSchema test', () => {
 		}
 	`)
 })
+
+
+namespace StrictModel {
+	export class Genre {
+		name = c.stringColumn()
+
+	}
+	export class Book {
+		title = c.stringColumn()
+		genre = c.manyHasOne(Genre)
+	}
+}
+
+test('strict test', () => {
+	const cb = () => createSchema(StrictModel, schema => ({
+		...schema,
+		settings: settingsPresets['v1.3'],
+	}), { strict: true })
+
+	expect(cb).toThrow(`Strict schema validation failed: 
+- Book.genre: inverse side of the relation is not defined.
+- Book.genre: onDelete behaviour is not set. Use one of cascadeOnDelete(), setNullOnDelete() or restrictOnDelete().`)
+})

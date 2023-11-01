@@ -21,7 +21,7 @@ export class ManyHasManyDefinitionImpl extends FieldDefinition<ManyHasManyDefini
 		return this.withOption('orderBy', [...(this.options.orderBy || []), { path, direction: direction as Model.OrderDirection }])
 	}
 
-	createField({ name, conventions, entityName, entityRegistry }: CreateFieldContext): Model.AnyField {
+	createField({ name, conventions, entityName, entityRegistry, strictDefinitionValidator }: CreateFieldContext): Model.AnyField {
 		const options = this.options
 		const columnNames = conventions.getJoiningTableColumnNames(
 			entityName,
@@ -36,6 +36,8 @@ export class ManyHasManyDefinitionImpl extends FieldDefinition<ManyHasManyDefini
 			eventLog: { enabled: true },
 			...options.joiningTable,
 		}
+
+		strictDefinitionValidator.validateInverseSide(entityName, name, options)
 
 		return {
 			type: Model.RelationType.ManyHasMany,

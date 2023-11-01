@@ -1,7 +1,6 @@
-import { EntityConstructor, Interface } from '../types'
+import { EntityConstructor, Interface, RelationTarget } from '../types'
 import { Model } from '@contember/schema'
 import { CreateFieldContext, FieldDefinition } from './FieldDefinition'
-import { RelationTarget } from '../types'
 
 export class ManyHasOneDefinitionImpl extends FieldDefinition<ManyHasOneDefinitionOptions> {
 	type = 'ManyHasOneDefinition' as const
@@ -26,13 +25,20 @@ export class ManyHasOneDefinitionImpl extends FieldDefinition<ManyHasOneDefiniti
 		return this.withOption('joiningColumn', { ...this.options.joiningColumn, onDelete: Model.OnDelete.setNull })
 	}
 
+	restrictOnDelete(): Interface<ManyHasOneDefinition> {
+		return this.withOption('joiningColumn', { ...this.options.joiningColumn, onDelete: Model.OnDelete.restrict })
+	}
+
 	notNull(): Interface<ManyHasOneDefinition> {
 		return this.withOption('nullable', false)
 	}
 
-	createField({ name, conventions, entityName, entityRegistry }: CreateFieldContext): Model.AnyField {
+	createField({ name, conventions, entityName, entityRegistry, strictDefinitionValidator }: CreateFieldContext): Model.AnyField {
 		const options = this.options
 		const joiningColumn = options.joiningColumn || {}
+		strictDefinitionValidator.validateInverseSide(entityName, name, options)
+		strictDefinitionValidator.validateOnCascade(entityName, name, joiningColumn)
+
 		return {
 			name: name,
 			...(typeof options.inversedBy === 'undefined' ? {} : { inversedBy: options.inversedBy }),

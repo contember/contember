@@ -6,6 +6,7 @@ import 'reflect-metadata'
 import { FieldDefinition } from './fieldDefinitions'
 import { isEntityConstructor } from '../../utils'
 import { DefaultNamingConventions } from '@contember/schema-utils'
+import { StrictOptions, StrictDefinitionValidator } from '../../strict'
 
 export * from './fieldDefinitions'
 export * from './EventLogDefinition'
@@ -24,8 +25,13 @@ export type ModelDefinition<M> = {
 	[K in keyof M]: unknown
 }
 
-export function createModel<M extends ModelDefinition<M>>(definitions: M): Model.Schema {
-	const schemaBuilder = new SchemaBuilder(new DefaultNamingConventions())
+export function createModel<M extends ModelDefinition<M>>(definitions: M, options: {
+	strictDefinitionValidator?: StrictDefinitionValidator
+} = {}): Model.Schema {
+	const schemaBuilder = new SchemaBuilder(
+		new DefaultNamingConventions(),
+		options.strictDefinitionValidator,
+	)
 	for (const [name, definition] of Object.entries(definitions)) {
 		if (definition instanceof EnumDefinition) {
 			schemaBuilder.addEnum(name, definition)

@@ -29,8 +29,8 @@ const processPackage = async (dir: string, projectList: ProjectList) => {
 					return
 				}
 				const module = (moduleSpecifier as ts.StringLiteral).text
-				if (module === '.') {
-					errors.push({ file, message: 'Dot import (".") is forbidden', type: 'forbidden_import' })
+				if (module === '.' || module === '..') {
+					errors.push({ file, message: `Dot import ("${module}") is forbidden`, type: 'forbidden_import' })
 				}
 				if (!module.startsWith('node:') && !module.startsWith('.') && !globalModules.has(module)) {
 					const moduleMatch = module.match(/^((?:@[\w_-]+\/)?[.\w_-]+)(\/.+)?$/)

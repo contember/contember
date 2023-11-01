@@ -22,7 +22,7 @@ export class SystemGraphQLContextFactory {
 		const systemContext = await systemContainer.resolverContextFactory.create(
 			schema,
 			dbContext,
-			{ ...projectContainer.project, systemSchema: dbContextFactory.schemaName },
+			{ ...projectContainer.project, systemSchema: dbContext.client.schema },
 			identity,
 		)
 		return {

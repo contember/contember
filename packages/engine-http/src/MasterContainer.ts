@@ -1,4 +1,4 @@
-import { SchemaDatabaseMetadataResolver, SystemContainerFactory } from '@contember/engine-system-api'
+import { SystemContainerFactory } from '@contember/engine-system-api'
 import { TenantContainerFactory } from '@contember/engine-tenant-api'
 import { Builder } from '@contember/dic'
 import { ServerConfig } from './config/config'
@@ -35,6 +35,7 @@ import { Plugin } from './plugin/Plugin'
 import { Application } from './application/application'
 import { ApplicationWorkerManager } from './workers/ApplicationWorkerManager'
 import { ContentQueryExecutorImpl } from './system/ContentQueryExecutor'
+import { DatabaseMetadataResolver } from '@contember/database'
 
 export interface MasterContainer {
 	initializer: Initializer
@@ -105,7 +106,7 @@ export class MasterContainerFactory {
 			.addService('contentPermissionFactory', ({}) =>
 				new PermissionFactory())
 			.addService('databaseMetadataResolver', () =>
-				new SchemaDatabaseMetadataResolver())
+				new DatabaseMetadataResolver())
 			.addService('projectContainerFactoryFactory', ({ plugins, providers, serverConfig, graphQlSchemaBuilderFactory, contentPermissionFactory, databaseMetadataResolver }) =>
 				new ProjectContainerFactoryFactory(plugins, providers, serverConfig, graphQlSchemaBuilderFactory, contentPermissionFactory, databaseMetadataResolver))
 			.addService('tenantGraphQLHandlerFactory', () =>
@@ -142,8 +143,8 @@ export class MasterContainerFactory {
 				new ContentSchemaTransferMappingFactory())
 			.addService('systemSchemaTransferMappingFactory', () =>
 				new SystemSchemaTransferMappingFactory())
-			.addService('importExecutor', ({ contentSchemaTransferMappingFactory, systemSchemaTransferMappingFactory }) =>
-				new ImportExecutor(contentSchemaTransferMappingFactory, systemSchemaTransferMappingFactory))
+			.addService('importExecutor', ({ contentSchemaTransferMappingFactory, systemSchemaTransferMappingFactory, databaseMetadataResolver }) =>
+				new ImportExecutor(contentSchemaTransferMappingFactory, systemSchemaTransferMappingFactory, databaseMetadataResolver))
 			.addService('exportExecutor', ({ contentSchemaTransferMappingFactory, systemSchemaTransferMappingFactory }) =>
 				new ExportExecutor(contentSchemaTransferMappingFactory, systemSchemaTransferMappingFactory))
 			.addService('importApiMiddlewareFactory', ({ projectGroupResolver, importExecutor }) =>

@@ -1,4 +1,4 @@
-import { Client, Connection, ConstraintHelper, wrapIdentifier } from '@contember/database'
+import { Client, Connection, ConstraintHelper, DatabaseMetadataResolver, wrapIdentifier } from '@contember/database'
 import { Model, Schema } from '@contember/schema'
 import * as Typesafe from '@contember/typesafe'
 import { ParseError } from '@contember/typesafe'
@@ -64,6 +64,7 @@ export class ImportExecutor {
 	constructor(
 		private readonly contentSchemaTransferMappingFactory: ContentSchemaTransferMappingFactory,
 		private readonly systemSchemaTransferMappingFactory: SystemSchemaTransferMappingFactory,
+		private readonly databaseMetadataResolver: DatabaseMetadataResolver,
 	) {
 	}
 
@@ -118,7 +119,7 @@ export class ImportExecutor {
 			await this.lockTables(db, options.tables)
 			await this.truncateTables(db, options.tables)
 
-			const metadata = await projectContainer.databaseMetadataResolver.resolveMetadata(db, db.schema)
+			const metadata = await this.databaseMetadataResolver.resolveMetadata(db, db.schema)
 			const constraintHelper = new ConstraintHelper(db, metadata)
 			await constraintHelper.setConstraintsDeferred('foreignKey')
 
@@ -150,7 +151,7 @@ export class ImportExecutor {
 		return await systemDatabaseContext.client.transaction(async db => {
 			await this.truncateTables(db, options.tables)
 
-			const metadata = await projectContainer.databaseMetadataResolver.resolveMetadata(db, db.schema)
+			const metadata = await this.databaseMetadataResolver.resolveMetadata(db, db.schema)
 			const constraintHelper = new ConstraintHelper(db, metadata)
 			await constraintHelper.setConstraintsDeferred('foreignKey')
 

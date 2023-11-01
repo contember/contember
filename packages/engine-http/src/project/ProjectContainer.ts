@@ -31,7 +31,6 @@ export interface ProjectContainer {
 	contentSchemaResolver: ContentSchemaResolver
 	projectInitializer: ProjectInitializer
 	projectDatabaseMetadataResolver: ProjectDatabaseMetadataResolver
-	databaseMetadataResolver: DatabaseMetadataResolver
 }
 
 export class ProjectContainerFactoryFactory {
@@ -142,8 +141,8 @@ export class ProjectContainerFactory {
 				systemDatabaseContextFactory.create(readConnection))
 			.addService('systemMigrationGroups', () =>
 				Object.fromEntries(this.plugins.flatMap(it => it.getSystemMigrations ? [[it.name, it.getSystemMigrations()]] : [])))
-			.addService('systemMigrationsRunner', ({ systemDatabaseContextFactory, project, systemSchemaName, systemMigrationGroups, databaseMetadataResolver }) =>
-				new SystemMigrationsRunner(systemDatabaseContextFactory, { ...project, systemSchema: systemSchemaName }, this.schemaVersionBuilder, systemMigrationGroups, databaseMetadataResolver))
+			.addService('systemMigrationsRunner', ({ systemDatabaseContextFactory, project, systemSchemaName, systemMigrationGroups }) =>
+				new SystemMigrationsRunner(systemDatabaseContextFactory, { ...project, systemSchema: systemSchemaName }, this.schemaVersionBuilder, systemMigrationGroups, this.databaseMetadataResolver))
 			.addService('projectInitializer', ({ systemMigrationsRunner, systemDatabaseContext, project, systemSchemaName }) =>
 				new ProjectInitializer(new StageCreator(), systemMigrationsRunner, systemDatabaseContext, { ...project, systemSchema: systemSchemaName }))
 			.addService('projectDatabaseMetadataResolver', () =>

@@ -38,6 +38,7 @@ test('table-on-delete test', async () => {
 			.buildSchema() })),
 		project: {
 			slug: 'test',
+			systemSchema: 'system',
 			stages: [
 				{
 					slug: 'prod',
@@ -90,6 +91,7 @@ test('table-on-delete test valid', async () => {
 		})),
 		project: {
 			slug: 'test',
+			systemSchema: 'system',
 			stages: [
 				{
 					slug: 'prod',

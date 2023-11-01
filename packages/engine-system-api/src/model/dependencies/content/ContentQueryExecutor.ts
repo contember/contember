@@ -2,7 +2,7 @@ import { Stage } from '../../dtos'
 import { DatabaseContext } from '../../database'
 import { Schema } from '@contember/schema'
 import { ExecutionResult } from 'graphql'
-import { SchemaDatabaseMetadata } from '@contember/schema-utils'
+import { DatabaseMetadata } from '@contember/database'
 
 export interface ContentQueryExecutorContext {
 	schema: Schema & { id: number }
@@ -10,7 +10,7 @@ export interface ContentQueryExecutorContext {
 	db: DatabaseContext
 	stage: Stage
 	project: { slug: string; systemSchema: string }
-	schemaDatabaseMetadata: SchemaDatabaseMetadata
+	databaseMetadata: DatabaseMetadata
 }
 
 export interface ContentQueryExecutorQuery {

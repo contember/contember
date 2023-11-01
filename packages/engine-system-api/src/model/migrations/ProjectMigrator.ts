@@ -1,5 +1,5 @@
 import { calculateMigrationChecksum, Migration, MigrationDescriber, MigrationVersionHelper } from '@contember/schema-migrations'
-import { Client, QueryError, wrapIdentifier } from '@contember/database'
+import { Client, DatabaseMetadata, QueryError, wrapIdentifier } from '@contember/database'
 import { Schema } from '@contember/schema'
 import { SaveMigrationCommand } from '../commands'
 import { Stage } from '../dtos'
@@ -7,7 +7,7 @@ import { DatabaseContext } from '../database'
 import { ExecutedMigrationsResolver } from './ExecutedMigrationsResolver'
 import { MigrateErrorCode } from '../../schema'
 import { SchemaVersionBuilder } from './SchemaVersionBuilder'
-import { SchemaDatabaseMetadata, SchemaValidator, SchemaValidatorSkippedErrors } from '@contember/schema-utils'
+import { SchemaValidator, SchemaValidatorSkippedErrors } from '@contember/schema-utils'
 import { logger } from '@contember/logger'
 import { MigrationsDatabaseMetadataResolverStoreFactory, SchemaDatabaseMetadataResolverStore } from '../metadata'
 import { ContentMigrationQuery, MigrationInput } from './MigrationInput'
@@ -72,7 +72,7 @@ export class ProjectMigrator {
 						db,
 						schema: schemaWithId,
 						stages,
-						schemaDatabaseMetadata: await metadataStore.getMetadata(db.client.schema),
+						databaseMetadata: await metadataStore.getMetadata(db.client.schema),
 						identity,
 						project,
 					})
@@ -91,7 +91,7 @@ export class ProjectMigrator {
 		schema: Schema & { id: number }
 		project: { slug: string; systemSchema: string }
 		identity: { id: string }
-		schemaDatabaseMetadata: SchemaDatabaseMetadata
+		databaseMetadata: DatabaseMetadata
 	}) {
 		const queryStages = query.stage ? stages.filter(it => it.slug === query.stage) : stages
 		for (const stage of queryStages) {

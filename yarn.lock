@@ -761,6 +761,7 @@ __metadata:
   dependencies:
     "@contember/cli-common": "workspace:*"
     "@contember/config-loader": "workspace:*"
+    "@contember/database": "workspace:*"
     "@contember/dic": "workspace:*"
     "@contember/engine-content-api": "workspace:*"
     "@contember/schema": "workspace:*"
@@ -1227,6 +1228,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@contember/schema-migrations@workspace:packages/schema-migrations"
   dependencies:
+    "@contember/database": "workspace:*"
     "@contember/database-migrations": "workspace:*"
     "@contember/engine-common": "workspace:*"
     "@contember/schema": "workspace:*"

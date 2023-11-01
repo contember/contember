@@ -10,6 +10,7 @@
 	"references": [
 		{ "path": "../../cli-common/src" },
 		{ "path": "../../config-loader/src" },
+		{ "path": "../../database/src" },
 		{ "path": "../../dic/src" },
 		{ "path": "../../engine-content-api/src" },
 		{ "path": "../../schema/src" },

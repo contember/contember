@@ -11,8 +11,9 @@ import {
 import * as Database from '@contember/database'
 import { UniqueWhereError } from '../inputProcessing'
 import { Model } from '@contember/schema'
-import { acceptFieldVisitor, SchemaDatabaseMetadata, tryGetColumnName } from '@contember/schema-utils'
+import { acceptFieldVisitor, tryGetColumnName } from '@contember/schema-utils'
 import { logger } from '@contember/logger'
+import { DatabaseMetadata } from '@contember/database'
 
 
 type UniqueConstraintResult = {
@@ -22,8 +23,8 @@ type UniqueConstraintResult = {
 
 const getEntityByTableName = (model: Model.Schema, tableName: string) => Object.values(model.entities).find(it => it.tableName === tableName)
 
-const findUniqueConstraint = (model: Model.Schema, databaseMetadata: SchemaDatabaseMetadata, tableName: string, constraintName: string): UniqueConstraintResult | null => {
-	const constraint = databaseMetadata.getUniqueConstraint(tableName, constraintName)
+const findUniqueConstraint = (model: Model.Schema, databaseMetadata: DatabaseMetadata, tableName: string, constraintName: string): UniqueConstraintResult | null => {
+	const constraint = databaseMetadata.uniqueConstraints.filter({ tableName, constraintName }).first()
 	if (!constraint) {
 		return null
 	}
@@ -50,8 +51,8 @@ type RelationInfo = {
 	targetEntity: Model.Entity
 }
 
-const findForeignConstraint = (model: Model.Schema, databaseMetadata: SchemaDatabaseMetadata, tableName: string, constraintName: string): RelationInfo | null => {
-	const constraint = databaseMetadata.getForeignKeyConstraint(tableName, constraintName)
+const findForeignConstraint = (model: Model.Schema, databaseMetadata: DatabaseMetadata, tableName: string, constraintName: string): RelationInfo | null => {
+	const constraint = databaseMetadata.foreignKeys.filter({ fromTable: tableName, constraintName }).first()
 	if (!constraint) {
 		return null
 	}
@@ -88,7 +89,7 @@ const findForeignConstraint = (model: Model.Schema, databaseMetadata: SchemaData
 
 export const convertError = (
 	schema: Model.Schema,
-	databaseMetadata: SchemaDatabaseMetadata,
+	databaseMetadata: DatabaseMetadata,
 	e: any,
 ): MutationResult => {
 
@@ -140,7 +141,7 @@ export const convertError = (
 	throw e
 }
 
-export const tryMutation = async (schema: Model.Schema, databaseMetadata: SchemaDatabaseMetadata, cb: () => Promise<MutationResultList>): Promise<MutationResultList> => {
+export const tryMutation = async (schema: Model.Schema, databaseMetadata: DatabaseMetadata, cb: () => Promise<MutationResultList>): Promise<MutationResultList> => {
 	try {
 		return await cb()
 	} catch (e) {

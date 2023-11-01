@@ -11,16 +11,17 @@ import { CreateInputVisitor } from '../../inputProcessing'
 import { SqlCreateInputProcessor } from './SqlCreateInputProcessor'
 import { Mapper } from '../Mapper'
 import { Input, Model, Value } from '@contember/schema'
-import { acceptEveryFieldVisitor, Providers, SchemaDatabaseMetadata } from '@contember/schema-utils'
+import { acceptEveryFieldVisitor, Providers } from '@contember/schema-utils'
 import { InsertBuilderFactory } from './InsertBuilderFactory'
 import { InsertBuilder } from './InsertBuilder'
 import { tryMutation } from '../ErrorUtils'
 import { rowDataToFieldValues } from '../ColumnValue'
+import { DatabaseMetadata } from '@contember/database'
 
 export class Inserter {
 	constructor(
 		private readonly schema: Model.Schema,
-		private readonly schemaDatabaseMetadata: SchemaDatabaseMetadata,
+		private readonly schemaDatabaseMetadata: DatabaseMetadata,
 		private readonly insertBuilderFactory: InsertBuilderFactory,
 		private readonly providers: Providers,
 	) {}

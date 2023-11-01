@@ -1,9 +1,8 @@
 import { Builder } from '@contember/dic'
-import { Connection } from '@contember/database'
+import { Connection, DatabaseMetadataResolver } from '@contember/database'
 import {
 	DatabaseContextFactory,
 	ProjectInitializer,
-	SchemaDatabaseMetadataResolver,
 	SchemaVersionBuilder,
 	StageCreator,
 	SystemMigrationsRunner,
@@ -37,6 +36,7 @@ export interface ProjectContainer {
 	contentSchemaResolver: ContentSchemaResolver
 	projectInitializer: ProjectInitializer
 	projectDatabaseMetadataResolver: ProjectDatabaseMetadataResolver
+	databaseMetadataResolver: DatabaseMetadataResolver
 }
 
 export class ProjectContainerFactoryFactory {
@@ -89,6 +89,7 @@ export class ProjectContainerFactory {
 				'projectInitializer',
 				'logger',
 				'projectDatabaseMetadataResolver',
+				'databaseMetadataResolver',
 			)
 	}
 
@@ -149,7 +150,7 @@ export class ProjectContainerFactory {
 			.addService('systemMigrationGroups', () =>
 				Object.fromEntries(this.plugins.flatMap(it => it.getSystemMigrations ? [[it.name, it.getSystemMigrations()]] : [])))
 			.addService('databaseMetadataResolver', () =>
-				new SchemaDatabaseMetadataResolver())
+				new DatabaseMetadataResolver())
 			.addService('systemMigrationsRunner', ({ systemDatabaseContextFactory, project, systemSchemaName, systemMigrationGroups, databaseMetadataResolver }) =>
 				new SystemMigrationsRunner(systemDatabaseContextFactory, project, systemSchemaName, this.schemaVersionBuilder, systemMigrationGroups, databaseMetadataResolver))
 			.addService('projectInitializer', ({ systemMigrationsRunner, systemDatabaseContext, project }) =>

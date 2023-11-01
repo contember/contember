@@ -29,7 +29,7 @@ export class RemoveUniqueConstraintModificationHandler implements ModificationHa
 			model: this.schema.model,
 		})
 
-		const constraintNames = databaseMetadata.getUniqueConstraintNames({ tableName: entity.tableName, columnNames: columns })
+		const constraintNames = databaseMetadata.uniqueConstraints.filter({ tableName: entity.tableName, columnNames: columns }).getNames()
 
 		for (const name of constraintNames) {
 			builder.sql(`ALTER TABLE ${wrapIdentifier(entity.tableName)} DROP CONSTRAINT ${wrapIdentifier(name)}`)
@@ -91,15 +91,13 @@ export class RemoveUniqueConstraintDiffer implements Differ {
 	createDiff(originalSchema: Schema, updatedSchema: Schema) {
 		return Object.values(originalSchema.model.entities).flatMap(entity =>
 			entity.unique
-				.filter(
-					it => {
-						const updatedEntity = updatedSchema.model.entities[entity.name]
-						if (!updatedEntity) {
-							return false
-						}
-						return !updatedEntity.unique.find(uniq => deepEqual(uniq.fields, it.fields))
-					},
-				)
+				.filter(it => {
+					const updatedEntity = updatedSchema.model.entities[entity.name]
+					if (!updatedEntity) {
+						return false
+					}
+					return !updatedEntity.unique.find(uniq => deepEqual(uniq.fields, it.fields) && it.timing === uniq.timing)
+				})
 				.map(unique =>
 					removeUniqueConstraintModification.createModification({
 						entityName: entity.name,

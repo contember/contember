@@ -2,6 +2,7 @@ import { testMigrations } from '../../src/tests'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
 import { SQL } from '../../src/tags'
+import { createDatabaseMetadata } from '@contember/database'
 
 testMigrations('convert one has one to many has one relation without inverse side', {
 	original: {
@@ -31,6 +32,17 @@ testMigrations('convert one has one to many has one relation without inverse sid
 		CREATE INDEX ON "post" ("image_id");
 		ALTER TABLE "post" DROP CONSTRAINT "uniq_post_image_id";
 	`,
+	databaseMetadata: createDatabaseMetadata({
+		foreignKeys: [],
+		indexes: [],
+		uniqueConstraints: [{
+			constraintName: 'uniq_post_image_id',
+			columnNames: ['image_id'],
+			tableName: 'post',
+			deferred: false,
+			deferrable: false,
+		}],
+	}),
 })
 
 
@@ -63,5 +75,16 @@ testMigrations('convert one has one to many has one relation with inverse side',
 	CREATE INDEX ON "post" ("image_id"); 
 	ALTER TABLE "post" DROP CONSTRAINT "uniq_post_image_id";
 `,
+	databaseMetadata: createDatabaseMetadata({
+		foreignKeys: [],
+		indexes: [],
+		uniqueConstraints: [{
+			constraintName: 'uniq_post_image_id',
+			columnNames: ['image_id'],
+			tableName: 'post',
+			deferred: false,
+			deferrable: false,
+		}],
+	}),
 })
 

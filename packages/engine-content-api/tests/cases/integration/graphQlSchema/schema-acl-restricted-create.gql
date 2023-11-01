@@ -306,4 +306,5 @@ type MutationTransaction {
 
 input MutationTransactionOptions {
   deferForeignKeyConstraints: Boolean
+  deferUniqueConstraints: Boolean
 }

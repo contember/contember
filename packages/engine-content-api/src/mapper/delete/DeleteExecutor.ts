@@ -252,7 +252,7 @@ export class DeleteExecutor {
 		relation: Model.ManyHasOneRelation | Model.OneHasOneOwningRelation,
 		values: Input.PrimaryValue[],
 	): Promise<void> {
-		if (mapper.constraintHelper.areFkConstraintsDeferred()) {
+		if (mapper.constraintHelper.areConstraintsDeferred('foreignKey')) {
 			return
 		}
 		const qb = this.createFetchByIdQueryBuilder(entity, relation, values)

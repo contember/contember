@@ -118,15 +118,16 @@ export class ImportExecutor {
 			await this.lockTables(db, options.tables)
 			await this.truncateTables(db, options.tables)
 
-			const constraintHelper = new ConstraintHelper(db)
-			await constraintHelper.setFkConstraintsDeferred()
+			const metadata = await projectContainer.databaseMetadataResolver.resolveMetadata(db, db.schema)
+			const constraintHelper = new ConstraintHelper(db, metadata)
+			await constraintHelper.setConstraintsDeferred('foreignKey')
 
 			const result = await this.match(await it.next(), {
 				importSequence: it => this.importSequence(db, mapping, it),
 				insertBegin: it => this.insertBegin(db, mapping, it),
 			})
 
-			await constraintHelper.setFkConstraintsImmediate()
+			await constraintHelper.setConstraintsImmediate('foreignKey')
 			await this.enableTriggers(db, options.tables)
 
 			return result
@@ -149,8 +150,9 @@ export class ImportExecutor {
 		return await systemDatabaseContext.client.transaction(async db => {
 			await this.truncateTables(db, options.tables)
 
-			const constraintHelper = new ConstraintHelper(db)
-			await constraintHelper.setFkConstraintsDeferred()
+			const metadata = await projectContainer.databaseMetadataResolver.resolveMetadata(db, db.schema)
+			const constraintHelper = new ConstraintHelper(db, metadata)
+			await constraintHelper.setConstraintsDeferred('foreignKey')
 
 			return await this.match(await it.next(), {
 				insertBegin: it => this.insertBegin(db, mapping, it),

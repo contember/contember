@@ -4,7 +4,7 @@ import { Input, Model } from '@contember/schema'
 import { PredicateFactory } from '../../acl'
 import { UpdateBuilderFactory } from './UpdateBuilderFactory'
 import { Mapper } from '../Mapper'
-import { acceptEveryFieldVisitor, SchemaDatabaseMetadata } from '@contember/schema-utils'
+import { acceptEveryFieldVisitor } from '@contember/schema-utils'
 import {
 	collectResults,
 	MutationNoResultError,
@@ -17,11 +17,12 @@ import {
 } from '../Result'
 import { UpdateBuilder } from './UpdateBuilder'
 import { rowDataToFieldValues } from '../ColumnValue'
+import { DatabaseMetadata } from '@contember/database'
 
 export class Updater {
 	constructor(
 		private readonly schema: Model.Schema,
-		private readonly schemaDatabaseMetadata: SchemaDatabaseMetadata,
+		private readonly schemaDatabaseMetadata: DatabaseMetadata,
 		private readonly predicateFactory: PredicateFactory,
 		private readonly updateBuilderFactory: UpdateBuilderFactory,
 	) {}

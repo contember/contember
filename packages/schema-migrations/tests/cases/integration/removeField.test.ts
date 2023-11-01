@@ -3,6 +3,7 @@ import { createSchema, SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
 import { SQL } from '../../src/tags'
 import { SchemaDefinition as def } from '@contember/schema-definition'
+import { createDatabaseMetadata } from '@contember/database'
 
 
 testMigrations('remove relation (many has one)', {
@@ -67,6 +68,17 @@ testMigrations('remove relation (one has many)', {
 	],
 	sql: SQL`ALTER TABLE "post_locale" DROP CONSTRAINT "uniq_post_locale_post_id_locale";
 						ALTER TABLE "post_locale" DROP "post_id";`,
+	databaseMetadata: createDatabaseMetadata({
+		foreignKeys: [],
+		indexes: [],
+		uniqueConstraints: [{
+			constraintName: 'uniq_post_locale_post_id_locale',
+			columnNames: ['post_id', 'locale'],
+			tableName: 'post_locale',
+			deferrable: false,
+			deferred: false,
+		}],
+	}),
 })
 
 testMigrations('remove relation (many has many)', {

@@ -1,6 +1,7 @@
 import { testMigrations } from '../../src/tests'
 import { SQL } from '../../src/tags'
 import { createSchema, SchemaDefinition as def } from '@contember/schema-definition'
+import { createDatabaseMetadata } from '@contember/database'
 
 namespace SchemaWithoutIndex {
 	export class Article {
@@ -41,4 +42,13 @@ testMigrations('drop index', {
 		},
 	],
 	sql: SQL`DROP INDEX "idx_article_title";`,
+	databaseMetadata: createDatabaseMetadata({
+		foreignKeys: [],
+		indexes: [{
+			tableName: 'article',
+			columnNames: ['title'],
+			indexName: 'idx_article_title',
+		}],
+		uniqueConstraints: [],
+	}),
 })

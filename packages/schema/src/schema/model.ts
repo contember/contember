@@ -202,8 +202,10 @@ export namespace Model {
 
 	export type UniqueConstraints = readonly UniqueConstraint[]
 
+	export type ConstraintTiming = 'deferrable' | 'deferred'
 	export type UniqueConstraint = {
 		readonly fields: readonly string[]
+		readonly timing?: ConstraintTiming // empty means not deferrable
 		readonly name?: string
 	}
 

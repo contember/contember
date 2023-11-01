@@ -1,13 +1,13 @@
 import { MigrationArgs, MigrationBuilder } from '@contember/database-migrations'
-import { wrapIdentifier } from '@contember/database'
+import { DatabaseMetadata, wrapIdentifier } from '@contember/database'
 import { SystemMigrationArgs } from './types'
-import { acceptFieldVisitor, SchemaDatabaseMetadata } from '@contember/schema-utils'
+import { acceptFieldVisitor } from '@contember/schema-utils'
 import { Model } from '@contember/schema'
 
 export default async function (builder: MigrationBuilder, args: MigrationArgs<SystemMigrationArgs>) {
 	const schema = await args.schemaResolver(args.connection)
 	const stages = (await args.connection.query<{schema: string}>('SELECT schema FROM stage')).rows
-	const metadataByStage: Record<string, SchemaDatabaseMetadata> = {}
+	const metadataByStage: Record<string, DatabaseMetadata> = {}
 
 	for (const entity of Object.values(schema.model.entities)) {
 		for (const field of Object.values(entity.fields)) {
@@ -40,12 +40,12 @@ export default async function (builder: MigrationBuilder, args: MigrationArgs<Sy
 			for (const stage of stages) {
 				const databaseMetadata = metadataByStage[stage.schema] ??= await args.databaseMetadataResolver(args.connection, stage.schema)
 
-				const fkNames = databaseMetadata.getForeignKeyConstraintNames({
+				const fkNames = databaseMetadata.foreignKeys.filter({
 					fromTable: entity.tableName,
 					fromColumn: relation.joiningColumn.columnName,
 					toTable: targetEntity.tableName,
 					toColumn: targetEntity.primaryColumn,
-				})
+				}).getNames()
 				for (const name of fkNames) {
 					builder.sql(`ALTER TABLE ${wrapIdentifier(stage.schema)}.${wrapIdentifier(entity.tableName)} DROP CONSTRAINT ${wrapIdentifier(name)}`)
 				}

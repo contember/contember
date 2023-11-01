@@ -8,6 +8,7 @@ export type ReturningAware = Returning.Aware
 
 export * from './client'
 export * from './builders'
+export * from './metadata'
 export * from './queryable'
 export * from './Literal'
 export * from './types'

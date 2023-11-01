@@ -2,8 +2,8 @@ import migration from '../../../src/migrations/2023-10-19-173000-fix-unique'
 import { createMigrationBuilder } from '@contember/database-migrations'
 import { assert, test } from 'vitest'
 import { c, createSchema } from '@contember/schema-definition'
-import { dummySchemaDatabaseMetadata } from '@contember/schema-utils'
 import { createConnectionMock } from '@contember/database-tester'
+import { createDatabaseMetadata } from '@contember/database'
 
 namespace UniqueModel {
 
@@ -32,19 +32,19 @@ test('unique fix test', async () => {
 	}])
 	await migration(builder, {
 		connection: connection,
-		databaseMetadataResolver: () => Promise.resolve({
-			...dummySchemaDatabaseMetadata,
-			getAllUniqueConstraints: () => [
-				{ constraintName: 'valid1', tableName: 'foo', columnNames: ['col_a', 'col_b'] },
-				{ constraintName: 'valid2', tableName: 'foo', columnNames: ['col_b', 'many_has_one_bar_id'] },
-				{ constraintName: 'valid3', tableName: 'foo', columnNames: ['single_col_unique'] },
-				{ constraintName: 'valid4', tableName: 'foo', columnNames: ['has_one_bar_id'] },
-
-				{ constraintName: 'invalid1', tableName: 'foo', columnNames: ['col_a', 'col_c'] },
-				{ constraintName: 'invalid2', tableName: 'foo', columnNames: ['col_c', 'many_has_one_bar_id'] },
+		databaseMetadataResolver: () => Promise.resolve(createDatabaseMetadata({
+			foreignKeys: [],
+			indexes: [],
+			uniqueConstraints: [
+				{ constraintName: 'valid1', tableName: 'foo', columnNames: ['col_a', 'col_b'], deferrable: false, deferred: false },
+				{ constraintName: 'valid2', tableName: 'foo', columnNames: ['col_b', 'many_has_one_bar_id'], deferrable: false, deferred: false },
+				{ constraintName: 'valid3', tableName: 'foo', columnNames: ['single_col_unique'], deferrable: false, deferred: false },
+				{ constraintName: 'valid4', tableName: 'foo', columnNames: ['has_one_bar_id'], deferrable: false, deferred: false },
+				{ constraintName: 'invalid1', tableName: 'foo', columnNames: ['col_a', 'col_c'], deferrable: false, deferred: false },
+				{ constraintName: 'invalid2', tableName: 'foo', columnNames: ['col_c', 'many_has_one_bar_id'], deferrable: false, deferred: false },
 
 			],
-		}),
+		})),
 		schemaResolver: () => Promise.resolve(createSchema(UniqueModel)),
 		project: {
 			slug: 'test',

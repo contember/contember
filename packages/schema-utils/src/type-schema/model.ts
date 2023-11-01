@@ -170,6 +170,14 @@ const indexesSchema = Typesafe.coalesce<Model.Indexes, Model.Indexes>(
 	[],
 )
 
+const uniqueConstraint = Typesafe.intersection(
+	indexLike,
+	Typesafe.partial({
+		timing: Typesafe.enumeration('deferrable', 'deferred'),
+	}),
+)
+const uniqueConstraintCheck: Typesafe.Equals<Model.UniqueConstraint, ReturnType<typeof uniqueConstraint>> = true
+
 const entitySchema = Typesafe.intersection(
 	Typesafe.object({
 		name: Typesafe.string,
@@ -177,8 +185,8 @@ const entitySchema = Typesafe.intersection(
 		primaryColumn: Typesafe.string,
 		tableName: Typesafe.string,
 		fields: Typesafe.record(Typesafe.string, fieldSchema),
-		unique: Typesafe.preprocess(
-			Typesafe.array(indexLike),
+		unique: Typesafe.preprocess<Model.UniqueConstraints>(
+			Typesafe.array(uniqueConstraint),
 			it => it?.constructor === Object ? Object.values(it) : it,
 		),
 		indexes: indexesSchema,

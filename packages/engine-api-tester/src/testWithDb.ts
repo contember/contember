@@ -1,7 +1,7 @@
 import { Schema } from '@contember/schema'
 import { ModificationHandlerFactory, SchemaDiffer, SchemaMigrator, VERSION_LATEST } from '@contember/schema-migrations'
-import { AllowAllPermissionFactory, dummySchemaDatabaseMetadata, emptySchema, Providers } from '@contember/schema-utils'
-import { Client, SelectBuilder } from '@contember/database'
+import { AllowAllPermissionFactory, emptySchema, Providers } from '@contember/schema-utils'
+import { Client, DatabaseMetadataResolver, SelectBuilder, emptyDatabaseMetadata } from '@contember/database'
 import { assert } from 'vitest'
 import { createLogger, NullLoggerHandler, withLogger } from '@contember/logger'
 import {
@@ -14,7 +14,6 @@ import { MigrationGroup } from '@contember/database-migrations'
 import { createUuidGenerator } from './testUuid'
 import {
 	DatabaseContextFactory,
-	SchemaDatabaseMetadataResolver,
 	formatSchemaName,
 	ProjectInitializer,
 	StageBySlugQuery,
@@ -87,8 +86,8 @@ export const executeDbTest = async (test: Test) => {
 		systemContainer.schemaVersionBuilder,
 		test.migrationGroups ?? {},
 		{
-			resolveMetadata: () => Promise.resolve(dummySchemaDatabaseMetadata),
-		} as unknown as SchemaDatabaseMetadataResolver,
+			resolveMetadata: () => Promise.resolve(emptyDatabaseMetadata),
+		} as unknown as DatabaseMetadataResolver,
 	)
 	const stageCreator = new StageCreator()
 	const projectInitializer = new ProjectInitializer(stageCreator, systemMigrationsRunner, db, projectConfigWithDb)
@@ -124,8 +123,8 @@ export const executeDbTest = async (test: Test) => {
 			now: () => new Date('2019-09-04 12:00'),
 		}
 
-		const databaseMetadataResolver = new SchemaDatabaseMetadataResolver()
-		const metadata = await databaseMetadataResolver.resolveMetadata(db, schemaName)
+		const databaseMetadataResolver = new DatabaseMetadataResolver()
+		const metadata = await databaseMetadataResolver.resolveMetadata(db.client, schemaName)
 
 		const queryContent = async (stageSlug: string, gql: string, variables?: { [key: string]: any }): Promise<any> => {
 			const executionContainer = (test.executionContainerFactoryFactory?.(providers) ?? new ExecutionContainerFactory(providers))

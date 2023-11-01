@@ -87,7 +87,7 @@ export class SchemaBuilder {
 		const unique: Model.UniqueConstraint[] = []
 		for (const [fieldName, definition] of Object.entries(fieldDefinitions)) {
 			if (definition.options.unique) {
-				unique.push({ fields: [fieldName] })
+				unique.push({ fields: [fieldName], ...definition.options.unique })
 			}
 		}
 		return unique

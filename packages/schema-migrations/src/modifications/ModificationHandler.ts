@@ -2,7 +2,7 @@ import { MigrationBuilder } from '@contember/database-migrations'
 import { SchemaUpdater } from './utils/schemaUpdateUtils'
 import { Schema } from '@contember/schema'
 import { Migration } from '../Migration'
-import { SchemaDatabaseMetadata } from '@contember/schema-utils'
+import { DatabaseMetadata } from '@contember/database'
 
 export interface ModificationDescription {
 	message: string
@@ -23,7 +23,7 @@ export interface ModificationHandler<Data> {
 
 export interface ModificationHandlerCreateSqlOptions {
 	systemSchema: string
-	databaseMetadata: SchemaDatabaseMetadata
+	databaseMetadata: DatabaseMetadata
 	invalidateDatabaseMetadata: () => void
 }
 

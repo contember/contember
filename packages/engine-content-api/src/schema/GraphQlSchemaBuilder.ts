@@ -76,6 +76,7 @@ export class GraphQlSchemaBuilder {
 				name: 'MutationTransactionOptions',
 				fields: {
 					deferForeignKeyConstraints: { type: GraphQLBoolean },
+					deferUniqueConstraints: { type: GraphQLBoolean },
 				},
 			})
 			const mutationTransactionType = new GraphQLObjectType({
@@ -102,10 +103,11 @@ export class GraphQlSchemaBuilder {
 				type: new GraphQLNonNull(
 					mutationTransactionType,
 				),
-				resolve: async (parent, args: { options?: { deferForeignKeyConstraints?: boolean } }, context: Context, info) => {
+				resolve: async (parent, args: { options?: { deferForeignKeyConstraints?: boolean; deferUniqueConstraints?: boolean } }, context: Context, info) => {
 					return context.timer(`GraphQL.mutation.${info.fieldName}`, () =>
 						context.executionContainer.mutationResolver.resolveTransaction(info, {
 							deferForeignKeyConstraints: args.options?.deferForeignKeyConstraints ?? false,
+							deferUniqueConstraints: args.options?.deferUniqueConstraints ?? false,
 						}),
 					)
 				},

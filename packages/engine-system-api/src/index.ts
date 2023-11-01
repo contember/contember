@@ -12,7 +12,6 @@ export {
 	LatestTransactionIdByStageQuery,
 	ProjectInitializer,
 	ProjectMigrator,
-	SchemaDatabaseMetadataResolver,
 	SchemaVersionBuilder,
 	Stage,
 	StageBySlugQuery,

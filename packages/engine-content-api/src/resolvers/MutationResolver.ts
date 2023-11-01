@@ -3,6 +3,7 @@ import {
 	AfterCommitEvent,
 	BeforeCommitEvent,
 	ConstraintType,
+	convertError,
 	getInsertPrimary,
 	InputErrorKind,
 	Mapper,
@@ -16,18 +17,20 @@ import { ValidationResolver } from './ValidationResolver'
 import { GraphQLResolveInfo } from 'graphql'
 import { GraphQlQueryAstFactory } from './GraphQlQueryAstFactory'
 import { ImplementationException } from '../exception'
-import { retryTransaction } from '@contember/database'
+import { DatabaseMetadata, retryTransaction } from '@contember/database'
 import { Operation, readOperationMeta } from '../schema'
 import { assertNever } from '../utils'
 import { InputPreValidator } from '../input-validation'
 import { ObjectNode } from '../inputProcessing'
 import { executeReadOperations } from './ReadHelpers'
 import { logger } from '@contember/logger'
-import { SchemaDatabaseMetadata } from '@contember/schema-utils'
 
 type WithoutNode<T extends { node: any }> = Pick<T, Exclude<keyof T, 'node'>>
 
-type TransactionOptions = { deferForeignKeyConstraints?: boolean }
+type TransactionOptions = {
+	deferForeignKeyConstraints?: boolean
+	deferUniqueConstraints?: boolean
+}
 
 export class MutationResolver {
 	constructor(
@@ -35,7 +38,7 @@ export class MutationResolver {
 		private readonly mapperFactory: MapperFactory,
 		private readonly inputValidator: InputPreValidator,
 		private readonly graphqlQueryAstFactory: GraphQlQueryAstFactory,
-		private readonly schemaDatabaseMetadata: SchemaDatabaseMetadata,
+		private readonly schemaDatabaseMetadata: DatabaseMetadata,
 	) {}
 
 	public async resolveTransaction(info: GraphQLResolveInfo, options: TransactionOptions): Promise<Result.TransactionResult> {
@@ -65,7 +68,11 @@ export class MutationResolver {
 		return this.transaction(async mapper => {
 			if (options?.deferForeignKeyConstraints) {
 				logger.debug('MutationResolver: deferring foreign constraints')
-				await mapper.constraintHelper.setFkConstraintsDeferred()
+				await mapper.constraintHelper.setConstraintsDeferred('foreignKey')
+			}
+			if (options?.deferUniqueConstraints) {
+				logger.debug('MutationResolver: deferring unique constraints')
+				await mapper.constraintHelper.setConstraintsDeferred('unique')
 			}
 			const validationResult: Record<string, Result.MutationFieldResult> = {}
 			const validationErrors: Result.ValidationError[] = []
@@ -195,18 +202,6 @@ export class MutationResolver {
 					}
 				}
 				trxResult[field.alias] = result
-			}
-			if (options?.deferForeignKeyConstraints) {
-				logger.debug('MutationResolver: validating fk constraints')
-				const constraintsResult = await tryMutation(this.schema, this.schemaDatabaseMetadata, async () => {
-					await mapper.constraintHelper.setFkConstraintsImmediate()
-					return []
-				})
-				const errorResponse = this.createErrorResponse(constraintsResult)
-				if (errorResponse) {
-					logger.debug('MutationResolver: deferred fk validation failed', { errorResponse })
-					return { ...errorResponse, ...validationResult }
-				}
 			}
 
 			return {
@@ -474,20 +469,31 @@ export class MutationResolver {
 	): Promise<R> {
 		return await retryTransaction(
 			async () => {
-				const [result, mapper] = await this.mapperFactory.transaction(async mapper => {
+				return await this.mapperFactory.transaction(async mapper => {
 					logger.debug('MutationResolver: Starting mutation transaction')
 					const result = await cb(mapper)
 					if (!result.ok) {
 						logger.debug('MutationResolver: Transaction failed, rolling back', { result })
 						await mapper.db.connection.rollback()
 					} else {
+						await mapper.eventManager.fire(new BeforeCommitEvent())
+
 						logger.debug('MutationResolver: Transaction ok, committing')
+						try {
+							await mapper.db.connection.commit()
+						} catch (e) {
+							const err = convertError(this.schema, this.schemaDatabaseMetadata, e)
+							const errorResponse = this.createErrorResponse([err])
+							if (!errorResponse) {
+								throw new ImplementationException()
+							}
+							return { ...result, ...errorResponse }
+						}
+
+						await mapper.eventManager.fire(new AfterCommitEvent())
 					}
-					await mapper.eventManager.fire(new BeforeCommitEvent())
-					return [result, mapper]
+					return result
 				})
-				await mapper.eventManager.fire(new AfterCommitEvent())
-				return result
 			},
 			message => logger.warn(message),
 			{
@@ -496,6 +502,7 @@ export class MutationResolver {
 				maxTimeout: 1000,
 			},
 		)
+
 	}
 
 	private createErrorResponse(result: MutationResultList) {

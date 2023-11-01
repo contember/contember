@@ -2,7 +2,8 @@ import { Migration, ModificationHandlerFactory, SchemaDiffer, SchemaMigrator, VE
 import { Schema } from '@contember/schema'
 import { createMigrationBuilder } from '@contember/database-migrations'
 import { assert, describe, it } from 'vitest'
-import { dummySchemaDatabaseMetadata, emptySchema } from '@contember/schema-utils'
+import { emptySchema } from '@contember/schema-utils'
+import { DatabaseMetadata, emptyDatabaseMetadata } from '@contember/database'
 
 const modificationFactory = new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap)
 const schemaMigrator = new SchemaMigrator(modificationFactory)
@@ -14,6 +15,7 @@ export interface TestContext {
 	updated: Partial<Schema>
 	sql: string
 	noDiff?: boolean
+	databaseMetadata?: DatabaseMetadata
 }
 
 export function testDiffSchemas(
@@ -61,7 +63,12 @@ export function testApplyDiff(
 	})
 }
 
-export function testGenerateSql(original: Partial<Schema>, diff: Migration.Modification[], expectedSql: string) {
+export function testGenerateSql(
+	original: Partial<Schema>,
+	diff: Migration.Modification[],
+	expectedSql: string,
+	databaseMetadata: DatabaseMetadata = emptyDatabaseMetadata,
+) {
 	let schema = { ...emptySchema, ...original }
 	const builder = createMigrationBuilder()
 	for (let { modification, ...data } of diff) {
@@ -70,7 +77,7 @@ export function testGenerateSql(original: Partial<Schema>, diff: Migration.Modif
 		})
 		modificationHandler.createSql(builder, {
 			systemSchema: 'system',
-			databaseMetadata: dummySchemaDatabaseMetadata,
+			databaseMetadata,
 			invalidateDatabaseMetadata: () => null,
 		})
 		schema = modificationHandler.getSchemaUpdater()({ schema })
@@ -79,7 +86,7 @@ export function testGenerateSql(original: Partial<Schema>, diff: Migration.Modif
 	assert.equal(actual, expectedSql)
 }
 
-export function testMigrations(title: string, { original, updated, diff, noDiff, sql }: TestContext) {
+export function testMigrations(title: string, { original, updated, diff, noDiff, sql, databaseMetadata }: TestContext) {
 	describe(title, () => {
 		it('diff schemas', () => {
 			if (noDiff) {
@@ -91,7 +98,7 @@ export function testMigrations(title: string, { original, updated, diff, noDiff,
 			testApplyDiff(original, updated, diff)
 		})
 		it('generate sql', () => {
-			testGenerateSql(original, diff, sql)
+			testGenerateSql(original, diff, sql, databaseMetadata)
 		})
 	})
 }

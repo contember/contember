@@ -38,8 +38,8 @@ export class ColumnDefinition extends FieldDefinition<ColumnDefinitionOptions> {
 		return this.withOption('sequence', { precedence: 'BY DEFAULT', ...options })
 	}
 
-	public unique(): Interface<ColumnDefinition> {
-		return this.withOption('unique', true)
+	public unique(options: { timing?: Model.ConstraintTiming } = {}): Interface<ColumnDefinition> {
+		return this.withOption('unique', options)
 	}
 
 	public default(value: ColumnDefinition['options']['default']): Interface<ColumnDefinition> {
@@ -133,7 +133,7 @@ export type ColumnDefinitionOptions = {
 	columnType?: string
 	typeAlias?: string
 	columnName?: string
-	unique?: boolean
+	unique?: { timing?: Model.ConstraintTiming }
 	nullable?: boolean
 	default?: Model.ColumnTypeDefinition['default']
 	sequence?: Model.ColumnTypeDefinition['sequence']

@@ -1,18 +1,13 @@
-import {
-	ForeignKeyConstraintMetadata,
-	IndexMetadata,
-	SchemaDatabaseMetadata,
-	UniqueConstraintMetadata,
-	ForeignKeyDeleteAction,
-} from '@contember/schema-utils'
-import { DatabaseContext } from '../database'
-import { Connection } from '@contember/database'
-import { ResolvedDatabaseMetadata } from './ResolvedDatabaseMetadata'
+import { Connection } from '../client'
+import { createDatabaseMetadata, DatabaseMetadata } from './DatabaseMetadata'
+import { ForeignKeyConstraintMetadata, ForeignKeyDeleteAction } from './ForeignKeyConstraintMetadata'
+import { UniqueConstraintMetadata } from './UniqueConstraintMetadata'
+import { IndexMetadata } from './IndexMetadata'
 
-export class SchemaDatabaseMetadataResolver {
-	async resolveMetadata(db: DatabaseContext, contentSchema: string): Promise<SchemaDatabaseMetadata> {
-		const constraintRows = await this.fetchConstraints(db.client, contentSchema)
-		const indexRows = await this.fetchIndexes(db.client, contentSchema)
+export class DatabaseMetadataResolver {
+	async resolveMetadata(db: Connection.Queryable, contentSchema: string): Promise<DatabaseMetadata> {
+		const constraintRows = await this.fetchConstraints(db, contentSchema)
+		const indexRows = await this.fetchIndexes(db, contentSchema)
 
 		const fkConstraints = constraintRows
 			.filter((it): it is ForeignKeyConstraintsRow => it.type === ConstraintTypes.foreignKey)
@@ -23,6 +18,8 @@ export class SchemaDatabaseMetadataResolver {
 				fromTable: it.table_name,
 				toTable: it.target_table,
 				deleteAction: it.delete_action ?? ForeignKeyDeleteAction.noaction,
+				deferred: it.deferred,
+				deferrable: it.deferrable,
 			}))
 		const uniqueConstraints = constraintRows
 			.filter((it): it is UniqueConstraintsRow => it.type === ConstraintTypes.unique)
@@ -30,6 +27,8 @@ export class SchemaDatabaseMetadataResolver {
 				constraintName: it.constraint_name,
 				tableName: it.table_name,
 				columnNames: it.columns,
+				deferred: it.deferred,
+				deferrable: it.deferrable,
 			}))
 		const indexes = indexRows
 			.map((it): IndexMetadata => ({
@@ -38,11 +37,11 @@ export class SchemaDatabaseMetadataResolver {
 				columnNames: it.columns,
 			}))
 
-		return new ResolvedDatabaseMetadata(
-			fkConstraints,
-			uniqueConstraints,
+		return createDatabaseMetadata({
+			foreignKeys: fkConstraints,
+			uniqueConstraints: uniqueConstraints,
 			indexes,
-		)
+		})
 	}
 
 	private async fetchConstraints(connection: Connection.Queryable, schema: string): Promise<ConstraintsRow[]> {
@@ -55,8 +54,8 @@ export class SchemaDatabaseMetadataResolver {
                 MAX(pg_constraint_table.relname) AS target_table,
                 JSONB_AGG(DISTINCT pg_attribute_target.attname)
                 FILTER ( WHERE pg_attribute_target.attname IS NOT NULL) AS target_columns,
-                BOOL_OR(condeferrable),
-                BOOL_OR(condeferred),
+                BOOL_OR(condeferrable) as deferrable,
+                BOOL_OR(condeferred) as deferred,
                 MAX(confdeltype) AS delete_action
             FROM pg_constraint
             JOIN pg_class

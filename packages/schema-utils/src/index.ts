@@ -5,7 +5,6 @@ import { aclSchema, modelSchema, validationSchema, settingsSchema } from './type
 import { actionsSchema } from './type-schema/actions'
 
 export * from './definition-generator'
-export * from './SchemaDatabaseMetadata'
 export * from './lax'
 export * from './model'
 export * from './acl'

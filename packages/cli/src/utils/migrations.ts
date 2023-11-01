@@ -10,7 +10,7 @@ import chalk from 'chalk'
 import { Schema } from '@contember/schema'
 import chalkTable from 'chalk-table'
 import { assertNever } from './assertNever'
-import { dummySchemaDatabaseMetadata } from '@contember/schema-utils'
+import { emptyDatabaseMetadata } from '@contember/database'
 
 export const getLatestMigration = async (migrationsResolver: MigrationsResolver): Promise<Migration | null> => {
 	const migrations = await migrationsResolver.getMigrations()
@@ -39,7 +39,7 @@ export const printMigrationDescription = function (
 	description.forEach(({ modification, getSql, description }) => {
 		const sql = getSql({
 			systemSchema: 'system',
-			databaseMetadata: dummySchemaDatabaseMetadata,
+			databaseMetadata: emptyDatabaseMetadata,
 			invalidateDatabaseMetadata: () => null,
 		})
 		if (options.sqlOnly) {

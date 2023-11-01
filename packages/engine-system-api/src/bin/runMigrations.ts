@@ -1,10 +1,8 @@
 import { SystemMigrationsRunner } from '../migrations'
 import { DatabaseContextFactory, emptyVersionedSchema, SchemaVersionBuilder } from '../model'
+import { Connection, DatabaseMetadataResolver, emptyDatabaseMetadata } from '@contember/database'
 import { createLogger, PrettyPrintLoggerHandler } from '@contember/logger'
 
-
-import { SchemaDatabaseMetadataResolver } from '../model'
-import { dummySchemaDatabaseMetadata } from '@contember/schema-utils';
 
 (async () => {
 	const dbConfig = {
@@ -27,8 +25,8 @@ import { dummySchemaDatabaseMetadata } from '@contember/schema-utils';
 		} as unknown as SchemaVersionBuilder,
 		{},
 		{
-			resolveMetadata: () => Promise.resolve(dummySchemaDatabaseMetadata),
-		} as unknown as SchemaDatabaseMetadataResolver,
+			resolveMetadata: () => Promise.resolve(emptyDatabaseMetadata),
+		} as unknown as DatabaseMetadataResolver,
 	)
 	// eslint-disable-next-line no-console
 	await migrationsRunner.run(createLogger(new PrettyPrintLoggerHandler(process.stderr)))

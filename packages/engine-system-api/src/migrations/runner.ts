@@ -21,13 +21,12 @@ import _20230911174000fixondelete from './2023-09-11-174000-fix-on-delete'
 import _20231019173000fixunique from './2023-10-19-173000-fix-unique'
 import snapshot from './snapshot'
 
-import { Client, Connection, createDatabaseIfNotExists, DatabaseConfig } from '@contember/database'
+import { Client, Connection, createDatabaseIfNotExists, DatabaseConfig, DatabaseMetadataResolver } from '@contember/database'
 import { DatabaseContextFactory, SchemaVersionBuilder } from '../model'
 import { ProjectConfig } from '../types'
 import { Logger } from '@contember/logger'
 import { GroupMigrationsResolver } from '@contember/database-migrations'
 import { SnapshotMigrationResolver } from '@contember/database-migrations'
-import { SchemaDatabaseMetadataResolver } from '../model/metadata/SchemaDatabaseMetadataResolver'
 
 const migrations = {
 	'2018-08-04-102200-init': _20180804102200init,
@@ -60,7 +59,7 @@ export class SystemMigrationsRunner {
 		private readonly schema: string,
 		private readonly schemaVersionBuilder: SchemaVersionBuilder,
 		private readonly migrationGroups: Record<string, MigrationGroup<unknown>>,
-		private readonly databaseMetadataResolver: SchemaDatabaseMetadataResolver,
+		private readonly databaseMetadataResolver: DatabaseMetadataResolver,
 	) {
 	}
 	async run(logger: Logger) {
@@ -91,7 +90,7 @@ export class SystemMigrationsRunner {
 				schemaResolver,
 				databaseMetadataResolver: (connection: Connection.ConnectionLike, schema: string) => {
 					const dbContextMigrations = this.databaseContextFactory.create(connection)
-					return this.databaseMetadataResolver.resolveMetadata(dbContextMigrations, schema)
+					return this.databaseMetadataResolver.resolveMetadata(dbContextMigrations.client, schema)
 				},
 
 			})

@@ -170,7 +170,7 @@ export class Application {
 		}
 	}
 
-	private async handleHttpRequest(ctx: KoaContext<{module?: string}>) {
+	private async handleHttpRequest(ctx: KoaContext<{ module?: string; projectGroup?: string; project?: string }>) {
 		let httpContext: HttpContext | null = null
 		let requestLogger = this.logger
 		const { timer, send: sendTimer } = this.createTimer()
@@ -192,6 +192,8 @@ export class Application {
 			requestLogger = requestLogger.child({
 				projectGroup: groupContainer.slug,
 			})
+			ctx.state.projectGroup = groupContainer.slug
+			ctx.state.project = matchedRequest.params.projectSlug
 
 			const authResult = await groupContainer.authenticator.authenticate({ request: ctx.req, timer })
 			requestLogger.debug('User authenticated', { authResult })

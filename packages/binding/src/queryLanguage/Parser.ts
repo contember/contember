@@ -326,20 +326,36 @@ class Parser extends EmbeddedActionsParser {
 			},
 		})
 
-		const condition = this.SUBRULE(this.condition)
-
-		let i = fields.length - 1
-		let where: Parser.AST.FieldWhere = {
-			[fields[i--]]: condition,
-		}
-
-		while (i >= 0) {
-			where = {
-				[fields[i--]]: where,
+		const createFieldWhere = (value: Parser.AST.Condition | Parser.AST.FieldWhere): Parser.AST.FieldWhere => {
+			let i = fields.length - 1
+			let where: Parser.AST.FieldWhere = {
+				[fields[i--]]: value,
 			}
+
+			while (i >= 0) {
+				where = {
+					[fields[i--]]: where,
+				}
+			}
+
+			return where
 		}
 
-		return where
+
+		return this.OR([
+			{
+				ALT: () => {
+					const condition = this.SUBRULE(this.condition)
+					return createFieldWhere(condition)
+				},
+			},
+			{
+				ALT: () => {
+					const subWhere = this.SUBRULE(this.nonUniqueWhere)
+					return createFieldWhere(subWhere)
+				},
+			},
+		])
 	})
 
 	private condition: () => Parser.AST.Condition = this.RULE('condition', () => {

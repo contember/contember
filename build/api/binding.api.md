@@ -1286,6 +1286,8 @@ export namespace Parser {
     // (undocumented)
     export interface ParserResult {
         // (undocumented)
+        columnValue: AST.ColumnValue;
+        // (undocumented)
         filter: Filter;
         // (undocumented)
         orderBy: OrderBy;

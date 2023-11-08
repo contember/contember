@@ -744,6 +744,7 @@ class Parser extends EmbeddedActionsParser {
 		return image
 			.substring(1, image.length - 1)
 			.replace("\\'", "'")
+			.replace(`\\"`, `"`)
 			.replace('\\b', '\b')
 			.replace('\\f', '\f')
 			.replace('\\n', '\n')
@@ -863,6 +864,9 @@ class Parser extends EmbeddedActionsParser {
 			case 'taggedMap':
 				expression = Parser.parser.taggedMap()
 				break
+			case 'columnValue':
+				expression = Parser.parser.columnValue()
+				break
 			default:
 				throw new QueryLanguageError(`Not implemented entry point '${entry}'`)
 		}
@@ -903,6 +907,7 @@ namespace Parser {
 		filter: Filter // E.g. [author.son.age < 123]
 		orderBy: OrderBy // E.g. items.order asc, items.content.name asc
 		taggedMap: ParsedTaggedMap // E.g editUser(id: $entity.id, foo: 'bar')
+		columnValue: AST.ColumnValue
 	}
 
 	export type EntryPoint = keyof ParserResult

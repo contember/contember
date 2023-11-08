@@ -3,10 +3,6 @@ import { EmbeddedActionsParser, Lexer } from 'chevrotain'
 import { Environment } from '../dao'
 import type { EntityName, FieldName, Filter, OrderBy, UniqueWhere } from '../treeParameters'
 import type {
-	ParsedTaggedMap,
-	ParsedTaggedMapVariableValue,
-	ParsedTaggedMapLiteralValue,
-	ParsedTaggedMapEntry,
 	ParsedHasManyRelation,
 	ParsedHasOneRelation,
 	ParsedQualifiedEntityList,
@@ -15,6 +11,10 @@ import type {
 	ParsedRelativeEntityList,
 	ParsedRelativeSingleEntity,
 	ParsedRelativeSingleField,
+	ParsedTaggedMap,
+	ParsedTaggedMapEntry,
+	ParsedTaggedMapLiteralValue,
+	ParsedTaggedMapVariableValue,
 	ParsedUnconstrainedQualifiedEntityList,
 	ParsedUnconstrainedQualifiedSingleEntity,
 } from './ParserResults'
@@ -317,28 +317,42 @@ class Parser extends EmbeddedActionsParser {
 	})
 
 	private fieldWhere: () => Parser.AST.FieldWhere = this.RULE('fieldWhere', () => {
-		const fields: FieldName[] = []
+		const fields: { name: FieldName, modifier?: string }[] = []
 
 		this.AT_LEAST_ONE_SEP({
 			SEP: tokens.Dot,
 			DEF: () => {
-				fields.push(this.SUBRULE(this.fieldIdentifier))
+				fields.push(this.SUBRULE(this.fieldIdentifierWithOptionalModifier))
 			},
 		})
 
 		const createFieldWhere = (value: Parser.AST.Condition | Parser.AST.FieldWhere): Parser.AST.FieldWhere => {
-			let i = fields.length - 1
-			let where: Parser.AST.FieldWhere = {
-				[fields[i--]]: value,
-			}
-
-			while (i >= 0) {
-				where = {
-					[fields[i--]]: where,
+			return this.ACTION(() => {
+				let val = value
+				for (let i = fields.length - 1; i >= 0; i--) {
+					const field = fields[i]
+					if (field.modifier === 'none') {
+						val = {
+							not: {
+								[field.name]: val,
+							},
+						}
+					} else if (field.modifier === 'all') {
+						val = {
+							not: {
+								[field.name]: { not: val },
+							},
+						}
+					} else if (!field.modifier || field.modifier === 'some') {
+						val = {
+							[field.name]: val,
+						}
+					} else {
+						throw new QueryLanguageError(`Unknown modifier '${field.modifier}', expected 'none', 'some' or 'all'`)
+					}
 				}
-			}
-
-			return where
+				return val
+			})
 		}
 
 
@@ -652,6 +666,15 @@ class Parser extends EmbeddedActionsParser {
 				},
 			},
 		])
+	})
+
+	private fieldIdentifierWithOptionalModifier: () => { name: FieldName, modifier?: string } = this.RULE('fieldIdentifierWithOptionalModifier', () => {
+		const fieldIdentifier = this.SUBRULE1(this.fieldIdentifier)
+		const modifier = this.OPTION(() => {
+			this.CONSUME(tokens.Colon)
+			return this.SUBRULE(this.identifier)
+		})
+		return { name: fieldIdentifier, modifier }
 	})
 
 	private fieldIdentifier: () => FieldName = this.RULE('fieldIdentifier', () => {

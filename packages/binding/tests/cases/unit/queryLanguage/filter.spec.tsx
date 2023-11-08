@@ -63,4 +63,38 @@ describe('filter QueryLanguage parser', () => {
 			},
 		})
 	})
+
+	it('should parse conditions with quantifiers', () => {
+		expect(parse(`[tags:none[name = 'foo' && isPublished = true]]`)).toEqual({
+			not: {
+				tags: {
+					and: [
+						{ name: { eq: 'foo' } },
+						{ isPublished: { eq: true } },
+					],
+				},
+			},
+		})
+	})
+
+
+	it('should parse conditions with quantifiers', () => {
+		expect(parse(`[tags:all[isPublished = true]]`)).toEqual({
+			not: {
+				tags: {
+					not: { isPublished: { eq: true } },
+				},
+			},
+		})
+	})
+
+	it('should parse conditions with quantifiers without subfilter', () => {
+		expect(parse(`[tags:all.isPublished = true]`)).toEqual({
+			not: {
+				tags: {
+					not: { isPublished: { eq: true } },
+				},
+			},
+		})
+	})
 })

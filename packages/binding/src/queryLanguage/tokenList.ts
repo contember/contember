@@ -56,7 +56,7 @@ export const tokens = {
 
 	StringLiteral: createToken({
 		name: 'StringLiteral',
-		pattern: /'(:?[^\\']|\\(:?[bfnrtv'\\/]|u[0-9a-fA-F]{4}))*'/,
+		pattern: /'(:?[^\\']|\\(:?[bfnrtv"'\\/]|u[0-9a-fA-F]{4}))*'|"(:?[^\\"]|\\(:?[bfnrtv"'\\/]|u[0-9a-fA-F]{4}))*"/,
 	}),
 
 	LeftParenthesis: createToken({

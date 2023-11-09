@@ -51,6 +51,7 @@ export class CacheStore {
 			filter: new LRUCache(100),
 			orderBy: new LRUCache(50),
 			taggedMap: new LRUCache(50),
+			columnValue: new LRUCache(500),
 		}
 	}
 }

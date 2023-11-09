@@ -52,4 +52,49 @@ describe('filter QueryLanguage parser', () => {
 			and: [{ a: { b: { c: { lt: 123 } } } }, { a: { d: { eq: 456 } } }],
 		})
 	})
+
+	it('should parse conditions with sub-filters', () => {
+		expect(parse(`[tags[name = 'foo' && isPublished = true]]`)).toEqual({
+			tags: {
+				and: [
+					{ name: { eq: 'foo' } },
+					{ isPublished: { eq: true } },
+				],
+			},
+		})
+	})
+
+	it('should parse conditions with quantifiers', () => {
+		expect(parse(`[tags:none[name = 'foo' && isPublished = true]]`)).toEqual({
+			not: {
+				tags: {
+					and: [
+						{ name: { eq: 'foo' } },
+						{ isPublished: { eq: true } },
+					],
+				},
+			},
+		})
+	})
+
+
+	it('should parse conditions with quantifiers', () => {
+		expect(parse(`[tags:all[isPublished = true]]`)).toEqual({
+			not: {
+				tags: {
+					not: { isPublished: { eq: true } },
+				},
+			},
+		})
+	})
+
+	it('should parse conditions with quantifiers without subfilter', () => {
+		expect(parse(`[tags:all.isPublished = true]`)).toEqual({
+			not: {
+				tags: {
+					not: { isPublished: { eq: true } },
+				},
+			},
+		})
+	})
 })

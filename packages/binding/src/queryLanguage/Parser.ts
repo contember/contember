@@ -3,10 +3,6 @@ import { EmbeddedActionsParser, Lexer } from 'chevrotain'
 import { Environment } from '../dao'
 import type { EntityName, FieldName, Filter, OrderBy, UniqueWhere } from '../treeParameters'
 import type {
-	ParsedTaggedMap,
-	ParsedTaggedMapVariableValue,
-	ParsedTaggedMapLiteralValue,
-	ParsedTaggedMapEntry,
 	ParsedHasManyRelation,
 	ParsedHasOneRelation,
 	ParsedQualifiedEntityList,
@@ -15,6 +11,10 @@ import type {
 	ParsedRelativeEntityList,
 	ParsedRelativeSingleEntity,
 	ParsedRelativeSingleField,
+	ParsedTaggedMap,
+	ParsedTaggedMapEntry,
+	ParsedTaggedMapLiteralValue,
+	ParsedTaggedMapVariableValue,
 	ParsedUnconstrainedQualifiedEntityList,
 	ParsedUnconstrainedQualifiedSingleEntity,
 } from './ParserResults'
@@ -317,29 +317,59 @@ class Parser extends EmbeddedActionsParser {
 	})
 
 	private fieldWhere: () => Parser.AST.FieldWhere = this.RULE('fieldWhere', () => {
-		const fields: FieldName[] = []
+		const fields: { name: FieldName, modifier?: string }[] = []
 
 		this.AT_LEAST_ONE_SEP({
 			SEP: tokens.Dot,
 			DEF: () => {
-				fields.push(this.SUBRULE(this.fieldIdentifier))
+				fields.push(this.SUBRULE(this.fieldIdentifierWithOptionalModifier))
 			},
 		})
 
-		const condition = this.SUBRULE(this.condition)
-
-		let i = fields.length - 1
-		let where: Parser.AST.FieldWhere = {
-			[fields[i--]]: condition,
+		const createFieldWhere = (value: Parser.AST.Condition | Parser.AST.FieldWhere): Parser.AST.FieldWhere => {
+			return this.ACTION(() => {
+				let val = value
+				for (let i = fields.length - 1; i >= 0; i--) {
+					const field = fields[i]
+					if (field.modifier === 'none') {
+						val = {
+							not: {
+								[field.name]: val,
+							},
+						}
+					} else if (field.modifier === 'all') {
+						val = {
+							not: {
+								[field.name]: { not: val },
+							},
+						}
+					} else if (!field.modifier || field.modifier === 'some') {
+						val = {
+							[field.name]: val,
+						}
+					} else {
+						throw new QueryLanguageError(`Unknown modifier '${field.modifier}', expected 'none', 'some' or 'all'`)
+					}
+				}
+				return val
+			})
 		}
 
-		while (i >= 0) {
-			where = {
-				[fields[i--]]: where,
-			}
-		}
 
-		return where
+		return this.OR([
+			{
+				ALT: () => {
+					const condition = this.SUBRULE(this.condition)
+					return createFieldWhere(condition)
+				},
+			},
+			{
+				ALT: () => {
+					const subWhere = this.SUBRULE(this.nonUniqueWhere)
+					return createFieldWhere(subWhere)
+				},
+			},
+		])
 	})
 
 	private condition: () => Parser.AST.Condition = this.RULE('condition', () => {
@@ -638,6 +668,15 @@ class Parser extends EmbeddedActionsParser {
 		])
 	})
 
+	private fieldIdentifierWithOptionalModifier: () => { name: FieldName, modifier?: string } = this.RULE('fieldIdentifierWithOptionalModifier', () => {
+		const fieldIdentifier = this.SUBRULE1(this.fieldIdentifier)
+		const modifier = this.OPTION(() => {
+			this.CONSUME(tokens.Colon)
+			return this.SUBRULE(this.identifier)
+		})
+		return { name: fieldIdentifier, modifier }
+	})
+
 	private fieldIdentifier: () => FieldName = this.RULE('fieldIdentifier', () => {
 		return this.SUBRULE(this.identifier)
 		// return this.OR([
@@ -705,6 +744,7 @@ class Parser extends EmbeddedActionsParser {
 		return image
 			.substring(1, image.length - 1)
 			.replace("\\'", "'")
+			.replace(`\\"`, `"`)
 			.replace('\\b', '\b')
 			.replace('\\f', '\f')
 			.replace('\\n', '\n')
@@ -824,6 +864,9 @@ class Parser extends EmbeddedActionsParser {
 			case 'taggedMap':
 				expression = Parser.parser.taggedMap()
 				break
+			case 'columnValue':
+				expression = Parser.parser.columnValue()
+				break
 			default:
 				throw new QueryLanguageError(`Not implemented entry point '${entry}'`)
 		}
@@ -864,6 +907,7 @@ namespace Parser {
 		filter: Filter // E.g. [author.son.age < 123]
 		orderBy: OrderBy // E.g. items.order asc, items.content.name asc
 		taggedMap: ParsedTaggedMap // E.g editUser(id: $entity.id, foo: 'bar')
+		columnValue: AST.ColumnValue
 	}
 
 	export type EntryPoint = keyof ParserResult

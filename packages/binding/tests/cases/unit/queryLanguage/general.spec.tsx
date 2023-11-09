@@ -4,6 +4,23 @@ import { Environment } from '../../../../src/dao'
 import { Parser } from '../../../../src/queryLanguage'
 
 describe('query language parser', () => {
+	it('shoud parse column value', () => {
+		const env = Environment.create()
+		expect(Parser.parseQueryLanguageExpression('123', 'columnValue', env)).toEqual(123)
+		expect(Parser.parseQueryLanguageExpression('123.456', 'columnValue', env)).toEqual(123.456)
+		expect(Parser.parseQueryLanguageExpression('true', 'columnValue', env)).toEqual(true)
+		expect(Parser.parseQueryLanguageExpression('false', 'columnValue', env)).toEqual(false)
+		expect(Parser.parseQueryLanguageExpression('null', 'columnValue', env)).toEqual(null)
+		expect(Parser.parseQueryLanguageExpression("'foo'", 'columnValue', env)).toEqual('foo')
+		expect(Parser.parseQueryLanguageExpression(`'foo\\'bar'`, 'columnValue', env)).toEqual("foo'bar")
+		expect(Parser.parseQueryLanguageExpression(`'foo"bar'`, 'columnValue', env)).toEqual(`foo"bar`)
+		expect(Parser.parseQueryLanguageExpression(`'foo\\"bar'`, 'columnValue', env)).toEqual(`foo"bar`)
+		expect(Parser.parseQueryLanguageExpression('"foo"', 'columnValue', env)).toEqual('foo')
+		expect(Parser.parseQueryLanguageExpression(`"foo\\"bar"`, 'columnValue', env)).toEqual('foo"bar')
+		expect(Parser.parseQueryLanguageExpression(`"foo\\'bar"`, 'columnValue', env)).toEqual("foo'bar")
+		expect(Parser.parseQueryLanguageExpression(`"foo'bar"`, 'columnValue', env)).toEqual("foo'bar")
+	})
+
 	it('should resolve variables adhering to the principle maximal munch', () => {
 		const environment = Environment.create().withVariables({
 			ab: 456,

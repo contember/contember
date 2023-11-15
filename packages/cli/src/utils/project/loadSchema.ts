@@ -2,7 +2,6 @@ import { Project } from '@contember/cli-common'
 import { Schema } from '@contember/schema'
 import * as esbuild from 'esbuild'
 import { join } from 'node:path'
-import { NodeVM } from 'vm2'
 import { schemaType } from '@contember/schema-utils'
 
 export const loadSchema = async (project: Project): Promise<Schema> => {
@@ -16,13 +15,9 @@ export const loadSchema = async (project: Project): Promise<Schema> => {
 		external: ['@contember/admin', 'react', 'react/jsx-runtime'],
 	})
 	const bundledJs = response.outputFiles[0].text
-	const vm = new NodeVM({
-		require: {
-			builtin: ['*'],
-		},
-	})
-	const schema = await vm.run(bundledJs).default
-	// https://github.com/patriksimek/vm2/issues/198
-	const fixedSchema = JSON.parse(JSON.stringify(schema))
-	return schemaType(fixedSchema)
+
+	const fn = new Function('require', `var module = {}; ((module) => { ${bundledJs} })(module); return module`)
+
+	const schema = fn(require).exports.default
+	return schemaType(schema)
 }

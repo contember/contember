@@ -12,8 +12,8 @@
     "test": "echo 'No tests'"
   },
   "devDependencies": {
-    "@types/js-yaml": "^4.0.1",
-    "@types/node": "^18"
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^18.18.9"
   },
   "dependencies": {
     "js-yaml": "^4.1.0"

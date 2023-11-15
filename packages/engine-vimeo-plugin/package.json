@@ -14,12 +14,12 @@
   "dependencies": {
     "@contember/engine-plugins": "workspace:*",
     "@contember/typesafe": "workspace:*",
-    "node-fetch": "^2.0"
+    "node-fetch": "^2.7.0"
   },
   "devDependencies": {
-    "@types/node": "^18",
-    "@types/node-fetch": "^2.5.4",
-    "graphql": "^16.5.0"
+    "@types/node": "^18.18.9",
+    "@types/node-fetch": "^2.6.9",
+    "graphql": "^16.8.1"
   },
   "peerDependencies": {
     "graphql": ">= 14.6.0"

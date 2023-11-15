@@ -27,15 +27,15 @@
     "@contember/schema": "workspace:*",
     "@contember/schema-utils": "workspace:*",
     "@contember/typesafe": "workspace:*",
-    "@graphql-tools/schema": "^8.3.5",
+    "@graphql-tools/schema": "^8.5.1",
     "graphql-tag": "^2.12.6"
   },
   "devDependencies": {
     "@contember/engine-api-tester": "workspace:*",
-    "@graphql-codegen/cli": "^2.6.2",
-    "@graphql-codegen/typescript": "^2.5.1",
-    "@graphql-codegen/typescript-operations": "^2.4.2",
-    "@graphql-codegen/typescript-resolvers": "^2.6.6",
+    "@graphql-codegen/cli": "^2.16.5",
+    "@graphql-codegen/typescript": "^2.8.8",
+    "@graphql-codegen/typescript-operations": "^2.5.13",
+    "@graphql-codegen/typescript-resolvers": "^2.7.13",
     "@types/ws": "^8.5.9",
     "graphql": "^16.8.1"
   },

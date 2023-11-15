@@ -23,16 +23,16 @@
     "@contember/schema": "workspace:*",
     "@contember/schema-migrations": "workspace:*",
     "@contember/schema-utils": "workspace:*",
-    "@graphql-tools/utils": "^10.0.7",
+    "@graphql-tools/utils": "^10.0.8",
     "graphql-tag": "^2.12.6"
   },
   "devDependencies": {
     "@contember/engine-api-tester": "workspace:*",
     "@contember/schema-definition": "workspace:*",
-    "@graphql-codegen/cli": "^2.6.2",
-    "@graphql-codegen/typescript": "^2.5.1",
-    "@graphql-codegen/typescript-operations": "^2.4.2",
-    "@graphql-codegen/typescript-resolvers": "^2.6.6",
+    "@graphql-codegen/cli": "^2.16.5",
+    "@graphql-codegen/typescript": "^2.8.8",
+    "@graphql-codegen/typescript-operations": "^2.5.13",
+    "@graphql-codegen/typescript-resolvers": "^2.7.13",
     "@types/node": "^20.9.0",
     "graphql": "^16.8.1",
     "pg": "^8.11.3"

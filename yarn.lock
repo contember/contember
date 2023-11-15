@@ -759,12 +759,10 @@ __metadata:
     "@contember/schema": "workspace:*"
     "@contember/schema-definition": "workspace:*"
     "@contember/schema-utils": "workspace:*"
-    "@types/node-fetch": ^2.6.9
     "@types/request": ^2.48.12
     autocannon: ^7.12.0
     autocannon-compare: ^0.4.0
     dotenv-cli: ^4.1.1
-    node-fetch: ^2.7.0
     pg: ^8.11.3
   languageName: unknown
   linkType: soft
@@ -812,7 +810,6 @@ __metadata:
     graphql: ^16.8.1
     graphql-request: ^4.3.0
     js-yaml: ^4.1.0
-    node-fetch: ^2.7.0
     pg: ^8.11.3
     postcss: ^8.4.31
     preact: ^10.19.2
@@ -1187,9 +1184,7 @@ __metadata:
     "@contember/engine-plugins": "workspace:*"
     "@contember/typesafe": "workspace:*"
     "@types/node": ^20.9.0
-    "@types/node-fetch": ^2.6.9
     graphql: ^16.8.1
-    node-fetch: ^2.7.0
   peerDependencies:
     graphql: ">= 14.6.0"
     pg: ^8.9.0
@@ -2973,7 +2968,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node-fetch@npm:^2.5.10, @types/node-fetch@npm:^2.6.9":
+"@types/node-fetch@npm:^2.5.10":
   version: 2.6.9
   resolution: "@types/node-fetch@npm:2.6.9"
   dependencies:
@@ -7746,7 +7741,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"node-fetch@npm:^2.6.1, node-fetch@npm:^2.6.7, node-fetch@npm:^2.7.0":
+"node-fetch@npm:^2.6.1, node-fetch@npm:^2.6.7":
   version: 2.7.0
   resolution: "node-fetch@npm:2.7.0"
   dependencies:

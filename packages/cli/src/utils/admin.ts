@@ -1,4 +1,3 @@
-import fetch, { Response } from 'node-fetch'
 import { readdir, readFile } from 'node:fs/promises'
 import { maskToken } from './token'
 

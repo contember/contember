@@ -1,5 +1,4 @@
 import { VimeoConfig } from './Config'
-import fetch from 'node-fetch'
 
 export class VimeoService {
 	constructor(public readonly config: VimeoConfig) {}

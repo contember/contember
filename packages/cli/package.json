@@ -35,7 +35,6 @@
     "graphql": "^16.8.1",
     "graphql-request": "^4.3.0",
     "js-yaml": "^4.1.0",
-    "node-fetch": "^2.7.0",
     "pg": "^8.11.3",
     "preact": "^10.19.2",
     "preact-render-to-string": "^5.2.6",

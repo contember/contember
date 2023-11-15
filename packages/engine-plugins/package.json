@@ -19,6 +19,6 @@
     "graphql": ">= 14.6.0"
   },
   "devDependencies": {
-    "graphql": "^16.5.0"
+    "graphql": "^16.8.1"
   }
 }

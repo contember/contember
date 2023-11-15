@@ -24,7 +24,7 @@
     "@contember/schema-migrations": "workspace:*",
     "@contember/schema-utils": "workspace:*",
     "@graphql-tools/utils": "^10.0.7",
-    "graphql-tag": "^2.12.5"
+    "graphql-tag": "^2.12.6"
   },
   "devDependencies": {
     "@contember/engine-api-tester": "workspace:*",
@@ -33,9 +33,9 @@
     "@graphql-codegen/typescript": "^2.5.1",
     "@graphql-codegen/typescript-operations": "^2.4.2",
     "@graphql-codegen/typescript-resolvers": "^2.6.6",
-    "@types/node": "^18",
-    "graphql": "^16.5.0",
-    "pg": "^8.9.0"
+    "@types/node": "^18.18.9",
+    "graphql": "^16.8.1",
+    "pg": "^8.11.3"
   },
   "peerDependencies": {
     "graphql": ">= 14.6.0",

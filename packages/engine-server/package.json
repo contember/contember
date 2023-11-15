@@ -12,16 +12,16 @@
     "@contember/engine-plugins": "workspace:*",
     "@contember/engine-s3-plugin": "workspace:*",
     "@contember/engine-vimeo-plugin": "workspace:*",
-    "graphql": "^16.5.0",
+    "graphql": "^16.8.1",
     "heapdump": "^0.3.15",
-    "pg": "^8.9.0",
-    "uuid": "^8.3.1"
+    "pg": "^8.11.3",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@contember/engine-api-tester": "workspace:*",
-    "@types/koa-compress": "^4.0.1",
-    "@types/node": "^18",
-    "@types/supertest": "^2.0.8",
-    "supertest": "^6.0.1"
+    "@types/koa-compress": "^4.0.6",
+    "@types/node": "^18.18.9",
+    "@types/supertest": "^2.0.16",
+    "supertest": "^6.3.3"
   }
 }

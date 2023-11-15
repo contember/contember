@@ -17,6 +17,6 @@
   },
   "devDependencies": {
     "@contember/schema-definition": "workspace:*",
-    "@types/node": "^18"
+    "@types/node": "^18.18.9"
   }
 }

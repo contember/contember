@@ -15,16 +15,16 @@
     "@contember/engine-plugins": "workspace:*",
     "@contember/graphql-utils": "workspace:*",
     "@contember/typesafe": "workspace:*",
-    "mime-types": "^2.1.24",
-    "picomatch": "^2.2.1",
-    "qs": "^6.10.1",
-    "uuid": "^8.3.1"
+    "mime-types": "^2.1.35",
+    "picomatch": "^2.3.1",
+    "qs": "^6.11.2",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
-    "@types/mime-types": "^2.1.0",
-    "@types/qs": "^6.9.6",
-    "@types/uuid": "^8.3.0",
-    "graphql": "^16.5.0"
+    "@types/mime-types": "^2.1.4",
+    "@types/qs": "^6.9.10",
+    "@types/uuid": "^8.3.4",
+    "graphql": "^16.8.1"
   },
   "peerDependencies": {
     "graphql": ">= 14.6.0"

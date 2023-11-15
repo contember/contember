@@ -1002,7 +1002,7 @@ __metadata:
     uuid: ^8.3.2
     ws: ^8.14.2
   peerDependencies:
-    graphql: ^14.6.0
+    graphql: ">= 14.6.0"
     pg: ^8.9.0
   languageName: unknown
   linkType: soft
@@ -1016,6 +1016,7 @@ __metadata:
     graphql: ^16.8.1
   peerDependencies:
     graphql: ">= 14.6.0"
+    pg: ^8.9.0
   languageName: unknown
   linkType: soft
 
@@ -1036,6 +1037,7 @@ __metadata:
     uuid: ^8.3.2
   peerDependencies:
     graphql: ">= 14.6.0"
+    pg: ^8.9.0
   languageName: unknown
   linkType: soft
 
@@ -1172,6 +1174,7 @@ __metadata:
     node-fetch: ^2.7.0
   peerDependencies:
     graphql: ">= 14.6.0"
+    pg: ^8.9.0
   languageName: unknown
   linkType: soft
 
@@ -1182,6 +1185,7 @@ __metadata:
     "@contember/engine-system-api": "workspace:*"
     "@graphql-tools/schema": ^10.0.0
     "@types/node": ^20.9.0
+    graphql: ^16.8.1
     graphql-ts-client-api: ^3.1.14
     graphql-ts-client-codegen: ^3.1.14
   languageName: unknown
@@ -1194,6 +1198,7 @@ __metadata:
     "@contember/engine-tenant-api": "workspace:*"
     "@graphql-tools/schema": ^10.0.0
     "@types/node": ^20.9.0
+    graphql: ^16.8.1
     graphql-ts-client-api: ^3.1.14
     graphql-ts-client-codegen: ^3.1.14
   languageName: unknown

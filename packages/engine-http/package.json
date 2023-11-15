@@ -52,7 +52,7 @@
     "graphql": "^16.8.1"
   },
   "peerDependencies": {
-    "graphql": "^14.6.0",
+    "graphql": ">= 14.6.0",
     "pg": "^8.9.0"
   }
 }

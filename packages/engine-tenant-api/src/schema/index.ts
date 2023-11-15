@@ -4,22 +4,24 @@ export type InputMaybe<T> = Maybe<T>
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] }
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> }
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> }
+export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never }
+export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never }
 export type RequireFields<T, K extends keyof T> = Omit<T, K> & { [P in K]-?: NonNullable<T[P]> }
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
-	ID: string
-	String: string
-	Boolean: boolean
-	Int: number
-	Float: number
-	DateTime: any
-	Json: any
+	ID: { input: string; output: string }
+	String: { input: string; output: string }
+	Boolean: { input: boolean; output: boolean }
+	Int: { input: number; output: number }
+	Float: { input: number; output: number }
+	DateTime: { input: any; output: any }
+	Json: { input: any; output: any }
 }
 
 export type AddGlobalIdentityRolesError = {
 	readonly __typename?: 'AddGlobalIdentityRolesError'
 	readonly code: AddGlobalIdentityRolesErrorCode
-	readonly developerMessage: Scalars['String']
+	readonly developerMessage: Scalars['String']['output']
 }
 
 export type AddGlobalIdentityRolesErrorCode =
@@ -29,7 +31,7 @@ export type AddGlobalIdentityRolesErrorCode =
 export type AddGlobalIdentityRolesResponse = {
 	readonly __typename?: 'AddGlobalIdentityRolesResponse'
 	readonly error?: Maybe<AddGlobalIdentityRolesError>
-	readonly ok: Scalars['Boolean']
+	readonly ok: Scalars['Boolean']['output']
 	readonly result?: Maybe<AddGlobalIdentityRolesResult>
 }
 
@@ -41,7 +43,7 @@ export type AddGlobalIdentityRolesResult = {
 export type AddIdpError = {
 	readonly __typename?: 'AddIDPError'
 	readonly code: AddIdpErrorCode
-	readonly developerMessage: Scalars['String']
+	readonly developerMessage: Scalars['String']['output']
 }
 
 export type AddIdpErrorCode =
@@ -52,15 +54,15 @@ export type AddIdpErrorCode =
 export type AddIdpResponse = {
 	readonly __typename?: 'AddIDPResponse'
 	readonly error?: Maybe<AddIdpError>
-	readonly ok: Scalars['Boolean']
+	readonly ok: Scalars['Boolean']['output']
 }
 
 export type AddMailTemplateError = {
 	readonly __typename?: 'AddMailTemplateError'
 	readonly code: AddMailTemplateErrorCode
-	readonly developerMessage: Scalars['String']
+	readonly developerMessage: Scalars['String']['output']
 	/** @deprecated Field no longer supported */
-	readonly endUserMessage?: Maybe<Scalars['String']>
+	readonly endUserMessage?: Maybe<Scalars['String']['output']>
 }
 
 export type AddMailTemplateErrorCode =
@@ -72,15 +74,15 @@ export type AddMailTemplateResponse = {
 	readonly error?: Maybe<AddMailTemplateError>
 	/** @deprecated Field no longer supported */
 	readonly errors: ReadonlyArray<AddMailTemplateError>
-	readonly ok: Scalars['Boolean']
+	readonly ok: Scalars['Boolean']['output']
 }
 
 export type AddProjectMemberError = {
 	readonly __typename?: 'AddProjectMemberError'
 	readonly code: AddProjectMemberErrorCode
-	readonly developerMessage: Scalars['String']
+	readonly developerMessage: Scalars['String']['output']
 	/** @deprecated Field no longer supported */
-	readonly endUserMessage?: Maybe<Scalars['String']>
+	readonly endUserMessage?: Maybe<Scalars['String']['output']>
 	readonly membershipValidation?: Maybe<ReadonlyArray<MembershipValidationError>>
 }
 
@@ -97,26 +99,26 @@ export type AddProjectMemberResponse = {
 	readonly __typename?: 'AddProjectMemberResponse'
 	readonly error?: Maybe<AddProjectMemberError>
 	readonly errors: ReadonlyArray<AddProjectMemberError>
-	readonly ok: Scalars['Boolean']
+	readonly ok: Scalars['Boolean']['output']
 }
 
 export type ApiKey = {
 	readonly __typename?: 'ApiKey'
-	readonly id: Scalars['String']
+	readonly id: Scalars['String']['output']
 	readonly identity: Identity
 }
 
 export type ApiKeyWithToken = {
 	readonly __typename?: 'ApiKeyWithToken'
-	readonly id: Scalars['String']
+	readonly id: Scalars['String']['output']
 	readonly identity: Identity
-	readonly token?: Maybe<Scalars['String']>
+	readonly token?: Maybe<Scalars['String']['output']>
 }
 
 export type ChangeMyPasswordError = {
 	readonly __typename?: 'ChangeMyPasswordError'
 	readonly code: ChangeMyPasswordErrorCode
-	readonly developerMessage: Scalars['String']
+	readonly developerMessage: Scalars['String']['output']
 }
 
 export type ChangeMyPasswordErrorCode =
@@ -128,13 +130,13 @@ export type ChangeMyPasswordErrorCode =
 export type ChangeMyPasswordResponse = {
 	readonly __typename?: 'ChangeMyPasswordResponse'
 	readonly error?: Maybe<ChangeMyPasswordError>
-	readonly ok: Scalars['Boolean']
+	readonly ok: Scalars['Boolean']['output']
 }
 
 export type ChangeMyProfileError = {
 	readonly __typename?: 'ChangeMyProfileError'
 	readonly code: ChangeMyProfileErrorCode
-	readonly developerMessage: Scalars['String']
+	readonly developerMessage: Scalars['String']['output']
 }
 
 export type ChangeMyProfileErrorCode =
@@ -145,15 +147,15 @@ export type ChangeMyProfileErrorCode =
 export type ChangeMyProfileResponse = {
 	readonly __typename?: 'ChangeMyProfileResponse'
 	readonly error?: Maybe<ChangeMyProfileError>
-	readonly ok: Scalars['Boolean']
+	readonly ok: Scalars['Boolean']['output']
 }
 
 export type ChangePasswordError = {
 	readonly __typename?: 'ChangePasswordError'
 	readonly code: ChangePasswordErrorCode
-	readonly developerMessage: Scalars['String']
+	readonly developerMessage: Scalars['String']['output']
 	/** @deprecated Field no longer supported */
-	readonly endUserMessage?: Maybe<Scalars['String']>
+	readonly endUserMessage?: Maybe<Scalars['String']['output']>
 }
 
 export type ChangePasswordErrorCode =
@@ -165,7 +167,7 @@ export type ChangePasswordResponse = {
 	readonly error?: Maybe<ChangePasswordError>
 	/** @deprecated Field no longer supported */
 	readonly errors: ReadonlyArray<ChangePasswordError>
-	readonly ok: Scalars['Boolean']
+	readonly ok: Scalars['Boolean']['output']
 }
 
 export type CheckResetPasswordTokenCode =
@@ -181,15 +183,15 @@ export type CheckResetPasswordTokenResult = {
 
 export type CommonSignInResult = {
 	readonly person: Person
-	readonly token: Scalars['String']
+	readonly token: Scalars['String']['output']
 }
 
 export type ConfirmOtpError = {
 	readonly __typename?: 'ConfirmOtpError'
 	readonly code: ConfirmOtpErrorCode
-	readonly developerMessage: Scalars['String']
+	readonly developerMessage: Scalars['String']['output']
 	/** @deprecated Field no longer supported */
-	readonly endUserMessage?: Maybe<Scalars['String']>
+	readonly endUserMessage?: Maybe<Scalars['String']['output']>
 }
 
 export type ConfirmOtpErrorCode =
@@ -201,15 +203,15 @@ export type ConfirmOtpResponse = {
 	readonly error?: Maybe<ConfirmOtpError>
 	/** @deprecated Field no longer supported */
 	readonly errors: ReadonlyArray<ConfirmOtpError>
-	readonly ok: Scalars['Boolean']
+	readonly ok: Scalars['Boolean']['output']
 }
 
 export type CreateApiKeyError = {
 	readonly __typename?: 'CreateApiKeyError'
 	readonly code: CreateApiKeyErrorCode
-	readonly developerMessage: Scalars['String']
+	readonly developerMessage: Scalars['String']['output']
 	/** @deprecated Field no longer supported */
-	readonly endUserMessage?: Maybe<Scalars['String']>
+	readonly endUserMessage?: Maybe<Scalars['String']['output']>
 	readonly membershipValidation?: Maybe<ReadonlyArray<MembershipValidationError>>
 }
 
@@ -225,7 +227,7 @@ export type CreateApiKeyResponse = {
 	readonly error?: Maybe<CreateApiKeyError>
 	/** @deprecated Field no longer supported */
 	readonly errors: ReadonlyArray<CreateApiKeyError>
-	readonly ok: Scalars['Boolean']
+	readonly ok: Scalars['Boolean']['output']
 	readonly result?: Maybe<CreateApiKeyResult>
 }
 
@@ -237,9 +239,9 @@ export type CreateApiKeyResult = {
 export type CreatePasswordResetRequestError = {
 	readonly __typename?: 'CreatePasswordResetRequestError'
 	readonly code: CreatePasswordResetRequestErrorCode
-	readonly developerMessage: Scalars['String']
+	readonly developerMessage: Scalars['String']['output']
 	/** @deprecated Field no longer supported */
-	readonly endUserMessage?: Maybe<Scalars['String']>
+	readonly endUserMessage?: Maybe<Scalars['String']['output']>
 }
 
 export type CreatePasswordResetRequestErrorCode =
@@ -250,25 +252,25 @@ export type CreatePasswordResetRequestResponse = {
 	readonly error?: Maybe<CreatePasswordResetRequestError>
 	/** @deprecated Field no longer supported */
 	readonly errors: ReadonlyArray<CreatePasswordResetRequestError>
-	readonly ok: Scalars['Boolean']
+	readonly ok: Scalars['Boolean']['output']
 }
 
 export type CreateProjectOptions = {
-	readonly deployTokenHash?: InputMaybe<Scalars['String']>
-	readonly noDeployToken?: InputMaybe<Scalars['Boolean']>
+	readonly deployTokenHash?: InputMaybe<Scalars['String']['input']>
+	readonly noDeployToken?: InputMaybe<Scalars['Boolean']['input']>
 }
 
 export type CreateProjectResponse = {
 	readonly __typename?: 'CreateProjectResponse'
 	readonly error?: Maybe<CreateProjectResponseError>
-	readonly ok: Scalars['Boolean']
+	readonly ok: Scalars['Boolean']['output']
 	readonly result?: Maybe<CreateProjectResult>
 }
 
 export type CreateProjectResponseError = {
 	readonly __typename?: 'CreateProjectResponseError'
 	readonly code: CreateProjectResponseErrorCode
-	readonly developerMessage: Scalars['String']
+	readonly developerMessage: Scalars['String']['output']
 }
 
 export type CreateProjectResponseErrorCode =
@@ -281,14 +283,14 @@ export type CreateProjectResult = {
 }
 
 export type CreateResetPasswordRequestOptions = {
-	readonly mailProject?: InputMaybe<Scalars['String']>
-	readonly mailVariant?: InputMaybe<Scalars['String']>
+	readonly mailProject?: InputMaybe<Scalars['String']['input']>
+	readonly mailVariant?: InputMaybe<Scalars['String']['input']>
 }
 
 export type CreateSessionTokenError = {
 	readonly __typename?: 'CreateSessionTokenError'
 	readonly code: CreateSessionTokenErrorCode
-	readonly developerMessage: Scalars['String']
+	readonly developerMessage: Scalars['String']['output']
 }
 
 export type CreateSessionTokenErrorCode =
@@ -299,22 +301,22 @@ export type CreateSessionTokenErrorCode =
 export type CreateSessionTokenResponse = {
 	readonly __typename?: 'CreateSessionTokenResponse'
 	readonly error?: Maybe<CreateSessionTokenError>
-	readonly ok: Scalars['Boolean']
+	readonly ok: Scalars['Boolean']['output']
 	readonly result?: Maybe<CreateSessionTokenResult>
 }
 
 export type CreateSessionTokenResult = CommonSignInResult & {
 	readonly __typename?: 'CreateSessionTokenResult'
 	readonly person: Person
-	readonly token: Scalars['String']
+	readonly token: Scalars['String']['output']
 }
 
 export type DisableApiKeyError = {
 	readonly __typename?: 'DisableApiKeyError'
 	readonly code: DisableApiKeyErrorCode
-	readonly developerMessage: Scalars['String']
+	readonly developerMessage: Scalars['String']['output']
 	/** @deprecated Field no longer supported */
-	readonly endUserMessage?: Maybe<Scalars['String']>
+	readonly endUserMessage?: Maybe<Scalars['String']['output']>
 }
 
 export type DisableApiKeyErrorCode =
@@ -325,13 +327,13 @@ export type DisableApiKeyResponse = {
 	readonly error?: Maybe<DisableApiKeyError>
 	/** @deprecated Field no longer supported */
 	readonly errors: ReadonlyArray<DisableApiKeyError>
-	readonly ok: Scalars['Boolean']
+	readonly ok: Scalars['Boolean']['output']
 }
 
 export type DisableIdpError = {
 	readonly __typename?: 'DisableIDPError'
 	readonly code: DisableIdpErrorCode
-	readonly developerMessage: Scalars['String']
+	readonly developerMessage: Scalars['String']['output']
 }
 
 export type DisableIdpErrorCode =
@@ -340,15 +342,15 @@ export type DisableIdpErrorCode =
 export type DisableIdpResponse = {
 	readonly __typename?: 'DisableIDPResponse'
 	readonly error?: Maybe<DisableIdpError>
-	readonly ok: Scalars['Boolean']
+	readonly ok: Scalars['Boolean']['output']
 }
 
 export type DisableOtpError = {
 	readonly __typename?: 'DisableOtpError'
 	readonly code: DisableOtpErrorCode
-	readonly developerMessage: Scalars['String']
+	readonly developerMessage: Scalars['String']['output']
 	/** @deprecated Field no longer supported */
-	readonly endUserMessage?: Maybe<Scalars['String']>
+	readonly endUserMessage?: Maybe<Scalars['String']['output']>
 }
 
 export type DisableOtpErrorCode =
@@ -359,13 +361,13 @@ export type DisableOtpResponse = {
 	readonly error?: Maybe<DisableOtpError>
 	/** @deprecated Field no longer supported */
 	readonly errors: ReadonlyArray<DisableOtpError>
-	readonly ok: Scalars['Boolean']
+	readonly ok: Scalars['Boolean']['output']
 }
 
 export type DisablePersonError = {
 	readonly __typename?: 'DisablePersonError'
 	readonly code: DisablePersonErrorCode
-	readonly developerMessage: Scalars['String']
+	readonly developerMessage: Scalars['String']['output']
 }
 
 export type DisablePersonErrorCode =
@@ -375,13 +377,13 @@ export type DisablePersonErrorCode =
 export type DisablePersonResponse = {
 	readonly __typename?: 'DisablePersonResponse'
 	readonly error?: Maybe<DisablePersonError>
-	readonly ok: Scalars['Boolean']
+	readonly ok: Scalars['Boolean']['output']
 }
 
 export type EnableIdpError = {
 	readonly __typename?: 'EnableIDPError'
 	readonly code: EnableIdpErrorCode
-	readonly developerMessage: Scalars['String']
+	readonly developerMessage: Scalars['String']['output']
 }
 
 export type EnableIdpErrorCode =
@@ -390,40 +392,41 @@ export type EnableIdpErrorCode =
 export type EnableIdpResponse = {
 	readonly __typename?: 'EnableIDPResponse'
 	readonly error?: Maybe<EnableIdpError>
-	readonly ok: Scalars['Boolean']
+	readonly ok: Scalars['Boolean']['output']
 }
 
 export type IdpOptions = {
-	readonly autoSignUp?: InputMaybe<Scalars['Boolean']>
-	readonly exclusive?: InputMaybe<Scalars['Boolean']>
-	readonly initReturnsConfig?: InputMaybe<Scalars['Boolean']>
+	readonly autoSignUp?: InputMaybe<Scalars['Boolean']['input']>
+	readonly exclusive?: InputMaybe<Scalars['Boolean']['input']>
+	readonly initReturnsConfig?: InputMaybe<Scalars['Boolean']['input']>
 }
 
 export type IdpOptionsOutput = {
 	readonly __typename?: 'IDPOptionsOutput'
-	readonly autoSignUp: Scalars['Boolean']
-	readonly exclusive: Scalars['Boolean']
+	readonly autoSignUp: Scalars['Boolean']['output']
+	readonly exclusive: Scalars['Boolean']['output']
+	readonly initReturnsConfig: Scalars['Boolean']['output']
 }
 
 export type IdpResponseInput = {
-	readonly url: Scalars['String']
+	readonly url: Scalars['String']['input']
 }
 
 export type Identity = {
 	readonly __typename?: 'Identity'
 	readonly apiKey?: Maybe<ApiKey>
-	readonly description?: Maybe<Scalars['String']>
-	readonly id: Scalars['String']
+	readonly description?: Maybe<Scalars['String']['output']>
+	readonly id: Scalars['String']['output']
 	readonly permissions?: Maybe<IdentityGlobalPermissions>
 	readonly person?: Maybe<Person>
 	readonly projects: ReadonlyArray<IdentityProjectRelation>
-	readonly roles?: Maybe<ReadonlyArray<Scalars['String']>>
+	readonly roles?: Maybe<ReadonlyArray<Scalars['String']['output']>>
 }
 
 export type IdentityGlobalPermissions = {
 	readonly __typename?: 'IdentityGlobalPermissions'
-	readonly canCreateProject: Scalars['Boolean']
-	readonly canDeployEntrypoint: Scalars['Boolean']
+	readonly canCreateProject: Scalars['Boolean']['output']
+	readonly canDeployEntrypoint: Scalars['Boolean']['output']
 }
 
 export type IdentityProjectRelation = {
@@ -434,19 +437,19 @@ export type IdentityProjectRelation = {
 
 export type IdentityProvider = {
 	readonly __typename?: 'IdentityProvider'
-	readonly configuration: Scalars['Json']
-	readonly disabledAt?: Maybe<Scalars['DateTime']>
+	readonly configuration: Scalars['Json']['output']
+	readonly disabledAt?: Maybe<Scalars['DateTime']['output']>
 	readonly options: IdpOptionsOutput
-	readonly slug: Scalars['String']
-	readonly type: Scalars['String']
+	readonly slug: Scalars['String']['output']
+	readonly type: Scalars['String']['output']
 }
 
 export type InitSignInIdpError = {
 	readonly __typename?: 'InitSignInIDPError'
 	readonly code: InitSignInIdpErrorCode
-	readonly developerMessage: Scalars['String']
+	readonly developerMessage: Scalars['String']['output']
 	/** @deprecated Field no longer supported */
-	readonly endUserMessage?: Maybe<Scalars['String']>
+	readonly endUserMessage?: Maybe<Scalars['String']['output']>
 }
 
 export type InitSignInIdpErrorCode =
@@ -458,23 +461,23 @@ export type InitSignInIdpResponse = {
 	readonly error?: Maybe<InitSignInIdpError>
 	/** @deprecated Field no longer supported */
 	readonly errors: ReadonlyArray<InitSignInIdpError>
-	readonly ok: Scalars['Boolean']
+	readonly ok: Scalars['Boolean']['output']
 	readonly result?: Maybe<InitSignInIdpResult>
 }
 
 export type InitSignInIdpResult = {
 	readonly __typename?: 'InitSignInIDPResult'
-	readonly authUrl: Scalars['String']
-	readonly idpConfiguration?: Maybe<Scalars['Json']>
-	readonly sessionData: Scalars['Json']
+	readonly authUrl: Scalars['String']['output']
+	readonly idpConfiguration?: Maybe<Scalars['Json']['output']>
+	readonly sessionData: Scalars['Json']['output']
 }
 
 export type InviteError = {
 	readonly __typename?: 'InviteError'
 	readonly code: InviteErrorCode
-	readonly developerMessage: Scalars['String']
+	readonly developerMessage: Scalars['String']['output']
 	/** @deprecated Field no longer supported */
-	readonly endUserMessage?: Maybe<Scalars['String']>
+	readonly endUserMessage?: Maybe<Scalars['String']['output']>
 	readonly membershipValidation?: Maybe<ReadonlyArray<MembershipValidationError>>
 }
 
@@ -492,7 +495,7 @@ export type InviteMethod =
   | 'RESET_PASSWORD'
 
 export type InviteOptions = {
-	readonly mailVariant?: InputMaybe<Scalars['String']>
+	readonly mailVariant?: InputMaybe<Scalars['String']['input']>
 	readonly method?: InputMaybe<InviteMethod>
 }
 
@@ -501,30 +504,30 @@ export type InviteResponse = {
 	readonly error?: Maybe<InviteError>
 	/** @deprecated Field no longer supported */
 	readonly errors: ReadonlyArray<InviteError>
-	readonly ok: Scalars['Boolean']
+	readonly ok: Scalars['Boolean']['output']
 	readonly result?: Maybe<InviteResult>
 }
 
 export type InviteResult = {
 	readonly __typename?: 'InviteResult'
-	readonly isNew: Scalars['Boolean']
+	readonly isNew: Scalars['Boolean']['output']
 	readonly person: Person
 }
 
 export type MailTemplate = {
-	readonly content: Scalars['String']
-	readonly projectSlug?: InputMaybe<Scalars['String']>
-	readonly subject: Scalars['String']
+	readonly content: Scalars['String']['input']
+	readonly projectSlug?: InputMaybe<Scalars['String']['input']>
+	readonly subject: Scalars['String']['input']
 	readonly type: MailType
-	readonly useLayout?: InputMaybe<Scalars['Boolean']>
+	readonly useLayout?: InputMaybe<Scalars['Boolean']['input']>
 	/** Custom mail variant identifier, e.g. a locale. */
-	readonly variant?: InputMaybe<Scalars['String']>
+	readonly variant?: InputMaybe<Scalars['String']['input']>
 }
 
 export type MailTemplateIdentifier = {
-	readonly projectSlug?: InputMaybe<Scalars['String']>
+	readonly projectSlug?: InputMaybe<Scalars['String']['input']>
 	readonly type: MailType
-	readonly variant?: InputMaybe<Scalars['String']>
+	readonly variant?: InputMaybe<Scalars['String']['input']>
 }
 
 export type MailType =
@@ -538,20 +541,20 @@ export type MemberType =
 
 export type Membership = {
 	readonly __typename?: 'Membership'
-	readonly role: Scalars['String']
+	readonly role: Scalars['String']['output']
 	readonly variables: ReadonlyArray<VariableEntry>
 }
 
 export type MembershipInput = {
-	readonly role: Scalars['String']
+	readonly role: Scalars['String']['input']
 	readonly variables: ReadonlyArray<VariableEntryInput>
 }
 
 export type MembershipValidationError = {
 	readonly __typename?: 'MembershipValidationError'
 	readonly code: MembershipValidationErrorCode
-	readonly role: Scalars['String']
-	readonly variable?: Maybe<Scalars['String']>
+	readonly role: Scalars['String']['output']
+	readonly variable?: Maybe<Scalars['String']['output']>
 }
 
 export type MembershipValidationErrorCode =
@@ -604,16 +607,16 @@ export type Mutation = {
 
 
 export type MutationAddGlobalIdentityRolesArgs = {
-	identityId: Scalars['String']
-	roles: ReadonlyArray<Scalars['String']>
+	identityId: Scalars['String']['input']
+	roles: ReadonlyArray<Scalars['String']['input']>
 }
 
 
 export type MutationAddIdpArgs = {
-	configuration: Scalars['Json']
-	identityProvider: Scalars['String']
+	configuration: Scalars['Json']['input']
+	identityProvider: Scalars['String']['input']
 	options?: InputMaybe<IdpOptions>
-	type: Scalars['String']
+	type: Scalars['String']['input']
 }
 
 
@@ -628,117 +631,117 @@ export type MutationAddProjectMailTemplateArgs = {
 
 
 export type MutationAddProjectMemberArgs = {
-	identityId: Scalars['String']
+	identityId: Scalars['String']['input']
 	memberships: ReadonlyArray<MembershipInput>
-	projectSlug: Scalars['String']
+	projectSlug: Scalars['String']['input']
 }
 
 
 export type MutationChangeMyPasswordArgs = {
-	currentPassword: Scalars['String']
-	newPassword: Scalars['String']
+	currentPassword: Scalars['String']['input']
+	newPassword: Scalars['String']['input']
 }
 
 
 export type MutationChangeMyProfileArgs = {
-	email?: InputMaybe<Scalars['String']>
-	name?: InputMaybe<Scalars['String']>
+	email?: InputMaybe<Scalars['String']['input']>
+	name?: InputMaybe<Scalars['String']['input']>
 }
 
 
 export type MutationChangePasswordArgs = {
-	password: Scalars['String']
-	personId: Scalars['String']
+	password: Scalars['String']['input']
+	personId: Scalars['String']['input']
 }
 
 
 export type MutationConfirmOtpArgs = {
-	otpToken: Scalars['String']
+	otpToken: Scalars['String']['input']
 }
 
 
 export type MutationCreateApiKeyArgs = {
-	description: Scalars['String']
+	description: Scalars['String']['input']
 	memberships: ReadonlyArray<MembershipInput>
-	projectSlug: Scalars['String']
-	tokenHash?: InputMaybe<Scalars['String']>
+	projectSlug: Scalars['String']['input']
+	tokenHash?: InputMaybe<Scalars['String']['input']>
 }
 
 
 export type MutationCreateGlobalApiKeyArgs = {
-	description: Scalars['String']
-	roles?: InputMaybe<ReadonlyArray<Scalars['String']>>
-	tokenHash?: InputMaybe<Scalars['String']>
+	description: Scalars['String']['input']
+	roles?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>
+	tokenHash?: InputMaybe<Scalars['String']['input']>
 }
 
 
 export type MutationCreateProjectArgs = {
-	config?: InputMaybe<Scalars['Json']>
-	deployTokenHash?: InputMaybe<Scalars['String']>
-	name?: InputMaybe<Scalars['String']>
+	config?: InputMaybe<Scalars['Json']['input']>
+	deployTokenHash?: InputMaybe<Scalars['String']['input']>
+	name?: InputMaybe<Scalars['String']['input']>
 	options?: InputMaybe<CreateProjectOptions>
-	projectSlug: Scalars['String']
+	projectSlug: Scalars['String']['input']
 	secrets?: InputMaybe<ReadonlyArray<ProjectSecret>>
 }
 
 
 export type MutationCreateResetPasswordRequestArgs = {
-	email: Scalars['String']
+	email: Scalars['String']['input']
 	options?: InputMaybe<CreateResetPasswordRequestOptions>
 }
 
 
 export type MutationCreateSessionTokenArgs = {
-	email?: InputMaybe<Scalars['String']>
-	expiration?: InputMaybe<Scalars['Int']>
-	personId?: InputMaybe<Scalars['String']>
+	email?: InputMaybe<Scalars['String']['input']>
+	expiration?: InputMaybe<Scalars['Int']['input']>
+	personId?: InputMaybe<Scalars['String']['input']>
 }
 
 
 export type MutationDisableApiKeyArgs = {
-	id: Scalars['String']
+	id: Scalars['String']['input']
 }
 
 
 export type MutationDisableIdpArgs = {
-	identityProvider: Scalars['String']
+	identityProvider: Scalars['String']['input']
 }
 
 
 export type MutationDisablePersonArgs = {
-	personId: Scalars['String']
+	personId: Scalars['String']['input']
 }
 
 
 export type MutationEnableIdpArgs = {
-	identityProvider: Scalars['String']
+	identityProvider: Scalars['String']['input']
 }
 
 
 export type MutationInitSignInIdpArgs = {
-	data?: InputMaybe<Scalars['Json']>
-	identityProvider: Scalars['String']
-	redirectUrl?: InputMaybe<Scalars['String']>
+	data?: InputMaybe<Scalars['Json']['input']>
+	identityProvider: Scalars['String']['input']
+	redirectUrl?: InputMaybe<Scalars['String']['input']>
 }
 
 
 export type MutationInviteArgs = {
-	email: Scalars['String']
+	email: Scalars['String']['input']
 	memberships: ReadonlyArray<MembershipInput>
-	name?: InputMaybe<Scalars['String']>
+	name?: InputMaybe<Scalars['String']['input']>
 	options?: InputMaybe<InviteOptions>
-	projectSlug: Scalars['String']
+	projectSlug: Scalars['String']['input']
 }
 
 
 export type MutationPrepareOtpArgs = {
-	label?: InputMaybe<Scalars['String']>
+	label?: InputMaybe<Scalars['String']['input']>
 }
 
 
 export type MutationRemoveGlobalIdentityRolesArgs = {
-	identityId: Scalars['String']
-	roles: ReadonlyArray<Scalars['String']>
+	identityId: Scalars['String']['input']
+	roles: ReadonlyArray<Scalars['String']['input']>
 }
 
 
@@ -753,118 +756,118 @@ export type MutationRemoveProjectMailTemplateArgs = {
 
 
 export type MutationRemoveProjectMemberArgs = {
-	identityId: Scalars['String']
-	projectSlug: Scalars['String']
+	identityId: Scalars['String']['input']
+	projectSlug: Scalars['String']['input']
 }
 
 
 export type MutationResetPasswordArgs = {
-	password: Scalars['String']
-	token: Scalars['String']
+	password: Scalars['String']['input']
+	token: Scalars['String']['input']
 }
 
 
 export type MutationSetProjectSecretArgs = {
-	key: Scalars['String']
-	projectSlug: Scalars['String']
-	value: Scalars['String']
+	key: Scalars['String']['input']
+	projectSlug: Scalars['String']['input']
+	value: Scalars['String']['input']
 }
 
 
 export type MutationSignInArgs = {
-	email: Scalars['String']
-	expiration?: InputMaybe<Scalars['Int']>
-	otpToken?: InputMaybe<Scalars['String']>
-	password: Scalars['String']
+	email: Scalars['String']['input']
+	expiration?: InputMaybe<Scalars['Int']['input']>
+	otpToken?: InputMaybe<Scalars['String']['input']>
+	password: Scalars['String']['input']
 }
 
 
 export type MutationSignInIdpArgs = {
-	data?: InputMaybe<Scalars['Json']>
-	expiration?: InputMaybe<Scalars['Int']>
-	identityProvider: Scalars['String']
+	data?: InputMaybe<Scalars['Json']['input']>
+	expiration?: InputMaybe<Scalars['Int']['input']>
+	identityProvider: Scalars['String']['input']
 	idpResponse?: InputMaybe<IdpResponseInput>
-	redirectUrl?: InputMaybe<Scalars['String']>
-	sessionData?: InputMaybe<Scalars['Json']>
+	redirectUrl?: InputMaybe<Scalars['String']['input']>
+	sessionData?: InputMaybe<Scalars['Json']['input']>
 }
 
 
 export type MutationSignOutArgs = {
-	all?: InputMaybe<Scalars['Boolean']>
+	all?: InputMaybe<Scalars['Boolean']['input']>
 }
 
 
 export type MutationSignUpArgs = {
-	email: Scalars['String']
-	name?: InputMaybe<Scalars['String']>
-	password?: InputMaybe<Scalars['String']>
-	passwordHash?: InputMaybe<Scalars['String']>
-	roles?: InputMaybe<ReadonlyArray<Scalars['String']>>
+	email: Scalars['String']['input']
+	name?: InputMaybe<Scalars['String']['input']>
+	password?: InputMaybe<Scalars['String']['input']>
+	passwordHash?: InputMaybe<Scalars['String']['input']>
+	roles?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>
 }
 
 
 export type MutationUnmanagedInviteArgs = {
-	email: Scalars['String']
+	email: Scalars['String']['input']
 	memberships: ReadonlyArray<MembershipInput>
-	name?: InputMaybe<Scalars['String']>
+	name?: InputMaybe<Scalars['String']['input']>
 	options?: InputMaybe<UnmanagedInviteOptions>
-	password?: InputMaybe<Scalars['String']>
-	projectSlug: Scalars['String']
+	password?: InputMaybe<Scalars['String']['input']>
+	projectSlug: Scalars['String']['input']
 }
 
 
 export type MutationUpdateIdpArgs = {
-	configuration?: InputMaybe<Scalars['Json']>
-	identityProvider: Scalars['String']
-	mergeConfiguration?: InputMaybe<Scalars['Boolean']>
+	configuration?: InputMaybe<Scalars['Json']['input']>
+	identityProvider: Scalars['String']['input']
+	mergeConfiguration?: InputMaybe<Scalars['Boolean']['input']>
 	options?: InputMaybe<IdpOptions>
-	type?: InputMaybe<Scalars['String']>
+	type?: InputMaybe<Scalars['String']['input']>
 }
 
 
 export type MutationUpdateProjectArgs = {
-	config?: InputMaybe<Scalars['Json']>
-	mergeConfig?: InputMaybe<Scalars['Boolean']>
-	name?: InputMaybe<Scalars['String']>
-	projectSlug: Scalars['String']
+	config?: InputMaybe<Scalars['Json']['input']>
+	mergeConfig?: InputMaybe<Scalars['Boolean']['input']>
+	name?: InputMaybe<Scalars['String']['input']>
+	projectSlug: Scalars['String']['input']
 }
 
 
 export type MutationUpdateProjectMemberArgs = {
-	identityId: Scalars['String']
+	identityId: Scalars['String']['input']
 	memberships: ReadonlyArray<MembershipInput>
-	projectSlug: Scalars['String']
+	projectSlug: Scalars['String']['input']
 }
 
 export type Person = {
 	readonly __typename?: 'Person'
-	readonly email?: Maybe<Scalars['String']>
-	readonly id: Scalars['String']
+	readonly email?: Maybe<Scalars['String']['output']>
+	readonly id: Scalars['String']['output']
 	readonly identity: Identity
-	readonly name?: Maybe<Scalars['String']>
-	readonly otpEnabled: Scalars['Boolean']
+	readonly name?: Maybe<Scalars['String']['output']>
+	readonly otpEnabled: Scalars['Boolean']['output']
 }
 
 export type PrepareOtpResponse = {
 	readonly __typename?: 'PrepareOtpResponse'
-	readonly ok: Scalars['Boolean']
+	readonly ok: Scalars['Boolean']['output']
 	readonly result?: Maybe<PrepareOtpResult>
 }
 
 export type PrepareOtpResult = {
 	readonly __typename?: 'PrepareOtpResult'
-	readonly otpSecret: Scalars['String']
-	readonly otpUri: Scalars['String']
+	readonly otpSecret: Scalars['String']['output']
+	readonly otpUri: Scalars['String']['output']
 }
 
 export type Project = {
 	readonly __typename?: 'Project'
-	readonly config: Scalars['Json']
-	readonly id: Scalars['String']
+	readonly config: Scalars['Json']['output']
+	readonly id: Scalars['String']['output']
 	readonly members: ReadonlyArray<ProjectIdentityRelation>
-	readonly name: Scalars['String']
+	readonly name: Scalars['String']['output']
 	readonly roles: ReadonlyArray<RoleDefinition>
-	readonly slug: Scalars['String']
+	readonly slug: Scalars['String']['output']
 }
 
 
@@ -880,21 +883,21 @@ export type ProjectIdentityRelation = {
 }
 
 export type ProjectMembersFilter = {
-	readonly email?: InputMaybe<ReadonlyArray<Scalars['String']>>
-	readonly identityId?: InputMaybe<ReadonlyArray<Scalars['String']>>
+	readonly email?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>
+	readonly identityId?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>
 	readonly memberType?: InputMaybe<MemberType>
-	readonly personId?: InputMaybe<ReadonlyArray<Scalars['String']>>
+	readonly personId?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>
 }
 
 export type ProjectMembersInput = {
 	readonly filter?: InputMaybe<ProjectMembersFilter>
-	readonly limit?: InputMaybe<Scalars['Int']>
-	readonly offset?: InputMaybe<Scalars['Int']>
+	readonly limit?: InputMaybe<Scalars['Int']['input']>
+	readonly offset?: InputMaybe<Scalars['Int']['input']>
 }
 
 export type ProjectSecret = {
-	readonly key: Scalars['String']
-	readonly value: Scalars['String']
+	readonly key: Scalars['String']['input']
+	readonly value: Scalars['String']['input']
 }
 
 export type Query = {
@@ -909,25 +912,25 @@ export type Query = {
 
 
 export type QueryCheckResetPasswordTokenArgs = {
-	requestId: Scalars['String']
-	token: Scalars['String']
+	requestId: Scalars['String']['input']
+	token: Scalars['String']['input']
 }
 
 
 export type QueryProjectBySlugArgs = {
-	slug: Scalars['String']
+	slug: Scalars['String']['input']
 }
 
 
 export type QueryProjectMembershipsArgs = {
-	identityId: Scalars['String']
-	projectSlug: Scalars['String']
+	identityId: Scalars['String']['input']
+	projectSlug: Scalars['String']['input']
 }
 
 export type RemoveGlobalIdentityRolesError = {
 	readonly __typename?: 'RemoveGlobalIdentityRolesError'
 	readonly code: RemoveGlobalIdentityRolesErrorCode
-	readonly developerMessage: Scalars['String']
+	readonly developerMessage: Scalars['String']['output']
 }
 
 export type RemoveGlobalIdentityRolesErrorCode =
@@ -937,7 +940,7 @@ export type RemoveGlobalIdentityRolesErrorCode =
 export type RemoveGlobalIdentityRolesResponse = {
 	readonly __typename?: 'RemoveGlobalIdentityRolesResponse'
 	readonly error?: Maybe<RemoveGlobalIdentityRolesError>
-	readonly ok: Scalars['Boolean']
+	readonly ok: Scalars['Boolean']['output']
 	readonly result?: Maybe<RemoveGlobalIdentityRolesResult>
 }
 
@@ -949,9 +952,9 @@ export type RemoveGlobalIdentityRolesResult = {
 export type RemoveMailTemplateError = {
 	readonly __typename?: 'RemoveMailTemplateError'
 	readonly code: RemoveMailTemplateErrorCode
-	readonly developerMessage: Scalars['String']
+	readonly developerMessage: Scalars['String']['output']
 	/** @deprecated Field no longer supported */
-	readonly endUserMessage?: Maybe<Scalars['String']>
+	readonly endUserMessage?: Maybe<Scalars['String']['output']>
 }
 
 export type RemoveMailTemplateErrorCode =
@@ -962,15 +965,15 @@ export type RemoveMailTemplateResponse = {
 	readonly __typename?: 'RemoveMailTemplateResponse'
 	readonly error?: Maybe<RemoveMailTemplateError>
 	readonly errors: ReadonlyArray<RemoveMailTemplateError>
-	readonly ok: Scalars['Boolean']
+	readonly ok: Scalars['Boolean']['output']
 }
 
 export type RemoveProjectMemberError = {
 	readonly __typename?: 'RemoveProjectMemberError'
 	readonly code: RemoveProjectMemberErrorCode
-	readonly developerMessage: Scalars['String']
+	readonly developerMessage: Scalars['String']['output']
 	/** @deprecated Field no longer supported */
-	readonly endUserMessage?: Maybe<Scalars['String']>
+	readonly endUserMessage?: Maybe<Scalars['String']['output']>
 }
 
 export type RemoveProjectMemberErrorCode =
@@ -981,15 +984,15 @@ export type RemoveProjectMemberResponse = {
 	readonly __typename?: 'RemoveProjectMemberResponse'
 	readonly error?: Maybe<RemoveProjectMemberError>
 	readonly errors: ReadonlyArray<RemoveProjectMemberError>
-	readonly ok: Scalars['Boolean']
+	readonly ok: Scalars['Boolean']['output']
 }
 
 export type ResetPasswordError = {
 	readonly __typename?: 'ResetPasswordError'
 	readonly code: ResetPasswordErrorCode
-	readonly developerMessage: Scalars['String']
+	readonly developerMessage: Scalars['String']['output']
 	/** @deprecated Field no longer supported */
-	readonly endUserMessage?: Maybe<Scalars['String']>
+	readonly endUserMessage?: Maybe<Scalars['String']['output']>
 }
 
 export type ResetPasswordErrorCode =
@@ -1003,40 +1006,40 @@ export type ResetPasswordResponse = {
 	readonly error?: Maybe<ResetPasswordError>
 	/** @deprecated Field no longer supported */
 	readonly errors: ReadonlyArray<ResetPasswordError>
-	readonly ok: Scalars['Boolean']
+	readonly ok: Scalars['Boolean']['output']
 }
 
 export type RoleConditionVariableDefinition = RoleVariableDefinition & {
 	readonly __typename?: 'RoleConditionVariableDefinition'
-	readonly name: Scalars['String']
+	readonly name: Scalars['String']['output']
 }
 
 export type RoleDefinition = {
 	readonly __typename?: 'RoleDefinition'
-	readonly name: Scalars['String']
+	readonly name: Scalars['String']['output']
 	readonly variables: ReadonlyArray<RoleVariableDefinition>
 }
 
 export type RoleEntityVariableDefinition = RoleVariableDefinition & {
 	readonly __typename?: 'RoleEntityVariableDefinition'
-	readonly entityName: Scalars['String']
-	readonly name: Scalars['String']
+	readonly entityName: Scalars['String']['output']
+	readonly name: Scalars['String']['output']
 }
 
 export type RolePredefinedVariableDefinition = RoleVariableDefinition & {
 	readonly __typename?: 'RolePredefinedVariableDefinition'
-	readonly name: Scalars['String']
-	readonly value: Scalars['String']
+	readonly name: Scalars['String']['output']
+	readonly value: Scalars['String']['output']
 }
 
 export type RoleVariableDefinition = {
-	readonly name: Scalars['String']
+	readonly name: Scalars['String']['output']
 }
 
 export type SetProjectSecretError = {
 	readonly __typename?: 'SetProjectSecretError'
 	readonly code: SetProjectSecretErrorCode
-	readonly developerMessage: Scalars['String']
+	readonly developerMessage: Scalars['String']['output']
 }
 
 export type SetProjectSecretErrorCode =
@@ -1045,15 +1048,15 @@ export type SetProjectSecretErrorCode =
 export type SetProjectSecretResponse = {
 	readonly __typename?: 'SetProjectSecretResponse'
 	readonly error?: Maybe<SetProjectSecretError>
-	readonly ok: Scalars['Boolean']
+	readonly ok: Scalars['Boolean']['output']
 }
 
 export type SignInError = {
 	readonly __typename?: 'SignInError'
 	readonly code: SignInErrorCode
-	readonly developerMessage: Scalars['String']
+	readonly developerMessage: Scalars['String']['output']
 	/** @deprecated Field no longer supported */
-	readonly endUserMessage?: Maybe<Scalars['String']>
+	readonly endUserMessage?: Maybe<Scalars['String']['output']>
 }
 
 export type SignInErrorCode =
@@ -1067,9 +1070,9 @@ export type SignInErrorCode =
 export type SignInIdpError = {
 	readonly __typename?: 'SignInIDPError'
 	readonly code: SignInIdpErrorCode
-	readonly developerMessage: Scalars['String']
+	readonly developerMessage: Scalars['String']['output']
 	/** @deprecated Field no longer supported */
-	readonly endUserMessage?: Maybe<Scalars['String']>
+	readonly endUserMessage?: Maybe<Scalars['String']['output']>
 }
 
 export type SignInIdpErrorCode =
@@ -1084,14 +1087,14 @@ export type SignInIdpResponse = {
 	readonly error?: Maybe<SignInIdpError>
 	/** @deprecated Field no longer supported */
 	readonly errors: ReadonlyArray<SignInIdpError>
-	readonly ok: Scalars['Boolean']
+	readonly ok: Scalars['Boolean']['output']
 	readonly result?: Maybe<SignInIdpResult>
 }
 
 export type SignInIdpResult = CommonSignInResult & {
 	readonly __typename?: 'SignInIDPResult'
 	readonly person: Person
-	readonly token: Scalars['String']
+	readonly token: Scalars['String']['output']
 }
 
 export type SignInResponse = {
@@ -1099,22 +1102,22 @@ export type SignInResponse = {
 	readonly error?: Maybe<SignInError>
 	/** @deprecated Field no longer supported */
 	readonly errors: ReadonlyArray<SignInError>
-	readonly ok: Scalars['Boolean']
+	readonly ok: Scalars['Boolean']['output']
 	readonly result?: Maybe<SignInResult>
 }
 
 export type SignInResult = CommonSignInResult & {
 	readonly __typename?: 'SignInResult'
 	readonly person: Person
-	readonly token: Scalars['String']
+	readonly token: Scalars['String']['output']
 }
 
 export type SignOutError = {
 	readonly __typename?: 'SignOutError'
 	readonly code: SignOutErrorCode
-	readonly developerMessage: Scalars['String']
+	readonly developerMessage: Scalars['String']['output']
 	/** @deprecated Field no longer supported */
-	readonly endUserMessage?: Maybe<Scalars['String']>
+	readonly endUserMessage?: Maybe<Scalars['String']['output']>
 }
 
 export type SignOutErrorCode =
@@ -1126,15 +1129,15 @@ export type SignOutResponse = {
 	readonly error?: Maybe<SignOutError>
 	/** @deprecated Field no longer supported */
 	readonly errors: ReadonlyArray<SignOutError>
-	readonly ok: Scalars['Boolean']
+	readonly ok: Scalars['Boolean']['output']
 }
 
 export type SignUpError = {
 	readonly __typename?: 'SignUpError'
 	readonly code: SignUpErrorCode
-	readonly developerMessage: Scalars['String']
+	readonly developerMessage: Scalars['String']['output']
 	/** @deprecated Field no longer supported */
-	readonly endPersonMessage?: Maybe<Scalars['String']>
+	readonly endPersonMessage?: Maybe<Scalars['String']['output']>
 }
 
 export type SignUpErrorCode =
@@ -1147,7 +1150,7 @@ export type SignUpResponse = {
 	readonly error?: Maybe<SignUpError>
 	/** @deprecated Field no longer supported */
 	readonly errors: ReadonlyArray<SignUpError>
-	readonly ok: Scalars['Boolean']
+	readonly ok: Scalars['Boolean']['output']
 	readonly result?: Maybe<SignUpResult>
 }
 
@@ -1157,14 +1160,14 @@ export type SignUpResult = {
 }
 
 export type UnmanagedInviteOptions = {
-	readonly password?: InputMaybe<Scalars['String']>
-	readonly resetTokenHash?: InputMaybe<Scalars['String']>
+	readonly password?: InputMaybe<Scalars['String']['input']>
+	readonly resetTokenHash?: InputMaybe<Scalars['String']['input']>
 }
 
 export type UpdateIdpError = {
 	readonly __typename?: 'UpdateIDPError'
 	readonly code: UpdateIdpErrorCode
-	readonly developerMessage: Scalars['String']
+	readonly developerMessage: Scalars['String']['output']
 }
 
 export type UpdateIdpErrorCode =
@@ -1174,13 +1177,13 @@ export type UpdateIdpErrorCode =
 export type UpdateIdpResponse = {
 	readonly __typename?: 'UpdateIDPResponse'
 	readonly error?: Maybe<UpdateIdpError>
-	readonly ok: Scalars['Boolean']
+	readonly ok: Scalars['Boolean']['output']
 }
 
 export type UpdateProjectError = {
 	readonly __typename?: 'UpdateProjectError'
 	readonly code: UpdateProjectErrorCode
-	readonly developerMessage: Scalars['String']
+	readonly developerMessage: Scalars['String']['output']
 }
 
 export type UpdateProjectErrorCode =
@@ -1189,9 +1192,9 @@ export type UpdateProjectErrorCode =
 export type UpdateProjectMemberError = {
 	readonly __typename?: 'UpdateProjectMemberError'
 	readonly code: UpdateProjectMemberErrorCode
-	readonly developerMessage: Scalars['String']
+	readonly developerMessage: Scalars['String']['output']
 	/** @deprecated Field no longer supported */
-	readonly endUserMessage?: Maybe<Scalars['String']>
+	readonly endUserMessage?: Maybe<Scalars['String']['output']>
 	readonly membershipValidation?: Maybe<ReadonlyArray<MembershipValidationError>>
 }
 
@@ -1208,24 +1211,24 @@ export type UpdateProjectMemberResponse = {
 	readonly error?: Maybe<UpdateProjectMemberError>
 	/** @deprecated Field no longer supported */
 	readonly errors: ReadonlyArray<UpdateProjectMemberError>
-	readonly ok: Scalars['Boolean']
+	readonly ok: Scalars['Boolean']['output']
 }
 
 export type UpdateProjectResponse = {
 	readonly __typename?: 'UpdateProjectResponse'
 	readonly error?: Maybe<UpdateProjectError>
-	readonly ok: Scalars['Boolean']
+	readonly ok: Scalars['Boolean']['output']
 }
 
 export type VariableEntry = {
 	readonly __typename?: 'VariableEntry'
-	readonly name: Scalars['String']
-	readonly values: ReadonlyArray<Scalars['String']>
+	readonly name: Scalars['String']['output']
+	readonly values: ReadonlyArray<Scalars['String']['output']>
 }
 
 export type VariableEntryInput = {
-	readonly name: Scalars['String']
-	readonly values: ReadonlyArray<Scalars['String']>
+	readonly name: Scalars['String']['input']
+	readonly values: ReadonlyArray<Scalars['String']['input']>
 }
 
 
@@ -1295,6 +1298,13 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 	info: GraphQLResolveInfo
 ) => TResult | Promise<TResult>
 
+
+/** Mapping of interface types */
+export type ResolversInterfaceTypes<RefType extends Record<string, unknown>> = {
+	CommonSignInResult: (CreateSessionTokenResult) | (SignInIdpResult) | (SignInResult)
+	RoleVariableDefinition: (RoleConditionVariableDefinition) | (RoleEntityVariableDefinition) | (RolePredefinedVariableDefinition)
+}
+
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
 	AddGlobalIdentityRolesError: ResolverTypeWrapper<AddGlobalIdentityRolesError>
@@ -1312,7 +1322,7 @@ export type ResolversTypes = {
 	AddProjectMemberResponse: ResolverTypeWrapper<AddProjectMemberResponse>
 	ApiKey: ResolverTypeWrapper<ApiKey>
 	ApiKeyWithToken: ResolverTypeWrapper<ApiKeyWithToken>
-	Boolean: ResolverTypeWrapper<Scalars['Boolean']>
+	Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>
 	ChangeMyPasswordError: ResolverTypeWrapper<ChangeMyPasswordError>
 	ChangeMyPasswordErrorCode: ChangeMyPasswordErrorCode
 	ChangeMyPasswordResponse: ResolverTypeWrapper<ChangeMyPasswordResponse>
@@ -1324,7 +1334,7 @@ export type ResolversTypes = {
 	ChangePasswordResponse: ResolverTypeWrapper<ChangePasswordResponse>
 	CheckResetPasswordTokenCode: CheckResetPasswordTokenCode
 	CheckResetPasswordTokenResult: ResolverTypeWrapper<CheckResetPasswordTokenResult>
-	CommonSignInResult: ResolversTypes['CreateSessionTokenResult'] | ResolversTypes['SignInIDPResult'] | ResolversTypes['SignInResult']
+	CommonSignInResult: ResolverTypeWrapper<ResolversInterfaceTypes<ResolversTypes>['CommonSignInResult']>
 	ConfirmOtpError: ResolverTypeWrapper<ConfirmOtpError>
 	ConfirmOtpErrorCode: ConfirmOtpErrorCode
 	ConfirmOtpResponse: ResolverTypeWrapper<ConfirmOtpResponse>
@@ -1345,7 +1355,7 @@ export type ResolversTypes = {
 	CreateSessionTokenErrorCode: CreateSessionTokenErrorCode
 	CreateSessionTokenResponse: ResolverTypeWrapper<CreateSessionTokenResponse>
 	CreateSessionTokenResult: ResolverTypeWrapper<CreateSessionTokenResult>
-	DateTime: ResolverTypeWrapper<Scalars['DateTime']>
+	DateTime: ResolverTypeWrapper<Scalars['DateTime']['output']>
 	DisableApiKeyError: ResolverTypeWrapper<DisableApiKeyError>
 	DisableApiKeyErrorCode: DisableApiKeyErrorCode
 	DisableApiKeyResponse: ResolverTypeWrapper<DisableApiKeyResponse>
@@ -1372,14 +1382,14 @@ export type ResolversTypes = {
 	InitSignInIDPErrorCode: InitSignInIdpErrorCode
 	InitSignInIDPResponse: ResolverTypeWrapper<InitSignInIdpResponse>
 	InitSignInIDPResult: ResolverTypeWrapper<InitSignInIdpResult>
-	Int: ResolverTypeWrapper<Scalars['Int']>
+	Int: ResolverTypeWrapper<Scalars['Int']['output']>
 	InviteError: ResolverTypeWrapper<InviteError>
 	InviteErrorCode: InviteErrorCode
 	InviteMethod: InviteMethod
 	InviteOptions: InviteOptions
 	InviteResponse: ResolverTypeWrapper<InviteResponse>
 	InviteResult: ResolverTypeWrapper<InviteResult>
-	Json: ResolverTypeWrapper<Scalars['Json']>
+	Json: ResolverTypeWrapper<Scalars['Json']['output']>
 	MailTemplate: MailTemplate
 	MailTemplateIdentifier: MailTemplateIdentifier
 	MailType: MailType
@@ -1415,7 +1425,7 @@ export type ResolversTypes = {
 	RoleDefinition: ResolverTypeWrapper<RoleDefinition>
 	RoleEntityVariableDefinition: ResolverTypeWrapper<RoleEntityVariableDefinition>
 	RolePredefinedVariableDefinition: ResolverTypeWrapper<RolePredefinedVariableDefinition>
-	RoleVariableDefinition: ResolversTypes['RoleConditionVariableDefinition'] | ResolversTypes['RoleEntityVariableDefinition'] | ResolversTypes['RolePredefinedVariableDefinition']
+	RoleVariableDefinition: ResolverTypeWrapper<ResolversInterfaceTypes<ResolversTypes>['RoleVariableDefinition']>
 	SetProjectSecretError: ResolverTypeWrapper<SetProjectSecretError>
 	SetProjectSecretErrorCode: SetProjectSecretErrorCode
 	SetProjectSecretResponse: ResolverTypeWrapper<SetProjectSecretResponse>
@@ -1434,7 +1444,7 @@ export type ResolversTypes = {
 	SignUpErrorCode: SignUpErrorCode
 	SignUpResponse: ResolverTypeWrapper<SignUpResponse>
 	SignUpResult: ResolverTypeWrapper<SignUpResult>
-	String: ResolverTypeWrapper<Scalars['String']>
+	String: ResolverTypeWrapper<Scalars['String']['output']>
 	UnmanagedInviteOptions: UnmanagedInviteOptions
 	UpdateIDPError: ResolverTypeWrapper<UpdateIdpError>
 	UpdateIDPErrorCode: UpdateIdpErrorCode
@@ -1462,7 +1472,7 @@ export type ResolversParentTypes = {
 	AddProjectMemberResponse: AddProjectMemberResponse
 	ApiKey: ApiKey
 	ApiKeyWithToken: ApiKeyWithToken
-	Boolean: Scalars['Boolean']
+	Boolean: Scalars['Boolean']['output']
 	ChangeMyPasswordError: ChangeMyPasswordError
 	ChangeMyPasswordResponse: ChangeMyPasswordResponse
 	ChangeMyProfileError: ChangeMyProfileError
@@ -1470,7 +1480,7 @@ export type ResolversParentTypes = {
 	ChangePasswordError: ChangePasswordError
 	ChangePasswordResponse: ChangePasswordResponse
 	CheckResetPasswordTokenResult: CheckResetPasswordTokenResult
-	CommonSignInResult: ResolversParentTypes['CreateSessionTokenResult'] | ResolversParentTypes['SignInIDPResult'] | ResolversParentTypes['SignInResult']
+	CommonSignInResult: ResolversInterfaceTypes<ResolversParentTypes>['CommonSignInResult']
 	ConfirmOtpError: ConfirmOtpError
 	ConfirmOtpResponse: ConfirmOtpResponse
 	CreateApiKeyError: CreateApiKeyError
@@ -1486,7 +1496,7 @@ export type ResolversParentTypes = {
 	CreateSessionTokenError: CreateSessionTokenError
 	CreateSessionTokenResponse: CreateSessionTokenResponse
 	CreateSessionTokenResult: CreateSessionTokenResult
-	DateTime: Scalars['DateTime']
+	DateTime: Scalars['DateTime']['output']
 	DisableApiKeyError: DisableApiKeyError
 	DisableApiKeyResponse: DisableApiKeyResponse
 	DisableIDPError: DisableIdpError
@@ -1507,12 +1517,12 @@ export type ResolversParentTypes = {
 	InitSignInIDPError: InitSignInIdpError
 	InitSignInIDPResponse: InitSignInIdpResponse
 	InitSignInIDPResult: InitSignInIdpResult
-	Int: Scalars['Int']
+	Int: Scalars['Int']['output']
 	InviteError: InviteError
 	InviteOptions: InviteOptions
 	InviteResponse: InviteResponse
 	InviteResult: InviteResult
-	Json: Scalars['Json']
+	Json: Scalars['Json']['output']
 	MailTemplate: MailTemplate
 	MailTemplateIdentifier: MailTemplateIdentifier
 	Membership: Membership
@@ -1541,7 +1551,7 @@ export type ResolversParentTypes = {
 	RoleDefinition: RoleDefinition
 	RoleEntityVariableDefinition: RoleEntityVariableDefinition
 	RolePredefinedVariableDefinition: RolePredefinedVariableDefinition
-	RoleVariableDefinition: ResolversParentTypes['RoleConditionVariableDefinition'] | ResolversParentTypes['RoleEntityVariableDefinition'] | ResolversParentTypes['RolePredefinedVariableDefinition']
+	RoleVariableDefinition: ResolversInterfaceTypes<ResolversParentTypes>['RoleVariableDefinition']
 	SetProjectSecretError: SetProjectSecretError
 	SetProjectSecretResponse: SetProjectSecretResponse
 	SignInError: SignInError
@@ -1555,7 +1565,7 @@ export type ResolversParentTypes = {
 	SignUpError: SignUpError
 	SignUpResponse: SignUpResponse
 	SignUpResult: SignUpResult
-	String: Scalars['String']
+	String: Scalars['String']['output']
 	UnmanagedInviteOptions: UnmanagedInviteOptions
 	UpdateIDPError: UpdateIdpError
 	UpdateIDPResponse: UpdateIdpResponse
@@ -1845,6 +1855,7 @@ export type EnableIdpResponseResolvers<ContextType = any, ParentType extends Res
 export type IdpOptionsOutputResolvers<ContextType = any, ParentType extends ResolversParentTypes['IDPOptionsOutput'] = ResolversParentTypes['IDPOptionsOutput']> = {
 	autoSignUp?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	exclusive?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	initReturnsConfig?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 

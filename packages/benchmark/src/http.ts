@@ -1,5 +1,3 @@
-import fetch, { RequestInit } from 'node-fetch'
-
 export const createHttpOptions = (options: {
 	query: string
 	variables?: Record<string, any>

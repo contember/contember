@@ -13,12 +13,10 @@
   },
   "dependencies": {
     "@contember/engine-plugins": "workspace:*",
-    "@contember/typesafe": "workspace:*",
-    "node-fetch": "^2.7.0"
+    "@contember/typesafe": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^20.9.0",
-    "@types/node-fetch": "^2.6.9",
     "graphql": "^16.8.1"
   },
   "peerDependencies": {

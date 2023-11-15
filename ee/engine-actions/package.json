@@ -32,10 +32,10 @@
   },
   "devDependencies": {
     "@contember/engine-api-tester": "workspace:*",
-    "@graphql-codegen/cli": "^2.16.5",
-    "@graphql-codegen/typescript": "^2.8.8",
-    "@graphql-codegen/typescript-operations": "^2.5.13",
-    "@graphql-codegen/typescript-resolvers": "^2.7.13",
+    "@graphql-codegen/cli": "^5.0.0",
+    "@graphql-codegen/typescript": "^4.0.1",
+    "@graphql-codegen/typescript-operations": "^4.0.1",
+    "@graphql-codegen/typescript-resolvers": "^4.0.1",
     "@types/ws": "^8.5.9",
     "graphql": "^16.8.1"
   },

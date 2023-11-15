@@ -26,6 +26,6 @@
   "devDependencies": {
     "@contember/engine-api-tester": "workspace:*",
     "@types/koa": "^2.13.11",
-    "@types/node": "^18.18.9"
+    "@types/node": "^20.9.0"
   }
 }

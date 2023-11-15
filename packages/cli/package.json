@@ -12,7 +12,7 @@
   "devDependencies": {
     "@types/fs-extra": "^9.0.13",
     "@types/js-yaml": "^4.0.9",
-    "@types/node": "^18.18.9",
+    "@types/node": "^20.9.0",
     "@types/prompts": "^2.4.8",
     "@types/semver": "^7.5.5",
     "autoprefixer": "^10.4.16",

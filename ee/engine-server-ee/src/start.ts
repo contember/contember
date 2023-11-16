@@ -20,10 +20,7 @@ const logger = createDefaultLogger()
 
 ;(async () => {
 	const isDebug = isDebugMode()
-	if (process.env.NODE_HEAPDUMP === 'true') {
-		logger.info('Initializing heapdump')
-		await import('heapdump')
-	}
+
 	const version = getServerVersion()
 	printStartInfo({ version, isDebug }, logger)
 	const plugins = await loadPlugins()

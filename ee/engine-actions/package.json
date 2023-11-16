@@ -27,7 +27,7 @@
     "@contember/schema": "workspace:*",
     "@contember/schema-utils": "workspace:*",
     "@contember/typesafe": "workspace:*",
-    "@graphql-tools/schema": "^8.5.1",
+    "@graphql-tools/schema": "^10.0.0",
     "graphql-tag": "^2.12.6"
   },
   "devDependencies": {

@@ -10,7 +10,7 @@ import {
 	validate,
 	validateSchema,
 } from 'graphql'
-import LRUCache from 'lru-cache'
+import { LRUCache } from 'lru-cache'
 import { createHash } from 'node:crypto'
 import { Request, Response } from 'koa'
 import { logger } from '@contember/logger'
@@ -65,7 +65,7 @@ export const createGraphQLQueryHandler = <Context>({
 
 		const now = Date.now()
 		if ((now - lastPrune) > pruneIntervalSeconds * 1000) {
-			documentCache.prune()
+			documentCache.purgeStale()
 			lastPrune = now
 		}
 		const listenersQueue = [...listeners]

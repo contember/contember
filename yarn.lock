@@ -2786,6 +2786,20 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@contember/client-generator@workspace:packages/client-generator":
+  version: 0.0.0-use.local
+  resolution: "@contember/client-generator@workspace:packages/client-generator"
+  dependencies:
+    "@contember/client": "workspace:*"
+    "@contember/schema": ^1.2.0
+    "@contember/schema-definition": ^1.2.0
+    "@contember/schema-utils": ^1.2.0
+    "@types/node": ^18
+  bin:
+    contember-client-generator: ./dist/production/generate.js
+  languageName: unknown
+  linkType: soft
+
 "@contember/client@workspace:*, @contember/client@workspace:packages/client":
   version: 0.0.0-use.local
   resolution: "@contember/client@workspace:packages/client"

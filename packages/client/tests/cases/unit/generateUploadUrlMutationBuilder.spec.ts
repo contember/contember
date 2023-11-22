@@ -11,19 +11,23 @@ describe('generate upload url mutation builder', () => {
 				},
 			}),
 		).toMatchInlineSnapshot(`
-			"mutation {
-				mySingleImage: generateUploadUrl(contentType: \\"image/png\\") {
-					__typename
+			{
+			  "query": "mutation($contentType_String_0: String) {
+				mySingleImage: generateUploadUrl(contentType: $contentType_String_0) {
 					url
 					publicUrl
 					method
 					headers {
-						__typename
 						key
 						value
 					}
 				}
-			}"
+			}
+			",
+			  "variables": {
+			    "contentType_String_0": "image/png",
+			  },
+			}
 		`)
 	})
 
@@ -41,30 +45,36 @@ describe('generate upload url mutation builder', () => {
 				},
 			}),
 		).toMatchInlineSnapshot(`
-			"mutation {
-				myPng: generateUploadUrl(contentType: \\"image/png\\") {
-					__typename
+			{
+			  "query": "mutation($contentType_String_0: String, $contentType_String_1: String, $expiration_Int_2: Int, $prefix_String_3: String, $acl_S3Acl_4: S3Acl) {
+				myPng: generateUploadUrl(contentType: $contentType_String_0) {
 					url
 					publicUrl
 					method
 					headers {
-						__typename
 						key
 						value
 					}
 				}
-				myMp3: generateUploadUrl(contentType: \\"audio/mpeg\\", expiration: 123456, prefix: \\"foo\\", acl: PUBLIC_READ) {
-					__typename
+				myMp3: generateUploadUrl(contentType: $contentType_String_1, expiration: $expiration_Int_2, prefix: $prefix_String_3, acl: $acl_S3Acl_4) {
 					url
 					publicUrl
 					method
 					headers {
-						__typename
 						key
 						value
 					}
 				}
-			}"
+			}
+			",
+			  "variables": {
+			    "acl_S3Acl_4": "PUBLIC_READ",
+			    "contentType_String_0": "image/png",
+			    "contentType_String_1": "audio/mpeg",
+			    "expiration_Int_2": 123456,
+			    "prefix_String_3": "foo",
+			  },
+			}
 		`)
 	})
 })

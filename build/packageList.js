@@ -21,6 +21,7 @@ export const list = {
 		'binding',
 		'brand',
 		'client',
+		'client-generator',
 		'interface-tester',
 		'layout',
 		'react-auto',

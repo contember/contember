@@ -41,6 +41,7 @@ export namespace CrudQueryBuilder {
 	export type WriteRelationOps = CrudQueryBuilderTmp.WriteRelationOps
 }
 
+export * from './builder'
 export * from './content'
 export * from './graphQlClient'
 export * from './system'

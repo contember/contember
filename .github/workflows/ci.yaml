@@ -37,7 +37,7 @@ jobs:
           - job_name: dedupe
             run_script: yarn dedupe --check
 
-    container: node:16-alpine
+    container: node:18-alpine
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -172,7 +172,7 @@ jobs:
     if: github.event_name == 'push' && github.ref_type == 'tag'
     needs: [test, playwright]
     runs-on: ubuntu-latest
-    container: node:16-alpine
+    container: node:18-alpine
 
     env:
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

@@ -12,6 +12,12 @@
 				"development": "./dist/development/index.js",
 				"production": "./dist/production/index.js",
 				"default": "./dist/production/index.js"
+			},
+			"require": {
+				"types": "./dist/types/index.d.ts",
+				"development": "./dist/development/index.cjs",
+				"production": "./dist/production/index.cjs",
+				"default": "./dist/production/index.cjs"
 			}
 		}
 	},

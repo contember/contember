@@ -9,6 +9,7 @@
 	"exports": {
 		".": {
 			"import": {
+				"types": "./dist/types/index.d.ts",
 				"development": "./dist/development/index.js",
 				"production": "./dist/production/index.js",
 				"default": "./dist/production/index.js"

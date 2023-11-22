@@ -3,9 +3,11 @@ import {
 	FieldNode as GraphQlFieldNode,
 	FragmentSpreadNode,
 	getArgumentValues,
+	GraphQLInterfaceType,
 	GraphQLObjectType,
 	GraphQLOutputType,
 	GraphQLResolveInfo,
+	isInterfaceType,
 	isListType,
 	isNonNullType,
 	isObjectType,
@@ -29,7 +31,7 @@ export class GraphQlQueryAstFactory {
 
 	private createFromNode(
 		info: GraphQLResolveInfo,
-		parentType: GraphQLObjectType,
+		parentType: GraphQLObjectType | GraphQLInterfaceType,
 		node: GraphQlFieldNode,
 		path: string[],
 		filter: NodeFilter,
@@ -60,7 +62,7 @@ export class GraphQlQueryAstFactory {
 
 	private processSelectionSet(
 		info: GraphQLResolveInfo,
-		parentType: GraphQLObjectType,
+		parentType: GraphQLObjectType | GraphQLInterfaceType,
 		selectionSet: SelectionSetNode,
 		path: string[],
 		filter: NodeFilter,
@@ -80,12 +82,12 @@ export class GraphQlQueryAstFactory {
 				}
 				const typeName = fragmentDefinition.typeCondition.name.value
 				const subField = info.schema.getType(typeName)
-				if (!isObjectType(subField)) {
-					throw new Error('GraphQlQueryAstFactory: subfield is expected to be GraphQLObjectType')
+				if (!isObjectType(subField) && !isInterfaceType(subField)) {
+					throw new Error('GraphQlQueryAstFactory: subfield is expected to be GraphQLObjectType or GraphQLInterfaceType')
 				}
 				const fragmentSelection = this.processSelectionSet(
 					info,
-					subField as GraphQLObjectType,
+					subField,
 					fragmentDefinition.selectionSet,
 					path,
 					filter,

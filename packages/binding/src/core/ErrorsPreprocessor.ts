@@ -1,13 +1,14 @@
 import type { ErrorAccessor } from '../accessors'
-import type { ExecutionError, MutationDataResponse, MutationResponse, ValidationError } from '../accessorTree'
 import type { EntityId, FieldName, PlaceholderName } from '../treeParameters'
 import { assertNever } from '../utils'
 import { MutationAlias } from './requestAliases'
 import { SubMutationOperation } from './MutationGenerator'
+import { DataBindingTransactionResult } from './DataBinding'
+import { MutationError, MutationResult, ValidationError } from '@contember/client'
 
 class ErrorsPreprocessor {
 	public constructor(
-		private readonly requestResponse: MutationDataResponse,
+		private readonly requestResponse: DataBindingTransactionResult,
 		private readonly operations: SubMutationOperation[],
 	) {}
 
@@ -19,7 +20,7 @@ class ErrorsPreprocessor {
 		}
 
 		for (const operation of this.operations) {
-			const mutationResponse = this.requestResponse[operation.alias]
+			const mutationResponse = this.requestResponse.data[operation.alias]
 			const processedResponse = this.processMutationResponse(mutationResponse)
 
 			if (processedResponse === undefined) {
@@ -53,7 +54,7 @@ class ErrorsPreprocessor {
 		return treeRoot
 	}
 
-	private processMutationResponse(mutationResponse: MutationResponse): ErrorsPreprocessor.ErrorNode | undefined {
+	private processMutationResponse(mutationResponse: MutationResult): ErrorsPreprocessor.ErrorNode | undefined {
 		if (mutationResponse.ok && mutationResponse.validation?.valid && mutationResponse.errors.length === 0) {
 			return undefined
 		}
@@ -66,7 +67,7 @@ class ErrorsPreprocessor {
 		return undefined
 	}
 
-	private getErrorNode(errors: ValidationError[] | ExecutionError[]): ErrorsPreprocessor.ErrorNode {
+	private getErrorNode(errors: ValidationError[] | MutationError[]): ErrorsPreprocessor.ErrorNode {
 		const [head, ...tail] = errors
 
 		let rootNode = this.getRootNode(head)
@@ -74,23 +75,25 @@ class ErrorsPreprocessor {
 		errorLoop: for (const error of tail) {
 			let currentNode = rootNode
 
-			for (let i = 0, pathLength = error.path.length; i < pathLength; i++) {
-				const pathNode = error.path[i]
+			const path = 'paths' in error ? (error.paths[0] ?? []) : error.path
+
+			for (let i = 0, pathLength = path.length; i < pathLength; i++) {
+				const pathNode = path[i]
 
 				if (currentNode.nodeType === 'leaf') {
 					(currentNode as any as ErrorsPreprocessor.ErrorINode).nodeType = 'iNode'
 					;(currentNode as any as ErrorsPreprocessor.ErrorINode).children = new Map()
 				}
 
-				if (pathNode.__typename === '_FieldPathFragment') {
+				if ('field' in pathNode) {
 					if (currentNode.nodeType === 'iNode') {
 						let alias = pathNode.field
 						let nextIndex = i + 1
-						if (nextIndex in error.path) {
-							const nextPathNode = error.path[nextIndex]
+						if (nextIndex in path) {
+							const nextPathNode = path[nextIndex]
 
 							if (
-								nextPathNode.__typename === '_IndexPathFragment' &&
+								'index' in nextPathNode &&
 								typeof nextPathNode.alias === 'string' &&
 								nextPathNode.alias.startsWith(pathNode.field)
 							) {
@@ -103,7 +106,7 @@ class ErrorsPreprocessor {
 
 						if (!currentNode.children.has(alias)) {
 							currentNode.children.set(alias, this.getRootNode(error, nextIndex))
-							if (nextIndex <= error.path.length) {
+							if (nextIndex <= path.length) {
 								// This path has been handled by getRootNode
 								continue errorLoop
 							}
@@ -112,7 +115,7 @@ class ErrorsPreprocessor {
 					} else {
 						this.rejectCorruptData()
 					}
-				} else if (pathNode.__typename === '_IndexPathFragment') {
+				} else if ('index' in path) {
 					if (currentNode.nodeType === 'iNode') {
 						const alias = pathNode.alias
 
@@ -126,7 +129,7 @@ class ErrorsPreprocessor {
 
 						if (!currentNode.children.has(entityId)) {
 							currentNode.children.set(entityId, this.getRootNode(error, i + 1))
-							if (i + 1 <= error.path.length) {
+							if (i + 1 <= path.length) {
 								// This path has been handled by getRootNode
 								continue errorLoop
 							}
@@ -135,8 +138,6 @@ class ErrorsPreprocessor {
 					} else {
 						this.rejectCorruptData()
 					}
-				} else {
-					assertNever(pathNode)
 				}
 			}
 			if (this.isExecutionError(error)) {
@@ -149,23 +150,23 @@ class ErrorsPreprocessor {
 		return rootNode
 	}
 
-	private getRootNode(error: ValidationError | ExecutionError, startIndex: number = 0): ErrorsPreprocessor.ErrorNode {
+	private getRootNode(error: ValidationError | MutationError, startIndex: number = 0): ErrorsPreprocessor.ErrorNode {
 		let rootNode: ErrorsPreprocessor.ErrorNode = {
 			validation: this.isExecutionError(error) ? [] : [this.createValidationError(error.message.text)],
 			execution: this.isExecutionError(error) ? [{ type: 'execution', code: error.type, developerMessage: error.message }] : [],
 			nodeType: 'leaf',
 		}
-
-		for (let i = error.path.length - 1; i >= startIndex; i--) {
-			const pathNode = error.path[i]
-			if (pathNode.__typename === '_FieldPathFragment') {
+		const path = 'paths' in error ? (error.paths[0] ?? []) : error.path
+		for (let i = path.length - 1; i >= startIndex; i--) {
+			const pathNode = path[i]
+			if ('field' in pathNode) {
 				rootNode = {
 					validation: [],
 					execution: [],
 					nodeType: 'iNode',
 					children: new Map([[pathNode.field, rootNode]]),
 				}
-			} else if (pathNode.__typename === '_IndexPathFragment') {
+			} else if ('index' in pathNode) {
 				const alias = pathNode.alias
 
 				if (alias === null) {
@@ -202,7 +203,7 @@ class ErrorsPreprocessor {
 		return { type: 'validation', message, code: undefined }
 	}
 
-	private isExecutionError(error: ValidationError | ExecutionError): error is ExecutionError {
+	private isExecutionError(error: ValidationError | MutationError): error is MutationError {
 		return 'type' in error
 	}
 

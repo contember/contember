@@ -1,4 +1,3 @@
-import { CrudQueryBuilder } from '@contember/client'
 import { PRIMARY_KEY_NAME } from '../bindingTypes'
 import {
 	EntityFieldMarkers,
@@ -10,164 +9,111 @@ import {
 	MarkerTreeRoot,
 } from '../markers'
 import { assertNever, ucfirst } from '../utils'
+import { ContentEntitySelection, ContentQuery, ContentQueryBuilder, replaceGraphQlLiteral } from '@contember/client'
+import { Filter } from '../treeParameters'
 
-type BaseQueryBuilder = Omit<CrudQueryBuilder.CrudQueryBuilder, CrudQueryBuilder.Mutations>
-
-type ReadBuilder = CrudQueryBuilder.ReadBuilder.Builder<never>
 
 export class QueryGenerator {
-	constructor(private tree: MarkerTreeRoot) {}
+	constructor(
+		private tree: MarkerTreeRoot,
+		private qb: ContentQueryBuilder,
+	) {}
 
-	public getReadQuery(): string | undefined {
-		try {
-			let baseQueryBuilder: BaseQueryBuilder = new CrudQueryBuilder.CrudQueryBuilder()
-
-			for (const [, subTreeMarker] of this.tree.subTrees) {
-				baseQueryBuilder = this.addSubQuery(subTreeMarker, baseQueryBuilder)
+	public getReadQuery(): Record<string, ContentQuery<any>> {
+		const result: Record<string, ContentQuery<any>> = {}
+		for (const [, subTreeMarker] of this.tree.subTrees) {
+			if (subTreeMarker.parameters.isCreating) {
+				continue
 			}
-			return baseQueryBuilder.getGql()
-		} catch (e) {
-			return undefined
+			if (subTreeMarker instanceof EntitySubTreeMarker) {
+				result[subTreeMarker.placeholderName] = this.addGetQuery(subTreeMarker)
+			} else if (subTreeMarker instanceof EntityListSubTreeMarker) {
+				result[subTreeMarker.placeholderName] = this.createListQuery(subTreeMarker)
+			}
 		}
+		return result
 	}
 
-	private addSubQuery(
-		subTree: EntitySubTreeMarker | EntityListSubTreeMarker,
-		baseQueryBuilder: BaseQueryBuilder,
-	): BaseQueryBuilder {
+	private addGetQuery(subTree: EntitySubTreeMarker): ContentQuery<any> {
 		if (subTree.parameters.isCreating) {
-			// Unconstrained trees, by definition, don't have any queries.
-			return baseQueryBuilder
+			throw new Error()
 		}
 
-		if (subTree instanceof EntityListSubTreeMarker) {
-			return this.addListQuery(baseQueryBuilder, subTree)
-		} else if (subTree instanceof EntitySubTreeMarker) {
-			return this.addGetQuery(baseQueryBuilder, subTree)
-		}
-
-		assertNever(subTree)
-	}
-
-	private addGetQuery(baseQueryBuilder: BaseQueryBuilder, subTree: EntitySubTreeMarker): BaseQueryBuilder {
-		if (subTree.parameters.isCreating) {
-			return baseQueryBuilder
-		}
-		const populatedListQueryBuilder = QueryGenerator.registerQueryPart(
-			subTree.fields.markers,
-			CrudQueryBuilder.ReadBuilder.instantiate<CrudQueryBuilder.GetQueryArguments>().by(subTree.parameters.where),
-		)
-		return baseQueryBuilder.get(
+		return this.qb.get(
 			subTree.entityName,
-			CrudQueryBuilder.ReadBuilder.instantiate(
-				populatedListQueryBuilder ? populatedListQueryBuilder.objectBuilder : undefined,
-			),
-			subTree.placeholderName,
+			{
+				by: replaceGraphQlLiteral(subTree.parameters.where),
+			},
+			it =>  QueryGenerator.registerQueryPart(subTree.fields.markers, it),
 		)
 	}
 
-	private addListQuery(baseQueryBuilder: BaseQueryBuilder, subTree: EntityListSubTreeMarker): BaseQueryBuilder {
+	private createListQuery(subTree: EntityListSubTreeMarker): ContentQuery<any> {
 		if (subTree.parameters.isCreating) {
-			return baseQueryBuilder
+			throw new Error()
 		}
-
-		let finalBuilder: ReadBuilder
-
-		if (subTree.parameters) {
-			const parameters = subTree.parameters
-			const withFilter: CrudQueryBuilder.ReadBuilder.Builder<Exclude<CrudQueryBuilder.ReadArguments, 'filter'>> =
-				parameters.filter
-					? CrudQueryBuilder.ReadBuilder.instantiate().filter(parameters.filter)
-					: CrudQueryBuilder.ReadBuilder.instantiate()
-
-			const withOrderBy: CrudQueryBuilder.ReadBuilder.Builder<
-				Exclude<CrudQueryBuilder.ReadArguments, 'filter' | 'orderBy'>
-			> = parameters.orderBy ? withFilter.orderBy(parameters.orderBy) : withFilter
-
-			const withOffset: CrudQueryBuilder.ReadBuilder.Builder<
-				Exclude<CrudQueryBuilder.ReadArguments, 'filter' | 'orderBy' | 'offset'>
-			> = parameters.offset === undefined ? withOrderBy : withOrderBy.offset(parameters.offset)
-
-			finalBuilder = parameters.limit === undefined ? withOffset : withOffset.limit(parameters.limit)
-		} else {
-			finalBuilder = CrudQueryBuilder.ReadBuilder.instantiate()
-		}
-
-		// const fullyPopulated = withAllParams
-		// 	.anyRelation('pageInfo', builder => builder.column('totalCount'))
-		// 	.anyRelation('edges', builder =>
-		// 		builder.anyRelation('node', builder => QueryGenerator.registerQueryPart(subTree.fields.markers, builder)),
-		// 	)
-
-		return baseQueryBuilder.list(
+		return this.qb.list(
 			subTree.entityName,
-			QueryGenerator.registerQueryPart(subTree.fields.markers, finalBuilder),
-			subTree.placeholderName,
+			{
+				filter: resolveFilter(subTree.parameters.filter),
+				orderBy: replaceGraphQlLiteral(subTree.parameters.orderBy),
+				offset: subTree.parameters.offset,
+				limit: subTree.parameters.limit,
+			},
+			it =>  QueryGenerator.registerQueryPart(subTree.fields.markers, it),
 		)
 	}
 
-	public static registerQueryPart(fields: EntityFieldMarkers, builder: ReadBuilder): ReadBuilder {
-		builder = builder.column(PRIMARY_KEY_NAME)
+	public static registerQueryPart(fields: EntityFieldMarkers, selection: ContentEntitySelection): ContentEntitySelection {
+		selection = selection.$(PRIMARY_KEY_NAME).$('__typename')
 
 		for (const [, fieldValue] of fields) {
 			if (fieldValue instanceof FieldMarker) {
 				if (fieldValue.fieldName !== PRIMARY_KEY_NAME) {
-					builder = builder.column(fieldValue.fieldName)
+					selection = selection.$(fieldValue.fieldName)
 				}
 			} else if (fieldValue instanceof HasOneRelationMarker) {
 				const relation = fieldValue.parameters
-				const builderWithBody = CrudQueryBuilder.ReadBuilder.instantiate(
-					this.registerQueryPart(fieldValue.fields.markers, CrudQueryBuilder.ReadBuilder.instantiate()).objectBuilder,
-				)
-
-				const filteredBuilder: CrudQueryBuilder.ReadBuilder.Builder<Exclude<CrudQueryBuilder.ReadArguments, 'filter'>> =
-					relation.filter ? builderWithBody.filter(relation.filter) : builderWithBody
 
 				if (relation.reducedBy) {
 					// Assuming there's exactly one reducer field as enforced by MarkerTreeGenerator
 					const relationField = `${relation.field}By${ucfirst(Object.keys(relation.reducedBy)[0])}`
-					builder = builder.reductionRelation(
+					selection = selection.$(
 						relationField,
-						filteredBuilder.by(relation.reducedBy),
-						fieldValue.placeholderName,
+						{ by: replaceGraphQlLiteral(relation.reducedBy), as: fieldValue.placeholderName },
+						it => QueryGenerator.registerQueryPart(fieldValue.fields.markers, it),
 					)
 				} else {
-					builder = builder.hasOneRelation(
+					selection = selection.$(
 						relation.field,
-						filteredBuilder,
-						// TODO this will currently always go to the latter condition, resulting in less than ideal queries.
-						fieldValue.placeholderName === relation.field ? undefined : fieldValue.placeholderName,
+						{ filter: resolveFilter(relation.filter), as: fieldValue.placeholderName },
+						it => QueryGenerator.registerQueryPart(fieldValue.fields.markers, it),
 					)
 				}
 			} else if (fieldValue instanceof HasManyRelationMarker) {
 				const relation = fieldValue.parameters
-				const builderWithBody = CrudQueryBuilder.ReadBuilder.instantiate(
-					this.registerQueryPart(fieldValue.fields.markers, CrudQueryBuilder.ReadBuilder.instantiate()).objectBuilder,
-				)
 
-				const withFilter: CrudQueryBuilder.ReadBuilder.Builder<Exclude<CrudQueryBuilder.ReadArguments, 'filter'>> =
-					relation.filter ? builderWithBody.filter(relation.filter) : builderWithBody
 
-				const withOrderBy: CrudQueryBuilder.ReadBuilder.Builder<
-					Exclude<CrudQueryBuilder.ReadArguments, 'filter' | 'orderBy'>
-				> = relation.orderBy ? withFilter.orderBy(relation.orderBy) : withFilter
-
-				const withOffset: CrudQueryBuilder.ReadBuilder.Builder<
-					Exclude<CrudQueryBuilder.ReadArguments, 'filter' | 'orderBy' | 'offset'>
-				> = relation.offset === undefined ? withOrderBy : withOrderBy.offset(relation.offset)
-
-				const withLimit = relation.limit === undefined ? withOffset : withOffset.limit(relation.limit)
-
-				builder = builder.anyRelation(
+				selection = selection.$(
 					relation.field,
-					withLimit,
-					fieldValue.placeholderName === relation.field ? undefined : fieldValue.placeholderName,
+					{
+						as: fieldValue.placeholderName,
+						filter: resolveFilter(relation.filter),
+						orderBy: replaceGraphQlLiteral(relation.orderBy),
+						offset: relation.offset,
+						limit: relation.limit,
+					},
+					it => QueryGenerator.registerQueryPart(fieldValue.fields.markers, it),
 				)
 			} else {
 				assertNever(fieldValue)
 			}
 		}
 
-		return builder
+		return selection
 	}
+}
+
+const resolveFilter = (input?: Filter): Filter<never> => {
+	return replaceGraphQlLiteral<unknown>(input) as Filter<never>
 }

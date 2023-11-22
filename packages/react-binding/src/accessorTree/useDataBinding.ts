@@ -1,5 +1,5 @@
 import {
-	GraphQlClientFailedRequestMetadata,
+	GraphQlClientError,
 	useCurrentContentGraphQlClient,
 	useCurrentSystemGraphQlClient,
 	useTenantGraphQlClient,
@@ -7,15 +7,10 @@ import {
 import { ReactNode, useCallback, useEffect, useReducer, useRef, useState } from 'react'
 import { useEnvironment } from '../accessorPropagation'
 import type { TreeRootAccessor } from '@contember/binding'
-import { DataBinding } from '@contember/binding'
+import { DataBinding, Environment, Schema, SchemaLoader, TreeStore } from '@contember/binding'
 import type { AccessorTreeState } from './AccessorTreeState'
 import type { AccessorTreeStateOptions } from './AccessorTreeStateOptions'
 import { accessorTreeStateReducer } from './accessorTreeStateReducer'
-import { metadataToRequestError } from '@contember/binding'
-import type { RequestError } from '@contember/binding'
-import { Environment } from '@contember/binding'
-import { Schema, SchemaLoader } from '@contember/binding'
-import { TreeStore } from '@contember/binding'
 import { useIsMounted } from '@contember/react-utils'
 import { MarkerTreeGenerator } from '../MarkerTreeGenerator'
 import ReactDOM from 'react-dom'
@@ -40,7 +35,7 @@ export const useDataBinding = ({
 			}
 		}
 
-		const onError = (error: RequestError, binding: DataBinding<ReactNode>) => {
+		const onError = (error: GraphQlClientError, binding: DataBinding<ReactNode>) => {
 			if (isMountedRef.current) {
 				dispatch({ type: 'failWithError', error, binding })
 			}
@@ -91,17 +86,18 @@ export const useDataBinding = ({
 			try {
 				setSchema(await SchemaLoader.loadSchema(contentClient))
 
-			} catch (metadata) {
-				if (typeof metadata === 'object' && metadata !== null && (metadata as { name?: unknown }).name === 'AbortError') {
-					return
-				}
-
-				if (isMountedRef.current) {
+			} catch (e) {
+				if (e instanceof GraphQlClientError) {
+					if (e.type === 'aborted') {
+						return
+					}
 					dispatch({
 						type: 'failWithError',
-						error: metadataToRequestError(metadata as GraphQlClientFailedRequestMetadata),
+						error: e,
 						binding: state.binding!,
 					})
+				} else {
+					throw e
 				}
 			}
 		})()

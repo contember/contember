@@ -1,7 +1,4 @@
-export * from './metadataToRequestError'
-export * from './MutationRequestResponse'
 export * from './NormalizedPersistedData'
 export * from './PersistResult'
 export * from './QueryRequestResponse'
-export * from './RequestError'
 export * from './RuntimeId'

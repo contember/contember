@@ -55,8 +55,8 @@ export class SchemaLoader {
 			return existing
 		}
 		const schemaPromise = (async () => {
-			const raw: { data: { schema: RawSchema } } = await client.sendRequest(this.schemaQuery, options)
-			return new Schema(SchemaPreprocessor.processRawSchema(raw.data.schema))
+			const raw = await client.execute<{ schema: RawSchema }>(this.schemaQuery, options)
+			return new Schema(SchemaPreprocessor.processRawSchema(raw.schema))
 		})()
 		this.schemaLoadCache.set(client.apiUrl, schemaPromise)
 		return await schemaPromise

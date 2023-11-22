@@ -162,7 +162,12 @@ export class AccessorErrorManager {
 				}
 				switch (fieldState.type) {
 					case 'entityRealm':
-						this.setEntityStateErrors(fieldState, child)
+						// unwrap for reduced has many
+						if (child.nodeType === 'iNode' && child.children.has(fieldState.entity.id.value)) {
+							this.setEntityStateErrors(fieldState, child.children.get(fieldState.entity.id.value)!)
+						} else {
+							this.setEntityStateErrors(fieldState, child)
+						}
 						break
 					case 'entityList':
 						this.setEntityListStateErrors(fieldState, child)

@@ -1,45 +1,63 @@
-import { GraphQlLiteral, ObjectBuilder, QueryBuilder } from '../../graphQlBuilder'
+import { GraphQlLiteral } from '../../graphQlBuilder'
+import { GraphQlField, GraphQlPrintResult, GraphQlQueryPrinter, GraphQlSelectionSet, GraphQlSelectionSetItem } from '../../builder'
+import { replaceGraphQlLiteral } from '../client'
 
 class GenerateUploadUrlMutationBuilder {
-	private static generateUploadUrlFields = new ObjectBuilder()
-		.name('generateUploadUrl')
-		.field('url')
-		.field('publicUrl')
-		.field('method')
-		.object('headers', builder => builder.field('key').field('value'))
-
-	public static buildQuery(parameters: GenerateUploadUrlMutationBuilder.MutationParameters): string {
-		return new QueryBuilder().mutation(builder => {
-			for (const alias in parameters) {
-				const fileParameters = parameters[alias]
-				if (fileParameters.suffix || fileParameters.fileName || fileParameters.extension) {
-					builder = builder.object(
-						alias,
-						GenerateUploadUrlMutationBuilder.generateUploadUrlFields
-							.argument('input', fileParameters),
-					)
-				} else {
-					// BC
-					builder = builder.object(
-						alias,
-						GenerateUploadUrlMutationBuilder.generateUploadUrlFields
-							.argument('contentType', fileParameters.contentType)
-							.argument('expiration', fileParameters.expiration)
-							.argument('prefix', fileParameters.prefix)
-							.argument('acl', fileParameters.acl),
-					)
-				}
+	private static generateUploadUrlFields = [
+		new GraphQlField(null, 'url'),
+		new GraphQlField(null, 'publicUrl'),
+		new GraphQlField(null, 'method'),
+		new GraphQlField(null, 'headers', {}, [
+			new GraphQlField(null, 'key'),
+			new GraphQlField(null, 'value'),
+		]),
+	]
+	/**
+	 * @internal
+	 */
+	public static buildQuery(parameters: GenerateUploadUrlMutationBuilder.MutationParameters): GraphQlPrintResult {
+		const selectionItems: GraphQlSelectionSetItem[] = []
+		for (const alias in parameters) {
+			const fileParameters = parameters[alias]
+			if (fileParameters.suffix || fileParameters.fileName || fileParameters.extension) {
+				const value = replaceGraphQlLiteral(fileParameters)
+				selectionItems.push(new GraphQlField(alias, 'generateUploadUrl', {
+					input: {
+						value: value,
+						graphQlType: 'S3GenerateSignedUploadInput',
+					},
+				}, GenerateUploadUrlMutationBuilder.generateUploadUrlFields))
+			} else {
+				selectionItems.push(new GraphQlField(alias, 'generateUploadUrl', {
+					contentType: {
+						graphQlType: 'String',
+						value: fileParameters.contentType,
+					},
+					expiration: {
+						graphQlType: 'Int',
+						value: fileParameters.expiration,
+					},
+					prefix: {
+						graphQlType: 'String',
+						value: fileParameters.prefix,
+					},
+					acl: {
+						graphQlType: 'S3Acl',
+						value: fileParameters.acl?.value,
+					},
+				}, GenerateUploadUrlMutationBuilder.generateUploadUrlFields))
 			}
+		}
 
-			return builder
-		})
+		const printer = new GraphQlQueryPrinter()
+		return printer.printDocument('mutation', selectionItems, {})
 	}
 }
 
 namespace GenerateUploadUrlMutationBuilder {
 	export type Acl = GraphQlLiteral<'PUBLIC_READ' | 'PRIVATE' | 'NONE'>;
 
-	export interface FileParameters {
+	export type FileParameters = {
 		contentType: string
 		expiration?: number
 		size?: number

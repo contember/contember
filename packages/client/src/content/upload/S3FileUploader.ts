@@ -63,8 +63,7 @@ class S3FileUploader implements FileUploader<S3FileUploader.SuccessMetadata> {
 
 		const mutation = GenerateUploadUrlMutationBuilder.buildQuery(parameters)
 		try {
-			const response = await options.contentApiClient.sendRequest<{ data: GenerateUploadUrlMutationBuilder.MutationResponse }>(mutation)
-			const responseData = response.data
+			const responseData = await options.contentApiClient.execute<GenerateUploadUrlMutationBuilder.MutationResponse>(mutation.query, { variables: mutation.variables })
 			const limit = pLimit(this.options.concurrency ?? 5)
 			const promises: Promise<void>[] = []
 			for (const [file] of files) {

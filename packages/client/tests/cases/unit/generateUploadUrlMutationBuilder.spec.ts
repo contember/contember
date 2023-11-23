@@ -39,7 +39,7 @@ describe('generate upload url mutation builder', () => {
 				},
 				myMp3: {
 					contentType: 'audio/mpeg',
-					acl: new GraphQlLiteral('PUBLIC_READ'),
+					acl: 'PUBLIC_READ',
 					expiration: 123456,
 					prefix: 'foo',
 				},

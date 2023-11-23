@@ -1,6 +1,6 @@
 import { ComponentType, FunctionComponent, ReactNode } from 'react'
 import { Component, QueryLanguage, SugarableRelativeSingleField, wrapFilterInHasOnes } from '@contember/react-binding'
-import { GraphQlLiteral, Input } from '@contember/client'
+import { Input } from '@contember/client'
 import { DataGridColumnCommonProps, FilterRendererProps } from '../types'
 import { DataGridColumn } from '../grid'
 
@@ -42,14 +42,14 @@ export const createEnumCell = <ColumnProps extends {}, ValueRendererProps extend
 				}
 				const desugared = QueryLanguage.desugarRelativeSingleField(props.field, environment)
 
-				const conditions: Input.Condition<GraphQlLiteral>[] = []
+				const conditions: Input.Condition<string>[] = []
 
 				if (nullCondition) {
 					conditions.push({ isNull: true })
 				}
 
 				conditions.push({
-					in: values.map(it => new GraphQlLiteral(it)),
+					in: values,
 				})
 
 				return wrapFilterInHasOnes(desugared.hasOneRelationPath, {

@@ -1,6 +1,7 @@
 import { GraphQlLiteral } from '../../graphQlBuilder'
-import { GraphQlField, GraphQlPrintResult, GraphQlQueryPrinter, GraphQlSelectionSet, GraphQlSelectionSetItem } from '../../builder'
+import { GraphQlField, GraphQlPrintResult, GraphQlQueryPrinter, GraphQlSelectionSetItem } from '../../builder'
 import { replaceGraphQlLiteral } from '../client'
+import { GraphQlBuilder } from '../../index'
 
 class GenerateUploadUrlMutationBuilder {
 	private static generateUploadUrlFields = [
@@ -43,7 +44,7 @@ class GenerateUploadUrlMutationBuilder {
 					},
 					acl: {
 						graphQlType: 'S3Acl',
-						value: fileParameters.acl?.value,
+						value: fileParameters.acl instanceof GraphQlBuilder.GraphqlLiteral ? fileParameters.acl?.value : fileParameters.acl,
 					},
 				}, GenerateUploadUrlMutationBuilder.generateUploadUrlFields))
 			}
@@ -55,7 +56,11 @@ class GenerateUploadUrlMutationBuilder {
 }
 
 namespace GenerateUploadUrlMutationBuilder {
-	export type Acl = GraphQlLiteral<'PUBLIC_READ' | 'PRIVATE' | 'NONE'>;
+	export type Acl =
+		| 'PUBLIC_READ'
+		| 'PRIVATE'
+		| 'NONE'
+		| GraphQlLiteral<'PUBLIC_READ' | 'PRIVATE' | 'NONE'>
 
 	export type FileParameters = {
 		contentType: string

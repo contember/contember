@@ -6,20 +6,9 @@ export { GraphQlLiteral } from './graphQlBuilder'
 export namespace GraphQlBuilder {
 	export import GraphqlLiteral = GraphQlBuilderTmp.GraphQlLiteral
 	export import GraphQlLiteral = GraphQlBuilderTmp.GraphQlLiteral
-	export import ObjectBuilder = GraphQlBuilderTmp.ObjectBuilder
-	export import QueryCompiler = GraphQlBuilderTmp.QueryCompiler
-	export import QueryBuilder = GraphQlBuilderTmp.QueryBuilder
-	export import RootObjectBuilder = GraphQlBuilderTmp.RootObjectBuilder
 }
 
 export namespace CrudQueryBuilder {
-	export import CrudQueryBuilder = CrudQueryBuilderTmp.CrudQueryBuilder
-	export import ReadBuilder = CrudQueryBuilderTmp.ReadBuilder
-	export import WriteBuilder = CrudQueryBuilderTmp.WriteBuilder
-	export import WriteDataBuilder = CrudQueryBuilderTmp.WriteDataBuilder
-	export import WriteManyRelationBuilder = CrudQueryBuilderTmp.WriteManyRelationBuilder
-	export import WriteOneRelationBuilder = CrudQueryBuilderTmp.WriteOneRelationBuilder
-	export import WriteOperation = CrudQueryBuilderTmp.WriteOperation
 	export type CreateMutationArguments = CrudQueryBuilderTmp.CreateMutationArguments
 	export type CreateMutationFields = CrudQueryBuilderTmp.CreateMutationFields
 	export type DeleteMutationArguments = CrudQueryBuilderTmp.DeleteMutationArguments

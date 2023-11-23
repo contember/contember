@@ -2669,9 +2669,11 @@ __metadata:
     "@contember/brand": "workspace:*"
     "@contember/interface-tester": "workspace:*"
     "@contember/layout": "workspace:*"
-    "@contember/schema": ^1.2.0
-    "@contember/schema-definition": ^1.2.0
+    "@contember/schema": ^1.3.6
+    "@contember/schema-definition": ^1.3.6
+    "@contember/schema-utils": ^1.3.6
     "@contember/ui": "workspace:*"
+    graphql: ^16.8.1
     lucide-react: ^0.268.0
     react: ^17 || ^18
     react-content-loader: ^6.0.3
@@ -2686,7 +2688,7 @@ __metadata:
     "@aws-sdk/client-s3": ^3.37.0
     "@aws-sdk/signature-v4-crt": ^3.37.0
     "@contember/admin": "workspace:*"
-    "@contember/dic": ^1.2.0
+    "@contember/dic": ^1.3.6
     "@types/cookie": ^0.4.1
     "@types/mime": ^2.0.3
     "@types/node": ^18
@@ -2720,10 +2722,10 @@ __metadata:
     "@contember/react-leaflet-fields-ui": "workspace:*"
     "@contember/react-multipass-rendering": "workspace:*"
     "@contember/react-utils": "workspace:*"
-    "@contember/schema": ^1.2.0
-    "@contember/schema-definition": ^1.2.0
-    "@contember/schema-migrations": ^1.2.0
-    "@contember/schema-utils": ^1.2.0
+    "@contember/schema": ^1.3.6
+    "@contember/schema-definition": ^1.3.6
+    "@contember/schema-migrations": ^1.3.6
+    "@contember/schema-utils": ^1.3.6
     "@contember/ui": "workspace:*"
     "@contember/utilities": "workspace:*"
     "@playwright/test": 1.32.3
@@ -2791,9 +2793,9 @@ __metadata:
   resolution: "@contember/client-generator@workspace:packages/client-generator"
   dependencies:
     "@contember/client": "workspace:*"
-    "@contember/schema": ^1.2.0
-    "@contember/schema-definition": ^1.2.0
-    "@contember/schema-utils": ^1.2.0
+    "@contember/schema": ^1.3.6
+    "@contember/schema-definition": ^1.3.6
+    "@contember/schema-utils": ^1.3.6
     "@types/node": ^18
   bin:
     contember-client-generator: ./dist/production/generate.js
@@ -2804,38 +2806,47 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@contember/client@workspace:packages/client"
   dependencies:
-    "@contember/schema": ^1.2.0
+    "@contember/schema": ^1.3.6
     p-limit: ^4.0.0
   languageName: unknown
   linkType: soft
 
-"@contember/database-migrations@npm:^1.2.0":
-  version: 1.2.0
-  resolution: "@contember/database-migrations@npm:1.2.0"
+"@contember/database-migrations@npm:1.3.6":
+  version: 1.3.6
+  resolution: "@contember/database-migrations@npm:1.3.6"
   dependencies:
-    "@contember/database": ^1.2.0
+    "@contember/database": 1.3.6
     node-pg-migrate: ^5.9.0
   peerDependencies:
     pg: ^8.9.0
-  checksum: ed0242111bc32ac6cd1228e7635743dc8f46c7247082899c2b3c4c7b6a5702c0973e116dff3ac439b000982faab29ed66563721a7b328da19d7b25fc212b1323
+  checksum: 1f13c3ba3995f2c2a99b22383ba71302a3db8ca2d2a62dc66e85365759c307b3475e9940d6227e6a6c9267616e87f0167ccf087ff760286f6ed3f39f8b029c49
   languageName: node
   linkType: hard
 
-"@contember/database@npm:^1.2.0":
-  version: 1.2.0
-  resolution: "@contember/database@npm:1.2.0"
+"@contember/database@npm:1.3.6":
+  version: 1.3.6
+  resolution: "@contember/database@npm:1.3.6"
   dependencies:
-    "@contember/queryable": ^1.2.0
+    "@contember/queryable": 1.3.6
   peerDependencies:
     pg: ^8.9.0
-  checksum: 4a1bf69c65fa439626a7fd8445f85232ac89f35baf624a3c0fd876c654d003f254dcf3e0e8bda2f63c6a6d3a95d40fce8513185bc36db5b403ba8ef9ae76a4f4
+  checksum: ffabe934de90c04d24c0f42ad6af063291fb6db81c1ae2e88699f288cbef17b058df8547a517542867890cc595c7825cc0a3d3ea04c0bc2dd38e23532fbbd350
   languageName: node
   linkType: hard
 
-"@contember/dic@npm:^1.2.0":
-  version: 1.2.0
-  resolution: "@contember/dic@npm:1.2.0"
-  checksum: 616bf9297bf3cef946ab60ebe73cfb97dd1ff47c98bb1331ab0cce9222cc8ce75356f9b6b4015b30a3c7caa9da1567997f4cedfd85024644d17606460521248a
+"@contember/dic@npm:^1.3.6":
+  version: 1.3.6
+  resolution: "@contember/dic@npm:1.3.6"
+  checksum: 66c30c2bc9641b039a7493f1c6b0b13e10387eaaf0033debb5199e8e047fa873854b9deb9b9c27ce6dabc02989efa6e16019db7733ba629e7ae310516f42e17e
+  languageName: node
+  linkType: hard
+
+"@contember/engine-common@npm:1.3.6":
+  version: 1.3.6
+  resolution: "@contember/engine-common@npm:1.3.6"
+  dependencies:
+    "@contember/logger": 1.3.6
+  checksum: 892a34da24e5eacef309cc4918037432954524ccd01ea656fac0597483ca96220a59af23fa7f64c3d542b22e47f33aebe379c36b5364ca2d8cb7cdf09f5b2655
   languageName: node
   linkType: hard
 
@@ -2844,8 +2855,8 @@ __metadata:
   resolution: "@contember/interface-tester@workspace:packages/interface-tester"
   dependencies:
     "@contember/admin": "workspace:*"
-    "@contember/schema": ^1.2.0
-    "@contember/schema-utils": ^1.2.0
+    "@contember/schema": ^1.3.6
+    "@contember/schema-utils": ^1.3.6
     "@types/micromatch": ^4.0.2
     "@types/node": ^18
     fast-glob: ^3.2.12
@@ -2876,10 +2887,19 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@contember/queryable@npm:^1.2.0":
-  version: 1.2.0
-  resolution: "@contember/queryable@npm:1.2.0"
-  checksum: cb94b4a3dbb219c85102b6f3e22da2ab952e41ab2d5066ed3615fdaf2db0710ffec49da01cf369ff1fa8f88a00faca2b2c55815c5ab1041787dca0f7874f64b6
+"@contember/logger@npm:1.3.6":
+  version: 1.3.6
+  resolution: "@contember/logger@npm:1.3.6"
+  dependencies:
+    chalk: ^4.1.2
+  checksum: 22bf79cde6c92310d198e85aac444bc1f01fd99142fa041128fa55ccbf974635ea1b899c4a8e28991cd03a89730a1d5dbd927c251b75231bad57a0fd7c3c173c
+  languageName: node
+  linkType: hard
+
+"@contember/queryable@npm:1.3.6":
+  version: 1.3.6
+  resolution: "@contember/queryable@npm:1.3.6"
+  checksum: 7d4683a6098c2b0b638c9fc7a3be7adf4a1b93227f7c7c175e63879ddc303afc814f9f730139b90a4a3c0a1827ba3affa9c7edb3a15e9f8e3d6db7910d5a3025
   languageName: node
   linkType: hard
 
@@ -3096,54 +3116,56 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@contember/schema-definition@npm:^1.2.0":
-  version: 1.2.0
-  resolution: "@contember/schema-definition@npm:1.2.0"
+"@contember/schema-definition@npm:^1.3.6":
+  version: 1.3.6
+  resolution: "@contember/schema-definition@npm:1.3.6"
   dependencies:
-    "@contember/schema": ^1.2.0
-    "@contember/schema-utils": ^1.2.0
+    "@contember/schema": 1.3.6
+    "@contember/schema-utils": 1.3.6
     reflect-metadata: ^0.1.13
-  checksum: f2e5263652ede86c9b6b200cf83fe20d78bfe78d8fc28055d5b5b090d6f76d5a7c9a3efce9459d34900af1bf64ca14db9dd2ee22cf1403b4b9d80918408ecb30
+  peerDependencies:
+    graphql: ">= 14.6.0"
+  checksum: 1b90b12c7a3921206fb039c362dba2befb321277c98a16c6fbfc9ac198648ceac9ef510b02fa6d3cab113127304803dd380271066e75c3a4c3a7761937db7fca
   languageName: node
   linkType: hard
 
-"@contember/schema-migrations@npm:^1.2.0":
-  version: 1.2.0
-  resolution: "@contember/schema-migrations@npm:1.2.0"
+"@contember/schema-migrations@npm:^1.3.6":
+  version: 1.3.6
+  resolution: "@contember/schema-migrations@npm:1.3.6"
   dependencies:
-    "@contember/database": ^1.2.0
-    "@contember/database-migrations": ^1.2.0
-    "@contember/schema": ^1.2.0
-    "@contember/schema-utils": ^1.2.0
+    "@contember/database-migrations": 1.3.6
+    "@contember/engine-common": 1.3.6
+    "@contember/schema": 1.3.6
+    "@contember/schema-utils": 1.3.6
     fast-deep-equal: ^3.1.3
     rfc6902: ^5.0.1
   peerDependencies:
     pg: ^8.9.0
-  checksum: e3b43f0d9c636c28852e8d488d5e67ebd071210de24461e4f9f622de76dcb6017f26e0555bf95617d4995fc53c790f85ff451f866b17ae90593fd58e84155c49
+  checksum: 1ce11b7721984a9f18431d685ba2aea58be5f3ea11ba0d82f1306ffbe37010d01a5f9d2de0b7b6931ceff7ed074458a8ad6cef4d21ecf77a2006894c52be0bd7
   languageName: node
   linkType: hard
 
-"@contember/schema-utils@npm:^1.2.0":
-  version: 1.2.0
-  resolution: "@contember/schema-utils@npm:1.2.0"
+"@contember/schema-utils@npm:1.3.6, @contember/schema-utils@npm:^1.3.6":
+  version: 1.3.6
+  resolution: "@contember/schema-utils@npm:1.3.6"
   dependencies:
-    "@contember/schema": ^1.2.0
-    "@contember/typesafe": ^1.2.0
-  checksum: 5f39783e9ec0dd908a6200179eb919c7ec744784092697da5e1d38d2bc7c0ac2abb97dc80d730aaa4bcce020533c029edd3a74603bae3b510f7db392f3371098
+    "@contember/schema": 1.3.6
+    "@contember/typesafe": 1.3.6
+  checksum: 5812ff9ddd140af49b312e03a05c93bb09bc4857ad3b2f9573a331bfc7fe24f8f4c36b427a80147f1c7e15d9a5e4208c9c239069115ba2baca76f9af3634042d
   languageName: node
   linkType: hard
 
-"@contember/schema@npm:^1.2.0":
-  version: 1.2.0
-  resolution: "@contember/schema@npm:1.2.0"
-  checksum: da1f04ada08d33d209a24e7938ce1955121bdcb709ca5794ac6580afea11b4bbcafa4b7807e3410852ec7db065678e8c53ea5254eb1672b9ae1bd357aca49d2b
+"@contember/schema@npm:1.3.6, @contember/schema@npm:^1.3.6":
+  version: 1.3.6
+  resolution: "@contember/schema@npm:1.3.6"
+  checksum: 69f5f5ca3ce43b4c191b75d26a29f5208e6cbe2f0a97825194d37fc787a69ae5dab56e06b97f008888a8c4505e6efdaa1f8d9fb1e3b08ed936c575e5f0f4af83
   languageName: node
   linkType: hard
 
-"@contember/typesafe@npm:^1.2.0":
-  version: 1.2.0
-  resolution: "@contember/typesafe@npm:1.2.0"
-  checksum: 84f4fd70834327f4dac3babec97386eeb09f8a2b0808532b9c92c88d45af40d841e47c5669e8e731460060a2dfcc37597ada73e2f6078c1b30ca17fe362f0c08
+"@contember/typesafe@npm:1.3.6":
+  version: 1.3.6
+  resolution: "@contember/typesafe@npm:1.3.6"
+  checksum: 7019af67b48ed6a2e2942f562a496a44cacb43d58e4b03bf8690cad35e41b4411c5cc64b3b20ce62db0df6dd9178edd3349fa7e6004bd3bd76b05cd6d4d8982a
   languageName: node
   linkType: hard
 
@@ -10903,6 +10925,13 @@ __metadata:
   version: 1.0.4
   resolution: "grapheme-splitter@npm:1.0.4"
   checksum: 0c22ec54dee1b05cd480f78cf14f732cb5b108edc073572c4ec205df4cd63f30f8db8025afc5debc8835a8ddeacf648a1c7992fe3dcd6ad38f9a476d84906620
+  languageName: node
+  linkType: hard
+
+"graphql@npm:^16.8.1":
+  version: 16.8.1
+  resolution: "graphql@npm:16.8.1"
+  checksum: 8d304b7b6f708c8c5cc164b06e92467dfe36aff6d4f2cf31dd19c4c2905a0e7b89edac4b7e225871131fd24e21460836b369de0c06532644d15b461d55b1ccc0
   languageName: node
   linkType: hard
 

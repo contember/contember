@@ -14,6 +14,7 @@ import {
 	useCurrentRequest,
 } from '../../../src'
 import './index.css'
+import { emptySchema } from '@contember/schema-utils'
 
 const projectSlug = window.location.pathname.split('/')[1]
 const pages = import.meta.glob<PageModule>('../cases/**/*.tsx')
@@ -34,7 +35,7 @@ function buildSchema(definitions: SchemaDefinition.ModelDefinition<{}>): Schema 
 	}
 
 	const validation = InputValidation.parseDefinition(definitions)
-	return { acl, model, validation, settings: {} }
+	return { ...emptySchema, acl, model, validation }
 }
 
 const SetProjectSlugContext = createContext<(slug: string | undefined) => void>(() => {

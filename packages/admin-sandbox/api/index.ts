@@ -1,11 +1,12 @@
 import { Schema } from '@contember/schema'
 import { InputValidation, PermissionsBuilder, SchemaDefinition } from '@contember/schema-definition'
 import * as modelDefinition from './model'
+import { emptySchema } from '@contember/schema-utils'
 
 const model = SchemaDefinition.createModel(modelDefinition)
 
 const schema: Schema = {
-	settings: {},
+	...emptySchema,
 	acl: {
 		roles: {
 			admin: {

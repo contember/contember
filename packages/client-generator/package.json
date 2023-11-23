@@ -40,11 +40,11 @@
 	},
 	"dependencies": {
 		"@contember/client": "workspace:*",
-		"@contember/schema": "^1.2.0",
-		"@contember/schema-utils": "^1.2.0"
+		"@contember/schema": "^1.3.6",
+		"@contember/schema-utils": "^1.3.6"
 	},
 	"devDependencies": {
-		"@contember/schema-definition": "^1.2.0",
+		"@contember/schema-definition": "^1.3.6",
 		"@types/node": "^18"
 	},
 	"repository": {

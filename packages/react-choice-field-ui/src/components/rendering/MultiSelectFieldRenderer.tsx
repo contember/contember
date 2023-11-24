@@ -140,7 +140,7 @@ export const MultiSelectFieldInner = memo(({
 							MultiValueLabel: SortableMultiValueLabel,
 						} as any}
 					/>
-					: <Select menuPortalTarget={portalProvider} {...allSelectProps} />
+					: <Select {...allSelectProps} />
 				}
 			</SelectCreateNewWrapper>
 		</FieldContainer>

@@ -3,6 +3,7 @@ import {
 	Entity,
 	EntityAccessor,
 	EntitySubTree,
+	TreeRootIdProvider,
 	useAccessorTreeState,
 	useEnvironment,
 	useExtendTree,
@@ -60,7 +61,11 @@ export const useOpenCreateNewDialog = ({ createNewForm, connect, ...props }: Bas
 					content: contentProps => (
 						<Stack>
 							<AccessorTree state={accessorTreeState}>
-								<Entity accessor={entity}>{createNewForm}</Entity>
+								<TreeRootIdProvider treeRootId={treeRootId}>
+									<Entity accessor={entity}>
+										{createNewForm}
+									</Entity>
+								</TreeRootIdProvider>
 							</AccessorTree>
 							<Stack horizontal evenly>
 							</Stack>

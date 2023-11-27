@@ -5,6 +5,7 @@ import { DataGridContent } from './DataGridContent'
 import { DataGridFooter } from './DataGridFooter'
 import { DataGridRenderingCommonProps } from '../types'
 import { useClassName } from '@contember/react-utils'
+import { EnvironmentContext } from '@contember/react-binding'
 
 
 export const createDataGridContainer = <HeaderProps extends {}, ContentProps extends {}, FooterProps extends {}>({ Header, Content, Footer }: {
@@ -14,9 +15,11 @@ export const createDataGridContainer = <HeaderProps extends {}, ContentProps ext
 }) => memo<HeaderProps & ContentProps & FooterProps & DataGridRenderingCommonProps>(props => {
 	return (
 		<Stack className={`${(useClassName('data-grid-body'))}-body`}>
-			<Header {...props} />
-			<Content {...props} />
-			<Footer {...props} />
+			<EnvironmentContext.Provider value={props.accessor.environment}>
+				<Header {...props} />
+				<Content {...props} />
+				<Footer {...props} />
+			</EnvironmentContext.Provider>
 		</Stack>
 	)
 })

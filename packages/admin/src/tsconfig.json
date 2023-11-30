@@ -8,6 +8,7 @@
 		{ "path": "../../react-auto/src" },
 		{ "path": "../../react-binding/src" },
 		{ "path": "../../react-binding-ui/src" },
+		{ "path": "../../react-board-ui/src" },
 		{ "path": "../../react-client/src" },
 		{ "path": "../../react-choice-field-ui/src" },
 		{ "path": "../../react-datagrid-ui/src" },

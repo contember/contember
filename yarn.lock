@@ -2714,6 +2714,7 @@ __metadata:
     "@contember/react-auto": "workspace:*"
     "@contember/react-binding": "workspace:*"
     "@contember/react-binding-ui": "workspace:*"
+    "@contember/react-board-ui": "workspace:*"
     "@contember/react-choice-field-ui": "workspace:*"
     "@contember/react-client": "workspace:*"
     "@contember/react-datagrid-ui": "workspace:*"
@@ -2979,6 +2980,52 @@ __metadata:
     "@contember/utilities": "workspace:*"
     "@types/js-levenshtein": 1.1.0
     "@types/uuid": 8.3.1
+    react: ^18
+    react-dom: ^18
+  peerDependencies:
+    react: ^17 || ^18
+    react-dom: ^17 || ^18
+  languageName: unknown
+  linkType: soft
+
+"@contember/react-board-dnd-kit@workspace:*, @contember/react-board-dnd-kit@workspace:packages/react-board-dnd-kit":
+  version: 0.0.0-use.local
+  resolution: "@contember/react-board-dnd-kit@workspace:packages/react-board-dnd-kit"
+  dependencies:
+    "@contember/react-binding": "workspace:*"
+    "@contember/react-board": "workspace:*"
+    "@dnd-kit/core": ^6.1.0
+    "@dnd-kit/sortable": ^8.0.0
+    react: ^18
+    react-dom: ^18
+  peerDependencies:
+    react: ^17 || ^18
+    react-dom: ^17 || ^18
+  languageName: unknown
+  linkType: soft
+
+"@contember/react-board-ui@workspace:*, @contember/react-board-ui@workspace:packages/react-board-ui":
+  version: 0.0.0-use.local
+  resolution: "@contember/react-board-ui@workspace:packages/react-board-ui"
+  dependencies:
+    "@contember/react-binding": "workspace:*"
+    "@contember/react-board": "workspace:*"
+    "@contember/react-board-dnd-kit": "workspace:*"
+    "@contember/ui": "workspace:*"
+    lucide-react: ^0.258.0
+    react: ^18
+    react-dom: ^18
+  peerDependencies:
+    react: ^17 || ^18
+    react-dom: ^17 || ^18
+  languageName: unknown
+  linkType: soft
+
+"@contember/react-board@workspace:*, @contember/react-board@workspace:packages/react-board":
+  version: 0.0.0-use.local
+  resolution: "@contember/react-board@workspace:packages/react-board"
+  dependencies:
+    "@contember/react-binding": "workspace:*"
     react: ^18
     react-dom: ^18
   peerDependencies:
@@ -3273,6 +3320,55 @@ __metadata:
   version: 0.5.7
   resolution: "@discoveryjs/json-ext@npm:0.5.7"
   checksum: 2176d301cc258ea5c2324402997cf8134ebb212469c0d397591636cea8d3c02f2b3cf9fd58dcb748c7a0dade77ebdc1b10284fa63e608c033a1db52fddc69918
+  languageName: node
+  linkType: hard
+
+"@dnd-kit/accessibility@npm:^3.1.0":
+  version: 3.1.0
+  resolution: "@dnd-kit/accessibility@npm:3.1.0"
+  dependencies:
+    tslib: ^2.0.0
+  peerDependencies:
+    react: ">=16.8.0"
+  checksum: fcb88c961e2f4c226ab575bc4a13712419884bb0f60761befcaa23bcb6c9939dc2cac6633416f2a07baee9a8830350c6df444039332408cdaaf27cad17c6b64b
+  languageName: node
+  linkType: hard
+
+"@dnd-kit/core@npm:^6.1.0":
+  version: 6.1.0
+  resolution: "@dnd-kit/core@npm:6.1.0"
+  dependencies:
+    "@dnd-kit/accessibility": ^3.1.0
+    "@dnd-kit/utilities": ^3.2.2
+    tslib: ^2.0.0
+  peerDependencies:
+    react: ">=16.8.0"
+    react-dom: ">=16.8.0"
+  checksum: 3b8f46d2f4d2723abad4721c7bc4d1df2c4f6f26ce54673243666212cfa6f34f33e3255b53144a847da469dc736c966c19e4c45330f967ce8c01f8f878ec7f5b
+  languageName: node
+  linkType: hard
+
+"@dnd-kit/sortable@npm:^8.0.0":
+  version: 8.0.0
+  resolution: "@dnd-kit/sortable@npm:8.0.0"
+  dependencies:
+    "@dnd-kit/utilities": ^3.2.2
+    tslib: ^2.0.0
+  peerDependencies:
+    "@dnd-kit/core": ^6.1.0
+    react: ">=16.8.0"
+  checksum: 26589fd23c18d930a949489b232a7345c0bee4abb6be91d3673232bc79085f13cb5d82087c2068edbc51cbdd3d47c2fe386bada92dc7f2d0dcde13d6be379daa
+  languageName: node
+  linkType: hard
+
+"@dnd-kit/utilities@npm:^3.2.2":
+  version: 3.2.2
+  resolution: "@dnd-kit/utilities@npm:3.2.2"
+  dependencies:
+    tslib: ^2.0.0
+  peerDependencies:
+    react: ">=16.8.0"
+  checksum: 8a5015c2faa52760ab82a64287b2ac6a3d798867a1bca5ccbc1178560dbd9a1f9f1a21faea80f590ba1a4277c3eb7e7c4d3b4a39f1f32171bf6bc8174b370547
   languageName: node
   linkType: hard
 
@@ -16186,6 +16282,13 @@ __metadata:
   version: 1.14.1
   resolution: "tslib@npm:1.14.1"
   checksum: dbe628ef87f66691d5d2959b3e41b9ca0045c3ee3c7c7b906cc1e328b39f199bb1ad9e671c39025bd56122ac57dfbf7385a94843b1cc07c60a4db74795829acd
+  languageName: node
+  linkType: hard
+
+"tslib@npm:^2.0.0":
+  version: 2.6.2
+  resolution: "tslib@npm:2.6.2"
+  checksum: 329ea56123005922f39642318e3d1f0f8265d1e7fcb92c633e0809521da75eeaca28d2cf96d7248229deb40e5c19adf408259f4b9640afd20d13aecc1430f3ad
   languageName: node
   linkType: hard
 

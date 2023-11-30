@@ -1,0 +1,12 @@
+{
+	"extends": "../../../tsconfig.settings.json",
+	"compilerOptions": {
+		"outDir": "../dist/types"
+	},
+	"references": [
+		{ "path": "../../ui/src" },
+		{ "path": "../../react-binding/src" },
+		{ "path": "../../react-board/src" },
+		{ "path": "../../react-board-dnd-kit/src" },
+	]
+}

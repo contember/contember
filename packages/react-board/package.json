@@ -1,0 +1,48 @@
+{
+	"name": "@contember/react-board",
+	"license": "Apache-2.0",
+	"version": "0.0.0",
+	"private": true,
+	"type": "module",
+	"sideEffects": false,
+	"main": "./dist/production/index.js",
+	"exports": {
+		".": {
+			"import": {
+				"types": "./dist/types/index.d.ts",
+				"development": "./dist/development/index.js",
+				"production": "./dist/production/index.js",
+				"default": "./dist/production/index.js"
+			}
+		}
+	},
+	"files": [
+		"dist/",
+		"src/"
+	],
+	"typings": "./dist/types/index.d.ts",
+	"scripts": {
+		"build": "yarn build:js:dev && yarn build:js:prod",
+		"build:js:dev": "vite build --mode development",
+		"build:js:prod": "vite build --mode production",
+		"ae:build": "api-extractor run --local",
+		"ae:test": "api-extractor run",
+		"test": "vitest"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/contember/interface.git",
+		"directory": "packages/react-board"
+	},
+	"dependencies": {
+		"@contember/react-binding": "workspace:*"
+	},
+	"peerDependencies": {
+		"react": "^17 || ^18",
+		"react-dom": "^17 || ^18"
+	},
+	"devDependencies": {
+		"react": "^18",
+		"react-dom": "^18"
+	}
+}

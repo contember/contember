@@ -43,6 +43,7 @@ import { CreateTargetDiffer } from './modifications/actions/CreateTargetModifica
 import { RemoveTargetDiffer } from './modifications/actions/RemoveTargetModification'
 import { UpdateSettingsDiffer } from './modifications/settings'
 import { RemoveIndexNamesDiffer } from './modifications/upgrade/RemoveIndexNamesModification'
+import { ConvertOneHasManyToOneHasOneRelationDiffer } from './modifications/relations/ConvertOneHasManyToOneHasOneRelationModification'
 
 type DiffOptions = { skipRecreateValidation?: boolean; skipInitialSchemaValidation?: boolean }
 
@@ -69,6 +70,7 @@ export class SchemaDiffer {
 			new UpdateSettingsDiffer(),
 			new ConvertOneToManyRelationDiffer(),
 			new ConvertOneHasManyToManyHasManyRelationDiffer(),
+			new ConvertOneHasManyToOneHasOneRelationDiffer(),
 			new RemoveUniqueConstraintDiffer(),
 			new RemoveIndexDiffer(),
 			new RemoveViewDiffer(),

@@ -1,0 +1,188 @@
+{
+	"formatVersion": 3,
+	"modifications": [
+		{
+			"modification": "createEnum",
+			"enumName": "TaskStatus",
+			"values": [
+				"new",
+				"in_progress",
+				"done"
+			]
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "Task",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "task",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": {},
+				"indexes": {},
+				"eventLog": {
+					"enabled": true
+				}
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "User",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "user",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": {},
+				"indexes": {},
+				"eventLog": {
+					"enabled": true
+				}
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "Task",
+			"field": {
+				"name": "title",
+				"columnName": "title",
+				"columnType": "text",
+				"nullable": false,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "Task",
+			"field": {
+				"name": "status",
+				"columnName": "status",
+				"columnType": "TaskStatus",
+				"nullable": false,
+				"type": "Enum"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "Task",
+			"field": {
+				"name": "order",
+				"columnName": "order",
+				"columnType": "integer",
+				"nullable": true,
+				"type": "Integer"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "User",
+			"field": {
+				"name": "name",
+				"columnName": "name",
+				"columnType": "text",
+				"nullable": false,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "Task",
+			"owningSide": {
+				"type": "ManyHasOne",
+				"name": "assignee",
+				"target": "User",
+				"joiningColumn": {
+					"columnName": "assignee_id",
+					"onDelete": "restrict"
+				},
+				"nullable": true,
+				"inversedBy": "assignedTasks"
+			},
+			"inverseSide": {
+				"type": "OneHasMany",
+				"name": "assignedTasks",
+				"target": "Task",
+				"ownedBy": "assignee"
+			}
+		},
+		{
+			"modification": "patchAclSchema",
+			"patch": [
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/Task",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"read": {
+								"id": true,
+								"title": true,
+								"status": true,
+								"order": true,
+								"assignee": true
+							},
+							"create": {
+								"id": true,
+								"title": true,
+								"status": true,
+								"order": true,
+								"assignee": true
+							},
+							"update": {
+								"id": true,
+								"title": true,
+								"status": true,
+								"order": true,
+								"assignee": true
+							},
+							"delete": true,
+							"customPrimary": true
+						}
+					}
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/User",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"read": {
+								"id": true,
+								"name": true,
+								"assignedTasks": true
+							},
+							"create": {
+								"id": true,
+								"name": true,
+								"assignedTasks": true
+							},
+							"update": {
+								"id": true,
+								"name": true,
+								"assignedTasks": true
+							},
+							"delete": true,
+							"customPrimary": true
+						}
+					}
+				}
+			]
+		}
+	]
+}

@@ -88,3 +88,45 @@ testMigrations('convert one has one to many has one relation with inverse side',
 	}),
 })
 
+testMigrations('convert one has one to many has one relation with inverse side, but not renamed', {
+	original: {
+		model: new SchemaBuilder()
+			.entity('Post', entity =>
+				entity.oneHasOne('image', rel => rel.target('Image').inversedBy('posts')),
+			)
+			.entity('Image', e => e.column('url', c => c.type(Model.ColumnType.String)))
+			.buildSchema(),
+	},
+	updated: {
+		model: new SchemaBuilder()
+			.entity('Post', entity =>
+				entity.manyHasOne('image', rel => rel.target('Image').inversedBy('posts')),
+			)
+			.entity('Image', e => e.column('url', c => c.type(Model.ColumnType.String)))
+			.buildSchema(),
+	},
+	diff: [
+		{
+			modification: 'convertOneToManyRelation',
+			entityName: 'Post',
+			fieldName: 'image',
+		},
+	],
+	sql: SQL`
+        CREATE INDEX ON "post" ("image_id");
+        ALTER TABLE "post"
+            DROP CONSTRAINT "uniq_post_image_id";
+	`,
+	databaseMetadata: createDatabaseMetadata({
+		foreignKeys: [],
+		indexes: [],
+		uniqueConstraints: [{
+			constraintName: 'uniq_post_image_id',
+			columnNames: ['image_id'],
+			tableName: 'post',
+			deferred: false,
+			deferrable: false,
+		}],
+	}),
+})
+

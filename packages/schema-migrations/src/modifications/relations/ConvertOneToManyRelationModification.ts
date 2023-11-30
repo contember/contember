@@ -61,6 +61,7 @@ export class ConvertOneToManyRelationModificationHandler implements Modification
 		const { relation } = this.getRelation()
 		const { entityName, fieldName } = this.data
 
+		const inverseFieldName = this.data.newInverseSideFieldName ?? relation.inversedBy
 		return updateSchema(
 			updateModel(
 				updateEntity(
@@ -75,12 +76,12 @@ export class ConvertOneToManyRelationModificationHandler implements Modification
 				),
 			),
 			this.subModification.getSchemaUpdater(),
-			this.data.newInverseSideFieldName ?
+			inverseFieldName ?
 				updateModel(
 					updateEntity(
 						relation.target,
 						updateField<Model.OneHasOneInverseRelation, Model.OneHasManyRelation>(
-							this.data.newInverseSideFieldName,
+							inverseFieldName,
 							({ field: { type,  nullable, ...field } }) => ({
 								type: Model.RelationType.OneHasMany,
 								...field,

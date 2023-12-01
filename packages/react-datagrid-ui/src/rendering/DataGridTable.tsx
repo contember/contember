@@ -46,7 +46,7 @@ export const DataGridTable = memo<DataGridTableProps>(props => {
 				)
 				: (
 					<TableRow>
-						<TableCell colSpan={columns.size}>a
+						<TableCell colSpan={columns.size}>
 							<EmptyMessage
 								border={false}
 								component={emptyMessageComponent}

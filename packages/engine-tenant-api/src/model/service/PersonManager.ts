@@ -18,7 +18,7 @@ class PersonManager {
 	}
 
 	async changeMyProfile(dbContext: DatabaseContext, person: PersonRow, data: ChangeProfileData): Promise<PersonManager.ProfileChangeResponse> {
-		if (data.email !== undefined) {
+		if (data.email !== undefined && person.email !== data.email) {
 			const validationError = await this.emailValidator.validateEmail(dbContext, data.email)
 			if (validationError !== null) {
 				return new ResponseError(validationError.error, validationError.errorMessage)

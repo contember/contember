@@ -56,6 +56,7 @@ export const configTemplate: any = {
 		},
 	},
 	projectDefaults: {
+		stageSlug: '%?project.env.STAGE_SLUG%',
 		db: {
 			host: `%?project.env.DB_HOST%`,
 			port: `%?project.env.DB_PORT::number%`,

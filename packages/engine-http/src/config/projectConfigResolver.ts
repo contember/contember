@@ -21,10 +21,11 @@ export const createProjectConfigResolver = (env: Env, config: any, configProcess
 			(config?.projects as any)?.[slug] as any,
 			additionalConfig,
 		)
-		if (!mergedConfig.stages) {
-			mergedConfig.stages = { live: {} }
-		}
 		const resolvedConfig = resolveParameters(mergedConfig, createProjectParametersResolver(slug, env, secrets))
+
+		if (!resolvedConfig.stages) {
+			resolvedConfig.stages = { [resolvedConfig.stageSlug ?? 'live']: {} }
+		}
 
 		const projectConfigSchemaWithPlugins = configProcessors.reduce(
 			(schema, current) => {

@@ -1,6 +1,6 @@
 {
   "name": "@contember/benchmark",
-  "version": "1.4.0-alpha.1",
+  "version": "1.4.0-alpha.2",
   "license": "Apache-2.0",
   "scripts": {
     "start-server": "node dist/src/start-server.js",

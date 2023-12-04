@@ -36,6 +36,7 @@ import { removeTargetModification } from './actions/RemoveTargetModification'
 import { updateTargetModification } from './actions/UpdateTargetModification'
 import { updateEntityOrderByModification } from './entities/UpdateEntityOrderByModification'
 import { removeIndexNamesModification } from './upgrade/RemoveIndexNamesModification'
+import { convertOneHasManyToOneHasOneRelationModification } from './relations/ConvertOneHasManyToOneHasOneRelationModification'
 
 
 class ModificationHandlerFactory {
@@ -86,6 +87,7 @@ namespace ModificationHandlerFactory {
 		updateValidationSchemaModification,
 		patchValidationSchemaModification,
 		convertOneToManyRelationModification,
+		convertOneHasManyToOneHasOneRelationModification,
 		toggleEventLogModification,
 		toggleJunctionEventLogModification,
 		convertOneHasManyToManyHasManyRelationModification,

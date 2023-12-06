@@ -4,6 +4,13 @@
 
 ```ts
 
+import { GraphQlClient as GraphQlClient_2 } from '@contember/graphql-client';
+import { GraphQlClientError } from '@contember/graphql-client';
+import { GraphQlClientRequestOptions as GraphQlClientRequestOptions_2 } from '@contember/graphql-client';
+import { GraphQlClientVariables } from '@contember/graphql-client';
+import { GraphQlErrorRequest } from '@contember/graphql-client';
+import { GraphQlErrorType } from '@contember/graphql-client';
+import { GraphQlPrintResult } from '@contember/graphql-builder';
 import { Input } from '@contember/schema';
 import { Result } from '@contember/schema';
 import { Value } from '@contember/schema';
@@ -11,53 +18,10 @@ import { Writable } from '@contember/schema';
 
 // @public (undocumented)
 export namespace CrudQueryBuilder {
-    import CrudQueryBuilder = CrudQueryBuilderTmp.CrudQueryBuilder;
-    import ReadBuilder = CrudQueryBuilderTmp.ReadBuilder;
-    import WriteBuilder = CrudQueryBuilderTmp.WriteBuilder;
-    import WriteDataBuilder = CrudQueryBuilderTmp.WriteDataBuilder;
-    import WriteManyRelationBuilder = CrudQueryBuilderTmp.WriteManyRelationBuilder;
-    import WriteOneRelationBuilder = CrudQueryBuilderTmp.WriteOneRelationBuilder;
-    import WriteOperation = CrudQueryBuilderTmp.WriteOperation;
     // Warning: (ae-forgotten-export) The symbol "CrudQueryBuilderTmp" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
-    export type CreateMutationArguments = CrudQueryBuilderTmp.CreateMutationArguments;
-    // (undocumented)
-    export type CreateMutationFields = CrudQueryBuilderTmp.CreateMutationFields;
-    // (undocumented)
-    export type DeleteMutationArguments = CrudQueryBuilderTmp.DeleteMutationArguments;
-    // (undocumented)
-    export type DeleteMutationFields = CrudQueryBuilderTmp.DeleteMutationFields;
-    // (undocumented)
-    export type GetQueryArguments = CrudQueryBuilderTmp.GetQueryArguments;
-    // (undocumented)
-    export type HasManyArguments = CrudQueryBuilderTmp.HasManyArguments;
-    // (undocumented)
-    export type HasOneArguments = CrudQueryBuilderTmp.HasOneArguments;
-    // (undocumented)
-    export type ListQueryArguments = CrudQueryBuilderTmp.ListQueryArguments;
-    // (undocumented)
-    export type Mutations = CrudQueryBuilderTmp.Mutations;
-    // (undocumented)
     export type OrderDirection = CrudQueryBuilderTmp.OrderDirection;
-    // (undocumented)
-    export type PaginateQueryArguments = CrudQueryBuilderTmp.PaginateQueryArguments;
-    // (undocumented)
-    export type Queries = CrudQueryBuilderTmp.Queries;
-    // (undocumented)
-    export type ReadArguments = CrudQueryBuilderTmp.ReadArguments;
-    // (undocumented)
-    export type ReductionArguments = CrudQueryBuilderTmp.ReductionArguments;
-    // (undocumented)
-    export type UpdateMutationArguments = CrudQueryBuilderTmp.UpdateMutationArguments;
-    // (undocumented)
-    export type UpdateMutationFields = CrudQueryBuilderTmp.UpdateMutationFields;
-    // (undocumented)
-    export type WriteArguments = CrudQueryBuilderTmp.WriteArguments;
-    // (undocumented)
-    export type WriteFields = CrudQueryBuilderTmp.WriteFields;
-    // (undocumented)
-    export type WriteRelationOps = CrudQueryBuilderTmp.WriteRelationOps;
 }
 
 // @public (undocumented)
@@ -109,33 +73,25 @@ export const formatSystemApiRelativeUrl: (projectSlug: string) => string;
 
 // @public (undocumented)
 export class GenerateUploadUrlMutationBuilder {
-    // (undocumented)
-    static buildQuery(parameters: GenerateUploadUrlMutationBuilder.MutationParameters): string;
+    // @internal (undocumented)
+    static buildQuery(parameters: GenerateUploadUrlMutationBuilder.MutationParameters): GraphQlPrintResult;
 }
 
 // @public (undocumented)
 export namespace GenerateUploadUrlMutationBuilder {
     // (undocumented)
-    export type Acl = GraphQlLiteral<'PUBLIC_READ' | 'PRIVATE' | 'NONE'>;
+    export type Acl = 'PUBLIC_READ' | 'PRIVATE' | 'NONE' | GraphQlLiteral<'PUBLIC_READ' | 'PRIVATE' | 'NONE'>;
     // (undocumented)
-    export interface FileParameters {
-        // (undocumented)
-        acl?: Acl;
-        // (undocumented)
+    export type FileParameters = {
         contentType: string;
-        // (undocumented)
         expiration?: number;
-        // (undocumented)
-        extension?: string;
-        // (undocumented)
-        fileName?: string;
-        // (undocumented)
-        prefix?: string;
-        // (undocumented)
         size?: number;
-        // (undocumented)
+        prefix?: string;
+        extension?: string;
         suffix?: string;
-    }
+        fileName?: string;
+        acl?: Acl;
+    };
     // (undocumented)
     export interface MutationParameters {
         // (undocumented)
@@ -169,20 +125,15 @@ export const getTenantErrorMessage: (errorCode: string) => string;
 export namespace GraphQlBuilder {
     import GraphqlLiteral = GraphQlBuilderTmp.GraphQlLiteral;
     import GraphQlLiteral = GraphQlBuilderTmp.GraphQlLiteral;
-    import ObjectBuilder = GraphQlBuilderTmp.ObjectBuilder;
-    import QueryCompiler = GraphQlBuilderTmp.QueryCompiler;
-    import QueryBuilder = GraphQlBuilderTmp.QueryBuilder;
-    import RootObjectBuilder = GraphQlBuilderTmp.RootObjectBuilder;
 }
 
 // @public (undocumented)
-export class GraphQlClient {
-    constructor(apiUrl: string, apiToken?: string | undefined);
-    // (undocumented)
-    readonly apiUrl: string;
-    // (undocumented)
-    sendRequest<T = unknown>(query: string, { apiTokenOverride, signal, variables, headers }?: GraphQlClientRequestOptions): Promise<T>;
+export class GraphQlClient extends GraphQlClient_2 {
+    // @deprecated (undocumented)
+    sendRequest<T = unknown>(query: string, options?: GraphQlClientRequestOptions): Promise<T>;
 }
+
+export { GraphQlClientError }
 
 // @public (undocumented)
 export type GraphQlClientFailedRequestMetadata = Pick<Response, 'status' | 'statusText'> & {
@@ -190,24 +141,18 @@ export type GraphQlClientFailedRequestMetadata = Pick<Response, 'status' | 'stat
 };
 
 // @public (undocumented)
-export interface GraphQlClientRequestOptions {
-    // (undocumented)
+export interface GraphQlClientRequestOptions extends GraphQlClientRequestOptions_2 {
+    // @deprecated (undocumented)
     apiTokenOverride?: string;
-    // (undocumented)
-    headers?: Record<string, string>;
-    // (undocumented)
-    signal?: AbortSignal;
-    // (undocumented)
-    variables?: GraphQlClientVariables;
 }
 
-// @public (undocumented)
-export interface GraphQlClientVariables {
-    // (undocumented)
-    [name: string]: any;
-}
+export { GraphQlClientVariables }
 
-// @public (undocumented)
+export { GraphQlErrorRequest }
+
+export { GraphQlErrorType }
+
+// @public @deprecated (undocumented)
 export class GraphQlLiteral<Value extends string = string> {
     constructor(value: Value);
     // (undocumented)
@@ -261,6 +206,14 @@ export interface RelationFilter {
     // (undocumented)
     relations: RelationFilter[];
 }
+
+// @public (undocumented)
+export type ReplaceGraphQlLiteral<T> = T extends GraphQlLiteral<infer Value> ? Value : T extends string | number | boolean | null ? T : T extends {} ? {
+    [K in keyof T]: ReplaceGraphQlLiteral<T[K]>;
+} : T extends any[] ? ReplaceGraphQlLiteral<T[number]>[] : T;
+
+// @public (undocumented)
+export const replaceGraphQlLiteral: <T>(input: T) => ReplaceGraphQlLiteral<T>;
 
 export { Result }
 
@@ -356,6 +309,9 @@ export { Value }
 export const whereToFilter: (by: Input.UniqueWhere<GraphQlLiteral>) => Input.Where<Input.Condition<Input.ColumnValue<GraphQlLiteral>>>;
 
 export { Writable }
+
+
+export * from "@contember/client-content";
 
 // (No @packageDocumentation comment for this package)
 

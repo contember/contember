@@ -4,17 +4,20 @@
 
 ```ts
 
+import { ContentQueryBuilder } from '@contember/client';
 import type { CrudQueryBuilder } from '@contember/client';
 import { EmbeddedActionsParser } from 'chevrotain';
 import { v4 as generateUuid } from 'uuid';
 import { GraphQlBuilder } from '@contember/client';
-import type { GraphQlClient } from '@contember/client';
-import type { GraphQlClientFailedRequestMetadata } from '@contember/client';
+import { GraphQlClient } from '@contember/client';
+import { GraphQlClientError } from '@contember/client';
 import type { GraphQlClientRequestOptions } from '@contember/client';
 import { GraphQlLiteral } from '@contember/client';
 import { Input } from '@contember/client';
+import { MutationResult } from '@contember/client';
 import type { Result } from '@contember/client';
 import { TokenType } from 'chevrotain';
+import { TransactionResult } from '@contember/client';
 import type { TreeFilter } from '@contember/client';
 
 // @public (undocumented)
@@ -113,8 +116,11 @@ export class Config {
 }
 
 // @public (undocumented)
+export const createQueryBuilder: (schema: Schema) => ContentQueryBuilder;
+
+// @public (undocumented)
 export class DataBinding<Node> {
-    constructor(contentApiClient: GraphQlClient, systemApiClient: GraphQlClient, tenantApiClient: GraphQlClient, treeStore: TreeStore, environment: Environment, createMarkerTree: (node: Node, environment: Environment) => MarkerTreeRoot, batchedUpdates: (callback: () => any) => void, onUpdate: (newData: TreeRootAccessor<Node>, binding: DataBinding<Node>) => void, onError: (error: RequestError, binding: DataBinding<Node>) => void, onPersistSuccess: (result: SuccessfulPersistResult, binding: DataBinding<Node>) => void, options: {
+    constructor(contentApiClient: GraphQlClient, systemApiClient: GraphQlClient, tenantApiClient: GraphQlClient, treeStore: TreeStore, environment: Environment, createMarkerTree: (node: Node, environment: Environment) => MarkerTreeRoot, batchedUpdates: (callback: () => any) => void, onUpdate: (newData: TreeRootAccessor<Node>, binding: DataBinding<Node>) => void, onError: (error: GraphQlClientError, binding: DataBinding<Node>) => void, onPersistSuccess: (result: SuccessfulPersistResult, binding: DataBinding<Node>) => void, options: {
         skipStateUpdateAfterPersist: boolean;
     });
     // (undocumented)
@@ -123,6 +129,9 @@ export class DataBinding<Node> {
 
 // @public (undocumented)
 export const DataBindingExtendAborted: unique symbol;
+
+// @public (undocumented)
+export type DataBindingTransactionResult = TransactionResult<Record<string, MutationResult<ReceivedEntityData>>>;
 
 // @public (undocumented)
 export class DirtinessTracker {
@@ -706,10 +715,7 @@ export namespace ErrorAccessor {
 }
 
 // @public (undocumented)
-export type ErrorPathNodeType = FieldPathErrorFragment | IndexPathErrorFragment;
-
-// @public (undocumented)
-export type ErrorPersistResult = InvalidInputPersistResult | RequestError | InvalidResponseResult;
+export type ErrorPersistResult = InvalidInputPersistResult | InvalidResponseResult;
 
 // Warning: (ae-forgotten-export) The symbol "GenericEventsMap" needs to be exported by the entry point index.d.ts
 //
@@ -786,16 +792,6 @@ export class EventManager {
     triggerOnPersistError(options: PersistErrorOptions): Promise<void>;
     // (undocumented)
     triggerOnPersistSuccess(options: PersistSuccessOptions): Promise<void>;
-}
-
-// @public (undocumented)
-export interface ExecutionError {
-    // (undocumented)
-    message: string | null;
-    // (undocumented)
-    path: MutationErrorPath;
-    // (undocumented)
-    type: Result.ExecutionErrorType;
 }
 
 // @public (undocumented)
@@ -932,14 +928,6 @@ export class FieldMarker {
 export type FieldName = string;
 
 // @public (undocumented)
-export interface FieldPathErrorFragment {
-    // (undocumented)
-    __typename: '_FieldPathFragment';
-    // (undocumented)
-    field: string;
-}
-
-// @public (undocumented)
 export type FieldValue = JsonValue;
 
 // @public (undocumented)
@@ -955,19 +943,6 @@ export type GetEntityListSubTree = (parametersOrAlias: Alias | SugaredQualifiedE
 
 // @public (undocumented)
 export type GetEntitySubTree = (parametersOrAlias: Alias | SugaredQualifiedSingleEntity | SugaredUnconstrainedQualifiedSingleEntity, treeId?: TreeRootId, environment?: Environment) => EntityAccessor;
-
-// @public (undocumented)
-export interface GqlError {
-    // (undocumented)
-    errors: {
-        message: string;
-        path?: string[];
-    }[];
-    // (undocumented)
-    query: string;
-    // (undocumented)
-    type: 'gqlError';
-}
 
 // @public (undocumented)
 export interface HasManyRelation extends Relation, EntityListParameters, EntityListEventListeners {
@@ -1007,16 +982,6 @@ export class HasOneRelationMarker {
     readonly parameters: HasOneRelation;
     // (undocumented)
     readonly placeholderName: string;
-}
-
-// @public (undocumented)
-export interface IndexPathErrorFragment {
-    // (undocumented)
-    __typename: '_IndexPathFragment';
-    // (undocumented)
-    alias: string | null;
-    // (undocumented)
-    index: number;
 }
 
 // @public (undocumented)
@@ -1153,64 +1118,6 @@ export class MarkerTreeRoot {
 
 // @public (undocumented)
 export type MeaningfulMarker = FieldMarker | HasOneRelationMarker | HasManyRelationMarker | EntityListSubTreeMarker | EntitySubTreeMarker;
-
-// @public (undocumented)
-export const metadataToRequestError: (metadata: GraphQlClientFailedRequestMetadata) => RequestError;
-
-// @public (undocumented)
-export interface MutationDataResponse {
-    // (undocumented)
-    [alias: string]: MutationResponse;
-}
-
-// @public (undocumented)
-export type MutationErrorPath = ErrorPathNodeType[];
-
-// @public (undocumented)
-export interface MutationRequestResponse {
-    // (undocumented)
-    data: MutationTransactionResponse | null;
-    // (undocumented)
-    errors?: {
-        message: string;
-        path?: string[];
-    }[];
-}
-
-// @public (undocumented)
-export interface MutationResponse {
-    // (undocumented)
-    errorMessage: string | null;
-    // (undocumented)
-    errors: ExecutionError[];
-    // (undocumented)
-    node: ReceivedEntityData;
-    // (undocumented)
-    ok: boolean;
-    // (undocumented)
-    validation: {
-        valid: boolean;
-        errors: ValidationError[];
-    } | undefined;
-}
-
-// @public (undocumented)
-export interface MutationTransactionResponse {
-    // (undocumented)
-    transaction: (MutationDataResponse & {
-        __typename: 'MutationTransaction';
-        ok: boolean;
-        errorMessage: string | null;
-    });
-}
-
-// @public (undocumented)
-export interface NetworkErrorRequestError {
-    // (undocumented)
-    metadata: GraphQlClientFailedRequestMetadata;
-    // (undocumented)
-    type: 'networkError';
-}
 
 // @public (undocumented)
 export const NIL_UUID = "00000000-0000-0000-0000-000000000000";
@@ -1537,9 +1444,6 @@ export type RelativeSingleField = AnyField & LeafField & {
 
 // @public (undocumented)
 export type RemovalType = 'disconnect' | 'delete';
-
-// @public (undocumented)
-export type RequestError = UnauthorizedRequestError | NetworkErrorRequestError | GqlError | UnknownErrorRequestError;
 
 // @public (undocumented)
 export type RuntimeId = ServerId | ClientGeneratedUuid | UnpersistedEntityDummyId;
@@ -2056,12 +1960,6 @@ export class TreeStore {
 export const TYPENAME_KEY_NAME = "__typename";
 
 // @public (undocumented)
-export interface UnauthorizedRequestError {
-    // (undocumented)
-    type: 'unauthorized';
-}
-
-// @public (undocumented)
 export interface UnconstrainedQualifiedEntityList extends QualifiedEntityParameters, EntityCreationParameters, EntityListEventListeners, EntityListPreferences {
     // (undocumented)
     hasOneRelationPath: HasOneRelation[];
@@ -2088,12 +1986,6 @@ export type UniqueEntityId = string & {
 
 // @public (undocumented)
 export type UniqueWhere<T = GraphQlBuilder.GraphQlLiteral> = Input.UniqueWhere<T>;
-
-// @public (undocumented)
-export interface UnknownErrorRequestError {
-    // (undocumented)
-    type: 'unknownError';
-}
 
 // @public (undocumented)
 export class UnpersistedEntityDummyId implements RuntimeIdSpec {
@@ -2227,16 +2119,6 @@ export interface UnsugarableUnconstrainedQualifiedSingleEntity extends Unsugarab
     isCreating: true;
     // (undocumented)
     isUnpersisted?: boolean;
-}
-
-// @public (undocumented)
-export interface ValidationError {
-    // (undocumented)
-    message: {
-        text: string;
-    };
-    // (undocumented)
-    path: MutationErrorPath;
 }
 
 // @public (undocumented)

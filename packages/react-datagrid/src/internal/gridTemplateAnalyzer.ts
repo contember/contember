@@ -2,6 +2,7 @@ import { ChildrenAnalyzer, Leaf } from '@contember/react-multipass-rendering'
 import type { ReactNode } from 'react'
 import { DataGridColumnProps, DataGridColumns } from '../types'
 import { DataGridColumn } from '../grid'
+import { Environment } from '@contember/react-binding'
 
 class BoxedGridColumnProps {
 	public constructor(public readonly value: DataGridColumnProps) {}
@@ -9,13 +10,13 @@ class BoxedGridColumnProps {
 
 const gridColumnLeaf = new Leaf(node => new BoxedGridColumnProps(node.props), DataGridColumn)
 
-const gridTemplateAnalyzer = new ChildrenAnalyzer<BoxedGridColumnProps>([gridColumnLeaf], {
+const gridTemplateAnalyzer = new ChildrenAnalyzer<BoxedGridColumnProps, never, Environment>([gridColumnLeaf], {
 	ignoreUnhandledNodes: false,
 	unhandledNodeErrorMessage: `DataGrid: encountered an illegal child node.`,
 })
 
-export const extractDataGridColumns = (nodes: ReactNode): DataGridColumns<any> => {
-	const processed = gridTemplateAnalyzer.processChildren(nodes, undefined)
+export const extractDataGridColumns = (nodes: ReactNode, env: Environment): DataGridColumns<any> => {
+	const processed = gridTemplateAnalyzer.processChildren(nodes, env)
 
 	let counter = 0
 	const suffixes: Record<string, number> = {}

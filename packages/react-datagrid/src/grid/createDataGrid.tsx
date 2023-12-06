@@ -35,7 +35,7 @@ const dummyStateMethods: DataGridStateMethods = {
 }
 
 const createInitialState = (props: DataGridProps<{}>, environment: Environment): DataGridState<any> => {
-	const columns = extractDataGridColumns(props.children)
+	const columns = extractDataGridColumns(props.children, environment)
 	return {
 		columns,
 		paging: {

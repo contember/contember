@@ -1,8 +1,14 @@
 {
-	"name": "@contember/client",
+	"name": "@contember/client-content-generator",
 	"license": "Apache-2.0",
 	"version": "0.0.0",
+	"private": true,
+	"type": "module",
+	"sideEffects": false,
 	"main": "./dist/production/index.js",
+	"bin": {
+		"contember-client-generator": "./dist/production/generate.js"
+	},
 	"exports": {
 		".": {
 			"import": {
@@ -24,11 +30,9 @@
 		"src/"
 	],
 	"typings": "./dist/types/index.d.ts",
-	"type": "module",
-	"sideEffects": false,
 	"scripts": {
 		"build": "yarn build:js:dev && yarn build:js:prod",
-		"build:js:dev": "NODE_ENV=development vite build --mode development",
+		"build:js:dev": "vite build --mode development",
 		"build:js:prod": "vite build --mode production",
 		"ae:build": "api-extractor run --local",
 		"ae:test": "api-extractor run",
@@ -36,14 +40,16 @@
 	},
 	"dependencies": {
 		"@contember/client-content": "workspace:*",
-		"@contember/graphql-builder": "workspace:*",
-		"@contember/graphql-client": "workspace:*",
 		"@contember/schema": "^1.3.6",
-		"p-limit": "^4.0.0"
+		"@contember/schema-utils": "^1.3.6"
+	},
+	"devDependencies": {
+		"@contember/schema-definition": "^1.3.6",
+		"@types/node": "^18"
 	},
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/contember/interface.git",
-		"directory": "packages/client"
+		"directory": "packages/client-content-generator"
 	}
 }

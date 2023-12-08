@@ -2788,11 +2788,11 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@contember/client-generator@workspace:packages/client-generator":
+"@contember/client-content-generator@workspace:packages/client-content-generator":
   version: 0.0.0-use.local
-  resolution: "@contember/client-generator@workspace:packages/client-generator"
+  resolution: "@contember/client-content-generator@workspace:packages/client-content-generator"
   dependencies:
-    "@contember/client": "workspace:*"
+    "@contember/client-content": "workspace:*"
     "@contember/schema": ^1.3.6
     "@contember/schema-definition": ^1.3.6
     "@contember/schema-utils": ^1.3.6
@@ -2802,10 +2802,23 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@contember/client-content@workspace:*, @contember/client-content@workspace:packages/client-content":
+  version: 0.0.0-use.local
+  resolution: "@contember/client-content@workspace:packages/client-content"
+  dependencies:
+    "@contember/graphql-builder": "workspace:*"
+    "@contember/graphql-client": "workspace:*"
+    "@contember/schema": ^1.3.6
+  languageName: unknown
+  linkType: soft
+
 "@contember/client@workspace:*, @contember/client@workspace:packages/client":
   version: 0.0.0-use.local
   resolution: "@contember/client@workspace:packages/client"
   dependencies:
+    "@contember/client-content": "workspace:*"
+    "@contember/graphql-builder": "workspace:*"
+    "@contember/graphql-client": "workspace:*"
     "@contember/schema": ^1.3.6
     p-limit: ^4.0.0
   languageName: unknown
@@ -2849,6 +2862,20 @@ __metadata:
   checksum: 892a34da24e5eacef309cc4918037432954524ccd01ea656fac0597483ca96220a59af23fa7f64c3d542b22e47f33aebe379c36b5364ca2d8cb7cdf09f5b2655
   languageName: node
   linkType: hard
+
+"@contember/graphql-builder@workspace:*, @contember/graphql-builder@workspace:packages/graphql-builder":
+  version: 0.0.0-use.local
+  resolution: "@contember/graphql-builder@workspace:packages/graphql-builder"
+  dependencies:
+    "@contember/schema": ^1.3.6
+  languageName: unknown
+  linkType: soft
+
+"@contember/graphql-client@workspace:*, @contember/graphql-client@workspace:packages/graphql-client":
+  version: 0.0.0-use.local
+  resolution: "@contember/graphql-client@workspace:packages/graphql-client"
+  languageName: unknown
+  linkType: soft
 
 "@contember/interface-tester@workspace:*, @contember/interface-tester@workspace:packages/interface-tester":
   version: 0.0.0-use.local

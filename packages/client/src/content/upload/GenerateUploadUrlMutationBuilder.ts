@@ -1,7 +1,7 @@
 import { GraphQlLiteral } from '../../graphQlBuilder'
-import { GraphQlField, GraphQlPrintResult, GraphQlQueryPrinter, GraphQlSelectionSetItem } from '../../builder'
-import { replaceGraphQlLiteral } from '../client'
+import { GraphQlField, GraphQlPrintResult, GraphQlQueryPrinter, GraphQlSelectionSetItem } from '@contember/graphql-builder'
 import { GraphQlBuilder } from '../../index'
+import { replaceGraphQlLiteral } from '../replaceGraphQlLiteral'
 
 class GenerateUploadUrlMutationBuilder {
 	private static generateUploadUrlFields = [

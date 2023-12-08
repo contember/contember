@@ -13,10 +13,11 @@ export namespace CrudQueryBuilder {
 	export type OrderDirection = CrudQueryBuilderTmp.OrderDirection
 }
 
-export * from './builder'
 export * from './content'
 export * from './graphQlClient'
 export * from './system'
 export * from './tenant'
+
+export * from '@contember/client-content'
 
 export type { Input, Value, Result, Writable } from '@contember/schema'

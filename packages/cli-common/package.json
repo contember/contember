@@ -12,18 +12,18 @@
     "test": "echo 'No tests'"
   },
   "devDependencies": {
-    "@types/js-yaml": "^4.0.1",
-    "@types/node": "^18",
-    "@types/npm-package-arg": "^6.1.0"
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^20.9.0",
+    "@types/npm-package-arg": "^6.1.4"
   },
   "dependencies": {
     "chalk": "^4.1.2",
     "download-tarball": "^2.0.0",
-    "fast-glob": "^3.2.12",
-    "fs-extra": "^10.0.0",
+    "fast-glob": "^3.3.2",
+    "fs-extra": "^11.1.1",
     "get-package-json-from-registry": "^2.2.2",
     "js-yaml": "^4.1.0",
-    "npm-package-arg": "^9.0.2",
+    "npm-package-arg": "^11.0.1",
     "registry-info": "^1.0.0"
   }
 }

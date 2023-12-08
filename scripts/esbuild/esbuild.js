@@ -26,7 +26,7 @@ const buildServer = entrypoint => esbuild.build({
 	sourcemap: 'external',
 	outfile: './server/server.js',
 	plugins: [resolvePlugin],
-	external: ['pg-native', 'mock-aws-s3', 'aws-sdk', 'nock', 'heapdump'],
+	external: ['pg-native', 'mock-aws-s3', 'aws-sdk', 'nock'],
 })
 
 module.exports = { resolvePlugin, buildServer }

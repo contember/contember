@@ -26,13 +26,13 @@
     "@contember/database-tester": "workspace:*",
     "@contember/engine-api-tester": "workspace:*",
     "@contember/schema-definition": "workspace:*",
-    "@graphql-codegen/cli": "^2.6.2",
-    "@graphql-codegen/typescript": "^2.5.1",
-    "@graphql-codegen/typescript-operations": "^2.4.2",
-    "@graphql-codegen/typescript-resolvers": "^2.6.6",
-    "@types/node": "^18",
-    "graphql": "^16.5.0",
-    "pg": "^8.9.0"
+    "@graphql-codegen/cli": "^5.0.0",
+    "@graphql-codegen/typescript": "^4.0.1",
+    "@graphql-codegen/typescript-operations": "^4.0.1",
+    "@graphql-codegen/typescript-resolvers": "^4.0.1",
+    "@types/node": "^20.9.0",
+    "graphql": "^16.8.1",
+    "pg": "^8.11.3"
   },
   "peerDependencies": {
     "graphql": ">= 14.6.0",

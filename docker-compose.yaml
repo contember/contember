@@ -1,7 +1,7 @@
 version: '2.4'
 services:
   ts_watch:
-    image: node:18
+    image: node:20
     volumes:
       - ./:/src:cached
     working_dir: /src
@@ -23,7 +23,7 @@ services:
       retries: 10
 
   cli-sandbox:
-    image: node:18
+    image: node:20
     working_dir: /src/sandbox
     depends_on:
       api:
@@ -45,7 +45,7 @@ services:
       - /src/packages/cli/src/run.ts
 
   api:
-    image: node:18
+    image: node:20
     working_dir: /src
     depends_on:
       db:

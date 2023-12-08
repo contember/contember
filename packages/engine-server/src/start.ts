@@ -16,10 +16,6 @@ process.on('warning', message => {
 })
 ;(async () => {
 	const isDebug = isDebugMode()
-	if (process.env.NODE_HEAPDUMP === 'true') {
-		logger.info('Initializing heapdump')
-		await import('heapdump')
-	}
 	const terminationJobs: TerminationJob[] = []
 	listenOnProcessTermination(terminationJobs, logger)
 

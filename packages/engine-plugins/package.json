@@ -16,9 +16,10 @@
     "@contember/engine-http": "workspace:*"
   },
   "peerDependencies": {
-    "graphql": ">= 14.6.0"
+    "graphql": ">= 14.6.0",
+    "pg": "^8.9.0"
   },
   "devDependencies": {
-    "graphql": "^16.5.0"
+    "graphql": "^16.8.1"
   }
 }

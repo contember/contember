@@ -4,65 +4,67 @@ export type InputMaybe<T> = Maybe<T>
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] }
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> }
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> }
+export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never }
+export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never }
 export type RequireFields<T, K extends keyof T> = Omit<T, K> & { [P in K]-?: NonNullable<T[P]> }
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
-	ID: string
-	String: string
-	Boolean: boolean
-	Int: number
-	Float: number
-	DateTime: Date
-	Json: unknown
-	PrimaryKey: any
+	ID: { input: string; output: string }
+	String: { input: string; output: string }
+	Boolean: { input: boolean; output: boolean }
+	Int: { input: number; output: number }
+	Float: { input: number; output: number }
+	DateTime: { input: Date; output: Date }
+	Json: { input: unknown; output: unknown }
+	PrimaryKey: { input: any; output: any }
 }
 
 export type CreateEvent = Event & {
 	readonly __typename?: 'CreateEvent'
-	readonly appliedAt: Scalars['DateTime']
-	readonly createdAt: Scalars['DateTime']
-	readonly description: Scalars['String']
-	readonly id: Scalars['String']
-	readonly identityDescription: Scalars['String']
-	readonly identityId: Scalars['String']
-	readonly newValues: Scalars['Json']
-	readonly primaryKey: ReadonlyArray<Scalars['PrimaryKey']>
-	readonly tableName: Scalars['String']
-	readonly transactionId: Scalars['String']
+	readonly appliedAt: Scalars['DateTime']['output']
+	readonly createdAt: Scalars['DateTime']['output']
+	readonly description: Scalars['String']['output']
+	readonly id: Scalars['String']['output']
+	readonly identityDescription: Scalars['String']['output']
+	readonly identityId: Scalars['String']['output']
+	readonly newValues: Scalars['Json']['output']
+	readonly primaryKey: ReadonlyArray<Scalars['PrimaryKey']['output']>
+	readonly tableName: Scalars['String']['output']
+	readonly transactionId: Scalars['String']['output']
 	readonly type: EventType
 }
 
 export type DeleteEvent = Event & {
 	readonly __typename?: 'DeleteEvent'
-	readonly appliedAt: Scalars['DateTime']
-	readonly createdAt: Scalars['DateTime']
-	readonly description: Scalars['String']
-	readonly id: Scalars['String']
-	readonly identityDescription: Scalars['String']
-	readonly identityId: Scalars['String']
-	readonly oldValues: Scalars['Json']
-	readonly primaryKey: ReadonlyArray<Scalars['PrimaryKey']>
-	readonly tableName: Scalars['String']
-	readonly transactionId: Scalars['String']
+	readonly appliedAt: Scalars['DateTime']['output']
+	readonly createdAt: Scalars['DateTime']['output']
+	readonly description: Scalars['String']['output']
+	readonly id: Scalars['String']['output']
+	readonly identityDescription: Scalars['String']['output']
+	readonly identityId: Scalars['String']['output']
+	readonly oldValues: Scalars['Json']['output']
+	readonly primaryKey: ReadonlyArray<Scalars['PrimaryKey']['output']>
+	readonly tableName: Scalars['String']['output']
+	readonly transactionId: Scalars['String']['output']
 	readonly type: EventType
 }
 
 export type Event = {
-	readonly appliedAt: Scalars['DateTime']
-	readonly createdAt: Scalars['DateTime']
-	readonly description: Scalars['String']
-	readonly id: Scalars['String']
-	readonly identityDescription: Scalars['String']
-	readonly identityId: Scalars['String']
-	readonly primaryKey: ReadonlyArray<Scalars['PrimaryKey']>
-	readonly tableName: Scalars['String']
-	readonly transactionId: Scalars['String']
+	readonly appliedAt: Scalars['DateTime']['output']
+	readonly createdAt: Scalars['DateTime']['output']
+	readonly description: Scalars['String']['output']
+	readonly id: Scalars['String']['output']
+	readonly identityDescription: Scalars['String']['output']
+	readonly identityId: Scalars['String']['output']
+	readonly primaryKey: ReadonlyArray<Scalars['PrimaryKey']['output']>
+	readonly tableName: Scalars['String']['output']
+	readonly transactionId: Scalars['String']['output']
 	readonly type: EventType
 }
 
 export type EventFilterRow = {
-	readonly primaryKey: ReadonlyArray<Scalars['PrimaryKey']>
-	readonly tableName: Scalars['String']
+	readonly primaryKey: ReadonlyArray<Scalars['PrimaryKey']['input']>
+	readonly tableName: Scalars['String']['input']
 }
 
 export enum EventType {
@@ -74,25 +76,25 @@ export enum EventType {
 export type EventsArgs = {
 	readonly filter?: InputMaybe<EventsFilter>
 	/** Max 10000 */
-	readonly limit?: InputMaybe<Scalars['Int']>
-	readonly offset?: InputMaybe<Scalars['Int']>
+	readonly limit?: InputMaybe<Scalars['Int']['input']>
+	readonly offset?: InputMaybe<Scalars['Int']['input']>
 	readonly order?: InputMaybe<EventsOrder>
-	readonly stage?: InputMaybe<Scalars['String']>
+	readonly stage?: InputMaybe<Scalars['String']['input']>
 }
 
 export type EventsFilter = {
 	readonly appliedAt?: InputMaybe<EventsFilterDate>
 	readonly createdAt?: InputMaybe<EventsFilterDate>
-	readonly identities?: InputMaybe<ReadonlyArray<Scalars['String']>>
+	readonly identities?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>
 	readonly rows?: InputMaybe<ReadonlyArray<EventFilterRow>>
-	readonly tables?: InputMaybe<ReadonlyArray<Scalars['String']>>
-	readonly transactions?: InputMaybe<ReadonlyArray<Scalars['String']>>
+	readonly tables?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>
+	readonly transactions?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>
 	readonly types?: InputMaybe<ReadonlyArray<EventType>>
 }
 
 export type EventsFilterDate = {
-	readonly from?: InputMaybe<Scalars['DateTime']>
-	readonly to?: InputMaybe<Scalars['DateTime']>
+	readonly from?: InputMaybe<Scalars['DateTime']['input']>
+	readonly to?: InputMaybe<Scalars['DateTime']['input']>
 }
 
 export enum EventsOrder {
@@ -104,19 +106,19 @@ export enum EventsOrder {
 
 export type ExecutedMigration = {
 	readonly __typename?: 'ExecutedMigration'
-	readonly checksum: Scalars['String']
-	readonly executedAt: Scalars['DateTime']
-	readonly formatVersion: Scalars['Int']
-	readonly modifications: ReadonlyArray<Scalars['Json']>
-	readonly name: Scalars['String']
-	readonly version: Scalars['String']
+	readonly checksum: Scalars['String']['output']
+	readonly executedAt: Scalars['DateTime']['output']
+	readonly formatVersion: Scalars['Int']['output']
+	readonly modifications: ReadonlyArray<Scalars['Json']['output']>
+	readonly name: Scalars['String']['output']
+	readonly version: Scalars['String']['output']
 }
 
 export type MigrateError = {
 	readonly __typename?: 'MigrateError'
 	readonly code: MigrateErrorCode
-	readonly developerMessage: Scalars['String']
-	readonly migration: Scalars['String']
+	readonly developerMessage: Scalars['String']['output']
+	readonly migration: Scalars['String']['output']
 }
 
 export enum MigrateErrorCode {
@@ -132,27 +134,27 @@ export type MigrateResponse = {
 	readonly error?: Maybe<MigrateError>
 	/** @deprecated Field no longer supported */
 	readonly errors: ReadonlyArray<MigrateError>
-	readonly ok: Scalars['Boolean']
+	readonly ok: Scalars['Boolean']['output']
 	readonly result?: Maybe<MigrateResult>
 }
 
 export type MigrateResult = {
 	readonly __typename?: 'MigrateResult'
-	readonly message: Scalars['String']
+	readonly message: Scalars['String']['output']
 }
 
 export type Migration = {
-	readonly formatVersion: Scalars['Int']
-	readonly modifications: ReadonlyArray<Scalars['Json']>
-	readonly name: Scalars['String']
+	readonly formatVersion: Scalars['Int']['input']
+	readonly modifications: ReadonlyArray<Scalars['Json']['input']>
+	readonly name: Scalars['String']['input']
 	readonly skippedErrors?: InputMaybe<ReadonlyArray<MigrationSkippedError>>
-	readonly version: Scalars['String']
+	readonly version: Scalars['String']['input']
 }
 
 export type MigrationDeleteError = {
 	readonly __typename?: 'MigrationDeleteError'
 	readonly code: MigrationDeleteErrorCode
-	readonly developerMessage: Scalars['String']
+	readonly developerMessage: Scalars['String']['output']
 }
 
 export enum MigrationDeleteErrorCode {
@@ -163,20 +165,20 @@ export enum MigrationDeleteErrorCode {
 export type MigrationDeleteResponse = {
 	readonly __typename?: 'MigrationDeleteResponse'
 	readonly error?: Maybe<MigrationDeleteError>
-	readonly ok: Scalars['Boolean']
+	readonly ok: Scalars['Boolean']['output']
 }
 
 export type MigrationModification = {
-	readonly formatVersion?: InputMaybe<Scalars['Int']>
-	readonly modifications?: InputMaybe<ReadonlyArray<Scalars['Json']>>
-	readonly name?: InputMaybe<Scalars['String']>
-	readonly version?: InputMaybe<Scalars['String']>
+	readonly formatVersion?: InputMaybe<Scalars['Int']['input']>
+	readonly modifications?: InputMaybe<ReadonlyArray<Scalars['Json']['input']>>
+	readonly name?: InputMaybe<Scalars['String']['input']>
+	readonly version?: InputMaybe<Scalars['String']['input']>
 }
 
 export type MigrationModifyError = {
 	readonly __typename?: 'MigrationModifyError'
 	readonly code: MigrationModifyErrorCode
-	readonly developerMessage: Scalars['String']
+	readonly developerMessage: Scalars['String']['output']
 }
 
 export enum MigrationModifyErrorCode {
@@ -186,12 +188,12 @@ export enum MigrationModifyErrorCode {
 export type MigrationModifyResponse = {
 	readonly __typename?: 'MigrationModifyResponse'
 	readonly error?: Maybe<MigrationModifyError>
-	readonly ok: Scalars['Boolean']
+	readonly ok: Scalars['Boolean']['output']
 }
 
 export type MigrationSkippedError = {
-	readonly code: Scalars['String']
-	readonly path?: InputMaybe<Scalars['String']>
+	readonly code: Scalars['String']['input']
+	readonly path?: InputMaybe<Scalars['String']['input']>
 }
 
 export type Mutation = {
@@ -215,12 +217,12 @@ export type MutationMigrateArgs = {
 
 
 export type MutationMigrationDeleteArgs = {
-	migration: Scalars['String']
+	migration: Scalars['String']['input']
 }
 
 
 export type MutationMigrationModifyArgs = {
-	migration: Scalars['String']
+	migration: Scalars['String']['input']
 	modification: MigrationModification
 }
 
@@ -238,34 +240,34 @@ export type QueryEventsArgs = {
 
 
 export type QueryExecutedMigrationsArgs = {
-	version?: InputMaybe<Scalars['String']>
+	version?: InputMaybe<Scalars['String']['input']>
 }
 
 export type Stage = {
 	readonly __typename?: 'Stage'
-	readonly id: Scalars['String']
-	readonly name: Scalars['String']
-	readonly slug: Scalars['String']
+	readonly id: Scalars['String']['output']
+	readonly name: Scalars['String']['output']
+	readonly slug: Scalars['String']['output']
 }
 
 export type TruncateResponse = {
 	readonly __typename?: 'TruncateResponse'
-	readonly ok: Scalars['Boolean']
+	readonly ok: Scalars['Boolean']['output']
 }
 
 export type UpdateEvent = Event & {
 	readonly __typename?: 'UpdateEvent'
-	readonly appliedAt: Scalars['DateTime']
-	readonly createdAt: Scalars['DateTime']
-	readonly description: Scalars['String']
-	readonly diffValues: Scalars['Json']
-	readonly id: Scalars['String']
-	readonly identityDescription: Scalars['String']
-	readonly identityId: Scalars['String']
-	readonly oldValues: Scalars['Json']
-	readonly primaryKey: ReadonlyArray<Scalars['PrimaryKey']>
-	readonly tableName: Scalars['String']
-	readonly transactionId: Scalars['String']
+	readonly appliedAt: Scalars['DateTime']['output']
+	readonly createdAt: Scalars['DateTime']['output']
+	readonly description: Scalars['String']['output']
+	readonly diffValues: Scalars['Json']['output']
+	readonly id: Scalars['String']['output']
+	readonly identityDescription: Scalars['String']['output']
+	readonly identityId: Scalars['String']['output']
+	readonly oldValues: Scalars['Json']['output']
+	readonly primaryKey: ReadonlyArray<Scalars['PrimaryKey']['output']>
+	readonly tableName: Scalars['String']['output']
+	readonly transactionId: Scalars['String']['output']
 	readonly type: EventType
 }
 
@@ -336,13 +338,19 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 	info: GraphQLResolveInfo
 ) => TResult | Promise<TResult>
 
+
+/** Mapping of interface types */
+export type ResolversInterfaceTypes<RefType extends Record<string, unknown>> = {
+	Event: (CreateEvent) | (DeleteEvent) | (UpdateEvent)
+}
+
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
-	Boolean: ResolverTypeWrapper<Scalars['Boolean']>
+	Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>
 	CreateEvent: ResolverTypeWrapper<CreateEvent>
-	DateTime: ResolverTypeWrapper<Scalars['DateTime']>
+	DateTime: ResolverTypeWrapper<Scalars['DateTime']['output']>
 	DeleteEvent: ResolverTypeWrapper<DeleteEvent>
-	Event: ResolversTypes['CreateEvent'] | ResolversTypes['DeleteEvent'] | ResolversTypes['UpdateEvent']
+	Event: ResolverTypeWrapper<ResolversInterfaceTypes<ResolversTypes>['Event']>
 	EventFilterRow: EventFilterRow
 	EventType: EventType
 	EventsArgs: EventsArgs
@@ -350,8 +358,8 @@ export type ResolversTypes = {
 	EventsFilterDate: EventsFilterDate
 	EventsOrder: EventsOrder
 	ExecutedMigration: ResolverTypeWrapper<ExecutedMigration>
-	Int: ResolverTypeWrapper<Scalars['Int']>
-	Json: ResolverTypeWrapper<Scalars['Json']>
+	Int: ResolverTypeWrapper<Scalars['Int']['output']>
+	Json: ResolverTypeWrapper<Scalars['Json']['output']>
 	MigrateError: ResolverTypeWrapper<MigrateError>
 	MigrateErrorCode: MigrateErrorCode
 	MigrateResponse: ResolverTypeWrapper<MigrateResponse>
@@ -366,28 +374,28 @@ export type ResolversTypes = {
 	MigrationModifyResponse: ResolverTypeWrapper<MigrationModifyResponse>
 	MigrationSkippedError: MigrationSkippedError
 	Mutation: ResolverTypeWrapper<{}>
-	PrimaryKey: ResolverTypeWrapper<Scalars['PrimaryKey']>
+	PrimaryKey: ResolverTypeWrapper<Scalars['PrimaryKey']['output']>
 	Query: ResolverTypeWrapper<{}>
 	Stage: ResolverTypeWrapper<Stage>
-	String: ResolverTypeWrapper<Scalars['String']>
+	String: ResolverTypeWrapper<Scalars['String']['output']>
 	TruncateResponse: ResolverTypeWrapper<TruncateResponse>
 	UpdateEvent: ResolverTypeWrapper<UpdateEvent>
 }
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
-	Boolean: Scalars['Boolean']
+	Boolean: Scalars['Boolean']['output']
 	CreateEvent: CreateEvent
-	DateTime: Scalars['DateTime']
+	DateTime: Scalars['DateTime']['output']
 	DeleteEvent: DeleteEvent
-	Event: ResolversParentTypes['CreateEvent'] | ResolversParentTypes['DeleteEvent'] | ResolversParentTypes['UpdateEvent']
+	Event: ResolversInterfaceTypes<ResolversParentTypes>['Event']
 	EventFilterRow: EventFilterRow
 	EventsArgs: EventsArgs
 	EventsFilter: EventsFilter
 	EventsFilterDate: EventsFilterDate
 	ExecutedMigration: ExecutedMigration
-	Int: Scalars['Int']
-	Json: Scalars['Json']
+	Int: Scalars['Int']['output']
+	Json: Scalars['Json']['output']
 	MigrateError: MigrateError
 	MigrateResponse: MigrateResponse
 	MigrateResult: MigrateResult
@@ -399,10 +407,10 @@ export type ResolversParentTypes = {
 	MigrationModifyResponse: MigrationModifyResponse
 	MigrationSkippedError: MigrationSkippedError
 	Mutation: {}
-	PrimaryKey: Scalars['PrimaryKey']
+	PrimaryKey: Scalars['PrimaryKey']['output']
 	Query: {}
 	Stage: Stage
-	String: Scalars['String']
+	String: Scalars['String']['output']
 	TruncateResponse: TruncateResponse
 	UpdateEvent: UpdateEvent
 }

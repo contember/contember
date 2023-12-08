@@ -21,11 +21,11 @@
     "@contember/schema-definition": "workspace:*",
     "@contember/schema-migrations": "workspace:*",
     "@contember/schema-utils": "workspace:*",
-    "graphql": "^16.5.0"
+    "graphql": "^16.8.1"
   },
   "devDependencies": {
-    "@types/node": "^18",
-    "pg": "^8.9.0"
+    "@types/node": "^20.9.0",
+    "pg": "^8.11.3"
   },
   "peerDependencies": {
     "pg": "^8.9.0"

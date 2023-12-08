@@ -12,6 +12,6 @@
     "test": "echo 'No tests'"
   },
   "devDependencies": {
-    "@types/node": "^18"
+    "@types/node": "^20.9.0"
   }
 }

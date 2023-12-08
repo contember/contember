@@ -18,7 +18,8 @@
   "devDependencies": {
     "@contember/engine-tenant-api": "workspace:*",
     "@graphql-tools/schema": "^10.0.0",
-    "@types/node": "^18",
+    "@types/node": "^20.9.0",
+    "graphql": "^16.8.1",
     "graphql-ts-client-codegen": "^3.1.14"
   }
 }

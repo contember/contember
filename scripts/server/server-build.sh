@@ -7,4 +7,3 @@ node $SERVER_DIR/esbuild.js
 cd server
 echo "{}" > package.json
 echo "" > yarn.lock
-yarn add heapdump

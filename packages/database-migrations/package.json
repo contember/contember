@@ -13,10 +13,10 @@
   },
   "dependencies": {
     "@contember/database": "workspace:*",
-    "node-pg-migrate": "^5.9.0"
+    "node-pg-migrate": "^5.10.0"
   },
   "devDependencies": {
-    "pg": "^8.9.0"
+    "pg": "^8.11.3"
   },
   "peerDependencies": {
     "pg": "^8.9.0"

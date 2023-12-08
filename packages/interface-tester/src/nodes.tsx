@@ -21,59 +21,32 @@ import {
 	TablePage,
 } from '@contember/admin'
 
-export const createNode = (value: any): ReactNode | undefined => {
+export const createNode = (value: any): ReactNode[] => {
 	if (typeof value === 'function') {
 		value = value() as any
 	}
-
-	if (value.type === Symbol.for('react.fragment')) {
-		value = getNodeForTesting(value.props.children)
-	}
-
 	if (value == null) {
-		return undefined
+		return []
 	}
 
 	if ('staticRender' in value) {
-		return undefined
-	}
-
-	if (!isValidElement(value)) {
-		return undefined
+		return []
 	}
 
 	const props = value.props as any
-	if (value.type === EditPage || value.type === EditScope || value.type === DetailPage || value.type === DetailScope) {
-		return <EntitySubTree {...props as any} />
+	if (value.type === DataBindingProvider) {
+		return [<>{props.children}</>]
+	} else if (value.type === EditPage || value.type === EditScope || value.type === DetailPage || value.type === DetailScope) {
+		return [<EntitySubTree {...props as any} />]
 	} else if (value.type === CreatePage || value.type === CreateScope) {
-		return <EntitySubTree {...props as any} isCreating />
+		return [<EntitySubTree {...props as any} isCreating />]
 	} else if (value.type === DataGridPage || value.type === DataGrid || value.type === DataGridScope) {
-		return <DataGrid {...props as any} />
+		return [<DataGrid {...props as any} />]
 	} else if (value.type === ListPage || value.type === ListScope || value.type === TablePage || value.type === MultiEditPage || value.type === MultiEditScope) {
-		return <EntityListSubTree {...props as any} />
-	} else if (value.type === GenericPage) {
-		for (const child of Array.isArray(props.children) ? props.children : [props.children]) {
-			if (isValidElement(child) && child.type === DataBindingProvider) {
-				return <>{(child.props as any).children}</>
-			}
-		}
+		return [<EntityListSubTree {...props as any} />]
+	} else if (value.type === GenericPage || value.type === Symbol.for('react.fragment')) {
+		return (Array.isArray(props.children) ? props.children : [props.children]).map(createNode).flat()
 	}
 
-	return undefined
-}
-
-function getNodeForTesting(children: ReactNode): ReactNode {
-	let childToTest: ReactNode = null
-
-	Children.forEach(children, child => {
-		if (child && typeof child === 'object' && 'props' in child) {
-			if ('entity' in child.props || 'entities' in child.props) {
-				childToTest = child
-			} else if (child.props.children) {
-				childToTest = getNodeForTesting(child.props.children)
-			}
-		}
-	})
-
-	return childToTest
+	return []
 }

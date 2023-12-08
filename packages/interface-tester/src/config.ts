@@ -17,6 +17,6 @@ export type PageConfig = {
 	roles?: string[]
 	parameters?: Environment.Parameters
 	dimensions?: Environment.SelectedDimensions
-	createNode?: (exported: unknown) => ReactNode
+	createNode?: (exported: unknown) => ReactNode | ReactNode[]
 	testNode?: (node: ReactNode | undefined, environment: Environment, originalExport: unknown) => void
 }

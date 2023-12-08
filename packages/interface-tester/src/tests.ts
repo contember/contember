@@ -90,8 +90,10 @@ export const getTests = async (config: Config): Promise<Test[]> => {
 					role,
 					pageConfig,
 					execute: () => {
-						const node = (pageConfig?.createNode ?? createNode)(_export)
-						;(pageConfig?.testNode ?? testNode)(node, environment, _export)
+						const nodes = (pageConfig?.createNode ?? createNode)(_export)
+						for (const node of !Array.isArray(nodes) ? [nodes] : nodes) {
+							(pageConfig?.testNode ?? testNode)(node, environment, _export)
+						}
 					},
 				})
 			}

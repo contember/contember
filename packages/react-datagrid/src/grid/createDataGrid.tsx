@@ -36,6 +36,8 @@ const dummyStateMethods: DataGridStateMethods = {
 
 const createInitialState = (props: DataGridProps<{}>, environment: Environment): DataGridState<any> => {
 	const columns = extractDataGridColumns(props.children, environment)
+	const entities = QueryLanguage.desugarQualifiedEntityList({ entities: props.entities }, environment)
+	const filter = { and: [entities.filter ?? {}] }
 	return {
 		columns,
 		paging: {
@@ -46,8 +48,8 @@ const createInitialState = (props: DataGridProps<{}>, environment: Environment):
 		filterArtifacts: {},
 		orderDirections: {},
 		orderBy: [],
-		entities: QueryLanguage.desugarQualifiedEntityList({ entities: props.entities }, environment),
-		filter: { and: [{}] },
+		entities: entities,
+		filter,
 		layout: 'default',
 	}
 }

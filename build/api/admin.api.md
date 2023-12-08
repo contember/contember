@@ -800,10 +800,13 @@ export const DataGridPageRenderer: React.NamedExoticComponent<LayoutRendererProp
 export type DataGridPageRendererProps = LayoutRendererProps & DataGridContainerProps;
 
 // @public (undocumented)
-export const DataGridScope: <StateProps>({ stateComponent, stateProps, ...props }: DataGridScopeProps<StateProps>) => JSX.Element;
+export const DataGridScope: <StateProps>({ stateComponent, stateProps, skipBindingStateUpdateAfterPersist, refreshDataBindingOnPersist, ...props }: DataGridScopeProps<StateProps>) => JSX.Element;
 
 // @public (undocumented)
-export type DataGridScopeProps<StateProps> = PropsWithChildren<DataGridProps<DataGridContainerPublicProps>> & DataBindingProviderStateComponent<StateProps>;
+export type DataGridScopeProps<StateProps> = PropsWithChildren<DataGridProps<DataGridContainerPublicProps>> & DataBindingProviderStateComponent<StateProps> & {
+    refreshDataBindingOnPersist?: boolean;
+    skipBindingStateUpdateAfterPersist?: boolean;
+};
 
 // @public (undocumented)
 export const DefaultElement: FunctionComponent<DefaultElementProps>;

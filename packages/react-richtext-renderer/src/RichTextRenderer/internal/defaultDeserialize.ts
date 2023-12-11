@@ -1,6 +1,6 @@
-import type { RichTextElement } from './RichTextElement'
-import type { RichTextLeaf } from './RichTextLeaf'
-import type { RootEditorNode } from './RootEditorNode'
+import type { RichTextElement } from '../types/RichTextElement'
+import type { RichTextLeaf } from '../types/RichTextLeaf'
+import type { RootEditorNode } from '../types/RootEditorNode'
 
 export const defaultDeserialize = <
 	CustomElements extends RichTextElement = never,

@@ -1387,6 +1387,7 @@ __metadata:
   resolution: "@contember/react-client@workspace:packages/react-client"
   dependencies:
     "@contember/client": "workspace:*"
+    "@contember/react-richtext-renderer": "workspace:*"
     "@contember/utilities": "workspace:*"
   peerDependencies:
     react: ^17 || ^18
@@ -1489,6 +1490,12 @@ __metadata:
     "@contember/utilities": "workspace:*"
   peerDependencies:
     react: ^17 || ^18
+  languageName: unknown
+  linkType: soft
+
+"@contember/react-richtext-renderer@workspace:*, @contember/react-richtext-renderer@workspace:packages/react-richtext-renderer":
+  version: 0.0.0-use.local
+  resolution: "@contember/react-richtext-renderer@workspace:packages/react-richtext-renderer"
   languageName: unknown
   linkType: soft
 

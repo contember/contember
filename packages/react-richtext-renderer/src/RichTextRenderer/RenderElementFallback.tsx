@@ -1,9 +1,9 @@
 import { createElement, ReactElement } from 'react'
-import type { BuiltinElements, RichTextReferenceElement, RichTextTableRowElement } from './BuiltinElements'
+import type { BuiltinElements, RichTextReferenceElement, RichTextTableRowElement } from './types/BuiltinElements'
 import { renderChildren, RenderChildrenOptions } from './renderChildren'
-import { resolveRichTextElementMetadata } from './resolveRichTextElementMetadata'
-import type { RichTextElement } from './RichTextElement'
-import type { RichTextLeaf } from './RichTextLeaf'
+import { resolveRichTextElementMetadata } from './internal/resolveRichTextElementMetadata'
+import type { RichTextElement } from './types/RichTextElement'
+import type { RichTextLeaf } from './types/RichTextLeaf'
 import { RichTextRendererError } from './RichTextRendererError'
 import { useRichTextRenderMetadata } from './RichTextRenderMetadataContext'
 

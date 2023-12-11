@@ -1,9 +1,9 @@
 import type { ComponentType, ReactElement } from 'react'
 import { createElement } from 'react'
-import type { BuiltinLeaves } from './BuiltinLeaves'
+import type { BuiltinLeaves } from './types/BuiltinLeaves'
 import { RenderLeafFallback } from './RenderLeafFallback'
-import type { RichTextLeaf } from './RichTextLeaf'
-import type { RichTextLeafMetadata } from './RichTextLeafMetadata'
+import type { RichTextLeaf } from './types/RichTextLeaf'
+import type { RichTextLeafMetadata } from './types/RichTextLeafMetadata'
 import { useRichTextRenderMetadata } from './RichTextRenderMetadataContext'
 
 export type RenderLeaf<CustomLeaves extends RichTextLeaf> = ComponentType<

@@ -1,0 +1,10 @@
+{
+	"extends": "../../../tsconfig.settings.json",
+	"compilerOptions": {
+		"outDir": "../dist/types",
+		"types": ["node"]
+	},
+	"references": [
+		{ "path": "../../client-content/src" }
+	]
+}

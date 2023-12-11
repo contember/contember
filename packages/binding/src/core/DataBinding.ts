@@ -1,4 +1,12 @@
-import type { GraphQlClient, GraphQlClientFailedRequestMetadata, TreeFilter } from '@contember/client'
+import {
+	ContentClient,
+	ContentQueryBuilder,
+	GraphQlClient,
+	GraphQlClientError,
+	MutationResult,
+	TransactionResult,
+	TreeFilter,
+} from '@contember/client'
 import {
 	AsyncBatchUpdatesOptions,
 	BatchUpdatesOptions,
@@ -8,17 +16,10 @@ import {
 	PersistSuccessOptions,
 	TreeRootAccessor,
 } from '../accessors'
-import {
-	ErrorPersistResult,
-	metadataToRequestError, MutationDataResponse,
-	MutationRequestResponse,
-	QueryRequestResponse,
-	RequestError,
-	SuccessfulPersistResult,
-} from '../accessorTree'
+import { ErrorPersistResult, ReceivedDataTree, ReceivedEntityData, SuccessfulPersistResult } from '../accessorTree'
 import type { Environment } from '../dao'
 import type { MarkerTreeRoot } from '../markers'
-import type { TreeRootId } from '../treeParameters'
+import type { EntityId, TreeRootId } from '../treeParameters'
 import { assertNever, generateEnumerabilityPreventingEntropy } from '../utils'
 import { AccessorErrorManager } from './AccessorErrorManager'
 import { Config } from './Config'
@@ -35,6 +36,9 @@ import { TreeFilterGenerator } from './TreeFilterGenerator'
 import { TreeStore } from './TreeStore'
 import type { UpdateMetadata } from './UpdateMetadata'
 import { getCombinedSignal } from './utils'
+import { createQueryBuilder } from './utils/createQueryBuilder'
+
+export type DataBindingTransactionResult = TransactionResult<Record<string, MutationResult<ReceivedEntityData>>>
 
 export class DataBinding<Node> {
 	private readonly accessorErrorManager: AccessorErrorManager
@@ -46,6 +50,8 @@ export class DataBinding<Node> {
 	private readonly eventManager: EventManager
 	private readonly stateInitializer: StateInitializer
 	private readonly treeAugmenter: TreeAugmenter
+	private readonly queryBuilder: ContentQueryBuilder
+	private readonly contentClient: ContentClient
 
 	// private treeRootListeners: {
 	// 	eventListeners: {}
@@ -62,7 +68,7 @@ export class DataBinding<Node> {
 		private readonly createMarkerTree: (node: Node, environment: Environment) => MarkerTreeRoot,
 		private readonly batchedUpdates: (callback: () => any) => void,
 		private readonly onUpdate: (newData: TreeRootAccessor<Node>, binding: DataBinding<Node>) => void,
-		private readonly onError: (error: RequestError, binding: DataBinding<Node>) => void,
+		private readonly onError: (error: GraphQlClientError, binding: DataBinding<Node>) => void,
 		private readonly onPersistSuccess: (result: SuccessfulPersistResult, binding: DataBinding<Node>) => void,
 		private readonly options: {
 			skipStateUpdateAfterPersist: boolean
@@ -108,6 +114,8 @@ export class DataBinding<Node> {
 			extendTree: async (...args) => await this.extendTree(...args),
 			persist: async options => await this.persist(options),
 		})
+		this.queryBuilder = createQueryBuilder(this.environment.getSchema())
+		this.contentClient = new ContentClient(contentApiClient.execute.bind(contentApiClient))
 	}
 
 	private async persist({ onPersistError, onPersistSuccess, signal }: PersistOptions = {}) {
@@ -121,7 +129,7 @@ export class DataBinding<Node> {
 
 			await this.checkErrorsBeforePersist(onPersistError)
 
-			const generator = new MutationGenerator(this.treeStore)
+			const generator = new MutationGenerator(this.treeStore, this.queryBuilder)
 			const mutationResult = generator.getPersistMutation()
 
 			if (mutationResult === undefined) {
@@ -131,36 +139,38 @@ export class DataBinding<Node> {
 				}
 			}
 
-			const { query, operations } = mutationResult
+			const { mutations, operations } = mutationResult
 
-			const mutationResponse: MutationRequestResponse = await this.contentApiClient.sendRequest(query, {
-				signal,
-			})
-
-			if (mutationResponse.errors !== undefined && mutationResponse.errors.length > 0) {
-				this.onError({
-					type: 'gqlError',
-					query,
-					errors: mutationResponse.errors,
-				}, this)
-			}
-
-			if (!mutationResponse.data?.transaction) {
-				this.persistFail({
-					errors: [],
-					type: 'invalidResponse',
+			let response: DataBindingTransactionResult
+			try {
+				response = await this.contentClient.mutate(this.queryBuilder.transaction(mutations, {
+					deferForeignKeyConstraints: true,
+				}), {
+					signal,
+					onBeforeRequest: ({ query, variables }) => {
+						console.debug(query, variables)
+					},
 				})
+			} catch (e) {
+				if (e instanceof GraphQlClientError) {
+					this.onError(e, this)
+					this.persistFail({
+						errors: [e],
+						type: 'invalidResponse',
+					})
+				} else {
+					throw e
+				}
 			}
 
-			const { __typename, ok, errorMessage, ...mutationData } = mutationResponse.data.transaction
-			if (Object.values(mutationData).every(it => it.ok)) {
-				return await this.processSuccessfulPersistResult(mutationData, operations, onPersistSuccess)
+			if (Object.values(response.data).every(it => it.ok)) {
+				return await this.processSuccessfulPersistResult(response, operations, onPersistSuccess)
 			} else {
-				if (errorMessage) {
-					console.error(errorMessage)
+				if (response.errorMessage) {
+					console.error(response.errorMessage)
 				}
 
-				this.eventManager.syncTransaction(() => this.accessorErrorManager.replaceErrors(mutationData, operations))
+				this.eventManager.syncTransaction(() => this.accessorErrorManager.replaceErrors(response, operations))
 
 				await this.eventManager.triggerOnPersistError(this.bindingOperations)
 				await onPersistError?.(this.bindingOperations)
@@ -195,8 +205,8 @@ export class DataBinding<Node> {
 		await onPersistSuccess?.(persistSuccessOptions)
 	}
 
-	private async processSuccessfulPersistResult(mutationData: MutationDataResponse, operations: SubMutationOperation[], onPersistSuccess: PersistOptions['onPersistSuccess']) {
-		const persistedEntityIds = Object.values(mutationData).map(it => it.node?.id).filter(id => id !== undefined)
+	private async processSuccessfulPersistResult(mutationData: DataBindingTransactionResult, operations: SubMutationOperation[], onPersistSuccess: PersistOptions['onPersistSuccess']) {
+		const persistedEntityIds = Object.values(mutationData.data).map(it => it.node?.id).filter((id): id is EntityId => id !== undefined)
 		const result: SuccessfulPersistResult = {
 			type: 'justSuccess',
 			persistedEntityIds,
@@ -207,7 +217,7 @@ export class DataBinding<Node> {
 				this.resetTreeAfterSuccessfulPersist()
 				this.treeAugmenter.updatePersistedData(
 					Object.fromEntries(
-						Object.entries(mutationData).map(([placeholderName, subTreeResponse]) => [
+						Object.entries(mutationData.data).map(([placeholderName, subTreeResponse]) => [
 							placeholderName,
 							subTreeResponse.node,
 						]),
@@ -330,7 +340,7 @@ export class DataBinding<Node> {
 		}
 
 		this.eventManager.syncOperation(() => {
-			this.treeAugmenter.extendPersistedData(aggregatePersistedData.data, aggregateMarkerTreeRoot)
+			this.treeAugmenter.extendPersistedData(aggregatePersistedData, aggregateMarkerTreeRoot)
 
 			for (const extension of pendingExtensions) {
 				this.treeAugmenter.extendTreeStates(extension.newTreeRootId, extension.markerTreeRoot)
@@ -342,35 +352,25 @@ export class DataBinding<Node> {
 	private async fetchPersistedData(
 		tree: MarkerTreeRoot,
 		signal?: AbortSignal,
-	): Promise<QueryRequestResponse | undefined> {
-		const queryGenerator = new QueryGenerator(tree)
+	): Promise<ReceivedDataTree | undefined> {
+		const queryGenerator = new QueryGenerator(tree, this.queryBuilder)
 		const query = queryGenerator.getReadQuery()
 
-		let queryResponse: QueryRequestResponse | undefined = undefined
-
 		try {
-			queryResponse =
-				query === undefined
-					? undefined
-					: await this.contentApiClient.sendRequest(query, {
-							signal,
-					  })
-		} catch (metadata) {
-			if (typeof metadata === 'object' && metadata !== null && (metadata as { name?: unknown }).name === 'AbortError') {
-				return
+			return await this.contentClient.query(query, {
+				signal,
+				onBeforeRequest: ({ query, variables }) => {
+					console.debug(query, variables)
+				},
+			})
+		} catch (e) {
+			if (e instanceof GraphQlClientError) {
+				if (e.type === 'aborted') {
+					return undefined
+				}
+				this.onError(e, this)
 			}
-			this.onError(metadataToRequestError(metadata as GraphQlClientFailedRequestMetadata), this)
 		}
-
-		if (queryResponse && queryResponse.errors !== undefined && queryResponse.errors.length > 0) {
-			this.onError({
-				type: 'gqlError',
-				query: query ?? 'unknown query',
-				errors: queryResponse.errors,
-			}, this)
-		}
-
-		return queryResponse
 	}
 
 	private resetTreeAfterSuccessfulPersist() {

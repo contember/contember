@@ -1,43 +1,44 @@
-import type { EntityName, Filter } from '@contember/react-binding'
-import { GraphQlBuilder } from '@contember/client'
-import { useContentApiRequest } from '@contember/react-client'
-import { useEffect } from 'react'
+import { createQueryBuilder, EntityName, Filter, useEnvironment } from '@contember/react-binding'
+import { ContentClient, GraphQlClientError, replaceGraphQlLiteral } from '@contember/client'
+import { useCurrentContentGraphQlClient } from '@contember/react-client'
+import { useEffect, useState } from 'react'
 import { useAbortController } from '@contember/react-utils'
 
 export const useDataGridTotalCount = (entityName: EntityName, filter: Filter | undefined): number | undefined => {
-	const [queryState, sendQuery] = useContentApiRequest<{
-		data: { paginate: { pageInfo: { totalCount: number } } }
-	}>()
+	const client = useCurrentContentGraphQlClient()
+	const env = useEnvironment()
 
 	const abortController = useAbortController()
 
-	const query = new GraphQlBuilder.QueryBuilder().query(builder =>
-		builder.object('paginate', builder => {
-			builder = builder.name(`paginate${entityName}`).object('pageInfo', builder => builder.field('totalCount'))
-			if (filter) {
-				builder = builder.argument('filter', filter)
-			}
-			return builder
-		}),
-	)
+	const [count, setCount] = useState<number | undefined>(undefined)
+	const schema = env.getSchema()
 
 	useEffect(() => {
 		(async () => {
+			const contentClient = new ContentClient(client.execute.bind(client))
+			const qb = createQueryBuilder(schema)
+			const query = qb.count(entityName, {
+				filter: resolveFilter(filter),
+			})
 			try {
-				await sendQuery(query, undefined, {
+				const result = await contentClient.query(query, {
 					signal: abortController(),
 				})
+				setCount(result)
 			} catch (e) {
-				if (e instanceof Error && e.name === 'AbortError') {
+				setCount(undefined)
+				if (e instanceof GraphQlClientError && e.type === 'aborted') {
 					return
 				}
 				throw e
 			}
-		})()
-	}, [abortController, query, sendQuery])
 
-	if (queryState.readyState !== 'networkSuccess') {
-		return undefined
-	}
-	return queryState.data.data.paginate.pageInfo.totalCount ?? undefined
+		})()
+	}, [abortController, client, entityName, filter, schema])
+
+	return count
+}
+
+const resolveFilter = (input?: Filter): Filter<never> => {
+	return replaceGraphQlLiteral<unknown>(input) as Filter<never>
 }

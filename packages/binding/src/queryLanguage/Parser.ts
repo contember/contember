@@ -1,4 +1,4 @@
-import { CrudQueryBuilder, GraphQlBuilder, Input, Writable } from '@contember/client'
+import { GraphQlBuilder, Input, Writable } from '@contember/client'
 import { EmbeddedActionsParser, Lexer } from 'chevrotain'
 import { Environment } from '../dao'
 import type { EntityName, FieldName, Filter, OrderBy, UniqueWhere } from '../treeParameters'
@@ -522,10 +522,10 @@ class Parser extends EmbeddedActionsParser {
 		return where
 	})
 
-	private orderBy: () => Input.OrderBy<CrudQueryBuilder.OrderDirection>[] = this.RULE<
-		Input.OrderBy<CrudQueryBuilder.OrderDirection>[]
+	private orderBy: () => Input.OrderBy<`${Input.OrderDirection}`>[] = this.RULE<
+		Input.OrderBy<`${Input.OrderDirection}`>[]
 	>('orderBy', () => {
-		const order: Input.OrderBy<CrudQueryBuilder.OrderDirection>[] = []
+		const order: Input.OrderBy<`${Input.OrderDirection}`>[] = []
 
 		this.AT_LEAST_ONE_SEP({
 			SEP: tokens.Comma,
@@ -537,24 +537,24 @@ class Parser extends EmbeddedActionsParser {
 						fieldNames.push(this.SUBRULE(this.fieldIdentifier))
 					},
 				})
-				let literal = this.OPTION(() => this.SUBRULE1(this.graphQlLiteral)) as
-					| CrudQueryBuilder.OrderDirection
-					| undefined
+				const literal = this.OPTION(() => this.SUBRULE1(this.identifier))
 
 				this.ACTION(() => {
+					let orderDirection: `${Input.OrderDirection}`
 					if (literal) {
-						if (literal.value !== 'asc' && literal.value !== 'desc') {
-							throw new QueryLanguageError(`The only valid order directions are \`asc\` and \`desc\`.`)
+						if (literal !== 'asc' && literal !== 'desc' && literal !== 'ascNullsFirst' && literal !== 'descNullsLast') {
+							throw new QueryLanguageError(`The only valid order directions are 'asc', 'desc', 'ascNullsFirst' and 'descNullsLast'.`)
 						}
+						orderDirection = literal
 					} else {
-						literal = new GraphQlBuilder.GraphQlLiteral('asc')
+						orderDirection = 'asc'
 					}
-					let orderBy: Input.FieldOrderBy<CrudQueryBuilder.OrderDirection> = literal
+					let orderBy: Input.FieldOrderBy<`${Input.OrderDirection}`> = orderDirection
 
 					for (let i = fieldNames.length - 1; i >= 0; i--) {
 						orderBy = { [fieldNames[i]]: orderBy }
 					}
-					order.push(orderBy as Input.OrderBy<CrudQueryBuilder.OrderDirection>)
+					order.push(orderBy as Input.OrderBy<`${Input.OrderDirection}`>)
 				})
 			},
 		})
@@ -646,7 +646,7 @@ class Parser extends EmbeddedActionsParser {
 				ALT: () => this.SUBRULE(this.number),
 			},
 			{
-				ALT: () => this.SUBRULE(this.graphQlLiteral),
+				ALT: () => this.SUBRULE(this.identifier),
 			},
 			{
 				ALT: () => {
@@ -757,12 +757,6 @@ class Parser extends EmbeddedActionsParser {
 		return parseFloat(this.CONSUME(tokens.NumberLiteral).image)
 	})
 
-	private graphQlLiteral: () => GraphQlBuilder.GraphQlLiteral = this.RULE('graphQlLiteral', () => {
-		const image = this.SUBRULE(this.identifier)
-
-		return new GraphQlBuilder.GraphQlLiteral(image)
-	})
-
 	private variable = this.RULE<Environment.ResolvedValue>('variable', () => {
 		this.CONSUME(tokens.DollarSign)
 		const variableName = this.CONSUME(tokens.Identifier).image
@@ -778,7 +772,8 @@ class Parser extends EmbeddedActionsParser {
 			}
 
 			if (Parser.environment.hasVariable(variableName)) {
-				return Parser.environment.getVariable(variableName)
+				const value = Parser.environment.getVariable(variableName)
+				return value instanceof GraphQlBuilder.GraphQlLiteral ? value.value : value
 			}
 			if (Parser.environment.hasParameter(variableName)) {
 				return Parser.environment.getParameter(variableName)

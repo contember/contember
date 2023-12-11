@@ -1,4 +1,3 @@
-import type { RequestError } from './RequestError'
 import { ErrorAccessor } from '../accessors'
 import { EntityId } from '../treeParameters'
 
@@ -24,4 +23,4 @@ export interface InvalidResponseResult {
 
 export type SuccessfulPersistResult = NothingToPersistPersistResult | JustSuccessPersistResult
 
-export type ErrorPersistResult = InvalidInputPersistResult | RequestError | InvalidResponseResult
+export type ErrorPersistResult = InvalidInputPersistResult  | InvalidResponseResult

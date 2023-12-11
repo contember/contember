@@ -25,7 +25,7 @@ export function createViteConfig(packageName) {
 			build: {
 				lib: {
 					entry,
-					formats: ['es'],
+					formats: ['es', 'cjs'],
 				},
 				minify: false,
 				outDir: resolve(rootDirectory, `${packagePath}/dist/${mode}`),
@@ -33,10 +33,18 @@ export function createViteConfig(packageName) {
 					external: (id, importer, resolved) => {
 						return !resolved && !id.startsWith('./') && !id.startsWith('../') && id !== '.' && id !== entry
 					},
-					output: {
-						preserveModules: true,
-						entryFileNames: '[name].js',
-					},
+					output: [
+						{
+							format: 'esm',
+							preserveModules: true,
+							entryFileNames: '[name].js',
+						},
+						{
+							format: 'cjs',
+							preserveModules: true,
+							entryFileNames: '[name].cjs',
+						},
+					],
 					treeshake: {
 						moduleSideEffects: false,
 					},

@@ -80,7 +80,7 @@ describe('single relative fields QueryLanguage parser', () => {
 					filter: undefined,
 					reducedBy: {
 						a: 'b',
-						bar: new GraphQlLiteral('Literal'),
+						bar: 'Literal',
 					},
 				},
 			],
@@ -111,7 +111,7 @@ describe('single relative fields QueryLanguage parser', () => {
 								be: {
 									indeed: {
 										not: {
-											shallow: new GraphQlLiteral('baz'),
+											shallow: 'baz',
 										},
 									},
 								},

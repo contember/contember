@@ -1,39 +1,25 @@
-export interface GraphQlClientRequestOptions {
-	variables?: GraphQlClientVariables
-	apiTokenOverride?: string
-	signal?: AbortSignal
-	headers?: Record<string, string>
-}
+import { GraphQlClient as BaseGraphQLClient, GraphQlClientRequestOptions as BaseGraphQlClientRequestOptions } from '@contember/graphql-client'
 
-export interface GraphQlClientVariables {
-	[name: string]: any
+export interface GraphQlClientRequestOptions extends BaseGraphQlClientRequestOptions {
+	/**
+	 * @deprecated use apiToken
+	 */
+	apiTokenOverride?: string
 }
 
 export type GraphQlClientFailedRequestMetadata = Pick<Response, 'status' | 'statusText'> & {
 	responseText: string
 }
 
-export class GraphQlClient {
-	constructor(public readonly apiUrl: string, private readonly apiToken?: string) { }
-
-	async sendRequest<T = unknown>(
-		query: string,
-		{ apiTokenOverride, signal, variables, headers }: GraphQlClientRequestOptions = {},
-	): Promise<T> {
-		const resolvedHeaders: Record<string, string> = { 'Content-Type': 'application/json', ...headers }
-		const resolvedToken = apiTokenOverride ?? this.apiToken
-
-		if (resolvedToken !== undefined) {
-			resolvedHeaders['Authorization'] = `Bearer ${resolvedToken}`
-		}
-
+export class GraphQlClient extends BaseGraphQLClient {
+	/**
+	 * @deprecated use execute
+	 */
+	async sendRequest<T = unknown>(query: string, options: GraphQlClientRequestOptions = {}): Promise<T> {
 		console.debug(query)
-
-		const response = await fetch(this.apiUrl, {
-			method: 'POST',
-			headers: resolvedHeaders,
-			signal,
-			body: JSON.stringify({ query, variables }),
+		const response = await this.doExecute(query, {
+			...options,
+			apiToken: options.apiTokenOverride ?? options.apiToken,
 		})
 
 		if (response.ok) {
@@ -49,4 +35,5 @@ export class GraphQlClient {
 
 		return Promise.reject(failedRequest)
 	}
+
 }

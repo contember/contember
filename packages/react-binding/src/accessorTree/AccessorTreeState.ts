@@ -1,8 +1,7 @@
 import type { TreeRootAccessor } from '@contember/binding'
-import type { RequestError } from '@contember/binding'
-import { DataBinding } from '@contember/binding'
-import { Environment } from '@contember/binding'
+import { DataBinding, Environment } from '@contember/binding'
 import { ReactNode } from 'react'
+import { GraphQlClientError } from '@contember/react-client'
 
 export interface InitializingAccessorTreeState {
 	name: 'initializing'
@@ -21,7 +20,7 @@ export interface ErrorAccessorTreeState {
 	name: 'error'
 	environment: Environment
 	binding: DataBinding<ReactNode>
-	error: RequestError
+	error: GraphQlClientError
 }
 
 export type AccessorTreeState =

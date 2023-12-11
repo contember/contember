@@ -21,6 +21,7 @@ import type { FieldName } from '@contember/binding';
 import { FieldValue } from '@contember/binding';
 import { Filter } from '@contember/binding';
 import type { GetEntityByKey } from '@contember/binding';
+import { GraphQlClientError } from '@contember/react-client';
 import type { HasManyRelationMarker } from '@contember/binding';
 import type { HasOneRelationMarker } from '@contember/binding';
 import { MarkerTreeRoot } from '@contember/binding';
@@ -32,7 +33,6 @@ import { ReactNode } from 'react';
 import type { RelativeEntityList } from '@contember/binding';
 import type { RelativeSingleEntity } from '@contember/binding';
 import { RelativeSingleField } from '@contember/binding';
-import type { RequestError } from '@contember/binding';
 import type { SugaredParentEntityParameters } from '@contember/binding';
 import type { SugaredQualifiedEntityList } from '@contember/binding';
 import type { SugaredQualifiedSingleEntity } from '@contember/binding';
@@ -72,7 +72,7 @@ export type AccessorTreeStateAction = {
     binding: DataBinding<ReactNode>;
 } | {
     type: 'failWithError';
-    error: RequestError;
+    error: GraphQlClientError;
     binding: DataBinding<ReactNode>;
 } | {
     type: 'reset';
@@ -316,7 +316,7 @@ export interface ErrorAccessorTreeState {
     // (undocumented)
     environment: Environment;
     // (undocumented)
-    error: RequestError;
+    error: GraphQlClientError;
     // (undocumented)
     name: 'error';
 }

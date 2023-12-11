@@ -46,12 +46,12 @@ describe('query language parser', () => {
 				{
 					field: 'field',
 					filter: undefined,
-					reducedBy: { ab: 456, literalColumn: new GraphQlBuilder.GraphQlLiteral('literal') },
+					reducedBy: { ab: 456, literalColumn: 'literal' },
 				},
 				{
 					field: 'x',
 					filter: undefined,
-					reducedBy: { x: new GraphQlBuilder.GraphQlLiteral('truecolor') },
+					reducedBy: { x: 'truecolor' },
 				},
 			],
 		})

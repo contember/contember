@@ -1,10 +1,11 @@
 import { ErrorAccessor } from '../accessors'
-import type { ExecutionError, MutationDataResponse, ValidationError } from '../accessorTree'
 import { ErrorsPreprocessor } from './ErrorsPreprocessor'
 import { EventManager } from './EventManager'
 import { EntityListState, EntityRealmState, getEntityMarker, StateNode } from './state'
 import type { TreeStore } from './TreeStore'
 import { SubMutationOperation } from './MutationGenerator'
+import { DataBindingTransactionResult } from './DataBinding'
+import { MutationError, ValidationError } from '@contember/client'
 
 export class AccessorErrorManager {
 	private errorsByState: Map<StateNode, ErrorAccessor.ErrorsById> = new Map()
@@ -46,7 +47,7 @@ export class AccessorErrorManager {
 		})
 	}
 
-	public replaceErrors(data: MutationDataResponse, operations: SubMutationOperation[]) {
+	public replaceErrors(data: DataBindingTransactionResult, operations: SubMutationOperation[]) {
 		this.eventManager.syncOperation(() => {
 			this.clearErrors()
 
@@ -162,7 +163,12 @@ export class AccessorErrorManager {
 				}
 				switch (fieldState.type) {
 					case 'entityRealm':
-						this.setEntityStateErrors(fieldState, child)
+						// unwrap for reduced has many
+						if (child.nodeType === 'iNode' && child.children.has(fieldState.entity.id.value)) {
+							this.setEntityStateErrors(fieldState, child.children.get(fieldState.entity.id.value)!)
+						} else {
+							this.setEntityStateErrors(fieldState, child)
+						}
 						break
 					case 'entityList':
 						this.setEntityListStateErrors(fieldState, child)
@@ -199,19 +205,20 @@ export class AccessorErrorManager {
 		}
 	}
 
-	private dumpErrorData(data: MutationDataResponse) {
+	private dumpErrorData(data: DataBindingTransactionResult) {
 		// TODO this is just temporary
-		for (const subTreePlaceholder in data) {
-			const treeDatum = data[subTreePlaceholder]
-			const executionErrors: Array<ExecutionError | ValidationError> = treeDatum.errors
+		for (const subTreePlaceholder in data.data) {
+			const treeDatum = data.data[subTreePlaceholder]
+			const executionErrors: Array<MutationError | ValidationError> = treeDatum.errors
 			const allErrors = treeDatum?.validation?.errors
 				? executionErrors.concat(treeDatum.validation.errors)
 				: executionErrors
-			const normalizedErrors = allErrors.map((error: ExecutionError | ValidationError) => {
+			const normalizedErrors = allErrors.map((error: MutationError | ValidationError) => {
+				const path = 'paths' in error ? (error.paths[0] ?? []) : error.path
 				return {
-					path: error.path
+					path: path
 						.map(pathPart => {
-							if (pathPart.__typename === '_FieldPathFragment') {
+							if ('field' in pathPart) {
 								return pathPart.field
 							}
 							if (pathPart.alias) {

@@ -1,5 +1,6 @@
 import {
-	ContentClient, ContentQueryBuilder,
+	ContentClient,
+	ContentQueryBuilder,
 	GraphQlClient,
 	GraphQlClientError,
 	MutationResult,
@@ -142,7 +143,9 @@ export class DataBinding<Node> {
 
 			let response: DataBindingTransactionResult
 			try {
-				response = await this.contentClient.mutate(mutations, {
+				response = await this.contentClient.mutate(this.queryBuilder.transaction(mutations, {
+					deferForeignKeyConstraints: true,
+				}), {
 					signal,
 					onBeforeRequest: ({ query, variables }) => {
 						console.debug(query, variables)

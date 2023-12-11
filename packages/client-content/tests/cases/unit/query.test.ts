@@ -6,9 +6,32 @@ import OrderDirection = Input.OrderDirection;
 describe('queries', () => {
 
 	test('list', async () => {
-		const [client, calls] = createClient()
+		const [client, calls] = createClient({
+			authors: [
+				{
+					name: 'John',
+					email: 'foo@localhost',
+				},
+				{
+					name: 'John',
+					email: 'bar@localhost',
+				},
+			],
+		})
 		const result = await client.query({
 			authors: qb.list('Author', {}, it => it.$$()),
+		})
+		expect(result).toEqual({
+			authors: [
+				{
+					name: 'John',
+					email: 'foo@localhost',
+				},
+				{
+					name: 'John',
+					email: 'bar@localhost',
+				},
+			],
 		})
 		expect(calls).toHaveLength(1)
 		expect(calls[0].query).toMatchInlineSnapshot(`
@@ -24,10 +47,53 @@ describe('queries', () => {
 	})
 
 	test('multiple queries', async () => {
-		const [client, calls] = createClient()
+		const [client, calls] = createClient({
+			authors: [
+				{
+					name: 'John',
+					email: 'foo@localhost',
+				},
+				{
+					name: 'John',
+					email: 'bar@localhost',
+				},
+			],
+			posts: [
+				{
+					title: 'Post 1',
+					content: 'Content 1',
+				},
+				{
+					title: 'Post 2',
+					content: 'Content 2',
+				},
+			],
+		})
 		const result = await client.query({
 			authors: qb.list('Author', {}, it => it.$$()),
 			posts: qb.list('Post', {}, it => it.$$()),
+		})
+		expect(result).toEqual({
+			authors: [
+				{
+					name: 'John',
+					email: 'foo@localhost',
+				},
+				{
+					name: 'John',
+					email: 'bar@localhost',
+				},
+			],
+			posts: [
+				{
+					title: 'Post 1',
+					content: 'Content 1',
+				},
+				{
+					title: 'Post 2',
+					content: 'Content 2',
+				},
+			],
 		})
 		expect(calls).toHaveLength(1)
 		expect(calls[0].query).toMatchInlineSnapshot(`
@@ -48,8 +114,28 @@ describe('queries', () => {
 
 
 	test('single query', async () => {
-		const [client, calls] = createClient()
-		await client.query(qb.list('Post', {}, it => it.$$()))
+		const [client, calls] = createClient({ value: [
+				{
+					title: 'Post 1',
+					content: 'Content 1',
+				},
+				{
+					title: 'Post 2',
+					content: 'Content 2',
+				},
+			] })
+
+		const result = await client.query(qb.list('Post', {}, it => it.$$()))
+		expect(result).toEqual([
+			{
+				title: 'Post 1',
+				content: 'Content 1',
+			},
+			{
+				title: 'Post 2',
+				content: 'Content 2',
+			},
+		])
 		expect(calls).toHaveLength(1)
 		expect(calls[0].query).toMatchInlineSnapshot(`
 			"query {

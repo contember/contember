@@ -25,14 +25,7 @@ export type EntitySelectionAnyArgs =
 	| EntitySelectionManyByArgs
 	| EntitySelectionOneArgs
 
-export const createEntitySelection = (
-	context: ContentEntitySelectionContext<string>,
-	selectionSet: GraphQlSelectionSet,
-): ContentEntitySelection => {
-	return new ContentEntitySelection(context, selectionSet)
-}
-
-type ContentEntitySelectionOrCallback = ContentEntitySelectionCallback | ContentEntitySelection
+export type ContentEntitySelectionOrCallback = ContentEntitySelectionCallback | ContentEntitySelection
 
 
 export class ContentEntitySelection {
@@ -97,7 +90,7 @@ export class ContentEntitySelection {
 			...this.selectionSet,
 			...columns.map(col => new GraphQlField(null, col)),
 		]
-		return createEntitySelection(this.context, nodes)
+		return new ContentEntitySelection(this.context, nodes)
 	}
 
 	private _column(
@@ -141,7 +134,7 @@ export class ContentEntitySelection {
 			schema: this.context.schema,
 		}
 
-		const entitySelection = typeof fields === 'function' ? fields(createEntitySelection(newContext, [])) : fields
+		const entitySelection = typeof fields === 'function' ? fields(new ContentEntitySelection(newContext, [])) : fields
 		const newObjectField = new GraphQlField(
 			alias,
 			name,
@@ -188,7 +181,7 @@ export class ContentEntitySelection {
 			},
 		}
 
-		const entitySelection = typeof fields === 'function' ? fields(createEntitySelection(newContext, []) as any) : fields
+		const entitySelection = typeof fields === 'function' ? fields(new ContentEntitySelection(newContext, []) as any) : fields
 		const newObjectField = new GraphQlField(
 			alias,
 			name,
@@ -226,7 +219,7 @@ export class ContentEntitySelection {
 			},
 		}
 		const entitySelection = typeof fields === 'function'
-			? fields(createEntitySelection(newContext, []) as any)
+			? fields(new ContentEntitySelection(newContext, []) as any)
 			: fields
 		const newObjectField = new GraphQlField(
 			alias,
@@ -239,7 +232,7 @@ export class ContentEntitySelection {
 
 
 	private withField(field: GraphQlField) {
-		return createEntitySelection(this.context, [
+		return new ContentEntitySelection(this.context, [
 			...this.selectionSet,
 			field,
 		])

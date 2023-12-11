@@ -1,5 +1,6 @@
-import { ContentClientInput, SchemaTypeLike } from './types'
+import { ContentClientInput, MutationResult, SchemaTypeLike, TransactionResult } from './types'
 import { ContentMutation, ContentQuery, TypedEntitySelection, TypedEntitySelectionCallback } from './nodes'
+import { MutationTransactionOptions } from './ContentQueryBuilder'
 
 
 export type TypedContentEntitySelectionOrCallback<TSchema extends SchemaTypeLike, TEntityName extends keyof TSchema['entities'] & string, TValue> =
@@ -28,7 +29,6 @@ export interface TypedContentQueryBuilder<TSchema extends SchemaTypeLike> {
 		fields: TypedContentEntitySelectionOrCallback<TSchema, EntityName, TValue>,
 	): ContentQuery<TValue[]>
 
-
 	get<EntityName extends keyof TSchema['entities'] & string, TValue>(
 		name: EntityName,
 		args: ContentClientInput.UniqueQueryInput<TSchema['entities'][EntityName]>,
@@ -39,24 +39,38 @@ export interface TypedContentQueryBuilder<TSchema extends SchemaTypeLike> {
 		name: EntityName,
 		args: ContentClientInput.CreateInput<TSchema['entities'][EntityName]>,
 		fields?: TypedContentEntitySelectionOrCallback<TSchema, EntityName, TValue>,
-	): ContentMutation<TValue>
+	): ContentMutation<MutationResult<TValue>>
 
 	update<EntityName extends keyof TSchema['entities'] & string, TValue>(
 		name: EntityName,
 		args: ContentClientInput.UpdateInput<TSchema['entities'][EntityName]>,
 		fields?: TypedContentEntitySelectionOrCallback<TSchema, EntityName, TValue>,
-	): ContentMutation<TValue>
+	): ContentMutation<MutationResult<TValue>>
 
 	upsert<EntityName extends keyof TSchema['entities'] & string, TValue>(
 		name: EntityName,
 		args: ContentClientInput.UpsertInput<TSchema['entities'][EntityName]>,
 		fields?: TypedContentEntitySelectionOrCallback<TSchema, EntityName, TValue>,
-	): ContentMutation<TValue>
+	): ContentMutation<MutationResult<TValue>>
 
 	delete<EntityName extends keyof TSchema['entities'] & string, TValue>(
 		name: EntityName,
 		args: ContentClientInput.UniqueQueryInput<TSchema['entities'][EntityName]>,
 		fields?: TypedContentEntitySelectionOrCallback<TSchema, EntityName, TValue>,
-	): ContentMutation<TValue>
+	): ContentMutation<MutationResult<TValue>>
+
+	transaction<Value>(
+		mutation: ContentMutation<Value>,
+		options?: MutationTransactionOptions,
+	): ContentMutation<TransactionResult<Value>>
+	transaction<Value>(
+		mutations: ContentMutation<Value>[],
+		options?: MutationTransactionOptions,
+	): ContentMutation<TransactionResult<Value[]>>
+
+	transaction<Values extends Record<string, any>>(
+		mutations: { [K in keyof Values]: ContentMutation<Values[K]> | ContentQuery<Values[K]> },
+		options?: MutationTransactionOptions,
+	): ContentMutation<TransactionResult<Values>>
 }
 

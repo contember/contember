@@ -144,6 +144,9 @@ export class DataBinding<Node> {
 			try {
 				response = await this.contentClient.mutate(mutations, {
 					signal,
+					onBeforeRequest: ({ query, variables }) => {
+						console.debug(query, variables)
+					},
 				})
 			} catch (e) {
 				if (e instanceof GraphQlClientError) {
@@ -353,6 +356,9 @@ export class DataBinding<Node> {
 		try {
 			return await this.contentClient.query(query, {
 				signal,
+				onBeforeRequest: ({ query, variables }) => {
+					console.debug(query, variables)
+				},
 			})
 		} catch (e) {
 			if (e instanceof GraphQlClientError) {

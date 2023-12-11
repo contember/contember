@@ -51,6 +51,8 @@
 	margin: 1em;
 	opacity: 0;
 	animation: cui-dialogIntroIn 0.2s 0.1s forwards;
+	max-height: 100%;
+	overflow-y: auto;
 }
 
 :where(.cui-dialog.view-immersive)::before {

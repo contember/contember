@@ -23,6 +23,9 @@ ${query}`
 
 			return new GraphQlClientError(`GraphQL request failed: ${type}`, type, request, response ?? undefined, errors, details, cause)
 		}
+
+		options?.onBeforeRequest?.({ query, variables: options.variables ?? {} })
+
 		try {
 			response = await this.doExecute(query, options)
 		} catch (e) {

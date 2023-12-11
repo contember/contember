@@ -3,6 +3,7 @@ export interface GraphQlClientRequestOptions {
 	apiToken?: string
 	signal?: AbortSignal
 	headers?: Record<string, string>
+	onBeforeRequest?: (query: { query: string, variables: GraphQlClientVariables }) => void
 	onResponse?: (response: Response) => void
 	onData?: (json: unknown) => void
 }

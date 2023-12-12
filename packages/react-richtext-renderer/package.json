@@ -39,5 +39,9 @@
 		"type": "git",
 		"url": "https://github.com/contember/interface.git",
 		"directory": "packages/react-richtext-renderer"
+	},
+	"devDependencies": {
+		"@testing-library/react": "^14.1.2",
+		"@testing-library/react-hooks": "^8.0.1"
 	}
 }

@@ -34,7 +34,7 @@ export const NumberInput = memo(forwardRef<HTMLInputElement, NumberInputProps>((
 				? (value)
 					.trim()
 					.replace(/[^0-9-]|(?<!^)-/g, '')
-					.replace(/^(-?)0+/, (match, p1) => p1 === '-' ? '-0' : '')
+					.replace(/^(-?)0+/, (match, p1) => p1 === '-' ? '-0' : '0')
 				: null
 
 			const int = value ? parseInt(value, 10) : null

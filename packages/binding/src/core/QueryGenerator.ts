@@ -43,6 +43,7 @@ export class QueryGenerator {
 			subTree.entityName,
 			{
 				by: replaceGraphQlLiteral(subTree.parameters.where),
+				filter: resolveFilter(subTree.parameters.filter),
 			},
 			it =>  QueryGenerator.registerQueryPart(subTree.fields.markers, it),
 		)

@@ -43,6 +43,7 @@ export class QueryGenerator {
 			subTree.entityName,
 			{
 				by: replaceGraphQlLiteral(subTree.parameters.where),
+				filter: resolveFilter(subTree.parameters.filter),
 			},
 			it =>  QueryGenerator.registerQueryPart(subTree.fields.markers, it),
 		)
@@ -80,13 +81,20 @@ export class QueryGenerator {
 					const relationField = `${relation.field}By${ucfirst(Object.keys(relation.reducedBy)[0])}`
 					selection = selection.$(
 						relationField,
-						{ by: replaceGraphQlLiteral(relation.reducedBy), as: fieldValue.placeholderName },
+						{
+							by: replaceGraphQlLiteral(relation.reducedBy),
+							filter: resolveFilter(relation.filter),
+							as: fieldValue.placeholderName,
+						},
 						it => QueryGenerator.registerQueryPart(fieldValue.fields.markers, it),
 					)
 				} else {
 					selection = selection.$(
 						relation.field,
-						{ filter: resolveFilter(relation.filter), as: fieldValue.placeholderName },
+						{
+							filter: resolveFilter(relation.filter),
+							as: fieldValue.placeholderName,
+						},
 						it => QueryGenerator.registerQueryPart(fieldValue.fields.markers, it),
 					)
 				}

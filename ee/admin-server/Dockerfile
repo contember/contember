@@ -15,7 +15,7 @@ COPY packages/binding/package.json ./packages/binding/package.json
 COPY packages/brand/package.json ./packages/brand/package.json
 COPY packages/client/package.json ./packages/client/package.json
 COPY packages/client-content/package.json ./packages/client-content/package.json
-COPY packages/client-generator/package.json ./packages/client-generator/package.json
+COPY packages/client-content-generator/package.json ./packages/client-content-generator/package.json
 COPY packages/graphql-builder/package.json ./packages/graphql-builder/package.json
 COPY packages/graphql-client/package.json ./packages/graphql-client/package.json
 COPY packages/interface-tester/package.json ./packages/interface-tester/package.json

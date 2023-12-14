@@ -23,7 +23,7 @@ export const ContemberClientNames: SchemaNames = ` + JSON.stringify(nameSchema, 
 		const indexCode = `
 import { ContemberClientNames } from './names'
 import { ContemberClientSchema } from './entities'
-import { ContentQueryBuilder, TypedContentQueryBuilder, TypedEntitySelection } from '@contember/client'
+import { ContentQueryBuilder, TypedContentQueryBuilder, TypedEntitySelection } from '@contember/client-content'
 export * from './names'
 export * from './enums'
 export * from './entities'

@@ -1,3 +1,5 @@
 import { createViteConfig } from '../../build/createViteConfig.js'
 
-export default createViteConfig('brand')
+const currentDirName = new URL('.', import.meta.url).pathname.split('/').filter(Boolean).pop()
+
+export default createViteConfig(currentDirName)

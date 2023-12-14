@@ -1,38 +1,100 @@
 {
-	"files": [ ],
-	"include": [ ],
+	"files": [],
+	"include": [],
 	"references": [
-		{ "path": "./ee/admin-server" },
-		{ "path": "./packages/.template" },
-		{ "path": "./packages/admin" },
-		{ "path": "./packages/admin-i18n" },
-		{ "path": "./packages/admin-sandbox" },
-		{ "path": "./packages/binding"  },
-		{ "path": "./packages/brand" },
-		{ "path": "./packages/client" },
-		{ "path": "./packages/client-content" },
-		{ "path": "./packages/client-content-generator" },
-		{ "path": "./packages/graphql-builder" },
-		{ "path": "./packages/graphql-client" },
-		{ "path": "./packages/interface-tester" },
-		{ "path": "./packages/layout" },
-		{ "path": "./packages/react-auto" },
-		{ "path": "./packages/react-binding" },
-		{ "path": "./packages/react-binding-ui" },
-		{ "path": "./packages/react-choice-field" },
-		{ "path": "./packages/react-choice-field-ui" },
-		{ "path": "./packages/react-client" },
-		{ "path": "./packages/react-datagrid" },
-		{ "path": "./packages/react-datagrid-ui" },
-		{ "path": "./packages/react-form-fields-ui" },
-		{ "path": "./packages/react-i18n" },
-		{ "path": "./packages/react-leaflet-fields-ui" },
-		{ "path": "./packages/react-multipass-rendering" },
-		{ "path": "./packages/react-utils" },
-		{ "path": "./packages/ui" },
-		{ "path": "./packages/utilities" },
-		{ "path": "./packages/vimeo-file-uploader" },
-		{ "path": "./packages/vite-plugin" }
+		{
+			"path": "./packages/.template"
+		},
+		{
+			"path": "./packages/admin"
+		},
+		{
+			"path": "./packages/admin-i18n"
+		},
+		{
+			"path": "./packages/admin-sandbox"
+		},
+		{
+			"path": "./packages/binding"
+		},
+		{
+			"path": "./packages/brand"
+		},
+		{
+			"path": "./packages/client"
+		},
+		{
+			"path": "./packages/client-content"
+		},
+		{
+			"path": "./packages/client-content-generator"
+		},
+		{
+			"path": "./packages/graphql-builder"
+		},
+		{
+			"path": "./packages/graphql-client"
+		},
+		{
+			"path": "./packages/interface-tester"
+		},
+		{
+			"path": "./packages/layout"
+		},
+		{
+			"path": "./packages/react-auto"
+		},
+		{
+			"path": "./packages/react-binding"
+		},
+		{
+			"path": "./packages/react-binding-ui"
+		},
+		{
+			"path": "./packages/react-choice-field"
+		},
+		{
+			"path": "./packages/react-choice-field-ui"
+		},
+		{
+			"path": "./packages/react-client"
+		},
+		{
+			"path": "./packages/react-datagrid"
+		},
+		{
+			"path": "./packages/react-datagrid-ui"
+		},
+		{
+			"path": "./packages/react-form-fields-ui"
+		},
+		{
+			"path": "./packages/react-i18n"
+		},
+		{
+			"path": "./packages/react-leaflet-fields-ui"
+		},
+		{
+			"path": "./packages/react-multipass-rendering"
+		},
+		{
+			"path": "./packages/react-utils"
+		},
+		{
+			"path": "./packages/ui"
+		},
+		{
+			"path": "./packages/utilities"
+		},
+		{
+			"path": "./packages/vimeo-file-uploader"
+		},
+		{
+			"path": "./packages/vite-plugin"
+		},
+		{
+			"path": "./ee/admin-server"
+		}
 	],
 	"ts-node": {
 		"moduleTypes": {
@@ -40,3 +102,4 @@
 		}
 	}
 }
+d

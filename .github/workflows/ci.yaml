@@ -211,7 +211,7 @@ jobs:
       - name: Publish
         run: |
           yarn config set npmAuthToken "$NPM_TOKEN"
-          yarn workspaces foreach -pt version "${GITHUB_REF:11}"
+          yarn workspaces foreach -t version "${GITHUB_REF:11}"
           # Extract the npm-tag from package.json
           NPM_TAG=$(sed -n 's/.*"npm-tag": "\(.*\)",/\1/p' package.json)
           if [ -z "$NPM_TAG" ]; then

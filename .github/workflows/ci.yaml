@@ -212,7 +212,14 @@ jobs:
         run: |
           yarn config set npmAuthToken "$NPM_TOKEN"
           yarn workspaces foreach -pt version "${GITHUB_REF:11}"
-          yarn workspaces foreach -pt --no-private npm publish --access public
+          # Extract the npm-tag from package.json
+          NPM_TAG=$(sed -n 's/.*"npm-tag": "\(.*\)",/\1/p' package.json)
+          if [ -z "$NPM_TAG" ]; then
+            echo "npm-tag not found in package.json"
+            exit 1
+          fi
+          # Use the extracted npm-tag in the npm publish command
+          yarn workspaces foreach -pt --no-private npm publish --tag $NPM_TAG --access public
 
 
   publish-docker:

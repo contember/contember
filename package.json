@@ -1,5 +1,7 @@
 {
 	"type": "module",
+	"version": "0.0.0",
+	"npm-tag": "next",
 	"private": true,
 	"scripts": {
 		"build": "yarn run ts:build && yarn workspaces foreach -pt run build",
@@ -66,8 +68,5 @@
 	"workspaces": [
 		"ee/*",
 		"packages/*"
-	],
-	"version": "1.1.0-rc.6",
-	"packageManager": "yarn@3.5.0",
-	"stableVersion": "0.0.0"
+	]
 }

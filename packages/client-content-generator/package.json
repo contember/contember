@@ -6,7 +6,7 @@
 	"sideEffects": false,
 	"main": "./dist/production/index.js",
 	"bin": {
-		"contember-client-generator": "./dist/production/generate.js"
+		"contember-client-generator": "./dist/production/generate.cjs"
 	},
 	"exports": {
 		".": {
@@ -30,7 +30,7 @@
 	],
 	"typings": "./dist/types/index.d.ts",
 	"scripts": {
-		"build": "yarn build:js:dev && yarn build:js:prod",
+		"build": "yarn build:js:dev && yarn build:js:prod && chmod +x ./dist/production/generate.cjs",
 		"build:js:dev": "vite build --mode development",
 		"build:js:prod": "vite build --mode production",
 		"ae:build": "api-extractor run --local",

@@ -147,7 +147,11 @@ export class ContentQueryBuilder {
 		const transactionArgs = createTypedArgs({ options }, {
 			options: 'MutationTransactionOptions',
 		})
-		return new ContentOperation<TransactionResult<any>, 'mutation'>('mutation', 'transaction', transactionArgs, combined.selection, ({ ok, errorMessage, errors, validation, ...data }) => {
+		const items = [
+			...this.createMutationSelection('transaction'),
+			...combined.selection,
+		]
+		return new ContentOperation<TransactionResult<any>, 'mutation'>('mutation', 'transaction', transactionArgs, items, ({ ok, errorMessage, errors, validation, ...data }) => {
 			return {
 				ok,
 				errorMessage,
@@ -158,7 +162,7 @@ export class ContentQueryBuilder {
 		})
 	}
 
-	private createMutationSelection(operation: 'create' | 'update' | 'delete' | 'upsert', selection?: GraphQlSelectionSet): GraphQlSelectionSet {
+	private createMutationSelection(operation: 'create' | 'update' | 'delete' | 'upsert' | 'transaction', selection?: GraphQlSelectionSet): GraphQlSelectionSet {
 		const items: GraphQlSelectionSet = [
 			new GraphQlField(null, 'ok'),
 			new GraphQlField(null, 'errorMessage'),

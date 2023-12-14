@@ -24,6 +24,14 @@ describe('mutations in trx', () => {
 		expect(calls[0].query).toMatchInlineSnapshot(`
 			"mutation($options_MutationTransactionOptions_0: MutationTransactionOptions, $data_AuthorCreateInput_1: AuthorCreateInput!) {
 				mut: transaction(options: $options_MutationTransactionOptions_0) {
+					ok
+					errorMessage
+					errors {
+						... MutationError
+					}
+					validation {
+						... ValidationResult
+					}
 					mut: createAuthor(data: $data_AuthorCreateInput_1) {
 						ok
 						errorMessage
@@ -101,6 +109,14 @@ describe('mutations in trx', () => {
 		expect(calls[0].query).toMatchInlineSnapshot(`
 			"mutation($options_MutationTransactionOptions_0: MutationTransactionOptions, $data_AuthorCreateInput_1: AuthorCreateInput!) {
 				mut: transaction(options: $options_MutationTransactionOptions_0) {
+					ok
+					errorMessage
+					errors {
+						... MutationError
+					}
+					validation {
+						... ValidationResult
+					}
 					mut: createAuthor(data: $data_AuthorCreateInput_1) {
 						ok
 						errorMessage
@@ -179,6 +195,14 @@ describe('mutations in trx', () => {
 		expect(calls[0].query).toMatchInlineSnapshot(`
 			"mutation($options_MutationTransactionOptions_0: MutationTransactionOptions, $by_AuthorUniqueWhere_1: AuthorUniqueWhere!, $data_AuthorUpdateInput_2: AuthorUpdateInput!) {
 				mut: transaction(options: $options_MutationTransactionOptions_0) {
+					ok
+					errorMessage
+					errors {
+						... MutationError
+					}
+					validation {
+						... ValidationResult
+					}
 					mut: updateAuthor(by: $by_AuthorUniqueWhere_1, data: $data_AuthorUpdateInput_2) {
 						ok
 						errorMessage
@@ -253,6 +277,14 @@ describe('mutations in trx', () => {
 		expect(calls[0].query).toMatchInlineSnapshot(`
 			"mutation($options_MutationTransactionOptions_0: MutationTransactionOptions, $by_AuthorUniqueWhere_1: AuthorUniqueWhere!) {
 				mut: transaction(options: $options_MutationTransactionOptions_0) {
+					ok
+					errorMessage
+					errors {
+						... MutationError
+					}
+					validation {
+						... ValidationResult
+					}
 					mut: deleteAuthor(by: $by_AuthorUniqueWhere_1) {
 						ok
 						errorMessage
@@ -274,6 +306,23 @@ describe('mutations in trx', () => {
 				}
 				message
 				type
+			}
+			fragment ValidationResult on _ValidationResult {
+				valid
+				errors {
+					path {
+						... on _FieldPathFragment {
+							field
+						}
+						... on _IndexPathFragment {
+							index
+							alias
+						}
+					}
+					message {
+						text
+					}
+				}
 			}
 			"
 		`)
@@ -309,52 +358,60 @@ describe('mutations in trx', () => {
 		})))
 		expect(calls).toHaveLength(1)
 		expect(calls[0].query).toMatchInlineSnapshot(`
-					"mutation($options_MutationTransactionOptions_0: MutationTransactionOptions, $by_AuthorUniqueWhere_1: AuthorUniqueWhere!, $create_AuthorCreateInput_2: AuthorCreateInput!, $update_AuthorUpdateInput_3: AuthorUpdateInput!) {
-						mut: transaction(options: $options_MutationTransactionOptions_0) {
-							mut: upsertAuthor(by: $by_AuthorUniqueWhere_1, create: $create_AuthorCreateInput_2, update: $update_AuthorUpdateInput_3) {
-								ok
-								errorMessage
-								errors {
-									... MutationError
-								}
-								validation {
-									... ValidationResult
-								}
-							}
-						}
+			"mutation($options_MutationTransactionOptions_0: MutationTransactionOptions, $by_AuthorUniqueWhere_1: AuthorUniqueWhere!, $create_AuthorCreateInput_2: AuthorCreateInput!, $update_AuthorUpdateInput_3: AuthorUpdateInput!) {
+				mut: transaction(options: $options_MutationTransactionOptions_0) {
+					ok
+					errorMessage
+					errors {
+						... MutationError
 					}
-					fragment MutationError on _MutationError {
-						paths {
-							... on _FieldPathFragment {
-								field
-							}
-							... on _IndexPathFragment {
-								index
-								alias
-							}
-						}
-						message
-						type
+					validation {
+						... ValidationResult
 					}
-					fragment ValidationResult on _ValidationResult {
-						valid
+					mut: upsertAuthor(by: $by_AuthorUniqueWhere_1, create: $create_AuthorCreateInput_2, update: $update_AuthorUpdateInput_3) {
+						ok
+						errorMessage
 						errors {
-							path {
-								... on _FieldPathFragment {
-									field
-								}
-								... on _IndexPathFragment {
-									index
-									alias
-								}
-							}
-							message {
-								text
-							}
+							... MutationError
+						}
+						validation {
+							... ValidationResult
 						}
 					}
-					"
-				`)
+				}
+			}
+			fragment MutationError on _MutationError {
+				paths {
+					... on _FieldPathFragment {
+						field
+					}
+					... on _IndexPathFragment {
+						index
+						alias
+					}
+				}
+				message
+				type
+			}
+			fragment ValidationResult on _ValidationResult {
+				valid
+				errors {
+					path {
+						... on _FieldPathFragment {
+							field
+						}
+						... on _IndexPathFragment {
+							index
+							alias
+						}
+					}
+					message {
+						text
+					}
+				}
+			}
+			"
+		`)
 		expect(calls[0].variables).toMatchInlineSnapshot(`
 					{
 					  "by_AuthorUniqueWhere_1": {
@@ -407,6 +464,14 @@ describe('mutations in trx', () => {
 		expect(calls[0].query).toMatchInlineSnapshot(`
 			"mutation($options_MutationTransactionOptions_0: MutationTransactionOptions, $data_AuthorCreateInput_1: AuthorCreateInput!, $data_AuthorCreateInput_2: AuthorCreateInput!) {
 				mut: transaction(options: $options_MutationTransactionOptions_0) {
+					ok
+					errorMessage
+					errors {
+						... MutationError
+					}
+					validation {
+						... ValidationResult
+					}
 					mut_0: createAuthor(data: $data_AuthorCreateInput_1) {
 						ok
 						errorMessage
@@ -508,6 +573,14 @@ describe('mutations in trx', () => {
 		expect(calls[0].query).toMatchInlineSnapshot(`
 			"mutation($options_MutationTransactionOptions_0: MutationTransactionOptions, $data_AuthorCreateInput_1: AuthorCreateInput!, $data_PostCreateInput_2: PostCreateInput!) {
 				mut: transaction(options: $options_MutationTransactionOptions_0) {
+					ok
+					errorMessage
+					errors {
+						... MutationError
+					}
+					validation {
+						... ValidationResult
+					}
 					createAuthor(data: $data_AuthorCreateInput_1) {
 						ok
 						errorMessage
@@ -613,6 +686,14 @@ describe('mutations in trx', () => {
 		expect(calls[0].query).toMatchInlineSnapshot(`
 			"mutation($options_MutationTransactionOptions_0: MutationTransactionOptions, $data_PostCreateInput_1: PostCreateInput!, $by_PostUniqueWhere_2: PostUniqueWhere!) {
 				mut: transaction(options: $options_MutationTransactionOptions_0) {
+					ok
+					errorMessage
+					errors {
+						... MutationError
+					}
+					validation {
+						... ValidationResult
+					}
 					createPost(data: $data_PostCreateInput_1) {
 						ok
 						errorMessage

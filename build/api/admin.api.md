@@ -4197,6 +4197,7 @@ export const withUnderline: <E extends Editor>(editor: E) => E;
 export * from "@contember/react-auto";
 export * from "@contember/react-binding";
 export * from "@contember/react-binding-ui";
+export * from "@contember/react-board-ui";
 export * from "@contember/react-choice-field-ui";
 export * from "@contember/react-client";
 export * from "@contember/react-datagrid-ui";

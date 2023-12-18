@@ -64,7 +64,7 @@ export namespace ContentClientInput {
 
 	export type CreateDataInput<TEntity extends EntityTypeLike> =
 		& {
-			readonly [key in keyof TEntity['columns']]?: TEntity['columns'][key]['tsType']
+			readonly [key in keyof TEntity['columns']]?: TEntity['columns'][key]
 		}
 		& {
 			readonly [key in keyof TEntity['hasMany']]?: CreateManyRelationInput<TEntity['hasMany'][key]>
@@ -82,7 +82,7 @@ export namespace ContentClientInput {
 
 	export type UpdateDataInput<TEntity extends EntityTypeLike> =
 		& {
-			readonly [key in keyof TEntity['columns']]?: TEntity['columns'][key]['tsType']
+			readonly [key in keyof TEntity['columns']]?: TEntity['columns'][key]
 		}
 		& {
 			readonly [key in keyof TEntity['hasMany']]?: UpdateManyRelationInput<TEntity['hasMany'][key]>

@@ -2798,7 +2798,7 @@ __metadata:
     "@contember/schema-utils": ^1.3.6
     "@types/node": ^18
   bin:
-    contember-client-generator: ./dist/production/generate.js
+    contember-client-generator: ./dist/production/generate.cjs
   languageName: unknown
   linkType: soft
 

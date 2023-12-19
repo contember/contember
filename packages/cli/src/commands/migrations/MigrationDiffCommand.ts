@@ -110,6 +110,11 @@ export class MigrationDiffCommand extends Command<Args, Options> {
 							requireConfirmation: status.migrationsToExecute.length > 1 && !yes,
 							schemaVersionBuilder,
 							migrationDescriber,
+							contentMigrationFactoryArgs: {
+								apiToken,
+								apiBaseUrl: instance.baseUrl.replace(/\/$/, ''),
+								projectName: project.name,
+							},
 						})
 					}
 					return 0

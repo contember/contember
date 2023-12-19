@@ -32,9 +32,15 @@ export type ContentMigration = {
 	queries: ContentMigrationQuery[]
 }
 
+export type ContentMigrationFactoryArgs = {
+	apiBaseUrl: string
+	projectName: string
+	apiToken: string
+}
+
 export type ContentMigrationFactory = {
 	type: 'factory'
-	factory: () => Promise<ContentMigration>
+	factory: (args: ContentMigrationFactoryArgs) => Promise<ContentMigration>
 }
 
 export type ContentMigrationQuery = {

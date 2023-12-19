@@ -90,6 +90,11 @@ export class MigrationExecuteCommand extends Command<Args, Options> {
 				migrations,
 				requireConfirmation: !input.getOption('yes'),
 				force: force,
+				contentMigrationFactoryArgs: {
+					apiToken,
+					apiBaseUrl: instance.baseUrl.replace(/\/$/, ''),
+					projectName: remoteProject,
+				},
 			})
 			code ||= singleCode
 		}

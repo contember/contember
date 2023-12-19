@@ -5,7 +5,7 @@ import { MigrationDescriber } from '@contember/schema-migrations'
 import prompts from 'prompts'
 import { MigrationsResolver } from './MigrationsResolver'
 import { SchemaVersionBuilder } from './SchemaVersionBuilder'
-import { isSchemaMigration, ResolvedMigrationContent } from './MigrationFile'
+import { ContentMigrationFactoryArgs, isSchemaMigration, ResolvedMigrationContent } from './MigrationFile'
 import { assertNever } from '../assertNever'
 
 export type ExecuteMigrationOptions = {
@@ -45,6 +45,7 @@ export const executeMigrations = async ({
 	requireConfirmation,
 	schemaVersionBuilder,
 	migrationDescriber,
+	contentMigrationFactoryArgs,
 	force,
 }: {
 	client: SystemClient
@@ -52,6 +53,7 @@ export const executeMigrations = async ({
 	requireConfirmation: boolean
 	schemaVersionBuilder: SchemaVersionBuilder
 	migrationDescriber: MigrationDescriber
+	contentMigrationFactoryArgs: ContentMigrationFactoryArgs
 	force?: boolean
 }): Promise<number> => {
 	if (migrations.length === 0) {
@@ -138,7 +140,7 @@ export const executeMigrations = async ({
 		const migrationContent = await migration.localMigration.getContent()
 		if (migrationContent.type === 'factory') {
 			await executeMigrations()
-			const result = await migrationContent.factory()
+			const result = await migrationContent.factory(contentMigrationFactoryArgs)
 			migrationsToRun.push(result)
 			await executeMigrations()
 		} else {

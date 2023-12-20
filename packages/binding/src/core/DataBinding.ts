@@ -115,7 +115,7 @@ export class DataBinding<Node> {
 			persist: async options => await this.persist(options),
 		})
 		this.queryBuilder = createQueryBuilder(this.environment.getSchema())
-		this.contentClient = new ContentClient(contentApiClient.execute.bind(contentApiClient))
+		this.contentClient = new ContentClient(contentApiClient)
 	}
 
 	private async persist({ onPersistError, onPersistSuccess, signal }: PersistOptions = {}) {

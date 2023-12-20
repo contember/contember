@@ -1,18 +1,17 @@
 import { mutationFragments } from './utils/mutationFragments'
-import { GraphQlClientRequestOptions } from '@contember/graphql-client'
+import { GraphQlClient, GraphQlClientRequestOptions } from '@contember/graphql-client'
 import { GraphQlQueryPrinter } from '@contember/graphql-builder'
 import { ContentMutation, ContentQuery } from './nodes'
 import { createMutationOperationSet } from './utils/createMutationOperationSet'
 import { createQueryOperationSet } from './utils/createQueryOperationSet'
 
 
-export type QueryExecutorOptions = GraphQlClientRequestOptions
-
-export type QueryExecutor = <T = unknown>(query: string, options: GraphQlClientRequestOptions) => Promise<T>
+export type QueryExecutorOptions =
+	& GraphQlClientRequestOptions
 
 export class ContentClient {
 	constructor(
-		private readonly executor: QueryExecutor,
+		private readonly client: Pick<GraphQlClient, 'execute'>,
 	) {
 	}
 
@@ -23,7 +22,7 @@ export class ContentClient {
 		const printer = new GraphQlQueryPrinter()
 		const operationSet = createQueryOperationSet(queries)
 		const { query, variables } = printer.printDocument('query', operationSet.selection, {})
-		const result = await this.executor(query, { variables, ...options })
+		const result = await this.client.execute(query, { variables, ...options })
 		return operationSet.parse(result)
 	}
 
@@ -35,7 +34,7 @@ export class ContentClient {
 
 		const printer = new GraphQlQueryPrinter()
 		const { query, variables } = printer.printDocument('mutation', operationSet.selection, mutationFragments)
-		const result = await this.executor(query, { variables, ...options })
+		const result = await this.client.execute(query, { variables, ...options })
 
 		return operationSet.parse(result)
 	}

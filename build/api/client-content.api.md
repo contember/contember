@@ -4,6 +4,7 @@
 
 ```ts
 
+import { GraphQlClient } from '@contember/graphql-client';
 import { GraphQlClientRequestOptions } from '@contember/graphql-client';
 import { GraphQlFieldTypedArgs } from '@contember/graphql-builder';
 import { GraphQlSelectionSet } from '@contember/graphql-builder';
@@ -13,7 +14,7 @@ import { Result } from '@contember/schema';
 
 // @public (undocumented)
 export class ContentClient {
-    constructor(executor: QueryExecutor);
+    constructor(client: Pick<GraphQlClient, 'execute'>);
     // (undocumented)
     mutate<Value>(mutation: ContentMutation<Value>, options?: QueryExecutorOptions): Promise<Value>;
     // (undocumented)
@@ -376,9 +377,6 @@ export type MutationTransactionOptions = {
 
 // @public (undocumented)
 export type Path = Array<FieldPath | IndexPath>;
-
-// @public (undocumented)
-export type QueryExecutor = <T = unknown>(query: string, options: GraphQlClientRequestOptions) => Promise<T>;
 
 // @public (undocumented)
 export type QueryExecutorOptions = GraphQlClientRequestOptions;

@@ -12,6 +12,8 @@ export class GraphQlQueryPrinter {
 		value: JSONValue
 	}> = {}
 
+	private variableValueToName: Record<string, Map<JSONValue, string>> = {}
+
 	private usedFragments = new Set<string>()
 
 	private body = ''
@@ -99,17 +101,13 @@ export class GraphQlQueryPrinter {
 			if (arg.value === undefined) {
 				continue
 			}
-			const variableName = `${argName}_${arg.graphQlType.replace(/[\W]/g, '')}_${this.variableCounter++}`
+			const variableName = this.resolveVariableName(arg.graphQlType, arg.value)
 			if (i++ === 0) {
 				this.body += '('
 			} else {
 				this.body += ', '
 			}
 			this.body += `${argName}: $${variableName}`
-			this.variables[variableName] = {
-				type: arg.graphQlType,
-				value: arg.value,
-			}
 		}
 		if (i > 0) {
 			this.body += ')'
@@ -120,6 +118,23 @@ export class GraphQlQueryPrinter {
 			this.body += this.indentString.repeat(indent) + '}'
 		}
 		this.body += '\n'
+	}
+
+	private resolveVariableName(graphQlType: string, value: JSONValue): string {
+		const variableName = this.variableValueToName[graphQlType]?.get(value)
+		if (variableName) {
+			return variableName
+		}
+		const newVariableName = `${graphQlType.replace(/[\W]/g, '')}_${this.variableCounter++}`
+		this.variables[newVariableName] = {
+			type: graphQlType,
+			value: value,
+		}
+		if (!this.variableValueToName[graphQlType]) {
+			this.variableValueToName[graphQlType] = new Map()
+		}
+		this.variableValueToName[graphQlType].set(value, newVariableName)
+		return newVariableName
 	}
 
 	private cleanState(): void {

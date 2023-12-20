@@ -12,8 +12,8 @@ describe('generate upload url mutation builder', () => {
 			}),
 		).toMatchInlineSnapshot(`
 			{
-			  "query": "mutation($contentType_String_0: String) {
-				mySingleImage: generateUploadUrl(contentType: $contentType_String_0) {
+			  "query": "mutation($String_0: String) {
+				mySingleImage: generateUploadUrl(contentType: $String_0) {
 					url
 					publicUrl
 					method
@@ -25,7 +25,7 @@ describe('generate upload url mutation builder', () => {
 			}
 			",
 			  "variables": {
-			    "contentType_String_0": "image/png",
+			    "String_0": "image/png",
 			  },
 			}
 		`)
@@ -46,8 +46,8 @@ describe('generate upload url mutation builder', () => {
 			}),
 		).toMatchInlineSnapshot(`
 			{
-			  "query": "mutation($contentType_String_0: String, $contentType_String_1: String, $expiration_Int_2: Int, $prefix_String_3: String, $acl_S3Acl_4: S3Acl) {
-				myPng: generateUploadUrl(contentType: $contentType_String_0) {
+			  "query": "mutation($String_0: String, $String_1: String, $Int_2: Int, $String_3: String, $S3Acl_4: S3Acl) {
+				myPng: generateUploadUrl(contentType: $String_0) {
 					url
 					publicUrl
 					method
@@ -56,7 +56,7 @@ describe('generate upload url mutation builder', () => {
 						value
 					}
 				}
-				myMp3: generateUploadUrl(contentType: $contentType_String_1, expiration: $expiration_Int_2, prefix: $prefix_String_3, acl: $acl_S3Acl_4) {
+				myMp3: generateUploadUrl(contentType: $String_1, expiration: $Int_2, prefix: $String_3, acl: $S3Acl_4) {
 					url
 					publicUrl
 					method
@@ -68,11 +68,11 @@ describe('generate upload url mutation builder', () => {
 			}
 			",
 			  "variables": {
-			    "acl_S3Acl_4": "PUBLIC_READ",
-			    "contentType_String_0": "image/png",
-			    "contentType_String_1": "audio/mpeg",
-			    "expiration_Int_2": 123456,
-			    "prefix_String_3": "foo",
+			    "Int_2": 123456,
+			    "S3Acl_4": "PUBLIC_READ",
+			    "String_0": "image/png",
+			    "String_1": "audio/mpeg",
+			    "String_3": "foo",
 			  },
 			}
 		`)

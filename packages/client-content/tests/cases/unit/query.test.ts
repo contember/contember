@@ -184,11 +184,11 @@ describe('queries', () => {
 		})
 		expect(calls).toHaveLength(1)
 		expect(calls[0].query).toMatchInlineSnapshot(`
-			"query($filter_PostWhere_0: PostWhere, $limit_Int_1: Int) {
+			"query($PostWhere_0: PostWhere, $Int_1: Int) {
 				authors: listAuthor {
 					name
 					email
-					posts(filter: $filter_PostWhere_0, limit: $limit_Int_1) {
+					posts(filter: $PostWhere_0, limit: $Int_1) {
 						title
 						content
 					}
@@ -198,14 +198,14 @@ describe('queries', () => {
 		`)
 		expect(calls[0].variables).toMatchInlineSnapshot(`
 			{
-			  "filter_PostWhere_0": {
+			  "Int_1": 10,
+			  "PostWhere_0": {
 			    "tags": {
 			      "name": {
 			        "eq": "foo",
 			      },
 			    },
 			  },
-			  "limit_Int_1": 10,
 			}
 		`)
 	})
@@ -223,8 +223,8 @@ describe('queries', () => {
 		})
 		expect(calls).toHaveLength(1)
 		expect(calls[0].query).toMatchInlineSnapshot(`
-			"query($filter_AuthorWhere_0: AuthorWhere, $orderBy_AuthorOrderBy_1: [AuthorOrderBy!], $limit_Int_2: Int, $offset_Int_3: Int) {
-				authors: listAuthor(filter: $filter_AuthorWhere_0, orderBy: $orderBy_AuthorOrderBy_1, limit: $limit_Int_2, offset: $offset_Int_3) {
+			"query($AuthorWhere_0: AuthorWhere, $AuthorOrderBy_1: [AuthorOrderBy!], $Int_2: Int, $Int_3: Int) {
+				authors: listAuthor(filter: $AuthorWhere_0, orderBy: $AuthorOrderBy_1, limit: $Int_2, offset: $Int_3) {
 					name
 					email
 				}
@@ -233,18 +233,18 @@ describe('queries', () => {
 		`)
 		expect(calls[0].variables).toMatchInlineSnapshot(`
 			{
-			  "filter_AuthorWhere_0": {
-			    "name": {
-			      "eq": "John",
-			    },
-			  },
-			  "limit_Int_2": 10,
-			  "offset_Int_3": 20,
-			  "orderBy_AuthorOrderBy_1": [
+			  "AuthorOrderBy_1": [
 			    {
 			      "name": "asc",
 			    },
 			  ],
+			  "AuthorWhere_0": {
+			    "name": {
+			      "eq": "John",
+			    },
+			  },
+			  "Int_2": 10,
+			  "Int_3": 20,
 			}
 		`)
 	})
@@ -259,8 +259,8 @@ describe('queries', () => {
 		})
 		expect(calls).toHaveLength(1)
 		expect(calls[0].query).toMatchInlineSnapshot(`
-			"query($by_AuthorUniqueWhere_0: AuthorUniqueWhere!) {
-				authors: getAuthor(by: $by_AuthorUniqueWhere_0) {
+			"query($AuthorUniqueWhere_0: AuthorUniqueWhere!) {
+				authors: getAuthor(by: $AuthorUniqueWhere_0) {
 					name
 					email
 				}
@@ -269,7 +269,7 @@ describe('queries', () => {
 		`)
 		expect(calls[0].variables).toMatchInlineSnapshot(`
 			{
-			  "by_AuthorUniqueWhere_0": {
+			  "AuthorUniqueWhere_0": {
 			    "id": 123,
 			  },
 			}

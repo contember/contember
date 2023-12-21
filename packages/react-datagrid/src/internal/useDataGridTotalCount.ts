@@ -15,7 +15,7 @@ export const useDataGridTotalCount = (entityName: EntityName, filter: Filter | u
 
 	useEffect(() => {
 		(async () => {
-			const contentClient = new ContentClient(client.execute.bind(client))
+			const contentClient = new ContentClient(client)
 			const qb = createQueryBuilder(schema)
 			const query = qb.count(entityName, {
 				filter: resolveFilter(filter),

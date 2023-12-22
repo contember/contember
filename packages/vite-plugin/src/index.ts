@@ -1,27 +1,32 @@
 import { createHash } from 'node:crypto'
+import { Plugin } from 'vite'
 
 type ContemberOptions = {
 	buildVersion?: boolean
 }
 
-export function contember(options: ContemberOptions) {
+export function contember(options?: ContemberOptions): Plugin {
 	return ({
 		name: 'contember',
-		transformIndexHtml: options.buildVersion === false
-			? undefined : {
+		transformIndexHtml: options?.buildVersion === false
+			? undefined
+			: {
 				order: 'post',
-				handler: (html: string) => {
+				handler: html => {
 					const fileHash = createHash('md5').update(html).digest().toString('hex')
-					return ([
-						{
-							tag: 'meta',
-							injectTo: 'head',
-							attrs: {
-								name: 'contember-build-version',
-								content: fileHash,
+					return ({
+						html,
+						tags: [
+							{
+								tag: 'meta',
+								injectTo: 'head',
+								attrs: {
+									name: 'contember-build-version',
+									content: fileHash,
+								},
 							},
-						},
-					])
+						],
+					})
 				},
 			},
 	})

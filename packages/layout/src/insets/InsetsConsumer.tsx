@@ -14,7 +14,7 @@ export type OwnInsetsConsumerProps = {
 export type InsetsConsumerProps<C extends ElementType> = PolymorphicComponentPropsWithRef<C, OwnInsetsConsumerProps>
 
 export type InsetsConsumerComponentType =
-	& (<C extends ElementType = 'div'>(props: InsetsConsumerProps<C>) => React.ReactElement | null)
+	& (<C extends ElementType = 'div'>(props: InsetsConsumerProps<C>) => ReactNode)
 	& {
 		displayName?: string | undefined;
 	}

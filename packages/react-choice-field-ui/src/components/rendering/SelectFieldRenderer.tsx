@@ -21,7 +21,7 @@ export type SelectFieldRendererPublicProps =
 	& {
 		placeholder?: string
 		allowNull?: boolean
-		reactSelectProps?: Partial<SelectProps<any>>
+		reactSelectProps?: Partial<SelectProps<any, boolean, never>>
 		createNewForm?: ReactElement
 	}
 

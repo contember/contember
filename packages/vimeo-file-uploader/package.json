@@ -35,6 +35,6 @@
 	},
 	"dependencies": {
 		"@contember/client": "workspace:*",
-		"tus-js-client": "2.3.0"
+		"tus-js-client": "4.0.1"
 	}
 }

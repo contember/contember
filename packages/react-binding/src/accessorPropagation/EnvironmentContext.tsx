@@ -1,4 +1,4 @@
-import { createContext, ReactElement, ReactNode, useCallback } from 'react'
+import { createContext, ReactNode, useCallback } from 'react'
 import { Environment } from '@contember/binding'
 import { useEnvironment } from './useEnvironment'
 import { Component } from '../coreComponents'
@@ -32,7 +32,7 @@ export interface EnvironmentWithExtensionProps<S, R> {
 	state: S
 }
 
-export const EnvironmentExtensionProvider: <S, R>(props: EnvironmentWithExtensionProps<S, R>) => ReactElement | null = Component(
+export const EnvironmentExtensionProvider: <S, R>(props: EnvironmentWithExtensionProps<S, R>) => ReactNode = Component(
 	({ children, extension, state }) => {
 		const create = useCallback((env: Environment) => env.withExtension(extension, state), [extension, state])
 		return <EnvironmentMiddleware create={create}>{children}</EnvironmentMiddleware>

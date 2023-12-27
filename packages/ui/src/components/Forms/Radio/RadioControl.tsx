@@ -27,6 +27,9 @@ export const RadioControl = memo(({ RadioButtonComponent, description, size, val
 	const ref = useRef<HTMLInputElement>(null)
 
 	const state = useContext(RadioContext)
+	if (!state) {
+		throw new Error('RadioControl must be used within a Radio')
+	}
 	const { isDisabled, isReadOnly } = state
 	const { inputProps } = useRadio(props, state, ref)
 	const { isFocusVisible, focusProps } = useFocusRing()

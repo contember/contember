@@ -17,7 +17,7 @@ export type InsetsProviderProps<C extends ElementType> = PolymorphicComponentPro
 
 export type InsetsProviderComponentType = (<C extends ElementType = 'div'>(
 	props: InsetsProviderProps<C>,
-) => React.ReactElement | null) & {
+) => ReactNode) & {
 	displayName?: string | undefined;
 }
 

@@ -1,4 +1,4 @@
-import type { ReactElement } from 'react'
+import type { ReactElement, ReactNode } from 'react'
 import type { Environment } from '@contember/binding'
 import type {
 	EntityFieldMarkersContainer,
@@ -43,7 +43,7 @@ export interface StaticRenderProvider<Props extends {} = any, NonStaticPropNames
 	staticRender: (
 		props: StaticRenderProviderProps<Props, NonStaticPropNames>,
 		environment: Environment,
-	) => ReactElement | null
+	) => ReactNode
 }
 
 export type CompleteMarkerProvider<

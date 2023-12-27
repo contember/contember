@@ -5,7 +5,7 @@ import type { ChoiceFieldOptions, ChoiceFieldSingleOption } from '@contember/rea
 import { SearchInput } from '../components/SearchInput'
 
 export interface UseCommonReactSelectPropsProps<T> extends Omit<CommonReactSelectStylesProps, 'isInvalid'> {
-	reactSelectProps: Partial<SelectProps<any>> | undefined
+	reactSelectProps: Partial<SelectProps<ChoiceFieldSingleOption<T>, boolean, never>> | undefined
 	placeholder: string | undefined
 	data: ChoiceFieldOptions<T>
 	isInvalid: boolean

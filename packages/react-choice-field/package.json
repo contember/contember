@@ -43,14 +43,14 @@
 	"dependencies": {
 		"@contember/react-binding": "workspace:*",
 		"@contember/react-utils": "workspace:*",
-		"fuse.js": "6.4.6"
+		"fuse.js": "6.6.2"
 	},
 	"peerDependencies": {
 		"react": "^17 || ^18",
 		"react-dom": "^17 || ^18"
 	},
 	"devDependencies": {
-		"react": "^18",
-		"react-dom": "^18"
+		"react": "^18.2.0",
+		"react-dom": "^18.2.0"
 	}
 }

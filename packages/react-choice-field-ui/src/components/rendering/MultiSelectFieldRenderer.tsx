@@ -34,7 +34,7 @@ export type MultiSelectFieldRendererPublicProps =
 	& PublicCommonReactSelectStylesProps
 	& {
 		placeholder?: string
-		reactSelectProps?: Partial<SelectProps<any>>
+		reactSelectProps?: Partial<SelectProps<any, boolean, never>>
 		createNewForm?: ReactElement
 	}
 

@@ -1,6 +1,6 @@
 import { useClassName } from '@contember/react-utils'
 import { NestedClassName, PolymorphicComponentPropsWithRef, PolymorphicRef, dataAttribute } from '@contember/utilities'
-import { ElementType, PropsWithChildren, forwardRef, memo } from 'react'
+import { ElementType, PropsWithChildren, forwardRef, memo, ReactNode } from 'react'
 
 export type OwnVisuallyHiddenProps = PropsWithChildren<{
 	hidden?: boolean;
@@ -13,7 +13,7 @@ export type VisuallyHiddenProps<C extends ElementType> =
 
 export type VisuallyHiddenComponentType = (<C extends ElementType = 'span'>(
 	props: VisuallyHiddenProps<C>,
-) => React.ReactElement | null) & {
+) => ReactNode) & {
 	displayName?: string | undefined;
 }
 

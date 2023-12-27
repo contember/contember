@@ -1,4 +1,3 @@
-import { Response } from 'node-fetch'
 import { ApiRequest, ApiRequestSender } from './ApiRequestSender'
 
 type SystemApiRequest = Omit<ApiRequest, 'path'> & { project: string }

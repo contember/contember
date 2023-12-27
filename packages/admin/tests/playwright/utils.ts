@@ -4,7 +4,6 @@ import * as SM from '@contember/schema-migrations'
 import type { Migration } from '@contember/schema-migrations'
 import { emptySchema } from '@contember/schema-utils'
 import { expect, Page, test, TestInfo } from '@playwright/test'
-import fetch from 'node-fetch'
 import { createHash } from 'crypto'
 
 // workaround for CommonJS + ESM incompatibilities

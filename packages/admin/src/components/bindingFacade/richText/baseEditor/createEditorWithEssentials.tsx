@@ -1,4 +1,4 @@
-import { createElement } from 'react'
+import { createElement, ReactElement } from 'react'
 import {
 	createEditor,
 	Descendant,
@@ -129,11 +129,14 @@ export const createEditorWithEssentials = (defaultElementType: string): Editor =
 		renderLeafChildren: props => props.children,
 
 		renderLeaf: props => {
-			let el = createElement('span', props.attributes, editor.renderLeafChildren(props))
+			let el: ReactElement = createElement('span', props.attributes, editor.renderLeafChildren(props))
 			for (const [, mark] of marks) {
 				if (props.leaf[mark.type] === true) {
 					const markerEl = mark.render({ ...props, children: el })
 					if (markerEl !== null) {
+						if (!React.isValidElement(markerEl)) {
+							throw new Error(`Mark plugin ${mark.type} returned a non-React element`)
+						}
 						el = markerEl
 					}
 				}

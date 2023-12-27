@@ -1,4 +1,4 @@
-import { Predicate, SlugString, UnionOfPredicateTypes } from './types'
+import { Predicate, UnionOfPredicateTypes } from './types'
 
 export function isNull(value: unknown): value is null {
 	return value === null
@@ -27,7 +27,7 @@ export function isFalse(value: unknown): value is false {
 export function isString(value: unknown): value is string {
 	return typeof value === 'string'
 }
-export function isSlugString(value: unknown): value is SlugString {
+export function isSlugString(value: unknown): value is string {
 	return isNonEmptyString(value) && /^[a-z0-9_-]+$/.test(value)
 }
 export function isSingleWordString(value: unknown): value is string {

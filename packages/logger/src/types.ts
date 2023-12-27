@@ -11,6 +11,8 @@ export interface Logger {
 	info: LogFn
 	debug: LogFn
 
+	log(level: LogLevelName, messageOrError: unknown, attributes?: LoggerAttributes): void
+
 	child(attributes?: LoggerAttributes, options?: Partial<LoggerChildOptions>): Logger
 	scope<T>(cb: (logger: Logger) => Promise<T> | T, attributes?: LoggerAttributes, options?: Partial<LoggerChildOptions>): Promise<T>
 	close(): void

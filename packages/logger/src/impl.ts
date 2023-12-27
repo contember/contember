@@ -6,7 +6,7 @@ import {
 	LoggerChildOptions,
 	LoggerHandler,
 	LoggerOptions,
-	LogLevel,
+	LogLevel, LogLevelName,
 } from './types'
 import { LogLevels } from './levels'
 import { formatLogEntryAttributes, formatLoggerAttributes, FormattedAttributes, stringify } from './formatting'
@@ -49,23 +49,28 @@ export class LoggerImpl implements Logger {
 	}
 
 	public crit(messageOrError: unknown, attributes?: LoggerAttributes) {
-		this.minLevelValue <= LogLevels.crit.value && this.log(LogLevels.crit, messageOrError, attributes)
+		this.minLevelValue <= LogLevels.crit.value && this.doLog(LogLevels.crit, messageOrError, attributes)
 	}
 
 	public error(messageOrError: unknown, attributes?: LoggerAttributes) {
-		this.minLevelValue <= LogLevels.error.value && this.log(LogLevels.error, messageOrError, attributes)
+		this.minLevelValue <= LogLevels.error.value && this.doLog(LogLevels.error, messageOrError, attributes)
 	}
 
 	public warn(messageOrError: unknown, attributes?: LoggerAttributes) {
-		this.minLevelValue <= LogLevels.warn.value && this.log(LogLevels.warn, messageOrError, attributes)
+		this.minLevelValue <= LogLevels.warn.value && this.doLog(LogLevels.warn, messageOrError, attributes)
 	}
 
 	public info(messageOrError: unknown, attributes?: LoggerAttributes) {
-		this.minLevelValue <= LogLevels.info.value && this.log(LogLevels.info, messageOrError, attributes)
+		this.minLevelValue <= LogLevels.info.value && this.doLog(LogLevels.info, messageOrError, attributes)
 	}
 
 	public debug(messageOrError: unknown, attributes?: LoggerAttributes) {
-		this.minLevelValue <= LogLevels.debug.value && this.log(LogLevels.debug, messageOrError, attributes)
+		this.minLevelValue <= LogLevels.debug.value && this.doLog(LogLevels.debug, messageOrError, attributes)
+	}
+
+	public log(levelName: LogLevelName, messageOrError: unknown, attributes?: LoggerAttributes) {
+		const level = LogLevels[levelName]
+		this.minLevelValue <= level.value && this.doLog(level, messageOrError, attributes)
 	}
 
 	public child(attributes: LoggerAttributes = {}, options: Partial<LoggerChildOptions> = {}): Logger {
@@ -82,7 +87,7 @@ export class LoggerImpl implements Logger {
 		}
 	}
 
-	private log(level: LogLevel, errorOrMessage: unknown, { error: errorAttr, message: messageAttr, ...attributes }: LoggerAttributes = {}) {
+	private doLog(level: LogLevel, errorOrMessage: unknown, { error: errorAttr, message: messageAttr, ...attributes }: LoggerAttributes = {}) {
 		const error: unknown | undefined = typeof errorOrMessage !== 'string' ? errorOrMessage : errorAttr
 		const errorMessage = typeof error === 'object' && error !== null && typeof (error as any).message === 'string'
 			? (error as any).message : undefined

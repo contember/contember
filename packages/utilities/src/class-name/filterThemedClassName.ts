@@ -1,4 +1,3 @@
-import { KebabCase } from 'type-fest'
 import { isColorSchemeClassName } from './colorSchemeClassName'
 import { THEME_CLASS_NAME_REG_EXP } from './constants'
 import { flatClassNameList } from './flatClassNameList'
@@ -23,8 +22,8 @@ export function filterThemedClassName(
 		const match = className.match(THEME_CLASS_NAME_REG_EXP)
 
 		if (match) {
-			const name = match.groups!.name as KebabCase<string>
-			const scope = match.groups!.scope as KebabCase<string>
+			const name = match.groups!.name
+			const scope = match.groups!.scope
 
 			if (!scope) {
 				theme.content = name

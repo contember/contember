@@ -1,4 +1,3 @@
-import { KebabCase } from 'type-fest'
 import { ThemeContentClassName, ThemeControlsClassName } from './types'
 
 /**
@@ -6,7 +5,7 @@ import { ThemeContentClassName, ThemeControlsClassName } from './types'
  *
  * IMPORTANT: Make sure to use color scheme class in combination with theme class names.
  *
- * @param contentTheme - Theme name basis for content
+ * @param theme - Theme name basis for content
  * @returns A content theme class name
  *
  * @see {@link controlsThemeClassName}
@@ -26,10 +25,8 @@ import { ThemeContentClassName, ThemeControlsClassName } from './types'
  * )
  * ```
  */
-export function contentThemeClassName<
-	ContentTheme extends KebabCase<string> = KebabCase<string>,
->(theme: ContentTheme | null | undefined) {
-	return theme ? `theme-${theme}-content` as ThemeContentClassName<ContentTheme> : undefined
+export function contentThemeClassName(theme: string | null | undefined): ThemeContentClassName | undefined {
+	return theme ? `theme-${theme}-content` : undefined
 }
 
 /**
@@ -57,12 +54,10 @@ export function contentThemeClassName<
  * )
  * ```
  */
-export function controlsThemeClassName<
-	ControlsTheme extends KebabCase<string> = KebabCase<string>,
->(
-	theme: ControlsTheme | null | undefined,
-) {
-	return theme ? `theme-${theme}-controls` as ThemeControlsClassName<ControlsTheme> : undefined
+export function controlsThemeClassName(
+	theme: string | null | undefined,
+): ThemeControlsClassName | undefined {
+	return theme ? `theme-${theme}-controls` : undefined
 }
 
 /**
@@ -89,10 +84,8 @@ export function controlsThemeClassName<
  * )
  * ```
  */
-export function themeClassName<
-	Theme extends KebabCase<string> = KebabCase<string>,
->(
-	theme: Theme | null | undefined,
+export function themeClassName(
+	theme: string | null | undefined,
 ) {
 	return [
 		contentThemeClassName(theme),

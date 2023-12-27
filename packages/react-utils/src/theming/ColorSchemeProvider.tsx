@@ -1,19 +1,16 @@
-import { KebabCase } from '@contember/utilities'
 import { memo } from 'react'
 import { ColorSchemeContext, useColorScheme } from './contexts'
 
-export type ColorSchemeProviderProps<T extends KebabCase<string>> = {
+export type ColorSchemeProviderProps = {
 	children: React.ReactNode
-	scheme?: T
+	scheme?: string
 }
 
-export const ColorSchemeProvider = memo(
-	<T extends KebabCase<string>>({ children, scheme }: ColorSchemeProviderProps<T>) => {
-		const inheritedColorScheme = useColorScheme()
+export const ColorSchemeProvider = memo(({ children, scheme }: ColorSchemeProviderProps) => {
+	const inheritedColorScheme = useColorScheme()
 
-		return (
-			<ColorSchemeContext.Provider value={scheme ?? inheritedColorScheme}>{children}</ColorSchemeContext.Provider>
-		)
-	},
-)
+	return (
+		<ColorSchemeContext.Provider value={scheme ?? inheritedColorScheme}>{children}</ColorSchemeContext.Provider>
+	)
+})
 ColorSchemeProvider.displayName = 'Interface.ColorSchemeProvider'

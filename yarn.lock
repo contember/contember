@@ -1217,7 +1217,6 @@ __metadata:
     "@contember/ui": "workspace:*"
     "@contember/utilities": "workspace:*"
     "@types/deep-equal": ^1.0.4
-    change-case: ^5.3.0
     fast-deep-equal: ^3.1.3
     lucide-react: ^0.302.0
     react: ^18.2.0
@@ -1586,8 +1585,6 @@ __metadata:
 "@contember/utilities@workspace:*, @contember/utilities@workspace:packages/utilities":
   version: 0.0.0-use.local
   resolution: "@contember/utilities@workspace:packages/utilities"
-  dependencies:
-    type-fest: ^3.12.0
   peerDependencies:
     react: ^17 || ^18
   languageName: unknown
@@ -5421,13 +5418,6 @@ __metadata:
     ansi-styles: ^4.1.0
     supports-color: ^7.1.0
   checksum: fe75c9d5c76a7a98d45495b91b2172fa3b7a09e0cc9370e5c8feb1c567b85c4288e2b3fded7cfdd7359ac28d6b3844feb8b82b8686842e93d23c827c417e83fc
-  languageName: node
-  linkType: hard
-
-"change-case@npm:^5.3.0":
-  version: 5.3.0
-  resolution: "change-case@npm:5.3.0"
-  checksum: 117fc879f1db0ce452774e232a438fc9cdfe2a07493fa3f2348a63622c0472fd6b95aee4e3576f6530d88d5bce9c51aa89d2a29a20d120f2bc8a7257b6c530c3
   languageName: node
   linkType: hard
 
@@ -9924,13 +9914,6 @@ __metadata:
   version: 0.20.2
   resolution: "type-fest@npm:0.20.2"
   checksum: 4fb3272df21ad1c552486f8a2f8e115c09a521ad7a8db3d56d53718d0c907b62c6e9141ba5f584af3f6830d0872c521357e512381f24f7c44acae583ad517d73
-  languageName: node
-  linkType: hard
-
-"type-fest@npm:^3.12.0":
-  version: 3.13.1
-  resolution: "type-fest@npm:3.13.1"
-  checksum: c06b0901d54391dc46de3802375f5579868949d71f93b425ce564e19a428a0d411ae8d8cb0e300d330071d86152c3ea86e744c3f2860a42a79585b6ec2fdae8e
   languageName: node
   linkType: hard
 

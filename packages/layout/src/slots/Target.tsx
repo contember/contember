@@ -1,7 +1,15 @@
 import { useClassName, useId } from '@contember/react-utils'
-import { assert, dataAttribute, isArrayOfMembersSatisfyingFactory, isNonEmptyArray, isNonEmptyTrimmedString, isSingleWordString, satisfiesOneOfFactory, setHasOneOf } from '@contember/utilities'
-import { snakeCase } from 'change-case'
-import { memo, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import {
+	assert,
+	dataAttribute,
+	isArrayOfMembersSatisfyingFactory,
+	isNonEmptyArray,
+	isNonEmptyTrimmedString,
+	isSingleWordString,
+	satisfiesOneOfFactory,
+	setHasOneOf,
+} from '@contember/utilities'
+import { memo, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useActiveSlotPortalsContext, useTargetsRegistryContext } from './contexts'
 import { SlotTargetProps } from './types'
 
@@ -101,7 +109,7 @@ export const Target = memo<SlotTargetProps>(
 					data-display={dataAttribute(display ?? (as === undefined ? true : undefined))}
 					data-id={id}
 					data-fallback={dataAttribute(!!fallback)}
-					data-name={dataAttribute(snakeCase(name).replace(/_/g, '-'))}
+					data-name={dataAttribute(name)}
 					className={className}
 					children={active ? null : fallback}
 				/>

@@ -1,8 +1,9 @@
 import { ComponentClassNameProps, PascalCase } from '@contember/utilities'
-import { CSSProperties, ComponentType, ElementType, ReactNode } from 'react'
+import { ComponentType, ElementType, ReactNode } from 'react'
 import { createSlotSourceComponent } from './createSlotSourceComponent'
 import { createSlotTargetComponent } from './createSlotTargetComponent'
 
+/** @deprecated No alternative since 1.4.0 */
 export type SlotComponentsRecords<K extends string> = Readonly<{
 	readonly [P in PascalCase<K>]: ComponentType
 }>

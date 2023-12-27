@@ -1,7 +1,8 @@
 import { createNonNullableContextFactory, noop } from '@contember/react-utils'
 import { deprecate } from '@contember/utilities'
-import { ComponentType, ElementType, Fragment, ReactNode, RefObject, createElement, useCallback } from 'react'
-import { SlotComponentsRecords } from './types'
+import { Fragment, createElement, useCallback } from 'react'
+import { createSlotTargetComponent } from './createSlotTargetComponent'
+import { SlotTargetComponentsRecord } from './types'
 
 export type SlotsRefMap = Map<string, HTMLElement>
 export type RegisterSlotTarget = (id: string, name: string, ref: HTMLElement) => void;
@@ -10,7 +11,7 @@ export type UnregisterSlotTarget = (id: string, name: string) => void;
 export type ActiveSlotPortalsContextType = Set<string>;
 export const [ActiveSlotPortalsContext, useActiveSlotPortalsContext] = createNonNullableContextFactory<ActiveSlotPortalsContextType>('ActiveSlotPortalsContext', new Set())
 
-export function useHasActiveSlotsFactory<T extends SlotComponentsRecords<string>>(SlotTargets: T) {
+export function useHasActiveSlotsFactory<T extends SlotTargetComponentsRecord<string>>(SlotTargets: T) {
 	const activeSlotPortals = useActiveSlotPortalsContext()
 
 	return useCallback((...slots: ReadonlyArray<keyof T & string>) => {
@@ -22,7 +23,7 @@ export function useHasActiveSlotsFactory<T extends SlotComponentsRecords<string>
  * Creates a function that returns a list of slot targets if any of them are active.
  * @param SlotTargets - List of slot targets to create
  */
-export function useSlotTargetsFactory<R extends SlotComponentsRecords<string>>(SlotTargets: R) {
+export function useSlotTargetsFactory<R extends SlotTargetComponentsRecord<string>>(SlotTargets: R) {
 	const activeSlotPortals = useActiveSlotPortalsContext()
 
 	return useCallback(function createSlotTargets<T>(slots: ReadonlyArray<keyof R & string>, override?: T) {
@@ -32,7 +33,7 @@ export function useSlotTargetsFactory<R extends SlotComponentsRecords<string>>(S
 			} else {
 				return createElement(Fragment, {}, ...slots.map(slot => {
 					if (slot in SlotTargets) {
-						const Target = SlotTargets[slot] as ComponentType
+						const Target = SlotTargets[slot] as ReturnType<typeof createSlotTargetComponent<typeof slot>>
 
 						return createElement(Target, {
 							key: `multi-element:${slot}`,
@@ -51,7 +52,7 @@ export function useSlotTargetsFactory<R extends SlotComponentsRecords<string>>(S
  * Fallback for `useSlotTargetsFactory` for backwards compatibility.
  * @deprecated Use `useSlotTargetsFactory` instead
  */
-export function useTargetsIfActiveFactory<R extends SlotComponentsRecords<string>>(SlotTargets: R) {
+export function useTargetsIfActiveFactory<R extends SlotTargetComponentsRecord<string>>(SlotTargets: R) {
 	deprecate('1.3.0', true, '`useTargetsIfActiveFactory()`', '`useSlotTargetsFactory()`')
 	return useSlotTargetsFactory(SlotTargets)
 }

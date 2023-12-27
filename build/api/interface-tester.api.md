@@ -26,7 +26,7 @@ export const createEnvironment: ({ model, role, pageConfig }: {
 }) => Environment;
 
 // @public (undocumented)
-export const createNode: (value: any) => ReactNode | undefined;
+export const createNode: (value: any) => ReactNode[];
 
 // @public (undocumented)
 export const getTests: (config: Config) => Promise<Test[]>;
@@ -36,7 +36,7 @@ export type PageConfig = {
     roles?: string[];
     parameters?: Environment.Parameters;
     dimensions?: Environment.SelectedDimensions;
-    createNode?: (exported: unknown) => ReactNode;
+    createNode?: (exported: unknown) => ReactNode | ReactNode[];
     testNode?: (node: ReactNode | undefined, environment: Environment, originalExport: unknown) => void;
 };
 

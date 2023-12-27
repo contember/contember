@@ -31,7 +31,7 @@ export const getTests = async (config: Config): Promise<Test[]> => {
 	let pageBaseDir
 	const possibleDirs = config.pagesDir ? [config.pagesDir] : ['pages', 'admin/pages']
 	for (const candidateDir of possibleDirs) {
-		const tmpBaseDir = join(process.cwd(), config.pagesDir ?? 'pages')
+		const tmpBaseDir = join(process.cwd(), candidateDir)
 		if (await pathExists(tmpBaseDir)) {
 			pageBaseDir = tmpBaseDir
 		}
@@ -90,8 +90,10 @@ export const getTests = async (config: Config): Promise<Test[]> => {
 					role,
 					pageConfig,
 					execute: () => {
-						const node = (pageConfig?.createNode ?? createNode)(_export)
-						;(pageConfig?.testNode ?? testNode)(node, environment, _export)
+						const nodes = (pageConfig?.createNode ?? createNode)(_export)
+						for (const node of !Array.isArray(nodes) ? [nodes] : nodes) {
+							(pageConfig?.testNode ?? testNode)(node, environment, _export)
+						}
 					},
 				})
 			}

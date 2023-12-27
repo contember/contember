@@ -8,5 +8,6 @@
 		{ "path": "../../admin/src" },
 		{ "path": "../../brand/src" },
 		{ "path": "../../layout/src" },
+		{ "path": "../../react-board-ui/src" },
 	]
 }

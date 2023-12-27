@@ -1,0 +1,36 @@
+{
+	"formatVersion": 3,
+	"modifications": [
+		{
+			"modification": "createColumn",
+			"entityName": "User",
+			"field": {
+				"name": "order",
+				"columnName": "order",
+				"columnType": "integer",
+				"nullable": true,
+				"type": "Integer"
+			}
+		},
+		{
+			"modification": "patchAclSchema",
+			"patch": [
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/User/operations/read/order",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/User/operations/create/order",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/User/operations/update/order",
+					"value": true
+				}
+			]
+		}
+	]
+}

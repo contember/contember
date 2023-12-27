@@ -207,7 +207,7 @@ export namespace EntityAccessor {
     // (undocumented)
     export type BatchUpdatesHandler = (getAccessor: GetEntityAccessor, options: BatchUpdatesOptions) => void;
     // (undocumented)
-    export type BeforePersistHandler = (getAccessor: GetEntityAccessor, options: AsyncBatchUpdatesOptions) => void | Promise<void | BeforePersistHandler>;
+    export type BeforePersistHandler = (getAccessor: GetEntityAccessor, options: AsyncBatchUpdatesOptions) => void | BeforePersistHandler | Promise<void | BeforePersistHandler>;
     // (undocumented)
     export interface EntityEventListenerMap extends RuntimeEntityEventListenerMap {
         // (undocumented)
@@ -233,7 +233,7 @@ export namespace EntityAccessor {
     // (undocumented)
     export type PersistErrorHandler = (getAccessor: GetEntityAccessor, options: PersistErrorOptions) => void | Promise<void>;
     // (undocumented)
-    export type PersistSuccessHandler = (getAccessor: GetEntityAccessor, options: PersistSuccessOptions) => void | Promise<void | PersistSuccessHandler>;
+    export type PersistSuccessHandler = (getAccessor: GetEntityAccessor, options: PersistSuccessOptions) => void | PersistSuccessHandler | Promise<void | PersistSuccessHandler>;
     // (undocumented)
     export interface RuntimeEntityEventListenerMap {
         // (undocumented)

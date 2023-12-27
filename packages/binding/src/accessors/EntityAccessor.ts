@@ -262,7 +262,7 @@ namespace EntityAccessor {
 	export type BeforePersistHandler = (
 		getAccessor: GetEntityAccessor,
 		options: AsyncBatchUpdatesOptions,
-	) => void | Promise<void | BeforePersistHandler>
+	) => void | BeforePersistHandler | Promise<void | BeforePersistHandler>
 
 	export type PersistErrorHandler = (
 		getAccessor: GetEntityAccessor,
@@ -272,7 +272,7 @@ namespace EntityAccessor {
 	export type PersistSuccessHandler = (
 		getAccessor: GetEntityAccessor,
 		options: PersistSuccessOptions,
-	) => void | Promise<void | PersistSuccessHandler>
+	) => void | PersistSuccessHandler | Promise<void | PersistSuccessHandler>
 
 	export interface RuntimeEntityEventListenerMap {
 		beforePersist: BeforePersistHandler

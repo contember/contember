@@ -1,5 +1,4 @@
 import { COLOR_SCHEME_CLASS_NAME_REG_EXP } from './constants'
-import { ColorSchemeClassName } from './types'
 
 /**
  * Returns a string with a color scheme class name, prefixed with `scheme-`
@@ -23,14 +22,10 @@ import { ColorSchemeClassName } from './types'
  * // </div>
  * ```
  */
-export function colorSchemeClassName(scheme: string): ColorSchemeClassName;
-export function colorSchemeClassName(scheme: null | undefined): undefined;
-export function colorSchemeClassName(scheme: string | null | undefined): ColorSchemeClassName | undefined {
-	if (typeof scheme === 'string') {
-		return `scheme-${scheme}`
-	} else {
-		return undefined
-	}
+export function colorSchemeClassName(scheme: string): string
+export function colorSchemeClassName(scheme: string | null | undefined): string | undefined
+export function colorSchemeClassName(scheme: string | null | undefined): string | undefined {
+	return typeof scheme === 'string' ? `scheme-${scheme}` : undefined
 }
 
 /**
@@ -39,6 +34,6 @@ export function colorSchemeClassName(scheme: string | null | undefined): ColorSc
  * @returns `true` if the string is a color scheme CSS class
  * @internal
  */
-export function isColorSchemeClassName(value: string): value is ColorSchemeClassName {
+export function isColorSchemeClassName(value: string) {
 	return COLOR_SCHEME_CLASS_NAME_REG_EXP.test(value)
 }

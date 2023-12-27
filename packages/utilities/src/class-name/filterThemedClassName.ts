@@ -2,16 +2,16 @@ import { isColorSchemeClassName } from './colorSchemeClassName'
 import { THEME_CLASS_NAME_REG_EXP } from './constants'
 import { flatClassNameList } from './flatClassNameList'
 import { contentThemeClassName, controlsThemeClassName } from './themeClassName'
-import { ColorSchemeClassName, NestedClassName } from './types'
+import { NestedClassName } from './types'
 
 export type ThemeConfig = { content: string | undefined, controls: string | undefined }
 
 export function filterThemedClassName(
 	nestedClassName: NestedClassName,
-	defaultColorSchemeContext: ColorSchemeClassName,
+	defaultColorSchemeContext: string,
 ) {
 	const theme: ThemeConfig = { content: undefined, controls: undefined }
-	let colorScheme: ColorSchemeClassName | undefined = undefined
+	let colorScheme: string | undefined = undefined
 
 	const flatClassName = flatClassNameList(nestedClassName).map(className => {
 		if (isColorSchemeClassName(className)) {

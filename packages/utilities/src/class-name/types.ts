@@ -5,7 +5,3 @@ export interface ComponentClassNameProps {
 	className?: NestedClassName;
 	componentClassName?: string | string[];
 }
-
-export type ColorSchemeClassName = `scheme-${string}`
-export type ThemeContentClassName = `theme-${string}-content`
-export type ThemeControlsClassName = `theme-${string}-controls`

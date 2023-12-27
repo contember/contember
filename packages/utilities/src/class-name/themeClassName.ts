@@ -1,5 +1,3 @@
-import { ThemeContentClassName, ThemeControlsClassName } from './types'
-
 /**
  * Returns a string with a content theme class name, prefixed with `theme-` and suffixed with `-content`
  *
@@ -25,7 +23,7 @@ import { ThemeContentClassName, ThemeControlsClassName } from './types'
  * )
  * ```
  */
-export function contentThemeClassName(theme: string | null | undefined): ThemeContentClassName | undefined {
+export function contentThemeClassName(theme: string | null | undefined): string | undefined {
 	return theme ? `theme-${theme}-content` : undefined
 }
 
@@ -54,9 +52,7 @@ export function contentThemeClassName(theme: string | null | undefined): ThemeCo
  * )
  * ```
  */
-export function controlsThemeClassName(
-	theme: string | null | undefined,
-): ThemeControlsClassName | undefined {
+export function controlsThemeClassName(theme: string | null | undefined): string | undefined {
 	return theme ? `theme-${theme}-controls` : undefined
 }
 

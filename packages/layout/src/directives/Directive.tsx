@@ -1,25 +1,23 @@
 import { useId } from '@contember/react-utils'
-import { RequiredDeepPlainObject, assert, isNonEmptyTrimmedString } from '@contember/utilities'
 import { memo, useContext, useLayoutEffect, useRef } from 'react'
 import { RegistryContext } from './contexts'
 
 export type DirectiveProps<T> = { [K in keyof T]: { name: K, content: T[K] } }[keyof T]
 
-export interface DirectiveComponentType<
-	T extends Record<string, unknown> = Record<string, unknown>,
-> extends React.ExoticComponent<DirectiveProps<RequiredDeepPlainObject<T>>> {
-	displayName?: string | undefined;
-}
+export type DirectiveComponentType<T extends Record<string, unknown> = Record<string, unknown>> =
+	& React.ExoticComponent<DirectiveProps<T>>
+	& {
+		displayName?: string | undefined;
+	}
 
 export function useDirectiveLifecycle<
-	T extends RequiredDeepPlainObject,
-	K extends keyof T,
+	T extends Record<string, unknown>,
+	K extends keyof T & string,
 	V extends T[K],
 >(
 	name: K,
 	content: V,
 ) {
-	assert('name is non-empty string', name, isNonEmptyTrimmedString)
 	const { update, register, unregister } = useContext(RegistryContext)
 
 	const directiveId = useRef(`Directive(${name}):${useId()}`)
@@ -48,7 +46,7 @@ export function useDirectiveLifecycle<
 /**
  * @group Layout
  */
-export const Directive: DirectiveComponentType<RequiredDeepPlainObject> = memo<DirectiveProps<Record<string, unknown>>>(({ name, content }) => {
+export const Directive: DirectiveComponentType = memo<DirectiveProps<Record<string, unknown>>>(({ name, content }) => {
 	useDirectiveLifecycle(name, content)
 
 	return null

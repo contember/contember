@@ -1,5 +1,5 @@
-import { assert, isNonEmptyTrimmedString, isNonNegativeNumber, isNotNullish } from '@contember/utilities'
-import { MaybePanelBehavior, MaybePanelVisibility, PanelBehavior, PanelConfig, PanelVisibility, isOneOfPanelBehaviors, isOneOfPanelVisibilities } from './Types'
+import { assert, isNonNegativeNumber } from '@contember/utilities'
+import { MaybePanelBehavior, MaybePanelVisibility, PanelBehavior, PanelConfig, PanelVisibility } from './Types'
 
 export function parsePanelsState(currentlyActivePanel: string | undefined, panels: Map<string, PanelConfig>) {
 	const requestedVisibilities: Map<string, MaybePanelVisibility> = new Map
@@ -17,36 +17,27 @@ export function parsePanelsState(currentlyActivePanel: string | undefined, panel
 
 	panels.forEach(panel => {
 		const name = panel.name
-		assert('name is present', name, isNonEmptyTrimmedString)
 
 		const requestedBehavior = panel.behavior
 		const defaultBehavior = panel.defaultBehavior
-		if (requestedBehavior != null) {
-			assert('behavior is present or nullish', requestedBehavior, isOneOfPanelBehaviors)
-		}
-		if (defaultBehavior != null) {
-			assert('defaultBehavior is present or nullish', defaultBehavior, isOneOfPanelBehaviors)
-		}
 		requestedBehaviors.set(name, requestedBehavior)
 		initialBehaviors.set(name, defaultBehavior)
 
 		const behavior = requestedBehavior ?? defaultBehavior
-		assert('behavior is not nullish', behavior, isNotNullish)
+		if (!behavior) {
+			throw new Error(`Panel ${name} has no behavior`)
+		}
 
 		const defaultVisibility = panel.defaultVisibility
 		const requestedVisibility = panel.visibility ?? defaultVisibility
-		if (requestedVisibility != null) {
-			assert('visibility is present or nullish', requestedVisibility, isOneOfPanelVisibilities)
-		}
-		if (defaultVisibility != null) {
-			assert('defaultVisibility is present or nullish', defaultVisibility, isOneOfPanelVisibilities)
-		}
 
 		requestedVisibilities.set(name, requestedVisibility)
 		initialVisibilities.set(name, defaultVisibility)
 
 		const visibility = requestedVisibility ?? defaultVisibility
-		assert('visibility is not nullish', visibility, isNotNullish)
+		if (!visibility) {
+			throw new Error(`Panel ${name} has no visibility`)
+		}
 
 		resultingVisibilities.set(name, behavior === 'static' ? 'visible' : visibility)
 		resultingBehaviors.set(name, behavior)
@@ -81,8 +72,12 @@ export function parsePanelsState(currentlyActivePanel: string | undefined, panel
 				const a_behavior: PanelBehavior | null | undefined = a.behavior ?? a.defaultBehavior
 				const b_behavior: PanelBehavior | null | undefined = b.behavior ?? b.defaultBehavior
 
-				assert('behavior is defined', a_behavior, isNotNullish)
-				assert('behavior is defined', b_behavior, isNotNullish)
+				if (!a_behavior) {
+					throw new Error(`Panel ${a.name} has no behavior`)
+				}
+				if (!b_behavior) {
+					throw new Error(`Panel ${b.name} has no behavior`)
+				}
 
 				let difference = layoutSpaceRequirement[b_behavior] ?? -layoutSpaceRequirement[a_behavior]
 

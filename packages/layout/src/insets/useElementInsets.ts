@@ -1,5 +1,5 @@
 import { useOnElementResize, useReferentiallyStableCallback, useScopedConsoleRef } from '@contember/react-utils'
-import { assert, getElementDimensions, getSizeFromResizeObserverEntryFactory, isHTMLElement, pick } from '@contember/utilities'
+import { getElementDimensions, getSizeFromResizeObserverEntryFactory, pick } from '@contember/utilities'
 import { CSSProperties, RefObject, useEffect, useMemo, useState } from 'react'
 import { useContainerInsetsContext } from './Contexts'
 import { getElementInsets } from './Helpers'
@@ -112,7 +112,9 @@ async function getPreviousElementSiblingWithLayout(element: HTMLElement): Promis
 	const sibling = element.previousElementSibling
 
 	if (sibling) {
-		assert('sibling is isHTMLElement', sibling, isHTMLElement)
+		if (!(sibling instanceof HTMLElement)) {
+			throw new Error(`Sibling is not HTMLElement`)
+		}
 
 		const { width, height } = await getElementDimensions(sibling)
 
@@ -130,7 +132,9 @@ async function getNextElementSiblingWithLayout(element: HTMLElement): Promise<HT
 	const sibling = element.nextElementSibling
 
 	if (sibling) {
-		assert('sibling is isHTMLElement', sibling, isHTMLElement)
+		if (!(sibling instanceof HTMLElement)) {
+			throw new Error(`Sibling is not HTMLElement`)
+		}
 
 		const { width, height } = await getElementDimensions(sibling)
 

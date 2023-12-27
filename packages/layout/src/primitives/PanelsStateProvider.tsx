@@ -1,4 +1,4 @@
-import { assert, isDefined } from '@contember/utilities'
+import { assert } from '@contember/utilities'
 import deepEqual from 'fast-deep-equal/es6/index.js'
 import { ReactNode, memo, useCallback, useMemo, useState } from 'react'
 import { GetLayoutPanelsStateContext, SetLayoutPanelsStateContext, SetLayoutPanelsStateContextType } from './Contexts'
@@ -18,7 +18,9 @@ export const PanelsStateProvider = memo<{ children: ReactNode }>(({ children }) 
 		setPanels(panels => {
 			if (panels.has(panel)) {
 				const previous = panels.get(panel)
-				assert(`previous value is defined`, previous, isDefined<PanelConfig>)
+				if (previous === undefined) {
+					throw new Error(`Previous value is undefined`)
+				}
 
 				const next = updater(previous)
 

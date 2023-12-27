@@ -1,9 +1,8 @@
 import { createNonNullableContextFactory } from '@contember/react-utils'
-import { RequiredDeepPlainObject } from '@contember/utilities'
 import { createContext, useContext } from 'react'
 import { RegistryContextType } from './types'
 
-export const StateContext = createContext<RequiredDeepPlainObject>({})
+export const StateContext = createContext<Record<string, unknown>>({})
 StateContext.displayName = 'Interface.Directives.StateContext'
 
 export const [RegistryContext, useRegistryContext] = createNonNullableContextFactory<RegistryContextType<Record<string, unknown>>>('Interface.Directives.RegistryContext', {
@@ -12,6 +11,6 @@ export const [RegistryContext, useRegistryContext] = createNonNullableContextFac
 	update: undefined,
 })
 
-export function useDirectives<T extends RequiredDeepPlainObject>() {
+export function useDirectives<T extends Record<string, unknown>>() {
 	return useContext(StateContext) as T
 }

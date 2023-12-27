@@ -1,20 +1,13 @@
-import { ComponentClassNameProps, PolymorphicComponent, isArrayOfMembersSatisfyingFactory, isNonEmptyString, isOneOfFactory, satisfiesOneOfFactory } from '@contember/utilities'
-import { ComponentProps, PropsWithChildren, ReactNode, RefObject } from 'react'
+import { ComponentClassNameProps, PolymorphicComponent } from '@contember/utilities'
+import { ComponentProps, PropsWithChildren, RefObject } from 'react'
 
 export const panelBehaviorsList = ['static', 'collapsible', 'overlay', 'modal'] as const
 export type PanelBehavior = typeof panelBehaviorsList[number]
-export const isOneOfPanelBehaviors = isOneOfFactory<PanelBehavior>(panelBehaviorsList)
 export type MaybePanelBehavior = PanelBehavior | null
 
 export const panelVisibilityList = ['visible', 'hidden'] as const
 export type PanelVisibility = typeof panelVisibilityList[number]
-export const isOneOfPanelVisibilities = isOneOfFactory<PanelVisibility>(panelVisibilityList)
 export type MaybePanelVisibility = PanelVisibility | null
-
-export const isComponentClassName = satisfiesOneOfFactory(
-	isArrayOfMembersSatisfyingFactory(isNonEmptyString),
-	isNonEmptyString,
-)
 
 export type OwnContainerProps = ComponentClassNameProps & PropsWithChildren<{
 	showDataState?: boolean;

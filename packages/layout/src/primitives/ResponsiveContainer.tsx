@@ -1,5 +1,5 @@
 import { useClassName, useContainerWidth } from '@contember/react-utils'
-import { assert, dataAttribute, isNotNullish } from '@contember/utilities'
+import { assert, dataAttribute } from '@contember/utilities'
 import { forwardRef, memo, useLayoutEffect, useMemo, useRef } from 'react'
 import { GetLayoutPanelsStateContext, GetLayoutPanelsStateContextType, useGetLayoutPanelsStateContext } from './Contexts'
 import { ContainerComponentType, PanelConfig } from './Types'
@@ -62,7 +62,9 @@ export const ResponsiveContainer: ContainerComponentType = memo(forwardRef(({
 			groups.otherPanels.forEach(panel => {
 				const name = panel.name
 				const behavior = maps.resultingBehaviors.get(name)
-				assert('behavior is defined', behavior, isNotNullish)
+				if (!behavior) {
+					throw new Error(`Behavior for panel ${name} is not defined`)
+				}
 
 				maps.resultingBehaviors.set(name, behavior)
 
@@ -83,8 +85,12 @@ export const ResponsiveContainer: ContainerComponentType = memo(forwardRef(({
 			const name = panel.name
 			const visibility = maps.resultingVisibilities.get(name)
 			const behavior = maps.resultingBehaviors.get(name)
-			assert('behavior is defined', behavior, isNotNullish)
-			assert('visibility is not nullish', visibility, isNotNullish)
+			if (!visibility) {
+				throw new Error(`Visibility for panel ${name} is not defined`)
+			}
+			if (!behavior) {
+				throw new Error(`Behavior for panel ${name} is not defined`)
+			}
 
 			const previousPanelState = previous?.panels.get(name)
 

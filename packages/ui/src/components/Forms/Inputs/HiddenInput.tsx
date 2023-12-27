@@ -1,5 +1,5 @@
 import { useClassName } from '@contember/react-utils'
-import { dataAttribute, deprecate, isDefined } from '@contember/utilities'
+import { dataAttribute, deprecate } from '@contember/utilities'
 import { forwardRef, memo } from 'react'
 import { useTextBasedInput } from '../Hooks'
 import type { TextInputProps } from './Types'
@@ -14,7 +14,7 @@ export const HiddenInput = memo(forwardRef<HTMLInputElement, TextInputProps>(({
 	type: _INTENTIONALLY_OMITTED_type,
 	...outerProps
 }, forwardedRed) => {
-	deprecate('1.4.0', isDefined(withTopToolbar), '`withTopToolbar` prop', null)
+	deprecate('1.4.0', withTopToolbar !== undefined, '`withTopToolbar` prop', null)
 
 	const props = useTextBasedInput<HTMLInputElement>({
 		...outerProps,

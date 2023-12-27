@@ -1,4 +1,3 @@
-import { assert, isNonEmptyString } from '@contember/utilities'
 import { ReactNode, createContext, memo, useContext, useMemo, useRef } from 'react'
 import { isNoopScopedConsole, noopScopedConsole } from './Constants'
 import { ScopedConsoleContextType } from './Types'
@@ -44,8 +43,9 @@ function parentScopedConsoleOrNone(parentConsole: ScopedConsoleContextType): Sco
 }
 
 export const useScopedConsoleRef = (prefix: string, override?: boolean) => {
-	assert('prefix is non-empty string', prefix, isNonEmptyString)
-
+	if (prefix.length === 0) {
+		throw new Error('Prefix must be non-empty string')
+	}
 	const parentConsole = parentScopedConsoleOrNone(useContext(ScopedConsoleContext))
 
 	const scopedConsole = useMemo(() => {

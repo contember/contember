@@ -1,5 +1,5 @@
 import { useClassName } from '@contember/react-utils'
-import { dataAttribute, deprecate, isDefined } from '@contember/utilities'
+import { dataAttribute, deprecate } from '@contember/utilities'
 import { forwardRef, memo, useCallback, useRef } from 'react'
 import { toViewClass } from '../../../utils'
 import { useTextBasedInput } from '../Hooks'
@@ -19,7 +19,7 @@ export const FloatInput = memo(forwardRef<HTMLInputElement, FloatInputProps>(({
 	withTopToolbar,
 	...outerProps
 }, forwardedRed) => {
-	deprecate('1.4.0', isDefined(withTopToolbar), '`withTopToolbar` prop', null)
+	deprecate('1.4.0', withTopToolbar !== undefined, '`withTopToolbar` prop', null)
 
 	const number = useRef<string>()
 

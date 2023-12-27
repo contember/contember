@@ -1,9 +1,9 @@
 import { useClassNameFactory } from '@contember/react-utils'
-import { assert, isNotNullish, isSlugString } from '@contember/utilities'
 import { ElementType, forwardRef, memo } from 'react'
 import { InsetsConsumer } from '../insets'
-import { GetLayoutPanelsStateContext, isComponentClassName } from '../primitives'
+import { GetLayoutPanelsStateContext } from '../primitives'
 import { BarComponentType } from './Types'
+import { isSlugString } from '../utils/isSlugString'
 
 export function createLayoutBarComponent({
 	name,
@@ -16,13 +16,9 @@ export function createLayoutBarComponent({
 	defaultComponentClassName?: string | string[];
 	displayName: string;
 }) {
-	assert('name is a slug string', name, isSlugString)
-	assert('as is defined', defaultAs, isNotNullish)
-	assert(
-		'componentClassName is either a non-empty string or an array of non-empty strings',
-		defaultComponentClassName,
-		isComponentClassName,
-	)
+	if (!isSlugString(name)) {
+		throw new Error(`Name must be a slug string, got: ${name}`)
+	}
 
 	const Component: BarComponentType = memo(forwardRef(({
 		as = defaultAs,

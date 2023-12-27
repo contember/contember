@@ -1,5 +1,5 @@
-import { assert, isNonEmptyString, isNonNegativeNumber } from '@contember/utilities'
-import { OwnPanelProps, isOneOfPanelBehaviors, isOneOfPanelVisibilities, panelBehaviorsList, panelVisibilityList } from './Types'
+import { assert, isNonNegativeNumber } from '@contember/utilities'
+import { OwnPanelProps } from './Types'
 
 export function parseLayoutPanelProps<T extends OwnPanelProps>(props: T): T {
 	if (props.defaultVisibility == null && props.visibility == null) {
@@ -29,22 +29,8 @@ export function parseLayoutPanelProps<T extends OwnPanelProps>(props: T): T {
 		throw new Error('You have provided `behavior` prop without a `onBehaviorChange` callback. Either provide a callback and use component as controlled or use `defaultBehavior` to use component as uncontrolled')
 	}
 
-	if (props.name != null) {
-		assert('LayoutPanel.panel to be a non-empty string', props.name, isNonEmptyString)
-	} else {
-		throw new Error('LayoutPanel.name is required')
-	}
-
 	if (props.basis != null) {
 		assert('LayoutPanel.basis to be number', props.basis, isNonNegativeNumber)
-	}
-
-	if (props.behavior != null) {
-		assert(`LayoutPanel.behavior to be one of defined behaviors ${panelBehaviorsList.join(', ')}`, props.behavior, isOneOfPanelBehaviors)
-	}
-
-	if (props.defaultVisibility != null) {
-		assert(`LayoutPanel.defaultVisibility to be one of defined visibilities ${panelVisibilityList.join(', ')}`, props.defaultVisibility, isOneOfPanelVisibilities)
 	}
 
 	if (props.maxWidth != null) {

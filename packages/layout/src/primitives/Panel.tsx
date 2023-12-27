@@ -1,5 +1,5 @@
 import { useClassNameFactory, useComposeRef, useContainerWidth, useElementSize, usePreviousValue, useReferentiallyStableCallback } from '@contember/react-utils'
-import { assert, dataAttribute, isNotNullish, px } from '@contember/utilities'
+import { dataAttribute, px } from '@contember/utilities'
 import { CSSProperties, forwardRef, memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef } from 'react'
 import { FocusScope } from '../focus-scope'
 import { ContainerInsetsContext, InsetsConsumer, useElementInsets, useSafeAreaInsetsContext } from '../insets'
@@ -64,8 +64,12 @@ export const Panel: PanelComponentType = memo(forwardRef(
 		const contextBehavior = panelState?.behavior ?? behavior ?? defaultBehavior
 		const contextVisibility = panelState?.visibility ?? visibility ?? defaultVisibility
 
-		assert('context visibility is not nullish', contextVisibility, isNotNullish)
-		assert('context behavior is not nullish', contextBehavior, isNotNullish)
+		if (!contextVisibility) {
+			throw new Error(`Panel ${name} has no visibility`)
+		}
+		if (!contextBehavior) {
+			throw new Error(`Panel ${name} has no behavior`)
+		}
 
 		const previousBehavior = usePreviousValue(contextBehavior)
 		const previousVisibility = usePreviousValue(contextVisibility)

@@ -1,14 +1,5 @@
 import { useClassName, useId } from '@contember/react-utils'
-import {
-	assert,
-	dataAttribute,
-	isArrayOfMembersSatisfyingFactory,
-	isNonEmptyArray,
-	isNonEmptyTrimmedString,
-	isSingleWordString,
-	satisfiesOneOfFactory,
-	setHasOneOf,
-} from '@contember/utilities'
+import { dataAttribute, setHasOneOf } from '@contember/utilities'
 import { memo, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useActiveSlotPortalsContext, useTargetsRegistryContext } from './contexts'
 import { SlotTargetProps } from './types'
@@ -16,16 +7,6 @@ import { SlotTargetProps } from './types'
 export type OwnTargetContainerProps = {
 	className: string;
 }
-
-const isNameString = satisfiesOneOfFactory(
-	isNonEmptyTrimmedString,
-	isSingleWordString,
-)
-
-const nonEmptyArrayOfNonEmptyStrings = satisfiesOneOfFactory(
-	isNonEmptyArray,
-	isArrayOfMembersSatisfyingFactory(isNameString),
-)
 
 /**
  * @group Layout
@@ -41,12 +22,6 @@ export const Target = memo<SlotTargetProps>(
 		name,
 		...rest
 	}) => {
-		assert('name is non-empty string without spaces', name, isNameString)
-
-		if (aliases) {
-			assert('aliases is an empty array or an array of names', aliases, nonEmptyArrayOfNonEmptyStrings)
-		}
-
 		const [element, setElement] = useState<HTMLElement | null>(null)
 		const id = useId()
 		const { unregisterSlotTarget, registerSlotTarget } = useTargetsRegistryContext()

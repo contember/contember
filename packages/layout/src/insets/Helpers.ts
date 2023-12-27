@@ -1,4 +1,4 @@
-import { assert, isNonNegativeNumber, px } from '@contember/utilities'
+import { assert, px } from '@contember/utilities'
 import type { ContainerInsets, ContainerOffsets } from './Types'
 import { ElementRect } from './Types'
 
@@ -25,11 +25,7 @@ export function combineElementInsets(...insets: Array<Partial<ContainerInsets> |
 }
 
 function clampSingleElementInset(containerInset: number | undefined, elementInset: number): number {
-	if (isNonNegativeNumber(containerInset)) {
-		return elementInset >= containerInset ? containerInset : 0
-	} else {
-		return 0
-	}
+	return containerInset !== undefined && elementInset >= containerInset ? containerInset : 0
 }
 
 function clampElementInsets(containerInsets: ContainerInsets | null | undefined, elementInsets: ContainerInsets): ContainerInsets {
@@ -42,11 +38,7 @@ function clampElementInsets(containerInsets: ContainerInsets | null | undefined,
 }
 
 function getSingleElementInset(containerInset: number | undefined, elementOffset: number | undefined): number {
-	if (isNonNegativeNumber(containerInset)) {
-		return Math.max(0, containerInset - (elementOffset ?? 0))
-	} else {
-		return 0
-	}
+	return containerInset !== undefined ? Math.max(0, containerInset - (elementOffset ?? 0)) : 0
 }
 
 export function getElementInsets(containerInsets: ContainerInsets | null | undefined, elementOffsets: ContainerOffsets | null | undefined): ContainerInsets {

@@ -170,7 +170,7 @@ export const LayoutChrome = memo(({
 					toViewClass('no-bar', !hasBar),
 					contentThemeClassName(themeContent ?? theme),
 					controlsThemeClassName(themeControls ?? theme),
-					colorSchemeClassName(scheme), ,
+					colorSchemeClassName(scheme),
 					toViewClass('collapsed', collapsed),
 				])}
 			>

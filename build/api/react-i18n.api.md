@@ -4,6 +4,7 @@
 
 ```ts
 
+import { JSX as JSX_2 } from 'react/jsx-runtime';
 import { ReactNode } from 'react';
 
 // @public (undocumented)
@@ -11,7 +12,7 @@ export class I18nError extends Error {
 }
 
 // @public (undocumented)
-export function I18nProvider({ localeCode, dictionaries, children }: I18nProviderProps): JSX.Element;
+export function I18nProvider({ localeCode, dictionaries, children }: I18nProviderProps): JSX_2.Element;
 
 // @public (undocumented)
 export interface I18nProviderProps {

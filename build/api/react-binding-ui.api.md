@@ -20,6 +20,7 @@ import { HTMLAnchorElementProps } from '@contember/ui';
 import { HTMLImageElementProps } from '@contember/ui';
 import { HTMLVideoElementProps } from '@contember/ui';
 import { IconProps } from '@contember/ui';
+import { JSX as JSX_2 } from 'react/jsx-runtime';
 import { MemoExoticComponent } from 'react';
 import { NamedExoticComponent } from 'react';
 import { PersistOptions } from '@contember/react-binding';
@@ -87,7 +88,7 @@ export interface CoalesceFieldViewProps<Persisted extends FieldValue = FieldValu
 }
 
 // @public (undocumented)
-export const CreateNewEntityButton: MemoExoticComponent<({ createNewEntity, iconProps, children, ...buttonProps }: CreateNewEntityButtonProps) => JSX.Element>;
+export const CreateNewEntityButton: MemoExoticComponent<({ createNewEntity, iconProps, children, ...buttonProps }: CreateNewEntityButtonProps) => JSX_2.Element>;
 
 // @public (undocumented)
 export type CreateNewEntityButtonProps = ButtonProps & {
@@ -113,7 +114,7 @@ export type DateFieldViewProps = {
 } & DateFieldViewFormattingProps & FieldFallbackViewPublicProps;
 
 // @public
-export const DeleteEntityButton: MemoExoticComponent<(props: DeleteEntityButtonProps) => JSX.Element | null>;
+export const DeleteEntityButton: MemoExoticComponent<(props: DeleteEntityButtonProps) => JSX_2.Element | null>;
 
 // @public (undocumented)
 export type DeleteEntityButtonProps = {
@@ -122,7 +123,7 @@ export type DeleteEntityButtonProps = {
 } & ButtonProps;
 
 // @public (undocumented)
-export const EmptyMessage: MemoExoticComponent<({ children, component, padding, ...rest }: EmptyMessageProps) => JSX.Element>;
+export const EmptyMessage: MemoExoticComponent<({ children, component, padding, ...rest }: EmptyMessageProps) => JSX_2.Element>;
 
 // @public (undocumented)
 export type EmptyMessageComponentProps = BoxProps & {

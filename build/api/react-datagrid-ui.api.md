@@ -4,8 +4,6 @@
 
 ```ts
 
-/// <reference types="react" />
-
 import { BooleanCellRendererProps } from '@contember/react-datagrid';
 import { BooleanFilterArtifacts } from '@contember/react-datagrid';
 import { CoalesceCellRendererProps } from '@contember/react-datagrid';
@@ -36,6 +34,7 @@ import { FunctionComponent } from 'react';
 import { GenericTextCellFilterArtifacts } from '@contember/react-datagrid';
 import { HasManySelectProps } from '@contember/react-datagrid';
 import { HasOneSelectProps } from '@contember/react-datagrid';
+import { JSX as JSX_2 } from 'react/jsx-runtime';
 import { Justification } from '@contember/ui';
 import { MemoExoticComponent } from 'react';
 import { NamedExoticComponent } from 'react';
@@ -64,7 +63,7 @@ format?: ((date: boolean) => ReactNode) | undefined;
 } & FieldFallbackViewProps>;
 
 // @public (undocumented)
-export const BooleanCellFilter: ({ setFilter, filter }: FilterRendererProps<BooleanFilterArtifacts>) => JSX.Element;
+export const BooleanCellFilter: ({ setFilter, filter }: FilterRendererProps<BooleanFilterArtifacts>) => JSX_2.Element;
 
 // @public
 export const CoalesceTextCell: FunctionComponent<DataGridColumnCommonProps & CoalesceCellRendererProps & {
@@ -244,7 +243,7 @@ export const DataGridHeader: NamedExoticComponent<DataGridHeaderProps>;
 export function DataGridHeaderCell(props: DataGridHeaderCellProps): ReactElement;
 
 // @public (undocumented)
-export const DataGridHeaderCellFilterDropdown: (props: DataGridHeaderCellFilterDropdownProps) => JSX.Element | null;
+export const DataGridHeaderCellFilterDropdown: (props: DataGridHeaderCellFilterDropdownProps) => JSX_2.Element | null;
 
 // @public (undocumented)
 export type DataGridHeaderCellFilterDropdownProps = DataGridRenderingCommonProps & {
@@ -279,7 +278,7 @@ export type DataGridHeaderProps = DataGridRenderingCommonProps & DataGridHeaderP
 export type DataGridHeaderPublicProps = DataGridLayoutControlPublicProps & DataGridColumnHidingPublicProps & DataGridFullFiltersPublicProps;
 
 // @public (undocumented)
-export const DataGridLayoutControl: ({ stateMethods: { setLayout }, desiredState: { layout }, tile }: DataGridLayoutControlProps) => JSX.Element | null;
+export const DataGridLayoutControl: ({ stateMethods: { setLayout }, desiredState: { layout }, tile }: DataGridLayoutControlProps) => JSX_2.Element | null;
 
 // @public (undocumented)
 export type DataGridLayoutControlProps = DataGridRenderingCommonProps & DataGridLayoutControlPublicProps;
@@ -290,7 +289,7 @@ export type DataGridLayoutControlPublicProps = {
 };
 
 // @public (undocumented)
-export const DataGridPagingSummary: ({ pagingInfo, displayedState: { paging: { pageIndex } } }: DataGridPagingSummaryProps) => JSX.Element;
+export const DataGridPagingSummary: ({ pagingInfo, displayedState: { paging: { pageIndex } } }: DataGridPagingSummaryProps) => JSX_2.Element;
 
 // @public (undocumented)
 export type DataGridPagingSummaryProps = DataGridRenderingCommonProps;
@@ -305,7 +304,7 @@ export const DataGridTable: NamedExoticComponent<DataGridTableProps>;
 export type DataGridTableHead = DataGridRenderingCommonProps;
 
 // @public (undocumented)
-export const DataGridTableHead: (props: DataGridTableHead) => JSX.Element;
+export const DataGridTableHead: (props: DataGridTableHead) => JSX_2.Element;
 
 // @public (undocumented)
 export type DataGridTableProps = DataGridRenderingCommonProps & DataGridTablePublicProps & EntityListBaseProps;
@@ -317,7 +316,7 @@ export type DataGridTablePublicProps = {
 } & DataGridTableRowPublicProps;
 
 // @public (undocumented)
-export const DataGridTableRow: ({ desiredState, displayedState, onEntityClick, isEntitySelected, selectedEntityIds }: DataGridTableRowProps) => JSX.Element;
+export const DataGridTableRow: ({ desiredState, displayedState, onEntityClick, isEntitySelected, selectedEntityIds }: DataGridTableRowProps) => JSX_2.Element;
 
 // @public (undocumented)
 export type DataGridTableRowProps = DataGridRenderingCommonProps & DataGridTableRowPublicProps;
@@ -330,7 +329,7 @@ export type DataGridTableRowPublicProps = {
 };
 
 // @public (undocumented)
-export const DataGridTiles: MemoExoticComponent<({ accessor, tileSize, tile, emptyMessage, emptyMessageComponent }: DataGridTilesProps) => JSX.Element>;
+export const DataGridTiles: MemoExoticComponent<({ accessor, tileSize, tile, emptyMessage, emptyMessageComponent }: DataGridTilesProps) => JSX_2.Element>;
 
 // @public (undocumented)
 export type DataGridTilesProps = DataGridRenderingCommonProps & DataGridTilesPublicProps;
@@ -365,7 +364,7 @@ options: Record<string, string>;
 }>;
 
 // @public (undocumented)
-export const EnumCellFilter: ({ filter, setFilter, environment, field, options, showNullConditionFilter }: FilterRendererProps<EnumCellFilterArtifacts, EnumCellFilterExtraProps>) => JSX.Element;
+export const EnumCellFilter: ({ filter, setFilter, environment, field, options, showNullConditionFilter }: FilterRendererProps<EnumCellFilterArtifacts, EnumCellFilterExtraProps>) => JSX_2.Element;
 
 // @public (undocumented)
 export type EnumCellFilterExtraProps = NullConditionFilterPublicProps & EnumCellRendererProps & {
@@ -384,7 +383,7 @@ export const GenericCell: FunctionComponent<DataGridColumnCommonProps & DataGrid
 export const GenericTextCellFilter: <Filter extends GenericTextCellFilterArtifacts>({ filter, setFilter }: {
     filter: Filter;
     setFilter: (filter: Filter) => void;
-}) => JSX.Element;
+}) => JSX_2.Element;
 
 // @public
 export const HasManyAbsentCell: FunctionComponent<DataGridColumnCommonProps & SugaredRelativeEntityList & {
@@ -393,7 +392,7 @@ children: ReactNode;
 } & DataGridCellPublicProps & DataGridHeaderCellPublicProps>;
 
 // @public (undocumented)
-export const HasManyAbsentCellFilter: ({ filter, setFilter }: FilterRendererProps<boolean>) => JSX.Element;
+export const HasManyAbsentCellFilter: ({ filter, setFilter }: FilterRendererProps<boolean>) => JSX_2.Element;
 
 // @public
 export const HasManySelectCell: FunctionComponent<HasManySelectProps & DataGridCellPublicProps & DataGridHeaderCellPublicProps & FieldFallbackViewProps>;
@@ -407,7 +406,7 @@ export type NullConditionArtifacts = {
 };
 
 // @public (undocumented)
-export const NullConditionFilter: <FA extends NullConditionArtifacts>({ filter, setFilter, field, environment, showNullConditionFilter }: NullConditionFilterProps<FA>) => JSX.Element | null;
+export const NullConditionFilter: <FA extends NullConditionArtifacts>({ filter, setFilter, field, environment, showNullConditionFilter }: NullConditionFilterProps<FA>) => JSX_2.Element | null;
 
 // @public (undocumented)
 export type NullConditionFilterProps<FA extends NullConditionArtifacts> = FilterRendererProps<FA> & NullConditionFilterPublicProps & {
@@ -429,7 +428,7 @@ format?: ((value: number | null) => ReactNode) | undefined;
 } & NullConditionFilterPublicProps>;
 
 // @public (undocumented)
-export const NumberCellFilter: ({ filter, setFilter, environment, field, showNullConditionFilter }: FilterRendererProps<NumberFilterArtifacts, NumberCellFilterExtraProps>) => JSX.Element;
+export const NumberCellFilter: ({ filter, setFilter, environment, field, showNullConditionFilter }: FilterRendererProps<NumberFilterArtifacts, NumberCellFilterExtraProps>) => JSX_2.Element;
 
 // @public (undocumented)
 export type NumberCellFilterExtraProps = NullConditionFilterPublicProps & NumberCellRendererProps;
@@ -440,7 +439,7 @@ export type NumberCellValueRendererProps = NumberCellRendererProps & FieldFallba
 };
 
 // @public
-export const SelectCellFilter: ({ filter, setFilter, options, allOptions, onSearch, isLoading }: SelectCellFilterProps) => JSX.Element;
+export const SelectCellFilter: ({ filter, setFilter, options, allOptions, onSearch, isLoading }: SelectCellFilterProps) => JSX_2.Element;
 
 // @public (undocumented)
 export type SelectCellFilterProps = FilterRendererProps<SelectCellArtifacts> & SelectCellFilterExtraProps;
@@ -455,7 +454,7 @@ format?: ((value: string | null) => ReactNode) | undefined;
 }>;
 
 // @public (undocumented)
-export const TextCellFilter: ({ filter, setFilter, ...props }: FilterRendererProps<TextFilterArtifacts>) => JSX.Element;
+export const TextCellFilter: ({ filter, setFilter, ...props }: FilterRendererProps<TextFilterArtifacts>) => JSX_2.Element;
 
 // @public (undocumented)
 export type TextCellValueRendererProps = TextCellRendererProps & FieldFallbackViewPublicProps & {

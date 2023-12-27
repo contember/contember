@@ -4,8 +4,6 @@
 
 ```ts
 
-/// <reference types="react" />
-
 import { ComponentType } from 'react';
 import { DataGridContainerPublicProps } from '@contember/react-datagrid-ui';
 import { EntityAccessor } from '@contember/react-binding';

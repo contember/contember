@@ -15,6 +15,7 @@ import { FieldAccessor } from '@contember/react-binding';
 import { FieldBasicProps } from '@contember/react-binding';
 import { FieldContainerProps } from '@contember/ui';
 import { FieldValue } from '@contember/react-binding';
+import { JSX as JSX_2 } from 'react/jsx-runtime';
 import { MemoExoticComponent } from 'react';
 import { NamedExoticComponent } from 'react';
 import type { NonOptionalControlProps } from '@contember/ui';
@@ -114,7 +115,7 @@ export interface SimpleRelativeSingleFieldMetadata<Value extends FieldValue = Fi
 export type SimpleRelativeSingleFieldProps = SimpleRelativeSingleFieldProxyProps;
 
 // @internal (undocumented)
-export const SimpleRelativeSingleFieldProxy: MemoExoticComponent<({ render, defaultValue, isNonbearing, onBeforeUpdate, onInitialize, onUpdate, description, display, evenly, footer, horizontal, gap, label, labelDescription, labelPosition, reverse, useLabelElement, className, componentClassName, style, errors, field: fieldName, required, size, containerClassName, containerStyle, suppressErrors, ...rest }: SimpleRelativeSingleFieldProxyProps & SimpleRelativeSingleFieldProxyRendererProps) => JSX.Element>;
+export const SimpleRelativeSingleFieldProxy: MemoExoticComponent<({ render, defaultValue, isNonbearing, onBeforeUpdate, onInitialize, onUpdate, description, display, evenly, footer, horizontal, gap, label, labelDescription, labelPosition, reverse, useLabelElement, className, componentClassName, style, errors, field: fieldName, required, size, containerClassName, containerStyle, suppressErrors, ...rest }: SimpleRelativeSingleFieldProxyProps & SimpleRelativeSingleFieldProxyRendererProps) => JSX_2.Element>;
 
 // @public (undocumented)
 export type SimpleRelativeSingleFieldProxyExcludeHandledProps<P extends SimpleRelativeSingleFieldProxyProps> = Omit<P, Exclude<keyof SugaredRelativeSingleField, RenderedSugaredRelativeSingleFieldKeys> | Exclude<keyof SimpleRelativeSingleFieldProxyExtraProps, RenderedSimpleRelativeSingleFieldProxyExtraPropsKeys> | Exclude<keyof SimpleRelativeSingleFieldProxyFieldContainerProps, RenderedSimpleRelativeSingleFieldProxyFieldContainerPropsKeys>>;

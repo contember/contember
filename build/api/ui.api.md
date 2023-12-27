@@ -26,6 +26,7 @@ import type { FunctionComponent } from 'react';
 import type { GroupBase } from 'react-select';
 import { HTMLAttributes } from 'react';
 import { IconName } from '@blueprintjs/icons';
+import { JSX as JSX_2 } from 'react/jsx-runtime';
 import { Key } from 'react';
 import { KeyboardEventHandler } from 'react';
 import { LucideIcon } from 'lucide-react';
@@ -35,7 +36,6 @@ import { MouseEventHandler } from 'react';
 import { MutableRefObject } from 'react';
 import { NamedExoticComponent } from 'react';
 import { Narrow } from '@contember/utilities';
-import { Narrowable } from '@contember/utilities';
 import { NestedClassName } from '@contember/utilities';
 import { NonOptional } from '@contember/utilities';
 import { PointerEventHandler } from 'react';
@@ -56,7 +56,6 @@ import { SyntheticEvent } from 'react';
 import { TextareaHTMLAttributes } from 'react';
 import { TouchEventHandler } from 'react';
 import { TransitionEventHandler } from 'react';
-import { Try } from '@contember/utilities';
 import { UIEventHandler } from 'react';
 import { useCloseOnClickOutside as useCloseOnClickOutside_2 } from '@contember/react-utils';
 import { useCloseOnEscape as useCloseOnEscape_2 } from '@contember/react-utils';
@@ -99,7 +98,7 @@ export interface ActiveSectionTabsMap {
 }
 
 // @public (undocumented)
-export const Aether: MemoExoticComponent<({ children, className, ...divProps }: AetherProps) => JSX.Element>;
+export const Aether: MemoExoticComponent<({ children, className, ...divProps }: AetherProps) => JSX_2.Element>;
 
 // @public (undocumented)
 export type AetherProps = HTMLDivElementProps;
@@ -214,7 +213,7 @@ export interface ButtonBasedProps extends Omit<HTMLButtonElementProps, 'ref' | '
 }
 
 // @public (undocumented)
-export const ButtonGroup: MemoExoticComponent<({ borderRadius, children, className, componentClassName, display, focusRing, inset, direction, size, }: ButtonGroupProps) => JSX.Element>;
+export const ButtonGroup: MemoExoticComponent<({ borderRadius, children, className, componentClassName, display, focusRing, inset, direction, size, }: ButtonGroupProps) => JSX_2.Element>;
 
 // @public (undocumented)
 export interface ButtonGroupProps extends ComponentClassNameProps {
@@ -235,7 +234,7 @@ export interface ButtonGroupProps extends ComponentClassNameProps {
 }
 
 // @public (undocumented)
-export const ButtonList: MemoExoticComponent<({ children, className, componentClassName, display, gap, inset, direction, size, }: ButtonListProps) => JSX.Element>;
+export const ButtonList: MemoExoticComponent<({ children, className, componentClassName, display, gap, inset, direction, size, }: ButtonListProps) => JSX_2.Element>;
 
 // @public (undocumented)
 export interface ButtonListProps extends ComponentClassNameProps {
@@ -306,10 +305,10 @@ export type CardProps = Omit<CommonCardProps, 'type'> & Omit<HTMLDivElementProps
 };
 
 // @public
-export const Checkbox: MemoExoticComponent<ForwardRefExoticComponent<Omit<RestHTMLCheckboxProps, "pattern" | "step" | "maxLength" | "minLength" | keyof ControlDisplayProps | keyof ValidationStateProps | keyof ControlStateProps | keyof ControlFocusProps | keyof ControlValueProps<boolean, boolean> | "CheckboxButtonComponent" | keyof DeprecatedCheckboxProps> & Omit<CheckboxOwnProps, keyof RestHTMLCheckboxProps> & DeprecatedCheckboxProps & RefAttributes<HTMLInputElement>>>;
+export const Checkbox: MemoExoticComponent<ForwardRefExoticComponent<Omit<RestHTMLCheckboxProps, "step" | "pattern" | "maxLength" | "minLength" | keyof ControlDisplayProps | keyof ValidationStateProps | keyof ControlStateProps | keyof ControlFocusProps | keyof ControlValueProps<boolean, boolean> | "CheckboxButtonComponent" | keyof DeprecatedCheckboxProps> & Omit<CheckboxOwnProps, keyof RestHTMLCheckboxProps> & DeprecatedCheckboxProps & RefAttributes<HTMLInputElement>>>;
 
 // @public (undocumented)
-export const CheckboxButton: ({ id, name, placeholder, checked, indeterminate, style, ...props }: CheckboxButtonProps) => JSX.Element;
+export const CheckboxButton: ({ id, name, placeholder, checked, indeterminate, style, ...props }: CheckboxButtonProps) => JSX_2.Element;
 
 // @public (undocumented)
 export interface CheckboxButtonProps extends NonOptionalVisuallyDependentControlProps {
@@ -385,10 +384,10 @@ export type ContemberIconName = keyof typeof ContemberIcons;
 // Warning: (ae-forgotten-export) The symbol "ContemberLogoImage_2" needs to be exported by the entry point index.d.ts
 //
 // @public @deprecated (undocumented)
-export const ContemberLogoImage: ({ withLabel }: ContemberLogoImage_2) => JSX.Element;
+export const ContemberLogoImage: ({ withLabel }: ContemberLogoImage_2) => JSX_2.Element;
 
 // @public (undocumented)
-export function ContentStatus({ label }: ContentStatusProps): JSX.Element;
+export function ContentStatus({ label }: ContentStatusProps): JSX_2.Element;
 
 // @public (undocumented)
 export namespace ContentStatus {
@@ -536,7 +535,7 @@ export type DeprecatedCheckboxProps = {
 };
 
 // @public (undocumented)
-export const Description: MemoExoticComponent<({ className, children }: DescriptionProps) => JSX.Element>;
+export const Description: MemoExoticComponent<({ className, children }: DescriptionProps) => JSX_2.Element>;
 
 // @public (undocumented)
 export interface DescriptionProps {
@@ -549,13 +548,13 @@ export interface DescriptionProps {
 // @public (undocumented)
 export const DevBar: ({ breakpoint, children, }: PropsWithChildren<{
     breakpoint?: number | undefined;
-}>) => JSX.Element;
+}>) => JSX_2.Element;
 
 // @public (undocumented)
-export function DevError(props: DevErrorProps): JSX.Element;
+export function DevError(props: DevErrorProps): JSX_2.Element;
 
 // @public (undocumented)
-export function DevErrorBadge({ errorCount, onOpen }: DevErrorBadgeProps): JSX.Element;
+export function DevErrorBadge({ errorCount, onOpen }: DevErrorBadgeProps): JSX_2.Element;
 
 // @public (undocumented)
 export interface DevErrorBadgeProps {
@@ -566,7 +565,7 @@ export interface DevErrorBadgeProps {
 }
 
 // @public (undocumented)
-export function DevErrorList({ currentError, currentErrorIndex, currentErrorSource, errorCount, onClose, onNext, onPrevious, }: DevErrorListProps): JSX.Element;
+export function DevErrorList({ currentError, currentErrorIndex, currentErrorSource, errorCount, onClose, onNext, onPrevious, }: DevErrorListProps): JSX_2.Element;
 
 // @public (undocumented)
 export interface DevErrorListProps {
@@ -600,10 +599,10 @@ export const DevPanel: ({ heading, icon, children, preview }: {
     heading: ReactNode;
     children: ReactNode;
     preview?: ReactNode;
-}) => JSX.Element;
+}) => JSX_2.Element;
 
 // @public (undocumented)
-export const DialogModal: MemoExoticComponent<({ bodyClassName, bodyProps, children, className, dividers, footer, footerClassName, footerProps, header, headerClassName, headerProps, layout, onClose, ...rest }: DialogModalProps) => JSX.Element>;
+export const DialogModal: MemoExoticComponent<({ bodyClassName, bodyProps, children, className, dividers, footer, footerClassName, footerProps, header, headerClassName, headerProps, layout, onClose, ...rest }: DialogModalProps) => JSX_2.Element>;
 
 // @public (undocumented)
 export type DialogModalProps = {
@@ -627,7 +626,7 @@ export interface DialogOptions<Result> {
 }
 
 // @public (undocumented)
-export const DialogProvider: MemoExoticComponent<(props: DialogProviderProps) => JSX.Element>;
+export const DialogProvider: MemoExoticComponent<(props: DialogProviderProps) => JSX_2.Element>;
 
 // @public (undocumented)
 export interface DialogProviderProps {
@@ -654,7 +653,7 @@ export interface DialogSettings<Result> {
 }
 
 // @public (undocumented)
-export function DimensionSwitcher({ dimensions }: DimensionSwitcherProps): JSX.Element;
+export function DimensionSwitcher({ dimensions }: DimensionSwitcherProps): JSX_2.Element;
 
 // @public (undocumented)
 export namespace DimensionSwitcher {
@@ -683,7 +682,7 @@ export interface DimensionSwitcherValue {
 }
 
 // @public (undocumented)
-export const Divider: MemoExoticComponent<({ className, componentClassName, gap, ...rest }: DividerProps) => JSX.Element>;
+export const Divider: MemoExoticComponent<({ className, componentClassName, gap, ...rest }: DividerProps) => JSX_2.Element>;
 
 // @public (undocumented)
 export interface DividerOwnProps extends ComponentClassNameProps {
@@ -694,7 +693,7 @@ export interface DividerOwnProps extends ComponentClassNameProps {
 export type DividerProps = Omit<HTMLDivElementProps, keyof DividerOwnProps> & DividerOwnProps;
 
 // @public (undocumented)
-export const Dropdown: MemoExoticComponent<(props: DropdownProps) => JSX.Element>;
+export const Dropdown: MemoExoticComponent<(props: DropdownProps) => JSX_2.Element>;
 
 // @public (undocumented)
 export type DropdownAlignment = Default | 'center' | 'start' | 'end' | 'top' | 'right';
@@ -804,7 +803,7 @@ suppressContentEditableWarning?: boolean | undefined;
 suppressHydrationWarning?: boolean | undefined;
 accessKey?: string | undefined;
 autoFocus?: boolean | undefined;
-contentEditable?: "inherit" | (boolean | "false" | "true") | undefined;
+contentEditable?: "inherit" | (boolean | "false" | "true") | "plaintext-only" | undefined;
 contextMenu?: string | undefined;
 dir?: string | undefined;
 draggable?: (boolean | "false" | "true") | undefined;
@@ -812,7 +811,6 @@ hidden?: boolean | undefined;
 id?: string | undefined;
 lang?: string | undefined;
 nonce?: string | undefined;
-placeholder?: string | undefined;
 slot?: string | undefined;
 spellCheck?: (boolean | "false" | "true") | undefined;
 tabIndex?: number | undefined;
@@ -845,54 +843,59 @@ security?: string | undefined;
 unselectable?: "on" | "off" | undefined;
 inputMode?: "none" | "text" | "search" | "tel" | "url" | "email" | "numeric" | "decimal" | undefined;
 is?: string | undefined;
-'aria-activedescendant'?: string | undefined;
-'aria-atomic'?: (boolean | "false" | "true") | undefined;
-'aria-autocomplete'?: "both" | "none" | "inline" | "list" | undefined;
-'aria-busy'?: (boolean | "false" | "true") | undefined;
-'aria-checked'?: boolean | "mixed" | "false" | "true" | undefined;
-'aria-colcount'?: number | undefined;
-'aria-colindex'?: number | undefined;
-'aria-colspan'?: number | undefined;
-'aria-controls'?: string | undefined;
-'aria-current'?: boolean | "page" | "false" | "true" | "time" | "step" | "location" | "date" | undefined;
-'aria-describedby'?: string | undefined;
-'aria-details'?: string | undefined;
-'aria-disabled'?: (boolean | "false" | "true") | undefined;
-'aria-dropeffect'?: "none" | "copy" | "move" | "link" | "execute" | "popup" | undefined;
-'aria-errormessage'?: string | undefined;
-'aria-expanded'?: (boolean | "false" | "true") | undefined;
-'aria-flowto'?: string | undefined;
-'aria-grabbed'?: (boolean | "false" | "true") | undefined;
-'aria-haspopup'?: boolean | "listbox" | "grid" | "menu" | "false" | "true" | "dialog" | "tree" | undefined;
-'aria-hidden'?: (boolean | "false" | "true") | undefined;
-'aria-invalid'?: boolean | "false" | "true" | "grammar" | "spelling" | undefined;
-'aria-keyshortcuts'?: string | undefined;
-'aria-label'?: string | undefined;
-'aria-labelledby'?: string | undefined;
-'aria-level'?: number | undefined;
-'aria-live'?: "off" | "assertive" | "polite" | undefined;
-'aria-modal'?: (boolean | "false" | "true") | undefined;
-'aria-multiline'?: (boolean | "false" | "true") | undefined;
-'aria-multiselectable'?: (boolean | "false" | "true") | undefined;
-'aria-orientation'?: "horizontal" | "vertical" | undefined;
-'aria-owns'?: string | undefined;
-'aria-placeholder'?: string | undefined;
-'aria-posinset'?: number | undefined;
-'aria-pressed'?: boolean | "mixed" | "false" | "true" | undefined;
-'aria-readonly'?: (boolean | "false" | "true") | undefined;
-'aria-relevant'?: "all" | "text" | "additions" | "additions removals" | "additions text" | "removals" | "removals additions" | "removals text" | "text additions" | "text removals" | undefined;
-'aria-required'?: (boolean | "false" | "true") | undefined;
-'aria-roledescription'?: string | undefined;
-'aria-rowcount'?: number | undefined;
-'aria-rowindex'?: number | undefined;
-'aria-rowspan'?: number | undefined;
-'aria-selected'?: (boolean | "false" | "true") | undefined;
-'aria-setsize'?: number | undefined;
-'aria-sort'?: "none" | "ascending" | "descending" | "other" | undefined;
-'aria-valuemax'?: number | undefined;
-'aria-valuemin'?: number | undefined;
-'aria-valuenow'?: number | undefined;
-'aria-valuetext'?: string | undefined;
+"aria-activedescendant"?: string | undefined;
+"aria-atomic"?: (boolean | "false" | "true") | undefined;
+"aria-autocomplete"?: "both" | "none" | "inline" | "list" | undefined;
+"aria-braillelabel"?: string | undefined;
+"aria-brailleroledescription"?: string | undefined;
+"aria-busy"?: (boolean | "false" | "true") | undefined;
+"aria-checked"?: boolean | "mixed" | "false" | "true" | undefined;
+"aria-colcount"?: number | undefined;
+"aria-colindex"?: number | undefined;
+"aria-colindextext"?: string | undefined;
+"aria-colspan"?: number | undefined;
+"aria-controls"?: string | undefined;
+"aria-current"?: boolean | "page" | "false" | "true" | "step" | "location" | "date" | "time" | undefined;
+"aria-describedby"?: string | undefined;
+"aria-description"?: string | undefined;
+"aria-details"?: string | undefined;
+"aria-disabled"?: (boolean | "false" | "true") | undefined;
+"aria-dropeffect"?: "none" | "copy" | "move" | "link" | "execute" | "popup" | undefined;
+"aria-errormessage"?: string | undefined;
+"aria-expanded"?: (boolean | "false" | "true") | undefined;
+"aria-flowto"?: string | undefined;
+"aria-grabbed"?: (boolean | "false" | "true") | undefined;
+"aria-haspopup"?: boolean | "listbox" | "grid" | "menu" | "false" | "true" | "dialog" | "tree" | undefined;
+"aria-hidden"?: (boolean | "false" | "true") | undefined;
+"aria-invalid"?: boolean | "false" | "true" | "grammar" | "spelling" | undefined;
+"aria-keyshortcuts"?: string | undefined;
+"aria-label"?: string | undefined;
+"aria-labelledby"?: string | undefined;
+"aria-level"?: number | undefined;
+"aria-live"?: "off" | "assertive" | "polite" | undefined;
+"aria-modal"?: (boolean | "false" | "true") | undefined;
+"aria-multiline"?: (boolean | "false" | "true") | undefined;
+"aria-multiselectable"?: (boolean | "false" | "true") | undefined;
+"aria-orientation"?: "horizontal" | "vertical" | undefined;
+"aria-owns"?: string | undefined;
+"aria-placeholder"?: string | undefined;
+"aria-posinset"?: number | undefined;
+"aria-pressed"?: boolean | "mixed" | "false" | "true" | undefined;
+"aria-readonly"?: (boolean | "false" | "true") | undefined;
+"aria-relevant"?: "all" | "text" | "additions" | "additions removals" | "additions text" | "removals" | "removals additions" | "removals text" | "text additions" | "text removals" | undefined;
+"aria-required"?: (boolean | "false" | "true") | undefined;
+"aria-roledescription"?: string | undefined;
+"aria-rowcount"?: number | undefined;
+"aria-rowindex"?: number | undefined;
+"aria-rowindextext"?: string | undefined;
+"aria-rowspan"?: number | undefined;
+"aria-selected"?: (boolean | "false" | "true") | undefined;
+"aria-setsize"?: number | undefined;
+"aria-sort"?: "none" | "ascending" | "descending" | "other" | undefined;
+"aria-valuemax"?: number | undefined;
+"aria-valuemin"?: number | undefined;
+"aria-valuenow"?: number | undefined;
+"aria-valuetext"?: string | undefined;
 children?: ReactNode;
 dangerouslySetInnerHTML?: {
 __html: string | TrustedHTML;
@@ -1100,7 +1103,7 @@ suppressContentEditableWarning?: boolean | undefined;
 suppressHydrationWarning?: boolean | undefined;
 accessKey?: string | undefined;
 autoFocus?: boolean | undefined;
-contentEditable?: "inherit" | (boolean | "false" | "true") | undefined;
+contentEditable?: "inherit" | (boolean | "false" | "true") | "plaintext-only" | undefined;
 contextMenu?: string | undefined;
 dir?: string | undefined;
 draggable?: (boolean | "false" | "true") | undefined;
@@ -1108,7 +1111,6 @@ hidden?: boolean | undefined;
 id?: string | undefined;
 lang?: string | undefined;
 nonce?: string | undefined;
-placeholder?: string | undefined;
 slot?: string | undefined;
 spellCheck?: (boolean | "false" | "true") | undefined;
 tabIndex?: number | undefined;
@@ -1141,54 +1143,59 @@ security?: string | undefined;
 unselectable?: "on" | "off" | undefined;
 inputMode?: "none" | "text" | "search" | "tel" | "url" | "email" | "numeric" | "decimal" | undefined;
 is?: string | undefined;
-'aria-activedescendant'?: string | undefined;
-'aria-atomic'?: (boolean | "false" | "true") | undefined;
-'aria-autocomplete'?: "both" | "none" | "inline" | "list" | undefined;
-'aria-busy'?: (boolean | "false" | "true") | undefined;
-'aria-checked'?: boolean | "mixed" | "false" | "true" | undefined;
-'aria-colcount'?: number | undefined;
-'aria-colindex'?: number | undefined;
-'aria-colspan'?: number | undefined;
-'aria-controls'?: string | undefined;
-'aria-current'?: boolean | "page" | "false" | "true" | "time" | "step" | "location" | "date" | undefined;
-'aria-describedby'?: string | undefined;
-'aria-details'?: string | undefined;
-'aria-disabled'?: (boolean | "false" | "true") | undefined;
-'aria-dropeffect'?: "none" | "copy" | "move" | "link" | "execute" | "popup" | undefined;
-'aria-errormessage'?: string | undefined;
-'aria-expanded'?: (boolean | "false" | "true") | undefined;
-'aria-flowto'?: string | undefined;
-'aria-grabbed'?: (boolean | "false" | "true") | undefined;
-'aria-haspopup'?: boolean | "listbox" | "grid" | "menu" | "false" | "true" | "dialog" | "tree" | undefined;
-'aria-hidden'?: (boolean | "false" | "true") | undefined;
-'aria-invalid'?: boolean | "false" | "true" | "grammar" | "spelling" | undefined;
-'aria-keyshortcuts'?: string | undefined;
-'aria-label'?: string | undefined;
-'aria-labelledby'?: string | undefined;
-'aria-level'?: number | undefined;
-'aria-live'?: "off" | "assertive" | "polite" | undefined;
-'aria-modal'?: (boolean | "false" | "true") | undefined;
-'aria-multiline'?: (boolean | "false" | "true") | undefined;
-'aria-multiselectable'?: (boolean | "false" | "true") | undefined;
-'aria-orientation'?: "horizontal" | "vertical" | undefined;
-'aria-owns'?: string | undefined;
-'aria-placeholder'?: string | undefined;
-'aria-posinset'?: number | undefined;
-'aria-pressed'?: boolean | "mixed" | "false" | "true" | undefined;
-'aria-readonly'?: (boolean | "false" | "true") | undefined;
-'aria-relevant'?: "all" | "text" | "additions" | "additions removals" | "additions text" | "removals" | "removals additions" | "removals text" | "text additions" | "text removals" | undefined;
-'aria-required'?: (boolean | "false" | "true") | undefined;
-'aria-roledescription'?: string | undefined;
-'aria-rowcount'?: number | undefined;
-'aria-rowindex'?: number | undefined;
-'aria-rowspan'?: number | undefined;
-'aria-selected'?: (boolean | "false" | "true") | undefined;
-'aria-setsize'?: number | undefined;
-'aria-sort'?: "none" | "ascending" | "descending" | "other" | undefined;
-'aria-valuemax'?: number | undefined;
-'aria-valuemin'?: number | undefined;
-'aria-valuenow'?: number | undefined;
-'aria-valuetext'?: string | undefined;
+"aria-activedescendant"?: string | undefined;
+"aria-atomic"?: (boolean | "false" | "true") | undefined;
+"aria-autocomplete"?: "both" | "none" | "inline" | "list" | undefined;
+"aria-braillelabel"?: string | undefined;
+"aria-brailleroledescription"?: string | undefined;
+"aria-busy"?: (boolean | "false" | "true") | undefined;
+"aria-checked"?: boolean | "mixed" | "false" | "true" | undefined;
+"aria-colcount"?: number | undefined;
+"aria-colindex"?: number | undefined;
+"aria-colindextext"?: string | undefined;
+"aria-colspan"?: number | undefined;
+"aria-controls"?: string | undefined;
+"aria-current"?: boolean | "page" | "false" | "true" | "step" | "location" | "date" | "time" | undefined;
+"aria-describedby"?: string | undefined;
+"aria-description"?: string | undefined;
+"aria-details"?: string | undefined;
+"aria-disabled"?: (boolean | "false" | "true") | undefined;
+"aria-dropeffect"?: "none" | "copy" | "move" | "link" | "execute" | "popup" | undefined;
+"aria-errormessage"?: string | undefined;
+"aria-expanded"?: (boolean | "false" | "true") | undefined;
+"aria-flowto"?: string | undefined;
+"aria-grabbed"?: (boolean | "false" | "true") | undefined;
+"aria-haspopup"?: boolean | "listbox" | "grid" | "menu" | "false" | "true" | "dialog" | "tree" | undefined;
+"aria-hidden"?: (boolean | "false" | "true") | undefined;
+"aria-invalid"?: boolean | "false" | "true" | "grammar" | "spelling" | undefined;
+"aria-keyshortcuts"?: string | undefined;
+"aria-label"?: string | undefined;
+"aria-labelledby"?: string | undefined;
+"aria-level"?: number | undefined;
+"aria-live"?: "off" | "assertive" | "polite" | undefined;
+"aria-modal"?: (boolean | "false" | "true") | undefined;
+"aria-multiline"?: (boolean | "false" | "true") | undefined;
+"aria-multiselectable"?: (boolean | "false" | "true") | undefined;
+"aria-orientation"?: "horizontal" | "vertical" | undefined;
+"aria-owns"?: string | undefined;
+"aria-placeholder"?: string | undefined;
+"aria-posinset"?: number | undefined;
+"aria-pressed"?: boolean | "mixed" | "false" | "true" | undefined;
+"aria-readonly"?: (boolean | "false" | "true") | undefined;
+"aria-relevant"?: "all" | "text" | "additions" | "additions removals" | "additions text" | "removals" | "removals additions" | "removals text" | "text additions" | "text removals" | undefined;
+"aria-required"?: (boolean | "false" | "true") | undefined;
+"aria-roledescription"?: string | undefined;
+"aria-rowcount"?: number | undefined;
+"aria-rowindex"?: number | undefined;
+"aria-rowindextext"?: string | undefined;
+"aria-rowspan"?: number | undefined;
+"aria-selected"?: (boolean | "false" | "true") | undefined;
+"aria-setsize"?: number | undefined;
+"aria-sort"?: "none" | "ascending" | "descending" | "other" | undefined;
+"aria-valuemax"?: number | undefined;
+"aria-valuemin"?: number | undefined;
+"aria-valuenow"?: number | undefined;
+"aria-valuetext"?: string | undefined;
 dangerouslySetInnerHTML?: {
 __html: string | TrustedHTML;
 } | undefined;
@@ -1478,7 +1485,7 @@ export type EmptyStateContainerProps = ComponentClassNameProps & PropsWithChildr
 }>;
 
 // @public (undocumented)
-export const ErrorList: MemoExoticComponent<({ errors }: ErrorListProps) => JSX.Element | null>;
+export const ErrorList: MemoExoticComponent<({ errors }: ErrorListProps) => JSX_2.Element | null>;
 
 // @public (undocumented)
 export interface ErrorListProps {
@@ -1490,7 +1497,7 @@ export interface ErrorListProps {
 export type ErrorType = Error | unknown;
 
 // @public
-export const FieldContainer: MemoExoticComponent<({ children, className: classNameProp, componentClassName, description, errors, display, footer, evenly, gap, horizontal, label, labelDescription, labelPosition, required, reverse, size, style, useLabelElement, ...props }: FieldContainerProps) => JSX.Element>;
+export const FieldContainer: MemoExoticComponent<({ children, className: classNameProp, componentClassName, description, errors, display, footer, evenly, gap, horizontal, label, labelDescription, labelPosition, required, reverse, size, style, useLabelElement, ...props }: FieldContainerProps) => JSX_2.Element>;
 
 // @public (undocumented)
 export type FieldContainerLabelPosition = 'bottom' | 'left' | 'right' | 'top';
@@ -1748,7 +1755,7 @@ export const isSpecialLinkClick: (e: MouseEvent) => boolean;
 export type Justification = Default | 'justifyStart' | 'justifyCenter' | 'justifyEnd';
 
 // @public (undocumented)
-export const Label: MemoExoticComponent<({ className, isDisabled, isActive, isFocused, isHover, children, size, weight, }: LabelProps) => JSX.Element>;
+export const Label: MemoExoticComponent<({ className, isDisabled, isActive, isFocused, isHover, children, size, weight, }: LabelProps) => JSX_2.Element>;
 
 // @public (undocumented)
 export interface LabelOwnProps {
@@ -1772,10 +1779,10 @@ export interface LabelOwnProps {
 export type LabelProps = LabelOwnProps & HTMLSpanElementProps;
 
 // @public @deprecated
-export const Layout: MemoExoticComponent<({ className, children, sidebarHeader, sidebarFooter, switchers, navigation, scheme, theme, themeContent, themeControls, pageScheme, pageTheme, pageThemeContent, pageThemeControls, titleScheme, titleTheme, titleThemeContent, titleThemeControls, }: LayoutProps) => JSX.Element>;
+export const Layout: MemoExoticComponent<({ className, children, sidebarHeader, sidebarFooter, switchers, navigation, scheme, theme, themeContent, themeControls, pageScheme, pageTheme, pageThemeContent, pageThemeControls, titleScheme, titleTheme, titleThemeContent, titleThemeControls, }: LayoutProps) => JSX_2.Element>;
 
 // @public @deprecated (undocumented)
-export const LayoutChrome: MemoExoticComponent<({ children, navigation, pageScheme, pageTheme, pageThemeContent, pageThemeControls, scheme, sidebarFooter, sidebarHeader, switchers, theme, themeContent, themeControls, titleScheme, titleTheme, titleThemeContent, titleThemeControls, }: LayoutChromeProps) => JSX.Element>;
+export const LayoutChrome: MemoExoticComponent<({ children, navigation, pageScheme, pageTheme, pageThemeContent, pageThemeControls, scheme, sidebarFooter, sidebarHeader, switchers, theme, themeContent, themeControls, titleScheme, titleTheme, titleThemeContent, titleThemeControls, }: LayoutChromeProps) => JSX_2.Element>;
 
 // @public (undocumented)
 export interface LayoutChromeProps extends ThemeScheme {
@@ -1808,13 +1815,13 @@ export interface LayoutChromeProps extends ThemeScheme {
 }
 
 // @public @deprecated (undocumented)
-export const LayoutPage: MemoExoticComponent<({ actions, afterTitle, children, fit, navigation, pageContentLayout, side, title, ...props }: LayoutPageProps) => JSX.Element>;
+export const LayoutPage: MemoExoticComponent<({ actions, afterTitle, children, fit, navigation, pageContentLayout, side, title, ...props }: LayoutPageProps) => JSX_2.Element>;
 
 // @public @deprecated (undocumented)
-export const LayoutPageAside: MemoExoticComponent<({ children }: HTMLDivElementProps) => JSX.Element>;
+export const LayoutPageAside: MemoExoticComponent<({ children }: HTMLDivElementProps) => JSX_2.Element>;
 
 // @public @deprecated (undocumented)
-export const LayoutPageContent: MemoExoticComponent<({ children, layout, pageContentLayout }: LayoutPageContentProps) => JSX.Element>;
+export const LayoutPageContent: MemoExoticComponent<({ children, layout, pageContentLayout }: LayoutPageContentProps) => JSX_2.Element>;
 
 // @public (undocumented)
 export type LayoutPageContentProps = {
@@ -1839,7 +1846,7 @@ export interface LayoutPageProps extends Omit<TitleBarProps, 'after' | 'children
 }
 
 // @public @deprecated (undocumented)
-export const LayoutPageStickyContainer: MemoExoticComponent<({ bottom, className: classNameProp, children, left, right, style: styleProp, top, ...rest }: LayoutPageStickyContainerProps) => JSX.Element>;
+export const LayoutPageStickyContainer: MemoExoticComponent<({ bottom, className: classNameProp, children, left, right, style: styleProp, top, ...rest }: LayoutPageStickyContainerProps) => JSX_2.Element>;
 
 // @public (undocumented)
 export type LayoutPageStickyContainerProps = {
@@ -1873,7 +1880,7 @@ export interface LinkCompatibleProps {
 }
 
 // @public @deprecated (undocumented)
-export function Logo({ children, image, size }: LogoProps): JSX.Element;
+export function Logo({ children, image, size }: LogoProps): JSX_2.Element;
 
 // @public (undocumented)
 export namespace Logo {
@@ -1882,7 +1889,7 @@ export namespace Logo {
 }
 
 // @public @deprecated (undocumented)
-export const LogoLabel: MemoExoticComponent<({ className, children, size }: LogoLabelProps) => JSX.Element>;
+export const LogoLabel: MemoExoticComponent<({ className, children, size }: LogoLabelProps) => JSX_2.Element>;
 
 // @public (undocumented)
 export interface LogoLabelProps {
@@ -1905,7 +1912,7 @@ export interface LogoProps {
 }
 
 // @public @deprecated (undocumented)
-export const LogoSymbol: MemoExoticComponent<({ className, children, size }: LogoSymbolProps) => JSX.Element>;
+export const LogoSymbol: MemoExoticComponent<({ className, children, size }: LogoSymbolProps) => JSX_2.Element>;
 
 // @public (undocumented)
 export interface LogoSymbolProps {
@@ -1949,7 +1956,7 @@ export interface MenuItemPropsTitleRequired<T> {
 }
 
 // @public (undocumented)
-export function MenuLink({ active, className: classNameProp, componentClassName, disabled, children, external, href, icon, onClick: onClickProp, ...rest }: MenuLinkProps): JSX.Element;
+export function MenuLink({ active, className: classNameProp, componentClassName, disabled, children, external, href, icon, onClick: onClickProp, ...rest }: MenuLinkProps): JSX_2.Element;
 
 // @public (undocumented)
 export type MenuLinkProps = HTMLAnchorElementProps & ComponentClassNameProps & {
@@ -1972,7 +1979,7 @@ export type MenuProps = HTMLDivElementProps & {
 };
 
 // @public
-export const Message: MemoExoticComponent<({ action, background, borderRadius, children, className, display, elevated, icon, important, intent, padding, size, textAlign, ...props }: MessageProps) => JSX.Element>;
+export const Message: MemoExoticComponent<({ action, background, borderRadius, children, className, display, elevated, icon, important, intent, padding, size, textAlign, ...props }: MessageProps) => JSX_2.Element>;
 
 // @public @deprecated (undocumented)
 export type MessageDistinction = Default | 'striking';
@@ -2027,7 +2034,7 @@ export const MonthInputStringRegExp: RegExp;
 export function MouseMoveProvider<E extends HTMLElement = HTMLElement>({ elementRef, children, }: {
     elementRef: RefObject<E>;
     children?: ReactNode;
-}): JSX.Element;
+}): JSX_2.Element;
 
 // @public (undocumented)
 export type NavigationContext = <T>(to: T) => NavigationLinkProps;
@@ -2077,7 +2084,7 @@ export type OwnVisuallyHiddenProps = PropsWithChildren<{
 }>;
 
 // @public @deprecated (undocumented)
-export const PageLayoutContent: MemoExoticComponent<({ children, layout, pageContentLayout }: LayoutPageContentProps) => JSX.Element>;
+export const PageLayoutContent: MemoExoticComponent<({ children, layout, pageContentLayout }: LayoutPageContentProps) => JSX_2.Element>;
 
 // @public (undocumented)
 export interface ParsedStackFrame {
@@ -2117,7 +2124,7 @@ export interface PortalProps {
 }
 
 // @public
-export const PortalProvider: MemoExoticComponent<(props: PortalProviderProps) => JSX.Element>;
+export const PortalProvider: MemoExoticComponent<(props: PortalProviderProps) => JSX_2.Element>;
 
 // @public (undocumented)
 export const PortalProviderContext: Context<MutableRefObject<HTMLDivElement>>;
@@ -2157,7 +2164,7 @@ export interface ProcessedError {
 }
 
 // @public (undocumented)
-export const ProgressBar: MemoExoticComponent<({ progress }: ProgressBarProps) => JSX.Element>;
+export const ProgressBar: MemoExoticComponent<({ progress }: ProgressBarProps) => JSX_2.Element>;
 
 // @public (undocumented)
 export interface ProgressBarProps {
@@ -2166,7 +2173,7 @@ export interface ProgressBarProps {
 }
 
 // @public (undocumented)
-export const Providers: ({ children, portalProviderProps, styleProviderProps, }: ProvidersProps) => JSX.Element;
+export const Providers: ({ children, portalProviderProps, styleProviderProps, }: ProvidersProps) => JSX_2.Element;
 
 // @public (undocumented)
 export type ProvidersProps = {
@@ -2181,7 +2188,7 @@ export type PublicCommonReactSelectStylesProps = {
 };
 
 // @public (undocumented)
-export const Radio: MemoExoticComponent<(props: RadioProps) => JSX.Element>;
+export const Radio: MemoExoticComponent<(props: RadioProps) => JSX_2.Element>;
 
 // @public (undocumented)
 export interface RadioButtonProps {
@@ -2254,10 +2261,10 @@ export interface RenderDialogContentProps<Result> {
 }
 
 // @public (undocumented)
-export const RepeaterItemContainer: MemoExoticComponent<ForwardRefExoticComponent<Omit<BoxProps, "footer" | "header" | "heading" | keyof RepeaterItemContainerOwnProps> & RepeaterItemContainerOwnProps & RefAttributes<HTMLDivElement>>>;
+export const RepeaterItemContainer: MemoExoticComponent<ForwardRefExoticComponent<Omit<BoxProps, "heading" | "footer" | "header" | keyof RepeaterItemContainerOwnProps> & RepeaterItemContainerOwnProps & RefAttributes<HTMLDivElement>>>;
 
 // @public (undocumented)
-export const RepeaterItemContainerHeader: MemoExoticComponent<({ label, actions, index }: RepeaterItemContainerHeaderProps) => JSX.Element>;
+export const RepeaterItemContainerHeader: MemoExoticComponent<({ label, actions, index }: RepeaterItemContainerHeaderProps) => JSX_2.Element>;
 
 // @public (undocumented)
 export type RepeaterItemContainerHeaderProps = {
@@ -2343,7 +2350,7 @@ export interface SectionTabProps {
 }
 
 // @public (undocumented)
-export const SectionTabs: MemoExoticComponent<() => JSX.Element | null>;
+export const SectionTabs: MemoExoticComponent<() => JSX_2.Element | null>;
 
 // @public (undocumented)
 export interface SectionTabsMap {
@@ -2358,7 +2365,7 @@ export interface SectionTabsProps {
 }
 
 // @public (undocumented)
-export const SectionTabsProvider: MemoExoticComponent<({ children }: SectionTabsProps) => JSX.Element>;
+export const SectionTabsProvider: MemoExoticComponent<({ children }: SectionTabsProps) => JSX_2.Element>;
 
 // @public (undocumented)
 export type SectionTabsRegistrationContextType = [
@@ -2368,7 +2375,7 @@ export type SectionTabsRegistrationContextType = [
 
 // @public (undocumented)
 export const Select: (<V, NN extends boolean>(props: Omit<ControlProps<V, NN>, "style" | "type" | keyof ControlConstraintProps<any>> & {
-    options: SelectOption<Try<V, [], (V extends [] ? [] : never) | (V extends Narrowable ? V : never) | { [K in keyof V]: V[K] extends Function ? V[K] : (V[K] extends infer T ? T extends V[K] ? T extends [] ? [] : never : never : never) | (V[K] extends infer T_1 ? T_1 extends V[K] ? T_1 extends Narrowable ? T_1 : never : never : never) | (V[K] extends infer T_2 ? { [K_1 in keyof T_2]: V[K][K_1] extends Function ? V[K][K_1] : (V[K][K_1] extends infer T_3 ? T_3 extends V[K][K_1] ? T_3 extends [] ? [] : never : never : never) | (V[K][K_1] extends infer T_4 ? T_4 extends V[K][K_1] ? T_4 extends Narrowable ? T_4 : never : never : never) | (V[K][K_1] extends infer T_5 ? { [K_2 in keyof T_5]: V[K][K_1][K_2] extends Function ? V[K][K_1][K_2] : (V[K][K_1][K_2] extends infer T_6 ? T_6 extends V[K][K_1][K_2] ? T_6 extends [] ? [] : never : never : never) | (V[K][K_1][K_2] extends infer T_7 ? T_7 extends V[K][K_1][K_2] ? T_7 extends Narrowable ? T_7 : never : never : never) | (V[K][K_1][K_2] extends infer T_8 ? { [K_3 in keyof T_8]: V[K][K_1][K_2][K_3] extends Function ? V[K][K_1][K_2][K_3] : (V[K][K_1][K_2][K_3] extends infer T_9 ? T_9 extends V[K][K_1][K_2][K_3] ? T_9 extends [] ? [] : never : never : never) | (V[K][K_1][K_2][K_3] extends infer T_10 ? T_10 extends V[K][K_1][K_2][K_3] ? T_10 extends Narrowable ? T_10 : never : never : never) | (V[K][K_1][K_2][K_3] extends infer T_11 ? { [K_4 in keyof T_11]: V[K][K_1][K_2][K_3][K_4] extends Function ? V[K][K_1][K_2][K_3][K_4] : (V[K][K_1][K_2][K_3][K_4] extends infer T_12 ? T_12 extends V[K][K_1][K_2][K_3][K_4] ? T_12 extends [] ? [] : never : never : never) | (V[K][K_1][K_2][K_3][K_4] extends infer T_13 ? T_13 extends V[K][K_1][K_2][K_3][K_4] ? T_13 extends Narrowable ? T_13 : never : never : never) | (V[K][K_1][K_2][K_3][K_4] extends infer T_14 ? { [K_5 in keyof T_14]: V[K][K_1][K_2][K_3][K_4][K_5] extends Function ? V[K][K_1][K_2][K_3][K_4][K_5] : (V[K][K_1][K_2][K_3][K_4][K_5] extends infer T_15 ? T_15 extends V[K][K_1][K_2][K_3][K_4][K_5] ? T_15 extends [] ? [] : never : never : never) | (V[K][K_1][K_2][K_3][K_4][K_5] extends infer T_16 ? T_16 extends V[K][K_1][K_2][K_3][K_4][K_5] ? T_16 extends Narrowable ? T_16 : never : never : never) | (V[K][K_1][K_2][K_3][K_4][K_5] extends infer T_17 ? { [K_6 in keyof T_17]: V[K][K_1][K_2][K_3][K_4][K_5][K_6] extends Function ? V[K][K_1][K_2][K_3][K_4][K_5][K_6] : (V[K][K_1][K_2][K_3][K_4][K_5][K_6] extends infer T_18 ? T_18 extends V[K][K_1][K_2][K_3][K_4][K_5][K_6] ? T_18 extends [] ? [] : never : never : never) | (V[K][K_1][K_2][K_3][K_4][K_5][K_6] extends infer T_19 ? T_19 extends V[K][K_1][K_2][K_3][K_4][K_5][K_6] ? T_19 extends Narrowable ? T_19 : never : never : never) | (V[K][K_1][K_2][K_3][K_4][K_5][K_6] extends infer T_20 ? { [K_7 in keyof T_20]: V[K][K_1][K_2][K_3][K_4][K_5][K_6][K_7] extends Function ? V[K][K_1][K_2][K_3][K_4][K_5][K_6][K_7] : (V[K][K_1][K_2][K_3][K_4][K_5][K_6][K_7] extends infer T_21 ? T_21 extends V[K][K_1][K_2][K_3][K_4][K_5][K_6][K_7] ? T_21 extends [] ? [] : never : never : never) | (V[K][K_1][K_2][K_3][K_4][K_5][K_6][K_7] extends infer T_22 ? T_22 extends V[K][K_1][K_2][K_3][K_4][K_5][K_6][K_7] ? T_22 extends Narrowable ? T_22 : never : never : never) | (V[K][K_1][K_2][K_3][K_4][K_5][K_6][K_7] extends infer T_23 ? { [K_8 in keyof T_23]: V[K][K_1][K_2][K_3][K_4][K_5][K_6][K_7][K_8] extends Function ? V[K][K_1][K_2][K_3][K_4][K_5][K_6][K_7][K_8] : (V[K][K_1][K_2][K_3][K_4][K_5][K_6][K_7][K_8] extends infer T_24 ? T_24 extends V[K][K_1][K_2][K_3][K_4][K_5][K_6][K_7][K_8] ? T_24 extends [] ? [] : never : never : never) | (V[K][K_1][K_2][K_3][K_4][K_5][K_6][K_7][K_8] extends infer T_25 ? T_25 extends V[K][K_1][K_2][K_3][K_4][K_5][K_6][K_7][K_8] ? T_25 extends Narrowable ? T_25 : never : never : never) | (V[K][K_1][K_2][K_3][K_4][K_5][K_6][K_7][K_8] extends infer T_26 ? { [K_9 in keyof T_26]: V[K][K_1][K_2][K_3][K_4][K_5][K_6][K_7][K_8][K_9] extends Function ? V[K][K_1][K_2][K_3][K_4][K_5][K_6][K_7][K_8][K_9] : (V[K][K_1][K_2][K_3][K_4][K_5][K_6][K_7][K_8][K_9] extends infer T_27 ? T_27 extends V[K][K_1][K_2][K_3][K_4][K_5][K_6][K_7][K_8][K_9] ? T_27 extends [] ? [] : never : never : never) | (V[K][K_1][K_2][K_3][K_4][K_5][K_6][K_7][K_8][K_9] extends infer T_28 ? T_28 extends V[K][K_1][K_2][K_3][K_4][K_5][K_6][K_7][K_8][K_9] ? T_28 extends Narrowable ? T_28 : never : never : never) | (V[K][K_1][K_2][K_3][K_4][K_5][K_6][K_7][K_8][K_9] extends infer T_29 ? { [K_10 in keyof T_29]: V[K][K_1][K_2][K_3][K_4][K_5][K_6][K_7][K_8][K_9][K_10] extends Function ? V[K][K_1][K_2][K_3][K_4][K_5][K_6][K_7][K_8][K_9][K_10] : (V[K][K_1][K_2][K_3][K_4][K_5][K_6][K_7][K_8][K_9][K_10] extends infer T_30 ? T_30 extends V[K][K_1][K_2][K_3][K_4][K_5][K_6][K_7][K_8][K_9][K_10] ? T_30 extends [] ? [] : never : never : never) | (V[K][K_1][K_2][K_3][K_4][K_5][K_6][K_7][K_8][K_9][K_10] extends infer T_31 ? T_31 extends V[K][K_1][K_2][K_3][K_4][K_5][K_6][K_7][K_8][K_9][K_10] ? T_31 extends Narrowable ? T_31 : never : never : never) | any; } : never); } : never); } : never); } : never); } : never); } : never); } : never); } : never); } : never); } : never); }>>[];
+    options: SelectOption<Narrow<V>>[];
     isSearchable?: ComponentProps<ReactSelect>['isSearchable'];
     styles?: StylesConfig<any, boolean, never> | undefined;
 } & RefAttributes<HTMLReactSelectElement<V>>) => ReactElement<any, any> | null) & {
@@ -2376,10 +2383,10 @@ export const Select: (<V, NN extends boolean>(props: Omit<ControlProps<V, NN>, "
 };
 
 // @public (undocumented)
-export const SelectComponent: <V, NN extends boolean>({ active, className: outerClassName, defaultValue: defaultValueProp, disabled, distinction, focused, hovered, id, intent, isSearchable, loading, name, notNull, onBlur, onChange, onFocus, onFocusChange, onValidationStateChange, options, placeholder, readOnly, required, scheme, size, styles, validationState, value: valueProp, ...outerProps }: SelectProps<V, NN>, forwardedRef: ForwardedRef<HTMLReactSelectElement<V>>) => JSX.Element;
+export const SelectComponent: <V, NN extends boolean>({ active, className: outerClassName, defaultValue: defaultValueProp, disabled, distinction, focused, hovered, id, intent, isSearchable, loading, name, notNull, onBlur, onChange, onFocus, onFocusChange, onValidationStateChange, options, placeholder, readOnly, required, scheme, size, styles, validationState, value: valueProp, ...outerProps }: SelectProps<V, NN>, forwardedRef: ForwardedRef<HTMLReactSelectElement<V>>) => JSX_2.Element;
 
 // @public (undocumented)
-export const SelectCreateNewWrapper: ({ onClick, children }: SelectCreateNewWrapperProps) => JSX.Element;
+export const SelectCreateNewWrapper: ({ onClick, children }: SelectCreateNewWrapperProps) => JSX_2.Element;
 
 // @public (undocumented)
 export interface SelectCreateNewWrapperProps {
@@ -2436,7 +2443,7 @@ export type SlugInputProps = TextInputProps & {
 };
 
 // @public (undocumented)
-export const Spacer: MemoExoticComponent<({ className, componentClassName, gap, grow, shrink, ...rest }: SpacerProps) => JSX.Element>;
+export const Spacer: MemoExoticComponent<({ className, componentClassName, gap, grow, shrink, ...rest }: SpacerProps) => JSX_2.Element>;
 
 // @public (undocumented)
 export interface SpacerOwnProps extends ComponentClassNameProps {
@@ -2452,10 +2459,10 @@ export interface SpacerOwnProps extends ComponentClassNameProps {
 export type SpacerProps = Omit<HTMLDivElementProps, 'children' | keyof SpacerOwnProps> & SpacerOwnProps;
 
 // @public (undocumented)
-export const Spinner: MemoExoticComponent<() => JSX.Element>;
+export const Spinner: MemoExoticComponent<() => JSX_2.Element>;
 
 // @public
-export const SpinnerContainer: MemoExoticComponent<({ enabled, children, size }: SpinnerContainerProps) => JSX.Element>;
+export const SpinnerContainer: MemoExoticComponent<({ enabled, children, size }: SpinnerContainerProps) => JSX_2.Element>;
 
 // @public (undocumented)
 export interface SpinnerContainerProps extends SpinnerOverlayProps {
@@ -2466,7 +2473,7 @@ export interface SpinnerContainerProps extends SpinnerOverlayProps {
 }
 
 // @public
-export const SpinnerOverlay: MemoExoticComponent<({ size }: SpinnerOverlayProps) => JSX.Element>;
+export const SpinnerOverlay: MemoExoticComponent<({ size }: SpinnerOverlayProps) => JSX_2.Element>;
 
 // @public (undocumented)
 export type SpinnerOverlayProps = ComponentClassNameProps & {
@@ -2512,7 +2519,7 @@ export type StackProps = Omit<HTMLDivElementProps, keyof StackOwnProps> & StackO
 
 // @public (undocumented)
 export const StyleProvider: {
-    ({ children, ...props }: PropsWithChildren<StyleProviderProps>): JSX.Element;
+    ({ children, ...props }: PropsWithChildren<StyleProviderProps>): JSX_2.Element;
     displayName: string;
 };
 
@@ -2561,10 +2568,10 @@ export interface TabItem {
 }
 
 // @public (undocumented)
-export const Table: MemoExoticComponent<({ bare, className: classNameProp, ...props }: TableProps) => JSX.Element>;
+export const Table: MemoExoticComponent<({ bare, className: classNameProp, ...props }: TableProps) => JSX_2.Element>;
 
 // @public (undocumented)
-export const TableCell: MemoExoticComponent<({ shrunk, numeric, ...props }: TableCellProps) => JSX.Element>;
+export const TableCell: MemoExoticComponent<({ shrunk, numeric, ...props }: TableCellProps) => JSX_2.Element>;
 
 // @public (undocumented)
 export interface TableCellProps {
@@ -2586,7 +2593,7 @@ export interface TableCellProps {
 export const TableColumnsIcon: LucideIcon;
 
 // @public (undocumented)
-export const TableHeaderCell: MemoExoticComponent<({ shrunk, ...props }: TableHeaderCellProps) => JSX.Element>;
+export const TableHeaderCell: MemoExoticComponent<({ shrunk, ...props }: TableHeaderCellProps) => JSX_2.Element>;
 
 // @public (undocumented)
 export interface TableHeaderCellProps {
@@ -2621,7 +2628,7 @@ export interface TableProps {
 }
 
 // @public (undocumented)
-export const TableRow: MemoExoticComponent<({ active, children, justification, onClick: onClick }: TableRowProps) => JSX.Element>;
+export const TableRow: MemoExoticComponent<({ active, children, justification, onClick: onClick }: TableRowProps) => JSX_2.Element>;
 
 // @public (undocumented)
 export interface TableRowProps {
@@ -2746,7 +2753,7 @@ export type TimeInputString = string;
 export const TimeInputStringRegExp: RegExp;
 
 // @public @deprecated (undocumented)
-export const TitleBar: MemoExoticComponent<({ after, navigation, children, actions, ...props }: TitleBarProps) => JSX.Element>;
+export const TitleBar: MemoExoticComponent<({ after, navigation, children, actions, ...props }: TitleBarProps) => JSX_2.Element>;
 
 // @public @deprecated (undocumented)
 export interface TitleBarProps extends ThemeScheme {
@@ -2874,7 +2881,7 @@ export function Trio({ className, column, start, center, end, clickThroughSpace,
     center?: ReactNode;
     end?: ReactNode;
     clickThroughSpace?: boolean;
-}): JSX.Element | null;
+}): JSX_2.Element | null;
 
 // @public (undocumented)
 export namespace Trio {
@@ -3015,7 +3022,7 @@ export type VisuallyDependentControlProps = ControlStateProps & ControlDisplayPr
 export const VisuallyHidden: VisuallyHiddenComponentType;
 
 // @public (undocumented)
-export type VisuallyHiddenComponentType = (<C extends ElementType = 'span'>(props: VisuallyHiddenProps<C>) => React.ReactElement | null) & {
+export type VisuallyHiddenComponentType = (<C extends ElementType = 'span'>(props: VisuallyHiddenProps<C>) => ReactNode) & {
     displayName?: string | undefined;
 };
 

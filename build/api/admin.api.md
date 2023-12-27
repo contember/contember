@@ -78,6 +78,7 @@ import { InputHTMLAttributes } from 'react';
 import { JsonObject } from '@contember/react-binding';
 import { JsonValue } from '@contember/binding';
 import { JsonValue as JsonValue_2 } from '@contember/react-binding';
+import { JSX as JSX_2 } from 'react/jsx-runtime';
 import type { KeyboardEvent as KeyboardEvent_2 } from 'react';
 import { LabelMiddleware } from '@contember/react-binding';
 import { LayoutPageProps } from '@contember/ui';
@@ -284,7 +285,7 @@ export interface ApiKeyListProps {
 }
 
 // @public (undocumented)
-export const ApplicationEntrypoint: (props: ApplicationEntrypointProps) => JSX.Element;
+export const ApplicationEntrypoint: (props: ApplicationEntrypointProps) => JSX_2.Element;
 
 // @public (undocumented)
 export interface ApplicationEntrypointProps extends ContemberClientProps, Omit<ProvidersProps, 'children'> {
@@ -489,7 +490,7 @@ export type ChangePasswordErrors = 'TOO_WEAK' | 'NOT_A_PERSON' | 'INVALID_PASSWO
 export const ClearFieldButton: React.NamedExoticComponent<ClearFieldButtonProps>;
 
 // @internal (undocumented)
-export const ClearFieldButtonInner: (props: ClearFieldButtonInnerProps) => JSX.Element;
+export const ClearFieldButtonInner: (props: ClearFieldButtonInnerProps) => JSX_2.Element;
 
 // @public (undocumented)
 export interface ClearFieldButtonInnerInternalProps {
@@ -525,7 +526,7 @@ export interface CommonToolbarButton extends IconSourceSpecification {
 }
 
 // @public (undocumented)
-export const ConcealableField: React.MemoExoticComponent<({ buttonProps, concealTimeout, renderConcealedValue, isExtended, children }: ConcealableFieldProps) => JSX.Element>;
+export const ConcealableField: React.MemoExoticComponent<({ buttonProps, concealTimeout, renderConcealedValue, isExtended, children }: ConcealableFieldProps) => JSX_2.Element>;
 
 // @public (undocumented)
 export interface ConcealableFieldProps {
@@ -680,7 +681,7 @@ export const createEmptyTableRowElement: (columnCount?: number) => {
 export const createMarkHtmlDeserializer: (markType: string, tagMatcher: (el: HTMLElement) => boolean, attributeMatcher: (el: HTMLElement) => boolean) => HtmlDeserializerPlugin;
 
 // @public (undocumented)
-export const CreatePage: PageComponent<({ pageName, children, rendererProps, redirectOnSuccess, onPersistSuccess, ...entityProps }: CreatePageProps) => JSX.Element>;
+export const CreatePage: PageComponent<({ pageName, children, rendererProps, redirectOnSuccess, onPersistSuccess, ...entityProps }: CreatePageProps) => JSX_2.Element>;
 
 // @public (undocumented)
 export type CreatePageProps = Omit<SugaredUnconstrainedQualifiedSingleEntity, 'isCreating'> & EntitySubTreeAdditionalProps & EntitySubTreeAdditionalCreationProps & {
@@ -712,7 +713,7 @@ export interface CreateResetPasswordRequestFormProps {
 }
 
 // @public (undocumented)
-export const CreateScope: <StateProps>({ children, redirectOnSuccess, onPersistSuccess, stateComponent, stateProps, ...entityProps }: CreateScopeProps<StateProps>) => JSX.Element;
+export const CreateScope: <StateProps>({ children, redirectOnSuccess, onPersistSuccess, stateComponent, stateProps, ...entityProps }: CreateScopeProps<StateProps>) => JSX_2.Element;
 
 // @public (undocumented)
 export type CreateScopeProps<StateProps> = Omit<SugaredUnconstrainedQualifiedSingleEntity, 'isCreating'> & EntitySubTreeAdditionalProps & EntitySubTreeAdditionalCreationProps & DataBindingProviderStateComponent<StateProps> & {
@@ -781,7 +782,7 @@ export interface CustomMarkPlugin {
 }
 
 // @public (undocumented)
-export const DataGridPage: PageComponent<({ children, rendererProps, pageName: _INTENTIONALLY_OMITTED_pageName, ...dataGridProps }: DataGridPageProps) => JSX.Element>;
+export const DataGridPage: PageComponent<({ children, rendererProps, pageName: _INTENTIONALLY_OMITTED_pageName, ...dataGridProps }: DataGridPageProps) => JSX_2.Element>;
 
 // @public (undocumented)
 export type DataGridPageProps = DataGridProps<DataGridContainerPublicProps> & {
@@ -800,7 +801,7 @@ export const DataGridPageRenderer: React.NamedExoticComponent<LayoutRendererProp
 export type DataGridPageRendererProps = LayoutRendererProps & DataGridContainerProps;
 
 // @public (undocumented)
-export const DataGridScope: <StateProps>({ stateComponent, stateProps, skipBindingStateUpdateAfterPersist, refreshDataBindingOnPersist, ...props }: DataGridScopeProps<StateProps>) => JSX.Element;
+export const DataGridScope: <StateProps>({ stateComponent, stateProps, skipBindingStateUpdateAfterPersist, refreshDataBindingOnPersist, ...props }: DataGridScopeProps<StateProps>) => JSX_2.Element;
 
 // @public (undocumented)
 export type DataGridScopeProps<StateProps> = PropsWithChildren<DataGridProps<DataGridContainerPublicProps>> & DataBindingProviderStateComponent<StateProps> & {
@@ -831,7 +832,7 @@ export interface DerivedFieldLinkProps<SourcePersisted extends FieldValue = Fiel
 }
 
 // @public (undocumented)
-export const DetailPage: PageComponent<({ pageName, children, rendererProps, ...entityProps }: DetailPageProps) => JSX.Element>;
+export const DetailPage: PageComponent<({ pageName, children, rendererProps, ...entityProps }: DetailPageProps) => JSX_2.Element>;
 
 // @public (undocumented)
 export type DetailPageProps = SugaredQualifiedSingleEntity & EntitySubTreeAdditionalProps & {
@@ -841,7 +842,7 @@ export type DetailPageProps = SugaredQualifiedSingleEntity & EntitySubTreeAdditi
 };
 
 // @public (undocumented)
-export const DetailScope: <StateProps>({ children, stateComponent, stateProps, ...entityProps }: DetailScopeProps<StateProps>) => JSX.Element;
+export const DetailScope: <StateProps>({ children, stateComponent, stateProps, ...entityProps }: DetailScopeProps<StateProps>) => JSX_2.Element;
 
 // @public (undocumented)
 export type DetailScopeProps<StateProps> = SugaredQualifiedSingleEntity & EntitySubTreeAdditionalProps & DataBindingProviderStateComponent<StateProps> & {
@@ -857,7 +858,7 @@ export interface DimensionDatum {
 }
 
 // @public (undocumented)
-export function DimensionsRenderer(props: DimensionsRendererProps): JSX.Element | null;
+export function DimensionsRenderer(props: DimensionsRendererProps): JSX_2.Element | null;
 
 // @public (undocumented)
 export interface DimensionsRendererProps {
@@ -880,7 +881,7 @@ export interface DimensionsRendererProps {
 }
 
 // @public (undocumented)
-export const DimensionsSwitcher: React.MemoExoticComponent<(props: DimensionsSwitcherProps) => JSX.Element>;
+export const DimensionsSwitcher: React.MemoExoticComponent<(props: DimensionsSwitcherProps) => JSX_2.Element>;
 
 // @public (undocumented)
 export interface DimensionsSwitcherBaseProps extends Omit<DimensionsRendererProps, 'accessor' | 'labelFactory' | 'minItems' | 'maxItems' | 'redirect'> {
@@ -945,7 +946,7 @@ export type DisplayTextFieldProps = Omit<SimpleRelativeSingleFieldProps, 'defaul
 };
 
 // @public (undocumented)
-export const DragHandle: () => JSX.Element;
+export const DragHandle: () => JSX_2.Element;
 
 // @public (undocumented)
 export type DynamicRequestParameters = RequestParameters<RoutingParameter>;
@@ -1093,7 +1094,7 @@ export type EditorWithBlocks = Editor_2 & WithBlockElements;
 export type EditorWithEssentials<E extends BaseEditor> = WithEssentials & E;
 
 // @public (undocumented)
-export const EditPage: PageComponent<({ pageName, children, rendererProps, redirectOnSuccess, onPersistSuccess, refreshDataBindingOnPersist, skipBindingStateUpdateAfterPersist, ...entityProps }: EditPageProps) => JSX.Element>;
+export const EditPage: PageComponent<({ pageName, children, rendererProps, redirectOnSuccess, onPersistSuccess, refreshDataBindingOnPersist, skipBindingStateUpdateAfterPersist, ...entityProps }: EditPageProps) => JSX_2.Element>;
 
 // @public (undocumented)
 export type EditPageProps = SugaredQualifiedSingleEntity & EntitySubTreeAdditionalProps & {
@@ -1106,7 +1107,7 @@ export type EditPageProps = SugaredQualifiedSingleEntity & EntitySubTreeAddition
 };
 
 // @public (undocumented)
-export const EditScope: <StateProps>({ children, onPersistSuccess, redirectOnSuccess, refreshDataBindingOnPersist, skipBindingStateUpdateAfterPersist, stateComponent, stateProps, ...entityProps }: EditScopeProps<StateProps>) => JSX.Element;
+export const EditScope: <StateProps>({ children, onPersistSuccess, redirectOnSuccess, refreshDataBindingOnPersist, skipBindingStateUpdateAfterPersist, stateComponent, stateProps, ...entityProps }: EditScopeProps<StateProps>) => JSX_2.Element;
 
 // @public (undocumented)
 export type EditScopeProps<StateProps> = SugaredQualifiedSingleEntity & EntitySubTreeAdditionalProps & DataBindingProviderStateComponent<StateProps> & {
@@ -1181,7 +1182,7 @@ export const EmbedHandlers: {
 };
 
 // @public (undocumented)
-export function FeedbackRenderer({ accessorTreeState, children }: FeedbackRendererProps): JSX.Element | null;
+export function FeedbackRenderer({ accessorTreeState, children }: FeedbackRendererProps): JSX_2.Element | null;
 
 // @public (undocumented)
 export interface FeedbackRendererProps {
@@ -1373,7 +1374,7 @@ export interface GenericFileMetadataExtractorProps {
 }
 
 // @public
-export const GenericPage: PageComponent<({ children, ...props }: GenericPageProps) => JSX.Element>;
+export const GenericPage: PageComponent<({ children, ...props }: GenericPageProps) => JSX_2.Element>;
 
 // @public (undocumented)
 export type GenericPageProps = Omit<LayoutPageProps, 'children'> & {
@@ -1584,7 +1585,7 @@ export interface HoveringToolbarContentsProps {
 }
 
 // @public (undocumented)
-export const HoveringToolbars: React.MemoExoticComponent<({ blockButtons, inlineButtons, shouldDisplayInlineToolbar: shouldDisplayInlineToolbarProp, showLabels, toolbarScheme, ...props }: HoveringToolbarsProps) => JSX.Element>;
+export const HoveringToolbars: React.MemoExoticComponent<({ blockButtons, inlineButtons, shouldDisplayInlineToolbar: shouldDisplayInlineToolbarProp, showLabels, toolbarScheme, ...props }: HoveringToolbarsProps) => JSX_2.Element>;
 
 // @public (undocumented)
 export interface HoveringToolbarsProps {
@@ -1751,7 +1752,7 @@ export type IDPAutoInitState = {
 };
 
 // @public (undocumented)
-export const IDPInitButton: ({ provider, onError }: IDPInitButtonProps) => JSX.Element;
+export const IDPInitButton: ({ provider, onError }: IDPInitButtonProps) => JSX_2.Element;
 
 // @public (undocumented)
 export interface IDPInitButtonProps {
@@ -1762,7 +1763,7 @@ export interface IDPInitButtonProps {
 }
 
 // @public (undocumented)
-export const IDPResponseHandler: ({ onLogin }: IDPResponseHandlerProps) => JSX.Element | null;
+export const IDPResponseHandler: ({ onLogin }: IDPResponseHandlerProps) => JSX_2.Element | null;
 
 // @public (undocumented)
 export interface IDPResponseHandlerProps {
@@ -1896,7 +1897,7 @@ export interface InnerRoutingLinkProps extends Omit<PublicAnchorProps, 'onClick'
 // @public (undocumented)
 export class InputGroup extends PureComponent<InputGroupProps & InputHTMLAttributes<HTMLInputElement>> {
     // (undocumented)
-    render(): JSX.Element;
+    render(): JSX_2.Element;
 }
 
 // @public (undocumented)
@@ -2122,7 +2123,7 @@ export interface ListMembersQueryVariables {
 }
 
 // @public (undocumented)
-export const ListPage: PageComponent<(<ContainerExtraProps, ItemExtraProps>({ children, rendererProps, pageName, ...entityListProps }: ListPageProps<ContainerExtraProps, ItemExtraProps>) => JSX.Element)>;
+export const ListPage: PageComponent<(<ContainerExtraProps, ItemExtraProps>({ children, rendererProps, pageName, ...entityListProps }: ListPageProps<ContainerExtraProps, ItemExtraProps>) => JSX_2.Element)>;
 
 // @public (undocumented)
 export type ListPageProps<ContainerExtraProps, ItemExtraProps> = SugaredQualifiedEntityList & EntityListSubTreeAdditionalProps & {
@@ -2147,7 +2148,7 @@ export interface ListRolesQueryVariables {
 }
 
 // @public (undocumented)
-export const ListScope: <ContainerExtraProps, ItemExtraProps, StateProps>({ children, stateComponent, stateProps, ...entityListProps }: ListScopeProps<ContainerExtraProps, ItemExtraProps, StateProps>) => JSX.Element;
+export const ListScope: <ContainerExtraProps, ItemExtraProps, StateProps>({ children, stateComponent, stateProps, ...entityListProps }: ListScopeProps<ContainerExtraProps, ItemExtraProps, StateProps>) => JSX_2.Element;
 
 // @public (undocumented)
 export type ListScopeProps<ContainerExtraProps, ItemExtraProps, StateProps> = SugaredQualifiedEntityList & EntityListSubTreeAdditionalProps & DataBindingProviderStateComponent<StateProps> & {
@@ -2162,10 +2163,10 @@ export interface ListUserQueryResult {
 }
 
 // @public (undocumented)
-export const Login: ({ onLogin, resetLink }: LoginProps) => JSX.Element;
+export const Login: ({ onLogin, resetLink }: LoginProps) => JSX_2.Element;
 
 // @public (undocumented)
-export const LoginEntrypoint: (props: LoginEntrypointProps) => JSX.Element;
+export const LoginEntrypoint: (props: LoginEntrypointProps) => JSX_2.Element;
 
 // @public (undocumented)
 export interface LoginEntrypointProps {
@@ -2328,7 +2329,7 @@ export type MiscPageLayoutProps = Omit<BoxOwnProps, 'header' | 'footer'> & {
 };
 
 // @public (undocumented)
-export const MultiEditPage: PageComponent<(<ContainerExtraProps, ItemExtraProps>({ children, rendererProps, pageName, ...entityListProps }: MultiEditPageProps<ContainerExtraProps, ItemExtraProps>) => JSX.Element)>;
+export const MultiEditPage: PageComponent<(<ContainerExtraProps, ItemExtraProps>({ children, rendererProps, pageName, ...entityListProps }: MultiEditPageProps<ContainerExtraProps, ItemExtraProps>) => JSX_2.Element)>;
 
 // @public (undocumented)
 export type MultiEditPageProps<ContainerExtraProps, ItemExtraProps> = SugaredQualifiedEntityList & EntityListSubTreeAdditionalProps & {
@@ -2338,7 +2339,7 @@ export type MultiEditPageProps<ContainerExtraProps, ItemExtraProps> = SugaredQua
 };
 
 // @public (undocumented)
-export const MultiEditScope: <ContainerExtraProps, ItemExtraProps, StateManagerProps>({ children, refreshDataBindingOnPersist, skipBindingStateUpdateAfterPersist, stateComponent, stateProps, ...entityListProps }: MultiEditScopeProps<ContainerExtraProps, ItemExtraProps, StateManagerProps>) => JSX.Element;
+export const MultiEditScope: <ContainerExtraProps, ItemExtraProps, StateManagerProps>({ children, refreshDataBindingOnPersist, skipBindingStateUpdateAfterPersist, stateComponent, stateProps, ...entityListProps }: MultiEditScopeProps<ContainerExtraProps, ItemExtraProps, StateManagerProps>) => JSX_2.Element;
 
 // @public (undocumented)
 export type MultiEditScopeProps<ContainerExtraProps, ItemExtraProps, StateManagerProps> = SugaredQualifiedEntityList & EntityListSubTreeAdditionalProps & DataBindingProviderStateComponent<StateManagerProps> & {
@@ -2386,7 +2387,7 @@ export const navigationBackLinkDictionary: {
 };
 
 // @public (undocumented)
-export const NavigationProvider: (props: NavigationProviderProps) => JSX.Element;
+export const NavigationProvider: (props: NavigationProviderProps) => JSX_2.Element;
 
 // @public (undocumented)
 export interface NavigationProviderProps {
@@ -2433,7 +2434,7 @@ export const orderedListElementType: "orderedList";
 export const orderedListToolbarButton: ElementToolbarButton<OrderedListElement>;
 
 // @public (undocumented)
-export const OtpManagement: () => JSX.Element;
+export const OtpManagement: () => JSX_2.Element;
 
 // @public (undocumented)
 export type OutdatedApplicationDictionary = typeof outdatedApplicationDictionary;
@@ -2475,7 +2476,7 @@ export interface OverrideInsertElementWithReferenceOptions {
 
 // @public
 export const Page: {
-    <P = unknown>(props: PageProps<P>): JSX.Element | null;
+    <P = unknown>(props: PageProps<P>): JSX_2.Element | null;
     displayName: string;
     getPageName(props: PageProps<unknown>): string;
 };
@@ -2528,7 +2529,7 @@ export interface PageRequest<P extends RequestParameters<RoutingParameter> = Req
 }
 
 // @public
-export const Pages: ({ children, layout, bindingFeedbackRenderer }: PagesProps) => JSX.Element;
+export const Pages: ({ children, layout, bindingFeedbackRenderer }: PagesProps) => JSX_2.Element;
 
 // @public (undocumented)
 export type PagesMap = Record<string, PagesMapElement>;
@@ -2573,7 +2574,7 @@ export const paragraphHtmlDeserializer: HtmlDeserializerPlugin;
 export const paragraphNumberedToolbarButton: ElementToolbarButton<ParagraphElement>;
 
 // @public (undocumented)
-export function ParagraphRenderer({ attributes, children, element }: ParagraphRendererProps): JSX.Element;
+export function ParagraphRenderer({ attributes, children, element }: ParagraphRendererProps): JSX_2.Element;
 
 // @public (undocumented)
 export interface ParagraphRendererProps extends Omit<RenderElementProps, 'element'> {
@@ -2683,10 +2684,10 @@ export interface ProjectGridProps {
 }
 
 // @public (undocumented)
-export const ProjectList: (props: ProjectListProps) => JSX.Element;
+export const ProjectList: (props: ProjectListProps) => JSX_2.Element;
 
 // @public (undocumented)
-export const ProjectListButtons: (props: ProjectListProps) => JSX.Element;
+export const ProjectListButtons: (props: ProjectListProps) => JSX_2.Element;
 
 // @public (undocumented)
 export interface ProjectListProps {
@@ -2766,7 +2767,7 @@ export interface ReferenceElementOptions {
 }
 
 // @public (undocumented)
-export const ReferenceElementRenderer: React.MemoExoticComponent<(props: ReferenceElementRendererProps) => JSX.Element>;
+export const ReferenceElementRenderer: React.MemoExoticComponent<(props: ReferenceElementRendererProps) => JSX_2.Element>;
 
 // @public (undocumented)
 export interface ReferenceElementRendererProps extends RenderElementProps, ReferenceElementOptions {
@@ -2780,10 +2781,10 @@ export interface ReferenceElementRendererProps extends RenderElementProps, Refer
 export const referenceElementType: "reference";
 
 // @public (undocumented)
-export const renderAnyFilePreview: ({ objectUrl }: RenderFilePreviewOptions) => JSX.Element;
+export const renderAnyFilePreview: ({ objectUrl }: RenderFilePreviewOptions) => JSX_2.Element;
 
 // @public (undocumented)
-export const renderAudioFilePreview: ({ objectUrl }: RenderFilePreviewOptions) => JSX.Element;
+export const renderAudioFilePreview: ({ objectUrl }: RenderFilePreviewOptions) => JSX_2.Element;
 
 // @public (undocumented)
 export const renderByJoining: SelectedDimensionRenderer;
@@ -2799,10 +2800,10 @@ export interface RenderFilePreviewOptions<AcceptArtifacts = unknown> {
 }
 
 // @public (undocumented)
-export const renderImageFilePreview: ({ objectUrl }: RenderFilePreviewOptions) => JSX.Element;
+export const renderImageFilePreview: ({ objectUrl }: RenderFilePreviewOptions) => JSX_2.Element;
 
 // @public (undocumented)
-export const renderVideoFilePreview: ({ objectUrl }: RenderFilePreviewOptions) => JSX.Element;
+export const renderVideoFilePreview: ({ objectUrl }: RenderFilePreviewOptions) => JSX_2.Element;
 
 // @public
 export const Repeater: <ContainerExtraProps, ItemExtraProps>(props: RepeaterProps<ContainerExtraProps, ItemExtraProps>) => ReactElement;
@@ -2826,7 +2827,7 @@ export const repeaterDictionary: {
 };
 
 // @public (undocumented)
-export const RepeaterFieldContainer: React.MemoExoticComponent<({ accessor, addButtonText, children, createNewEntity, addButtonComponent: AddButton, addButtonComponentExtraProps, addButtonProps, emptyMessage, emptyMessageComponent, enableAddingNew, formatMessage, isEmpty, label, ...rest }: RepeaterFieldContainerProps) => JSX.Element>;
+export const RepeaterFieldContainer: React.MemoExoticComponent<({ accessor, addButtonText, children, createNewEntity, addButtonComponent: AddButton, addButtonComponentExtraProps, addButtonProps, emptyMessage, emptyMessageComponent, enableAddingNew, formatMessage, isEmpty, label, ...rest }: RepeaterFieldContainerProps) => JSX_2.Element>;
 
 // @public (undocumented)
 export interface RepeaterFieldContainerPrivateProps extends Omit<FieldContainerOwnProps, 'useLabelElement'> {
@@ -2851,7 +2852,7 @@ export type RepeaterFieldContainerPublicProps = EmptyMessageOuterProps & AddEnti
 };
 
 // @public (undocumented)
-export const RepeaterHandle: React.MemoExoticComponent<() => JSX.Element>;
+export const RepeaterHandle: React.MemoExoticComponent<() => JSX_2.Element>;
 
 // @public (undocumented)
 export const RepeaterInner: (<ContainerExtraProps, ItemExtraProps>(props: RepeaterInnerProps<ContainerExtraProps, ItemExtraProps>) => ReactElement) & StaticRenderProvider<RepeaterInnerProps<unknown, unknown>, "accessor">;
@@ -3286,7 +3287,7 @@ export class SideDimensions extends PureComponent<SideDimensionsProps> {
     // (undocumented)
     static displayName: string;
     // (undocumented)
-    render(): JSX.Element;
+    render(): JSX_2.Element;
     // (undocumented)
     static staticRender(props: SideDimensionsProps, environment: Environment): ReactElement | null;
 }
@@ -3313,7 +3314,7 @@ export namespace SideDimensions {
         // (undocumented)
         getLabelMiddleware(): LabelMiddleware | undefined;
         // (undocumented)
-        render(): JSX.Element;
+        render(): JSX_2.Element;
         // (undocumented)
         static staticRender(props: SingleDimensionProps, environment: Environment): ReactNode;
     }
@@ -3406,7 +3407,7 @@ export interface SortableBlockProps extends RepeaterItemProps, SortableBlockOwnP
 
 // @public (undocumented)
 export const SortableRepeaterContainer: {
-    ({ helperClass, ...props }: SortableRepeaterContainerProps): JSX.Element;
+    ({ helperClass, ...props }: SortableRepeaterContainerProps): JSX_2.Element;
     displayName: string;
 };
 
@@ -3497,7 +3498,7 @@ export const tableElementPlugin: CustomElementPlugin<TableElement>;
 export const tableElementType: "table";
 
 // @public (undocumented)
-export const TablePage: PageComponent<(<ContainerExtraProps, ItemExtraProps>({ rendererProps, children, pageName, ...entityListProps }: TablePageProps<ContainerExtraProps, ItemExtraProps>) => JSX.Element)>;
+export const TablePage: PageComponent<(<ContainerExtraProps, ItemExtraProps>({ rendererProps, children, pageName, ...entityListProps }: TablePageProps<ContainerExtraProps, ItemExtraProps>) => JSX_2.Element)>;
 
 // @public (undocumented)
 export type TablePageProps<ContainerExtraProps, ItemExtraProps> = SugaredQualifiedEntityList & EntityListSubTreeAdditionalProps & {
@@ -3579,7 +3580,7 @@ export const Tile: React.NamedExoticComponent<BoxOwnProps>;
 // @public (undocumented)
 export const TileList: ({ children }: {
     children?: ReactNode;
-}) => JSX.Element;
+}) => JSX_2.Element;
 
 // @public (undocumented)
 export type TileProps = BoxOwnProps;
@@ -3914,10 +3915,10 @@ password: GQLVariableType<string, true>;
 }>, TenantMutationResponse<never, PasswordResetErrors>>;
 
 // @public (undocumented)
-export const useResponseHandlerFeedback: ({ onLogin }: IDPResponseHandlerProps) => JSX.Element | null;
+export const useResponseHandlerFeedback: ({ onLogin }: IDPResponseHandlerProps) => JSX_2.Element | null;
 
 // @public (undocumented)
-export const UserListPage: <T extends {}>(props: UserListPageProps<T>) => JSX.Element;
+export const UserListPage: <T extends {}>(props: UserListPageProps<T>) => JSX_2.Element;
 
 // @public (undocumented)
 export type UserListPageProps<T> = UseRoleRendererFactoryProps<T> & {
@@ -3962,7 +3963,7 @@ export interface UsersListProps {
 }
 
 // @public @deprecated (undocumented)
-export const UsersManagement: <T extends {}>(props: UserListPageProps<T>) => JSX.Element;
+export const UsersManagement: <T extends {}>(props: UserListPageProps<T>) => JSX_2.Element;
 
 // @public (undocumented)
 export const useSaveBacklink: () => () => void;

@@ -11,6 +11,7 @@ import { DynamicMultiChoiceFieldRendererProps } from '@contember/react-choice-fi
 import { DynamicMultipleChoiceFieldProps } from '@contember/react-choice-field';
 import { DynamicSingleChoiceFieldProps } from '@contember/react-choice-field';
 import { FieldContainerProps } from '@contember/ui';
+import { JSX as JSX_2 } from 'react/jsx-runtime';
 import { MemoExoticComponent } from 'react';
 import type { Props } from 'react-select';
 import { PublicCommonReactSelectStylesProps } from '@contember/ui';
@@ -38,7 +39,7 @@ export const choiceFieldDictionary: {
 export const MultiSelectField: ComponentType<MultiSelectFieldProps>;
 
 // @internal (undocumented)
-export const MultiSelectFieldInner: MemoExoticComponent<({ currentValues, data, errors, onAdd, onClear, onRemove, reactSelectProps, placeholder, menuZIndex, onMove, onSearch, isLoading, createNewForm: _INTENTIONALLY_OMITTED_createNewForm, onAddNew, ...props }: MultiSelectFieldInnerProps) => JSX.Element>;
+export const MultiSelectFieldInner: MemoExoticComponent<({ currentValues, data, errors, onAdd, onClear, onRemove, reactSelectProps, placeholder, menuZIndex, onMove, onSearch, isLoading, createNewForm: _INTENTIONALLY_OMITTED_createNewForm, onAddNew, ...props }: MultiSelectFieldInnerProps) => JSX_2.Element>;
 
 // @public (undocumented)
 export type MultiSelectFieldInnerProps = DynamicMultiChoiceFieldRendererProps & MultiSelectFieldRendererPublicProps & {
@@ -49,7 +50,7 @@ export type MultiSelectFieldInnerProps = DynamicMultiChoiceFieldRendererProps & 
 export type MultiSelectFieldProps = MultiSelectFieldRendererPublicProps & DynamicMultipleChoiceFieldProps;
 
 // @internal (undocumented)
-export const MultiSelectFieldRenderer: MemoExoticComponent<(props: MultiSelectFieldRendererProps) => JSX.Element>;
+export const MultiSelectFieldRenderer: MemoExoticComponent<(props: MultiSelectFieldRendererProps) => JSX_2.Element>;
 
 // @public (undocumented)
 export type MultiSelectFieldRendererProps = MultiSelectFieldInnerProps & BaseDynamicChoiceField;
@@ -57,7 +58,7 @@ export type MultiSelectFieldRendererProps = MultiSelectFieldInnerProps & BaseDyn
 // @public (undocumented)
 export type MultiSelectFieldRendererPublicProps = Pick<FieldContainerProps, 'description' | 'gap' | 'label' | 'labelDescription' | 'labelPosition' | 'required' | 'size' | 'useLabelElement' | 'style' | 'className'> & PublicCommonReactSelectStylesProps & {
     placeholder?: string;
-    reactSelectProps?: Partial<Props<any>>;
+    reactSelectProps?: Partial<Props<any, boolean, never>>;
     createNewForm?: ReactElement;
 };
 
@@ -70,7 +71,7 @@ export const RadioField: ComponentType<RadioFieldProps>;
 export type RadioFieldProps = RadioFieldRendererPublicProps & (StaticSingleChoiceFieldProps | SimpleDynamicSingleChoiceFieldProps);
 
 // @public (undocumented)
-export const RadioFieldRenderer: MemoExoticComponent<(<T = unknown>(props: RadioFieldRendererProps<T>) => JSX.Element)>;
+export const RadioFieldRenderer: MemoExoticComponent<(<T = unknown>(props: RadioFieldRendererProps<T>) => JSX_2.Element)>;
 
 // @public (undocumented)
 export type RadioFieldRendererProps<T = unknown> = SingleChoiceFieldRendererProps<T> & RadioFieldRendererPublicProps;
@@ -82,7 +83,7 @@ export type RadioFieldRendererPublicProps = Omit<FieldContainerProps, 'children'
 export const SelectField: ComponentType<SelectFieldProps>;
 
 // @public (undocumented)
-export const SelectFieldInner: <T = unknown>({ placeholder, allowNull, currentValue, data, errors, menuZIndex, onSelect, onClear, reactSelectProps, onSearch, isLoading, createNewForm: _INTENTIONALLY_OMITTED_createNewForm, onAddNew, ...props }: SelectFieldInnerProps<T>) => JSX.Element;
+export const SelectFieldInner: <T = unknown>({ placeholder, allowNull, currentValue, data, errors, menuZIndex, onSelect, onClear, reactSelectProps, onSearch, isLoading, createNewForm: _INTENTIONALLY_OMITTED_createNewForm, onAddNew, ...props }: SelectFieldInnerProps<T>) => JSX_2.Element;
 
 // @public (undocumented)
 export type SelectFieldInnerProps<T = unknown> = SingleChoiceFieldRendererProps<T> & SelectFieldRendererPublicProps & {
@@ -93,7 +94,7 @@ export type SelectFieldInnerProps<T = unknown> = SingleChoiceFieldRendererProps<
 export type SelectFieldProps = SelectFieldRendererPublicProps & (StaticSingleChoiceFieldProps | DynamicSingleChoiceFieldProps);
 
 // @internal (undocumented)
-export const SelectFieldRenderer: MemoExoticComponent<(<T = unknown>({ createNewForm, ...props }: SelectFieldRendererProps<T>) => JSX.Element)>;
+export const SelectFieldRenderer: MemoExoticComponent<(<T = unknown>({ createNewForm, ...props }: SelectFieldRendererProps<T>) => JSX_2.Element)>;
 
 // @public (undocumented)
 export type SelectFieldRendererProps<T = unknown> = SelectFieldInnerProps<T> & ChoiceFieldProps;
@@ -102,7 +103,7 @@ export type SelectFieldRendererProps<T = unknown> = SelectFieldInnerProps<T> & C
 export type SelectFieldRendererPublicProps = Omit<FieldContainerProps, 'children' | 'errors'> & PublicCommonReactSelectStylesProps & {
     placeholder?: string;
     allowNull?: boolean;
-    reactSelectProps?: Partial<Props<any>>;
+    reactSelectProps?: Partial<Props<any, boolean, never>>;
     createNewForm?: ReactElement;
 };
 

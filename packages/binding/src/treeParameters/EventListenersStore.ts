@@ -1,5 +1,6 @@
+type AnyFunction = (...args: any[]) => any
 type GenericEventsMap<EventTypes extends string> = {
-	[K in EventTypes]?: (...args: any[]) => void | Promise<void | any>
+	[K in EventTypes]?: (...args: any[]) => void | AnyFunction | Promise<void | AnyFunction>
 }
 
 export class EventListenersStore<EventTypes extends string, Events extends GenericEventsMap<EventTypes>> {

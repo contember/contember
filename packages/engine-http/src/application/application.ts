@@ -23,6 +23,8 @@ export class Application {
 	private internalRoutes: Route<InternalHttpController>[] = []
 	private websocketRoutes: Route<WebSocketController>[] = []
 
+	private suppressAccessLog: boolean | RegExp
+
 	constructor(
 		private readonly projectGroupResolver: ProjectGroupResolver,
 		private readonly serverConfig: ServerConfig,
@@ -30,6 +32,8 @@ export class Application {
 		private readonly version: string | undefined,
 		private readonly logger: Logger,
 	) {
+		const suppressAccessLogRaw = serverConfig.http.suppressAccessLog
+		this.suppressAccessLog = suppressAccessLogRaw === true ? true : suppressAccessLogRaw ? new RegExp(suppressAccessLogRaw) : false
 	}
 
 	addMiddleware(middleware: KoaMiddleware<any>) {
@@ -172,6 +176,7 @@ export class Application {
 			requestLogger.debug('Websocket connection failed')
 		} finally {
 			sendTimer({
+				req,
 				requestDebugMode: false,
 				logger: requestLogger,
 			})
@@ -187,15 +192,13 @@ export class Application {
 			}
 		}
 		let httpContext: HttpContext | null = null
-		let requestLogger = this.logger
+		let requestLogger = this.createRequestLogger(ctx.req, ctx.request.body, matchedRequest?.module)
 		const { timer, send: sendTimer } = this.createTimer()
 
 		try {
 			if (!matchedRequest) {
 				return this.sendHttpResponse(ctx, new HttpErrorResponse(404, 'Route not found'))
 			}
-
-			requestLogger = this.createRequestLogger(ctx.req, ctx.request.body, matchedRequest.module)
 			requestLogger.debug('Request processing started', {
 				body: ctx.request.body,
 				query: ctx.request.query,
@@ -246,6 +249,7 @@ export class Application {
 			}
 		} finally {
 			sendTimer({
+				req: ctx.req,
 				response: ctx.res,
 				body: ctx.response.body,
 				requestDebugMode: (httpContext as HttpContext | null)?.requestDebugMode ?? false,
@@ -312,7 +316,7 @@ export class Application {
 		)
 	}
 
-	private createRequestLogger(request: IncomingMessage, body: any, module: string): Logger {
+	private createRequestLogger(request: IncomingMessage, body: any, module?: string): Logger {
 		return this.logger.child({
 			method: request.method,
 			uri: request.url,
@@ -346,7 +350,7 @@ export class Application {
 			return res
 		}
 
-		const send = (ctx: { response?: ServerResponse; body?: unknown; requestDebugMode: boolean; logger: Logger }) => {
+		const send = (ctx: { req: IncomingMessage; response?: ServerResponse; body?: unknown; requestDebugMode: boolean; logger: Logger }) => {
 			if (ctx.response && !ctx.response.headersSent && (ctx.requestDebugMode || this.debugMode) && times.length) {
 				ctx.response.setHeader('server-timing', times.map(it => `${it.label};desc="${it.label} T+${it.start}";dur=${it.duration ?? -1}`).join(', '))
 			}
@@ -354,7 +358,10 @@ export class Application {
 			const emit = () => {
 				const total = new Date().getTime() - globalStart
 				const timeLabel = total > 500 ? 'TIME_SLOW' : 'TIME_OK'
-				ctx.logger.info(!ctx.response ? 'Connection established' : ctx.response.statusCode < 400 ? `Request successful` : 'Request failed', {
+				const shouldSuppress = this.suppressAccessLog === true || !ctx.req.url || (this.suppressAccessLog !== false && this.suppressAccessLog.test(ctx.req.url))
+
+				const level = shouldSuppress ? 'debug' : 'info'
+				ctx.logger.log(level, !ctx.response ? 'Connection established' : ctx.response.statusCode < 400 ? `Request successful` : 'Request failed', {
 					status: ctx.response?.statusCode,
 					timeLabel: timeLabel,
 					totalTimeMs: total,

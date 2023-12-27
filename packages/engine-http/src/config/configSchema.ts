@@ -87,6 +87,21 @@ export const serverConfigSchema = Typesafe.object({
 	port: Typesafe.number,
 	http: Typesafe.partial({
 		requestBodySize: Typesafe.string,
+		suppressAccessLog: (val: unknown) => {
+			if (!val) {
+				return undefined
+			}
+			if (val === 'true' || val === '1' || val === 'on') {
+				return true
+			}
+			if (val === 'false' || val === '0' || val === 'off') {
+				return false
+			}
+			if (typeof val === 'string') {
+				return val
+			}
+			Typesafe.fail([])
+		},
 	}),
 	contentApi: Typesafe.partial({
 		schemaCacheTtlSeconds: Typesafe.integer,

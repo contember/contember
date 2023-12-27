@@ -81,6 +81,7 @@ export const configTemplate: any = {
 		applicationWorker: '%?env.CONTEMBER_APPLICATION_WORKER::string%',
 		http: {
 			requestBodySize: '%?env.CONTEMBER_HTTP_REQUEST_BODY_SIZE::string%',
+			suppressAccessLog: '%?env.CONTEMBER_HTTP_SUPPRESS_ACCESS_LOG::string%',
 		},
 		contentApi: {
 			schemaCacheTtlSeconds: '%?env.CONTEMBER_CONTENT_API_SCHEMA_CACHE_TTL_SECONDS::number%',

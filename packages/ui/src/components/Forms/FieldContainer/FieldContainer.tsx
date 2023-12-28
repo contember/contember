@@ -250,6 +250,7 @@ const unfilteredBindingRestProps = [
 	'itemComponent',
 	'itemComponentExtraProps',
 	'lazy',
+	'fuseOptions',
 	'onClear',
 	'onSearch',
 	'optionLabel',

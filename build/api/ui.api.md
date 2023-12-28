@@ -38,6 +38,7 @@ import { NamedExoticComponent } from 'react';
 import { Narrow } from '@contember/utilities';
 import { NestedClassName } from '@contember/utilities';
 import { NonOptional } from '@contember/utilities';
+import { Placement } from '@popperjs/core';
 import { PointerEventHandler } from 'react';
 import { PolymorphicComponent } from '@contember/utilities';
 import { PolymorphicComponentPropsWithRef } from '@contember/utilities';
@@ -96,6 +97,18 @@ export interface ActiveSectionTabsMap {
     // (undocumented)
     [id: string]: ActiveSectionTabProps;
 }
+
+// @internal
+export const AddColumnAfterIcon: LucideIcon;
+
+// @internal
+export const AddColumnBeforeIcon: LucideIcon;
+
+// @internal
+export const AddRowAboveIcon: LucideIcon;
+
+// @internal
+export const AddRowBelowIcon: LucideIcon;
 
 // @public (undocumented)
 export const Aether: MemoExoticComponent<({ children, className, ...divProps }: AetherProps) => JSX_2.Element>;
@@ -682,25 +695,27 @@ export interface DimensionSwitcherValue {
 }
 
 // @public (undocumented)
-export const Divider: MemoExoticComponent<({ className, componentClassName, gap, ...rest }: DividerProps) => JSX_2.Element>;
+export const Divider: MemoExoticComponent<({ className, componentClassName, gap, padding, ...rest }: DividerProps) => JSX_2.Element>;
 
 // @public (undocumented)
 export interface DividerOwnProps extends ComponentClassNameProps {
     gap?: StackOwnProps['gap'];
+    // (undocumented)
+    padding?: StackOwnProps['gap'];
 }
 
 // @public (undocumented)
 export type DividerProps = Omit<HTMLDivElementProps, keyof DividerOwnProps> & DividerOwnProps;
 
 // @public (undocumented)
-export const Dropdown: MemoExoticComponent<(props: DropdownProps) => JSX_2.Element>;
+export const Dropdown: MemoExoticComponent<({ alignment, placement, ...props }: DropdownProps) => JSX_2.Element>;
 
 // @public (undocumented)
 export type DropdownAlignment = Default | 'center' | 'start' | 'end' | 'top' | 'right';
 
 // @public (undocumented)
 export interface DropdownProps {
-    // (undocumented)
+    // @deprecated (undocumented)
     alignment?: DropdownAlignment;
     // (undocumented)
     buttonProps?: ButtonProps;
@@ -710,6 +725,8 @@ export interface DropdownProps {
     contentContainer?: HTMLElement;
     // (undocumented)
     onDismiss?: () => void;
+    // (undocumented)
+    placement?: Placement;
     // (undocumented)
     renderContent?: (props: DropdownRenderProps) => ReactNode;
     // (undocumented)

@@ -1,4 +1,3 @@
-import { Response } from 'node-fetch'
 import { array, nullable, object, string } from '../utils/schema'
 import { ApiRequest, ApiRequestSender } from './ApiRequestSender'
 

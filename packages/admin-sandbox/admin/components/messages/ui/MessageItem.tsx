@@ -1,5 +1,5 @@
 import { useClassName, useClassNameFactory } from '@contember/react-utils'
-import { Box, BoxProps, Description, HTMLDivElementProps, Stack } from '@contember/ui'
+import { Box, BoxHeaderProps, BoxProps, Description, HTMLDivElementProps, Stack } from '@contember/ui'
 import { ComponentClassNameProps, contentThemeClassName, controlsThemeClassName, dataAttribute } from '@contember/utilities'
 import { memo } from 'react'
 import { MessagesListItemLineProps, MessagesListItemProps } from '../types'
@@ -7,6 +7,9 @@ import { MessagesListItemLineProps, MessagesListItemProps } from '../types'
 export interface MessageItemProps extends MessagesListItemProps, Omit<BoxProps, keyof MessagesListItemProps> { }
 
 const MessageItemComponent = memo<MessageItemProps>(({
+	actions,
+	label,
+	header,
 	authorName,
 	className: classNameProp,
 	componentClassName = 'message-item',
@@ -16,9 +19,12 @@ const MessageItemComponent = memo<MessageItemProps>(({
 	...rest
 }) => {
 	const className = useClassNameFactory(componentClassName)
+	const boxHeaderProps: BoxHeaderProps = header ? { header } : { actions, label }
 
 	return (
 		<Box
+			{...rest}
+			{...boxHeaderProps}
 			align={mine ? 'end' : 'start'}
 			background={false}
 			border={false}
@@ -27,7 +33,6 @@ const MessageItemComponent = memo<MessageItemProps>(({
 			data-mine={dataAttribute(mine)}
 			gap="gap"
 			fit={false}
-			{...rest}
 		>
 			<Box
 				horizontal

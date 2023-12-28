@@ -1,4 +1,3 @@
-import fetch, { Response } from 'node-fetch'
 import { ApiEndpointResolver } from './ApiEndpointResolver'
 
 export interface ApiRequest {

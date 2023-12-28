@@ -4,23 +4,7 @@
 
 ```ts
 
-import { CamelCase } from 'type-fest';
-import { DelimiterCase } from 'type-fest';
-import { KebabCase } from 'type-fest';
-import { LiteralToPrimitiveDeep } from 'type-fest';
-import { MergeExclusive } from 'type-fest';
-import { Opaque } from 'type-fest';
-import { PascalCase } from 'type-fest';
-import { Replace } from 'type-fest';
-import { Simplify } from 'type-fest';
-import { UnionToIntersection } from 'type-fest';
-import { UnwrapOpaque } from 'type-fest';
-
-// @public (undocumented)
-export type AnyArray<Type = any> = Array<Type> | ReadonlyArray<Type>;
-
-// @public (undocumented)
-export type AnyRecord<T = any> = Record<KeyofBase, T>;
+import { ReactNode } from 'react';
 
 // @public (undocumented)
 export type AsProp<C extends React.ElementType> = {
@@ -38,11 +22,6 @@ export class AssertionError extends Error {
 // @public (undocumented)
 export function assertNever(_: never): never;
 
-export { CamelCase }
-
-// @public (undocumented)
-export function capitalize(str: string): string;
-
 // @public (undocumented)
 export type ClassNameStateMap = {
     [key: string]: string | number | boolean | null | undefined;
@@ -51,17 +30,11 @@ export type ClassNameStateMap = {
 // @internal
 export const COLOR_SCHEME_CLASS_NAME_REG_EXP: RegExp;
 
-// @public (undocumented)
-export type ColorSchemeClassName<T extends KebabCase<string> = KebabCase<string>> = `scheme-${T}`;
-
 // @public
-export function colorSchemeClassName<S extends KebabCase<string> = KebabCase<string>>(scheme: S): ColorSchemeClassName<S>;
+export function colorSchemeClassName(scheme: string): string;
 
 // @public (undocumented)
-export function colorSchemeClassName<S extends KebabCase<string> = KebabCase<string>>(scheme: null | undefined): undefined;
-
-// @public (undocumented)
-export function colorSchemeClassName<S extends KebabCase<string> = KebabCase<string>>(scheme: S | null | undefined): ColorSchemeClassName<S> | undefined;
+export function colorSchemeClassName(scheme: string | null | undefined): string | undefined;
 
 // @public (undocumented)
 export interface ComponentClassNameProps {
@@ -71,11 +44,15 @@ export interface ComponentClassNameProps {
     componentClassName?: string | string[];
 }
 
+// Warning: (ae-unresolved-link) The @link reference could not be resolved: An overload for "colorSchemeClassName" was not found that matches the TSDoc selector ":3"
+//
 // @public
-export function contentThemeClassName<ContentTheme extends KebabCase<string> = KebabCase<string>, State extends `:${KebabCase<string>}` | null | undefined = undefined>(theme: ContentTheme | null | undefined, state?: State | null | undefined): ThemeContentClassName<ContentTheme, State> | undefined;
+export function contentThemeClassName(theme: string | null | undefined): string | undefined;
 
+// Warning: (ae-unresolved-link) The @link reference could not be resolved: An overload for "colorSchemeClassName" was not found that matches the TSDoc selector ":3"
+//
 // @public
-export function controlsThemeClassName<ControlsTheme extends KebabCase<string> = KebabCase<string>, State extends `:${KebabCase<string>}` | null | undefined = undefined>(theme: ControlsTheme | null | undefined, state?: State | null | undefined): ThemeControlsClassName<ControlsTheme, State> | undefined;
+export function controlsThemeClassName(theme: string | null | undefined): string | undefined;
 
 // @public (undocumented)
 export function dataAttribute(value: unknown): string | true | undefined;
@@ -88,29 +65,14 @@ export const dateToStringWithoutTimezone: (date: Date, { includeTime }?: {
 // @public (undocumented)
 export function deduplicateClassName(classNameArray: string[]): string[];
 
-// @public (undocumented)
-export type DeepPartial<T> = T extends Function ? T : T extends Array<infer InferredArrayMember> ? Array<DeepPartial<InferredArrayMember>> : T extends object ? {
-    [Key in keyof T]?: DeepPartial<T[Key]>;
-} : T | undefined;
-
-export { DelimiterCase }
-
 // @internal
 export function deprecate(removal: SemverString, condition: boolean, deprecated: string, replacement: string | null): void;
-
-// @internal (undocumented)
-export function extend<B, E>(base: B, extension: E): B | E | readonly (B & object & any[])[number][] | Readonly<{
-    [k: string]: unknown;
-}>;
 
 // @public
 export type ExtendableProps<ExtendedProps = {}, OverrideProps = {}> = OverrideProps & Omit<ExtendedProps, keyof OverrideProps>;
 
 // @public (undocumented)
-export function fallback<R>(current: R, condition: boolean, mapped: R): R;
-
-// @public (undocumented)
-export function filterThemedClassName(nestedClassName: NestedClassName, defaultColorSchemeContext: ColorSchemeClassName): string[];
+export function filterThemedClassName(nestedClassName: NestedClassName, defaultColorSchemeContext: string): string[];
 
 // @public (undocumented)
 export function flatClassNameList(className: NestedClassName): string[];
@@ -122,9 +84,6 @@ export function getElementDimensions(element: HTMLElement): Promise<DOMRectReadO
 export function getElementDimensionsCallback(element: HTMLElement, callback: (dimensions: DOMRectReadOnly) => void): void;
 
 // @public (undocumented)
-export function getMatchingParentElement(element: HTMLElement | null, predicate: (element: HTMLElement | null) => boolean | Promise<boolean>): HTMLElement;
-
-// @public (undocumented)
 export function getSizeFromResizeObserverEntryFactory(box: ResizeObserverOptions['box']): (entry: ResizeObserverEntry) => {
     height: number;
     width: number;
@@ -133,100 +92,19 @@ export function getSizeFromResizeObserverEntryFactory(box: ResizeObserverOptions
 // @public
 export type InheritableElementProps<C extends React.ElementType, Props = {}> = ExtendableProps<PropsOf<C>, Props>;
 
-// @public (undocumented)
-export function isArrayOfMembersSatisfyingFactory<T>(predicate: (value: unknown) => value is T): (value: unknown) => value is Array<T>;
-
-// @public (undocumented)
-export function isBoolean(value: unknown): value is boolean;
-
 // @internal
-export function isColorSchemeClassName<T extends string>(value: string): value is ColorSchemeClassName<T>;
-
-// @public (undocumented)
-export function isDefined<T>(value: unknown): value is Exclude<T, undefined>;
-
-// @public (undocumented)
-export function isFalse(value: unknown): value is false;
-
-// @public (undocumented)
-export function isHTMLElement(value: unknown): value is HTMLElement;
-
-// @public (undocumented)
-export function isNonEmptyArray<T>(value: unknown): value is [T, ...T[]];
-
-// @public (undocumented)
-export function isNonEmptyString(value: unknown): value is string;
-
-// @public (undocumented)
-export const isNonEmptyTrimmedEndString: (value: unknown) => value is string;
-
-// @public (undocumented)
-export const isNonEmptyTrimmedStartString: (value: unknown) => value is string;
-
-// @public (undocumented)
-export const isNonEmptyTrimmedString: (value: unknown) => value is string;
+export function isColorSchemeClassName(value: string): boolean;
 
 // @public (undocumented)
 export function isNonNegativeNumber(value: unknown): value is number;
 
-// @public (undocumented)
-export function isNotNull<T>(value: unknown): value is T;
-
-// @public (undocumented)
-export function isNotNullish<T>(value: T): value is Exclude<T, null | undefined>;
-
-// @public (undocumented)
-export function isNull(value: unknown): value is null;
-
-// @public (undocumented)
-export function isNumber(value: unknown): value is number;
-
-// @public (undocumented)
-export function isNumericString(value: string): value is string;
-
-// @public (undocumented)
-export function isObject(value: unknown): value is Object;
-
-// @public (undocumented)
-export function isOneOfFactory<U, T = any>(members: T extends Array<U> | ReadonlyArray<U> ? T : never): (value: unknown) => value is U;
-
-// @public (undocumented)
-export function isPlainObject<T extends Record<string, unknown>>(value: unknown): value is T;
-
-// @public
-export function isScrollable(element: HTMLElement | null): boolean;
-
-// @public (undocumented)
-export function isSingleWordString(value: unknown): value is string;
-
-// @public (undocumented)
-export function isSlugString(value: unknown): value is SlugString;
-
-// @public (undocumented)
-export function isString(value: unknown): value is string;
-
-// @public (undocumented)
-export function isTrue(value: unknown): value is true;
-
-// @public (undocumented)
-export function isUndefined(value: unknown): value is undefined;
-
-export { KebabCase }
-
-// @public (undocumented)
-export type KeyofBase = keyof any;
-
 // @public
 export function listClassName(list: NestedClassName): string;
-
-export { LiteralToPrimitiveDeep }
-
-export { MergeExclusive }
 
 // Warning: (ae-forgotten-export) The symbol "NarrowRaw" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
-export type Narrow<A extends any> = Try<A, [], NarrowRaw<A>>;
+export type Narrow<A extends any> = A extends [] ? A : NarrowRaw<A>;
 
 // @public
 export type Narrowable = string | number | bigint | boolean;
@@ -234,43 +112,19 @@ export type Narrowable = string | number | bigint | boolean;
 // @public (undocumented)
 export type NestedClassName = string | false | null | undefined | (string | false | null | undefined)[] | NestedClassName[];
 
-// @public (undocumented)
-export type NonNullableRequired<T> = {
-    [P in keyof T]-?: NonNullable<T[P]>;
-};
-
 // @public
 export type NonOptional<T> = {
     [P in keyof Required<T>]: Pick<T, P> extends Required<Pick<T, P>> ? T[P] : (T[P] | undefined);
 };
 
 // @public (undocumented)
-export type ObjectKeyValue<T, K extends keyof T> = T extends {
-    [P in K]: T[P];
-} ? T[K] : never;
-
-// @public (undocumented)
 export function omit<T extends Object, K extends keyof T>(object: T, properties: ReadonlyArray<K>, strict?: boolean): Omit<T, K>;
-
-export { Opaque }
-
-// @public
-export function parseTransformMatrix(transform?: string): {
-    scaleX: number;
-    skewY: number;
-    skewX: number;
-    scaleY: number;
-    translateX: number;
-    translateY: number;
-} | undefined;
-
-export { PascalCase }
 
 // @public (undocumented)
 export function pick<T extends Object, K extends keyof T>(object: T, properties: ReadonlyArray<K>): Pick<T, K>;
 
 // @public
-export type PolymorphicComponent<T extends React.ElementType, P = {}> = (<C extends React.ElementType = T>(props: PolymorphicComponentPropsWithRef<C, P>) => React.ReactElement | null) & {
+export type PolymorphicComponent<T extends React.ElementType, P = {}> = (<C extends React.ElementType = T>(props: PolymorphicComponentPropsWithRef<C, P>) => ReactNode) & {
     displayName?: string | undefined;
 };
 
@@ -289,38 +143,13 @@ export type PolymorphicRef<C extends React.ElementType> = React.ComponentPropsWi
 export type Predicate<T, U extends T> = (value: T) => value is U;
 
 // @public (undocumented)
-export type Primitive = string | number | boolean | null | undefined;
-
-// @public (undocumented)
 export type PropsOf<C extends keyof JSX.IntrinsicElements | React.JSXElementConstructor<any>> = JSX.LibraryManagedAttributes<C, React.ComponentPropsWithoutRef<C>>;
 
-// @public (undocumented)
-export function px<V extends number>(value: V): `${V}px`;
-
-// @public (undocumented)
-export function px<V extends false>(value: V): '';
-
-// @public (undocumented)
-export function px<V extends null>(value: V): '';
-
-// @public (undocumented)
-export function px<V extends undefined>(value: V): '';
-
-// @public (undocumented)
+// @public
 export function px<V extends number | false | null | undefined>(value?: V): string;
 
 // @public
 export function range(start: number, end: number, step?: number): number[];
-
-export { Replace }
-
-// @public (undocumented)
-export type RequiredDeepPlainObject<T extends RequiredDeepPlainObject<Record<string, unknown>> = RequiredDeepPlainObject<Record<string, unknown>>, K extends keyof T & string = keyof T & string> = {
-    [P in K]-?: T[P] extends Record<string, unknown> ? RequiredDeepPlainObject<T[P]> : T[P];
-};
-
-// @public (undocumented)
-export function satisfiesOneOfFactory<T extends Array<Predicate<any, any>>>(...predicates: T): Predicate<unknown, UnionOfPredicateTypes<T>>;
 
 // @public (undocumented)
 export type SemverString = `${number}.${number}.${number}`;
@@ -332,28 +161,6 @@ export function setHasOneOf<T>(set: Set<T>, values: T[]): boolean;
 export const shouldCancelStart: (event: {
     target?: unknown;
 }) => boolean;
-
-export { Simplify }
-
-// @public (undocumented)
-export type SlugString = Opaque<string, 'SlugString'>;
-
-// Warning: (tsdoc-escape-greater-than) The ">" character should be escaped using a backslash to avoid confusion with an HTML tag
-// Warning: (tsdoc-escape-right-brace) The "}" character should be escaped using a backslash to avoid confusion with a TSDoc inline tag
-// Warning: (tsdoc-malformed-inline-tag) Expecting a TSDoc tag starting with "{@"
-// Warning: (tsdoc-param-tag-with-invalid-name) The @param block should be followed by a valid parameter name: The identifier cannot non-word characters
-// Warning: (tsdoc-param-tag-with-invalid-name) The @param block should be followed by a valid parameter name: The identifier cannot non-word characters
-//
-// @public
-export function stateClassName(state?: ClassNameStateMap | null, { glue, removeFalsy }?: StateClassNameOptions): string[];
-
-// @public (undocumented)
-export interface StateClassNameOptions {
-    // (undocumented)
-    glue?: string;
-    // (undocumented)
-    removeFalsy?: boolean;
-}
 
 // @public (undocumented)
 export function stateDataAttributes(state: Record<string, unknown>): {
@@ -376,8 +183,10 @@ export function svgSizeProps(width: number, height?: number, crop?: number): Svg
 // @internal
 export const THEME_CLASS_NAME_REG_EXP: RegExp;
 
+// Warning: (ae-unresolved-link) The @link reference could not be resolved: An overload for "colorSchemeClassName" was not found that matches the TSDoc selector ":3"
+//
 // @public
-export function themeClassName<Theme extends KebabCase<string> = KebabCase<string>, State extends `:${KebabCase<string>}` | null | undefined = undefined>(theme: Theme | null | undefined, state?: State | null | undefined): readonly [ThemeContentClassName<Theme, State> | undefined, ThemeControlsClassName<Theme, State> | undefined];
+export function themeClassName(theme: string | null | undefined): readonly [string | undefined, string | undefined];
 
 // @public (undocumented)
 export type ThemeConfig = {
@@ -386,29 +195,7 @@ export type ThemeConfig = {
 };
 
 // @public (undocumented)
-export type ThemeContentClassName<T extends KebabCase<string> = KebabCase<string>, S extends `:${KebabCase<string>}` | null | undefined = undefined> = S extends string ? `theme-${T}-content${S}` : `theme-${T}-content`;
-
-// @public (undocumented)
-export type ThemeControlsClassName<T extends KebabCase<string> = KebabCase<string>, S extends `:${KebabCase<string>}` | null | undefined = undefined> = S extends string ? `theme-${T}-controls${S}` : `theme-${T}-controls`;
-
-// @public (undocumented)
 export function toKebabCase(value: string): string;
-
-// @public
-export function trimString(value: string, characters: string): string;
-
-// @public (undocumented)
-export type Try<A1, A2, Catch = never> = A1 extends A2 ? A1 : Catch;
-
-// @public (undocumented)
-export type TypeofStringLiteral<T> = string extends T ? never : T;
-
-// @public (undocumented)
-export type UnionOfPredicateTypes<T> = T extends Array<(value: any) => value is infer U> ? U : never;
-
-export { UnionToIntersection }
-
-export { UnwrapOpaque }
 
 // (No @packageDocumentation comment for this package)
 

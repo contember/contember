@@ -1,8 +1,7 @@
-import { useChildrenAsLabel, useClassNameFactory, useSessionStorageState } from '@contember/react-utils'
+import { useChildrenAsLabel, useClassNameFactory, useId, useSessionStorageState } from '@contember/react-utils'
 import { stateDataAttributes } from '@contember/utilities'
 import { Fragment, SyntheticEvent, useCallback, useContext, useEffect, useMemo, useRef } from 'react'
 import { useNavigationLink } from '../../Navigation'
-import { randomId } from '../../auxiliary'
 import { Collapsible } from '../Collapsible'
 import { usePreventCloseContext } from '../PreventCloseContext'
 import { DepthContext, ExpandParentContext, useExpandParentContext } from './Contexts'
@@ -19,7 +18,7 @@ import { useMenuId } from './useMenuId'
 export function MenuItem<T = unknown>({ children, componentClassName = 'menu-item', icon, ...props }: MenuItemProps<T>) {
 	const { isActive: active, href, navigate } = useNavigationLink(props.to, props.href)
 	const depth = useContext(DepthContext)
-	const id = useRef(`cui-menu-id-${randomId()}`)
+	const id = useRef(`cui-menu-id-${useId()}`)
 	const label = useChildrenAsLabel(props.title)
 
 	const menuItemId = `${componentClassName}-${depth}-${href ?? label}`

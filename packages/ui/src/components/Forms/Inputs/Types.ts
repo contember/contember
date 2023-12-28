@@ -14,6 +14,7 @@ export interface RestHTMLTextInputProps extends Omit<AllHTMLAttributes<HTMLInput
 
 export type TextInputOwnProps<V extends string | number = string> = ControlProps<V> & {
 	focusRing?: boolean
+	/** @deprecated No alternative since 1.4.0 */
 	withTopToolbar?: boolean
 }
 

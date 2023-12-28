@@ -1,9 +1,10 @@
 import { useClassName, useClassNameFactory, useComposeRef, useElementSize, useReferentiallyStableCallback } from '@contember/react-utils'
-import { assert, isNonNegativeNumber, isNotNullish, isSlugString, px } from '@contember/utilities'
+import { isNonNegativeNumber, px } from '@contember/utilities'
 import { ElementType, forwardRef, memo, useCallback, useRef } from 'react'
 import { MenuAutoCloseProvider } from '../menu-auto-close-provider'
-import { GetLayoutPanelsStateContext, LayoutPanelContext, PanelBehavior, PanelBody, PanelFooter, PanelHeader, Panel as PanelPrimitive, PanelState, PanelVisibility, isComponentClassName, useClosePanelOnEscape, useGetLayoutPanelsStateContext, useSetLayoutPanelsStateContext } from '../primitives'
+import { GetLayoutPanelsStateContext, LayoutPanelContext, PanelBehavior, PanelBody, PanelFooter, PanelHeader, Panel as PanelPrimitive, PanelState, PanelVisibility, useClosePanelOnEscape, useGetLayoutPanelsStateContext, useSetLayoutPanelsStateContext } from '../primitives'
 import { SidebarComponentAttributes, SidebarComponentType } from './Types'
+import { isSlugString } from '../utils/isSlugString'
 
 const BASIS = 256
 const MIN_WIDTH = 256
@@ -24,13 +25,9 @@ export function createLayoutSidebarComponent({
 	displayName: string;
 	name: string;
 }) {
-	assert('name is a slug string', name, isSlugString)
-	assert('defaultAs is defined', defaultAs, isNotNullish)
-	assert(
-		'componentClassName is either a non-empty string or an array of non-empty strings',
-		defaultComponentClassName,
-		isComponentClassName,
-	)
+	if (!isSlugString(name)) {
+		throw new Error(`Name must be a slug string, got: ${name}`)
+	}
 
 	return Object.assign<SidebarComponentType, SidebarComponentAttributes>(memo(forwardRef(({
 		as = defaultAs,

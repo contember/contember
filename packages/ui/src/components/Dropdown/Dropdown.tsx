@@ -1,4 +1,4 @@
-import { useClassNameFactory, useColorScheme, useId } from '@contember/react-utils'
+import { useClassNameFactory, useCloseOnClickOutside, useCloseOnEscape, useColorScheme, useId } from '@contember/react-utils'
 import { assertNever, colorSchemeClassName } from '@contember/utilities'
 import {
 	MouseEventHandler,
@@ -12,7 +12,6 @@ import {
 } from 'react'
 import { FocusScope } from 'react-aria'
 import { usePopper } from 'react-popper'
-import { useCloseOnClickOutside, useCloseOnEscape } from '../../auxiliary'
 import type { DropdownAlignment } from '../../types'
 import { toViewClass } from '../../utils'
 import { Collapsible } from '../Collapsible'
@@ -120,13 +119,13 @@ export const Dropdown = memo((props: DropdownProps) => {
 			{renderToggle ? (
 				renderToggle({ ref: setReferenceElement, onClick: onButtonClick })
 			) : (
-					<Button
-						active={isActive}
-						{...props.buttonProps}
-						onClick={onButtonClick}
-						ref={setReferenceElement}
-						aria-controls={id}
-					/>
+				<Button
+					active={isActive}
+					{...props.buttonProps}
+					onClick={onButtonClick}
+					ref={setReferenceElement}
+					aria-controls={id}
+				/>
 			)}
 			{isActive && (
 				<Portal to={currentPortalContainer}>

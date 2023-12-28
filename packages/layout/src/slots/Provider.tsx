@@ -1,4 +1,4 @@
-import { ReactNode, RefObject, memo, useCallback, useMemo, useRef, useState } from 'react'
+import { ReactNode, memo, useCallback, useMemo, useRef, useState } from 'react'
 import { ActiveSlotPortalsContext, PortalsRegistryContext, SlotTargetsRegistryContextType, SlotsRefMap, TargetsRegistryContext } from './contexts'
 
 /**

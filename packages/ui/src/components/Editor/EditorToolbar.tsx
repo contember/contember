@@ -1,4 +1,5 @@
 import { useClassName, useClassNameFactory } from '@contember/react-utils'
+import { MoreHorizontalIcon } from 'lucide-react'
 import { forwardRef, memo, useCallback } from 'react'
 import type { HoveringToolbarScope } from '../../types'
 import { toEnumViewClass, toStateClass, toViewClass } from '../../utils'
@@ -123,7 +124,7 @@ export const EditorToolbar = memo(forwardRef<HTMLDivElement, EditorToolbarProps>
 					<div className={componentClassName('group', 'view-rest')}>
 						<ButtonOrDropdown
 							label="More…"
-							contemberIcon="ellipsis"
+							customIcon={<MoreHorizontalIcon />}
 							groups={restGroups}
 							showLabel={showLabels}
 							popup={{

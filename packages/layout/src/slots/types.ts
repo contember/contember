@@ -1,27 +1,27 @@
-import { ComponentClassNameProps, PascalCase } from '@contember/utilities'
+import { ComponentClassNameProps } from '@contember/utilities'
 import { ComponentType, ElementType, ReactNode } from 'react'
 import { createSlotSourceComponent } from './createSlotSourceComponent'
 import { createSlotTargetComponent } from './createSlotTargetComponent'
 
 /** @deprecated No alternative since 1.4.0 */
 export type SlotComponentsRecords<K extends string> = Readonly<{
-	readonly [P in PascalCase<K>]: ComponentType
+	readonly [P in K]: ComponentType
 }>
 
 export type SlotSourceComponentsRecord<K extends string> = Readonly<{
-	readonly [P in PascalCase<K>]: ReturnType<typeof createSlotSourceComponent<P>>
+	readonly [P in K]: ReturnType<typeof createSlotSourceComponent<P>>
 }>
 
 export type SlotTargetComponentsRecord<K extends string> = Readonly<{
-	readonly [P in PascalCase<K>]: ReturnType<typeof createSlotTargetComponent<P>>
+	readonly [P in K]: ReturnType<typeof createSlotTargetComponent<P>>
 }>
 
-export type SlotSourceProps<K extends string = string> = {
+export type SlotSourceProps = {
 	children: ReactNode;
-	name: K;
+	name: string;
 }
 
-export type SlotTargetProps<Name extends string = string> = ComponentClassNameProps & {
+export type SlotTargetProps = ComponentClassNameProps & {
 	/**
 	 * Type of the container element, default is `div`.
 	 *
@@ -42,14 +42,14 @@ export type SlotTargetProps<Name extends string = string> = ComponentClassNamePr
 	/**
 	 * Name of the slot, similar to the `name` prop of the `Source` component.
 	 */
-	name: Name;
+	name: string;
 	/**
 	 * Optional list of aliases for the slot.
 	 *
 	 * This is useful when one target element is sufficient for multiple slots sources.
 	 * E.g. when you know that `Sidebar` and `SidebarBody` slot sources result in the same target.
 	 */
-	aliases?: [Name, ...Name[]];
+	aliases?: [string, ...string[]];
 	/**
 	 * Controls the display of the target element, default is 'contents'.
 	 */

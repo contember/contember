@@ -1,11 +1,11 @@
-import { memo, NamedExoticComponent, PropsWithChildren, ReactElement } from 'react'
+import { memo, NamedExoticComponent, PropsWithChildren, ReactElement, ReactNode } from 'react'
 import { useEnvironment } from '../accessorPropagation'
 import type { Environment } from '@contember/binding'
 import type { MarkerProvider, StaticRenderProvider, StaticRenderProviderProps } from './MarkerProvider'
 import { assertNever } from '@contember/utilities'
 
 interface EnvironmentAwareFunctionComponent<P> {
-	(props: PropsWithChildren<P>, environment: Environment): ReactElement<any, any> | null;
+	(props: PropsWithChildren<P>, environment: Environment): ReactNode;
 	displayName?: string | undefined;
 }
 
@@ -16,10 +16,7 @@ function Component<Props extends {}>(
 
 function Component<Props extends {}, NonStaticPropNames extends keyof Props = never>(
 	statefulRender: EnvironmentAwareFunctionComponent<Props>,
-	staticRender: (
-		props: StaticRenderProviderProps<Props, NonStaticPropNames>,
-		environment: Environment,
-	) => ReactElement | null,
+	staticRender: (props: StaticRenderProviderProps<Props, NonStaticPropNames>, environment: Environment) => ReactNode,
 	displayName?: string,
 ): NamedExoticComponent<Props>
 
@@ -33,7 +30,7 @@ function Component<Props extends {}, NonStaticPropNames extends keyof Props = ne
 	render: EnvironmentAwareFunctionComponent<Props>,
 	decider?:
 		| string
-		| ((props: StaticRenderProviderProps<Props, NonStaticPropNames>, environment: Environment) => ReactElement | null)
+		| ((props: StaticRenderProviderProps<Props, NonStaticPropNames>, environment: Environment) => ReactNode)
 		| MarkerProvider<Props, NonStaticPropNames>,
 	displayName?: string,
 ) {

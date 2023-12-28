@@ -1,4 +1,3 @@
-export * from './auxiliary'
 export * from './components'
 export * from './deprecated'
 export { NavigationContext } from './Navigation'

@@ -1,7 +1,7 @@
 import { BindingError, RemovalType } from '@contember/react-binding'
+import { DeleteEntityButton } from '@contember/react-binding-ui'
 import { RepeaterItemContainer, RepeaterItemContainerProps } from '@contember/ui'
 import { ReactNode, forwardRef, memo } from 'react'
-import { DeleteEntityButton } from '@contember/react-binding-ui'
 import { RepeaterCreateNewEntity } from './RepeaterFieldContainer'
 
 export type RepeaterItemOwnProps = {
@@ -19,7 +19,7 @@ export interface RepeaterItemProps extends Omit<RepeaterItemContainerProps, keyo
 export const RepeaterItem = memo(forwardRef<HTMLDivElement, RepeaterItemProps>(({
 	canBeRemoved,
 	children,
-	createNewEntity,
+	createNewEntity: _INTENTIONALLY_OMITTED_createNewEntity,
 	dragHandleComponent,
 	index,
 	label,

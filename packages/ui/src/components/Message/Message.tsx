@@ -1,12 +1,9 @@
 import { useClassNameFactory, useColorScheme } from '@contember/react-utils'
-import { colorSchemeClassName, dataAttribute, deprecate, fallback, isDefined, themeClassName } from '@contember/utilities'
+import { colorSchemeClassName, dataAttribute, themeClassName } from '@contember/utilities'
 import { ReactNode, memo } from 'react'
-import type { Default, HTMLDivElementProps, Intent, MessageDistinction, MessageFlow } from '../../types'
+import type { HTMLDivElementProps, Intent } from '../../types'
 import { StackOwnProps } from '../Stack'
 import { Text } from '../Typography'
-
-/** @deprecated Omit the prop instead */
-export type DeprecatedMessageSize = Default
 
 export interface MessageOwnProps {
 	action?: ReactNode
@@ -23,21 +20,7 @@ export interface MessageOwnProps {
 	size?: 'small' | 'medium' | 'large'
 }
 
-/** @deprecated Use `MessageOwnProps` instead */
-export type DeprecatedMessageProps = {
-	/** @deprecated Use `elevated` instead */
-	lifted?: boolean
-	/** @deprecated Use `important` prop instead */
-	distinction?: MessageDistinction
-	/** @deprecated Use `padding` and `display` props instead */
-	flow?: MessageFlow
-	size?: MessageOwnProps['size'] | DeprecatedMessageSize
-}
-
-export type MessageProps =
-	& Omit<HTMLDivElementProps, keyof MessageOwnProps | keyof DeprecatedMessageProps>
-	& Omit<MessageOwnProps, keyof DeprecatedMessageProps>
-	& DeprecatedMessageProps
+export type MessageProps = Omit<HTMLDivElementProps, keyof MessageOwnProps> & MessageOwnProps
 
 /**
  * Message is a component for displaying a short message to the user.
@@ -117,32 +100,15 @@ export const Message = memo(({
 	children,
 	className,
 	display = 'block',
-	distinction,
 	elevated = false,
-	flow,
 	icon,
 	important,
 	intent = 'positive',
-	lifted,
 	padding,
 	size,
 	textAlign,
 	...props
 }: MessageProps) => {
-	deprecate('1.3.0', isDefined(lifted), '`lifted` prop', '`elevated` prop')
-	elevated = fallback(elevated, isDefined(lifted), lifted ?? false)
-
-	deprecate('1.3.0', isDefined(flow), '`flow` prop', '`display` prop')
-	display = fallback(display, flow === 'block' || flow === 'generousBlock', 'block')
-	padding = fallback(padding, flow === 'generous' || flow === 'generousBlock', 'large')
-
-	deprecate('1.3.0', isDefined(distinction), '`distinction` prop', 'combination of `important` and/or `padding` props')
-	important = fallback(important, distinction === 'striking', true)
-	padding = fallback(padding, distinction === 'striking', true)
-
-	deprecate('1.3.0', size === 'default', '`size="default"` prop', 'omit `size` prop')
-	size = fallback(size, size === 'default', undefined)
-
 	const componentClassName = useClassNameFactory('message')
 
 	return (

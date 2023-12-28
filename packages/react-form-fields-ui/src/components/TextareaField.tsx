@@ -42,35 +42,3 @@ export const TextareaField = SimpleRelativeSingleField<TextareaFieldProps, strin
 	},
 	'TextareaField',
 )
-
-// TODO: Remove after depreciation period
-/**
- * @deprecated Use `TextareaField` instead
- */
-export const TextAreaField = SimpleRelativeSingleField<TextareaFieldProps, string>(
-	(fieldMetadata, {
-		minRows,
-		style,
-		...props
-	}) => {
-		if (import.meta.env.DEV) {
-			console.warn('TextAreaField is deprecated. Please use TextareaField to align with HTML/UI naming of components')
-		}
-
-		const inputProps = useFieldControl<string, string>({
-			...props,
-			fieldMetadata,
-			parse,
-			format,
-		})
-
-		return (
-			<TextareaInput
-				{...inputProps}
-				minRows={minRows || 3}
-				style={style}
-			/>
-		)
-	},
-	'TextAreaField',
-)

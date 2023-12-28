@@ -62,7 +62,7 @@ export const SimpleRelativeSingleFieldProxy = memo(
 		// Used by useField():
 		defaultValue, isNonbearing, onBeforeUpdate, onInitialize, onUpdate,
 		// Used only by FieldContainer:
-		description, display, direction, evenly, footer, horizontal, gap, label, labelDescription, labelPosition, reverse, useLabelElement, width,
+		description, display, evenly, footer, horizontal, gap, label, labelDescription, labelPosition, reverse, useLabelElement,
 		// Used only by render():
 		className, componentClassName, style,
 		// Used by both render() and FieldContainer:
@@ -89,7 +89,7 @@ export const SimpleRelativeSingleFieldProxy = memo(
 		const combinedErrors = !suppressErrors ? combineErrorMessages(errors, fieldErrors) : undefined
 
 		const fieldContainerProps: NonOptional<Omit<FieldContainerProps, 'children'>> = {
-			description, display, direction, errors: combinedErrors, evenly, footer, horizontal, gap, label: normalizedLabel, labelDescription, labelPosition, required, reverse, size, useLabelElement, width,
+			description, display, errors: combinedErrors, evenly, footer, horizontal, gap, label: normalizedLabel, labelDescription, labelPosition, required, reverse, size, useLabelElement,
 			className: containerClassName, componentClassName, style: containerStyle,
 		}
 		const renderProps: PropsPassedToRendererCheck = { field: fieldName, className, style, required, size, errors, ...rest }

@@ -1,6 +1,5 @@
-import { useClassNameFactory } from '@contember/react-utils'
+import { useClassNameFactory, useCloseOnClickOutside, useCloseOnEscape } from '@contember/react-utils'
 import { useLayoutEffect, useMemo, useState } from 'react'
-import { useCloseOnClickOutside, useCloseOnEscape } from '../../auxiliary'
 import { toEnumViewClass } from '../../utils'
 import { Box } from '../Box'
 import type { DialogSettingsWithMetadata } from './dialogReducer'

@@ -24,6 +24,7 @@ import type { GetEntityByKey } from '@contember/binding';
 import { GraphQlClientError } from '@contember/react-client';
 import type { HasManyRelationMarker } from '@contember/binding';
 import type { HasOneRelationMarker } from '@contember/binding';
+import { JSX as JSX_2 } from 'react/jsx-runtime';
 import { MarkerTreeRoot } from '@contember/binding';
 import { NamedExoticComponent } from 'react';
 import type { Persist } from '@contember/binding';
@@ -46,11 +47,11 @@ import type { TreeRootAccessor } from '@contember/binding';
 import { TreeRootId } from '@contember/binding';
 
 // @public (undocumented)
-export function AccessorProvider(props: EntityProviderProps): JSX.Element;
+export function AccessorProvider(props: EntityProviderProps): JSX_2.Element;
 
 // @public (undocumented)
 export const AccessorTree: {
-    ({ state, children }: AccessorTreeProps): JSX.Element;
+    ({ state, children }: AccessorTreeProps): JSX_2.Element;
     displayName: string;
 };
 
@@ -103,7 +104,7 @@ export const accessorTreeStateReducer: (previousState: AccessorTreeState, action
 export const addEntityAtIndex: (entityList: EntityListAccessor, sortableByField: RelativeSingleField, index: number, preprocess?: EntityAccessor.BatchUpdatesHandler) => void;
 
 // @public (undocumented)
-export function BindingOperationsProvider(props: BindingOperationsProviderProps): JSX.Element;
+export function BindingOperationsProvider(props: BindingOperationsProviderProps): JSX_2.Element;
 
 // @public (undocumented)
 export interface BindingOperationsProviderProps {
@@ -126,7 +127,7 @@ export type CompleteMarkerProvider<Props extends {} = any, NonStaticPropNames ex
 export function Component<Props extends {}>(statelessRender: EnvironmentAwareFunctionComponent<Props>, displayName?: string): NamedExoticComponent<Props>;
 
 // @public (undocumented)
-export function Component<Props extends {}, NonStaticPropNames extends keyof Props = never>(statefulRender: EnvironmentAwareFunctionComponent<Props>, staticRender: (props: StaticRenderProviderProps<Props, NonStaticPropNames>, environment: Environment) => ReactElement | null, displayName?: string): NamedExoticComponent<Props>;
+export function Component<Props extends {}, NonStaticPropNames extends keyof Props = never>(statefulRender: EnvironmentAwareFunctionComponent<Props>, staticRender: (props: StaticRenderProviderProps<Props, NonStaticPropNames>, environment: Environment) => ReactNode, displayName?: string): NamedExoticComponent<Props>;
 
 // @public (undocumented)
 export function Component<Props extends {}, NonStaticPropNames extends keyof Props = never>(statefulRender: EnvironmentAwareFunctionComponent<Props>, markerProvisions: MarkerProvider<Props, NonStaticPropNames>, displayName?: string): NamedExoticComponent<Props>;
@@ -183,7 +184,7 @@ export interface EntityBaseProps {
 }
 
 // @public (undocumented)
-export function EntityKeyProvider(props: EntityKeyProviderProps): JSX.Element;
+export function EntityKeyProvider(props: EntityKeyProviderProps): JSX_2.Element;
 
 // @public (undocumented)
 export interface EntityKeyProviderProps {
@@ -258,7 +259,7 @@ export type EntitySubTreeProps<EntityProps> = {
 } & EntitySubTreeAdditionalProps & (SugaredQualifiedSingleEntity | (SugaredUnconstrainedQualifiedSingleEntity & EntitySubTreeAdditionalCreationProps));
 
 // @public (undocumented)
-export function EntityView(props: EntityViewProps): JSX.Element;
+export function EntityView(props: EntityViewProps): JSX_2.Element;
 
 // @public (undocumented)
 export interface EntityViewProps {
@@ -271,7 +272,7 @@ export interface EntityViewProps {
 // @public (undocumented)
 export interface EnvironmentAwareFunctionComponent<P> {
     // (undocumented)
-    (props: PropsWithChildren<P>, environment: Environment): ReactElement<any, any> | null;
+    (props: PropsWithChildren<P>, environment: Environment): ReactNode;
     // (undocumented)
     displayName?: string | undefined;
 }
@@ -286,7 +287,7 @@ export interface EnvironmentDeltaProvider<Props extends {} = any> {
 }
 
 // @public (undocumented)
-export const EnvironmentExtensionProvider: <S, R>(props: EnvironmentWithExtensionProps<S, R>) => ReactElement | null;
+export const EnvironmentExtensionProvider: <S, R>(props: EnvironmentWithExtensionProps<S, R>) => ReactNode;
 
 // @public (undocumented)
 export const EnvironmentMiddleware: NamedExoticComponent<EnvironmentMiddlewareProps>;
@@ -463,7 +464,7 @@ export const LabelMiddlewareContext: Context<LabelMiddleware>;
 export const LabelMiddlewareProvider: ({ value, children }: {
     value: LabelMiddleware;
     children: ReactNode;
-}) => JSX.Element;
+}) => JSX_2.Element;
 
 // @public (undocumented)
 export interface LeafMarkerProvider<Props extends {} = any> {
@@ -546,7 +547,7 @@ export interface StaticRenderProps {
 // @public (undocumented)
 export interface StaticRenderProvider<Props extends {} = any, NonStaticPropNames extends keyof Props = never> {
     // (undocumented)
-    staticRender: (props: StaticRenderProviderProps<Props, NonStaticPropNames>, environment: Environment) => ReactElement | null;
+    staticRender: (props: StaticRenderProviderProps<Props, NonStaticPropNames>, environment: Environment) => ReactNode;
 }
 
 // @public (undocumented)
@@ -564,7 +565,7 @@ export interface SugaredFieldProps<Persisted extends FieldValue = FieldValue> ex
 }
 
 // @public (undocumented)
-export function TreeRootIdProvider(props: TreeRootIdProviderProps): JSX.Element;
+export function TreeRootIdProvider(props: TreeRootIdProviderProps): JSX_2.Element;
 
 // @public (undocumented)
 export interface TreeRootIdProviderProps {

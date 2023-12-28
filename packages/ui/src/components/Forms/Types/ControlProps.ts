@@ -1,6 +1,6 @@
 import { NonOptional } from '@contember/utilities'
 import { CSSProperties } from 'react'
-import { ControlDistinction, HTMLInputElementProps, Intent, Scheme, Size, ValidationState } from '../../../types'
+import { ControlDistinction, Intent, Scheme, Size, ValidationState } from '../../../types'
 
 export interface ValidationStateProps {
 	onValidationStateChange?: (error?: string) => void

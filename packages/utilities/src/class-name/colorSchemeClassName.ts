@@ -1,6 +1,4 @@
-import { KebabCase } from 'type-fest'
 import { COLOR_SCHEME_CLASS_NAME_REG_EXP } from './constants'
-import { ColorSchemeClassName } from './types'
 
 /**
  * Returns a string with a color scheme class name, prefixed with `scheme-`
@@ -24,15 +22,10 @@ import { ColorSchemeClassName } from './types'
  * // </div>
  * ```
  */
-export function colorSchemeClassName<S extends KebabCase<string> = KebabCase<string>>(scheme: S): ColorSchemeClassName<S>;
-export function colorSchemeClassName<S extends KebabCase<string> = KebabCase<string>>(scheme: null | undefined): undefined;
-export function colorSchemeClassName<S extends KebabCase<string> = KebabCase<string>>(scheme: S | null | undefined): ColorSchemeClassName<S> | undefined;
-export function colorSchemeClassName<S extends KebabCase<string> = KebabCase<string>>(scheme: S | null | undefined): ColorSchemeClassName<S> | undefined {
-	if (typeof scheme === 'string') {
-		return `scheme-${scheme}`
-	} else {
-		return undefined
-	}
+export function colorSchemeClassName(scheme: string): string
+export function colorSchemeClassName(scheme: string | null | undefined): string | undefined
+export function colorSchemeClassName(scheme: string | null | undefined): string | undefined {
+	return typeof scheme === 'string' ? `scheme-${scheme}` : undefined
 }
 
 /**
@@ -41,6 +34,6 @@ export function colorSchemeClassName<S extends KebabCase<string> = KebabCase<str
  * @returns `true` if the string is a color scheme CSS class
  * @internal
  */
-export function isColorSchemeClassName<T extends string>(value: string): value is ColorSchemeClassName<T> {
+export function isColorSchemeClassName(value: string) {
 	return COLOR_SCHEME_CLASS_NAME_REG_EXP.test(value)
 }

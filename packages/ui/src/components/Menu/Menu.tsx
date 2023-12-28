@@ -1,7 +1,6 @@
 import { useClassNameFactory } from '@contember/react-utils'
-import { dataAttribute, deprecate, isDefined } from '@contember/utilities'
+import { dataAttribute } from '@contember/utilities'
 import { MemoExoticComponent, PropsWithChildren, memo, useCallback, useMemo, useRef } from 'react'
-import { MouseMoveProvider } from '../../auxiliary'
 import { DepthContext, FocusableContext } from './Contexts'
 import { MenuItem } from './MenuItem'
 import type { MenuItemProps, MenuProps } from './Types'
@@ -33,14 +32,9 @@ const MenuInternal = memo(({
 	caret = true,
 	className: classNameProp,
 	componentClassName = 'menu',
-	focusMenuItemLabel,
-	showCaret,
 	children,
 	...rest
 }: PropsWithChildren<MenuProps>) => {
-	deprecate('1.3.0', isDefined(focusMenuItemLabel), '`focusMenuItemLabel` prop', null)
-	deprecate('1.3.0', isDefined(showCaret), '`showCaret` prop', '`caret` prop')
-
 	const menuRef = useRef<HTMLUListElement>(null)
 	const className = useClassNameFactory(componentClassName)
 
@@ -63,20 +57,18 @@ const MenuInternal = memo(({
 	return (
 		<DepthContext.Provider value={0}>
 			<MenuIdProvider menuId={id}>
-				<MouseMoveProvider elementRef={menuRef}>
-					<ActiveMenuItemProvider menuRef={menuRef}>
-						<nav aria-label={label} data-caret={dataAttribute(caret)} className={className(null, classNameProp)} {...rest}>
-							<ul ref={menuRef} className={className('list')}>
-								<FocusableContext.Provider value={useMemo(() => ({
-									nextFocusable,
-									previousFocusable,
-								}), [nextFocusable, previousFocusable])}>
-									{children}
-								</FocusableContext.Provider>
-							</ul>
-						</nav>
-					</ActiveMenuItemProvider>
-				</MouseMoveProvider>
+				<ActiveMenuItemProvider menuRef={menuRef}>
+					<nav aria-label={label} data-caret={dataAttribute(caret)} className={className(null, classNameProp)} {...rest}>
+						<ul ref={menuRef} className={className('list')}>
+							<FocusableContext.Provider value={useMemo(() => ({
+								nextFocusable,
+								previousFocusable,
+							}), [nextFocusable, previousFocusable])}>
+								{children}
+							</FocusableContext.Provider>
+						</ul>
+					</nav>
+				</ActiveMenuItemProvider>
 			</MenuIdProvider>
 		</DepthContext.Provider>
 	)

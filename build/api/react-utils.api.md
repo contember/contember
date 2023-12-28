@@ -7,7 +7,7 @@
 import { Context } from 'react';
 import { DispatchWithoutAction } from 'react';
 import { EventHandler } from 'react';
-import { KebabCase } from '@contember/utilities';
+import { JSX as JSX_2 } from 'react/jsx-runtime';
 import { MemoExoticComponent } from 'react';
 import { MutableRefObject } from 'react';
 import { NamedExoticComponent } from 'react';
@@ -21,12 +21,12 @@ import { SyntheticEvent } from 'react';
 export const ColorSchemeContext: Context<string>;
 
 // @public (undocumented)
-export const ColorSchemeProvider: MemoExoticComponent<(<T extends string>({ children, scheme }: ColorSchemeProviderProps<T>) => JSX.Element)>;
+export const ColorSchemeProvider: MemoExoticComponent<({ children, scheme }: ColorSchemeProviderProps) => JSX_2.Element>;
 
 // @public (undocumented)
-export type ColorSchemeProviderProps<T extends KebabCase<string>> = {
+export type ColorSchemeProviderProps = {
     children: React.ReactNode;
-    scheme?: T;
+    scheme?: string;
 };
 
 // @public (undocumented)
@@ -176,6 +176,20 @@ export function useClassName(componentClassName: NestedClassName, additionalClas
 
 // @public
 export function useClassNameFactory(componentClassName: NestedClassName, glue?: string | null, prefixOverride?: string | null | undefined): (suffix?: string | null | undefined, additionalClassName?: NestedClassName) => string;
+
+// @public (undocumented)
+export const useCloseOnClickOutside: ({ isOpen, close, contents, outside }: {
+    isOpen: boolean;
+    close: () => void;
+    contents: (Node | null)[];
+    outside?: HTMLElement | null | undefined;
+}) => void;
+
+// @public (undocumented)
+export const useCloseOnEscape: ({ isOpen, close }: {
+    isOpen: boolean;
+    close: () => void;
+}) => void;
 
 // @public (undocumented)
 export const useColorScheme: () => string;

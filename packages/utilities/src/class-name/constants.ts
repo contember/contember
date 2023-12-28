@@ -16,8 +16,7 @@
  * - theme-brand-color-controls
  */
 
-// TODO: v1.3.0 >>> THEME_CLASS_NAME_REG_EXP = /^theme-(?<name>[\w-]+?)(?:-(?<scope>content|controls))?$/
-export const THEME_CLASS_NAME_REG_EXP = /^theme-(?<name>[\w-]+?)(?:-(?<scope>content|controls))?(?<state>:[\w]+(?:[\w-]+)?)?$/
+export const THEME_CLASS_NAME_REG_EXP = /^theme-(?<name>[\w-]+?)(?:-(?<scope>content|controls))?$/
 
 /**
  * Regular expression for testing if a string is a color scheme CSS class

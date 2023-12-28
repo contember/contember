@@ -1,22 +1,26 @@
-import { PascalCase } from '@contember/utilities'
-import { pascalCase } from 'change-case'
 import { createSlotSourceComponent } from './createSlotSourceComponent'
 import { createSlotTargetComponent } from './createSlotTargetComponent'
-import type {
-	SlotSourceComponentsRecord,
-	SlotTargetComponentsRecord,
-} from './types'
+import type { SlotSourceComponentsRecord, SlotTargetComponentsRecord } from './types'
 
-export function createSlotComponents<K extends PascalCase<string>>(slots: ReadonlyArray<PascalCase<K>>) {
+const pascalCaseRegex = /^[A-Z][a-zA-Z0-9]*$/
+
+export function createSlotComponents<K extends string>(slots: readonly K[]) {
+
+	slots.forEach(slot => {
+		if (!pascalCaseRegex.test(slot)) {
+			throw new Error(`Slot name "${slot}" is not in pascal case.`)
+		}
+	})
+
 	const sources = Object.freeze(
 		Object.fromEntries(slots.map(
-			slot => [pascalCase(slot), createSlotSourceComponent(pascalCase(slot), slot)],
+			slot => [slot, createSlotSourceComponent(slot)],
 		)) as SlotSourceComponentsRecord<K>,
 	)
 
 	const targets = Object.freeze(
 		Object.fromEntries(slots.map(
-			slot => [pascalCase(slot), createSlotTargetComponent(pascalCase(slot), slot)]),
+			slot => [slot, createSlotTargetComponent(slot)]),
 		) as SlotTargetComponentsRecord<K>,
 	)
 

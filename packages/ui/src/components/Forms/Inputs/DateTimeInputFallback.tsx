@@ -1,4 +1,5 @@
 import { useClassName } from '@contember/react-utils'
+import { deprecate } from '@contember/utilities'
 import { ChangeEvent, forwardRef, memo, Ref, useCallback, useEffect, useRef, useState } from 'react'
 import { toViewClass } from '../../../utils'
 import { Divider } from '../../Divider'
@@ -21,6 +22,8 @@ export const DateTimeInputFallback = memo(forwardRef(({
 	withTopToolbar,
 	...outerProps
 }: DateTimeInputProps, forwardedRef: Ref<HTMLInputElement>) => {
+	deprecate('1.4.0', withTopToolbar !== undefined, '`withTopToolbar` prop', null)
+
 	const value = _value ?? ''
 
 	if (value) {

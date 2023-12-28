@@ -1,8 +1,8 @@
 import { Box, SpinnerOverlay } from '@contember/ui'
-import { FC, ReactElement } from 'react'
+import { FC, ReactNode } from 'react'
 import { QueryRequestState, RequestStateOk } from '../lib'
 
-export function QueryLoader<Result>({ query, children }: { query: QueryRequestState<Result>, children: FC<{ query: RequestStateOk<Result> }> }): ReactElement | null {
+export function QueryLoader<Result>({ query, children }: { query: QueryRequestState<Result>, children: FC<{ query: RequestStateOk<Result> }> }): ReactNode {
 	if (query.state === 'error') {
 		return <Box intent="danger">Error loading data</Box>
 	}

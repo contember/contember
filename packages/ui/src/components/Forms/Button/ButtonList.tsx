@@ -1,5 +1,5 @@
 import { useClassName } from '@contember/react-utils'
-import { dataAttribute, deprecate, fallback, isDefined } from '@contember/utilities'
+import { dataAttribute } from '@contember/utilities'
 import { memo } from 'react'
 import type { ButtonListProps } from './Types'
 
@@ -11,23 +11,11 @@ export const ButtonList = memo(({
 	className,
 	componentClassName = 'button-list',
 	display = 'inline',
-	flow,
 	gap = true,
 	inset,
-	orientation,
 	direction = 'horizontal',
 	size = 'medium',
 }: ButtonListProps) => {
-	// TODO: deprecated since v1.3.0
-	deprecate('1.3.0', isDefined(flow), '`flow` prop', '`display` prop')
-	display = fallback(display, flow === 'block', 'block')
-
-	deprecate('1.3.0', isDefined(orientation), '`orientation` prop', '`direction` prop')
-	direction = fallback(direction, isDefined(orientation), orientation === 'default' || !orientation ? 'horizontal' : orientation)
-
-	deprecate('1.3.0', size === 'default', 'size="default"', 'omitted `size` prop')
-	size = fallback(size, size === 'default', 'medium')
-
 	return (
 		<div
 			className={useClassName(componentClassName, className)}

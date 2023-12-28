@@ -1,6 +1,6 @@
 import { useClassNameFactory } from '@contember/react-utils'
+import { Clock9Icon } from 'lucide-react'
 import type { ReactNode } from 'react'
-import { Icon } from '../Icon'
 
 export interface ContentStatusProps {
 	label?: ReactNode
@@ -13,7 +13,7 @@ export function ContentStatus({ label }: ContentStatusProps) {
 		<div className={componentClassName()}>
 			<span className={componentClassName('label')}>{label}</span>
 			<span className={componentClassName('icon')}>
-				<Icon contemberIcon="clock" alignWithLowercase />
+				<Clock9Icon />
 			</span>
 		</div>
 	)

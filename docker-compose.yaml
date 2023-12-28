@@ -1,6 +1,6 @@
 services:
   sandbox-vite:
-    image: node:18-alpine
+    image: node:20-alpine
     command: 'npm run start'
 
     environment:
@@ -14,7 +14,7 @@ services:
 
 
   admin-server:
-    image: node:18-alpine
+    image: node:20-alpine
     command: 'npm run start'
 
     working_dir: /src/ee/admin-server
@@ -45,7 +45,7 @@ services:
 
 
   admin-server-vite:
-    image: node:18-alpine
+    image: node:20-alpine
     command: 'npm run watch:public'
 
     working_dir: /src/ee/admin-server
@@ -53,7 +53,7 @@ services:
       - .:/src:cached
 
   playwright:
-    image: node:18-alpine
+    image: node:20-alpine
     command: [ 'npm', 'run', 'pw:dev' ]
     user: '1000:1000'
 
@@ -67,7 +67,7 @@ services:
       - .:/src:cached
 
   playwright-tests:
-    image: mcr.microsoft.com/playwright:v1.32.3-focal
+    image: mcr.microsoft.com/playwright:v1.40.1-focal
     scale: 0
     command: [ 'sh' ]
     user: '1000:1000'

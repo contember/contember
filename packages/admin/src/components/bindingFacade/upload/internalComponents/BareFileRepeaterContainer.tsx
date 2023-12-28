@@ -19,10 +19,6 @@ export interface BareFileRepeaterContainerPrivateProps {
 }
 
 export interface BareFileRepeaterContainerPublicProps extends Omit<FileInputPublicProps, 'label'> {
-	/**
-	 * @deprecated Use label instead
-	 */
-	boxLabel?: ReactNode
 	label: ReactNode
 }
 

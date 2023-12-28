@@ -1,4 +1,6 @@
 import { EntityAccessor, useLabelMiddleware } from '@contember/react-binding'
+import { useAccessorErrors } from '@contember/react-binding-ui'
+import { BaseDynamicChoiceField, ChoiceFieldProps, ChoiceFieldSingleOption, SingleChoiceFieldRendererProps } from '@contember/react-choice-field'
 import {
 	FieldContainer,
 	FieldContainerProps,
@@ -6,11 +8,9 @@ import {
 	SelectCreateNewWrapper,
 	usePortalProvider,
 } from '@contember/ui'
-import { ComponentType, memo, ReactElement } from 'react'
+import { ReactElement, memo } from 'react'
 import type { Props as SelectProps } from 'react-select'
 import Select from 'react-select'
-import { useAccessorErrors } from '@contember/react-binding-ui'
-import { ChoiceFieldSingleOption, SingleChoiceFieldRendererProps, ChoiceFieldProps, BaseDynamicChoiceField } from '@contember/react-choice-field'
 import { useCommonReactSelectProps } from '../../hooks/useCommonReactSelectProps'
 import { useOpenCreateNewDialog } from '../../hooks/useOpenCreateNewDialog'
 
@@ -21,7 +21,7 @@ export type SelectFieldRendererPublicProps =
 	& {
 		placeholder?: string
 		allowNull?: boolean
-		reactSelectProps?: Partial<SelectProps<any>>
+		reactSelectProps?: Partial<SelectProps<any, boolean, never>>
 		createNewForm?: ReactElement
 	}
 
@@ -73,7 +73,7 @@ export const SelectFieldInner = typedMemo(<T = unknown>({
 	reactSelectProps,
 	onSearch,
 	isLoading,
-	createNewForm,
+	createNewForm: _INTENTIONALLY_OMITTED_createNewForm,
 	onAddNew,
 	...props
 }: SelectFieldInnerProps<T>) => {
@@ -114,4 +114,3 @@ export const SelectFieldInner = typedMemo(<T = unknown>({
 		</FieldContainer>
 	)
 })
-

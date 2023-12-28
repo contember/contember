@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import type { GroupBase, StylesConfig } from 'react-select'
+import type { CSSObjectWithLabel, GroupBase, StylesConfig } from 'react-select'
 
 export type PublicCommonReactSelectStylesProps = {
 	/**
@@ -13,16 +13,18 @@ export type CommonReactSelectStylesProps =
 	& { isInvalid?: boolean }
 
 export const useCommonReactSelectStyles = <Option = unknown, IsMulti extends boolean = boolean, Group extends GroupBase<Option> = GroupBase<Option>>({ isInvalid = false, menuZIndex }: CommonReactSelectStylesProps): StylesConfig<Option, IsMulti, Group> => useMemo(() => ({
-	indicatorSeparator: (provided, { isFocused, isDisabled }) => {
+	indicatorSeparator: (provided, { isFocused, isDisabled }): CSSObjectWithLabel => {
 		const backgroundColor = isDisabled
 			? 'rgba(var(--cui-color--rgb-50), var(--cui-opacity--lower))'
 			: isFocused
 				? 'rgba(var(--cui-color--rgb-50), var(--cui-opacity--low))'
 				: 'rgba(var(--cui-color--rgb-50), var(--cui-opacity--lower))'
-
+		const custom: CSSObjectWithLabel = {
+			backgroundColor,
+		}
 		return {
 			...provided,
-			backgroundColor,
+			...custom,
 		}
 	},
 	indicatorsContainer: (provided, { isDisabled }) => {
@@ -30,27 +32,38 @@ export const useCommonReactSelectStyles = <Option = unknown, IsMulti extends boo
 			? 'rgba(var(--cui-color--rgb-50), var(--cui-opacity--low))'
 			: 'rgb(var(--cui-color--rgb-50))'
 
-		return {
-			...provided,
+		const custom: CSSObjectWithLabel = {
 			color,
 			margin: 'calc(-1 * var(--cui-border-width, 1px)) 0',
 			padding: '0 var(--cui-gap)',
+
+		}
+
+		return {
+			...provided,
+			...custom,
 		}
 	},
 	valueContainer: provided => {
-		return {
-			...provided,
+		const custom: CSSObjectWithLabel = {
 			display: 'flex',
 			gap: 'var(--cui-gap)',
 			padding: 'var(--cui-gap) calc(var(--cui-gutter) - var(--cui-border-width))',
 		}
-	},
-	placeholder: provided => {
 		return {
 			...provided,
+			...custom,
+		}
+	},
+	placeholder: provided => {
+		const custom: CSSObjectWithLabel = {
 			color: 'rgba(var(--cui-color--rgb-25), var(--cui-opacity--high))',
 			margin: 0,
 			position: 'absolute',
+		}
+		return {
+			...provided,
+			...custom,
 		}
 	},
 	singleValue: (provided, { isDisabled }) => {
@@ -58,9 +71,13 @@ export const useCommonReactSelectStyles = <Option = unknown, IsMulti extends boo
 			? 'rgba(var(--cui-color--rgb-50), var(--cui-opacity--low))'
 			: 'rgb(var(--cui-color--strong-rgb-50))'
 
+		const custom: CSSObjectWithLabel = {
+			color,
+		}
+
 		return {
 			...provided,
-			color,
+			...custom,
 		}
 	},
 	multiValue: (provided, { isDisabled }) => {
@@ -70,9 +87,7 @@ export const useCommonReactSelectStyles = <Option = unknown, IsMulti extends boo
 		const lineHeight = 'var(--cui-line-height--controls)'
 		const margin = 0
 		const padding = '0 0 0 calc(var(--cui-gap) - var(--cui-border-width, 1px))'
-
-		return {
-			...provided,
+		const custom: CSSObjectWithLabel = {
 			backgroundColor,
 			borderColor,
 			borderWidth,
@@ -83,13 +98,20 @@ export const useCommonReactSelectStyles = <Option = unknown, IsMulti extends boo
 				borderColor: isDisabled ? borderColor : 'rgba(var(--cui-color--rgb-50), var(--cui-opacity--high))',
 			},
 		}
-	},
-	multiValueLabel: (provided, { isDisabled }) => {
-		const color = isDisabled ? 'rgba(var(--cui-color--rgb-50), var(--cui-opacity--low))' : 'rgb(var(--cui-color--strong-rgb-50))'
 
 		return {
 			...provided,
+			...custom,
+		}
+	},
+	multiValueLabel: (provided, { isDisabled }) => {
+		const color = isDisabled ? 'rgba(var(--cui-color--rgb-50), var(--cui-opacity--low))' : 'rgb(var(--cui-color--strong-rgb-50))'
+		const custom: CSSObjectWithLabel = {
 			color,
+		}
+		return {
+			...provided,
+			...custom,
 		}
 	},
 	multiValueRemove: provided => {
@@ -100,8 +122,7 @@ export const useCommonReactSelectStyles = <Option = unknown, IsMulti extends boo
 		// TODO: Indirect, but there seems to be no better way for now
 		const isFocusing = provided.backgroundColor
 
-		return {
-			...provided,
+		const custom: CSSObjectWithLabel = {
 			color,
 			'backgroundColor': isFocusing ? backgroundColor : undefined,
 			'opacity': isFocusing ? 1 : 0.5,
@@ -111,10 +132,14 @@ export const useCommonReactSelectStyles = <Option = unknown, IsMulti extends boo
 				opacity: 1,
 			},
 		}
-	},
-	dropdownIndicator: (provided, { isFocused, isDisabled }) => {
+
 		return {
 			...provided,
+			...custom,
+		}
+	},
+	dropdownIndicator: (provided, { isFocused, isDisabled }) => {
+		const custom: CSSObjectWithLabel = {
 			'alignSelf': 'stretch',
 			'alignItems': 'center',
 			'color': isDisabled
@@ -127,16 +152,23 @@ export const useCommonReactSelectStyles = <Option = unknown, IsMulti extends boo
 				color: 'rgb(var(--cui-color--rgb-0))',
 			},
 		}
-	},
-	clearIndicator: (provided, { isFocused }) => {
 		return {
 			...provided,
+			...custom,
+		}
+	},
+	clearIndicator: (provided, { isFocused }) => {
+		const custom: CSSObjectWithLabel = {
 			'color': isFocused
 				? 'rgb(var(--cui-color--rgb-0))'
 				: 'rgb(var(--cui-color--rgb-50))',
 			'&:hover': {
 				color: 'rgb(var(--cui-color--rgb-0))',
 			},
+		}
+		return {
+			...provided,
+			...custom,
 		}
 	},
 	control: (provided, { isFocused, isDisabled }) => {
@@ -153,8 +185,7 @@ export const useCommonReactSelectStyles = <Option = unknown, IsMulti extends boo
 				? 'rgba(var(--cui-color--rgb-50), var(--cui-opacity--lower))'
 				: 'rgb(var(--cui-background-color--toned-rgb-75))'
 
-		return {
-			...provided,
+		const custom: CSSObjectWithLabel = {
 			backgroundColor,
 			borderColor,
 			'borderWidth': 'var(--cui-border-width, 1px)',
@@ -169,36 +200,45 @@ export const useCommonReactSelectStyles = <Option = unknown, IsMulti extends boo
 					: 'rgba(var(--cui-color--rgb-50), var(--cui-opacity--high))',
 			},
 		}
+		return {
+			...provided,
+			...custom,
+		}
 	},
 	menu: provided => {
 		const backgroundColor = 'rgb(var(--cui-background-color--rgb-50))'
 		const border = 'var(--cui-border-width, 1px) solid rgb(var(--cui-background-color--toned-rgb-75))'
 
-		return {
-			...provided,
+		const custom: CSSObjectWithLabel = {
 			backgroundColor,
 			border,
 		}
-	},
-	menuList: provided => {
 		return {
 			...provided,
+			...custom,
+		}
+	},
+	menuList: provided => {
+		const custom: CSSObjectWithLabel = {
 			display: 'flex',
 			flexDirection: 'column',
 			gap: 'var(--cui-gap)',
 			padding: 'var(--cui-gap)',
 			zIndex: menuZIndex ?? 'unset',
 		}
+		return {
+			...provided,
+			...custom,
+		}
 	},
 	menuPortal: provided => {
 		return {
-			...provided,
+			// ...provided,
 			zIndex: 150,
 		}
 	},
 	option: (provided, { isFocused, isSelected }) => {
-		return {
-			...provided,
+		const custom: CSSObjectWithLabel = {
 			'borderRadius': 'var(--cui-border-radius--controls)',
 			'backgroundColor': isFocused
 				? 'rgb(var(--cui-background-color--controls-rgb-75))'
@@ -220,6 +260,10 @@ export const useCommonReactSelectStyles = <Option = unknown, IsMulti extends boo
 					? 'rgb(var(--cui-color--controls-rgb-100))'
 					: 'rgb(var(--cui-color--controls-rgb-75))',
 			},
+		}
+		return {
+			...provided,
+			...custom,
 		}
 	},
 }), [isInvalid, menuZIndex])

@@ -8,6 +8,7 @@ const getErrorContainer = () => {
 	let errorContainer = document.getElementById(errorElementId)
 
 	if (errorContainer) {
+		// eslint-disable-next-line react/no-deprecated
 		ReactDOM.unmountComponentAtNode(errorContainer)
 
 	} else {

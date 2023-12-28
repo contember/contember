@@ -11,8 +11,6 @@ export type MenuProps =
 		className?: NestedClassName;
 		caret?: boolean;
 		componentClassName?: string;
-		/** @deprecated No alternative */
-		focusMenuItemLabel?: string;
 		/**
 		 * Unique identifier to identify menu. Mandatory if you have multiple menus on a single page.
 		 *
@@ -20,8 +18,6 @@ export type MenuProps =
 		 */
 		id?: string;
 		label?: string;
-		/** @deprecated Use `caret` instead */
-		showCaret?: boolean;
 	}
 
 export interface MenuItemPropsTitleRequired<T> {

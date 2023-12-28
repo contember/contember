@@ -2,6 +2,8 @@
 
 // Source: https://github.com/emotion-js/emotion/blob/master/packages/styled-base/types/helper.d.ts
 // A more precise version of just React.ComponentPropsWithoutRef on its own
+import { ReactNode } from 'react'
+
 export type PropsOf<
 	C extends keyof JSX.IntrinsicElements | React.JSXElementConstructor<any>
 > = JSX.LibraryManagedAttributes<C, React.ComponentPropsWithoutRef<C>>
@@ -64,5 +66,5 @@ export type PolymorphicComponentPropsWithRef<
  * that the component accepts.
  */
 export type PolymorphicComponent<T extends React.ElementType, P = {}> =
-	& (<C extends React.ElementType = T>(props: PolymorphicComponentPropsWithRef<C, P>) => React.ReactElement | null)
+	& (<C extends React.ElementType = T>(props: PolymorphicComponentPropsWithRef<C, P>) => ReactNode)
 	& { displayName?: string | undefined }

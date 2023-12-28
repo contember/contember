@@ -2,9 +2,16 @@
 // even if it's empty and all deprecated code has been removed.
 export default {}
 
-export * from './ContainerSpinner'
-export * from './DropdownContentContainerContext'
+export * from './BoxDistinction'
+export * from './Icon'
 export * from './Layout'
-export * from './Portal'
-export * from './toSchemeClass'
-export * from './toThemeClass'
+export * from './Logo'
+export * from './MessageDistinction'
+export * from './TitleBar'
+export * from './Trio'
+export * from './UserMiniControl'
+export * from './randomId'
+export * from './useCloseOnClickOutside'
+export * from './useCloseOnEscape'
+export * from './useFallbackRef'
+export * from './useMouseMove'

@@ -1,5 +1,3 @@
-import { Try } from './Try'
-
 /**
  * Describes types that can be narrowed
  */
@@ -18,4 +16,4 @@ type NarrowRaw<A> =
 		: NarrowRaw<A[K]> })
 
 // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-constraint
-export type Narrow<A extends any> = Try<A, [], NarrowRaw<A>>
+export type Narrow<A extends any> = A extends [] ? A : NarrowRaw<A>

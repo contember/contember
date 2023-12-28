@@ -1,8 +1,16 @@
 import { useClassNameFactory, useElementSize } from '@contember/react-utils'
-import { assert, isNonNegativeNumber, isNotNullish, isSlugString, px } from '@contember/utilities'
+import { px } from '@contember/utilities'
 import { ElementType, forwardRef, memo, useRef } from 'react'
-import { GetLayoutPanelsStateContext, LayoutPanelContext, PanelBody, PanelFooter, PanelHeader, Panel as PanelPrimitive, isComponentClassName } from '../primitives'
+import {
+	GetLayoutPanelsStateContext,
+	LayoutPanelContext,
+	Panel as PanelPrimitive,
+	PanelBody,
+	PanelFooter,
+	PanelHeader,
+} from '../primitives'
 import { ContentComponentAttributes, ContentPanelComponentType } from './Types'
+import { isSlugString } from '../utils/isSlugString'
 
 const BASIS = 640
 const MIN_WIDTH = 480
@@ -19,13 +27,9 @@ export function createLayoutContentPanelComponent({
 	displayName: string;
 	name: string;
 }) {
-	assert('name is a slug string', name, isSlugString)
-	assert('defaultAs is defined', defaultAs, isNotNullish)
-	assert(
-		'componentClassName is either a non-empty string or an array of non-empty strings',
-		defaultComponentClassName,
-		isComponentClassName,
-	)
+	if (!isSlugString(name)) {
+		throw new Error(`Name must be a slug string, got: ${name}`)
+	}
 
 	return Object.assign<ContentPanelComponentType, ContentComponentAttributes>(memo(forwardRef(({
 		as = defaultAs,
@@ -50,12 +54,12 @@ export function createLayoutContentPanelComponent({
 			<PanelPrimitive
 				ref={forwardedRef}
 				as={as}
-				basis={isNonNegativeNumber(basis) ? basis : BASIS}
+				basis={basis}
 				className={className(null, classNameProp)}
 				defaultBehavior="static"
 				defaultVisibility="visible"
-				maxWidth={isNonNegativeNumber(maxWidth) ? maxWidth : null}
-				minWidth={isNonNegativeNumber(minWidth) ? minWidth : MIN_WIDTH}
+				maxWidth={maxWidth || null}
+				minWidth={minWidth}
 				name={name}
 				style={{
 					...style,

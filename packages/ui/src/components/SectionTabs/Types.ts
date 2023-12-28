@@ -6,8 +6,6 @@ export interface SectionTabsProps {
 
 export interface SectionTabProps {
 	id: string
-	/** @deprecated unused */
-	isMeta?: never
 	label: ReactNode
 }
 

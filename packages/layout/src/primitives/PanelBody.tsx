@@ -21,7 +21,7 @@ export const PanelBody: PanelBodyComponentType = memo(forwardRef(({
 	const elementRef = useRef<HTMLDivElement>(null)
 	const composeRef = useComposeRef(elementRef, forwardedRef)
 
-	const insetsStyle = useElementInsetCustomProperties(elementRef, '--inset')
+	const insetsStyle = useElementInsetCustomProperties(elementRef, 'inset')
 	const className = useClassNameFactory(componentClassName)
 
 	return (

@@ -11,14 +11,11 @@ export type SaveButtonProps =
 	}
 	& ButtonProps
 
-// TODO: Save i18n
-
 /**
  * @group UI
  */
 export const SaveButton = memo(forwardRef<HTMLButtonElement, SaveButtonProps>(({
 	distinction,
-	flow,
 	isDirty,
 	isPrimary = true,
 	labelSave,
@@ -32,7 +29,6 @@ export const SaveButton = memo(forwardRef<HTMLButtonElement, SaveButtonProps>(({
 		componentClassName={['button', 'save-button']}
 		className={[rest.className]}
 		distinction={isPrimary ? 'primary' : distinction}
-		flow={flow}
 		scheme={scheme}
 		size={size}
 		{...rest}

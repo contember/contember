@@ -12,12 +12,12 @@ test('generate enums', () => {
 		},
 	})).toMatchInlineSnapshot(`
 		"export type OrderStatus = 
-			 | \\"new\\"
-			 | \\"paid\\"
-			 | \\"cancelled\\"
+			 | "new"
+			 | "paid"
+			 | "cancelled"
 		export type OrderType = 
-			 | \\"normal\\"
-			 | \\"express\\"
+			 | "normal"
+			 | "express"
 		"
 	`)
 })

@@ -148,7 +148,6 @@ export const SelectComponent = <V, NN extends boolean>({
 			isDisabled={disabled || readOnly || loading}
 			isLoading={loading}
 			isOptionDisabled={isOptionDisabled}
-			menuPortalTarget={usePortalProvider()}
 			name={name}
 			options={optionsWithKeys}
 			placeholder={placeholder}

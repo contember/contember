@@ -41,6 +41,5 @@ export const useCommonReactSelectProps = <T>({
 			Input: SearchInput,
 		},
 		filterOption: () => true,
-		menuPosition: 'fixed',
 	}
 }

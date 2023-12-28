@@ -69,7 +69,7 @@ export const useDynamicMultipleChoiceWithConnectingEntityField = (
 		onRemove: useCallback(value => {
 			optionIdToConnectingEntityMap.get(value.id)?.deleteEntity()
 		}, [optionIdToConnectingEntityMap]),
-		onMove: sortedConnectingEntities.moveEntity,
+		onMove: props.sortableBy ? sortedConnectingEntities.moveEntity : undefined,
 		onSearch,
 		isLoading,
 	}

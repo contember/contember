@@ -98,7 +98,6 @@ export const SelectFieldInner = typedMemo(<T = unknown>({
 				<Select
 					{...selectProps}
 					menuPlacement="auto"
-					menuPortalTarget={usePortalProvider()}
 					isClearable={allowNull === true}
 					value={currentValue}
 					isLoading={isLoading}

@@ -1213,6 +1213,7 @@ __metadata:
   resolution: "@contember/layout@workspace:packages/layout"
   dependencies:
     "@contember/react-i18n": "workspace:*"
+    "@contember/react-slots": "workspace:*"
     "@contember/react-utils": "workspace:*"
     "@contember/ui": "workspace:*"
     "@contember/utilities": "workspace:*"
@@ -1488,6 +1489,12 @@ __metadata:
     "@contember/utilities": "workspace:*"
   peerDependencies:
     react: ^17 || ^18
+  languageName: unknown
+  linkType: soft
+
+"@contember/react-slots@workspace:*, @contember/react-slots@workspace:packages/react-slots":
+  version: 0.0.0-use.local
+  resolution: "@contember/react-slots@workspace:packages/react-slots"
   languageName: unknown
   linkType: soft
 

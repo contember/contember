@@ -155,9 +155,6 @@ export function range(start: number, end: number, step?: number): number[];
 export type SemverString = `${number}.${number}.${number}`;
 
 // @public (undocumented)
-export function setHasOneOf<T>(set: Set<T>, values: T[]): boolean;
-
-// @public (undocumented)
 export const shouldCancelStart: (event: {
     target?: unknown;
 }) => boolean;

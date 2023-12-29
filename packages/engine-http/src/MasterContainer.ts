@@ -34,6 +34,7 @@ import { homepageController, playgroundController } from './misc'
 import { Plugin } from './plugin/Plugin'
 import { Application } from './application/application'
 import { ApplicationWorkerManager } from './workers/ApplicationWorkerManager'
+import { HttpResponse } from './common'
 
 export interface MasterContainer {
 	initializer: Initializer
@@ -160,6 +161,10 @@ export class MasterContainerFactory {
 				it.addRoute('transfer', '/export', exportApiMiddlewareFactory.create())
 				it.addRoute('misc', '/playground', playgroundController)
 				it.addRoute('misc', '/', homepageController)
+
+				it.addInternalRoute('internal', '/health', () => {
+					return new HttpResponse(200, 'OK')
+				})
 			})
 			.addService('initializer', ({ projectGroupContainer }) =>
 				new Initializer(projectGroupContainer))

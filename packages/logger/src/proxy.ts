@@ -24,6 +24,10 @@ class CurrentLoggerProxy implements Logger {
 		getLogger().debug(a, b)
 	}
 
+	log(level: any, a: any, b?: any, c?: any) {
+		getLogger().log(level, a, b)
+	}
+
 	child(attributes?: LoggerAttributes, options?: Partial<LoggerOptions>): Logger {
 		return getLogger().child(attributes, options)
 	}

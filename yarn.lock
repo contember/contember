@@ -1495,6 +1495,14 @@ __metadata:
 "@contember/react-slots@workspace:*, @contember/react-slots@workspace:packages/react-slots":
   version: 0.0.0-use.local
   resolution: "@contember/react-slots@workspace:packages/react-slots"
+  dependencies:
+    "@contember/react-utils": "workspace:*"
+    "@contember/utilities": "workspace:*"
+    react: ^18.2.0
+    react-dom: ^18.2.0
+  peerDependencies:
+    react: ^17 || ^18
+    react-dom: ^17 || ^18
   languageName: unknown
   linkType: soft
 

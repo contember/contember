@@ -8,11 +8,14 @@ export class Transaction implements Connection.TransactionLike {
 		return this.state.isClosed
 	}
 
+	public on
+
 	constructor(
 		private readonly connection: Connection.AcquiredConnectionLike,
 		private readonly savepointManager = new SavepointState(),
 		private readonly state = new TransactionLikeState(),
 	) {
+		this.on = this.connection.on.bind(this.connection)
 	}
 
 	get eventManager() {
@@ -62,12 +65,11 @@ export class Transaction implements Connection.TransactionLike {
 		await this.query(command)
 		this.state.close()
 	}
-
-	on = this.connection.on.bind(this.connection)
-
 }
 
 class SavePoint implements Connection.TransactionLike {
+
+	public on
 
 	constructor(
 		public readonly savepointName: string,
@@ -75,6 +77,7 @@ class SavePoint implements Connection.TransactionLike {
 		private readonly connection: Connection.AcquiredConnectionLike,
 		private readonly state = new TransactionLikeState(),
 	) {
+		this.on = this.connection.on.bind(this.connection)
 	}
 
 	get isClosed() {
@@ -129,8 +132,6 @@ class SavePoint implements Connection.TransactionLike {
 		await this.query(sql)
 		this.state.close()
 	}
-
-	on = this.connection.on.bind(this.connection)
 }
 
 class TransactionLikeState {

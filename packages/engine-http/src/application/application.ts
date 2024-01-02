@@ -312,7 +312,7 @@ export class Application {
 				.map(h => `${h}: ${headers[h]}`)
 				.join('\r\n') +
 			'\r\n\r\n' +
-			response.body ?? '',
+			(response.body ?? ''),
 		)
 	}
 

@@ -1,10 +1,13 @@
 import { Input, Project, Workspace } from '@contember/cli-common'
 import { MigrationsContainerFactory } from './MigrationsContainer'
-import { MigrationDescriber, SchemaMigrator } from '@contember/schema-migrations'
-import { MigrationCreator } from './MigrationCreator'
-import { MigrationsResolver } from './MigrationsResolver'
-import { SchemaVersionBuilder } from './SchemaVersionBuilder'
-import { MigrationFilesManager } from './MigrationFilesManager'
+import {
+	MigrationCreator,
+	MigrationDescriber,
+	MigrationFilesManager,
+	MigrationsResolver,
+	SchemaMigrator,
+	SchemaVersionBuilder,
+} from '@contember/migrations-client'
 
 type Args = {
 	project?: string

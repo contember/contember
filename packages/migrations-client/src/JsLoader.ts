@@ -1,19 +1,21 @@
 import { MigrationFileLoader } from './MigrationFileLoader'
-import { buildJs } from '../esbuild'
 import { MigrationParser } from './MigrationParser'
 import { ContentMigration, MigrationContent, MigrationFile } from './MigrationFile'
 
 export class JsLoader implements MigrationFileLoader {
 	constructor(
 		private readonly migrationParser: MigrationParser,
+		private readonly jsExecutor: (file: string) => Promise<any>,
 	) {
 	}
 
 
 	public async load(file: MigrationFile): Promise<MigrationContent> {
-		const code = await buildJs(file.path)
-		const fn = new Function(`var module = {}; ((module) => { ${code} })(module); return module`)
-		const exports = fn().exports
+
+		// const code = await buildJs(file.path)
+		// const fn = new Function(`var module = {}; ((module) => { ${code} })(module); return module`)
+
+		const exports = await this.jsExecutor(file.path)
 		if (!('default' in exports) && !('query' in exports) && !('queries' in exports)) {
 			throw `export "default" or "query" is required in ${file.path}`
 		}

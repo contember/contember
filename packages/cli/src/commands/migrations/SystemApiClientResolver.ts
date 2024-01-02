@@ -1,6 +1,6 @@
 import { interactiveResolveInstanceEnvironmentFromInput } from '../../utils/instance'
 import { interactiveResolveApiToken } from '../../utils/tenant'
-import { SystemClient } from '../../utils/system'
+import { SystemClient } from '@contember/migrations-client'
 import { Workspace, Project } from '@contember/cli-common'
 import { Input } from '@contember/cli-common'
 

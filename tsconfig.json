@@ -28,6 +28,7 @@
 		{ "path": "./packages/graphql-utils" },
 		{ "path": "./packages/logger" },
 		{ "path": "./packages/queryable" },
+		{ "path": "./packages/migrations-client" },
 		{ "path": "./packages/schema" },
 		{ "path": "./packages/schema-definition" },
 		{ "path": "./packages/schema-migrations" },

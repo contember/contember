@@ -755,8 +755,8 @@ __metadata:
     "@contember/config-loader": "workspace:*"
     "@contember/database": "workspace:*"
     "@contember/dic": "workspace:*"
-    "@contember/engine-common": "workspace:*"
     "@contember/engine-content-api": "workspace:*"
+    "@contember/migrations-client": "workspace:*"
     "@contember/schema": "workspace:*"
     "@contember/schema-migrations": "workspace:*"
     "@contember/schema-utils": "workspace:*"
@@ -1194,6 +1194,19 @@ __metadata:
   dependencies:
     "@types/node": ^20.9.0
     chalk: ^4.1.2
+  languageName: unknown
+  linkType: soft
+
+"@contember/migrations-client@workspace:*, @contember/migrations-client@workspace:packages/migrations-client":
+  version: 0.0.0-use.local
+  resolution: "@contember/migrations-client@workspace:packages/migrations-client"
+  dependencies:
+    "@contember/engine-common": "workspace:*"
+    "@contember/schema": "workspace:*"
+    "@contember/schema-migrations": "workspace:*"
+    "@contember/schema-utils": "workspace:*"
+    "@types/node": ^20.9.0
+    graphql-request: ^6.1.0
   languageName: unknown
   linkType: soft
 

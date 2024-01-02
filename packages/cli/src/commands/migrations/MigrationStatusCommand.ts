@@ -2,8 +2,9 @@ import { Command, CommandConfiguration, Input, Workspace } from '@contember/cli-
 import { MigrationsContainerFactory } from '../../utils/migrations/MigrationsContainer'
 import { interactiveResolveInstanceEnvironmentFromInput } from '../../utils/instance'
 import { interactiveResolveApiToken } from '../../utils/tenant'
-import { SystemClient } from '../../utils/system'
-import { createMigrationStatusTable, MigrationState, sortMigrations } from '../../utils/migrations/migrations'
+import { SystemClient } from '@contember/migrations-client'
+import { MigrationState, sortMigrations } from '@contember/migrations-client'
+import { createMigrationStatusTable } from '../../utils/migrations/migrations'
 import chalk from 'chalk'
 import { resolveMigrationStatus } from '../../utils/migrations/MigrationExecuteHelper'
 

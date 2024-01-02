@@ -1,12 +1,13 @@
 import { Builder } from '@contember/dic'
 import { MigrationDescriber, ModificationHandlerFactory, SchemaDiffer, SchemaMigrator, VERSION_LATEST } from '@contember/schema-migrations'
-import { MigrationCreator } from './MigrationCreator'
-import { SchemaVersionBuilder } from './SchemaVersionBuilder'
-import { MigrationsResolver } from './MigrationsResolver'
-import { MigrationFilesManager } from './MigrationFilesManager'
-import { JsonLoader } from './JsonLoader'
-import { MigrationParser } from './MigrationParser'
-import { JsLoader } from './JsLoader'
+import { MigrationCreator } from '@contember/migrations-client'
+import { SchemaVersionBuilder } from '@contember/migrations-client'
+import { MigrationsResolver } from '@contember/migrations-client'
+import { MigrationFilesManager } from '@contember/migrations-client'
+import { JsonLoader } from '@contember/migrations-client'
+import { MigrationParser } from '@contember/migrations-client'
+import { JsLoader } from '@contember/migrations-client'
+import { buildJs } from '../esbuild'
 
 export interface MigrationsContainer {
 	migrationCreator: MigrationCreator
@@ -34,12 +35,19 @@ export class MigrationsContainerFactory {
 
 	public create(): MigrationsContainer {
 		return new Builder({})
-			.addService('migrationFilesManager', () =>
-				new MigrationFilesManager(this.directory, {
+			.addService('migrationFilesManager', () => {
+				const jsExecutor = async (file: string) => {
+					const code = await buildJs(file)
+					const fn = new Function(`var module = {}; ((module) => { ${code} })(module); return module`)
+					return fn().exports
+				}
+
+				return new MigrationFilesManager(this.directory, {
 					json: new JsonLoader(new MigrationParser()),
-					ts: new JsLoader(new MigrationParser()),
-					js: new JsLoader(new MigrationParser()),
-				}))
+					ts: new JsLoader(new MigrationParser(), jsExecutor),
+					js: new JsLoader(new MigrationParser(), jsExecutor),
+				})
+			})
 			.addService('modificationHandlerFactory', () =>
 				new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap))
 			.addService('schemaMigrator', ({ modificationHandlerFactory }) =>

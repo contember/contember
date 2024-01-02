@@ -1,5 +1,5 @@
 import { GraphQLClient } from 'graphql-request'
-import { ExecutedMigration, ExecutedMigrationInfo } from '../migrations/migrations'
+import { ExecutedMigration, ExecutedMigrationInfo } from './migrations'
 
 export type MigrateError = {
 	readonly code: MigrateErrorCode
@@ -18,13 +18,6 @@ export enum MigrateErrorCode {
 export type MigrateResponse = {
 	readonly ok: boolean
 	readonly errors: MigrateError[]
-}
-
-export const createSystemUrl = (baseUrl: string, projectName: string) => {
-	if (baseUrl.endsWith('/')) {
-		baseUrl = baseUrl.substring(0, baseUrl.length - 1)
-	}
-	return baseUrl + '/system/' + projectName
 }
 
 export class SystemClient {
@@ -147,4 +140,11 @@ mutation($version: String!, $modification: MigrationModification!) {
 			).executedMigrations.map(it => ({ ...it, executedAt: new Date(it.executedAt) }))[0] || null
 		)
 	}
+}
+
+const createSystemUrl = (baseUrl: string, projectName: string) => {
+	if (baseUrl.endsWith('/')) {
+		baseUrl = baseUrl.substring(0, baseUrl.length - 1)
+	}
+	return baseUrl + '/system/' + projectName
 }

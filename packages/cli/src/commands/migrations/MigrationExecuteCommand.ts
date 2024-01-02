@@ -9,7 +9,7 @@ import {
 import { createMigrationStatusTable } from '../../utils/migrations/migrations'
 import { interactiveResolveInstanceEnvironmentFromInput } from '../../utils/instance'
 import { interactiveResolveApiToken, TenantClient } from '../../utils/tenant'
-import { SystemClient } from '../../utils/system'
+import { SystemClient } from '@contember/migrations-client'
 import { MigrationVersionHelper } from '@contember/schema-migrations'
 
 type Args = {

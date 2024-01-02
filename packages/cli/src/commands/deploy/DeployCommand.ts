@@ -7,7 +7,7 @@ import {
 } from '../../utils/migrations/MigrationExecuteHelper'
 import { interactiveResolveApiToken, TenantClient } from '../../utils/tenant'
 import { interactiveResolveInstanceEnvironmentFromInput } from '../../utils/instance'
-import { createSystemUrl, SystemClient } from '../../utils/system'
+import { SystemClient } from '@contember/migrations-client'
 import { MigrationsContainerFactory } from '../../utils/migrations/MigrationsContainer'
 import { AdminClient, readAdminFiles } from '../../utils/admin'
 import prompts from 'prompts'

@@ -1,5 +1,5 @@
 import { Migration } from '@contember/schema-migrations'
-import { JSONObject } from '@contember/cli-common'
+import { JSONObject } from './utils/json'
 
 export interface MigrationFile {
 	path: string

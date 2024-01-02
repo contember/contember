@@ -1,5 +1,5 @@
 import { MigrationFileLoader } from './MigrationFileLoader'
-import fs from 'node:fs/promises'
+import * as fs from 'node:fs/promises'
 import { MigrationParser } from './MigrationParser'
 import { MigrationFile } from './MigrationFile'
 

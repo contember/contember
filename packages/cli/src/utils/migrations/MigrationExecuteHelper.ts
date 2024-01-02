@@ -1,12 +1,17 @@
 import { CommandConfiguration } from '@contember/cli-common'
-import { SystemClient } from '../system'
-import { getMigrationsStatus, MigrationToExecuteOkStatus, printMigrationDescription } from './migrations'
-import { MigrationDescriber } from '@contember/schema-migrations'
+import {
+	ContentMigrationFactoryArgs,
+	isSchemaMigration,
+	MigrationDescriber,
+	MigrationsResolver,
+	MigrationToExecuteOkStatus,
+	SchemaVersionBuilder,
+	SystemClient,
+	MigrationExecutor,
+	MigrationsStatusResolver,
+} from '@contember/migrations-client'
+import { printMigrationDescription } from './migrations'
 import prompts from 'prompts'
-import { MigrationsResolver } from './MigrationsResolver'
-import { SchemaVersionBuilder } from './SchemaVersionBuilder'
-import { ContentMigrationFactoryArgs, isSchemaMigration, ResolvedMigrationContent } from './MigrationFile'
-import { assertNever } from '../assertNever'
 
 export type ExecuteMigrationOptions = {
 	instance?: string
@@ -33,10 +38,11 @@ export const resolveMigrationStatus = async (
 	client: SystemClient,
 	migrationsResolver: MigrationsResolver,
 	force: boolean = false,
-): Promise<ReturnType<typeof getMigrationsStatus>> => {
+) => {
+	const migrationStatusResolver = new MigrationsStatusResolver()
 	const executedMigrations = await client.listExecutedMigrations()
 	const localMigrations = await migrationsResolver.getMigrationFiles()
-	return getMigrationsStatus(executedMigrations, localMigrations, force)
+	return migrationStatusResolver.getMigrationsStatus(executedMigrations, localMigrations, force)
 }
 
 export const executeMigrations = async ({
@@ -96,58 +102,14 @@ export const executeMigrations = async ({
 		} while (true)
 	}
 
-	let migrationsToRun: ResolvedMigrationContent[] = []
+	const executor = new MigrationExecutor()
 
-	const executeMigrations = async () => {
-		if (migrationsToRun.length === 0) {
-			return
-		}
-		await client.migrate(
-			migrationsToRun.map(it => {
-				if (it.type === 'schema') {
-					return {
-						version: it.version,
-						name: it.name,
-						type: 'SCHEMA',
-						schemaMigration: {
-							formatVersion: it.formatVersion,
-							modifications: it.modifications,
-							skippedErrors: it.skippedErrors,
-						},
-					}
-				}
-				if (it.type === 'content') {
-					return {
-						version: it.version,
-						name: it.name,
-						type: 'CONTENT',
-						contentMigration: it.queries,
-					}
-				}
-				return assertNever(it)
-			}),
-			force,
-		)
-		migrationsToRun.forEach(it => {
-			console.log(it.name)
-		})
-		migrationsToRun = []
-	}
-
-	console.log('Executing...')
-
-	for (const migration of migrations) {
-		const migrationContent = await migration.localMigration.getContent()
-		if (migrationContent.type === 'factory') {
-			await executeMigrations()
-			const result = await migrationContent.factory(contentMigrationFactoryArgs)
-			migrationsToRun.push(result)
-			await executeMigrations()
-		} else {
-			migrationsToRun.push(migrationContent)
-		}
-	}
-	await executeMigrations()
-	console.log('Migration executed')
+	await executor.executeMigrations({
+		client,
+		migrations,
+		contentMigrationFactoryArgs,
+		log: message => console.log(message),
+		force,
+	})
 	return 0
 }

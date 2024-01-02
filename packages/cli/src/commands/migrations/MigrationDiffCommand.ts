@@ -7,7 +7,7 @@ import { executeMigrations, resolveMigrationStatus } from '../../utils/migration
 import prompts from 'prompts'
 import { interactiveResolveApiToken, TenantClient } from '../../utils/tenant'
 import { interactiveResolveInstanceEnvironmentFromInput } from '../../utils/instance'
-import { SystemClient } from '../../utils/system'
+import { SystemClient } from '@contember/migrations-client'
 import { loadSchema } from '../../utils/project/loadSchema'
 
 type Args = {

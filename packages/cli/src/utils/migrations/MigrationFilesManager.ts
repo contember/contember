@@ -13,9 +13,9 @@ export class MigrationFilesManager {
 		private readonly loaders: Record<string, MigrationFileLoader>,
 	) {}
 
-	public async createFile(content: string, name: string): Promise<string> {
+	public async createFile(content: string, name: string, extension = 'json'): Promise<string> {
 		this.migrations = null
-		const path = this.formatPath(name)
+		const path = this.formatPath(name, extension)
 		await fs.writeFile(path, content, { encoding: 'utf8' })
 		return await fs.realpath(path)
 	}
@@ -94,8 +94,8 @@ export class MigrationFilesManager {
 		return filteredFiles.sort()
 	}
 
-	private formatPath(version: string) {
-		const filename = `${version}.json`
+	private formatPath(version: string, extension = 'json'): string {
+		const filename = `${version}.${extension}`
 		const path = `${this.directory}/${filename}`
 		return path
 	}

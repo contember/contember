@@ -7,7 +7,19 @@ export class MigrationCreator {
 	constructor(
 		private readonly migrationFilesManager: MigrationFilesManager,
 		private readonly schemaDiffer: SchemaDiffer,
+		private readonly emptyTemplates: Record<string, string> = {},
 	) {}
+
+	async createEmptyMigrationFile(migrationName: string, format: string): Promise<string> {
+		if (!this.emptyTemplates.hasOwnProperty(format)) {
+			throw new Error(`Unknown format ${format}`)
+		}
+		await this.migrationFilesManager.createDirIfNotExist()
+		const [, fullName] = MigrationVersionHelper.createVersion(migrationName)
+		const filename = await this.migrationFilesManager.createFile(this.emptyTemplates[format], fullName, format)
+
+		return filename
+	}
 
 	async prepareMigration(
 		initialSchema: Schema,

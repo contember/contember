@@ -1,4 +1,3 @@
-import { MigrationBuilder } from '@contember/database-migrations'
 import { Acl, Schema } from '@contember/schema'
 import { SchemaUpdater } from '../utils/schemaUpdateUtils'
 import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler'
@@ -9,7 +8,7 @@ import { patchAclSchemaModification } from './PatchAclSchemaModification'
 export class UpdateAclSchemaModificationHandler implements ModificationHandler<UpdateAclSchemaModificationData>{
 	constructor(private readonly data: UpdateAclSchemaModificationData) {}
 
-	public createSql(builder: MigrationBuilder): void {}
+	public createSql(): void {}
 
 	public getSchemaUpdater(): SchemaUpdater {
 		return ({ schema }) => ({

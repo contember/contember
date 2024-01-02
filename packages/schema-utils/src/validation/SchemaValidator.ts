@@ -6,9 +6,9 @@ import { ValidationValidator } from './ValidationValidator'
 import { ActionsValidator } from './ActionsValidator'
 
 export interface SchemaValidatorSkippedErrors {
-	code: ValidationErrorCode
-	skipUntil?: string
-	path?: string
+	readonly code: ValidationErrorCode
+	readonly skipUntil?: string
+	readonly path?: string
 }
 
 export class SchemaValidator {

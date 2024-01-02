@@ -11,7 +11,7 @@ import { TenantConfigResolver } from './config/tenantConfigResolver'
 import { ProjectGroupContainerFactory } from './projectGroup/ProjectGroupContainer'
 import { ProjectGroupResolver, SingleProjectGroupResolver } from './projectGroup/ProjectGroupResolver'
 import { Logger } from '@contember/logger'
-import { ExecutionContainerFactory } from '@contember/engine-content-api'
+import { ExecutionContainerFactory, GraphQlSchemaBuilderFactory, PermissionFactory } from '@contember/engine-content-api'
 import { createProviders, Providers } from './providers'
 import { TenantApiMiddlewareFactory, TenantGraphQLContextFactory, TenantGraphQLHandlerFactory } from './tenant'
 import { SystemApiMiddlewareFactory, SystemGraphQLContextFactory, SystemGraphQLHandlerFactory } from './system'
@@ -35,6 +35,8 @@ import { Plugin } from './plugin/Plugin'
 import { Application } from './application/application'
 import { ApplicationWorkerManager } from './workers/ApplicationWorkerManager'
 import { HttpResponse } from './common'
+import { ContentQueryExecutorImpl } from './system/ContentQueryExecutor'
+import { DatabaseMetadataResolver } from '@contember/database'
 
 export interface MasterContainer {
 	initializer: Initializer
@@ -94,10 +96,20 @@ export class MasterContainerFactory {
 				new TenantContainerFactory(providers))
 			.addService('modificationHandlerFactory', () =>
 				new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap))
-			.addService('systemContainerFactory', ({ providers, modificationHandlerFactory }) =>
-				new SystemContainerFactory(providers, modificationHandlerFactory))
-			.addService('projectContainerFactoryFactory', ({ debugMode, plugins, providers, serverConfig }) =>
-				new ProjectContainerFactoryFactory(debugMode, plugins, providers, serverConfig))
+			.addService('executionContainerFactory', ({ providers }) =>
+				new ExecutionContainerFactory(providers))
+			.addService('graphQlSchemaBuilderFactory', () =>
+				new GraphQlSchemaBuilderFactory())
+			.addService('contentQueryExecutor', ({ executionContainerFactory, graphQlSchemaBuilderFactory }) =>
+				new ContentQueryExecutorImpl(executionContainerFactory, graphQlSchemaBuilderFactory))
+			.addService('systemContainerFactory', ({ providers, modificationHandlerFactory, contentQueryExecutor }) =>
+				new SystemContainerFactory(providers, modificationHandlerFactory, contentQueryExecutor))
+			.addService('contentPermissionFactory', ({}) =>
+				new PermissionFactory())
+			.addService('databaseMetadataResolver', () =>
+				new DatabaseMetadataResolver())
+			.addService('projectContainerFactoryFactory', ({ plugins, providers, serverConfig, graphQlSchemaBuilderFactory, contentPermissionFactory, databaseMetadataResolver }) =>
+				new ProjectContainerFactoryFactory(plugins, providers, serverConfig, graphQlSchemaBuilderFactory, contentPermissionFactory, databaseMetadataResolver))
 			.addService('tenantGraphQLHandlerFactory', () =>
 				new TenantGraphQLHandlerFactory())
 			.addService('systemGraphQLHandlerFactory', ({ debugMode }) =>
@@ -112,8 +124,6 @@ export class MasterContainerFactory {
 				new SingleProjectGroupResolver(projectGroupContainer))
 			.addService('notModifiedChecker', () =>
 				new NotModifiedChecker())
-			.addService('executionContainerFactory', ({ providers }) =>
-				new ExecutionContainerFactory(providers))
 			.addService('contentGraphqlContextFactory', ({ providers, executionContainerFactory }) =>
 				new ContentGraphQLContextFactory(providers, executionContainerFactory))
 			.addService('contentQueryHandlerFactory', ({ debugMode }) =>
@@ -134,8 +144,8 @@ export class MasterContainerFactory {
 				new ContentSchemaTransferMappingFactory())
 			.addService('systemSchemaTransferMappingFactory', () =>
 				new SystemSchemaTransferMappingFactory())
-			.addService('importExecutor', ({ contentSchemaTransferMappingFactory, systemSchemaTransferMappingFactory }) =>
-				new ImportExecutor(contentSchemaTransferMappingFactory, systemSchemaTransferMappingFactory))
+			.addService('importExecutor', ({ contentSchemaTransferMappingFactory, systemSchemaTransferMappingFactory, databaseMetadataResolver }) =>
+				new ImportExecutor(contentSchemaTransferMappingFactory, systemSchemaTransferMappingFactory, databaseMetadataResolver))
 			.addService('exportExecutor', ({ contentSchemaTransferMappingFactory, systemSchemaTransferMappingFactory }) =>
 				new ExportExecutor(contentSchemaTransferMappingFactory, systemSchemaTransferMappingFactory))
 			.addService('importApiMiddlewareFactory', ({ projectGroupResolver, importExecutor }) =>

@@ -1,33 +1,10 @@
-import {
-	calculateMigrationChecksum,
-	Migration,
-	MigrationDescriber,
-	MigrationInfo,
-	MigrationsResolver,
-	MigrationVersionHelper,
-} from '@contember/schema-migrations'
+import { calculateMigrationChecksum, Migration, MigrationDescriber, MigrationInfo } from '@contember/schema-migrations'
 import chalk from 'chalk'
 import { Schema } from '@contember/schema'
 import chalkTable from 'chalk-table'
-import { assertNever } from './assertNever'
+import { assertNever } from '../assertNever'
 import { emptyDatabaseMetadata } from '@contember/database'
-
-export const getLatestMigration = async (migrationsResolver: MigrationsResolver): Promise<Migration | null> => {
-	const migrations = await migrationsResolver.getMigrations()
-	return migrations.length > 0 ? migrations[migrations.length - 1] : null
-}
-export const getMigrationByName = async (
-	migrationsResolver: MigrationsResolver,
-	version: string,
-): Promise<Migration | null> => {
-	const migrations = await migrationsResolver.getMigrations()
-	return findMigration(migrations, version)
-}
-
-export const findMigration = <M extends { version: string }>(migrations: M[], version: string): M | null =>
-	migrations.find(
-		it => MigrationVersionHelper.extractVersion(it.version) === MigrationVersionHelper.extractVersion(version),
-	) || null
+import { isSchemaMigration, MigrationFile } from './MigrationFile'
 
 export const printMigrationDescription = function (
 	migrationsDescriber: MigrationDescriber,
@@ -83,33 +60,34 @@ export enum MigrationState {
 	EXECUTED_MISSING = 'executed_missing',
 }
 
-export interface MigrationToExecuteOkStatus extends MigrationInfo {
-	state: MigrationState.TO_EXECUTE_OK
-	localMigration: Migration
+export interface MigrationStatusBase<S extends MigrationState> {
+	state: S
+	version: string
+	name: string
 }
 
-interface MigrationToExecuteInvalidStatus extends MigrationInfo {
-	state: MigrationState.TO_EXECUTE_ERROR
-	localMigration: Migration
+export interface MigrationToExecuteOkStatus extends MigrationStatusBase<MigrationState.TO_EXECUTE_OK> {
+	localMigration: MigrationFile
+}
+
+interface MigrationToExecuteInvalidStatus extends MigrationStatusBase<MigrationState.TO_EXECUTE_ERROR> {
+	localMigration: MigrationFile
 	errorMessage: string
 }
 
-interface MigrationExecutedOkStatus extends MigrationInfo {
-	state: MigrationState.EXECUTED_OK
+interface MigrationExecutedOkStatus extends MigrationStatusBase<MigrationState.EXECUTED_OK>{
 	executedMigration: ExecutedMigrationInfo
-	localMigration: Migration
+	localMigration: MigrationFile
 }
 
-interface MigrationExecutedMissingStatus extends MigrationInfo {
-	state: MigrationState.EXECUTED_MISSING
+interface MigrationExecutedMissingStatus extends MigrationStatusBase<MigrationState.EXECUTED_MISSING>{
 	executedMigration: ExecutedMigrationInfo
 	errorMessage: string
 }
 
-interface MigrationExecutedErrorStatus extends MigrationInfo {
-	state: MigrationState.EXECUTED_ERROR
+interface MigrationExecutedErrorStatus extends MigrationStatusBase<MigrationState.EXECUTED_ERROR>{
 	executedMigration: ExecutedMigrationInfo
-	localMigration: Migration
+	localMigration: MigrationFile
 	errorMessage: string
 }
 
@@ -128,15 +106,15 @@ export const sortMigrations = <M extends { version: string }>(migrations: M[]): 
 	return [...migrations].sort((a, b) => a.version.localeCompare(b.version))
 }
 
-export const getMigrationsStatus = (
+export const getMigrationsStatus = async (
 	executedMigrations: ExecutedMigrationInfo[],
-	localMigrations: Migration[],
+	localMigrations: MigrationFile[],
 	force: boolean = false,
-): {
+): Promise<{
 	allMigrations: AnyMigrationStatus[]
 	errorMigrations: ErrorMigrationStatus[]
 	migrationsToExecute: MigrationToExecuteOkStatus[]
-} => {
+}> => {
 	const sortedExecuted = sortMigrations(executedMigrations)
 
 	const allMigrations: AnyMigrationStatus[] = []
@@ -146,22 +124,23 @@ export const getMigrationsStatus = (
 			allMigrations.push({
 				state: MigrationState.EXECUTED_MISSING,
 				executedMigration: executed,
-				formatVersion: executed.formatVersion,
-				name: executed.name,
 				version: executed.version,
+				name: executed.name,
 				errorMessage: `Migration ${executed.name} is missing locally`,
 			})
 			continue
 		}
-		const localChecksum = calculateMigrationChecksum(localMigration)
+		const migrationContent = await localMigration.getContent()
+
+		const localChecksum = !isSchemaMigration(migrationContent) ? null : calculateMigrationChecksum(migrationContent)
+
 		if (localChecksum !== executed.checksum) {
 			allMigrations.push({
 				state: MigrationState.EXECUTED_ERROR,
 				executedMigration: executed,
-				localMigration,
-				formatVersion: executed.formatVersion,
-				name: executed.name,
 				version: executed.version,
+				name: executed.name,
+				localMigration,
 				errorMessage: `Checksum of executed migration "${executed.checksum}" does not match "${localChecksum}"`,
 			})
 			continue
@@ -169,10 +148,9 @@ export const getMigrationsStatus = (
 		allMigrations.push({
 			state: MigrationState.EXECUTED_OK,
 			executedMigration: executed,
-			localMigration,
-			formatVersion: executed.formatVersion,
-			name: executed.name,
 			version: executed.version,
+			name: executed.name,
+			localMigration,
 		})
 	}
 
@@ -186,9 +164,8 @@ export const getMigrationsStatus = (
 			allMigrations.push({
 				state: MigrationState.TO_EXECUTE_ERROR,
 				localMigration,
-				formatVersion: localMigration.formatVersion,
-				name: localMigration.name,
 				version: localMigration.version,
+				name: localMigration.name,
 				errorMessage: `Must follow latest executed migration ${latestExecuted.name}`,
 			})
 			continue
@@ -196,9 +173,8 @@ export const getMigrationsStatus = (
 		allMigrations.push({
 			state: MigrationState.TO_EXECUTE_OK,
 			localMigration,
-			formatVersion: localMigration.formatVersion,
-			name: localMigration.name,
 			version: localMigration.version,
+			name: localMigration.name,
 		})
 	}
 	const allMigrationsSorted = sortMigrations(allMigrations)

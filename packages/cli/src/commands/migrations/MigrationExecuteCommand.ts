@@ -1,12 +1,12 @@
 import { Command, CommandConfiguration, Input, Workspace } from '@contember/cli-common'
-import { MigrationsContainerFactory } from '../../MigrationsContainer'
+import { MigrationsContainerFactory } from '../../utils/migrations/MigrationsContainer'
 import {
 	configureExecuteMigrationCommand,
 	ExecuteMigrationOptions,
 	executeMigrations,
 	resolveMigrationStatus,
-} from './MigrationExecuteHelper'
-import { createMigrationStatusTable } from '../../utils/migrations'
+} from '../../utils/migrations/MigrationExecuteHelper'
+import { createMigrationStatusTable } from '../../utils/migrations/migrations'
 import { interactiveResolveInstanceEnvironmentFromInput } from '../../utils/instance'
 import { interactiveResolveApiToken, TenantClient } from '../../utils/tenant'
 import { SystemClient } from '../../utils/system'
@@ -90,6 +90,11 @@ export class MigrationExecuteCommand extends Command<Args, Options> {
 				migrations,
 				requireConfirmation: !input.getOption('yes'),
 				force: force,
+				contentMigrationFactoryArgs: {
+					apiToken,
+					apiBaseUrl: instance.baseUrl.replace(/\/$/, ''),
+					projectName: remoteProject,
+				},
 			})
 			code ||= singleCode
 		}

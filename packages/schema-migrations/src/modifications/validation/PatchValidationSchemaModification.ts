@@ -1,4 +1,3 @@
-import { MigrationBuilder } from '@contember/database-migrations'
 import { SchemaUpdater } from '../utils/schemaUpdateUtils'
 import { createModificationType, ModificationHandler } from '../ModificationHandler'
 import { applyPatch, Operation } from 'rfc6902'
@@ -7,7 +6,7 @@ import deepCopy from '../../utils/deepCopy'
 export class PatchValidationSchemaModificationHandler implements ModificationHandler<PatchValidationSchemaModificationData> {
 	constructor(private readonly data: PatchValidationSchemaModificationData) {}
 
-	public createSql(builder: MigrationBuilder): void {}
+	public createSql(): void {}
 
 	public getSchemaUpdater(): SchemaUpdater {
 		return ({ schema }) => {

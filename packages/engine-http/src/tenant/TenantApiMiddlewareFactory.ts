@@ -2,6 +2,7 @@ import { HttpController } from '../application'
 import { HttpErrorResponse } from '../common'
 import { TenantGraphQLContextFactory } from './TenantGraphQLContextFactory'
 import { ProjectGroupResolver } from '../projectGroup/ProjectGroupResolver'
+import { GraphQLKoaState } from '../graphql'
 
 export class TenantApiMiddlewareFactory {
 	constructor(
@@ -20,12 +21,16 @@ export class TenantApiMiddlewareFactory {
 			const tenantContainer = projectGroup.tenantContainer
 			await logger.scope(async logger => {
 				logger.debug('Tenant query processing started')
-				const context = this.tenantGraphQLContextFactory.create({ authResult, tenantContainer, koaContext: koa, logger })
-
 				await timer('GraphQL', () => projectGroup.tenantGraphQLHandler({
 					request: koa.request,
 					response: koa.response,
-					createContext: () => context,
+					createContext: ({ operation }) => {
+						(koa.state as GraphQLKoaState).graphql = {
+							operationName: operation,
+						}
+
+						return this.tenantGraphQLContextFactory.create({ authResult, tenantContainer, logger })
+					},
 				}))
 				logger.debug('Tenant query finished')
 			})

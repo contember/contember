@@ -1,15 +1,25 @@
 import { MigrationFilesManager } from './MigrationFilesManager'
 import { Schema } from '@contember/schema'
-import { SchemaDiffer } from './SchemaDiffer'
-import { VERSION_LATEST } from './modifications/ModificationVersions'
-import { Migration } from './Migration'
+import { Migration, SchemaDiffer, VERSION_LATEST } from '@contember/schema-migrations'
 import { MigrationVersionHelper } from '@contember/engine-common'
 
 export class MigrationCreator {
 	constructor(
 		private readonly migrationFilesManager: MigrationFilesManager,
 		private readonly schemaDiffer: SchemaDiffer,
+		private readonly emptyTemplates: Record<string, string> = {},
 	) {}
+
+	async createEmptyMigrationFile(migrationName: string, format: string): Promise<string> {
+		if (!this.emptyTemplates.hasOwnProperty(format)) {
+			throw new Error(`Unknown format ${format}`)
+		}
+		await this.migrationFilesManager.createDirIfNotExist()
+		const [, fullName] = MigrationVersionHelper.createVersion(migrationName)
+		const filename = await this.migrationFilesManager.createFile(this.emptyTemplates[format], fullName, format)
+
+		return filename
+	}
 
 	async prepareMigration(
 		initialSchema: Schema,

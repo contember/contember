@@ -147,7 +147,7 @@ export const createGraphQLQueryHandler = <Context>({
 }
 
 
-const extractOriginalError = (e: Error): Error => {
+export const extractOriginalError = (e: Error): Error => {
 	if (e instanceof GraphQLError && e.originalError) {
 		return extractOriginalError(e.originalError)
 	}

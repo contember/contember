@@ -1,9 +1,9 @@
 import { Command, CommandConfiguration, Input, Workspace } from '@contember/cli-common'
 import { printValidationErrors } from '../../utils/schema'
 import { InvalidSchemaException } from '@contember/schema-migrations'
-import { executeCreateMigrationCommand } from './MigrationCreateHelper'
-import { createMigrationStatusTable, printMigrationDescription } from '../../utils/migrations'
-import { executeMigrations, resolveMigrationStatus } from './MigrationExecuteHelper'
+import { executeCreateMigrationCommand } from '../../utils/migrations/MigrationCreateHelper'
+import { createMigrationStatusTable, printMigrationDescription } from '../../utils/migrations/migrations'
+import { executeMigrations, resolveMigrationStatus } from '../../utils/migrations/MigrationExecuteHelper'
 import prompts from 'prompts'
 import { interactiveResolveApiToken, TenantClient } from '../../utils/tenant'
 import { interactiveResolveInstanceEnvironmentFromInput } from '../../utils/instance'
@@ -110,6 +110,11 @@ export class MigrationDiffCommand extends Command<Args, Options> {
 							requireConfirmation: status.migrationsToExecute.length > 1 && !yes,
 							schemaVersionBuilder,
 							migrationDescriber,
+							contentMigrationFactoryArgs: {
+								apiToken,
+								apiBaseUrl: instance.baseUrl.replace(/\/$/, ''),
+								projectName: project.name,
+							},
 						})
 					}
 					return 0

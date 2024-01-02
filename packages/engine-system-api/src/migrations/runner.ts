@@ -1,4 +1,9 @@
-import { MigrationGroup, MigrationsRunner as DbMigrationsRunner } from '@contember/database-migrations'
+import {
+	GroupMigrationsResolver,
+	MigrationGroup,
+	MigrationsRunner as DbMigrationsRunner,
+	SnapshotMigrationResolver,
+} from '@contember/database-migrations'
 import _20180804102200init from './2018-08-04-102200-init'
 import _20180805130501triggereventfunction from './2018-08-05-130501-trigger-event-function'
 import _20190114143432eventtrxid from './2019-01-14-143432-event-trx-id'
@@ -19,14 +24,13 @@ import _20220208144400dynamicstageschema from './2022-02-08-144400-dynamic-stage
 import _20221003110000tableondelete from './2022-10-03-110000-table-on-delete'
 import _20230911174000fixondelete from './2023-09-11-174000-fix-on-delete'
 import _20231019173000fixunique from './2023-10-19-173000-fix-unique'
+import _20231024140000schemanullablechecksum from './2023-10-24-140000-schema-nullable-checksum'
 import snapshot from './snapshot'
 
-import { Client, Connection, createDatabaseIfNotExists, DatabaseConfig, DatabaseMetadataResolver } from '@contember/database'
+import { Connection, createDatabaseIfNotExists, DatabaseConfig, DatabaseMetadataResolver } from '@contember/database'
 import { DatabaseContextFactory, SchemaVersionBuilder } from '../model'
 import { ProjectConfig } from '../types'
 import { Logger } from '@contember/logger'
-import { GroupMigrationsResolver } from '@contember/database-migrations'
-import { SnapshotMigrationResolver } from '@contember/database-migrations'
 
 const migrations = {
 	'2018-08-04-102200-init': _20180804102200init,
@@ -49,6 +53,7 @@ const migrations = {
 	'2022-10-03-110000-table-on-delete': _20221003110000tableondelete,
 	'2023-09-11-174000-fix-on-delete': _20230911174000fixondelete,
 	'2023-10-19-173000-fix-unique': _20231019173000fixunique,
+	'2023-10-24-140000-schema-nullable-checksum': _20231024140000schemanullablechecksum,
 }
 
 
@@ -56,7 +61,6 @@ export class SystemMigrationsRunner {
 	constructor(
 		private readonly databaseContextFactory: DatabaseContextFactory,
 		private readonly project: ProjectConfig & { db: DatabaseConfig },
-		private readonly schema: string,
 		private readonly schemaVersionBuilder: SchemaVersionBuilder,
 		private readonly migrationGroups: Record<string, MigrationGroup<unknown>>,
 		private readonly databaseMetadataResolver: DatabaseMetadataResolver,
@@ -84,7 +88,7 @@ export class SystemMigrationsRunner {
 					]),
 				),
 			)
-			const migrationsRunner = new DbMigrationsRunner(connection, this.schema, migrationResolver)
+			const migrationsRunner = new DbMigrationsRunner(connection, this.project.systemSchema, migrationResolver)
 			await migrationsRunner.migrate(message => logger.warn(message), {
 				project: this.project,
 				schemaResolver,

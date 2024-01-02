@@ -14,7 +14,6 @@ import { MigrationGroup } from '@contember/database-migrations'
 import { createUuidGenerator } from './testUuid'
 import {
 	DatabaseContextFactory,
-	formatSchemaName,
 	ProjectInitializer,
 	StageBySlugQuery,
 	StageCreator,
@@ -54,7 +53,11 @@ export const executeDbTest = async (test: Test) => {
 	const providers = { uuid: uuidGenerator, now: () => new Date('2019-09-04 12:00') }
 
 	const modificationHandlerFactory = new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap)
-	const systemContainerFactory = new SystemContainerFactory(providers, modificationHandlerFactory)
+	const systemContainerFactory = new SystemContainerFactory(providers, modificationHandlerFactory, {
+		execute: () => {
+			throw new Error('not implemented')
+		},
+	})
 	let systemContainerBuilder = systemContainerFactory.createBuilder({
 		identityFetcher: {
 			fetchIdentities: () => {
@@ -78,11 +81,11 @@ export const executeDbTest = async (test: Test) => {
 		slug: 'test',
 		db: projectDbCredentials,
 		stages: [{ slug: 'live', name: 'live' }],
+		systemSchema: 'system',
 	}
 	const systemMigrationsRunner = new SystemMigrationsRunner(
 		databaseContextFactory,
 		projectConfigWithDb,
-		'system',
 		systemContainer.schemaVersionBuilder,
 		test.migrationGroups ?? {},
 		{
@@ -101,13 +104,21 @@ export const executeDbTest = async (test: Test) => {
 		if (!stage) {
 			throw new Error()
 		}
-		await systemContainer.projectMigrator.migrate(db, [stage], [{
+		const migration = {
+			type: 'schema',
 			version: '2019-01-01-100000',
 			name: '2019-01-01-100000-init',
 			formatVersion: VERSION_LATEST,
 			modifications,
-		}], {})
-
+		} as const
+		await systemContainer.projectMigrator.migrate({
+			db,
+			stages: [stage],
+			migrationsToExecute: [migration],
+			options: {},
+			identity: { id: '00000000-0000-0000-0000-000000000000' },
+			project: projectConfigWithDb,
+		})
 		const model = schema.model
 		const permissions = new AllowAllPermissionFactory().create(model)
 		const authorizator = new Authorizator(permissions, false)

@@ -8,15 +8,7 @@ import { ProjectGroupContainerResolver } from './ProjectGroupContainerResolver'
 import { IncomingMessage } from 'node:http'
 
 export class ProjectGroupResolver implements ProjectGroupResolverInterface {
-	private groupRegex = (
-		this.projectGroupDomainMapping
-			? new RegExp(
-				this.projectGroupDomainMapping.includes('{group}')
-					? regexpQuote(this.projectGroupDomainMapping).replace(regexpQuote('{group}'), '([^.]+)')
-					: this.projectGroupDomainMapping,
-			)
-			: undefined
-	)
+	private groupRegex
 	private projectGroupConfigHeader
 
 	constructor(
@@ -26,6 +18,15 @@ export class ProjectGroupResolver implements ProjectGroupResolverInterface {
 		private projectGroupContainerResolver: ProjectGroupContainerResolver,
 	) {
 		this.projectGroupConfigHeader = projectGroupConfigHeader?.toLowerCase()
+		this.groupRegex = (
+			this.projectGroupDomainMapping
+				? new RegExp(
+					this.projectGroupDomainMapping.includes('{group}')
+						? regexpQuote(this.projectGroupDomainMapping).replace(regexpQuote('{group}'), '([^.]+)')
+						: this.projectGroupDomainMapping,
+				)
+				: undefined
+		)
 	}
 
 	async resolveContainer({ request }: { request: IncomingMessage }): Promise<ProjectGroupContainer> {

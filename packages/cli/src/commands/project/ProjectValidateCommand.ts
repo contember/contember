@@ -1,5 +1,5 @@
 import { Command, CommandConfiguration, Input, validateProjectName, Workspace } from '@contember/cli-common'
-import { MigrationsContainerFactory } from '../../MigrationsContainer'
+import { MigrationsContainerFactory } from '../../utils/migrations/MigrationsContainer'
 import { validateSchemaAndPrintErrors } from '../../utils/schema'
 import { emptySchema } from '@contember/schema-utils'
 import { validateMigrations } from '../migrations/MigrationValidationHelper'
@@ -39,7 +39,7 @@ export class ProjectValidateCommand extends Command<Args, Options> {
 			console.group(`Project ${project.name}:`)
 			const migrationsDir = await project.migrationsDir
 			const container = new MigrationsContainerFactory(migrationsDir).create()
-			const migrations = await container.migrationsResolver.getMigrations()
+			const migrations = await container.migrationsResolver.getSchemaMigrations()
 			let projectValid = await validateMigrations(
 				emptySchema,
 				migrations,

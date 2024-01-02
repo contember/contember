@@ -25,16 +25,19 @@ export class PathFactory {
 }
 
 export class Path {
-	public readonly alias = this.createAlias()
+	public readonly alias: string
 
-	public get fullAlias() {
-		return this.rootAlias + this.path.join('_')
-	}
 	constructor(
 		public readonly path: string[],
 		private readonly aliasContext: AliasContext,
 		public readonly rootAlias = 'root_',
-	) {}
+	) {
+		this.alias = this.createAlias()
+	}
+
+	public get fullAlias() {
+		return this.rootAlias + this.path.join('_')
+	}
 
 	public back() {
 		const newPath = [...this.path]

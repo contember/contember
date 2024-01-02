@@ -1,4 +1,3 @@
-import { MigrationBuilder } from '@contember/database-migrations'
 import { Schema, Validation } from '@contember/schema'
 import { SchemaUpdater } from '../utils/schemaUpdateUtils'
 import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler'
@@ -9,7 +8,7 @@ import { patchValidationSchemaModification } from './PatchValidationSchemaModifi
 export class UpdateValidationSchemaModificationHandler implements ModificationHandler<UpdateValidationSchemaModificationData> {
 	constructor(private readonly data: UpdateValidationSchemaModificationData) {}
 
-	public createSql(builder: MigrationBuilder): void {}
+	public createSql(): void {}
 
 	public getSchemaUpdater(): SchemaUpdater {
 		return ({ schema }) => ({

@@ -1,6 +1,6 @@
 import { Schema } from '@contember/schema'
 import { emptySchema } from '@contember/schema-utils'
-import { SchemaMigrator } from './SchemaMigrator'
+import { SchemaMigrator } from '@contember/schema-migrations'
 import { MigrationsResolver } from './MigrationsResolver'
 
 export class SchemaVersionBuilder {
@@ -22,7 +22,7 @@ export class SchemaVersionBuilder {
 	}
 
 	public async buildSchemaAdvanced(initialSchema: Schema, condition: (version: string) => boolean): Promise<Schema> {
-		return (await this.migrationsResolver.getMigrations())
+		return (await this.migrationsResolver.getSchemaMigrations())
 			.filter(({ version }) => condition(version))
 			.reduce<Schema>(
 				(schema, { modifications, formatVersion }) =>

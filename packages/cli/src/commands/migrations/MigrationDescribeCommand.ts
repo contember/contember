@@ -1,6 +1,6 @@
 import { Command, CommandConfiguration, Input, Workspace } from '@contember/cli-common'
-import { MigrationsContainerFactory } from '../../MigrationsContainer'
-import { getLatestMigration, getMigrationByName, printMigrationDescription } from '../../utils/migrations'
+import { MigrationsContainerFactory } from '../../utils/migrations/MigrationsContainer'
+import { printMigrationDescription } from '../../utils/migrations/migrations'
 
 type Args = {
 	project?: string
@@ -40,9 +40,11 @@ export class MigrationDescribeCommand extends Command<Args, Options> {
 
 		const migrationArg = input.getArgument('migration')
 		const migrationsResolver = container.migrationsResolver
-		const migration = await (migrationArg
-			? getMigrationByName(migrationsResolver, migrationArg)
-			: getLatestMigration(migrationsResolver))
+
+		const migration = migrationArg
+			? await migrationsResolver.findSchemaMigrationByVersion(migrationArg)
+			: await migrationsResolver.findLatestSchemaMigration()
+
 		if (!migration) {
 			throw 'Undefined migration'
 		}

@@ -4,14 +4,14 @@ import {
 	ExecuteMigrationOptions,
 	executeMigrations,
 	resolveMigrationStatus,
-} from '../migrations/MigrationExecuteHelper'
+} from '../../utils/migrations/MigrationExecuteHelper'
 import { interactiveResolveApiToken, TenantClient } from '../../utils/tenant'
 import { interactiveResolveInstanceEnvironmentFromInput } from '../../utils/instance'
-import { SystemClient } from '../../utils/system'
-import { MigrationsContainerFactory } from '../../MigrationsContainer'
+import { createSystemUrl, SystemClient } from '../../utils/system'
+import { MigrationsContainerFactory } from '../../utils/migrations/MigrationsContainer'
 import { AdminClient, readAdminFiles } from '../../utils/admin'
 import prompts from 'prompts'
-import { createMigrationStatusTable } from '../../utils/migrations'
+import { createMigrationStatusTable } from '../../utils/migrations/migrations'
 import { maskToken } from '../../utils/token'
 import { parseDsn } from '../../utils/dsn'
 
@@ -129,6 +129,11 @@ export class DeployCommand extends Command<Args, Options> {
 				migrations: status.migrationsToExecute,
 				requireConfirmation: false,
 				force: false,
+				contentMigrationFactoryArgs: {
+					apiToken,
+					apiBaseUrl: instance.baseUrl.replace(/\/$/, ''),
+					projectName: remoteProject,
+				},
 			})
 
 			if (migrationExitCode !== 0) {

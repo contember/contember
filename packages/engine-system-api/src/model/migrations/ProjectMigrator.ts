@@ -1,5 +1,5 @@
 import { calculateMigrationChecksum, Migration, MigrationDescriber, MigrationVersionHelper } from '@contember/schema-migrations'
-import { Client, QueryError, wrapIdentifier } from '@contember/database'
+import { Client, DatabaseMetadata, QueryError, wrapIdentifier } from '@contember/database'
 import { Schema } from '@contember/schema'
 import { SaveMigrationCommand } from '../commands'
 import { Stage } from '../dtos'
@@ -9,10 +9,9 @@ import { MigrateErrorCode } from '../../schema'
 import { SchemaVersionBuilder } from './SchemaVersionBuilder'
 import { SchemaValidator, SchemaValidatorSkippedErrors } from '@contember/schema-utils'
 import { logger } from '@contember/logger'
-import {
-	SchemaDatabaseMetadataResolverStore,
-	MigrationsDatabaseMetadataResolverStoreFactory,
-} from '../metadata/SchemaDatabaseMetadataResolverStore'
+import { MigrationsDatabaseMetadataResolverStoreFactory, SchemaDatabaseMetadataResolverStore } from '../metadata'
+import { ContentMigrationQuery, MigrationInput } from './MigrationInput'
+import { ContentQueryExecutor } from '../dependencies'
 
 export class ProjectMigrator {
 	constructor(
@@ -20,17 +19,20 @@ export class ProjectMigrator {
 		private readonly schemaVersionBuilder: SchemaVersionBuilder,
 		private readonly executedMigrationsResolver: ExecutedMigrationsResolver,
 		private readonly migrationsDatabaseMetadataResolverStoreFactory: MigrationsDatabaseMetadataResolverStoreFactory,
+		private readonly contentQueryExecutor: ContentQueryExecutor,
 	) {}
 
-	public async migrate(
-		db: DatabaseContext,
-		stages: Stage[],
-		migrationsToExecute: readonly Migration[],
-		{ ignoreOrder = false, skipExecuted = false }: {
+	public async migrate({ db, project, identity, options: { ignoreOrder = false, skipExecuted = false }, migrationsToExecute, stages }: {
+		db: DatabaseContext
+		project: { slug: string; systemSchema: string }
+		identity: { id: string }
+		stages: Stage[]
+		migrationsToExecute: readonly MigrationInput[]
+		options: {
 			ignoreOrder?: boolean
 			skipExecuted?: boolean
-		},
-	) {
+		}
+	}) {
 		if (migrationsToExecute.length === 0) {
 			return
 		}
@@ -42,21 +44,73 @@ export class ProjectMigrator {
 		const metadataStore = this.migrationsDatabaseMetadataResolverStoreFactory.create(db)
 
 		for (const migration of sorted) {
-			const formatVersion = migration.formatVersion
 
-			for (const modification of migration.modifications) {
-				[schema] = await this.applyModification(
-					db.client,
-					stages,
-					schema,
-					modification,
-					formatVersion,
-					migration.version,
-					db.client.schema,
-					metadataStore,
-				)
+			if (migration.type === 'schema') {
+				const formatVersion = migration.formatVersion
+
+				for (const modification of migration.modifications) {
+					[schema] = await this.applyModification(
+						db.client,
+						stages,
+						schema,
+						modification,
+						formatVersion,
+						migration.version,
+						db.client.schema,
+						metadataStore,
+					)
+				}
+			} else if (migration.type === 'content') {
+				const schemaWithId = {
+					...schema,
+					id,
+				}
+				for (const query of migration.queries) {
+					await this.executeContentMigration({
+						version: migration.version,
+						query,
+						db,
+						schema: schemaWithId,
+						stages,
+						databaseMetadata: await metadataStore.getMetadata(db.client.schema),
+						identity,
+						project,
+					})
+				}
+
 			}
-			await db.commandBus.execute(new SaveMigrationCommand(migration))
+			id = await db.commandBus.execute(new SaveMigrationCommand(migration))
+		}
+	}
+
+	private async executeContentMigration({ query, stages, version, ...ctx }: {
+		version: string
+		db: DatabaseContext
+		query: ContentMigrationQuery
+		stages: Stage[]
+		schema: Schema & { id: number }
+		project: { slug: string; systemSchema: string }
+		identity: { id: string }
+		databaseMetadata: DatabaseMetadata
+	}) {
+		const queryStages = query.stage ? stages.filter(it => it.slug === query.stage) : stages
+		for (const stage of queryStages) {
+			const response = await this.contentQueryExecutor.execute({
+				stage,
+				...ctx,
+			}, query)
+
+			if (!response.ok) {
+				throw new FailedContentMigrationError(version, response.errors.join(', '))
+			}
+			if (query.checkMutationResult !== false) {
+				for (const [key, value] of Object.entries(response.result.data ?? {})) {
+					if (typeof value === 'object' && value !== null && 'ok' in value && !value.ok) {
+						const errorDetails = 'errorMessage' in value ? value.errorMessage : 'No details available. Please fetch errorMessage field.'
+						throw new NotSuccessfulContentMigrationError(version, `Mutation ${key} failed: ${errorDetails}`)
+					}
+				}
+			}
 		}
 	}
 
@@ -64,45 +118,49 @@ export class ProjectMigrator {
 		db: DatabaseContext,
 		schema: Schema,
 		version: string,
-		migrationsToExecute: readonly Migration[],
+		migrationsToExecute: readonly MigrationInput[],
 		{ ignoreOrder, skipExecuted }: {
 			ignoreOrder: boolean
 			skipExecuted: boolean
 		},
-	): Promise<readonly Migration[]> {
+	): Promise<readonly MigrationInput[]> {
 		const executedMigrations = await this.executedMigrationsResolver.getMigrations(db)
-		const toExecute = []
+		const toExecute: MigrationInput[] = []
 		let skippedErrors: SchemaValidatorSkippedErrors[] = []
 		for (const migration of migrationsToExecute) {
 			const executedMigration = executedMigrations.find(it => it.version === migration.version)
 			if (executedMigration) {
-				if (skipExecuted && executedMigration.checksum === calculateMigrationChecksum(migration)) {
+				if (skipExecuted && (migration.type !== 'schema' || executedMigration.checksum === calculateMigrationChecksum(migration))) {
 					continue
 				} else {
 					throw new AlreadyExecutedMigrationError(migration.version, `Migration is already executed`)
 				}
 			}
+
 			if (migration.version < version && !ignoreOrder) {
 				throw new MustFollowLatestMigrationError(migration.version, `Must follow latest executed migration ${version}`)
 			}
-			const described = this.migrationDescriber.describeModifications(schema, migration)
-			if (described.length === 0) {
-				continue
+			if (migration.type === 'schema') {
+				const described = this.migrationDescriber.describeModifications(schema, migration)
+				if (described.length === 0) {
+					continue
+				}
+				const latestModification = described[described.length - 1]
+				schema = latestModification.schema
+				skippedErrors = [
+					...skippedErrors.filter(it => it.skipUntil && MigrationVersionHelper.extractVersion(it.skipUntil) >= migration.version),
+					...migration.skippedErrors ?? [],
+				]
+				const errors = SchemaValidator.validate(schema, skippedErrors)
+				if (errors.length > 0) {
+					throw new InvalidSchemaError(
+						migration.version,
+						'Migration generates invalid schema: \n' +
+						errors.map(it => `${it.path.join('.')}: [${it.code}] ${it.message}`).join('\n'),
+					)
+				}
 			}
-			const latestModification = described[described.length - 1]
-			schema = latestModification.schema
-			skippedErrors = [
-				...skippedErrors.filter(it => it.skipUntil && MigrationVersionHelper.extractVersion(it.skipUntil) >= migration.version),
-				...migration.skippedErrors ?? [],
-			]
-			const errors = SchemaValidator.validate(schema, skippedErrors)
-			if (errors.length > 0) {
-				throw new InvalidSchemaError(
-					migration.version,
-					'Migration generates invalid schema: \n' +
-					errors.map(it => `${it.path.join('.')}: [${it.code}] ${it.message}`).join('\n'),
-				)
-			}
+
 			toExecute.push(migration)
 		}
 		// intentionally not using skippedErrors here
@@ -179,4 +237,12 @@ export class MigrationFailedError extends MigrationError {
 
 export class InvalidSchemaError extends MigrationError {
 	code = MigrateErrorCode.InvalidSchema
+}
+
+export class FailedContentMigrationError extends MigrationError {
+	code = MigrateErrorCode.ContentMigrationFailed
+}
+
+export class NotSuccessfulContentMigrationError extends MigrationError {
+	code = MigrateErrorCode.ContentMigrationNotSuccessful
 }

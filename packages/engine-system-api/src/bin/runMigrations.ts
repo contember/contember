@@ -18,8 +18,7 @@ import { createLogger, PrettyPrintLoggerHandler } from '@contember/logger'
 				throw new Error()
 			},
 		}),
-		{ db: dbConfig, slug: 'test', stages: [] },
-		'system',
+		{ db: dbConfig, slug: 'test', stages: [], systemSchema: 'system' },
 		{
 			buildSchema: () => Promise.resolve(emptyVersionedSchema),
 		} as unknown as SchemaVersionBuilder,

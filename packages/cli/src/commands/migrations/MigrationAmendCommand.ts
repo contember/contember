@@ -1,14 +1,9 @@
 import { Command, CommandConfiguration, Input, Workspace } from '@contember/cli-common'
 import { printValidationErrors } from '../../utils/schema'
 import { InvalidSchemaException } from '@contember/schema-migrations'
-import { executeCreateMigrationCommand } from './MigrationCreateHelper'
-import {
-	createMigrationStatusTable,
-	getLatestMigration,
-	getMigrationByName,
-	printMigrationDescription,
-} from '../../utils/migrations'
-import { resolveMigrationStatus } from './MigrationExecuteHelper'
+import { executeCreateMigrationCommand } from '../../utils/migrations/MigrationCreateHelper'
+import { createMigrationStatusTable, printMigrationDescription } from '../../utils/migrations/migrations'
+import { resolveMigrationStatus } from '../../utils/migrations/MigrationExecuteHelper'
 import { resolveSystemApiClient } from './SystemApiClientResolver'
 import prompts from 'prompts'
 import { emptySchema } from '@contember/schema-utils'
@@ -60,8 +55,9 @@ export class MigrationAmendCommand extends Command<Args, Options> {
 			}) => {
 				const migrationName = input.getArgument('migration')
 				const amendMigration = migrationName
-					? await getMigrationByName(migrationsResolver, migrationName)
-					: await getLatestMigration(migrationsResolver)
+					? await migrationsResolver.findSchemaMigrationByVersion(migrationName)
+					: await migrationsResolver.findLatestSchemaMigration()
+
 				if (!amendMigration) {
 					throw 'No migration to amend'
 				}
@@ -98,7 +94,7 @@ export class MigrationAmendCommand extends Command<Args, Options> {
 						amendMigration.formatVersion,
 					)
 					const newMigrationResult = await migrationCreator.prepareMigration(prevSchema, newSchema, '')
-					const followingMigrations = (await migrationsResolver.getMigrations()).filter(
+					const followingMigrations = (await migrationsResolver.getSchemaMigrations()).filter(
 						it => it.version > amendMigration.version,
 					)
 

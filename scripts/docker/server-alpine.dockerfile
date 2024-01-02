@@ -1,4 +1,4 @@
-FROM node:18-alpine as builder
+FROM node:20-alpine as builder
 ARG SERVER_DIR
 
 WORKDIR /src
@@ -9,7 +9,7 @@ COPY ./ ./
 RUN test ! -f yarn.tar.gz || tar xf yarn.tar.gz -C "./.yarn/cache" .
 RUN /src/scripts/server/server-build.sh
 
-FROM node:18-alpine
+FROM node:20-alpine
 ARG LICENSE_FILE
 
 WORKDIR /src

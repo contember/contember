@@ -1,4 +1,4 @@
-FROM node:18 as builder
+FROM node:20 as builder
 ARG SERVER_DIR
 
 WORKDIR /src
@@ -7,7 +7,7 @@ COPY ./ ./
 RUN test ! -f yarn.tar.gz || tar xf yarn.tar.gz -C "./.yarn/cache" .
 RUN /src/scripts/server/server-build.sh
 
-FROM node:18
+FROM node:20
 ARG LICENSE_FILE
 
 WORKDIR /src

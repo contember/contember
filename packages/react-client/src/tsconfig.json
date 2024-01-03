@@ -5,6 +5,7 @@
 	},
 	"references": [
 		{ "path": "../../client/src" },
+		{ "path": "../../react-richtext-renderer/src" },
 		{ "path": "../../utilities/src" }
 	]
 }

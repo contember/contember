@@ -4,7 +4,6 @@
 
 ```ts
 
-import { ComponentType } from 'react';
 import { Context } from 'react';
 import type { FileUploader } from '@contember/client';
 import type { FileUploadError } from '@contember/client';
@@ -13,8 +12,6 @@ import type { GraphQlClientFailedRequestMetadata } from '@contember/client';
 import type { GraphQlClientRequestOptions } from '@contember/client';
 import type { GraphQlClientVariables } from '@contember/client';
 import { NamedExoticComponent } from 'react';
-import { ReactElement } from 'react';
-import { ReactNode } from 'react';
 
 // @public (undocumented)
 export const ApiBaseUrlContext: Context<string | undefined>;
@@ -58,12 +55,6 @@ export type ApiRequestState<SuccessData> = {
     readyState: 'networkError';
     data: GraphQlClientFailedRequestMetadata;
 };
-
-// @public (undocumented)
-export type BuiltinElements<CustomElements extends RichTextElement = never, CustomLeaves extends RichTextLeaf = never> = RichTextAnchorElement<CustomElements, CustomLeaves> | RichTextHeadingElement<CustomElements, CustomLeaves> | RichTextHorizontalRuleElement<CustomElements, CustomLeaves> | RichTextListItemElement<CustomElements, CustomLeaves> | RichTextOrderedListElement<CustomElements, CustomLeaves> | RichTextParagraphElement<CustomElements, CustomLeaves> | RichTextReferenceElement<CustomElements, CustomLeaves> | RichTextScrollTargetElement<CustomElements, CustomLeaves> | RichTextTableCellElement<CustomElements, CustomLeaves> | RichTextTableElement<CustomElements, CustomLeaves> | RichTextTableRowElement<CustomElements, CustomLeaves> | RichTextUnorderedListElement<CustomElements, CustomLeaves>;
-
-// @public (undocumented)
-export type BuiltinLeaves = RichTextBoldLeaf & RichTextCodeLeaf & RichTextHighlightLeaf & RichTextItalicLeaf & RichTextStrikeThroughLeaf & RichTextUnderlineLeaf;
 
 // @public (undocumented)
 export class ClientError extends Error {
@@ -150,258 +141,6 @@ export const ProjectSlugContext: Context<string | undefined>;
 
 // @public (undocumented)
 export type PurgeUpload = (files: Iterable<FileId | File>) => void;
-
-// @public (undocumented)
-export type ReferenceRenderer<Reference extends RichTextReference = RichTextReference, CustomElements extends RichTextElement = never, CustomLeaves extends RichTextLeaf = never> = (props: ReferenceRendererProps<Reference, CustomElements, CustomLeaves>) => ReactNode;
-
-// @public (undocumented)
-export type ReferenceRendererProps<Reference extends RichTextReference = RichTextReference, CustomElements extends RichTextElement = never, CustomLeaves extends RichTextLeaf = never> = {
-    element: CustomElements | BuiltinElements<CustomElements, CustomLeaves>;
-    children: ReactElement;
-} & {
-    [Prop in keyof RichTextElementMetadata<CustomElements, CustomLeaves, Reference>]: Exclude<RichTextElementMetadata<CustomElements, CustomLeaves, Reference>[Prop], undefined>;
-};
-
-// @public (undocumented)
-export interface RenderChildrenOptions<CustomElements extends RichTextElement = never, CustomLeaves extends RichTextLeaf = never> {
-    // (undocumented)
-    attributeNamePrefix?: string;
-    // (undocumented)
-    renderElement?: RenderElement<CustomElements, CustomLeaves>;
-    // (undocumented)
-    renderLeaf?: RenderLeaf<CustomLeaves>;
-}
-
-// @public (undocumented)
-export type RenderElement<CustomElements extends RichTextElement = never, CustomLeaves extends RichTextLeaf = never, Reference extends RichTextReference = RichTextReference> = ComponentType<{
-    element: CustomElements | BuiltinElements<CustomElements, CustomLeaves>;
-    children: ReactElement;
-    fallback: ReactElement;
-    renderChildren: (children: CustomElements | BuiltinElements<CustomElements, CustomLeaves> | CustomLeaves | BuiltinLeaves | Array<CustomElements | BuiltinElements<CustomElements, CustomLeaves> | CustomLeaves | BuiltinLeaves>, options: RenderChildrenOptions<CustomElements, CustomLeaves>) => ReactElement;
-    renderChildrenOptions: RenderChildrenOptions<CustomElements, CustomLeaves>;
-} & RichTextElementMetadata<CustomElements, CustomLeaves, Reference>>;
-
-// @public (undocumented)
-export type RenderLeaf<CustomLeaves extends RichTextLeaf> = ComponentType<{
-    leaf: CustomLeaves | BuiltinLeaves;
-    fallback: ReactElement;
-} & RichTextLeafMetadata>;
-
-// @public (undocumented)
-export interface RichTextAnchorElement<CustomElements extends RichTextElement = never, CustomLeaves extends RichTextLeaf = never> extends RichTextElement<CustomElements, CustomLeaves> {
-    // (undocumented)
-    href: string;
-    // (undocumented)
-    type: 'anchor';
-}
-
-// @public (undocumented)
-export type RichTextBlock = Readonly<Record<string, unknown>>;
-
-// @public (undocumented)
-export interface RichTextBoldLeaf extends RichTextLeaf {
-    // (undocumented)
-    isBold?: boolean;
-}
-
-// @public (undocumented)
-export interface RichTextCodeLeaf extends RichTextLeaf {
-    // (undocumented)
-    isCode?: boolean;
-}
-
-// @public (undocumented)
-export interface RichTextElement<CustomElements extends RichTextElement = never, CustomLeaves extends RichTextLeaf = never> {
-    // (undocumented)
-    children: RichTextElement<CustomElements, CustomLeaves>[] | Array<CustomLeaves | RichTextLeaf>;
-    // (undocumented)
-    referenceId?: string;
-    // (undocumented)
-    type: string;
-}
-
-// @public (undocumented)
-export interface RichTextElementMetadata<CustomElements extends RichTextElement = never, CustomLeaves extends RichTextLeaf = never, Reference extends RichTextReference = RichTextReference> {
-    // (undocumented)
-    formatVersion: number;
-    // (undocumented)
-    reference: Reference | undefined;
-    // (undocumented)
-    referenceRenderer: ReferenceRenderer<Reference, CustomElements, CustomLeaves> | undefined;
-    // (undocumented)
-    referenceType: string | undefined;
-}
-
-// @public (undocumented)
-export interface RichTextHeadingElement<CustomElements extends RichTextElement = never, CustomLeaves extends RichTextLeaf = never> extends RichTextElement<CustomElements, CustomLeaves> {
-    // (undocumented)
-    isNumbered?: boolean;
-    // (undocumented)
-    level: 1 | 2 | 3 | 4 | 5 | 6;
-    // (undocumented)
-    type: 'heading';
-}
-
-// @public (undocumented)
-export interface RichTextHighlightLeaf extends RichTextLeaf {
-    // (undocumented)
-    isHighlighted?: boolean;
-}
-
-// @public (undocumented)
-export interface RichTextHorizontalRuleElement<CustomElements extends RichTextElement = never, CustomLeaves extends RichTextLeaf = never> extends RichTextElement<CustomElements, CustomLeaves> {
-    // (undocumented)
-    type: 'horizontalRule';
-}
-
-// @public (undocumented)
-export interface RichTextItalicLeaf extends RichTextLeaf {
-    // (undocumented)
-    isItalic?: boolean;
-}
-
-// @public (undocumented)
-export interface RichTextLeaf {
-    // (undocumented)
-    text: string;
-}
-
-// @public (undocumented)
-export interface RichTextLeafMetadata {
-    // (undocumented)
-    formatVersion: number;
-}
-
-// @public (undocumented)
-export interface RichTextListItemElement<CustomElements extends RichTextElement = never, CustomLeaves extends RichTextLeaf = never> extends RichTextElement<CustomElements, CustomLeaves> {
-    // (undocumented)
-    type: 'listItem';
-}
-
-// @public (undocumented)
-export interface RichTextOrderedListElement<CustomElements extends RichTextElement = never, CustomLeaves extends RichTextLeaf = never> extends RichTextElement<CustomElements, CustomLeaves> {
-    // (undocumented)
-    type: 'orderedList';
-}
-
-// @public (undocumented)
-export interface RichTextParagraphElement<CustomElements extends RichTextElement = never, CustomLeaves extends RichTextLeaf = never> extends RichTextElement<CustomElements, CustomLeaves> {
-    // (undocumented)
-    isNumbered?: boolean;
-    // (undocumented)
-    type: 'paragraph';
-}
-
-// @public (undocumented)
-export interface RichTextReference {
-    // (undocumented)
-    id: string;
-}
-
-// @public (undocumented)
-export interface RichTextReferenceElement<CustomElements extends RichTextElement = never, CustomLeaves extends RichTextLeaf = never> extends RichTextElement<CustomElements, CustomLeaves> {
-    // (undocumented)
-    referenceId: string;
-    // (undocumented)
-    type: 'reference';
-}
-
-// @public (undocumented)
-export const RichTextRenderer: <CustomElements extends RichTextElement<never, never> = never, CustomLeaves extends RichTextLeaf = never>(props: RichTextRendererProps<CustomElements, CustomLeaves>) => ReactElement;
-
-// @public (undocumented)
-export interface RichTextRendererBlockProps<CustomElements extends RichTextElement = never, CustomLeaves extends RichTextLeaf = never> {
-    // (undocumented)
-    blocks: readonly RichTextBlock[];
-    // (undocumented)
-    referenceDiscriminationField?: string;
-    // (undocumented)
-    referenceRenderers?: Record<string, ReferenceRenderer<any, CustomElements, CustomLeaves>>;
-    // (undocumented)
-    referencesField?: string;
-    // (undocumented)
-    sourceField?: string;
-}
-
-// @public (undocumented)
-export class RichTextRendererError extends Error {
-}
-
-// @public (undocumented)
-export interface RichTextRendererFieldProps {
-    // (undocumented)
-    source: string | null;
-}
-
-// @public (undocumented)
-export type RichTextRendererProps<CustomElements extends RichTextElement = never, CustomLeaves extends RichTextLeaf = never> = {
-    deserialize?: (source: string) => RootEditorNode<CustomElements, CustomLeaves>;
-    renderElement?: RenderElement<CustomElements, CustomLeaves>;
-    renderLeaf?: RenderLeaf<CustomLeaves>;
-    attributeNamePrefix?: string;
-    renderBlock?: ComponentType<{
-        block: unknown;
-        children?: ReactNode;
-    }>;
-} & (RichTextRendererFieldProps | RichTextRendererBlockProps<CustomElements, CustomLeaves>);
-
-// @public (undocumented)
-export interface RichTextScrollTargetElement<CustomElements extends RichTextElement = never, CustomLeaves extends RichTextLeaf = never> extends RichTextElement<CustomElements, CustomLeaves> {
-    // (undocumented)
-    identifier: string;
-    // (undocumented)
-    type: 'scrollTarget';
-}
-
-// @public (undocumented)
-export interface RichTextStrikeThroughLeaf extends RichTextLeaf {
-    // (undocumented)
-    isStruckThrough?: boolean;
-}
-
-// @public (undocumented)
-export interface RichTextTableCellElement<CustomElements extends RichTextElement = never, CustomLeaves extends RichTextLeaf = never> extends RichTextElement<CustomElements, CustomLeaves> {
-    // (undocumented)
-    headerScope?: 'row';
-    // (undocumented)
-    justify?: 'start' | 'center' | 'end';
-    // (undocumented)
-    type: 'tableCell';
-}
-
-// @public (undocumented)
-export interface RichTextTableElement<CustomElements extends RichTextElement = never, CustomLeaves extends RichTextLeaf = never> extends RichTextElement<CustomElements, CustomLeaves> {
-    // (undocumented)
-    type: 'table';
-}
-
-// @public (undocumented)
-export interface RichTextTableRowElement<CustomElements extends RichTextElement = never, CustomLeaves extends RichTextLeaf = never> extends RichTextElement<CustomElements, CustomLeaves> {
-    // (undocumented)
-    headerScope?: 'table';
-    // (undocumented)
-    type: 'tableRow';
-}
-
-// @public (undocumented)
-export interface RichTextUnderlineLeaf extends RichTextLeaf {
-    // (undocumented)
-    isUnderlined?: boolean;
-}
-
-// @public (undocumented)
-export interface RichTextUnorderedListElement<CustomElements extends RichTextElement = never, CustomLeaves extends RichTextLeaf = never> extends RichTextElement<CustomElements, CustomLeaves> {
-    // (undocumented)
-    type: 'unorderedList';
-}
-
-// @public (undocumented)
-export interface RootEditorNode<CustomElements extends RichTextElement = never, CustomLeaves extends RichTextLeaf = never> {
-    // (undocumented)
-    children: Array<BuiltinElements<CustomElements, CustomLeaves> | CustomElements | BuiltinLeaves | CustomLeaves>;
-    // (undocumented)
-    formatVersion: number;
-}
 
 // @public (undocumented)
 export const SessionTokenContext: Context<SessionTokenContextValue>;
@@ -526,6 +265,7 @@ export const useTenantGraphQlClient: () => GraphQlClient;
 
 
 export * from "@contember/client";
+export * from "@contember/react-richtext-renderer";
 
 // (No @packageDocumentation comment for this package)
 

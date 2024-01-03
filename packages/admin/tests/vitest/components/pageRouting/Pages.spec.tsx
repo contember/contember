@@ -1,7 +1,7 @@
 import { ReactNode } from 'react'
-import * as renderer from 'react-test-renderer'
 import { describe, expect, it } from 'vitest'
 import { ContemberClient, CurrentRequestContext, Page, Pages, RequestState, Schema, SchemaLoader } from '../../../../src'
+import { render } from '@testing-library/react'
 
 function expectRequest(pages: ReactNode, request: RequestState) {
 	(SchemaLoader as any).schemaLoadCache.set('apiBaseUrl/content/projectSlug/stage', new Schema({
@@ -9,7 +9,7 @@ function expectRequest(pages: ReactNode, request: RequestState) {
 		enums: new Map(),
 	}))
 
-	const el = renderer.create(
+	const el = render(
 		<CurrentRequestContext.Provider value={request}>
 			<ContemberClient
 				apiBaseUrl={'apiBaseUrl'}
@@ -23,7 +23,7 @@ function expectRequest(pages: ReactNode, request: RequestState) {
 		</CurrentRequestContext.Provider>,
 	)
 
-	return expect(el.toJSON())
+	return expect(el.container.firstChild)
 }
 
 describe('Pages', () => {
@@ -33,7 +33,7 @@ describe('Pages', () => {
 				<Page name="foo">Foo</Page>
 			</Pages>
 		)
-		expectRequest(pages, { pageName: 'foo', parameters: {}, dimensions: {} }).toMatchInlineSnapshot('"Foo"')
+		expectRequest(pages, { pageName: 'foo', parameters: {}, dimensions: {} }).toMatchInlineSnapshot(`Foo`)
 	})
 
 	it('support multiple Page as children', () => {
@@ -44,8 +44,8 @@ describe('Pages', () => {
 			</Pages>
 		)
 
-		expectRequest(pages, { pageName: 'foo', parameters: {}, dimensions: {} }).toMatchInlineSnapshot('"Foo"')
-		expectRequest(pages, { pageName: 'bar', parameters: {}, dimensions: {} }).toMatchInlineSnapshot('"Bar"')
+		expectRequest(pages, { pageName: 'foo', parameters: {}, dimensions: {} }).toMatchInlineSnapshot(`Foo`)
+		expectRequest(pages, { pageName: 'bar', parameters: {}, dimensions: {} }).toMatchInlineSnapshot(`Bar`)
 	})
 
 	it('support pageMap with pageName as key and ReactElement as value', () => {
@@ -55,8 +55,8 @@ describe('Pages', () => {
 				children={{ foo: <>Foo</>, bar: <>Bar</> }}
 			/>
 		)
-		expectRequest(pages, { pageName: 'foo', parameters: {}, dimensions: {} }).toMatchInlineSnapshot('"Foo"')
-		expectRequest(pages, { pageName: 'bar', parameters: {}, dimensions: {} }).toMatchInlineSnapshot('"Bar"')
+		expectRequest(pages, { pageName: 'foo', parameters: {}, dimensions: {} }).toMatchInlineSnapshot(`Foo`)
+		expectRequest(pages, { pageName: 'bar', parameters: {}, dimensions: {} }).toMatchInlineSnapshot(`Bar`)
 	})
 
 	it('support pageMap with pageName as key and ComponentType as value', () => {
@@ -66,8 +66,8 @@ describe('Pages', () => {
 				children={{ foo: () => <>Foo</>, bar: () => <>Bar</> }}
 			/>
 		)
-		expectRequest(pages, { pageName: 'foo', parameters: {}, dimensions: {} }).toMatchInlineSnapshot('"Foo"')
-		expectRequest(pages, { pageName: 'bar', parameters: {}, dimensions: {} }).toMatchInlineSnapshot('"Bar"')
+		expectRequest(pages, { pageName: 'foo', parameters: {}, dimensions: {} }).toMatchInlineSnapshot(`Foo`)
+		expectRequest(pages, { pageName: 'bar', parameters: {}, dimensions: {} }).toMatchInlineSnapshot(`Bar`)
 	})
 
 	it('support pageMap with PageProviderElement as value', () => {
@@ -80,8 +80,8 @@ describe('Pages', () => {
 				}}
 			/>
 		)
-		expectRequest(pages, { pageName: 'foo', parameters: {}, dimensions: {} }).toMatchInlineSnapshot('"Foo"')
-		expectRequest(pages, { pageName: 'bar', parameters: {}, dimensions: {} }).toMatchInlineSnapshot('"Bar"')
+		expectRequest(pages, { pageName: 'foo', parameters: {}, dimensions: {} }).toMatchInlineSnapshot(`Foo`)
+		expectRequest(pages, { pageName: 'bar', parameters: {}, dimensions: {} }).toMatchInlineSnapshot(`Bar`)
 	})
 
 	it('support pageMap with path as key and as LazyPageModule as value', () => {
@@ -106,19 +106,19 @@ describe('Pages', () => {
 
 		expectRequest(pages, { pageName: 'foo', parameters: {}, dimensions: {} }).toMatchInlineSnapshot(`
 			<div
-			  className="cui-aether cui-spinner-overlay"
+			  class="cui-aether cui-spinner-overlay"
 			>
 			  <div
-			    className="cui-spinner"
+			    class="cui-spinner"
 			  />
 			</div>
 		`)
 		expectRequest(pages, { pageName: 'bar', parameters: {}, dimensions: {} }).toMatchInlineSnapshot(`
 			<div
-			  className="cui-aether cui-spinner-overlay"
+			  class="cui-aether cui-spinner-overlay"
 			>
 			  <div
-			    className="cui-spinner"
+			    class="cui-spinner"
 			  />
 			</div>
 		`)
@@ -145,10 +145,10 @@ describe('Pages', () => {
 			/>
 		)
 
-		expectRequest(pages, { pageName: 'foo', parameters: {}, dimensions: {} }).toMatchInlineSnapshot('"Foo"')
-		expectRequest(pages, { pageName: 'foobar', parameters: {}, dimensions: {} }).toMatchInlineSnapshot('"FooBar"')
-		expectRequest(pages, { pageName: 'lorem/ipsum/edit', parameters: {}, dimensions: {} }).toMatchInlineSnapshot('"Lorem Ipsum Edit"')
-		expectRequest(pages, { pageName: 'lorem/ipsum/list', parameters: {}, dimensions: {} }).toMatchInlineSnapshot('"Lorem Ipsum List"')
+		expectRequest(pages, { pageName: 'foo', parameters: {}, dimensions: {} }).toMatchInlineSnapshot(`Foo`)
+		expectRequest(pages, { pageName: 'foobar', parameters: {}, dimensions: {} }).toMatchInlineSnapshot(`FooBar`)
+		expectRequest(pages, { pageName: 'lorem/ipsum/edit', parameters: {}, dimensions: {} }).toMatchInlineSnapshot(`Lorem Ipsum Edit`)
+		expectRequest(pages, { pageName: 'lorem/ipsum/list', parameters: {}, dimensions: {} }).toMatchInlineSnapshot(`Lorem Ipsum List`)
 	})
 
 	it('support pageMap with path as key and as EagerPageModule as value (single entry)', () => {
@@ -163,6 +163,6 @@ describe('Pages', () => {
 			/>
 		)
 
-		expectRequest(pages, { pageName: 'index', parameters: {}, dimensions: {} }).toMatchInlineSnapshot('"Index"')
+		expectRequest(pages, { pageName: 'index', parameters: {}, dimensions: {} }).toMatchInlineSnapshot(`Index`)
 	})
 })

@@ -1,5 +1,6 @@
 import glob from 'fast-glob'
 import * as fs from 'fs/promises'
+import { existsSync } from 'fs'
 import JSON5 from 'json5'
 import { join, normalize } from 'path'
 import ts from 'typescript'
@@ -117,6 +118,7 @@ interface Project {
 (async () => {
 	const dirs = (await glob(process.cwd() + '/{ee,packages}/*', { onlyDirectories: true }))
 		.filter(dir => !dir.endsWith('packages/admin-sandbox'))
+		.filter(it => existsSync(`${it}/package.json`))
 
 	const projects = await Promise.all(dirs.map(async (dir): Promise<Project> => {
 		try {

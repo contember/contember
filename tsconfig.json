@@ -87,6 +87,9 @@
 			"path": "./packages/react-multipass-rendering"
 		},
 		{
+			"path": "./packages/react-slots"
+		},
+		{
 			"path": "./packages/react-utils"
 		},
 		{

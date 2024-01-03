@@ -1,4 +1,4 @@
-import { createSlotComponents } from '../../slots'
+import { createSlotComponents } from '@contember/react-slots'
 
 export const [commonSlots, CommonSlotSources, CommonSlotTargets] = createSlotComponents([
 	'Actions',

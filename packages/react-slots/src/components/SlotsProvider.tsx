@@ -1,27 +1,39 @@
-import { ReactNode, memo, useCallback, useMemo, useRef, useState } from 'react'
-import { ActiveSlotPortalsContext, PortalsRegistryContext, SlotTargetsRegistryContextType, SlotsRefMap, TargetsRegistryContext } from './contexts'
+import { memo, ReactNode, useCallback, useMemo, useRef, useState } from 'react'
+import {
+	ActiveSlotPortalsContext,
+	PortalsRegistryContext,
+	RenderToSlotPortalContextType,
+	SlotTargetsRegistryContextType,
+	TargetsRegistryContext,
+} from '../internal/contexts'
 
 /**
  * @group Layout
  */
-export const Provider = memo<{ children: ReactNode }>(({ children }) => {
-	const [slotsRefMap, setSlotsRefMap] = useState<SlotsRefMap>(new Map)
+export const SlotsProvider = memo<{ children: ReactNode }>(({ children }) => {
+	const [slotsRefMap, setSlotsRefMap] = useState<Map<string, HTMLElement>>(new Map)
 	const [activeSlotsMap, setActiveSlotsMap] = useState<Map<string, string>>(new Map)
 	const activeSlotPortals: Set<string> = useMemo(() => new Set(activeSlotsMap.values()), [activeSlotsMap])
 
 	const activeSlotsMapRef = useRef(activeSlotsMap); activeSlotsMapRef.current = activeSlotsMap
 
 	// TODO: refactor to use ID
-	const registerSlotTarget = useCallback((id: string, name: string, ref: HTMLElement) => {
-		setSlotsRefMap(previous => new Map([...previous, [name, ref]]))
-	}, [])
-
 	const unregisterSlotTarget = useCallback((id: string, name: string) => {
 		setSlotsRefMap(previous => {
-			previous.delete(name)
-			return new Map([...previous])
+			const newVal = new Map([...previous])
+			newVal.delete(name)
+			return newVal
 		})
 	}, [])
+
+	const registerSlotTarget = useCallback((id: string, name: string, ref: HTMLElement) => {
+		setSlotsRefMap(previous => new Map([...previous, [name, ref]]))
+
+		return () => {
+			unregisterSlotTarget(id, name)
+		}
+	}, [unregisterSlotTarget])
+
 
 	const slotTargetsRegistry: SlotTargetsRegistryContextType = useMemo(() => {
 		return {
@@ -35,22 +47,27 @@ export const Provider = memo<{ children: ReactNode }>(({ children }) => {
 		return slotsRefMap.get(name)
 	}, [slotsRefMap])
 
+	const unregisterSlotSource = useCallback((id: string, name: string) => {
+		setActiveSlotsMap(previous => {
+			const newVal = new Map([...previous])
+			newVal.delete(id)
+			return newVal
+		})
+	}, [])
+
 	const registerSlotSource = useCallback((id: string, name: string) => {
 		if (activeSlotsMapRef.current.has(id)) {
 			throw new Error(`Cannot register slot portal for '${name}' because it is already registered. You have likely forgotten to unregister it.`)
 		}
 
 		setActiveSlotsMap(previous => new Map([...previous, [id, name]]))
-	}, [])
 
-	const unregisterSlotSource = useCallback((id: string, name: string) => {
-		setActiveSlotsMap(previous => {
-			previous.delete(id)
-			return new Map([...previous])
-		})
-	}, [])
+		return () => {
+			unregisterSlotSource(id, name)
+		}
+	}, [unregisterSlotSource])
 
-	const renderToSlotPortal = useMemo(() => ({
+	const renderToSlotPortal: RenderToSlotPortalContextType = useMemo(() => ({
 		getTarget,
 		registerSlotSource,
 		unregisterSlotSource,
@@ -66,4 +83,4 @@ export const Provider = memo<{ children: ReactNode }>(({ children }) => {
 		</PortalsRegistryContext.Provider>
 	)
 })
-Provider.displayName = 'Layout.Slots.Provider'
+SlotsProvider.displayName = 'Layout.Slots.Provider'

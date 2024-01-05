@@ -1,4 +1,4 @@
-import { ContentClient, ContentQueryBuilder, TypedContentQueryBuilder } from '../../../src'
+import { ContentClient, ContentQueryBuilder, TypedContentQueryBuilder, TypedEntitySelection } from '../../../src'
 
 export namespace Schema {
 	export type Author = {
@@ -50,6 +50,13 @@ export namespace Schema {
 
 }
 
+export type ContemberClientSchema = {
+	entities: {
+		Post: Schema.Post,
+		Author: Schema.Author,
+		Tag: Schema.Tag,
+	},
+};
 export const qb = new ContentQueryBuilder({
 	entities: {
 		Author: {
@@ -112,13 +119,7 @@ export const qb = new ContentQueryBuilder({
 			scalars: ['name'],
 		},
 	},
-}) as unknown as TypedContentQueryBuilder<{
-	entities: {
-		Post: Schema.Post,
-		Author: Schema.Author,
-		Tag: Schema.Tag,
-	},
-}>
+}) as unknown as TypedContentQueryBuilder<ContemberClientSchema>
 
 export const createClient = (result?: any) => {
 	const calls: { query: string, variables: Record<string, unknown> }[] = []
@@ -133,3 +134,7 @@ export const createClient = (result?: any) => {
 	})
 	return [client, calls] as const
 }
+
+
+export type FragmentOf<EntityName extends keyof ContemberClientSchema['entities'] & string, Data = unknown> =
+	TypedEntitySelection<ContemberClientSchema, EntityName, ContemberClientSchema['entities'][EntityName], Data>

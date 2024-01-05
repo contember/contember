@@ -4,31 +4,45 @@ import { EntityTypeLike } from './Schema'
 
 export namespace ContentClientInput {
 	export type ConnectRelationInput<TEntity extends EntityTypeLike> = {
+		/** @internal */
+		readonly __typeGuard?: TEntity['name']
 		readonly connect: UniqueWhere<TEntity>
 	}
 
 	export type CreateRelationInput<TEntity extends EntityTypeLike> = {
+		/** @internal */
+		readonly __typeGuard?: TEntity['name']
 		readonly create: CreateDataInput<TEntity>
 	}
 
 	export type ConnectOrCreateInput<TEntity extends EntityTypeLike> = {
+		/** @internal */
+		readonly __typeGuard?: TEntity['name']
 		readonly connect: UniqueWhere<TEntity>
 		readonly create: CreateDataInput<TEntity>
 	}
 
 	export type ConnectOrCreateRelationInput<TEntity extends EntityTypeLike> = {
+		/** @internal */
+		readonly __typeGuard?: TEntity['name']
 		readonly connectOrCreate: ConnectOrCreateInput<TEntity>
 	}
 
 	export type DisconnectSpecifiedRelationInput<TEntity extends EntityTypeLike> = {
+		/** @internal */
+		readonly __typeGuard?: TEntity['name']
 		readonly disconnect: UniqueWhere<TEntity>
 	}
 
 	export type DeleteSpecifiedRelationInput<TEntity extends EntityTypeLike> = {
+		/** @internal */
+		readonly __typeGuard?: TEntity['name']
 		readonly delete: UniqueWhere<TEntity>
 	}
 
 	export type UpdateSpecifiedRelationInput<TEntity extends EntityTypeLike> = {
+		/** @internal */
+		readonly __typeGuard?: TEntity['name']
 		readonly update: {
 			readonly by: UniqueWhere<TEntity>
 			readonly data: UpdateDataInput<TEntity>
@@ -36,6 +50,8 @@ export namespace ContentClientInput {
 	}
 
 	export type UpsertSpecifiedRelationInput<TEntity extends EntityTypeLike> = {
+		/** @internal */
+		readonly __typeGuard?: TEntity['name']
 		readonly upsert: {
 			readonly by: UniqueWhere<TEntity>
 			readonly update: UpdateDataInput<TEntity>
@@ -43,19 +59,27 @@ export namespace ContentClientInput {
 		}
 	}
 
-	export type DisconnectRelationInput = {
+	export type DisconnectRelationInput<TEntity extends EntityTypeLike> = {
+		/** @internal */
+		readonly __typeGuard?: TEntity['name']
 		readonly disconnect: true
 	}
 
 	export type UpdateRelationInput<TEntity extends EntityTypeLike> = {
+		/** @internal */
+		readonly __typeGuard?: TEntity['name']
 		readonly update: UpdateDataInput<TEntity>
 	}
 
-	export type DeleteRelationInput = {
+	export type DeleteRelationInput<TEntity extends EntityTypeLike> = {
+		/** @internal */
+		readonly __typeGuard?: TEntity['name']
 		readonly delete: true
 	}
 
 	export type UpsertRelationInput<TEntity extends EntityTypeLike> = {
+		/** @internal */
+		readonly __typeGuard?: TEntity['name']
 		readonly upsert: {
 			readonly update: UpdateDataInput<TEntity>
 			readonly create: CreateDataInput<TEntity>
@@ -63,6 +87,10 @@ export namespace ContentClientInput {
 	}
 
 	export type CreateDataInput<TEntity extends EntityTypeLike> =
+		& {
+			/** @internal */
+			readonly __typeGuard?: TEntity['name']
+		}
 		& {
 			readonly [key in keyof TEntity['columns']]?: TEntity['columns'][key]
 		}
@@ -80,7 +108,14 @@ export namespace ContentClientInput {
 
 	export type CreateManyRelationInput<TEntity extends EntityTypeLike> = readonly CreateOneRelationInput<TEntity>[]
 
+
 	export type UpdateDataInput<TEntity extends EntityTypeLike> =
+		& {
+			/**
+			 * @internal
+			 */
+			readonly __typeGuard?: TEntity['name']
+		}
 		& {
 			readonly [key in keyof TEntity['columns']]?: TEntity['columns'][key]
 		}
@@ -92,12 +127,16 @@ export namespace ContentClientInput {
 		}
 
 	export type UpdateInput<TEntity extends EntityTypeLike> = {
+		/** @internal */
+		readonly __typeGuard?: TEntity['name']
 		readonly by: UniqueWhere<TEntity>
 		readonly filter?: Where<TEntity>
 		readonly data: UpdateDataInput<TEntity>
 	}
 
 	export type UpsertInput<TEntity extends EntityTypeLike> = {
+		/** @internal */
+		readonly __typeGuard?: TEntity['name']
 		readonly by: UniqueWhere<TEntity>
 		readonly filter?: Where<TEntity>
 		readonly update: UpdateDataInput<TEntity>
@@ -105,20 +144,28 @@ export namespace ContentClientInput {
 	}
 
 	export type CreateInput<TEntity extends EntityTypeLike> = {
+		/** @internal */
+		readonly __typeGuard?: TEntity['name']
 		readonly data: CreateDataInput<TEntity>
 	}
 
 	export type DeleteInput<TEntity extends EntityTypeLike> = {
+		/** @internal */
+		readonly __typeGuard?: TEntity['name']
 		readonly by: UniqueWhere<TEntity>
 		readonly filter?: Where<TEntity>
 	}
 
 	export type UniqueQueryInput<TEntity extends EntityTypeLike> = {
+		/** @internal */
+		readonly __typeGuard?: TEntity['name']
 		readonly by: UniqueWhere<TEntity>
 		readonly filter?: Where<TEntity>
 	}
 
 	export type ListQueryInput<TEntity extends EntityTypeLike> = {
+		/** @internal */
+		readonly __typeGuard?: TEntity['name']
 		readonly filter?: Where<TEntity>
 		readonly orderBy?: readonly OrderBy<TEntity>[]
 		readonly offset?: number
@@ -126,6 +173,8 @@ export namespace ContentClientInput {
 	}
 
 	export type PaginationQueryInput<TEntity extends EntityTypeLike> = {
+		/** @internal */
+		readonly __typeGuard?: TEntity['name']
 		readonly filter?: Where<TEntity>
 		readonly orderBy?: readonly OrderBy<TEntity>[]
 		readonly skip?: number
@@ -133,10 +182,14 @@ export namespace ContentClientInput {
 	}
 
 	export type HasOneRelationInput<TEntity extends EntityTypeLike> = {
+		/** @internal */
+		readonly __typeGuard?: TEntity['name']
 		readonly filter?: Where<TEntity>
 	}
 
 	export type HasManyByRelationInput<TEntity extends EntityTypeLike, TUnique extends JSONObject> = {
+		/** @internal */
+		readonly __typeGuard?: TEntity['name']
 		readonly by: TUnique
 		readonly filter?: Where<TEntity>
 	}
@@ -149,8 +202,8 @@ export namespace ContentClientInput {
 		| CreateRelationInput<TEntity>
 		| ConnectRelationInput<TEntity>
 		| ConnectOrCreateRelationInput<TEntity>
-		| DeleteRelationInput
-		| DisconnectRelationInput
+		| DeleteRelationInput<TEntity>
+		| DisconnectRelationInput<TEntity>
 		| UpdateRelationInput<TEntity>
 		| UpsertRelationInput<TEntity>
 
@@ -169,6 +222,10 @@ export namespace ContentClientInput {
 
 	export type FieldOrderBy<TEntity extends EntityTypeLike> =
 		& {
+			/** @internal */
+			readonly __typeGuard?: TEntity['name']
+		}
+		& {
 			readonly [key in keyof TEntity['columns']]?: `${Input.OrderDirection}` | null
 		}
 		& {
@@ -180,17 +237,28 @@ export namespace ContentClientInput {
 
 	export type OrderBy<TEntity extends EntityTypeLike> =
 		& {
+			/** @internal */
+			readonly __typeGuard?: TEntity['name']
 			readonly _random?: boolean
 			readonly _randomSeeded?: number
 		}
 		& FieldOrderBy<TEntity>
 
 
-	export type UniqueWhere<TEntity extends EntityTypeLike> = TEntity['unique']
+	export type UniqueWhere<TEntity extends EntityTypeLike> =
+		& {
+			/**
+			 * @internal
+			 */
+			readonly __typeGuard?: TEntity['name']
+		}
+		& TEntity['unique']
 
 
 	export type Where<TEntity extends EntityTypeLike> =
 		& {
+			/** @internal */
+			readonly __typeGuard?: TEntity['name']
 			readonly and?: (readonly (Where<TEntity>)[]) | null
 			readonly or?: (readonly (Where<TEntity>)[]) | null
 			readonly not?: Where<TEntity> | null

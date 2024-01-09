@@ -3,7 +3,7 @@
 	"include": [],
 	"references": [
 		{
-			"path": "./packages/.template"
+			"path": "./scripts/.template"
 		},
 		{
 			"path": "./packages/admin"

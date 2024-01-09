@@ -41,19 +41,24 @@ export namespace ContentClientInput {
     export type AnyOrderBy = Input.OrderBy<`${Input.OrderDirection}`>[];
     // (undocumented)
     export type ConnectOrCreateInput<TEntity extends EntityTypeLike> = {
+        readonly __typeGuard?: TEntity['name'];
         readonly connect: UniqueWhere<TEntity>;
         readonly create: CreateDataInput<TEntity>;
     };
     // (undocumented)
     export type ConnectOrCreateRelationInput<TEntity extends EntityTypeLike> = {
+        readonly __typeGuard?: TEntity['name'];
         readonly connectOrCreate: ConnectOrCreateInput<TEntity>;
     };
     // (undocumented)
     export type ConnectRelationInput<TEntity extends EntityTypeLike> = {
+        readonly __typeGuard?: TEntity['name'];
         readonly connect: UniqueWhere<TEntity>;
     };
     // (undocumented)
     export type CreateDataInput<TEntity extends EntityTypeLike> = {
+        readonly __typeGuard?: TEntity['name'];
+    } & {
         readonly [key in keyof TEntity['columns']]?: TEntity['columns'][key];
     } & {
         readonly [key in keyof TEntity['hasMany']]?: CreateManyRelationInput<TEntity['hasMany'][key]>;
@@ -62,6 +67,7 @@ export namespace ContentClientInput {
     };
     // (undocumented)
     export type CreateInput<TEntity extends EntityTypeLike> = {
+        readonly __typeGuard?: TEntity['name'];
         readonly data: CreateDataInput<TEntity>;
     };
     // (undocumented)
@@ -70,31 +76,39 @@ export namespace ContentClientInput {
     export type CreateOneRelationInput<TEntity extends EntityTypeLike> = ConnectRelationInput<TEntity> | CreateRelationInput<TEntity> | ConnectOrCreateRelationInput<TEntity>;
     // (undocumented)
     export type CreateRelationInput<TEntity extends EntityTypeLike> = {
+        readonly __typeGuard?: TEntity['name'];
         readonly create: CreateDataInput<TEntity>;
     };
     // (undocumented)
     export type DeleteInput<TEntity extends EntityTypeLike> = {
+        readonly __typeGuard?: TEntity['name'];
         readonly by: UniqueWhere<TEntity>;
         readonly filter?: Where<TEntity>;
     };
     // (undocumented)
-    export type DeleteRelationInput = {
+    export type DeleteRelationInput<TEntity extends EntityTypeLike> = {
+        readonly __typeGuard?: TEntity['name'];
         readonly delete: true;
     };
     // (undocumented)
     export type DeleteSpecifiedRelationInput<TEntity extends EntityTypeLike> = {
+        readonly __typeGuard?: TEntity['name'];
         readonly delete: UniqueWhere<TEntity>;
     };
     // (undocumented)
-    export type DisconnectRelationInput = {
+    export type DisconnectRelationInput<TEntity extends EntityTypeLike> = {
+        readonly __typeGuard?: TEntity['name'];
         readonly disconnect: true;
     };
     // (undocumented)
     export type DisconnectSpecifiedRelationInput<TEntity extends EntityTypeLike> = {
+        readonly __typeGuard?: TEntity['name'];
         readonly disconnect: UniqueWhere<TEntity>;
     };
     // (undocumented)
     export type FieldOrderBy<TEntity extends EntityTypeLike> = {
+        readonly __typeGuard?: TEntity['name'];
+    } & {
         readonly [key in keyof TEntity['columns']]?: `${Input.OrderDirection}` | null;
     } & {
         readonly [key in keyof TEntity['hasMany']]?: FieldOrderBy<TEntity['hasMany'][key]> | null;
@@ -103,6 +117,7 @@ export namespace ContentClientInput {
     };
     // (undocumented)
     export type HasManyByRelationInput<TEntity extends EntityTypeLike, TUnique extends JSONObject> = {
+        readonly __typeGuard?: TEntity['name'];
         readonly by: TUnique;
         readonly filter?: Where<TEntity>;
     };
@@ -112,10 +127,12 @@ export namespace ContentClientInput {
     export type HasManyRelationPaginateInput<TEntity extends EntityTypeLike> = PaginationQueryInput<TEntity>;
     // (undocumented)
     export type HasOneRelationInput<TEntity extends EntityTypeLike> = {
+        readonly __typeGuard?: TEntity['name'];
         readonly filter?: Where<TEntity>;
     };
     // (undocumented)
     export type ListQueryInput<TEntity extends EntityTypeLike> = {
+        readonly __typeGuard?: TEntity['name'];
         readonly filter?: Where<TEntity>;
         readonly orderBy?: readonly OrderBy<TEntity>[];
         readonly offset?: number;
@@ -123,11 +140,13 @@ export namespace ContentClientInput {
     };
     // (undocumented)
     export type OrderBy<TEntity extends EntityTypeLike> = {
+        readonly __typeGuard?: TEntity['name'];
         readonly _random?: boolean;
         readonly _randomSeeded?: number;
     } & FieldOrderBy<TEntity>;
     // (undocumented)
     export type PaginationQueryInput<TEntity extends EntityTypeLike> = {
+        readonly __typeGuard?: TEntity['name'];
         readonly filter?: Where<TEntity>;
         readonly orderBy?: readonly OrderBy<TEntity>[];
         readonly skip?: number;
@@ -135,13 +154,18 @@ export namespace ContentClientInput {
     };
     // (undocumented)
     export type UniqueQueryInput<TEntity extends EntityTypeLike> = {
+        readonly __typeGuard?: TEntity['name'];
         readonly by: UniqueWhere<TEntity>;
         readonly filter?: Where<TEntity>;
     };
     // (undocumented)
-    export type UniqueWhere<TEntity extends EntityTypeLike> = TEntity['unique'];
+    export type UniqueWhere<TEntity extends EntityTypeLike> = {
+        readonly __typeGuard?: TEntity['name'];
+    } & TEntity['unique'];
     // (undocumented)
     export type UpdateDataInput<TEntity extends EntityTypeLike> = {
+        readonly __typeGuard?: TEntity['name'];
+    } & {
         readonly [key in keyof TEntity['columns']]?: TEntity['columns'][key];
     } & {
         readonly [key in keyof TEntity['hasMany']]?: UpdateManyRelationInput<TEntity['hasMany'][key]>;
@@ -150,6 +174,7 @@ export namespace ContentClientInput {
     };
     // (undocumented)
     export type UpdateInput<TEntity extends EntityTypeLike> = {
+        readonly __typeGuard?: TEntity['name'];
         readonly by: UniqueWhere<TEntity>;
         readonly filter?: Where<TEntity>;
         readonly data: UpdateDataInput<TEntity>;
@@ -159,13 +184,15 @@ export namespace ContentClientInput {
     // (undocumented)
     export type UpdateManyRelationInputItem<TEntity extends EntityTypeLike> = CreateRelationInput<TEntity> | ConnectRelationInput<TEntity> | ConnectOrCreateRelationInput<TEntity> | DeleteSpecifiedRelationInput<TEntity> | DisconnectSpecifiedRelationInput<TEntity> | UpdateSpecifiedRelationInput<TEntity> | UpsertSpecifiedRelationInput<TEntity>;
     // (undocumented)
-    export type UpdateOneRelationInput<TEntity extends EntityTypeLike> = CreateRelationInput<TEntity> | ConnectRelationInput<TEntity> | ConnectOrCreateRelationInput<TEntity> | DeleteRelationInput | DisconnectRelationInput | UpdateRelationInput<TEntity> | UpsertRelationInput<TEntity>;
+    export type UpdateOneRelationInput<TEntity extends EntityTypeLike> = CreateRelationInput<TEntity> | ConnectRelationInput<TEntity> | ConnectOrCreateRelationInput<TEntity> | DeleteRelationInput<TEntity> | DisconnectRelationInput<TEntity> | UpdateRelationInput<TEntity> | UpsertRelationInput<TEntity>;
     // (undocumented)
     export type UpdateRelationInput<TEntity extends EntityTypeLike> = {
+        readonly __typeGuard?: TEntity['name'];
         readonly update: UpdateDataInput<TEntity>;
     };
     // (undocumented)
     export type UpdateSpecifiedRelationInput<TEntity extends EntityTypeLike> = {
+        readonly __typeGuard?: TEntity['name'];
         readonly update: {
             readonly by: UniqueWhere<TEntity>;
             readonly data: UpdateDataInput<TEntity>;
@@ -173,6 +200,7 @@ export namespace ContentClientInput {
     };
     // (undocumented)
     export type UpsertInput<TEntity extends EntityTypeLike> = {
+        readonly __typeGuard?: TEntity['name'];
         readonly by: UniqueWhere<TEntity>;
         readonly filter?: Where<TEntity>;
         readonly update: UpdateDataInput<TEntity>;
@@ -180,6 +208,7 @@ export namespace ContentClientInput {
     };
     // (undocumented)
     export type UpsertRelationInput<TEntity extends EntityTypeLike> = {
+        readonly __typeGuard?: TEntity['name'];
         readonly upsert: {
             readonly update: UpdateDataInput<TEntity>;
             readonly create: CreateDataInput<TEntity>;
@@ -187,6 +216,7 @@ export namespace ContentClientInput {
     };
     // (undocumented)
     export type UpsertSpecifiedRelationInput<TEntity extends EntityTypeLike> = {
+        readonly __typeGuard?: TEntity['name'];
         readonly upsert: {
             readonly by: UniqueWhere<TEntity>;
             readonly update: UpdateDataInput<TEntity>;
@@ -195,6 +225,7 @@ export namespace ContentClientInput {
     };
     // (undocumented)
     export type Where<TEntity extends EntityTypeLike> = {
+        readonly __typeGuard?: TEntity['name'];
         readonly and?: (readonly (Where<TEntity>)[]) | null;
         readonly or?: (readonly (Where<TEntity>)[]) | null;
         readonly not?: Where<TEntity> | null;
@@ -497,6 +528,8 @@ export interface TypedEntitySelection<TSchema extends SchemaTypeLike, TEntityNam
     }, TNestedKey extends keyof TEntity['hasOne'] & string, TAlias extends string | null = null>(name: TNestedKey, fields: TypedEntitySelectionCallback<TSchema, TEntity['hasOne'][TNestedKey]['name'], TEntity['hasOne'][TNestedKey], TNestedValue> | TypedEntitySelection<TSchema, TEntity['hasOne'][TNestedKey]['name'], TEntity['hasOne'][TNestedKey], TNestedValue>): TypedEntitySelection<TSchema, TEntityName, TEntity, TValue & {
         [key in TAlias extends null ? TNestedKey : TAlias]: TNestedValue | null;
     }>;
+    // @internal (undocumented)
+    readonly context: ContentEntitySelectionContext<TEntityName>;
 }
 
 // @public (undocumented)

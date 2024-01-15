@@ -1,5 +1,6 @@
 import { EntityTypeLike, SchemaTypeLike } from '../types/Schema'
 import { ContentClientInput } from '../types'
+import { ContentEntitySelectionContext } from './ContentEntitySelection'
 
 export type TypedEntitySelectionCallback<
 	TSchema extends SchemaTypeLike,
@@ -9,6 +10,9 @@ export type TypedEntitySelectionCallback<
 > = (select: TypedEntitySelection<TSchema, EntityName, TEntity, {}>) => TypedEntitySelection<TSchema, EntityName, TEntity, TValue>
 
 export interface TypedEntitySelection<TSchema extends SchemaTypeLike, TEntityName extends string, TEntity extends EntityTypeLike, TValue> {
+
+	/** @internal */
+	readonly context: ContentEntitySelectionContext<TEntityName>,
 
 	$$(): TypedEntitySelection<TSchema, TEntityName, TEntity, TValue & {
 		[key in keyof TEntity['columns']]: TEntity['columns'][key]

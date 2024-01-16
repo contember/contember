@@ -6,9 +6,9 @@ import { RichTextRendererError } from '../RichTextRendererError'
 export const useRichTextBlocksSource = <CustomElements extends RichTextElement, CustomLeaves extends RichTextLeaf>({
 	deserialize = defaultDeserialize,
 	blocks,
-	referencesField = 'references',
-	sourceField = 'source',
-	referenceDiscriminationField = 'type',
+	referencesField,
+	sourceField,
+	referenceDiscriminationField,
 }: RichTextBlockSource<CustomElements, CustomLeaves>) => {
 	return useMemo((): RichTextBlock<CustomElements, CustomLeaves>[] => {
 		const sourceFieldResolved = sourceField ?? 'source'
@@ -16,7 +16,7 @@ export const useRichTextBlocksSource = <CustomElements extends RichTextElement, 
 		const referenceDiscriminationFieldResolved = referenceDiscriminationField ?? 'type'
 
 		return blocks.map(block => {
-			if (!(sourceField in block)) {
+			if (!(sourceFieldResolved in block)) {
 				throw new RichTextRendererError(
 					`Found a block without a '${sourceFieldResolved}' field. ` +
 					(sourceField === undefined

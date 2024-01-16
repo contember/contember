@@ -1,4 +1,4 @@
-import { createElement, ReactElement } from 'react'
+import { createElement, isValidElement, ReactElement } from 'react'
 import {
 	createEditor,
 	Descendant,
@@ -134,7 +134,7 @@ export const createEditorWithEssentials = (defaultElementType: string): Editor =
 				if (props.leaf[mark.type] === true) {
 					const markerEl = mark.render({ ...props, children: el })
 					if (markerEl !== null) {
-						if (!React.isValidElement(markerEl)) {
+						if (!isValidElement(markerEl)) {
 							throw new Error(`Mark plugin ${mark.type} returned a non-React element`)
 						}
 						el = markerEl

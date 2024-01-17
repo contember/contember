@@ -1,38 +1,18 @@
 import { Button, LayoutPageStickyContainer, Stack } from '@contember/ui'
-import { memo, useCallback } from 'react'
+import { memo } from 'react'
 import { useMessageFormatter } from '@contember/react-i18n'
 import { dataGridDictionary } from '../dict/dataGridDictionary'
-import { DataGridRenderingCommonProps } from '../types'
 import { DataGridPagingSummary } from './DataGridPagingSummary'
+import { DataViewChangePageTrigger, useDataViewPagingInfo } from '@contember/react-dataview'
 
 export type DataGridFooterPublicProps = {}
 
 export type DataGridFooterProps =
 	& DataGridFooterPublicProps
-	& DataGridRenderingCommonProps
 
-export const DataGridFooter = memo<DataGridFooterProps>(props => {
-
-	const {
-		desiredState: { paging: { pageIndex, itemsPerPage } },
-		pagingInfo: { totalCount, pagesCount },
-		stateMethods: { updatePaging },
-	} = props
-
+export const DataGridFooter = memo<DataGridFooterProps>(() => {
 	const formatMessage = useMessageFormatter(dataGridDictionary)
-
-	const goToFirstPageClick = useCallback(() => {
-		updatePaging({ type: 'goToFirstPage' })
-	}, [updatePaging])
-	const goToPreviousPageClick = useCallback(() => {
-		updatePaging({ type: 'goToPreviousPage' })
-	}, [updatePaging])
-	const goToNextPageClick = useCallback(() => {
-		updatePaging({ type: 'goToNextPage' })
-	}, [updatePaging])
-	const goToLastPageClick = useCallback(() => {
-		pagesCount !== undefined && updatePaging({ type: 'goToPage', newPageIndex: pagesCount - 1 })
-	}, [pagesCount, updatePaging])
+	const pagesCount = useDataViewPagingInfo().pagesCount
 
 	if (!pagesCount || pagesCount <= 1) {
 		return null
@@ -45,42 +25,37 @@ export const DataGridFooter = memo<DataGridFooterProps>(props => {
 		>
 			<Stack wrap align="center" horizontal justify="space-between">
 				<Stack horizontal justify="space-between" gap="gap">
-					<Button
-						distinction="seamless"
-						inset={false}
-						disabled={pageIndex === 0}
-						onClick={goToFirstPageClick}
-					>
-						{formatMessage('dataGrid.paging.first')}
-					</Button>
-					<Button
-						inset={false}
-						disabled={pageIndex === 0}
-						onClick={goToPreviousPageClick}
-					>
-						{formatMessage('dataGrid.paging.previous')}
-					</Button>
-					{itemsPerPage !== null && (
-						<>
-							<Button
-								inset={false}
-								disabled={pagesCount === undefined || pagesCount <= pageIndex + 1}
-								onClick={goToNextPageClick}
-							>
-								{formatMessage('dataGrid.paging.next')}
-							</Button>
-							<Button
-								inset={false}
-								distinction="seamless"
-								disabled={pagesCount === undefined || pagesCount <= pageIndex + 1}
-								onClick={goToLastPageClick}
-							>
-								{formatMessage('dataGrid.paging.last')}
-							</Button>
-						</>
-					)}
+					<DataViewChangePageTrigger page={'first'}>
+						<Button
+							distinction="seamless"
+							inset={false}
+						>
+							{formatMessage('dataGrid.paging.first')}
+						</Button>
+					</DataViewChangePageTrigger>
+					<DataViewChangePageTrigger page={'previous'}>
+						<Button
+							inset={false}
+						>
+							{formatMessage('dataGrid.paging.previous')}
+						</Button>
+					</DataViewChangePageTrigger>
+					<DataViewChangePageTrigger page={'next'}>
+						<Button
+							inset={false}
+						>
+							{formatMessage('dataGrid.paging.next')}
+						</Button>
+					</DataViewChangePageTrigger>
+					<DataViewChangePageTrigger page={'last'}>
+						<Button
+							inset={false}
+						>
+							{formatMessage('dataGrid.paging.last')}
+						</Button>
+					</DataViewChangePageTrigger>
 				</Stack>
-				<div><DataGridPagingSummary {...props} /></div>
+				<div><DataGridPagingSummary /></div>
 			</Stack>
 		</LayoutPageStickyContainer>
 	)

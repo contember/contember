@@ -1,8 +1,8 @@
-import { Component, QueryLanguage, SugarableRelativeSingleField, wrapFilterInHasOnes } from '@contember/react-binding'
-import type { Input } from '@contember/client'
+import { Component, QueryLanguage, SugarableRelativeSingleField } from '@contember/react-binding'
 import { ComponentType, FunctionComponent } from 'react'
-import { DataGridColumnCommonProps, DataGridOrderDirection, FilterRendererProps } from '../types'
+import { DataGridColumnCommonProps, FilterRendererProps } from '../types'
 import { DataGridColumn } from '../grid'
+import { createDateFilter, DataViewOrderDirection, DateRangeFilterArtifacts } from '@contember/react-dataview'
 
 export type DateCellRendererProps = {
 	field: SugarableRelativeSingleField | string
@@ -12,14 +12,10 @@ export type DateCellProps =
 	& DataGridColumnCommonProps
 	& {
 		disableOrder?: boolean
-		initialOrder?: DataGridOrderDirection
+		initialOrder?: DataViewOrderDirection
 		initialFilter?: DateRangeFilterArtifacts
 	}
 
-export type DateRangeFilterArtifacts = {
-	start: string | null
-	end: string | null
-}
 
 export const createDateCell = <ColumnProps extends {}, ValueRendererProps extends {}>({ FilterRenderer, ValueRenderer }: {
 	FilterRenderer: ComponentType<FilterRendererProps<DateRangeFilterArtifacts>>,
@@ -29,28 +25,7 @@ export const createDateCell = <ColumnProps extends {}, ValueRendererProps extend
 		<DataGridColumn<DateRangeFilterArtifacts>
 			{...props}
 			enableOrdering={!props.disableOrder as true}
-			getNewOrderBy={(newDirection, { environment }) =>
-				newDirection ? QueryLanguage.desugarOrderBy(`${props.field as string} ${newDirection}`, environment) : undefined
-			}
-			getNewFilter={(filterArtifact, { environment }) => {
-				if (!filterArtifact.start && !filterArtifact.end) {
-					return undefined
-				}
-				const desugared = QueryLanguage.desugarRelativeSingleField(props.field, environment)
-
-				const conditions: Input.Condition<Input.ColumnValue>[] = []
-
-				if (filterArtifact.start) {
-					conditions.push({ gte: filterArtifact.start })
-				}
-				if (filterArtifact.end) {
-					conditions.push({ lte: filterArtifact.end })
-				}
-
-				return wrapFilterInHasOnes(desugared.hasOneRelationPath, {
-					[desugared.field]: conditions.length > 1 ? { and: conditions } : conditions[0],
-				})
-			}}
+			getNewFilter={createDateFilter(props.field)}
 			emptyFilter={{
 				start: null,
 				end: null,

@@ -47,7 +47,7 @@ export const useDataViewFiltering = ({ dataViewKey, initialFilters, filterTypes 
 			if (filterResolved === undefined) {
 				return otherFilters
 			} else {
-				return { ...otherFilters, [key]: filterResolved }
+				return { ...filters, [key]: filterResolved }
 			}
 		})
 		if (!didBailOut) {

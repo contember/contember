@@ -33,7 +33,7 @@ export const useDataViewSorting = ({ dataViewKey, initialSorting, resetPage }: U
 		let didBailOut = false
 
 		setDirections(orderBys => {
-			const existingValue = orderBys[columnKey]
+			const existingValue = orderBys[columnKey] ?? null
 
 			if (existingValue === columnOrderBy) {
 				didBailOut = true

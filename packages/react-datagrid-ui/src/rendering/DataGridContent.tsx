@@ -1,22 +1,18 @@
-import { DataGridRenderingCommonProps } from '../types'
 import { DataGridTiles, DataGridTilesPublicProps } from './DataGridTiles'
-import { DataGridTable } from './DataGridTable'
-import { ComponentType, ReactNode } from 'react'
+import { DataGridTable, DataGridTablePublicProps } from './DataGridTable'
+import { useDataGridLayoutState } from '@contember/react-datagrid'
 
-export const createDataGridContent = <
-	TableProps extends {},
-	GridProps extends { tile?: ReactNode } = DataGridTilesPublicProps
->({ Table, Grid }: {
-	Table: ComponentType<TableProps & DataGridRenderingCommonProps>
-	Grid: ComponentType<GridProps & DataGridRenderingCommonProps>
-}): ComponentType<TableProps & GridProps & DataGridRenderingCommonProps> => props => {
-	if (props.displayedState.layout === 'tiles' && props.tile) {
-		return <Grid {...props} />
+export type DataGridContentPublicProps =
+	& DataGridTablePublicProps
+	& DataGridTilesPublicProps
+
+export type DataGridContentProps =
+	& DataGridContentPublicProps
+
+export const DataGridContent = (props: DataGridContentProps) => {
+	const layout = useDataGridLayoutState()
+	if (layout.view === 'tiles' && props.tile) {
+		return <DataGridTiles {...props} />
 	}
-	return <Table {...props} />
+	return <DataGridTable {...props} />
 }
-
-export const DataGridContent = createDataGridContent({
-	Table: DataGridTable,
-	Grid: DataGridTiles,
-})

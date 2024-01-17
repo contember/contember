@@ -1,6 +1,7 @@
-import { EnumCellFilterArtifacts, EnumCellRendererProps, FilterRendererProps } from '@contember/react-datagrid'
+import { EnumCellRendererProps, FilterRendererProps } from '@contember/react-datagrid'
 import { Checkbox, FieldContainer, Stack } from '@contember/ui'
 import { NullConditionFilter, NullConditionFilterPublicProps } from './NullConditionFilter'
+import { EnumCellFilterArtifacts } from '@contember/react-dataview'
 
 export type EnumCellFilterExtraProps =
 	& NullConditionFilterPublicProps

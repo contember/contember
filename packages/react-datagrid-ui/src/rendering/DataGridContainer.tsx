@@ -1,35 +1,24 @@
-import { ComponentType, memo } from 'react'
+import { memo } from 'react'
 import { Stack } from '@contember/ui'
-import { DataGridHeader } from './DataGridHeader'
-import { DataGridContent } from './DataGridContent'
-import { DataGridFooter } from './DataGridFooter'
-import { DataGridRenderingCommonProps } from '../types'
+import { DataGridHeader, DataGridHeaderPublicProps } from './DataGridHeader'
+import { DataGridContent, DataGridContentPublicProps } from './DataGridContent'
+import { DataGridFooter, DataGridFooterPublicProps } from './DataGridFooter'
 import { useClassName } from '@contember/react-utils'
-import { EnvironmentContext } from '@contember/react-binding'
 
+export type DataGridContainerPublicProps =
+	& DataGridHeaderPublicProps
+	& DataGridContentPublicProps
+	& DataGridFooterPublicProps
 
-export const createDataGridContainer = <HeaderProps extends {}, ContentProps extends {}, FooterProps extends {}>({ Header, Content, Footer }: {
-	Header: ComponentType<HeaderProps & DataGridRenderingCommonProps>,
-	Content: ComponentType<ContentProps & DataGridRenderingCommonProps>,
-	Footer: ComponentType<FooterProps & DataGridRenderingCommonProps>,
-}) => memo<HeaderProps & ContentProps & FooterProps & DataGridRenderingCommonProps>(props => {
+export type DataGridContainerProps =
+	& DataGridContainerPublicProps
+
+export const DataGridContainer = memo<& DataGridContainerProps>(props => {
 	return (
 		<Stack className={`${(useClassName('data-grid-body'))}-body`}>
-			<EnvironmentContext.Provider value={props.accessor.environment}>
-				<Header {...props} />
-				<Content {...props} />
-				<Footer {...props} />
-			</EnvironmentContext.Provider>
+			<DataGridHeader {...props} />
+			<DataGridContent {...props} />
+			<DataGridFooter />
 		</Stack>
 	)
-})
-
-
-export type DataGridContainerProps = typeof DataGridContainer extends ComponentType<infer P> ? P : never
-export type DataGridContainerPublicProps = Omit<DataGridContainerProps, keyof DataGridRenderingCommonProps>
-
-export const DataGridContainer = createDataGridContainer({
-	Header: DataGridHeader,
-	Content: DataGridContent,
-	Footer: DataGridFooter,
 })

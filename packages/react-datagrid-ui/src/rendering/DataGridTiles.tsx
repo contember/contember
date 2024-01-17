@@ -1,11 +1,10 @@
-import { Entity } from '@contember/react-binding'
 import { Grid } from '@contember/ui'
 import { ComponentType, memo, ReactNode } from 'react'
-import { DataGridRenderingCommonProps } from '../types'
 import { useClassName } from '@contember/react-utils'
 import { useMessageFormatter } from '@contember/react-i18n'
 import { dataGridDictionary } from '../dict/dataGridDictionary'
 import { EmptyMessage, EmptyMessageProps } from '@contember/react-binding-ui'
+import { DataViewEachRow, DataViewEmpty } from '@contember/react-dataview'
 
 export type DataGridTilesPublicProps = {
 	tile?: ReactNode
@@ -15,26 +14,22 @@ export type DataGridTilesPublicProps = {
 }
 
 export type DataGridTilesProps =
-	& DataGridRenderingCommonProps
 	& DataGridTilesPublicProps
 
-export const DataGridTiles = memo(({ accessor, tileSize = 160, tile, emptyMessage, emptyMessageComponent }: DataGridTilesProps) => {
+export const DataGridTiles = memo(({ tileSize = 160, tile, emptyMessage, emptyMessageComponent }: DataGridTilesProps) => {
 	const formatMessage = useMessageFormatter(dataGridDictionary)
 
 	return (
 		<div className={useClassName('data-grid-body-content-grid')}>
 			<Grid columnWidth={tileSize}>
-				{!!accessor.length
-					? Array.from(accessor, entity => (
-						<Entity key={entity.id} accessor={entity}>
-							{tile}
-						</Entity>
-					))
-					: (
-						<EmptyMessage component={emptyMessageComponent} className="cui-grid-row-full-width">
-							{formatMessage(emptyMessage, 'dataGrid.emptyMessage.text')}
-						</EmptyMessage>
-					)}
+				<DataViewEmpty>
+					<EmptyMessage component={emptyMessageComponent} className="cui-grid-row-full-width">
+						{formatMessage(emptyMessage, 'dataGrid.emptyMessage.text')}
+					</EmptyMessage>
+				</DataViewEmpty>
+				<DataViewEachRow>
+					{tile}
+				</DataViewEachRow>
 			</Grid>
 		</div>
 	)

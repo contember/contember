@@ -1,2 +1,10 @@
 export type DataGridLayout = 'default' | 'tiles'
-export type SetDataGridView = (layout: DataGridLayout) => void
+export type SetDataGridLayout = (layout: DataGridLayout) => void
+
+export type DataGridLayoutState = {
+	view: DataGridLayout
+}
+
+export type DataGridLayoutMethods = {
+	setView: SetDataGridLayout
+}

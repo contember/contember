@@ -1,7 +1,9 @@
 import { TableCell, TableRow } from '@contember/ui'
 import { EntityAccessor, EntityId, useEntity } from '@contember/react-binding'
-import { DataGridRenderingCommonProps } from '../types'
 import { useCallback } from 'react'
+import { DataGridState, useDataGridColumns, useDataGridHidingState } from '@contember/react-datagrid'
+import { DataGridColumnPublicProps } from '../types'
+import { useDataViewDisplayedState } from '@contember/react-dataview'
 
 export type DataGridTableRowPublicProps = {
 	onEntityClick?: (entity: EntityAccessor) => void
@@ -12,10 +14,9 @@ export type DataGridTableRowPublicProps = {
 }
 
 export type DataGridTableRowProps =
-	& DataGridRenderingCommonProps
 	& DataGridTableRowPublicProps
 
-export const DataGridTableRow = ({ desiredState, displayedState, onEntityClick, isEntitySelected, selectedEntityIds }: DataGridTableRowProps) => {
+export const DataGridTableRow = ({ onEntityClick, isEntitySelected, selectedEntityIds }: DataGridTableRowProps) => {
 	const entity = useEntity()
 	if (selectedEntityIds !== undefined && import.meta.env.DEV) {
 		console.warn(`selectedEntityIds prop on DataGrid is deprecated, use isEntitySelected callback instead.`)
@@ -25,20 +26,14 @@ export const DataGridTableRow = ({ desiredState, displayedState, onEntityClick, 
 	const onClick = useCallback(() => {
 		onEntityClick?.(entity)
 	}, [entity, onEntityClick])
+	const columns = useDataGridColumns<DataGridColumnPublicProps>()
+	const hiddenColumns = useDataViewDisplayedState<DataGridState<any>>().hiddenColumns
 
 	return (
 		<TableRow onClick={onClick} active={isSelected}>
-			{Array.from(desiredState.columns)
-				.filter(([columnKey]) => !desiredState.hiddenColumns[columnKey])
+			{Array.from(columns)
+				.filter(([columnKey]) => !hiddenColumns[columnKey])
 				.map(([columnKey, column]) => {
-					// This is tricky. We need to render a table cell from here no matter what so that the cell count
-					// matches that of the headers. However, there might be a header displayed for a column whose data
-					// has not yet been fetched. Displaying its cell contents from here would cause an error. Also, the
-					// column may have just been hidden but the information hasn't made it to displayed sate yet.
-					// For these, we just display an empty cell then.
-					if (displayedState.hiddenColumns[columnKey]) {
-						return <TableCell key={columnKey} shrunk />
-					}
 					return (
 						<TableCell key={columnKey} shrunk={column.shrunk} justification={column.justification}>
 							{column.children}

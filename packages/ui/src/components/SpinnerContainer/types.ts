@@ -8,5 +8,5 @@ export type SpinnerOverlayProps = ComponentClassNameProps & {
 
 export interface SpinnerContainerProps extends SpinnerOverlayProps {
 	enabled?: boolean;
-	children: ReactNode;
+	children?: ReactNode;
 }

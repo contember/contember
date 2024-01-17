@@ -1,46 +1,18 @@
-import { Component, useEnvironment } from '@contember/react-binding'
-import { ComponentType } from 'react'
-import { useDataGridDisplayedState } from '../internal/useDataGridDisplayedState'
-import { DataGridRendererProps, DataGridState, DataGridStateMethods } from '../types'
-import { usePagingInfo } from '../internal/usePagingInfo'
+import { Component } from '@contember/react-binding'
+import { ComponentType, useEffect } from 'react'
+import { DataGridMethods, DataGridState } from '../types'
+import { ControlledDataView, DataViewInfo } from '@contember/react-dataview'
 
-export type ControlledDataGridProps<P extends {}> =
+export type ControlledDataGridProps =
 	& {
-		state: DataGridState<any>
-		stateMethods: DataGridStateMethods
-	}
-	& P
+	state: DataGridState<any>
+	methods: DataGridMethods
+	info: DataViewInfo
+}
 
-export const createControlledDataGrid = <P extends {}>(Renderer: ComponentType<P & DataGridRendererProps<any>>) => Component<ControlledDataGridProps<Omit<P, keyof DataGridRendererProps<any>>>>(({ state, stateMethods, ...props }) => {
-	const { gridState, treeRootId } = useDataGridDisplayedState<P>(stateMethods, state, Renderer, props as any)
-	const environment = useEnvironment()
-	const pagingInfo = usePagingInfo({
-		entityName: state.entities.entityName,
-		filter: state.filter,
-		itemsPerPage: state.paging.itemsPerPage,
-	})
-	const rendererProps: DataGridRendererProps<any> = {
-		environment,
-		stateMethods,
-		pagingInfo,
-		desiredState: state,
-		displayedState: gridState,
-		treeRootId,
-	}
-
-	return <Renderer {...rendererProps} {...(props as unknown as P)} />
-}, ({ state, stateMethods, ...props }, environment) => {
-	const rendererProps: DataGridRendererProps<any> = {
-		environment,
-		stateMethods,
-		pagingInfo: {
-			pagesCount: undefined,
-			totalCount: undefined,
-		},
-		desiredState: state,
-		displayedState: state,
-		treeRootId: undefined,
-	}
-
-	return <Renderer {...rendererProps} {...(props as unknown as P)} />
+export const createControlledDataGrid = <P extends {}>(Renderer: ComponentType<P & ControlledDataGridProps>) => Component<ControlledDataGridProps & P>(({ state, methods, info, ...props }) => {
+	const renderer = <Renderer state={state} methods={methods} info={info} {...props as P} />
+	return (
+		<ControlledDataView state={state} methods={methods} info={info} children={renderer}/>
+	)
 })

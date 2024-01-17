@@ -1,44 +1,35 @@
-import {
-	Box,
-	Button,
-	ButtonGroup,
-	Dropdown,
-	DropdownProps,
-	Table,
-	TableCell,
-	TableHeaderCell,
-	TableRow,
-	Text,
-} from '@contember/ui'
+import { Box, Button, ButtonGroup, Dropdown, DropdownProps, Table, TableCell, TableHeaderCell, TableRow, Text } from '@contember/ui'
 import { createElement, Fragment, ReactElement, useMemo } from 'react'
-import { DataGridRenderingCommonProps } from '../types'
 import { dataGridDictionary } from '../dict/dataGridDictionary'
 import { useEnvironment } from '@contember/react-binding'
 import { useMessageFormatter } from '@contember/react-i18n'
 import { EmptyMessage } from '@contember/react-binding-ui'
 import { FilterIcon, PlusCircleIcon, Trash2Icon } from 'lucide-react'
+import { useDataViewFilteringMethods, useDataViewFilteringState } from '@contember/react-dataview'
+import { useDataGridColumns } from '@contember/react-datagrid'
+import { DataGridColumnPublicProps } from '../types'
 
 export type DataGridFullFiltersPublicProps = {
 	allowAggregateFilterControls?: boolean
 }
 
 export type DataGridFullFiltersProps =
-	& DataGridRenderingCommonProps
 	& DataGridFullFiltersPublicProps
 
 export function DataGridFullFilters({
-	desiredState,
-	stateMethods,
 	allowAggregateFilterControls,
 }: DataGridFullFiltersProps): ReactElement | null {
 	const formatMessage = useMessageFormatter(dataGridDictionary)
 	const environment = useEnvironment()
-	const { setFilter } = stateMethods
-	const remainingColumns = Array.from(desiredState.columns).filter(
-		([key, column]) => column.enableFiltering !== false && !(key in desiredState.filterArtifacts),
+	const { setFilter } = useDataViewFilteringMethods()
+	const columns = useDataGridColumns<DataGridColumnPublicProps>()
+	const filteringArtifact = useDataViewFilteringState().artifact
+
+	const remainingColumns = Array.from(columns).filter(
+		([key, column]) => column.enableFiltering !== false && !(key in filteringArtifact),
 	)
 
-	const hasAnyFilters = Object.keys(desiredState.filterArtifacts).length > 0
+	const hasAnyFilters = Object.keys(filteringArtifact).length > 0
 
 	const columnFilteringButtonProps: DropdownProps['buttonProps'] = useMemo(() => ({
 		intent: hasAnyFilters ? undefined : 'default',
@@ -90,8 +81,8 @@ export function DataGridFullFilters({
 								</TableRow>
 							}
 						>
-							{Array.from(Object.entries(desiredState.filterArtifacts), ([key, filterArtifact]) => {
-								const column = desiredState.columns.get(key)!
+							{Array.from(Object.entries(filteringArtifact), ([key, filterArtifact]) => {
+								const column = columns.get(key)!
 								const filterRenderer = column.enableFiltering !== false ? column.filterRenderer : undefined
 
 								if (!filterRenderer) {

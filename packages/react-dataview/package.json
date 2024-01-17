@@ -38,5 +38,22 @@
 		"type": "git",
 		"url": "https://github.com/contember/interface.git",
 		"directory": "packages/react-dataview"
+	},
+	"dependencies": {
+		"@contember/binding": "workspace:*",
+		"@contember/client": "workspace:*",
+		"@contember/react-binding": "workspace:*",
+		"@contember/react-client": "workspace:*",
+		"@contember/react-utils": "workspace:*",
+		"@contember/utilities": "workspace:*",
+		"@radix-ui/react-slot": "^1.0.2"
+	},
+	"peerDependencies": {
+		"react": "^17 || ^18",
+		"react-dom": "^17 || ^18"
+	},
+	"devDependencies": {
+		"react": "^18.2.0",
+		"react-dom": "^18.2.0"
 	}
 }

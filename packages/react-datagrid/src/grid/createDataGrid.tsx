@@ -1,10 +1,15 @@
-import { Component, Environment, QueryLanguage, SugaredQualifiedEntityList } from '@contember/react-binding'
+import { Component, Environment, Filter, QueryLanguage, SugaredQualifiedEntityList } from '@contember/react-binding'
 import { ComponentType, ReactNode } from 'react'
-import { DataGridRendererProps, DataGridState, DataGridStateMethods } from '../types'
-import { createControlledDataGrid } from './createControlledDataGrid'
+import { DataGridMethods, DataGridState } from '../types'
+import { ControlledDataGridProps, createControlledDataGrid } from './createControlledDataGrid'
 import { extractDataGridColumns } from '../internal/gridTemplateAnalyzer'
-import { DATA_GRID_DEFAULT_ITEMS_PER_PAGE } from '../internal/useDataGridState'
 import { useDataGrid } from './useDataGrid'
+import {
+	DataGridColumnsContext,
+	DataGridHidingMethodsContext,
+	DataGridHidingStateContext, DataGridLayoutMethodsContext,
+	DataGridLayoutStateContext,
+} from '../internal/contexts'
 
 export type DataGridProps<P extends {}> =
 	& {
@@ -15,41 +20,74 @@ export type DataGridProps<P extends {}> =
 	}
 	& P
 
-export const createDataGrid = <P extends {}>(Renderer: ComponentType<DataGridRendererProps<any> & P>): ComponentType<DataGridProps<Omit<P, keyof DataGridRendererProps<any>>>> => {
+export const createDataGrid = <P extends {}>(Renderer: ComponentType<P & ControlledDataGridProps>): ComponentType<DataGridProps<P>> => {
 	const ControlledDataGrid = createControlledDataGrid(Renderer)
 
-	return Component<DataGridProps<Omit<P, keyof DataGridRendererProps<any>>>>(props => {
-		return <ControlledDataGrid {...useDataGrid(props)} />
+	return Component<DataGridProps<P>>(props => {
+		const dataGridProps = useDataGrid(props)
+		return (
+			<DataGridColumnsContext.Provider value={dataGridProps.state.columns}>
+				<DataGridHidingStateContext.Provider value={dataGridProps.state.hiddenColumns}>
+					<DataGridHidingMethodsContext.Provider value={dataGridProps.methods.hiding}>
+						<DataGridLayoutStateContext.Provider value={dataGridProps.state.layout}>
+							<DataGridLayoutMethodsContext.Provider value={dataGridProps.methods.layout}>
+								<ControlledDataGrid {...dataGridProps} {...(props as unknown as P)} />
+							</DataGridLayoutMethodsContext.Provider>
+						</DataGridLayoutStateContext.Provider>
+					</DataGridHidingMethodsContext.Provider>
+				</DataGridHidingStateContext.Provider>
+			</DataGridColumnsContext.Provider>
+		)
 	}, (props, environment) => {
 		const fakeState = createInitialState(props, environment)
-		return <ControlledDataGrid state={fakeState} stateMethods={dummyStateMethods} {...props} />
+		return <ControlledDataGrid state={fakeState} info={dummyInfo} methods={dummyStateMethods} {...(props as unknown as P)} />
 	})
 }
 
-const dummyStateMethods: DataGridStateMethods = {
-	setFilter: () => null,
-	setIsColumnHidden: () => null,
-	setOrderBy: () => null,
-	updatePaging: () => null,
-	setLayout: () => null,
+const dummyInfo = { paging: { pagesCount: undefined, totalCount: undefined } }
+const dummyStateMethods: DataGridMethods = {
+	layout: {
+		setView: () => null,
+	},
+	hiding: {
+		setIsColumnHidden: () => null,
+	},
+	filtering: {
+		setFilter: () => null,
+	},
+	sorting: {
+		setOrderBy: () => null,
+	},
+	paging: {
+		goToPage: () => null,
+		setItemsPerPage: () => null,
+	},
 }
 
 const createInitialState = (props: DataGridProps<{}>, environment: Environment): DataGridState<any> => {
 	const columns = extractDataGridColumns(props.children, environment)
 	const entities = QueryLanguage.desugarQualifiedEntityList({ entities: props.entities }, environment)
-	const filter = { and: [entities.filter ?? {}] }
+	const filter: Filter = { and: [entities.filter ?? {}] }
 	return {
+		key: '_',
 		columns,
 		paging: {
-			itemsPerPage: props.itemsPerPage ?? DATA_GRID_DEFAULT_ITEMS_PER_PAGE,
+			itemsPerPage: props.itemsPerPage ?? 50,
 			pageIndex: 0,
 		},
+		filtering: {
+			filter: filter,
+			artifact: {},
+			filterTypes: {},
+		},
 		hiddenColumns: {},
-		filterArtifacts: {},
-		orderDirections: {},
-		orderBy: [],
+		sorting: {
+			orderBy: [],
+			directions: {},
+		},
 		entities: entities,
-		filter,
-		layout: 'default',
+		layout: {
+			view: 'default',
+		},
 	}
 }

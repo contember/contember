@@ -17,7 +17,8 @@ import {
 } from '@contember/react-choice-field'
 import { DataGridColumnCommonProps, FilterRendererProps } from '../types'
 import { DataGridColumn } from '../grid'
-import { SelectCellArtifacts, SelectCellFilterExtraProps } from './common'
+import { SelectCellArtifacts, createHasManyFilter } from '@contember/react-dataview'
+import { SelectCellFilterExtraProps } from './common'
 
 export type HasManySelectRendererProps =
 	& SugaredRelativeEntityList
@@ -40,31 +41,7 @@ export const createHasManySelectCell = <ColumnProps extends {}, ValueRendererPro
 		<DataGridColumn<SelectCellArtifacts>
 			{...props}
 			enableOrdering={false}
-			getNewFilter={(filter, { environment }) => {
-				if (filter.id.length === 0 && filter.nullCondition === false) {
-					return undefined
-				}
-				const desugared = QueryLanguage.desugarRelativeEntityList(props, environment)
-				const ors = []
-				if (filter.id.length > 0) {
-					ors.push(wrapFilterInHasOnes(desugared.hasOneRelationPath, {
-						[desugared.hasManyRelation.field]: {
-							id: { in: filter.id },
-						},
-					}))
-				}
-				if (filter.nullCondition === true) {
-					ors.push({
-						not: wrapFilterInHasOnes(desugared.hasOneRelationPath, {
-							[desugared.hasManyRelation.field]: {
-								id: { isNull: false },
-							},
-						}),
-					})
-				}
-
-				return { or: ors }
-			}}
+			getNewFilter={createHasManyFilter(props.field)}
 			emptyFilter={{
 				id: [],
 				nullCondition: false,

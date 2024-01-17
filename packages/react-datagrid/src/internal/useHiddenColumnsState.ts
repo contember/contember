@@ -1,13 +1,13 @@
 import { useCallback } from 'react'
 import { normalizeInitialHiddenColumnsState } from './normalizeInitialHiddenColumnsState'
 import { useSessionStorageState } from '@contember/react-utils'
-import { DataGridColumns, DataGridHiddenColumnsStateStore, DataGridSetIsColumnHidden } from '../types'
+import { DataGridColumns, DataGridHidingState, DataGridSetIsColumnHidden } from '../types'
 
 export const useHiddenColumnsState = (
 	columns: DataGridColumns<any>,
 	dataGridKey: string,
-): [DataGridHiddenColumnsStateStore, DataGridSetIsColumnHidden] => {
-	const [hiddenColumns, setHiddenColumns] = useSessionStorageState<DataGridHiddenColumnsStateStore>(
+): [DataGridHidingState, DataGridSetIsColumnHidden] => {
+	const [hiddenColumns, setHiddenColumns] = useSessionStorageState<DataGridHidingState>(
 		`${dataGridKey}-hidden`,
 		val => normalizeInitialHiddenColumnsState(val, columns),
 	)

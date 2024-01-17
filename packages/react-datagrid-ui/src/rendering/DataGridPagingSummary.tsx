@@ -1,11 +1,12 @@
 import { dataGridDictionary } from '../dict/dataGridDictionary'
-import { DataGridRenderingCommonProps } from '../types'
 import { useMessageFormatter } from '@contember/react-i18n'
+import { useDataViewPagingInfo, useDataViewPagingState } from '@contember/react-dataview'
 
-export type DataGridPagingSummaryProps =
-	& DataGridRenderingCommonProps
+export const DataGridPagingSummary = () => {
+	const pagingInfo = useDataViewPagingInfo()
+	const pagingState = useDataViewPagingState()
+	const pageIndex = pagingState.pageIndex
 
-export const DataGridPagingSummary = ({ pagingInfo, displayedState: { paging: { pageIndex } } }: DataGridPagingSummaryProps) => {
 	const formatMessage = useMessageFormatter(dataGridDictionary)
 
 	const pageCount = pagingInfo.pagesCount === undefined

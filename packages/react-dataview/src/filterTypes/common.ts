@@ -1,13 +1,11 @@
 import { EntityId } from '@contember/react-binding'
 import { Input } from '@contember/client'
-import { SelectOptions } from '@contember/react-choice-field'
 
 export type SelectCellArtifacts = {
 	id: EntityId[]
 	nullCondition: boolean
 }
 
-export type SelectCellFilterExtraProps = SelectOptions
 
 export type GenericTextCellFilterArtifacts = {
 	mode: 'matches' | 'matchesExactly' | 'startsWith' | 'endsWith' | 'doesNotMatch'

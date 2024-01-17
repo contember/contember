@@ -5,8 +5,9 @@ import { MultiSelectFieldInner } from '@contember/react-choice-field-ui'
 import { dataGridCellsDictionary } from '../dict/dataGridCellsDictionary'
 import { EntityAccessor } from '@contember/react-binding'
 
-import { FilterRendererProps, SelectCellArtifacts, SelectCellFilterExtraProps } from '@contember/react-datagrid'
+import { FilterRendererProps, SelectCellFilterExtraProps } from '@contember/react-datagrid'
 import { useMessageFormatter } from '@contember/react-i18n'
+import { SelectCellArtifacts } from '@contember/react-dataview'
 
 export type SelectCellFilterProps =
 	& FilterRendererProps<SelectCellArtifacts>

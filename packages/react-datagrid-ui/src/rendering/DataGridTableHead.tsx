@@ -1,12 +1,10 @@
 import { DataGridHeaderCell } from './DataGridHeaderCell'
-import { DataGridRenderingCommonProps } from '../types'
 import { TableRow } from '@contember/ui'
+import { useDataGridColumns, useDataGridHidingState } from '@contember/react-datagrid'
 
-export type DataGridTableHead =
-	& DataGridRenderingCommonProps
-
-export const DataGridTableHead = (props: DataGridTableHead) => {
-	const { desiredState: { columns, hiddenColumns } } = props
+export const DataGridTableHead = () => {
+	const columns = useDataGridColumns()
+	const hiddenColumns = useDataGridHidingState()
 	return (
 		<TableRow>
 			{Array.from(columns)
@@ -18,7 +16,6 @@ export const DataGridTableHead = (props: DataGridTableHead) => {
 							key={columnKey}
 							columnKey={columnKey}
 							column={column}
-							{...props}
 						/>
 					)
 				})}

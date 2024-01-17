@@ -3,9 +3,6 @@
 	"include": [],
 	"references": [
 		{
-			"path": "./scripts/template-package"
-		},
-		{
 			"path": "./packages/admin"
 		},
 		{
@@ -73,6 +70,9 @@
 		},
 		{
 			"path": "./packages/react-datagrid-ui"
+		},
+		{
+			"path": "./packages/react-dataview"
 		},
 		{
 			"path": "./packages/react-form-fields-ui"

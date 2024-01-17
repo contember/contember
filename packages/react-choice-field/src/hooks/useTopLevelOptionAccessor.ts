@@ -7,6 +7,6 @@ export const useTopLevelOptionAccessors = (desugaredOptionPath: DesugaredOptionP
 		() => ({ entities: desugaredOptionPath, ...desugaredOptionPath }),
 		[desugaredOptionPath],
 	)
-	const subTreeData = useEntityListSubTree(entityList, treeRootId)
+	const subTreeData = useEntityListSubTree(entityList, ...(treeRootId ? [treeRootId] : []))
 	return useMemo(() => Array.from(subTreeData), [subTreeData]) // Preserve ref equality if possible.
 }

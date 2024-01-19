@@ -1,7 +1,9 @@
 import * as ReactDOM from 'react-dom'
-import { DevErrorManager, ErrorBus } from '../components/Dev'
 import { Buffer } from 'buffer'
-import { ReactRenderer } from './render'
+import { DevErrorManager, ErrorBus } from './DevErrorManager'
+import { ReactElement } from 'react'
+
+export type ErrorReactRenderer = (domElement: Element, reactElement: ReactElement, onRecoverableError: (e: any) => void) => void
 
 const getErrorContainer = () => {
 	const errorElementId = '__contember__dev__error__container__element'
@@ -20,7 +22,7 @@ const getErrorContainer = () => {
 	return errorContainer
 }
 
-const devErrorHandler = (renderer: ReactRenderer): TryRun => {
+const devErrorHandler = (renderer: ErrorReactRenderer): TryRun => {
 	const errorBus = new ErrorBus()
 
 	;(window as any).Buffer = Buffer
@@ -55,7 +57,7 @@ const devErrorHandler = (renderer: ReactRenderer): TryRun => {
 }
 
 type TryRun = <T>(cb: (onRecoverableError: (e: any) => void) => T | Promise<T>) => void
-const prodErrorHandler = (renderer: ReactRenderer): TryRun => {
+const prodErrorHandler = (renderer: ErrorReactRenderer): TryRun => {
 	const renderError = () => {
 		renderer(getErrorContainer(), <h1>Fatal error</h1>, () => {})
 	}
@@ -76,7 +78,7 @@ const prodErrorHandler = (renderer: ReactRenderer): TryRun => {
 }
 
 
-export const createErrorHandler = (renderer: ReactRenderer) => {
+export const createErrorHandler = (renderer: ErrorReactRenderer) => {
 	if (import.meta.env.DEV) {
 		return devErrorHandler(renderer)
 	} else {

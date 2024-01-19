@@ -4,6 +4,7 @@
 		"outDir": "../dist/types"
 	},
 	"references": [
+		{ "path": "../../brand/src" },
 		{ "path": "../../client/src" },
 		{ "path": "../../react-auto/src" },
 		{ "path": "../../react-binding/src" },
@@ -12,6 +13,8 @@
 		{ "path": "../../react-client/src" },
 		{ "path": "../../react-choice-field-ui/src" },
 		{ "path": "../../react-datagrid-ui/src" },
+		{ "path": "../../react-dataview/src" },
+		{ "path": "../../react-devbar/src" },
 		{ "path": "../../react-form-fields-ui/src" },
 		{ "path": "../../react-i18n/src" },
 		{ "path": "../../react-leaflet-fields-ui/src" },

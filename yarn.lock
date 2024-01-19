@@ -1061,6 +1061,7 @@ __metadata:
     "@contember/react-choice-field-ui": "workspace:*"
     "@contember/react-client": "workspace:*"
     "@contember/react-datagrid-ui": "workspace:*"
+    "@contember/react-devbar": "workspace:*"
     "@contember/react-form-fields-ui": "workspace:*"
     "@contember/react-i18n": "workspace:*"
     "@contember/react-leaflet-fields-ui": "workspace:*"
@@ -1467,6 +1468,12 @@ __metadata:
 "@contember/react-dataview@workspace:*, @contember/react-dataview@workspace:packages/react-dataview":
   version: 0.0.0-use.local
   resolution: "@contember/react-dataview@workspace:packages/react-dataview"
+  languageName: unknown
+  linkType: soft
+
+"@contember/react-devbar@workspace:*, @contember/react-devbar@workspace:packages/react-devbar":
+  version: 0.0.0-use.local
+  resolution: "@contember/react-devbar@workspace:packages/react-devbar"
   languageName: unknown
   linkType: soft
 

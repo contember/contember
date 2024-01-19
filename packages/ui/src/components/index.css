@@ -39,8 +39,6 @@
 @import "./SpinnerContainer/index.css";
 @import "./ContentStatus/index.css";
 @import "./Breadcrumbs/index.css";
-@import "./DevBar/index.css";
-@import "./DevError/index.css";
 @import "./DimensionSwitcher/index.css";
 @import "./ErrorList/index.css";
 @import "./HoveringToolbar/index.css";

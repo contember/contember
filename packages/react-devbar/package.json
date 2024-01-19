@@ -1,11 +1,9 @@
 {
-	"name": "@contember/ui",
+	"name": "@contember/react-devbar",
 	"license": "Apache-2.0",
 	"version": "0.0.0",
 	"type": "module",
-	"sideEffects": [
-		"*.css"
-	],
+	"sideEffects": false,
 	"main": "./dist/production/index.js",
 	"exports": {
 		".": {
@@ -26,46 +24,39 @@
 			"development": "./src/index.css",
 			"production": "./dist/assets/index.css",
 			"default": "./dist/assets/index.css"
-		},
-		"./style.css": "./dist/assets/index.css"
+		}
 	},
-	"typings": "./dist/types/index.d.ts",
 	"files": [
 		"dist/",
 		"src/"
 	],
+	"typings": "./dist/types/index.d.ts",
 	"scripts": {
 		"build": "yarn build:js:dev && yarn build:js:prod && yarn build:css",
-		"build:js:dev": "NODE_ENV=development vite build --mode development",
+		"build:js:dev": "vite build --mode development",
 		"build:js:prod": "vite build --mode production",
 		"build:css": "vite build --config vite.config.css.js",
 		"ae:build": "api-extractor run --local",
-		"ae:test": "api-extractor run -v",
-		"storybook": "exit 1",
-		"build-storybook": "exit 1",
+		"ae:test": "api-extractor run",
 		"test": "vitest"
 	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/contember/interface.git",
+		"directory": "packages/react-devbar"
+	},
 	"dependencies": {
-		"@blueprintjs/icons": "3.33.0",
 		"@contember/react-utils": "workspace:*",
 		"@contember/utilities": "workspace:*",
-		"@popperjs/core": "2.11.8",
-		"lucide-react": "^0.302.0",
-		"react-aria": "^3.31.0",
-		"react-popper": "^2.3.0",
-		"react-select": "5.8.0",
-		"react-stately": "3.29.0"
+		"buffer": "6.0.3"
 	},
 	"peerDependencies": {
 		"react": "^17 || ^18",
 		"react-dom": "^17 || ^18"
 	},
 	"devDependencies": {
-		"@testing-library/react-hooks": "^8.0.1",
-		"@types/node": "^20.10.5",
 		"@types/react": "^18.2.45",
 		"@types/react-dom": "^18.2.18",
-		"csstype": "3.1.3",
 		"react": "^18.2.0",
 		"react-dom": "^18.2.0"
 	}

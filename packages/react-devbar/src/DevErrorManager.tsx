@@ -1,6 +1,6 @@
-import { DevErrorBadge, DevErrorList, ErrorType } from '@contember/ui'
+import { DevErrorBadge, DevErrorList, ErrorType } from './ui/DevError'
 import { useEffect, useState } from 'react'
-import { useProcessedError } from './useParsedStacktrace'
+import { useProcessedError } from './hooks/useParsedStacktrace'
 
 export class ErrorBus {
 	private queue: { error: ErrorType, source: string }[] = []
@@ -11,8 +11,14 @@ export class ErrorBus {
 
 		if (!this.listener) {
 			this.queue.push(boxedError)
+			this.queue.push(boxedError)
+			this.queue.push(boxedError)
+			this.queue.push(boxedError)
 
 		} else {
+			this.listener(boxedError)
+			this.listener(boxedError)
+			this.listener(boxedError)
 			this.listener(boxedError)
 		}
 	}

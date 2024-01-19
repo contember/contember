@@ -32,6 +32,7 @@ COPY ./packages/react-client/package.json ././packages/react-client/package.json
 COPY ./packages/react-datagrid/package.json ././packages/react-datagrid/package.json
 COPY ./packages/react-datagrid-ui/package.json ././packages/react-datagrid-ui/package.json
 COPY ./packages/react-dataview/package.json ././packages/react-dataview/package.json
+COPY ./packages/react-devbar/package.json ././packages/react-devbar/package.json
 COPY ./packages/react-form-fields-ui/package.json ././packages/react-form-fields-ui/package.json
 COPY ./packages/react-i18n/package.json ././packages/react-i18n/package.json
 COPY ./packages/react-leaflet-fields-ui/package.json ././packages/react-leaflet-fields-ui/package.json

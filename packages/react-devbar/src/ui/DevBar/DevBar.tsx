@@ -1,18 +1,20 @@
-import { Identity2023 } from '@contember/brand'
-import { createNonNullableContextFactory, useClassNameFactory, useId, useOnElementClickOutsideCallback, useOnElementMouseEnterDelayedCallback, useReferentiallyStableCallback, useWindowSize } from '@contember/react-utils'
+import {
+	useClassNameFactory,
+	useId,
+	useOnElementClickOutsideCallback,
+	useOnElementMouseEnterDelayedCallback,
+	useReferentiallyStableCallback,
+	useWindowSize,
+} from '@contember/react-utils'
 import { dataAttribute } from '@contember/utilities'
-import { ChevronLeftIcon, ExternalLinkIcon, XIcon } from 'lucide-react'
 import { PropsWithChildren, ReactNode, useEffect, useRef, useState } from 'react'
-import { FocusScope } from 'react-aria'
-import { Divider } from '../Divider'
-import { VisuallyHidden } from '../VisuallyHidden'
-
-const [SmallScreenContext, useSmallScreenContext] = createNonNullableContextFactory<boolean>('SmallScreenContext')
 
 export const DevBar = ({
 	breakpoint = 768,
 	children,
+	brand,
 }: PropsWithChildren<{
+	brand?: ReactNode;
 	breakpoint?: number;
 }>) => {
 	const className = useClassNameFactory('devBar')
@@ -80,46 +82,35 @@ export const DevBar = ({
 		>
 			<style>{`svg { pointer-events: none }`}</style>
 			<div ref={devBarContentRef} className={className('content')}>
-				<FocusScope contain={expanded} restoreFocus>
-					<div
-						data-expanded={dataAttribute(expanded)}
-						id={id}
-						role="dialog"
-						style={{ display: 'contents' }}
-					>
-						<a className={className('brand')} href="https://docs.contember.com/" target="_blank" rel="noreferrer">
-							{isSmallScreen ? (
-								<Identity2023.LogoIcon />
-							) : (
-								<>
-									<Identity2023.LogoType />
-									<ExternalLinkIcon />
-								</>
-							)}
-						</a>
+				<div
+					data-expanded={dataAttribute(expanded)}
+					id={id}
+					role="dialog"
+					style={{ display: 'contents' }}
+				>
+					<div className={className('brand')}>
+						{brand}
 
-						<Divider gap="gutter" />
-
-						<div className={className('panels')}>
-							<SmallScreenContext.Provider value={isSmallScreen}>{children}</SmallScreenContext.Provider>
-						</div>
-
-						<Divider gap="gutter" />
 					</div>
 
-					<button
-						ref={toggleButtonRef}
-						id="dev-bar-toggle-button"
-						aria-label="Toggle Contember Developer Toolbar"
-						aria-controls={id}
-						aria-expanded={expanded}
-						className={className('close')}
-						onClick={handleToggle}
-						tabIndex={0}
-					>
-						{expanded ? <XIcon /> : <ChevronLeftIcon />}
-					</button>
-				</FocusScope>
+					<div className={className('panels')}>
+						{children}
+					</div>
+
+				</div>
+
+				<button
+					ref={toggleButtonRef}
+					id="dev-bar-toggle-button"
+					aria-label="Toggle Contember Developer Toolbar"
+					aria-controls={id}
+					aria-expanded={expanded}
+					className={className('close')}
+					onClick={handleToggle}
+					tabIndex={0}
+				>
+					{expanded ? '🗙' : 'ᐸ'}
+				</button>
 			</div>
 		</section>
 	)
@@ -133,8 +124,6 @@ export const DevPanel = ({ heading, icon, children, preview }: {
 }) => {
 	const id = `cui-devBar-panel-${useId()}`
 	const className = useClassNameFactory('devBar')
-	const isSmallScreen = useSmallScreenContext()
-
 	const [expanded, setExpanded] = useState(false)
 	const mouseEnterTimeStampRef = useRef<ReturnType<typeof Date.now> | undefined>(undefined)
 
@@ -179,21 +168,19 @@ export const DevPanel = ({ heading, icon, children, preview }: {
 				})}
 			>
 				{icon}
-				<VisuallyHidden hidden={isSmallScreen}>{preview ?? heading}</VisuallyHidden>
+				<span className={className('trigger-label-text')}>{preview ?? heading}</span>
 			</button>
 			{expanded && (
-				<FocusScope autoFocus contain restoreFocus>
-					<div tabIndex={0} id={id} role="dialog" className={className('panel', 'dangerously-remove-native-focus-outline')}>
-						<div className={className('panel-content', 'native-focus-outline-handler')}>
-							<h2 className="h4">
-								{heading}
-							</h2>
-							<div className={className('panel-body')}>
-								{children}
-							</div>
+				<div tabIndex={0} id={id} role="dialog" className={className('panel', 'dangerously-remove-native-focus-outline')}>
+					<div className={className('panel-content', 'native-focus-outline-handler')}>
+						<h2 className="h4">
+							{heading}
+						</h2>
+						<div className={className('panel-body')}>
+							{children}
 						</div>
 					</div>
-				</FocusScope>
+				</div>
 			)}
 		</div>
 	)

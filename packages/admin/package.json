@@ -56,6 +56,7 @@
 		"test": "vitest --environment jsdom tests/vitest"
 	},
 	"dependencies": {
+		"@contember/brand": "workspace:*",
 		"@contember/client": "workspace:*",
 		"@contember/react-auto": "workspace:*",
 		"@contember/react-binding": "workspace:*",
@@ -64,6 +65,8 @@
 		"@contember/react-choice-field-ui": "workspace:*",
 		"@contember/react-client": "workspace:*",
 		"@contember/react-datagrid-ui": "workspace:*",
+		"@contember/react-dataview": "workspace:*",
+		"@contember/react-devbar": "workspace:*",
 		"@contember/react-form-fields-ui": "workspace:*",
 		"@contember/react-i18n": "workspace:*",
 		"@contember/react-leaflet-fields-ui": "workspace:*",
@@ -72,7 +75,6 @@
 		"@contember/ui": "workspace:*",
 		"@contember/utilities": "workspace:*",
 		"blueimp-md5": "2.19.0",
-		"buffer": "6.0.3",
 		"is-hotkey": "0.2.0",
 		"lucide-react": "^0.302.0",
 		"path-to-regexp": "6.2.1",

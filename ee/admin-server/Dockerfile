@@ -38,6 +38,7 @@ COPY ./packages/react-i18n/package.json ././packages/react-i18n/package.json
 COPY ./packages/react-leaflet-fields-ui/package.json ././packages/react-leaflet-fields-ui/package.json
 COPY ./packages/react-multipass-rendering/package.json ././packages/react-multipass-rendering/package.json
 COPY ./packages/react-richtext-renderer/package.json ././packages/react-richtext-renderer/package.json
+COPY ./packages/react-routing/package.json ././packages/react-routing/package.json
 COPY ./packages/react-slots/package.json ././packages/react-slots/package.json
 COPY ./packages/react-utils/package.json ././packages/react-utils/package.json
 COPY ./packages/ui/package.json ././packages/ui/package.json

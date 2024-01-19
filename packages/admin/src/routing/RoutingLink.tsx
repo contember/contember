@@ -1,21 +1,8 @@
-import { isSpecialLinkClick } from '@contember/ui'
-import {
-	AnchorHTMLAttributes,
-	ComponentType,
-	FunctionComponent,
-	memo,
-	MouseEvent as ReactMouseEvent,
-	ReactNode,
-	useCallback,
-} from 'react'
-import { RequestParameters, RoutingLinkTarget, RoutingParameterResolver } from './types'
-import { useRoutingLink } from './useRoutingLink'
+import { AnchorHTMLAttributes, ComponentType, FunctionComponent, memo, MouseEvent as ReactMouseEvent, ReactNode } from 'react'
+import { RoutingLink as RoutingLinkBase, RoutingLinkProps as RoutingLinkPropsBase } from '@contember/react-routing'
 
-
-const defaultComponent: FunctionComponent<InnerRoutingLinkProps> = ({ active, ...props }) => (
-	// TODO do something with isActive?
-	<a {...props} />
-)
+export type { RoutingLinkPropsBase }
+export { RoutingLinkBase }
 
 /**
  * Low level link. Usually, you should use {@link Link}
@@ -23,22 +10,12 @@ const defaultComponent: FunctionComponent<InnerRoutingLinkProps> = ({ active, ..
  * @group Routing
  */
 export const RoutingLink = memo<RoutingLinkProps & PublicAnchorProps>(({ onClick, to, parametersResolver, parameters, Component, componentProps, target, ...props }) => {
-	const { navigate, isActive: active, href } = useRoutingLink(to, parametersResolver, parameters)
-
-	const innerOnClick = useCallback((e?: ReactMouseEvent<HTMLAnchorElement, MouseEvent>) => {
-		if (e) {
-			if (onClick) {
-				onClick(e)
-			}
-			if (e.isDefaultPrevented() || isSpecialLinkClick(e.nativeEvent) || target) {
-				return
-			}
-		}
-		navigate(e)
-	}, [navigate, onClick, target])
-
-	const InnerComponent = Component ?? defaultComponent
-	return <InnerComponent active={active} href={href} target={target} {...componentProps} {...props} onClick={innerOnClick} />
+	const InnerComponent = Component ?? 'a'
+	return (
+		<RoutingLinkBase parameters={parameters} parametersResolver={parametersResolver} to={to}>
+			<InnerComponent target={target} {...componentProps} {...props} />
+		</RoutingLinkBase>
+	)
 })
 RoutingLink.displayName = 'RoutingLink'
 
@@ -46,17 +23,15 @@ export type PublicAnchorProps = Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'h
 
 
 export interface InnerRoutingLinkProps extends Omit<PublicAnchorProps, 'onClick'> {
-	href: string
-	active: boolean
-	onClick: (e?: ReactMouseEvent<HTMLAnchorElement>) => void
+	href?: string
+	onClick?: (e?: ReactMouseEvent<HTMLAnchorElement>) => void
 }
 
 
-export interface RoutingLinkProps<T = {}> {
-	Component?: ComponentType<InnerRoutingLinkProps & T>
-	componentProps?: T
-	children?: ReactNode
-	to: RoutingLinkTarget
-	parametersResolver?: RoutingParameterResolver
-	parameters?: RequestParameters
-}
+export type RoutingLinkProps<T = {}> =
+	& Omit<RoutingLinkPropsBase, 'children'>
+	& {
+		children?: ReactNode
+		Component?: ComponentType<InnerRoutingLinkProps & T>
+		componentProps?: T
+	}

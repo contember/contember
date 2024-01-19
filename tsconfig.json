@@ -93,6 +93,9 @@
 			"path": "./packages/react-richtext-renderer"
 		},
 		{
+			"path": "./packages/react-routing"
+		},
+		{
 			"path": "./packages/react-slots"
 		},
 		{

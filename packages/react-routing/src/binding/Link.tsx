@@ -1,5 +1,5 @@
 import { Component, Field, useEnvironment } from '@contember/react-binding'
-import { AnchorHTMLAttributes, useMemo } from 'react'
+import { useMemo } from 'react'
 import { RoutingLink, RoutingLinkProps } from '../RoutingLink'
 import { RoutingParameter } from '../RoutingParameter'
 import { DynamicRequestParameters } from '../types'
@@ -7,8 +7,7 @@ import { targetToRequest } from '../useRoutingLink'
 import { LinkTarget, parseLinkTarget } from './LinkLanguage'
 import { ROUTING_BINDING_PARAMETER_PREFIX, useBindingLinkParametersResolver } from './useBindingLinkParametersResolver'
 
-export interface LinkProps extends Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'>, Omit<RoutingLinkProps, 'parametersResolver'> {
-}
+export type LinkProps = Omit<RoutingLinkProps, 'parametersResolver'>
 
 /**
  * @group Routing

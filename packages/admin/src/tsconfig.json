@@ -19,6 +19,7 @@
 		{ "path": "../../react-i18n/src" },
 		{ "path": "../../react-leaflet-fields-ui/src" },
 		{ "path": "../../react-multipass-rendering/src" },
+		{ "path": "../../react-routing/src" },
 		{ "path": "../../react-utils/src" },
 		{ "path": "../../utilities/src" },
 		{ "path": "../../ui/src" }

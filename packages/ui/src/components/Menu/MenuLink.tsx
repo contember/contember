@@ -2,7 +2,7 @@ import { useClassNameFactory } from '@contember/react-utils'
 import { ComponentClassNameProps, dataAttribute } from '@contember/utilities'
 import { MouseEventHandler, ReactNode, SyntheticEvent, useCallback } from 'react'
 import { HTMLAnchorElementProps } from '../../types'
-import { isSpecialLinkClick } from '../../utils'
+import { isSpecialLinkClick } from '@contember/utilities'
 import { Label } from '../Typography'
 
 export type MenuLinkProps =

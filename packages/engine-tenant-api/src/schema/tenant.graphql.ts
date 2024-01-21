@@ -12,6 +12,7 @@ const schema: DocumentNode = gql`
 
 	type Query {
 		me: Identity!
+		personById(id: String!): Person
 		projects: [Project!]!
 		projectBySlug(slug: String!): Project
 		projectMemberships(projectSlug: String!, identityId: String!): [Membership!]!

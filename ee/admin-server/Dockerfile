@@ -39,6 +39,8 @@ COPY ./packages/react-form-fields-ui/package.json ././packages/react-form-fields
 COPY ./packages/react-i18n/package.json ././packages/react-i18n/package.json
 COPY ./packages/react-leaflet-fields-ui/package.json ././packages/react-leaflet-fields-ui/package.json
 COPY ./packages/react-multipass-rendering/package.json ././packages/react-multipass-rendering/package.json
+COPY ./packages/react-repeater/package.json ././packages/react-repeater/package.json
+COPY ./packages/react-repeater-dnd-kit/package.json ././packages/react-repeater-dnd-kit/package.json
 COPY ./packages/react-richtext-renderer/package.json ././packages/react-richtext-renderer/package.json
 COPY ./packages/react-routing/package.json ././packages/react-routing/package.json
 COPY ./packages/react-slots/package.json ././packages/react-slots/package.json

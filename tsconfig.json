@@ -96,6 +96,12 @@
 			"path": "./packages/react-multipass-rendering"
 		},
 		{
+			"path": "./packages/react-repeater"
+		},
+		{
+			"path": "./packages/react-repeater-dnd-kit"
+		},
+		{
 			"path": "./packages/react-richtext-renderer"
 		},
 		{

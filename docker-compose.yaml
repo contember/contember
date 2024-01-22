@@ -12,6 +12,18 @@ services:
     volumes:
       - .:/src:cached
 
+  playground-vite:
+    image: node:20-alpine
+    command: 'npm run start'
+
+    environment:
+      NODE_ENV: 'development'
+      VITE_CONTEMBER_ADMIN_API_BASE_URL: 'http://localhost:3001'
+      VITE_CONTEMBER_ADMIN_SESSION_TOKEN: '0000000000000000000000000000000000000000'
+
+    working_dir: /src/packages/playground
+    volumes:
+      - .:/src:cached
 
   admin-server:
     image: node:20-alpine

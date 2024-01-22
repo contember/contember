@@ -14,6 +14,7 @@ const allowedUnused = new Set([
 
 const allowedDirectoryImports = new Set([
 	'fast-deep-equal/es6/index.js',
+	'react-dom/client',
 ])
 
 const processPackage = async (dir: string, projectList: ProjectList) => {
@@ -117,7 +118,7 @@ interface Project {
 }
 (async () => {
 	const dirs = (await glob(process.cwd() + '/{ee,packages}/*', { onlyDirectories: true }))
-		.filter(dir => !dir.endsWith('packages/admin-sandbox'))
+		.filter(dir => !dir.endsWith('packages/admin-sandbox') && !dir.endsWith('packages/playground'))
 		.filter(it => existsSync(`${it}/package.json`))
 
 	const projects = await Promise.all(dirs.map(async (dir): Promise<Project> => {

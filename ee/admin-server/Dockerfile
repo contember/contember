@@ -18,8 +18,10 @@ COPY ./packages/client-content/package.json ././packages/client-content/package.
 COPY ./packages/client-content-generator/package.json ././packages/client-content-generator/package.json
 COPY ./packages/graphql-builder/package.json ././packages/graphql-builder/package.json
 COPY ./packages/graphql-client/package.json ././packages/graphql-client/package.json
+COPY ./packages/interface/package.json ././packages/interface/package.json
 COPY ./packages/interface-tester/package.json ././packages/interface-tester/package.json
 COPY ./packages/layout/package.json ././packages/layout/package.json
+COPY ./packages/playground/package.json ././packages/playground/package.json
 COPY ./packages/react-auto/package.json ././packages/react-auto/package.json
 COPY ./packages/react-binding/package.json ././packages/react-binding/package.json
 COPY ./packages/react-binding-ui/package.json ././packages/react-binding-ui/package.json

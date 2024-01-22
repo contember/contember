@@ -1,4 +1,3 @@
-export * from './Page'
 export * from './Pages'
 export * from './Scopes'
 export * from './pageComponents'

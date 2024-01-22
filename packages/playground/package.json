@@ -1,22 +1,21 @@
 {
-	"name": "@contember/admin-sandbox",
+	"name": "@contember/playground",
 	"version": "0.0.0",
 	"type": "module",
 	"private": true,
 	"scripts": {
-		"build": "vite build --config vite.config.ts --base /admin-sandbox/",
+		"build": "vite build --config vite.config.ts --base /playground/",
 		"contember": "docker-compose run contember-cli",
-		"deploy": "yarn -- contember deploy admin-sandbox --admin http://admin-server:4000 --yes",
-		"start": "vite --config vite.config.ts --port ${VITE_PORT:-3010} --host 0.0.0.0",
+		"deploy": "yarn -- contember deploy playground --admin http://admin-server:4000 --yes",
+		"start": "vite --config vite.config.ts --port ${VITE_PORT:-3000} --host 0.0.0.0",
 		"test": "vitest --root ./ --environment jsdom"
 	},
 	"devDependencies": {
-		"@contember/admin": "workspace:*",
 		"@contember/brand": "workspace:*",
+		"@contember/interface": "workspace:*",
 		"@contember/interface-tester": "workspace:*",
-		"@contember/layout": "workspace:*",
 		"@contember/react-dataview": "workspace:*",
-		"@contember/ui": "workspace:*",
+		"@contember/react-slots": "workspace:*",
 		"graphql": "^16.8.1"
 	},
 	"dependencies": {
@@ -33,7 +32,6 @@
 		"lucide-react": "^0.302.0",
 		"postcss": "^8",
 		"react": "^18.2.0",
-		"react-content-loader": "^6.2.1",
 		"react-dom": "^18.2.0",
 		"react-twc": "^1.3.0",
 		"tailwind-merge": "^2.2.0",

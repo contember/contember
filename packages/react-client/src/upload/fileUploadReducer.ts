@@ -139,10 +139,11 @@ export const fileUploadReducer = <Result = unknown, Metadata = undefined>(
 				if (progress === undefined || previousFileState === undefined || previousFileState.readyState !== 'uploading') {
 					continue
 				}
-				const roundedProgress = Math.floor(progress) // throttling
-				if (roundedProgress === previousFileState.progress) {
+
+				if (previousFileState.progress && Math.abs(progress - previousFileState.progress) < 0.01) {
 					continue
 				}
+
 				(newState ??= new Map(previousState.state)).set(fileId, {
 					readyState: 'uploading',
 					file: previousFileState.file,
@@ -150,7 +151,7 @@ export const fileUploadReducer = <Result = unknown, Metadata = undefined>(
 					abortController: previousFileState.abortController,
 					previewUrl: previousFileState.previewUrl,
 					metadata: previousFileState.metadata,
-					progress: roundedProgress,
+					progress: progress,
 				})
 			}
 			break

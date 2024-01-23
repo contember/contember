@@ -219,7 +219,6 @@ export const createBoardDndKitRenderer = <ColumnExtraProps extends {}, ItemExtra
 			}
 
 			if (activeItem.type === 'column' && activeItem.column.value instanceof EntityAccessor) {
-				console.log(overItem)
 				moveColumn?.(activeItem.column.value, overItem?.column.index ?? columns.length)
 				return
 			}

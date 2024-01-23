@@ -9,5 +9,6 @@
 		{ "path": "../../brand/src" },
 		{ "path": "../../layout/src" },
 		{ "path": "../../react-board-ui/src" },
+		{ "path": "../../react-repeater-dnd-kit/src" },
 	]
 }

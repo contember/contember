@@ -498,6 +498,9 @@ export type TextFilterArtifacts = {
     nullCondition: boolean;
 };
 
+// @public (undocumented)
+export const useDataGrid: <P extends {}>(props: DataGridProps<P>) => ControlledDataGridProps<P>;
+
 // (No @packageDocumentation comment for this package)
 
 ```

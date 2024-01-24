@@ -1,4 +1,4 @@
-import { createOptionalContextFactory } from '../context'
+import { createContext } from '../context'
 
 export const DEFAULT_COLOR_SCHEME = 'system'
 
@@ -12,7 +12,7 @@ export const DEFAULT_COLOR_SCHEME = 'system'
  * @see https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme
  *
  */
-export const [ColorSchemeContext, useColorScheme] = createOptionalContextFactory<string>(
+export const [ColorSchemeContext, useColorScheme] = createContext<string>(
 	'Interface.ColorScheme',
 	DEFAULT_COLOR_SCHEME,
 )

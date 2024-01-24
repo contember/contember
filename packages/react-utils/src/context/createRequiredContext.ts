@@ -1,14 +1,16 @@
 import type { Context } from 'react'
 import { createContext, useContext } from 'react'
 
-export function createNonNullableContextFactory<T>(displayName: string, initialValue?: T): [Context<T>, () => NonNullable<T>] {
-  const RequiredContext = createContext<T>((initialValue ?? null)!)
+const EmptyContextSymbol = Symbol('EmptyContextSymbol')
+
+export function createRequiredContext<T>(displayName: string): [Context<T>, () => T] {
+  const RequiredContext = createContext<T>(EmptyContextSymbol as T)
   RequiredContext.displayName = displayName
 
-  const useRequiredContext = () => {
+  const useRequiredContext = (): T => {
     const context = useContext(RequiredContext)
 
-    if (context == null) {
+    if (context === EmptyContextSymbol) {
       throw new Error(`use${displayName} must be used within a ${displayName} provider`)
     }
 

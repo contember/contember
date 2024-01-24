@@ -1,11 +1,11 @@
-import { createNonNullableContextFactory } from '@contember/react-utils'
+import { createRequiredContext } from '@contember/react-utils'
 import type { PanelConfig, PanelState } from './Types'
 
 export type PanelWidthContextType = {
 	height: number,
 	width: number,
 }
-export const [PanelWidthContext, usePanelWidthContext] = createNonNullableContextFactory<PanelWidthContextType>('PanelWidthContext')
+export const [PanelWidthContext, usePanelWidthContext] = createRequiredContext<PanelWidthContextType>('PanelWidthContext')
 PanelWidthContext.displayName = 'PanelWidthContext'
 
 export type LayoutPanelCallback = (name: string) => void
@@ -24,7 +24,7 @@ export type SetLayoutPanelsStateContextType = {
 	activate: LayoutPanelCallback;
 	deactivate: LayoutPanelCallback;
 }
-export const [SetLayoutPanelsStateContext, useSetLayoutPanelsStateContext] = createNonNullableContextFactory<SetLayoutPanelsStateContextType>('SetLayoutPanelsStateContext')
+export const [SetLayoutPanelsStateContext, useSetLayoutPanelsStateContext] = createRequiredContext<SetLayoutPanelsStateContextType>('SetLayoutPanelsStateContext')
 SetLayoutPanelsStateContext.displayName = 'SetLayoutPanelsStateContext'
 
 export type GetLayoutPanelsStateContextType = {
@@ -32,8 +32,8 @@ export type GetLayoutPanelsStateContextType = {
 	panels: Map<string, PanelConfig>;
 	currentlyActivePanel: string | undefined;
 }
-export const [GetLayoutPanelsStateContext, useGetLayoutPanelsStateContext] = createNonNullableContextFactory<GetLayoutPanelsStateContextType>('GetLayoutPanelsStateContext')
+export const [GetLayoutPanelsStateContext, useGetLayoutPanelsStateContext] = createRequiredContext<GetLayoutPanelsStateContextType>('GetLayoutPanelsStateContext')
 GetLayoutPanelsStateContext.displayName = 'GetLayoutPanelsStateContext'
 
-export const [LayoutPanelContext, useLayoutPanelContext] = createNonNullableContextFactory<PanelState>('LayoutPanelContext')
+export const [LayoutPanelContext, useLayoutPanelContext] = createRequiredContext<PanelState>('LayoutPanelContext')
 LayoutPanelContext.displayName = 'LayoutPanelContext'

@@ -37,6 +37,7 @@ COPY ./packages/react-dataview/package.json ././packages/react-dataview/package.
 COPY ./packages/react-devbar/package.json ././packages/react-devbar/package.json
 COPY ./packages/react-form-fields-ui/package.json ././packages/react-form-fields-ui/package.json
 COPY ./packages/react-i18n/package.json ././packages/react-i18n/package.json
+COPY ./packages/react-identity/package.json ././packages/react-identity/package.json
 COPY ./packages/react-leaflet-fields-ui/package.json ././packages/react-leaflet-fields-ui/package.json
 COPY ./packages/react-multipass-rendering/package.json ././packages/react-multipass-rendering/package.json
 COPY ./packages/react-repeater/package.json ././packages/react-repeater/package.json

@@ -1,9 +1,9 @@
 import { Button, FieldContainer, TextInput, useShowToast } from '@contember/ui'
 import { FC, useCallback, useContext } from 'react'
-import { IdentityRefreshContext } from '../../../components'
 import { RoutingLinkTarget, useRedirect } from '../../../routing'
 import { useForm } from '../../lib'
 import { useConfirmOtp } from '../../mutations'
+import { useIdentityMethods } from '@contember/react-identity'
 
 export interface ConfirmOtpFormProps {
 	redirectOnSuccess?: RoutingLinkTarget
@@ -18,7 +18,7 @@ export const ConfirmOtpForm: FC<ConfirmOtpFormProps> = ({ redirectOnSuccess, onS
 	const redirect = useRedirect()
 	const addToast = useShowToast()
 	const confirmOtp = useConfirmOtp()
-	const refreshIdentity = useContext(IdentityRefreshContext)
+	const { refreshIdentity } = useIdentityMethods()
 
 	const { isSubmitting, onSubmit, register } = useForm<typeof initialValues>(initialValues, useCallback(
 		async (values: typeof initialValues) => {

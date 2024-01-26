@@ -1203,6 +1203,15 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@contember/graphql-client-tenant@npm:^1.3.6":
+  version: 1.3.6
+  resolution: "@contember/graphql-client-tenant@npm:1.3.6"
+  dependencies:
+    graphql-ts-client-api: ^3.1.14
+  checksum: 991fb5a3d2ed280a864b9fb4b57d615fed3d1d68a8bf771836c8611cc1e78be6ee5463084254e750ebfb62a6047dcefca6f3866b61a26e8b7d97a716a32149d3
+  languageName: node
+  linkType: hard
+
 "@contember/graphql-client@workspace:*, @contember/graphql-client@workspace:packages/graphql-client":
   version: 0.0.0-use.local
   resolution: "@contember/graphql-client@workspace:packages/graphql-client"
@@ -1560,6 +1569,24 @@ __metadata:
     "@contember/react-utils": "workspace:*"
     "@formatjs/icu-messageformat-parser": 2.7.3
     intl-messageformat: 10.5.8
+    react: ^18.2.0
+    react-dom: ^18.2.0
+  peerDependencies:
+    react: ^17 || ^18
+    react-dom: ^17 || ^18
+  languageName: unknown
+  linkType: soft
+
+"@contember/react-identity@workspace:packages/react-identity":
+  version: 0.0.0-use.local
+  resolution: "@contember/react-identity@workspace:packages/react-identity"
+  dependencies:
+    "@contember/graphql-client-tenant": ^1.3.6
+    "@contember/react-binding": "workspace:*"
+    "@contember/react-client": "workspace:*"
+    "@contember/react-utils": "workspace:*"
+    "@radix-ui/react-slot": ^1.0.2
+    graphql-ts-client-api: ^3.1.17
     react: ^18.2.0
     react-dom: ^18.2.0
   peerDependencies:
@@ -7866,6 +7893,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"graphql-ts-client-api@npm:^3.1.14, graphql-ts-client-api@npm:^3.1.17":
+  version: 3.1.17
+  resolution: "graphql-ts-client-api@npm:3.1.17"
+  dependencies:
+    ts-md5: ^1.2.9
+  checksum: 3898cfd6c06265d19bdf0428f7ff1ebe769743485e3b4292250cb96b665229b000f314845a96d8fa6ae4b7a6edfd778ae5baf0e0146ab22bd1d0db2f90a6a0a3
+  languageName: node
+  linkType: hard
+
 "graphql@npm:^16.8.1":
   version: 16.8.1
   resolution: "graphql@npm:16.8.1"
@@ -11382,6 +11418,13 @@ __metadata:
   version: 0.1.13
   resolution: "ts-interface-checker@npm:0.1.13"
   checksum: 20c29189c2dd6067a8775e07823ddf8d59a33e2ffc47a1bd59a5cb28bb0121a2969a816d5e77eda2ed85b18171aa5d1c4005a6b88ae8499ec7cc49f78571cb5e
+  languageName: node
+  linkType: hard
+
+"ts-md5@npm:^1.2.9":
+  version: 1.3.1
+  resolution: "ts-md5@npm:1.3.1"
+  checksum: 88fc4df837e17949fef92a8e71a0691b20e2f8b02a002876a162a102e7c9d364f1eb00cbd217f9578fec5fa07bb66ffa14ed054cdfe164486fab2173c8e9ea23
   languageName: node
   linkType: hard
 

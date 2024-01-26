@@ -1,12 +1,11 @@
-import { useCallback, useContext } from 'react'
-import { IdentityContext } from './IdentityProvider'
-import { useSignOut } from '../../tenant'
+import { useCallback } from 'react'
 import { useSetSessionToken } from '@contember/react-client'
+import { useIdentityMethods } from '../internal/contexts'
+import { useSignOut } from '../internal/hooks/useSignOut'
 
 export const useLogout = () => {
-	const ctx = useContext(IdentityContext)
-	const [tenantLogout] = useSignOut()
-	const clearIdentity = ctx?.clearIdentity
+	const { clearIdentity } = useIdentityMethods()
+	const tenantLogout = useSignOut()
 	const setSessionToken = useSetSessionToken()
 
 	return useCallback(
@@ -22,9 +21,9 @@ export const useLogout = () => {
 			clearIdentity?.()
 			setSessionToken(undefined)
 			try {
-				const response = await tenantLogout({})
-				if (!response.signOut.ok) {
-					console.warn(response.signOut.error)
+				const response = await tenantLogout()
+				if (!response?.ok) {
+					console.warn(response?.error)
 				}
 			} catch (e) {
 				console.warn(e)

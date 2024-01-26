@@ -69,6 +69,7 @@
 		"@contember/react-devbar": "workspace:*",
 		"@contember/react-form-fields-ui": "workspace:*",
 		"@contember/react-i18n": "workspace:*",
+		"@contember/react-identity": "workspace:*",
 		"@contember/react-leaflet-fields-ui": "workspace:*",
 		"@contember/react-multipass-rendering": "workspace:*",
 		"@contember/react-routing": "workspace:*",

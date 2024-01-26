@@ -1,8 +1,7 @@
 import { Component } from '@contember/react-binding'
 import { ReactNode } from 'react'
-import { identityEnvironmentExtension } from './IdentityEnvironmentExtension'
-import { useProjectUserRoles } from '../../acl'
-import { projectEnvironmentExtension } from '../Project'
+import { useProjectUserRoles } from '../hooks'
+import { identityEnvironmentExtension, projectEnvironmentExtension } from '../environment'
 
 export type RoleCondition = string | ((roles: Set<string>) => boolean)
 

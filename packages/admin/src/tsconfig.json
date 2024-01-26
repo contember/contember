@@ -16,6 +16,7 @@
 		{ "path": "../../react-dataview/src" },
 		{ "path": "../../react-devbar/src" },
 		{ "path": "../../react-form-fields-ui/src" },
+		{ "path": "../../react-identity/src" },
 		{ "path": "../../react-i18n/src" },
 		{ "path": "../../react-leaflet-fields-ui/src" },
 		{ "path": "../../react-multipass-rendering/src" },

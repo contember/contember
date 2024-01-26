@@ -8,8 +8,8 @@ import { OutdatedApplicationChecker } from './Application/OutdatedApplicationChe
 import { ApplicationDevBar } from './Dev/DevBar'
 import { IdentityProvider } from './Identity'
 import { NavigationProvider } from './NavigationProvider'
-import { projectEnvironmentExtension } from './Project'
 import { DataViewPageNameKeyProvider } from './DataViewPageNameKeyProvider'
+import { projectEnvironmentExtension } from '@contember/react-identity'
 
 export interface ApplicationEntrypointProps extends ContemberClientProps, Omit<ProvidersProps, 'children'> {
 	basePath?: string

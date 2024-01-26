@@ -20,7 +20,7 @@ import {
 } from './mutation'
 
 import { Resolvers } from '../schema'
-import { MeQueryResolver, ProjectMembersQueryResolver, ProjectQueryResolver } from './query'
+import { MeQueryResolver, PersonQueryResolver, ProjectMembersQueryResolver, ProjectQueryResolver } from './query'
 import { IdentityTypeResolver, ProjectTypeResolver } from './types'
 import { DateTimeType, JSONType } from '@contember/graphql-utils'
 import { IDPQueryResolver } from './query/IDPQueryResolver'
@@ -32,6 +32,7 @@ class ResolverFactory {
 	public constructor(
 		private readonly resolvers: {
 			meQueryResolver: MeQueryResolver
+			personQueryResolver: PersonQueryResolver
 			projectQueryResolver: ProjectQueryResolver
 			projectMembersQueryResolver: ProjectMembersQueryResolver
 			idpQueryResolver: IDPQueryResolver
@@ -90,6 +91,7 @@ class ResolverFactory {
 			},
 			Query: {
 				me: this.resolvers.meQueryResolver.me.bind(this.resolvers.meQueryResolver),
+				personById: this.resolvers.personQueryResolver.personById.bind(this.resolvers.personQueryResolver),
 				projectBySlug: this.resolvers.projectQueryResolver.projectBySlug.bind(this.resolvers.projectQueryResolver),
 				projects: this.resolvers.projectQueryResolver.projects.bind(this.resolvers.projectQueryResolver),
 				projectMemberships: this.resolvers.projectMembersQueryResolver.projectMemberships.bind(this.resolvers.projectMembersQueryResolver),

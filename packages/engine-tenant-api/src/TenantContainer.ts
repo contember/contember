@@ -55,6 +55,7 @@ import {
 	MailTemplateMutationResolver,
 	MeQueryResolver,
 	OtpMutationResolver,
+	PersonQueryResolver,
 	ProjectMembersQueryResolver,
 	ProjectQueryResolver,
 	ProjectTypeResolver,
@@ -208,6 +209,8 @@ export class TenantContainerFactory {
 				new SignInResponseFactory(permissionContextFactory, identityTypeResolver))
 			.addService('meQueryResolver', () =>
 				new MeQueryResolver())
+			.addService('personQueryResolver', ({ personManager }) =>
+				new PersonQueryResolver(personManager))
 			.addService('idpQueryResolver', ({ idpManager }) =>
 				new IDPQueryResolver(idpManager))
 			.addService('projectQueryResolver', ({ projectManager }) =>

@@ -19,6 +19,7 @@ namespace PermissionActions {
 
 	export const PERSON_DISABLE = (roles?: readonly string[]) => Authorizator.createAction(Resources.person, 'disable', { roles })
 
+	export const PERSON_VIEW = Authorizator.createAction(Resources.person, 'view')
 	export const PERSON_SIGN_IN = Authorizator.createAction(Resources.person, 'signIn')
 	export const PERSON_SIGN_UP = (roles?: readonly string[]) => Authorizator.createAction(Resources.person, 'signUp', { roles })
 	export const PERSON_SIGN_OUT = Authorizator.createAction(Resources.person, 'signOut')

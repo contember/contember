@@ -905,6 +905,7 @@ export type Query = {
 	readonly checkResetPasswordToken: CheckResetPasswordTokenCode
 	readonly identityProviders: ReadonlyArray<IdentityProvider>
 	readonly me: Identity
+	readonly personById?: Maybe<Person>
 	readonly projectBySlug?: Maybe<Project>
 	readonly projectMemberships: ReadonlyArray<Membership>
 	readonly projects: ReadonlyArray<Project>
@@ -914,6 +915,11 @@ export type Query = {
 export type QueryCheckResetPasswordTokenArgs = {
 	requestId: Scalars['String']['input']
 	token: Scalars['String']['input']
+}
+
+
+export type QueryPersonByIdArgs = {
+	id: Scalars['String']['input']
 }
 
 
@@ -2032,6 +2038,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
 	checkResetPasswordToken?: Resolver<ResolversTypes['CheckResetPasswordTokenCode'], ParentType, ContextType, RequireFields<QueryCheckResetPasswordTokenArgs, 'requestId' | 'token'>>
 	identityProviders?: Resolver<ReadonlyArray<ResolversTypes['IdentityProvider']>, ParentType, ContextType>
 	me?: Resolver<ResolversTypes['Identity'], ParentType, ContextType>
+	personById?: Resolver<Maybe<ResolversTypes['Person']>, ParentType, ContextType, RequireFields<QueryPersonByIdArgs, 'id'>>
 	projectBySlug?: Resolver<Maybe<ResolversTypes['Project']>, ParentType, ContextType, RequireFields<QueryProjectBySlugArgs, 'slug'>>
 	projectMemberships?: Resolver<ReadonlyArray<ResolversTypes['Membership']>, ParentType, ContextType, RequireFields<QueryProjectMembershipsArgs, 'identityId' | 'projectSlug'>>
 	projects?: Resolver<ReadonlyArray<ResolversTypes['Project']>, ParentType, ContextType>

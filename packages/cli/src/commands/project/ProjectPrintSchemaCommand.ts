@@ -13,6 +13,7 @@ import { DocumentNode, GraphQLSchema, printSchema } from 'graphql'
 import { mergeSchemas } from '@graphql-tools/schema'
 import { loadSchema } from '../../utils/project/loadSchema'
 import { normalizeSchema } from '@contember/schema-utils'
+import { MigrationsContainerFactory } from '../../utils/migrations/MigrationsContainer'
 
 type Args = {
 	project?: string
@@ -22,6 +23,7 @@ type Options = {
 	role?: string[]
 	normalize?: boolean
 	format?: 'graphql' | 'introspection' | 'schema'
+	source?: 'migrations' | 'definition'
 }
 
 export class ProjectPrintSchemaCommand extends Command<Args, Options> {
@@ -37,6 +39,7 @@ export class ProjectPrintSchemaCommand extends Command<Args, Options> {
 			configuration.argument('project')
 		}
 		configuration.option('format').valueRequired().description('graphql|introspection|schema')
+		configuration.option('source').valueRequired().description('migrations|definition')
 		configuration.option('role').valueArray()
 		configuration.option('normalize').valueNone()
 	}
@@ -47,7 +50,12 @@ export class ProjectPrintSchemaCommand extends Command<Args, Options> {
 		const format = input.getOption('format') || 'graphql'
 
 		const project = await workspace.projects.getProject(projectName, { fuzzy: true })
-		const schema = await loadSchema(project)
+		const migrationsDir = await project.migrationsDir
+		const container = new MigrationsContainerFactory(migrationsDir).create()
+		const schema = input.getOption('source') === 'migrations'
+			? await container.schemaVersionBuilder.buildSchema()
+			: await loadSchema(project)
+
 		if (!validateSchemaAndPrintErrors(schema, 'Defined schema is invalid:')) {
 			return 1
 		}

@@ -1,8 +1,8 @@
 import { useCallback, useMemo, useState } from 'react'
 import { Identity, IdentityMethods, IdentityStateValue } from '../types'
 import { useSessionToken } from '@contember/react-client'
-import { useLogout } from './useLogout'
 import { useFetchMe } from '../internal/hooks/useFetchMe'
+import { useLogoutInternal } from '../internal/hooks/useLogoutInternal'
 
 export const useFetchIdentity = (): [{ state: IdentityStateValue, identity: Identity | undefined }, IdentityMethods] => {
 	const sessionToken = useSessionToken()
@@ -11,9 +11,8 @@ export const useFetchIdentity = (): [{ state: IdentityStateValue, identity: Iden
 	const [identityState, setIdentityState] = useState<IdentityStateValue>(sessionToken ? 'loading' : 'none')
 	const [identity, setIdentity] = useState<Identity | undefined>()
 
-	const logout = useLogout()
-
 	const clearIdentity = useCallback(() => setIdentityState('cleared'), [])
+	const logout = useLogoutInternal(clearIdentity)
 
 	const fetch = useCallback(async () => {
 		setIdentityState('loading')

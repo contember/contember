@@ -2,27 +2,32 @@ import { ApplicationEntrypoint, PageModule, Pages, runReactApp } from '@contembe
 import { SlotsProvider } from '@contember/react-slots'
 import { Layout } from './src/components/Layout'
 import './index.css'
+import { Toaster } from './src/components/ui/toast'
 
 runReactApp(
-		<SlotsProvider>
-			<ApplicationEntrypoint
-				apiBaseUrl={import.meta.env.VITE_CONTEMBER_ADMIN_API_BASE_URL as string}
-				sessionToken={import.meta.env.VITE_CONTEMBER_ADMIN_SESSION_TOKEN as string}
-				project={'admin-sandbox'}
-				stage={'live'}
-				basePath={import.meta.env.BASE_URL}
-				devBarPanels={
-					<>
-					</>
-				}
-				children={<Pages
-					layout={Layout}
-					children={import.meta.glob<PageModule>(
-						'./src/pages/**/*.tsx',
-						{ eager: true },
-					)}
-				/>}
-			/>
-		</SlotsProvider>
+	<SlotsProvider>
+		<ApplicationEntrypoint
+			apiBaseUrl={import.meta.env.VITE_CONTEMBER_ADMIN_API_BASE_URL as string}
+			sessionToken={import.meta.env.VITE_CONTEMBER_ADMIN_SESSION_TOKEN as string}
+			project={'playground'}
+			stage={'live'}
+			basePath={import.meta.env.BASE_URL}
+			devBarPanels={
+				<>
+				</>
+			}
+			children={
+				<Toaster>
+					<Pages
+						layout={Layout}
+						children={import.meta.glob<PageModule>(
+							'./src/pages/**/*.tsx',
+							{ eager: true },
+						)}
+					/>
+				</Toaster>
+			}
+		/>
+	</SlotsProvider>
 	,
 )

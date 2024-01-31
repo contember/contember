@@ -64,11 +64,11 @@ export const RepeaterSortable = ({ children }: {
 			onDragEnd={onDragEnd}
 			onDragCancel={onDragCancel}
 		>
-			<SortableContext items={entities} strategy={verticalListSortingStrategy}>
-				<RepeaterActiveEntityContext.Provider value={activeItem}>
+			<RepeaterActiveEntityContext.Provider value={activeItem}>
+				<SortableContext items={entities} strategy={verticalListSortingStrategy}>
 					{children}
-				</RepeaterActiveEntityContext.Provider>
-			</SortableContext>
+				</SortableContext>
+			</RepeaterActiveEntityContext.Provider>
 		</DndContext>
 	)
 }

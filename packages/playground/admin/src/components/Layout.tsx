@@ -5,9 +5,11 @@ import { Navigation } from './Navigation'
 import { Slot } from './Slots'
 import { LayoutComponent } from './LayoutComponent'
 import { Link } from '@contember/interface'
+import { IdentityLoader } from './IdentityLoader'
 
 export const Layout = memo(({ children }: PropsWithChildren) => {
 	return (
+		<IdentityLoader>
 			<LayoutComponent>
 				<Slot.Logo>
 					<Link to="index">
@@ -33,6 +35,7 @@ export const Layout = memo(({ children }: PropsWithChildren) => {
 
 				{children}
 			</LayoutComponent>
+		</IdentityLoader>
 	)
 })
 Layout.displayName = 'Layout'

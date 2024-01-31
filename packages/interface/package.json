@@ -39,6 +39,7 @@
 		"@contember/react-client": "workspace:*",
 		"@contember/react-dataview": "workspace:*",
 		"@contember/react-devbar": "workspace:*",
+		"@contember/react-identity": "workspace:*",
 		"@contember/react-routing": "workspace:*",
 		"@radix-ui/react-slot": "^1.0.2"
 	},

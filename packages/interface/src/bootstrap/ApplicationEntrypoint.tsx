@@ -1,8 +1,9 @@
-import { Environment, EnvironmentContext } from '@contember/react-binding'
+import { Environment, EnvironmentContext, EnvironmentExtensionProvider } from '@contember/react-binding'
 import { ContemberClient, ContemberClientProps } from '@contember/react-client'
 import { ReactNode } from 'react'
 import { RequestProvider, RouteMap, RoutingContext, RoutingContextValue, SelectedDimension } from '@contember/react-routing'
 import { DataViewPageNameKeyProvider } from './DataViewPageNameKeyProvider'
+import { IdentityProvider, projectEnvironmentExtension } from '@contember/react-identity'
 
 export interface ApplicationEntrypointProps extends ContemberClientProps {
 	basePath?: string
@@ -12,7 +13,6 @@ export interface ApplicationEntrypointProps extends ContemberClientProps {
 	defaultLocale?: string
 	envVariables?: Record<string, string>
 	children: ReactNode
-	onInvalidIdentity?: () => void
 	devBarPanels?: ReactNode
 }
 
@@ -55,14 +55,14 @@ export const ApplicationEntrypoint = (props: ApplicationEntrypointProps) => {
 						project={projectSlug}
 						stage={props.stage}
 					>
-						{/*<EnvironmentExtensionProvider extension={projectEnvironmentExtension} state={projectSlug ?? null}>*/}
+						<EnvironmentExtensionProvider extension={projectEnvironmentExtension} state={projectSlug ?? null}>
 							<DataViewPageNameKeyProvider>
-								{/*<IdentityProvider onInvalidIdentity={props.onInvalidIdentity}>*/}
+								<IdentityProvider>
 									{/*todo outdated application dialog*/}
 									{props.children}
-								{/*</IdentityProvider>*/}
+								</IdentityProvider>
 							</DataViewPageNameKeyProvider>
-						{/*</EnvironmentExtensionProvider>*/}
+						</EnvironmentExtensionProvider>
 					</ContemberClient>
 				</RequestProvider>
 			</RoutingContext.Provider>

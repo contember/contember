@@ -1,44 +1,30 @@
-import { BoardColumn, BoardColumnValue } from '../BoardBindingProps'
 import { useMemo } from 'react'
 import { UseGroupItemsByColumn } from './useGroupItemsByColumn'
 import { EntityListAccessor } from '@contember/react-binding'
 import { BoardNullColumnPlaceholder } from '../const'
-import { BoardNullBehaviourProps } from '../types'
+import { BoardColumnNode, BoardColumnValue } from '../types'
 
-export const useBoardColumns = <ColumnValue extends BoardColumnValue>({ groupItemsByColumn, items, columns, nullColumn, nullColumnPlacement, columnIdGetter }: {
+export const useCreateBoardColumns = <ColumnValue extends BoardColumnValue>({ groupItemsByColumn, items, columns, columnIdGetter }: {
 	items: EntityListAccessor
 	columns: Iterable<ColumnValue>
 	columnIdGetter: (column: ColumnValue) => string | number
 	groupItemsByColumn: UseGroupItemsByColumn,
-} & BoardNullBehaviourProps): BoardColumn<ColumnValue>[] => {
+}): BoardColumnNode<ColumnValue>[] => {
 
 	return useMemo(() => {
 		const itemsByColumn = groupItemsByColumn(items)
 
-		const result: BoardColumn<ColumnValue>[] = []
-		let index = 0
 		const nullItems = itemsByColumn.get(null) ?? []
-
-		const pushNullColumn = () => {
-			if (nullColumn === 'never') {
-				return
-			}
-			if (nullColumn === 'auto' && nullItems.length === 0) {
-				return
-			}
-
-			result.push({
+		const result: BoardColumnNode<ColumnValue>[] = [
+			{
 				id: BoardNullColumnPlaceholder,
-				index: index++,
+				index: Number.MAX_SAFE_INTEGER,
 				value: null,
 				items: nullItems.map((it, index) => ({ value: it, id: it.id, index })),
-			})
-		}
+			},
+		]
+		let index = 0
 
-		if (nullColumnPlacement === 'start') {
-			index--
-			pushNullColumn()
-		}
 
 		for (const column of columns) {
 			result.push({
@@ -48,10 +34,7 @@ export const useBoardColumns = <ColumnValue extends BoardColumnValue>({ groupIte
 				items: itemsByColumn.get(columnIdGetter(column))?.map((it, index) => ({ value: it, id: it.id, index })) ?? [],
 			})
 		}
-
-		if (nullColumnPlacement !== 'start') {
-			pushNullColumn()
-		}
 		return result
-	}, [columnIdGetter, columns, groupItemsByColumn, items, nullColumn, nullColumnPlacement])
+
+	}, [columnIdGetter, columns, groupItemsByColumn, items])
 }

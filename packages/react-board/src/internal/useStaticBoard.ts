@@ -1,10 +1,11 @@
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
 import { EntityAccessor, EntityListAccessor, useDesugaredRelativeSingleField } from '@contember/react-binding'
-import { BoardBindingProps, BoardStaticColumnValue } from './BoardBindingProps'
-import { useGroupItemsByColumn } from './internal/useGroupItemsByColumn'
-import { useBoardColumns } from './internal/useBoardColumns'
-import { BoardCommonProps, BoardStaticColumnsBindingProps } from './types'
-import { useBoardItemsMethods } from './internal/useBoardItemsMethods'
+import { BoardMethods, BoardStaticColumnValue } from '../types'
+import { useGroupItemsByColumn } from './useGroupItemsByColumn'
+import { useCreateBoardColumns } from './useCreateBoardColumns'
+import { useBoardItemsMethods } from './useBoardItemsMethods'
+import { BoardData } from '../types/BoardData'
+import { BoardCommonProps, BoardStaticColumnsBindingProps } from '../components'
 
 
 export type UseStaticBoardBindingProps =
@@ -20,9 +21,7 @@ export const useStaticBoard = ({
 	columns,
 	discriminationField,
 	itemEntities,
-	nullColumnPlacement = 'end',
-	nullColumn = 'auto',
-}: UseStaticBoardBindingProps): BoardBindingProps<BoardStaticColumnValue> => {
+}: UseStaticBoardBindingProps): [BoardData<BoardStaticColumnValue>, BoardMethods<BoardStaticColumnValue>] => {
 
 	const desugaredSortableByField = useDesugaredRelativeSingleField(sortableBy)
 	const desugaredDiscriminationField = useDesugaredRelativeSingleField(discriminationField)
@@ -33,13 +32,11 @@ export const useStaticBoard = ({
 
 	const groupItemsByColumn = useGroupItemsByColumn(getDiscriminatorValue, desugaredSortableByField)
 
-	const columnsResult = useBoardColumns({
+	const columnsResult = useCreateBoardColumns({
 		columns,
 		columnIdGetter: it => it.value,
 		groupItemsByColumn,
 		items: itemEntities,
-		nullColumn,
-		nullColumnPlacement,
 	})
 
 	const connectItemToColumn = useCallback((item: EntityAccessor, column: BoardStaticColumnValue | null) => {
@@ -55,10 +52,8 @@ export const useStaticBoard = ({
 		sortScope,
 		getDiscriminatorValue,
 	})
-	return {
-		columns: columnsResult,
-		addItem,
-		moveItem,
-		removeItem,
-	}
+
+	const methods = useMemo(() => ({ addItem, moveItem, removeItem }), [addItem, moveItem, removeItem])
+
+	return [{ columns: columnsResult }, methods]
 }

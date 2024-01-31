@@ -10,12 +10,18 @@ import {
 	useDesugaredRelativeSingleEntity,
 	useDesugaredRelativeSingleField,
 } from '@contember/react-binding'
-import { BoardAddColumnMethod, BoardBindingProps, BoardMoveColumnMethod, BoardRemoveColumnMethod } from './BoardBindingProps'
-import { useGroupItemsByColumn } from './internal/useGroupItemsByColumn'
-import { useBoardColumns } from './internal/useBoardColumns'
-import { BoardCommonProps, BoardDynamicColumnsBindingProps } from './types'
-import { useBoardItemsMethods } from './internal/useBoardItemsMethods'
-import { arrayMove } from './utils/arrayMove'
+import {
+	BoardAddColumnMethod,
+	BoardMethods,
+	BoardMoveColumnMethod,
+	BoardRemoveColumnMethod,
+} from '../types'
+import { useGroupItemsByColumn } from './useGroupItemsByColumn'
+import { useCreateBoardColumns } from './useCreateBoardColumns'
+import { arrayMove } from '../utils/arrayMove'
+import { useBoardItemsMethods } from './useBoardItemsMethods'
+import { BoardData } from '../types/BoardData'
+import { BoardCommonProps, BoardDynamicColumnsBindingProps } from '../components'
 
 
 export type UseDynamicBoardBindingProps =
@@ -39,9 +45,7 @@ export const useDynamicBoard = ({
 	discriminationField,
 	columnEntities,
 	itemEntities,
-	nullColumnPlacement = 'end',
-	nullColumn = 'auto',
-}: UseDynamicBoardBindingProps): BoardBindingProps<EntityAccessor> => {
+}: UseDynamicBoardBindingProps): [BoardData<EntityAccessor>, BoardMethods<EntityAccessor>] => {
 
 	const desugaredSortableByField = useDesugaredRelativeSingleField(sortableBy)
 	const desugaredColumnSortableByField = useDesugaredRelativeSingleField(columnsSortableBy)
@@ -61,13 +65,11 @@ export const useDynamicBoard = ({
 
 	const getSortedColumns = useGetSortedColumns(desugaredColumnSortableByField)
 
-	const columnsResult = useBoardColumns<EntityAccessor>({
+	const columnsResult = useCreateBoardColumns<EntityAccessor>({
 		columns: getSortedColumns(columnEntities),
 		columnIdGetter: it => it.id,
 		groupItemsByColumn,
 		items: itemEntities,
-		nullColumn,
-		nullColumnPlacement,
 	})
 
 	const addColumn = useCallback<BoardAddColumnMethod>((index, preprocess) => {
@@ -123,13 +125,14 @@ export const useDynamicBoard = ({
 		itemEntities,
 	})
 
-	return {
-		columns: columnsResult,
-		addColumn,
+	const methods = useMemo(() => ({
 		addItem,
-		moveColumn,
 		moveItem,
-		removeColumn,
 		removeItem,
-	}
+		moveColumn,
+		addColumn,
+		removeColumn,
+	}), [addItem, moveItem, removeItem, moveColumn, addColumn, removeColumn])
+
+	return [{ columns: columnsResult }, methods]
 }

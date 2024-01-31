@@ -60,9 +60,6 @@
 			"path": "./packages/react-board-dnd-kit"
 		},
 		{
-			"path": "./packages/react-board-ui"
-		},
-		{
 			"path": "./packages/react-choice-field"
 		},
 		{

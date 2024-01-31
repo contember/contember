@@ -1,6 +1,6 @@
 import { ComponentType, ReactNode, useCallback } from 'react'
 import { Slot } from '@radix-ui/react-slot'
-import { useEntity, useMutationState, usePersist } from '@contember/react-binding'
+import { ErrorPersistResult, SuccessfulPersistResult, useEntity, useMutationState, usePersist } from '@contember/react-binding'
 
 
 const SlotButton = Slot as ComponentType<React.ButtonHTMLAttributes<HTMLButtonElement>>
@@ -8,9 +8,11 @@ const SlotButton = Slot as ComponentType<React.ButtonHTMLAttributes<HTMLButtonEl
 export interface DeleteEntityTriggerProps {
 	immediatePersist?: true
 	children: ReactNode
+	onPersistSuccess?: (result: SuccessfulPersistResult) => void
+	onPersistError?: (result: ErrorPersistResult) => void
 }
 
-export const DeleteEntityTrigger = ({ immediatePersist, ...props }: DeleteEntityTriggerProps) => {
+export const DeleteEntityTrigger = ({ immediatePersist, onPersistError, onPersistSuccess, ...props }: DeleteEntityTriggerProps) => {
 	const parentEntity = useEntity()
 	const triggerPersist = usePersist()
 	const isMutating = useMutationState()
@@ -18,10 +20,11 @@ export const DeleteEntityTrigger = ({ immediatePersist, ...props }: DeleteEntity
 		parentEntity.deleteEntity()
 
 		if (immediatePersist) {
-			triggerPersist().catch(() => {
-			})
+			triggerPersist()
+				.then(onPersistSuccess)
+				.catch(onPersistError)
 		}
-	}, [triggerPersist, immediatePersist, parentEntity])
+	}, [parentEntity, immediatePersist, triggerPersist, onPersistSuccess, onPersistError])
 
 	return (
 		<SlotButton

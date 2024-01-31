@@ -7,19 +7,19 @@ const SlotButton = Slot as ComponentType<React.ButtonHTMLAttributes<HTMLButtonEl
 
 export interface PersistTriggerProps {
 	children: ReactElement
-	onSuccess?: (result: SuccessfulPersistResult) => void
-	onError?: (result: ErrorPersistResult) => void
+	onPersistSuccess?: (result: SuccessfulPersistResult) => void
+	onPersistError?: (result: ErrorPersistResult) => void
 }
 
-export const PersistTrigger = ({ onError, onSuccess, ...props }: PersistTriggerProps) => {
+export const PersistTrigger = ({ onPersistError, onPersistSuccess, ...props }: PersistTriggerProps) => {
 	const isMutating = useMutationState()
 	const isDirty = useDirtinessState()
 	const triggerPersist = usePersist()
 	const onClick = useCallback(() => {
 		triggerPersist()
-			.then(onSuccess)
-			.catch(onError)
-	}, [onError, onSuccess, triggerPersist])
+			.then(onPersistSuccess)
+			.catch(onPersistError)
+	}, [onPersistError, onPersistSuccess, triggerPersist])
 
 	const isDisabled = isMutating || !isDirty
 

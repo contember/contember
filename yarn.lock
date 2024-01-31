@@ -1004,9 +1004,9 @@ __metadata:
     "@contember/interface-tester": "workspace:*"
     "@contember/layout": "workspace:*"
     "@contember/react-dataview": "workspace:*"
-    "@contember/schema": ^1.3.6
-    "@contember/schema-definition": ^1.3.6
-    "@contember/schema-utils": ^1.3.6
+    "@contember/schema": ^1.4.0-beta.1
+    "@contember/schema-definition": ^1.4.0-beta.1
+    "@contember/schema-utils": ^1.4.0-beta.1
     "@contember/ui": "workspace:*"
     graphql: ^16.8.1
     lucide-react: ^0.302.0
@@ -1151,7 +1151,7 @@ __metadata:
     "@contember/client-content": "workspace:*"
     "@contember/graphql-builder": "workspace:*"
     "@contember/graphql-client": "workspace:*"
-    "@contember/schema": ^1.3.6
+    "@contember/schema": ^1.4.0-beta.1
     p-limit: ^5.0.0
   languageName: unknown
   linkType: soft
@@ -1287,18 +1287,23 @@ __metadata:
   resolution: "@contember/playground@workspace:packages/playground"
   dependencies:
     "@contember/brand": "workspace:*"
+    "@contember/client-content": "workspace:*"
+    "@contember/graphql-builder": "workspace:*"
     "@contember/interface": "workspace:*"
     "@contember/interface-tester": "workspace:*"
+    "@contember/react-board": "workspace:*"
+    "@contember/react-board-dnd-kit": "workspace:*"
     "@contember/react-dataview": "workspace:*"
     "@contember/react-slots": "workspace:*"
-    "@contember/schema": ^1.3.6
-    "@contember/schema-definition": ^1.3.6
-    "@contember/schema-utils": ^1.3.6
+    "@contember/schema": ^1.4.0-beta.1
+    "@contember/schema-definition": ^1.4.0-beta.1
+    "@contember/schema-utils": ^1.4.0-beta.1
     "@radix-ui/react-alert-dialog": ^1.0.5
     "@radix-ui/react-dropdown-menu": ^2.0.6
     "@radix-ui/react-primitive": ^1.0.3
     "@radix-ui/react-select": ^2.0.0
     "@radix-ui/react-slot": ^1.0.2
+    "@radix-ui/react-toast": ^1.1.5
     autoprefixer: ^10
     class-variance-authority: ^0.7.0
     graphql: ^16.8.1
@@ -1708,6 +1713,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@contember/schema-definition@npm:^1.4.0-beta.1":
+  version: 1.4.0-beta.1
+  resolution: "@contember/schema-definition@npm:1.4.0-beta.1"
+  dependencies:
+    "@contember/schema": 1.4.0-beta.1
+    "@contember/schema-utils": 1.4.0-beta.1
+    reflect-metadata: ^0.1.13
+  peerDependencies:
+    graphql: ">= 14.6.0"
+  checksum: 208c8fe5347ecdc1c7535e44f7a5cb5e7d262d01fb53123c3b12bc994547e454381061914eaf72b368312c8eacb3f0186b3ec3cdb3f0b48f1a430282225dd47a
+  languageName: node
+  linkType: hard
+
 "@contember/schema-migrations@npm:^1.3.6":
   version: 1.3.6
   resolution: "@contember/schema-migrations@npm:1.3.6"
@@ -1734,6 +1752,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@contember/schema-utils@npm:1.4.0-beta.1, @contember/schema-utils@npm:^1.4.0-beta.1":
+  version: 1.4.0-beta.1
+  resolution: "@contember/schema-utils@npm:1.4.0-beta.1"
+  dependencies:
+    "@contember/schema": 1.4.0-beta.1
+    "@contember/typesafe": 1.4.0-beta.1
+  checksum: 11fd999bfe53b5cfcee625749e9d7f166737baed3006feed460f12ce2616a4cd5ab6b3f08f96307b62574151eccfc5430803cd1e90a7886498a99acde8f1ee80
+  languageName: node
+  linkType: hard
+
 "@contember/schema@npm:1.3.6, @contember/schema@npm:^1.3.6":
   version: 1.3.6
   resolution: "@contember/schema@npm:1.3.6"
@@ -1741,10 +1769,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@contember/schema@npm:1.4.0-beta.1, @contember/schema@npm:^1.4.0-beta.1":
+  version: 1.4.0-beta.1
+  resolution: "@contember/schema@npm:1.4.0-beta.1"
+  checksum: d91c0a8bb82e4ecbcb272dfb2c7aa3ff4a8a625f0e95a1e05f5e17fbbdcde3f92f6c32d8bdcf1bc9d2fad7fbf3f66e7597896545af0ae8b07afc3b89519f16a1
+  languageName: node
+  linkType: hard
+
 "@contember/typesafe@npm:1.3.6":
   version: 1.3.6
   resolution: "@contember/typesafe@npm:1.3.6"
   checksum: 7019af67b48ed6a2e2942f562a496a44cacb43d58e4b03bf8690cad35e41b4411c5cc64b3b20ce62db0df6dd9178edd3349fa7e6004bd3bd76b05cd6d4d8982a
+  languageName: node
+  linkType: hard
+
+"@contember/typesafe@npm:1.4.0-beta.1":
+  version: 1.4.0-beta.1
+  resolution: "@contember/typesafe@npm:1.4.0-beta.1"
+  checksum: bcf9346e5cbc447ff2aa2623645d840a8c96a88d5e5c63d81ff759f9abf5d7147e8e556e661333074924a5da407d0e70965477505df0a8b4c6934071628bd6e6
   languageName: node
   linkType: hard
 

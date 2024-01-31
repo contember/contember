@@ -94,7 +94,7 @@ services:
       - .:/src:cached
 
   contember-engine:
-    image: contember/engine:1.3.6
+    image: contember/engine:1.4.0-beta.1
 
     environment:
       NODE_ENV: 'development'
@@ -132,7 +132,7 @@ services:
         condition: service_healthy
 
   playwright-contember-engine:
-    image: contember/engine:1.3.6
+    image: contember/engine:1.4.0-beta.1
 
     environment:
       NODE_ENV: 'development'
@@ -171,12 +171,13 @@ services:
 
 
   contember-cli:
-    image: contember/cli:1.3.6
+    image: contember/cli:1.4.0-beta.1
 
     deploy:
       replicas: 0
 
     environment:
+      CONTEMBER_SKIP_VERSION_CHECK: 1
       CONTEMBER_API_URL: 'http://contember-engine:4000/'
       CONTEMBER_API_TOKEN: '0000000000000000000000000000000000000000'
 

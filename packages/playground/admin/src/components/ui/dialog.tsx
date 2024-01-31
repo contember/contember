@@ -54,5 +54,6 @@ export const AlertDialogCancel = uic(AlertDialogPrimitive.Cancel, {
 	...buttonConfig,
 	defaultVariants: {
 		variant: 'outline',
+		size: 'default',
 	},
 })

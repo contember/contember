@@ -1,10 +1,47 @@
+import { Identity2023 } from '@contember/brand'
+import { LogOutIcon, MenuIcon, PanelLeftCloseIcon, PanelLeftOpenIcon, PanelRightCloseIcon, PanelRightOpenIcon } from 'lucide-react'
+import { memo, PropsWithChildren, useState } from 'react'
+import { Navigation } from './navigation'
+import { Slot, SlotTargets } from './slots'
+import { Link } from '@contember/interface'
+import { IdentityLoader } from './binding/identity'
 import { ComponentClassNameProps } from '@contember/utilities'
-import { PropsWithChildren, useState } from 'react'
-import { SlotTargets } from './Slots'
 import { useHasActiveSlotsFactory } from '@contember/react-slots'
-import { MenuIcon, PanelLeftCloseIcon, PanelLeftOpenIcon, PanelRightCloseIcon, PanelRightOpenIcon } from 'lucide-react'
 
-export const LayoutComponent = ({ children, ...rest }: PropsWithChildren<ComponentClassNameProps>) => {
+export const Layout = memo(({ children }: PropsWithChildren) => {
+	return (
+		<IdentityLoader>
+			<LayoutComponent>
+				<Slot.Logo>
+					<Link to="index">
+						<Identity2023.Edit scale={2} />
+					</Link>
+				</Slot.Logo>
+				<Slot.Navigation>
+					<Navigation />
+				</Slot.Navigation>
+
+				<Slot.Profile>
+					{/*<LogoutLink Component={AlertLogoutLink}>*/}
+					{/*	<Stack align="center" horizontal gap="gap">*/}
+							<LogOutIcon /> Logout
+						{/*</Stack>*/}
+					{/*</LogoutLink>*/}
+				</Slot.Profile>
+
+				<Slot.Footer>
+					<p><small>Created with <a className="content-link" href="https://www.contember.com/">AI-assisted Contember
+						Studio</a></small></p>
+				</Slot.Footer>
+
+				{children}
+			</LayoutComponent>
+		</IdentityLoader>
+	)
+})
+Layout.displayName = 'Layout'
+
+const LayoutComponent = ({ children, ...rest }: PropsWithChildren<ComponentClassNameProps>) => {
 	const isActive = useHasActiveSlotsFactory()
 
 	const [showLeftSidebar, setShowLeftSidebar] = useState<boolean | null>(null)
@@ -34,7 +71,8 @@ export const LayoutComponent = ({ children, ...rest }: PropsWithChildren<Compone
 					</div> : null}
 					<div
 						className={`${showLeftSidebar === false ? 'hidden' : (showLeftSidebar === true ? 'flex' : 'hidden lg:flex')} flex-col p-4 pt-6 lg:border-r border-r-gray-300 lg:w-96 flex-auto gap-2 relative`}>
-						<div className={'hidden lg:flex self-end absolute top-0 right-1 opacity-0 text-gray-400 hover:opacity-100 transition-opacity cursor-pointer'}>
+						<div
+							className={'hidden lg:flex self-end absolute top-0 right-1 opacity-0 text-gray-400 hover:opacity-100 transition-opacity cursor-pointer'}>
 							<a onClick={() => setShowLeftSidebar(false)}><PanelLeftCloseIcon /></a>
 						</div>
 						<div>
@@ -72,7 +110,7 @@ export const LayoutComponent = ({ children, ...rest }: PropsWithChildren<Compone
 
 				<div className={'flex justify-between'}>
 					<div>
-						<SlotTargets.Footer/>
+						<SlotTargets.Footer />
 					</div>
 				</div>
 			</div>

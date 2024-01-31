@@ -1,7 +1,9 @@
 import * as React from 'react'
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu'
-import { Check, ChevronRight, Circle } from 'lucide-react'
+import { Check, ChevronRight, Circle, MoreHorizontalIcon } from 'lucide-react'
 import { uic } from '../../utils/uic'
+import { buttonConfig } from './button'
+import { cn } from '../../utils/cn'
 
 export const DropdownMenu = DropdownMenuPrimitive.Root
 
@@ -78,4 +80,17 @@ export const DropdownMenuSeparator = uic(DropdownMenuPrimitive.Separator, {
 export const DropdownMenuShortcut = uic('span', {
 	baseClass: 'ml-auto text-xs tracking-widest opacity-60',
 	displayName: 'DropdownMenuShortcut',
+})
+
+export const DropDownTriggerButton = uic('button', {
+	...buttonConfig,
+	baseClass: cn(buttonConfig.baseClass, ' flex h-8 w-8 p-0 data-[state=open]:bg-muted'),
+	defaultVariants: {
+		variant: 'ghost',
+	},
+	displayName: 'DropDownTriggerButton',
+	beforeChildren: <>
+		<MoreHorizontalIcon className="h-4 w-4" />
+		<span className="sr-only">Open menu</span>
+	</>,
 })

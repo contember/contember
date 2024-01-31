@@ -46,13 +46,17 @@ export const ContemberClientNames: SchemaNames = {
         "tags": {
           "type": "many",
           "entity": "BoardTag"
+        },
+        "order": {
+          "type": "column"
         }
       },
       "scalars": [
         "id",
         "title",
         "description",
-        "status"
+        "status",
+        "order"
       ]
     },
     "BoardUser": {
@@ -66,12 +70,35 @@ export const ContemberClientNames: SchemaNames = {
         },
         "username": {
           "type": "column"
+        },
+        "order": {
+          "type": "column"
         }
       },
       "scalars": [
         "id",
         "name",
-        "username"
+        "username",
+        "order"
+      ]
+    },
+    "RepeaterItem": {
+      "name": "RepeaterItem",
+      "fields": {
+        "id": {
+          "type": "column"
+        },
+        "title": {
+          "type": "column"
+        },
+        "order": {
+          "type": "column"
+        }
+      },
+      "scalars": [
+        "id",
+        "title",
+        "order"
       ]
     }
   }

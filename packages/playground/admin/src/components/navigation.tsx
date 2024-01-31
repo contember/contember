@@ -1,6 +1,6 @@
 import { Link, RoutingLinkTarget } from '@contember/react-routing'
 import { ReactNode } from 'react'
-import { BrushIcon, HomeIcon, KanbanIcon } from 'lucide-react'
+import { BrushIcon, GripVertical, HomeIcon, KanbanIcon } from 'lucide-react'
 import { uic } from '../utils/uic'
 
 export type NavigationItem = {
@@ -29,14 +29,12 @@ export const Navigation = () => {
 						label: 'UI',
 						subItems: [
 							{
-								// icon: <ListIcon size={16}/>,
 								label: 'Buttons',
 								to: 'ui/button',
 							},
 							{
-								// icon: <ListIcon size={16}/>,
-								label: 'Page 2',
-								to: 'index',
+								label: 'Toasts',
+								to: 'ui/toast',
 							},
 						],
 					},
@@ -53,6 +51,11 @@ export const Navigation = () => {
 								to: 'board/status',
 							},
 						],
+					},
+					{
+						icon: <GripVertical size={16} />,
+						label: 'Repeater',
+						to: 'repeater',
 					},
 				]}
 			/>

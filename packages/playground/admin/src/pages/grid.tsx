@@ -1,6 +1,6 @@
 import { DataBindingProvider, DeleteEntityTrigger, Field } from '@contember/interface'
 import { MoreHorizontalIcon } from 'lucide-react'
-import { Slot } from '../components/Slots'
+import { Slot } from '../components/slots'
 import {
 	createTextFilter,
 	DataView,
@@ -16,7 +16,14 @@ import { DataTableColumnHeader, DataTablePagination } from '../components/datagr
 import * as React from 'react'
 import { ChangeEvent, useCallback } from 'react'
 import { Input } from '../components/ui/input'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '../components/ui/dropdown'
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuSeparator,
+	DropdownMenuTrigger,
+	DropDownTriggerButton,
+} from '../components/ui/dropdown'
 import { Button } from '../components/ui/button'
 import {
 	AlertDialog,
@@ -91,13 +98,7 @@ export const list = () => (
 
 												<DropdownMenu>
 													<DropdownMenuTrigger asChild>
-														<Button
-															variant="ghost"
-															className="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
-														>
-															<MoreHorizontalIcon className="h-4 w-4" />
-															<span className="sr-only">Open menu</span>
-														</Button>
+														<DropDownTriggerButton />
 													</DropdownMenuTrigger>
 													<DropdownMenuContent className="w-[160px]">
 														<DropdownMenuItem>Edit</DropdownMenuItem>

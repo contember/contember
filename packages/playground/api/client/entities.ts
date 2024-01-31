@@ -32,6 +32,7 @@ export type BoardTask = {
 		title: string
 		description: string | null
 		status: BoardTaskStatus | null
+		order: number | null
 	}
 	hasOne: {
 		assignee: BoardUser
@@ -51,6 +52,23 @@ export type BoardUser = {
 		id: string
 		name: string
 		username: string
+		order: number | null
+	}
+	hasOne: {
+	}
+	hasMany: {
+	}
+	hasManyBy: {
+	}
+}
+export type RepeaterItem = {
+	name: 'RepeaterItem'
+	unique:
+		| { id: string }
+	columns: {
+		id: string
+		title: string
+		order: number | null
 	}
 	hasOne: {
 	}
@@ -64,6 +82,7 @@ export type ContemberClientEntities = {
 	BoardTag: BoardTag
 	BoardTask: BoardTask
 	BoardUser: BoardUser
+	RepeaterItem: RepeaterItem
 }
 
 export type ContemberClientSchema = {

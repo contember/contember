@@ -1,6 +1,6 @@
 import { ApplicationEntrypoint, PageModule, Pages, runReactApp } from '@contember/interface'
 import { SlotsProvider } from '@contember/react-slots'
-import { Layout } from './src/components/Layout'
+import { Layout } from './src/components/layout'
 import './index.css'
 import { Toaster } from './src/components/ui/toast'
 

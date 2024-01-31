@@ -23,65 +23,53 @@ import { GripHorizontal, GripIcon } from 'lucide-react'
 import { Component } from '@contember/interface'
 import { ReactNode } from 'react'
 import { uic } from '../utils/uic'
+import { DropIndicator } from './ui/sortable'
 
-const BoardWrapperUI = uic('div', {
+export const BoardWrapperUI = uic('div', {
 	baseClass: 'flex gap-4',
 })
-const BoardItemsWrapperUI = uic('div', {
+export const BoardItemsWrapperUI = uic('div', {
 	baseClass: 'flex flex-col gap-4 p-2',
 })
-const BoardColumnHeaderUI = uic('div', {
+export const BoardColumnHeaderUI = uic('div', {
 	baseClass: 'px-4 py-1 border-b bg-gray-50',
 })
-const BoardCardUI = uic('div', {
+export const BoardCardUI = uic('div', {
 	baseClass: 'rounded border border-gray-300 p-4 relative',
 })
-const BoardColumnUI = uic('div', {
+export const BoardColumnUI = uic('div', {
 	baseClass: 'rounded border border-gray-300 relative min-w-48 data-[sortable-over="item"]:bg-yellow-100',
 })
-const BoardDragOverlayUI = uic('div', {
+export const BoardDragOverlayUI = uic('div', {
 	baseClass: 'rounded border border-gray-300 p-4 relative bg-opacity-60 bg-gray-100 backdrop-blur-sm',
 })
-const BoardItemHandleUI = uic('button', {
+export const BoardItemHandleUI = uic('button', {
 	baseClass: 'absolute top-0 right-0 h-6 w-6 flex justify-end align-center opacity-10 hover:opacity-100 transition-opacity',
 	beforeChildren: <GripIcon size={16} />,
 })
 
-const BoardColumnHandleUI = uic('button', {
+export const BoardColumnHandleUI = uic('button', {
 	baseClass: 'absolute top-0 right-0 h-6 w-6 flex justify-end align-center opacity-10 hover:opacity-100 transition-opacity',
 	beforeChildren: <GripHorizontal size={16} />,
 })
 
-const BoardDropIndicatorUI = uic('div', {
-	baseClass: 'bg-blue-300 absolute',
-	variants: {
-		placement: {
-			top: 'w-full h-1 -top-2',
-			bottom: 'w-full h-1 -bottom-2',
-			left: 'w-1 h-full -left-2',
-			right: 'w-1 h-full -right-2',
-		},
-	},
-})
-
-
-const ItemDropIndicator = ({ position }: { position: 'before' | 'after' }) => (
+export const ItemDropIndicator = ({ position }: { position: 'before' | 'after' }) => (
 	<div className={'relative'}>
 		<BoardSortableItemDropIndicator position={position}>
-			<BoardDropIndicatorUI placement={position === 'before' ? 'top' : 'bottom'} />
+			<DropIndicator placement={position === 'before' ? 'top' : 'bottom'} />
 		</BoardSortableItemDropIndicator>
 	</div>
 )
 
-const ColumnDropIndicator = ({ position }: { position: 'before' | 'after' }) => (
+export const ColumnDropIndicator = ({ position }: { position: 'before' | 'after' }) => (
 	<div className={'relative'}>
 		<BoardSortableColumnDropIndicator position={position}>
-			<BoardDropIndicatorUI placement={position === 'before' ? 'left' : 'right'} />
+			<DropIndicator placement={position === 'before' ? 'left' : 'right'} />
 		</BoardSortableColumnDropIndicator>
 	</div>
 )
 
-const BoardSortableItems = Component<{ children: ReactNode }>(({ children }) => (
+export const BoardSortableItems = Component<{ children: ReactNode }>(({ children }) => (
 	<BoardItemsWrapperUI>
 		<BoardSortableEachItem>
 			<div>
@@ -100,7 +88,7 @@ const BoardSortableItems = Component<{ children: ReactNode }>(({ children }) => 
 	</BoardItemsWrapperUI>
 ))
 
-const BoardNonSortableItems = Component<{ children: ReactNode }>(({ children }) => (
+export const BoardNonSortableItems = Component<{ children: ReactNode }>(({ children }) => (
 	<BoardItemsWrapperUI>
 		<BoardEachItem>
 			<BoardCardUI>
@@ -110,7 +98,7 @@ const BoardNonSortableItems = Component<{ children: ReactNode }>(({ children }) 
 	</BoardItemsWrapperUI>
 ))
 
-const BoardSortableColumn = Component<{
+export const BoardSortableColumn = Component<{
 	children: ReactNode,
 	columnHeader: ReactNode,
 	columnFooter?: ReactNode,
@@ -154,7 +142,7 @@ const BoardSortableColumn = Component<{
 		</BoardSortableNullColumn>
 	</>
 ))
-const BoardNonSortableColumn = Component<{
+export const BoardNonSortableColumn = Component<{
 	children: ReactNode,
 	columnHeader: ReactNode,
 	columnFooter?: ReactNode,
@@ -184,7 +172,7 @@ const BoardNonSortableColumn = Component<{
 ))
 
 
-export type BoardProps =
+export type DefaultBoardProps =
 	& {
 		columnHeader: ReactNode
 		nullColumnHeader: ReactNode
@@ -193,7 +181,7 @@ export type BoardProps =
 	}
 	& BoardPropsInternal
 
-export const Board = Component<BoardProps>(({ columnHeader, nullColumnHeader, children, columnFooter, ...props }) => {
+export const DefaultBoard = Component<DefaultBoardProps>(({ columnHeader, nullColumnHeader, children, columnFooter, ...props }) => {
 	const itemsSortable = 'sortableBy' in props && props.sortableBy !== undefined
 	const columnsSortable = 'columnsSortableBy' in props && props.columnsSortableBy !== undefined
 	const anySortable = itemsSortable || columnsSortable

@@ -1,5 +1,5 @@
 import { IdentityState } from '@contember/react-identity'
-import { Loader } from './ui/loader'
+import { Loader } from '../ui/loader'
 
 export const IdentityLoader = ({ children }: {
 	children: React.ReactNode

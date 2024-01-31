@@ -19,6 +19,8 @@
 		"@contember/react-board": "workspace:*",
 		"@contember/react-board-dnd-kit": "workspace:*",
 		"@contember/react-dataview": "workspace:*",
+		"@contember/react-repeater": "workspace:*",
+		"@contember/react-repeater-dnd-kit": "workspace:*",
 		"@contember/react-slots": "workspace:*",
 		"graphql": "^16.8.1"
 	},

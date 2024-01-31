@@ -1,4 +1,4 @@
-import { ReactNode, useEffect } from 'react'
+import { ReactNode, useEffect, useState } from 'react'
 import { AccessorTreeState, DataBindingProvider } from '@contember/interface'
 import { Loader } from '../ui/loader'
 
@@ -17,6 +17,7 @@ export interface BindingStateRendererProps {
 	children?: ReactNode
 }
 
+
 function BindingStateRenderer({ accessorTreeState, children }: BindingStateRendererProps) {
 	useEffect(() => {
 		if (accessorTreeState.name === 'error' && accessorTreeState.error.type === 'unauthorized') {
@@ -25,7 +26,7 @@ function BindingStateRenderer({ accessorTreeState, children }: BindingStateRende
 	}, [accessorTreeState])
 
 	if (accessorTreeState.name === 'initializing') {
-		return <Loader />
+		return <DelayedLoader />
 	}
 
 	if (accessorTreeState.name === 'error') {
@@ -40,4 +41,14 @@ function BindingStateRenderer({ accessorTreeState, children }: BindingStateRende
 	}
 
 	return <>{children}</>
+}
+
+const DelayedLoader = () => {
+	const [show, setShow] = useState(false)
+	useEffect(() => {
+		const timeout = setTimeout(() => setShow(true), 500)
+		return () => clearTimeout(timeout)
+	}, [])
+
+	return show ? <Loader /> : null
 }

@@ -1,0 +1,227 @@
+{
+	"formatVersion": 5,
+	"modifications": [
+		{
+			"modification": "createEnum",
+			"enumName": "BoardTaskStatus",
+			"values": [
+				"backlog",
+				"todo",
+				"inProgress",
+				"done"
+			]
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"eventLog": {
+					"enabled": true
+				},
+				"name": "BoardTag",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "board_tag",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": [],
+				"indexes": []
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"eventLog": {
+					"enabled": true
+				},
+				"name": "BoardTask",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "board_task",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": [],
+				"indexes": []
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"eventLog": {
+					"enabled": true
+				},
+				"name": "BoardUser",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "board_user",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": [],
+				"indexes": []
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "BoardTag",
+			"field": {
+				"name": "name",
+				"columnName": "name",
+				"columnType": "text",
+				"nullable": false,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "BoardTag",
+			"field": {
+				"name": "color",
+				"columnName": "color",
+				"columnType": "text",
+				"nullable": true,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "BoardTag",
+			"field": {
+				"name": "slug",
+				"columnName": "slug",
+				"columnType": "text",
+				"nullable": false,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "BoardTask",
+			"field": {
+				"name": "title",
+				"columnName": "title",
+				"columnType": "text",
+				"nullable": false,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "BoardTask",
+			"field": {
+				"name": "description",
+				"columnName": "description",
+				"columnType": "text",
+				"nullable": true,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "BoardTask",
+			"field": {
+				"name": "status",
+				"columnName": "status",
+				"columnType": "BoardTaskStatus",
+				"nullable": true,
+				"type": "Enum"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "BoardUser",
+			"field": {
+				"name": "name",
+				"columnName": "name",
+				"columnType": "text",
+				"nullable": false,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "BoardUser",
+			"field": {
+				"name": "username",
+				"columnName": "username",
+				"columnType": "text",
+				"nullable": false,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "BoardTask",
+			"owningSide": {
+				"type": "ManyHasOne",
+				"name": "assignee",
+				"target": "BoardUser",
+				"joiningColumn": {
+					"columnName": "assignee_id",
+					"onDelete": "set null"
+				},
+				"nullable": true
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "BoardTask",
+			"owningSide": {
+				"type": "ManyHasMany",
+				"name": "tags",
+				"target": "BoardTag",
+				"joiningTable": {
+					"eventLog": {
+						"enabled": true
+					},
+					"tableName": "board_task_tags",
+					"joiningColumn": {
+						"columnName": "board_task_id",
+						"onDelete": "cascade"
+					},
+					"inverseJoiningColumn": {
+						"columnName": "board_tag_id",
+						"onDelete": "cascade"
+					}
+				}
+			}
+		},
+		{
+			"modification": "createUniqueConstraint",
+			"entityName": "BoardTag",
+			"unique": {
+				"fields": [
+					"slug"
+				]
+			}
+		},
+		{
+			"modification": "createUniqueConstraint",
+			"entityName": "BoardUser",
+			"unique": {
+				"fields": [
+					"username"
+				]
+			}
+		}
+	]
+}

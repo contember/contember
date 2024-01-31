@@ -1,6 +1,6 @@
 import { Link, RoutingLinkTarget } from '@contember/react-routing'
 import { ReactNode } from 'react'
-import { BrushIcon, HomeIcon } from 'lucide-react'
+import { BrushIcon, HomeIcon, KanbanIcon } from 'lucide-react'
 import { uic } from '../utils/uic'
 
 export type NavigationItem = {
@@ -37,6 +37,20 @@ export const Navigation = () => {
 								// icon: <ListIcon size={16}/>,
 								label: 'Page 2',
 								to: 'index',
+							},
+						],
+					},
+					{
+						icon: <KanbanIcon size={16} />,
+						label: 'Kanban',
+						subItems: [
+							{
+								label: 'Dynamic columns',
+								to: 'board/assignee',
+							},
+							{
+								label: 'Static columns',
+								to: 'board/status',
 							},
 						],
 					},

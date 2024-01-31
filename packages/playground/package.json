@@ -12,8 +12,12 @@
 	},
 	"devDependencies": {
 		"@contember/brand": "workspace:*",
+		"@contember/client-content": "workspace:*",
+		"@contember/graphql-builder": "workspace:*",
 		"@contember/interface": "workspace:*",
 		"@contember/interface-tester": "workspace:*",
+		"@contember/react-board": "workspace:*",
+		"@contember/react-board-dnd-kit": "workspace:*",
 		"@contember/react-dataview": "workspace:*",
 		"@contember/react-slots": "workspace:*",
 		"graphql": "^16.8.1"
@@ -27,6 +31,7 @@
 		"@radix-ui/react-primitive": "^1.0.3",
 		"@radix-ui/react-select": "^2.0.0",
 		"@radix-ui/react-slot": "^1.0.2",
+		"@radix-ui/react-toast": "^1.1.5",
 		"autoprefixer": "^10",
 		"class-variance-authority": "^0.7.0",
 		"lucide-react": "^0.302.0",

@@ -1055,6 +1055,7 @@ __metadata:
     "@contember/react-devbar": "workspace:*"
     "@contember/react-form-fields-ui": "workspace:*"
     "@contember/react-i18n": "workspace:*"
+    "@contember/react-identity": "workspace:*"
     "@contember/react-leaflet-fields-ui": "workspace:*"
     "@contember/react-multipass-rendering": "workspace:*"
     "@contember/react-routing": "workspace:*"
@@ -1243,6 +1244,7 @@ __metadata:
     "@contember/react-client": "workspace:*"
     "@contember/react-dataview": "workspace:*"
     "@contember/react-devbar": "workspace:*"
+    "@contember/react-identity": "workspace:*"
     "@contember/react-routing": "workspace:*"
     "@radix-ui/react-slot": ^1.0.2
     react: ^18.2.0
@@ -1582,7 +1584,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@contember/react-identity@workspace:packages/react-identity":
+"@contember/react-identity@workspace:*, @contember/react-identity@workspace:packages/react-identity":
   version: 0.0.0-use.local
   resolution: "@contember/react-identity@workspace:packages/react-identity"
   dependencies:
@@ -1590,7 +1592,6 @@ __metadata:
     "@contember/react-binding": "workspace:*"
     "@contember/react-client": "workspace:*"
     "@contember/react-utils": "workspace:*"
-    "@radix-ui/react-slot": ^1.0.2
     graphql-ts-client-api: ^3.1.17
     react: ^18.2.0
     react-dom: ^18.2.0
@@ -3089,6 +3090,37 @@ __metadata:
     "@types/react":
       optional: true
   checksum: edf5edf435ff594bea7e198bf16d46caf81b6fb559493acad4fa8c308218896136acb16f9b7238c788fd13e94a904f2fd0b6d834e530e4cae94522cdb8f77ce9
+  languageName: node
+  linkType: hard
+
+"@radix-ui/react-toast@npm:^1.1.5":
+  version: 1.1.5
+  resolution: "@radix-ui/react-toast@npm:1.1.5"
+  dependencies:
+    "@babel/runtime": ^7.13.10
+    "@radix-ui/primitive": 1.0.1
+    "@radix-ui/react-collection": 1.0.3
+    "@radix-ui/react-compose-refs": 1.0.1
+    "@radix-ui/react-context": 1.0.1
+    "@radix-ui/react-dismissable-layer": 1.0.5
+    "@radix-ui/react-portal": 1.0.4
+    "@radix-ui/react-presence": 1.0.1
+    "@radix-ui/react-primitive": 1.0.3
+    "@radix-ui/react-use-callback-ref": 1.0.1
+    "@radix-ui/react-use-controllable-state": 1.0.1
+    "@radix-ui/react-use-layout-effect": 1.0.1
+    "@radix-ui/react-visually-hidden": 1.0.3
+  peerDependencies:
+    "@types/react": "*"
+    "@types/react-dom": "*"
+    react: ^16.8 || ^17.0 || ^18.0
+    react-dom: ^16.8 || ^17.0 || ^18.0
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+    "@types/react-dom":
+      optional: true
+  checksum: 6fe821ffaefd0b802e6faf1dffa3d7f69c64cf0972f10eafbdfa5a518f3e2c25c834fe542454e141bd8a35f45b8a1807e6a639e0aefe2a00a26aaeea5057ac7f
   languageName: node
   linkType: hard
 

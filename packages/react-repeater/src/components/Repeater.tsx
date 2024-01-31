@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo } from 'react'
 import { verifySortableProp } from '../internal/verifySortableProp'
 import { useCreateRepeaterMethods } from '../internal/useCreateRepeaterMethods'
 import { RepeaterEntityListAccessorContext, RepeaterMethodsContext, RepeaterSortedEntitiesContext } from '../internal/contexts'
@@ -6,6 +6,7 @@ import {
 	Component,
 	EntityListSubTree,
 	HasMany,
+	repairEntitiesOrder,
 	sortEntities,
 	SugaredField,
 	SugaredFieldProps,
@@ -98,6 +99,14 @@ const RepeaterInner = ({ sortableBy, accessor, children }: RepeaterInnerProps) =
 	const sortedEntities = useMemo(() => {
 		return sortEntities(Array.from(accessor), desugaredSortableByField)
 	}, [desugaredSortableByField, accessor])
+
+	useEffect(() => {
+		if (!desugaredSortableByField) {
+			return
+		}
+		repairEntitiesOrder(desugaredSortableByField, sortedEntities)
+	}, [desugaredSortableByField, sortedEntities])
+
 	const methods = useCreateRepeaterMethods({ accessor, sortableBy: desugaredSortableByField })
 
 	return (

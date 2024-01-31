@@ -1,4 +1,4 @@
-import { ComponentType, forwardRef, ReactNode, useCallback } from 'react'
+import { ComponentType, ReactNode, useCallback } from 'react'
 import { Slot } from '@radix-ui/react-slot'
 import { useEntity, useMutationState, usePersist } from '@contember/react-binding'
 
@@ -10,7 +10,7 @@ export interface DeleteEntityTriggerProps {
 	children: ReactNode
 }
 
-export const DeleteEntityTrigger = forwardRef<HTMLElement, DeleteEntityTriggerProps>(({ immediatePersist, ...props }) => {
+export const DeleteEntityTrigger = ({ immediatePersist, ...props }: DeleteEntityTriggerProps) => {
 	const parentEntity = useEntity()
 	const triggerPersist = usePersist()
 	const isMutating = useMutationState()
@@ -30,4 +30,4 @@ export const DeleteEntityTrigger = forwardRef<HTMLElement, DeleteEntityTriggerPr
 			{...props}
 		/>
 	)
-})
+}

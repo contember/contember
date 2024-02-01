@@ -44,6 +44,7 @@
 		"@contember/react-binding": "workspace:*",
 		"@contember/react-client": "workspace:*",
 		"@contember/react-utils": "workspace:*",
+		"@radix-ui/react-slot": "^1.0.2",
 		"graphql-ts-client-api": "^3.1.17"
 	},
 	"peerDependencies": {

@@ -1,13 +1,13 @@
 import { uic } from '../../utils/uic'
 
 export const DropIndicator = uic('div', {
-	baseClass: 'bg-blue-300 absolute',
+	baseClass: 'bg-blue-300 rounded shadow-lg shadow-blue-700 absolute',
 	variants: {
 		placement: {
-			top: 'w-full h-1 -top-2',
-			bottom: 'w-full h-1 -bottom-2',
-			left: 'w-1 h-full -left-2',
-			right: 'w-1 h-full -right-2',
+			top: 'w-full h-1 -top-1',
+			bottom: 'w-full h-1 bottom-0',
+			left: 'w-1 h-full -left-1',
+			right: 'w-1 h-full right-0',
 		},
 	},
 })

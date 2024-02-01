@@ -6,7 +6,9 @@ import { Slot, SlotTargets } from './slots'
 import { Link } from '@contember/interface'
 import { IdentityLoader } from './binding/identity'
 import { ComponentClassNameProps } from '@contember/utilities'
+import { LogoutTrigger } from '@contember/react-identity'
 import { useHasActiveSlotsFactory } from '@contember/react-slots'
+import { Button } from './ui/button'
 
 export const Layout = memo(({ children }: PropsWithChildren) => {
 	return (
@@ -22,11 +24,11 @@ export const Layout = memo(({ children }: PropsWithChildren) => {
 				</Slot.Navigation>
 
 				<Slot.Profile>
-					{/*<LogoutLink Component={AlertLogoutLink}>*/}
-					{/*	<Stack align="center" horizontal gap="gap">*/}
+					<LogoutTrigger>
+						<Button variant={'ghost'}>
 							<LogOutIcon /> Logout
-						{/*</Stack>*/}
-					{/*</LogoutLink>*/}
+						</Button>
+					</LogoutTrigger>
 				</Slot.Profile>
 
 				<Slot.Footer>
@@ -78,7 +80,7 @@ const LayoutComponent = ({ children, ...rest }: PropsWithChildren<ComponentClass
 						<div>
 							<SlotTargets.Navigation />
 						</div>
-						<div className={'mt-auto'}>
+						<div className={'mt-auto pt-8'}>
 							<SlotTargets.Profile />
 						</div>
 					</div>

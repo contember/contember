@@ -29,27 +29,27 @@ export const BoardWrapperUI = uic('div', {
 	baseClass: 'flex gap-4',
 })
 export const BoardItemsWrapperUI = uic('div', {
-	baseClass: 'flex flex-col gap-4 p-2',
+	baseClass: 'flex flex-col gap-2 p-2',
 })
 export const BoardColumnHeaderUI = uic('div', {
-	baseClass: 'px-4 py-1 border-b bg-gray-50',
+	baseClass: 'px-4 py-1 border-b border-gray-100',
 })
 export const BoardCardUI = uic('div', {
-	baseClass: 'rounded border border-gray-300 p-4 relative',
+	baseClass: 'rounded border bg-card text-card-foreground shadow-sm p-4 relative',
 })
 export const BoardColumnUI = uic('div', {
-	baseClass: 'rounded border border-gray-300 relative min-w-48 data-[sortable-over="item"]:bg-yellow-100',
+	baseClass: 'rounded-lg border bg-card text-card-foreground shadow-sm relative min-w-48 data-[sortable-over="item"]:bg-yellow-100',
 })
 export const BoardDragOverlayUI = uic('div', {
 	baseClass: 'rounded border border-gray-300 p-4 relative bg-opacity-60 bg-gray-100 backdrop-blur-sm',
 })
 export const BoardItemHandleUI = uic('button', {
-	baseClass: 'absolute top-0 right-0 h-6 w-6 flex justify-end align-center opacity-10 hover:opacity-100 transition-opacity',
+	baseClass: 'absolute top-0 right-0 h-5 w-5 flex justify-center items-center opacity-10 hover:opacity-100 transition-opacity',
 	beforeChildren: <GripIcon size={16} />,
 })
 
 export const BoardColumnHandleUI = uic('button', {
-	baseClass: 'absolute top-0 right-0 h-6 w-6 flex justify-end align-center opacity-10 hover:opacity-100 transition-opacity',
+	baseClass: 'absolute top-0 right-0 h-6 w-6 flex justify-end items-center opacity-10 hover:opacity-100 transition-opacity',
 	beforeChildren: <GripHorizontal size={16} />,
 })
 

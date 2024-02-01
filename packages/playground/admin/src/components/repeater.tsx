@@ -8,7 +8,7 @@ import { RepeaterSortable,
 	RepeaterSortableDragOverlay, RepeaterSortableDropIndicator, RepeaterSortableEachItem, RepeaterSortableItemActivator, RepeaterSortableItemNode } from '@contember/react-repeater-dnd-kit'
 
 export const RepeaterItemsWrapperUI = uic('div', {
-	baseClass: 'flex flex-col gap-4 p-2',
+	baseClass: 'flex flex-col gap-2 p-2',
 })
 export const RepeaterItemUI = uic('div', {
 	baseClass: 'rounded border border-gray-300 p-4 relative',

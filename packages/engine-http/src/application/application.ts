@@ -20,6 +20,7 @@ export class Application {
 	private middlewares: KoaMiddleware<any>[] = []
 
 	private routes: Route<HttpController>[] = []
+	private internalRoutes: Route<InternalHttpController>[] = []
 	private websocketRoutes: Route<WebSocketController>[] = []
 
 	constructor(
@@ -37,6 +38,14 @@ export class Application {
 
 	public addRoute(module: string, mask: string, controller: HttpController): void {
 		this.routes.push({
+			module,
+			controller,
+			match: createRequestMatcher(mask),
+		})
+	}
+
+	public addInternalRoute(module: string, mask: string, controller: InternalHttpController): void {
+		this.internalRoutes.push({
 			module,
 			controller,
 			match: createRequestMatcher(mask),
@@ -133,7 +142,6 @@ export class Application {
 				timer,
 				url,
 				request: req,
-				requestDebugMode: false,
 				authResult,
 				params: matchedRequest.params,
 				projectGroup: groupContainer,
@@ -171,14 +179,22 @@ export class Application {
 	}
 
 	private async handleHttpRequest(ctx: KoaContext<{ module?: string; projectGroup?: string; project?: string }>) {
+		const matchedRequest = this.matchRequest(this.routes, ctx.request.URL)
+		if (!matchedRequest) {
+			const internalMatchedRequest = this.matchRequest(this.internalRoutes, ctx.request.URL)
+			if (internalMatchedRequest) {
+				return await this.handleInternalRequest(internalMatchedRequest, ctx)
+			}
+		}
 		let httpContext: HttpContext | null = null
 		let requestLogger = this.logger
 		const { timer, send: sendTimer } = this.createTimer()
+
 		try {
-			const matchedRequest = this.matchRequest(this.routes, ctx.request.URL)
 			if (!matchedRequest) {
-				throw new HttpErrorResponse(404, 'Route not found')
+				return this.sendHttpResponse(ctx, new HttpErrorResponse(404, 'Route not found'))
 			}
+
 			requestLogger = this.createRequestLogger(ctx.req, ctx.request.body, matchedRequest.module)
 			requestLogger.debug('Request processing started', {
 				body: ctx.request.body,
@@ -238,6 +254,34 @@ export class Application {
 			requestLogger.debug('Request processing finished')
 		}
 	}
+
+
+	private async handleInternalRequest(matchedRequest: MatchedRequest<InternalHttpController>, ctx: KoaContext<{ module?: string }>) {
+		try {
+			const response = await this.logger.scope(async logger => {
+				return await matchedRequest.controller({
+					koa: ctx,
+					body: ctx.request.body,
+					url: ctx.request.URL,
+					logger,
+					request: ctx.req,
+					response: ctx.res,
+					params: matchedRequest.params,
+				})
+			})
+			if (response) {
+				this.sendHttpResponse(ctx, response)
+			}
+		} catch (e) {
+			if (e instanceof HttpResponse) {
+				this.sendHttpResponse(ctx, e)
+			} else {
+				this.sendHttpResponse(ctx, new HttpErrorResponse(500, 'Internal server error'))
+				this.logger.error(e)
+			}
+		}
+	}
+
 
 	private sendHttpResponse(ctx: KoaContext<{}>, response: HttpResponse) {
 		if (response.contentType) {
@@ -338,7 +382,7 @@ export class Application {
 		return { timer, send }
 	}
 
-	private matchRequest<C>(routes: Route<C>[], url: URL): { params: Params; controller: C; module: string } | null {
+	private matchRequest<C>(routes: Route<C>[], url: URL): MatchedRequest<C> | null {
 		for (const route of routes) {
 			const params = route.match({ url })
 			if (params !== null) {
@@ -354,31 +398,50 @@ type EventTime = { label: string; start: number; duration?: number }
 
 export type Timer = <T>(event: string, cb: () => T) => T
 
-export interface ApplicationContext {
+export type MatchedRequest<C> = { params: Params; controller: C; module: string }
+
+export type BaseRequestContext = {
 	logger: Logger
-	timer: Timer
 	request: IncomingMessage
 	url: URL
-
-	projectGroup: ProjectGroupContainer
-	authResult: AuthResult | null
 	params: Params
-
-	requestDebugMode: boolean
 }
 
-export interface HttpContext extends ApplicationContext {
+export type ApplicationContext =
+	& BaseRequestContext
+	& {
+		projectGroup: ProjectGroupContainer
+		authResult: AuthResult | null
+		timer: Timer
+	}
+
+export type BaseHttpRequestContext = {
 	koa: KoaContext<{}>
 	body: unknown
 	response: ServerResponse
 }
 
-export interface WebSocketContext extends ApplicationContext {
-	ws: WebSocket
-	abortSignal: AbortSignal
-}
+export type HttpContext =
+	& ApplicationContext
+	& BaseHttpRequestContext
+	& {
+		requestDebugMode: boolean
+	}
 
-export type HttpController = (context: HttpContext) => Promise<HttpErrorResponse | undefined | void> | HttpErrorResponse | undefined | void
+export type InternalHttpContext =
+	& BaseRequestContext
+	& BaseHttpRequestContext
+
+export type WebSocketContext =
+	& ApplicationContext
+	& {
+		ws: WebSocket
+		abortSignal: AbortSignal
+	}
+
+export type HttpControllerResponse = Promise<HttpErrorResponse | undefined | void> | HttpErrorResponse | undefined | void
+export type HttpController = (context: HttpContext) => HttpControllerResponse
+export type InternalHttpController = (context: InternalHttpContext) => HttpControllerResponse
 
 export type WebSocketController = (context: WebSocketContext) => void
 

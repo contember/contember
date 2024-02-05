@@ -2,7 +2,7 @@ import { Box, Checkbox, Dropdown, DropdownProps, FieldContainer, TableColumnsIco
 import { Fragment, ReactElement, useMemo } from 'react'
 import { useMessageFormatter } from '@contember/react-i18n'
 import { dataGridDictionary } from '../dict/dataGridDictionary'
-import { useDataGridColumns, useDataGridHidingMethods, useDataGridHidingState, useDataGridLayoutState } from '@contember/react-datagrid'
+import { useDataGridColumns, useDataGridHiddenColumns, useDataGridLayout, useDataGridSetColumnHidden } from '@contember/react-datagrid'
 import { DataGridColumnPublicProps } from '../types'
 
 export type DataGridColumnHidingPublicProps = {
@@ -16,10 +16,10 @@ export const DataGridColumnHiding = ({
 	allowColumnVisibilityControls,
 }: DataGridColumnHidingProps): ReactElement | null => {
 	const formatMessage = useMessageFormatter(dataGridDictionary)
-	const { setIsColumnHidden } = useDataGridHidingMethods()
-	const layout = useDataGridLayoutState()
+	const setIsColumnHidden = useDataGridSetColumnHidden()
+	const layout = useDataGridLayout()
 	const columns = useDataGridColumns<DataGridColumnPublicProps>()
-	const hiding = useDataGridHidingState()
+	const hiding = useDataGridHiddenColumns()
 	const buttonProps: DropdownProps['buttonProps'] = useMemo(() => ({
 		intent: 'default',
 		distinction: 'seamless',
@@ -32,7 +32,7 @@ export const DataGridColumnHiding = ({
 		size: 'small',
 	}), [formatMessage])
 
-	if (allowColumnVisibilityControls === false || layout.view === 'tiles') {
+	if (allowColumnVisibilityControls === false || layout === 'tiles') {
 		return null
 	}
 

@@ -1,10 +1,10 @@
 import { DataGridHeaderCell } from './DataGridHeaderCell'
 import { TableRow } from '@contember/ui'
-import { useDataGridColumns, useDataGridHidingState } from '@contember/react-datagrid'
+import { useDataGridColumns, useDataGridHiddenColumns } from '@contember/react-datagrid'
 
 export const DataGridTableHead = () => {
 	const columns = useDataGridColumns()
-	const hiddenColumns = useDataGridHidingState()
+	const hiddenColumns = useDataGridHiddenColumns()
 	return (
 		<TableRow>
 			{Array.from(columns)

@@ -1,9 +1,8 @@
 import { TableCell, TableRow } from '@contember/ui'
 import { EntityAccessor, EntityId, useEntity } from '@contember/react-binding'
 import { useCallback } from 'react'
-import { DataGridState, useDataGridColumns, useDataGridHidingState } from '@contember/react-datagrid'
+import { useDataGridColumns, useDataGridHiddenColumns } from '@contember/react-datagrid'
 import { DataGridColumnPublicProps } from '../types'
-import { useDataViewDisplayedState } from '@contember/react-dataview'
 
 export type DataGridTableRowPublicProps = {
 	onEntityClick?: (entity: EntityAccessor) => void
@@ -27,7 +26,7 @@ export const DataGridTableRow = ({ onEntityClick, isEntitySelected, selectedEnti
 		onEntityClick?.(entity)
 	}, [entity, onEntityClick])
 	const columns = useDataGridColumns<DataGridColumnPublicProps>()
-	const hiddenColumns = useDataViewDisplayedState<DataGridState<any>>().hiddenColumns
+	const hiddenColumns = useDataGridHiddenColumns()
 
 	return (
 		<TableRow onClick={onClick} active={isSelected}>

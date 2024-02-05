@@ -3,14 +3,14 @@ import type { ComponentType, FunctionComponent } from 'react'
 import { BaseDynamicChoiceField, renderDynamicChoiceFieldStatic, useDesugaredOptionPath, useSelectOptions, useCurrentlyChosenEntities } from '@contember/react-choice-field'
 import { DataGridColumnCommonProps, FilterRendererProps } from '../types'
 import { DataGridColumn } from '../grid'
-import { createHasOneFilter, SelectCellArtifacts } from '@contember/react-dataview'
+import { createHasOneFilter, RelationFilterArtifacts } from '@contember/react-dataview'
 import { SelectCellFilterExtraProps } from './common'
 
 export type HasOneSelectRendererProps =
 	& BaseDynamicChoiceField
 	& SugaredRelativeSingleEntity
 	& {
-		initialFilter?: SelectCellArtifacts
+		initialFilter?: RelationFilterArtifacts
 	}
 
 export type HasOneSelectProps =
@@ -19,11 +19,11 @@ export type HasOneSelectProps =
 
 
 export const createHasOneSelectCell = <ColumnProps extends {}, ValueRendererProps extends {}>({ FilterRenderer, ValueRenderer }: {
-	FilterRenderer: ComponentType<FilterRendererProps<SelectCellArtifacts, SelectCellFilterExtraProps>>,
+	FilterRenderer: ComponentType<FilterRendererProps<RelationFilterArtifacts, SelectCellFilterExtraProps>>,
 	ValueRenderer: ComponentType<HasOneSelectRendererProps & ValueRendererProps>
 }): FunctionComponent<HasOneSelectProps & ColumnProps & ValueRendererProps> => Component(props => {
 	return (
-		<DataGridColumn<SelectCellArtifacts>
+		<DataGridColumn<RelationFilterArtifacts>
 			{...props}
 			enableOrdering={false}
 			getNewFilter={createHasOneFilter(props.field)}
@@ -36,7 +36,7 @@ export const createHasOneSelectCell = <ColumnProps extends {}, ValueRendererProp
 					lazy: { initialLimit: 0 },
 					...props,
 				}
-				const currentlyChosenEntities = useCurrentlyChosenEntities(optionProps, filterProps.filter.id)
+				const currentlyChosenEntities = useCurrentlyChosenEntities(optionProps, filterProps.filter.id ?? [])
 				const selectProps = useSelectOptions(optionProps, currentlyChosenEntities)
 
 				return <FilterRenderer {...selectProps} {...filterProps} />

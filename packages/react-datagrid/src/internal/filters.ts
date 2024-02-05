@@ -1,5 +1,14 @@
-import { DataGridColumns } from '../types'
+import { DataGridColumnProps, DataGridColumns } from '../types'
 import { DataViewFilteringArtifacts } from '@contember/react-dataview'
+
+export const getFilterTypes = (columns: DataGridColumns<any>) => {
+	return Object.fromEntries(Array.from(columns.entries()).flatMap(([i, value]: [string, DataGridColumnProps<any>]) => {
+		if (value.enableFiltering === false) {
+			return []
+		}
+		return [[i, value.getNewFilter]]
+	}))
+}
 
 export const normalizeInitialFilters = (storedValue: DataViewFilteringArtifacts, columns: DataGridColumns<any>): DataViewFilteringArtifacts => {
 	return Object.fromEntries(Array.from(columns.entries()).flatMap(([i, value]) => {

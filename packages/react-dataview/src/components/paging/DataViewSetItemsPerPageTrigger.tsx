@@ -1,5 +1,5 @@
 import { forwardRef, ReactNode, useCallback } from 'react'
-import { useDataViewPagingMethods, useDataViewPagingState } from '../../internal/contexts'
+import { useDataViewPagingMethods, useDataViewPagingState } from '../../contexts'
 import { Slot } from '@radix-ui/react-slot'
 
 

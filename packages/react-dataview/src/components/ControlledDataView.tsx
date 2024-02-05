@@ -7,11 +7,16 @@ import {
 	DataViewFilteringStateContext,
 	DataViewPagingInfoContext,
 	DataViewPagingMethodsContext,
-	DataViewPagingStateContext, DataViewSortingMethodsContext, DataViewSortingStateContext,
-} from '../internal/contexts'
-import { Component } from '@contember/react-binding'
+	DataViewPagingStateContext,
+	DataViewSelectionMethodsContext,
+	DataViewSelectionStateContext,
+	DataViewSortingMethodsContext,
+	DataViewSortingStateContext,
+} from '../contexts'
+import { Component, EnvironmentMiddleware } from '@contember/react-binding'
 import { DataViewLoader } from '../internal/components/DataViewLoader'
 import { DataViewInfo, DataViewMethods, DataViewState } from '../types'
+import { dataViewSelectionEnvironmentExtension } from '../dataViewSelectionEnvironmentExtension'
 
 
 export type ControlledDataViewProps =
@@ -34,7 +39,11 @@ export const ControlledDataView = Component<ControlledDataViewProps>(({ state, i
 									<DataViewFilterHandlerRegistryContext.Provider value={state.filtering.filterTypes ?? {}}>
 										<DataViewFilteringStateContext.Provider value={state.filtering}>
 											<DataViewFilteringMethodsContext.Provider value={methods.filtering}>
-												<DataViewLoader children={children} state={state} />
+												<DataViewSelectionMethodsContext.Provider value={methods.selection}>
+													<EnvironmentMiddleware create={it => it.withExtension(dataViewSelectionEnvironmentExtension, state.selection)}>
+														<DataViewLoader children={children} state={state} />
+													</EnvironmentMiddleware>
+												</DataViewSelectionMethodsContext.Provider>
 											</DataViewFilteringMethodsContext.Provider>
 										</DataViewFilteringStateContext.Provider>
 									</DataViewFilterHandlerRegistryContext.Provider>

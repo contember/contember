@@ -1,5 +1,5 @@
 import { DataViewProps } from '../components'
-import { useDataViewGlobalKey } from '../internal/contexts'
+import { useDataViewGlobalKey } from '../contexts'
 
 export const useDataViewKey = (props: Pick<DataViewProps, 'entities' | 'dataViewKey'>): string => {
 	const pageName = useDataViewGlobalKey()

@@ -1,12 +1,13 @@
 import { Environment, SugaredOrderBy } from '@contember/binding'
 import { OrderBy } from '@contember/react-binding'
 
-export type DataViewOrderDirection = 'asc' | 'desc' | null
-export type DataViewSetOrderBy = (setOrderBy: DataViewOrderDirection | 'next', append?: boolean) => void
-export type DataViewSetColumnOrderBy = (key: string, columnOrderBy: DataViewOrderDirection | 'next', append?: boolean) => void
+export type DataViewSortingDirection = 'asc' | 'desc' | null
+export type DataViewSortingDirectionAction = DataViewSortingDirection | 'next' | 'toggleAsc' | 'toggleDesc' | 'clear'
+export type DataViewSetSorting = (setOrderBy: DataViewSortingDirectionAction, append?: boolean) => void
+export type DataViewSetColumnSorting = (key: string, columnOrderBy: DataViewSortingDirectionAction, append?: boolean) => void
 
 export type DataViewSortingMethods = {
-	setOrderBy: DataViewSetColumnOrderBy
+	setOrderBy: DataViewSetColumnSorting
 }
 
 export type DataViewSortingHandler = {}
@@ -17,11 +18,11 @@ export interface GetNewOrderByOptions {
 }
 
 export type GetNewOrderBy = (
-	newDirection: DataViewOrderDirection,
+	newDirection: DataViewSortingDirection,
 	options: GetNewOrderByOptions,
 ) => SugaredOrderBy | undefined
 
-export type DataViewSortingDirections = Record<string, Exclude<DataViewOrderDirection, null>>;
+export type DataViewSortingDirections = Record<string, Exclude<DataViewSortingDirection, null>>;
 
 export type DataViewSortingState = {
 	directions: DataViewSortingDirections

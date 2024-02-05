@@ -2,6 +2,7 @@ import { DataViewPagingInfo, DataViewPagingMethods, DataViewPagingState } from '
 import { DataViewSortingMethods, DataViewSortingState } from './sorting'
 import { DataViewFilteringMethods, DataViewFilteringState } from './filtering'
 import { QualifiedEntityList } from '@contember/binding'
+import { DataViewSelectionMethods, DataViewSelectionState } from './selection'
 
 export type DataViewState = {
 	entities: QualifiedEntityList
@@ -9,6 +10,7 @@ export type DataViewState = {
 	paging: DataViewPagingState
 	sorting: DataViewSortingState
 	filtering: DataViewFilteringState
+	selection: DataViewSelectionState
 }
 
 export type DataViewInfo = {
@@ -19,4 +21,5 @@ export type DataViewMethods = {
 	paging: DataViewPagingMethods
 	sorting: DataViewSortingMethods
 	filtering: DataViewFilteringMethods
+	selection: DataViewSelectionMethods
 }

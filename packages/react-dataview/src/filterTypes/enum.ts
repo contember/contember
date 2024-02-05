@@ -2,30 +2,43 @@ import { QueryLanguage, SugaredRelativeSingleField, wrapFilterInHasOnes } from '
 import { Input } from '@contember/client'
 import { DataViewFilterHandler } from '../types'
 
-export type EnumCellFilterArtifacts = {
-	values: string[]
-	nullCondition: boolean
+export type EnumFilterArtifacts = {
+	values?: string[]
+	notValues?: string[]
+	nullCondition?: boolean
 }
 
-export const createEnumFilter = (field: SugaredRelativeSingleField['field']): DataViewFilterHandler<EnumCellFilterArtifacts> => (filter, { environment }) => {
-	const { values, nullCondition = false } = filter
+export const createEnumFilter = (field: SugaredRelativeSingleField['field']): DataViewFilterHandler<EnumFilterArtifacts> => (filter, { environment }) => {
+	const { values, notValues, nullCondition } = filter
 
-	if (values.length === 0 && !nullCondition) {
+	if (!values?.length && nullCondition === undefined && !notValues?.length) {
 		return undefined
 	}
 	const desugared = QueryLanguage.desugarRelativeSingleField(field, environment)
 
-	const conditions: Input.Condition<string>[] = []
+	const inclusion: Input.Condition<string>[] = []
+	const exclusion: Input.Condition<string>[] = []
 
-	if (nullCondition) {
-		conditions.push({ isNull: true })
+	if (nullCondition === true) {
+		inclusion.push({ isNull: true })
+	}
+	if (nullCondition === false) {
+		exclusion.push({ isNull: false })
+	}
+	if (values?.length) {
+		inclusion.push({ in: values })
+	}
+	if (notValues?.length) {
+		exclusion.push({ notIn: notValues })
 	}
 
-	conditions.push({
-		in: values,
-	})
 
 	return wrapFilterInHasOnes(desugared.hasOneRelationPath, {
-		[desugared.field]: { or: conditions },
+		[desugared.field]: {
+			and: [
+				{ or: inclusion },
+				...exclusion,
+			],
+		},
 	})
 }

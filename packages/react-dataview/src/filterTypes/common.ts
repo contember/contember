@@ -1,18 +1,22 @@
 import { EntityId } from '@contember/react-binding'
 import { Input } from '@contember/client'
 
-export type SelectCellArtifacts = {
-	id: EntityId[]
-	nullCondition: boolean
+export type RelationFilterArtifacts = {
+	id?: EntityId[]
+	notId?: EntityId[]
+	nullCondition?: boolean
 }
 
 
 export type GenericTextCellFilterArtifacts = {
-	mode: 'matches' | 'matchesExactly' | 'startsWith' | 'endsWith' | 'doesNotMatch'
-	query: string
+	mode?: 'matches' | 'matchesExactly' | 'startsWith' | 'endsWith' | 'doesNotMatch'
+	query?: string
 }
 
 export const createGenericTextCellFilterCondition = (filter: GenericTextCellFilterArtifacts) => {
+	if (!filter.query) {
+		return {}
+	}
 	const baseOperators = {
 		matches: 'containsCI',
 		doesNotMatch: 'containsCI',
@@ -22,7 +26,7 @@ export const createGenericTextCellFilterCondition = (filter: GenericTextCellFilt
 	}
 
 	let condition: Input.Condition<string> = {
-		[baseOperators[filter.mode]]: filter.query,
+		[baseOperators[filter.mode ?? 'matches']]: filter.query,
 	}
 
 	if (filter.mode === 'doesNotMatch') {

@@ -2,28 +2,28 @@ import { QueryLanguage, SugaredRelativeSingleField, wrapFilterInHasOnes } from '
 import { createGenericTextCellFilterCondition } from './common'
 import { DataViewFilterHandler } from '../types'
 
+export type TextFilterArtifactsMatchMode = 'matches' | 'matchesExactly' | 'startsWith' | 'endsWith' | 'doesNotMatch'
+
 export type TextFilterArtifacts = {
-	mode: 'matches' | 'matchesExactly' | 'startsWith' | 'endsWith' | 'doesNotMatch'
-	query: string
-	nullCondition: boolean
+	mode?: TextFilterArtifactsMatchMode
+	query?: string
+	nullCondition?: boolean
 }
 
 export const createTextFilter = (field: SugaredRelativeSingleField['field']): DataViewFilterHandler<TextFilterArtifacts> => (filter, { environment }) => {
-	if (filter.query === '' && filter.nullCondition === false) {
+	if (!filter.query && filter.nullCondition === undefined) {
 		return undefined
 	}
 
 	let condition = filter.query !== '' ? createGenericTextCellFilterCondition(filter) : {}
 
-	if (filter.mode === 'doesNotMatch') {
-		if (filter.nullCondition) {
-			condition = {
-				and: [condition, { isNull: false }],
-			}
-		}
-	} else if (filter.nullCondition) {
+	if (filter.nullCondition === true) {
 		condition = {
 			or: [condition, { isNull: true }],
+		}
+	} else if (filter.nullCondition === false) {
+		condition = {
+			and: [condition, { isNull: false }],
 		}
 	}
 

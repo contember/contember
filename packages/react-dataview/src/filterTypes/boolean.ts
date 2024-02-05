@@ -3,30 +3,39 @@ import { Input } from '@contember/client'
 import { DataViewFilterHandler } from '../types'
 
 export type BooleanFilterArtifacts = {
-	includeTrue: boolean
-	includeFalse: boolean
-	includeNull: boolean
+	includeTrue?: boolean
+	includeFalse?: boolean
+	nullCondition?: boolean
 }
 
 export const createBooleanFilter = (field: SugaredRelativeSingleField['field']): DataViewFilterHandler<BooleanFilterArtifacts> => (filterArtifact, { environment }) => {
-	const conditions: Input.Condition<boolean>[] = []
-
+	const inclusion: Input.Condition[] = []
+	const exclusion: Input.Condition[] = []
 	if (filterArtifact.includeTrue) {
-		conditions.push({ eq: true })
+		inclusion.push({ eq: true })
 	}
 	if (filterArtifact.includeFalse) {
-		conditions.push({ eq: false })
+		inclusion.push({ eq: false })
 	}
-	if (filterArtifact.includeNull) {
-		conditions.push({ isNull: true })
+	if (filterArtifact.nullCondition === true) {
+		inclusion.push({ isNull: true })
 	}
-	if (conditions.length === 0 || conditions.length === 3) {
+	if (filterArtifact.nullCondition === false) {
+		exclusion.push({ isNull: false })
+	}
+
+	if (inclusion.length === 0 && exclusion.length === 0) {
 		return undefined
 	}
 
 	const desugared = QueryLanguage.desugarRelativeSingleField(field, environment)
 
 	return wrapFilterInHasOnes(desugared.hasOneRelationPath, {
-		[desugared.field]: conditions.length > 1 ? { or: conditions } : conditions[0],
+		[desugared.field]: {
+			and: [
+				{ or: inclusion },
+				...exclusion,
+			],
+		},
 	})
 }

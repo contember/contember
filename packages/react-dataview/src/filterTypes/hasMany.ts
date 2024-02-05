@@ -1,22 +1,25 @@
-import { QueryLanguage, SugaredRelativeEntityList, wrapFilterInHasOnes } from '@contember/binding'
+import { Filter, QueryLanguage, SugaredRelativeEntityList, wrapFilterInHasOnes } from '@contember/binding'
 import { DataViewFilterHandler } from '../types'
-import { SelectCellArtifacts } from './common'
+import { RelationFilterArtifacts } from './common'
 
-export const createHasManyFilter = (field: SugaredRelativeEntityList['field']): DataViewFilterHandler<SelectCellArtifacts> => (filter, { environment }) => {
-	if (filter.id.length === 0 && filter.nullCondition === false) {
+export const createHasManyFilter = (field: SugaredRelativeEntityList['field']): DataViewFilterHandler<RelationFilterArtifacts> => (filter, { environment }) => {
+	if (!filter.id?.length && !filter.notId?.length && filter.nullCondition === undefined) {
 		return undefined
 	}
+
 	const desugared = QueryLanguage.desugarRelativeEntityList({ field }, environment)
-	const ors = []
-	if (filter.id.length > 0) {
-		ors.push(wrapFilterInHasOnes(desugared.hasOneRelationPath, {
+
+	const inclusionConditions: Filter[] = []
+	const exclusionConditions: Filter[] = []
+	if (filter.id?.length) {
+		inclusionConditions.push(wrapFilterInHasOnes(desugared.hasOneRelationPath, {
 			[desugared.hasManyRelation.field]: {
 				id: { in: filter.id },
 			},
 		}))
 	}
 	if (filter.nullCondition === true) {
-		ors.push({
+		inclusionConditions.push({
 			not: wrapFilterInHasOnes(desugared.hasOneRelationPath, {
 				[desugared.hasManyRelation.field]: {
 					id: { isNull: false },
@@ -24,6 +27,27 @@ export const createHasManyFilter = (field: SugaredRelativeEntityList['field']): 
 			}),
 		})
 	}
+	if (filter.notId?.length) {
+		exclusionConditions.push({
+			not: wrapFilterInHasOnes(desugared.hasOneRelationPath, {
+				[desugared.hasManyRelation.field]: {
+					id: { in: filter.notId },
+				},
+			}),
+		})
+	}
+	if (filter.nullCondition === false) {
+		exclusionConditions.push(wrapFilterInHasOnes(desugared.hasOneRelationPath, {
+			[desugared.hasManyRelation.field]: {
+				id: { isNull: false },
+			},
+		}))
+	}
 
-	return { or: ors }
+	return {
+		and: [
+			{ or: inclusionConditions },
+			...exclusionConditions,
+		],
+	}
 }

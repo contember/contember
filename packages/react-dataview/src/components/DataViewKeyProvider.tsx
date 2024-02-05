@@ -1,3 +1,3 @@
-import { DataViewGlobalKeyContext } from '../internal/contexts'
+import { DataViewGlobalKeyContext } from '../contexts'
 
 export const DataViewKeyProvider = DataViewGlobalKeyContext.Provider

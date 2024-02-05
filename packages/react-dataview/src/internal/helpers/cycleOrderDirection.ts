@@ -1,8 +1,8 @@
 import { assertNever } from '@contember/utilities'
-import { DataViewOrderDirection } from '../../types/sorting'
+import { DataViewSortingDirection } from '../../types/sorting'
 
 
-export const cycleOrderDirection = (direction: DataViewOrderDirection): DataViewOrderDirection => {
+export const cycleOrderDirection = (direction: DataViewSortingDirection): DataViewSortingDirection => {
 	if (direction === null) {
 		return 'asc'
 	}

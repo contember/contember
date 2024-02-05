@@ -1,6 +1,6 @@
 import { forwardRef, useCallback, useMemo } from 'react'
 import { Slot } from '@radix-ui/react-slot'
-import { useDataViewPagingInfo, useDataViewPagingMethods, useDataViewPagingState } from '../../internal/contexts'
+import { useDataViewPagingInfo, useDataViewPagingMethods, useDataViewPagingState } from '../../contexts'
 
 export interface DataViewChangePageTriggerProps {
 	page: number | 'first' | 'last' | 'next' | 'previous'

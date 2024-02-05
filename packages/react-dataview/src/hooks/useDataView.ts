@@ -4,9 +4,10 @@ import { useDataViewKey } from './useDataViewKey'
 import { useCallback, useMemo, useRef } from 'react'
 import { useEnvironment } from '@contember/react-binding'
 import { useDataViewFiltering } from '../internal/hooks/useDataViewFiltering'
-import { DataViewFilteringProps, DataViewPagingProps, DataViewSortingProps } from '../types'
+import { DataViewFilteringProps, DataViewPagingProps, DataViewSelectionProps, DataViewSortingProps } from '../types'
 import { useDataViewSorting } from '../internal/hooks/useDataViewSorting'
 import { useDataViewPaging } from '../internal/hooks/useDataViewPaging'
+import { useDataViewSelection } from '../internal/hooks/useDataViewSelection'
 
 export type UseDataViewArgs =
 	& {
@@ -16,6 +17,7 @@ export type UseDataViewArgs =
 	& DataViewFilteringProps
 	& DataViewSortingProps
 	& DataViewPagingProps
+	& DataViewSelectionProps
 
 export type UseDataViewResult = {
 	state: DataViewState
@@ -60,6 +62,13 @@ export const useDataView = (args: UseDataViewArgs): UseDataViewResult => {
 		filter: filteringState.filter,
 	})
 
+	const { state: selectionState, methods: selectionMethods } = useDataViewSelection({
+		dataViewKey: key,
+		resetPage,
+		selectionFallback: args.selectionFallback,
+		initialSelection: args.initialSelection,
+	})
+
 	resetPageRef.current = () => {
 		pagingMethods.goToPage(0)
 	}
@@ -70,13 +79,15 @@ export const useDataView = (args: UseDataViewArgs): UseDataViewResult => {
 		filtering: filteringState,
 		sorting: sortingState,
 		paging: pagingState,
-	}), [key, entities, filteringState, sortingState, pagingState])
+		selection: selectionState,
+	}), [key, entities, filteringState, sortingState, pagingState, selectionState])
 
 	const methods = useMemo(() => ({
 		filtering: filteringMethods,
 		sorting: sortingMethods,
 		paging: pagingMethods,
-	}), [filteringMethods, sortingMethods, pagingMethods])
+		selection: selectionMethods,
+	}), [filteringMethods, sortingMethods, pagingMethods, selectionMethods])
 
 	const info = useMemo(() => ({
 		paging: pagingInfo,

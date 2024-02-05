@@ -39,7 +39,20 @@ export const useDataViewSorting = ({ dataViewKey, initialSorting, resetPage }: U
 				didBailOut = true
 				return orderBys
 			}
-			const resolvedValue = columnOrderBy === 'next' ? cycleOrderDirection(existingValue) : columnOrderBy
+			const resolvedValue = (() => {
+				switch (columnOrderBy) {
+					case 'next':
+						return cycleOrderDirection(existingValue)
+					case 'toggleAsc':
+						return existingValue === 'asc' ? null : 'asc'
+					case 'toggleDesc':
+						return existingValue === 'desc' ? null : 'desc'
+					case 'clear':
+						return null
+					default:
+						return columnOrderBy
+				}
+			})()
 			if (resolvedValue === null) {
 				const { [columnKey]: _, ...rest } = orderBys
 				return rest
@@ -49,7 +62,7 @@ export const useDataViewSorting = ({ dataViewKey, initialSorting, resetPage }: U
 		if (!didBailOut) {
 			resetPage()
 		}
-	}, [])
+	}, [resetPage, setDirections])
 
 	return {
 		state: useMemo(() => {

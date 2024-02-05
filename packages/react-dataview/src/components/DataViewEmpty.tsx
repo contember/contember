@@ -1,5 +1,5 @@
 import { ReactNode } from 'react'
-import { useDataViewEntityListAccessor } from '../internal/contexts'
+import { useDataViewEntityListAccessor } from '../contexts'
 
 export const DataViewEmpty = ({ children }: { children: ReactNode }) => {
 	const accessor = useDataViewEntityListAccessor()

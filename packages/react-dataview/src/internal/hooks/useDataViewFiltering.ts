@@ -32,7 +32,7 @@ export const useDataViewFiltering = ({ dataViewKey, initialFilters, filterTypes 
 	const setFilter = useCallback<DataViewFilteringMethods['setFilter']>((key, columnFilter) => {
 		const column = filterTypes?.[key]
 		if (column === undefined) {
-			return
+			throw new Error(`Unknown filter ${key}`)
 		}
 		let didBailOut = false
 

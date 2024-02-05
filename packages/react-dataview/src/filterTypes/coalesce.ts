@@ -3,13 +3,13 @@ import { DataViewFilterHandler } from '../types'
 import { createGenericTextCellFilterCondition } from './common'
 
 export type CoalesceTextFilterArtifacts = {
-	mode: 'matches' | 'matchesExactly' | 'startsWith' | 'endsWith' | 'doesNotMatch'
-	query: string
+	mode?: 'matches' | 'matchesExactly' | 'startsWith' | 'endsWith' | 'doesNotMatch'
+	query?: string
 }
 
 
 export const createCoalesceFilter = (fields: SugaredRelativeSingleField['field'][]): DataViewFilterHandler<CoalesceTextFilterArtifacts> => (filter, { environment }): Filter | undefined => {
-	if (filter.query === '') {
+	if (!filter.query) {
 		return undefined
 	}
 	const condition = createGenericTextCellFilterCondition(filter)

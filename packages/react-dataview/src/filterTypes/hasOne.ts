@@ -1,21 +1,33 @@
 import { QueryLanguage, SugaredRelativeSingleEntity, wrapFilterInHasOnes } from '@contember/binding'
 import { DataViewFilterHandler } from '../types'
-import { SelectCellArtifacts } from './common'
+import { RelationFilterArtifacts } from './common'
 
-export const createHasOneFilter = (field: SugaredRelativeSingleEntity['field']): DataViewFilterHandler<SelectCellArtifacts> => (filter, { environment }) => {
-	if (filter.id.length === 0 && filter.nullCondition === false) {
+export const createHasOneFilter = (field: SugaredRelativeSingleEntity['field']): DataViewFilterHandler<RelationFilterArtifacts> => (filter, { environment }) => {
+	if (!filter.id?.length && !filter.notId?.length && filter.nullCondition === undefined) {
 		return undefined
 	}
 	const desugared = QueryLanguage.desugarRelativeSingleEntity({ field }, environment)
-	const conditions = []
-	if (filter.id.length > 0) {
-		conditions.push({ in: filter.id })
+	const inclusionConditions = []
+	const exclusionConditions = []
+	if (filter.id?.length) {
+		inclusionConditions.push({ in: filter.id })
 	}
 	if (filter.nullCondition === true) {
-		conditions.push({ isNull: true })
+		inclusionConditions.push({ isNull: filter.nullCondition })
+	}
+	if (filter.notId?.length) {
+		exclusionConditions.push({ notIn: filter.notId })
+	}
+	if (filter.nullCondition === false) {
+		exclusionConditions.push({ isNull: false })
 	}
 
 	return wrapFilterInHasOnes(desugared.hasOneRelationPath, {
-		id: { or: conditions },
+		id: {
+			and: [
+				{ or: inclusionConditions },
+				...exclusionConditions,
+			],
+		},
 	})
 }

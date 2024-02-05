@@ -1,7 +1,9 @@
 import { ReactNode } from 'react'
-import { Component } from '@contember/react-binding'
-import { useDataView, UseDataViewArgs } from '../hooks/useDataView'
+import { Component, QueryLanguage } from '@contember/react-binding'
+import { useDataView, UseDataViewArgs } from '../hooks'
 import { ControlledDataView } from './ControlledDataView'
+import { DataViewLoader } from '../internal/components/DataViewLoader'
+import { DATA_VIEW_DEFAULT_ITEMS_PER_PAGE } from '../internal/hooks/useDataViewPaging'
 
 
 export type DataViewProps =
@@ -18,6 +20,30 @@ export const DataView = Component<DataViewProps>(props => {
 			{props.children}
 		</ControlledDataView>
 	)
-}, () => {
-	return null
+}, (props, env) => {
+	return (
+		<DataViewLoader children={props.children} state={{
+			key: '_',
+			entities: QueryLanguage.desugarQualifiedEntityList({ entities: props.entities }, env),
+			paging: {
+				pageIndex: 0,
+				itemsPerPage: props.initialItemsPerPage ?? DATA_VIEW_DEFAULT_ITEMS_PER_PAGE,
+			},
+			filtering: {
+				filter: {
+					and: [{}],
+				},
+				filterTypes: {},
+				artifact: {},
+			},
+			sorting: {
+				orderBy: [],
+				directions: {},
+			},
+			selection: {
+				values: props.initialSelection && typeof props.initialSelection !== 'function' ? props.initialSelection : {},
+				fallback: props.selectionFallback === undefined ? true : props.selectionFallback,
+			},
+		}} />
+	)
 })

@@ -2,7 +2,7 @@ import { Identity2023 } from '@contember/brand'
 import { LogOutIcon, MenuIcon, PanelLeftCloseIcon, PanelLeftOpenIcon, PanelRightCloseIcon, PanelRightOpenIcon } from 'lucide-react'
 import { memo, PropsWithChildren, useState } from 'react'
 import { Navigation } from './navigation'
-import { Slot, SlotTargets } from './slots'
+import { Slots, SlotTargets } from './slots'
 import { Link } from '@contember/interface'
 import { IdentityLoader } from './binding/identity'
 import { ComponentClassNameProps } from '@contember/utilities'
@@ -14,27 +14,27 @@ export const Layout = memo(({ children }: PropsWithChildren) => {
 	return (
 		<IdentityLoader>
 			<LayoutComponent>
-				<Slot.Logo>
+				<Slots.Logo>
 					<Link to="index">
 						<Identity2023.Edit scale={2} />
 					</Link>
-				</Slot.Logo>
-				<Slot.Navigation>
+				</Slots.Logo>
+				<Slots.Navigation>
 					<Navigation />
-				</Slot.Navigation>
+				</Slots.Navigation>
 
-				<Slot.Profile>
+				<Slots.Profile>
 					<LogoutTrigger>
 						<Button variant={'ghost'}>
 							<LogOutIcon /> Logout
 						</Button>
 					</LogoutTrigger>
-				</Slot.Profile>
+				</Slots.Profile>
 
-				<Slot.Footer>
+				<Slots.Footer>
 					<p><small>Created with <a className="content-link" href="https://www.contember.com/">AI-assisted Contember
 						Studio</a></small></p>
-				</Slot.Footer>
+				</Slots.Footer>
 
 				{children}
 			</LayoutComponent>
@@ -84,7 +84,7 @@ const LayoutComponent = ({ children, ...rest }: PropsWithChildren<ComponentClass
 							<SlotTargets.Profile />
 						</div>
 					</div>
-					<div className={'flex flex-col flex-2 p-4 gap-2 w-full flex-auto'}>
+					<div className={'flex flex-col flex-2 p-4 gap-2 w-full flex-auto overflow-hidden'}>
 						<div className={'flex'}>
 							<div className={'flex gap-2'}>
 								<SlotTargets.Back />

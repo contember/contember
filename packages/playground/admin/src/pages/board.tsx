@@ -1,5 +1,5 @@
 import { Field } from '@contember/interface'
-import { Slot } from '../components/slots'
+import { Slots } from '../components/slots'
 import { BoardColumnLabel } from '@contember/react-board'
 import { Binding } from '../components/binding/Binding'
 import { PersistButton } from '../components/binding/PersistButton'
@@ -15,9 +15,9 @@ const statusList = [
 
 export const assignee = () => <>
 	<Binding>
-		<Slot.Actions>
+		<Slots.Actions>
 			<PersistButton />
-		</Slot.Actions>
+		</Slots.Actions>
 
 		<DefaultBoard
 			entities={'BoardTask'}
@@ -46,7 +46,7 @@ export const assignee = () => <>
 </>
 export const status = () => <>
 	<Binding>
-		<Slot.Actions><PersistButton /></Slot.Actions>
+		<Slots.Actions><PersistButton /></Slots.Actions>
 
 		<DefaultBoard
 			entities={'BoardTask'}

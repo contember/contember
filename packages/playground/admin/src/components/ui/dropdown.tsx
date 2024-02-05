@@ -4,6 +4,7 @@ import { Check, ChevronRight, Circle, MoreHorizontalIcon } from 'lucide-react'
 import { uic } from '../../utils/uic'
 import { buttonConfig } from './button'
 import { cn } from '../../utils/cn'
+import { ReactNode } from 'react'
 
 export const DropdownMenu = DropdownMenuPrimitive.Root
 
@@ -94,3 +95,15 @@ export const DropDownTriggerButton = uic('button', {
 		<span className="sr-only">Open menu</span>
 	</>,
 })
+
+export const DefaultDropdown = ({ children }: {
+	children: ReactNode
+}) => (<DropdownMenu>
+		<DropdownMenuTrigger asChild>
+			<DropDownTriggerButton />
+		</DropdownMenuTrigger>
+		<DropdownMenuContent className="w-[160px]">
+			{children}
+		</DropdownMenuContent>
+	</DropdownMenu>
+)

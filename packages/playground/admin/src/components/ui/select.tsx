@@ -3,7 +3,9 @@ import * as SelectPrimitive from '@radix-ui/react-select'
 import { Check, ChevronDown, ChevronUp } from 'lucide-react'
 import { uic } from '../../utils/uic'
 
-export const Select = SelectPrimitive.Root
+export const Select = uic(SelectPrimitive.Root, {
+	baseClass: 'relative',
+})
 
 export const SelectGroup = SelectPrimitive.Group
 

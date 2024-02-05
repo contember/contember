@@ -82,6 +82,106 @@ export const ContemberClientNames: SchemaNames = {
         "order"
       ]
     },
+    "GridArticle": {
+      "name": "GridArticle",
+      "fields": {
+        "id": {
+          "type": "column"
+        },
+        "title": {
+          "type": "column"
+        },
+        "slug": {
+          "type": "column"
+        },
+        "state": {
+          "type": "column"
+        },
+        "locked": {
+          "type": "column"
+        },
+        "publishedAt": {
+          "type": "column"
+        },
+        "author": {
+          "type": "one",
+          "entity": "GridAuthor"
+        },
+        "category": {
+          "type": "one",
+          "entity": "GridCategory"
+        },
+        "tags": {
+          "type": "many",
+          "entity": "GridTag"
+        }
+      },
+      "scalars": [
+        "id",
+        "title",
+        "slug",
+        "state",
+        "locked",
+        "publishedAt"
+      ]
+    },
+    "GridAuthor": {
+      "name": "GridAuthor",
+      "fields": {
+        "id": {
+          "type": "column"
+        },
+        "name": {
+          "type": "column"
+        },
+        "slug": {
+          "type": "column"
+        }
+      },
+      "scalars": [
+        "id",
+        "name",
+        "slug"
+      ]
+    },
+    "GridCategory": {
+      "name": "GridCategory",
+      "fields": {
+        "id": {
+          "type": "column"
+        },
+        "name": {
+          "type": "column"
+        },
+        "slug": {
+          "type": "column"
+        }
+      },
+      "scalars": [
+        "id",
+        "name",
+        "slug"
+      ]
+    },
+    "GridTag": {
+      "name": "GridTag",
+      "fields": {
+        "id": {
+          "type": "column"
+        },
+        "name": {
+          "type": "column"
+        },
+        "slug": {
+          "type": "column"
+        }
+      },
+      "scalars": [
+        "id",
+        "name",
+        "slug"
+      ]
+    },
     "RepeaterItem": {
       "name": "RepeaterItem",
       "fields": {

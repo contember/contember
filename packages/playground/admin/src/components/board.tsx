@@ -11,13 +11,13 @@ import {
 	BoardSortableNullColumn,
 } from '@contember/react-board-dnd-kit'
 import {
-	Board as BoardInternal,
+	Board,
 	BoardColumn,
 	BoardEachColumn,
 	BoardEachItem,
 	BoardItem,
 	BoardNullColumn,
-	BoardProps as BoardPropsInternal,
+	BoardProps,
 } from '@contember/react-board'
 import { GripHorizontal, GripIcon } from 'lucide-react'
 import { Component } from '@contember/interface'
@@ -26,7 +26,7 @@ import { uic } from '../utils/uic'
 import { DropIndicator } from './ui/sortable'
 
 export const BoardWrapperUI = uic('div', {
-	baseClass: 'flex gap-4',
+	baseClass: 'flex gap-4 max-w-full overflow-x-auto pb-4',
 })
 export const BoardItemsWrapperUI = uic('div', {
 	baseClass: 'flex flex-col gap-2 p-2',
@@ -35,10 +35,10 @@ export const BoardColumnHeaderUI = uic('div', {
 	baseClass: 'px-4 py-1 border-b border-gray-100',
 })
 export const BoardCardUI = uic('div', {
-	baseClass: 'rounded border bg-card text-card-foreground shadow-sm p-4 relative',
+	baseClass: 'rounded border bg-card text-card-foreground shadow-sm p-4 relative hover:shadow-md transition-all duration-200',
 })
 export const BoardColumnUI = uic('div', {
-	baseClass: 'rounded-lg border bg-card text-card-foreground shadow-sm relative min-w-48 data-[sortable-over="item"]:bg-yellow-100',
+	baseClass: 'rounded-lg border bg-card text-card-foreground shadow-md relative min-w-48 data-[sortable-over="item"]:bg-yellow-100 hover:shadow-lg transition-all duration-200',
 })
 export const BoardDragOverlayUI = uic('div', {
 	baseClass: 'rounded border border-gray-300 p-4 relative bg-opacity-60 bg-gray-100 backdrop-blur-sm',
@@ -179,7 +179,7 @@ export type DefaultBoardProps =
 		columnFooter?: ReactNode,
 		children: ReactNode
 	}
-	& BoardPropsInternal
+	& BoardProps
 
 export const DefaultBoard = Component<DefaultBoardProps>(({ columnHeader, nullColumnHeader, children, columnFooter, ...props }) => {
 	const itemsSortable = 'sortableBy' in props && props.sortableBy !== undefined
@@ -187,7 +187,7 @@ export const DefaultBoard = Component<DefaultBoardProps>(({ columnHeader, nullCo
 	const anySortable = itemsSortable || columnsSortable
 	if (!anySortable) {
 		return (
-			<BoardInternal {...props}>
+			<Board {...props}>
 				<BoardWrapperUI>
 					<BoardNonSortableColumn
 						columnHeader={columnHeader}
@@ -199,13 +199,13 @@ export const DefaultBoard = Component<DefaultBoardProps>(({ columnHeader, nullCo
 						</BoardNonSortableItems>
 					</BoardNonSortableColumn>
 				</BoardWrapperUI>
-			</BoardInternal>
+			</Board>
 		)
 	}
 	const ItemsComponent = itemsSortable ? BoardSortableItems : BoardNonSortableItems
 
 	return (
-		<BoardInternal {...props}>
+		<Board {...props}>
 			<BoardSortable>
 				<BoardWrapperUI>
 					<BoardSortableColumn
@@ -232,17 +232,17 @@ export const DefaultBoard = Component<DefaultBoardProps>(({ columnHeader, nullCo
 					</BoardDragOverlayUI>
 				</BoardSortableItemDragOverlay> : null}
 			</BoardSortable>
-		</BoardInternal>
+		</Board>
 	)
 }, ({ children, columnHeader, nullColumnHeader, ...props }) => {
 	return <>
-		<BoardInternal {...props}>
+		<Board {...props}>
 			<BoardItem>
 				{children}
 			</BoardItem>
 			<BoardColumn>
 				{columnHeader}
 			</BoardColumn>
-		</BoardInternal>
+		</Board>
 	</>
 })

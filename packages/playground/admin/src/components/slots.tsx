@@ -2,7 +2,7 @@ import { createSlotComponents } from '@contember/react-slots'
 import { useChildrenAsLabel, useDocumentTitle } from '@contember/react-utils'
 import { memo, ReactNode } from 'react'
 
-export const [, Slot, SlotTargets] = createSlotComponents([
+export const [, Slots, SlotTargets] = createSlotComponents([
 	'Title',
 	'Logo',
 	'Navigation',
@@ -19,7 +19,7 @@ export const Title = memo<{ children: ReactNode }>(({ children }) => {
 	useDocumentTitle(titleText)
 
 	return (
-		<Slot.Title>{children}</Slot.Title>
+		<Slots.Title>{children}</Slots.Title>
 	)
 })
 

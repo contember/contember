@@ -1,4 +1,5 @@
 import type { BoardTaskStatus } from './enums'
+import type { GridArticleState } from './enums'
 
 export type JSONPrimitive = string | number | boolean | null
 export type JSONValue = JSONPrimitive | JSONObject | JSONArray
@@ -61,6 +62,80 @@ export type BoardUser = {
 	hasManyBy: {
 	}
 }
+export type GridArticle = {
+	name: 'GridArticle'
+	unique:
+		| { id: string }
+		| { slug: string }
+	columns: {
+		id: string
+		title: string
+		slug: string
+		state: GridArticleState
+		locked: boolean
+		publishedAt: string | null
+	}
+	hasOne: {
+		author: GridAuthor
+		category: GridCategory
+	}
+	hasMany: {
+		tags: GridTag
+	}
+	hasManyBy: {
+	}
+}
+export type GridAuthor = {
+	name: 'GridAuthor'
+	unique:
+		| { id: string }
+		| { slug: string }
+	columns: {
+		id: string
+		name: string
+		slug: string
+	}
+	hasOne: {
+	}
+	hasMany: {
+	}
+	hasManyBy: {
+	}
+}
+export type GridCategory = {
+	name: 'GridCategory'
+	unique:
+		| { id: string }
+		| { slug: string }
+	columns: {
+		id: string
+		name: string
+		slug: string
+	}
+	hasOne: {
+	}
+	hasMany: {
+	}
+	hasManyBy: {
+	}
+}
+export type GridTag = {
+	name: 'GridTag'
+	unique:
+		| { id: string }
+		| { slug: string }
+	columns: {
+		id: string
+		name: string
+		slug: string
+	}
+	hasOne: {
+	}
+	hasMany: {
+	}
+	hasManyBy: {
+	}
+}
 export type RepeaterItem = {
 	name: 'RepeaterItem'
 	unique:
@@ -82,6 +157,10 @@ export type ContemberClientEntities = {
 	BoardTag: BoardTag
 	BoardTask: BoardTask
 	BoardUser: BoardUser
+	GridArticle: GridArticle
+	GridAuthor: GridAuthor
+	GridCategory: GridCategory
+	GridTag: GridTag
 	RepeaterItem: RepeaterItem
 }
 

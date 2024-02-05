@@ -1,17 +1,18 @@
 import { cn } from '../../utils/cn'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '../ui/dropdown'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown'
 import { Button } from '../ui/button'
 import { ReactNode } from 'react'
-import { ArrowDownIcon, ArrowUpDownIcon, ArrowUpIcon } from 'lucide-react'
-import { DataViewSortingCondition, DataViewSortingTrigger } from '@contember/react-dataview'
+import { ArrowDownIcon, ArrowUpDownIcon, ArrowUpIcon, EyeOffIcon } from 'lucide-react'
+import { DataViewSelectionTrigger, DataViewSortingSwitch, DataViewSortingTrigger } from '@contember/react-dataview'
 
 
-export function DataTableColumnHeader<TData, TValue>({ field, children, enableOrdering }: {
+export function DataViewColumnHeader<TData, TValue>({ field, children, enableOrdering, enableHiding }: {
 	field: string,
 	enableOrdering?: boolean,
+	enableHiding?: boolean,
 	children: ReactNode,
 }) {
-	if (!enableOrdering) {
+	if (!enableOrdering && !enableHiding) {
 		return <div>{children}</div>
 	}
 
@@ -22,38 +23,41 @@ export function DataTableColumnHeader<TData, TValue>({ field, children, enableOr
 					<Button
 						variant="ghost"
 						size="sm"
-						className="-ml-3 h-8 data-[state=open]:bg-accent"
+						className="flex-inline gap-1 -ml-3 h-8 data-[state=open]:bg-accent"
 					>
 						<span>{children}</span>
-						<DataViewSortingCondition field={field} direction="asc">
-							<ArrowDownIcon className="ml-2 h-4 w-4" />
-						</DataViewSortingCondition>
-						<DataViewSortingCondition field={field} direction="desc">
-							<ArrowUpIcon className="ml-2 h-4 w-4" />
-						</DataViewSortingCondition>
-						<DataViewSortingCondition field={field} direction="none">
-							<ArrowUpDownIcon className="ml-2 h-4 w-4" />
-						</DataViewSortingCondition>
+
+						{enableOrdering && <DataViewSortingSwitch
+							field={field}
+							asc={<ArrowDownIcon className={'h-4 w-4'} />}
+							desc={<ArrowUpIcon className={'h-4 w-4'} />}
+							none={<ArrowUpDownIcon className={'h-4 w-4'} />}
+						/>}
 					</Button>
 				</DropdownMenuTrigger>
 				<DropdownMenuContent align="start">
-					<DataViewSortingTrigger field={field} direction="asc">
-						<DropdownMenuItem>
-							<ArrowUpIcon className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
-							Asc
-						</DropdownMenuItem>
-					</DataViewSortingTrigger>
-					<DataViewSortingTrigger field={field} direction="desc">
-						<DropdownMenuItem>
-							<ArrowDownIcon className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
-							Desc
-						</DropdownMenuItem>
-					</DataViewSortingTrigger>
-					<DropdownMenuSeparator />
-					{/*<DropdownMenuItem onClick={() => setIsColumnHidden(columnKey, true)}>*/}
-					{/*	<EyeOffIcon className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />*/}
-					{/*	Hide*/}
-					{/*</DropdownMenuItem>*/}
+					{enableOrdering && <>
+						<DataViewSortingTrigger field={field} direction="asc">
+							<DropdownMenuItem>
+								<ArrowUpIcon className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
+								Asc
+							</DropdownMenuItem>
+						</DataViewSortingTrigger>
+						<DataViewSortingTrigger field={field} direction="desc">
+							<DropdownMenuItem>
+								<ArrowDownIcon className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
+								Desc
+							</DropdownMenuItem>
+						</DataViewSortingTrigger>
+					</>}
+					{enableHiding &&
+						<DataViewSelectionTrigger name={field} value={false}>
+							<DropdownMenuItem>
+								<EyeOffIcon className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
+								Hide
+							</DropdownMenuItem>
+						</DataViewSelectionTrigger>
+					}
 				</DropdownMenuContent>
 			</DropdownMenu>
 		</div>

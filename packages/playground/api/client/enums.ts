@@ -3,3 +3,7 @@ export type BoardTaskStatus =
 	 | "todo"
 	 | "inProgress"
 	 | "done"
+export type GridArticleState = 
+	 | "published"
+	 | "draft"
+	 | "archived"

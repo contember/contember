@@ -14,7 +14,7 @@ export type EntityListSubTreeLoaderState =
 	| 'refreshing'
 	| 'loaded'
 
-export const useEntityListSubTreeLoader = <State>(entities: SugaredQualifiedEntityList, children: ReactNode, state?: State): [UseEntityListSubTreeLoaderResult<State>, EntityListSubTreeLoaderState] => {
+export const useEntityListSubTreeLoader = <State>(entities: SugaredQualifiedEntityList | undefined, children: ReactNode, state?: State): [UseEntityListSubTreeLoaderResult<State>, EntityListSubTreeLoaderState] => {
 	const [displayedState, setDisplayedState] = useState<UseEntityListSubTreeLoaderResult<State>>({
 		entities: undefined,
 		treeRootId: undefined,
@@ -31,7 +31,8 @@ export const useEntityListSubTreeLoader = <State>(entities: SugaredQualifiedEnti
 	useEffect(() => {
 		(async () => {
 			if (
-				displayedState.state === state && displayedState.entities === entities
+				!entities
+				|| displayedState.state === state && displayedState.entities === entities
 				|| currentlyLoading.current?.entities === entities && currentlyLoading.current?.state === state
 			) {
 				return

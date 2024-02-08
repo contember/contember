@@ -1,7 +1,6 @@
 import { Environment } from '@contember/react-binding'
-import { DataViewFilterArtifact, DataViewFilterHandler, DataViewOrderDirection, DataViewSetFilter } from '@contember/react-dataview'
+import { DataViewFilterArtifact, DataViewFilterHandler, DataViewSetFilter, DataViewSortingDirection } from '@contember/react-dataview'
 import { ComponentType, ReactNode } from 'react'
-import { DataGridHidingState } from './hiding'
 
 export type DataGridColumnKey = string
 
@@ -31,7 +30,7 @@ export type DataGridColumnOrdering =
 	}
 	| {
 		enableOrdering?: true
-		initialOrder?: DataViewOrderDirection
+		initialOrder?: DataViewSortingDirection
 	}
 
 export type DataGridColumnCommonProps = {

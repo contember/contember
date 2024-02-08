@@ -2,7 +2,7 @@ import { Component, QueryLanguage, SugarableRelativeSingleField } from '@contemb
 import { ComponentType, FunctionComponent } from 'react'
 import { DataGridColumnCommonProps, FilterRendererProps } from '../types'
 import { DataGridColumn } from '../grid'
-import { createDateFilter, DataViewOrderDirection, DateRangeFilterArtifacts } from '@contember/react-dataview'
+import { createDateFilter, DataViewSortingDirection, DateRangeFilterArtifacts } from '@contember/react-dataview'
 
 export type DateCellRendererProps = {
 	field: SugarableRelativeSingleField | string
@@ -12,7 +12,7 @@ export type DateCellProps =
 	& DataGridColumnCommonProps
 	& {
 		disableOrder?: boolean
-		initialOrder?: DataViewOrderDirection
+		initialOrder?: DataViewSortingDirection
 		initialFilter?: DateRangeFilterArtifacts
 	}
 
@@ -26,10 +26,7 @@ export const createDateCell = <ColumnProps extends {}, ValueRendererProps extend
 			{...props}
 			enableOrdering={!props.disableOrder as true}
 			getNewFilter={createDateFilter(props.field)}
-			emptyFilter={{
-				start: null,
-				end: null,
-			}}
+			emptyFilter={{}}
 			filterRenderer={FilterRenderer}
 		>
 			<ValueRenderer {...props} />

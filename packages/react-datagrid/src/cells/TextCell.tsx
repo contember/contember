@@ -2,7 +2,7 @@ import { Component, QueryLanguage, SugarableRelativeSingleField } from '@contemb
 import type { ComponentType, FunctionComponent } from 'react'
 import { DataGridColumn } from '../grid'
 import { DataGridColumnCommonProps,  FilterRendererProps } from '../types'
-import { DataViewOrderDirection, TextFilterArtifacts, createTextFilter } from '@contember/react-dataview'
+import { DataViewSortingDirection, TextFilterArtifacts, createTextFilter } from '@contember/react-dataview'
 
 export type TextCellRendererProps = {
 	field: SugarableRelativeSingleField | string
@@ -13,7 +13,7 @@ export type TextCellProps =
 	& DataGridColumnCommonProps
 	& {
 		disableOrder?: boolean
-		initialOrder?: DataViewOrderDirection
+		initialOrder?: DataViewSortingDirection
 		initialFilter?: TextFilterArtifacts
 	}
 
@@ -27,11 +27,7 @@ export const createTextCell = <ColumnProps extends {}, ValueRendererProps extend
 			{...props}
 			enableOrdering={!props.disableOrder as true}
 			getNewFilter={createTextFilter(props.field)}
-			emptyFilter={{
-				mode: 'matches',
-				query: '',
-				nullCondition: false,
-			}}
+			emptyFilter={{}}
 			filterRenderer={FilterRenderer}
 		>
 			<ValueRenderer {...props} />

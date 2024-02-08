@@ -4,7 +4,7 @@ import { dataGridCellsDictionary } from '../dict/dataGridCellsDictionary'
 import { FilterRendererProps } from '@contember/react-datagrid'
 import { useMessageFormatter } from '@contember/react-i18n'
 
-export type NullConditionArtifacts = { nullCondition: boolean }
+export type NullConditionArtifacts = { nullCondition?: boolean }
 
 export type NullConditionFilterPublicProps = {
 	showNullConditionFilter?: boolean
@@ -38,7 +38,7 @@ export const NullConditionFilter = <FA extends NullConditionArtifacts>({ filter,
 		>
 			<Checkbox
 				notNull
-				value={filter.nullCondition}
+				value={filter?.nullCondition}
 				onChange={checked => {
 					setFilter({
 						...filter,

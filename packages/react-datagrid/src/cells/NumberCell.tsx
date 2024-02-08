@@ -2,7 +2,7 @@ import { Component, QueryLanguage, SugarableRelativeSingleField } from '@contemb
 import type { ComponentType, FunctionComponent } from 'react'
 import { DataGridColumnCommonProps, FilterRendererProps } from '../types'
 import { DataGridColumn } from '../grid'
-import { createNumberFilter, DataViewOrderDirection } from '@contember/react-dataview'
+import { createNumberFilter, DataViewSortingDirection } from '@contember/react-dataview'
 
 export type NumberCellRendererProps = {
 	field: SugarableRelativeSingleField | string
@@ -12,7 +12,7 @@ export type NumberCellProps =
 	& NumberCellRendererProps
 	& {
 		disableOrder?: boolean
-		initialOrder?: DataViewOrderDirection
+		initialOrder?: DataViewSortingDirection
 		initialFilter?: NumberFilterArtifacts
 	}
 

@@ -12,7 +12,7 @@ export const BooleanCellFilter = ({ setFilter, filter }: FilterRendererProps<Boo
 				[
 					['includeTrue', formatMessage('dataGridCells.booleanCell.includeTrue')],
 					['includeFalse', formatMessage('dataGridCells.booleanCell.includeFalse')],
-					['includeNull', formatMessage('dataGridCells.booleanCell.includeNull')],
+					['nullCondition', formatMessage('dataGridCells.booleanCell.includeNull')],
 				] as const
 			).map(([item, label], index) => (
 				<FieldContainer

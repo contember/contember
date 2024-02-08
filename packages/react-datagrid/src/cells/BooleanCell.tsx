@@ -2,7 +2,7 @@ import { Component, QueryLanguage, SugarableRelativeSingleField } from '@contemb
 import type { ComponentType, FunctionComponent } from 'react'
 import { DataGridColumnCommonProps, FilterRendererProps } from '../types'
 import { DataGridColumn } from '../grid'
-import { BooleanFilterArtifacts, DataViewOrderDirection, createBooleanFilter } from '@contember/react-dataview'
+import { BooleanFilterArtifacts, DataViewSortingDirection, createBooleanFilter } from '@contember/react-dataview'
 
 export type BooleanCellRendererProps = {
 	field: SugarableRelativeSingleField | string
@@ -13,7 +13,7 @@ export type BooleanCellProps =
 	& BooleanCellRendererProps
 	& {
 		disableOrder?: boolean
-		initialOrder?: DataViewOrderDirection
+		initialOrder?: DataViewSortingDirection
 		initialFilter?: BooleanFilterArtifacts
 	}
 
@@ -28,11 +28,7 @@ export const createBooleanCell = <ColumnProps extends {}, ValueRendererProps ext
 			{...props}
 			enableOrdering={!props.disableOrder as true}
 			getNewFilter={createBooleanFilter(props.field)}
-			emptyFilter={{
-				includeFalse: false,
-				includeTrue: false,
-				includeNull: false,
-			}}
+			emptyFilter={{}}
 			filterRenderer={FilterRenderer}
 		>
 			<ValueRenderer {...props} />

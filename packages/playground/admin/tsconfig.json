@@ -5,6 +5,7 @@
 		"emitDeclarationOnly": false
 	},
 	"references": [
+		{ "path": "../api" },
 		{ "path": "../../interface/src" },
 		{ "path": "../../react-dataview/src" },
 	]

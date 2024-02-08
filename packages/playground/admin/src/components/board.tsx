@@ -26,7 +26,7 @@ import { uic } from '../utils/uic'
 import { DropIndicator } from './ui/sortable'
 
 export const BoardWrapperUI = uic('div', {
-	baseClass: 'flex gap-4 max-w-full overflow-x-auto pb-4',
+	baseClass: 'flex gap-4 max-w-full overflow-x-auto -mx-2 px-2 pb-4',
 })
 export const BoardItemsWrapperUI = uic('div', {
 	baseClass: 'flex flex-col gap-2 p-2',

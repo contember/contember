@@ -3,13 +3,13 @@ import { ToastContent, useShowToast } from '../ui/toast'
 import { ErrorPersistResult, SuccessfulPersistResult } from '@contember/binding'
 import { Slot } from '@radix-ui/react-slot'
 
-export const FeedbackTrigger = (props: {children: ReactElement}) => {
+export const FeedbackTrigger = (props: { children: ReactElement }) => {
 	return <Slot {...props} {...useFeedbackTrigger()} />
 }
 
-export const useFeedbackTrigger = () => {
+export const usePersistErrorHandler = () => {
 	const showToast = useShowToast()
-	const errorHandler = useCallback((result: ErrorPersistResult) => {
+	return useCallback((result: ErrorPersistResult) => {
 		if (result.type === 'invalidInput') {
 			const errorList = result.errors.map((it, i) => {
 				if (it.type === 'validation') {
@@ -38,8 +38,12 @@ export const useFeedbackTrigger = () => {
 			)
 		}
 	}, [showToast])
+}
 
-	const successHandler = useCallback((result: SuccessfulPersistResult) => {
+export const usePersistSuccessHandler = () => {
+	const showToast = useShowToast()
+
+	return useCallback((result: SuccessfulPersistResult) => {
 		showToast(<ToastContent
 			title={'Successfully saved!'}
 		/>, {
@@ -53,6 +57,11 @@ export const useFeedbackTrigger = () => {
 			})
 		}
 	}, [showToast])
+}
 
-	return { onPersistError: errorHandler, onPersistSuccess: successHandler }
+export const useFeedbackTrigger = () => {
+	return {
+		onPersistError: usePersistErrorHandler(),
+		onPersistSuccess: usePersistSuccessHandler(),
+	}
 }

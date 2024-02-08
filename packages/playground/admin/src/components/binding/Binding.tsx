@@ -26,7 +26,7 @@ function BindingStateRenderer({ accessorTreeState, children }: BindingStateRende
 	}, [accessorTreeState])
 
 	if (accessorTreeState.name === 'initializing') {
-		return <DelayedLoader />
+		return <Loader />
 	}
 
 	if (accessorTreeState.name === 'error') {
@@ -43,12 +43,3 @@ function BindingStateRenderer({ accessorTreeState, children }: BindingStateRende
 	return <>{children}</>
 }
 
-const DelayedLoader = () => {
-	const [show, setShow] = useState(false)
-	useEffect(() => {
-		const timeout = setTimeout(() => setShow(true), 500)
-		return () => clearTimeout(timeout)
-	}, [])
-
-	return show ? <Loader /> : null
-}

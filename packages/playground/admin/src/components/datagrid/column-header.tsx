@@ -2,17 +2,16 @@ import { cn } from '../../utils/cn'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown'
 import { Button } from '../ui/button'
 import { ReactNode } from 'react'
-import { ArrowDownIcon, ArrowUpDownIcon, ArrowUpIcon, EyeOffIcon } from 'lucide-react'
+import { ArrowDownAZIcon, ArrowUpDownIcon, ArrowUpZaIcon, EyeOffIcon } from 'lucide-react'
 import { DataViewSelectionTrigger, DataViewSortingSwitch, DataViewSortingTrigger } from '@contember/react-dataview'
 
 
-export function DataViewColumnHeader<TData, TValue>({ field, children, enableOrdering, enableHiding }: {
-	field: string,
-	enableOrdering?: boolean,
-	enableHiding?: boolean,
+export function DataViewColumnHeader<TData, TValue>({ sortingField, hidingName, children }: {
+	sortingField?: string,
+	hidingName?: string,
 	children: ReactNode,
 }) {
-	if (!enableOrdering && !enableHiding) {
+	if (!sortingField && !hidingName) {
 		return <div>{children}</div>
 	}
 
@@ -27,31 +26,31 @@ export function DataViewColumnHeader<TData, TValue>({ field, children, enableOrd
 					>
 						<span>{children}</span>
 
-						{enableOrdering && <DataViewSortingSwitch
-							field={field}
-							asc={<ArrowDownIcon className={'h-4 w-4'} />}
-							desc={<ArrowUpIcon className={'h-4 w-4'} />}
+						{sortingField && <DataViewSortingSwitch
+							field={sortingField}
+							asc={<ArrowDownAZIcon className={'h-4 w-4'} />}
+							desc={<ArrowUpZaIcon className={'h-4 w-4'} />}
 							none={<ArrowUpDownIcon className={'h-4 w-4'} />}
 						/>}
 					</Button>
 				</DropdownMenuTrigger>
 				<DropdownMenuContent align="start">
-					{enableOrdering && <>
-						<DataViewSortingTrigger field={field} direction="asc">
-							<DropdownMenuItem>
-								<ArrowUpIcon className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
-								Asc
+					{sortingField && <>
+						<DataViewSortingTrigger field={sortingField} action="toggleAsc">
+							<DropdownMenuItem className={'data-[active]:text-gray-500 cursor-pointer'}>
+								<ArrowDownAZIcon className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
+								asc
 							</DropdownMenuItem>
 						</DataViewSortingTrigger>
-						<DataViewSortingTrigger field={field} direction="desc">
-							<DropdownMenuItem>
-								<ArrowDownIcon className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
-								Desc
+						<DataViewSortingTrigger field={sortingField} action="toggleDesc">
+							<DropdownMenuItem className={'data-[active]:text-gray-500 cursor-pointer'}>
+								<ArrowUpZaIcon className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
+								desc
 							</DropdownMenuItem>
 						</DataViewSortingTrigger>
 					</>}
-					{enableHiding &&
-						<DataViewSelectionTrigger name={field} value={false}>
+					{hidingName &&
+						<DataViewSelectionTrigger name={hidingName} value={false}>
 							<DropdownMenuItem>
 								<EyeOffIcon className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
 								Hide

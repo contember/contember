@@ -41,6 +41,7 @@
 		"@contember/react-devbar": "workspace:*",
 		"@contember/react-identity": "workspace:*",
 		"@contember/react-routing": "workspace:*",
+		"@contember/utilities": "workspace:*",
 		"@radix-ui/react-slot": "^1.0.2"
 	},
 	"peerDependencies": {

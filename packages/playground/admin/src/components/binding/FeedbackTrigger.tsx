@@ -2,6 +2,7 @@ import { ReactElement, useCallback } from 'react'
 import { ToastContent, useShowToast } from '../ui/toast'
 import { ErrorPersistResult, SuccessfulPersistResult } from '@contember/binding'
 import { Slot } from '@radix-ui/react-slot'
+import { useErrorFormatter } from '../errors'
 
 export const FeedbackTrigger = (props: { children: ReactElement }) => {
 	return <Slot {...props} {...useFeedbackTrigger()} />
@@ -9,22 +10,13 @@ export const FeedbackTrigger = (props: { children: ReactElement }) => {
 
 export const usePersistErrorHandler = () => {
 	const showToast = useShowToast()
+	const errorFormatter = useErrorFormatter()
 	return useCallback((result: ErrorPersistResult) => {
 		if (result.type === 'invalidInput') {
-			const errorList = result.errors.map((it, i) => {
-				if (it.type === 'validation') {
-					return it.message
-				} else if (it.type === 'execution') {
-					if (it.code === 'UniqueConstraintViolation') {
-						return 'Unique constraint violation'
-					} else {
-						return 'Unknown error'
-					}
-				}
-			})
+			const errorList = errorFormatter(result.errors)
 			showToast(<ToastContent
 				title={'Invalid input'}
-				description={<ul>{errorList.map((it, i) => <li key={i}>{it}</li>)}</ul>}
+				description={<ul>{errorList.map((it, i) => <li key={i}>{it.message}</li>)}</ul>}
 			/>, {
 				type: 'error',
 			})
@@ -37,7 +29,7 @@ export const usePersistErrorHandler = () => {
 				},
 			)
 		}
-	}, [showToast])
+	}, [errorFormatter, showToast])
 }
 
 export const usePersistSuccessHandler = () => {

@@ -1,0 +1,278 @@
+{
+	"formatVersion": 5,
+	"modifications": [
+		{
+			"modification": "createEnum",
+			"enumName": "InputUnique",
+			"values": [
+				"unique"
+			]
+		},
+		{
+			"modification": "createEnum",
+			"enumName": "InputRootEnumValue",
+			"values": [
+				"a",
+				"b",
+				"c"
+			]
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "InputRoot",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "input_root",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": [],
+				"indexes": [],
+				"eventLog": {
+					"enabled": true
+				}
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "InputRules",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "input_rules",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": [],
+				"indexes": [],
+				"eventLog": {
+					"enabled": true
+				}
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "InputRoot",
+			"field": {
+				"name": "unique",
+				"columnName": "unique",
+				"columnType": "InputUnique",
+				"nullable": false,
+				"type": "Enum"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "InputRoot",
+			"field": {
+				"name": "textValue",
+				"columnName": "text_value",
+				"columnType": "text",
+				"nullable": true,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "InputRoot",
+			"field": {
+				"name": "intValue",
+				"columnName": "int_value",
+				"columnType": "integer",
+				"nullable": true,
+				"type": "Integer"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "InputRoot",
+			"field": {
+				"name": "floatValue",
+				"columnName": "float_value",
+				"columnType": "double precision",
+				"nullable": true,
+				"type": "Double"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "InputRoot",
+			"field": {
+				"name": "boolValue",
+				"columnName": "bool_value",
+				"columnType": "boolean",
+				"nullable": true,
+				"type": "Bool"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "InputRoot",
+			"field": {
+				"name": "dateValue",
+				"columnName": "date_value",
+				"columnType": "date",
+				"nullable": true,
+				"type": "Date"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "InputRoot",
+			"field": {
+				"name": "datetimeValue",
+				"columnName": "datetime_value",
+				"columnType": "timestamptz",
+				"nullable": true,
+				"type": "DateTime"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "InputRoot",
+			"field": {
+				"name": "jsonValue",
+				"columnName": "json_value",
+				"columnType": "jsonb",
+				"nullable": true,
+				"type": "Json"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "InputRoot",
+			"field": {
+				"name": "enumValue",
+				"columnName": "enum_value",
+				"columnType": "InputRootEnumValue",
+				"nullable": true,
+				"type": "Enum"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "InputRoot",
+			"field": {
+				"name": "uuidValue",
+				"columnName": "uuid_value",
+				"columnType": "uuid",
+				"nullable": true,
+				"type": "Uuid"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "InputRules",
+			"field": {
+				"name": "unique",
+				"columnName": "unique",
+				"columnType": "InputUnique",
+				"nullable": false,
+				"type": "Enum"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "InputRules",
+			"field": {
+				"name": "notNullValue",
+				"columnName": "not_null_value",
+				"columnType": "text",
+				"nullable": false,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "InputRules",
+			"field": {
+				"name": "uniqueValue",
+				"columnName": "unique_value",
+				"columnType": "text",
+				"nullable": true,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "InputRules",
+			"field": {
+				"name": "validationValue",
+				"columnName": "validation_value",
+				"columnType": "text",
+				"nullable": true,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createUniqueConstraint",
+			"entityName": "InputRoot",
+			"unique": {
+				"fields": [
+					"unique"
+				]
+			}
+		},
+		{
+			"modification": "createUniqueConstraint",
+			"entityName": "InputRules",
+			"unique": {
+				"fields": [
+					"unique"
+				]
+			}
+		},
+		{
+			"modification": "createUniqueConstraint",
+			"entityName": "InputRules",
+			"unique": {
+				"fields": [
+					"uniqueValue"
+				]
+			}
+		},
+		{
+			"modification": "patchValidationSchema",
+			"patch": [
+				{
+					"op": "add",
+					"path": "/InputRules",
+					"value": {
+						"validationValue": [
+							{
+								"validator": {
+									"operation": "pattern",
+									"args": [
+										{
+											"type": "literal",
+											"value": [
+												"^[a-z]+$",
+												""
+											]
+										}
+									]
+								},
+								"message": {
+									"text": "Invalid value"
+								}
+							}
+						]
+					}
+				}
+			]
+		}
+	]
+}

@@ -1,7 +1,7 @@
 import { uic } from '../../utils/uic'
 
 export const Input = uic('input', {
-	baseClass: 'flex w-full border border-input bg-background m ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
+	baseClass: 'flex w-full border border-input bg-background m ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[invalid]:border-destructive data-[invalid]:ring-destructive',
 	variants: {
 		inputSize: {
 			default: 'h-10 rounded-md  px-3 py-2 text-sm',

@@ -1,6 +1,15 @@
 import { Link, RoutingLinkTarget } from '@contember/react-routing'
 import { ReactNode } from 'react'
-import { BrushIcon, ChevronRight, DotIcon, GripVertical, HomeIcon, KanbanIcon, TableIcon } from 'lucide-react'
+import {
+	BrushIcon,
+	ChevronRight,
+	DotIcon,
+	FormInputIcon,
+	GripVertical,
+	HomeIcon,
+	KanbanIcon,
+	TableIcon,
+} from 'lucide-react'
 import { uic } from '../utils/uic'
 
 export type NavigationItem = {
@@ -17,6 +26,7 @@ export interface NavigationProps {
 }
 
 export const Navigation = () => {
+	const line = <span className={'h-full w-[1px] bg-gray-200'}>&nbsp;</span>
 	return (
 		<div>
 			<NavigationList
@@ -31,12 +41,12 @@ export const Navigation = () => {
 						label: 'UI',
 						subItems: [
 							{
-								icon: <span className={'h-full w-[1px] bg-gray-200'}>&nbsp;</span>,
+								icon: line,
 								label: 'Buttons',
 								to: 'ui/button',
 							},
 							{
-								icon: <span className={'h-full w-[1px] bg-gray-200'}>&nbsp;</span>,
+								icon: line,
 								label: 'Toasts',
 								to: 'ui/toast',
 							},
@@ -47,12 +57,12 @@ export const Navigation = () => {
 						label: 'Kanban',
 						subItems: [
 							{
-								icon: <span className={'h-full w-[1px] bg-gray-200'}>&nbsp;</span>,
+								icon: line,
 								label: 'Dynamic columns',
 								to: 'board/assignee',
 							},
 							{
-								icon: <span className={'h-full w-[1px] bg-gray-200'}>&nbsp;</span>,
+								icon: line,
 								label: 'Static columns',
 								to: 'board/status',
 							},
@@ -67,6 +77,22 @@ export const Navigation = () => {
 						icon: <TableIcon size={16} />,
 						label: 'Grid',
 						to: 'grid',
+					},
+					{
+						icon: <FormInputIcon size={16}/>,
+						label: 'Inputs',
+						subItems: [
+							{
+								icon: line,
+								label: 'Basic inputs',
+								to: 'input/basic',
+							},
+							{
+								icon: line,
+								label: 'Client validation',
+								to: 'input/clientValidation',
+							},
+						],
 					},
 				]}
 			/>

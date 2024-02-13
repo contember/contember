@@ -1,33 +1,13 @@
 import * as React from 'react'
-import { ReactNode, useCallback } from 'react'
+import { forwardRef, ReactNode, useCallback } from 'react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../../ui/tooltip'
 import { Button } from '../../ui/button'
-import {
-	createTextFilter,
-	DataView,
-	DataViewEachRow,
-	DataViewLoaderState,
-	DataViewNullFilterTrigger,
-	DataViewRelationFilterList,
-	DataViewRelationFilterTrigger,
-	DataViewTextFilterInput,
-	useDataViewRelationFilterFactory,
-	UseDataViewRelationFilterResult,
-} from '@contember/react-dataview'
+import { DataViewNullFilterTrigger, DataViewRelationFilterList, DataViewRelationFilterTrigger, useDataViewRelationFilterFactory, UseDataViewRelationFilterResult } from '@contember/react-dataview'
 import { Component, EntityId, SugarableQualifiedEntityList, SugaredQualifiedEntityList, useEntity } from '@contember/interface'
 import { Popover, PopoverContent, PopoverTrigger } from '../../ui/popover'
-import { Input } from '../../ui/input'
-import { DataViewLoaderOverlay } from '../loader'
-import {
-	DataViewActiveFilterUI,
-	DataViewExcludeActionButtonUI,
-	DataViewFilterActionButtonUI,
-	DataViewFilterSelectItemUI,
-	DataViewFilterSelectTriggerUI,
-	DataViewSingleFilterUI,
-} from '../ui'
+import { DataViewActiveFilterUI, DataViewExcludeActionButtonUI, DataViewFilterActionButtonUI, DataViewFilterSelectItemUI, DataViewFilterSelectTriggerUI, DataViewSingleFilterUI } from '../ui'
 import { DataViewNullFilter } from './common'
-import { Loader } from '../../ui/loader'
+import { createDefaultSelectFilter, SelectList, SelectPopoverContent } from '../../select'
 
 export const DataViewRelationFieldTooltip = ({ filter, children, actions }: { filter: string, children: ReactNode, actions?: ReactNode }) => (
 	<TooltipProvider>
@@ -73,10 +53,10 @@ const DataViewRelationFilteredItemsList = ({ name, children, options }: {
 	</>
 )
 
-const DataViewRelationFilterSelectItem = ({ children, filterFactory }: {
+const DataViewRelationFilterSelectItem = forwardRef<HTMLButtonElement, {
 	children: ReactNode
-	filterFactory: (value: EntityId) => UseDataViewRelationFilterResult
-}) => {
+	filterFactory:(value: EntityId) => UseDataViewRelationFilterResult
+}>(({ children, filterFactory, ...props }, ref) => {
 	const entity = useEntity()
 	const [current, setFilter] = filterFactory(entity.id)
 
@@ -87,11 +67,11 @@ const DataViewRelationFilterSelectItem = ({ children, filterFactory }: {
 	const isExcluded = current == 'exclude'
 
 	return (
-		<DataViewFilterSelectItemUI onExclude={exclude} onInclude={include} isExcluded={isExcluded} isIncluded={isIncluded}>
+		<DataViewFilterSelectItemUI ref={ref} onExclude={exclude} onInclude={include} isExcluded={isExcluded} isIncluded={isIncluded} {...props}>
 			{children}
 		</DataViewFilterSelectItemUI>
 	)
-}
+})
 
 
 const DataViewRelationFilterSelect = ({ name, children, options, filterField, label }: {
@@ -100,44 +80,37 @@ const DataViewRelationFilterSelect = ({ name, children, options, filterField, la
 	options: string | SugarableQualifiedEntityList
 	children: ReactNode
 	label?: ReactNode
-}) => (
-	<Popover>
-		<PopoverTrigger asChild>
-			<DataViewFilterSelectTriggerUI>
-				{label}
-			</DataViewFilterSelectTriggerUI>
-		</PopoverTrigger>
-		<PopoverContent>
-			<DataView entities={options} initialItemsPerPage={20} filterTypes={filterField ? {
-				query: createTextFilter(filterField),
-			} : undefined}>
-				<div className={'mb-2'}>
-					{filterField && <div className={'mb-4'}>
-						<DataViewTextFilterInput name={'query'}>
-							<Input placeholder={'Search'} className={'w-full'} autoFocus inputSize={'sm'} />
-						</DataViewTextFilterInput>
-					</div>}
-					<div className={'relative flex flex-col gap-2'}>
-						<DataViewLoaderState refreshing>
-							<DataViewLoaderOverlay />
-						</DataViewLoaderState>
-						<DataViewLoaderState refreshing loaded>
-							<DataViewEachRow>
-								<DataViewRelationFilterSelectItem filterFactory={useDataViewRelationFilterFactory(name)}>
-									{children}
-								</DataViewRelationFilterSelectItem>
-							</DataViewEachRow>
-						</DataViewLoaderState>
-					</div>
-					<DataViewLoaderState initial>
-						<Loader position={'static'} size={'small'} />
-					</DataViewLoaderState>
+}) => {
+	const filter = filterField ? createDefaultSelectFilter(filterField) : { filterTypes: undefined, filterToolbar: undefined }
+	let filterFactory = useDataViewRelationFilterFactory(name)
+	return (
+		<Popover>
+			<PopoverTrigger asChild>
+				<DataViewFilterSelectTriggerUI>
+					{label}
+				</DataViewFilterSelectTriggerUI>
+			</PopoverTrigger>
+			<SelectPopoverContent>
+				<SelectList
+					{...filter}
+					entities={options}
+					onSelect={it => {
+						const [, set] = filterFactory(it.id)
+						set('toggleInclude')
+					}}
+
+				>
+					<DataViewRelationFilterSelectItem filterFactory={filterFactory}>
+						{children}
+					</DataViewRelationFilterSelectItem>
+				</SelectList>
+				<div className="px-4 py-2">
+					<DataViewNullFilter name={name} />
 				</div>
-			</DataView>
-			<DataViewNullFilter name={name} />
-		</PopoverContent>
-	</Popover>
-)
+			</SelectPopoverContent>
+		</Popover>
+	)
+}
 
 
 export const DefaultDataViewRelationFilter = Component(({ name, options, children, label, filterField }: {

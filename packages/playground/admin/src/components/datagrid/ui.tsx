@@ -82,13 +82,15 @@ export const DataViewFilterSelectTriggerUI = forwardRef<HTMLButtonElement, { chi
 	)
 })
 
-export const DataViewFilterSelectItemUI = ({ children, onExclude, isExcluded, onInclude, isIncluded }: {
+export interface DataViewFilterSelectItemProps {
 	onInclude: () => void
 	onExclude: () => void
 	isIncluded: boolean
 	isExcluded: boolean
 	children: ReactNode
-}) => {
+}
+
+export const DataViewFilterSelectItemUI = forwardRef<HTMLButtonElement, DataViewFilterSelectItemProps>(({ children, onExclude, isExcluded, onInclude, isIncluded, ...props }, ref) => {
 	const include = useCallback<ReactEventHandler>(e => {
 		onInclude()
 		e.preventDefault()
@@ -100,8 +102,8 @@ export const DataViewFilterSelectItemUI = ({ children, onExclude, isExcluded, on
 	}, [onExclude])
 
 	return (
-		<div className={'relative'}>
-			<Button onClick={include} size={'sm'} className={'w-full text-left justify-start gap-1'} variant={'ghost'}>
+		<div className={'relative'} >
+			<Button ref={ref} onClick={include} size={'sm'} className={'pl-1 w-full text-left justify-start gap-1 data-[highlighted]:bg-gray-200'} variant={'ghost'} {...props}>
 				{isIncluded ? <CheckSquareIcon className={'w-3 h-3'} /> : <SquareIcon className={'w-3 h-3'} />}
 				<span className={cn('font-normal', isIncluded && 'text-blue-700')}>
 					{children}
@@ -114,4 +116,4 @@ export const DataViewFilterSelectItemUI = ({ children, onExclude, isExcluded, on
 		</div>
 
 	)
-}
+})

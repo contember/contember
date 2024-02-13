@@ -16,12 +16,13 @@ type ConfigVariantsMulti<T extends ConfigSchema | undefined> = T extends ConfigS
 	[Variant in keyof T]?: StringToBoolean<keyof T[Variant]> | StringToBoolean<keyof T[Variant]>[] | undefined;
 } : {}
 
-type Config<T extends ConfigSchema | undefined> = {
+type Config<T extends ConfigSchema | undefined, El extends React.ElementType> = {
 	baseClass?: ClassValue
 	variants?: T;
 	passVariantProps?: string[]
+	defaultProps?: React.ComponentProps<El>
 	defaultVariants?: ConfigVariants<T>;
-	compoundVariants?: ((ConfigVariants<T> | ConfigVariantsMulti<T>) & {className?: string})[];
+	compoundVariants?: ((ConfigVariants<T> | ConfigVariantsMulti<T>) & { className?: string })[];
 	displayName?: string;
 	wrapOuter?: ComponentType<{ children?: ReactNode } & ConfigVariants<T>>
 	wrapInner?: ComponentType<{ children?: ReactNode } & ConfigVariants<T>>
@@ -29,9 +30,11 @@ type Config<T extends ConfigSchema | undefined> = {
 	afterChildren?: ReactElement
 }
 
-export const uiconfig = <T extends ConfigSchema | undefined>(config: Config<T>) => config
+export const uiconfig = <T extends ConfigSchema | undefined, El extends React.ElementType | unknown = unknown>(config: Config<T, ComponentType<{}>>) => config
 
-export const uic = <El extends React.ElementType, Variants extends ConfigSchema | undefined  = undefined>(Component: El, config: Config<Variants>) => {
+export type NoInfer<T> = T & { [K in keyof T]: T[K] }
+
+export const uic = <El extends React.ElementType, Variants extends ConfigSchema | undefined  = undefined>(Component: El, config: Config<Variants, NoInfer<El>>) => {
 	const cls = cva<any>(config?.baseClass, {
 		variants: config?.variants,
 		defaultVariants: config?.defaultVariants,
@@ -67,7 +70,7 @@ export const uic = <El extends React.ElementType, Variants extends ConfigSchema 
 			</>
 		}
 
-		const innerEl = <Comp ref={ref} className={twMerge(clsx(cls(props), classNameProp))} {...rest}>{children}</Comp>
+		const innerEl = <Comp ref={ref} className={twMerge(clsx(cls(props), classNameProp))} {...config.defaultProps} {...rest}>{children}</Comp>
 		return config?.wrapOuter ? React.createElement(config.wrapOuter, props, innerEl) : innerEl
 	})
 	component.displayName = config?.displayName

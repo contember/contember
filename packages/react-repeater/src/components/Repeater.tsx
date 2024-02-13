@@ -62,7 +62,7 @@ const RepeaterRelative = Component(
 	(props, environment) => (
 		<HasMany {...props} initialEntityCount={props.initialEntityCount ?? 1}>
 			{props.children}
-			{props.sortableBy && <SugaredField field={props.sortableBy} defaultValue={0} isNonbearing />}
+			{props.sortableBy && <SugaredField field={props.sortableBy} isNonbearing />}
 		</HasMany>
 	),
 	'Repeater',
@@ -80,7 +80,7 @@ const RepeaterQualified = Component(
 	(props, environment) => (
 		<EntityListSubTree {...props} initialEntityCount={props.initialEntityCount ?? 1}>
 			{props.children}
-			{props.sortableBy && <SugaredField field={props.sortableBy} defaultValue={0} isNonbearing />}
+			{props.sortableBy && <SugaredField field={props.sortableBy} isNonbearing />}
 		</EntityListSubTree>
 	),
 	'Repeater',

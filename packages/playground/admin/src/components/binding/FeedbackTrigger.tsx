@@ -3,9 +3,10 @@ import { ToastContent, useShowToast } from '../ui/toast'
 import { ErrorPersistResult, SuccessfulPersistResult } from '@contember/binding'
 import { Slot } from '@radix-ui/react-slot'
 import { useErrorFormatter } from '../errors'
+import { usePersist } from '@contember/react-binding'
 
 export const FeedbackTrigger = (props: { children: ReactElement }) => {
-	return <Slot {...props} {...useFeedbackTrigger()} />
+	return <Slot {...props} {...usePersistFeedbackHandlers()} />
 }
 
 export const usePersistErrorHandler = () => {
@@ -51,9 +52,19 @@ export const usePersistSuccessHandler = () => {
 	}, [showToast])
 }
 
-export const useFeedbackTrigger = () => {
+export const usePersistFeedbackHandlers = () => {
 	return {
 		onPersistError: usePersistErrorHandler(),
 		onPersistSuccess: usePersistSuccessHandler(),
 	}
+}
+
+export const usePersistWithFeedback = () => {
+	const triggerPersist = usePersist()
+	const { onPersistSuccess, onPersistError } = usePersistFeedbackHandlers()
+	return useCallback(() => {
+		triggerPersist()
+			.then(onPersistSuccess)
+			.catch(onPersistError)
+	}, [onPersistError, onPersistSuccess, triggerPersist])
 }

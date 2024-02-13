@@ -9,6 +9,7 @@ import {
 	HomeIcon,
 	KanbanIcon,
 	TableIcon,
+	ArchiveIcon,
 } from 'lucide-react'
 import { uic } from '../utils/uic'
 
@@ -91,6 +92,27 @@ export const Navigation = () => {
 								icon: line,
 								label: 'Client validation',
 								to: 'input/clientValidation',
+							},
+						],
+					},
+					{
+						icon: <ArchiveIcon size={16}/>,
+						label: 'Select',
+						subItems: [
+							{
+								icon: line,
+								label: 'Has one select',
+								to: 'select/hasOne',
+							},
+							{
+								icon: line,
+								label: 'Has many select',
+								to: 'select/hasMany',
+							},
+							{
+								icon: line,
+								label: 'Has many sortable select',
+								to: 'select/hasManySortable',
 							},
 						],
 					},

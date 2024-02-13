@@ -80,12 +80,22 @@ class EntityAccessor implements Errorable {
 		this.operations.batchUpdates(this.state, performUpdates)
 	}
 
-	public connectEntityAtField(field: FieldName, entityToConnect: EntityAccessor): void {
-		this.operations.connectEntityAtField(this.state, field, entityToConnect)
+	public connectEntityAtField(field: SugaredRelativeSingleEntity | string, entityToConnect: EntityAccessor): void {
+		const desugared = QueryLanguage.desugarRelativeSingleEntity(field, this.environment)
+		const relativeTo = this.getRelativeSingleEntity({
+			hasOneRelationPath: desugared.hasOneRelationPath.slice(0, -1),
+		})
+		const fieldName = desugared.hasOneRelationPath[desugared.hasOneRelationPath.length - 1].field
+		this.operations.connectEntityAtField(relativeTo.state, fieldName, entityToConnect)
 	}
 
-	public disconnectEntityAtField(field: FieldName, initializeReplacement?: EntityAccessor.BatchUpdatesHandler): void {
-		this.operations.disconnectEntityAtField(this.state, field, initializeReplacement)
+	public disconnectEntityAtField(field: SugaredRelativeSingleEntity | string, initializeReplacement?: EntityAccessor.BatchUpdatesHandler): void {
+		const desugared = QueryLanguage.desugarRelativeSingleEntity(field, this.environment)
+		const relativeTo = this.getRelativeSingleEntity({
+			hasOneRelationPath: desugared.hasOneRelationPath.slice(0, -1),
+		})
+		const fieldName = desugared.hasOneRelationPath[desugared.hasOneRelationPath.length - 1].field
+		this.operations.disconnectEntityAtField(relativeTo.state, fieldName, initializeReplacement)
 	}
 
 	public deleteEntity(): void {
@@ -108,9 +118,7 @@ class EntityAccessor implements Errorable {
 	 * Please keep in mind that this method signature is literally impossible to implement safely. The generic parameter
 	 * is really just a way to succinctly write a type cast. Nothing more, really.
 	 */
-	public getField<Value extends FieldValue = FieldValue>(
-		field: SugaredRelativeSingleField | string,
-	): FieldAccessor<Value> {
+	public getField<Value extends FieldValue = FieldValue>(field: SugaredRelativeSingleField | string): FieldAccessor<Value> {
 		return this.getRelativeSingleField<Value>(QueryLanguage.desugarRelativeSingleField(field, this.environment))
 	}
 

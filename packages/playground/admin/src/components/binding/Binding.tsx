@@ -1,6 +1,25 @@
-import { ReactNode, useEffect, useState } from 'react'
+import { ReactNode, useEffect } from 'react'
 import { AccessorTreeState, DataBindingProvider } from '@contember/interface'
 import { Loader } from '../ui/loader'
+import { usePersistWithFeedback } from './FeedbackTrigger'
+
+export const SaveHandler = () => {
+	const persist = usePersistWithFeedback()
+	useEffect(() => {
+		const listener = (event: KeyboardEvent) => {
+			if (event.ctrlKey && event.key === 's') {
+				event.preventDefault()
+				persist()
+			}
+		}
+		document.body.addEventListener('keydown', listener)
+		return () => {
+			document.body.removeEventListener('keydown', listener)
+		}
+	}, [persist])
+
+	return null
+}
 
 export const Binding = ({ children }: {
 	children: ReactNode

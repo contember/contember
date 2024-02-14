@@ -82,7 +82,7 @@ export const DataGridHeaderCellFilterDropdown = (props: DataGridHeaderCellFilter
 		props.stateMethods.setFilter(props.columnKey, filter)
 	}, [props.columnKey, props.stateMethods])
 
-	if (!props.column.enableFiltering) {
+	if (props.column.enableFiltering === false) {
 		return null
 	}
 

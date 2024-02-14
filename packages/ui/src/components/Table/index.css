@@ -50,8 +50,6 @@
 	flex-direction: row;
 }
 
-:where(.cui-table-container) { overflow-x: auto }
-
 :where(.cui-table-wrapper) {
 	border-radius: var(--cui-border-radius--controls, 0);
 	display: flex;

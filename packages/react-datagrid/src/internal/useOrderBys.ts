@@ -25,7 +25,7 @@ export const useOrderBys = (
 				let didBailOut = false
 
 				setOrderBys(orderBys => {
-					const existingValue = orderBys[columnKey]
+					const existingValue = orderBys[columnKey] ?? null
 
 					if (existingValue === columnOrderBy) {
 						didBailOut = true

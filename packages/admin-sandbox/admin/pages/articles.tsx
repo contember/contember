@@ -33,14 +33,13 @@ import { Directive } from '../components/Directives'
 import { EditOrCreateForm } from '../components/EditOrCreateForm'
 import { SlotSources } from '../components/Slots'
 import {
-	RepeaterEachItem,
 	Repeater,
 	RepeaterSortable,
 	RepeaterSortableDragOverlay,
 	RepeaterSortableDropIndicator,
-	RepeaterSortableItem,
 	RepeaterSortableItemActivator,
 	RepeaterSortableItemNode,
+	RepeaterSortableEachItem,
 } from '@contember/react-repeater-dnd-kit'
 
 import * as React from 'react'
@@ -141,7 +140,7 @@ const CustomRepeaterItem = (props: RepeaterItemProps) => {
 	return (
 		<Stack gap="gap">
 			<CreateNewEntityButton createNewEntity={noop}
-								   onClick={() => props.createNewEntity(undefined, props.index)}>Locales</CreateNewEntityButton>
+														 onClick={() => props.createNewEntity(undefined, props.index)}>Locales</CreateNewEntityButton>
 			<RepeaterItem {...props} />
 		</Stack>
 	)
@@ -172,30 +171,28 @@ export const tags = () => (
 			{/*</Stack>*/}
 			<Repeater field={'locales'} sortableBy={'order'}>
 				<RepeaterSortable>
-					<RepeaterEachItem>
-						<RepeaterSortableItem>
-							<div style={{ position: 'relative' }}>
-								<RepeaterSortableDropIndicator position={'before'}>
-									{dropIndicatorEl}
-								</RepeaterSortableDropIndicator>
-							</div>
-							<RepeaterSortableItemNode>
-								<Box>
-									<RepeaterSortableItemActivator>
-										<div>handle</div>
-									</RepeaterSortableItemActivator>
-									<SelectField label={'Locale'} options={'Locale.code'} field={'locale'}
-												 createNewForm={<TextField field={'code'} label={'Locale code'} />} />
-									<TextField field={'name'} label={'Name'} />
-								</Box>
-							</RepeaterSortableItemNode>
-							<div style={{ position: 'relative' }}>
-								<RepeaterSortableDropIndicator position={'after'}>
-									{dropIndicatorEl}
-								</RepeaterSortableDropIndicator>
-							</div>
-						</RepeaterSortableItem>
-					</RepeaterEachItem>
+					<RepeaterSortableEachItem>
+						<div style={{ position: 'relative' }}>
+							<RepeaterSortableDropIndicator position={'before'}>
+								{dropIndicatorEl}
+							</RepeaterSortableDropIndicator>
+						</div>
+						<RepeaterSortableItemNode>
+							<Box>
+								<RepeaterSortableItemActivator>
+									<div>handle</div>
+								</RepeaterSortableItemActivator>
+								<SelectField label={'Locale'} options={'Locale.code'} field={'locale'}
+														 createNewForm={<TextField field={'code'} label={'Locale code'} />} />
+								<TextField field={'name'} label={'Name'} />
+							</Box>
+						</RepeaterSortableItemNode>
+						<div style={{ position: 'relative' }}>
+							<RepeaterSortableDropIndicator position={'after'}>
+								{dropIndicatorEl}
+							</RepeaterSortableDropIndicator>
+						</div>
+					</RepeaterSortableEachItem>
 					<RepeaterSortableDragOverlay>
 						<Box>
 							Dragging <Field field={'name'} />

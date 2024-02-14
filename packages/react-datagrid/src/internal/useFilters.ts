@@ -30,7 +30,7 @@ export const useFilters = (
 					if (columnFilter === undefined) {
 						return otherFilters
 					} else {
-						return { ...otherFilters, [columnKey]: columnFilter }
+						return { ...filters, [columnKey]: columnFilter }
 					}
 				})
 				if (!didBailOut) {

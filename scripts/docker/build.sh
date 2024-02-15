@@ -40,7 +40,7 @@ if [[ -z "$1" || "$1" == "engine-ee-alpine" ]]; then
 		--build-arg SERVER_DIR=ee/engine-server-ee \
 		--platform linux/amd64,linux/arm64 \
 		--push $TAGS \
-		-f ./scripts/docker/server-debian.dockerfile \
+		-f ./scripts/docker/server-alpine.dockerfile \
 		.
 fi
 
@@ -53,7 +53,7 @@ if [[ -z "$1" || "$1" == "engine-ee-debian" ]]; then
 		--build-arg SERVER_DIR=ee/engine-server-ee \
 		--platform linux/amd64,linux/arm64 \
 		--push $TAGS \
-		-f ./scripts/docker/server-alpine.dockerfile \
+		-f ./scripts/docker/server-debian.dockerfile \
 		.
 fi
 

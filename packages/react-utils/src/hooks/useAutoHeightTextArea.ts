@@ -18,7 +18,7 @@ export const useAutoHeightTextArea = (
 			ref.style.maxHeight = ''
 
 			if (minRows !== maxRows) {
-				const height = ref.scrollHeight
+				const height = ref.scrollHeight - ref.clientHeight + ref.offsetHeight
 				let minHeight: number
 				let maxHeight: number
 

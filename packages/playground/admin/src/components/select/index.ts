@@ -1,5 +1,4 @@
 export * from './filter'
-export * from './highlight'
 export * from './list'
 export * from './multi-select'
 export * from './pagination'

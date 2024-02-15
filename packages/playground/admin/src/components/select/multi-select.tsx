@@ -17,11 +17,10 @@ export interface MultiSelectInputProps {
 }
 
 export const MultiSelectInput = Component<MultiSelectInputProps>(({ field, filterField, options, children, placeholder }) => {
-	const filter = filterField ? createDefaultSelectFilter(filterField) : {
-		filterTypes: undefined,
-		filterToolbar: undefined,
-	}
+	const filter = createDefaultSelectFilter(filterField)
+
 	placeholder ??= <SelectDefaultPlaceholderUI />
+
 	const entities = useEntityList({ field })
 	const hasEntities = entities.length > 0
 	const selectedEntities = useMemo(() => Array.from(entities).map(it => it.id), [entities])

@@ -3,10 +3,16 @@ import { ReactNode } from 'react'
 import { Input } from '../ui/input'
 import { createTextFilter, DataViewFilterHandlerRegistry, DataViewTextFilterInput } from '@contember/react-dataview'
 
-export const createDefaultSelectFilter = (filterField: string): {
-	filterTypes: DataViewFilterHandlerRegistry
-	filterToolbar: ReactNode
+export const createDefaultSelectFilter = (filterField?: string): {
+	filterTypes?: DataViewFilterHandlerRegistry
+	filterToolbar?: ReactNode
 } => {
+	if (!filterField) {
+		return {
+			filterTypes: undefined,
+			filterToolbar: undefined,
+		}
+	}
 	return {
 		filterTypes: { query: createTextFilter(filterField) },
 		filterToolbar: (

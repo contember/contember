@@ -1,14 +1,14 @@
 import * as React from 'react'
-import { forwardRef, ReactNode, useCallback, useMemo } from 'react'
-import { DataViewHighlightRow, DataViewInteractionContext, DataViewKeyboardEventHandler } from './highlight'
+import { forwardRef, ReactNode, useCallback } from 'react'
 import { ScrollArea } from '../ui/scroll-area'
 import { DataViewLoaderOverlay } from '../datagrid'
 import { SelectPagination } from './pagination'
 import { Loader } from '../ui/loader'
-import { EntityAccessor, EntityId, useEntity } from '@contember/interface'
-import { DataView, DataViewEachRow, DataViewLoaderState, DataViewProps } from '@contember/react-dataview'
+import { EntityAccessor, useEntity } from '@contember/interface'
+import { DataView, DataViewEachRow, DataViewHighlightRow, DataViewKeyboardEventHandler, DataViewLoaderState, DataViewProps } from '@contember/react-dataview'
 import { Slot } from '@radix-ui/react-slot'
 import { dataAttribute } from '@contember/utilities'
+import { DataViewHighlightedWithScroll } from './highlight'
 
 
 export type SelectListProps =
@@ -41,8 +41,7 @@ const SelectListItem = forwardRef<HTMLButtonElement, {
 
 export const SelectList = ({ children, filterToolbar, onSelect, isSelected, ...props }: SelectListProps) => {
 	return (
-		<DataView {...props}>
-			<DataViewInteractionContext onSelectHighlighted={onSelect}>
+		<DataView {...props} onSelectHighlighted={onSelect}>
 				<DataViewKeyboardEventHandler>
 					<div className={'flex flex-col gap-4 group-data-[side="top"]:flex-col-reverse'}>
 						{filterToolbar && <div className={'px-4'}>
@@ -56,9 +55,11 @@ export const SelectList = ({ children, filterToolbar, onSelect, isSelected, ...p
 								<DataViewLoaderState refreshing loaded>
 									<DataViewEachRow>
 										<DataViewHighlightRow>
-											<SelectListItem onSelect={onSelect} isSelected={isSelected}>
-												{children}
-											</SelectListItem>
+											<DataViewHighlightedWithScroll>
+												<SelectListItem onSelect={onSelect} isSelected={isSelected}>
+													{children}
+												</SelectListItem>
+											</DataViewHighlightedWithScroll>
 										</DataViewHighlightRow>
 									</DataViewEachRow>
 									<SelectPagination />
@@ -71,7 +72,6 @@ export const SelectList = ({ children, filterToolbar, onSelect, isSelected, ...p
 						</DataViewLoaderState>
 					</div>
 				</DataViewKeyboardEventHandler>
-			</DataViewInteractionContext>
 		</DataView>
 	)
 }

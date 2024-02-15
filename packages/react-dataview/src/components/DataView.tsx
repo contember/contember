@@ -4,11 +4,13 @@ import { useDataView, UseDataViewArgs } from '../hooks'
 import { ControlledDataView } from './ControlledDataView'
 import { DataViewLoader } from '../internal/components/DataViewLoader'
 import { DATA_VIEW_DEFAULT_ITEMS_PER_PAGE } from '../internal/hooks/useDataViewPaging'
+import { EntityAccessor } from '@contember/binding'
 
 
 export type DataViewProps =
 	& {
 		children: ReactNode
+		onSelectHighlighted?: (entity: EntityAccessor) => void
 	}
 	& UseDataViewArgs
 
@@ -16,7 +18,7 @@ export const DataView = Component<DataViewProps>(props => {
 	const { state, methods, info } = useDataView(props)
 
 	return (
-		<ControlledDataView state={state} methods={methods} info={info}>
+		<ControlledDataView state={state} methods={methods} info={info} onSelectHighlighted={props.onSelectHighlighted}>
 			{props.children}
 		</ControlledDataView>
 	)

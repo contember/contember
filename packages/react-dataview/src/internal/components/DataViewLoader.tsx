@@ -1,5 +1,5 @@
 import { memo, ReactNode, useMemo } from 'react'
-import { SugaredQualifiedEntityList } from '@contember/binding'
+import { EntityAccessor, SugaredQualifiedEntityList } from '@contember/binding'
 import {
 	Component,
 	EntityListSubTree,
@@ -16,10 +16,12 @@ import {
 } from '../../contexts'
 import { DataViewState } from '../../types'
 import { dataViewSelectionEnvironmentExtension } from '../../dataViewSelectionEnvironmentExtension'
+import { DataViewInteractionProvider } from './DataViewInteractionProvider'
 
 export interface DataViewLoaderProps {
 	children: ReactNode
 	state: DataViewState
+	onSelectHighlighted?: (entity: EntityAccessor) => void
 }
 
 const ExistingEntityListSubtree = memo(({ entities, children }: {
@@ -45,7 +47,7 @@ const NonExistingEntityListSubtree = memo(({ children }: {
 	)
 })
 
-export const DataViewLoader = Component(({ children, state }: DataViewLoaderProps) => {
+export const DataViewLoader = Component(({ children, state, onSelectHighlighted }: DataViewLoaderProps) => {
 
 	const resolvedFilters = state.filtering.filter
 	const orderBy = state.sorting.orderBy
@@ -56,18 +58,22 @@ export const DataViewLoader = Component(({ children, state }: DataViewLoaderProp
 	}, [entities, resolvedFilters, orderBy, paging.itemsPerPage, paging.pageIndex])
 
 	const [loadedEntityList, loadState] = useEntityListSubTreeLoader(entityListProps, children, state)
-
+	const innerChildren = (
+		<DataViewInteractionProvider onSelectHighlighted={onSelectHighlighted}>
+			{children}
+		</DataViewInteractionProvider>
+	)
 	return (
 		<DataViewLoaderStateContext.Provider value={loadState}>
 			<DataViewSelectionStateContext.Provider value={loadedEntityList.state?.selection}>
 				<DataViewDisplayedStateContext.Provider value={loadedEntityList.state}>
 					<TreeRootIdProvider treeRootId={loadedEntityList.treeRootId}>
 						{!loadedEntityList.entities
-							? <NonExistingEntityListSubtree children={children} />
+							? <NonExistingEntityListSubtree children={innerChildren} />
 							: (
 								<ExistingEntityListSubtree
 									entities={loadedEntityList.entities}
-									children={children}
+									children={innerChildren}
 								/>
 							)
 						}</TreeRootIdProvider>

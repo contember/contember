@@ -13,7 +13,7 @@ import {
 	DataViewSortingMethodsContext,
 	DataViewSortingStateContext,
 } from '../contexts'
-import { Component, EnvironmentMiddleware } from '@contember/react-binding'
+import { Component, EntityAccessor, EnvironmentMiddleware } from '@contember/react-binding'
 import { DataViewLoader } from '../internal/components/DataViewLoader'
 import { DataViewInfo, DataViewMethods, DataViewState } from '../types'
 import { dataViewSelectionEnvironmentExtension } from '../dataViewSelectionEnvironmentExtension'
@@ -25,9 +25,10 @@ export type ControlledDataViewProps =
 		state: DataViewState
 		info: DataViewInfo
 		methods: DataViewMethods
+		onSelectHighlighted?: (entity: EntityAccessor) => void
 	}
 
-export const ControlledDataView = Component<ControlledDataViewProps>(({ state, info, methods, children }) => {
+export const ControlledDataView = Component<ControlledDataViewProps>(({ state, info, methods, children, onSelectHighlighted }) => {
 	return (
 		<DataViewEntityListPropsContext.Provider value={state.entities}>
 			<DataViewCurrentKeyContext.Provider value={state.key}>
@@ -41,7 +42,7 @@ export const ControlledDataView = Component<ControlledDataViewProps>(({ state, i
 											<DataViewFilteringMethodsContext.Provider value={methods.filtering}>
 												<DataViewSelectionMethodsContext.Provider value={methods.selection}>
 													<EnvironmentMiddleware create={it => it.withExtension(dataViewSelectionEnvironmentExtension, state.selection)}>
-														<DataViewLoader children={children} state={state} />
+														<DataViewLoader children={children} state={state} onSelectHighlighted={onSelectHighlighted} />
 													</EnvironmentMiddleware>
 												</DataViewSelectionMethodsContext.Provider>
 											</DataViewFilteringMethodsContext.Provider>

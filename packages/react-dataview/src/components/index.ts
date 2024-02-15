@@ -1,3 +1,4 @@
+export * from './highlight'
 export * from './paging'
 export * from './sorting'
 export * from './selection'

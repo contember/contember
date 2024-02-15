@@ -14,6 +14,7 @@ import {
 } from './types'
 import { EntityListAccessor, QualifiedEntityList } from '@contember/binding'
 import { EntityListSubTreeLoaderState } from '@contember/react-binding'
+import * as React from 'react'
 
 
 const _DataViewSortingStateContext = createRequiredContext<DataViewSortingState>('DataViewSortingStateContext')
@@ -95,3 +96,15 @@ const _DataViewSelectionMethodsContext = createRequiredContext<DataViewSelection
 /** @internal */
 export const DataViewSelectionMethodsContext = _DataViewSelectionMethodsContext[0]
 export const useDataViewSelectionMethods = _DataViewSelectionMethodsContext[1]
+
+
+const DataViewHighlightIndexContext_ = createRequiredContext<number | null>('DataViewHighlightIndex')
+/** @internal */
+export const DataViewHighlightIndexContext = DataViewHighlightIndexContext_[0]
+export const useDataViewHighlightIndex = DataViewHighlightIndexContext_[1]
+
+const DataViewKeyboardEventHandlerContext_ = createRequiredContext<React.KeyboardEventHandler>('DataViewKeyboardEventHandler')
+/** @internal */
+export const DataViewKeyboardEventHandlerContext = DataViewKeyboardEventHandlerContext_[0]
+export const useDataViewKeyboardEventHandler = DataViewKeyboardEventHandlerContext_[1]
+

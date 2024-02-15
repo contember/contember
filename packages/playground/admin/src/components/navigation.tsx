@@ -90,6 +90,11 @@ export const Navigation = () => {
 							},
 							{
 								icon: line,
+								label: 'Textarea',
+								to: 'input/textarea',
+							},
+							{
+								icon: line,
 								label: 'Client validation',
 								to: 'input/clientValidation',
 							},

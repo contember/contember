@@ -1,13 +1,14 @@
 import * as React from 'react'
-import { ComponentProps, forwardRef, ReactNode } from 'react'
+import { ComponentProps, ReactNode } from 'react'
 import { Label } from './ui/label'
 import { Component, Field, SugaredRelativeSingleField } from '@contember/interface'
-import { Input } from './ui/input'
+import { CheckboxInput, Input, RadioInput } from './ui/input'
 import { uic } from '../utils/uic'
 import { useErrorFormatter } from './errors'
 import { cn } from '../utils/cn'
 import { MultiSelectInput, MultiSelectInputProps, SelectInput, SelectInputProps, SortableMultiSelectInput, SortableMultiSelectInputProps } from './select'
 import { FormCheckbox, FormCheckboxProps, FormError, FormFieldScope, FormHasManyRelationScope, FormHasOneRelationScope, FormInput, FormInputProps, FormLabel, FormRadioInput } from '@contember/react-form'
+import { TextareaAutosize } from './ui/textarea'
 
 const FormDescriptionUI = uic('p', {
 	baseClass: 'text-[0.8rem] text-muted-foreground',
@@ -70,14 +71,31 @@ export type InputFieldProps =
 	& Omit<FormInputProps, 'children'>
 	& Omit<FormContainerProps, 'children'>
 	& {
-	inputProps?: ComponentProps<typeof Input>
-}
+		inputProps?: ComponentProps<typeof Input>
+	}
 
 export const InputField = Component(({ field, label, description, inputProps, isNonbearing, defaultValue }: InputFieldProps) => (
 	<FormFieldScope field={field}>
 		<FormContainer description={description} label={label}>
 			<FormInput field={field} isNonbearing={isNonbearing} defaultValue={defaultValue}>
 				<Input {...(inputProps ?? {})} className={cn('max-w-md', inputProps?.className)} />
+			</FormInput>
+		</FormContainer>
+	</FormFieldScope>
+))
+
+export type TextareaFieldProps =
+	& Omit<FormInputProps, 'children'>
+	& Omit<FormContainerProps, 'children'>
+	& {
+		inputProps?: ComponentProps<typeof TextareaAutosize>
+	}
+
+export const TextareaField = Component(({ field, label, description, inputProps, isNonbearing, defaultValue }: TextareaFieldProps) => (
+	<FormFieldScope field={field}>
+		<FormContainer description={description} label={label}>
+			<FormInput field={field} isNonbearing={isNonbearing} defaultValue={defaultValue}>
+				<TextareaAutosize {...(inputProps ?? {})} className={cn('max-w-md', inputProps?.className)} />
 			</FormInput>
 		</FormContainer>
 	</FormFieldScope>
@@ -96,7 +114,7 @@ export const CheckboxField = Component(({ field, label, description, inputProps,
 		<FormContainer description={description} label={undefined}>
 			<div className="flex gap-2 items-center">
 				<FormCheckbox field={field} isNonbearing={isNonbearing} defaultValue={defaultValue}>
-					<CheckboxInputUI {...inputProps} />
+					<CheckboxInput {...inputProps} />
 				</FormCheckbox>
 				{label && <FormLabel>
 					<FormLabelUI>
@@ -109,14 +127,6 @@ export const CheckboxField = Component(({ field, label, description, inputProps,
 ))
 
 
-const CheckboxInputUI = forwardRef<HTMLInputElement, ComponentProps<typeof Input>>((props, ref) => {
-	return <input ref={ref} type="checkbox" {...props} className="
-		appearance-none bg-white w-4 h-4 ring-1 ring-gray-400 hover:ring-gray-600 grid place-items-center
-		before:transform  before:transition-all before:scale-0 checked:before:scale-100
-		checked:before:bg-gray-600 checked:before:w-2 checked:before:h-2 checked:before:content-['']
-		before:leading-3 before:text-sm data-[state=indeterminate]:before:content-['?'] data-[state=indeterminate]:before:scale-100
-	" />
-})
 
 
 export type SelectFieldProps =
@@ -185,7 +195,7 @@ export const RadioEnumField = Component<RadioEnumFieldProps>(({ field, label, de
 					{Object.entries(options).map(([value, label]) => (
 						<FormLabelUI className="flex gap-2 items-center font-normal" key={value}>
 							<FormRadioInput field={field} value={value}>
-								<RadioInputUI {...inputProps} />
+								<RadioInput {...inputProps} />
 							</FormRadioInput>
 							{label}
 						</FormLabelUI>
@@ -196,11 +206,4 @@ export const RadioEnumField = Component<RadioEnumFieldProps>(({ field, label, de
 	)
 }, ({ field }) => {
 	return <Field field={field} />
-})
-
-const RadioInputUI = forwardRef<HTMLInputElement, ComponentProps<typeof Input>>((props, ref) => {
-	return <input ref={ref} type="radio" {...props} className="
-		appearance-none bg-white rounded-full w-4 h-4 ring-1 ring-gray-400 hover:ring-gray-600 grid place-items-center
-		before:rounded-full before:bg-gray-600 before:w-2 before:h-2 before:ring-2 before:ring-white before:content-[''] before:transform  before:transition-all before:scale-0 checked:before:scale-100
-	"/>
 })

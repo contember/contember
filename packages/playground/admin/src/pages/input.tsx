@@ -2,7 +2,7 @@ import { Slots } from '../components/slots'
 import { PersistButton } from '../components/binding/PersistButton'
 import { Binding } from '../components/binding/Binding'
 import { EntitySubTree, Field, useField } from '@contember/interface'
-import { CheckboxField, InputField, RadioEnumField } from '../components/form'
+import { CheckboxField, InputField, RadioEnumField, TextareaField } from '../components/form'
 import * as React from 'react'
 import { Button } from '../components/ui/button'
 
@@ -19,6 +19,19 @@ export const basic = () => <>
 				<InputField field={'floatValue'} label={'Float'} />
 				<InputField field={'dateValue'} label={'Date'} />
 				<InputField field={'datetimeValue'} label={'Date time'} />
+			</div>
+		</EntitySubTree>
+	</Binding>
+</>
+
+export const textarea = () => <>
+	<Binding>
+		<Slots.Actions>
+			<PersistButton />
+		</Slots.Actions>
+		<EntitySubTree entity={'InputRoot(unique=unique)'} setOnCreate={'(unique=unique)'}>
+			<div className={'space-y-4'}>
+				<TextareaField field={'textValue'} label={'Text'} description={'Hello world'} />
 			</div>
 		</EntitySubTree>
 	</Binding>

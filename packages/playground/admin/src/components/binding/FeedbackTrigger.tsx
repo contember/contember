@@ -15,14 +15,16 @@ export const usePersistErrorHandler = () => {
 	return useCallback((result: ErrorPersistResult) => {
 		if (result.type === 'invalidInput') {
 			const errorList = errorFormatter(result.errors)
-			showToast(<ToastContent
-				title={'Invalid input'}
-				description={<ul>{errorList.map((it, i) => <li key={i}>{it}</li>)}</ul>}
-			/>, {
-				type: 'error',
-			})
+			showToast(
+				<ToastContent
+					title={'Invalid input'}
+					description={<ul>{errorList.map((it, i) => <li key={i}>{it}</li>)}</ul>}
+				/>, {
+					type: 'error',
+				})
 		} else if (result.type === 'invalidResponse') {
-			showToast(<ToastContent
+			showToast(
+				<ToastContent
 					title={'Invalid response'}
 					description={'Server responded with invalid data'}
 				/>, {
@@ -37,17 +39,19 @@ export const usePersistSuccessHandler = () => {
 	const showToast = useShowToast()
 
 	return useCallback((result: SuccessfulPersistResult) => {
-		showToast(<ToastContent
-			title={'Successfully saved!'}
-		/>, {
-			type: 'success',
-		})
-		if (result.type === 'justSuccess' && result.afterPersistError) {
-			showToast(<ToastContent
-				title={'Something wrong has happened after the data were persisted. Please refresh the page.'}
+		showToast(
+			<ToastContent
+				title={'Successfully saved!'}
 			/>, {
-				type: 'warning',
+				type: 'success',
 			})
+		if (result.type === 'justSuccess' && result.afterPersistError) {
+			showToast(
+				<ToastContent
+					title={'Something wrong has happened after the data were persisted. Please refresh the page.'}
+				/>, {
+					type: 'warning',
+				})
 		}
 	}, [showToast])
 }

@@ -34,6 +34,7 @@ export const SelectInput = Component<SelectInputProps>(({ field, filterField, op
 		entity.disconnectEntityAtField({ field })
 		e.stopPropagation()
 	})
+	const isSelected = (entity: EntityAccessor) => entity.id === selectedEntity.id
 
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
@@ -54,7 +55,7 @@ export const SelectInput = Component<SelectInputProps>(({ field, filterField, op
 				</SelectInputUI>
 			</PopoverTrigger>
 			<SelectPopoverContent>
-				<SelectList filterToolbar={filter?.filterToolbar} filterTypes={filter?.filterTypes} entities={options} onSelect={handleSelect}>
+				<SelectList filterToolbar={filter?.filterToolbar} filterTypes={filter?.filterTypes} entities={options} onSelect={handleSelect} isSelected={isSelected}>
 					<SelectListItemUI>
 						{children}
 					</SelectListItemUI>

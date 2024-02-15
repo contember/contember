@@ -1,9 +1,9 @@
 import * as React from 'react'
-import { ReactNode } from 'react'
+import { forwardRef, ReactNode, useMemo } from 'react'
 import { MultiSelectItemContentUI, MultiSelectItemRemoveButtonUI, MultiSelectItemUI, SelectDefaultPlaceholderUI, SelectInputActionsUI, SelectInputUI, SelectListItemUI, SelectPopoverContent } from './ui'
 import { ChevronDownIcon } from 'lucide-react'
 import { Popover, PopoverTrigger } from '../ui/popover'
-import { Component, EntityAccessor, HasMany, SugaredQualifiedEntityList, SugaredRelativeEntityList, useEntity } from '@contember/interface'
+import { Component, EntityAccessor, HasMany, SugaredQualifiedEntityList, SugaredRelativeEntityList, useEntity, useEntityList } from '@contember/interface'
 import { useReferentiallyStableCallback } from '@contember/react-utils'
 import { createDefaultSelectFilter } from './filter'
 import { SelectList } from './list'
@@ -22,22 +22,29 @@ export const MultiSelectInput = Component<MultiSelectInputProps>(({ field, filte
 		filterToolbar: undefined,
 	}
 	placeholder ??= <SelectDefaultPlaceholderUI />
-	const entity = useEntity()
-	const hasEntities = entity.getEntityList({ field }).length > 0
+	const entities = useEntityList({ field })
+	const hasEntities = entities.length > 0
+	const selectedEntities = useMemo(() => Array.from(entities).map(it => it.id), [entities])
 	const [open, setOpen] = React.useState(false)
 	const handleSelect = useReferentiallyStableCallback((selected: EntityAccessor) => {
-
-		entity.getEntityList({ field }).connectEntity(selected)
+		if (selectedEntities.includes(selected.id)) {
+			entities.disconnectEntity(selected)
+		} else {
+			entities.connectEntity(selected)
+		}
 		// setOpen(false)
 	})
 	const RemoveButton = () => {
 		const itemEntity = useEntity()
 		return (
 			<MultiSelectItemRemoveButtonUI onClick={e => {
-				entity.getEntityList({ field }).disconnectEntity(itemEntity)
+				entities.disconnectEntity(itemEntity)
 				e.stopPropagation()
 			}} />
 		)
+	}
+	const isSelected = (entity: EntityAccessor) => {
+		return selectedEntities.includes(entity.id)
 	}
 
 	return (
@@ -59,7 +66,7 @@ export const MultiSelectInput = Component<MultiSelectInputProps>(({ field, filte
 				</SelectInputUI>
 			</PopoverTrigger>
 			<SelectPopoverContent>
-				<SelectList filterToolbar={filter?.filterToolbar} filterTypes={filter?.filterTypes} entities={options} onSelect={handleSelect}>
+				<SelectList filterToolbar={filter?.filterToolbar} filterTypes={filter?.filterTypes} entities={options} onSelect={handleSelect} isSelected={isSelected}>
 					<SelectListItemUI>
 						{children}
 					</SelectListItemUI>

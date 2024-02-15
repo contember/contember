@@ -1,14 +1,14 @@
 import { cn } from '../../utils/cn'
 import { DropIndicator } from '../ui/sortable'
 import * as React from 'react'
-import { ReactNode } from 'react'
+import { ReactNode, useMemo } from 'react'
 import { MultiSelectItemDragOverlayUI, MultiSelectItemRemoveButtonUI, MultiSelectItemUI, MultiSelectSortableItemContentUI, SelectDefaultPlaceholderUI, SelectInputActionsUI, SelectInputUI, SelectListItemUI, SelectPopoverContent } from './ui'
 import { createDefaultSelectFilter } from './filter'
 import { Popover, PopoverTrigger } from '../ui/popover'
 import { ChevronDownIcon } from 'lucide-react'
 import { SelectList } from './list'
 import { Repeater, RepeaterEmpty, RepeaterSortable, RepeaterSortableDragOverlay, RepeaterSortableDropIndicator, RepeaterSortableEachItem, RepeaterSortableItemActivator, RepeaterSortableItemNode } from '@contember/react-repeater-dnd-kit'
-import { Component, EntityAccessor, HasOne, SugaredQualifiedEntityList, SugaredRelativeEntityList, SugaredRelativeSingleEntity, SugaredRelativeSingleField, useEntity } from '@contember/interface'
+import { Component, EntityAccessor, HasOne, SugaredQualifiedEntityList, SugaredRelativeEntityList, SugaredRelativeSingleEntity, SugaredRelativeSingleField, useEntity, useEntityList } from '@contember/interface'
 import { useReferentiallyStableCallback } from '@contember/react-utils'
 
 const MultiSortableSelectDropIndicator = ({ position }: { position: 'before' | 'after' }) => (
@@ -36,13 +36,18 @@ export const SortableMultiSelectInput = Component<SortableMultiSelectInputProps>
 		filterTypes: undefined,
 		filterToolbar: undefined,
 	}
-	const entity = useEntity()
+	const list = useEntityList({ field })
 	const [open, setOpen] = React.useState(false)
+	const selectedIds = useMemo(() => Array.from(list).map(it => it.getEntity({ field: connectAt }).id), [connectAt, list])
 
 	const handleSelect = useReferentiallyStableCallback((selected: EntityAccessor) => {
-		entity.getEntityList({ field }).createNewEntity(getEntity => {
-			getEntity().connectEntityAtField({ field: connectAt }, selected)
-		})
+		if (selectedIds.includes(selected.id)) {
+			Array.from(list).find(it => it.getEntity({ field: connectAt }).id === selected.id)?.deleteEntity()
+		} else {
+			list.createNewEntity(getEntity => {
+				getEntity().connectEntityAtField({ field: connectAt }, selected)
+			})
+		}
 		// setOpen(false)
 	})
 	const RemoveButton = () => {
@@ -54,6 +59,7 @@ export const SortableMultiSelectInput = Component<SortableMultiSelectInputProps>
 			}}/>
 		)
 	}
+	const isSelected = (entity: EntityAccessor) => selectedIds.includes(entity.id)
 
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
@@ -97,7 +103,7 @@ export const SortableMultiSelectInput = Component<SortableMultiSelectInputProps>
 				</SelectInputUI>
 			</PopoverTrigger>
 			<SelectPopoverContent>
-				<SelectList filterToolbar={filter?.filterToolbar} filterTypes={filter?.filterTypes} entities={options} onSelect={handleSelect}>
+				<SelectList filterToolbar={filter?.filterToolbar} filterTypes={filter?.filterTypes} entities={options} onSelect={handleSelect} isSelected={isSelected}>
 					<SelectListItemUI>
 						{children}
 					</SelectListItemUI>

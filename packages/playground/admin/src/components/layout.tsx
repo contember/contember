@@ -51,7 +51,7 @@ const LayoutComponent = ({ children, ...rest }: PropsWithChildren<ComponentClass
 
 	const hasRightSidebar = isActive('SidebarRightHeader', 'SidebarRightBody', 'SidebarRightFooter', 'Sidebar')
 	return (
-		<div className={'bg-gray-50 h-full min-h-screen relative py-4'}>
+		<div className={'bg-white h-full min-h-screen relative py-4'}>
 			<div className={'max-w-[100rem] mx-auto'}>
 				<div className={'flex justify-between'}>
 					<div className={'flex gap-2'}>
@@ -64,7 +64,7 @@ const LayoutComponent = ({ children, ...rest }: PropsWithChildren<ComponentClass
 						</div>
 					</div>
 				</div>
-				<div className={'rounded shadow bg-white gap-1 flex flex-col lg:flex-row mt-4 relative'}>
+				<div className={'rounded-xl shadow-lg border bg-white gap-1 flex flex-col lg:flex-row mt-4 relative'}>
 					{showLeftSidebar === false && <div className={'hidden lg:block absolute top-1 left-1'}>
 						<a onClick={() => setShowLeftSidebar(null)}><PanelLeftOpenIcon /></a>
 					</div>}
@@ -72,7 +72,7 @@ const LayoutComponent = ({ children, ...rest }: PropsWithChildren<ComponentClass
 						<a onClick={() => setShowRightSidebar(true)}><PanelRightOpenIcon /></a>
 					</div> : null}
 					<div
-						className={`${showLeftSidebar === false ? 'hidden' : (showLeftSidebar === true ? 'flex' : 'hidden lg:flex')} flex-col lg:border-r border-r-gray-300 lg:w-96 flex-auto gap-2 relative`}>
+						className={`${showLeftSidebar === false ? 'hidden' : (showLeftSidebar === true ? 'flex' : 'hidden lg:flex')} flex-col lg:border-r bg-neutral-50 border-r-gray-300 lg:w-96 flex-auto gap-2 relative`}>
 						<div
 							className={'hidden lg:flex self-end absolute top-0 right-1 opacity-0 text-gray-400 hover:opacity-100 transition-opacity cursor-pointer'}>
 							<a onClick={() => setShowLeftSidebar(false)}><PanelLeftCloseIcon /></a>
@@ -80,7 +80,7 @@ const LayoutComponent = ({ children, ...rest }: PropsWithChildren<ComponentClass
 						<div className="p-4">
 							<SlotTargets.Navigation />
 						</div>
-						<div className={'mt-auto bg-gray-100 rounded-bl py-2 px-2 border-t'}>
+						<div className={'mt-auto rounded-bl py-2 px-2 border-t'}>
 							<SlotTargets.Profile />
 						</div>
 					</div>
@@ -110,7 +110,7 @@ const LayoutComponent = ({ children, ...rest }: PropsWithChildren<ComponentClass
 
 				</div>
 
-				<div className={'flex justify-between'}>
+				<div className={'flex justify-center'}>
 					<div>
 						<SlotTargets.Footer />
 					</div>

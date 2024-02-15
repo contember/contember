@@ -7,7 +7,7 @@ import { cn } from '../../utils/cn'
 /**
  * Button in a tooltip that triggers the filter action
  */
-export const DataViewFilterActionButtonUI = forwardRef((props: {}, ref) => {
+export const DataViewFilterActionButtonUI = forwardRef<HTMLButtonElement, {}>((props: {}, ref) => {
 	return (
 		<Button
 			variant={'outline'}
@@ -25,7 +25,7 @@ export const DataViewFilterActionButtonUI = forwardRef((props: {}, ref) => {
 /**
  * Button in a tooltip that triggers the exclude action
  */
-export const DataViewExcludeActionButtonUI = forwardRef((props: {}, ref) => {
+export const DataViewExcludeActionButtonUI = forwardRef<HTMLButtonElement, {}>((props: {}, ref) => {
 	return (
 		<Button
 			variant={'outline'}
@@ -43,7 +43,7 @@ export const DataViewExcludeActionButtonUI = forwardRef((props: {}, ref) => {
 /**
  * Button in a filter list that removes the filter
  */
-export const DataViewActiveFilterUI = forwardRef(({ children, className, ...props }: { children: ReactNode, className?: string }, ref) => {
+export const DataViewActiveFilterUI = forwardRef<HTMLButtonElement, { children: ReactNode, className? : string }>(({ children, className, ...props }, ref) => {
 	return (
 		<Button
 			variant={'outline'}

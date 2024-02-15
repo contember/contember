@@ -30,7 +30,7 @@ type Config<T extends ConfigSchema | undefined, El extends React.ElementType> = 
 	afterChildren?: ReactElement
 }
 
-export const uiconfig = <T extends ConfigSchema | undefined, El extends React.ElementType | unknown = unknown>(config: Config<T, ComponentType<{}>>) => config
+export const uiconfig = <T extends ConfigSchema | undefined>(config: Config<T, ComponentType<{}>>) => config
 
 export type NoInfer<T> = T & { [K in keyof T]: T[K] }
 
@@ -41,7 +41,7 @@ export const uic = <El extends React.ElementType, Variants extends ConfigSchema 
 		compoundVariants: config?.compoundVariants,
 	})
 
-	const component =  React.forwardRef<any, React.ComponentProps<El> & {
+	const component =  React.forwardRef<React.ElementRef<El>, React.ComponentProps<El> & {
 		asChild?: boolean
 		children?: React.ReactNode
 		className?: string
@@ -70,7 +70,7 @@ export const uic = <El extends React.ElementType, Variants extends ConfigSchema 
 			</>
 		}
 
-		const innerEl = <Comp ref={ref} className={twMerge(clsx(cls(props), classNameProp))} {...config.defaultProps} {...rest}>{children}</Comp>
+		const innerEl = <Comp ref={ref} className={twMerge(clsx(cls(props), classNameProp))} {...(config.defaultProps ?? {})} {...rest}>{children}</Comp>
 		return config?.wrapOuter ? React.createElement(config.wrapOuter, props, innerEl) : innerEl
 	})
 	component.displayName = config?.displayName

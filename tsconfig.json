@@ -81,6 +81,9 @@
 			"path": "./packages/react-devbar"
 		},
 		{
+			"path": "./packages/react-form"
+		},
+		{
 			"path": "./packages/react-form-fields-ui"
 		},
 		{

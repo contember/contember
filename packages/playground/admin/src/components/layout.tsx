@@ -25,8 +25,8 @@ export const Layout = memo(({ children }: PropsWithChildren) => {
 
 				<Slots.Profile>
 					<LogoutTrigger>
-						<Button variant={'ghost'}>
-							<LogOutIcon /> Logout
+						<Button variant={'ghost'} size="sm" className="gap-2 hover:underline">
+							<LogOutIcon className="w-3 h-3 text-gray-500" /> Logout
 						</Button>
 					</LogoutTrigger>
 				</Slots.Profile>
@@ -72,15 +72,15 @@ const LayoutComponent = ({ children, ...rest }: PropsWithChildren<ComponentClass
 						<a onClick={() => setShowRightSidebar(true)}><PanelRightOpenIcon /></a>
 					</div> : null}
 					<div
-						className={`${showLeftSidebar === false ? 'hidden' : (showLeftSidebar === true ? 'flex' : 'hidden lg:flex')} flex-col p-4 pt-6 lg:border-r border-r-gray-300 lg:w-96 flex-auto gap-2 relative`}>
+						className={`${showLeftSidebar === false ? 'hidden' : (showLeftSidebar === true ? 'flex' : 'hidden lg:flex')} flex-col lg:border-r border-r-gray-300 lg:w-96 flex-auto gap-2 relative`}>
 						<div
 							className={'hidden lg:flex self-end absolute top-0 right-1 opacity-0 text-gray-400 hover:opacity-100 transition-opacity cursor-pointer'}>
 							<a onClick={() => setShowLeftSidebar(false)}><PanelLeftCloseIcon /></a>
 						</div>
-						<div>
+						<div className="p-4">
 							<SlotTargets.Navigation />
 						</div>
-						<div className={'mt-auto pt-8'}>
+						<div className={'mt-auto bg-gray-100 rounded-bl py-2 px-2 border-t'}>
 							<SlotTargets.Profile />
 						</div>
 					</div>

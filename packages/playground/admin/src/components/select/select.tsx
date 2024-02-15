@@ -10,7 +10,7 @@ import { SelectDefaultPlaceholderUI, SelectInputActionsUI, SelectInputUI, Select
 import { SelectList } from './list'
 import { createDefaultSelectFilter } from './filter'
 
-export interface SelectFieldProps {
+export interface SelectInputProps {
 	field: SugaredRelativeSingleEntity['field']
 	children: ReactNode
 	options: SugaredQualifiedEntityList['entities']
@@ -19,8 +19,8 @@ export interface SelectFieldProps {
 }
 
 
-export const SelectField = Component<SelectFieldProps>(({ field, filterField, options, children, placeholder }) => {
-	placeholder ??= <SelectDefaultPlaceholderUI/>
+export const SelectInput = Component<SelectInputProps>(({ field, filterField, options, children, placeholder }) => {
+	placeholder ??= <SelectDefaultPlaceholderUI />
 	const filter = filterField ? createDefaultSelectFilter(filterField) : { filterTypes: undefined, filterToolbar: undefined }
 	const entity = useEntity()
 	const selectedEntity = entity.getEntity({ field })
@@ -45,10 +45,10 @@ export const SelectField = Component<SelectFieldProps>(({ field, filterField, op
 					}
 					<SelectInputActionsUI>
 						{entityExists && <Button size={'xs'} variant={'ghost'}>
-							<XIcon className={'w-4 h-4'} onClick={handleClear}/>
+							<XIcon className={'w-4 h-4'} onClick={handleClear} />
 						</Button>}
 
-						<ChevronDownIcon className={'w-4 h-4'}/>
+						<ChevronDownIcon className={'w-4 h-4'} />
 					</SelectInputActionsUI>
 
 				</SelectInputUI>

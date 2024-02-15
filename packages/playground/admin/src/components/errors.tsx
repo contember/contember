@@ -1,42 +1,24 @@
 import { ErrorAccessor } from '@contember/binding'
-import { useCallback } from 'react'
-
-export interface FormattedError {
-	message: string
-	type: 'validation' | 'execution' | 'unknown'
-	code?: string
-}
+import { ReactNode, useCallback } from 'react'
 
 export const useErrorFormatter = () => {
-	return useCallback((errors: ErrorAccessor.Error[]): FormattedError[] => {
+	return useCallback((errors: ErrorAccessor.Error[]): ReactNode[] => {
 		return errors.map((it, i) => {
 			if (it.type === 'validation') {
 				switch (it.code) {
 					// case 'fieldRequired':
-					// 	return {
-					// 		...it,
-					// 		message: 'This field is required',
-					// 	}
+					// return  'This field is required'
 					default:
-						return it
+						return it.message
 				}
 			} else if (it.type === 'execution') {
 				if (it.code === 'UniqueConstraintViolation') {
-					return {
-						...it,
-						message: 'Unique constraint violation',
-					}
+					return 'Unique constraint violation'
 				} else {
-					return {
-						...it,
-						message: 'Unknown error',
-					}
+					return 'Unknown error'
 				}
 			} else {
-				return {
-					type: 'unknown',
-					message: 'Unknown error',
-				}
+				return 'Unknown error'
 			}
 		})
 	}, [])

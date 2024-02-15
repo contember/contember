@@ -3,7 +3,7 @@ import { AccessorTreeState, DataBindingProvider } from '@contember/interface'
 import { Loader } from '../ui/loader'
 import { usePersistWithFeedback } from './FeedbackTrigger'
 
-export const SaveHandler = () => {
+export const CmdS = () => {
 	const persist = usePersistWithFeedback()
 	useEffect(() => {
 		const listener = (event: KeyboardEvent) => {
@@ -13,9 +13,7 @@ export const SaveHandler = () => {
 			}
 		}
 		document.body.addEventListener('keydown', listener)
-		return () => {
-			document.body.removeEventListener('keydown', listener)
-		}
+		return () => document.body.removeEventListener('keydown', listener)
 	}, [persist])
 
 	return null

@@ -93,6 +93,16 @@ export const Navigation = () => {
 								label: 'Client validation',
 								to: 'input/clientValidation',
 							},
+							{
+								icon: line,
+								label: 'Checkbox',
+								to: 'input/checkbox',
+							},
+							{
+								icon: line,
+								label: 'Radio',
+								to: 'input/enumRadio',
+							},
 						],
 					},
 					{

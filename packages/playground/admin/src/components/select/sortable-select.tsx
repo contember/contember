@@ -19,7 +19,7 @@ const MultiSortableSelectDropIndicator = ({ position }: { position: 'before' | '
 	</div>
 )
 
-export interface SortableMultiSelectFieldProps {
+export interface SortableMultiSelectInputProps {
 	field: SugaredRelativeEntityList['field']
 	sortableBy: SugaredRelativeSingleField['field']
 	connectAt: SugaredRelativeSingleEntity['field']
@@ -29,7 +29,7 @@ export interface SortableMultiSelectFieldProps {
 	placeholder?: ReactNode
 }
 
-export const SortableMultiSelectField = Component<SortableMultiSelectFieldProps>(({ field, filterField, options, children, sortableBy, connectAt, placeholder }) => {
+export const SortableMultiSelectInput = Component<SortableMultiSelectInputProps>(({ field, filterField, options, children, sortableBy, connectAt, placeholder }) => {
 	placeholder ??= <SelectDefaultPlaceholderUI/>
 
 	const filter = filterField ? createDefaultSelectFilter(filterField) : {

@@ -8,5 +8,6 @@
 		{ "path": "../api" },
 		{ "path": "../../interface/src" },
 		{ "path": "../../react-dataview/src" },
+		{ "path": "../../react-form/src" },
 	]
 }

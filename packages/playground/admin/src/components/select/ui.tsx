@@ -9,7 +9,7 @@ export const SelectInputUI = uic(InputLike, {
 	baseClass: 'cursor-pointer hover:border-gray-400 relative flex gap-2 flex-wrap py-1',
 })
 export const SelectInputActionsUI = uic('div', {
-	baseClass: 'absolute right-2 top-1/2 -translate-y-1/2 flex gap-1',
+	baseClass: 'absolute right-2 top-1/2 -translate-y-1/2 flex gap-1 items-center',
 })
 
 export const SelectListItemUI = uic(Button, {

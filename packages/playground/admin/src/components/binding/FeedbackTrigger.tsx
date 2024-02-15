@@ -17,7 +17,7 @@ export const usePersistErrorHandler = () => {
 			const errorList = errorFormatter(result.errors)
 			showToast(<ToastContent
 				title={'Invalid input'}
-				description={<ul>{errorList.map((it, i) => <li key={i}>{it.message}</li>)}</ul>}
+				description={<ul>{errorList.map((it, i) => <li key={i}>{it}</li>)}</ul>}
 			/>, {
 				type: 'error',
 			})

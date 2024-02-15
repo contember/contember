@@ -8,7 +8,7 @@ import { useReferentiallyStableCallback } from '@contember/react-utils'
 import { createDefaultSelectFilter } from './filter'
 import { SelectList } from './list'
 
-export interface MultiSelectFieldProps {
+export interface MultiSelectInputProps {
 	field: SugaredRelativeEntityList['field']
 	children: ReactNode
 	options: SugaredQualifiedEntityList['entities']
@@ -16,7 +16,7 @@ export interface MultiSelectFieldProps {
 	placeholder?: ReactNode
 }
 
-export const MultiSelectField = Component<MultiSelectFieldProps>(({ field, filterField, options, children, placeholder }) => {
+export const MultiSelectInput = Component<MultiSelectInputProps>(({ field, filterField, options, children, placeholder }) => {
 	const filter = filterField ? createDefaultSelectFilter(filterField) : {
 		filterTypes: undefined,
 		filterToolbar: undefined,

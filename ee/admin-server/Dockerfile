@@ -44,6 +44,7 @@ COPY ./packages/react-repeater/package.json ././packages/react-repeater/package.
 COPY ./packages/react-repeater-dnd-kit/package.json ././packages/react-repeater-dnd-kit/package.json
 COPY ./packages/react-richtext-renderer/package.json ././packages/react-richtext-renderer/package.json
 COPY ./packages/react-routing/package.json ././packages/react-routing/package.json
+COPY ./packages/react-select/package.json ././packages/react-select/package.json
 COPY ./packages/react-slots/package.json ././packages/react-slots/package.json
 COPY ./packages/react-utils/package.json ././packages/react-utils/package.json
 COPY ./packages/ui/package.json ././packages/ui/package.json

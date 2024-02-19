@@ -1308,6 +1308,7 @@ __metadata:
     "@contember/react-form": "workspace:*"
     "@contember/react-repeater": "workspace:*"
     "@contember/react-repeater-dnd-kit": "workspace:*"
+    "@contember/react-select": "workspace:*"
     "@contember/react-slots": "workspace:*"
     "@contember/schema": ^1.4.0-beta.1
     "@contember/schema-definition": ^1.4.0-beta.1
@@ -1698,6 +1699,27 @@ __metadata:
     "@contember/utilities": "workspace:*"
     "@radix-ui/react-slot": ^1.0.2
     path-to-regexp: 6.2.1
+    react: ^18.2.0
+    react-dom: ^18.2.0
+  peerDependencies:
+    react: ^17 || ^18
+    react-dom: ^17 || ^18
+  languageName: unknown
+  linkType: soft
+
+"@contember/react-select@workspace:*, @contember/react-select@workspace:packages/react-select":
+  version: 0.0.0-use.local
+  resolution: "@contember/react-select@workspace:packages/react-select"
+  dependencies:
+    "@contember/binding": "workspace:*"
+    "@contember/client": "workspace:*"
+    "@contember/react-binding": "workspace:*"
+    "@contember/react-client": "workspace:*"
+    "@contember/react-dataview": "workspace:*"
+    "@contember/react-repeater": "workspace:*"
+    "@contember/react-utils": "workspace:*"
+    "@contember/utilities": "workspace:*"
+    "@radix-ui/react-slot": ^1.0.2
     react: ^18.2.0
     react-dom: ^18.2.0
   peerDependencies:

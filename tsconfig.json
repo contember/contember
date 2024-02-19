@@ -111,6 +111,9 @@
 			"path": "./packages/react-routing"
 		},
 		{
+			"path": "./packages/react-select"
+		},
+		{
 			"path": "./packages/react-slots"
 		},
 		{

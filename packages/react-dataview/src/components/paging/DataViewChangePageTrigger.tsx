@@ -18,8 +18,9 @@ export const DataViewChangePageTrigger = forwardRef<HTMLElement, DataViewChangeP
 		}
 		switch (page) {
 			case 'last':
+				return pagesCount === undefined ||  pagesCount === 0 || pageIndex === pagesCount - 1
 			case 'next':
-				return pagesCount !== undefined && pageIndex === pagesCount - 1
+				return pagesCount !== undefined && pageIndex === Math.max(pagesCount - 1, 0)
 			case 'first':
 			case 'previous':
 				return pageIndex === 0

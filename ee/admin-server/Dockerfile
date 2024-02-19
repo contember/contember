@@ -30,6 +30,7 @@ COPY ./packages/react-board-dnd-kit/package.json ././packages/react-board-dnd-ki
 COPY ./packages/react-choice-field/package.json ././packages/react-choice-field/package.json
 COPY ./packages/react-choice-field-ui/package.json ././packages/react-choice-field-ui/package.json
 COPY ./packages/react-client/package.json ././packages/react-client/package.json
+COPY ./packages/react-client-tenant/package.json ././packages/react-client-tenant/package.json
 COPY ./packages/react-datagrid/package.json ././packages/react-datagrid/package.json
 COPY ./packages/react-datagrid-ui/package.json ././packages/react-datagrid-ui/package.json
 COPY ./packages/react-dataview/package.json ././packages/react-dataview/package.json

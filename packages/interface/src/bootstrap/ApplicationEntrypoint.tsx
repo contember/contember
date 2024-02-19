@@ -6,14 +6,11 @@ import { DataViewPageNameKeyProvider } from './DataViewPageNameKeyProvider'
 import { IdentityProvider, projectEnvironmentExtension } from '@contember/react-identity'
 
 export interface ApplicationEntrypointProps extends ContemberClientProps {
-	basePath?: string
+	basePath: string
 	sessionToken?: string
 	routes?: RouteMap
-	defaultDimensions?: SelectedDimension
-	defaultLocale?: string
-	envVariables?: Record<string, string>
 	children: ReactNode
-	devBarPanels?: ReactNode
+	environment?: Environment
 }
 
 const validateProps = (props: Partial<ApplicationEntrypointProps>) => {
@@ -27,22 +24,15 @@ const validateProps = (props: Partial<ApplicationEntrypointProps>) => {
  */
 export const ApplicationEntrypoint = (props: ApplicationEntrypointProps) => {
 	validateProps(props)
-	const projectSlug = props.project === '__PROJECT_SLUG__'
-		? window.location.pathname.split('/')[1]
-		: props.project
-	const basePath = props.basePath === './'
-		? `/${projectSlug}/`
-		: (props.basePath ?? '/')
+
+	const rootEnv = props.environment ?? Environment.create()
 
 	const routing: RoutingContextValue = {
-		basePath,
+		basePath: props.basePath,
 		routes: props.routes ?? { index: { path: '/' } },
-		defaultDimensions: props.defaultDimensions,
+		defaultDimensions: rootEnv.getAllDimensions(),
 	}
 
-	const rootEnv = Environment.create()
-		.withVariables(props.envVariables)
-		.withDimensions(props.defaultDimensions ?? {})
 
 	return (
 		<EnvironmentContext.Provider value={rootEnv}>
@@ -52,13 +42,12 @@ export const ApplicationEntrypoint = (props: ApplicationEntrypointProps) => {
 						apiBaseUrl={props.apiBaseUrl}
 						sessionToken={props.sessionToken}
 						loginToken={props.loginToken}
-						project={projectSlug}
+						project={props.project}
 						stage={props.stage}
 					>
-						<EnvironmentExtensionProvider extension={projectEnvironmentExtension} state={projectSlug ?? null}>
+						<EnvironmentExtensionProvider extension={projectEnvironmentExtension} state={props.project ?? null}>
 							<DataViewPageNameKeyProvider>
 								<IdentityProvider>
-									{/*todo outdated application dialog*/}
 									{props.children}
 								</IdentityProvider>
 							</DataViewPageNameKeyProvider>

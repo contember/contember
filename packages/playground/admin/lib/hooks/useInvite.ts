@@ -1,4 +1,4 @@
-import { TenantApi, useTenantApi } from '@contember/react-client-tenant'
+import * as TenantApi from '@contember/react-client-tenant'
 import { useCallback } from 'react'
 
 const InviteFetcher = TenantApi.inviteResponse$$
@@ -8,7 +8,7 @@ const InviteFetcher = TenantApi.inviteResponse$$
 export type InviteErrorCodes = TenantApi.InviteErrorCode
 
 export const useInvite = () => {
-	const api = useTenantApi()
+	const api = TenantApi.useTenantApi()
 
 	return useCallback(async (variables: {
 		email: string,

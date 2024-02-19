@@ -4,7 +4,7 @@ import { useInvite } from './useInvite'
 import { ToastContent, useShowToast } from '../components/ui/toast'
 import { useProjectSlug } from '@contember/react-client'
 import { EntityAccessor } from '@contember/interface'
-import { TenantApi } from '@contember/react-client-tenant'
+import * as TenantApi from '@contember/react-client-tenant'
 import { useReferentiallyStableCallback } from '@contember/react-utils'
 import { dict } from '../dict'
 

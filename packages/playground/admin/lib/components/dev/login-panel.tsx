@@ -4,7 +4,7 @@ import { FieldContainer } from '../form'
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
 import { useSessionTokenWithMeta, useSetSessionToken } from '@contember/react-client'
-import { TenantApi, useTenantApi } from '@contember/react-client-tenant'
+import * as TenantApi from '@contember/react-client-tenant'
 
 export const LoginWithEmail = () => {
 	const [email, setEmail] = useState('')
@@ -12,7 +12,7 @@ export const LoginWithEmail = () => {
 	const addToast = useShowToast()
 	const [isSubmitting, setSubmitting] = useState(false)
 	const setSessionToken = useSetSessionToken()
-	const api = useTenantApi()
+	const api = TenantApi.useTenantApi()
 
 	const submit = useCallback(async (e: SyntheticEvent) => {
 		e.preventDefault()

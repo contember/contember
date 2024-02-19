@@ -1,15 +1,13 @@
-import * as tenant from '@contember/graphql-client-tenant'
-import { ModelType } from 'graphql-ts-client-api'
-import { useTenantExecutor } from './useTenantExecutor'
+import { ModelType, TenantApi, useTenantApi } from '@contember/react-client-tenant'
 import { useCallback } from 'react'
 
-const signOutFragment = tenant.signOutResponse$$.error(tenant.signOutError$$)
+const signOutFragment = TenantApi.signOutResponse$$.error(TenantApi.signOutError$$)
 
 export type SignOutResult = ModelType<typeof signOutFragment>
 
 export const useSignOut = () => {
-	const executor = useTenantExecutor()
+	const api = useTenantApi()
 	return useCallback(async () => {
-		return (await executor(tenant.mutation$.signOut(signOutFragment))).signOut
-	}, [executor])
+		return (await api(TenantApi.mutation$.signOut(signOutFragment))).signOut
+	}, [api])
 }

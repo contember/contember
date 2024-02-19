@@ -121,6 +121,9 @@ services:
 
       TENANT_DB_NAME: 'tenant'
 
+      TENANT_MAILER_HOST: 'mailhog'
+      TENANT_MAILER_PORT: '1025'
+      TENANT_MAILER_FROM: 'contember@localhost'
     healthcheck:
       test: 'curl --fail http://localhost:4000'
       interval: 5s
@@ -239,7 +242,8 @@ services:
   redis:
     image: redis:3.2-alpine
 
-
+  mailhog:
+    image: mailhog/mailhog
 volumes:
   pgsql-data: ~
   minio-data: ~

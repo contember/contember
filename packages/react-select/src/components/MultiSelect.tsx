@@ -1,7 +1,6 @@
 import React, { ReactNode, useCallback, useMemo } from 'react'
 import { SelectCurrentEntitiesContext, SelectHandler, SelectHandleSelectContext, SelectIsSelectedContext, SelectOptionsContext } from '../contexts'
-import { EntityAccessor, SugaredQualifiedEntityList, SugaredRelativeEntityList } from '@contember/binding'
-import { Component, HasMany, useEntityList } from '@contember/react-binding'
+import { Component, EntityAccessor, HasMany, SugaredQualifiedEntityList, SugaredRelativeEntityList, useEntityList } from '@contember/react-binding'
 import { useReferentiallyStableCallback } from '@contember/react-utils'
 import { SelectEvents } from '../types'
 

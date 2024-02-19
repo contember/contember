@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useCallback, useEffect, useRef } from 'react'
-import { FieldAccessor } from '@contember/binding'
-import { useEntityBeforePersist } from '@contember/react-binding'
+import { FieldAccessor, useEntityBeforePersist } from '@contember/react-binding'
 
 export const useFormInputValidationHandler = (field: FieldAccessor<any>) => {
 	const accessorGetter = field.getAccessor

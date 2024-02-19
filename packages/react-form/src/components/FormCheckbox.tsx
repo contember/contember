@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { ChangeEventHandler, ReactElement, useCallback, useEffect } from 'react'
-import { OptionallyVariableFieldValue, SugaredRelativeSingleField, TreeNodeEnvironmentFactory } from '@contember/binding'
-import { Component, Field, useField } from '@contember/react-binding'
+import { Component, Field, OptionallyVariableFieldValue, SugaredRelativeSingleField, TreeNodeEnvironmentFactory, useField } from '@contember/react-binding'
 import { useFormError, useFormFieldId } from '../contexts'
 import { dataAttribute } from '@contember/utilities'
 import { useFormInputValidationHandler } from '../hooks'

@@ -1,8 +1,7 @@
 import * as React from 'react'
 import { useId } from 'react'
 import { FormErrorContext, FormFieldIdContext } from '../contexts'
-import { SugaredRelativeSingleEntity } from '@contember/binding'
-import { useEntity } from '@contember/react-binding'
+import { SugaredRelativeSingleEntity, useEntity } from '@contember/react-binding'
 
 const emptyArr: [] = []
 

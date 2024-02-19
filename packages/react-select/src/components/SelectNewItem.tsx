@@ -1,5 +1,4 @@
-import { EntityAccessor, QueryLanguage, TreeRootId } from '@contember/binding'
-import { Entity, EntitySubTree, TreeRootIdProvider, useEnvironment, useExtendTree, useGetEntitySubTree } from '@contember/react-binding'
+import { Entity, EntityAccessor, EntitySubTree, QueryLanguage, TreeRootId, TreeRootIdProvider, useEnvironment, useExtendTree, useGetEntitySubTree } from '@contember/react-binding'
 import * as React from 'react'
 import { ReactNode, useEffect, useMemo, useState } from 'react'
 import { useSelectOptions } from '../contexts'

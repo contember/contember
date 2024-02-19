@@ -1,4 +1,4 @@
-import { SugaredRelativeEntityList, useEntityList } from '@contember/interface'
+import { SugaredRelativeEntityList, useEntityList } from '@contember/react-binding'
 import * as React from 'react'
 import { useId } from 'react'
 import { FormErrorContext, FormFieldIdContext } from '../contexts'

@@ -1,6 +1,6 @@
 import { cloneElement, ReactElement, ReactNode, useMemo } from 'react'
 import { useFormError, useFormFieldId } from '../contexts'
-import { BindingError, ErrorAccessor } from '@contember/binding'
+import { BindingError, ErrorAccessor } from '@contember/react-binding'
 
 export const FormError = ({ children, formatter }: {
 	formatter: (errors: ErrorAccessor.Error[]) => ReactNode[]

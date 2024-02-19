@@ -1,4 +1,4 @@
-import { EntityAccessor } from '@contember/binding'
+import { EntityAccessor } from '@contember/react-binding'
 
 export interface SelectEvents {
 	onSelect?: (entity: EntityAccessor) => void

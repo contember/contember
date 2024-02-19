@@ -1,13 +1,10 @@
 import * as React from 'react'
-import { ChangeEventHandler, ComponentType, useCallback, useMemo } from 'react'
+import { ChangeEventHandler, ComponentType, useCallback } from 'react'
 import { Slot } from '@radix-ui/react-slot'
-import { FieldAccessor, OptionallyVariableFieldValue, SchemaColumn, SugaredRelativeSingleField } from '@contember/binding'
-import { Component, SchemaKnownColumnType, useField } from '@contember/interface'
+import { Component, Field, OptionallyVariableFieldValue, SugaredRelativeSingleField, useField } from '@contember/react-binding'
 import { dataAttribute } from '@contember/utilities'
-import { Field } from '@contember/react-binding'
 import { useFormInputHandler } from '../internal/useFormInputHandler'
-import { useFormError } from '../contexts'
-import { useFormFieldId } from '../contexts'
+import { useFormError, useFormFieldId } from '../contexts'
 import { useFormInputValidationHandler } from '../hooks/useFormInputValidationHandler'
 
 type InputProps = React.JSX.IntrinsicElements['input']

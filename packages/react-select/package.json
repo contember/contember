@@ -40,10 +40,7 @@
 		"directory": "packages/react-select"
 	},
 	"dependencies": {
-		"@contember/binding": "workspace:*",
-		"@contember/client": "workspace:*",
 		"@contember/react-binding": "workspace:*",
-		"@contember/react-client": "workspace:*",
 		"@contember/react-dataview": "workspace:*",
 		"@contember/react-repeater": "workspace:*",
 		"@contember/react-utils": "workspace:*",

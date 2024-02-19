@@ -1,4 +1,4 @@
-import { FieldAccessor, SchemaColumn, SchemaKnownColumnType } from '@contember/binding'
+import { FieldAccessor, SchemaColumn, SchemaKnownColumnType } from '@contember/react-binding'
 import * as React from 'react'
 import { useMemo } from 'react'
 

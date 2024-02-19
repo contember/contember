@@ -2,5 +2,10 @@
 	"extends": "../../../tsconfig.settings.json",
 	"compilerOptions": {
 		"outDir": "../dist/types"
-	}
+	},
+	"references": [
+		{ "path": "../../react-binding/src" },
+		{ "path": "../../react-utils/src" },
+		{ "path": "../../utilities/src" },
+	]
 }

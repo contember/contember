@@ -1,5 +1,5 @@
 import { createContext } from '@contember/react-utils'
-import { ErrorAccessor } from '@contember/binding'
+import { ErrorAccessor } from '@contember/react-binding'
 
 const FormFieldIdContext_ = createContext<string | undefined>('FormFieldIdContext', undefined)
 /** @internal */

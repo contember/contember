@@ -1,5 +1,5 @@
 import { createRequiredContext } from '@contember/react-utils'
-import { EntityAccessor, SugaredQualifiedEntityList } from '@contember/binding'
+import { EntityAccessor, SugaredQualifiedEntityList } from '@contember/react-binding'
 
 const _SelectCurrentEntitiesContext = createRequiredContext<EntityAccessor[]>('SelectCurrentEntitiesContext')
 /** @internal */

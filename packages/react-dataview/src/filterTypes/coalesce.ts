@@ -1,6 +1,6 @@
-import { Filter, QueryLanguage, SugaredRelativeSingleField, wrapFilterInHasOnes } from '@contember/binding'
+import { Filter, SugaredRelativeSingleField } from '@contember/binding'
 import { DataViewFilterHandler } from '../types'
-import { createGenericTextCellFilterCondition } from './common'
+import { createTextFilter, TextFilterArtifacts } from './text'
 
 export type CoalesceTextFilterArtifacts = {
 	mode?: 'matches' | 'matchesExactly' | 'startsWith' | 'endsWith' | 'doesNotMatch'
@@ -8,18 +8,15 @@ export type CoalesceTextFilterArtifacts = {
 }
 
 
-export const createCoalesceFilter = (fields: SugaredRelativeSingleField['field'][]): DataViewFilterHandler<CoalesceTextFilterArtifacts> => (filter, { environment }): Filter | undefined => {
-	if (!filter.query) {
-		return undefined
+export const createCoalesceFilter = (fields: SugaredRelativeSingleField['field'][]): DataViewFilterHandler<TextFilterArtifacts> => {
+	const filters = fields.map(it => createTextFilter(it))
+
+	return (filter, { environment }): Filter | undefined => {
+		if (!filter.query) {
+			return undefined
+		}
+		return {
+			or: filters.map(it => it(filter, { environment })!),
+		}
 	}
-	const condition = createGenericTextCellFilterCondition(filter)
-	const parts: Filter[] = []
-	for (const field of fields) {
-		const desugared = QueryLanguage.desugarRelativeSingleField({ field: field }, environment)
-		const fieldCondition = wrapFilterInHasOnes(desugared.hasOneRelationPath, {
-			[desugared.field]: condition,
-		})
-		parts.push(fieldCondition)
-	}
-	return filter.mode === 'doesNotMatch' ? { and: parts } : { or: parts }
 }

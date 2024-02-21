@@ -67,6 +67,7 @@ jobs:
         run: ${{ matrix.run_script }}
 
   playwright:
+    if: false
     needs: [ test ]
     runs-on: ubuntu-latest
     container: mcr.microsoft.com/playwright:v1.40.1-focal

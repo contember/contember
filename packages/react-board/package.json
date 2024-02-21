@@ -34,7 +34,10 @@
 		"directory": "packages/react-board"
 	},
 	"dependencies": {
-		"@contember/react-binding": "workspace:*"
+		"@contember/binding": "workspace:*",
+		"@contember/react-binding": "workspace:*",
+		"@contember/react-multipass-rendering": "workspace:*",
+		"@contember/react-utils": "workspace:*"
 	},
 	"peerDependencies": {
 		"react": "^17 || ^18",

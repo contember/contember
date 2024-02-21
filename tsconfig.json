@@ -3,9 +3,6 @@
 	"include": [],
 	"references": [
 		{
-			"path": "./scripts/template-package"
-		},
-		{
 			"path": "./packages/admin"
 		},
 		{
@@ -36,10 +33,16 @@
 			"path": "./packages/graphql-client"
 		},
 		{
+			"path": "./packages/interface"
+		},
+		{
 			"path": "./packages/interface-tester"
 		},
 		{
 			"path": "./packages/layout"
+		},
+		{
+			"path": "./packages/playground"
 		},
 		{
 			"path": "./packages/react-auto"
@@ -57,9 +60,6 @@
 			"path": "./packages/react-board-dnd-kit"
 		},
 		{
-			"path": "./packages/react-board-ui"
-		},
-		{
 			"path": "./packages/react-choice-field"
 		},
 		{
@@ -69,10 +69,22 @@
 			"path": "./packages/react-client"
 		},
 		{
+			"path": "./packages/react-client-tenant"
+		},
+		{
 			"path": "./packages/react-datagrid"
 		},
 		{
 			"path": "./packages/react-datagrid-ui"
+		},
+		{
+			"path": "./packages/react-dataview"
+		},
+		{
+			"path": "./packages/react-devbar"
+		},
+		{
+			"path": "./packages/react-form"
 		},
 		{
 			"path": "./packages/react-form-fields-ui"
@@ -81,13 +93,28 @@
 			"path": "./packages/react-i18n"
 		},
 		{
+			"path": "./packages/react-identity"
+		},
+		{
 			"path": "./packages/react-leaflet-fields-ui"
 		},
 		{
 			"path": "./packages/react-multipass-rendering"
 		},
 		{
+			"path": "./packages/react-repeater"
+		},
+		{
+			"path": "./packages/react-repeater-dnd-kit"
+		},
+		{
 			"path": "./packages/react-richtext-renderer"
+		},
+		{
+			"path": "./packages/react-routing"
+		},
+		{
+			"path": "./packages/react-select"
 		},
 		{
 			"path": "./packages/react-slots"

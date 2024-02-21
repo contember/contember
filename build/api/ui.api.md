@@ -559,62 +559,6 @@ export interface DescriptionProps {
 }
 
 // @public (undocumented)
-export const DevBar: ({ breakpoint, children, }: PropsWithChildren<{
-    breakpoint?: number | undefined;
-}>) => JSX_2.Element;
-
-// @public (undocumented)
-export function DevError(props: DevErrorProps): JSX_2.Element;
-
-// @public (undocumented)
-export function DevErrorBadge({ errorCount, onOpen }: DevErrorBadgeProps): JSX_2.Element;
-
-// @public (undocumented)
-export interface DevErrorBadgeProps {
-    // (undocumented)
-    errorCount: number;
-    // (undocumented)
-    onOpen: () => void;
-}
-
-// @public (undocumented)
-export function DevErrorList({ currentError, currentErrorIndex, currentErrorSource, errorCount, onClose, onNext, onPrevious, }: DevErrorListProps): JSX_2.Element;
-
-// @public (undocumented)
-export interface DevErrorListProps {
-    // (undocumented)
-    currentError: ProcessedError;
-    // (undocumented)
-    currentErrorIndex: number;
-    // (undocumented)
-    currentErrorSource: string;
-    // (undocumented)
-    errorCount: number;
-    // (undocumented)
-    onClose: () => void;
-    // (undocumented)
-    onNext: () => void;
-    // (undocumented)
-    onPrevious: () => void;
-}
-
-// Warning: (ae-forgotten-export) The symbol "DevErrorInnerProps" needs to be exported by the entry point index.d.ts
-//
-// @public (undocumented)
-export interface DevErrorProps extends DevErrorInnerProps {
-    // (undocumented)
-    source: string;
-}
-
-// @public (undocumented)
-export const DevPanel: ({ heading, icon, children, preview }: {
-    icon: ReactNode;
-    heading: ReactNode;
-    children: ReactNode;
-    preview?: ReactNode;
-}) => JSX_2.Element;
-
-// @public (undocumented)
 export const DialogModal: MemoExoticComponent<({ bodyClassName, bodyProps, children, className, dividers, footer, footerClassName, footerProps, header, headerClassName, headerProps, layout, onClose, ...rest }: DialogModalProps) => JSX_2.Element>;
 
 // @public (undocumented)
@@ -1510,9 +1454,6 @@ export interface ErrorListProps {
     errors?: FieldErrors;
 }
 
-// @public (undocumented)
-export type ErrorType = Error | unknown;
-
 // @public
 export const FieldContainer: MemoExoticComponent<({ children, className: classNameProp, componentClassName, description, errors, display, footer, evenly, gap, horizontal, label, labelDescription, labelPosition, required, reverse, size, style, useLabelElement, ...props }: FieldContainerProps) => JSX_2.Element>;
 
@@ -1766,9 +1707,6 @@ withTopToolbar?: boolean | undefined;
 } & RestHTMLTextInputProps & RefAttributes<HTMLInputElement>>>;
 
 // @public (undocumented)
-export const isSpecialLinkClick: (e: MouseEvent) => boolean;
-
-// @public (undocumented)
 export type Justification = Default | 'justifyStart' | 'justifyCenter' | 'justifyEnd';
 
 // @public (undocumented)
@@ -1889,11 +1827,11 @@ export type LinkCardProps = Omit<CommonCardProps, 'active' | 'type'> & Omit<HTML
 // @public (undocumented)
 export interface LinkCompatibleProps {
     // (undocumented)
-    active: boolean;
+    active?: boolean;
     // (undocumented)
-    href: string;
+    href?: string;
     // (undocumented)
-    onClick: (e?: MouseEvent_2<HTMLAnchorElement>) => void;
+    onClick?: (e?: MouseEvent_2<HTMLAnchorElement>) => void;
 }
 
 // @public @deprecated (undocumented)
@@ -2104,23 +2042,6 @@ export type OwnVisuallyHiddenProps = PropsWithChildren<{
 export const PageLayoutContent: MemoExoticComponent<({ children, layout, pageContentLayout }: LayoutPageContentProps) => JSX_2.Element>;
 
 // @public (undocumented)
-export interface ParsedStackFrame {
-    // (undocumented)
-    callee?: string;
-    // (undocumented)
-    filename: string;
-    // (undocumented)
-    line?: number;
-    // (undocumented)
-    sourceCodeLines?: string[];
-    // (undocumented)
-    thirdParty: boolean;
-}
-
-// @public (undocumented)
-export type ParsedStackTrace = ParsedStackFrame[];
-
-// @public (undocumented)
 export const PasswordInput: MemoExoticComponent<ForwardRefExoticComponent<ControlDisplayProps & ValidationStateProps & ControlStateProps & ControlFocusProps & ControlConstraintProps<string> & ControlValueProps<string, boolean> & {
 focusRing?: boolean | undefined;
 withTopToolbar?: boolean | undefined;
@@ -2169,16 +2090,6 @@ export type PortalRootProviderProps = PropsWithChildren<{
 
 // @public (undocumented)
 export const PreventCloseContext: Context<() => void>;
-
-// @public (undocumented)
-export interface ProcessedError {
-    // (undocumented)
-    cause?: ProcessedError;
-    // (undocumented)
-    error: ErrorType;
-    // (undocumented)
-    parsedStackStrace?: ParsedStackTrace;
-}
 
 // @public (undocumented)
 export const ProgressBar: MemoExoticComponent<({ progress }: ProgressBarProps) => JSX_2.Element>;
@@ -2484,7 +2395,7 @@ export const SpinnerContainer: MemoExoticComponent<({ enabled, children, size }:
 // @public (undocumented)
 export interface SpinnerContainerProps extends SpinnerOverlayProps {
     // (undocumented)
-    children: ReactNode;
+    children?: ReactNode;
     // (undocumented)
     enabled?: boolean;
 }

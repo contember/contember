@@ -1,8 +1,8 @@
-import { Component, QueryLanguage, SugarableRelativeSingleField, wrapFilterInHasOnes } from '@contember/react-binding'
-import { Input } from '@contember/client'
+import { Component, QueryLanguage, SugarableRelativeSingleField } from '@contember/react-binding'
 import type { ComponentType, FunctionComponent } from 'react'
-import { DataGridColumnCommonProps, DataGridOrderDirection, FilterRendererProps } from '../types'
+import { DataGridColumnCommonProps, FilterRendererProps } from '../types'
 import { DataGridColumn } from '../grid'
+import { createNumberFilter, DataViewSortingDirection } from '@contember/react-dataview'
 
 export type NumberCellRendererProps = {
 	field: SugarableRelativeSingleField | string
@@ -12,7 +12,7 @@ export type NumberCellProps =
 	& NumberCellRendererProps
 	& {
 		disableOrder?: boolean
-		initialOrder?: DataGridOrderDirection
+		initialOrder?: DataViewSortingDirection
 		initialFilter?: NumberFilterArtifacts
 	}
 
@@ -30,35 +30,7 @@ export const createNumberCell = <ColumnProps extends {}, ValueRendererProps exte
 		<DataGridColumn<NumberFilterArtifacts>
 			{...props}
 			enableOrdering={!props.disableOrder as true}
-			getNewOrderBy={(newDirection, { environment }) =>
-				newDirection ? QueryLanguage.desugarOrderBy(`${props.field as string} ${newDirection}`, environment) : undefined
-			}
-			getNewFilter={(filter, { environment }) => {
-				if (filter.query === null && !filter.nullCondition) {
-					return undefined
-				}
-
-				const baseOperators = {
-					eq: 'eq',
-					gte: 'gte',
-					lte: 'lte',
-				}
-
-				const conditions: Input.Condition[] = []
-				if (filter.query !== null) {
-					conditions.push({
-						[baseOperators[filter.mode]]: filter.query,
-					})
-				}
-				if (filter.nullCondition) {
-					conditions.push({ isNull: true })
-				}
-
-				const desugared = QueryLanguage.desugarRelativeSingleField(props, environment)
-				return wrapFilterInHasOnes(desugared.hasOneRelationPath, {
-					[desugared.field]: { or: conditions },
-				})
-			}}
+			getNewFilter={createNumberFilter(props.field)}
 			emptyFilter={{
 				mode: 'eq',
 				query: null,

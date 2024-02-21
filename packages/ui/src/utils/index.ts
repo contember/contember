@@ -1,6 +1,5 @@
 export * from './flipValue'
 export * from './forceReflow'
-export * from './isSpecialLinkClick'
 export * from './noop'
 export * from './toEnumClass'
 export * from './toEnumStateClass'

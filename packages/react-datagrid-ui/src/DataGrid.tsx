@@ -1,10 +1,10 @@
 import { createControlledDataGrid, createDataGrid, createDataGridRenderer } from '@contember/react-datagrid'
 import { DataGridColumnPublicProps } from './types'
 import { DataGridContainer, DataGridContainerPublicProps } from './rendering'
-import { SpinnerContainer } from '@contember/ui'
+import { SpinnerContainer, SpinnerOverlay } from '@contember/ui'
 
 const DataGridRenderer = createDataGridRenderer<DataGridColumnPublicProps, DataGridContainerPublicProps>({
-	Fallback: SpinnerContainer,
+	Fallback: SpinnerOverlay as any,
 	Container: DataGridContainer,
 	staticRender: props => <>{props.tile}</>,
 	columnStaticRender: props => <>{props.column.header}</>,

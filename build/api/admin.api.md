@@ -14,7 +14,6 @@ import { AnchorButtonProps } from '@contember/ui';
 import { AnchorHTMLAttributes } from 'react';
 import type { AsyncBatchUpdatesOptions } from '@contember/react-binding';
 import { BaseEditor } from 'slate';
-import { BaseSyntheticEvent } from 'react';
 import { BoxOwnProps } from '@contember/ui';
 import { ButtonProps } from '@contember/ui';
 import { ChildrenAnalyzer } from '@contember/react-multipass-rendering';
@@ -22,8 +21,8 @@ import { ChoiceFieldDictionary } from '@contember/react-choice-field-ui';
 import { ComponentType } from 'react';
 import { ContemberClientProps } from '@contember/react-client';
 import type { CreateNewEntityButtonProps } from '@contember/react-binding-ui';
+import { CurrentRequestContext } from '@contember/react-routing';
 import { DataBindingProviderStateComponent } from '@contember/react-binding';
-import { DataBindingStateComponentProps } from '@contember/react-binding';
 import { DataGridCellsDictionary } from '@contember/react-datagrid-ui';
 import { DataGridColumnHidingPublicProps } from '@contember/react-datagrid-ui';
 import { DataGridContainerProps } from '@contember/react-datagrid-ui';
@@ -32,7 +31,6 @@ import { DataGridDictionary } from '@contember/react-datagrid-ui';
 import { DataGridFullFiltersPublicProps } from '@contember/react-datagrid-ui';
 import { DataGridLayoutControlPublicProps } from '@contember/react-datagrid-ui';
 import { DataGridProps } from '@contember/react-datagrid-ui';
-import { DataGridRenderingCommonProps } from '@contember/react-datagrid-ui';
 import { DataGridTableRowPublicProps } from '@contember/react-datagrid-ui';
 import { DataGridTilesPublicProps } from '@contember/react-datagrid-ui';
 import { Descendant } from 'slate';
@@ -50,7 +48,6 @@ import { EmptyMessageOuterProps } from '@contember/react-binding-ui';
 import { EntityAccessor } from '@contember/react-binding';
 import { EntityId } from '@contember/react-binding';
 import { EntityListAccessor } from '@contember/react-binding';
-import { EntityListBaseProps } from '@contember/react-binding';
 import { EntityListSubTreeAdditionalProps } from '@contember/react-binding';
 import { EntitySubTreeAdditionalCreationProps } from '@contember/react-binding';
 import { EntitySubTreeAdditionalProps } from '@contember/react-binding';
@@ -72,9 +69,14 @@ import type { GraphQlClient } from '@contember/client';
 import { GraphQlClientRequestOptions } from '@contember/react-client';
 import { GraphQlClientVariables } from '@contember/react-client';
 import { GraphQlClientVariables as GraphQlClientVariables_2 } from '@contember/client';
+import { HasRole } from '@contember/react-identity';
 import { HistoryEditor } from 'slate-history';
 import { IconSourceSpecification } from '@contember/ui';
+import { Identity } from '@contember/react-identity';
+import { identityEnvironmentExtension } from '@contember/react-identity';
+import { IncompleteRequestState } from '@contember/react-routing';
 import { InputHTMLAttributes } from 'react';
+import { isRoutingLinkTarget } from '@contember/react-routing';
 import { JsonObject } from '@contember/react-binding';
 import { JsonValue } from '@contember/binding';
 import { JsonValue as JsonValue_2 } from '@contember/react-binding';
@@ -82,6 +84,7 @@ import { JSX as JSX_2 } from 'react/jsx-runtime';
 import type { KeyboardEvent as KeyboardEvent_2 } from 'react';
 import { LabelMiddleware } from '@contember/react-binding';
 import { LayoutPageProps } from '@contember/ui';
+import { LazyPageModule } from '@contember/react-routing';
 import { Location as Location_2 } from 'slate';
 import { MessageDictionaryByLocaleCode } from '@contember/react-i18n';
 import type { MessageFormatter } from '@contember/react-i18n';
@@ -89,11 +92,23 @@ import { MouseEvent as MouseEvent_2 } from 'react';
 import { Node as Node_2 } from 'slate';
 import { NodeEntry } from 'slate';
 import type { OptionallyVariableFieldValue } from '@contember/react-binding';
+import { Page } from '@contember/react-routing';
+import { PageModule } from '@contember/react-routing';
+import { PageNotFound } from '@contember/react-routing';
+import { PageProps } from '@contember/react-routing';
+import { PageProvider } from '@contember/react-routing';
+import { PageProviderElement } from '@contember/react-routing';
+import { PageRequest } from '@contember/react-routing';
+import { PagesMap } from '@contember/react-routing';
+import { PagesMapElement } from '@contember/react-routing';
+import { PagesProps } from '@contember/react-routing';
+import { parseLinkTarget } from '@contember/react-routing';
 import { Path } from 'slate';
 import { PathRef } from 'slate';
 import { PersistFeedbackDictionary } from '@contember/react-binding-ui';
 import type { PersistSuccessOptions } from '@contember/react-binding';
 import { Point } from 'slate';
+import { projectEnvironmentExtension } from '@contember/react-identity';
 import { PropsWithChildren } from 'react';
 import { ProvidersProps } from '@contember/ui';
 import { PureComponent } from 'react';
@@ -108,10 +123,21 @@ import { RemovalType } from '@contember/react-binding';
 import { RenderElementProps } from 'slate-react';
 import { RenderLeafProps } from 'slate-react';
 import { RepeaterItemContainerProps } from '@contember/ui';
+import { RequestChange } from '@contember/react-routing';
+import { RequestProvider } from '@contember/react-routing';
+import { RequestState } from '@contember/react-routing';
+import { RouteMap } from '@contember/react-routing';
+import { RoutingContext } from '@contember/react-routing';
+import { RoutingContextValue } from '@contember/react-routing';
+import { RoutingLink as RoutingLinkBase } from '@contember/react-routing';
+import { RoutingLinkProps as RoutingLinkPropsBase } from '@contember/react-routing';
+import { RoutingLinkTarget } from '@contember/react-routing';
+import { RoutingParameter } from '@contember/react-routing';
 import type { S3FileUploader } from '@contember/client';
 import { SaveButtonProps } from '@contember/ui';
 import type { Scalar } from '@contember/react-binding';
 import { Scheme } from '@contember/ui';
+import { SelectedDimension } from '@contember/react-routing';
 import { SelectEntityButtonProps } from '@contember/react-binding-ui';
 import { Selection as Selection_2 } from 'slate';
 import { SetStateAction } from 'react';
@@ -135,6 +161,13 @@ import { TableProps } from '@contember/ui';
 import { TableRowProps } from '@contember/ui';
 import { Text as Text_2 } from 'slate';
 import { UnsugarableSingleEntityEventListeners } from '@contember/react-binding';
+import { useCurrentRequest } from '@contember/react-routing';
+import { useLinkFactory } from '@contember/react-routing';
+import { useLogout } from '@contember/react-identity';
+import { useIdentity as useOptionalIdentity } from '@contember/react-identity';
+import { useRedirect } from '@contember/react-routing';
+import { useRouting } from '@contember/react-routing';
+import { useRoutingLinkFactory } from '@contember/react-routing';
 import { VisuallyDependentControlProps } from '@contember/ui';
 
 // @public (undocumented)
@@ -356,7 +389,7 @@ export interface AvatarProps {
 export const Block: FunctionComponent<BlockProps>;
 
 // @public (undocumented)
-export const blockAnalyzer: ChildrenAnalyzer<BlockProps, never, Environment>;
+export const blockAnalyzer: ChildrenAnalyzer<BlockProps, never, Environment<Environment.AnyNode | undefined>>;
 
 // @public
 export const BlockEditor: FunctionComponent<BlockEditorProps> & {
@@ -622,9 +655,6 @@ export interface CreateApiKeyFormProps {
 }
 
 // @public (undocumented)
-export const createBindingLinkParametersResolver: (entity: EntityAccessor | undefined) => RoutingParameterResolver;
-
-// @public (undocumented)
 export interface CreateEditorOptions extends OverrideCreateElementReferenceOptions, ReferenceElementOptions, OverrideInsertDataOptions, OverrideInsertElementWithReferenceOptions, CreateEditorPublicOptions<EditorWithBlocks> {
 }
 
@@ -721,8 +751,7 @@ export type CreateScopeProps<StateProps> = Omit<SugaredUnconstrainedQualifiedSin
     redirectOnSuccess?: RedirectOnSuccessTarget;
 };
 
-// @public (undocumented)
-export const CurrentRequestContext: React.Context<RequestState>;
+export { CurrentRequestContext }
 
 // @public (undocumented)
 export interface CustomElementPlugin<T extends Element_2> {
@@ -795,7 +824,7 @@ export type DataGridPageProps = DataGridProps<DataGridContainerPublicProps> & {
 export const DataGridPageRenderer: React.NamedExoticComponent<LayoutRendererProps & DataGridLayoutControlPublicProps & DataGridColumnHidingPublicProps & DataGridFullFiltersPublicProps & {
     emptyMessage?: React.ReactNode;
     emptyMessageComponent?: React.ComponentType<any> | undefined;
-} & DataGridTableRowPublicProps & EntityListBaseProps & DataGridTilesPublicProps & DataGridRenderingCommonProps>;
+} & DataGridTableRowPublicProps & DataGridTilesPublicProps>;
 
 // @public (undocumented)
 export type DataGridPageRendererProps = LayoutRendererProps & DataGridContainerProps;
@@ -947,9 +976,6 @@ export type DisplayTextFieldProps = Omit<SimpleRelativeSingleFieldProps, 'defaul
 
 // @public (undocumented)
 export const DragHandle: () => JSX_2.Element;
-
-// @public (undocumented)
-export type DynamicRequestParameters = RequestParameters<RoutingParameter>;
 
 // @public (undocumented)
 export const EditIdentity: FC<EditIdentityProps>;
@@ -1468,16 +1494,7 @@ export type GQLVariableValues<VariableMap extends Record<string, GQLVariableType
 // @public (undocumented)
 export type HandleIdpResponseError = SignInIDPErrors | 'INVALID_LOCAL_STATE';
 
-// @public (undocumented)
-export const HasRole: React.NamedExoticComponent<HasRoleProps>;
-
-// @public (undocumented)
-export interface HasRoleProps {
-    // (undocumented)
-    children?: ReactNode;
-    // (undocumented)
-    role: RoleCondition;
-}
+export { HasRole }
 
 // @public (undocumented)
 export interface HeadingElement extends Element_2 {
@@ -1658,41 +1675,9 @@ export interface HtmlDeserializerPlugin {
 // @public (undocumented)
 export type HybridFileKindProps = DiscriminatedFileKindsProps | SingleKindFileProps;
 
-// @public (undocumented)
-export interface Identity {
-    // @deprecated (undocumented)
-    email?: string;
-    // (undocumented)
-    id: string;
-    // @deprecated (undocumented)
-    otpEnabled?: boolean;
-    // (undocumented)
-    permissions: {
-        canCreateProject: boolean;
-    };
-    // (undocumented)
-    person?: Person;
-    // @deprecated (undocumented)
-    personId?: string;
-    // (undocumented)
-    projects: IdentityProject[];
-}
+export { Identity }
 
-// @public (undocumented)
-export const IdentityContext: React.Context<IdentityContextValue | undefined>;
-
-// @public (undocumented)
-export interface IdentityContextValue {
-    // (undocumented)
-    clearIdentity: () => void;
-    // (undocumented)
-    identity: Identity;
-}
-
-// @public (undocumented)
-export const identityEnvironmentExtension: Environment.Extension<Identity | null, {
-    identity: Identity | undefined;
-}>;
+export { identityEnvironmentExtension }
 
 // @public (undocumented)
 export const IdentityMembership: FC<IdentityMembershipProps>;
@@ -1703,16 +1688,6 @@ export interface IdentityMembershipProps {
     memberships: Membership[];
     // (undocumented)
     RoleRenderer: RoleRenderer;
-}
-
-// @public (undocumented)
-export interface IdentityProject {
-    // (undocumented)
-    name: string;
-    // (undocumented)
-    roles: string[];
-    // (undocumented)
-    slug: string;
 }
 
 // @public (undocumented)
@@ -1727,9 +1702,6 @@ export interface IdentityProviderProps {
     // (undocumented)
     onInvalidIdentity?: () => void;
 }
-
-// @public (undocumented)
-export const IdentityRefreshContext: React.Context<() => void>;
 
 // @public (undocumented)
 export interface IDP {
@@ -1837,10 +1809,7 @@ export type ImmutableEntityListTablePageRendererProps<ContainerExtraProps, ItemE
     enableRemoving?: boolean;
 };
 
-// @public (undocumented)
-export type IncompleteRequestState = Partial<RequestState<DynamicRequestParameters>> & {
-    pageName: string;
-} | null;
+export { IncompleteRequestState }
 
 // @public (undocumented)
 export const initBlockEditor: ({ editor, ...options }: CreateEditorOptions & {
@@ -1887,11 +1856,9 @@ export interface InitSignInIDPResult {
 // @public (undocumented)
 export interface InnerRoutingLinkProps extends Omit<PublicAnchorProps, 'onClick'> {
     // (undocumented)
-    active: boolean;
+    href?: string;
     // (undocumented)
-    href: string;
-    // (undocumented)
-    onClick: (e?: MouseEvent_2<HTMLAnchorElement>) => void;
+    onClick?: (e?: MouseEvent_2<HTMLAnchorElement>) => void;
 }
 
 // @public (undocumented)
@@ -1994,8 +1961,7 @@ export const isParagraphElement: (element: Node_2, suchThat?: Partial<ParagraphE
 // @public (undocumented)
 export const isReferenceElement: (node: Node_2) => node is ReferenceElement;
 
-// @public (undocumented)
-export const isRoutingLinkTarget: (value: unknown) => value is RoutingLinkTarget;
+export { isRoutingLinkTarget }
 
 // @public (undocumented)
 export const isScrollTargetElement: (element: Node_2) => element is ScrollTargetElement;
@@ -2039,8 +2005,7 @@ export const LayoutRenderer: FunctionComponent<LayoutRendererProps>;
 export interface LayoutRendererProps extends LayoutPageProps {
 }
 
-// @public (undocumented)
-export type LazyPageModule = () => Promise<PageModule>;
+export { LazyPageModule }
 
 // @public (undocumented)
 export const LegacyDeprecatedEditorFormerlyKnownAsRichTextField: FunctionComponent<LegacyDeprecatedEditorFormerlyKnownAsRichTextFieldProps>;
@@ -2050,7 +2015,7 @@ export interface LegacyDeprecatedEditorFormerlyKnownAsRichTextFieldProps extends
 }
 
 // @public (undocumented)
-export const Link: React.NamedExoticComponent<LinkProps>;
+export const Link: React.NamedExoticComponent<Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "href"> & Omit<RoutingLinkProps, "parametersResolver">>;
 
 // @public
 export const LinkButton: React.NamedExoticComponent<LinkButtonProps>;
@@ -2059,11 +2024,7 @@ export const LinkButton: React.NamedExoticComponent<LinkButtonProps>;
 export type LinkButtonProps = LinkProps & AnchorButtonProps;
 
 // @public (undocumented)
-export interface LinkProps extends Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'>, Omit<RoutingLinkProps, 'parametersResolver'> {
-}
-
-// @public (undocumented)
-export type LinkTarget = RoutingLinkTarget;
+export type LinkProps = Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> & Omit<RoutingLinkProps, 'parametersResolver'>;
 
 // @public (undocumented)
 export interface ListElementProperties {
@@ -2474,80 +2435,34 @@ export interface OverrideInsertElementWithReferenceOptions {
     insertElementWithReference: InsertElementWithReference;
 }
 
-// @public
-export const Page: {
-    <P = unknown>(props: PageProps<P>): JSX_2.Element | null;
-    displayName: string;
-    getPageName(props: PageProps<unknown>): string;
-};
+export { Page }
 
 // @public (undocumented)
 export type PageComponent<T> = T & PageProvider<T extends (props: infer P) => any ? P : never>;
 
 // @public @deprecated (undocumented)
-export const PageLink: React.NamedExoticComponent<LinkProps>;
-
-// @public @deprecated (undocumented)
 export const PageLinkButton: React.NamedExoticComponent<LinkButtonProps>;
 
-// @public (undocumented)
-export interface PageModule {
-    // (undocumented)
-    [action: string]: ComponentType<any> | ReactElement<any> | undefined;
-}
+export { PageModule }
+
+export { PageNotFound }
+
+export { PageProps }
+
+export { PageProvider }
+
+export { PageProviderElement }
+
+export { PageRequest }
 
 // @public (undocumented)
-export class PageNotFound extends Error {
-    constructor(reason?: string);
-}
+export const Pages: (props: PagesProps) => JSX_2.Element;
 
-// @public (undocumented)
-export interface PageProps<P> {
-    // (undocumented)
-    children: FunctionComponent<P> | ReactNode;
-    // (undocumented)
-    name: string;
-}
+export { PagesMap }
 
-// @public (undocumented)
-export interface PageProvider<P> {
-    // (undocumented)
-    getPageName(props: P, fallback?: string): string;
-}
+export { PagesMapElement }
 
-// @public (undocumented)
-export type PageProviderElement = ReactElement<any, ComponentType<any> & PageProvider<any>>;
-
-// @public (undocumented)
-export interface PageRequest<P extends RequestParameters<RoutingParameter> = RequestParameters> {
-    // (undocumented)
-    dimensions: SelectedDimension;
-    // (undocumented)
-    pageName: string;
-    // (undocumented)
-    parameters: P;
-}
-
-// @public
-export const Pages: ({ children, layout, bindingFeedbackRenderer }: PagesProps) => JSX_2.Element;
-
-// @public (undocumented)
-export type PagesMap = Record<string, PagesMapElement>;
-
-// @public (undocumented)
-export type PagesMapElement = LazyPageModule | PageModule | ComponentType<any> | ReactElement<any> | PageProviderElement;
-
-// @public (undocumented)
-export interface PagesProps {
-    // (undocumented)
-    bindingFeedbackRenderer?: ComponentType<DataBindingStateComponentProps>;
-    // (undocumented)
-    children: PagesMap | PageProviderElement[] | PageProviderElement;
-    // (undocumented)
-    layout?: ComponentType<{
-        children?: ReactNode;
-    }>;
-}
+export { PagesProps }
 
 // @public (undocumented)
 export interface ParagraphElement extends Element_2 {
@@ -2585,30 +2500,16 @@ export interface ParagraphRendererProps extends Omit<RenderElementProps, 'elemen
 // @public (undocumented)
 export const paragraphToolbarButton: ElementToolbarButton<ParagraphElement>;
 
-// @public (undocumented)
-export const parseLinkTarget: (to: LinkTarget, env: Environment) => Exclude<LinkTarget, string>;
+export { parseLinkTarget }
 
 // @public (undocumented)
 export type PasswordResetErrors = 'TOKEN_NOT_FOUND' | 'TOKEN_USED' | 'TOKEN_EXPIRED' | 'PASSWORD_TOO_WEAK';
-
-// @public (undocumented)
-export const pathToRequestState: (routing: RoutingContextValue, path: string, query: string) => RequestState;
 
 // @public
 export const PersistButton: React.MemoExoticComponent<React.ForwardRefExoticComponent<PersistButtonProps & React.RefAttributes<HTMLButtonElement>>>;
 
 // @public (undocumented)
 export type PersistButtonProps = Omit<SaveButtonProps, 'children' | 'isDirty'>;
-
-// @public (undocumented)
-export interface Person {
-    // (undocumented)
-    email: string;
-    // (undocumented)
-    id: string;
-    // (undocumented)
-    otpEnabled: boolean;
-}
 
 // @public (undocumented)
 export interface PlainTextFieldBackedElement {
@@ -2633,9 +2534,6 @@ export interface PopulateEmbedDataOptions<EmbedArtifacts = any> {
     // (undocumented)
     source: string;
 }
-
-// @public (undocumented)
-export const populateRequest: (routing: RoutingContextValue, location: Location) => RequestState;
 
 // @public (undocumented)
 export const prepareElementForInsertion: (editor: Editor_2, node: Node_2) => Path;
@@ -2672,10 +2570,7 @@ export interface Project {
 // @public (undocumented)
 export const PROJECT_ROLES_FRAGMENT = "\n\tfragment ProjectRoles on Project {\n\t\troles {\n\t\t\tname\n\t\t\tvariables {\n\t\t\t\t... on RoleEntityVariableDefinition {\n\t\t\t\t\tname\n\t\t\t\t\tentityName\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t}\n";
 
-// @public (undocumented)
-export const projectEnvironmentExtension: Environment.Extension<string | null, {
-    slug: string | undefined;
-}>;
+export { projectEnvironmentExtension }
 
 // @public (undocumented)
 export interface ProjectGridProps {
@@ -2718,9 +2613,6 @@ export type PublicSingleKindFileRepeaterProps<AcceptArtifacts = unknown, SFExtra
 
 // @public (undocumented)
 export type PublicSingleKindUploadFieldProps<AcceptArtifacts = unknown, SFExtraProps extends {} = {}> = CommonFileKindProps<AcceptArtifacts> & SelectFileInputSelectionComponentProps<SFExtraProps> & FileInputPublicProps;
-
-// @public (undocumented)
-export const PushRequestContext: React.Context<(req: RequestState) => void>;
 
 // @public (undocumented)
 export interface QueryRequestObject<T> {
@@ -2909,27 +2801,11 @@ export interface RepeaterItemProps extends Omit<RepeaterItemContainerProps, keyo
 export interface RepeaterProps<ContainerExtraProps, ItemExtraProps> extends SugaredRelativeEntityList, Omit<RepeaterInnerProps<ContainerExtraProps, ItemExtraProps>, 'accessor'> {
 }
 
-// @public (undocumented)
-export type RequestChange = (currentState: RequestState) => IncompleteRequestState | string;
+export { RequestChange }
 
-// @public (undocumented)
-export const requestChangeFactory: <P extends RequestParameters>(pageName: string, parameters?: P | undefined) => (currentState: RequestState) => PageRequest<P>;
+export { RequestProvider }
 
-// @public (undocumented)
-export type RequestParameters<Extra extends RoutingParameter = never> = {
-    [K in string]?: RequestParameterValue | Extra;
-};
-
-// @public (undocumented)
-export type RequestParameterValue = number | string;
-
-// @public (undocumented)
-export const RequestProvider: FC<{
-    children: ReactNode;
-}>;
-
-// @public (undocumented)
-export type RequestState<Parameters extends RequestParameters<RoutingParameter> = RequestParameters> = PageRequest<Parameters> | null;
+export { RequestState }
 
 // @public (undocumented)
 export interface RequestStateError<T> {
@@ -2954,9 +2830,6 @@ export interface RequestStateOk<T> {
     // (undocumented)
     state: 'success';
 }
-
-// @public (undocumented)
-export const requestStateToPath: (routing: RoutingContextValue, request: RequestState) => string;
 
 // @public (undocumented)
 export interface RequestStateUninitialized<T> {
@@ -3059,9 +2932,6 @@ export interface RichTextFieldProps extends FieldBasicProps, Omit<FieldContainer
 }
 
 // @public (undocumented)
-export type RoleCondition = string | ((roles: Set<string>) => boolean);
-
-// @public (undocumented)
 export interface RoleConfig {
     // (undocumented)
     name: string;
@@ -3118,106 +2988,33 @@ export interface RoleVariableDefinitionBase {
     name: string;
 }
 
-// @public (undocumented)
-export type RouteConfig<N> = RouteConfigWithMapping<N> | RouteConfigWithoutMapping;
+export { RouteMap }
 
-// @public (undocumented)
-export interface RouteConfigWithMapping<N, T extends RouteParams = any> {
-    // (undocumented)
-    objectToParams: (params: N) => T;
-    // (undocumented)
-    paramsToObject: (params: T) => {
-        [K in Exclude<keyof N, 'name'>]: N[K];
-    };
-    // (undocumented)
-    path: string;
-}
+export { RoutingContext }
 
-// @public (undocumented)
-export interface RouteConfigWithoutMapping {
-    // (undocumented)
-    objectToParams?: undefined;
-    // (undocumented)
-    paramsToObject?: undefined;
-    // (undocumented)
-    path: string;
-}
-
-// @public (undocumented)
-export type RouteMap<N extends RouteName = RouteName> = {
-    [K in N]: RouteConfig<RouteParamsByName<N>>;
-};
-
-// @public (undocumented)
-export type RouteName = string;
-
-// @public (undocumented)
-export type RouteParams = any;
-
-// @public (undocumented)
-export type RouteParamsByName<K extends RouteName, T = RouteParams> = T extends {
-    name: K;
-} ? T : never;
-
-// @public (undocumented)
-export const ROUTING_BINDING_PARAMETER_PREFIX = "entity.";
-
-// @public (undocumented)
-export const RoutingContext: React.Context<RoutingContextValue>;
-
-// @public (undocumented)
-export interface RoutingContextValue {
-    // (undocumented)
-    basePath: string;
-    // (undocumented)
-    defaultDimensions?: SelectedDimension;
-    // (undocumented)
-    pageInQuery?: boolean;
-    // (undocumented)
-    routes: RouteMap;
-}
+export { RoutingContextValue }
 
 // @public
-export const RoutingLink: React.NamedExoticComponent<RoutingLinkProps<{}> & PublicAnchorProps>;
-
-// @public (undocumented)
-export interface RoutingLinkParams {
-    // (undocumented)
-    href: string;
-    // (undocumented)
-    isActive: boolean;
-    // (undocumented)
-    navigate: (e?: BaseSyntheticEvent) => void;
-}
-
-// @public (undocumented)
-export interface RoutingLinkProps<T = {}> {
-    // (undocumented)
+export const RoutingLink: React.NamedExoticComponent<Omit<RoutingLinkPropsBase, "children"> & {
     children?: ReactNode;
-    // (undocumented)
+    Component?: ComponentType<InnerRoutingLinkProps> | undefined;
+    componentProps?: {} | undefined;
+} & PublicAnchorProps>;
+
+export { RoutingLinkBase }
+
+// @public (undocumented)
+export type RoutingLinkProps<T = {}> = Omit<RoutingLinkPropsBase, 'children'> & {
+    children?: ReactNode;
     Component?: ComponentType<InnerRoutingLinkProps & T>;
-    // (undocumented)
     componentProps?: T;
-    // (undocumented)
-    parameters?: RequestParameters;
-    // (undocumented)
-    parametersResolver?: RoutingParameterResolver;
-    // (undocumented)
-    to: RoutingLinkTarget;
-}
+};
 
-// @public (undocumented)
-export type RoutingLinkTarget = string | RequestChange | IncompleteRequestState;
+export { RoutingLinkPropsBase }
 
-// @public (undocumented)
-export class RoutingParameter {
-    constructor(name: string);
-    // (undocumented)
-    readonly name: string;
-}
+export { RoutingLinkTarget }
 
-// @public (undocumented)
-export type RoutingParameterResolver = (name: string) => RequestParameterValue | undefined;
+export { RoutingParameter }
 
 // @public (undocumented)
 export const runReactApp: (reactElement: ReactElement, domRoot?: HTMLElement | string | null, render?: ReactRenderer) => void;
@@ -3250,11 +3047,7 @@ export interface ScrollTargetRendererProps extends Omit<RenderElementProps, 'ele
 // @public (undocumented)
 export const scrollTargetToolbarButton: ElementToolbarButton<ScrollTargetElement>;
 
-// @public (undocumented)
-export interface SelectedDimension {
-    // (undocumented)
-    [key: string]: string[];
-}
+export { SelectedDimension }
 
 // @public (undocumented)
 export type SelectedDimensionRenderer = (dimensionData: StatefulDimensionDatum<true>[]) => ReactNode;
@@ -3533,9 +3326,6 @@ export const tableRowElementType: "tableRow";
 export const tableToolbarButton: ElementToolbarButton<TableElement>;
 
 // @public (undocumented)
-export const targetToRequest: (target: RoutingLinkTarget, currentRequest: RequestState) => IncompleteRequestState | null;
-
-// @public (undocumented)
 export interface TenantMutationErrorResponse<Code extends string> {
     // (undocumented)
     error: {
@@ -3689,9 +3479,6 @@ export const useAuthedTenantMutation: <R, V extends GraphQlClientVariables>(quer
 export const useAuthedTenantQuery: <R, V extends GraphQlClientVariables>(query: string, variables: V) => QueryRequestObject<R>;
 
 // @public (undocumented)
-export const useBindingLinkParametersResolver: () => RoutingParameterResolver;
-
-// @public (undocumented)
 export const useBlockEditorSlateNodes: ({ editor, blockElementCache, blockElementPathRefs, blockContentField, topLevelBlocks, }: UseBlockEditorSlateNodesOptions) => Descendant[];
 
 // @public (undocumented)
@@ -3755,8 +3542,7 @@ export const useCreateResetPasswordRequest: () => TenantMutationExecutor<GQLVari
 email: GQLVariableType<string, true>;
 }>, TenantMutationResponse<never, "PERSON_NOT_FOUND">>;
 
-// @public (undocumented)
-export const useCurrentRequest: () => RequestState;
+export { useCurrentRequest }
 
 // @public (undocumented)
 export const useDisableOtp: () => TenantMutationExecutor<GQLVariableValues<    {}>, TenantMutationResponse<never, "OTP_NOT_ACTIVE">>;
@@ -3832,6 +3618,8 @@ method: GQLVariableType<InviteMethod, false>;
 mailVariant: GQLVariableType<string, false>;
 }>, TenantMutationResponse<never, InviteErrorCodes>>;
 
+export { useLinkFactory }
+
 // @public (undocumented)
 export const useListMembersQuery: (projectSlug: string, memberType: ListMembersQueryVariables['memberType']) => QueryRequestObject<ListMembersQuery>;
 
@@ -3848,10 +3636,7 @@ expiration: GQLVariableType<number, false>;
 otpToken: GQLVariableType<string, false>;
 }>, TenantMutationResponse<LoginResult, LoginErrors>>;
 
-// @public (undocumented)
-export const useLogout: () => ({ noRedirect }?: {
-    noRedirect?: boolean | undefined;
-}) => Promise<void>;
+export { useLogout }
 
 // @public (undocumented)
 export const useMutation: <R, V extends JsonObject<never>>(client: GraphQlClient, query: string, apiToken?: string, headers?: Record<string, string>) => UseMutationReturn<R, V>;
@@ -3870,8 +3655,7 @@ export type UseOnPersistSuccessProps = Pick<UnsugarableSingleEntityEventListener
     redirectOnSuccess?: RedirectOnSuccessTarget;
 };
 
-// @public (undocumented)
-export const useOptionalIdentity: () => Identity | undefined;
+export { useOptionalIdentity }
 
 // @public (undocumented)
 export const usePrepareOtp: () => TenantMutationExecutor<GQLVariableValues<    {
@@ -3885,13 +3669,9 @@ export const useProjectMembershipsQuery: (projectSlug: string, identityId: strin
 export const useProjectUserRoles: () => ProjectUserRoles;
 
 // @public (undocumented)
-export const usePushRequest: () => (req: RequestState) => void;
-
-// @public (undocumented)
 export const useQuery: <R, V extends GraphQlClientVariables_2>(client: GraphQlClient, query: string, variables: V, apiToken?: string) => QueryRequestObject<R>;
 
-// @public (undocumented)
-export const useRedirect: () => (target: RoutingLinkTarget, parameters?: RequestParameters) => void;
+export { useRedirect }
 
 // @public (undocumented)
 export const useRedirectToBacklink: () => void;
@@ -3938,14 +3718,9 @@ export type UseRoleRendererFactoryProps<T = undefined> = {
     roleRenderers?: RoleRenderers<T>;
 };
 
-// @public (undocumented)
-export const useRouting: () => RoutingContextValue;
+export { useRouting }
 
-// @public (undocumented)
-export const useRoutingLink: (target: RoutingLinkTarget, parametersResolver?: RoutingParameterResolver, parameters?: RequestParameters) => RoutingLinkParams;
-
-// @public (undocumented)
-export const useRoutingLinkFactory: () => (target: RoutingLinkTarget, parameters?: RequestParameters, parametersResolver?: RoutingParameterResolver) => RoutingLinkParams;
+export { useRoutingLinkFactory }
 
 // @public (undocumented)
 export const UsersList: React.NamedExoticComponent<UsersListProps>;
@@ -4194,10 +3969,10 @@ export const withUnderline: <E extends Editor>(editor: E) => E;
 export * from "@contember/react-auto";
 export * from "@contember/react-binding";
 export * from "@contember/react-binding-ui";
-export * from "@contember/react-board-ui";
 export * from "@contember/react-choice-field-ui";
 export * from "@contember/react-client";
 export * from "@contember/react-datagrid-ui";
+export * from "@contember/react-devbar";
 export * from "@contember/react-form-fields-ui";
 export * from "@contember/react-i18n";
 export * from "@contember/react-leaflet-fields-ui";

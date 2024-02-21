@@ -17,13 +17,14 @@ import {
 } from '@contember/react-choice-field'
 import { DataGridColumnCommonProps, FilterRendererProps } from '../types'
 import { DataGridColumn } from '../grid'
-import { SelectCellArtifacts, SelectCellFilterExtraProps } from './common'
+import { RelationFilterArtifacts, createHasManyFilter } from '@contember/react-dataview'
+import { SelectCellFilterExtraProps } from './common'
 
 export type HasManySelectRendererProps =
 	& SugaredRelativeEntityList
 	& BaseDynamicChoiceField
 	& {
-		initialFilter?: SelectCellArtifacts
+		initialFilter?: RelationFilterArtifacts
 	}
 
 
@@ -33,38 +34,14 @@ export type HasManySelectProps =
 
 
 export const createHasManySelectCell = <ColumnProps extends {}, ValueRendererProps extends {}>({ FilterRenderer, ValueRenderer }: {
-	FilterRenderer: ComponentType<FilterRendererProps<SelectCellArtifacts, SelectCellFilterExtraProps>>,
+	FilterRenderer: ComponentType<FilterRendererProps<RelationFilterArtifacts, SelectCellFilterExtraProps>>,
 	ValueRenderer: ComponentType<HasManySelectRendererProps & ValueRendererProps>
 }): FunctionComponent<HasManySelectProps & ColumnProps & ValueRendererProps> => Component(props => {
 	return (
-		<DataGridColumn<SelectCellArtifacts>
+		<DataGridColumn<RelationFilterArtifacts>
 			{...props}
 			enableOrdering={false}
-			getNewFilter={(filter, { environment }) => {
-				if (filter.id.length === 0 && filter.nullCondition === false) {
-					return undefined
-				}
-				const desugared = QueryLanguage.desugarRelativeEntityList(props, environment)
-				const ors = []
-				if (filter.id.length > 0) {
-					ors.push(wrapFilterInHasOnes(desugared.hasOneRelationPath, {
-						[desugared.hasManyRelation.field]: {
-							id: { in: filter.id },
-						},
-					}))
-				}
-				if (filter.nullCondition === true) {
-					ors.push({
-						not: wrapFilterInHasOnes(desugared.hasOneRelationPath, {
-							[desugared.hasManyRelation.field]: {
-								id: { isNull: false },
-							},
-						}),
-					})
-				}
-
-				return { or: ors }
-			}}
+			getNewFilter={createHasManyFilter(props.field)}
 			emptyFilter={{
 				id: [],
 				nullCondition: false,
@@ -74,7 +51,7 @@ export const createHasManySelectCell = <ColumnProps extends {}, ValueRendererPro
 					lazy: { initialLimit: 0 },
 					...props,
 				}
-				const currentlyChosenEntities = useCurrentlyChosenEntities(optionProps, filterProps.filter.id)
+				const currentlyChosenEntities = useCurrentlyChosenEntities(optionProps, filterProps.filter.id ?? [])
 				const selectProps = useSelectOptions(optionProps, currentlyChosenEntities)
 
 				return <FilterRenderer {...selectProps}  {...filterProps} />

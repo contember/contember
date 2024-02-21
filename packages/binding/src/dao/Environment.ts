@@ -4,9 +4,9 @@ import equal from 'fast-deep-equal/es6/index.js'
 import { Schema, SchemaColumn, SchemaEntity, SchemaRelation } from '../core/schema'
 import { GraphQlLiteral } from '@contember/client'
 
-class Environment {
+class Environment<Node extends Environment.AnyNode | undefined = Environment.AnyNode | undefined> {
 	private constructor(
-		private readonly options: Environment.Options,
+		private readonly options: Environment.Options<Node>,
 	) {
 	}
 
@@ -29,14 +29,14 @@ class Environment {
 		throw new BindingError('Not in a SubTree')
 	}
 
-	public getSubTreeNode(): Environment.AnyNode {
+	public getSubTreeNode(): Node & Environment.AnyNode {
 		if (!this.options.node) {
 			throw new BindingError()
 		}
 		return this.options.node
 	}
 
-	public withSubTree(SubTree: Environment.SubTreeNode) {
+	public withSubTree<Node extends Environment.SubTreeNode>(SubTree: Node): Environment<Node> {
 		const { parent, ...options } = this.options
 		return new Environment({
 			...options,
@@ -44,7 +44,7 @@ class Environment {
 		})
 	}
 
-	public withSubTreeChild(node: Environment.InnerNode) {
+	public withSubTreeChild<Node extends Environment.InnerNode>(node: Node): Environment<Node> {
 		if (!this.options.node) {
 			throw new BindingError(`Cannot call withSubTreeChild without previous call of withSubTree`)
 		}
@@ -251,8 +251,8 @@ namespace Environment {
 
 	export type ResolvedValue = Value
 
-	export interface Options {
-		node?: AnyNode
+	export interface Options<Node extends AnyNode | undefined> {
+		node?: Node
 		schema?: Schema
 		dimensions: SelectedDimensions
 		parameters: Parameters

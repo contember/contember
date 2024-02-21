@@ -5,11 +5,12 @@ import { MultiSelectFieldInner } from '@contember/react-choice-field-ui'
 import { dataGridCellsDictionary } from '../dict/dataGridCellsDictionary'
 import { EntityAccessor } from '@contember/react-binding'
 
-import { FilterRendererProps, SelectCellArtifacts, SelectCellFilterExtraProps } from '@contember/react-datagrid'
+import { FilterRendererProps, SelectCellFilterExtraProps } from '@contember/react-datagrid'
 import { useMessageFormatter } from '@contember/react-i18n'
+import { RelationFilterArtifacts } from '@contember/react-dataview'
 
 export type SelectCellFilterProps =
-	& FilterRendererProps<SelectCellArtifacts>
+	& FilterRendererProps<RelationFilterArtifacts>
 	& SelectCellFilterExtraProps
 
 /**
@@ -19,7 +20,7 @@ export type SelectCellFilterProps =
  */
 export const SelectCellFilter = ({ filter, setFilter, options, allOptions, onSearch, isLoading }: SelectCellFilterProps) => {
 	const currentValues = useMemo<ChoiceFieldOptions<EntityAccessor>>(() => {
-		return allOptions.filter(it => filter.id.includes(it.value.id))
+		return allOptions.filter(it => filter.id?.includes(it.value.id))
 	}, [filter.id, allOptions])
 	const formatMessage = useMessageFormatter(dataGridCellsDictionary)
 
@@ -28,8 +29,8 @@ export const SelectCellFilter = ({ filter, setFilter, options, allOptions, onSea
 			<MultiSelectFieldInner
 				label={undefined}
 				data={options}
-				onAdd={(val: EntityAccessor) => setFilter({ ...filter, id: [...filter.id, val.id] })}
-				onRemove={val => setFilter({ ...filter, id: filter.id.filter(it => it !== val.id) })}
+				onAdd={(val: EntityAccessor) => setFilter({ ...filter, id: [...filter.id ?? [], val.id] })}
+				onRemove={val => setFilter({ ...filter, id: filter.id?.filter(it => it !== val.id) })}
 				errors={undefined}
 				currentValues={currentValues}
 				onClear={() => {

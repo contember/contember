@@ -98,6 +98,9 @@ export function isColorSchemeClassName(value: string): boolean;
 // @public (undocumented)
 export function isNonNegativeNumber(value: unknown): value is number;
 
+// @public (undocumented)
+export const isSpecialLinkClick: (e: MouseEvent) => boolean;
+
 // @public
 export function listClassName(list: NestedClassName): string;
 

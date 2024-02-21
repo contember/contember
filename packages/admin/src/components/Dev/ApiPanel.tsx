@@ -6,7 +6,8 @@ import {
 	useSessionTokenWithMeta,
 	useStageSlug,
 } from '@contember/react-client'
-import { DevPanel, Table, TableCell, TableHeaderCell, TableRow } from '@contember/ui'
+import { Table, TableCell, TableHeaderCell, TableRow } from '@contember/ui'
+import { DevPanel } from '@contember/react-devbar'
 import { GlobeIcon } from 'lucide-react'
 
 export const ApiPanel = () => {

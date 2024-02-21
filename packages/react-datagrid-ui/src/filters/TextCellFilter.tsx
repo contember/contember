@@ -1,8 +1,9 @@
 import { dataGridCellsDictionary } from '../dict/dataGridCellsDictionary'
 import { GenericTextCellFilter } from './GenericTextCellFilter'
-import { FilterRendererProps, TextFilterArtifacts } from '@contember/react-datagrid'
+import { FilterRendererProps } from '@contember/react-datagrid'
 import { Checkbox, FieldContainer, Stack } from '@contember/ui'
 import { useMessageFormatter } from '@contember/react-i18n'
+import { TextFilterArtifacts } from '@contember/react-dataview'
 
 export const TextCellFilter = ({ filter, setFilter, ...props }: FilterRendererProps<TextFilterArtifacts>) => {
 	const formatMessage = useMessageFormatter(dataGridCellsDictionary)

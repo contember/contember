@@ -2,7 +2,7 @@ import { Select, TextInput } from '@contember/ui'
 import { useCallback } from 'react'
 import { useMessageFormatter } from '@contember/react-i18n'
 import { dataGridCellsDictionary } from '../dict/dataGridCellsDictionary'
-import { GenericTextCellFilterArtifacts, TextFilterArtifacts } from '@contember/react-datagrid'
+import { GenericTextCellFilterArtifacts, TextFilterArtifacts } from '@contember/react-dataview'
 
 
 /**

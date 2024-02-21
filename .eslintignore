@@ -5,3 +5,4 @@
 /ee/*/dist
 /ee/*/temp
 /ee/*/node_modules
+/packages/playground/api/client

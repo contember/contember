@@ -1,6 +1,6 @@
-import { DevError, Portal } from '@contember/ui'
+import { Portal } from '@contember/ui'
 import { FallbackProps } from 'react-error-boundary'
-import { useProcessedError } from './useParsedStacktrace'
+import { DevError, useProcessedError } from '@contember/react-devbar'
 
 export function DevErrorFallback({ error }: FallbackProps) {
 	return (

@@ -33,13 +33,13 @@ export const DateCell = createDateCell<DataGridColumnPublicProps, DateCellValueR
 		const onDateStartChange = useCallback((value?: string | null) => {
 			setFilter({
 				...filter,
-				start: value ? dateToStringWithoutTimezone(new Date(value)) : null,
+				start: value ? dateToStringWithoutTimezone(new Date(value)) : undefined,
 			})
 		}, [filter, setFilter])
 		const onDateEndChange = useCallback((value?: string | null) => {
 			setFilter({
 				...filter,
-				end: value ? dateToStringWithoutTimezone(new Date(value)) : null,
+				end: value ? dateToStringWithoutTimezone(new Date(value)) : undefined,
 			})
 		}, [filter, setFilter])
 

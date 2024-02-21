@@ -1,10 +1,10 @@
-import { Component, Environment, QueryLanguage, SugaredQualifiedEntityList } from '@contember/react-binding'
+import { Component, Environment, Filter, QueryLanguage, SugaredQualifiedEntityList } from '@contember/react-binding'
 import { ComponentType, ReactNode } from 'react'
-import { DataGridRendererProps, DataGridState, DataGridStateMethods } from '../types'
-import { createControlledDataGrid } from './createControlledDataGrid'
+import { DataGridMethods, DataGridState } from '../types'
+import { ControlledDataGridProps, createControlledDataGrid } from './createControlledDataGrid'
 import { extractDataGridColumns } from '../internal/gridTemplateAnalyzer'
-import { DATA_GRID_DEFAULT_ITEMS_PER_PAGE } from '../internal/useDataGridState'
 import { useDataGrid } from './useDataGrid'
+import { DataGridColumnsContext } from '../internal/contexts'
 
 export type DataGridProps<P extends {}> =
 	& {
@@ -15,41 +15,64 @@ export type DataGridProps<P extends {}> =
 	}
 	& P
 
-export const createDataGrid = <P extends {}>(Renderer: ComponentType<DataGridRendererProps<any> & P>): ComponentType<DataGridProps<Omit<P, keyof DataGridRendererProps<any>>>> => {
+export const createDataGrid = <P extends {}>(Renderer: ComponentType<P & ControlledDataGridProps>): ComponentType<DataGridProps<P>> => {
 	const ControlledDataGrid = createControlledDataGrid(Renderer)
 
-	return Component<DataGridProps<Omit<P, keyof DataGridRendererProps<any>>>>(props => {
-		return <ControlledDataGrid {...useDataGrid(props)} />
+	return Component<DataGridProps<P>>(props => {
+		const dataGridProps = useDataGrid(props)
+		return (
+			<DataGridColumnsContext.Provider value={dataGridProps.columns}>
+				<ControlledDataGrid {...dataGridProps} {...(props as unknown as P)} />
+			</DataGridColumnsContext.Provider>
+		)
 	}, (props, environment) => {
 		const fakeState = createInitialState(props, environment)
-		return <ControlledDataGrid state={fakeState} stateMethods={dummyStateMethods} {...props} />
+		const columns = extractDataGridColumns(props.children, environment)
+		return <ControlledDataGrid state={fakeState} info={dummyInfo} methods={dummyStateMethods} columns={columns} {...(props as unknown as P)} />
 	})
 }
 
-const dummyStateMethods: DataGridStateMethods = {
-	setFilter: () => null,
-	setIsColumnHidden: () => null,
-	setOrderBy: () => null,
-	updatePaging: () => null,
-	setLayout: () => null,
+const dummyInfo = { paging: { pagesCount: undefined, totalCount: undefined } }
+const dummyStateMethods: DataGridMethods = {
+
+	filtering: {
+		setFilter: () => null,
+	},
+	sorting: {
+		setOrderBy: () => null,
+	},
+	paging: {
+		goToPage: () => null,
+		setItemsPerPage: () => null,
+	},
+	selection: {
+		setSelection: () => null,
+	},
 }
 
-const createInitialState = (props: DataGridProps<{}>, environment: Environment): DataGridState<any> => {
-	const columns = extractDataGridColumns(props.children, environment)
+const createInitialState = (props: DataGridProps<{}>, environment: Environment): DataGridState => {
+
 	const entities = QueryLanguage.desugarQualifiedEntityList({ entities: props.entities }, environment)
-	const filter = { and: [entities.filter ?? {}] }
+	const filter: Filter = { and: [entities.filter ?? {}] }
 	return {
-		columns,
+		key: '_',
 		paging: {
-			itemsPerPage: props.itemsPerPage ?? DATA_GRID_DEFAULT_ITEMS_PER_PAGE,
+			itemsPerPage: props.itemsPerPage ?? 50,
 			pageIndex: 0,
 		},
-		hiddenColumns: {},
-		filterArtifacts: {},
-		orderDirections: {},
-		orderBy: [],
+		filtering: {
+			filter: filter,
+			artifact: {},
+			filterTypes: {},
+		},
+		selection: {
+			values: {
+			},
+		},
+		sorting: {
+			orderBy: [],
+			directions: {},
+		},
 		entities: entities,
-		filter,
-		layout: 'default',
 	}
 }

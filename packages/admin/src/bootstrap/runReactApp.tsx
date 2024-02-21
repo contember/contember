@@ -1,6 +1,6 @@
 import { ReactElement } from 'react'
 import { legacyReactRenderer, ReactRenderer } from './render'
-import { createErrorHandler } from './errorHandling'
+import { createErrorHandler } from '@contember/react-devbar'
 
 export const runReactApp = (
 	reactElement: ReactElement,

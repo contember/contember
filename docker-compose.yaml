@@ -12,6 +12,18 @@ services:
     volumes:
       - .:/src:cached
 
+  playground-vite:
+    image: node:20-alpine
+    command: 'npm run start'
+
+    environment:
+      NODE_ENV: 'development'
+      VITE_CONTEMBER_ADMIN_API_BASE_URL: 'http://localhost:3001'
+      VITE_CONTEMBER_ADMIN_SESSION_TOKEN: '0000000000000000000000000000000000000000'
+
+    working_dir: /src/packages/playground
+    volumes:
+      - .:/src:cached
 
   admin-server:
     image: node:20-alpine
@@ -82,7 +94,7 @@ services:
       - .:/src:cached
 
   contember-engine:
-    image: contember/engine:1.3.6
+    image: contember/engine:1.4.0-beta.1
 
     environment:
       NODE_ENV: 'development'
@@ -109,6 +121,9 @@ services:
 
       TENANT_DB_NAME: 'tenant'
 
+      TENANT_MAILER_HOST: 'mailhog'
+      TENANT_MAILER_PORT: '1025'
+      TENANT_MAILER_FROM: 'contember@localhost'
     healthcheck:
       test: 'curl --fail http://localhost:4000'
       interval: 5s
@@ -120,7 +135,7 @@ services:
         condition: service_healthy
 
   playwright-contember-engine:
-    image: contember/engine:1.3.6
+    image: contember/engine:1.4.0-beta.1
 
     environment:
       NODE_ENV: 'development'
@@ -159,12 +174,13 @@ services:
 
 
   contember-cli:
-    image: contember/cli:1.3.6
+    image: contember/cli:1.4.0-beta.1
 
     deploy:
       replicas: 0
 
     environment:
+      CONTEMBER_SKIP_VERSION_CHECK: 1
       CONTEMBER_API_URL: 'http://contember-engine:4000/'
       CONTEMBER_API_TOKEN: '0000000000000000000000000000000000000000'
 
@@ -226,7 +242,8 @@ services:
   redis:
     image: redis:3.2-alpine
 
-
+  mailhog:
+    image: mailhog/mailhog
 volumes:
   pgsql-data: ~
   minio-data: ~

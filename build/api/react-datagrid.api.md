@@ -5,47 +5,44 @@
 ```ts
 
 import { BaseDynamicChoiceField } from '@contember/react-choice-field';
+import { BooleanFilterArtifacts } from '@contember/react-dataview';
+import { CoalesceTextFilterArtifacts } from '@contember/react-dataview';
 import { ComponentType } from 'react';
-import { EntityId } from '@contember/react-binding';
-import { EntityListAccessor } from '@contember/react-binding';
+import { DataViewFilterArtifact } from '@contember/react-dataview';
+import { DataViewFilterHandler } from '@contember/react-dataview';
+import { DataViewInfo } from '@contember/react-dataview';
+import { DataViewMethods } from '@contember/react-dataview';
+import { DataViewSelectionValue } from '@contember/react-dataview';
+import { DataViewSetFilter } from '@contember/react-dataview';
+import { DataViewSortingDirection } from '@contember/react-dataview';
+import { DataViewState } from '@contember/react-dataview';
+import { DateRangeFilterArtifacts } from '@contember/react-dataview';
 import { EntityListBaseProps } from '@contember/react-binding';
+import { EnumFilterArtifacts } from '@contember/react-dataview';
 import { Environment } from '@contember/react-binding';
-import { Filter } from '@contember/react-binding';
 import { FunctionComponent } from 'react';
-import { Input } from '@contember/client';
 import { NamedExoticComponent } from 'react';
-import { OrderBy } from '@contember/react-binding';
-import { Provider } from 'react';
-import { QualifiedEntityList } from '@contember/react-binding';
 import { ReactElement } from 'react';
 import { ReactNode } from 'react';
+import { RelationFilterArtifacts } from '@contember/react-dataview';
 import { SelectOptions } from '@contember/react-choice-field';
 import { Serializable } from '@contember/react-utils';
 import { SugarableRelativeSingleField } from '@contember/react-binding';
-import { SugaredFilter } from '@contember/react-binding';
-import { SugaredOrderBy } from '@contember/react-binding';
 import { SugaredQualifiedEntityList } from '@contember/react-binding';
 import { SugaredRelativeEntityList } from '@contember/react-binding';
 import { SugaredRelativeSingleEntity } from '@contember/react-binding';
-import { TreeRootId } from '@contember/react-binding';
+import { TextFilterArtifacts } from '@contember/react-dataview';
 
 // @public (undocumented)
 export type BooleanCellProps = DataGridColumnCommonProps & BooleanCellRendererProps & {
     disableOrder?: boolean;
-    initialOrder?: DataGridOrderDirection;
+    initialOrder?: DataViewSortingDirection;
     initialFilter?: BooleanFilterArtifacts;
 };
 
 // @public (undocumented)
 export type BooleanCellRendererProps = {
     field: SugarableRelativeSingleField | string;
-};
-
-// @public (undocumented)
-export type BooleanFilterArtifacts = {
-    includeTrue: boolean;
-    includeFalse: boolean;
-    includeNull: boolean;
 };
 
 // @public (undocumented)
@@ -60,16 +57,12 @@ export type CoalesceTextCellProps = DataGridColumnCommonProps & CoalesceCellRend
 };
 
 // @public (undocumented)
-export type CoalesceTextFilterArtifacts = {
-    mode: 'matches' | 'matchesExactly' | 'startsWith' | 'endsWith' | 'doesNotMatch';
-    query: string;
+export type ControlledDataGridProps = {
+    state: DataGridState;
+    methods: DataGridMethods;
+    info: DataViewInfo;
+    columns: DataGridColumns<any>;
 };
-
-// @public (undocumented)
-export type ControlledDataGridProps<P extends {}> = {
-    state: DataGridState<any>;
-    stateMethods: DataGridStateMethods;
-} & P;
 
 // @public (undocumented)
 export const createBooleanCell: <ColumnProps extends {}, ValueRendererProps extends {}>({ FilterRenderer, ValueRenderer }: {
@@ -77,7 +70,7 @@ export const createBooleanCell: <ColumnProps extends {}, ValueRendererProps exte
     ValueRenderer: ComponentType<BooleanCellRendererProps & ValueRendererProps>;
 }) => FunctionComponent<DataGridColumnCommonProps & BooleanCellRendererProps & {
     disableOrder?: boolean | undefined;
-    initialOrder?: DataGridOrderDirection | undefined;
+    initialOrder?: DataViewSortingDirection | undefined;
     initialFilter?: BooleanFilterArtifacts | undefined;
 } & ColumnProps & ValueRendererProps>;
 
@@ -90,22 +83,42 @@ export const createCoalesceTextCell: <ColumnProps extends {}, ValueRendererProps
 } & ColumnProps & ValueRendererProps>;
 
 // @public (undocumented)
-export const createControlledDataGrid: <P extends {}>(Renderer: ComponentType<P & DataGridRendererProps<any>>) => NamedExoticComponent<ControlledDataGridProps<Omit<P, keyof DataGridRendererProps<any>>>>;
+export const createControlledDataGrid: <P extends {}>(Renderer: ComponentType<P & {
+    state: DataGridState;
+    methods: DataGridMethods;
+    info: DataViewInfo;
+    columns: DataGridColumns<any>;
+}>) => NamedExoticComponent<    {
+state: DataGridState;
+methods: DataGridMethods;
+info: DataViewInfo;
+columns: DataGridColumns<any>;
+} & P>;
 
 // @public (undocumented)
-export const createDataGrid: <P extends {}>(Renderer: ComponentType<DataGridRendererProps<any> & P>) => ComponentType<DataGridProps<Omit<P, keyof DataGridRendererProps<any>>>>;
+export const createDataGrid: <P extends {}>(Renderer: ComponentType<P & {
+    state: DataViewState;
+    methods: DataViewMethods;
+    info: DataViewInfo;
+    columns: DataGridColumns<any>;
+}>) => ComponentType<DataGridProps<P>>;
 
 // @public (undocumented)
 export const createDataGridRenderer: <ColumnProps extends {}, ContainerProps extends {}>({ Fallback, Container, staticRender, columnStaticRender }: {
     Fallback: ComponentType<{
-        children: ReactNode;
+        children?: ReactNode;
     }>;
-    Container: ComponentType<DataGridRendererInnerProps<ColumnProps> & ContainerProps>;
-    staticRender?: ((props: DataGridRendererInnerProps<ColumnProps> & ContainerProps) => ReactNode) | undefined;
+    Container: ComponentType<ContainerProps>;
+    staticRender?: ((props: ContainerProps) => ReactNode) | undefined;
     columnStaticRender?: ((props: {
         column: DataGridColumnProps<Serializable, ColumnProps>;
     }) => ReactNode) | undefined;
-}) => NamedExoticComponent<DataGridRendererProps<ColumnProps> & ContainerProps>;
+}) => NamedExoticComponent<ContainerProps & {
+state: DataViewState;
+methods: DataViewMethods;
+info: DataViewInfo;
+columns: DataGridColumns<any>;
+}>;
 
 // @public (undocumented)
 export const createDateCell: <ColumnProps extends {}, ValueRendererProps extends {}>({ FilterRenderer, ValueRenderer }: {
@@ -113,25 +126,22 @@ export const createDateCell: <ColumnProps extends {}, ValueRendererProps extends
     ValueRenderer: ComponentType<DateCellRendererProps & ValueRendererProps>;
 }) => FunctionComponent<DateCellRendererProps & DataGridColumnCommonProps & {
     disableOrder?: boolean | undefined;
-    initialOrder?: DataGridOrderDirection | undefined;
+    initialOrder?: DataViewSortingDirection | undefined;
     initialFilter?: DateRangeFilterArtifacts | undefined;
 } & ColumnProps & ValueRendererProps>;
 
 // @public (undocumented)
 export const createEnumCell: <ColumnProps extends {}, ValueRendererProps extends {}, FilterProps extends {}>({ FilterRenderer, ValueRenderer }: {
-    FilterRenderer: ComponentType<FilterRendererProps<EnumCellFilterArtifacts, FilterProps>>;
+    FilterRenderer: ComponentType<FilterRendererProps<EnumFilterArtifacts, FilterProps>>;
     ValueRenderer: ComponentType<EnumCellRendererProps & ValueRendererProps>;
 }) => FunctionComponent<DataGridColumnCommonProps & EnumCellRendererProps & {
     options: Record<string, string>;
     format?: ((value: string | null) => ReactNode) | undefined;
-    initialFilter?: EnumCellFilterArtifacts | undefined;
+    initialFilter?: EnumFilterArtifacts | undefined;
 } & ColumnProps & ValueRendererProps & FilterProps>;
 
 // @public (undocumented)
 export const createGenericCell: <ColumnProps extends {}>() => FunctionComponent<DataGridColumnCommonProps & ColumnProps>;
-
-// @public (undocumented)
-export const createGenericTextCellFilterCondition: (filter: GenericTextCellFilterArtifacts) => Input.Condition<string>;
 
 // @public (undocumented)
 export const createHasManyAbsentCell: <ColumnProps extends {}>({ FilterRenderer }: {
@@ -143,7 +153,7 @@ export const createHasManyAbsentCell: <ColumnProps extends {}>({ FilterRenderer 
 
 // @public (undocumented)
 export const createHasManySelectCell: <ColumnProps extends {}, ValueRendererProps extends {}>({ FilterRenderer, ValueRenderer }: {
-    FilterRenderer: ComponentType<FilterRendererProps<SelectCellArtifacts, SelectCellFilterExtraProps>>;
+    FilterRenderer: ComponentType<FilterRendererProps<RelationFilterArtifacts, SelectCellFilterExtraProps>>;
     ValueRenderer: ComponentType<HasManySelectRendererProps & ValueRendererProps>;
 }) => FunctionComponent<HasManySelectProps & ColumnProps & ValueRendererProps>;
 
@@ -157,7 +167,7 @@ renderElements?: ((elements: ReactNode[]) => ReactElement) | undefined;
 
 // @public (undocumented)
 export const createHasOneSelectCell: <ColumnProps extends {}, ValueRendererProps extends {}>({ FilterRenderer, ValueRenderer }: {
-    FilterRenderer: ComponentType<FilterRendererProps<SelectCellArtifacts, SelectCellFilterExtraProps>>;
+    FilterRenderer: ComponentType<FilterRendererProps<RelationFilterArtifacts, SelectCellFilterExtraProps>>;
     ValueRenderer: ComponentType<HasOneSelectRendererProps & ValueRendererProps>;
 }) => FunctionComponent<HasOneSelectProps & ColumnProps & ValueRendererProps>;
 
@@ -172,7 +182,7 @@ export const createNumberCell: <ColumnProps extends {}, ValueRendererProps exten
     ValueRenderer: ComponentType<NumberCellRendererProps & ValueRendererProps>;
 }) => FunctionComponent<DataGridColumnCommonProps & NumberCellRendererProps & {
     disableOrder?: boolean | undefined;
-    initialOrder?: DataGridOrderDirection | undefined;
+    initialOrder?: DataViewSortingDirection | undefined;
     initialFilter?: NumberFilterArtifacts | undefined;
 } & ColumnProps & ValueRendererProps & FilterProps>;
 
@@ -182,7 +192,7 @@ export const createTextCell: <ColumnProps extends {}, ValueRendererProps extends
     ValueRenderer: ComponentType<TextCellRendererProps & ValueRendererProps>;
 }) => FunctionComponent<TextCellRendererProps & DataGridColumnCommonProps & {
     disableOrder?: boolean | undefined;
-    initialOrder?: DataGridOrderDirection | undefined;
+    initialOrder?: DataViewSortingDirection | undefined;
     initialFilter?: TextFilterArtifacts | undefined;
 } & ColumnProps & ValueRendererProps>;
 
@@ -196,12 +206,12 @@ export type DataGridColumnCommonProps = {
 };
 
 // @public (undocumented)
-export type DataGridColumnFiltering<FA extends DataGridFilterArtifact = DataGridFilterArtifact> = {
+export type DataGridColumnFiltering<FA extends DataViewFilterArtifact = DataViewFilterArtifact> = {
     enableFiltering: false;
 } | {
     enableFiltering?: true;
     initialFilter?: FA;
-    getNewFilter: GetNewFilter<FA>;
+    getNewFilter: DataViewFilterHandler<FA>;
     emptyFilter: FA;
     filterRenderer: ComponentType<FilterRendererProps<FA>>;
 };
@@ -214,36 +224,41 @@ export type DataGridColumnOrdering = {
     enableOrdering: false;
 } | {
     enableOrdering?: true;
-    initialOrder?: DataGridOrderDirection;
-    getNewOrderBy: GetNewOrderBy;
+    initialOrder?: DataViewSortingDirection;
 };
 
 // @public (undocumented)
-export type DataGridColumnProps<FA extends DataGridFilterArtifact = DataGridFilterArtifact, P extends {} = {}> = DataGridColumnCommonProps & DataGridColumnFiltering<FA> & DataGridColumnOrdering & P;
+export type DataGridColumnProps<FA extends DataViewFilterArtifact = DataViewFilterArtifact, P extends {} = {}> = DataGridColumnCommonProps & DataGridColumnFiltering<FA> & DataGridColumnOrdering & P;
 
 // @public (undocumented)
-export type DataGridColumns<P extends {}> = Map<DataGridColumnKey, DataGridColumnProps<DataGridFilterArtifact, P>>;
+export type DataGridColumns<P extends {}> = Map<DataGridColumnKey, DataGridColumnProps<DataViewFilterArtifact, P>>;
 
 // @public (undocumented)
-export type DataGridFilterArtifact = Serializable;
+export type DataGridFilterArtifact = DataViewFilterArtifact;
 
 // @public (undocumented)
-export type DataGridFilterArtifactStore = Record<DataGridColumnKey, DataGridFilterArtifact>;
+export type DataGridHidingMethods = {
+    setIsColumnHidden: DataGridSetIsColumnHidden;
+};
 
 // @public (undocumented)
-export type DataGridHiddenColumnsStateStore = Record<DataGridColumnKey, boolean>;
-
-// @public (undocumented)
-export const DataGridKeyProvider: Provider<string>;
+export type DataGridHidingState = Record<DataGridColumnKey, boolean>;
 
 // @public (undocumented)
 export type DataGridLayout = 'default' | 'tiles';
 
 // @public (undocumented)
-export type DataGridOrderDirection = 'asc' | 'desc' | null;
+export type DataGridLayoutMethods = {
+    setView: SetDataGridLayout;
+};
 
 // @public (undocumented)
-export type DataGridOrderDirectionStore = Record<DataGridColumnKey, Exclude<DataGridOrderDirection, null>>;
+export type DataGridLayoutState = {
+    view: DataGridLayout;
+};
+
+// @public (undocumented)
+export type DataGridMethods = DataViewMethods;
 
 // @public (undocumented)
 export type DataGridProps<P extends {}> = {
@@ -254,83 +269,15 @@ export type DataGridProps<P extends {}> = {
 } & P;
 
 // @public (undocumented)
-export type DataGridRendererInnerProps<ColumnProps extends {}> = {
-    desiredState: DataGridState<ColumnProps>;
-    displayedState: DataGridState<ColumnProps>;
-    stateMethods: DataGridStateMethods;
-    pagingInfo: GridPagingInfo;
-    environment: Environment;
-    accessor: EntityListAccessor;
-    children?: ReactNode;
-};
-
-// @public (undocumented)
-export interface DataGridRendererProps<ColumnProps extends {}> {
-    // (undocumented)
-    desiredState: DataGridState<ColumnProps>;
-    // (undocumented)
-    displayedState: DataGridState<ColumnProps> | undefined;
-    // (undocumented)
-    environment: Environment;
-    // (undocumented)
-    pagingInfo: GridPagingInfo;
-    // (undocumented)
-    stateMethods: DataGridStateMethods;
-    // (undocumented)
-    treeRootId: TreeRootId | undefined;
-}
-
-// @public (undocumented)
-export type DataGridSetColumnFilter<FA extends DataGridFilterArtifact = DataGridFilterArtifact> = (columnKey: DataGridColumnKey, columnFilter: FA | undefined) => void;
-
-// @public (undocumented)
-export type DataGridSetColumnOrderBy = (columnKey: DataGridColumnKey, columnOrderBy: DataGridOrderDirection | 'next', append?: boolean) => void;
-
-// @public (undocumented)
-export type DataGridSetFilter<FA extends DataGridFilterArtifact = DataGridFilterArtifact> = (filter: FA | undefined) => void;
-
-// @public (undocumented)
 export type DataGridSetIsColumnHidden = (columnKey: DataGridColumnKey, isHidden: boolean) => void;
 
 // @public (undocumented)
-export type DataGridSetOrderBy = (setOrderBy: DataGridOrderDirection | 'next', append?: boolean) => void;
-
-// @public (undocumented)
-export interface DataGridState<ColumnProps extends {}> {
-    columns: DataGridColumns<ColumnProps>;
-    entities: QualifiedEntityList;
-    // (undocumented)
-    filter: Filter;
-    // (undocumented)
-    filterArtifacts: DataGridFilterArtifactStore;
-    // (undocumented)
-    hiddenColumns: DataGridHiddenColumnsStateStore;
-    // (undocumented)
-    layout: DataGridLayout;
-    orderBy: OrderBy;
-    // (undocumented)
-    orderDirections: DataGridOrderDirectionStore;
-    paging: GridPagingState;
-}
-
-// @public (undocumented)
-export interface DataGridStateMethods {
-    // (undocumented)
-    setFilter: DataGridSetColumnFilter;
-    // (undocumented)
-    setIsColumnHidden: DataGridSetIsColumnHidden;
-    // (undocumented)
-    setLayout: SetDataGridView;
-    // (undocumented)
-    setOrderBy: DataGridSetColumnOrderBy;
-    // (undocumented)
-    updatePaging: DispatchChangePage;
-}
+export type DataGridState = DataViewState;
 
 // @public (undocumented)
 export type DateCellProps = DateCellRendererProps & DataGridColumnCommonProps & {
     disableOrder?: boolean;
-    initialOrder?: DataGridOrderDirection;
+    initialOrder?: DataViewSortingDirection;
     initialFilter?: DateRangeFilterArtifacts;
 };
 
@@ -340,25 +287,10 @@ export type DateCellRendererProps = {
 };
 
 // @public (undocumented)
-export type DateRangeFilterArtifacts = {
-    start: string | null;
-    end: string | null;
-};
-
-// @public (undocumented)
-export type DispatchChangePage = (action: GridPagingAction) => void;
-
-// @public (undocumented)
-export type EnumCellFilterArtifacts = {
-    values: string[];
-    nullCondition: boolean;
-};
-
-// @public (undocumented)
 export type EnumCellProps = DataGridColumnCommonProps & EnumCellRendererProps & {
     options: Record<string, string>;
     format?: (value: string | null) => ReactNode;
-    initialFilter?: EnumCellFilterArtifacts;
+    initialFilter?: EnumFilterArtifacts;
 };
 
 // @public (undocumented)
@@ -367,61 +299,14 @@ export type EnumCellRendererProps = {
 };
 
 // @public (undocumented)
-export type FilterRendererProps<FA extends DataGridFilterArtifact, FilterProps extends {} = {}> = {
+export type FilterRendererProps<FA extends DataViewFilterArtifact, FilterProps extends {} = {}> = {
     filter: FA;
-    setFilter: DataGridSetFilter<FA>;
+    setFilter: DataViewSetFilter<FA>;
     environment: Environment;
 } & FilterProps;
 
 // @public (undocumented)
 export type GenericCellProps = DataGridColumnCommonProps;
-
-// @public (undocumented)
-export type GenericTextCellFilterArtifacts = {
-    mode: 'matches' | 'matchesExactly' | 'startsWith' | 'endsWith' | 'doesNotMatch';
-    query: string;
-};
-
-// @public (undocumented)
-export type GetNewFilter<FA extends DataGridFilterArtifact = DataGridFilterArtifact> = (filterArtifact: FA, options: GetNewFilterOptions<FA>) => SugaredFilter | undefined;
-
-// @public (undocumented)
-export interface GetNewFilterOptions<FA extends DataGridFilterArtifact = DataGridFilterArtifact> {
-    // (undocumented)
-    environment: Environment;
-}
-
-// @public (undocumented)
-export type GetNewOrderBy = (newDirection: DataGridOrderDirection, options: GetNewOrderByOptions) => SugaredOrderBy | undefined;
-
-// @public (undocumented)
-export interface GetNewOrderByOptions {
-    // (undocumented)
-    environment: Environment;
-}
-
-// @public (undocumented)
-export type GridPagingAction = {
-    type: 'goToPage';
-    newPageIndex: number;
-} | {
-    type: 'setItemsPerPage';
-    newItemsPerPage: number | null;
-} | {
-    type: 'goToNextPage' | 'goToPreviousPage' | 'goToFirstPage';
-};
-
-// @public (undocumented)
-export type GridPagingInfo = {
-    totalCount: number | undefined;
-    pagesCount: number | undefined;
-};
-
-// @public (undocumented)
-export type GridPagingState = {
-    pageIndex: number;
-    itemsPerPage: number | null;
-};
 
 // @public (undocumented)
 export type HasManyAbsentCellProps = DataGridColumnCommonProps & SugaredRelativeEntityList & {
@@ -437,7 +322,7 @@ export type HasManySelectProps = HasManySelectRendererProps & DataGridColumnComm
 
 // @public (undocumented)
 export type HasManySelectRendererProps = SugaredRelativeEntityList & BaseDynamicChoiceField & {
-    initialFilter?: SelectCellArtifacts;
+    initialFilter?: RelationFilterArtifacts;
 };
 
 // @public (undocumented)
@@ -445,13 +330,13 @@ export type HasOneSelectProps = HasOneSelectRendererProps & DataGridColumnCommon
 
 // @public (undocumented)
 export type HasOneSelectRendererProps = BaseDynamicChoiceField & SugaredRelativeSingleEntity & {
-    initialFilter?: SelectCellArtifacts;
+    initialFilter?: RelationFilterArtifacts;
 };
 
 // @public (undocumented)
 export type NumberCellProps = DataGridColumnCommonProps & NumberCellRendererProps & {
     disableOrder?: boolean;
-    initialOrder?: DataGridOrderDirection;
+    initialOrder?: DataViewSortingDirection;
     initialFilter?: NumberFilterArtifacts;
 };
 
@@ -468,21 +353,15 @@ export type NumberFilterArtifacts = {
 };
 
 // @public (undocumented)
-export type SelectCellArtifacts = {
-    id: EntityId[];
-    nullCondition: boolean;
-};
-
-// @public (undocumented)
 export type SelectCellFilterExtraProps = SelectOptions;
 
 // @public (undocumented)
-export type SetDataGridView = (layout: DataGridLayout) => void;
+export type SetDataGridLayout = (layout: DataGridLayout) => void;
 
 // @public (undocumented)
 export type TextCellProps = TextCellRendererProps & DataGridColumnCommonProps & {
     disableOrder?: boolean;
-    initialOrder?: DataGridOrderDirection;
+    initialOrder?: DataViewSortingDirection;
     initialFilter?: TextFilterArtifacts;
 };
 
@@ -492,14 +371,24 @@ export type TextCellRendererProps = {
 };
 
 // @public (undocumented)
-export type TextFilterArtifacts = {
-    mode: 'matches' | 'matchesExactly' | 'startsWith' | 'endsWith' | 'doesNotMatch';
-    query: string;
-    nullCondition: boolean;
+export const useDataGrid: <P extends {}>(props: DataGridProps<P>) => ControlledDataGridProps;
+
+// @public (undocumented)
+export const useDataGridColumns: <T extends {}>() => DataGridColumns<T>;
+
+// @public (undocumented)
+export const useDataGridHiddenColumns: () => {
+    [k: string]: DataViewSelectionValue;
 };
 
 // @public (undocumented)
-export const useDataGrid: <P extends {}>(props: DataGridProps<P>) => ControlledDataGridProps<P>;
+export const useDataGridLayout: () => string | number | boolean;
+
+// @public (undocumented)
+export const useDataGridSetColumnHidden: () => (column: string, hidden: boolean) => void;
+
+// @public (undocumented)
+export const useDataGridSetLayout: () => (layout: 'default' | 'tiles') => void;
 
 // (No @packageDocumentation comment for this package)
 

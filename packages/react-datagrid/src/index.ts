@@ -1,4 +1,4 @@
 export * from './types'
-export { DataGridKeyProvider } from './context'
+export * from './hooks'
 export * from './cells'
 export * from './grid'

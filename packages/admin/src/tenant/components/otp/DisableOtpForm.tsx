@@ -1,9 +1,9 @@
 import { Button, useShowToast } from '@contember/ui'
-import { FC, useCallback, useContext } from 'react'
-import { IdentityRefreshContext } from '../../../components'
+import { FC, useCallback } from 'react'
 import { RoutingLinkTarget, useRedirect } from '../../../routing'
 import { useForm } from '../../lib'
 import { useDisableOtp } from '../../mutations'
+import { useIdentityMethods } from '@contember/react-identity'
 
 export interface DisableOtpFormProps {
 	onSuccess?: () => void
@@ -17,7 +17,7 @@ export const DisableOtpForm: FC<DisableOtpFormProps> = ({ redirectOnSuccess }) =
 	const redirect = useRedirect()
 	const addToast = useShowToast()
 	const disableOtp = useDisableOtp()
-	const refreshIdentity = useContext(IdentityRefreshContext)
+	const { refreshIdentity } = useIdentityMethods()
 
 	const { isSubmitting, onSubmit } = useForm<typeof initialValues>(initialValues, useCallback(
 		async () => {

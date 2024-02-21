@@ -1,43 +1,35 @@
-import { Component, EntityListSubTree } from '@contember/react-binding'
+import { Component } from '@contember/react-binding'
 import { ComponentType, Fragment, ReactNode } from 'react'
-import {
-	DataGridColumnProps,
-	DataGridFilterArtifact,
-	DataGridRendererInnerProps,
-	DataGridRendererProps,
-} from '../types'
+import { DataGridColumnProps, DataGridFilterArtifact } from '../types'
+import { DataViewLoaderState, dataViewSelectionEnvironmentExtension } from '@contember/react-dataview'
+import { ControlledDataGridProps } from './createControlledDataGrid'
+import { getHidingKey } from '../internal/hiding'
 
 export const createDataGridRenderer = <ColumnProps extends {}, ContainerProps extends {}>({ Fallback, Container, staticRender, columnStaticRender }: {
-	Fallback: ComponentType<{ children: ReactNode }>
-	Container: ComponentType<DataGridRendererInnerProps<ColumnProps> & ContainerProps>
-	staticRender?: (props: DataGridRendererInnerProps<ColumnProps> & ContainerProps) => ReactNode
+	Fallback: ComponentType<{ children?: ReactNode }>
+	Container: ComponentType<ContainerProps>
+	staticRender?: (props: ContainerProps) => ReactNode
 	columnStaticRender?: (props: { column: DataGridColumnProps<DataGridFilterArtifact, ColumnProps> }) => ReactNode
-}) => Component<DataGridRendererProps<ColumnProps> & ContainerProps>(({ treeRootId, ...props }) => {
-	const displayedState = props.displayedState
+}) => Component<ContainerProps & ControlledDataGridProps>(props => {
 	return (
-		<Fallback>
-			{displayedState && <EntityListSubTree
-				entities={{
-					...displayedState.entities,
-					filter: displayedState.filter,
-				}}
-				treeRootId={treeRootId}
-				offset={displayedState.paging.itemsPerPage === null ? undefined : displayedState.paging.itemsPerPage * displayedState.paging.pageIndex}
-				limit={displayedState.paging.itemsPerPage === null ? undefined : displayedState.paging.itemsPerPage}
-				orderBy={displayedState.orderBy}
-				listComponent={Container as any}
-				listProps={props}
-			>
-				{staticRender && staticRender(props as any)}
-				{Array.from(displayedState.columns)
-					.filter(([key]) => !displayedState.hiddenColumns[key])
-					.map(([key, props]) => (
-						<Fragment key={key}>
-							{columnStaticRender && columnStaticRender({ column: props })}
-							{props.children}
-						</Fragment>
-					))}
-			</EntityListSubTree>}
-		</Fallback>
+		<>
+			<DataViewLoaderState initial refreshing>
+				<Fallback />
+			</DataViewLoaderState>
+			<Container {...props as any} />
+		</>
 	)
+}, (props, env) => {
+	const selection = env.getExtension(dataViewSelectionEnvironmentExtension).values
+	return <>
+		{staticRender && staticRender(props as any)}
+		{Array.from(props.columns)
+			.filter(([key]) => !selection[getHidingKey(key)])
+			.map(([key, props]) => (
+				<Fragment key={key}>
+					{columnStaticRender && columnStaticRender({ column: props })}
+					{props.children}
+				</Fragment>
+			))}
+	</>
 })

@@ -1,6 +1,6 @@
 import { Justification } from '@contember/ui'
 import { ReactNode } from 'react'
-import { DataGridRendererInnerProps } from '@contember/react-datagrid'
+
 
 export interface DataGridHeaderCellPublicProps {
 	header?: ReactNode
@@ -22,4 +22,3 @@ export type DataGridColumnPublicProps =
 	& DataGridCellPublicProps
 	& DataGridHeaderCellPublicProps
 
-export type DataGridRenderingCommonProps = DataGridRendererInnerProps<DataGridColumnPublicProps>

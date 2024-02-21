@@ -1,8 +1,8 @@
-import { Component, QueryLanguage, SugarableRelativeSingleField, wrapFilterInHasOnes } from '@contember/react-binding'
+import { Component, QueryLanguage, SugarableRelativeSingleField } from '@contember/react-binding'
 import type { ComponentType, FunctionComponent } from 'react'
 import { DataGridColumn } from '../grid'
-import { DataGridColumnCommonProps, DataGridOrderDirection, FilterRendererProps } from '../types'
-import { createGenericTextCellFilterCondition } from './common'
+import { DataGridColumnCommonProps,  FilterRendererProps } from '../types'
+import { DataViewSortingDirection, TextFilterArtifacts, createTextFilter } from '@contember/react-dataview'
 
 export type TextCellRendererProps = {
 	field: SugarableRelativeSingleField | string
@@ -13,15 +13,10 @@ export type TextCellProps =
 	& DataGridColumnCommonProps
 	& {
 		disableOrder?: boolean
-		initialOrder?: DataGridOrderDirection
+		initialOrder?: DataViewSortingDirection
 		initialFilter?: TextFilterArtifacts
 	}
 
-export type TextFilterArtifacts = {
-	mode: 'matches' | 'matchesExactly' | 'startsWith' | 'endsWith' | 'doesNotMatch'
-	query: string
-	nullCondition: boolean
-}
 
 export const createTextCell = <ColumnProps extends {}, ValueRendererProps extends {}>({ FilterRenderer, ValueRenderer }: {
 	FilterRenderer: ComponentType<FilterRendererProps<TextFilterArtifacts>>,
@@ -31,38 +26,8 @@ export const createTextCell = <ColumnProps extends {}, ValueRendererProps extend
 		<DataGridColumn<TextFilterArtifacts>
 			{...props}
 			enableOrdering={!props.disableOrder as true}
-			getNewOrderBy={(newDirection, { environment }) =>
-				newDirection ? QueryLanguage.desugarOrderBy(`${props.field as string} ${newDirection}`, environment) : undefined
-			}
-			getNewFilter={(filter, { environment }) => {
-				if (filter.query === '' && filter.nullCondition === false) {
-					return undefined
-				}
-
-				let condition = filter.query !== '' ? createGenericTextCellFilterCondition(filter) : {}
-
-				if (filter.mode === 'doesNotMatch') {
-					if (filter.nullCondition) {
-						condition = {
-							and: [condition, { isNull: false }],
-						}
-					}
-				} else if (filter.nullCondition) {
-					condition = {
-						or: [condition, { isNull: true }],
-					}
-				}
-
-				const desugared = QueryLanguage.desugarRelativeSingleField(props.field, environment)
-				return wrapFilterInHasOnes(desugared.hasOneRelationPath, {
-					[desugared.field]: condition,
-				})
-			}}
-			emptyFilter={{
-				mode: 'matches',
-				query: '',
-				nullCondition: false,
-			}}
+			getNewFilter={createTextFilter(props.field)}
+			emptyFilter={{}}
 			filterRenderer={FilterRenderer}
 		>
 			<ValueRenderer {...props} />

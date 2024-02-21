@@ -2,7 +2,6 @@ import { useProjectSlug, useSessionTokenWithMeta, useSetSessionToken } from '@co
 import {
 	Button,
 	ButtonGroup,
-	DevPanel,
 	EmailInput,
 	FieldContainer,
 	Stack,
@@ -18,6 +17,7 @@ import { FC, SyntheticEvent, useCallback, useState } from 'react'
 import { EditMembership, GQLVariable, Membership, useCreateApiKey, useSingleTenantMutation } from '../../tenant'
 import { useOptionalIdentity } from '../Identity'
 import { LogoutLink } from '../LogoutLink'
+import { DevPanel } from '@contember/react-devbar'
 
 export const IdentityPanel = () => {
 	const identity = useOptionalIdentity()

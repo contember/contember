@@ -1,16 +1,12 @@
-import { createNonNullableContextFactory } from '@contember/react-utils'
-import { createContext, useContext } from 'react'
+import { createContext } from '@contember/react-utils'
 import { RegistryContextType } from './types'
 
-export const StateContext = createContext<Record<string, unknown>>({})
-StateContext.displayName = 'Interface.Directives.StateContext'
+const StateContextInternal = createContext<Record<string, unknown>>('Interface.Directives.StateContext', {})
+export const StateContext = StateContextInternal[0]
+export const useDirectives = StateContextInternal[1] as <T extends Record<string, unknown>>() => T
 
-export const [RegistryContext, useRegistryContext] = createNonNullableContextFactory<RegistryContextType<Record<string, unknown>>>('Interface.Directives.RegistryContext', {
+export const [RegistryContext, useRegistryContext] = createContext<RegistryContextType<Record<string, unknown>>>('Interface.Directives.RegistryContext', {
 	register: undefined,
 	unregister: undefined,
 	update: undefined,
 })
-
-export function useDirectives<T extends Record<string, unknown>>() {
-	return useContext(StateContext) as T
-}

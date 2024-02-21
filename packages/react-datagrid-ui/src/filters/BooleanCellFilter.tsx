@@ -1,7 +1,8 @@
-import { BooleanFilterArtifacts, FilterRendererProps } from '@contember/react-datagrid'
+import { FilterRendererProps } from '@contember/react-datagrid'
 import { dataGridCellsDictionary } from '../dict/dataGridCellsDictionary'
 import { Checkbox, FieldContainer, Stack } from '@contember/ui'
 import { useMessageFormatter } from '@contember/react-i18n'
+import { BooleanFilterArtifacts } from '@contember/react-dataview'
 
 export const BooleanCellFilter = ({ setFilter, filter }: FilterRendererProps<BooleanFilterArtifacts>) => {
 	const formatMessage = useMessageFormatter(dataGridCellsDictionary)
@@ -11,7 +12,7 @@ export const BooleanCellFilter = ({ setFilter, filter }: FilterRendererProps<Boo
 				[
 					['includeTrue', formatMessage('dataGridCells.booleanCell.includeTrue')],
 					['includeFalse', formatMessage('dataGridCells.booleanCell.includeFalse')],
-					['includeNull', formatMessage('dataGridCells.booleanCell.includeNull')],
+					['nullCondition', formatMessage('dataGridCells.booleanCell.includeNull')],
 				] as const
 			).map(([item, label], index) => (
 				<FieldContainer

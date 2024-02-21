@@ -1,5 +1,6 @@
 import {
 	AnchorButton,
+	Box,
 	CreateNewEntityButton,
 	CreateScope,
 	DataGridScope,
@@ -8,6 +9,7 @@ import {
 	DropdownProps,
 	EditScope,
 	EnumCell,
+	Field,
 	FieldView,
 	GenericCell,
 	HasManySelectCell,
@@ -15,24 +17,33 @@ import {
 	LinkButton,
 	MultiEditScope,
 	NavigateBackLink,
+	noop,
 	NumberCell,
 	PersistButton,
-	Repeater,
 	RepeaterItem,
 	RepeaterItemProps,
 	SelectField,
-	SideDimensions,
 	Stack,
 	TextCell,
 	TextField,
-	noop,
 } from '@contember/admin'
 import { MoreVerticalIcon } from 'lucide-react'
 import { CategoryForm } from '../components/CategoryForm'
-import { DataGridTile } from '../components/DataGridTile'
 import { Directive } from '../components/Directives'
 import { EditOrCreateForm } from '../components/EditOrCreateForm'
 import { SlotSources } from '../components/Slots'
+import {
+	Repeater,
+	RepeaterSortable,
+	RepeaterSortableDragOverlay,
+	RepeaterSortableDropIndicator,
+	RepeaterSortableItemActivator,
+	RepeaterSortableItemNode,
+	RepeaterSortableEachItem,
+} from '@contember/react-repeater-dnd-kit'
+
+import * as React from 'react'
+import { DataGridTile } from '../components/DataGridTile'
 
 
 const stateOptions = {
@@ -69,6 +80,7 @@ export const list = () => (
 				<LinkButton to={`articles/edit(id: $entity.id)`} Component={AnchorButton}>Edit</LinkButton>
 				<DeleteEntityButton title="Delete" immediatePersist={true} />
 			</GenericCell>
+
 		</DataGridScope>
 	</>
 )
@@ -127,11 +139,24 @@ export const categories = () => (
 const CustomRepeaterItem = (props: RepeaterItemProps) => {
 	return (
 		<Stack gap="gap">
-			<CreateNewEntityButton createNewEntity={noop} onClick={() => props.createNewEntity(undefined, props.index)}>Locales</CreateNewEntityButton>
+			<CreateNewEntityButton createNewEntity={noop}
+														 onClick={() => props.createNewEntity(undefined, props.index)}>Locales</CreateNewEntityButton>
 			<RepeaterItem {...props} />
 		</Stack>
 	)
 }
+
+const dropIndicatorEl = <div style={{
+	'position': 'absolute',
+	'left': 0,
+	'right': 0,
+	'width': '100%',
+	'height': '5px',
+	'border': '1px solid transparent',
+	'backgroundColor': '#486AADFF',
+	'borderRadius': '2px',
+	// 'marginTop': dropIndicator === 'after' ? '5px' : '-10px',
+}} />
 
 export const tags = () => (
 	<>
@@ -139,16 +164,42 @@ export const tags = () => (
 
 		<MultiEditScope entities="Tag" listProps={{ beforeContent: <SlotSources.Actions><PersistButton /></SlotSources.Actions> }}>
 			<TextField field={'name'} label="Default name" />
-			<Stack horizontal evenly>
-				<SideDimensions dimension="locale" hasOneField="locales(locale.code=$currentLocale)" variableName="currentLocale">
-					<TextField field="name" label="Name" />
-				</SideDimensions>
-			</Stack>
-			{/* <Repeater field={'locales'} label={'Locales'} sortableBy={'order'} itemComponent={CustomRepeaterItem} containerComponentExtraProps={{ className: 'locales-list' }} itemComponentExtraProps={{ className: 'locale-list-item' }}>
-				<SelectField label={'Locale'} options={'Locale.code'} field={'locale'}
-					createNewForm={<TextField field={'code'} label={'Locale code'} />} />
-				<TextField field={'name'} label={'Name'} />
-			</Repeater> */}
+			{/*<Stack horizontal evenly>*/}
+			{/*	<SideDimensions dimension="locale" hasOneField="locales(locale.code=$currentLocale)" variableName="currentLocale">*/}
+			{/*		<TextField field="name" label="Name" />*/}
+			{/*	</SideDimensions>*/}
+			{/*</Stack>*/}
+			<Repeater field={'locales'} sortableBy={'order'}>
+				<RepeaterSortable>
+					<RepeaterSortableEachItem>
+						<div style={{ position: 'relative' }}>
+							<RepeaterSortableDropIndicator position={'before'}>
+								{dropIndicatorEl}
+							</RepeaterSortableDropIndicator>
+						</div>
+						<RepeaterSortableItemNode>
+							<Box>
+								<RepeaterSortableItemActivator>
+									<div>handle</div>
+								</RepeaterSortableItemActivator>
+								<SelectField label={'Locale'} options={'Locale.code'} field={'locale'}
+														 createNewForm={<TextField field={'code'} label={'Locale code'} />} />
+								<TextField field={'name'} label={'Name'} />
+							</Box>
+						</RepeaterSortableItemNode>
+						<div style={{ position: 'relative' }}>
+							<RepeaterSortableDropIndicator position={'after'}>
+								{dropIndicatorEl}
+							</RepeaterSortableDropIndicator>
+						</div>
+					</RepeaterSortableEachItem>
+					<RepeaterSortableDragOverlay>
+						<Box>
+							Dragging <Field field={'name'} />
+						</Box>
+					</RepeaterSortableDragOverlay>
+				</RepeaterSortable>
+			</Repeater>
 		</MultiEditScope>
 	</>
 )

@@ -47,7 +47,6 @@
 	},
 	"dependencies": {
 		"@blueprintjs/icons": "3.33.0",
-		"@contember/brand": "workspace:*",
 		"@contember/react-utils": "workspace:*",
 		"@contember/utilities": "workspace:*",
 		"@popperjs/core": "2.11.8",

@@ -1,19 +1,20 @@
 import { Button, ButtonList, Divider, TableRowsIcon } from '@contember/ui'
-import { DataGridRenderingCommonProps } from '../types'
 import { LayoutGridIcon } from 'lucide-react'
 import { ReactNode, useCallback } from 'react'
+import { useDataGridSetLayout, useDataGridLayout } from '@contember/react-datagrid'
 
 export type DataGridLayoutControlPublicProps = {
 	tile?: ReactNode
 }
 
 export type DataGridLayoutControlProps =
-	& DataGridRenderingCommonProps
 	& DataGridLayoutControlPublicProps
 
-export const DataGridLayoutControl = ({ stateMethods: { setLayout }, desiredState: { layout }, tile }: DataGridLayoutControlProps) => {
-	const setDefaultView = useCallback(() => setLayout('default'), [setLayout])
-	const setTileView = useCallback(() => setLayout('tiles'), [setLayout])
+export const DataGridLayoutControl = ({ tile } : DataGridLayoutControlProps) => {
+	const setView = useDataGridSetLayout()
+	const setDefaultView = useCallback(() => setView('default'), [setView])
+	const setTileView = useCallback(() => setView('tiles'), [setView])
+	const layout = useDataGridLayout()
 
 	if (!tile) {
 		return null

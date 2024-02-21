@@ -1,0 +1,316 @@
+{
+	"formatVersion": 5,
+	"modifications": [
+		{
+			"modification": "createEnum",
+			"enumName": "GridArticleState",
+			"values": [
+				"published",
+				"draft",
+				"archived"
+			]
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"eventLog": {
+					"enabled": true
+				},
+				"name": "GridArticle",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "grid_article",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": [],
+				"indexes": []
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"eventLog": {
+					"enabled": true
+				},
+				"name": "GridAuthor",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "grid_author",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": [],
+				"indexes": []
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"eventLog": {
+					"enabled": true
+				},
+				"name": "GridCategory",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "grid_category",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": [],
+				"indexes": []
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"eventLog": {
+					"enabled": true
+				},
+				"name": "GridTag",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "grid_tag",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": [],
+				"indexes": []
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "GridArticle",
+			"field": {
+				"name": "title",
+				"columnName": "title",
+				"columnType": "text",
+				"nullable": false,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "GridArticle",
+			"field": {
+				"name": "state",
+				"columnName": "state",
+				"columnType": "GridArticleState",
+				"nullable": false,
+				"type": "Enum"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "GridArticle",
+			"field": {
+				"name": "locked",
+				"columnName": "locked",
+				"columnType": "boolean",
+				"nullable": false,
+				"type": "Bool",
+				"default": false
+			},
+			"fillValue": false
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "GridArticle",
+			"field": {
+				"name": "publishedAt",
+				"columnName": "published_at",
+				"columnType": "timestamptz",
+				"nullable": true,
+				"type": "DateTime"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "GridArticle",
+			"field": {
+				"name": "slug",
+				"columnName": "slug",
+				"columnType": "text",
+				"nullable": false,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "GridAuthor",
+			"field": {
+				"name": "name",
+				"columnName": "name",
+				"columnType": "text",
+				"nullable": false,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "GridAuthor",
+			"field": {
+				"name": "slug",
+				"columnName": "slug",
+				"columnType": "text",
+				"nullable": false,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "GridCategory",
+			"field": {
+				"name": "name",
+				"columnName": "name",
+				"columnType": "text",
+				"nullable": false,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "GridCategory",
+			"field": {
+				"name": "slug",
+				"columnName": "slug",
+				"columnType": "text",
+				"nullable": false,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "GridTag",
+			"field": {
+				"name": "name",
+				"columnName": "name",
+				"columnType": "text",
+				"nullable": false,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "GridTag",
+			"field": {
+				"name": "slug",
+				"columnName": "slug",
+				"columnType": "text",
+				"nullable": false,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "GridArticle",
+			"owningSide": {
+				"type": "ManyHasOne",
+				"name": "author",
+				"target": "GridAuthor",
+				"joiningColumn": {
+					"columnName": "author_id",
+					"onDelete": "restrict"
+				},
+				"nullable": true
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "GridArticle",
+			"owningSide": {
+				"type": "ManyHasOne",
+				"name": "category",
+				"target": "GridCategory",
+				"joiningColumn": {
+					"columnName": "category_id",
+					"onDelete": "restrict"
+				},
+				"nullable": true
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "GridArticle",
+			"owningSide": {
+				"type": "ManyHasMany",
+				"name": "tags",
+				"target": "GridTag",
+				"joiningTable": {
+					"eventLog": {
+						"enabled": true
+					},
+					"tableName": "grid_article_tags",
+					"joiningColumn": {
+						"columnName": "grid_article_id",
+						"onDelete": "cascade"
+					},
+					"inverseJoiningColumn": {
+						"columnName": "grid_tag_id",
+						"onDelete": "cascade"
+					}
+				}
+			}
+		},
+		{
+			"modification": "createUniqueConstraint",
+			"entityName": "GridArticle",
+			"unique": {
+				"fields": [
+					"slug"
+				]
+			}
+		},
+		{
+			"modification": "createUniqueConstraint",
+			"entityName": "GridAuthor",
+			"unique": {
+				"fields": [
+					"slug"
+				]
+			}
+		},
+		{
+			"modification": "createUniqueConstraint",
+			"entityName": "GridCategory",
+			"unique": {
+				"fields": [
+					"slug"
+				]
+			}
+		},
+		{
+			"modification": "createUniqueConstraint",
+			"entityName": "GridTag",
+			"unique": {
+				"fields": [
+					"slug"
+				]
+			}
+		}
+	]
+}

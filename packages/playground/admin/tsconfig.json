@@ -1,0 +1,18 @@
+{
+	"extends": "../../../tsconfig.settings.json",
+	"compilerOptions": {
+		"noEmit": true,
+		"emitDeclarationOnly": false
+	},
+	"references": [
+		{ "path": "../api" },
+		{ "path": "../../interface/src" },
+		{ "path": "../../react-dataview/src" },
+		{ "path": "../../react-board/src" },
+		{ "path": "../../react-board-dnd-kit/src" },
+		{ "path": "../../react-repeater/src" },
+		{ "path": "../../react-repeater-dnd-kit/src" },
+		{ "path": "../../react-form/src" },
+		{ "path": "../../react-select/src" },
+	]
+}

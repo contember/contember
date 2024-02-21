@@ -230,8 +230,8 @@ declare namespace Directives {
         Directive,
         ProviderProps,
         Provider,
-        useDirectives,
         StateContext,
+        useDirectives,
         RegistryContext,
         useRegistryContext,
         RegistryContextType
@@ -852,7 +852,7 @@ export const useContainerInsetsContext: () => ContainerInsets;
 function useDirectiveLifecycle<T extends Record<string, unknown>, K extends keyof T & string, V extends T[K]>(name: K, content: V): boolean;
 
 // @public (undocumented)
-function useDirectives<T extends Record<string, unknown>>(): T;
+const useDirectives: <T extends Record<string, unknown>>() => T;
 
 // @public (undocumented)
 export function useElementInsetCustomProperties(elementRef: RefObject<HTMLElement>, prefix?: string): CSSProperties | undefined;

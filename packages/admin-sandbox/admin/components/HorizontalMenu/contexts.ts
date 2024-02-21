@@ -1,4 +1,4 @@
-import { createOptionalContextFactory } from '@contember/react-utils'
+import { createContext } from '@contember/react-utils'
 import { HorizontalMenuContainerProps } from './types'
 
 export const defaultHorizontalMenuProps = {
@@ -10,4 +10,4 @@ export const defaultHorizontalMenuProps = {
 	itemsSizeEvenly: false,
 }
 
-export const [HorizontalMenuContext, useHorizontalMenuContext] = createOptionalContextFactory<HorizontalMenuContainerProps>('HorizontalMenuContainer', defaultHorizontalMenuProps)
+export const [HorizontalMenuContext, useHorizontalMenuContext] = createContext<HorizontalMenuContainerProps>('HorizontalMenuContainer', defaultHorizontalMenuProps)

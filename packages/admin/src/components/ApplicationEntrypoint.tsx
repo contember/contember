@@ -8,8 +8,8 @@ import { OutdatedApplicationChecker } from './Application/OutdatedApplicationChe
 import { ApplicationDevBar } from './Dev/DevBar'
 import { IdentityProvider } from './Identity'
 import { NavigationProvider } from './NavigationProvider'
-import { projectEnvironmentExtension } from './Project'
-import { DataGridPageNameKeyProvider } from './DataGridPageNameKeyProvider'
+import { DataViewPageNameKeyProvider } from './DataViewPageNameKeyProvider'
+import { projectEnvironmentExtension } from '@contember/react-identity'
 
 export interface ApplicationEntrypointProps extends ContemberClientProps, Omit<ProvidersProps, 'children'> {
 	basePath?: string
@@ -68,7 +68,7 @@ export const ApplicationEntrypoint = (props: ApplicationEntrypointProps) => {
 							stage={props.stage}
 						>
 							<EnvironmentExtensionProvider extension={projectEnvironmentExtension} state={projectSlug ?? null}>
-								<DataGridPageNameKeyProvider>
+								<DataViewPageNameKeyProvider>
 									<NavigationProvider>
 										<IdentityProvider onInvalidIdentity={props.onInvalidIdentity}>
 											<Providers portalProviderProps={props.portalProviderProps} styleProviderProps={props.styleProviderProps}>
@@ -78,7 +78,7 @@ export const ApplicationEntrypoint = (props: ApplicationEntrypointProps) => {
 											</Providers>
 										</IdentityProvider>
 									</NavigationProvider>
-								</DataGridPageNameKeyProvider>
+								</DataViewPageNameKeyProvider>
 							</EnvironmentExtensionProvider>
 						</ContemberClient>
 					</RequestProvider>

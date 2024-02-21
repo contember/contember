@@ -11,9 +11,6 @@ export const sortEntities = (
 		const aField = a.getRelativeSingleField<number>(sortByField)
 		const bField = b.getRelativeSingleField<number>(sortByField)
 
-		if (typeof aField.value === 'number' && typeof bField.value === 'number') {
-			return aField.value - bField.value
-		}
-		return 0
+		return (aField.value ?? Number.MAX_SAFE_INTEGER) - (bField.value ?? Number.MAX_SAFE_INTEGER)
 	})
 }

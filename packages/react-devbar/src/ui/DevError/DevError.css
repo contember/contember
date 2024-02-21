@@ -1,0 +1,191 @@
+.cui-devError {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 99;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    background: rgba(212, 212, 212, 0.66);
+    font-family: Poppins, Roboto, sans-serif;
+}
+
+.cui-devError-in {
+    z-index: 100;
+    width: 100%;
+    height: 100%;
+    color: #333;
+    background: #222;
+    box-shadow: 3px 3px 10px rgba(50, 50, 50, 0.5);
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+}
+
+.cui-devError-header {
+    background: #CD1818;
+    color: #FFF;
+    padding: 0.5em 1em;
+}
+
+.cui-devError-errorMessage,
+.cui-devError-errorName,
+.cui-devError-errorDetails {
+    margin: 0;
+    flex: 0 0 auto;
+    font-weight: 300;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    line-height: 130%;
+}
+
+.cui-devError-errorMessage {
+    font-family: monospace;
+    margin-top: 0.5em;
+    font-size: 1.7em;
+}
+
+.cui-devError-errorDetails {
+    font-family: monospace;
+    margin-top: 0.5em;
+    font-size: 1em;
+    white-space: pre;
+    overflow-x: scroll;
+}
+
+.cui-devError-causeLink {
+    color: #FFCC00;
+    text-decoration: underline;
+}
+
+.cui-devError-stack {
+    flex: 1 1 auto;
+}
+
+.cui-devError-stack-dump {
+    color: #fff;
+    margin-top: 1em;
+    padding: 1em;
+    white-space: pre-wrap;
+}
+
+.cui-devError-bar {
+    padding: 0.2em 0.2em 0.2em 1em;
+    background: #ac1616;
+    color: #eee;
+    display: flex;
+}
+
+.cui-devError-causedBy {
+    padding: 0.2em 0.2em 0.2em 1em;
+    background: #FFCC00;
+    color: #000;
+    display: flex;
+}
+
+.cui-devError-actions {
+    margin-left: auto;
+    display: flex;
+}
+
+.cui-devError-actions .cui-button {
+    color: #fff;
+    border-color: #cbcbcb;
+}
+
+.cui-devError-actions .cui-button:hover {
+    color: #fff;
+}
+
+.cui-devError-close {
+    margin-left: 1em;
+}
+
+.cui-devError-close .cui-button {
+    border-color: transparent;
+}
+
+.cui-devError-switcher {
+    display: flex;
+    align-items: center;
+    margin-left: 2em;
+}
+
+
+.cui-devError-switcherButtons {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+}
+.cui-devError-closeButton,
+.cui-devError-switcherButton {
+    border: 1px solid #cbcbcb;
+    border-radius: 0.2em;
+    padding: 0.2em 0.5em;
+}
+
+.cui-devError-errorCount {
+    margin: 0;
+    margin-right: 0.5em;
+}
+
+.cui-devError-stackFrame {
+    font-family: monospace;
+}
+
+.cui-devError-stackFrame:last-child {
+    border-bottom: 1px solid #666;
+}
+
+.cui-devError-stackFrameHeader {
+    display: flex;
+    padding: 0.5em 1em;
+    background: #333;
+    color: #fff;
+    border-bottom: 1px solid #666;
+    border-top: 1px solid #666;
+}
+
+.cui-devError-stackFrameSource {
+    margin-left: 0.2em;
+}
+
+.cui-devError-stackFrameCallee {
+    margin-left: 1em;
+    color: #a4ffa4;
+}
+
+.cui-devError-stackFrameCode {
+    background: #222;
+    color: #D5D5D5;
+}
+
+.cui-devError-stackFrameLine {
+    display: flex;
+}
+
+.cui-devError-stackFrameLine.is-active {
+    color: #fff;
+    background: #CD1818;
+}
+
+.cui-devError-stackFrameLine.is-active .cui-devError-stackFrameLineNumber {
+    color: #fff;
+}
+
+.cui-devError-stackFrameLineNumber {
+    color: #888;
+    flex: 0 0 50px;
+    text-align: right;
+    padding: 0.2em;
+}
+
+.cui-devError-stackFrameLineCode {
+    padding: 0.2em 1em;
+    white-space: pre-wrap;
+    tab-size: 4;
+}

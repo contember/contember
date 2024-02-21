@@ -1,42 +1,8 @@
-import { Filter, OrderBy, QualifiedEntityList } from '@contember/react-binding'
-import { DispatchChangePage, GridPagingState } from './paging'
-import { DataGridOrderDirectionStore, DataGridSetColumnOrderBy } from './ordering'
-import { DataGridFilterArtifactStore, DataGridSetColumnFilter } from './filters'
-import { DataGridHiddenColumnsStateStore, DataGridSetIsColumnHidden } from './hiding'
-import { DataGridColumns } from './column'
-import { DataGridLayout, SetDataGridView } from './layout'
+import { DataViewMethods, DataViewState } from '@contember/react-dataview'
 
-export interface DataGridState<ColumnProps extends {}> {
-	/**
-	 * input entities, does not include applied filters
-	 */
-	entities: QualifiedEntityList
+export type DataGridState =
+	& DataViewState
 
-	/**
-	 * collected columns
-	 */
-	columns: DataGridColumns<ColumnProps>
+export type DataGridMethods =
+	& DataViewMethods
 
-	/**
-	 * raw grid state
-	 */
-	paging: GridPagingState
-	hiddenColumns: DataGridHiddenColumnsStateStore
-	filterArtifacts: DataGridFilterArtifactStore
-	orderDirections: DataGridOrderDirectionStore
-	layout: DataGridLayout
-
-	/**
-	 * constructed structs
-	 */
-	orderBy: OrderBy
-	filter: Filter
-}
-
-export interface DataGridStateMethods {
-	setIsColumnHidden: DataGridSetIsColumnHidden
-	setOrderBy: DataGridSetColumnOrderBy
-	setFilter: DataGridSetColumnFilter
-	updatePaging: DispatchChangePage
-	setLayout: SetDataGridView
-}

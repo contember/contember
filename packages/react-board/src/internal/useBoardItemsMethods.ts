@@ -1,4 +1,3 @@
-import { BoardAddItemMethod, BoardColumnValue, BoardMethods, BoardMoveItemMethod, BoardRemoveItemMethod } from '../BoardBindingProps'
 import { useCallback, useMemo } from 'react'
 import {
 	BatchUpdatesOptions,
@@ -10,6 +9,7 @@ import {
 } from '@contember/react-binding'
 import { BoardColumnKey, UseGroupItemsByColumn } from './useGroupItemsByColumn'
 import { arrayMove } from '../utils/arrayMove'
+import { BoardAddItemMethod, BoardColumnValue, BoardMethods, BoardMoveItemMethod, BoardRemoveItemMethod } from '../types'
 
 
 export type UseBoardItemsMethodsProps<ColumnValue extends BoardColumnValue> = {

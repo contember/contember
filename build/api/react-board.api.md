@@ -4,9 +4,9 @@
 
 ```ts
 
-import { ComponentType } from 'react';
-import { EntityAccessor } from '@contember/react-binding';
-import { EntityListAccessor } from '@contember/react-binding';
+import { Context } from 'react';
+import { EntityAccessor } from '@contember/binding';
+import { JSX as JSX_2 } from 'react/jsx-runtime';
 import { NamedExoticComponent } from 'react';
 import { ReactNode } from 'react';
 import { SugaredQualifiedEntityList } from '@contember/react-binding';
@@ -15,36 +15,50 @@ import { SugaredRelativeSingleEntity } from '@contember/react-binding';
 import { SugaredRelativeSingleField } from '@contember/react-binding';
 
 // @public (undocumented)
+export const Board: NamedExoticComponent<BoardProps>;
+
+// @public (undocumented)
 export type BoardAddColumnMethod = (index: number | undefined, preprocess?: EntityAccessor.BatchUpdatesHandler) => void;
 
 // @public (undocumented)
 export type BoardAddItemMethod<ColumnValue extends BoardColumnValue> = (column: ColumnValue | null, index: number | undefined, preprocess?: EntityAccessor.BatchUpdatesHandler) => void;
 
 // @public (undocumented)
-export type BoardBaseProps<RendererExtraProps> = (BoardQualifiedDynamicProps | BoardRelativeDynamicProps | BoardQualifiedStaticProps | BoardRelativeStaticProps) & RendererExtraProps;
+export const BoardColumn: ({}: {
+    children: ReactNode;
+}) => null;
 
 // @public (undocumented)
-export type BoardBindingProps<ColumnValue extends BoardColumnValue> = {
-    columns: BoardColumn<ColumnValue>[];
-} & BoardMethods<ColumnValue>;
+export const BoardColumnLabel: () => ReactNode;
 
 // @public (undocumented)
-export type BoardColumn<ColumnValue extends BoardColumnValue = BoardColumnValue> = {
+export type BoardColumnNode<ColumnValue extends BoardColumnValue = BoardColumnValue> = {
     id: string | number;
     index: number;
     value: ColumnValue | null;
-    items: BoardItem[];
+    items: BoardItemNode[];
 };
+
+// @internal (undocumented)
+export const BoardColumnsContext: Context<BoardColumnNode[]>;
 
 // @public (undocumented)
 export type BoardColumnValue = BoardStaticColumnValue | EntityAccessor;
 
 // @public (undocumented)
-export type BoardCommonProps = BoardNullBehaviourProps & {
+export type BoardCommonProps = {
     children: ReactNode;
     sortableBy?: string | SugaredRelativeSingleField;
     sortScope?: 'column' | 'board';
 };
+
+// @internal (undocumented)
+export const BoardCurrentColumnContext: Context<BoardColumnNode>;
+
+// @internal (undocumented)
+export const BoardCurrentItemContext: Context<BoardItemNode & {
+column: BoardColumnNode;
+}>;
 
 // @public (undocumented)
 export type BoardDynamicColumnsBindingProps = {
@@ -54,14 +68,42 @@ export type BoardDynamicColumnsBindingProps = {
 };
 
 // @public (undocumented)
-export type BoardItem = {
+export const BoardEachColumn: {
+    ({ children }: {
+        children: ReactNode;
+    }): (JSX_2.Element | null)[];
+    staticRender({ children }: {
+        children: ReactNode;
+    }): JSX_2.Element;
+};
+
+// @public (undocumented)
+export const BoardEachItem: {
+    ({ children }: {
+        children: ReactNode;
+    }): JSX_2.Element[];
+    staticRender({ children }: {
+        children: ReactNode;
+    }): JSX_2.Element;
+};
+
+// @public (undocumented)
+export const BoardItem: {
+    ({}: {
+        children: ReactNode;
+    }): null;
+    staticRender(): null;
+};
+
+// @public (undocumented)
+export type BoardItemNode = {
     id: string | number;
     index: number;
     value: EntityAccessor;
 };
 
 // @public (undocumented)
-export type BoardMethods<ColumnValue extends BoardColumnValue> = {
+export type BoardMethods<ColumnValue extends BoardColumnValue = BoardColumnValue> = {
     moveColumn?: BoardMoveColumnMethod;
     addColumn?: BoardAddColumnMethod;
     removeColumn?: BoardRemoveColumnMethod;
@@ -70,6 +112,9 @@ export type BoardMethods<ColumnValue extends BoardColumnValue> = {
     removeItem?: BoardRemoveItemMethod;
 };
 
+// @internal (undocumented)
+export const BoardMethodsContext: Context<BoardMethods<any>>;
+
 // @public (undocumented)
 export type BoardMoveColumnMethod = (entity: EntityAccessor, index: number) => void;
 
@@ -77,13 +122,19 @@ export type BoardMoveColumnMethod = (entity: EntityAccessor, index: number) => v
 export type BoardMoveItemMethod<ColumnValue extends BoardColumnValue> = (entity: EntityAccessor, column: ColumnValue | null, index: number) => void;
 
 // @public (undocumented)
-export type BoardNullBehaviourProps = {
-    nullColumn?: 'never' | 'always' | 'auto';
-    nullColumnPlacement?: 'start' | 'end';
-};
+export const BoardNullColumn: ({ children, hideEmpty }: BoardNullColumnProps) => JSX_2.Element | null;
 
 // @public (undocumented)
 export const BoardNullColumnPlaceholder = "__null_column";
+
+// @public (undocumented)
+export type BoardNullColumnProps = {
+    children: ReactNode;
+    hideEmpty?: boolean;
+};
+
+// @public (undocumented)
+export type BoardProps = BoardQualifiedDynamicProps | BoardRelativeDynamicProps | BoardQualifiedStaticProps | BoardRelativeStaticProps;
 
 // @public (undocumented)
 export type BoardQualifiedDynamicProps = BoardCommonProps & BoardDynamicColumnsBindingProps & BoardQualifiedItemsProps;
@@ -125,31 +176,18 @@ export type BoardStaticColumnValue = {
 };
 
 // @public (undocumented)
-export const createBoard: <RendererExtraProps extends {}>({ Renderer, ItemStaticRender, ColumnStaticRender }: CreateBoardArgs<RendererExtraProps>) => NamedExoticComponent<BoardBaseProps<RendererExtraProps>>;
+export const useBoardColumns: <T extends BoardColumnValue = BoardColumnValue>() => BoardColumnNode<T>[];
 
 // @public (undocumented)
-export type CreateBoardArgs<T extends {}> = {
-    Renderer: ComponentType<BoardBindingProps<any> & T>;
-    ItemStaticRender?: ComponentType<T>;
-    ColumnStaticRender?: ComponentType<T>;
+export const useBoardCurrentColumn: () => BoardColumnNode;
+
+// @public (undocumented)
+export const useBoardCurrentItem: () => BoardItemNode & {
+    column: BoardColumnNode;
 };
 
 // @public (undocumented)
-export const useDynamicBoard: ({ sortableBy, sortScope, columnsSortableBy, discriminationField, columnEntities, itemEntities, nullColumnPlacement, nullColumn, }: UseDynamicBoardBindingProps) => BoardBindingProps<EntityAccessor>;
-
-// @public (undocumented)
-export type UseDynamicBoardBindingProps = Omit<BoardCommonProps, 'children'> & BoardDynamicColumnsBindingProps & {
-    columnEntities: EntityListAccessor;
-    itemEntities: EntityListAccessor;
-};
-
-// @public (undocumented)
-export const useStaticBoard: ({ sortableBy, sortScope, columns, discriminationField, itemEntities, nullColumnPlacement, nullColumn, }: UseStaticBoardBindingProps) => BoardBindingProps<BoardStaticColumnValue>;
-
-// @public (undocumented)
-export type UseStaticBoardBindingProps = Omit<BoardCommonProps, 'children'> & BoardStaticColumnsBindingProps & {
-    itemEntities: EntityListAccessor;
-};
+export const useBoardMethods: <T extends BoardColumnValue = BoardColumnValue>() => BoardMethods<T>;
 
 // (No @packageDocumentation comment for this package)
 

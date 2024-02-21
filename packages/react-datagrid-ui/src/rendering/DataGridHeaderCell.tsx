@@ -1,14 +1,19 @@
 import { useEnvironment } from '@contember/react-binding'
-import { ActionableBox, Box, Dropdown, DropdownProps, Icon, TableHeaderCell } from '@contember/ui'
+import { ActionableBox, Box, Dropdown, DropdownProps, TableHeaderCell } from '@contember/ui'
 import { createElement, ReactElement, useCallback, useMemo } from 'react'
 import { DataGridColumnProps } from '@contember/react-datagrid'
-import { DataGridColumnPublicProps, DataGridRenderingCommonProps } from '../types'
+import { DataGridColumnPublicProps } from '../types'
 import { Serializable } from '@contember/react-utils'
 import { ChevronDownIcon, ChevronUpIcon, FilterIcon } from 'lucide-react'
+import {
+	useDataViewFilteringMethods,
+	useDataViewFilteringState,
+	useDataViewSortingMethods,
+	useDataViewSortingState,
+} from '@contember/react-dataview'
 
 
 export type DataGridHeaderCellProps =
-	& DataGridRenderingCommonProps
 	& {
 		columnKey: string
 		column: DataGridColumnProps<Serializable, DataGridColumnPublicProps>
@@ -18,9 +23,9 @@ export function DataGridHeaderCell(props: DataGridHeaderCellProps): ReactElement
 	const {
 		columnKey,
 		column: { header, headerJustification, justification, shrunk, ascOrderIcon, descOrderIcon },
-		stateMethods: { setOrderBy },
-		desiredState: { orderDirections },
 	} = props
+	const orderDirections = useDataViewSortingState().directions
+	const { setOrderBy } = useDataViewSortingMethods()
 	const orderDirection = orderDirections[columnKey]
 	const orderColumns = Object.keys(orderDirections)
 	const orderState = orderDirection ? {
@@ -54,7 +59,6 @@ const defaultAscIcon = <ChevronUpIcon />
 const defaultDescIcon = <ChevronDownIcon />
 
 export type DataGridHeaderCellFilterDropdownProps =
-	& DataGridRenderingCommonProps
 	& {
 		columnKey: string
 		column: DataGridColumnProps<Serializable, DataGridColumnPublicProps>
@@ -62,7 +66,9 @@ export type DataGridHeaderCellFilterDropdownProps =
 
 export const DataGridHeaderCellFilterDropdown = (props: DataGridHeaderCellFilterDropdownProps) => {
 	const environment = useEnvironment()
-	const filterArtifact = props.desiredState.filterArtifacts[props.columnKey]
+	const filterArtifact = useDataViewFilteringState().artifact[props.columnKey]
+	const { setFilter: setFilterInner } = useDataViewFilteringMethods()
+
 	const hasFilter = props.column.enableFiltering
 		&& filterArtifact !== undefined
 		&& props.column.getNewFilter(filterArtifact, { environment }) !== undefined
@@ -79,8 +85,8 @@ export const DataGridHeaderCellFilterDropdown = (props: DataGridHeaderCellFilter
 	}), [hasFilter])
 
 	const setFilter = useCallback((filter: Serializable | undefined) => {
-		props.stateMethods.setFilter(props.columnKey, filter)
-	}, [props.columnKey, props.stateMethods])
+		setFilterInner(props.columnKey, filter)
+	}, [props.columnKey, setFilterInner])
 
 	if (props.column.enableFiltering === false) {
 		return null

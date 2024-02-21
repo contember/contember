@@ -45,6 +45,7 @@
 		"@contember/react-choice-field": "workspace:*",
 		"@contember/react-choice-field-ui": "workspace:*",
 		"@contember/react-datagrid": "workspace:*",
+		"@contember/react-dataview": "workspace:*",
 		"@contember/react-i18n": "workspace:*",
 		"@contember/react-utils": "workspace:*",
 		"@contember/ui": "workspace:*",

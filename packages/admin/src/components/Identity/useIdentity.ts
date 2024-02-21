@@ -1,10 +1,9 @@
-import { useContext } from 'react'
-import { Identity, IdentityContext } from './IdentityProvider'
+import { Identity, useIdentity as useOptionalIdentity } from '@contember/react-identity'
 
 export const useIdentity = (): Identity => {
-	const ctx = useContext(IdentityContext)
-	if (!ctx) {
+	const identity = useOptionalIdentity()
+	if (!identity) {
 		throw new Error('Identity context is not initialized')
 	}
-	return ctx.identity
+	return identity
 }

@@ -41,10 +41,10 @@ export const ContainerWidthContext: Context<number | null | undefined>;
 export type ContainerWidthContextType = number;
 
 // @public (undocumented)
-export function createNonNullableContextFactory<T>(displayName: string, initialValue?: T): [Context<T>, () => NonNullable<T>];
+export function createContext<T>(name: string, initialValue: T): [Context<T>, () => T];
 
 // @public (undocumented)
-export function createOptionalContextFactory<T>(name: string, initialValue: T): [Context<T>, () => T];
+export function createRequiredContext<T>(displayName: string): [Context<T>, () => T];
 
 // @public (undocumented)
 export const DebugChildren: NamedExoticComponent<DebugChildrenProps>;

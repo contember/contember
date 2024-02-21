@@ -37,7 +37,8 @@
 		"admin:pw:test": "yarn workspace @contember/admin run pw:test",
 		"admin:pw:update": "yarn workspace @contember/admin run pw:update",
 		"vite": "cd packages/admin-sandbox && yarn run start",
-		"as:build": "yarn workspace @contember/admin-server run build"
+		"as:build": "yarn workspace @contember/admin-server run build",
+		"plaground:generate-client": "yarn run --silent contember project:print-schema playground --format=schema | tsx ./packages/client-content-generator/src/generate.ts - ./packages/playground/api/client/"
 	},
 	"devDependencies": {
 		"@microsoft/api-extractor": "^7.39.0",

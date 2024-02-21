@@ -86,6 +86,7 @@ describe('Pages', () => {
 	it('support pageMap with path as key and as LazyPageModule as value', () => {
 		const pages = (
 			<Pages
+				suspenseFallback={<div>Loading...</div>}
 				children={{
 					'./pages/foo.tsx': async () => {
 						return {
@@ -103,21 +104,13 @@ describe('Pages', () => {
 		)
 
 		expectRequest(pages, { pageName: 'foo', parameters: {}, dimensions: {} }).toMatchInlineSnapshot(`
-			<div
-			  class="cui-aether cui-spinner-overlay"
-			>
-			  <div
-			    class="cui-spinner"
-			  />
+			<div>
+			  Loading...
 			</div>
 		`)
 		expectRequest(pages, { pageName: 'bar', parameters: {}, dimensions: {} }).toMatchInlineSnapshot(`
-			<div
-			  class="cui-aether cui-spinner-overlay"
-			>
-			  <div
-			    class="cui-spinner"
-			  />
+			<div>
+			  Loading...
 			</div>
 		`)
 	})

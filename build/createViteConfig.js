@@ -25,7 +25,6 @@ export function createViteConfig(packageName) {
 			build: {
 				lib: {
 					entry,
-					formats: ['es', 'cjs'],
 				},
 				minify: false,
 				outDir: resolve(rootDirectory, `${packagePath}/dist/${mode}`),

@@ -23,7 +23,7 @@ export const createEnvironment: ({ model, role, pageConfig }: {
     role: string;
     model: Model.Schema;
     pageConfig: PageConfig;
-}) => Environment;
+}) => Environment<Environment.AnyNode | undefined>;
 
 // @public (undocumented)
 export const createNode: (value: any) => ReactNode[];

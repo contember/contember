@@ -81,11 +81,9 @@ export type AutoLabelProps = {
 // @public (undocumented)
 export interface InnerLinkProps {
     // (undocumented)
-    active: boolean;
+    href?: string;
     // (undocumented)
-    href: string;
-    // (undocumented)
-    onClick: (e?: MouseEvent_2<HTMLAnchorElement>) => void;
+    onClick?: (e?: MouseEvent_2<HTMLAnchorElement>) => void;
 }
 
 // @public (undocumented)

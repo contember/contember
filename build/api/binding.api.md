@@ -161,11 +161,11 @@ export class EntityAccessor implements Errorable {
     // (undocumented)
     batchUpdates(performUpdates: EntityAccessor.BatchUpdatesHandler): void;
     // (undocumented)
-    connectEntityAtField(field: FieldName, entityToConnect: EntityAccessor): void;
+    connectEntityAtField(field: SugaredRelativeSingleEntity | string, entityToConnect: EntityAccessor): void;
     // (undocumented)
     deleteEntity(): void;
     // (undocumented)
-    disconnectEntityAtField(field: FieldName, initializeReplacement?: EntityAccessor.BatchUpdatesHandler): void;
+    disconnectEntityAtField(field: SugaredRelativeSingleEntity | string, initializeReplacement?: EntityAccessor.BatchUpdatesHandler): void;
     // (undocumented)
     readonly environment: Environment;
     // (undocumented)
@@ -486,9 +486,9 @@ export class EntitySubTreeMarker {
 }
 
 // @public (undocumented)
-export class Environment {
+export class Environment<Node extends Environment.AnyNode | undefined = Environment.AnyNode | undefined> {
     // (undocumented)
-    static create(): Environment;
+    static create(): Environment<Environment.AnyNode | undefined>;
     // (undocumented)
     getAllDimensions(): Environment.SelectedDimensions;
     // (undocumented)
@@ -512,7 +512,7 @@ export class Environment {
     // (undocumented)
     getSubTree(): Environment.SubTreeNode;
     // (undocumented)
-    getSubTreeNode(): Environment.AnyNode;
+    getSubTreeNode(): Node & Environment.AnyNode;
     // @deprecated (undocumented)
     getValue<V extends Environment.Value = Environment.Value>(key: string): V;
     // @deprecated (undocumented)
@@ -542,9 +542,9 @@ export class Environment {
     // (undocumented)
     withSchema(schema: Schema): Environment;
     // (undocumented)
-    withSubTree(SubTree: Environment.SubTreeNode): Environment;
+    withSubTree<Node extends Environment.SubTreeNode>(SubTree: Node): Environment<Node>;
     // (undocumented)
-    withSubTreeChild(node: Environment.InnerNode): Environment;
+    withSubTreeChild<Node extends Environment.InnerNode>(node: Node): Environment<Node>;
     // (undocumented)
     withVariables(variables: Environment.ValuesMapWithFactory | undefined): Environment;
 }
@@ -598,13 +598,13 @@ export namespace Environment {
     // (undocumented)
     export type Name = string;
     // (undocumented)
-    export interface Options {
+    export interface Options<Node extends AnyNode | undefined> {
         // (undocumented)
         dimensions: SelectedDimensions;
         // (undocumented)
         extensions: Map<Extension<unknown, unknown>, unknown>;
         // (undocumented)
-        node?: AnyNode;
+        node?: Node;
         // (undocumented)
         parameters: Parameters;
         // (undocumented)
@@ -1861,7 +1861,7 @@ export class TreeAugmenter {
 // @public (undocumented)
 export class TreeNodeEnvironmentFactory {
     // (undocumented)
-    static createEnvironmentForEntity(environment: Environment, sugaredRelativeSingleEntity: SugaredRelativeSingleEntity): Environment;
+    static createEnvironmentForEntity(environment: Environment, sugaredRelativeSingleEntity: SugaredRelativeSingleEntity): Environment<Environment.AnyNode | undefined>;
     // (undocumented)
     static createEnvironmentForEntityList(environment: Environment, sugaredRelativeEntityList: SugaredRelativeEntityList): Environment;
     // (undocumented)
@@ -1869,7 +1869,11 @@ export class TreeNodeEnvironmentFactory {
     // (undocumented)
     static createEnvironmentForEntitySubtree(environment: Environment, sugaredEntityList: SugaredQualifiedSingleEntity | SugaredUnconstrainedQualifiedSingleEntity): Environment;
     // (undocumented)
-    static createEnvironmentForField(environment: Environment, sugaredRelativeSingleField: SugaredRelativeSingleField): Environment;
+    static createEnvironmentForField(environment: Environment, sugaredRelativeSingleField: SugaredRelativeSingleField): Environment<{
+        type: "column";
+        entity: SchemaEntity;
+        field: SchemaColumn;
+    }>;
 }
 
 // @public (undocumented)

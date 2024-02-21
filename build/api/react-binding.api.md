@@ -35,7 +35,7 @@ import type { RelativeEntityList } from '@contember/binding';
 import type { RelativeSingleEntity } from '@contember/binding';
 import { RelativeSingleField } from '@contember/binding';
 import type { SugaredParentEntityParameters } from '@contember/binding';
-import type { SugaredQualifiedEntityList } from '@contember/binding';
+import { SugaredQualifiedEntityList } from '@contember/binding';
 import type { SugaredQualifiedSingleEntity } from '@contember/binding';
 import type { SugaredRelativeEntityList } from '@contember/binding';
 import type { SugaredRelativeSingleEntity } from '@contember/binding';
@@ -221,6 +221,9 @@ export interface EntityListSubTreeAdditionalProps {
 }
 
 // @public (undocumented)
+export type EntityListSubTreeLoaderState = 'initial' | 'refreshing' | 'loaded';
+
+// @public (undocumented)
 export type EntityListSubTreeProps<ListProps, EntityProps> = {
     treeRootId?: TreeRootId;
     children?: ReactNode;
@@ -278,7 +281,7 @@ export interface EnvironmentAwareFunctionComponent<P> {
 }
 
 // @public (undocumented)
-export const EnvironmentContext: Context<Environment>;
+export const EnvironmentContext: Context<Environment<Environment.AnyNode | undefined>>;
 
 // @public (undocumented)
 export interface EnvironmentDeltaProvider<Props extends {} = any> {
@@ -677,6 +680,16 @@ export function useEntityList(sugaredRelativeEntityList: string | SugaredRelativ
 // @public (undocumented)
 export const useEntityListSubTree: (qualifiedEntityList: Alias | SugaredQualifiedEntityList | SugaredUnconstrainedQualifiedEntityList, ...treeId: [TreeRootId | undefined] | [
 ]) => EntityListAccessor;
+
+// @public (undocumented)
+export const useEntityListSubTreeLoader: <State>(entities: SugaredQualifiedEntityList | undefined, children: ReactNode, state?: State | undefined) => [UseEntityListSubTreeLoaderResult<State>, EntityListSubTreeLoaderState];
+
+// @public (undocumented)
+export type UseEntityListSubTreeLoaderResult<State> = {
+    entities: SugaredQualifiedEntityList | undefined;
+    treeRootId: TreeRootId | undefined;
+    state: State | undefined;
+};
 
 // @public (undocumented)
 export function useEntityListSubTreeParameters(alias: Alias): Alias;

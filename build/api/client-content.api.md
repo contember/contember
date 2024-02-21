@@ -7,6 +7,7 @@
 import { GraphQlClient } from '@contember/graphql-client';
 import { GraphQlClientRequestOptions } from '@contember/graphql-client';
 import { GraphQlFieldTypedArgs } from '@contember/graphql-builder';
+import { GraphQlFragment } from '@contember/graphql-builder';
 import { GraphQlSelectionSet } from '@contember/graphql-builder';
 import { Input } from '@contember/schema';
 import { JSONObject } from '@contember/schema';
@@ -390,6 +391,9 @@ export type MutationError = {
     readonly message: string;
     readonly type: Result.ExecutionErrorType;
 };
+
+// @public (undocumented)
+export const mutationFragments: Record<string, GraphQlFragment>;
 
 // @public (undocumented)
 export type MutationResult<Value = unknown> = {

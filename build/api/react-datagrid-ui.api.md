@@ -5,33 +5,34 @@
 ```ts
 
 import { BooleanCellRendererProps } from '@contember/react-datagrid';
-import { BooleanFilterArtifacts } from '@contember/react-datagrid';
+import { BooleanFilterArtifacts } from '@contember/react-dataview';
 import { CoalesceCellRendererProps } from '@contember/react-datagrid';
 import { CoalesceFieldViewProps } from '@contember/react-binding-ui';
-import { CoalesceTextFilterArtifacts } from '@contember/react-datagrid';
+import { CoalesceTextFilterArtifacts } from '@contember/react-dataview';
 import { ComponentType } from 'react';
-import { ControlledDataGridProps } from '@contember/react-datagrid';
 import { DataGridColumnCommonProps } from '@contember/react-datagrid';
 import { DataGridColumnProps } from '@contember/react-datagrid';
-import { DataGridOrderDirection } from '@contember/react-datagrid';
+import { DataGridColumns } from '@contember/react-datagrid';
 import { DataGridProps } from '@contember/react-datagrid';
-import { DataGridRendererInnerProps } from '@contember/react-datagrid';
-import { DataGridRendererProps } from '@contember/react-datagrid';
+import { DataViewInfo } from '@contember/react-dataview';
+import { DataViewMethods } from '@contember/react-dataview';
+import { DataViewSortingDirection } from '@contember/react-dataview';
+import { DataViewState } from '@contember/react-dataview';
 import { DateCellRendererProps } from '@contember/react-datagrid';
 import { DateFieldViewFormattingProps } from '@contember/react-binding-ui';
-import { DateRangeFilterArtifacts } from '@contember/react-datagrid';
+import { DateRangeFilterArtifacts } from '@contember/react-dataview';
 import { EmptyMessageProps } from '@contember/react-binding-ui';
 import { EntityAccessor } from '@contember/react-binding';
 import { EntityId } from '@contember/react-binding';
 import { EntityListBaseProps } from '@contember/react-binding';
-import { EnumCellFilterArtifacts } from '@contember/react-datagrid';
 import { EnumCellRendererProps } from '@contember/react-datagrid';
+import { EnumFilterArtifacts } from '@contember/react-dataview';
 import { FieldFallbackViewProps } from '@contember/react-binding-ui';
 import { FieldFallbackViewPublicProps } from '@contember/react-binding-ui';
 import { FieldValue } from '@contember/binding';
 import { FilterRendererProps } from '@contember/react-datagrid';
 import { FunctionComponent } from 'react';
-import { GenericTextCellFilterArtifacts } from '@contember/react-datagrid';
+import { GenericTextCellFilterArtifacts } from '@contember/react-dataview';
 import { HasManySelectProps } from '@contember/react-datagrid';
 import { HasOneSelectProps } from '@contember/react-datagrid';
 import { JSX as JSX_2 } from 'react/jsx-runtime';
@@ -42,19 +43,19 @@ import { NumberCellRendererProps } from '@contember/react-datagrid';
 import { NumberFilterArtifacts } from '@contember/react-datagrid';
 import { ReactElement } from 'react';
 import { ReactNode } from 'react';
-import { SelectCellArtifacts } from '@contember/react-datagrid';
+import { RelationFilterArtifacts } from '@contember/react-dataview';
 import { SelectCellFilterExtraProps } from '@contember/react-datagrid';
 import { Serializable } from '@contember/react-utils';
 import { SugarableRelativeSingleField } from '@contember/react-binding';
 import { SugaredRelativeEntityList } from '@contember/binding';
 import { SugaredRelativeSingleField } from '@contember/react-binding';
 import { TextCellRendererProps } from '@contember/react-datagrid';
-import { TextFilterArtifacts } from '@contember/react-datagrid';
+import { TextFilterArtifacts } from '@contember/react-dataview';
 
 // @public
 export const BooleanCell: FunctionComponent<DataGridColumnCommonProps & BooleanCellRendererProps & {
 disableOrder?: boolean | undefined;
-initialOrder?: DataGridOrderDirection | undefined;
+initialOrder?: DataViewSortingDirection | undefined;
 initialFilter?: BooleanFilterArtifacts | undefined;
 } & DataGridCellPublicProps & DataGridHeaderCellPublicProps & {
 field: string | SugaredRelativeSingleField;
@@ -71,25 +72,21 @@ initialFilter?: CoalesceTextFilterArtifacts | undefined;
 } & DataGridCellPublicProps & DataGridHeaderCellPublicProps & CoalesceFieldViewProps<FieldValue>>;
 
 // @public
-export const ControlledDataGrid: NamedExoticComponent<ControlledDataGridProps<Omit<DataGridContainerPublicProps, keyof DataGridRendererProps<any>>>>;
-
-// @public (undocumented)
-export const createDataGridContainer: <HeaderProps extends {}, ContentProps extends {}, FooterProps extends {}>({ Header, Content, Footer }: {
-    Header: ComponentType<HeaderProps & DataGridRenderingCommonProps>;
-    Content: ComponentType<ContentProps & DataGridRenderingCommonProps>;
-    Footer: ComponentType<FooterProps & DataGridRenderingCommonProps>;
-}) => NamedExoticComponent<HeaderProps & ContentProps & FooterProps & DataGridRenderingCommonProps>;
-
-// @public (undocumented)
-export const createDataGridContent: <TableProps extends {}, GridProps extends {
-    tile?: ReactNode;
-} = DataGridTilesPublicProps>({ Table, Grid }: {
-    Table: ComponentType<TableProps & DataGridRenderingCommonProps>;
-    Grid: ComponentType<GridProps & DataGridRenderingCommonProps>;
-}) => ComponentType<TableProps & GridProps & DataGridRenderingCommonProps>;
+export const ControlledDataGrid: NamedExoticComponent<    {
+state: DataViewState;
+methods: DataViewMethods;
+info: DataViewInfo;
+columns: DataGridColumns<any>;
+} & DataGridLayoutControlPublicProps & DataGridColumnHidingPublicProps & DataGridFullFiltersPublicProps & {
+emptyMessage?: ReactNode;
+emptyMessageComponent?: ComponentType<any> | undefined;
+} & DataGridTableRowPublicProps & DataGridTilesPublicProps>;
 
 // @public
-export const DataGrid: ComponentType<DataGridProps<Omit<DataGridContainerPublicProps, keyof DataGridRendererProps<any>>>>;
+export const DataGrid: ComponentType<DataGridProps<DataGridLayoutControlPublicProps & DataGridColumnHidingPublicProps & DataGridFullFiltersPublicProps & {
+emptyMessage?: ReactNode;
+emptyMessageComponent?: ComponentType<any> | undefined;
+} & DataGridTableRowPublicProps & DataGridTilesPublicProps>>;
 
 // @public (undocumented)
 export interface DataGridCellPublicProps {
@@ -138,10 +135,10 @@ export const dataGridCellsDictionary: {
 };
 
 // @public (undocumented)
-export const DataGridColumnHiding: ({ desiredState, displayedState, stateMethods: { setIsColumnHidden }, allowColumnVisibilityControls, }: DataGridColumnHidingProps) => ReactElement | null;
+export const DataGridColumnHiding: ({ allowColumnVisibilityControls, }: DataGridColumnHidingProps) => ReactElement | null;
 
 // @public (undocumented)
-export type DataGridColumnHidingProps = DataGridRenderingCommonProps & DataGridColumnHidingPublicProps;
+export type DataGridColumnHidingProps = DataGridColumnHidingPublicProps;
 
 // @public (undocumented)
 export type DataGridColumnHidingPublicProps = {
@@ -155,19 +152,22 @@ export type DataGridColumnPublicProps = DataGridCellPublicProps & DataGridHeader
 export const DataGridContainer: NamedExoticComponent<DataGridLayoutControlPublicProps & DataGridColumnHidingPublicProps & DataGridFullFiltersPublicProps & {
 emptyMessage?: ReactNode;
 emptyMessageComponent?: ComponentType<any> | undefined;
-} & DataGridTableRowPublicProps & EntityListBaseProps & DataGridTilesPublicProps & DataGridRenderingCommonProps>;
+} & DataGridTableRowPublicProps & DataGridTilesPublicProps>;
 
 // @public (undocumented)
-export type DataGridContainerProps = typeof DataGridContainer extends ComponentType<infer P> ? P : never;
+export type DataGridContainerProps = DataGridContainerPublicProps;
 
 // @public (undocumented)
-export type DataGridContainerPublicProps = Omit<DataGridContainerProps, keyof DataGridRenderingCommonProps>;
+export type DataGridContainerPublicProps = DataGridHeaderPublicProps & DataGridContentPublicProps & DataGridFooterPublicProps;
 
 // @public (undocumented)
-export const DataGridContent: ComponentType<{
-    emptyMessage?: ReactNode;
-    emptyMessageComponent?: ComponentType<any> | undefined;
-} & DataGridTableRowPublicProps & EntityListBaseProps & DataGridTilesPublicProps & DataGridRenderingCommonProps>;
+export const DataGridContent: (props: DataGridContentProps) => JSX_2.Element;
+
+// @public (undocumented)
+export type DataGridContentProps = DataGridContentPublicProps;
+
+// @public (undocumented)
+export type DataGridContentPublicProps = DataGridTablePublicProps & DataGridTilesPublicProps;
 
 // @public (undocumented)
 export type DataGridDictionary = typeof dataGridDictionary;
@@ -217,19 +217,19 @@ export const dataGridDictionary: {
 };
 
 // @public (undocumented)
-export const DataGridFooter: NamedExoticComponent<DataGridRenderingCommonProps>;
+export const DataGridFooter: NamedExoticComponent<DataGridFooterPublicProps>;
 
 // @public (undocumented)
-export type DataGridFooterProps = DataGridFooterPublicProps & DataGridRenderingCommonProps;
+export type DataGridFooterProps = DataGridFooterPublicProps;
 
 // @public (undocumented)
 export type DataGridFooterPublicProps = {};
 
 // @public (undocumented)
-export function DataGridFullFilters({ desiredState, stateMethods, allowAggregateFilterControls, }: DataGridFullFiltersProps): ReactElement | null;
+export function DataGridFullFilters({ allowAggregateFilterControls, }: DataGridFullFiltersProps): ReactElement | null;
 
 // @public (undocumented)
-export type DataGridFullFiltersProps = DataGridRenderingCommonProps & DataGridFullFiltersPublicProps;
+export type DataGridFullFiltersProps = DataGridFullFiltersPublicProps;
 
 // @public (undocumented)
 export type DataGridFullFiltersPublicProps = {
@@ -246,13 +246,13 @@ export function DataGridHeaderCell(props: DataGridHeaderCellProps): ReactElement
 export const DataGridHeaderCellFilterDropdown: (props: DataGridHeaderCellFilterDropdownProps) => JSX_2.Element | null;
 
 // @public (undocumented)
-export type DataGridHeaderCellFilterDropdownProps = DataGridRenderingCommonProps & {
+export type DataGridHeaderCellFilterDropdownProps = {
     columnKey: string;
     column: DataGridColumnProps<Serializable, DataGridColumnPublicProps>;
 };
 
 // @public (undocumented)
-export type DataGridHeaderCellProps = DataGridRenderingCommonProps & {
+export type DataGridHeaderCellProps = {
     columnKey: string;
     column: DataGridColumnProps<Serializable, DataGridColumnPublicProps>;
 };
@@ -272,16 +272,16 @@ export interface DataGridHeaderCellPublicProps {
 }
 
 // @public (undocumented)
-export type DataGridHeaderProps = DataGridRenderingCommonProps & DataGridHeaderPublicProps;
+export type DataGridHeaderProps = DataGridHeaderPublicProps;
 
 // @public (undocumented)
 export type DataGridHeaderPublicProps = DataGridLayoutControlPublicProps & DataGridColumnHidingPublicProps & DataGridFullFiltersPublicProps;
 
 // @public (undocumented)
-export const DataGridLayoutControl: ({ stateMethods: { setLayout }, desiredState: { layout }, tile }: DataGridLayoutControlProps) => JSX_2.Element | null;
+export const DataGridLayoutControl: ({ tile }: DataGridLayoutControlProps) => JSX_2.Element | null;
 
 // @public (undocumented)
-export type DataGridLayoutControlProps = DataGridRenderingCommonProps & DataGridLayoutControlPublicProps;
+export type DataGridLayoutControlProps = DataGridLayoutControlPublicProps;
 
 // @public (undocumented)
 export type DataGridLayoutControlPublicProps = {
@@ -289,25 +289,16 @@ export type DataGridLayoutControlPublicProps = {
 };
 
 // @public (undocumented)
-export const DataGridPagingSummary: ({ pagingInfo, displayedState: { paging: { pageIndex } } }: DataGridPagingSummaryProps) => JSX_2.Element;
-
-// @public (undocumented)
-export type DataGridPagingSummaryProps = DataGridRenderingCommonProps;
-
-// @public (undocumented)
-export type DataGridRenderingCommonProps = DataGridRendererInnerProps<DataGridColumnPublicProps>;
+export const DataGridPagingSummary: () => JSX_2.Element;
 
 // @public (undocumented)
 export const DataGridTable: NamedExoticComponent<DataGridTableProps>;
 
 // @public (undocumented)
-export type DataGridTableHead = DataGridRenderingCommonProps;
+export const DataGridTableHead: () => JSX_2.Element;
 
 // @public (undocumented)
-export const DataGridTableHead: (props: DataGridTableHead) => JSX_2.Element;
-
-// @public (undocumented)
-export type DataGridTableProps = DataGridRenderingCommonProps & DataGridTablePublicProps & EntityListBaseProps;
+export type DataGridTableProps = DataGridTablePublicProps;
 
 // @public (undocumented)
 export type DataGridTablePublicProps = {
@@ -316,10 +307,10 @@ export type DataGridTablePublicProps = {
 } & DataGridTableRowPublicProps;
 
 // @public (undocumented)
-export const DataGridTableRow: ({ desiredState, displayedState, onEntityClick, isEntitySelected, selectedEntityIds }: DataGridTableRowProps) => JSX_2.Element;
+export const DataGridTableRow: ({ onEntityClick, isEntitySelected, selectedEntityIds }: DataGridTableRowProps) => JSX_2.Element;
 
 // @public (undocumented)
-export type DataGridTableRowProps = DataGridRenderingCommonProps & DataGridTableRowPublicProps;
+export type DataGridTableRowProps = DataGridTableRowPublicProps;
 
 // @public (undocumented)
 export type DataGridTableRowPublicProps = {
@@ -329,10 +320,10 @@ export type DataGridTableRowPublicProps = {
 };
 
 // @public (undocumented)
-export const DataGridTiles: MemoExoticComponent<({ accessor, tileSize, tile, emptyMessage, emptyMessageComponent }: DataGridTilesProps) => JSX_2.Element>;
+export const DataGridTiles: MemoExoticComponent<({ tileSize, tile, emptyMessage, emptyMessageComponent }: DataGridTilesProps) => JSX_2.Element>;
 
 // @public (undocumented)
-export type DataGridTilesProps = DataGridRenderingCommonProps & DataGridTilesPublicProps;
+export type DataGridTilesProps = DataGridTilesPublicProps;
 
 // @public (undocumented)
 export type DataGridTilesPublicProps = {
@@ -345,7 +336,7 @@ export type DataGridTilesPublicProps = {
 // @public
 export const DateCell: FunctionComponent<DateCellRendererProps & DataGridColumnCommonProps & {
 disableOrder?: boolean | undefined;
-initialOrder?: DataGridOrderDirection | undefined;
+initialOrder?: DataViewSortingDirection | undefined;
 initialFilter?: DateRangeFilterArtifacts | undefined;
 } & DataGridCellPublicProps & DataGridHeaderCellPublicProps & DateCellValueRendererProps>;
 
@@ -356,7 +347,7 @@ export type DateCellValueRendererProps = DateCellRendererProps & DateFieldViewFo
 export const EnumCell: FunctionComponent<DataGridColumnCommonProps & EnumCellRendererProps & {
 options: Record<string, string>;
 format?: ((value: string | null) => ReactNode) | undefined;
-initialFilter?: EnumCellFilterArtifacts | undefined;
+initialFilter?: EnumFilterArtifacts | undefined;
 } & DataGridCellPublicProps & DataGridHeaderCellPublicProps & FieldFallbackViewProps & {
 format?: ((value: string | null) => ReactNode) | undefined;
 } & NullConditionFilterPublicProps & {
@@ -364,7 +355,7 @@ options: Record<string, string>;
 }>;
 
 // @public (undocumented)
-export const EnumCellFilter: ({ filter, setFilter, environment, field, options, showNullConditionFilter }: FilterRendererProps<EnumCellFilterArtifacts, EnumCellFilterExtraProps>) => JSX_2.Element;
+export const EnumCellFilter: ({ filter, setFilter, environment, field, options, showNullConditionFilter }: FilterRendererProps<EnumFilterArtifacts, EnumCellFilterExtraProps>) => JSX_2.Element;
 
 // @public (undocumented)
 export type EnumCellFilterExtraProps = NullConditionFilterPublicProps & EnumCellRendererProps & {
@@ -402,7 +393,7 @@ export const HasOneSelectCell: FunctionComponent<HasOneSelectProps & DataGridCel
 
 // @public (undocumented)
 export type NullConditionArtifacts = {
-    nullCondition: boolean;
+    nullCondition?: boolean;
 };
 
 // @public (undocumented)
@@ -421,7 +412,7 @@ export type NullConditionFilterPublicProps = {
 // @public
 export const NumberCell: FunctionComponent<DataGridColumnCommonProps & NumberCellRendererProps & {
 disableOrder?: boolean | undefined;
-initialOrder?: DataGridOrderDirection | undefined;
+initialOrder?: DataViewSortingDirection | undefined;
 initialFilter?: NumberFilterArtifacts | undefined;
 } & DataGridCellPublicProps & DataGridHeaderCellPublicProps & FieldFallbackViewProps & {
 format?: ((value: number | null) => ReactNode) | undefined;
@@ -442,12 +433,12 @@ export type NumberCellValueRendererProps = NumberCellRendererProps & FieldFallba
 export const SelectCellFilter: ({ filter, setFilter, options, allOptions, onSearch, isLoading }: SelectCellFilterProps) => JSX_2.Element;
 
 // @public (undocumented)
-export type SelectCellFilterProps = FilterRendererProps<SelectCellArtifacts> & SelectCellFilterExtraProps;
+export type SelectCellFilterProps = FilterRendererProps<RelationFilterArtifacts> & SelectCellFilterExtraProps;
 
 // @public
 export const TextCell: FunctionComponent<TextCellRendererProps & DataGridColumnCommonProps & {
 disableOrder?: boolean | undefined;
-initialOrder?: DataGridOrderDirection | undefined;
+initialOrder?: DataViewSortingDirection | undefined;
 initialFilter?: TextFilterArtifacts | undefined;
 } & DataGridCellPublicProps & DataGridHeaderCellPublicProps & FieldFallbackViewProps & {
 format?: ((value: string | null) => ReactNode) | undefined;

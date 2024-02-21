@@ -4,64 +4,153 @@
 
 ```ts
 
-import { BoardBaseProps } from '@contember/react-board';
-import { BoardBindingProps } from '@contember/react-board';
-import { BoardColumn } from '@contember/react-board';
-import { BoardItem } from '@contember/react-board';
-import { BoardMethods } from '@contember/react-board';
-import { default as React_2 } from 'react';
+/// <reference types="react" />
+
+import { Active } from '@dnd-kit/core';
+import { BoardColumnNode } from '@contember/react-board';
+import { BoardItemNode } from '@contember/react-board';
+import { BoardNullColumnProps } from '@contember/react-board';
+import { ClientRect as ClientRect_2 } from '@dnd-kit/core';
+import { Context } from 'react';
+import { DraggableAttributes } from '@dnd-kit/core';
+import { JSX as JSX_2 } from 'react/jsx-runtime';
+import { MutableRefObject } from 'react';
+import { Over } from '@dnd-kit/core';
 import { ReactNode } from 'react';
-import { useSortable } from '@dnd-kit/sortable';
+import { SortableData } from '@dnd-kit/sortable';
+import { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities';
+import { Transform } from '@dnd-kit/utilities';
+import { UniqueIdentifier } from '@dnd-kit/core';
+
+// @internal (undocumented)
+export const BoardActiveColumnContext: Context<BoardColumnNode | undefined>;
+
+// @internal (undocumented)
+export const BoardActiveItemContext: Context<(BoardItemNode & {
+column: BoardColumnNode;
+}) | undefined>;
 
 // @public (undocumented)
-export type BoardColumnRendererProps = {
-    children?: ReactNode;
-    value?: BoardColumn;
-    dragOverlay?: boolean;
-    sortableProps?: UseSortableProps;
-    boardMethods?: BoardMethods<any>;
-    dropIndicator?: 'before' | 'after';
+export const BoardSortable: ({ children }: {
+    children: ReactNode;
+}) => JSX_2.Element;
+
+// @public (undocumented)
+export const BoardSortableActivator: ({ children }: {
+    children: ReactNode;
+}) => JSX_2.Element;
+
+// @public (undocumented)
+export const BoardSortableColumnDragOverlay: ({ children }: {
+    children: ReactNode;
+}) => JSX_2.Element | null;
+
+// @public (undocumented)
+export const BoardSortableColumnDropIndicator: ({ children, position }: {
+    children: ReactNode;
+    position: 'before' | 'after';
+}) => JSX_2.Element | null;
+
+// @public (undocumented)
+export const BoardSortableEachColumn: {
+    ({ children }: {
+        children: ReactNode;
+    }): JSX_2.Element;
+    staticRender({ children }: {
+        children: ReactNode;
+    }): JSX_2.Element;
 };
 
 // @public (undocumented)
-export type BoardDndKitRendererProps = BoardBindingProps<any>;
-
-// @public (undocumented)
-export type BoardItemRendererProps = {
-    value?: BoardItem;
-    dragOverlay?: boolean;
-    sortableProps?: UseSortableProps;
-    boardMethods?: BoardMethods<any>;
-    dropIndicator?: 'before' | 'after';
+export const BoardSortableEachItem: {
+    ({ children }: {
+        children: ReactNode;
+    }): JSX_2.Element;
+    staticRender({ children }: {
+        children: ReactNode;
+    }): JSX_2.Element;
 };
 
 // @public (undocumented)
-export const createBoardDndKit: <ColumnExtraProps extends {}, ItemExtraProps extends {}>({ Column, Item, Wrapper, usePortalProvider }: {
-    Wrapper: React_2.ComponentType<{
-        children: ReactNode;
-    }>;
-    Column: React_2.ComponentType<BoardColumnRendererProps & ColumnExtraProps>;
-    Item: React_2.ComponentType<BoardItemRendererProps & ItemExtraProps>;
-    usePortalProvider?: (() => Element | null) | undefined;
-}) => React_2.FunctionComponent<BoardBaseProps<ColumnExtraProps & ItemExtraProps>>;
+export const BoardSortableItemDragOverlay: ({ children }: {
+    children: ReactNode;
+}) => JSX_2.Element | null;
 
 // @public (undocumented)
-export const createBoardDndKitRenderer: <ColumnExtraProps extends {}, ItemExtraProps extends {}>({ Column, Item, Wrapper, usePortalProvider }: {
-    Wrapper: React_2.ComponentType<{
-        children: ReactNode;
-    }>;
-    Column: React_2.ComponentType<BoardColumnRendererProps & ColumnExtraProps>;
-    Item: React_2.ComponentType<BoardItemRendererProps & ItemExtraProps>;
-    usePortalProvider?: (() => Element | null) | undefined;
-}) => React_2.FunctionComponent<{
-    columns: BoardColumn<any>[];
-} & BoardMethods<any> & ColumnExtraProps & ItemExtraProps>;
+export const BoardSortableItemDropIndicator: ({ children, position }: {
+    children: ReactNode;
+    position: 'before' | 'after';
+}) => JSX_2.Element | null;
 
 // @public (undocumented)
-export type UseSortableProps = ReturnType<typeof useSortable>;
+export const BoardSortableNode: ({ children }: {
+    children: ReactNode;
+}) => JSX_2.Element;
 
+// @internal (undocumented)
+export const BoardSortableNodeContext: Context<    {
+active: Active | null;
+activeIndex: number;
+attributes: DraggableAttributes;
+data: SortableData & {
+[x: string]: any;
+};
+rect: MutableRefObject<ClientRect_2 | null>;
+index: number;
+newIndex: number;
+items: UniqueIdentifier[];
+isOver: boolean;
+isSorting: boolean;
+isDragging: boolean;
+listeners: SyntheticListenerMap | undefined;
+node: MutableRefObject<HTMLElement | null>;
+overIndex: number;
+over: Over | null;
+setNodeRef: (node: HTMLElement | null) => void;
+setActivatorNodeRef: (element: HTMLElement | null) => void;
+setDroppableNodeRef: (element: HTMLElement | null) => void;
+setDraggableNodeRef: (element: HTMLElement | null) => void;
+transform: Transform | null;
+transition: string | undefined;
+}>;
 
-export * from "@contember/react-board";
+// @public (undocumented)
+export const BoardSortableNullColumn: ({ children }: BoardNullColumnProps) => JSX_2.Element;
+
+// @public (undocumented)
+export const useBoardActiveColumn: () => BoardColumnNode | undefined;
+
+// @public (undocumented)
+export const useBoardActiveItem: () => (BoardItemNode & {
+    column: BoardColumnNode;
+}) | undefined;
+
+// @public (undocumented)
+export const useBoardSortableNode: () => {
+    active: Active | null;
+    activeIndex: number;
+    attributes: DraggableAttributes;
+    data: SortableData & {
+        [x: string]: any;
+    };
+    rect: MutableRefObject<ClientRect_2 | null>;
+    index: number;
+    newIndex: number;
+    items: UniqueIdentifier[];
+    isOver: boolean;
+    isSorting: boolean;
+    isDragging: boolean;
+    listeners: SyntheticListenerMap | undefined;
+    node: MutableRefObject<HTMLElement | null>;
+    overIndex: number;
+    over: Over | null;
+    setNodeRef: (node: HTMLElement | null) => void;
+    setActivatorNodeRef: (element: HTMLElement | null) => void;
+    setDroppableNodeRef: (element: HTMLElement | null) => void;
+    setDraggableNodeRef: (element: HTMLElement | null) => void;
+    transform: Transform | null;
+    transition: string | undefined;
+};
 
 // (No @packageDocumentation comment for this package)
 

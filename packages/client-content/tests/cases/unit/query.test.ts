@@ -1,10 +1,12 @@
 import { describe, expect, test } from 'vitest'
-import { createClient, qb } from './lib'
+import { createClient } from '../../lib'
 import { Input } from '@contember/schema'
 import OrderDirection = Input.OrderDirection;
+import { queryBuilder } from '../../client'
 
 describe('queries', () => {
 
+	const qb = queryBuilder
 	test('list', async () => {
 		const [client, calls] = createClient({
 			authors: [
@@ -37,6 +39,7 @@ describe('queries', () => {
 		expect(calls[0].query).toMatchInlineSnapshot(`
 			"query {
 				authors: listAuthor {
+					id
 					name
 					email
 				}
@@ -99,12 +102,13 @@ describe('queries', () => {
 		expect(calls[0].query).toMatchInlineSnapshot(`
 			"query {
 				authors: listAuthor {
+					id
 					name
 					email
 				}
 				posts: listPost {
-					title
-					content
+					id
+					publishedAt
 				}
 			}
 			"
@@ -140,8 +144,8 @@ describe('queries', () => {
 		expect(calls[0].query).toMatchInlineSnapshot(`
 			"query {
 				value: listPost {
-					title
-					content
+					id
+					publishedAt
 				}
 			}
 			"
@@ -159,12 +163,14 @@ describe('queries', () => {
 		expect(calls[0].query).toMatchInlineSnapshot(`
 			"query {
 				authors: listAuthor {
+					id
 					name
 					email
 					posts {
-						title
-						content
+						id
+						publishedAt
 						tags {
+							id
 							name
 						}
 					}
@@ -186,11 +192,12 @@ describe('queries', () => {
 		expect(calls[0].query).toMatchInlineSnapshot(`
 			"query($PostWhere_0: PostWhere, $Int_1: Int) {
 				authors: listAuthor {
+					id
 					name
 					email
 					posts(filter: $PostWhere_0, limit: $Int_1) {
-						title
-						content
+						id
+						publishedAt
 					}
 				}
 			}
@@ -225,6 +232,7 @@ describe('queries', () => {
 		expect(calls[0].query).toMatchInlineSnapshot(`
 			"query($AuthorWhere_0: AuthorWhere, $AuthorOrderBy_1: [AuthorOrderBy!], $Int_2: Int, $Int_3: Int) {
 				authors: listAuthor(filter: $AuthorWhere_0, orderBy: $AuthorOrderBy_1, limit: $Int_2, offset: $Int_3) {
+					id
 					name
 					email
 				}
@@ -254,13 +262,14 @@ describe('queries', () => {
 		const [client, calls] = createClient()
 		const result = await client.query({
 			authors: qb.get('Author', {
-				by: { id: 123 },
+				by: { id: 'ca7a9b84-efbb-435d-a063-da11f205335a' },
 			}, it => it.$$()),
 		})
 		expect(calls).toHaveLength(1)
 		expect(calls[0].query).toMatchInlineSnapshot(`
 			"query($AuthorUniqueWhere_0: AuthorUniqueWhere!) {
 				authors: getAuthor(by: $AuthorUniqueWhere_0) {
+					id
 					name
 					email
 				}
@@ -270,7 +279,7 @@ describe('queries', () => {
 		expect(calls[0].variables).toMatchInlineSnapshot(`
 			{
 			  "AuthorUniqueWhere_0": {
-			    "id": 123,
+			    "id": "ca7a9b84-efbb-435d-a063-da11f205335a",
 			  },
 			}
 		`)

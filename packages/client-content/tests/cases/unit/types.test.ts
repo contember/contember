@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { assertType, describe, expectTypeOf, test } from 'vitest'
-import { FragmentOf, qb, Schema } from './lib'
 import { ContentClientInput } from '../../../src'
+import { ContemberClientEntities, FragmentOf, queryBuilder } from '../../client'
 
+const qb = queryBuilder
 describe('ts types', () => {
 	test('fragment - valid', async () => {
 		expectTypeOf(
@@ -21,7 +22,7 @@ describe('ts types', () => {
 	test('where - valid', async () => {
 		qb.list('Post', {
 			filter: {
-				title: { eq: 'foo' },
+				publishedAt: { eq: 'foo' },
 			},
 		}, it => it.$$())
 	})
@@ -36,7 +37,7 @@ describe('ts types', () => {
 	})
 
 	test('where - invalid assignment to type', async () => {
-		const where: ContentClientInput.Where<Schema.Post> = {
+		const where: ContentClientInput.Where<ContemberClientEntities['Post']> = {
 			// @ts-expect-error
 			caption: { eq: 'foo' },
 		}
@@ -44,7 +45,7 @@ describe('ts types', () => {
 
 	test('where - valid extracted without a type', async () => {
 		const where = {
-			title: { eq: 'foo' },
+			publishedAt: { eq: 'foo' },
 		}
 		qb.list('Post', {
 			filter: where,
@@ -52,8 +53,8 @@ describe('ts types', () => {
 	})
 
 	test('where - valid extracted with a type', async () => {
-		const where: ContentClientInput.Where<Schema.Post> = {
-			title: { eq: 'foo' },
+		const where: ContentClientInput.Where<ContemberClientEntities['Post']> = {
+			publishedAt: { eq: 'foo' },
 		}
 		qb.list('Post', {
 			filter: where,
@@ -61,8 +62,8 @@ describe('ts types', () => {
 	})
 
 	test('where - incompatible types', async () => {
-		const where: ContentClientInput.Where<Schema.Post> = {
-			title: { eq: 'foo' },
+		const where: ContentClientInput.Where<ContemberClientEntities['Post']> = {
+			publishedAt: { eq: 'foo' },
 		}
 		qb.list('Author', {
 			// @ts-expect-error

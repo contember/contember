@@ -1,5 +1,8 @@
 import { describe, expect, test } from 'vitest'
-import { createClient, qb } from './lib'
+import { createClient } from '../../lib'
+import { queryBuilder } from '../../client'
+
+const qb = queryBuilder
 describe('mutations in trx', () => {
 	test('create trx', async () => {
 		const [client, calls] = createClient({
@@ -93,7 +96,7 @@ describe('mutations in trx', () => {
 				ok: true,
 				mut: {
 					ok: true,
-					node: { id: 123 },
+					node: { id: 'ca7a9b84-efbb-435d-a063-da11f205335a' },
 				},
 			},
 		})
@@ -104,7 +107,7 @@ describe('mutations in trx', () => {
 			},
 		}, it => it.$('id'))))
 		expect(result.ok).toBe(true)
-		expect(result.data?.node?.id).toBe(123)
+		expect(result.data?.node?.id).toBe('ca7a9b84-efbb-435d-a063-da11f205335a')
 		expect(calls).toHaveLength(1)
 		expect(calls[0].query).toMatchInlineSnapshot(`
 			"mutation($MutationTransactionOptions_0: MutationTransactionOptions, $AuthorCreateInput_1: AuthorCreateInput!) {
@@ -185,7 +188,7 @@ describe('mutations in trx', () => {
 			},
 		})
 		await client.mutate(qb.transaction(qb.update('Author', {
-			by: { id: 1 },
+			by: { id: 'ca7a9b84-efbb-435d-a063-da11f205335a' },
 			data: {
 				name: 'John',
 				email: 'xx@localhost',
@@ -250,7 +253,7 @@ describe('mutations in trx', () => {
 		expect(calls[0].variables).toMatchInlineSnapshot(`
 			{
 			  "AuthorUniqueWhere_1": {
-			    "id": 1,
+			    "id": "ca7a9b84-efbb-435d-a063-da11f205335a",
 			  },
 			  "AuthorUpdateInput_2": {
 			    "email": "xx@localhost",
@@ -271,7 +274,7 @@ describe('mutations in trx', () => {
 			},
 		})
 		await client.mutate(qb.transaction(qb.delete('Author', {
-			by: { id: 1 },
+			by: { id: 'ca7a9b84-efbb-435d-a063-da11f205335a' },
 		})))
 		expect(calls).toHaveLength(1)
 		expect(calls[0].query).toMatchInlineSnapshot(`
@@ -329,7 +332,7 @@ describe('mutations in trx', () => {
 		expect(calls[0].variables).toMatchInlineSnapshot(`
 			{
 			  "AuthorUniqueWhere_1": {
-			    "id": 1,
+			    "id": "ca7a9b84-efbb-435d-a063-da11f205335a",
 			  },
 			  "MutationTransactionOptions_0": {},
 			}
@@ -346,7 +349,7 @@ describe('mutations in trx', () => {
 			},
 		})
 		await client.mutate(qb.transaction(qb.upsert('Author', {
-			by: { id: 1 },
+			by: { id: 'ca7a9b84-efbb-435d-a063-da11f205335a' },
 			create: {
 				name: 'John',
 				email: 'xx@localhost',
@@ -419,7 +422,7 @@ describe('mutations in trx', () => {
 			    "name": "John",
 			  },
 			  "AuthorUniqueWhere_1": {
-			    "id": 1,
+			    "id": "ca7a9b84-efbb-435d-a063-da11f205335a",
 			  },
 			  "AuthorUpdateInput_3": {
 			    "email": "xx@localhost",
@@ -562,8 +565,7 @@ describe('mutations in trx', () => {
 			}),
 			createPost: qb.create('Post', {
 				data: {
-					title: 'Hello',
-					content: 'World',
+					publishedAt: 'now',
 				},
 			}),
 		}))
@@ -643,8 +645,7 @@ describe('mutations in trx', () => {
 			  },
 			  "MutationTransactionOptions_0": {},
 			  "PostCreateInput_2": {
-			    "content": "World",
-			    "title": "Hello",
+			    "publishedAt": "now",
 			  },
 			}
 		`)
@@ -659,9 +660,8 @@ describe('mutations in trx', () => {
 				},
 				post: {
 					value: {
-						id: 1,
-						title: 'Foo bar',
-						content: 'Hello world',
+						id: 'ca7a9b84-efbb-435d-a063-da11f205335a',
+						publishedAt: 'now',
 					},
 				},
 			},
@@ -670,17 +670,16 @@ describe('mutations in trx', () => {
 		const trx = qb.transaction({
 			createPost: qb.create('Post', {
 				data: {
-					title: 'Hello',
-					content: 'World',
+					publishedAt: 'now',
 				},
 			}),
 			post: qb.get('Post', {
-				by: { id: 1 },
+				by: { id: 'ca7a9b84-efbb-435d-a063-da11f205335a' },
 			}, it => it.$$()),
 		})
 		const result = await client.mutate(trx)
 		expect(result.data.createPost.ok).toBe(true)
-		expect(result.data.post?.title).toBe('Foo bar')
+		expect(result.data.post?.publishedAt).toBe('now')
 
 		expect(calls).toHaveLength(1)
 		expect(calls[0].query).toMatchInlineSnapshot(`
@@ -706,8 +705,8 @@ describe('mutations in trx', () => {
 					}
 					post: query {
 						value: getPost(by: $PostUniqueWhere_2) {
-							title
-							content
+							id
+							publishedAt
 						}
 					}
 				}
@@ -748,11 +747,10 @@ describe('mutations in trx', () => {
 			{
 			  "MutationTransactionOptions_0": {},
 			  "PostCreateInput_1": {
-			    "content": "World",
-			    "title": "Hello",
+			    "publishedAt": "now",
 			  },
 			  "PostUniqueWhere_2": {
-			    "id": 1,
+			    "id": "ca7a9b84-efbb-435d-a063-da11f205335a",
 			  },
 			}
 		`)
@@ -836,7 +834,7 @@ describe('mutations without trx', () => {
 		const [client, calls] = createClient({
 			mut: {
 				ok: true,
-				node: { id: 123 },
+				node: { id: 'ca7a9b84-efbb-435d-a063-da11f205335a' },
 			},
 		})
 		const result = await client.mutate(qb.create('Author', {
@@ -846,7 +844,7 @@ describe('mutations without trx', () => {
 			},
 		}, it => it.$('id')))
 		expect(result.ok).toBe(true)
-		expect(result.node?.id).toBe(123)
+		expect(result.node?.id).toBe('ca7a9b84-efbb-435d-a063-da11f205335a')
 		expect(calls).toHaveLength(1)
 		expect(calls[0].query).toMatchInlineSnapshot(`
 			"mutation($AuthorCreateInput_0: AuthorCreateInput!) {
@@ -913,7 +911,7 @@ describe('mutations without trx', () => {
 			},
 		})
 		await client.mutate(qb.update('Author', {
-			by: { id: 1 },
+			by: { id: 'ca7a9b84-efbb-435d-a063-da11f205335a' },
 			data: {
 				name: 'John',
 				email: 'xx@localhost',
@@ -968,7 +966,7 @@ describe('mutations without trx', () => {
 		expect(calls[0].variables).toMatchInlineSnapshot(`
 			{
 			  "AuthorUniqueWhere_0": {
-			    "id": 1,
+			    "id": "ca7a9b84-efbb-435d-a063-da11f205335a",
 			  },
 			  "AuthorUpdateInput_1": {
 			    "email": "xx@localhost",
@@ -985,7 +983,7 @@ describe('mutations without trx', () => {
 			},
 		})
 		await client.mutate(qb.delete('Author', {
-			by: { id: 1 },
+			by: { id: 'ca7a9b84-efbb-435d-a063-da11f205335a' },
 		}))
 		expect(calls).toHaveLength(1)
 		expect(calls[0].query).toMatchInlineSnapshot(`
@@ -1016,7 +1014,7 @@ describe('mutations without trx', () => {
 		expect(calls[0].variables).toMatchInlineSnapshot(`
 			{
 			  "AuthorUniqueWhere_0": {
-			    "id": 1,
+			    "id": "ca7a9b84-efbb-435d-a063-da11f205335a",
 			  },
 			}
 		`)
@@ -1029,7 +1027,7 @@ describe('mutations without trx', () => {
 			},
 		})
 		await client.mutate(qb.upsert('Author', {
-			by: { id: 1 },
+			by: { id: 'ca7a9b84-efbb-435d-a063-da11f205335a' },
 			create: {
 				name: 'John',
 				email: 'xx@localhost',
@@ -1092,7 +1090,7 @@ describe('mutations without trx', () => {
 			    "name": "John",
 			  },
 			  "AuthorUniqueWhere_0": {
-			    "id": 1,
+			    "id": "ca7a9b84-efbb-435d-a063-da11f205335a",
 			  },
 			  "AuthorUpdateInput_2": {
 			    "email": "xx@localhost",
@@ -1216,8 +1214,7 @@ describe('mutations without trx', () => {
 			}),
 			createPost: qb.create('Post', {
 				data: {
-					title: 'Hello',
-					content: 'World',
+					publishedAt: 'now',
 				},
 			}),
 		})
@@ -1286,8 +1283,7 @@ describe('mutations without trx', () => {
 			    "name": "John",
 			  },
 			  "PostCreateInput_1": {
-			    "content": "World",
-			    "title": "Hello",
+			    "publishedAt": "now",
 			  },
 			}
 		`)
@@ -1300,9 +1296,8 @@ describe('mutations without trx', () => {
 			},
 			post: {
 				value: {
-					id: 1,
-					title: 'Foo bar',
-					content: 'Hello world',
+					id: 'ca7a9b84-efbb-435d-a063-da11f205335a',
+					publishedAt: 'now',
 				},
 			},
 		})
@@ -1310,16 +1305,15 @@ describe('mutations without trx', () => {
 		const result = await client.mutate({
 			createPost: qb.create('Post', {
 				data: {
-					title: 'Hello',
-					content: 'World',
+					publishedAt: 'now',
 				},
 			}),
 			post: qb.get('Post', {
-				by: { id: 1 },
+				by: { id: 'ca7a9b84-efbb-435d-a063-da11f205335a' },
 			}, it => it.$$()),
 		})
 		expect(result.createPost.ok).toBe(true)
-		expect(result.post?.title).toBe('Foo bar')
+		expect(result.post?.publishedAt).toBe('now')
 
 		expect(calls).toHaveLength(1)
 		expect(calls[0].query).toMatchInlineSnapshot(`
@@ -1336,8 +1330,8 @@ describe('mutations without trx', () => {
 				}
 				post: query {
 					value: getPost(by: $PostUniqueWhere_1) {
-						title
-						content
+						id
+						publishedAt
 					}
 				}
 			}
@@ -1376,11 +1370,104 @@ describe('mutations without trx', () => {
 		expect(calls[0].variables).toMatchInlineSnapshot(`
 			{
 			  "PostCreateInput_0": {
-			    "content": "World",
-			    "title": "Hello",
+			    "publishedAt": "now",
 			  },
 			  "PostUniqueWhere_1": {
-			    "id": 1,
+			    "id": "ca7a9b84-efbb-435d-a063-da11f205335a",
+			  },
+			}
+		`)
+	})
+
+	test('update locale relation', async () => {
+		const [client, calls] = createClient({
+			mut: {
+				ok: true,
+			},
+		})
+
+		const result = await client.mutate(qb.update('Post', {
+			by: { id: 'ca7a9b84-efbb-435d-a063-da11f205335a' },
+			data: {
+				publishedAt: 'now',
+				locales: [{
+					update: {
+						by: { locale: { code: 'cs' } },
+						data: {
+							title: 'cs title',
+						},
+					},
+				}],
+			},
+		}))
+		expect(result.ok).toBe(true)
+		expect(calls).toHaveLength(1)
+		expect(calls[0].query).toMatchInlineSnapshot(`
+			"mutation($PostUniqueWhere_0: PostUniqueWhere!, $PostUpdateInput_1: PostUpdateInput!) {
+				mut: updatePost(by: $PostUniqueWhere_0, data: $PostUpdateInput_1) {
+					ok
+					errorMessage
+					errors {
+						... MutationError
+					}
+					validation {
+						... ValidationResult
+					}
+				}
+			}
+			fragment MutationError on _MutationError {
+				paths {
+					... on _FieldPathFragment {
+						field
+					}
+					... on _IndexPathFragment {
+						index
+						alias
+					}
+				}
+				message
+				type
+			}
+			fragment ValidationResult on _ValidationResult {
+				valid
+				errors {
+					path {
+						... on _FieldPathFragment {
+							field
+						}
+						... on _IndexPathFragment {
+							index
+							alias
+						}
+					}
+					message {
+						text
+					}
+				}
+			}
+			"
+		`)
+		expect(calls[0].variables).toMatchInlineSnapshot(`
+			{
+			  "PostUniqueWhere_0": {
+			    "id": "ca7a9b84-efbb-435d-a063-da11f205335a",
+			  },
+			  "PostUpdateInput_1": {
+			    "locales": [
+			      {
+			        "update": {
+			          "by": {
+			            "locale": {
+			              "code": "cs",
+			            },
+			          },
+			          "data": {
+			            "title": "cs title",
+			          },
+			        },
+			      },
+			    ],
+			    "publishedAt": "now",
 			  },
 			}
 		`)

@@ -2,9 +2,11 @@
 	"extends": "../../../tsconfig.settings.json",
 	"compilerOptions": {
 		"noEmit": true,
-		"emitDeclarationOnly": false
+		"emitDeclarationOnly": false,
+		"experimentalDecorators": true
 	},
 	"references": [
-		{ "path": "../src" }
+		{ "path": "../src" },
+		{ "path": "../../client-content-generator/src" },
 	]
 }

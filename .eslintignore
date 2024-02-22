@@ -6,3 +6,4 @@
 /ee/*/temp
 /ee/*/node_modules
 /packages/playground/api/client
+/packages/client-content/tests/client

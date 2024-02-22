@@ -171,7 +171,7 @@ jobs:
 
   publish-npm:
     if: github.event_name == 'push' && github.ref_type == 'tag'
-    needs: [test, playwright]
+    needs: [test]
     runs-on: ubuntu-latest
     container: node:20-alpine
 
@@ -225,7 +225,7 @@ jobs:
 
   publish-docker:
     if: (github.event_name == 'push' && github.ref_type == 'tag') || github.event_name == 'workflow_dispatch'
-    needs: [test, playwright]
+    needs: [test]
     runs-on: ubuntu-latest
 
     steps:

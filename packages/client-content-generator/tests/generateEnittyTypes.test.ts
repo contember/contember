@@ -15,10 +15,10 @@ describe('generate entities', () => {
 			export type JSONObject = { readonly [K in string]?: JSONValue }
 			export type JSONArray = readonly JSONValue[]
 
-			export type Foo = {
+			export type Foo <OverRelation extends string | never = never> = {
 				name: 'Foo'
 				unique:
-					| { id: string }
+					| Omit<{ id: string}, OverRelation>
 				columns: {
 					id: string
 					stringCol: string | null
@@ -59,10 +59,10 @@ describe('generate entities', () => {
 			export type JSONObject = { readonly [K in string]?: JSONValue }
 			export type JSONArray = readonly JSONValue[]
 
-			export type Foo = {
+			export type Foo <OverRelation extends string | never = never> = {
 				name: 'Foo'
 				unique:
-					| { id: string }
+					| Omit<{ id: string}, OverRelation>
 				columns: {
 					id: string
 					enumCol: FooEnumCol | null
@@ -94,11 +94,11 @@ describe('generate entities', () => {
 			export type JSONObject = { readonly [K in string]?: JSONValue }
 			export type JSONArray = readonly JSONValue[]
 
-			export type Foo = {
+			export type Foo <OverRelation extends string | never = never> = {
 				name: 'Foo'
 				unique:
-					| { id: string }
-					| { oneHasOneInverseRel: Bar['unique'] }
+					| Omit<{ id: string}, OverRelation>
+					| Omit<{ oneHasOneInverseRel: Bar['unique']}, OverRelation>
 				columns: {
 					id: string
 				}
@@ -110,11 +110,11 @@ describe('generate entities', () => {
 				hasManyBy: {
 				}
 			}
-			export type Bar = {
+			export type Bar <OverRelation extends string | never = never> = {
 				name: 'Bar'
 				unique:
-					| { id: string }
-					| { oneHasOneOwningRel: Foo['unique'] }
+					| Omit<{ id: string}, OverRelation>
+					| Omit<{ oneHasOneOwningRel: Foo['unique']}, OverRelation>
 				columns: {
 					id: string
 				}
@@ -148,26 +148,26 @@ describe('generate entities', () => {
 			export type JSONObject = { readonly [K in string]?: JSONValue }
 			export type JSONArray = readonly JSONValue[]
 
-			export type Foo = {
+			export type Foo <OverRelation extends string | never = never> = {
 				name: 'Foo'
 				unique:
-					| { id: string }
-					| { oneHasManyRel: Bar['unique'] }
+					| Omit<{ id: string}, OverRelation>
+					| Omit<{ oneHasManyRel: Bar['unique']}, OverRelation>
 				columns: {
 					id: string
 				}
 				hasOne: {
 				}
 				hasMany: {
-					oneHasManyRel: Bar
+					oneHasManyRel: Bar<'manyHasOneRel'>
 				}
 				hasManyBy: {
 				}
 			}
-			export type Bar = {
+			export type Bar <OverRelation extends string | never = never> = {
 				name: 'Bar'
 				unique:
-					| { id: string }
+					| Omit<{ id: string}, OverRelation>
 				columns: {
 					id: string
 				}
@@ -201,10 +201,10 @@ describe('generate entities', () => {
 			export type JSONObject = { readonly [K in string]?: JSONValue }
 			export type JSONArray = readonly JSONValue[]
 
-			export type Foo = {
+			export type Foo <OverRelation extends string | never = never> = {
 				name: 'Foo'
 				unique:
-					| { id: string }
+					| Omit<{ id: string}, OverRelation>
 				columns: {
 					id: string
 				}
@@ -216,10 +216,10 @@ describe('generate entities', () => {
 				hasManyBy: {
 				}
 			}
-			export type Bar = {
+			export type Bar <OverRelation extends string | never = never> = {
 				name: 'Bar'
 				unique:
-					| { id: string }
+					| Omit<{ id: string}, OverRelation>
 				columns: {
 					id: string
 				}
@@ -253,28 +253,28 @@ describe('generate entities', () => {
 			export type JSONObject = { readonly [K in string]?: JSONValue }
 			export type JSONArray = readonly JSONValue[]
 
-			export type Foo = {
+			export type Foo <OverRelation extends string | never = never> = {
 				name: 'Foo'
 				unique:
-					| { id: string }
-					| { locales: FooLocale['unique'] }
+					| Omit<{ id: string}, OverRelation>
+					| Omit<{ locales: FooLocale['unique']}, OverRelation>
 				columns: {
 					id: string
 				}
 				hasOne: {
 				}
 				hasMany: {
-					locales: FooLocale
+					locales: FooLocale<'foo'>
 				}
 				hasManyBy: {
 					localesByLocale: { entity: FooLocale; by: {locale: string}  }
 				}
 			}
-			export type FooLocale = {
+			export type FooLocale <OverRelation extends string | never = never> = {
 				name: 'FooLocale'
 				unique:
-					| { id: string }
-					| { locale: string, foo: Foo['unique'] }
+					| Omit<{ id: string}, OverRelation>
+					| Omit<{ locale: string, foo: Foo['unique']}, OverRelation>
 				columns: {
 					id: string
 					locale: string

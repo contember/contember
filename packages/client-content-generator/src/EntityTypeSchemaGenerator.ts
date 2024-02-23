@@ -32,7 +32,7 @@ export type JSONArray = readonly JSONValue[]
 	}
 
 	private generateTypeEntityCode(model: Model.Schema, entity: Model.Entity): string {
-		let code = `export type ${entity.name} = {\n`
+		let code = `export type ${entity.name} <OverRelation extends string | never = never> = {\n`
 		code += '\tname: \'' + entity.name + '\'\n'
 		code += '\tunique:\n'
 		code += this.formatUniqueFields(model, entity)
@@ -41,7 +41,7 @@ export type JSONArray = readonly JSONValue[]
 		let hasManyCode = ''
 		acceptEveryFieldVisitor(model, entity, {
 			visitHasMany: ctx => {
-				hasManyCode += `\t\t${ctx.relation.name}: ${ctx.targetEntity.name}\n`
+				hasManyCode += `\t\t${ctx.relation.name}: ${ctx.targetEntity.name}${ctx.targetRelation?.type === Model.RelationType.ManyHasOne ? `<'${ctx.targetRelation.name}'>` : ''}\n`
 			},
 			visitHasOne: ctx => {
 				hasOneCode += `\t\t${ctx.relation.name}: ${ctx.targetEntity.name}\n`
@@ -117,9 +117,9 @@ export type JSONArray = readonly JSONValue[]
 		const fields = getFieldsForUniqueWhere(model, entity)
 		let code = ''
 		for (const field of fields) {
-			code += '\t\t| { '
+			code += '\t\t| Omit<{ '
 			code += field.map(it => `${it}: ${uniqueType(model, entity, entity.fields[it])}`).join(', ')
-			code += ' }\n'
+			code += '}, OverRelation>\n'
 		}
 		return code
 	}

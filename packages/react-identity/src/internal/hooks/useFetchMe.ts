@@ -1,4 +1,5 @@
-import * as TenantApi from '@contember/react-client-tenant'
+import * as TenantApi from '@contember/graphql-client-tenant'
+import { ModelType, useTenantApi } from '@contember/react-client-tenant'
 import { useCallback } from 'react'
 
 const identityFragment = TenantApi
@@ -11,10 +12,10 @@ const identityFragment = TenantApi
 	)
 	.permissions(TenantApi.identityGlobalPermissions$$)
 
-export type FetchedIdentity = TenantApi.ModelType<typeof identityFragment>
+export type FetchedIdentity = ModelType<typeof identityFragment>
 
 export const useFetchMe = () => {
-	const executor = TenantApi.useTenantApi()
+	const executor = useTenantApi()
 	return useCallback(async () => {
 		return (await executor(TenantApi.query$.me(identityFragment))).me
 	}, [executor])

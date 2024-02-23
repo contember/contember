@@ -1,4 +1,5 @@
-import * as TenantApi from '@contember/react-client-tenant'
+import * as TenantApi from '@contember/graphql-client-tenant'
+import { useTenantApi } from '@contember/react-client-tenant'
 import { useCallback } from 'react'
 
 const InviteFetcher = TenantApi.inviteResponse$$
@@ -8,7 +9,7 @@ const InviteFetcher = TenantApi.inviteResponse$$
 export type InviteErrorCodes = TenantApi.InviteErrorCode
 
 export const useInvite = () => {
-	const api = TenantApi.useTenantApi()
+	const api = useTenantApi()
 
 	return useCallback(async (variables: {
 		email: string,

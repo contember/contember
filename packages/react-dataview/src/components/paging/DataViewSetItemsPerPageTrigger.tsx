@@ -8,7 +8,7 @@ export interface DataViewSetItemsPerPageTriggerProps {
 	value: number
 }
 
-export const DataViewSetItemsPerPageTrigger = forwardRef<HTMLElement, DataViewSetItemsPerPageTriggerProps>(({ value, ...props }) => {
+export const DataViewSetItemsPerPageTrigger = forwardRef<HTMLElement, DataViewSetItemsPerPageTriggerProps>(({ value, ...props }, ref) => {
 	const { setItemsPerPage } = useDataViewPagingMethods()
 	const { itemsPerPage: current } = useDataViewPagingState()
 
@@ -18,6 +18,7 @@ export const DataViewSetItemsPerPageTrigger = forwardRef<HTMLElement, DataViewSe
 
 	return (
 		<Slot
+			ref={ref}
 			onClick={setItems}
 			data-active={value === current ? '1' : undefined}
 			{...props}

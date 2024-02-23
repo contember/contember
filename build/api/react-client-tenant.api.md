@@ -4,7 +4,7 @@
 
 ```ts
 
-import type { Fetcher } from 'graphql-ts-client-api';
+import { Fetcher } from 'graphql-ts-client-api';
 import { ModelType } from 'graphql-ts-client-api';
 
 export { ModelType }
@@ -15,9 +15,6 @@ export const useTenantApi: () => <TData extends object, TVariables extends objec
     readonly headers?: Record<string, string> | undefined;
     readonly apiToken?: string | undefined;
 } | undefined) => Promise<TData>;
-
-
-export * from "@contember/graphql-client-tenant";
 
 // (No @packageDocumentation comment for this package)
 

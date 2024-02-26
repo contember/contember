@@ -17,7 +17,7 @@ export const DataViewHasSelection = Component<DataViewHasSelectionProps>(props =
 		return null
 	}
 
-	return resolveCondition(selection, props) ? props.children : null
+	return resolveCondition(selection, props) ? <>{props.children}</> : null
 }, (props, env) => {
 	const selection = env.getExtension(dataViewSelectionEnvironmentExtension)
 	return resolveCondition(selection, props) ? props.children : null

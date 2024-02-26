@@ -7,11 +7,13 @@ export const DataViewEachRow = ({ children }: { children: ReactNode }) => {
 	if (!accessor) {
 		return null
 	}
-	return Array.from(accessor, entity => {
-		return (
-			<Entity key={entity.key} accessor={entity}>
-				{children}
-			</Entity>
-		)
-	})
+	return <>
+		{Array.from(accessor, entity => {
+			return (
+				<Entity key={entity.key} accessor={entity}>
+					{children}
+				</Entity>
+			)
+		})}
+	</>
 }

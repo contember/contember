@@ -67,7 +67,7 @@ export interface IdentityProviderProps {
 }
 
 // @public (undocumented)
-export const IdentityState: ({ state, children }: IdentityStateProps) => ReactNode;
+export const IdentityState: ({ state, children }: IdentityStateProps) => JSX_2.Element | null;
 
 // @public (undocumented)
 export interface IdentityStateProps {

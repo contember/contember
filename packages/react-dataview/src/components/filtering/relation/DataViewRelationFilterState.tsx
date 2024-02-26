@@ -16,7 +16,7 @@ export const DataViewRelationFilterState = ({ name, children, state }: {
 		if (isValidElement(children)) {
 			return <Slot data-current={current}>{children}</Slot>
 		}
-		return children
+		return <>{children}</>
 	}
 	return null
 }

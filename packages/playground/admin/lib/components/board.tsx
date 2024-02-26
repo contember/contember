@@ -99,10 +99,10 @@ export const BoardNonSortableItems = Component<{ children: ReactNode }>(({ child
 ))
 
 export const BoardSortableColumn = Component<{
-	children: ReactNode,
-	columnHeader: ReactNode,
-	columnFooter?: ReactNode,
-	nullColumnHeader: ReactNode,
+	children: ReactNode
+	columnHeader: ReactNode
+	columnFooter?: ReactNode
+	nullColumnHeader?: ReactNode
 	sortable: boolean // even if not sortable, we still want to make column droppable
 }>(({ children, columnHeader, nullColumnHeader, columnFooter, sortable }) => (
 	<>
@@ -129,7 +129,7 @@ export const BoardSortableColumn = Component<{
 			</div>
 		</BoardSortableEachColumn>
 
-		<BoardSortableNullColumn>
+		{nullColumnHeader && <BoardSortableNullColumn>
 			<BoardSortableNode>
 				<BoardColumnUI>
 					<BoardColumnHeaderUI>
@@ -139,14 +139,14 @@ export const BoardSortableColumn = Component<{
 					{columnFooter}
 				</BoardColumnUI>
 			</BoardSortableNode>
-		</BoardSortableNullColumn>
+		</BoardSortableNullColumn>}
 	</>
 ))
 export const BoardNonSortableColumn = Component<{
-	children: ReactNode,
-	columnHeader: ReactNode,
-	columnFooter?: ReactNode,
-	nullColumnHeader: ReactNode
+	children: ReactNode
+	columnHeader: ReactNode
+	columnFooter?: ReactNode
+	nullColumnHeader?: ReactNode
 }>(({ children, columnHeader, nullColumnHeader, columnFooter }) => (
 	<>
 		<BoardEachColumn>
@@ -159,7 +159,7 @@ export const BoardNonSortableColumn = Component<{
 			</BoardColumnUI>
 		</BoardEachColumn>
 
-		<BoardNullColumn>
+		{nullColumnHeader && <BoardNullColumn>
 			<BoardColumnUI>
 				<BoardColumnHeaderUI>
 					{nullColumnHeader}
@@ -167,7 +167,7 @@ export const BoardNonSortableColumn = Component<{
 				{children}
 				{columnFooter}
 			</BoardColumnUI>
-		</BoardNullColumn>
+		</BoardNullColumn>}
 	</>
 ))
 
@@ -175,8 +175,8 @@ export const BoardNonSortableColumn = Component<{
 export type DefaultBoardProps =
 	& {
 		columnHeader: ReactNode
-		nullColumnHeader: ReactNode
-		columnFooter?: ReactNode,
+		nullColumnHeader?: ReactNode
+		columnFooter?: ReactNode
 		children: ReactNode
 	}
 	& BoardProps

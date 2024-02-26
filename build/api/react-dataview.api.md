@@ -147,7 +147,7 @@ export const DataViewDisplayedStateContext: React_2.Context<DataViewState | unde
 // @public (undocumented)
 export const DataViewEachRow: ({ children }: {
     children: ReactNode;
-}) => JSX_2.Element[] | null;
+}) => JSX_2.Element | null;
 
 // @public (undocumented)
 export interface DataViewEachRowProps {
@@ -164,7 +164,7 @@ export interface DataViewEachRowProps {
 // @public (undocumented)
 export const DataViewEmpty: ({ children }: {
     children: ReactNode;
-}) => ReactNode;
+}) => JSX_2.Element | null;
 
 // @internal (undocumented)
 export const DataViewEntityListAccessorContext: React_2.Context<EntityListAccessor | undefined>;
@@ -181,7 +181,7 @@ export const DataViewEnumFilterState: ({ name, children, state, value }: {
     value: string;
     children: ReactNode;
     state?: DataViewEnumFilterCurrent | DataViewEnumFilterCurrent[] | undefined;
-}) => string | number | boolean | Iterable<React_2.ReactNode> | JSX_2.Element | null | undefined;
+}) => JSX_2.Element | null;
 
 // @public (undocumented)
 export const DataViewEnumFilterTrigger: ({ name, action, value, ...props }: {
@@ -293,7 +293,7 @@ export const DataViewKeyboardEventHandlerContext: React_2.Context<React_2.Keyboa
 export const DataViewKeyProvider: Provider<string>;
 
 // @public (undocumented)
-export const DataViewLoaderState: ({ children, ...props }: DataViewEachRowProps) => ReactNode;
+export const DataViewLoaderState: ({ children, ...props }: DataViewEachRowProps) => JSX_2.Element | null;
 
 // @internal (undocumented)
 export const DataViewLoaderStateContext: React_2.Context<EntityListSubTreeLoaderState>;
@@ -309,7 +309,7 @@ export type DataViewMethods = {
 // @public (undocumented)
 export const DataViewNonEmpty: ({ children }: {
     children: ReactNode;
-}) => ReactNode;
+}) => JSX_2.Element | null;
 
 // @public (undocumented)
 export type DataViewNullFilterState = 'include' | 'exclude' | 'none';
@@ -372,7 +372,7 @@ export type DataViewPagingState = {
 export const DataViewPagingStateContext: React_2.Context<DataViewPagingState>;
 
 // @public (undocumented)
-export const DataViewPagingStateView: ({ render }: DataViewPagingStateViewProps) => ReactNode;
+export const DataViewPagingStateView: ({ render }: DataViewPagingStateViewProps) => JSX_2.Element;
 
 // @public (undocumented)
 export interface DataViewPagingStateViewProps {
@@ -404,7 +404,7 @@ export const DataViewRelationFilterState: ({ name, children, state }: {
     name: string;
     children: ReactNode;
     state?: DataViewRelationFilterCurrent | DataViewRelationFilterCurrent[] | undefined;
-}) => string | number | boolean | Iterable<React_2.ReactNode> | JSX_2.Element | null | undefined;
+}) => JSX_2.Element | null;
 
 // @public (undocumented)
 export const DataViewRelationFilterTrigger: ({ name, action, ...props }: {
@@ -581,7 +581,7 @@ export const DataViewTextFilterInput: ({ name, ...props }: {
 }) => JSX_2.Element;
 
 // @public (undocumented)
-export const DataViewTextFilterMatchModeLabel: ({ name, render }: DataViewTextFilterMatchModeLabelProps) => ReactNode;
+export const DataViewTextFilterMatchModeLabel: ({ name, render }: DataViewTextFilterMatchModeLabelProps) => JSX_2.Element;
 
 // @public (undocumented)
 export type DataViewTextFilterMatchModeLabelProps = {

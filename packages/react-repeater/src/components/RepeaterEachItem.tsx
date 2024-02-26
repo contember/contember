@@ -4,9 +4,11 @@ import { Entity } from '@contember/react-binding'
 
 export const RepeaterEachItem = ({ children }: { children: ReactNode }) => {
 	const entities = useRepeaterSortedEntities()
-	return entities.map(entity => (
-		<Entity key={entity.key} accessor={entity}>
-			{children}
-		</Entity>
-	))
+	return <>
+		{entities.map(entity => (
+			<Entity key={entity.key} accessor={entity}>
+				{children}
+			</Entity>
+		))}
+	</>
 }

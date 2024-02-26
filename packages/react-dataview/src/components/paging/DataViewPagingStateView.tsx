@@ -8,5 +8,5 @@ export interface DataViewPagingStateViewProps {
 export const DataViewPagingStateView = ({ render }: DataViewPagingStateViewProps) => {
 	const state = useDataViewPagingState()
 	const info = useDataViewPagingInfo()
-	return render({ ...state, ...info })
+	return <>{render({ ...state, ...info })}</>
 }

@@ -13,7 +13,7 @@ export const DataViewTextFilterMatchModeLabel = ({ name, render }: DataViewTextF
 	const [state] = useDataViewFilter<TextFilterArtifacts>(name)
 
 	if (typeof render === 'function') {
-		return render(state?.mode ?? 'matches')
+		return <>{render(state?.mode ?? 'matches')}</>
 	}
-	return render[state?.mode ?? 'matches']
+	return <>{render[state?.mode ?? 'matches']}</>
 }

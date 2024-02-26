@@ -32,7 +32,7 @@ export const RepeaterAddItemTrigger: ({ children, index }: {
 // @public (undocumented)
 export const RepeaterEachItem: ({ children }: {
     children: ReactNode;
-}) => JSX_2.Element[];
+}) => JSX_2.Element;
 
 // @public (undocumented)
 export const RepeaterEmpty: ({ children }: {

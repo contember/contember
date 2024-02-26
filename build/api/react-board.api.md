@@ -29,7 +29,7 @@ export const BoardColumn: ({}: {
 }) => null;
 
 // @public (undocumented)
-export const BoardColumnLabel: () => ReactNode;
+export const BoardColumnLabel: () => JSX_2.Element | null;
 
 // @public (undocumented)
 export type BoardColumnNode<ColumnValue extends BoardColumnValue = BoardColumnValue> = {
@@ -71,7 +71,7 @@ export type BoardDynamicColumnsBindingProps = {
 export const BoardEachColumn: {
     ({ children }: {
         children: ReactNode;
-    }): (JSX_2.Element | null)[];
+    }): JSX_2.Element;
     staticRender({ children }: {
         children: ReactNode;
     }): JSX_2.Element;
@@ -81,7 +81,7 @@ export const BoardEachColumn: {
 export const BoardEachItem: {
     ({ children }: {
         children: ReactNode;
-    }): JSX_2.Element[];
+    }): JSX_2.Element;
     staticRender({ children }: {
         children: ReactNode;
     }): JSX_2.Element;

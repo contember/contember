@@ -10,20 +10,22 @@ export const BoardEachColumn = ({ children }: {
 }) => {
 	const columns = useBoardColumns()
 
-	return columns.map(column => {
-		if (column.id === BoardNullColumnPlaceholder) {
-			return null
-		}
-		return (
-			<BoardCurrentColumnContext.Provider value={column} key={column.id}>
-				{column.value instanceof EntityAccessor ? (
-					<Entity accessor={column.value}>
-						{children}
-					</Entity>
-				) : children}
-			</BoardCurrentColumnContext.Provider>
-		)
-	})
+	return <>
+		{columns.map(column => {
+			if (column.id === BoardNullColumnPlaceholder) {
+				return null
+			}
+			return (
+				<BoardCurrentColumnContext.Provider value={column} key={column.id}>
+					{column.value instanceof EntityAccessor ? (
+						<Entity accessor={column.value}>
+							{children}
+						</Entity>
+					) : children}
+				</BoardCurrentColumnContext.Provider>
+			)
+		})}
+	</>
 }
 BoardEachColumn.staticRender = ({ children }: { children: ReactNode }) => {
 	return <BoardColumn>{children}</BoardColumn>

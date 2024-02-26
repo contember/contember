@@ -28,14 +28,14 @@ export type EntityTypeLike = {
 		[columnName: string]: any
 	}
 	hasOne: {
-		[relationName: string]: EntityTypeLike
+		[relationName: string]: any
 	}
 	hasMany: {
-		[relationName: string]: EntityTypeLike
+		[relationName: string]: any
 	}
 	hasManyBy: {
 		[relationName: string]: {
-			entity: EntityTypeLike
+			entity: any
 			by: JSONObject
 		}
 	}

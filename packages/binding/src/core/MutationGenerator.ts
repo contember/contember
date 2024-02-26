@@ -366,7 +366,12 @@ export class MutationGenerator {
 								field.marker,
 							)
 							if (input !== undefined) {
-								result[field.marker.parameters.field] = input
+								const current = result[field.marker.parameters.field]
+								if (Array.isArray(input) && Array.isArray(current)) {
+									current.push(...input)
+								} else {
+									result[field.marker.parameters.field] = input
+								}
 							}
 							break
 						}
@@ -376,7 +381,12 @@ export class MutationGenerator {
 								field.fieldState,
 							)
 							if (input !== undefined) {
-								result[field.marker.parameters.field] = input
+								const current = result[field.marker.parameters.field]
+								if (Array.isArray(current)) {
+									current.push(...input)
+								} else {
+									result[field.marker.parameters.field] = input
+								}
 							}
 							break
 						}
@@ -534,7 +544,12 @@ export class MutationGenerator {
 					} else {
 						const relationData = this.getUpdateManyRelationForReducedInput(currentState, fieldState, persistedValue, processedPlaceholdersByEntity, placeholderName, reducedBy)
 						if (relationData !== undefined) {
-							result[marker.parameters.field] = relationData
+							const current = result[marker.parameters.field]
+							if (Array.isArray(current)) {
+								current.push(...relationData)
+							} else {
+								result[marker.parameters.field] = relationData
+							}
 						}
 
 					}
@@ -555,7 +570,12 @@ export class MutationGenerator {
 					}
 					const relationData = this.getUpdateManyRelationInput(fieldState, persistedEntityIds, processedPlaceholdersByEntity)
 					if (relationData !== undefined) {
-						result[marker.parameters.field] = relationData
+						const current = result[marker.parameters.field]
+						if (Array.isArray(current)) {
+							current.push(...relationData)
+						} else {
+							result[marker.parameters.field] = relationData
+						}
 					}
 					break
 				}

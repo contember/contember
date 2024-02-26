@@ -109,6 +109,7 @@ import { PersistFeedbackDictionary } from '@contember/react-binding-ui';
 import type { PersistSuccessOptions } from '@contember/react-binding';
 import { Point } from 'slate';
 import { projectEnvironmentExtension } from '@contember/react-identity';
+import { ProjectUserRoles } from '@contember/react-identity';
 import { PropsWithChildren } from 'react';
 import { ProvidersProps } from '@contember/ui';
 import { PureComponent } from 'react';
@@ -165,6 +166,7 @@ import { useCurrentRequest } from '@contember/react-routing';
 import { useLinkFactory } from '@contember/react-routing';
 import { useLogout } from '@contember/react-identity';
 import { useIdentity as useOptionalIdentity } from '@contember/react-identity';
+import { useProjectUserRoles } from '@contember/react-identity';
 import { useRedirect } from '@contember/react-routing';
 import { useRouting } from '@contember/react-routing';
 import { useRoutingLinkFactory } from '@contember/react-routing';
@@ -2595,8 +2597,7 @@ export interface ProjectListProps {
 // @public (undocumented)
 export const ProjectsGrid: FC<ProjectGridProps>;
 
-// @public (undocumented)
-export type ProjectUserRoles = Set<string>;
+export { ProjectUserRoles }
 
 // @public (undocumented)
 export type PublicAnchorProps = Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'>;
@@ -3665,8 +3666,7 @@ label: GQLVariableType<string, false>;
 // @public (undocumented)
 export const useProjectMembershipsQuery: (projectSlug: string, identityId: string) => QueryRequestObject<ListUserQueryResult>;
 
-// @public (undocumented)
-export const useProjectUserRoles: () => ProjectUserRoles;
+export { useProjectUserRoles }
 
 // @public (undocumented)
 export const useQuery: <R, V extends GraphQlClientVariables_2>(client: GraphQlClient, query: string, variables: V, apiToken?: string) => QueryRequestObject<R>;

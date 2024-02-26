@@ -8,44 +8,45 @@ export const useFetchIdentity = (): [{ state: IdentityStateValue, identity: Iden
 	const sessionToken = useSessionToken()
 	const fetchMe = useFetchMe()
 
-	const [identityState, setIdentityState] = useState<IdentityStateValue>(sessionToken ? 'loading' : 'none')
-	const [identity, setIdentity] = useState<Identity | undefined>()
+	const [identityState, setIdentityState] = useState<ReturnType<typeof useFetchIdentity>[0]>({ state: sessionToken ? 'loading' : 'none', identity: undefined })
 
-	const clearIdentity = useCallback(() => setIdentityState('cleared'), [])
+	const clearIdentity = useCallback(() => setIdentityState({ state: 'cleared', identity: undefined }), [])
 	const logout = useLogoutInternal(clearIdentity)
 
 	const fetch = useCallback(async () => {
-		setIdentityState('loading')
+		setIdentityState({ state: 'loading', identity: undefined })
 		try {
 			const response = await fetchMe()
 			const person = response.person
 			const projects = response.projects
 			const permissions = response.permissions ?? { canCreateProject: false }
 
-			setIdentityState('success')
-			setIdentity({
-				id: response.id,
-				person: person ?? undefined,
-				projects: projects.map(it => ({
-					name: it.project.name,
-					slug: it.project.slug,
-					roles: it.memberships.map(it => it.role),
-				})),
-				permissions,
+			setIdentityState({
+				state: 'success',
+				identity: {
+					id: response.id,
+					person: person ?? undefined,
+					projects: projects.map(it => ({
+						name: it.project.name,
+						slug: it.project.slug,
+						roles: it.memberships.map(it => it.role),
+					})),
+					permissions,
+				},
 			})
 		} catch (e) {
 			console.error(e)
 			if (typeof e === 'object' && e !== null && 'status' in e && (e as { status?: unknown }).status === 401) {
 				logout({ noRedirect: true })
-				setIdentityState('cleared')
+				setIdentityState({ state: 'cleared', identity: undefined })
 			} else {
-				setIdentityState('failed')
+				setIdentityState({ state: 'failed', identity: undefined })
 			}
 		}
 	}, [fetchMe, logout])
 
 	return [
-		{ state: identityState, identity },
+		identityState,
 		useMemo((): IdentityMethods => ({
 			clearIdentity,
 			refreshIdentity: fetch,

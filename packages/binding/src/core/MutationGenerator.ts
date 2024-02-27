@@ -317,7 +317,12 @@ export class MutationGenerator {
 						}
 						const input = this.getCreateOneRelationInput(processedPlaceholdersByEntity, fieldState, marker)
 						if (input !== undefined) {
-							result[marker.parameters.field] = input
+							const current = result[marker.parameters.field]
+							if (Array.isArray(input) && Array.isArray(current)) {
+								current.push(...input)
+							} else {
+								result[marker.parameters.field] = input
+							}
 						}
 						break
 					}
@@ -339,7 +344,12 @@ export class MutationGenerator {
 						}
 						const input = this.getCreateManyRelationInput(processedPlaceholdersByEntity, fieldState)
 						if (input !== undefined) {
-							result[marker.parameters.field] = input
+							const current = result[marker.parameters.field]
+							if (Array.isArray(current)) {
+								current.push(...input)
+							} else {
+								result[marker.parameters.field] = input
+							}
 						}
 						break
 					}

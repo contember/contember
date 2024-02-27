@@ -1,11 +1,12 @@
-import { ApplicationEntrypoint, PageModule, Pages, runReactApp } from '@contember/interface'
+import { ApplicationEntrypoint, PageModule, Pages } from '@contember/interface'
 import { SlotsProvider } from '@contember/react-slots'
 import { Layout } from './app/components/layout'
 import './index.css'
 import { Toaster } from './lib/components/ui/toast'
-import { DevBar, DevPanel } from '@contember/react-devbar'
+import { DevBar, DevPanel, createErrorHandler } from '@contember/react-devbar'
 import { LogInIcon } from 'lucide-react'
 import { LoginWithEmail } from './lib/components/dev/login-panel'
+import { createRoot } from 'react-dom/client'
 
 if (!import.meta.env.VITE_CONTEMBER_ADMIN_API_BASE_URL) {
 	throw new Error('VITE_CONTEMBER_ADMIN_API_BASE_URL is not set')
@@ -21,7 +22,10 @@ if (basePath === './') {
 	basePath = `/${projectSlug}/`
 }
 
-runReactApp(
+const errorHandler = createErrorHandler((dom, react, onRecoverableError) => createRoot(dom, { onRecoverableError }).render(react))
+const rootEl = document.body.appendChild(document.createElement('div'))
+
+errorHandler(onRecoverableError => createRoot(rootEl, { onRecoverableError }).render(<>
 	<SlotsProvider>
 		<ApplicationEntrypoint
 			apiBaseUrl={import.meta.env.VITE_CONTEMBER_ADMIN_API_BASE_URL as string}
@@ -47,5 +51,4 @@ runReactApp(
 			}
 		/>
 	</SlotsProvider>
-	,
-)
+</>))

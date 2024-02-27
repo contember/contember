@@ -83,11 +83,6 @@ export const RedirectOnPersist: ({ to }: {
     to: RoutingLinkTarget;
 }) => null;
 
-// @public (undocumented)
-export const runReactApp: (reactElement: ReactElement, { domRoot }?: {
-    domRoot?: HTMLElement | undefined;
-}) => void;
-
 
 export * from "@contember/react-binding";
 export * from "@contember/react-identity";

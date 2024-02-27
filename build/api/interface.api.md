@@ -5,6 +5,7 @@
 ```ts
 
 import { ContemberClientProps } from '@contember/react-client';
+import { createErrorHandler } from '@contember/react-devbar';
 import { EntityAccessor } from '@contember/react-binding';
 import { Environment } from '@contember/react-binding';
 import { ErrorPersistResult } from '@contember/react-binding';
@@ -44,6 +45,8 @@ export interface ClearFieldTriggerProps {
     // (undocumented)
     field: SugaredRelativeSingleField['field'];
 }
+
+export { createErrorHandler }
 
 // @public (undocumented)
 export const DeleteEntityTrigger: ({ immediatePersist, onPersistError, onPersistSuccess, ...props }: DeleteEntityTriggerProps) => JSX_2.Element;

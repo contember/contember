@@ -229,9 +229,6 @@ export namespace ContentClientInput {
 			readonly [key in keyof TEntity['columns']]?: `${Input.OrderDirection}` | null
 		}
 		& {
-			readonly [key in keyof TEntity['hasMany']]?: FieldOrderBy<TEntity['hasMany'][key]> | null
-		}
-		& {
 			readonly [key in keyof TEntity['hasOne']]?: FieldOrderBy<TEntity['hasOne'][key]> | null
 		}
 

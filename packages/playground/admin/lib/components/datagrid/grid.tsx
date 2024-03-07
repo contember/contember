@@ -9,17 +9,17 @@ import {
 	DataViewProps,
 	DataViewSelectionTrigger,
 } from '@contember/react-dataview'
+import { EyeIcon, EyeOffIcon } from 'lucide-react'
 import * as React from 'react'
 import { Fragment, ReactNode, useMemo } from 'react'
-import { DataViewInitialLoader, DataViewLoaderOverlay } from './loader'
-import { DataViewNoResults } from './empty'
-import { DataTablePagination } from './pagination'
-import { DataViewLayoutSwitcher } from './layout-switcher'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown'
-import { Button } from '../ui/button'
-import { EyeIcon, EyeOffIcon } from 'lucide-react'
-import { DataViewTable, DataViewTableColumn } from './table'
 import { dict } from '../../../lib/dict'
+import { Button } from '../ui/button'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown'
+import { DataViewNoResults } from './empty'
+import { DataViewLayoutSwitcher } from './layout-switcher'
+import { DataViewInitialLoader, DataViewLoaderOverlay } from './loader'
+import { DataTablePagination } from './pagination'
+import { DataViewTable, DataViewTableColumn } from './table'
 
 export type DataViewColumn =
 	& DataViewTableColumn

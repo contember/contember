@@ -43,7 +43,7 @@ export const MultiSelectItemRemoveButtonUI = uic('button', {
 })
 
 export const SelectPopoverContent = uic(PopoverContent, {
-	baseClass: 'p-0 py-4  group w-[max(16rem,var(--radix-popover-trigger-width))]',
+	baseClass: 'p-0 py-1 group w-[max(16rem,var(--radix-popover-trigger-width))]',
 })
 
 

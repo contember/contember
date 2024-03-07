@@ -17,7 +17,7 @@ export const DataViewTextFilter = ({ name }: {
 		<InputLike className={'p-1 relative basis-1/4 min-w-40'}>
 			<DropdownMenu>
 				<DropdownMenuTrigger asChild>
-					<Button size={'sm'} variant={'secondary'} className={' px-1'}>
+					<Button size={'sm'} variant={'secondary'} className={'px-3'}>
 						<DataViewTextFilterMatchModeLabel name={name} render={dict.datagrid.textMatchMode} />
 					</Button>
 				</DropdownMenuTrigger>
@@ -45,7 +45,7 @@ export const DataViewTextFilter = ({ name }: {
 				<Popover>
 					<PopoverTrigger asChild>
 						<Button variant={'ghost'} size={'sm'} className={'p-0.5 h-5 w-5'}>
-							<MoreHorizontalIcon className="h-3 w-3" />
+							<MoreHorizontalIcon />
 						</Button>
 					</PopoverTrigger>
 					<PopoverContent>

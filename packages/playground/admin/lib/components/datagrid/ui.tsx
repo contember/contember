@@ -44,7 +44,10 @@ export const DataViewExcludeActionButtonUI = forwardRef<HTMLButtonElement, {}>((
 /**
  * Button in a filter list that removes the filter
  */
-export const DataViewActiveFilterUI = forwardRef<HTMLButtonElement, { children: ReactNode, className? : string }>(({ children, className, ...props }, ref) => {
+export const DataViewActiveFilterUI = forwardRef<HTMLButtonElement, {
+	children: ReactNode,
+	className?: string
+}>(({ children, className, ...props }, ref) => {
 	return (
 		<Button
 			variant={'outline'}
@@ -68,10 +71,13 @@ export const DataViewSingleFilterUI = forwardRef<HTMLDivElement, { children: Rea
 	)
 })
 
-export const DataViewFilterSelectTriggerUI = forwardRef<HTMLButtonElement, { children: ReactNode }>(({ children, ...props }, ref) => {
+export const DataViewFilterSelectTriggerUI = forwardRef<HTMLButtonElement, { children: ReactNode }>(({
+	children,
+	...props
+}, ref) => {
 	return (
-		<button className={'hover:underline inline-flex items-center gap-1 group'} ref={ref} {...props}>
-			<span className={'text-xs font-semibold'}>
+		<button className={'hover:underline inline-flex items-center gap-2 group px-1'} ref={ref} {...props}>
+			<span className={'text-xs font-medium'}>
 				{children}
 			</span>
 			<span
@@ -91,7 +97,14 @@ export interface DataViewFilterSelectItemProps {
 	children: ReactNode
 }
 
-export const DataViewFilterSelectItemUI = forwardRef<HTMLButtonElement, DataViewFilterSelectItemProps>(({ children, onExclude, isExcluded, onInclude, isIncluded, ...props }, ref) => {
+export const DataViewFilterSelectItemUI = forwardRef<HTMLButtonElement, DataViewFilterSelectItemProps>(({
+	children,
+	onExclude,
+	isExcluded,
+	onInclude,
+	isIncluded,
+	...props
+}, ref) => {
 	const include = useCallback<ReactEventHandler>(e => {
 		onInclude()
 		e.preventDefault()
@@ -103,16 +116,26 @@ export const DataViewFilterSelectItemUI = forwardRef<HTMLButtonElement, DataView
 	}, [onExclude])
 
 	return (
-		<div className={'relative'} >
-			<Button ref={ref} onClick={include} size={'sm'} className={'pl-1 w-full text-left justify-start gap-1 data-[highlighted]:bg-gray-200'} variant={'ghost'} {...props}>
-				{isIncluded ? <CheckSquareIcon className={'w-3 h-3'} /> : <SquareIcon className={'w-3 h-3'} />}
+		<div className={'relative flex gap-1 justify-between items-center'}>
+			<Button
+				ref={ref}
+				onClick={include}
+				size={'sm'}
+				className={'pl-1 w-full text-left justify-start gap-1 data-[highlighted]:bg-gray-200'}
+				variant={'ghost'} {...props}>
+				{isIncluded ? <CheckSquareIcon className={'w-3 h-3'}/> : <SquareIcon className={'w-3 h-3'}/>}
 				<span className={cn('font-normal', isIncluded && 'text-blue-700')}>
 					{children}
 				</span>
 			</Button>
-			<button onClick={exclude}
-				  className={cn('absolute right-1 top-1/2 -translate-y-1/2 p-1 border rounded hover:bg-red-200', isExcluded ? 'bg-red-300 shadow-inner' : '')}>
-				<FilterXIcon className={'h-3 w-3'} />
+			<button
+				onClick={exclude}
+				className={cn(
+					'p-1 border rounded hover:bg-red-200',
+					isExcluded ? 'bg-red-300 shadow-inner' : '',
+				)}
+			>
+				<FilterXIcon className={'h-3 w-3'}/>
 			</button>
 		</div>
 

@@ -22,7 +22,7 @@ export const SelectListInner = ({ children, filterToolbar }: SelectListProps) =>
 					{filterToolbar}
 				</div>}
 				<ScrollArea className={'max-h-96'}>
-					<div className={'flex flex-col gap-1 px-4'}>
+					<div className={'flex flex-col gap-1 px-1'}>
 						<DataViewLoaderState refreshing>
 							<DataViewLoaderOverlay />
 						</DataViewLoaderState>

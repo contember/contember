@@ -44,7 +44,11 @@ export const RequestProvider: FC<{ children: ReactNode }> = ({ children }) => {
 	const pushRequest = useCallback(
 		(request: RequestState) => {
 			setRequest(request)
-			window.history.pushState({}, document.title, requestStateToPath(routing, request))
+			const newUrl = requestStateToPath(routing, request)
+			if (newUrl === window.location.pathname + window.location.search) {
+				return
+			}
+			window.history.pushState({}, document.title, newUrl)
 		},
 		[routing],
 	)

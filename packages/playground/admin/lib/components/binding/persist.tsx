@@ -19,7 +19,7 @@ export const PersistButton = ({ label }: {
 	return (
 		<FeedbackTrigger>
 			<PersistTrigger>
-				<Button size={'lg'} className="rounded-xl py-6 group relative">
+				<Button className="group">
 					<Loader size="sm" position="absolute" className="hidden group-data-[loading]:block" />
 					{label ?? dict.persist.persistButton}
 				</Button>

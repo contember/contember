@@ -10,6 +10,11 @@ import { MultiSelectInput, MultiSelectInputProps, SelectInput, SelectInputProps,
 import { FormCheckbox, FormCheckboxProps, FormError, FormFieldScope, FormHasManyRelationScope, FormHasOneRelationScope, FormInput, FormInputProps, FormLabel, FormRadioInput } from '@contember/react-form'
 import { TextareaAutosize } from './ui/textarea'
 
+export const FormLayout = uic('div', {
+	baseClass: 'flex flex-col gap-2 w-full ml-4',
+	displayName: 'FormLayout',
+})
+
 const FormDescriptionUI = uic('p', {
 	baseClass: 'text-[0.8rem] text-muted-foreground',
 	displayName: 'FormDescription',
@@ -20,7 +25,7 @@ const FormErrorUI = uic('p', {
 	displayName: 'FormError',
 })
 const FormLabelWrapperUI = uic('div', {
-	baseClass: 'flex md:justify-end md:items-center',
+	baseClass: 'flex',
 	displayName: 'FormLabelWrapper',
 })
 const FormLabelUI = uic(Label, {
@@ -28,7 +33,7 @@ const FormLabelUI = uic(Label, {
 	displayName: 'FormLabel',
 })
 const FormContainerUI = uic('div', {
-	baseClass: 'grid grid-cols-1 md:grid-cols-[min(30%,10rem),1fr] gap-x-4 gap-y-2',
+	baseClass: 'flex flex-col gap-2 w-full',
 	displayName: 'FormContainer',
 })
 
@@ -72,10 +77,9 @@ const FormContainer = Component(({ children, description, label }: FormContainer
 				</FormLabelUI>
 			</FormLabel>}
 		</FormLabelWrapperUI>
-		<div className="self-center">
+		<div>
 			{children}
 		</div>
-		<div></div>
 		<div>
 			{description && <FormDescriptionUI>
 				{description}
@@ -217,7 +221,7 @@ export const RadioEnumField = Component<RadioEnumFieldProps>(({ field, label, de
 	return (
 		<FormFieldScope field={field}>
 			<FormContainer description={description} label={label}>
-				<div className={'flex flex-wrap gap-3 data-[orientation=vertical]:flex-col'} data-orientation={orientation ?? 'vertical'}>
+				<div className={'flex flex-wrap gap-3 data-[orientation=vertical]:flex-col'} data-orientation={orientation ?? 'horizontal'}>
 					{Object.entries(options).map(([value, label]) => (
 						<FormLabelUI className="flex gap-2 items-center font-normal" key={value}>
 							<FormRadioInput field={field} value={value}>

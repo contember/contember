@@ -30,22 +30,22 @@ export const MenuItem = ({ icon, label, to, subItems, lvl = 0 }: MenuItem) => {
 		<div>
 			{to ? (
 				<Link to={to}>
-					<MenuLink className={'hover:bg-gray-100 cursor-pointer '}>
+					<MenuLink className={'hover:bg-gray-100 cursor-pointer gap-2'}>
 						<span className={'w-4 text-gray-400 inline-flex items-center justify-center'}>{icon}</span>
-						<span className={lvl === 0 ? 'font-semibold' : ''}>{label}</span>
+						<span className={lvl === 0 ? 'font-medium' : ''}>{label}</span>
 						<span className={'ml-auto'}></span>
 					</MenuLink>
 				</Link>
 			) : (
-				<MenuLink>
+				<MenuLink className={'gap-2'}>
 					<span className={'w-4 text-gray-400 items-center justify-center'}>{icon}</span>
-					<span className={lvl === 0 ? 'font-semibold' : ''}>{label}</span>
+					<span className={lvl === 0 ? 'font-medium' : ''}>{label}</span>
 					<span className={'ml-auto'}></span>
 				</MenuLink>
 			)}
 			{subItems && (
 				<div className={'ml-2'}>
-					<MenuList items={subItems} lvl={lvl + 1} />
+					<MenuList items={subItems} lvl={lvl + 1}/>
 				</div>
 			)}
 		</div>

@@ -1,9 +1,7 @@
+import { Button } from '../../lib/components/ui/button'
 import { uic } from '../../lib/utils/uic'
-import { GripVerticalIcon } from 'lucide-react'
 import { Component } from '@contember/interface'
-import { Repeater, RepeaterEachItem, RepeaterProps } from '@contember/react-repeater'
-import { DropIndicator } from './ui/sortable'
-import * as React from 'react'
+import { Repeater, RepeaterAddItemTrigger, RepeaterEachItem, RepeaterProps } from '@contember/react-repeater'
 import {
 	RepeaterSortable,
 	RepeaterSortableDragOverlay,
@@ -12,9 +10,11 @@ import {
 	RepeaterSortableItemActivator,
 	RepeaterSortableItemNode,
 } from '@contember/react-repeater-dnd-kit'
+import { GripVerticalIcon, PlusCircleIcon } from 'lucide-react'
+import { DropIndicator } from './ui/sortable'
 
 export const RepeaterItemsWrapperUI = uic('div', {
-	baseClass: 'flex flex-col gap-2 p-2',
+	baseClass: 'flex flex-col gap-2 py-4',
 })
 export const RepeaterItemUI = uic('div', {
 	baseClass: 'rounded border border-gray-300 p-4 relative',
@@ -35,50 +35,73 @@ export const RepeaterDropIndicator = ({ position }: { position: 'before' | 'afte
 	</div>
 )
 
-export type DefaultRepeaterProps =
+export const RepeaterAddItemButton = ({ children }: { children?: React.ReactNode }) => (
+	<RepeaterAddItemTrigger index={'last'}>
+		<div>
+			<Button variant={'link'} size={'sm'} className={'gap-1 px-0'}>
+				{children || <>
+					<PlusCircleIcon size={16}/>
+					<span>Add item</span>
+				</>}
+			</Button>
+		</div>
+	</RepeaterAddItemTrigger>
+)
+
+export type DefaultRepeaterProps = { title?: string }
 	& RepeaterProps
 
-export const DefaultRepeater = Component<DefaultRepeaterProps>(({ children, ...props }) => {
+export const DefaultRepeater = Component<DefaultRepeaterProps>(({ title, children, ...props }) => {
 	const isSortable = props.sortableBy !== undefined
 
 	if (!isSortable) {
 		return (
-			<Repeater {...props}>
-				<RepeaterEachItem>
-					<RepeaterItemsWrapperUI>
-						{children}
-					</RepeaterItemsWrapperUI>
-				</RepeaterEachItem>
-			</Repeater>
+			<div>
+				<Repeater {...props}>
+					{title && <h3 className={'font-medium'}>{title}</h3>}
+
+					<RepeaterEachItem>
+						<RepeaterItemsWrapperUI>
+							{children}
+						</RepeaterItemsWrapperUI>
+					</RepeaterEachItem>
+
+					<RepeaterAddItemButton/>
+				</Repeater>
+			</div>
 		)
 	}
 	return (
-		<Repeater {...props}>
-			<RepeaterItemsWrapperUI>
-				<RepeaterSortable>
-					<RepeaterSortableEachItem>
-						<div>
-							<RepeaterDropIndicator position={'before'}/>
-							<RepeaterSortableItemNode>
-								<RepeaterItemUI>
-									<RepeaterSortableItemActivator>
-										<RepeaterHandleUI/>
-									</RepeaterSortableItemActivator>
-									{children}
-								</RepeaterItemUI>
-							</RepeaterSortableItemNode>
-							<RepeaterDropIndicator position={'after'}/>
-						</div>
-					</RepeaterSortableEachItem>
-					<RepeaterSortableDragOverlay>
-						<RepeaterDragOverlayUI>
-							{children}
-						</RepeaterDragOverlayUI>
-					</RepeaterSortableDragOverlay>
-				</RepeaterSortable>
+		<div>
+			<Repeater {...props}>
+				<RepeaterItemsWrapperUI>
+					{title && <h3 className={'font-medium'}>{title}</h3>}
+					<RepeaterSortable>
+						<RepeaterSortableEachItem>
+							<div>
+								<RepeaterDropIndicator position={'before'}/>
+								<RepeaterSortableItemNode>
+									<RepeaterItemUI>
+										<RepeaterSortableItemActivator>
+											<RepeaterHandleUI/>
+										</RepeaterSortableItemActivator>
+										{children}
+									</RepeaterItemUI>
+								</RepeaterSortableItemNode>
+								<RepeaterDropIndicator position={'after'}/>
+							</div>
+						</RepeaterSortableEachItem>
+						<RepeaterSortableDragOverlay>
+							<RepeaterDragOverlayUI>
+								{children}
+							</RepeaterDragOverlayUI>
+						</RepeaterSortableDragOverlay>
+					</RepeaterSortable>
 
-			</RepeaterItemsWrapperUI>
-		</Repeater>
+					<RepeaterAddItemButton/>
+				</RepeaterItemsWrapperUI>
+			</Repeater>
+		</div>
 	)
 }, props => {
 	return <Repeater {...props} />

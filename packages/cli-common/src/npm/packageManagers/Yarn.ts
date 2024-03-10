@@ -27,7 +27,7 @@ export class Yarn implements PackageManager {
 
 	async isActive({ dir, packageJson }: { dir: string; packageJson: PackageJson }): Promise<boolean> {
 		return await this.fsManager.exists(join(dir, 'yarn.lock'))
-			&& (!packageJson.packageManager || (packageJson.packageManager as string).startsWith('yarn@3') || (packageJson.packageManager as string).startsWith('yarn@2'))
+			&& (!packageJson.packageManager || (packageJson.packageManager as string).startsWith('yarn@4') || (packageJson.packageManager as string).startsWith('yarn@3') || (packageJson.packageManager as string).startsWith('yarn@2'))
 	}
 
 	async readWorkspacePackages({ dir, packageJson }: { dir: string; packageJson: PackageJson }): Promise<Package[]> {

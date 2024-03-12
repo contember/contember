@@ -8,8 +8,8 @@
     "test": "echo 'No tests'"
   },
   "dependencies": {
-    "@contember/schema": "^1.0.4",
-    "@contember/schema-utils": "^1.0.4",
+    "@contember/schema": "1.0.4",
+    "@contember/schema-utils": "1.0.4",
     "reflect-metadata": "^0.1.13"
   },
   "devDependencies": {}

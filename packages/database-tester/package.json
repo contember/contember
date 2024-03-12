@@ -5,7 +5,7 @@
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
   "dependencies": {
-    "@contember/database": "^1.0.4",
+    "@contember/database": "1.0.4",
     "uvu": "^0.5.1"
   },
   "scripts": {

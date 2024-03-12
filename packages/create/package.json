@@ -8,6 +8,6 @@
   },
   "devDependencies": {},
   "dependencies": {
-    "@contember/cli-common": "^1.0.4"
+    "@contember/cli-common": "1.0.4"
   }
 }

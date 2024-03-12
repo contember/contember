@@ -8,10 +8,10 @@
     "test": "uvu dist/tests/cases/ \\.js$"
   },
   "dependencies": {
-    "@contember/engine-common": "^1.0.4",
-    "@contember/engine-plugins": "^1.0.4",
-    "@contember/graphql-utils": "^1.0.4",
-    "@contember/schema": "^1.0.4",
+    "@contember/engine-common": "1.0.4",
+    "@contember/engine-plugins": "1.0.4",
+    "@contember/graphql-utils": "1.0.4",
+    "@contember/schema": "1.0.4",
     "apollo-server-errors": "^2.3.4",
     "mime-types": "^2.1.24",
     "picomatch": "^2.2.1",

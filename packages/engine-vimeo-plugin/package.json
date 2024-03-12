@@ -8,10 +8,10 @@
   },
   "typings": "dist/src/index.d.ts",
   "dependencies": {
-    "@contember/engine-common": "^1.0.4",
-    "@contember/engine-plugins": "^1.0.4",
-    "@contember/graphql-utils": "^1.0.4",
-    "@contember/schema": "^1.0.4",
+    "@contember/engine-common": "1.0.4",
+    "@contember/engine-plugins": "1.0.4",
+    "@contember/graphql-utils": "1.0.4",
+    "@contember/schema": "1.0.4",
     "apollo-server-errors": "^2.3.4",
     "node-fetch": "^2.6.0"
   },

@@ -102,7 +102,7 @@ const DataViewRelationFilterSelect = ({ name, children, options, filterField, la
 						</DataViewRelationFilterSelectItem>
 					</SelectListInner>
 				</DataView>
-				<div className="px-1">
+				<div>
 					<DataViewNullFilter name={name} />
 				</div>
 			</SelectPopoverContent>

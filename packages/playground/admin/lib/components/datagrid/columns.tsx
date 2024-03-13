@@ -3,7 +3,7 @@ import { ReactNode } from 'react'
 import {
 	DataViewEnumFieldTooltip,
 	DataViewRelationFieldTooltip,
-	DataViewTextFilter,
+	DataViewTextFilter, DefaultDataViewBooleanFilter, DefaultDataViewDateFilter,
 	DefaultDataViewEnumFilter,
 	DefaultDataViewNumberFilter,
 	DefaultDataViewRelationFilter,
@@ -174,6 +174,7 @@ export const createDateColumn = ({ field, label, ...args }: DataViewDateColumnAr
 		hidingName: field,
 		sortingField: field,
 		filterHandler: createDateFilter(field),
+		filterToolbar: <DefaultDataViewDateFilter name={field} label={label} />,
 		...args,
 	}
 }
@@ -193,6 +194,7 @@ export const createBooleanColumn = ({ field, label, ...args }: DataViewBooleanCo
 		hidingName: field,
 		sortingField: field,
 		filterHandler: createBooleanFilter(field),
+		filterToolbar: <DefaultDataViewBooleanFilter name={field} label={label} />,
 		...args,
 	}
 }

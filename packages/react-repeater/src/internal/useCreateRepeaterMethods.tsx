@@ -37,7 +37,7 @@ export const useCreateRepeaterMethods = ({ accessor, sortableBy }: {
 				preprocess?.(getEntity, options)
 			})
 		},
-		moveItem: (entity, index) => {
+		moveItem: sortableBy ? (entity, index) => {
 			if (!sortableBy) {
 				throw new BindingError('Cannot move item without sortableBy field')
 			}
@@ -64,7 +64,7 @@ export const useCreateRepeaterMethods = ({ accessor, sortableBy }: {
 			})()
 			const newSorted = arrayMove(sortedEntities, currentIndex, resolvedIndex)
 			repairEntitiesOrder(sortableBy, newSorted)
-		},
+		} : undefined,
 		removeItem: (entity: EntityAccessor) => {
 			if (sortableBy) {
 				const entities = accessorGetter()

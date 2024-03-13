@@ -7,7 +7,9 @@ export const RepeaterEachItem = ({ children }: { children: ReactNode }) => {
 	return <>
 		{entities.map(entity => (
 			<Entity key={entity.key} accessor={entity}>
-				{children}
+				<RepeaterCurrentEntityContext.Provider value={entity}>
+					{children}
+				</RepeaterCurrentEntityContext.Provider>
 			</Entity>
 		))}
 	</>

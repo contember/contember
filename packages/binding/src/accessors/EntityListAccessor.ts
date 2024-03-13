@@ -129,6 +129,10 @@ class EntityListAccessor implements Errorable {
 	public getChildEntityById(id: EntityId): EntityAccessor {
 		return this.operations.getChildEntityById(this.state, id)
 	}
+
+	public getParent(): EntityAccessor | undefined {
+		return this.state.blueprint.parent?.getAccessor()
+	}
 }
 
 namespace EntityListAccessor {

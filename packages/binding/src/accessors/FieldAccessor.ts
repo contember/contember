@@ -6,6 +6,7 @@ import type { BatchUpdatesOptions } from './BatchUpdatesOptions'
 import type { Errorable } from './Errorable'
 import { ErrorAccessor } from './ErrorAccessor'
 import type { SchemaColumn } from '../core/schema/SchemaColumn'
+import { EntityAccessor } from './EntityAccessor'
 
 class FieldAccessor<Value extends FieldValue = FieldValue> implements Errorable {
 	constructor(
@@ -68,6 +69,10 @@ class FieldAccessor<Value extends FieldValue = FieldValue> implements Errorable 
 
 	public get asUuid(): UuidFieldHelper {
 		return new UuidFieldHelper(this.getAccessor as FieldAccessor.GetFieldAccessor<any>)
+	}
+
+	public getParent(): EntityAccessor {
+		return this.state.parent.getAccessor()
 	}
 }
 namespace FieldAccessor {

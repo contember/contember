@@ -163,7 +163,7 @@ export class DataBinding<Node> {
 				}
 			}
 
-			if (Object.values(response.data).every(it => it.ok)) {
+			if (response.ok && Object.values(response.data).every(it => it.ok)) {
 				return await this.processSuccessfulPersistResult(response, operations, onPersistSuccess)
 			} else {
 				if (response.errorMessage) {
@@ -177,6 +177,7 @@ export class DataBinding<Node> {
 				this.persistFail({
 					errors: this.accessorErrorManager.getErrors(),
 					type: 'invalidInput',
+					response,
 				})
 
 			}

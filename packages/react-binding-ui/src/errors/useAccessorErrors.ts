@@ -4,9 +4,6 @@ import { useCallback, useMemo } from 'react'
 import { useMessageFormatter } from '@contember/react-i18n'
 import { errorCodeDictionary } from './errorCodeDictionary'
 
-export interface AccessorErrorsHolder {
-	readonly errors: ErrorAccessor | undefined
-}
 
 export interface AccessorErrorMessage { message: string }
 export type AccessorErrorMessages = [AccessorErrorMessage, ...AccessorErrorMessage[]]

@@ -1,6 +1,5 @@
-import type { EntityAccessor, Environment } from '@contember/react-binding'
+import type { EntityAccessor, Environment, ErrorAccessorHolder } from '@contember/react-binding'
 import type { ReactNode } from 'react'
-import { AccessorErrorsHolder } from '@contember/react-binding-ui'
 
 export interface FileDataExtractorPopulateFieldsOptions<
 	ExtractedData = unknown,
@@ -40,5 +39,5 @@ export interface FileDataExtractor<ExtractedData = unknown, UploadResult = unkno
 	populateFields: (
 		options: FileDataExtractorPopulateFieldsOptions<ExtractedData, UploadResult, AcceptArtifacts>,
 	) => void
-	getErrorsHolders?: (options: FileDataExtractorGetErrorsOptions) => AccessorErrorsHolder[]
+	getErrorsHolders?: (options: FileDataExtractorGetErrorsOptions) => ErrorAccessorHolder[]
 }

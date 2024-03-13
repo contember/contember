@@ -2,13 +2,14 @@ import * as React from 'react'
 import { forwardRef, ReactNode, useCallback } from 'react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../../ui/tooltip'
 import { Button } from '../../ui/button'
-import { DataView, DataViewNullFilterTrigger, DataViewRelationFilterList, DataViewRelationFilterTrigger, useDataViewRelationFilterFactory, UseDataViewRelationFilterResult } from '@contember/react-dataview'
+import { createCoalesceFilter, DataView, DataViewNullFilterTrigger, DataViewRelationFilterList, DataViewRelationFilterTrigger, useDataViewRelationFilterFactory, UseDataViewRelationFilterResult } from '@contember/react-dataview'
 import { Component, EntityId, SugarableQualifiedEntityList, SugaredQualifiedEntityList, useEntity } from '@contember/interface'
 import { Popover, PopoverTrigger } from '../../ui/popover'
 import { DataViewActiveFilterUI, DataViewExcludeActionButtonUI, DataViewFilterActionButtonUI, DataViewFilterSelectItemUI, DataViewFilterSelectTriggerUI, DataViewSingleFilterUI } from '../ui'
 import { DataViewNullFilter } from './common'
-import { createDefaultSelectFilter, SelectListInner, SelectPopoverContent } from '../../select'
+import { SelectDefaultFilter, SelectListInner, SelectPopoverContent } from '../../select'
 import { dict } from '../../../dict'
+import { SelectFilterFieldProps } from '@contember/react-select'
 
 export const DataViewRelationFieldTooltip = ({ filter, children, actions }: { filter: string, children: ReactNode, actions?: ReactNode }) => (
 	<TooltipProvider>
@@ -75,14 +76,13 @@ const DataViewRelationFilterSelectItem = forwardRef<HTMLButtonElement, {
 })
 
 
-const DataViewRelationFilterSelect = ({ name, children, options, filterField, label }: {
+const DataViewRelationFilterSelect = ({ name, children, options, filterField, label }: SelectFilterFieldProps & {
 	name: string
-	filterField?: string
 	options: string | SugarableQualifiedEntityList
 	children: ReactNode
 	label?: ReactNode
 }) => {
-	const filter = filterField ? createDefaultSelectFilter(filterField) : { filterTypes: undefined, filterToolbar: undefined }
+	const filter = filterField ? { query: createCoalesceFilter(Array.isArray(filterField) ? filterField : [filterField]) } : undefined
 	let filterFactory = useDataViewRelationFilterFactory(name)
 	return (
 		<Popover>
@@ -92,11 +92,11 @@ const DataViewRelationFilterSelect = ({ name, children, options, filterField, la
 				</DataViewFilterSelectTriggerUI>
 			</PopoverTrigger>
 			<SelectPopoverContent>
-				<DataView filterTypes={filter.filterTypes} entities={options} onSelectHighlighted={it => {
+				<DataView filterTypes={filter} entities={options} onSelectHighlighted={it => {
 							const [, set] = filterFactory(it.id)
 							set('toggleInclude')
 				}}>
-					<SelectListInner filterToolbar={filter.filterToolbar}>
+					<SelectListInner filterToolbar={<SelectDefaultFilter />}>
 						<DataViewRelationFilterSelectItem filterFactory={filterFactory}>
 							{children}
 						</DataViewRelationFilterSelectItem>

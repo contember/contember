@@ -7,26 +7,26 @@ import { SugaredRelativeSingleEntity } from '@contember/react-binding'
 import { ChevronDownIcon, XIcon } from 'lucide-react'
 import { SelectCreateNewTrigger, SelectDefaultPlaceholderUI, SelectInputActionsUI, SelectInputUI, SelectListItemUI, SelectPopoverContent } from './ui'
 import { SelectListInner } from './list'
-import { createDefaultSelectFilter } from './filter'
-import { Select, SelectDataView, SelectEachValue, SelectItemTrigger, SelectOption, SelectPlaceholder } from '@contember/react-select'
+import { Select, SelectDataView, SelectEachValue, SelectFilterFieldProps, SelectItemTrigger, SelectOption, SelectPlaceholder } from '@contember/react-select'
 import { CreateEntityDialog } from './create-new'
+import { SelectDefaultFilter } from './filter'
 
-export interface SelectInputProps {
-	field: SugaredRelativeSingleEntity['field']
-	children: ReactNode
-	options: SugaredQualifiedEntityList['entities']
-	filterField?: string
-	placeholder?: ReactNode
-	createNewForm?: ReactNode
-}
+export type SelectInputProps =
+	& SelectFilterFieldProps
+	& {
+		field: SugaredRelativeSingleEntity['field']
+		children: ReactNode
+		options?: SugaredQualifiedEntityList['entities']
+		placeholder?: ReactNode
+		createNewForm?: ReactNode
+	}
 
 
-export const SelectInput = Component<SelectInputProps>(({ field, filterField, options, children, placeholder, createNewForm }, env) => {
-	const filter = createDefaultSelectFilter(filterField)
+export const SelectInput = Component<SelectInputProps>(({ field, filterField, options, children, placeholder, createNewForm }) => {
 	const [open, setOpen] = React.useState(false)
 
 	return (
-		<Select field={field} onSelect={() => setOpen(false)} options={options}>
+		<Select field={field} onSelect={() => setOpen(false)} options={options} filterField={filterField}>
 			<div className="flex gap-1 items-center">
 				<Popover open={open} onOpenChange={setOpen}>
 					<PopoverTrigger asChild>
@@ -52,8 +52,8 @@ export const SelectInput = Component<SelectInputProps>(({ field, filterField, op
 
 					</PopoverTrigger>
 					<SelectPopoverContent>
-						<SelectDataView filterTypes={filter?.filterTypes}>
-							<SelectListInner filterToolbar={filter?.filterToolbar}>
+						<SelectDataView>
+							<SelectListInner filterToolbar={<SelectDefaultFilter/>}>
 								<SelectOption>
 									<SelectItemTrigger>
 										<SelectListItemUI>

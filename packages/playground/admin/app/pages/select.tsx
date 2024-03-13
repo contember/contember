@@ -13,10 +13,7 @@ export const hasOne = () => <>
 		</Slots.Actions>
 		<EntitySubTree entity={'SelectRoot(unique=unique)'} setOnCreate={'(unique=unique)'}>
 			<div className={'space-y-4'}>
-				<SelectField field={'hasOne'} options={'SelectValue'} filterField={'name'} label="Has one value" createNewForm={<>
-					<InputField field="name"/>
-					<InputField field="slug"/>
-				</>}>
+				<SelectField field={'hasOne'} label="Has one value">
 					<Field field={'name'} />
 				</SelectField>
 			</div>
@@ -30,7 +27,7 @@ export const hasMany = () => <>
 		</Slots.Actions>
 		<EntitySubTree entity={'SelectRoot(unique=unique)'} setOnCreate={'(unique=unique)'}>
 			<div className={'space-y-4'}>
-				<MultiSelectField field={'hasMany'} options={'SelectValue'} filterField={'name'} label="Has many values">
+				<MultiSelectField field={'hasMany'} label="Has many values">
 					<Field field={'name'} />
 				</MultiSelectField>
 			</div>
@@ -44,9 +41,31 @@ export const hasManySortable = () => <>
 		</Slots.Actions>
 		<EntitySubTree entity={'SelectRoot(unique=unique)'} setOnCreate={'(unique=unique)'}>
 			<div className={'space-y-4'}>
-				<SortableMultiSelectField field={'hasManySorted'} options={'SelectValue'} filterField={'name'} connectAt={'value'} sortableBy={'order'} label="Has many sortable values">
+				<SortableMultiSelectField field={'hasManySorted'} connectAt={'value'} sortableBy={'order'} label="Has many sortable values">
 					<Field field={'name'} />
 				</SortableMultiSelectField>
+			</div>
+		</EntitySubTree>
+	</Binding>
+</>
+
+export const createNewForm = () => <>
+	<Binding>
+		<Slots.Actions>
+			<PersistButton />
+		</Slots.Actions>
+		<EntitySubTree entity={'SelectRoot(unique=unique)'} setOnCreate={'(unique=unique)'}>
+			<div className={'space-y-4'}>
+				<SelectField
+					field={'hasOne'}
+					label="Has one value"
+					createNewForm={<>
+						<InputField field="name" />
+						<InputField field="slug" />
+					</>}
+				>
+					<Field field={'name'} />
+				</SelectField>
 			</div>
 		</EntitySubTree>
 	</Binding>

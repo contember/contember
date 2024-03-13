@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react'
-import { useRepeaterSortedEntities } from '../internal/contexts'
+import { useRepeaterSortedEntities } from '../contexts'
 
 export const RepeaterEmpty = ({ children }: { children: ReactNode }) => {
 	const entities = useRepeaterSortedEntities()

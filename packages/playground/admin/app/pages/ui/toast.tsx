@@ -12,7 +12,7 @@ const ToastTrigger = ({ type, description, title, ...props }: {
 	const showToast = useShowToast()
 	const onClick = () => {
 		showToast(
-			<ToastContent title={title} description={description} />,
+			<ToastContent title={title} children={description} />,
 			{
 				type,
 			},

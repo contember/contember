@@ -4,6 +4,8 @@
 		"outDir": "../dist/types"
 	},
 	"references": [
-		{ "path": "../../admin/src" }
+		{ "path": "../../admin/src" },
+		{ "path": "../../react-uploader/src" },
+		{ "path": "../../react-uploader-dropzone/src" },
 	]
 }

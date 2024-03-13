@@ -7,6 +7,6 @@ export type RepeaterAddItemMethod = (index: RepeaterAddItemIndex, preprocess?: E
 export type RepeaterRemoveItemMethod = (entity: EntityAccessor) => void
 export type RepeaterMethods = {
 	moveItem?: RepeaterMoveItemMethod
-	addItem?: RepeaterAddItemMethod
-	removeItem?: RepeaterRemoveItemMethod
+	addItem: RepeaterAddItemMethod
+	removeItem: RepeaterRemoveItemMethod
 }

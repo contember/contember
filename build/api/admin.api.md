@@ -6,7 +6,6 @@
 
 /// <reference types="react" />
 
-import { AccessorErrorsHolder } from '@contember/react-binding-ui';
 import type { AccessorTreeState } from '@contember/react-binding';
 import { AddEntityButtonProps } from '@contember/react-binding-ui';
 import { Ancestor } from 'slate';
@@ -52,6 +51,7 @@ import { EntityListSubTreeAdditionalProps } from '@contember/react-binding';
 import { EntitySubTreeAdditionalCreationProps } from '@contember/react-binding';
 import { EntitySubTreeAdditionalProps } from '@contember/react-binding';
 import { Environment } from '@contember/react-binding';
+import { ErrorAccessorHolder } from '@contember/react-binding';
 import { ErrorCodeDictionary } from '@contember/react-binding-ui';
 import { FC } from 'react';
 import { FieldAccessor } from '@contember/react-binding';
@@ -1228,7 +1228,7 @@ export interface FileDataExtractor<ExtractedData = unknown, UploadResult = unkno
     // (undocumented)
     extractFileData?: (options: FileDataExtractorExtractFileDataOptions<AcceptArtifacts>) => Promise<ExtractedData> | null;
     // (undocumented)
-    getErrorsHolders?: (options: FileDataExtractorGetErrorsOptions) => AccessorErrorsHolder[];
+    getErrorsHolders?: (options: FileDataExtractorGetErrorsOptions) => ErrorAccessorHolder[];
     // (undocumented)
     populateFields: (options: FileDataExtractorPopulateFieldsOptions<ExtractedData, UploadResult, AcceptArtifacts>) => void;
     // (undocumented)
@@ -2861,7 +2861,7 @@ export interface ResolvedDiscriminatedDatum<Datum> {
 export type ResolvedFileEntity = {
     parentEntity: EntityAccessor;
     destroy?: () => void;
-    getErrorHolders: () => AccessorErrorsHolder[];
+    getErrorHolders: () => ErrorAccessorHolder[];
 } & ({
     fileEntity: EntityAccessor;
     fileKind: FullFileKind<any, any>;

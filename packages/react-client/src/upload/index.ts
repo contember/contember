@@ -12,4 +12,4 @@ export type {
 	FailUpload,
 } from './FileUploadOperations'
 export type { FileWithMetadata } from './FileWithMetadata'
-export type { SingleFileUploadState } from './SingleFileUploadState'
+export * from './SingleFileUploadState'

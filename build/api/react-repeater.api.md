@@ -4,6 +4,7 @@
 
 ```ts
 
+import { Context } from 'react';
 import { EntityAccessor } from '@contember/binding';
 import { EntityAccessor as EntityAccessor_2 } from '@contember/react-binding';
 import { EntityListAccessor } from '@contember/binding';
@@ -29,6 +30,9 @@ export const RepeaterAddItemTrigger: ({ children, index }: {
     index: RepeaterAddItemIndex;
 }) => JSX_2.Element;
 
+// @internal (undocumented)
+export const RepeaterCurrentEntityContext: Context<EntityAccessor_2>;
+
 // @public (undocumented)
 export const RepeaterEachItem: ({ children }: {
     children: ReactNode;
@@ -39,12 +43,18 @@ export const RepeaterEmpty: ({ children }: {
     children: ReactNode;
 }) => JSX_2.Element | null;
 
+// @internal (undocumented)
+export const RepeaterEntityListAccessorContext: Context<EntityListAccessor>;
+
 // @public (undocumented)
 export type RepeaterMethods = {
     moveItem?: RepeaterMoveItemMethod;
-    addItem?: RepeaterAddItemMethod;
-    removeItem?: RepeaterRemoveItemMethod;
+    addItem: RepeaterAddItemMethod;
+    removeItem: RepeaterRemoveItemMethod;
 };
+
+// @internal (undocumented)
+export const RepeaterMethodsContext: Context<RepeaterMethods>;
 
 // @public (undocumented)
 export type RepeaterMoveItemIndex = number | 'first' | 'last' | 'previous' | 'next';
@@ -68,13 +78,13 @@ export type RepeaterProps = RepeaterQualifiedProps | RepeaterRelativeProps;
 
 // @public (undocumented)
 export type RepeaterQualifiedProps = SugaredQualifiedEntityList & {
-    children: React_2.ReactNode;
+    children?: React_2.ReactNode;
     sortableBy?: SugaredFieldProps['field'];
 };
 
 // @public (undocumented)
 export type RepeaterRelativeProps = SugaredRelativeEntityList & {
-    children: React_2.ReactNode;
+    children?: React_2.ReactNode;
     sortableBy?: SugaredFieldProps['field'];
 };
 
@@ -86,8 +96,14 @@ export const RepeaterRemoveItemTrigger: ({ children }: {
     children: ReactNode;
 }) => JSX_2.Element;
 
+// @internal (undocumented)
+export const RepeaterSortedEntitiesContext: Context<EntityAccessor_2[]>;
+
 // @public (undocumented)
-export const useRepeaterEntityListAccessor: () => EntityListAccessor | undefined;
+export const useRepeaterCurrentEntity: () => EntityAccessor_2;
+
+// @public (undocumented)
+export const useRepeaterEntityListAccessor: () => EntityListAccessor;
 
 // @public (undocumented)
 export const useRepeaterMethods: () => RepeaterMethods;

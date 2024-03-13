@@ -37,3 +37,7 @@ namespace ErrorAccessor {
 	} : error
 }
 export { ErrorAccessor }
+
+export interface ErrorAccessorHolder {
+	readonly errors: ErrorAccessor | undefined
+}

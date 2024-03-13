@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react'
-import { useRepeaterSortedEntities } from '../internal/contexts'
+import { RepeaterCurrentEntityContext, useRepeaterSortedEntities } from '../contexts'
 import { Entity } from '@contember/react-binding'
 
 export const RepeaterEachItem = ({ children }: { children: ReactNode }) => {
@@ -7,7 +7,9 @@ export const RepeaterEachItem = ({ children }: { children: ReactNode }) => {
 	return <>
 		{entities.map(entity => (
 			<Entity key={entity.key} accessor={entity}>
-				{children}
+				<RepeaterCurrentEntityContext.Provider value={entity}>
+					{children}
+				</RepeaterCurrentEntityContext.Provider>
 			</Entity>
 		))}
 	</>

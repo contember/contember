@@ -357,6 +357,8 @@ export class EntityListAccessor implements Errorable {
     // (undocumented)
     getChildEntityById(id: EntityId): EntityAccessor;
     // (undocumented)
+    getParent(): EntityAccessor | undefined;
+    // (undocumented)
     hasEntityId(id: EntityId): boolean;
     // (undocumented)
     hasEntityOnServer(entityOrItsId: EntityAccessor | EntityId): boolean;
@@ -715,6 +717,12 @@ export namespace ErrorAccessor {
 }
 
 // @public (undocumented)
+export interface ErrorAccessorHolder {
+    // (undocumented)
+    readonly errors: ErrorAccessor | undefined;
+}
+
+// @public (undocumented)
 export type ErrorPersistResult = InvalidInputPersistResult | InvalidResponseResult;
 
 // Warning: (ae-forgotten-export) The symbol "GenericEventsMap" needs to be exported by the entry point index.d.ts
@@ -844,6 +852,8 @@ export class FieldAccessor<Value extends FieldValue = FieldValue> implements Err
     readonly fieldName: FieldName;
     // (undocumented)
     readonly getAccessor: FieldAccessor.GetFieldAccessor<Value>;
+    // (undocumented)
+    getParent(): EntityAccessor;
     // (undocumented)
     readonly hasUnpersistedChanges: boolean;
     // (undocumented)

@@ -131,7 +131,7 @@ export const useNormalizedUploadState = ({
 	const dropzoneState = useDropzone({
 		onDrop,
 		disabled: isMutating,
-		accept: fileHandler.acceptedMimes ?? undefined,
+		// accept: fileHandler.acceptedMimes ?? undefined, todo
 		multiple: isMultiple,
 		noKeyboard: true, // This would normally be absolutely henious but there is a keyboard-focusable button inside.
 	})

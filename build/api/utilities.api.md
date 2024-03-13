@@ -124,6 +124,12 @@ export type NonOptional<T> = {
 export function omit<T extends Object, K extends keyof T>(object: T, properties: ReadonlyArray<K>, strict?: boolean): Omit<T, K>;
 
 // @public (undocumented)
+export type PartialExcept<T, K extends keyof T> = Pick<T, K> & Partial<Omit<T, K>>;
+
+// @public (undocumented)
+export type PartialSome<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
+
+// @public (undocumented)
 export function pick<T extends Object, K extends keyof T>(object: T, properties: ReadonlyArray<K>): Pick<T, K>;
 
 // @public

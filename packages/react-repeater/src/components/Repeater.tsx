@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from 'react'
 import { verifySortableProp } from '../internal/verifySortableProp'
 import { useCreateRepeaterMethods } from '../internal/useCreateRepeaterMethods'
-import { RepeaterEntityListAccessorContext, RepeaterMethodsContext, RepeaterSortedEntitiesContext } from '../internal/contexts'
+import { RepeaterEntityListAccessorContext, RepeaterMethodsContext, RepeaterSortedEntitiesContext } from '../contexts'
 import {
 	Component,
 	EntityListSubTree,
@@ -19,14 +19,14 @@ import { EntityListAccessor, QueryLanguage, SugaredQualifiedEntityList, SugaredR
 export type RepeaterRelativeProps =
 	& SugaredRelativeEntityList
 	& {
-		children: React.ReactNode
+		children?: React.ReactNode
 		sortableBy?: SugaredFieldProps['field']
 	}
 
 export type RepeaterQualifiedProps =
 	& SugaredQualifiedEntityList
 	& {
-		children: React.ReactNode
+		children?: React.ReactNode
 		sortableBy?: SugaredFieldProps['field']
 	}
 

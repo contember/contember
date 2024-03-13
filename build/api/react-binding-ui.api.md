@@ -43,12 +43,6 @@ export type AccessorErrorMessages = [AccessorErrorMessage, ...AccessorErrorMessa
 export function AccessorErrors({ accessor, ...errorListProps }: AccessorErrorsProps): ReactElement | null;
 
 // @public (undocumented)
-export interface AccessorErrorsHolder {
-    // (undocumented)
-    readonly errors: ErrorAccessor | undefined;
-}
-
-// @public (undocumented)
 export interface AccessorErrorsProps extends Omit<ErrorListProps, 'errors'> {
     // (undocumented)
     accessor: FieldAccessor | EntityAccessor | EntityListAccessor;

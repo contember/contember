@@ -47,6 +47,8 @@ COPY ./packages/react-richtext-renderer/package.json ././packages/react-richtext
 COPY ./packages/react-routing/package.json ././packages/react-routing/package.json
 COPY ./packages/react-select/package.json ././packages/react-select/package.json
 COPY ./packages/react-slots/package.json ././packages/react-slots/package.json
+COPY ./packages/react-uploader/package.json ././packages/react-uploader/package.json
+COPY ./packages/react-uploader-dropzone/package.json ././packages/react-uploader-dropzone/package.json
 COPY ./packages/react-utils/package.json ././packages/react-utils/package.json
 COPY ./packages/ui/package.json ././packages/ui/package.json
 COPY ./packages/utilities/package.json ././packages/utilities/package.json

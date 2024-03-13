@@ -89,7 +89,7 @@ export const DefaultDataGrid = ({ columns, tile, lastColumnActions, firstColumnA
 		>
 			<DataViewBody toolbar={<>
 				<DataGridToolbarFilters columns={columns} />
-				<div className="ml-auto">
+				<div className="ml-auto flex gap-2">
 					{tile && <DataViewLayoutSwitcher />}
 					<DataGridToolbarColumns columns={columns} />
 				</div>

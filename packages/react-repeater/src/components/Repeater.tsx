@@ -19,14 +19,14 @@ import { EntityListAccessor, QueryLanguage, SugaredQualifiedEntityList, SugaredR
 export type RepeaterRelativeProps =
 	& SugaredRelativeEntityList
 	& {
-		children: React.ReactNode
+		children?: React.ReactNode
 		sortableBy?: SugaredFieldProps['field']
 	}
 
 export type RepeaterQualifiedProps =
 	& SugaredQualifiedEntityList
 	& {
-		children: React.ReactNode
+		children?: React.ReactNode
 		sortableBy?: SugaredFieldProps['field']
 	}
 

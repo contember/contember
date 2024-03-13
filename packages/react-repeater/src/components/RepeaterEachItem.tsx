@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react'
-import { useRepeaterSortedEntities } from '../internal/contexts'
+import { RepeaterCurrentEntityContext, useRepeaterSortedEntities } from '../contexts'
 import { Entity } from '@contember/react-binding'
 
 export const RepeaterEachItem = ({ children }: { children: ReactNode }) => {

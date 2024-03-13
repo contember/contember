@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from 'react'
 import { verifySortableProp } from '../internal/verifySortableProp'
 import { useCreateRepeaterMethods } from '../internal/useCreateRepeaterMethods'
-import { RepeaterEntityListAccessorContext, RepeaterMethodsContext, RepeaterSortedEntitiesContext } from '../internal/contexts'
+import { RepeaterEntityListAccessorContext, RepeaterMethodsContext, RepeaterSortedEntitiesContext } from '../contexts'
 import {
 	Component,
 	EntityListSubTree,

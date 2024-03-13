@@ -6,14 +6,16 @@ import { useEntity } from '@contember/react-binding'
 export type SelectItemTriggerProps = {
 	children: ReactElement
 	action?: 'select' | 'unselect' | 'toggle'
+	onClick?: (event: React.MouseEvent<HTMLElement>) => void
 }
 
 export const SelectItemTrigger = forwardRef<HTMLElement, SelectItemTriggerProps>(({ action, ...props }: SelectItemTriggerProps, ref) => {
 	const handleSelect = useSelectHandleSelect()
 	const entity = useEntity()
-	const onClick = useCallback(() => {
+	const onClickProp = props.onClick
+	const onClick = useCallback((e: React.MouseEvent<HTMLElement>) => {
 		handleSelect?.(entity, action)
-	}, [action, entity, handleSelect])
-
-	return <Slot onClick={onClick} {...props} ref={ref} />
+		onClickProp?.(e)
+	}, [action, entity, handleSelect, onClickProp])
+	return <Slot {...props} onClick={onClick}  ref={ref} />
 })

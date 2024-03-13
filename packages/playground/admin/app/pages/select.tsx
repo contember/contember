@@ -3,7 +3,7 @@ import { Binding, PersistButton } from '../../lib/components/binding'
 import { EntitySubTree } from '@contember/interface'
 import * as React from 'react'
 import { Field } from '@contember/react-binding'
-import { MultiSelectField, SelectField, SortableMultiSelectField } from '../../lib/components/form'
+import { InputField, MultiSelectField, SelectField, SortableMultiSelectField } from '../../lib/components/form'
 
 
 export const hasOne = () => <>
@@ -13,7 +13,10 @@ export const hasOne = () => <>
 		</Slots.Actions>
 		<EntitySubTree entity={'SelectRoot(unique=unique)'} setOnCreate={'(unique=unique)'}>
 			<div className={'space-y-4'}>
-				<SelectField field={'hasOne'} options={'SelectValue'} filterField={'name'} label="Has one value">
+				<SelectField field={'hasOne'} options={'SelectValue'} filterField={'name'} label="Has one value" createNewForm={<>
+					<InputField field="name"/>
+					<InputField field="slug"/>
+				</>}>
 					<Field field={'name'} />
 				</SelectField>
 			</div>

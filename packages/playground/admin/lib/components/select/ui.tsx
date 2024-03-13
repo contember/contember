@@ -5,6 +5,7 @@ import * as React from 'react'
 import { CheckIcon, PlusIcon, XIcon } from 'lucide-react'
 import { PopoverContent } from '../ui/popover'
 import { dict } from '../../../lib/dict'
+import { forwardRef } from 'react'
 
 export const SelectInputUI = uic(InputLike, {
 	baseClass: 'cursor-pointer hover:border-gray-400 relative flex gap-2 flex-wrap py-1 pr-6',
@@ -47,4 +48,4 @@ export const SelectPopoverContent = uic(PopoverContent, {
 })
 
 
-export const SelectCreateNewTrigger = () => <Button variant="outline" size="icon"><PlusIcon className="w-3 h-3" /></Button>
+export const SelectCreateNewTrigger = forwardRef<HTMLButtonElement, {}>((props, ref) => <Button variant="outline" size="icon" ref={ref} {...props}><PlusIcon className="w-3 h-3" /></Button>)

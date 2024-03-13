@@ -15,6 +15,7 @@ import {
 	createBooleanFilter,
 	createDateFilter,
 	createEnumFilter,
+	createHasManyFilter,
 	createHasOneFilter,
 	createNumberRangeFilter,
 	createTextFilter,
@@ -126,7 +127,7 @@ export const createHasManyColumn = ({ field, label, tooltipActions, filterOption
 		),
 		header: label,
 		hidingName: field,
-		filterHandler: createHasOneFilter(field),
+		filterHandler: createHasManyFilter(field),
 		filterToolbar: filterOptions && (
 			<DefaultDataViewRelationFilter
 				name={field}

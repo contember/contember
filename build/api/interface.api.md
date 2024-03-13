@@ -16,6 +16,7 @@ import { ReactNode } from 'react';
 import { RouteMap } from '@contember/react-routing';
 import { RoutingLinkTarget } from '@contember/react-routing';
 import { SuccessfulPersistResult } from '@contember/react-binding';
+import { SugaredRelativeSingleEntity } from '@contember/react-binding';
 import { SugaredRelativeSingleField } from '@contember/react-binding';
 
 // @public (undocumented)
@@ -55,6 +56,23 @@ export const DeleteEntityTrigger: ({ immediatePersist, onPersistError, onPersist
 export interface DeleteEntityTriggerProps {
     // (undocumented)
     children: ReactNode;
+    // (undocumented)
+    immediatePersist?: true;
+    // (undocumented)
+    onPersistError?: (result: ErrorPersistResult) => void;
+    // (undocumented)
+    onPersistSuccess?: (result: SuccessfulPersistResult) => void;
+}
+
+// @public (undocumented)
+export const DisconnectEntityTrigger: ({ immediatePersist, onPersistError, onPersistSuccess, field, ...props }: DisconnectEntityTriggerProps) => JSX_2.Element;
+
+// @public (undocumented)
+export interface DisconnectEntityTriggerProps {
+    // (undocumented)
+    children: ReactNode;
+    // (undocumented)
+    field?: SugaredRelativeSingleEntity['field'];
     // (undocumented)
     immediatePersist?: true;
     // (undocumented)

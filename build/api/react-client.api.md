@@ -159,27 +159,7 @@ export interface SessionTokenContextValue {
 export const SetSessionTokenContext: Context<(token: string | undefined) => void>;
 
 // @public (undocumented)
-export type SingleFileUploadState<Result = unknown, Metadata = undefined> = {
-    readyState: 'initializing';
-    abortController: AbortController;
-    file: File;
-    previewUrl: string;
-} | {
-    readyState: 'uploading';
-    abortController: AbortController;
-    file: File;
-    metadata: Metadata;
-    previewUrl: string;
-    progress: number | undefined;
-    uploader: FileUploader;
-} | {
-    readyState: 'success';
-    file: File;
-    metadata: Metadata;
-    previewUrl: string;
-    result: Result;
-    uploader: FileUploader;
-} | {
+export type SingleFileUploadErrorState<Metadata = undefined> = {
     readyState: 'error';
     errors: FileUploadError[] | undefined;
     rawError: any;
@@ -187,6 +167,38 @@ export type SingleFileUploadState<Result = unknown, Metadata = undefined> = {
     metadata: Metadata | undefined;
     previewUrl: string;
     uploader: FileUploader | undefined;
+};
+
+// @public (undocumented)
+export type SingleFileUploadInitializingState = {
+    readyState: 'initializing';
+    abortController: AbortController;
+    file: File;
+    previewUrl: string;
+};
+
+// @public (undocumented)
+export type SingleFileUploadState<Result = unknown, Metadata = undefined> = SingleFileUploadInitializingState | SingleFileUploadUploadingState<Metadata> | SingleFileUploadSuccessState<Metadata, Result> | SingleFileUploadErrorState<Metadata>;
+
+// @public (undocumented)
+export type SingleFileUploadSuccessState<Metadata = undefined, Result = unknown> = {
+    readyState: 'success';
+    file: File;
+    metadata: Metadata;
+    previewUrl: string;
+    result: Result;
+    uploader: FileUploader;
+};
+
+// @public (undocumented)
+export type SingleFileUploadUploadingState<Metadata = undefined> = {
+    readyState: 'uploading';
+    abortController: AbortController;
+    file: File;
+    metadata: Metadata;
+    previewUrl: string;
+    progress: number | undefined;
+    uploader: FileUploader;
 };
 
 // @public (undocumented)

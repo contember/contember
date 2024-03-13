@@ -5,6 +5,7 @@ import * as React from 'react'
 import { CheckIcon, PlusIcon, XIcon } from 'lucide-react'
 import { PopoverContent } from '../ui/popover'
 import { dict } from '../../../lib/dict'
+import { forwardRef } from 'react'
 
 export const SelectInputUI = uic(InputLike, {
 	baseClass: 'cursor-pointer hover:border-gray-400 relative flex gap-2 flex-wrap py-1 pr-6',
@@ -14,12 +15,12 @@ export const SelectInputActionsUI = uic('div', {
 })
 
 export const SelectListItemUI = uic(Button, {
-	baseClass: 'w-full text-left justify-start gap-1 data-[highlighted]:bg-gray-200 group pl-1',
+	baseClass: 'w-full text-left justify-start gap-1 data-[highlighted]:bg-gray-200 data-[selected]:bg-gray-100 group relative',
 	defaultProps: {
 		variant: 'ghost',
 		size: 'sm',
 	},
-	beforeChildren: <CheckIcon className="h-3 w-3 opacity-0 group-data-[selected]:opacity-100"/>,
+	afterChildren: <CheckIcon className="h-3 w-3 opacity-0 group-data-[selected]:opacity-100 ml-auto"/>,
 })
 
 export const SelectDefaultPlaceholderUI = () => <span className={'text-gray-400'}>{dict.select.placeholder}</span>
@@ -43,8 +44,8 @@ export const MultiSelectItemRemoveButtonUI = uic('button', {
 })
 
 export const SelectPopoverContent = uic(PopoverContent, {
-	baseClass: 'p-0 py-1 group w-[max(16rem,var(--radix-popover-trigger-width))]',
+	baseClass: 'group w-[max(16rem,var(--radix-popover-trigger-width))]',
 })
 
 
-export const SelectCreateNewTrigger = () => <Button variant="outline" size="icon"><PlusIcon className="w-3 h-3" /></Button>
+export const SelectCreateNewTrigger = forwardRef<HTMLButtonElement, {}>((props, ref) => <Button variant="outline" size="icon" ref={ref} {...props}><PlusIcon className="w-3 h-3" /></Button>)

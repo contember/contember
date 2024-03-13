@@ -1,5 +1,6 @@
 import { ErrorAccessor } from '../accessors'
 import { EntityId } from '../treeParameters'
+import { DataBindingTransactionResult } from '../core'
 
 export interface NothingToPersistPersistResult {
 	type: 'nothingToPersist'
@@ -14,6 +15,7 @@ export interface JustSuccessPersistResult {
 export interface InvalidInputPersistResult {
 	type: 'invalidInput'
 	errors: ErrorAccessor.Error[]
+	response?: DataBindingTransactionResult
 }
 
 export interface InvalidResponseResult {

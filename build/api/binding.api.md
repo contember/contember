@@ -989,6 +989,8 @@ export interface InvalidInputPersistResult {
     // (undocumented)
     errors: ErrorAccessor.Error[];
     // (undocumented)
+    response?: DataBindingTransactionResult;
+    // (undocumented)
     type: 'invalidInput';
 }
 

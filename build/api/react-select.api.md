@@ -78,6 +78,7 @@ export const SelectItemTrigger: React_2.ForwardRefExoticComponent<SelectItemTrig
 export type SelectItemTriggerProps = {
     children: ReactElement;
     action?: 'select' | 'unselect' | 'toggle';
+    onClick?: (event: React_2.MouseEvent<HTMLElement>) => void;
 };
 
 // @public (undocumented)

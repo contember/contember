@@ -13,15 +13,18 @@ export const CreateEntityDialog = ({ trigger, children }: { trigger: ReactElemen
 				{trigger}
 			</AlertDialogTrigger>
 			<AlertDialogContent>
-				<SelectNewItem children={children} />
-				<AlertDialogFooter>
-					<AlertDialogCancel>{dict.select.cancelNew}</AlertDialogCancel>
-					<AlertDialogAction asChild>
-						<SelectItemTrigger>
-							<Button>{dict.select.confirmNew}</Button>
-						</SelectItemTrigger>
-					</AlertDialogAction>
-				</AlertDialogFooter>
+				<SelectNewItem>
+					{children}
+					<AlertDialogFooter>
+						<AlertDialogCancel>{dict.select.cancelNew}</AlertDialogCancel>
+						<AlertDialogAction asChild>
+							<SelectItemTrigger>
+								<Button>{dict.select.confirmNew}</Button>
+							</SelectItemTrigger>
+						</AlertDialogAction>
+					</AlertDialogFooter>
+
+				</SelectNewItem>
 			</AlertDialogContent>
 		</AlertDialog>
 	)

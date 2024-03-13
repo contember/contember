@@ -18,11 +18,9 @@ export const SelectListInner = ({ children, filterToolbar }: SelectListProps) =>
 	return (
 		<DataViewKeyboardEventHandler>
 			<div className={'flex flex-col gap-4 group-data-[side="top"]:flex-col-reverse'}>
-				{filterToolbar && <div className={'px-4'}>
-					{filterToolbar}
-				</div>}
+				{filterToolbar}
 				<ScrollArea className={'max-h-96'}>
-					<div className={'flex flex-col gap-1 px-1'}>
+					<div className={'flex flex-col gap-1'}>
 						<DataViewLoaderState refreshing>
 							<DataViewLoaderOverlay />
 						</DataViewLoaderState>

@@ -4,17 +4,29 @@ import { X } from 'lucide-react'
 import { uic } from '../../../../lib/utils/uic'
 import { ReactNode } from 'react'
 import { ToasterProvider, useToasts } from './toaster'
+import { dict } from '../../../dict'
 
-export const ToastContent = ({ title, description, action }: {
+export const ToastContent = ({ title, description, action, details }: {
 	title?: ReactNode
 	description?: ReactNode
 	action?: ReactNode
+	details?: ReactNode
 }) => {
+	const [open, setOpen] = React.useState(false)
 
 	return <>
 		<div className="grid gap-1">
 			{title && <ToastTitle>{title}</ToastTitle>}
 			{description && <ToastDescription>{description}</ToastDescription>}
+			{details ? (
+				open ? (
+					<code className="p-1 bg-gray-50 border rounded font-mono text-xs">{details}</code>
+				) : (
+					<div>
+						<button onClick={() => setOpen(true)} className="text-sm text-gray-400 underline">{dict.toast.showDetails}</button>
+					</div>
+				)
+			) : null}
 		</div>
 		{action}
 	</>
@@ -49,6 +61,11 @@ const Toast = uic(ToastPrimitives.Root, {
 		variant: 'info',
 	},
 	displayName: 'Toast',
+	defaultProps: {
+		style: {
+			userSelect: 'auto',
+		},
+	},
 })
 
 const ToastClose = uic(ToastPrimitives.Close, {

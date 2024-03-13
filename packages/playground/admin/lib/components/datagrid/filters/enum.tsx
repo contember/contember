@@ -99,7 +99,7 @@ const DataViewEnumFilterSelect = ({ name, options, label }: {
 			<PopoverTrigger asChild>
 				<DataViewFilterSelectTriggerUI>{label}</DataViewFilterSelectTriggerUI>
 			</PopoverTrigger>
-			<PopoverContent>
+			<PopoverContent className="p-2">
 				<div className={'relative flex flex-col gap-2'}>
 					{Object.entries(options).map(([value, label]) => (
 						<DataViewEnumFilterSelectItem value={value} key={value} filterFactory={filterFactory}>

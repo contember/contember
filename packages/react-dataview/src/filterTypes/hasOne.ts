@@ -16,7 +16,7 @@ export const createHasOneFilter = (field: SugaredRelativeSingleEntity['field']):
 		inclusionConditions.push({ isNull: filter.nullCondition })
 	}
 	if (filter.notId?.length) {
-		exclusionConditions.push({ notIn: filter.notId })
+		exclusionConditions.push({ or: [{ notIn: filter.notId }, { isNull: true }] })
 	}
 	if (filter.nullCondition === false) {
 		exclusionConditions.push({ isNull: false })

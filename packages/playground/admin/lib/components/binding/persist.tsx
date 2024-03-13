@@ -38,6 +38,7 @@ export const usePersistErrorHandler = () => {
 				<ToastContent
 					title={dict.persist.invalidInputError}
 					description={<ul>{errorList.map((it, i) => <li key={i}>{it}</li>)}</ul>}
+					details={result.response?.errorMessage}
 				/>, {
 					type: 'error',
 				})

@@ -1,4 +1,4 @@
-import { ArchiveIcon, BrushIcon, FormInputIcon, GripVertical, HomeIcon, KanbanIcon, TableIcon } from 'lucide-react'
+import { ArchiveIcon, BrushIcon, FormInputIcon, GripVertical, HomeIcon, KanbanIcon, TableIcon, UploadIcon } from 'lucide-react'
 import { MenuList } from '../../lib/components/ui/menu'
 
 
@@ -104,6 +104,42 @@ export const Navigation = () => {
 								icon: line,
 								label: 'Has many sortable select',
 								to: 'select/hasManySortable',
+							},
+						],
+					},
+					{
+						icon: <UploadIcon size={16} />,
+						label: 'Upload',
+						subItems: [
+							{
+								icon: line,
+								label: 'Image upload',
+								to: 'upload/image',
+							},
+							{
+								icon: line,
+								label: 'Image w/o meta',
+								to: 'upload/imageTrivial',
+							},
+							{
+								icon: line,
+								label: 'Audio upload',
+								to: 'upload/audio',
+							},
+							{
+								icon: line,
+								label: 'Video upload',
+								to: 'upload/video',
+							},
+							{
+								icon: line,
+								label: 'Generic file upload',
+								to: 'upload/any',
+							},
+							{
+								icon: line,
+								label: 'Image repeater',
+								to: 'upload/imageList',
 							},
 						],
 					},

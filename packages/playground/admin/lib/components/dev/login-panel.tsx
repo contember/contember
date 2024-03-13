@@ -1,6 +1,6 @@
 import { SyntheticEvent, useCallback, useState } from 'react'
 import { ToastContent, useShowToast } from '../ui/toast'
-import { FieldContainer } from '../form'
+import { StandaloneFormContainer } from '../form'
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
 import { useSessionTokenWithMeta, useSetSessionToken } from '@contember/react-client'
@@ -40,9 +40,9 @@ export const LoginWithEmail = () => {
 	return <>
 		<form onSubmit={submit}>
 			<div>
-				<FieldContainer label={'E-mail'}>
+				<StandaloneFormContainer label={'E-mail'}>
 					<Input value={email} onChange={e => setEmail(e.target.value)} />
-				</FieldContainer>
+				</StandaloneFormContainer>
 				<Button type="submit" disabled={isSubmitting}>Login</Button>
 			</div>
 		</form>

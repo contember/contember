@@ -1,5 +1,6 @@
 import { TextFilterArtifactsMatchMode } from '@contember/react-dataview'
 import { InviteErrorCodes } from './hooks/useInvite'
+import { UploaderErrorType } from '@contember/react-uploader'
 
 export const dict = {
 	deleteEntityDialog: {
@@ -87,4 +88,18 @@ export const dict = {
 		VARIABLE_NOT_FOUND: 'Variable not found',
 		fallback: 'Failed to invite user',
 	} satisfies Record<InviteErrorCodes | 'fallback',  string>,
+	uploader: {
+		uploadErrors: {
+			httpError: 'HTTP error',
+			aborted: 'Upload aborted',
+			networkError: 'Network error',
+			timeout: 'Upload timeout',
+			fileRejected: 'File rejected',
+		} satisfies Record<UploaderErrorType, string>,
+		uploaderUnknownError: 'Unknown error',
+
+		browseFiles: 'Browse',
+		dropFiles: 'Drop files here',
+		or: 'or',
+	},
 }

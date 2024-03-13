@@ -1,0 +1,962 @@
+{
+	"formatVersion": 5,
+	"modifications": [
+		{
+			"modification": "createEnum",
+			"enumName": "UploadMediaType",
+			"values": [
+				"image",
+				"video",
+				"audio",
+				"file"
+			]
+		},
+		{
+			"modification": "createEnum",
+			"enumName": "UploadOne",
+			"values": [
+				"unique"
+			]
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"eventLog": {
+					"enabled": true
+				},
+				"name": "UploadAudio",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "upload_audio",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": [],
+				"indexes": []
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"eventLog": {
+					"enabled": true
+				},
+				"name": "UploadFile",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "upload_file",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": [],
+				"indexes": []
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"eventLog": {
+					"enabled": true
+				},
+				"name": "UploadFileMetadata",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "upload_file_metadata",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": [],
+				"indexes": []
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"eventLog": {
+					"enabled": true
+				},
+				"name": "UploadGallery",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "upload_gallery",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": [],
+				"indexes": []
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"eventLog": {
+					"enabled": true
+				},
+				"name": "UploadGalleryItem",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "upload_gallery_item",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": [],
+				"indexes": []
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"eventLog": {
+					"enabled": true
+				},
+				"name": "UploadImage",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "upload_image",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": [],
+				"indexes": []
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"eventLog": {
+					"enabled": true
+				},
+				"name": "UploadImageList",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "upload_image_list",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": [],
+				"indexes": []
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"eventLog": {
+					"enabled": true
+				},
+				"name": "UploadImageListItem",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "upload_image_list_item",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": [],
+				"indexes": []
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"eventLog": {
+					"enabled": true
+				},
+				"name": "UploadList",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "upload_list",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": [],
+				"indexes": []
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"eventLog": {
+					"enabled": true
+				},
+				"name": "UploadListItem",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "upload_list_item",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": [],
+				"indexes": []
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"eventLog": {
+					"enabled": true
+				},
+				"name": "UploadMedium",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "upload_medium",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": [],
+				"indexes": []
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"eventLog": {
+					"enabled": true
+				},
+				"name": "UploadRoot",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "upload_root",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": [],
+				"indexes": []
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"eventLog": {
+					"enabled": true
+				},
+				"name": "UploadVideo",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "upload_video",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": [],
+				"indexes": []
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "UploadAudio",
+			"field": {
+				"name": "url",
+				"columnName": "url",
+				"columnType": "text",
+				"nullable": true,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "UploadAudio",
+			"field": {
+				"name": "duration",
+				"columnName": "duration",
+				"columnType": "integer",
+				"nullable": true,
+				"type": "Integer"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "UploadFile",
+			"field": {
+				"name": "url",
+				"columnName": "url",
+				"columnType": "text",
+				"nullable": true,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "UploadFile",
+			"field": {
+				"name": "duration",
+				"columnName": "duration",
+				"columnType": "integer",
+				"nullable": true,
+				"type": "Integer"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "UploadFileMetadata",
+			"field": {
+				"name": "fileName",
+				"columnName": "file_name",
+				"columnType": "text",
+				"nullable": true,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "UploadFileMetadata",
+			"field": {
+				"name": "lastModified",
+				"columnName": "last_modified",
+				"columnType": "timestamptz",
+				"nullable": true,
+				"type": "DateTime"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "UploadFileMetadata",
+			"field": {
+				"name": "fileSize",
+				"columnName": "file_size",
+				"columnType": "integer",
+				"nullable": true,
+				"type": "Integer"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "UploadFileMetadata",
+			"field": {
+				"name": "fileType",
+				"columnName": "file_type",
+				"columnType": "text",
+				"nullable": true,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "UploadGalleryItem",
+			"field": {
+				"name": "type",
+				"columnName": "type",
+				"columnType": "UploadMediaType",
+				"nullable": false,
+				"type": "Enum"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "UploadImage",
+			"field": {
+				"name": "url",
+				"columnName": "url",
+				"columnType": "text",
+				"nullable": true,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "UploadImage",
+			"field": {
+				"name": "width",
+				"columnName": "width",
+				"columnType": "integer",
+				"nullable": true,
+				"type": "Integer"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "UploadImage",
+			"field": {
+				"name": "height",
+				"columnName": "height",
+				"columnType": "integer",
+				"nullable": true,
+				"type": "Integer"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "UploadImage",
+			"field": {
+				"name": "alt",
+				"columnName": "alt",
+				"columnType": "text",
+				"nullable": true,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "UploadImageListItem",
+			"field": {
+				"name": "order",
+				"columnName": "order",
+				"columnType": "integer",
+				"nullable": false,
+				"type": "Integer"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "UploadListItem",
+			"field": {
+				"name": "order",
+				"columnName": "order",
+				"columnType": "integer",
+				"nullable": false,
+				"type": "Integer"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "UploadMedium",
+			"field": {
+				"name": "type",
+				"columnName": "type",
+				"columnType": "UploadMediaType",
+				"nullable": false,
+				"type": "Enum"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "UploadRoot",
+			"field": {
+				"name": "unique",
+				"columnName": "unique",
+				"columnType": "UploadOne",
+				"nullable": false,
+				"type": "Enum"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "UploadVideo",
+			"field": {
+				"name": "url",
+				"columnName": "url",
+				"columnType": "text",
+				"nullable": true,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "UploadVideo",
+			"field": {
+				"name": "width",
+				"columnName": "width",
+				"columnType": "integer",
+				"nullable": true,
+				"type": "Integer"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "UploadVideo",
+			"field": {
+				"name": "height",
+				"columnName": "height",
+				"columnType": "integer",
+				"nullable": true,
+				"type": "Integer"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "UploadVideo",
+			"field": {
+				"name": "duration",
+				"columnName": "duration",
+				"columnType": "integer",
+				"nullable": true,
+				"type": "Integer"
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "UploadAudio",
+			"owningSide": {
+				"type": "OneHasOne",
+				"name": "meta",
+				"target": "UploadFileMetadata",
+				"joiningColumn": {
+					"columnName": "meta_id",
+					"onDelete": "restrict"
+				},
+				"nullable": true
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "UploadFile",
+			"owningSide": {
+				"type": "OneHasOne",
+				"name": "meta",
+				"target": "UploadFileMetadata",
+				"joiningColumn": {
+					"columnName": "meta_id",
+					"onDelete": "restrict"
+				},
+				"nullable": true
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "UploadGalleryItem",
+			"owningSide": {
+				"type": "ManyHasOne",
+				"name": "gallery",
+				"target": "UploadGallery",
+				"joiningColumn": {
+					"columnName": "gallery_id",
+					"onDelete": "restrict"
+				},
+				"nullable": true,
+				"inversedBy": "items"
+			},
+			"inverseSide": {
+				"type": "OneHasMany",
+				"name": "items",
+				"target": "UploadGalleryItem",
+				"ownedBy": "gallery"
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "UploadGalleryItem",
+			"owningSide": {
+				"type": "OneHasOne",
+				"name": "image",
+				"target": "UploadImage",
+				"joiningColumn": {
+					"columnName": "image_id",
+					"onDelete": "restrict"
+				},
+				"nullable": true
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "UploadGalleryItem",
+			"owningSide": {
+				"type": "OneHasOne",
+				"name": "video",
+				"target": "UploadVideo",
+				"joiningColumn": {
+					"columnName": "video_id",
+					"onDelete": "restrict"
+				},
+				"nullable": true
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "UploadGalleryItem",
+			"owningSide": {
+				"type": "OneHasOne",
+				"name": "audio",
+				"target": "UploadAudio",
+				"joiningColumn": {
+					"columnName": "audio_id",
+					"onDelete": "restrict"
+				},
+				"nullable": true
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "UploadGalleryItem",
+			"owningSide": {
+				"type": "OneHasOne",
+				"name": "file",
+				"target": "UploadFile",
+				"joiningColumn": {
+					"columnName": "file_id",
+					"onDelete": "restrict"
+				},
+				"nullable": true
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "UploadImage",
+			"owningSide": {
+				"type": "OneHasOne",
+				"name": "meta",
+				"target": "UploadFileMetadata",
+				"joiningColumn": {
+					"columnName": "meta_id",
+					"onDelete": "restrict"
+				},
+				"nullable": true
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "UploadImageListItem",
+			"owningSide": {
+				"type": "ManyHasOne",
+				"name": "list",
+				"target": "UploadImageList",
+				"joiningColumn": {
+					"columnName": "list_id",
+					"onDelete": "cascade"
+				},
+				"nullable": false,
+				"inversedBy": "items"
+			},
+			"inverseSide": {
+				"type": "OneHasMany",
+				"name": "items",
+				"target": "UploadImageListItem",
+				"ownedBy": "list",
+				"orderBy": [
+					{
+						"path": [
+							"order"
+						],
+						"direction": "asc"
+					}
+				]
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "UploadImageListItem",
+			"owningSide": {
+				"type": "OneHasOne",
+				"name": "image",
+				"target": "UploadImage",
+				"joiningColumn": {
+					"columnName": "image_id",
+					"onDelete": "restrict"
+				},
+				"nullable": false
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "UploadListItem",
+			"owningSide": {
+				"type": "ManyHasOne",
+				"name": "list",
+				"target": "UploadList",
+				"joiningColumn": {
+					"columnName": "list_id",
+					"onDelete": "cascade"
+				},
+				"nullable": false,
+				"inversedBy": "items"
+			},
+			"inverseSide": {
+				"type": "OneHasMany",
+				"name": "items",
+				"target": "UploadListItem",
+				"ownedBy": "list",
+				"orderBy": [
+					{
+						"path": [
+							"order"
+						],
+						"direction": "asc"
+					}
+				]
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "UploadListItem",
+			"owningSide": {
+				"type": "ManyHasOne",
+				"name": "item",
+				"target": "UploadMedium",
+				"joiningColumn": {
+					"columnName": "item_id",
+					"onDelete": "cascade"
+				},
+				"nullable": false
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "UploadMedium",
+			"owningSide": {
+				"type": "OneHasOne",
+				"name": "image",
+				"target": "UploadImage",
+				"joiningColumn": {
+					"columnName": "image_id",
+					"onDelete": "restrict"
+				},
+				"nullable": true
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "UploadMedium",
+			"owningSide": {
+				"type": "OneHasOne",
+				"name": "video",
+				"target": "UploadVideo",
+				"joiningColumn": {
+					"columnName": "video_id",
+					"onDelete": "restrict"
+				},
+				"nullable": true
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "UploadMedium",
+			"owningSide": {
+				"type": "OneHasOne",
+				"name": "audio",
+				"target": "UploadAudio",
+				"joiningColumn": {
+					"columnName": "audio_id",
+					"onDelete": "restrict"
+				},
+				"nullable": true
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "UploadMedium",
+			"owningSide": {
+				"type": "OneHasOne",
+				"name": "file",
+				"target": "UploadFile",
+				"joiningColumn": {
+					"columnName": "file_id",
+					"onDelete": "restrict"
+				},
+				"nullable": true
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "UploadRoot",
+			"owningSide": {
+				"type": "OneHasOne",
+				"name": "image",
+				"target": "UploadImage",
+				"joiningColumn": {
+					"columnName": "image_id",
+					"onDelete": "restrict"
+				},
+				"nullable": true
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "UploadRoot",
+			"owningSide": {
+				"type": "OneHasOne",
+				"name": "audio",
+				"target": "UploadAudio",
+				"joiningColumn": {
+					"columnName": "audio_id",
+					"onDelete": "restrict"
+				},
+				"nullable": true
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "UploadRoot",
+			"owningSide": {
+				"type": "OneHasOne",
+				"name": "video",
+				"target": "UploadVideo",
+				"joiningColumn": {
+					"columnName": "video_id",
+					"onDelete": "restrict"
+				},
+				"nullable": true
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "UploadRoot",
+			"owningSide": {
+				"type": "OneHasOne",
+				"name": "file",
+				"target": "UploadFile",
+				"joiningColumn": {
+					"columnName": "file_id",
+					"onDelete": "restrict"
+				},
+				"nullable": true
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "UploadRoot",
+			"owningSide": {
+				"type": "OneHasOne",
+				"name": "imageTrivial",
+				"target": "UploadImage",
+				"joiningColumn": {
+					"columnName": "image_trivial_id",
+					"onDelete": "restrict"
+				},
+				"nullable": true
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "UploadRoot",
+			"owningSide": {
+				"type": "OneHasOne",
+				"name": "medium",
+				"target": "UploadMedium",
+				"joiningColumn": {
+					"columnName": "medium_id",
+					"onDelete": "restrict"
+				},
+				"nullable": true
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "UploadRoot",
+			"owningSide": {
+				"type": "OneHasOne",
+				"name": "gallery",
+				"target": "UploadGallery",
+				"joiningColumn": {
+					"columnName": "gallery_id",
+					"onDelete": "restrict"
+				},
+				"nullable": true
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "UploadRoot",
+			"owningSide": {
+				"type": "OneHasOne",
+				"name": "list",
+				"target": "UploadList",
+				"joiningColumn": {
+					"columnName": "list_id",
+					"onDelete": "restrict"
+				},
+				"nullable": true
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "UploadRoot",
+			"owningSide": {
+				"type": "OneHasOne",
+				"name": "imageList",
+				"target": "UploadImageList",
+				"joiningColumn": {
+					"columnName": "image_list_id",
+					"onDelete": "restrict"
+				},
+				"nullable": true
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "UploadVideo",
+			"owningSide": {
+				"type": "OneHasOne",
+				"name": "meta",
+				"target": "UploadFileMetadata",
+				"joiningColumn": {
+					"columnName": "meta_id",
+					"onDelete": "restrict"
+				},
+				"nullable": true
+			}
+		},
+		{
+			"modification": "createUniqueConstraint",
+			"entityName": "UploadRoot",
+			"unique": {
+				"fields": [
+					"unique"
+				]
+			}
+		}
+	]
+}

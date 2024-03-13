@@ -13,11 +13,14 @@ export const dict = {
 	},
 	persist: {
 		persistButton: 'Save data',
-		invalidInputError: 'Invalid input',
+		invalidInputError: 'Failed to save data',
 		invalidResponseError: 'Invalid response',
 		invalidResponseErrorDetails: 'The server returned an invalid response. Please try again later.',
 		success: 'Successfully saved',
 		afterPersistError: 'Something wrong has happened after the data were persisted. Please refresh the page.',
+	},
+	toast: {
+		showDetails: 'Show details',
 	},
 	datagrid: {
 		na: 'N/A',

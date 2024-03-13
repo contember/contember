@@ -1,20 +1,25 @@
 import React, { ReactNode, useCallback, useMemo } from 'react'
-import { SelectCurrentEntitiesContext, SelectHandler, SelectHandleSelectContext, SelectIsSelectedContext, SelectOptionsContext } from '../contexts'
+import { SelectCurrentEntitiesContext, SelectHandler, SelectHandleSelectContext, SelectIsSelectedContext, SelectOptionsContext, SelectOptionsFilterContext } from '../contexts'
 import { Component, EntityAccessor, HasOne, SugaredQualifiedEntityList, SugaredRelativeSingleEntity, useEntity } from '@contember/react-binding'
 import { useReferentiallyStableCallback } from '@contember/react-utils'
 import { SelectEvents } from '../types'
+import { SelectFilterFieldProps, useSelectFilter } from '../hooks'
 
 export type SelectProps =
 	& {
 		children: ReactNode
 		field: SugaredRelativeSingleEntity['field']
-		options: SugaredQualifiedEntityList['entities']
+		options?: SugaredQualifiedEntityList['entities']
 	}
+	& SelectFilterFieldProps
 	& SelectEvents
 
-export const Select = Component(({ field, children, onUnselect, onSelect, options }: SelectProps) => {
+export const Select = Component(({ field, children, onUnselect, onSelect, options, filterField }: SelectProps) => {
 	const entity = useEntity()
 	const selectedEntity = entity.getEntity({ field })
+	options ??= selectedEntity.name
+	const filter = useSelectFilter({ filterField, marker: selectedEntity.getMarker() })
+
 	const entityExists = selectedEntity.existsOnServer || selectedEntity.hasUnpersistedChanges
 	const entitiesArr = useMemo(() => entityExists ? [selectedEntity] : [], [entityExists, selectedEntity])
 
@@ -37,7 +42,9 @@ export const Select = Component(({ field, children, onUnselect, onSelect, option
 			<SelectIsSelectedContext.Provider value={isSelected}>
 				<SelectHandleSelectContext.Provider value={handleSelect}>
 					<SelectOptionsContext.Provider value={options}>
-						{children}
+						<SelectOptionsFilterContext.Provider value={filter}>
+							{children}
+						</SelectOptionsFilterContext.Provider>
 					</SelectOptionsContext.Provider>
 				</SelectHandleSelectContext.Provider>
 			</SelectIsSelectedContext.Provider>

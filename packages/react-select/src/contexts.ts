@@ -1,5 +1,6 @@
 import { createRequiredContext } from '@contember/react-utils'
 import { EntityAccessor, SugaredQualifiedEntityList } from '@contember/react-binding'
+import { DataViewFilterHandler, TextFilterArtifacts } from '@contember/react-dataview'
 
 const _SelectCurrentEntitiesContext = createRequiredContext<EntityAccessor[]>('SelectCurrentEntitiesContext')
 /** @internal */
@@ -23,3 +24,8 @@ const _SelectOptionsContext = createRequiredContext<SugaredQualifiedEntityList['
 /** @internal */
 export const SelectOptionsContext = _SelectOptionsContext[0]
 export const useSelectOptions = _SelectOptionsContext[1]
+
+const _SelectOptionsFilterContext = createRequiredContext<DataViewFilterHandler<TextFilterArtifacts> | undefined>('SelectOptionsFilterContext')
+/** @internal */
+export const SelectOptionsFilterContext = _SelectOptionsFilterContext[0]
+export const useSelectOptionsFilter = _SelectOptionsFilterContext[1]

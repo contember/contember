@@ -995,9 +995,9 @@ __metadata:
     "@contember/interface-tester": "workspace:*"
     "@contember/layout": "workspace:*"
     "@contember/react-dataview": "workspace:*"
-    "@contember/schema": ^1.3.6
-    "@contember/schema-definition": ^1.3.6
-    "@contember/schema-utils": ^1.3.6
+    "@contember/schema": ^1.4.0-beta.1
+    "@contember/schema-definition": ^1.4.0-beta.1
+    "@contember/schema-utils": ^1.4.0-beta.1
     "@contember/ui": "workspace:*"
     graphql: ^16.8.1
     lucide-react: ^0.302.0
@@ -1073,7 +1073,7 @@ __metadata:
     qrcode-generator: ^1.4.4
     react: ^18.2.0
     react-dom: ^18.2.0
-    react-dropzone: 10.2.2
+    react-dropzone: ^14.2.3
     react-error-boundary: 4.0.12
     react-sortable-hoc: 2.0.0
     slate: 0.73.1
@@ -1293,6 +1293,8 @@ __metadata:
     "@contember/react-repeater-dnd-kit": "workspace:*"
     "@contember/react-select": "workspace:*"
     "@contember/react-slots": "workspace:*"
+    "@contember/react-uploader": "workspace:*"
+    "@contember/react-uploader-dropzone": "workspace:*"
     "@contember/schema": ^1.4.0-beta.1
     "@contember/schema-definition": ^1.4.0-beta.1
     "@contember/schema-utils": ^1.4.0-beta.1
@@ -1303,6 +1305,7 @@ __metadata:
     "@radix-ui/react-label": ^2.0.2
     "@radix-ui/react-popover": ^1.0.7
     "@radix-ui/react-primitive": ^1.0.3
+    "@radix-ui/react-progress": ^1.0.3
     "@radix-ui/react-scroll-area": ^1.0.5
     "@radix-ui/react-select": ^2.0.0
     "@radix-ui/react-slot": ^1.0.2
@@ -1739,6 +1742,43 @@ __metadata:
   dependencies:
     "@contember/react-utils": "workspace:*"
     "@contember/utilities": "workspace:*"
+    react: ^18.2.0
+    react-dom: ^18.2.0
+  peerDependencies:
+    react: ^17 || ^18
+    react-dom: ^17 || ^18
+  languageName: unknown
+  linkType: soft
+
+"@contember/react-uploader-dropzone@workspace:*, @contember/react-uploader-dropzone@workspace:packages/react-uploader-dropzone":
+  version: 0.0.0-use.local
+  resolution: "@contember/react-uploader-dropzone@workspace:packages/react-uploader-dropzone"
+  dependencies:
+    "@contember/react-binding": "workspace:*"
+    "@contember/react-uploader": "workspace:*"
+    "@contember/react-utils": "workspace:*"
+    "@contember/utilities": "workspace:*"
+    "@radix-ui/react-slot": ^1.0.2
+    react: ^18.2.0
+    react-dom: ^18.2.0
+    react-dropzone: ^14.2.3
+  peerDependencies:
+    react: ^17 || ^18
+    react-dom: ^17 || ^18
+  languageName: unknown
+  linkType: soft
+
+"@contember/react-uploader@workspace:*, @contember/react-uploader@workspace:packages/react-uploader":
+  version: 0.0.0-use.local
+  resolution: "@contember/react-uploader@workspace:packages/react-uploader"
+  dependencies:
+    "@contember/binding": "workspace:*"
+    "@contember/client": "workspace:*"
+    "@contember/graphql-client": "workspace:*"
+    "@contember/react-binding": "workspace:*"
+    "@contember/react-client": "workspace:*"
+    "@contember/react-repeater": "workspace:*"
+    "@contember/react-utils": "workspace:*"
     react: ^18.2.0
     react-dom: ^18.2.0
   peerDependencies:
@@ -3125,6 +3165,27 @@ __metadata:
     "@types/react-dom":
       optional: true
   checksum: 9402bc22923c8e5c479051974a721c301535c36521c0237b83e5fa213d013174e77f3ad7905e6d60ef07e14f88ec7f4ea69891dc7a2b39047f8d3640e8f8d713
+  languageName: node
+  linkType: hard
+
+"@radix-ui/react-progress@npm:^1.0.3":
+  version: 1.0.3
+  resolution: "@radix-ui/react-progress@npm:1.0.3"
+  dependencies:
+    "@babel/runtime": ^7.13.10
+    "@radix-ui/react-context": 1.0.1
+    "@radix-ui/react-primitive": 1.0.3
+  peerDependencies:
+    "@types/react": "*"
+    "@types/react-dom": "*"
+    react: ^16.8 || ^17.0 || ^18.0
+    react-dom: ^16.8 || ^17.0 || ^18.0
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+    "@types/react-dom":
+      optional: true
+  checksum: a4398812315ae5b25f8637a6553daf85bd36e6e08d15f7486248538a994a99268752e2c21e4af15277c17e861c1825fdd7292938c515c112dc2cdce63ec1a892
   languageName: node
   linkType: hard
 
@@ -6364,7 +6425,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"attr-accept@npm:^2.0.0":
+"attr-accept@npm:^2.2.2":
   version: 2.2.2
   resolution: "attr-accept@npm:2.2.2"
   checksum: 496f7249354ab53e522510c1dc8f67a1887382187adde4dc205507d2f014836a247073b05e9d9ea51e2e9c7f71b0d2aa21730af80efa9af2d68303e5f0565c4d
@@ -7742,12 +7803,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"file-selector@npm:^0.1.12":
-  version: 0.1.19
-  resolution: "file-selector@npm:0.1.19"
+"file-selector@npm:^0.6.0":
+  version: 0.6.0
+  resolution: "file-selector@npm:0.6.0"
   dependencies:
-    tslib: ^2.0.1
-  checksum: 5b105a3ede9139729ada72d6653ae3f4387a7bf2585e8700f9fa53f22457d1f88304fdde9ad7b43b694a5610d67058302257f448a75248fc2225880bca6df5df
+    tslib: ^2.4.0
+  checksum: 7d051b6e5d793f3c6e2ab287ba5e7c2c6a0971bccc9d56e044c8047ba483e18f60fc0b5771c951dc707c0d15f4f36ccb4f1f1aaf385d21ec8f7700dadf8325ba
   languageName: node
   linkType: hard
 
@@ -10254,7 +10315,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prop-types@npm:^15.5.7, prop-types@npm:^15.6.0, prop-types@npm:^15.6.2, prop-types@npm:^15.7.2, prop-types@npm:^15.8.1":
+"prop-types@npm:^15.5.7, prop-types@npm:^15.6.0, prop-types@npm:^15.6.2, prop-types@npm:^15.8.1":
   version: 15.8.1
   resolution: "prop-types@npm:15.8.1"
   dependencies:
@@ -10397,16 +10458,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-dropzone@npm:10.2.2":
-  version: 10.2.2
-  resolution: "react-dropzone@npm:10.2.2"
+"react-dropzone@npm:^14.2.3":
+  version: 14.2.3
+  resolution: "react-dropzone@npm:14.2.3"
   dependencies:
-    attr-accept: ^2.0.0
-    file-selector: ^0.1.12
-    prop-types: ^15.7.2
+    attr-accept: ^2.2.2
+    file-selector: ^0.6.0
+    prop-types: ^15.8.1
   peerDependencies:
-    react: ">= 16.8"
-  checksum: af08b78db753dd9c277c64364c153d6cb6d563df3cc4db1731458edcc203cfa41ed3d032c5249822e5eb4d2534232e514d663a025962d08f0e6ea65550411116
+    react: ">= 16.8 || 18.0.0"
+  checksum: 174b744d5ca898cf3d84ec1aeb6cef5211c446697e45dc8ece8287a03d291f8d07253206d5a1247ef156fd385d65e7de666d4d5c2986020b8543b8f2434e8b40
   languageName: node
   linkType: hard
 
@@ -11700,7 +11761,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tslib@npm:^2.0.0, tslib@npm:^2.0.1, tslib@npm:^2.1.0, tslib@npm:^2.3.1, tslib@npm:^2.4.0, tslib@npm:^2.5.0, tslib@npm:^2.6.2":
+"tslib@npm:^2.0.0, tslib@npm:^2.1.0, tslib@npm:^2.3.1, tslib@npm:^2.4.0, tslib@npm:^2.5.0, tslib@npm:^2.6.2":
   version: 2.6.2
   resolution: "tslib@npm:2.6.2"
   checksum: 329ea56123005922f39642318e3d1f0f8265d1e7fcb92c633e0809521da75eeaca28d2cf96d7248229deb40e5c19adf408259f4b9640afd20d13aecc1430f3ad

@@ -120,6 +120,12 @@
 			"path": "./packages/react-slots"
 		},
 		{
+			"path": "./packages/react-uploader"
+		},
+		{
+			"path": "./packages/react-uploader-dropzone"
+		},
+		{
 			"path": "./packages/react-utils"
 		},
 		{

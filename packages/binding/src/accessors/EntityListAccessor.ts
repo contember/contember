@@ -135,6 +135,10 @@ class EntityListAccessor implements Errorable {
 	public getParent(): EntityAccessor | undefined {
 		return this.state.blueprint.parent?.getAccessor()
 	}
+
+	public getMarker(): EntityListSubTreeMarker | HasManyRelationMarker {
+		return this.state.blueprint.marker
+	}
 }
 
 namespace EntityListAccessor {

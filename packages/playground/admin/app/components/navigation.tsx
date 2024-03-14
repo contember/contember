@@ -66,6 +66,11 @@ export const Navigation = () => {
 							},
 							{
 								icon: line,
+								label: 'Select or type',
+								to: 'input/selectOrType',
+							},
+							{
+								icon: line,
 								label: 'Textarea',
 								to: 'input/textarea',
 							},

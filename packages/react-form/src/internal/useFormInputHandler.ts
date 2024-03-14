@@ -66,7 +66,7 @@ const ColumnTypeHandlerFactories: Record<SchemaKnownColumnType, ColumnTypeHandle
 				return null
 			}
 			const parsed = Date.parse(value)
-			return isNaN(parsed) ? null : new Date(parsed)
+			return isNaN(parsed) ? null : (new Date(parsed)).toISOString().split('T')[0]
 		},
 		formatValue: (value: string | null) => {
 			const parsed = value ? Date.parse(value) : null
@@ -81,12 +81,13 @@ const ColumnTypeHandlerFactories: Record<SchemaKnownColumnType, ColumnTypeHandle
 			if (value === '') {
 				return null
 			}
+
 			const parsed = Date.parse(value)
-			return isNaN(parsed) ? null : new Date(parsed)
+			return isNaN(parsed) ? null : (new Date(parsed)).toISOString()
 		},
 		formatValue: (value: string | null) => {
 			const parsed = value ? Date.parse(value) : null
-			return !parsed || isNaN(parsed) ? '' : new Date(parsed).toISOString().substring(0, 16)
+			return !parsed || isNaN(parsed) ? '' : toLocalDate(new Date(parsed))
 		},
 		defaultInputProps: {
 			type: 'datetime-local',
@@ -101,4 +102,18 @@ const ColumnTypeHandlerFactories: Record<SchemaKnownColumnType, ColumnTypeHandle
 	Uuid: () => {
 		throw new Error('UUID column type is not supported yet')
 	},
+}
+
+const toLocalDate = (date: Date) => {
+	const pad = (num: number, length: number = 2) => {
+		const str = num.toString()
+		return '0'.repeat(Math.max(0, length - str.length)) + str
+	}
+
+	return pad(date.getFullYear(), 4) +
+		'-' + pad(date.getMonth() + 1) +
+		'-' + pad(date.getDate()) +
+		'T' + pad(date.getHours()) +
+		':' + pad(date.getMinutes()) +
+		':' + pad(date.getSeconds())
 }

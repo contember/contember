@@ -11,8 +11,8 @@ import { Popover, PopoverContent, PopoverTrigger } from '../../ui/popover'
 import { DataViewActiveFilterUI, DataViewFilterSelectTriggerUI, DataViewSingleFilterUI } from '../ui'
 import { DataViewNullFilter } from './common'
 import { Input } from '../../ui/input'
-import { formatNumber } from '../../../../lib/utils/formatting'
-import { dict } from '../../../../lib/dict'
+import { formatNumber } from '../../../utils/formatting'
+import { dict } from '../../../dict'
 
 const DataViewNumberFilterRange = ({ name }: {
 	name: string

@@ -4,8 +4,8 @@ import { Button } from '../ui/button'
 import { DataViewChangePageTrigger, DataViewPagingStateView, DataViewSetItemsPerPageTrigger } from '@contember/react-dataview'
 import { DropdownMenu } from '@radix-ui/react-dropdown-menu'
 import { DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown'
-import { dictFormat } from '../../../lib/utils/dictFormat'
-import { dict } from '../../../lib/dict'
+import { dictFormat } from '../../utils/dictFormat'
+import { dict } from '../../dict'
 
 export const DataTablePagination = () => (
 	<div className="flex gap-6 lg:gap-8 justify-between">

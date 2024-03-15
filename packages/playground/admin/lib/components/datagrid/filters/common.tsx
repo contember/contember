@@ -2,7 +2,7 @@ import * as React from 'react'
 import { ReactEventHandler, useCallback } from 'react'
 import { useDataViewNullFilter } from '@contember/react-dataview'
 import { DataViewFilterSelectItemUI } from '../ui'
-import { dict } from '../../../../lib/dict'
+import { dict } from '../../../dict'
 
 export const DataViewNullFilter = ({ name }: {
 	name: string

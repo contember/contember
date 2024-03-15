@@ -10,15 +10,16 @@ import { DataViewNullFilter } from './common'
 import { dict } from '../../../../lib/dict'
 
 
-export const DataViewTextFilter = ({ name }: {
+export const DataViewTextFilter = ({ name, label }: {
 	name: string
+	label: React.ReactNode
 }) => (
 	<>
 		<InputLike className={'p-1 relative basis-1/4 min-w-40'}>
 			<DropdownMenu>
 				<DropdownMenuTrigger asChild>
 					<Button size={'sm'} variant={'secondary'} className={'px-3'}>
-						<DataViewTextFilterMatchModeLabel name={name} render={dict.datagrid.textMatchMode} />
+						{label} <DataViewTextFilterMatchModeLabel name={name} render={dict.datagrid.textMatchMode} />
 					</Button>
 				</DropdownMenuTrigger>
 				<DropdownMenuContent className="w-[160px]">

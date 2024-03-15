@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { dict } from '../../../lib/dict'
+import { dict } from '../../dict'
 
 export const DataViewNoResults = () => (
 	<div className={'p-4 text-lg rounded-md border'}>

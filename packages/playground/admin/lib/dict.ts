@@ -32,11 +32,11 @@ export const dict = {
 		textReset: 'Reset filter',
 		textPlaceholder: 'Search',
 		textMatchMode: {
-			'matches': 'Contains',
-			'matchesExactly': 'Equals',
-			'startsWith': 'Starts with',
-			'endsWith': 'Ends with',
-			'doesNotMatch': 'Does not contain',
+			'matches': 'contains',
+			'matchesExactly': 'equals',
+			'startsWith': 'starts with',
+			'endsWith': 'ends with',
+			'doesNotMatch': 'does not contain',
 		} satisfies Record<TextFilterArtifactsMatchMode, string>,
 		columns: 'Columns',
 		columnAsc: 'asc',
@@ -66,6 +66,9 @@ export const dict = {
 		paginationPreviousPage: 'Previous page',
 		paginationNextPage: 'Next page',
 		placeholder: 'Select',
+	},
+	backButton: {
+		back: 'Back',
 	},
 
 	errors: {

@@ -2,8 +2,8 @@ import * as React from 'react'
 import { forwardRef, ReactEventHandler, ReactNode, SyntheticEvent, useCallback } from 'react'
 import { CheckSquareIcon, FilterIcon, FilterXIcon, PlusIcon, SquareIcon, XIcon } from 'lucide-react'
 import { Button } from '../ui/button'
-import { cn } from '../../../lib/utils/cn'
-import { dict } from '../../../lib/dict'
+import { cn } from '../../utils/cn'
+import { dict } from '../../dict'
 
 /**
  * Button in a tooltip that triggers the filter action

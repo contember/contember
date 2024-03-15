@@ -1,7 +1,11 @@
-import { Button } from '../../lib/components/ui/button'
-import { uic } from '../../lib/utils/uic'
 import { Component } from '@contember/interface'
-import { Repeater, RepeaterAddItemTrigger, RepeaterEachItem, RepeaterProps } from '@contember/react-repeater'
+import {
+	Repeater,
+	RepeaterAddItemTrigger,
+	RepeaterEachItem,
+	RepeaterProps,
+	RepeaterRemoveItemTrigger,
+} from '@contember/react-repeater'
 import {
 	RepeaterSortable,
 	RepeaterSortableDragOverlay,
@@ -10,11 +14,16 @@ import {
 	RepeaterSortableItemActivator,
 	RepeaterSortableItemNode,
 } from '@contember/react-repeater-dnd-kit'
-import { GripVerticalIcon, PlusCircleIcon } from 'lucide-react'
+import { GripVerticalIcon, PlusCircleIcon, Trash2Icon } from 'lucide-react'
+import { Button } from './ui/button'
+import { uic } from '../utils/uic'
 import { DropIndicator } from './ui/sortable'
 
+export const RepeaterWrapperUI = uic('div', {
+	baseClass: 'flex flex-col gap-2',
+})
 export const RepeaterItemsWrapperUI = uic('div', {
-	baseClass: 'flex flex-col gap-2 py-4',
+	baseClass: 'flex flex-col gap-2 p-4 pr-8 relative shadow-sm bg-white rounded border border-gray-300 max-w-md',
 })
 export const RepeaterItemUI = uic('div', {
 	baseClass: 'rounded border border-gray-300 p-4 relative',
@@ -48,6 +57,18 @@ export const RepeaterAddItemButton = ({ children }: { children?: React.ReactNode
 	</RepeaterAddItemTrigger>
 )
 
+export const RepeaterRemoveItemButton = ({ children }: { children?: React.ReactNode }) => (
+	<RepeaterRemoveItemTrigger>
+		<div className={'absolute top-1 right-2 flex'}>
+			<Button variant={'link'} size={'sm'} className={'gap-1 px-0 group'}>
+				{children || <>
+					<Trash2Icon className={'group-hover:text-red-600'} size={16}/>
+				</>}
+			</Button>
+		</div>
+	</RepeaterRemoveItemTrigger>
+)
+
 export type DefaultRepeaterProps = { title?: string }
 	& RepeaterProps
 
@@ -60,11 +81,14 @@ export const DefaultRepeater = Component<DefaultRepeaterProps>(({ title, childre
 				<Repeater {...props}>
 					{title && <h3 className={'font-medium'}>{title}</h3>}
 
-					<RepeaterEachItem>
-						<RepeaterItemsWrapperUI>
-							{children}
-						</RepeaterItemsWrapperUI>
-					</RepeaterEachItem>
+					<RepeaterWrapperUI>
+						<RepeaterEachItem>
+							<RepeaterItemsWrapperUI>
+								<RepeaterRemoveItemButton/>
+								{children}
+							</RepeaterItemsWrapperUI>
+						</RepeaterEachItem>
+					</RepeaterWrapperUI>
 
 					<RepeaterAddItemButton/>
 				</Repeater>
@@ -104,5 +128,5 @@ export const DefaultRepeater = Component<DefaultRepeaterProps>(({ title, childre
 		</div>
 	)
 }, props => {
-	return <Repeater {...props} />
+	return <Repeater {...props}/>
 })

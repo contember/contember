@@ -21,7 +21,7 @@ import {
 	DataViewSingleFilterUI,
 } from '../ui'
 import { DataViewNullFilter } from './common'
-import { dict } from '../../../../lib/dict'
+import { dict } from '../../../dict'
 
 export const DataViewEnumFieldTooltip = ({ filter, children, actions, value }: { filter: string, children: ReactNode, value: string, actions?: ReactNode }) => (
 	<TooltipProvider>

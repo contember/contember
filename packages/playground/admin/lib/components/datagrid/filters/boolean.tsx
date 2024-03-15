@@ -4,9 +4,9 @@ import { DataViewBooleanFilterTrigger, DataViewNullFilterTrigger } from '@contem
 import { Popover, PopoverContent, PopoverTrigger } from '../../ui/popover'
 import { DataViewActiveFilterUI, DataViewFilterSelectTriggerUI, DataViewSingleFilterUI } from '../ui'
 import { DataViewNullFilter } from './common'
-import { formatBoolean } from '../../../../lib/utils/formatting'
+import { formatBoolean } from '../../../utils/formatting'
 import { Button } from '../../ui/button'
-import { dict } from '../../../../lib/dict'
+import { dict } from '../../../dict'
 
 
 export const DataViewBooleanFilterList = ({ name }: {

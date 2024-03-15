@@ -22,6 +22,7 @@ import { DataGridLayoutSwitcher } from './layout-switcher'
 import { DataGridInitialLoader, DataGridOverlayLoader } from './loader'
 import { DataGridPagination } from './pagination'
 import { DataGridTable, DataGridTableColumn } from './table'
+import { DataGridTextFilter } from './filters'
 import { DataGridToolbarUI } from './ui'
 import { DataGridAutoExport } from './export'
 
@@ -38,6 +39,7 @@ export type DataGridColumn =
 export type DataGridProps =
 	& Omit<DataViewProps, 'children' | 'filterTypes'>
 	& {
+		searchFields?: string[]
 		columns: DataGridColumn[]
 		tile?: ReactNode
 		firstColumnActions?: ReactNode
@@ -77,7 +79,7 @@ const DataGridToolbarColumns = ({ columns }: { columns: DataGridColumn[] }) => {
 	</DropdownMenu>
 }
 
-export const DataGrid = ({ columns, tile, lastColumnActions, firstColumnActions, toolbarButtons, ...props }: DataGridProps) => {
+export const DataGrid = ({ columns, tile, lastColumnActions, firstColumnActions, searchFields, toolbarButtons, ...props }: DataGridProps) => {
 	const filterTypes = useMemo(() => {
 		const columnFilters = Object.fromEntries(
 			columns
@@ -85,8 +87,13 @@ export const DataGrid = ({ columns, tile, lastColumnActions, firstColumnActions,
 				.map(it => [it.filterName, it.filterHandler]),
 		) as Record<string, DataViewFilterHandler<any>>
 
+		const searchFieldsResolved = searchFields ?? columns.filter(it => it.type === 'text').map(it => it.field)
+		if (searchFieldsResolved.length > 0) {
+			columnFilters['__search'] = createCoalesceFilter(searchFieldsResolved)
+		}
+
 		return columnFilters
-	}, [columns])
+	}, [columns, searchFields])
 
 	return (
 		<DataView
@@ -98,6 +105,7 @@ export const DataGrid = ({ columns, tile, lastColumnActions, firstColumnActions,
 			{...props}
 		>
 			<DataGridToolbarUI>
+				{filterTypes.__search && <DataGridTextFilter name={'__search'} />}
 				<DataGridToolbarFilters columns={columns} />
 				<div className="ml-auto flex gap-2">
 					{tile && <DataGridLayoutSwitcher />}

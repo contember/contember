@@ -2,7 +2,7 @@ import { DataViewSelectionTrigger } from '@contember/react-dataview'
 import { Button } from '../ui/button'
 import { LayoutGridIcon, SheetIcon } from 'lucide-react'
 import * as React from 'react'
-import { dict } from '../../../lib/dict'
+import { dict } from '../../dict'
 
 export const DataViewLayoutSwitcher = () => <>
 	<div className={'space-x-0'}>

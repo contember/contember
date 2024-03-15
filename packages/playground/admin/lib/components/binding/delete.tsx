@@ -14,7 +14,7 @@ import * as React from 'react'
 import { ReactElement } from 'react'
 import { DeleteEntityTrigger } from '@contember/interface'
 import { FeedbackTrigger } from './persist'
-import { dict } from '../../../lib/dict'
+import { dict } from '../../dict'
 
 export const DeleteEntityDialog = ({ trigger }: { trigger: ReactElement }) => {
 	return (

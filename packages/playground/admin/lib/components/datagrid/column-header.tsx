@@ -1,10 +1,10 @@
-import { cn } from '../../../lib/utils/cn'
+import { cn } from '../../utils/cn'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown'
 import { Button } from '../ui/button'
 import { ReactNode } from 'react'
 import { ArrowDownAZIcon, ArrowUpDownIcon, ArrowUpZaIcon, EyeOffIcon } from 'lucide-react'
 import { DataViewSelectionTrigger, DataViewSortingSwitch, DataViewSortingTrigger } from '@contember/react-dataview'
-import { dict } from '../../../lib/dict'
+import { dict } from '../../dict'
 
 
 export function DataViewColumnHeader<TData, TValue>({ sortingField, hidingName, children }: {

@@ -12,8 +12,8 @@ import { Popover, PopoverContent, PopoverTrigger } from '../../ui/popover'
 import { DataViewActiveFilterUI, DataViewFilterSelectTriggerUI, DataViewSingleFilterUI } from '../ui'
 import { DataViewNullFilter } from './common'
 import { Input } from '../../ui/input'
-import { formatDate } from '../../../../lib/utils/formatting'
-import { dict } from '../../../../lib/dict'
+import { formatDate } from '../../../utils/formatting'
+import { dict } from '../../../dict'
 
 const DataViewDateFilterRange = ({ name }: { name: string }) => {
 	const [artifact] = useDataViewFilter<DateRangeFilterArtifacts>(name)

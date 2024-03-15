@@ -12,7 +12,7 @@ import {
 import { EyeIcon, EyeOffIcon } from 'lucide-react'
 import * as React from 'react'
 import { Fragment, ReactNode, useMemo } from 'react'
-import { dict } from '../../../lib/dict'
+import { dict } from '../../dict'
 import { Button } from '../ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown'
 import { DataViewNoResults } from './empty'

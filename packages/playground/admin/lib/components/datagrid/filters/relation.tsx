@@ -8,7 +8,7 @@ import { Popover, PopoverTrigger } from '../../ui/popover'
 import { DataViewActiveFilterUI, DataViewExcludeActionButtonUI, DataViewFilterActionButtonUI, DataViewFilterSelectItemUI, DataViewFilterSelectTriggerUI, DataViewSingleFilterUI } from '../ui'
 import { DataViewNullFilter } from './common'
 import { createDefaultSelectFilter, SelectListInner, SelectPopoverContent } from '../../select'
-import { dict } from '../../../../lib/dict'
+import { dict } from '../../../dict'
 
 export const DataViewRelationFieldTooltip = ({ filter, children, actions }: { filter: string, children: ReactNode, actions?: ReactNode }) => (
 	<TooltipProvider>

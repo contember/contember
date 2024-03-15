@@ -1,11 +1,11 @@
 import { Component } from '@contember/interface'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table'
-import { DataViewColumnHeader } from './column-header'
+import { DataGridColumnHeader } from './column-header'
 import * as React from 'react'
 import { ReactNode } from 'react'
 import { DataViewEachRow, DataViewHasSelection } from '@contember/react-dataview'
 
-export type DataViewTableColumn = {
+export type DataGridTableColumn = {
 	header: ReactNode
 	cell: ReactNode
 	hidingName?: string
@@ -15,10 +15,10 @@ export type DataViewTableColumn = {
 export interface DataViewTableProps {
 	firstColumnActions?: ReactNode
 	lastColumnActions?: ReactNode
-	columns: DataViewTableColumn[]
+	columns: DataGridTableColumn[]
 }
 
-export const DataViewTable = Component(({ columns, firstColumnActions, lastColumnActions }: DataViewTableProps) => {
+export const DataGridTable = Component(({ columns, firstColumnActions, lastColumnActions }: DataViewTableProps) => {
 	return (
 		<div className={'rounded-md border overflow-x-auto'}>
 			<Table>
@@ -30,9 +30,9 @@ export const DataViewTable = Component(({ columns, firstColumnActions, lastColum
 						{Object.entries(columns).map(([key, { header, hidingName, sortingField }]) => (
 							<DataViewHasSelection name={hidingName ?? key} key={key}>
 								<TableHead className={'text-center'}>
-									<DataViewColumnHeader hidingName={hidingName ?? key} sortingField={sortingField}>
+									<DataGridColumnHeader hidingName={hidingName ?? key} sortingField={sortingField}>
 										{header}
-									</DataViewColumnHeader>
+									</DataGridColumnHeader>
 								</TableHead>
 							</DataViewHasSelection>
 						))}

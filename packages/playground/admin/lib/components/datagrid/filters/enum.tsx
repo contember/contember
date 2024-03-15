@@ -1,29 +1,15 @@
 import * as React from 'react'
-import { ReactEventHandler, ReactNode, useCallback } from 'react'
+import { ReactNode, useCallback } from 'react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../../ui/tooltip'
 import { Button } from '../../ui/button'
-import {
-	DataViewEnumFilterTrigger,
-	DataViewNullFilterTrigger,
-	EnumFilterArtifacts,
-	UseDataViewEnumFilter,
-	useDataViewEnumFilterFactory,
-	useDataViewFilter,
-} from '@contember/react-dataview'
+import { DataViewEnumFilterTrigger, DataViewNullFilterTrigger, UseDataViewEnumFilter, useDataViewEnumFilterFactory } from '@contember/react-dataview'
 import { Component } from '@contember/interface'
 import { Popover, PopoverContent, PopoverTrigger } from '../../ui/popover'
-import {
-	DataViewActiveFilterUI,
-	DataViewExcludeActionButtonUI,
-	DataViewFilterActionButtonUI,
-	DataViewFilterSelectItemUI,
-	DataViewFilterSelectTriggerUI,
-	DataViewSingleFilterUI,
-} from '../ui'
-import { DataViewNullFilter } from './common'
+import { DataGridActiveFilterUI, DataGridExcludeActionButtonUI, DataGridFilterActionButtonUI, DataGridFilterSelectItemUI, DataGridFilterSelectTriggerUI, DataGridSingleFilterUI } from '../ui'
+import { DataGridNullFilter } from './common'
 import { dict } from '../../../dict'
 
-export const DataViewEnumFieldTooltip = ({ filter, children, actions, value }: { filter: string, children: ReactNode, value: string, actions?: ReactNode }) => (
+export const DataGridEnumFieldTooltip = ({ filter, children, actions, value }: { filter: string, children: ReactNode, value: string, actions?: ReactNode }) => (
 	<TooltipProvider>
 		<Tooltip>
 			<TooltipTrigger asChild>
@@ -34,10 +20,10 @@ export const DataViewEnumFieldTooltip = ({ filter, children, actions, value }: {
 			<TooltipContent variant={'blurred'}>
 				<div className={'flex gap-1'}>
 					<DataViewEnumFilterTrigger name={filter} action={'toggleInclude'} value={value}>
-						<DataViewFilterActionButtonUI />
+						<DataGridFilterActionButtonUI />
 					</DataViewEnumFilterTrigger>
 					<DataViewEnumFilterTrigger name={filter} action={'toggleExclude'} value={value}>
-						<DataViewExcludeActionButtonUI />
+						<DataGridExcludeActionButtonUI />
 					</DataViewEnumFilterTrigger>
 					{actions}
 				</div>
@@ -46,29 +32,29 @@ export const DataViewEnumFieldTooltip = ({ filter, children, actions, value }: {
 	</TooltipProvider>
 )
 
-const DataViewEnumFilterList = ({ name, options }: {
+const DataGridEnumFilterList = ({ name, options }: {
 	name: string
 	options: Record<string, ReactNode>
 }) => (
 	<>
 		{Object.entries(options).map(([value, label]) => (
 			<DataViewEnumFilterTrigger name={name} action={'unset'} value={value} key={value}>
-				<DataViewActiveFilterUI>
+				<DataGridActiveFilterUI>
 					{label}
-				</DataViewActiveFilterUI>
+				</DataGridActiveFilterUI>
 			</DataViewEnumFilterTrigger>
 		))}
 
 		<DataViewNullFilterTrigger name={name} action={'unset'}>
-			<DataViewActiveFilterUI>
+			<DataGridActiveFilterUI>
 				<span className={'italic'}>{dict.datagrid.na}</span>
-			</DataViewActiveFilterUI>
+			</DataGridActiveFilterUI>
 		</DataViewNullFilterTrigger>
 	</>
 )
 
 
-const DataViewEnumFilterSelectItem = ({ value, children, filterFactory }: {
+const DataGridEnumFilterSelectItem = ({ value, children, filterFactory }: {
 	value: string
 	children: ReactNode
 	filterFactory: (value: string) => UseDataViewEnumFilter
@@ -81,13 +67,13 @@ const DataViewEnumFilterSelectItem = ({ value, children, filterFactory }: {
 	const isExcluded = current == 'exclude'
 
 	return (
-		<DataViewFilterSelectItemUI onExclude={exclude} onInclude={include} isExcluded={isExcluded} isIncluded={isIncluded}>
+		<DataGridFilterSelectItemUI onExclude={exclude} onInclude={include} isExcluded={isExcluded} isIncluded={isIncluded}>
 			{children}
-		</DataViewFilterSelectItemUI>
+		</DataGridFilterSelectItemUI>
 	)
 }
 
-const DataViewEnumFilterSelect = ({ name, options, label }: {
+const DataGridEnumFilterSelect = ({ name, options, label }: {
 	name: string
 	options: Record<string, ReactNode>
 	label?: ReactNode
@@ -97,16 +83,16 @@ const DataViewEnumFilterSelect = ({ name, options, label }: {
 	return (
 		<Popover>
 			<PopoverTrigger asChild>
-				<DataViewFilterSelectTriggerUI>{label}</DataViewFilterSelectTriggerUI>
+				<DataGridFilterSelectTriggerUI>{label}</DataGridFilterSelectTriggerUI>
 			</PopoverTrigger>
 			<PopoverContent className="p-2">
 				<div className={'relative flex flex-col gap-2'}>
 					{Object.entries(options).map(([value, label]) => (
-						<DataViewEnumFilterSelectItem value={value} key={value} filterFactory={filterFactory}>
+						<DataGridEnumFilterSelectItem value={value} key={value} filterFactory={filterFactory}>
 							{label}
-						</DataViewEnumFilterSelectItem>
+						</DataGridEnumFilterSelectItem>
 					))}
-					<DataViewNullFilter name={name} />
+					<DataGridNullFilter name={name} />
 				</div>
 			</PopoverContent>
 		</Popover>
@@ -114,13 +100,13 @@ const DataViewEnumFilterSelect = ({ name, options, label }: {
 }
 
 
-export const DefaultDataViewEnumFilter = Component(({ name, options, label }: {
+export const DataGridEnumFilter = Component(({ name, options, label }: {
 	name: string
 	options: Record<string, ReactNode>
 	label: ReactNode
 }) => (
-	<DataViewSingleFilterUI>
-		<DataViewEnumFilterSelect name={name} options={options} label={label} />
-		<DataViewEnumFilterList name={name} options={options} />
-	</DataViewSingleFilterUI>
+	<DataGridSingleFilterUI>
+		<DataGridEnumFilterSelect name={name} options={options} label={label} />
+		<DataGridEnumFilterList name={name} options={options} />
+	</DataGridSingleFilterUI>
 ), () => null)

@@ -1,7 +1,7 @@
 import { Component, Field, HasMany } from '@contember/interface'
 import { Slots } from '../../lib/components/slots'
 import { DataViewHasSelection } from '@contember/react-dataview'
-import { DataViewColumns, DataViewRelationFieldTooltip, DefaultDataGrid } from '../../lib/components/datagrid'
+import { DataGrid, DataGridColumns, DataGridRelationFieldTooltip } from '../../lib/components/datagrid'
 import * as React from 'react'
 import { DefaultDropdown, DropdownMenuItem, DropdownMenuSeparator } from '../../lib/components/ui/dropdown'
 import { Binding, DeleteEntityDialog } from '../../lib/components/binding'
@@ -33,9 +33,9 @@ const GridTile = Component(() => (
 		<div className={'flex -mx-2'}>
 			<DataViewHasSelection name={'tags'}>
 				<HasMany field="tags">
-					<DataViewRelationFieldTooltip filter={'tags'}>
+					<DataGridRelationFieldTooltip filter={'tags'}>
 						<Field field="name" />
-					</DataViewRelationFieldTooltip>
+					</DataGridRelationFieldTooltip>
 				</HasMany>
 			</DataViewHasSelection>
 		</div>
@@ -52,19 +52,19 @@ export default () => (
 		</Slots.Title>
 
 		<Binding>
-			<DefaultDataGrid
+			<DataGrid
 				entities="GridArticle"
 				tile={<GridTile />}
 				lastColumnActions={<GridDropdown />}
 				columns={[
-					DataViewColumns.text({ field: 'title', label: 'Title' }),
-					DataViewColumns.enum({ field: 'state', label: 'State', options: GridArticleStateLabels }),
-					DataViewColumns.date({ field: 'publishedAt', label: 'Published at' }),
-					DataViewColumns.hasOne({ field: 'author', valueField: 'name', label: 'Author', filterOptions: 'GridAuthor' }),
-					DataViewColumns.hasOne({ field: 'category', valueField: 'name', label: 'Category', filterOptions: 'GridCategory' }),
-					DataViewColumns.hasMany({ field: 'tags', valueField: 'name', label: 'Tags', filterOptions: 'GridTag' }),
-					DataViewColumns.boolean({ field: 'locked', label: 'Locked' }),
-					DataViewColumns.number({ field: 'views', label: 'Views' }),
+					DataGridColumns.text({ field: 'title', label: 'Title' }),
+					DataGridColumns.enum({ field: 'state', label: 'State', options: GridArticleStateLabels }),
+					DataGridColumns.date({ field: 'publishedAt', label: 'Published at' }),
+					DataGridColumns.hasOne({ field: 'author', valueField: 'name', label: 'Author' }),
+					DataGridColumns.hasOne({ field: 'category', valueField: 'name', label: 'Category' }),
+					DataGridColumns.hasMany({ field: 'tags', valueField: 'name', label: 'Tags' }),
+					DataGridColumns.boolean({ field: 'locked', label: 'Locked' }),
+					DataGridColumns.number({ field: 'views', label: 'Views' }),
 				]}
 			/>
 

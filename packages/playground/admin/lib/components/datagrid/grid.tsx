@@ -1,8 +1,10 @@
 import {
+	createCoalesceFilter,
 	DataView,
 	DataViewEachRow,
 	DataViewEmpty,
 	DataViewFilterHandler,
+	DataViewHasFilterType,
 	DataViewHasSelection,
 	DataViewLoaderState,
 	DataViewNonEmpty,
@@ -15,30 +17,35 @@ import { Fragment, ReactNode, useMemo } from 'react'
 import { dict } from '../../dict'
 import { Button } from '../ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown'
-import { DataViewNoResults } from './empty'
-import { DataViewLayoutSwitcher } from './layout-switcher'
-import { DataViewInitialLoader, DataViewLoaderOverlay } from './loader'
-import { DataTablePagination } from './pagination'
-import { DataViewTable, DataViewTableColumn } from './table'
+import { DataGridNoResults } from './empty'
+import { DataGridLayoutSwitcher } from './layout-switcher'
+import { DataGridInitialLoader, DataGridOverlayLoader } from './loader'
+import { DataGridPagination } from './pagination'
+import { DataGridTable, DataGridTableColumn } from './table'
+import { DataGridToolbarUI } from './ui'
+import { DataGridAutoExport } from './export'
 
-export type DataViewColumn =
-	& DataViewTableColumn
+export type DataGridColumn =
+	& DataGridTableColumn
 	& {
+		type: 'text' | 'hasOne' | 'hasMany' | 'boolean' | 'number' | 'enum' | 'date'
+		field: string
 		filterName?: string
 		filterHandler?: DataViewFilterHandler<any>
 		filterToolbar?: ReactNode
 	}
 
-export type DefaultDataGridProps =
+export type DataGridProps =
 	& Omit<DataViewProps, 'children' | 'filterTypes'>
 	& {
-		columns: DataViewColumn[]
+		columns: DataGridColumn[]
 		tile?: ReactNode
 		firstColumnActions?: ReactNode
 		lastColumnActions?: ReactNode
+		toolbarButtons?: ReactNode
 	}
 
-const DataGridToolbarFilters = ({ columns }: { columns: DataViewColumn[] }) => {
+const DataGridToolbarFilters = ({ columns }: { columns: DataGridColumn[] }) => {
 	return <>
 		{columns
 			.filter(it => it.filterToolbar && it.filterName)
@@ -47,7 +54,7 @@ const DataGridToolbarFilters = ({ columns }: { columns: DataViewColumn[] }) => {
 	</>
 }
 
-const DataGridToolbarColumns = ({ columns }: { columns: DataViewColumn[] }) => {
+const DataGridToolbarColumns = ({ columns }: { columns: DataGridColumn[] }) => {
 	return <DropdownMenu>
 		<DropdownMenuTrigger asChild>
 			<Button variant={'outline'} size={'sm'} className={'gap-2'}>
@@ -70,12 +77,15 @@ const DataGridToolbarColumns = ({ columns }: { columns: DataViewColumn[] }) => {
 	</DropdownMenu>
 }
 
-export const DefaultDataGrid = ({ columns, tile, lastColumnActions, firstColumnActions, ...props }: DefaultDataGridProps) => {
+export const DataGrid = ({ columns, tile, lastColumnActions, firstColumnActions, toolbarButtons, ...props }: DataGridProps) => {
 	const filterTypes = useMemo(() => {
-		return Object.fromEntries(columns
-			.filter(it => it.filterHandler)
-			.map(it => [it.filterName, it.filterHandler]),
+		const columnFilters = Object.fromEntries(
+			columns
+				.filter(it => it.filterHandler)
+				.map(it => [it.filterName, it.filterHandler]),
 		) as Record<string, DataViewFilterHandler<any>>
+
+		return columnFilters
 	}, [columns])
 
 	return (
@@ -87,20 +97,26 @@ export const DefaultDataGrid = ({ columns, tile, lastColumnActions, firstColumnA
 			}}
 			{...props}
 		>
-			<DataViewBody toolbar={<>
+			<DataGridToolbarUI>
 				<DataGridToolbarFilters columns={columns} />
 				<div className="ml-auto flex gap-2">
-					{tile && <DataViewLayoutSwitcher />}
+					{tile && <DataGridLayoutSwitcher />}
 					<DataGridToolbarColumns columns={columns} />
+					<DataGridAutoExport columns={columns} />
+					{toolbarButtons}
 				</div>
-			</>}>
+			</DataGridToolbarUI>
+
+			<DataGridLoader>
+
 				<DataViewHasSelection name={'layout'} value={'table'}>
-					<DataViewTable
+					<DataGridTable
 						columns={columns}
 						firstColumnActions={firstColumnActions}
 						lastColumnActions={lastColumnActions}
 					/>
 				</DataViewHasSelection>
+
 				<DataViewHasSelection name={'layout'} value={'grid'}>
 					<div className="grid grid-cols-2 md:grid-cols-4 gap-4">
 						<DataViewEachRow>
@@ -109,26 +125,24 @@ export const DefaultDataGrid = ({ columns, tile, lastColumnActions, firstColumnA
 					</div>
 				</DataViewHasSelection>
 
-			</DataViewBody>
+			</DataGridLoader>
+
+			<DataGridPagination />
 		</DataView>
 	)
 }
 
 
 export interface DataViewBodyProps {
-	toolbar: ReactNode
 	children: ReactNode
 }
 
-export const DataViewBody = ({ children, toolbar }: DataViewBodyProps) => (
-	<div className="space-y-4">
-		<div className={'flex gap-2 items-stretch flex-wrap'}>
-			{toolbar}
-		</div>
+export const DataGridLoader = ({ children }: DataViewBodyProps) => (
+	<>
 		<DataViewLoaderState refreshing loaded>
 			<div className="relative">
 				<DataViewLoaderState refreshing>
-					<DataViewLoaderOverlay />
+					<DataGridOverlayLoader />
 				</DataViewLoaderState>
 
 				<DataViewNonEmpty>
@@ -136,15 +150,14 @@ export const DataViewBody = ({ children, toolbar }: DataViewBodyProps) => (
 				</DataViewNonEmpty>
 
 				<DataViewEmpty>
-					<DataViewNoResults />
+					<DataGridNoResults />
 				</DataViewEmpty>
 			</div>
 		</DataViewLoaderState>
 		<DataViewLoaderState initial>
-			<DataViewInitialLoader />
+			<DataGridInitialLoader />
 		</DataViewLoaderState>
-		<DataTablePagination />
-	</div>
+	</>
 )
 
 

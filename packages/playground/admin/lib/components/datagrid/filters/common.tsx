@@ -1,10 +1,10 @@
 import * as React from 'react'
-import { ReactEventHandler, useCallback } from 'react'
+import { useCallback } from 'react'
 import { useDataViewNullFilter } from '@contember/react-dataview'
-import { DataViewFilterSelectItemUI } from '../ui'
+import { DataGridFilterSelectItemUI } from '../ui'
 import { dict } from '../../../dict'
 
-export const DataViewNullFilter = ({ name }: {
+export const DataGridNullFilter = ({ name }: {
 	name: string
 }) => {
 
@@ -13,7 +13,7 @@ export const DataViewNullFilter = ({ name }: {
 	const toggleIncludeNull = useCallback(() => setNullFilter('toggleInclude'), [setNullFilter])
 
 	return <>
-		<DataViewFilterSelectItemUI
+		<DataGridFilterSelectItemUI
 			onExclude={toggleExcludeNull}
 			onInclude={toggleIncludeNull}
 			isExcluded={nullFilter === 'exclude'}
@@ -22,6 +22,6 @@ export const DataViewNullFilter = ({ name }: {
 			<span className={'italic'}>
 				{dict.datagrid.na}
 			</span>
-		</DataViewFilterSelectItemUI>
+		</DataGridFilterSelectItemUI>
 	</>
 }

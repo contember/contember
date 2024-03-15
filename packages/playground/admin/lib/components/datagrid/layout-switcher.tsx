@@ -4,7 +4,7 @@ import { LayoutGridIcon, SheetIcon } from 'lucide-react'
 import * as React from 'react'
 import { dict } from '../../dict'
 
-export const DataViewLayoutSwitcher = () => <>
+export const DataGridLayoutSwitcher = () => <>
 	<div className={'space-x-0'}>
 		<DataViewSelectionTrigger name={'layout'} value={'grid'}>
 			<Button variant={'outline'} size={'sm'}

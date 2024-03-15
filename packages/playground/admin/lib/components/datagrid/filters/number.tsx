@@ -8,13 +8,13 @@ import {
 	useDataViewFilter,
 } from '@contember/react-dataview'
 import { Popover, PopoverContent, PopoverTrigger } from '../../ui/popover'
-import { DataViewActiveFilterUI, DataViewFilterSelectTriggerUI, DataViewSingleFilterUI } from '../ui'
-import { DataViewNullFilter } from './common'
+import { DataGridActiveFilterUI, DataGridFilterSelectTriggerUI, DataGridSingleFilterUI } from '../ui'
+import { DataGridNullFilter } from './common'
 import { Input } from '../../ui/input'
 import { formatNumber } from '../../../utils/formatting'
 import { dict } from '../../../dict'
 
-const DataViewNumberFilterRange = ({ name }: {
+const DataGridNumberFilterRange = ({ name }: {
 	name: string
 }) => {
 	const [artifact] = useDataViewFilter<NumberRangeFilterArtifacts>(name)
@@ -34,32 +34,32 @@ const DataViewNumberFilterRange = ({ name }: {
 }
 
 
-export const DataViewNumberFilterList = ({ name }: {
+export const DataGridNumberFilterList = ({ name }: {
 	name: string
 }) => (
 	<>
 		<DataViewNumberFilterResetTrigger name={name}>
-			<DataViewActiveFilterUI>
-				<DataViewNumberFilterRange name={name} />
-			</DataViewActiveFilterUI>
+			<DataGridActiveFilterUI>
+				<DataGridNumberFilterRange name={name} />
+			</DataGridActiveFilterUI>
 		</DataViewNumberFilterResetTrigger>
 
 		<DataViewNullFilterTrigger name={name} action={'unset'}>
-			<DataViewActiveFilterUI>
+			<DataGridActiveFilterUI>
 				<span className={'italic'}>{dict.datagrid.na}</span>
-			</DataViewActiveFilterUI>
+			</DataGridActiveFilterUI>
 		</DataViewNullFilterTrigger>
 	</>
 )
 
 
-export const DataViewNumberFilterSelect = ({ name, label }: {
+export const DataGridNumberFilterSelect = ({ name, label }: {
 	name: string
 	label?: ReactNode
 }) => (
 	<Popover>
 		<PopoverTrigger asChild>
-			<DataViewFilterSelectTriggerUI>{label}</DataViewFilterSelectTriggerUI>
+			<DataGridFilterSelectTriggerUI>{label}</DataGridFilterSelectTriggerUI>
 		</PopoverTrigger>
 		<PopoverContent>
 			<div className={'relative flex flex-col gap-4'}>
@@ -75,19 +75,19 @@ export const DataViewNumberFilterSelect = ({ name, label }: {
 					</DataViewNumberFilterInput>
 				</div>
 
-				<DataViewNullFilter name={name} />
+				<DataGridNullFilter name={name} />
 			</div>
 		</PopoverContent>
 	</Popover>
 )
 
 
-export const DefaultDataViewNumberFilter = ({ name, label }: {
+export const DataGridNumberFilter = ({ name, label }: {
 	name: string
 	label: ReactNode
 }) => (
-	<DataViewSingleFilterUI>
-		<DataViewNumberFilterSelect name={name} label={label} />
-		<DataViewNumberFilterList name={name} />
-	</DataViewSingleFilterUI>
+	<DataGridSingleFilterUI>
+		<DataGridNumberFilterSelect name={name} label={label} />
+		<DataGridNumberFilterList name={name} />
+	</DataGridSingleFilterUI>
 )

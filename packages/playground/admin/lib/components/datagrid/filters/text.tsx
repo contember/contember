@@ -5,14 +5,14 @@ import { MoreHorizontalIcon, XIcon } from 'lucide-react'
 import * as React from 'react'
 import { DataViewNullFilterTrigger, DataViewTextFilterInput, DataViewTextFilterMatchModeLabel, DataViewTextFilterMatchModeTrigger, DataViewTextFilterResetTrigger, TextFilterArtifactsMatchMode } from '@contember/react-dataview'
 import { Popover, PopoverContent, PopoverTrigger } from '../../ui/popover'
-import { DataViewActiveFilterUI } from '../ui'
-import { DataViewNullFilter } from './common'
+import { DataGridActiveFilterUI } from '../ui'
+import { DataGridNullFilter } from './common'
 import { dict } from '../../../../lib/dict'
 
 
-export const DataViewTextFilter = ({ name, label }: {
+export const DataGridTextFilter = ({ name, label }: {
 	name: string
-	label: React.ReactNode
+	label?: React.ReactNode
 }) => (
 	<>
 		<InputLike className={'p-1 relative basis-1/4 min-w-40'}>
@@ -39,9 +39,9 @@ export const DataViewTextFilter = ({ name, label }: {
 
 			<div className={'ml-auto flex gap-1 items-center'}>
 				<DataViewNullFilterTrigger name={name} action={'unset'}>
-					<DataViewActiveFilterUI className={'ml-auto'}>
+					<DataGridActiveFilterUI className={'ml-auto'}>
 						<span className={'italic'}>{dict.datagrid.na}</span>
-					</DataViewActiveFilterUI>
+					</DataGridActiveFilterUI>
 				</DataViewNullFilterTrigger>
 				<Popover>
 					<PopoverTrigger asChild>
@@ -55,7 +55,7 @@ export const DataViewTextFilter = ({ name, label }: {
 								<XIcon className={'w-3 h-3'} /> {dict.datagrid.textReset}
 							</Button>
 						</DataViewTextFilterResetTrigger>
-						<DataViewNullFilter name={name} />
+						<DataGridNullFilter name={name} />
 					</PopoverContent>
 				</Popover>
 			</div>

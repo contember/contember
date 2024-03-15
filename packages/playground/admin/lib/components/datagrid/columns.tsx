@@ -8,7 +8,7 @@ import {
 	DefaultDataViewNumberFilter,
 	DefaultDataViewRelationFilter,
 } from './filters'
-import { formatBoolean, formatDate, formatNumber } from '../../../lib/utils/formatting'
+import { formatBoolean, formatDate, formatNumber } from '../../utils/formatting'
 import { DataViewColumn } from './grid'
 import { Field, HasMany, HasOne } from '@contember/react-binding'
 import {
@@ -49,7 +49,7 @@ export const createTextColumn = ({ field, label, ...args }: DataViewTextColumnAr
 		hidingName: field,
 		sortingField: field,
 		filterHandler: createTextFilter(field),
-		filterToolbar: <DataViewTextFilter name={field} />,
+		filterToolbar: <DataViewTextFilter name={field} label={label} />,
 		...args,
 	}
 }

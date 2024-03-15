@@ -1,7 +1,11 @@
-import { Button } from '../../lib/components/ui/button'
-import { uic } from '../../lib/utils/uic'
 import { Component } from '@contember/interface'
-import { Repeater, RepeaterAddItemTrigger, RepeaterEachItem, RepeaterProps } from '@contember/react-repeater'
+import {
+	Repeater,
+	RepeaterAddItemTrigger,
+	RepeaterEachItem,
+	RepeaterProps,
+	RepeaterRemoveItemTrigger,
+} from '@contember/react-repeater'
 import {
 	RepeaterSortable,
 	RepeaterSortableDragOverlay,
@@ -10,11 +14,16 @@ import {
 	RepeaterSortableItemActivator,
 	RepeaterSortableItemNode,
 } from '@contember/react-repeater-dnd-kit'
-import { GripVerticalIcon, PlusCircleIcon } from 'lucide-react'
+import { GripVerticalIcon, PlusCircleIcon, Trash2Icon } from 'lucide-react'
+import { Button } from './ui/button'
+import { uic } from '../utils/uic'
 import { DropIndicator } from './ui/sortable'
 
+export const RepeaterWrapperUI = uic('div', {
+	baseClass: 'flex flex-col gap-2',
+})
 export const RepeaterItemsWrapperUI = uic('div', {
-	baseClass: 'flex flex-col gap-2 py-4',
+	baseClass: 'flex flex-col gap-2 p-4 pr-8 relative shadow-sm bg-white rounded border border-gray-300 max-w-md',
 })
 export const RepeaterItemUI = uic('div', {
 	baseClass: 'rounded border border-gray-300 p-4 relative',
@@ -24,13 +33,13 @@ export const RepeaterDragOverlayUI = uic('div', {
 })
 export const RepeaterHandleUI = uic('button', {
 	baseClass: 'absolute top-1/2 -left-6 h-6 w-6 flex justify-end align-center opacity-10 hover:opacity-100 transition-opacity -translate-y-1/2',
-	beforeChildren: <GripVerticalIcon size={16}/>,
+	beforeChildren: <GripVerticalIcon size={16} />,
 })
 
 export const RepeaterDropIndicator = ({ position }: { position: 'before' | 'after' }) => (
 	<div className={'relative'}>
 		<RepeaterSortableDropIndicator position={position}>
-			<DropIndicator placement={position === 'before' ? 'top' : 'bottom'}/>
+			<DropIndicator placement={position === 'before' ? 'top' : 'bottom'} />
 		</RepeaterSortableDropIndicator>
 	</div>
 )
@@ -40,12 +49,24 @@ export const RepeaterAddItemButton = ({ children }: { children?: React.ReactNode
 		<div>
 			<Button variant={'link'} size={'sm'} className={'gap-1 px-0'}>
 				{children || <>
-					<PlusCircleIcon size={16}/>
+					<PlusCircleIcon size={16} />
 					<span>Add item</span>
 				</>}
 			</Button>
 		</div>
 	</RepeaterAddItemTrigger>
+)
+
+export const RepeaterRemoveItemButton = ({ children }: { children?: React.ReactNode }) => (
+	<RepeaterRemoveItemTrigger>
+		<div className={'absolute top-1 right-2 flex'}>
+			<Button variant={'link'} size={'sm'} className={'gap-1 px-0 group'}>
+				{children || <>
+					<Trash2Icon className={'group-hover:text-red-600'} size={16} />
+				</>}
+			</Button>
+		</div>
+	</RepeaterRemoveItemTrigger>
 )
 
 export type DefaultRepeaterProps = { title?: string }
@@ -60,13 +81,16 @@ export const DefaultRepeater = Component<DefaultRepeaterProps>(({ title, childre
 				<Repeater {...props}>
 					{title && <h3 className={'font-medium'}>{title}</h3>}
 
-					<RepeaterEachItem>
-						<RepeaterItemsWrapperUI>
-							{children}
-						</RepeaterItemsWrapperUI>
-					</RepeaterEachItem>
+					<RepeaterWrapperUI>
+						<RepeaterEachItem>
+							<RepeaterItemsWrapperUI>
+								<RepeaterRemoveItemButton />
+								{children}
+							</RepeaterItemsWrapperUI>
+						</RepeaterEachItem>
+					</RepeaterWrapperUI>
 
-					<RepeaterAddItemButton/>
+					<RepeaterAddItemButton />
 				</Repeater>
 			</div>
 		)
@@ -79,16 +103,16 @@ export const DefaultRepeater = Component<DefaultRepeaterProps>(({ title, childre
 					<RepeaterSortable>
 						<RepeaterSortableEachItem>
 							<div>
-								<RepeaterDropIndicator position={'before'}/>
+								<RepeaterDropIndicator position={'before'} />
 								<RepeaterSortableItemNode>
 									<RepeaterItemUI>
 										<RepeaterSortableItemActivator>
-											<RepeaterHandleUI/>
+											<RepeaterHandleUI />
 										</RepeaterSortableItemActivator>
 										{children}
 									</RepeaterItemUI>
 								</RepeaterSortableItemNode>
-								<RepeaterDropIndicator position={'after'}/>
+								<RepeaterDropIndicator position={'after'} />
 							</div>
 						</RepeaterSortableEachItem>
 						<RepeaterSortableDragOverlay>
@@ -98,7 +122,7 @@ export const DefaultRepeater = Component<DefaultRepeaterProps>(({ title, childre
 						</RepeaterSortableDragOverlay>
 					</RepeaterSortable>
 
-					<RepeaterAddItemButton/>
+					<RepeaterAddItemButton />
 				</RepeaterItemsWrapperUI>
 			</Repeater>
 		</div>

@@ -7,7 +7,7 @@ import { useAbortController } from '@contember/react-utils'
 export type UseDataViewTotalCountArgs =
 	& {
 		entities: QualifiedEntityList
-		filter: Filter
+		filter: Filter<never>
 	}
 
 export const useDataViewTotalCount = ({ entities: { entityName }, filter }: UseDataViewTotalCountArgs): number | undefined => {
@@ -24,7 +24,7 @@ export const useDataViewTotalCount = ({ entities: { entityName }, filter }: UseD
 			const contentClient = new ContentClient(client)
 			const qb = createQueryBuilder(schema)
 			const query = qb.count(entityName, {
-				filter: resolveFilter(filter),
+				filter,
 			})
 			try {
 				const result = await contentClient.query(query, {
@@ -43,8 +43,4 @@ export const useDataViewTotalCount = ({ entities: { entityName }, filter }: UseD
 	}, [abortController, client, entityName, filter, schema])
 
 	return count
-}
-
-const resolveFilter = (input?: Filter): Filter<never> => {
-	return replaceGraphQlLiteral<unknown>(input) as Filter<never>
 }

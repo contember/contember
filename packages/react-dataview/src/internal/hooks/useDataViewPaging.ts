@@ -7,7 +7,7 @@ import { Filter, QualifiedEntityList } from '@contember/binding'
 type UseDataViewPagingArgs =
 	& {
 		dataViewKey?: string
-		filter: Filter
+		filter: Filter<never>
 		entities: QualifiedEntityList
 	}
 	& DataViewPagingProps

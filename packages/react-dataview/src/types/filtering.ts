@@ -32,7 +32,7 @@ export type DataViewFilterHandlerRegistry = Record<string, DataViewFilterHandler
 export type DataViewFilteringArtifacts = Record<string, DataViewFilterArtifact>
 export type DataViewFilteringState = {
 	artifact: DataViewFilteringArtifacts
-	filter: Filter
+	filter: Filter<never>
 	filterTypes: DataViewFilterHandlerRegistry
 }
 

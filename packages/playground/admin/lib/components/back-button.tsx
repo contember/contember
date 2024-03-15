@@ -1,7 +1,12 @@
 import { Button } from '../../lib/components/ui/button'
 import { ArrowLeftIcon } from 'lucide-react'
+import { dict } from '../dict'
 
-export const BackButton = () => {
+export type BackButtonProps = {
+	label?: string
+}
+
+export const BackButton = ({ label }: BackButtonProps) => {
 	return (
 		<Button
 			variant={'ghost'}
@@ -9,7 +14,7 @@ export const BackButton = () => {
 			onClick={() => history.back()}
 		>
 			<ArrowLeftIcon size={16}/>
-			<span>Back</span>
+			<span>{label ?? dict.backButton.back}</span>
 		</Button>
 	)
 }

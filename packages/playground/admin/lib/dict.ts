@@ -43,8 +43,9 @@ export const dict = {
 		columnDesc: 'desc',
 		columnHide: 'Hide',
 		empty: 'No results.',
-		showGrid: 'Show grid',
-		showTable: 'Show table',
+		layout: 'Layout',
+		showGrid: 'Grid',
+		showTable: 'Table',
 		paginationFirstPage: 'First page',
 		paginationPreviousPage: 'Previous page',
 		paginationNextPage: 'Next page',
@@ -53,7 +54,7 @@ export const dict = {
 
 		pageInfo: 'Page ${page} of ${pagesCount}',
 		pageInfoShort: 'Page ${page}',
-		pageRowsCount: '(${totalCount} rows total)',
+		pageRowsCount: '${totalCount} rows total',
 
 		filter: 'Filter',
 		exclude: 'Exclude',

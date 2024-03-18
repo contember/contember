@@ -1,30 +1,18 @@
-import {
-	createCoalesceFilter,
-	DataView,
-	DataViewEachRow,
-	DataViewEmpty,
-	DataViewFilterHandler,
-	DataViewHasFilterType,
-	DataViewHasSelection,
-	DataViewLoaderState,
-	DataViewNonEmpty,
-	DataViewProps,
-	DataViewSelectionTrigger,
-} from '@contember/react-dataview'
-import { EyeIcon, EyeOffIcon } from 'lucide-react'
+import { createCoalesceFilter, DataView, DataViewEachRow, DataViewEmpty, DataViewFilterHandler, DataViewHasSelection, DataViewLoaderState, DataViewNonEmpty, DataViewProps } from '@contember/react-dataview'
+import { SettingsIcon } from 'lucide-react'
 import * as React from 'react'
 import { Fragment, ReactNode, useMemo } from 'react'
-import { dict } from '../../dict'
 import { Button } from '../ui/button'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown'
 import { DataGridNoResults } from './empty'
 import { DataGridLayoutSwitcher } from './layout-switcher'
 import { DataGridInitialLoader, DataGridOverlayLoader } from './loader'
-import { DataGridPagination } from './pagination'
+import { DataGridPagination, DataGridPerPageSelector } from './pagination'
 import { DataGridTable, DataGridTableColumn } from './table'
 import { DataGridTextFilter } from './filters'
 import { DataGridToolbarUI } from './ui'
 import { DataGridAutoExport } from './export'
+import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
+import { DataGridToolbarColumns } from './columns-hiding'
 
 export type DataGridColumn =
 	& DataGridTableColumn
@@ -56,29 +44,6 @@ const DataGridToolbarFilters = ({ columns }: { columns: DataGridColumn[] }) => {
 	</>
 }
 
-const DataGridToolbarColumns = ({ columns }: { columns: DataGridColumn[] }) => {
-	return <DropdownMenu>
-		<DropdownMenuTrigger asChild>
-			<Button variant={'outline'} size={'sm'} className={'gap-2'}>
-				<EyeIcon className={'w-4 h-4'} />
-				<span className={'sr-only'}>{dict.datagrid.columns}</span>
-			</Button>
-		</DropdownMenuTrigger>
-		<DropdownMenuContent className="w-[160px]">
-			{columns.map(column => (
-				column.hidingName && <DataViewSelectionTrigger key={column.hidingName} name={column.hidingName} value={it => !it}>
-					<DropdownMenuItem onSelect={e => e.preventDefault()}
-									  className={'gap-1 group text-gray-500 data-[current]:text-black'}>
-						<EyeIcon className={'w-3 h-3 hidden group-data-[current]:block'} />
-						<EyeOffIcon className={'w-3 h-3 block group-data-[current]:hidden'} />
-						<span>{column.header}</span>
-					</DropdownMenuItem>
-				</DataViewSelectionTrigger>
-			))}
-		</DropdownMenuContent>
-	</DropdownMenu>
-}
-
 export const DataGrid = ({ columns, tile, lastColumnActions, firstColumnActions, searchFields, toolbarButtons, ...props }: DataGridProps) => {
 	const filterTypes = useMemo(() => {
 		const columnFilters = Object.fromEntries(
@@ -107,9 +72,22 @@ export const DataGrid = ({ columns, tile, lastColumnActions, firstColumnActions,
 			<DataGridToolbarUI>
 				{filterTypes.__search && <DataGridTextFilter name={'__search'} />}
 				<DataGridToolbarFilters columns={columns} />
-				<div className="ml-auto flex gap-2">
-					{tile && <DataGridLayoutSwitcher />}
-					<DataGridToolbarColumns columns={columns} />
+				<div className="ml-auto flex gap-2 items-center">
+					<Popover>
+						<PopoverTrigger>
+							<Button variant={'outline'} size={'sm'} className={'gap-2'}>
+								<SettingsIcon className={'w-4 h-4'} />
+							</Button>
+						</PopoverTrigger>
+						<PopoverContent className="w-64">
+							<div className="flex flex-col gap-2">
+								{tile && <DataGridLayoutSwitcher />}
+								<DataGridToolbarColumns columns={columns} />
+								<DataGridPerPageSelector />
+							</div>
+
+						</PopoverContent>
+					</Popover>
 					<DataGridAutoExport columns={columns} />
 					{toolbarButtons}
 				</div>

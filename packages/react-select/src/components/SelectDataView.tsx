@@ -15,6 +15,14 @@ export const SelectDataView = (props: SelectDataViewProps) => {
 	const defaultFilterTypes = useMemo((): DataViewFilterHandlerRegistry => filter ? { query: filter } : {}, [filter])
 
 	return (
-		<DataView filterTypes={defaultFilterTypes} {...props} onSelectHighlighted={handleSelect} entities={entities} />
+		<DataView
+			filterTypes={defaultFilterTypes}
+			{...props}
+			onSelectHighlighted={handleSelect}
+			entities={entities}
+			filteringStateStorage="null"
+			sortingStateStorage="null"
+			currentPageStateStorage="null"
+		/>
 	)
 }

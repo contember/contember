@@ -1,6 +1,7 @@
 import { Link, RoutingLinkTarget } from '@contember/react-routing'
 import { ReactNode } from 'react'
 import { uic } from '../../../lib/utils/uic'
+import { RoleCondition, useProjectUserRoles } from '@contember/interface'
 
 export type MenuItem = {
 	icon?: ReactNode
@@ -8,6 +9,7 @@ export type MenuItem = {
 	to?: RoutingLinkTarget
 	subItems?: MenuItem[]
 	lvl?: number
+	role?: RoleCondition
 }
 
 export interface MenuProps {
@@ -25,7 +27,12 @@ export const MenuList = ({ items, lvl = 0 }: MenuProps) => {
 	)
 }
 
-export const MenuItem = ({ icon, label, to, subItems, lvl = 0 }: MenuItem) => {
+export const MenuItem = ({ icon, label, to, subItems, lvl = 0, role }: MenuItem) => {
+	const projectRoles = useProjectUserRoles()
+	if (role && !(typeof role === 'string' ? projectRoles.has(role) : role(projectRoles))) {
+		return null
+	}
+
 	return (
 		<div>
 			{to ? (

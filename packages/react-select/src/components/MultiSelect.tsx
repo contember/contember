@@ -53,7 +53,7 @@ export const MultiSelect = Component(({ field, children, options, onSelect, onUn
 	)
 }, ({ field, children }) => {
 	return (
-		<HasMany field={field}>
+		<HasMany field={field} expectedMutation="connectOrDisconnect">
 			{children}
 		</HasMany>
 	)

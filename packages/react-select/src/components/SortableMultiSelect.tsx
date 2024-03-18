@@ -79,7 +79,7 @@ export const SortableMultiSelect = Component(({ field, children, sortableBy, con
 }, ({ children, field, sortableBy, connectAt }) => {
 	return (
 		<Repeater field={field} sortableBy={sortableBy} initialEntityCount={0}>
-			<HasOne field={connectAt}>
+			<HasOne field={connectAt} expectedMutation="connectOrDisconnect">
 				{children}
 			</HasOne>
 		</Repeater>

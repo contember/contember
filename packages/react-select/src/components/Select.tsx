@@ -52,7 +52,7 @@ export const Select = Component(({ field, children, onUnselect, onSelect, option
 	)
 }, ({ field, children }) => {
 	return (
-		<HasOne field={field}>
+		<HasOne field={field} expectedMutation="connectOrDisconnect">
 			{children}
 		</HasOne>
 	)

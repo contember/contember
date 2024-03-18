@@ -93,9 +93,9 @@ const DataGridRelationFilterSelect = ({ name, children, options, filterField, la
 			</PopoverTrigger>
 			<SelectPopoverContent>
 				<DataView filterTypes={filter} entities={options} onSelectHighlighted={it => {
-							const [, set] = filterFactory(it.id)
-							set('toggleInclude')
-				}}>
+					const [, set] = filterFactory(it.id)
+					set('toggleInclude')
+				}} filteringStateStorage="null" sortingStateStorage="null" currentPageStateStorage="null">
 					<SelectListInner filterToolbar={<SelectDefaultFilter />}>
 						<DataGridRelationFilterSelectItem filterFactory={filterFactory}>
 							{children}

@@ -60,9 +60,9 @@ export default () => (
 					DataGridColumns.text({ field: 'title', label: 'Title' }),
 					DataGridColumns.enum({ field: 'state', label: 'State', options: GridArticleStateLabels }),
 					DataGridColumns.date({ field: 'publishedAt', label: 'Published at' }),
-					DataGridColumns.hasOne({ field: 'author', valueField: 'name', label: 'Author' }),
-					DataGridColumns.hasOne({ field: 'category', valueField: 'name', label: 'Category' }),
-					DataGridColumns.hasMany({ field: 'tags', valueField: 'name', label: 'Tags' }),
+					DataGridColumns.hasOne({ field: 'author', valueField: 'name', label: 'Author', filterOptions: 'GridAuthor' }),
+					DataGridColumns.hasOne({ field: 'category', valueField: 'name', label: 'Category', filterOptions: 'GridCategory' }),
+					DataGridColumns.hasMany({ field: 'tags', valueField: 'name', label: 'Tags', filterOptions: 'GridTag' }),
 					DataGridColumns.boolean({ field: 'locked', label: 'Locked' }),
 					DataGridColumns.number({ field: 'views', label: 'Views' }),
 				]}

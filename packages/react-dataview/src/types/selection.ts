@@ -1,3 +1,4 @@
+import { StateStorageOrName } from '@contember/react-utils'
 import { SetStateAction } from 'react'
 
 export type DataViewSelectionValue = boolean | string | number | null
@@ -17,4 +18,5 @@ export type DataViewSelectionMethods = {
 export type DataViewSelectionProps = {
 	initialSelection?: DataViewSelectionValues | ((stored: DataViewSelectionValues) => DataViewSelectionValues)
 	selectionFallback?: DataViewSelectionValue
+	selectionStateStorage?: StateStorageOrName
 }

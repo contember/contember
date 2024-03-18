@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useSessionStorageState } from '@contember/react-utils'
+import { useSessionStorageState, useStoredState } from '@contember/react-utils'
 import { DataViewPagingInfo, DataViewPagingMethods, DataViewPagingProps, DataViewPagingState } from '../../types'
 import { useDataViewTotalCount } from './useDataViewTotalCount'
 import { Filter, QualifiedEntityList } from '@contember/binding'
@@ -14,15 +14,34 @@ type UseDataViewPagingArgs =
 
 export const DATA_VIEW_DEFAULT_ITEMS_PER_PAGE = 50
 
-export const useDataViewPaging = ({ dataViewKey, initialItemsPerPage, ...args }: UseDataViewPagingArgs): {
+export const useDataViewPaging = ({ dataViewKey, initialItemsPerPage, pagingSettingsStorage, currentPageStateStorage, ...args }: UseDataViewPagingArgs): {
 	state: DataViewPagingState
 	info: DataViewPagingInfo
 	methods: DataViewPagingMethods
 } => {
-	const [pagingState, setPagingState] = useSessionStorageState<DataViewPagingState>(`${dataViewKey}-page`, val => val ?? {
-		itemsPerPage: initialItemsPerPage ?? DATA_VIEW_DEFAULT_ITEMS_PER_PAGE,
-		pageIndex: 0,
-	})
+	const [currentPageState, setCurrentPageState] = useStoredState<Pick<DataViewPagingState, 'pageIndex'>>(
+		currentPageStateStorage ?? 'session',
+		[dataViewKey ?? 'dataview', 'currentPage'],
+		val => val ?? {
+			pageIndex: 0,
+		},
+	)
+	const [pagingSettingsState, setPagingSettingsState] = useStoredState<Pick<DataViewPagingState, 'itemsPerPage'>>(
+		pagingSettingsStorage ?? 'local',
+		[dataViewKey ?? 'dataview', 'itemsPerPage'],
+		val => val ?? {
+			itemsPerPage: initialItemsPerPage ?? DATA_VIEW_DEFAULT_ITEMS_PER_PAGE,
+		},
+	)
+
+
+	const pagingState = useMemo(() => {
+		return {
+			...pagingSettingsState,
+			...currentPageState,
+		}
+	}, [pagingSettingsState, currentPageState])
+
 	const [pagingInfo, setPagingInfo] = useState<DataViewPagingInfo>({
 		pagesCount: undefined,
 		totalCount: undefined,
@@ -44,7 +63,7 @@ export const useDataViewPaging = ({ dataViewKey, initialItemsPerPage, ...args }:
 		methods: useMemo(() => {
 			return {
 				setItemsPerPage: (newItemsPerPage: number | null) => {
-					setPagingState(val => {
+					setPagingSettingsState(val => {
 						if (val.itemsPerPage === newItemsPerPage) {
 							return val
 						}
@@ -56,7 +75,7 @@ export const useDataViewPaging = ({ dataViewKey, initialItemsPerPage, ...args }:
 				},
 				goToPage: (page: number | 'first' | 'next' | 'previous' | 'last') => {
 
-					setPagingState(val => {
+					setCurrentPageState(val => {
 						const newPage = (() => {
 							const current = val.pageIndex
 							switch (page) {
@@ -86,6 +105,6 @@ export const useDataViewPaging = ({ dataViewKey, initialItemsPerPage, ...args }:
 					})
 				},
 			}
-		}, [pagesCount, setPagingState]),
+		}, [pagesCount, setCurrentPageState, setPagingSettingsState]),
 	}
 }

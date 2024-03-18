@@ -1,5 +1,6 @@
 import { Environment, SugaredOrderBy } from '@contember/binding'
 import { OrderBy } from '@contember/react-binding'
+import { StateStorageOrName } from '@contember/react-utils'
 
 export type DataViewSortingDirection = 'asc' | 'desc' | null
 export type DataViewSortingDirectionAction = DataViewSortingDirection | 'next' | 'toggleAsc' | 'toggleDesc' | 'clear'
@@ -31,4 +32,5 @@ export type DataViewSortingState = {
 
 export type DataViewSortingProps = {
 	initialSorting?: DataViewSortingDirections
+	sortingStateStorage?: StateStorageOrName
 }

@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from 'react'
-import { useSessionStorageState } from '@contember/react-utils'
+import { useStoredState } from '@contember/react-utils'
 import { DataViewSortingMethods, DataViewSortingProps, DataViewSortingState } from '../../types'
 import { cycleOrderDirection } from '../helpers/cycleOrderDirection'
 import { OrderBy, QueryLanguage, useEnvironment } from '@contember/react-binding'
@@ -16,9 +16,10 @@ export type UseDataViewSortingResult = {
 	methods: DataViewSortingMethods
 }
 
-export const useDataViewSorting = ({ dataViewKey, initialSorting, resetPage }: UseDataViewSortingArgs): UseDataViewSortingResult => {
-	const [directions, setDirections] = useSessionStorageState<DataViewSortingState['directions']>(
-		`${dataViewKey}-orderBy`,
+export const useDataViewSorting = ({ dataViewKey, initialSorting, sortingStateStorage, resetPage }: UseDataViewSortingArgs): UseDataViewSortingResult => {
+	const [directions, setDirections] = useStoredState<DataViewSortingState['directions']>(
+		sortingStateStorage ?? 'session',
+		[dataViewKey ?? 'dataview', 'orderBy'],
 		val => val ?? initialSorting ?? {},
 	)
 	const environment = useEnvironment()

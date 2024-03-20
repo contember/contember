@@ -162,7 +162,7 @@ export const partial = <T extends Record<string, Type<Json | undefined>>>(inner:
 		if (input === null || typeof input !== 'object') throw ParseError.format(input, path, 'object')
 		return Object.fromEntries(Object.entries(inner ?? {}).flatMap(([k, v]) => {
 			const newPath = [...path, k]
-			if (!(k in (input as object))) {
+			if (!(k in (input as object)) || (input as any)[k] === undefined) {
 				return []
 			}
 			const val = v((input as any)[k], newPath)

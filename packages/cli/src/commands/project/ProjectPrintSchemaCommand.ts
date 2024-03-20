@@ -1,15 +1,14 @@
-import { Command, CommandConfiguration, Input } from '@contember/cli-common'
+import { Command, CommandConfiguration, Input, Workspace } from '@contember/cli-common'
 import { validateSchemaAndPrintErrors } from '../../utils/schema'
-import { Workspace, validateProjectName } from '@contember/cli-common'
 import {
+	Authorizator,
 	EntityRulesResolver,
 	GraphQlSchemaBuilderFactory,
 	IntrospectionSchemaDefinitionFactory,
 	IntrospectionSchemaFactory,
 	PermissionFactory,
-	Authorizator,
 } from '@contember/engine-content-api'
-import { DocumentNode, GraphQLSchema, printSchema } from 'graphql'
+import { printSchema } from 'graphql'
 import { mergeSchemas } from '@graphql-tools/schema'
 import { loadSchema } from '../../utils/project/loadSchema'
 import { normalizeSchema } from '@contember/schema-utils'
@@ -70,13 +69,20 @@ export class ProjectPrintSchemaCommand extends Command<Args, Options> {
 			new EntityRulesResolver(schemaNormalized.validation, schemaNormalized.model),
 			authorizator,
 		)
+
+		const printByLine = (out: string) => {
+			out.split('\n').forEach(line => {
+				process.stdout.write(line + '\n')
+			})
+		}
 		if (format === 'schema') {
 			if (inputRoles) {
 				throw `--roles option is not supported for "schema" format`
 			}
-			console.log(JSON.stringify(schemaNormalized, null, '\t'))
+			const jsonString = JSON.stringify(schemaNormalized, null, '\t')
+			printByLine(jsonString)
 		} else if (format === 'introspection') {
-			console.log(JSON.stringify(introspection.create(), null, '\t'))
+			printByLine(JSON.stringify(introspection.create(), null, '\t'))
 		} else if (format === 'graphql') {
 			const contentSchema = schemaBuilderFactory.create(schemaNormalized.model, authorizator).build()
 			const introspectionSchemaFactory = new IntrospectionSchemaDefinitionFactory(introspection)
@@ -86,7 +92,7 @@ export class ProjectPrintSchemaCommand extends Command<Args, Options> {
 			})
 			gqlSchema.description = '' // this enforces schema definition print
 			const printedSchema = printSchema(gqlSchema).replace('""""""\n', '') // remove empty comment
-			console.log(printedSchema)
+			printByLine(printedSchema)
 		} else {
 			throw `Unknown format ${format}`
 		}

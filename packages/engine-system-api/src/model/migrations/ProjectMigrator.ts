@@ -77,6 +77,9 @@ export class ProjectMigrator {
 						project,
 					})
 				}
+				// event log uses deferred constraint triggers, we need to fire them before ALTER
+				await db.client.query(`SET CONSTRAINTS ALL IMMEDIATE`)
+				await db.client.query(`SET CONSTRAINTS ALL DEFERRED`)
 
 			}
 			id = await db.commandBus.execute(new SaveMigrationCommand(migration))

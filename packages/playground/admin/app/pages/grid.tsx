@@ -1,6 +1,6 @@
 import { Component, Field, HasMany } from '@contember/interface'
 import { Slots } from '../../lib/components/slots'
-import { DataViewHasSelection } from '@contember/react-dataview'
+import { createHasManyFilter, DataViewHasSelection } from '@contember/react-dataview'
 import { DataGrid, DataGridColumns, DataGridRelationFieldTooltip } from '../../lib/components/datagrid'
 import * as React from 'react'
 import { DefaultDropdown, DropdownMenuItem, DropdownMenuSeparator } from '../../lib/components/ui/dropdown'
@@ -63,6 +63,7 @@ export default () => (
 					DataGridColumns.hasOne({ field: 'author', valueField: 'name', label: 'Author', filterOptions: 'GridAuthor' }),
 					DataGridColumns.hasOne({ field: 'category', valueField: 'name', label: 'Category', filterOptions: 'GridCategory' }),
 					DataGridColumns.hasMany({ field: 'tags', valueField: 'name', label: 'Tags', filterOptions: 'GridTag' }),
+					DataGridColumns.hasMany({ field: 'comments', valueField: 'author.name', label: 'Comment authors', filterOptions: 'GridAuthor', filterHandler: createHasManyFilter('comments.author'), filterOption: <Field field="name" /> }),
 					DataGridColumns.boolean({ field: 'locked', label: 'Locked' }),
 					DataGridColumns.number({ field: 'views', label: 'Views' }),
 				]}

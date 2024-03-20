@@ -99,7 +99,7 @@ export type DataViewHasManyColumnArgs =
 
 
 export const createHasManyColumn = ({ field, label, tooltipActions, filterOptions, valueField, value, filterLabel, filterField, filterOption, ...args }: DataViewHasManyColumnArgs): DataGridColumn => {
-	value ??= <Field field="name" />
+	value ??= valueField ? <Field field={valueField} /> : null
 	filterOption ??= value
 	return {
 		type: 'hasMany',

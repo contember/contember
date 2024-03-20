@@ -1,0 +1,90 @@
+{
+	"formatVersion": 5,
+	"modifications": [
+		{
+			"modification": "removeField",
+			"entityName": "UploadFile",
+			"fieldName": "duration"
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "GridArticleComment",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "grid_article_comment",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": [],
+				"indexes": [],
+				"eventLog": {
+					"enabled": true
+				}
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "GridArticleComment",
+			"field": {
+				"name": "content",
+				"columnName": "content",
+				"columnType": "text",
+				"nullable": true,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "GridArticleComment",
+			"field": {
+				"name": "createdAt",
+				"columnName": "created_at",
+				"columnType": "timestamptz",
+				"nullable": true,
+				"type": "DateTime"
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "GridArticleComment",
+			"owningSide": {
+				"type": "ManyHasOne",
+				"name": "article",
+				"target": "GridArticle",
+				"joiningColumn": {
+					"columnName": "article_id",
+					"onDelete": "cascade"
+				},
+				"nullable": false,
+				"inversedBy": "comments"
+			},
+			"inverseSide": {
+				"type": "OneHasMany",
+				"name": "comments",
+				"target": "GridArticleComment",
+				"ownedBy": "article"
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "GridArticleComment",
+			"owningSide": {
+				"type": "ManyHasOne",
+				"name": "author",
+				"target": "GridAuthor",
+				"joiningColumn": {
+					"columnName": "author_id",
+					"onDelete": "cascade"
+				},
+				"nullable": false
+			}
+		}
+	]
+}

@@ -38,7 +38,7 @@ export const dict = {
 			'endsWith': 'ends with',
 			'doesNotMatch': 'does not contain',
 		} satisfies Record<TextFilterArtifactsMatchMode, string>,
-		columns: 'Columns',
+		visibleFields: 'Fields',
 		columnAsc: 'asc',
 		columnDesc: 'desc',
 		columnHide: 'Hide',

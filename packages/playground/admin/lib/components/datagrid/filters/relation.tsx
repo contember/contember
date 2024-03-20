@@ -15,9 +15,7 @@ export const DataGridRelationFieldTooltip = ({ filter, children, actions }: { fi
 	<TooltipProvider>
 		<Tooltip>
 			<TooltipTrigger asChild>
-				<Button variant={'ghost'} size={'sm'}>
-					{children}
-				</Button>
+				{children}
 			</TooltipTrigger>
 			<TooltipContent variant={'blurred'}>
 				<div className={'flex gap-1'}>

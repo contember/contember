@@ -53,7 +53,18 @@ export const Navigation = () => {
 					{
 						icon: <TableIcon size={16} />,
 						label: 'Grid',
-						to: 'grid',
+						subItems: [
+							{
+								icon: line,
+								label: 'Grid',
+								to: 'grid',
+							},
+							{
+								icon: line,
+								label: 'Custom grid row',
+								to: 'grid/customGrid',
+							},
+						],
 					},
 					{
 						icon: <FormInputIcon size={16} />,

@@ -12,7 +12,7 @@ import { DataGridTextFilter } from './filters'
 import { DataGridToolbarUI } from './ui'
 import { DataGridAutoExport } from './export'
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
-import { DataGridToolbarColumns } from './columns-hiding'
+import { DataGridToolbarVisibleFields } from './columns-hiding'
 
 export type DataGridColumn =
 	& DataGridTableColumn
@@ -84,7 +84,7 @@ export const DataGrid = ({ columns, tile, lastColumnActions, firstColumnActions,
 						<PopoverContent className="w-64">
 							<div className="flex flex-col gap-2">
 								{tile && <DataGridLayoutSwitcher />}
-								<DataGridToolbarColumns columns={columns} />
+								<DataGridToolbarVisibleFields fields={columns.filter(it => it.hidingName).map(it => ({ header: it.header, name: it.hidingName as string }))} />
 								<DataGridPerPageSelector />
 							</div>
 

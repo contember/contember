@@ -6,6 +6,7 @@ import { DataGridColumn } from './grid'
 import { Field, HasMany, HasOne } from '@contember/react-binding'
 import { createBooleanFilter, createDateFilter, createEnumFilter, createHasManyFilter, createHasOneFilter, createNumberRangeFilter, createTextFilter, DataViewFilterHandler } from '@contember/react-dataview'
 import { SugaredQualifiedEntityList } from '@contember/interface'
+import { Button } from '../ui/button'
 
 export interface DataViewColumnCommonArgs {
 	field: string
@@ -70,7 +71,9 @@ export const createHasOneColumn = ({ field, label, tooltipActions, filterOptions
 			<div className={'-mx-3'}>
 				<HasOne field={field}>
 					<DataGridRelationFieldTooltip filter={args.filterName ?? field} actions={tooltipActions}>
-						{value}
+						<Button variant={'ghost'} size={'sm'}>
+							{value}
+						</Button>
 					</DataGridRelationFieldTooltip>
 				</HasOne>
 			</div>
@@ -109,7 +112,9 @@ export const createHasManyColumn = ({ field, label, tooltipActions, filterOption
 			<div className={'-mx-3'}>
 				<HasMany field={field}>
 					<DataGridRelationFieldTooltip filter={args.filterName ?? field} actions={tooltipActions}>
-						{value}
+						<Button variant={'ghost'} size={'sm'}>
+							{value}
+						</Button>
 					</DataGridRelationFieldTooltip>
 				</HasMany>
 			</div>

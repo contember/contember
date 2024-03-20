@@ -70,8 +70,10 @@ export const DataGrid = ({ columns, tile, lastColumnActions, firstColumnActions,
 			{...props}
 		>
 			<DataGridToolbarUI>
-				{filterTypes.__search && <DataGridTextFilter name={'__search'} />}
-				<DataGridToolbarFilters columns={columns} />
+				<div className="flex flex-wrap gap-2">
+					{filterTypes.__search && <DataGridTextFilter name={'__search'} />}
+					<DataGridToolbarFilters columns={columns} />
+				</div>
 				<div className="ml-auto flex gap-2 items-center">
 					<Popover>
 						<PopoverTrigger>

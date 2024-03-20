@@ -387,12 +387,7 @@ export const transform = <Input extends Json, Result extends Json>(inner: Type<I
 
 export const coalesce = <T extends Json, F extends Json>(inner: Type<T>, fallback: F): Type<T | F> => {
 	const type = (input: unknown, path: PropertyKey[] = []): T | F => {
-		try {
-			return inner(input, path)
-		} catch (e) {
-			if (e instanceof ParseError) return fallback
-			else throw e
-		}
+		return inner(input ?? fallback, path)
 	}
 
 	type.inner = inner

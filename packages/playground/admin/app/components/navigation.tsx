@@ -1,166 +1,40 @@
 import { ArchiveIcon, BrushIcon, FormInputIcon, GripVertical, HomeIcon, KanbanIcon, TableIcon, UploadIcon } from 'lucide-react'
-import { MenuList } from '../../lib/components/ui/menu'
+import { Menu, MenuItem, MenuList } from '../../lib/components/ui/menu'
 
 
 export const Navigation = () => {
 	const line = <span className={'h-full w-[1px] bg-gray-200'}>&nbsp;</span>
 	return (
 		<div>
-			<MenuList
-				items={[
-					{
-						icon: <HomeIcon size={16} />,
-						label: 'Home',
-						to: 'index',
-					},
-					{
-						icon: <BrushIcon size={16} />,
-						label: 'UI',
-						subItems: [
-							{
-								icon: line,
-								label: 'Buttons',
-								to: 'ui/button',
-							},
-							{
-								icon: line,
-								label: 'Toasts',
-								to: 'ui/toast',
-							},
-						],
-					},
-					{
-						icon: <KanbanIcon size={16} />,
-						label: 'Kanban',
-						subItems: [
-							{
-								icon: line,
-								label: 'Dynamic columns',
-								to: 'board/assignee',
-							},
-							{
-								icon: line,
-								label: 'Static columns',
-								to: 'board/status',
-							},
-						],
-					},
-					{
-						icon: <GripVertical size={16} />,
-						label: 'Repeater',
-						to: 'repeater',
-					},
-					{
-						icon: <TableIcon size={16} />,
-						label: 'Grid',
-						subItems: [
-							{
-								icon: line,
-								label: 'Grid',
-								to: 'grid',
-							},
-							{
-								icon: line,
-								label: 'Custom grid row',
-								to: 'grid/customGrid',
-							},
-						],
-					},
-					{
-						icon: <FormInputIcon size={16} />,
-						label: 'Inputs',
-						subItems: [
-							{
-								icon: line,
-								label: 'Basic inputs',
-								to: 'input/basic',
-							},
-							{
-								icon: line,
-								label: 'Select or type',
-								to: 'input/selectOrType',
-							},
-							{
-								icon: line,
-								label: 'Textarea',
-								to: 'input/textarea',
-							},
-							{
-								icon: line,
-								label: 'Client validation',
-								to: 'input/clientValidation',
-							},
-							{
-								icon: line,
-								label: 'Checkbox',
-								to: 'input/checkbox',
-							},
-							{
-								icon: line,
-								label: 'Radio',
-								to: 'input/enumRadio',
-							},
-						],
-					},
-					{
-						icon: <ArchiveIcon size={16} />,
-						label: 'Select',
-						subItems: [
-							{
-								icon: line,
-								label: 'Has one select',
-								to: 'select/hasOne',
-							},
-							{
-								icon: line,
-								label: 'Has many select',
-								to: 'select/hasMany',
-							},
-							{
-								icon: line,
-								label: 'Has many sortable select',
-								to: 'select/hasManySortable',
-							},
-						],
-					},
-					{
-						icon: <UploadIcon size={16} />,
-						label: 'Upload',
-						subItems: [
-							{
-								icon: line,
-								label: 'Image upload',
-								to: 'upload/image',
-							},
-							{
-								icon: line,
-								label: 'Image w/o meta',
-								to: 'upload/imageTrivial',
-							},
-							{
-								icon: line,
-								label: 'Audio upload',
-								to: 'upload/audio',
-							},
-							{
-								icon: line,
-								label: 'Video upload',
-								to: 'upload/video',
-							},
-							{
-								icon: line,
-								label: 'Generic file upload',
-								to: 'upload/any',
-							},
-							{
-								icon: line,
-								label: 'Image repeater',
-								to: 'upload/imageList',
-							},
-						],
-					},
-				]}
-			/>
+			<Menu>
+				<MenuItem icon={<HomeIcon size={16} />} label={'Home'} to={'index'} />
+				<MenuItem icon={<BrushIcon size={16} />} label={'UI'}>
+					<MenuItem icon={line} label={'Buttons'} to={'ui/button'} />
+					<MenuItem icon={line} label={'Toasts'} to={'ui/toast'} />
+				</MenuItem>
+				<MenuItem icon={<KanbanIcon size={16} />} label={'Kanban'}>
+					<MenuItem icon={line} label={'Dynamic columns'} to={'board/assignee'} />
+					<MenuItem icon={line} label={'Static columns'} to={'board/status'} />
+				</MenuItem>
+				<MenuItem icon={<GripVertical size={16} />} label={'Repeater'} to={'repeater'} />
+				<MenuItem icon={<TableIcon size={16} />} label={'Grid'}>
+					<MenuItem icon={line} label={'Grid'} to={'grid'} />
+					<MenuItem icon={line} label={'Custom grid row'} to={'grid/customGrid'} />
+				</MenuItem>
+				<MenuItem icon={<FormInputIcon size={16} />} label={'Inputs'}>
+					<MenuItem icon={line} label={'Basic inputs'} to={'input/basic'} />
+					<MenuItem icon={line} label={'Select or type'} to={'input/selectOrType'} />
+					<MenuItem icon={line} label={'Textarea'} to={'input/textarea'} />
+					<MenuItem icon={line} label={'Client validation'} to={'input/clientValidation'} />
+					<MenuItem icon={line} label={'Checkbox'} to={'input/checkbox'} />
+					<MenuItem icon={line} label={'Radio'} to={'input/enumRadio'} />
+				</MenuItem>
+				<MenuItem icon={<ArchiveIcon size={16} />} label={'Select'}>
+					<MenuItem icon={line} label={'Has one select'} to={'select/hasOne'} />
+					<MenuItem icon={line} label={'Has many select'} to={'select/hasMany'} />
+					<MenuItem icon={line} label={'Has many sortable select'} to={'select/hasManySortable'} />
+				</MenuItem>
+			</Menu>
 		</div>
 	)
 }

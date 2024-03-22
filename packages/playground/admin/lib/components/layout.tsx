@@ -1,5 +1,5 @@
 import { LogOutIcon, MenuIcon, PanelLeftCloseIcon, PanelLeftOpenIcon, PanelRightCloseIcon, PanelRightOpenIcon } from 'lucide-react'
-import { PropsWithChildren, useState } from 'react'
+import { PropsWithChildren, useEffect, useState } from 'react'
 import { ComponentClassNameProps } from '@contember/utilities'
 import { useHasActiveSlotsFactory } from '@contember/react-slots'
 import { uic } from '../../lib/utils/uic'
@@ -7,6 +7,7 @@ import { SlotTargets } from './slots'
 import { Button } from './ui/button'
 import { LogoutTrigger } from '@contember/react-identity'
 import { dict } from '../dict'
+import { useCurrentRequest } from '@contember/interface'
 
 
 const TitleEl = uic('h1', { baseClass: 'text-2xl font-bold' })
@@ -15,6 +16,12 @@ export const LayoutComponent = ({ children, ...rest }: PropsWithChildren<Compone
 	const isActive = useHasActiveSlotsFactory()
 
 	const [showLeftSidebar, setShowLeftSidebar] = useState<boolean | null>(null)
+
+	const request = useCurrentRequest()
+	useEffect(() => {
+			setShowLeftSidebar(it => it === true ? null : it)
+	}, [request])
+
 	const [showRightSidebar, setShowRightSidebar] = useState<boolean>(true)
 
 	const hasRightSidebar = isActive('SidebarRightHeader', 'SidebarRightBody', 'SidebarRightFooter', 'Sidebar')

@@ -1,9 +1,9 @@
-import { useDataViewEntityListProps } from '@contember/react-dataview'
 import * as React from 'react'
 import { ReactElement, ReactNode, useCallback } from 'react'
 import { Slot } from '@radix-ui/react-slot'
 import { useDataViewFetchAllData } from '../hooks'
 import { CsvExportFactory, ExportFactory } from '../export'
+import { useDataViewEntityListProps } from '../contexts'
 
 
 export interface DataViewExportTriggerProps {

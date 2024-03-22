@@ -1,5 +1,5 @@
 import { FieldMarker, HasOneRelationMarker, MeaningfulMarker, SugaredRelativeSingleField } from '@contember/binding'
-import { createCoalesceFilter } from '@contember/react-dataview'
+import { createUnionTextFilter } from '@contember/react-dataview'
 import { useMemo } from 'react'
 
 export type SelectFilterFieldProps = {
@@ -14,7 +14,7 @@ export const useSelectFilter = ({ filterField, marker }: SelectFilterFieldProps 
 		if (!filter || (Array.isArray(filter) && filter.length === 0)) {
 			return undefined
 		}
-		return createCoalesceFilter(Array.isArray(filter) ? filter : [filter])
+		return createUnionTextFilter(Array.isArray(filter) ? filter : [filter])
 	}, [filterField, marker])
 }
 

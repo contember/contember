@@ -1,11 +1,23 @@
 import React, { ReactNode, useCallback, useMemo } from 'react'
 import { SelectCurrentEntitiesContext, SelectHandler, SelectHandleSelectContext, SelectIsSelectedContext, SelectOptionsContext, SelectOptionsFilterContext } from '../contexts'
-import { Component, EntityAccessor, HasOne, PlaceholderGenerator, QueryLanguage, SugaredQualifiedEntityList, SugaredRelativeEntityList, SugaredRelativeSingleEntity, SugaredRelativeSingleField, useEntityList } from '@contember/react-binding'
+import {
+	Component,
+	EntityAccessor,
+	FieldMarker,
+	HasOne,
+	MeaningfulMarker,
+	PlaceholderGenerator,
+	QueryLanguage,
+	SugaredQualifiedEntityList,
+	SugaredRelativeEntityList,
+	SugaredRelativeSingleEntity,
+	SugaredRelativeSingleField,
+	useEntityList,
+} from '@contember/react-binding'
 import { useReferentiallyStableCallback } from '@contember/react-utils'
 import { Repeater } from '@contember/react-repeater'
 import { SelectEvents } from '../types'
 import { SelectFilterFieldProps, useSelectFilter } from '../hooks'
-import { FieldMarker, MeaningfulMarker } from '@contember/binding'
 
 export type SortableMultiSelectProps =
 	& {

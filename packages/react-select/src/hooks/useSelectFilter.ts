@@ -1,4 +1,4 @@
-import { FieldMarker, HasOneRelationMarker, MeaningfulMarker, SugaredRelativeSingleField } from '@contember/binding'
+import { FieldMarker, HasOneRelationMarker, MeaningfulMarker, SugaredRelativeSingleField } from '@contember/react-binding'
 import { createUnionTextFilter } from '@contember/react-dataview'
 import { useMemo } from 'react'
 

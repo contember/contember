@@ -40,6 +40,7 @@
 		"directory": "packages/react-datagrid"
 	},
 	"dependencies": {
+		"@contember/client": "workspace:*",
 		"@contember/react-binding": "workspace:*",
 		"@contember/react-choice-field": "workspace:*",
 		"@contember/react-dataview": "workspace:*",

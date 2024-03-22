@@ -4,6 +4,7 @@
 		"outDir": "../dist/types"
 	},
 	"references": [
+		{ "path": "../../client/src" },
 		{ "path": "../../react-binding/src" },
 		{ "path": "../../react-choice-field/src" },
 		{ "path": "../../react-dataview/src" },

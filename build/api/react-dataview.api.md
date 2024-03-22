@@ -5,16 +5,22 @@
 ```ts
 
 import { ChangeEvent } from 'react';
+import { ChildrenAnalyzer } from '@contember/react-multipass-rendering';
 import { EntityAccessor } from '@contember/react-binding';
 import { EntityAccessor as EntityAccessor_2 } from '@contember/binding';
 import { EntityId } from '@contember/react-binding';
 import { EntityId as EntityId_2 } from '@contember/binding';
 import { EntityListAccessor } from '@contember/binding';
 import { EntityListSubTreeLoaderState } from '@contember/react-binding';
+import { EntityListSubTreeMarker } from '@contember/binding';
+import { EntityListSubTreeMarker as EntityListSubTreeMarker_2 } from '@contember/react-binding';
 import { Environment } from '@contember/react-binding';
 import { Environment as Environment_2 } from '@contember/binding';
+import { FieldMarker } from '@contember/binding';
 import { Filter } from '@contember/binding';
 import { ForwardRefExoticComponent } from 'react';
+import { HasManyRelationMarker } from '@contember/binding';
+import { HasOneRelationMarker } from '@contember/binding';
 import { Input } from '@contember/client';
 import { JSX as JSX_2 } from 'react/jsx-runtime';
 import { JSXElementConstructor } from 'react';
@@ -28,6 +34,7 @@ import { ReactNode } from 'react';
 import { RefAttributes } from 'react';
 import { Serializable } from '@contember/react-utils';
 import { SetStateAction } from 'react';
+import { StateStorageOrName } from '@contember/react-utils';
 import { SugaredOrderBy } from '@contember/binding';
 import { SugaredQualifiedEntityList } from '@contember/binding';
 import { SugaredRelativeEntityList } from '@contember/binding';
@@ -40,12 +47,6 @@ export type BooleanFilterArtifacts = {
     includeTrue?: boolean;
     includeFalse?: boolean;
     nullCondition?: boolean;
-};
-
-// @public (undocumented)
-export type CoalesceTextFilterArtifacts = {
-    mode?: 'matches' | 'matchesExactly' | 'startsWith' | 'endsWith' | 'doesNotMatch';
-    query?: string;
 };
 
 // @public (undocumented)
@@ -70,9 +71,6 @@ export type ControlledDataViewProps = {
 export const createBooleanFilter: (field: SugaredRelativeSingleField['field']) => DataViewFilterHandler<BooleanFilterArtifacts>;
 
 // @public (undocumented)
-export const createCoalesceFilter: (fields: SugaredRelativeSingleField['field'][]) => DataViewFilterHandler<TextFilterArtifacts>;
-
-// @public (undocumented)
 export const createDateFilter: (field: SugaredRelativeSingleField['field']) => DataViewFilterHandler<DateRangeFilterArtifacts>;
 
 // @public (undocumented)
@@ -95,6 +93,29 @@ export const createNumberRangeFilter: (field: SugaredRelativeSingleField['field'
 
 // @public (undocumented)
 export const createTextFilter: (field: SugaredRelativeSingleField['field']) => DataViewFilterHandler<TextFilterArtifacts>;
+
+// @public (undocumented)
+export const createUnionTextFilter: (fields: SugaredRelativeSingleField['field'][]) => DataViewFilterHandler<TextFilterArtifacts>;
+
+// @public (undocumented)
+export class CsvExportFactory implements ExportFactory {
+    // (undocumented)
+    create(args: ExportFormatterCreateOutputArgs): ExportResult;
+    // (undocumented)
+    protected createData(data: DataViewDataForExport): string[][];
+    // (undocumented)
+    protected createHeader(data: DataViewDataForExport): string[];
+    // (undocumented)
+    protected filterData(data: DataViewDataForExport): DataViewDataForExport;
+    // Warning: (ae-forgotten-export) The symbol "ContainerMarker" needs to be exported by the entry point index.d.ts
+    //
+    // (undocumented)
+    protected flattenData(data: any[], marker: ContainerMarker): DataViewDataForExport;
+    // (undocumented)
+    protected formatOutput(data: DataViewDataForExport): string;
+    // (undocumented)
+    protected formatValue(value: any): string;
+}
 
 // @public (undocumented)
 const DataView_2: NamedExoticComponent<DataViewProps>;
@@ -124,6 +145,12 @@ export interface DataViewChangePageTriggerProps {
 
 // @internal (undocumented)
 export const DataViewCurrentKeyContext: React_2.Context<string>;
+
+// @public (undocumented)
+export type DataViewDataForExport = {
+    markerPath: (EntityListSubTreeMarker | HasOneRelationMarker | HasManyRelationMarker | FieldMarker)[];
+    values: any[];
+}[];
 
 // @public (undocumented)
 export const DataViewDateFilterInput: ({ name, type, ...props }: {
@@ -192,6 +219,27 @@ export const DataViewEnumFilterTrigger: ({ name, action, value, ...props }: {
 }) => JSX_2.Element;
 
 // @public (undocumented)
+export const DataViewExportTrigger: ({ fields, children, baseName, exportFactory }: DataViewExportTriggerProps) => JSX_2.Element;
+
+// @public (undocumented)
+export interface DataViewExportTriggerProps {
+    // (undocumented)
+    baseName?: string;
+    // (undocumented)
+    children: ReactElement;
+    // (undocumented)
+    exportFactory?: ExportFactory;
+    // (undocumented)
+    fields: ReactNode;
+}
+
+// @public (undocumented)
+export const DataViewFilter: ({}: DataViewFilterProps) => never;
+
+// @public (undocumented)
+export const dataViewFilterAnalyzer: ChildrenAnalyzer<DataViewFilterProps, never, Environment_2<Environment_2.AnyNode | undefined>>;
+
+// @public (undocumented)
 export type DataViewFilterArtifact = Serializable;
 
 // @public (undocumented)
@@ -224,20 +272,38 @@ export const DataViewFilteringMethodsContext: React_2.Context<DataViewFilteringM
 export type DataViewFilteringProps = {
     filterTypes?: DataViewFilterHandlerRegistry;
     initialFilters?: DataViewFilteringArtifacts | ((stored: DataViewFilteringArtifacts) => DataViewFilteringArtifacts);
+    filteringStateStorage?: StateStorageOrName;
 };
 
 // @public (undocumented)
 export type DataViewFilteringState = {
     artifact: DataViewFilteringArtifacts;
-    filter: Filter;
+    filter: Filter<never>;
     filterTypes: DataViewFilterHandlerRegistry;
 };
 
 // @internal (undocumented)
 export const DataViewFilteringStateContext: React_2.Context<DataViewFilteringState>;
 
+// @public (undocumented)
+export type DataViewFilterProps = {
+    name: string;
+    filterHandler: DataViewFilterHandler<any>;
+};
+
 // @internal (undocumented)
 export const DataViewGlobalKeyContext: React_2.Context<string>;
+
+// @public (undocumented)
+export const DataViewHasFilterType: ({ name, children }: DataViewHasFilterTypeProps) => JSX_2.Element | null;
+
+// @public (undocumented)
+export interface DataViewHasFilterTypeProps {
+    // (undocumented)
+    children: React.ReactNode;
+    // (undocumented)
+    name: string;
+}
 
 // @public (undocumented)
 export const DataViewHasSelection: NamedExoticComponent<DataViewHasSelectionProps>;
@@ -359,7 +425,11 @@ export const DataViewPagingMethodsContext: React_2.Context<DataViewPagingMethods
 // @public (undocumented)
 export interface DataViewPagingProps {
     // (undocumented)
+    currentPageStateStorage?: StateStorageOrName;
+    // (undocumented)
     initialItemsPerPage?: number | null;
+    // (undocumented)
+    pagingSettingsStorage?: StateStorageOrName;
 }
 
 // @public (undocumented)
@@ -428,6 +498,7 @@ export const DataViewSelectionMethodsContext: React_2.Context<DataViewSelectionM
 export type DataViewSelectionProps = {
     initialSelection?: DataViewSelectionValues | ((stored: DataViewSelectionValues) => DataViewSelectionValues);
     selectionFallback?: DataViewSelectionValue;
+    selectionStateStorage?: StateStorageOrName;
 };
 
 // @public (undocumented)
@@ -523,6 +594,7 @@ export const DataViewSortingMethodsContext: React_2.Context<DataViewSortingMetho
 // @public (undocumented)
 export type DataViewSortingProps = {
     initialSorting?: DataViewSortingDirections;
+    sortingStateStorage?: StateStorageOrName;
 };
 
 // @public (undocumented)
@@ -575,8 +647,9 @@ export type DataViewState = {
 };
 
 // @public (undocumented)
-export const DataViewTextFilterInput: ({ name, ...props }: {
+export const DataViewTextFilterInput: ({ name, debounceMs, ...props }: {
     name: string;
+    debounceMs?: number | undefined;
     children: ReactElement;
 }) => JSX_2.Element;
 
@@ -621,6 +694,28 @@ export type EnumFilterArtifacts = {
     notValues?: string[];
     nullCondition?: boolean;
 };
+
+// @public (undocumented)
+export interface ExportFactory {
+    // (undocumented)
+    create(args: ExportFormatterCreateOutputArgs): ExportResult;
+}
+
+// @public (undocumented)
+export interface ExportFormatterCreateOutputArgs {
+    // (undocumented)
+    data: any[];
+    // (undocumented)
+    marker: EntityListSubTreeMarker | HasOneRelationMarker | HasManyRelationMarker;
+}
+
+// @public (undocumented)
+export interface ExportResult {
+    // (undocumented)
+    blob: Blob;
+    // (undocumented)
+    extension: string;
+}
 
 // @public (undocumented)
 export type GenericTextCellFilterArtifacts = {
@@ -734,6 +829,14 @@ export const useDataViewEnumFilter: (name: string, value: string) => UseDataView
 export const useDataViewEnumFilterFactory: (name: string) => (value: string) => UseDataViewEnumFilter;
 
 // @public (undocumented)
+export const useDataViewFetchAllData: ({ children }: {
+    children: ReactNode;
+}) => () => Promise<{
+    data: any;
+    marker: EntityListSubTreeMarker_2;
+}>;
+
+// @public (undocumented)
 export const useDataViewFilter: <T extends Serializable>(key: string) => [T | undefined, (filter: SetStateAction<T | undefined>) => void];
 
 // @public (undocumented)
@@ -835,7 +938,10 @@ export const useDataViewSortingMethods: () => DataViewSortingMethods;
 export const useDataViewSortingState: () => DataViewSortingState;
 
 // @public (undocumented)
-export const useDataViewTextFilterInput: (name: string) => UseDataViewTextFilterInputResult;
+export const useDataViewTextFilterInput: ({ name, debounceMs }: {
+    name: string;
+    debounceMs?: number | undefined;
+}) => UseDataViewTextFilterInputResult;
 
 // @public (undocumented)
 export interface UseDataViewTextFilterInputResult {

@@ -6,7 +6,6 @@
 
 import { BaseDynamicChoiceField } from '@contember/react-choice-field';
 import { BooleanFilterArtifacts } from '@contember/react-dataview';
-import { CoalesceTextFilterArtifacts } from '@contember/react-dataview';
 import { ComponentType } from 'react';
 import { DataViewFilterArtifact } from '@contember/react-dataview';
 import { DataViewFilterHandler } from '@contember/react-dataview';
@@ -48,12 +47,12 @@ export type BooleanCellRendererProps = {
 // @public (undocumented)
 export type CoalesceCellRendererProps = {
     fields: (SugarableRelativeSingleField | string)[];
-    initialFilter?: CoalesceTextFilterArtifacts;
+    initialFilter?: TextFilterArtifacts;
 };
 
 // @public (undocumented)
 export type CoalesceTextCellProps = DataGridColumnCommonProps & CoalesceCellRendererProps & {
-    initialFilter?: CoalesceTextFilterArtifacts;
+    initialFilter?: TextFilterArtifacts;
 };
 
 // @public (undocumented)
@@ -76,10 +75,10 @@ export const createBooleanCell: <ColumnProps extends {}, ValueRendererProps exte
 
 // @public (undocumented)
 export const createCoalesceTextCell: <ColumnProps extends {}, ValueRendererProps extends {}>({ FilterRenderer, ValueRenderer }: {
-    FilterRenderer: ComponentType<FilterRendererProps<CoalesceTextFilterArtifacts>>;
+    FilterRenderer: ComponentType<FilterRendererProps<TextFilterArtifacts>>;
     ValueRenderer: ComponentType<CoalesceCellRendererProps & ValueRendererProps>;
 }) => FunctionComponent<DataGridColumnCommonProps & CoalesceCellRendererProps & {
-    initialFilter?: CoalesceTextFilterArtifacts | undefined;
+    initialFilter?: TextFilterArtifacts | undefined;
 } & ColumnProps & ValueRendererProps>;
 
 // @public (undocumented)

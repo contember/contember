@@ -8,7 +8,6 @@ import { BooleanCellRendererProps } from '@contember/react-datagrid';
 import { BooleanFilterArtifacts } from '@contember/react-dataview';
 import { CoalesceCellRendererProps } from '@contember/react-datagrid';
 import { CoalesceFieldViewProps } from '@contember/react-binding-ui';
-import { CoalesceTextFilterArtifacts } from '@contember/react-dataview';
 import { ComponentType } from 'react';
 import { DataGridColumnCommonProps } from '@contember/react-datagrid';
 import { DataGridColumnProps } from '@contember/react-datagrid';
@@ -68,7 +67,7 @@ export const BooleanCellFilter: ({ setFilter, filter }: FilterRendererProps<Bool
 
 // @public
 export const CoalesceTextCell: FunctionComponent<DataGridColumnCommonProps & CoalesceCellRendererProps & {
-initialFilter?: CoalesceTextFilterArtifacts | undefined;
+initialFilter?: TextFilterArtifacts | undefined;
 } & DataGridCellPublicProps & DataGridHeaderCellPublicProps & CoalesceFieldViewProps<FieldValue>>;
 
 // @public

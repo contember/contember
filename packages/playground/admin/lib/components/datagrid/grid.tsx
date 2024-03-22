@@ -1,5 +1,5 @@
-import { DataView, DataViewEachRow, DataViewEmpty, DataViewFilterHandler, DataViewHasSelection, DataViewLoaderState, DataViewNonEmpty, DataViewProps } from '@contember/react-dataview'
-import { SettingsIcon } from 'lucide-react'
+import { DataView, DataViewEachRow, DataViewEmpty, DataViewFilterHandler, DataViewHasSelection, DataViewLoaderState, DataViewNonEmpty, DataViewProps, useDataViewFilteringState } from '@contember/react-dataview'
+import { FilterIcon, SettingsIcon } from 'lucide-react'
 import * as React from 'react'
 import { Fragment, ReactNode, useMemo } from 'react'
 import { Button } from '../ui/button'
@@ -14,6 +14,8 @@ import { DataGridAutoExport } from './export'
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
 import { DataGridToolbarVisibleFields } from './columns-hiding'
 import { Component } from '@contember/interface'
+import { dataAttribute } from '@contember/utilities'
+import { cn } from '../../utils/cn'
 
 export type DataGridColumn =
 	& DataGridTableColumn
@@ -35,19 +37,38 @@ export type DataGridProps =
 		toolbarButtons?: ReactNode
 	}
 
-const DataGridToolbarFilters = Component(({ columns }: { columns: DataGridColumn[] }) => {
+const DataGridToolbarFilters = Component(({ columns, alwaysShow }: { columns: DataGridColumn[], alwaysShow: boolean }) => {
 	return <>
 		{columns
-			.filter(it => it.filterToolbar && it.filterName)
-			.map(column => <Fragment key={column.filterName}>{column.filterToolbar}</Fragment>)
-		}
+			.map(column => {
+				if (!column.filterName || !column.filterToolbar) {
+					return null
+				}
+				return (
+					<DataGridFilterMobileHiding key={column.filterName} name={column.filterName} alwaysShow={alwaysShow}>
+						{column.filterToolbar}
+					</DataGridFilterMobileHiding>
+				)
+		})}
 	</>
 })
+
+const DataGridFilterMobileHiding = ({ name, alwaysShow, children }: { name: string, alwaysShow: boolean, children: ReactNode }) => {
+	const activeFilter = useDataViewFilteringState().artifact
+	const isActive = !!activeFilter[name]
+	return (
+		<div key={name} className={alwaysShow || isActive ? 'contents' : 'hidden sm:contents'}>
+			{children}
+		</div>
+	)
+}
 
 export const DataGrid = ({ columns, tile, lastColumnActions, firstColumnActions, searchFields, toolbarButtons, ...props }: DataGridProps) => {
 	const searchFieldsResolved = useMemo(() => {
 		return searchFields ?? columns.filter(it => it.type === 'text').map(it => it.field)
 	}, [columns, searchFields])
+
+	const [showFilters, setShowFilters] = React.useState(false)
 
 	return (
 		<DataView
@@ -58,11 +79,17 @@ export const DataGrid = ({ columns, tile, lastColumnActions, firstColumnActions,
 			{...props}
 		>
 			<DataGridToolbarUI>
-				<div className="flex flex-wrap gap-2">
-					{searchFieldsResolved.length && <DataGridUnionTextFilter name={'__search'} fields={searchFieldsResolved}/>}
-					<DataGridToolbarFilters columns={columns} />
-				</div>
-				<div className="ml-auto flex gap-2 items-center">
+
+				<div className="ml-auto flex gap-2 items-center sm:order-1">
+					<Button
+						variant={'outline'}
+						size={'sm'}
+						className={'gap-2 sm:hidden data-[active]:bg-gray-50 data-[active]:shadow-inner'}
+						data-active={dataAttribute(showFilters)}
+						onClick={() => setShowFilters(!showFilters)}
+					>
+						<FilterIcon className="w-4 h-4" /> Filters
+					</Button>
 					<Popover>
 						<PopoverTrigger>
 							<Button variant={'outline'} size={'sm'} className={'gap-2'}>
@@ -80,6 +107,15 @@ export const DataGrid = ({ columns, tile, lastColumnActions, firstColumnActions,
 					</Popover>
 					<DataGridAutoExport columns={columns} />
 					{toolbarButtons}
+				</div>
+
+				<div className="flex flex-wrap gap-2">
+					{searchFieldsResolved.length && (
+						<DataGridFilterMobileHiding name="__search" alwaysShow={showFilters}>
+							<DataGridUnionTextFilter name={'__search'} fields={searchFieldsResolved} />
+						</DataGridFilterMobileHiding>
+					)}
+					<DataGridToolbarFilters columns={columns} alwaysShow={showFilters} />
 				</div>
 			</DataGridToolbarUI>
 

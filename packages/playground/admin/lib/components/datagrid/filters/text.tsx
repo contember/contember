@@ -52,7 +52,7 @@ export const DataGridTextFilterInner = ({ name, label }: {
 }) => {
 	return (
 		<>
-			<InputLike className={'p-1 relative basis-1/4 min-w-40'}>
+			<InputLike className={'p-1 relative basis-1/4 min-w-56'}>
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
 						<Button size={'sm'} variant={'secondary'} className={'px-3'}>

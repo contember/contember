@@ -68,7 +68,7 @@ export const DataGridActiveFilterUI = forwardRef<HTMLButtonElement, {
 
 export const DataGridSingleFilterUI = forwardRef<HTMLDivElement, { children: ReactNode }>((props, ref) => {
 	return (
-		<div className={'flex gap-2 rounded bg-gray-50 items-center text-sm px-2 py-1.5 border'} ref={ref} {...props} />
+		<div className={'flex flex-wrap gap-2 rounded bg-gray-50 items-center text-sm px-2 py-1.5 border'} ref={ref} {...props} />
 	)
 })
 
@@ -145,5 +145,5 @@ export const DataGridFilterSelectItemUI = forwardRef<HTMLButtonElement, DataGrid
 
 
 export const DataGridToolbarUI = uic('div', {
-	baseClass: 'flex gap-2 items-end mb-4',
+	baseClass: 'flex flex-col md:flex-row gap-2 md:items-end mb-4',
 })

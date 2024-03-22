@@ -1,10 +1,10 @@
 import * as React from 'react'
 import { ReactNode } from 'react'
-import { DataGridBooleanFilter, DataGridDateFilter, DataGridEnumFieldTooltip, DataGridEnumFilter, DataGridNumberFilter, DataGridRelationFieldTooltip, DataGridRelationFilter, DataGridTextFilter } from './filters'
+import { DataGridBooleanFilter, DataGridDateFilter, DataGridEnumFieldTooltip, DataGridEnumFilter, DataGridHasManyFilter, DataGridHasOneFilter, DataGridNumberFilter, DataGridRelationFieldTooltip } from './filters'
 import { formatBoolean, formatDate, formatNumber } from '../../utils/formatting'
 import { DataGridColumn } from './grid'
 import { Field, HasMany, HasOne } from '@contember/react-binding'
-import { createBooleanFilter, createDateFilter, createEnumFilter, createHasManyFilter, createHasOneFilter, createNumberRangeFilter, createTextFilter, DataViewFilterHandler } from '@contember/react-dataview'
+import { createHasManyFilter, DataViewFilterHandler } from '@contember/react-dataview'
 import { SugaredQualifiedEntityList } from '@contember/interface'
 import { Button } from '../ui/button'
 
@@ -26,7 +26,6 @@ export type DataViewTextColumnArgs =
 	}
 
 export const createTextColumn = ({ field, label, ...args }: DataViewTextColumnArgs): DataGridColumn => {
-
 	return {
 		type: 'text',
 		field,
@@ -35,7 +34,6 @@ export const createTextColumn = ({ field, label, ...args }: DataViewTextColumnAr
 		header: label,
 		hidingName: field,
 		sortingField: field,
-		filterHandler: createTextFilter(field),
 		...args,
 	}
 }
@@ -81,16 +79,15 @@ export const createHasOneColumn = ({ field, label, tooltipActions, filterOptions
 		header: label,
 		hidingName: field,
 		sortingField: valueField ? field + '.' + valueField : undefined,
-		filterHandler: createHasOneFilter(field),
 		filterToolbar: filterOptions && (
-			<DataGridRelationFilter
-				name={field}
+			<DataGridHasOneFilter
+				field={field}
 				options={filterOptions}
 				label={filterLabel ?? label}
 				filterField={filterField ?? valueField}
 			>
 				{filterOption}
-			</DataGridRelationFilter>
+			</DataGridHasOneFilter>
 		),
 		...args,
 	}
@@ -123,14 +120,14 @@ export const createHasManyColumn = ({ field, label, tooltipActions, filterOption
 		hidingName: field,
 		filterHandler: createHasManyFilter(field),
 		filterToolbar: filterOptions && (
-			<DataGridRelationFilter
-				name={field}
+			<DataGridHasManyFilter
+				field={field}
 				options={filterOptions}
 				label={filterLabel ?? label}
 				filterField={filterField ?? valueField}
 			>
 				{filterOption}
-			</DataGridRelationFilter>
+			</DataGridHasManyFilter>
 		),
 		...args,
 	}
@@ -151,8 +148,7 @@ export const createNumberColumn = ({ field, label, ...args }: DataViewNumberColu
 		header: label,
 		hidingName: field,
 		sortingField: field,
-		filterHandler: createNumberRangeFilter(field),
-		filterToolbar: <DataGridNumberFilter name={field} label={label} />,
+		filterToolbar: <DataGridNumberFilter field={field} label={label} />,
 		...args,
 	}
 }
@@ -172,8 +168,7 @@ export const createDateColumn = ({ field, label, ...args }: DataViewDateColumnAr
 		header: label,
 		hidingName: field,
 		sortingField: field,
-		filterHandler: createDateFilter(field),
-		filterToolbar: <DataGridDateFilter name={field} label={label} />,
+		filterToolbar: <DataGridDateFilter field={field} label={label} />,
 		...args,
 	}
 }
@@ -194,8 +189,7 @@ export const createBooleanColumn = ({ field, label, ...args }: DataViewBooleanCo
 		header: label,
 		hidingName: field,
 		sortingField: field,
-		filterHandler: createBooleanFilter(field),
-		filterToolbar: <DataGridBooleanFilter name={field} label={label} />,
+		filterToolbar: <DataGridBooleanFilter field={field} label={label} />,
 		...args,
 	}
 }
@@ -225,10 +219,9 @@ export const createEnumColumn = ({ field, label, options, filterLabel, ...args }
 		header: label,
 		hidingName: field,
 		sortingField: field,
-		filterHandler: createEnumFilter(field),
 		filterToolbar: (
 			<DataGridEnumFilter
-				name={field}
+				field={field}
 				label={filterLabel ?? label}
 				options={options}
 			/>

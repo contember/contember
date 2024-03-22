@@ -1,13 +1,34 @@
 import * as React from 'react'
 import { ReactNode } from 'react'
-import { DataViewBooleanFilterTrigger, DataViewNullFilterTrigger } from '@contember/react-dataview'
+import { createBooleanFilter, DataViewBooleanFilterTrigger, DataViewFilter, DataViewNullFilterTrigger } from '@contember/react-dataview'
 import { Popover, PopoverContent, PopoverTrigger } from '../../ui/popover'
 import { DataGridActiveFilterUI, DataGridFilterSelectTriggerUI, DataGridSingleFilterUI } from '../ui'
 import { DataGridNullFilter } from './common'
 import { formatBoolean } from '../../../utils/formatting'
 import { Button } from '../../ui/button'
 import { dict } from '../../../dict'
+import { SugaredRelativeSingleField } from '@contember/binding'
+import { Component } from '@contember/interface'
+import { getFilterName } from './utils'
 
+
+type DataGridBooleanFilterProps = {
+	field: SugaredRelativeSingleField['field']
+	name?: string
+	label: ReactNode
+}
+
+export const DataGridBooleanFilter = Component(({ name: nameIn, field, label }: DataGridBooleanFilterProps) => {
+	const name = getFilterName(nameIn, field)
+	return (
+		<DataGridSingleFilterUI>
+			<DataGridBooleanFilterSelect name={name} label={label} />
+			<DataGridBooleanFilterList name={name} />
+		</DataGridSingleFilterUI>
+	)
+}, ({ name, field }) => {
+	return <DataViewFilter name={getFilterName(name, field)} filterHandler={createBooleanFilter(field)} />
+})
 
 export const DataGridBooleanFilterList = ({ name }: {
 	name: string
@@ -28,6 +49,7 @@ export const DataGridBooleanFilterList = ({ name }: {
 		</DataViewNullFilterTrigger>
 	</>
 )
+
 
 export const DataGridBooleanFilterSelect = ({ name, label }: {
 	name: string
@@ -56,15 +78,4 @@ export const DataGridBooleanFilterSelect = ({ name, label }: {
 			</div>
 		</PopoverContent>
 	</Popover>
-)
-
-
-export const DataGridBooleanFilter = ({ name, label }: {
-	name: string
-	label: ReactNode
-}) => (
-	<DataGridSingleFilterUI>
-		<DataGridBooleanFilterSelect name={name} label={label} />
-		<DataGridBooleanFilterList name={name} />
-	</DataGridSingleFilterUI>
 )

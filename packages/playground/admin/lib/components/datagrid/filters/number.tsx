@@ -1,18 +1,33 @@
 import * as React from 'react'
 import { ReactNode } from 'react'
-import {
-	DataViewNullFilterTrigger,
-	DataViewNumberFilterInput,
-	DataViewNumberFilterResetTrigger,
-	NumberRangeFilterArtifacts,
-	useDataViewFilter,
-} from '@contember/react-dataview'
+import { createNumberFilter, DataViewFilter, DataViewNullFilterTrigger, DataViewNumberFilterInput, DataViewNumberFilterResetTrigger, NumberRangeFilterArtifacts, useDataViewFilter } from '@contember/react-dataview'
 import { Popover, PopoverContent, PopoverTrigger } from '../../ui/popover'
 import { DataGridActiveFilterUI, DataGridFilterSelectTriggerUI, DataGridSingleFilterUI } from '../ui'
 import { DataGridNullFilter } from './common'
 import { Input } from '../../ui/input'
 import { formatNumber } from '../../../utils/formatting'
 import { dict } from '../../../dict'
+import { Component, SugaredRelativeSingleField } from '@contember/interface'
+import { getFilterName } from './utils'
+
+export type DataGridNumberFilterProps = {
+	field: SugaredRelativeSingleField['field']
+	name?: string
+	label: ReactNode
+}
+
+export const DataGridNumberFilter = Component(({ name: nameIn, field, label }: DataGridNumberFilterProps) => {
+	const name = getFilterName(nameIn, field)
+	return (
+		<DataGridSingleFilterUI>
+			<DataGridNumberFilterSelect name={name} label={label} />
+			<DataGridNumberFilterList name={name} />
+		</DataGridSingleFilterUI>
+	)
+}, ({ name, field }) => {
+	return <DataViewFilter name={getFilterName(name, field)} filterHandler={createNumberFilter(field)} />
+})
+
 
 const DataGridNumberFilterRange = ({ name }: {
 	name: string
@@ -79,15 +94,4 @@ export const DataGridNumberFilterSelect = ({ name, label }: {
 			</div>
 		</PopoverContent>
 	</Popover>
-)
-
-
-export const DataGridNumberFilter = ({ name, label }: {
-	name: string
-	label: ReactNode
-}) => (
-	<DataGridSingleFilterUI>
-		<DataGridNumberFilterSelect name={name} label={label} />
-		<DataGridNumberFilterList name={name} />
-	</DataGridSingleFilterUI>
 )

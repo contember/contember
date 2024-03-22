@@ -1,16 +1,17 @@
 import { Component, Field, HasMany, If } from '@contember/interface'
 import { Slots } from '../../lib/components/slots'
-import { createBooleanFilter, createDateFilter, createEnumFilter, createHasManyFilter, createHasOneFilter, createNumberFilter, createTextFilter, DataView, DataViewEachRow, DataViewHasSelection } from '@contember/react-dataview'
+import { createHasManyFilter, DataView, DataViewEachRow, DataViewHasSelection } from '@contember/react-dataview'
 import {
 	DataGrid,
-	DataGridBooleanFilter,
 	DataGridColumns,
 	DataGridDateFilter,
-	DataGridEnumFilter, DataGridLayoutSwitcher,
+	DataGridEnumFilter,
+	DataGridHasManyFilter,
+	DataGridHasOneFilter,
 	DataGridLoader,
-	DataGridNumberFilter, DataGridPagination, DataGridPerPageSelector,
+	DataGridPagination,
+	DataGridPerPageSelector,
 	DataGridRelationFieldTooltip,
-	DataGridRelationFilter,
 	DataGridTextFilter,
 } from '../../lib/components/datagrid'
 import * as React from 'react'
@@ -74,6 +75,9 @@ export default () => (
 				entities="GridArticle"
 				tile={<GridTile />}
 				lastColumnActions={<GridDropdown />}
+				initialSorting={{
+					publishedAt: 'asc',
+				}}
 				columns={[
 					DataGridColumns.text({ field: 'title', label: 'Title' }),
 					DataGridColumns.enum({ field: 'state', label: 'State', options: GridArticleStateLabels }),
@@ -150,32 +154,22 @@ export const customGrid = () => (
 
 		<Binding>
 
-			<DataView
-				entities="GridArticle"
-				filterTypes={{
-					title: createTextFilter('title'),
-					state: createEnumFilter('state'),
-					publishedAt: createDateFilter('publishedAt'),
-					author: createHasOneFilter('author'),
-					category: createHasOneFilter('category'),
-					tags: createHasManyFilter('tags'),
-				}}
-			>
+			<DataView entities="GridArticle">
 				<div className="rounded-md border">
 					<div className="flex gap-2 bg-gray-100 px-4 py-2 border-b items-end">
 						<div className="flex flex-wrap gap-2">
-							<DataGridTextFilter name={'title'} />
-							<DataGridEnumFilter name={'state'} options={GridArticleStateLabels} label="State" />
-							<DataGridDateFilter name={'publishedAt'} label="Published at" />
-							<DataGridRelationFilter name={'author'} options={'GridAuthor'} label="Author">
+							<DataGridTextFilter field={'title'} />
+							<DataGridEnumFilter field={'state'} options={GridArticleStateLabels} label="State" />
+							<DataGridDateFilter field={'publishedAt'} label="Published at" />
+							<DataGridHasOneFilter field={'author'} options={'GridAuthor'} label="Author">
 								<Field field="name" />
-							</DataGridRelationFilter>
-							<DataGridRelationFilter name={'category'} options={'GridCategory'} label="Category">
+							</DataGridHasOneFilter>
+							<DataGridHasOneFilter field={'category'} options={'GridCategory'} label="Category">
 								<Field field="name" />
-							</DataGridRelationFilter>
-							<DataGridRelationFilter name={'tags'} options={'GridTag'} label="Tags">
+							</DataGridHasOneFilter>
+							<DataGridHasManyFilter field={'tags'} options={'GridTag'} label="Tags">
 								<Field field="name" />
-							</DataGridRelationFilter>
+							</DataGridHasManyFilter>
 						</div>
 						<div className="ml-auto">
 							<Popover>

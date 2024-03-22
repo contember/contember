@@ -1,4 +1,4 @@
-import { createCoalesceFilter, DataView, DataViewEachRow, DataViewEmpty, DataViewFilterHandler, DataViewHasSelection, DataViewLoaderState, DataViewNonEmpty, DataViewProps } from '@contember/react-dataview'
+import { DataView, DataViewEachRow, DataViewEmpty, DataViewFilterHandler, DataViewHasSelection, DataViewLoaderState, DataViewNonEmpty, DataViewProps } from '@contember/react-dataview'
 import { SettingsIcon } from 'lucide-react'
 import * as React from 'react'
 import { Fragment, ReactNode, useMemo } from 'react'
@@ -8,11 +8,12 @@ import { DataGridLayoutSwitcher } from './layout-switcher'
 import { DataGridInitialLoader, DataGridOverlayLoader } from './loader'
 import { DataGridPagination, DataGridPerPageSelector } from './pagination'
 import { DataGridTable, DataGridTableColumn } from './table'
-import { DataGridTextFilter } from './filters'
+import { DataGridTextFilter, DataGridUnionTextFilter } from './filters'
 import { DataGridToolbarUI } from './ui'
 import { DataGridAutoExport } from './export'
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
 import { DataGridToolbarVisibleFields } from './columns-hiding'
+import { Component } from '@contember/interface'
 
 export type DataGridColumn =
 	& DataGridTableColumn
@@ -20,7 +21,6 @@ export type DataGridColumn =
 		type: 'text' | 'hasOne' | 'hasMany' | 'boolean' | 'number' | 'enum' | 'date'
 		field: string
 		filterName?: string
-		filterHandler?: DataViewFilterHandler<any>
 		filterToolbar?: ReactNode
 	}
 
@@ -35,34 +35,22 @@ export type DataGridProps =
 		toolbarButtons?: ReactNode
 	}
 
-const DataGridToolbarFilters = ({ columns }: { columns: DataGridColumn[] }) => {
+const DataGridToolbarFilters = Component(({ columns }: { columns: DataGridColumn[] }) => {
 	return <>
 		{columns
 			.filter(it => it.filterToolbar && it.filterName)
 			.map(column => <Fragment key={column.filterName}>{column.filterToolbar}</Fragment>)
 		}
 	</>
-}
+})
 
 export const DataGrid = ({ columns, tile, lastColumnActions, firstColumnActions, searchFields, toolbarButtons, ...props }: DataGridProps) => {
-	const filterTypes = useMemo(() => {
-		const columnFilters = Object.fromEntries(
-			columns
-				.filter(it => it.filterHandler)
-				.map(it => [it.filterName, it.filterHandler]),
-		) as Record<string, DataViewFilterHandler<any>>
-
-		const searchFieldsResolved = searchFields ?? columns.filter(it => it.type === 'text').map(it => it.field)
-		if (searchFieldsResolved.length > 0) {
-			columnFilters['__search'] = createCoalesceFilter(searchFieldsResolved)
-		}
-
-		return columnFilters
+	const searchFieldsResolved = useMemo(() => {
+		return searchFields ?? columns.filter(it => it.type === 'text').map(it => it.field)
 	}, [columns, searchFields])
 
 	return (
 		<DataView
-			filterTypes={filterTypes}
 			initialSelection={{
 				layout: tile ? 'grid' : 'table',
 				...props.initialSelection,
@@ -71,7 +59,7 @@ export const DataGrid = ({ columns, tile, lastColumnActions, firstColumnActions,
 		>
 			<DataGridToolbarUI>
 				<div className="flex flex-wrap gap-2">
-					{filterTypes.__search && <DataGridTextFilter name={'__search'} />}
+					{searchFieldsResolved.length && <DataGridUnionTextFilter name={'__search'} fields={searchFieldsResolved}/>}
 					<DataGridToolbarFilters columns={columns} />
 				</div>
 				<div className="ml-auto flex gap-2 items-center">

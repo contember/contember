@@ -60,8 +60,8 @@ export const createNewForm = () => <>
 					field={'hasOne'}
 					label="Has one value"
 					createNewForm={<>
-						<InputField field="name" />
-						<InputField field="slug" />
+						<InputField field="name" label="Name" />
+						<InputField field="slug" label="Slug" />
 					</>}
 				>
 					<Field field={'name'} />

@@ -31,6 +31,7 @@ export const Navigation = () => {
 				</MenuItem>
 				<MenuItem icon={<ArchiveIcon size={16} />} label={'Select'}>
 					<MenuItem icon={line} label={'Has one select'} to={'select/hasOne'} />
+					<MenuItem icon={line} label={'Create new form'} to={'select/createNewForm'} />
 					<MenuItem icon={line} label={'Has many select'} to={'select/hasMany'} />
 					<MenuItem icon={line} label={'Has many sortable select'} to={'select/hasManySortable'} />
 				</MenuItem>

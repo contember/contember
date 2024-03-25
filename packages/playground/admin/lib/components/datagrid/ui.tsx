@@ -6,6 +6,10 @@ import { cn } from '../../utils/cn'
 import { dict } from '../../dict'
 import { uic } from '../../utils/uic'
 
+export const DataGridTooltipLabel = uic('span', {
+	baseClass: 'cursor-pointer border-dashed border-b border-b-gray-400 hover:border-gray-800',
+})
+
 /**
  * Button in a tooltip that triggers the filter action
  */

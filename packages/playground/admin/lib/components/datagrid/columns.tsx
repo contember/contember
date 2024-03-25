@@ -7,6 +7,7 @@ import { Field, HasMany, HasOne } from '@contember/react-binding'
 import { createHasManyFilter, DataViewFilterHandler } from '@contember/react-dataview'
 import { SugaredQualifiedEntityList } from '@contember/interface'
 import { Button } from '../ui/button'
+import { DataGridTooltipLabel } from './ui'
 
 export interface DataViewColumnCommonArgs {
 	field: string
@@ -66,12 +67,12 @@ export const createHasOneColumn = ({ field, label, tooltipActions, filterOptions
 		field,
 		filterName: field,
 		cell: (
-			<div className={'-mx-3'}>
+			<div>
 				<HasOne field={field}>
 					<DataGridRelationFieldTooltip filter={args.filterName ?? field} actions={tooltipActions}>
-						<Button variant={'ghost'} size={'sm'}>
+						<DataGridTooltipLabel>
 							{value}
-						</Button>
+						</DataGridTooltipLabel>
 					</DataGridRelationFieldTooltip>
 				</HasOne>
 			</div>
@@ -106,12 +107,12 @@ export const createHasManyColumn = ({ field, label, tooltipActions, filterOption
 		field,
 		filterName: field,
 		cell: (
-			<div className={'-mx-3'}>
+			<div className={'flex flex-wrap gap-2'}>
 				<HasMany field={field}>
 					<DataGridRelationFieldTooltip filter={args.filterName ?? field} actions={tooltipActions}>
-						<Button variant={'ghost'} size={'sm'}>
+						<DataGridTooltipLabel>
 							{value}
-						</Button>
+						</DataGridTooltipLabel>
 					</DataGridRelationFieldTooltip>
 				</HasMany>
 			</div>
@@ -211,10 +212,12 @@ export const createEnumColumn = ({ field, label, options, filterLabel, ...args }
 			<div className={'-mx-3'}>
 				<Field<string> field={field} format={it => it ? (
 					<DataGridEnumFieldTooltip value={it} filter={args.filterName ?? field}>
-						{options[it]}
+						<DataGridTooltipLabel>
+							{options[it]}
+						</DataGridTooltipLabel>
 					</DataGridEnumFieldTooltip>
-				) : null}
-				/>
+					) : null}
+					/>
 			</div>),
 		header: label,
 		hidingName: field,

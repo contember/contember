@@ -32,9 +32,7 @@ export const DataGridEnumFieldTooltip = ({ filter, children, actions, value }: {
 	<TooltipProvider>
 		<Tooltip>
 			<TooltipTrigger asChild>
-				<Button variant={'ghost'} size={'sm'}>
-					{children}
-				</Button>
+				{children}
 			</TooltipTrigger>
 			<TooltipContent variant={'blurred'}>
 				<div className={'flex gap-1'}>

@@ -173,10 +173,8 @@ export interface StateStorage {
 // @public (undocumented)
 export type StateStorageKey = [uniquePrefix: string, key: string];
 
-// Warning: (ae-forgotten-export) The symbol "builtInStorages" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
-export type StateStorageOrName = StateStorage | keyof typeof builtInStorages;
+export type StateStorageOrName = StateStorage | 'url' | 'session' | 'local' | 'null';
 
 // @public
 export function unwrapRefValue<T>(value: RefObjectOrElement<T>): T | null;

@@ -3,7 +3,7 @@ import { GenerateUploadUrlMutationBuilder } from '@contember/client'
 import { GraphQlClient } from '@contember/graphql-client'
 import { UploaderError } from '../UploaderError'
 
-interface S3UploadClientOptions {
+export interface S3UploadClientOptions {
 	getUploadOptions?: (file: File) => S3FileOptions
 	concurrency?: number
 }

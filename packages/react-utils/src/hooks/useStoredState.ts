@@ -56,7 +56,8 @@ const builtInStorages = {
 	null: nullStorage,
 }
 
-export type StateStorageOrName = StateStorage | keyof typeof builtInStorages
+export type StateStorageOrName = StateStorage | 'url' | 'session' | 'local' | 'null'
+
 export const useStoredState = <V extends Serializable>(storageOrName: StateStorageOrName | StateStorageOrName[], key: StateStorageKey, initializeValue: ValueInitializer<V>): [V, SetState<V>] => {
 	const storage = useMemo(() => {
 		if (Array.isArray(storageOrName)) {

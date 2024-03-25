@@ -2,8 +2,6 @@ import { EntityListSubTreeMarker, FieldMarker, HasManyRelationMarker, HasOneRela
 import { ExportFactory, ExportFormatterCreateOutputArgs, ExportResult } from './ExportFactory'
 import { DataViewDataForExport } from '../types'
 
-type ContainerMarker = EntityListSubTreeMarker | HasOneRelationMarker | HasManyRelationMarker
-
 export class CsvExportFactory implements ExportFactory {
 
 	create(args: ExportFormatterCreateOutputArgs): ExportResult {
@@ -24,9 +22,9 @@ export class CsvExportFactory implements ExportFactory {
 		})
 	}
 
-	protected flattenData(data: any[], marker: ContainerMarker) {
+	protected flattenData(data: any[], marker: EntityListSubTreeMarker | HasOneRelationMarker | HasManyRelationMarker) {
 		const columns: DataViewDataForExport = []
-		const traverseMarkers = (data: any[], markerPath: [ContainerMarker, ...ContainerMarker[]]) => {
+		const traverseMarkers = (data: any[], markerPath: (EntityListSubTreeMarker | HasOneRelationMarker | HasManyRelationMarker)[]) => {
 			for (const subMarker of markerPath[markerPath.length - 1].fields.markers.values()) {
 				const values = data.map((it: any) =>
 					Array.isArray(it)

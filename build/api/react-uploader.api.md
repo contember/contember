@@ -274,14 +274,20 @@ export interface S3FileOptions {
 // @public (undocumented)
 export class S3UploadClient implements UploadClient<S3FileOptions> {
     constructor(contentApiClient: GraphQlClient, options?: S3UploadClientOptions);
-    // Warning: (ae-forgotten-export) The symbol "S3UploadClientOptions" needs to be exported by the entry point index.d.ts
-    //
     // (undocumented)
     readonly options: S3UploadClientOptions;
     // (undocumented)
     upload({ file, signal, onProgress, ...options }: UploadClientUploadArgs & S3FileOptions): Promise<{
         publicUrl: string;
     }>;
+}
+
+// @public (undocumented)
+export interface S3UploadClientOptions {
+    // (undocumented)
+    concurrency?: number;
+    // (undocumented)
+    getUploadOptions?: (file: File) => S3FileOptions;
 }
 
 // @public (undocumented)
@@ -441,8 +447,16 @@ export const UploaderHasFile: ({ children, state, fallback }: {
     state?: "initial" | "uploading" | "finalizing" | "success" | "error" | ("initial" | "uploading" | "finalizing" | "success" | "error")[] | undefined;
 }) => JSX_2.Element;
 
-// Warning: (ae-forgotten-export) The symbol "UploaderOptions" needs to be exported by the entry point index.d.ts
-//
+// @public (undocumented)
+export interface UploaderOptions {
+    // (undocumented)
+    accept: {
+        [key: string]: string[];
+    } | undefined;
+    // (undocumented)
+    multiple: boolean;
+}
+
 // @public (undocumented)
 export const UploaderOptionsContext: Context<UploaderOptions>;
 

@@ -107,10 +107,8 @@ export class CsvExportFactory implements ExportFactory {
     protected createHeader(data: DataViewDataForExport): string[];
     // (undocumented)
     protected filterData(data: DataViewDataForExport): DataViewDataForExport;
-    // Warning: (ae-forgotten-export) The symbol "ContainerMarker" needs to be exported by the entry point index.d.ts
-    //
     // (undocumented)
-    protected flattenData(data: any[], marker: ContainerMarker): DataViewDataForExport;
+    protected flattenData(data: any[], marker: EntityListSubTreeMarker | HasOneRelationMarker | HasManyRelationMarker): DataViewDataForExport;
     // (undocumented)
     protected formatOutput(data: DataViewDataForExport): string;
     // (undocumented)

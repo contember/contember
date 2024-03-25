@@ -31,12 +31,12 @@ export const TableRow = uic('tr', {
 })
 
 export const TableHead = uic('th', {
-	baseClass: 'h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0',
+	baseClass: 'px-4 py-3 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0',
 	displayName: 'TableHead',
 })
 
 export const TableCell = uic('td', {
-	baseClass: 'p-4 align-middle [&:has([role=checkbox])]:pr-0',
+	baseClass: 'px-4 py-3 align-middle [&:has([role=checkbox])]:pr-0',
 	displayName: 'TableCell',
 })
 

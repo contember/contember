@@ -44,6 +44,7 @@
 		"@contember/client": "workspace:*",
 		"@contember/react-binding": "workspace:*",
 		"@contember/react-client": "workspace:*",
+		"@contember/react-multipass-rendering": "workspace:*",
 		"@contember/react-utils": "workspace:*",
 		"@contember/utilities": "workspace:*",
 		"@radix-ui/react-slot": "^1.0.2"

@@ -1,106 +1,134 @@
-import {
-	DataView,
-	DataViewEachRow,
-	DataViewEmpty,
-	DataViewFilterHandler,
-	DataViewHasSelection,
-	DataViewLoaderState,
-	DataViewNonEmpty,
-	DataViewProps,
-	DataViewSelectionTrigger,
-} from '@contember/react-dataview'
-import { EyeIcon, EyeOffIcon } from 'lucide-react'
+import { DataView, DataViewEachRow, DataViewEmpty, DataViewFilterHandler, DataViewHasSelection, DataViewLoaderState, DataViewNonEmpty, DataViewProps, useDataViewFilteringState } from '@contember/react-dataview'
+import { FilterIcon, SettingsIcon } from 'lucide-react'
 import * as React from 'react'
 import { Fragment, ReactNode, useMemo } from 'react'
-import { dict } from '../../dict'
 import { Button } from '../ui/button'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown'
-import { DataViewNoResults } from './empty'
-import { DataViewLayoutSwitcher } from './layout-switcher'
-import { DataViewInitialLoader, DataViewLoaderOverlay } from './loader'
-import { DataTablePagination } from './pagination'
-import { DataViewTable, DataViewTableColumn } from './table'
+import { DataGridNoResults } from './empty'
+import { DataGridLayoutSwitcher } from './layout-switcher'
+import { DataGridInitialLoader, DataGridOverlayLoader } from './loader'
+import { DataGridPagination, DataGridPerPageSelector } from './pagination'
+import { DataGridTable, DataGridTableColumn } from './table'
+import { DataGridTextFilter, DataGridUnionTextFilter } from './filters'
+import { DataGridToolbarUI } from './ui'
+import { DataGridAutoExport } from './export'
+import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
+import { DataGridToolbarVisibleFields } from './columns-hiding'
+import { Component } from '@contember/interface'
+import { dataAttribute } from '@contember/utilities'
+import { cn } from '../../utils/cn'
 
-export type DataViewColumn =
-	& DataViewTableColumn
+export type DataGridColumn =
+	& DataGridTableColumn
 	& {
+		type: 'text' | 'hasOne' | 'hasMany' | 'boolean' | 'number' | 'enum' | 'date'
+		field: string
 		filterName?: string
-		filterHandler?: DataViewFilterHandler<any>
 		filterToolbar?: ReactNode
 	}
 
-export type DefaultDataGridProps =
+export type DataGridProps =
 	& Omit<DataViewProps, 'children' | 'filterTypes'>
 	& {
-		columns: DataViewColumn[]
+		searchFields?: string[]
+		columns: DataGridColumn[]
 		tile?: ReactNode
 		firstColumnActions?: ReactNode
 		lastColumnActions?: ReactNode
+		toolbarButtons?: ReactNode
 	}
 
-const DataGridToolbarFilters = ({ columns }: { columns: DataViewColumn[] }) => {
+const DataGridToolbarFilters = Component(({ columns, alwaysShow }: { columns: DataGridColumn[], alwaysShow: boolean }) => {
 	return <>
 		{columns
-			.filter(it => it.filterToolbar && it.filterName)
-			.map(column => <Fragment key={column.filterName}>{column.filterToolbar}</Fragment>)
-		}
+			.map(column => {
+				if (!column.filterName || !column.filterToolbar) {
+					return null
+				}
+				return (
+					<DataGridFilterMobileHiding key={column.filterName} name={column.filterName} alwaysShow={alwaysShow}>
+						{column.filterToolbar}
+					</DataGridFilterMobileHiding>
+				)
+		})}
 	</>
+})
+
+const DataGridFilterMobileHiding = ({ name, alwaysShow, children }: { name: string, alwaysShow: boolean, children: ReactNode }) => {
+	const activeFilter = useDataViewFilteringState().artifact
+	const isActive = !!activeFilter[name]
+	return (
+		<div key={name} className={alwaysShow || isActive ? 'contents' : 'hidden sm:contents'}>
+			{children}
+		</div>
+	)
 }
 
-const DataGridToolbarColumns = ({ columns }: { columns: DataViewColumn[] }) => {
-	return <DropdownMenu>
-		<DropdownMenuTrigger asChild>
-			<Button variant={'outline'} size={'sm'} className={'gap-2'}>
-				<EyeIcon className={'w-4 h-4'} />
-				<span className={'sr-only'}>{dict.datagrid.columns}</span>
-			</Button>
-		</DropdownMenuTrigger>
-		<DropdownMenuContent className="w-[160px]">
-			{columns.map(column => (
-				column.hidingName && <DataViewSelectionTrigger key={column.hidingName} name={column.hidingName} value={it => !it}>
-					<DropdownMenuItem onSelect={e => e.preventDefault()}
-									  className={'gap-1 group text-gray-500 data-[current]:text-black'}>
-						<EyeIcon className={'w-3 h-3 hidden group-data-[current]:block'} />
-						<EyeOffIcon className={'w-3 h-3 block group-data-[current]:hidden'} />
-						<span>{column.header}</span>
-					</DropdownMenuItem>
-				</DataViewSelectionTrigger>
-			))}
-		</DropdownMenuContent>
-	</DropdownMenu>
-}
+export const DataGrid = ({ columns, tile, lastColumnActions, firstColumnActions, searchFields, toolbarButtons, ...props }: DataGridProps) => {
+	const searchFieldsResolved = useMemo(() => {
+		return searchFields ?? columns.filter(it => it.type === 'text').map(it => it.field)
+	}, [columns, searchFields])
 
-export const DefaultDataGrid = ({ columns, tile, lastColumnActions, firstColumnActions, ...props }: DefaultDataGridProps) => {
-	const filterTypes = useMemo(() => {
-		return Object.fromEntries(columns
-			.filter(it => it.filterHandler)
-			.map(it => [it.filterName, it.filterHandler]),
-		) as Record<string, DataViewFilterHandler<any>>
-	}, [columns])
+	const [showFilters, setShowFilters] = React.useState(false)
 
 	return (
 		<DataView
-			filterTypes={filterTypes}
 			initialSelection={{
 				layout: tile ? 'grid' : 'table',
 				...props.initialSelection,
 			}}
 			{...props}
 		>
-			<DataViewBody toolbar={<>
-				<DataGridToolbarFilters columns={columns} />
-				<div className="ml-auto flex gap-2">
-					{tile && <DataViewLayoutSwitcher />}
-					<DataGridToolbarColumns columns={columns} />
+			<DataGridToolbarUI>
+
+				<div className="ml-auto flex gap-2 items-center sm:order-1">
+					<Button
+						variant={'outline'}
+						size={'sm'}
+						className={'gap-2 sm:hidden data-[active]:bg-gray-50 data-[active]:shadow-inner'}
+						data-active={dataAttribute(showFilters)}
+						onClick={() => setShowFilters(!showFilters)}
+					>
+						<FilterIcon className="w-4 h-4" /> Filters
+					</Button>
+					<Popover>
+						<PopoverTrigger>
+							<Button variant={'outline'} size={'sm'} className={'gap-2'}>
+								<SettingsIcon className={'w-4 h-4'} />
+							</Button>
+						</PopoverTrigger>
+						<PopoverContent className="w-64">
+							<div className="flex flex-col gap-2">
+								{tile && <DataGridLayoutSwitcher />}
+								<DataGridToolbarVisibleFields fields={columns.filter(it => it.hidingName).map(it => ({ header: it.header, name: it.hidingName as string }))} />
+								<DataGridPerPageSelector />
+							</div>
+
+						</PopoverContent>
+					</Popover>
+					<DataGridAutoExport columns={columns} />
+					{toolbarButtons}
 				</div>
-			</>}>
+
+				<div className="flex flex-wrap gap-2">
+					{searchFieldsResolved.length && (
+						<DataGridFilterMobileHiding name="__search" alwaysShow={showFilters}>
+							<DataGridUnionTextFilter name={'__search'} fields={searchFieldsResolved} />
+						</DataGridFilterMobileHiding>
+					)}
+					<DataGridToolbarFilters columns={columns} alwaysShow={showFilters} />
+				</div>
+			</DataGridToolbarUI>
+
+			<DataGridLoader>
+
 				<DataViewHasSelection name={'layout'} value={'table'}>
-					<DataViewTable
+					<DataGridTable
 						columns={columns}
 						firstColumnActions={firstColumnActions}
 						lastColumnActions={lastColumnActions}
 					/>
 				</DataViewHasSelection>
+
 				<DataViewHasSelection name={'layout'} value={'grid'}>
 					<div className="grid grid-cols-2 md:grid-cols-4 gap-4">
 						<DataViewEachRow>
@@ -109,26 +137,24 @@ export const DefaultDataGrid = ({ columns, tile, lastColumnActions, firstColumnA
 					</div>
 				</DataViewHasSelection>
 
-			</DataViewBody>
+			</DataGridLoader>
+
+			<DataGridPagination />
 		</DataView>
 	)
 }
 
 
 export interface DataViewBodyProps {
-	toolbar: ReactNode
 	children: ReactNode
 }
 
-export const DataViewBody = ({ children, toolbar }: DataViewBodyProps) => (
-	<div className="space-y-4">
-		<div className={'flex gap-2 items-stretch flex-wrap'}>
-			{toolbar}
-		</div>
+export const DataGridLoader = ({ children }: DataViewBodyProps) => (
+	<>
 		<DataViewLoaderState refreshing loaded>
 			<div className="relative">
 				<DataViewLoaderState refreshing>
-					<DataViewLoaderOverlay />
+					<DataGridOverlayLoader />
 				</DataViewLoaderState>
 
 				<DataViewNonEmpty>
@@ -136,15 +162,14 @@ export const DataViewBody = ({ children, toolbar }: DataViewBodyProps) => (
 				</DataViewNonEmpty>
 
 				<DataViewEmpty>
-					<DataViewNoResults />
+					<DataGridNoResults />
 				</DataViewEmpty>
 			</div>
 		</DataViewLoaderState>
 		<DataViewLoaderState initial>
-			<DataViewInitialLoader />
+			<DataGridInitialLoader />
 		</DataViewLoaderState>
-		<DataTablePagination />
-	</div>
+	</>
 )
 
 

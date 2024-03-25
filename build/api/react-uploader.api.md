@@ -130,8 +130,6 @@ export interface FileType {
     acceptFile?: ((file: FileWithMeta) => boolean | Promise<void>) | undefined;
     // (undocumented)
     extractors?: FileDataExtractor[];
-    // Warning: (ae-forgotten-export) The symbol "UploadClient" needs to be exported by the entry point index.d.ts
-    //
     // (undocumented)
     uploader?: UploadClient<any>;
 }
@@ -166,6 +164,22 @@ export interface FileUploadHandlerPopulateEntityArgs<Result extends FileUploadRe
 export interface FileUploadHandlerStaticRenderArgs {
     // (undocumented)
     environment: Environment_2;
+}
+
+// @public (undocumented)
+export interface FileUploadProgress {
+    // (undocumented)
+    progress: number;
+    // (undocumented)
+    totalBytes: number;
+    // (undocumented)
+    uploadedBytes: number;
+}
+
+// @public (undocumented)
+export interface FileUploadResult {
+    // (undocumented)
+    publicUrl: string;
 }
 
 // @public (undocumented)
@@ -238,6 +252,45 @@ type ProgressEvent_2 = {
 export { ProgressEvent_2 as ProgressEvent }
 
 // @public (undocumented)
+export interface S3FileOptions {
+    // (undocumented)
+    acl?: GenerateUploadUrlMutationBuilder.Acl;
+    // (undocumented)
+    contentType?: GenerateUploadUrlMutationBuilder.FileParameters['contentType'];
+    // (undocumented)
+    expiration?: number;
+    // (undocumented)
+    extension?: string;
+    // (undocumented)
+    fileName?: string;
+    // (undocumented)
+    prefix?: string;
+    // (undocumented)
+    size?: number;
+    // (undocumented)
+    suffix?: string;
+}
+
+// @public (undocumented)
+export class S3UploadClient implements UploadClient<S3FileOptions> {
+    constructor(contentApiClient: GraphQlClient, options?: S3UploadClientOptions);
+    // (undocumented)
+    readonly options: S3UploadClientOptions;
+    // (undocumented)
+    upload({ file, signal, onProgress, ...options }: UploadClientUploadArgs & S3FileOptions): Promise<{
+        publicUrl: string;
+    }>;
+}
+
+// @public (undocumented)
+export interface S3UploadClientOptions {
+    // (undocumented)
+    concurrency?: number;
+    // (undocumented)
+    getUploadOptions?: (file: File) => S3FileOptions;
+}
+
+// @public (undocumented)
 export type StartUploadEvent = {
     file: FileWithMeta;
     fileType: FileType;
@@ -249,6 +302,23 @@ export type SuccessEvent = {
     result: FileUploadResult;
     fileType: FileType;
 };
+
+// @public (undocumented)
+export interface UploadClient<Options, // contains file-specific options
+Result extends FileUploadResult = FileUploadResult> {
+    // (undocumented)
+    upload: (args: UploadClientUploadArgs & Omit<Options, keyof UploadClientUploadArgs>) => Promise<Result>;
+}
+
+// @public (undocumented)
+export interface UploadClientUploadArgs {
+    // (undocumented)
+    file: File;
+    // (undocumented)
+    onProgress: (progress: FileUploadProgress) => void;
+    // (undocumented)
+    signal: AbortSignal;
+}
 
 // @public (undocumented)
 export const Uploader: NamedExoticComponent<UploaderProps>;
@@ -377,8 +447,16 @@ export const UploaderHasFile: ({ children, state, fallback }: {
     state?: "initial" | "uploading" | "finalizing" | "success" | "error" | ("initial" | "uploading" | "finalizing" | "success" | "error")[] | undefined;
 }) => JSX_2.Element;
 
-// Warning: (ae-forgotten-export) The symbol "UploaderOptions" needs to be exported by the entry point index.d.ts
-//
+// @public (undocumented)
+export interface UploaderOptions {
+    // (undocumented)
+    accept: {
+        [key: string]: string[];
+    } | undefined;
+    // (undocumented)
+    multiple: boolean;
+}
+
 // @public (undocumented)
 export const UploaderOptionsContext: Context<UploaderOptions>;
 
@@ -397,8 +475,6 @@ export const UploaderStateContext: Context<UploaderState>;
 // @public (undocumented)
 export const UploaderUploadFilesContext: Context<(files: File[]) => void>;
 
-// Warning: (ae-forgotten-export) The symbol "S3UploadClient" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export const useS3Client: () => S3UploadClient;
 
@@ -440,11 +516,6 @@ export interface VideoFileDataExtractorProps {
 
 // @public (undocumented)
 export type VideoFileTypeProps = FileType & FileUrlDataExtractorProps & GenericFileMetadataExtractorProps & VideoFileDataExtractorProps;
-
-// Warnings were encountered during analysis:
-//
-// src/types/events.ts:17:2 - (ae-forgotten-export) The symbol "FileUploadProgress" needs to be exported by the entry point index.d.ts
-// src/types/events.ts:29:2 - (ae-forgotten-export) The symbol "FileUploadResult" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

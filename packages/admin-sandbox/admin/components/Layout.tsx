@@ -19,7 +19,7 @@ export const Layout = memo(({ children }: PropsWithChildren) => {
 	const width = useContainerWidth()
 
 	const [scheme, setScheme] = useSessionStorageState<Scheme>(
-		'contember-admin-sandbox-scheme',
+		['', 'contember-admin-sandbox-scheme'],
 		scheme => scheme ?? 'system',
 	)
 

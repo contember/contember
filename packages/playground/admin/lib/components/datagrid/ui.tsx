@@ -1,14 +1,19 @@
 import * as React from 'react'
-import { forwardRef, ReactEventHandler, ReactNode, SyntheticEvent, useCallback } from 'react'
+import { forwardRef, ReactEventHandler, ReactNode, useCallback } from 'react'
 import { CheckSquareIcon, FilterIcon, FilterXIcon, PlusIcon, SquareIcon, XIcon } from 'lucide-react'
 import { Button } from '../ui/button'
 import { cn } from '../../utils/cn'
 import { dict } from '../../dict'
+import { uic } from '../../utils/uic'
+
+export const DataGridTooltipLabel = uic('span', {
+	baseClass: 'cursor-pointer border-dashed border-b border-b-gray-400 hover:border-gray-800',
+})
 
 /**
  * Button in a tooltip that triggers the filter action
  */
-export const DataViewFilterActionButtonUI = forwardRef<HTMLButtonElement, {}>((props: {}, ref) => {
+export const DataGridFilterActionButtonUI = forwardRef<HTMLButtonElement, {}>((props: {}, ref) => {
 	return (
 		<Button
 			variant={'outline'}
@@ -26,7 +31,7 @@ export const DataViewFilterActionButtonUI = forwardRef<HTMLButtonElement, {}>((p
 /**
  * Button in a tooltip that triggers the exclude action
  */
-export const DataViewExcludeActionButtonUI = forwardRef<HTMLButtonElement, {}>((props: {}, ref) => {
+export const DataGridExcludeActionButtonUI = forwardRef<HTMLButtonElement, {}>((props: {}, ref) => {
 	return (
 		<Button
 			variant={'outline'}
@@ -44,7 +49,7 @@ export const DataViewExcludeActionButtonUI = forwardRef<HTMLButtonElement, {}>((
 /**
  * Button in a filter list that removes the filter
  */
-export const DataViewActiveFilterUI = forwardRef<HTMLButtonElement, {
+export const DataGridActiveFilterUI = forwardRef<HTMLButtonElement, {
 	children: ReactNode,
 	className?: string
 }>(({ children, className, ...props }, ref) => {
@@ -65,13 +70,13 @@ export const DataViewActiveFilterUI = forwardRef<HTMLButtonElement, {
 })
 
 
-export const DataViewSingleFilterUI = forwardRef<HTMLDivElement, { children: ReactNode }>((props, ref) => {
+export const DataGridSingleFilterUI = forwardRef<HTMLDivElement, { children: ReactNode }>((props, ref) => {
 	return (
-		<div className={'flex gap-2 rounded bg-gray-50 items-center text-sm px-2 py-1.5 border'} ref={ref} {...props} />
+		<div className={'flex flex-wrap gap-2 rounded bg-gray-50 items-center text-sm px-2 py-1.5 border'} ref={ref} {...props} />
 	)
 })
 
-export const DataViewFilterSelectTriggerUI = forwardRef<HTMLButtonElement, { children: ReactNode }>(({
+export const DataGridFilterSelectTriggerUI = forwardRef<HTMLButtonElement, { children: ReactNode }>(({
 	children,
 	...props
 }, ref) => {
@@ -89,7 +94,7 @@ export const DataViewFilterSelectTriggerUI = forwardRef<HTMLButtonElement, { chi
 	)
 })
 
-export interface DataViewFilterSelectItemProps {
+export interface DataGridFilterSelectItemProps {
 	onInclude: () => void
 	onExclude: () => void
 	isIncluded: boolean
@@ -97,7 +102,7 @@ export interface DataViewFilterSelectItemProps {
 	children: ReactNode
 }
 
-export const DataViewFilterSelectItemUI = forwardRef<HTMLButtonElement, DataViewFilterSelectItemProps>(({
+export const DataGridFilterSelectItemUI = forwardRef<HTMLButtonElement, DataGridFilterSelectItemProps>(({
 	children,
 	onExclude,
 	isExcluded,
@@ -140,4 +145,9 @@ export const DataViewFilterSelectItemUI = forwardRef<HTMLButtonElement, DataView
 		</div>
 
 	)
+})
+
+
+export const DataGridToolbarUI = uic('div', {
+	baseClass: 'flex flex-col md:flex-row gap-2 md:items-end mb-4',
 })

@@ -1,4 +1,4 @@
-import { cn } from '../../../lib/utils/cn'
+import { cn } from '../../utils/cn'
 import { DropIndicator } from '../ui/sortable'
 import * as React from 'react'
 import { ReactNode } from 'react'
@@ -14,15 +14,14 @@ import {
 	SelectListItemUI,
 	SelectPopoverContent,
 } from './ui'
-import { createDefaultSelectFilter } from './filter'
 import { Popover, PopoverTrigger } from '../ui/popover'
-import { ChevronDownIcon, PlusIcon } from 'lucide-react'
+import { ChevronDownIcon } from 'lucide-react'
 import { SelectListInner } from './list'
 import { RepeaterSortable, RepeaterSortableDragOverlay, RepeaterSortableDropIndicator, RepeaterSortableEachItem, RepeaterSortableItemActivator, RepeaterSortableItemNode } from '@contember/react-repeater-dnd-kit'
 import { Component, HasOne, SugaredQualifiedEntityList, SugaredRelativeEntityList, SugaredRelativeSingleEntity, SugaredRelativeSingleField } from '@contember/interface'
-import { SelectDataView, SelectItemTrigger, SelectOption, SelectPlaceholder, SortableMultiSelect } from '@contember/react-select'
+import { SelectDataView, SelectFilterFieldProps, SelectItemTrigger, SelectOption, SelectPlaceholder, SortableMultiSelect } from '@contember/react-select'
 import { CreateEntityDialog } from './create-new'
-import { Button } from '../ui/button'
+import { SelectDefaultFilter } from './filter'
 
 const MultiSortableSelectDropIndicator = ({ position }: { position: 'before' | 'after' }) => (
 	<div className={cn('relative', position === 'before' ? '-translate-x-0.5' : 'translate-x-1.5')}>
@@ -32,21 +31,21 @@ const MultiSortableSelectDropIndicator = ({ position }: { position: 'before' | '
 	</div>
 )
 
-export interface SortableMultiSelectInputProps {
-	field: SugaredRelativeEntityList['field']
-	sortableBy: SugaredRelativeSingleField['field']
-	connectAt: SugaredRelativeSingleEntity['field']
-	children: ReactNode
-	options: SugaredQualifiedEntityList['entities']
-	filterField?: string
-	placeholder?: ReactNode
-	createNewForm?: ReactNode
-}
+export type SortableMultiSelectInputProps =
+	& SelectFilterFieldProps
+	& {
+		field: SugaredRelativeEntityList['field']
+		sortableBy: SugaredRelativeSingleField['field']
+		connectAt: SugaredRelativeSingleEntity['field']
+		children: ReactNode
+		options?: SugaredQualifiedEntityList['entities']
+		placeholder?: ReactNode
+		createNewForm?: ReactNode
+	}
 
 export const SortableMultiSelectInput = Component<SortableMultiSelectInputProps>(({ field, filterField, options, children, sortableBy, connectAt, placeholder, createNewForm }) => {
-	const filter = createDefaultSelectFilter(filterField)
 	return (
-		<SortableMultiSelect field={field} sortableBy={sortableBy} connectAt={connectAt} options={options}>
+		<SortableMultiSelect field={field} sortableBy={sortableBy} connectAt={connectAt} options={options} filterField={filterField}>
 			<div className="flex gap-1 items-center">
 				<Popover>
 					<PopoverTrigger asChild>
@@ -94,8 +93,8 @@ export const SortableMultiSelectInput = Component<SortableMultiSelectInputProps>
 					</PopoverTrigger>
 
 					<SelectPopoverContent>
-						<SelectDataView filterTypes={filter?.filterTypes}>
-							<SelectListInner filterToolbar={filter?.filterToolbar}>
+						<SelectDataView>
+							<SelectListInner filterToolbar={<SelectDefaultFilter />}>
 								<SelectOption>
 									<SelectItemTrigger>
 										<SelectListItemUI>

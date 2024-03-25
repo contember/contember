@@ -1,95 +1,150 @@
 import { LogOutIcon, MenuIcon, PanelLeftCloseIcon, PanelLeftOpenIcon, PanelRightCloseIcon, PanelRightOpenIcon } from 'lucide-react'
-import { PropsWithChildren, useState } from 'react'
+import { PropsWithChildren, useEffect, useState } from 'react'
 import { ComponentClassNameProps } from '@contember/utilities'
 import { useHasActiveSlotsFactory } from '@contember/react-slots'
-import { uic } from '../../lib/utils/uic'
+import { uic } from '../utils/uic'
 import { SlotTargets } from './slots'
 import { Button } from './ui/button'
 import { LogoutTrigger } from '@contember/react-identity'
 import { dict } from '../dict'
+import { useCurrentRequest } from '@contember/interface'
 
+const LayoutBodyUI = uic('div', { baseClass: 'bg-gray-50 h-full min-h-screen relative py-4' })
+const LayoutMaxWidthUI = uic('div', { baseClass: 'max-w-[100rem] mx-auto' })
+const LayoutBoxUI = uic('div', { baseClass: 'rounded-xl shadow-lg border bg-white gap-1 flex flex-col lg:flex-row mt-4 relative min-h-[calc(100vh-10rem)]' })
 
-const TitleEl = uic('h1', { baseClass: 'text-2xl font-bold' })
+const LayoutCenterPanelUI = uic('div', { baseClass: 'flex flex-col flex-2 p-4 gap-2 w-full flex-auto overflow-hidden' })
+const LayoutCenterTopUI = uic('div', { baseClass: 'flex justify-between pb-4 mb-4 border-b' })
+
+const LayoutLeftSidebarUI = uic('div', {
+	baseClass: 'flex-col lg:border-r bg-neutral-50 border-r-gray-300 lg:w-96 flex-auto gap-2 relative rounded-l-xl',
+	variants: {
+		visibility: {
+			show: 'flex',
+			hidden: 'hidden',
+			auto: 'hidden lg:flex',
+		},
+	},
+	defaultVariants: {
+		visibility: 'auto',
+	},
+})
+const LayoutRightSidebarUI = uic('div', {
+	baseClass: ' flex-col p-4 pt-6 gap-2 lg:border-l border-l-gray-300 lg:w-96 flex-auto relative',
+	variants: {
+		visibility: {
+			show: 'flex',
+			hidden: 'hidden',
+		},
+	},
+	defaultVariants: {
+		visibility: 'show',
+	},
+})
+
+const LayoutTitleUI = uic('h1', { baseClass: 'text-2xl font-bold' })
+
+const LayoutFooterUI = uic('div', { baseClass: 'flex justify-end mt-2 mx-4' })
+
+const LayoutLeftPanelCloserUI = uic('a', { baseClass: 'hidden lg:flex self-end absolute top-1 right-1 opacity-0 text-gray-400 hover:opacity-100 transition-opacity cursor-pointer' })
+const LayoutLeftPanelOpenerUI = uic('a', { baseClass: 'hidden lg:block absolute top-1 left-1' })
+const LayoutRightPanelCloserUI = uic('a', { baseClass: 'hidden lg:flex self-end absolute top-1 right-1 opacity-0 text-gray-400 hover:opacity-100 transition-opacity cursor-pointer' })
+const LayoutRightPanelOpenerUI = uic('a', { baseClass: 'absolute top-1 right-1' })
+
 
 export const LayoutComponent = ({ children, ...rest }: PropsWithChildren<ComponentClassNameProps>) => {
 	const isActive = useHasActiveSlotsFactory()
 
-	const [showLeftSidebar, setShowLeftSidebar] = useState<boolean | null>(null)
-	const [showRightSidebar, setShowRightSidebar] = useState<boolean>(true)
+	const [leftSidebarVisibility, setLeftSidebarVisibility] = useState<'show' | 'hidden' | 'auto'>('auto')
+
+	const request = useCurrentRequest()
+	useEffect(() => {
+			setLeftSidebarVisibility(it => it === 'show' ? 'auto' : it)
+	}, [request])
+
+	const [rightSidebarVisibility, setRightSidebarVisibility] = useState<'show' | 'hidden'>('show')
 
 	const hasRightSidebar = isActive('SidebarRightHeader', 'SidebarRightBody', 'SidebarRightFooter', 'Sidebar')
 	return (
-		<div className={'bg-gray-50 h-full min-h-screen relative py-4'}>
-			<div className={'max-w-[100rem] mx-auto'}>
-				<div className={'rounded-xl shadow-lg border bg-white gap-1 flex flex-col lg:flex-row mt-4 relative min-h-[calc(100vh-10rem)]'}>
-					{showLeftSidebar === false && <div className={'hidden lg:block absolute top-1 left-1'}>
-						<a onClick={() => setShowLeftSidebar(null)}><PanelLeftOpenIcon /></a>
-					</div>}
-					{hasRightSidebar && !showRightSidebar ? <div className={'absolute top-1 right-1'}>
-						<a onClick={() => setShowRightSidebar(true)}><PanelRightOpenIcon /></a>
-					</div> : null}
-					<div
-						className={`${showLeftSidebar === false ? 'hidden' : (showLeftSidebar === true ? 'flex' : 'hidden lg:flex')} flex-col lg:border-r bg-neutral-50 border-r-gray-300 lg:w-96 flex-auto gap-2 relative rounded-l-xl`}
-					>
-						<div
-							className={'hidden lg:flex self-end absolute top-0 right-1 opacity-0 text-gray-400 hover:opacity-100 transition-opacity cursor-pointer'}
-						>
-							<a onClick={() => setShowLeftSidebar(false)}><PanelLeftCloseIcon/></a>
-						</div>
+		<LayoutBodyUI>
+			<LayoutMaxWidthUI>
+				<LayoutBoxUI>
+					{leftSidebarVisibility === 'hidden' && (
+						<LayoutLeftPanelOpenerUI onClick={() => setLeftSidebarVisibility('auto')}>
+							<PanelLeftOpenIcon className="w-4 h-4" />
+						</LayoutLeftPanelOpenerUI>
+					)}
+					{hasRightSidebar && rightSidebarVisibility === 'hidden' ? (
+						<LayoutRightPanelOpenerUI onClick={() => setRightSidebarVisibility('show')}>
+							<PanelRightOpenIcon className="w-4 h-4" />
+						</LayoutRightPanelOpenerUI>
+					) : null}
+
+					<LayoutLeftSidebarUI visibility={leftSidebarVisibility}>
+
+						<LayoutLeftPanelCloserUI onClick={() => setLeftSidebarVisibility('hidden')}>
+							<PanelLeftCloseIcon className="w-4 h-4" />
+						</LayoutLeftPanelCloserUI>
+
 						<div className={'p-4 flex gap-2'}>
-							<SlotTargets.Logo/>
+							<SlotTargets.Logo />
 						</div>
+
 						<div className="px-4">
-							<SlotTargets.Navigation/>
+							<SlotTargets.Navigation />
 						</div>
+
 						<div className={'mt-auto rounded-bl py-2 px-2 border-t'}>
 							<LogoutTrigger>
 								<Button variant={'ghost'} size="sm" className="gap-2 hover:underline">
-									<LogOutIcon className="w-3 h-3 text-gray-500"/> {dict.logout}
+									<LogOutIcon className="w-3 h-3 text-gray-500" /> {dict.logout}
 								</Button>
 							</LogoutTrigger>
 						</div>
-					</div>
-					<div className={'flex flex-col flex-2 p-4 gap-2 w-full flex-auto overflow-hidden'}>
-						<div className={'flex justify-between pb-4 mb-4 border-b'}>
+
+					</LayoutLeftSidebarUI>
+
+
+					<LayoutCenterPanelUI>
+						<LayoutCenterTopUI>
 							<div className={'flex gap-2'}>
-								<SlotTargets.Back/>
-								<SlotTargets.Title as={TitleEl}/>
+								<SlotTargets.Back />
+								<SlotTargets.Title as={LayoutTitleUI} />
 							</div>
-							<SlotTargets.ContentHeader/>
+							<SlotTargets.ContentHeader />
 							<div className={'flex gap-2'}>
-								<SlotTargets.Actions/>
+								<SlotTargets.Actions />
 								<div className={'flex flex-col lg:hidden p-4 gap-2 w-full flex-auto'}>
-									<a onClick={() => setShowLeftSidebar(!showLeftSidebar ? true : null)}><MenuIcon/></a>
+									<a onClick={() => setLeftSidebarVisibility(it => it !== 'show' ? 'show' : 'auto')}><MenuIcon /></a>
 								</div>
 							</div>
-						</div>
+						</LayoutCenterTopUI>
+
 						<div>
 							{children}
 						</div>
-					</div>
+					</LayoutCenterPanelUI>
 					{hasRightSidebar ?
-						<div
-							className={`${showRightSidebar === false ? 'hidden' : 'flex'} flex-col p-4 pt-6 gap-2 lg:border-l border-l-gray-300 lg:w-96 flex-auto relative`}
-						>
-							<div className={'hidden lg:flex self-end absolute top-1 right-1'}>
-								<a onClick={() => setShowRightSidebar(false)}><PanelRightCloseIcon /></a>
-							</div>
+						<LayoutRightSidebarUI visibility={rightSidebarVisibility ? 'show' : 'hidden'}>
+							<LayoutRightPanelCloserUI onClick={() => setRightSidebarVisibility('hidden')}>
+								<PanelRightCloseIcon />
+							</LayoutRightPanelCloserUI>
 							<div>
 								<SlotTargets.Sidebar />
 							</div>
-						</div>
-						: null}
+						</LayoutRightSidebarUI>
+						: null
+					}
 
-				</div>
+				</LayoutBoxUI>
 
-				<div className={'flex justify-end mt-2 mx-4'}>
+				<LayoutFooterUI>
 					<div>
 						<SlotTargets.Footer />
 					</div>
-				</div>
-			</div>
-		</div>
+				</LayoutFooterUI>
+			</LayoutMaxWidthUI>
+		</LayoutBodyUI>
 	)
 }
 LayoutComponent.displayName = 'Layout'

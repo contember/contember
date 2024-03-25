@@ -1,23 +1,56 @@
 import React, { ReactNode, useCallback, useMemo } from 'react'
-import { SelectCurrentEntitiesContext, SelectHandler, SelectHandleSelectContext, SelectIsSelectedContext, SelectOptionsContext } from '../contexts'
-import { Component, EntityAccessor, HasOne, SugaredQualifiedEntityList, SugaredRelativeEntityList, SugaredRelativeSingleEntity, SugaredRelativeSingleField, useEntityList } from '@contember/react-binding'
+import { SelectCurrentEntitiesContext, SelectHandler, SelectHandleSelectContext, SelectIsSelectedContext, SelectOptionsContext, SelectOptionsFilterContext } from '../contexts'
+import {
+	Component,
+	EntityAccessor,
+	FieldMarker,
+	HasOne,
+	MeaningfulMarker,
+	PlaceholderGenerator,
+	QueryLanguage,
+	SugaredQualifiedEntityList,
+	SugaredRelativeEntityList,
+	SugaredRelativeSingleEntity,
+	SugaredRelativeSingleField,
+	useEntityList,
+} from '@contember/react-binding'
 import { useReferentiallyStableCallback } from '@contember/react-utils'
 import { Repeater } from '@contember/react-repeater'
 import { SelectEvents } from '../types'
+import { SelectFilterFieldProps, useSelectFilter } from '../hooks'
 
 export type SortableMultiSelectProps =
 	& {
 		children: ReactNode
 		field: SugaredRelativeEntityList['field']
-		options: SugaredQualifiedEntityList['entities']
+		options?: SugaredQualifiedEntityList['entities']
 		sortableBy: SugaredRelativeSingleField['field']
 		connectAt: SugaredRelativeSingleEntity['field']
 	}
+	& SelectFilterFieldProps
 	& SelectEvents
 
-export const SortableMultiSelect = Component(({ field, children, sortableBy, connectAt, options, onSelect, onUnselect }: SortableMultiSelectProps) => {
+export const SortableMultiSelect = Component(({ field, children, sortableBy, connectAt, options, onSelect, onUnselect, filterField }: SortableMultiSelectProps) => {
 	const list = useEntityList({ field })
 	const entitiesArr = useMemo(() => Array.from(list), [list])
+
+	const optionsMarker = useMemo(() => {
+		const desugared = QueryLanguage.desugarRelativeSingleEntity({ field: connectAt }, list.environment)
+		let marker: Exclude<MeaningfulMarker, FieldMarker> = list.getMarker()
+		for (let relation of desugared.hasOneRelationPath) {
+			const placeholder = PlaceholderGenerator.getHasOneRelationPlaceholder(relation)
+			const relationMarker = marker.fields.markers.get(placeholder)
+			if (!relationMarker || relationMarker instanceof FieldMarker) {
+				throw new Error('Invalid marker')
+			}
+			marker = relationMarker
+		}
+		return marker
+	}, [connectAt, list])
+
+	options ??= optionsMarker.environment.getSubTreeNode().entity.name
+
+	const filter = useSelectFilter({ filterField, marker: optionsMarker })
 
 	const selectedEntities = useMemo(() => Array.from(list).map(it => it.getEntity({ field: connectAt }).id), [connectAt, list])
 
@@ -46,7 +79,9 @@ export const SortableMultiSelect = Component(({ field, children, sortableBy, con
 				<SelectIsSelectedContext.Provider value={isSelected}>
 					<SelectHandleSelectContext.Provider value={handler}>
 						<SelectOptionsContext.Provider value={options}>
-							{children}
+							<SelectOptionsFilterContext.Provider value={filter}>
+								{children}
+							</SelectOptionsFilterContext.Provider>
 						</SelectOptionsContext.Provider>
 					</SelectHandleSelectContext.Provider>
 				</SelectIsSelectedContext.Provider>
@@ -56,7 +91,7 @@ export const SortableMultiSelect = Component(({ field, children, sortableBy, con
 }, ({ children, field, sortableBy, connectAt }) => {
 	return (
 		<Repeater field={field} sortableBy={sortableBy} initialEntityCount={0}>
-			<HasOne field={connectAt}>
+			<HasOne field={connectAt} expectedMutation="connectOrDisconnect">
 				{children}
 			</HasOne>
 		</Repeater>

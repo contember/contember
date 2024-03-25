@@ -1,3 +1,5 @@
+import { StateStorageOrName } from '@contember/react-utils'
+
 export type DataViewPagingMethods = {
 	goToPage: (page: number | 'first' | 'next' | 'previous' | 'last') => void
 	setItemsPerPage: (newItemsPerPage: number | null) => void
@@ -15,4 +17,6 @@ export type DataViewPagingInfo = {
 
 export interface DataViewPagingProps {
 	initialItemsPerPage?: number | null
+	currentPageStateStorage?: StateStorageOrName
+	pagingSettingsStorage?: StateStorageOrName
 }

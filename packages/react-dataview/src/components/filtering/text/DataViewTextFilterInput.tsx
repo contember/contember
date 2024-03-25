@@ -5,9 +5,10 @@ import { useDataViewTextFilterInput } from '../../../hooks'
 
 const SlotInput = Slot as ComponentType<React.InputHTMLAttributes<HTMLInputElement>>
 
-export const DataViewTextFilterInput = ({ name, ...props }: {
+export const DataViewTextFilterInput = ({ name, debounceMs, ...props }: {
 	name: string
+	debounceMs?: number
 	children: ReactElement
 }) => {
-	return <SlotInput {...useDataViewTextFilterInput(name)} {...props} />
+	return <SlotInput {...useDataViewTextFilterInput({ name, debounceMs })} {...props} />
 }

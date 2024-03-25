@@ -4,7 +4,7 @@ import { CheckboxInput, Input, RadioInput } from '../ui/input'
 import { cn } from '../../utils/cn'
 import { TextareaAutosize } from '../ui/textarea'
 import { FormLabelUI } from './ui'
-import { FormCheckbox, FormCheckboxProps, FormFieldScope, FormInput, FormInputProps, FormLabel, FormRadioInput } from '@contember/react-form'
+import { FormCheckbox, FormCheckboxProps, FormFieldScope, FormInput, FormInputProps, FormLabel, FormRadioInput, FormRadioItemProps } from '@contember/react-form'
 import { FormContainer, FormContainerProps } from './container'
 import { Component, Field, SugaredRelativeSingleField } from '@contember/interface'
 
@@ -71,22 +71,22 @@ export const CheckboxField = Component(({ field, label, description, inputProps,
 
 
 export type RadioEnumFieldProps =
+	& Omit<FormRadioItemProps, 'children' | 'value'>
 	& Omit<FormContainerProps, 'children'>
 	& {
-		field: SugaredRelativeSingleField['field']
 		options: Record<string, ReactNode>
 		orientation?: 'horizontal' | 'vertical'
 		inputProps?: Omit<React.InputHTMLAttributes<HTMLInputElement>, 'defaultValue'>
 	}
 
-export const RadioEnumField = Component<RadioEnumFieldProps>(({ field, label, description, options, inputProps, orientation }) => {
+export const RadioEnumField = Component<RadioEnumFieldProps>(({ field, label, description, options, inputProps, orientation, defaultValue, isNonbearing  }) => {
 	return (
 		<FormFieldScope field={field}>
 			<FormContainer description={description} label={label}>
 				<div className={'flex flex-wrap gap-3 data-[orientation=vertical]:flex-col'} data-orientation={orientation ?? 'vertical'}>
 					{Object.entries(options).map(([value, label]) => (
 						<FormLabelUI className="flex gap-2 items-center font-normal" key={value}>
-							<FormRadioInput field={field} value={value}>
+							<FormRadioInput field={field} value={value} defaultValue={defaultValue} isNonbearing={isNonbearing}>
 								<RadioInput {...inputProps} />
 							</FormRadioInput>
 							{label}
@@ -96,6 +96,4 @@ export const RadioEnumField = Component<RadioEnumFieldProps>(({ field, label, de
 			</FormContainer>
 		</FormFieldScope>
 	)
-}, ({ field }) => {
-	return <Field field={field} />
 })

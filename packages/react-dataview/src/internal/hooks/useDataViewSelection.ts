@@ -1,6 +1,6 @@
 import { DataViewSelectionMethods, DataViewSelectionProps, DataViewSelectionState } from '../../types'
 import { useCallback, useMemo } from 'react'
-import { useSessionStorageState } from '@contember/react-utils'
+import { useStoredState } from '@contember/react-utils'
 
 export type UseDataViewSelectionArgs =
 	& {
@@ -14,9 +14,10 @@ export type UseDataViewSelectionResult = {
 	methods: DataViewSelectionMethods
 }
 
-export const useDataViewSelection = ({ dataViewKey, initialSelection, selectionFallback, resetPage }: UseDataViewSelectionArgs): UseDataViewSelectionResult => {
-	const [values, setValues] = useSessionStorageState<DataViewSelectionState['values']>(
-		`${dataViewKey}-selection`,
+export const useDataViewSelection = ({ dataViewKey, initialSelection, selectionStateStorage, selectionFallback, resetPage }: UseDataViewSelectionArgs): UseDataViewSelectionResult => {
+	const [values, setValues] = useStoredState<DataViewSelectionState['values']>(
+		selectionStateStorage ?? 'local',
+		[dataViewKey ?? 'dataview', 'selection'],
 		val => {
 			return typeof initialSelection === 'function' ? initialSelection(val ?? {}) : val ?? initialSelection ?? {}
 		},

@@ -1,4 +1,5 @@
 export * from './filters'
 export * from './useDataView'
+export * from './useDataViewFetchAllData'
 export * from './useDataViewKey'
 export * from './useDataViewFilter'

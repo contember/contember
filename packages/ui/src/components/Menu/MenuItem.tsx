@@ -24,7 +24,7 @@ export function MenuItem<T = unknown>({ children, componentClassName = 'menu-ite
 	const menuItemId = `${componentClassName}-${depth}-${href ?? label}`
 	const menuId = useMenuId()
 	const [expanded, setExpanded] = useSessionStorageState<boolean>(
-		`menu-${menuId}-${menuItemId}`,
+		['', `menu-${menuId}-${menuItemId}`],
 		val => val ?? props.expandedByDefault ?? (depth === 0 || !label),
 	)
 

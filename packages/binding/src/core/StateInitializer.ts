@@ -317,6 +317,7 @@ export class StateInitializer {
 					entityListState.accessor = new EntityListAccessor(
 						entityListState,
 						this.listOperations,
+						entityListState.entityName,
 						entityListState.children,
 						persistedEntityIds,
 						entityListState.unpersistedChangesCount !== 0,

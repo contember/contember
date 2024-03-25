@@ -4,6 +4,8 @@
 
 ```ts
 
+import { ContentEntitySelection } from '@contember/client';
+import { ContentQuery } from '@contember/client';
 import { ContentQueryBuilder } from '@contember/client';
 import type { CrudQueryBuilder } from '@contember/client';
 import { EmbeddedActionsParser } from 'chevrotain';
@@ -319,7 +321,7 @@ export class EntityListAccessor implements Errorable {
     [Symbol.iterator](): IterableIterator<EntityAccessor>;
     // Warning: (ae-forgotten-export) The symbol "EntityListState" needs to be exported by the entry point index.d.ts
     // Warning: (ae-forgotten-export) The symbol "ListOperations" needs to be exported by the entry point index.d.ts
-    constructor(state: EntityListState, operations: ListOperations, _children: ReadonlyMap<EntityId, {
+    constructor(state: EntityListState, operations: ListOperations, name: EntityName, _children: ReadonlyMap<EntityId, {
         getAccessor: EntityAccessor.GetEntityAccessor;
     }>, _idsPersistedOnServer: ReadonlySet<EntityId>, hasUnpersistedChanges: boolean, errors: ErrorAccessor | undefined, environment: Environment, getAccessor: EntityListAccessor.GetEntityListAccessor);
     // (undocumented)
@@ -357,6 +359,8 @@ export class EntityListAccessor implements Errorable {
     // (undocumented)
     getChildEntityById(id: EntityId): EntityAccessor;
     // (undocumented)
+    getMarker(): EntityListSubTreeMarker | HasManyRelationMarker;
+    // (undocumented)
     getParent(): EntityAccessor | undefined;
     // (undocumented)
     hasEntityId(id: EntityId): boolean;
@@ -372,6 +376,8 @@ export class EntityListAccessor implements Errorable {
     keys(): IterableIterator<EntityRealmKey>;
     // (undocumented)
     get length(): number;
+    // (undocumented)
+    readonly name: EntityName;
 }
 
 // @public (undocumented)
@@ -1337,6 +1343,15 @@ export interface QualifiedSingleEntity extends QualifiedSingleEntityParameters, 
 export interface QualifiedSingleEntityParameters {
     // (undocumented)
     where: UniqueWhere;
+}
+
+// @public (undocumented)
+export class QueryGenerator {
+    constructor(tree: MarkerTreeRoot, qb: ContentQueryBuilder);
+    // (undocumented)
+    getReadQuery(): Record<string, ContentQuery<any>>;
+    // (undocumented)
+    static registerQueryPart(fields: EntityFieldMarkers, selection: ContentEntitySelection): ContentEntitySelection;
 }
 
 // @public (undocumented)

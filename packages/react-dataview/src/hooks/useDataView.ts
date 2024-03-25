@@ -45,6 +45,7 @@ export const useDataView = (args: UseDataViewArgs): UseDataViewResult => {
 		dataViewKey: key,
 		filterTypes: args.filterTypes,
 		initialFilters: args.initialFilters,
+		filteringStateStorage: args.filteringStateStorage,
 		entities,
 		resetPage,
 	})
@@ -52,12 +53,15 @@ export const useDataView = (args: UseDataViewArgs): UseDataViewResult => {
 	const { state: sortingState, methods: sortingMethods } = useDataViewSorting({
 		dataViewKey: key,
 		initialSorting: args.initialSorting,
+		sortingStateStorage: args.sortingStateStorage,
 		resetPage,
 	})
 
 	const { state: pagingState, methods: pagingMethods, info: pagingInfo } = useDataViewPaging({
 		dataViewKey: key,
 		initialItemsPerPage: args.initialItemsPerPage,
+		currentPageStateStorage: args.currentPageStateStorage,
+		pagingSettingsStorage: args.pagingSettingsStorage,
 		entities,
 		filter: filteringState.filter,
 	})
@@ -67,6 +71,7 @@ export const useDataView = (args: UseDataViewArgs): UseDataViewResult => {
 		resetPage,
 		selectionFallback: args.selectionFallback,
 		initialSelection: args.initialSelection,
+		selectionStateStorage: args.selectionStateStorage,
 	})
 
 	resetPageRef.current = () => {

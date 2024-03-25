@@ -1,28 +1,27 @@
 import * as React from 'react'
 import { ReactNode } from 'react'
 import { MultiSelectItemContentUI, MultiSelectItemRemoveButtonUI, MultiSelectItemUI, SelectCreateNewTrigger, SelectDefaultPlaceholderUI, SelectInputActionsUI, SelectInputUI, SelectListItemUI, SelectPopoverContent } from './ui'
-import { ChevronDownIcon, PlusIcon } from 'lucide-react'
+import { ChevronDownIcon } from 'lucide-react'
 import { Popover, PopoverTrigger } from '../ui/popover'
 import { Component, SugaredQualifiedEntityList, SugaredRelativeEntityList } from '@contember/interface'
-import { createDefaultSelectFilter } from './filter'
+import { SelectDefaultFilter } from './filter'
 import { SelectListInner } from './list'
-import { MultiSelect, SelectDataView, SelectEachValue, SelectItemTrigger, SelectOption, SelectPlaceholder } from '@contember/react-select'
+import { MultiSelect, SelectDataView, SelectEachValue, SelectFilterFieldProps, SelectItemTrigger, SelectOption, SelectPlaceholder } from '@contember/react-select'
 import { CreateEntityDialog } from './create-new'
-import { Button } from '../ui/button'
 
-export interface MultiSelectInputProps {
-	field: SugaredRelativeEntityList['field']
-	options: SugaredQualifiedEntityList['entities']
-	children: ReactNode
-	filterField?: string
-	placeholder?: ReactNode
-	createNewForm?: ReactNode
+export type MultiSelectInputProps =
+	& SelectFilterFieldProps
+	& {
+		field: SugaredRelativeEntityList['field']
+		options?: SugaredQualifiedEntityList['entities']
+		children: ReactNode
+		placeholder?: ReactNode
+		createNewForm?: ReactNode
 }
 
 export const MultiSelectInput = Component<MultiSelectInputProps>(({ field, filterField, options, children, placeholder, createNewForm }) => {
-	const filter = createDefaultSelectFilter(filterField)
 	return (
-		<MultiSelect field={field} options={options}>
+		<MultiSelect field={field} options={options} filterField={filterField}>
 			<div className="flex gap-1 items-center">
 				<Popover>
 					<PopoverTrigger asChild>
@@ -48,8 +47,8 @@ export const MultiSelectInput = Component<MultiSelectInputProps>(({ field, filte
 						</SelectInputUI>
 					</PopoverTrigger>
 					<SelectPopoverContent>
-						<SelectDataView filterTypes={filter?.filterTypes}>
-							<SelectListInner filterToolbar={filter?.filterToolbar}>
+						<SelectDataView>
+							<SelectListInner filterToolbar={<SelectDefaultFilter />}>
 								<SelectOption>
 									<SelectItemTrigger>
 										<SelectListItemUI>
@@ -68,5 +67,5 @@ export const MultiSelectInput = Component<MultiSelectInputProps>(({ field, filte
 				)}
 			</div>
 		</MultiSelect>
-)
+	)
 })

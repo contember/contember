@@ -1515,6 +1515,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@contember/react-datagrid@workspace:packages/react-datagrid"
   dependencies:
+    "@contember/client": "workspace:*"
     "@contember/react-binding": "workspace:*"
     "@contember/react-choice-field": "workspace:*"
     "@contember/react-dataview": "workspace:*"
@@ -1536,6 +1537,7 @@ __metadata:
     "@contember/client": "workspace:*"
     "@contember/react-binding": "workspace:*"
     "@contember/react-client": "workspace:*"
+    "@contember/react-multipass-rendering": "workspace:*"
     "@contember/react-utils": "workspace:*"
     "@contember/utilities": "workspace:*"
     "@radix-ui/react-slot": ^1.0.2

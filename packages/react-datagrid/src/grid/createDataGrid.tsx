@@ -5,6 +5,7 @@ import { ControlledDataGridProps, createControlledDataGrid } from './createContr
 import { extractDataGridColumns } from '../internal/gridTemplateAnalyzer'
 import { useDataGrid } from './useDataGrid'
 import { DataGridColumnsContext } from '../internal/contexts'
+import { replaceGraphQlLiteral } from '@contember/client'
 
 export type DataGridProps<P extends {}> =
 	& {
@@ -53,7 +54,7 @@ const dummyStateMethods: DataGridMethods = {
 const createInitialState = (props: DataGridProps<{}>, environment: Environment): DataGridState => {
 
 	const entities = QueryLanguage.desugarQualifiedEntityList({ entities: props.entities }, environment)
-	const filter: Filter = { and: [entities.filter ?? {}] }
+	const filter = resolveFilter({ and: [entities.filter ?? {}] })
 	return {
 		key: '_',
 		paging: {
@@ -75,4 +76,7 @@ const createInitialState = (props: DataGridProps<{}>, environment: Environment):
 		},
 		entities: entities,
 	}
+}
+const resolveFilter = (input?: Filter): Filter<never> => {
+	return replaceGraphQlLiteral<unknown>(input) as Filter<never>
 }

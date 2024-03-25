@@ -13,6 +13,7 @@ export class GridArticle {
 	category = c.manyHasOne(GridCategory)
 	tags = c.manyHasMany(GridTag)
 	views = c.intColumn()
+	comments = c.oneHasMany(GridArticleComment, 'article')
 }
 
 export class GridTag {
@@ -28,4 +29,11 @@ export class GridCategory {
 export class GridAuthor {
 	name = c.stringColumn().notNull()
 	slug = c.stringColumn().notNull().unique()
+}
+
+export class GridArticleComment {
+	article = c.manyHasOne(GridArticle, 'comments').notNull().cascadeOnDelete()
+	author = c.manyHasOne(GridAuthor).notNull().cascadeOnDelete()
+	content = c.stringColumn()
+	createdAt = c.dateTimeColumn()
 }

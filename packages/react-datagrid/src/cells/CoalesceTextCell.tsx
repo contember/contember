@@ -2,30 +2,30 @@ import { Component, SugarableRelativeSingleField } from '@contember/react-bindin
 import { ComponentType, FunctionComponent } from 'react'
 import { DataGridColumnCommonProps, FilterRendererProps } from '../types'
 import { DataGridColumn } from '../grid'
-import { CoalesceTextFilterArtifacts, createCoalesceFilter } from '@contember/react-dataview'
+import { TextFilterArtifacts, createUnionTextFilter } from '@contember/react-dataview'
 
 export type CoalesceCellRendererProps = {
 	fields: (SugarableRelativeSingleField | string)[]
-	initialFilter?: CoalesceTextFilterArtifacts
+	initialFilter?: TextFilterArtifacts
 }
 
 export type CoalesceTextCellProps =
 	& DataGridColumnCommonProps
 	& CoalesceCellRendererProps
 	& {
-		initialFilter?: CoalesceTextFilterArtifacts
+		initialFilter?: TextFilterArtifacts
 	}
 
 
 export const createCoalesceTextCell = <ColumnProps extends {}, ValueRendererProps extends {}>({ FilterRenderer, ValueRenderer }: {
-	FilterRenderer: ComponentType<FilterRendererProps<CoalesceTextFilterArtifacts>>,
+	FilterRenderer: ComponentType<FilterRendererProps<TextFilterArtifacts>>,
 	ValueRenderer: ComponentType<CoalesceCellRendererProps & ValueRendererProps>
 }): FunctionComponent<CoalesceTextCellProps & ColumnProps & ValueRendererProps> => Component(props => {
 	return (
-		<DataGridColumn<CoalesceTextFilterArtifacts>
+		<DataGridColumn<TextFilterArtifacts>
 			{...props}
 			enableOrdering={false}
-			getNewFilter={createCoalesceFilter(props.fields)}
+			getNewFilter={createUnionTextFilter(props.fields)}
 			emptyFilter={{
 				mode: 'matches',
 				query: '',

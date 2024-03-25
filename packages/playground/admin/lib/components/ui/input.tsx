@@ -1,7 +1,7 @@
 import { uic } from '../../../lib/utils/uic'
 
 export const Input = uic('input', {
-	baseClass: 'flex w-full border border-input bg-background m ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[invalid]:border-destructive data-[invalid]:ring-destructive',
+	baseClass: 'flex w-full border border-input bg-background ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[invalid]:border-destructive data-[invalid]:ring-destructive',
 	variants: {
 		inputSize: {
 			default: 'h-10 rounded-md p-2 text-sm',
@@ -14,6 +14,10 @@ export const Input = uic('input', {
 	displayName: 'Input',
 })
 
+export const SelectInput = uic('select', {
+	baseClass: 'flex w-full h-10 rounded-md p-2 text-sm border border-input bg-background ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[invalid]:border-destructive data-[invalid]:ring-destructive',
+	displayName: 'SelectInput',
+})
 
 export const InputLike = uic('div', {
 	baseClass: `

@@ -120,6 +120,10 @@ export const ContemberClientNames: SchemaNames = {
         },
         "views": {
           "type": "column"
+        },
+        "comments": {
+          "type": "many",
+          "entity": "GridArticleComment"
         }
       },
       "scalars": [
@@ -131,6 +135,33 @@ export const ContemberClientNames: SchemaNames = {
         "publishedAt",
         "publishDate",
         "views"
+      ]
+    },
+    "GridArticleComment": {
+      "name": "GridArticleComment",
+      "fields": {
+        "id": {
+          "type": "column"
+        },
+        "article": {
+          "type": "one",
+          "entity": "GridArticle"
+        },
+        "author": {
+          "type": "one",
+          "entity": "GridAuthor"
+        },
+        "content": {
+          "type": "column"
+        },
+        "createdAt": {
+          "type": "column"
+        }
+      },
+      "scalars": [
+        "id",
+        "content",
+        "createdAt"
       ]
     },
     "GridAuthor": {
@@ -354,6 +385,345 @@ export const ContemberClientNames: SchemaNames = {
         "id",
         "name",
         "slug"
+      ]
+    },
+    "UploadAudio": {
+      "name": "UploadAudio",
+      "fields": {
+        "id": {
+          "type": "column"
+        },
+        "url": {
+          "type": "column"
+        },
+        "duration": {
+          "type": "column"
+        },
+        "meta": {
+          "type": "one",
+          "entity": "UploadFileMetadata"
+        }
+      },
+      "scalars": [
+        "id",
+        "url",
+        "duration"
+      ]
+    },
+    "UploadFile": {
+      "name": "UploadFile",
+      "fields": {
+        "id": {
+          "type": "column"
+        },
+        "url": {
+          "type": "column"
+        },
+        "meta": {
+          "type": "one",
+          "entity": "UploadFileMetadata"
+        }
+      },
+      "scalars": [
+        "id",
+        "url"
+      ]
+    },
+    "UploadFileMetadata": {
+      "name": "UploadFileMetadata",
+      "fields": {
+        "id": {
+          "type": "column"
+        },
+        "fileName": {
+          "type": "column"
+        },
+        "lastModified": {
+          "type": "column"
+        },
+        "fileSize": {
+          "type": "column"
+        },
+        "fileType": {
+          "type": "column"
+        }
+      },
+      "scalars": [
+        "id",
+        "fileName",
+        "lastModified",
+        "fileSize",
+        "fileType"
+      ]
+    },
+    "UploadGallery": {
+      "name": "UploadGallery",
+      "fields": {
+        "id": {
+          "type": "column"
+        },
+        "items": {
+          "type": "many",
+          "entity": "UploadGalleryItem"
+        }
+      },
+      "scalars": [
+        "id"
+      ]
+    },
+    "UploadGalleryItem": {
+      "name": "UploadGalleryItem",
+      "fields": {
+        "id": {
+          "type": "column"
+        },
+        "gallery": {
+          "type": "one",
+          "entity": "UploadGallery"
+        },
+        "type": {
+          "type": "column"
+        },
+        "image": {
+          "type": "one",
+          "entity": "UploadImage"
+        },
+        "video": {
+          "type": "one",
+          "entity": "UploadVideo"
+        },
+        "audio": {
+          "type": "one",
+          "entity": "UploadAudio"
+        },
+        "file": {
+          "type": "one",
+          "entity": "UploadFile"
+        }
+      },
+      "scalars": [
+        "id",
+        "type"
+      ]
+    },
+    "UploadImage": {
+      "name": "UploadImage",
+      "fields": {
+        "id": {
+          "type": "column"
+        },
+        "url": {
+          "type": "column"
+        },
+        "width": {
+          "type": "column"
+        },
+        "height": {
+          "type": "column"
+        },
+        "alt": {
+          "type": "column"
+        },
+        "meta": {
+          "type": "one",
+          "entity": "UploadFileMetadata"
+        }
+      },
+      "scalars": [
+        "id",
+        "url",
+        "width",
+        "height",
+        "alt"
+      ]
+    },
+    "UploadImageList": {
+      "name": "UploadImageList",
+      "fields": {
+        "id": {
+          "type": "column"
+        },
+        "items": {
+          "type": "many",
+          "entity": "UploadImageListItem"
+        }
+      },
+      "scalars": [
+        "id"
+      ]
+    },
+    "UploadImageListItem": {
+      "name": "UploadImageListItem",
+      "fields": {
+        "id": {
+          "type": "column"
+        },
+        "list": {
+          "type": "one",
+          "entity": "UploadImageList"
+        },
+        "order": {
+          "type": "column"
+        },
+        "image": {
+          "type": "one",
+          "entity": "UploadImage"
+        }
+      },
+      "scalars": [
+        "id",
+        "order"
+      ]
+    },
+    "UploadList": {
+      "name": "UploadList",
+      "fields": {
+        "id": {
+          "type": "column"
+        },
+        "items": {
+          "type": "many",
+          "entity": "UploadListItem"
+        }
+      },
+      "scalars": [
+        "id"
+      ]
+    },
+    "UploadListItem": {
+      "name": "UploadListItem",
+      "fields": {
+        "id": {
+          "type": "column"
+        },
+        "list": {
+          "type": "one",
+          "entity": "UploadList"
+        },
+        "order": {
+          "type": "column"
+        },
+        "item": {
+          "type": "one",
+          "entity": "UploadMedium"
+        }
+      },
+      "scalars": [
+        "id",
+        "order"
+      ]
+    },
+    "UploadMedium": {
+      "name": "UploadMedium",
+      "fields": {
+        "id": {
+          "type": "column"
+        },
+        "type": {
+          "type": "column"
+        },
+        "image": {
+          "type": "one",
+          "entity": "UploadImage"
+        },
+        "video": {
+          "type": "one",
+          "entity": "UploadVideo"
+        },
+        "audio": {
+          "type": "one",
+          "entity": "UploadAudio"
+        },
+        "file": {
+          "type": "one",
+          "entity": "UploadFile"
+        }
+      },
+      "scalars": [
+        "id",
+        "type"
+      ]
+    },
+    "UploadRoot": {
+      "name": "UploadRoot",
+      "fields": {
+        "id": {
+          "type": "column"
+        },
+        "unique": {
+          "type": "column"
+        },
+        "image": {
+          "type": "one",
+          "entity": "UploadImage"
+        },
+        "audio": {
+          "type": "one",
+          "entity": "UploadAudio"
+        },
+        "video": {
+          "type": "one",
+          "entity": "UploadVideo"
+        },
+        "file": {
+          "type": "one",
+          "entity": "UploadFile"
+        },
+        "imageTrivial": {
+          "type": "one",
+          "entity": "UploadImage"
+        },
+        "imageList": {
+          "type": "one",
+          "entity": "UploadImageList"
+        },
+        "medium": {
+          "type": "one",
+          "entity": "UploadMedium"
+        },
+        "gallery": {
+          "type": "one",
+          "entity": "UploadGallery"
+        },
+        "list": {
+          "type": "one",
+          "entity": "UploadList"
+        }
+      },
+      "scalars": [
+        "id",
+        "unique"
+      ]
+    },
+    "UploadVideo": {
+      "name": "UploadVideo",
+      "fields": {
+        "id": {
+          "type": "column"
+        },
+        "url": {
+          "type": "column"
+        },
+        "width": {
+          "type": "column"
+        },
+        "height": {
+          "type": "column"
+        },
+        "duration": {
+          "type": "column"
+        },
+        "meta": {
+          "type": "one",
+          "entity": "UploadFileMetadata"
+        }
+      },
+      "scalars": [
+        "id",
+        "url",
+        "width",
+        "height",
+        "duration"
       ]
     }
   }

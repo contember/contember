@@ -1,10 +1,10 @@
 import * as React from 'react'
 import { Loader } from '../ui/loader'
 
-export const DataViewLoaderOverlay = () => (
+export const DataGridOverlayLoader = () => (
 	<Loader position={'absolute'} />
 )
 
-export const DataViewInitialLoader = () => (
+export const DataGridInitialLoader = () => (
 	<Loader position={'static'} />
 )

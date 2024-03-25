@@ -1,30 +1,90 @@
 import * as React from 'react'
 import { forwardRef, ReactNode, useCallback } from 'react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../../ui/tooltip'
-import { Button } from '../../ui/button'
-import { DataView, DataViewNullFilterTrigger, DataViewRelationFilterList, DataViewRelationFilterTrigger, useDataViewRelationFilterFactory, UseDataViewRelationFilterResult } from '@contember/react-dataview'
-import { Component, EntityId, SugarableQualifiedEntityList, SugaredQualifiedEntityList, useEntity } from '@contember/interface'
+import {
+	createHasManyFilter,
+	createHasOneFilter, createUnionTextFilter,
+	DataView,
+	DataViewFilter,
+	DataViewNullFilterTrigger,
+	DataViewRelationFilterList,
+	DataViewRelationFilterTrigger,
+	useDataViewRelationFilterFactory,
+	UseDataViewRelationFilterResult,
+} from '@contember/react-dataview'
+import { Component, EntityId, SugarableQualifiedEntityList, SugaredQualifiedEntityList, SugaredRelativeEntityList, SugaredRelativeSingleEntity, useEntity } from '@contember/interface'
 import { Popover, PopoverTrigger } from '../../ui/popover'
-import { DataViewActiveFilterUI, DataViewExcludeActionButtonUI, DataViewFilterActionButtonUI, DataViewFilterSelectItemUI, DataViewFilterSelectTriggerUI, DataViewSingleFilterUI } from '../ui'
-import { DataViewNullFilter } from './common'
-import { createDefaultSelectFilter, SelectListInner, SelectPopoverContent } from '../../select'
+import { DataGridActiveFilterUI, DataGridExcludeActionButtonUI, DataGridFilterActionButtonUI, DataGridFilterSelectItemUI, DataGridFilterSelectTriggerUI, DataGridSingleFilterUI } from '../ui'
+import { DataGridNullFilter } from './common'
+import { SelectDefaultFilter, SelectListInner, SelectPopoverContent } from '../../select'
 import { dict } from '../../../dict'
+import { SelectFilterFieldProps } from '@contember/react-select'
+import { getFilterName } from './utils'
+import { PartialSome } from '@contember/utilities'
 
-export const DataViewRelationFieldTooltip = ({ filter, children, actions }: { filter: string, children: ReactNode, actions?: ReactNode }) => (
+
+type DataGridRelationFilterCommonProps = {
+	name: string
+	options: SugaredQualifiedEntityList['entities']
+	children: ReactNode
+	label: ReactNode
+	filterField?: string
+}
+
+export type DataGridHasOneFilterProps =
+	& PartialSome<DataGridRelationFilterCommonProps, 'name'>
+	& {
+		field: SugaredRelativeSingleEntity['field']
+	}
+
+export const DataGridHasOneFilter = Component(({ name: nameIn, field, ...props }: DataGridHasOneFilterProps) => {
+	const name = getFilterName(nameIn, field)
+	return <DataGridRelationFilterInner name={name} {...props} />
+}, ({ name, field }) => {
+		return <DataViewFilter name={getFilterName(name, field)} filterHandler={createHasOneFilter(field)} />
+})
+
+
+export type DataGridHasManyFilterProps =
+	& PartialSome<DataGridRelationFilterCommonProps, 'name'>
+	& {
+		field: SugaredRelativeEntityList['field']
+	}
+
+export const DataGridHasManyFilter = Component(({ name: nameIn, field, ...props }: DataGridHasManyFilterProps) => {
+	const name = getFilterName(nameIn, field)
+	return <DataGridRelationFilterInner name={name} {...props} />
+}, ({ name, field }) => {
+	return <DataViewFilter name={getFilterName(name, field)} filterHandler={createHasManyFilter(field)} />
+})
+
+const DataGridRelationFilterInner = Component(({ name, options, children, label, filterField }: DataGridRelationFilterCommonProps) => {
+	return (
+		<DataGridSingleFilterUI>
+			<DataGridRelationFilterSelect name={name} options={options} label={label} filterField={filterField}>
+				{children}
+			</DataGridRelationFilterSelect>
+			<DataGridRelationFilteredItemsList name={name} options={options}>
+				{children}
+			</DataGridRelationFilteredItemsList>
+		</DataGridSingleFilterUI>
+	)
+}, () => null)
+
+
+export const DataGridRelationFieldTooltip = ({ filter, children, actions }: { filter: string, children: ReactNode, actions?: ReactNode }) => (
 	<TooltipProvider>
 		<Tooltip>
 			<TooltipTrigger asChild>
-				<Button variant={'ghost'} size={'sm'}>
-					{children}
-				</Button>
+				{children}
 			</TooltipTrigger>
 			<TooltipContent variant={'blurred'}>
 				<div className={'flex gap-1'}>
 					<DataViewRelationFilterTrigger name={filter} action={'toggleInclude'}>
-						<DataViewFilterActionButtonUI />
+						<DataGridFilterActionButtonUI />
 					</DataViewRelationFilterTrigger>
 					<DataViewRelationFilterTrigger name={filter} action={'toggleExclude'}>
-						<DataViewExcludeActionButtonUI />
+						<DataGridExcludeActionButtonUI />
 					</DataViewRelationFilterTrigger>
 					{actions}
 				</div>
@@ -33,7 +93,7 @@ export const DataViewRelationFieldTooltip = ({ filter, children, actions }: { fi
 	</TooltipProvider>
 )
 
-const DataViewRelationFilteredItemsList = ({ name, children, options }: {
+const DataGridRelationFilteredItemsList = ({ name, children, options }: {
 	name: string
 	options: SugaredQualifiedEntityList['entities']
 	children: ReactNode
@@ -41,20 +101,20 @@ const DataViewRelationFilteredItemsList = ({ name, children, options }: {
 	<>
 		<DataViewRelationFilterList name={name} options={options}>
 			<DataViewRelationFilterTrigger name={name} action={'unset'}>
-				<DataViewActiveFilterUI>
+				<DataGridActiveFilterUI>
 					{children}
-				</DataViewActiveFilterUI>
+				</DataGridActiveFilterUI>
 			</DataViewRelationFilterTrigger>
 		</DataViewRelationFilterList>
 		<DataViewNullFilterTrigger name={name} action={'unset'}>
-			<DataViewActiveFilterUI>
+			<DataGridActiveFilterUI>
 				<span className={'italic'}>{dict.datagrid.na}</span>
-			</DataViewActiveFilterUI>
+			</DataGridActiveFilterUI>
 		</DataViewNullFilterTrigger>
 	</>
 )
 
-const DataViewRelationFilterSelectItem = forwardRef<HTMLButtonElement, {
+const DataGridRelationFilterSelectItem = forwardRef<HTMLButtonElement, {
 	children: ReactNode
 	filterFactory:(value: EntityId) => UseDataViewRelationFilterResult
 }>(({ children, filterFactory, ...props }, ref) => {
@@ -68,64 +128,44 @@ const DataViewRelationFilterSelectItem = forwardRef<HTMLButtonElement, {
 	const isExcluded = current == 'exclude'
 
 	return (
-		<DataViewFilterSelectItemUI ref={ref} onExclude={exclude} onInclude={include} isExcluded={isExcluded} isIncluded={isIncluded} {...props}>
+		<DataGridFilterSelectItemUI ref={ref} onExclude={exclude} onInclude={include} isExcluded={isExcluded} isIncluded={isIncluded} {...props}>
 			{children}
-		</DataViewFilterSelectItemUI>
+		</DataGridFilterSelectItemUI>
 	)
 })
 
 
-const DataViewRelationFilterSelect = ({ name, children, options, filterField, label }: {
+const DataGridRelationFilterSelect = ({ name, children, options, filterField, label }: SelectFilterFieldProps & {
 	name: string
-	filterField?: string
 	options: string | SugarableQualifiedEntityList
 	children: ReactNode
 	label?: ReactNode
 }) => {
-	const filter = filterField ? createDefaultSelectFilter(filterField) : { filterTypes: undefined, filterToolbar: undefined }
+	const filter = filterField ? { query: createUnionTextFilter(Array.isArray(filterField) ? filterField : [filterField]) } : undefined
 	let filterFactory = useDataViewRelationFilterFactory(name)
 	return (
 		<Popover>
 			<PopoverTrigger asChild>
-				<DataViewFilterSelectTriggerUI>
+				<DataGridFilterSelectTriggerUI>
 					{label}
-				</DataViewFilterSelectTriggerUI>
+				</DataGridFilterSelectTriggerUI>
 			</PopoverTrigger>
 			<SelectPopoverContent>
-				<DataView filterTypes={filter.filterTypes} entities={options} onSelectHighlighted={it => {
-							const [, set] = filterFactory(it.id)
-							set('toggleInclude')
-				}}>
-					<SelectListInner filterToolbar={filter.filterToolbar}>
-						<DataViewRelationFilterSelectItem filterFactory={filterFactory}>
+				<DataView filterTypes={filter} entities={options} onSelectHighlighted={it => {
+					const [, set] = filterFactory(it.id)
+					set('toggleInclude')
+				}} filteringStateStorage="null" sortingStateStorage="null" currentPageStateStorage="null">
+					<SelectListInner filterToolbar={<SelectDefaultFilter />}>
+						<DataGridRelationFilterSelectItem filterFactory={filterFactory}>
 							{children}
-						</DataViewRelationFilterSelectItem>
+						</DataGridRelationFilterSelectItem>
 					</SelectListInner>
 				</DataView>
 				<div>
-					<DataViewNullFilter name={name} />
+					<DataGridNullFilter name={name} />
 				</div>
 			</SelectPopoverContent>
 		</Popover>
 	)
 }
 
-
-export const DefaultDataViewRelationFilter = Component(({ name, options, children, label, filterField }: {
-	name: string
-	options: SugaredQualifiedEntityList['entities']
-	children: ReactNode
-	label: ReactNode
-	filterField?: string
-}) => {
-	return (
-		<DataViewSingleFilterUI>
-			<DataViewRelationFilterSelect name={name} options={options} label={label} filterField={filterField}>
-				{children}
-			</DataViewRelationFilterSelect>
-			<DataViewRelationFilteredItemsList name={name} options={options}>
-				{children}
-			</DataViewRelationFilteredItemsList>
-		</DataViewSingleFilterUI>
-	)
-}, () => null)

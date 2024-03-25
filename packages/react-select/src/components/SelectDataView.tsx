@@ -1,6 +1,6 @@
-import React, { ReactNode } from 'react'
-import { useSelectHandleSelect, useSelectOptions } from '../contexts'
-import { DataViewProps, DataView } from '@contember/react-dataview'
+import React, { ReactNode, useMemo } from 'react'
+import { useSelectHandleSelect, useSelectOptions, useSelectOptionsFilter } from '../contexts'
+import { DataViewProps, DataView, DataViewFilterHandlerRegistry } from '@contember/react-dataview'
 
 export type SelectDataViewProps =
 	& Omit<DataViewProps, 'entities'>
@@ -11,7 +11,18 @@ export type SelectDataViewProps =
 export const SelectDataView = (props: SelectDataViewProps) => {
 	const handleSelect = useSelectHandleSelect()
 	const entities = useSelectOptions()
+	const filter = useSelectOptionsFilter()
+	const defaultFilterTypes = useMemo((): DataViewFilterHandlerRegistry => filter ? { query: filter } : {}, [filter])
+
 	return (
-		<DataView {...props} onSelectHighlighted={handleSelect} entities={entities} />
+		<DataView
+			filterTypes={defaultFilterTypes}
+			{...props}
+			onSelectHighlighted={handleSelect}
+			entities={entities}
+			filteringStateStorage="null"
+			sortingStateStorage="null"
+			currentPageStateStorage="null"
+		/>
 	)
 }

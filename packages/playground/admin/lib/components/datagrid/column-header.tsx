@@ -7,7 +7,7 @@ import { DataViewSelectionTrigger, DataViewSortingSwitch, DataViewSortingTrigger
 import { dict } from '../../dict'
 
 
-export function DataViewColumnHeader<TData, TValue>({ sortingField, hidingName, children }: {
+export function DataGridColumnHeader<TData, TValue>({ sortingField, hidingName, children }: {
 	sortingField?: string,
 	hidingName?: string,
 	children: ReactNode,

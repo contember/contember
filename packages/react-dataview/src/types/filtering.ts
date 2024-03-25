@@ -1,4 +1,4 @@
-import { Serializable } from '@contember/react-utils'
+import { Serializable, StateStorageOrName } from '@contember/react-utils'
 import { Environment, SugaredFilter } from '@contember/react-binding'
 import { Filter } from '@contember/binding'
 import { SetStateAction } from 'react'
@@ -32,11 +32,12 @@ export type DataViewFilterHandlerRegistry = Record<string, DataViewFilterHandler
 export type DataViewFilteringArtifacts = Record<string, DataViewFilterArtifact>
 export type DataViewFilteringState = {
 	artifact: DataViewFilteringArtifacts
-	filter: Filter
+	filter: Filter<never>
 	filterTypes: DataViewFilterHandlerRegistry
 }
 
 export type DataViewFilteringProps = {
 	filterTypes?: DataViewFilterHandlerRegistry
 	initialFilters?: DataViewFilteringArtifacts | ((stored: DataViewFilteringArtifacts) => DataViewFilteringArtifacts)
+	filteringStateStorage?: StateStorageOrName
 }

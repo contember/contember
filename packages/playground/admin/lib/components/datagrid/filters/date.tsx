@@ -1,21 +1,34 @@
 import * as React from 'react'
 import { ReactNode } from 'react'
-import {
-	DataViewDateFilterInput,
-	DataViewDateFilterResetTrigger,
-	DataViewNullFilterTrigger,
-	DateRangeFilterArtifacts,
-	useDataViewFilter,
-} from '@contember/react-dataview'
-import { Component } from '@contember/interface'
+import { createDateFilter, DataViewDateFilterInput, DataViewDateFilterResetTrigger, DataViewFilter, DataViewNullFilterTrigger, DateRangeFilterArtifacts, useDataViewFilter } from '@contember/react-dataview'
+import { Component, SugaredRelativeSingleField } from '@contember/interface'
 import { Popover, PopoverContent, PopoverTrigger } from '../../ui/popover'
-import { DataViewActiveFilterUI, DataViewFilterSelectTriggerUI, DataViewSingleFilterUI } from '../ui'
-import { DataViewNullFilter } from './common'
+import { DataGridActiveFilterUI, DataGridFilterSelectTriggerUI, DataGridSingleFilterUI } from '../ui'
 import { Input } from '../../ui/input'
 import { formatDate } from '../../../utils/formatting'
 import { dict } from '../../../dict'
+import { DataGridNullFilter } from './common'
+import { getFilterName } from './utils'
 
-const DataViewDateFilterRange = ({ name }: { name: string }) => {
+export type DataGridDateFilterProps = {
+	field: SugaredRelativeSingleField['field']
+	name?: string
+	label: ReactNode
+}
+
+export const DataGridDateFilter = Component(({ name: nameIn, field, label }: DataGridDateFilterProps) => {
+	const name = getFilterName(nameIn, field)
+	return (
+		<DataGridSingleFilterUI>
+			<DataGridDateFilterSelect name={name} label={label} />
+			<DataGridDateFilterList name={name} />
+		</DataGridSingleFilterUI>
+	)
+}, ({ name, field }) => {
+	return <DataViewFilter name={getFilterName(name, field)} filterHandler={createDateFilter(field)} />
+})
+
+const DataGridDateFilterRange = ({ name }: { name: string }) => {
 	const [artifact] = useDataViewFilter<DateRangeFilterArtifacts>(name)
 	if (!artifact) {
 		return null
@@ -33,34 +46,36 @@ const DataViewDateFilterRange = ({ name }: { name: string }) => {
 		return `≤ ${endFormatted}`
 	}
 	return undefined
+
 }
 
-const DataViewDateFilterList = ({ name }: {
+
+const DataGridDateFilterList = ({ name }: {
 	name: string
 }) => (
 	<>
 		<DataViewDateFilterResetTrigger name={name}>
-			<DataViewActiveFilterUI>
-				<DataViewDateFilterRange name={name} />
-			</DataViewActiveFilterUI>
+			<DataGridActiveFilterUI>
+				<DataGridDateFilterRange name={name} />
+			</DataGridActiveFilterUI>
 		</DataViewDateFilterResetTrigger>
 
 		<DataViewNullFilterTrigger name={name} action={'unset'}>
-			<DataViewActiveFilterUI>
+			<DataGridActiveFilterUI>
 				<span className={'italic'}>{dict.datagrid.na}</span>
-			</DataViewActiveFilterUI>
+			</DataGridActiveFilterUI>
 		</DataViewNullFilterTrigger>
 	</>
 )
 
 
-const DataViewDateFilterSelect = ({ name, label }: {
+const DataGridDateFilterSelect = ({ name, label }: {
 	name: string
 	label?: ReactNode
 }) => (
 	<Popover>
 		<PopoverTrigger asChild>
-			<DataViewFilterSelectTriggerUI>{label}</DataViewFilterSelectTriggerUI>
+			<DataGridFilterSelectTriggerUI>{label}</DataGridFilterSelectTriggerUI>
 		</PopoverTrigger>
 		<PopoverContent>
 			<div className={'relative flex flex-col gap-4'}>
@@ -75,21 +90,8 @@ const DataViewDateFilterSelect = ({ name, label }: {
 						<Input className={''} inputSize={'sm'} placeholder={dict.datagrid.dateEnd} type={'date'} />
 					</DataViewDateFilterInput>
 				</div>
-				<DataViewNullFilter name={name} />
+				<DataGridNullFilter name={name} />
 			</div>
 		</PopoverContent>
 	</Popover>
 )
-
-
-export const DefaultDataViewDateFilter = Component(({ name, label }: {
-	name: string
-	label: ReactNode
-}) => {
-	return (
-		<DataViewSingleFilterUI>
-			<DataViewDateFilterSelect name={name} label={label} />
-			<DataViewDateFilterList name={name} />
-		</DataViewSingleFilterUI>
-	)
-}, () => null)

@@ -1,27 +1,13 @@
 import * as React from 'react'
 import { ReactNode } from 'react'
-import {
-	DataViewEnumFieldTooltip,
-	DataViewRelationFieldTooltip,
-	DataViewTextFilter, DefaultDataViewBooleanFilter, DefaultDataViewDateFilter,
-	DefaultDataViewEnumFilter,
-	DefaultDataViewNumberFilter,
-	DefaultDataViewRelationFilter,
-} from './filters'
+import { DataGridBooleanFilter, DataGridDateFilter, DataGridEnumFieldTooltip, DataGridEnumFilter, DataGridHasManyFilter, DataGridHasOneFilter, DataGridNumberFilter, DataGridRelationFieldTooltip } from './filters'
 import { formatBoolean, formatDate, formatNumber } from '../../utils/formatting'
-import { DataViewColumn } from './grid'
+import { DataGridColumn } from './grid'
 import { Field, HasMany, HasOne } from '@contember/react-binding'
-import {
-	createBooleanFilter,
-	createDateFilter,
-	createEnumFilter,
-	createHasManyFilter,
-	createHasOneFilter,
-	createNumberRangeFilter,
-	createTextFilter,
-	DataViewFilterHandler,
-} from '@contember/react-dataview'
+import { createHasManyFilter, DataViewFilterHandler } from '@contember/react-dataview'
 import { SugaredQualifiedEntityList } from '@contember/interface'
+import { Button } from '../ui/button'
+import { DataGridTooltipLabel } from './ui'
 
 export interface DataViewColumnCommonArgs {
 	field: string
@@ -40,16 +26,15 @@ export type DataViewTextColumnArgs =
 		sortingField?: string
 	}
 
-export const createTextColumn = ({ field, label, ...args }: DataViewTextColumnArgs): DataViewColumn => {
-
+export const createTextColumn = ({ field, label, ...args }: DataViewTextColumnArgs): DataGridColumn => {
 	return {
+		type: 'text',
+		field,
 		filterName: field,
 		cell: <Field field={field} />,
 		header: label,
 		hidingName: field,
 		sortingField: field,
-		filterHandler: createTextFilter(field),
-		filterToolbar: <DataViewTextFilter name={field} label={label} />,
 		...args,
 	}
 }
@@ -72,35 +57,38 @@ export type DataViewHasOneColumnArgs =
 		sortingField?: string
 	}
 
-export const createHasOneColumn = ({ field, label, tooltipActions, filterOptions, valueField, value, filterLabel, filterField, filterOption, ...args }: DataViewHasOneColumnArgs): DataViewColumn => {
+export const createHasOneColumn = ({ field, label, tooltipActions, filterOptions, valueField, value, filterLabel, filterField, filterOption, ...args }: DataViewHasOneColumnArgs): DataGridColumn => {
 
 	value ??= valueField ? <Field field={valueField} /> : null
 	filterOption ??= value
 
 	return {
+		type: 'hasOne',
+		field,
 		filterName: field,
 		cell: (
-			<div className={'-mx-3'}>
+			<div>
 				<HasOne field={field}>
-					<DataViewRelationFieldTooltip filter={args.filterName ?? field} actions={tooltipActions}>
-						{value}
-					</DataViewRelationFieldTooltip>
+					<DataGridRelationFieldTooltip filter={args.filterName ?? field} actions={tooltipActions}>
+						<DataGridTooltipLabel>
+							{value}
+						</DataGridTooltipLabel>
+					</DataGridRelationFieldTooltip>
 				</HasOne>
 			</div>
 		),
 		header: label,
 		hidingName: field,
 		sortingField: valueField ? field + '.' + valueField : undefined,
-		filterHandler: createHasOneFilter(field),
 		filterToolbar: filterOptions && (
-			<DefaultDataViewRelationFilter
-				name={field}
+			<DataGridHasOneFilter
+				field={field}
 				options={filterOptions}
 				label={filterLabel ?? label}
 				filterField={filterField ?? valueField}
 			>
 				{filterOption}
-			</DefaultDataViewRelationFilter>
+			</DataGridHasOneFilter>
 		),
 		...args,
 	}
@@ -111,17 +99,21 @@ export type DataViewHasManyColumnArgs =
 	& DataViewRelationColumnArgs
 
 
-export const createHasManyColumn = ({ field, label, tooltipActions, filterOptions, valueField, value, filterLabel, filterField, filterOption, ...args }: DataViewHasManyColumnArgs): DataViewColumn => {
-	value ??= <Field field="name" />
+export const createHasManyColumn = ({ field, label, tooltipActions, filterOptions, valueField, value, filterLabel, filterField, filterOption, ...args }: DataViewHasManyColumnArgs): DataGridColumn => {
+	value ??= valueField ? <Field field={valueField} /> : null
 	filterOption ??= value
 	return {
+		type: 'hasMany',
+		field,
 		filterName: field,
 		cell: (
-			<div className={'-mx-3'}>
+			<div className={'flex flex-wrap gap-2'}>
 				<HasMany field={field}>
-					<DataViewRelationFieldTooltip filter={args.filterName ?? field} actions={tooltipActions}>
-						{value}
-					</DataViewRelationFieldTooltip>
+					<DataGridRelationFieldTooltip filter={args.filterName ?? field} actions={tooltipActions}>
+						<DataGridTooltipLabel>
+							{value}
+						</DataGridTooltipLabel>
+					</DataGridRelationFieldTooltip>
 				</HasMany>
 			</div>
 		),
@@ -129,14 +121,14 @@ export const createHasManyColumn = ({ field, label, tooltipActions, filterOption
 		hidingName: field,
 		filterHandler: createHasManyFilter(field),
 		filterToolbar: filterOptions && (
-			<DefaultDataViewRelationFilter
-				name={field}
+			<DataGridHasManyFilter
+				field={field}
 				options={filterOptions}
 				label={filterLabel ?? label}
 				filterField={filterField ?? valueField}
 			>
 				{filterOption}
-			</DefaultDataViewRelationFilter>
+			</DataGridHasManyFilter>
 		),
 		...args,
 	}
@@ -148,15 +140,16 @@ export type DataViewNumberColumnArgs =
 		sortingField?: string
 	}
 
-export const createNumberColumn = ({ field, label, ...args }: DataViewNumberColumnArgs): DataViewColumn => {
+export const createNumberColumn = ({ field, label, ...args }: DataViewNumberColumnArgs): DataGridColumn => {
 	return {
+		type: 'number',
+		field,
 		filterName: field,
 		cell: <Field field={field} format={formatNumber} />,
 		header: label,
 		hidingName: field,
 		sortingField: field,
-		filterHandler: createNumberRangeFilter(field),
-		filterToolbar: <DefaultDataViewNumberFilter name={field} label={label} />,
+		filterToolbar: <DataGridNumberFilter field={field} label={label} />,
 		...args,
 	}
 }
@@ -167,15 +160,16 @@ export type DataViewDateColumnArgs =
 		sortingField?: string
 	}
 
-export const createDateColumn = ({ field, label, ...args }: DataViewDateColumnArgs): DataViewColumn => {
+export const createDateColumn = ({ field, label, ...args }: DataViewDateColumnArgs): DataGridColumn => {
 	return {
+		type: 'date',
+		field,
 		filterName: field,
 		cell: <Field field={field} format={formatDate} />,
 		header: label,
 		hidingName: field,
 		sortingField: field,
-		filterHandler: createDateFilter(field),
-		filterToolbar: <DefaultDataViewDateFilter name={field} label={label} />,
+		filterToolbar: <DataGridDateFilter field={field} label={label} />,
 		...args,
 	}
 }
@@ -186,16 +180,17 @@ export type DataViewBooleanColumnArgs =
 		sortingField?: string
 	}
 
-export const createBooleanColumn = ({ field, label, ...args }: DataViewBooleanColumnArgs): DataViewColumn => {
+export const createBooleanColumn = ({ field, label, ...args }: DataViewBooleanColumnArgs): DataGridColumn => {
 
 	return {
+		type: 'boolean',
+		field,
 		filterName: field,
 		cell: <Field field={field} format={formatBoolean} />,
 		header: label,
 		hidingName: field,
 		sortingField: field,
-		filterHandler: createBooleanFilter(field),
-		filterToolbar: <DefaultDataViewBooleanFilter name={field} label={label} />,
+		filterToolbar: <DataGridBooleanFilter field={field} label={label} />,
 		...args,
 	}
 }
@@ -208,25 +203,28 @@ export type DataViewEnumColumnArgs =
 		filterLabel?: ReactNode
 	}
 
-export const createEnumColumn = ({ field, label, options, filterLabel, ...args }: DataViewEnumColumnArgs): DataViewColumn => {
+export const createEnumColumn = ({ field, label, options, filterLabel, ...args }: DataViewEnumColumnArgs): DataGridColumn => {
 	return {
+		type: 'enum',
+		field,
 		filterName: field,
 		cell: (
 			<div className={'-mx-3'}>
 				<Field<string> field={field} format={it => it ? (
-					<DataViewEnumFieldTooltip value={it} filter={args.filterName ?? field}>
-						{options[it]}
-					</DataViewEnumFieldTooltip>
-				) : null}
-				/>
+					<DataGridEnumFieldTooltip value={it} filter={args.filterName ?? field}>
+						<DataGridTooltipLabel>
+							{options[it]}
+						</DataGridTooltipLabel>
+					</DataGridEnumFieldTooltip>
+					) : null}
+					/>
 			</div>),
 		header: label,
 		hidingName: field,
 		sortingField: field,
-		filterHandler: createEnumFilter(field),
 		filterToolbar: (
-			<DefaultDataViewEnumFilter
-				name={field}
+			<DataGridEnumFilter
+				field={field}
 				label={filterLabel ?? label}
 				options={options}
 			/>
@@ -234,7 +232,7 @@ export const createEnumColumn = ({ field, label, options, filterLabel, ...args }
 		...args,
 	}
 }
-export const DataViewColumns = {
+export const DataGridColumns = {
 	text: createTextColumn,
 	number: createNumberColumn,
 	date: createDateColumn,

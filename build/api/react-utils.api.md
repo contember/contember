@@ -91,6 +91,9 @@ export const identityFunction: <Value>(value: Value) => Value;
 export function isNoopScopedConsole(value: unknown): boolean;
 
 // @public (undocumented)
+export const localStateStorage: StateStorage;
+
+// @public (undocumented)
 export type MaybeRef<T> = ((instance: T | null) => void) | MutableRefObject<T | null> | null | undefined;
 
 // @public (undocumented)
@@ -104,6 +107,9 @@ export function noopLogged<T>(message: string, value: T): T;
 
 // @public (undocumented)
 export const noopScopedConsole: ScopedConsoleContextType;
+
+// @public (undocumented)
+export const nullStorage: StateStorage;
 
 // @public (undocumented)
 export type Offsets = {
@@ -151,10 +157,30 @@ export type Serializable = string | number | boolean | null | readonly Serializa
 };
 
 // @public (undocumented)
+export const sessionStateStorage: StateStorage;
+
+// @public (undocumented)
 export type SetState<V extends Serializable> = (value: V | ((current: V) => V)) => void;
+
+// @public (undocumented)
+export interface StateStorage {
+    // (undocumented)
+    getItem(key: StateStorageKey): Serializable;
+    // (undocumented)
+    setItem(key: StateStorageKey, value: Serializable): void;
+}
+
+// @public (undocumented)
+export type StateStorageKey = [uniquePrefix: string, key: string];
+
+// @public (undocumented)
+export type StateStorageOrName = StateStorage | 'url' | 'session' | 'local' | 'null';
 
 // @public
 export function unwrapRefValue<T>(value: RefObjectOrElement<T>): T | null;
+
+// @public (undocumented)
+export const urlStateStorage: StateStorage;
 
 // @public (undocumented)
 export const useAbortController: () => () => AbortSignal;
@@ -242,6 +268,9 @@ export function useId(): string;
 export const useIsMounted: () => MutableRefObject<boolean>;
 
 // @public (undocumented)
+export const useLocalStorageState: <V extends Serializable>(key: StateStorageKey, initializeValue: ValueInitializer<V>) => [V, SetState<V>];
+
+// @public (undocumented)
 export const useObjectMemo: <A extends object>(value: A) => A;
 
 // @public (undocumented)
@@ -280,7 +309,10 @@ export function useScrollOffsets(refOrElement: RefObjectOrElement<HTMLElement | 
 };
 
 // @public (undocumented)
-export const useSessionStorageState: <V extends Serializable>(key: string, initializeValue: ValueInitializer<V>) => [V, SetState<V>];
+export const useSessionStorageState: <V extends Serializable>(key: StateStorageKey, initializeValue: ValueInitializer<V>) => [V, SetState<V>];
+
+// @public (undocumented)
+export const useStoredState: <V extends Serializable>(storageOrName: StateStorageOrName | StateStorageOrName[], key: StateStorageKey, initializeValue: ValueInitializer<V>) => [V, SetState<V>];
 
 // @internal
 export function useThemedClassName(componentClassName: NestedClassName, additionalClassName: NestedClassName, prefixOverride?: string | null | undefined): string;

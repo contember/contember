@@ -1,4 +1,4 @@
-import { PersistTrigger } from '@contember/interface'
+import { PersistTrigger, SugaredRelativeSingleField, useField } from '@contember/interface'
 import { Button } from '../ui/button'
 import { Loader } from '../ui/loader'
 import { ReactElement, ReactNode, useCallback, useEffect } from 'react'
@@ -105,6 +105,32 @@ export const PersistOnCmdS = () => {
 		document.body.addEventListener('keydown', listener)
 		return () => document.body.removeEventListener('keydown', listener)
 	}, [persist])
+
+	return null
+}
+
+
+export const PersistOnFieldChange = ({ field }: {
+	field: SugaredRelativeSingleField['field']
+}) => {
+	const triggerPersist = usePersist()
+	const onError = usePersistErrorHandler()
+	const getField = useField(field).getAccessor
+	useEffect(() => {
+		let persisting = false
+		return getField().addEventListener({ type: 'update' }, async field => {
+			if (persisting || field.value === field.valueOnServer) {
+				return
+			}
+			persisting = true
+			try {
+				await Promise.resolve()
+				await triggerPersist().catch(onError)
+			} finally {
+				persisting = false
+			}
+		})
+	}, [getField, onError, triggerPersist])
 
 	return null
 }

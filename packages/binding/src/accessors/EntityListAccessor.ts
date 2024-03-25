@@ -1,6 +1,6 @@
 import type { ListOperations } from '../core/operations'
 import type { Environment } from '../dao'
-import type { EntityId, EntityRealmKey } from '../treeParameters'
+import type { EntityId, EntityName, EntityRealmKey } from '../treeParameters'
 import type { AsyncBatchUpdatesOptions } from './AsyncBatchUpdatesOptions'
 import type { BatchUpdatesOptions } from './BatchUpdatesOptions'
 import type { EntityAccessor } from './EntityAccessor'
@@ -10,11 +10,13 @@ import type { PersistErrorOptions } from './PersistErrorOptions'
 import type { PersistSuccessOptions } from './PersistSuccessOptions'
 import type { EntityListState } from '../core/state'
 import { RuntimeId } from '../accessorTree'
+import { EntityListSubTreeMarker, HasManyRelationMarker } from '../markers'
 
 class EntityListAccessor implements Errorable {
 	public constructor(
 		private readonly state: EntityListState,
 		private readonly operations: ListOperations,
+		public readonly name: EntityName,
 		private readonly _children: ReadonlyMap<EntityId, { getAccessor: EntityAccessor.GetEntityAccessor }>,
 		private readonly _idsPersistedOnServer: ReadonlySet<EntityId>,
 		public readonly hasUnpersistedChanges: boolean,
@@ -132,6 +134,10 @@ class EntityListAccessor implements Errorable {
 
 	public getParent(): EntityAccessor | undefined {
 		return this.state.blueprint.parent?.getAccessor()
+	}
+
+	public getMarker(): EntityListSubTreeMarker | HasManyRelationMarker {
+		return this.state.blueprint.marker
 	}
 }
 

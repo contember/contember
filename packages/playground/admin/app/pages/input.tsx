@@ -4,6 +4,7 @@ import { CheckboxField, InputField, RadioEnumField, TextareaField } from '../../
 import * as React from 'react'
 import { Button } from '../../lib/components/ui/button'
 import { Binding, PersistButton } from '../../lib/components/binding'
+import { SelectOrTypeField } from '../../lib-extra/select-or-type-field'
 
 
 export const basic = () => <>
@@ -18,6 +19,23 @@ export const basic = () => <>
 				<InputField field={'floatValue'} label={'Float'} />
 				<InputField field={'dateValue'} label={'Date'} />
 				<InputField field={'datetimeValue'} label={'Date time'} />
+			</div>
+		</EntitySubTree>
+	</Binding>
+</>
+
+
+export const selectOrType = () => <>
+	<Binding>
+		<Slots.Actions>
+			<PersistButton />
+		</Slots.Actions>
+		<EntitySubTree entity={'InputRoot(unique=unique)'} setOnCreate={'(unique=unique)'}>
+			<div className={'space-y-4'}>
+				<SelectOrTypeField field={'textValue'} label={'Text'} options={{
+					a: 'Option A',
+					b: 'Option B',
+				}}/>
 			</div>
 		</EntitySubTree>
 	</Binding>

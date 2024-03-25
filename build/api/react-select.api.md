@@ -5,9 +5,12 @@
 ```ts
 
 import { Context } from 'react';
+import { DataViewFilterHandler } from '@contember/react-dataview';
 import { DataViewProps } from '@contember/react-dataview';
 import { EntityAccessor } from '@contember/react-binding';
+import { FieldMarker } from '@contember/react-binding';
 import { JSX as JSX_2 } from 'react/jsx-runtime';
+import { MeaningfulMarker } from '@contember/react-binding';
 import { default as React_2 } from 'react';
 import { ReactElement } from 'react';
 import { ReactNode } from 'react';
@@ -16,27 +19,28 @@ import { SugaredQualifiedEntityList } from '@contember/react-binding';
 import { SugaredRelativeEntityList } from '@contember/react-binding';
 import { SugaredRelativeSingleEntity } from '@contember/react-binding';
 import { SugaredRelativeSingleField } from '@contember/react-binding';
+import { TextFilterArtifacts } from '@contember/react-dataview';
 
 // @public (undocumented)
 export const MultiSelect: React_2.NamedExoticComponent<{
     children: ReactNode;
     field: SugaredRelativeEntityList['field'];
-    options: SugaredQualifiedEntityList['entities'];
-} & SelectEvents>;
+    options?: string | SugarableQualifiedEntityList | undefined;
+} & SelectFilterFieldProps & SelectEvents>;
 
 // @public (undocumented)
 export type MultiSelectProps = {
     children: ReactNode;
     field: SugaredRelativeEntityList['field'];
-    options: SugaredQualifiedEntityList['entities'];
-} & SelectEvents;
+    options?: SugaredQualifiedEntityList['entities'];
+} & SelectFilterFieldProps & SelectEvents;
 
 // @public (undocumented)
 export const Select: React_2.NamedExoticComponent<{
     children: ReactNode;
     field: SugaredRelativeSingleEntity['field'];
-    options: SugaredQualifiedEntityList['entities'];
-} & SelectEvents>;
+    options?: string | SugarableQualifiedEntityList | undefined;
+} & SelectFilterFieldProps & SelectEvents>;
 
 // @internal (undocumented)
 export const SelectCurrentEntitiesContext: Context<EntityAccessor[]>;
@@ -61,6 +65,11 @@ export interface SelectEvents {
     // (undocumented)
     onUnselect?: (entity: EntityAccessor) => void;
 }
+
+// @public (undocumented)
+export type SelectFilterFieldProps = {
+    filterField?: SugaredRelativeSingleField['field'] | SugaredRelativeSingleField['field'][];
+};
 
 // @public (undocumented)
 export type SelectHandler = (entity: EntityAccessor, action?: 'select' | 'unselect' | 'toggle') => void;
@@ -98,6 +107,9 @@ export type SelectOptionProps = {
 // @internal (undocumented)
 export const SelectOptionsContext: Context<string | SugarableQualifiedEntityList>;
 
+// @internal (undocumented)
+export const SelectOptionsFilterContext: Context<DataViewFilterHandler<TextFilterArtifacts> | undefined>;
+
 // @public (undocumented)
 export const SelectPlaceholder: ({ children }: {
     children: ReactNode;
@@ -107,29 +119,34 @@ export const SelectPlaceholder: ({ children }: {
 export type SelectProps = {
     children: ReactNode;
     field: SugaredRelativeSingleEntity['field'];
-    options: SugaredQualifiedEntityList['entities'];
-} & SelectEvents;
+    options?: SugaredQualifiedEntityList['entities'];
+} & SelectFilterFieldProps & SelectEvents;
 
 // @public (undocumented)
 export const SortableMultiSelect: React_2.NamedExoticComponent<{
     children: ReactNode;
     field: SugaredRelativeEntityList['field'];
-    options: SugaredQualifiedEntityList['entities'];
+    options?: string | SugarableQualifiedEntityList | undefined;
     sortableBy: SugaredRelativeSingleField['field'];
     connectAt: SugaredRelativeSingleEntity['field'];
-} & SelectEvents>;
+} & SelectFilterFieldProps & SelectEvents>;
 
 // @public (undocumented)
 export type SortableMultiSelectProps = {
     children: ReactNode;
     field: SugaredRelativeEntityList['field'];
-    options: SugaredQualifiedEntityList['entities'];
+    options?: SugaredQualifiedEntityList['entities'];
     sortableBy: SugaredRelativeSingleField['field'];
     connectAt: SugaredRelativeSingleEntity['field'];
-} & SelectEvents;
+} & SelectFilterFieldProps & SelectEvents;
 
 // @public (undocumented)
 export const useSelectCurrentEntities: () => EntityAccessor[];
+
+// @public (undocumented)
+export const useSelectFilter: ({ filterField, marker }: SelectFilterFieldProps & {
+    marker: Exclude<MeaningfulMarker, FieldMarker>;
+}) => DataViewFilterHandler<TextFilterArtifacts> | undefined;
 
 // @public (undocumented)
 export const useSelectHandleSelect: () => SelectHandler;
@@ -139,6 +156,9 @@ export const useSelectIsSelected: () => (entity: EntityAccessor) => boolean;
 
 // @public (undocumented)
 export const useSelectOptions: () => string | SugarableQualifiedEntityList;
+
+// @public (undocumented)
+export const useSelectOptionsFilter: () => DataViewFilterHandler<TextFilterArtifacts> | undefined;
 
 // (No @packageDocumentation comment for this package)
 

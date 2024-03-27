@@ -21,7 +21,7 @@ import { RepeaterSortable, RepeaterSortableDragOverlay, RepeaterSortableDropIndi
 import { Component, HasOne, SugaredQualifiedEntityList, SugaredRelativeEntityList, SugaredRelativeSingleEntity, SugaredRelativeSingleField } from '@contember/interface'
 import { SelectDataView, SelectFilterFieldProps, SelectItemTrigger, SelectOption, SelectPlaceholder, SortableMultiSelect } from '@contember/react-select'
 import { CreateEntityDialog } from './create-new'
-import { SelectDefaultFilter } from './filter'
+import { SelectDefaultFilter, SelectDefaultFilterInner } from './filter'
 
 const MultiSortableSelectDropIndicator = ({ position }: { position: 'before' | 'after' }) => (
 	<div className={cn('relative', position === 'before' ? '-translate-x-0.5' : 'translate-x-1.5')}>
@@ -94,7 +94,7 @@ export const SortableMultiSelectInput = Component<SortableMultiSelectInputProps>
 
 					<SelectPopoverContent>
 						<SelectDataView>
-							<SelectListInner filterToolbar={<SelectDefaultFilter />}>
+							<SelectListInner filterToolbar={<SelectDefaultFilterInner />}>
 								<SelectOption>
 									<SelectItemTrigger>
 										<SelectListItemUI>

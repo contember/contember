@@ -4,6 +4,7 @@ import { Slot } from '@radix-ui/react-slot'
 import { useEntity } from '@contember/react-binding'
 import { dataAttribute } from '@contember/utilities'
 import { DataViewRelationFilterCurrent, DataViewSetRelationFilterAction, useDataViewRelationFilter } from '../../../hooks'
+import { useDataViewFilterName } from '../../../contexts'
 
 
 const actionToState: Record<DataViewSetRelationFilterAction, DataViewRelationFilterCurrent> = {
@@ -15,10 +16,12 @@ const actionToState: Record<DataViewSetRelationFilterAction, DataViewRelationFil
 }
 
 export const DataViewRelationFilterTrigger = ({ name, action = 'include', ...props }: {
-	name: string
+	name?: string
 	children: ReactNode
 	action?: DataViewSetRelationFilterAction
 }) => {
+	// eslint-disable-next-line react-hooks/rules-of-hooks
+	name ??= useDataViewFilterName()
 	const entity = useEntity()
 	const [current, setFilter] = useDataViewRelationFilter(name, entity.id)
 	const toggleFilter = useCallback(() => {

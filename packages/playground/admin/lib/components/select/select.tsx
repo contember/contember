@@ -9,7 +9,7 @@ import { SelectCreateNewTrigger, SelectDefaultPlaceholderUI, SelectInputActionsU
 import { SelectListInner } from './list'
 import { Select, SelectDataView, SelectEachValue, SelectFilterFieldProps, SelectItemTrigger, SelectOption, SelectPlaceholder } from '@contember/react-select'
 import { CreateEntityDialog } from './create-new'
-import { SelectDefaultFilter } from './filter'
+import { SelectDefaultFilter, SelectDefaultFilterInner } from './filter'
 
 export type SelectInputProps =
 	& SelectFilterFieldProps
@@ -53,7 +53,7 @@ export const SelectInput = Component<SelectInputProps>(({ field, filterField, op
 					</PopoverTrigger>
 					<SelectPopoverContent>
 						<SelectDataView>
-							<SelectListInner filterToolbar={<SelectDefaultFilter/>}>
+							<SelectListInner filterToolbar={<SelectDefaultFilterInner/>}>
 								<SelectOption>
 									<SelectItemTrigger>
 										<SelectListItemUI>

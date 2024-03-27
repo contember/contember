@@ -4,7 +4,7 @@ import { MultiSelectItemContentUI, MultiSelectItemRemoveButtonUI, MultiSelectIte
 import { ChevronDownIcon } from 'lucide-react'
 import { Popover, PopoverTrigger } from '../ui/popover'
 import { Component, SugaredQualifiedEntityList, SugaredRelativeEntityList } from '@contember/interface'
-import { SelectDefaultFilter } from './filter'
+import { SelectDefaultFilter, SelectDefaultFilterInner } from './filter'
 import { SelectListInner } from './list'
 import { MultiSelect, SelectDataView, SelectEachValue, SelectFilterFieldProps, SelectItemTrigger, SelectOption, SelectPlaceholder } from '@contember/react-select'
 import { CreateEntityDialog } from './create-new'
@@ -48,7 +48,7 @@ export const MultiSelectInput = Component<MultiSelectInputProps>(({ field, filte
 					</PopoverTrigger>
 					<SelectPopoverContent>
 						<SelectDataView>
-							<SelectListInner filterToolbar={<SelectDefaultFilter />}>
+							<SelectListInner filterToolbar={<SelectDefaultFilterInner />}>
 								<SelectOption>
 									<SelectItemTrigger>
 										<SelectListItemUI>

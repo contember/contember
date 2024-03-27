@@ -3,6 +3,7 @@ import { ReactNode, useCallback } from 'react'
 import { Slot } from '@radix-ui/react-slot'
 import { dataAttribute } from '@contember/utilities'
 import { DataViewEnumFilterCurrent, DataViewSetEnumFilterAction, useDataViewEnumFilter } from '../../../hooks'
+import { useDataViewFilterName } from '../../../contexts'
 
 
 const actionToState: Record<DataViewSetEnumFilterAction, DataViewEnumFilterCurrent> = {
@@ -14,11 +15,13 @@ const actionToState: Record<DataViewSetEnumFilterAction, DataViewEnumFilterCurre
 }
 
 export const DataViewEnumFilterTrigger = ({ name, action = 'include', value, ...props }: {
-	name: string
+	name?: string
 	value: string
 	children: ReactNode
 	action?: DataViewSetEnumFilterAction
 }) => {
+	// eslint-disable-next-line react-hooks/rules-of-hooks
+	name ??= useDataViewFilterName()
 	const [current, setFilter] = useDataViewEnumFilter(name, value)
 	const toggleFilter = useCallback(() => {
 		setFilter(action)

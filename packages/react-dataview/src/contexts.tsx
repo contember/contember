@@ -12,8 +12,8 @@ import {
 	DataViewSortingState,
 	DataViewState,
 } from './types'
-import { EntityListAccessor, QualifiedEntityList } from '@contember/binding'
-import { EntityListSubTreeLoaderState } from '@contember/react-binding'
+import { EntityListAccessor, QualifiedEntityList, SugaredQualifiedEntityList } from '@contember/binding'
+import { EntityListSubTreeLoaderState, SugaredRelativeSingleField } from '@contember/react-binding'
 import * as React from 'react'
 
 
@@ -108,3 +108,15 @@ const DataViewKeyboardEventHandlerContext_ = createRequiredContext<React.Keyboar
 export const DataViewKeyboardEventHandlerContext = DataViewKeyboardEventHandlerContext_[0]
 export const useDataViewKeyboardEventHandler = DataViewKeyboardEventHandlerContext_[1]
 
+
+const DataViewFilterNameContext_ = createRequiredContext<string>('DataViewFilterName')
+/** @internal */
+export const DataViewFilterNameContext = DataViewFilterNameContext_[0]
+export const useDataViewFilterName = DataViewFilterNameContext_[1]
+
+const DataViewRelationFilterArgsContext_ = createRequiredContext<{
+	options: SugaredQualifiedEntityList['entities']
+}>('DataViewRelationFilterArgs')
+/** @internal */
+export const DataViewRelationFilterArgsContext = DataViewRelationFilterArgsContext_[0]
+export const useDataViewRelationFilterArgs = DataViewRelationFilterArgsContext_[1]

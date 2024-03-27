@@ -1,4 +1,4 @@
-import { Component, Field, HasMany, If } from '@contember/interface'
+import { Component, Field, HasMany, If, useDerivedField } from '@contember/interface'
 import { Slots } from '../../lib/components/slots'
 import { createHasManyFilter, DataView, DataViewEachRow, DataViewHasSelection } from '@contember/react-dataview'
 import {
@@ -23,6 +23,9 @@ import { Button } from '../../lib/components/ui/button'
 import { EyeIcon, LockIcon, MessageSquareIcon, SettingsIcon } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from '../../lib/components/ui/popover'
 import { DataGridToolbarVisibleFields } from '../../lib/components/datagrid/columns-hiding'
+import { useCallback } from 'react'
+
+
 
 const GridDropdown = () => (
 	<DefaultDropdown>
@@ -161,13 +164,13 @@ export const customGrid = () => (
 							<DataGridTextFilter field={'title'} />
 							<DataGridEnumFilter field={'state'} options={GridArticleStateLabels} label="State" />
 							<DataGridDateFilter field={'publishedAt'} label="Published at" />
-							<DataGridHasOneFilter field={'author'} options={'GridAuthor'} label="Author">
+							<DataGridHasOneFilter field={'author'} label="Author">
 								<Field field="name" />
 							</DataGridHasOneFilter>
-							<DataGridHasOneFilter field={'category'} options={'GridCategory'} label="Category">
+							<DataGridHasOneFilter field={'category'} label="Category">
 								<Field field="name" />
 							</DataGridHasOneFilter>
-							<DataGridHasManyFilter field={'tags'} options={'GridTag'} label="Tags">
+							<DataGridHasManyFilter field={'tags'} label="Tags">
 								<Field field="name" />
 							</DataGridHasManyFilter>
 						</div>

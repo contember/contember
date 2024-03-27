@@ -3,13 +3,16 @@ import { ReactElement, useCallback } from 'react'
 import { Slot } from '@radix-ui/react-slot'
 import { useDataViewFilter } from '../../../hooks'
 import { DateRangeFilterArtifacts } from '../../../filterTypes'
+import { useDataViewFilterName } from '../../../contexts'
 
 export type DataViewDateFilterResetTriggerProps = {
-	name: string
+	name?: string
 	children: ReactElement
 }
 
 export const DataViewDateFilterResetTrigger = ({ name, ...props }: DataViewDateFilterResetTriggerProps) => {
+	// eslint-disable-next-line react-hooks/rules-of-hooks
+	name ??= useDataViewFilterName()
 	const [state, setFilter] = useDataViewFilter<DateRangeFilterArtifacts>(name)
 	const cb = useCallback(() => {
 		setFilter(it => ({

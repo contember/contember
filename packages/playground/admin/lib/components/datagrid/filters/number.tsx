@@ -1,38 +1,41 @@
 import * as React from 'react'
 import { ReactNode } from 'react'
-import { createNumberRangeFilter, DataViewFilter, DataViewNullFilterTrigger, DataViewNumberFilterInput, DataViewNumberFilterResetTrigger, NumberRangeFilterArtifacts, useDataViewFilter } from '@contember/react-dataview'
+import {
+	DataViewNullFilterTrigger,
+	DataViewNumberFilter,
+	DataViewNumberFilterInput,
+	DataViewNumberFilterProps,
+	DataViewNumberFilterResetTrigger,
+	NumberRangeFilterArtifacts,
+	useDataViewFilter,
+	useDataViewFilterName,
+} from '@contember/react-dataview'
 import { Popover, PopoverContent, PopoverTrigger } from '../../ui/popover'
 import { DataGridActiveFilterUI, DataGridFilterSelectTriggerUI, DataGridSingleFilterUI } from '../ui'
 import { DataGridNullFilter } from './common'
 import { Input } from '../../ui/input'
 import { formatNumber } from '../../../utils/formatting'
 import { dict } from '../../../dict'
-import { Component, SugaredRelativeSingleField } from '@contember/interface'
-import { getFilterName } from './utils'
+import { Component } from '@contember/interface'
 
-export type DataGridNumberFilterProps = {
-	field: SugaredRelativeSingleField['field']
-	name?: string
-	label: ReactNode
-}
+export type DataGridNumberFilterProps =
+	& Omit<DataViewNumberFilterProps, 'children'>
+	& {
+		label: ReactNode
+	}
 
-export const DataGridNumberFilter = Component(({ name: nameIn, field, label }: DataGridNumberFilterProps) => {
-	const name = getFilterName(nameIn, field)
-	return (
-		<DataGridSingleFilterUI>
-			<DataGridNumberFilterSelect name={name} label={label} />
-			<DataGridNumberFilterList name={name} />
-		</DataGridSingleFilterUI>
-	)
-}, ({ name, field }) => {
-	return <DataViewFilter name={getFilterName(name, field)} filterHandler={createNumberRangeFilter(field)} />
-})
+export const DataGridNumberFilter = Component(({ label, ...props }: DataGridNumberFilterProps) => (
+		<DataViewNumberFilter {...props}>
+			<DataGridSingleFilterUI>
+				<DataGridNumberFilterSelect label={label} />
+				<DataGridNumberFilterList />
+			</DataGridSingleFilterUI>
+		</DataViewNumberFilter>
+	))
 
 
-const DataGridNumberFilterRange = ({ name }: {
-	name: string
-}) => {
-	const [artifact] = useDataViewFilter<NumberRangeFilterArtifacts>(name)
+const DataGridNumberFilterRange = () => {
+	const [artifact] = useDataViewFilter<NumberRangeFilterArtifacts>(useDataViewFilterName())
 	if (!artifact) {
 		return null
 	}
@@ -49,17 +52,15 @@ const DataGridNumberFilterRange = ({ name }: {
 }
 
 
-export const DataGridNumberFilterList = ({ name }: {
-	name: string
-}) => (
+export const DataGridNumberFilterList = () => (
 	<>
-		<DataViewNumberFilterResetTrigger name={name}>
+		<DataViewNumberFilterResetTrigger>
 			<DataGridActiveFilterUI>
-				<DataGridNumberFilterRange name={name} />
+				<DataGridNumberFilterRange />
 			</DataGridActiveFilterUI>
 		</DataViewNumberFilterResetTrigger>
 
-		<DataViewNullFilterTrigger name={name} action={'unset'}>
+		<DataViewNullFilterTrigger action={'unset'}>
 			<DataGridActiveFilterUI>
 				<span className={'italic'}>{dict.datagrid.na}</span>
 			</DataGridActiveFilterUI>
@@ -68,8 +69,7 @@ export const DataGridNumberFilterList = ({ name }: {
 )
 
 
-export const DataGridNumberFilterSelect = ({ name, label }: {
-	name: string
+export const DataGridNumberFilterSelect = ({ label }: {
 	label?: ReactNode
 }) => (
 	<Popover>
@@ -79,18 +79,18 @@ export const DataGridNumberFilterSelect = ({ name, label }: {
 		<PopoverContent>
 			<div className={'relative flex flex-col gap-4'}>
 				<div className={'flex justify-center items-center'}>
-					<DataViewNumberFilterInput name={name} type={'from'}>
+					<DataViewNumberFilterInput type={'from'}>
 						<Input className={''} inputSize={'sm'} placeholder={dict.datagrid.numberFrom} type={'number'} />
 					</DataViewNumberFilterInput>
 					<span className={'mx-4 font-bold '}>
 						–
 					</span>
-					<DataViewNumberFilterInput name={name} type={'to'}>
+					<DataViewNumberFilterInput type={'to'}>
 						<Input className={''} inputSize={'sm'} placeholder={dict.datagrid.numberTo} type={'number'} />
 					</DataViewNumberFilterInput>
 				</div>
 
-				<DataGridNullFilter name={name} />
+				<DataGridNullFilter />
 			</div>
 		</PopoverContent>
 	</Popover>

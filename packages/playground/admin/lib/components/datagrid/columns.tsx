@@ -45,7 +45,7 @@ export type DataViewRelationColumnArgs =
 		value?: ReactNode
 		filterOptions?: SugaredQualifiedEntityList['entities']
 		filterLabel?: ReactNode
-		filterField?: string
+		queryField?: string
 		filterOption?: ReactNode
 		tooltipActions?: ReactNode
 	}
@@ -57,7 +57,7 @@ export type DataViewHasOneColumnArgs =
 		sortingField?: string
 	}
 
-export const createHasOneColumn = ({ field, label, tooltipActions, filterOptions, valueField, value, filterLabel, filterField, filterOption, ...args }: DataViewHasOneColumnArgs): DataGridColumn => {
+export const createHasOneColumn = ({ field, label, tooltipActions, filterOptions, valueField, value, filterLabel, queryField, filterOption, ...args }: DataViewHasOneColumnArgs): DataGridColumn => {
 
 	value ??= valueField ? <Field field={valueField} /> : null
 	filterOption ??= value
@@ -85,7 +85,7 @@ export const createHasOneColumn = ({ field, label, tooltipActions, filterOptions
 				field={field}
 				options={filterOptions}
 				label={filterLabel ?? label}
-				filterField={filterField ?? valueField}
+				queryField={queryField ?? valueField}
 			>
 				{filterOption}
 			</DataGridHasOneFilter>
@@ -99,7 +99,7 @@ export type DataViewHasManyColumnArgs =
 	& DataViewRelationColumnArgs
 
 
-export const createHasManyColumn = ({ field, label, tooltipActions, filterOptions, valueField, value, filterLabel, filterField, filterOption, ...args }: DataViewHasManyColumnArgs): DataGridColumn => {
+export const createHasManyColumn = ({ field, label, tooltipActions, filterOptions, valueField, value, filterLabel, queryField, filterOption, ...args }: DataViewHasManyColumnArgs): DataGridColumn => {
 	value ??= valueField ? <Field field={valueField} /> : null
 	filterOption ??= value
 	return {
@@ -125,7 +125,7 @@ export const createHasManyColumn = ({ field, label, tooltipActions, filterOption
 				field={field}
 				options={filterOptions}
 				label={filterLabel ?? label}
-				filterField={filterField ?? valueField}
+				queryField={queryField ?? valueField}
 			>
 				{filterOption}
 			</DataGridHasManyFilter>

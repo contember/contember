@@ -4,24 +4,25 @@ import { MultiSelectItemContentUI, MultiSelectItemRemoveButtonUI, MultiSelectIte
 import { ChevronDownIcon } from 'lucide-react'
 import { Popover, PopoverTrigger } from '../ui/popover'
 import { Component, SugaredQualifiedEntityList, SugaredRelativeEntityList } from '@contember/interface'
-import { SelectDefaultFilter, SelectDefaultFilterInner } from './filter'
+import { SelectDefaultFilter } from './filter'
 import { SelectListInner } from './list'
-import { MultiSelect, SelectDataView, SelectEachValue, SelectFilterFieldProps, SelectItemTrigger, SelectOption, SelectPlaceholder } from '@contember/react-select'
+import { MultiSelect, SelectDataView, SelectEachValue, SelectItemTrigger, SelectOption, SelectPlaceholder } from '@contember/react-select'
 import { CreateEntityDialog } from './create-new'
+import { DataViewUnionFilterFields } from '@contember/react-dataview'
 
 export type MultiSelectInputProps =
-	& SelectFilterFieldProps
 	& {
 		field: SugaredRelativeEntityList['field']
 		options?: SugaredQualifiedEntityList['entities']
 		children: ReactNode
 		placeholder?: ReactNode
 		createNewForm?: ReactNode
+		queryField?: DataViewUnionFilterFields
 }
 
-export const MultiSelectInput = Component<MultiSelectInputProps>(({ field, filterField, options, children, placeholder, createNewForm }) => {
+export const MultiSelectInput = Component<MultiSelectInputProps>(({ field, queryField, options, children, placeholder, createNewForm }) => {
 	return (
-		<MultiSelect field={field} options={options} filterField={filterField}>
+		<MultiSelect field={field} options={options}>
 			<div className="flex gap-1 items-center">
 				<Popover>
 					<PopoverTrigger asChild>
@@ -47,8 +48,8 @@ export const MultiSelectInput = Component<MultiSelectInputProps>(({ field, filte
 						</SelectInputUI>
 					</PopoverTrigger>
 					<SelectPopoverContent>
-						<SelectDataView>
-							<SelectListInner filterToolbar={<SelectDefaultFilterInner />}>
+						<SelectDataView queryField={queryField}>
+							<SelectListInner filterToolbar={<SelectDefaultFilter />}>
 								<SelectOption>
 									<SelectItemTrigger>
 										<SelectListItemUI>

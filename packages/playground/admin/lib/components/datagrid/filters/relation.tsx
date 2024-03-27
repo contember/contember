@@ -9,7 +9,7 @@ import {
 	DataViewNullFilterTrigger,
 	DataViewRelationFilterList,
 	DataViewRelationFilterOptions,
-	DataViewRelationFilterTrigger,
+	DataViewRelationFilterTrigger, DataViewUnionFilterFields,
 	useDataViewFilterName,
 	useDataViewRelationFilterFactory,
 	UseDataViewRelationFilterResult,
@@ -20,7 +20,6 @@ import { DataGridActiveFilterUI, DataGridExcludeActionButtonUI, DataGridFilterAc
 import { DataGridNullFilter } from './common'
 import { SelectDefaultFilter, SelectListInner, SelectPopoverContent } from '../../select'
 import { dict } from '../../../dict'
-import { SelectFilterFieldProps } from '@contember/react-select'
 
 
 type DataGridRelationFilterInnerProps = {
@@ -128,7 +127,8 @@ const DataGridRelationFilterSelectItem = forwardRef<HTMLButtonElement, {
 })
 
 
-const DataGridRelationFilterSelect = ({ children, filterField, label }: SelectFilterFieldProps & {
+const DataGridRelationFilterSelect = ({ children, queryField, label }: {
+	queryField?: DataViewUnionFilterFields
 	children: ReactNode
 	label?: ReactNode
 }) => {
@@ -141,8 +141,8 @@ const DataGridRelationFilterSelect = ({ children, filterField, label }: SelectFi
 				</DataGridFilterSelectTriggerUI>
 			</PopoverTrigger>
 			<SelectPopoverContent>
-				<DataViewRelationFilterOptions>
-					<SelectListInner filterToolbar={filterField ? <SelectDefaultFilter filterField={filterField} /> : null}>
+				<DataViewRelationFilterOptions queryField={queryField}>
+					<SelectListInner filterToolbar={<SelectDefaultFilter />}>
 						<DataGridRelationFilterSelectItem filterFactory={filterFactory}>
 							{children}
 						</DataGridRelationFilterSelectItem>

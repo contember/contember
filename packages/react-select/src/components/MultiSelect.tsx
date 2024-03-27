@@ -1,9 +1,8 @@
 import React, { ReactNode, useCallback, useMemo } from 'react'
-import { SelectCurrentEntitiesContext, SelectHandler, SelectHandleSelectContext, SelectIsSelectedContext, SelectOptionsContext, SelectOptionsFilterContext } from '../contexts'
+import { SelectCurrentEntitiesContext, SelectHandler, SelectHandleSelectContext, SelectIsSelectedContext, SelectOptionsContext } from '../contexts'
 import { Component, EntityAccessor, HasMany, SugaredQualifiedEntityList, SugaredRelativeEntityList, useEntityList } from '@contember/react-binding'
 import { useReferentiallyStableCallback } from '@contember/react-utils'
 import { SelectEvents } from '../types'
-import { SelectFilterFieldProps, useSelectFilter } from '../hooks'
 
 export type MultiSelectProps =
 	& {
@@ -11,13 +10,11 @@ export type MultiSelectProps =
 		field: SugaredRelativeEntityList['field']
 		options?: SugaredQualifiedEntityList['entities']
 	}
-	& SelectFilterFieldProps
 	& SelectEvents
 
-export const MultiSelect = Component(({ field, children, options, onSelect, onUnselect, filterField }: MultiSelectProps) => {
+export const MultiSelect = Component(({ field, children, options, onSelect, onUnselect }: MultiSelectProps) => {
 	const entities = useEntityList({ field })
 	options ??= entities.name
-	const filter = useSelectFilter({ filterField, marker: entities.getMarker() })
 	const entitiesArr = useMemo(() => Array.from(entities), [entities])
 	const selectedEntities = useMemo(() => Array.from(entities).map(it => it.id), [entities])
 
@@ -43,9 +40,7 @@ export const MultiSelect = Component(({ field, children, options, onSelect, onUn
 			<SelectIsSelectedContext.Provider value={isSelected}>
 				<SelectHandleSelectContext.Provider value={handler}>
 					<SelectOptionsContext.Provider value={options}>
-						<SelectOptionsFilterContext.Provider value={filter}>
-							{children}
-						</SelectOptionsFilterContext.Provider>
+						{children}
 					</SelectOptionsContext.Provider>
 				</SelectHandleSelectContext.Provider>
 			</SelectIsSelectedContext.Provider>

@@ -1,5 +1,5 @@
 import React, { ReactNode, useCallback, useMemo } from 'react'
-import { SelectCurrentEntitiesContext, SelectHandler, SelectHandleSelectContext, SelectIsSelectedContext, SelectOptionsContext, SelectOptionsFilterContext } from '../contexts'
+import { SelectCurrentEntitiesContext, SelectHandler, SelectHandleSelectContext, SelectIsSelectedContext, SelectOptionsContext } from '../contexts'
 import {
 	Component,
 	EntityAccessor,
@@ -17,7 +17,6 @@ import {
 import { useReferentiallyStableCallback } from '@contember/react-utils'
 import { Repeater } from '@contember/react-repeater'
 import { SelectEvents } from '../types'
-import { SelectFilterFieldProps, useSelectFilter } from '../hooks'
 
 export type SortableMultiSelectProps =
 	& {
@@ -27,10 +26,9 @@ export type SortableMultiSelectProps =
 		sortableBy: SugaredRelativeSingleField['field']
 		connectAt: SugaredRelativeSingleEntity['field']
 	}
-	& SelectFilterFieldProps
 	& SelectEvents
 
-export const SortableMultiSelect = Component(({ field, children, sortableBy, connectAt, options, onSelect, onUnselect, filterField }: SortableMultiSelectProps) => {
+export const SortableMultiSelect = Component(({ field, children, sortableBy, connectAt, options, onSelect, onUnselect }: SortableMultiSelectProps) => {
 	const list = useEntityList({ field })
 	const entitiesArr = useMemo(() => Array.from(list), [list])
 
@@ -50,7 +48,6 @@ export const SortableMultiSelect = Component(({ field, children, sortableBy, con
 
 	options ??= optionsMarker.environment.getSubTreeNode().entity.name
 
-	const filter = useSelectFilter({ filterField, marker: optionsMarker })
 
 	const selectedEntities = useMemo(() => Array.from(list).map(it => it.getEntity({ field: connectAt }).id), [connectAt, list])
 
@@ -79,9 +76,7 @@ export const SortableMultiSelect = Component(({ field, children, sortableBy, con
 				<SelectIsSelectedContext.Provider value={isSelected}>
 					<SelectHandleSelectContext.Provider value={handler}>
 						<SelectOptionsContext.Provider value={options}>
-							<SelectOptionsFilterContext.Provider value={filter}>
-								{children}
-							</SelectOptionsFilterContext.Provider>
+							{children}
 						</SelectOptionsContext.Provider>
 					</SelectHandleSelectContext.Provider>
 				</SelectIsSelectedContext.Provider>

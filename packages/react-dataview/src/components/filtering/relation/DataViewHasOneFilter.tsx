@@ -12,16 +12,16 @@ export interface DataViewHasOneFilterProps {
 	field: SugaredRelativeSingleEntity['field']
 	name?: string
 	options?: SugaredQualifiedEntityList['entities']
-	filterField?: SugaredRelativeSingleField['field']
+	queryField?: SugaredRelativeSingleField['field']
 	children: React.ReactNode
 }
 
-export const DataViewHasOneFilter = Component< DataViewHasOneFilterProps>(({ children, filterField, field, name, options }) => {
+export const DataViewHasOneFilter = Component< DataViewHasOneFilterProps>(({ children, queryField, field, name, options }) => {
 	const nameResolved = getFilterName(name, field)
 	const optionsResolved = useDataViewHasOneFilterOptions({ options, field })
 	const args = useMemo(() => {
-		return { options: optionsResolved, filterField }
-	}, [optionsResolved, filterField])
+		return { options: optionsResolved, queryField }
+	}, [optionsResolved, queryField])
 	return (
 		<DataViewFilterNameContext.Provider value={nameResolved}>
 			<DataViewRelationFilterArgsContext.Provider value={args}>

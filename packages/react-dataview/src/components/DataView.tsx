@@ -1,31 +1,44 @@
 import { ReactNode, useState } from 'react'
-import { Component, EntityListSubTree, QueryLanguage } from '@contember/react-binding'
+import { Component, EntityListSubTree, MarkerTreeGenerator, QueryLanguage } from '@contember/react-binding'
 import { useDataView, UseDataViewArgs } from '../hooks'
 import { ControlledDataView } from './ControlledDataView'
 import { DataViewLoader } from '../internal/components/DataViewLoader'
 import { DATA_VIEW_DEFAULT_ITEMS_PER_PAGE } from '../internal/hooks/useDataViewPaging'
-import { EntityAccessor, Environment } from '@contember/binding'
+import { EntityAccessor, EntityListSubTreeMarker, Environment, FieldMarker, HasOneRelationMarker, MeaningfulMarker } from '@contember/binding'
 import { ChildrenAnalyzer, Leaf } from '@contember/react-multipass-rendering'
 import { DataViewFilter, DataViewFilterProps } from './filtering'
 import { dataViewSelectionEnvironmentExtension } from '../dataViewSelectionEnvironmentExtension'
+import { createUnionTextFilter, DataViewUnionFilterFields } from '../filterTypes'
 
 
 export type DataViewProps =
 	& {
 		children: ReactNode
 		onSelectHighlighted?: (entity: EntityAccessor) => void
+		queryField?: DataViewUnionFilterFields
 	}
 	& UseDataViewArgs
 
 export const DataView = Component<DataViewProps>((props, env) => {
 	const [filterTypes] = useState(() => {
 		const state = resolveInitialState(props, env)
-		const result = dataViewFilterAnalyzer.processChildren(
-			<EntityListSubTree entities={props.entities}>{props.children}</EntityListSubTree>,
-			env.withExtension(dataViewSelectionEnvironmentExtension, state.selection),
-		)
+		const envWithSelectionState = env.withExtension(dataViewSelectionEnvironmentExtension, state.selection)
+		const entityListSubTree = <EntityListSubTree entities={props.entities}>{props.children}</EntityListSubTree>
+		const filtersResult = dataViewFilterAnalyzer.processChildren(entityListSubTree, envWithSelectionState)
+
+		const queryField = props.queryField ?? (() => {
+			const markerTreeGenerator = new MarkerTreeGenerator(entityListSubTree, envWithSelectionState)
+			const markerTree = markerTreeGenerator.generate()
+			const marker = Array.from(markerTree.subTrees.values())[0]
+			if (!(marker instanceof EntityListSubTreeMarker)) {
+				throw new Error()
+			}
+			return extractStringFields(marker)
+		})()
+
 		return {
-			...Object.fromEntries(result.map(it => [it.name, it.filterHandler])),
+			_query: createUnionTextFilter(queryField),
+			...Object.fromEntries(filtersResult.map(it => [it.name, it.filterHandler])),
 			...props.filterTypes,
 		}
 	})
@@ -81,3 +94,20 @@ export const dataViewFilterAnalyzer = new ChildrenAnalyzer<
 	staticRenderFactoryName: 'staticRender',
 	staticContextFactoryName: 'generateEnvironment',
 })
+
+
+const extractStringFields = (marker: Exclude<MeaningfulMarker, FieldMarker>): string[] => {
+	const node = marker.environment.getSubTreeNode()
+	const textFields = []
+	for (const field of marker.fields.markers.values()) {
+		if (field instanceof FieldMarker) {
+			const columnInfo = node.entity.fields.get(field.fieldName)
+			if (columnInfo?.type === 'String') {
+				textFields.push(field.fieldName)
+			}
+		} else if (field instanceof HasOneRelationMarker) {
+			textFields.push(...extractStringFields(field).map(it => `${field.parameters.field}.${it}`))
+		}
+	}
+	return textFields
+}

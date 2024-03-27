@@ -17,6 +17,7 @@ import { Input } from '../../ui/input'
 import { formatNumber } from '../../../utils/formatting'
 import { dict } from '../../../dict'
 import { Component } from '@contember/interface'
+import { DataGridFilterMobileHiding } from './mobile'
 
 export type DataGridNumberFilterProps =
 	& Omit<DataViewNumberFilterProps, 'children'>
@@ -26,10 +27,12 @@ export type DataGridNumberFilterProps =
 
 export const DataGridNumberFilter = Component(({ label, ...props }: DataGridNumberFilterProps) => (
 		<DataViewNumberFilter {...props}>
-			<DataGridSingleFilterUI>
-				<DataGridNumberFilterSelect label={label} />
-				<DataGridNumberFilterList />
-			</DataGridSingleFilterUI>
+			<DataGridFilterMobileHiding>
+				<DataGridSingleFilterUI>
+					<DataGridNumberFilterSelect label={label} />
+					<DataGridNumberFilterList />
+				</DataGridSingleFilterUI>
+			</DataGridFilterMobileHiding>
 		</DataViewNumberFilter>
 	))
 

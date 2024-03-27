@@ -20,6 +20,7 @@ import { DataGridActiveFilterUI } from '../ui'
 import { DataGridNullFilter } from './common'
 import { dict } from '../../../dict'
 import { Component } from '@contember/interface'
+import { DataGridFilterMobileHiding } from './mobile'
 
 
 export type DataGridTextFilterProps =
@@ -30,7 +31,9 @@ export type DataGridTextFilterProps =
 
 export const DataGridTextFilter = Component(({ label, ...props }: DataGridTextFilterProps) => (
 	<DataViewTextFilter {...props}>
-		<DataGridTextFilterInner label={label} />
+		<DataGridFilterMobileHiding>
+			<DataGridTextFilterInner label={label} />
+		</DataGridFilterMobileHiding>
 	</DataViewTextFilter>
 ))
 
@@ -42,7 +45,9 @@ export type DataGridUnionTextFilterProps =
 
 export const DataGridUnionTextFilter = Component(({ label, ...props }: DataGridUnionTextFilterProps) => (
 	<DataViewUnionTextFilter {...props}>
-		<DataGridTextFilterInner label={label} />
+		<DataGridFilterMobileHiding>
+			<DataGridTextFilterInner label={label} />
+		</DataGridFilterMobileHiding>
 	</DataViewUnionTextFilter>
 ))
 

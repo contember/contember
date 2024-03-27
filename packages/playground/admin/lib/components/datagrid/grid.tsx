@@ -1,4 +1,4 @@
-import { DataView, DataViewEachRow, DataViewEmpty, DataViewFilterHandler, DataViewHasSelection, DataViewLoaderState, DataViewNonEmpty, DataViewProps, useDataViewFilteringState } from '@contember/react-dataview'
+import { DataView, DataViewEachRow, DataViewEmpty, DataViewHasSelection, DataViewLoaderState, DataViewNonEmpty, DataViewProps } from '@contember/react-dataview'
 import { FilterIcon, SettingsIcon } from 'lucide-react'
 import * as React from 'react'
 import { Fragment, ReactNode, useMemo } from 'react'
@@ -8,36 +8,36 @@ import { DataGridLayoutSwitcher } from './layout-switcher'
 import { DataGridInitialLoader, DataGridOverlayLoader } from './loader'
 import { DataGridPagination, DataGridPerPageSelector } from './pagination'
 import { DataGridTable, DataGridTableColumn } from './table'
-import { DataGridTextFilter, DataGridUnionTextFilter } from './filters'
+import { DataGridUnionTextFilter } from './filters'
 import { DataGridToolbarUI } from './ui'
 import { DataGridAutoExport } from './export'
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
 import { DataGridToolbarVisibleFields } from './columns-hiding'
 import { Component } from '@contember/interface'
 import { dataAttribute } from '@contember/utilities'
-import { cn } from '../../utils/cn'
+import { DataGridShowFiltersContext } from './filters/mobile'
 
 export type DataGridColumn =
 	& DataGridTableColumn
 	& {
-		type: 'text' | 'hasOne' | 'hasMany' | 'boolean' | 'number' | 'enum' | 'date'
-		field: string
-		filterName?: string
-		filterToolbar?: ReactNode
-	}
+	type: 'text' | 'hasOne' | 'hasMany' | 'boolean' | 'number' | 'enum' | 'date'
+	field: string
+	filterName?: string
+	filterToolbar?: ReactNode
+}
 
 export type DataGridProps =
 	& Omit<DataViewProps, 'children' | 'filterTypes'>
 	& {
-		searchFields?: string[]
-		columns: DataGridColumn[]
-		tile?: ReactNode
-		firstColumnActions?: ReactNode
-		lastColumnActions?: ReactNode
-		toolbarButtons?: ReactNode
-	}
+	searchFields?: string[]
+	columns: DataGridColumn[]
+	tile?: ReactNode
+	firstColumnActions?: ReactNode
+	lastColumnActions?: ReactNode
+	toolbarButtons?: ReactNode
+}
 
-const DataGridToolbarFilters = Component(({ columns, alwaysShow }: { columns: DataGridColumn[], alwaysShow: boolean }) => {
+const DataGridToolbarFilters = Component(({ columns }: { columns: DataGridColumn[]}) => {
 	return <>
 		{columns
 			.map(column => {
@@ -45,23 +45,14 @@ const DataGridToolbarFilters = Component(({ columns, alwaysShow }: { columns: Da
 					return null
 				}
 				return (
-					<DataGridFilterMobileHiding key={column.filterName} name={column.filterName} alwaysShow={alwaysShow}>
+					<Fragment key={column.filterName}>
 						{column.filterToolbar}
-					</DataGridFilterMobileHiding>
+					</Fragment>
 				)
-		})}
+			})}
 	</>
 })
 
-const DataGridFilterMobileHiding = ({ name, alwaysShow, children }: { name: string, alwaysShow: boolean, children: ReactNode }) => {
-	const activeFilter = useDataViewFilteringState().artifact
-	const isActive = !!activeFilter[name]
-	return (
-		<div key={name} className={alwaysShow || isActive ? 'contents' : 'hidden sm:contents'}>
-			{children}
-		</div>
-	)
-}
 
 export const DataGrid = ({ columns, tile, lastColumnActions, firstColumnActions, searchFields, toolbarButtons, ...props }: DataGridProps) => {
 	const searchFieldsResolved = useMemo(() => {
@@ -78,46 +69,45 @@ export const DataGrid = ({ columns, tile, lastColumnActions, firstColumnActions,
 			}}
 			{...props}
 		>
-			<DataGridToolbarUI>
+			<DataGridShowFiltersContext.Provider value={showFilters}>
+				<DataGridToolbarUI>
+					<div className="ml-auto flex gap-2 items-center sm:order-1">
+						<Button
+							variant={'outline'}
+							size={'sm'}
+							className={'gap-2 sm:hidden data-[active]:bg-gray-50 data-[active]:shadow-inner'}
+							data-active={dataAttribute(showFilters)}
+							onClick={() => setShowFilters(!showFilters)}
+						>
+							<FilterIcon className="w-4 h-4" /> Filters
+						</Button>
+						<Popover>
+							<PopoverTrigger>
+								<Button variant={'outline'} size={'sm'} className={'gap-2'}>
+									<SettingsIcon className={'w-4 h-4'} />
+								</Button>
+							</PopoverTrigger>
+							<PopoverContent className="w-64">
+								<div className="flex flex-col gap-2">
+									{tile && <DataGridLayoutSwitcher />}
+									<DataGridToolbarVisibleFields fields={columns.filter(it => it.hidingName).map(it => ({ header: it.header, name: it.hidingName as string }))} />
+									<DataGridPerPageSelector />
+								</div>
 
-				<div className="ml-auto flex gap-2 items-center sm:order-1">
-					<Button
-						variant={'outline'}
-						size={'sm'}
-						className={'gap-2 sm:hidden data-[active]:bg-gray-50 data-[active]:shadow-inner'}
-						data-active={dataAttribute(showFilters)}
-						onClick={() => setShowFilters(!showFilters)}
-					>
-						<FilterIcon className="w-4 h-4" /> Filters
-					</Button>
-					<Popover>
-						<PopoverTrigger>
-							<Button variant={'outline'} size={'sm'} className={'gap-2'}>
-								<SettingsIcon className={'w-4 h-4'} />
-							</Button>
-						</PopoverTrigger>
-						<PopoverContent className="w-64">
-							<div className="flex flex-col gap-2">
-								{tile && <DataGridLayoutSwitcher />}
-								<DataGridToolbarVisibleFields fields={columns.filter(it => it.hidingName).map(it => ({ header: it.header, name: it.hidingName as string }))} />
-								<DataGridPerPageSelector />
-							</div>
+							</PopoverContent>
+						</Popover>
+						<DataGridAutoExport columns={columns} />
+						{toolbarButtons}
+					</div>
 
-						</PopoverContent>
-					</Popover>
-					<DataGridAutoExport columns={columns} />
-					{toolbarButtons}
-				</div>
-
-				<div className="flex flex-wrap gap-2">
-					{searchFieldsResolved.length > 0 ? (
-						<DataGridFilterMobileHiding name="__search" alwaysShow={showFilters}>
+					<div className="flex flex-wrap gap-2">
+						{searchFieldsResolved.length > 0 ? (
 							<DataGridUnionTextFilter name={'__search'} fields={searchFieldsResolved} />
-						</DataGridFilterMobileHiding>
-					) : null}
-					<DataGridToolbarFilters columns={columns} alwaysShow={showFilters} />
-				</div>
-			</DataGridToolbarUI>
+						) : null}
+						<DataGridToolbarFilters columns={columns} />
+					</div>
+				</DataGridToolbarUI>
+			</DataGridShowFiltersContext.Provider>
 
 			<DataGridLoader>
 

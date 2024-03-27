@@ -7,6 +7,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '../../ui/popover'
 import { DataGridActiveFilterUI, DataGridExcludeActionButtonUI, DataGridFilterActionButtonUI, DataGridFilterSelectItemUI, DataGridFilterSelectTriggerUI, DataGridSingleFilterUI } from '../ui'
 import { DataGridNullFilter } from './common'
 import { dict } from '../../../dict'
+import { DataGridFilterMobileHiding } from './mobile'
 
 export type DataGridEnumFilterProps =
 	& Omit<DataViewEnumFilterProps, 'children'>
@@ -18,10 +19,12 @@ export type DataGridEnumFilterProps =
 export const DataGridEnumFilter = Component(({ options, label, ...props }: DataGridEnumFilterProps) =>
 	(
 		<DataViewEnumFilter {...props}>
-			<DataGridSingleFilterUI>
-				<DataGridEnumFilterSelect options={options} label={label} />
-				<DataGridEnumFilterList options={options} />
-			</DataGridSingleFilterUI>
+			<DataGridFilterMobileHiding>
+				<DataGridSingleFilterUI>
+					<DataGridEnumFilterSelect options={options} label={label} />
+					<DataGridEnumFilterList options={options} />
+				</DataGridSingleFilterUI>
+			</DataGridFilterMobileHiding>
 		</DataViewEnumFilter>
 	))
 

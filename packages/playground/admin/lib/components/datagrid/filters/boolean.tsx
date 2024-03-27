@@ -8,6 +8,7 @@ import { formatBoolean } from '../../../utils/formatting'
 import { Button } from '../../ui/button'
 import { dict } from '../../../dict'
 import { Component } from '@contember/interface'
+import { DataGridFilterMobileHiding } from './mobile'
 
 
 type DataGridBooleanFilterProps =
@@ -18,10 +19,12 @@ type DataGridBooleanFilterProps =
 
 export const DataGridBooleanFilter = Component(({ label, ...props }: DataGridBooleanFilterProps) => (
 	<DataViewBooleanFilter {...props}>
-		<DataGridSingleFilterUI>
-			<DataGridBooleanFilterSelect label={label} />
-			<DataGridBooleanFilterList />
-		</DataGridSingleFilterUI>
+		<DataGridFilterMobileHiding>
+			<DataGridSingleFilterUI>
+				<DataGridBooleanFilterSelect label={label} />
+				<DataGridBooleanFilterList />
+			</DataGridSingleFilterUI>
+		</DataGridFilterMobileHiding>
 	</DataViewBooleanFilter>
 ))
 

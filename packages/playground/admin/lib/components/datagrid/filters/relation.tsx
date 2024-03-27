@@ -20,6 +20,7 @@ import { DataGridActiveFilterUI, DataGridExcludeActionButtonUI, DataGridFilterAc
 import { DataGridNullFilter } from './common'
 import { SelectDefaultFilter, SelectListInner, SelectPopoverContent } from '../../select'
 import { dict } from '../../../dict'
+import { DataGridFilterMobileHiding } from './mobile'
 
 
 type DataGridRelationFilterInnerProps = {
@@ -33,9 +34,11 @@ export type DataGridHasOneFilterProps =
 
 export const DataGridHasOneFilter = Component(({ label, children, ...props }: DataGridHasOneFilterProps) => (
 	<DataViewHasOneFilter {...props}>
-		<DataGridRelationFilterInner label={label}>
-			{children}
-		</DataGridRelationFilterInner>
+		<DataGridFilterMobileHiding>
+			<DataGridRelationFilterInner label={label}>
+				{children}
+			</DataGridRelationFilterInner>
+		</DataGridFilterMobileHiding>
 	</DataViewHasOneFilter>
 ))
 
@@ -46,9 +49,11 @@ export type DataGridHasManyFilterProps =
 
 export const DataGridHasManyFilter = Component(({ label, children, ...props }: DataGridHasManyFilterProps) => (
 	<DataViewHasManyFilter {...props} >
-		<DataGridRelationFilterInner label={label}>
-			{children}
-		</DataGridRelationFilterInner>
+		<DataGridFilterMobileHiding>
+			<DataGridRelationFilterInner label={label}>
+				{children}
+			</DataGridRelationFilterInner>
+		</DataGridFilterMobileHiding>
 	</DataViewHasManyFilter>
 ))
 

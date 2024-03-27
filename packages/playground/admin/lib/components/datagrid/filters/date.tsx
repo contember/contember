@@ -8,6 +8,7 @@ import { Input } from '../../ui/input'
 import { formatDate } from '../../../utils/formatting'
 import { dict } from '../../../dict'
 import { DataGridNullFilter } from './common'
+import { DataGridFilterMobileHiding } from './mobile'
 
 export type DataGridDateFilterProps =
 	& Omit<DataViewDateFilterProps, 'children'>
@@ -17,10 +18,12 @@ export type DataGridDateFilterProps =
 
 export const DataGridDateFilter = Component(({ label, ...props }: DataGridDateFilterProps) => (
 	<DataViewDateFilter {...props}>
-		<DataGridSingleFilterUI>
-			<DataGridDateFilterSelect label={label} />
-			<DataGridDateFilterList />
-		</DataGridSingleFilterUI>
+		<DataGridFilterMobileHiding>
+			<DataGridSingleFilterUI>
+				<DataGridDateFilterSelect label={label} />
+				<DataGridDateFilterList />
+			</DataGridSingleFilterUI>
+		</DataGridFilterMobileHiding>
 	</DataViewDateFilter>
 ))
 

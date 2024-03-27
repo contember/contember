@@ -19,6 +19,8 @@ export type DataViewProps =
 	}
 	& UseDataViewArgs
 
+export const DataViewQueryFilterName = '_query'
+
 export const DataView = Component<DataViewProps>((props, env) => {
 	const [filterTypes] = useState(() => {
 		const state = resolveInitialState(props, env)
@@ -37,7 +39,7 @@ export const DataView = Component<DataViewProps>((props, env) => {
 		})()
 
 		return {
-			_query: createUnionTextFilter(queryField),
+			...(!queryField || (Array.isArray(queryField) && queryField.length === 0) ? {} : { [DataViewQueryFilterName]: createUnionTextFilter(queryField) }),
 			...Object.fromEntries(filtersResult.map(it => [it.name, it.filterHandler])),
 			...props.filterTypes,
 		}

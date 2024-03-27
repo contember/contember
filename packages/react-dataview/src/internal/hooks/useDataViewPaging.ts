@@ -3,6 +3,7 @@ import { useSessionStorageState, useStoredState } from '@contember/react-utils'
 import { DataViewPagingInfo, DataViewPagingMethods, DataViewPagingProps, DataViewPagingState } from '../../types'
 import { useDataViewTotalCount } from './useDataViewTotalCount'
 import { Filter, QualifiedEntityList } from '@contember/binding'
+import { DataViewCurrentPageStoredState, getDataViewCurrentPageStorageArgs, getDataViewPagingSettingStorageArgs } from '../stateStorage'
 
 type UseDataViewPagingArgs =
 	& {
@@ -19,19 +20,20 @@ export const useDataViewPaging = ({ dataViewKey, initialItemsPerPage, pagingSett
 	info: DataViewPagingInfo
 	methods: DataViewPagingMethods
 } => {
-	const [currentPageState, setCurrentPageState] = useStoredState<Pick<DataViewPagingState, 'pageIndex'>>(
+	const [currentPageState, setCurrentPageState] = useStoredState<DataViewCurrentPageStoredState>(
 		currentPageStateStorage ?? 'null',
-		[dataViewKey ?? 'dataview', 'currentPage'],
-		val => val ?? {
-			pageIndex: 0,
-		},
+		...getDataViewCurrentPageStorageArgs({
+			dataViewKey,
+		}),
 	)
+
 	const [pagingSettingsState, setPagingSettingsState] = useStoredState<Pick<DataViewPagingState, 'itemsPerPage'>>(
 		pagingSettingsStorage ?? 'null',
-		[dataViewKey ?? 'dataview', 'itemsPerPage'],
-		val => val ?? {
-			itemsPerPage: initialItemsPerPage ?? DATA_VIEW_DEFAULT_ITEMS_PER_PAGE,
-		},
+		...getDataViewPagingSettingStorageArgs({
+				dataViewKey,
+				initialItemsPerPage,
+			},
+		),
 	)
 
 

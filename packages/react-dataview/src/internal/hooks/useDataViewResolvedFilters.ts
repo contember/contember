@@ -1,4 +1,4 @@
-import { Filter, QualifiedEntityList } from '@contember/binding'
+import { Environment, Filter, QualifiedEntityList } from '@contember/binding'
 import { useMemo } from 'react'
 import { useEnvironment } from '@contember/react-binding'
 import { DataViewFilterHandlerRegistry, DataViewFilteringArtifacts } from '../../types'
@@ -16,7 +16,14 @@ export const useDataViewResolvedFilters = ({
 	filters,
 }: UseDataViewResolvedFiltersArgs) => {
 	const environment = useEnvironment()
-	const customFilters = useMemo((): Filter[] => {
+
+	return useMemo((): Filter<never> => {
+		return resolveFilters({ filterTypes, filters, environment, entities })
+	}, [filterTypes, filters, environment, entities])
+}
+
+
+export const resolveFilters = ({ filterTypes, filters, environment, entities }: UseDataViewResolvedFiltersArgs & { environment: Environment }): Filter<never> => {
 		const ands: Filter[] = []
 		for (const [key, value] of Object.entries(filters)) {
 			const handler = filterTypes?.[key]
@@ -29,15 +36,6 @@ export const useDataViewResolvedFilters = ({
 			}
 			ands.push(filter)
 		}
-		return ands
-	}, [environment, filters, filterTypes])
 
-	return useMemo((): Filter<never> => {
-		return resolveFilter({ and: [...customFilters, entities.filter ?? {}] })
-	}, [entities.filter, customFilters])
-}
-
-
-const resolveFilter = (input?: Filter): Filter<never> => {
-	return replaceGraphQlLiteral<unknown>(input) as Filter<never>
+		return replaceGraphQlLiteral<unknown>({ and: [...ands, entities.filter ?? {}] }) as Filter<never>
 }

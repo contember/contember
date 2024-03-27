@@ -1,6 +1,6 @@
 import { Component } from '@contember/react-binding'
 import { DataViewSelectionValue } from '../../types'
-import { dataViewSelectionEnvironmentExtension } from '../../dataViewSelectionEnvironmentExtension'
+import { dataViewSelectionEnvironmentExtension } from '../../env/dataViewSelectionEnvironmentExtension'
 import { useDataViewSelectionState } from '../../contexts'
 import { resolveCondition } from './utils'
 

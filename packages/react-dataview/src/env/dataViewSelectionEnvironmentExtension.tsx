@@ -1,5 +1,5 @@
 import { BindingError, Environment } from '@contember/react-binding'
-import { DataViewSelectionState } from './types'
+import { DataViewSelectionState } from '../types'
 
 export const dataViewSelectionEnvironmentExtension = Environment.createExtension((state: DataViewSelectionState | undefined) => {
 	if (state === undefined) {

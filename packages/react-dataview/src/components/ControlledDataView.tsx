@@ -16,7 +16,7 @@ import {
 import { Component, EntityAccessor, EnvironmentMiddleware } from '@contember/react-binding'
 import { DataViewLoader } from '../internal/components/DataViewLoader'
 import { DataViewInfo, DataViewMethods, DataViewState } from '../types'
-import { dataViewSelectionEnvironmentExtension } from '../dataViewSelectionEnvironmentExtension'
+import { dataViewSelectionEnvironmentExtension } from '../env/dataViewSelectionEnvironmentExtension'
 
 
 export type ControlledDataViewProps =

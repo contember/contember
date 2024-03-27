@@ -15,7 +15,7 @@ import {
 	DataViewSelectionStateContext,
 } from '../../contexts'
 import { DataViewState } from '../../types'
-import { dataViewSelectionEnvironmentExtension } from '../../dataViewSelectionEnvironmentExtension'
+import { dataViewSelectionEnvironmentExtension } from '../../env/dataViewSelectionEnvironmentExtension'
 import { DataViewInteractionProvider } from './DataViewInteractionProvider'
 
 export interface DataViewLoaderProps {

@@ -1,4 +1,4 @@
-import { DataView, DataViewEachRow, DataViewEmpty, DataViewHasSelection, DataViewLoaderState, DataViewNonEmpty, DataViewProps } from '@contember/react-dataview'
+import { DataView, DataViewEachRow, DataViewEmpty, DataViewFilterScope, DataViewHasFilterType, DataViewHasSelection, DataViewLoaderState, DataViewNonEmpty, DataViewProps } from '@contember/react-dataview'
 import { FilterIcon, SettingsIcon } from 'lucide-react'
 import * as React from 'react'
 import { Fragment, ReactNode, useMemo } from 'react'
@@ -8,7 +8,7 @@ import { DataGridLayoutSwitcher } from './layout-switcher'
 import { DataGridInitialLoader, DataGridOverlayLoader } from './loader'
 import { DataGridPagination, DataGridPerPageSelector } from './pagination'
 import { DataGridTable, DataGridTableColumn } from './table'
-import { DataGridUnionTextFilter } from './filters'
+import { DataGridQueryFilter, DataGridUnionTextFilter } from './filters'
 import { DataGridToolbarUI } from './ui'
 import { DataGridAutoExport } from './export'
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
@@ -29,13 +29,13 @@ export type DataGridColumn =
 export type DataGridProps =
 	& Omit<DataViewProps, 'children' | 'filterTypes'>
 	& {
-	searchFields?: string[]
-	columns: DataGridColumn[]
-	tile?: ReactNode
-	firstColumnActions?: ReactNode
-	lastColumnActions?: ReactNode
-	toolbarButtons?: ReactNode
-}
+		columns: DataGridColumn[]
+		tile?: ReactNode
+		firstColumnActions?: ReactNode
+		lastColumnActions?: ReactNode
+		toolbarButtons?: ReactNode
+		filters?: ReactNode
+	}
 
 const DataGridToolbarFilters = Component(({ columns }: { columns: DataGridColumn[]}) => {
 	return <>
@@ -54,11 +54,7 @@ const DataGridToolbarFilters = Component(({ columns }: { columns: DataGridColumn
 })
 
 
-export const DataGrid = ({ columns, tile, lastColumnActions, firstColumnActions, searchFields, toolbarButtons, ...props }: DataGridProps) => {
-	const searchFieldsResolved = useMemo(() => {
-		return searchFields ?? columns.filter(it => it.type === 'text').map(it => it.field)
-	}, [columns, searchFields])
-
+export const DataGrid = ({ columns, tile, lastColumnActions, firstColumnActions, toolbarButtons, filters, ...props }: DataGridProps) => {
 	const [showFilters, setShowFilters] = React.useState(false)
 
 	return (
@@ -101,10 +97,10 @@ export const DataGrid = ({ columns, tile, lastColumnActions, firstColumnActions,
 					</div>
 
 					<div className="flex flex-wrap gap-2">
-						{searchFieldsResolved.length > 0 ? (
-							<DataGridUnionTextFilter name={'__search'} fields={searchFieldsResolved} />
-						) : null}
-						<DataGridToolbarFilters columns={columns} />
+						{filters ?? <>
+							<DataGridQueryFilter />
+							<DataGridToolbarFilters columns={columns} />
+						</>}
 					</div>
 				</DataGridToolbarUI>
 			</DataGridShowFiltersContext.Provider>

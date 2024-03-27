@@ -4,7 +4,10 @@ import { Button } from '../../ui/button'
 import { MoreHorizontalIcon, XIcon } from 'lucide-react'
 import * as React from 'react'
 import {
+	DataViewFilterScope,
+	DataViewHasFilterType,
 	DataViewNullFilterTrigger,
+	DataViewQueryFilterName,
 	DataViewTextFilter,
 	DataViewTextFilterInput,
 	DataViewTextFilterMatchModeLabel,
@@ -49,6 +52,18 @@ export const DataGridUnionTextFilter = Component(({ label, ...props }: DataGridU
 			<DataGridTextFilterInner label={label} />
 		</DataGridFilterMobileHiding>
 	</DataViewUnionTextFilter>
+))
+
+export const DataGridQueryFilter = Component(({ label }: {
+	label?: React.ReactNode
+}) => (
+	<DataViewHasFilterType name={DataViewQueryFilterName}>
+		<DataViewFilterScope name={DataViewQueryFilterName}>
+			<DataGridFilterMobileHiding>
+				<DataGridTextFilterInner label={label} />
+			</DataGridFilterMobileHiding>
+		</DataViewFilterScope>
+	</DataViewHasFilterType>
 ))
 
 export const DataGridTextFilterInner = ({ label }: {

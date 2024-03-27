@@ -1,16 +1,19 @@
-import { Component, Field, HasMany, If, useDerivedField } from '@contember/interface'
+import { Component, Field, HasMany, If } from '@contember/interface'
 import { Slots } from '../../lib/components/slots'
 import { createHasManyFilter, DataView, DataViewEachRow, DataViewHasSelection } from '@contember/react-dataview'
 import {
 	DataGrid,
+	DataGridBooleanFilter,
 	DataGridColumns,
 	DataGridDateFilter,
 	DataGridEnumFilter,
 	DataGridHasManyFilter,
 	DataGridHasOneFilter,
 	DataGridLoader,
+	DataGridNumberFilter,
 	DataGridPagination,
 	DataGridPerPageSelector,
+	DataGridQueryFilter,
 	DataGridRelationFieldTooltip,
 	DataGridTextFilter,
 } from '../../lib/components/datagrid'
@@ -23,8 +26,6 @@ import { Button } from '../../lib/components/ui/button'
 import { EyeIcon, LockIcon, MessageSquareIcon, SettingsIcon } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from '../../lib/components/ui/popover'
 import { DataGridToolbarVisibleFields } from '../../lib/components/datagrid/columns-hiding'
-import { useCallback } from 'react'
-
 
 
 const GridDropdown = () => (
@@ -64,38 +65,96 @@ const GridTile = Component(() => (
 	</div>
 ))
 
+const filters = <>
+	<DataGridQueryFilter />
+	<DataGridEnumFilter field={'state'} options={GridArticleStateLabels} label="State" />
+	<DataGridDateFilter field={'publishedAt'} label="Published at" />
+	<DataGridHasOneFilter field={'author'} label="Author">
+		<Field field="name" />
+	</DataGridHasOneFilter>
+	<Popover>
+		<PopoverTrigger asChild>
+			<Button className="h-auto" variant={'outline'}>More filters</Button>
+		</PopoverTrigger>
+		<PopoverContent>
+			<div className="flex flex-col gap-2">
+				<DataGridHasOneFilter field={'category'} label="Category">
+					<Field field="name" />
+				</DataGridHasOneFilter>
+				<DataGridHasManyFilter field={'tags'} label="Tags">
+					<Field field="name" />
+				</DataGridHasManyFilter>
+				<DataGridHasManyFilter field={'comments.author'} label="Comment authors">
+					<Field field="name" />
+				</DataGridHasManyFilter>
+				<DataGridBooleanFilter field={'locked'} label="Locked" />
+				<DataGridNumberFilter field={'views'} label="Views" />
+			</div>
+		</PopoverContent>
+	</Popover>
+</>
+const columns = [
+	DataGridColumns.text({ field: 'title', label: 'Title' }),
+	DataGridColumns.enum({ field: 'state', label: 'State', options: GridArticleStateLabels }),
+	DataGridColumns.date({ field: 'publishedAt', label: 'Published at' }),
+	DataGridColumns.hasOne({ field: 'author', valueField: 'name', label: 'Author', filterOptions: 'GridAuthor' }),
+	DataGridColumns.hasOne({ field: 'category', valueField: 'name', label: 'Category', filterOptions: 'GridCategory' }),
+	DataGridColumns.hasMany({ field: 'tags', valueField: 'name', label: 'Tags', filterOptions: 'GridTag' }),
+	DataGridColumns.hasMany({ field: 'comments', valueField: 'author.name', label: 'Comment authors', filterOptions: 'GridAuthor', filterHandler: createHasManyFilter('comments.author'), filterOption: <Field field="name" /> }),
+	DataGridColumns.boolean({ field: 'locked', label: 'Locked' }),
+	DataGridColumns.number({ field: 'views', label: 'Views' }),
+]
 
-export default () => (
-	<>
-		<Slots.Title>
-			<h1 className="text-3xl font-semibold">
-				Articles
-			</h1>
-		</Slots.Title>
+export default () => {
+	return (
+		<>
+			<Slots.Title>
+				<h1 className="text-3xl font-semibold">
+					Articles
+				</h1>
+			</Slots.Title>
 
-		<Binding>
-			<DataGrid
-				entities="GridArticle"
-				tile={<GridTile />}
-				lastColumnActions={<GridDropdown />}
-				initialSorting={{
-					publishedAt: 'asc',
-				}}
-				columns={[
-					DataGridColumns.text({ field: 'title', label: 'Title' }),
-					DataGridColumns.enum({ field: 'state', label: 'State', options: GridArticleStateLabels }),
-					DataGridColumns.date({ field: 'publishedAt', label: 'Published at' }),
-					DataGridColumns.hasOne({ field: 'author', valueField: 'name', label: 'Author', filterOptions: 'GridAuthor' }),
-					DataGridColumns.hasOne({ field: 'category', valueField: 'name', label: 'Category', filterOptions: 'GridCategory' }),
-					DataGridColumns.hasMany({ field: 'tags', valueField: 'name', label: 'Tags', filterOptions: 'GridTag' }),
-					DataGridColumns.hasMany({ field: 'comments', valueField: 'author.name', label: 'Comment authors', filterOptions: 'GridAuthor', filterHandler: createHasManyFilter('comments.author'), filterOption: <Field field="name" /> }),
-					DataGridColumns.boolean({ field: 'locked', label: 'Locked' }),
-					DataGridColumns.number({ field: 'views', label: 'Views' }),
-				]}
-			/>
-		</Binding>
-	</>
-)
+			<Binding>
+				<DataGrid
+					entities="GridArticle"
+					tile={<GridTile />}
+					lastColumnActions={<GridDropdown />}
+					initialSorting={{
+						publishedAt: 'asc',
+					}}
+					columns={columns}
+				/>
+			</Binding>
+		</>
+	)
+}
+
+
+export const customFilters = () => {
+	return (
+		<>
+			<Slots.Title>
+				<h1 className="text-3xl font-semibold">
+					Articles
+				</h1>
+			</Slots.Title>
+
+			<Binding>
+				<DataGrid
+					entities="GridArticle"
+					tile={<GridTile />}
+					lastColumnActions={<GridDropdown />}
+					initialSorting={{
+						publishedAt: 'asc',
+					}}
+					filters={filters}
+					columns={columns}
+				/>
+			</Binding>
+		</>
+	)
+}
+
 
 const CustomGridRow = Component(() => (
 	<div className="flex px-4 py-2 border-b last:border-b-0 hover:bg-gray-50">
@@ -116,9 +175,7 @@ const CustomGridRow = Component(() => (
 						</button>
 					</DataGridRelationFieldTooltip>
 				</DataViewHasSelection>
-				<span className="text-lg font-bold">
-											<Field field="title" />
-				</span>
+				<span className="text-lg font-bold"><Field field="title" /></span>
 				<DataViewHasSelection name={'tags'}>
 					<HasMany field="tags">
 						<DataGridRelationFieldTooltip filter={'tags'}>
@@ -161,18 +218,7 @@ export const customGrid = () => (
 				<div className="rounded-md border">
 					<div className="flex gap-2 bg-gray-100 px-4 py-2 border-b items-end">
 						<div className="flex flex-wrap gap-2">
-							<DataGridTextFilter field={'title'} />
-							<DataGridEnumFilter field={'state'} options={GridArticleStateLabels} label="State" />
-							<DataGridDateFilter field={'publishedAt'} label="Published at" />
-							<DataGridHasOneFilter field={'author'} label="Author">
-								<Field field="name" />
-							</DataGridHasOneFilter>
-							<DataGridHasOneFilter field={'category'} label="Category">
-								<Field field="name" />
-							</DataGridHasOneFilter>
-							<DataGridHasManyFilter field={'tags'} label="Tags">
-								<Field field="name" />
-							</DataGridHasManyFilter>
+							{filters}
 						</div>
 						<div className="ml-auto">
 							<Popover>

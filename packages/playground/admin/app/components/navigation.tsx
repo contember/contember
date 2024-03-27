@@ -19,6 +19,7 @@ export const Navigation = () => {
 				<MenuItem icon={<GripVertical size={16} />} label={'Repeater'} to={'repeater'} />
 				<MenuItem icon={<TableIcon size={16} />} label={'Grid'}>
 					<MenuItem icon={line} label={'Grid'} to={'grid'} />
+					<MenuItem icon={line} label={'Grid custom filters'} to={'grid/customFilters'} />
 					<MenuItem icon={line} label={'Custom grid row'} to={'grid/customGrid'} />
 				</MenuItem>
 				<MenuItem icon={<FormInputIcon size={16} />} label={'Inputs'}>

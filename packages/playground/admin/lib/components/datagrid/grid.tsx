@@ -20,11 +20,11 @@ import { DataGridShowFiltersContext } from './filters/mobile'
 export type DataGridColumn =
 	& DataGridTableColumn
 	& {
-	type: 'text' | 'hasOne' | 'hasMany' | 'boolean' | 'number' | 'enum' | 'date'
-	field: string
-	filterName?: string
-	filterToolbar?: ReactNode
-}
+		type: 'text' | 'hasOne' | 'hasMany' | 'boolean' | 'number' | 'enum' | 'date'
+		field: string
+		filterName?: string
+		filterToolbar?: ReactNode
+	}
 
 export type DataGridProps =
 	& Omit<DataViewProps, 'children' | 'filterTypes'>
@@ -37,32 +37,23 @@ export type DataGridProps =
 		filters?: ReactNode
 	}
 
-const DataGridToolbarFilters = Component(({ columns }: { columns: DataGridColumn[]}) => {
-	return <>
-		{columns
-			.map(column => {
-				if (!column.filterName || !column.filterToolbar) {
-					return null
-				}
-				return (
-					<Fragment key={column.filterName}>
-						{column.filterToolbar}
-					</Fragment>
-				)
-			})}
-	</>
-})
-
+export const dataGridDefaultStorages: Partial<DataGridProps> = {
+	filteringStateStorage: 'session',
+	sortingStateStorage: 'session',
+	currentPageStateStorage: 'session',
+	selectionStateStorage: 'local',
+	pagingSettingsStorage: 'local',
+}
 
 export const DataGrid = ({ columns, tile, lastColumnActions, firstColumnActions, toolbarButtons, filters, ...props }: DataGridProps) => {
 	const [showFilters, setShowFilters] = React.useState(false)
-
 	return (
 		<DataView
 			initialSelection={{
 				layout: tile ? 'grid' : 'table',
 				...props.initialSelection,
 			}}
+			{...dataGridDefaultStorages}
 			{...props}
 		>
 			<DataGridShowFiltersContext.Provider value={showFilters}>
@@ -128,7 +119,23 @@ export const DataGrid = ({ columns, tile, lastColumnActions, firstColumnActions,
 			<DataGridPagination />
 		</DataView>
 	)
+
 }
+const DataGridToolbarFilters = Component(({ columns }: { columns: DataGridColumn[]}) => {
+	return <>
+		{columns
+			.map(column => {
+				if (!column.filterName || !column.filterToolbar) {
+					return null
+				}
+				return (
+					<Fragment key={column.filterName}>
+						{column.filterToolbar}
+					</Fragment>
+				)
+			})}
+	</>
+})
 
 
 export interface DataViewBodyProps {

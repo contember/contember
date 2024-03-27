@@ -18,7 +18,7 @@ export type UseDataViewSortingResult = {
 
 export const useDataViewSorting = ({ dataViewKey, initialSorting, sortingStateStorage, resetPage }: UseDataViewSortingArgs): UseDataViewSortingResult => {
 	const [directions, setDirections] = useStoredState<DataViewSortingState['directions']>(
-		sortingStateStorage ?? 'session',
+		sortingStateStorage ?? 'null',
 		[dataViewKey ?? 'dataview', 'orderBy'],
 		val => val ?? initialSorting ?? {},
 	)

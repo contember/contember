@@ -16,7 +16,7 @@ export type UseDataViewSelectionResult = {
 
 export const useDataViewSelection = ({ dataViewKey, initialSelection, selectionStateStorage, selectionFallback, resetPage }: UseDataViewSelectionArgs): UseDataViewSelectionResult => {
 	const [values, setValues] = useStoredState<DataViewSelectionState['values']>(
-		selectionStateStorage ?? 'local',
+		selectionStateStorage ?? 'null',
 		[dataViewKey ?? 'dataview', 'selection'],
 		val => {
 			return typeof initialSelection === 'function' ? initialSelection(val ?? {}) : val ?? initialSelection ?? {}

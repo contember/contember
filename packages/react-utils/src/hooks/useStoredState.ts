@@ -27,7 +27,7 @@ export const urlStateStorage: StateStorage = {
 	},
 }
 
-const createStateStorage = (getStorage: () => Storage): StateStorage => {
+const createStateStorageFromNativeStorage = (getStorage: () => Storage): StateStorage => {
 	return {
 		getItem(key) {
 			const value = getStorage().getItem(key.join('-'))
@@ -39,8 +39,8 @@ const createStateStorage = (getStorage: () => Storage): StateStorage => {
 	}
 }
 
-export const sessionStateStorage = createStateStorage(() => sessionStorage)
-export const localStateStorage = createStateStorage(() => localStorage)
+export const sessionStateStorage = createStateStorageFromNativeStorage(() => sessionStorage)
+export const localStateStorage = createStateStorageFromNativeStorage(() => localStorage)
 export const nullStorage: StateStorage = {
 	getItem() {
 		return null
@@ -60,10 +60,7 @@ export type StateStorageOrName = StateStorage | 'url' | 'session' | 'local' | 'n
 
 export const useStoredState = <V extends Serializable>(storageOrName: StateStorageOrName | StateStorageOrName[], key: StateStorageKey, initializeValue: ValueInitializer<V>): [V, SetState<V>] => {
 	const storage = useMemo(() => {
-		if (Array.isArray(storageOrName)) {
-			return createFallbackStorage(storageOrName)
-		}
-		return typeof storageOrName === 'string' ? builtInStorages[storageOrName] : storageOrName
+		return getStateStorage(storageOrName)
 	}, [storageOrName])
 
 	const [value, setValue] = useState<V>(() => {
@@ -90,12 +87,18 @@ export const useLocalStorageState = <V extends Serializable>(key: StateStorageKe
 	return useStoredState<V>(localStateStorage, key, initializeValue)
 }
 
+export const getStateStorage = (storageOrName: StateStorageOrName | StateStorageOrName[]) => {
+	if (Array.isArray(storageOrName)) {
+		return createFallbackStorage(storageOrName.map(it => typeof it === 'string' ? builtInStorages[it] : it))
+	}
+	return typeof storageOrName === 'string' ? builtInStorages[storageOrName] : storageOrName
+}
 
-const createFallbackStorage = <V extends Serializable>(storageTypes: StateStorageOrName[]): StateStorage => {
-	const resultStorages = storageTypes.map(it => typeof it === 'string' ? builtInStorages[it] : it)
+
+const createFallbackStorage = (storageTypes: StateStorage[]): StateStorage => {
 	return {
 		getItem(key) {
-			for (const storage of resultStorages) {
+			for (const storage of storageTypes) {
 				const value = storage.getItem(key)
 				if (value !== null) {
 					return value
@@ -104,7 +107,7 @@ const createFallbackStorage = <V extends Serializable>(storageTypes: StateStorag
 			return null
 		},
 		setItem(key, value) {
-			for (const storage of resultStorages) {
+			for (const storage of storageTypes) {
 				storage.setItem(key, value)
 			}
 		},

@@ -20,14 +20,14 @@ export const useDataViewPaging = ({ dataViewKey, initialItemsPerPage, pagingSett
 	methods: DataViewPagingMethods
 } => {
 	const [currentPageState, setCurrentPageState] = useStoredState<Pick<DataViewPagingState, 'pageIndex'>>(
-		currentPageStateStorage ?? 'session',
+		currentPageStateStorage ?? 'null',
 		[dataViewKey ?? 'dataview', 'currentPage'],
 		val => val ?? {
 			pageIndex: 0,
 		},
 	)
 	const [pagingSettingsState, setPagingSettingsState] = useStoredState<Pick<DataViewPagingState, 'itemsPerPage'>>(
-		pagingSettingsStorage ?? 'local',
+		pagingSettingsStorage ?? 'null',
 		[dataViewKey ?? 'dataview', 'itemsPerPage'],
 		val => val ?? {
 			itemsPerPage: initialItemsPerPage ?? DATA_VIEW_DEFAULT_ITEMS_PER_PAGE,

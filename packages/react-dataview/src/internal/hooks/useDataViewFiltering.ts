@@ -21,7 +21,7 @@ export type UseDataViewFilteringResult = {
 const emptyObject = {}
 export const useDataViewFiltering = ({ dataViewKey, initialFilters, filteringStateStorage, filterTypes = emptyObject, resetPage, entities }: UseDataViewFilteringArgs): UseDataViewFilteringResult => {
 	const [filters, setFilters] = useStoredState<DataViewFilteringArtifacts>(
-		filteringStateStorage ?? 'session',
+		filteringStateStorage ?? 'null',
 		[dataViewKey ?? 'dataview', 'filters'],
 		val => {
 			return typeof initialFilters === 'function' ? initialFilters(val ?? {}) : val ?? initialFilters ?? {}

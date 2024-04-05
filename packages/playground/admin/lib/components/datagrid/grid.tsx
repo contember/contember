@@ -110,11 +110,11 @@ export const DataGrid = ({ columns, tile, lastColumnActions, firstColumnActions,
 				</div>
 
 				<div className="flex flex-wrap gap-2">
-					{searchFieldsResolved.length && (
+					{searchFieldsResolved.length > 0 ? (
 						<DataGridFilterMobileHiding name="__search" alwaysShow={showFilters}>
 							<DataGridUnionTextFilter name={'__search'} fields={searchFieldsResolved} />
 						</DataGridFilterMobileHiding>
-					)}
+					) : null}
 					<DataGridToolbarFilters columns={columns} alwaysShow={showFilters} />
 				</div>
 			</DataGridToolbarUI>

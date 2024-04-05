@@ -63,52 +63,12 @@ export class S3UploadClient implements UploadClient<S3FileOptions> {
 			}
 			this.activeCount++
 
-			const uploadAdapter = signedUrl.url.startsWith('https://') ? fetchAdapter : xhrAdapter
-
-			await uploadAdapter(signedUrl, options)
+			await xhrAdapter(signedUrl, options)
 
 		} finally {
 			this.activeCount--
 			this.resolverQueue.shift()?.()
 		}
-	}
-}
-
-const fetchAdapter = async (
-	signedUrl: GenerateUploadUrlMutationBuilder.ResponseBody,
-	{ file, signal, onProgress }: UploadClientUploadArgs,
-) => {
-	const stream = createFileStream(file, progress => {
-		onProgress(progress)
-	})
-
-	try {
-		const response = await fetch(signedUrl.url, {
-			method: signedUrl.method,
-			signal: signal,
-			body: stream,
-			headers: Object.fromEntries(signedUrl.headers.map(({ key, value }) => [key, value])),
-			...({
-				duplex: 'half',
-			}),
-		})
-		if (!response.ok) {
-			throw new UploaderError({
-				type: 'httpError',
-			})
-		}
-	} catch (e: any) {
-		if (e instanceof UploaderError) {
-			throw e
-		}
-		if (e.name === 'AbortError') {
-			throw new UploaderError({
-				type: 'aborted',
-			})
-		}
-		throw new UploaderError({
-			type: 'networkError',
-		})
 	}
 }
 
@@ -192,34 +152,4 @@ const createBatchSignedUrlGenerator = (client: GraphQlClient) => {
 		}
 		return (await uploadUrlBatchResult)[`url_${index}`]
 	}
-}
-
-const createFileStream = (file: File, onProgress: (progress: FileUploadProgress) => void) => {
-	const totalSize = file.size
-	let uploadedSize = 0
-	return new ReadableStream({
-		start(controller) {
-			const reader = file.stream().getReader()
-			read()
-
-			function read() {
-				reader.read().then(({ done, value }) => {
-					if (done) {
-						controller.close()
-						return
-					}
-					controller.enqueue(value)
-					uploadedSize += value.byteLength
-					onProgress({
-						progress: uploadedSize / totalSize,
-						uploadedBytes: uploadedSize,
-						totalBytes: totalSize,
-					})
-					read()
-				}).catch(error => {
-					controller.error(error)
-				})
-			}
-		},
-	})
 }

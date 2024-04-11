@@ -3,7 +3,7 @@ import { ReactNode, useEffect } from 'react'
 import { EnvironmentExtensionProvider } from '@contember/react-binding'
 import { useFetchIdentity } from '../hooks'
 import { IdentityContext, IdentityMethodsContext, IdentityStateContext } from '../internal/contexts'
-import { identityEnvironmentExtension } from '../environment/IdentityEnvironmentExtension'
+import { identityEnvironmentExtension } from '../environment'
 
 
 export interface IdentityProviderProps {
@@ -15,16 +15,19 @@ export const IdentityProvider: React.FC<IdentityProviderProps> = ({ children }) 
 	const [{ identity, state }, methods] = useFetchIdentity()
 
 	const { refreshIdentity, clearIdentity } = methods
-	useEffect(
-		() => {
-			if (sessionToken !== undefined) {
-				refreshIdentity()
-			} else {
-				clearIdentity()
-			}
-		},
-		[sessionToken, refreshIdentity, clearIdentity],
-	)
+	useEffect(() => {
+		if (sessionToken !== undefined) {
+			refreshIdentity()
+		}
+	}, [sessionToken, refreshIdentity])
+
+
+	const hasIdentity = identity !== undefined
+	useEffect(() => {
+		if (sessionToken === undefined && hasIdentity) {
+			clearIdentity()
+		}
+	}, [sessionToken, clearIdentity, hasIdentity])
 
 	return (
 		<IdentityStateContext.Provider value={state}>

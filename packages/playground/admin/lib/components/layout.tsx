@@ -9,7 +9,7 @@ import { LogoutTrigger } from '@contember/react-identity'
 import { dict } from '../dict'
 import { useCurrentRequest } from '@contember/interface'
 
-const LayoutBodyUI = uic('div', { baseClass: 'bg-gray-50 h-full min-h-screen relative py-4' })
+const LayoutBodyUI = uic('div', { baseClass: 'bg-gray-50 h-full min-h-screen relative py-4 pl-[calc(100vw-100%)]' })
 const LayoutMaxWidthUI = uic('div', { baseClass: 'max-w-[100rem] mx-auto' })
 const LayoutBoxUI = uic('div', { baseClass: 'rounded-xl shadow-lg border bg-white gap-1 flex flex-col lg:flex-row mt-4 relative min-h-[calc(100vh-10rem)]' })
 

@@ -1,6 +1,6 @@
-import { SchemaDefinition as def, AclDefinition as acl } from '@contember/schema-definition'
+import { c } from '@contember/schema-definition'
 
-@def.Unique('title')
+@c.Unique('title')
 export class Article {
-	title = def.stringColumn()
+	title = c.stringColumn()
 }

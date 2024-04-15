@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { ReactNode } from 'react'
-import { createNumberFilter, DataViewFilter, DataViewNullFilterTrigger, DataViewNumberFilterInput, DataViewNumberFilterResetTrigger, NumberRangeFilterArtifacts, useDataViewFilter } from '@contember/react-dataview'
+import { createNumberRangeFilter, DataViewFilter, DataViewNullFilterTrigger, DataViewNumberFilterInput, DataViewNumberFilterResetTrigger, NumberRangeFilterArtifacts, useDataViewFilter } from '@contember/react-dataview'
 import { Popover, PopoverContent, PopoverTrigger } from '../../ui/popover'
 import { DataGridActiveFilterUI, DataGridFilterSelectTriggerUI, DataGridSingleFilterUI } from '../ui'
 import { DataGridNullFilter } from './common'
@@ -25,7 +25,7 @@ export const DataGridNumberFilter = Component(({ name: nameIn, field, label }: D
 		</DataGridSingleFilterUI>
 	)
 }, ({ name, field }) => {
-	return <DataViewFilter name={getFilterName(name, field)} filterHandler={createNumberFilter(field)} />
+	return <DataViewFilter name={getFilterName(name, field)} filterHandler={createNumberRangeFilter(field)} />
 })
 
 

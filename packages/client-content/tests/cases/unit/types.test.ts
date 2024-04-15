@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { assertType, describe, expectTypeOf, test } from 'vitest'
+import { assertType, describe, expect, expectTypeOf, test } from 'vitest'
 import { ContentClientInput } from '../../../src'
-import { ContemberClientEntities, FragmentOf, queryBuilder } from '../../client'
+import { ContemberClientEntities, FragmentOf, FragmentType, queryBuilder } from '../../client'
 
 const qb = queryBuilder
 describe('ts types', () => {
@@ -69,5 +69,76 @@ describe('ts types', () => {
 			// @ts-expect-error
 			filter: where,
 		}, it => it.$$())
+	})
+
+	test('has one field on fragment type', async () => {
+		const fragment = qb.fragment('Post', it => it.$('author', it => it.$$().$('posts', it => it.$('id'))))
+		type fragmentType = FragmentType<typeof fragment>
+		expectTypeOf<fragmentType>().toEqualTypeOf<{ author: ({ id: string; name: string | null; email: string | null; } & { posts: { id: string; }[]; }) | null; }>()
+	})
+
+
+	test('has one without arg', async () => {
+		qb.list('Post', {}, it => it.$('author', it => it.$$()))
+	})
+
+	test('has one with arg', async () => {
+		qb.list('Post', {}, it => it.$('author', { filter: { name: { eq: 'John' } } }, it => it.$$()))
+	})
+
+	test('has one with invalid arg', async () => {
+		qb.list('Post', {}, it => it
+			.$('author',
+				// @ts-expect-error
+				{ filter: { foo: { eq: 'xx' } } },
+				it => it.$$(),
+			),
+		)
+	})
+
+	test('has many without arg', async () => {
+		qb.list('Post', {}, it => it.$('locales', it => it.$$()))
+	})
+
+	test('has many with arg', async () => {
+		qb.list('Post', {}, it => it.$('locales', { filter: { locale: { code: { eq: 'cs' } } } },  it => it.$$()))
+	})
+
+	test('has many with invalid arg', async () => {
+		qb.list('Post', {}, it => it
+			.$('locales',
+				// @ts-expect-error
+				{ filter: { locale: { eq: 'cs' } } },
+				it => it.$$(),
+			),
+		)
+	})
+
+	test('reduced has may', async () => {
+		qb.list('Post', {}, it => it.$('localesByLocale', { by: { locale: { code: 'cs' } } },  it => it.$$()))
+	})
+
+	test('reduced has may - invalid "by"', async () => {
+		qb.list('Post',
+			{},
+				it => it
+					.$('localesByLocale',
+						// @ts-expect-error
+						{ by: { locale: {} } },
+						qb.fragment('PostLocale'),
+					),
+		)
+	})
+
+
+	test('invalid field', async () => {
+		expect(() => {
+			qb.list(
+				'Post',
+				{},
+				// @ts-expect-error
+				it => it.$('lorem', it => it.$$()),
+			)
+		}).toThrow('Field Post.lorem does not exist.')
 	})
 })

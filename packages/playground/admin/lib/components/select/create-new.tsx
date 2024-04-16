@@ -1,32 +1,34 @@
 import * as React from 'react'
 import { ReactElement, ReactNode } from 'react'
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogFooter, AlertDialogTrigger } from '../ui/dialog'
 import { Button } from '../ui/button'
 import { SelectItemTrigger, SelectNewItem } from '@contember/react-select'
 import { dict } from '../../../lib/dict'
+import { Dialog, DialogClose, DialogContent, DialogFooter, DialogTrigger } from '../ui/dialog'
 
 
 export const CreateEntityDialog = ({ trigger, children }: { trigger: ReactElement, children: ReactNode }) => {
 	return (
-		<AlertDialog>
-			<AlertDialogTrigger asChild>
+		<Dialog>
+			<DialogTrigger asChild>
 				{trigger}
-			</AlertDialogTrigger>
-			<AlertDialogContent>
+			</DialogTrigger>
+			<DialogContent>
 				<SelectNewItem>
 					{children}
-					<AlertDialogFooter>
-						<AlertDialogCancel>{dict.select.cancelNew}</AlertDialogCancel>
-						<AlertDialogAction asChild>
+					<DialogFooter>
+						<DialogClose asChild>
+							<Button variant="outline">{dict.select.cancelNew}</Button>
+						</DialogClose>
+						<DialogClose asChild>
 							<SelectItemTrigger>
 								<Button>{dict.select.confirmNew}</Button>
 							</SelectItemTrigger>
-						</AlertDialogAction>
-					</AlertDialogFooter>
+						</DialogClose>
+					</DialogFooter>
 
 				</SelectNewItem>
-			</AlertDialogContent>
-		</AlertDialog>
+			</DialogContent>
+		</Dialog>
 	)
 }
 

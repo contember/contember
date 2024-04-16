@@ -8,7 +8,7 @@ import {
 	AlertDialogHeader,
 	AlertDialogTitle,
 	AlertDialogTrigger,
-} from '../ui/dialog'
+} from '../ui/alert-dialog'
 import { Button } from '../ui/button'
 import * as React from 'react'
 import { ReactElement } from 'react'

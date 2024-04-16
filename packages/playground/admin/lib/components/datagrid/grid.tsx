@@ -98,21 +98,21 @@ export const DataGrid = ({ columns, tile, lastColumnActions, firstColumnActions,
 
 			<DataGridLoader>
 
-				<DataViewHasSelection name={'layout'} value={'table'}>
+				<DataViewHasLayout layout={'table'}>
 					<DataGridTable
 						columns={columns}
 						firstColumnActions={firstColumnActions}
 						lastColumnActions={lastColumnActions}
 					/>
-				</DataViewHasSelection>
+				</DataViewHasLayout>
 
-				<DataViewHasSelection name={'layout'} value={'grid'}>
+				<DataViewHasLayout layout={'grid'}>
 					<div className="grid grid-cols-2 md:grid-cols-4 gap-4">
 						<DataViewEachRow>
 							{tile}
 						</DataViewEachRow>
 					</div>
-				</DataViewHasSelection>
+				</DataViewHasLayout>
 
 			</DataGridLoader>
 

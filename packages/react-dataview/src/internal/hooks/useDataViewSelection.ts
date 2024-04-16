@@ -15,7 +15,7 @@ export type UseDataViewSelectionResult = {
 	methods: DataViewSelectionMethods
 }
 
-export const useDataViewSelection = ({ dataViewKey, initialSelection, selectionStateStorage, selectionFallback, resetPage }: UseDataViewSelectionArgs): UseDataViewSelectionResult => {
+export const useDataViewSelection = ({ dataViewKey, initialSelection, selectionStateStorage, resetPage }: UseDataViewSelectionArgs): UseDataViewSelectionResult => {
 	const [values, setValues] = useStoredState<DataViewSelectionStoredState>(
 		selectionStateStorage ?? 'null',
 		...getDataViewSelectionStorageArgs({
@@ -24,19 +24,41 @@ export const useDataViewSelection = ({ dataViewKey, initialSelection, selectionS
 		}),
 	)
 
-	const setSelection = useCallback<DataViewSelectionMethods['setSelection']>((key, value) => {
+	const setLayout = useCallback<DataViewSelectionMethods['setLayout']>(value => {
 		let didBailOut = false
 
 		setValues(current => {
-			const existingValue = current[key]
+			const existingValue = current.layout
 			const resolvedValue = typeof value === 'function' ? value(existingValue) : value
 
 			if (existingValue === resolvedValue) {
 				didBailOut = true
 				return current
 			}
-			const { [key]: _, ...rest } = current
-			return resolvedValue === undefined ? rest : { ...rest, [key]: resolvedValue }
+			return { ...current, layout: resolvedValue }
+		})
+		if (!didBailOut) {
+			resetPage()
+		}
+	}, [resetPage, setValues])
+
+	const setVisibility = useCallback<DataViewSelectionMethods['setVisibility']>((key, visible) => {
+		let didBailOut = false
+		setValues(current => {
+			const existingValue = current.visibility?.[key]
+			const resolvedValue = typeof visible === 'function' ? visible(existingValue) : visible
+
+			if (existingValue === resolvedValue) {
+				didBailOut = true
+				return current
+			}
+			return {
+				...current,
+				visibility: {
+					...current.visibility,
+					[key]: resolvedValue,
+				},
+			}
 		})
 		if (!didBailOut) {
 			resetPage()
@@ -44,16 +66,12 @@ export const useDataViewSelection = ({ dataViewKey, initialSelection, selectionS
 	}, [resetPage, setValues])
 
 	return {
-		state: useMemo((): DataViewSelectionState => {
-			return {
-				values,
-				fallback: selectionFallback === undefined ? true : selectionFallback,
-			}
-		}, [selectionFallback, values]),
+		state: values,
 		methods: useMemo((): DataViewSelectionMethods => {
 			return {
-				setSelection,
+				setLayout,
+				setVisibility,
 			}
-		}, [setSelection]),
+		}, [setLayout, setVisibility]),
 	}
 }

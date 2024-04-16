@@ -77,19 +77,13 @@ const resolveInitialState = (props: DataViewProps, env: Environment) => {
 			orderBy: resolveOrderBy({ directions: sortingStorage, environment: env }),
 			directions: sortingStorage,
 		},
-		selection: {
-			values: selectionStorage,
-			fallback: props.selectionFallback === undefined ? true : props.selectionFallback,
-		},
+		selection: selectionStorage,
 	}
 }
 
 
 const getFilterTypes = (props: DataViewProps, env: Environment) => {
-	const selectionState = {
-		values: props.initialSelection && typeof props.initialSelection !== 'function' ? props.initialSelection : {},
-		fallback: props.selectionFallback === undefined ? true : props.selectionFallback,
-	}
+	const selectionState = props.initialSelection && typeof props.initialSelection !== 'function' ? props.initialSelection : {}
 	const envWithSelectionState = env.withExtension(dataViewSelectionEnvironmentExtension, selectionState)
 	const entityListSubTree = <EntityListSubTree entities={props.entities}>{props.children}</EntityListSubTree>
 	const filtersResult = dataViewFilterAnalyzer.processChildren(entityListSubTree, envWithSelectionState)

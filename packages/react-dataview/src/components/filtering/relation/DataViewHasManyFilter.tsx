@@ -1,4 +1,4 @@
-import { Component, QueryLanguage, SugaredQualifiedEntityList, SugaredRelativeEntityList, SugaredRelativeSingleField, useEnvironment } from '@contember/react-binding'
+import { Component, QueryLanguage, SugaredQualifiedEntityList, SugaredRelativeEntityList, useEnvironment } from '@contember/react-binding'
 import * as React from 'react'
 import { useMemo } from 'react'
 import { DataViewFilterNameContext, DataViewRelationFilterArgsContext } from '../../../contexts'
@@ -11,16 +11,15 @@ export interface DataViewHasManyFilterProps {
 	field: SugaredRelativeEntityList['field']
 	name?: string
 	options?: SugaredQualifiedEntityList['entities']
-	queryField?: SugaredRelativeSingleField['field']
 	children: React.ReactNode
 }
 
-export const DataViewHasManyFilter = Component<DataViewHasManyFilterProps>(({ field, queryField, children, options, name }) => {
+export const DataViewHasManyFilter = Component<DataViewHasManyFilterProps>(({ field, children, options, name }) => {
 	const nameResolved = getFilterName(name, field)
 	const optionsResolved = useDataViewHasManyFilterOptions({ options, field })
 	const args = useMemo(() => {
-		return { options: optionsResolved, queryField }
-	}, [optionsResolved, queryField])
+		return { options: optionsResolved }
+	}, [optionsResolved])
 	return (
 		<DataViewFilterNameContext.Provider value={nameResolved}>
 			<DataViewRelationFilterArgsContext.Provider value={args}>

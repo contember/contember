@@ -3,7 +3,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 import { DataGridColumnHeader } from './column-header'
 import * as React from 'react'
 import { ReactNode } from 'react'
-import { DataViewEachRow, DataViewHasSelection } from '@contember/react-dataview'
+import { DataViewEachRow, DataViewIsVisible } from '@contember/react-dataview'
 
 export type DataGridTableColumn = {
 	header: ReactNode
@@ -28,13 +28,13 @@ export const DataGridTable = Component(({ columns, firstColumnActions, lastColum
 						</TableHead>}
 
 						{Object.entries(columns).map(([key, { header, hidingName, sortingField }]) => (
-							<DataViewHasSelection name={hidingName ?? key} key={key}>
+							<DataViewIsVisible name={hidingName ?? key} key={key}>
 								<TableHead className={'text-center'}>
 									<DataGridColumnHeader hidingName={hidingName ?? key} sortingField={sortingField}>
 										{header}
 									</DataGridColumnHeader>
 								</TableHead>
-							</DataViewHasSelection>
+							</DataViewIsVisible>
 						))}
 
 						{lastColumnActions && <TableHead align={'right'}>
@@ -48,11 +48,11 @@ export const DataGridTable = Component(({ columns, firstColumnActions, lastColum
 								{firstColumnActions}
 							</TableCell>}
 							{Object.entries(columns).map(([key, { cell, hidingName }]) => (
-								<DataViewHasSelection name={hidingName ?? key} key={key}>
+								<DataViewIsVisible name={hidingName ?? key} key={key}>
 									<TableCell>
 										{cell}
 									</TableCell>
-								</DataViewHasSelection>
+								</DataViewIsVisible>
 							))}
 							{lastColumnActions && <TableCell align={'right'}>
 								{lastColumnActions}

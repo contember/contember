@@ -40,7 +40,7 @@ export const getDataViewFilteringStorageArgs = ({ dataViewKey, initialFilters }:
 	]
 }
 
-export type DataViewSelectionStoredState = DataViewSelectionState['values']
+export type DataViewSelectionStoredState = DataViewSelectionState
 export const getDataViewSelectionStorageArgs = ({ dataViewKey, initialSelection }: {
 	dataViewKey?: string
 	initialSelection?: DataViewSelectionProps['initialSelection']

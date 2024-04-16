@@ -3,7 +3,6 @@ import { ComponentType, Fragment, ReactNode } from 'react'
 import { DataGridColumnProps, DataGridFilterArtifact } from '../types'
 import { DataViewLoaderState, dataViewSelectionEnvironmentExtension } from '@contember/react-dataview'
 import { ControlledDataGridProps } from './createControlledDataGrid'
-import { getHidingKey } from '../internal/hiding'
 
 export const createDataGridRenderer = <ColumnProps extends {}, ContainerProps extends {}>({ Fallback, Container, staticRender, columnStaticRender }: {
 	Fallback: ComponentType<{ children?: ReactNode }>
@@ -20,11 +19,11 @@ export const createDataGridRenderer = <ColumnProps extends {}, ContainerProps ex
 		</>
 	)
 }, (props, env) => {
-	const selection = env.getExtension(dataViewSelectionEnvironmentExtension).values
+	const selection = env.getExtension(dataViewSelectionEnvironmentExtension).visibility ?? {}
 	return <>
 		{staticRender && staticRender(props as any)}
 		{Array.from(props.columns)
-			.filter(([key]) => !selection[getHidingKey(key)])
+			.filter(([key]) => selection[key] !== false)
 			.map(([key, props]) => (
 				<Fragment key={key}>
 					{columnStaticRender && columnStaticRender({ column: props })}

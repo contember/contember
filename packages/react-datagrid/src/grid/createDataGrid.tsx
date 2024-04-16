@@ -47,7 +47,8 @@ const dummyStateMethods: DataGridMethods = {
 		setItemsPerPage: () => null,
 	},
 	selection: {
-		setSelection: () => null,
+		setLayout: () => null,
+		setVisibility: () => null,
 	},
 }
 
@@ -67,8 +68,6 @@ const createInitialState = (props: DataGridProps<{}>, environment: Environment):
 			filterTypes: {},
 		},
 		selection: {
-			values: {
-			},
 		},
 		sorting: {
 			orderBy: [],

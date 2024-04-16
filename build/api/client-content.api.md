@@ -452,6 +452,16 @@ export type TransactionResult<V> = {
 };
 
 // @public (undocumented)
+export type TypedColumnArgs<TAlias extends string | null = null> = {
+    as?: TAlias;
+};
+
+// @public (undocumented)
+export type TypedColumnParams<TAlias extends string | null = null> = [
+args: TypedColumnArgs<TAlias>
+] | [];
+
+// @public (undocumented)
 export type TypedContentEntitySelectionOrCallback<TSchema extends SchemaTypeLike, TEntityName extends keyof TSchema['entities'] & string, TValue> = TypedEntitySelection<TSchema, TEntityName, TSchema['entities'][TEntityName], TValue> | TypedEntitySelectionCallback<TSchema, TEntityName, TSchema['entities'][TEntityName], TValue>;
 
 // @public (undocumented)
@@ -491,44 +501,8 @@ export interface TypedEntitySelection<TSchema extends SchemaTypeLike, TEntityNam
         [key in keyof TEntity['columns']]: TEntity['columns'][key];
     }>;
     // (undocumented)
-    $<TKey extends (keyof TEntity['columns']) & string, TAlias extends string | null = null>(name: TKey, args?: {
-        as?: TAlias;
-    }): TypedEntitySelection<TSchema, TEntityName, TEntity, TValue & {
-        [key in TAlias extends null ? TKey : TAlias]: TEntity['columns'][key];
-    }>;
-    // (undocumented)
-    $<TNestedValue, TNestedKey extends keyof TEntity['hasMany'] & string, TAlias extends string | null = null>(name: TNestedKey, args: ContentClientInput.HasManyRelationInput<TEntity['hasMany'][TNestedKey]> & {
-        as?: TAlias;
-    }, fields: TypedEntitySelectionCallback<TSchema, TEntity['hasMany'][TNestedKey]['name'], TEntity['hasMany'][TNestedKey], TNestedValue> | TypedEntitySelection<TSchema, TEntity['hasMany'][TNestedKey]['name'], TEntity['hasMany'][TNestedKey], TNestedValue>): TypedEntitySelection<TSchema, TEntityName, TEntity, TValue & {
-        [key in TAlias extends null ? TNestedKey : TAlias]: TNestedValue[];
-    }>;
-    // (undocumented)
-    $<TNestedValue, TNestedKey extends keyof TEntity['hasMany'] & string, TAlias extends string | null = null>(name: TNestedKey, fields: TypedEntitySelectionCallback<TSchema, TEntity['hasMany'][TNestedKey]['name'], TEntity['hasMany'][TNestedKey], TNestedValue> | TypedEntitySelection<TSchema, TEntity['hasMany'][TNestedKey]['name'], TEntity['hasMany'][TNestedKey], TNestedValue>): TypedEntitySelection<TSchema, TEntityName, TEntity, TValue & {
-        [key in TAlias extends null ? TNestedKey : TAlias]: TNestedValue[];
-    }>;
-    // (undocumented)
-    $<TNestedValue, TNestedKey extends keyof TEntity['hasManyBy'] & string, TAlias extends string | null = null>(name: TNestedKey, args: ContentClientInput.HasManyByRelationInput<TEntity['hasManyBy'][TNestedKey]['entity'], TEntity['hasManyBy'][TNestedKey]['by']> & {
-        as?: TAlias;
-    }, fields: TypedEntitySelectionCallback<TSchema, TEntity['hasManyBy'][TNestedKey]['entity']['name'], TEntity['hasManyBy'][TNestedKey]['entity'], TNestedValue> | TypedEntitySelection<TSchema, TEntity['hasManyBy'][TNestedKey]['entity']['name'], TEntity['hasManyBy'][TNestedKey]['entity'], TNestedValue>): TypedEntitySelection<TSchema, TEntityName, TEntity, TValue & {
-        [key in TAlias extends null ? TNestedKey : TAlias]: null | TNestedValue;
-    }>;
-    // (undocumented)
-    $<TNestedValue, TNestedKey extends keyof TEntity['hasManyBy'] & string, TAlias extends string | null = null>(name: TNestedKey, fields: TypedEntitySelectionCallback<TSchema, TEntity['hasManyBy'][TNestedKey]['entity']['name'], TEntity['hasManyBy'][TNestedKey]['entity'], TNestedValue> | TypedEntitySelection<TSchema, TEntity['hasManyBy'][TNestedKey]['entity']['name'], TEntity['hasManyBy'][TNestedKey]['entity'], TNestedValue>): TypedEntitySelection<TSchema, TEntityName, TEntity, TValue & {
-        [key in TAlias extends null ? TNestedKey : TAlias]: null | TNestedValue;
-    }>;
-    // (undocumented)
-    $<TNestedValue extends {
-        [K in string]: unknown;
-    }, TNestedKey extends keyof TEntity['hasOne'] & string, TAlias extends string | null = null>(name: TNestedKey, args: ContentClientInput.HasOneRelationInput<TEntity['hasOne'][TNestedKey]> & {
-        as?: TAlias;
-    }, fields: TypedEntitySelectionCallback<TSchema, TEntity['hasOne'][TNestedKey]['name'], TEntity['hasOne'][TNestedKey], TNestedValue> | TypedEntitySelection<TSchema, TEntity['hasOne'][TNestedKey]['name'], TEntity['hasOne'][TNestedKey], TNestedValue>): TypedEntitySelection<TSchema, TEntityName, TEntity, TValue & {
-        [key in TAlias extends null ? TNestedKey : TAlias]: TNestedValue | null;
-    }>;
-    // (undocumented)
-    $<TNestedValue extends {
-        [K in string]: unknown;
-    }, TNestedKey extends keyof TEntity['hasOne'] & string, TAlias extends string | null = null>(name: TNestedKey, fields: TypedEntitySelectionCallback<TSchema, TEntity['hasOne'][TNestedKey]['name'], TEntity['hasOne'][TNestedKey], TNestedValue> | TypedEntitySelection<TSchema, TEntity['hasOne'][TNestedKey]['name'], TEntity['hasOne'][TNestedKey], TNestedValue>): TypedEntitySelection<TSchema, TEntityName, TEntity, TValue & {
-        [key in TAlias extends null ? TNestedKey : TAlias]: TNestedValue | null;
+    $<TNestedValue, TKey extends (keyof TEntity['columns'] | keyof TEntity['hasMany'] | keyof TEntity['hasManyBy'] | keyof TEntity['hasOne']) & string, TAlias extends string | null = null>(name: TKey, ...args: TypedEntitySelectionParams<TSchema, TEntity, TKey, TNestedValue, TAlias>): TypedEntitySelection<TSchema, TEntityName, TEntity, TValue & {
+        [key in TAlias extends null ? TKey : TAlias]: TypedEntitySelectionResult<TEntity, TKey, TNestedValue>;
     }>;
     // @internal (undocumented)
     readonly context: ContentEntitySelectionContext<TEntityName>;
@@ -536,6 +510,58 @@ export interface TypedEntitySelection<TSchema extends SchemaTypeLike, TEntityNam
 
 // @public (undocumented)
 export type TypedEntitySelectionCallback<TSchema extends SchemaTypeLike, EntityName extends string, TEntity extends EntityTypeLike, TValue> = (select: TypedEntitySelection<TSchema, EntityName, TEntity, {}>) => TypedEntitySelection<TSchema, EntityName, TEntity, TValue>;
+
+// @public (undocumented)
+export type TypedEntitySelectionParams<TSchema extends SchemaTypeLike, TEntity extends EntityTypeLike, TKey extends string, TNestedValue, TAlias extends string | null = null> = TKey extends keyof TEntity['columns'] ? TypedColumnParams<TAlias> : TKey extends keyof TEntity['hasMany'] ? TypedHasManyParams<TSchema, TEntity, TKey, TNestedValue, TAlias> : TKey extends keyof TEntity['hasManyBy'] ? TypedHasManyByParams<TSchema, TEntity, TKey, TNestedValue, TAlias> : TKey extends keyof TEntity['hasOne'] ? TypedHasOneParams<TSchema, TEntity, TKey, TNestedValue, TAlias> : never;
+
+// @public (undocumented)
+export type TypedEntitySelectionResult<TEntity extends EntityTypeLike, TKey extends string, TValue> = TKey extends keyof TEntity['columns'] ? TEntity['columns'][TKey] : TKey extends keyof TEntity['hasMany'] ? TValue[] : TKey extends keyof TEntity['hasManyBy'] ? null | TValue : TKey extends keyof TEntity['hasOne'] ? null | TValue : never;
+
+// @public (undocumented)
+export type TypedHasManyArgs<TEntity extends EntityTypeLike, TKey extends keyof TEntity['hasMany'] & string, TAlias extends string | null = null> = ContentClientInput.HasManyRelationInput<TEntity['hasMany'][TKey]> & {
+    as?: TAlias;
+};
+
+// @public (undocumented)
+export type TypedHasManyByArgs<TEntity extends EntityTypeLike, TKey extends keyof TEntity['hasManyBy'] & string, TAlias extends string | null = null> = ContentClientInput.HasManyByRelationInput<TEntity['hasManyBy'][TKey]['entity'], TEntity['hasManyBy'][TKey]['by']> & {
+    as?: TAlias;
+};
+
+// @public (undocumented)
+export type TypedHasManyByFields<TSchema extends SchemaTypeLike, TEntity extends EntityTypeLike, TKey extends keyof TEntity['hasManyBy'] & string, TNestedValue> = TypedEntitySelectionCallback<TSchema, TEntity['hasManyBy'][TKey]['entity']['name'], TEntity['hasManyBy'][TKey]['entity'], TNestedValue> | TypedEntitySelection<TSchema, TEntity['hasManyBy'][TKey]['entity']['name'], TEntity['hasManyBy'][TKey]['entity'], TNestedValue>;
+
+// @public (undocumented)
+export type TypedHasManyByParams<TSchema extends SchemaTypeLike, TEntity extends EntityTypeLike, TKey extends keyof TEntity['hasManyBy'] & string, TNestedValue, TAlias extends string | null = null> = [
+args: TypedHasManyByArgs<TEntity, TKey, TAlias>,
+fields: TypedHasManyByFields<TSchema, TEntity, TKey, TNestedValue>
+];
+
+// @public (undocumented)
+export type TypedHasManyFields<TSchema extends SchemaTypeLike, TEntity extends EntityTypeLike, TKey extends keyof TEntity['hasMany'] & string, TNestedValue> = TypedEntitySelectionCallback<TSchema, TEntity['hasMany'][TKey]['name'], TEntity['hasMany'][TKey], TNestedValue> | TypedEntitySelection<TSchema, TEntity['hasMany'][TKey]['name'], TEntity['hasMany'][TKey], TNestedValue>;
+
+// @public (undocumented)
+export type TypedHasManyParams<TSchema extends SchemaTypeLike, TEntity extends EntityTypeLike, TKey extends keyof TEntity['hasMany'] & string, TNestedValue, TAlias extends string | null = null> = [
+args: TypedHasManyArgs<TEntity, TKey, TAlias>,
+fields: TypedHasManyFields<TSchema, TEntity, TKey, TNestedValue>
+] | [
+fields: TypedHasManyFields<TSchema, TEntity, TKey, TNestedValue>
+];
+
+// @public (undocumented)
+export type TypedHasOneArgs<TEntity extends EntityTypeLike, TKey extends keyof TEntity['hasOne'] & string, TAlias extends string | null = null> = ContentClientInput.HasOneRelationInput<TEntity['hasOne'][TKey]> & {
+    as?: TAlias;
+};
+
+// @public (undocumented)
+export type TypedHasOneFields<TSchema extends SchemaTypeLike, TEntity extends EntityTypeLike, TKey extends keyof TEntity['hasOne'] & string, TNestedValue> = TypedEntitySelectionCallback<TSchema, TEntity['hasOne'][TKey]['name'], TEntity['hasOne'][TKey], TNestedValue> | TypedEntitySelection<TSchema, TEntity['hasOne'][TKey]['name'], TEntity['hasOne'][TKey], TNestedValue>;
+
+// @public (undocumented)
+export type TypedHasOneParams<TSchema extends SchemaTypeLike, TEntity extends EntityTypeLike, TKey extends keyof TEntity['hasOne'] & string, TNestedValue, TAlias extends string | null = null> = [
+args: TypedHasOneArgs<TEntity, TKey, TAlias>,
+fields: TypedHasOneFields<TSchema, TEntity, TKey, TNestedValue>
+] | [
+fields: TypedHasOneFields<TSchema, TEntity, TKey, TNestedValue>
+];
 
 // @public (undocumented)
 export type ValidationError = {

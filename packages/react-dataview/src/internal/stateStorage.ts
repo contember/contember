@@ -1,5 +1,4 @@
 import { DataViewFilteringArtifacts, DataViewFilteringProps, DataViewPagingProps, DataViewPagingState, DataViewSelectionValues, DataViewSelectionProps, DataViewSortingState } from '../types'
-import { defaultLayout } from 'typedoc/dist/lib/output/themes/default/layouts/default'
 
 export const dataViewKeyFallback = 'dataview'
 

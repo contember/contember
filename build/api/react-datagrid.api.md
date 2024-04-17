@@ -11,7 +11,6 @@ import { DataViewFilterArtifact } from '@contember/react-dataview';
 import { DataViewFilterHandler } from '@contember/react-dataview';
 import { DataViewInfo } from '@contember/react-dataview';
 import { DataViewMethods } from '@contember/react-dataview';
-import { DataViewSelectionValue } from '@contember/react-dataview';
 import { DataViewSetFilter } from '@contember/react-dataview';
 import { DataViewSortingDirection } from '@contember/react-dataview';
 import { DataViewState } from '@contember/react-dataview';
@@ -26,6 +25,7 @@ import { ReactNode } from 'react';
 import { RelationFilterArtifacts } from '@contember/react-dataview';
 import { SelectOptions } from '@contember/react-choice-field';
 import { Serializable } from '@contember/react-utils';
+import { SetStateAction } from 'react';
 import { SugarableRelativeSingleField } from '@contember/react-binding';
 import { SugaredQualifiedEntityList } from '@contember/react-binding';
 import { SugaredRelativeEntityList } from '@contember/react-binding';
@@ -236,27 +236,6 @@ export type DataGridColumns<P extends {}> = Map<DataGridColumnKey, DataGridColum
 export type DataGridFilterArtifact = DataViewFilterArtifact;
 
 // @public (undocumented)
-export type DataGridHidingMethods = {
-    setIsColumnHidden: DataGridSetIsColumnHidden;
-};
-
-// @public (undocumented)
-export type DataGridHidingState = Record<DataGridColumnKey, boolean>;
-
-// @public (undocumented)
-export type DataGridLayout = 'default' | 'tiles';
-
-// @public (undocumented)
-export type DataGridLayoutMethods = {
-    setView: SetDataGridLayout;
-};
-
-// @public (undocumented)
-export type DataGridLayoutState = {
-    view: DataGridLayout;
-};
-
-// @public (undocumented)
 export type DataGridMethods = DataViewMethods;
 
 // @public (undocumented)
@@ -266,9 +245,6 @@ export type DataGridProps<P extends {}> = {
     children: ReactNode;
     itemsPerPage?: number | null;
 } & P;
-
-// @public (undocumented)
-export type DataGridSetIsColumnHidden = (columnKey: DataGridColumnKey, isHidden: boolean) => void;
 
 // @public (undocumented)
 export type DataGridState = DataViewState;
@@ -355,9 +331,6 @@ export type NumberFilterArtifacts = {
 export type SelectCellFilterExtraProps = SelectOptions;
 
 // @public (undocumented)
-export type SetDataGridLayout = (layout: DataGridLayout) => void;
-
-// @public (undocumented)
 export type TextCellProps = TextCellRendererProps & DataGridColumnCommonProps & {
     disableOrder?: boolean;
     initialOrder?: DataViewSortingDirection;
@@ -377,17 +350,17 @@ export const useDataGridColumns: <T extends {}>() => DataGridColumns<T>;
 
 // @public (undocumented)
 export const useDataGridHiddenColumns: () => {
-    [k: string]: DataViewSelectionValue;
+    [k: string]: boolean | undefined;
 };
 
 // @public (undocumented)
-export const useDataGridLayout: () => string | number | boolean;
+export const useDataGridLayout: () => string;
 
 // @public (undocumented)
 export const useDataGridSetColumnHidden: () => (column: string, hidden: boolean) => void;
 
 // @public (undocumented)
-export const useDataGridSetLayout: () => (layout: 'default' | 'tiles') => void;
+export const useDataGridSetLayout: () => (layout: SetStateAction<string | undefined>) => void;
 
 // (No @packageDocumentation comment for this package)
 

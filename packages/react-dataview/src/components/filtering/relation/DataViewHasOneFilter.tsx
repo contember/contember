@@ -28,8 +28,11 @@ export const DataViewHasOneFilter = Component< DataViewHasOneFilterProps>(({ chi
 			</DataViewRelationFilterArgsContext.Provider>
 		</DataViewFilterNameContext.Provider>
 	)
-}, ({ name, field }) => {
-	return <DataViewFilter name={getFilterName(name, field)} filterHandler={createHasOneFilter(field)} />
+}, ({ name, field, children }) => {
+	return <>
+		<DataViewFilter name={getFilterName(name, field)} filterHandler={createHasOneFilter(field)} />
+		{children}
+	</>
 })
 
 

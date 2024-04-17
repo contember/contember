@@ -1,7 +1,14 @@
 import { StateStorageOrName } from '@contember/react-utils'
-import { SetStateAction } from 'react'
+import { ReactNode, SetStateAction } from 'react'
+
+export type DataViewSelectionLayout = { name: string, label?: ReactNode }
 
 export type DataViewSelectionState = {
+	values: DataViewSelectionValues
+	layouts: DataViewSelectionLayout[]
+}
+
+export type DataViewSelectionValues = {
 	layout?: string
 	visibility?: {
 		[key: string]: boolean | undefined
@@ -14,6 +21,7 @@ export type DataViewSelectionMethods = {
 }
 
 export type DataViewSelectionProps = {
-	initialSelection?: DataViewSelectionState | ((stored: DataViewSelectionState) => DataViewSelectionState)
+	initialSelection?: DataViewSelectionValues | ((stored: DataViewSelectionValues) => DataViewSelectionValues)
 	selectionStateStorage?: StateStorageOrName
+	layouts?: DataViewSelectionLayout[]
 }

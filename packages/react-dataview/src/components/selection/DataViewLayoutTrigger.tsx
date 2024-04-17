@@ -4,18 +4,18 @@ import { Slot } from '@radix-ui/react-slot'
 import { dataAttribute } from '@contember/utilities'
 
 export interface DataViewLayoutTriggerProps {
-	layout: string | undefined
+	name: string | undefined
 	children: ReactElement
 }
 
-export const DataViewLayoutTrigger = ({ layout, ...props }: DataViewLayoutTriggerProps) => {
+export const DataViewLayoutTrigger = ({ name, ...props }: DataViewLayoutTriggerProps) => {
 	const { setLayout } = useDataViewSelectionMethods()
-	const layoutCurrent = useDataViewSelectionState()?.layout
+	const layoutCurrent = useDataViewSelectionState()?.values?.layout
 
 	const handleClick = useCallback(() => {
-		setLayout(layout)
-	}, [setLayout, layout])
-	const isActive = layout === layoutCurrent
+		setLayout(name)
+	}, [setLayout, name])
+	const isActive = name === layoutCurrent
 
-	return <Slot onClick={handleClick} data-active={dataAttribute(isActive)} data-current={dataAttribute(layout)} {...props} />
+	return <Slot onClick={handleClick} data-active={dataAttribute(isActive)} data-current={dataAttribute(layoutCurrent)} {...props} />
 }

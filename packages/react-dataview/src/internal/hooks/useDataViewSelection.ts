@@ -15,12 +15,13 @@ export type UseDataViewSelectionResult = {
 	methods: DataViewSelectionMethods
 }
 
-export const useDataViewSelection = ({ dataViewKey, initialSelection, selectionStateStorage, resetPage }: UseDataViewSelectionArgs): UseDataViewSelectionResult => {
+export const useDataViewSelection = ({ dataViewKey, initialSelection, selectionStateStorage, resetPage, layouts }: UseDataViewSelectionArgs): UseDataViewSelectionResult => {
 	const [values, setValues] = useStoredState<DataViewSelectionStoredState>(
 		selectionStateStorage ?? 'null',
 		...getDataViewSelectionStorageArgs({
 			dataViewKey,
 			initialSelection,
+			defaultLayout: layouts?.[0]?.name,
 		}),
 	)
 
@@ -66,7 +67,12 @@ export const useDataViewSelection = ({ dataViewKey, initialSelection, selectionS
 	}, [resetPage, setValues])
 
 	return {
-		state: values,
+		state: useMemo(() => {
+			return {
+				values,
+				layouts: layouts ?? [],
+			}
+		}, [layouts, values]),
 		methods: useMemo((): DataViewSelectionMethods => {
 			return {
 				setLayout,

@@ -3,7 +3,7 @@ import { useMemo, useState } from 'react'
 import { DataGridProps } from '../grid'
 import { DataGridColumns, DataGridMethods, DataGridState } from '../types'
 import { extractDataGridColumns } from './gridTemplateAnalyzer'
-import { DataViewFilteringArtifacts, DataViewInfo, DataViewSelectionState, useDataView } from '@contember/react-dataview'
+import { DataViewFilteringArtifacts, DataViewInfo, DataViewSelectionValues, useDataView } from '@contember/react-dataview'
 import { getInitialSorting } from './sorting'
 import { getFilterTypes, normalizeInitialFilters } from './filters'
 import { normalizeInitialHiddenColumnsState } from './hiding'
@@ -20,7 +20,7 @@ export const useDataGridState = (props: Pick<DataGridProps<{ tile?: unknown }>, 
 	const [initialSorting] = useState(() => getInitialSorting(columns))
 	const [initialFilters] = useState(() => (stored: DataViewFilteringArtifacts) => normalizeInitialFilters(stored, columns))
 
-	const [initialSelection] = useState(() => (stored: DataViewSelectionState) => ({
+	const [initialSelection] = useState(() => (stored: DataViewSelectionValues) => ({
 		...normalizeInitialHiddenColumnsState(stored, columns),
 		layout: stored?.layout ?? (props.tile ? 'tiles' : 'default'),
 	}))

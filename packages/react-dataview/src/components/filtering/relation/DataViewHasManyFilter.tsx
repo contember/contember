@@ -27,8 +27,11 @@ export const DataViewHasManyFilter = Component<DataViewHasManyFilterProps>(({ fi
 			</DataViewRelationFilterArgsContext.Provider>
 		</DataViewFilterNameContext.Provider>
 	)
-}, ({ name, field }) => {
-	return <DataViewFilter name={getFilterName(name, field)} filterHandler={createHasManyFilter(field)} />
+}, ({ name, field, children }) => {
+	return <>
+		<DataViewFilter name={getFilterName(name, field)} filterHandler={createHasManyFilter(field)} />
+		{children}
+	</>
 })
 
 

@@ -12,7 +12,7 @@ export interface DataViewBooleanFilterProps {
 	children: React.ReactNode
 }
 
-export const DataViewBooleanFilter = Component< DataViewBooleanFilterProps>(({ name, field, children }) => {
+export const DataViewBooleanFilter = Component<DataViewBooleanFilterProps>(({ name, field, children }) => {
 	const nameResolved = getFilterName(name, field)
 
 	return (

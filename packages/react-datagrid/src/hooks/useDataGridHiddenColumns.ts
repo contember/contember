@@ -6,9 +6,9 @@ export const useDataGridHiddenColumns = () => {
 
 	return useMemo(() => {
 		return Object.fromEntries(
-			Object.entries(selection?.visibility ?? {})
+			Object.entries(selection?.values?.visibility ?? {})
 				.filter(([key, value]) => value === false)
 				.map(([key, value]) => [key, value]),
 		)
-	}, [selection?.visibility])
+	}, [selection?.values?.visibility])
 }

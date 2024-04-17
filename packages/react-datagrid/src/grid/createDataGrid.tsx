@@ -68,6 +68,8 @@ const createInitialState = (props: DataGridProps<{}>, environment: Environment):
 			filterTypes: {},
 		},
 		selection: {
+			values: {},
+			layouts: [],
 		},
 		sorting: {
 			orderBy: [],

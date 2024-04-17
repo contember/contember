@@ -3,11 +3,11 @@ import { ReactElement, ReactNode, useCallback } from 'react'
 import { Slot } from '@radix-ui/react-slot'
 import { useDataViewFetchAllData } from '../hooks'
 import { CsvExportFactory, ExportFactory } from '../export'
-import { useDataViewEntityListProps } from '../contexts'
+import { useDataViewChildren, useDataViewEntityListProps } from '../contexts'
 
 
 export interface DataViewExportTriggerProps {
-	fields: ReactNode
+	fields?: ReactNode
 	children: ReactElement
 	baseName?: string
 	exportFactory?: ExportFactory
@@ -18,7 +18,8 @@ const defaultExportFactory = new CsvExportFactory()
 
 export const DataViewExportTrigger = ({ fields, children, baseName, exportFactory }: DataViewExportTriggerProps) => {
 	const entityName = useDataViewEntityListProps().entityName
-	const fetchData = useDataViewFetchAllData({ children: fields })
+	const globalChildren = useDataViewChildren()
+	const fetchData = useDataViewFetchAllData({ children: fields ?? globalChildren })
 	const download = useTriggerDownload()
 	const doExport = useCallback(async () => {
 

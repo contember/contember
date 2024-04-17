@@ -19,7 +19,7 @@ export const createDataGridRenderer = <ColumnProps extends {}, ContainerProps ex
 		</>
 	)
 }, (props, env) => {
-	const selection = env.getExtension(dataViewSelectionEnvironmentExtension).visibility ?? {}
+	const selection = env.getExtension(dataViewSelectionEnvironmentExtension)?.visibility ?? {}
 	return <>
 		{staticRender && staticRender(props as any)}
 		{Array.from(props.columns)

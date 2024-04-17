@@ -1,16 +1,18 @@
 import { Component } from '@contember/react-binding'
 import { dataViewSelectionEnvironmentExtension } from '../../env/dataViewSelectionEnvironmentExtension'
-import { useDataViewSelectionState } from '../../contexts'
+import { useDataViewDisplayedState } from '../../contexts'
+import { ReactNode } from 'react'
 
-export interface DataViewIsVisibleProps {
+export interface DataViewElementProps {
 	name: string
+	label?: ReactNode
 	fallback?: boolean
 	children: React.ReactNode;
 }
 
-export const DataViewIsVisible = Component<DataViewIsVisibleProps>(({ name, fallback = true, children }) => {
-	const selection = useDataViewSelectionState()
-	const value = selection?.visibility?.[name] ?? fallback
+export const DataViewElement = Component<DataViewElementProps>(({ name, fallback = true, children }) => {
+	const selection = useDataViewDisplayedState()?.selection
+	const value = selection?.values?.visibility?.[name] ?? fallback
 
 	return value ? <>{children}</> : null
 }, ({ children, fallback = true, name }, env) => {

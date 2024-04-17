@@ -17,7 +17,7 @@ export const DataViewVisibilityTrigger = ({ name, value, fallbackValue = true, .
 	const handleClick = useCallback(() => {
 		setVisibility(name, value)
 	}, [name, setVisibility, value])
-	const resolvedValue = state?.visibility?.[name] ?? fallbackValue
+	const resolvedValue = state?.values?.visibility?.[name] ?? fallbackValue
 	const isActive = resolvedValue === value
 	return <Slot onClick={handleClick} data-active={dataAttribute(isActive)} data-current={dataAttribute(resolvedValue)} {...props} />
 }

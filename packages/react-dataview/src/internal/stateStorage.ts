@@ -1,4 +1,5 @@
-import { DataViewFilteringArtifacts, DataViewFilteringProps, DataViewPagingProps, DataViewPagingState, DataViewSelectionProps, DataViewSelectionState, DataViewSortingState } from '../types'
+import { DataViewFilteringArtifacts, DataViewFilteringProps, DataViewPagingProps, DataViewPagingState, DataViewSelectionValues, DataViewSelectionProps, DataViewSortingState } from '../types'
+import { defaultLayout } from 'typedoc/dist/lib/output/themes/default/layouts/default'
 
 export const dataViewKeyFallback = 'dataview'
 
@@ -40,14 +41,21 @@ export const getDataViewFilteringStorageArgs = ({ dataViewKey, initialFilters }:
 	]
 }
 
-export type DataViewSelectionStoredState = DataViewSelectionState
-export const getDataViewSelectionStorageArgs = ({ dataViewKey, initialSelection }: {
+export type DataViewSelectionStoredState = DataViewSelectionValues
+export const getDataViewSelectionStorageArgs = ({ dataViewKey, initialSelection, defaultLayout }: {
 	dataViewKey?: string
 	initialSelection?: DataViewSelectionProps['initialSelection']
+	defaultLayout?: string
 }): DataViewStoredStateArgs<DataViewSelectionStoredState> => {
 	return [
 		[dataViewKey ?? dataViewKeyFallback, 'selection'],
-		val => typeof initialSelection === 'function' ? initialSelection(val ?? {}) : val ?? initialSelection ?? {},
+		val => {
+			const selection = typeof initialSelection === 'function' ? initialSelection(val ?? {}) : val ?? initialSelection ?? {}
+			return {
+				layout: defaultLayout,
+				...selection,
+			}
+		},
 	]
 }
 

@@ -1,34 +1,34 @@
-import { SchemaDefinition as def, AclDefinition as acl } from '@contember/schema-definition'
+import { c } from '@contember/schema-definition'
 
-export const readerRole = acl.createRole('reader', { stages: '*' })
+export const readerRole = c.createRole('reader', { stages: '*' })
 
-export const editorRole = acl.createRole('editor', { stages: '*' })
+export const editorRole = c.createRole('editor', { stages: '*' })
 
-export const categoryEditorVariable = acl.createEntityVariable('category', 'Category', editorRole)
+export const categoryEditorVariable = c.createEntityVariable('category', 'Category', editorRole)
 
 
-@acl.allow(readerRole, {
+@c.Allow(readerRole, {
 	read: true,
 })
-@acl.allow(editorRole, {
+@c.Allow(editorRole, {
 	when: { category: { id: categoryEditorVariable } },
 	read: true,
 	create: ['title', 'category'],
 	update: ['title', 'category'],
 })
 export class Article {
-	title = def.stringColumn()
-	deletedAt = def.dateTimeColumn()
-	category = def.manyHasOne(Category)
+	title = c.stringColumn()
+	deletedAt = c.dateTimeColumn()
+	category = c.manyHasOne(Category)
 }
 
 
-@acl.allow(readerRole, {
+@c.Allow(readerRole, {
 	read: true,
 })
-@acl.allow(editorRole, {
+@c.Allow(editorRole, {
 	read: true,
 })
 export class Category {
-	name = def.stringColumn()
+	name = c.stringColumn()
 }

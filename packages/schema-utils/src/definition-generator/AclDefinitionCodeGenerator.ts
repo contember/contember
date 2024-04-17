@@ -23,7 +23,7 @@ export class AclDefinitionCodeGenerator {
 	private generateRole({ name, values }: { name: string; values: Acl.RolePermissions }): string {
 		const { variables, entities, inherits, ...other } = values
 		const roleVarName = this.definitionNamingConventions.roleVarName(name)
-		return `\nexport const ${roleVarName} = acl.createRole(${printJsValue(name)}, ${printJsValue(other)})\n`
+		return `\nexport const ${roleVarName} = c.createRole(${printJsValue(name)}, ${printJsValue(other)})\n`
 	}
 
 	public generateAclVariables({ acl }: { acl: Acl.Schema }): string {
@@ -31,7 +31,7 @@ export class AclDefinitionCodeGenerator {
 
 		Object.entries(acl.roles).map(([roleName, roleValues]) => {
 			Object.entries(roleValues.variables).map(([variableName, variableValues]) => {
-				let variableDefinition = `\nexport const ${this.definitionNamingConventions.variableVarName(roleName, variableName)} = acl.`
+				let variableDefinition = `\nexport const ${this.definitionNamingConventions.variableVarName(roleName, variableName)} = c.`
 				const varFormatted = printJsValue(variableName)
 				const roleVarName = this.definitionNamingConventions.roleVarName(roleName)
 
@@ -81,7 +81,7 @@ export class AclDefinitionCodeGenerator {
 						},
 					})
 					const aclDefinition = printJsValue({ when, ...operations }, indentFirstLevel)
-					aclOutput.push(`@acl.allow(${roleVarName}, ${aclDefinition})\n`)
+					aclOutput.push(`@c.Allow(${roleVarName}, ${aclDefinition})\n`)
 				}
 			}
 			const trueOperations = this.getMatchingOperations({
@@ -91,7 +91,7 @@ export class AclDefinitionCodeGenerator {
 			})
 			if (Object.keys(trueOperations).length > 0) {
 				const aclDefinition = printJsValue({ ...trueOperations }, indentFirstLevel)
-				aclOutput.push(`@acl.allow(${roleVarName}, ${aclDefinition})\n`)
+				aclOutput.push(`@c.Allow(${roleVarName}, ${aclDefinition})\n`)
 			}
 		}
 

@@ -30,13 +30,13 @@ export class DefinitionCodeGenerator {
 
 		const entities = Object.values(schema.model.entities).map(entity => this.generateEntity({ entity, schema })).join('')
 
-		return `import { SchemaDefinition as def, AclDefinition as acl } from '@contember/schema-definition'
+		return `import { c } from '@contember/schema-definition'
 ${roles}${aclVariables}${enums}${entities}`
 	}
 
 
 	private generateEnum({ name, values }: { name: string; values: readonly string[] }): string {
-		return `\nexport const ${this.formatIdentifier(name)} = def.createEnum(${values.map(it => printJsValue(it)).join(', ')})\n`
+		return `\nexport const ${this.formatIdentifier(name)} = c.createEnum(${values.map(it => printJsValue(it)).join(', ')})\n`
 	}
 
 	public generateEntity({ entity, schema }: { entity: Model.Entity; schema: Schema }): string {
@@ -57,12 +57,12 @@ ${Object.values(entity.fields).map(field => this.generateField({ field, entity, 
 		constraint: Model.UniqueConstraint
 	}): string {
 		const fieldsList = `${constraint.fields.map(it => printJsValue(it)).join(', ')}`
-		return `@def.Unique(${fieldsList})`
+		return `@c.Unique(${fieldsList})`
 	}
 
 	private generateIndex({ entity, index }: { entity: Model.Entity; index: Model.Index }): string {
 		const fieldsList = `${index.fields.map(it => printJsValue(it)).join(', ')}`
-		return `@def.Index(${fieldsList})`
+		return `@c.Index(${fieldsList})`
 	}
 
 
@@ -75,7 +75,7 @@ ${Object.values(entity.fields).map(field => this.generateField({ field, entity, 
 			? `, {\n\tdependencies: () => [${entity.view.dependencies?.map(it => this.formatIdentifier(it))}]\n}`
 			: ''
 
-		return `@def.View(\`${entity.view.sql}\`${dependenciesExpr})`
+		return `@c.View(\`${entity.view.sql}\`${dependenciesExpr})`
 	}
 
 	public generateField({ entity, field, schema }: { entity: Model.Entity; field: Model.AnyField; schema: Schema }): string | undefined {
@@ -195,7 +195,7 @@ ${Object.values(entity.fields).map(field => this.generateField({ field, entity, 
 		if (field.name === 'id' && definitionCode === 'uuidColumn().notNull()') {
 			return undefined
 		}
-		return `\t${this.formatIdentifier(field.name)} = def.${definitionCode}`
+		return `\t${this.formatIdentifier(field.name)} = c.${definitionCode}`
 	}
 
 	private generateColumn({ entity, column }: { entity: Model.Entity; column: Model.AnyColumn }): string[] {

@@ -1,66 +1,69 @@
-import { Component } from '@contember/interface'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table'
-import { DataGridColumnHeader } from './column-header'
+import { Component, Environment } from '@contember/interface'
+import { Table, TableBody, TableHeader, TableRow } from '../ui/table'
 import * as React from 'react'
-import { ReactNode } from 'react'
-import { DataViewEachRow, DataViewHasSelection } from '@contember/react-dataview'
-
-export type DataGridTableColumn = {
-	header: ReactNode
-	cell: ReactNode
-	hidingName?: string
-	sortingField?: string
-}
+import { Fragment, ReactNode, useState } from 'react'
+import { DataViewEachRow, DataViewLayout } from '@contember/react-dataview'
+import { SheetIcon } from 'lucide-react'
+import { dict } from '../../dict'
+import { ChildrenAnalyzer, Leaf } from '@contember/react-multipass-rendering'
+import { DataGridColumnLeaf, DataGridColumnLeafProps } from './columns'
 
 export interface DataViewTableProps {
-	firstColumnActions?: ReactNode
-	lastColumnActions?: ReactNode
-	columns: DataGridTableColumn[]
+	children: ReactNode
 }
 
-export const DataGridTable = Component(({ columns, firstColumnActions, lastColumnActions }: DataViewTableProps) => {
+export const DataGridTable = Component<DataViewTableProps>(({ children }) => {
 	return (
-		<div className={'rounded-md border overflow-x-auto'}>
-			<Table>
-				<TableHeader>
-					<TableRow>
-						{firstColumnActions && <TableHead align={'left'}>
-						</TableHead>}
-
-						{Object.entries(columns).map(([key, { header, hidingName, sortingField }]) => (
-							<DataViewHasSelection name={hidingName ?? key} key={key}>
-								<TableHead className={'text-center'}>
-									<DataGridColumnHeader hidingName={hidingName ?? key} sortingField={sortingField}>
-										{header}
-									</DataGridColumnHeader>
-								</TableHead>
-							</DataViewHasSelection>
-						))}
-
-						{lastColumnActions && <TableHead align={'right'}>
-						</TableHead>}
-					</TableRow>
-				</TableHeader>
-				<TableBody>
-					<DataViewEachRow>
-						<TableRow>
-							{firstColumnActions && <TableCell align={'left'}>
-								{firstColumnActions}
-							</TableCell>}
-							{Object.entries(columns).map(([key, { cell, hidingName }]) => (
-								<DataViewHasSelection name={hidingName ?? key} key={key}>
-									<TableCell>
-										{cell}
-									</TableCell>
-								</DataViewHasSelection>
-							))}
-							{lastColumnActions && <TableCell align={'right'}>
-								{lastColumnActions}
-							</TableCell>}
-						</TableRow>
-					</DataViewEachRow>
-				</TableBody>
-			</Table>
-		</div>
+		<DataViewLayout name="table" label={<>
+			<SheetIcon className={'w-3 h-3'} />
+			<span>{dict.datagrid.showTable}</span>
+		</>}>
+			<div className={'rounded-md border overflow-x-auto'}>
+				<DataGridTableRenderer>
+					{children}
+				</DataGridTableRenderer>
+			</div>
+		</DataViewLayout>
 	)
+})
+
+const DataGridTableRenderer = Component< DataViewTableProps>(({ children }, env) => {
+	const [columns] = useState(() => datagridColumnsAnalyzer.processChildren(children, env))
+	return (
+		<Table>
+			<TableHeader>
+				<TableRow>
+					{columns.map(({ header, name }, i) => (
+						<Fragment key={name ?? `_${i}`}>
+							{header}
+						</Fragment>
+					))}
+				</TableRow>
+			</TableHeader>
+			<TableBody>
+				<DataViewEachRow>
+					<TableRow>
+						{columns.map(({ cell, name }, i) => (
+							<Fragment key={name ?? `_${i}`}>
+								{cell}
+							</Fragment>
+						))}
+					</TableRow>
+				</DataViewEachRow>
+			</TableBody>
+		</Table>
+	)
+}, ({ children }) => {
+	return <>{children}</>
+})
+
+const columnLeaf = new Leaf(node => node.props, DataGridColumnLeaf)
+
+const datagridColumnsAnalyzer = new ChildrenAnalyzer<
+	DataGridColumnLeafProps,
+	never,
+	Environment
+>([columnLeaf], {
+	staticRenderFactoryName: 'staticRender',
+	staticContextFactoryName: 'generateEnvironment',
 })

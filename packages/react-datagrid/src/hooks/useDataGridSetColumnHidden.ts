@@ -1,11 +1,10 @@
 import { useDataViewSelectionMethods } from '@contember/react-dataview'
 import { useCallback } from 'react'
-import { getHidingKey } from '../internal/hiding'
 
 export const useDataGridSetColumnHidden = () => {
-	const { setSelection } = useDataViewSelectionMethods()
+	const { setVisibility } = useDataViewSelectionMethods()
 
 	return useCallback((column: string, hidden: boolean) => {
-		setSelection(getHidingKey(column), hidden)
-	}, [setSelection])
+		setVisibility(column, !hidden)
+	}, [setVisibility])
 }

@@ -1,48 +1,44 @@
 import * as React from 'react'
 import { ReactNode } from 'react'
-import { createBooleanFilter, DataViewBooleanFilterTrigger, DataViewFilter, DataViewNullFilterTrigger } from '@contember/react-dataview'
+import { DataViewBooleanFilter, DataViewBooleanFilterProps, DataViewBooleanFilterTrigger, DataViewNullFilterTrigger } from '@contember/react-dataview'
 import { Popover, PopoverContent, PopoverTrigger } from '../../ui/popover'
 import { DataGridActiveFilterUI, DataGridFilterSelectTriggerUI, DataGridSingleFilterUI } from '../ui'
 import { DataGridNullFilter } from './common'
 import { formatBoolean } from '../../../utils/formatting'
 import { Button } from '../../ui/button'
 import { dict } from '../../../dict'
-import { SugaredRelativeSingleField } from '@contember/binding'
 import { Component } from '@contember/interface'
-import { getFilterName } from './utils'
+import { DataGridFilterMobileHiding } from './mobile'
 
 
-type DataGridBooleanFilterProps = {
-	field: SugaredRelativeSingleField['field']
-	name?: string
-	label: ReactNode
+type DataGridBooleanFilterProps =
+	& Omit<DataViewBooleanFilterProps, 'children'>
+	& {
+		label: ReactNode
 }
 
-export const DataGridBooleanFilter = Component(({ name: nameIn, field, label }: DataGridBooleanFilterProps) => {
-	const name = getFilterName(nameIn, field)
-	return (
-		<DataGridSingleFilterUI>
-			<DataGridBooleanFilterSelect name={name} label={label} />
-			<DataGridBooleanFilterList name={name} />
-		</DataGridSingleFilterUI>
-	)
-}, ({ name, field }) => {
-	return <DataViewFilter name={getFilterName(name, field)} filterHandler={createBooleanFilter(field)} />
-})
+export const DataGridBooleanFilter = Component(({ label, ...props }: DataGridBooleanFilterProps) => (
+	<DataViewBooleanFilter {...props}>
+		<DataGridFilterMobileHiding>
+			<DataGridSingleFilterUI>
+				<DataGridBooleanFilterSelect label={label} />
+				<DataGridBooleanFilterList />
+			</DataGridSingleFilterUI>
+		</DataGridFilterMobileHiding>
+	</DataViewBooleanFilter>
+))
 
-export const DataGridBooleanFilterList = ({ name }: {
-	name: string
-}) => (
+export const DataGridBooleanFilterList = () => (
 	<>
 		{[true, false].map(value => (
-			<DataViewBooleanFilterTrigger name={name} action={'unset'} value={value} key={value.toString()}>
+			<DataViewBooleanFilterTrigger action={'unset'} value={value} key={value.toString()}>
 				<DataGridActiveFilterUI className={'data-[current=none]:hidden'}>
 					{formatBoolean(value)}
 				</DataGridActiveFilterUI>
 			</DataViewBooleanFilterTrigger>
 		))}
 
-		<DataViewNullFilterTrigger name={name} action={'unset'}>
+		<DataViewNullFilterTrigger action={'unset'}>
 			<DataGridActiveFilterUI>
 				<span className={'italic'}>{dict.datagrid.na}</span>
 			</DataGridActiveFilterUI>
@@ -51,8 +47,7 @@ export const DataGridBooleanFilterList = ({ name }: {
 )
 
 
-export const DataGridBooleanFilterSelect = ({ name, label }: {
-	name: string
+export const DataGridBooleanFilterSelect = ({ label }: {
 	label?: ReactNode
 }) => (
 	<Popover>
@@ -63,7 +58,7 @@ export const DataGridBooleanFilterSelect = ({ name, label }: {
 			<div className={'relative flex flex-col gap-2'}>
 				<div className={'flex gap-2'}>
 					{[true, false].map(it => (
-						<DataViewBooleanFilterTrigger name={name} action={'toggle'} value={it} key={it.toString()}>
+						<DataViewBooleanFilterTrigger action={'toggle'} value={it} key={it.toString()}>
 							<Button size={'lg'} className={'w-full data-[active]:shadow-inner data-[active]:text-blue-500'}
 									variant={'outline'}>
 
@@ -74,7 +69,7 @@ export const DataGridBooleanFilterSelect = ({ name, label }: {
 						</DataViewBooleanFilterTrigger>
 					))}
 				</div>
-				<DataGridNullFilter name={name} />
+				<DataGridNullFilter />
 			</div>
 		</PopoverContent>
 	</Popover>

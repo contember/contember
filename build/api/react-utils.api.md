@@ -82,6 +82,9 @@ export const emptyObject: Readonly<{}>;
 export function getChildrenAsLabel(node: ReactNode): string | undefined;
 
 // @public (undocumented)
+export const getStateStorage: (storageOrName: StateStorageOrName | StateStorageOrName[]) => StateStorage;
+
+// @public (undocumented)
 export const GlobalClassNamePrefixContext: Context<string>;
 
 // @public (undocumented)

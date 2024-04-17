@@ -19,8 +19,9 @@ import { ChevronDownIcon } from 'lucide-react'
 import { SelectListInner } from './list'
 import { RepeaterSortable, RepeaterSortableDragOverlay, RepeaterSortableDropIndicator, RepeaterSortableEachItem, RepeaterSortableItemActivator, RepeaterSortableItemNode } from '@contember/react-repeater-dnd-kit'
 import { Component, HasOne, SugaredQualifiedEntityList, SugaredRelativeEntityList, SugaredRelativeSingleEntity, SugaredRelativeSingleField } from '@contember/interface'
-import { SelectDataView, SelectFilterFieldProps, SelectItemTrigger, SelectOption, SelectPlaceholder, SortableMultiSelect } from '@contember/react-select'
+import { SelectDataView, SelectItemTrigger, SelectOption, SelectPlaceholder, SortableMultiSelect } from '@contember/react-select'
 import { CreateEntityDialog } from './create-new'
+import { DataViewUnionFilterFields } from '@contember/react-dataview'
 import { SelectDefaultFilter } from './filter'
 
 const MultiSortableSelectDropIndicator = ({ position }: { position: 'before' | 'after' }) => (
@@ -32,7 +33,6 @@ const MultiSortableSelectDropIndicator = ({ position }: { position: 'before' | '
 )
 
 export type SortableMultiSelectInputProps =
-	& SelectFilterFieldProps
 	& {
 		field: SugaredRelativeEntityList['field']
 		sortableBy: SugaredRelativeSingleField['field']
@@ -41,11 +41,12 @@ export type SortableMultiSelectInputProps =
 		options?: SugaredQualifiedEntityList['entities']
 		placeholder?: ReactNode
 		createNewForm?: ReactNode
+		queryField?: DataViewUnionFilterFields
 	}
 
-export const SortableMultiSelectInput = Component<SortableMultiSelectInputProps>(({ field, filterField, options, children, sortableBy, connectAt, placeholder, createNewForm }) => {
+export const SortableMultiSelectInput = Component<SortableMultiSelectInputProps>(({ field, queryField, options, children, sortableBy, connectAt, placeholder, createNewForm }) => {
 	return (
-		<SortableMultiSelect field={field} sortableBy={sortableBy} connectAt={connectAt} options={options} filterField={filterField}>
+		<SortableMultiSelect field={field} sortableBy={sortableBy} connectAt={connectAt} options={options}>
 			<div className="flex gap-1 items-center">
 				<Popover>
 					<PopoverTrigger asChild>
@@ -93,7 +94,7 @@ export const SortableMultiSelectInput = Component<SortableMultiSelectInputProps>
 					</PopoverTrigger>
 
 					<SelectPopoverContent>
-						<SelectDataView>
+						<SelectDataView queryField={queryField}>
 							<SelectListInner filterToolbar={<SelectDefaultFilter />}>
 								<SelectOption>
 									<SelectItemTrigger>

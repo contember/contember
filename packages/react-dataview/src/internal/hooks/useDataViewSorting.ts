@@ -3,6 +3,7 @@ import { useStoredState } from '@contember/react-utils'
 import { DataViewSortingMethods, DataViewSortingProps, DataViewSortingState } from '../../types'
 import { cycleOrderDirection } from '../helpers/cycleOrderDirection'
 import { OrderBy, QueryLanguage, useEnvironment } from '@contember/react-binding'
+import { DataViewSortingStoredState, getDataViewSortingStorageArgs } from '../stateStorage'
 
 export type UseDataViewSortingArgs =
 	& {
@@ -17,17 +18,17 @@ export type UseDataViewSortingResult = {
 }
 
 export const useDataViewSorting = ({ dataViewKey, initialSorting, sortingStateStorage, resetPage }: UseDataViewSortingArgs): UseDataViewSortingResult => {
-	const [directions, setDirections] = useStoredState<DataViewSortingState['directions']>(
-		sortingStateStorage ?? 'session',
-		[dataViewKey ?? 'dataview', 'orderBy'],
-		val => val ?? initialSorting ?? {},
+	const [directions, setDirections] = useStoredState<DataViewSortingStoredState>(
+		sortingStateStorage ?? 'null',
+		...getDataViewSortingStorageArgs({
+			dataViewKey,
+			initialSorting,
+		}),
 	)
 	const environment = useEnvironment()
 
 	const orderBy = useMemo((): OrderBy => {
-		return Object.entries(directions).flatMap(([field, direction]) => {
-			return QueryLanguage.desugarOrderBy(`${field} ${direction}`, environment)
-		})
+		return resolveOrderBy({ directions, environment })
 	}, [environment, directions])
 
 	const setOrderBy = useCallback<DataViewSortingMethods['setOrderBy']>((columnKey, columnOrderBy, append) => {
@@ -78,4 +79,13 @@ export const useDataViewSorting = ({ dataViewKey, initialSorting, sortingStateSt
 			}
 		}, [setOrderBy]),
 	}
+}
+
+export const resolveOrderBy = ({ directions, environment }: {
+	directions: DataViewSortingState['directions']
+	environment: ReturnType<typeof useEnvironment>
+}): OrderBy => {
+	return Object.entries(directions).flatMap(([field, direction]) => {
+		return QueryLanguage.desugarOrderBy(`${field} ${direction}`, environment)
+	})
 }

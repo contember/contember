@@ -6,6 +6,7 @@ import { SelectPagination } from './pagination'
 import { Loader } from '../ui/loader'
 import { DataViewEachRow, DataViewHighlightRow, DataViewKeyboardEventHandler, DataViewLoaderState } from '@contember/react-dataview'
 import { useOnHighlight } from './highlight'
+import { Component } from '@contember/interface'
 
 
 export type SelectListProps =
@@ -14,7 +15,7 @@ export type SelectListProps =
 		filterToolbar?: ReactNode
 	}
 
-export const SelectListInner = ({ children, filterToolbar }: SelectListProps) => {
+export const SelectListInner = Component(({ children, filterToolbar }: SelectListProps) => {
 	return (
 		<DataViewKeyboardEventHandler>
 			<div className={'flex flex-col gap-4 group-data-[side="top"]:flex-col-reverse'}>
@@ -40,4 +41,9 @@ export const SelectListInner = ({ children, filterToolbar }: SelectListProps) =>
 			</div>
 		</DataViewKeyboardEventHandler>
 	)
-}
+}, ({ children, filterToolbar }) => {
+	return <>
+		{filterToolbar}
+		{children}
+	</>
+})

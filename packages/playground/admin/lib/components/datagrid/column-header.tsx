@@ -3,7 +3,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Button } from '../ui/button'
 import { ReactNode } from 'react'
 import { ArrowDownAZIcon, ArrowUpDownIcon, ArrowUpZaIcon, EyeOffIcon } from 'lucide-react'
-import { DataViewSelectionTrigger, DataViewSortingSwitch, DataViewSortingTrigger } from '@contember/react-dataview'
+import { DataViewVisibilityTrigger, DataViewSortingSwitch, DataViewSortingTrigger } from '@contember/react-dataview'
 import { dict } from '../../dict'
 
 
@@ -51,12 +51,12 @@ export function DataGridColumnHeader<TData, TValue>({ sortingField, hidingName, 
 						</DataViewSortingTrigger>
 					</>}
 					{hidingName &&
-						<DataViewSelectionTrigger name={hidingName} value={false}>
+						<DataViewVisibilityTrigger name={hidingName} value={false}>
 							<DropdownMenuItem>
 								<EyeOffIcon className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
 								{dict.datagrid.columnHide}
 							</DropdownMenuItem>
-						</DataViewSelectionTrigger>
+						</DataViewVisibilityTrigger>
 					}
 				</DropdownMenuContent>
 			</DropdownMenu>

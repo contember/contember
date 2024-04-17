@@ -69,9 +69,9 @@ export const useDataView = (args: UseDataViewArgs): UseDataViewResult => {
 	const { state: selectionState, methods: selectionMethods } = useDataViewSelection({
 		dataViewKey: key,
 		resetPage,
-		selectionFallback: args.selectionFallback,
 		initialSelection: args.initialSelection,
 		selectionStateStorage: args.selectionStateStorage,
+		layouts: args.layouts,
 	})
 
 	resetPageRef.current = () => {

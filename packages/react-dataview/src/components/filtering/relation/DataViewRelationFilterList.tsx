@@ -1,16 +1,18 @@
 import * as React from 'react'
 import { ReactNode } from 'react'
 import { Component, EntityListSubTree } from '@contember/react-binding'
-import { SugaredQualifiedEntityList } from '@contember/binding'
-import { useDataViewRelationFilterData } from '../../../hooks/filters/relation/useDataViewRelationFilterData'
+import { useDataViewRelationFilterData } from '../../../hooks'
+import { useDataViewFilterName, useDataViewRelationFilterArgs } from '../../../contexts'
 
 export type DataViewRelationFilterListProps = {
-	name: string
-	options: SugaredQualifiedEntityList['entities']
+	name?: string
 	children: ReactNode
-};
+}
 
-export const DataViewRelationFilterList = Component(({ name, options, children }: DataViewRelationFilterListProps) => {
+export const DataViewRelationFilterList = Component(({ children, name }: DataViewRelationFilterListProps) => {
+	const { options } = useDataViewRelationFilterArgs()
+	// eslint-disable-next-line react-hooks/rules-of-hooks
+	name ??= useDataViewFilterName()
 	const [state, loadingState] = useDataViewRelationFilterData({ name, options, children })
 
 	if (loadingState === 'initial' || !state.entities) {
@@ -18,8 +20,6 @@ export const DataViewRelationFilterList = Component(({ name, options, children }
 	}
 
 	return <EntityListSubTree {...state.entities} treeRootId={state.treeRootId}>{children}</EntityListSubTree>
-}, ({ options, children }) => {
-
+}, () => {
 	return null
-	// return <EntityListSubTree {...state.entities} treeRootId={state.treeRootId}>{children}</EntityListSubTree>
 })

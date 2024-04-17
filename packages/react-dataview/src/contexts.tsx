@@ -12,9 +12,10 @@ import {
 	DataViewSortingState,
 	DataViewState,
 } from './types'
-import { EntityListAccessor, QualifiedEntityList } from '@contember/binding'
-import { EntityListSubTreeLoaderState } from '@contember/react-binding'
+import { EntityListAccessor, QualifiedEntityList, SugaredQualifiedEntityList } from '@contember/binding'
+import { EntityListSubTreeLoaderState, SugaredRelativeSingleField } from '@contember/react-binding'
 import * as React from 'react'
+import { ReactNode } from 'react'
 
 
 const _DataViewSortingStateContext = createRequiredContext<DataViewSortingState>('DataViewSortingStateContext')
@@ -87,7 +88,7 @@ const _DataViewDisplayedContextTmp = createRequiredContext<DataViewState | undef
 export const DataViewDisplayedStateContext = _DataViewDisplayedContextTmp[0]
 export const useDataViewDisplayedState = _DataViewDisplayedContextTmp[1] as <T extends DataViewState>() => T
 
-const _DataViewSelectionStateContext = createRequiredContext<DataViewSelectionState | undefined>('DataViewSelectionStateContext')
+const _DataViewSelectionStateContext = createRequiredContext<DataViewSelectionState>('DataViewSelectionStateContext')
 /** @internal */
 export const DataViewSelectionStateContext = _DataViewSelectionStateContext[0]
 export const useDataViewSelectionState = _DataViewSelectionStateContext[1]
@@ -108,3 +109,21 @@ const DataViewKeyboardEventHandlerContext_ = createRequiredContext<React.Keyboar
 export const DataViewKeyboardEventHandlerContext = DataViewKeyboardEventHandlerContext_[0]
 export const useDataViewKeyboardEventHandler = DataViewKeyboardEventHandlerContext_[1]
 
+
+const DataViewFilterNameContext_ = createRequiredContext<string>('DataViewFilterName')
+/** @internal */
+export const DataViewFilterNameContext = DataViewFilterNameContext_[0]
+export const useDataViewFilterName = DataViewFilterNameContext_[1]
+
+const DataViewRelationFilterArgsContext_ = createRequiredContext<{
+	options: SugaredQualifiedEntityList['entities']
+}>('DataViewRelationFilterArgs')
+/** @internal */
+export const DataViewRelationFilterArgsContext = DataViewRelationFilterArgsContext_[0]
+export const useDataViewRelationFilterArgs = DataViewRelationFilterArgsContext_[1]
+
+
+const DataViewChildrenContext_ = createRequiredContext<ReactNode>('DataViewChildren')
+/** @internal */
+export const DataViewChildrenContext = DataViewChildrenContext_[0]
+export const useDataViewChildren = DataViewChildrenContext_[1]

@@ -3,6 +3,7 @@ import * as React from 'react'
 import { useDataViewEntityListProps, useDataViewFilteringState } from '../contexts'
 import { ContentClient, useCurrentContentGraphQlClient } from '@contember/react-client'
 import { EntityListSubTree, EntityListSubTreeMarker, MarkerTreeGenerator, QueryGenerator, createQueryBuilder, useEnvironment } from '@contember/react-binding'
+import { dataViewSelectionEnvironmentExtension } from '../env/dataViewSelectionEnvironmentExtension'
 
 export const useDataViewFetchAllData = ({ children }: { children: ReactNode }) => {
 	const entityName = useDataViewEntityListProps().entityName
@@ -21,7 +22,7 @@ export const useDataViewFetchAllData = ({ children }: { children: ReactNode }) =
 			</EntityListSubTree>
 		)
 
-		const gen = new MarkerTreeGenerator(node, env)
+		const gen = new MarkerTreeGenerator(node, env.withExtension(dataViewSelectionEnvironmentExtension, {}))
 		const qb = createQueryBuilder(env.getSchema())
 		const markerTree = gen.generate()
 

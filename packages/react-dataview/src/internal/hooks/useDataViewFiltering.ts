@@ -1,8 +1,9 @@
 import { useCallback, useMemo } from 'react'
-import { useSessionStorageState, useStoredState } from '@contember/react-utils'
-import { DataViewFilteringArtifacts, DataViewFilteringMethods, DataViewFilteringProps, DataViewFilteringState } from '../../types'
+import { useStoredState } from '@contember/react-utils'
+import { DataViewFilteringMethods, DataViewFilteringProps, DataViewFilteringState } from '../../types'
 import { useDataViewResolvedFilters } from './useDataViewResolvedFilters'
 import { QualifiedEntityList } from '@contember/binding'
+import { DataViewFilteringStoredState, getDataViewFilteringStorageArgs } from '../stateStorage'
 
 export type UseDataViewFilteringArgs =
 	& {
@@ -20,12 +21,12 @@ export type UseDataViewFilteringResult = {
 
 const emptyObject = {}
 export const useDataViewFiltering = ({ dataViewKey, initialFilters, filteringStateStorage, filterTypes = emptyObject, resetPage, entities }: UseDataViewFilteringArgs): UseDataViewFilteringResult => {
-	const [filters, setFilters] = useStoredState<DataViewFilteringArtifacts>(
-		filteringStateStorage ?? 'session',
-		[dataViewKey ?? 'dataview', 'filters'],
-		val => {
-			return typeof initialFilters === 'function' ? initialFilters(val ?? {}) : val ?? initialFilters ?? {}
-		},
+	const [filters, setFilters] = useStoredState<DataViewFilteringStoredState>(
+		filteringStateStorage ?? 'null',
+		...getDataViewFilteringStorageArgs({
+			dataViewKey,
+			initialFilters,
+		}),
 	)
 	const resolvedFilters = useDataViewResolvedFilters({
 		entities,

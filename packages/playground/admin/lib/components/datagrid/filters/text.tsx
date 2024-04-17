@@ -4,50 +4,69 @@ import { Button } from '../../ui/button'
 import { MoreHorizontalIcon, XIcon } from 'lucide-react'
 import * as React from 'react'
 import {
-	createTextFilter,
-	createUnionTextFilter,
-	DataViewFilter,
+	DataViewFilterScope,
+	DataViewHasFilterType,
 	DataViewNullFilterTrigger,
+	DataViewQueryFilterName,
+	DataViewTextFilter,
 	DataViewTextFilterInput,
 	DataViewTextFilterMatchModeLabel,
 	DataViewTextFilterMatchModeTrigger,
+	DataViewTextFilterProps,
 	DataViewTextFilterResetTrigger,
+	DataViewUnionTextFilter,
+	DataViewUnionTextFilterProps,
 	TextFilterArtifactsMatchMode,
 } from '@contember/react-dataview'
 import { Popover, PopoverContent, PopoverTrigger } from '../../ui/popover'
 import { DataGridActiveFilterUI } from '../ui'
 import { DataGridNullFilter } from './common'
-import { dict } from '../../../../lib/dict'
-import { Component, SugaredRelativeSingleField } from '@contember/interface'
-import { getFilterName } from './utils'
+import { dict } from '../../../dict'
+import { Component } from '@contember/interface'
+import { DataGridFilterMobileHiding } from './mobile'
 
 
-export type DataGridTextFilterProps = {
-	field: SugaredRelativeSingleField['field']
-	name?: string
+export type DataGridTextFilterProps =
+	& Omit<DataViewTextFilterProps, 'children'>
+	& {
+		label?: React.ReactNode
+	}
+
+export const DataGridTextFilter = Component(({ label, ...props }: DataGridTextFilterProps) => (
+	<DataViewTextFilter {...props}>
+		<DataGridFilterMobileHiding>
+			<DataGridTextFilterInner label={label} />
+		</DataGridFilterMobileHiding>
+	</DataViewTextFilter>
+))
+
+export type DataGridUnionTextFilterProps =
+	& Omit<DataViewUnionTextFilterProps, 'children'>
+	& {
+		label?: React.ReactNode
+	}
+
+export const DataGridUnionTextFilter = Component(({ label, ...props }: DataGridUnionTextFilterProps) => (
+	<DataViewUnionTextFilter {...props}>
+		<DataGridFilterMobileHiding>
+			<DataGridTextFilterInner label={label} />
+		</DataGridFilterMobileHiding>
+	</DataViewUnionTextFilter>
+))
+
+export const DataGridQueryFilter = Component(({ label }: {
 	label?: React.ReactNode
-}
+}) => (
+	<DataViewHasFilterType name={DataViewQueryFilterName}>
+		<DataViewFilterScope name={DataViewQueryFilterName}>
+			<DataGridFilterMobileHiding>
+				<DataGridTextFilterInner label={label} />
+			</DataGridFilterMobileHiding>
+		</DataViewFilterScope>
+	</DataViewHasFilterType>
+))
 
-export const DataGridTextFilter = Component(({ name: nameIn, field, label }: DataGridTextFilterProps) => {
-	const name = getFilterName(nameIn, field)
-	return <DataGridTextFilterInner name={name} label={label} />
-}, ({ name, field }) => {
-	return <DataViewFilter name={getFilterName(name, field)} filterHandler={createTextFilter(field)} />
-})
-export type DataGridUnionTextFilterProps = {
-	fields: SugaredRelativeSingleField['field'][]
-	name: string
-	label?: React.ReactNode
-}
-
-export const DataGridUnionTextFilter = Component(({ name,  label }: DataGridUnionTextFilterProps) => {
-	return <DataGridTextFilterInner name={name} label={label} />
-}, ({ name, fields }) => {
-	return <DataViewFilter name={name} filterHandler={createUnionTextFilter(fields)} />
-})
-
-export const DataGridTextFilterInner = ({ name, label }: {
-	name: string
+export const DataGridTextFilterInner = ({ label }: {
 	label?: React.ReactNode
 }) => {
 	return (
@@ -56,12 +75,12 @@ export const DataGridTextFilterInner = ({ name, label }: {
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
 						<Button size={'sm'} variant={'secondary'} className={'px-3'}>
-							{label} <DataViewTextFilterMatchModeLabel name={name} render={dict.datagrid.textMatchMode} />
+							{label} <DataViewTextFilterMatchModeLabel render={dict.datagrid.textMatchMode} />
 						</Button>
 					</DropdownMenuTrigger>
 					<DropdownMenuContent className="w-[160px]">
 						{Object.entries(dict.datagrid.textMatchMode).map(([mode, label]) => (
-							<DataViewTextFilterMatchModeTrigger name={name} mode={mode as TextFilterArtifactsMatchMode} key={mode}>
+							<DataViewTextFilterMatchModeTrigger mode={mode as TextFilterArtifactsMatchMode} key={mode}>
 								<DropdownMenuItem className={'data-[active]:font-bold'}>
 									{label}
 								</DropdownMenuItem>
@@ -70,12 +89,12 @@ export const DataGridTextFilterInner = ({ name, label }: {
 					</DropdownMenuContent>
 				</DropdownMenu>
 
-				<DataViewTextFilterInput name={name}>
+				<DataViewTextFilterInput>
 					<InputBare placeholder={dict.datagrid.textPlaceholder} className={'w-full ml-2'} />
 				</DataViewTextFilterInput>
 
 				<div className={'ml-auto flex gap-1 items-center'}>
-					<DataViewNullFilterTrigger name={name} action={'unset'}>
+					<DataViewNullFilterTrigger action={'unset'}>
 						<DataGridActiveFilterUI className={'ml-auto'}>
 							<span className={'italic'}>{dict.datagrid.na}</span>
 						</DataGridActiveFilterUI>
@@ -87,12 +106,12 @@ export const DataGridTextFilterInner = ({ name, label }: {
 							</Button>
 						</PopoverTrigger>
 						<PopoverContent>
-							<DataViewTextFilterResetTrigger name={name}>
+							<DataViewTextFilterResetTrigger>
 								<Button size={'sm'} className={'w-full text-left justify-start gap-1'} variant={'ghost'}>
 									<XIcon className={'w-3 h-3'} /> {dict.datagrid.textReset}
 								</Button>
 							</DataViewTextFilterResetTrigger>
-							<DataGridNullFilter name={name} />
+							<DataGridNullFilter />
 						</PopoverContent>
 					</Popover>
 				</div>

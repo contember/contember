@@ -15,7 +15,7 @@ import {
 	DataViewSelectionStateContext,
 } from '../../contexts'
 import { DataViewState } from '../../types'
-import { dataViewSelectionEnvironmentExtension } from '../../dataViewSelectionEnvironmentExtension'
+import { dataViewSelectionEnvironmentExtension } from '../../env/dataViewSelectionEnvironmentExtension'
 import { DataViewInteractionProvider } from './DataViewInteractionProvider'
 
 export interface DataViewLoaderProps {
@@ -65,20 +65,18 @@ export const DataViewLoader = Component(({ children, state, onSelectHighlighted 
 	)
 	return (
 		<DataViewLoaderStateContext.Provider value={loadState}>
-			<DataViewSelectionStateContext.Provider value={loadedEntityList.state?.selection}>
-				<DataViewDisplayedStateContext.Provider value={loadedEntityList.state}>
-					<TreeRootIdProvider treeRootId={loadedEntityList.treeRootId}>
-						{!loadedEntityList.entities
-							? <NonExistingEntityListSubtree children={innerChildren} />
-							: (
-								<ExistingEntityListSubtree
-									entities={loadedEntityList.entities}
-									children={innerChildren}
-								/>
-							)
-						}</TreeRootIdProvider>
-				</DataViewDisplayedStateContext.Provider>
-			</DataViewSelectionStateContext.Provider>
+			<DataViewDisplayedStateContext.Provider value={loadedEntityList.state}>
+				<TreeRootIdProvider treeRootId={loadedEntityList.treeRootId}>
+					{!loadedEntityList.entities
+						? <NonExistingEntityListSubtree children={innerChildren} />
+						: (
+							<ExistingEntityListSubtree
+								entities={loadedEntityList.entities}
+								children={innerChildren}
+							/>
+						)
+					}</TreeRootIdProvider>
+			</DataViewDisplayedStateContext.Provider>
 		</DataViewLoaderStateContext.Provider>
 	)
 }, ({ state, children }) => {
@@ -90,7 +88,7 @@ export const DataViewLoader = Component(({ children, state, onSelectHighlighted 
 		state.paging.pageIndex,
 	)
 	return (
-		<EnvironmentMiddleware create={it => it.withExtension(dataViewSelectionEnvironmentExtension, state.selection)}>
+		<EnvironmentMiddleware create={it => it.withExtension(dataViewSelectionEnvironmentExtension, state.selection.values)}>
 			<EntityListSubTree {...entityListProps}>{children}</EntityListSubTree>
 		</EnvironmentMiddleware>
 	)

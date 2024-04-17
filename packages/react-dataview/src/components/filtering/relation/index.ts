@@ -1,3 +1,6 @@
+export * from './DataViewHasManyFilter'
+export * from './DataViewHasOneFilter'
+export * from './DataViewRelationFilterOptions'
 export * from './DataViewRelationFilterTrigger'
 export * from './DataViewRelationFilterList'
 export * from './DataViewRelationFilterState'

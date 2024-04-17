@@ -1,6 +1,7 @@
 import { DataViewSelectionMethods, DataViewSelectionProps, DataViewSelectionState } from '../../types'
 import { useCallback, useMemo } from 'react'
 import { useStoredState } from '@contember/react-utils'
+import { DataViewSelectionStoredState, getDataViewSelectionStorageArgs } from '../stateStorage'
 
 export type UseDataViewSelectionArgs =
 	& {
@@ -14,28 +15,51 @@ export type UseDataViewSelectionResult = {
 	methods: DataViewSelectionMethods
 }
 
-export const useDataViewSelection = ({ dataViewKey, initialSelection, selectionStateStorage, selectionFallback, resetPage }: UseDataViewSelectionArgs): UseDataViewSelectionResult => {
-	const [values, setValues] = useStoredState<DataViewSelectionState['values']>(
-		selectionStateStorage ?? 'local',
-		[dataViewKey ?? 'dataview', 'selection'],
-		val => {
-			return typeof initialSelection === 'function' ? initialSelection(val ?? {}) : val ?? initialSelection ?? {}
-		},
+export const useDataViewSelection = ({ dataViewKey, initialSelection, selectionStateStorage, resetPage, layouts }: UseDataViewSelectionArgs): UseDataViewSelectionResult => {
+	const [values, setValues] = useStoredState<DataViewSelectionStoredState>(
+		selectionStateStorage ?? 'null',
+		...getDataViewSelectionStorageArgs({
+			dataViewKey,
+			initialSelection,
+			defaultLayout: layouts?.[0]?.name,
+		}),
 	)
 
-	const setSelection = useCallback<DataViewSelectionMethods['setSelection']>((key, value) => {
+	const setLayout = useCallback<DataViewSelectionMethods['setLayout']>(value => {
 		let didBailOut = false
 
 		setValues(current => {
-			const existingValue = current[key]
+			const existingValue = current.layout
 			const resolvedValue = typeof value === 'function' ? value(existingValue) : value
 
 			if (existingValue === resolvedValue) {
 				didBailOut = true
 				return current
 			}
-			const { [key]: _, ...rest } = current
-			return resolvedValue === undefined ? rest : { ...rest, [key]: resolvedValue }
+			return { ...current, layout: resolvedValue }
+		})
+		if (!didBailOut) {
+			resetPage()
+		}
+	}, [resetPage, setValues])
+
+	const setVisibility = useCallback<DataViewSelectionMethods['setVisibility']>((key, visible) => {
+		let didBailOut = false
+		setValues(current => {
+			const existingValue = current.visibility?.[key]
+			const resolvedValue = typeof visible === 'function' ? visible(existingValue) : visible
+
+			if (existingValue === resolvedValue) {
+				didBailOut = true
+				return current
+			}
+			return {
+				...current,
+				visibility: {
+					...current.visibility,
+					[key]: resolvedValue,
+				},
+			}
 		})
 		if (!didBailOut) {
 			resetPage()
@@ -43,16 +67,17 @@ export const useDataViewSelection = ({ dataViewKey, initialSelection, selectionS
 	}, [resetPage, setValues])
 
 	return {
-		state: useMemo((): DataViewSelectionState => {
+		state: useMemo(() => {
 			return {
 				values,
-				fallback: selectionFallback === undefined ? true : selectionFallback,
+				layouts: layouts ?? [],
 			}
-		}, [selectionFallback, values]),
+		}, [layouts, values]),
 		methods: useMemo((): DataViewSelectionMethods => {
 			return {
-				setSelection,
+				setLayout,
+				setVisibility,
 			}
-		}, [setSelection]),
+		}, [setLayout, setVisibility]),
 	}
 }

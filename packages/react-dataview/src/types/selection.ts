@@ -1,22 +1,27 @@
 import { StateStorageOrName } from '@contember/react-utils'
-import { SetStateAction } from 'react'
+import { ReactNode, SetStateAction } from 'react'
 
-export type DataViewSelectionValue = boolean | string | number | null
+export type DataViewSelectionLayout = { name: string, label?: ReactNode }
 
-export type DataViewSelectionValues = {
-	[key: string]: DataViewSelectionValue
-};
 export type DataViewSelectionState = {
 	values: DataViewSelectionValues
-	fallback?: DataViewSelectionValue
+	layouts: DataViewSelectionLayout[]
+}
+
+export type DataViewSelectionValues = {
+	layout?: string
+	visibility?: {
+		[key: string]: boolean | undefined
+	}
 }
 
 export type DataViewSelectionMethods = {
-	setSelection: (key: string, value: SetStateAction<DataViewSelectionValue | undefined>) => void
+	setLayout: (layout: SetStateAction<string | undefined>) => void
+	setVisibility: (key: string, visible: SetStateAction<boolean | undefined>) => void
 }
 
 export type DataViewSelectionProps = {
 	initialSelection?: DataViewSelectionValues | ((stored: DataViewSelectionValues) => DataViewSelectionValues)
-	selectionFallback?: DataViewSelectionValue
 	selectionStateStorage?: StateStorageOrName
+	layouts?: DataViewSelectionLayout[]
 }

@@ -57,7 +57,9 @@ export const dict = {
 		pageRowsCount: '${totalCount} rows total',
 
 		filter: 'Filter',
+		filters: 'Filters',
 		exclude: 'Exclude',
+		export: 'Export',
 
 	},
 	select: {

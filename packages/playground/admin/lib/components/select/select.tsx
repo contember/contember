@@ -7,26 +7,27 @@ import { SugaredRelativeSingleEntity } from '@contember/react-binding'
 import { ChevronDownIcon, XIcon } from 'lucide-react'
 import { SelectCreateNewTrigger, SelectDefaultPlaceholderUI, SelectInputActionsUI, SelectInputUI, SelectListItemUI, SelectPopoverContent } from './ui'
 import { SelectListInner } from './list'
-import { Select, SelectDataView, SelectEachValue, SelectFilterFieldProps, SelectItemTrigger, SelectOption, SelectPlaceholder } from '@contember/react-select'
+import { Select, SelectDataView, SelectEachValue, SelectItemTrigger, SelectOption, SelectPlaceholder } from '@contember/react-select'
 import { CreateEntityDialog } from './create-new'
 import { SelectDefaultFilter } from './filter'
+import { DataViewUnionFilterFields } from '@contember/react-dataview'
 
 export type SelectInputProps =
-	& SelectFilterFieldProps
 	& {
 		field: SugaredRelativeSingleEntity['field']
 		children: ReactNode
 		options?: SugaredQualifiedEntityList['entities']
 		placeholder?: ReactNode
 		createNewForm?: ReactNode
+		queryField?: DataViewUnionFilterFields
 	}
 
 
-export const SelectInput = Component<SelectInputProps>(({ field, filterField, options, children, placeholder, createNewForm }) => {
+export const SelectInput = Component<SelectInputProps>(({ field, queryField, options, children, placeholder, createNewForm }) => {
 	const [open, setOpen] = React.useState(false)
 
 	return (
-		<Select field={field} onSelect={() => setOpen(false)} options={options} filterField={filterField}>
+		<Select field={field} onSelect={() => setOpen(false)} options={options}>
 			<div className="flex gap-1 items-center">
 				<Popover open={open} onOpenChange={setOpen}>
 					<PopoverTrigger asChild>
@@ -52,7 +53,7 @@ export const SelectInput = Component<SelectInputProps>(({ field, filterField, op
 
 					</PopoverTrigger>
 					<SelectPopoverContent>
-						<SelectDataView>
+						<SelectDataView queryField={queryField}>
 							<SelectListInner filterToolbar={<SelectDefaultFilter/>}>
 								<SelectOption>
 									<SelectItemTrigger>

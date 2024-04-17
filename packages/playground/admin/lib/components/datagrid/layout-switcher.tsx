@@ -1,26 +1,32 @@
-import { DataViewLayoutTrigger } from '@contember/react-dataview'
+import { DataViewLayoutTrigger, useDataViewSelectionState } from '@contember/react-dataview'
 import { Button } from '../ui/button'
-import { LayoutGridIcon, SheetIcon } from 'lucide-react'
 import * as React from 'react'
 import { dict } from '../../dict'
+import { uic } from '../../utils/uic'
 
-export const DataGridLayoutSwitcher = () => <div>
-	<p className="text-gray-400 text-xs font-semibold mb-1">{dict.datagrid.layout}</p>
-	<div className={'grid grid-cols-2'}>
-		<DataViewLayoutTrigger layout={'grid'}>
-			<Button variant={'outline'} size={'sm'} className={'data-[active]:text-blue-600 data-[active]:bg-gray-50 data-[active]:shadow-inner rounded-r-none gap-2'}
-					title={'Grid'}>
-				<LayoutGridIcon className={'w-3 h-3'} />
-				<span>{dict.datagrid.showGrid}</span>
-			</Button>
-		</DataViewLayoutTrigger>
-		<DataViewLayoutTrigger layout={'table'}>
-			<Button variant={'outline'} size={'sm'}
-					className={'data-[active]:text-blue-600 data-[active]:bg-gray-50 data-[active]:shadow-inner rounded-l-none gap-2'}
-					title={'Table'}>
-				<SheetIcon className={'w-3 h-3'} />
-				<span>{dict.datagrid.showTable}</span>
-			</Button>
-		</DataViewLayoutTrigger>
-	</div>
-</div>
+const LayoutSwitchButton = uic(Button, {
+	baseClass: 'data-[active]:text-blue-600 data-[active]:bg-gray-50 data-[active]:shadow-inner gap-2 flex-1',
+	defaultProps: {
+		variant: 'outline',
+		size: 'sm',
+	},
+})
+
+export const DataGridLayoutSwitcher = () => {
+	const layouts = useDataViewSelectionState().layouts
+
+	return (
+		<div>
+			<p className="text-gray-400 text-xs font-semibold mb-1">{dict.datagrid.layout}</p>
+			<div className={'flex gap-1'}>
+				{layouts.map(it => (
+					<DataViewLayoutTrigger name={it.name} key={it.name}>
+						<LayoutSwitchButton>
+							{it.label}
+						</LayoutSwitchButton>
+					</DataViewLayoutTrigger>
+				))}
+			</div>
+		</div>
+	)
+}

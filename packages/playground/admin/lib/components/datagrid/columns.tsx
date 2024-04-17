@@ -1,243 +1,166 @@
+import { Component, Field } from '@contember/interface'
 import * as React from 'react'
 import { ReactNode } from 'react'
-import { DataGridBooleanFilter, DataGridDateFilter, DataGridEnumFieldTooltip, DataGridEnumFilter, DataGridHasManyFilter, DataGridHasOneFilter, DataGridNumberFilter, DataGridRelationFieldTooltip } from './filters'
+import { TableCell, TableHead } from '../ui/table'
+import { DataGridColumnHeader } from './column-header'
+import { DataViewElement } from '@contember/react-dataview'
 import { formatBoolean, formatDate, formatNumber } from '../../utils/formatting'
-import { DataGridColumn } from './grid'
-import { Field, HasMany, HasOne } from '@contember/react-binding'
-import { createHasManyFilter, DataViewFilterHandler } from '@contember/react-dataview'
-import { SugaredQualifiedEntityList } from '@contember/interface'
-import { Button } from '../ui/button'
-import { DataGridTooltipLabel } from './ui'
+import { DataGridEnumCell, DataGridHasManyCell, DataGridHasManyCellProps, DataGridHasOneCell, DataGridHasOneCellProps } from './cells'
 
-export interface DataViewColumnCommonArgs {
+export const DataGridActionColumn = Component<{ children: ReactNode }>(({ children }) => (
+	<DataGridColumnLeaf
+		header={<TableHead className="w-0"></TableHead>}
+		cell={<TableCell className="w-0">{children}</TableCell>}
+	/>
+))
+
+
+export type DataGridTextColumnProps = {
 	field: string
-	label: ReactNode
+	header: ReactNode
+	children?: ReactNode
+}
 
-	filterName?: string
-	filterHandler?: DataViewFilterHandler<any>
-	filterToolbar?: ReactNode
+export const DataGridTextColumn = Component<DataGridTextColumnProps>(({ field, header, children }) => (
+	<DataGridColumn
+		header={header}
+		sortingField={field}
+		name={field}
+		children={children ?? <Field field={field} />}
+	/>
+))
+
+export type DataGridBooleanColumnProps = {
+	field: string
+	header: ReactNode
+	children?: ReactNode
+}
+
+export const DataGridBooleanColumn = Component<DataGridBooleanColumnProps>(({ field, header, children }) => (
+	<DataGridColumn
+		header={header}
+		sortingField={field}
+		name={field}
+		children={children ?? <Field field={field} format={formatBoolean} />}
+	/>
+))
+
+export type DataGridNumberColumnProps = {
+	field: string
+	header: ReactNode
+	children?: ReactNode
+}
+
+export const DataGridNumberColumn = Component<DataGridNumberColumnProps>(({ field, header, children }) => (
+	<DataGridColumn
+		header={header}
+		sortingField={field}
+		name={field}
+		children={children ?? <Field field={field} format={formatNumber} />}
+	/>
+))
+
+export type DataGridDateColumnProps = {
+	field: string
+	header: ReactNode
+	children?: ReactNode
+}
+
+export const DataGridDateColumn = Component<DataGridDateColumnProps>(({ field, header, children }) => (
+	<DataGridColumn
+		header={header}
+		sortingField={field}
+		name={field}
+		children={children ?? <Field field={field} format={formatDate} />}
+	/>
+))
+
+
+export type DataGridEnumColumnProps = {
+	field: string
+	header: ReactNode
+	options: Record<string, ReactNode>
+	children?: ReactNode
+}
+
+export const DataGridEnumColumn = Component<DataGridEnumColumnProps>(({ field, header, options, children }) => (
+	<DataGridColumn
+		header={header}
+		sortingField={field}
+		name={field}
+		children={children ?? <DataGridEnumCell field={field} options={options} />}
+	/>
+))
+
+export type DataGridHasOneColumnProps =
+	& DataGridHasOneCellProps
+	& {
+		header: ReactNode
+	}
+
+
+export const DataGridHasOneColumn = Component<DataGridHasOneColumnProps>(({ field, header, children }) => (
+	<DataGridColumn
+		header={header}
+		name={typeof field === 'string' ? field : undefined}
+		children={<DataGridHasOneCell field={field}>{children}</DataGridHasOneCell>}
+	/>
+))
+
+export type DataGridHasManyColumnProps =
+	& DataGridHasManyCellProps
+	& {
+		header: ReactNode
+	}
+
+export const DataGridHasManyColumn = Component<DataGridHasManyColumnProps>(({ field, header, children }) => (
+	<DataGridColumn
+		header={header}
+		name={typeof field === 'string' ? field : undefined}
+		children={<DataGridHasManyCell field={field}>{children}</DataGridHasManyCell>}
+	/>
+))
+
+export type DataGridColumnProps = {
+	children: ReactNode
+	header?: ReactNode
+	name?: string
 	hidingName?: string
-	cell?: ReactNode
+	sortingField?: string
 }
 
-export type DataViewTextColumnArgs =
-	& DataViewColumnCommonArgs
-	& {
-		sortingField?: string
+export const DataGridColumn = Component<DataGridColumnProps>(({ children, header, name, hidingName, sortingField }) => {
+	const wrapIsVisible = (child: ReactNode) => {
+		const resolvedName = hidingName ?? name
+		return resolvedName ? <DataViewElement name={resolvedName} label={header}>{child}</DataViewElement> : child
 	}
 
-export const createTextColumn = ({ field, label, ...args }: DataViewTextColumnArgs): DataGridColumn => {
-	return {
-		type: 'text',
-		field,
-		filterName: field,
-		cell: <Field field={field} />,
-		header: label,
-		hidingName: field,
-		sortingField: field,
-		...args,
-	}
+	return (
+		<DataGridColumnLeaf
+			name={name}
+			header={
+				wrapIsVisible(
+					<TableHead className={'text-center'}>
+						{header ? <DataGridColumnHeader hidingName={hidingName ?? name} sortingField={sortingField}>
+							{header}
+						</DataGridColumnHeader> : null}
+					</TableHead>,
+				)
+			}
+			cell={wrapIsVisible(<TableCell>{children}</TableCell>)}
+		/>
+	)
+})
+
+export interface DataGridColumnLeafProps {
+	header: ReactNode
+	cell: ReactNode
+	name?: string
 }
 
-export type DataViewRelationColumnArgs =
-	& {
-		valueField?: string
-		value?: ReactNode
-		filterOptions?: SugaredQualifiedEntityList['entities']
-		filterLabel?: ReactNode
-		queryField?: string
-		filterOption?: ReactNode
-		tooltipActions?: ReactNode
-	}
+export const DataGridColumnLeaf = Component<DataGridColumnLeafProps>(() => {
+	throw new Error('DataGridColumnLeaf is not supposed to be rendered')
+}, ({ header, cell }) => {
+	return <>{header}{cell}</>
+})
 
-export type DataViewHasOneColumnArgs =
-	& DataViewColumnCommonArgs
-	& DataViewRelationColumnArgs
-	& {
-		sortingField?: string
-	}
-
-export const createHasOneColumn = ({ field, label, tooltipActions, filterOptions, valueField, value, filterLabel, queryField, filterOption, ...args }: DataViewHasOneColumnArgs): DataGridColumn => {
-
-	value ??= valueField ? <Field field={valueField} /> : null
-	filterOption ??= value
-
-	return {
-		type: 'hasOne',
-		field,
-		filterName: field,
-		cell: (
-			<div>
-				<HasOne field={field}>
-					<DataGridRelationFieldTooltip filter={args.filterName ?? field} actions={tooltipActions}>
-						<DataGridTooltipLabel>
-							{value}
-						</DataGridTooltipLabel>
-					</DataGridRelationFieldTooltip>
-				</HasOne>
-			</div>
-		),
-		header: label,
-		hidingName: field,
-		sortingField: valueField ? field + '.' + valueField : undefined,
-		filterToolbar: filterOptions && (
-			<DataGridHasOneFilter
-				field={field}
-				options={filterOptions}
-				label={filterLabel ?? label}
-				queryField={queryField ?? valueField}
-			>
-				{filterOption}
-			</DataGridHasOneFilter>
-		),
-		...args,
-	}
-}
-
-export type DataViewHasManyColumnArgs =
-	& DataViewColumnCommonArgs
-	& DataViewRelationColumnArgs
-
-
-export const createHasManyColumn = ({ field, label, tooltipActions, filterOptions, valueField, value, filterLabel, queryField, filterOption, ...args }: DataViewHasManyColumnArgs): DataGridColumn => {
-	value ??= valueField ? <Field field={valueField} /> : null
-	filterOption ??= value
-	return {
-		type: 'hasMany',
-		field,
-		filterName: field,
-		cell: (
-			<div className={'flex flex-wrap gap-2'}>
-				<HasMany field={field}>
-					<DataGridRelationFieldTooltip filter={args.filterName ?? field} actions={tooltipActions}>
-						<DataGridTooltipLabel>
-							{value}
-						</DataGridTooltipLabel>
-					</DataGridRelationFieldTooltip>
-				</HasMany>
-			</div>
-		),
-		header: label,
-		hidingName: field,
-		filterHandler: createHasManyFilter(field),
-		filterToolbar: filterOptions && (
-			<DataGridHasManyFilter
-				field={field}
-				options={filterOptions}
-				label={filterLabel ?? label}
-				queryField={queryField ?? valueField}
-			>
-				{filterOption}
-			</DataGridHasManyFilter>
-		),
-		...args,
-	}
-}
-
-export type DataViewNumberColumnArgs =
-	& DataViewColumnCommonArgs
-	& {
-		sortingField?: string
-	}
-
-export const createNumberColumn = ({ field, label, ...args }: DataViewNumberColumnArgs): DataGridColumn => {
-	return {
-		type: 'number',
-		field,
-		filterName: field,
-		cell: <Field field={field} format={formatNumber} />,
-		header: label,
-		hidingName: field,
-		sortingField: field,
-		filterToolbar: <DataGridNumberFilter field={field} label={label} />,
-		...args,
-	}
-}
-
-export type DataViewDateColumnArgs =
-	& DataViewColumnCommonArgs
-	& {
-		sortingField?: string
-	}
-
-export const createDateColumn = ({ field, label, ...args }: DataViewDateColumnArgs): DataGridColumn => {
-	return {
-		type: 'date',
-		field,
-		filterName: field,
-		cell: <Field field={field} format={formatDate} />,
-		header: label,
-		hidingName: field,
-		sortingField: field,
-		filterToolbar: <DataGridDateFilter field={field} label={label} />,
-		...args,
-	}
-}
-
-export type DataViewBooleanColumnArgs =
-	& DataViewColumnCommonArgs
-	& {
-		sortingField?: string
-	}
-
-export const createBooleanColumn = ({ field, label, ...args }: DataViewBooleanColumnArgs): DataGridColumn => {
-
-	return {
-		type: 'boolean',
-		field,
-		filterName: field,
-		cell: <Field field={field} format={formatBoolean} />,
-		header: label,
-		hidingName: field,
-		sortingField: field,
-		filterToolbar: <DataGridBooleanFilter field={field} label={label} />,
-		...args,
-	}
-}
-
-export type DataViewEnumColumnArgs =
-	& DataViewColumnCommonArgs
-	& {
-		sortingField?: string
-		options: Record<string, ReactNode>
-		filterLabel?: ReactNode
-	}
-
-export const createEnumColumn = ({ field, label, options, filterLabel, ...args }: DataViewEnumColumnArgs): DataGridColumn => {
-	return {
-		type: 'enum',
-		field,
-		filterName: field,
-		cell: (
-			<div className={'-mx-3'}>
-				<Field<string> field={field} format={it => it ? (
-					<DataGridEnumFieldTooltip value={it} filter={args.filterName ?? field}>
-						<DataGridTooltipLabel>
-							{options[it]}
-						</DataGridTooltipLabel>
-					</DataGridEnumFieldTooltip>
-					) : null}
-					/>
-			</div>),
-		header: label,
-		hidingName: field,
-		sortingField: field,
-		filterToolbar: (
-			<DataGridEnumFilter
-				field={field}
-				label={filterLabel ?? label}
-				options={options}
-			/>
-		),
-		...args,
-	}
-}
-export const DataGridColumns = {
-	text: createTextColumn,
-	number: createNumberColumn,
-	date: createDateColumn,
-	boolean: createBooleanColumn,
-	hasOne: createHasOneColumn,
-	hasMany: createHasManyColumn,
-	enum: createEnumColumn,
-}

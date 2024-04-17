@@ -28,25 +28,27 @@ export const DataGridEnumFilter = Component(({ options, label, ...props }: DataG
 		</DataViewEnumFilter>
 	))
 
-export const DataGridEnumFieldTooltip = ({ filter, children, actions, value }: { filter: string, children: ReactNode, value: string, actions?: ReactNode }) => (
-	<TooltipProvider>
-		<Tooltip>
-			<TooltipTrigger asChild>
-				{children}
-			</TooltipTrigger>
-			<TooltipContent variant={'blurred'}>
-				<div className={'flex gap-1'}>
-					<DataViewEnumFilterTrigger name={filter} action={'toggleInclude'} value={value}>
-						<DataGridFilterActionButtonUI />
-					</DataViewEnumFilterTrigger>
-					<DataViewEnumFilterTrigger name={filter} action={'toggleExclude'} value={value}>
-						<DataGridExcludeActionButtonUI />
-					</DataViewEnumFilterTrigger>
-					{actions}
-				</div>
-			</TooltipContent>
-		</Tooltip>
-	</TooltipProvider>
+export const DataGridEnumFieldTooltip = ({ children, actions, value, ...props }: Omit<DataViewEnumFilterProps, 'children'> & { children: ReactNode, value: string, actions?: ReactNode }) => (
+	<DataViewEnumFilter {...props}>
+		<TooltipProvider>
+			<Tooltip>
+				<TooltipTrigger asChild>
+					{children}
+				</TooltipTrigger>
+				<TooltipContent variant={'blurred'}>
+					<div className={'flex gap-1'}>
+						<DataViewEnumFilterTrigger action={'toggleInclude'} value={value}>
+							<DataGridFilterActionButtonUI />
+						</DataViewEnumFilterTrigger>
+						<DataViewEnumFilterTrigger action={'toggleExclude'} value={value}>
+							<DataGridExcludeActionButtonUI />
+						</DataViewEnumFilterTrigger>
+						{actions}
+					</div>
+				</TooltipContent>
+			</Tooltip>
+		</TooltipProvider>
+	</DataViewEnumFilter>
 )
 
 

@@ -70,8 +70,25 @@ const DataGridRelationFilterInner = Component(({ children, label }: DataGridRela
 	)
 }, () => null)
 
+export const DataGridHasOneTooltip = Component(({ children, actions, ...props }: DataViewHasOneFilterProps & { children: ReactNode, actions?: ReactNode }) => (
+	<DataViewHasOneFilter {...props}>
+		<DataGridRelationFieldTooltipInner actions={actions}>
+			{children}
+		</DataGridRelationFieldTooltipInner>
+	</DataViewHasOneFilter>
+))
 
-export const DataGridRelationFieldTooltip = ({ filter, children, actions }: { filter: string, children: ReactNode, actions?: ReactNode }) => (
+export const DataGridHasManyTooltip = Component<DataViewHasManyFilterProps & { children: ReactNode, actions?: ReactNode }>(({ children, actions, ...props }, env) => {
+	return (
+		<DataViewHasManyFilter {...props}>
+			<DataGridRelationFieldTooltipInner actions={actions}>
+				{children}
+			</DataGridRelationFieldTooltipInner>
+		</DataViewHasManyFilter>
+	)
+})
+
+const DataGridRelationFieldTooltipInner = Component(({ children, actions }: { children: ReactNode, actions?: ReactNode }) => (
 	<TooltipProvider>
 		<Tooltip>
 			<TooltipTrigger asChild>
@@ -79,10 +96,10 @@ export const DataGridRelationFieldTooltip = ({ filter, children, actions }: { fi
 			</TooltipTrigger>
 			<TooltipContent variant={'blurred'}>
 				<div className={'flex gap-1'}>
-					<DataViewRelationFilterTrigger name={filter} action={'toggleInclude'}>
+					<DataViewRelationFilterTrigger action={'toggleInclude'}>
 						<DataGridFilterActionButtonUI />
 					</DataViewRelationFilterTrigger>
-					<DataViewRelationFilterTrigger name={filter} action={'toggleExclude'}>
+					<DataViewRelationFilterTrigger action={'toggleExclude'}>
 						<DataGridExcludeActionButtonUI />
 					</DataViewRelationFilterTrigger>
 					{actions}
@@ -90,7 +107,7 @@ export const DataGridRelationFieldTooltip = ({ filter, children, actions }: { fi
 			</TooltipContent>
 		</Tooltip>
 	</TooltipProvider>
-)
+))
 
 const DataGridRelationFilteredItemsList = ({ children }: {
 	children: ReactNode

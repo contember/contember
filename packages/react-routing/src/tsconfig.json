@@ -5,6 +5,7 @@
 	},
 	"references": [
 		{ "path": "../../react-binding/src" },
+		{ "path": "../../react-utils/src" },
 		{ "path": "../../utilities/src" },
 	]
 }

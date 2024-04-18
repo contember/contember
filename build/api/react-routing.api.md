@@ -15,12 +15,31 @@ import { JSX as JSX_2 } from 'react/jsx-runtime';
 import { NamedExoticComponent } from 'react';
 import { ReactElement } from 'react';
 import { ReactNode } from 'react';
+import { StateStorageOrName } from '@contember/react-utils';
 
 // @public (undocumented)
 export const createBindingLinkParametersResolver: (entity: EntityAccessor | undefined) => RoutingParameterResolver;
 
 // @public (undocumented)
 export const CurrentRequestContext: Context<RequestState>;
+
+// @public (undocumented)
+export const DimensionLink: NamedExoticComponent<DimensionLinkProps>;
+
+// @public (undocumented)
+export type DimensionLinkAction = 'add' | 'toggle' | 'set' | 'unset';
+
+// @public (undocumented)
+export interface DimensionLinkProps {
+    // (undocumented)
+    action?: DimensionLinkAction;
+    // (undocumented)
+    children: ReactElement;
+    // (undocumented)
+    dimension: string;
+    // (undocumented)
+    value: string;
+}
 
 // @public (undocumented)
 export type DynamicRequestParameters = RequestParameters<RoutingParameter>;
@@ -268,6 +287,13 @@ export const useBindingLinkParametersResolver: () => RoutingParameterResolver;
 
 // @public (undocumented)
 export const useCurrentRequest: () => RequestState;
+
+// @public (undocumented)
+export const useDimensionState: ({ dimension, defaultValue, storage }: {
+    dimension: string;
+    defaultValue: string | string[];
+    storage?: StateStorageOrName | undefined;
+}) => string[];
 
 // @public (undocumented)
 export const useLinkFactory: () => (target: RoutingLinkTarget, parameters?: RequestParameters, entity?: EntityAccessor) => RoutingLinkParams;

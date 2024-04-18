@@ -1,3 +1,4 @@
+import * as React from 'react'
 import { memo, PropsWithChildren } from 'react'
 import { IdentityLoader } from '../../lib/components/binding/identity'
 import { Slots } from '../../lib/components/slots'

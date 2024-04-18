@@ -82,6 +82,71 @@ export const ContemberClientNames: SchemaNames = {
         "order"
       ]
     },
+    "DimensionsItem": {
+      "name": "DimensionsItem",
+      "fields": {
+        "id": {
+          "type": "column"
+        },
+        "unique": {
+          "type": "column"
+        },
+        "locales": {
+          "type": "many",
+          "entity": "DimensionsItemLocale"
+        }
+      },
+      "scalars": [
+        "id",
+        "unique"
+      ]
+    },
+    "DimensionsItemLocale": {
+      "name": "DimensionsItemLocale",
+      "fields": {
+        "id": {
+          "type": "column"
+        },
+        "item": {
+          "type": "one",
+          "entity": "DimensionsItem"
+        },
+        "locale": {
+          "type": "one",
+          "entity": "DimensionsLocale"
+        },
+        "title": {
+          "type": "column"
+        },
+        "content": {
+          "type": "column"
+        }
+      },
+      "scalars": [
+        "id",
+        "title",
+        "content"
+      ]
+    },
+    "DimensionsLocale": {
+      "name": "DimensionsLocale",
+      "fields": {
+        "id": {
+          "type": "column"
+        },
+        "code": {
+          "type": "column"
+        },
+        "label": {
+          "type": "column"
+        }
+      },
+      "scalars": [
+        "id",
+        "code",
+        "label"
+      ]
+    },
     "GridArticle": {
       "name": "GridArticle",
       "fields": {

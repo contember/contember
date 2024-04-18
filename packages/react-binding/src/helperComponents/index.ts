@@ -1,4 +1,5 @@
 export * from './DeferredSubTrees'
+export * from './DimensionRenderer'
 export * from './EntityView'
 export * from './If'
 export * from './FieldView'

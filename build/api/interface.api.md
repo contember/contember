@@ -57,7 +57,7 @@ export interface DeleteEntityTriggerProps {
     // (undocumented)
     children: ReactNode;
     // (undocumented)
-    immediatePersist?: true;
+    immediatePersist?: boolean;
     // (undocumented)
     onPersistError?: (result: ErrorPersistResult) => void;
     // (undocumented)

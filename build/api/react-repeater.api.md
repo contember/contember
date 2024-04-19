@@ -25,10 +25,14 @@ export type RepeaterAddItemIndex = number | 'first' | 'last' | undefined;
 export type RepeaterAddItemMethod = (index: RepeaterAddItemIndex, preprocess?: EntityAccessor.BatchUpdatesHandler) => void;
 
 // @public (undocumented)
-export const RepeaterAddItemTrigger: ({ children, index }: {
+export const RepeaterAddItemTrigger: ({ children, index, preprocess }: RepeaterAddItemTriggerProps) => JSX_2.Element;
+
+// @public (undocumented)
+export type RepeaterAddItemTriggerProps = {
     children: ReactNode;
-    index: RepeaterAddItemIndex;
-}) => JSX_2.Element;
+    index?: RepeaterAddItemIndex;
+    preprocess?: EntityAccessor.BatchUpdatesHandler;
+};
 
 // @internal (undocumented)
 export const RepeaterCurrentEntityContext: Context<EntityAccessor_2>;

@@ -6,7 +6,7 @@ import { EntityAccessor } from '@contember/binding'
 
 export type RepeaterAddItemTriggerProps = {
 	children: ReactNode
-	index: RepeaterAddItemIndex
+	index?: RepeaterAddItemIndex
 	preprocess?: EntityAccessor.BatchUpdatesHandler
 }
 export const RepeaterAddItemTrigger = ({ children, index, preprocess }: RepeaterAddItemTriggerProps) => {

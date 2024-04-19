@@ -25,6 +25,7 @@ COPY ./packages/playground/package.json ././packages/playground/package.json
 COPY ./packages/react-auto/package.json ././packages/react-auto/package.json
 COPY ./packages/react-binding/package.json ././packages/react-binding/package.json
 COPY ./packages/react-binding-ui/package.json ././packages/react-binding-ui/package.json
+COPY ./packages/react-block-repeater/package.json ././packages/react-block-repeater/package.json
 COPY ./packages/react-board/package.json ././packages/react-board/package.json
 COPY ./packages/react-board-dnd-kit/package.json ././packages/react-board-dnd-kit/package.json
 COPY ./packages/react-choice-field/package.json ././packages/react-choice-field/package.json

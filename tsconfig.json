@@ -54,6 +54,9 @@
 			"path": "./packages/react-binding-ui"
 		},
 		{
+			"path": "./packages/react-block-repeater"
+		},
+		{
 			"path": "./packages/react-board"
 		},
 		{

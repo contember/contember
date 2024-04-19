@@ -1,3 +1,4 @@
+export * from './Blocks'
 export * from './Board'
 export * from './Dimensions'
 export * from './Grid'

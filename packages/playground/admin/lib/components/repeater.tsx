@@ -58,16 +58,16 @@ export const RepeaterAddItemButton = ({ children }: { children?: React.ReactNode
 
 export const RepeaterRemoveItemButton = ({ children }: { children?: React.ReactNode }) => (
 	<RepeaterRemoveItemTrigger>
-		<Button variant={'link'} size={'sm'} className={'gap-1 px-0 group'}>
+		<Button variant={'link'} size={'sm'} className={'gap-1 px-0 group/button'}>
 			{children || <>
-				<Trash2Icon className={'group-hover:text-red-600'} size={16}/>
+				<Trash2Icon className={'group-hover/button:text-red-600'} size={16}/>
 			</>}
 		</Button>
 	</RepeaterRemoveItemTrigger>
 )
 
 export const RepeaterItemActions = uic('div', {
-	baseClass: 'absolute top-1 right-2 flex',
+	baseClass: 'absolute top-1 right-2 flex gap-2',
 })
 
 export type DefaultRepeaterProps = { title?: string }

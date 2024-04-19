@@ -1,9 +1,12 @@
+import type { BlockType } from './enums'
 import type { BoardTaskStatus } from './enums'
 import type { GridArticleState } from './enums'
 import type { InputUnique } from './enums'
 import type { SelectUnique } from './enums'
 import type { UploadMediaType } from './enums'
 import type { UploadOne } from './enums'
+import type { BlockImagePosition } from './enums'
+import type { BlockListUnique } from './enums'
 import type { DimensionsItemUnique } from './enums'
 import type { InputRootEnumValue } from './enums'
 
@@ -12,6 +15,63 @@ export type JSONValue = JSONPrimitive | JSONObject | JSONArray
 export type JSONObject = { readonly [K in string]?: JSONValue }
 export type JSONArray = readonly JSONValue[]
 
+export type Block <OverRelation extends string | never = never> = {
+	name: 'Block'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+		| Omit<{ image: BlockImage['unique']}, OverRelation>
+	columns: {
+		id: string
+		order: number
+		type: BlockType
+		title: string
+		content: string | null
+		imagePosition: BlockImagePosition | null
+		color: string | null
+	}
+	hasOne: {
+		list: BlockList
+		image: BlockImage
+	}
+	hasMany: {
+	}
+	hasManyBy: {
+	}
+}
+export type BlockImage <OverRelation extends string | never = never> = {
+	name: 'BlockImage'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+	columns: {
+		id: string
+		url: string | null
+	}
+	hasOne: {
+	}
+	hasMany: {
+	}
+	hasManyBy: {
+	}
+}
+export type BlockList <OverRelation extends string | never = never> = {
+	name: 'BlockList'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+		| Omit<{ unique: BlockListUnique}, OverRelation>
+		| Omit<{ blocks: Block['unique']}, OverRelation>
+	columns: {
+		id: string
+		unique: BlockListUnique
+	}
+	hasOne: {
+	}
+	hasMany: {
+		blocks: Block<'list'>
+	}
+	hasManyBy: {
+		blocksByImage: { entity: Block; by: {image: BlockImage['unique']}  }
+	}
+}
 export type BoardTag <OverRelation extends string | never = never> = {
 	name: 'BoardTag'
 	unique:
@@ -599,6 +659,9 @@ export type UploadVideo <OverRelation extends string | never = never> = {
 }
 
 export type ContemberClientEntities = {
+	Block: Block
+	BlockImage: BlockImage
+	BlockList: BlockList
 	BoardTag: BoardTag
 	BoardTask: BoardTask
 	BoardUser: BoardUser

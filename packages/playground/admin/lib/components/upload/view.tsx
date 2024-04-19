@@ -19,10 +19,10 @@ export type UploadedImageViewProps =
 export const UploadedImageView = Component<UploadedImageViewProps>(({ DestroyAction, ...props }) => {
 	const url = useField<string>(props.urlField).value
 	return (
-		<div className="flex items-center justify-center h-40 w-40 rounded-md group">
+		<div className="flex items-center justify-center h-40 w-40 rounded-md group relative">
 			{url && <img src={formatImageResizeUrl(url)} className="max-w-full max-h-full" />}
 			<FileActions DestroyAction={DestroyAction}>
-							<ImageMetadata {...props} />
+					<ImageMetadata {...props} />
 			</FileActions>
 		</div>
 	)
@@ -199,7 +199,7 @@ const FileActions = ({ DestroyAction, children }: {
 		<div className="absolute -top-2 -right-1 p-0.5 bg-gray-200 border border-gray-300 rounded shadow flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
 			<Popover>
 				<PopoverTrigger asChild>
-					<Button variant={'ghost'} size={'sm'} className={'p-0.5 h-5 w-5'}>
+					<Button variant={'ghost'} size={'sm'} className={'p-0.5 h-5 w-5'} onClick={e => e.stopPropagation()}>
 						<InfoIcon className="h-3 w-3" />
 					</Button>
 				</PopoverTrigger>

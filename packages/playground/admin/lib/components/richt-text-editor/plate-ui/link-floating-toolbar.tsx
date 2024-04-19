@@ -11,10 +11,11 @@ import {
 } from '@udecode/plate-link'
 import { ExternalLinkIcon, LinkIcon, TextIcon, UnlinkIcon } from 'lucide-react'
 import { Button, buttonConfig } from '../../ui/button'
-import { Input } from '../../ui/input'
+import { Input, inputConfig } from '../../ui/input'
 import { popoverVariants } from './popover'
 
 import { Separator } from './separator'
+import { uic } from '../../../utils/uic'
 
 const floatingOptions: UseVirtualFloatingOptions = {
 	placement: 'bottom-start',
@@ -30,6 +31,10 @@ const floatingOptions: UseVirtualFloatingOptions = {
 export interface LinkFloatingToolbarProps {
 	state?: LinkFloatingToolbarState;
 }
+
+const FloatingLinkUrlInputUi = uic(FloatingLinkUrlInput, {
+	...inputConfig,
+})
 
 export function LinkFloatingToolbar({ state }: LinkFloatingToolbarProps) {
 	const insertState = useFloatingLinkInsertState({
@@ -69,8 +74,10 @@ export function LinkFloatingToolbar({ state }: LinkFloatingToolbarProps) {
 					<LinkIcon className="size-4"/>
 				</div>
 
-				<FloatingLinkUrlInput
+				<FloatingLinkUrlInputUi
 					placeholder="Paste link"
+					variant="ghost"
+					inputSize="sm"
 				/>
 			</div>
 

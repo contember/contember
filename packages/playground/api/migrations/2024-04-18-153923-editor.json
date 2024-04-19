@@ -1,0 +1,227 @@
+{
+	"formatVersion": 5,
+	"modifications": [
+		{
+			"modification": "createEnum",
+			"enumName": "EditorReferenceType",
+			"values": [
+				"image",
+				"link"
+			]
+		},
+		{
+			"modification": "createEnum",
+			"enumName": "EditorContentUnique",
+			"values": [
+				"unique"
+			]
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "EditorContent",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "editor_content",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": [],
+				"indexes": [],
+				"eventLog": {
+					"enabled": true
+				}
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "EditorImage",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "editor_image",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": [],
+				"indexes": [],
+				"eventLog": {
+					"enabled": true
+				}
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "EditorLink",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "editor_link",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": [],
+				"indexes": [],
+				"eventLog": {
+					"enabled": true
+				}
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "EditorReference",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "editor_reference",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": [],
+				"indexes": [],
+				"eventLog": {
+					"enabled": true
+				}
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "EditorContent",
+			"field": {
+				"name": "unique",
+				"columnName": "unique",
+				"columnType": "EditorContentUnique",
+				"nullable": false,
+				"type": "Enum",
+				"default": "unique"
+			},
+			"fillValue": "unique"
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "EditorContent",
+			"field": {
+				"name": "data",
+				"columnName": "data",
+				"columnType": "jsonb",
+				"nullable": false,
+				"type": "Json"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "EditorImage",
+			"field": {
+				"name": "url",
+				"columnName": "url",
+				"columnType": "text",
+				"nullable": false,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "EditorLink",
+			"field": {
+				"name": "url",
+				"columnName": "url",
+				"columnType": "text",
+				"nullable": false,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "EditorReference",
+			"field": {
+				"name": "type",
+				"columnName": "type",
+				"columnType": "EditorReferenceType",
+				"nullable": false,
+				"type": "Enum"
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "EditorReference",
+			"owningSide": {
+				"type": "ManyHasOne",
+				"name": "content",
+				"target": "EditorContent",
+				"joiningColumn": {
+					"columnName": "content_id",
+					"onDelete": "restrict"
+				},
+				"nullable": false,
+				"inversedBy": "references"
+			},
+			"inverseSide": {
+				"type": "OneHasMany",
+				"name": "references",
+				"target": "EditorReference",
+				"ownedBy": "content"
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "EditorReference",
+			"owningSide": {
+				"type": "ManyHasOne",
+				"name": "image",
+				"target": "EditorImage",
+				"joiningColumn": {
+					"columnName": "image_id",
+					"onDelete": "restrict"
+				},
+				"nullable": true
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "EditorReference",
+			"owningSide": {
+				"type": "ManyHasOne",
+				"name": "link",
+				"target": "EditorLink",
+				"joiningColumn": {
+					"columnName": "link_id",
+					"onDelete": "restrict"
+				},
+				"nullable": true
+			}
+		},
+		{
+			"modification": "createUniqueConstraint",
+			"entityName": "EditorContent",
+			"unique": {
+				"fields": [
+					"unique"
+				]
+			}
+		}
+	]
+}

@@ -57,7 +57,7 @@ export function TurnIntoDropdownMenu(props: DropdownMenuProps) {
 	const value: string = useEditorSelector(editor => {
 		if (isCollapsed(editor.selection)) {
 			const entry = findNode<TElement>(editor, {
-				match: n => isBlock(editor, n),
+				match: (n: any) => isBlock(editor, n),
 			})
 
 			if (entry) {

@@ -16,7 +16,7 @@ import { DeleteEntityTrigger } from '@contember/interface'
 import { FeedbackTrigger } from './persist'
 import { dict } from '../../dict'
 
-export const DeleteEntityDialog = ({ trigger }: { trigger: ReactElement }) => {
+export const DeleteEntityDialog = ({ trigger, immediatePersist }: { trigger: ReactElement, immediatePersist?: boolean }) => {
 	return (
 		<AlertDialog>
 			<AlertDialogTrigger asChild>
@@ -30,7 +30,7 @@ export const DeleteEntityDialog = ({ trigger }: { trigger: ReactElement }) => {
 				<AlertDialogFooter>
 					<AlertDialogCancel>{dict.deleteEntityDialog.cancelButton}</AlertDialogCancel>
 					<FeedbackTrigger>
-						<DeleteEntityTrigger immediatePersist>
+						<DeleteEntityTrigger immediatePersist={immediatePersist ?? true}>
 							<AlertDialogAction asChild>
 								<Button variant={'destructive'}>{dict.deleteEntityDialog.confirmButton}</Button>
 							</AlertDialogAction>

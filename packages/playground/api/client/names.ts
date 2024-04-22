@@ -1,6 +1,83 @@
 import { SchemaNames } from '@contember/client-content'
 export const ContemberClientNames: SchemaNames = {
   "entities": {
+    "Block": {
+      "name": "Block",
+      "fields": {
+        "id": {
+          "type": "column"
+        },
+        "list": {
+          "type": "one",
+          "entity": "BlockList"
+        },
+        "order": {
+          "type": "column"
+        },
+        "type": {
+          "type": "column"
+        },
+        "title": {
+          "type": "column"
+        },
+        "content": {
+          "type": "column"
+        },
+        "image": {
+          "type": "one",
+          "entity": "BlockImage"
+        },
+        "imagePosition": {
+          "type": "column"
+        },
+        "color": {
+          "type": "column"
+        }
+      },
+      "scalars": [
+        "id",
+        "order",
+        "type",
+        "title",
+        "content",
+        "imagePosition",
+        "color"
+      ]
+    },
+    "BlockImage": {
+      "name": "BlockImage",
+      "fields": {
+        "id": {
+          "type": "column"
+        },
+        "url": {
+          "type": "column"
+        }
+      },
+      "scalars": [
+        "id",
+        "url"
+      ]
+    },
+    "BlockList": {
+      "name": "BlockList",
+      "fields": {
+        "id": {
+          "type": "column"
+        },
+        "unique": {
+          "type": "column"
+        },
+        "blocks": {
+          "type": "many",
+          "entity": "Block"
+        }
+      },
+      "scalars": [
+        "id",
+        "unique"
+      ]
+    },
     "BoardTag": {
       "name": "BoardTag",
       "fields": {

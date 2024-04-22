@@ -16,7 +16,12 @@ export const Navigation = () => {
 					<MenuItem icon={line} label={'Dynamic columns'} to={'board/assignee'} />
 					<MenuItem icon={line} label={'Static columns'} to={'board/status'} />
 				</MenuItem>
-				<MenuItem icon={<GripVertical size={16} />} label={'Repeater'} to={'repeater'} />
+				<MenuItem icon={<GripVertical size={16} />} label={'Repeater'}>
+						<MenuItem icon={line} label={'Sortable repeater'} to={'repeater'} />
+						<MenuItem icon={line} label={'Non-sortable repeater'} to={'repeater/nonSortable'} />
+						<MenuItem icon={line} label={'Block repeater'} to={'blocks'} />
+						<MenuItem icon={line} label={'Block repeater w/o dual render'} to={'blocks/withoutDualRender'} />
+				</MenuItem>
 				<MenuItem icon={<TableIcon size={16} />} label={'Grid'}>
 					<MenuItem icon={line} label={'Complex grid'} to={'grid'} />
 					<MenuItem icon={line} label={'Simple grid'} to={'grid/simpleGrid'} />
@@ -34,6 +39,14 @@ export const Navigation = () => {
 					<MenuItem icon={line} label={'Create new form'} to={'select/createNewForm'} />
 					<MenuItem icon={line} label={'Has many select'} to={'select/hasMany'} />
 					<MenuItem icon={line} label={'Has many sortable select'} to={'select/hasManySortable'} />
+				</MenuItem>
+				<MenuItem icon={<UploadIcon size={16} />} label={'Upload'}>
+					<MenuItem icon={line} label={'Image upload'} to={'upload/image'} />
+					<MenuItem icon={line} label={'Image w/o meta'} to={'upload/imageTrivial'} />
+					<MenuItem icon={line} label={'Audio upload'} to={'upload/audio'} />
+					<MenuItem icon={line} label={'Video upload'} to={'upload/video'} />
+					<MenuItem icon={line} label={'Generic file upload'} to={'upload/any'} />
+					<MenuItem icon={line} label={'Image repeater'} to={'upload/imageList'} />
 				</MenuItem>
 				<MenuItem icon={<LanguagesIcon size={16} />} label={'Dimensions'} to={'dimensions'} />
 			</Menu>

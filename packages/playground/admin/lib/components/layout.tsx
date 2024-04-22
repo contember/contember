@@ -1,4 +1,4 @@
-import { LogOutIcon, MenuIcon, PanelLeftCloseIcon, PanelLeftOpenIcon, PanelRightCloseIcon, PanelRightOpenIcon } from 'lucide-react'
+import { LogOutIcon, Maximize2Icon, MenuIcon, Minimize2Icon, PanelLeftCloseIcon, PanelLeftOpenIcon, PanelRightCloseIcon, PanelRightOpenIcon } from 'lucide-react'
 import { PropsWithChildren, useEffect, useState } from 'react'
 import { ComponentClassNameProps } from '@contember/utilities'
 import { useHasActiveSlotsFactory } from '@contember/react-slots'
@@ -10,7 +10,18 @@ import { dict } from '../dict'
 import { useCurrentRequest } from '@contember/interface'
 
 const LayoutBodyUI = uic('div', { baseClass: 'bg-gray-50 h-full min-h-screen relative py-4 pl-[calc(100vw-100%)]' })
-const LayoutMaxWidthUI = uic('div', { baseClass: 'max-w-[100rem] mx-auto' })
+const LayoutMaxWidthUI = uic('div', {
+	baseClass: 'mx-auto transition-all',
+	variants: {
+		layout: {
+			stretch: 'max-w-[calc(100vw-5rem)]',
+			default: 'max-w-[100rem]',
+		},
+	},
+	defaultVariants: {
+		layout: 'default',
+	},
+})
 const LayoutBoxUI = uic('div', { baseClass: 'rounded-xl shadow-lg border bg-white gap-1 flex flex-col lg:flex-row mt-4 relative min-h-[calc(100vh-10rem)]' })
 
 const LayoutCenterPanelUI = uic('div', { baseClass: 'flex flex-col flex-2 p-4 gap-2 w-full flex-auto overflow-hidden' })
@@ -50,12 +61,14 @@ const LayoutLeftPanelCloserUI = uic('a', { baseClass: 'hidden lg:flex self-end a
 const LayoutLeftPanelOpenerUI = uic('a', { baseClass: 'hidden lg:block absolute top-1 left-1' })
 const LayoutRightPanelCloserUI = uic('a', { baseClass: 'hidden lg:flex self-end absolute top-1 right-1 opacity-0 text-gray-400 hover:opacity-100 transition-opacity cursor-pointer' })
 const LayoutRightPanelOpenerUI = uic('a', { baseClass: 'absolute top-1 right-1' })
+const LayoutSwitcherUI = uic('a', { baseClass: 'hidden lg:flex self-end absolute top-1 right-1 opacity-20 text-gray-400 hover:opacity-100 transition-opacity cursor-pointer' })
 
 
 export const LayoutComponent = ({ children, ...rest }: PropsWithChildren<ComponentClassNameProps>) => {
 	const isActive = useHasActiveSlotsFactory()
 
 	const [leftSidebarVisibility, setLeftSidebarVisibility] = useState<'show' | 'hidden' | 'auto'>('auto')
+	const [layout, setLayout] = useState<'default' | 'stretch'>('default')
 
 	const request = useCurrentRequest()
 	useEffect(() => {
@@ -67,7 +80,12 @@ export const LayoutComponent = ({ children, ...rest }: PropsWithChildren<Compone
 	const hasRightSidebar = isActive('SidebarRightHeader', 'SidebarRightBody', 'SidebarRightFooter', 'Sidebar')
 	return (
 		<LayoutBodyUI>
-			<LayoutMaxWidthUI>
+			<LayoutSwitcherUI className="absolute top-0.5 right-0.5" onClick={() => setLayout(it => it === 'default' ? 'stretch' : 'default')}>
+				{layout === 'default' ? <Maximize2Icon /> : <Minimize2Icon />}
+			</LayoutSwitcherUI>
+
+
+			<LayoutMaxWidthUI layout={layout}>
 				<LayoutBoxUI>
 					{leftSidebarVisibility === 'hidden' && (
 						<LayoutLeftPanelOpenerUI onClick={() => setLeftSidebarVisibility('auto')}>

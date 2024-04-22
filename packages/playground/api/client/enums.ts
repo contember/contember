@@ -1,3 +1,8 @@
+export type BlockType = 
+	 | "text"
+	 | "image"
+	 | "textWithImage"
+	 | "hero"
 export type BoardTaskStatus = 
 	 | "backlog"
 	 | "todo"
@@ -17,6 +22,11 @@ export type UploadMediaType =
 	 | "audio"
 	 | "file"
 export type UploadOne = 
+	 | "unique"
+export type BlockImagePosition = 
+	 | "left"
+	 | "right"
+export type BlockListUnique = 
 	 | "unique"
 export type DimensionsItemUnique = 
 	 | "unique"

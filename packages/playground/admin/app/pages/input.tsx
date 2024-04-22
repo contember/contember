@@ -5,6 +5,7 @@ import * as React from 'react'
 import { Button } from '../../lib/components/ui/button'
 import { Binding, PersistButton } from '../../lib/components/binding'
 import { SelectOrTypeField } from '../../lib-extra/select-or-type-field'
+import { FieldExists } from '../../lib-extra/has-field'
 
 
 export const basic = () => <>
@@ -19,6 +20,10 @@ export const basic = () => <>
 				<InputField field={'floatValue'} label={'Float'} />
 				<InputField field={'dateValue'} label={'Date'} />
 				<InputField field={'datetimeValue'} label={'Date time'} />
+
+				<FieldExists field={'nonExistingField'}>
+					<InputField field={'nonExistingField'} label={'Date time'} />
+				</FieldExists>
 			</div>
 		</EntitySubTree>
 	</Binding>

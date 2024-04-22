@@ -3,6 +3,7 @@ import {
 	Repeater,
 	RepeaterAddItemTrigger,
 	RepeaterEachItem,
+	RepeaterEmpty,
 	RepeaterProps,
 	RepeaterRemoveItemTrigger,
 } from '@contember/react-repeater'
@@ -18,11 +19,9 @@ import { GripVerticalIcon, PlusCircleIcon, Trash2Icon } from 'lucide-react'
 import { Button } from './ui/button'
 import { uic } from '../utils/uic'
 import { DropIndicator } from './ui/sortable'
+import { dict } from '../dict'
 
 export const RepeaterWrapperUI = uic('div', {
-	baseClass: 'flex flex-col gap-2',
-})
-export const RepeaterItemsWrapperUI = uic('div', {
 	baseClass: 'flex flex-col gap-2 p-4 pr-8 relative shadow-sm bg-white rounded border border-gray-300 max-w-md',
 })
 export const RepeaterItemUI = uic('div', {
@@ -59,15 +58,17 @@ export const RepeaterAddItemButton = ({ children }: { children?: React.ReactNode
 
 export const RepeaterRemoveItemButton = ({ children }: { children?: React.ReactNode }) => (
 	<RepeaterRemoveItemTrigger>
-		<div className={'absolute top-1 right-2 flex'}>
-			<Button variant={'link'} size={'sm'} className={'gap-1 px-0 group'}>
-				{children || <>
-					<Trash2Icon className={'group-hover:text-red-600'} size={16}/>
-				</>}
-			</Button>
-		</div>
+		<Button variant={'link'} size={'sm'} className={'gap-1 px-0 group/button'}>
+			{children || <>
+				<Trash2Icon className={'group-hover/button:text-red-600'} size={16}/>
+			</>}
+		</Button>
 	</RepeaterRemoveItemTrigger>
 )
+
+export const RepeaterItemActions = uic('div', {
+	baseClass: 'absolute top-1 right-2 flex gap-2',
+})
 
 export type DefaultRepeaterProps = { title?: string }
 	& RepeaterProps
@@ -82,11 +83,15 @@ export const DefaultRepeater = Component<DefaultRepeaterProps>(({ title, childre
 					{title && <h3 className={'font-medium'}>{title}</h3>}
 
 					<RepeaterWrapperUI>
+						<RepeaterEmpty>
+							<div className="italic text-sm text-gray-600">
+								{dict.repeater.empty}
+							</div>
+						</RepeaterEmpty>
 						<RepeaterEachItem>
-							<RepeaterItemsWrapperUI>
-								<RepeaterRemoveItemButton/>
+							<RepeaterItemUI>
 								{children}
-							</RepeaterItemsWrapperUI>
+							</RepeaterItemUI>
 						</RepeaterEachItem>
 					</RepeaterWrapperUI>
 
@@ -98,9 +103,14 @@ export const DefaultRepeater = Component<DefaultRepeaterProps>(({ title, childre
 	return (
 		<div>
 			<Repeater {...props}>
-				<RepeaterItemsWrapperUI>
+				<RepeaterWrapperUI>
 					{title && <h3 className={'font-medium'}>{title}</h3>}
 					<RepeaterSortable>
+						<RepeaterEmpty>
+							<div className="italic text-sm text-gray-600">
+								{dict.repeater.empty}
+							</div>
+						</RepeaterEmpty>
 						<RepeaterSortableEachItem>
 							<div>
 								<RepeaterDropIndicator position={'before'}/>
@@ -122,8 +132,8 @@ export const DefaultRepeater = Component<DefaultRepeaterProps>(({ title, childre
 						</RepeaterSortableDragOverlay>
 					</RepeaterSortable>
 
-					<RepeaterAddItemButton/>
-				</RepeaterItemsWrapperUI>
+					<RepeaterAddItemButton />
+				</RepeaterWrapperUI>
 			</Repeater>
 		</div>
 	)

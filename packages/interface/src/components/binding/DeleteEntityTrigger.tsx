@@ -6,7 +6,7 @@ import { ErrorPersistResult, SuccessfulPersistResult, useEntity, useMutationStat
 const SlotButton = Slot as ComponentType<React.ButtonHTMLAttributes<HTMLButtonElement>>
 
 export interface DeleteEntityTriggerProps {
-	immediatePersist?: true
+	immediatePersist?: boolean
 	children: ReactNode
 	onPersistSuccess?: (result: SuccessfulPersistResult) => void
 	onPersistError?: (result: ErrorPersistResult) => void

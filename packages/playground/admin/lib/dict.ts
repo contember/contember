@@ -108,4 +108,8 @@ export const dict = {
 		dropFiles: 'Drop files here',
 		or: 'or',
 	},
+	repeater: {
+		empty: 'No items.',
+		addItem: 'Add item',
+	},
 }

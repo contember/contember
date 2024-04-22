@@ -87,7 +87,7 @@ export const usePersistWithFeedback = () => {
 	const triggerPersist = usePersist()
 	const { onPersistSuccess, onPersistError } = usePersistFeedbackHandlers()
 	return useCallback(() => {
-		triggerPersist()
+		return triggerPersist()
 			.then(onPersistSuccess)
 			.catch(onPersistError)
 	}, [onPersistError, onPersistSuccess, triggerPersist])

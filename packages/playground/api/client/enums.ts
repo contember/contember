@@ -18,6 +18,8 @@ export type UploadMediaType =
 	 | "file"
 export type UploadOne = 
 	 | "unique"
+export type DimensionsItemUnique = 
+	 | "unique"
 export type InputRootEnumValue = 
 	 | "a"
 	 | "b"

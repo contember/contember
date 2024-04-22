@@ -4,6 +4,7 @@ import type { InputUnique } from './enums'
 import type { SelectUnique } from './enums'
 import type { UploadMediaType } from './enums'
 import type { UploadOne } from './enums'
+import type { DimensionsItemUnique } from './enums'
 import type { InputRootEnumValue } from './enums'
 
 export type JSONPrimitive = string | number | boolean | null
@@ -59,6 +60,61 @@ export type BoardUser <OverRelation extends string | never = never> = {
 		name: string
 		username: string
 		order: number | null
+	}
+	hasOne: {
+	}
+	hasMany: {
+	}
+	hasManyBy: {
+	}
+}
+export type DimensionsItem <OverRelation extends string | never = never> = {
+	name: 'DimensionsItem'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+		| Omit<{ unique: DimensionsItemUnique}, OverRelation>
+		| Omit<{ locales: DimensionsItemLocale['unique']}, OverRelation>
+	columns: {
+		id: string
+		unique: DimensionsItemUnique
+	}
+	hasOne: {
+	}
+	hasMany: {
+		locales: DimensionsItemLocale<'item'>
+	}
+	hasManyBy: {
+		localesByLocale: { entity: DimensionsItemLocale; by: {locale: DimensionsLocale['unique']}  }
+	}
+}
+export type DimensionsItemLocale <OverRelation extends string | never = never> = {
+	name: 'DimensionsItemLocale'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+		| Omit<{ item: DimensionsItem['unique'], locale: DimensionsLocale['unique']}, OverRelation>
+	columns: {
+		id: string
+		title: string
+		content: string | null
+	}
+	hasOne: {
+		item: DimensionsItem
+		locale: DimensionsLocale
+	}
+	hasMany: {
+	}
+	hasManyBy: {
+	}
+}
+export type DimensionsLocale <OverRelation extends string | never = never> = {
+	name: 'DimensionsLocale'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+		| Omit<{ code: string}, OverRelation>
+	columns: {
+		id: string
+		code: string
+		label: string
 	}
 	hasOne: {
 	}
@@ -546,6 +602,9 @@ export type ContemberClientEntities = {
 	BoardTag: BoardTag
 	BoardTask: BoardTask
 	BoardUser: BoardUser
+	DimensionsItem: DimensionsItem
+	DimensionsItemLocale: DimensionsItemLocale
+	DimensionsLocale: DimensionsLocale
 	GridArticle: GridArticle
 	GridArticleComment: GridArticleComment
 	GridAuthor: GridAuthor

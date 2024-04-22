@@ -1,4 +1,4 @@
-import { ArchiveIcon, BrushIcon, FormInputIcon, GripVertical, HomeIcon, KanbanIcon, TableIcon, UploadIcon } from 'lucide-react'
+import { ArchiveIcon, BrushIcon, FormInputIcon, GripVertical, HomeIcon, KanbanIcon, LanguagesIcon, TableIcon, UploadIcon } from 'lucide-react'
 import { Menu, MenuItem, MenuList } from '../../lib/components/ui/menu'
 
 
@@ -35,6 +35,7 @@ export const Navigation = () => {
 					<MenuItem icon={line} label={'Has many select'} to={'select/hasMany'} />
 					<MenuItem icon={line} label={'Has many sortable select'} to={'select/hasManySortable'} />
 				</MenuItem>
+				<MenuItem icon={<LanguagesIcon size={16} />} label={'Dimensions'} to={'dimensions'} />
 			</Menu>
 		</div>
 	)

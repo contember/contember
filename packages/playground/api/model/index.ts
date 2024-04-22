@@ -1,4 +1,5 @@
 export * from './Board'
+export * from './Dimensions'
 export * from './Grid'
 export * from './Repeater'
 export * from './Input'

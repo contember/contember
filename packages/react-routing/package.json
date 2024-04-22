@@ -36,6 +36,7 @@
 	},
 	"dependencies": {
 		"@contember/react-binding": "workspace:*",
+		"@contember/react-utils": "workspace:*",
 		"@contember/utilities": "workspace:*",
 		"@radix-ui/react-slot": "^1.0.2",
 		"path-to-regexp": "6.2.1"

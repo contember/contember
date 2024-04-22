@@ -26,9 +26,11 @@ import type { HasManyRelationMarker } from '@contember/binding';
 import type { HasOneRelationMarker } from '@contember/binding';
 import { JSX as JSX_2 } from 'react/jsx-runtime';
 import { MarkerTreeRoot } from '@contember/binding';
+import { MemoExoticComponent } from 'react';
 import { NamedExoticComponent } from 'react';
 import type { Persist } from '@contember/binding';
 import { PropsWithChildren } from 'react';
+import * as React_2 from 'react';
 import { ReactElement } from 'react';
 import { ReactNode } from 'react';
 import type { RelativeEntityList } from '@contember/binding';
@@ -168,6 +170,16 @@ export interface DeferredSubTreesProps {
     // (undocumented)
     fallback: ReactNode;
 }
+
+// @public (undocumented)
+export const DimensionRenderer: React_2.NamedExoticComponent<DimensionRendererProps>;
+
+// @public (undocumented)
+export type DimensionRendererProps = {
+    dimension: string;
+    as: string;
+    children: ReactNode;
+};
 
 // @public (undocumented)
 export const DirtinessContext: Context<boolean>;
@@ -765,6 +777,17 @@ export const useSortedEntities: (entityList: EntityListAccessor, sortableByField
 
 // @public (undocumented)
 export const useTreeRootId: () => TreeRootId | undefined;
+
+// @public (undocumented)
+export const Variable: MemoExoticComponent<({ name, format }: VariableProps) => ReactElement>;
+
+// @public (undocumented)
+export interface VariableProps {
+    // (undocumented)
+    format?: (value: ReactNode) => ReactNode;
+    // (undocumented)
+    name: Environment.Name;
+}
 
 
 export * from "@contember/binding";

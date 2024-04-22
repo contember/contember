@@ -16,7 +16,7 @@ export interface RoutingLinkProps {
  *
  * @group Routing
  */
-export const RoutingLink = memo<RoutingLinkProps>(({ to, parametersResolver, parameters, children }) => {
+export const RoutingLink = memo<RoutingLinkProps>(({ to, parametersResolver, parameters, ...props }) => {
 	const { navigate, isActive: active, href } = useRoutingLink(to, parametersResolver, parameters)
 
 	const innerOnClick = useCallback((e?: ReactMouseEvent<HTMLElement, MouseEvent>) => {
@@ -33,9 +33,8 @@ export const RoutingLink = memo<RoutingLinkProps>(({ to, parametersResolver, par
 			onClick={innerOnClick}
 			data-active={dataAttribute(active)}
 			{...{ href }}
-		>
-			{children}
-		</Slot>
+			{...props}
+		/>
 	)
 })
 

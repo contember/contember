@@ -3777,23 +3777,12 @@ memberships: GQLVariableType<Membership[], true>;
 }>, TenantMutationResponse<never, UpdateMembershipErrorCodes>>;
 
 // @public (undocumented)
-export const Variable: React.MemoExoticComponent<({ name, format }: VariableProps) => ReactElement>;
-
-// @public (undocumented)
 export interface VariableConfig {
     // (undocumented)
     render: ComponentType<{
         value: string[];
         onChange: (newValues: string[]) => void;
     }>;
-}
-
-// @public (undocumented)
-export interface VariableProps {
-    // (undocumented)
-    format?: (value: ReactNode) => ReactNode;
-    // (undocumented)
-    name: Environment.Name;
 }
 
 // @public (undocumented)

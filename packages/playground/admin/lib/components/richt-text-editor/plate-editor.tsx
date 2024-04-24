@@ -1,7 +1,7 @@
 import { Component, Field, SugarableRelativeSingleField, useField } from '@contember/interface'
 import { cn } from '@udecode/cn'
-import { Plate } from '@udecode/plate-common'
-import { useRef } from 'react'
+import { normalizeInitialValue, Plate, replaceNodeChildren, useEditorRef } from '@udecode/plate-common'
+import { useEffect, useRef } from 'react'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 import { plugins } from './plate-plugins'
@@ -26,7 +26,9 @@ export const PlateEditor = Component(
 		const handleEditorOnChange = (value: any) => {
 			const contentJson = isJsonObject(value) ? { children: value } : null
 
-			if (contentJson && contentField.value && (isJsonContent(contentField.value) && contentField.value.children === value)) return
+			if (contentJson && contentField.value && (isJsonContent(contentField.value) && contentField.value.children === value)) {
+				return
+			}
 
 			contentField.updateValue(contentJson)
 		}
@@ -40,6 +42,7 @@ export const PlateEditor = Component(
 						onChange={handleEditorOnChange}
 						normalizeInitialValue
 					>
+						<PlateContentSync />
 						<div
 							ref={containerRef}
 							className={cn(
@@ -79,3 +82,29 @@ export const PlateEditor = Component(
 	),
 	'PlateEditor',
 )
+
+const PlateContentSync = () => {
+	const field = useField('data')
+	const fieldAccessor = field.getAccessor
+	const fieldValue = field.value
+	const editor = useEditorRef()
+
+	useEffect(() => {
+		if (fieldValue !== fieldAccessor().value) {
+			return
+		}
+		const currValue = isJsonContent(fieldValue) && fieldValue.children.length > 0
+			? fieldValue.children
+			: editor.childrenFactory()
+		if (currValue === editor.children) {
+			return
+		}
+		const normalizedValue = normalizeInitialValue(editor, currValue) ?? currValue
+		replaceNodeChildren(editor, {
+			at: [],
+			nodes: normalizedValue,
+		} as any)
+	}, [editor, fieldAccessor, fieldValue])
+
+	return null
+}

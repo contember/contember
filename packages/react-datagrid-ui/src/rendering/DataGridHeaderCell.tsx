@@ -22,7 +22,7 @@ export type DataGridHeaderCellProps =
 export function DataGridHeaderCell(props: DataGridHeaderCellProps): ReactElement {
 	const {
 		columnKey,
-		column: { header, headerJustification, justification, shrunk, ascOrderIcon, descOrderIcon },
+		column: { header, headerJustification, justification, shrunk, ascOrderIcon, descOrderIcon, enableOrdering },
 	} = props
 	const orderDirections = useDataViewSortingState().directions
 	const { setOrderBy } = useDataViewSortingMethods()
@@ -36,7 +36,12 @@ export function DataGridHeaderCell(props: DataGridHeaderCellProps): ReactElement
 	return (
 		<TableHeaderCell scope="col" justification={headerJustification || justification} shrunk={shrunk}>
 			<span style={{ display: 'flex', justifyContent: 'flex-start', gap: '.25em' }}>
-				<span onClick={e => setOrderBy(columnKey, 'next', e.ctrlKey || e.metaKey)} style={{ cursor: 'pointer' }}>
+				<span onClick={e => {
+					if (enableOrdering === false) {
+						return
+					}
+					return setOrderBy(columnKey, 'next', e.ctrlKey || e.metaKey)
+				}} style={{ cursor: 'pointer' }}>
 					{header}
 					&nbsp;
 					{orderState &&

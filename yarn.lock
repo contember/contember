@@ -1319,12 +1319,14 @@ __metadata:
     "@udecode/cn": ^31.0.0
     "@udecode/plate-autoformat": ^31.0.0
     "@udecode/plate-basic-marks": ^31.0.0
+    "@udecode/plate-break": ^31.0.0
     "@udecode/plate-common": ^31.0.0
     "@udecode/plate-cursor": ^31.0.0
     "@udecode/plate-dnd": ^31.0.0
     "@udecode/plate-floating": ^31.0.0
     "@udecode/plate-font": ^31.0.0
     "@udecode/plate-heading": ^31.0.0
+    "@udecode/plate-indent": ^31.1.0
     "@udecode/plate-link": ^31.0.0
     "@udecode/plate-list": ^31.1.3
     "@udecode/plate-node-id": ^31.0.0
@@ -6341,6 +6343,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@udecode/plate-break@npm:^31.0.0":
+  version: 31.0.0
+  resolution: "@udecode/plate-break@npm:31.0.0"
+  peerDependencies:
+    "@udecode/plate-common": ">=31.0.0"
+    react: ">=16.8.0"
+    react-dom: ">=16.8.0"
+    slate: ">=0.94.0"
+    slate-history: ">=0.93.0"
+    slate-hyperscript: ">=0.66.0"
+    slate-react: ">=0.99.0"
+  checksum: 1536e5f59891c68e3f40428959f38d6836f48572a568869f0eaa52f9e25cbe1fcc6042a592d4aa737151b7fc35c68f46c41ff14daf938dd1aa7ebd85deaf6b42
+  languageName: node
+  linkType: hard
+
 "@udecode/plate-code-block@npm:31.3.4":
   version: 31.3.4
   resolution: "@udecode/plate-code-block@npm:31.3.4"
@@ -6530,7 +6547,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@udecode/plate-indent@npm:31.1.0":
+"@udecode/plate-indent@npm:31.1.0, @udecode/plate-indent@npm:^31.1.0":
   version: 31.1.0
   resolution: "@udecode/plate-indent@npm:31.1.0"
   peerDependencies:

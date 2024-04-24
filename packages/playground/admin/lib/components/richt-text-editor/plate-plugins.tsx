@@ -1,32 +1,9 @@
 import { withProps } from '@udecode/cn'
-import {
-	autoformatArrow,
-	autoformatLegal,
-	autoformatMath,
-	autoformatPunctuation,
-	createAutoformatPlugin,
-} from '@udecode/plate-autoformat'
-import {
-	createBoldPlugin,
-	createItalicPlugin,
-	createStrikethroughPlugin,
-	createUnderlinePlugin,
-	MARK_BOLD,
-	MARK_ITALIC,
-	MARK_STRIKETHROUGH,
-	MARK_UNDERLINE,
-} from '@udecode/plate-basic-marks'
+import { autoformatArrow, autoformatLegal, autoformatMath, autoformatPunctuation, createAutoformatPlugin } from '@udecode/plate-autoformat'
+import { createBoldPlugin, createItalicPlugin, createStrikethroughPlugin, createUnderlinePlugin, MARK_BOLD, MARK_ITALIC, MARK_STRIKETHROUGH, MARK_UNDERLINE } from '@udecode/plate-basic-marks'
 import { createPlugins, PlateElement, PlateLeaf, RenderAfterEditable } from '@udecode/plate-common'
 import { createDndPlugin } from '@udecode/plate-dnd'
-import {
-	createHeadingPlugin,
-	ELEMENT_H1,
-	ELEMENT_H2,
-	ELEMENT_H3,
-	ELEMENT_H4,
-	ELEMENT_H5,
-	ELEMENT_H6,
-} from '@udecode/plate-heading'
+import { createHeadingPlugin, ELEMENT_H1, ELEMENT_H2, ELEMENT_H3, ELEMENT_H4, ELEMENT_H5, ELEMENT_H6 } from '@udecode/plate-heading'
 import { createLinkPlugin, ELEMENT_LINK } from '@udecode/plate-link'
 import { createListPlugin, ELEMENT_LI, ELEMENT_OL, ELEMENT_UL } from '@udecode/plate-list'
 import { createNodeIdPlugin } from '@udecode/plate-node-id'
@@ -42,6 +19,8 @@ import { ListElement } from './plate-ui/list-element'
 import { ParagraphElement } from './plate-ui/paragraph-element'
 import { withPlaceholders } from './plate-ui/placeholder'
 import { withDraggables } from './plate-ui/with-draggables'
+import { createExitBreakPlugin } from '@udecode/plate-break'
+import { createIndentPlugin } from '@udecode/plate-indent'
 
 export const plugins = createPlugins([
 	// Nodes
@@ -78,6 +57,40 @@ export const plugins = createPlugins([
 			enableUndoOnDelete: true,
 		},
 	}),
+	createIndentPlugin({
+		inject: {
+			props: {
+				validTypes: [
+					ELEMENT_PARAGRAPH,
+					// ELEMENT_H1, ELEMENT_H2, ELEMENT_H3, ELEMENT_BLOCKQUOTE, ELEMENT_CODE_BLOCK
+				],
+			},
+		},
+	}),
+	createExitBreakPlugin({
+		options: {
+			rules: [
+				{
+					hotkey: 'mod+enter',
+				},
+				{
+					hotkey: 'mod+shift+enter',
+					before: true,
+				},
+				{
+					hotkey: 'enter',
+					query: {
+						start: true,
+						end: true,
+						// allow: KEYS_HEADING,
+					},
+					relative: true,
+					level: 1,
+				},
+			],
+		},
+	}),
+
 	dragOverCursorPlugin,
 
 	// Deserialization

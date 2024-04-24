@@ -12,6 +12,9 @@ export interface TypedEntitySelection<TSchema extends SchemaTypeLike, TEntityNam
 		[key in keyof TEntity['columns']]: TEntity['columns'][key]
 	}>
 
+
+	transform<T>(cb: (value: TValue) => T): TypedEntitySelection<TSchema, TEntityName, TEntity, T>
+
 	$<
 		TNestedValue,
 		TKey extends (keyof TEntity['columns'] | keyof TEntity['hasMany'] | keyof TEntity['hasManyBy'] | keyof TEntity['hasOne']) & string,

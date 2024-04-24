@@ -1,16 +1,9 @@
 import { ContentClientInput, MutationResult, SchemaNames, TransactionResult } from './types'
-import {
-	ContentEntitySelection,
-	ContentEntitySelectionCallback,
-	ContentEntitySelectionContext,
-	ContentMutation,
-	ContentOperation,
-	ContentQuery,
-} from './nodes'
+import { ContentEntitySelection, ContentEntitySelectionCallback, ContentEntitySelectionContext, ContentMutation, ContentOperation, ContentQuery } from './nodes'
 import { createListArgs } from './utils/createListArgs'
 import { createTypedArgs } from './utils/createTypedArgs'
 import { Input } from '@contember/schema'
-import { GraphQlField, GraphQlFragmentSpread, GraphQlSelectionSet } from '@contember/graphql-builder'
+import { GraphQlField, GraphQlFieldTypedArgs, GraphQlFragmentSpread, GraphQlSelectionSet } from '@contember/graphql-builder'
 import { createMutationOperationSet } from './utils/createMutationOperationSet'
 
 export type EntitySelectionOrCallback =
@@ -21,6 +14,8 @@ export type MutationTransactionOptions = {
 	deferForeignKeyConstraints?: boolean
 	deferUniqueConstraints?: boolean
 }
+
+type MutationOperation = 'create' | 'update' | 'delete' | 'upsert' | 'transaction';
 
 export class ContentQueryBuilder {
 	constructor(private readonly schema: SchemaNames) {
@@ -61,9 +56,17 @@ export class ContentQueryBuilder {
 		const context = this.createContext(name)
 		const fieldName = `list${name}`
 		const typedArgs = createListArgs(context.entity, args)
-		const selectionSet = this.resolveSelectionSet(fields, context)
+		const selection = this.resolveSelection(fields, context)
 
-		return new ContentOperation('query', fieldName, typedArgs, selectionSet)
+		return new ContentOperation('query', fieldName, typedArgs, selection.selectionSet, it => {
+			const transformFn = selection.transformFn
+			if (transformFn) {
+				return it.map((el: any) => transformFn(el, {
+					rootValue: it,
+				}))
+			}
+			return it
+		})
 	}
 
 
@@ -74,68 +77,83 @@ export class ContentQueryBuilder {
 			by: `${context.entity.name}UniqueWhere!`,
 			filter: `${context.entity.name}Where`,
 		})
-		const selectionSet = this.resolveSelectionSet(fields, context)
+		const selection = this.resolveSelection(fields, context)
 
-		return new ContentOperation('query', fieldName, typedArgs, selectionSet)
+		return new ContentOperation('query', fieldName, typedArgs, selection.selectionSet, it => {
+			if (it && selection.transformFn) {
+				return selection.transformFn(it, {
+					rootValue: it,
+				})
+			}
+			return it
+		})
 	}
 
 
 	public create(name: string, args: Input.CreateInput, fields?: EntitySelectionOrCallback): ContentMutation<MutationResult> {
 
-		const context = this.createContext(name)
-		const fieldName = `create${name}`
+		const entity = this.getEntity(name)
 		const typedArgs = createTypedArgs(args, {
-			data: `${context.entity.name}CreateInput!`,
+			data: `${entity.name}CreateInput!`,
 		})
-		const selectionSet = this.createMutationSelection('create', fields ? this.resolveSelectionSet(fields, context) : undefined)
 
-		return new ContentOperation('mutation', fieldName, typedArgs, selectionSet)
+		return this.createMutationOperation(name, 'create', typedArgs, fields)
 	}
-
 
 	public update(name: string, args: Input.UpdateInput, fields?: EntitySelectionOrCallback): ContentMutation<MutationResult> {
 
-		const context = this.createContext(name)
-		const fieldName = `update${name}`
+		const entity = this.getEntity(name)
 		const typedArgs = createTypedArgs(args, {
-			data: `${context.entity.name}UpdateInput!`,
-			by: `${context.entity.name}UniqueWhere!`,
-			filter: `${context.entity.name}Where`,
+			data: `${entity.name}UpdateInput!`,
+			by: `${entity.name}UniqueWhere!`,
+			filter: `${entity.name}Where`,
 		})
-		const selectionSet = this.createMutationSelection('update', fields ? this.resolveSelectionSet(fields, context) : undefined)
-
-		return new ContentOperation('mutation', fieldName, typedArgs, selectionSet)
+		return this.createMutationOperation(name, 'update', typedArgs, fields)
 	}
 
 
 	public upsert(name: string, args: Input.UpsertInput, fields?: EntitySelectionOrCallback): ContentMutation<MutationResult> {
 
-		const context = this.createContext(name)
-		const fieldName = `upsert${name}`
+		const entity = this.getEntity(name)
 		const typedArgs = createTypedArgs(args, {
-			update: `${context.entity.name}UpdateInput!`,
-			create: `${context.entity.name}CreateInput!`,
-			by: `${context.entity.name}UniqueWhere!`,
-			filter: `${context.entity.name}Where`,
+			update: `${entity.name}UpdateInput!`,
+			create: `${entity.name}CreateInput!`,
+			by: `${entity.name}UniqueWhere!`,
+			filter: `${entity.name}Where`,
 		})
-
-		const selectionSet = this.createMutationSelection('upsert', fields ? this.resolveSelectionSet(fields, context) : undefined)
-
-		return new ContentOperation('mutation', fieldName, typedArgs, selectionSet)
+		return this.createMutationOperation(name, 'upsert', typedArgs, fields)
 	}
 
 
 	public delete(name: string, args: Input.UniqueQueryInput, fields?: EntitySelectionOrCallback): ContentMutation<MutationResult> {
 
-		const context = this.createContext(name)
+		const entity = this.getEntity(name)
 		const typedArgs = createTypedArgs(args, {
-			by: `${context.entity.name}UniqueWhere!`,
-			filter: `${context.entity.name}Where`,
+			by: `${entity.name}UniqueWhere!`,
+			filter: `${entity.name}Where`,
 		})
-		const fieldName = `delete${name}`
-		const selectionSet = this.createMutationSelection('delete', fields ? this.resolveSelectionSet(fields, context) : undefined)
+		return this.createMutationOperation(name, 'delete', typedArgs, fields)
+	}
 
-		return new ContentOperation('mutation', fieldName, typedArgs, selectionSet)
+
+	private createMutationOperation(name: string, operation: MutationOperation, args: GraphQlFieldTypedArgs, fields?: EntitySelectionOrCallback): ContentMutation<MutationResult> {
+
+		const context = this.createContext(name)
+		const fieldName = `${operation}${name}`
+		const nodeSelection = fields ? this.resolveSelection(fields, context) : undefined
+		const selectionSet = this.createMutationSelection(operation, nodeSelection?.selectionSet)
+
+		return new ContentOperation('mutation', fieldName, args, selectionSet, it => {
+			if (!nodeSelection?.transformFn) {
+				return it
+			}
+			return {
+				...it,
+				node: it.node ? nodeSelection.transformFn(it.node, {
+					rootValue: it.node,
+				}) : null,
+			}
+		})
 	}
 
 	public transaction(
@@ -162,7 +180,7 @@ export class ContentQueryBuilder {
 		})
 	}
 
-	private createMutationSelection(operation: 'create' | 'update' | 'delete' | 'upsert' | 'transaction', selection?: GraphQlSelectionSet): GraphQlSelectionSet {
+	private createMutationSelection(operation: MutationOperation, selection?: GraphQlSelectionSet): GraphQlSelectionSet {
 		const items: GraphQlSelectionSet = [
 			new GraphQlField(null, 'ok'),
 			new GraphQlField(null, 'errorMessage'),
@@ -182,23 +200,28 @@ export class ContentQueryBuilder {
 	}
 
 
-	private resolveSelectionSet(
+	private resolveSelection(
 		fields: EntitySelectionOrCallback,
 		context: ContentEntitySelectionContext<string>,
 	) {
-		return (typeof fields === 'function' ? fields(new ContentEntitySelection(context, [])) : fields).selectionSet
+		return (typeof fields === 'function' ? fields(new ContentEntitySelection(context, [])) : fields)
 	}
 
 	private createContext(
 		name: string,
 	): ContentEntitySelectionContext<string> {
-		const entity = this.schema.entities[name]
-		if (!entity) {
-			throw new Error(`Entity ${name} not found`)
-		}
+		const entity = this.getEntity(name)
 		return {
 			entity: entity,
 			schema: this.schema,
 		}
+	}
+
+	private getEntity(name: string) {
+		const entity = this.schema.entities[name]
+		if (!entity) {
+			throw new Error(`Entity ${name} not found`)
+		}
+		return entity
 	}
 }

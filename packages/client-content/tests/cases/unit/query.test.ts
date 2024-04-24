@@ -118,7 +118,8 @@ describe('queries', () => {
 
 
 	test('single query', async () => {
-		const [client, calls] = createClient({ value: [
+		const [client, calls] = createClient({
+			value: [
 				{
 					title: 'Post 1',
 					content: 'Content 1',
@@ -127,7 +128,8 @@ describe('queries', () => {
 					title: 'Post 2',
 					content: 'Content 2',
 				},
-			] })
+			],
+		})
 
 		const result = await client.query(qb.list('Post', {}, it => it.$$()))
 		expect(result).toEqual([
@@ -284,4 +286,234 @@ describe('queries', () => {
 			}
 		`)
 	})
+
+	test('top level list transform', async () => {
+		const [client, calls] = createClient({
+			authors: [
+				{
+					name: 'John',
+					email: 'foo@localhost',
+				},
+				{
+					name: 'Jane',
+					email: 'bar@localhost',
+				},
+			],
+		})
+		const result = await client.query({
+			authors: qb.list('Author', {}, it => it
+				.$$()
+				.transform(it => ({
+					...it,
+					label: `${it.name} (${it.email})`,
+				})),
+			),
+		})
+		expect(result).toEqual({
+			authors: [
+				{
+					name: 'John',
+					email: 'foo@localhost',
+					label: 'John (foo@localhost)',
+				},
+				{
+					name: 'Jane',
+					email: 'bar@localhost',
+					label: 'Jane (bar@localhost)',
+				},
+			],
+		})
+		expect(calls).toHaveLength(1)
+	})
+
+	test('top level get transform', async () => {
+		const [client, calls] = createClient({
+			author: {
+				name: 'John',
+				email: 'foo@localhost',
+			},
+		})
+		const result = await client.query({
+			author: qb.get('Author', { by: { id: '123' } }, it => it
+				.$$()
+				.transform(it => ({
+					...it,
+					label: `${it.name} (${it.email})`,
+				})),
+			),
+		})
+		expect(result).toEqual({
+			author: {
+				name: 'John',
+				email: 'foo@localhost',
+				label: 'John (foo@localhost)',
+			},
+		})
+		expect(calls).toHaveLength(1)
+	})
+
+
+	test('nested has-many transform', async () => {
+		const [client, calls] = createClient({
+			author: {
+				name: 'John',
+				email: 'foo@localhost',
+				posts: [
+					{
+						publishedAt: '2021-01-01T00:00:00Z',
+					},
+					{
+						publishedAt: '2021-01-02T00:00:00Z',
+					},
+				],
+			},
+		})
+		const result = await client.query({
+			author: qb.get('Author', { by: { id: '123' } }, it => it
+				.$$()
+				.$('posts', {}, it => it.$$().transform(it => ({
+					...it,
+					publishYear: it.publishedAt ? new Date(it.publishedAt).getFullYear() : null,
+				}))),
+			),
+		})
+		expect(result).toEqual({
+			author: {
+				name: 'John',
+				email: 'foo@localhost',
+				posts: [
+					{
+						publishedAt: '2021-01-01T00:00:00Z',
+						publishYear: 2021,
+					},
+					{
+						publishedAt: '2021-01-02T00:00:00Z',
+						publishYear: 2021,
+					},
+				],
+			},
+		})
+		expect(calls).toHaveLength(1)
+	})
+
+
+	test('nested has-one transform', async () => {
+		const [client, calls] = createClient({
+			post: {
+				publishedAt: '2021-01-01T00:00:00Z',
+				author: {
+					name: 'John',
+					email: 'foo@localhost',
+				},
+			},
+		})
+		const author = qb.fragment('Author', it => it
+			.$$()
+			.transform(it => ({
+				...it,
+				label: `${it.name} (${it.email})`,
+			})),
+		)
+
+		const result = await client.query({
+			post: qb.get('Post', { by: { id: '123' } }, it => it
+				.$$()
+				.$('author', author),
+			),
+		})
+		expect(result).toEqual({
+			post: {
+				publishedAt: '2021-01-01T00:00:00Z',
+				author: {
+					name: 'John',
+					email: 'foo@localhost',
+					label: 'John (foo@localhost)',
+				},
+			},
+		})
+	})
+
+
+	test('nested has-many-by transform', async () => {
+		const [client, calls] = createClient({
+			post: {
+				publishedAt: '2021-01-01T00:00:00Z',
+				localesByLocale: {
+					title: 'Hello',
+				},
+			},
+		})
+		const result = await client.query({
+			post: qb.get('Post', { by: { id: '123' } }, it => it
+				.$$()
+				.$('localesByLocale', { by: { locale: { code: 'en' } } }, it => it.$$().transform(it => ({
+					...it,
+					label: it.title?.toUpperCase(),
+				}))),
+			),
+		})
+		expect(result).toEqual({
+			post: {
+				publishedAt: '2021-01-01T00:00:00Z',
+				localesByLocale: {
+					title: 'Hello',
+					label: 'HELLO',
+				},
+			},
+		})
+	})
+
+	test('multiple transforms', async () => {
+		const [client, calls] = createClient({
+			author: {
+				name: 'John',
+				email: 'foo@localhost',
+				posts: [
+					{
+						publishedAt: '2021-01-01T00:00:00Z',
+					},
+					{
+						publishedAt: '2021-01-02T00:00:00Z',
+					},
+				],
+			},
+		})
+		const result = await client.query({
+			author: qb.get('Author', { by: { id: '123' } }, it => it
+				.$$()
+				.transform(it => ({
+					...it,
+					value1: 'foo',
+				}))
+				.$('posts', {}, it => it.$$().transform(it => ({
+					...it,
+					postLabel: 'foo bar',
+				})))
+				.transform(it => ({
+					...it,
+					value2: 'bar',
+				})),
+			),
+		})
+		expect(result).toEqual({
+			author: {
+				name: 'John',
+				email: 'foo@localhost',
+				value1: 'foo',
+				value2: 'bar',
+				posts: [
+					{
+						publishedAt: '2021-01-01T00:00:00Z',
+						postLabel: 'foo bar',
+					},
+					{
+						publishedAt: '2021-01-02T00:00:00Z',
+						postLabel: 'foo bar',
+					},
+				],
+			},
+		})
+		expect(calls).toHaveLength(1)
+	})
+
 })

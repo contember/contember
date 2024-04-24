@@ -28,6 +28,10 @@ export type EntitySelectionAnyArgs =
 export type ContentEntitySelectionOrCallback = ContentEntitySelectionCallback | ContentEntitySelection
 
 
+export type ContentTransformContext = {
+	rootValue: unknown
+}
+
 export class ContentEntitySelection {
 
 	/**
@@ -38,6 +42,8 @@ export class ContentEntitySelection {
 		public readonly context: ContentEntitySelectionContext<string>,
 		/** @internal */
 		public readonly selectionSet: GraphQlSelectionSet,
+		/** @internal */
+		public readonly transformFn?: (value: any, ctx: ContentTransformContext) => any,
 	) {
 	}
 
@@ -93,6 +99,13 @@ export class ContentEntitySelection {
 		return new ContentEntitySelection(this.context, nodes)
 	}
 
+
+	transform(transform: (value: any, context: ContentTransformContext) => any): ContentEntitySelection {
+		return new ContentEntitySelection(this.context, this.selectionSet, !this.transformFn ? transform : (value, ctx) => {
+			return transform(this.transformFn!(value, ctx), ctx)
+		})
+	}
+
 	private _column(
 		name: string,
 		args: EntitySelectionCommonInput = {},
@@ -141,7 +154,12 @@ export class ContentEntitySelection {
 			createListArgs(entity, args),
 			entitySelection.selectionSet,
 		)
-		return this.withField(newObjectField)
+		const selectionWithField = this.withField(newObjectField)
+		const nestedTransform = entitySelection.transformFn
+		if (!nestedTransform) {
+			return selectionWithField
+		}
+		return this.withFieldTransform(alias, it => it.map(nestedTransform))
 	}
 
 
@@ -188,7 +206,12 @@ export class ContentEntitySelection {
 			argsWithType,
 			entitySelection.selectionSet,
 		)
-		return this.withField(newObjectField)
+		const selectionWithField = this.withField(newObjectField)
+		const nestedTransform = entitySelection.transformFn
+		if (!nestedTransform) {
+			return selectionWithField
+		}
+		return this.withFieldTransform(alias, (it, ctx) => it !== null ? nestedTransform(it, ctx) : null)
 	}
 
 	private _one(
@@ -227,7 +250,12 @@ export class ContentEntitySelection {
 			argsWithType,
 			entitySelection.selectionSet,
 		)
-		return this.withField(newObjectField)
+		const selectionWithField = this.withField(newObjectField)
+		const nestedTransform = entitySelection.transformFn
+		if (!nestedTransform) {
+			return selectionWithField
+		}
+		return this.withFieldTransform(alias, (it, ctx) => it !== null ? nestedTransform(it, ctx) : null)
 	}
 
 
@@ -235,6 +263,17 @@ export class ContentEntitySelection {
 		return new ContentEntitySelection(this.context, [
 			...this.selectionSet,
 			field,
-		])
+		], this.transformFn)
+	}
+
+	private withFieldTransform(alias: string, transform: (value: any, ctx: ContentTransformContext) => any) {
+		return new ContentEntitySelection(this.context, this.selectionSet, (value, ctx) => {
+			const transformedValue = transform(value[alias], ctx)
+			const newValue = {
+				...value,
+				[alias]: transformedValue,
+			}
+			return this.transformFn ? this.transformFn(newValue, ctx) : newValue
+		})
 	}
 }

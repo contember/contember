@@ -102,6 +102,9 @@
 			"path": "./packages/react-leaflet-fields-ui"
 		},
 		{
+			"path": "./packages/react-legacy-editor"
+		},
+		{
 			"path": "./packages/react-multipass-rendering"
 		},
 		{

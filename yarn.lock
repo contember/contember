@@ -1009,6 +1009,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@contember/react-legacy-editor@workspace:packages/react-legacy-editor":
+  version: 0.0.0-use.local
+  resolution: "@contember/react-legacy-editor@workspace:packages/react-legacy-editor"
+  languageName: unknown
+  linkType: soft
+
 "@contember/react-multipass-rendering@workspace:*, @contember/react-multipass-rendering@workspace:packages/react-multipass-rendering":
   version: 0.0.0-use.local
   resolution: "@contember/react-multipass-rendering@workspace:packages/react-multipass-rendering"

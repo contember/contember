@@ -1,16 +1,25 @@
-import { uic } from '../../../lib/utils/uic'
+import { uic, uiconfig } from '../../../lib/utils/uic'
 
-export const Input = uic('input', {
-	baseClass: 'flex w-full border border-input bg-background ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[invalid]:border-destructive data-[invalid]:ring-destructive',
+export const inputConfig = uiconfig({
+	baseClass: 'flex w-full border bg-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none  disabled:cursor-not-allowed disabled:opacity-50 data-[invalid]:border-destructive data-[invalid]:ring-destructive',
 	variants: {
+		variant: {
+			default: 'border border-input ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+			ghost: 'border-none focus-visible:ring-transparent',
+		},
 		inputSize: {
 			default: 'h-10 rounded-md p-2 text-sm',
 			sm: 'h-8 rounded p-1 text-sm',
 		},
 	},
 	defaultVariants: {
+		variant: 'default',
 		inputSize: 'default',
 	},
+})
+
+export const Input = uic('input', {
+	...inputConfig,
 	displayName: 'Input',
 })
 

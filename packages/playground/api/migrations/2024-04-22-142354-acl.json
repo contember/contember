@@ -1,0 +1,1016 @@
+{
+	"formatVersion": 5,
+	"modifications": [
+		{
+			"modification": "patchAclSchema",
+			"patch": [
+				{
+					"op": "add",
+					"path": "/roles/admin",
+					"value": {
+						"entities": {
+							"Block": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"list": true,
+										"order": true,
+										"type": true,
+										"title": true,
+										"content": true,
+										"image": true,
+										"imagePosition": true,
+										"color": true
+									},
+									"create": {
+										"id": true,
+										"list": true,
+										"order": true,
+										"type": true,
+										"title": true,
+										"content": true,
+										"image": true,
+										"imagePosition": true,
+										"color": true
+									},
+									"update": {
+										"id": true,
+										"list": true,
+										"order": true,
+										"type": true,
+										"title": true,
+										"content": true,
+										"image": true,
+										"imagePosition": true,
+										"color": true
+									},
+									"delete": true,
+									"customPrimary": true
+								}
+							},
+							"BlockImage": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"url": true
+									},
+									"create": {
+										"id": true,
+										"url": true
+									},
+									"update": {
+										"id": true,
+										"url": true
+									},
+									"delete": true,
+									"customPrimary": true
+								}
+							},
+							"BlockList": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"unique": true,
+										"blocks": true
+									},
+									"create": {
+										"id": true,
+										"unique": true,
+										"blocks": true
+									},
+									"update": {
+										"id": true,
+										"unique": true,
+										"blocks": true
+									},
+									"delete": true,
+									"customPrimary": true
+								}
+							},
+							"BoardTag": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"name": true,
+										"slug": true,
+										"color": true
+									},
+									"create": {
+										"id": true,
+										"name": true,
+										"slug": true,
+										"color": true
+									},
+									"update": {
+										"id": true,
+										"name": true,
+										"slug": true,
+										"color": true
+									},
+									"delete": true,
+									"customPrimary": true
+								}
+							},
+							"BoardTask": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"title": true,
+										"description": true,
+										"status": true,
+										"assignee": true,
+										"tags": true,
+										"order": true
+									},
+									"create": {
+										"id": true,
+										"title": true,
+										"description": true,
+										"status": true,
+										"assignee": true,
+										"tags": true,
+										"order": true
+									},
+									"update": {
+										"id": true,
+										"title": true,
+										"description": true,
+										"status": true,
+										"assignee": true,
+										"tags": true,
+										"order": true
+									},
+									"delete": true,
+									"customPrimary": true
+								}
+							},
+							"BoardUser": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"name": true,
+										"username": true,
+										"order": true
+									},
+									"create": {
+										"id": true,
+										"name": true,
+										"username": true,
+										"order": true
+									},
+									"update": {
+										"id": true,
+										"name": true,
+										"username": true,
+										"order": true
+									},
+									"delete": true,
+									"customPrimary": true
+								}
+							},
+							"DimensionsItem": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"unique": true,
+										"locales": true
+									},
+									"create": {
+										"id": true,
+										"unique": true,
+										"locales": true
+									},
+									"update": {
+										"id": true,
+										"unique": true,
+										"locales": true
+									},
+									"delete": true,
+									"customPrimary": true
+								}
+							},
+							"DimensionsItemLocale": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"item": true,
+										"locale": true,
+										"title": true,
+										"content": true
+									},
+									"create": {
+										"id": true,
+										"item": true,
+										"locale": true,
+										"title": true,
+										"content": true
+									},
+									"update": {
+										"id": true,
+										"item": true,
+										"locale": true,
+										"title": true,
+										"content": true
+									},
+									"delete": true,
+									"customPrimary": true
+								}
+							},
+							"DimensionsLocale": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"code": true,
+										"label": true
+									},
+									"create": {
+										"id": true,
+										"code": true,
+										"label": true
+									},
+									"update": {
+										"id": true,
+										"code": true,
+										"label": true
+									},
+									"delete": true,
+									"customPrimary": true
+								}
+							},
+							"EditorContent": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"unique": true,
+										"data": true,
+										"references": true
+									},
+									"create": {
+										"id": true,
+										"unique": true,
+										"data": true,
+										"references": true
+									},
+									"update": {
+										"id": true,
+										"unique": true,
+										"data": true,
+										"references": true
+									},
+									"delete": true,
+									"customPrimary": true
+								}
+							},
+							"EditorImage": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"url": true
+									},
+									"create": {
+										"id": true,
+										"url": true
+									},
+									"update": {
+										"id": true,
+										"url": true
+									},
+									"delete": true,
+									"customPrimary": true
+								}
+							},
+							"EditorLink": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"url": true
+									},
+									"create": {
+										"id": true,
+										"url": true
+									},
+									"update": {
+										"id": true,
+										"url": true
+									},
+									"delete": true,
+									"customPrimary": true
+								}
+							},
+							"EditorReference": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"content": true,
+										"type": true,
+										"image": true,
+										"link": true
+									},
+									"create": {
+										"id": true,
+										"content": true,
+										"type": true,
+										"image": true,
+										"link": true
+									},
+									"update": {
+										"id": true,
+										"content": true,
+										"type": true,
+										"image": true,
+										"link": true
+									},
+									"delete": true,
+									"customPrimary": true
+								}
+							},
+							"GridArticle": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"title": true,
+										"slug": true,
+										"state": true,
+										"locked": true,
+										"publishedAt": true,
+										"publishDate": true,
+										"author": true,
+										"category": true,
+										"tags": true,
+										"views": true,
+										"comments": true
+									},
+									"create": {
+										"id": true,
+										"title": true,
+										"slug": true,
+										"state": true,
+										"locked": true,
+										"publishedAt": true,
+										"publishDate": true,
+										"author": true,
+										"category": true,
+										"tags": true,
+										"views": true,
+										"comments": true
+									},
+									"update": {
+										"id": true,
+										"title": true,
+										"slug": true,
+										"state": true,
+										"locked": true,
+										"publishedAt": true,
+										"publishDate": true,
+										"author": true,
+										"category": true,
+										"tags": true,
+										"views": true,
+										"comments": true
+									},
+									"delete": true,
+									"customPrimary": true
+								}
+							},
+							"GridArticleComment": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"article": true,
+										"author": true,
+										"content": true,
+										"createdAt": true
+									},
+									"create": {
+										"id": true,
+										"article": true,
+										"author": true,
+										"content": true,
+										"createdAt": true
+									},
+									"update": {
+										"id": true,
+										"article": true,
+										"author": true,
+										"content": true,
+										"createdAt": true
+									},
+									"delete": true,
+									"customPrimary": true
+								}
+							},
+							"GridAuthor": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"name": true,
+										"slug": true
+									},
+									"create": {
+										"id": true,
+										"name": true,
+										"slug": true
+									},
+									"update": {
+										"id": true,
+										"name": true,
+										"slug": true
+									},
+									"delete": true,
+									"customPrimary": true
+								}
+							},
+							"GridCategory": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"name": true,
+										"slug": true
+									},
+									"create": {
+										"id": true,
+										"name": true,
+										"slug": true
+									},
+									"update": {
+										"id": true,
+										"name": true,
+										"slug": true
+									},
+									"delete": true,
+									"customPrimary": true
+								}
+							},
+							"GridTag": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"name": true,
+										"slug": true
+									},
+									"create": {
+										"id": true,
+										"name": true,
+										"slug": true
+									},
+									"update": {
+										"id": true,
+										"name": true,
+										"slug": true
+									},
+									"delete": true,
+									"customPrimary": true
+								}
+							},
+							"InputRoot": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"unique": true,
+										"textValue": true,
+										"intValue": true,
+										"floatValue": true,
+										"boolValue": true,
+										"dateValue": true,
+										"datetimeValue": true,
+										"jsonValue": true,
+										"enumValue": true,
+										"uuidValue": true
+									},
+									"create": {
+										"id": true,
+										"unique": true,
+										"textValue": true,
+										"intValue": true,
+										"floatValue": true,
+										"boolValue": true,
+										"dateValue": true,
+										"datetimeValue": true,
+										"jsonValue": true,
+										"enumValue": true,
+										"uuidValue": true
+									},
+									"update": {
+										"id": true,
+										"unique": true,
+										"textValue": true,
+										"intValue": true,
+										"floatValue": true,
+										"boolValue": true,
+										"dateValue": true,
+										"datetimeValue": true,
+										"jsonValue": true,
+										"enumValue": true,
+										"uuidValue": true
+									},
+									"delete": true,
+									"customPrimary": true
+								}
+							},
+							"InputRules": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"unique": true,
+										"notNullValue": true,
+										"uniqueValue": true,
+										"validationValue": true
+									},
+									"create": {
+										"id": true,
+										"unique": true,
+										"notNullValue": true,
+										"uniqueValue": true,
+										"validationValue": true
+									},
+									"update": {
+										"id": true,
+										"unique": true,
+										"notNullValue": true,
+										"uniqueValue": true,
+										"validationValue": true
+									},
+									"delete": true,
+									"customPrimary": true
+								}
+							},
+							"RepeaterItem": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"title": true,
+										"order": true
+									},
+									"create": {
+										"id": true,
+										"title": true,
+										"order": true
+									},
+									"update": {
+										"id": true,
+										"title": true,
+										"order": true
+									},
+									"delete": true,
+									"customPrimary": true
+								}
+							},
+							"SelectItem": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"root": true,
+										"value": true,
+										"order": true
+									},
+									"create": {
+										"id": true,
+										"root": true,
+										"value": true,
+										"order": true
+									},
+									"update": {
+										"id": true,
+										"root": true,
+										"value": true,
+										"order": true
+									},
+									"delete": true,
+									"customPrimary": true
+								}
+							},
+							"SelectRoot": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"unique": true,
+										"hasOne": true,
+										"hasMany": true,
+										"hasManySorted": true
+									},
+									"create": {
+										"id": true,
+										"unique": true,
+										"hasOne": true,
+										"hasMany": true,
+										"hasManySorted": true
+									},
+									"update": {
+										"id": true,
+										"unique": true,
+										"hasOne": true,
+										"hasMany": true,
+										"hasManySorted": true
+									},
+									"delete": true,
+									"customPrimary": true
+								}
+							},
+							"SelectValue": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"name": true,
+										"slug": true
+									},
+									"create": {
+										"id": true,
+										"name": true,
+										"slug": true
+									},
+									"update": {
+										"id": true,
+										"name": true,
+										"slug": true
+									},
+									"delete": true,
+									"customPrimary": true
+								}
+							},
+							"UploadAudio": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"url": true,
+										"duration": true,
+										"meta": true
+									},
+									"create": {
+										"id": true,
+										"url": true,
+										"duration": true,
+										"meta": true
+									},
+									"update": {
+										"id": true,
+										"url": true,
+										"duration": true,
+										"meta": true
+									},
+									"delete": true,
+									"customPrimary": true
+								}
+							},
+							"UploadFile": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"url": true,
+										"meta": true
+									},
+									"create": {
+										"id": true,
+										"url": true,
+										"meta": true
+									},
+									"update": {
+										"id": true,
+										"url": true,
+										"meta": true
+									},
+									"delete": true,
+									"customPrimary": true
+								}
+							},
+							"UploadFileMetadata": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"fileName": true,
+										"lastModified": true,
+										"fileSize": true,
+										"fileType": true
+									},
+									"create": {
+										"id": true,
+										"fileName": true,
+										"lastModified": true,
+										"fileSize": true,
+										"fileType": true
+									},
+									"update": {
+										"id": true,
+										"fileName": true,
+										"lastModified": true,
+										"fileSize": true,
+										"fileType": true
+									},
+									"delete": true,
+									"customPrimary": true
+								}
+							},
+							"UploadGallery": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"items": true
+									},
+									"create": {
+										"id": true,
+										"items": true
+									},
+									"update": {
+										"id": true,
+										"items": true
+									},
+									"delete": true,
+									"customPrimary": true
+								}
+							},
+							"UploadGalleryItem": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"gallery": true,
+										"type": true,
+										"image": true,
+										"video": true,
+										"audio": true,
+										"file": true
+									},
+									"create": {
+										"id": true,
+										"gallery": true,
+										"type": true,
+										"image": true,
+										"video": true,
+										"audio": true,
+										"file": true
+									},
+									"update": {
+										"id": true,
+										"gallery": true,
+										"type": true,
+										"image": true,
+										"video": true,
+										"audio": true,
+										"file": true
+									},
+									"delete": true,
+									"customPrimary": true
+								}
+							},
+							"UploadImage": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"url": true,
+										"width": true,
+										"height": true,
+										"alt": true,
+										"meta": true
+									},
+									"create": {
+										"id": true,
+										"url": true,
+										"width": true,
+										"height": true,
+										"alt": true,
+										"meta": true
+									},
+									"update": {
+										"id": true,
+										"url": true,
+										"width": true,
+										"height": true,
+										"alt": true,
+										"meta": true
+									},
+									"delete": true,
+									"customPrimary": true
+								}
+							},
+							"UploadImageList": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"items": true
+									},
+									"create": {
+										"id": true,
+										"items": true
+									},
+									"update": {
+										"id": true,
+										"items": true
+									},
+									"delete": true,
+									"customPrimary": true
+								}
+							},
+							"UploadImageListItem": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"list": true,
+										"order": true,
+										"image": true
+									},
+									"create": {
+										"id": true,
+										"list": true,
+										"order": true,
+										"image": true
+									},
+									"update": {
+										"id": true,
+										"list": true,
+										"order": true,
+										"image": true
+									},
+									"delete": true,
+									"customPrimary": true
+								}
+							},
+							"UploadList": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"items": true
+									},
+									"create": {
+										"id": true,
+										"items": true
+									},
+									"update": {
+										"id": true,
+										"items": true
+									},
+									"delete": true,
+									"customPrimary": true
+								}
+							},
+							"UploadListItem": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"list": true,
+										"order": true,
+										"item": true
+									},
+									"create": {
+										"id": true,
+										"list": true,
+										"order": true,
+										"item": true
+									},
+									"update": {
+										"id": true,
+										"list": true,
+										"order": true,
+										"item": true
+									},
+									"delete": true,
+									"customPrimary": true
+								}
+							},
+							"UploadMedium": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"type": true,
+										"image": true,
+										"video": true,
+										"audio": true,
+										"file": true
+									},
+									"create": {
+										"id": true,
+										"type": true,
+										"image": true,
+										"video": true,
+										"audio": true,
+										"file": true
+									},
+									"update": {
+										"id": true,
+										"type": true,
+										"image": true,
+										"video": true,
+										"audio": true,
+										"file": true
+									},
+									"delete": true,
+									"customPrimary": true
+								}
+							},
+							"UploadRoot": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"unique": true,
+										"image": true,
+										"audio": true,
+										"video": true,
+										"file": true,
+										"imageTrivial": true,
+										"imageList": true,
+										"medium": true,
+										"gallery": true,
+										"list": true
+									},
+									"create": {
+										"id": true,
+										"unique": true,
+										"image": true,
+										"audio": true,
+										"video": true,
+										"file": true,
+										"imageTrivial": true,
+										"imageList": true,
+										"medium": true,
+										"gallery": true,
+										"list": true
+									},
+									"update": {
+										"id": true,
+										"unique": true,
+										"image": true,
+										"audio": true,
+										"video": true,
+										"file": true,
+										"imageTrivial": true,
+										"imageList": true,
+										"medium": true,
+										"gallery": true,
+										"list": true
+									},
+									"delete": true,
+									"customPrimary": true
+								}
+							},
+							"UploadVideo": {
+								"predicates": {},
+								"operations": {
+									"read": {
+										"id": true,
+										"url": true,
+										"width": true,
+										"height": true,
+										"duration": true,
+										"meta": true
+									},
+									"create": {
+										"id": true,
+										"url": true,
+										"width": true,
+										"height": true,
+										"duration": true,
+										"meta": true
+									},
+									"update": {
+										"id": true,
+										"url": true,
+										"width": true,
+										"height": true,
+										"duration": true,
+										"meta": true
+									},
+									"delete": true,
+									"customPrimary": true
+								}
+							}
+						},
+						"variables": {}
+					}
+				}
+			]
+		}
+	]
+}

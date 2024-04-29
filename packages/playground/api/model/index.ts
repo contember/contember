@@ -1,6 +1,7 @@
 export * from './Blocks'
 export * from './Board'
 export * from './Dimensions'
+export * from './Editor'
 export * from './Grid'
 export * from './Repeater'
 export * from './Input'

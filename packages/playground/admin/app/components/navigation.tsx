@@ -1,5 +1,5 @@
-import { ArchiveIcon, BrushIcon, FormInputIcon, GripVertical, HomeIcon, KanbanIcon, LanguagesIcon, TableIcon, UploadIcon } from 'lucide-react'
-import { Menu, MenuItem, MenuList } from '../../lib/components/ui/menu'
+import { ArchiveIcon, BrushIcon, FormInputIcon, GripVertical, HomeIcon, KanbanIcon, LanguagesIcon, PencilIcon, TableIcon, UploadIcon } from 'lucide-react'
+import { Menu, MenuItem } from '../../lib/components/ui/menu'
 
 
 export const Navigation = () => {
@@ -49,6 +49,7 @@ export const Navigation = () => {
 					<MenuItem icon={line} label={'Image repeater'} to={'upload/imageList'} />
 				</MenuItem>
 				<MenuItem icon={<LanguagesIcon size={16} />} label={'Dimensions'} to={'dimensions'} />
+				<MenuItem icon={<PencilIcon size={16} />} label={'Editor'} to={'editor'} />
 			</Menu>
 		</div>
 	)

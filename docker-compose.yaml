@@ -55,7 +55,7 @@ services:
       - .:/src:cached
 
   contember-engine:
-    image: contember/engine:1.4.0-beta.1
+    image: contember/engine:1.4.0-rc.1
 
     environment:
       NODE_ENV: 'development'

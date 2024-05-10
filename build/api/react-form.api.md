@@ -75,6 +75,13 @@ export type FormHasOneRelationScopeProps = {
 export const FormInput: React_2.NamedExoticComponent<FormInputProps>;
 
 // @public (undocumented)
+export type FormInputHandler = {
+    parseValue: (value: string) => any;
+    formatValue: (value: any) => string;
+    defaultInputProps?: React_2.InputHTMLAttributes<HTMLInputElement>;
+};
+
+// @public (undocumented)
 export interface FormInputProps {
     // (undocumented)
     children: React_2.ReactElement;
@@ -83,7 +90,11 @@ export interface FormInputProps {
     // (undocumented)
     field: SugaredRelativeSingleField['field'];
     // (undocumented)
+    formatValue?: FormInputHandler['formatValue'];
+    // (undocumented)
     isNonbearing?: boolean;
+    // (undocumented)
+    parseValue?: FormInputHandler['parseValue'];
 }
 
 // @public (undocumented)

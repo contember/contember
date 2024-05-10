@@ -104,6 +104,11 @@ export const RedirectOnPersist: ({ to }: {
     to: RoutingLinkTarget;
 }) => null;
 
+// @public (undocumented)
+export const useIsApplicationOutdated: ({ checkIntervalMs }?: {
+    checkIntervalMs?: number | undefined;
+}) => boolean;
+
 
 export * from "@contember/react-binding";
 export * from "@contember/react-identity";

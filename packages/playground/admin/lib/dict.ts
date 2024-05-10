@@ -112,4 +112,12 @@ export const dict = {
 		empty: 'No items.',
 		addItem: 'Add item',
 	},
+	outdatedApplication: {
+		title: 'An updated version is available',
+		description: 'To access the latest features and improvements, kindly refresh your browser.',
+		warning: 'Any unsaved data will be lost. Please save your work before refreshing.',
+		snooze: 'Snooze',
+		refreshNow: 'Refresh now',
+
+	},
 }

@@ -28,10 +28,7 @@ export const FormCheckbox = Component<FormCheckboxProps>(({ field, isNonbearing,
 		if (!checkboxRef) {
 			return
 		}
-		(ref as any).current = checkboxRef
-		if (value === null) {
-			checkboxRef.indeterminate = true
-		}
+		checkboxRef.indeterminate = value === null
 	}, [checkboxRef, ref, value])
 
 	return (

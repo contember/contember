@@ -6,6 +6,7 @@ import { dataAttribute } from '@contember/utilities'
 import { useFormInputHandler } from '../internal/useFormInputHandler'
 import { useFormError, useFormFieldId } from '../contexts'
 import { useFormInputValidationHandler } from '../hooks/useFormInputValidationHandler'
+import { FormInputHandler } from '../types'
 
 type InputProps = React.JSX.IntrinsicElements['input']
 const SlotInput = Slot as ComponentType<InputProps>
@@ -15,13 +16,15 @@ export interface FormInputProps {
 	isNonbearing?: boolean
 	defaultValue?: OptionallyVariableFieldValue
 	children: React.ReactElement
+	formatValue?: FormInputHandler['formatValue']
+	parseValue?: FormInputHandler['parseValue']
 }
 
-export const FormInput = Component<FormInputProps>(({ field, isNonbearing, defaultValue, ...props }) => {
+export const FormInput = Component<FormInputProps>(({ field, isNonbearing, defaultValue, formatValue: formatValueIn, parseValue: parseValueIn, ...props }) => {
 	const id = useFormFieldId()
 	const accessor = useField(field)
 	const errors = useFormError() ?? accessor.errors?.errors ?? []
-	const { parseValue, formatValue, defaultInputProps } = useFormInputHandler(accessor)
+	const { parseValue, formatValue, defaultInputProps } = useFormInputHandler(accessor, { formatValue: formatValueIn, parseValue: parseValueIn })
 	const accessorGetter = accessor.getAccessor
 	const { ref, onFocus, onBlur } = useFormInputValidationHandler(accessor)
 

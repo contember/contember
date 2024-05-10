@@ -107,7 +107,7 @@ export const clientValidation = () => <>
 				<div className={'pl-52 space-x-4'}>
 					<FillValue />
 				</div>
-				<InputField field={'textValue'} label={'Name'} inputProps={{ pattern: '[a-z]+' }} />
+				<InputField field={'textValue'} label={'Name'} required inputProps={{ pattern: '[a-z]+' }} />
 				<InputField field={'intValue'} label={'Number'} inputProps={{ required: true, max: 100 }} />
 				<CheckboxField field={'boolValue'} label={'Some boolean'} description={'Hello world'} inputProps={{ required: true }} />
 			</div>

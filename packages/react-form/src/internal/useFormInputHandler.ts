@@ -1,26 +1,35 @@
 import { FieldAccessor, SchemaColumn, SchemaKnownColumnType } from '@contember/react-binding'
-import * as React from 'react'
 import { useMemo } from 'react'
+import { FormInputHandler } from '../types'
 
-export const useFormInputHandler = (field: FieldAccessor) => {
+export const useFormInputHandler = (field: FieldAccessor, { formatValue, parseValue }: Partial<FormInputHandler>): FormInputHandler => {
 	return useMemo(() => {
 		const schema = field.schema
 		const columnType = schema.type
-		const handlerFactory = ColumnTypeHandlerFactories[columnType as SchemaKnownColumnType]
-		if (!handlerFactory) {
-			throw new Error(`Column type ${columnType} is not supported yet`)
+		const handlerFactory = ColumnTypeHandlerFactories[columnType as SchemaKnownColumnType] ?? defaultHandlerFactory
+		const handler = handlerFactory(schema, field.getAccessor)
+		return {
+			defaultInputProps: handler.defaultInputProps,
+			formatValue: formatValue ?? handler.formatValue,
+			parseValue: parseValue ?? handler.parseValue,
 		}
-		return handlerFactory(schema, field.getAccessor)
-	}, [field.getAccessor, field.schema])
+	}, [field.getAccessor, field.schema, formatValue, parseValue])
 }
 
-type ColumnTypeHandlerFactory = (column: SchemaColumn, getAccessor: FieldAccessor.GetFieldAccessor) => {
-	parseValue: (value: string) => any
-	formatValue: (value: any) => string
-	defaultInputProps?: React.InputHTMLAttributes<HTMLInputElement>
-}
+type ColumnTypeHandlerFactory = (column: SchemaColumn, getAccessor: FieldAccessor.GetFieldAccessor) => FormInputHandler
 
-const ColumnTypeHandlerFactories: Record<SchemaKnownColumnType, ColumnTypeHandlerFactory> = {
+const defaultHandlerFactory: ColumnTypeHandlerFactory = (schema, field) => ({
+	parseValue: (value: string) => {
+		if (value === '' && schema.nullable && field().valueOnServer === null) {
+			return null
+		}
+		return value
+	},
+	formatValue: (value: string | null) => value ?? '',
+})
+
+const ColumnTypeHandlerFactories: Record<SchemaKnownColumnType, ColumnTypeHandlerFactory | undefined> = {
+	String: defaultHandlerFactory,
 	Integer: () => ({
 		parseValue: (value: string) => {
 			if (value === '') {
@@ -51,15 +60,7 @@ const ColumnTypeHandlerFactories: Record<SchemaKnownColumnType, ColumnTypeHandle
 			type: 'number',
 		},
 	}),
-	String: (schema, field) => ({
-		parseValue: (value: string) => {
-			if (value === '' && schema.nullable && field().valueOnServer === null) {
-				return null
-			}
-			return value
-		},
-		formatValue: (value: string | null) => value ?? '',
-	}),
+
 	Date: () => ({
 		parseValue: (value: string) => {
 			if (value === '') {
@@ -93,15 +94,9 @@ const ColumnTypeHandlerFactories: Record<SchemaKnownColumnType, ColumnTypeHandle
 			type: 'datetime-local',
 		},
 	}),
-	Bool: () => {
-		throw new Error('Boolean column type is not supported yet')
-	},
-	Enum: () => {
-		throw new Error('Enum column type is not supported yet')
-	},
-	Uuid: () => {
-		throw new Error('UUID column type is not supported yet')
-	},
+	Bool: undefined,
+	Enum: undefined,
+	Uuid: undefined,
 }
 
 const toLocalDate = (date: Date) => {

@@ -92,9 +92,13 @@ export const enumRadio = () => <>
 
 const FillValue = () => {
 	const field = useField('textValue')
+	const checkbox = useField('boolValue')
 	return <>
 		<Button onClick={() => field.updateValue('123')}>Fill invalid</Button>
 		<Button onClick={() => field.updateValue('abc')}>Fill valid</Button>
+		<Button onClick={() => checkbox.updateValue(null)}>Set checkbox null</Button>
+		<Button onClick={() => checkbox.updateValue(true)}>Set checkbox true</Button>
+		<Button onClick={() => checkbox.updateValue(false)}>Set checkbox false</Button>
 	</>
 }
 export const clientValidation = () => <>
@@ -107,9 +111,10 @@ export const clientValidation = () => <>
 				<div className={'pl-52 space-x-4'}>
 					<FillValue />
 				</div>
-				<InputField field={'textValue'} label={'Name'} inputProps={{ pattern: '[a-z]+' }} />
+				<InputField field={'textValue'} label={'Name'} required inputProps={{ pattern: '[a-z]+' }} />
 				<InputField field={'intValue'} label={'Number'} inputProps={{ required: true, max: 100 }} />
 				<CheckboxField field={'boolValue'} label={'Some boolean'} description={'Hello world'} inputProps={{ required: true }} />
+				<InputField field={'uuidValue'} label={'UUID'}  />
 			</div>
 		</EntitySubTree>
 	</Binding>

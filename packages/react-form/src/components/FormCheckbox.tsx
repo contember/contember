@@ -28,15 +28,15 @@ export const FormCheckbox = Component<FormCheckboxProps>(({ field, isNonbearing,
 		if (!checkboxRef) {
 			return
 		}
-		(ref as any).current = checkboxRef
-		if (value === null) {
-			checkboxRef.indeterminate = true
-		}
+		checkboxRef.indeterminate = value === null
 	}, [checkboxRef, ref, value])
 
 	return (
 			<SlotInput
-				ref={setCheckboxRef}
+				ref={it => {
+					(ref as any).current = checkboxRef
+					setCheckboxRef(it)
+				}}
 				type="checkbox"
 				checked={accessor.value === true}
 				data-state={value === null ? 'indeterminate' : (value ? 'checked' : 'unchecked')}

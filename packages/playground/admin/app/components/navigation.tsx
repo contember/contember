@@ -56,6 +56,11 @@ export const Navigation = () => {
 				</MenuItem>
 				<MenuItem icon={<LanguagesIcon size={16} />} label={'Dimensions'} to={'dimensions'} />
 				<MenuItem icon={<PencilIcon size={16} />} label={'Editor'} to={'editor'} />
+				<MenuItem icon={<PencilIcon size={16} />} label={'Legacy editor'}>
+					<MenuItem icon={line} label={'Rich text field'} to={'legacyEditor/richtext'} />
+					<MenuItem icon={line} label={'Block editor'} to={'legacyEditor/blocks'} />
+
+				</MenuItem>
 			</Menu>
 		</div>
 	)

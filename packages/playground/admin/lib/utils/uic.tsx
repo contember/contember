@@ -8,7 +8,7 @@ import { twMerge } from 'tailwind-merge'
 type StringToBoolean<T> = T extends 'true' | 'false' ? boolean : T;
 type ConfigSchema = Record<string, Record<string, ClassValue>>;
 
-type ConfigVariants<T extends ConfigSchema | undefined> = T extends ConfigSchema ? {
+export type ConfigVariants<T extends ConfigSchema | undefined> = T extends ConfigSchema ? {
 	[Variant in keyof T]?: StringToBoolean<keyof T[Variant]> | null | undefined;
 } : {}
 
@@ -20,7 +20,7 @@ type Config<T extends ConfigSchema | undefined, El extends React.ElementType> = 
 	baseClass?: ClassValue
 	variants?: T;
 	passVariantProps?: string[]
-	defaultProps?: React.ComponentProps<El>
+	defaultProps?: Partial<React.ComponentProps<El>>
 	defaultVariants?: ConfigVariants<T>;
 	compoundVariants?: ((ConfigVariants<T> | ConfigVariantsMulti<T>) & { className?: string })[];
 	displayName?: string;

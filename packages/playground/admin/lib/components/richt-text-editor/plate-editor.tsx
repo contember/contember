@@ -42,7 +42,7 @@ export const PlateEditor = Component(
 						onChange={handleEditorOnChange}
 						normalizeInitialValue
 					>
-						<PlateContentSync />
+						<PlateContentSync field={field} />
 						<div
 							ref={containerRef}
 							className={cn(
@@ -83,10 +83,14 @@ export const PlateEditor = Component(
 	'PlateEditor',
 )
 
-const PlateContentSync = () => {
-	const field = useField('data')
-	const fieldAccessor = field.getAccessor
-	const fieldValue = field.value
+interface PlateContentSyncProps {
+	field: string | SugarableRelativeSingleField
+}
+
+const PlateContentSync = ({ field }: PlateContentSyncProps) => {
+	const contentField = useField(field)
+	const fieldAccessor = contentField.getAccessor
+	const fieldValue = contentField.value
 	const editor = useEditorRef()
 
 	useEffect(() => {

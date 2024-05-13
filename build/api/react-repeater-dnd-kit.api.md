@@ -4,9 +4,25 @@
 
 ```ts
 
+/// <reference types="react" />
+
+import { Active } from '@dnd-kit/core';
+import { ClientRect as ClientRect_2 } from '@dnd-kit/core';
+import { Context } from 'react';
+import { DraggableAttributes } from '@dnd-kit/core';
+import { EntityAccessor } from '@contember/react-binding';
 import { JSX as JSX_2 } from 'react/jsx-runtime';
+import { MutableRefObject } from 'react';
+import { Over } from '@dnd-kit/core';
 import { default as React_2 } from 'react';
 import { ReactNode } from 'react';
+import { SortableData } from '@dnd-kit/sortable';
+import { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities';
+import { Transform } from '@dnd-kit/utilities';
+import { UniqueIdentifier } from '@dnd-kit/core';
+
+// @internal (undocumented)
+export const RepeaterActiveEntityContext: Context<EntityAccessor | undefined>;
 
 // @public (undocumented)
 export const RepeaterSortable: ({ children }: {
@@ -34,10 +50,67 @@ export const RepeaterSortableItemActivator: React_2.ForwardRefExoticComponent<{
     children: ReactNode;
 } & React_2.RefAttributes<HTMLElement>>;
 
+// @internal (undocumented)
+export const RepeaterSortableItemContext: Context<    {
+active: Active | null;
+activeIndex: number;
+attributes: DraggableAttributes;
+data: SortableData & {
+[x: string]: any;
+};
+rect: MutableRefObject<ClientRect_2 | null>;
+index: number;
+newIndex: number;
+items: UniqueIdentifier[];
+isOver: boolean;
+isSorting: boolean;
+isDragging: boolean;
+listeners: SyntheticListenerMap | undefined;
+node: MutableRefObject<HTMLElement | null>;
+overIndex: number;
+over: Over | null;
+setNodeRef: (node: HTMLElement | null) => void;
+setActivatorNodeRef: (element: HTMLElement | null) => void;
+setDroppableNodeRef: (element: HTMLElement | null) => void;
+setDraggableNodeRef: (element: HTMLElement | null) => void;
+transform: Transform | null;
+transition: string | undefined;
+}>;
+
 // @public (undocumented)
 export const RepeaterSortableItemNode: ({ children }: {
     children: ReactNode;
 }) => JSX_2.Element;
+
+// @public (undocumented)
+export const useRepeaterActiveEntity: () => EntityAccessor | undefined;
+
+// @public (undocumented)
+export const useRepeaterSortableItem: () => {
+    active: Active | null;
+    activeIndex: number;
+    attributes: DraggableAttributes;
+    data: SortableData & {
+        [x: string]: any;
+    };
+    rect: MutableRefObject<ClientRect_2 | null>;
+    index: number;
+    newIndex: number;
+    items: UniqueIdentifier[];
+    isOver: boolean;
+    isSorting: boolean;
+    isDragging: boolean;
+    listeners: SyntheticListenerMap | undefined;
+    node: MutableRefObject<HTMLElement | null>;
+    overIndex: number;
+    over: Over | null;
+    setNodeRef: (node: HTMLElement | null) => void;
+    setActivatorNodeRef: (element: HTMLElement | null) => void;
+    setDroppableNodeRef: (element: HTMLElement | null) => void;
+    setDraggableNodeRef: (element: HTMLElement | null) => void;
+    transform: Transform | null;
+    transition: string | undefined;
+};
 
 
 export * from "@contember/react-repeater";

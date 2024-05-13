@@ -1,7 +1,6 @@
-import type { CustomElementPlugin } from '../../../baseEditor'
+import type { CustomElementPlugin, ElementRenderer } from '../../../baseEditor'
 import { Editor as SlateEditor, Editor, Element as SlateElement, Node as SlateNode, Transforms } from 'slate'
 import { ContemberEditor } from '../../../ContemberEditor'
-import { ParagraphRenderer } from './ParagraphRenderer'
 import { AlignDirection } from '../../attributes'
 
 export const paragraphElementType = 'paragraph' as const
@@ -18,9 +17,9 @@ export const isParagraphElement = (
 	suchThat?: Partial<ParagraphElement>,
 ): element is ParagraphElement => ContemberEditor.isElementType(element, paragraphElementType, suchThat)
 
-export const paragraphElementPlugin: CustomElementPlugin<ParagraphElement> = {
+export const paragraphElementPlugin = ({ render }: {render: ElementRenderer<ParagraphElement>}): CustomElementPlugin<ParagraphElement> => ({
 	type: paragraphElementType,
-	render: ParagraphRenderer,
+	render,
 	canContainAnyBlocks: false,
 	acceptsAttributes: ({ editor, suchThat }) => {
 		return 'align' in suchThat
@@ -51,10 +50,10 @@ export const paragraphElementPlugin: CustomElementPlugin<ParagraphElement> = {
 	},
 	normalizeNode: ({ editor, element, path, preventDefault }) => {
 		for (const [i, child] of element.children.entries()) {
-			if (Editor.isBlock(editor, child)) {
+			if (SlateElement.isElement(child) && Editor.isBlock(editor, child)) {
 				Transforms.unwrapNodes(editor, { at: [...path, i] })
 				return preventDefault()
 			}
 		}
 	},
-}
+})

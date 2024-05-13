@@ -1,9 +1,8 @@
-import { CustomElementPlugin } from '../../../baseEditor'
-import { Editor as SlateEditor, Node as SlateNode, Element as SlateElement } from 'slate'
+import { CustomElementPlugin, type ElementRenderer } from '../../../baseEditor'
+import { Editor as SlateEditor, Element as SlateElement, Node as SlateNode } from 'slate'
 import { ContemberEditor } from '../../../ContemberEditor'
 import { getParentListElement } from './ListElement'
 import { orderedListElementType } from './OrderedListElement'
-import { UnorderedListRenderer } from './UnorderedListRenderer'
 import { normalizeListElement, toggleListElement } from './transforms'
 
 export const unorderedListElementType = 'unorderedList' as const
@@ -18,9 +17,9 @@ export const isUnorderedListElement = (
 	suchThat?: Partial<UnorderedListElement>,
 ): element is UnorderedListElement => ContemberEditor.isElementType(element, unorderedListElementType, suchThat)
 
-export const unorderedListElementPlugin: CustomElementPlugin<UnorderedListElement> = {
+export const unorderedListElementPlugin = ({ render }: { render: ElementRenderer<UnorderedListElement> }): CustomElementPlugin<UnorderedListElement> => ({
 	type: unorderedListElementType,
-	render: UnorderedListRenderer,
+	render,
 	isActive: ({ editor, suchThat }) => {
 		const list = getParentListElement(editor)
 		return list ? isUnorderedListElement(list, suchThat) : false
@@ -29,4 +28,4 @@ export const unorderedListElementPlugin: CustomElementPlugin<UnorderedListElemen
 		toggleListElement(editor, unorderedListElementType, suchThat, orderedListElementType)
 	},
 	normalizeNode: normalizeListElement,
-}
+})

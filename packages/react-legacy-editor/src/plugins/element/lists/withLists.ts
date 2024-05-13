@@ -9,21 +9,27 @@ import {
 } from 'slate'
 import { ContemberEditor } from '../../../ContemberEditor'
 import { isListItemElement, ListItemElement, listItemElementPlugin } from './ListItemElement'
-import { orderedListElementPlugin } from './OrderedListElement'
+import { OrderedListElement, orderedListElementPlugin } from './OrderedListElement'
 import { dedentListItem, indentListItem } from './transforms'
-import { unorderedListElementPlugin } from './UnorderedListElement'
+import { UnorderedListElement, unorderedListElementPlugin } from './UnorderedListElement'
 import { isListElement } from './ListElement'
 import { listHtmlDeserializerFactory } from './ListHtmlDeserializer'
+import type { ElementRenderer } from '../../../baseEditor'
+import { AnchorElement } from '../anchors'
 
-export const withLists = <E extends Editor>(editor: E): E => {
+export const withLists = ({ renderListItem, renderUnorderedList, renderOrderedList }: {
+	renderListItem: ElementRenderer<ListItemElement>
+	renderOrderedList: ElementRenderer<OrderedListElement>
+	renderUnorderedList: ElementRenderer<UnorderedListElement>
+}) => <E extends Editor>(editor: E): E => {
 	const {
 		insertBreak,
 		onKeyDown,
 	} = editor
 
-	editor.registerElement(listItemElementPlugin)
-	editor.registerElement(orderedListElementPlugin)
-	editor.registerElement(unorderedListElementPlugin)
+	editor.registerElement(listItemElementPlugin({ render: renderListItem }))
+	editor.registerElement(orderedListElementPlugin({ render: renderOrderedList }))
+	editor.registerElement(unorderedListElementPlugin({ render: renderUnorderedList }))
 
 	editor.htmlDeserializer.registerPlugin(listHtmlDeserializerFactory())
 
@@ -159,7 +165,7 @@ export const withLists = <E extends Editor>(editor: E): E => {
 					return Transforms.splitNodes(editor, {
 						always: true,
 						at: selection.focus,
-						match: node => Editor.isBlock(editor, node) && editor.isDefaultElement(node),
+						match: node => SlateElement.isElement(node) && Editor.isBlock(editor, node) && editor.isDefaultElement(node),
 					})
 				} else if (isListItemElement(closestBlockElement)) {
 					// We want to create a newline but the closest block is the list item.

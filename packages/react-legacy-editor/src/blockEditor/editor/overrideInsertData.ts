@@ -1,6 +1,6 @@
 import type { FieldValue, RelativeSingleField } from '@contember/react-binding'
 import { Descendant, Element as SlateElement, Node as SlateNode, Text } from 'slate'
-import type { ResolvedDiscriminatedDatum } from '../../../discrimination'
+import type { ResolvedDiscriminatedDatum } from '../../discrimination'
 import { ReferenceElement, referenceElementType } from '../elements'
 import type { EmbedHandler, NormalizedEmbedHandlers } from '../embed'
 import type { EditorWithBlocks } from './EditorWithBlocks'

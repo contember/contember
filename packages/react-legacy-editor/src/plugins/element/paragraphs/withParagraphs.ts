@@ -2,14 +2,15 @@ import { Editor, Element as SlateElement, Point, Range as SlateRange, Transforms
 import { ContemberEditor } from '../../../ContemberEditor'
 import { isParagraphElement, ParagraphElement, paragraphElementPlugin, paragraphElementType } from './ParagraphElement'
 import { paragraphHtmlDeserializer } from './ParagraphHtmlDeserializer'
+import type { ElementRenderer } from '../../../baseEditor'
 
-export const withParagraphs = <E extends Editor>(editor: E): E => {
+export const withParagraphs = ({ render }: { render: ElementRenderer<ParagraphElement> }) => <E extends Editor>(editor: E): E => {
 	const {
 		canToggleElement,
 		deleteBackward,
 	} = editor
 
-	editor.registerElement(paragraphElementPlugin)
+	editor.registerElement(paragraphElementPlugin({ render }))
 
 
 	editor.canToggleElement = (elementType, suchThat) => {

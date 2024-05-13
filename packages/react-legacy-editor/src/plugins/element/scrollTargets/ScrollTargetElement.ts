@@ -1,5 +1,4 @@
-import type { CustomElementPlugin } from '../../../baseEditor'
-import { ScrollTargetRenderer } from './ScrollTargetRenderer'
+import type { CustomElementPlugin, ElementRenderer } from '../../../baseEditor'
 import {
 	Editor as SlateEditor,
 	Editor,
@@ -25,9 +24,9 @@ export const isScrollTargetElementActive = (editor: Editor) => {
 	return !!link
 }
 
-export const scrollTargetElementPlugin: CustomElementPlugin<ScrollTargetElement> = {
+export const scrollTargetElementPlugin = ({ render }: { render: ElementRenderer<ScrollTargetElement> }): CustomElementPlugin<ScrollTargetElement> => ({
 	type: scrollTargetElementType,
-	render: ScrollTargetRenderer,
+	render,
 	isActive: ({ editor }) => isScrollTargetElementActive(editor),
 	isInline: true,
 	isVoid: true,
@@ -45,7 +44,7 @@ export const scrollTargetElementPlugin: CustomElementPlugin<ScrollTargetElement>
 			wrapScrollTarget(editor, identifier)
 		}
 	},
-}
+})
 const unwrapScrollTarget = (editor: Editor) => {
 	Transforms.removeNodes(editor, { match: isScrollTargetElement })
 }

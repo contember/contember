@@ -1,7 +1,6 @@
-import type { CustomElementPlugin } from '../../../baseEditor'
+import type { CustomElementPlugin, ElementRenderer } from '../../../baseEditor'
 import { Editor as SlateEditor, Editor, Element as SlateElement, Node as SlateNode, Transforms } from 'slate'
 import { ContemberEditor } from '../../../ContemberEditor'
-import { ListItemRenderer } from './ListItemRenderer'
 import { isListElement } from './ListElement'
 
 export const listItemElementType = 'listItem' as const
@@ -17,9 +16,9 @@ export const isListItemElement = (
 ): element is ListItemElement => ContemberEditor.isElementType(element, listItemElementType, suchThat)
 
 
-export const listItemElementPlugin: CustomElementPlugin<ListItemElement> = {
+export const listItemElementPlugin = ({ render }: { render: ElementRenderer<ListItemElement> }): CustomElementPlugin<ListItemElement> => ({
 	type: listItemElementType,
-	render: ListItemRenderer,
+	render,
 	canContainAnyBlocks: true,
 	normalizeNode: ({ editor, path, element, preventDefault }) => {
 		const parentEntry = Editor.above(editor, { at: path })
@@ -58,4 +57,4 @@ export const listItemElementPlugin: CustomElementPlugin<ListItemElement> = {
 			return preventDefault()
 		}
 	},
-}
+})

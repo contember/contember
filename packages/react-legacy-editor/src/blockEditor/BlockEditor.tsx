@@ -1,43 +1,14 @@
-import {
-	BindingError,
-	Component,
-	Environment,
-	FieldValue,
-	HasMany,
-	SugaredField,
-	SugaredFieldProps,
-	SugaredRelativeEntityList,
-	useDesugaredRelativeSingleField,
-	useEnvironment,
-	VariableInputTransformer,
-} from '@contember/react-binding'
-import { emptyArray, noop, useReferentiallyStableCallback } from '@contember/react-utils'
-import { EditorCanvas, EditorCanvasSize, FieldContainer, Scheme } from '@contember/ui'
-import { Fragment, FunctionComponent, ReactElement, ReactNode, useCallback, useLayoutEffect, useMemo, useState } from 'react'
-import { SortEnd } from 'react-sortable-hoc'
-import { Range as SlateRange, Transforms } from 'slate'
+import { BindingError, Component, Environment, FieldValue, HasMany, SugaredField, SugaredFieldProps, SugaredRelativeEntityList, useDesugaredRelativeSingleField, useEnvironment, VariableInputTransformer } from '@contember/react-binding'
+import { emptyArray, useReferentiallyStableCallback } from '@contember/react-utils'
+import { ComponentType, Fragment, FunctionComponent, ReactElement, ReactNode, useEffect, useMemo, useState } from 'react'
 import { Slate } from 'slate-react'
-import { getDiscriminatedBlock, useNormalizedBlocks } from '../../blocks'
-import { Repeater, SortableRepeaterContainer } from '../../collections'
-import { SugaredDiscriminateBy, useDiscriminatedData } from '../../discrimination'
-import { TextareaField } from '@contember/react-form-fields-ui'
-import { shouldCancelStart } from '@contember/utilities'
+import { getDiscriminatedBlock, useNormalizedBlocks } from '../blocks'
+import { SugaredDiscriminateBy, useDiscriminatedData } from '../discrimination'
 import { createEditorWithEssentials } from '../baseEditor'
-import { EditableCanvas } from '../baseEditor/EditableCanvas'
 import type { CreateEditorPublicOptions } from '../editorFactory'
 import { paragraphElementType } from '../plugins'
-import { RichEditor } from '../RichEditor'
-import { RichTextField } from '../RichTextField'
-import {
-	HoveringToolbars,
-	HoveringToolbarsProps,
-	InitializeReferenceToolbarButton,
-	ToolbarButtonSpec,
-} from '../toolbars'
-import { BlockHoveringToolbarContents, BlockHoveringToolbarContentsProps } from './BlockHoveringToolbarContents'
-import { EditorWithBlocks, initBlockEditor } from './editor'
+import { initBlockEditor } from './editor'
 import type { EmbedHandler } from './embed'
-import type { FieldBackedElement } from './FieldBackedElement'
 import { useCreateElementReference } from './references'
 import { ReferencesProvider } from './references/ReferencesProvider'
 import { useGetReferencedEntity } from './references/useGetReferencedEntity'
@@ -45,33 +16,28 @@ import { useInsertElementWithReference } from './references/useInsertElementWith
 import { SortedBlocksContext } from './state/SortedBlocksContext'
 import { useBlockEditorState } from './state/useBlockEditorState'
 import { ContentOutlet, ContentOutletProps, useEditorReferenceBlocks } from './templating'
+import { OverrideRenderElementOptions } from './editor/overrideRenderElement'
+import { EditorReferenceBlocksContext } from '../contexts'
+import { ReferenceElementRendererProps } from './elements'
+import { Repeater } from '@contember/react-repeater'
+import { useEditor } from '../slate-reexport'
+import { Descendant, insertNodes, Node, removeNodes, withoutNormalizing } from 'slate'
 
-export interface BlockEditorProps extends SugaredRelativeEntityList, CreateEditorPublicOptions<EditorWithBlocks> {
-	label?: ReactNode
-	placeholder?: string
+export interface BlockEditorProps extends SugaredRelativeEntityList, CreateEditorPublicOptions {
+
 	contentField: SugaredFieldProps['field']
 	sortableBy: SugaredFieldProps['field']
 	children?: ReactNode
-	size?: EditorCanvasSize
-
-	leadingFieldBackedElements?: FieldBackedElement[]
-	trailingFieldBackedElements?: FieldBackedElement[]
 
 	referencesField?: SugaredRelativeEntityList | string
 	referenceDiscriminationField?: SugaredFieldProps['field']
 	monolithicReferencesMode?: boolean
+	renderReference?: ComponentType<ReferenceElementRendererProps>
 
 	embedReferenceDiscriminateBy?: SugaredDiscriminateBy
 	embedContentDiscriminationField?: SugaredFieldProps['field']
 	embedHandlers?: Iterable<EmbedHandler>
-
-	showToolbarLabels?: BlockHoveringToolbarContentsProps['showLabels']
-	toolbarScheme?: Scheme
-
-	// TODO
-	inlineButtons?: HoveringToolbarsProps['inlineButtons']
-	blockButtons?: BlockHoveringToolbarContentsProps['blockButtons']
-	otherBlockButtons?: BlockHoveringToolbarContentsProps['otherBlockButtons']
+	renderSortableBlock: OverrideRenderElementOptions['renderSortableBlock']
 }
 
 const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
@@ -82,14 +48,8 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 
 		const {
 			contentField,
-			label,
-			placeholder,
 			sortableBy,
 			children,
-			size,
-
-			leadingFieldBackedElements = emptyArray,
-			trailingFieldBackedElements = emptyArray,
 
 			referencesField,
 			referenceDiscriminationField,
@@ -99,16 +59,10 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 			embedContentDiscriminationField,
 			embedHandlers = emptyArray,
 
-			toolbarScheme,
-
-			inlineButtons = defaultInlineButtons,
-			blockButtons,
-			otherBlockButtons,
-			showToolbarLabels,
 
 			plugins,
-			augmentEditor,
-			augmentEditorBuiltins,
+			renderSortableBlock,
+			renderReference,
 
 			...blockListProps
 		} = props
@@ -166,8 +120,6 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 		const [editor] = useState(() =>
 			initBlockEditor({
 				editor: baseEditor,
-				augmentEditor,
-				augmentEditorBuiltins,
 				editorReferenceBlocks,
 				embedContentDiscriminationField: desugaredEmbedContentDiscriminationField,
 				embedHandlers: discriminatedEmbedHandlers,
@@ -178,93 +130,29 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 				createElementReferences: stableCreateElementReference,
 				getReferencedEntity: stableGetReferencedEntity,
 				insertElementWithReference,
+				renderSortableBlock,
+				renderReference,
 			}))
 
-
-		const shouldDisplayInlineToolbar = useCallback(() => {
-			const selection = baseEditor.selection
-			return !(!selection || SlateRange.isCollapsed(selection))
-		}, [baseEditor])
-
-
-		const leadingElements = useFieldBackedElementFields(leadingFieldBackedElements)
-		const trailingElements = useFieldBackedElementFields(trailingFieldBackedElements)
-
-		const [_, setMeaninglessState] = useState(0)
-		useLayoutEffect(() => {
-			if (editor.children !== nodes && JSON.stringify(editor.children) !== JSON.stringify(nodes)) {
-				editor.children = nodes
-				// Force a re-render
-				setMeaninglessState(meaninglessState => meaninglessState + 1)
-			}
-		}, [nodes, editor])
-
+		useEffect(() => {
+			refreshBlocks()
+			// eslint-disable-next-line react-hooks/exhaustive-deps
+		}, [])
 
 		return (
-			<FieldContainer label={label} useLabelElement={false}>
+			<Repeater {...blockListProps} sortableBy={sortableBy}>
+
 				<ReferencesProvider getReferencedEntity={getReferencedEntity}>
 					<SortedBlocksContext.Provider value={sortedBlocksRef.current}>
-						<SortableRepeaterContainer
-							axis="y"
-							lockAxis="y"
-							helperClass="is-dragged"
-							lockToContainerEdges={true}
-							useWindowAsScrollContainer={true}
-							useDragHandle={true}
-							onSortEnd={useCallback((data: SortEnd) => {
-								Transforms.moveNodes(editor, {
-									at: [data.oldIndex],
-									to: [data.newIndex],
-								})
-							}, [editor])}
-							shouldCancelStart={shouldCancelStart}
-						>
-							<Slate editor={editor} value={nodes} onChange={onChange}>
-								<EditorCanvas
-									inset="hovering-toolbar"
-									underlyingComponent={EditableCanvas}
-									componentProps={{
-										renderElement: baseEditor.renderElement,
-										renderLeaf: baseEditor.renderLeaf,
-										onKeyDown: baseEditor.onKeyDown,
-										onFocusCapture: baseEditor.onFocus,
-										onBlurCapture: baseEditor.onBlur,
-										onDOMBeforeInput: baseEditor.onDOMBeforeInput,
-										onDrop: (e => {
-											e.preventDefault()
-										}),
-										placeholder: placeholder,
-										leading: leadingElements,
-										trailing: trailingElements,
-									}}
-									size={size ?? 'large'}
-
-								>
-									{useMemo(
-										() => (
-											<HoveringToolbars
-												toolbarScheme={toolbarScheme}
-												shouldDisplayInlineToolbar={shouldDisplayInlineToolbar}
-												inlineButtons={inlineButtons}
-												showLabels={showToolbarLabels}
-												blockButtons={
-													<BlockHoveringToolbarContents
-														editorReferenceBlocks={editorReferenceBlocks}
-														blockButtons={blockButtons}
-														otherBlockButtons={otherBlockButtons}
-														showLabels={showToolbarLabels}
-													/>
-												}
-											/>
-										),
-										[blockButtons, editorReferenceBlocks, inlineButtons, otherBlockButtons, shouldDisplayInlineToolbar, showToolbarLabels, toolbarScheme],
-									)}
-								</EditorCanvas>
+						<EditorReferenceBlocksContext.Provider value={editorReferenceBlocks}>
+							<Slate editor={editor} initialValue={nodes} onChange={onChange}>
+								<SyncValue nodes={nodes}/>
+								{children}
 							</Slate>
-						</SortableRepeaterContainer>
+						</EditorReferenceBlocksContext.Provider>
 					</SortedBlocksContext.Provider>
 				</ReferencesProvider>
-			</FieldContainer>
+			</Repeater>
 		)
 	},
 	(props, environment) => {
@@ -272,24 +160,11 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 
 		const embedHandlers = Array.from(props.embedHandlers || [])
 
-		const inlineButtons: ToolbarButtonSpec[] = props.inlineButtons
-			? (
-				(Array.isArray(props.inlineButtons[0]) ? props.inlineButtons : [props.inlineButtons]) as ToolbarButtonSpec[][]
-			).flat()
-			: emptyArray
-
 		const references = !!(props.referencesField && props.referenceDiscriminationField) && (
 			<HasMany
 				{...(typeof props.referencesField === 'string' ? { field: props.referencesField } : props.referencesField)}
 				initialEntityCount={0}
 			>
-				{inlineButtons
-					.filter((button): button is InitializeReferenceToolbarButton => 'referenceContent' in button)
-					.map(({ referenceContent: Content }, i) => {
-						return (
-							<Content key={i} referenceId="" editor={0 as any} selection={null} onSuccess={noop} onCancel={noop} />
-						)
-					})}
 				<SugaredField field={props.referenceDiscriminationField} />
 				{props.children}
 				{props.embedContentDiscriminationField && (
@@ -305,23 +180,35 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 
 		return (
 			<>
-				{props.leadingFieldBackedElements?.map((item, i) => (
-					'element' in item ? <Fragment key={`leading_${i}`}>{item.element}</Fragment> : <SugaredField field={item.field} key={`leading_${i}`} />
-				))}
-				{props.trailingFieldBackedElements?.map((item, i) => (
-					'element' in item ? <Fragment key={`trailing_${i}`}>{item.element}</Fragment> : <SugaredField field={item.field} key={`trailing_${i}`} />
-				))}
-				<Repeater {...props} label={props.label ?? ''} initialEntityCount={0}>
+				<HasMany field={props.field} initialEntityCount={0}>
 					<SugaredField field={props.sortableBy} />
 					<SugaredField field={props.contentField} />
 					{!props.monolithicReferencesMode && references}
-				</Repeater>
+				</HasMany>
 				{props.monolithicReferencesMode && references}
 			</>
 		)
 	},
 	'BlockEditor',
 )
+
+const SyncValue = ({ nodes }: { nodes: Descendant[] }) => {
+	const editor = useEditor()
+	useEffect(() => {
+		if (editor.children !== nodes && JSON.stringify(editor.children) !== JSON.stringify(nodes)) {
+			withoutNormalizing(editor, () => {
+				for (const [, childPath] of Node.children(editor, [], {
+					reverse: true,
+				})) {
+					removeNodes(editor, { at: childPath })
+				}
+				insertNodes(editor, nodes)
+			})
+		}
+
+	}, [editor, nodes])
+	return null
+}
 
 /**
  * The `BlockEditor` component is the main component of the editor. It is responsible for rendering the content editor.
@@ -337,29 +224,6 @@ export const BlockEditor = Object.assign<
 >(BlockEditorComponent, {
 	ContentOutlet,
 })
-
-const useFieldBackedElementFields = (elements: FieldBackedElement[]) => {
-	return <>
-		{elements.map((el, i) => {
-			if ('element' in el) {
-				return <Fragment key={i}>{el.element}</Fragment>
-			}
-			if (el.format === 'plainText') {
-				return (
-					<TextareaField
-						key={i}
-						distinction={'seamless'}
-						field={el.field}
-						label={undefined}
-						placeholder={el.placeholder}
-						size={el.size}
-					/>
-				)
-			}
-			return <RichTextField key={i} field={el.field} label={undefined} placeholder={el.placeholder} distinction={el.distinction ?? 'seamless'} />
-		})}
-	</>
-}
 
 const assertStaticBlockEditorInvariants = (props: BlockEditorProps, environment: Environment) => {
 	if (import.meta.env.DEV) {
@@ -416,10 +280,3 @@ const assertStaticBlockEditorInvariants = (props: BlockEditorProps, environment:
 		}
 	}
 }
-
-const RB = RichEditor.buttons
-const defaultInlineButtons: HoveringToolbarsProps['inlineButtons'] = [
-	[RB.bold, RB.italic, RB.underline, RB.anchor],
-	[RB.headingOne, RB.headingTwo],
-	[RB.strikeThrough, RB.code],
-]

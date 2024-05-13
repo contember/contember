@@ -1,8 +1,7 @@
-import { CustomElementPlugin } from '../../../baseEditor'
+import { CustomElementPlugin, ElementRenderer } from '../../../baseEditor'
 import { Editor as SlateEditor, Element, Element as SlateElement, Node, Transforms } from 'slate'
 import { ContemberEditor } from '../../../ContemberEditor'
 import { tableRowElementType } from './TableRowElement'
-import { TableCellElementRenderer } from './TableCellElementRenderer'
 
 export const tableCellElementType = 'tableCell' as const
 
@@ -21,9 +20,9 @@ export const createEmptyTableCellElement = () => ({
 })
 
 
-export const tableCellElementPlugin: CustomElementPlugin<TableCellElement> = {
+export const tableCellElementPlugin = ({ render }: {render: ElementRenderer<TableCellElement>}): CustomElementPlugin<TableCellElement> => ({
 	type: tableCellElementType,
-	render: TableCellElementRenderer,
+	render,
 	normalizeNode: ({ element, editor, path, preventDefault }) => {
 		if (element.children.length === 1) {
 			const onlyChild = element.children[0]
@@ -43,4 +42,4 @@ export const tableCellElementPlugin: CustomElementPlugin<TableCellElement> = {
 		}
 	},
 	canContainAnyBlocks: true,
-}
+})

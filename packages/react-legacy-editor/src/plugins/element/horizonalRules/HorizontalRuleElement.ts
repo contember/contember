@@ -1,4 +1,4 @@
-import type { CustomElementPlugin } from '../../../baseEditor'
+import type { CustomElementPlugin, ElementRenderer } from '../../../baseEditor'
 import {
 	Editor as SlateEditor,
 	Editor,
@@ -7,7 +7,7 @@ import {
 	Range as SlateRange,
 	Transforms,
 } from 'slate'
-import { HorizontalRuleRenderer } from './HorizontalRuleRenderer'
+import { ListItemElement } from '../lists'
 
 export const horizontalRuleElementType = 'horizontalRule' as const
 
@@ -24,9 +24,9 @@ export const isHorizontalRuleElementActive = (editor: Editor) => {
 	return !!hr
 }
 
-export const horizontalRuleElementPlugin: CustomElementPlugin<HorizontalRuleElement> = {
+export const horizontalRuleElementPlugin = ({ render }: { render: ElementRenderer<HorizontalRuleElement> }): CustomElementPlugin<HorizontalRuleElement> => ({
 	type: horizontalRuleElementType,
-	render: HorizontalRuleRenderer,
+	render,
 	isVoid: true,
 	toggleElement: ({ editor }) => {
 		if (isHorizontalRuleElementActive(editor)) {
@@ -35,7 +35,7 @@ export const horizontalRuleElementPlugin: CustomElementPlugin<HorizontalRuleElem
 			insertHorizontalRule(editor)
 		}
 	},
-}
+})
 
 const removeHorizontalRule = (editor: Editor) => {
 	Transforms.removeNodes(editor, { match: isHorizontalRuleElement })

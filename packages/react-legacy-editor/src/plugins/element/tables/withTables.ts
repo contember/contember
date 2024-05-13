@@ -1,28 +1,17 @@
-import {
-	Editor,
-	Element,
-	NodeEntry,
-	Point,
-	Node as SlateNode,
-	Path as SlatePath,
-	Range as SlateRange,
-	Text,
-	Transforms,
-} from 'slate'
+import { Editor, Element, Node as SlateNode, NodeEntry, Path as SlatePath, Point, Range as SlateRange, Text, Transforms } from 'slate'
 import { ContemberEditor } from '../../../ContemberEditor'
-import { TableCellElement, isTableCellElement, tableCellElementPlugin } from './TableCellElement'
-import {
-	TableElement,
-	getTableElementColumnCount,
-	getTableElementRowCount,
-	isTableElement,
-	tableElementPlugin,
-} from './TableElement'
+import { isTableCellElement, TableCellElement, tableCellElementPlugin } from './TableCellElement'
+import { getTableElementColumnCount, getTableElementRowCount, isTableElement, TableElement, tableElementPlugin } from './TableElement'
 import { getTableCellCoordinates, selectTableCellContents } from './TableElementSelection'
 import { TableModifications } from './TableModifications'
-import { isTableRowElement, tableRowElementPlugin } from './TableRowElement'
+import { isTableRowElement, TableRowElement, tableRowElementPlugin } from './TableRowElement'
+import { ElementRenderer } from '../../../baseEditor'
 
-export const withTables = <E extends Editor>(editor: E): E => {
+export const withTables = ({ renderTable, renderTableCell, renderTableRow }: {
+	renderTable: ElementRenderer<TableElement>
+	renderTableCell: ElementRenderer<TableCellElement>
+	renderTableRow: ElementRenderer<TableRowElement>
+}) => <E extends Editor>(editor: E): E => {
 	const {
 		deleteForward,
 		deleteBackward,
@@ -31,9 +20,9 @@ export const withTables = <E extends Editor>(editor: E): E => {
 		onKeyDown,
 	} = editor
 
-	editor.registerElement(tableElementPlugin)
-	editor.registerElement(tableCellElementPlugin)
-	editor.registerElement(tableRowElementPlugin)
+	editor.registerElement(tableElementPlugin({ render: renderTable }))
+	editor.registerElement(tableCellElementPlugin({ render: renderTableCell }))
+	editor.registerElement(tableRowElementPlugin({ render: renderTableRow }))
 
 	Object.assign<Editor, Partial<Editor>>(editor, {
 		insertBreak: () => {

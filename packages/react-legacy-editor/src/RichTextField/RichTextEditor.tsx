@@ -1,38 +1,24 @@
-import {
-	Component,
-	Field,
-	FieldAccessor,
-	FieldBasicProps,
-	QueryLanguage,
-	useEntity,
-	useMutationState,
-} from '@contember/react-binding'
-import { EditorCanvas, EditorCanvasDistinction, FieldContainer, FieldContainerProps } from '@contember/ui'
+import { Component, Field, FieldAccessor, FieldBasicProps, QueryLanguage, useEntity, useMutationState } from '@contember/react-binding'
 import { FunctionComponent, useCallback, useMemo, useState } from 'react'
 import { Descendant, Editor, Element as SlateElement, Node as SlateNode, NodeEntry, Transforms } from 'slate'
-import { Editable, Slate } from 'slate-react'
-import { useAccessorErrors } from '@contember/react-binding-ui'
+import { Slate } from 'slate-react'
 import { createEditor, CreateEditorPublicOptions } from '../editorFactory'
 import { paragraphElementType } from '../plugins'
-import { RichEditor } from '../RichEditor'
-import { HoveringToolbars, HoveringToolbarsProps } from '../toolbars'
 import { useRichTextFieldNodes } from './useRichTextFieldNodes'
 
-export interface RichTextFieldProps
-	extends FieldBasicProps,
-		Omit<FieldContainerProps, 'children' | 'errors'>,
-		CreateEditorPublicOptions,
-		HoveringToolbarsProps {
-	placeholder?: string
-	distinction?: EditorCanvasDistinction
-}
+export type RichTextEditorProps =
+	& FieldBasicProps
+	& CreateEditorPublicOptions
+	& {
+		children: React.ReactNode
+	}
 
 /**
  * Rich text field supports more advanced formatting capabilities. Output of this field is a JSON.
  *
  * @group Form Fields
  */
-export const RichTextField: FunctionComponent<RichTextFieldProps> = Component(
+export const RichTextEditor: FunctionComponent<RichTextEditorProps> = Component(
 	props => {
 		const entity = useEntity()
 		const environment = entity.environment
@@ -46,25 +32,12 @@ export const RichTextField: FunctionComponent<RichTextFieldProps> = Component(
 
 		// The cache is questionable, really.
 		const [contemberFieldElementCache] = useState(() => new WeakMap<FieldAccessor<string>, SlateElement[]>())
-		const isMutating = useMutationState()
+
 
 		const [editor] = useState(() => {
 			const editor = createEditor({
-				plugins: props.plugins ?? [
-					'code',
-					'strikeThrough',
-					'highlight',
-					'underline',
-					'italic',
-					'bold',
-					'scrollTarget',
-					'anchor',
-					'paragraph',
-				],
-				augmentEditor: props.augmentEditor,
-				augmentEditorBuiltins: props.augmentEditorBuiltins,
+				plugins: props.plugins,
 				defaultElementType: paragraphElementType,
-				addEditorBuiltins: editor => editor,
 			})
 
 			const { normalizeNode } = editor
@@ -95,7 +68,7 @@ export const RichTextField: FunctionComponent<RichTextFieldProps> = Component(
 							})
 						}
 					}
-					if (Editor.isBlock(editor, node) && path.length > 1) {
+					if (SlateElement.isElement(node) && Editor.isBlock(editor, node) && path.length > 1) {
 						return Transforms.unwrapNodes(editor, { at: path })
 					}
 					normalizeNode(nodeEntry)
@@ -132,52 +105,16 @@ export const RichTextField: FunctionComponent<RichTextFieldProps> = Component(
 		)
 
 		return (
-			<FieldContainer
-				label={props.label}
-				size={props.size}
-				labelDescription={props.labelDescription}
-				labelPosition={props.labelPosition}
-				description={props.description}
-				useLabelElement={props.useLabelElement}
-				errors={useAccessorErrors(fieldAccessor.errors?.errors)}
-			>
-				<Slate editor={editor} value={valueNodes} onChange={onChange}>
-					<EditorCanvas
-						underlyingComponent={Editable}
-						distinction={props.distinction}
-						componentProps={{
-							readOnly: isMutating,
-							renderElement: editor.renderElement,
-							renderLeaf: editor.renderLeaf,
-							onKeyDown: editor.onKeyDown,
-							onFocusCapture: editor.onFocus,
-							onBlurCapture: editor.onBlur,
-							onDOMBeforeInput: editor.onDOMBeforeInput,
-							placeholder: props.placeholder,
-						}}
-					>
-						<HoveringToolbars
-							blockButtons={props.blockButtons}
-							inlineButtons={props.inlineButtons ?? defaultInlineButtons}
-						/>
-					</EditorCanvas>
+				<Slate editor={editor} initialValue={valueNodes} onChange={onChange}>
+					{props.children}
 				</Slate>
-			</FieldContainer>
 		)
 	},
 	props => (
 		<>
 			<Field defaultValue={props.defaultValue} field={props.field} isNonbearing={props.isNonbearing} />
-			{props.label}
-			{props.labelDescription}
-			{props.description}
 		</>
 	),
 	'RichTextField',
 )
 
-const RB = RichEditor.buttons
-const defaultInlineButtons: HoveringToolbarsProps['inlineButtons'] = [
-	[RB.bold, RB.italic, RB.underline, RB.anchor],
-	[RB.strikeThrough, RB.code],
-]

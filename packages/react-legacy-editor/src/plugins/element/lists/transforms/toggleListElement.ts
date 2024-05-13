@@ -77,7 +77,7 @@ export const toggleListElement = <T extends OrderedListElement | UnorderedListEl
 			Transforms.insertNodes(editor, { type: listItemElementType, children: [] }, { at: listItemPath })
 			Transforms.moveNodes(editor, {
 				to: [...listItemPath, 0],
-				match: node => Text.isText(node) || Editor.isInline(editor, node),
+				match: node => Text.isText(node) || SlateElement.isElement(node) && Editor.isInline(editor, node),
 				at: {
 					anchor: Editor.start(editor, [...targetParentPath, 1]),
 					focus: Editor.end(editor, [...targetParentPath, targetParent.children.length]),

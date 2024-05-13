@@ -10,5 +10,5 @@ export const closestBlockEntry = <E extends SlateEditor>(
 ) =>
 	closest(editor, {
 		at: options?.at,
-		match: node => Editor.isBlock(editor, node) && (options?.match ? options.match(node) : true),
+		match: node => !Editor.isEditor(node) && Editor.isBlock(editor, node) && (options?.match ? options.match(node) : true),
 	})

@@ -1,15 +1,20 @@
 import { Ancestor, Element, Node, Path } from 'slate'
 import type { ElementWithReference } from './ElementWithReference'
 import { CustomElementPlugin } from '../../baseEditor'
-import { ReferenceElementRenderer } from '../renderers'
 import { BindingError, EntityAccessor, EntityId, FieldValue, RelativeSingleField } from '@contember/react-binding'
-import { getDiscriminatedDatum } from '../../../discrimination'
+import { getDiscriminatedDatum } from '../../discrimination'
 import { EditorReferenceBlocks } from '../templating'
 import { NormalizedEmbedHandlers } from '../embed'
-import { NormalizedBlocks } from '../../../blocks'
-import { ReactEditor } from 'slate-react'
+import { NormalizedBlocks } from '../../blocks'
+import { ReactEditor, RenderElementProps } from 'slate-react'
+import { ComponentType } from 'react'
 
 export const referenceElementType = 'reference' as const
+
+export interface ReferenceElementRendererProps extends RenderElementProps, ReferenceElementOptions {
+	element: ReferenceElement
+	referenceDiscriminationField: RelativeSingleField
+}
 
 export interface ReferenceElement extends ElementWithReference {
 	type: typeof referenceElementType
@@ -27,6 +32,7 @@ export interface ReferenceElementOptions {
 	embedContentDiscriminationField: RelativeSingleField | undefined
 	embedSubBlocks: NormalizedBlocks | undefined
 	getReferencedEntity: (path: Path, referenceId: EntityId) => EntityAccessor
+	renderReference: ComponentType<ReferenceElementRendererProps> | undefined
 }
 
 const findElementPathFallback = (parent: Ancestor, element: ReferenceElement): Path | undefined => {
@@ -52,7 +58,11 @@ export const createReferenceElementPlugin = (args: ReferenceElementOptions): Cus
 			if (!args.referenceDiscriminationField) {
 				throw new Error()
 			}
-			return <ReferenceElementRenderer {...args} {...props} referenceDiscriminationField={args.referenceDiscriminationField} />
+			if (!args.renderReference) {
+				throw new Error(`ReferenceElement: renderReference is not set.`)
+			}
+			const Comp = args.renderReference
+			return <Comp {...args} {...props} referenceDiscriminationField={args.referenceDiscriminationField} />
 		},
 		canContainAnyBlocks: true,
 		isVoid: ({ element, editor }) => {

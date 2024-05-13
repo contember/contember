@@ -11,7 +11,7 @@ import { MutableRefObject, useCallback, useRef } from 'react'
 import { BlockElementCache } from './useBlockElementCache'
 import { BlockElementPathRefs } from './useBlockElementPathRefs'
 
-export const useRefreshBlocks = ({ editor, sortedBlocksRef, sortableBy, contentField, blockList, blockElementCache, blockElementPathRefs, referencesField, monolithicReferencesMode }: {
+export const useRefreshBlocks = ({ editor, sortedBlocksRef, sortableBy, contentField, blockList, blockElementCache, blockElementPathRefs, referencesField, monolithicReferencesMode, trashFakeBlockId }: {
 	editor: Editor,
 	sortedBlocksRef: MutableRefObject<EntityAccessor[]>,
 	contentField: SugaredFieldProps['field'],
@@ -21,12 +21,12 @@ export const useRefreshBlocks = ({ editor, sortedBlocksRef, sortableBy, contentF
 	blockElementPathRefs: BlockElementPathRefs
 	referencesField?: SugaredRelativeEntityList | string
 	monolithicReferencesMode?: boolean
+	trashFakeBlockId: MutableRefObject<EntityId | undefined>
 }) => {
 	const desugaredBlockList = useDesugaredRelativeEntityList(blockList)
 	const desugaredBlockContentField = useDesugaredRelativeSingleField(contentField)
 	const desugaredSortableByField = useDesugaredRelativeSingleField(sortableBy)
 	const getParentEntityRef = useGetParentEntityRef()
-	const trashFakeBlockId = useRef<EntityId>()
 	useEntityBeforePersist(() => {
 		if (trashFakeBlockId.current) {
 			const block = getParentEntityRef.current().getRelativeEntityList(desugaredBlockList).getChildEntityById(trashFakeBlockId.current)
@@ -168,5 +168,5 @@ export const useRefreshBlocks = ({ editor, sortedBlocksRef, sortableBy, contentF
 			}
 			cleanupStack()
 		})
-	}, [blockElementCache, blockElementPathRefs, desugaredBlockContentField, desugaredBlockList, desugaredSortableByField, editor, getParentEntityRef, monolithicReferencesMode, referencesField, sortedBlocksRef])
+	}, [blockElementCache, blockElementPathRefs, desugaredBlockContentField, desugaredBlockList, desugaredSortableByField, editor, getParentEntityRef, monolithicReferencesMode, referencesField, sortedBlocksRef, trashFakeBlockId])
 }

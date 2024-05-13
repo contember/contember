@@ -1,4 +1,4 @@
-import { Editor, Node as SlateNode, Path } from 'slate'
+import { Editor, Element as SlateElement, Node as SlateNode, Path } from 'slate'
 import { isElementWithReference } from '../elements'
 
 const isPathInReferenceElement = (editor: Editor, path: Path) => {
@@ -6,7 +6,7 @@ const isPathInReferenceElement = (editor: Editor, path: Path) => {
 		if (isElementWithReference(node)) {
 			return true
 		}
-		if (Editor.isBlock(editor, node)) {
+		if (SlateElement.isElement(node) && Editor.isBlock(editor, node)) {
 			break
 		}
 	}

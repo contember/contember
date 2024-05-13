@@ -11,7 +11,7 @@ export const isListElement = <T extends UnorderedListElement | OrderedListElemen
 
 export const getParentListElement = (editor: Editor): Element | undefined => {
 	const closestNonDefaultEntry = ContemberEditor.closest(editor, {
-		match: node => Editor.isBlock(editor, node) && !editor.isDefaultElement(node),
+		match: node => SlateElement.isElement(node) && Editor.isBlock(editor, node) && !editor.isDefaultElement(node),
 	})
 	if (!closestNonDefaultEntry) {
 		return undefined

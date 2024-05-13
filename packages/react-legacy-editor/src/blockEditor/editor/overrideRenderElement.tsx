@@ -1,16 +1,17 @@
-import { Editor, Element } from 'slate'
+import { Editor } from 'slate'
 import { ReferenceElementWrapper } from '../references/ReferenceElementWrapper'
 import { isElementWithReference } from '../elements'
 import { ErrorBoundary } from 'react-error-boundary'
-import { ReactEditor, useSlateStatic } from 'slate-react'
-import { SortableRepeaterItem, SortableRepeaterItemHandle } from '../../../collections'
-import { DragHandle } from '../../../../ui'
-import { EditorBlock } from '@contember/ui'
-import { ReactNode, useContext } from 'react'
-import { SortedBlocksContext } from '../state/SortedBlocksContext'
+import { ReactEditor } from 'slate-react'
+import { ComponentType, ReactNode } from 'react'
+import { EditorElement } from '../../slate-types'
 
 
-export const overrideRenderElement = (editor: Editor) => {
+export interface OverrideRenderElementOptions {
+	renderSortableBlock: ComponentType<{ children: ReactNode, element: EditorElement }>
+}
+
+export const overrideRenderElement = (editor: Editor, { renderSortableBlock: SortableBlock }: OverrideRenderElementOptions) => {
 	const { renderElement } = editor
 
 	editor.renderElement = props => {
@@ -28,19 +29,4 @@ export const overrideRenderElement = (editor: Editor) => {
 		}
 		return children
 	}
-}
-
-const SortableBlock = ({ children, element }: { children: ReactNode, element: Element }) => {
-	const editor = useSlateStatic()
-	// intentionally passing through the context, so it redraws on order change
-	const sortedBlocks = useContext(SortedBlocksContext)
-	// intentionally finding path again and not passing from renderElement, because it might have changed
-	const [index] = ReactEditor.findPath(editor, element)
-	return (
-		<SortableRepeaterItem index={index} key={sortedBlocks[index]?.id}>
-			<EditorBlock dragHandle={<SortableRepeaterItemHandle><DragHandle /></SortableRepeaterItemHandle>}>
-				{children}
-			</EditorBlock>
-		</SortableRepeaterItem>
-	)
 }

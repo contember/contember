@@ -1,15 +1,6 @@
-import type { CustomElementPlugin } from '../../../baseEditor'
-import {
-	Editor as SlateEditor,
-	Editor,
-	Element as SlateElement,
-	Node as SlateNode,
-	Path,
-	Range as SlateRange,
-	Transforms,
-} from 'slate'
+import type { CustomElementPlugin, ElementRenderer } from '../../../baseEditor'
+import { Editor as SlateEditor, Editor, Element as SlateElement, Node as SlateNode, Path, Range as SlateRange, Transforms } from 'slate'
 import { AnchorModifications } from './AnchorModifications'
-import { AnchorRenderer } from './AnchorRenderer'
 
 export const anchorElementType = 'anchor' as const
 
@@ -27,10 +18,10 @@ export const isAnchorElementActive = (editor: Editor) => {
 }
 
 
-export const anchorElementPlugin: CustomElementPlugin<AnchorElement> = {
+export const anchorElementPlugin = ({ render }: { render: ElementRenderer<AnchorElement> }): CustomElementPlugin<AnchorElement> => ({
 	type: anchorElementType,
 	isInline: true,
-	render: AnchorRenderer,
+	render,
 	isActive: ({ editor }) => isAnchorElementActive(editor),
 	toggleElement: ({ editor, suchThat }) => {
 		if (isAnchorElementActive(editor)) {
@@ -55,4 +46,4 @@ export const anchorElementPlugin: CustomElementPlugin<AnchorElement> = {
 			return preventDefault()
 		}
 	},
-}
+})

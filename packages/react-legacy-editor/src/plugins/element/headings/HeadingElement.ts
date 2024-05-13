@@ -1,7 +1,6 @@
-import type { CustomElementPlugin } from '../../../baseEditor'
+import type { CustomElementPlugin, ElementRenderer } from '../../../baseEditor'
 import { Editor, Editor as SlateEditor, Element, Node as SlateNode, Path as SlatePath, Transforms } from 'slate'
 import { ContemberEditor } from '../../../ContemberEditor'
-import { HeadingRenderer } from './HeadingRenderer'
 import { AlignDirection } from '../../attributes'
 
 export const headingElementType = 'heading' as const
@@ -25,9 +24,9 @@ export const ejectHeadingElement = (editor: Editor, elementPath: SlatePath) => {
 }
 
 
-export const headingElementPlugin: CustomElementPlugin<HeadingElement> = {
+export const headingElementPlugin = ({ render }: { render: ElementRenderer<HeadingElement> }): CustomElementPlugin<HeadingElement> => ({
 	type: headingElementType,
-	render: HeadingRenderer,
+	render,
 	canContainAnyBlocks: false,
 	acceptsAttributes: ({ editor, suchThat }) => {
 		return 'align' in suchThat
@@ -50,4 +49,4 @@ export const headingElementPlugin: CustomElementPlugin<HeadingElement> = {
 			}
 		})
 	},
-}
+})

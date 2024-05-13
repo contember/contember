@@ -9,8 +9,10 @@ import {
 } from './HeadingElement'
 import { headingHtmlDeserializer } from './HeadingHtmlDeserializer'
 import { isReferenceElement } from '../../../blockEditor'
+import type { ElementRenderer } from '../../../baseEditor'
+import { AnchorElement } from '../anchors'
 
-export const withHeadings = <E extends Editor>(editor: E): E => {
+export const withHeadings = ({ render }: { render: ElementRenderer<HeadingElement> }) => <E extends Editor>(editor: E): E => {
 	const {
 		canToggleElement,
 		insertBreak,
@@ -18,7 +20,7 @@ export const withHeadings = <E extends Editor>(editor: E): E => {
 	} = editor
 
 
-	editor.registerElement(headingElementPlugin)
+	editor.registerElement(headingElementPlugin({ render }))
 	editor.htmlDeserializer.registerPlugin(headingHtmlDeserializer)
 
 	// T O D O cache this

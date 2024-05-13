@@ -123,7 +123,8 @@ export const createEditorWithEssentials = (defaultElementType: string): Editor =
 		},
 
 		renderElement: props => {
-			return createElement(elements.get(props.element.type)?.render ?? DefaultElement, props)
+			const component = elements.get(props.element.type)?.render ?? DefaultElement
+			return createElement(component, props)
 		},
 
 		renderLeafChildren: props => props.children,

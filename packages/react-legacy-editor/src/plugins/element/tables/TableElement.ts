@@ -1,18 +1,6 @@
-import { CustomElementPlugin } from '../../../baseEditor'
-import {
-	Editor as SlateEditor,
-	Editor,
-	Element as SlateElement,
-	Element,
-	Node as SlateNode,
-	Node,
-	NodeEntry,
-	Path as SlatePath,
-	Range as SlateRange,
-	Transforms,
-} from 'slate'
+import { CustomElementPlugin, ElementRenderer } from '../../../baseEditor'
+import { Editor as SlateEditor, Editor, Element as SlateElement, Element, Node as SlateNode, Node, NodeEntry, Path as SlatePath, Range as SlateRange, Transforms } from 'slate'
 import { createEmptyTableRowElement, isTableRowElement, TableRowElement, tableRowElementType } from './TableRowElement'
-import { TableElementRenderer } from './TableElementRenderer'
 import { ContemberEditor } from '../../../ContemberEditor'
 import { gaugeTableColumnCount } from './gaugeTableColumnCount'
 import { createEmptyTableCellElement } from './TableCellElement'
@@ -40,9 +28,9 @@ export const getTableElementColumnCount = (element: TableElement): number => {
 	return firstRow?.children.length ?? 0
 }
 
-export const tableElementPlugin: CustomElementPlugin<TableElement> = {
+export const tableElementPlugin = ({ render }: {render: ElementRenderer<TableElement>}): CustomElementPlugin<TableElement> => ({
 	type: tableElementType,
-	render: TableElementRenderer,
+	render,
 	normalizeNode: ({ editor, element, path, preventDefault }) => {
 		if (element.children.length === 0) {
 			Transforms.removeNodes(editor, { at: path })
@@ -134,4 +122,4 @@ export const tableElementPlugin: CustomElementPlugin<TableElement> = {
 			})
 		})
 	},
-}
+})

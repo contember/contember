@@ -8,6 +8,7 @@ import { LogInIcon } from 'lucide-react'
 import { LoginWithEmail } from './lib/components/dev/login-panel'
 import { createRoot } from 'react-dom/client'
 import { getConfig } from './config'
+import { OutdatedApplicationDialog } from './lib/components/outdated-application-dialog'
 
 const errorHandler = createErrorHandler((dom, react, onRecoverableError) => createRoot(dom, { onRecoverableError }).render(react))
 
@@ -27,6 +28,7 @@ errorHandler(onRecoverableError => createRoot(rootEl, { onRecoverableError }).re
 								{ eager: true },
 							)}
 						/>
+						<OutdatedApplicationDialog />
 						{import.meta.env.DEV && <DevBar>
 							<DevPanel heading="Login" icon={<LogInIcon />}><LoginWithEmail /></DevPanel>
 						</DevBar>}

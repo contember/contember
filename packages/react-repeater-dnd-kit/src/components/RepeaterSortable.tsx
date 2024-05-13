@@ -10,7 +10,7 @@ import {
 	useSensor,
 	useSensors,
 } from '@dnd-kit/core'
-import { RepeaterActiveEntityContext } from '../internal/contexts'
+import { RepeaterActiveEntityContext } from '../contexts'
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { useRepeaterSortedEntities } from '@contember/react-repeater'
 import { useRepeaterMethods } from '@contember/react-repeater'

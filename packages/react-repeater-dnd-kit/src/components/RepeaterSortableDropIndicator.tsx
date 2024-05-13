@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react'
-import { useRepeaterSortableItem } from '../internal/contexts'
+import { useRepeaterSortableItem } from '../contexts'
 
 export const RepeaterSortableDropIndicator = ({ children, position }: {
 	children: ReactNode

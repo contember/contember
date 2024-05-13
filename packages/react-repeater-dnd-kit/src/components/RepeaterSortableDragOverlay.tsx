@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react'
-import { useRepeaterActiveEntity } from '../internal/contexts'
+import { useRepeaterActiveEntity } from '../contexts'
 import { Portal } from '@radix-ui/react-portal'
 import { DragOverlay } from '@dnd-kit/core'
 import { AccessorTree, Entity, useAccessorTreeState } from '@contember/react-binding'

@@ -434,6 +434,10 @@ export interface IfCallbackProps {
     children?: ReactNode;
     // (undocumented)
     condition: (accessor: EntityAccessor) => boolean;
+    // (undocumented)
+    else?: ReactNode;
+    // (undocumented)
+    then?: ReactNode;
 }
 
 // @public (undocumented)
@@ -442,6 +446,10 @@ export interface IfFilterProps {
     children?: ReactNode;
     // (undocumented)
     condition: string | Filter;
+    // (undocumented)
+    else?: ReactNode;
+    // (undocumented)
+    then?: ReactNode;
 }
 
 // @public (undocumented)

@@ -1,7 +1,7 @@
 import { Environment, EnvironmentContext, EnvironmentExtensionProvider } from '@contember/react-binding'
 import { ContemberClient, ContemberClientProps } from '@contember/react-client'
 import { ReactNode } from 'react'
-import { RequestProvider, RouteMap, RoutingContext, RoutingContextValue, SelectedDimension } from '@contember/react-routing'
+import { RequestProvider, RouteMap, RoutingContext, RoutingContextValue, RoutingProvider, SelectedDimension } from '@contember/react-routing'
 import { DataViewPageNameKeyProvider } from './DataViewPageNameKeyProvider'
 import { IdentityProvider, projectEnvironmentExtension } from '@contember/react-identity'
 
@@ -36,25 +36,23 @@ export const ApplicationEntrypoint = (props: ApplicationEntrypointProps) => {
 
 	return (
 		<EnvironmentContext.Provider value={rootEnv}>
-			<RoutingContext.Provider value={routing}>
-				<RequestProvider>
-					<ContemberClient
-						apiBaseUrl={props.apiBaseUrl}
-						sessionToken={props.sessionToken}
-						loginToken={props.loginToken}
-						project={props.project}
-						stage={props.stage}
-					>
-						<EnvironmentExtensionProvider extension={projectEnvironmentExtension} state={props.project ?? null}>
-							<DataViewPageNameKeyProvider>
-								<IdentityProvider>
-									{props.children}
-								</IdentityProvider>
-							</DataViewPageNameKeyProvider>
-						</EnvironmentExtensionProvider>
-					</ContemberClient>
-				</RequestProvider>
-			</RoutingContext.Provider>
+			<RoutingProvider {...routing}>
+				<ContemberClient
+					apiBaseUrl={props.apiBaseUrl}
+					sessionToken={props.sessionToken}
+					loginToken={props.loginToken}
+					project={props.project}
+					stage={props.stage}
+				>
+					<EnvironmentExtensionProvider extension={projectEnvironmentExtension} state={props.project ?? null}>
+						<DataViewPageNameKeyProvider>
+							<IdentityProvider>
+								{props.children}
+							</IdentityProvider>
+						</DataViewPageNameKeyProvider>
+					</EnvironmentExtensionProvider>
+				</ContemberClient>
+			</RoutingProvider>
 		</EnvironmentContext.Provider>
 	)
 }

@@ -1280,25 +1280,35 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@contember/playground@workspace:packages/playground"
   dependencies:
+    "@contember/binding": "workspace:*"
     "@contember/brand": "workspace:*"
+    "@contember/client": "workspace:*"
     "@contember/client-content": "workspace:*"
     "@contember/graphql-builder": "workspace:*"
     "@contember/interface": "workspace:*"
     "@contember/interface-tester": "workspace:*"
+    "@contember/react-binding": "workspace:*"
     "@contember/react-block-repeater": "workspace:*"
     "@contember/react-board": "workspace:*"
     "@contember/react-board-dnd-kit": "workspace:*"
+    "@contember/react-client": "workspace:*"
+    "@contember/react-client-tenant": "workspace:*"
     "@contember/react-dataview": "workspace:*"
     "@contember/react-form": "workspace:*"
+    "@contember/react-identity": "workspace:*"
+    "@contember/react-multipass-rendering": "workspace:*"
     "@contember/react-repeater": "workspace:*"
     "@contember/react-repeater-dnd-kit": "workspace:*"
+    "@contember/react-routing": "workspace:*"
     "@contember/react-select": "workspace:*"
     "@contember/react-slots": "workspace:*"
     "@contember/react-uploader": "workspace:*"
     "@contember/react-uploader-dropzone": "workspace:*"
+    "@contember/react-utils": "workspace:*"
     "@contember/schema": ^1.4.0-beta.1
     "@contember/schema-definition": ^1.4.0-beta.1
     "@contember/schema-utils": ^1.4.0-beta.1
+    "@contember/utilities": "workspace:*"
     "@faker-js/faker": ^8.4.1
     "@radix-ui/react-alert-dialog": ^1.0.5
     "@radix-ui/react-checkbox": ^1.0.4

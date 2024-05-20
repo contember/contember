@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react'
 import { IdentityStateValue } from '../types'
-import { useIdentityState } from '../internal/contexts'
+import { useIdentityState } from '../contexts'
 
 export interface IdentityStateProps {
 	state: IdentityStateValue | IdentityStateValue[]

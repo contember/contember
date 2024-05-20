@@ -7,6 +7,5 @@
 		{ "path": "../../react-binding/src" },
 		{ "path": "../../react-client/src" },
 		{ "path": "../../react-client-tenant/src" },
-		{ "path": "../../react-utils/src" },
 	]
 }

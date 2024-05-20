@@ -1,12 +1,12 @@
 import { useCallback, useMemo, useState } from 'react'
 import { Identity, IdentityMethods, IdentityStateValue } from '../types'
 import { useSessionToken } from '@contember/react-client'
-import { useFetchMe } from '../internal/hooks/useFetchMe'
 import { useLogoutInternal } from '../internal/hooks/useLogoutInternal'
+import { useMeQuery } from './queries'
 
 export const useFetchIdentity = (): [{ state: IdentityStateValue, identity: Identity | undefined }, IdentityMethods] => {
 	const sessionToken = useSessionToken()
-	const fetchMe = useFetchMe()
+	const fetchMe = useMeQuery()
 
 	const [identityState, setIdentityState] = useState<ReturnType<typeof useFetchIdentity>[0]>({ state: sessionToken ? 'loading' : 'none', identity: undefined })
 
@@ -16,7 +16,7 @@ export const useFetchIdentity = (): [{ state: IdentityStateValue, identity: Iden
 	const fetch = useCallback(async () => {
 		setIdentityState({ state: 'loading', identity: undefined })
 		try {
-			const response = await fetchMe()
+			const response = await fetchMe({})
 			const person = response.person
 			const projects = response.projects
 			const permissions = response.permissions ?? { canCreateProject: false }

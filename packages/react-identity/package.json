@@ -40,12 +40,9 @@
 		"directory": "packages/react-identity"
 	},
 	"dependencies": {
-		"@contember/graphql-client-tenant": "^1.3.7",
 		"@contember/react-binding": "workspace:*",
 		"@contember/react-client": "workspace:*",
-		"@contember/react-client-tenant": "workspace:*",
-		"@contember/react-utils": "workspace:*",
-		"@radix-ui/react-slot": "^1.0.2"
+		"@contember/react-client-tenant": "workspace:*"
 	},
 	"peerDependencies": {
 		"react": "^18 || ^19",

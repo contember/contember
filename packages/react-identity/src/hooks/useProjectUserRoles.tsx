@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { useProjectSlug } from '@contember/react-client'
-import { useIdentity } from '../internal/contexts'
+import { useIdentity } from '@contember/react-client-tenant'
 
 export type ProjectUserRoles = Set<string>
 

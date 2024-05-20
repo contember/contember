@@ -211,7 +211,7 @@ export const useCloseOnClickOutside: ({ isOpen, close, contents, outside }: {
     isOpen: boolean;
     close: () => void;
     contents: (Node | null)[];
-    outside?: HTMLElement | null | undefined;
+    outside?: HTMLElement | null;
 }) => void;
 
 // @public (undocumented)

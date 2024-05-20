@@ -106,7 +106,7 @@ export const RedirectOnPersist: ({ to }: {
 
 // @public (undocumented)
 export const useIsApplicationOutdated: ({ checkIntervalMs }?: {
-    checkIntervalMs?: number | undefined;
+    checkIntervalMs?: number;
 }) => boolean;
 
 

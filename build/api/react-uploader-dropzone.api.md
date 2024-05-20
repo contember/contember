@@ -19,7 +19,7 @@ export const UploaderDropzoneInput: () => JSX_2.Element;
 // @public (undocumented)
 export const UploaderDropzoneRoot: ({ children, noInput }: {
     children: ReactNode;
-    noInput?: boolean | undefined;
+    noInput?: boolean;
 }) => JSX_2.Element;
 
 // @public (undocumented)

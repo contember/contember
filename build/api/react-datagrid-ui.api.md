@@ -333,11 +333,11 @@ export type DataGridTilesPublicProps = {
 };
 
 // @public
-export const DateCell: FunctionComponent<DateCellRendererProps & DataGridColumnCommonProps & {
+export const DateCell: FunctionComponent<DateCellRendererProps & DataGridColumnCommonProps & ({
 disableOrder?: boolean | undefined;
 initialOrder?: DataViewSortingDirection | undefined;
 initialFilter?: DateRangeFilterArtifacts | undefined;
-} & DataGridCellPublicProps & DataGridHeaderCellPublicProps & DateCellValueRendererProps>;
+} & (DataGridCellPublicProps & DataGridHeaderCellPublicProps & DateCellValueRendererProps))>;
 
 // @public (undocumented)
 export type DateCellValueRendererProps = DateCellRendererProps & DateFieldViewFormattingProps & FieldFallbackViewPublicProps;
@@ -385,10 +385,10 @@ children: ReactNode;
 export const HasManyAbsentCellFilter: ({ filter, setFilter }: FilterRendererProps<boolean>) => JSX_2.Element;
 
 // @public
-export const HasManySelectCell: FunctionComponent<HasManySelectProps & DataGridCellPublicProps & DataGridHeaderCellPublicProps & FieldFallbackViewProps>;
+export const HasManySelectCell: FunctionComponent<(HasManySelectProps & DataGridCellPublicProps) & DataGridHeaderCellPublicProps & FieldFallbackViewProps>;
 
 // @public
-export const HasOneSelectCell: FunctionComponent<HasOneSelectProps & DataGridCellPublicProps & DataGridHeaderCellPublicProps & FieldFallbackViewProps>;
+export const HasOneSelectCell: FunctionComponent<(HasOneSelectProps & DataGridCellPublicProps) & DataGridHeaderCellPublicProps & FieldFallbackViewProps>;
 
 // @public (undocumented)
 export type NullConditionArtifacts = {

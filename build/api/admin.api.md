@@ -291,7 +291,7 @@ export const AnyFileRepeater: <AcceptArtifacts = unknown, SFExtraProps extends {
 export type AnyFileRepeaterProps<AcceptArtifacts = unknown, SFExtraProps extends {} = {}> = PublicSingleKindFileRepeaterProps<AcceptArtifacts, SFExtraProps>;
 
 // @public (undocumented)
-export const AnyFiles: <AcceptArtifacts = unknown>(props: AnyFilesProps<AcceptArtifacts, {}>) => ReactElement | null;
+export const AnyFiles: <AcceptArtifacts = unknown>(props: AnyFilesProps<AcceptArtifacts>) => ReactElement | null;
 
 // @public (undocumented)
 export type AnyFilesProps<AcceptArtifacts = unknown, SFExtraProps extends {} = {}> = StockAnyFileKindProps<AcceptArtifacts> & SelectFileInputSelectionComponentProps<SFExtraProps> & {
@@ -361,7 +361,7 @@ export const AudioFileRepeater: <AcceptArtifacts = unknown, SFExtraProps extends
 export type AudioFileRepeaterProps<AcceptArtifacts = unknown, SFExtraProps extends {} = {}> = PublicSingleKindFileRepeaterProps<AcceptArtifacts, SFExtraProps> & AudioFileDataExtractorProps;
 
 // @public (undocumented)
-export const AudioFiles: <AcceptArtifacts = unknown>(props: AudioFilesProps<AcceptArtifacts, {}>) => ReactElement | null;
+export const AudioFiles: <AcceptArtifacts = unknown>(props: AudioFilesProps<AcceptArtifacts>) => ReactElement | null;
 
 // @public (undocumented)
 export type AudioFilesProps<AcceptArtifacts = unknown, SFExtraProps extends {} = {}> = StockAudioFileKindProps<AcceptArtifacts> & SelectFileInputSelectionComponentProps<SFExtraProps> & {
@@ -619,20 +619,20 @@ export const ContemberEditor: {
         at?: Location_2 | undefined;
     } | undefined) => NodeEntry<Editor | EditorElement> | undefined;
     ejectElement: <E_5 extends Editor>(editor: E_5, path: Path) => void;
-    elementToSpecifics: <Element_1 extends EditorElement = EditorElement>(element: Element_1) => Partial<Element_1>;
-    getElementDataAttributes: <Element_2 extends EditorElement = EditorElement>(element: Element_2, attributeNamePrefix?: string) => ElementDataAttributes;
+    elementToSpecifics: <Element extends EditorElement = EditorElement>(element: Element) => Partial<Element>;
+    getElementDataAttributes: <Element_1 extends EditorElement = EditorElement>(element: Element_1, attributeNamePrefix?: string) => ElementDataAttributes;
     getPreviousSibling: <E_6 extends Editor = Editor, CurrentNode extends Node_2 = Node_2, PreviousNode extends Node_2 = CurrentNode>(editor: E_6, node: CurrentNode, nodePath: Path) => NodeEntry<PreviousNode> | undefined;
     hasMarks: <T_2 extends EditorText, E_7 extends Editor>(editor: E_7, marks: TextSpecifics<T_2>, options?: {
         from?: Path | undefined;
         to?: Path | undefined;
     }) => boolean;
-    hasParentOfType: <Editor extends Editor, Element_3 extends EditorElement>(editor: Editor, nodeEntry: NodeEntry<Node_2>, type: Element_3["type"], suchThat?: Partial<Element_3> | undefined) => boolean;
-    isElementType: <Element_4 extends EditorElement>(element: Node_2, type: Element_4["type"], suchThat?: Partial<Element_4> | undefined) => boolean;
+    hasParentOfType: <Editor extends Editor, Element_2 extends EditorElement>(editor: Editor, nodeEntry: NodeEntry<Node_2>, type: Element_2["type"], suchThat?: Partial<Element_2> | undefined) => boolean;
+    isElementType: <Element_3 extends EditorElement>(element: Node_2, type: Element_3["type"], suchThat?: Partial<Element_3> | undefined) => boolean;
     permissivelyDeserializeNodes: <E_8 extends Editor>(editor: E_8, serializedElement: string, errorMessage?: string | undefined) => (EditorText | EditorElement)[];
     removeMarks: <T_3 extends EditorText, E_9 extends Editor>(editor: E_9, marks: TextSpecifics<T_3>) => void;
     serializeNodes: <E_10 extends Editor>(editor: E_10, elements: (EditorText | EditorElement)[], errorMessage?: string | undefined) => string;
     strictlyDeserializeNodes: <E_11 extends Editor>(editor: E_11, serializedElement: string, errorMessage?: string | undefined) => (EditorText | EditorElement)[];
-    textToSpecifics: <Text_1 extends EditorText = EditorText>(textNode: Text_1) => TextSpecifics<Text_1>;
+    textToSpecifics: <Text extends EditorText = EditorText>(textNode: Text) => TextSpecifics<Text>;
     toLatestFormat: <E_12 extends Editor>(editor: E_12, potentiallyOldNode: SerializableEditorNode) => SerializableEditorNode;
     topLevelNodes: <E_13 extends Editor>(editor: E_13) => Generator<NodeEntry<Node_2>, void, undefined>;
 };
@@ -3563,7 +3563,7 @@ export const useFetchMe: () => () => Promise<{
 }>;
 
 // @public (undocumented)
-export const useForm: <V>(initialValues: V, handler?: FormHandler<V> | undefined) => FormMethods<V>;
+export const useForm: <V>(initialValues: V, handler?: FormHandler<V>) => FormMethods<V>;
 
 // @public (undocumented)
 export const useHandleIDPResponse: ({ onLogin, onError }: UseHandleIDPResponseProps) => IDPResponseState;
@@ -3680,13 +3680,19 @@ export const useRedirectToBacklink: () => void;
 export const useRedirectToBacklinkCallback: () => () => void;
 
 // @public (undocumented)
-export const useRemoveCurrentProjectMembership: () => [(identityId: string) => Promise<UpdateMembershipResult>, MutationRequestState<UpdateMembershipResult>];
+export const useRemoveCurrentProjectMembership: () => [
+(identityId: string) => Promise<UpdateMembershipResult>,
+MutationRequestState<UpdateMembershipResult>
+];
 
 // @public (undocumented)
 export const useRemoveMemberIntent: (project: string, onRemove?: () => void | Promise<void>) => (id: string) => Promise<void>;
 
 // @public (undocumented)
-export const useRemoveProjectMembership: () => [(project: string, identityId: string) => Promise<UpdateMembershipResult>, MutationRequestState<UpdateMembershipResult>];
+export const useRemoveProjectMembership: () => [
+(project: string, identityId: string) => Promise<UpdateMembershipResult>,
+MutationRequestState<UpdateMembershipResult>
+];
 
 // @public (undocumented)
 export const useResetPassword: () => TenantMutationExecutor<GQLVariableValues<    {
@@ -3828,7 +3834,7 @@ export const VideoFileRepeater: <AcceptArtifacts = unknown, SFExtraProps extends
 export type VideoFileRepeaterProps<AcceptArtifacts = unknown, SFExtraProps extends {} = {}> = PublicSingleKindFileRepeaterProps<AcceptArtifacts, SFExtraProps> & VideoFileDataExtractorProps;
 
 // @public (undocumented)
-export const VideoFiles: <AcceptArtifacts = unknown>(props: VideoFilesProps<AcceptArtifacts, {}>) => ReactElement | null;
+export const VideoFiles: <AcceptArtifacts = unknown>(props: VideoFilesProps<AcceptArtifacts>) => ReactElement | null;
 
 // @public (undocumented)
 export type VideoFilesProps<AcceptArtifacts = unknown, SFExtraProps extends {} = {}> = StockVideoFileKindProps<AcceptArtifacts> & SelectFileInputSelectionComponentProps<SFExtraProps> & {

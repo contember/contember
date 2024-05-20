@@ -17,7 +17,7 @@ export const createErrorHandler: (renderer: ErrorReactRenderer) => TryRun;
 // @public (undocumented)
 export const DevBar: ({ breakpoint, children, brand, }: PropsWithChildren<{
     brand?: ReactNode;
-    breakpoint?: number | undefined;
+    breakpoint?: number;
 }>) => JSX_2.Element;
 
 // @public (undocumented)

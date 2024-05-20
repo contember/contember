@@ -138,10 +138,10 @@ export interface DataViewBooleanFilterProps {
 
 // @public (undocumented)
 export const DataViewBooleanFilterTrigger: ({ name, action, value, ...props }: {
-    name?: string | undefined;
+    name?: string;
     value: boolean;
     children: ReactNode;
-    action?: DataViewSetBooleanFilterAction | undefined;
+    action?: DataViewSetBooleanFilterAction;
 }) => JSX_2.Element;
 
 // @public (undocumented)
@@ -172,7 +172,7 @@ export const DataViewDateFilter: React_2.NamedExoticComponent<DataViewDateFilter
 
 // @public (undocumented)
 export const DataViewDateFilterInput: ({ name, type, ...props }: {
-    name?: string | undefined;
+    name?: string;
     type: 'start' | 'end';
     children: ReactElement;
 }) => JSX_2.Element;
@@ -260,18 +260,18 @@ export interface DataViewEnumFilterProps {
 
 // @public (undocumented)
 export const DataViewEnumFilterState: ({ name, children, state, value }: {
-    name?: string | undefined;
+    name?: string;
     value: string;
     children: ReactNode;
-    state?: DataViewEnumFilterCurrent | DataViewEnumFilterCurrent[] | undefined;
+    state?: DataViewEnumFilterCurrent | DataViewEnumFilterCurrent[];
 }) => JSX_2.Element | null;
 
 // @public (undocumented)
 export const DataViewEnumFilterTrigger: ({ name, action, value, ...props }: {
-    name?: string | undefined;
+    name?: string;
     value: string;
     children: ReactNode;
-    action?: DataViewSetEnumFilterAction | undefined;
+    action?: DataViewSetEnumFilterAction;
 }) => JSX_2.Element;
 
 // @public (undocumented)
@@ -486,7 +486,7 @@ export type DataViewNullFilterState = 'include' | 'exclude' | 'none';
 
 // @public (undocumented)
 export const DataViewNullFilterTrigger: ({ name, action, ...props }: {
-    name?: string | undefined;
+    name?: string;
     children: ReactNode;
     action: DataViewSetNullFilterAction;
 }) => JSX_2.Element;
@@ -496,9 +496,9 @@ export const DataViewNumberFilter: React_2.NamedExoticComponent<DataViewNumberFi
 
 // @public (undocumented)
 export const DataViewNumberFilterInput: ({ name, type, allowFloat, ...props }: {
-    name?: string | undefined;
+    name?: string;
     type: 'from' | 'to';
-    allowFloat?: boolean | undefined;
+    allowFloat?: boolean;
     children: ReactElement;
 }) => JSX_2.Element;
 
@@ -596,22 +596,22 @@ export type DataViewRelationFilterListProps = {
 
 // @public (undocumented)
 export const DataViewRelationFilterOptions: ({ children, name, ...props }: {
-    name?: string | undefined;
+    name?: string;
     children: React_2.ReactNode;
-} & Omit<DataViewProps, "entities">) => JSX_2.Element;
+} & Omit<DataViewProps, 'entities'>) => JSX_2.Element;
 
 // @public (undocumented)
 export const DataViewRelationFilterState: ({ name, children, state }: {
-    name?: string | undefined;
+    name?: string;
     children: ReactNode;
-    state?: DataViewRelationFilterCurrent | DataViewRelationFilterCurrent[] | undefined;
+    state?: DataViewRelationFilterCurrent | DataViewRelationFilterCurrent[];
 }) => JSX_2.Element | null;
 
 // @public (undocumented)
 export const DataViewRelationFilterTrigger: ({ name, action, ...props }: {
-    name?: string | undefined;
+    name?: string;
     children: ReactNode;
-    action?: DataViewSetRelationFilterAction | undefined;
+    action?: DataViewSetRelationFilterAction;
 }) => JSX_2.Element;
 
 // @public (undocumented)
@@ -774,8 +774,8 @@ export const DataViewTextFilter: React_2.NamedExoticComponent<DataViewTextFilter
 
 // @public (undocumented)
 export const DataViewTextFilterInput: ({ name, debounceMs, ...props }: {
-    name?: string | undefined;
-    debounceMs?: number | undefined;
+    name?: string;
+    debounceMs?: number;
     children: ReactElement;
 }) => JSX_2.Element;
 
@@ -979,7 +979,7 @@ export const useDataViewDisplayedState: <T extends DataViewState>() => T;
 
 // @public (undocumented)
 export const useDataViewElements: ({ selection }?: {
-    selection?: DataViewSelectionValues | undefined;
+    selection?: DataViewSelectionValues;
 }) => DataViewElementProps[];
 
 // @public (undocumented)
@@ -1120,7 +1120,7 @@ export const useDataViewSortingState: () => DataViewSortingState;
 // @public (undocumented)
 export const useDataViewTextFilterInput: ({ name, debounceMs }: {
     name: string;
-    debounceMs?: number | undefined;
+    debounceMs?: number;
 }) => UseDataViewTextFilterInputResult;
 
 // @public (undocumented)

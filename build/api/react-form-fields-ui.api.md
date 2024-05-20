@@ -99,7 +99,7 @@ export const SearchField: NamedExoticComponent<SearchFieldProps>;
 export type SearchFieldProps = SimpleRelativeSingleFieldProps & Omit<SearchInputProps, 'value' | 'validationState' | 'allowNewlines' | 'wrapLines'>;
 
 // @public (undocumented)
-export const SimpleRelativeSingleField: <P extends SimpleRelativeSingleFieldProxyProps, Value extends FieldValue = FieldValue>(render: (fieldMetadata: SimpleRelativeSingleFieldMetadata<Value>, props: SimpleRelativeSingleFieldProxyExcludeHandledProps<P>) => ReactNode, displayName: string, defaultProps?: Partial<P> | undefined) => NamedExoticComponent<P>;
+export const SimpleRelativeSingleField: <P extends SimpleRelativeSingleFieldProxyProps, Value extends FieldValue = FieldValue>(render: (fieldMetadata: SimpleRelativeSingleFieldMetadata<Value>, props: SimpleRelativeSingleFieldProxyExcludeHandledProps<P>) => ReactNode, displayName: string, defaultProps?: Partial<P>) => NamedExoticComponent<P>;
 
 // @public (undocumented)
 export interface SimpleRelativeSingleFieldMetadata<Value extends FieldValue = FieldValue> {

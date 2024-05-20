@@ -59,7 +59,7 @@ export function dataAttribute(value: unknown): string | true | undefined;
 
 // @public (undocumented)
 export const dateToStringWithoutTimezone: (date: Date, { includeTime }?: {
-    includeTime?: boolean | undefined;
+    includeTime?: boolean;
 }) => string;
 
 // @public (undocumented)

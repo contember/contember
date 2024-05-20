@@ -1,4 +1,4 @@
-import { ArchiveIcon, BrushIcon, FormInputIcon, GripVertical, HomeIcon, KanbanIcon, LanguagesIcon, PencilIcon, TableIcon, UploadIcon } from 'lucide-react'
+import { ArchiveIcon, BrushIcon, FormInputIcon, GripVertical, HomeIcon, KanbanIcon, KeyRoundIcon, LanguagesIcon, LockKeyholeIcon, PencilIcon, TableIcon, UploadIcon, UserIcon, UsersIcon } from 'lucide-react'
 import { Menu, MenuItem } from '../../lib/components/ui/menu'
 
 
@@ -8,6 +8,11 @@ export const Navigation = () => {
 		<div>
 			<Menu>
 				<MenuItem icon={<HomeIcon size={16} />} label={'Home'} to={'index'} />
+				<MenuItem icon={<UserIcon size={16} />} label={'Tenant'}>
+					<MenuItem icon={<LockKeyholeIcon />} label={'Security'} to={'tenant/security'} />
+					<MenuItem icon={<UsersIcon />} label={'Members'} to={'tenant/members'} />
+					<MenuItem icon={<KeyRoundIcon />} label={'API keys'} to={'tenant/apiKeys'} />
+				</MenuItem>
 				<MenuItem icon={<BrushIcon size={16} />} label={'UI'}>
 					<MenuItem icon={line} label={'Buttons'} to={'ui/button'} />
 					<MenuItem icon={line} label={'Toasts'} to={'ui/toast'} />

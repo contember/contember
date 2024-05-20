@@ -1,15 +1,16 @@
 import { uic, uiconfig } from '../../../lib/utils/uic'
 
 export const inputConfig = uiconfig({
-	baseClass: 'flex w-full border bg-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none  disabled:cursor-not-allowed disabled:opacity-50 data-[invalid]:border-destructive data-[invalid]:ring-destructive',
+	baseClass: 'flex w-full border bg-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none  disabled:cursor-not-allowed disabled:opacity-50 data-[invalid]:border-destructive data-[invalid]:ring-destructive read-only:bg-gray-100',
 	variants: {
 		variant: {
-			default: 'border border-input ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+			default: 'border border-input ring-offset-background focus-visible:ring-2 focus-visible:ring-ring',
 			ghost: 'border-none focus-visible:ring-transparent',
 		},
 		inputSize: {
 			default: 'h-10 rounded-md p-2 text-sm',
 			sm: 'h-8 rounded p-1 text-sm',
+			lg: 'h-12 rounded-lg p-3 text-lg',
 		},
 	},
 	defaultVariants: {

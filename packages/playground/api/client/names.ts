@@ -1,6 +1,21 @@
 import { SchemaNames } from '@contember/client-content'
 export const ContemberClientNames: SchemaNames = {
   "entities": {
+    "AclBranch": {
+      "name": "AclBranch",
+      "fields": {
+        "id": {
+          "type": "column"
+        },
+        "code": {
+          "type": "column"
+        }
+      },
+      "scalars": [
+        "id",
+        "code"
+      ]
+    },
     "Block": {
       "name": "Block",
       "fields": {
@@ -222,6 +237,86 @@ export const ContemberClientNames: SchemaNames = {
         "id",
         "code",
         "label"
+      ]
+    },
+    "EditorContent": {
+      "name": "EditorContent",
+      "fields": {
+        "id": {
+          "type": "column"
+        },
+        "unique": {
+          "type": "column"
+        },
+        "data": {
+          "type": "column"
+        },
+        "references": {
+          "type": "many",
+          "entity": "EditorReference"
+        }
+      },
+      "scalars": [
+        "id",
+        "unique",
+        "data"
+      ]
+    },
+    "EditorImage": {
+      "name": "EditorImage",
+      "fields": {
+        "id": {
+          "type": "column"
+        },
+        "url": {
+          "type": "column"
+        }
+      },
+      "scalars": [
+        "id",
+        "url"
+      ]
+    },
+    "EditorLink": {
+      "name": "EditorLink",
+      "fields": {
+        "id": {
+          "type": "column"
+        },
+        "url": {
+          "type": "column"
+        }
+      },
+      "scalars": [
+        "id",
+        "url"
+      ]
+    },
+    "EditorReference": {
+      "name": "EditorReference",
+      "fields": {
+        "id": {
+          "type": "column"
+        },
+        "content": {
+          "type": "one",
+          "entity": "EditorContent"
+        },
+        "type": {
+          "type": "column"
+        },
+        "image": {
+          "type": "one",
+          "entity": "EditorImage"
+        },
+        "link": {
+          "type": "one",
+          "entity": "EditorLink"
+        }
+      },
+      "scalars": [
+        "id",
+        "type"
       ]
     },
     "GridArticle": {

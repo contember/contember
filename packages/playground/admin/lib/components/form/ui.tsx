@@ -20,7 +20,7 @@ export const FormLabelWrapperUI = uic('div', {
 	displayName: 'FormLabelWrapper',
 })
 export const FormLabelUI = uic(Label, {
-	baseClass: 'data-[invalid]:text-destructive text-left',
+	baseClass: 'text-left',
 	displayName: 'FormLabel',
 })
 export const FormContainerUI = uic('div', {

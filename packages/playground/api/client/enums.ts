@@ -8,6 +8,9 @@ export type BoardTaskStatus =
 	 | "todo"
 	 | "inProgress"
 	 | "done"
+export type EditorReferenceType = 
+	 | "image"
+	 | "link"
 export type GridArticleState = 
 	 | "published"
 	 | "draft"
@@ -29,6 +32,8 @@ export type BlockImagePosition =
 export type BlockListUnique = 
 	 | "unique"
 export type DimensionsItemUnique = 
+	 | "unique"
+export type EditorContentUnique = 
 	 | "unique"
 export type InputRootEnumValue = 
 	 | "a"

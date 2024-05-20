@@ -35,8 +35,8 @@
 	},
 	"dependencies": {
 		"@contember/admin": "workspace:*",
-		"@contember/schema": "^1.3.6",
-		"@contember/schema-utils": "^1.3.6",
+		"@contember/schema": "^1.3.7",
+		"@contember/schema-utils": "^1.3.7",
 		"fast-glob": "^3.3.2",
 		"micromatch": "^4.0.5"
 	},

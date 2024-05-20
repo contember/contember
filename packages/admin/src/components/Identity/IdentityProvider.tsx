@@ -2,7 +2,7 @@ import { Message, SpinnerOverlay } from '@contember/ui'
 import { ReactNode, useEffect } from 'react'
 import { MiscPageLayout } from '../MiscPageLayout'
 import { InvalidIdentityFallback } from './InvalidIdentityFallback'
-import { IdentityProvider as BaseIdentityProvider, IdentityState } from '@contember/react-identity'
+import { IdentityProvider as BaseIdentityProvider, IdentityEnvironmentProvider, IdentityState } from '@contember/react-identity'
 
 export interface IdentityProviderProps {
 	children: ReactNode
@@ -28,21 +28,23 @@ const ClearIdentityHandler = ({ onInvalidIdentity }: {
 export const IdentityProvider: React.FC<IdentityProviderProps> = ({ children, onInvalidIdentity, allowUnauthenticated }) => {
 	return (
 		<BaseIdentityProvider>
-			<IdentityState state={'cleared'}>
-				<ClearIdentityHandler onInvalidIdentity={onInvalidIdentity}/>
-				<MiscPageLayout>
-					<Message size="large" padding="large" display="block">Logging out&hellip;</Message>
-				</MiscPageLayout>
-			</IdentityState>
-			<IdentityState state={'failed'}>
-				<InvalidIdentityFallback />
-			</IdentityState>
-			<IdentityState state={allowUnauthenticated ? 'loading' : ['loading', 'none']}>
-				<SpinnerOverlay />
-			</IdentityState>
-			<IdentityState state={allowUnauthenticated ? ['success', 'none'] : 'success'}>
-				{children}
-			</IdentityState>
+			<IdentityEnvironmentProvider>
+				<IdentityState state={'cleared'}>
+					<ClearIdentityHandler onInvalidIdentity={onInvalidIdentity}/>
+					<MiscPageLayout>
+						<Message size="large" padding="large" display="block">Logging out&hellip;</Message>
+					</MiscPageLayout>
+				</IdentityState>
+				<IdentityState state={'failed'}>
+					<InvalidIdentityFallback />
+				</IdentityState>
+				<IdentityState state={allowUnauthenticated ? 'loading' : ['loading', 'none']}>
+					<SpinnerOverlay />
+				</IdentityState>
+				<IdentityState state={allowUnauthenticated ? ['success', 'none'] : 'success'}>
+					{children}
+				</IdentityState>
+			</IdentityEnvironmentProvider>
 		</BaseIdentityProvider>
 	)
 }

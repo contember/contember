@@ -3,7 +3,7 @@ import { ContemberClient, ContemberClientProps } from '@contember/react-client'
 import { ReactNode } from 'react'
 import { RequestProvider, RouteMap, RoutingContext, RoutingContextValue, RoutingProvider, SelectedDimension } from '@contember/react-routing'
 import { DataViewPageNameKeyProvider } from './DataViewPageNameKeyProvider'
-import { IdentityProvider, projectEnvironmentExtension } from '@contember/react-identity'
+import { IdentityEnvironmentProvider, IdentityProvider, projectEnvironmentExtension } from '@contember/react-identity'
 
 export interface ApplicationEntrypointProps extends ContemberClientProps {
 	basePath: string
@@ -47,7 +47,9 @@ export const ApplicationEntrypoint = (props: ApplicationEntrypointProps) => {
 					<EnvironmentExtensionProvider extension={projectEnvironmentExtension} state={props.project ?? null}>
 						<DataViewPageNameKeyProvider>
 							<IdentityProvider>
-								{props.children}
+								<IdentityEnvironmentProvider>
+									{props.children}
+								</IdentityEnvironmentProvider>
 							</IdentityProvider>
 						</DataViewPageNameKeyProvider>
 					</EnvironmentExtensionProvider>

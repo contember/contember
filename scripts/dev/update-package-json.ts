@@ -5,7 +5,6 @@ const root = process.cwd()
 
 const packages = [
 	...fs.readdirSync(join(root, 'packages')).map(it => `packages/${it}`),
-	...fs.readdirSync(join(root, 'ee')).map(it => `ee/${it}`),
 ]
 
 const updatePackageJson = (packageJson: any, packageDir: string) => {

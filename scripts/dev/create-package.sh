@@ -12,4 +12,3 @@ sed -i "s/.template/$PACKAGE_NAME/g" packages/$PACKAGE_NAME/tests/example.test.t
 
 yarn
 yarn tsx ./scripts/dev/update-tsconfig.ts
-yarn tsx ./scripts/dev/update-dockerfile.ts

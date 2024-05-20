@@ -22,7 +22,7 @@ import { join } from 'path'
 	const LOCAL_REF = `${execSync('git describe --tags --abbrev=0').toString().trim()}-${execSync('git rev-parse --short HEAD').toString().trim()}`
 	console.log(`LOCAL_REF: ${LOCAL_REF}`)
 
-	const dirs = (await glob(CWD + '/{ee,packages}/*', { onlyDirectories: true }))
+	const dirs = (await glob(CWD + '/packages/*', { onlyDirectories: true }))
 		.filter(dir => !dir.endsWith('packages/admin-sandbox'))
 
 	const outDirPath = join(CWD, 'dist')

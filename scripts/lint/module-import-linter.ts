@@ -117,7 +117,7 @@ interface Project {
 	}
 }
 (async () => {
-	const dirs = (await glob(process.cwd() + '/{ee,packages}/*', { onlyDirectories: true }))
+	const dirs = (await glob(process.cwd() + '/packages/*', { onlyDirectories: true }))
 		.filter(dir => !dir.endsWith('packages/admin-sandbox') && !dir.endsWith('packages/playground'))
 		.filter(it => existsSync(`${it}/package.json`))
 

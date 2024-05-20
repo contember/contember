@@ -8,15 +8,11 @@
 !.yarn/versions
 
 # node_modules
-/ee/**/node_modules
 /packages/**/node_modules
 /node_modules
 
 # build
 /dist
-/ee/**/dist
-/ee/**/LICENSE
-/ee/**/temp
 /packages/**/dist
 /packages/**/temp
 

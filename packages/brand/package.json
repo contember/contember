@@ -49,6 +49,6 @@
 		"@contember/utilities": "workspace:*"
 	},
 	"peerDependencies": {
-		"react": "^18"
+		"react": "^18 || ^19"
 	}
 }

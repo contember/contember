@@ -665,7 +665,7 @@ export namespace Environment {
     // (undocumented)
     export type Value = string | number | boolean | undefined | GraphQlLiteral | Filter | ReactElementLike;
     const // (undocumented)
-    createExtension: <S, R>(create: (state: S | undefined, environment: Environment) => R, otherMethods?: Omit<Extension<S, R>, "create"> | undefined) => Extension<S, R>;
+    createExtension: <S, R>(create: Extension<S, R>['create'], otherMethods?: Omit<Extension<S, R>, 'create'>) => Extension<S, R>;
     // (undocumented)
     export interface ValuesMapWithFactory {
         // (undocumented)

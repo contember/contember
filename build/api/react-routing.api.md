@@ -155,7 +155,7 @@ export const PushRequestContext: Context<(req: RequestState) => void>;
 export type RequestChange = (currentState: RequestState) => IncompleteRequestState | string;
 
 // @public (undocumented)
-export const requestChangeFactory: <P extends RequestParameters>(pageName: string, parameters?: P | undefined) => (currentState: RequestState) => PageRequest<P>;
+export const requestChangeFactory: <P extends RequestParameters>(pageName: string, parameters?: P) => (currentState: RequestState) => PageRequest<P>;
 
 // @public (undocumented)
 export type RequestParameters<Extra extends RoutingParameter = never> = {
@@ -292,7 +292,7 @@ export const useCurrentRequest: () => RequestState;
 export const useDimensionState: ({ dimension, defaultValue, storage }: {
     dimension: string;
     defaultValue: string | string[];
-    storage?: StateStorageOrName | undefined;
+    storage?: StateStorageOrName;
 }) => string[];
 
 // @public (undocumented)

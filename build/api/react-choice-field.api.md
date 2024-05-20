@@ -275,7 +275,7 @@ export const useStaticSingleChoiceField: (props: StaticSingleChoiceFieldProps) =
 
 // Warnings were encountered during analysis:
 //
-// src/ChoiceField.tsx:15:31 - (ae-forgotten-export) The symbol "AllDynamicSingleChoiceFieldRenderer" needs to be exported by the entry point index.d.ts
+// src/ChoiceField.tsx:16:2 - (ae-forgotten-export) The symbol "AllDynamicSingleChoiceFieldRenderer" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

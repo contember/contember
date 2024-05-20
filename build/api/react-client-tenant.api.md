@@ -10,11 +10,11 @@ import { ModelType } from 'graphql-ts-client-api';
 export { ModelType }
 
 // @public (undocumented)
-export const useTenantApi: () => <TData extends object, TVariables extends object>(fetcher: Fetcher<"Query" | "Mutation", TData, TVariables>, options?: {
-    readonly variables?: TVariables | undefined;
-    readonly headers?: Record<string, string> | undefined;
-    readonly apiToken?: string | undefined;
-} | undefined) => Promise<TData>;
+export const useTenantApi: () => <TData extends object, TVariables extends object>(fetcher: Fetcher<'Query' | 'Mutation', TData, TVariables>, options?: {
+    readonly variables?: TVariables;
+    readonly headers?: Record<string, string>;
+    readonly apiToken?: string;
+}) => Promise<TData>;
 
 // (No @packageDocumentation comment for this package)
 

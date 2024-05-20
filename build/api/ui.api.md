@@ -1000,9 +1000,7 @@ onPointerUpCapture?: PointerEventHandler<HTMLHeadingElement> | undefined;
 onPointerCancel?: PointerEventHandler<HTMLHeadingElement> | undefined;
 onPointerCancelCapture?: PointerEventHandler<HTMLHeadingElement> | undefined;
 onPointerEnter?: PointerEventHandler<HTMLHeadingElement> | undefined;
-onPointerEnterCapture?: PointerEventHandler<HTMLHeadingElement> | undefined;
 onPointerLeave?: PointerEventHandler<HTMLHeadingElement> | undefined;
-onPointerLeaveCapture?: PointerEventHandler<HTMLHeadingElement> | undefined;
 onPointerOver?: PointerEventHandler<HTMLHeadingElement> | undefined;
 onPointerOverCapture?: PointerEventHandler<HTMLHeadingElement> | undefined;
 onPointerOut?: PointerEventHandler<HTMLHeadingElement> | undefined;
@@ -1299,9 +1297,7 @@ onPointerUpCapture?: PointerEventHandler<HTMLParagraphElement> | undefined;
 onPointerCancel?: PointerEventHandler<HTMLParagraphElement> | undefined;
 onPointerCancelCapture?: PointerEventHandler<HTMLParagraphElement> | undefined;
 onPointerEnter?: PointerEventHandler<HTMLParagraphElement> | undefined;
-onPointerEnterCapture?: PointerEventHandler<HTMLParagraphElement> | undefined;
 onPointerLeave?: PointerEventHandler<HTMLParagraphElement> | undefined;
-onPointerLeaveCapture?: PointerEventHandler<HTMLParagraphElement> | undefined;
 onPointerOver?: PointerEventHandler<HTMLParagraphElement> | undefined;
 onPointerOverCapture?: PointerEventHandler<HTMLParagraphElement> | undefined;
 onPointerOut?: PointerEventHandler<HTMLParagraphElement> | undefined;
@@ -2302,11 +2298,7 @@ export type SectionTabsRegistrationContextType = [
 ];
 
 // @public (undocumented)
-export const Select: (<V, NN extends boolean>(props: Omit<ControlProps<V, NN>, "style" | "type" | keyof ControlConstraintProps<any>> & {
-    options: SelectOption<Narrow<V>>[];
-    isSearchable?: ComponentProps<ReactSelect>['isSearchable'];
-    styles?: StylesConfig<any, boolean, never> | undefined;
-} & RefAttributes<HTMLReactSelectElement<V>>) => ReactElement<any, any> | null) & {
+export const Select: (<V, NN extends boolean>(props: SelectProps<V, NN> & RefAttributes<HTMLReactSelectElement<V>>) => ReactElement<any, any> | null) & {
     displayName?: string | undefined;
 };
 
@@ -2745,13 +2737,13 @@ export function toDateString(value?: any): DateInputString | null;
 export function toDatetimeString(value?: any): DateTimeInputString | null;
 
 // @public (undocumented)
-export const toEnumClass: <N extends string>(classPrefix: string, name: N | undefined, namedDefault?: N | undefined) => string | undefined;
+export const toEnumClass: <N extends string>(classPrefix: string, name: N | undefined, namedDefault?: N) => string | undefined;
 
 // @public (undocumented)
-export const toEnumStateClass: <N extends string>(name: N | undefined, namedDefault?: N | undefined) => string | undefined;
+export const toEnumStateClass: <N extends string>(name: N | undefined, namedDefault?: N) => string | undefined;
 
 // @public (undocumented)
-export const toEnumViewClass: <N extends string>(name: N | undefined, namedDefault?: N | undefined) => string | undefined;
+export const toEnumViewClass: <N extends string>(name: N | undefined, namedDefault?: N) => string | undefined;
 
 // @public (undocumented)
 export const toFeatureClass: (name: string, feature?: boolean) => string | undefined;
@@ -2847,13 +2839,13 @@ export function useActiveSectionsTabs(): ActiveSectionTabsMap;
 // @public (undocumented)
 export const useChangeValidationState: ({ ref, onValidationStateChange }: {
     ref: ForwardedRef<any>;
-    onValidationStateChange?: ((message: string) => void) | undefined;
+    onValidationStateChange?: (message: string) => void;
 }) => void;
 
 // @public (undocumented)
 export const useCheckboxInput: <E extends HTMLInputElement>(props: ControlProps<boolean>, forwardedRef: ForwardedRef<E>) => AllHTMLAttributes<E> & {
     ref: RefObject<E>;
-    indeterminate?: boolean | undefined;
+    indeterminate?: boolean;
 };
 
 // @public @deprecated (undocumented)

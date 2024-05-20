@@ -2,8 +2,5 @@
 /packages/*/dist
 /packages/*/temp
 /packages/*/node_modules
-/ee/*/dist
-/ee/*/temp
-/ee/*/node_modules
 /packages/playground/api/client
 /packages/client-content/tests/client

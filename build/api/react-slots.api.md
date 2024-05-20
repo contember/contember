@@ -91,12 +91,12 @@ export function useHasActiveSlotsFactory<T extends SlotTargetComponentsRecord<st
 export const useSlotTargetElement: (name: string) => HTMLElement | null | undefined;
 
 // @public
-export function useSlotTargetsFactory<R extends SlotTargetComponentsRecord<string>>(SlotTargets: R): <T>(slots: ReadonlyArray<keyof R & string>, override?: T | undefined) => NonNullable<T> | FunctionComponentElement<    {
+export function useSlotTargetsFactory<R extends SlotTargetComponentsRecord<string>>(SlotTargets: R): <T>(slots: ReadonlyArray<keyof R & string>, override?: T) => NonNullable<T> | FunctionComponentElement<    {
 children?: ReactNode;
 }> | null;
 
 // @public
-export const useTargetElementRegistrar: (name: string, aliases?: string[]) => (element: HTMLElement | null) => void;
+export const useTargetElementRegistrar: (name: string, aliases?: string[]) => ((element: HTMLElement | null) => void);
 
 // (No @packageDocumentation comment for this package)
 

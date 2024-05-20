@@ -40,6 +40,6 @@
 		"directory": "packages/utilities"
 	},
 	"peerDependencies": {
-		"react": "^17 || ^18"
+		"react": "^18 || ^19"
 	}
 }

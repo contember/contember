@@ -24,7 +24,6 @@ import { ReactElement } from 'react';
 import { ReactNode } from 'react';
 import { RelationFilterArtifacts } from '@contember/react-dataview';
 import { SelectOptions } from '@contember/react-choice-field';
-import { Serializable } from '@contember/react-utils';
 import { SetStateAction } from 'react';
 import { SugarableRelativeSingleField } from '@contember/react-binding';
 import { SugaredQualifiedEntityList } from '@contember/react-binding';
@@ -67,27 +66,16 @@ export type ControlledDataGridProps = {
 export const createBooleanCell: <ColumnProps extends {}, ValueRendererProps extends {}>({ FilterRenderer, ValueRenderer }: {
     FilterRenderer: ComponentType<FilterRendererProps<BooleanFilterArtifacts>>;
     ValueRenderer: ComponentType<BooleanCellRendererProps & ValueRendererProps>;
-}) => FunctionComponent<DataGridColumnCommonProps & BooleanCellRendererProps & {
-    disableOrder?: boolean | undefined;
-    initialOrder?: DataViewSortingDirection | undefined;
-    initialFilter?: BooleanFilterArtifacts | undefined;
-} & ColumnProps & ValueRendererProps>;
+}) => FunctionComponent<BooleanCellProps & ColumnProps & ValueRendererProps>;
 
 // @public (undocumented)
 export const createCoalesceTextCell: <ColumnProps extends {}, ValueRendererProps extends {}>({ FilterRenderer, ValueRenderer }: {
     FilterRenderer: ComponentType<FilterRendererProps<TextFilterArtifacts>>;
     ValueRenderer: ComponentType<CoalesceCellRendererProps & ValueRendererProps>;
-}) => FunctionComponent<DataGridColumnCommonProps & CoalesceCellRendererProps & {
-    initialFilter?: TextFilterArtifacts | undefined;
-} & ColumnProps & ValueRendererProps>;
+}) => FunctionComponent<CoalesceTextCellProps & ColumnProps & ValueRendererProps>;
 
 // @public (undocumented)
-export const createControlledDataGrid: <P extends {}>(Renderer: ComponentType<P & {
-    state: DataGridState;
-    methods: DataGridMethods;
-    info: DataViewInfo;
-    columns: DataGridColumns<any>;
-}>) => NamedExoticComponent<    {
+export const createControlledDataGrid: <P extends {}>(Renderer: ComponentType<P & ControlledDataGridProps>) => NamedExoticComponent<    {
 state: DataGridState;
 methods: DataGridMethods;
 info: DataViewInfo;
@@ -95,12 +83,7 @@ columns: DataGridColumns<any>;
 } & P>;
 
 // @public (undocumented)
-export const createDataGrid: <P extends {}>(Renderer: ComponentType<P & {
-    state: DataViewState;
-    methods: DataViewMethods;
-    info: DataViewInfo;
-    columns: DataGridColumns<any>;
-}>) => ComponentType<DataGridProps<P>>;
+export const createDataGrid: <P extends {}>(Renderer: ComponentType<P & ControlledDataGridProps>) => ComponentType<DataGridProps<P>>;
 
 // @public (undocumented)
 export const createDataGridRenderer: <ColumnProps extends {}, ContainerProps extends {}>({ Fallback, Container, staticRender, columnStaticRender }: {
@@ -108,10 +91,10 @@ export const createDataGridRenderer: <ColumnProps extends {}, ContainerProps ext
         children?: ReactNode;
     }>;
     Container: ComponentType<ContainerProps>;
-    staticRender?: ((props: ContainerProps) => ReactNode) | undefined;
-    columnStaticRender?: ((props: {
-        column: DataGridColumnProps<Serializable, ColumnProps>;
-    }) => ReactNode) | undefined;
+    staticRender?: (props: ContainerProps) => ReactNode;
+    columnStaticRender?: (props: {
+        column: DataGridColumnProps<DataGridFilterArtifact, ColumnProps>;
+    }) => ReactNode;
 }) => NamedExoticComponent<ContainerProps & {
 state: DataViewState;
 methods: DataViewMethods;
@@ -123,32 +106,21 @@ columns: DataGridColumns<any>;
 export const createDateCell: <ColumnProps extends {}, ValueRendererProps extends {}>({ FilterRenderer, ValueRenderer }: {
     FilterRenderer: ComponentType<FilterRendererProps<DateRangeFilterArtifacts>>;
     ValueRenderer: ComponentType<DateCellRendererProps & ValueRendererProps>;
-}) => FunctionComponent<DateCellRendererProps & DataGridColumnCommonProps & {
-    disableOrder?: boolean | undefined;
-    initialOrder?: DataViewSortingDirection | undefined;
-    initialFilter?: DateRangeFilterArtifacts | undefined;
-} & ColumnProps & ValueRendererProps>;
+}) => FunctionComponent<DateCellProps & ColumnProps & ValueRendererProps>;
 
 // @public (undocumented)
 export const createEnumCell: <ColumnProps extends {}, ValueRendererProps extends {}, FilterProps extends {}>({ FilterRenderer, ValueRenderer }: {
     FilterRenderer: ComponentType<FilterRendererProps<EnumFilterArtifacts, FilterProps>>;
     ValueRenderer: ComponentType<EnumCellRendererProps & ValueRendererProps>;
-}) => FunctionComponent<DataGridColumnCommonProps & EnumCellRendererProps & {
-    options: Record<string, string>;
-    format?: ((value: string | null) => ReactNode) | undefined;
-    initialFilter?: EnumFilterArtifacts | undefined;
-} & ColumnProps & ValueRendererProps & FilterProps>;
+}) => FunctionComponent<EnumCellProps & ColumnProps & ValueRendererProps & FilterProps>;
 
 // @public (undocumented)
-export const createGenericCell: <ColumnProps extends {}>() => FunctionComponent<DataGridColumnCommonProps & ColumnProps>;
+export const createGenericCell: <ColumnProps extends {}>() => FunctionComponent<GenericCellProps & ColumnProps>;
 
 // @public (undocumented)
 export const createHasManyAbsentCell: <ColumnProps extends {}>({ FilterRenderer }: {
     FilterRenderer: ComponentType<FilterRendererProps<boolean>>;
-}) => FunctionComponent<DataGridColumnCommonProps & SugaredRelativeEntityList & {
-    render: ComponentType<EntityListBaseProps>;
-    children: ReactNode;
-} & ColumnProps>;
+}) => FunctionComponent<HasManyAbsentCellProps & ColumnProps>;
 
 // @public (undocumented)
 export const createHasManySelectCell: <ColumnProps extends {}, ValueRendererProps extends {}>({ FilterRenderer, ValueRenderer }: {
@@ -158,8 +130,8 @@ export const createHasManySelectCell: <ColumnProps extends {}, ValueRendererProp
 
 // @public (undocumented)
 export const createHasManySelectCellRenderer: <FallbackProps extends {}>({ renderElements, FallbackRenderer }: {
-    renderElements?: HasManySelectCellElementsRenderer | undefined;
-    FallbackRenderer?: ComponentType<FallbackProps> | undefined;
+    renderElements?: HasManySelectCellElementsRenderer;
+    FallbackRenderer?: ComponentType<FallbackProps>;
 }) => NamedExoticComponent<HasManySelectRendererProps & {
 renderElements?: ((elements: ReactNode[]) => ReactElement) | undefined;
 } & FallbackProps>;
@@ -172,28 +144,20 @@ export const createHasOneSelectCell: <ColumnProps extends {}, ValueRendererProps
 
 // @public (undocumented)
 export const createHasOneSelectCellRenderer: <FallbackProps extends {}>({ FallbackRenderer }: {
-    FallbackRenderer?: ComponentType<FallbackProps> | undefined;
+    FallbackRenderer?: ComponentType<FallbackProps>;
 }) => NamedExoticComponent<HasOneSelectRendererProps & FallbackProps>;
 
 // @public (undocumented)
 export const createNumberCell: <ColumnProps extends {}, ValueRendererProps extends {}, FilterProps extends {}>({ FilterRenderer, ValueRenderer }: {
     FilterRenderer: ComponentType<FilterRendererProps<NumberFilterArtifacts, FilterProps>>;
     ValueRenderer: ComponentType<NumberCellRendererProps & ValueRendererProps>;
-}) => FunctionComponent<DataGridColumnCommonProps & NumberCellRendererProps & {
-    disableOrder?: boolean | undefined;
-    initialOrder?: DataViewSortingDirection | undefined;
-    initialFilter?: NumberFilterArtifacts | undefined;
-} & ColumnProps & ValueRendererProps & FilterProps>;
+}) => FunctionComponent<NumberCellProps & ColumnProps & ValueRendererProps & FilterProps>;
 
 // @public (undocumented)
 export const createTextCell: <ColumnProps extends {}, ValueRendererProps extends {}>({ FilterRenderer, ValueRenderer }: {
     FilterRenderer: ComponentType<FilterRendererProps<TextFilterArtifacts>>;
     ValueRenderer: ComponentType<TextCellRendererProps & ValueRendererProps>;
-}) => FunctionComponent<TextCellRendererProps & DataGridColumnCommonProps & {
-    disableOrder?: boolean | undefined;
-    initialOrder?: DataViewSortingDirection | undefined;
-    initialFilter?: TextFilterArtifacts | undefined;
-} & ColumnProps & ValueRendererProps>;
+}) => FunctionComponent<TextCellProps & ColumnProps & ValueRendererProps>;
 
 // @public
 export const DataGridColumn: <FA extends DataGridFilterArtifact = DataGridFilterArtifact, ColumnProps extends {} = {}>(props: DataGridColumnProps<FA>) => ReactElement;

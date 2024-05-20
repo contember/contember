@@ -25,45 +25,6 @@ services:
     volumes:
       - .:/src:cached
 
-  admin-server:
-    image: node:20-alpine
-    command: 'npm run start'
-
-    working_dir: /src/ee/admin-server
-    volumes:
-      - .:/src:cached
-
-    environment:
-      NODE_ENV: 'development'
-      CONTEMBER_PORT: '4000'
-
-      CONTEMBER_API_ENDPOINT: 'http://contember-engine:4000'
-      CONTEMBER_LOGIN_TOKEN: '1111111111111111111111111111111111111111'
-      CONTEMBER_PUBLIC_DIR: '/src/ee/admin-server/dist/public'
-      CONTEMBER_INVITE_METHOD: 'RESET_PASSWORD'
-
-      CONTEMBER_S3_ENDPOINT: 'http://minio:9000'
-      CONTEMBER_S3_REGION: '_'
-      CONTEMBER_S3_BUCKET: 'contember'
-      CONTEMBER_S3_PREFIX: 'admin/'
-      CONTEMBER_S3_KEY: 'contember'
-      CONTEMBER_S3_SECRET: 'contember'
-
-      REDIS_HOST: 'redis://redis:6379'
-      REDIS_PREFIX: 'contember-admin-server'
-
-    depends_on:
-      - admin-server-vite
-
-
-  admin-server-vite:
-    image: node:20-alpine
-    command: 'npm run watch:public'
-
-    working_dir: /src/ee/admin-server
-    volumes:
-      - .:/src:cached
-
   playwright:
     image: node:20-alpine
     command: [ 'npm', 'run', 'pw:dev' ]

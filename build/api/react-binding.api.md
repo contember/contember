@@ -694,7 +694,7 @@ export const useEntityListSubTree: (qualifiedEntityList: Alias | SugaredQualifie
 ]) => EntityListAccessor;
 
 // @public (undocumented)
-export const useEntityListSubTreeLoader: <State>(entities: SugaredQualifiedEntityList | undefined, children: ReactNode, state?: State | undefined) => [UseEntityListSubTreeLoaderResult<State>, EntityListSubTreeLoaderState];
+export const useEntityListSubTreeLoader: <State>(entities: SugaredQualifiedEntityList | undefined, children: ReactNode, state?: State) => [UseEntityListSubTreeLoaderResult<State>, EntityListSubTreeLoaderState];
 
 // @public (undocumented)
 export type UseEntityListSubTreeLoaderResult<State> = {
@@ -747,12 +747,12 @@ export function useField<Value extends FieldValue = FieldValue>(sugaredRelativeS
 export const useGetEntityByKey: () => GetEntityByKey;
 
 // @public (undocumented)
-export const useGetEntityListSubTree: () => (parametersOrAlias: Alias | SugaredQualifiedEntityList | SugaredUnconstrainedQualifiedEntityList, ...treeId: [TreeRootId | undefined] | [
-]) => EntityListAccessor;
+export const useGetEntityListSubTree: () => ((parametersOrAlias: Alias | SugaredQualifiedEntityList | SugaredUnconstrainedQualifiedEntityList, ...treeId: [TreeRootId | undefined] | [
+]) => EntityListAccessor);
 
 // @public (undocumented)
-export const useGetEntitySubTree: () => (parametersOrAlias: Alias | SugaredQualifiedSingleEntity | SugaredUnconstrainedQualifiedSingleEntity, ...treeId: [TreeRootId | undefined] | [
-]) => EntityAccessor;
+export const useGetEntitySubTree: () => ((parametersOrAlias: Alias | SugaredQualifiedSingleEntity | SugaredUnconstrainedQualifiedSingleEntity, ...treeId: [TreeRootId | undefined] | [
+]) => EntityAccessor);
 
 // @public (undocumented)
 export const useGetTreeFilters: () => (() => TreeFilter[]);

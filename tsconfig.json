@@ -142,9 +142,6 @@
 		},
 		{
 			"path": "./packages/vite-plugin"
-		},
-		{
-			"path": "./ee/admin-server"
 		}
 	],
 	"ts-node": {

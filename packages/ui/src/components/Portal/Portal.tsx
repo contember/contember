@@ -1,4 +1,4 @@
-import { memo } from 'react'
+import { memo, ReactPortal } from 'react'
 import { createPortal } from 'react-dom'
 import { usePortalProvider } from './contexts'
 import { PortalProps } from './types'
@@ -16,7 +16,7 @@ import { PortalProps } from './types'
  * @see usePortalProvider
  * @see PortalProvider
  */
-export const Portal = memo(({ children, to }: PortalProps) => {
+export const Portal = memo(({ children, to }: PortalProps): ReactPortal => {
 	const portalContainer = usePortalProvider()
 	return createPortal(children, to ?? portalContainer)
 })

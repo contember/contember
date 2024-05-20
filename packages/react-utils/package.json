@@ -35,7 +35,7 @@
 		"test": "vitest --environment jsdom"
 	},
 	"peerDependencies": {
-		"react": "^17 || ^18"
+		"react": "^18 || ^19"
 	},
 	"dependencies": {
 		"@contember/utilities": "workspace:*",

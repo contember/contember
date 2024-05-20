@@ -53,8 +53,8 @@
 		"lucide-react": "^0.302.0"
 	},
 	"peerDependencies": {
-		"react": "^17 || ^18",
-		"react-dom": "^17 || ^18"
+		"react": "^18 || ^19",
+		"react-dom": "^18 || ^19"
 	},
 	"devDependencies": {
 		"react": "^18.2.0",

@@ -5,7 +5,7 @@
 ```ts
 
 import { Environment } from '@contember/react-binding';
-import { JSX as JSX_2 } from 'react/jsx-runtime';
+import { Identity } from '@contember/react-client-tenant';
 import { NamedExoticComponent } from 'react';
 import { ReactNode } from 'react';
 
@@ -21,78 +21,17 @@ export interface HasRoleProps {
 }
 
 // @public (undocumented)
-export interface Identity {
-    // (undocumented)
-    readonly id: string;
-    // (undocumented)
-    readonly permissions: {
-        readonly canCreateProject: boolean;
-    };
-    // (undocumented)
-    readonly person?: Person;
-    // (undocumented)
-    readonly projects: IdentityProject[];
-}
-
-// @public (undocumented)
 export const identityEnvironmentExtension: Environment.Extension<Identity | null, {
     identity: Identity | undefined;
 }>;
 
 // @public (undocumented)
-export interface IdentityMethods {
-    // (undocumented)
-    clearIdentity: () => void;
-    // (undocumented)
-    refreshIdentity: () => Promise<void>;
-}
+export const IdentityEnvironmentProvider: React.FC<IdentityEnvironmentProviderProps>;
 
 // @public (undocumented)
-export interface IdentityProject {
-    // (undocumented)
-    readonly name: string;
-    // (undocumented)
-    readonly roles: readonly string[];
-    // (undocumented)
-    readonly slug: string;
-}
-
-// @public (undocumented)
-export const IdentityProvider: React.FC<IdentityProviderProps>;
-
-// @public (undocumented)
-export interface IdentityProviderProps {
+export interface IdentityEnvironmentProviderProps {
     // (undocumented)
     children: ReactNode;
-}
-
-// @public (undocumented)
-export const IdentityState: ({ state, children }: IdentityStateProps) => JSX_2.Element | null;
-
-// @public (undocumented)
-export interface IdentityStateProps {
-    // (undocumented)
-    children: ReactNode;
-    // (undocumented)
-    state: IdentityStateValue | IdentityStateValue[];
-}
-
-// @public (undocumented)
-export type IdentityStateValue = 'none' | 'loading' | 'failed' | 'cleared' | 'success';
-
-// @public (undocumented)
-export const LogoutTrigger: ({ children }: {
-    children: ReactNode;
-}) => JSX_2.Element;
-
-// @public (undocumented)
-export interface Person {
-    // (undocumented)
-    readonly email?: string;
-    // (undocumented)
-    readonly id: string;
-    // (undocumented)
-    readonly otpEnabled: boolean;
 }
 
 // @public (undocumented)
@@ -107,27 +46,10 @@ export type ProjectUserRoles = Set<string>;
 export type RoleCondition = string | ((roles: Set<string>) => boolean);
 
 // @public (undocumented)
-export const useFetchIdentity: () => [{
-    state: IdentityStateValue;
-    identity: Identity | undefined;
-}, IdentityMethods];
-
-// @public (undocumented)
-export const useIdentity: () => Identity | undefined;
-
-// @public (undocumented)
-export const useIdentityMethods: () => IdentityMethods;
-
-// @public (undocumented)
-export const useIdentityState: () => IdentityStateValue;
-
-// @public (undocumented)
-export const useLogout: () => ({ noRedirect }?: {
-    noRedirect?: boolean | undefined;
-}) => Promise<void>;
-
-// @public (undocumented)
 export const useProjectUserRoles: () => ProjectUserRoles;
+
+
+export * from "@contember/react-client-tenant";
 
 // (No @packageDocumentation comment for this package)
 

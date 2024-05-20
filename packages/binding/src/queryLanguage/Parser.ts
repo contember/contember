@@ -351,7 +351,7 @@ class Parser extends EmbeddedActionsParser {
 						throw new QueryLanguageError(`Unknown modifier '${field.modifier}', expected 'none', 'some' or 'all'`)
 					}
 				}
-				return val
+				return val as Parser.AST.FieldWhere
 			})
 		}
 

@@ -22,6 +22,7 @@ export const LoginWithEmail = () => {
 		const response = await api(TenantApi.mutation$.createSessionToken(TenantApi.createSessionTokenResponse$$.error(TenantApi.createSessionTokenError$$).result(TenantApi.createSessionTokenResult$$)), {
 			variables: {
 				email,
+				expiration: 3600 * 24 * 7,
 			},
 			apiToken: sessionToken.propsToken,
 		})

@@ -203,10 +203,12 @@ export namespace Model {
 	export type UniqueConstraints = readonly UniqueConstraint[]
 
 	export type ConstraintTiming = 'deferrable' | 'deferred'
+	export type UniqueDistinctBehaviour = 'distinct' | 'not distinct'
 	export type UniqueConstraint = {
 		readonly fields: readonly string[]
 		readonly timing?: ConstraintTiming // empty means not deferrable
 		readonly name?: string
+		readonly nulls?: UniqueDistinctBehaviour // empty means distinct
 	}
 
 	export type Indexes = readonly Index[]

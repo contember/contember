@@ -96,7 +96,7 @@ export class RemoveUniqueConstraintDiffer implements Differ {
 					if (!updatedEntity) {
 						return false
 					}
-					return !updatedEntity.unique.find(uniq => deepEqual(uniq.fields, it.fields) && it.timing === uniq.timing)
+					return !updatedEntity.unique.find(uniq => deepEqual(uniq.fields, it.fields) && it.timing === uniq.timing && it.nulls === uniq.nulls)
 				})
 				.map(unique =>
 					removeUniqueConstraintModification.createModification({

@@ -174,6 +174,7 @@ const uniqueConstraint = Typesafe.intersection(
 	indexLike,
 	Typesafe.partial({
 		timing: Typesafe.enumeration('deferrable', 'deferred'),
+		nulls: Typesafe.enumeration('distinct', 'not distinct'),
 	}),
 )
 const uniqueConstraintCheck: Typesafe.Equals<Model.UniqueConstraint, ReturnType<typeof uniqueConstraint>> = true

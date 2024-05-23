@@ -38,7 +38,7 @@ export class ColumnDefinition extends FieldDefinition<ColumnDefinitionOptions> {
 		return this.withOption('sequence', { precedence: 'BY DEFAULT', ...options })
 	}
 
-	public unique(options: { timing?: Model.ConstraintTiming } = {}): Interface<ColumnDefinition> {
+	public unique(options: { timing?: Model.ConstraintTiming; nulls?: Model.UniqueDistinctBehaviour } = {}): Interface<ColumnDefinition> {
 		return this.withOption('unique', options)
 	}
 

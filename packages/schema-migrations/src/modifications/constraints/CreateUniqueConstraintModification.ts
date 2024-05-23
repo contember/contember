@@ -37,7 +37,9 @@ export class CreateUniqueConstraintModificationHandler implements ModificationHa
 			checkModifier = ' DEFERRABLE'
 		}
 
-		builder.sql(`ALTER TABLE ${tableNameId} ADD UNIQUE (${columnNameIds.join(', ')})${checkModifier}`)
+		const nullsModifier = this.data.unique.nulls === 'not distinct' ? 'NULLS NOT DISTINCT ' : ''
+
+		builder.sql(`ALTER TABLE ${tableNameId} ADD UNIQUE ${nullsModifier}(${columnNameIds.join(', ')})${checkModifier}`)
 
 		invalidateDatabaseMetadata()
 	}

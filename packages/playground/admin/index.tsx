@@ -5,7 +5,7 @@ import { LoginFormFields } from './lib/components/tenant/loginForm'
 import { ContemberClient } from '@contember/react-client'
 import { IdentityProvider, IdentityState, IDP, IDPInitTrigger, IDPState, LoginForm, LogoutTrigger, PasswordResetForm, PasswordResetRequestForm } from '@contember/react-identity'
 import { Link, RoutingProvider, useCurrentRequest, useRedirect } from '@contember/react-routing'
-import { Pages } from '@contember/interface'
+import { Pages, useIdentity } from '@contember/interface'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './lib/components/ui/card'
 import { AnchorButton, Button } from './lib/components/ui/button'
 import { PasswordResetRequestFormFields } from './lib/components/tenant/passwordResetRequestForm'
@@ -14,65 +14,94 @@ import { PasswordResetFormFields } from './lib/components/tenant/passwordResetFo
 import { ToastContent, Toaster, useShowToast } from './lib/components/ui/toast'
 import { Loader } from './lib/components/ui/loader'
 import { Overlay } from './lib/components/ui/overlay'
+import { useEffect } from 'react'
 
 const errorHandler = createErrorHandler((dom, react, onRecoverableError) => createRoot(dom, { onRecoverableError }).render(react))
 
 const rootEl = document.body.appendChild(document.createElement('div'))
 
-const LoginPage = () => {
+const Login = () => {
 	const showToast = useShowToast()
+	return <>
+		<IDP
+			onInitError={error => showToast(<ToastContent>Failed to initialize IdP login: {error}</ToastContent>, { type: 'error' })}
+			onResponseError={error => showToast(<ToastContent>Failed to process IdP response: {error}</ToastContent>, { type: 'error' })}
+		>
+
+			<Card className="w-96 relative">
+				<CardHeader>
+					<CardTitle className="text-2xl">Login</CardTitle>
+					<CardDescription>
+						Enter your email below to login to your account
+					</CardDescription>
+				</CardHeader>
+				<CardContent>
+					<LoginForm>
+						<form className="grid gap-4">
+							<LoginFormFields />
+						</form>
+					</LoginForm>
+
+					<IDPInitTrigger identityProvider="google">
+						<Button variant="outline" className="w-full">
+							Login with Google
+						</Button>
+					</IDPInitTrigger>
+				</CardContent>
+				<IDPState state={['processing_init', 'processing_response', 'success']}>
+					<Loader />
+				</IDPState>
+			</Card>
+		</IDP>
+	</>
+}
+
+const LoggedIn = () => {
+	const identity = useIdentity()
+	useEffect(() => {
+		setTimeout(() => {
+			window.location.href = '/app/'
+		}, 2000)
+	}, [])
+
+	return (
+		<Card className="w-96 relative">
+			<CardHeader>
+				<CardTitle className="text-2xl">Logged in </CardTitle>
+				<CardDescription>
+					as {identity?.person?.email ?? 'unknown'}
+				</CardDescription>
+			</CardHeader>
+			<Loader position="static" />
+		</Card>
+	)
+
+}
+
+const IndexPage = () => {
 	return (
 		<IdentityProvider>
-			<IDP
-				onInitError={error => showToast(<ToastContent>Failed to initialize IdP login: {error}</ToastContent>, { type: 'error' })}
-				onResponseError={error => showToast(<ToastContent>Failed to process IdP response: {error}</ToastContent>, { type: 'error' })}
-			>
-
-				<Card className="w-96 relative">
-					<CardHeader>
-						<CardTitle className="text-2xl">Login</CardTitle>
-						<CardDescription>
-							Enter your email below to login to your account
-						</CardDescription>
-					</CardHeader>
-					<CardContent>
-						<LoginForm>
-							<form className="grid gap-4">
-								<LoginFormFields />
-							</form>
-						</LoginForm>
-
-						<IDPInitTrigger identityProvider="google">
-							<Button variant="outline" className="w-full">
-								Login with Google
-							</Button>
-						</IDPInitTrigger>
-					</CardContent>
-					<IDPState state={['processing_init', 'processing_response', 'success']}>
-						<Loader />
-					</IDPState>
-					<IdentityState state={['success', 'loading']}>
-						<Loader />
-					</IdentityState>
-
-					<IdentityState state="loading">
-						<Loader />
-					</IdentityState>
-					<IdentityState state="failed">
-						<Overlay>
-							<div className="bg-gray-100 flex flex-col gap-4 items-center justify-center p-16 rounded-lg shadow-lg border">
-								<p className="text-lg">
-									Failed to load identity.
-								</p>
-								<LogoutTrigger>
-									<Button className="w-full" variant="outline">Logout</Button>
-								</LogoutTrigger>
-							</div>
-
-						</Overlay>
-					</IdentityState>
-				</Card>
-			</IDP>
+			<IdentityState state={['none', 'cleared']}>
+				<Login />
+			</IdentityState>
+			<IdentityState state="success">
+				<LoggedIn />
+			</IdentityState>
+			<IdentityState state="loading">
+				<Loader />
+			</IdentityState>
+			<IdentityState state="failed">
+				<Overlay>
+					<div className="bg-gray-100 flex flex-col gap-4 items-center justify-center p-16 rounded-lg shadow-lg border">
+						<p className="text-lg">
+							Failed to load identity.
+						</p>
+						<LogoutTrigger>
+							<Button className="w-full" variant="outline">Logout</Button>
+						</LogoutTrigger>
+					</div>
+				</Overlay>
+			</IdentityState>
 		</IdentityProvider>
 	)
 }
@@ -192,7 +221,7 @@ errorHandler(onRecoverableError => createRoot(rootEl, { onRecoverableError }).re
 				<Pages
 					layout={Layout}
 					children={{
-						index: LoginPage,
+						index: IndexPage,
 						resetRequest: PasswordResetRequestPage,
 						resetRequestSuccess: PasswordResetRequestSuccessPage,
 						passwordReset: PasswordResetPage,

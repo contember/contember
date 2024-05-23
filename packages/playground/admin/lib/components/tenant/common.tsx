@@ -16,6 +16,7 @@ export const TenantFormError = <CtxValue extends FormContextValue<any, any, any>
 		<div>
 			{form.errors
 				.filter(error => error.field === field)
+				.filter(it => !(it.code in messages && ((messages as any)[it.code] === undefined)))
 				.map(error => [error.code, { error: (messages as any)[error.code] || 'Unknown error', developerMessage: error.developerMessage }])
 				.map(([code, error]) => {
 					return (<TenantFormSingleError key={code} {...error} />)

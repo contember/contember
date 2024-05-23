@@ -12,6 +12,7 @@ type Args = {
 }
 type Options = {
 	'yes': boolean
+	'no-gzip-transfer'?: boolean
 }
 
 export class ImportCommand extends Command<Args, Options> {
@@ -28,6 +29,7 @@ export class ImportCommand extends Command<Args, Options> {
 		if (this.workspace.isSingleProjectMode()) {
 			from.optional()
 		}
+		configuration.option('no-gzip-transfer').valueNone()
 		configuration.option('yes').valueNone()
 	}
 
@@ -47,7 +49,13 @@ export class ImportCommand extends Command<Args, Options> {
 		const file = input.getArgument('file')
 		const baseInputStream = createReadStream(file)
 		const stream = (file.endsWith('.gz') ? baseInputStream.pipe(createGunzip()) : baseInputStream)
-		const response = await dataImport({ stream: stream, project, printProgress: printProgressLine })
+		const gzipTransfer = !input.getOption('no-gzip-transfer')
+		const response = await dataImport({
+			stream: stream,
+			project,
+			printProgress: printProgressLine,
+			gzip: gzipTransfer,
+		})
 		console.log('')
 		const responseData = JSON.parse((await readStream(response)).toString())
 		if (responseData.ok) {

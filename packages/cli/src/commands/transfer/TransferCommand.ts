@@ -3,6 +3,7 @@ import { confirmImport, dataExport, dataImport, resolveProject } from './utils'
 import { maskToken } from '../../utils/token'
 import { printProgressLine } from '../../utils/stdio'
 import { readStream } from '../../utils/stream'
+import { createGunzip } from 'node:zlib'
 
 type Args = {
 	source: string
@@ -10,6 +11,7 @@ type Args = {
 }
 type Options = {
 	'include-system'?: boolean
+	'no-gzip-transfer'?: boolean
 	yes: boolean
 }
 
@@ -28,6 +30,7 @@ export class TransferCommand extends Command<Args, Options> {
 			target.optional()
 		}
 		configuration.option('include-system').valueNone()
+		configuration.option('no-gzip-transfer').valueNone()
 		configuration.option('yes').valueNone()
 	}
 
@@ -54,9 +57,14 @@ export class TransferCommand extends Command<Args, Options> {
 		}
 
 		const includeSystem = input.getOption('include-system') === true
-		const exportResponse = (await dataExport({ project: sourceProject, includeSystem, noGzip: true }))
+		const gzipTransfer = !input.getOption('no-gzip-transfer')
+		const exportResponse = (await dataExport({ project: sourceProject, includeSystem, gzip: gzipTransfer }))
+		const ungzipedResponse = gzipTransfer ? exportResponse.pipe(createGunzip()) : exportResponse
 		const importResponse = await dataImport({
-			stream: exportResponse, project: targetProject, printProgress: printProgressLine,
+			stream: ungzipedResponse,
+			project: targetProject,
+			printProgress: printProgressLine,
+			gzip: gzipTransfer,
 		})
 		console.log('')
 

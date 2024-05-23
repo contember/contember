@@ -1,4 +1,5 @@
 export * from './CreateApiKeyForm'
+export * from './CreateSessionTokenForm'
 export * from './ChangeMyPasswordForm'
 export * from './InviteForm'
 export * from './LoginForm'

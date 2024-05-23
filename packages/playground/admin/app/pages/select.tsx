@@ -3,7 +3,7 @@ import { Binding, PersistButton } from '../../lib/components/binding'
 import { EntitySubTree } from '@contember/interface'
 import * as React from 'react'
 import { Field } from '@contember/react-binding'
-import { InputField, MultiSelectField, SelectField, SortableMultiSelectField } from '../../lib/components/form'
+import { InputField, MultiSelectField, SelectEnumField, SelectField, SortableMultiSelectField } from '../../lib/components/form'
 
 
 export const hasOne = () => <>
@@ -66,6 +66,23 @@ export const createNewForm = () => <>
 				>
 					<Field field={'name'} />
 				</SelectField>
+			</div>
+		</EntitySubTree>
+	</Binding>
+</>
+
+export const enumSelect = () => <>
+	<Binding>
+		<Slots.Actions>
+			<PersistButton />
+		</Slots.Actions>
+		<EntitySubTree entity={'InputRoot(unique=unique)'} setOnCreate={'(unique=unique)'}>
+			<div className={'space-y-4'}>
+				<SelectEnumField field={'enumValue'} label={'Some enum'} options={{
+					a: 'Option A',
+					b: 'Option B',
+					c: 'Option C',
+				}} />
 			</div>
 		</EntitySubTree>
 	</Binding>

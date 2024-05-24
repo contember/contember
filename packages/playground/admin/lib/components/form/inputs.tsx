@@ -6,7 +6,7 @@ import { TextareaAutosize } from '../ui/textarea'
 import { FormLabelUI } from './ui'
 import { FormCheckbox, FormCheckboxProps, FormFieldScope, FormInput, FormInputProps, FormLabel, FormRadioInput, FormRadioItemProps } from '@contember/react-form'
 import { FormContainer, FormContainerProps } from './container'
-import { Component, Field, SugaredRelativeSingleField } from '@contember/interface'
+import { Component } from '@contember/interface'
 
 
 export type InputFieldProps =

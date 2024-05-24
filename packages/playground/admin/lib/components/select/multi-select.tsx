@@ -1,6 +1,17 @@
 import * as React from 'react'
 import { ReactNode } from 'react'
-import { MultiSelectItemContentUI, MultiSelectItemRemoveButtonUI, MultiSelectItemUI, SelectCreateNewTrigger, SelectDefaultPlaceholderUI, SelectInputActionsUI, SelectInputUI, SelectListItemUI, SelectPopoverContent } from './ui'
+import {
+	MultiSelectItemContentUI,
+	MultiSelectItemRemoveButtonUI,
+	MultiSelectItemUI,
+	SelectCreateNewTrigger,
+	SelectDefaultPlaceholderUI,
+	SelectInputActionsUI,
+	SelectInputUI,
+	SelectInputWrapperUI,
+	SelectListItemUI,
+	SelectPopoverContent,
+} from './ui'
 import { ChevronDownIcon } from 'lucide-react'
 import { Popover, PopoverTrigger } from '../ui/popover'
 import { Component, SugaredQualifiedEntityList, SugaredRelativeEntityList } from '@contember/interface'
@@ -9,6 +20,7 @@ import { SelectListInner } from './list'
 import { MultiSelect, SelectDataView, SelectEachValue, SelectItemTrigger, SelectOption, SelectPlaceholder } from '@contember/react-select'
 import { CreateEntityDialog } from './create-new'
 import { DataViewUnionFilterFields } from '@contember/react-dataview'
+import { useFormFieldId } from '@contember/react-form'
 
 export type MultiSelectInputProps =
 	& {
@@ -21,32 +33,36 @@ export type MultiSelectInputProps =
 }
 
 export const MultiSelectInput = Component<MultiSelectInputProps>(({ field, queryField, options, children, placeholder, createNewForm }) => {
+	const id = useFormFieldId()
 	return (
 		<MultiSelect field={field} options={options}>
 			<div className="flex gap-1 items-center">
 				<Popover>
-					<PopoverTrigger asChild>
-						<SelectInputUI>
-							<SelectPlaceholder>
-								{placeholder ?? <SelectDefaultPlaceholderUI />}
-							</SelectPlaceholder>
+					<SelectInputWrapperUI>
+						<PopoverTrigger asChild>
+							<SelectInputUI id={id ? `${id}-input` : undefined}>
+								<SelectPlaceholder>
+									{placeholder ?? <SelectDefaultPlaceholderUI />}
+								</SelectPlaceholder>
 
-							<SelectEachValue>
-								<MultiSelectItemUI>
-									<MultiSelectItemContentUI>
-										{children}
-									</MultiSelectItemContentUI>
-									<SelectItemTrigger>
-										<MultiSelectItemRemoveButtonUI onClick={e => e.stopPropagation()} />
-									</SelectItemTrigger>
-								</MultiSelectItemUI>
-							</SelectEachValue>
+								<SelectEachValue>
+									<MultiSelectItemUI>
+										<MultiSelectItemContentUI>
+											{children}
+										</MultiSelectItemContentUI>
+										<SelectItemTrigger>
+											<MultiSelectItemRemoveButtonUI onClick={e => e.stopPropagation()} />
+										</SelectItemTrigger>
+									</MultiSelectItemUI>
+								</SelectEachValue>
 
-							<SelectInputActionsUI>
-								<ChevronDownIcon className={'w-4 h-4'} />
-							</SelectInputActionsUI>
-						</SelectInputUI>
-					</PopoverTrigger>
+								<SelectInputActionsUI>
+									<ChevronDownIcon className={'w-4 h-4'} />
+								</SelectInputActionsUI>
+							</SelectInputUI>
+						</PopoverTrigger>
+
+					</SelectInputWrapperUI>
 					<SelectPopoverContent>
 						<SelectDataView queryField={queryField}>
 							<SelectListInner filterToolbar={<SelectDefaultFilter />}>
@@ -67,6 +83,12 @@ export const MultiSelectInput = Component<MultiSelectInputProps>(({ field, query
 					</CreateEntityDialog>
 				)}
 			</div>
+		</MultiSelect>
+	)
+}, ({ field, options, children }) => {
+	return (
+		<MultiSelect field={field} options={options}>
+			{children}
 		</MultiSelect>
 	)
 })

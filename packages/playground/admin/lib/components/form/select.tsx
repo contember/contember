@@ -1,7 +1,20 @@
-import { MultiSelectInput, MultiSelectInputProps, SelectDefaultPlaceholderUI, SelectInput, SelectInputActionsUI, SelectInputProps, SelectInputUI, SelectListItemUI, SelectPopoverContent, SortableMultiSelectInput, SortableMultiSelectInputProps } from '../select'
+import {
+	MultiSelectInput,
+	MultiSelectInputProps,
+	SelectDefaultPlaceholderUI,
+	SelectInput,
+	SelectInputActionsUI,
+	SelectInputProps,
+	SelectInputUI,
+	SelectInputWrapperUI,
+	SelectListItemUI,
+	SelectPopoverContent,
+	SortableMultiSelectInput,
+	SortableMultiSelectInputProps,
+} from '../select'
 import * as React from 'react'
 import { FormContainer, FormContainerProps } from './container'
-import { FormFieldScope, FormHasManyRelationScope, FormHasOneRelationScope } from '@contember/react-form'
+import { FormFieldScope, FormHasManyRelationScope, FormHasOneRelationScope, useFormFieldId } from '@contember/react-form'
 import { Component, Field, SugaredRelativeSingleField, useField } from '@contember/interface'
 import { Popover, PopoverTrigger } from '../ui/popover'
 import { ChevronDownIcon, ChevronUpIcon } from 'lucide-react'
@@ -66,33 +79,10 @@ export type SelectEnumFieldProps =
 
 export const SelectEnumField = Component<SelectEnumFieldProps>(
 	({ field, label, description, options, placeholder }) => {
-		const [open, setOpen] = React.useState(false)
-		const fieldAccessor = useField<string>(field)
-
 		return (
 			<FormFieldScope field={field}>
 				<FormContainer description={description} label={label}>
-					<Popover open={open} onOpenChange={setOpen}>
-						<PopoverTrigger asChild>
-							<SelectInputUI>
-								{fieldAccessor.value ? options[fieldAccessor.value] : placeholder ?? <SelectDefaultPlaceholderUI />}
-								<SelectInputActionsUI>
-									{open ? <ChevronUpIcon /> : <ChevronDownIcon />}
-								</SelectInputActionsUI>
-							</SelectInputUI>
-						</PopoverTrigger>
-						<SelectPopoverContent>
-							{Object.entries(options).map(([value, label]) => (
-								<SelectListItemUI key={value} onClick={() => {
-									fieldAccessor.updateValue(value)
-									setOpen(false)
-								}}>
-									{label}
-								</SelectListItemUI>
-							))}
-						</SelectPopoverContent>
-					</Popover>
-
+					<SelectEnumFieldInner field={field} options={options} placeholder={placeholder} />
 				</FormContainer>
 			</FormFieldScope>
 		)
@@ -100,3 +90,34 @@ export const SelectEnumField = Component<SelectEnumFieldProps>(
 	({ field, defaultValue }) => <Field field={field} defaultValue={defaultValue} />,
 	'SelectEnumField',
 )
+
+const SelectEnumFieldInner = ({ field, options, placeholder }: SelectEnumFieldProps) => {
+	const [open, setOpen] = React.useState(false)
+	const fieldAccessor = useField<string>(field)
+	const id = useFormFieldId()
+	return (
+		<Popover open={open} onOpenChange={setOpen}>
+			<SelectInputWrapperUI>
+				<PopoverTrigger asChild>
+					<SelectInputUI id={id ? `${id}-input` : undefined}>
+						{fieldAccessor.value ? options[fieldAccessor.value] : placeholder ?? <SelectDefaultPlaceholderUI />}
+						<SelectInputActionsUI>
+							{open ? <ChevronUpIcon /> : <ChevronDownIcon />}
+						</SelectInputActionsUI>
+					</SelectInputUI>
+				</PopoverTrigger>
+			</SelectInputWrapperUI>
+			<SelectPopoverContent>
+				{Object.entries(options).map(([value, label]) => (
+					<SelectListItemUI key={value} onClick={() => {
+						fieldAccessor.updateValue(value)
+						setOpen(false)
+					}}>
+						{label}
+					</SelectListItemUI>
+				))}
+			</SelectPopoverContent>
+		</Popover>
+
+	)
+}

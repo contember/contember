@@ -27,7 +27,7 @@ export const collectStaticInfo = (props: DataViewProps, env: Environment): DataV
 const createDataViewReactNode = (props: DataViewProps, env: Environment) => {
 	const selectionState = props.initialSelection && typeof props.initialSelection !== 'function' ? props.initialSelection : {}
 	const envWithSelectionState = env.withExtension(dataViewSelectionEnvironmentExtension, selectionState)
-	const entityListSubTree = <EntityListSubTree entities={props.entities}>{props.children}</EntityListSubTree>
+	const entityListSubTree = <EntityListSubTree entities={props.entities} alias="__dataview_static">{props.children}</EntityListSubTree>
 	return [entityListSubTree, envWithSelectionState] as const
 }
 
@@ -39,7 +39,11 @@ const getQueryField = (props: DataViewProps, env: Environment) => {
 	const [node, envWithSelectionState] = createDataViewReactNode(props, env)
 	const markerTreeGenerator = new MarkerTreeGenerator(node, envWithSelectionState)
 	const markerTree = markerTreeGenerator.generate()
-	const marker = Array.from(markerTree.subTrees.values())[0]
+	const placeholder = markerTree.placeholdersByAliases.get('__dataview_static')
+	if (!placeholder) {
+		throw new Error()
+	}
+	const marker = markerTree.subTrees.get(placeholder)
 	if (!(marker instanceof EntityListSubTreeMarker)) {
 		throw new Error()
 	}

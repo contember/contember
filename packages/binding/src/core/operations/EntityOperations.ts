@@ -67,11 +67,7 @@ export class EntityOperations {
 			}
 
 			for (const state of StateIterator.eachSiblingRealm(outerState)) {
-				const targetHasOneMarkers = this.resolveHasOneRelationMarkers(
-					getEntityMarker(state).fields,
-					fieldName,
-					`Cannot connect at field '${fieldName}' as it doesn't refer to a has one relation.`,
-				)
+				const targetHasOneMarkers = this.resolveHasOneRelationMarkers(getEntityMarker(state).fields, fieldName, 'connect')
 				for (const targetHasOneMarker of targetHasOneMarkers) {
 					const previouslyConnectedState = state.children.get(targetHasOneMarker.placeholderName)
 
@@ -169,11 +165,7 @@ export class EntityOperations {
 			const persistedData = this.treeStore.persistedEntityData.get(outerState.entity.id.uniqueValue)
 
 			for (const state of StateIterator.eachSiblingRealm(outerState)) {
-				const targetHasOneMarkers = this.resolveHasOneRelationMarkers(
-					getEntityMarker(state).fields,
-					fieldName,
-					`Cannot disconnect at field '${fieldName}' as it doesn't refer to a has one relation.`,
-				)
+				const targetHasOneMarkers = this.resolveHasOneRelationMarkers(getEntityMarker(state).fields, fieldName, 'disconnect')
 				for (const targetHasOneMarker of targetHasOneMarkers) {
 					const stateToDisconnect = state.children.get(targetHasOneMarker.placeholderName)
 
@@ -293,12 +285,12 @@ export class EntityOperations {
 	private *resolveHasOneRelationMarkers(
 		container: EntityFieldMarkersContainer,
 		field: FieldName,
-		message: string,
+		type: 'connect' | 'disconnect',
 	): IterableIterator<HasOneRelationMarker> {
 		const placeholders = container.placeholders.get(field)
 
 		if (placeholders === undefined) {
-			return
+			throw new BindingError(`Cannot ${type} at field '${field}' as it wasn't registered during static render.`)
 		}
 		const normalizedPlaceholders = placeholders instanceof Set ? placeholders : [placeholders]
 
@@ -306,7 +298,7 @@ export class EntityOperations {
 			const hasOneRelation = container.markers.get(placeholderName)
 
 			if (!(hasOneRelation instanceof HasOneRelationMarker)) {
-				throw new BindingError(message)
+				throw new BindingError(`Cannot ${type} at field '${field}' as it doesn't refer to a has one relation.`)
 			}
 			yield hasOneRelation
 		}

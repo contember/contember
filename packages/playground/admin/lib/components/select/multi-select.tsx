@@ -19,7 +19,7 @@ import { SelectDefaultFilter } from './filter'
 import { SelectListInner } from './list'
 import { MultiSelect, SelectDataView, SelectEachValue, SelectItemTrigger, SelectOption, SelectPlaceholder } from '@contember/react-select'
 import { CreateEntityDialog } from './create-new'
-import { DataViewUnionFilterFields } from '@contember/react-dataview'
+import { DataViewSortingDirections, DataViewUnionFilterFields } from '@contember/react-dataview'
 import { useFormFieldId } from '@contember/react-form'
 
 export type MultiSelectInputProps =
@@ -30,9 +30,10 @@ export type MultiSelectInputProps =
 		placeholder?: ReactNode
 		createNewForm?: ReactNode
 		queryField?: DataViewUnionFilterFields
-}
+		initialSorting?: DataViewSortingDirections
+	}
 
-export const MultiSelectInput = Component<MultiSelectInputProps>(({ field, queryField, options, children, placeholder, createNewForm }) => {
+export const MultiSelectInput = Component<MultiSelectInputProps>(({ field, queryField, options, children, placeholder, createNewForm, initialSorting }) => {
 	const id = useFormFieldId()
 	return (
 		<MultiSelect field={field} options={options}>
@@ -64,7 +65,7 @@ export const MultiSelectInput = Component<MultiSelectInputProps>(({ field, query
 
 					</SelectInputWrapperUI>
 					<SelectPopoverContent>
-						<SelectDataView queryField={queryField}>
+						<SelectDataView initialSorting={initialSorting} queryField={queryField}>
 							<SelectListInner filterToolbar={<SelectDefaultFilter />}>
 								<SelectOption>
 									<SelectItemTrigger>

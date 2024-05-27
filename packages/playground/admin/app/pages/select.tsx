@@ -13,7 +13,7 @@ export const hasOne = () => <>
 		</Slots.Actions>
 		<EntitySubTree entity={'SelectRoot(unique=unique)'} setOnCreate={'(unique=unique)'}>
 			<div className={'space-y-4'}>
-				<SelectField field={'hasOne'} label="Has one value">
+				<SelectField field={'hasOne'} label="Has one value" initialSorting={{ name: 'asc' }}>
 					<Field field={'name'} />
 				</SelectField>
 			</div>

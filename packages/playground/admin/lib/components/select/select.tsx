@@ -10,7 +10,7 @@ import { SelectListInner } from './list'
 import { Select, SelectDataView, SelectEachValue, SelectItemTrigger, SelectOption, SelectPlaceholder } from '@contember/react-select'
 import { CreateEntityDialog } from './create-new'
 import { SelectDefaultFilter } from './filter'
-import { DataViewUnionFilterFields } from '@contember/react-dataview'
+import { DataViewSortingDirections, DataViewUnionFilterFields } from '@contember/react-dataview'
 import { useFormFieldId } from '@contember/react-form'
 
 export type SelectInputProps =
@@ -21,10 +21,11 @@ export type SelectInputProps =
 		placeholder?: ReactNode
 		createNewForm?: ReactNode
 		queryField?: DataViewUnionFilterFields
+		initialSorting?: DataViewSortingDirections
 	}
 
 
-export const SelectInput = Component<SelectInputProps>(({ field, queryField, options, children, placeholder, createNewForm }) => {
+export const SelectInput = Component<SelectInputProps>(({ field, queryField, options, children, placeholder, createNewForm, initialSorting }) => {
 	const [open, setOpen] = React.useState(false)
 	const id = useFormFieldId()
 
@@ -55,7 +56,7 @@ export const SelectInput = Component<SelectInputProps>(({ field, queryField, opt
 						</SelectInputActionsUI>
 					</SelectInputWrapperUI>
 					<SelectPopoverContent>
-						<SelectDataView queryField={queryField}>
+						<SelectDataView initialSorting={initialSorting} queryField={queryField}>
 							<SelectListInner filterToolbar={<SelectDefaultFilter />}>
 								<SelectOption>
 									<SelectItemTrigger>

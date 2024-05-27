@@ -21,7 +21,7 @@ import { RepeaterSortable, RepeaterSortableDragOverlay, RepeaterSortableDropIndi
 import { Component, HasOne, SugaredQualifiedEntityList, SugaredRelativeEntityList, SugaredRelativeSingleEntity, SugaredRelativeSingleField } from '@contember/interface'
 import { SelectDataView, SelectItemTrigger, SelectOption, SelectPlaceholder, SortableMultiSelect } from '@contember/react-select'
 import { CreateEntityDialog } from './create-new'
-import { DataViewUnionFilterFields } from '@contember/react-dataview'
+import { DataViewSortingDirections, DataViewUnionFilterFields } from '@contember/react-dataview'
 import { SelectDefaultFilter } from './filter'
 import { useFormFieldId } from '@contember/react-form'
 
@@ -35,17 +35,18 @@ const MultiSortableSelectDropIndicator = ({ position }: { position: 'before' | '
 
 export type SortableMultiSelectInputProps =
 	& {
-	field: SugaredRelativeEntityList['field']
-	sortableBy: SugaredRelativeSingleField['field']
-	connectAt: SugaredRelativeSingleEntity['field']
-	children: ReactNode
-	options?: SugaredQualifiedEntityList['entities']
-	placeholder?: ReactNode
-	createNewForm?: ReactNode
-	queryField?: DataViewUnionFilterFields
-}
+		field: SugaredRelativeEntityList['field']
+		sortableBy: SugaredRelativeSingleField['field']
+		connectAt: SugaredRelativeSingleEntity['field']
+		children: ReactNode
+		options?: SugaredQualifiedEntityList['entities']
+		placeholder?: ReactNode
+		createNewForm?: ReactNode
+		queryField?: DataViewUnionFilterFields
+		initialSorting?: DataViewSortingDirections
+	}
 
-export const SortableMultiSelectInput = Component<SortableMultiSelectInputProps>(({ field, queryField, options, children, sortableBy, connectAt, placeholder, createNewForm }) => {
+export const SortableMultiSelectInput = Component<SortableMultiSelectInputProps>(({ field, queryField, options, children, sortableBy, connectAt, placeholder, createNewForm, initialSorting }) => {
 	const id = useFormFieldId()
 	return (
 		<SortableMultiSelect field={field} sortableBy={sortableBy} connectAt={connectAt} options={options}>
@@ -98,7 +99,7 @@ export const SortableMultiSelectInput = Component<SortableMultiSelectInputProps>
 					</SelectInputWrapperUI>
 
 					<SelectPopoverContent>
-						<SelectDataView queryField={queryField}>
+						<SelectDataView initialSorting={initialSorting} queryField={queryField}>
 							<SelectListInner filterToolbar={<SelectDefaultFilter />}>
 								<SelectOption>
 									<SelectItemTrigger>

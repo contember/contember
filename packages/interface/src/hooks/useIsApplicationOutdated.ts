@@ -17,7 +17,7 @@ export const useIsApplicationOutdated = ({ checkIntervalMs = defaultCheckInterva
 			return
 		}
 		const version = await fetchVersion()
-		if (version !== initialVersion || Math.random() < 0.3) {
+		if (version !== initialVersion) {
 			setIsOutdated(true)
 		}
 	}, [fetchVersion, initialVersion])

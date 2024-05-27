@@ -15,30 +15,37 @@ export type IfProps =
 export interface IfFilterProps {
 	condition: string | Filter
 	children?: ReactNode
+	then?: ReactNode
+	else?: ReactNode
 }
 
 export interface IfCallbackProps {
 	condition: (accessor: EntityAccessor) => boolean
 	children?: ReactNode
+	then?: ReactNode
+	else?: ReactNode
 }
 
 /**
  * @group Logic Components
  */
-export const If = Component<IfProps>(props => {
-		return typeof props.condition !== 'function'
-			? <IfFilter condition={props.condition}>{props.children}</IfFilter>
-			: <IfCallback condition={props.condition}>{props.children}</IfCallback>
+export const If = Component<IfProps>(({ condition, ...props }) => {
+		if (props.children && props.then) {
+			throw new Error('If component cannot have both children and then prop')
+		}
+		return typeof condition !== 'function'
+			? <IfFilter condition={condition} {...props} />
+			: <IfCallback condition={condition} {...props} />
 	},
 	'If',
 )
 
 const IfCallback = Component<IfCallbackProps>(
-	({ children, condition }) => {
+	({ children, condition, then, else: elseIn }) => {
 		const entity = useEntity()
 		const evaluated = useMemo(() => condition(entity), [condition, entity])
 
-		return evaluated ? <>{children}</> : null
+		return <>{evaluated ? (children ?? then) : elseIn}</>
 	},
 	({ children }) => {
 		return <>{children}</>
@@ -47,7 +54,7 @@ const IfCallback = Component<IfCallbackProps>(
 )
 
 const IfFilter = Component<IfFilterProps>(
-	({ children, condition }) => {
+	({ children, condition, then, else: elseIn }) => {
 		const env = useEnvironment()
 		const entity = useEntity()
 
@@ -56,8 +63,7 @@ const IfFilter = Component<IfFilterProps>(
 			() => new FilterEvaluator(schema).evaluateFilter(entity, QueryLanguage.desugarFilter(condition, env)),
 			[condition, entity, env, schema],
 		)
-
-		return evaluated ? <>{children}</> : null
+		return <>{evaluated ? (children ?? then) : elseIn}</>
 	},
 	({ children, condition }, env) => {
 		const desugaredFilter = QueryLanguage.desugarFilter(condition, env)
@@ -71,4 +77,3 @@ const IfFilter = Component<IfFilterProps>(
 	},
 	'IfFilter',
 )
-

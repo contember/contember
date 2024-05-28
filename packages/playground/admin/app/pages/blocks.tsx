@@ -6,7 +6,7 @@ import { DefaultBlockRepeater } from '../../lib/components/block-repeater'
 import { ImageField, InputField, RadioEnumField, TextareaField } from '../../lib/components/form'
 import { UploadedImageView } from '../../lib/components/upload'
 import { Block } from '@contember/react-block-repeater'
-import { AlertOctagonIcon, ImageIcon, TextIcon } from 'lucide-react'
+import { AlertOctagonIcon, ColumnsIcon, ImageIcon, TextIcon } from 'lucide-react'
 import { cn } from '../../lib/utils/cn'
 
 export default () => <>
@@ -64,7 +64,7 @@ export default () => <>
 				/>
 				<Block
 					name="textWithImage"
-					label={<><span className="inline-flex gap-1"><ImageIcon /> <TextIcon /></span> Image with text</>}
+					label={<><ColumnsIcon /> Image with text</>}
 					form={<>
 						<InputField field={'title'} label={'Title'} />
 						<TextareaField field={'content'} label={'Content'} />

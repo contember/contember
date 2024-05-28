@@ -32,8 +32,8 @@ export const useCreateRepeaterMethods = ({ accessor, sortableBy }: {
 				}
 			})()
 			entities.createNewEntity((getEntity, options) => {
-				const newSorted = sortedEntities.splice(resolvedIndex, 0, getEntity())
-				repairEntitiesOrder(sortableBy, newSorted)
+				sortedEntities.splice(resolvedIndex, 0, getEntity())
+				repairEntitiesOrder(sortableBy, sortedEntities)
 				preprocess?.(getEntity, options)
 			})
 		},
@@ -71,8 +71,8 @@ export const useCreateRepeaterMethods = ({ accessor, sortableBy }: {
 				const sortedEntities = sortEntities(Array.from(entities), sortableBy)
 				const currentIndex = sortedEntities.findIndex(it => it.id === entity.id)
 				if (currentIndex !== -1) {
-					const newSorted = sortedEntities.splice(currentIndex, 1)
-					repairEntitiesOrder(sortableBy, newSorted)
+					sortedEntities.splice(currentIndex, 1)
+					repairEntitiesOrder(sortableBy, sortedEntities)
 				}
 			}
 			entity.deleteEntity()

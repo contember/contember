@@ -1,24 +1,26 @@
 import { Component, DeleteEntityTrigger, PersistTrigger, StaticRender, useEntity } from '@contember/interface'
 import { RepeaterSortable, RepeaterSortableDragOverlay, RepeaterSortableEachItem, RepeaterSortableItemActivator, RepeaterSortableItemNode } from '@contember/react-repeater-dnd-kit'
-import { GripVerticalIcon, TrashIcon } from 'lucide-react'
+import { GripVerticalIcon, PlusCircleIcon, TrashIcon } from 'lucide-react'
 import { Button } from './ui/button'
 import { uic } from '../utils/uic'
 import { Sheet, SheetClose, SheetContent, SheetFooter, SheetHeader, SheetTitle } from './ui/sheet'
 import { BlockRepeater, BlockRepeaterAddItemTrigger, BlockRepeaterProps, useBlockRepeaterConfig, useBlockRepeaterCurrentBlock } from '@contember/react-block-repeater'
 import { RepeaterDropIndicator, RepeaterRemoveItemButton } from './repeater'
-import { RepeaterEmpty } from '@contember/react-repeater'
+import { RepeaterAddItemIndex, RepeaterEmpty } from '@contember/react-repeater'
 import { dict } from '../dict'
 import { FeedbackTrigger } from './binding'
 import { createRequiredContext } from '@contember/react-utils'
-import { useId, useState } from 'react'
+import { useEffect, useId, useState } from 'react'
 import { Label } from './ui/label'
 import { Switch } from './ui/switch'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown'
+import { cn } from '../utils/cn'
 
 export const BlockRepeaterItemsWrapperUI = uic('div', {
-	baseClass: 'rounded border border-gray-300 p-4 flex flex-col',
+	baseClass: 'rounded border border-gray-300 px-4 py-8 flex flex-col',
 })
 export const BlockRepeaterItemUI = uic('div', {
-	baseClass: ' relative border-b transition-all group',
+	baseClass: 'relative border-t transition-all group',
 })
 export const BlockRepeaterDragOverlayUI = uic('div', {
 	baseClass: 'rounded border border-gray-300 p-4 relative bg-opacity-60 bg-gray-100 backdrop-blur-sm',
@@ -46,7 +48,7 @@ export const DefaultBlockRepeater = Component<DefaultBlockRepeaterProps>(({ chil
 			</StaticRender>
 			<BlockRepeaterEditModeContext.Provider value={editMode}>
 				<ToggleEditMode setEditMode={setEditMode} editMode={editMode} />
-				<BlockRepeaterSortable />
+				<BlockRepeaterSortable sortableBy={props.sortableBy} />
 				<div className="mt-4">
 					<BlockRepeaterAddButtons />
 				</div>
@@ -72,7 +74,7 @@ const ToggleEditMode = ({ setEditMode, editMode }: { setEditMode: (value: boolea
 	)
 }
 
-export const BlockRepeaterSortable = Component(() => {
+export const BlockRepeaterSortable = Component<{ sortableBy: DefaultBlockRepeaterProps['sortableBy'] }>(({ sortableBy }) => {
 	return (
 		<RepeaterSortable>
 			<BlockRepeaterItemsWrapperUI>
@@ -82,7 +84,7 @@ export const BlockRepeaterSortable = Component(() => {
 					</div>
 				</RepeaterEmpty>
 				<RepeaterSortableEachItem>
-					<div>
+					<div className="relative">
 						<RepeaterDropIndicator position={'before'} />
 						<RepeaterSortableItemNode>
 							<BlockRepeaterItemUI>
@@ -93,6 +95,7 @@ export const BlockRepeaterSortable = Component(() => {
 							</BlockRepeaterItemUI>
 						</RepeaterSortableItemNode>
 						<RepeaterDropIndicator position={'after'} />
+						<BlockRepeaterAddItemBefore sortableBy={sortableBy} />
 					</div>
 				</RepeaterSortableEachItem>
 
@@ -107,13 +110,13 @@ export const BlockRepeaterSortable = Component(() => {
 	)
 })
 
-export const BlockRepeaterAddButtons = () => {
+export const BlockRepeaterAddButtons = ({ index }: { index?: RepeaterAddItemIndex }) => {
 	const { blocks } = useBlockRepeaterConfig()
 	return (
 		<div className="grid grid-cols-[repeat(auto-fill,minmax(110px,1fr))] gap-2">
 			{Object.values(blocks).map(it => (
-				<BlockRepeaterAddItemTrigger key={it.name} type={it.name}>
-					<Button size="lg" variant="outline" className="aspect-square flex-col h-auto gap-2 p-2">
+				<BlockRepeaterAddItemTrigger key={it.name} type={it.name} index={index}>
+					<Button size="lg" variant="outline" className="aspect-square flex-col h-auto gap-2 p-2" onClick={e => e.stopPropagation()}>
 						{it.label || it.name}
 					</Button>
 				</BlockRepeaterAddItemTrigger>
@@ -149,6 +152,34 @@ export const BlockRepeaterContent = () => {
 	</>
 }
 
+
+
+const BlockRepeaterAddItemBefore = ({ sortableBy }: { sortableBy: DefaultBlockRepeaterProps['sortableBy'] }) => {
+	const entity = useEntity()
+	const order = sortableBy ? entity.getField<number>(sortableBy).value : null
+	const { blocks } = useBlockRepeaterConfig()
+	if (order === null) {
+		return null
+	}
+	return (
+		<DropdownMenu>
+			<DropdownMenuTrigger asChild>
+				<Button className="absolute top-0 right-1/2 -translate-x-1/2 -translate-y-1/2 bg-white" variant="ghost">
+					<PlusCircleIcon className="w-4 h-4  opacity-25 hover:opacity-100 transition-opacity" />
+				</Button>
+			</DropdownMenuTrigger>
+			<DropdownMenuContent>
+				{Object.values(blocks).map(it => (
+					<BlockRepeaterAddItemTrigger key={it.name} type={it.name} index={order}>
+						<DropdownMenuItem className="gap-2">
+							{it.label || it.name}
+						</DropdownMenuItem>
+					</BlockRepeaterAddItemTrigger>
+				))}
+			</DropdownMenuContent>
+		</DropdownMenu>
+	)
+}
 
 const BlockRepeaterEditSheetInner = ({ open, setOpen }: { open: boolean, setOpen: (value: boolean) => void }) => {
 	const block = useBlockRepeaterCurrentBlock()

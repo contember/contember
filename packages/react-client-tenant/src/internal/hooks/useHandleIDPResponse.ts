@@ -15,7 +15,7 @@ export interface UseHandleIDPResponseProps {
 }
 
 const headers = {
-	'X-Contember-Token-Path': 'data.signInIDP.result.token',
+	'X-Contember-Token-Path': 'data.mutation.result.token',
 }
 
 const DEFAULT_LOGIN_EXPIRATION = 14 * 24 * 3600 // 14 days

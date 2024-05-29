@@ -38,7 +38,7 @@ export interface LoginFormProps {
 export const useLoginForm = useForm as () => LoginFormContextValue
 
 const headers = {
-	'X-Contember-Token-Path': 'data.signIn.result.token',
+	'X-Contember-Token-Path': 'data.mutation.result.token',
 }
 
 const DEFAULT_LOGIN_EXPIRATION = 14 * 24 * 3600 // 14 days

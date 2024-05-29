@@ -1,50 +1,56 @@
-import { SyntheticEvent, useCallback, useState } from 'react'
-import { ToastContent, useShowToast } from '../ui/toast'
-import { StandaloneFormContainer } from '../form'
-import { Input } from '../ui/input'
 import { Button } from '../ui/button'
 import { useSessionTokenWithMeta, useSetSessionToken } from '@contember/react-client'
-import * as TenantApi from '@contember/graphql-client-tenant'
-import { useTenantApi } from '@contember/react-client-tenant'
+import { CreateSessionTokenForm, useCreateSessionTokenForm } from '@contember/react-client-tenant'
+import { Loader } from '../ui/loader'
+import { TenantFormError, TenantFormField } from '../tenant/common'
 
 export const LoginWithEmail = () => {
-	const [email, setEmail] = useState('')
 	const sessionToken = useSessionTokenWithMeta()
-	const addToast = useShowToast()
-	const [isSubmitting, setSubmitting] = useState(false)
 	const setSessionToken = useSetSessionToken()
-	const api = useTenantApi()
-
-	const submit = useCallback(async (e: SyntheticEvent) => {
-		e.preventDefault()
-
-		setSubmitting(true)
-		const response = await api(TenantApi.mutation$.createSessionToken(TenantApi.createSessionTokenResponse$$.error(TenantApi.createSessionTokenError$$).result(TenantApi.createSessionTokenResult$$)), {
-			variables: {
-				email,
-			},
-			apiToken: sessionToken.propsToken,
-		})
-		setSubmitting(false)
-
-		if (!response.createSessionToken?.ok) {
-			switch (response.createSessionToken?.error?.code) {
-				case 'UNKNOWN_EMAIL':
-					return addToast(<ToastContent title="Person with given email not found." />, { type: 'error' })
-			}
-		} else {
-			setSessionToken(response.createSessionToken.result!.token)
-		}
-	}, [addToast, api, email, sessionToken.propsToken, setSessionToken])
 
 	return <>
-		<form onSubmit={submit}>
-			<div>
-				<StandaloneFormContainer label={'E-mail'}>
-					<Input value={email} onChange={e => setEmail(e.target.value)} />
-				</StandaloneFormContainer>
-				<Button type="submit" disabled={isSubmitting}>Login</Button>
-			</div>
-		</form>
+		<CreateSessionTokenForm
+			expiration={3600 * 24 * 7}
+			apiToken={sessionToken.propsToken}
+			onSuccess={it => {
+				setSessionToken(it.result.token)
+			}}>
+			<form>
+				<CreateSessionTokenFormFields />
+			</form>
+		</CreateSessionTokenForm>
 	</>
+}
+
+
+const CreateSessionTokenFormFields = () => {
+	const form = useCreateSessionTokenForm()
+
+	const messages = {
+		FIELD_REQUIRED: 'This field is required',
+		UNKNOWN_ERROR: 'An unknown error occurred',
+		PERSON_DISABLED: 'Person is disabled',
+		UNKNOWN_EMAIL: 'Person with given email not found',
+		UNKNOWN_PERSON_ID: 'Person with given ID not found',
+	}
+	return (
+		<div className="relative flex flex-col gap-2">
+			{form.state === 'submitting' ? <Loader position="absolute" /> : null}
+
+			<TenantFormError
+				form={form} messages={messages}
+			/>
+
+			<TenantFormField
+				form={form} messages={messages} field="email"
+				type="text" required autoFocus
+			>
+				E-mail
+			</TenantFormField>
+
+			<Button type="submit" className="w-full" disabled={form.state === 'submitting'}>
+				Login
+			</Button>
+		</div>
+	)
 }

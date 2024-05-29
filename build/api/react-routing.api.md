@@ -274,6 +274,14 @@ export class RoutingParameter {
 export type RoutingParameterResolver = (name: string) => RequestParameterValue | undefined;
 
 // @public (undocumented)
+export const RoutingProvider: ({ children, ...props }: RoutingProviderProps) => JSX_2.Element;
+
+// @public (undocumented)
+export type RoutingProviderProps = Partial<RoutingContextValue> & {
+    children: ReactNode;
+};
+
+// @public (undocumented)
 export interface SelectedDimension {
     // (undocumented)
     [key: string]: string[];

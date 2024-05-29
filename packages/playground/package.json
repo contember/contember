@@ -4,10 +4,10 @@
 	"type": "module",
 	"private": true,
 	"scripts": {
-		"build": "vite build --config vite.config.ts --base /playground/",
+		"build": "vite build admin",
 		"contember": "docker-compose run contember-cli",
-		"deploy": "yarn -- contember deploy playground --admin http://admin-server:4000 --yes",
-		"start": "vite --config vite.config.ts --port ${VITE_PORT:-3000} --host 0.0.0.0",
+		"deploy": "yarn run build \"$0\" && docker-compose run --no-deps contember-cli deploy \"$@\" --root ",
+		"start": "vite dev admin --port ${VITE_PORT:-3000} --host 0.0.0.0",
 		"test": "vitest --root ./ --environment jsdom"
 	},
 	"devDependencies": {

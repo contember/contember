@@ -3,7 +3,7 @@ import { HomeIcon } from 'lucide-react'
 
 export default <>
 
-	<div className={'flex flex-col gap-2 items-start'}>
+	<div className={'flex flex-col gap-2 items-start h-screen'}>
 		<h2 className={'text-2xl'}>Button variants</h2>
 		<Button>Default button</Button>
 		<Button variant={'outline'}>Outline button</Button>

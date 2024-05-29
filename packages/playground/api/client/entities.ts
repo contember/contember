@@ -1,5 +1,6 @@
 import type { BlockType } from './enums'
 import type { BoardTaskStatus } from './enums'
+import type { EditorReferenceType } from './enums'
 import type { GridArticleState } from './enums'
 import type { InputUnique } from './enums'
 import type { SelectUnique } from './enums'
@@ -8,6 +9,7 @@ import type { UploadOne } from './enums'
 import type { BlockImagePosition } from './enums'
 import type { BlockListUnique } from './enums'
 import type { DimensionsItemUnique } from './enums'
+import type { EditorContentUnique } from './enums'
 import type { InputRootEnumValue } from './enums'
 
 export type JSONPrimitive = string | number | boolean | null
@@ -15,6 +17,22 @@ export type JSONValue = JSONPrimitive | JSONObject | JSONArray
 export type JSONObject = { readonly [K in string]?: JSONValue }
 export type JSONArray = readonly JSONValue[]
 
+export type AclBranch <OverRelation extends string | never = never> = {
+	name: 'AclBranch'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+		| Omit<{ code: string}, OverRelation>
+	columns: {
+		id: string
+		code: string
+	}
+	hasOne: {
+	}
+	hasMany: {
+	}
+	hasManyBy: {
+	}
+}
 export type Block <OverRelation extends string | never = never> = {
 	name: 'Block'
 	unique:
@@ -177,6 +195,73 @@ export type DimensionsLocale <OverRelation extends string | never = never> = {
 		label: string
 	}
 	hasOne: {
+	}
+	hasMany: {
+	}
+	hasManyBy: {
+	}
+}
+export type EditorContent <OverRelation extends string | never = never> = {
+	name: 'EditorContent'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+		| Omit<{ unique: EditorContentUnique}, OverRelation>
+		| Omit<{ references: EditorReference['unique']}, OverRelation>
+	columns: {
+		id: string
+		unique: EditorContentUnique
+		data: JSONValue
+	}
+	hasOne: {
+	}
+	hasMany: {
+		references: EditorReference<'content'>
+	}
+	hasManyBy: {
+	}
+}
+export type EditorImage <OverRelation extends string | never = never> = {
+	name: 'EditorImage'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+	columns: {
+		id: string
+		url: string
+	}
+	hasOne: {
+	}
+	hasMany: {
+	}
+	hasManyBy: {
+	}
+}
+export type EditorLink <OverRelation extends string | never = never> = {
+	name: 'EditorLink'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+	columns: {
+		id: string
+		url: string
+	}
+	hasOne: {
+	}
+	hasMany: {
+	}
+	hasManyBy: {
+	}
+}
+export type EditorReference <OverRelation extends string | never = never> = {
+	name: 'EditorReference'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+	columns: {
+		id: string
+		type: EditorReferenceType
+	}
+	hasOne: {
+		content: EditorContent
+		image: EditorImage
+		link: EditorLink
 	}
 	hasMany: {
 	}
@@ -659,6 +744,7 @@ export type UploadVideo <OverRelation extends string | never = never> = {
 }
 
 export type ContemberClientEntities = {
+	AclBranch: AclBranch
 	Block: Block
 	BlockImage: BlockImage
 	BlockList: BlockList
@@ -668,6 +754,10 @@ export type ContemberClientEntities = {
 	DimensionsItem: DimensionsItem
 	DimensionsItemLocale: DimensionsItemLocale
 	DimensionsLocale: DimensionsLocale
+	EditorContent: EditorContent
+	EditorImage: EditorImage
+	EditorLink: EditorLink
+	EditorReference: EditorReference
 	GridArticle: GridArticle
 	GridArticleComment: GridArticleComment
 	GridAuthor: GridAuthor

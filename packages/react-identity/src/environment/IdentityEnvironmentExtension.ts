@@ -1,5 +1,5 @@
 import { BindingError, Environment } from '@contember/react-binding'
-import { Identity } from '../types'
+import { Identity } from '@contember/react-client-tenant'
 
 export const identityEnvironmentExtension = Environment.createExtension((state: Identity | null | undefined) => {
 	if (state === undefined) {

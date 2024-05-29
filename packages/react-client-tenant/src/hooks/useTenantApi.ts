@@ -1,16 +1,24 @@
-import { useTenantGraphQlClient } from '@contember/react-client'
+import { useLoginToken, useTenantGraphQlClient } from '@contember/react-client'
 import { useCallback } from 'react'
 import { Fetcher, TextWriter, util } from 'graphql-ts-client-api'
 
-export const useTenantApi = () => {
+export const LoginToken = Symbol('LoginToken')
+
+export type TenantApiOptions = {
+	readonly headers?: Record<string, string>
+	readonly apiToken?: string | typeof LoginToken
+}
+
+export const useTenantApi = ({ headers, apiToken }: TenantApiOptions = {}) => {
 	const client = useTenantGraphQlClient()
+	const loginToken = useLoginToken()
 
 	return useCallback(<TData extends object, TVariables extends object>(
 		fetcher: Fetcher<'Query' | 'Mutation', TData, TVariables>,
 		options?: {
 			readonly variables?: TVariables
 			readonly headers?: Record<string, string>
-			readonly apiToken?: string
+			readonly apiToken?: string | typeof LoginToken
 		},
 	): Promise<TData> => {
 
@@ -27,10 +35,14 @@ export const useTenantApi = () => {
 		writer.text(fetcher.toString())
 		writer.text(fetcher.toFragmentString())
 
+		const apiTokenResolved = apiToken ?? options?.apiToken
 		return client.execute(writer.toString(), {
 			variables: options?.variables,
-			headers: options?.headers,
-			apiToken: options?.apiToken,
+			headers: {
+				...headers,
+				...options?.headers,
+			},
+			apiToken: apiTokenResolved === LoginToken ? loginToken : apiTokenResolved,
 		})
-	}, [client])
+	}, [apiToken, client, headers, loginToken])
 }

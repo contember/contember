@@ -193,6 +193,7 @@ export const dict = {
 			email: 'Email',
 			password: 'Password',
 			otpToken: 'OTP token',
+			forgotPassword: 'Forgot password?',
 			login: 'Login',
 			errorMessages: {
 				'FIELD_REQUIRED': 'This field is required',
@@ -205,6 +206,11 @@ export const dict = {
 				'UNKNOWN_EMAIL': 'Unknown email',
 				'OTP_REQUIRED': undefined,
 			} satisfies Record<LoginFormErrorCode, string | undefined>,
+			idpInitError: 'Failed to initialize IdP login:',
+			idpResponseError: 'Failed to process IdP response:',
+			title: 'Login',
+			description: 'Enter your email below to login to your account',
+			backToLogin: 'Back to login',
 		},
 		personList: {
 			email: 'Email',
@@ -268,6 +274,9 @@ export const dict = {
 				'TOKEN_NOT_FOUND': 'Token not found',
 				'TOKEN_USED': 'Token already used',
 			} satisfies Record<PasswordResetFormErrorCode, string>,
+			title: 'Reset password',
+			description: 'Enter new password below',
+			success: 'Password has been reset',
 		},
 		passwordResetRequest: {
 			email: 'Email',
@@ -278,6 +287,11 @@ export const dict = {
 				'UNKNOWN_ERROR': 'Something went wrong. Please try again later',
 				'PERSON_NOT_FOUND': 'Unknown email',
 			} satisfies Record<PasswordResetRequestFormErrorCode, string>,
+			title: 'Reset password',
+			description: 'Enter your email below to reset your password',
+			success: 'Password reset link has been sent',
+			checkMail: 'Please check your mailbox for instructions on how to reset your password.',
+			entryCode: 'Or enter the reset code directly.',
 		},
 		updateProjectMember: {
 			updateSuccess: 'Roles updated',

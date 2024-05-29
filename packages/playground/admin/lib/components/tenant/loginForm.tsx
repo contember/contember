@@ -3,6 +3,7 @@ import { Button } from '../ui/button'
 import { Loader } from '../ui/loader'
 import { TenantFormError, TenantFormField } from './common'
 import { dict } from '../../dict'
+import { Link } from '@contember/interface'
 
 export const LoginFormFields = () => {
 	const form = useLoginForm()
@@ -17,21 +18,26 @@ export const LoginFormFields = () => {
 
 			<TenantFormField
 				form={form} messages={dict.tenant.login.errorMessages} field="email"
-				type="email" required autoFocus={form.state === 'initial'} readOnly={form.state === 'otp-required'} placeholder="me@example.com"
+				type="email" required autoFocus={form.state === 'initial'} readOnly={form.state === 'otp-required'} placeholder="me@example.com" autoComplete="email"
 			>
 				{dict.tenant.login.email}
 			</TenantFormField>
 
 			<TenantFormField
-				form={form} messages={dict.tenant.login.errorMessages} field="password"
+				form={form} messages={dict.tenant.login.errorMessages} field="password" autoComplete="current-password"
 				type="password" required readOnly={form.state === 'otp-required'}
 			>
 				{dict.tenant.login.password}
+				<Link to="resetRequest">
+					<a className="float-end underline text-gray-600 text-sm font-normal">
+						{dict.tenant.login.forgotPassword}
+					</a>
+				</Link>
 			</TenantFormField>
 
 			{(form.state === 'otp-required' || fieldErrors.includes('otpToken')) && (
 				<TenantFormField
-					form={form} messages={dict.tenant.login.errorMessages} field="otpToken"
+					form={form} messages={dict.tenant.login.errorMessages} field="otpToken" autoComplete="one-time-code"
 					type="text" required autoFocus maxLength={6}
 				>
 					{dict.tenant.login.otpToken}

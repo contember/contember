@@ -1,4 +1,4 @@
-import { PasswordResetFormErrorCode, usePasswordResetForm } from '@contember/react-identity'
+import { usePasswordResetForm } from '@contember/react-identity'
 import { Button } from '../ui/button'
 import { Loader } from '../ui/loader'
 import { TenantFormError, TenantFormField } from './common'
@@ -17,21 +17,21 @@ export const PasswordResetFormFields = ({ hasToken }: { hasToken?: boolean }) =>
 
 			<TenantFormField
 				form={form} messages={dict.tenant.passwordReset.errorMessages} field="token"
-				type="text" required readOnly={hasToken}
+				type="text" required readOnly={hasToken} autoComplete="off"
 			>
 				{dict.tenant.passwordReset.token}
 			</TenantFormField>
 
 			<TenantFormField
 				form={form} messages={dict.tenant.passwordReset.errorMessages} field="password"
-				type="password" required autoFocus
+				type="password" required autoFocus autoComplete="new-password"
 			>
 				{dict.tenant.passwordReset.password}
 			</TenantFormField>
 
 			<TenantFormField
 				form={form} messages={dict.tenant.passwordReset.errorMessages} field="passwordConfirmation"
-				type="password" required
+				type="password" required autoComplete="new-password"
 			>
 				{dict.tenant.passwordReset.passwordConfirmation}
 			</TenantFormField>

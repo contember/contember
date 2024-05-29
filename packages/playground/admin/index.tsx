@@ -15,38 +15,51 @@ import { ToastContent, Toaster, useShowToast } from './lib/components/ui/toast'
 import { Loader } from './lib/components/ui/loader'
 import { Overlay } from './lib/components/ui/overlay'
 import { useEffect } from 'react'
+import { dict } from './lib/dict'
 
 const errorHandler = createErrorHandler((dom, react, onRecoverableError) => createRoot(dom, { onRecoverableError }).render(react))
 
 const rootEl = document.body.appendChild(document.createElement('div'))
 
+const Idps = {
+	google: 'Login with Google',
+}
+
+const hasTokenFromEnv = import.meta.env.VITE_CONTEMBER_ADMIN_SESSION_TOKEN !== '__SESSION_TOKEN__'
+const appUrl = '/app'
+
 const Login = () => {
 	const showToast = useShowToast()
 	return <>
 		<IDP
-			onInitError={error => showToast(<ToastContent>Failed to initialize IdP login: {error}</ToastContent>, { type: 'error' })}
-			onResponseError={error => showToast(<ToastContent>Failed to process IdP response: {error}</ToastContent>, { type: 'error' })}
+			onInitError={error => showToast(<ToastContent>{dict.tenant.login.idpInitError} {error}</ToastContent>, { type: 'error' })}
+			onResponseError={error => showToast(<ToastContent>{dict.tenant.login.idpResponseError} {error}</ToastContent>, { type: 'error' })}
 		>
 
 			<Card className="w-96 relative">
 				<CardHeader>
-					<CardTitle className="text-2xl">Login</CardTitle>
+					<CardTitle className="text-2xl">{dict.tenant.login.title}</CardTitle>
 					<CardDescription>
-						Enter your email below to login to your account
+						{dict.tenant.login.description}
 					</CardDescription>
 				</CardHeader>
 				<CardContent>
+					{hasTokenFromEnv && <AnchorButton href={appUrl} size="lg" className="w-full" variant="destructive">
+						Continue as default user
+					</AnchorButton>}
 					<LoginForm>
 						<form className="grid gap-4">
 							<LoginFormFields />
 						</form>
 					</LoginForm>
 
-					<IDPInitTrigger identityProvider="google">
-						<Button variant="outline" className="w-full">
-							Login with Google
-						</Button>
-					</IDPInitTrigger>
+					{Object.entries(Idps).map(([idp, label]) => (
+						<IDPInitTrigger key={idp} identityProvider={idp}>
+							<Button variant="outline" className="w-full">
+								{label}
+							</Button>
+						</IDPInitTrigger>
+					))}
 				</CardContent>
 				<IDPState state={['processing_init', 'processing_response', 'success']}>
 					<Loader />
@@ -60,8 +73,8 @@ const LoggedIn = () => {
 	const identity = useIdentity()
 	useEffect(() => {
 		setTimeout(() => {
-			window.location.href = '/app/'
-		}, 2000)
+			window.location.href = appUrl
+		}, 500)
 	}, [])
 
 	return (
@@ -111,9 +124,9 @@ const PasswordResetRequestPage = () => {
 	return (
 		<Card className="w-96">
 			<CardHeader>
-				<CardTitle className="text-2xl">Password reset request</CardTitle>
+				<CardTitle className="text-2xl">{dict.tenant.passwordResetRequest.title}</CardTitle>
 				<CardDescription>
-					Enter your email below to reset your password
+					{dict.tenant.passwordResetRequest.description}
 				</CardDescription>
 			</CardHeader>
 			<CardContent>
@@ -126,7 +139,7 @@ const PasswordResetRequestPage = () => {
 			<CardFooter>
 				<Link to="index">
 					<AnchorButton variant="link" className="ml-auto">
-						Back to login
+						{dict.tenant.login.backToLogin}
 					</AnchorButton>
 				</Link>
 			</CardFooter>
@@ -142,14 +155,16 @@ const PasswordResetPage = () => {
 	return (
 		<Card className="w-96">
 			<CardHeader>
-				<CardTitle className="text-2xl">Password reset</CardTitle>
+				<CardTitle className="text-2xl">{dict.tenant.passwordReset.title}</CardTitle>
 				<CardDescription>
-					Enter new password
+					{dict.tenant.passwordReset.description}
 				</CardDescription>
 			</CardHeader>
 			<CardContent>
 				<PasswordResetForm onSuccess={() => {
-					showToast(<ToastContent>Password has been reset</ToastContent>, { type: 'success' })
+					showToast(<ToastContent>
+						Password has been reset
+					</ToastContent>, { type: 'success' })
 					redirect('index')
 				}} token={token}>
 					<form>
@@ -160,7 +175,7 @@ const PasswordResetPage = () => {
 			<CardFooter>
 				<Link to="index">
 					<AnchorButton variant="link" className="ml-auto">
-						Back to login
+						{dict.tenant.login.backToLogin}
 					</AnchorButton>
 				</Link>
 			</CardFooter>
@@ -171,26 +186,26 @@ const PasswordResetPage = () => {
 const PasswordResetRequestSuccessPage = () => (
 	<Card className="w-96">
 		<CardHeader>
-			<CardTitle className="text-2xl">Password reset request</CardTitle>
+			<CardTitle className="text-2xl">{dict.tenant.passwordResetRequest.title}</CardTitle>
 			<CardDescription>
-				Password reset link has been sent
+				{dict.tenant.passwordResetRequest.description}
 			</CardDescription>
 		</CardHeader>
 		<CardContent>
 			<div className="flex flex-col items-center justify-center gap-4">
 				<MailIcon className="text-gray-300 w-16 h-16" />
 				<div className="text-center">
-					Please check you mailbox for instructions on how to reset your password.
+					An email with password reset instructions has been sent to your email address.
 				</div>
 				<div className="text-center text-gray-500">
-					Or <Link to="passwordReset"><a className="underline">entry password reset code</a></Link> directly.
+					<Link to="passwordReset"><a className="underline">{dict.tenant.passwordResetRequest.entryCode}</a></Link>
 				</div>
 			</div>
 		</CardContent>
 		<CardFooter>
 			<Link to="index">
 				<AnchorButton variant="link" className="ml-auto">
-					Back to login
+					{dict.tenant.login.backToLogin}
 				</AnchorButton>
 			</Link>
 		</CardFooter>
@@ -204,7 +219,8 @@ const Layout = ({ children }: { children?: React.ReactNode }) => (
 		</div>
 		<div className="bg-gray-700 text-white p-4 flex items-center justify-center">
 			<div className="w-full max-w-md">
-				<div className="text-center text-2xl"></div>
+				<div className="text-center text-2xl">Welcome to your app</div>
+				<p className="mt-8 text-center text-gray-300">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec auctor, sem eget ultricies ultricies, sapien urna tristique eros, ac tincidunt felis lacus nec nunc.</p>
 			</div>
 		</div>
 	</div>
@@ -225,8 +241,6 @@ errorHandler(onRecoverableError => createRoot(rootEl, { onRecoverableError }).re
 						resetRequest: PasswordResetRequestPage,
 						resetRequestSuccess: PasswordResetRequestSuccessPage,
 						passwordReset: PasswordResetPage,
-						passwordResetSuccess: <div>password reset success</div>,
-
 					}}
 				/>
 			</Toaster>

@@ -17,7 +17,7 @@ export const PasswordResetRequestFormFields = () => {
 
 			<TenantFormField
 				form={form} messages={dict.tenant.passwordResetRequest.errorMessages} field="email"
-				type="email" required autoFocus
+				type="email" required autoFocus autoComplete="email"
 			>
 				{dict.tenant.passwordResetRequest.email}
 			</TenantFormField>

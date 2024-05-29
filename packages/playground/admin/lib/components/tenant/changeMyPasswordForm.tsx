@@ -15,19 +15,19 @@ export const ChangeMyPasswordFormFields = () => {
 			/>
 			<TenantFormField
 				form={form} messages={dict.tenant.changePassword.errorMessages} field="currentPassword"
-				type="password" required autoFocus
+				type="password" required autoFocus autoComplete="current-password"
 			>
 				{dict.tenant.changePassword.currentPassword}
 			</TenantFormField>
 			<TenantFormField
 				form={form} messages={dict.tenant.changePassword.errorMessages} field="newPassword"
-				type="password" required
+				type="password" required autoComplete="new-password"
 			>
 				{dict.tenant.changePassword.newPassword}
 			</TenantFormField>
 			<TenantFormField
 				form={form} messages={dict.tenant.changePassword.errorMessages} field="passwordConfirmation"
-				type="password" required
+				type="password" required autoComplete="new-password"
 			>
 				{dict.tenant.changePassword.confirmPassword}
 			</TenantFormField>

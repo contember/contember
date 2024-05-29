@@ -254,11 +254,16 @@ export class ContentEntitySelection {
     // @internal
     constructor(
     context: ContentEntitySelectionContext<string>,
-    selectionSet: GraphQlSelectionSet);
+    selectionSet: GraphQlSelectionSet,
+    transformFn?: ((value: any, ctx: ContentTransformContext) => any) | undefined);
     // @internal (undocumented)
     readonly context: ContentEntitySelectionContext<string>;
     // @internal (undocumented)
     readonly selectionSet: GraphQlSelectionSet;
+    // (undocumented)
+    transform(transform: (value: any, context: ContentTransformContext) => any): ContentEntitySelection;
+    // @internal (undocumented)
+    readonly transformFn?: ((value: any, ctx: ContentTransformContext) => any) | undefined;
 }
 
 // @public (undocumented)
@@ -322,6 +327,11 @@ export class ContentQueryBuilder {
     // (undocumented)
     upsert(name: string, args: Input.UpsertInput, fields?: EntitySelectionOrCallback): ContentMutation<MutationResult>;
 }
+
+// @public (undocumented)
+export type ContentTransformContext = {
+    rootValue: unknown;
+};
 
 // @public (undocumented)
 export type EntitySelectionAnyArgs = EntitySelectionColumnArgs | EntitySelectionManyArgs | EntitySelectionManyByArgs | EntitySelectionOneArgs;
@@ -506,6 +516,8 @@ export interface TypedEntitySelection<TSchema extends SchemaTypeLike, TEntityNam
     }>;
     // @internal (undocumented)
     readonly context: ContentEntitySelectionContext<TEntityName>;
+    // (undocumented)
+    transform<T>(cb: (value: TValue) => T): TypedEntitySelection<TSchema, TEntityName, TEntity, T>;
 }
 
 // @public (undocumented)

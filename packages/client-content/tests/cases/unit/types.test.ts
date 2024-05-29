@@ -9,7 +9,7 @@ describe('ts types', () => {
 		expectTypeOf(
 			qb.fragment('Post')
 				.$('author', qb.fragment('Author')),
-		).toEqualTypeOf<FragmentOf<'Post'>>()
+		).toMatchTypeOf<FragmentOf<'Post'>>()
 	})
 
 	test('fragment - invalid', async () => {

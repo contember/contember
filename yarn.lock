@@ -1366,7 +1366,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@contember/vite-plugin@workspace:packages/vite-plugin"
   peerDependencies:
-    vite: ^4
+    vite: ^4 || ^5
   languageName: unknown
   linkType: soft
 

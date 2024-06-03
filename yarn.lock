@@ -1011,28 +1011,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@contember/react-legacy-editor@workspace:packages/react-legacy-editor":
-  version: 0.0.0-use.local
-  resolution: "@contember/react-legacy-editor@workspace:packages/react-legacy-editor"
-  dependencies:
-    "@contember/react-binding": "workspace:*"
-    "@contember/react-multipass-rendering": "workspace:*"
-    "@contember/react-repeater": "workspace:*"
-    "@contember/react-utils": "workspace:*"
-    "@contember/utilities": "workspace:*"
-    is-hotkey: ^0.2.0
-    react: ^18.2.0
-    react-dom: ^18.2.0
-    react-error-boundary: ^4.0.13
-    slate: ^0.103.0
-    slate-history: ^0.100.0
-    slate-react: ^0.102.0
-  peerDependencies:
-    react: ^17 || ^18
-    react-dom: ^17 || ^18
-  languageName: unknown
-  linkType: soft
-
 "@contember/react-multipass-rendering@workspace:*, @contember/react-multipass-rendering@workspace:packages/react-multipass-rendering":
   version: 0.0.0-use.local
   resolution: "@contember/react-multipass-rendering@workspace:packages/react-multipass-rendering"
@@ -1121,6 +1099,39 @@ __metadata:
   peerDependencies:
     react: ^18 || ^19
     react-dom: ^18 || ^19
+  languageName: unknown
+  linkType: soft
+
+"@contember/react-slate-editor-base@workspace:packages/react-slate-editor-base":
+  version: 0.0.0-use.local
+  resolution: "@contember/react-slate-editor-base@workspace:packages/react-slate-editor-base"
+  dependencies:
+    "@contember/react-binding": "workspace:*"
+    "@contember/react-multipass-rendering": "workspace:*"
+    "@contember/react-utils": "workspace:*"
+    "@contember/utilities": "workspace:*"
+    is-hotkey: ^0.2.0
+    react: ^18.3.1
+    react-dom: ^18.3.1
+    react-error-boundary: ^4.0.13
+    slate: ^0.103.0
+    slate-history: ^0.100.0
+    slate-react: ^0.102.0
+  peerDependencies:
+    react: ^18 || ^19
+    react-dom: ^18 || ^19
+  languageName: unknown
+  linkType: soft
+
+"@contember/react-slate-editor-legacy@workspace:packages/react-slate-editor-legacy":
+  version: 0.0.0-use.local
+  resolution: "@contember/react-slate-editor-legacy@workspace:packages/react-slate-editor-legacy"
+  languageName: unknown
+  linkType: soft
+
+"@contember/react-slate-editor@workspace:packages/react-slate-editor":
+  version: 0.0.0-use.local
+  resolution: "@contember/react-slate-editor@workspace:packages/react-slate-editor"
   languageName: unknown
   linkType: soft
 
@@ -10281,7 +10292,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-dom@npm:^18.2.0, react-dom@npm:^18.3.1":
+"react-dom@npm:^18.3.1":
   version: 18.3.1
   resolution: "react-dom@npm:18.3.1"
   dependencies:
@@ -10555,7 +10566,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react@npm:^18.2.0, react@npm:^18.3.1":
+"react@npm:^18.3.1":
   version: 18.3.1
   resolution: "react@npm:18.3.1"
   dependencies:

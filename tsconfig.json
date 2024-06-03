@@ -102,9 +102,6 @@
 			"path": "./packages/react-leaflet-fields-ui"
 		},
 		{
-			"path": "./packages/react-legacy-editor"
-		},
-		{
 			"path": "./packages/react-multipass-rendering"
 		},
 		{
@@ -121,6 +118,15 @@
 		},
 		{
 			"path": "./packages/react-select"
+		},
+		{
+			"path": "./packages/react-slate-editor"
+		},
+		{
+			"path": "./packages/react-slate-editor-base"
+		},
+		{
+			"path": "./packages/react-slate-editor-legacy"
 		},
 		{
 			"path": "./packages/react-slots"

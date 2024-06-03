@@ -10,10 +10,11 @@
 		{ "path": "../../react-dataview/src" },
 		{ "path": "../../react-board/src" },
 		{ "path": "../../react-board-dnd-kit/src" },
-		{ "path": "../../react-legacy-editor/src" },
+		{ "path": "../../react-slate-editor-legacy/src" },
 		{ "path": "../../react-repeater/src" },
 		{ "path": "../../react-repeater-dnd-kit/src" },
 		{ "path": "../../react-form/src" },
 		{ "path": "../../react-select/src" },
+		{ "path": "../../react-slate-editor/src" }
 	]
 }

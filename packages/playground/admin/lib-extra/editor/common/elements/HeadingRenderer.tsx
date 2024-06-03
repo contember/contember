@@ -1,7 +1,7 @@
-import { HeadingElement } from '@contember/react-legacy-editor'
+import { HeadingElement } from '@contember/react-slate-editor-base'
 import React, { FunctionComponent } from 'react'
 import type { RenderElementProps } from 'slate-react'
-import { cn } from '../../../lib/utils/cn'
+import { cn } from '../../../../lib/utils/cn'
 
 export interface HeadingRendererProps extends Omit<RenderElementProps, 'element'> {
 	element: HeadingElement

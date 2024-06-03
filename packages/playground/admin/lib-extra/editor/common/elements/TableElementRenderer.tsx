@@ -1,4 +1,4 @@
-import { isTableElement, TableCellElement, TableElement, TableModifications } from '@contember/react-legacy-editor'
+import { isTableElement, TableCellElement, TableElement, TableModifications } from '@contember/react-slate-editor-base'
 import { assertNever } from '@contember/utilities'
 import { memo, useCallback } from 'react'
 import { Transforms } from 'slate'

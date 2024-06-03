@@ -1,9 +1,6 @@
 import { c } from '@contember/schema-definition'
 
-export class LegacyEditorTextArea {
-	unique = c.enumColumn(c.createEnum('unique')).default('unique').notNull().unique()
-	data = c.stringColumn().notNull()
-}
+
 
 
 export class LegacyEditorContent {

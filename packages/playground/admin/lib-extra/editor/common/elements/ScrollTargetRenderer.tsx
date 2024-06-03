@@ -1,4 +1,4 @@
-import { ScrollTargetElement } from '@contember/react-legacy-editor'
+import { ScrollTargetElement } from '@contember/react-slate-editor-base'
 import type { FunctionComponent } from 'react'
 import { RenderElementProps, useSelected } from 'slate-react'
 

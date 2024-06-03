@@ -1,12 +1,13 @@
 import { ReactNode } from 'react'
-import { EditorCanvas } from './EditorCanvas'
-import { EditableCanvas } from './EditableCanvas'
-import { BlockEditor, BlockEditorProps, useEditor } from '@contember/react-legacy-editor'
+import { EditorCanvas } from '../common/EditorCanvas'
+import { EditableCanvas } from '../common/EditableCanvas'
+import { BlockEditor, BlockEditorProps } from '@contember/react-slate-editor-legacy'
 import { Component } from '@contember/interface'
 import { SortableBlock } from './SortableBlock'
-import { ReferenceElementRenderer } from './elements/ReferenceElementRenderer'
+import { ReferenceElementRenderer } from './ReferenceElementRenderer'
 import { RepeaterSortable, useRepeaterSortedEntities } from '@contember/react-repeater-dnd-kit'
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
+import { useSlate, useSlateStatic } from 'slate-react'
 
 export type BlockEditorFieldProps =
 	& Omit<BlockEditorProps, 'renderSortableBlock' | 'renderReference'>
@@ -30,7 +31,7 @@ export const BlockEditorInner = ({ children, placeholder }: {
 	placeholder?: string
 	children: ReactNode
 }) => {
-	const editor = useEditor()
+	const editor = useSlateStatic()
 	const entities = useRepeaterSortedEntities()
 
 	return (

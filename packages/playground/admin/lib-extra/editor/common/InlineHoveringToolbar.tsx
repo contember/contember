@@ -1,6 +1,5 @@
 import { memo, ReactNode, useLayoutEffect, useRef } from 'react'
-import { useEditor } from '@contember/react-legacy-editor'
-import { ReactEditor, useSlateSelection } from 'slate-react'
+import { ReactEditor, useSlateSelection, useSlateStatic } from 'slate-react'
 
 export interface InlineHoveringToolbarProps {
 	children: ReactNode
@@ -8,7 +7,7 @@ export interface InlineHoveringToolbarProps {
 
 export const InlineHoveringToolbar = memo(({ children }: InlineHoveringToolbarProps) => {
 	const ref = useRef<HTMLDivElement | null>(null)
-	const editor = useEditor()
+	const editor = useSlateStatic()
 	const selection = useSlateSelection()
 	useLayoutEffect(() => {
 		const toolbar = ref.current

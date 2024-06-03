@@ -1,4 +1,5 @@
 import {
+	EditorPlugin,
 	withAnchors,
 	withBold,
 	withCode,
@@ -13,7 +14,7 @@ import {
 	withStrikeThrough,
 	withTables,
 	withUnderline,
-} from '@contember/react-legacy-editor'
+} from '@contember/react-slate-editor-base'
 import { AnchorRenderer } from './elements/AnchorRenderer'
 import { ParagraphRenderer } from './elements/ParagraphRenderer'
 import { HeadingRenderer } from './elements/HeadingRenderer'
@@ -21,13 +22,12 @@ import { ListItemRenderer } from './elements/ListItemRenderer'
 import { OrderedListRenderer } from './elements/OrderedListRenderer'
 import { UnorderedListRenderer } from './elements/UnorderedListRenderer'
 import { HorizontalRuleRenderer } from './elements/HorizontalRuleRenderer'
-import { Editor } from 'slate'
 import { ScrollTargetRenderer } from './elements/ScrollTargetRenderer'
 import { TableElementRenderer } from './elements/TableElementRenderer'
 import { TableCellElementRenderer } from './elements/TableCellElementRenderer'
 import { TableRowElementRenderer } from './elements/TableRowElementRenderer'
 
-const plugins = {
+export const baseEditorPlugins = {
 	anchor: withAnchors({
 		render: AnchorRenderer,
 	}),
@@ -54,41 +54,13 @@ const plugins = {
 		renderTableRow: TableRowElementRenderer,
 	}),
 
-	bold: withBold,
-	code: withCode,
-	highlight: withHighlight,
-	italic: withItalic,
-	newline: withNewline,
-	strikeThrough: withStrikeThrough,
-	underline: withUnderline,
-} satisfies Record<string, (editor: Editor) => Editor>
+	bold: withBold(),
+	code: withCode(),
+	highlight: withHighlight(),
+	italic: withItalic(),
+	newline: withNewline(),
+	strikeThrough: withStrikeThrough(),
+	underline: withUnderline(),
+} satisfies Record<string, EditorPlugin>
 
 
-export const richTextFieldPlugins = [
-	plugins.anchor,
-	plugins.bold,
-	plugins.code,
-	plugins.highlight,
-	plugins.italic,
-	plugins.newline,
-	plugins.strikeThrough,
-	plugins.underline,
-]
-
-export const blockEditorPlugins = [
-	plugins.anchor,
-	plugins.paragraph,
-	plugins.heading,
-	plugins.list,
-	plugins.horizontalRule,
-	plugins.scrollTarget,
-	plugins.table,
-	plugins.bold,
-	plugins.code,
-	plugins.highlight,
-	plugins.italic,
-	plugins.newline,
-	plugins.strikeThrough,
-	plugins.underline,
-
-]

@@ -1,7 +1,6 @@
 import { EventHandler, KeyboardEvent, KeyboardEventHandler, MouseEvent, useCallback, useRef } from 'react'
 import { Path, Transforms } from 'slate'
 import { Editable, useSlate } from 'slate-react'
-import { EditorWithBlocks } from '@contember/react-legacy-editor'
 
 type EditableProps = typeof Editable extends (p: infer P) => any ? P : never
 
@@ -10,7 +9,7 @@ export interface EditableCanvasProps extends EditableProps {
 }
 
 export const EditableCanvas = ({ className, ...editableProps }: EditableCanvasProps) => {
-	const editor = useSlate() as EditorWithBlocks
+	const editor = useSlate()
 	const pathRef = useRef<Path | undefined>(undefined)
 
 	const handleSlateNodeChange: EventHandler<MouseEvent<HTMLDivElement> | KeyboardEvent<HTMLDivElement>> = useCallback(event => {
@@ -43,6 +42,7 @@ export const EditableCanvas = ({ className, ...editableProps }: EditableCanvasPr
 			onKeyUp={handleSlateNodeChange}
 			onMouseDownCapture={handleCapturedMouseDown}
 			onMouseUp={handleSlateNodeChange}
+			className="py-4"
 		>
 			<Editable {...editableProps} />
 		</div>

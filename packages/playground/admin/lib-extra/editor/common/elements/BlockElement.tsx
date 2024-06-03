@@ -1,4 +1,4 @@
-import { ContemberEditor } from '@contember/react-legacy-editor'
+import { ContemberEditor } from '@contember/react-slate-editor-base'
 import { memo } from 'react'
 import { ReactEditor, RenderElementProps, useSlateStatic } from 'slate-react'
 import { PlusCircleIcon } from 'lucide-react'
@@ -12,9 +12,9 @@ export interface BlockElementProps extends RenderElementProps {
 const BlockBoundary = ({ onClick }: {onClick: () => void}) => {
 	return (<>
 		<div className="relative group" contentEditable={false}>
-			<div className="bg-gray-500 h-0.5 rounded absolute top-1/2 left-0 right-0 w-full opacity-0 transition-opacity group-hover:opacity-100"></div>
-			<div className="absolute -top-2 left-0 w-full h-4 flex justify-center items-center opacity-0 group-hover:opacity-100 cursor-pointer" onClick={onClick}>
-				<div className=" px-2 flex gap-2 items-center bg-gray-800 py-0.5 rounded-xl text-white shadow">
+			<div className="bg-gray-500 h-0.5 rounded absolute top-1/2 left-0 right-0 w-full opacity-0 transition-opacity delay-100 group-hover:opacity-100"></div>
+			<div className="absolute -top-2 left-0 w-full h-4 flex justify-center items-center opacity-0 transition-opacity delay-100 duration-0 group-hover:opacity-100 cursor-pointer" onClick={onClick}>
+				<div className=" px-2 flex gap-2 items-center bg-gray-800 py-0.5 rounded-xl text-white shadow ">
 					<PlusCircleIcon className="w-3 h-3" />
 					Add paragraph
 				</div>

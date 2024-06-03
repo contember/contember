@@ -1,4 +1,4 @@
-import { TableCellElement } from '@contember/react-legacy-editor'
+import { TableCellElement } from '@contember/react-slate-editor-base'
 import type { RenderElementProps } from 'slate-react'
 
 export interface TableCellElementRendererProps extends Omit<RenderElementProps, 'element'> {

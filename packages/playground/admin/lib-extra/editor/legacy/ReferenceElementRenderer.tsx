@@ -1,13 +1,13 @@
 import { BindingError, Entity, RelativeSingleField, useEntity } from '@contember/react-binding'
-import { BlockProps, EditorWithBlocks, EmbedHandler, ReferenceElement, ReferenceElementOptions, getDiscriminatedBlock, getDiscriminatedDatum } from '@contember/react-legacy-editor'
+import { BlockProps, EditorWithBlocks, EmbedHandler, getDiscriminatedBlock, getDiscriminatedDatum, ReferenceElement, ReferenceElementOptions } from '@contember/react-slate-editor-legacy'
 import { memo, MouseEvent as ReactMouseEvent, ReactNode, useCallback } from 'react'
 import { Transforms } from 'slate'
 import { ReactEditor, RenderElementProps, useSelected, useSlateStatic } from 'slate-react'
-import { BlockElement } from './BlockElement'
 import { Card, CardContent, CardHeader, CardTitle } from '../../../lib/components/ui/card'
 import { PencilIcon, TrashIcon } from 'lucide-react'
 import { Button } from '../../../lib/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '../../../lib/components/ui/popover'
+import { BlockElement } from '../common/elements/BlockElement'
 
 export interface ReferenceElementRendererProps extends RenderElementProps, ReferenceElementOptions {
 	element: ReferenceElement

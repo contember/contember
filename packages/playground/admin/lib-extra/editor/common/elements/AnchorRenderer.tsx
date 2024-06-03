@@ -1,4 +1,4 @@
-import { AnchorElement } from '@contember/react-legacy-editor'
+import { AnchorElement } from '@contember/react-slate-editor-base'
 import type { FunctionComponent, MouseEvent as ReactMouseEvent } from 'react'
 import type { RenderElementProps } from 'slate-react'
 import { LinkIcon } from 'lucide-react'
@@ -17,7 +17,7 @@ const style = {
 } as const
 
 export const AnchorRenderer: FunctionComponent<AnchorRendererProps> = (props: AnchorRendererProps) => (<span className="inline-flex gap-1 items-center">
-	<span>
+	<span className="bg-gray-50 border-b border-b-blue-300">
 		{props.children}
 	</span>
 	<a

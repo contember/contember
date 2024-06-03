@@ -1,6 +1,6 @@
 import { RenderElementProps } from 'slate-react'
 import { FunctionComponent } from 'react'
-import { UnorderedListElement } from '@contember/react-legacy-editor'
+import { UnorderedListElement } from '@contember/react-slate-editor-base'
 import { BlockElement } from './BlockElement'
 
 export interface UnorderedListRendererProps extends Omit<RenderElementProps, 'element'> {

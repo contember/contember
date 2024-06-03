@@ -1,16 +1,16 @@
-import { SortedBlocksContext } from '@contember/react-legacy-editor'
+import { SortedBlocksContext } from '@contember/react-slate-editor-legacy'
 import React, { ReactNode, useContext } from 'react'
 import { Element } from 'slate'
 import { ReactEditor, useSlateStatic } from 'slate-react'
 import { useSortable } from '@dnd-kit/sortable'
 import { RepeaterCurrentEntityContext, RepeaterSortableItemActivator, RepeaterSortableItemContext, RepeaterSortableItemNode } from '@contember/react-repeater-dnd-kit'
 import { Entity } from '@contember/interface'
-import { RepeaterDropIndicator } from '../../lib/components/repeater'
-import { uic } from '../../lib/utils/uic'
+import { RepeaterDropIndicator } from '../../../lib/components/repeater'
+import { uic } from '../../../lib/utils/uic'
 import { GripVerticalIcon } from 'lucide-react'
 
 export const BlockeEditorHandle = uic('button', {
-	baseClass: 'absolute top-1/2 -left-3 h-6 w-6 flex justify-end align-center opacity-10 hover:opacity-100 transition-opacity -translate-y-1/2',
+	baseClass: 'absolute top-1/2 -left-3 h-6 w-6 flex justify-end items-center opacity-10 hover:opacity-100 transition-opacity -translate-y-1/2',
 	beforeChildren: <GripVerticalIcon size={16} />,
 })
 

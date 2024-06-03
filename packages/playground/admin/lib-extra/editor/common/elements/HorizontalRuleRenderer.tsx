@@ -1,4 +1,4 @@
-import { HorizontalRuleElement } from '@contember/react-legacy-editor'
+import { HorizontalRuleElement } from '@contember/react-slate-editor-base'
 import type { FunctionComponent } from 'react'
 import { RenderElementProps, useSelected } from 'slate-react'
 import { BlockElement } from './BlockElement'

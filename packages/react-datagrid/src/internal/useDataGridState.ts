@@ -40,6 +40,11 @@ export const useDataGridState = (props: Pick<DataGridProps<{ tile?: unknown }>, 
 		initialItemsPerPage: props.itemsPerPage,
 		initialSorting,
 		initialSelection,
+		filteringStateStorage: 'session',
+		selectionStateStorage: 'session',
+		sortingStateStorage: 'session',
+		currentPageStateStorage: 'session',
+		pagingSettingsStorage: 'session',
 	})
 
 	return {

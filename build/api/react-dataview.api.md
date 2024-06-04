@@ -188,12 +188,13 @@ export interface DataViewDateFilterProps {
 }
 
 // @public (undocumented)
-export const DataViewDateFilterResetTrigger: ({ name, ...props }: DataViewDateFilterResetTriggerProps) => JSX_2.Element | null;
+export const DataViewDateFilterResetTrigger: ({ name, type, ...props }: DataViewDateFilterResetTriggerProps) => JSX_2.Element | null;
 
 // @public (undocumented)
 export type DataViewDateFilterResetTriggerProps = {
     name?: string;
     children: ReactElement;
+    type?: 'start' | 'end';
 };
 
 // @internal (undocumented)

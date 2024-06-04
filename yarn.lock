@@ -1102,18 +1102,18 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@contember/react-slate-editor-base@workspace:packages/react-slate-editor-base":
+"@contember/react-slate-editor-base@workspace:*, @contember/react-slate-editor-base@workspace:packages/react-slate-editor-base":
   version: 0.0.0-use.local
   resolution: "@contember/react-slate-editor-base@workspace:packages/react-slate-editor-base"
   dependencies:
+    "@contember/binding": "workspace:*"
     "@contember/react-binding": "workspace:*"
-    "@contember/react-multipass-rendering": "workspace:*"
-    "@contember/react-utils": "workspace:*"
     "@contember/utilities": "workspace:*"
+    "@radix-ui/primitive": ^1.0.1
+    "@radix-ui/react-slot": ^1.0.2
     is-hotkey: ^0.2.0
     react: ^18.3.1
     react-dom: ^18.3.1
-    react-error-boundary: ^4.0.13
     slate: ^0.103.0
     slate-history: ^0.100.0
     slate-react: ^0.102.0
@@ -1126,12 +1126,44 @@ __metadata:
 "@contember/react-slate-editor-legacy@workspace:packages/react-slate-editor-legacy":
   version: 0.0.0-use.local
   resolution: "@contember/react-slate-editor-legacy@workspace:packages/react-slate-editor-legacy"
+  dependencies:
+    "@contember/binding": "workspace:*"
+    "@contember/react-binding": "workspace:*"
+    "@contember/react-multipass-rendering": "workspace:*"
+    "@contember/react-repeater": "workspace:*"
+    "@contember/react-slate-editor-base": "workspace:*"
+    "@contember/react-utils": "workspace:*"
+    "@contember/utilities": "workspace:*"
+    "@radix-ui/react-slot": ^1.0.2
+    react: ^18.3.1
+    react-dom: ^18.3.1
+    react-error-boundary: ^4.0.13
+    slate: ^0.103.0
+    slate-react: ^0.102.0
+  peerDependencies:
+    react: ^18 || ^19
+    react-dom: ^18 || ^19
   languageName: unknown
   linkType: soft
 
 "@contember/react-slate-editor@workspace:packages/react-slate-editor":
   version: 0.0.0-use.local
   resolution: "@contember/react-slate-editor@workspace:packages/react-slate-editor"
+  dependencies:
+    "@contember/binding": "workspace:*"
+    "@contember/react-binding": "workspace:*"
+    "@contember/react-multipass-rendering": "workspace:*"
+    "@contember/react-slate-editor-base": "workspace:*"
+    "@contember/react-utils": "workspace:*"
+    "@radix-ui/react-slot": ^1.0.2
+    react: ^18.3.1
+    react-dom: ^18.3.1
+    react-error-boundary: ^4.0.13
+    slate: ^0.103.0
+    slate-react: ^0.102.0
+  peerDependencies:
+    react: ^18 || ^19
+    react-dom: ^18 || ^19
   languageName: unknown
   linkType: soft
 

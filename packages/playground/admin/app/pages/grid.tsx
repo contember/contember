@@ -2,6 +2,7 @@ import { Component, Field, HasMany, HasOne, If } from '@contember/interface'
 import { Slots } from '../../lib/components/slots'
 import { DataViewEachRow, DataViewElement, DataViewLayout } from '@contember/react-dataview'
 import {
+	createDataGridDateRange,
 	DataGrid,
 	DataGridActionColumn,
 	DataGridBooleanColumn,
@@ -21,6 +22,7 @@ import {
 	DataGridNumberColumn,
 	DataGridNumberFilter,
 	DataGridPagination,
+	DataGridPredefinedDateRange,
 	DataGridQueryFilter,
 	DataGridTable,
 	DataGridTextColumn,
@@ -29,6 +31,7 @@ import {
 	DataGridTooltipLabel,
 } from '../../lib/components/datagrid'
 import * as React from 'react'
+import { ReactNode } from 'react'
 import { DefaultDropdown, DropdownMenuItem, DropdownMenuSeparator } from '../../lib/components/ui/dropdown'
 import { Binding, DeleteEntityDialog } from '../../lib/components/binding'
 import { GridArticleStateLabels } from '../labels'
@@ -167,7 +170,17 @@ const CustomGridFilters = Component(() => {
 		<>
 			<DataGridQueryFilter />
 			<DataGridEnumFilter field={'state'} options={GridArticleStateLabels} label="State" />
-			<DataGridDateFilter field={'publishedAt'} label="Published at" />
+			<DataGridDateFilter
+				field={'publishedAt'}
+				label="Published at"
+				ranges={[
+					createDataGridDateRange('Today', 0, 0),
+					createDataGridDateRange('Yesterday', -1, -1),
+					createDataGridDateRange('Last 7 days', -7, 0),
+					createDataGridDateRange('Last 30 days', -30, 0),
+					createDataGridDateRange('Last 90 days', -90, 0),
+				]}
+			/>
 			<DataGridHasOneFilter field={'author'} label="Author">
 				<Field field="name" />
 			</DataGridHasOneFilter>

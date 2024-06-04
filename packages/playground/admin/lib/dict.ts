@@ -27,8 +27,9 @@ export const dict = {
 	},
 	datagrid: {
 		na: 'N/A',
-		dateStart: 'Start',
-		dateEnd: 'End',
+		dateStart: 'From',
+		today: 'Today',
+		dateEnd: 'To',
 		numberFrom: 'From',
 		numberTo: 'To',
 		textReset: 'Reset filter',

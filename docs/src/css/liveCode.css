@@ -1,0 +1,41 @@
+.live-code-editor {
+  --border-radius: 6px;
+  border-radius: var(--border-radius);
+  margin-bottom: 1em;
+  font-size: inherit;
+  font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  padding: 5px;
+  background-color: #011627;
+}
+
+.live-code-preview-wrapper {
+  --preview-padding: 1.25em 1em;
+  --wrapper-padding: 0.5em;
+  padding: var(--wrapper-padding);
+  border-radius: var(--border-radius);
+  background-color: var(--ifm-code-background);
+}
+
+.live-code-preview-wrapper h6 {
+  padding-bottom: 0.5em;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  margin: 0;
+}
+
+.live-code-preview-wrapper .live-code-preview {
+  padding: var(--preview-padding);
+  background-color: var(--ifm-code-background);
+  position: relative;
+  min-height: 100px;
+  z-index: 1;
+}
+
+.live-code-preview-wrapper .live-code-preview.view-no-padding {
+  --preview-padding: 0em;
+  margin: 0 calc(-1 * var(--wrapper-padding)) calc(-1 * var(--wrapper-padding));
+}
+
+.live-code-error.alert--danger {
+  overflow: unset;
+  white-space: normal;
+}

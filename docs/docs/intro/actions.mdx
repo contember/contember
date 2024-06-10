@@ -1,0 +1,72 @@
+---
+title: Automating workflows with Contember Actions
+---
+
+import DocsCard from '../../src/components/global/DocsCard';
+import DocsCards from '../../src/components/global/DocsCards';
+
+# <span className="version">Engine EE 1.3+</span> Automating workflows with Contember Actions
+
+In this section, we'll explore the usage of Contember Actions to automate Slack notifications. You'll discover how to set up an Action, track changes, and trigger Slack notifications.
+
+While there's an extensive range of potential applications for Actions, we're going to focus on a simple showcase for now. More complex usage is covered in our advanced reference guide.
+
+### Defining our first Action
+
+From our [previous steps](/intro/quickstart), we already have the schema. Imagine you want to send a Slack notification every time a new article is created. Here's how you'd modify the schema:
+
+```javascript
+import { SchemaDefinition as def, ActionsDefinition as actions } from '@contember/schema-definition'
+
+@actions.trigger({
+  name: 'sent_to_slack',
+  create: true,
+  selection: `title`,
+  webhook: 'https://example.com/send_to_slack', // we'll get to this later
+})
+export class Article {
+  title = def.stringColumn()
+  content = def.stringColumn()
+}
+```
+
+With this Trigger Action setup, the webhook is invoked whenever a new Article entity is created. The dispatched webhook payload includes the title field, allowing you to alert external systems about the creation event.
+
+Before this can work, though, you'll need to apply the changes using migrations. You can generate a migration with the following command:
+
+```bash
+npm run contember migrations:diff "my-first-action"
+```
+
+(Learn more about [migrations](/reference/engine/migrations/overview.md))
+
+That's all there is to the Contember setup. To test this locally, refer to our [guide to Actions](/reference/engine/actions/overview). If you're using Contember Cloud, you'll need to enable Actions for your project in the interface.
+
+![Contember Cloud Actions](/assets/actions-enable.png)
+
+### What comes next?
+
+The Action you've just configured will send the specified payload wherever you direct it. It supports numerous advanced parameters, such as headers for authorization. Here's an example of the payload you might receive:
+
+```json
+{
+  "events": [
+    {
+      "id": "f4f0a97d-7850-4add-8946-a1ce016306ce",
+      "entity": "Article",
+      "values": {
+        "title": "Article Title",
+      },
+      "operation": "create",
+    }
+  ]
+}
+```
+
+The next step is to use this payload for your specific needs. In our case, we want to send it to Slack. While there are several no-code solutions like [Make](https://www.make.com/) that could be used, we'll illustrate an example using [Superface AI](https://superface.ai/), as it allows us to integrate AI capabilities and maintain everything in code.
+
+<DocsCards>
+  <DocsCard header="Easy integrations with Actions and Superface AI" href="/guides/superface">
+    <p>Quick tutorial on how to quickly use Action with Superface AI.</p>
+  </DocsCard>
+</DocsCards>

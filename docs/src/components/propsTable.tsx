@@ -20,13 +20,13 @@ export const PropsTable: (props: PropsTableProps) => JSX.Element = ({ firstColum
     </table>
 )
 
-export interface PropsTableRowProps { 
-    prop?: string 
+export interface PropsTableRowProps {
+    prop?: string
     propType?: string
     description?: string
     inherited?: string
     required?: boolean
-    readOnly?: boolean 
+    readOnly?: boolean
 }
 
 export const PropsTableRow: (props: PropsTableRowProps) => JSX.Element = ({ prop, propType, description, inherited, required, readOnly }) => (
@@ -42,7 +42,7 @@ export const PropsTableRow: (props: PropsTableRowProps) => JSX.Element = ({ prop
             {propType && <p className="props-type-prop" dangerouslySetInnerHTML={{ __html: propType }} />}
             {description && <p className="props-description-prop" dangerouslySetInnerHTML={{ __html: description }} />}
             {inherited && <p className="props-inherited-prop">Inherited from <b>{inherited}</b></p>}
-            <div style={{ display: "flex", gap: "0.5em" }}>
+            <div style={{ display: 'flex', gap: '0.5em' }}>
                 {required && <p className="props-required-prop">Required</p>}
                 {readOnly && <p className="props-readonly-prop">Read Only</p>}
             </div>

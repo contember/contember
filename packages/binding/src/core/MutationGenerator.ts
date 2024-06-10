@@ -41,7 +41,7 @@ export class MutationGenerator {
 	) {
 	}
 
-	public getPersistMutation(): PersistMutationResult | undefined {
+	public getPersistMutation(): PersistMutationResult {
 		const mutations: Record<string, ContentMutation<any>> = {}
 		const operations: SubMutationOperation[] = []
 		const processedPlaceholdersByEntity: ProcessedPlaceholdersByEntity = new Map()

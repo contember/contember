@@ -32,6 +32,6 @@
 		"build:js:prod": "vite build --mode production"
 	},
 	"peerDependencies": {
-		"vite": "^4"
+		"vite": "^4 || ^5"
 	}
 }

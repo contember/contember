@@ -1,0 +1,112 @@
+---
+title: Designing your data model
+---
+
+import DocsCard from '../../src/components/global/DocsCard';
+import DocsCards from '../../src/components/global/DocsCards';
+
+Your data model forms the backbone of your Contember application. From this model, Contember automatically generates a well structured PostgreSQL database for your and instantly provides a ready-to-use GraphQL API.
+
+Contember gives you the flexibility to shape your data model according to your application's specific needs. It offers a wide variety of [supported data types](https://docs.contember.com/reference/engine/schema/columns) and allows you to define [relationships between your entities](https://docs.contember.com/reference/engine/schema/relationships). There are no mandatory structures imposed on you, which means you can design your data model in the most effective way for your project.
+
+:::important important
+
+Make sure you have already followed our [installation guide](/intro/installation) and have a new project running on your local machine.
+
+:::
+
+After following our installation guide and having your project running on your local machine, you will notice the folder structure, which serves specific purposes:
+
+- The `admin` folder houses the user intefrace of your application. It contains all the scripts, styles, and assets required to create your application's interface.
+- The `api` folder is where you define your data model, user roles, access control rules and Actions.
+
+```
+your_project_name/
+  ├── admin/
+  │   ├── components/
+  │   ├── pages/
+  │   ├── index.html
+  │   ├── index.tsx
+  │   ├── tsconfig.json
+  │   ├── vite-env.d.ts
+  │   └── vite.config.ts
+  ├── api/
+  │   ├── migrations/
+  │   ├── model/
+  │   ├── index.ts
+  │   └── tsconfig.json
+  ├── docker-compose.yaml
+  ├── package.json
+  └── tsconfig.json
+```
+
+## Create your first data model
+
+### Define data model
+
+When we installed Contember it already created the structure above. Let's go to `api/model/index.ts` file. It looks like this:
+
+```ts
+import { SchemaDefinition as def } from '@contember/schema-definition'
+
+// export your model definition here
+
+export { } // you can delete this line once you export your first entity
+```
+
+Let's define our first entity.
+
+:::note What is entity
+
+An entity represents a real-world object that is relevant to the system or application you are building. Each entity has properties that define its characteristics.
+
+For instance, if you were building a blog platform, some of the entities could be `Article`, `Author`, `Comment`, etc. An `Article` entity might have properties like `title`, `content`, `published_date`, while an `Author` might have `name`, `email`, `bio`, and so on.
+
+:::
+
+In this example, we'll define entity `Article` with two properties: `title` and `content`, which are both of type string. <span class="smallNote">In real life we would obviously want it a bit different, but this is a very basic example designed to quickly show you how to work with Contember.</span>
+
+```ts title="api/model/index.ts"
+import { SchemaDefinition as def } from '@contember/schema-definition'
+
+export class Article {
+  title = def.stringColumn()
+  content = def.stringColumn()
+}
+```
+
+### Generate and run migration
+
+After defining your data model, you need to generate and execute a migration for Contember Engine. Until migration is executed, no changes are applied to your database and GraphQL API.
+
+:::note What are migrations
+
+Migrations are a way of version controlling your database schema. They provide a systematic approach to evolve your database schema over time, instead of making ad-hoc changes. This makes it easier to coordinate changes to the schema across a development team, especially when multiple developers are working on the same project and need to keep their local databases in sync. [Migrations in detail →](/reference/engine/migrations/overview.md)
+
+:::
+
+To generate a new database migration is simple. Just run command:
+
+```bash
+npm run contember migrations:diff "my-custom-describe-of-this-migration-in-few-words"
+```
+
+Execute the following command and select the Yes and execute immediately option. This action will generate your migration and, upon your confirmation, execute it. What actually happens behind the scenes is that a new JSON file detailing the changes in the database is created in the api/migrations directory. By opting to "execute", the changes are automatically applied on your local machine. As you deploy your project to various environments, the system will sequentially implement all migrations from this directory. For projects that are already live and functional, only the newly added migrations will be executed.
+
+Now if you would look into your database, you would see there a table `article` with three columns: `id`, `title`, `content`. Nice.
+
+:::note Contember CLI
+
+`npm run contember` is a Contember CLI, if you call this without any arguments you'll see all the available commands.
+We'll use `migrations:diff` command. It goes through your schema and generates migration - instructions for Contember how to get from previous state to your new one.
+This command needs two parameters: first is name of your project (`quickstart` in our example) and then name your migration. It can be anything you want.
+
+:::
+
+Now we have a structure in our database and GraphQL API is available.
+
+<DocsCards>
+  <DocsCard header="Data handling with GraphQL" href="/intro/graphql">
+    <p>Getting started with GraphQL in Contember.</p>
+  </DocsCard>
+</DocsCards>

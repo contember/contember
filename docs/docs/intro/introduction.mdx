@@ -1,0 +1,87 @@
+---
+title: Introduction
+slug: /
+---
+
+import DocsCard from '../../src/components/global/DocsCard';
+import DocsCards from '../../src/components/global/DocsCards';
+
+Contember is an open source platform that empowers developers to quickly build and manage data-driven web applications.
+
+## What is Contember
+
+With Contember, you can structure your data models using TypeScript and Contember Engine will instantly provide a GraphQL API for your data. Meanwhile, Contember Interface, a React framework, enables you to build bespoke user interfaces with high-level React components in hours.
+
+Behind the scenes, Contember takes care of technical aspects like generating a well-structured PostgreSQL database, handling automatic database migrations, and providing a built-in authentication and powerful role-based access control list. This means you can concentrate on building your application, rather than getting lost in setup and configurations.
+
+Whether you're developing on your own or as part of a team, Contember makes it easy to build custom backends, headless CMSes, customer relationship systems, employee portals, or other management apps.
+
+:::tip New: Contember Studio
+
+Meet Contember AI Studio. Describe your ideal backend and AI and Contember will build and launch it for you in minutes. No coding required. You will get a Postgres database, authentication, GraphQL API, and user interface. All custom-built for your project in minutes. [Try it today](https://www.contember.com/open/studio)
+
+:::
+
+<DocsCards>
+  <DocsCard header="Installation Guide" href="/intro/installation">
+    <p>Step-by-step guide to start a new project with Contember.</p>
+  </DocsCard>
+
+  <DocsCard header="How Contember works" href="/intro/how-it-works">
+    <p>Quickly understand Contember's core mechanics and structure.</p>
+  </DocsCard>
+</DocsCards>
+
+## Main features
+
+| Feature | Description |
+|---|---|
+| **[Declarative role-based access control](/reference/engine/schema/acl.md)** | Build secure apps with numerous roles and granular data access controls. This helps you create secure apps with complex access requirements. |
+| **[Instant GraphQL API](/reference/engine/content/overview.md)** | Automatically get high-performant, role-specific GraphQL APIs, accelerating feature development and allowing easy data utilization with any framework or language. |
+| **Data Binding in Contember Interface** | Automated data binding from GraphQL server to React components removes manual data fetching or updating work. This makes creating a custom interface a breeze. |
+| **Actions for data changes** (new in Engine v1.3) | Automate workflows, integrate with external systems, and enhance performance with Actions. |
+| **Extendable with your React.js components** | Beyond out-of-the-box React components, Contember Interface lets you use React's full power to customise your applications. |
+| **[Built-in authentication and authorization](/reference/engine/tenant/overview.md)** | Skip integrating third-party auth solutions and spend more time developing. |
+| **[Automatic database migrations](/reference/engine/migrations/overview.md)** | Database schema changes are handled smoothly, reducing update risks. |
+| **Well-structured PostgreSQL database** | Focus on development, not database setup. We ensure that your data is organized and efficient, making it easier to manage and maintain. |
+| **Everything is code** | Manage and deploy your entire application with version control systems like Git, simplifying multi-environment setups. |
+| **Multi-language, translatable** | Build global-ready apps with ease thanks to multi-language support. |
+| **History API** | A detailed event log automatically tracks data changes. |
+
+## Why we build Contember
+
+Building custom web apps is more challenging than necessary, particularly for small teams or individual developers tasked with maintaining complex code bases over time. At Contember, we're challenging this status quo.
+
+We envision a world where everyone can become a full-stack developer, and where backend and frontend specializations aren't prerequisites for creating robust applications. Our declarative framework is central to this vision. But we're pushing boundaries even further with Contember Studio, an innovative AI tool that allows users to craft a functional first version of their app in mere minutes. This allows developers to focus on what really matters: creating apps that solve problems and delight users.
+
+Although the expanding complexity of web development allows for building remarkable things, it comes with a cost. Our goal at Contember is to simplify, streamline, and democratize web app development. We're here to empower you to build the web apps you need, and to bring the joy back into the building process.
+
+## License
+
+The Contember framework is open source under the Apache 2 license, so you can use it freely when self-hosting. This ensures you'll always have the ability to move your data wherever you need and continue using the applications you've built with the Contember framework.
+
+In addition to the core features, we offer an Enterprise Edition of Contember, which comes with several advanced capabilities. Access to these features requires a license fee, or you can utilize them as part of our managed hosting solution, Contember Cloud.
+
+## Questions and support
+
+If you have questions about anything related to Contembre, you're always welcome to ask our us on [Github Discussions](https://github.com/orgs/contember/discussions) or [Twitter](https://twitter.com/contember).
+
+## Where to go from here
+
+<DocsCards>
+  <DocsCard header="Installation Guide" href="/intro/installation">
+    <p>Step-by-step guide to start a new project with Contember.</p>
+  </DocsCard>
+
+  <DocsCard header="Quickstart" href="/intro/quickstart">
+    <p>Build your first project from scratch with Contember.</p>
+  </DocsCard>
+
+  <DocsCard header="Starter Kits" href="https://github.com/contember/starter-kits">
+    <p>Check out our ready-to-use examples of what you can do with Contember.</p>
+  </DocsCard>
+
+  <DocsCard header="How Contember works" href="/intro/how-it-works">
+    <p>Quickly understand Contember's core mechanics and structure.</p>
+  </DocsCard>
+</DocsCards>

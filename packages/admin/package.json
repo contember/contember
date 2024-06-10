@@ -80,7 +80,7 @@
 		"lucide-react": "^0.302.0",
 		"qrcode-generator": "^1.4.4",
 		"react-dropzone": "^14.2.3",
-		"react-error-boundary": "4.0.12",
+		"react-error-boundary": "^4.0.12",
 		"react-sortable-hoc": "2.0.0",
 		"slate": "0.73.1",
 		"slate-history": "0.66.0",

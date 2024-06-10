@@ -387,7 +387,7 @@ __metadata:
     react: ^18.3.1
     react-dom: ^18.3.1
     react-dropzone: ^14.2.3
-    react-error-boundary: 4.0.12
+    react-error-boundary: ^4.0.12
     react-sortable-hoc: 2.0.0
     slate: 0.73.1
     slate-history: 0.66.0
@@ -630,6 +630,8 @@ __metadata:
     "@radix-ui/react-slot": ^1.0.2
     "@radix-ui/react-switch": ^1.0.3
     "@radix-ui/react-toast": ^1.1.5
+    "@radix-ui/react-toggle": ^1.0.3
+    "@radix-ui/react-toggle-group": ^1.0.4
     "@radix-ui/react-toolbar": ^1.0.4
     "@radix-ui/react-tooltip": ^1.0.7
     "@udecode/cn": ^31.0.0
@@ -659,7 +661,7 @@ __metadata:
     react-dnd: ^16.0.1
     react-dnd-html5-backend: ^16.0.1
     react-dom: ^18.3.1
-    slate: ^0.102.0
+    slate: ^0.103.0
     slate-history: ^0.100.0
     slate-hyperscript: ^0.100.0
     slate-react: ^0.102.0
@@ -1094,6 +1096,71 @@ __metadata:
     "@radix-ui/react-slot": ^1.0.2
     react: ^18.3.1
     react-dom: ^18.3.1
+  peerDependencies:
+    react: ^18 || ^19
+    react-dom: ^18 || ^19
+  languageName: unknown
+  linkType: soft
+
+"@contember/react-slate-editor-base@workspace:*, @contember/react-slate-editor-base@workspace:packages/react-slate-editor-base":
+  version: 0.0.0-use.local
+  resolution: "@contember/react-slate-editor-base@workspace:packages/react-slate-editor-base"
+  dependencies:
+    "@contember/binding": "workspace:*"
+    "@contember/react-binding": "workspace:*"
+    "@contember/utilities": "workspace:*"
+    "@radix-ui/primitive": ^1.0.1
+    "@radix-ui/react-slot": ^1.0.2
+    is-hotkey: ^0.2.0
+    react: ^18.3.1
+    react-dom: ^18.3.1
+    slate: ^0.103.0
+    slate-history: ^0.100.0
+    slate-react: ^0.102.0
+  peerDependencies:
+    react: ^18 || ^19
+    react-dom: ^18 || ^19
+  languageName: unknown
+  linkType: soft
+
+"@contember/react-slate-editor-legacy@workspace:packages/react-slate-editor-legacy":
+  version: 0.0.0-use.local
+  resolution: "@contember/react-slate-editor-legacy@workspace:packages/react-slate-editor-legacy"
+  dependencies:
+    "@contember/binding": "workspace:*"
+    "@contember/react-binding": "workspace:*"
+    "@contember/react-multipass-rendering": "workspace:*"
+    "@contember/react-repeater": "workspace:*"
+    "@contember/react-slate-editor-base": "workspace:*"
+    "@contember/react-utils": "workspace:*"
+    "@contember/utilities": "workspace:*"
+    "@radix-ui/react-slot": ^1.0.2
+    react: ^18.3.1
+    react-dom: ^18.3.1
+    react-error-boundary: ^4.0.13
+    slate: ^0.103.0
+    slate-react: ^0.102.0
+  peerDependencies:
+    react: ^18 || ^19
+    react-dom: ^18 || ^19
+  languageName: unknown
+  linkType: soft
+
+"@contember/react-slate-editor@workspace:packages/react-slate-editor":
+  version: 0.0.0-use.local
+  resolution: "@contember/react-slate-editor@workspace:packages/react-slate-editor"
+  dependencies:
+    "@contember/binding": "workspace:*"
+    "@contember/react-binding": "workspace:*"
+    "@contember/react-multipass-rendering": "workspace:*"
+    "@contember/react-slate-editor-base": "workspace:*"
+    "@contember/react-utils": "workspace:*"
+    "@radix-ui/react-slot": ^1.0.2
+    react: ^18.3.1
+    react-dom: ^18.3.1
+    react-error-boundary: ^4.0.13
+    slate: ^0.103.0
+    slate-react: ^0.102.0
   peerDependencies:
     react: ^18 || ^19
     react-dom: ^18 || ^19
@@ -2921,7 +2988,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@radix-ui/react-toggle-group@npm:1.0.4":
+"@radix-ui/react-toggle-group@npm:1.0.4, @radix-ui/react-toggle-group@npm:^1.0.4":
   version: 1.0.4
   resolution: "@radix-ui/react-toggle-group@npm:1.0.4"
   dependencies:
@@ -2947,7 +3014,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@radix-ui/react-toggle@npm:1.0.3":
+"@radix-ui/react-toggle@npm:1.0.3, @radix-ui/react-toggle@npm:^1.0.3":
   version: 1.0.3
   resolution: "@radix-ui/react-toggle@npm:1.0.3"
   dependencies:
@@ -10282,17 +10349,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-error-boundary@npm:4.0.12":
-  version: 4.0.12
-  resolution: "react-error-boundary@npm:4.0.12"
-  dependencies:
-    "@babel/runtime": ^7.12.5
-  peerDependencies:
-    react: ">=16.13.1"
-  checksum: c4a14c2b609037baba394d8871fb021a7c16fb1abfd8d23b2d2aa331bdcc420e5cff4b3d48f2f2ac7fa64ac90c322d0bcf358d706995b30df5a8d5fcb0c27b1e
-  languageName: node
-  linkType: hard
-
 "react-error-boundary@npm:^3.1.0":
   version: 3.1.4
   resolution: "react-error-boundary@npm:3.1.4"
@@ -10301,6 +10357,17 @@ __metadata:
   peerDependencies:
     react: ">=16.13.1"
   checksum: f36270a5d775a25c8920f854c0d91649ceea417b15b5bc51e270a959b0476647bb79abb4da3be7dd9a4597b029214e8fe43ea914a7f16fa7543c91f784977f1b
+  languageName: node
+  linkType: hard
+
+"react-error-boundary@npm:^4.0.12, react-error-boundary@npm:^4.0.13":
+  version: 4.0.13
+  resolution: "react-error-boundary@npm:4.0.13"
+  dependencies:
+    "@babel/runtime": ^7.12.5
+  peerDependencies:
+    react: ">=16.13.1"
+  checksum: 50398d080015d51d22c6f94c56f4ea336d10232d72345b36ee6f15b6b643666d20b072829b02f091a80e5af68fe67f68a62ef0d2b649dbd759ead929304449af
   languageName: node
   linkType: hard
 
@@ -11110,14 +11177,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"slate@npm:^0.102.0":
-  version: 0.102.0
-  resolution: "slate@npm:0.102.0"
+"slate@npm:^0.103.0":
+  version: 0.103.0
+  resolution: "slate@npm:0.103.0"
   dependencies:
     immer: ^10.0.3
     is-plain-object: ^5.0.0
     tiny-warning: ^1.0.3
-  checksum: 69bb9160c24342804a3771d9ef69d9f58749b361181576a58b60e8fdcdfe3ee4f8afddb4745f5b3cd7e1d99af0ff949586c5720d1c15c600f4e121a59a488369
+  checksum: 50a2f79f80b11be7f475c74d666bdccd39720354cb08932864161dd48094e991f10f66a4d8ecc455fff9327895a6d7cf8591d113c606ca2565404d56d4d7fea3
   languageName: node
   linkType: hard
 

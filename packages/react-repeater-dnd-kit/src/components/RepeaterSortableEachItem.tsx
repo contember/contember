@@ -1,7 +1,7 @@
 import React, { ReactNode } from 'react'
 import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { RepeaterEachItem, useRepeaterSortedEntities } from '@contember/react-repeater'
-import { RepeaterSortableItemContext } from '../internal/contexts'
+import { RepeaterSortableItemContext } from '../contexts'
 import { useEntity } from '@contember/react-binding'
 
 export const RepeaterSortableEachItem = ({ children }: {

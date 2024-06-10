@@ -1,5 +1,6 @@
 import React, { ReactNode, useCallback, useMemo, useState } from 'react'
 import {
+	closestCenter,
 	DndContext,
 	DragEndEvent,
 	KeyboardSensor,
@@ -10,7 +11,7 @@ import {
 	useSensor,
 	useSensors,
 } from '@dnd-kit/core'
-import { RepeaterActiveEntityContext } from '../internal/contexts'
+import { RepeaterActiveEntityContext } from '../contexts'
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { useRepeaterSortedEntities } from '@contember/react-repeater'
 import { useRepeaterMethods } from '@contember/react-repeater'
@@ -63,6 +64,7 @@ export const RepeaterSortable = ({ children }: {
 			}}
 			onDragEnd={onDragEnd}
 			onDragCancel={onDragCancel}
+			collisionDetection={closestCenter}
 		>
 			<RepeaterActiveEntityContext.Provider value={activeItem}>
 				<SortableContext items={entities} strategy={verticalListSortingStrategy}>

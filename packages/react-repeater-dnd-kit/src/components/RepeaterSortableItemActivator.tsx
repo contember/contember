@@ -1,5 +1,5 @@
 import React, { forwardRef, ReactNode } from 'react'
-import { useRepeaterSortableItem } from '../internal/contexts'
+import { useRepeaterSortableItem } from '../contexts'
 import { Slot } from '@radix-ui/react-slot'
 import { useComposeRef } from '@contember/react-utils'
 

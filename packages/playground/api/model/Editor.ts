@@ -6,7 +6,7 @@ export class EditorContent {
 	references = c.oneHasMany(EditorReference, 'content')
 }
 
-export const EditorReferenceType = c.createEnum('image', 'link')
+export const EditorReferenceType = c.createEnum('image', 'link', 'quote')
 
 export class EditorReference {
 	content = c.manyHasOne(EditorContent, 'references').notNull()
@@ -21,4 +21,9 @@ export class EditorImage {
 
 export class EditorLink {
 	url = c.stringColumn().notNull()
+}
+
+export class EditorTextArea {
+	unique = c.enumColumn(c.createEnum('unique')).default('unique').notNull().unique()
+	data = c.stringColumn().notNull()
 }

@@ -61,6 +61,9 @@ export const Navigation = () => {
 					<MenuItem icon={line} label={'Plate editor'} to={'plateEditor'} />
 					<MenuItem icon={line} label={'Legacy block editor'} to={'legacyEditor/blocks'} />
 				</MenuItem>
+				<MenuItem icon={<PencilIcon size={16} />} label={'Custom components'}>
+					<MenuItem icon={line} label={'Input'} to={'custom/input'} />
+				</MenuItem>
 			</Menu>
 		</div>
 	)

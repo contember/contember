@@ -1,0 +1,106 @@
+{
+	"formatVersion": 5,
+	"modifications": [
+		{
+			"modification": "createView",
+			"entity": {
+				"eventLog": {
+					"enabled": true
+				},
+				"name": "GridArticleDetail",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "grid_article_detail",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					},
+					"commentsCount": {
+						"name": "commentsCount",
+						"columnName": "comments_count",
+						"columnType": "integer",
+						"nullable": false,
+						"type": "Integer"
+					},
+					"article": {
+						"type": "OneHasOne",
+						"name": "article",
+						"target": "GridArticle",
+						"joiningColumn": {
+							"columnName": "article_id",
+							"onDelete": "restrict"
+						},
+						"nullable": false,
+						"inversedBy": "details"
+					}
+				},
+				"unique": [],
+				"indexes": [],
+				"view": {
+					"sql": "\n\tSELECT\n\t\tarticle.id AS id,\n\t\tarticle.id AS article_id,\n\t\t(SELECT COUNT(*)\n\t\t FROM \"grid_article_comment\" comment\n\t\t WHERE comment.article_id = article.id) AS comments_count\n\tFROM \"grid_article\" article;\n"
+				}
+			}
+		},
+		{
+			"modification": "createRelationInverseSide",
+			"entityName": "GridArticle",
+			"relation": {
+				"type": "OneHasOne",
+				"name": "details",
+				"target": "GridArticleDetail",
+				"ownedBy": "article",
+				"nullable": true
+			}
+		},
+		{
+			"modification": "patchAclSchema",
+			"patch": [
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/GridArticleDetail",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"read": {
+								"id": true,
+								"article": true,
+								"commentsCount": true
+							},
+							"create": {
+								"id": true,
+								"article": true,
+								"commentsCount": true
+							},
+							"update": {
+								"id": true,
+								"article": true,
+								"commentsCount": true
+							},
+							"delete": true,
+							"customPrimary": true
+						}
+					}
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/GridArticle/operations/read/details",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/GridArticle/operations/create/details",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/GridArticle/operations/update/details",
+					"value": true
+				}
+			]
+		}
+	]
+}

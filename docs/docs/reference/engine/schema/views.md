@@ -32,10 +32,10 @@ The first step is to write the SQL query representing the view. Ensure it adhere
 
 ### 2. Creating the View Entity
 
-Use the `@def.View` decorator to wrap the SQL query. Then, define columns and relationships using Contember's standard methods.
+Use the `@c.View` decorator to wrap the SQL query. Then, define columns and relationships using Contember's standard methods.
 
 :::note
-View entities in Contember must hold the owning side of a relationship, so only `oneHasOne` and `manyHasOne` relations are allowed within them. 
+View entities in Contember must hold the owning side of a relationship, so only `oneHasOne` and `manyHasOne` relations are allowed within them.
 :::
 Certainly! Here's a revised version that maintains the original structure but rewords the descriptions:
 
@@ -44,7 +44,7 @@ Certainly! Here's a revised version that maintains the original structure but re
 Suppose you want to gather statistics on survey answers. You can define a view to handle this as follows:
 
 ```typescript
-@d.View(`
+@c.View(`
   SELECT
     gen_random_uuid() AS id,
     COUNT(*) as total_count,
@@ -53,8 +53,8 @@ Suppose you want to gather statistics on survey answers. You can define a view t
   GROUP BY answer_id
 `)
 export class SurveyAnswerStats {
-  totalCount = d.intColumn().notNull()
-  answer = d.oneHasOne(SurveyAnswer, 'stats').notNull()
+  totalCount = c.intColumn().notNull()
+  answer = c.oneHasOne(SurveyAnswer, 'stats').notNull()
 }
 ```
 
@@ -64,9 +64,9 @@ The Inverse Side of the Relation in the Survey Answer Entity will look like this
 
 ```typescript
 export class SurveyAnswer {
-  survey = def.manyHasOne(Survey, 'answers').notNull()
-  answer = def.stringColumn()
-  stats = def.oneHasOneInverse(SurveyAnswerStats, 'answer')
+  survey = c.manyHasOne(Survey, 'answers').notNull()
+  answer = c.stringColumn()
+  stats = c.oneHasOneInverse(SurveyAnswerStats, 'answer')
 }
 ```
 
@@ -97,7 +97,7 @@ In Contember, if you are defining a view that relies on or selects data from ano
 
 #### Example: defining dependencies
 ```typescript
-@d.View(`SELECT ....`,
+@c.View(`SELECT ....`,
 	{
 		dependencies: () => [OrderSummary],
 	},
@@ -106,8 +106,8 @@ In Contember, if you are defining a view that relies on or selects data from ano
 
 ### FAQs
 
-**Q: Can I use any SQL function in the view?**  
+**Q: Can I use any SQL function in the view?**
 **A:** Yes, you can use any SQL function, but ensure that the output matches the defined Contember schema.
 
-**Q: What happens if my mapping is incorrect?**  
+**Q: What happens if my mapping is incorrect?**
 **A:** Incorrect mapping between the SQL and the schema fields will result in runtime errors.

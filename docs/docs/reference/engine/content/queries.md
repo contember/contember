@@ -8,11 +8,11 @@ Contember provides a GraphQL API for fetching and modifying data. There are thre
 For following entity:
 
 ```typescript
-import { SchemaDefinition as def } from "@contember/schema-definition";
+import { c } from "@contember/schema-definition";
 
 export class Post {
-  title = def.stringColumn().notNull();
-  publishedAt = def.dateTimeColumn();
+  title = c.stringColumn().notNull();
+  publishedAt = c.dateTimeColumn();
 }
 ```
 
@@ -71,7 +71,7 @@ query {
 }
 ```
 
-The "by" parameter allows you to filter by any unique column (or columns in case of a compound unique key). By default, the unique field is "id", but you can specify other unique fields using the `.unique()` method on the column or using the `@def.Unique(...)` class annotation.
+The "by" parameter allows you to filter by any unique column (or columns in case of a compound unique key). By default, the unique field is "id", but you can specify other unique fields using the `.unique()` method on the column or using the `@c.Unique(...)` class annotation.
 
 You can then specify the fields you want to retrieve in the GraphQL query. In the example above, we are retrieving the "title" and "publishedAt" fields of the Post with the specified id.
 
@@ -304,7 +304,7 @@ In addition to `asc` and `desc`, there are also `ascNullsFirst` and `descNullsLa
 
 When working with GraphQL, it is often necessary to traverse relationships between objects to retrieve the data needed.
 
-#### Example 
+#### Example
 ```graphql
 query {
   listPost {
@@ -320,7 +320,7 @@ query {
 }
 ```
 
-Additionally, you can traverse multiple levels of relationships by nesting fields within each other. 
+Additionally, you can traverse multiple levels of relationships by nesting fields within each other.
 
 #### Example how to retrieve the author of each post within a category:
 
@@ -372,20 +372,20 @@ query {
 
 ## Narrowed has many
 
-You can use the narrowed has many to filter a "has many" relation by a field of a compound unique key, where the second part of the unique key references the entity that you are querying. This allows you to access a specific record within the "has many" relation. 
+You can use the narrowed has many to filter a "has many" relation by a field of a compound unique key, where the second part of the unique key references the entity that you are querying. This allows you to access a specific record within the "has many" relation.
 
 For example, consider the following schema:
 ```typescript
 export class Category {
-	translations = d.oneHasMany(CategoryTranslation, 'category'))
-	internalNote = def.stringColumn()
+	translations = c.oneHasMany(CategoryTranslation, 'category')
+	internalNote = c.stringColumn()
 }
 
-@d.Unique('category', 'locale')
+@c.Unique('category', 'locale')
 export class CategoryTranslation {
-	category = d.manyHasOne(Category, 'translations').cascadeOnDelete().notNull()
-	locale = d.stringColumn().notNull()
-	name = d.stringColumn()
+	category = c.manyHasOne(Category, 'translations').cascadeOnDelete().notNull()
+	locale = c.stringColumn().notNull()
+	name = c.stringColumn()
 }
 ```
 

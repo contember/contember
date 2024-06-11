@@ -10,11 +10,11 @@ Let's define two entities - a *Category* and a *Post*:
 
 ```typescript
 export class Category {
-	name = def.stringColumn();
+	name = c.stringColumn();
 }
 export class Post {
-	title = def.stringColumn();
-	content = def.stringColumn();
+	title = c.stringColumn();
+	content = c.stringColumn();
 }
 ```
 
@@ -22,14 +22,14 @@ Now just add a relationship field to the *Post* entity definition:
 
 ```typescript
 export class Post {
-	title = def.stringColumn().notNull();
-	content = def.stringColumn();
+	title = c.stringColumn().notNull();
+	content = c.stringColumn();
 	// highlight-next-line
-	category = def.manyHasOne(Category);
+	category = c.manyHasOne(Category);
 }
 ```
 
-That's all. In next sections, you'll find out how to setup inverse side, not null etc. 
+That's all. In next sections, you'll find out how to setup inverse side, not null etc.
 
 ## Types of relationships
 
@@ -41,8 +41,8 @@ Owning side of this relationship references (at most) one entity, but that entit
 
 ![one has many relationship](/assets/one-has-many.svg)
 
-- We define owning side of this relationship using `manyHasOne` method. 
-- Optionally, we define an inverse side using `oneHasMany` method. 
+- We define owning side of this relationship using `manyHasOne` method.
+- Optionally, we define an inverse side using `oneHasMany` method.
 - Joining column with actual relationship value is located on owning side.
 - For this relationship, you can also configure:
   - [nullability](#nullability) on owning side
@@ -51,9 +51,9 @@ Owning side of this relationship references (at most) one entity, but that entit
 
 #### Use case
 
-This is probably the most common type of relationship. 
+This is probably the most common type of relationship.
 
-An example is a *Post* having a many *PostComment*, but the *PostComment* belongs to one single *Post*. 
+An example is a *Post* having a many *PostComment*, but the *PostComment* belongs to one single *Post*.
 Here, the *PostComment* is owning side of this relationship, because it holds a *Post* identifier in its joining column.
 
 #### Example: Configuring only owning side
@@ -61,10 +61,10 @@ Here, the *PostComment* is owning side of this relationship, because it holds a 
 ```typescript
 export class PostComment {
 	// highlight-next-line
-	post = def.manyHasOne(Post)
+	post = c.manyHasOne(Post)
 }
 export class Post {
-} 
+}
 ```
 
 #### Example: Configuring both owning and inverse side
@@ -72,33 +72,33 @@ export class Post {
 ```typescript
 export class PostComment {
 	// highlight-next-line
-	post = def.manyHasOne(Post, 'comments')
+	post = c.manyHasOne(Post, 'comments')
 }
 
 export class Post {
 	// highlight-next-line
-	comments = def.oneHasMany(PostComment, 'post')
+	comments = c.oneHasMany(PostComment, 'post')
 }
 ```
 
 ### Many-has-many
 
-An owning entity can reference many inverse entities. Also, this inverse entity can be referenced from many owning entities. 
+An owning entity can reference many inverse entities. Also, this inverse entity can be referenced from many owning entities.
 
 ![many has many relationship](/assets/many-has-many.svg)
 
-- Relationship is realized through a joining (also called junction) table. 
-- Although there is no joining column, we still recognize owning and inverse side (mainly for configuration purposes). 
-- We define owning side of this relationship using `manyHasMany` method. 
+- Relationship is realized through a joining (also called junction) table.
+- Although there is no joining column, we still recognize owning and inverse side (mainly for configuration purposes).
+- We define owning side of this relationship using `manyHasMany` method.
 - Optionally, we define an inverse side using `manyHasManyInverse` method.
 - For this relationship, you can also configure:
   - [default order](#default-order) on both sides
-  
+
 #### Use case
 
 Useful when you need to just connect two entities without any additional metadata.
-E.g. a *Post* has many *Tag*s, also there are many *Post*s of each *Tag*. 
-Downside is that you cannot attach any information on the relationship between them, e.g. you can't even sort *Tag*s of given *Post*. 
+E.g. a *Post* has many *Tag*s, also there are many *Post*s of each *Tag*.
+Downside is that you cannot attach any information on the relationship between them, e.g. you can't even sort *Tag*s of given *Post*.
 In case you need such thing, you'd better create an extra entity representing the relationship (e.g. a *PostTag* referencing using ManyHasOne both *Post* and *Tag*)
 
 #### Example: Configuring only owning side
@@ -106,10 +106,10 @@ In case you need such thing, you'd better create an extra entity representing th
 ```typescript
 export class Post {
 	// highlight-next-line
-	tags = def.manyHasMany(Tag)
+	tags = c.manyHasMany(Tag)
 }
 export class Tag {
-} 
+}
 ```
 
 #### Example: Configuring both owning and inverse side
@@ -117,12 +117,12 @@ export class Tag {
 ```typescript
 export class Post {
 	// highlight-next-line
-	tags = def.manyHasMany(Tag, 'posts')
+	tags = c.manyHasMany(Tag, 'posts')
 }
 
 export class Category {
 	// highlight-next-line
-	posts = def.manyHasManyInverse(Post, 'tags')
+	posts = c.manyHasManyInverse(Post, 'tags')
 }
 ```
 
@@ -130,20 +130,20 @@ export class Category {
 
 ```typescript
 export class Post {
-	tags = def.oneHasMany(PostTag, 'post')
+	tags = c.oneHasMany(PostTag, 'post')
 }
 
 export class PostTag {
 	// highlight-next-line
-    post = def.manyHasOne(Post, 'tags').notNull().cascadeOnDelete()
+    post = c.manyHasOne(Post, 'tags').notNull().cascadeOnDelete()
 	// highlight-next-line
-    tag = def.manyHasOne(Tag, 'posts').notNull().cascadeOnDelete()
+    tag = c.manyHasOne(Tag, 'posts').notNull().cascadeOnDelete()
 	// highlight-next-line
-    order = def.intColumn()
+    order = c.intColumn()
 }
 
 export class Tag {
-	posts = def.oneHasMany(PostTag, 'tag')
+	posts = c.oneHasMany(PostTag, 'tag')
 }
 ```
 
@@ -153,21 +153,21 @@ There is at most one entity on each side of this relationship.
 
 ![one has one relationship](/assets/one-has-one.svg)
 
-- We define owning side of this relationship using `oneHasOne` method. 
-- Optionally, we define an inverse side using `oneHasOneInverse` method. 
+- We define owning side of this relationship using `oneHasOne` method.
+- Optionally, we define an inverse side using `oneHasOneInverse` method.
 - Joining column with actual relationship value is located on owning side.
-- For this relationship, you can also configure 
+- For this relationship, you can also configure
   - [nullability](#nullability) on both sides
-  - [delete behaviour](#on-delete-behavior) on owning side 
+  - [delete behaviour](#on-delete-behavior) on owning side
   - [orphan removal](#orphan-removal) on owning side
 
 #### Use case
 
-Not as common, but sometimes useful type of relationship. 
-Imagine entities *Post* and *PostContent* - there is always single *PostContent* entity of each *Post* and a single *Post* for each *PostContent*. 
-In this case, it might seem a bit pointless - all fields *PostContent* entity can be safely inlined into *Post*. 
-Let's change it a bit - rename *PostContent* to *Content*. 
-Now we can reference this generic *Content* not only from a *Post*, but also from e.g. a *Category* and use same logic for storing, managing and rendering the *Content* of both entities. 
+Not as common, but sometimes useful type of relationship.
+Imagine entities *Post* and *PostContent* - there is always single *PostContent* entity of each *Post* and a single *Post* for each *PostContent*.
+In this case, it might seem a bit pointless - all fields *PostContent* entity can be safely inlined into *Post*.
+Let's change it a bit - rename *PostContent* to *Content*.
+Now we can reference this generic *Content* not only from a *Post*, but also from e.g. a *Category* and use same logic for storing, managing and rendering the *Content* of both entities.
 In this example, owning side would be in *Post* and *Category* entities, optional inverse side in *Content*.
 
 #### Example: Configuring only owning side
@@ -175,7 +175,7 @@ In this example, owning side would be in *Post* and *Category* entities, optiona
 ```typescript
 export class Post {
 	// highlight-next-line
-	content = def.oneHasOne(Content)
+	content = c.oneHasOne(Content)
 }
 export class Content {
 }
@@ -186,12 +186,12 @@ export class Content {
 ```typescript
 export class Post {
 	// highlight-next-line
-	content = def.oneHasOne(Content, 'post')
+	content = c.oneHasOne(Content, 'post')
 }
 
 export class Content {
 	// highlight-next-line
-	post = def.oneHasOneInverse(Post, 'content')
+	post = c.oneHasOneInverse(Post, 'content')
 }
 ```
 
@@ -200,18 +200,18 @@ export class Content {
 ### Nullability
 
 You can also define `.notNull()` constraint for "one has one" relationships and owning side of "many has one" relationship.
-This will ensure that there is an entity connected. 
+This will ensure that there is an entity connected.
 #### Example: making category of post not nullable
 ```typescript
 export class Post {
 	// highlight-next-line
-	category = def.manyHasOne(Category).notNull();
+	category = c.manyHasOne(Category).notNull();
 }
 ```
 
 ### On delete behavior
 
-Using `.onDelete()` you can set what happens when referenced entity is deleted. 
+Using `.onDelete()` you can set what happens when referenced entity is deleted.
 E.g. you have a post, which is assigned to a category. When a category is deleted, three things can happen:
 
 - Restrict: this is default behavior. When you try to delete an entity, which is referenced from other entities, the delete operation will fail.
@@ -220,8 +220,8 @@ E.g. you have a post, which is assigned to a category. When a category is delete
 
 Pay attention when you are choosing the strategy, because choosing a wrong strategy may lead to runtime errors or deleting more content than you wanted.
 
-:::note 
-In database, all relationships are marked as "NO ACTION" and actual strategy is executed by Contember. 
+:::note
+In database, all relationships are marked as "NO ACTION" and actual strategy is executed by Contember.
 This is because Contember can evaluate ACL rules.
 :::
 
@@ -232,7 +232,7 @@ This will delete Post entity when referenced Content is deleted.
 ```typescript
 export class Post {
 	// highlight-next-line
-	content = def.oneHasOne(Content, 'post').cascadeOnDelete()
+	content = c.oneHasOne(Content, 'post').cascadeOnDelete()
 }
 ```
 
@@ -243,27 +243,27 @@ This will set content relationship to `null` when referenced Content is deleted
 ```typescript
 export class Post {
 	// highlight-next-line
-	content = def.oneHasOne(Content, 'post').setNullOnDelete()
+	content = c.oneHasOne(Content, 'post').setNullOnDelete()
 }
 ```
 
 ### Default order
 
-You can use a method `.orderBy()` on "has many" relationships to set default order of this relationship. 
+You can use a method `.orderBy()` on "has many" relationships to set default order of this relationship.
 Of course, you can later override this order in a query.
 
 
 #### Example: sorting posts in a category by title
 ```typescript
 export class Category {
-	title = def.stringColumn();
+	title = c.stringColumn();
 	// highlight-next-line
-	posts = def.oneHasMany(Post, "category").orderBy("title");
+	posts = c.oneHasMany(Post, "category").orderBy("title");
 }
 
 export class Post {
-	title = def.stringColumn().notNull();
-	category = def.manyHasOne(Category, "posts");
+	title = c.stringColumn().notNull();
+	category = c.manyHasOne(Category, "posts");
 }
 ```
 
@@ -271,9 +271,9 @@ export class Post {
 By calling this method multiple times, you can set subsequent order rules.
 ```typescript
 export class Category {
-	title = def.stringColumn();
+	title = c.stringColumn();
 	// highlight-next-line
-	posts = def.oneHasMany(Post, "category").orderBy("title").orderBy('lead');
+	posts = c.oneHasMany(Post, "category").orderBy("title").orderBy('lead');
 }
 ```
 :::
@@ -290,6 +290,6 @@ By enabling this option, *Content* will be removed once *Post* is removed.
 ```typescript
 export class Post {
 	// highlight-next-line
-	content = def.oneHasOne(Content, 'post').removeOrphan()
+	content = c.oneHasOne(Content, 'post').removeOrphan()
 }
 ```

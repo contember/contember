@@ -58,7 +58,7 @@ To allow an identity to use the assume membership feature, the appropriate permi
 #### Example how to define a role with ability to assume a membership:
 
 ```typescript
-export const authorRole = acl.createRole('author', {
+export const authorRole = c.createRole('author', {
 	content: {
 		assumeMembership: {reader: true}
 	}

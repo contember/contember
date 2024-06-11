@@ -4,7 +4,7 @@ title: Permissions and ACL
 
 Contember provides an easy way to create user roles with granular permission.
 
-Using our declarative ACL, you can define not only row and column level permissions, but also cell level. In other words, you can define different conditions for accessing individual fields of a single row. 
+Using our declarative ACL, you can define not only row and column level permissions, but also cell level. In other words, you can define different conditions for accessing individual fields of a single row.
 
 In ACL definition, you use same filters you know from [Content API filters](/reference/engine/content/queries.md), so you can traverse through relations and build complex cross-entity rules.
 
@@ -56,20 +56,20 @@ createRole(roleName, options)
 
 #### Function arguments:
 - `roleName`: a role identifier. You use this name in [Tenant API](/reference/engine/tenant/memberships.md)
-- `options`: optional argument, where you can define [tenant](#tenant-permissions) and [system](#system-api-permissions) permissions. 
+- `options`: optional argument, where you can define [tenant](#tenant-permissions) and [system](#system-api-permissions) permissions.
 
 Each role must be exported from schema definition using `export const ...`
 
 #### Example: creating editorRole
 ```typescript
-import { AclDefinition as acl } from '@contember/schema-definition'
-export const editorRole = acl.createRole('editor')
+import { c } from '@contember/schema-definition'
+export const editorRole = c.createRole('editor')
 ```
 
 #### Example: creating editorRole with additional options
 ```typescript
-import { AclDefinition as acl } from '@contember/schema-definition'
-export const editorRole = acl.createRole('editor', {
+import { c } from '@contember/schema-definition'
+export const editorRole = c.createRole('editor', {
 	tenant: {
 		invite: true,
 		// ...
@@ -98,9 +98,9 @@ createEntityVariable(variableName, entityName, role[, fallback])
 
 #### Example: defining categoryId entity variable
 ```typescript
-import { AclDefinition as acl } from '@contember/schema-definition'
+import { c } from '@contember/schema-definition'
 
-export const categoryIdVariable = acl.createEntityVariable('categoryId', 'Category', editorRole)
+export const categoryIdVariable = c.createEntityVariable('categoryId', 'Category', editorRole)
 ```
 
 ### `createPredefinedVariable`: Defining a predefined variable {#create-predefined-variable}
@@ -112,16 +112,16 @@ createConditionVariable(variableName, value, role[, fallback])
 #### Function arguments:
 
 - `variableName`: a variable identifier. It must be unique for given role. You use this name in [Tenant API](/reference/engine/tenant/memberships.md)
-- `value`: a value type passed to a variable, can be either `identityID` or `personID`  
+- `value`: a value type passed to a variable, can be either `identityID` or `personID`
 - `role`: a role reference (created using [createRole](#createrole)), for which this variable is defined. You can also pass an array of roles.
 - `fallback`: optional fallback condition, when a variable is not passed
 
 #### Example: defining personVariable predefined variable
 
 ```typescript
-import { AclDefinition as acl } from '@contember/schema-definition'
+import { c } from '@contember/schema-definition'
 
-export const personVariable = acl.createPredefinedVariable('person', 'personID', readerRole)
+export const personVariable = c.createPredefinedVariable('person', 'personID', readerRole)
 ```
 
 ### `createConditionVariable`: Defining a condition variable {#create-condition-variable}
@@ -140,9 +140,9 @@ createConditionVariable(variableName, role[, fallback])
 #### Example: defining subscriptionVariable condition variable
 
 ```typescript
-import { AclDefinition as acl } from '@contember/schema-definition'
+import { c } from '@contember/schema-definition'
 
-export const subscriptionVariable = acl.createConditionVariable('subscription', readerRole)
+export const subscriptionVariable = c.createConditionVariable('subscription', readerRole)
 ```
 
 :::note
@@ -273,4 +273,4 @@ import acl from './acl'
 export default { ...createSchema(model), acl }
 ```
 
-> Note, that this will override any ACL definition produced by decorators API. To combine these approaches, you must merge it deeply. 
+> Note, that this will override any ACL definition produced by decorators API. To combine these approaches, you must merge it deeply.

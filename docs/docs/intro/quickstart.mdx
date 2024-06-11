@@ -47,7 +47,7 @@ your_project_name/
 When we installed Contember it already created the structure above. Let's go to `api/model/index.ts` file. It looks like this:
 
 ```ts
-import { SchemaDefinition as def } from '@contember/schema-definition'
+import { c } from '@contember/schema-definition'
 
 // export your model definition here
 
@@ -67,11 +67,11 @@ For instance, if you were building a blog platform, some of the entities could b
 In this example, we'll define entity `Article` with two properties: `title` and `content`, which are both of type string. <span class="smallNote">In real life we would obviously want it a bit different, but this is a very basic example designed to quickly show you how to work with Contember.</span>
 
 ```ts title="api/model/index.ts"
-import { SchemaDefinition as def } from '@contember/schema-definition'
+import { c } from '@contember/schema-definition'
 
 export class Article {
-  title = def.stringColumn()
-  content = def.stringColumn()
+  title = c.stringColumn()
+  content = c.stringColumn()
 }
 ```
 

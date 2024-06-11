@@ -1,6 +1,5 @@
 import { LogOutIcon, Maximize2Icon, MenuIcon, Minimize2Icon, PanelLeftCloseIcon, PanelLeftOpenIcon, PanelRightCloseIcon, PanelRightOpenIcon } from 'lucide-react'
 import { PropsWithChildren, useEffect, useState } from 'react'
-import { ComponentClassNameProps } from '@contember/utilities'
 import { useHasActiveSlotsFactory } from '@contember/react-slots'
 import { uic } from '../utils/uic'
 import { SlotTargets } from './slots'
@@ -64,7 +63,7 @@ const LayoutRightPanelOpenerUI = uic('a', { baseClass: 'absolute top-1 right-1' 
 const LayoutSwitcherUI = uic('a', { baseClass: 'hidden lg:flex self-end absolute top-1 right-1 opacity-20 text-gray-400 hover:opacity-100 transition-opacity cursor-pointer' })
 
 
-export const LayoutComponent = ({ children, ...rest }: PropsWithChildren<ComponentClassNameProps>) => {
+export const LayoutComponent = ({ children, ...rest }: PropsWithChildren<{}>) => {
 	const isActive = useHasActiveSlotsFactory()
 
 	const [leftSidebarVisibility, setLeftSidebarVisibility] = useState<'show' | 'hidden' | 'auto'>('auto')

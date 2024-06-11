@@ -15,6 +15,7 @@
 		{ "path": "../../react-repeater-dnd-kit/src" },
 		{ "path": "../../react-form/src" },
 		{ "path": "../../react-select/src" },
-		{ "path": "../../react-slate-editor/src" }
+		{ "path": "../../react-slate-editor/src" },
+		{ "path": "../../react-utils/src" },
 	]
 }

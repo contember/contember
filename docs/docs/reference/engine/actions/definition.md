@@ -19,9 +19,9 @@ To define a Watch Action, you employ decorator syntax. The `@watch` decorator is
 #### Example: Basic structure of a Watch Action definition:
 
 ```javascript
-import { SchemaDefinition as def, ActionsDefinition as actions } from '@contember/schema-definition'
+import { c } from '@contember/schema-definition'
 
-@actions.watch({
+@c.Watch({
   name: 'action_name',
   watch: `fields_to_watch`,
   webhook: 'webhook_url',
@@ -46,9 +46,9 @@ To define a Trigger Action, you attach the `@trigger` decorator to the entity cl
 #### Example: Basic structure of a Trigger Action definition:
 
 ```typescript
-import { SchemaDefinition as def, ActionsDefinition as actions } from '@contember/schema-definition'
+import { c } from '@contember/schema-definition'
 
-@actions.trigger({
+@c.Trigger({
   name: 'action_name',
   create: true,
   delete: true,
@@ -71,9 +71,9 @@ export class YourEntity {
 #### Example: Defining a Trigger Action
 
 ```javascript
-import { SchemaDefinition as def, ActionsDefinition as actions } from '@contember/schema-definition'
+import { c } from '@contember/schema-definition'
 
-@actions.trigger({
+@c.Trigger({
   name: 'book_created',
   create: true,
   selection: `
@@ -85,8 +85,8 @@ import { SchemaDefinition as def, ActionsDefinition as actions } from '@contembe
   webhook: 'https://example.com/book/created',
 })
 export class Book {
-  title = def.stringColumn();
-  author = def.manyHasOne(Author);
+  title = c.stringColumn();
+  author = c.manyHasOne(Author);
 }
 ```
 
@@ -99,9 +99,9 @@ By default, the payload that is sent to the webhook encapsulates the changes tha
 Example: Defining a selection within a watch
 
 ```typescript
-import { SchemaDefinition as def, ActionsDefinition as actions } from '@contember/schema-definition'
+import { c } from '@contember/schema-definition'
 
-@actions.watch({
+@c.Watch({
 	name: 'order_watch',
 	watch: `
     status
@@ -132,9 +132,9 @@ The `webhook` property determines the URL where the webhook notification will be
 Instead of defining a simple string for the `webhook` property, you have the option to pass an object that allows for a more detailed configuration of the webhook. This feature gives you the ability to set additional headers, specify timeouts, manage retry attempts, and adjust the batching of webhook requests. Below is an example demonstrating how to leverage these advanced options:
 
 ```javascript
-import { SchemaDefinition as def, ActionsDefinition as actions } from "@contember/schema-definition"
+import { c } from "@contember/schema-definition"
 
-@actions.watch({
+@c.Watch({
   name: 'book_watch',
   watch: `
     title
@@ -177,9 +177,9 @@ Variables can be employed within the webhook URLs and header values of your Acti
 #### Example: Using variables in URL and headers:
 
 ```javascript
-import {SchemaDefinition as def, ActionsDefinition as actions} from "@contember/schema-definition"
+import { c } from "@contember/schema-definition"
 
-@actions.watch({
+@c.Watch({
   name: 'book_watch',
   watch: `
     title
@@ -211,15 +211,15 @@ The managementof these variables are explained in greater detail in the upcoming
 Contember enables the use of an alternative syntax that separates webhook targets for shared webhook configurations. This method promotes the reuse of identical webhook configurations across multiple Actions, granting flexibility for enabling or disabling watches, while preserving the target definition. Here's an example illustrating this syntax:
 
 ```javascript
-import {SchemaDefinition as def, ActionsDefinition as actions} from "@contember/schema-definition"
+import { c } from "@contember/schema-definition"
 
-export const myOrderUpdateTarget = actions.createTarget({
+export const myOrderUpdateTarget = c.createActionsTarget({
   name: 'my_order_update_target',
   type: 'webhook',
   url: 'http://localhost',
 });
 
-@actions.watch({
+@c.Watch({
   target: myOrderUpdateTarget,
   name: '...',
   watch: '...',
@@ -244,9 +244,9 @@ To assign priority for a `watch` or `trigger` action, include the `priority` pro
 Below is an example of assigning priority to a `watch` action:
 
 ```typescript
-import { SchemaDefinition as def, ActionsDefinition as action } from "@contember/schema-definition"
+import { c } from "@contember/schema-definition"
 
-@action.watch({
+@c.Watch({
   name: 'book_watch',
   watch: `
     title

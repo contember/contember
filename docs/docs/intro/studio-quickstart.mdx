@@ -82,22 +82,22 @@ In `api/model/index.ts` file you can find your application data model that AI bu
 Really simple example looks like this but you'll obviously have a more complicated one.
 
 ```ts title="api/model/index.ts"
-import { SchemaDefinition as def } from '@contember/schema-definition'
+import { c } from '@contember/schema-definition'
 
-@acl.allow(publicRole, {
+@c.Allow(publicRole, {
     read: ['content'],
     when: { hiddenAt: { isNull: true } },
 })
 export class Article {
-  title = def.stringColumn()
-  content = def.stringColumn()
-  hiddenAt = def.dateTimeColumn()
+  title = c.stringColumn()
+  content = c.stringColumn()
+  hiddenAt = c.dateTimeColumn()
 }
 ```
 
 Few notes:
 
-1. Thanks to `import { SchemaDefinition as def }` you get TypeScript autocompletion. Just press ctrl+space in your editor and you'll what you can use for each entity. It will also underline any errors.
+1. Thanks to `import { c }` you get TypeScript autocompletion. Just press ctrl+space in your editor and you'll what you can use for each entity. It will also underline any errors.
 2. Schema consists of Entities. Each entity has columns with many supported types.
 3. Above Entities you can find access control decorators which define what role can access what.
 

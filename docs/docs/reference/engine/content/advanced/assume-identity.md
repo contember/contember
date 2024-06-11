@@ -28,9 +28,9 @@ To use this feature, you must first enable it for the role you are using by sett
 #### Example how to define a role with ability to assume an identity:
 
 ```typescript
-export const adminRole = acl.createRole('admin', {
+export const adminRole = c.createRole('admin', {
   system: {
     assumeIdentity: true,
   },
 })
-```	
+```

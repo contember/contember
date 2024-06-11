@@ -16,7 +16,7 @@ To use the `data:export` command, open a terminal window and navigate to the roo
 ```
 npm run contember data:export [source-project]
 ```
-The source project argument is optional. If you leave it blank, the command will export data from the local project. If you want to export data from a remote project, you can specify the project using a DSN format like `contember://project:token@apiurl`. 
+The source project argument is optional. If you leave it blank, the command will export data from the local project. If you want to export data from a remote project, you can specify the project using a DSN format like `contember://project:token@apiurl`.
 
 For example:
 ```
@@ -47,7 +47,7 @@ To use the `data:import` command, open a terminal window and navigate to the roo
 ```
 npm run contember data:import <input-file> [target-project]
 ```
-The input file argument should be the path to the file containing the data you want to import. The target project argument is optional. If you leave it blank, the command will import the data into the local project. If you want to import the data into a remote project, you can specify the project using a DSN format like `contember://project:token@apiurl`. 
+The input file argument should be the path to the file containing the data you want to import. The target project argument is optional. If you leave it blank, the command will import the data into the local project. If you want to import the data into a remote project, you can specify the project using a DSN format like `contember://project:token@apiurl`.
 
 For example:
 ```
@@ -71,7 +71,7 @@ To use the `data:transfer` command, open a terminal window and navigate to the r
 ```
 npm run contember data:transfer <source-project> <target-project>
 ```
-The source project and target project arguments should be the projects you want to transfer data between. You can specify a local project using a dot `.`, or a remote project using a DSN format like `contember://project:token@apiurl` 
+The source project and target project arguments should be the projects you want to transfer data between. You can specify a local project using a dot `.`, or a remote project using a DSN format like `contember://project:token@apiurl`
 
 For example:
 ```
@@ -125,7 +125,7 @@ curl --request POST \
 ```
 This will send a POST request to the `/export` endpoint with a bearer token in the `Authorization` header and a JSON body specifying the project you want to export. The exported data will be returned in the response body.
 
-You can also use the `Content-Encoding: gzip` header to enable gzip compression for the export. 
+You can also use the `Content-Encoding: gzip` header to enable gzip compression for the export.
 
 # Data import
 
@@ -153,7 +153,7 @@ The ability to import and export data is controlled by user roles and their perm
 For example, to grant the editor role the ability to export data but not import it, you could use following configuration:
 
 ```typescript
-export const editorRole = acl.createRole('editor', {
+export const editorRole = c.createRole('editor', {
 	// ...
 	content: {
 		export: true,

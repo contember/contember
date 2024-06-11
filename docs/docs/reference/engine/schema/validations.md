@@ -5,15 +5,12 @@ title: Input validations
 Input validations are is a way to add more constraints to a field. They are specified using annotation on checked field.
 
 ```ts
-import {
-  InputValidation as validation,
-  SchemaDefinition as def,
-} from "@contember/schema-definition";
+import { c } from "@contember/schema-definition";
 
 export class Article {
   // highlight-next-line
-  @validation.assertNotEmpty("Article title cannot be empty")
-  title = def.stringColumn().notNull();
+  @c.AssertNotEmpty("Article title cannot be empty")
+  title = c.stringColumn().notNull();
 }
 ```
 

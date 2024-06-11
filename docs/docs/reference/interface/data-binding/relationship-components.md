@@ -69,12 +69,12 @@ To use the `Repeater` component, you must specify the `field` prop, which specif
 The example considers following model:
 ```typescript
 export class Question {
-	answers = def.oneHasMany(Answer, 'question')
+	answers = c.oneHasMany(Answer, 'question')
 }
 export class Answer {
-	question = def.manyHasOne(Question, 'answers')
-	answer = def.stringColumn()
-	order = def.intColumn()
+	question = c.manyHasOne(Question, 'answers')
+	answer = c.stringColumn()
+	order = c.intColumn()
 }
 ```
 

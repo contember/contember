@@ -38,18 +38,18 @@ Define your project's schema, which is then passed to the Contember Engine. Cont
 
 ```typescript
 // Post.ts
-import { SchemaDefinition as def } from '@contember/schema-definition'
+import { c } from '@contember/schema-definition'
 
-export const publicRole = acl.createRole('public')
+export const publicRole = c.createRole('public')
 
-@acl.allow(publicRole, {
+@c.Allow(publicRole, {
     when: { publishedAt: { gte: 'now' } },
     read: ['content'],
 })
 export class Post {
-  title = def.stringColumn().notNull()
-  publishedAt = def.dateTimeColumn()
-  content = def.stringColumn().notNull()
+  title = c.stringColumn().notNull()
+  publishedAt = c.dateTimeColumn()
+  content = c.stringColumn().notNull()
 }
 ```
 ### 2. GraphQL API Generation

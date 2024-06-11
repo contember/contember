@@ -9,9 +9,9 @@ Actions in Contember provide developers with a powerful way to keep track of ent
 To configure an Action, you need to employ the decorator syntax provided by Contember. Below is an example of an Action definition to demonstrate its structure:
 
 ```javascript
-import { SchemaDefinition as def, ActionsDefinition as actions } from "@contember/schema-definition"
+import { c } from "@contember/schema-definition"
 
-@actions.watch({
+@c.Watch({
   name: 'book_watch',
   watch: `
     title
@@ -22,9 +22,9 @@ import { SchemaDefinition as def, ActionsDefinition as actions } from "@contembe
   webhook: 'https://example.com/book/updated',
 })
 export class Book {
-  title = def.stringColumn();
-  tags = def.manyHasMany(Tag);
-  category = def.manyHasOne(Category);
+  title = c.stringColumn();
+  tags = c.manyHasMany(Tag);
+  category = c.manyHasOne(Category);
 }
 ```
 

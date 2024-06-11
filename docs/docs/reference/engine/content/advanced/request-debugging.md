@@ -11,7 +11,7 @@ In development mode, it is always enabled. On production, the `x-contember-debug
 Note that debugging information is only included in the response if the role used for the request has debugging enabled in its ACL definition. By default, the admin role has debugging enabled, but for other roles it must be explicitly enabled in the ACL definition. For example:
 
 ```typescript
-export const editor = acl.createRole('editor', {
+export const editor = c.createRole('editor', {
 	debug: true,
 })
 ```

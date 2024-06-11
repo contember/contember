@@ -16,17 +16,17 @@ While there's an extensive range of potential applications for Actions, we're go
 From our [previous steps](/intro/quickstart), we already have the schema. Imagine you want to send a Slack notification every time a new article is created. Here's how you'd modify the schema:
 
 ```javascript
-import { SchemaDefinition as def, ActionsDefinition as actions } from '@contember/schema-definition'
+import { c } from '@contember/schema-definition'
 
-@actions.trigger({
+@c.Trigger({
   name: 'sent_to_slack',
   create: true,
   selection: `title`,
   webhook: 'https://example.com/send_to_slack', // we'll get to this later
 })
 export class Article {
-  title = def.stringColumn()
-  content = def.stringColumn()
+  title = c.stringColumn()
+  content = c.stringColumn()
 }
 ```
 

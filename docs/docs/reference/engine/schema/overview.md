@@ -13,10 +13,10 @@ TODO: PICTURE OF PROJECT SCHEMA, MODEL SCHEMA, ACL SCHEMA AND INPUT VALIDATION S
 
 First let's look at the model schema, which is now the most important for us.
 
-:::note 
-Make sure you have `SchemaDefinition` imported in each file
+:::note
+Make sure you have `c` imported in each file
 ```typescript
-import { SchemaDefinition as def } from "@contember/schema-definition"
+import { c } from "@contember/schema-definition"
 ```
 :::
 
@@ -37,7 +37,7 @@ You don't have to define a primary key, because every entity has "id" column by 
 
 ### Columns
 
-See [columns chapter](columns.md). 
+See [columns chapter](columns.md).
 
 ### Relationships
 

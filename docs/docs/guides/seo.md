@@ -18,13 +18,13 @@ First, we have to define the schema. Here we have chosen four fields we want to 
 For this, we define an entity in our schema with fields. We are making only the `title` field required (using the `.notNull()` call). We save it in a new file.
 
 ```tsx title="api/model/Seo.ts"
-import { SchemaDefinition as def } from '@contember/schema-definition'
+import { c } from '@contember/schema-definition'
 
 export class Seo {
-	title = def.stringColumn().notNull()
-	description = def.stringColumn()
-	ogTitle = def.stringColumn()
-	ogDescription = def.stringColumn()
+	title = c.stringColumn().notNull()
+	description = c.stringColumn()
+	ogTitle = c.stringColumn()
+	ogDescription = c.stringColumn()
 }
 ```
 
@@ -41,7 +41,7 @@ To add SEO fields to all of these pages you can create a single `Seo` entity and
 To connect it to the `Article` entity we add the relation to the entity:
 
 ```tsx title="api/model/Article.ts"
-import { SchemaDefinition as def } from '@contember/schema-definition'
+import { c } from '@contember/schema-definition'
 // highlight-next-line
 import { Seo } from './Seo'
 
@@ -49,7 +49,7 @@ export class Article {
 	// some specific fields…
 
 	// highlight-next-line
-	seo = def.oneHasOne(Seo, 'article').notNull().removeOrphan()
+	seo = c.oneHasOne(Seo, 'article').notNull().removeOrphan()
 }
 ```
 
@@ -60,18 +60,18 @@ Note, that if you have already created some articles you can't mark this field a
 To specify the other side of the relation we add a field to the `Seo` entity we created earlier.
 
 ```tsx title="api/model/Seo.ts"
-import { SchemaDefinition as def } from '@contember/schema-definition'
+import { c } from '@contember/schema-definition'
 // highlight-next-line
 import { Article } from './Article'
 
 export class Seo {
-	title = def.stringColumn().notNull()
-	description = def.stringColumn()
-	ogTitle = def.stringColumn()
-	ogDescription = def.stringColumn()
+	title = c.stringColumn().notNull()
+	description = c.stringColumn()
+	ogTitle = c.stringColumn()
+	ogDescription = c.stringColumn()
 
 	// highlight-next-line
-	article = def.oneHasOneInverse(Article, 'seo')
+	article = c.oneHasOneInverse(Article, 'seo')
 }
 ```
 
@@ -82,11 +82,7 @@ To create migration for this we run `npm run contember migration:diff . add-seo`
 Now, we have these fields in our database and API, but we need to add them to our administration. To easily reuse them in different parts of our administration we can create a component that will encapsulate all the fields. We create a new file for it:
 
 ```tsx title="admin/components/Seo.tsx"
-import {
-	Component,
-	TextAreaField,
-	TextField,
-} from '@contember/admin'
+import { Component, TextAreaField, TextField } from '@contember/admin'
 
 export const Seo = Component(
 	() => (
@@ -127,11 +123,7 @@ Most of the time your article or page has a title that you use as a title in SEO
 First, let's modify our `Seo` component to take the name of the field we should copy the title from.
 
 ```tsx title="admin/components/Seo.tsx"
-import {
-	Component,
-	TextAreaField,
-	TextField,
-} from '@contember/admin'
+import { Component, TextAreaField, TextField } from '@contember/admin'
 
 /* highlight-start */
 interface SeoProps {
@@ -156,11 +148,7 @@ export const Seo = Component<SeoProps>(
 And then, when the prop is passed, we use the `DerivedFieldLink` component. Thus when the source field (title of the article) is edited, the change is mirrored in the derived fields (`seo.title` and `seo.ogTitle`).
 
 ```tsx title="admin/components/Seo.tsx"
-import {
-	Component,
-	TextAreaField,
-	TextField,
-} from '@contember/admin'
+import { Component, TextAreaField, TextField } from '@contember/admin'
 
 interface SeoProps {
 	titleField?: string

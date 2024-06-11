@@ -8,8 +8,8 @@ To define columns in Contember, you can add properties to your entity class. Eac
 
 ```typescript
 export class Post {
-	title = def.stringColumn().notNull()
-	publishedAt = def.dateTimeColumn()
+	title = c.stringColumn().notNull()
+	publishedAt = c.dateTimeColumn()
 }
 ```
 
@@ -36,7 +36,7 @@ The type of column in PostgreSQL database can be changed using `.columnType(...)
 #### Example: changing database type of Json column
 ```typescript
 export class Post {
-	config = def.jsonColumn().columnType('json')
+	config = c.jsonColumn().columnType('json')
 }
 ```
 :::
@@ -54,7 +54,7 @@ By default, columns are nullable, meaning that they can store a `null` value. Ho
 #### Example how to define a not-null string column:
 
 ```typescript
-title = def.stringColumn().notNull()
+title = c.stringColumn().notNull()
 ```
 
 In this example, the title column is a string column that is defined as not nullable. This means that you must provide a value for the title column when you create a record in the Post entity.
@@ -64,16 +64,16 @@ In this example, the title column is a string column that is defined as not null
 You can mark a column as unique by calling the `.unique()` method on it:
 
 ```typescript
-slug = def.stringColumn().unique()
+slug = c.stringColumn().unique()
 ```
 
 You can also define composite unique keys by using a class decorator:
 
 ```typescript
-@def.Unique("locale", "slug")
+@c.Unique("locale", "slug")
 export class Post {
-	slug = def.stringColumn().notNull()
-	locale = def.stringColumn().notNull()
+	slug = c.stringColumn().notNull()
+	locale = c.stringColumn().notNull()
 }
 ```
 
@@ -90,18 +90,18 @@ To define ordinary non-unique index, you can use `Index` decorator in your schem
 
 #### Example how to define a single column index
 ```typescript
-@def.Index('title')
+@c.Index('title')
 export class Article {
-	title = def.stringColumn()
+	title = c.stringColumn()
 }
 ```
 
 #### Example how to define a multi column index
 ```typescript
-@def.Index('title', 'description')
+@c.Index('title', 'description')
 export class Article {
-	title = def.stringColumn()
-	description = def.stringColumn()
+	title = c.stringColumn()
+	description = c.stringColumn()
 }
 ```
 
@@ -112,7 +112,7 @@ To change the name of a column in a database, you can use the `columnName` metho
 #### Example how to define a column with a custom column name:
 
 ```typescript
-publishedAt = def.dateTimeColumn().columnName('published')
+publishedAt = c.dateTimeColumn().columnName('published')
 ```
 In this example, the publishedAt property is a date-time column that is defined with the column name `published`. This means that the column will be named `published` in the database, rather than `published_at`.
 
@@ -130,7 +130,7 @@ However, you can use the columnType method to specify a custom column type in th
 #### Example how to use the columnType method to specify a custom column type in the database:
 
 ```typescript
-config = def.jsonColumn().columnType('json')
+config = c.jsonColumn().columnType('json')
 ```
 In this example, the config property is a JSON column that is defined with the column type json in the database. This means that the config column will be of type json in the database, rather than the default jsonb type.
 
@@ -140,7 +140,7 @@ The `default` method allows you to specify a default value for a column in your 
 
 #### Example how to use the default method to specify a default value for a column:
 ```typescript
-published = def.boolColumn().default(false)
+published = c.boolColumn().default(false)
 ```
 In this example, the published property is a boolean column that is defined with the default value false. This means that when a new record is created, the published column will be set to false if no value is explicitly provided.
 
@@ -155,7 +155,7 @@ However, you can use the typeAlias method to specify a custom GraphQL type for a
 #### Example how to use the typeAlias method to specify a custom GraphQL type for a column:
 
 ```typescript
-publishedAt = def.dateTimeColumn().typeAlias('CustomDateTime')
+publishedAt = c.dateTimeColumn().typeAlias('CustomDateTime')
 ```
 
 In this example, the publishedAt property is a date-time column that is mapped to the `CustomDateTime` GraphQL type in the schema. This means that the `publishedAt` column will be of type `CustomDateTime` in the GraphQL schema, rather than the default `DateTime` type.
@@ -167,7 +167,7 @@ The `sequence` method allows you to enable a generated sequence on an integer co
 ### Example how to enable a sequence:
 ```typescript
 export class Task {
-	counter = def.intColumn().sequence().notNull()
+	counter = c.intColumn().sequence().notNull()
 }
 ```
 :::caution
@@ -179,7 +179,7 @@ You can also pass an optional configuration with start and precedence. The start
 #### Example of how to enable a sequence with different start and precedence:
 ```typescript
 export class Task {
-	counter = def.intColumn().notNull().sequence({ start: 1000, precedence: 'ALWAYS' })
+	counter = c.intColumn().notNull().sequence({ start: 1000, precedence: 'ALWAYS' })
 }
 ```
 
@@ -188,16 +188,16 @@ In this example, the counter column in the Task entity is defined as an integer 
 
 ## Enums
 
-Enums in Contember allow you to define a set of predefined values for a column in your entity schema. Enums can be used to limit the possible values that can be stored in a column, and can be useful for defining values that are used consistently throughout your application. The enum defined in a schema is mapped to a GraphQL enum. 
+Enums in Contember allow you to define a set of predefined values for a column in your entity schema. Enums can be used to limit the possible values that can be stored in a column, and can be useful for defining values that are used consistently throughout your application. The enum defined in a schema is mapped to a GraphQL enum.
 
 To define an enum, you can use the `createEnum` method. This method takes a list of string values, which will become the possible values of the enum.
 
 ### Example how to define an enum for a status column in a Task entity:
 ```typescript
-export const TaskStatus = def.createEnum('pending', 'in_progress', 'completed')
+export const TaskStatus = c.createEnum('pending', 'in_progress', 'completed')
 
 export class Task {
-  status = def.enumColumn(TaskStatus)
+  status = c.enumColumn(TaskStatus)
 }
 ```
 

@@ -11,7 +11,7 @@ The `invite` permission controls the ability to invite other users to a project.
 #### Example: Simple Invite Permission
 
 ```typescript
-export const editorRole = acl.createRole('editor', {
+export const editorRole = c.createRole('editor', {
   tenant: {
     invite: true,
   },
@@ -19,7 +19,7 @@ export const editorRole = acl.createRole('editor', {
 ```
 
 :::note
-Before Engine 1.3, the `invite` and `unmanagedInvite` allowed only a boolean value. 
+Before Engine 1.3, the `invite` and `unmanagedInvite` allowed only a boolean value.
 :::
 
 ### <span className="version">Engine 1.3+</span> Unmanaged Invite Permissions
@@ -33,7 +33,7 @@ The `view` field enables you to specify which roles and their associated variabl
 #### Example: View Permissions
 
 ```typescript
-export const editorRole = acl.createRole('editor', {
+export const editorRole = c.createRole('editor', {
   tenant: {
     view: {
       editor: {
@@ -53,7 +53,7 @@ The `manage` field helps you specify the roles and their variables that a user c
 #### Example: Manage Permissions
 
 ```typescript
-export const editorRole = acl.createRole('editor', {
+export const editorRole = c.createRole('editor', {
   tenant: {
     manage: {
       editor: {

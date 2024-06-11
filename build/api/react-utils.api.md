@@ -6,39 +6,16 @@
 
 import { Context } from 'react';
 import { DispatchWithoutAction } from 'react';
-import { EventHandler } from 'react';
-import { JSX as JSX_2 } from 'react/jsx-runtime';
-import { MemoExoticComponent } from 'react';
 import { MutableRefObject } from 'react';
 import { NamedExoticComponent } from 'react';
-import { NestedClassName } from '@contember/utilities';
 import { ReactNode } from 'react';
 import { RefCallback } from 'react';
 import { RefObject } from 'react';
-import { SyntheticEvent } from 'react';
-
-// @public (undocumented)
-export const ColorSchemeContext: Context<string>;
-
-// @public (undocumented)
-export const ColorSchemeProvider: MemoExoticComponent<({ children, scheme }: ColorSchemeProviderProps) => JSX_2.Element>;
-
-// @public (undocumented)
-export type ColorSchemeProviderProps = {
-    children: React.ReactNode;
-    scheme?: string;
-};
 
 // @public (undocumented)
 export type ComposedRefCallback<T> = RefCallback<T> & {
     current: T | null;
 };
-
-// @public (undocumented)
-export const ContainerWidthContext: Context<number | null | undefined>;
-
-// @public (undocumented)
-export type ContainerWidthContextType = number;
 
 // @public (undocumented)
 export function createContext<T>(name: string, initialValue: T): [Context<T>, () => T];
@@ -64,15 +41,6 @@ export type DebugChildrenProps = {
 export type DebugMethod = (...parameters: any[]) => void;
 
 // @public (undocumented)
-export const DEFAULT_COLOR_SCHEME = "system";
-
-// @public (undocumented)
-export type ElementSize = {
-    height: number;
-    width: number;
-};
-
-// @public (undocumented)
 export const emptyArray: any[];
 
 // @public (undocumented)
@@ -83,9 +51,6 @@ export function getChildrenAsLabel(node: ReactNode): string | undefined;
 
 // @public (undocumented)
 export const getStateStorage: (storageOrName: StateStorageOrName | StateStorageOrName[]) => StateStorage;
-
-// @public (undocumented)
-export const GlobalClassNamePrefixContext: Context<string>;
 
 // @public (undocumented)
 export const identityFunction: <Value>(value: Value) => Value;
@@ -113,14 +78,6 @@ export const noopScopedConsole: ScopedConsoleContextType;
 
 // @public (undocumented)
 export const nullStorage: StateStorage;
-
-// @public (undocumented)
-export type Offsets = {
-    bottom: number;
-    left: number;
-    right: number;
-    top: number;
-};
 
 // @public (undocumented)
 export type PropsWithRequiredChildren<P = unknown> = P & {
@@ -189,9 +146,6 @@ export const urlStateStorage: StateStorage;
 export const useAbortController: () => () => AbortSignal;
 
 // @public
-export function useAddClassNameDuringResize(className: string, timeoutToRestore?: number, element?: HTMLElement): void;
-
-// @public
 export const useArrayMapMemo: <Item, OutputItem>(items: Item[], map: (value: Item, index: number, array: Item[]) => OutputItem) => OutputItem[];
 
 // @public (undocumented)
@@ -199,29 +153,6 @@ export const useAutoHeightTextArea: (textAreaRef: RefObjectOrElement<HTMLTextAre
 
 // @public
 export function useChildrenAsLabel(node: ReactNode): string | undefined;
-
-// @public
-export function useClassName(componentClassName: NestedClassName, additionalClassName?: NestedClassName, prefixOverride?: string | null | undefined): string;
-
-// @public
-export function useClassNameFactory(componentClassName: NestedClassName, glue?: string | null, prefixOverride?: string | null | undefined): (suffix?: string | null | undefined, additionalClassName?: NestedClassName) => string;
-
-// @public (undocumented)
-export const useCloseOnClickOutside: ({ isOpen, close, contents, outside }: {
-    isOpen: boolean;
-    close: () => void;
-    contents: (Node | null)[];
-    outside?: HTMLElement | null;
-}) => void;
-
-// @public (undocumented)
-export const useCloseOnEscape: ({ isOpen, close }: {
-    isOpen: boolean;
-    close: () => void;
-}) => void;
-
-// @public (undocumented)
-export const useColorScheme: () => string;
 
 // @public
 export function useComposeRef<T>(...refs: MaybeRef<T>[]): ComposedRefCallback<T>;
@@ -233,9 +164,6 @@ export const useConstantLengthInvariant: <Item>(items: Item[], message?: string)
 export const useConstantValueInvariant: <Value>(value: Value, message?: string) => void;
 
 // @public (undocumented)
-export function useContainerWidth(): number;
-
-// @public (undocumented)
 export const useDebounce: <T>(value: T, debounceMs: number) => T;
 
 // @public (undocumented)
@@ -243,18 +171,6 @@ export const useDebounceCallback: (cb: () => any, debounceMs: number) => () => v
 
 // @public (undocumented)
 export function useDocumentTitle(title: string | null | undefined, formatter?: (title: string, initialTitle: string) => string): void;
-
-// @public
-export function useElementSize(refOrElement: RefObjectOrElement<HTMLElement>, options?: ResizeObserverOptions, timeout?: number): {
-    height: number | undefined;
-    width: number | undefined;
-};
-
-// @public (undocumented)
-export function useElementTopOffset(ref?: RefObject<HTMLElement>): number | undefined;
-
-// @public
-export function useEventHandler<E extends SyntheticEvent<any>>(type: E['type'], callback: EventHandler<E>): EventHandler<E>;
 
 // @public
 export function useExpectSameValueReference<T>(next: T, shouldThrow?: boolean): void;
@@ -283,13 +199,7 @@ export function useOnElementClickOutsideCallback(refOrElement: RefObjectOrElemen
 export function useOnElementMouseEnterDelayedCallback(refOrElement: RefObjectOrElement<HTMLElement>, callback: (event: MouseEvent) => void, timeoutMs?: number): void;
 
 // @public (undocumented)
-export function useOnElementMutation(refOrElement: RefObjectOrElement<HTMLElement | undefined>, callback: MutationCallback, options?: MutationObserverInit): void;
-
-// @public (undocumented)
 export function useOnElementResize(refOrElement: RefObjectOrElement<HTMLElement | null> | null, callback: (entries: ResizeObserverEntry) => void, options?: ResizeObserverOptions, timeout?: number): void;
-
-// @public
-export function useOnScrollWithin(refOrElement: RefObjectOrElement<HTMLElement | null> | null, callback: (event: Event) => void, interval?: number): void;
 
 // @public (undocumented)
 export function useOnWindowResize(callback: (event: Event) => void, interval?: number): void;
@@ -304,24 +214,10 @@ export const useReferentiallyStableCallback: <T extends (...args: any[]) => any>
 export const useScopedConsoleRef: (prefix: string, override?: boolean) => MutableRefObject<ScopedConsoleContextType>;
 
 // @public (undocumented)
-export function useScrollOffsets(refOrElement: RefObjectOrElement<HTMLElement | null> | null, interval?: number): {
-    bottom: number;
-    left: number;
-    right: number;
-    top: number;
-};
-
-// @public (undocumented)
 export const useSessionStorageState: <V extends Serializable>(key: StateStorageKey, initializeValue: ValueInitializer<V>) => [V, SetState<V>];
 
 // @public (undocumented)
 export const useStoredState: <V extends Serializable>(storageOrName: StateStorageOrName | StateStorageOrName[], key: StateStorageKey, initializeValue: ValueInitializer<V>) => [V, SetState<V>];
-
-// @internal
-export function useThemedClassName(componentClassName: NestedClassName, additionalClassName: NestedClassName, prefixOverride?: string | null | undefined): string;
-
-// @public (undocumented)
-export function useThemedClassNameFactory(componentClassName: NestedClassName, glue?: string | null, prefixOverride?: string | null | undefined): (suffix?: string | null | undefined, additionalClassName?: NestedClassName) => string;
 
 // @public
 export function useUpdatedRef<T>(value: T): MutableRefObject<T>;

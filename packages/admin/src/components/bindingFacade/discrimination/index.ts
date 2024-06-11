@@ -1,6 +1,0 @@
-export * from './DiscriminatedDatum'
-export * from './getDiscriminatedDatum'
-export * from './NormalizedDiscriminatedData'
-export * from './ResolvedDiscriminatedDatum'
-export * from './SugaredDiscriminateBy'
-export * from './useDiscriminatedData'

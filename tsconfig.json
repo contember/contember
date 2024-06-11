@@ -3,19 +3,7 @@
 	"include": [],
 	"references": [
 		{
-			"path": "./packages/admin"
-		},
-		{
-			"path": "./packages/admin-i18n"
-		},
-		{
-			"path": "./packages/admin-sandbox"
-		},
-		{
 			"path": "./packages/binding"
-		},
-		{
-			"path": "./packages/brand"
 		},
 		{
 			"path": "./packages/client"
@@ -36,22 +24,10 @@
 			"path": "./packages/interface"
 		},
 		{
-			"path": "./packages/interface-tester"
-		},
-		{
-			"path": "./packages/layout"
-		},
-		{
 			"path": "./packages/playground"
 		},
 		{
-			"path": "./packages/react-auto"
-		},
-		{
 			"path": "./packages/react-binding"
-		},
-		{
-			"path": "./packages/react-binding-ui"
 		},
 		{
 			"path": "./packages/react-block-repeater"
@@ -63,22 +39,10 @@
 			"path": "./packages/react-board-dnd-kit"
 		},
 		{
-			"path": "./packages/react-choice-field"
-		},
-		{
-			"path": "./packages/react-choice-field-ui"
-		},
-		{
 			"path": "./packages/react-client"
 		},
 		{
 			"path": "./packages/react-client-tenant"
-		},
-		{
-			"path": "./packages/react-datagrid"
-		},
-		{
-			"path": "./packages/react-datagrid-ui"
 		},
 		{
 			"path": "./packages/react-dataview"
@@ -90,16 +54,7 @@
 			"path": "./packages/react-form"
 		},
 		{
-			"path": "./packages/react-form-fields-ui"
-		},
-		{
-			"path": "./packages/react-i18n"
-		},
-		{
 			"path": "./packages/react-identity"
-		},
-		{
-			"path": "./packages/react-leaflet-fields-ui"
 		},
 		{
 			"path": "./packages/react-multipass-rendering"
@@ -141,9 +96,6 @@
 			"path": "./packages/react-utils"
 		},
 		{
-			"path": "./packages/ui"
-		},
-		{
 			"path": "./packages/utilities"
 		},
 		{
@@ -152,10 +104,5 @@
 		{
 			"path": "./packages/vite-plugin"
 		}
-	],
-	"ts-node": {
-		"moduleTypes": {
-			"packages/admin-sandbox/api/**/*": "cjs"
-		}
-	}
+	]
 }

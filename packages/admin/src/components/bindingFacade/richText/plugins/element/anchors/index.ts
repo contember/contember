@@ -1,5 +1,0 @@
-export * from './AnchorElement'
-export * from './AnchorHtmlDeserializer'
-export * from './AnchorRenderer'
-export * from './anchorToolbarButton'
-export * from './withAnchors'

@@ -4,7 +4,6 @@
 
 ```ts
 
-import { ComponentClassNameProps } from '@contember/utilities';
 import { ComponentType } from 'react';
 import { ElementType } from 'react';
 import { FunctionComponentElement } from 'react';
@@ -60,7 +59,14 @@ children: ReactNode;
 }>;
 
 // @public (undocumented)
-export const SlotTarget: NamedExoticComponent<SlotTargetProps>;
+export const SlotTarget: NamedExoticComponent<    {
+as?: ElementType | undefined;
+fallback?: ReactNode;
+name: string;
+aliases?: [string, ...string[]] | undefined;
+display?: boolean | "contents" | "block" | "flex" | "grid" | "inline" | "inline-flex" | "inline-grid" | "inline-block" | "inherit" | "initial" | "none" | "unset" | undefined;
+className?: string | undefined;
+}>;
 
 // @public (undocumented)
 export type SlotTargetComponent<T extends string> = ComponentType<SlotTargetComponentProps> & {
@@ -76,12 +82,13 @@ export type SlotTargetComponentsRecord<K extends string> = Readonly<{
 }>;
 
 // @public (undocumented)
-export type SlotTargetProps = ComponentClassNameProps & {
+export type SlotTargetProps = {
     as?: ElementType;
     fallback?: ReactNode;
     name: string;
     aliases?: [string, ...string[]];
     display?: boolean | 'contents' | 'block' | 'flex' | 'grid' | 'inline' | 'inline-flex' | 'inline-grid' | 'inline-block' | 'inherit' | 'initial' | 'none' | 'unset';
+    className?: string;
 };
 
 // @public

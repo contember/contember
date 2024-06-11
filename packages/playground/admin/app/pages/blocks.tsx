@@ -1,13 +1,13 @@
-import { Binding, PersistButton } from '../../lib/components/binding'
-import { Slots } from '../../lib/components/slots'
+import { Binding, PersistButton } from '@app/lib/binding'
+import { Slots } from '@app/lib/layout'
 import * as React from 'react'
 import { EntitySubTree, EntityView, Field, HasOne, StaticRender } from '@contember/interface'
-import { DefaultBlockRepeater } from '../../lib/components/block-repeater'
-import { ImageField, InputField, RadioEnumField, TextareaField } from '../../lib/components/form'
-import { UploadedImageView } from '../../lib/components/upload'
+import { DefaultBlockRepeater } from '@app/lib/block-repeater'
+import { ImageField, InputField, RadioEnumField, TextareaField } from '@app/lib/form'
+import { UploadedImageView } from '@app/lib/upload'
 import { Block } from '@contember/react-block-repeater'
 import { AlertOctagonIcon, ColumnsIcon, ImageIcon, TextIcon } from 'lucide-react'
-import { cn } from '../../lib/utils/cn'
+import { cn } from '@app/lib/utils'
 
 export default () => <>
 	<Binding>

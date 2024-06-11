@@ -38,5 +38,16 @@
 		"type": "git",
 		"url": "https://github.com/contember/interface.git",
 		"directory": "packages/.template"
+	},
+	"dependencies": {
+		"@contember/binding": "workspace:*"
+	},
+	"peerDependencies": {
+		"react": "^18 || ^19",
+		"react-dom": "^18 || ^19"
+	},
+	"devDependencies": {
+		"react": "^18.3.1",
+		"react-dom": "^18.3.1"
 	}
 }

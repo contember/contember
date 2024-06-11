@@ -1,6 +1,0 @@
-export * from './CreateScope'
-export * from './DetailScope'
-export * from './DataGridScope'
-export * from './EditScope'
-export * from './ListScope'
-export * from './MultiEditScope'

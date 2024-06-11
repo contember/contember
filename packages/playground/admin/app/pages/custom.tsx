@@ -1,8 +1,8 @@
 import { Component, EntitySubTree, Field, SugaredRelativeSingleField, useField } from '@contember/interface'
-import { Binding, PersistButton } from '../../lib/components/binding'
+import { Binding, PersistButton } from '@app/lib/binding'
 import * as React from 'react'
-import { Slots } from '../../lib/components/slots'
-import { Button } from '../../lib/components/ui/button'
+import { Slots } from '@app/lib/layout'
+import { Button } from '@app/lib/ui/button'
 
 export const input = () => (
 	<Binding>

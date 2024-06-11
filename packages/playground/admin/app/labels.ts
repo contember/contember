@@ -1,5 +1,5 @@
 import { BoardTaskStatus, GridArticleState } from '../../api/client'
-import { createEnumFormatter } from '../lib/utils/formatting'
+import { createEnumFormatter } from '@app/lib/formatting'
 
 export const BoardTaskStatusLabels: Record<BoardTaskStatus, string> = {
 	backlog: 'Backlog',

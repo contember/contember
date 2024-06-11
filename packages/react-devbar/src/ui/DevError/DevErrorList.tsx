@@ -1,4 +1,3 @@
-import { useClassNameFactory } from '@contember/react-utils'
 import { DevErrorInner } from './DevErrorInner'
 import { ProcessedError } from './types'
 
@@ -12,6 +11,7 @@ export interface DevErrorListProps {
 	onClose: () => void
 }
 
+const className = (cls?: string | null) => cls ? `cui-devError-${cls}` : 'cui-devError'
 
 export function DevErrorList({
 	currentError,
@@ -22,31 +22,29 @@ export function DevErrorList({
 	onNext,
 	onPrevious,
 }: DevErrorListProps) {
-	const componentClassName = useClassNameFactory('devError')
-
 	return (
-		<div className={componentClassName()}>
-			<div className={componentClassName('in')}>
-				<div className={componentClassName('bar')}>
-					<div className={componentClassName('errorSource')}>{currentErrorSource}</div>
-					<div className={componentClassName('actions')}>
+		<div className={className()}>
+			<div className={className('in')}>
+				<div className={className('bar')}>
+					<div className={className('errorSource')}>{currentErrorSource}</div>
+					<div className={className('actions')}>
 						{errorCount > 1 ? (
-							<div className={componentClassName('switcher')}>
-								<p className={componentClassName('errorCount')}>
+							<div className={className('switcher')}>
+								<p className={className('errorCount')}>
 									Error {currentErrorIndex + 1} of {errorCount}
 								</p>
-								<div className={componentClassName('switcherButtons')}>
-									<button className={componentClassName('switcherButton')} onClick={onPrevious}>
+								<div className={className('switcherButtons')}>
+									<button className={className('switcherButton')} onClick={onPrevious}>
 										ᐊ
 									</button>
-									<button className={componentClassName('switcherButton')} onClick={onNext}>
+									<button className={className('switcherButton')} onClick={onNext}>
 										ᐅ
 									</button>
 								</div>
 							</div>
 						) : null}
-						<div className={componentClassName('close')}>
-							<button className={componentClassName('closeButton')} onClick={onClose}>
+						<div className={className('close')}>
+							<button className={className('closeButton')} onClick={onClose}>
 								🗙
 							</button>
 						</div>

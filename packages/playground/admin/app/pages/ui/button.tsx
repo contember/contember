@@ -1,4 +1,4 @@
-import { Button } from '../../../lib/components/ui/button'
+import { Button } from '@app/lib/ui/button'
 import { HomeIcon } from 'lucide-react'
 
 export default <>

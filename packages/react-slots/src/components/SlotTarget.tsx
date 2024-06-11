@@ -1,5 +1,4 @@
-import { useClassName } from '@contember/react-utils'
-import { ComponentClassNameProps, dataAttribute } from '@contember/utilities'
+import { dataAttribute } from '@contember/utilities'
 import { ElementType, memo, ReactNode, useMemo } from 'react'
 import { useTargetElementRegistrar } from '../hooks'
 import { useHasActiveSlotsFactory } from '../hooks'
@@ -9,7 +8,6 @@ export type OwnTargetContainerProps = {
 }
 
 export type SlotTargetProps =
-	& ComponentClassNameProps
 	& {
 		/**
 		 * Type of the container element, default is `div`.
@@ -43,6 +41,8 @@ export type SlotTargetProps =
 		 * Controls the display of the target element, default is 'contents'.
 		 */
 		display?: boolean | 'contents' | 'block' | 'flex' | 'grid' | 'inline' | 'inline-flex' | 'inline-grid' | 'inline-block' | 'inherit' | 'initial' | 'none' | 'unset';
+
+		className?: string;
 	}
 
 /**
@@ -51,8 +51,7 @@ export type SlotTargetProps =
 export const SlotTarget = memo<SlotTargetProps>(({
 	as,
 	aliases,
-	componentClassName = 'slot',
-	className: classNameProp,
+	className,
 	display,
 	fallback,
 	name,
@@ -66,7 +65,6 @@ export const SlotTarget = memo<SlotTargetProps>(({
 	}, [aliases, hasActiveSlots, name])
 
 	const Container = as ?? 'div'
-	const className = useClassName(componentClassName, classNameProp)
 	const style = useMemo(() => ({ display: display ?? (as === undefined ? 'contents' : undefined) }), [as, display])
 
 	return ((active || fallback)

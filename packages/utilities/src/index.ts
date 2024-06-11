@@ -1,5 +1,4 @@
 export * from './assert-types'
-export * from './class-name'
 export * from './css-utilities'
 export * from './data-utilities'
 export * from './deprecate'

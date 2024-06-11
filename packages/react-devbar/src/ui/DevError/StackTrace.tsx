@@ -1,11 +1,10 @@
-import { useClassNameFactory } from '@contember/react-utils'
 import { ParsedStackFrame, ParsedStackTrace } from './types'
 
-export const StackTrace = ({ stackTrace }: { stackTrace: ParsedStackTrace }) => {
-	const componentClassName = useClassNameFactory('devError')
 
+const className = (cls?: string | null) => cls ? `cui-devError-${cls}` : 'cui-devError'
+export const StackTrace = ({ stackTrace }: { stackTrace: ParsedStackTrace }) => {
 	return (
-		<div className={componentClassName('stack')}>
+		<div className={className('stack')}>
 			{stackTrace.map((it, index) => (
 				<StackFrame stackFrame={it} key={index} />
 			))}
@@ -14,19 +13,18 @@ export const StackTrace = ({ stackTrace }: { stackTrace: ParsedStackTrace }) => 
 }
 
 const StackFrame = ({ stackFrame }: { stackFrame: ParsedStackFrame }) => {
-	const componentClassName = useClassNameFactory('devError')
 	const line = stackFrame.line
 
 	return (
-		<div className={componentClassName('stackFrame')}>
-			<div className={componentClassName('stackFrameHeader')}>
-				<div className={componentClassName('stackFrameSource')}>
+		<div className={className('stackFrame')}>
+			<div className={className('stackFrameHeader')}>
+				<div className={className('stackFrameSource')}>
 					{stackFrame.filename}:{line}
 				</div>
-				{stackFrame.callee && <div className={componentClassName('stackFrameCallee')}>{stackFrame.callee}</div>}
+				{stackFrame.callee && <div className={className('stackFrameCallee')}>{stackFrame.callee}</div>}
 			</div>
 			{line !== undefined && stackFrame.sourceCodeLines && (
-				<div className={componentClassName('stackFrameCode')}>
+				<div className={className('stackFrameCode')}>
 					{stackFrame.sourceCodeLines.map((it, index) => {
 						const lineNumber = index + 1
 						if (lineNumber + 5 < line || lineNumber - 3 > line) {
@@ -34,11 +32,11 @@ const StackFrame = ({ stackFrame }: { stackFrame: ParsedStackFrame }) => {
 						}
 						return (
 							<div
-								className={componentClassName('stackFrameLine', lineNumber === line && 'is-active')}
+								className={`${className('stackFrameLine')} ${lineNumber === line && 'is-active'}`}
 								key={lineNumber}
 							>
-								<div className={componentClassName('stackFrameLineNumber')}>{lineNumber}</div>
-								<div className={componentClassName('stackFrameLineCode')}>{it}</div>
+								<div className={className('stackFrameLineNumber')}>{lineNumber}</div>
+								<div className={className('stackFrameLineCode')}>{it}</div>
 							</div>
 						)
 					})}

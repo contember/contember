@@ -1,9 +1,9 @@
-import { Slots } from '../../lib/components/slots'
-import { Binding, PersistButton } from '../../lib/components/binding'
+import { Slots } from '@app/lib/layout'
+import { Binding, PersistButton } from '@app/lib/binding'
 import { EntitySubTree } from '@contember/interface'
 import * as React from 'react'
 import { Field } from '@contember/react-binding'
-import { InputField, MultiSelectField, SelectEnumField, SelectField, SortableMultiSelectField } from '../../lib/components/form'
+import { InputField, MultiSelectField, SelectEnumField, SelectField, SortableMultiSelectField } from '@app/lib/form'
 
 
 export const hasOne = () => <>

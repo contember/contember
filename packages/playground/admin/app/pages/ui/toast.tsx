@@ -1,7 +1,7 @@
 import { Slot } from '@radix-ui/react-slot'
 import { ReactNode } from 'react'
-import { ToastContent, ToastType, useShowToast } from '../../../lib/components/ui/toast'
-import { Button } from '../../../lib/components/ui/button'
+import { ToastContent, ToastType, useShowToast } from '@app/lib/toast'
+import { Button } from '@app/lib/ui/button'
 
 const ToastTrigger = ({ type, description, title, ...props }: {
 	title: string

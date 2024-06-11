@@ -1,5 +1,5 @@
 import { ArchiveIcon, BrushIcon, FormInputIcon, GripVertical, HomeIcon, KanbanIcon, KeyRoundIcon, LanguagesIcon, LockKeyholeIcon, PencilIcon, TableIcon, UploadIcon, UserIcon, UsersIcon } from 'lucide-react'
-import { Menu, MenuItem } from '../../lib/components/ui/menu'
+import { Menu, MenuItem } from '@app/lib/ui/menu'
 
 
 export const Navigation = () => {

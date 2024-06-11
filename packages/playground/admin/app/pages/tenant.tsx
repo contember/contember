@@ -1,16 +1,10 @@
 import { ChangeMyPasswordForm, CreateApiKeyForm, InviteForm } from '@contember/react-identity'
-import { Card, CardContent, CardHeader, CardTitle } from '../../lib/components/ui/card'
-import { ChangeMyPasswordFormFields } from '../../lib/components/tenant/changeMyPasswordForm'
-import { ToastContent, useShowToast } from '../../lib/components/ui/toast'
-import { OtpSetup } from '../../lib/components/tenant/otpSetup'
-import { PersonList } from '../../lib/components/tenant/personList'
-import { InviteFormFields } from '../../lib/components/tenant/inviteForm'
+import { Card, CardContent, CardHeader, CardTitle } from '@app/lib/ui/card'
+import { ApiKeyList, ChangeMyPasswordFormFields, CreateApiKeyFormFields, InviteFormFields, MemberListController, OtpSetup, PersonList } from '@app/lib/tenant'
+import { ToastContent, useShowToast } from '@app/lib/toast'
 import { useProjectSlug } from '@contember/react-client'
-import { Input } from '../../lib/components/ui/input'
-import { CreateApiKeyFormFields } from '../../lib/components/tenant/createApiKeyForm'
-import { ApiKeyList } from '../../lib/components/tenant/apiKeyList'
+import { Input } from '@app/lib/ui/input'
 import { useRef } from 'react'
-import { MemberListController } from '../../lib/components/tenant/memberList'
 
 export const Security = () => {
 	const showToast = useShowToast()

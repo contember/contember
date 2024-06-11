@@ -1,5 +1,5 @@
 import { Component, Field, HasMany, HasOne, If } from '@contember/interface'
-import { Slots } from '../../lib/components/slots'
+import { Slots } from '@app/lib/layout'
 import { DataViewEachRow, DataViewElement, DataViewLayout } from '@contember/react-dataview'
 import {
 	createDataGridDateRange,
@@ -22,23 +22,21 @@ import {
 	DataGridNumberColumn,
 	DataGridNumberFilter,
 	DataGridPagination,
-	DataGridPredefinedDateRange,
 	DataGridQueryFilter,
 	DataGridTable,
 	DataGridTextColumn,
 	DataGridTiles,
 	DataGridToolbar,
 	DataGridTooltipLabel,
-} from '../../lib/components/datagrid'
+} from '@app/lib/datagrid'
 import * as React from 'react'
-import { ReactNode } from 'react'
-import { DefaultDropdown, DropdownMenuItem, DropdownMenuSeparator } from '../../lib/components/ui/dropdown'
-import { Binding, DeleteEntityDialog } from '../../lib/components/binding'
+import { DefaultDropdown, DropdownMenuItem, DropdownMenuSeparator } from '@app/lib/ui/dropdown'
+import { Binding, DeleteEntityDialog } from '@app/lib/binding'
 import { GridArticleStateLabels } from '../labels'
-import { formatDate } from '../../lib/utils/formatting'
-import { Button } from '../../lib/components/ui/button'
+import { formatDate } from '@app/lib/formatting'
+import { Button } from '@app/lib/ui/button'
 import { EyeIcon, LockIcon, MessageSquareIcon, RowsIcon } from 'lucide-react'
-import { Popover, PopoverContent, PopoverTrigger } from '../../lib/components/ui/popover'
+import { Popover, PopoverContent, PopoverTrigger } from '@app/lib/ui/popover'
 
 export const simpleGrid = () => {
 	return (

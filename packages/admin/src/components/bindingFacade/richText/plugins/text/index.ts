@@ -1,7 +1,0 @@
-export * from './bold'
-export * from './code'
-export * from './highlight'
-export * from './italic'
-export * from './newline'
-export * from './strikeThrough'
-export * from './underline'

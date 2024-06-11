@@ -23,38 +23,6 @@ export class AssertionError extends Error {
 export function assertNever(_: never): never;
 
 // @public (undocumented)
-export type ClassNameStateMap = {
-    [key: string]: string | number | boolean | null | undefined;
-};
-
-// @internal
-export const COLOR_SCHEME_CLASS_NAME_REG_EXP: RegExp;
-
-// @public
-export function colorSchemeClassName(scheme: string): string;
-
-// @public (undocumented)
-export function colorSchemeClassName(scheme: string | null | undefined): string | undefined;
-
-// @public (undocumented)
-export interface ComponentClassNameProps {
-    // (undocumented)
-    className?: NestedClassName;
-    // (undocumented)
-    componentClassName?: string | string[];
-}
-
-// Warning: (ae-unresolved-link) The @link reference could not be resolved: An overload for "colorSchemeClassName" was not found that matches the TSDoc selector ":3"
-//
-// @public
-export function contentThemeClassName(theme: string | null | undefined): string | undefined;
-
-// Warning: (ae-unresolved-link) The @link reference could not be resolved: An overload for "colorSchemeClassName" was not found that matches the TSDoc selector ":3"
-//
-// @public
-export function controlsThemeClassName(theme: string | null | undefined): string | undefined;
-
-// @public (undocumented)
 export function dataAttribute(value: unknown): string | true | undefined;
 
 // @public (undocumented)
@@ -62,20 +30,11 @@ export const dateToStringWithoutTimezone: (date: Date, { includeTime }?: {
     includeTime?: boolean;
 }) => string;
 
-// @public (undocumented)
-export function deduplicateClassName(classNameArray: string[]): string[];
-
 // @internal
 export function deprecate(removal: SemverString, condition: boolean, deprecated: string, replacement: string | null): void;
 
 // @public
 export type ExtendableProps<ExtendedProps = {}, OverrideProps = {}> = OverrideProps & Omit<ExtendedProps, keyof OverrideProps>;
-
-// @public (undocumented)
-export function filterThemedClassName(nestedClassName: NestedClassName, defaultColorSchemeContext: string): string[];
-
-// @public (undocumented)
-export function flatClassNameList(className: NestedClassName): string[];
 
 // @public
 export function getElementDimensions(element: HTMLElement): Promise<DOMRectReadOnly>;
@@ -92,17 +51,11 @@ export function getSizeFromResizeObserverEntryFactory(box: ResizeObserverOptions
 // @public
 export type InheritableElementProps<C extends React.ElementType, Props = {}> = ExtendableProps<PropsOf<C>, Props>;
 
-// @internal
-export function isColorSchemeClassName(value: string): boolean;
-
 // @public (undocumented)
 export function isNonNegativeNumber(value: unknown): value is number;
 
 // @public (undocumented)
 export const isSpecialLinkClick: (e: MouseEvent) => boolean;
-
-// @public
-export function listClassName(list: NestedClassName): string;
 
 // Warning: (ae-forgotten-export) The symbol "NarrowRaw" needs to be exported by the entry point index.d.ts
 //
@@ -111,9 +64,6 @@ export type Narrow<A extends any> = A extends [] ? A : NarrowRaw<A>;
 
 // @public
 export type Narrowable = string | number | bigint | boolean;
-
-// @public (undocumented)
-export type NestedClassName = string | false | null | undefined | (string | false | null | undefined)[] | NestedClassName[];
 
 // @public
 export type NonOptional<T> = {
@@ -185,20 +135,6 @@ export interface SvgSizeProps {
 
 // @public (undocumented)
 export function svgSizeProps(width: number, height?: number, crop?: number): SvgSizeProps;
-
-// @internal
-export const THEME_CLASS_NAME_REG_EXP: RegExp;
-
-// Warning: (ae-unresolved-link) The @link reference could not be resolved: An overload for "colorSchemeClassName" was not found that matches the TSDoc selector ":3"
-//
-// @public
-export function themeClassName(theme: string | null | undefined): readonly [string | undefined, string | undefined];
-
-// @public (undocumented)
-export type ThemeConfig = {
-    content: string | undefined;
-    controls: string | undefined;
-};
 
 // @public (undocumented)
 export function toKebabCase(value: string): string;

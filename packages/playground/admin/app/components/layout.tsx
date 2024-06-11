@@ -1,11 +1,10 @@
 import * as React from 'react'
 import { memo, PropsWithChildren } from 'react'
-import { IdentityLoader } from '../../lib/components/binding/identity'
-import { Slots } from '../../lib/components/slots'
+import { IdentityLoader } from '@app/lib/binding'
+import { LayoutComponent, Slots } from '@app/lib/layout'
 import { Navigation } from './navigation'
-import { LayoutComponent } from '../../lib/components/layout'
-import { Identity2023 } from '@contember/brand'
 import { Link } from '@contember/interface'
+import { Logo } from './icon'
 
 export const Layout = memo(({ children }: PropsWithChildren) => {
 	return (
@@ -14,7 +13,7 @@ export const Layout = memo(({ children }: PropsWithChildren) => {
 
 				<Slots.Logo>
 					<Link to="index">
-						<Identity2023.Edit scale={2} />
+						<Logo />
 					</Link>
 				</Slots.Logo>
 

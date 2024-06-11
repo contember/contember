@@ -1,5 +1,4 @@
 import {
-	useClassNameFactory,
 	useId,
 	useOnElementClickOutsideCallback,
 	useOnElementMouseEnterDelayedCallback,
@@ -9,6 +8,8 @@ import {
 import { dataAttribute } from '@contember/utilities'
 import { PropsWithChildren, ReactNode, useEffect, useRef, useState } from 'react'
 
+const className = (cls: string | null) => cls ? `cui-devBar-${cls}` : 'cui-devBar'
+
 export const DevBar = ({
 	breakpoint = 768,
 	children,
@@ -17,7 +18,6 @@ export const DevBar = ({
 	brand?: ReactNode;
 	breakpoint?: number;
 }>) => {
-	const className = useClassNameFactory('devBar')
 	const [expanded, setExpanded] = useState(true)
 	const isSmallScreen = useWindowSize().width < breakpoint
 	const toggleButtonRef = useRef<HTMLButtonElement>(null)
@@ -123,7 +123,6 @@ export const DevPanel = ({ heading, icon, children, preview }: {
 	preview?: ReactNode
 }) => {
 	const id = `cui-devBar-panel-${useId()}`
-	const className = useClassNameFactory('devBar')
 	const [expanded, setExpanded] = useState(false)
 	const mouseEnterTimeStampRef = useRef<ReturnType<typeof Date.now> | undefined>(undefined)
 
@@ -171,8 +170,8 @@ export const DevPanel = ({ heading, icon, children, preview }: {
 				<span className={className('trigger-label-text')}>{preview ?? heading}</span>
 			</button>
 			{expanded && (
-				<div tabIndex={0} id={id} role="dialog" className={className('panel', 'dangerously-remove-native-focus-outline')}>
-					<div className={className('panel-content', 'native-focus-outline-handler')}>
+				<div tabIndex={0} id={id} role="dialog" className={className('panel')}>
+					<div className={className('panel-content')}>
 						<h2 className="h4">
 							{heading}
 						</h2>

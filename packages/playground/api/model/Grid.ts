@@ -14,6 +14,7 @@ export class GridArticle {
 	tags = c.manyHasMany(GridTag)
 	views = c.intColumn()
 	comments = c.oneHasMany(GridArticleComment, 'article')
+	details = c.oneHasOneInverse(GridArticleDetail, 'article')
 }
 
 export class GridTag {
@@ -36,4 +37,18 @@ export class GridArticleComment {
 	author = c.manyHasOne(GridAuthor).notNull().cascadeOnDelete()
 	content = c.stringColumn()
 	createdAt = c.dateTimeColumn()
+}
+
+@c.View(`
+	SELECT
+		article.id AS id,
+		article.id AS article_id,
+		(SELECT COUNT(*)
+		 FROM "grid_article_comment" comment
+		 WHERE comment.article_id = article.id) AS comments_count
+	FROM "grid_article" article;
+`)
+export class GridArticleDetail {
+	article = c.oneHasOne(GridArticle, 'details').notNull()
+	commentsCount = c.intColumn().notNull()
 }

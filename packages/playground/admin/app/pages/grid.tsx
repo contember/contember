@@ -279,7 +279,7 @@ const CustomGridRow = Component(() => (
 			</div>
 			<div className="inline-flex gap-2">
 				<MessageSquareIcon className="w-4 h-4" />
-				<HasMany field="comments" listComponent={({ accessor }) => accessor.length} />
+				<Field field={'details.commentsCount'} />
 			</div>
 		</div>
 	</div>

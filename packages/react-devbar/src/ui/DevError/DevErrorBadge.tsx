@@ -1,16 +1,15 @@
-import { useClassNameFactory } from '@contember/react-utils'
-
 export interface DevErrorBadgeProps {
 	onOpen: () => void
 	errorCount: number
 }
 
-export function DevErrorBadge({ errorCount, onOpen }: DevErrorBadgeProps) {
-	const componentClassName = useClassNameFactory('devErrorBadge')
 
+const className = (cls?: string | null) => cls ? `cui-devErrorBadge-${cls}` : 'cui-devErrorBadge'
+
+export function DevErrorBadge({ errorCount, onOpen }: DevErrorBadgeProps) {
 	return (
-		<div className={componentClassName()}>
-			<a className={componentClassName('button')} onClick={onOpen}>
+		<div className={className()}>
+			<a className={className('button')} onClick={onOpen}>
 				{errorCount} {errorCount > 1 ? 'errors' : 'error'}
 			</a>
 		</div>

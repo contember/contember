@@ -1,18 +1,18 @@
-import { useClassNameFactory } from '@contember/react-utils'
 import { DevErrorInner, DevErrorInnerProps } from './DevErrorInner'
 
 export interface DevErrorProps extends DevErrorInnerProps {
 	source: string
 }
 
+const className = (cls?: string | null) => cls ? `cui-devError-${cls}` : 'cui-devError'
+
 export function DevError(props: DevErrorProps) {
-	const componentClassName = useClassNameFactory('devError')
 
 	return (
-		<div className={componentClassName()}>
-			<div className={componentClassName('in')}>
-				<div className={componentClassName('bar')}>
-					<div className={componentClassName('errorSource')}>{props.source}</div>
+		<div className={className()}>
+			<div className={className('in')}>
+				<div className={className('bar')}>
+					<div className={className('errorSource')}>{props.source}</div>
 				</div>
 				<DevErrorInner error={props.error} />
 			</div>

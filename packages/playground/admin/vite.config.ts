@@ -4,6 +4,7 @@ import { defineConfig } from 'vite'
 // @ts-ignore
 import { resolveConfig } from '../../../build/createViteConfig.js'
 import { resolve } from 'node:path'
+import tsconfigPaths from 'vite-tsconfig-paths'
 
 export default defineConfig(() => {
 	const dsn = process.argv.find(it => it.includes('://'))
@@ -14,6 +15,7 @@ export default defineConfig(() => {
 		} : {},
 		base: '/',
 		plugins: [
+			tsconfigPaths(),
 			react(),
 			{
 				name: 'rewrite-middleware',

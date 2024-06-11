@@ -1,7 +1,7 @@
-import { FormContainer, FormContainerProps } from '../lib/components/form'
+import { FormContainer, FormContainerProps } from '@app/lib/form'
 import { ComponentProps, useState } from 'react'
-import { Input, SelectInput } from '../lib/components/ui/input'
-import { cn } from '../lib/utils/cn'
+import { Input, Select } from '@app/lib/ui/input'
+import { cn } from '@app/lib/utils'
 import * as React from 'react'
 import { FormFieldScope, FormInput, FormInputProps } from '@contember/react-form'
 import { Component, Field } from '@contember/react-binding'
@@ -12,7 +12,7 @@ export type SelectOrTypeFieldProps =
 	& Omit<FormContainerProps, 'children'>
 	& {
 		required?: boolean
-		selectProps?: ComponentProps<typeof SelectInput>
+		selectProps?: ComponentProps<typeof Select>
 		inputProps?: ComponentProps<typeof Input>
 		options: Record<string, string>
 	}
@@ -24,7 +24,7 @@ export const SelectOrTypeField = Component(({ field, label, description, selectP
 	return (
 		<FormFieldScope field={field}>
 			<FormContainer description={description} label={label}>
-				{showSelect ? <SelectInput onChange={e => {
+				{showSelect ? <Select onChange={e => {
 						const value = e.target.value
 						if (value === '___other') {
 							setShowSelect(false)
@@ -41,7 +41,7 @@ export const SelectOrTypeField = Component(({ field, label, description, selectP
 							</option>
 						))}
 						<option value="___other">Other</option>
-					</SelectInput>
+					</Select>
 					: <FormInput field={field} isNonbearing={isNonbearing} defaultValue={defaultValue}>
 						<Input required={required} {...(inputProps ?? {})} className={cn('max-w-md', inputProps?.className)} />
 					</FormInput>}

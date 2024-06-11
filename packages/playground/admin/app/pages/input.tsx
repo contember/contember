@@ -1,11 +1,11 @@
-import { Slots } from '../../lib/components/slots'
+import { Slots } from '@app/lib/layout'
 import { EntitySubTree, useField } from '@contember/interface'
-import { CheckboxField, InputField, RadioEnumField, TextareaField } from '../../lib/components/form'
+import { CheckboxField, InputField, RadioEnumField, TextareaField } from '@app/lib/form'
 import * as React from 'react'
-import { Button } from '../../lib/components/ui/button'
-import { Binding, PersistButton } from '../../lib/components/binding'
-import { SelectOrTypeField } from '../../lib-extra/select-or-type-field'
-import { FieldExists } from '../../lib-extra/has-field'
+import { Button } from '@app/lib/ui/button'
+import { Binding, PersistButton } from '@app/lib/binding'
+import { SelectOrTypeField } from '@app/lib-extra/select-or-type-field'
+import { FieldExists } from '@app/lib-extra/has-field'
 
 
 export const basic = () => <>

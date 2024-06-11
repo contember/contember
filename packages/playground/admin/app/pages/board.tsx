@@ -1,8 +1,8 @@
 import { Field } from '@contember/interface'
-import { Slots } from '../../lib/components/slots'
+import { Slots } from '@app/lib/layout'
 import { BoardColumnLabel } from '@contember/react-board'
-import { Binding, PersistButton, PersistOnFieldChange } from '../../lib/components/binding'
-import { DefaultBoard } from '../../lib/components/board'
+import { Binding, PersistButton, PersistOnFieldChange } from '@app/lib/binding'
+import { DefaultBoard } from '@app/lib/board/board'
 
 const statusList = [
 	{ value: 'backlog', label: 'Backlog' },

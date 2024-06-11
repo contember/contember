@@ -1,10 +1,9 @@
-import { Binding, PersistButton } from '../../lib/components/binding'
-import { Slots } from '../../lib/components/slots'
-import { InputField } from '../../lib/components/form'
+import { Binding, PersistButton } from '@app/lib/binding'
+import { Slots } from '@app/lib/layout/slots'
 import * as React from 'react'
 import { EntitySubTree, useField } from '@contember/interface'
-import { PlateEditor } from '../../lib/components/richt-text-editor/plate-editor'
-import { Button } from '../../lib/components/ui/button'
+import { Button } from '@app/lib/ui/button'
+import { PlateEditor } from '@app/lib-extra/plate-editor/plate-editor'
 
 export default () => <>
 	<Binding>

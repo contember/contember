@@ -1,0 +1,29 @@
+{
+	"extends": "../../../tsconfig.settings.json",
+	"compilerOptions": {
+		"outDir": "../dist/types"
+	},
+	"references": [
+		{ "path": "../../interface/src" },
+		{ "path": "../../react-block-repeater/src" },
+		{ "path": "../../react-board/src" },
+		{ "path": "../../react-board-dnd-kit/src" },
+		{ "path": "../../react-client/src" },
+		{ "path": "../../react-client-tenant/src" },
+		{ "path": "../../react-dataview/src" },
+		{ "path": "../../react-identity/src" },
+		{ "path": "../../react-multipass-rendering/src" },
+		{ "path": "../../react-repeater/src" },
+		{ "path": "../../react-routing/src" },
+		{ "path": "../../react-repeater-dnd-kit/src" },
+		{ "path": "../../react-form/src" },
+		{ "path": "../../react-select/src" },
+		{ "path": "../../react-slots/src" },
+		{ "path": "../../react-slate-editor-base/src" },
+		{ "path": "../../react-slate-editor/src" },
+		{ "path": "../../react-uploader/src" },
+		{ "path": "../../react-uploader-dropzone/src" },
+		{ "path": "../../react-utils/src" },
+		{ "path": "../../utilities/src" },
+	]
+}

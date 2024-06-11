@@ -1,10 +1,10 @@
-import { Slots } from '../../lib/components/slots'
-import { Binding, PersistButton } from '../../lib/components/binding'
+import { Slots } from '@app/lib/layout'
+import { Binding, PersistButton } from '@app/lib/binding'
 import * as React from 'react'
-import { DimensionsSwitcher, SideDimensions } from '../../lib/components/dimensions'
+import { DimensionsSwitcher, SideDimensions } from '@app/lib/dimensions'
 import { EntitySubTree, Field, Variable } from '@contember/interface'
-import { InputField, TextareaField } from '../../lib/components/form'
-import { Card, CardContent, CardHeader, CardTitle } from '../../lib/components/ui/card'
+import { InputField, TextareaField } from '@app/lib/form'
+import { Card, CardContent, CardHeader, CardTitle } from '@app/lib/ui/card'
 
 export default () => {
 	return <>

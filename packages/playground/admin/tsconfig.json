@@ -2,20 +2,23 @@
 	"extends": "../../../tsconfig.settings.json",
 	"compilerOptions": {
 		"noEmit": true,
-		"emitDeclarationOnly": false
+		"emitDeclarationOnly": false,
+		"paths": {
+			"@app/lib/ui/*": [
+				"../../react-ui-lib/src/ui/*"
+			],
+			"@app/lib/*": [
+				"../../react-ui-lib/src/*"
+			],
+			"@app/*": [
+				"./*"
+			]
+		}
 	},
 	"references": [
 		{ "path": "../api" },
 		{ "path": "../../interface/src" },
-		{ "path": "../../react-dataview/src" },
-		{ "path": "../../react-board/src" },
-		{ "path": "../../react-board-dnd-kit/src" },
-		{ "path": "../../react-slate-editor-legacy/src" },
-		{ "path": "../../react-repeater/src" },
-		{ "path": "../../react-repeater-dnd-kit/src" },
-		{ "path": "../../react-form/src" },
-		{ "path": "../../react-select/src" },
-		{ "path": "../../react-slate-editor/src" },
-		{ "path": "../../react-utils/src" },
+		{ "path": "../../react-ui-lib/src" },
+		{ "path": "../../react-slate-editor-legacy/src" }
 	]
 }

@@ -254,7 +254,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/runtime@npm:^7.12.5, @babel/runtime@npm:^7.13.10, @babel/runtime@npm:^7.22.15, @babel/runtime@npm:^7.24.1, @babel/runtime@npm:^7.9.2":
+"@babel/runtime@npm:^7.12.5, @babel/runtime@npm:^7.13.10, @babel/runtime@npm:^7.24.1, @babel/runtime@npm:^7.9.2":
   version: 7.24.5
   resolution: "@babel/runtime@npm:7.24.5"
   dependencies:
@@ -405,49 +405,15 @@ __metadata:
     "@contember/binding": "workspace:*"
     "@contember/client": "workspace:*"
     "@contember/client-content": "workspace:*"
-    "@contember/graphql-builder": "workspace:*"
     "@contember/interface": "workspace:*"
-    "@contember/react-binding": "workspace:*"
-    "@contember/react-block-repeater": "workspace:*"
-    "@contember/react-board": "workspace:*"
-    "@contember/react-board-dnd-kit": "workspace:*"
-    "@contember/react-client": "workspace:*"
-    "@contember/react-client-tenant": "workspace:*"
-    "@contember/react-dataview": "workspace:*"
-    "@contember/react-form": "workspace:*"
-    "@contember/react-identity": "workspace:*"
-    "@contember/react-multipass-rendering": "workspace:*"
-    "@contember/react-repeater": "workspace:*"
-    "@contember/react-repeater-dnd-kit": "workspace:*"
-    "@contember/react-routing": "workspace:*"
-    "@contember/react-select": "workspace:*"
-    "@contember/react-slots": "workspace:*"
-    "@contember/react-uploader": "workspace:*"
-    "@contember/react-uploader-dropzone": "workspace:*"
-    "@contember/react-utils": "workspace:*"
+    "@contember/react-ui-lib": "workspace:*"
     "@contember/schema": ^1.4.0-beta.1
     "@contember/schema-definition": ^1.4.0-beta.1
     "@contember/schema-utils": ^1.4.0-beta.1
     "@contember/utilities": "workspace:*"
     "@faker-js/faker": ^8.4.1
-    "@radix-ui/react-alert-dialog": ^1.0.5
-    "@radix-ui/react-checkbox": ^1.0.4
-    "@radix-ui/react-dialog": ^1.0.5
-    "@radix-ui/react-dropdown-menu": ^2.0.6
-    "@radix-ui/react-label": ^2.0.2
-    "@radix-ui/react-popover": ^1.0.7
-    "@radix-ui/react-primitive": ^1.0.3
-    "@radix-ui/react-progress": ^1.0.3
-    "@radix-ui/react-scroll-area": ^1.0.5
-    "@radix-ui/react-select": ^2.0.0
     "@radix-ui/react-separator": ^1.0.3
-    "@radix-ui/react-slot": ^1.0.2
-    "@radix-ui/react-switch": ^1.0.3
-    "@radix-ui/react-toast": ^1.1.5
-    "@radix-ui/react-toggle": ^1.0.3
-    "@radix-ui/react-toggle-group": ^1.0.4
     "@radix-ui/react-toolbar": ^1.0.4
-    "@radix-ui/react-tooltip": ^1.0.7
     "@udecode/cn": ^31.0.0
     "@udecode/plate-autoformat": ^31.0.0
     "@udecode/plate-basic-marks": ^31.0.0
@@ -466,8 +432,6 @@ __metadata:
     "@udecode/plate-serializer-docx": ^31.1.2
     "@udecode/plate-serializer-md": ^31.0.0
     autoprefixer: ^10.4.19
-    class-variance-authority: ^0.7.0
-    downshift: ^8.3.1
     graphql: ^16.8.1
     lucide-react: ^0.302.0
     postcss: ^8.4.38
@@ -476,13 +440,10 @@ __metadata:
     react-dnd: ^16.0.1
     react-dnd-html5-backend: ^16.0.1
     react-dom: ^18.3.1
-    slate: ^0.103.0
-    slate-history: ^0.100.0
     slate-hyperscript: ^0.100.0
-    slate-react: ^0.102.0
-    tailwind-merge: ^2.3.0
     tailwindcss: ^3.4.3
     tailwindcss-animate: ^1.0.7
+    vite-tsconfig-paths: ^4.3.2
   languageName: unknown
   linkType: soft
 
@@ -793,7 +754,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@contember/react-slate-editor@workspace:packages/react-slate-editor":
+"@contember/react-slate-editor@workspace:*, @contember/react-slate-editor@workspace:packages/react-slate-editor":
   version: 0.0.0-use.local
   resolution: "@contember/react-slate-editor@workspace:packages/react-slate-editor"
   dependencies:
@@ -822,6 +783,63 @@ __metadata:
     "@contember/utilities": "workspace:*"
     react: ^18.3.1
     react-dom: ^18.3.1
+  peerDependencies:
+    react: ^18 || ^19
+    react-dom: ^18 || ^19
+  languageName: unknown
+  linkType: soft
+
+"@contember/react-ui-lib@workspace:*, @contember/react-ui-lib@workspace:packages/react-ui-lib":
+  version: 0.0.0-use.local
+  resolution: "@contember/react-ui-lib@workspace:packages/react-ui-lib"
+  dependencies:
+    "@contember/graphql-client-tenant": ^1.3.7
+    "@contember/interface": "workspace:*"
+    "@contember/react-block-repeater": "workspace:*"
+    "@contember/react-board": "workspace:*"
+    "@contember/react-board-dnd-kit": "workspace:*"
+    "@contember/react-client": "workspace:*"
+    "@contember/react-client-tenant": "workspace:*"
+    "@contember/react-dataview": "workspace:*"
+    "@contember/react-form": "workspace:*"
+    "@contember/react-identity": "workspace:*"
+    "@contember/react-multipass-rendering": "workspace:*"
+    "@contember/react-repeater": "workspace:*"
+    "@contember/react-repeater-dnd-kit": "workspace:*"
+    "@contember/react-routing": "workspace:*"
+    "@contember/react-select": "workspace:*"
+    "@contember/react-slate-editor": "workspace:*"
+    "@contember/react-slate-editor-base": "workspace:*"
+    "@contember/react-slots": "workspace:*"
+    "@contember/react-uploader": "workspace:*"
+    "@contember/react-uploader-dropzone": "workspace:*"
+    "@contember/react-utils": "workspace:*"
+    "@contember/utilities": "workspace:*"
+    "@dnd-kit/core": ^6.1.0
+    "@dnd-kit/sortable": ^8.0.0
+    "@radix-ui/react-alert-dialog": ^1.0.5
+    "@radix-ui/react-dialog": ^1.0.5
+    "@radix-ui/react-dropdown-menu": ^2.0.6
+    "@radix-ui/react-label": ^2.0.2
+    "@radix-ui/react-popover": ^1.0.7
+    "@radix-ui/react-portal": ^1.0.4
+    "@radix-ui/react-progress": ^1.0.3
+    "@radix-ui/react-scroll-area": ^1.0.5
+    "@radix-ui/react-slot": ^1.0.2
+    "@radix-ui/react-switch": ^1.0.3
+    "@radix-ui/react-toast": ^1.1.5
+    "@radix-ui/react-toggle": ^1.0.3
+    "@radix-ui/react-toggle-group": ^1.0.4
+    "@radix-ui/react-tooltip": ^1.0.7
+    class-variance-authority: ^0.7.0
+    clsx: ^1.2.1
+    lucide-react: ^0.302.0
+    qrcode-generator: ^1.4.4
+    react: ^18.3.1
+    react-dom: ^18.3.1
+    slate: ^0.103.0
+    slate-react: ^0.102.0
+    tailwind-merge: ^2.3.0
   peerDependencies:
     react: ^18 || ^19
     react-dom: ^18 || ^19
@@ -1750,33 +1768,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@radix-ui/react-checkbox@npm:^1.0.4":
-  version: 1.0.4
-  resolution: "@radix-ui/react-checkbox@npm:1.0.4"
-  dependencies:
-    "@babel/runtime": ^7.13.10
-    "@radix-ui/primitive": 1.0.1
-    "@radix-ui/react-compose-refs": 1.0.1
-    "@radix-ui/react-context": 1.0.1
-    "@radix-ui/react-presence": 1.0.1
-    "@radix-ui/react-primitive": 1.0.3
-    "@radix-ui/react-use-controllable-state": 1.0.1
-    "@radix-ui/react-use-previous": 1.0.1
-    "@radix-ui/react-use-size": 1.0.1
-  peerDependencies:
-    "@types/react": "*"
-    "@types/react-dom": "*"
-    react: ^16.8 || ^17.0 || ^18.0
-    react-dom: ^16.8 || ^17.0 || ^18.0
-  peerDependenciesMeta:
-    "@types/react":
-      optional: true
-    "@types/react-dom":
-      optional: true
-  checksum: 6dac5bddd9e1c42b149555501440918d9eae70da13b6d8539c3bf46b6c07681119d865d2106a43f729884ae8e2043bedc34c4d00a09a527b3bf0feade088d188
-  languageName: node
-  linkType: hard
-
 "@radix-ui/react-collection@npm:1.0.3":
   version: 1.0.3
   resolution: "@radix-ui/react-collection@npm:1.0.3"
@@ -2142,7 +2133,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@radix-ui/react-primitive@npm:1.0.3, @radix-ui/react-primitive@npm:^1.0.3":
+"@radix-ui/react-primitive@npm:1.0.3":
   version: 1.0.3
   resolution: "@radix-ui/react-primitive@npm:1.0.3"
   dependencies:
@@ -2236,46 +2227,6 @@ __metadata:
     "@types/react-dom":
       optional: true
   checksum: 1e0cf7af83ca61ef05ae664d529fa4922f02c148114d642fe1704f0361928b2785519ea091e242e61bda8feeab35bc6908ce754f679654a0d9e33c59046a67fa
-  languageName: node
-  linkType: hard
-
-"@radix-ui/react-select@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "@radix-ui/react-select@npm:2.0.0"
-  dependencies:
-    "@babel/runtime": ^7.13.10
-    "@radix-ui/number": 1.0.1
-    "@radix-ui/primitive": 1.0.1
-    "@radix-ui/react-collection": 1.0.3
-    "@radix-ui/react-compose-refs": 1.0.1
-    "@radix-ui/react-context": 1.0.1
-    "@radix-ui/react-direction": 1.0.1
-    "@radix-ui/react-dismissable-layer": 1.0.5
-    "@radix-ui/react-focus-guards": 1.0.1
-    "@radix-ui/react-focus-scope": 1.0.4
-    "@radix-ui/react-id": 1.0.1
-    "@radix-ui/react-popper": 1.1.3
-    "@radix-ui/react-portal": 1.0.4
-    "@radix-ui/react-primitive": 1.0.3
-    "@radix-ui/react-slot": 1.0.2
-    "@radix-ui/react-use-callback-ref": 1.0.1
-    "@radix-ui/react-use-controllable-state": 1.0.1
-    "@radix-ui/react-use-layout-effect": 1.0.1
-    "@radix-ui/react-use-previous": 1.0.1
-    "@radix-ui/react-visually-hidden": 1.0.3
-    aria-hidden: ^1.1.1
-    react-remove-scroll: 2.5.5
-  peerDependencies:
-    "@types/react": "*"
-    "@types/react-dom": "*"
-    react: ^16.8 || ^17.0 || ^18.0
-    react-dom: ^16.8 || ^17.0 || ^18.0
-  peerDependenciesMeta:
-    "@types/react":
-      optional: true
-    "@types/react-dom":
-      optional: true
-  checksum: 9ebf4a3e70fd5f583cf468e432ff04768b3442c44788eaf415e044f19c900b886e92eb46e19e138c4994d8a361f5e31f93d13b5bcf413469f21899bbe1112d1d
   languageName: node
   linkType: hard
 
@@ -4430,7 +4381,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"compute-scroll-into-view@npm:^3.0.2, compute-scroll-into-view@npm:^3.0.3":
+"compute-scroll-into-view@npm:^3.0.2":
   version: 3.1.0
   resolution: "compute-scroll-into-view@npm:3.1.0"
   checksum: 224549d6dd1d40342230de5c6d69cac5c3ed5c2f6a4437310f959aadc8db1d20b03da44a6e0de14d9419c6f9130ce51ec99a91b11bde55d4640f10551c89c213
@@ -4561,15 +4512,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"debug@npm:4, debug@npm:^4.0.0, debug@npm:^4.1.0, debug@npm:^4.3.1, debug@npm:^4.3.2, debug@npm:^4.3.3, debug@npm:^4.3.4":
-  version: 4.3.4
-  resolution: "debug@npm:4.3.4"
+"debug@npm:4, debug@npm:^4.0.0, debug@npm:^4.1.0, debug@npm:^4.1.1, debug@npm:^4.3.1, debug@npm:^4.3.2, debug@npm:^4.3.3, debug@npm:^4.3.4":
+  version: 4.3.5
+  resolution: "debug@npm:4.3.5"
   dependencies:
     ms: 2.1.2
   peerDependenciesMeta:
     supports-color:
       optional: true
-  checksum: 3dbad3f94ea64f34431a9cbf0bafb61853eda57bff2880036153438f50fb5a84f27683ba0d8e5426bf41a8c6ff03879488120cf5b3a761e77953169c0600a708
+  checksum: 7c002b51e256257f936dda09eb37167df952758c57badf6bf44bdc40b89a4bcb8e5a0a2e4c7b53f97c69e2970dd5272d33a757378a12c8f8e64ea7bf99e8e86e
   languageName: node
   linkType: hard
 
@@ -4751,21 +4702,6 @@ __metadata:
   version: 0.5.16
   resolution: "dom-accessibility-api@npm:0.5.16"
   checksum: 005eb283caef57fc1adec4d5df4dd49189b628f2f575af45decb210e04d634459e3f1ee64f18b41e2dcf200c844bc1d9279d80807e686a30d69a4756151ad248
-  languageName: node
-  linkType: hard
-
-"downshift@npm:^8.3.1":
-  version: 8.3.1
-  resolution: "downshift@npm:8.3.1"
-  dependencies:
-    "@babel/runtime": ^7.22.15
-    compute-scroll-into-view: ^3.0.3
-    prop-types: ^15.8.1
-    react-is: ^18.2.0
-    tslib: ^2.6.2
-  peerDependencies:
-    react: ">=16.12.0"
-  checksum: 3438ee9ff9662a4558fbe860e22e39269ad54f44d70dd381d4dd440129e648cc09993e2d1c7dbbe70fdbb23a66ec118c76253d689165d48020f9e670d9ce0d67
   languageName: node
   linkType: hard
 
@@ -5724,6 +5660,13 @@ __metadata:
     merge2: ^1.4.1
     slash: ^3.0.0
   checksum: b4be8885e0cfa018fc783792942d53926c35c50b3aefd3fdcfb9d22c627639dc26bd2327a40a0b74b074100ce95bb7187bfeae2f236856aa3de183af7a02aea6
+  languageName: node
+  linkType: hard
+
+"globrex@npm:^0.1.2":
+  version: 0.1.2
+  resolution: "globrex@npm:0.1.2"
+  checksum: adca162494a176ce9ecf4dd232f7b802956bb1966b37f60c15e49d2e7d961b66c60826366dc2649093cad5a0d69970cfa8875bd1695b5a1a2f33dcd2aa88da3c
   languageName: node
   linkType: hard
 
@@ -7865,7 +7808,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-is@npm:^18.0.0, react-is@npm:^18.2.0":
+"react-is@npm:^18.0.0":
   version: 18.2.0
   resolution: "react-is@npm:18.2.0"
   checksum: e72d0ba81b5922759e4aff17e0252bd29988f9642ed817f56b25a3e217e13eea8a7f2322af99a06edb779da12d5d636e9fda473d620df9a3da0df2a74141d53e
@@ -8958,7 +8901,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tslib@npm:^2.0.0, tslib@npm:^2.1.0, tslib@npm:^2.4.0, tslib@npm:^2.6.2":
+"tsconfck@npm:^3.0.3":
+  version: 3.1.0
+  resolution: "tsconfck@npm:3.1.0"
+  peerDependencies:
+    typescript: ^5.0.0
+  peerDependenciesMeta:
+    typescript:
+      optional: true
+  bin:
+    tsconfck: bin/tsconfck.js
+  checksum: c33cb853362dc45d5efbb4763b2cd07e5808533b6c6f84dad2dcc61f3fe6d22736ec9459233f47e9e90e8c430dd4ff284d5a09e85fa63ca570b9f144a87b1c76
+  languageName: node
+  linkType: hard
+
+"tslib@npm:^2.0.0, tslib@npm:^2.1.0, tslib@npm:^2.4.0":
   version: 2.6.2
   resolution: "tslib@npm:2.6.2"
   checksum: 329ea56123005922f39642318e3d1f0f8265d1e7fcb92c633e0809521da75eeaca28d2cf96d7248229deb40e5c19adf408259f4b9640afd20d13aecc1430f3ad
@@ -9366,6 +9323,22 @@ __metadata:
   bin:
     vite-node: vite-node.mjs
   checksum: ce111c5c7a4cf65b722baa15cbc065b7bfdbf1b65576dd6372995f6a72b2b93773ec5df59f6c5f08cfe1284806597b44b832efcea50d5971102428159ff4379f
+  languageName: node
+  linkType: hard
+
+"vite-tsconfig-paths@npm:^4.3.2":
+  version: 4.3.2
+  resolution: "vite-tsconfig-paths@npm:4.3.2"
+  dependencies:
+    debug: ^4.1.1
+    globrex: ^0.1.2
+    tsconfck: ^3.0.3
+  peerDependencies:
+    vite: "*"
+  peerDependenciesMeta:
+    vite:
+      optional: true
+  checksum: 7105ff641379f9f7055110f33067b236c8ee71b1390c0e6482412cdcc7a98c2e139c1c2a483d14fe9045d1977c14dc931e1ff302d6257ec919c70379db9d2419
   languageName: node
   linkType: hard
 

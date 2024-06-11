@@ -1,8 +1,8 @@
-import { Binding, PersistButton } from '../../lib/components/binding'
-import { Slots } from '../../lib/components/slots'
+import { Binding, PersistButton } from '@app/lib/binding'
+import { Slots } from '@app/lib/layout'
 import * as React from 'react'
 import { Component, EntitySubTree, HasOne, useEntity, useField } from '@contember/interface'
-import { Toggle } from '../../lib/components/ui/toggle'
+import { Toggle } from '@app/lib/ui/toggle'
 import {
 	AlignCenterIcon,
 	AlignJustifyIcon,
@@ -31,11 +31,14 @@ import {
 } from 'lucide-react'
 import {
 	anchorElementType,
-	BlockContent,
 	boldMark,
 	codeMark,
 	createAlignHandler,
+	EditorElementTrigger,
+	EditorGenericTrigger,
+	EditorInlineReferencePortal,
 	EditorMarkTrigger,
+	EditorReferenceTrigger,
 	EditorRenderElementProps,
 	EditorTransforms,
 	EditorWrapNodeTrigger,
@@ -51,18 +54,13 @@ import {
 	underlineMark,
 	unorderedListElementType,
 } from '@contember/react-slate-editor'
-import { ImageField, InputField } from '../../lib/components/form'
-import { Popover, PopoverContent, PopoverTrigger } from '../../lib/components/ui/popover'
-import { Button } from '../../lib/components/ui/button'
+import { ImageField, InputField } from '@app/lib/form'
+import { Popover, PopoverContent, PopoverTrigger } from '@app/lib/ui/popover'
+import { Button } from '@app/lib/ui/button'
 import { PopoverClose } from '@radix-ui/react-popover'
-import { uic } from '../../lib/utils/uic'
-import { EditorElementTrigger, EditorGenericTrigger, EditorInlineReferencePortal, EditorReferenceTrigger } from '@contember/react-slate-editor'
+import { uic } from '@app/lib/utils'
 import { useSlateStatic } from 'slate-react'
-import { RichTextField } from '../../lib-extra/editor/new/RichTextField'
-import { InlineHoveringToolbar } from '../../lib-extra/editor/common/InlineHoveringToolbar'
-import { BlockEditorField } from '../../lib-extra/editor/new/BlockEditor'
-import { BlockToolbar } from '../../lib-extra/editor/common/BlockToolbar'
-import { EditorBlock, EditorBlockContent } from '../../lib-extra/editor/new/EditorBlock'
+import { BlockEditorField, EditorBlock, EditorBlockContent, EditorBlockToolbar, EditorInlineToolbar, RichTextField } from '@app/lib/editor'
 
 export const richtext = () => <>
 	<Binding>
@@ -72,7 +70,7 @@ export const richtext = () => <>
 		<EntitySubTree entity={'EditorTextArea(unique=unique)'} setOnCreate={'(unique=unique)'}>
 			<div className={'space-y-4'}>
 				<RichTextField field={'data'} label="Rich text field">
-					<InlineHoveringToolbar>
+					<EditorInlineToolbar>
 						<EditorMarkTrigger mark={boldMark}><Toggle><BoldIcon className="h-3 w-3" /></Toggle></EditorMarkTrigger>
 						<EditorMarkTrigger mark={italicMark}><Toggle><ItalicIcon className="h-3 w-3" /></Toggle></EditorMarkTrigger>
 						<EditorMarkTrigger mark={underlineMark}><Toggle><UnderlineIcon className="h-3 w-3" /></Toggle></EditorMarkTrigger>
@@ -80,7 +78,7 @@ export const richtext = () => <>
 						<EditorGenericTrigger {...createAlignHandler('start')}><Toggle><AlignLeftIcon className="h-3 w-3" /></Toggle></EditorGenericTrigger>
 						<EditorGenericTrigger {...createAlignHandler('end')}><Toggle><AlignRightIcon className="h-3 w-3" /></Toggle></EditorGenericTrigger>
 						<EditorGenericTrigger {...createAlignHandler('center')}><Toggle><AlignCenterIcon className="h-3 w-3" /></Toggle></EditorGenericTrigger>
-					</InlineHoveringToolbar>
+					</EditorInlineToolbar>
 				</RichTextField>
 			</div>
 		</EntitySubTree>
@@ -113,14 +111,14 @@ export const blocks = () => <>
 						},
 					]}
 				>
-					<BlockToolbar>
+					<EditorBlockToolbar>
 						<EditorReferenceTrigger referenceType="quote"><BlockButton><QuoteIcon /> Quote</BlockButton></EditorReferenceTrigger>
 						<EditorReferenceTrigger referenceType="image"><BlockButton><ImageIcon /> Image</BlockButton></EditorReferenceTrigger>
 						<EditorElementTrigger elementType={tableElementType}><BlockButton><TableIcon /> Table</BlockButton></EditorElementTrigger>
 						<EditorElementTrigger elementType={scrollTargetElementType}><BlockButton><LocateIcon /> Scroll target</BlockButton></EditorElementTrigger>
 						<EditorElementTrigger elementType={horizontalRuleElementType}><BlockButton><MinusIcon  /> Horizontal rule</BlockButton></EditorElementTrigger>
-					</BlockToolbar>
-					<InlineHoveringToolbar>
+					</EditorBlockToolbar>
+					<EditorInlineToolbar>
 						<div>
 							<EditorMarkTrigger mark={boldMark}><Toggle><BoldIcon className="h-3 w-3" /></Toggle></EditorMarkTrigger>
 							<EditorMarkTrigger mark={italicMark}><Toggle><ItalicIcon className="h-3 w-3" /></Toggle></EditorMarkTrigger>
@@ -154,7 +152,7 @@ export const blocks = () => <>
 							<EditorGenericTrigger {...createAlignHandler('center')}><Toggle><AlignCenterIcon className="h-3 w-3" /></Toggle></EditorGenericTrigger>
 							<EditorGenericTrigger {...createAlignHandler('justify')}><Toggle><AlignJustifyIcon className="h-3 w-3" /></Toggle></EditorGenericTrigger>
 						</div>
-					</InlineHoveringToolbar>
+					</EditorInlineToolbar>
 
 					<EditorBlock name="quote" label="Quote">
 						<EditorBlockContent />

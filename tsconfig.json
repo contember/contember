@@ -87,6 +87,9 @@
 			"path": "./packages/react-slots"
 		},
 		{
+			"path": "./packages/react-ui-lib"
+		},
+		{
 			"path": "./packages/react-uploader"
 		},
 		{

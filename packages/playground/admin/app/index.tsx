@@ -2,13 +2,13 @@ import { ApplicationEntrypoint, PageModule, Pages } from '@contember/interface'
 import { SlotsProvider } from '@contember/react-slots'
 import { Layout } from './components/layout'
 import '../index.css'
-import { Toaster } from '../lib/components/ui/toast'
+import { Toaster } from '@app/lib/toast'
 import { createErrorHandler, DevBar, DevPanel } from '@contember/react-devbar'
 import { LogInIcon } from 'lucide-react'
-import { LoginWithEmail } from '../lib/components/dev/login-panel'
+import { LoginWithEmail } from '@app/lib/dev'
 import { createRoot } from 'react-dom/client'
 import { getConfig } from './config'
-import { OutdatedApplicationDialog } from '../lib/components/outdated-application-dialog'
+import { OutdatedApplicationDialog } from '@app/lib/outdated-application-dialog'
 
 const errorHandler = createErrorHandler((dom, react, onRecoverableError) => createRoot(dom, { onRecoverableError }).render(react))
 

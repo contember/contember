@@ -1,9 +1,8 @@
 import * as React from 'react'
 import { memo, PropsWithChildren } from 'react'
-import { IdentityLoader } from '../../lib/components/binding/identity'
-import { Slots } from '../../lib/components/slots'
+import { IdentityLoader } from '@app/lib/binding'
+import { LayoutComponent, Slots } from '@app/lib/layout'
 import { Navigation } from './navigation'
-import { LayoutComponent } from '../../lib/components/layout'
 import { Link } from '@contember/interface'
 import { Logo } from './icon'
 

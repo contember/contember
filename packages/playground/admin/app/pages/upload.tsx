@@ -1,8 +1,8 @@
 import { EntitySubTree } from '@contember/react-binding'
 import * as React from 'react'
-import { Binding, PersistButton } from '../../lib/components/binding'
-import { Slots } from '../../lib/components/slots'
-import { AudioField, FileField, ImageField, ImageRepeaterField, VideoField } from '../../lib/components/form'
+import { Binding, PersistButton } from '@app/lib/binding'
+import { Slots } from '@app/lib/layout'
+import { AudioField, FileField, ImageField, ImageRepeaterField, VideoField } from '@app/lib/form'
 
 
 export const image = () => <>

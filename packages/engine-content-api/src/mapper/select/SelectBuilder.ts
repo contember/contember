@@ -1,4 +1,4 @@
-import { Acl, Input, Model } from '@contember/schema'
+import { Acl, Input, Model, Value } from '@contember/schema'
 import { acceptFieldVisitor, getColumnName } from '@contember/schema-utils'
 import { ColumnValueGetter, SelectHydrator, SelectRow } from './SelectHydrator'
 import { Path, PathFactory } from './Path'
@@ -138,15 +138,21 @@ export class SelectBuilder {
 				relationPath: this.relationPath,
 				addData: async ({ field, dataProvider, defaultValue, predicate }) => {
 					if (predicate === false) {
-						this.hydrator.addPromise(fieldPath, path.for(field), Promise.resolve({}), defaultValue ?? null)
+						this.hydrator.addPromise(fieldPath, () => null, Promise.resolve({}), defaultValue ?? null)
 						return
 					}
 					const predicateGetter = predicate !== undefined && predicate !== true ? addPredicate(predicate) : null
 					const columnName = getColumnName(this.schema, entity, field)
-					let ids = await this.getColumnValues(path.for(field), columnName, predicateGetter)
+					const parentValuePath = path.for(field)
+					let ids = await this.getColumnValues(parentValuePath, columnName, predicateGetter)
 
 					const data = ids.length > 0 ? dataProvider(ids) : Promise.resolve({})
-					this.hydrator.addPromise(fieldPath, path.for(field), data, defaultValue ?? null)
+					this.hydrator.addPromise(
+						fieldPath,
+						row => predicateGetter === null || predicateGetter(row) ? (row[parentValuePath.alias] as Value.PrimaryValue) : null,
+						data,
+						defaultValue ?? null,
+					)
 				},
 				addColumn: ({ path = fieldPath, predicate, query, valueGetter }) => {
 					if (predicate === false) {

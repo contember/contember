@@ -5,14 +5,14 @@ import { logger } from '@contember/logger'
 
 type DataPromises = {
 	path: Path
-	parentKeyPath: Path
+	getParentValue: ColumnValueGetter<Value.PrimaryValue | null>
 	data: Promise<SelectNestedData>
 	defaultValue: SelectNestedDefaultValue
 }
 
 type ResolvedData = {
 	path: Path
-	parentKeyPath: Path
+	getParentValue: ColumnValueGetter<Value.PrimaryValue | null>
 	data: SelectNestedData
 	defaultValue: SelectNestedDefaultValue
 }
@@ -34,11 +34,11 @@ export class SelectHydrator {
 
 	public addPromise(
 		path: Path,
-		parentKeyPath: Path,
+		getParentValue: ColumnValueGetter<Value.PrimaryValue | null>,
 		data: Promise<SelectNestedData>,
 		defaultValue: SelectNestedDefaultValue,
 	) {
-		this.promises.push({ path, parentKeyPath, data, defaultValue })
+		this.promises.push({ path, getParentValue, data, defaultValue })
 	}
 
 	public async hydrateGroups(rows: SelectRow[], groupBy: string): Promise<SelectGroupedObjects> {
@@ -87,11 +87,11 @@ export class SelectHydrator {
 			currentObject[last] = this.formatValue(columnPath.getValue(row))
 		}
 
-		for (let { path, parentKeyPath, data, defaultValue } of resolvedData) {
+		for (let { path, getParentValue, data, defaultValue } of resolvedData) {
 			const pathTmp = [...path.path]
 			const last = pathTmp.pop() as string
 			const currentObject = pathTmp.reduce<any>((obj, part) => (obj && obj[part]) || undefined, result)
-			const parentValue = row[parentKeyPath.alias] as Value.PrimaryValue
+			const parentValue = getParentValue(row)
 			if (currentObject) {
 				currentObject[last] = (parentValue ? data[parentValue] : undefined) || defaultValue
 			}
@@ -103,7 +103,7 @@ export class SelectHydrator {
 	private async resolveDataPromises(): Promise<ResolvedData[]> {
 		const results = await Promise.allSettled(this.promises.map(async (it): Promise<ResolvedData> => ({
 			defaultValue: it.defaultValue,
-			parentKeyPath: it.parentKeyPath,
+			getParentValue: it.getParentValue,
 			path: it.path,
 			data: await it.data,
 		})))

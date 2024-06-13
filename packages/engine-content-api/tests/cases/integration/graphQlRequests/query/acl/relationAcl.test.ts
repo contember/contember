@@ -1,0 +1,229 @@
+import { AclDefinition as acl, createSchema, SchemaDefinition as def } from '@contember/schema-definition'
+import { test } from 'vitest'
+import { execute } from '../../../../../src/test'
+import { GQL, SQL } from '../../../../../src/tags'
+import { PermissionFactory } from '../../../../../../src'
+import { testUuid } from '@contember/engine-api-tester'
+
+
+namespace RelationAclManyHasOne {
+	export const readerRole = acl.createRole('reader')
+
+	@acl.allow(readerRole, {
+		read: ['title'],
+	})
+	@acl.allow(readerRole, {
+		when: { discloseAuthor: { eq: true } },
+		read: ['author'],
+	})
+	export class Article {
+		title = def.stringColumn().notNull()
+		author = def.manyHasOne(Author).notNull()
+		discloseAuthor = def.boolColumn().notNull()
+	}
+
+	@acl.allow(readerRole, {
+		read: true,
+	})
+	export class Author {
+		name = def.stringColumn().notNull()
+	}
+}
+
+
+test('can read same entity only over relation of some rows - many has one', async () => {
+	const schema = createSchema(RelationAclManyHasOne)
+
+	const permissions = new PermissionFactory(schema.model).create(schema.acl, ['reader'])
+
+	await execute({
+		schema: schema.model,
+		permissions: permissions,
+		variables: {},
+		query: GQL`
+        query {
+          listArticle {
+          	title
+          	author {
+				name
+          	}
+          }
+        }`,
+		executes: [
+			{
+				sql: SQL`select "root_"."title" as "root_title", "root_"."disclose_author" = ? as "root_$predicate_discloseAuthor_eq_true", "root_"."author_id" as "root_$key_author", "root_"."id" as "root_id" 
+from "public"."article" as "root_"`,
+				response: {
+					rows: [
+						{
+							root_id: testUuid(1),
+							root_title: 'Article A',
+							root_$predicate_discloseAuthor_eq_true: true,
+							root_$key_author: testUuid(10),
+						},
+						{
+							root_id: testUuid(2),
+							root_title: 'Article B',
+							root_$predicate_discloseAuthor_eq_true: false,
+							root_$key_author: testUuid(10),
+						},
+					],
+				},
+			},
+			{
+				sql: SQL`select "root_"."id" as "root_$index_id", "root_"."name" as "root_name", "root_"."id" as "root_id" from "public"."author" as "root_" where "root_"."id" in (?)`,
+				parameters: [testUuid(10)],
+				response: {
+					rows: [
+						{
+							root_id: testUuid(10),
+							root_$index_id: testUuid(10),
+							root_name: 'John doe',
+						},
+					],
+				},
+			},
+		],
+		return: {
+			data: {
+				listArticle: [
+					{
+						title: 'Article A',
+						author: {
+							name: 'John doe',
+						},
+					},
+					{
+						title: 'Article B',
+						author: null,
+					},
+				],
+			},
+		},
+	})
+})
+
+
+
+namespace RelationAclManyHasMany {
+	export const readerRole = acl.createRole('reader')
+
+	@acl.allow(readerRole, {
+		read: ['title'],
+	})
+	@acl.allow(readerRole, {
+		when: { discloseAuthor: { eq: true } },
+		read: ['authors'],
+	})
+	export class Article {
+		title = def.stringColumn().notNull()
+		authors = def.manyHasMany(Author)
+		discloseAuthor = def.boolColumn().notNull()
+	}
+
+	@acl.allow(readerRole, {
+		read: true,
+	})
+	export class Author {
+		name = def.stringColumn().notNull()
+	}
+}
+
+
+test('can read same entity only over relation of some rows - many has many', async () => {
+	const schema = createSchema(RelationAclManyHasMany)
+
+	const permissions = new PermissionFactory(schema.model).create(schema.acl, ['reader'])
+
+	await execute({
+		schema: schema.model,
+		permissions: permissions,
+		variables: {},
+		query: GQL`
+        query {
+          listArticle {
+          	title
+          	authors {
+				name
+          	}
+          }
+        }`,
+		executes: [
+			{
+				sql: SQL`select "root_"."title" as "root_title", "root_"."disclose_author" = ? as "root_$predicate_discloseAuthor_eq_true", "root_"."id" as "root_$key_id", "root_"."id" as "root_id" 
+from "public"."article" as "root_"`,
+				response: {
+					rows: [
+						{
+							root_id: testUuid(1),
+							root_$key_id: testUuid(1),
+							root_title: 'Article A',
+							root_$predicate_discloseAuthor_eq_true: true,
+						},
+						{
+							root_id: testUuid(2),
+							root_$key_id: testUuid(2),
+							root_title: 'Article B',
+							root_$predicate_discloseAuthor_eq_true: false,
+						},
+					],
+				},
+			},
+			{
+				sql: SQL`select "junction_"."author_id", "junction_"."article_id" from "public"."article_authors" as "junction_" where "junction_"."article_id" in (?)`,
+				parameters: [testUuid(1)],
+				response: {
+					rows: [
+						{
+							article_id: testUuid(1),
+							author_id: testUuid(10),
+						},
+						{
+							article_id: testUuid(1),
+							author_id: testUuid(11),
+						},
+					],
+				},
+			},
+			{
+				sql: SQL`select "root_"."name" as "root_name", "root_"."id" as "root_id" from "public"."author" as "root_" where "root_"."id" in (?, ?)`,
+				parameters: [testUuid(10), testUuid(11)],
+				response: {
+					rows: [
+						{
+							root_id: testUuid(10),
+							root_name: 'John doe',
+						},
+						{
+							root_id: testUuid(11),
+							root_name: 'Jack doe',
+						},
+					],
+				},
+			},
+		],
+		return: {
+			data: {
+				listArticle: [
+					{
+						title: 'Article A',
+						authors: [
+							{
+								name: 'John doe',
+							},
+							{
+								name: 'Jack doe',
+							},
+						],
+					},
+					{
+						title: 'Article B',
+						authors: [],
+					},
+				],
+			},
+		},
+	})
+})
+
+

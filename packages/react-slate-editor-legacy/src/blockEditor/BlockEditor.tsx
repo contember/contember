@@ -154,19 +154,24 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 		}, [])
 
 		return (
-			<Repeater {...blockListProps} sortableBy={sortableBy}>
+			<OuterWrapper>
+				<Repeater {...blockListProps} sortableBy={sortableBy}>
 
-				<ReferencesProvider getReferencedEntity={getReferencedEntity}>
-					<SortedBlocksContext.Provider value={sortedBlocksRef.current}>
-						<EditorReferenceBlocksContext.Provider value={editorReferenceBlocks}>
-							<Slate editor={editor} initialValue={nodes} onChange={onChange}>
-								<SyncValue nodes={nodes}/>
-								{children}
-							</Slate>
-						</EditorReferenceBlocksContext.Provider>
-					</SortedBlocksContext.Provider>
-				</ReferencesProvider>
-			</Repeater>
+					<ReferencesProvider getReferencedEntity={getReferencedEntity}>
+						<SortedBlocksContext.Provider value={sortedBlocksRef.current}>
+							<EditorReferenceBlocksContext.Provider value={editorReferenceBlocks}>
+								<Slate editor={editor} initialValue={nodes} onChange={onChange}>
+									<SyncValue nodes={nodes}/>
+									<InnerWrapper>
+										{children}
+									</InnerWrapper>
+								</Slate>
+							</EditorReferenceBlocksContext.Provider>
+						</SortedBlocksContext.Provider>
+					</ReferencesProvider>
+				</Repeater>
+
+			</OuterWrapper>
 		)
 	},
 	(props, environment) => {

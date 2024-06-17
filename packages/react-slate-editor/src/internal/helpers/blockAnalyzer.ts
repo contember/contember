@@ -10,5 +10,6 @@ export const blockAnalyzer = new ChildrenAnalyzer<
 	Environment
 >([columnLeaf], {
 	staticRenderFactoryName: 'staticRender',
-	unhandledNodeErrorMessage: 'Only Block children are supported.',
+	staticContextFactoryName: 'generateEnvironment',
+	// unhandledNodeErrorMessage: 'Only Block children are supported.',
 })

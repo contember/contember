@@ -14,6 +14,7 @@ export const boardColumnsAnalyzer = new ChildrenAnalyzer<
 	Environment
 >([columnLeaf], {
 	staticRenderFactoryName: 'staticRender',
+	staticContextFactoryName: 'generateEnvironment',
 })
 
 export const boardItemsAnalyzer = new ChildrenAnalyzer<
@@ -22,4 +23,5 @@ export const boardItemsAnalyzer = new ChildrenAnalyzer<
 	Environment
 >([itemLeaf], {
 	staticRenderFactoryName: 'staticRender',
+	staticContextFactoryName: 'generateEnvironment',
 })

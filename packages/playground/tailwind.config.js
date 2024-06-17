@@ -1,7 +1,7 @@
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-	content: ['./**/*.{html,js,tsx,ts}'],
+	content: ['./**/*.{html,js,tsx,ts}', '../react-ui-lib/src/**/*.{html,js,tsx,ts}'],
 	darkMode: ['class'],
 	theme: {
 		container: {

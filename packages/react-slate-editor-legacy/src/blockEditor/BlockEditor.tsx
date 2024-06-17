@@ -7,6 +7,7 @@ import {
 	SugaredField,
 	SugaredFieldProps,
 	SugaredRelativeEntityList,
+	TreeNodeEnvironmentFactory,
 	useDesugaredRelativeSingleField,
 	useEntity,
 	useEnvironment,
@@ -81,7 +82,17 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 		const desugaredEmbedContentDiscriminationField = useDesugaredRelativeSingleField(embedContentDiscriminationField)
 
 
-		const editorReferenceBlocks = useEditorReferenceBlocks(children)
+
+		let refEnv = environment
+		if (!props.monolithicReferencesMode) {
+			refEnv = TreeNodeEnvironmentFactory.createEnvironmentForEntityList(refEnv, {
+				field: props.field,
+			})
+		}
+		refEnv = referencesField ? TreeNodeEnvironmentFactory.createEnvironmentForEntityList(refEnv, typeof referencesField === 'string' ? {
+			field: referencesField,
+		} : referencesField) : refEnv
+		const editorReferenceBlocks = useEditorReferenceBlocks(children, refEnv)
 
 		//
 
@@ -96,6 +107,7 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 			embedReferenceDiscriminant !== undefined
 				? getDiscriminatedBlock(editorReferenceBlocks, embedReferenceDiscriminant)?.datum.children
 				: undefined, // TODO this may crash
+			refEnv,
 		)
 
 		const entity = useEntity()

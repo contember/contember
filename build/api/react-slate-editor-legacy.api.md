@@ -18,7 +18,7 @@ import { EntityAccessor } from '@contember/react-binding';
 import { EntityAccessor as EntityAccessor_2 } from '@contember/binding';
 import { EntityId } from '@contember/react-binding';
 import { EntityId as EntityId_2 } from '@contember/binding';
-import type { Environment } from '@contember/react-binding';
+import { Environment } from '@contember/react-binding';
 import { FieldAccessor } from '@contember/react-binding';
 import { FieldValue } from '@contember/react-binding';
 import { FunctionComponent } from 'react';
@@ -339,7 +339,7 @@ export interface UseBlockEditorSlateNodesOptions {
 }
 
 // @public (undocumented)
-export const useBlockProps: (children: ReactNode) => BlockProps[];
+export const useBlockProps: (children: ReactNode, env: Environment) => BlockProps[];
 
 // @public (undocumented)
 export const useDiscriminatedData: <Datum extends DiscriminatedDatum = DiscriminatedDatum>(source: Iterable<Datum>) => NormalizedDiscriminatedData<Datum>;
@@ -348,7 +348,7 @@ export const useDiscriminatedData: <Datum extends DiscriminatedDatum = Discrimin
 export const useEditorReferenceBlocks: () => EditorReferenceBlocks;
 
 // @public (undocumented)
-export const useNormalizedBlocks: (children: ReactNode) => NormalizedBlocks;
+export const useNormalizedBlocks: (children: ReactNode, env: Environment) => NormalizedBlocks;
 
 // @public (undocumented)
 export interface WithBlockElements {

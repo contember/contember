@@ -1,6 +1,6 @@
 import { EditorPlugin, EditorPluginWrapperProps } from '@contember/react-slate-editor-base'
 import { useMemo } from 'react'
-import { SugaredRelativeEntityList, SugaredRelativeSingleField } from '@contember/binding'
+import { SugaredRelativeEntityList, SugaredRelativeSingleField, TreeNodeEnvironmentFactory } from '@contember/binding'
 import { isElementWithReference } from './elements'
 import { referenceOverrides } from './referenceOverrides'
 import { ErrorBoundary } from 'react-error-boundary'
@@ -22,7 +22,9 @@ export interface ReferencesPluginArgs {
 export const withReferences = (args: ReferencesPluginArgs): EditorPlugin => {
 	return {
 		extendEditor: ({ editor, children, environment, entity }) => {
-			const blocks = getEditorReferenceBlocks(children, environment)
+			const blocks = getEditorReferenceBlocks(children, TreeNodeEnvironmentFactory.createEnvironmentForEntityList(environment, {
+				field: args.field,
+			}))
 			for (const block of Object.values(blocks)) {
 				editor.registerElement({
 					type: block.name,
@@ -58,7 +60,9 @@ export const withReferences = (args: ReferencesPluginArgs): EditorPlugin => {
 			const env = useEnvironment()
 
 			const editorReferenceBlocks = useMemo(() => {
-				return getEditorReferenceBlocks(children, env)
+				return getEditorReferenceBlocks(children, TreeNodeEnvironmentFactory.createEnvironmentForEntityList(env, {
+					field: args.field,
+				}))
 			}, [children, env])
 			useCleanupReferences({ field: args.field, editor })
 

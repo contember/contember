@@ -1,4 +1,4 @@
-import { useEnvironment } from '@contember/react-binding'
+import { Environment, useEnvironment } from '@contember/react-binding'
 import { useConstantValueInvariant } from '@contember/react-utils'
 import { ReactNode, useMemo } from 'react'
 import { BlockProps, useBlockProps } from '../../blocks'
@@ -11,11 +11,10 @@ export interface EditorReferenceBlock extends BlockProps {
 
 export type EditorReferenceBlocks = NormalizedDiscriminatedData<EditorReferenceBlock>
 
-export const useEditorReferenceBlocks = (children: ReactNode): EditorReferenceBlocks => {
+export const useEditorReferenceBlocks = (children: ReactNode, env: Environment): EditorReferenceBlocks => {
 	useConstantValueInvariant(children, `BlockEditor: cannot change the set of Blocks between renders!`)
-	const env = useEnvironment()
 
-	const propList = useBlockProps(children)
+	const propList = useBlockProps(children, env)
 	const propsWithTemplates = useMemo(() => {
 		return propList.map(
 			(props): EditorReferenceBlock => ({

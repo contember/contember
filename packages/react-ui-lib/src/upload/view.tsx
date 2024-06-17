@@ -13,8 +13,8 @@ export type UploadedImageViewProps =
 	& GenericFileMetadataExtractorProps
 	& ImageFileDataExtractorProps
 	& {
-	DestroyAction?: ComponentType<{ children: ReactNode }>
-}
+		DestroyAction?: ComponentType<{ children: ReactNode }>
+	}
 
 export const UploadedImageView = Component<UploadedImageViewProps>(({ DestroyAction, ...props }) => {
 	const url = useField<string>(props.urlField).value

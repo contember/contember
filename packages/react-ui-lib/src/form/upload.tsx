@@ -159,27 +159,78 @@ const UploadFieldInner = Component((({ baseField, label, description, children, 
 	</>
 })
 
-
-
-
-export type ImageRepeaterField =
+export type BaseFileRepeaterFieldProps =
 	& Omit<FormContainerProps, 'children'>
 	& RepeaterProps
 	& UploaderBaseFieldProps
+
+
+export type ImageRepeaterFieldProps =
+	& BaseFileRepeaterFieldProps
 	& ImageFileTypeProps
+
+export const ImageRepeaterField = Component<ImageRepeaterFieldProps>(props => <>
+	<FileRepeaterFieldInner {...props} fileType={createImageFileType(props)}>
+		<UploadedImageView {...props} DestroyAction={RepeaterRemoveItemTrigger} />
+	</FileRepeaterFieldInner>
+</>)
+
+
+export type AudioRepeaterFieldProps =
+	& BaseFileRepeaterFieldProps
+	& AudioFileTypeProps
+
+export const AudioRepeaterField = Component<AudioRepeaterFieldProps>(props => <>
+	<FileRepeaterFieldInner {...props} fileType={createAudioFileType(props)}>
+		<UploadedAudioView {...props} DestroyAction={RepeaterRemoveItemTrigger} />
+	</FileRepeaterFieldInner>
+</>)
+
+
+export type VideoRepeaterFieldProps =
+	& BaseFileRepeaterFieldProps
+	& VideoFileTypeProps
+
+export const VideoRepeaterField = Component<VideoRepeaterFieldProps>(props => <>
+	<FileRepeaterFieldInner {...props} fileType={createVideoFileType(props)}>
+		<UploadedVideoView {...props} DestroyAction={RepeaterRemoveItemTrigger} />
+	</FileRepeaterFieldInner>
+</>)
+
+
+export type FileRepeaterFieldProps =
+	& BaseFileRepeaterFieldProps
+	& AnyFileTypeProps
+
+export const FileRepeaterField = Component<FileRepeaterFieldProps>(props => <>
+	<FileRepeaterFieldInner {...props} fileType={createAnyFileType(props)}>
+		<UploadedAnyView {...props} DestroyAction={RepeaterRemoveItemTrigger} />
+	</FileRepeaterFieldInner>
+</>)
+
+
+type FileRepeaterFieldInnerProps =
+	& BaseFileRepeaterFieldProps
 	& {
-		children?: React.ReactNode
+		fileType: FileType
+		children: ReactNode
 	}
 
-export const ImageRepeaterField = Component<ImageRepeaterField>(({ baseField, label, description, children, uploader, ...props }, environment) => {
-	const entity = useEntity()
+const FileRepeaterFieldInner = Component<FileRepeaterFieldInnerProps>(({ baseField, label, description, children, fileType, ...props }) => {
+
 	const defaultUploader = useS3Client()
-	uploader ??= defaultUploader
-	const [type] = useState(() => createImageFileType({ uploader, ...props }))
+	const [fileTypeStable] = useState(fileType)
+	const fileTypeWithUploader = useMemo(
+		() => ({ ...fileTypeStable, uploader: fileTypeStable?.uploader ?? defaultUploader }),
+		[defaultUploader, fileTypeStable],
+	)
+
+	// const entity = useEntity()
 	// const errors = type.extractors?.flatMap(it => it.getErrorsHolders?.({
 	// 	environment,
 	// 	entity,
 	// }) ?? []).flatMap(it => it.errors?.errors ?? [])
+
 	const id = useId()
 	return (
 		<FormFieldIdContext.Provider value={id}>
@@ -188,7 +239,7 @@ export const ImageRepeaterField = Component<ImageRepeaterField>(({ baseField, la
 					<Repeater {...props} initialEntityCount={0}>
 						<UploaderRepeaterItemsWrapperUI>
 
-							<MultiUploader baseField={baseField} fileType={type}>
+							<MultiUploader baseField={baseField} fileType={fileTypeWithUploader}>
 								<UploaderHasFile>
 									<UploaderProgress />
 								</UploaderHasFile>
@@ -207,7 +258,7 @@ export const ImageRepeaterField = Component<ImageRepeaterField>(({ baseField, la
 													<UploaderRepeaterHandleUI />
 												</RepeaterSortableItemActivator>
 												<UploaderBase baseField={baseField}>
-													<UploadedImageView {...props} DestroyAction={RepeaterRemoveItemTrigger} />
+													{children}
 												</UploaderBase>
 											</UploaderRepeaterItemUI>
 										</RepeaterSortableItemNode>
@@ -220,7 +271,7 @@ export const ImageRepeaterField = Component<ImageRepeaterField>(({ baseField, la
 								<RepeaterSortableDragOverlay>
 									<UploaderRepeaterDragOverlayUI>
 										<UploaderBase baseField={baseField}>
-											<UploadedImageView {...props} DestroyAction={RepeaterRemoveItemTrigger} />
+											{children}
 										</UploaderBase>
 									</UploaderRepeaterDragOverlayUI>
 								</RepeaterSortableDragOverlay>
@@ -232,12 +283,12 @@ export const ImageRepeaterField = Component<ImageRepeaterField>(({ baseField, la
 			</FormErrorContext.Provider>
 		</FormFieldIdContext.Provider>
 	)
-}, ({ baseField, label, description, children, ...props }) => {
-	const type = createImageFileType(props)
+}, ({ baseField, label, description, children, fileType, ...props }) => {
 	return <>
 		<Repeater {...props} initialEntityCount={0}>
-			<Uploader baseField={baseField} fileType={type}></Uploader>
-			<UploadedImageView {...props} >{children}</UploadedImageView>
+			<MultiUploader baseField={baseField} fileType={fileType}>
+				{children}
+			</MultiUploader>
 		</Repeater>
 	</>
-})
+}, 'FileRepeaterFieldInner')

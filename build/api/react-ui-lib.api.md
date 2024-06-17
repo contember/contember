@@ -191,6 +191,12 @@ export const AudioField: React_2.NamedExoticComponent<AudioFieldProps>;
 export type AudioFieldProps = BaseFieldProps & AudioFileTypeProps;
 
 // @public (undocumented)
+export const AudioRepeaterField: React_2.NamedExoticComponent<AudioRepeaterFieldProps>;
+
+// @public (undocumented)
+export type AudioRepeaterFieldProps = BaseFileRepeaterFieldProps & AudioFileTypeProps;
+
+// @public (undocumented)
 export const BackButton: ({ label }: BackButtonProps) => JSX_2.Element;
 
 // @public (undocumented)
@@ -218,6 +224,9 @@ export const baseEditorPlugins: {
 
 // @public (undocumented)
 export type BaseFieldProps = Omit<FormContainerProps, 'children'> & UploaderBaseFieldProps;
+
+// @public (undocumented)
+export type BaseFileRepeaterFieldProps = Omit<FormContainerProps, 'children'> & RepeaterProps & UploaderBaseFieldProps;
 
 // @public (undocumented)
 export const Binding: ({ children }: {
@@ -1251,6 +1260,12 @@ export const FileField: React_2.NamedExoticComponent<FileFieldProps>;
 export type FileFieldProps = BaseFieldProps & AnyFileTypeProps;
 
 // @public (undocumented)
+export const FileRepeaterField: React_2.NamedExoticComponent<FileRepeaterFieldProps>;
+
+// @public (undocumented)
+export type FileRepeaterFieldProps = BaseFileRepeaterFieldProps & AnyFileTypeProps;
+
+// @public (undocumented)
 export const formatBoolean: (value: boolean | null) => string | null;
 
 // @public (undocumented)
@@ -1348,12 +1363,10 @@ export const ImageField: React_2.NamedExoticComponent<ImageFieldProps>;
 export type ImageFieldProps = BaseFieldProps & ImageFileTypeProps;
 
 // @public (undocumented)
-export type ImageRepeaterField = Omit<FormContainerProps, 'children'> & RepeaterProps & UploaderBaseFieldProps & ImageFileTypeProps & {
-    children?: React_2.ReactNode;
-};
+export const ImageRepeaterField: React_2.NamedExoticComponent<ImageRepeaterFieldProps>;
 
 // @public (undocumented)
-export const ImageRepeaterField: React_2.NamedExoticComponent<ImageRepeaterField>;
+export type ImageRepeaterFieldProps = BaseFileRepeaterFieldProps & ImageFileTypeProps;
 
 // @public (undocumented)
 export interface ImageResizeOptions {
@@ -2563,6 +2576,12 @@ export const VideoField: React_2.NamedExoticComponent<VideoFieldProps>;
 
 // @public (undocumented)
 export type VideoFieldProps = BaseFieldProps & VideoFileTypeProps;
+
+// @public (undocumented)
+export const VideoRepeaterField: React_2.NamedExoticComponent<VideoRepeaterFieldProps>;
+
+// @public (undocumented)
+export type VideoRepeaterFieldProps = BaseFileRepeaterFieldProps & VideoFileTypeProps;
 
 // @public (undocumented)
 export const withFallback: <T>(formatter: (value: T) => string, fallback: string) => (value: T | null) => string;

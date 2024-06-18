@@ -12,7 +12,6 @@ import { Environment as Environment_2 } from '@contember/react-binding';
 import { ErrorAccessor } from '@contember/binding';
 import { ErrorAccessorHolder } from '@contember/binding';
 import { GenerateUploadUrlMutationBuilder } from '@contember/client';
-import { GraphQlClient } from '@contember/graphql-client';
 import { JSX as JSX_2 } from 'react/jsx-runtime';
 import { JSXElementConstructor } from 'react';
 import { NamedExoticComponent } from 'react';
@@ -273,7 +272,7 @@ export interface S3FileOptions {
 
 // @public (undocumented)
 export class S3UploadClient implements UploadClient<S3FileOptions> {
-    constructor(contentApiClient: GraphQlClient, options?: S3UploadClientOptions);
+    constructor(s3UrlSigner: S3UrlSigner, options?: S3UploadClientOptions);
     // (undocumented)
     readonly options: S3UploadClientOptions;
     // (undocumented)
@@ -289,6 +288,9 @@ export interface S3UploadClientOptions {
     // (undocumented)
     getUploadOptions?: (file: File) => S3FileOptions;
 }
+
+// @public (undocumented)
+export type S3UrlSigner = (parameters: GenerateUploadUrlMutationBuilder.FileParameters) => Promise<GenerateUploadUrlMutationBuilder.ResponseBody>;
 
 // @public (undocumented)
 export type StartUploadEvent = {

@@ -1,6 +1,5 @@
-import { FileUploadProgress, UploadClient, UploadClientUploadArgs } from './UploadClient'
+import { UploadClient, UploadClientUploadArgs } from './UploadClient'
 import { GenerateUploadUrlMutationBuilder } from '@contember/client'
-import { GraphQlClient } from '@contember/graphql-client'
 import { UploaderError } from '../UploaderError'
 
 export interface S3UploadClientOptions {
@@ -19,17 +18,17 @@ export interface S3FileOptions {
 	acl?: GenerateUploadUrlMutationBuilder.Acl
 }
 
+export type S3UrlSigner = (parameters: GenerateUploadUrlMutationBuilder.FileParameters) => Promise<GenerateUploadUrlMutationBuilder.ResponseBody>
+
 export class S3UploadClient implements UploadClient<S3FileOptions> {
 
-	private getSignedUploadUrl: ReturnType<typeof createBatchSignedUrlGenerator>
 	private activeCount = 0
 	private resolverQueue: Array<() => void> = []
 
 	public constructor(
-		contentApiClient: GraphQlClient,
+		private readonly s3UrlSigner: S3UrlSigner,
 		public readonly options: S3UploadClientOptions = {},
 	) {
-		this.getSignedUploadUrl = createBatchSignedUrlGenerator(contentApiClient)
 	}
 
 
@@ -44,7 +43,7 @@ export class S3UploadClient implements UploadClient<S3FileOptions> {
 			contentType: file.type,
 			...resolvedOptions,
 		}
-		const responseData = await this.getSignedUploadUrl(parameters)
+		const responseData = await this.s3UrlSigner(parameters)
 		await this.uploadSingleFile(responseData, { file, onProgress, signal })
 
 		return {
@@ -131,25 +130,3 @@ const xhrAdapter = async (
 }
 
 
-const createBatchSignedUrlGenerator = (client: GraphQlClient) => {
-
-	let uploadUrlBatchParameters: GenerateUploadUrlMutationBuilder.FileParameters[] = []
-	let uploadUrlBatchResult: null | Promise<GenerateUploadUrlMutationBuilder.MutationResponse> = null
-
-	return async (parameters: GenerateUploadUrlMutationBuilder.FileParameters): Promise<GenerateUploadUrlMutationBuilder.ResponseBody> => {
-		const index = uploadUrlBatchParameters.length
-		uploadUrlBatchParameters.push(parameters)
-		if (uploadUrlBatchResult === null) {
-			uploadUrlBatchResult = (async () => {
-				await new Promise(resolve => setTimeout(resolve, 0))
-
-				const mutation = GenerateUploadUrlMutationBuilder.buildQuery(Object.fromEntries(uploadUrlBatchParameters.map((_, i) => ['url_' + i, _])))
-				const response = await client.execute<GenerateUploadUrlMutationBuilder.MutationResponse>(mutation.query, { variables: mutation.variables })
-				uploadUrlBatchParameters = []
-				uploadUrlBatchResult = null
-				return response
-			})()
-		}
-		return (await uploadUrlBatchResult)[`url_${index}`]
-	}
-}

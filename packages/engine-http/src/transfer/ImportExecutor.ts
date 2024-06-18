@@ -177,6 +177,9 @@ export class ImportExecutor {
 		const insertContext = await this.buildInsertContext(db, mapping, db.schema, options.table, options.columns)
 		let insertRowsPromise: Promise<Connection.Result> | null = null
 
+		// postgresql has a limit of 65535 parameters per query
+		const batchSize = Math.max(1, Math.min(1000, Math.floor(65500 / options.columns.length)))
+
 		const result = await this.match(await it.next(), {
 			insertRow: async it => {
 				const [values] = it.commandArgs
@@ -193,7 +196,7 @@ export class ImportExecutor {
 					}
 				}
 
-				if (insertContext.rows.length === 1000) {
+				if (insertContext.rows.length === batchSize) {
 					await insertRowsPromise
 					insertRowsPromise = this.insertRows(db, insertContext)
 					insertContext.insertedRowCount += insertContext.rows.length

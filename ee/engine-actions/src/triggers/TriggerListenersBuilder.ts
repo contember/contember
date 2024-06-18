@@ -53,7 +53,7 @@ export class TriggerListenerBuilder {
 				type: 'update',
 				entity,
 				trigger,
-				fields: new Set(Object.keys(entity.fields)), // todo: only columns and owning
+				fields: new Set(trigger.update === true ? Object.keys(entity.fields) : trigger.update), // todo: only columns and owning
 			})
 		}
 	}

@@ -13,7 +13,6 @@ ARG LICENSE_FILE
 WORKDIR /src
 
 COPY --from=builder /src/server/server.js /src/
-COPY --from=builder /src/server/node_modules /src/node_modules
 COPY --from=builder /src/$SERVER_DIR/package.json /src/package.json
 COPY --from=builder /src/$LICENSE_FILE /src/
 

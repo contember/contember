@@ -1051,7 +1051,6 @@ __metadata:
     "@types/koa": ^2.11.3
     "@types/node": ^18
     graphql: ^16.5.0
-    heapdump: ^0.3.15
     pg: ^8.9.0
     prom-client: ^12
     uuid: ^8.3.1
@@ -1071,7 +1070,6 @@ __metadata:
     "@types/node": ^18
     "@types/supertest": ^2.0.8
     graphql: ^16.5.0
-    heapdump: ^0.3.15
     pg: ^8.9.0
     supertest: ^6.0.1
     uuid: ^8.3.1
@@ -5693,16 +5691,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"heapdump@npm:^0.3.15":
-  version: 0.3.15
-  resolution: "heapdump@npm:0.3.15"
-  dependencies:
-    nan: ^2.13.2
-    node-gyp: latest
-  checksum: ac4f5094edee34f9c5a1c9d226a87b606d10ca394513cdcebb695e9896ce8f058e5bf5adecd6d4c05c5cccdd79e7bdc1fe3ed2578bc621ae565c5638c4a3e868
-  languageName: node
-  linkType: hard
-
 "hexoid@npm:1.0.0":
   version: 1.0.0
   resolution: "hexoid@npm:1.0.0"
@@ -7187,15 +7175,6 @@ __metadata:
   version: 0.0.8
   resolution: "mute-stream@npm:0.0.8"
   checksum: ff48d251fc3f827e5b1206cda0ffdaec885e56057ee86a3155e1951bc940fd5f33531774b1cc8414d7668c10a8907f863f6561875ee6e8768931a62121a531a1
-  languageName: node
-  linkType: hard
-
-"nan@npm:^2.13.2":
-  version: 2.16.0
-  resolution: "nan@npm:2.16.0"
-  dependencies:
-    node-gyp: latest
-  checksum: cb16937273ea55b01ea47df244094c12297ce6b29b36e845d349f1f7c268b8d7c5abd126a102c5678a1e1afd0d36bba35ea0cc959e364928ce60561c9306064a
   languageName: node
   linkType: hard
 

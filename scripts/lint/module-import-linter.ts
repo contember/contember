@@ -4,7 +4,7 @@ import { join, normalize } from 'node:path'
 import glob from 'fast-glob'
 
 const globalModules = new Set(['vitest'])
-const allowedUnused = new Set(['pg', 'uuid', 'graphql', 'heapdump'])
+const allowedUnused = new Set(['pg', 'uuid', 'graphql'])
 
 const allowedDirectoryImports = new Set([
 	'yawn-yaml/cjs',

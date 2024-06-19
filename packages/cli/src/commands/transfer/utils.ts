@@ -7,6 +7,7 @@ import { parseDsn } from '../../utils/dsn'
 import { interactiveResolveInstanceEnvironmentFromInput } from '../../utils/instance'
 import { interactiveResolveApiToken } from '../../utils/tenant'
 import prompts from 'prompts'
+import { createGzip } from 'node:zlib'
 
 export type ProjectEndpoint = {
 	token: string
@@ -30,7 +31,7 @@ export const resolveProject = async ({ projectOrDsn, workspace }: { projectOrDsn
 
 }
 
-export const dataImport = async ({ printProgress, stream, project: { project, token, baseUrl } }: { stream: Readable; project: ProjectEndpoint; printProgress: (message: string) => void }) => {
+export const dataImport = async ({ printProgress, stream, project: { project, token, baseUrl }, gzip }: { stream: Readable; project: ProjectEndpoint; printProgress: (message: string) => void; gzip: boolean }) => {
 	let table = ''
 	let rowCount = 0
 	let rowTotal = 0
@@ -71,17 +72,18 @@ export const dataImport = async ({ printProgress, stream, project: { project, to
 		token,
 		headers: {
 			'Content-type': 'application/x-ndjson',
+			...(gzip ? { 'Content-Encoding': 'gzip' } : {}),
 		},
-		body: inputStream,
+		body: gzip ? inputStream.pipe(createGzip()) : inputStream,
 	})
 }
 
-export const dataExport = async ({ project: { project, token, baseUrl }, noGzip, includeSystem }: { project: ProjectEndpoint; includeSystem: boolean; noGzip: boolean }) => {
+export const dataExport = async ({ project: { project, token, baseUrl }, gzip, includeSystem }: { project: ProjectEndpoint; includeSystem: boolean; gzip: boolean }) => {
 	return await executeRequest({
 		url: `${baseUrl}/export`,
 		token,
 		headers: {
-			'Accept-Encoding': noGzip ? 'identity' : 'gzip',
+			'Accept-Encoding': gzip ? 'gzip' : 'identity',
 			'Content-type': 'application/json',
 		},
 		body: JSON.stringify({

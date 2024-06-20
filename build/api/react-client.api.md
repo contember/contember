@@ -5,8 +5,6 @@
 ```ts
 
 import { Context } from 'react';
-import type { FileUploader } from '@contember/client';
-import type { FileUploadError } from '@contember/client';
 import { GraphQlClient } from '@contember/client';
 import type { GraphQlClientFailedRequestMetadata } from '@contember/client';
 import type { GraphQlClientRequestOptions } from '@contember/client';
@@ -80,67 +78,10 @@ export interface ContemberClientProps {
 }
 
 // @public (undocumented)
-export type FailUpload = (files: Iterable<FileId | File | [FileId | File, any]>) => void;
-
-// @public (undocumented)
-export type FileId = string | number;
-
-// @public (undocumented)
-export type FileUpload<Result = unknown, Metadata = undefined> = [
-FileUploadCompoundState<Result, Metadata>,
-FileUploadOperations<Metadata>
-];
-
-// @public (undocumented)
-export type FileUploadCompoundState<Result = unknown, Metadata = undefined> = Map<FileId, SingleFileUploadState<Result, Metadata>>;
-
-// @public (undocumented)
-export interface FileUploadMetadata<Metadata = undefined> {
-    // (undocumented)
-    metadata: Metadata | undefined;
-    // (undocumented)
-    uploader: FileUploader;
-}
-
-// @public (undocumented)
-export interface FileUploadOperations<Metadata = undefined> {
-    // (undocumented)
-    failUpload: FailUpload;
-    // (undocumented)
-    initializeUpload: InitializeUpload;
-    // (undocumented)
-    purgeUpload: PurgeUpload;
-    // (undocumented)
-    startUpload: StartUpload<Metadata>;
-}
-
-// @public (undocumented)
-export interface FileUploadOptions {
-}
-
-// @public (undocumented)
-export interface FileWithMetadata {
-    // (undocumented)
-    abortController: AbortController;
-    // (undocumented)
-    file: File;
-    // (undocumented)
-    fileId: FileId;
-    // (undocumented)
-    previewUrl: string;
-}
-
-// @public (undocumented)
-export type InitializeUpload = (files: Iterable<[FileId, File] | File>) => Map<FileId, FileWithMetadata>;
-
-// @public (undocumented)
 export const LoginTokenContext: Context<string | undefined>;
 
 // @public (undocumented)
 export const ProjectSlugContext: Context<string | undefined>;
-
-// @public (undocumented)
-export type PurgeUpload = (files: Iterable<FileId | File>) => void;
 
 // @public (undocumented)
 export const SessionTokenContext: Context<SessionTokenContextValue>;
@@ -159,61 +100,7 @@ export interface SessionTokenContextValue {
 export const SetSessionTokenContext: Context<(token: string | undefined) => void>;
 
 // @public (undocumented)
-export type SingleFileUploadErrorState<Metadata = undefined> = {
-    readyState: 'error';
-    errors: FileUploadError[] | undefined;
-    rawError: any;
-    file: File;
-    metadata: Metadata | undefined;
-    previewUrl: string;
-    uploader: FileUploader | undefined;
-};
-
-// @public (undocumented)
-export type SingleFileUploadInitializingState = {
-    readyState: 'initializing';
-    abortController: AbortController;
-    file: File;
-    previewUrl: string;
-};
-
-// @public (undocumented)
-export type SingleFileUploadState<Result = unknown, Metadata = undefined> = SingleFileUploadInitializingState | SingleFileUploadUploadingState<Metadata> | SingleFileUploadSuccessState<Metadata, Result> | SingleFileUploadErrorState<Metadata>;
-
-// @public (undocumented)
-export type SingleFileUploadSuccessState<Metadata = undefined, Result = unknown> = {
-    readyState: 'success';
-    file: File;
-    metadata: Metadata;
-    previewUrl: string;
-    result: Result;
-    uploader: FileUploader;
-};
-
-// @public (undocumented)
-export type SingleFileUploadUploadingState<Metadata = undefined> = {
-    readyState: 'uploading';
-    abortController: AbortController;
-    file: File;
-    metadata: Metadata;
-    previewUrl: string;
-    progress: number | undefined;
-    uploader: FileUploader;
-};
-
-// @public (undocumented)
 export const StageSlugContext: Context<string | undefined>;
-
-// @public (undocumented)
-export type StartUpload<Metadata = undefined> = (files: Iterable<FileId | File | [FileId | File, StartUploadFileOptions<Metadata>]>) => void;
-
-// @public (undocumented)
-export interface StartUploadFileOptions<Metadata = undefined> {
-    // (undocumented)
-    metadata?: Metadata;
-    // (undocumented)
-    uploader?: FileUploader;
-}
 
 // @public (undocumented)
 export const useApiBaseUrl: () => string | undefined;
@@ -238,9 +125,6 @@ export const useCurrentContentGraphQlClient: () => GraphQlClient;
 
 // @public (undocumented)
 export const useCurrentSystemGraphQlClient: () => GraphQlClient;
-
-// @public (undocumented)
-export const useFileUpload: <Result = unknown, Metadata = undefined>({}?: FileUploadOptions) => FileUpload<Result, Metadata>;
 
 // @public (undocumented)
 export const useGraphQlClient: (path: string) => GraphQlClient;

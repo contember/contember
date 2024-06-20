@@ -6,12 +6,12 @@
 
 import { ComponentType } from 'react';
 import { Context } from 'react';
-import { EntityAccessor } from '@contember/binding';
+import type { EntityAccessor } from '@contember/binding';
 import type { Environment } from '@contember/binding';
-import { Environment as Environment_2 } from '@contember/react-binding';
 import { ErrorAccessor } from '@contember/binding';
-import { ErrorAccessorHolder } from '@contember/binding';
+import type { ErrorAccessorHolder } from '@contember/binding';
 import { GenerateUploadUrlMutationBuilder } from '@contember/client';
+import { GraphQlClient } from '@contember/graphql-client';
 import { JSX as JSX_2 } from 'react/jsx-runtime';
 import { JSXElementConstructor } from 'react';
 import { NamedExoticComponent } from 'react';
@@ -52,6 +52,9 @@ export const createAnyFileType: ({ fileSizeField, fileTypeField, lastModifiedFie
 
 // @public (undocumented)
 export const createAudioFileType: ({ durationField, fileSizeField, fileTypeField, lastModifiedField, fileNameField, urlField, uploader, extractors, acceptFile, accept, }: AudioFileTypeProps) => FileType;
+
+// @public (undocumented)
+export const createContentApiS3Signer: (client: GraphQlClient) => (parameters: GenerateUploadUrlMutationBuilder.FileParameters) => Promise<GenerateUploadUrlMutationBuilder.ResponseBody>;
 
 // @public (undocumented)
 export const createImageFileType: ({ uploader, urlField, fileSizeField, fileTypeField, lastModifiedField, fileNameField, heightField, widthField, accept, acceptFile, extractors, }: ImageFileTypeProps) => FileType;
@@ -131,38 +134,6 @@ export interface FileType {
     extractors?: FileDataExtractor[];
     // (undocumented)
     uploader?: UploadClient<any>;
-}
-
-// @public (undocumented)
-export interface FileUploadHandler<FileOptions = {}, Result extends FileUploadResult = FileUploadResult> {
-    // (undocumented)
-    getErrorsHolders: (args: FileUploadHandlerGetErrorHoldersArgs) => ErrorAccessorHolder[];
-    // (undocumented)
-    populateEntity: (args: FileUploadHandlerPopulateEntityArgs) => void;
-    // (undocumented)
-    staticRender: (args: FileUploadHandlerStaticRenderArgs) => React.ReactNode;
-}
-
-// @public (undocumented)
-export interface FileUploadHandlerGetErrorHoldersArgs {
-    // (undocumented)
-    entity: EntityAccessor;
-    // (undocumented)
-    environment: Environment_2;
-}
-
-// @public (undocumented)
-export interface FileUploadHandlerPopulateEntityArgs<Result extends FileUploadResult = FileUploadResult> {
-    // (undocumented)
-    entity: EntityAccessor;
-    // (undocumented)
-    uploadResult: Result;
-}
-
-// @public (undocumented)
-export interface FileUploadHandlerStaticRenderArgs {
-    // (undocumented)
-    environment: Environment_2;
 }
 
 // @public (undocumented)
@@ -251,28 +222,11 @@ type ProgressEvent_2 = {
 export { ProgressEvent_2 as ProgressEvent }
 
 // @public (undocumented)
-export interface S3FileOptions {
-    // (undocumented)
-    acl?: GenerateUploadUrlMutationBuilder.Acl;
-    // (undocumented)
-    contentType?: GenerateUploadUrlMutationBuilder.FileParameters['contentType'];
-    // (undocumented)
-    expiration?: number;
-    // (undocumented)
-    extension?: string;
-    // (undocumented)
-    fileName?: string;
-    // (undocumented)
-    prefix?: string;
-    // (undocumented)
-    size?: number;
-    // (undocumented)
-    suffix?: string;
-}
+export type S3FileOptions = Partial<GenerateUploadUrlMutationBuilder.FileParameters>;
 
 // @public (undocumented)
 export class S3UploadClient implements UploadClient<S3FileOptions> {
-    constructor(s3UrlSigner: S3UrlSigner, options?: S3UploadClientOptions);
+    constructor(options: S3UploadClientOptions);
     // (undocumented)
     readonly options: S3UploadClientOptions;
     // (undocumented)
@@ -287,10 +241,14 @@ export interface S3UploadClientOptions {
     concurrency?: number;
     // (undocumented)
     getUploadOptions?: (file: File) => S3FileOptions;
+    // (undocumented)
+    signUrl: S3UrlSigner;
 }
 
 // @public (undocumented)
-export type S3UrlSigner = (parameters: GenerateUploadUrlMutationBuilder.FileParameters) => Promise<GenerateUploadUrlMutationBuilder.ResponseBody>;
+export type S3UrlSigner = (args: GenerateUploadUrlMutationBuilder.FileParameters & {
+    file: File;
+}) => Promise<GenerateUploadUrlMutationBuilder.ResponseBody>;
 
 // @public (undocumented)
 export type StartUploadEvent = {
@@ -478,7 +436,7 @@ export const UploaderStateContext: Context<UploaderState>;
 export const UploaderUploadFilesContext: Context<(files: File[]) => void>;
 
 // @public (undocumented)
-export const useS3Client: () => S3UploadClient;
+export const useS3Client: (options?: Partial<S3UploadClientOptions>) => S3UploadClient;
 
 // @public (undocumented)
 export const useUploaderClient: () => UploadClient<any, FileUploadResult> | null;

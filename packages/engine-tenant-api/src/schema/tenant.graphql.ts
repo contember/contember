@@ -19,6 +19,7 @@ const schema: DocumentNode = gql`
 		checkResetPasswordToken(requestId: String!, token: String!): CheckResetPasswordTokenCode!
 
 		identityProviders: [IdentityProvider!]!
+		mailTemplates: [MailTemplateData!]!
 	}
 
 	type Mutation {
@@ -808,7 +809,17 @@ const schema: DocumentNode = gql`
 	}
 
 	# === mails ===
-
+	
+    type MailTemplateData {
+        projectSlug: String
+        type: MailType!
+        variant: String
+        subject: String!
+        content: String!
+        useLayout: Boolean!
+        replyTo: String
+    }
+	
 	input MailTemplate {
 		projectSlug: String
 		type: MailType!
@@ -817,6 +828,7 @@ const schema: DocumentNode = gql`
 		subject: String!
 		content: String!
 		useLayout: Boolean
+		replyTo: String
 	}
 
 	enum MailType {
@@ -846,6 +858,7 @@ const schema: DocumentNode = gql`
 	enum AddMailTemplateErrorCode {
 		MISSING_VARIABLE
 		PROJECT_NOT_FOUND
+        INVALID_REPLY_EMAIL_FORMAT
 	}
 
 	type RemoveMailTemplateResponse {

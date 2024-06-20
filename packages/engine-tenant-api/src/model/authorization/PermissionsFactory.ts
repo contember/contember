@@ -54,6 +54,7 @@ class PermissionsFactory {
 
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.MAIL_TEMPLATE_ADD)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.MAIL_TEMPLATE_REMOVE)
+		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.MAIL_TEMPLATE_LIST)
 
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.IDP_ADD)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.IDP_UPDATE)

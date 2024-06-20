@@ -78,6 +78,7 @@ import { IDPQueryResolver } from './resolvers/query/IDPQueryResolver'
 import { UpdateIDPMutationResolver } from './resolvers/mutation/idp/UpdateIDPMutationResolver'
 import { TenantCredentials, TenantMigrationsRunner } from './migrations'
 import { DisablePersonMutationResolver } from './resolvers/mutation/person/DisablePersonMutationResolver'
+import { MailTemplateQueryResolver } from './resolvers/query/MailTemplateQueryResolver'
 
 export interface TenantContainer {
 	projectMemberManager: ProjectMemberManager
@@ -217,6 +218,8 @@ export class TenantContainerFactory {
 				new ProjectQueryResolver(projectManager))
 			.addService('projectMembersQueryResolver', ({ projectManager, projectMemberManager }) =>
 				new ProjectMembersQueryResolver(projectManager, projectMemberManager))
+			.addService('mailTemplateQueryResolver', ({ mailTemplateManager }) =>
+				new MailTemplateQueryResolver(mailTemplateManager))
 			.addService('signUpMutationResolver', ({ signUpManager, apiKeyManager }) =>
 				new SignUpMutationResolver(signUpManager, apiKeyManager))
 			.addService('signInMutationResolver', ({ signInManager, signInResponseFactory }) =>

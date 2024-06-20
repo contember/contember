@@ -64,7 +64,8 @@ CREATE TABLE "mail_template" (
     "variant" "text" NOT NULL,
     "subject" "text" NOT NULL,
     "content" "text" NOT NULL,
-    "use_layout" boolean NOT NULL
+    "use_layout" boolean NOT NULL,
+    "reply_to" "text"
 );
 CREATE TABLE "person" (
     "id" "uuid" NOT NULL,

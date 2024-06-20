@@ -54,6 +54,7 @@ namespace PermissionActions {
 
 	export const MAIL_TEMPLATE_ADD = Authorizator.createAction(Resources.mailTemplate, 'add')
 	export const MAIL_TEMPLATE_REMOVE = Authorizator.createAction(Resources.mailTemplate, 'remove')
+	export const MAIL_TEMPLATE_LIST = Authorizator.createAction(Resources.mailTemplate, 'list')
 
 	export const IDP_ADD = Authorizator.createAction(Resources.idp, 'add')
 	export const IDP_UPDATE = Authorizator.createAction(Resources.idp, 'update')

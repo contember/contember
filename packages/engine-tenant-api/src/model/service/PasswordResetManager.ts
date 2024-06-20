@@ -49,7 +49,7 @@ export class PasswordResetManager {
 			},
 			{
 				variant: mailOptions.mailVariant || '',
-				projectId: project?.id,
+				projectId: project?.id ?? null,
 			},
 		)
 	}

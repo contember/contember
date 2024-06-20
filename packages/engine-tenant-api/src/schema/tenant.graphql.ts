@@ -19,6 +19,7 @@ const schema: DocumentNode = gql`
 		checkResetPasswordToken(requestId: String!, token: String!): CheckResetPasswordTokenCode!
 
 		identityProviders: [IdentityProvider!]!
+		mailTemplates: [MailTemplateData!]!
 	}
 
 	type Mutation {
@@ -808,7 +809,17 @@ const schema: DocumentNode = gql`
 	}
 
 	# === mails ===
-
+	
+    type MailTemplateData {
+        projectSlug: String
+        type: MailType!
+        variant: String
+        subject: String!
+        content: String!
+        useLayout: Boolean!
+        replyTo: String
+    }
+	
 	input MailTemplate {
 		projectSlug: String
 		type: MailType!

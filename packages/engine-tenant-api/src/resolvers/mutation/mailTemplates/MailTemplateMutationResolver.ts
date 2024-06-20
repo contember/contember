@@ -1,13 +1,12 @@
 import {
 	AddMailTemplateResponse,
-	MailType as SchemaMailType,
 	MutationAddProjectMailTemplateArgs,
 	MutationRemoveProjectMailTemplateArgs,
 	MutationResolvers,
 	RemoveMailTemplateResponse,
 } from '../../../schema'
 import { TenantResolverContext } from '../../TenantResolverContext'
-import { MailTemplateManager, MailType, PermissionActions, ProjectManager } from '../../../model'
+import { MailTemplateManager, mailTypeFromSchemaToDb, PermissionActions, ProjectManager } from '../../../model'
 import { createErrorResponse, createProjectNotFoundResponse } from '../../errorUtils'
 import { validateEmail } from '../../../model/utils/email'
 
@@ -37,11 +36,11 @@ export class MailTemplateMutationResolver implements MutationResolvers {
 
 		await this.mailTemplateManager.addMailTemplate(context.db, {
 			content,
-			projectId: project?.id,
+			projectId: project?.id ?? null,
 			subject,
 			useLayout: typeof useLayout === 'boolean' ? useLayout : true,
 			variant: variant || '',
-			type: this.mapMailType(type),
+			type: mailTypeFromSchemaToDb(type),
 			replyTo: replyTo?.trim() || null,
 		})
 
@@ -67,9 +66,9 @@ export class MailTemplateMutationResolver implements MutationResolvers {
 		}
 
 		const removed = await this.mailTemplateManager.removeMailTemplate(context.db, {
-			projectId: project?.id,
+			projectId: project?.id ?? null,
 			variant: variant || '',
-			type: this.mapMailType(type),
+			type: mailTypeFromSchemaToDb(type),
 		})
 		if (!removed) {
 			return createErrorResponse('PROJECT_NOT_FOUND', 'Mail template not found')
@@ -79,13 +78,5 @@ export class MailTemplateMutationResolver implements MutationResolvers {
 			ok: true,
 			errors: [],
 		}
-	}
-
-	private mapMailType(type: SchemaMailType): MailType {
-		return {
-			EXISTING_USER_INVITED: MailType.existingUserInvited,
-			NEW_USER_INVITED: MailType.newUserInvited,
-			RESET_PASSWORD_REQUEST: MailType.passwordReset,
-		}[type]
 	}
 }

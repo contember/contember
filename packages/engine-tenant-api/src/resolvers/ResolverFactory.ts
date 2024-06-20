@@ -1,14 +1,18 @@
 import {
+	AddIDPMutationResolver,
 	AddProjectMemberMutationResolver,
-	ChangeProfileMutationResolver,
 	ChangePasswordMutationResolver,
+	ChangeProfileMutationResolver,
 	CreateApiKeyMutationResolver,
 	CreateProjectMutationResolver,
-	DisableApiKeyMutationResolver, DisableIDPMutationResolver, EnableIDPMutationResolver,
+	DisableApiKeyMutationResolver,
+	DisableIDPMutationResolver,
+	EnableIDPMutationResolver,
+	IdentityGlobalRolesMutationResolver,
 	IDPMutationResolver,
 	InviteMutationResolver,
 	MailTemplateMutationResolver,
-	OtpMutationResolver, AddIDPMutationResolver,
+	OtpMutationResolver,
 	RemoveProjectMemberMutationResolver,
 	ResetPasswordMutationResolver,
 	SetProjectSecretMutationResolver,
@@ -16,7 +20,7 @@ import {
 	SignOutMutationResolver,
 	SignUpMutationResolver,
 	UpdateProjectMemberMutationResolver,
-	UpdateProjectMutationResolver, IdentityGlobalRolesMutationResolver,
+	UpdateProjectMutationResolver,
 } from './mutation'
 
 import { Resolvers } from '../schema'
@@ -26,7 +30,7 @@ import { DateTimeType, JSONType } from '@contember/graphql-utils'
 import { IDPQueryResolver } from './query/IDPQueryResolver'
 import { UpdateIDPMutationResolver } from './mutation/idp/UpdateIDPMutationResolver'
 import { DisablePersonMutationResolver } from './mutation/person/DisablePersonMutationResolver'
-import { } from './mutation/person/ChangeProfileMutationResolver'
+import { MailTemplateQueryResolver } from './query/MailTemplateQueryResolver'
 
 class ResolverFactory {
 	public constructor(
@@ -36,6 +40,7 @@ class ResolverFactory {
 			projectQueryResolver: ProjectQueryResolver
 			projectMembersQueryResolver: ProjectMembersQueryResolver
 			idpQueryResolver: IDPQueryResolver
+			mailTemplateQueryResolver: MailTemplateQueryResolver
 
 			signUpMutationResolver: SignUpMutationResolver
 			signInMutationResolver: SignInMutationResolver
@@ -96,6 +101,7 @@ class ResolverFactory {
 				projects: this.resolvers.projectQueryResolver.projects.bind(this.resolvers.projectQueryResolver),
 				projectMemberships: this.resolvers.projectMembersQueryResolver.projectMemberships.bind(this.resolvers.projectMembersQueryResolver),
 				identityProviders: this.resolvers.idpQueryResolver.identityProviders.bind(this.resolvers.idpQueryResolver),
+				mailTemplates: this.resolvers.mailTemplateQueryResolver.mailTemplates.bind(this.resolvers.mailTemplateQueryResolver),
 				checkResetPasswordToken: () => {
 					throw new Error('not implemented')
 				},

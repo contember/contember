@@ -526,6 +526,17 @@ export type MailTemplate = {
 	readonly variant?: InputMaybe<Scalars['String']['input']>
 }
 
+export type MailTemplateData = {
+	readonly __typename?: 'MailTemplateData'
+	readonly content: Scalars['String']['output']
+	readonly projectSlug?: Maybe<Scalars['String']['output']>
+	readonly replyTo?: Maybe<Scalars['String']['output']>
+	readonly subject: Scalars['String']['output']
+	readonly type: MailType
+	readonly useLayout: Scalars['Boolean']['output']
+	readonly variant?: Maybe<Scalars['String']['output']>
+}
+
 export type MailTemplateIdentifier = {
 	readonly projectSlug?: InputMaybe<Scalars['String']['input']>
 	readonly type: MailType
@@ -906,6 +917,7 @@ export type Query = {
 	readonly __typename?: 'Query'
 	readonly checkResetPasswordToken: CheckResetPasswordTokenCode
 	readonly identityProviders: ReadonlyArray<IdentityProvider>
+	readonly mailTemplates: ReadonlyArray<MailTemplateData>
 	readonly me: Identity
 	readonly personById?: Maybe<Person>
 	readonly projectBySlug?: Maybe<Project>
@@ -1399,6 +1411,7 @@ export type ResolversTypes = {
 	InviteResult: ResolverTypeWrapper<InviteResult>
 	Json: ResolverTypeWrapper<Scalars['Json']['output']>
 	MailTemplate: MailTemplate
+	MailTemplateData: ResolverTypeWrapper<MailTemplateData>
 	MailTemplateIdentifier: MailTemplateIdentifier
 	MailType: MailType
 	MemberType: MemberType
@@ -1532,6 +1545,7 @@ export type ResolversParentTypes = {
 	InviteResult: InviteResult
 	Json: Scalars['Json']['output']
 	MailTemplate: MailTemplate
+	MailTemplateData: MailTemplateData
 	MailTemplateIdentifier: MailTemplateIdentifier
 	Membership: Membership
 	MembershipInput: MembershipInput
@@ -1947,6 +1961,17 @@ export interface JsonScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes
 	name: 'Json'
 }
 
+export type MailTemplateDataResolvers<ContextType = any, ParentType extends ResolversParentTypes['MailTemplateData'] = ResolversParentTypes['MailTemplateData']> = {
+	content?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	projectSlug?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	replyTo?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	subject?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	type?: Resolver<ResolversTypes['MailType'], ParentType, ContextType>
+	useLayout?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	variant?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
 export type MembershipResolvers<ContextType = any, ParentType extends ResolversParentTypes['Membership'] = ResolversParentTypes['Membership']> = {
 	role?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	variables?: Resolver<ReadonlyArray<ResolversTypes['VariableEntry']>, ParentType, ContextType>
@@ -2039,6 +2064,7 @@ export type ProjectIdentityRelationResolvers<ContextType = any, ParentType exten
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
 	checkResetPasswordToken?: Resolver<ResolversTypes['CheckResetPasswordTokenCode'], ParentType, ContextType, RequireFields<QueryCheckResetPasswordTokenArgs, 'requestId' | 'token'>>
 	identityProviders?: Resolver<ReadonlyArray<ResolversTypes['IdentityProvider']>, ParentType, ContextType>
+	mailTemplates?: Resolver<ReadonlyArray<ResolversTypes['MailTemplateData']>, ParentType, ContextType>
 	me?: Resolver<ResolversTypes['Identity'], ParentType, ContextType>
 	personById?: Resolver<Maybe<ResolversTypes['Person']>, ParentType, ContextType, RequireFields<QueryPersonByIdArgs, 'id'>>
 	projectBySlug?: Resolver<Maybe<ResolversTypes['Project']>, ParentType, ContextType, RequireFields<QueryProjectBySlugArgs, 'slug'>>
@@ -2323,6 +2349,7 @@ export type Resolvers<ContextType = any> = {
 	InviteResponse?: InviteResponseResolvers<ContextType>
 	InviteResult?: InviteResultResolvers<ContextType>
 	Json?: GraphQLScalarType
+	MailTemplateData?: MailTemplateDataResolvers<ContextType>
 	Membership?: MembershipResolvers<ContextType>
 	MembershipValidationError?: MembershipValidationErrorResolvers<ContextType>
 	Mutation?: MutationResolvers<ContextType>

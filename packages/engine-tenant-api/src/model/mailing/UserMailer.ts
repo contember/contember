@@ -42,7 +42,7 @@ export class UserMailer {
 	async sendPasswordResetEmail(
 		dbContext: DatabaseContext,
 		mailArguments: { email: string; token: string; project?: string; projectSlug?: string },
-		customMailOptions: { projectId?: string; variant: string },
+		customMailOptions: { projectId: string | null; variant: string },
 	): Promise<void> {
 		const template = (await this.getCustomTemplate(dbContext, { type: MailType.passwordReset, ...customMailOptions })) || {
 			subject: 'Password reset',
@@ -73,7 +73,7 @@ export class UserMailer {
 	): Promise<Pick<MailTemplateData, 'subject' | 'content' | 'replyTo'> | null> {
 		const customTemplate =
 			(await dbContext.queryHandler.fetch(new MailTemplateQuery(identifier)))
-			?? (await dbContext.queryHandler.fetch(new MailTemplateQuery({ ...identifier, projectId: undefined })))
+			?? (await dbContext.queryHandler.fetch(new MailTemplateQuery({ ...identifier, projectId: null })))
 
 		if (!customTemplate) {
 			return null

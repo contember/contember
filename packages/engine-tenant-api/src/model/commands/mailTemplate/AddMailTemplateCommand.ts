@@ -10,13 +10,13 @@ export class AddMailTemplateCommand implements Command<void> {
 			.into('mail_template')
 			.values({
 				id: providers.uuid(),
-				project_id: this.mailTemplate.projectId ?? null,
+				project_id: this.mailTemplate.projectId,
 				mail_type: this.mailTemplate.type,
 				variant: this.mailTemplate.variant,
 				subject: this.mailTemplate.subject,
 				content: this.mailTemplate.content,
 				use_layout: this.mailTemplate.useLayout,
-				reply_to: this.mailTemplate.replyTo ?? null,
+				reply_to: this.mailTemplate.replyTo,
 			})
 			.onConflict(ConflictActionType.update, this.mailTemplate.projectId ? {
 				columns: ['project_id', 'mail_type', 'variant'],

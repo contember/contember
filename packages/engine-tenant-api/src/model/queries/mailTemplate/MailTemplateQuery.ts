@@ -1,23 +1,18 @@
-import { DatabaseQuery, DatabaseQueryable, SelectBuilder } from '@contember/database'
-import { MailTemplateData, MailTemplateIdentifier } from '../../mailing'
+import { DatabaseQuery, DatabaseQueryable } from '@contember/database'
+import { MailTemplateIdentifier } from '../../mailing'
+import { createMailTemplateQuery, MailTemplateRow } from './helpers'
 
-class MailTemplateQuery extends DatabaseQuery<MailTemplateQuery.Result> {
+export class MailTemplateQuery extends DatabaseQuery<MailTemplateRow | null> {
 	constructor(
 		private mailTemplateIdentifier: MailTemplateIdentifier,
 	) {
 		super()
 	}
 
-	async fetch({ db }: DatabaseQueryable): Promise<MailTemplateQuery.Result> {
-		const rows = await SelectBuilder.create<MailTemplateQuery.Row>()
-			.select('id')
-			.select('subject')
-			.select('content')
-			.select('use_layout', 'useLayout')
-			.select('reply_to', 'replyTo')
-			.from('mail_template')
+	async fetch({ db }: DatabaseQueryable): Promise<MailTemplateRow | null> {
+		const rows = await createMailTemplateQuery()
 			.where({
-				project_id: this.mailTemplateIdentifier.projectId ?? null,
+				project_id: this.mailTemplateIdentifier.projectId,
 				mail_type: this.mailTemplateIdentifier.type,
 				variant: this.mailTemplateIdentifier.variant,
 			})
@@ -26,12 +21,3 @@ class MailTemplateQuery extends DatabaseQuery<MailTemplateQuery.Result> {
 		return this.fetchOneOrNull(rows)
 	}
 }
-
-namespace MailTemplateQuery {
-	export type Row = {
-		readonly id: string
-	} & MailTemplateData
-	export type Result = null | Row
-}
-
-export { MailTemplateQuery }

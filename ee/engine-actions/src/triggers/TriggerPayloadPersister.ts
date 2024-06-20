@@ -1,7 +1,6 @@
 import { Client, InsertBuilder } from '@contember/database'
-import { AnyEventPayload } from './Payload'
 import { Mapper } from '@contember/engine-content-api'
-import { Actions } from '@contember/schema'
+import { Actions, ActionsPayload } from '@contember/schema'
 import { EventRow } from '../model/types'
 
 export const NOTIFY_CHANNEL_NAME = 'actions_event'
@@ -22,7 +21,7 @@ export class TriggerPayloadPersister {
 	) {
 	}
 
-	public async persist(trigger: Actions.AnyTrigger, payloads: AnyEventPayload[]): Promise<void> {
+	public async persist(trigger: Actions.AnyTrigger, payloads: ActionsPayload.AnyEventPayload[]): Promise<void> {
 		const chunkSize = 100
 		for (let i = 0; i < payloads.length; i += chunkSize) {
 			const chunk = payloads.slice(i, i + chunkSize)

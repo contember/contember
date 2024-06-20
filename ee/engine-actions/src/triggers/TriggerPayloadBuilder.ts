@@ -1,8 +1,7 @@
-import { AnyEventPayload, BaseEventPayload, WatchEventPayload } from './Payload'
 import { ImplementationException } from '../ImplementationException'
 import { assertNever } from '../utils/assertNever'
 import { FiredEvent } from './TriggerPayloadManager'
-import { Actions, Input } from '@contember/schema'
+import { Actions, ActionsPayload, Input } from '@contember/schema'
 import { FieldNode, Mapper, ObjectNode } from '@contember/engine-content-api'
 
 type Selections = Record<Input.PrimaryValue, any>
@@ -13,7 +12,7 @@ export class TriggerPayloadBuilder {
 	) {
 	}
 
-	public async build(events: FiredEvent[]): Promise<AnyEventPayload[]> {
+	public async build(events: FiredEvent[]): Promise<ActionsPayload.AnyEventPayload[]> {
 		const filteredEvents = events.filter(it => {
 			return it.cause.type !== 'BeforeUpdateEvent'
 				|| it.cause.afterEvent?.hasChanges === true
@@ -44,13 +43,13 @@ export class TriggerPayloadBuilder {
 		return event
 	}
 
-	private buildWatchEventPayloads(events: FiredEvent[], selections: Selections): WatchEventPayload[] {
+	private buildWatchEventPayloads(events: FiredEvent[], selections: Selections): ActionsPayload.WatchEventPayload[] {
 		const byPrimary: Record<Input.PrimaryValue, { primary: Input.PrimaryValue; events: FiredEvent[] }> = {}
 		for (const event of events) {
 			byPrimary[event.primary] ??= { primary: event.primary, events: [] }
 			byPrimary[event.primary].events.push(event)
 		}
-		const payloads: WatchEventPayload[] = []
+		const payloads: ActionsPayload.WatchEventPayload[] = []
 		for (const eventsByPrimary of Object.values(byPrimary)) {
 			payloads.push({
 				operation: 'watch',
@@ -64,7 +63,7 @@ export class TriggerPayloadBuilder {
 		return payloads
 	}
 
-	private buildBaseEventPayloads(event: FiredEvent, selection?: any): BaseEventPayload {
+	private buildBaseEventPayloads(event: FiredEvent, selection?: any): ActionsPayload.BaseEventPayload {
 		switch (event.cause.type) {
 			case 'AfterInsertEvent':
 				return {

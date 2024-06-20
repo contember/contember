@@ -3,9 +3,8 @@ import { WebhookTargetHandler } from '../../../src/dispatch/WebhookTargetHandler
 import { FetcherResponse } from '../../../src/dispatch/WebhookFetcher'
 import { createLogger, TestLoggerHandler } from '@contember/logger'
 import { testUuid } from '@contember/engine-api-tester'
-import { AnyEventPayload } from '../../../src/triggers/Payload'
 import { EventRow } from '../../../src/model/types'
-import { Actions } from '@contember/schema'
+import { Actions, ActionsPayload } from '@contember/schema'
 import { HandledEvent } from '../../../src/dispatch/types'
 
 
@@ -22,7 +21,7 @@ const createTestEvent = (i = 0, row: Partial<EventRow> = {}): EventRow => ({
 	transaction_id: testUuid(i * 10 + 2),
 	stage_id: testUuid(i * 10 + 3),
 	visible_at: now,
-	payload: { foo: 'bar' } as unknown as AnyEventPayload,
+	payload: { foo: 'bar' } as unknown as ActionsPayload.AnyEventPayload,
 	priority: 1,
 	schema_id: 1,
 	state: 'created',

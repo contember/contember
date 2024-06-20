@@ -1,5 +1,4 @@
 import { Actions, Input, Model } from '@contember/schema'
-import { AnyEventPayload } from './Payload'
 import { AnyListener } from './TriggerListenersStore'
 import { EventCause } from './TriggerHandler'
 import { TriggerPayloadBuilder } from './TriggerPayloadBuilder'
@@ -12,12 +11,6 @@ export interface FiredEvent {
 	entity: Model.Entity
 	primary: Input.PrimaryValue
 	selection?: any
-}
-
-export type GroupedPayloads = {
-	trigger: Actions.AnyTrigger
-	entity: Model.Entity
-	payloads: AnyEventPayload[]
 }
 
 export class TriggerPayloadManager {

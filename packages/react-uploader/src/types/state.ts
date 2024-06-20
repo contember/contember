@@ -1,4 +1,4 @@
-import { FileUploadProgress, FileUploadResult } from '../uploadClient/UploadClient'
+import { FileUploadProgress, FileUploadResult } from './uploadClient'
 import { FileWithMeta } from './file'
 
 export type UploaderFileStateInitial = { state: 'initial', file: FileWithMeta }

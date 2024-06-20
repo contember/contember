@@ -1,6 +1,6 @@
 import { EntityAccessor, ErrorAccessorHolder } from '@contember/binding'
 import { Environment } from '@contember/react-binding'
-import { FileUploadResult, UploadClient, UploadClientUploadArgs } from '../uploadClient/UploadClient'
+import { FileUploadResult, UploadClient, UploadClientUploadArgs } from './uploadClient'
 
 
 export interface FileUploadHandler<FileOptions = {}, Result extends FileUploadResult = FileUploadResult> {

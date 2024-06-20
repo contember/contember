@@ -1,7 +1,7 @@
 import { FileDataExtractor } from './extractor'
 import { SugaredRelativeSingleEntity } from '@contember/react-binding'
 import { FileWithMeta } from './file'
-import { UploadClient } from '../uploadClient/UploadClient'
+import { UploadClient } from './uploadClient'
 
 export interface FileType {
 

@@ -1,5 +1,5 @@
 import { JSONObject, JSONPrimitive, pathExists } from '@contember/cli-common'
-import YAWN from 'yawn-yaml/cjs'
+import YAWN from 'yawn-yaml'
 import { Merger } from '@contember/config-loader'
 import jsyaml from 'js-yaml'
 import { readFile, writeFile } from 'node:fs/promises'

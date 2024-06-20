@@ -350,7 +350,6 @@ __metadata:
     "@contember/graphql-builder": "workspace:*"
     "@contember/graphql-client": "workspace:*"
     "@contember/schema": ^1.4.0-beta.1
-    p-limit: ^5.0.0
   languageName: unknown
   linkType: soft
 
@@ -545,7 +544,6 @@ __metadata:
   dependencies:
     "@contember/client": "workspace:*"
     "@contember/react-richtext-renderer": "workspace:*"
-    "@contember/utilities": "workspace:*"
   peerDependencies:
     react: ^18 || ^19
   languageName: unknown

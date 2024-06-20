@@ -35,8 +35,7 @@
 	},
 	"dependencies": {
 		"@contember/client": "workspace:*",
-		"@contember/react-richtext-renderer": "workspace:*",
-		"@contember/utilities": "workspace:*"
+		"@contember/react-richtext-renderer": "workspace:*"
 	},
 	"peerDependencies": {
 		"react": "^18 || ^19"

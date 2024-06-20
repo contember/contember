@@ -1,14 +1,14 @@
 import { assert, describe, expect, test } from 'vitest'
 import { WebhookTargetHandler } from '../../../src/dispatch/WebhookTargetHandler'
 import { FetcherResponse } from '../../../src/dispatch/WebhookFetcher'
-import { createLogger, TestLoggerHandler } from '@contember/logger'
+import { createLogger, Logger, TestLoggerHandler } from '@contember/logger'
 import { testUuid } from '@contember/engine-api-tester'
 import { EventRow } from '../../../src/model/types'
 import { Actions, ActionsPayload } from '@contember/schema'
 import { HandledEvent } from '../../../src/dispatch/types'
 
 
-const now = new Date()
+const now = new Date('2024-06-20T12:00:00Z')
 const createTestEvent = (i = 0, row: Partial<EventRow> = {}): EventRow => ({
 	created_at: now,
 	id: testUuid(i * 10 + 1),
@@ -32,7 +32,115 @@ const dropDuration = (events: HandledEvent[]): HandledEvent[] => {
 	return events.map(it => ({ ...it, result: { ...it.result, durationMs: -1 } }))
 }
 
-describe('webhook handler', () => {
+const okResponse = Promise.resolve({
+	ok: true,
+	headers: new Headers(),
+	responseText: '',
+	status: 200,
+	statusText: 'OK',
+})
+
+describe('webhook request', () => {
+	test('default request', async () => {
+		let fetchCalled = false
+		const webhookHandler = new WebhookTargetHandler({
+			fetch(url: string, init: RequestInit): Promise<FetcherResponse> {
+				fetchCalled = true
+				assert.equal(url, 'http://localhost')
+				assert.equal(init.body, JSON.stringify({
+					events: [{
+						meta: {
+							eventId: testUuid(1),
+							transactionId: testUuid(2),
+							createdAt: now.toISOString(),
+							lastStateChange: now.toISOString(),
+							numRetries: 0,
+							trigger: 'test',
+							target: 'test_target',
+						},
+						foo: 'bar',
+					}],
+				}))
+
+				return okResponse
+			},
+		})
+
+		const target: Actions.AnyTarget = {
+			name: 'test_target',
+			type: 'webhook',
+			url: 'http://localhost',
+		}
+
+		const event1 = createTestEvent(0)
+		await webhookHandler.handle({
+			logger: {
+				warn: (e: any) => {
+					throw e
+				},
+			} as unknown as Logger,
+			target: target,
+			events: [event1],
+			variables: {},
+		})
+		assert.equal(fetchCalled, true)
+	})
+
+	test('custom body', async () => {
+		let fetchCalled = false
+		const webhookHandler = new WebhookTargetHandler({
+			fetch(url: string, init: RequestInit): Promise<FetcherResponse> {
+				fetchCalled = true
+				assert.equal(url, 'http://localhost')
+				assert.equal(init.body, JSON.stringify({
+					options: 'value',
+					payload: {
+						json: {
+							events: [{
+								meta: {
+									eventId: testUuid(1),
+									transactionId: testUuid(2),
+									createdAt: now.toISOString(),
+									lastStateChange: now.toISOString(),
+									numRetries: 0,
+									trigger: 'test',
+									target: 'test_target',
+								},
+								foo: 'bar',
+							}],
+						},
+					},
+				}))
+
+				return okResponse
+			},
+		})
+
+		const target: Actions.AnyTarget = {
+			name: 'test_target',
+			type: 'webhook',
+			url: 'http://localhost',
+			body: {
+				options: 'value',
+			},
+			payloadPath: ['payload', 'json'],
+		}
+
+		const event1 = createTestEvent(0)
+		await webhookHandler.handle({
+			logger: {
+				warn: (e: any) => {
+					throw e
+				},
+			} as unknown as Logger,
+			target: target,
+			events: [event1],
+			variables: {},
+		})
+		assert.equal(fetchCalled, true)
+	})
+})
+describe('webhook response', () => {
 	test('successful response', async () => {
 		const testLoggerHandler = new TestLoggerHandler()
 		const logger = createLogger(testLoggerHandler)
@@ -43,13 +151,7 @@ describe('webhook handler', () => {
 				fetchCalled = true
 				assert.equal(url, 'http://localhost')
 
-				return Promise.resolve({
-					ok: true,
-					headers: new Headers(),
-					responseText: '',
-					status: 200,
-					statusText: 'OK',
-				})
+				return okResponse
 			},
 		})
 

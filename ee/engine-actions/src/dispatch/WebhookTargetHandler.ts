@@ -1,5 +1,5 @@
 import { Actions, ActionsPayload } from '@contember/schema'
-import { EventRow, HandledEvent, InvokeHandler, InvokeHandlerArgs } from './types'
+import { EventRow, HandledEvent, InvokeHandler, InvokeHandlerArgs  } from './types'
 import { VariablesMap } from '../model/VariablesManager'
 import * as Typesafe from '@contember/typesafe'
 import { FetcherResponse, WebhookFetcher } from './WebhookFetcher'
@@ -145,10 +145,6 @@ export class WebhookTargetHandler implements InvokeHandler<Actions.WebhookTarget
 		const resolvedHeaders = Object.fromEntries(Object.entries(target.headers ?? {})
 			.map(([key, value]) => [key, this.resolveVariables(value, variables)]))
 
-		const payload: ActionsPayload.WebhookRequestPayload = {
-			events: events.map(this.formatEventPayload),
-		}
-
 		return await this.fetcher.fetch(resolvedUrl, {
 			method: 'POST',
 			headers: {
@@ -157,8 +153,20 @@ export class WebhookTargetHandler implements InvokeHandler<Actions.WebhookTarget
 				['Content-type']: 'application/json',
 			},
 			signal: abortController.signal,
-			body: JSON.stringify(payload),
+			body: this.formatBody(events, target),
 		})
+	}
+
+	private formatBody(events: EventRow[], target: Actions.WebhookTarget): string {
+		const body = target.body ?? {}
+		const path = target.payloadPath ?? []
+		let current: any = body
+		for (let i = 0; i < path.length; i++) {
+			current[path[i]] ??= {}
+			current = current[path[i]]
+		}
+		current['events'] = events.map(this.formatEventPayload)
+		return JSON.stringify(body)
 	}
 
 	private formatEventPayload(it: EventRow): ActionsPayload.WebhookEvent {

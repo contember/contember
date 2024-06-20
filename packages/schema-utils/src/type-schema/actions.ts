@@ -26,6 +26,8 @@ const webhookTargetSchema = Typesafe.intersection(
 		maxAttempts: Typesafe.integer,
 		initialRepeatIntervalMs: Typesafe.integer,
 		batchSize: Typesafe.integer,
+		body: Typesafe.anyJsonObject,
+		payloadPath: Typesafe.array(Typesafe.string),
 	}),
 )
 const webhookTargetSchemaCheck: Typesafe.Equals<Actions.WebhookTarget, ReturnType<typeof webhookTargetSchema>> = true

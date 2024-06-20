@@ -14,6 +14,8 @@ export namespace Actions {
 		readonly headers?: {
 			readonly [key: string]: string
 		}
+		readonly body?: JSONObject
+		readonly payloadPath?: readonly string[]
 		readonly timeoutMs?: number
 		readonly maxAttempts?: number
 		readonly initialRepeatIntervalMs?: number

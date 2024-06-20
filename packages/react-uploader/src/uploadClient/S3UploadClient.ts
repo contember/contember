@@ -1,24 +1,16 @@
-import { UploadClient, UploadClientUploadArgs } from './UploadClient'
+import { UploadClient, UploadClientUploadArgs } from '../types'
 import { GenerateUploadUrlMutationBuilder } from '@contember/client'
 import { UploaderError } from '../UploaderError'
 
 export interface S3UploadClientOptions {
+	signUrl: S3UrlSigner
 	getUploadOptions?: (file: File) => S3FileOptions
 	concurrency?: number
 }
 
-export interface S3FileOptions {
-	contentType?: GenerateUploadUrlMutationBuilder.FileParameters['contentType']
-	expiration?: number
-	size?: number
-	prefix?: string
-	suffix?: string
-	fileName?: string
-	extension?: string
-	acl?: GenerateUploadUrlMutationBuilder.Acl
-}
+export type S3FileOptions = Partial<GenerateUploadUrlMutationBuilder.FileParameters>
 
-export type S3UrlSigner = (parameters: GenerateUploadUrlMutationBuilder.FileParameters) => Promise<GenerateUploadUrlMutationBuilder.ResponseBody>
+export type S3UrlSigner = (args: GenerateUploadUrlMutationBuilder.FileParameters & { file: File }) => Promise<GenerateUploadUrlMutationBuilder.ResponseBody>
 
 export class S3UploadClient implements UploadClient<S3FileOptions> {
 
@@ -26,28 +18,24 @@ export class S3UploadClient implements UploadClient<S3FileOptions> {
 	private resolverQueue: Array<() => void> = []
 
 	public constructor(
-		private readonly s3UrlSigner: S3UrlSigner,
-		public readonly options: S3UploadClientOptions = {},
+		public readonly options: S3UploadClientOptions,
 	) {
 	}
 
 
 	public async upload({ file, signal, onProgress, ...options }: UploadClientUploadArgs & S3FileOptions) {
 
-		const resolvedOptions = {
+		const parameters: GenerateUploadUrlMutationBuilder.FileParameters = {
+			contentType: file.type,
 			...this.options.getUploadOptions?.(file),
 			...options,
 		}
 
-		const parameters: GenerateUploadUrlMutationBuilder.FileParameters = {
-			contentType: file.type,
-			...resolvedOptions,
-		}
-		const responseData = await this.s3UrlSigner(parameters)
-		await this.uploadSingleFile(responseData, { file, onProgress, signal })
+		const signedUrl = await this.options.signUrl({ ...parameters, file })
+		await this.uploadSingleFile(signedUrl, { file, onProgress, signal })
 
 		return {
-			publicUrl: responseData.publicUrl,
+			publicUrl: signedUrl.publicUrl,
 		}
 	}
 

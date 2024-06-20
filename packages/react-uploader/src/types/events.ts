@@ -1,4 +1,4 @@
-import { FileUploadProgress, FileUploadResult } from '../uploadClient/UploadClient'
+import { FileUploadProgress, FileUploadResult } from '../uploadClient'
 import { FileWithMeta } from './file'
 import { FileType } from './type'
 

@@ -102,9 +102,6 @@
 			"path": "./packages/utilities"
 		},
 		{
-			"path": "./packages/vimeo-file-uploader"
-		},
-		{
 			"path": "./packages/vite-plugin"
 		}
 	]

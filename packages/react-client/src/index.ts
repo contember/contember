@@ -5,7 +5,6 @@ export * from './content'
 export * from './project'
 export * from './system'
 export * from './tenant'
-export * from './upload'
 
 export * from './ContemberClient'
 export * from './ClientError'

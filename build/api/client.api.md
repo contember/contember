@@ -25,47 +25,6 @@ export namespace CrudQueryBuilder {
 }
 
 // @public (undocumented)
-export interface FileUploader<Result = any, Error extends FileUploadError = FileUploadError> {
-    // (undocumented)
-    destroy?: (files: Result[]) => Promise<void>;
-    // (undocumented)
-    upload: (files: Map<File, UploadedFileMetadata>, options: FileUploaderInitializeOptions<Result, Error>) => Promise<void>;
-}
-
-// @public (undocumented)
-export interface FileUploaderInitializeOptions<Result = any, Error extends FileUploadError = FileUploadError> {
-    // (undocumented)
-    contentApiClient: GraphQlClient;
-    // (undocumented)
-    onError: (error: Iterable<File | [File, Error]>) => void;
-    // (undocumented)
-    onProgress: (progress: Iterable<[File, FileUploadProgress]>) => void;
-    // (undocumented)
-    onSuccess: (result: Iterable<[File, Result]>) => void;
-}
-
-// @public (undocumented)
-export class FileUploadError extends Error {
-    constructor(options?: FileUploadErrorOptions);
-    // (undocumented)
-    readonly options: FileUploadErrorOptions;
-}
-
-// @public (undocumented)
-export interface FileUploadErrorOptions {
-    // (undocumented)
-    developerMessage?: string;
-    // (undocumented)
-    endUserMessage?: string;
-}
-
-// @public (undocumented)
-export interface FileUploadProgress {
-    // (undocumented)
-    progress?: number;
-}
-
-// @public (undocumented)
 export const formatContentApiRelativeUrl: (projectSlug: string, stageSlug: string) => string;
 
 // @public (undocumented)
@@ -218,50 +177,6 @@ export const replaceGraphQlLiteral: <T>(input: T) => ReplaceGraphQlLiteral<T>;
 export { Result }
 
 // @public (undocumented)
-export class S3FileUploader implements FileUploader<S3FileUploader.SuccessMetadata> {
-    constructor(options?: S3FileUploader.Options);
-    // (undocumented)
-    readonly options: S3FileUploader.Options;
-    // (undocumented)
-    upload(files: Map<File, UploadedFileMetadata>, options: FileUploaderInitializeOptions): Promise<void>;
-}
-
-// @public (undocumented)
-export namespace S3FileUploader {
-    // (undocumented)
-    export interface Options {
-        // (undocumented)
-        concurrency?: number;
-        // (undocumented)
-        getUploadOptions?: (file: File) => S3UploadOptions;
-    }
-    // (undocumented)
-    export interface S3UploadOptions {
-        // (undocumented)
-        fileAcl?: GenerateUploadUrlMutationBuilder.Acl;
-        // (undocumented)
-        fileExpiration?: number;
-        // (undocumented)
-        fileExtension?: string;
-        // (undocumented)
-        fileName?: string;
-        // (undocumented)
-        filePrefix?: string;
-        // (undocumented)
-        fileSize?: number;
-        // (undocumented)
-        fileSuffix?: string;
-        // (undocumented)
-        fileType?: GenerateUploadUrlMutationBuilder.FileParameters['contentType'];
-    }
-    // (undocumented)
-    export interface SuccessMetadata {
-        // (undocumented)
-        fileUrl: string;
-    }
-}
-
-// @public (undocumented)
 export interface SystemEvent {
     // (undocumented)
     createdAt: string;
@@ -295,12 +210,6 @@ export interface TreeFilter {
     id: string | number;
     // (undocumented)
     relations: RelationFilter[];
-}
-
-// @public (undocumented)
-export interface UploadedFileMetadata {
-    // (undocumented)
-    abortSignal: AbortSignal;
 }
 
 export { Value }

@@ -14,6 +14,7 @@ class MailTemplateQuery extends DatabaseQuery<MailTemplateQuery.Result> {
 			.select('subject')
 			.select('content')
 			.select('use_layout', 'useLayout')
+			.select('reply_to', 'replyTo')
 			.from('mail_template')
 			.where({
 				project_id: this.mailTemplateIdentifier.projectId ?? null,

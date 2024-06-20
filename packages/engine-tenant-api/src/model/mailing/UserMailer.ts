@@ -21,6 +21,7 @@ export class UserMailer {
 		const template = (await this.getCustomTemplate(dbContext, { type: MailType.newUserInvited, ...customMailOptions })) || {
 			subject: 'You have been invited to {{project}}',
 			content: NewUserInvited,
+			replyTo: null,
 		}
 		await this.sendTemplate(template, mailArguments)
 	}
@@ -33,6 +34,7 @@ export class UserMailer {
 		const template = (await this.getCustomTemplate(dbContext, { type: MailType.existingUserInvited, ...customMailOptions })) || {
 			subject: 'You have been invited to {{project}}',
 			content: ExistingUserInvited,
+			replyTo: null,
 		}
 		await this.sendTemplate(template, mailArguments)
 	}
@@ -45,12 +47,13 @@ export class UserMailer {
 		const template = (await this.getCustomTemplate(dbContext, { type: MailType.passwordReset, ...customMailOptions })) || {
 			subject: 'Password reset',
 			content: PasswordReset,
+			replyTo: null,
 		}
 		await this.sendTemplate(template, mailArguments)
 	}
 
 	private async sendTemplate(
-		template: Pick<MailTemplateData, 'subject' | 'content'>,
+		template: Pick<MailTemplateData, 'subject' | 'content' | 'replyTo'>,
 		mailArguments: Record<string, any>,
 	) {
 		const html = await this.templateRenderer.render(template.content, mailArguments)
@@ -58,13 +61,16 @@ export class UserMailer {
 			to: mailArguments.email,
 			subject: await this.templateRenderer.render(template.subject, mailArguments),
 			html,
+			...(template.replyTo ? {
+				replyTo: template.replyTo,
+			} : {}),
 		})
 	}
 
 	private async getCustomTemplate(
 		dbContext: DatabaseContext,
 		identifier: MailTemplateIdentifier,
-	): Promise<Pick<MailTemplateData, 'subject' | 'content'> | null> {
+	): Promise<Pick<MailTemplateData, 'subject' | 'content' | 'replyTo'> | null> {
 		const customTemplate =
 			(await dbContext.queryHandler.fetch(new MailTemplateQuery(identifier)))
 			?? (await dbContext.queryHandler.fetch(new MailTemplateQuery({ ...identifier, projectId: undefined })))
@@ -73,6 +79,6 @@ export class UserMailer {
 			return null
 		}
 		const content = customTemplate.useLayout ? Layout(customTemplate.content) : customTemplate.content
-		return { content, subject: customTemplate.subject }
+		return { content, subject: customTemplate.subject, replyTo: customTemplate.replyTo }
 	}
 }

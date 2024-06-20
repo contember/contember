@@ -36,6 +36,7 @@ import _20221108projectupdatenotification from './2022-11-08-project-update-noti
 import _20230120135500personemailnormalize from './2023-01-20-135500-person-email-normalize'
 import _20230603104000persondisabled from './2023-06-03-104000-person-disabled'
 import _20230901165000idpreturnconfig from './2023-09-01-165000-idp-return-config'
+import _20240620140000mailreply from './2024-06-20-140000-mail-reply'
 
 import snapshot from './snapshot'
 import { computeTokenHash, Providers } from '../model'
@@ -85,6 +86,7 @@ const migrations = {
 	'2023-01-20-135500-person-email-normalize': _20230120135500personemailnormalize,
 	'2023-06-03-104000-person-disabled': _20230603104000persondisabled,
 	'2023-09-01-165000-idp-return-config': _20230901165000idpreturnconfig,
+	'2024-06-20-140000-mail-reply': _20240620140000mailreply,
 }
 
 export class TenantMigrationsRunner {

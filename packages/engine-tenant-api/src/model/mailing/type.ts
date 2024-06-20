@@ -14,6 +14,7 @@ export interface MailTemplateData {
 	subject: string
 	content: string
 	useLayout: boolean
+	replyTo?: string | null
 }
 
 export interface MailTemplate extends MailTemplateIdentifier, MailTemplateData {}

@@ -1,16 +1,15 @@
 import {
-	AddMailTemplateErrorCode,
 	AddMailTemplateResponse,
 	MailType as SchemaMailType,
 	MutationAddProjectMailTemplateArgs,
 	MutationRemoveProjectMailTemplateArgs,
 	MutationResolvers,
-	RemoveMailTemplateErrorCode,
 	RemoveMailTemplateResponse,
 } from '../../../schema'
 import { TenantResolverContext } from '../../TenantResolverContext'
 import { MailTemplateManager, MailType, PermissionActions, ProjectManager } from '../../../model'
 import { createErrorResponse, createProjectNotFoundResponse } from '../../errorUtils'
+import { validateEmail } from '../../../model/utils/email'
 
 export class MailTemplateMutationResolver implements MutationResolvers {
 	constructor(
@@ -20,7 +19,7 @@ export class MailTemplateMutationResolver implements MutationResolvers {
 
 	async addMailTemplate(
 		parent: any,
-		{ template: { content, projectSlug, subject, type, useLayout, variant } }: MutationAddProjectMailTemplateArgs,
+		{ template: { content, projectSlug, subject, type, useLayout, variant, replyTo } }: MutationAddProjectMailTemplateArgs,
 		context: TenantResolverContext,
 	): Promise<AddMailTemplateResponse> {
 		const project = projectSlug ? await this.projectManager.getProjectBySlug(context.db, projectSlug) : null
@@ -32,6 +31,9 @@ export class MailTemplateMutationResolver implements MutationResolvers {
 		if (projectSlug && !project) {
 			return createProjectNotFoundResponse('PROJECT_NOT_FOUND', projectSlug)
 		}
+		if (replyTo && !validateEmail(replyTo)) {
+			return createErrorResponse('INVALID_REPLY_EMAIL_FORMAT', 'Reply-to email address is not in a valid format')
+		}
 
 		await this.mailTemplateManager.addMailTemplate(context.db, {
 			content,
@@ -40,6 +42,7 @@ export class MailTemplateMutationResolver implements MutationResolvers {
 			useLayout: typeof useLayout === 'boolean' ? useLayout : true,
 			variant: variant || '',
 			type: this.mapMailType(type),
+			replyTo: replyTo?.trim() || null,
 		})
 
 		return {

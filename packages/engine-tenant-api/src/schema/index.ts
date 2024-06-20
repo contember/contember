@@ -66,6 +66,7 @@ export type AddMailTemplateError = {
 }
 
 export type AddMailTemplateErrorCode =
+  | 'INVALID_REPLY_EMAIL_FORMAT'
   | 'MISSING_VARIABLE'
   | 'PROJECT_NOT_FOUND'
 
@@ -517,6 +518,7 @@ export type InviteResult = {
 export type MailTemplate = {
 	readonly content: Scalars['String']['input']
 	readonly projectSlug?: InputMaybe<Scalars['String']['input']>
+	readonly replyTo?: InputMaybe<Scalars['String']['input']>
 	readonly subject: Scalars['String']['input']
 	readonly type: MailType
 	readonly useLayout?: InputMaybe<Scalars['Boolean']['input']>

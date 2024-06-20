@@ -1,5 +1,5 @@
-import { Actions } from '@contember/schema'
-import { EventRow, HandledEvent, InvokeHandler, InvokeHandlerArgs, WebhookEvent, WebhookRequestPayload } from './types'
+import { Actions, ActionsPayload } from '@contember/schema'
+import { EventRow, HandledEvent, InvokeHandler, InvokeHandlerArgs } from './types'
 import { VariablesMap } from '../model/VariablesManager'
 import * as Typesafe from '@contember/typesafe'
 import { FetcherResponse, WebhookFetcher } from './WebhookFetcher'
@@ -145,7 +145,7 @@ export class WebhookTargetHandler implements InvokeHandler<Actions.WebhookTarget
 		const resolvedHeaders = Object.fromEntries(Object.entries(target.headers ?? {})
 			.map(([key, value]) => [key, this.resolveVariables(value, variables)]))
 
-		const payload: WebhookRequestPayload = {
+		const payload: ActionsPayload.WebhookRequestPayload = {
 			events: events.map(this.formatEventPayload),
 		}
 
@@ -161,7 +161,7 @@ export class WebhookTargetHandler implements InvokeHandler<Actions.WebhookTarget
 		})
 	}
 
-	private formatEventPayload(it: EventRow): WebhookEvent {
+	private formatEventPayload(it: EventRow): ActionsPayload.WebhookEvent {
 		return {
 			meta: {
 				eventId: it.id,

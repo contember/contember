@@ -1,5 +1,6 @@
 import { Acl } from './schema/acl'
 import { Actions } from './schema/actions'
+import { ActionsPayload } from './schema/actionsPayload'
 import { Input } from './schema/input'
 import { Model } from './schema/model'
 import { Result } from './schema/result'
@@ -20,4 +21,4 @@ type Schema = {
 
 export type Writable<V> = {-readonly [K in keyof V]: V[K]}
 
-export { Input, Model, Acl, Schema, Validation, Value, Result, Actions, Settings }
+export { Input, Model, Acl, ActionsPayload, Schema, Validation, Value, Result, Actions, Settings }

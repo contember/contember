@@ -2,7 +2,6 @@ import { Logger } from '@contember/logger'
 import { Actions } from '@contember/schema'
 import { EventRow } from '../model/types'
 import { VariablesMap } from '../model/VariablesManager'
-import { AnyEventPayload } from '../triggers/Payload'
 
 export { EventRow }
 
@@ -31,28 +30,3 @@ export type InvocationResult = {
 	response?: string
 }
 
-
-export type WebhookEvent =
-	& AnyEventPayload
-	& {
-		meta: {
-			eventId: string
-			transactionId: string
-			createdAt: string
-			lastStateChange: string
-			numRetries: number
-			trigger: string
-			target: string
-		}
-	}
-
-export type WebhookRequestPayload = {
-	events: WebhookEvent[]
-}
-
-export type WebhookResponsePayload = {
-	failures: {
-		eventId: string
-		error?: string
-	}
-}

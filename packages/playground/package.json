@@ -53,5 +53,8 @@
 		"tailwindcss": "^3.4.3",
 		"tailwindcss-animate": "^1.0.7",
 		"vite-tsconfig-paths": "^4.3.2"
+	},
+	"dependencies": {
+		"@sindresorhus/slugify": "^2.2.1"
 	}
 }

@@ -6,7 +6,8 @@ import { Button } from '@app/lib/ui/button'
 import { Binding, PersistButton } from '@app/lib/binding'
 import { SelectOrTypeField } from '@app/lib-extra/select-or-type-field'
 import { FieldExists } from '@app/lib-extra/has-field'
-
+import { SlugField } from '@app/lib-extra/slug-field/field'
+import slugify from '@sindresorhus/slugify'
 
 export const basic = () => <>
 	<Binding>
@@ -40,7 +41,7 @@ export const selectOrType = () => <>
 				<SelectOrTypeField field={'textValue'} label={'Text'} options={{
 					a: 'Option A',
 					b: 'Option B',
-				}}/>
+				}} />
 			</div>
 		</EntitySubTree>
 	</Binding>
@@ -114,7 +115,30 @@ export const clientValidation = () => <>
 				<InputField field={'textValue'} label={'Name'} required inputProps={{ pattern: '[a-z]+' }} />
 				<InputField field={'intValue'} label={'Number'} inputProps={{ required: true, max: 100 }} />
 				<CheckboxField field={'boolValue'} label={'Some boolean'} description={'Hello world'} inputProps={{ required: true }} />
-				<InputField field={'uuidValue'} label={'UUID'}  />
+				<InputField field={'uuidValue'} label={'UUID'} />
+			</div>
+		</EntitySubTree>
+	</Binding>
+</>
+
+
+export const slug = () => <>
+	<Binding>
+		<Slots.Actions>
+			<PersistButton />
+		</Slots.Actions>
+		<EntitySubTree entity={'Slug(unique=unique)'} setOnCreate={'(unique=unique)'}>
+			<div className={'space-y-4'}>
+				<InputField field={'title'} label={'Title'} />
+				<SlugField
+					slugify={slugify}
+					field={'slug'}
+					label={'Slug'}
+					derivedFrom="title"
+					unpersistedHardPrefix="http://google.com"
+					persistedHardPrefix="/article/"
+					persistedSoftPrefix="foo/"
+				/>
 			</div>
 		</EntitySubTree>
 	</Binding>

@@ -53,7 +53,7 @@ export const DataGridToolbar = Component<DataGridToolbarProps>(({ children }) =>
 					<DataGridAutoExport />
 				</div>
 
-				<div className="flex flex-wrap gap-2">
+				<div className="flex flex-1 flex-wrap gap-2">
 					{children ?? <>
 						<DataGridQueryFilter />
 					</>}

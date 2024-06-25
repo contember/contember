@@ -22,7 +22,7 @@ import { DropIndicator } from '../ui/sortable'
 import { dict } from '../dict'
 
 export const RepeaterWrapperUI = uic('div', {
-	baseClass: 'flex flex-col gap-2 p-4 pr-8 relative shadow-sm bg-white rounded border border-gray-300 max-w-md',
+	baseClass: 'flex flex-col gap-2 p-4 pr-8 relative shadow-sm bg-white rounded border border-gray-300',
 })
 export const RepeaterItemUI = uic('div', {
 	baseClass: 'rounded border border-gray-300 p-4 relative',

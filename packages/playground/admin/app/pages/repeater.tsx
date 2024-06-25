@@ -24,7 +24,7 @@ const repeaterDropdown = (
 export default <>
 	<Binding>
 		<Slots.Actions><PersistButton /></Slots.Actions>
-		<DefaultRepeater entities={'RepeaterItem'} sortableBy={'order'} title="Foo items">
+		<DefaultRepeater entities={'RepeaterItem'} sortableBy={'order'} title="Foo items" addButtonPosition="around">
 			<Field field={'title'} />
 
 			<RepeaterItemActions>

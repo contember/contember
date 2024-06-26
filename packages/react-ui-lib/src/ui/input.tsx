@@ -52,6 +52,9 @@ export const InputBare = uic('input', {
 
 export const CheckboxInput = uic('input', {
 	baseClass: 'w-4 h-4',
+	defaultProps: {
+		type: 'checkbox',
+	},
 })
 
 export const RadioInput = uic('input', {

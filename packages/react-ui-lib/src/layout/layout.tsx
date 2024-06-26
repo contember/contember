@@ -7,6 +7,7 @@ import { Button } from '../ui/button'
 import { LogoutTrigger } from '@contember/react-identity'
 import { dict } from '../dict'
 import { useCurrentRequest } from '@contember/interface'
+import { useStoredState } from '@contember/react-utils'
 
 const LayoutBodyUI = uic('div', { baseClass: 'bg-gray-50 h-full min-h-screen relative py-4 pl-[calc(100vw-100%)]' })
 const LayoutMaxWidthUI = uic('div', {
@@ -67,7 +68,7 @@ export const LayoutComponent = ({ children, ...rest }: PropsWithChildren<{}>) =>
 	const isActive = useHasActiveSlotsFactory()
 
 	const [leftSidebarVisibility, setLeftSidebarVisibility] = useState<'show' | 'hidden' | 'auto'>('auto')
-	const [layout, setLayout] = useState<'default' | 'stretch'>('default')
+	const [layout, setLayout] = useStoredState<'default' | 'stretch'>('local', ['', 'layout'], it => it ?? 'default')
 
 	const request = useCurrentRequest()
 	useEffect(() => {

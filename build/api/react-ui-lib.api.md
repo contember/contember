@@ -223,10 +223,14 @@ export const baseEditorPlugins: {
 };
 
 // @public (undocumented)
-export type BaseFieldProps = Omit<FormContainerProps, 'children'> & UploaderBaseFieldProps;
+export type BaseFieldProps = Omit<FormContainerProps, 'children'> & UploaderBaseFieldProps & {
+    dropzonePlaceholder?: ReactNode;
+};
 
 // @public (undocumented)
-export type BaseFileRepeaterFieldProps = Omit<FormContainerProps, 'children'> & RepeaterProps & UploaderBaseFieldProps;
+export type BaseFileRepeaterFieldProps = Omit<FormContainerProps, 'children'> & RepeaterProps & UploaderBaseFieldProps & {
+    dropzonePlaceholder?: ReactNode;
+};
 
 // @public (undocumented)
 export const Binding: ({ children }: {
@@ -633,6 +637,8 @@ export type DataGridColumnProps = {
     name?: string;
     hidingName?: string;
     sortingField?: string;
+    cellClassName?: string;
+    headerClassName?: string;
 };
 
 // @public (undocumented)
@@ -908,6 +914,8 @@ export const DataGridTiles: React_2.NamedExoticComponent<DataGridTilesProps>;
 export interface DataGridTilesProps {
     // (undocumented)
     children: React_2.ReactNode;
+    // (undocumented)
+    className?: string;
 }
 
 // @public (undocumented)
@@ -994,7 +1002,8 @@ export const DefaultRepeater: NamedExoticComponent<DefaultRepeaterProps>;
 
 // @public (undocumented)
 export type DefaultRepeaterProps = {
-    title?: string;
+    title?: ReactNode;
+    addButtonPosition?: 'none' | 'after' | 'before' | 'around';
 } & RepeaterProps;
 
 // @public (undocumented)
@@ -1793,8 +1802,9 @@ className?: string | undefined;
 }, "ref"> & RefAttributes<HTMLInputElement>>;
 
 // @public (undocumented)
-export const RepeaterAddItemButton: ({ children }: {
+export const RepeaterAddItemButton: ({ children, index }: {
     children?: React.ReactNode;
+    index?: RepeaterAddItemIndex;
 }) => JSX_2.Element;
 
 // @public (undocumented)
@@ -2473,8 +2483,9 @@ export type UploadedVideoViewProps = FileUrlDataExtractorProps & GenericFileMeta
 };
 
 // @public (undocumented)
-export const UploaderDropzone: ({ inactiveOnUpload }: {
+export const UploaderDropzone: ({ inactiveOnUpload, dropzonePlaceholder }: {
     inactiveOnUpload?: boolean;
+    dropzonePlaceholder?: ReactNode;
 }) => JSX_2.Element;
 
 // @public (undocumented)

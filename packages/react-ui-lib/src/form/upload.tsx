@@ -41,6 +41,9 @@ import { UploaderRepeaterDropIndicator } from '../upload/repeater'
 export type BaseFieldProps =
 	& Omit<FormContainerProps, 'children'>
 	& UploaderBaseFieldProps
+	& {
+		dropzonePlaceholder?: ReactNode
+	}
 
 
 
@@ -110,7 +113,7 @@ type UploadFieldInnerProps =
 		children: ReactNode
 	}
 
-const UploadFieldInner = Component((({ baseField, label, description, children, fileType, urlField }: UploadFieldInnerProps) => {
+const UploadFieldInner = Component((({ baseField, label, description, children, fileType, urlField, dropzonePlaceholder }: UploadFieldInnerProps) => {
 	const entity = useEntity()
 	const defaultUploader = useS3Client()
 	const [fileTypeStable] = useState(fileType)
@@ -139,7 +142,7 @@ const UploadFieldInner = Component((({ baseField, label, description, children, 
 
 								<EntityView render={entity => {
 									if (entity.getField(urlField).value === null) {
-										return <UploaderDropzone inactiveOnUpload />
+										return <UploaderDropzone inactiveOnUpload dropzonePlaceholder={dropzonePlaceholder} />
 									} else {
 										return <>{children}</>
 									}
@@ -163,7 +166,9 @@ export type BaseFileRepeaterFieldProps =
 	& Omit<FormContainerProps, 'children'>
 	& RepeaterProps
 	& UploaderBaseFieldProps
-
+	& {
+		dropzonePlaceholder?: ReactNode
+	}
 
 export type ImageRepeaterFieldProps =
 	& BaseFileRepeaterFieldProps
@@ -216,7 +221,7 @@ type FileRepeaterFieldInnerProps =
 		children: ReactNode
 	}
 
-const FileRepeaterFieldInner = Component<FileRepeaterFieldInnerProps>(({ baseField, label, description, children, fileType, ...props }) => {
+const FileRepeaterFieldInner = Component<FileRepeaterFieldInnerProps>(({ baseField, label, description, children, fileType, dropzonePlaceholder, ...props }) => {
 
 	const defaultUploader = useS3Client()
 	const [fileTypeStable] = useState(fileType)
@@ -243,7 +248,7 @@ const FileRepeaterFieldInner = Component<FileRepeaterFieldInnerProps>(({ baseFie
 								<UploaderHasFile>
 									<UploaderProgress />
 								</UploaderHasFile>
-								<UploaderDropzone />
+								<UploaderDropzone dropzonePlaceholder={dropzonePlaceholder} />
 							</MultiUploader>
 
 							<RepeaterSortable>

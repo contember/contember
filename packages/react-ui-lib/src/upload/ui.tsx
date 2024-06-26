@@ -1,8 +1,6 @@
 import * as React from 'react'
 import { Loader } from '../ui/loader'
-import { GripIcon, GripVerticalIcon, UploadIcon } from 'lucide-react'
-import { dict } from '../dict'
-import { Button } from '../ui/button'
+import { GripIcon } from 'lucide-react'
 import { uic } from '../utils/uic'
 
 export const UploaderDropzoneWrapperUI = uic('div', { baseClass: 'rounded border p-1 shadow' })
@@ -21,14 +19,6 @@ export const UploaderDropzoneAreaUI = uic('div', {
 	defaultVariants: {
 		size: 'square',
 	},
-	beforeChildren: <>
-		<UploadIcon className={'w-12 h-12 text-gray-400'} />
-		<div className={'font-semibold text-sm'}>{dict.uploader.dropFiles}</div>
-		<div className={'text-xs'}>{dict.uploader.or}</div>
-		<div className={'flex gap-2 items-center text-xs'}>
-			<Button size={'sm'} variant={'outline'}>{dict.uploader.browseFiles}</Button>
-		</div>
-	</>,
 })
 
 

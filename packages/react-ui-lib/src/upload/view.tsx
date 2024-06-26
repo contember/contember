@@ -2,11 +2,11 @@ import * as React from 'react'
 import { ComponentType, ReactNode } from 'react'
 import { Component, Field, SugaredRelativeSingleField, useEntity, useField } from '@contember/interface'
 import { AudioFileDataExtractorProps, FileUrlDataExtractorProps, GenericFileMetadataExtractorProps, ImageFileDataExtractorProps, VideoFileDataExtractorProps } from '@contember/react-uploader'
-import { formatBytes, formatDate, formatDuration } from '../formatting/formatting'
+import { formatBytes, formatDate, formatDuration } from '../formatting'
 import { Button } from '../ui/button'
 import { FileIcon, InfoIcon, TrashIcon } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
-import { formatImageResizeUrl } from '../images/formatImageResizeUrl'
+import { formatImageResizeUrl } from '../images'
 
 export type UploadedImageViewProps =
 	& FileUrlDataExtractorProps
@@ -26,18 +26,20 @@ export const UploadedImageView = Component<UploadedImageViewProps>(({ DestroyAct
 			</FileActions>
 		</div>
 	)
-}, () => {
-	// todo
-	return null
+}, props => {
+	return <>
+		<Field field={props.urlField} />
+		<ImageMetadata {...props} />
+	</>
 })
 
-const ImageMetadata = ({ heightField, widthField, ...props }: UploadedImageViewProps) => {
+const ImageMetadata = Component(({ heightField, widthField, ...props }: UploadedImageViewProps) => {
 	return (
 		<Metadata {...props}>
 			<DimensionsMeta widthField={widthField} heightField={heightField} />
 		</Metadata>
 	)
-}
+})
 
 
 export type UploadedAudioViewProps =
@@ -58,9 +60,11 @@ export const UploadedAudioView = Component<UploadedAudioViewProps>(({ DestroyAct
 			</FileActions>
 		</div>
 	)
-}, () => {
-	// todo
-	return null
+}, props => {
+	return <>
+		<Field field={props.urlField} />
+		<AudioMetadata {...props} />
+	</>
 })
 
 const AudioMetadata = ({ durationField, ...props }: UploadedAudioViewProps) => {
@@ -90,19 +94,21 @@ export const UploadedVideoView = Component<UploadedVideoViewProps>(({ DestroyAct
 			</FileActions>
 		</div>
 	)
-}, () => {
-	// todo
-	return null
+}, props => {
+	return <>
+		<Field field={props.urlField} />
+		<VideoMetadata {...props} />
+	</>
 })
 
-const VideoMetadata = ({ durationField, widthField, heightField, ...props }: UploadedVideoViewProps) => {
+const VideoMetadata = Component(({ durationField, widthField, heightField, ...props }: UploadedVideoViewProps) => {
 	return (
 		<Metadata {...props}>
 			<MetaField field={durationField} label="Duration:" format={formatDuration} />
 			<DimensionsMeta widthField={widthField} heightField={heightField} />
 		</Metadata>
 	)
-}
+})
 
 export type UploadedAnyViewProps =
 	& FileUrlDataExtractorProps
@@ -137,7 +143,7 @@ type MetadataProps =
 		children?: ReactNode
 	}
 
-const Metadata = ({ children, urlField, fileSizeField, fileNameField, lastModifiedField, fileTypeField }: MetadataProps) => {
+const Metadata = Component(({ children, urlField, fileSizeField, fileNameField, lastModifiedField, fileTypeField }: MetadataProps) => {
 	return (
 		<div className="grid grid-cols-[6rem_1fr] gap-2">
 			<MetaField field={fileSizeField} label="Size:" format={formatBytes} />
@@ -152,9 +158,9 @@ const Metadata = ({ children, urlField, fileSizeField, fileNameField, lastModifi
 			)} />
 		</div>
 	)
-}
+})
 
-const DimensionsMeta = ({ widthField, heightField }: {
+const DimensionsMeta = Component(({ widthField, heightField }: {
 	widthField?: SugaredRelativeSingleField['field']
 	heightField?: SugaredRelativeSingleField['field']
 }) => {
@@ -171,14 +177,19 @@ const DimensionsMeta = ({ widthField, heightField }: {
 			<span>{width} x {height} px</span>
 		</>
 	)
+}, ({ widthField, heightField }) => {
+	return <>
+		{widthField && <Field field={widthField} />}
+		{heightField && <Field field={heightField} />}
+	</>
+})
 
-}
-
-const MetaField = ({ field, label, format = it => it }: {
+interface MetaFieldProps {
 	field?: SugaredRelativeSingleField['field']
 	label: ReactNode
 	format?: (value: any) => ReactNode
-}) => {
+}
+const MetaField = Component<MetaFieldProps>(({ field, label, format = it => it }) => {
 	const entity = useEntity()
 	return field ? (
 		<>
@@ -188,7 +199,9 @@ const MetaField = ({ field, label, format = it => it }: {
 			</span>
 		</>
 	) : null
-}
+}, ({ field }) => {
+	return field ? <Field field={field} /> : null
+})
 
 
 const FileActions = ({ DestroyAction, children }: {

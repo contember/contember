@@ -6,6 +6,7 @@ import { DataGridColumnHeader } from './column-header'
 import { DataViewElement } from '@contember/react-dataview'
 import { formatBoolean, formatDate, formatNumber } from '../formatting'
 import { DataGridEnumCell, DataGridHasManyCell, DataGridHasManyCellProps, DataGridHasOneCell, DataGridHasOneCellProps } from './cells'
+import { cn } from '../utils'
 
 export const DataGridActionColumn = Component<{ children: ReactNode }>(({ children }) => (
 	<DataGridColumnLeaf
@@ -127,9 +128,11 @@ export type DataGridColumnProps = {
 	name?: string
 	hidingName?: string
 	sortingField?: string
+	cellClassName?: string
+	headerClassName?: string
 }
 
-export const DataGridColumn = Component<DataGridColumnProps>(({ children, header, name, hidingName, sortingField }) => {
+export const DataGridColumn = Component<DataGridColumnProps>(({ children, header, name, hidingName, sortingField, cellClassName, headerClassName }) => {
 	const wrapIsVisible = (child: ReactNode) => {
 		const resolvedName = hidingName ?? name
 		return resolvedName ? <DataViewElement name={resolvedName} label={header}>{child}</DataViewElement> : child
@@ -140,14 +143,14 @@ export const DataGridColumn = Component<DataGridColumnProps>(({ children, header
 			name={name}
 			header={
 				wrapIsVisible(
-					<TableHead className={'text-center'}>
+					<TableHead className={cn('text-center', headerClassName)}>
 						{header ? <DataGridColumnHeader hidingName={hidingName ?? name} sortingField={sortingField}>
 							{header}
 						</DataGridColumnHeader> : null}
 					</TableHead>,
 				)
 			}
-			cell={wrapIsVisible(<TableCell>{children}</TableCell>)}
+			cell={wrapIsVisible(<TableCell className={cellClassName}>{children}</TableCell>)}
 		/>
 	)
 })

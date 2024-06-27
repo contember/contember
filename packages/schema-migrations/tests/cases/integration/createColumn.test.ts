@@ -11,10 +11,11 @@ testMigrations('create a column with default value', {
 	}),
 	updated: createSchema({
 		Author: class Author {
-			name = def.stringColumn().default('unnamed author').notNull()
+			name = def.stringColumn().notNull()
 			email = def.stringColumn().unique()
 		},
 	}),
+	noDiff: true,
 	diff: [
 		{
 			modification: 'createColumn',
@@ -23,7 +24,6 @@ testMigrations('create a column with default value', {
 				columnName: 'name',
 				name: 'name',
 				nullable: false,
-				default: 'unnamed author',
 				type: Model.ColumnType.String,
 				columnType: 'text',
 			},
@@ -67,4 +67,37 @@ testMigrations('create a column with copy value', {
 UPDATE "author" SET "name" = "email"::text;
 SET CONSTRAINTS ALL IMMEDIATE; SET CONSTRAINTS ALL DEFERRED;
 ALTER TABLE "author" ALTER "name" SET NOT NULL;`,
+})
+
+
+testMigrations('create a column with default value with "using"', {
+	original: createSchema({
+		Author: class Author {
+			email = def.stringColumn().unique()
+		},
+	}),
+	updated: createSchema({
+		Author: class Author {
+			name = def.stringColumn().default('unnamed author').notNull()
+			email = def.stringColumn().unique()
+		},
+	}),
+	diff: [
+		{
+			modification: 'createColumn',
+			entityName: 'Author',
+			field: {
+				columnName: 'name',
+				name: 'name',
+				nullable: false,
+				default: 'unnamed author',
+				type: Model.ColumnType.String,
+				columnType: 'text',
+			},
+			fillValue: 'unnamed author',
+			valueMigrationStrategy: 'using',
+		},
+	],
+	sql: SQL`ALTER TABLE "author" ADD "name" text;
+ALTER TABLE "author" ALTER "name" SET DATA TYPE text USING $pga$unnamed author$pga$, ALTER "name" SET NOT NULL;`,
 })

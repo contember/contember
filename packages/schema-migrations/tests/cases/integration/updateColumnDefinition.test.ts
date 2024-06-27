@@ -205,3 +205,23 @@ UPDATE "author" SET "name" = $pga$unnamed$pga$ WHERE "name" IS NULL;
 SET CONSTRAINTS ALL IMMEDIATE; SET CONSTRAINTS ALL DEFERRED;
 ALTER TABLE "author" ALTER "name" SET NOT NULL;`,
 })
+
+testMigrations('set not null and fill with "using"', {
+	original: createSchema(NotNullOrig),
+	updated: createSchema(NotNullUpdated),
+	noDiff: true,
+	diff: [
+		updateColumnDefinitionModification.createModification({
+			entityName: 'Author',
+			fieldName: 'name',
+			definition: {
+				type: Model.ColumnType.String,
+				columnType: 'text',
+				nullable: false,
+			},
+			fillValue: 'unnamed',
+			valueMigrationStrategy: 'using',
+		}),
+	],
+	sql: SQL` ALTER TABLE "author" ALTER "name" SET DATA TYPE text USING COALESCE("name"::text, $pga$unnamed$pga$), ALTER "name" SET NOT NULL;`,
+})

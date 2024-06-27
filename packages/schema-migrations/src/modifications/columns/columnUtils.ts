@@ -1,31 +1,20 @@
 import { wrapIdentifier } from '../../utils/dbHelpers'
-import { ImplementationException } from '../../exceptions'
 import { JSONValue, Model } from '@contember/schema'
 import { escapeValue, MigrationBuilder } from '@contember/database-migrations'
 import { getColumnName } from '@contember/schema-utils'
 
-export const fillSeed = ({ builder, fillValue, copyValue, entity, columnName, nullable, model, columnType, type }: {
-	model: Model.Schema
+export const fillSeed = ({ builder, entity, columnName, nullable, type, seedExpression }: {
 	entity: Model.Entity
 	columnName: string
-	columnType: string
 	nullable: boolean
 	builder: MigrationBuilder
-	fillValue?: JSONValue
-	copyValue?: string
 	type: 'creating' | 'updating'
+	seedExpression: string
 }) => {
+
 	const where = type === 'updating' ? ` WHERE ${wrapIdentifier(columnName)} IS NULL` : ''
-	if (fillValue !== undefined) {
-		builder.sql(`UPDATE ${wrapIdentifier(entity.tableName)}
-                     SET ${wrapIdentifier(columnName)} = ${escapeValue(fillValue)}${where}`)
-	} else if (copyValue !== undefined) {
-		const copyFrom = getColumnName(model, entity, copyValue)
-		builder.sql(`UPDATE ${wrapIdentifier(entity.tableName)}
-                     SET ${wrapIdentifier(columnName)} = ${wrapIdentifier(copyFrom)}::${columnType}${where}`)
-	} else {
-		throw new ImplementationException()
-	}
+	builder.sql(`UPDATE ${wrapIdentifier(entity.tableName)}
+				 SET ${wrapIdentifier(columnName)} = ${seedExpression}${where}`)
 
 	// event log uses deferred constraint triggers, we need to fire them before ALTER
 	builder.sql(`SET CONSTRAINTS ALL IMMEDIATE`)
@@ -36,4 +25,21 @@ export const fillSeed = ({ builder, fillValue, copyValue, entity, columnName, nu
 			notNull: true,
 		})
 	}
+}
+
+
+export const formatSeedExpression = ({ model, entity, columnType, fillValue, copyValue }: {
+	model: Model.Schema
+	entity: Model.Entity
+	columnType: string
+	fillValue?: JSONValue
+	copyValue?: string
+}): string | null => {
+	if (fillValue !== undefined) {
+		return escapeValue(fillValue)
+	} else if (copyValue !== undefined) {
+		const copyFrom = getColumnName(model, entity, copyValue)
+		return `${wrapIdentifier(copyFrom)}::${columnType}`
+	}
+	return null
 }

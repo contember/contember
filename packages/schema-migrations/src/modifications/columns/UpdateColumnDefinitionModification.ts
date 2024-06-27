@@ -6,7 +6,7 @@ import deepEqual from 'fast-deep-equal'
 import { updateColumns } from '../utils/diffUtils'
 import { wrapIdentifier } from '../../utils/dbHelpers'
 import { getColumnSqlType } from '../utils/columnUtils'
-import { fillSeed } from './columnUtils'
+import { fillSeed, formatSeedExpression } from './columnUtils'
 
 export class UpdateColumnDefinitionModificationHandler implements ModificationHandler<UpdateColumnDefinitionModificationData>  {
 	constructor(private readonly data: UpdateColumnDefinitionModificationData, private readonly schema: Schema) {}
@@ -22,33 +22,48 @@ export class UpdateColumnDefinitionModificationHandler implements ModificationHa
 		const hasNewSequence = !oldColumn.sequence && newColumn.sequence
 		const hasNewType = newColumn.columnType !== oldColumn.columnType
 		const columnType = getColumnSqlType(newColumn)
+		const hasNullableChanged = oldColumn.nullable !== newColumn.nullable
 
 		const usingCast = `${wrapIdentifier(oldColumn.columnName)}::${columnType}`
 
-		const hasSeed = this.data.fillValue !== undefined || this.data.copyValue !== undefined
+		const seedExpression = formatSeedExpression({
+			model: this.schema.model,
+			entity,
+			columnType,
+			fillValue: this.data.fillValue,
+			copyValue: this.data.copyValue,
+		})
+		const hasSeed = seedExpression !== null
+		const migrateWithUsing = hasSeed && this.data.valueMigrationStrategy === 'using'
+		const migrateWithUpdate = hasSeed && this.data.valueMigrationStrategy !== 'using'
 
 		builder.alterColumn(entity.tableName, oldColumn.columnName, {
-			type: hasNewSequence || hasNewType ? columnType : undefined,
-			notNull: oldColumn.nullable !== newColumn.nullable && (!hasSeed || newColumn.nullable) ? !newColumn.nullable : undefined,
-			using: hasNewSequence
-				? `COALESCE(${usingCast}, nextval(PG_GET_SERIAL_SEQUENCE(${escapeValue(entity.tableName)}, ${escapeValue(oldColumn.columnName)})))`
-				: hasNewType
-					? usingCast
-					: undefined,
+			type: hasNewSequence || hasNewType || migrateWithUsing ? columnType : undefined,
+			notNull: hasNullableChanged && (!migrateWithUpdate || newColumn.nullable) ? !newColumn.nullable : undefined,
+			using: (() => {
+				if (hasNewSequence) {
+					return `COALESCE(${usingCast}, nextval(PG_GET_SERIAL_SEQUENCE(${escapeValue(entity.tableName)}, ${escapeValue(oldColumn.columnName)})))`
+				}
+				if (migrateWithUsing) {
+					return `COALESCE(${usingCast}, ${seedExpression})`
+				}
+
+				if (hasNewType) {
+					return usingCast
+				}
+				return undefined
+			})(),
 			sequenceGenerated: oldColumn.sequence && !newColumn.sequence ? false : (!oldColumn.sequence ? newColumn.sequence : undefined),
 		})
 
-		if (hasSeed) {
+		if (migrateWithUpdate) {
 			fillSeed({
 				builder,
 				type: 'updating',
-				model: this.schema.model,
 				entity,
 				columnName: oldColumn.columnName,
 				nullable: newColumn.nullable,
-				columnType,
-				copyValue: this.data.copyValue,
-				fillValue: this.data.fillValue,
+				seedExpression,
 			})
 		}
 
@@ -114,6 +129,7 @@ export interface UpdateColumnDefinitionModificationData {
 	definition: ColumnDefinitionAlter
 	fillValue?: JSONValue
 	copyValue?: string
+	valueMigrationStrategy?: 'using' | 'update'
 }
 
 export const updateColumnDefinitionModification = createModificationType({

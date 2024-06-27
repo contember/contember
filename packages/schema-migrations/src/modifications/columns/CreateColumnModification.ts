@@ -5,7 +5,7 @@ import { createModificationType, Differ, ModificationHandler } from '../Modifica
 import { isColumn } from '@contember/schema-utils'
 import { createFields } from '../utils/diffUtils'
 import { getColumnSqlType } from '../utils/columnUtils'
-import { fillSeed } from './columnUtils'
+import { fillSeed, formatSeedExpression } from './columnUtils'
 
 export class CreateColumnModificationHandler implements ModificationHandler<CreateColumnModificationData> {
 	constructor(private readonly data: CreateColumnModificationData, private readonly schema: Schema) {}
@@ -16,28 +16,43 @@ export class CreateColumnModificationHandler implements ModificationHandler<Crea
 			return
 		}
 		const column = this.data.field
-		const hasSeed = this.data.fillValue !== undefined || this.data.copyValue !== undefined
+
 		const columnType = getColumnSqlType(column)
+
+		const seedExpression = formatSeedExpression({
+			model: this.schema.model,
+			entity,
+			columnType,
+			fillValue: this.data.fillValue,
+			copyValue: this.data.copyValue,
+		})
+
+
 		builder.addColumn(entity.tableName, {
 			[column.columnName]: {
 				type: columnType,
-				notNull: !column.nullable && !hasSeed,
+				notNull: !column.nullable && seedExpression === null,
 				sequenceGenerated: column.sequence,
 			},
 		})
 
-		if (hasSeed) {
-			fillSeed({
-				builder,
-				type: 'creating',
-				model: this.schema.model,
-				entity,
-				columnName: column.columnName,
-				nullable: column.nullable,
-				columnType,
-				copyValue: this.data.copyValue,
-				fillValue: this.data.fillValue,
-			})
+		if (seedExpression !== null) {
+			if (this.data.valueMigrationStrategy === 'using') {
+				builder.alterColumn(entity.tableName, column.columnName, {
+					notNull: !column.nullable ? true : undefined,
+					type: columnType,
+					using: seedExpression,
+				})
+			} else {
+				fillSeed({
+					builder,
+					type: 'creating',
+					entity,
+					columnName: column.columnName,
+					nullable: column.nullable,
+					seedExpression,
+				})
+			}
 		}
 	}
 
@@ -61,6 +76,7 @@ export interface CreateColumnModificationData {
 	field: Model.AnyColumn
 	fillValue?: JSONValue
 	copyValue?: string
+	valueMigrationStrategy?: 'using' | 'update'
 }
 
 
@@ -78,7 +94,7 @@ export class CreateColumnDiffer implements Differ {
 			return createColumnModification.createModification({
 				entityName: updatedEntity.name,
 				field: newField,
-				...(newField.default !== undefined ? { fillValue: newField.default } : {}),
+				...(newField.default !== undefined ? { fillValue: newField.default, valueMigrationStrategy: 'using' } : {}),
 			})
 		})
 	}

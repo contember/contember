@@ -218,8 +218,8 @@ export class TenantContainerFactory {
 				new ProjectQueryResolver(projectManager))
 			.addService('projectMembersQueryResolver', ({ projectManager, projectMemberManager }) =>
 				new ProjectMembersQueryResolver(projectManager, projectMemberManager))
-			.addService('mailTemplateQueryResolver', ({ mailTemplateManager }) =>
-				new MailTemplateQueryResolver(mailTemplateManager))
+			.addService('mailTemplateQueryResolver', () =>
+				new MailTemplateQueryResolver())
 			.addService('signUpMutationResolver', ({ signUpManager, apiKeyManager }) =>
 				new SignUpMutationResolver(signUpManager, apiKeyManager))
 			.addService('signInMutationResolver', ({ signInManager, signInResponseFactory }) =>

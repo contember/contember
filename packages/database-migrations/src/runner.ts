@@ -52,12 +52,20 @@ const ensureMigrationsTable = async (db: Connection.ConnectionLike, options: Run
 		const fullTableName = getMigrationsTableName(options)
 		await db.query(`
 			CREATE TABLE IF NOT EXISTS ${fullTableName} (
-				id SERIAL PRIMARY KEY,
+				id INT PRIMARY KEY,
 				name varchar(255) NOT NULL,
 				run_on timestamp NOT NULL
 			)`,
 		)
 		await db.query(`ALTER TABLE ${fullTableName} ADD COLUMN IF NOT EXISTS "group" TEXT DEFAULT NULL`)
+
+		await db.query(`ALTER TABLE ${fullTableName} ALTER id DROP DEFAULT`)
+		const seqName = (await db.query<{seq_name: string}>(`
+			SELECT pg_get_serial_sequence('${fullTableName}', 'id') as seq_name
+		`)).rows[0].seq_name
+		if (seqName) {
+			await db.query(`DROP SEQUENCE ${seqName}`)
+		}
 	} catch (err) {
 		if (!(err instanceof Error)) {
 			throw err
@@ -112,10 +120,11 @@ export default async <Args>(
 							for (const sql of steps) {
 								await trx.query(sql)
 							}
-
+							const maxId = await trx.query<{id: number}>(`SELECT MAX(id) as id FROM ${getMigrationsTableName(options)}`)
+							const nextId = (maxId.rows[0]?.id ?? 0) + 1
 							await trx.query(
-								`INSERT INTO ${getMigrationsTableName(options)} (name, run_on, "group") VALUES (?, NOW(), ?);`,
-								[migration.name, migration.group],
+								`INSERT INTO ${getMigrationsTableName(options)} (id, name, run_on, "group") VALUES (?, ?, NOW(), ?);`,
+								[nextId, migration.name, migration.group],
 							)
 							logger(`  Done`)
 						} catch (e) {

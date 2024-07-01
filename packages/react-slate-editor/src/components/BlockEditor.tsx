@@ -4,6 +4,7 @@ import { Fragment, ReactNode, useEffect, useState } from 'react'
 import { Slate, useSlate } from 'slate-react'
 import { createEditor, EditorPlugin, paragraphElementType } from '@contember/react-slate-editor-base'
 import { Descendant, insertNodes, Node, removeNodes, withoutNormalizing } from 'slate'
+import { createElementKey } from '../internal/helpers/createElementKey'
 
 export interface BlockEditorProps {
 	field: SugaredRelativeSingleField['field']
@@ -37,7 +38,7 @@ export const BlockEditor = Component<BlockEditorProps>(
 			contentField.updateValue(contentJson)
 		})
 
-		const [emptyValue] = useState(() => [editor.createDefaultElement([{ text: '' }])])
+		const [emptyValue] = useState(() => [{ ...editor.createDefaultElement([{ text: '' }]), key: createElementKey() }])
 
 		const nodes = contentField.value && typeof contentField.value === 'object' && 'children' in contentField.value
 			? (contentField.value.children as Descendant[])

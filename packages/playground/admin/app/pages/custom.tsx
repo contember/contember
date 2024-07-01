@@ -18,17 +18,17 @@ type MyComponentProps = {
 }
 
 const UseFieldComponent = Component<MyComponentProps>(
-	({ field }) => {
+	({ field: fieldName }) => {
 		// The `useField` hook is used to get and update the field value from data-binding.
-		const { value, updateValue } = useField<number>(field)
-		const increment = () => updateValue((value ?? 0) + 1)
-		const decrement = () => updateValue((value ?? 0) - 1)
+		const field = useField<number>(fieldName)
+		const increment = () => field.updateValue((field.value ?? 0) + 1)
+		const decrement = () => field.updateValue((field.value ?? 0) - 1)
 
 		return (
 			<div className={'flex gap-4 items-center'}>
 				<Button onClick={decrement}>Decrement</Button>
 				<div className={'w-8 h-8 border flex justify-center items-center'}>
-					<div>{value}</div>
+					<div>{field.value}</div>
 				</div>
 				<Button onClick={increment}>Increment</Button>
 			</div>

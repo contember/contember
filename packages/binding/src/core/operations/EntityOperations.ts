@@ -67,7 +67,7 @@ export class EntityOperations {
 			}
 
 			for (const state of StateIterator.eachSiblingRealm(outerState)) {
-				const targetHasOneMarkers = this.resolveHasOneRelationMarkers(getEntityMarker(state).fields, fieldName, 'connect')
+				const targetHasOneMarkers = this.resolveHasOneRelationMarkers(getEntityMarker(state).fields, fieldName, 'connect', state === outerState)
 				for (const targetHasOneMarker of targetHasOneMarkers) {
 					const previouslyConnectedState = state.children.get(targetHasOneMarker.placeholderName)
 
@@ -165,7 +165,7 @@ export class EntityOperations {
 			const persistedData = this.treeStore.persistedEntityData.get(outerState.entity.id.uniqueValue)
 
 			for (const state of StateIterator.eachSiblingRealm(outerState)) {
-				const targetHasOneMarkers = this.resolveHasOneRelationMarkers(getEntityMarker(state).fields, fieldName, 'disconnect')
+				const targetHasOneMarkers = this.resolveHasOneRelationMarkers(getEntityMarker(state).fields, fieldName, 'disconnect', state === outerState)
 				for (const targetHasOneMarker of targetHasOneMarkers) {
 					const stateToDisconnect = state.children.get(targetHasOneMarker.placeholderName)
 
@@ -286,10 +286,14 @@ export class EntityOperations {
 		container: EntityFieldMarkersContainer,
 		field: FieldName,
 		type: 'connect' | 'disconnect',
+		mustExists: boolean,
 	): IterableIterator<HasOneRelationMarker> {
 		const placeholders = container.placeholders.get(field)
 
 		if (placeholders === undefined) {
+			if (!mustExists) {
+				return
+			}
 			throw new BindingError(`Cannot ${type} at field '${field}' as it wasn't registered during static render.`)
 		}
 		const normalizedPlaceholders = placeholders instanceof Set ? placeholders : [placeholders]

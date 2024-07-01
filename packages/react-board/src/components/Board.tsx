@@ -11,7 +11,7 @@ import {
 	useEntityList,
 	useEntityListSubTree,
 } from '@contember/react-binding'
-import { boardColumnsAnalyzer, boardItemsAnalyzer } from '../internal/boardAnalyzer'
+import { boardAnalyzer } from '../internal/boardAnalyzer'
 import { Fragment, ReactNode } from 'react'
 import { useDynamicBoard } from '../internal/useDynamicBoard'
 import { useStaticBoard } from '../internal/useStaticBoard'
@@ -95,8 +95,9 @@ const BoardQualifiedDynamic = Component<BoardQualifiedDynamicProps>(({ entities,
 	)
 }, ({ entities, orderBy, limit, offset, columns, discriminationField, sortableBy, columnsSortableBy, children }, env) => {
 
-	const columnChildren = boardColumnsAnalyzer.processChildren(children, env)
-	const itemChildren = boardItemsAnalyzer.processChildren(children, env)
+	const childrenByType = boardAnalyzer.processChildren(children, env)
+	const columnChildren = childrenByType.filter(it => it.type === 'column').map(it => it.children)
+	const itemChildren = childrenByType.filter(it => it.type === 'item').map(it => it.children)
 
 	return (<>
 		<EntityListSubTree entities={entities} orderBy={orderBy} limit={limit} offset={offset}>
@@ -138,8 +139,9 @@ const RelativeDynamicBoard = Component<BoardRelativeDynamicProps>(({ field, orde
 		</BoardMethodsContext.Provider>
 	)
 }, ({ field, orderBy, limit, offset, columns, discriminationField, sortableBy, columnsSortableBy, children }, env) => {
-	const columnChildren = boardColumnsAnalyzer.processChildren(children, env)
-	const itemChildren = boardItemsAnalyzer.processChildren(children, env)
+	const childrenByType = boardAnalyzer.processChildren(children, env)
+	const columnChildren = childrenByType.filter(it => it.type === 'column').map(it => it.children)
+	const itemChildren = childrenByType.filter(it => it.type === 'item').map(it => it.children)
 	return (<>
 		<HasMany field={field} orderBy={orderBy} limit={limit} offset={offset}>
 			<HasOne {...typeof discriminationField === 'string' ? { field: discriminationField } : discriminationField} />
@@ -175,7 +177,8 @@ const BoardQualifiedStatic = Component<BoardQualifiedStaticProps>(({ entities, o
 		</BoardMethodsContext.Provider>
 	)
 }, ({ entities, orderBy, limit, offset, columns, discriminationField, sortableBy, children }, env) => {
-	const itemChildren = boardItemsAnalyzer.processChildren(children, env)
+	const childrenByType = boardAnalyzer.processChildren(children, env)
+	const itemChildren = childrenByType.filter(it => it.type === 'item').map(it => it.children)
 	return (<>
 		<EntityListSubTree entities={entities} orderBy={orderBy} limit={limit} offset={offset}>
 			<Field {...typeof discriminationField === 'string' ? { field: discriminationField } : discriminationField} />
@@ -208,7 +211,8 @@ const RelativeStaticBoard = Component<BoardRelativeStaticProps>(({ field, orderB
 		</BoardMethodsContext.Provider>
 	)
 }, ({ field, orderBy, limit, offset, columns, discriminationField, sortableBy, children }, env) => {
-	const itemChildren = boardItemsAnalyzer.processChildren(children, env)
+	const childrenByType = boardAnalyzer.processChildren(children, env)
+	const itemChildren = childrenByType.filter(it => it.type === 'item').map(it => it.children)
 	return (<>
 		<HasMany field={field} orderBy={orderBy} limit={limit} offset={offset}>
 			<Field {...typeof discriminationField === 'string' ? { field: discriminationField } : discriminationField} />

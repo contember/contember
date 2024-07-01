@@ -8,7 +8,7 @@ export interface EditorEditableCanvasProps extends EditableProps {
 
 }
 
-export const EditorEditableCanvas = ({ className, ...editableProps }: EditorEditableCanvasProps) => {
+export const EditorEditableCanvas = (editableProps: EditorEditableCanvasProps) => {
 	const editor = useSlate()
 	const pathRef = useRef<Path | undefined>(undefined)
 

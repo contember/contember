@@ -11,6 +11,7 @@ export interface useBlockEditorStateResult {
 	onChange: () => void
 	nodes: Descendant[]
 	sortedBlocksRef: MutableRefObject<EntityAccessor[]>
+	sortedBlocks: EntityAccessor[]
 	refreshBlocks: () => void
 }
 
@@ -42,5 +43,5 @@ export const useBlockEditorState = ({ editor, blockList, sortableBy, contentFiel
 	const onChange = useBlockEditorOnChange({ editor, blockList, contentField, blockElementCache, sortedBlocksRef, refreshBlocks })
 	const nodes = useBlockEditorSlateNodes({ editor, blockElementCache, blockElementPathRefs, blockContentField: contentField, topLevelBlocks: sortedBlocks })
 
-	return { onChange, nodes, sortedBlocksRef, refreshBlocks }
+	return { onChange, nodes, sortedBlocksRef, refreshBlocks, sortedBlocks }
 }

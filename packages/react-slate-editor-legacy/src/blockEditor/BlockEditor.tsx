@@ -116,7 +116,7 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 			return createEditor({ defaultElementType: paragraphElementType, plugins, entity, environment, children })
 		})
 
-		const { nodes, onChange, sortedBlocksRef, refreshBlocks } = useBlockEditorState({
+		const { nodes, onChange, sortedBlocksRef, refreshBlocks, sortedBlocks } = useBlockEditorState({
 			editor,
 			blockList: blockListProps,
 			contentField,
@@ -170,7 +170,7 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 				<Repeater {...blockListProps} sortableBy={sortableBy}>
 
 					<ReferencesProvider getReferencedEntity={getReferencedEntity}>
-						<SortedBlocksContext.Provider value={sortedBlocksRef.current}>
+						<SortedBlocksContext.Provider value={sortedBlocks}>
 							<EditorReferenceBlocksContext.Provider value={editorReferenceBlocks}>
 								<Slate editor={editor} initialValue={nodes} onChange={onChange}>
 									<SyncValue nodes={nodes}/>

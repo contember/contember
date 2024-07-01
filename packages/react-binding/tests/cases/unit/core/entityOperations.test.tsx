@@ -1,42 +1,30 @@
 import { describe, expect, it } from 'vitest'
-import { EntitySubTree, Field } from '../../../../src'
-import { createBindingWithEntitySubtree } from './bindingFactory'
+import { EntitySubTree, Field, HasOne } from '../../../../src'
+import { createBinding } from '../../../lib/bindingFactory'
+import { c, createSchema } from '@contember/schema-definition'
+import { convertModelToAdminSchema } from '../../../lib/convertModelToAdminSchema'
+import assert from 'assert'
+
+
+namespace TrackChangesModel {
+	export class Foo {
+		fooField = c.stringColumn()
+	}
+}
 
 describe('entity operations', () => {
 	it('tracks unpersisted changes count', () => {
-		const { entity } = createBindingWithEntitySubtree({
+		const { treeStore } = createBinding({
 			node: (
 				<EntitySubTree entity="Foo(bar = 123)">
 					<Field field={'fooField'} />
 				</EntitySubTree>
 			),
-			schema: {
-				enums: [],
-				entities: [{
-					name: 'Foo',
-					customPrimaryAllowed: false,
-					unique: [],
-					fields: [
-						{
-							__typename: '_Column',
-							name: 'id',
-							nullable: false,
-							defaultValue: null,
-							type: 'Uuid',
-							enumName: null,
-						},
-						{
-						__typename: '_Column',
-						type: 'String',
-						enumName: null,
-						nullable: true,
-						defaultValue: null,
-						name: 'fooField',
-					},
-],
-				}],
-			},
+			schema: convertModelToAdminSchema(createSchema(TrackChangesModel).model),
 		})
+
+		const entity = Array.from(treeStore.subTreeStatesByRoot.get(undefined)!.values())[0]
+		assert(entity.type === 'entityRealm')
 
 		expect(entity.unpersistedChangesCount).eq(0)
 		entity.getAccessor().getField('fooField').updateValue('bar')

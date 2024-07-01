@@ -1,41 +1,28 @@
 import { describe, expect, it } from 'vitest'
 import { EntityAccessor, EntitySubTree, Field } from '../../../../src'
-import { createBindingWithEntitySubtree } from './bindingFactory'
+import { createBinding } from '../../../lib/bindingFactory'
+import { c, createSchema } from '@contember/schema-definition'
+import { convertModelToAdminSchema } from '../../../lib/convertModelToAdminSchema'
+import assert from 'assert'
+
+namespace EventManagerModel {
+	export class Foo {
+		fooField = c.stringColumn()
+	}
+}
 
 const prepareBeforePersistTest = ({ event }: { event: (getAccessor: () => EntityAccessor) => any }) => {
-	return createBindingWithEntitySubtree({
+	const { treeStore, eventManager } = createBinding({
 		node: (
 			<EntitySubTree entity="Foo(bar = 123)" onBeforePersist={event}>
 				<Field field={'fooField'} />
 			</EntitySubTree>
 		),
-		schema: {
-			enums: [],
-			entities: [{
-				name: 'Foo',
-				customPrimaryAllowed: false,
-				unique: [],
-				fields: [
-					{
-						__typename: '_Column',
-						name: 'id',
-						nullable: false,
-						defaultValue: null,
-						type: 'Uuid',
-						enumName: null,
-					},
-					{
-						__typename: '_Column',
-						type: 'String',
-						enumName: null,
-						nullable: true,
-						defaultValue: null,
-						name: 'fooField',
-					},
-				],
-			}],
-		},
+		schema: convertModelToAdminSchema(createSchema(EventManagerModel).model),
 	})
+	const entity = Array.from(treeStore.subTreeStatesByRoot.get(undefined)!.values())[0]
+	assert(entity.type === 'entityRealm')
+	return { entity, eventManager }
 }
 
 describe('event manager', () => {

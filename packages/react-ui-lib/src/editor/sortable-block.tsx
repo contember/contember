@@ -7,8 +7,8 @@ import { DropIndicator } from '../ui/sortable'
 import { Portal } from '@radix-ui/react-portal'
 import { DragOverlay } from '@dnd-kit/core'
 
-export const BlockEditorHandle = uic('button', {
-	baseClass: 'absolute top-1/2 -left-3 h-6 w-6 flex justify-end items-center opacity-10 hover:opacity-100 transition-opacity -translate-y-1/2',
+export const BlockEditorHandle = uic('span', {
+	baseClass: 'absolute top-1/2 -left-3 h-6 w-6 flex justify-end items-center opacity-10 hover:opacity-100 transition-opacity -translate-y-1/2 cursor-grab',
 	beforeChildren: <GripVerticalIcon size={16} />,
 })
 

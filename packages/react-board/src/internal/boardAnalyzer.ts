@@ -4,24 +4,14 @@ import { BoardItem } from '../components/BoardItem'
 import { ReactNode } from 'react'
 import { BoardColumn } from '../components/BoardColumn'
 
-const itemLeaf = new Leaf(node => node.props.children, BoardItem)
-const columnLeaf = new Leaf(node => node.props.children, BoardColumn)
+const itemLeaf = new Leaf(node => ({ type: 'item' as const, children: node.props.children }), BoardItem)
+const columnLeaf = new Leaf(node => ({ type: 'column' as const, children: node.props.children }), BoardColumn)
 
-
-export const boardColumnsAnalyzer = new ChildrenAnalyzer<
-	ReactNode,
+export const boardAnalyzer = new ChildrenAnalyzer<
+	{ type: 'column' | 'item', children: ReactNode },
 	never,
 	Environment
->([columnLeaf], {
-	staticRenderFactoryName: 'staticRender',
-	staticContextFactoryName: 'generateEnvironment',
-})
-
-export const boardItemsAnalyzer = new ChildrenAnalyzer<
-	ReactNode,
-	never,
-	Environment
->([itemLeaf], {
+>([itemLeaf, columnLeaf], {
 	staticRenderFactoryName: 'staticRender',
 	staticContextFactoryName: 'generateEnvironment',
 })

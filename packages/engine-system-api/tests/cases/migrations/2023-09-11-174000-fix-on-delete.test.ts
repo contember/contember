@@ -30,12 +30,23 @@ test('table-on-delete test', async () => {
 				deferred: false,
 			}],
 		})),
-		schemaResolver: () => Promise.resolve(({ ...emptySchema, model: new SchemaBuilder()
-			.entity('Post', entity =>
-				entity.manyHasOne('author', relation => relation.target('Author').onDelete(Model.OnDelete.setNull)),
-			)
-			.entity('Author', entity => entity)
-			.buildSchema() })),
+		schemaResolver: () => Promise.resolve(({
+			schema: {
+				...emptySchema,
+				model: new SchemaBuilder()
+					.entity('Post', entity =>
+						entity.manyHasOne('author', relation => relation.target('Author').onDelete(Model.OnDelete.setNull)),
+					)
+					.entity('Author', entity => entity)
+					.buildSchema(),
+			},
+			meta: {
+				id: 1,
+				version: '2024-06-28-153001',
+				checksum: '_checksum_',
+				updatedAt: new Date(),
+			},
+		})),
 		project: {
 			slug: 'test',
 			systemSchema: 'system',
@@ -82,12 +93,21 @@ test('table-on-delete test valid', async () => {
 			}],
 		})),
 		schemaResolver: () => Promise.resolve(({
-			...emptySchema, model: new SchemaBuilder()
-				.entity('Post', entity =>
-					entity.manyHasOne('author', relation => relation.target('Author').onDelete(Model.OnDelete.setNull)),
-				)
-				.entity('Author', entity => entity)
-				.buildSchema(),
+			schema: {
+				...emptySchema,
+				model: new SchemaBuilder()
+					.entity('Post', entity =>
+						entity.manyHasOne('author', relation => relation.target('Author').onDelete(Model.OnDelete.setNull)),
+					)
+					.entity('Author', entity => entity)
+					.buildSchema(),
+			},
+			meta: {
+				id: 1,
+				version: '2024-06-28-153001',
+				checksum: '_checksum_',
+				updatedAt: new Date(),
+			},
 		})),
 		project: {
 			slug: 'test',

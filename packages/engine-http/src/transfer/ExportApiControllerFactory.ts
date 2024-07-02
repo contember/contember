@@ -6,6 +6,7 @@ import { ExportExecutor, ExportRequest } from './ExportExecutor'
 import { ParseError } from '@contember/typesafe'
 import { ProjectGroupResolver } from '../projectGroup/ProjectGroupResolver'
 import { ProjectContainer } from '../project'
+import { emptySchema } from '@contember/schema-utils'
 
 export class ExportApiControllerFactory {
 	constructor(
@@ -45,7 +46,8 @@ export class ExportApiControllerFactory {
 				}
 
 				const systemContext = projectContainer.systemReadDatabaseContext
-				const schema = await projectContainer.contentSchemaResolver.getSchema(systemContext, project.slug)
+				const schemaWithMeta = await projectContainer.contentSchemaResolver.getSchema(systemContext, project.slug)
+				const schema = schemaWithMeta?.schema ?? emptySchema
 				const { effective: memberships } = await timer('MembershipFetch', () => projectGroup.projectMembershipResolver.resolveMemberships({
 					request: { get: () => '' },
 					acl: schema.acl,

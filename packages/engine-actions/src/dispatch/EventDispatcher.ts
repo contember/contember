@@ -29,7 +29,7 @@ export class EventDispatcher {
 	}
 
 	async processBatch({ db, contentSchemaResolver, logger }: ProcessBatchArgs): Promise<ProcessBatchResult> {
-		const schema = await contentSchemaResolver.getSchema(db)
+		const schema = (await contentSchemaResolver.getSchema(db)).schema
 		const batch = await this.eventsRepository.fetchBatch(schema.actions, db.client)
 		const batchId = Math.random().toString().substring(2)
 		const batchLogger = logger.child({ loc: 'Actions.EventDispatcher', batchId })

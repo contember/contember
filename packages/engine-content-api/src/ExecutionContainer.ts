@@ -43,7 +43,8 @@ import {
 } from './input-validation'
 
 export type ExecutionContainerArgs = {
-	schema: Schema & { id: number }
+	schema: Schema
+	schemaMeta: { id?: number }
 	schemaDatabaseMetadata: DatabaseMetadata
 	db: Client
 	identityId: string
@@ -76,7 +77,7 @@ export class ExecutionContainerFactory {
 		return this.hooks.reduce((acc, cb) => cb(acc), builder)
 	}
 
-	createBuilderInternal({ permissions, identityVariables, identityId, db, schema, systemSchema, stage, project, schemaDatabaseMetadata }: ExecutionContainerArgs) {
+	createBuilderInternal({ permissions, identityVariables, identityId, db, schema, schemaMeta, systemSchema, stage, project, schemaDatabaseMetadata }: ExecutionContainerArgs) {
 		return new Builder({})
 			.addService('systemSchema', () =>
 				systemSchema)
@@ -88,6 +89,8 @@ export class ExecutionContainerFactory {
 				stage)
 			.addService('schema', () =>
 				schema)
+			.addService('schemaMeta', () =>
+				schemaMeta)
 			.addService('schemaDatabaseMetadata', () =>
 				schemaDatabaseMetadata)
 			.addService('providers', () =>

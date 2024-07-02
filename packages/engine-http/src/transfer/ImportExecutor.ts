@@ -106,13 +106,13 @@ export class ImportExecutor {
 
 		const contentSchema = await projectContainer.contentSchemaResolver.getSchema(systemDatabaseContext, stage.slug)
 
-		if (contentSchema.version !== options.schemaVersion) {
-			throw new ImportError(`Incompatible schema version (import version ${options.schemaVersion} does not match server version ${contentSchema.version})`)
+		if (contentSchema.meta.version !== options.schemaVersion) {
+			throw new ImportError(`Incompatible schema version (import version ${options.schemaVersion} does not match server version ${contentSchema.meta.version})`)
 		}
 
-		await this.requireImportAccess(groupContainer, contentSchema, authResult, options.project, 'content')
+		await this.requireImportAccess(groupContainer, contentSchema.schema, authResult, options.project, 'content')
 		const contentDatabaseClient = projectContainer.connection.createClient(stage.schema, {})
-		const mapping = this.contentSchemaTransferMappingFactory.createContentSchemaMapping(contentSchema)
+		const mapping = this.contentSchemaTransferMappingFactory.createContentSchemaMapping(contentSchema.schema)
 
 		return await contentDatabaseClient.transaction(async db => {
 			await this.disableTriggers(db, options.tables)

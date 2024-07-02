@@ -16,7 +16,6 @@ import {
 	PermissionsFactory,
 	ProjectMigrator,
 	ProjectTruncateExecutor,
-	SchemaVersionBuilder,
 } from './model'
 import { UuidProvider } from './utils'
 import {
@@ -31,12 +30,13 @@ import {
 } from './resolvers'
 import { EventOldValuesResolver } from './resolvers/types'
 import { DatabaseMetadataResolver } from '@contember/database'
+import { SchemaProvider } from './model'
 
 export interface SystemContainer {
 	systemResolversFactory: ResolverFactory
 	authorizator: Authorizator
 	resolverContextFactory: SystemResolverContextFactory
-	schemaVersionBuilder: SchemaVersionBuilder
+	schemaProvider: SchemaProvider
 }
 
 type Args = {
@@ -58,7 +58,7 @@ export class SystemContainerFactory {
 				'systemResolversFactory',
 				'authorizator',
 				'resolverContextFactory',
-				'schemaVersionBuilder',
+				'schemaProvider',
 			)
 	}
 	public createBuilder({ identityFetcher }: Args) {
@@ -73,8 +73,8 @@ export class SystemContainerFactory {
 				new SchemaMigrator(modificationHandlerFactory))
 			.addService('executedMigrationsResolver', ({}) =>
 				new ExecutedMigrationsResolver())
-			.addService('schemaVersionBuilder', ({ executedMigrationsResolver, schemaMigrator }) =>
-				new SchemaVersionBuilder(executedMigrationsResolver, schemaMigrator))
+			.addService('schemaProvider', ({ executedMigrationsResolver, schemaMigrator }) =>
+				new SchemaProvider(executedMigrationsResolver, schemaMigrator))
 			.addService('accessEvaluator', ({}) =>
 				new AccessEvaluator.PermissionEvaluator(new PermissionsFactory().create()))
 			.addService('authorizator', ({ accessEvaluator }): Authorizator =>
@@ -87,12 +87,12 @@ export class SystemContainerFactory {
 				new DatabaseMetadataResolver())
 			.addService('migrationsDatabaseMetadataResolverStoreFactory', ({ databaseMetadataResolver }) =>
 				new MigrationsDatabaseMetadataResolverStoreFactory(databaseMetadataResolver))
-			.addService('projectMigrator', ({ migrationDescriber, schemaVersionBuilder, executedMigrationsResolver, migrationsDatabaseMetadataResolverStoreFactory }) =>
-				new ProjectMigrator(migrationDescriber, schemaVersionBuilder, executedMigrationsResolver, migrationsDatabaseMetadataResolverStoreFactory, this.contentQueryExecutor))
+			.addService('projectMigrator', ({ migrationDescriber, schemaProvider, executedMigrationsResolver, migrationsDatabaseMetadataResolverStoreFactory }) =>
+				new ProjectMigrator(migrationDescriber, schemaProvider, executedMigrationsResolver, migrationsDatabaseMetadataResolverStoreFactory, this.contentQueryExecutor))
 			.addService('projectTruncateExecutor', () =>
 				new ProjectTruncateExecutor())
-			.addService('migrationAlterer', () =>
-				new MigrationAlterer())
+			.addService('migrationAlterer', ({ schemaProvider }) =>
+				new MigrationAlterer(schemaProvider))
 			.addService('eventResponseBuilder', ({ identityFetcher }) =>
 				new EventResponseBuilder(identityFetcher))
 			.addService('stagesQueryResolver', () =>

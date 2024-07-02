@@ -1,6 +1,6 @@
 import { SystemMigrationsRunner } from '../migrations'
-import { DatabaseContextFactory, emptyVersionedSchema, SchemaVersionBuilder } from '../model'
-import { Connection, DatabaseMetadataResolver, emptyDatabaseMetadata } from '@contember/database'
+import { DatabaseContextFactory, emptyVersionedSchema, SchemaProvider } from '../model'
+import { DatabaseMetadataResolver, emptyDatabaseMetadata } from '@contember/database'
 import { createLogger, PrettyPrintLoggerHandler } from '@contember/logger'
 
 
@@ -20,8 +20,8 @@ import { createLogger, PrettyPrintLoggerHandler } from '@contember/logger'
 		}),
 		{ db: dbConfig, slug: 'test', stages: [], systemSchema: 'system' },
 		{
-			buildSchema: () => Promise.resolve(emptyVersionedSchema),
-		} as unknown as SchemaVersionBuilder,
+			buildSchemaFromMigrations: () => Promise.resolve(emptyVersionedSchema),
+		} as unknown as SchemaProvider,
 		{},
 		{
 			resolveMetadata: () => Promise.resolve(emptyDatabaseMetadata),

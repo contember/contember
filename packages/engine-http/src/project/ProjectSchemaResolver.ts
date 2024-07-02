@@ -7,13 +7,13 @@ export class ProjectSchemaResolver implements ProjectSchemaResolverInterface {
 		private readonly projectContainerResolver: ProjectContainerResolver,
 	) {}
 
-	async getSchema(slug: string) {
+	async getSchema(slug: string): Promise<Schema | undefined> {
 		const container = await this.projectContainerResolver.getProjectContainer(slug)
 		if (!container) {
 			return undefined
 		}
 		const db = container.systemReadDatabaseContext
-		return container.contentSchemaResolver.getSchema(db)
+		return (await container.contentSchemaResolver.getSchema(db))?.schema
 	}
 }
 
@@ -24,7 +24,7 @@ export class ProjectSchemaResolverProxy implements ProjectSchemaResolverInterfac
 		this.resolver = resolver
 	}
 
-	getSchema(projectSlug: string): Promise<Schema | undefined> {
+	async getSchema(projectSlug: string): Promise<Schema | undefined> {
 		if (!this.resolver) {
 			throw new Error('Resolved is not set')
 		}

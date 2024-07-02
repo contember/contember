@@ -1,7 +1,7 @@
 import { Component, Environment } from '@contember/interface'
 import { Table, TableBody, TableHeader, TableRow } from '../ui/table'
 import * as React from 'react'
-import { Fragment, ReactNode, useState } from 'react'
+import { Fragment, ReactNode, useMemo } from 'react'
 import { DataViewEachRow, DataViewLayout } from '@contember/react-dataview'
 import { SheetIcon } from 'lucide-react'
 import { dict } from '../dict'
@@ -28,7 +28,7 @@ export const DataGridTable = Component<DataViewTableProps>(({ children }) => {
 })
 
 const DataGridTableRenderer = Component< DataViewTableProps>(({ children }, env) => {
-	const [columns] = useState(() => datagridColumnsAnalyzer.processChildren(children, env))
+	const columns = useMemo(() => datagridColumnsAnalyzer.processChildren(children, env), [children, env])
 	return (
 		<Table>
 			<TableHeader>

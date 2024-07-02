@@ -9,6 +9,7 @@
 import { Active } from '@dnd-kit/core';
 import { ClientRect as ClientRect_2 } from '@dnd-kit/core';
 import { Context } from 'react';
+import { DndContextProps } from '@dnd-kit/core';
 import { DraggableAttributes } from '@dnd-kit/core';
 import { EntityAccessor } from '@contember/react-binding';
 import { JSX as JSX_2 } from 'react/jsx-runtime';
@@ -25,9 +26,9 @@ import { UniqueIdentifier } from '@dnd-kit/core';
 export const RepeaterActiveEntityContext: Context<EntityAccessor | undefined>;
 
 // @public (undocumented)
-export const RepeaterSortable: ({ children }: {
+export const RepeaterSortable: ({ children, onDragStart, onDragEnd: onDragEndIn, onDragCancel: onDragCancelIn, ...props }: {
     children: ReactNode;
-}) => JSX_2.Element;
+} & DndContextProps) => JSX_2.Element;
 
 // @public (undocumented)
 export const RepeaterSortableDragOverlay: ({ children }: {

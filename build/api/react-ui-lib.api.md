@@ -1240,7 +1240,7 @@ export interface EditorCanvasProps<P extends HTMLTextAreaDivTargetProps> {
 }
 
 // @public (undocumented)
-export const EditorEditableCanvas: ({ className, ...editableProps }: EditorEditableCanvasProps) => JSX_2.Element;
+export const EditorEditableCanvas: (editableProps: EditorEditableCanvasProps) => JSX_2.Element;
 
 // Warning: (ae-forgotten-export) The symbol "EditableProps" needs to be exported by the entry point index.d.ts
 //

@@ -1,24 +1,13 @@
 import React, { ReactNode, useCallback, useMemo, useState } from 'react'
-import {
-	closestCenter,
-	DndContext,
-	DragEndEvent,
-	KeyboardSensor,
-	MeasuringStrategy,
-	MouseSensor,
-	TouchSensor,
-	UniqueIdentifier,
-	useSensor,
-	useSensors,
-} from '@dnd-kit/core'
+import type { DragStartEvent } from '@dnd-kit/core'
+import { closestCenter, DndContext, DndContextProps, DragCancelEvent, DragEndEvent, KeyboardSensor, MeasuringStrategy, MouseSensor, TouchSensor, UniqueIdentifier, useSensor, useSensors } from '@dnd-kit/core'
 import { RepeaterActiveEntityContext } from '../contexts'
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
-import { useRepeaterSortedEntities } from '@contember/react-repeater'
-import { useRepeaterMethods } from '@contember/react-repeater'
+import { useRepeaterMethods, useRepeaterSortedEntities } from '@contember/react-repeater'
 
-export const RepeaterSortable = ({ children }: {
+export const RepeaterSortable = ({ children, onDragStart, onDragEnd: onDragEndIn, onDragCancel: onDragCancelIn, ...props }: {
 	children: ReactNode
-}) => {
+} & DndContextProps) => {
 	const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null)
 	const { moveItem } = useRepeaterMethods()
 	const entities = useRepeaterSortedEntities()
@@ -37,19 +26,22 @@ export const RepeaterSortable = ({ children }: {
 		useSensor(KeyboardSensor),
 	)
 
-	const onDragCancel = () => {
+	const onDragCancel = (event: DragCancelEvent) => {
+		onDragCancelIn?.(event)
 		setActiveId(null)
 	}
 
-	const onDragEnd = useCallback(({ active, over }: DragEndEvent) => {
+	const onDragEnd = useCallback((event: DragEndEvent) => {
+		onDragEndIn?.(event)
 		setActiveId(null)
+		const { active, over } = event
 		const activeEntity = entities.find(it => it.id === active.id)
 		const overIndex = over ? entities.findIndex(it => it.id === over.id) : undefined
 		if (!activeEntity || overIndex === undefined) {
 			return
 		}
 		moveItem?.(activeEntity, overIndex)
-	}, [entities, moveItem])
+	}, [entities, moveItem, onDragEndIn])
 
 	return (
 		<DndContext
@@ -59,12 +51,14 @@ export const RepeaterSortable = ({ children }: {
 					strategy: MeasuringStrategy.Always,
 				},
 			}}
-			onDragStart={({ active }) => {
-				setActiveId(active.id)
+			collisionDetection={closestCenter}
+			{...props}
+			onDragStart={(event: DragStartEvent) => {
+				onDragStart?.(event)
+				setActiveId(event.active.id)
 			}}
 			onDragEnd={onDragEnd}
 			onDragCancel={onDragCancel}
-			collisionDetection={closestCenter}
 		>
 			<RepeaterActiveEntityContext.Provider value={activeItem}>
 				<SortableContext items={entities} strategy={verticalListSortingStrategy}>

@@ -47,8 +47,12 @@ const IfCallback = Component<IfCallbackProps>(
 
 		return <>{evaluated ? (children ?? then) : elseIn}</>
 	},
-	({ children }) => {
-		return <>{children}</>
+	({ children, then, else: elseIn }) => {
+		return <>
+			{children}
+			{then}
+			{elseIn}
+		</>
 	},
 	'IfCallback',
 )
@@ -65,7 +69,7 @@ const IfFilter = Component<IfFilterProps>(
 		)
 		return <>{evaluated ? (children ?? then) : elseIn}</>
 	},
-	({ children, condition }, env) => {
+	({ children, condition, then, else: elseIn }, env) => {
 		const desugaredFilter = QueryLanguage.desugarFilter(condition, env)
 		const collectedFields = new FilterFieldsCollector(env.getSchema(), desugaredFilter).collectFields(env.getSubTreeNode().entity)
 		const additionalFields = <>{Array.from(collectedFields).map(it => <Field field={it} key={it} />)}</>
@@ -73,6 +77,8 @@ const IfFilter = Component<IfFilterProps>(
 		return <>
 			{additionalFields}
 			{children}
+			{then}
+			{elseIn}
 		</>
 	},
 	'IfFilter',

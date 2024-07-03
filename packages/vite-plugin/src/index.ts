@@ -38,7 +38,7 @@ export function contember(options?: ContemberOptions): Plugin {
 		},
 		configureServer(serve) {
 			if (!options?.disableMiddleware) {
-				return () => serve.middlewares.use((req, res, next) => {
+				serve.middlewares.use((req, res, next) => {
 					if (req.url === appPath || req.url?.startsWith(`${appPath}/`) && !req.url?.match(/\.\w+($|\?)/)) {
 						req.url = `${appPath}/`
 					}

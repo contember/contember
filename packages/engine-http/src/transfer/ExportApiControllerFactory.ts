@@ -46,7 +46,7 @@ export class ExportApiControllerFactory {
 				}
 
 				const systemContext = projectContainer.systemReadDatabaseContext
-				const schemaWithMeta = await projectContainer.contentSchemaResolver.getSchema(systemContext, project.slug)
+				const schemaWithMeta = await projectContainer.contentSchemaResolver.getSchema({ db: systemContext, normalize: true })
 				const schema = schemaWithMeta?.schema ?? emptySchema
 				const { effective: memberships } = await timer('MembershipFetch', () => projectGroup.projectMembershipResolver.resolveMemberships({
 					request: { get: () => '' },

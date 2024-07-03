@@ -14,6 +14,6 @@ export class SchemaQueryResolver implements QueryResolver<'schema'> {
 		for (const stage of stages) {
 			await context.requireAccess(AuthorizationActions.PROJECT_SHOW_SCHEMA, stage.slug)
 		}
-		return context.schema
+		return context.getSchema()
 	}
 }

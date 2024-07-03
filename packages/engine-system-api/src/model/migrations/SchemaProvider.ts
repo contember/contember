@@ -63,14 +63,15 @@ export class SchemaProvider {
 		}
 	}
 
-	public async fetch(db: DatabaseContext, currentSchema: SchemaWithMeta | null): Promise<SchemaWithMeta> {
+	public async fetch({ db, currentSchema  }: {
+		db: DatabaseContext
+		currentSchema?: SchemaWithMeta | null
+	}): Promise<SchemaWithMeta> {
 		const newSchema = await db.queryHandler.fetch(new SchemaQuery(currentSchema?.meta.checksum))
 		if (!newSchema) {
 			return currentSchema ?? emptyVersionedSchema
 		}
-		return {
-			...newSchema,
-			schema: normalizeSchema(newSchema.schema),
-		}
+
+		return newSchema
 	}
 }

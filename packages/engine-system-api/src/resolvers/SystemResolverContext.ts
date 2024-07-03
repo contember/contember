@@ -1,31 +1,26 @@
 import { Authorizator } from '@contember/authorization'
-import { Schema } from '@contember/schema'
 import { ForbiddenError } from '@contember/graphql-utils'
 import { DatabaseContext, Identity } from '../model'
 import { ProjectConfig } from '../types'
 import { StagePermissionsFactory } from '../model/authorization/StagePermissionsFactory'
 import { StageScope } from '../model/authorization/StageScope'
 import { ItemLoader } from '../utils/batchQuery'
+import { SchemaGetter } from '../model/SchemaGetter'
 
 export class SystemResolverContextFactory {
 	constructor(
 		private readonly authorizator: Authorizator<Identity>,
 	) {}
 
-	public async create(
-		schema: Schema,
-		systemDbContext: DatabaseContext,
-		project: ProjectConfig,
-		identity: Identity,
-	): Promise<SystemResolverContext> {
-		const stagePermissionsFactory = new StagePermissionsFactory(schema)
+	public async create({ getSchema, identity, project, db }: Pick<SystemResolverContext, 'getSchema' | 'db' | 'identity' | 'project'>): Promise<SystemResolverContext> {
+		const stagePermissionsFactory = new StagePermissionsFactory(getSchema)
 		const loaders = new Map<LoaderFactory<any, any>, ItemLoader<any, any>>()
 		return {
 			project,
 			identity,
-			schema,
+			getSchema,
 			authorizator: this.authorizator,
-			db: systemDbContext,
+			db,
 			requireAccess: async (action, stage, message?) => {
 				if (!(await this.authorizator.isAllowed(identity, new StageScope(stage, stagePermissionsFactory), action))) {
 					throw new ForbiddenError(message || 'Forbidden')
@@ -36,7 +31,7 @@ export class SystemResolverContextFactory {
 				if (loader) {
 					return loader
 				}
-				const newLoader = loaderFactory(systemDbContext)
+				const newLoader = loaderFactory(db)
 				loaders.set(loaderFactory, newLoader)
 				return newLoader
 			},
@@ -48,7 +43,7 @@ export type LoaderFactory<Args, Item> = (db: DatabaseContext) => ItemLoader<Args
 
 export interface SystemResolverContext {
 	readonly project: ProjectConfig
-	readonly schema: Schema
+	readonly getSchema: SchemaGetter
 	readonly identity: Identity
 	readonly db: DatabaseContext
 	readonly authorizator: Authorizator<Identity>

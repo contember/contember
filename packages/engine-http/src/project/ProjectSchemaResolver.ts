@@ -13,7 +13,7 @@ export class ProjectSchemaResolver implements ProjectSchemaResolverInterface {
 			return undefined
 		}
 		const db = container.systemReadDatabaseContext
-		return (await container.contentSchemaResolver.getSchema(db))?.schema
+		return (await container.contentSchemaResolver.getSchema({ db, normalize: true }))?.schema
 	}
 }
 

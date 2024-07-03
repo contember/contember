@@ -3,7 +3,6 @@ import { SystemGraphQLContext } from './SystemGraphQLHandlerFactory'
 import { AuthResult } from '../common'
 import { Acl } from '@contember/schema'
 import { ProjectContainer } from '../project'
-import { emptySchema } from '@contember/schema-utils'
 
 export class SystemGraphQLContextFactory {
 	public async create({ authResult, memberships,  projectContainer, systemContainer, onClearCache }: {
@@ -18,14 +17,15 @@ export class SystemGraphQLContextFactory {
 			memberships.map(it => it.role),
 		)
 
-		const dbContext = projectContainer.systemDatabaseContext
-		const schema = await projectContainer.contentSchemaResolver.getSchema(dbContext)
-		const systemContext = await systemContainer.resolverContextFactory.create(
-			schema?.schema ?? emptySchema,
-			dbContext,
-			{ ...projectContainer.project, systemSchema: dbContext.client.schema },
+		const db = projectContainer.systemDatabaseContext
+		const systemContext = await systemContainer.resolverContextFactory.create({
+			db,
 			identity,
-		)
+			project: { ...projectContainer.project, systemSchema: db.client.schema },
+			getSchema: async options => {
+				 return (await projectContainer.contentSchemaResolver.getSchema({ db, ...options })).schema
+			},
+		})
 		return {
 			...systemContext,
 			onClearCache,

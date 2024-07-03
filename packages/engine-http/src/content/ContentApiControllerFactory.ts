@@ -48,7 +48,7 @@ export class ContentApiControllerFactory {
 				return new HttpResponse(304)
 			}
 
-			const schemaWithMeta = await projectContainer.contentSchemaResolver.getSchema(systemDatabase, stage.slug)
+			const schemaWithMeta = await projectContainer.contentSchemaResolver.getSchema({ db: systemDatabase, stage: stage.slug, normalize: true })
 			const schema = schemaWithMeta.schema
 			const { effective: memberships, fetched: fetchedMemberships } = await timer(
 				'MembershipFetch',

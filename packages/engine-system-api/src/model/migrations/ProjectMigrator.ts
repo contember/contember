@@ -38,7 +38,7 @@ export class ProjectMigrator {
 		if (migrationsToExecute.length === 0) {
 			return
 		}
-		const schemaWithMeta  = await this.schemaProvider.fetch(db, null)
+		const schemaWithMeta = await this.schemaProvider.fetch({ db })
 		let schema = schemaWithMeta.schema
 		let id = schemaWithMeta.meta.id
 

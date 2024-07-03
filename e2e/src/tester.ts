@@ -82,8 +82,8 @@ const createProject = async (slug: string) => {
 		.expect(200)
 }
 
-const executeMigrations = async (projectSlug: string, modifications: Migration.Modification[]) => {
-	const [version, fullName] = MigrationVersionHelper.createVersion('test')
+const executeMigrations = async (projectSlug: string, modifications: Migration.Modification[], fullName: string = '2024-07-01-120000-init') => {
+	const version = MigrationVersionHelper.extractVersion(fullName)
 	await executeGraphql(
 		'/system/' + projectSlug,
 		gql`
@@ -128,6 +128,9 @@ export const createTester = async (schema: Schema) => {
 		return executeGraphql(options.path ?? '/content/' + projectSlug + '/live', query, options)
 	}
 	queryCb.projectSlug = projectSlug
+	queryCb.migrate = async (modifications: Migration.Modification[], fullName: string) => {
+		await executeMigrations(projectSlug, modifications, fullName)
+	}
 	return queryCb
 }
 

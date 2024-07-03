@@ -1197,6 +1197,7 @@ __metadata:
   resolution: "@contember/graphql-client-system@workspace:packages/graphql-client-system"
   dependencies:
     "@contember/engine-system-api": "workspace:*"
+    "@contember/schema": "workspace:*"
     "@graphql-tools/schema": ^10.0.0
     "@types/node": ^20.9.0
     graphql: ^16.8.1

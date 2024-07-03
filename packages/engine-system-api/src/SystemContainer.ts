@@ -31,6 +31,7 @@ import {
 import { EventOldValuesResolver } from './resolvers/types'
 import { DatabaseMetadataResolver } from '@contember/database'
 import { SchemaProvider } from './model'
+import { SchemaQueryResolver } from './resolvers/query/SchemaQueryResolver'
 
 export interface SystemContainer {
 	systemResolversFactory: ResolverFactory
@@ -109,8 +110,10 @@ export class SystemContainerFactory {
 				new EventsQueryResolver(eventResponseBuilder))
 			.addService('eventOldValuesResolver', () =>
 				new EventOldValuesResolver())
-			.addService('systemResolversFactory', ({ stagesQueryResolver, executedMigrationsQueryResolver, migrateMutationResolver, truncateMutationResolver, migrationAlterMutationResolver, eventsQueryResolver, eventOldValuesResolver }) =>
-				new ResolverFactory(stagesQueryResolver, executedMigrationsQueryResolver, migrateMutationResolver, truncateMutationResolver, migrationAlterMutationResolver, eventsQueryResolver, eventOldValuesResolver))
+			.addService('schemaQueryResolver', () =>
+				new SchemaQueryResolver())
+			.addService('systemResolversFactory', ({ stagesQueryResolver, executedMigrationsQueryResolver, migrateMutationResolver, truncateMutationResolver, migrationAlterMutationResolver, eventsQueryResolver, eventOldValuesResolver, schemaQueryResolver }) =>
+				new ResolverFactory(stagesQueryResolver, executedMigrationsQueryResolver, migrateMutationResolver, truncateMutationResolver, migrationAlterMutationResolver, eventsQueryResolver, eventOldValuesResolver, schemaQueryResolver))
 			.addService('resolverContextFactory', ({ authorizator }) =>
 				new SystemResolverContextFactory(authorizator))
 	}

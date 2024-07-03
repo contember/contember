@@ -14,7 +14,21 @@ services:
     volumes:
       - .:/src:cached
 
-
+  test-e2e:
+    image: node:20-alpine
+    working_dir: /src
+    volumes:
+      - .:/src:cached
+    deploy:
+      replicas: 0
+    environment:
+      NODE_ENV: development
+      CONTEMBER_API_URL: 'http://engine:4000'
+      CONTEMBER_ROOT_TOKEN: '0000000000000000000000000000000000000000'
+      CONTEMBER_LOGIN_TOKEN: '1111111111111111111111111111111111111111'
+    command:
+      - yarn
+      - test:e2e
   engine:
     image: oven/bun:canary
     working_dir: /src

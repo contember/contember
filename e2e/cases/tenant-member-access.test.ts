@@ -29,7 +29,14 @@ test('Tenant API: sign up, add to a project and check project access', async () 
 		{ authorizationToken: authKey },
 	)
 		.expect(404)
-		.expect({ errors: [{ message: `Project ${tester.projectSlug} NOT found`, code: 404 }] })
+		.expect({
+			errors: [{
+				message:
+				process.env.NODE_ENV === 'development' ?
+					`You are not allowed to access project ${tester.projectSlug}`
+					: `Project ${tester.projectSlug} NOT found`, code: 404,
+			}],
+		})
 
 
 	await addProjectMember(identityId, tester.projectSlug)

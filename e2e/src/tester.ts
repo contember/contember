@@ -28,13 +28,25 @@ export const executeGraphql = (
 	query: string,
 	options: { authorizationToken?: string; variables?: Record<string, any> },
 ) => {
-	return supertest(apiUrl)
+	const result = supertest(apiUrl)
 		.post(path)
 		.set('Authorization', 'Bearer ' + (options.authorizationToken || rootToken))
 		.send({
 			query,
 			variables: options.variables || {},
 		})
+	result.on('error', e => {
+		// eslint-disable-next-line no-console
+		// console.error(e)
+	})
+	result.on('response', e => {
+		if ('extensions' in e.body) {
+			const { extensions, ...rest } = e.body
+			e.body = rest
+		}
+	})
+
+	return result
 }
 
 

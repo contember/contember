@@ -43,6 +43,9 @@ export class ProjectMigrator {
 		let id = schemaWithMeta.meta.id
 
 		const validated = await this.validateMigrations(db, schema, schemaWithMeta.meta.version ?? null, migrationsToExecute, { ignoreOrder, skipExecuted })
+		if (validated.length === 0) {
+			return
+		}
 
 		const sorted = [...validated].sort((a, b) => a.version.localeCompare(b.version))
 

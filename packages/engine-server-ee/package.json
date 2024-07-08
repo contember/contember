@@ -1,7 +1,7 @@
 {
   "name": "@contember/engine-server-ee",
   "version": "1.4.0-rc.4",
-  "license": "proprietary",
+  "license": "Apache-2.0",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
   "exports": {

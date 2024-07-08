@@ -21,7 +21,6 @@ We're glad you're interested in contributing. Here's a guide to help you get sta
 - To run the engine locally, simply run `docker-compose up api`.
 
 ## Making Contributions:
-- Contributions are welcome to all open-source parts of Contember, except for the `/ee/` folder.
 - Create a new branch for your changes (e.g. `git checkout -b my-changes`)
 - Make your changes and be sure all tests and lints are passing.
 - Commit your changes with a meaningful message, we try to follow "Conventional Commits" (e.g. `git commit -m "fix(content-api): handle null in orderBy"`). Check the git log, if you are not sure.

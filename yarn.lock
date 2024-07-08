@@ -850,9 +850,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@contember/engine-actions@workspace:*, @contember/engine-actions@workspace:ee/engine-actions":
+"@contember/engine-actions@workspace:*, @contember/engine-actions@workspace:packages/engine-actions":
   version: 0.0.0-use.local
-  resolution: "@contember/engine-actions@workspace:ee/engine-actions"
+  resolution: "@contember/engine-actions@workspace:packages/engine-actions"
   dependencies:
     "@contember/authorization": "workspace:*"
     "@contember/database": "workspace:*"
@@ -1030,9 +1030,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@contember/engine-server-ee@workspace:ee/engine-server-ee":
+"@contember/engine-server-ee@workspace:packages/engine-server-ee":
   version: 0.0.0-use.local
-  resolution: "@contember/engine-server-ee@workspace:ee/engine-server-ee"
+  resolution: "@contember/engine-server-ee@workspace:packages/engine-server-ee"
   dependencies:
     "@contember/database": "workspace:*"
     "@contember/engine-actions": "workspace:*"

@@ -87,7 +87,7 @@ services:
       - tsx
       - watch
       - "--conditions=typescript"
-      - ./ee/engine-server-ee/src/start.ts
+      - ./packages/engine-server-ee/src/start.ts
   mailhog:
     image: mailhog/mailhog
 

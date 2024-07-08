@@ -13,6 +13,7 @@ const packages = [
 	'database-migrations',
 	'database-tester',
 	'dic',
+	'engine-actions',
 	'engine-api-tester',
 	'engine-common',
 	'engine-content-api',
@@ -20,6 +21,7 @@ const packages = [
 	'engine-plugins',
 	'engine-s3-plugin',
 	'engine-server',
+	'engine-server-ee',
 	'engine-system-api',
 	'engine-tenant-api',
 	'engine-vimeo-plugin',
@@ -30,10 +32,6 @@ const packages = [
 	'schema-migrations',
 	'schema-utils',
 ]
-const eePackages = [
-	'engine-actions',
-	'engine-server-ee',
-]
 export  const createViteConfig = () => defineConfig({
 	esbuild: {
 		target: 'ES2019',
@@ -43,9 +41,6 @@ export  const createViteConfig = () => defineConfig({
 		alias: {
 			...Object.fromEntries(packages.map(packageName =>
 				([`@contember/${packageName}`, join(rootDirectory, 'packages/' + packageName + '/src')])),
-			),
-			...Object.fromEntries(eePackages.map(packageName =>
-				([`@contember/${packageName}`, join(rootDirectory, 'ee/' + packageName + '/src')])),
 			),
 			'graphql-tag': join(rootDirectory, 'node_modules/graphql-tag/lib/index.js'),
 			'graphql/execution/values': join(rootDirectory, 'node_modules/graphql/execution/values.js'),

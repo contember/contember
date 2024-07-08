@@ -1,11 +1,9 @@
-Copyright (c) 2022 Contember Limited
+Copyright (c) 2024 Contember Limited
 
 Portions of this software are licensed as follows:
 
-* All content that resides under the "EE/" directory of this repository, if that directory exists, is licensed under the license defined in "EE/LICENSE".
-* All third party components incorporated into the Contember/Engine are licensed under the original license provided by the owner of the applicable component.
-* Content outside of the above mentioned directories or restrictions above is available under the Apache License, Version 2.0 (the "License") as defined below.
-
+* All third party components incorporated into the software are licensed under the original license provided by the owner of the applicable component.
+* Content outside of the above mentioned restrictions is available under the Apache License, Version 2.0 (the "License") as defined below.
 
 -------------------------------------------------------------------------
                               Apache License

@@ -115,7 +115,7 @@ interface Project {
 	}
 }
 (async () => {
-	const dirs = await glob(process.cwd() + '/{ee,packages}/*', { onlyDirectories: true })
+	const dirs = await glob(process.cwd() + '/packages/*', { onlyDirectories: true })
 	const projects = await Promise.all(dirs.map(async (dir): Promise<Project> => {
 		try {
 			const packageJson = JSON.parse(await fs.readFile(`${dir}/package.json`, 'utf8'))

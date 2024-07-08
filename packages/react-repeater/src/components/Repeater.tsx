@@ -2,32 +2,21 @@ import React, { useEffect, useMemo } from 'react'
 import { verifySortableProp } from '../internal/verifySortableProp'
 import { useCreateRepeaterMethods } from '../internal/useCreateRepeaterMethods'
 import { RepeaterEntityListAccessorContext, RepeaterMethodsContext, RepeaterSortedEntitiesContext } from '../contexts'
-import {
-	Component,
-	EntityListSubTree,
-	HasMany,
-	repairEntitiesOrder,
-	sortEntities,
-	SugaredField,
-	SugaredFieldProps,
-	useEntityList,
-	useEntityListSubTree,
-	useEnvironment,
-} from '@contember/react-binding'
-import { EntityListAccessor, QueryLanguage, SugaredQualifiedEntityList, SugaredRelativeEntityList } from '@contember/binding'
+import { Component, EntityListSubTree, HasMany, repairEntitiesOrder, sortEntities, SugaredField, useEntityList, useEntityListSubTree, useEnvironment } from '@contember/react-binding'
+import { EntityListAccessor, QueryLanguage, SugaredQualifiedEntityList, SugaredRelativeEntityList, SugaredRelativeSingleField } from '@contember/binding'
 
 export type RepeaterRelativeProps =
 	& SugaredRelativeEntityList
 	& {
 		children?: React.ReactNode
-		sortableBy?: SugaredFieldProps['field']
+		sortableBy?: SugaredRelativeSingleField['field']
 	}
 
 export type RepeaterQualifiedProps =
 	& SugaredQualifiedEntityList
 	& {
 		children?: React.ReactNode
-		sortableBy?: SugaredFieldProps['field']
+		sortableBy?: SugaredRelativeSingleField['field']
 	}
 
 export type RepeaterProps =
@@ -90,7 +79,7 @@ const RepeaterQualified = Component(
 interface RepeaterInnerProps {
 	accessor: EntityListAccessor
 	children: React.ReactNode
-	sortableBy?: SugaredFieldProps['field']
+	sortableBy?: SugaredRelativeSingleField['field']
 }
 
 const RepeaterInner = ({ sortableBy, accessor, children }: RepeaterInnerProps) => {

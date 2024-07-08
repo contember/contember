@@ -21,7 +21,6 @@ const packages = [
 	'engine-plugins',
 	'engine-s3-plugin',
 	'engine-server',
-	'engine-server-ee',
 	'engine-system-api',
 	'engine-tenant-api',
 	'engine-vimeo-plugin',

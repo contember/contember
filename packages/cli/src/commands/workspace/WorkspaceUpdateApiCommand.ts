@@ -35,7 +35,7 @@ export class WorkspaceUpdateApiCommand extends Command<Args, Options> {
 		const getNewImage = (currentImage: string): string | null => {
 			for (const candidate of contemberDockerImages) {
 				if (currentImage.startsWith(`${candidate}:`)) {
-					return `${candidate}:${version}`
+					return `${candidate.replace(/-ee$/, '')}:${version}`
 				}
 			}
 			return null

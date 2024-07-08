@@ -1,14 +1,13 @@
 import cluster, { Worker } from 'node:cluster'
-import { timeout } from './timeout'
+import { timeout } from './utils'
 
-export const getClusterProcessType = (isClusterMode: boolean) =>
-	!isClusterMode ? ProcessType.singleNode : cluster.isMaster ? ProcessType.clusterMaster : ProcessType.clusterWorker
+export const getClusterProcessType = (isClusterMode: boolean): ProcessType =>
+	!isClusterMode ? 'singleNode' : cluster.isMaster ? 'clusterMaster' : 'clusterWorker'
 
-export enum ProcessType {
-	singleNode,
-	clusterMaster,
-	clusterWorker,
-}
+export type ProcessType =
+	| 'singleNode'
+	| 'clusterMaster'
+	| 'clusterWorker'
 
 const MSG_WORKER_STARTED = 'msg_worker_started'
 

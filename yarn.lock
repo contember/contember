@@ -978,6 +978,7 @@ __metadata:
     koa-compress: ^5.1.1
     lru-cache: ^10.0.2
     path-to-regexp: ^6.2.1
+    prom-client: ^12.0.0
     uuid: ^9.0.1
     ws: ^8.14.2
   peerDependencies:
@@ -1030,32 +1031,11 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@contember/engine-server-ee@workspace:packages/engine-server-ee":
-  version: 0.0.0-use.local
-  resolution: "@contember/engine-server-ee@workspace:packages/engine-server-ee"
-  dependencies:
-    "@contember/database": "workspace:*"
-    "@contember/engine-actions": "workspace:*"
-    "@contember/engine-api-tester": "workspace:*"
-    "@contember/engine-common": "workspace:*"
-    "@contember/engine-http": "workspace:*"
-    "@contember/engine-plugins": "workspace:*"
-    "@contember/engine-s3-plugin": "workspace:*"
-    "@contember/engine-vimeo-plugin": "workspace:*"
-    "@contember/typesafe": "workspace:*"
-    "@types/koa": ^2.13.11
-    "@types/node": ^20.9.0
-    graphql: ^16.8.1
-    pg: ^8.11.3
-    prom-client: ^12.0.0
-    uuid: ^9.0.1
-  languageName: unknown
-  linkType: soft
-
 "@contember/engine-server@workspace:packages/engine-server":
   version: 0.0.0-use.local
   resolution: "@contember/engine-server@workspace:packages/engine-server"
   dependencies:
+    "@contember/engine-actions": "workspace:*"
     "@contember/engine-api-tester": "workspace:*"
     "@contember/engine-http": "workspace:*"
     "@contember/engine-plugins": "workspace:*"

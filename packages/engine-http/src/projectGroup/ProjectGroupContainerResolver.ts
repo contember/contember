@@ -1,9 +1,7 @@
-import { ProjectGroupContainerFactory, TenantConfigResolver } from '@contember/engine-http'
-import {
-	ProjectGroupContainer,
-} from '@contember/engine-http'
 import { PromiseMap, EventEmitter, EventManager } from '@contember/engine-common'
 import { isDeepStrictEqual } from 'node:util'
+import { ProjectGroupContainer, ProjectGroupContainerFactory } from './ProjectGroupContainer'
+import { TenantConfigResolver } from '../config/tenantConfigResolver'
 
 interface ContainerWithMeta {
 	container: ProjectGroupContainer

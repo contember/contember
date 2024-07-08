@@ -1,5 +1,5 @@
-import { KoaMiddleware } from '@contember/engine-http'
 import prom from 'prom-client'
+import { KoaMiddleware } from '../application'
 
 export const createShowMetricsMiddleware = (registry: prom.Registry): KoaMiddleware<any> => {
 	return async (ctx, next) => {

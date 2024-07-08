@@ -20,7 +20,6 @@
 		{ "path": "./packages/engine-s3-plugin" },
 		{ "path": "./packages/engine-vimeo-plugin" },
 		{ "path": "./packages/engine-server" },
-		{ "path": "./packages/engine-server-ee" },
 		{ "path": "./packages/engine-system-api" },
 		{ "path": "./packages/engine-tenant-api" },
 		{ "path": "./packages/graphql-client-system" },

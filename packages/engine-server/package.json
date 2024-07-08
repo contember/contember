@@ -7,7 +7,12 @@
   "scripts": {
     "test-e2e": "vitest --dir ./tests/e2e --no-threads"
   },
+  "exports": {
+    "typescript": "./src/index.ts",
+    "default": "./dist/src/index.js"
+  },
   "dependencies": {
+    "@contember/engine-actions": "workspace:*",
     "@contember/engine-http": "workspace:*",
     "@contember/engine-plugins": "workspace:*",
     "@contember/engine-s3-plugin": "workspace:*",

@@ -11,9 +11,9 @@ import { EntityListAccessor } from '@contember/binding';
 import { JSX as JSX_2 } from 'react/jsx-runtime';
 import { default as React_2 } from 'react';
 import { ReactNode } from 'react';
-import { SugaredFieldProps } from '@contember/react-binding';
 import { SugaredQualifiedEntityList } from '@contember/binding';
 import { SugaredRelativeEntityList } from '@contember/binding';
+import { SugaredRelativeSingleField } from '@contember/binding';
 
 // @public (undocumented)
 export const Repeater: React_2.NamedExoticComponent<RepeaterProps>;
@@ -83,13 +83,13 @@ export type RepeaterProps = RepeaterQualifiedProps | RepeaterRelativeProps;
 // @public (undocumented)
 export type RepeaterQualifiedProps = SugaredQualifiedEntityList & {
     children?: React_2.ReactNode;
-    sortableBy?: SugaredFieldProps['field'];
+    sortableBy?: SugaredRelativeSingleField['field'];
 };
 
 // @public (undocumented)
 export type RepeaterRelativeProps = SugaredRelativeEntityList & {
     children?: React_2.ReactNode;
-    sortableBy?: SugaredFieldProps['field'];
+    sortableBy?: SugaredRelativeSingleField['field'];
 };
 
 // @public (undocumented)

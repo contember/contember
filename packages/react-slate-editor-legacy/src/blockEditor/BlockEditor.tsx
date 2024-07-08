@@ -2,11 +2,11 @@ import {
 	BindingError,
 	Component,
 	Environment,
+	Field,
 	FieldValue,
 	HasMany,
 	SugaredField,
-	SugaredFieldProps,
-	SugaredRelativeEntityList,
+	SugaredRelativeEntityList, SugaredRelativeSingleField,
 	TreeNodeEnvironmentFactory,
 	useDesugaredRelativeSingleField,
 	useEntity,
@@ -36,17 +36,17 @@ import { createEditor, CreateEditorPublicOptions, paragraphElementType } from '@
 
 export interface BlockEditorProps extends SugaredRelativeEntityList, CreateEditorPublicOptions {
 
-	contentField: SugaredFieldProps['field']
-	sortableBy: SugaredFieldProps['field']
+	contentField: SugaredRelativeSingleField['field']
+	sortableBy: SugaredRelativeSingleField['field']
 	children?: ReactNode
 
 	referencesField?: SugaredRelativeEntityList | string
-	referenceDiscriminationField?: SugaredFieldProps['field']
+	referenceDiscriminationField?: SugaredRelativeSingleField['field']
 	monolithicReferencesMode?: boolean
 	renderReference?: ComponentType<ReferenceElementRendererProps>
 
 	embedReferenceDiscriminateBy?: SugaredDiscriminateBy
-	embedContentDiscriminationField?: SugaredFieldProps['field']
+	embedContentDiscriminationField?: SugaredRelativeSingleField['field']
 	embedHandlers?: Iterable<EmbedHandler>
 	renderSortableBlock: OverrideRenderElementOptions['renderSortableBlock']
 }
@@ -196,11 +196,11 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 				{...(typeof props.referencesField === 'string' ? { field: props.referencesField } : props.referencesField)}
 				initialEntityCount={0}
 			>
-				<SugaredField field={props.referenceDiscriminationField} />
+				<Field field={props.referenceDiscriminationField} />
 				{props.children}
 				{props.embedContentDiscriminationField && (
 					<>
-						<SugaredField field={props.embedContentDiscriminationField} />
+						<Field field={props.embedContentDiscriminationField} />
 						{embedHandlers.map((handler, i) => (
 							<Fragment key={i}>{handler.staticRender(environment)}</Fragment>
 						))}
@@ -212,8 +212,8 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 		return (
 			<>
 				<HasMany field={props.field} initialEntityCount={0}>
-					<SugaredField field={props.sortableBy} />
-					<SugaredField field={props.contentField} />
+					<Field field={props.sortableBy} />
+					<Field field={props.contentField} />
 					{!props.monolithicReferencesMode && references}
 				</HasMany>
 				{props.monolithicReferencesMode && references}

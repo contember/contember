@@ -51,6 +51,7 @@ import {
 import { Parser } from './Parser'
 import { GraphQlLiteral } from '@contember/client'
 import { ParsedHasManyRelation, ParsedHasOneRelation } from './ParserResults'
+import { TokenRegExps } from './tokenList'
 
 const emptyObject = Object.freeze({})
 
@@ -293,13 +294,17 @@ export class QueryLanguage {
 	}
 
 	private static augmentDesugaredHasOneRelationPath(
-		path: ParsedHasOneRelation[],
+		path: (ParsedHasOneRelation | string)[],
 		unsugarable: UnsugarableHasOneRelation,
 		environment: Environment,
 	): HasOneRelation[] {
 		return path.map((desugaredHasOneRelation, i) =>
 			// Unsugarable applies to the last
-			this.desugarHasOneRelation(desugaredHasOneRelation, i === path.length - 1 ? unsugarable : {}, environment),
+			this.desugarHasOneRelation(
+				typeof desugaredHasOneRelation === 'string' ? { field: desugaredHasOneRelation } : desugaredHasOneRelation,
+				i === path.length - 1 ? unsugarable : {},
+				environment,
+			),
 		)
 	}
 
@@ -636,19 +641,30 @@ export class QueryLanguage {
 		sugaredRelativeSingleEntity: string | SugaredRelativeSingleEntity,
 		environment: Environment,
 	): RelativeSingleEntity {
+		let field: SugaredRelativeSingleEntity['field']
+		let unsugarableEntity: Omit<SugaredRelativeSingleEntity, 'field'>
 		if (typeof sugaredRelativeSingleEntity === 'string') {
-			return this.desugarRelativeSingleEntity({ field: sugaredRelativeSingleEntity }, environment)
+			field = sugaredRelativeSingleEntity
+			unsugarableEntity = {}
+		} else {
+			field = sugaredRelativeSingleEntity.field
+			unsugarableEntity = sugaredRelativeSingleEntity
 		}
 
-		const { field, ...unsugarableEntity } = sugaredRelativeSingleEntity
 		let hasOneRelationPath: HasOneRelation[]
 		if (typeof field === 'string') {
-			const parsed = this.parseRelativeSingleEntity(field, environment)
-			hasOneRelationPath = this.augmentDesugaredHasOneRelationPath(
-				parsed.hasOneRelationPath,
-				unsugarableEntity,
-				environment,
-			)
+			// fast path
+			if (field.match(TokenRegExps.dotSeparatedIdentifier)) {
+				const parts = field.split('.')
+				hasOneRelationPath = this.augmentDesugaredHasOneRelationPath(parts, unsugarableEntity, environment)
+			} else {
+				const parsed = this.parseRelativeSingleEntity(field, environment)
+				hasOneRelationPath = this.augmentDesugaredHasOneRelationPath(
+					parsed.hasOneRelationPath,
+					unsugarableEntity,
+					environment,
+				)
+			}
 
 		} else {
 			hasOneRelationPath = this.desugarHasOneRelationPath(field, unsugarableEntity, environment)
@@ -663,18 +679,30 @@ export class QueryLanguage {
 		sugaredRelativeSingleField: string | SugaredRelativeSingleField,
 		environment: Environment,
 	): RelativeSingleField {
+		let field: SugaredRelativeSingleField['field']
+		let unsugarableField: Omit<SugaredRelativeSingleField, 'field'>
 		if (typeof sugaredRelativeSingleField === 'string') {
-			return this.desugarRelativeSingleField({ field: sugaredRelativeSingleField }, environment)
+			field = sugaredRelativeSingleField
+			unsugarableField = {}
+		} else {
+			field = sugaredRelativeSingleField.field
+			unsugarableField = sugaredRelativeSingleField
 		}
-
-		const { field, ...unsugarableField } = sugaredRelativeSingleField
 
 		let hasOneRelationPath: HasOneRelation[]
 		let fieldName: FieldName
 		if (typeof field === 'string') {
-			const parsed = this.parseRelativeSingleField(field, environment)
-			hasOneRelationPath = this.augmentDesugaredHasOneRelationPath(parsed.hasOneRelationPath, {}, environment)
-			fieldName = parsed.field
+			// fast path
+			if (field.match(TokenRegExps.dotSeparatedIdentifier)) {
+				const parts = field.split('.')
+				fieldName = parts.pop()!
+				hasOneRelationPath = this.augmentDesugaredHasOneRelationPath(parts, {}, environment)
+			} else {
+				const parsed = this.parseRelativeSingleField(field, environment)
+				hasOneRelationPath = this.augmentDesugaredHasOneRelationPath(parsed.hasOneRelationPath, {}, environment)
+				fieldName = parsed.field
+			}
+
 		} else {
 			hasOneRelationPath = this.desugarHasOneRelationPath(field.hasOneRelationPath, {}, environment)
 			fieldName = field.field
@@ -696,16 +724,17 @@ export class QueryLanguage {
 		sugaredRelativeEntityList: string | SugaredRelativeEntityList,
 		environment: Environment,
 	): RelativeEntityList {
+		let field: SugaredRelativeEntityList['field']
+		let unsugarableEntityList: Omit<SugaredRelativeEntityList, 'field'>
+
 		if (typeof sugaredRelativeEntityList === 'string') {
-			return this.desugarRelativeEntityList(
-				{
-					field: sugaredRelativeEntityList,
-				},
-				environment,
-			)
+			field = sugaredRelativeEntityList
+			unsugarableEntityList = {}
+		} else {
+			field = sugaredRelativeEntityList.field
+			unsugarableEntityList = sugaredRelativeEntityList
 		}
 
-		const { field, ...unsugarableEntityList } = sugaredRelativeEntityList
 		let hasOneRelationPath: HasOneRelation[]
 		let hasManyRelation: HasManyRelation
 		if (typeof field === 'string') {

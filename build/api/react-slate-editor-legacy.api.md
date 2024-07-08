@@ -37,6 +37,7 @@ import { RenderElementProps } from 'slate-react';
 import * as Slate from 'slate';
 import { SugaredFieldProps } from '@contember/react-binding';
 import { SugaredRelativeEntityList } from '@contember/react-binding';
+import { SugaredRelativeSingleField } from '@contember/react-binding';
 
 // Warning: (ae-unresolved-link) The @link reference could not be resolved: The package "@contember/react-slate-editor-legacy" does not have an export "BlockRepeater"
 // Warning: (ae-unresolved-link) The @link reference could not be resolved: The package "@contember/react-slate-editor-legacy" does not have an export "DiscriminatedBlocks"
@@ -57,9 +58,9 @@ export interface BlockEditorProps extends SugaredRelativeEntityList, CreateEdito
     // (undocumented)
     children?: ReactNode;
     // (undocumented)
-    contentField: SugaredFieldProps['field'];
+    contentField: SugaredRelativeSingleField['field'];
     // (undocumented)
-    embedContentDiscriminationField?: SugaredFieldProps['field'];
+    embedContentDiscriminationField?: SugaredRelativeSingleField['field'];
     // (undocumented)
     embedHandlers?: Iterable<EmbedHandler>;
     // (undocumented)
@@ -67,7 +68,7 @@ export interface BlockEditorProps extends SugaredRelativeEntityList, CreateEdito
     // (undocumented)
     monolithicReferencesMode?: boolean;
     // (undocumented)
-    referenceDiscriminationField?: SugaredFieldProps['field'];
+    referenceDiscriminationField?: SugaredRelativeSingleField['field'];
     // (undocumented)
     referencesField?: SugaredRelativeEntityList | string;
     // (undocumented)
@@ -77,7 +78,7 @@ export interface BlockEditorProps extends SugaredRelativeEntityList, CreateEdito
     // (undocumented)
     renderSortableBlock: OverrideRenderElementOptions['renderSortableBlock'];
     // (undocumented)
-    sortableBy: SugaredFieldProps['field'];
+    sortableBy: SugaredRelativeSingleField['field'];
 }
 
 // @public (undocumented)

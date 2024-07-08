@@ -142,6 +142,9 @@ export class MarkerMerger {
 		if (original === fresh) {
 			return original
 		}
+		if (original.size === 0) {
+			return fresh
+		}
 		const newOriginal: Map<PlaceholderName, MeaningfulMarker> = new Map(original)
 		for (const [placeholderName, freshMarker] of fresh) {
 			const markerFromOriginal = newOriginal.get(placeholderName)
@@ -159,6 +162,9 @@ export class MarkerMerger {
 	): EntityFieldPlaceholders {
 		if (original === fresh) {
 			return original
+		}
+		if (original.size === 0) {
+			return fresh
 		}
 		const newOriginal: EntityFieldPlaceholders = new Map(original)
 		for (const [fieldName, freshPlaceholders] of fresh) {

@@ -1838,6 +1838,8 @@ export namespace TokenRegExps {
     entityIdentifier: RegExp;
     const // (undocumented)
     identifier: RegExp;
+    const // (undocumented)
+    dotSeparatedIdentifier: RegExp;
 }
 
 // @public (undocumented)

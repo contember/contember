@@ -1,0 +1,10 @@
+{
+	"extends": [
+		"../tsconfig.settings.json"
+	],
+	"compilerOptions": {
+		"experimentalDecorators": true,
+		"emitDecoratorMetadata": true,
+		"moduleResolution": "node",
+	}
+}

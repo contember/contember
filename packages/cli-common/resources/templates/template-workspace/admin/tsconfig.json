@@ -1,0 +1,23 @@
+{
+	"extends": ["../tsconfig.settings.json"],
+	"compilerOptions": {
+		"allowSyntheticDefaultImports": true,
+		"jsx": "react-jsx",
+		"lib": [
+			"esnext",
+			"dom",
+			"dom.iterable",
+		],
+		"paths": {
+			"@app/components": [
+				"./app/components/*"
+			],
+			"@app/lib/*": [
+				"./lib/*"
+			],
+			"@app/lib/plugins/*": [
+				"./lib/plugins/*"
+			]
+		}
+	}
+}

@@ -171,6 +171,23 @@ export type ChangePasswordResponse = {
 	readonly ok: Scalars['Boolean']['output']
 }
 
+export type ChangeProfileError = {
+	readonly __typename?: 'ChangeProfileError'
+	readonly code: ChangeProfileErrorCode
+	readonly developerMessage: Scalars['String']['output']
+}
+
+export type ChangeProfileErrorCode =
+  | 'EMAIL_ALREADY_EXISTS'
+  | 'INVALID_EMAIL_FORMAT'
+  | 'PERSON_NOT_FOUND'
+
+export type ChangeProfileResponse = {
+	readonly __typename?: 'ChangeProfileResponse'
+	readonly error?: Maybe<ChangeProfileError>
+	readonly ok: Scalars['Boolean']['output']
+}
+
 export type CheckResetPasswordTokenCode =
   | 'REQUEST_NOT_FOUND'
   | 'TOKEN_EXPIRED'
@@ -587,6 +604,7 @@ export type Mutation = {
 	readonly changeMyPassword?: Maybe<ChangeMyPasswordResponse>
 	readonly changeMyProfile?: Maybe<ChangeMyProfileResponse>
 	readonly changePassword?: Maybe<ChangePasswordResponse>
+	readonly changeProfile?: Maybe<ChangeProfileResponse>
 	readonly confirmOtp?: Maybe<ConfirmOtpResponse>
 	readonly createApiKey?: Maybe<CreateApiKeyResponse>
 	readonly createGlobalApiKey?: Maybe<CreateApiKeyResponse>
@@ -664,6 +682,13 @@ export type MutationChangeMyProfileArgs = {
 
 export type MutationChangePasswordArgs = {
 	password: Scalars['String']['input']
+	personId: Scalars['String']['input']
+}
+
+
+export type MutationChangeProfileArgs = {
+	email?: InputMaybe<Scalars['String']['input']>
+	name?: InputMaybe<Scalars['String']['input']>
 	personId: Scalars['String']['input']
 }
 
@@ -1352,6 +1377,9 @@ export type ResolversTypes = {
 	ChangePasswordError: ResolverTypeWrapper<ChangePasswordError>
 	ChangePasswordErrorCode: ChangePasswordErrorCode
 	ChangePasswordResponse: ResolverTypeWrapper<ChangePasswordResponse>
+	ChangeProfileError: ResolverTypeWrapper<ChangeProfileError>
+	ChangeProfileErrorCode: ChangeProfileErrorCode
+	ChangeProfileResponse: ResolverTypeWrapper<ChangeProfileResponse>
 	CheckResetPasswordTokenCode: CheckResetPasswordTokenCode
 	CheckResetPasswordTokenResult: ResolverTypeWrapper<CheckResetPasswordTokenResult>
 	CommonSignInResult: ResolverTypeWrapper<ResolversInterfaceTypes<ResolversTypes>['CommonSignInResult']>
@@ -1500,6 +1528,8 @@ export type ResolversParentTypes = {
 	ChangeMyProfileResponse: ChangeMyProfileResponse
 	ChangePasswordError: ChangePasswordError
 	ChangePasswordResponse: ChangePasswordResponse
+	ChangeProfileError: ChangeProfileError
+	ChangeProfileResponse: ChangeProfileResponse
 	CheckResetPasswordTokenResult: CheckResetPasswordTokenResult
 	CommonSignInResult: ResolversInterfaceTypes<ResolversParentTypes>['CommonSignInResult']
 	ConfirmOtpError: ConfirmOtpError
@@ -1705,6 +1735,18 @@ export type ChangePasswordErrorResolvers<ContextType = any, ParentType extends R
 export type ChangePasswordResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['ChangePasswordResponse'] = ResolversParentTypes['ChangePasswordResponse']> = {
 	error?: Resolver<Maybe<ResolversTypes['ChangePasswordError']>, ParentType, ContextType>
 	errors?: Resolver<ReadonlyArray<ResolversTypes['ChangePasswordError']>, ParentType, ContextType>
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type ChangeProfileErrorResolvers<ContextType = any, ParentType extends ResolversParentTypes['ChangeProfileError'] = ResolversParentTypes['ChangeProfileError']> = {
+	code?: Resolver<ResolversTypes['ChangeProfileErrorCode'], ParentType, ContextType>
+	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type ChangeProfileResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['ChangeProfileResponse'] = ResolversParentTypes['ChangeProfileResponse']> = {
+	error?: Resolver<Maybe<ResolversTypes['ChangeProfileError']>, ParentType, ContextType>
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
@@ -1994,6 +2036,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 	changeMyPassword?: Resolver<Maybe<ResolversTypes['ChangeMyPasswordResponse']>, ParentType, ContextType, RequireFields<MutationChangeMyPasswordArgs, 'currentPassword' | 'newPassword'>>
 	changeMyProfile?: Resolver<Maybe<ResolversTypes['ChangeMyProfileResponse']>, ParentType, ContextType, Partial<MutationChangeMyProfileArgs>>
 	changePassword?: Resolver<Maybe<ResolversTypes['ChangePasswordResponse']>, ParentType, ContextType, RequireFields<MutationChangePasswordArgs, 'password' | 'personId'>>
+	changeProfile?: Resolver<Maybe<ResolversTypes['ChangeProfileResponse']>, ParentType, ContextType, RequireFields<MutationChangeProfileArgs, 'personId'>>
 	confirmOtp?: Resolver<Maybe<ResolversTypes['ConfirmOtpResponse']>, ParentType, ContextType, RequireFields<MutationConfirmOtpArgs, 'otpToken'>>
 	createApiKey?: Resolver<Maybe<ResolversTypes['CreateApiKeyResponse']>, ParentType, ContextType, RequireFields<MutationCreateApiKeyArgs, 'description' | 'memberships' | 'projectSlug'>>
 	createGlobalApiKey?: Resolver<Maybe<ResolversTypes['CreateApiKeyResponse']>, ParentType, ContextType, RequireFields<MutationCreateGlobalApiKeyArgs, 'description'>>
@@ -2311,6 +2354,8 @@ export type Resolvers<ContextType = any> = {
 	ChangeMyProfileResponse?: ChangeMyProfileResponseResolvers<ContextType>
 	ChangePasswordError?: ChangePasswordErrorResolvers<ContextType>
 	ChangePasswordResponse?: ChangePasswordResponseResolvers<ContextType>
+	ChangeProfileError?: ChangeProfileErrorResolvers<ContextType>
+	ChangeProfileResponse?: ChangeProfileResponseResolvers<ContextType>
 	CheckResetPasswordTokenResult?: CheckResetPasswordTokenResultResolvers<ContextType>
 	CommonSignInResult?: CommonSignInResultResolvers<ContextType>
 	ConfirmOtpError?: ConfirmOtpErrorResolvers<ContextType>

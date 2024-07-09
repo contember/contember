@@ -17,19 +17,6 @@ export interface WorkspaceDirectoryArgument {
 	workspaceDirectory: string
 }
 
-type CreateWorkspaceArgs = {
-	workspaceName: string
-	template?: string
-} & WorkspaceDirectoryArgument
-
-export const createWorkspace = async ({ workspaceDirectory, workspaceName, template }: CreateWorkspaceArgs) => {
-	template ??= '@contember/template-workspace'
-	await installTemplate(template, workspaceDirectory, 'workspace', {
-		version: getPackageVersion(),
-		projectName: workspaceName,
-	})
-}
-
 export interface WorkspaceConfig {
 	projects?: PathMapping
 }

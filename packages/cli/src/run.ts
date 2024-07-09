@@ -11,7 +11,6 @@ import {
 	MigrationExecuteCommand,
 	MigrationRebaseCommand,
 	MigrationStatusCommand,
-	ProjectCreateCommand,
 	ProjectGenerateDocumentation,
 	ProjectPrintSchemaCommand,
 	ProjectValidateCommand,
@@ -20,9 +19,7 @@ import {
 	VersionCommand,
 	WorkspaceUpdateApiCommand,
 } from './commands'
-import { ExportCommand } from './commands/transfer/ExportCommand'
-import { ImportCommand } from './commands/transfer/ImportCommand'
-import { TransferCommand } from './commands/transfer/TransferCommand'
+import { ExportCommand, ImportCommand, TransferCommand } from './commands/transfer'
 import { checkVersions } from './utils/checkVersions';
 
 (async () => {
@@ -50,9 +47,7 @@ import { checkVersions } from './utils/checkVersions';
 		['tenant:invite']: () => new InviteCommand(workspace),
 		['tenant:reset-password']: () => new ResetPasswordCommand(workspace),
 	}
-	if (!workspace.isSingleProjectMode()) {
-		commands['project:create'] = () => new ProjectCreateCommand(workspace)
-	}
+
 	const commandManager = new CommandManager(commands)
 
 	const nodeVersion = process.version.match(/^v?(\d+)\..+$/)

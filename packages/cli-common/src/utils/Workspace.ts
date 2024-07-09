@@ -31,13 +31,6 @@ export const createWorkspace = async ({ workspaceDirectory, workspaceName, templ
 }
 
 export interface WorkspaceConfig {
-	api?: {
-		configFile?: string
-	}
-	admin?: {
-		enabled?: boolean
-		projectsFile?: string
-	}
 	projects?: PathMapping
 }
 
@@ -68,9 +61,6 @@ export class Workspace {
 		return basename(this.directory)
 	}
 
-	get adminEnabled(): boolean {
-		return this.config?.admin?.enabled || false
-	}
 
 	public isSingleProjectMode(): boolean {
 		return !!this.env.projectName  || !this.config.projects

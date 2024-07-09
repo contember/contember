@@ -62,27 +62,6 @@ export const interactiveSignIn = async ({
 	return await client.signIn(email, password, expiration || 3600)
 }
 
-export const interactiveAskForCredentials = async (): Promise<{ email: string; password: string }> => {
-	const { email, password } = await prompts([
-		{
-			type: 'text',
-			name: 'email',
-			message: 'Superadmin email',
-		},
-		{
-			type: 'password',
-			name: 'password',
-			message: 'Superadmin password',
-			validate: validatePassword,
-		},
-	])
-
-	if (!email || !password) {
-		throw 'Aborting a setup'
-	}
-	return { email, password }
-}
-
 export const interactiveResolveApiToken = async ({
 	workspace,
 	instance,
@@ -397,25 +376,6 @@ export class TenantClient {
 			throw result.signIn.errors.map((it: any) => it.code)
 		}
 		return { sessionToken: result.signIn.result.token }
-	}
-
-	public async setup(email: string, password: string): Promise<{ loginToken: string }> {
-		const query = `mutation($email: String!, $password: String!) {
-  setup(superadmin: {email: $email, password: $password}) {
-    ok
-    result {
-      loginKey {
-        token
-      }
-    }
-  }
-}`
-		const result = await this.apiClient.request<{ setup: { ok: boolean; result: { loginKey: { token: string } } } }>(
-			query,
-			{ email, password },
-		)
-		const loginToken = result.setup.result.loginKey.token
-		return { loginToken }
 	}
 
 	public async createResetPasswordRequest(email: string): Promise<void> {

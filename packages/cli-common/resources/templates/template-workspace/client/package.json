@@ -1,0 +1,16 @@
+{
+  "name": "@app/client",
+  "version": "0.0.0",
+  "typings": "./dist/src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "import": "./dist/src/index.js"
+    }
+  },
+  "scripts": {
+    "test": "echo \"No test\""
+  },
+  "private": true,
+  "type": "module"
+}

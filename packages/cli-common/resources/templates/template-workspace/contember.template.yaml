@@ -1,10 +1,7 @@
 type: workspace
-remove:
-  - package-lock.json
-patchPackageJson: true
 replaceVariables:
   - package.json
+  - api/package.json
+  - admin/package.json
+  - client/package.json
   - docker-compose.yaml
-
-rename:
-  .gitignore.dist: .gitignore

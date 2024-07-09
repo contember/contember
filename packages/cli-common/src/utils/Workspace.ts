@@ -28,8 +28,6 @@ export const createWorkspace = async ({ workspaceDirectory, workspaceName, templ
 		version: getPackageVersion(),
 		projectName: workspaceName,
 	})
-	const workspace = await Workspace.get(workspaceDirectory)
-	await workspace.projects.createProject(workspaceName, {})
 }
 
 export interface WorkspaceConfig {

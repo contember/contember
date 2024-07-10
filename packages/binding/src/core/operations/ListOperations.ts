@@ -134,7 +134,7 @@ export class ListOperations {
 				}
 
 				this.treeStore.disposeOfRealm(disconnectedChildRealm)
-				listState.children.delete(disconnectedChildIdValue)
+				state.children.delete(disconnectedChildIdValue)
 
 				let changesDelta = 0
 

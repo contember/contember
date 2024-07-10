@@ -1,9 +1,7 @@
 #!/usr/bin/env node
 import { Application, CommandFactoryList, CommandManager, getPackageVersion, Workspace } from '@contember/cli-common'
 import {
-	CreateApiKeyCommand,
 	DeployCommand,
-	InviteCommand,
 	MigrationAmendCommand,
 	MigrationBlankCommand,
 	MigrationDescribeCommand,
@@ -14,8 +12,6 @@ import {
 	ProjectGenerateDocumentation,
 	ProjectPrintSchemaCommand,
 	ProjectValidateCommand,
-	ResetPasswordCommand,
-	SignInCommand,
 	VersionCommand,
 	WorkspaceUpdateApiCommand,
 } from './commands'
@@ -42,10 +38,6 @@ import { checkVersions } from './utils/checkVersions';
 		['project:validate']: () => new ProjectValidateCommand(workspace),
 		['project:print-schema']: () => new ProjectPrintSchemaCommand(workspace),
 		['project:generate-doc']: () => new ProjectGenerateDocumentation(workspace),
-		['tenant:sign-in']: () => new SignInCommand(workspace),
-		['tenant:create-api-key']: () => new CreateApiKeyCommand(workspace),
-		['tenant:invite']: () => new InviteCommand(workspace),
-		['tenant:reset-password']: () => new ResetPasswordCommand(workspace),
 	}
 
 	const commandManager = new CommandManager(commands)

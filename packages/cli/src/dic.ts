@@ -43,7 +43,7 @@ import {
 import { MigrationExecutionFacade } from './lib/migrations/MigrationExecutionFacade'
 import { MigrationPrinter } from './lib/migrations/MigrationPrinter'
 import { MigrationsStatusFacade } from './lib/migrations/MigrationsStatusFacade'
-import { SchemaLoader } from './lib/schema/SchemaLoader'
+import { ImportSchemaLoader, SchemaLoader, TranspilingSchemaLoader } from './lib/schema/SchemaLoader'
 import { MigrationsValidator } from './lib/migrations/MigrationsValidator'
 import { MigrationRebaseFacade } from './lib/migrations/MigrationRebaseFacade'
 import { DataTransferClient } from './lib/transfer/DataTransferClient'
@@ -76,10 +76,11 @@ export const variables = {}
 // export default async () => ({ queries: [] })
 `
 
-export const createContainer = ({ dir, env, version }: {
+export const createContainer = ({ dir, env, version, runtime }: {
 	dir: string
 	env: CliEnv
 	version: string
+	runtime: 'node' | 'bun'
 }) => {
 	return new Builder({})
 		.addService('env', () =>
@@ -88,6 +89,8 @@ export const createContainer = ({ dir, env, version }: {
 			dir)
 		.addService('version', () =>
 			version)
+		.addService('runtime', () =>
+			runtime)
 		.addService('fs', () =>
 			new FileSystem())
 		.addService('yamlHandler', ({ fs }) =>
@@ -171,8 +174,8 @@ export const createContainer = ({ dir, env, version }: {
 			new MigrationsValidator(migrationDescriber, schemaMigrator))
 		.addService('migrationRebaseFacade', ({ schemaVersionBuilder, migrationsValidator, systemClientProvider, migrationFilesManager }) =>
 			new MigrationRebaseFacade(schemaVersionBuilder, migrationsValidator, systemClientProvider, migrationFilesManager))
-		.addService('schemaLoader', ({ workspace, jsCodeRunner }) =>
-			new SchemaLoader(workspace, jsCodeRunner))
+		.addService('schemaLoader', ({ workspace, jsCodeRunner, runtime }) =>
+			runtime === 'bun' ? new ImportSchemaLoader(workspace) : new TranspilingSchemaLoader(workspace, jsCodeRunner))
 
 		.addService('adminDeployer', ({ remoteProjectProvider, adminClient, fs }) =>
 			new AdminDeployer(remoteProjectProvider, adminClient, fs))

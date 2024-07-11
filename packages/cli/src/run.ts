@@ -17,6 +17,7 @@ import { readCliEnv } from './lib/env';
 		version,
 		dir,
 		env: env,
+		runtime: process.title === 'bun' ? 'bun' : 'node',
 	})
 
 

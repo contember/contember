@@ -2,7 +2,7 @@
 import { Application, CommandManager } from '@contember/cli-common'
 import { WorkspaceCreateCommand } from './commands'
 import { TemplateInstaller } from './lib/TemplateInstaller'
-import { resourcesDir } from './lib/pathUtils'
+import { resourcesDir } from './paths'
 import { PackageDownloader } from './lib/PackageDownloader'
 import { FileSystem } from './lib/FileSystem'
 

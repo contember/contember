@@ -1,12 +1,8 @@
-import { Command, CommandConfiguration, Input, Workspace } from '@contember/cli-common'
-import { MigrationVersionHelper } from '@contember/schema-migrations'
-import { executeCreateMigrationCommand } from '../../utils/migrations/MigrationCreateHelper'
-import { resolveSystemApiClient } from './SystemApiClientResolver'
-import { emptySchema } from '@contember/schema-utils'
-import { validateMigrations } from './MigrationValidationHelper'
+import { Command, CommandConfiguration, Input } from '@contember/cli-common'
+import { Migration, MigrationsResolver } from '@contember/migrations-client'
+import { MigrationRebaseFacade } from '../../lib/migrations/MigrationRebaseFacade'
 
 type Args = {
-	project?: string
 	migration: string[]
 }
 
@@ -16,7 +12,8 @@ type Options = {
 
 export class MigrationRebaseCommand extends Command<Args, Options> {
 	constructor(
-		private readonly workspace: Workspace,
+		private readonly migrationsResolver: MigrationsResolver,
+		private readonly migrationRebaseFacade: MigrationRebaseFacade,
 	) {
 		super()
 	}
@@ -24,9 +21,6 @@ export class MigrationRebaseCommand extends Command<Args, Options> {
 
 	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Rebase migrations on filesystem and in local instance')
-		if (!this.workspace.isSingleProjectMode()) {
-			configuration.argument('project')
-		}
 		configuration.argument('migration').variadic()
 		configuration //
 			.option('yes')
@@ -34,57 +28,21 @@ export class MigrationRebaseCommand extends Command<Args, Options> {
 			.description('Do not ask for confirmation.')
 	}
 
-	protected async execute(input: Input<Args, Options>): Promise<number> {
-		return await executeCreateMigrationCommand(
-			input,
-			{ workspace: this.workspace },
-			async ({
-				schemaVersionBuilder,
-				migrationsResolver,
-				workspace,
-				project,
-				migrationCreator,
-				migrationDescriber,
-				schemaMigrator,
-				migrationFilesManager,
-			}) => {
-				const migrationNames = input.getArgument('migration')
-				const migrations = []
-				for (const migrationName of migrationNames) {
-					const migration = await migrationsResolver.findSchemaMigrationByVersion(migrationName)
-					if (!migration) {
-						throw `Migration ${migrationName} not found`
-					}
-					migrations.push(migration)
-				}
-				console.log('Rebasing: ' + migrations.map(it => it.name).join(', '))
-				const versions = migrations.map(it => it.version)
-				const schemaWithoutMigrations = await schemaVersionBuilder.buildSchemaAdvanced(
-					emptySchema,
-					version => !versions.includes(version),
-				)
-				const valid = await validateMigrations(schemaWithoutMigrations, migrations, migrationDescriber, schemaMigrator)
-				if (!valid) {
-					throw `Cannot rebase migrations`
-				}
-				const client = await resolveSystemApiClient(workspace, project)
-				let i = 0
-				for (const migration of migrations) {
-					const name = migration.name.substring(MigrationVersionHelper.prefixLength + 1)
-					const [version, fullName] = MigrationVersionHelper.createVersion(name, i++)
-					const newMigration = {
-						name: fullName,
-						version: version,
-						formatVersion: migration.formatVersion,
-						modifications: migration.modifications,
-					}
-					await client.migrationModify(migration.version, newMigration)
-					await migrationFilesManager.moveFile(migration.name, newMigration.name)
-				}
-				console.log('Done')
+	protected async execute(input: Input<Args, Options>): Promise<void> {
 
-				return 0
-			},
-		)
+		const migrationNames = input.getArgument('migration')
+
+		const migrations: Migration[] = []
+		for (const migrationName of migrationNames) {
+			const migration = await this.migrationsResolver.findSchemaMigrationByVersion(migrationName)
+			if (!migration) {
+				throw `Migration ${migrationName} not found`
+			}
+			migrations.push(migration)
+		}
+
+		console.log('Rebasing: ' + migrations.map(it => it.name).join(', '))
+		await this.migrationRebaseFacade.rebase(migrations)
+		console.log('Done')
 	}
 }

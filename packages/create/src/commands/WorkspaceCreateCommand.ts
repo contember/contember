@@ -1,7 +1,8 @@
-import { Command, CommandConfiguration, getPackageVersion, Input } from '@contember/cli-common'
+import { Command, CommandConfiguration, Input } from '@contember/cli-common'
 import { join } from 'node:path'
 import chalk from 'chalk'
 import { TemplateInstaller } from '../lib/TemplateInstaller'
+import { getPackageVersion } from '../lib/version'
 
 type Args = {
 	workspaceName: string

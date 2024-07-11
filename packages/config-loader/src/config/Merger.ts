@@ -25,10 +25,10 @@ namespace Merger {
 	export type ValueItem<P> = P | ValueObject<P> | ValueArray<P>
 
 	export interface ValueObject<P> {
-		[x: string]: ValueItem<P>
+		readonly [x: string]: ValueItem<P>
 	}
 
-	export interface ValueArray<P> extends Array<ValueItem<P>> {}
+	export interface ValueArray<P> extends ReadonlyArray<ValueItem<P>> {}
 }
 
 export default Merger

@@ -1,78 +1,57 @@
-import { Command, CommandConfiguration, Input, validateProjectName, Workspace } from '@contember/cli-common'
-import { MigrationsContainerFactory } from '../../utils/migrations/MigrationsContainer'
-import { validateSchemaAndPrintErrors } from '../../utils/schema'
+import { Command, CommandConfiguration } from '@contember/cli-common'
 import { emptySchema } from '@contember/schema-utils'
-import { validateMigrations } from '../migrations/MigrationValidationHelper'
-import { loadSchema } from '../../utils/project/loadSchema'
+import { SchemaLoader } from '../../lib/schema/SchemaLoader'
+import { validateSchemaAndPrintErrors } from '../../lib/schema/SchemaValidationHelper'
+import { MigrationsValidator } from '../../lib/migrations/MigrationsValidator'
+import { MigrationsResolver, SchemaVersionBuilder } from '@contember/migrations-client'
+import { SchemaDiffer } from '@contember/schema-migrations'
 
-type Args = {
-	project?: string
-}
+type Args = {}
 
 type Options = {}
 
 export class ProjectValidateCommand extends Command<Args, Options> {
 	constructor(
-		private readonly workspace: Workspace,
+		private readonly schemaLoader: SchemaLoader,
+		private readonly migrationValidator: MigrationsValidator,
+		private readonly migrationsResolver: MigrationsResolver,
+		private readonly schemaDiffer: SchemaDiffer,
+		private readonly schemaVersionBuilder: SchemaVersionBuilder,
 	) {
 		super()
 	}
 
 	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Validates project schema')
-		if (!this.workspace.isSingleProjectMode()) {
-			configuration.argument('project')
-		}
 	}
 
-	protected async execute(input: Input<Args, Options>): Promise<number> {
-		const [projectName] = [input.getArgument('project')]
-		const workspace = this.workspace
+	protected async execute(): Promise<number> {
+		let projectValid = true
 
-		const allProjects = projectName === '.'
-		const projects = allProjects
-			? await workspace.projects.listProjects()
-			: [await workspace.projects.getProject(projectName, { fuzzy: true })]
-		let valid = true
-		const invalidProjects = []
-		for (const project of projects) {
-			console.group(`Project ${project.name}:`)
-			const migrationsDir = await project.migrationsDir
-			const container = new MigrationsContainerFactory(migrationsDir).create()
-			const migrations = await container.migrationsResolver.getSchemaMigrations()
-			let projectValid = await validateMigrations(
-				emptySchema,
-				migrations,
-				container.migrationDescriber,
-				container.schemaMigrator,
-			)
-			const schema = await loadSchema(project)
-			projectValid = validateSchemaAndPrintErrors(schema, 'Defined schema is invalid:') && projectValid
+		const migrations = await this.migrationsResolver.getSchemaMigrations()
+		projectValid = this.migrationValidator.validate(emptySchema, migrations)
+			&& projectValid
 
-			const builtSchema = await container.schemaVersionBuilder.buildSchema()
-			projectValid =
-				validateSchemaAndPrintErrors(builtSchema, 'Schema built from migrations is invalid:') && projectValid
+		const schema = await this.schemaLoader.loadSchema()
+		projectValid = validateSchemaAndPrintErrors(schema, 'Defined schema is invalid:')
+			&& projectValid
 
-			if (projectValid) {
-				const diff = await container.schemaDiffer.diffSchemas(builtSchema, schema)
-				if (diff.length > 0) {
-					console.log('Migrations are not in sync with a defined schema')
-					projectValid = false
-				}
+		const builtSchema = await this.schemaVersionBuilder.buildSchema()
+		projectValid = validateSchemaAndPrintErrors(builtSchema, 'Schema built from migrations is invalid:')
+			&& projectValid
+
+		if (projectValid) {
+			const diff = await this.schemaDiffer.diffSchemas(builtSchema, schema)
+			if (diff.length > 0) {
+				console.log('Migrations are not in sync with a defined schema')
+				projectValid = false
 			}
+		}
 
-			if (projectValid) {
-				console.log('Project schema is valid')
-			} else {
-				invalidProjects.push(project.name)
-			}
-			console.groupEnd()
-			valid = valid && projectValid
+		if (projectValid) {
+			console.log('Project schema is valid')
 		}
-		if (invalidProjects.length) {
-			console.log('Following projects failed the validation:')
-			invalidProjects.forEach(it => console.log(it))
-		}
-		return valid ? 0 : 1
+
+		return projectValid ? 0 : 1
 	}
 }

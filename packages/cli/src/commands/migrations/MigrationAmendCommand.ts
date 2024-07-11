@@ -1,17 +1,16 @@
-import { Command, CommandConfiguration, Input, Workspace } from '@contember/cli-common'
-import { printValidationErrors } from '../../utils/schema'
-import { InvalidSchemaException } from '@contember/schema-migrations'
-import { executeCreateMigrationCommand } from '../../utils/migrations/MigrationCreateHelper'
-import { createMigrationStatusTable, printMigrationDescription } from '../../utils/migrations/migrations'
-import { resolveMigrationStatus } from '../../utils/migrations/MigrationExecuteHelper'
-import { resolveSystemApiClient } from './SystemApiClientResolver'
+import { Command, CommandConfiguration, Input } from '@contember/cli-common'
+import { InvalidSchemaException, SchemaMigrator } from '@contember/schema-migrations'
 import prompts from 'prompts'
 import { emptySchema } from '@contember/schema-utils'
-import { validateMigrations } from './MigrationValidationHelper'
-import { loadSchema } from '../../utils/project/loadSchema'
+import { MigrationCreator, MigrationsResolver, SchemaVersionBuilder, SystemClient } from '@contember/migrations-client'
+import { MigrationsStatusFacade } from '../../lib/migrations/MigrationsStatusFacade'
+import { SchemaLoader } from '../../lib/schema/SchemaLoader'
+import { MigrationsValidator } from '../../lib/migrations/MigrationsValidator'
+import { MigrationPrinter } from '../../lib/migrations/MigrationPrinter'
+import { printValidationErrors } from '../../lib/schema/SchemaValidationPrinter'
+import { SystemClientProvider } from '../../lib/SystemClientProvider'
 
 type Args = {
-	project?: string
 	migration?: string
 }
 
@@ -22,16 +21,21 @@ type Options = {
 
 export class MigrationAmendCommand extends Command<Args, Options> {
 	constructor(
-		private readonly workspace: Workspace,
+		private readonly migrationsResolver: MigrationsResolver,
+		private readonly systemApiClientProvider: SystemClientProvider,
+		private readonly migrationsStatusFacade: MigrationsStatusFacade,
+		private readonly schemaLoader: SchemaLoader,
+		private readonly schemaVersionBuilder: SchemaVersionBuilder,
+		private readonly migrationCreator: MigrationCreator,
+		private readonly migrationsValidator: MigrationsValidator,
+		private readonly migrationPrinter: MigrationPrinter,
+		private readonly schemaMigrator: SchemaMigrator,
 	) {
 		super()
 	}
 
 	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Amends latest migration')
-		if (!this.workspace.isSingleProjectMode()) {
-			configuration.argument('project')
-		}
 		configuration.argument('migration').optional()
 		configuration.option('force').description('Ignore migrations order and missing migrations (dev only)')
 		configuration //
@@ -41,112 +45,90 @@ export class MigrationAmendCommand extends Command<Args, Options> {
 	}
 
 	protected async execute(input: Input<Args, Options>): Promise<number> {
-		return await executeCreateMigrationCommand(
-			input,
-			{ workspace: this.workspace },
-			async ({
-				schemaVersionBuilder,
-				migrationsResolver,
-				workspace,
-				project,
-				migrationCreator,
-				migrationDescriber,
-				schemaMigrator,
-			}) => {
-				const migrationName = input.getArgument('migration')
-				const amendMigration = migrationName
-					? await migrationsResolver.findSchemaMigrationByVersion(migrationName)
-					: await migrationsResolver.findLatestSchemaMigration()
+		const migrationName = input.getArgument('migration')
+		const amendMigration = migrationName
+			? await this.migrationsResolver.findSchemaMigrationByVersion(migrationName)
+			: await this.migrationsResolver.findLatestSchemaMigration()
+		if (!amendMigration) {
+			throw 'No migration to amend'
+		}
+		const force = input.getOption('force')
+		const status = await this.migrationsStatusFacade.resolveMigrationsStatus({ force })
+		if (status.migrationsToExecute.length > 0) {
+			throw `Some migrations are not executed. Unable to amend.`
+		}
 
-				if (!amendMigration) {
-					throw 'No migration to amend'
-				}
-				const client = await resolveSystemApiClient(workspace, project)
-				const status = await resolveMigrationStatus(client, migrationsResolver)
-				const force = input.getOption('force')
-				if (status.errorMigrations.length > 0) {
-					console.error(createMigrationStatusTable(status.errorMigrations))
-					if (!force) {
-						throw `Cannot execute migrations`
-					}
-				}
-				if (status.migrationsToExecute.length > 0) {
-					throw `Some migrations are not executed. Unable to amend.`
-				}
-				const schema = await loadSchema(project)
-				try {
-					const initialSchema = await schemaVersionBuilder.buildSchema()
-					const intermediateResult = await migrationCreator.prepareMigration(initialSchema, schema, '')
-					if (intermediateResult === null) {
-						console.log('Nothing to do')
-						return 0
-					}
-					if (amendMigration.formatVersion !== intermediateResult.migration.formatVersion) {
-						throw 'Incompatible migration format version'
-					}
-					const prevSchema = await schemaVersionBuilder.buildSchemaAdvanced(
-						emptySchema,
-						version => version < amendMigration.version,
-					)
-					const newSchema = await schemaMigrator.applyModifications(
-						prevSchema,
-						[...amendMigration.modifications, ...intermediateResult.migration.modifications],
-						amendMigration.formatVersion,
-					)
-					const newMigrationResult = await migrationCreator.prepareMigration(prevSchema, newSchema, '')
-					const followingMigrations = (await migrationsResolver.getSchemaMigrations()).filter(
-						it => it.version > amendMigration.version,
-					)
 
-					const valid = await validateMigrations(
-						prevSchema,
-						[...(newMigrationResult ? [newMigrationResult.migration] : []), ...followingMigrations],
-						migrationDescriber,
-						schemaMigrator,
-					)
-					if (!valid) {
-						throw `Cannot amend migration`
-					}
+		const schema = await this.schemaLoader.loadSchema()
+		try {
+			const initialSchema = await this.schemaVersionBuilder.buildSchema()
+			const intermediateResult = await this.migrationCreator.prepareMigration(initialSchema, schema, '')
+			if (intermediateResult === null) {
+				console.log('Nothing to do')
+				return 0
+			}
+			if (amendMigration.formatVersion !== intermediateResult.migration.formatVersion) {
+				throw 'Incompatible migration format version'
+			}
+			const prevSchema = await this.schemaVersionBuilder.buildSchemaAdvanced(
+				emptySchema,
+				version => version < amendMigration.version,
+			)
+			const newSchema = await this.schemaMigrator.applyModifications(
+				prevSchema,
+				[...amendMigration.modifications, ...intermediateResult.migration.modifications],
+				amendMigration.formatVersion,
+			)
+			const newMigrationResult = await this.migrationCreator.prepareMigration(prevSchema, newSchema, '')
+			const followingMigrations = (await this.migrationsResolver.getSchemaMigrations()).filter(
+				it => it.version > amendMigration.version,
+			)
 
-					await printMigrationDescription(
-						migrationDescriber,
-						intermediateResult.initialSchema,
-						intermediateResult.migration,
-						{ noSql: true },
-					)
-					console.log(`Amending ${amendMigration.name}`)
-					if (!(await this.shouldContinue(input))) {
-						console.log('Aborting')
-						return 1
-					}
-					await client.migrate([intermediateResult.migration], force)
-					await client.migrationDelete(intermediateResult.migration.version)
+			const valid = await this.migrationsValidator.validate(
+				prevSchema,
+				[...(newMigrationResult ? [newMigrationResult.migration] : []), ...followingMigrations],
+			)
+			if (!valid) {
+				throw `Cannot amend migration`
+			}
 
-					if (!newMigrationResult) {
-						await migrationCreator.removeMigration(amendMigration.name)
-						await client.migrationDelete(amendMigration.version)
-						console.log('Latest migration was removed')
-						return 0
-					}
-					const newMigration = {
-						name: amendMigration.name,
-						version: amendMigration.version,
-						formatVersion: newMigrationResult.migration.formatVersion,
-						modifications: newMigrationResult.migration.modifications,
-					}
-					await migrationCreator.saveMigration(newMigration)
-					await client.migrationModify(amendMigration.version, newMigration)
+			this.migrationPrinter.printMigrationDescription(
+				intermediateResult.initialSchema,
+				intermediateResult.migration,
+				{ noSql: true },
+			)
+			console.log(`Amending ${amendMigration.name}`)
+			if (!(await this.shouldContinue(input))) {
+				console.log('Aborting')
+				return 1
+			}
+			const systemClient = this.systemApiClientProvider.get()
+			await systemClient.migrate([intermediateResult.migration], force)
+			await systemClient.migrationDelete(intermediateResult.migration.version)
 
-					return 0
-				} catch (e) {
-					if (e instanceof InvalidSchemaException) {
-						printValidationErrors(e.validationErrors, e.message)
-						return 1
-					}
-					throw e
-				}
-			},
-		)
+			if (!newMigrationResult) {
+				await this.migrationCreator.removeMigration(amendMigration.name)
+				await systemClient.migrationDelete(amendMigration.version)
+				console.log('Latest migration was removed')
+				return 0
+			}
+			const newMigration = {
+				name: amendMigration.name,
+				version: amendMigration.version,
+				formatVersion: newMigrationResult.migration.formatVersion,
+				modifications: newMigrationResult.migration.modifications,
+			}
+			await this.migrationCreator.saveMigration(newMigration)
+			await systemClient.migrationModify(amendMigration.version, newMigration)
+
+			return 0
+		} catch (e) {
+			if (e instanceof InvalidSchemaException) {
+				printValidationErrors(e.validationErrors, e.message)
+				return 1
+			}
+			throw e
+		}
 	}
 
 	private async shouldContinue(input: Input<{}, { yes?: true }>): Promise<boolean> {

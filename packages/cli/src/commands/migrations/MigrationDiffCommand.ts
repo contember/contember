@@ -1,17 +1,13 @@
-import { Command, CommandConfiguration, Input, Workspace } from '@contember/cli-common'
-import { printValidationErrors } from '../../utils/schema'
+import { Command, CommandConfiguration, Input } from '@contember/cli-common'
 import { InvalidSchemaException } from '@contember/schema-migrations'
-import { executeCreateMigrationCommand } from '../../utils/migrations/MigrationCreateHelper'
-import { createMigrationStatusTable, printMigrationDescription } from '../../utils/migrations/migrations'
-import { executeMigrations, resolveMigrationStatus } from '../../utils/migrations/MigrationExecuteHelper'
 import prompts from 'prompts'
-import { interactiveResolveApiToken, TenantClient } from '../../utils/tenant'
-import { interactiveResolveInstanceEnvironmentFromInput } from '../../utils/instance'
-import { SystemClient } from '@contember/migrations-client'
-import { loadSchema } from '../../utils/project/loadSchema'
+import { MigrationCreator, SchemaVersionBuilder } from '@contember/migrations-client'
+import { SchemaLoader } from '../../lib/schema/SchemaLoader'
+import { MigrationPrinter } from '../../lib/migrations/MigrationPrinter'
+import { MigrationExecutionFacade } from '../../lib/migrations/MigrationExecutionFacade'
+import { printValidationErrors } from '../../lib/schema/SchemaValidationPrinter'
 
 type Args = {
-	project?: string
 	migrationName: string
 }
 
@@ -23,16 +19,17 @@ type Options = {
 
 export class MigrationDiffCommand extends Command<Args, Options> {
 	constructor(
-		private readonly workspace: Workspace,
+		private readonly schemaLoader: SchemaLoader,
+		private readonly schemaVersionBuilder: SchemaVersionBuilder,
+		private readonly migrationCreator: MigrationCreator,
+		private readonly migrationPrinter: MigrationPrinter,
+		private readonly migrationExecutorFacade: MigrationExecutionFacade,
 	) {
 		super()
 	}
 
 	protected configure(configuration: CommandConfiguration<Args, Options>): void {
-		configuration.description('Creates schema migration diff for given project')
-		if (!this.workspace.isSingleProjectMode()) {
-			configuration.argument('project')
-		}
+		configuration.description('Creates schema migration diff')
 		configuration.argument('migrationName')
 		configuration.option('execute').valueNone()
 		configuration //
@@ -43,89 +40,63 @@ export class MigrationDiffCommand extends Command<Args, Options> {
 		configuration.option('skip-initial-schema-validation')
 	}
 
-	protected async execute(input: Input<Args, Options>): Promise<number> {
-		return await executeCreateMigrationCommand(
-			input,
-			{ workspace: this.workspace },
-			async ({
-				schemaVersionBuilder,
-				migrationsResolver,
-				workspace,
-				project,
-				migrationCreator,
-				migrationDescriber,
-			}) => {
-				const schema = await loadSchema(project)
-				try {
-					const migrationName = input.getArgument('migrationName')
-					const initialSchema = await schemaVersionBuilder.buildSchema()
-					const result = await migrationCreator.prepareMigration(initialSchema, schema, migrationName, {
-						skipInitialSchemaValidation: input.getOption('skip-initial-schema-validation') === true,
-					})
-					if (result === null) {
-						console.log('Nothing to do')
-						return 0
-					}
-					await printMigrationDescription(migrationDescriber, result.initialSchema, result.migration, { noSql: true })
-					const yes = input.getOption('yes')
-					let shouldExecute = input.getOption('execute')
-					if (!yes) {
-						const { action } = await prompts({
-							type: 'select',
-							name: 'action',
-							message: 'Do you want to continue?',
-							choices: [
-								{ value: 'yes', title: 'Yes' },
-								...(!shouldExecute ? [{ value: 'execute', title: 'Yes and execute immediately' }] : []),
-								{ value: 'no', title: 'Abort' },
-							],
-						})
-						if (!action || action === 'no') {
-							console.log('Aborting')
-							return 1
-						}
-						if (action === 'execute') {
-							shouldExecute = true
-						}
-					}
-					const filename = await migrationCreator.saveMigration(result.migration)
+	protected async execute(input: Input<Args, Options>): Promise<void> {
+		const migrationName = input.getArgument('migrationName')
+		let shouldExecute = input.getOption('execute')
+		const yes = input.getOption('yes')
+		const skipInitialSchemaValidation = input.getOption('skip-initial-schema-validation') === true
 
-					console.log(`${filename} created`)
+		const schema = await this.schemaLoader.loadSchema()
+		try {
+			const initialSchema = await this.schemaVersionBuilder.buildSchema()
+			const result = await this.migrationCreator.prepareMigration(initialSchema, schema, migrationName, {
+				skipInitialSchemaValidation: skipInitialSchemaValidation,
+			})
+			if (result === null) {
+				console.log('Nothing to do')
+				return
+			}
+			this.migrationPrinter.printMigrationDescription(result.initialSchema, result.migration, { noSql: true })
 
-					if (shouldExecute) {
-						const instance = await interactiveResolveInstanceEnvironmentFromInput(workspace)
-						const apiToken = await interactiveResolveApiToken({ workspace, instance })
-						const tenantClient = TenantClient.create(instance.baseUrl, apiToken)
-						await tenantClient.createProject(project.name, true)
-						const systemClient = SystemClient.create(instance.baseUrl, project.name, apiToken)
 
-						const status = await resolveMigrationStatus(systemClient, migrationsResolver)
-						if (status.errorMigrations.length > 0) {
-							console.error(createMigrationStatusTable(status.errorMigrations))
-							throw `Cannot execute migrations`
-						}
-						await executeMigrations({
-							client: systemClient,
-							migrations: status.migrationsToExecute,
-							requireConfirmation: status.migrationsToExecute.length > 1 && !yes,
-							schemaVersionBuilder,
-							migrationDescriber,
-							contentMigrationFactoryArgs: {
-								apiToken,
-								apiBaseUrl: instance.baseUrl.replace(/\/$/, ''),
-								projectName: project.name,
-							},
-						})
-					}
-					return 0
-				} catch (e) {
-					if (e instanceof InvalidSchemaException) {
-						printValidationErrors(e.validationErrors, e.message)
-						return 1
-					}
-					throw e
+			if (!yes) {
+				const { action } = await prompts({
+					type: 'select',
+					name: 'action',
+					message: 'Do you want to continue?',
+					choices: [
+						{ value: 'yes', title: 'Yes' },
+						...(!shouldExecute ? [{ value: 'execute', title: 'Yes and execute immediately' }] : []),
+						{ value: 'no', title: 'Abort' },
+					],
+				})
+				if (!action || action === 'no') {
+					console.log('Aborting')
+					return
 				}
-			},
-		)
+				if (action === 'execute') {
+					shouldExecute = true
+				}
+			}
+
+			const filename = await this.migrationCreator.saveMigration(result.migration)
+
+			console.log(`${filename} created`)
+
+		} catch (e) {
+			if (e instanceof InvalidSchemaException) {
+				printValidationErrors(e.validationErrors, e.message)
+
+				return
+			}
+			throw e
+		}
+
+		if (shouldExecute) {
+			await this.migrationExecutorFacade.execute({
+				force: false,
+				requireConfirmation: !yes,
+			})
+		}
 	}
 }

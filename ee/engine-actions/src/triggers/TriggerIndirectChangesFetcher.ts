@@ -15,8 +15,8 @@ export class TriggerIndirectChangesFetcher {
 		listener: IndirectListener | JunctionListener,
 		where: Input.Where,
 	): Promise<Input.PrimaryValue[]> {
-		for (const key of listener.path.reverse()) {
-			where = { [key]: where }
+		for (let i = listener.path.length - 1; i >= 0; i--) {
+			where = { [listener.path[i]]: where }
 		}
 		const qb = SelectBuilder.create<{ id: Input.PrimaryValue }>()
 			.from(listener.rootEntity.tableName, 'root_')

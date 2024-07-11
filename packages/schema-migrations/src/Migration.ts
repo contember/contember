@@ -23,4 +23,5 @@ export const calculateMigrationChecksum = (migration: Migration): string => {
 		.update(canonicalMigration)
 		.digest('hex')
 }
-export { Migration }
+
+export type { Migration }

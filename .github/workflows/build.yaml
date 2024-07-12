@@ -1,12 +1,66 @@
 name: Build
 on:
   push:
-    branches: [ 'master' ]
+    branches: [ 'main' ]
     tags: [ '**' ]
   pull_request:
+    paths-ignore:
+      - docs/**
   workflow_dispatch:
 jobs:
-  build:
+  check:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+
+          - job_name: eslint
+            run_script: yarn run eslint:lint
+
+          - job_name: build
+            run_script: yarn run build
+
+          - job_name: api-exporter
+            run_script: |
+              yarn run ts:build
+              yarn run ae:test
+
+          - job_name: lint-imports
+            run_script: yarn tsx ./scripts/lint/module-import-linter.ts
+
+          - job_name: dedupe
+            run_script: yarn dedupe --check
+
+    container: node:20-alpine
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Get yarn cache directory path
+        run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
+        id: yarn-cache-dir-path
+
+      - name: Install GNU tar
+        run: apk add --no-cache tar
+
+      - name: Set up yarn cache
+        uses: actions/cache@v3
+        id: yarn-cache
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: Install yarn deps
+        run: |
+          yarn --version
+          yarn install --immutable
+
+      - name: Run ${{ matrix.job_name }}
+        run: ${{ matrix.run_script }}
+
+  test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -23,17 +77,26 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - name: Setup node
-        uses: actions/setup-node@v3
+      - name: Get yarn cache directory path
+        run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
+        id: yarn-cache-dir-path
+
+      - name: Install GNU tar
+        run: apk add --no-cache tar
+
+      - name: Set up yarn cache
+        uses: actions/cache@v3
+        id: yarn-cache
         with:
-          node-version: 20
-          cache: 'yarn'
-      - name: "Install yarn deps"
-        run: yarn install
-      - name: "Run linter"
-        run: yarn run eslint:lint
-      - name: "Lint imports"
-        run: yarn tsc --esModuleInterop scripts/lint/module-import-linter.ts && node ./scripts/lint/module-import-linter.js
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: Install yarn deps
+        run: |
+          yarn --version
+          yarn install --immutable
       - name: "Build app"
         run: yarn run build
       - name: "Run tests"

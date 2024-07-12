@@ -2,19 +2,19 @@ version: '3.7'
 services:
   playground:
     user: '1000:1000'
-    ports: ['3000:3000']
+    ports: [ '3000:3000' ]
 
   engine:
-    ports: ['3001:4000']
+    ports: [ '3001:4000' ]
 
   adminer:
-    ports: ['3002:8080']
+    ports: [ '3002:8080' ]
 
   minio:
-    ports: ['3003:9000']
+    ports: [ '3003:9000' ]
 
   postgres:
-    ports: ['3005:5432']
+    ports: [ '3005:5432' ]
 
 #---- project groups
 #services:

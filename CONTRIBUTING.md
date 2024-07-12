@@ -28,7 +28,6 @@ We're glad you're interested in contributing. Here's a guide to help you get sta
 - Create a pull request on GitHub, explaining your changes and referencing any relevant issues.
 - We want to make sure that everyone who contributes to Contember feels valued and supported. If you have any questions, feel free to reach us in [Github Discussions](https://github.com/orgs/contember/discussions). Happy coding!
 
-
 ## Creating a new package
 
 - run `./scripts/dev/create-package.sh <package-name>`

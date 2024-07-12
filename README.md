@@ -7,9 +7,10 @@
 	</a>
 </div>
 
-# Contember Interface
 
-Contember is an open source headless development platform. It makes it easy to build, maintain and operate systems for managing any type of content. Enjoy GraphQL API, role-based access control, authentication and a well-structured PostgreSQL database. Built by developers for developers.
+# Contember
+
+Contember is an open-source platform that empowers developers to quickly build and manage data-driven web applications. It gives you full control over the administration interface and data structure. Enjoy GraphQL API, role-based access control, authentication and a well-structured PostgreSQL database. Built by developers for developers.
 
 - [Start building with Contember](https://www.contember.com/start)
 - [Documentation](https://docs.contember.com/)
@@ -23,4 +24,4 @@ very quickly and are happy to provide any guidance.
 2. Run `yarn install`
 3. Run `docker-compose up`
 4. Run `test -f docker-compose.override.yaml || cp docker-compose.override.dist.yaml docker-compose.override.yaml`
-5. Run `docker-compose run contember-cli migrations:execute admin-sandbox`
+5. Run `yarn contember migrations:execute`

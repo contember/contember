@@ -1,9 +1,8 @@
-import { ChangeMyProfileErrorCode } from '../../schema'
 import { ChangeProfileCommand, ChangeProfileData } from '../commands/person/ChangeProfileCommand'
 import { Response, ResponseError, ResponseOk } from '../utils/Response'
 import { PersonQuery, PersonRow } from '../queries'
 import { DatabaseContext } from '../utils'
-import { EmailValidator } from './EmailValidator'
+import { EmailValidator, EmailValidatorError } from './EmailValidator'
 
 class PersonManager {
 	constructor(
@@ -17,7 +16,7 @@ class PersonManager {
 		)
 	}
 
-	async changeMyProfile(dbContext: DatabaseContext, person: PersonRow, data: ChangeProfileData): Promise<PersonManager.ProfileChangeResponse> {
+	async changeProfile(dbContext: DatabaseContext, person: PersonRow, data: ChangeProfileData): Promise<PersonManager.ProfileChangeResponse> {
 		if (data.email !== undefined && person.email !== data.email) {
 			const validationError = await this.emailValidator.validateEmail(dbContext, data.email)
 			if (validationError !== null) {
@@ -31,7 +30,7 @@ class PersonManager {
 }
 
 namespace PersonManager {
-	export type ProfileChangeResponse = Response<null, ChangeMyProfileErrorCode>
+	export type ProfileChangeResponse = Response<null, EmailValidatorError>
 }
 
 export { PersonManager }

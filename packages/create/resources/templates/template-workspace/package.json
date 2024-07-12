@@ -1,0 +1,32 @@
+{
+  "private": true,
+  "scripts": {
+    "contember": "docker-compose run --rm contember-cli",
+    "start": "yarn run contember:start-engine && yarn run client:generate && yarn contember:start-admin",
+    "build": "yarn run ts:build && yarn run contember:build-admin \"$0\" && yarn run contember:build-api",
+    "deploy": "yarn run build \"$0\" && docker-compose run --no-deps contember-cli deploy \"$@\" --root",
+    "contember:start-engine": "docker-compose up --detach && yarn run contember migrations:execute --yes",
+    "contember:start-admin": "yarn workspace @app/admin dev",
+    "contember:build-admin": "tsc --project admin && yarn workspace @app/admin build \"$0\"",
+    "contember:build-api": "tsc --project api",
+    "client:build": "tsc --project client",
+    "client:generate": "bash ./scripts/generate-client.sh",
+    "ts:build": "tsc --build",
+    "ts:clean": "tsc --build --clean",
+    "ts:watch": "tsc --build --watch",
+    "lint": "biome lint .",
+    "lint:fix": "biome lint . --apply"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.7.1",
+    "@contember/client-content-generator": "2.0.0-alpha.5",
+    "typescript": "^5.0",
+    "vite": "^5",
+    "vite-tsconfig-paths": "^4.3.1"
+  },
+  "workspaces": [
+    "admin",
+    "api",
+    "client"
+  ]
+}

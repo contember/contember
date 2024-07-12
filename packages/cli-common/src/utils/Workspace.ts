@@ -1,8 +1,6 @@
 import { basename, join } from 'node:path'
 import { ProjectManager } from './ProjectManager'
 import { PathMapping } from './PathMapping'
-import { installTemplate } from './template'
-import { getPackageVersion } from './version'
 import { readYaml } from './yaml'
 import { CliEnv, readCliEnv } from '../application'
 import { pathExists } from './fs'
@@ -17,29 +15,7 @@ export interface WorkspaceDirectoryArgument {
 	workspaceDirectory: string
 }
 
-type CreateWorkspaceArgs = {
-	workspaceName: string
-	template?: string
-} & WorkspaceDirectoryArgument
-
-export const createWorkspace = async ({ workspaceDirectory, workspaceName, template }: CreateWorkspaceArgs) => {
-	template ??= '@contember/template-workspace'
-	await installTemplate(template, workspaceDirectory, 'workspace', {
-		version: getPackageVersion(),
-		projectName: workspaceName,
-	})
-	const workspace = await Workspace.get(workspaceDirectory)
-	await workspace.projects.createProject(workspaceName, {})
-}
-
 export interface WorkspaceConfig {
-	api?: {
-		configFile?: string
-	}
-	admin?: {
-		enabled?: boolean
-		projectsFile?: string
-	}
 	projects?: PathMapping
 }
 
@@ -70,9 +46,6 @@ export class Workspace {
 		return basename(this.directory)
 	}
 
-	get adminEnabled(): boolean {
-		return this.config?.admin?.enabled || false
-	}
 
 	public isSingleProjectMode(): boolean {
 		return !!this.env.projectName  || !this.config.projects

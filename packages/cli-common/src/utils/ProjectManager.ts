@@ -1,8 +1,6 @@
 import { Project, validateProjectName } from './Project'
-import { basename, join } from 'node:path'
+import { basename } from 'node:path'
 import { Workspace } from './Workspace'
-import { resourcesDir } from '../pathUtils'
-import { installTemplate } from './template'
 import { getPathFromMapping, listEntriesInMapping, resolvePathMappingConfig } from './PathMapping'
 import { pathExists } from './fs'
 
@@ -54,19 +52,6 @@ export class ProjectManager {
 		return this.getProject(matched[0])
 	}
 
-	public async createProject(name: string, args: { template?: string }): Promise<Project> {
-		validateProjectName(name)
-		const projectDir = await this.getDirectory(name)
-		if (!projectDir) {
-			throw `Cannot resolve directory for project ${name}`
-		}
-		const withAdmin = this.workspace.adminEnabled
-		const template =
-			args.template ||
-			(withAdmin ? '@contember/template-project-with-admin' : join(resourcesDir, 'templates/template-project'))
-		await installTemplate(template, projectDir, 'project', { projectName: name })
-		return new Project(name, projectDir, this.workspace)
-	}
 
 	private async getDirectory(name: string) {
 		return getPathFromMapping(await this.getProjectPathMapping(), name)

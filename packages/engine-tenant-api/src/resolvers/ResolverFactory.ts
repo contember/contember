@@ -112,6 +112,7 @@ class ResolverFactory {
 				createSessionToken: this.resolvers.signInMutationResolver.createSessionToken.bind(this.resolvers.signInMutationResolver),
 				signOut: this.resolvers.signOutMutationResolver.signOut.bind(this.resolvers.signOutMutationResolver),
 
+				changeProfile: this.resolvers.changeProfileMutationResolver.changeProfile.bind(this.resolvers.changeProfileMutationResolver),
 				changeMyProfile: this.resolvers.changeProfileMutationResolver.changeMyProfile.bind(this.resolvers.changeProfileMutationResolver),
 				changePassword: this.resolvers.changePasswordMutationResolver.changePassword.bind(this.resolvers.changePasswordMutationResolver),
 				changeMyPassword: this.resolvers.changePasswordMutationResolver.changeMyPassword.bind(this.resolvers.changePasswordMutationResolver),

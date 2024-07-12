@@ -164,7 +164,7 @@ namespace EntityListAccessor {
 
 	export type ChildEventListenerMap = {
 		[EventType in keyof Pick<EntityAccessor.EntityEventListenerMap, 'beforeUpdate' | 'initialize' | 'update'> &
-			string as `child${Capitalize<EventType>}`]: EntityAccessor.EntityEventListenerMap[EventType]
+		string as `child${Capitalize<EventType>}`]: EntityAccessor.EntityEventListenerMap[EventType]
 	}
 
 	export interface RuntimeEntityListEventListenerMap {

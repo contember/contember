@@ -84,19 +84,19 @@ describe('reference render', () => {
 			references: {},
 		}
 		expect(render(<RichText
-				blocks={[block]}
-				undefinedReferenceHandler={id => ({
-					reference: {
-						id,
-						type: 'err',
-					},
-					referenceType: 'err',
-					referenceRenderer: () => <div>err</div>,
-				})}
-				referenceRenderers={{
-					link: ({ reference }) => <a href={reference.url} />,
-				}}
-			/>).container.firstChild,
+			blocks={[block]}
+			undefinedReferenceHandler={id => ({
+				reference: {
+					id,
+					type: 'err',
+				},
+				referenceType: 'err',
+				referenceRenderer: () => <div>err</div>,
+			})}
+			referenceRenderers={{
+				link: ({ reference }) => <a href={reference.url} />,
+			}}
+		/>).container.firstChild,
 		).toMatchInlineSnapshot(`
 			<p
 			  data-contember-type="paragraph"

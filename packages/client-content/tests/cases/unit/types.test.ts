@@ -121,12 +121,12 @@ describe('ts types', () => {
 	test('reduced has may - invalid "by"', async () => {
 		qb.list('Post',
 			{},
-				it => it
-					.$('localesByLocale',
-						// @ts-expect-error
-						{ by: { locale: {} } },
-						qb.fragment('PostLocale'),
-					),
+			it => it
+				.$('localesByLocale',
+					// @ts-expect-error
+					{ by: { locale: {} } },
+					qb.fragment('PostLocale'),
+				),
 		)
 	})
 

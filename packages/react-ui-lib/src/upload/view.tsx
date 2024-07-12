@@ -22,7 +22,7 @@ export const UploadedImageView = Component<UploadedImageViewProps>(({ DestroyAct
 		<div className="flex items-center justify-center h-40 w-40 rounded-md group relative">
 			{url && <img src={formatImageResizeUrl(url)} className="max-w-full max-h-full" />}
 			<FileActions DestroyAction={DestroyAction}>
-					<ImageMetadata {...props} />
+				<ImageMetadata {...props} />
 			</FileActions>
 		</div>
 	)

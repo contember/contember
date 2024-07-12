@@ -168,7 +168,7 @@ export class MutationGenerator {
 					markers: fieldMarkers,
 					id: entityId,
 				},
-]
+			]
 		}
 		const builder = this.createUpdateMutation(
 			processedPlaceholdersByEntity,
@@ -264,8 +264,8 @@ export class MutationGenerator {
 			const pathBack = this.treeStore.getPathBackToParent(siblingState)
 
 			const nonbearingFields: Array<| { type: 'field'; marker: FieldMarker; fieldState: FieldState }
-				| { type: 'hasOne'; marker: HasOneRelationMarker; fieldState: EntityRealmState | EntityRealmStateStub }
-				| { type: 'hasMany'; marker: HasManyRelationMarker; fieldState: EntityListState }> = []
+			| { type: 'hasOne'; marker: HasOneRelationMarker; fieldState: EntityRealmState | EntityRealmStateStub }
+			| { type: 'hasMany'; marker: HasManyRelationMarker; fieldState: EntityListState }> = []
 
 			for (const [placeholderName, fieldState] of siblingState.children) {
 				if (processedPlaceholders.has(placeholderName)) {

@@ -31,8 +31,8 @@ export const useDataView = (args: UseDataViewArgs): UseDataViewResult => {
 
 	const environment = useEnvironment()
 	const entities = useMemo(() =>
-			QueryLanguage.desugarQualifiedEntityList({ entities: args.entities }, environment),
-		[environment, args.entities],
+		QueryLanguage.desugarQualifiedEntityList({ entities: args.entities }, environment),
+	[environment, args.entities],
 	)
 
 	const resetPageRef = useRef<() => void>(() => {

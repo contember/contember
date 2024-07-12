@@ -151,13 +151,13 @@ export class ChildrenAnalyzer<
 		// Component, PureComponent, FunctionComponent
 
 		const treeNode = node.type as ElementType &
-			{
-				[staticMethod in ValidFactoryName]:
-				| StaticContextFactory<any, StaticContext>
-				| SyntheticChildrenFactory<any, StaticContext>
-				| UnconstrainedLeafRepresentationFactory<any, AllLeavesRepresentation, StaticContext>
-				| DeclarationSiteNodeRepresentationFactory<any, unknown, AllBranchNodesRepresentation, StaticContext>
-			}
+		{
+			[staticMethod in ValidFactoryName]:
+			| StaticContextFactory<any, StaticContext>
+			| SyntheticChildrenFactory<any, StaticContext>
+			| UnconstrainedLeafRepresentationFactory<any, AllLeavesRepresentation, StaticContext>
+			| DeclarationSiteNodeRepresentationFactory<any, unknown, AllBranchNodesRepresentation, StaticContext>
+		}
 
 		componentPath = [...componentPath, node]
 		if (typeof treeNode !== 'string') {

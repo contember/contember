@@ -32,23 +32,23 @@ export const FormCheckbox = Component<FormCheckboxProps>(({ field, isNonbearing,
 	}, [checkboxRef, ref, value])
 
 	return (
-			<SlotInput
-				ref={it => {
-					(ref as any).current = checkboxRef
-					setCheckboxRef(it)
-				}}
-				type="checkbox"
-				checked={accessor.value === true}
-				data-state={value === null ? 'indeterminate' : (value ? 'checked' : 'unchecked')}
-				data-invalid={dataAttribute(errors.length > 0)}
-				id={`${id}-input`}
-				onFocus={onFocus}
-				onBlur={onBlur}
-				onChange={useCallback<ChangeEventHandler<HTMLInputElement>>(e => {
-					accessorGetter().updateValue(e.target.checked)
-				}, [accessorGetter])}
-				{...props}
-			/>
+		<SlotInput
+			ref={it => {
+				(ref as any).current = checkboxRef
+				setCheckboxRef(it)
+			}}
+			type="checkbox"
+			checked={accessor.value === true}
+			data-state={value === null ? 'indeterminate' : (value ? 'checked' : 'unchecked')}
+			data-invalid={dataAttribute(errors.length > 0)}
+			id={`${id}-input`}
+			onFocus={onFocus}
+			onBlur={onBlur}
+			onChange={useCallback<ChangeEventHandler<HTMLInputElement>>(e => {
+				accessorGetter().updateValue(e.target.checked)
+			}, [accessorGetter])}
+			{...props}
+		/>
 	)
 }, ({ field, isNonbearing, defaultValue }, env) => {
 	const node = TreeNodeEnvironmentFactory.createEnvironmentForField(env, { field }).getSubTreeNode()

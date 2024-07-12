@@ -42,7 +42,7 @@ const editorVariants = cva(
 )
 
 export type EditorProps = PlateContentProps &
-	VariantProps<typeof editorVariants> & {};
+VariantProps<typeof editorVariants> & {};
 
 const Editor = forwardRef<HTMLDivElement, EditorProps>(
 	(

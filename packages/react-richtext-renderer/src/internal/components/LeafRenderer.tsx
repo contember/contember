@@ -24,13 +24,13 @@ export function LeafRenderer<
 
 	return renderLeaf
 		? createElement(
-				renderLeaf,
-				{
-					formatVersion,
-					leaf,
-					fallback,
-					children: leaf.text,
-				},
+			renderLeaf,
+			{
+				formatVersion,
+				leaf,
+				fallback,
+				children: leaf.text,
+			},
 		  )
 		: fallback
 }

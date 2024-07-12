@@ -137,7 +137,7 @@ export class EntityOperations {
 						}
 					}
 					if (stateToConnect.type === 'entityRealm') {
-							changesDelta += stateToConnect.unpersistedChangesCount
+						changesDelta += stateToConnect.unpersistedChangesCount
 					}
 
 					// TODO do something about the existing state…

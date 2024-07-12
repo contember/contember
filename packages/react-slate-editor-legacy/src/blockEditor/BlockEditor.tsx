@@ -252,9 +252,9 @@ export const BlockEditor = Object.assign<
 		ContentOutlet: (props: ContentOutletProps) => ReactElement | null
 		// TextField: (props: TextFieldProps) => ReactElement | null
 	}
->(BlockEditorComponent, {
-	ContentOutlet,
-})
+			>(BlockEditorComponent, {
+				ContentOutlet,
+			})
 
 const assertStaticBlockEditorInvariants = (props: BlockEditorProps, environment: Environment) => {
 	if (import.meta.env.DEV) {

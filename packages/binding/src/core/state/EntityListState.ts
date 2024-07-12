@@ -12,14 +12,14 @@ import type { EntityRealmState, EntityRealmStateStub } from './EntityRealmState'
 
 export type EntityListBlueprint =
 	| {
-			readonly type: 'hasMany'
-			readonly marker: HasManyRelationMarker
-			readonly parent: EntityRealmState
+		readonly type: 'hasMany'
+		readonly marker: HasManyRelationMarker
+		readonly parent: EntityRealmState
 	  }
 	| {
-			readonly type: 'subTree'
-			readonly marker: EntityListSubTreeMarker
-			readonly parent: undefined
+		readonly type: 'subTree'
+		readonly marker: EntityListSubTreeMarker
+		readonly parent: undefined
 	  }
 
 export interface EntityListState {

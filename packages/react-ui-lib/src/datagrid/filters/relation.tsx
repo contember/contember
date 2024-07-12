@@ -132,21 +132,21 @@ const DataGridRelationFilterSelectItem = forwardRef<HTMLButtonElement, {
 	children: ReactNode
 	filterFactory: (value: EntityId) => UseDataViewRelationFilterResult
 }>(({ children, filterFactory, ...props }, ref) => {
-	const entity = useEntity()
-	const [current, setFilter] = filterFactory(entity.id)
+			const entity = useEntity()
+			const [current, setFilter] = filterFactory(entity.id)
 
-	const include = useCallback(() => setFilter('toggleInclude'), [setFilter])
-	const exclude = useCallback(() => setFilter('toggleExclude'), [setFilter])
+			const include = useCallback(() => setFilter('toggleInclude'), [setFilter])
+			const exclude = useCallback(() => setFilter('toggleExclude'), [setFilter])
 
-	const isIncluded = current === 'include'
-	const isExcluded = current == 'exclude'
+			const isIncluded = current === 'include'
+			const isExcluded = current == 'exclude'
 
-	return (
-		<DataGridFilterSelectItemUI ref={ref} onExclude={exclude} onInclude={include} isExcluded={isExcluded} isIncluded={isIncluded} {...props}>
-			{children}
-		</DataGridFilterSelectItemUI>
-	)
-})
+			return (
+				<DataGridFilterSelectItemUI ref={ref} onExclude={exclude} onInclude={include} isExcluded={isExcluded} isIncluded={isIncluded} {...props}>
+					{children}
+				</DataGridFilterSelectItemUI>
+			)
+		})
 
 
 const DataGridRelationFilterSelect = ({ children, queryField, label }: {

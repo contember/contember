@@ -39,7 +39,7 @@ export const Select = Component(({ field, children, onUnselect, onSelect, option
 			<SelectIsSelectedContext.Provider value={isSelected}>
 				<SelectHandleSelectContext.Provider value={handleSelect}>
 					<SelectOptionsContext.Provider value={options}>
-							{children}
+						{children}
 					</SelectOptionsContext.Provider>
 				</SelectHandleSelectContext.Provider>
 			</SelectIsSelectedContext.Provider>

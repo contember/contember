@@ -30,14 +30,14 @@ export interface IfCallbackProps {
  * @group Logic Components
  */
 export const If = Component<IfProps>(({ condition, ...props }) => {
-		if (props.children && props.then) {
-			throw new Error('If component cannot have both children and then prop')
-		}
-		return typeof condition !== 'function'
-			? <IfFilter condition={condition} {...props} />
-			: <IfCallback condition={condition} {...props} />
-	},
-	'If',
+	if (props.children && props.then) {
+		throw new Error('If component cannot have both children and then prop')
+	}
+	return typeof condition !== 'function'
+		? <IfFilter condition={condition} {...props} />
+		: <IfCallback condition={condition} {...props} />
+},
+'If',
 )
 
 const IfCallback = Component<IfCallbackProps>(

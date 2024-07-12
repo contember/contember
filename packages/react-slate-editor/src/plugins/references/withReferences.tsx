@@ -83,11 +83,11 @@ export const withReferences = (args: ReferencesPluginArgs): EditorPlugin => {
 
 			const methods = useMemo(() => ({ insertElementWithReference, createElementReference }), [insertElementWithReference, createElementReference])
 			return (
-					<EditorGetReferencedEntityContext.Provider value={getReferencedEntity}>
-						<EditorReferenceMethodsContext.Provider value={methods}>
-							{children}
-						</EditorReferenceMethodsContext.Provider>
-					</EditorGetReferencedEntityContext.Provider>
+				<EditorGetReferencedEntityContext.Provider value={getReferencedEntity}>
+					<EditorReferenceMethodsContext.Provider value={methods}>
+						{children}
+					</EditorReferenceMethodsContext.Provider>
+				</EditorGetReferencedEntityContext.Provider>
 			)
 		},
 		staticRender: ({ children }, environment) => {

@@ -67,9 +67,9 @@ export const useDataViewFiltering = ({ dataViewKey, initialFilters, filteringSta
 			filterTypes,
 		}), [filters, resolvedFilters, filterTypes]),
 		methods: useMemo(() => ({
-				setFilter,
-			}),
-			[setFilter],
+			setFilter,
+		}),
+		[setFilter],
 		),
 	}
 }

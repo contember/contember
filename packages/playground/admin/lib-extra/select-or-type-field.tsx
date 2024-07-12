@@ -25,23 +25,23 @@ export const SelectOrTypeField = Component(({ field, label, description, selectP
 		<FormFieldScope field={field}>
 			<FormContainer description={description} label={label}>
 				{showSelect ? <Select onChange={e => {
-						const value = e.target.value
-						if (value === '___other') {
-							setShowSelect(false)
-							fieldAccessor.updateValue('')
-						} else {
-							fieldAccessor.updateValue(value)
+					const value = e.target.value
+					if (value === '___other') {
+						setShowSelect(false)
+						fieldAccessor.updateValue('')
+					} else {
+						fieldAccessor.updateValue(value)
 
-						}
-					}} {...selectProps} className={cn('max-w-md', selectProps?.className)}>
-						<option value="">Select</option>
-						{Object.entries(options ?? {}).map(([value, label]) => (
-							<option key={value} value={value} selected={value === fieldValue}>
-								{label}
-							</option>
-						))}
-						<option value="___other">Other</option>
-					</Select>
+					}
+				}} {...selectProps} className={cn('max-w-md', selectProps?.className)}>
+					<option value="">Select</option>
+					{Object.entries(options ?? {}).map(([value, label]) => (
+						<option key={value} value={value} selected={value === fieldValue}>
+							{label}
+						</option>
+					))}
+					<option value="___other">Other</option>
+				</Select>
 					: <FormInput field={field} isNonbearing={isNonbearing} defaultValue={defaultValue}>
 						<Input required={required} {...(inputProps ?? {})} className={cn('max-w-md', inputProps?.className)} />
 					</FormInput>}

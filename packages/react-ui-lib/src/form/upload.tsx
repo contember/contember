@@ -157,14 +157,14 @@ const UploadFieldInner = Component((({ baseField, label, description, children, 
 								</UploaderHasFile>
 							</UploaderBase>
 
-								<EntityView render={entity => {
-									entity = baseField ? entity.getEntity({ field: baseField }) : entity
-									if (entity.getField(urlField).value === null) {
-										return <UploaderDropzone inactiveOnUpload dropzonePlaceholder={dropzonePlaceholder} />
-									} else {
-										return children
-									}
-								}} />
+							<EntityView render={entity => {
+								entity = baseField ? entity.getEntity({ field: baseField }) : entity
+								if (entity.getField(urlField).value === null) {
+									return <UploaderDropzone inactiveOnUpload dropzonePlaceholder={dropzonePlaceholder} />
+								} else {
+									return children
+								}
+							}} />
 						</Uploader>
 					</div>
 				</FormContainer>

@@ -42,12 +42,12 @@ function useDesugaredRelativeSingleEntity(
 		() =>
 			hasEntity
 				? QueryLanguage.desugarRelativeSingleEntity(
-						{
-							field: normalizedSugared!.field,
-							isNonbearing: normalizedSugared?.isNonbearing,
-							setOnCreate: normalizedSugared?.setOnCreate,
-						},
-						environment,
+					{
+						field: normalizedSugared!.field,
+						isNonbearing: normalizedSugared?.isNonbearing,
+						setOnCreate: normalizedSugared?.setOnCreate,
+					},
+					environment,
 				  )
 				: undefined,
 		// eslint-disable-next-line react-hooks/exhaustive-deps

@@ -9,10 +9,10 @@ import { FormFieldScope } from '@contember/react-form'
 import { richTextFieldPlugins } from './plugins'
 
 export type RichTextFieldProps = {
-		field: SugaredRelativeSingleField['field']
-		children: ReactNode
-	}
-	& Omit<FormContainerProps, 'children'>
+	field: SugaredRelativeSingleField['field']
+	children: ReactNode
+}
+& Omit<FormContainerProps, 'children'>
 
 export const RichTextField = Component<RichTextFieldProps>(({ field, description, label, children }) => {
 	return (

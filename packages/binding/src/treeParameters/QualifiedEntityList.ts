@@ -15,24 +15,24 @@ import type {
 
 export interface QualifiedEntityList
 	extends EntityListParameters,
-		QualifiedEntityParameters,
-		EntityCreationParameters,
-		EntityListEventListeners {
+	QualifiedEntityParameters,
+	EntityCreationParameters,
+	EntityListEventListeners {
 	isCreating: false
 	hasOneRelationPath: HasOneRelation[]
 }
 
 export interface SugarableQualifiedEntityList
 	extends SugarableEntityListParameters,
-		SugarableQualifiedEntityParameters {
+	SugarableQualifiedEntityParameters {
 	hasOneRelationPath?: SugarableHasOneRelation[] | SugarableHasOneRelation
 }
 
 export interface UnsugarableQualifiedEntityList
 	extends UnsugarableEntityListParameters,
-		UnsugarableQualifiedEntityParameters,
-		UnsugarableEntityCreationParameters,
-		UnsugarableEntityListEventListeners {
+	UnsugarableQualifiedEntityParameters,
+	UnsugarableEntityCreationParameters,
+	UnsugarableEntityListEventListeners {
 	isCreating?: false
 	// Deliberately leaving out UnsugarableHasOneRelation
 }

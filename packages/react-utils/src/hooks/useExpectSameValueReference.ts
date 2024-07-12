@@ -37,9 +37,9 @@ export function useExpectSameValueReference<T>(next: T, shouldThrow: boolean = f
 				'Try declaring constants outside of the component scope. ' +
 				'Otherwise try to memoize callbacks with useCallback, ' +
 				'useReferentiallyStableCallback useEvent, useRef or useMemo.', {
-				previous: previous.current,
-				next,
-			})
+					previous: previous.current,
+					next,
+				})
 		}
 
 		if (shouldThrow) {

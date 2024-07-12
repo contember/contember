@@ -14,12 +14,12 @@ export type FieldViewProps =
 	& FieldViewCommonProps
 	& (
 		| {
-				render: (...accessors: FieldAccessor[]) => ReactNode
-				field: string | SugaredRelativeSingleField
+			render: (...accessors: FieldAccessor[]) => ReactNode
+			field: string | SugaredRelativeSingleField
 		  }
 		| {
-				render: (...accessors: FieldAccessor[]) => ReactNode
-				fields: Array<string | SugaredRelativeSingleField>
+			render: (...accessors: FieldAccessor[]) => ReactNode
+			fields: Array<string | SugaredRelativeSingleField>
 		  }
 	)
 
@@ -43,8 +43,8 @@ export const FieldView = Component<FieldViewProps>(
 			'fields' in props && Array.isArray(props.fields)
 				? props.fields
 				: 'field' in props && props.field
-				? [props.field]
-				: throwBindingError(`FieldView: failed to supply either the 'field' or the 'fields' prop.`)
+					? [props.field]
+					: throwBindingError(`FieldView: failed to supply either the 'field' or the 'fields' prop.`)
 
 		useConstantLengthInvariant(
 			fields,
@@ -83,8 +83,8 @@ export const FieldView = Component<FieldViewProps>(
 			'fields' in props && Array.isArray(props.fields)
 				? props.fields
 				: 'field' in props && props.field
-				? [props.field]
-				: throwBindingError(`FieldView: failed to supply either the 'field' or the 'fields' prop.`)
+					? [props.field]
+					: throwBindingError(`FieldView: failed to supply either the 'field' or the 'fields' prop.`)
 		return (
 			<>
 				{props.fallbackIfUnpersisted}
@@ -102,54 +102,54 @@ export type FieldViewComponentSignature = {
 		props:
 			& FieldViewCommonProps
 			& {
-			field: string | SugaredRelativeSingleField;
-			render: (field1: FieldAccessor<FV1>) => ReactNode
-		},
+				field: string | SugaredRelativeSingleField;
+				render: (field1: FieldAccessor<FV1>) => ReactNode
+			},
 	): ReactElement | null
 
 	<FV1 extends FieldValue>(
 		props:
 			& FieldViewCommonProps
 			& {
-			fields: [string | SugaredRelativeSingleField];
-			render: (field1: FieldAccessor<FV1>) => ReactNode
-		},
+				fields: [string | SugaredRelativeSingleField];
+				render: (field1: FieldAccessor<FV1>) => ReactNode
+			},
 	): ReactElement | null
 
 	<FV1 extends FieldValue, FV2 extends FieldValue>(
 		props:
 			& FieldViewCommonProps
 			& {
-			fields: [string | SugaredRelativeSingleField, string | SugaredRelativeSingleField];
-			render: (field1: FieldAccessor<FV1>, field2: FieldAccessor<FV2>) => ReactNode
-		},
+				fields: [string | SugaredRelativeSingleField, string | SugaredRelativeSingleField];
+				render: (field1: FieldAccessor<FV1>, field2: FieldAccessor<FV2>) => ReactNode
+			},
 	): ReactElement | null
 
 	<FV1 extends FieldValue, FV2 extends FieldValue, FV3 extends FieldValue>(
 		props:
 			& FieldViewCommonProps
 			& {
-			fields: [string | SugaredRelativeSingleField, string | SugaredRelativeSingleField, string | SugaredRelativeSingleField]
-			render: (field1: FieldAccessor<FV1>, field2: FieldAccessor<FV2>, field3: FieldAccessor<FV3>) => ReactNode
-		},
+				fields: [string | SugaredRelativeSingleField, string | SugaredRelativeSingleField, string | SugaredRelativeSingleField]
+				render: (field1: FieldAccessor<FV1>, field2: FieldAccessor<FV2>, field3: FieldAccessor<FV3>) => ReactNode
+			},
 	): ReactElement | null
 
 	<FV1 extends FieldValue, FV2 extends FieldValue, FV3 extends FieldValue, FV4 extends FieldValue>(
 		props:
 			& FieldViewCommonProps
 			& {
-			fields: [string | SugaredRelativeSingleField, string | SugaredRelativeSingleField, string | SugaredRelativeSingleField, string | SugaredRelativeSingleField]
-			render: (field1: FieldAccessor<FV1>, field2: FieldAccessor<FV2>, field3: FieldAccessor<FV3>, field4: FieldAccessor<FV4>) => ReactNode
-		},
+				fields: [string | SugaredRelativeSingleField, string | SugaredRelativeSingleField, string | SugaredRelativeSingleField, string | SugaredRelativeSingleField]
+				render: (field1: FieldAccessor<FV1>, field2: FieldAccessor<FV2>, field3: FieldAccessor<FV3>, field4: FieldAccessor<FV4>) => ReactNode
+			},
 	): ReactElement | null
 
 	<FV1 extends FieldValue, FV2 extends FieldValue, FV3 extends FieldValue, FV4 extends FieldValue, FV5 extends FieldValue>(
 		props:
 			& FieldViewCommonProps
 			& {
-			fields: [string | SugaredRelativeSingleField, string | SugaredRelativeSingleField, string | SugaredRelativeSingleField, string | SugaredRelativeSingleField, string | SugaredRelativeSingleField]
-			render: (field1: FieldAccessor<FV1>, field2: FieldAccessor<FV2>, field3: FieldAccessor<FV3>, field4: FieldAccessor<FV4>, field5: FieldAccessor<FV5>) => ReactNode
-		},
+				fields: [string | SugaredRelativeSingleField, string | SugaredRelativeSingleField, string | SugaredRelativeSingleField, string | SugaredRelativeSingleField, string | SugaredRelativeSingleField]
+				render: (field1: FieldAccessor<FV1>, field2: FieldAccessor<FV2>, field3: FieldAccessor<FV3>, field4: FieldAccessor<FV4>, field5: FieldAccessor<FV5>) => ReactNode
+			},
 	): ReactElement | null
 
 	(props: FieldViewProps): ReactElement | null

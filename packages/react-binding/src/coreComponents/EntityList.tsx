@@ -9,13 +9,13 @@ export interface EntityListBaseProps {
 }
 
 export type EntityListProps<ListProps> = EntityListBaseProps &
-	(
-		| {}
-		| {
-				listComponent: ComponentType<ListProps & EntityListBaseProps>
-				listProps?: ListProps
+(
+	| {}
+	| {
+		listComponent: ComponentType<ListProps & EntityListBaseProps>
+		listProps?: ListProps
 		  }
-	)
+)
 
 /**
  * @group Data binding

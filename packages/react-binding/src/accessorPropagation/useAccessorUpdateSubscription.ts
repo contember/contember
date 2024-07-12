@@ -41,9 +41,9 @@ function useAccessorUpdateSubscription<
 		accessor: A
 		getAccessor: () => A
 	}>(() => ({
-		accessor: getAccessor(),
-		getAccessor,
-	}))
+				accessor: getAccessor(),
+				getAccessor,
+			}))
 
 	useConstantValueInvariant(withForceUpdate, 'useAccessorUpdateSubscription: cannot change the withForceUpdate value!')
 

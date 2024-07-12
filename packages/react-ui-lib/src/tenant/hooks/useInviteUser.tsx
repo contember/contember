@@ -18,28 +18,28 @@ export const useInviteUser = ({ emailField, personIdField, memberships }: {
 	const toast = useShowToast()
 
 	return useReferentiallyStableCallback(async (getAccessor: () => EntityAccessor) => {
-			const accessor = getAccessor()
-			const personId = accessor.getField<string>(personIdField)
-			const email = accessor.getField<string>(emailField)
+		const accessor = getAccessor()
+		const personId = accessor.getField<string>(personIdField)
+		const email = accessor.getField<string>(emailField)
 
-			if (personId.value || !email.value) {
-				return
+		if (personId.value || !email.value) {
+			return
+		}
+
+		const result = await invite({
+			email: email.value,
+			projectSlug: project!,
+			memberships: memberships,
+		})
+
+		return () => {
+			if (!result?.ok || !result?.result) {
+				return toast(<ToastContent title={dict.inviteErrors[result?.error?.code ?? 'fallback']} />, {
+					type: 'error',
+				})
 			}
-
-			const result = await invite({
-				email: email.value,
-				projectSlug: project!,
-				memberships: memberships,
-			})
-
-			return () => {
-				if (!result?.ok || !result?.result) {
-					return toast(<ToastContent title={dict.inviteErrors[result?.error?.code ?? 'fallback']} />, {
-						type: 'error',
-					})
-				}
-				personId.updateValue(result.result.person.id)
-			}
-		},
+			personId.updateValue(result.result.person.id)
+		}
+	},
 	)
 }

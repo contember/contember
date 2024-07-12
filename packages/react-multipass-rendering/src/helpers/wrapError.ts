@@ -16,14 +16,14 @@ export const wrapError = (e: unknown, currentComponentName: string, methodName: 
 				}
 				try {
 					const valuePrinted = JSON.stringify(value, (key, value) => {
-							if (typeof value === 'function') {
-								return '(function)'
-							}
-							if (React.isValidElement(value)) {
-								return '(react element)'
-							}
-							return value
-						},
+						if (typeof value === 'function') {
+							return '(function)'
+						}
+						if (React.isValidElement(value)) {
+							return '(react element)'
+						}
+						return value
+					},
 					)
 					result += ` ${key}=${valuePrinted}`
 				} catch {

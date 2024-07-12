@@ -12,10 +12,10 @@ export interface HasOneRelation extends Relation, SingleEntityParameters, Single
 
 export interface SugarableHasOneRelation
 	extends SugarableRelation,
-		SugarableSingleEntityParameters {
+	SugarableSingleEntityParameters {
 	reducedBy?: SugaredUniqueWhere
 }
 
 export interface UnsugarableHasOneRelation
 	extends UnsugarableRelation,
-		UnsugarableSingleEntityEventListeners {}
+	UnsugarableSingleEntityEventListeners {}

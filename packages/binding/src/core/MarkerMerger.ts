@@ -108,8 +108,8 @@ export class MarkerMerger {
 				fromOriginal === undefined
 					? fromFresh
 					: fromOriginal instanceof EntityListSubTreeMarker
-					? MarkerMerger.mergeEntityListSubTreeMarkers(fromOriginal, fromFresh as EntityListSubTreeMarker)
-					: MarkerMerger.mergeEntitySubTreeMarkers(fromOriginal, fromFresh as EntitySubTreeMarker),
+						? MarkerMerger.mergeEntityListSubTreeMarkers(fromOriginal, fromFresh as EntityListSubTreeMarker)
+						: MarkerMerger.mergeEntitySubTreeMarkers(fromOriginal, fromFresh as EntitySubTreeMarker),
 			)
 		}
 		return newOriginal

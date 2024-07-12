@@ -16,8 +16,8 @@ export interface SugarableRelativeEntityList {
 
 export interface UnsugarableRelativeEntityList
 	extends UnsugarableRelation,
-		UnsugarableEntityListParameters,
-		UnsugarableEntityListEventListeners {}
+	UnsugarableEntityListParameters,
+	UnsugarableEntityListEventListeners {}
 
 export interface SugaredRelativeEntityList extends UnsugarableRelativeEntityList {
 	// E.g. genres(slug = 'sciFi').authors[age < 123]

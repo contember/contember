@@ -13,12 +13,12 @@ export type HasManyProps<ListProps = never, EntityProps = never> = SugaredRelati
 	children?: ReactNode
 	variables?: Environment.ValuesMapWithFactory
 } & (
-		| {}
-		| {
-				listComponent: ComponentType<ListProps & EntityListBaseProps>
-				listProps?: ListProps
+	| {}
+	| {
+		listComponent: ComponentType<ListProps & EntityListBaseProps>
+		listProps?: ListProps
 		  }
-	)
+)
 
 /**
  * @group Data binding

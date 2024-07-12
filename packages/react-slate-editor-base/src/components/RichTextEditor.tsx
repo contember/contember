@@ -108,9 +108,9 @@ export const RichTextEditor: FunctionComponent<RichTextEditorProps> = Component(
 		)
 
 		return (
-				<Slate editor={editor} initialValue={valueNodes} onChange={onChange}>
-					{props.children}
-				</Slate>
+			<Slate editor={editor} initialValue={valueNodes} onChange={onChange}>
+				{props.children}
+			</Slate>
 		)
 	},
 	props => (

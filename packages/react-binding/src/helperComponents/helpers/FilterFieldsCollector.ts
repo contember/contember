@@ -19,13 +19,13 @@ export class FilterFieldsCollector {
 	private collectFieldsInternal(filter: Filter, entity: SchemaEntity, path: string[], result: Set<string>): void {
 		for (const [key, value] of Object.entries(filter)) {
 			if (key === 'and' || key === 'or') {
-					if (!Array.isArray(value)) {
-						throw new BindingError()
-					}
-					value?.forEach(it => this.collectFieldsInternal(it, entity, path, result))
+				if (!Array.isArray(value)) {
+					throw new BindingError()
+				}
+				value?.forEach(it => this.collectFieldsInternal(it, entity, path, result))
 
 			} else if (key === 'not') {
-					this.collectFieldsInternal(value as Filter, entity, path, result)
+				this.collectFieldsInternal(value as Filter, entity, path, result)
 
 			} else {
 				const field = entity.fields.get(key)

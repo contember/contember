@@ -14,7 +14,7 @@ export interface FieldRuntimeProps<Persisted extends FieldValue = FieldValue> {
 
 export interface FieldProps<Persisted extends FieldValue = FieldValue>
 	extends FieldBasicProps,
-		FieldRuntimeProps<Persisted> {}
+	FieldRuntimeProps<Persisted> {}
 
 /**
  * @group Data binding

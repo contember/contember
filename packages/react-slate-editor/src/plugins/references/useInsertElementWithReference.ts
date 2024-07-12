@@ -16,10 +16,10 @@ export const useInsertElementWithReference = ({ createElementReference, blocks, 
 	editor: Editor
 }): InsertElementWithReference => {
 	return useReferentiallyStableCallback((
-			element: Partial<Element> & { type: string },
-			referenceDiscriminant: string,
-			initialize?: EntityAccessor.BatchUpdatesHandler,
-		) => {
+		element: Partial<Element> & { type: string },
+		referenceDiscriminant: string,
+		initialize?: EntityAccessor.BatchUpdatesHandler,
+	) => {
 
 		const targetBlock = blocks[element.type]
 

@@ -189,9 +189,9 @@ export class DataBinding<Node> {
 			await this.eventManager.triggerOnPersistError(this.bindingOperations)
 			await onPersistError?.(this.bindingOperations)
 			this.persistFail({
-					errors: this.accessorErrorManager.getErrors(),
-					type: 'invalidInput',
-				},
+				errors: this.accessorErrorManager.getErrors(),
+				type: 'invalidInput',
+			},
 			)
 		}
 	}

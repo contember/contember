@@ -20,16 +20,16 @@ export function withTooltip<
 	return forwardRef<
 		React.ElementRef<T>,
 		React.ComponentPropsWithoutRef<T> & {
-		tooltip?: React.ReactNode;
-		tooltipContentProps?: Omit<
+			tooltip?: React.ReactNode;
+			tooltipContentProps?: Omit<
 			React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Content>,
 			'children'
 		>;
-		tooltipProps?: Omit<
+			tooltipProps?: Omit<
 			React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Root>,
 			'children'
 		>;
-	}
+		}
 	>(function ExtendComponent(
 		{ tooltip, tooltipContentProps, tooltipProps, ...props },
 		ref,

@@ -68,8 +68,8 @@ export class TreeStore {
 
 	public getPathBackToParent(entityRealm: EntityRealmState | EntityRealmStateStub):
 		| {
-				fieldBackToParent: FieldName
-				parent: EntityRealmState
+			fieldBackToParent: FieldName
+			parent: EntityRealmState
 		  }
 		| undefined {
 		const blueprint = entityRealm.blueprint
@@ -158,8 +158,8 @@ export class TreeStore {
 			placeholderName = PlaceholderGenerator.getEntityListSubTreePlaceholder(
 				aliasOrParameters.isCreating
 					? QueryLanguage.desugarUnconstrainedQualifiedEntityList(
-							aliasOrParameters as SugaredUnconstrainedQualifiedEntityList,
-							environment,
+						aliasOrParameters as SugaredUnconstrainedQualifiedEntityList,
+						environment,
 					  )
 					: QueryLanguage.desugarQualifiedEntityList(aliasOrParameters as SugaredQualifiedEntityList, environment),
 				environment,
@@ -168,8 +168,8 @@ export class TreeStore {
 			placeholderName = PlaceholderGenerator.getEntitySubTreePlaceholder(
 				aliasOrParameters.isCreating
 					? QueryLanguage.desugarUnconstrainedQualifiedSingleEntity(
-							aliasOrParameters as SugaredUnconstrainedQualifiedSingleEntity,
-							environment,
+						aliasOrParameters as SugaredUnconstrainedQualifiedSingleEntity,
+						environment,
 					  )
 					: QueryLanguage.desugarQualifiedSingleEntity(aliasOrParameters as SugaredQualifiedSingleEntity, environment),
 				environment,

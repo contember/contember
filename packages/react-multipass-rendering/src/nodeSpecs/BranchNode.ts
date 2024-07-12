@@ -86,17 +86,17 @@ namespace BranchNode {
 		Representation = any,
 	> =
 		| {
-				type: 'declarationSite'
-				factoryMethodName: FactoryMethodName
-				childrenRepresentationReducer: ChildrenRepresentationReducer<
+			type: 'declarationSite'
+			factoryMethodName: FactoryMethodName
+			childrenRepresentationReducer: ChildrenRepresentationReducer<
 					ChildrenRepresentation,
 					ReducedChildrenRepresentation
 				>
 		  }
 		| {
-				type: 'useSite'
-				factory: UseSiteBranchNodeRepresentationFactory<Props, ChildrenRepresentation, Representation, StaticContext>
-				ComponentType?: ElementType<Props>
+			type: 'useSite'
+			factory: UseSiteBranchNodeRepresentationFactory<Props, ChildrenRepresentation, Representation, StaticContext>
+			ComponentType?: ElementType<Props>
 		  }
 }
 

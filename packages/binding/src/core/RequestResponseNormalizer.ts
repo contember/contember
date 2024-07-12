@@ -110,7 +110,7 @@ export class RequestResponseNormalizer {
 					return assertNever(subTreeType)
 				}
 			} else {
-					return assertNever(operation)
+				return assertNever(operation)
 			}
 		}
 	}

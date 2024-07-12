@@ -1,4 +1,4 @@
-	export * from './editor'
+export * from './editor'
 export * from './elements'
 export * from './embed'
 // export * from './templating' // Deliberately not exporting it

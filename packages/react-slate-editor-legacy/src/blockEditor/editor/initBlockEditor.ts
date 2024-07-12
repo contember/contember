@@ -12,10 +12,10 @@ import { overrideRenderElement, OverrideRenderElementOptions } from './overrideR
 
 export interface InitEditorOptions
 	extends OverrideCreateElementReferenceOptions,
-		ReferenceElementOptions,
-		OverrideInsertDataOptions,
-		OverrideRenderElementOptions,
-		OverrideInsertElementWithReferenceOptions {}
+	ReferenceElementOptions,
+	OverrideInsertDataOptions,
+	OverrideRenderElementOptions,
+	OverrideInsertElementWithReferenceOptions {}
 
 export const initBlockEditor = ({ editor, ...options }: InitEditorOptions & { editor: Editor }) => {
 	const e = editor as EditorWithBlocks

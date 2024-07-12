@@ -42,12 +42,12 @@ function useDesugaredRelativeSingleField(
 		() =>
 			hasField
 				? QueryLanguage.desugarRelativeSingleField(
-						{
-							field: normalizedSugared!.field,
-							defaultValue: normalizedSugared?.defaultValue,
-							isNonbearing: normalizedSugared?.isNonbearing,
-						},
-						environment,
+					{
+						field: normalizedSugared!.field,
+						defaultValue: normalizedSugared?.defaultValue,
+						isNonbearing: normalizedSugared?.isNonbearing,
+					},
+					environment,
 				  )
 				: undefined,
 		// eslint-disable-next-line react-hooks/exhaustive-deps

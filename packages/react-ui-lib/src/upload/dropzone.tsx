@@ -18,12 +18,12 @@ export const UploaderDropzone = ({ inactiveOnUpload, dropzonePlaceholder }: { in
 				{showLoader
 					? <UploaderInactiveDropzoneUI />
 					: <UploaderDropzoneArea>{dropzonePlaceholder ?? <UploaderDropzoneAreaUI>
-							<UploadIcon className={'w-12 h-12 text-gray-400'} />
-							<div className={'font-semibold text-sm'}>{dict.uploader.dropFiles}</div>
-							<div className={'text-xs'}>{dict.uploader.or}</div>
-							<div className={'flex gap-2 items-center text-xs'}>
-								<Button size={'sm'} variant={'outline'}>{dict.uploader.browseFiles}</Button>
-							</div>
+						<UploadIcon className={'w-12 h-12 text-gray-400'} />
+						<div className={'font-semibold text-sm'}>{dict.uploader.dropFiles}</div>
+						<div className={'text-xs'}>{dict.uploader.or}</div>
+						<div className={'flex gap-2 items-center text-xs'}>
+							<Button size={'sm'} variant={'outline'}>{dict.uploader.browseFiles}</Button>
+						</div>
 					</UploaderDropzoneAreaUI>}</UploaderDropzoneArea>
 				}
 			</UploaderDropzoneWrapperUI>

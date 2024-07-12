@@ -19,7 +19,7 @@ export const useSlugInput = ({
 	persistedHardPrefix,
 	persistedSoftPrefix,
 	slugify,
- }: UseSlugValueProps) => {
+}: UseSlugValueProps) => {
 
 	const field = useField<string>(fieldName)
 	const normalizedUnpersistedHardPrefix = useNormalizedPrefix(unpersistedHardPrefix)

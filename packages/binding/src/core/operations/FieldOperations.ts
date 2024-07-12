@@ -98,8 +98,8 @@ export class FieldOperations {
 					field.fieldMarker.defaultValue === undefined
 						? newValue
 						: newValue === null
-						? field.fieldMarker.defaultValue
-						: newValue
+							? field.fieldMarker.defaultValue
+							: newValue
 				const normalizedPersistedValue = field.persistedValue === undefined ? null : field.persistedValue
 				const hadUnpersistedChangesBefore = field.hasUnpersistedChanges
 				const hasUnpersistedChangesNow = resolvedValue !== normalizedPersistedValue

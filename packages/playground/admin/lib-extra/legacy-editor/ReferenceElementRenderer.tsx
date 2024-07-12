@@ -140,7 +140,7 @@ export const ReferenceElementRenderer = memo((props: ReferenceElementRendererPro
 					</div>
 				</CardHeader>
 				<CardContent onClick={isEditable ? onContainerClick : undefined}>
-						{blockBody}
+					{blockBody}
 				</CardContent>
 			</Card>
 		</Entity>

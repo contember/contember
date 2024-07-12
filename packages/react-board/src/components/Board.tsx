@@ -56,10 +56,10 @@ export type BoardStaticColumnsBindingProps = {
 
 export type BoardCommonProps =
 	& {
-	children: ReactNode
-	sortableBy?: string | SugaredRelativeSingleField
-	sortScope?: 'column' | 'board'
-}
+		children: ReactNode
+		sortableBy?: string | SugaredRelativeSingleField
+		sortScope?: 'column' | 'board'
+	}
 
 export type BoardQualifiedItemsProps =
 	& Pick<SugaredQualifiedEntityList, 'entities' | 'orderBy' | 'limit' | 'offset'>

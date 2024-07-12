@@ -37,41 +37,41 @@ export const useBlockEditorSlateNodes = ({
 
 	const topLevelBlockElements = topLevelBlocks.length
 		? topLevelBlocks.map((entity, index) => {
-				const existingBlockElement = blockElementCache.get(entity)
+			const existingBlockElement = blockElementCache.get(entity)
 
-				const blockPathRef = blockElementPathRefs.get(entity.id)
-				if (blockPathRef === undefined) {
+			const blockPathRef = blockElementPathRefs.get(entity.id)
+			if (blockPathRef === undefined) {
+				blockElementPathRefs.set(entity.id, Editor.pathRef(editor, [index], { affinity: 'backward' }))
+			} else {
+				const current = blockPathRef.current
+				if (current === null || current.length !== 1 || current[0] !== index) {
+					blockPathRef.unref()
 					blockElementPathRefs.set(entity.id, Editor.pathRef(editor, [index], { affinity: 'backward' }))
-				} else {
-					const current = blockPathRef.current
-					if (current === null || current.length !== 1 || current[0] !== index) {
-						blockPathRef.unref()
-						blockElementPathRefs.set(entity.id, Editor.pathRef(editor, [index], { affinity: 'backward' }))
-					}
 				}
+			}
 
-				if (existingBlockElement) {
-					return existingBlockElement
-				}
-				const contentField = entity.getRelativeSingleField(desugaredContentField)
+			if (existingBlockElement) {
+				return existingBlockElement
+			}
+			const contentField = entity.getRelativeSingleField(desugaredContentField)
 
-				let blockElement: SlateElement
+			let blockElement: SlateElement
 
-				if (contentField.value === null || contentField.value === '') {
-					blockElement = editor.createDefaultElement([{ text: '' }])
-				} else if (typeof contentField.value !== 'string') {
-					throw new BindingError(`BlockEditor: The 'textBlockField' does not contain a string value.`)
-				} else {
-					blockElement = editor.deserializeNodes(
-						contentField.value,
-						`BlockEditor: The 'contentField' of a block contains invalid data.`,
-					)[0] as SlateElement
-				}
-				blockElementCache.set(entity, blockElement)
-				return blockElement
+			if (contentField.value === null || contentField.value === '') {
+				blockElement = editor.createDefaultElement([{ text: '' }])
+			} else if (typeof contentField.value !== 'string') {
+				throw new BindingError(`BlockEditor: The 'textBlockField' does not contain a string value.`)
+			} else {
+				blockElement = editor.deserializeNodes(
+					contentField.value,
+					`BlockEditor: The 'contentField' of a block contains invalid data.`,
+				)[0] as SlateElement
+			}
+			blockElementCache.set(entity, blockElement)
+			return blockElement
 		  })
 		: [
-				editor.createDefaultElement([{ text: '' }]),
+			editor.createDefaultElement([{ text: '' }]),
 		  ]
 	return topLevelBlockElements
 }

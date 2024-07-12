@@ -17,7 +17,7 @@ export interface SetOrderFieldOnCreateOwnProps {
 
 export interface SetOrderFieldOnCreateProps
 	extends SetOrderFieldOnCreateOwnProps,
-		Pick<SugaredUnconstrainedQualifiedSingleEntity, 'entity'> {}
+	Pick<SugaredUnconstrainedQualifiedSingleEntity, 'entity'> {}
 
 export const SetOrderFieldOnCreate = Component<SetOrderFieldOnCreateProps>(
 	() => null,

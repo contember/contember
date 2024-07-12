@@ -261,8 +261,8 @@ export class EventManager {
 				state.type === 'field'
 					? this.getEventDispatchers(state, { type: 'update' }, [state.getAccessor()])
 					: state.type === 'entityRealm'
-					? this.getEventDispatchers(state, { type: 'update' }, [state.getAccessor()])
-					: this.getEventDispatchers(state, { type: 'update' }, [state.getAccessor()])
+						? this.getEventDispatchers(state, { type: 'update' }, [state.getAccessor()])
+						: this.getEventDispatchers(state, { type: 'update' }, [state.getAccessor()])
 
 			if (updateListeners !== undefined) {
 				for (const handler of updateListeners) {
@@ -466,8 +466,8 @@ export class EventManager {
 					state.type === 'field'
 						? this.getEventDispatchers(state, { type: 'initialize' }, [state.getAccessor, this.batchUpdatesOptions])
 						: state.type === 'entityRealm'
-						? this.getEventDispatchers(state, { type: 'initialize' }, [state.getAccessor, this.batchUpdatesOptions])
-						: this.getEventDispatchers(state, { type: 'initialize' }, [state.getAccessor, this.batchUpdatesOptions])
+							? this.getEventDispatchers(state, { type: 'initialize' }, [state.getAccessor, this.batchUpdatesOptions])
+							: this.getEventDispatchers(state, { type: 'initialize' }, [state.getAccessor, this.batchUpdatesOptions])
 
 				if (listeners) {
 					for (const listener of listeners) {
@@ -528,7 +528,7 @@ export class EventManager {
 	public getEventListeners<
 		State extends StateNode,
 		EventListenerTypes extends
-			Exclude<State['eventListeners'], undefined> extends EventListenersStore<infer Keys, infer Map> ? [Keys, Map] : never,
+		Exclude<State['eventListeners'], undefined> extends EventListenersStore<infer Keys, infer Map> ? [Keys, Map] : never,
 		EventType extends EventListenerTypes[0],
 	>(state: State, event: { type: EventType; key?: string }): Set<Exclude<EventListenerTypes[1][EventType], undefined>> | undefined {
 		if (!state.eventListeners) {
@@ -542,7 +542,7 @@ export class EventManager {
 	public getEventDispatchers<
 		State extends StateNode,
 		EventListenerTypes extends
-			Exclude<State['eventListeners'], undefined> extends EventListenersStore<infer Keys, infer Map> ? [Keys, Map] : never,
+		Exclude<State['eventListeners'], undefined> extends EventListenersStore<infer Keys, infer Map> ? [Keys, Map] : never,
 		EventType extends EventListenerTypes[0],
 	>(
 		state: State,

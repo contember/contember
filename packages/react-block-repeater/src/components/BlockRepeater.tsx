@@ -18,9 +18,9 @@ export const BlockRepeater = Component<BlockRepeaterProps>(({ children, ...props
 	}
 	return (
 		<Repeater {...props} initialEntityCount={0}>
-				<BlockRepeaterConfigContext.Provider value={{ discriminatedBy: props.discriminationField, blocks }}>
-					{children}
-				</BlockRepeaterConfigContext.Provider>
+			<BlockRepeaterConfigContext.Provider value={{ discriminatedBy: props.discriminationField, blocks }}>
+				{children}
+			</BlockRepeaterConfigContext.Provider>
 		</Repeater>
 	)
 }, props => {

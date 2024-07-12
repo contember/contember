@@ -176,8 +176,8 @@ export class QueryLanguage {
 
 	private static desugarEntityListEventListeners(unsugarable: UnsugarableEntityListEventListeners):
 		| {
-				eventListeners: EntityListEventListenerStore | undefined
-				childEventListeners: EntityEventListenerStore | undefined
+			eventListeners: EntityListEventListenerStore | undefined
+			childEventListeners: EntityEventListenerStore | undefined
 		  }
 		| undefined {
 		if (

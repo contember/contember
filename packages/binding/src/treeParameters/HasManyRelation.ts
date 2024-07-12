@@ -10,9 +10,9 @@ export interface HasManyRelation extends Relation, EntityListParameters, EntityL
 
 export interface SugarableHasManyRelation
 	extends SugarableRelation,
-		SugarableEntityListParameters {}
+	SugarableEntityListParameters {}
 
 export interface UnsugarableHasManyRelation
 	extends UnsugarableRelation,
-		UnsugarableEntityListParameters,
-		UnsugarableEntityListEventListeners {}
+	UnsugarableEntityListParameters,
+	UnsugarableEntityListEventListeners {}

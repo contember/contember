@@ -12,9 +12,9 @@ export interface SingleEntityEventListeners {
 
 export type UnsugarableSingleEntityEventListeners = {
 	[EventName in Exclude<keyof EntityAccessor.EntityEventListenerMap, 'connectionUpdate'> &
-		string as `on${Capitalize<EventName>}`]?:
-		| EntityAccessor.EntityEventListenerMap[EventName]
-		| Set<EntityAccessor.EntityEventListenerMap[EventName]>
+	string as `on${Capitalize<EventName>}`]?:
+	| EntityAccessor.EntityEventListenerMap[EventName]
+	| Set<EntityAccessor.EntityEventListenerMap[EventName]>
 } & {
 	onConnectionUpdate?: {
 		[fieldName: string]:

@@ -12,10 +12,10 @@ export const useInsertElementWithReference = ({ editor,  createElementReference 
 	createElementReference: CreateElementReferences
 }): InsertElementWithReference => {
 	return useCallback(<Element extends SlateElement>(
-			element: Omit<Element, 'referenceId'>,
-			referenceDiscriminant: FieldValue,
-			initialize?: EntityAccessor.BatchUpdatesHandler,
-		) => {
+		element: Omit<Element, 'referenceId'>,
+		referenceDiscriminant: FieldValue,
+		initialize?: EntityAccessor.BatchUpdatesHandler,
+	) => {
 		Editor.withoutNormalizing(editor, () => {
 			const preppedPath = prepareElementForInsertion(editor, element as Element)
 			Transforms.insertNodes(editor, editor.createDefaultElement([{ text: '' }]), { at: preppedPath })

@@ -12,8 +12,8 @@ import type {
 
 export interface UnconstrainedQualifiedSingleEntity
 	extends QualifiedEntityParameters,
-		EntityCreationParameters,
-		SingleEntityEventListeners {
+	EntityCreationParameters,
+	SingleEntityEventListeners {
 	isCreating: true
 	isUnpersisted: boolean
 	hasOneRelationPath: HasOneRelation[]
@@ -26,8 +26,8 @@ export interface SugarableUnconstrainedQualifiedSingleEntity
 
 export interface UnsugarableUnconstrainedQualifiedSingleEntity
 	extends UnsugarableQualifiedEntityParameters,
-		UnsugarableEntityCreationParameters,
-		UnsugarableSingleEntityEventListeners {
+	UnsugarableEntityCreationParameters,
+	UnsugarableSingleEntityEventListeners {
 	isCreating: true
 	isUnpersisted?: boolean
 	// Deliberately leaving out UnsugarableHasOneRelation

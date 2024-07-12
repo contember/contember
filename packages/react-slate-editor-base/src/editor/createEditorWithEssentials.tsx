@@ -175,10 +175,10 @@ export const createEditorWithEssentials = ({ defaultElementType }: { defaultElem
 					const adjacentPoint =
 						e.key === 'Backspace'
 							? Editor.point(editor, Path.next(nodePath), {
-									edge: 'start',
+								edge: 'start',
 							  })
 							: Editor.point(editor, Path.previous(nodePath), {
-									edge: 'end',
+								edge: 'end',
 							  })
 					Transforms.select(editor, adjacentPoint)
 				}

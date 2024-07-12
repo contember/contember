@@ -15,12 +15,12 @@ export type EntityProps = EntityBaseProps
  */
 export const Entity = Component(
 	({ children, accessor }: EntityProps) => {
-	return (
+		return (
 		// HACK: the ?. is actually important, despite the typings.
-		<AccessorProvider accessor={accessor} key={accessor?.key}>
-			{children}
-		</AccessorProvider>
-	)
+			<AccessorProvider accessor={accessor} key={accessor?.key}>
+				{children}
+			</AccessorProvider>
+		)
 	},
 	'Entity',
 )

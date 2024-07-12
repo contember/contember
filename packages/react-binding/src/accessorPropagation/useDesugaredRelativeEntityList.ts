@@ -42,15 +42,15 @@ function useDesugaredRelativeEntityList(
 		() =>
 			hasList
 				? QueryLanguage.desugarRelativeEntityList(
-						{
-							field: normalizedSugared!.field,
-							setOnCreate: normalizedSugared?.setOnCreate,
-							isNonbearing: normalizedSugared?.isNonbearing,
-							offset: normalizedSugared?.offset,
-							limit: normalizedSugared?.limit,
-							orderBy: normalizedSugared?.orderBy,
-						},
-						environment,
+					{
+						field: normalizedSugared!.field,
+						setOnCreate: normalizedSugared?.setOnCreate,
+						isNonbearing: normalizedSugared?.isNonbearing,
+						offset: normalizedSugared?.offset,
+						limit: normalizedSugared?.limit,
+						orderBy: normalizedSugared?.orderBy,
+					},
+					environment,
 				  )
 				: undefined,
 		// eslint-disable-next-line react-hooks/exhaustive-deps

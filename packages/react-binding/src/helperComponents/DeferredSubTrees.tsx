@@ -18,8 +18,8 @@ type LoadState =
 	| { name: 'initial' }
 	| { name: 'loading' }
 	| {
-			name: 'success'
-			treeRootId: TreeRootId | undefined
+		name: 'success'
+		treeRootId: TreeRootId | undefined
 	  }
 
 /**

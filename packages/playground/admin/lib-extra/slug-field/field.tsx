@@ -56,8 +56,8 @@ export const SlugInput = forwardRef<HTMLInputElement, SlugInputProps>(({ prefix,
 			<InputBare className={cn('pr-1', className)} {...props} ref={ref} />
 
 			{href && <a className="ml-auto self-stretch flex items-center px-2 text-gray-600 bg-gray-50 rounded-r-md border-l hover:bg-gray-100 -my-2 -mr-2" href={href} target="_blank" rel="noreferrer">
-					<ExternalLinkIcon className="h-4 w-4" />
-				</a>}
+				<ExternalLinkIcon className="h-4 w-4" />
+			</a>}
 		</InputLike>
 	)
 })

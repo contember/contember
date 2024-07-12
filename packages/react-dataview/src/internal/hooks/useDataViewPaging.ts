@@ -30,9 +30,9 @@ export const useDataViewPaging = ({ dataViewKey, initialItemsPerPage, pagingSett
 	const [pagingSettingsState, setPagingSettingsState] = useStoredState<Pick<DataViewPagingState, 'itemsPerPage'>>(
 		pagingSettingsStorage ?? 'null',
 		...getDataViewPagingSettingStorageArgs({
-				dataViewKey,
-				initialItemsPerPage,
-			},
+			dataViewKey,
+			initialItemsPerPage,
+		},
 		),
 	)
 

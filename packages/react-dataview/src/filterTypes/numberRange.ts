@@ -17,9 +17,9 @@ export const createNumberRangeFilter = (field: SugaredRelativeSingleField['field
 	const exclusion: Input.Condition[] = []
 	if (filter.from !== undefined || filter.to !== undefined) {
 		inclusion.push({
-				gte: filter.from,
-				lte: filter.to,
-			},
+			gte: filter.from,
+			lte: filter.to,
+		},
 		)
 	}
 	if (filter.nullCondition === true) {

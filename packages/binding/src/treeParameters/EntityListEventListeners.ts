@@ -15,6 +15,6 @@ export interface EntityListEventListeners {
 
 export type UnsugarableEntityListEventListeners = {
 	[EventType in keyof UnsugarableEvents & string as `on${Capitalize<EventType>}`]?:
-		| UnsugarableEvents[EventType]
-		| Set<UnsugarableEvents[EventType]>
+	| UnsugarableEvents[EventType]
+	| Set<UnsugarableEvents[EventType]>
 }

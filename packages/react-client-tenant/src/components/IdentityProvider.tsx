@@ -31,7 +31,7 @@ export const IdentityProvider: React.FC<IdentityProviderProps> = ({ children }) 
 		<IdentityStateContext.Provider value={state}>
 			<IdentityContext.Provider value={identity}>
 				<IdentityMethodsContext.Provider value={methods}>
-						{children}
+					{children}
 				</IdentityMethodsContext.Provider>
 			</IdentityContext.Provider>
 		</IdentityStateContext.Provider>

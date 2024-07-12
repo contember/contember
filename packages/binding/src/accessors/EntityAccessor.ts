@@ -257,7 +257,7 @@ namespace EntityAccessor {
 
 	export type FieldValuePairs =
 		| {
-				[field: string]: FieldValue
+			[field: string]: FieldValue
 		  }
 		| Iterable<[SugaredRelativeSingleField | string, FieldValue]>
 

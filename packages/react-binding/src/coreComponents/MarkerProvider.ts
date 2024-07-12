@@ -50,9 +50,9 @@ export type CompleteMarkerProvider<
 	Props extends {} = any,
 	NonStaticPropNames extends keyof Props = never,
 > = EnvironmentDeltaProvider<Props> &
-	LeafMarkerProvider<Props> &
-	BranchMarkerProvider<Props> &
-	StaticRenderProvider<Props, NonStaticPropNames>
+LeafMarkerProvider<Props> &
+BranchMarkerProvider<Props> &
+StaticRenderProvider<Props, NonStaticPropNames>
 
 export type MarkerProvider<Props extends {} = any, NonStaticPropNames extends keyof Props = never> = Partial<
 	CompleteMarkerProvider<Props, NonStaticPropNames>

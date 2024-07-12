@@ -35,7 +35,7 @@ export class HtmlDeserializer {
 		const processed: (
 			| { text: SlateText | SlateElement; element?: undefined; isWhiteSpace: boolean }
 			| { element: SlateElement; text?: undefined }
-			)[] = []
+		)[] = []
 
 		for (const childNode of nodeList) {
 			const isWhiteSpace = childNode.nodeType === Node.TEXT_NODE && childNode.textContent?.match(/^\s*$/) !== null

@@ -6,8 +6,8 @@ import { useCallback } from 'react'
 const projectIdentityRelationFragment = TenantApi
 	.projectIdentityRelation$
 	.identity(TenantApi.identity$$
-			.person(TenantApi.person$$)
-			.apiKey(TenantApi.apiKey$$)
+		.person(TenantApi.person$$)
+		.apiKey(TenantApi.apiKey$$)
 		,
 	)
 	.memberships(TenantApi.membership$$.variables(TenantApi.variableEntry$$))

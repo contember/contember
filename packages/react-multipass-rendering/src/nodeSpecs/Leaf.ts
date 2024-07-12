@@ -46,13 +46,13 @@ namespace Leaf {
 		StaticContext,
 	> =
 		| {
-				type: 'declarationSite'
-				factoryMethodName: FactoryMethodName
+			type: 'declarationSite'
+			factoryMethodName: FactoryMethodName
 		  }
 		| {
-				type: 'useSite'
-				factory: UnconstrainedLeafRepresentationFactory<Props, Representation, StaticContext>
-				ComponentType?: ElementType<Props>
+			type: 'useSite'
+			factory: UnconstrainedLeafRepresentationFactory<Props, Representation, StaticContext>
+			ComponentType?: ElementType<Props>
 		  }
 }
 

@@ -3,9 +3,9 @@ import { createTenantMutation } from '../../useTenantMutation'
 
 export const confirmOtpMutation = TenantApi.mutation$
 	.confirmOtp(TenantApi
-			.confirmOtpResponse$$
-			.error(TenantApi.confirmOtpError$$),
-		options => options.alias('mutation'),
+		.confirmOtpResponse$$
+		.error(TenantApi.confirmOtpError$$),
+	options => options.alias('mutation'),
 	)
 
 

@@ -62,9 +62,9 @@ const ToolbarButton = withTooltip(
 			'asChild' | 'value'
 		> &
 		VariantProps<typeof toolbarButtonVariants> & {
-		pressed?: boolean;
-		isDropdown?: boolean;
-	}
+			pressed?: boolean;
+			isDropdown?: boolean;
+		}
 	>(
 		(
 			{ className, variant, size, isDropdown, children, pressed, ...props },

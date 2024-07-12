@@ -5,17 +5,17 @@ import { GraphQlClientError } from '@contember/react-client'
 
 export type AccessorTreeStateAction =
 	| {
-			type: 'setData'
-			data: TreeRootAccessor<ReactNode>
-			binding: DataBinding<ReactNode>
+		type: 'setData'
+		data: TreeRootAccessor<ReactNode>
+		binding: DataBinding<ReactNode>
 	  }
 	| {
-			type: 'failWithError'
-			error: GraphQlClientError
-			binding: DataBinding<ReactNode>
+		type: 'failWithError'
+		error: GraphQlClientError
+		binding: DataBinding<ReactNode>
 	  }
 	| {
-			type: 'reset'
-			binding: DataBinding<ReactNode>
-			environment: Environment
+		type: 'reset'
+		binding: DataBinding<ReactNode>
+		environment: Environment
 	}

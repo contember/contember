@@ -24,18 +24,18 @@ export const useDataViewResolvedFilters = ({
 
 
 export const resolveFilters = ({ filterTypes, filters, environment, entities }: UseDataViewResolvedFiltersArgs & { environment: Environment }): Filter<never> => {
-		const ands: Filter[] = []
-		for (const [key, value] of Object.entries(filters)) {
-			const handler = filterTypes?.[key]
-			if (handler === undefined) {
-				continue
-			}
-			const filter = handler(value, { environment })
-			if (filter === undefined) {
-				continue
-			}
-			ands.push(filter)
+	const ands: Filter[] = []
+	for (const [key, value] of Object.entries(filters)) {
+		const handler = filterTypes?.[key]
+		if (handler === undefined) {
+			continue
 		}
+		const filter = handler(value, { environment })
+		if (filter === undefined) {
+			continue
+		}
+		ands.push(filter)
+	}
 
-		return replaceGraphQlLiteral<unknown>({ and: [...ands, entities.filter ?? {}] }) as Filter<never>
+	return replaceGraphQlLiteral<unknown>({ and: [...ands, entities.filter ?? {}] }) as Filter<never>
 }

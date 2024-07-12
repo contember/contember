@@ -31,8 +31,8 @@ export type TextareaFieldProps =
 	& Omit<FormInputProps, 'children'>
 	& Omit<FormContainerProps, 'children'>
 	& {
-	inputProps?: ComponentProps<typeof TextareaAutosize>
-}
+		inputProps?: ComponentProps<typeof TextareaAutosize>
+	}
 
 export const TextareaField = Component(({ field, label, description, inputProps, isNonbearing, defaultValue }: TextareaFieldProps) => (
 	<FormFieldScope field={field}>

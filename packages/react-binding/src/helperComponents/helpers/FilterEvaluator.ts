@@ -18,15 +18,15 @@ export class FilterEvaluator {
 		let acc = true
 		for (const [key, value] of Object.entries(filter)) {
 			if (key === 'and' || key === 'or') {
-					if (!Array.isArray(value)) {
-						throw new BindingError()
-					}
+				if (!Array.isArray(value)) {
+					throw new BindingError()
+				}
 
-					const operation = key === 'and' ? 'every' : 'some' as const
-					acc &&= value[operation](it => this.evaluateFilter(entity, it))
+				const operation = key === 'and' ? 'every' : 'some' as const
+				acc &&= value[operation](it => this.evaluateFilter(entity, it))
 
 			} else if (key === 'not') {
-					acc &&= !this.evaluateFilter(entity, value as Filter)
+				acc &&= !this.evaluateFilter(entity, value as Filter)
 
 			} else {
 				const field = entitySchema.fields.get(key)

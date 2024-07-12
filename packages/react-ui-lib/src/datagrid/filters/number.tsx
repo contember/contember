@@ -26,15 +26,15 @@ export type DataGridNumberFilterProps =
 	}
 
 export const DataGridNumberFilter = Component(({ label, ...props }: DataGridNumberFilterProps) => (
-		<DataViewNumberFilter {...props}>
-			<DataGridFilterMobileHiding>
-				<DataGridSingleFilterUI>
-					<DataGridNumberFilterSelect label={label} />
-					<DataGridNumberFilterList />
-				</DataGridSingleFilterUI>
-			</DataGridFilterMobileHiding>
-		</DataViewNumberFilter>
-	))
+	<DataViewNumberFilter {...props}>
+		<DataGridFilterMobileHiding>
+			<DataGridSingleFilterUI>
+				<DataGridNumberFilterSelect label={label} />
+				<DataGridNumberFilterList />
+			</DataGridSingleFilterUI>
+		</DataGridFilterMobileHiding>
+	</DataViewNumberFilter>
+))
 
 
 const DataGridNumberFilterRange = () => {

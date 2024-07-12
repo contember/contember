@@ -44,12 +44,12 @@ export const DataBindingProvider = memo(function DataBindingProvider<StateProps 
 	const children =
 		'stateComponent' in props && props.stateComponent
 			? createElement(
-					props.stateComponent,
-					{
-						...props.stateProps!,
-						accessorTreeState: accessorTreeState,
-					},
-					props.children,
+				props.stateComponent,
+				{
+					...props.stateProps!,
+					accessorTreeState: accessorTreeState,
+				},
+				props.children,
 			  )
 			: props.children
 	return (

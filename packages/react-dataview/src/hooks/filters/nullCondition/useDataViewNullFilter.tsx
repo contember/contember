@@ -49,7 +49,7 @@ export const useDataViewNullFilter = (name: string): UseDataViewNullFilterResult
 	const currentState: DataViewNullFilterState = state?.nullCondition
 		? 'include'
 		: state?.nullCondition === false
-		? 'exclude' : 'none'
+			? 'exclude' : 'none'
 
 	return [currentState, cb]
 }

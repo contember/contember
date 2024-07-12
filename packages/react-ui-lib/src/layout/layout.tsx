@@ -72,7 +72,7 @@ export const LayoutComponent = ({ children, ...rest }: PropsWithChildren<{}>) =>
 
 	const request = useCurrentRequest()
 	useEffect(() => {
-			setLeftSidebarVisibility(it => it === 'show' ? 'auto' : it)
+		setLeftSidebarVisibility(it => it === 'show' ? 'auto' : it)
 	}, [request])
 
 	const [rightSidebarVisibility, setRightSidebarVisibility] = useState<'show' | 'hidden'>('show')

@@ -98,11 +98,11 @@ export const DropDownTriggerButton = uic('button', {
 export const DefaultDropdown = ({ children }: {
 	children: ReactNode
 }) => (<DropdownMenu>
-		<DropdownMenuTrigger asChild>
-			<DropDownTriggerButton />
-		</DropdownMenuTrigger>
-		<DropdownMenuContent className="w-[160px]">
-			{children}
-		</DropdownMenuContent>
-	</DropdownMenu>
+	<DropdownMenuTrigger asChild>
+		<DropDownTriggerButton />
+	</DropdownMenuTrigger>
+	<DropdownMenuContent className="w-[160px]">
+		{children}
+	</DropdownMenuContent>
+</DropdownMenu>
 )

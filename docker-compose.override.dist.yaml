@@ -1,10 +1,20 @@
 version: '3.7'
 services:
-  ts_watch:
-    user: "1000"
-  api:
-    ports:
-      - 127.0.0.1:7000:4000
+  playground:
+    user: '1000:1000'
+    ports: ['3000:3000']
+
+  engine:
+    ports: ['3001:4000']
+
+  adminer:
+    ports: ['3002:8080']
+
+  minio:
+    ports: ['3003:9000']
+
+  postgres:
+    ports: ['3005:5432']
 
 #---- project groups
 #services:
@@ -13,7 +23,6 @@ services:
 #       CONTEMBER_PROJECT_GROUP_DOMAIN_MAPPING: '^api-([^.]+)\..+'
 #       CONTEMBER_PROJECT_GROUP_CONFIG_HEADER: 'X-Contember-Project-Group-Config'
 #       CONTEMBER_PROJECT_GROUP_CONFIG_ENCRYPTION_KEY: '0000000000000000000000000000000000000000000000000000000000000000'
-
 # --- replicas setup
 #services:
 #  db:
@@ -49,7 +58,6 @@ services:
 #      POSTGRESQL_PGAUDIT_LOG: READ,WRITE
 #    ports:
 #      - "5433:5432"
-#    volumes:
 #      - pgsql-read-data:/var/lib/postgresql/data
 #    depends_on:
 #      - db
@@ -57,3 +65,4 @@ services:
 #      DEFAULT_DB_READ_HOST: 'db_replica'
 #volumes:
 #  pgsql-read-data: ~
+

@@ -1,0 +1,14 @@
+{
+	"extends": "../../../tsconfig.settings.json",
+	"compilerOptions": {
+		"outDir": "../dist/types"
+	},
+	"references": [
+		{
+			"path": "../../graphql-builder/src"
+		},
+		{
+			"path": "../../graphql-client/src"
+		}
+	]
+}

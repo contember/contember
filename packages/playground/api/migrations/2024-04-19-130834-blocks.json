@@ -1,0 +1,241 @@
+{
+	"formatVersion": 5,
+	"modifications": [
+		{
+			"modification": "createEnum",
+			"enumName": "BlockType",
+			"values": [
+				"text",
+				"image",
+				"textWithImage",
+				"hero"
+			]
+		},
+		{
+			"modification": "createEnum",
+			"enumName": "BlockImagePosition",
+			"values": [
+				"left",
+				"right"
+			]
+		},
+		{
+			"modification": "createEnum",
+			"enumName": "BlockListUnique",
+			"values": [
+				"unique"
+			]
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "Block",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "block",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": [],
+				"indexes": [],
+				"eventLog": {
+					"enabled": true
+				}
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "BlockImage",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "block_image",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": [],
+				"indexes": [],
+				"eventLog": {
+					"enabled": true
+				}
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "BlockList",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "block_list",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": [],
+				"indexes": [],
+				"eventLog": {
+					"enabled": true
+				}
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "Block",
+			"field": {
+				"name": "order",
+				"columnName": "order",
+				"columnType": "integer",
+				"nullable": false,
+				"type": "Integer"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "Block",
+			"field": {
+				"name": "type",
+				"columnName": "type",
+				"columnType": "BlockType",
+				"nullable": false,
+				"type": "Enum"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "Block",
+			"field": {
+				"name": "title",
+				"columnName": "title",
+				"columnType": "text",
+				"nullable": false,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "Block",
+			"field": {
+				"name": "content",
+				"columnName": "content",
+				"columnType": "text",
+				"nullable": true,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "Block",
+			"field": {
+				"name": "imagePosition",
+				"columnName": "image_position",
+				"columnType": "BlockImagePosition",
+				"nullable": true,
+				"type": "Enum"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "Block",
+			"field": {
+				"name": "color",
+				"columnName": "color",
+				"columnType": "text",
+				"nullable": true,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "BlockImage",
+			"field": {
+				"name": "url",
+				"columnName": "url",
+				"columnType": "text",
+				"nullable": true,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "BlockList",
+			"field": {
+				"name": "unique",
+				"columnName": "unique",
+				"columnType": "BlockListUnique",
+				"nullable": false,
+				"type": "Enum",
+				"default": "unique"
+			},
+			"fillValue": "unique"
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "Block",
+			"owningSide": {
+				"type": "ManyHasOne",
+				"name": "list",
+				"target": "BlockList",
+				"joiningColumn": {
+					"columnName": "list_id",
+					"onDelete": "restrict"
+				},
+				"nullable": true,
+				"inversedBy": "blocks"
+			},
+			"inverseSide": {
+				"type": "OneHasMany",
+				"name": "blocks",
+				"target": "Block",
+				"ownedBy": "list",
+				"orderBy": [
+					{
+						"path": [
+							"order"
+						],
+						"direction": "asc"
+					}
+				]
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "Block",
+			"owningSide": {
+				"type": "OneHasOne",
+				"name": "image",
+				"target": "BlockImage",
+				"joiningColumn": {
+					"columnName": "image_id",
+					"onDelete": "restrict"
+				},
+				"nullable": true
+			}
+		},
+		{
+			"modification": "createUniqueConstraint",
+			"entityName": "BlockList",
+			"unique": {
+				"fields": [
+					"unique"
+				]
+			}
+		}
+	]
+}

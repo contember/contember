@@ -2,11 +2,25 @@ import * as ts from 'typescript'
 import * as fs from 'fs/promises'
 import { join, normalize } from 'node:path'
 import glob from 'fast-glob'
+import * as fs from 'fs/promises'
+import { existsSync } from 'fs'
+import JSON5 from 'json5'
+import { join, normalize } from 'path'
+import ts from 'typescript'
 
 const globalModules = new Set(['vitest'])
-const allowedUnused = new Set(['pg', 'uuid', 'graphql'])
+const allowedUnused = new Set([
+	'stacktracey',
+	'@popperjs/core',
+	'@aws-sdk/signature-v4-crt',
+	'pg',
+	'uuid',
+	'graphql',
+])
 
 const allowedDirectoryImports = new Set([
+	'fast-deep-equal/es6/index.js',
+	'react-dom/client',
 	'yawn-yaml/cjs',
 	'nodemailer/lib/mailer',
 	'nodemailer/lib/smtp-transport',
@@ -21,7 +35,7 @@ const processPackage = async (dir: string, projectList: ProjectList) => {
 	const files = await glob(`${dir}/src/**/*.{ts,tsx}`, { onlyFiles: true })
 	const contents = await Promise.all(files.map(async (it): Promise<[file: string, content: string]> => [it, await fs.readFile(it, 'utf-8')]))
 	const imports = new Set<string>()
-	const errors: {file: string; message: string}[] = []
+	const errors: { file: string; message: string, type: string }[] = []
 	for (const [file, content] of contents) {
 		const sourceFile = ts.createSourceFile(file, content, ts.ScriptTarget.ESNext)
 		sourceFile.forEachChild(node => {
@@ -31,16 +45,16 @@ const processPackage = async (dir: string, projectList: ProjectList) => {
 					return
 				}
 				const module = (moduleSpecifier as ts.StringLiteral).text
-				if (module === '.') {
-					errors.push({ file, message: 'Dot import (".") is forbidden' })
+				if (module === '.' || module === '..') {
+					errors.push({ file, message: `Dot import ("${module}") is forbidden`, type: 'forbidden_import' })
 				}
 				if (!module.startsWith('node:') && !module.startsWith('.') && !globalModules.has(module)) {
-					const moduleMatch = module.match(/^((?:@[\w_-]+\/)?[\w_-]+)(\/.+)?$/)
+					const moduleMatch = module.match(/^((?:@[\w_-]+\/)?[.\w_-]+)(\/.+)?$/)
 					if (!moduleMatch) {
 						throw new Error(`Invalid module ${module}`)
 					}
 					if (moduleMatch[2] && !allowedDirectoryImports.has(module)) {
-						errors.push({ file, message: `Forbidden file/directory import found: ${module}` })
+						errors.push({ file, message: `Forbidden file/directory import found: ${module}`, type: 'forbidden_import' })
 					}
 					imports.add(moduleMatch[1])
 				}
@@ -54,27 +68,28 @@ const processPackage = async (dir: string, projectList: ProjectList) => {
 
 	for (const module of Array.from(imports.values())) {
 		if (!thisProject.packageJson.dependencies?.[module] && !thisProject.packageJson.peerDependencies?.[module]) {
-			errors.push({ file: dir, message: `Module ${module} is missing in package.json` })
+			errors.push({ file: dir, message: `Module ${module} is missing in package.json`, type: 'package_missing' })
 		}
 		if (allProjectNames.includes(module) && !referencedProjectNames.includes(module)) {
-			errors.push({ file: dir, message: `Module ${module} is not referenced from tsconfig.json` })
+			errors.push({ file: dir, message: `Module ${module} is not referenced from tsconfig.json`, type: 'tsconfig_missing' })
 		}
 	}
 	for (const referenced of referencedProjectNames) {
 		if (!imports.has(referenced)) {
-			errors.push({ file: dir, message: `Project ${referenced} referenced from tsconfig.json is not used` })
+			errors.push({ file: dir, message: `Project ${referenced} referenced from tsconfig.json is not used`, type: 'tsconfig_unused' })
 		}
 	}
 	for (const key in thisProject.packageJson.dependencies ?? {}) {
 		if (!imports.has(key) && !allowedUnused.has(key)) {
-			errors.push({ file: dir, message: `Module ${key} from package.json dependencies is unused` })
+			errors.push({file: dir,  message: `Module ${key} from package.json dependencies is unused`, type: 'package_unused' })
 		}
 	}
 
 	if (errors.length > 0) {
-		for (const { file, message } of errors) {
+		for (const { file, message } of errors.sort((a, b) => a.type.localeCompare(b.type) || a.message.localeCompare(b.message))) {
 			console.log(`${file}:\n${message}\n`)
 		}
+		console.log('')
 		return false
 	}
 	return true
@@ -115,11 +130,14 @@ interface Project {
 	}
 }
 (async () => {
-	const dirs = await glob(process.cwd() + '/packages/*', { onlyDirectories: true })
+	const dirs = (await glob(process.cwd() + '/packages/*', { onlyDirectories: true }))
+		.filter(dir => !dir.endsWith('packages/playground'))
+		.filter(it => existsSync(`${it}/package.json`))
+
 	const projects = await Promise.all(dirs.map(async (dir): Promise<Project> => {
 		try {
-			const packageJson = JSON.parse(await fs.readFile(`${dir}/package.json`, 'utf8'))
-			const tsconfig = JSON.parse(await fs.readFile(`${dir}/src/tsconfig.json`, 'utf8'))
+			const packageJson = JSON5.parse(await fs.readFile(`${dir}/package.json`, 'utf8'))
+			const tsconfig = JSON5.parse(await fs.readFile(`${dir}/src/tsconfig.json`, 'utf8'))
 			return {
 				dir,
 				name: packageJson.name,
@@ -132,7 +150,7 @@ interface Project {
 		}
 	}))
 	const projectList = new ProjectList(projects)
-	const failed = (await Promise.all(dirs.map(it => processPackage(it, projectList)))).some(it => !it)
+	const failed = (await Promise.all(dirs.filter(it => !process.argv[2] || it.endsWith(process.argv[2])).map(it => processPackage(it, projectList)))).some(it => !it)
 	if (failed) {
 		process.exit(1)
 	}

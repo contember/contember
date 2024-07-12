@@ -1,0 +1,81 @@
+---
+title: Installation
+---
+
+import DocsCard from '../../src/components/global/DocsCard';
+import DocsCards from '../../src/components/global/DocsCards';
+
+:::note System requirements
+
+- [NPM 7](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) or later.
+- [Docker](https://docs.docker.com/install/) with [Docker Compose](https://docs.docker.com/compose/install/) version 1.27+.
+- macOS, Windows (including WSL), and Linux are supported. If you're using Apple Silicon, make sure to enable Use Rosetta for x86/amd64 emulation in your Docker Desktop settings/Features in development.
+
+:::
+
+## Pre-Requisite Knowledge
+
+While our documentation is designed with beginners in mind, we do assume a foundational knowledge base to keep our focus on Contember's features and capabilities. Rest assured, we'll provide links to appropriate resources whenever we introduce new concepts.
+
+To get the most out of Contember, we will assume that you have a basic understanding of Docker, React and TypeScript. If you don't, we suggest following resources:
+
+- [React: Official documentation](https://react.dev/learn)
+- [Docker: Official documentation](https://docs.docker.com/get-started/)
+- [TypeScript: The Basics](https://www.typescriptlang.org/docs/handbook/2/basic-types.html)
+
+## Create a new project with Contember
+
+We'll begin by creating a new Contember project using the `@contember/create` tool. Run the following command in your terminal:
+
+```bash
+npm exec "@contember/create@latest" quickstart
+```
+
+This command creates a new folder called "quickstart" that contains a basic Contember setup.
+
+After the command completes, navigate to the newly created "quickstart" directory:
+
+```bash
+cd quickstart
+```
+
+Next, we'll install the project dependencies. These will install Contember Interface and other libraries it needs to run properly. Install them using npm:
+
+```bash
+npm install
+```
+
+Once the installation is complete, you're ready to start your Contember project. The npm start command will initiate Docker containers and get Contember up and running.
+
+```
+npm start
+```
+
+The npm start command executes two processes:
+
+- `start-engine` runs `docker-compose up --detach` to start the Docker containers, followed by `npm run contember migrations:execute --yes` to execute database migrations. <span class="smallNote">(There's nothing in your model at the moment so no migration will be executed. We'll show you how to create your first model in a minute.)</span>
+- `start-admin` runs the Vite server for Contember Interface on port 1480 and listens to all network interfaces.
+
+At this point, you should be able to access your Contember Interface on your local machine at [http://localhost:1480](http://localhost:1480).
+
+To stop your Contember project, just press ctrl+c to exit the process. This will stop the Contember interface (which is not running in Docker for faster development). You will also need to run `docker-compose down` to stop all the Docker containers as well.
+
+**Here's a summary of the services that are now running on your machine:**
+
+- Your Contember application at [http://localhost:1480](http://localhost:1480)
+- API endpoints at [http://localhost:1481](http://localhost:1481) (you can authorize with token `0000000000000000000000000000000000000000`)
+
+**For advanced use-cases, there are also:**
+
+- Adminer database management tool at [http://localhost:1485](http://localhost:1485) to access database created by Contember.
+- Minio local S3 provider at [http://localhost:1483](http://localhost:1483) (you can sign in with contember / contember credentials). Contember uses object storage to store files and images uploaded by your users.
+- Mailhog - tool for testing emails at [http://localhost:1484](http://localhost:1484).
+- And of course PostgreSQL database at [localhost:1482](localhost:1482) (you can sign in with `contember` / `contember` credentials).
+
+Congratulations! You've successfully created your first Contember project. Now let's build something.
+
+<DocsCards>
+  <DocsCard header="Build your first project with Contember" href="/intro/quickstart">
+    <p>Step-by-step guide to create your first model and user interface with Contember.</p>
+  </DocsCard>
+</DocsCards>

@@ -1,0 +1,42 @@
+{
+	"name": "@contember/graphql-client",
+	"license": "Apache-2.0",
+	"version": "0.0.0",
+	"main": "./dist/production/index.js",
+	"exports": {
+		".": {
+			"import": {
+				"types": "./dist/types/index.d.ts",
+				"development": "./dist/development/index.js",
+				"production": "./dist/production/index.js",
+				"default": "./dist/production/index.js"
+			},
+			"require": {
+				"types": "./dist/types/index.d.ts",
+				"development": "./dist/development/index.cjs",
+				"production": "./dist/production/index.cjs",
+				"default": "./dist/production/index.cjs"
+			}
+		}
+	},
+	"files": [
+		"dist/",
+		"src/"
+	],
+	"typings": "./dist/types/index.d.ts",
+	"type": "module",
+	"sideEffects": false,
+	"scripts": {
+		"build": "yarn build:js:dev && yarn build:js:prod",
+		"build:js:dev": "NODE_ENV=development vite build --mode development",
+		"build:js:prod": "vite build --mode production",
+		"ae:build": "api-extractor run --local",
+		"ae:test": "api-extractor run",
+		"test": "vitest"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/contember/interface.git",
+		"directory": "packages/graphql-client"
+	}
+}

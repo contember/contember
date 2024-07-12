@@ -1,0 +1,187 @@
+{
+	"formatVersion": 5,
+	"modifications": [
+		{
+			"modification": "createEnum",
+			"enumName": "SlugUnique",
+			"values": [
+				"unique"
+			]
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "Slug",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "slug",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": [],
+				"indexes": [],
+				"eventLog": {
+					"enabled": true
+				}
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "SlugCategory",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "slug_category",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": [],
+				"indexes": [],
+				"eventLog": {
+					"enabled": true
+				}
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "Slug",
+			"field": {
+				"name": "unique",
+				"columnName": "unique",
+				"columnType": "SlugUnique",
+				"nullable": false,
+				"type": "Enum",
+				"default": "unique"
+			},
+			"fillValue": "unique"
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "Slug",
+			"field": {
+				"name": "slug",
+				"columnName": "slug",
+				"columnType": "text",
+				"nullable": false,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "Slug",
+			"field": {
+				"name": "title",
+				"columnName": "title",
+				"columnType": "text",
+				"nullable": false,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "SlugCategory",
+			"field": {
+				"name": "name",
+				"columnName": "name",
+				"columnType": "text",
+				"nullable": false,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "Slug",
+			"owningSide": {
+				"type": "ManyHasOne",
+				"name": "category",
+				"target": "SlugCategory",
+				"joiningColumn": {
+					"columnName": "category_id",
+					"onDelete": "restrict"
+				},
+				"nullable": true
+			}
+		},
+		{
+			"modification": "createUniqueConstraint",
+			"entityName": "Slug",
+			"unique": {
+				"fields": [
+					"unique"
+				]
+			}
+		},
+		{
+			"modification": "patchAclSchema",
+			"patch": [
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/Slug",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"read": {
+								"id": true,
+								"unique": true,
+								"slug": true,
+								"title": true,
+								"category": true
+							},
+							"create": {
+								"id": true,
+								"unique": true,
+								"slug": true,
+								"title": true,
+								"category": true
+							},
+							"update": {
+								"id": true,
+								"unique": true,
+								"slug": true,
+								"title": true,
+								"category": true
+							},
+							"delete": true,
+							"customPrimary": true
+						}
+					}
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/SlugCategory",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"read": {
+								"id": true,
+								"name": true
+							},
+							"create": {
+								"id": true,
+								"name": true
+							},
+							"update": {
+								"id": true,
+								"name": true
+							},
+							"delete": true,
+							"customPrimary": true
+						}
+					}
+				}
+			]
+		}
+	]
+}

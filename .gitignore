@@ -1,4 +1,3 @@
-# Yarn
 .yarn/*
 !.yarn/patches
 !.yarn/plugins
@@ -6,9 +5,18 @@
 !.yarn/sdks
 !.yarn/versions
 
-/packages/*/dist
-/packages/*/node_modules
-/packages/cli/resources/templates/*/node_modules
+# node_modules
+/packages/**/node_modules
+
+# node_modules
+/packages/**/node_modules
 /node_modules
-docker-compose.override.yaml
+
+# build
+/dist
+/packages/**/dist
+/packages/**/temp
 /**/tsconfig.tsbuildinfo
+
+# env / config
+/docker-compose.override.yaml

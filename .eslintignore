@@ -1,6 +1,8 @@
 /node_modules
-
 /packages/*/dist
+/packages/*/temp
 /packages/*/node_modules
 /packages/create/resources
 /scripts
+/packages/playground/api/client
+/packages/client-content/tests/client

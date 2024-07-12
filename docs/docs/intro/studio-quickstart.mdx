@@ -1,0 +1,204 @@
+---
+title: Walkthrough for Studio projects
+---
+
+You've just downloaded your Contember project and are eager to dive in and make changes. This tutorial is designed to guide you through the major concepts and help you understand the structure of your Contember project. By the end of this tutorial, you'll have a clear idea of where to find what you need and how to make modifications to your project with confidence.
+
+We'll cover essential topics such as project structure, data modeling, user interfaces, and more. Whether you're a seasoned developer or just starting out with Contember, this tutorial will equip you with the knowledge and skills needed to make the most of your new project.
+
+So, let's get started and unlock the full potential of your Contember project!
+
+<hr />
+
+## Project downloaded
+
+When you download your project, you'll see this structure:
+
+```
+your_project_name/
+  ├── admin/
+  │   ├── components/
+  │   ├── pages/
+  │   ├── .env
+  │   ├── index.html
+  │   ├── index.tsx
+  │   └── vite-env.d.ts
+  ├── api/
+  │   ├── migrations/
+  │   ├── model/
+  │   ├── acl.ts
+  │   └── index.ts
+  ├── docker/
+  ├── node_modules/
+  ├── docker-compose.yaml
+  ├── package.json
+  ├── package-lock.json
+  └── tsconfig.json
+```
+
+:::note For running Contember locally you'll need following:
+
+- Installed [NPM](https://www.npmjs.com/) version 7+
+- Installed [Docker](https://docs.docker.com/install/) with [Docker Compose](https://docs.docker.com/compose/install/) version 1.27+
+
+:::
+
+Go to the project folder:
+
+```bash
+cd your_project_name
+```
+
+First step is to install dependencies.
+
+```bash
+npm install
+```
+
+Now you're ready to start your project locally. Please make sure Docker is running and run:
+
+```bash
+npm start
+```
+
+It will take about a minute and your project will be running on your computer. Any change you make is on your local machine only so feel free to experiement as much as you'd like.
+
+Services that are now running on your local machine:
+
+- User interface at: [http://localhost:1480](http://localhost:1480).
+- API endpoints at [http://localhost:1481](http://localhost:1481) (you can authorize with token `0000000000000000000000000000000000000000`)
+
+For advanced use-cases there is also:
+
+- Adminer database management tool at [http://localhost:1485](http://localhost:1485).
+- Minio local S3 provider at [http://localhost:1483](http://localhost:1483) (you can sign in with contember / contember credentials).
+- Mailhog testing SMTP at [http://localhost:1484](http://localhost:1484).
+- PostgreSQL database at [localhost:1482](localhost:1482) (you can sign in with contember / contember credentials).
+
+## Your data model
+
+In `api/model/index.ts` file you can find your application data model that AI built.
+
+Really simple example looks like this but you'll obviously have a more complicated one.
+
+```ts title="api/model/index.ts"
+import { c } from '@contember/schema-definition'
+
+@c.Allow(publicRole, {
+    read: ['content'],
+    when: { hiddenAt: { isNull: true } },
+})
+export class Article {
+  title = c.stringColumn()
+  content = c.stringColumn()
+  hiddenAt = c.dateTimeColumn()
+}
+```
+
+Few notes:
+
+1. Thanks to `import { c }` you get TypeScript autocompletion. Just press ctrl+space in your editor and you'll what you can use for each entity. It will also underline any errors.
+2. Schema consists of Entities. Each entity has columns with many supported types.
+3. Above Entities you can find access control decorators which define what role can access what.
+
+When you make changes, it won't get applied right away. You need to generate and execute database migration. Just run:
+
+```bash
+npm run contember migrations:diff name-of-your-migration
+```
+
+Run this command and choose an option `Yes and execute immediately`. It will create your migration and after confirmation execute it.
+
+:::note Contember CLI
+
+`npm run contember` is a Contember CLI, if you call this without any arguments you'll see all the available commands.
+We'll use `migrations:diff` command. It goes through your schema and generates migration - instructions for Contember how to get from previous state to your new one.
+This command needs two parameters: first is name of your project (`quickstart` in our example) and then name your migration. It can be anything you want.
+
+:::
+
+## Your user interface
+
+Go to `admin/pages` where you can find all the pages you have in your project. You'll mostly have listing pages, create pages and edit pages.
+
+### Listing pages
+
+```tsx title="admin/pages/articleList.tsx"
+import * as React from 'react'
+import { DataGridPage, TextCell } from '@contember/admin'
+
+export default () => (
+  <DataGridPage entities="Article" rendererProps={{ title: 'Articles' }}>
+    <TextCell field="title" header="Title" />
+  </DataGridPage>
+)
+```
+
+Few notes:
+
+1. There's import from `@contember/admin` package for TypeScript autocompletion.
+2. Each page need to be exported component as default export.
+3. In our example we use `DataGridPage` component to show the data in a simple datagrid. But there's many more components you can use.
+4. Tell it which entities you'd like to edit. In our case it's `Article` (it has to be the same name you have in the model).
+5. Another component we use here is a `TextCell` which is used to show `title` of each article.
+
+If you go to [localhost:1480/article-list](http://localhost:1480/article-list) you'll see list of your articles. Which is empty as we didn't add any data there yet.
+
+### Create page
+
+```tsx title="admin/pages/articleCreate.tsx"
+import * as React from 'react'
+import { CreatePage, RichTextField, TextField } from '@contember/admin'
+
+export default () => (
+  <CreatePage entity="Article" rendererProps={{ title: 'Create Article' }}>
+    <TextField field="title" label="Title" />
+    <RichTextField field="content" label="Content" />
+  </CreatePage>
+)
+```
+
+1. There's a `CreatePage` component.
+2. We tell it what we want to add (`Article`).
+3. There are two components - `TextField` and `RichTextField` and each has fields which to edit.
+
+### Edit page
+
+```tsx title="admin/pages/articleEdit.tsx"
+import * as React from 'react'
+import { EditPage, RichTextField, TextField } from '@contember/admin'
+
+export default () => (
+	<EditPage entity="Article(id = $id)" rendererProps={{ title: 'Edit Article' }}>
+		<TextField field="title" label="Title" />
+		<RichTextField field="content" label="Content" />
+	</EditPage>
+)
+```
+
+It's pretty much the same as Create page but edits a specific Entity ID.
+
+### Navigation
+
+```tsx title="admin/components/Navigation.tsx"
+import * as React from 'react'
+import { Menu } from '@contember/admin'
+
+export const Navigation = () => (
+  <Menu>
+    <Menu.Item>
+      <Menu.Item title="Dashboard" to="index" />
+      <Menu.Item title="Articles" to="articleList" />
+      <Menu.Item title="Create new article" to="articleCreate" />
+    </Menu.Item>
+  </Menu>
+)
+```
+
+## Fetch data via GraphQL API
+
+We recommend reading [Content API topic](/reference/engine/content/overview) however if you're looking to quickly play with the API, we've prepared [Insomnia](https://insomnia.rest/) project for you to import and quickly try it out. To use it <a href="/assets/insomnia-quickstart.json" target="_blank">download it here</a> and just drag&drop it to Insomnia.
+
+## Deploy updates to Contember Cloud
+
+Your project is already deployed to Contember Cloud. Therefore all you need to do is to setup a Github Action (or similar if you're not using Github). Take a look at our guide on how to [deploy your project to Contember Cloud](/guides/deploy-contember.md)

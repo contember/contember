@@ -1,0 +1,18 @@
+{
+	"arrowParens": "avoid",
+	"bracketSpacing": true,
+	"printWidth": 120,
+	"semi": false,
+	"singleQuote": true,
+	"tabWidth": 2,
+	"trailingComma": "all",
+	"useTabs": true,
+	"overrides": [
+		{
+			"files": "tsconfig.json",
+			"options": {
+				"printWidth": 80
+			}
+		}
+	]
+}

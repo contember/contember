@@ -1,0 +1,645 @@
+{
+	"formatVersion": 5,
+	"modifications": [
+		{
+			"modification": "createEnum",
+			"enumName": "LegacyEditorReferenceType",
+			"values": [
+				"link",
+				"quote",
+				"image",
+				"embed"
+			]
+		},
+		{
+			"modification": "createEnum",
+			"enumName": "LegacyEditorTextAreaUnique",
+			"values": [
+				"unique"
+			]
+		},
+		{
+			"modification": "createEnum",
+			"enumName": "LegacyEditorContentUnique",
+			"values": [
+				"unique"
+			]
+		},
+		{
+			"modification": "createEnum",
+			"enumName": "ContentEmbedType",
+			"values": [
+				"youtube",
+				"vimeo"
+			]
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"eventLog": {
+					"enabled": true
+				},
+				"name": "LegacyEditorBlock",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "legacy_editor_block",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": [],
+				"indexes": []
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"eventLog": {
+					"enabled": true
+				},
+				"name": "LegacyEditorContent",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "legacy_editor_content",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": [],
+				"indexes": []
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"eventLog": {
+					"enabled": true
+				},
+				"name": "LegacyEditorReference",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "legacy_editor_reference",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": [],
+				"indexes": []
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"eventLog": {
+					"enabled": true
+				},
+				"name": "LegacyEditorTextArea",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "legacy_editor_text_area",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": [],
+				"indexes": []
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"eventLog": {
+					"enabled": true
+				},
+				"name": "LegacyEditorEmbed",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "legacy_editor_embed",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": [],
+				"indexes": []
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"eventLog": {
+					"enabled": true
+				},
+				"name": "LegacyEditorImage",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "legacy_editor_image",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": [],
+				"indexes": []
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"eventLog": {
+					"enabled": true
+				},
+				"name": "LegacyEditorLink",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "legacy_editor_link",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": [],
+				"indexes": []
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "LegacyEditorBlock",
+			"field": {
+				"name": "order",
+				"columnName": "order",
+				"columnType": "integer",
+				"nullable": false,
+				"type": "Integer"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "LegacyEditorBlock",
+			"field": {
+				"name": "data",
+				"columnName": "data",
+				"columnType": "text",
+				"nullable": false,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "LegacyEditorContent",
+			"field": {
+				"name": "unique",
+				"columnName": "unique",
+				"columnType": "LegacyEditorContentUnique",
+				"nullable": false,
+				"type": "Enum",
+				"default": "unique"
+			},
+			"fillValue": "unique"
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "LegacyEditorReference",
+			"field": {
+				"name": "type",
+				"columnName": "type",
+				"columnType": "LegacyEditorReferenceType",
+				"nullable": false,
+				"type": "Enum"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "LegacyEditorTextArea",
+			"field": {
+				"name": "unique",
+				"columnName": "unique",
+				"columnType": "LegacyEditorTextAreaUnique",
+				"nullable": false,
+				"type": "Enum",
+				"default": "unique"
+			},
+			"fillValue": "unique"
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "LegacyEditorTextArea",
+			"field": {
+				"name": "data",
+				"columnName": "data",
+				"columnType": "text",
+				"nullable": false,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "LegacyEditorEmbed",
+			"field": {
+				"name": "type",
+				"columnName": "type",
+				"columnType": "ContentEmbedType",
+				"nullable": false,
+				"type": "Enum"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "LegacyEditorEmbed",
+			"field": {
+				"name": "youtubeId",
+				"columnName": "youtube_id",
+				"columnType": "text",
+				"nullable": true,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "LegacyEditorEmbed",
+			"field": {
+				"name": "vimeoId",
+				"columnName": "vimeo_id",
+				"columnType": "text",
+				"nullable": true,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "LegacyEditorImage",
+			"field": {
+				"name": "url",
+				"columnName": "url",
+				"columnType": "text",
+				"nullable": true,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "LegacyEditorLink",
+			"field": {
+				"name": "url",
+				"columnName": "url",
+				"columnType": "text",
+				"nullable": true,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "LegacyEditorBlock",
+			"owningSide": {
+				"type": "ManyHasOne",
+				"name": "content",
+				"target": "LegacyEditorContent",
+				"joiningColumn": {
+					"columnName": "content_id",
+					"onDelete": "restrict"
+				},
+				"nullable": true,
+				"inversedBy": "blocks"
+			},
+			"inverseSide": {
+				"type": "OneHasMany",
+				"name": "blocks",
+				"target": "LegacyEditorBlock",
+				"ownedBy": "content",
+				"orderBy": [
+					{
+						"path": [
+							"order"
+						],
+						"direction": "asc"
+					}
+				]
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "LegacyEditorReference",
+			"owningSide": {
+				"type": "ManyHasOne",
+				"name": "block",
+				"target": "LegacyEditorBlock",
+				"joiningColumn": {
+					"columnName": "block_id",
+					"onDelete": "cascade"
+				},
+				"nullable": false,
+				"inversedBy": "references"
+			},
+			"inverseSide": {
+				"type": "OneHasMany",
+				"name": "references",
+				"target": "LegacyEditorReference",
+				"ownedBy": "block"
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "LegacyEditorReference",
+			"owningSide": {
+				"type": "OneHasOne",
+				"name": "target",
+				"target": "LegacyEditorLink",
+				"joiningColumn": {
+					"columnName": "target_id",
+					"onDelete": "set null"
+				},
+				"nullable": true,
+				"orphanRemoval": true
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "LegacyEditorReference",
+			"owningSide": {
+				"type": "OneHasOne",
+				"name": "embed",
+				"target": "LegacyEditorEmbed",
+				"joiningColumn": {
+					"columnName": "embed_id",
+					"onDelete": "restrict"
+				},
+				"nullable": true,
+				"inversedBy": "reference",
+				"orphanRemoval": true
+			},
+			"inverseSide": {
+				"type": "OneHasOne",
+				"name": "reference",
+				"target": "LegacyEditorReference",
+				"ownedBy": "embed",
+				"nullable": true
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "LegacyEditorReference",
+			"owningSide": {
+				"type": "ManyHasOne",
+				"name": "image",
+				"target": "LegacyEditorImage",
+				"joiningColumn": {
+					"columnName": "image_id",
+					"onDelete": "set null"
+				},
+				"nullable": true
+			}
+		},
+		{
+			"modification": "createUniqueConstraint",
+			"entityName": "LegacyEditorContent",
+			"unique": {
+				"fields": [
+					"unique"
+				]
+			}
+		},
+		{
+			"modification": "createUniqueConstraint",
+			"entityName": "LegacyEditorTextArea",
+			"unique": {
+				"fields": [
+					"unique"
+				]
+			}
+		},
+		{
+			"modification": "patchAclSchema",
+			"patch": [
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/LegacyEditorBlock",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"read": {
+								"id": true,
+								"content": true,
+								"order": true,
+								"data": true,
+								"references": true
+							},
+							"create": {
+								"id": true,
+								"content": true,
+								"order": true,
+								"data": true,
+								"references": true
+							},
+							"update": {
+								"id": true,
+								"content": true,
+								"order": true,
+								"data": true,
+								"references": true
+							},
+							"delete": true,
+							"customPrimary": true
+						}
+					}
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/LegacyEditorContent",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"read": {
+								"id": true,
+								"unique": true,
+								"blocks": true
+							},
+							"create": {
+								"id": true,
+								"unique": true,
+								"blocks": true
+							},
+							"update": {
+								"id": true,
+								"unique": true,
+								"blocks": true
+							},
+							"delete": true,
+							"customPrimary": true
+						}
+					}
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/LegacyEditorEmbed",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"read": {
+								"id": true,
+								"type": true,
+								"youtubeId": true,
+								"vimeoId": true,
+								"reference": true
+							},
+							"create": {
+								"id": true,
+								"type": true,
+								"youtubeId": true,
+								"vimeoId": true,
+								"reference": true
+							},
+							"update": {
+								"id": true,
+								"type": true,
+								"youtubeId": true,
+								"vimeoId": true,
+								"reference": true
+							},
+							"delete": true,
+							"customPrimary": true
+						}
+					}
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/LegacyEditorImage",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"read": {
+								"id": true,
+								"url": true
+							},
+							"create": {
+								"id": true,
+								"url": true
+							},
+							"update": {
+								"id": true,
+								"url": true
+							},
+							"delete": true,
+							"customPrimary": true
+						}
+					}
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/LegacyEditorLink",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"read": {
+								"id": true,
+								"url": true
+							},
+							"create": {
+								"id": true,
+								"url": true
+							},
+							"update": {
+								"id": true,
+								"url": true
+							},
+							"delete": true,
+							"customPrimary": true
+						}
+					}
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/LegacyEditorReference",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"read": {
+								"id": true,
+								"block": true,
+								"type": true,
+								"target": true,
+								"embed": true,
+								"image": true
+							},
+							"create": {
+								"id": true,
+								"block": true,
+								"type": true,
+								"target": true,
+								"embed": true,
+								"image": true
+							},
+							"update": {
+								"id": true,
+								"block": true,
+								"type": true,
+								"target": true,
+								"embed": true,
+								"image": true
+							},
+							"delete": true,
+							"customPrimary": true
+						}
+					}
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/LegacyEditorTextArea",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"read": {
+								"id": true,
+								"unique": true,
+								"data": true
+							},
+							"create": {
+								"id": true,
+								"unique": true,
+								"data": true
+							},
+							"update": {
+								"id": true,
+								"unique": true,
+								"data": true
+							},
+							"delete": true,
+							"customPrimary": true
+						}
+					}
+				}
+			]
+		}
+	]
+}

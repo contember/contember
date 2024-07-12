@@ -1,57 +1,24 @@
-version: '2.4'
+version: '3.7'
 services:
-  ts_watch:
-    image: node:20
-    volumes:
-      - ./:/src:cached
-    working_dir: /src
-    command: yarn run ts:watch
 
-  db:
-    image: postgres:14-alpine
-    restart: unless-stopped
+  playground:
+    image: node:20-alpine
+    command: 'npm run start'
+
     environment:
-      POSTGRES_PASSWORD: contember
-      POSTGRES_USER: contember
-      POSTGRES_DB: contember
-    volumes:
-    - pgsql-data:/var/lib/postgresql/data
-    healthcheck:
-      test: [ 'CMD-SHELL', 'pg_isready -U contember' ]
-      interval: 5s
-      timeout: 5s
-      retries: 10
+      NODE_ENV: 'development'
+      VITE_CONTEMBER_ADMIN_API_BASE_URL: 'http://localhost:3001'
+      VITE_CONTEMBER_ADMIN_SESSION_TOKEN: '0000000000000000000000000000000000000000'
 
-  cli-sandbox:
-    image: node:20
-    working_dir: /src/sandbox
-    depends_on:
-      api:
-        condition: service_started
+    working_dir: /src/packages/playground
     volumes:
-      - .:/src
-    environment:
-      NODE_ENV: development
-      CONTEMBER_API_TOKEN: '0000000000000000000000000000000000000000'
-      CONTEMBER_API_URL: 'http://api:4000'
-      CONTEMBER_PROJECT_NAME: 'sandbox'
-      CONTEMBER_CLI_PACKAGE_ROOT: '/src/packages/cli'
-    entrypoint:
-      - yarn
-      - run
-      - "-T"
-      - tsx
-      - "--conditions=typescript"
-      - /src/packages/cli/src/run.ts
+      - .:/src:cached
 
-  api:
+
+  engine:
     image: node:20
     working_dir: /src
-    depends_on:
-      db:
-        condition: service_healthy
-    volumes:
-      - .:/src
+
     environment:
       NODE_ENV: development
       CONTEMBER_PORT: 4000
@@ -88,8 +55,53 @@ services:
       - watch
       - "--conditions=typescript"
       - ./packages/engine-server/src/start.ts
-  mailhog:
-    image: mailhog/mailhog
+    healthcheck:
+      test: 'curl --fail http://localhost:4000'
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+
+    healthcheck:
+      test: 'curl --fail http://localhost:4000'
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+
+  cli:
+    image: node:20
+    working_dir: /src
+    deploy:
+      replicas: 0
+
+    environment:
+      CONTEMBER_SKIP_VERSION_CHECK: 1
+      CONTEMBER_API_URL: 'http://engine:4000/'
+      CONTEMBER_API_TOKEN: '0000000000000000000000000000000000000000'
+      CONTEMBER_PROJECT_NAME: playground
+
+    volumes:
+      - ./:/src
+    entrypoint:
+      - yarn
+      - run
+      - "-T"
+      - tsx
+      - "--conditions=typescript"
+      - /src/packages/cli/src/run.ts
+    depends_on:
+      engine:
+        condition: service_healthy
+
 
   minio:
     image: bitnami/minio
@@ -101,6 +113,48 @@ services:
 
     volumes:
       - minio-data:/data:cached
+
+
+  adminer:
+    image: michalhosna/adminer:latest
+
+    environment:
+      ADMINER_DRIVER: pgsql
+      ADMINER_SERVER: postgres
+      ADMINER_DB: contember
+      ADMINER_USERNAME: contember
+      ADMINER_PASSWORD: contember
+      ADMINER_AUTOLOGIN: 1
+      ADMINER_NAME: Contember
+
+    depends_on:
+      - postgres
+
+
+  postgres:
+    image: postgres:16-alpine
+
+    environment:
+      POSTGRES_PASSWORD: contember
+      POSTGRES_USER: contember
+      POSTGRES_DB: contember
+
+    volumes:
+      - pgsql-data:/var/lib/postgresql/data
+
+    healthcheck:
+      test: 'pg_isready --username contember'
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+
+
+  redis:
+    image: redis:3.2-alpine
+
+  mailhog:
+    image: mailhog/mailhog
 volumes:
   pgsql-data: ~
   minio-data: ~

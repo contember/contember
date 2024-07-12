@@ -1,40 +1,60 @@
 {
-  "version": "1.4.0-rc.4",
-  "packageManager": "yarn@3.5.1",
-  "private": true,
-  "scripts": {
-    "ts:build": "tsc --build",
-    "ts:watch": "tsc --build --watch --pretty",
-    "ts:clean": "tsc --build --clean",
-    "build": "tsc --build && yarn workspaces foreach run build",
-    "test": "yarn workspaces foreach run test",
-    "test-e2e": "yarn workspaces foreach run test-e2e",
-    "eslint:lint": "eslint \"**/*.{ts,tsx}\" ",
-    "eslint:fix": "eslint --fix \"**/*.{ts,tsx}\" ",
-    "tag-version": "./scripts/npm/tag-version.sh $@",
-    "contember": "docker-compose run --rm cli-sandbox"
-  },
-  "devDependencies": {
-    "@actions/core": "^1.10.1",
-    "@types/node": "^20.9.0",
-    "@typescript-eslint/eslint-plugin": "^6.11.0",
-    "@typescript-eslint/parser": "^6.11.0",
-    "esbuild": "^0.18.20",
-    "eslint": "^8.53.0",
-    "eslint-plugin-promise": "^6.1.1",
-    "fast-glob": "^3.3.2",
-    "tsx": "^4.1.2",
-    "typescript": "^5.2.2",
-    "vite": "^4.5.1",
-    "vitest": "^0.34.6"
-  },
-  "resolutions": {
-    "graphql": "16.8.1",
-    "vite": "4.5.1",
-    "@types/node": "20.9.0"
-  },
-  "workspaces": [
-    "sandbox",
-    "packages/*"
-  ]
+	"type": "module",
+	"version": "1.4.0-rc.4",
+	"packageManager": "yarn@3.5.1",
+	"private": true,
+	"scripts": {
+		"build": "yarn run ts:build && yarn workspaces foreach -pt run build",
+		"check": "./scripts/runChecks.sh",
+		"clean": "yarn run clean:generated && yarn run clean:dependencies",
+		"clean:dependencies": "rm -rf packages/*/node_modules || true; rm -rf node_modules || true",
+		"clean:generated": "rm -rf dist || true; packages/*/dist || true; rm -rf packages/*/temp || true",
+		"contember": "docker-compose run --rm contember-cli",
+		"eslint:fix": "eslint --fix \"**/*.{ts,tsx}\" ",
+		"eslint:lint": "eslint \"**/*.{ts,tsx}\" ",
+		"start": "docker-compose up --detach && yarn run contember migrations:execute . --yes",
+		"test": "yarn workspaces foreach -pt run test --run",
+		"test-e2e": "yarn workspaces foreach run test-e2e",
+		"ts:build": "tsc --build",
+		"ts:watch": "tsc --build --watch",
+		"ts:clean": "tsc --build --clean",
+		"ae:build": "yarn workspaces foreach -pt run ae:build",
+		"ae:update": "yarn run ts:build --clean && yarn run ts:build && yarn run ae:build",
+		"ae:test": "yarn workspaces foreach -pt run ae:test",
+		"tag-version": "./scripts/npm/tag-version.sh $@",
+		"plaground:generate-client": "yarn run --silent contember project:print-schema playground --format=schema | tsx ./packages/client-content-generator/src/generate.ts - ./packages/playground/api/client/"
+	},
+	"devDependencies": {
+		"@actions/core": "^1.10.1",
+		"@microsoft/api-extractor": "^7.43.7",
+		"@types/jsdom": "^21.1.6",
+		"@types/react": "^18.3.2",
+		"@types/react-dom": "^18.3.0",
+		"@types/node": "^20.9.0",
+		"@typescript-eslint/eslint-plugin": "^6.21.0",
+		"@typescript-eslint/parser": "^6.21.0",
+		"@vitejs/plugin-react": "^4.2.1",
+		"esbuild": "^0.19.12",
+		"eslint": "^8.57.0",
+		"eslint-plugin-react": "^7.34.1",
+		"eslint-plugin-react-hooks": "^4.6.2",
+		"fast-glob": "^3.3.2",
+		"jsdom": "^23.2.0",
+		"json5": "^2.2.3",
+		"react": "^18.3.1",
+		"react-dom": "^18.3.1",
+		"tsx": "^4.10.5",
+		"typedoc": "^0.25.13",
+		"typescript": "^5.4.5",
+		"vite": "^5.2.11",
+		"vitest": "^1.6.0"
+	},
+	"workspaces": [
+		"packages/*"
+	],
+	"resolutions": {
+		"graphql": "16.8.1",
+		"@types/node": "20.9.0",
+		"rollup": "npm:@rollup/wasm-node@*"
+	}
 }

@@ -31,7 +31,7 @@ export class ChangeProfileMutationResolver implements Pick<MutationResolvers, 'c
 
 		await context.requireAccess({
 			scope: new IdentityScope(person.identity_id),
-			action: PermissionActions.PERSON_CHANGE_PROFILE,
+			action: PermissionActions.PERSON_CHANGE_PROFILE(person.roles),
 			message: 'You are not allowed to change a profile',
 		})
 		const result = await this.personManager.changeProfile(context.db, person, {

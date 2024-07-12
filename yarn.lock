@@ -1079,9 +1079,9 @@ __metadata:
   resolution: "@contember/client-content-generator@workspace:packages/client-content-generator"
   dependencies:
     "@contember/client-content": "workspace:*"
-    "@contember/schema": ^1.3.7
-    "@contember/schema-definition": ^1.3.7
-    "@contember/schema-utils": ^1.3.7
+    "@contember/schema": "workspace:*"
+    "@contember/schema-definition": "workspace:*"
+    "@contember/schema-utils": "workspace:*"
     "@types/node": ^20.10.5
   bin:
     contember-client-generator: ./dist/production/generate.cjs
@@ -1095,7 +1095,7 @@ __metadata:
     "@contember/client-content-generator": "workspace:*"
     "@contember/graphql-builder": "workspace:*"
     "@contember/graphql-client": "workspace:*"
-    "@contember/schema": ^1.3.7
+    "@contember/schema": "workspace:*"
   languageName: unknown
   linkType: soft
 
@@ -1106,7 +1106,7 @@ __metadata:
     "@contember/client-content": "workspace:*"
     "@contember/graphql-builder": "workspace:*"
     "@contember/graphql-client": "workspace:*"
-    "@contember/schema": ^1.4.0-beta.1
+    "@contember/schema": "workspace:*"
   languageName: unknown
   linkType: soft
 
@@ -1455,7 +1455,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@contember/graphql-builder@workspace:packages/graphql-builder"
   dependencies:
-    "@contember/schema": ^1.3.7
+    "@contember/schema": "workspace:*"
   languageName: unknown
   linkType: soft
 
@@ -1472,16 +1472,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@contember/graphql-client-tenant@npm:^1.3.7":
-  version: 1.3.9
-  resolution: "@contember/graphql-client-tenant@npm:1.3.9"
-  dependencies:
-    graphql-ts-client-api: ^3.1.14
-  checksum: 512aa62c0c9bed4ef70121f483d958594dff82ff48b9252711540045f79e5e3563178b1f150e2651dbc74e191db53fd4cb2996ea1fb81dd3a8424dc6949b0791
-  languageName: node
-  linkType: hard
-
-"@contember/graphql-client-tenant@workspace:packages/graphql-client-tenant":
+"@contember/graphql-client-tenant@workspace:*, @contember/graphql-client-tenant@workspace:packages/graphql-client-tenant":
   version: 0.0.0-use.local
   resolution: "@contember/graphql-client-tenant@workspace:packages/graphql-client-tenant"
   dependencies:
@@ -1563,9 +1554,9 @@ __metadata:
     "@contember/client-content": "workspace:*"
     "@contember/interface": "workspace:*"
     "@contember/react-ui-lib": "workspace:*"
-    "@contember/schema": ^1.4.0-beta.1
-    "@contember/schema-definition": ^1.4.0-beta.1
-    "@contember/schema-utils": ^1.4.0-beta.1
+    "@contember/schema": "workspace:*"
+    "@contember/schema-definition": "workspace:*"
+    "@contember/schema-utils": "workspace:*"
     "@contember/utilities": "workspace:*"
     "@faker-js/faker": ^8.4.1
     "@radix-ui/react-separator": ^1.0.3
@@ -1688,7 +1679,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@contember/react-client-tenant@workspace:packages/react-client-tenant"
   dependencies:
-    "@contember/graphql-client-tenant": ^1.3.7
+    "@contember/graphql-client-tenant": "workspace:*"
     "@contember/react-client": "workspace:*"
     "@contember/react-utils": "workspace:*"
     "@radix-ui/primitive": ^1.0.1
@@ -1955,7 +1946,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@contember/react-ui-lib@workspace:packages/react-ui-lib"
   dependencies:
-    "@contember/graphql-client-tenant": ^1.3.7
+    "@contember/graphql-client-tenant": "workspace:*"
     "@contember/interface": "workspace:*"
     "@contember/react-block-repeater": "workspace:*"
     "@contember/react-board": "workspace:*"
@@ -2056,7 +2047,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@contember/schema-definition@^1.4.0-beta.1, @contember/schema-definition@workspace:*, @contember/schema-definition@workspace:packages/schema-definition":
+"@contember/schema-definition@workspace:*, @contember/schema-definition@workspace:packages/schema-definition":
   version: 0.0.0-use.local
   resolution: "@contember/schema-definition@workspace:packages/schema-definition"
   dependencies:
@@ -2068,19 +2059,6 @@ __metadata:
     graphql: ">= 14.6.0"
   languageName: unknown
   linkType: soft
-
-"@contember/schema-definition@npm:^1.3.7":
-  version: 1.3.9
-  resolution: "@contember/schema-definition@npm:1.3.9"
-  dependencies:
-    "@contember/schema": 1.3.9
-    "@contember/schema-utils": 1.3.9
-    reflect-metadata: ^0.1.13
-  peerDependencies:
-    graphql: ">= 14.6.0"
-  checksum: 25621374264d087d72c4c1dd3cf35ca7aa01f4c0e0842de6279aa646fdecf5045b11cc2b2b7f3516da8d7fc665ed12a1047e5ea2529240fa5094dd93d7d8da69
-  languageName: node
-  linkType: hard
 
 "@contember/schema-migrations@workspace:*, @contember/schema-migrations@workspace:packages/schema-migrations":
   version: 0.0.0-use.local
@@ -2099,7 +2077,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@contember/schema-utils@^1.4.0-beta.1, @contember/schema-utils@workspace:*, @contember/schema-utils@workspace:packages/schema-utils":
+"@contember/schema-utils@workspace:*, @contember/schema-utils@workspace:packages/schema-utils":
   version: 0.0.0-use.local
   resolution: "@contember/schema-utils@workspace:packages/schema-utils"
   dependencies:
@@ -2110,35 +2088,11 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@contember/schema-utils@npm:1.3.9, @contember/schema-utils@npm:^1.3.7":
-  version: 1.3.9
-  resolution: "@contember/schema-utils@npm:1.3.9"
-  dependencies:
-    "@contember/schema": 1.3.9
-    "@contember/typesafe": 1.3.9
-  checksum: e681599a8477f60f4c61a8e344c50ca7defc96c33b07b292b2fba664e8d79d17e2aef7b15a241b1363d106d428ff07bcd9aca90e75a4a1d480be1de0519d343f
-  languageName: node
-  linkType: hard
-
-"@contember/schema@^1.4.0-beta.1, @contember/schema@workspace:*, @contember/schema@workspace:packages/schema":
+"@contember/schema@workspace:*, @contember/schema@workspace:packages/schema":
   version: 0.0.0-use.local
   resolution: "@contember/schema@workspace:packages/schema"
   languageName: unknown
   linkType: soft
-
-"@contember/schema@npm:1.3.9, @contember/schema@npm:^1.3.7":
-  version: 1.3.9
-  resolution: "@contember/schema@npm:1.3.9"
-  checksum: 5bc246e8cc02752439e73a6c1d9fc6c62ff2845a897758d4c4d515ba9049d7542ffd8106f5fcee137165bf0173ccffe9dcfe2040a705da0233d31f19091b9f66
-  languageName: node
-  linkType: hard
-
-"@contember/typesafe@npm:1.3.9":
-  version: 1.3.9
-  resolution: "@contember/typesafe@npm:1.3.9"
-  checksum: bc327d8d2d2ffc3588dcac6723889bb31ea6031b014304574c5419941141b2d92150469a15e6629ae3a81eaa13637b2edca65458becefd9d9a78c5a087e10ff5
-  languageName: node
-  linkType: hard
 
 "@contember/typesafe@workspace:*, @contember/typesafe@workspace:packages/typesafe":
   version: 0.0.0-use.local

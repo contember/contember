@@ -37,7 +37,7 @@
 	"dependencies": {
 		"@contember/graphql-builder": "workspace:*",
 		"@contember/graphql-client": "workspace:*",
-		"@contember/schema": "^1.3.7"
+		"@contember/schema": "workspace:*"
 	},
 	"devDependencies": {
 		"@contember/client-content-generator": "workspace:*"

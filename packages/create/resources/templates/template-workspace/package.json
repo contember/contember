@@ -19,7 +19,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^1.7.1",
-    "@contember/client-content-generator": "2.0.0-alpha.5",
+    "@contember/client-content-generator": "{version}",
     "typescript": "^5.0",
     "vite": "^5",
     "vite-tsconfig-paths": "^4.3.1"

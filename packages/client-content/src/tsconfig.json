@@ -9,6 +9,9 @@
 		},
 		{
 			"path": "../../graphql-client/src"
+		},
+		{
+			"path": "../../schema/src"
 		}
 	]
 }

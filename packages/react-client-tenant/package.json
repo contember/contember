@@ -40,7 +40,7 @@
 		"directory": "packages/react-client-tenant"
 	},
 	"dependencies": {
-		"@contember/graphql-client-tenant": "^1.3.7",
+		"@contember/graphql-client-tenant": "workspace:*",
 		"@contember/react-client": "workspace:*",
 		"@contember/react-utils": "workspace:*",
 		"@radix-ui/primitive": "^1.0.1",

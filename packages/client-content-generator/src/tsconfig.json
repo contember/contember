@@ -5,6 +5,8 @@
 		"types": ["node"]
 	},
 	"references": [
-		{ "path": "../../client-content/src" }
+		{ "path": "../../client-content/src" },
+		{ "path": "../../schema/src" },
+		{ "path": "../../schema-utils/src" },
 	]
 }

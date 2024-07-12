@@ -38,7 +38,7 @@
 		"@contember/client-content": "workspace:*",
 		"@contember/graphql-builder": "workspace:*",
 		"@contember/graphql-client": "workspace:*",
-		"@contember/schema": "^1.4.0-beta.1"
+		"@contember/schema": "workspace:*"
 	},
 	"repository": {
 		"type": "git",

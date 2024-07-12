@@ -30,7 +30,7 @@ export class ChangePasswordMutationResolver implements MutationResolvers {
 
 		await context.requireAccess({
 			scope: new IdentityScope(person.identity_id),
-			action: PermissionActions.PERSON_CHANGE_PASSWORD,
+			action: PermissionActions.PERSON_CHANGE_PASSWORD(person.roles),
 			message: 'You are not allowed to change password',
 		})
 		const result = await this.passwordChangeManager.changePassword(context.db, args.personId, args.password)

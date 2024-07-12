@@ -1,10 +1,12 @@
-import { Command, CommandConfiguration, Input, Workspace } from '@contember/cli-common'
+import { Command, CommandConfiguration, Input } from '@contember/cli-common'
 import { createReadStream } from 'node:fs'
 import { createGunzip } from 'node:zlib'
-import { confirmImport, dataImport, resolveProject } from './utils'
-import { maskToken } from '../../utils/token'
-import { printProgressLine } from '../../utils/stdio'
-import { readStream } from '../../utils/stream'
+import { confirmImport } from './utils'
+import { maskToken } from '../../lib/maskToken'
+import { printProgressLine } from '../../lib/transfer/stdio'
+import { readStream } from '../../lib/stream'
+import { RemoteProjectResolver } from '../../lib/project/RemoteProjectResolver'
+import { DataTransferClient } from '../../lib/transfer/DataTransferClient'
 
 type Args = {
 	file: string
@@ -17,7 +19,8 @@ type Options = {
 
 export class ImportCommand extends Command<Args, Options> {
 	constructor(
-		private readonly workspace: Workspace,
+		private readonly remoteProjectResolver: RemoteProjectResolver,
+		private readonly dataTransferClient: DataTransferClient,
 	) {
 		super()
 	}
@@ -25,22 +28,22 @@ export class ImportCommand extends Command<Args, Options> {
 	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Import data into a project')
 		configuration.argument('file')
-		const from = configuration.argument('target')
-		if (this.workspace.isSingleProjectMode()) {
-			from.optional()
-		}
+		configuration.argument('target').optional()
 		configuration.option('no-gzip-transfer').valueNone()
 		configuration.option('yes').valueNone()
 	}
 
 	protected async execute(input: Input<Args, Options>): Promise<void | number> {
-		const from = input.getArgument('target')
-		const project = await resolveProject({ projectOrDsn: from, workspace: this.workspace })
+		const target = input.getArgument('target')
+		const project = await this.remoteProjectResolver.resolve(target)
+		if (!project) {
+			throw `Target project not defined`
+		}
 		console.log('')
 		console.log('Importing data into a following project')
 		console.log('')
-		console.log(`Project name: ${project.project}`)
-		console.log(`API URL: ${project.baseUrl}`)
+		console.log(`Project name: ${project.name}`)
+		console.log(`API URL: ${project.endpoint}`)
 		console.log(`Token: ${maskToken(project.token)}`)
 		console.log('')
 		if (!await confirmImport(input)) {
@@ -50,7 +53,7 @@ export class ImportCommand extends Command<Args, Options> {
 		const baseInputStream = createReadStream(file)
 		const stream = (file.endsWith('.gz') ? baseInputStream.pipe(createGunzip()) : baseInputStream)
 		const gzipTransfer = !input.getOption('no-gzip-transfer')
-		const response = await dataImport({
+		const response = await this.dataTransferClient.dataImport({
 			stream: stream,
 			project,
 			printProgress: printProgressLine,

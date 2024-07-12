@@ -1,5 +1,4 @@
-import { Command, CommandConfiguration, Input, Workspace } from '@contember/cli-common'
-import { validateSchemaAndPrintErrors } from '../../utils/schema'
+import { Command, CommandConfiguration, Input } from '@contember/cli-common'
 import {
 	Authorizator,
 	EntityRulesResolver,
@@ -10,12 +9,12 @@ import {
 } from '@contember/engine-content-api'
 import { printSchema } from 'graphql'
 import { mergeSchemas } from '@graphql-tools/schema'
-import { loadSchema } from '../../utils/project/loadSchema'
 import { normalizeSchema } from '@contember/schema-utils'
-import { MigrationsContainerFactory } from '../../utils/migrations/MigrationsContainer'
+import { SchemaLoader } from '../../lib/schema/SchemaLoader'
+import { SchemaVersionBuilder } from '@contember/migrations-client'
+import { validateSchemaAndPrintErrors } from '../../lib/schema/SchemaValidationHelper'
 
 type Args = {
-	project?: string
 }
 
 type Options = {
@@ -27,16 +26,14 @@ type Options = {
 
 export class ProjectPrintSchemaCommand extends Command<Args, Options> {
 	constructor(
-		private readonly workspace: Workspace,
+		private readonly schemaLoader: SchemaLoader,
+		private readonly schemaVersionBuilder: SchemaVersionBuilder,
 	) {
 		super()
 	}
 
 	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Prints project schema')
-		if (!this.workspace.isSingleProjectMode()) {
-			configuration.argument('project')
-		}
 		configuration.option('format').valueRequired().description('graphql|introspection|schema')
 		configuration.option('source').valueRequired().description('migrations|definition')
 		configuration.option('role').valueArray()
@@ -44,20 +41,17 @@ export class ProjectPrintSchemaCommand extends Command<Args, Options> {
 	}
 
 	protected async execute(input: Input<Args, Options>): Promise<number> {
-		const projectName = input.getArgument('project')
-		const workspace = this.workspace
 		const format = input.getOption('format') || 'graphql'
 
-		const project = await workspace.projects.getProject(projectName, { fuzzy: true })
-		const migrationsDir = await project.migrationsDir
-		const container = new MigrationsContainerFactory(migrationsDir).create()
+
 		const schema = input.getOption('source') === 'migrations'
-			? await container.schemaVersionBuilder.buildSchema()
-			: await loadSchema(project)
+			? await this.schemaVersionBuilder.buildSchema()
+			: await this.schemaLoader.loadSchema()
 
 		if (!validateSchemaAndPrintErrors(schema, 'Defined schema is invalid:')) {
 			return 1
 		}
+
 		const permissionFactory = new PermissionFactory()
 		const inputRoles = input.getOption('role')
 		const schemaNormalized = input.getOption('normalize') ? normalizeSchema(schema) : schema

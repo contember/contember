@@ -1,1 +1,7 @@
+export * from './CommandRunner'
 export * from './PackageWorkspace'
+export * from './packageManagers/Npm'
+export * from './packageManagers/Pnpm'
+export * from './packageManagers/Yarn'
+export * from './packageManagers/YarnClassic'
+export { PackageWorkspaceResolver } from './PackageWorkspaceResolver'

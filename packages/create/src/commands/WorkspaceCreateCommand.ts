@@ -1,15 +1,23 @@
-import { createWorkspace, Command, CommandConfiguration, Input } from '@contember/cli-common'
+import { Command, CommandConfiguration, Input } from '@contember/cli-common'
 import { join } from 'node:path'
 import chalk from 'chalk'
+import { TemplateInstaller } from '../lib/TemplateInstaller'
+import { getPackageVersion } from '../lib/version'
+
 type Args = {
 	workspaceName: string
 }
 
 type Options = {
-	template?: string
 }
 
 export class WorkspaceCreateCommand extends Command<Args, Options> {
+	constructor(
+		private readonly templateInstaller: TemplateInstaller,
+	) {
+		super()
+	}
+
 	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Creates a new Contember workspace')
 		configuration.argument('workspaceName')
@@ -18,8 +26,10 @@ export class WorkspaceCreateCommand extends Command<Args, Options> {
 	protected async execute(input: Input<Args, Options>): Promise<void> {
 		const workspaceName = input.getArgument('workspaceName')
 		const workspaceDirectory = join(process.cwd(), workspaceName)
-		const template = input.getOption('template')
-		await createWorkspace({ workspaceDirectory, workspaceName, template })
+		await this.templateInstaller.installTemplate('@contember/template-workspace', workspaceDirectory, {
+			version: getPackageVersion(),
+			projectName: workspaceName,
+		})
 		// eslint-disable-next-line no-console
 		console.log(createDocs(workspaceDirectory, workspaceName))
 	}
@@ -32,10 +42,10 @@ You can now enter this directory:
 $ ${chalk.greenBright(`cd ${workspaceName}`)}
 
 Install NPM dependencies:
-$ ${chalk.greenBright(`npm install`)}
+$ ${chalk.greenBright(`yarn install`)}
 
 And start the Contember stack:
-$ ${chalk.greenBright('npm start')}
+$ ${chalk.greenBright('yarn start')}
 
 The following services will be accessible:
 

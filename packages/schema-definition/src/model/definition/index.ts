@@ -15,7 +15,7 @@ export * from './OrderByDefinition'
 export * from './EnumDefinition'
 export * from './UniqueDefinition'
 export * from './ViewDefinition'
-export { extendEntity, EntityExtension } from './extensions'
+export { extendEntity, type EntityExtension } from './extensions'
 
 export abstract class Entity {
 	[key: string]: Interface<FieldDefinition<any>> | undefined

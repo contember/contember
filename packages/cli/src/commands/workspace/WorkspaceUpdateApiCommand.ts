@@ -1,6 +1,6 @@
-import { Command, CommandConfiguration, Input, Workspace } from '@contember/cli-common'
-import { updateWorkspaceApiVersion } from '../../utils/workspace'
-import { contemberDockerImages, updateMainDockerComposeConfig } from '../../utils/dockerCompose'
+import { Command, CommandConfiguration, Input, PackageWorkspaceResolver } from '@contember/cli-common'
+import { DockerComposeManager } from '../../lib/fs/DockerComposeManager'
+import { contemberDockerImages } from '../../consts'
 
 type Args = {
 	version: string
@@ -10,7 +10,8 @@ type Options = {}
 
 export class WorkspaceUpdateApiCommand extends Command<Args, Options> {
 	constructor(
-		private readonly workspace: Workspace,
+		private readonly packageWorkspaceResolver: PackageWorkspaceResolver,
+		private readonly dockerComposeManager: DockerComposeManager,
 	) {
 		super()
 	}
@@ -22,22 +23,13 @@ export class WorkspaceUpdateApiCommand extends Command<Args, Options> {
 
 	protected async execute(input: Input<Args, Options>): Promise<void> {
 		const version = input.getArgument('version')
-		const workspace = this.workspace
-		const packageWorkspace = await workspace.resolvePackageWorkspace()
+		const packageWorkspace = await this.packageWorkspaceResolver.resolve()
 
 		await packageWorkspace.updateEverywhere({
 			'@contember/schema': version,
 			'@contember/schema-definition': version,
 			'@contember/cli': version,
 		})
-
-		const updatedYaml = await updateWorkspaceApiVersion(workspace, version)
-
-		if (updatedYaml) {
-			console.log(`${updatedYaml} updated`)
-		} else {
-			console.log('contember.yaml not found, skipping')
-		}
 
 		console.log('Updating docker-compose')
 		const getNewImage = (currentImage: string): string | null => {
@@ -48,7 +40,7 @@ export class WorkspaceUpdateApiCommand extends Command<Args, Options> {
 			}
 			return null
 		}
-		await updateMainDockerComposeConfig(workspace.directory, data => ({
+		await this.dockerComposeManager.updateMainDockerComposeConfig(data => ({
 			...data,
 			services: Object.fromEntries(Object.entries(data?.services ?? {}).map(([name, service]: [string, any]) => {
 				const newImage = getNewImage(service.image)

@@ -1,9 +1,8 @@
 import { PackageManager } from './packageManagers/PackageManager'
 import { Package } from './Package'
-import { FsManager } from './FsManager'
 import { dirname, join } from 'node:path'
 import { PackageJson } from './PackageJson'
-import { pathExists } from '../utils'
+import { FileSystem } from './FileSystem'
 
 export type Dependency = {
 	pckg: Package
@@ -16,7 +15,7 @@ export type Dependency = {
 export class PackageWorkspace {
 	constructor(
 		private readonly packageManager: PackageManager,
-		private readonly fsManager: FsManager,
+		private readonly fs: FileSystem,
 		public readonly rootPackage: Package,
 		public readonly packages: Package[],
 	) {
@@ -48,7 +47,7 @@ export class PackageWorkspace {
 				deps.push({ defined })
 				continue
 			}
-			const packageJson = await this.fsManager.tryReadJson<PackageJson>(packageJsonPath)
+			const packageJson = JSON.parse(await this.fs.readFile(packageJsonPath, 'utf-8'))
 			deps.push({ defined, installed: { ...defined, version: packageJson?.version ?? '' } })
 		}
 		return deps
@@ -57,7 +56,7 @@ export class PackageWorkspace {
 	private async resolvePackageJson(dir: string, packageName: string) {
 		while (true) {
 			const fullPath = join(dir, 'node_modules', packageName, 'package.json')
-			if (await pathExists(fullPath)) {
+			if (await this.fs.pathExists(fullPath)) {
 				return fullPath
 			}
 			if (dir === '/') {
@@ -96,46 +95,3 @@ export class PackageWorkspace {
 	}
 }
 
-export class PackageWorkspaceResolver {
-	constructor(
-		private fsManager: FsManager,
-		private packageManagers: PackageManager[],
-	) {
-	}
-
-	public async resolve(dir: string, packageJsonFound: boolean = false): Promise<PackageWorkspace> {
-		const packageJson = await this.fsManager.tryReadJson<PackageJson>(join(dir, 'package.json'))
-		if (!packageJson) {
-			if (dir === '/') {
-				if (packageJsonFound) {
-					throw `No lockfile found. Please install dependencies using package manager of your choice.`
-				} else {
-					throw `package.json not found.`
-				}
-			}
-			return await this.resolve(dirname(dir), packageJsonFound)
-		}
-
-		const pm = await this.resolvePackageManager({ dir, packageJson })
-		if (!pm) {
-			if (dir === '/') {
-				throw `No lockfile found. Please install dependencies using package manager of your choice.`
-			}
-			return await this.resolve(dirname(dir), true)
-		}
-
-		const rootPackage = new Package(dir, true, packageJson)
-		const workspacePackages = await pm.readWorkspacePackages({ dir, packageJson })
-
-		return new PackageWorkspace(pm, this.fsManager, rootPackage, workspacePackages)
-	}
-
-	private async resolvePackageManager(args: { dir: string; packageJson: PackageJson }): Promise<PackageManager | null> {
-		for (const pm of this.packageManagers) {
-			if (await pm.isActive(args)) {
-				return pm
-			}
-		}
-		return null
-	}
-}

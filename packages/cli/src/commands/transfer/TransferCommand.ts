@@ -1,9 +1,11 @@
-import { Command, CommandConfiguration, Input, Workspace } from '@contember/cli-common'
-import { confirmImport, dataExport, dataImport, resolveProject } from './utils'
-import { maskToken } from '../../utils/token'
-import { printProgressLine } from '../../utils/stdio'
-import { readStream } from '../../utils/stream'
+import { Command, CommandConfiguration, Input } from '@contember/cli-common'
+import { confirmImport } from './utils'
+import { maskToken } from '../../lib/maskToken'
+import { printProgressLine } from '../../lib/transfer/stdio'
+import { readStream } from '../../lib/stream'
 import { createGunzip } from 'node:zlib'
+import { RemoteProjectResolver } from '../../lib/project/RemoteProjectResolver'
+import { DataTransferClient } from '../../lib/transfer/DataTransferClient'
 
 type Args = {
 	source: string
@@ -17,7 +19,8 @@ type Options = {
 
 export class TransferCommand extends Command<Args, Options> {
 	constructor(
-		private readonly workspace: Workspace,
+		private readonly remoteProjectResolver: RemoteProjectResolver,
+		private readonly dataTransferClient: DataTransferClient,
 	) {
 		super()
 	}
@@ -25,10 +28,7 @@ export class TransferCommand extends Command<Args, Options> {
 	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Transfer data between projects')
 		configuration.argument('source')
-		const target = configuration.argument('target')
-		if (this.workspace.isSingleProjectMode()) {
-			target.optional()
-		}
+		configuration.argument('target').optional()
 		configuration.option('include-system').valueNone()
 		configuration.option('no-gzip-transfer').valueNone()
 		configuration.option('yes').valueNone()
@@ -36,20 +36,27 @@ export class TransferCommand extends Command<Args, Options> {
 
 	protected async execute(input: Input<Args, Options>): Promise<void | number> {
 		const source = input.getArgument('source')
-		const sourceProject = await resolveProject({ projectOrDsn: source, workspace: this.workspace })
+		const sourceProject = await this.remoteProjectResolver.resolve(source)
+		if (!sourceProject) {
+			throw `Source project not defined`
+		}
 
 		const target = input.getArgument('target')
-		const targetProject = await resolveProject({ projectOrDsn: target, workspace: this.workspace })
+		const targetProject = await this.remoteProjectResolver.resolve(target)
+		if (!targetProject) {
+			throw `Target project not defined`
+		}
+
 
 		console.log('')
 		console.log('Transferring data between projects:')
 		console.log('')
-		console.log(`Source project name: ${sourceProject.project}`)
-		console.log(`Source API URL: ${sourceProject.baseUrl}`)
+		console.log(`Source project name: ${sourceProject.name}`)
+		console.log(`Source API URL: ${sourceProject.endpoint}`)
 		console.log(`Source token: ${maskToken(sourceProject.token)}`)
 		console.log('')
-		console.log(`Target project name: ${targetProject.project}`)
-		console.log(`Target API URL: ${targetProject.baseUrl}`)
+		console.log(`Target project name: ${targetProject.name}`)
+		console.log(`Target API URL: ${targetProject.endpoint}`)
 		console.log(`Target token: ${maskToken(targetProject.token)}`)
 		console.log('')
 		if (!await confirmImport(input)) {
@@ -58,9 +65,13 @@ export class TransferCommand extends Command<Args, Options> {
 
 		const includeSystem = input.getOption('include-system') === true
 		const gzipTransfer = !input.getOption('no-gzip-transfer')
-		const exportResponse = (await dataExport({ project: sourceProject, includeSystem, gzip: gzipTransfer }))
+		const exportResponse = (await this.dataTransferClient.dataExport({
+			project: sourceProject,
+			includeSystem,
+			gzip: gzipTransfer,
+		}))
 		const ungzipedResponse = gzipTransfer ? exportResponse.pipe(createGunzip()) : exportResponse
-		const importResponse = await dataImport({
+		const importResponse = await this.dataTransferClient.dataImport({
 			stream: ungzipedResponse,
 			project: targetProject,
 			printProgress: printProgressLine,

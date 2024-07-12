@@ -1,14 +1,15 @@
 export {
-	Migration,
 	MigrationDescriber,
-	MigrationInfo,
 	ModificationHandlerFactory,
 	SchemaDiffer,
 	SchemaMigrator,
 	VERSION_LATEST,
 	calculateMigrationChecksum,
 } from '@contember/schema-migrations'
-
+export type {
+	MigrationInfo,
+	Migration,
+} from '@contember/schema-migrations'
 export * from './JsLoader'
 export * from './JsonLoader'
 export * from './MigrationCreator'

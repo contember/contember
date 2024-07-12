@@ -1,0 +1,7 @@
+type: workspace
+replaceVariables:
+  - package.json
+  - api/package.json
+  - admin/package.json
+  - client/package.json
+  - docker-compose.yaml

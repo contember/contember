@@ -1,0 +1,16 @@
+{
+  "name": "@app/api",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "test": "echo \"Error: no test specified\""
+  },
+  "type": "module",
+  "devDependencies": {
+    "@contember/schema": "{version}",
+    "@contember/schema-definition": "{version}"
+  },
+  "dependencies": {
+    "graphql": "^16.8.1"
+  }
+}

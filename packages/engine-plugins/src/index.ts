@@ -1,4 +1,5 @@
-export { MigrationsResolver, Migration, RunMigration } from '@contember/database-migrations'
+export { MigrationsResolver, RunMigration } from '@contember/database-migrations'
+export type { Migration } from '@contember/database-migrations'
 export {
 	ConfigProcessor,
 	Plugin,

@@ -1,14 +1,23 @@
 #!/usr/bin/env node
-import { CommandManager, Application } from '@contember/cli-common'
+import { Application, CommandManager } from '@contember/cli-common'
 import { WorkspaceCreateCommand } from './commands'
-;(async () => {
+import { TemplateInstaller } from './lib/TemplateInstaller'
+import { resourcesDir } from './paths'
+import { PackageDownloader } from './lib/PackageDownloader'
+import { FileSystem } from './lib/FileSystem'
+
+(async () => {
 	const commandManager = new CommandManager({
-		['workspace']: () => new WorkspaceCreateCommand(),
+		['workspace']: () => new WorkspaceCreateCommand(new TemplateInstaller(
+			resourcesDir,
+			new PackageDownloader(new FileSystem()),
+			new FileSystem(),
+		)),
 	})
 
 	const nodeVersion = process.version.match(/^v?(\d+)\..+$/)
-	if (nodeVersion && Number(nodeVersion[1]) < 12) {
-		throw `Node >= 12 is required`
+	if (nodeVersion && Number(nodeVersion[1]) < 18) {
+		throw `Node >= 18 is required`
 	}
 	const app = new Application(commandManager, `Contember installer`)
 	await app.runCommand('workspace', process.argv.slice(2))

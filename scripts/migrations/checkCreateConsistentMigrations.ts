@@ -1,8 +1,8 @@
 import { relative } from 'node:path'
 import { ModificationHandlerFactory, SchemaDiffer, SchemaMigrator, } from '../../packages/schema-migrations/src'
 import { emptySchema, schemaType } from '@contember/schema-utils';
-import { MigrationsResolver } from "../../packages/cli/src/utils/migrations/MigrationsResolver";
-import { MigrationFilesManager } from "../../packages/cli/src/utils/migrations/MigrationFilesManager";
+import { MigrationsResolver } from "../../packages/cli/src/lib/migrations/MigrationsResolver";
+import { MigrationFilesManager } from "../../packages/cli/src/lib/migrations/MigrationFilesManager";
 
 (async () => {
 	// eslint-disable-next-line no-console

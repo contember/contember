@@ -1,10 +1,11 @@
-import { Command, CommandConfiguration, Input, Workspace } from '@contember/cli-common'
+import { Command, CommandConfiguration, Input } from '@contember/cli-common'
 import { createWriteStream } from 'node:fs'
-import { dataExport, resolveProject } from './utils'
-import { maskToken } from '../../utils/token'
+import { maskToken } from '../../lib/maskToken'
 import { pipeline } from 'node:stream/promises'
-import { printProgressLine } from '../../utils/stdio'
+import { printProgressLine } from '../../lib/transfer/stdio'
 import { createGunzip, createGzip } from 'node:zlib'
+import { RemoteProjectResolver } from '../../lib/project/RemoteProjectResolver'
+import { DataTransferClient } from '../../lib/transfer/DataTransferClient'
 
 type Args = {
 	source?: string
@@ -20,17 +21,15 @@ type Options = {
 
 export class ExportCommand extends Command<Args, Options> {
 	constructor(
-		private readonly workspace: Workspace,
+		private readonly remoteProjectResolver: RemoteProjectResolver,
+		private readonly dataTransferClient: DataTransferClient,
 	) {
 		super()
 	}
 
 	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Export data from a project')
-		const from = configuration.argument('source')
-		if (this.workspace.isSingleProjectMode()) {
-			from.optional()
-		}
+		configuration.argument('source').optional()
 		configuration.option('include-system').valueNone()
 		configuration.option('no-gzip').valueNone().deprecated()
 		configuration.option('no-gzip-transfer').valueNone()
@@ -40,13 +39,16 @@ export class ExportCommand extends Command<Args, Options> {
 
 	protected async execute(input: Input<Args, Options>): Promise<void | number> {
 		const from = input.getArgument('source')
-		const project = await resolveProject({ workspace: this.workspace, projectOrDsn: from })
+		const project = await this.remoteProjectResolver.resolve(from)
+		if (!project) {
+			throw `Project not defined`
+		}
 
 		console.log('')
 		console.log('Exporting data from a following project')
 		console.log('')
-		console.log(`Project name: ${project.project}`)
-		console.log(`API URL: ${project.baseUrl}`)
+		console.log(`Project name: ${project.name}`)
+		console.log(`API URL: ${project.endpoint}`)
 		console.log(`Token: ${maskToken(project.token)}`)
 
 		const gzipOutput = !input.getOption('no-gzip-output') && !input.getOption('no-gzip')
@@ -54,7 +56,7 @@ export class ExportCommand extends Command<Args, Options> {
 
 		const includeSystem = input.getOption('include-system') === true
 
-		const response = await dataExport({
+		const response = await this.dataTransferClient.dataExport({
 			project,
 			includeSystem,
 			gzip: gzipTransfer,
@@ -74,7 +76,7 @@ export class ExportCommand extends Command<Args, Options> {
 			}
 		})
 
-		const fileName = input.getOption('output') ?? `${project.project}.jsonl${gzipOutput ? '.gz' : ''}`
+		const fileName = input.getOption('output') ?? `${project.name}.jsonl${gzipOutput ? '.gz' : ''}`
 		const fileStream = createWriteStream(fileName)
 
 		const responseStream = gzipOutput === gzipTransfer

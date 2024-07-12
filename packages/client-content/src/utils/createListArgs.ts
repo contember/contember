@@ -1,7 +1,7 @@
 import { SchemaEntityNames } from '../types'
 import { GraphQlFieldTypedArgs } from '@contember/graphql-builder'
 
-export const createListArgs = (entity: SchemaEntityNames<string>, args: { filter?: any, orderBy?: any, limit?: number, offset?: number }, type: 'list' | 'paginate' = 'list'): GraphQlFieldTypedArgs => {
+export const createListArgs = (entity: SchemaEntityNames<string>, args: { filter?: any; orderBy?: any; limit?: number; offset?: number }, type: 'list' | 'paginate' = 'list'): GraphQlFieldTypedArgs => {
 	return {
 		filter: {
 			graphQlType: `${entity.name}Where`,

@@ -2,7 +2,7 @@ import { Component, SugaredRelativeSingleField } from '@contember/interface'
 import { ReactNode } from 'react'
 import { TreeNodeEnvironmentFactory } from '@contember/react-binding'
 
-export const FieldExists = Component<{ children: ReactNode, field: SugaredRelativeSingleField['field'] }>(({ field, children }, env) => {
+export const FieldExists = Component<{ children: ReactNode; field: SugaredRelativeSingleField['field'] }>(({ field, children }, env) => {
 	try {
 		TreeNodeEnvironmentFactory.createEnvironmentForField(env, { field })
 	} catch (e: any) {

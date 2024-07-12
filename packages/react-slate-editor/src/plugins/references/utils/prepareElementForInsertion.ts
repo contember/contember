@@ -50,8 +50,8 @@ export const prepareElementForInsertion = (editor: Editor, isReference: boolean)
 	if (isElementWithReference(closestBlockElement)) {
 		const newPath = SlatePath.next(closestBlockPath)
 		Promise.resolve().then(() => {
-			Transforms.select(editor, newPath)
-		})
+			return Transforms.select(editor, newPath)
+		}).catch(() => {})
 		return newPath
 	}
 

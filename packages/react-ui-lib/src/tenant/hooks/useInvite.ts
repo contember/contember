@@ -12,9 +12,9 @@ export const useInvite = () => {
 	const api = useTenantApi()
 
 	return useCallback(async (variables: {
-		email: string,
-		projectSlug: string,
-		memberships: TenantApi.MembershipInput[],
+		email: string
+		projectSlug: string
+		memberships: TenantApi.MembershipInput[]
 	}) => {
 		return (await api(TenantApi.mutation$.invite(InviteFetcher), {
 			variables: {

@@ -5,8 +5,8 @@ import * as GraphQlBuilderTmp from './graphQlBuilder'
 export { GraphQlLiteral } from './graphQlBuilder'
 
 export namespace GraphQlBuilder {
-	export import GraphqlLiteral = GraphQlBuilderTmp.GraphQlLiteral;
-	export import GraphQlLiteral = GraphQlBuilderTmp.GraphQlLiteral;
+	export import GraphqlLiteral = GraphQlBuilderTmp.GraphQlLiteral
+	export import GraphQlLiteral = GraphQlBuilderTmp.GraphQlLiteral
 }
 
 export namespace CrudQueryBuilder {

@@ -11,8 +11,8 @@ import { Editor, Element as SlateElement } from 'slate'
 export type BlockElementCache = WeakMap<EntityAccessor, SlateElement>
 
 export const useBlockElementCache = ({ editor, blockList, sortableBy, contentField }: {
-	editor: Editor,
-	blockList: SugaredRelativeEntityList,
+	editor: Editor
+	blockList: SugaredRelativeEntityList
 	sortableBy: SugaredFieldProps['field']
 	contentField: SugaredFieldProps['field']
 }): BlockElementCache => {

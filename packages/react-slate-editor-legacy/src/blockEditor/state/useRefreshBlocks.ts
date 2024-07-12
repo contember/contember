@@ -12,12 +12,12 @@ import { BlockElementCache } from './useBlockElementCache'
 import { BlockElementPathRefs } from './useBlockElementPathRefs'
 
 export const useRefreshBlocks = ({ editor, sortedBlocksRef, sortableBy, contentField, blockList, blockElementCache, blockElementPathRefs, referencesField, monolithicReferencesMode, trashFakeBlockId }: {
-	editor: Editor,
-	sortedBlocksRef: MutableRefObject<EntityAccessor[]>,
-	contentField: SugaredFieldProps['field'],
-	sortableBy: SugaredFieldProps['field'],
-	blockList: SugaredRelativeEntityList,
-	blockElementCache: BlockElementCache,
+	editor: Editor
+	sortedBlocksRef: MutableRefObject<EntityAccessor[]>
+	contentField: SugaredFieldProps['field']
+	sortableBy: SugaredFieldProps['field']
+	blockList: SugaredRelativeEntityList
+	blockElementCache: BlockElementCache
 	blockElementPathRefs: BlockElementPathRefs
 	referencesField?: SugaredRelativeEntityList | string
 	monolithicReferencesMode?: boolean

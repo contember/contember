@@ -148,6 +148,7 @@ export class DataBinding<Node> {
 				}), {
 					signal,
 					onBeforeRequest: ({ query, variables }) => {
+						// eslint-disable-next-line no-console
 						console.debug(query, variables)
 					},
 				})
@@ -301,7 +302,9 @@ export class DataBinding<Node> {
 				if (pendingExtensionsCount < this.pendingExtensions.size) {
 					return
 				}
-				this.flushBatchedTreeExtensions()
+				return this.flushBatchedTreeExtensions()
+			}).catch(e => {
+				console.error(e)
 			})
 		})
 	}
@@ -361,6 +364,7 @@ export class DataBinding<Node> {
 			return await this.contentClient.query(query, {
 				signal,
 				onBeforeRequest: ({ query, variables }) => {
+					// eslint-disable-next-line no-console
 					console.debug(query, variables)
 				},
 			})

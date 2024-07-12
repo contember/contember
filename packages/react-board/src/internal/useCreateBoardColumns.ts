@@ -8,7 +8,7 @@ export const useCreateBoardColumns = <ColumnValue extends BoardColumnValue>({ gr
 	items: EntityListAccessor
 	columns: Iterable<ColumnValue>
 	columnIdGetter: (column: ColumnValue) => string | number
-	groupItemsByColumn: UseGroupItemsByColumn,
+	groupItemsByColumn: UseGroupItemsByColumn
 }): BoardColumnNode<ColumnValue>[] => {
 
 	return useMemo(() => {

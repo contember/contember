@@ -1,7 +1,7 @@
 export interface SvgSizeProps {
-	width: number;
-	height: number;
-	viewBox: string;
+	width: number
+	height: number
+	viewBox: string
 }
 
 export function svgSizeProps(

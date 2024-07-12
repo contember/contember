@@ -8,7 +8,7 @@ export type ReplaceGraphQlLiteral<T> = T extends GraphQlLiteral<infer Value>
 			? { [K in keyof T]: ReplaceGraphQlLiteral<T[K]> } // Recursively apply to objects
 			: T extends any[]
 				? ReplaceGraphQlLiteral<T[number]>[] // Recursively apply to array elements
-				: T;
+				: T
 
 export const replaceGraphQlLiteral = <T>(input: T): ReplaceGraphQlLiteral<T> => {
 	if (input instanceof GraphQlLiteral) {

@@ -6,7 +6,7 @@ import { createElementKey } from '../../../internal/helpers/createElementKey'
 
 
 export const withSortable = ({ render: Sortable }: {
-	render: (props: { element: EditorElement, children: ReactNode }) => ReactNode
+	render: (props: { element: EditorElement; children: ReactNode }) => ReactNode
 }): EditorPlugin => editor => {
 	const { renderElement, normalizeNode } = editor
 

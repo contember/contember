@@ -5,8 +5,8 @@ import { Slot } from '@radix-ui/react-slot'
 import { cva } from 'class-variance-authority'
 import { twMerge } from 'tailwind-merge'
 
-type StringToBoolean<T> = T extends 'true' | 'false' ? boolean : T;
-type ConfigSchema = Record<string, Record<string, ClassValue>>;
+type StringToBoolean<T> = T extends 'true' | 'false' ? boolean : T
+type ConfigSchema = Record<string, Record<string, ClassValue>>
 
 export type ConfigVariants<T extends ConfigSchema | undefined> = T extends ConfigSchema ? {
 	[Variant in keyof T]?: StringToBoolean<keyof T[Variant]> | null | undefined;
@@ -18,12 +18,12 @@ type ConfigVariantsMulti<T extends ConfigSchema | undefined> = T extends ConfigS
 
 type Config<T extends ConfigSchema | undefined, El extends React.ElementType> = {
 	baseClass?: ClassValue
-	variants?: T;
+	variants?: T
 	passVariantProps?: string[]
 	defaultProps?: Partial<React.ComponentProps<El>>
-	defaultVariants?: ConfigVariants<T>;
-	compoundVariants?: ((ConfigVariants<T> | ConfigVariantsMulti<T>) & { className?: string })[];
-	displayName?: string;
+	defaultVariants?: ConfigVariants<T>
+	compoundVariants?: ((ConfigVariants<T> | ConfigVariantsMulti<T>) & { className?: string })[]
+	displayName?: string
 	wrapOuter?: ComponentType<{ children?: ReactNode } & ConfigVariants<T>>
 	wrapInner?: ComponentType<{ children?: ReactNode } & ConfigVariants<T>>
 	beforeChildren?: ReactElement

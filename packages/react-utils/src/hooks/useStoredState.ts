@@ -1,10 +1,10 @@
 import { useCallback, useMemo, useState } from 'react'
 import { Serializable } from '../types'
 
-export type SetState<V extends Serializable> = (value: V | ((current: V) => V)) => void;
+export type SetState<V extends Serializable> = (value: V | ((current: V) => V)) => void
 export type StateStorageKey = [uniquePrefix: string, key: string]
 
-export type ValueInitializer<V extends Serializable> = (storedValue: V | undefined) => V;
+export type ValueInitializer<V extends Serializable> = (storedValue: V | undefined) => V
 
 export interface StateStorage {
 	getItem(key: StateStorageKey): Serializable

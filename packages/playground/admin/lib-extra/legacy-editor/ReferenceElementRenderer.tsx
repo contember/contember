@@ -44,10 +44,10 @@ export const ReferenceElementRenderer = memo((props: ReferenceElementRendererPro
 			// This is a hack. Otherwise if the removed block is the last one, we get an exception from Slate whose onClick
 			// handler is also trying to do something with this element. So we just schedule a micro task, let it do its
 			// thing and just remove the node later.
-			Transforms.removeNodes(editor, {
+			return Transforms.removeNodes(editor, {
 				at: path,
 			})
-		})
+		}).catch(() => {})
 	}, [editor, props.element])
 
 	let blockBody: ReactNode

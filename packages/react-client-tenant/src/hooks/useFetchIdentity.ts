@@ -4,7 +4,7 @@ import { useSessionToken } from '@contember/react-client'
 import { useLogoutInternal } from '../internal/hooks/useLogoutInternal'
 import { useMeQuery } from './queries'
 
-export const useFetchIdentity = (): [{ state: IdentityStateValue, identity: Identity | undefined }, IdentityMethods] => {
+export const useFetchIdentity = (): [{ state: IdentityStateValue; identity: Identity | undefined }, IdentityMethods] => {
 	const sessionToken = useSessionToken()
 	const fetchMe = useMeQuery()
 

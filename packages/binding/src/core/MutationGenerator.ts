@@ -15,14 +15,14 @@ type ProcessedPlaceholdersByEntity = Map<EntityState, Set<PlaceholderName>>
 
 export type SubMutationOperation =
 	& {
-		alias: string,
-		subTreePlaceholder: PlaceholderName,
+		alias: string
+		subTreePlaceholder: PlaceholderName
 		subTreeType: 'list' | 'single'
 	}
 	& (
-		| { type: 'delete', id: EntityId }
-		| { type: 'update', markers: EntityFieldMarkers, id: EntityId }
-		| { type: 'create', markers: EntityFieldMarkers, id: EntityId }
+		| { type: 'delete'; id: EntityId }
+		| { type: 'update'; markers: EntityFieldMarkers; id: EntityId }
+		| { type: 'create'; markers: EntityFieldMarkers; id: EntityId }
 	)
 
 export type PersistMutationResult = {

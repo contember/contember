@@ -1,5 +1,5 @@
 export function getSizeFromResizeObserverEntryFactory(box: ResizeObserverOptions['box']) {
-	return function getSizeFromResizeObserverEntry(entry: ResizeObserverEntry): { height: number, width: number } {
+	return function getSizeFromResizeObserverEntry(entry: ResizeObserverEntry): { height: number; width: number } {
 		const boxSize = box === 'border-box'
 			? entry.borderBoxSize
 			: box === 'content-box'

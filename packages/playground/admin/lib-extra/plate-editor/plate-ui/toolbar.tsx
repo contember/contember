@@ -62,8 +62,8 @@ const ToolbarButton = withTooltip(
 			'asChild' | 'value'
 		> &
 		VariantProps<typeof toolbarButtonVariants> & {
-			pressed?: boolean;
-			isDropdown?: boolean;
+			pressed?: boolean
+			isDropdown?: boolean
 		}
 	>(
 		(
@@ -132,7 +132,7 @@ export const ToolbarToggleItem = withVariants(
 export const ToolbarGroup = withRef<
 	'div',
 	{
-		noSeparator?: boolean;
+		noSeparator?: boolean
 	}
 >(({ className, children, noSeparator }, ref) => {
 	const childArr = Children.map(children, c => c)

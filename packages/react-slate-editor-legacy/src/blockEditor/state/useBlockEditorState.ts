@@ -16,8 +16,8 @@ export interface useBlockEditorStateResult {
 }
 
 export const useBlockEditorState = ({ editor, blockList, sortableBy, contentField, monolithicReferencesMode, referencesField }: {
-	editor: Editor,
-	blockList: SugaredRelativeEntityList,
+	editor: Editor
+	blockList: SugaredRelativeEntityList
 	sortableBy: SugaredFieldProps['field']
 	contentField: SugaredFieldProps['field']
 	referencesField?: SugaredRelativeEntityList | string

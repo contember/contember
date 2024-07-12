@@ -8,7 +8,7 @@ const itemLeaf = new Leaf(node => ({ type: 'item' as const, children: node.props
 const columnLeaf = new Leaf(node => ({ type: 'column' as const, children: node.props.children }), BoardColumn)
 
 export const boardAnalyzer = new ChildrenAnalyzer<
-	{ type: 'column' | 'item', children: ReactNode },
+	{ type: 'column' | 'item'; children: ReactNode },
 	never,
 	Environment
 >([itemLeaf, columnLeaf], {

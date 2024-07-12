@@ -1,7 +1,7 @@
 import { MutableRefObject, RefCallback, useMemo, useRef } from 'react'
 
 export type MaybeRef<T> = ((instance: T | null) => void) | MutableRefObject<T | null> | null | undefined
-export type ComposedRefCallback<T> = RefCallback<T> & { current: T | null };
+export type ComposedRefCallback<T> = RefCallback<T> & { current: T | null }
 
 function setRef<T>(ref: MaybeRef<T>, instance: T | null): void {
 	if (ref) {

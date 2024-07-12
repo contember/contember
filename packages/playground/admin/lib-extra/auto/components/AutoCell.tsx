@@ -182,7 +182,7 @@ export const AutoCell = Component<AutoCellProps>(
 	},
 )
 
-const ClickToEdit = Component<{ view: ReactNode, edit: ReactNode }>(
+const ClickToEdit = Component<{ view: ReactNode; edit: ReactNode }>(
 	props => {
 		const [edit, setEdit] = useState(false)
 		const onClick = useCallback((e: MouseEvent) => e.ctrlKey && setEdit(true), [])

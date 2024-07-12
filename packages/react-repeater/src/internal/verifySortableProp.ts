@@ -1,6 +1,6 @@
 import { BindingError } from '@contember/binding'
 
-export const verifySortableProp = (props: {sortableBy?: unknown, orderBy?: unknown}) => {
+export const verifySortableProp = (props: {sortableBy?: unknown; orderBy?: unknown}) => {
 	if (
 		'sortableBy' in props &&
 		props.sortableBy !== undefined &&

@@ -7,7 +7,7 @@ export const ReferencesContext = createContext<GetReferencedEntity>(() => {
 })
 
 export type ReferencesProviderProps = {
-	getReferencedEntity: GetReferencedEntity,
+	getReferencedEntity: GetReferencedEntity
 	children: ReactNode
 }
 

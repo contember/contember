@@ -6,7 +6,7 @@ import { dict } from '../dict'
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogTrigger } from '../ui/dialog'
 
 
-export const CreateEntityDialog = ({ trigger, children }: { trigger: ReactElement, children: ReactNode }) => {
+export const CreateEntityDialog = ({ trigger, children }: { trigger: ReactElement; children: ReactNode }) => {
 	return (
 		<Dialog>
 			<DialogTrigger asChild>

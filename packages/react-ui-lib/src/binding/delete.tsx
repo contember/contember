@@ -16,7 +16,7 @@ import { DeleteEntityTrigger } from '@contember/interface'
 import { FeedbackTrigger } from './persist'
 import { dict } from '../dict'
 
-export const DeleteEntityDialog = ({ trigger, immediatePersist }: { trigger: ReactElement, immediatePersist?: boolean }) => {
+export const DeleteEntityDialog = ({ trigger, immediatePersist }: { trigger: ReactElement; immediatePersist?: boolean }) => {
 	return (
 		<AlertDialog>
 			<AlertDialogTrigger asChild>

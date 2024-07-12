@@ -19,5 +19,5 @@ export interface ReceivedDataTree {
 
 export interface QueryRequestResponse {
 	data: ReceivedDataTree
-	errors?: { message: string, path?: string[] }[]
+	errors?: { message: string; path?: string[] }[]
 }

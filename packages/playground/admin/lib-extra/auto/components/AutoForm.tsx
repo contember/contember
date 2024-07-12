@@ -7,8 +7,8 @@ import { LinkComponent } from './types'
 
 
 export type AutoFormProps = {
-	entity: string,
-	id?: EntityId,
+	entity: string
+	id?: EntityId
 	onCreateSuccess?: EntityAccessor.PersistSuccessHandler | Set<EntityAccessor.PersistSuccessHandler>
 	LinkComponent?: LinkComponent
 }

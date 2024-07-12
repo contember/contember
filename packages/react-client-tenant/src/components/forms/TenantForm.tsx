@@ -9,17 +9,17 @@ const SlotForm = Slot as ComponentType<React.FormHTMLAttributes<HTMLFormElement>
 
 type ExecuteResult<T extends FormContextValue<any, any, any>, OkResult = undefined> =
 	| ({ ok: true } & (OkResult extends undefined ? {} : { result: OkResult }))
-	| { ok: false, error?: T['errors'][number]['code'], developerMessage?: string, state?: T['state'] }
+	| { ok: false; error?: T['errors'][number]['code']; developerMessage?: string; state?: T['state'] }
 
 export interface TenantFormProps<T extends FormContextValue<any, any, any>, OkResult = undefined> {
 	children: ReactElement
 	loading?: boolean
 	initialValues: T['values']
 	errorMapping?: Partial<Record<T['errors'][number]['code'], keyof T['values']>>
-	validate?: (args: { values: T['values'], state: T['state'] }) => T['errors'] | undefined
-	execute: (args: { values: T['values'], state: T['state'] }) => Promise<ExecuteResult<T, OkResult>>
+	validate?: (args: { values: T['values']; state: T['state'] }) => T['errors'] | undefined
+	execute: (args: { values: T['values']; state: T['state'] }) => Promise<ExecuteResult<T, OkResult>>
 	onSuccess?: (args: { result: OkResult }) => void
-	onChange?: (args: { values: T['values'], state: T['state'], submit: () => Promise<void> }) => void
+	onChange?: (args: { values: T['values']; state: T['state']; submit: () => Promise<void> }) => void
 }
 
 export const TenantForm = <T extends FormContextValue<any, any, any>, OkResult = undefined>({

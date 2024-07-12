@@ -70,7 +70,7 @@ const DataGridRelationFilterInner = Component(({ children, label }: DataGridRela
 	)
 }, () => null)
 
-export const DataGridHasOneTooltip = Component(({ children, actions, ...props }: DataViewHasOneFilterProps & { children: ReactNode, actions?: ReactNode }) => (
+export const DataGridHasOneTooltip = Component(({ children, actions, ...props }: DataViewHasOneFilterProps & { children: ReactNode; actions?: ReactNode }) => (
 	<DataViewHasOneFilter {...props}>
 		<DataGridRelationFieldTooltipInner actions={actions}>
 			{children}
@@ -78,7 +78,7 @@ export const DataGridHasOneTooltip = Component(({ children, actions, ...props }:
 	</DataViewHasOneFilter>
 ))
 
-export const DataGridHasManyTooltip = Component<DataViewHasManyFilterProps & { children: ReactNode, actions?: ReactNode }>(({ children, actions, ...props }, env) => {
+export const DataGridHasManyTooltip = Component<DataViewHasManyFilterProps & { children: ReactNode; actions?: ReactNode }>(({ children, actions, ...props }, env) => {
 	return (
 		<DataViewHasManyFilter {...props}>
 			<DataGridRelationFieldTooltipInner actions={actions}>
@@ -88,7 +88,7 @@ export const DataGridHasManyTooltip = Component<DataViewHasManyFilterProps & { c
 	)
 })
 
-const DataGridRelationFieldTooltipInner = Component(({ children, actions }: { children: ReactNode, actions?: ReactNode }) => (
+const DataGridRelationFieldTooltipInner = Component(({ children, actions }: { children: ReactNode; actions?: ReactNode }) => (
 	<TooltipProvider>
 		<Tooltip>
 			<TooltipTrigger asChild>

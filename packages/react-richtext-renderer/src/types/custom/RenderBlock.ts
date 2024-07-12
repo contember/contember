@@ -1,7 +1,7 @@
 import { ComponentType, ReactNode } from 'react'
 
 export type RenderBlockProps = {
-	block: unknown,
+	block: unknown
 	children?: ReactNode
 }
 

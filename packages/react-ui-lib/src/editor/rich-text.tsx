@@ -28,7 +28,7 @@ export const RichTextField = Component<RichTextFieldProps>(({ field, description
 	)
 })
 
-const RichTextAreaInner = ({ placeholder, children }: { placeholder?: string, children: ReactNode }) => {
+const RichTextAreaInner = ({ placeholder, children }: { placeholder?: string; children: ReactNode }) => {
 	const editor = useSlateStatic()
 	const isMutating = useMutationState()
 

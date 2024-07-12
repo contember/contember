@@ -21,7 +21,7 @@ const floatingOptions: UseVirtualFloatingOptions = {
 }
 
 export interface LinkFloatingToolbarProps {
-	state?: LinkFloatingToolbarState;
+	state?: LinkFloatingToolbarState
 }
 
 const FloatingLinkUrlInputUi = uic(FloatingLinkUrlInput, {

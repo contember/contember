@@ -15,7 +15,7 @@ export const useInitIDPRedirect = ({ onRedirect, setState }: UseInitIDPRedirectP
 	const saveBacklink = useSaveBacklink()
 	const { set: saveIdpState } = useIDPStateStore()
 
-	return useCallback(async ({ provider }: { provider: string }): Promise<{ ok: true } | { ok: false, error: IDPInitError }> => {
+	return useCallback(async ({ provider }: { provider: string }): Promise<{ ok: true } | { ok: false; error: IDPInitError }> => {
 		const fail = (error: IDPInitError) => {
 			setState({ type: 'init_failed', error })
 			return { ok: false, error }

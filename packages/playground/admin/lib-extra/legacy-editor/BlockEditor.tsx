@@ -25,7 +25,7 @@ export const BlockEditorField = Component<BlockEditorFieldProps>(({ placeholder,
 	)
 })
 
-const BlockEditorSortable = ({ children, placeholder }: { children: ReactNode, placeholder?: string }) => {
+const BlockEditorSortable = ({ children, placeholder }: { children: ReactNode; placeholder?: string }) => {
 	const editor = useSlateStatic()
 	const entities = useRepeaterSortedEntities()
 	const onDragEnd = useCallback(({ active, over }: DragEndEvent) => {

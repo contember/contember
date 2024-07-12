@@ -5,7 +5,7 @@ import { EditorElementPlugin, EditorMarkPlugin } from './plugins'
 import type * as Slate from 'slate'
 import { HtmlDeserializer } from '../plugins/behaviour/paste/HtmlDeserializer'
 
-export type EditorDefaultElementFactory = (children: Descendant[]) => SlateElement;
+export type EditorDefaultElementFactory = (children: Descendant[]) => SlateElement
 
 export interface WithEssentials {
 	slate: typeof Slate

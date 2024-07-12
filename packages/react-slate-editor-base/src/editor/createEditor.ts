@@ -24,7 +24,7 @@ export const createEditor = ({
 	environment,
 	children,
 }: CreateEditorOptions): {
-	editor: Editor,
+	editor: Editor
 	OuterWrapper: FunctionComponent<{ children: ReactNode }>
 	InnerWrapper: FunctionComponent<{ children: ReactNode }>
 } => {

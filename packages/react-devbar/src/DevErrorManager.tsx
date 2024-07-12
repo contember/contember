@@ -3,8 +3,8 @@ import { useEffect, useState } from 'react'
 import { useProcessedError } from './hooks/useParsedStacktrace'
 
 export class ErrorBus {
-	private queue: { error: ErrorType, source: string }[] = []
-	private listener: null | ((error: { error: ErrorType, source: string }) => void) = null
+	private queue: { error: ErrorType; source: string }[] = []
+	private listener: null | ((error: { error: ErrorType; source: string }) => void) = null
 
 	async handleError(source: string, error: ErrorType) {
 		const boxedError = { error, source }
@@ -23,7 +23,7 @@ export class ErrorBus {
 		}
 	}
 
-	register(listener: (error: { error: ErrorType, source: string }) => void): () => void {
+	register(listener: (error: { error: ErrorType; source: string }) => void): () => void {
 		this.listener = listener
 		this.queue.forEach(listener)
 		this.queue = []
@@ -38,7 +38,7 @@ export interface DevErrorManagerProps {
 }
 
 export function DevErrorManager(props: DevErrorManagerProps) {
-	const [errors, setErrors] = useState<{ error: ErrorType, source: string }[]>([])
+	const [errors, setErrors] = useState<{ error: ErrorType; source: string }[]>([])
 	const [errIndex, setErrorIndex] = useState(0)
 	const [open, setOpen] = useState(false)
 

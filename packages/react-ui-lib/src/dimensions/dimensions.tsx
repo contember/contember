@@ -64,7 +64,7 @@ export const DimensionsSwitcher = Component(({ options, dimension, children, slu
 	)
 })
 
-const DimensionSwitcherCurrentValues = ({ children, dimension, slugField }: { children: ReactNode, dimension: string, slugField: SugaredRelativeSingleField['field'] }) => {
+const DimensionSwitcherCurrentValues = ({ children, dimension, slugField }: { children: ReactNode; dimension: string; slugField: SugaredRelativeSingleField['field'] }) => {
 	const entitiesBySlug = useDimensionEntitiesBySlug(slugField)
 
 	const currentDimensionValue = useDimensionState({
@@ -89,7 +89,7 @@ const DimensionSwitcherCurrentValues = ({ children, dimension, slugField }: { ch
 }
 
 
-const DimensionSwitcherItem = ({ children, dimension, slugField, isMulti }: { children: ReactNode, dimension: string, slugField: SugaredRelativeSingleField['field'], isMulti?: boolean }) => {
+const DimensionSwitcherItem = ({ children, dimension, slugField, isMulti }: { children: ReactNode; dimension: string; slugField: SugaredRelativeSingleField['field']; isMulti?: boolean }) => {
 	const entity = useEntity()
 	const slugValue = entity.getField<string>(slugField).value
 	if (!slugValue) {

@@ -48,7 +48,7 @@ export type BoardDynamicColumnsBindingProps = {
 
 export type BoardStaticColumnsBindingProps = {
 	columns: {
-		value: string,
+		value: string
 		label: ReactNode
 	}[]
 	discriminationField: string | SugaredRelativeSingleField

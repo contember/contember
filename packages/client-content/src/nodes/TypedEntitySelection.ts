@@ -6,7 +6,7 @@ import { ContentEntitySelectionContext } from './ContentEntitySelection'
 export interface TypedEntitySelection<TSchema extends SchemaTypeLike, TEntityName extends string, TEntity extends EntityTypeLike, TValue> {
 
 	/** @internal */
-	readonly context: ContentEntitySelectionContext<TEntityName>,
+	readonly context: ContentEntitySelectionContext<TEntityName>
 
 	$$(): TypedEntitySelection<TSchema, TEntityName, TEntity, TValue & {
 		[key in keyof TEntity['columns']]: TEntity['columns'][key]

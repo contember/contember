@@ -64,11 +64,11 @@ export const TableElementRenderer = memo(function TableElementRenderer(props: Ta
 			// Slate also has an onClick handler somewhere that attempts to update the caret position but if our handler
 			// deletes the table before that gets to run, it operates on stale props (I think) and ends up throwing.
 			// So as a hacky workaround, we just let it do its thing and actually remove the table later.
-			Transforms.removeNodes(editor, {
+			return Transforms.removeNodes(editor, {
 				at: ReactEditor.findPath(editor, props.element),
 				match: node => isTableElement(node),
 			})
-		})
+		}).catch(() => {})
 	}, [editor, props.element])
 	return (
 		<BlockElement element={props.element} attributes={props.attributes} withBoundaries>

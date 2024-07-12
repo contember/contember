@@ -8,5 +8,5 @@ declare namespace React {
 	declare function useCallback<T extends Function>(
 		callback: NoConstructor<T>,
 		deps: DependencyList,
-	): T;
+	): T
 }

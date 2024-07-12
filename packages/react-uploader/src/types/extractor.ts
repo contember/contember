@@ -16,8 +16,8 @@ export interface FileDataExtractorGetErrorsOptions {
 export interface FileDataExtractor {
 	staticRender: (options: FileDataExtractorStaticRenderOptions) => ReactNode
 	extractFileData?: (options: FileWithMeta) => Promise<FileDataExtractorPopulator | undefined> | FileDataExtractorPopulator | undefined
-	populateFields?: (options: { entity: EntityAccessor, result: FileUploadResult }) => void
+	populateFields?: (options: { entity: EntityAccessor; result: FileUploadResult }) => void
 	getErrorsHolders?: (options: FileDataExtractorGetErrorsOptions) => ErrorAccessorHolder[]
 }
 
-export type FileDataExtractorPopulator = (options: { entity: EntityAccessor, result: FileUploadResult }) => void
+export type FileDataExtractorPopulator = (options: { entity: EntityAccessor; result: FileUploadResult }) => void

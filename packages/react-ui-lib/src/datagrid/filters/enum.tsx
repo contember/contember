@@ -28,7 +28,7 @@ export const DataGridEnumFilter = Component(({ options, label, ...props }: DataG
 		</DataViewEnumFilter>
 	))
 
-export const DataGridEnumFieldTooltip = ({ children, actions, value, ...props }: Omit<DataViewEnumFilterProps, 'children'> & { children: ReactNode, value: string, actions?: ReactNode }) => (
+export const DataGridEnumFieldTooltip = ({ children, actions, value, ...props }: Omit<DataViewEnumFilterProps, 'children'> & { children: ReactNode; value: string; actions?: ReactNode }) => (
 	<DataViewEnumFilter {...props}>
 		<TooltipProvider>
 			<Tooltip>

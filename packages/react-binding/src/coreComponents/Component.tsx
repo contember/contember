@@ -5,8 +5,8 @@ import type { MarkerProvider, StaticRenderProvider, StaticRenderProviderProps } 
 import { assertNever } from '@contember/utilities'
 
 interface EnvironmentAwareFunctionComponent<P> {
-	(props: PropsWithChildren<P>, environment: Environment): ReactNode;
-	displayName?: string | undefined;
+	(props: PropsWithChildren<P>, environment: Environment): ReactNode
+	displayName?: string | undefined
 }
 
 function Component<Props extends {}>(

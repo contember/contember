@@ -17,7 +17,7 @@ export type UseBoardItemsMethodsProps<ColumnValue extends BoardColumnValue> = {
 	connectItemToColumn: (item: EntityAccessor, column: ColumnValue | null) => void
 	desugaredSortableByField: RelativeSingleField | undefined
 	sortScope?: 'column' | 'board'
-	groupItemsByColumn: UseGroupItemsByColumn,
+	groupItemsByColumn: UseGroupItemsByColumn
 	getDiscriminatorValue: (entity: EntityAccessor) => BoardColumnKey
 	columnIdGetter: (column: ColumnValue) => string | number
 }

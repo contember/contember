@@ -49,14 +49,14 @@ export const useApiRequest = <SuccessData>(client: GraphQlClient): UseApiRequest
 						type: 'resolveSuccessfully',
 						data,
 					})
-					return Promise.resolve(data)
+					return data
 				})
 				.catch((error: GraphQlClientFailedRequestMetadata) => {
 					dispatch({
 						type: 'resolveWithError',
 						error,
 					})
-					return Promise.reject(error)
+					throw error
 				})
 		},
 		[client],

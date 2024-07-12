@@ -40,7 +40,7 @@ export const OnDelete = ({ references, entity, visited = [] }: { references: Ref
 						: 'no inverse side'
 					if (it.owningRelation.joiningColumn.onDelete === 'restrict') {
 						return (
-							<li>
+							<li key={it.owningEntity.name + '_' + it.owningRelation.name}>
 								<span class={'bg-black text-white px-1'}>Fails</span> when referenced from
 								{' '}<FieldLink entity={it.owningEntity.name} field={it.owningRelation.name} />
 								{' '}({inverseDescr})
@@ -49,7 +49,7 @@ export const OnDelete = ({ references, entity, visited = [] }: { references: Ref
 					}
 					if (it.owningRelation.joiningColumn.onDelete === 'set null') {
 						return (
-							<li>
+							<li key={it.owningEntity.name + '_' + it.owningRelation.name}>
 								<span class={'bg-blue-400 text-white px-1'}>Sets null</span> at
 								{' '}<FieldLink entity={it.owningEntity.name} field={it.owningRelation.name} />
 								{' '}({inverseDescr})
@@ -58,7 +58,7 @@ export const OnDelete = ({ references, entity, visited = [] }: { references: Ref
 					}
 					if (it.owningRelation.joiningColumn.onDelete === 'cascade') {
 						return (
-							<li>
+							<li key={it.owningEntity.name + '_' + it.owningRelation.name}>
 								<span class={'bg-red-400 text-white px-1'}>Deletes</span> <EntityLink entity={it.owningEntity.name} />
 								{' '}connected using
 								{' '}<FieldLink entity={it.owningEntity.name} field={it.owningRelation.name} noEntityLabel />

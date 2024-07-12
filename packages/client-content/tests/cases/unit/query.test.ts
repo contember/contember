@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest'
 import { createClient } from '../../lib'
 import { Input } from '@contember/schema'
-import OrderDirection = Input.OrderDirection;
+import OrderDirection = Input.OrderDirection
 import { queryBuilder } from '../../client'
 
 describe('queries', () => {

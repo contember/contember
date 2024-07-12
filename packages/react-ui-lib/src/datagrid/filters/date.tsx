@@ -137,7 +137,7 @@ const DataGridDateFilterSelect = ({ label, ranges = defaultRanges }: {
 	)
 }
 
-export type DataGridPredefinedDateRange = { start: string, end: string, label: ReactNode }
+export type DataGridPredefinedDateRange = { start: string; end: string; label: ReactNode }
 const DataGridRangeFilter = ({ start, end, label }: DataGridPredefinedDateRange) => {
 	const name = useDataViewFilterName()
 	const [filter, setFilter] = useDataViewFilter<DateRangeFilterArtifacts>(name)

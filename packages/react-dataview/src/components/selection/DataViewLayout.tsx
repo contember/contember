@@ -6,7 +6,7 @@ import { ReactNode } from 'react'
 export interface DataViewLayoutProps {
 	name: string
 	label?: ReactNode
-	children: ReactNode;
+	children: ReactNode
 }
 
 export const DataViewLayout = Component<DataViewLayoutProps>(({ name, children }) => {

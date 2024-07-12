@@ -12,7 +12,7 @@ export const useLabelMiddleware = () => {
 	return useCallback((it: ReactNode) => labelMiddleware(it, env), [env, labelMiddleware])
 }
 
-export const LabelMiddlewareProvider = ({ value, children }: { value: LabelMiddleware, children: ReactNode }) => {
+export const LabelMiddlewareProvider = ({ value, children }: { value: LabelMiddleware; children: ReactNode }) => {
 	return (
 		<LabelMiddlewareContext.Provider value={value}>
 			{children}

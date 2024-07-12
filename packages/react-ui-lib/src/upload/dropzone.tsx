@@ -8,7 +8,7 @@ import { dict } from '../dict'
 import { Button } from '../ui/button'
 
 
-export const UploaderDropzone = ({ inactiveOnUpload, dropzonePlaceholder }: { inactiveOnUpload?: boolean, dropzonePlaceholder?: ReactNode }) => {
+export const UploaderDropzone = ({ inactiveOnUpload, dropzonePlaceholder }: { inactiveOnUpload?: boolean; dropzonePlaceholder?: ReactNode }) => {
 	const filesInProgress = useUploaderStateFiles({ state: ['uploading', 'initial', 'finalizing'] })
 	const showLoader = inactiveOnUpload && filesInProgress.length > 0
 

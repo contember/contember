@@ -14,7 +14,7 @@ export interface InitializeReferenceContentProps {
 }
 export interface EditorInlineReferenceTriggerProps {
 	referenceType: OptionallyVariableFieldValue
-	initializeReference?: EntityAccessor.BatchUpdatesHandler,
+	initializeReference?: EntityAccessor.BatchUpdatesHandler
 	children: ReactNode
 }
 

@@ -58,7 +58,7 @@ export const DefaultBlockRepeater = Component<DefaultBlockRepeaterProps>(({ chil
 	return <BlockRepeater {...props} />
 })
 
-const ToggleEditMode = ({ setEditMode, editMode }: { setEditMode: (value: boolean) => void, editMode: boolean }) => {
+const ToggleEditMode = ({ setEditMode, editMode }: { setEditMode: (value: boolean) => void; editMode: boolean }) => {
 	const id = useId()
 	const { blocks } = useBlockRepeaterConfig()
 	const anyHasForm = Object.values(blocks).some(it => it.form)
@@ -180,7 +180,7 @@ const BlockRepeaterAddItemBefore = ({ sortableBy }: { sortableBy: DefaultBlockRe
 	)
 }
 
-const BlockRepeaterEditSheetInner = ({ open, setOpen }: { open: boolean, setOpen: (value: boolean) => void }) => {
+const BlockRepeaterEditSheetInner = ({ open, setOpen }: { open: boolean; setOpen: (value: boolean) => void }) => {
 	const block = useBlockRepeaterCurrentBlock()
 	const form = block?.form
 	const editMode = useBlockRepeaterEditMode()

@@ -1,4 +1,4 @@
-export type GraphQlErrorRequest = { url: string, query: string, variables: Record<string, any> };
+export type GraphQlErrorRequest = { url: string; query: string; variables: Record<string, any> }
 
 export type GraphQlErrorType =
 	| 'aborted'

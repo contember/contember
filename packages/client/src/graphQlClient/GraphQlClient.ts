@@ -16,6 +16,7 @@ export class GraphQlClient extends BaseGraphQLClient {
 	 * @deprecated use execute
 	 */
 	async sendRequest<T = unknown>(query: string, options: GraphQlClientRequestOptions = {}): Promise<T> {
+		// eslint-disable-next-line no-console
 		console.debug(query)
 		const response = await this.doExecute(query, {
 			...options,

@@ -6,7 +6,7 @@ import { BindingError, EntityAccessor, EntityListAccessor, RelativeSingleField }
 import { repairEntitiesOrder, sortEntities } from '@contember/react-binding'
 
 export const useCreateRepeaterMethods = ({ accessor, sortableBy }: {
-	accessor: EntityListAccessor,
+	accessor: EntityListAccessor
 	sortableBy: RelativeSingleField | undefined
 }): RepeaterMethods => {
 	const accessorGetter = accessor.getAccessor

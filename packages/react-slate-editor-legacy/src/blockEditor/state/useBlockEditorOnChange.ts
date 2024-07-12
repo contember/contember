@@ -14,11 +14,11 @@ import { useGetParentEntityRef } from '../useGetParentEntityRef'
 import { BlockElementCache } from './useBlockElementCache'
 
 export const useBlockEditorOnChange = ({ refreshBlocks, editor, sortedBlocksRef, contentField, blockList, blockElementCache }: {
-	editor: Editor,
-	sortedBlocksRef: MutableRefObject<EntityAccessor[]>,
-	contentField: SugaredFieldProps['field'],
-	blockList: SugaredRelativeEntityList,
-	blockElementCache: BlockElementCache,
+	editor: Editor
+	sortedBlocksRef: MutableRefObject<EntityAccessor[]>
+	contentField: SugaredFieldProps['field']
+	blockList: SugaredRelativeEntityList
+	blockElementCache: BlockElementCache
 	refreshBlocks: () => void
 }) => {
 

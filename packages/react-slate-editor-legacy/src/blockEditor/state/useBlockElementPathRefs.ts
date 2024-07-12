@@ -9,8 +9,8 @@ import {
 
 export type BlockElementPathRefs = Map<EntityId, PathRef>
 export const useBlockElementPathRefs = ({ editor, blockList }: {
-	editor: Editor,
-	blockList: SugaredRelativeEntityList,
+	editor: Editor
+	blockList: SugaredRelativeEntityList
 }): BlockElementPathRefs => {
 	const [blockElementPathRefs] = useState(() => new Map<EntityId, PathRef>())
 	const desugaredBlockList = useDesugaredRelativeEntityList(blockList)

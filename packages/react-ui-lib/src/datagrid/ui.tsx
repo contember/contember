@@ -50,7 +50,7 @@ export const DataGridExcludeActionButtonUI = forwardRef<HTMLButtonElement, {}>((
  * Button in a filter list that removes the filter
  */
 export const DataGridActiveFilterUI = forwardRef<HTMLButtonElement, {
-	children: ReactNode,
+	children: ReactNode
 	className?: string
 }>(({ children, className, ...props }, ref) => {
 	return (

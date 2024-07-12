@@ -5,8 +5,8 @@ export type IDPStateValue =
 	| { type: 'processing_init' }
 	| { type: 'processing_response' }
 	| { type: 'success' }
-	| { type: 'init_failed', error: IDPInitError }
-	| { type: 'response_failed', error: IDPResponseError }
+	| { type: 'init_failed'; error: IDPInitError }
+	| { type: 'response_failed'; error: IDPResponseError }
 
 export type IDPStateType = IDPStateValue['type']
 
@@ -21,5 +21,5 @@ export type IDPResponseError =
 
 
 export type IDPMethods = {
-	initRedirect: (args: { provider: string }) => Promise<{ ok: true } | { ok: false, error: IDPInitError }>
+	initRedirect: (args: { provider: string }) => Promise<{ ok: true } | { ok: false; error: IDPInitError }>
 }

@@ -7,7 +7,7 @@ export interface UseDataViewTextFilterInputResult {
 	onChange: (e: ChangeEvent<HTMLInputElement>) => void
 }
 
-export const useDataViewTextFilterInput = ({ name, debounceMs = 500 }: { name: string, debounceMs?: number }): UseDataViewTextFilterInputResult => {
+export const useDataViewTextFilterInput = ({ name, debounceMs = 500 }: { name: string; debounceMs?: number }): UseDataViewTextFilterInputResult => {
 	const [state, setFilter] = useDataViewFilter<TextFilterArtifacts>(name)
 	const [value, setValue] = useState(state?.query ?? '')
 	const timerRef = useRef<ReturnType<typeof setTimeout>>()

@@ -12,7 +12,7 @@ import { ToolbarButton } from './toolbar'
 export const ListToolbarButton = withRef<
 	typeof ToolbarButton,
 	{
-		nodeType?: string;
+		nodeType?: string
 	}
 >(({ nodeType = ELEMENT_UL, ...rest }, ref) => {
 	const state = useListToolbarButtonState({ nodeType })

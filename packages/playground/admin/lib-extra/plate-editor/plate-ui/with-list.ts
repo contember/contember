@@ -11,13 +11,13 @@ interface ListPlugin extends HotkeyPlugin {
 	/**
 	 * Valid children types for list items, in addition to p and ul types.
 	 */
-	validLiChildrenTypes?: string[];
-	enableResetOnShiftTab?: boolean;
+	validLiChildrenTypes?: string[]
+	enableResetOnShiftTab?: boolean
 }
 
 export interface TodoListPlugin extends HotkeyPlugin {
-	inheritCheckStateOnLineStartBreak?: boolean;
-	inheritCheckStateOnLineEndBreak?: boolean;
+	inheritCheckStateOnLineStartBreak?: boolean
+	inheritCheckStateOnLineEndBreak?: boolean
 }
 
 export const withList = <

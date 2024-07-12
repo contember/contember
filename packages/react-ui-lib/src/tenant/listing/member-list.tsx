@@ -118,7 +118,7 @@ export const MemberList = ({ filter, labels, tableColumns, controller, tableHead
 	}
 }
 
-const EditMembershipDialog = ({ projectSlug, identityId, onSuccess }: { projectSlug: string, identityId: string, onSuccess: () => void }) => {
+const EditMembershipDialog = ({ projectSlug, identityId, onSuccess }: { projectSlug: string; identityId: string; onSuccess: () => void }) => {
 
 	const showToast = useShowToast()
 	const [open, setOpen] = useState(false)

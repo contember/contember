@@ -7,7 +7,7 @@ export interface DataViewElementProps {
 	name: string
 	label?: ReactNode
 	fallback?: boolean
-	children: React.ReactNode;
+	children: React.ReactNode
 }
 
 export const DataViewElement = Component<DataViewElementProps>(({ name, fallback = true, children }) => {

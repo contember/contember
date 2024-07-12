@@ -74,7 +74,7 @@ describe('ts types', () => {
 	test('has one field on fragment type', async () => {
 		const fragment = qb.fragment('Post', it => it.$('author', it => it.$$().$('posts', it => it.$('id'))))
 		type fragmentType = FragmentType<typeof fragment>
-		expectTypeOf<fragmentType>().toEqualTypeOf<{ author: ({ id: string; name: string | null; email: string | null; } & { posts: { id: string; }[]; }) | null; }>()
+		expectTypeOf<fragmentType>().toEqualTypeOf<{ author: ({ id: string; name: string | null; email: string | null } & { posts: { id: string }[] }) | null }>()
 	})
 
 

@@ -25,7 +25,7 @@ export const TenantFormError = <CtxValue extends FormContextValue<any, any, any>
 	)
 }
 
-const TenantFormSingleError = ({ error, developerMessage }: { error: string, developerMessage?: string }) => {
+const TenantFormSingleError = ({ error, developerMessage }: { error: string; developerMessage?: string }) => {
 	const [showDeveloperMessage, setShowDeveloperMessage] = useState(false)
 	return <>
 		<FormErrorUI>{error}</FormErrorUI>

@@ -1,7 +1,7 @@
 import { StateStorageOrName } from '@contember/react-utils'
 import { ReactNode, SetStateAction } from 'react'
 
-export type DataViewSelectionLayout = { name: string, label?: ReactNode }
+export type DataViewSelectionLayout = { name: string; label?: ReactNode }
 
 export type DataViewSelectionState = {
 	values: DataViewSelectionValues

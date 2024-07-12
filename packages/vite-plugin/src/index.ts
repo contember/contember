@@ -4,8 +4,8 @@ import { Plugin } from 'vite'
 
 type ContemberOptions = {
 	buildVersion?: boolean
-	disableMiddleware?: boolean,
-	appPath?: string,
+	disableMiddleware?: boolean
+	appPath?: string
 }
 
 export function contember(options?: ContemberOptions): Plugin {

@@ -2,7 +2,7 @@ import { ReactNode } from 'react'
 import { Config, DirtinessTracker, Environment, EventManager, Schema, SchemaStore, StateInitializer, TreeAugmenter, TreeStore } from '@contember/binding'
 import { MarkerTreeGenerator } from '../../src'
 
-export const createBinding = ({ node, schema }: { node: ReactNode, schema: SchemaStore }) => {
+export const createBinding = ({ node, schema }: { node: ReactNode; schema: SchemaStore }) => {
 	const finalSchema = new Schema(schema)
 	const treeStore = new TreeStore(finalSchema)
 	const environment = Environment.create().withSchema(finalSchema)

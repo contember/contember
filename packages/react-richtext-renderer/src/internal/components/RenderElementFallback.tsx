@@ -114,7 +114,7 @@ export function RenderElementFallback<
 }
 
 type ReferenceElementFallbackProps<CustomElements extends RichTextElement = never, CustomLeaves extends RichTextLeaf = RichTextLeaf> = {
-	element: RichTextReferenceElement<CustomElements, CustomLeaves>;
+	element: RichTextReferenceElement<CustomElements, CustomLeaves>
 	children: ReactElement
 	options: RichTextRenderingOptions<CustomElements, CustomLeaves>
 	block: RichTextBlock<CustomElements, CustomLeaves>

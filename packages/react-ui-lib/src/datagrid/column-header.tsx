@@ -8,9 +8,9 @@ import { dict } from '../dict'
 
 
 export function DataGridColumnHeader<TData, TValue>({ sortingField, hidingName, children }: {
-	sortingField?: string,
-	hidingName?: string,
-	children: ReactNode,
+	sortingField?: string
+	hidingName?: string
+	children: ReactNode
 }) {
 	if (!sortingField && !hidingName) {
 		return <div>{children}</div>

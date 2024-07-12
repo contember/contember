@@ -43,7 +43,7 @@ const SelectImageRepeater = () => {
 	}} />
 }
 
-const SelectImageInner = ({ connect, closeOnSelect }: { connect: (entity: EntityAccessor) => void, closeOnSelect?: boolean }) => {
+const SelectImageInner = ({ connect, closeOnSelect }: { connect: (entity: EntityAccessor) => void; closeOnSelect?: boolean }) => {
 	const [open, setOpen] = useState(false)
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>

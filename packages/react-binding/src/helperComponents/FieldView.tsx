@@ -102,7 +102,7 @@ export type FieldViewComponentSignature = {
 		props:
 			& FieldViewCommonProps
 			& {
-				field: string | SugaredRelativeSingleField;
+				field: string | SugaredRelativeSingleField
 				render: (field1: FieldAccessor<FV1>) => ReactNode
 			},
 	): ReactElement | null
@@ -111,7 +111,7 @@ export type FieldViewComponentSignature = {
 		props:
 			& FieldViewCommonProps
 			& {
-				fields: [string | SugaredRelativeSingleField];
+				fields: [string | SugaredRelativeSingleField]
 				render: (field1: FieldAccessor<FV1>) => ReactNode
 			},
 	): ReactElement | null
@@ -120,7 +120,7 @@ export type FieldViewComponentSignature = {
 		props:
 			& FieldViewCommonProps
 			& {
-				fields: [string | SugaredRelativeSingleField, string | SugaredRelativeSingleField];
+				fields: [string | SugaredRelativeSingleField, string | SugaredRelativeSingleField]
 				render: (field1: FieldAccessor<FV1>, field2: FieldAccessor<FV2>) => ReactNode
 			},
 	): ReactElement | null

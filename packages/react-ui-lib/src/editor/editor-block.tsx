@@ -47,7 +47,7 @@ export const EditorBlockContent = Component(() => {
 }, () => <BlockContent />)
 
 const EditorBlockUi = ({ blockProps, renderBlockProps }: {
-	blockProps: EditorBlockProps,
+	blockProps: EditorBlockProps
 	renderBlockProps: BlockRendererProps }) => {
 	const {
 		children,

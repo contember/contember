@@ -15,8 +15,8 @@ export const DevBar = ({
 	children,
 	brand,
 }: PropsWithChildren<{
-	brand?: ReactNode;
-	breakpoint?: number;
+	brand?: ReactNode
+	breakpoint?: number
 }>) => {
 	const [expanded, setExpanded] = useState(true)
 	const isSmallScreen = useWindowSize().width < breakpoint
@@ -117,9 +117,9 @@ export const DevBar = ({
 }
 
 export const DevPanel = ({ heading, icon, children, preview }: {
-	icon: ReactNode;
-	heading: ReactNode,
-	children: ReactNode,
+	icon: ReactNode
+	heading: ReactNode
+	children: ReactNode
 	preview?: ReactNode
 }) => {
 	const id = `cui-devBar-panel-${useId()}`

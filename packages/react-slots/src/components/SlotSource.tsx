@@ -3,8 +3,8 @@ import { createPortal } from 'react-dom'
 import { useSlotTargetElement } from '../hooks'
 
 export type SlotSourceProps = {
-	children: ReactNode;
-	name: string;
+	children: ReactNode
+	name: string
 }
 
 /**

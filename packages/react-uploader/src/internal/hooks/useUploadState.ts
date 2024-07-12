@@ -4,7 +4,7 @@ import { UploaderFileState, UploaderState } from '../../types/state'
 import { useReferentiallyStableCallback } from '@contember/react-utils'
 
 export const useUploadState = ({ onBeforeUpload, onStartUpload, onSuccess, onError, onProgress, onAfterUpload }: UploaderEvents): UploaderEvents & {
-	files: UploaderState,
+	files: UploaderState
 	purgeFinal: () => void
 	purgeAll: () => void
 } => {

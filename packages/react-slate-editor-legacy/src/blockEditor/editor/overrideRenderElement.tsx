@@ -7,7 +7,7 @@ import { ComponentType, ReactNode } from 'react'
 
 
 export interface OverrideRenderElementOptions {
-	renderSortableBlock: ComponentType<{ children: ReactNode, element: Element }>
+	renderSortableBlock: ComponentType<{ children: ReactNode; element: Element }>
 }
 
 export const overrideRenderElement = (editor: Editor, { renderSortableBlock: SortableBlock }: OverrideRenderElementOptions) => {

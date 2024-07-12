@@ -2,7 +2,7 @@ import { Editor, Element as SlateElement, Node as SlateNode, Path as SlatePath, 
 import { listItemElementType } from '../ListItemElement'
 import { ContemberEditor } from '../../../../editor'
 
-export const normalizeListElement = ({ editor, path, preventDefault }: { editor: Editor, path: SlatePath, preventDefault: () => void }) => {
+export const normalizeListElement = ({ editor, path, preventDefault }: { editor: Editor; path: SlatePath; preventDefault: () => void }) => {
 	for (const [child, childPath] of SlateNode.children(editor, path)) {
 		if (SlateElement.isElement(child)) {
 			if (child.type !== listItemElementType) {

@@ -317,7 +317,7 @@ class Parser extends EmbeddedActionsParser {
 	})
 
 	private fieldWhere: () => Parser.AST.FieldWhere = this.RULE('fieldWhere', () => {
-		const fields: { name: FieldName, modifier?: string }[] = []
+		const fields: { name: FieldName; modifier?: string }[] = []
 
 		this.AT_LEAST_ONE_SEP({
 			SEP: tokens.Dot,
@@ -668,7 +668,7 @@ class Parser extends EmbeddedActionsParser {
 		])
 	})
 
-	private fieldIdentifierWithOptionalModifier: () => { name: FieldName, modifier?: string } = this.RULE('fieldIdentifierWithOptionalModifier', () => {
+	private fieldIdentifierWithOptionalModifier: () => { name: FieldName; modifier?: string } = this.RULE('fieldIdentifierWithOptionalModifier', () => {
 		const fieldIdentifier = this.SUBRULE1(this.fieldIdentifier)
 		const modifier = this.OPTION(() => {
 			this.CONSUME(tokens.Colon)

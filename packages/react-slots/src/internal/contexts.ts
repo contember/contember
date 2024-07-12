@@ -8,8 +8,8 @@ export type ActiveSlotPortalsContextType = Set<string>
 export const [ActiveSlotPortalsContext, useActiveSlotPortalsContext] = createContext<ActiveSlotPortalsContextType>('ActiveSlotPortalsContext', new Set())
 
 export type SlotTargetsRegistryContextType = {
-	registerSlotTarget: RegisterSlotTarget;
-	unregisterSlotTarget: UnregisterSlotTarget;
+	registerSlotTarget: RegisterSlotTarget
+	unregisterSlotTarget: UnregisterSlotTarget
 }
 export const [TargetsRegistryContext, useTargetsRegistryContext] = createContext<SlotTargetsRegistryContextType>('Layout.Slots.TargetsRegistryContext', {
 	registerSlotTarget: () => () => undefined,

@@ -7,8 +7,8 @@ import { StateStorageOrName, useStoredState } from '@contember/react-utils'
 const emptyDim = [] as string[]
 
 export const useDimensionState = ({ dimension, defaultValue, storage = 'null' }: {
-	dimension: string,
-	defaultValue: string | string[],
+	dimension: string
+	defaultValue: string | string[]
 	storage?: StateStorageOrName
 }) => {
 	const currentDimensionValue = useCurrentRequest()?.dimensions[dimension] ?? emptyDim

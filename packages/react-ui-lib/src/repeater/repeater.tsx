@@ -45,7 +45,7 @@ export const RepeaterDropIndicator = ({ position }: { position: 'before' | 'afte
 	</div>
 )
 
-export const RepeaterAddItemButton = ({ children, index }: { children?: React.ReactNode, index?: RepeaterAddItemIndex }) => (
+export const RepeaterAddItemButton = ({ children, index }: { children?: React.ReactNode; index?: RepeaterAddItemIndex }) => (
 	<RepeaterAddItemTrigger index={index}>
 		<div>
 			<Button variant={'link'} size={'sm'} className={'gap-1 px-0'}>

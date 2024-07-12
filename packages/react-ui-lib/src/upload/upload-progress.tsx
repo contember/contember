@@ -40,7 +40,7 @@ const UploadError = ({ state: { error } }: { state: UploaderFileStateError }) =>
 	return <div className="text-red-700 text-xs font-semibold">{formattedError}</div>
 }
 
-export const UploaderFileProgressUI = ({ file, progress, info, actions }: { file: File, progress?: number, actions?: ReactNode, info?: ReactNode }) => {
+export const UploaderFileProgressUI = ({ file, progress, info, actions }: { file: File; progress?: number; actions?: ReactNode; info?: ReactNode }) => {
 	const fileName = file.name
 	const extension = file.name.split('.').pop()?.toUpperCase()
 

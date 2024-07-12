@@ -9,8 +9,8 @@ export interface TenantActionTriggerProps<OkResult, Error extends string> {
 	children: ReactElement
 	onClick?: MouseEventHandler<HTMLButtonElement>
 	onSuccess?: (args: {result: OkResult}) => void
-	onError?: (args: { code: Error | 'UNKNOWN_ERROR', error: unknown }) => void
-	execute: () => Promise<({ ok: true } & (OkResult extends undefined ? {} : { result: OkResult })) | { ok: false, error?: Error }>
+	onError?: (args: { code: Error | 'UNKNOWN_ERROR'; error: unknown }) => void
+	execute: () => Promise<({ ok: true } & (OkResult extends undefined ? {} : { result: OkResult })) | { ok: false; error?: Error }>
 }
 
 export const TenantActionTrigger = <OkResult, Error extends string>({ onError: onErrorIn, onSuccess: onSuccessIn, onClick: onClickProp, execute: executeIn, ...props }: TenantActionTriggerProps<OkResult, Error>) => {

@@ -232,6 +232,7 @@ export class AccessorErrorManager {
 				}
 			})
 			if (Object.keys(normalizedErrors).length) {
+				// eslint-disable-next-line no-console
 				console.table(normalizedErrors)
 			}
 			if (treeDatum.errorMessage) {

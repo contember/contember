@@ -12,7 +12,7 @@ export const BlockEditorHandle = uic('span', {
 	beforeChildren: <GripVerticalIcon size={16} />,
 })
 
-export const SortableBlock = ({ children, element }: { children: ReactNode, element: Element }) => {
+export const SortableBlock = ({ children, element }: { children: ReactNode; element: Element }) => {
 	const sortable = useSortable({
 		id: element.key as string,
 	})

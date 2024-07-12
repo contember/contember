@@ -15,7 +15,7 @@ export type MutationTransactionOptions = {
 	deferUniqueConstraints?: boolean
 }
 
-type MutationOperation = 'create' | 'update' | 'delete' | 'upsert' | 'transaction';
+type MutationOperation = 'create' | 'update' | 'delete' | 'upsert' | 'transaction'
 
 export class ContentQueryBuilder {
 	constructor(private readonly schema: SchemaNames) {

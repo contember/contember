@@ -14,7 +14,7 @@ export const BlockeEditorHandle = uic('span', {
 	beforeChildren: <GripVerticalIcon size={16} />,
 })
 
-export const SortableBlock = ({ children, element }: { children: ReactNode, element: Element }) => {
+export const SortableBlock = ({ children, element }: { children: ReactNode; element: Element }) => {
 	const editor = useSlateStatic()
 	// intentionally passing through the context, so it redraws on order change
 	const sortedBlocks = useContext(SortedBlocksContext)

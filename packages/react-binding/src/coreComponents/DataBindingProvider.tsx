@@ -5,8 +5,8 @@ import { EntityKeyContext } from '../accessorPropagation/EntityKeyContext'
 
 export type DataBindingProviderStateComponent<StateProps> = (
 	| {
-		stateComponent?: never;
-		stateProps?: never;
+		stateComponent?: never
+		stateProps?: never
 	}
 	| {
 		stateComponent: ComponentType<StateProps & DataBindingStateComponentProps>

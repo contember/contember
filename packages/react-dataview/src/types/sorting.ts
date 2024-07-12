@@ -23,7 +23,7 @@ export type GetNewOrderBy = (
 	options: GetNewOrderByOptions,
 ) => SugaredOrderBy | undefined
 
-export type DataViewSortingDirections = Record<string, Exclude<DataViewSortingDirection, null>>;
+export type DataViewSortingDirections = Record<string, Exclude<DataViewSortingDirection, null>>
 
 export type DataViewSortingState = {
 	directions: DataViewSortingDirections

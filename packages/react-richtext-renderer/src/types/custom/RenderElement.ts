@@ -21,7 +21,7 @@ export type RenderElementProps<
 		options: RichTextRenderingOptions<CustomElements, CustomLeaves>
 		fallback: ReactElement
 
-		renderChildren: RenderChildren<CustomElements, CustomLeaves>,
+		renderChildren: RenderChildren<CustomElements, CustomLeaves>
 
 		/**
 		 * @deprecated To access the rendering options, use options. No need to pass it to renderChildren function.

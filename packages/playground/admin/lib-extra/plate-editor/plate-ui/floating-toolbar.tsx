@@ -9,7 +9,7 @@ import { cn } from '@app/lib/utils'
 export const FloatingToolbar = withRef<
 	typeof Toolbar,
 	{
-		state?: FloatingToolbarState;
+		state?: FloatingToolbarState
 	}
 >(({ state, children, ...props }, componentRef) => {
 	const floatingToolbarState = useFloatingToolbarState({

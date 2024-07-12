@@ -8,7 +8,7 @@ export const SelectNewItem = ({ children }: { children: ReactNode }) => {
 	const env = useEnvironment()
 	const { entityName } = useMemo((() => QueryLanguage.desugarQualifiedEntityList({ entities: options }, env)), [env, options])
 
-	const [state, setState] = useState<{ entity: EntityAccessor, treeRootId: TreeRootId } | null>(null)
+	const [state, setState] = useState<{ entity: EntityAccessor; treeRootId: TreeRootId } | null>(null)
 	const extendTree = useExtendTree()
 	const getSubTree = useGetEntitySubTree()
 

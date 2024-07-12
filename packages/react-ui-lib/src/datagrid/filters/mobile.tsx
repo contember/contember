@@ -5,7 +5,7 @@ import { createContext, ReactNode, useContext } from 'react'
 
 export const DataGridShowFiltersContext = createContext(true)
 
-export const DataGridFilterMobileHiding = ({ name,  children }: { name?: string, children: ReactNode }) => {
+export const DataGridFilterMobileHiding = ({ name,  children }: { name?: string; children: ReactNode }) => {
 	// eslint-disable-next-line react-hooks/rules-of-hooks
 	name ??= useDataViewFilterName()
 	const activeFilter = useDataViewFilteringState().artifact

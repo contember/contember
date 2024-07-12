@@ -2,7 +2,7 @@ import { FileType, FileWithMeta } from '../../types'
 import { EntityAccessor } from '@contember/binding'
 import { FileUploadResult } from '../../types/uploadClient'
 
-export const executeExtractors = async ({ fileType, file, result }: { fileType: FileType, file: FileWithMeta, result: FileUploadResult }) => {
+export const executeExtractors = async ({ fileType, file, result }: { fileType: FileType; file: FileWithMeta; result: FileUploadResult }) => {
 	const extractorsResult = fileType.extractors?.map(it => {
 		return it.extractFileData?.(file)
 	}) ?? []

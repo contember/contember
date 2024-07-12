@@ -9,7 +9,7 @@ import { ProjectContainerFactoryFactory } from './project'
 import { ProjectConfigResolver } from './config/projectConfigResolver'
 import { TenantConfigResolver } from './config/tenantConfigResolver'
 import { ProjectGroupContainerFactory } from './projectGroup/ProjectGroupContainer'
-import { ProjectGroupResolver, SingleProjectGroupResolver } from './projectGroup/ProjectGroupResolver'
+import { MultiProjectGroupResolver, ProjectGroupResolver, SingleProjectGroupResolver } from './projectGroup/ProjectGroupResolver'
 import { Logger } from '@contember/logger'
 import { ExecutionContainerFactory, GraphQlSchemaBuilderFactory, PermissionFactory } from '@contember/engine-content-api'
 import { createProviders, Providers } from './providers'
@@ -32,17 +32,30 @@ import {
 } from './transfer'
 import { homepageController, playgroundController } from './misc'
 import { Plugin } from './plugin/Plugin'
-import { Application } from './application/application'
-import { ApplicationWorkerManager } from './workers/ApplicationWorkerManager'
+import { Application } from './application'
+import { ApplicationWorkerManager } from './workers'
 import { HttpResponse } from './common'
 import { ContentQueryExecutorImpl } from './system/ContentQueryExecutor'
 import { DatabaseMetadataResolver } from '@contember/database'
+import Koa from 'koa'
+import { ProjectGroupContainerResolver } from './projectGroup/ProjectGroupContainerResolver'
+import { PrometheusRegistryFactory } from './prometheus/PrometheusRegistryFactory'
+import { ProjectGroupContainerMetricsHook } from './prometheus/ProjectGroupContainerMetricsHook'
+import { createColllectHttpMetricsMiddleware, createShowMetricsMiddleware } from './prometheus'
+import { createSecretKey } from 'node:crypto'
+import { CryptoWrapper } from './utils/CryptoWrapper'
+
+export type ProcessType =
+	| 'singleNode'
+	| 'clusterMaster'
+	| 'clusterWorker'
 
 export interface MasterContainer {
 	initializer: Initializer
 	application: Application
 	providers: Providers
 	applicationWorkers: ApplicationWorkerManager
+	monitoringKoa: Koa
 }
 
 export interface MasterContainerArgs {
@@ -53,6 +66,7 @@ export interface MasterContainerArgs {
 	plugins: Plugin[]
 	logger: Logger
 	version?: string
+	processType: ProcessType
 }
 
 export type MasterContainerBuilder = ReturnType<MasterContainerFactory['createBuilderInternal']>
@@ -76,6 +90,7 @@ export class MasterContainerFactory {
 		tenantConfigResolver,
 		version,
 		logger,
+		processType,
 	}: MasterContainerArgs) {
 		return new Builder({})
 			.addService('serverConfig', () =>
@@ -84,6 +99,8 @@ export class MasterContainerFactory {
 				debugMode)
 			.addService('version', () =>
 				version)
+			.addService('processType', () =>
+				processType)
 			.addService('projectConfigResolver', () =>
 				projectConfigResolver)
 			.addService('tenantConfigResolver', () =>
@@ -118,10 +135,35 @@ export class MasterContainerFactory {
 				logger)
 			.addService('projectGroupContainerFactory', ({ debugMode, providers, systemContainerFactory, tenantContainerFactory, projectContainerFactoryFactory, projectConfigResolver, tenantGraphQLHandlerFactory, systemGraphQLHandlerFactory, logger }) =>
 				new ProjectGroupContainerFactory(debugMode, providers, systemContainerFactory, tenantContainerFactory, projectContainerFactoryFactory, projectConfigResolver, tenantGraphQLHandlerFactory, systemGraphQLHandlerFactory, logger))
+			.addService('projectGroupContainerResolver', ({ tenantConfigResolver, projectGroupContainerFactory }) =>
+				new ProjectGroupContainerResolver(tenantConfigResolver, projectGroupContainerFactory))
+			.addService('promRegistryFactory', ({ processType, version }) =>
+				new PrometheusRegistryFactory(processType, { version }))
+			.addService('projectGroupContainerMetricsHook', ({ projectGroupContainerResolver }) =>
+				new ProjectGroupContainerMetricsHook(projectGroupContainerResolver))
+			.addService('promRegistry', ({ promRegistryFactory, projectGroupContainerMetricsHook }) => {
+				const registry = promRegistryFactory.create()
+				projectGroupContainerMetricsHook.register(registry)
+				return registry
+			})
 			.addService('projectGroupContainer', ({ tenantConfigResolver, projectGroupContainerFactory }) =>
 				projectGroupContainerFactory.create({ slug: undefined, config: tenantConfigResolver(undefined, {}) }))
-			.addService('projectGroupResolver', ({ projectGroupContainer }): ProjectGroupResolver =>
-				new SingleProjectGroupResolver(projectGroupContainer))
+			.addService('projectGroupResolver', ({ projectGroupContainer, serverConfig, projectGroupContainerResolver }): ProjectGroupResolver => {
+				if (!serverConfig.projectGroup) {
+					return new SingleProjectGroupResolver(projectGroupContainer)
+				}
+
+				const encryptionKey = serverConfig.projectGroup?.configEncryptionKey
+					? createSecretKey(Buffer.from(serverConfig.projectGroup?.configEncryptionKey, 'hex'))
+					: undefined
+				return new MultiProjectGroupResolver(
+					serverConfig.projectGroup?.domainMapping,
+					serverConfig.projectGroup?.configHeader,
+					serverConfig.projectGroup?.configEncryptionKey ? new CryptoWrapper(encryptionKey) : undefined,
+					projectGroupContainerResolver,
+				)
+
+			})
 			.addService('notModifiedChecker', () =>
 				new NotModifiedChecker())
 			.addService('contentGraphqlContextFactory', ({ providers, executionContainerFactory }) =>
@@ -152,7 +194,7 @@ export class MasterContainerFactory {
 				new ImportApiMiddlewareFactory(projectGroupResolver, importExecutor))
 			.addService('exportApiMiddlewareFactory', ({ projectGroupResolver, exportExecutor }) =>
 				new ExportApiControllerFactory(projectGroupResolver, exportExecutor))
-			.addService('application', ({ projectGroupResolver, serverConfig, logger, debugMode, version }) => {
+			.addService('application', ({ projectGroupResolver, serverConfig, logger, debugMode, version, promRegistry }) => {
 				const app = new Application(
 					projectGroupResolver,
 					serverConfig,
@@ -160,6 +202,7 @@ export class MasterContainerFactory {
 					version,
 					logger,
 				)
+				app.addMiddleware(createColllectHttpMetricsMiddleware(promRegistry))
 
 				return app
 			})
@@ -187,11 +230,17 @@ export class MasterContainerFactory {
 					}
 				}
 			})
+			.addService('monitoringKoa', ({ promRegistry }) => {
+				const app = new Koa()
+				app.use(createShowMetricsMiddleware(promRegistry))
+
+				return app
+			})
 
 	}
 
 	create(args: MasterContainerArgs): MasterContainer {
 		const container = this.createBuilder(args).build()
-		return container.pick('initializer', 'application', 'providers', 'applicationWorkers')
+		return container.pick('initializer', 'application', 'providers', 'applicationWorkers', 'monitoringKoa')
 	}
 }

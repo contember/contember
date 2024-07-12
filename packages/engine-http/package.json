@@ -37,6 +37,7 @@
     "koa-compress": "^5.1.1",
     "lru-cache": "^10.0.2",
     "path-to-regexp": "^6.2.1",
+    "prom-client": "^12.0.0",
     "uuid": "^9.0.1",
     "ws": "^8.14.2"
   },

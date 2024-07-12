@@ -4,6 +4,7 @@
 		"outDir": "../dist/src"
 	},
 	"references": [
+		{ "path": "../../engine-actions/src" },
 		{ "path": "../../engine-http/src" },
 		{ "path": "../../engine-plugins/src" },
 		{ "path": "../../engine-s3-plugin/src" },

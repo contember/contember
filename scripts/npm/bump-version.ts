@@ -4,7 +4,7 @@ import glob from "fast-glob";
 ;(async () => {
 	const cwd = process.cwd()
 	const version = process.argv[2]
-	const dirs = [cwd, ...await glob(process.cwd() + '/{ee,packages}/*', { onlyDirectories: true })]
+	const dirs = [cwd, ...await glob(process.cwd() + '/packages/*', { onlyDirectories: true })]
 
 	await Promise.all(dirs.map(async (dir): Promise<void> => {
 		try {

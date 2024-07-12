@@ -2,13 +2,21 @@
 
 import {
 	createContainer,
-	createDefaultLogger, createSentryLoggerHandler,
+	createDefaultLogger,
+	createSentryLoggerHandler,
+	getServerVersion,
+	isDebugMode,
 	listenOnProcessTermination,
+	printStartInfo,
+	resolveServerConfig,
 	serverConfigSchema,
 	TerminationJob,
-	getServerVersion, isDebugMode, printStartInfo, resolveServerConfig,
 } from '@contember/engine-http'
 import loadPlugins from './loadPlugins'
+import cluster from 'node:cluster'
+import * as os from 'node:os'
+import { timeout } from './utils'
+import { getClusterProcessType, notifyWorkerStarted, WorkerManager } from './cluster'
 
 const logger = createDefaultLogger()
 process.on('warning', message => {
@@ -16,21 +24,27 @@ process.on('warning', message => {
 })
 ;(async () => {
 	const isDebug = isDebugMode()
-	const terminationJobs: TerminationJob[] = []
-	listenOnProcessTermination(terminationJobs, logger)
 
 	const version = getServerVersion()
 	printStartInfo({ version, isDebug }, logger)
 	const plugins = await loadPlugins()
-	const { serverConfig, projectConfigResolver, tenantConfigResolver } = await resolveServerConfig({
-		plugins,
-		serverConfigSchema,
-	})
+	const { serverConfig, projectConfigResolver, tenantConfigResolver } = await resolveServerConfig({ plugins, serverConfigSchema })
 
-	const sentryTransport = createSentryLoggerHandler(serverConfig.logging.sentry?.dsn)
-	if (sentryTransport !== null) {
-		logger.addHandler(sentryTransport)
+	if (process.argv[2] === 'validate') {
+		process.exit(0)
 	}
+
+	const sentryhandler = createSentryLoggerHandler(serverConfig.logging.sentry?.dsn)
+	if (sentryhandler !== null) {
+		logger.addHandler(sentryhandler)
+	}
+
+	const workerConfig = serverConfig.workerCount || 1
+
+	const workerCount = workerConfig === 'auto' ? os.cpus().length : Number(workerConfig)
+	const isClusterMode = serverConfig.workerCount !== undefined
+
+	const processType = getClusterProcessType(isClusterMode)
 
 	const container = createContainer({
 		debugMode: isDebug,
@@ -38,16 +52,113 @@ process.on('warning', message => {
 		projectConfigResolver,
 		tenantConfigResolver,
 		plugins,
+		processType,
 		version,
 		logger,
 	})
 
-	const initializedProjects: string[] = await container.initializer.initialize()
+	let initializedProjects: string[] = []
+	const terminationJobs: TerminationJob[] = []
+	listenOnProcessTermination(terminationJobs, logger)
 
-	const httpServerPromise = container.application.listen()
-	terminationJobs.push(async () => await (await httpServerPromise).close())
-	logger.info(`Contember API running on http://localhost:${(serverConfig.port)}`)
-	logger.info(initializedProjects.length ? `Initialized projects: ${initializedProjects.join(', ')}` : 'No project initialized')
+	if (cluster.isMaster) {
+		const monitoringPort = serverConfig.monitoringPort
+		const monitoringServer = container.monitoringKoa.listen(monitoringPort, () => {
+			logger.info(`Monitoring running on http://localhost:${monitoringPort}`)
+		})
+		terminationJobs.push(async () => {
+			await new Promise<any>(resolve => monitoringServer.close(resolve))
+			logger.info('Monitoring server terminated')
+		})
+		if (!serverConfig.projectGroup) {
+			initializedProjects = await container.initializer.initialize()
+		}
+	}
+
+	const port = serverConfig.port
+	const printStarted = () => {
+		if (serverConfig.projectGroup) {
+			logger.info('Contember Cloud running')
+		} else {
+			logger.info(`Contember API running on http://localhost:${port}`)
+		}
+		if (initializedProjects.length) {
+			logger.info(`Initialized projects: ${initializedProjects.join(', ')}`)
+		}
+	}
+
+	const startApplication = async () => {
+		const httpServerPromise = container.application.listen()
+		terminationJobs.push(async () => {
+			await (await httpServerPromise).close()
+			logger.info('API server terminated')
+		})
+		await httpServerPromise
+	}
+
+	const startWorker = async (workerName: string) => {
+		const worker = container.applicationWorkers.getWorker(workerName)
+		const runningWorker = worker.run({
+			logger,
+			onError: e => {
+				logger.crit(e)
+				process.exit(1)
+			},
+		})
+		terminationJobs.push(async () => {
+			(await runningWorker).end()
+		})
+		await runningWorker
+		logger.info(`Contember Worker ${workerName} started.`)
+
+	}
+
+	const applicationWorker = serverConfig.applicationWorker
+	if (applicationWorker && applicationWorker !== 'all') {
+		await startWorker(applicationWorker)
+		if (isClusterMode) {
+			notifyWorkerStarted()
+		}
+	} else if (isClusterMode) {
+		if (cluster.isMaster) {
+			logger.info(`Master ${process.pid} is running`)
+			const workerManager = new WorkerManager()
+			terminationJobs.push(async ({ signal }) => {
+				await workerManager.terminate(signal)
+				logger.info('Workers terminated')
+			})
+
+			await workerManager.start({ workerCount })
+
+			if (applicationWorker === 'all') {
+				for (const workerName of container.applicationWorkers.getWorkerNames()) {
+					await workerManager.start({
+						workerCount, env: {
+							CONTEMBER_APPLICATION_WORKER: workerName,
+						},
+					})
+				}
+			}
+			printStarted()
+		} else {
+			logger.info(`Starting worker ${process.pid}`)
+
+			// this line somehow ensures, that worker waits for termination of all jobs
+			process.on('disconnect', () => timeout(0))
+
+			await startApplication()
+			notifyWorkerStarted()
+		}
+	} else {
+		await startApplication()
+		if (applicationWorker === 'all') {
+			for (const workerName of container.applicationWorkers.getWorkerNames()) {
+				await startWorker(workerName)
+			}
+		}
+		printStarted()
+	}
+
 })().catch(e => {
 	logger.crit(e)
 	process.exit(1)

@@ -124,14 +124,6 @@ CREATE TABLE "schema_migration" (
     "executed_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "type" "schema_migration_type" DEFAULT 'schema'::"schema_migration_type" NOT NULL
 );
-CREATE SEQUENCE "schema_migration_id_seq"
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-ALTER SEQUENCE "schema_migration_id_seq" OWNED BY "schema_migration"."id";
 CREATE TABLE "stage" (
     "id" "uuid" NOT NULL,
     "name" "text" NOT NULL,
@@ -143,7 +135,6 @@ CREATE TABLE "stage_transaction" (
     "stage_id" "uuid" NOT NULL,
     "applied_at" timestamp with time zone NOT NULL
 );
-ALTER TABLE ONLY "schema_migration" ALTER COLUMN "id" SET DEFAULT "nextval"('"schema_migration_id_seq"'::"regclass");
 ALTER TABLE ONLY "event_data"
     ADD CONSTRAINT "event_data_pkey" PRIMARY KEY ("id");
 ALTER TABLE ONLY "schema_migration"

@@ -1,4 +1,4 @@
-import { InsertBuilder, QueryBuilder } from '@contember/database'
+import { InsertBuilder, Literal, QueryBuilder, SelectBuilder } from '@contember/database'
 import { calculateMigrationChecksum } from '@contember/schema-migrations'
 import { Command } from '../Command'
 import { MigrationInput } from '../../migrations/MigrationInput'
@@ -22,12 +22,18 @@ export class SaveMigrationCommand implements Command<number> {
 			checksum: this.migration.type === 'schema' ? calculateMigrationChecksum(this.migration) : null,
 		}
 
+		const latestId = (await SelectBuilder.create<{ id: number }>()
+			.from('schema_migration')
+			.select(new Literal('max(id)'), 'id')
+			.getResult(db)
+		)[0]?.id ?? 0
+
+		const newId = latestId + 1
 		const result = await InsertBuilder.create()
 			.into('schema_migration')
-			.values(values)
-			.returning<{id: number}>('id')
+			.values({ id: newId, ...values })
 			.execute(db)
 
-		return result[0].id
+		return newId
 	}
 }

@@ -27,6 +27,7 @@ const schema: DocumentNode = gql`
 		signIn(email: String!, password: String!, expiration: Int, otpToken: String): SignInResponse
 		createSessionToken(email: String, personId: String, expiration: Int): CreateSessionTokenResponse
 		signOut(all: Boolean): SignOutResponse
+		changeProfile(personId: String!, email: String, name: String): ChangeProfileResponse
 		changeMyProfile(email: String, name: String): ChangeMyProfileResponse
 		changePassword(personId: String!, password: String!): ChangePasswordResponse
 		changeMyPassword(currentPassword: String!, newPassword: String!): ChangeMyPasswordResponse
@@ -206,6 +207,24 @@ const schema: DocumentNode = gql`
 	}
 
 	# === changeProfile ===
+	
+	type ChangeProfileResponse {
+		ok: Boolean!
+		error: ChangeProfileError
+	}
+	
+	type ChangeProfileError {
+		code: ChangeProfileErrorCode!
+		developerMessage: String!
+	}
+	
+	enum ChangeProfileErrorCode {
+		PERSON_NOT_FOUND
+		INVALID_EMAIL_FORMAT
+		EMAIL_ALREADY_EXISTS
+	}
+	
+	# === changeMyProfile ===
 
 	type ChangeMyProfileResponse {
 		ok: Boolean!
@@ -221,7 +240,7 @@ const schema: DocumentNode = gql`
 		NOT_A_PERSON
 		INVALID_EMAIL_FORMAT
 		EMAIL_ALREADY_EXISTS
-	}
+	}	
 
 	# === changePassword ===
 
@@ -243,6 +262,8 @@ const schema: DocumentNode = gql`
 	}
 
 
+	# === changeMyPassword ===
+	
 	type ChangeMyPasswordResponse {
 		ok: Boolean!
 		error: ChangeMyPasswordError

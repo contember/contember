@@ -1,8 +1,6 @@
 import { basename, join } from 'node:path'
 import { ProjectManager } from './ProjectManager'
 import { PathMapping } from './PathMapping'
-import { installTemplate } from './template'
-import { getPackageVersion } from './version'
 import { readYaml } from './yaml'
 import { CliEnv, readCliEnv } from '../application'
 import { pathExists } from './fs'

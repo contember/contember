@@ -25,7 +25,7 @@ process.on('warning', message => {
 ;(async () => {
 	const isDebug = isDebugMode()
 
-	const version = getServerVersion()
+	const version = await getServerVersion()
 	printStartInfo({ version, isDebug }, logger)
 	const plugins = await loadPlugins()
 	const { serverConfig, projectConfigResolver, tenantConfigResolver } = await resolveServerConfig({ plugins, serverConfigSchema })

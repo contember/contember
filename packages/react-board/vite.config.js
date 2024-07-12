@@ -1,3 +1,7 @@
-import { createViteConfig } from '../../build/createViteConfig.js'
+import { createViteConfig } from '../../scripts/vite/createViteConfig'
+import { basename, dirname } from 'node:path'
+import { fileURLToPath } from 'node:url'
 
-export default createViteConfig('react-board')
+const packageName = basename(dirname(fileURLToPath(import.meta.url)))
+
+export default createViteConfig(packageName)

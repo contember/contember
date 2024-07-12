@@ -1,45 +1,66 @@
 {
-  "name": "@contember/engine-actions",
-  "license": "Apache-2.0",
-  "main": "dist/src/index.js",
-  "typings": "dist/src/index.d.ts",
-  "exports": {
-    "typescript": "./src/index.ts",
-    "default": "./dist/src/index.js"
-  },
-  "scripts": {
-    "generate": "gql-gen --config graphql-actions.codegen.yml",
-    "test": "vitest --no-threads"
-  },
-  "dependencies": {
-    "@contember/authorization": "workspace:*",
-    "@contember/database": "workspace:*",
-    "@contember/database-migrations": "workspace:*",
-    "@contember/engine-common": "workspace:*",
-    "@contember/engine-content-api": "workspace:*",
-    "@contember/engine-http": "workspace:*",
-    "@contember/engine-plugins": "workspace:*",
-    "@contember/engine-system-api": "workspace:*",
-    "@contember/engine-tenant-api": "workspace:*",
-    "@contember/graphql-utils": "workspace:*",
-    "@contember/logger": "workspace:*",
-    "@contember/schema": "workspace:*",
-    "@contember/schema-utils": "workspace:*",
-    "@contember/typesafe": "workspace:*",
-    "@graphql-tools/schema": "^10.0.0",
-    "graphql-tag": "^2.12.6"
-  },
-  "devDependencies": {
-    "@contember/engine-api-tester": "workspace:*",
-    "@graphql-codegen/cli": "^5.0.0",
-    "@graphql-codegen/typescript": "^4.0.1",
-    "@graphql-codegen/typescript-operations": "^4.0.1",
-    "@graphql-codegen/typescript-resolvers": "^4.0.1",
-    "@types/ws": "^8.5.9",
-    "graphql": "^16.8.1"
-  },
-  "peerDependencies": {
-    "graphql": ">= 14.6.0",
-    "pg": "^8.5.0"
-  }
+	"name": "@contember/engine-actions",
+	"license": "Apache-2.0",
+	"main": "./dist/production/index.js",
+	"typings": "./dist/types/index.d.ts",
+	"exports": {
+		".": {
+			"import": {
+				"types": "./dist/types/index.d.ts",
+				"development": "./dist/development/index.js",
+				"production": "./dist/production/index.js",
+				"typescript": "./src/index.ts",
+				"default": "./dist/production/index.js"
+			},
+			"require": {
+				"types": "./dist/types/index.d.ts",
+				"development": "./dist/development/index.cjs",
+				"production": "./dist/production/index.cjs",
+				"default": "./dist/production/index.cjs"
+			}
+		}
+	},
+	"scripts": {
+		"generate": "gql-gen --config graphql-actions.codegen.yml",
+		"test": "vitest --no-threads",
+		"build": "yarn build:js:dev && yarn build:js:prod",
+		"build:js:dev": "NODE_ENV=development vite build --mode development",
+		"build:js:prod": "vite build --mode production"
+	},
+	"dependencies": {
+		"@contember/authorization": "workspace:*",
+		"@contember/database": "workspace:*",
+		"@contember/database-migrations": "workspace:*",
+		"@contember/engine-common": "workspace:*",
+		"@contember/engine-content-api": "workspace:*",
+		"@contember/engine-http": "workspace:*",
+		"@contember/engine-plugins": "workspace:*",
+		"@contember/engine-system-api": "workspace:*",
+		"@contember/engine-tenant-api": "workspace:*",
+		"@contember/graphql-utils": "workspace:*",
+		"@contember/logger": "workspace:*",
+		"@contember/schema": "workspace:*",
+		"@contember/schema-utils": "workspace:*",
+		"@contember/typesafe": "workspace:*",
+		"@graphql-tools/schema": "^10.0.0",
+		"graphql-tag": "^2.12.6"
+	},
+	"devDependencies": {
+		"@contember/engine-api-tester": "workspace:*",
+		"@graphql-codegen/cli": "^5.0.0",
+		"@graphql-codegen/typescript": "^4.0.1",
+		"@graphql-codegen/typescript-operations": "^4.0.1",
+		"@graphql-codegen/typescript-resolvers": "^4.0.1",
+		"@types/ws": "^8.5.9",
+		"graphql": "^16.8.1"
+	},
+	"peerDependencies": {
+		"graphql": ">= 14.6.0",
+		"pg": "^8.5.0"
+	},
+	"type": "module",
+	"files": [
+		"dist/",
+		"src/"
+	]
 }

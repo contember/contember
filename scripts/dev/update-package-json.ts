@@ -8,7 +8,6 @@ const packages = [
 ]
 
 const updatePackageJson = (packageJson: any, packageDir: string) => {
-	// custom code
 	return packageJson
 }
 

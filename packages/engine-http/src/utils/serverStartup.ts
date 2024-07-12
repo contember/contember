@@ -1,14 +1,16 @@
-import { join } from 'node:path'
+import { dirname, join } from 'node:path'
 import { ConfigSource, readConfig, ServerConfig } from '../config/config'
 import { Type } from '@contember/typesafe'
 import { createLogger, JsonStreamLoggerHandler, Logger, LogLevels, PrettyPrintLoggerHandler } from '@contember/logger'
 import { ConfigProcessor } from '../config/ConfigProcessor'
 import { Plugin } from '../plugin/Plugin'
+import { fileURLToPath } from 'node:url'
+import { readFile } from 'node:fs/promises'
 
-export const getServerVersion = (): string => {
-	const packageJsonFile = process.env.CONTEMBER_PACKAGE_JSON || join(__dirname, '../../../package.json')
-	// eslint-disable-next-line @typescript-eslint/no-var-requires
-	const version = require(packageJsonFile).version
+export const getServerVersion = async (): Promise<string> => {
+	const dir = dirname(fileURLToPath(import.meta.url))
+	const packageJsonFile = process.env.CONTEMBER_PACKAGE_JSON || join(dir, dir.endsWith('dist/src/utils') ? '../../../' : '../../', 'package.json')
+	const version = JSON.parse(await readFile(packageJsonFile, 'utf-8')).version
 	return version
 }
 

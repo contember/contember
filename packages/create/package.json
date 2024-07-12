@@ -1,19 +1,46 @@
 {
-  "name": "@contember/create",
-  "version": "1.4.0-rc.4",
-  "license": "Apache-2.0",
-  "bin": "dist/src/run.js",
-  "scripts": {
-    "test": "echo 'No tests'"
-  },
-  "dependencies": {
-    "@contember/cli-common": "workspace:*",
-    "chalk": "^4.1.2",
-    "download-tarball": "^2.0.0",
-    "fs-extra": "^11.1.1",
-    "get-package-json-from-registry": "^2.2.2",
-    "js-yaml": "^4.1.0",
-    "npm-package-arg": "^11.0.1",
-    "registry-info": "^1.0.0"
-  }
+	"name": "@contember/create",
+	"version": "1.4.0-rc.4",
+	"license": "Apache-2.0",
+	"bin": "dist/src/run.js",
+	"scripts": {
+		"test": "echo 'No tests'",
+		"build": "yarn build:js:dev && yarn build:js:prod",
+		"build:js:dev": "NODE_ENV=development vite build --mode development",
+		"build:js:prod": "vite build --mode production"
+	},
+	"dependencies": {
+		"@contember/cli-common": "workspace:*",
+		"chalk": "^4.1.2",
+		"download-tarball": "^2.0.0",
+		"fs-extra": "^11.1.1",
+		"get-package-json-from-registry": "^2.2.2",
+		"js-yaml": "^4.1.0",
+		"npm-package-arg": "^11.0.1",
+		"registry-info": "^1.0.0"
+	},
+	"type": "module",
+	"main": "./dist/production/index.js",
+	"typings": "./dist/types/index.d.ts",
+	"exports": {
+		".": {
+			"import": {
+				"types": "./dist/types/index.d.ts",
+				"development": "./dist/development/index.js",
+				"production": "./dist/production/index.js",
+				"typescript": "./src/index.ts",
+				"default": "./dist/production/index.js"
+			},
+			"require": {
+				"types": "./dist/types/index.d.ts",
+				"development": "./dist/development/index.cjs",
+				"production": "./dist/production/index.cjs",
+				"default": "./dist/production/index.cjs"
+			}
+		}
+	},
+	"files": [
+		"dist/",
+		"src/"
+	]
 }

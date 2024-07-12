@@ -1,5 +1,7 @@
-import { createViteConfig } from '../../build/createViteConfig.js'
+import { createViteConfig } from '../../scripts/vite/createViteConfig'
+import { basename, dirname } from 'node:path'
+import { fileURLToPath } from 'node:url'
 
-const currentDirName = new URL('.', import.meta.url).pathname.split('/').filter(Boolean).pop()
+const packageName = basename(dirname(fileURLToPath(import.meta.url)))
 
-export default createViteConfig(currentDirName)
+export default createViteConfig(packageName)

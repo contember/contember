@@ -1,59 +1,80 @@
 {
-  "name": "@contember/engine-http",
-  "version": "1.4.0-rc.4",
-  "license": "Apache-2.0",
-  "main": "dist/src/index.js",
-  "typings": "dist/src/index.d.ts",
-  "scripts": {
-    "test": "vitest --dir ./tests/cases && node --expose-gc ./dist/tests/cases/unit/contentApiSpecificCache.tst.js"
-  },
-  "exports": {
-    "typescript": "./src/index.ts",
-    "default": "./dist/src/index.js"
-  },
-  "dependencies": {
-    "@apollographql/graphql-playground-html": "^1.6.29",
-    "@contember/config-loader": "workspace:*",
-    "@contember/database": "workspace:*",
-    "@contember/database-migrations": "workspace:*",
-    "@contember/dic": "workspace:*",
-    "@contember/engine-common": "workspace:*",
-    "@contember/engine-content-api": "workspace:*",
-    "@contember/engine-system-api": "workspace:*",
-    "@contember/engine-tenant-api": "workspace:*",
-    "@contember/graphql-utils": "workspace:*",
-    "@contember/logger": "workspace:*",
-    "@contember/schema": "workspace:*",
-    "@contember/schema-migrations": "workspace:*",
-    "@contember/schema-utils": "workspace:*",
-    "@contember/typesafe": "workspace:*",
-    "@graphql-tools/merge": "^9.0.0",
-    "@graphql-tools/schema": "^10.0.0",
-    "@koa/cors": "^4.0.0",
-    "@sentry/node": "^7.80.1",
-    "bcryptjs": "^2.4.3",
-    "koa": "^2.14.2",
-    "koa-bodyparser": "^4.4.1",
-    "koa-compress": "^5.1.1",
-    "lru-cache": "^10.0.2",
-    "path-to-regexp": "^6.2.1",
-    "prom-client": "^12.0.0",
-    "uuid": "^9.0.1",
-    "ws": "^8.14.2"
-  },
-  "devDependencies": {
-    "@types/bcryptjs": "^2.4.6",
-    "@types/koa": "^2.13.11",
-    "@types/koa-bodyparser": "^4.3.12",
-    "@types/koa__cors": "^4.0.3",
-    "@types/lru-cache": "^7.10.10",
-    "@types/node": "^20.9.0",
-    "@types/uuid": "^9.0.7",
-    "@types/ws": "^8.5.9",
-    "graphql": "^16.8.1"
-  },
-  "peerDependencies": {
-    "graphql": ">= 14.6.0",
-    "pg": "^8.9.0"
-  }
+	"name": "@contember/engine-http",
+	"version": "1.4.0-rc.4",
+	"license": "Apache-2.0",
+	"main": "./dist/production/index.js",
+	"typings": "./dist/types/index.d.ts",
+	"scripts": {
+		"test": "vitest --dir ./tests/cases && node --expose-gc ./dist/tests/cases/unit/contentApiSpecificCache.tst.js",
+		"build": "yarn build:js:dev && yarn build:js:prod",
+		"build:js:dev": "NODE_ENV=development vite build --mode development",
+		"build:js:prod": "vite build --mode production"
+	},
+	"exports": {
+		".": {
+			"import": {
+				"types": "./dist/types/index.d.ts",
+				"development": "./dist/development/index.js",
+				"production": "./dist/production/index.js",
+				"typescript": "./src/index.ts",
+				"default": "./dist/production/index.js"
+			},
+			"require": {
+				"types": "./dist/types/index.d.ts",
+				"development": "./dist/development/index.cjs",
+				"production": "./dist/production/index.cjs",
+				"default": "./dist/production/index.cjs"
+			}
+		}
+	},
+	"dependencies": {
+		"@apollographql/graphql-playground-html": "^1.6.29",
+		"@contember/config-loader": "workspace:*",
+		"@contember/database": "workspace:*",
+		"@contember/database-migrations": "workspace:*",
+		"@contember/dic": "workspace:*",
+		"@contember/engine-common": "workspace:*",
+		"@contember/engine-content-api": "workspace:*",
+		"@contember/engine-system-api": "workspace:*",
+		"@contember/engine-tenant-api": "workspace:*",
+		"@contember/graphql-utils": "workspace:*",
+		"@contember/logger": "workspace:*",
+		"@contember/schema": "workspace:*",
+		"@contember/schema-migrations": "workspace:*",
+		"@contember/schema-utils": "workspace:*",
+		"@contember/typesafe": "workspace:*",
+		"@graphql-tools/merge": "^9.0.0",
+		"@graphql-tools/schema": "^10.0.0",
+		"@koa/cors": "^4.0.0",
+		"@sentry/node": "^7.80.1",
+		"bcryptjs": "^2.4.3",
+		"koa": "^2.14.2",
+		"koa-bodyparser": "^4.4.1",
+		"koa-compress": "^5.1.1",
+		"lru-cache": "^10.0.2",
+		"path-to-regexp": "^6.2.1",
+		"prom-client": "^12.0.0",
+		"uuid": "^9.0.1",
+		"ws": "^8.14.2"
+	},
+	"devDependencies": {
+		"@types/bcryptjs": "^2.4.6",
+		"@types/koa": "^2.13.11",
+		"@types/koa-bodyparser": "^4.3.12",
+		"@types/koa__cors": "^4.0.3",
+		"@types/lru-cache": "^7.10.10",
+		"@types/node": "^20.9.0",
+		"@types/uuid": "^9.0.7",
+		"@types/ws": "^8.5.9",
+		"graphql": "^16.8.1"
+	},
+	"peerDependencies": {
+		"graphql": ">= 14.6.0",
+		"pg": "^8.9.0"
+	},
+	"type": "module",
+	"files": [
+		"dist/",
+		"src/"
+	]
 }

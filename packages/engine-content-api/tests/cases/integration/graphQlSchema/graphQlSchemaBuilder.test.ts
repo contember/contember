@@ -11,6 +11,8 @@ import {
 import { Authorizator, GraphQlSchemaBuilderFactory } from '../../../../src'
 import * as model from './model'
 import { assert, describe, it } from 'vitest'
+import { dirname } from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 interface Test {
 	schema: (builder: SchemaBuilder) => SchemaBuilder | Model.Schema
@@ -44,7 +46,7 @@ const testSchema = async (test: Test) => {
 
 	const textSchema = printSchema(graphQlSchema) + '\n'
 
-	const filename = path.join(__dirname, test.graphQlSchemaFile)
+	const filename = path.join(dirname(fileURLToPath(import.meta.url)), test.graphQlSchemaFile)
 	let expectedSchema: string
 	try {
 		expectedSchema = await fs.readFile(filename, { encoding: 'utf8' })

@@ -14,17 +14,22 @@ import { OneHasManyInputProcessor } from '../relations/OneHasManyInputProcessor'
 
 export class SqlCreateInputProcessor implements CreateInputProcessor<MutationResultList> {
 
-	private oneHasOneInverseCreateInputProcessor = new OneHasOneInverseCreateInputProcessor(this.insertBuilder, this.mapper)
-	private oneHasOneOwningCreateInputProcessor = new OneHasOneOwningCreateInputProcessor(this.insertBuilder, this.mapper)
-	private oneHasManyCreateInputProcessor = new OneHasManyInputProcessor(this.mapper)
-	private manyHasOneCreateInputProcessor = new ManyHasOneInputProcessor(this.mapper)
-	private manyHasManyCreateInputProcessor = new ManyHasManyInputProcessor(this.mapper)
+	private oneHasOneInverseCreateInputProcessor:  OneHasOneInverseCreateInputProcessor
+	private oneHasOneOwningCreateInputProcessor:  OneHasOneOwningCreateInputProcessor
+	private oneHasManyCreateInputProcessor:  OneHasManyInputProcessor
+	private manyHasOneCreateInputProcessor:  ManyHasOneInputProcessor
+	private manyHasManyCreateInputProcessor:  ManyHasManyInputProcessor
 
 	constructor(
 		private readonly insertBuilder: InsertBuilder,
 		private readonly mapper: Mapper,
 		private readonly providers: Providers,
 	) {
+		this.oneHasOneInverseCreateInputProcessor = new OneHasOneInverseCreateInputProcessor(this.insertBuilder, this.mapper)
+		this.oneHasOneOwningCreateInputProcessor = new OneHasOneOwningCreateInputProcessor(this.insertBuilder, this.mapper)
+		this.oneHasManyCreateInputProcessor = new OneHasManyInputProcessor(this.mapper)
+		this.manyHasOneCreateInputProcessor = new ManyHasOneInputProcessor(this.mapper)
+		this.manyHasManyCreateInputProcessor = new ManyHasManyInputProcessor(this.mapper)
 	}
 
 	public async column(context: Model.ColumnContext & { input: Input.ColumnValue | undefined }): Promise<MutationResultList> {

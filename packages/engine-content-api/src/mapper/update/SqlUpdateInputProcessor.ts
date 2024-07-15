@@ -11,18 +11,24 @@ import { UpdateInputProcessor } from '../../inputProcessing'
 import { MutationResultList } from '../Result'
 
 export class SqlUpdateInputProcessor implements UpdateInputProcessor<MutationResultList> {
-	private oneHasOneInverseUpdateInputProcessor = new OneHasOneInverseUpdateInputProcessor(this.primaryValue, this.mapper)
-	private oneHasOneOwningUpdateInputProcessor = new OneHasOneOwningUpdateInputProcessor(this.primaryValue, this.mapper, this.updateBuilder)
-	private oneHasManyUpdateInputProcessor = new OneHasManyInputProcessor(this.mapper)
-	private manyHasOneUpdateInputProcessor = new ManyHasOneInputProcessor(this.mapper)
-	private manyHasManyUpdateInputProcessor = new ManyHasManyInputProcessor(this.mapper)
+	private oneHasOneInverseUpdateInputProcessor: OneHasOneInverseUpdateInputProcessor
+	private oneHasOneOwningUpdateInputProcessor: OneHasOneOwningUpdateInputProcessor
+	private oneHasManyUpdateInputProcessor: OneHasManyInputProcessor
+	private manyHasOneUpdateInputProcessor: ManyHasOneInputProcessor
+	private manyHasManyUpdateInputProcessor: ManyHasManyInputProcessor
 
 	constructor(
 		private readonly primaryValue: Input.PrimaryValue,
 		private readonly data: Input.UpdateDataInput,
 		private readonly updateBuilder: UpdateBuilder,
 		private readonly mapper: Mapper,
-	) {}
+	) {
+		this.oneHasOneInverseUpdateInputProcessor = new OneHasOneInverseUpdateInputProcessor(this.primaryValue, this.mapper)
+		this.oneHasOneOwningUpdateInputProcessor = new OneHasOneOwningUpdateInputProcessor(this.primaryValue, this.mapper, this.updateBuilder)
+		this.oneHasManyUpdateInputProcessor = new OneHasManyInputProcessor(this.mapper)
+		this.manyHasOneUpdateInputProcessor = new ManyHasOneInputProcessor(this.mapper)
+		this.manyHasManyUpdateInputProcessor = new ManyHasManyInputProcessor(this.mapper)
+	}
 
 	public column({ entity, column }: Model.ColumnContext) {
 		if (this.data[column.name] !== undefined) {

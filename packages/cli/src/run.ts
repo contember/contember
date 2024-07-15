@@ -2,7 +2,10 @@
 import { join, resolve } from 'node:path'
 import { packageRoot } from './consts'
 import { createContainer } from './dic'
-import { readCliEnv } from './lib/env';
+import { readCliEnv } from './lib/env'
+import { WorkspaceResolver } from './lib/workspace/WorkspaceResolver'
+import { YamlHandler } from './lib/fs/YamlHandler'
+import { FileSystem } from './lib/fs/FileSystem';
 
 (async () => {
 	// eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -13,9 +16,11 @@ import { readCliEnv } from './lib/env';
 	}
 	const env = readCliEnv()
 	const dir = env.dir ? resolve(env.dir) : process.cwd()
+	const workspaceResolver = new WorkspaceResolver(new YamlHandler(new FileSystem()))
+	const workspace = await workspaceResolver.resolve(dir)
 	const dic = createContainer({
 		version,
-		dir,
+		workspace,
 		env: env,
 		runtime: process.title === 'bun' ? 'bun' : 'node',
 	})

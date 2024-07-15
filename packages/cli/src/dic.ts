@@ -64,6 +64,7 @@ import { DockerComposeManager } from './lib/fs/DockerComposeManager'
 import { RemoteProjectProvider } from './lib/project/RemoteProjectProvider'
 import { SystemClientProvider } from './lib/SystemClientProvider'
 import { TenantClientProvider } from './lib/TenantClientProvider'
+import { Workspace } from './lib/workspace/Workspace'
 
 const jsSample = `
 export const query = \`\`
@@ -76,8 +77,8 @@ export const variables = {}
 // export default async () => ({ queries: [] })
 `
 
-export const createContainer = ({ dir, env, version, runtime }: {
-	dir: string
+export const createContainer = ({ env, version, runtime, workspace }: {
+	workspace: Workspace
 	env: CliEnv
 	version: string
 	runtime: 'node' | 'bun'
@@ -85,12 +86,12 @@ export const createContainer = ({ dir, env, version, runtime }: {
 	return new Builder({})
 		.addService('env', () =>
 			env)
-		.addService('dir', () =>
-			dir)
 		.addService('version', () =>
 			version)
 		.addService('runtime', () =>
 			runtime)
+		.addService('workspace', () =>
+			workspace)
 		.addService('fs', () =>
 			new FileSystem())
 		.addService('yamlHandler', ({ fs }) =>
@@ -104,8 +105,6 @@ export const createContainer = ({ dir, env, version, runtime }: {
 
 		.addService('workspaceResolver', ({ yamlHandler }) =>
 			new WorkspaceResolver(yamlHandler))
-		.addService('workspace', ({ workspaceResolver, dir }) =>
-			workspaceResolver.resolve(dir))
 
 		.addService('remoteProjectResolver', ({ env }) =>
 			new RemoteProjectResolver(env))
@@ -123,25 +122,25 @@ export const createContainer = ({ dir, env, version, runtime }: {
 			new TenantClientProvider(remoteProjectProvider))
 		.addService('adminClient', ({ remoteProjectProvider }) =>
 			new AdminClient(remoteProjectProvider))
-		.addService('migrationFilesManager', ({ jsCodeRunner, dir }) => {
+		.addService('migrationFilesManager', ({ jsCodeRunner, workspace }) => {
 
-			return new MigrationFilesManager(dir, {
+			return new MigrationFilesManager(workspace.migrationsDir, {
 				json: new JsonLoader(new MigrationParser()),
 				ts: new JsLoader(new MigrationParser(), jsCodeRunner.run),
 				js: new JsLoader(new MigrationParser(), jsCodeRunner.run),
 			})
 		})
-		.addService('packageWorkspaceResolver', ({ dir, fs }) => {
+		.addService('packageWorkspaceResolver', ({ workspace, fs }) => {
 			const commandRunner = new CommandRunner()
-			return new PackageWorkspaceResolver(dir, fs, [
+			return new PackageWorkspaceResolver(workspace.baseDir, fs, [
 				new Yarn(fs, commandRunner),
 				new YarnClassic(fs, commandRunner),
 				new Pnpm(fs, commandRunner),
 				new Npm(fs, commandRunner),
 			])
 		})
-		.addService('dockerComposeManager', ({ dir, env, fs, yamlHandler }) =>
-			new DockerComposeManager(dir, env.dockerComposeFile, fs, yamlHandler))
+		.addService('dockerComposeManager', ({ workspace, env, fs, yamlHandler }) =>
+			new DockerComposeManager(workspace.baseDir, env.dockerComposeFile, fs, yamlHandler))
 		.addService('modificationHandlerFactory', () =>
 			new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap))
 		.addService('schemaMigrator', ({ modificationHandlerFactory }) =>
@@ -239,8 +238,8 @@ export const createContainer = ({ dir, env, version, runtime }: {
 		.addService('commandManager', ({ commandList }) =>
 			new CommandManager(commandList))
 
-		.addService('versionChecker', ({ version, dir, packageWorkspaceResolver, dockerComposeManager }) =>
-			new VersionChecker(version, dir, packageWorkspaceResolver, dockerComposeManager))
+		.addService('versionChecker', ({ version, workspace, packageWorkspaceResolver, dockerComposeManager }) =>
+			new VersionChecker(version, workspace.baseDir, packageWorkspaceResolver, dockerComposeManager))
 		.addService('application', ({ commandManager, versionChecker }) => {
 			const app = new Application(
 				commandManager,

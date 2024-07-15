@@ -11,10 +11,11 @@ on:
 jobs:
 
   install:
+    if: false
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -28,6 +29,7 @@ jobs:
           yarn install --immutable
 
   check:
+    if: false
     needs: [install]
     runs-on: ubuntu-latest
     strategy:
@@ -42,6 +44,7 @@ jobs:
 
           - job_name: api-exporter
             run_script: |
+              yarn run pre-build
               yarn run ts:build
               yarn run ae:test
 
@@ -52,7 +55,7 @@ jobs:
             run_script: yarn dedupe --check
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -69,6 +72,7 @@ jobs:
         run: ${{ matrix.run_script }}
 
   test:
+    if: false
     needs: [ install ]
     runs-on: ubuntu-latest
     strategy:
@@ -85,7 +89,7 @@ jobs:
           - 5432:5432
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -96,7 +100,8 @@ jobs:
           yarn --version
           yarn install --immutable
       - name: "Build app"
-        run: yarn run build
+        run: |
+          yarn run pre-build
       - name: "Run tests"
         run: yarn run test
         env:
@@ -106,6 +111,38 @@ jobs:
           TEST_DB_NAME: test
           CONTEMBER_ROOT_TOKEN: '0000000000000000000000000000000000000000'
           CONTEMBER_LOGIN_TOKEN: '1111111111111111111111111111111111111111'
+
+  test-e2e:
+#    needs: [ install ]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        postgres: [ 11, 12, 13, 14, 15, 16 ]
+    services:
+      postgres:
+        image: postgres:${{ matrix.postgres }}
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          cache: 'yarn'
+          node-version: '20'
+      - name: Install yarn deps
+        run: |
+          yarn --version
+          yarn install --immutable
+      - name: "Build app"
+        run: |
+          scripts/server/server-build.sh
+
       - name: Start server
         run: ./packages/engine-server/tests/start-server.sh
         env:

@@ -7,7 +7,7 @@ jobs:
   publish-node:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Setup node
         uses: actions/setup-node@v3
@@ -39,7 +39,7 @@ jobs:
       matrix:
         image: [cli, engine-alpine, engine-debian]
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v4
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1

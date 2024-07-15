@@ -2,7 +2,7 @@ import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import { resolveConfig } from '../../../build/createViteConfig.js'
+import { resolveConfig } from '../../../scripts/vite/createViteConfig.js'
 import { resolve } from 'node:path'
 import tsconfigPaths from 'vite-tsconfig-paths'
 

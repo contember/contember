@@ -6,8 +6,10 @@
 		"contember": "./dist/src/run.js"
 	},
 	"scripts": {
-		"build": "tailwindcss -i src/lib/project/docs/resources/style.css -o ./dist/src/utils/project/resources/out.css",
-		"test": "echo 'No tests'"
+		"build": "yarn build:js:dev && yarn build:js:prod && tailwindcss -i src/lib/project/docs/resources/style.css -o ./dist/src/utils/project/resources/out.css",
+		"test": "echo 'No tests'",
+		"build:js:dev": "NODE_ENV=development vite build --mode development",
+		"build:js:prod": "vite build --mode production"
 	},
 	"devDependencies": {
 		"@types/fs-extra": "^11.0.4",

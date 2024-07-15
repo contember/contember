@@ -1,6 +1,6 @@
 #!/bin/bash
 
-node ./packages/engine-server/dist/src/start.js &
+node ./server/server.js &
 
 max_retry=20
 counter=0

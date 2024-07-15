@@ -1,5 +1,5 @@
 import * as assert from 'node:assert'
-import { ContentApiSpecificCache } from '../../../src/content/ContentApiSpecificCache'
+import { ContentApiSpecificCache } from '../../../dist/production/content/ContentApiSpecificCache.js'
 
 /**
  * Probably not possible to pass --expose-gc through vitest (--expose-gc cannot be in NODE_OPTIONS)

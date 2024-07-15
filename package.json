@@ -4,7 +4,8 @@
 	"packageManager": "yarn@3.5.1",
 	"private": true,
 	"scripts": {
-		"build": "yarn workspaces foreach -pt run pre-build && yarn run ts:build && yarn workspaces foreach -pt run build",
+		"pre-build": "yarn workspaces foreach -pt run pre-build",
+		"build": "yarn run pre-build && yarn run ts:build && yarn workspaces foreach -pt run build",
 		"clean": "yarn run clean:generated && yarn run clean:dependencies",
 		"clean:dependencies": "rm -rf packages/*/node_modules || true; rm -rf node_modules || true",
 		"clean:generated": "rm -rf dist || true; packages/*/dist || true; rm -rf packages/*/temp || true",

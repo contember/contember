@@ -16,7 +16,7 @@ services:
 
 
   engine:
-    image: node:20
+    image: oven/bun:canary
     working_dir: /src
 
     environment:
@@ -30,11 +30,11 @@ services:
       CONTEMBER_LOGIN_TOKEN: '1111111111111111111111111111111111111111'
       CONTEMBER_API_URL: 'http://localhost:4000'
       CONTEMBER_APPLICATION_WORKER: 'all'
-      DEFAULT_DB_HOST: 'db'
+      DEFAULT_DB_HOST: 'postgres'
       DEFAULT_DB_PORT: '5432'
       DEFAULT_DB_USER: 'contember'
       DEFAULT_DB_PASSWORD: 'contember'
-      TEST_DB_HOST: 'db'
+      TEST_DB_HOST: 'postgres'
       TEST_DB_PORT: '5432'
       TEST_DB_USER: 'contember'
       TEST_DB_PASSWORD: 'contember'
@@ -49,25 +49,15 @@ services:
       DEFAULT_S3_KEY: 'contember'
       DEFAULT_S3_SECRET: 'contember'
       CONTEMBER_PACKAGE_JSON: /src/packages/engine-server/package.json
+    volumes:
+      - .:/src:cached
     command:
-      - yarn
-      - tsx
-      - watch
+      - bun
       - "--conditions=typescript"
       - ./packages/engine-server/src/start.ts
     healthcheck:
-      test: 'curl --fail http://localhost:4000'
-      interval: 5s
-      timeout: 5s
-      retries: 10
-
-    depends_on:
-      postgres:
-        condition: service_healthy
-
-
-    healthcheck:
-      test: 'curl --fail http://localhost:4000'
+#      test: 'curl --fail http://localhost:4000'
+      test: [ "CMD", "bash", "-c", "echo > /dev/tcp/localhost/4000" ]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -78,8 +68,8 @@ services:
 
 
   cli:
-    image: node:20
-    working_dir: /src
+    image: oven/bun:canary
+    working_dir: /src/packages/playground
     deploy:
       replicas: 0
 
@@ -92,10 +82,7 @@ services:
     volumes:
       - ./:/src
     entrypoint:
-      - yarn
-      - run
-      - "-T"
-      - tsx
+      - bun
       - "--conditions=typescript"
       - /src/packages/cli/src/run.ts
     depends_on:

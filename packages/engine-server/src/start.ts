@@ -34,7 +34,7 @@ process.on('warning', message => {
 		process.exit(0)
 	}
 
-	const sentryhandler = createSentryLoggerHandler(serverConfig.logging.sentry?.dsn)
+	const sentryhandler = createSentryLoggerHandler(serverConfig.logging?.sentry?.dsn)
 	if (sentryhandler !== null) {
 		logger.addHandler(sentryhandler)
 	}

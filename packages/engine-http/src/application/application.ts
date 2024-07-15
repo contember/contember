@@ -32,7 +32,7 @@ export class Application {
 		private readonly version: string | undefined,
 		private readonly logger: Logger,
 	) {
-		const suppressAccessLogRaw = serverConfig.http.suppressAccessLog
+		const suppressAccessLogRaw = serverConfig.http?.suppressAccessLog
 		this.suppressAccessLog = suppressAccessLogRaw === true ? true : suppressAccessLogRaw ? new RegExp(suppressAccessLogRaw) : false
 	}
 
@@ -74,7 +74,7 @@ export class Application {
 			br: false,
 		}))
 		koa.use(bodyParser({
-			jsonLimit: this.serverConfig.http.requestBodySize || '1mb',
+			jsonLimit: this.serverConfig.http?.requestBodySize || '1mb',
 		}))
 		koa.use(corsMiddleware())
 		const versionMatch = this.version?.match(/^(0\.\d+|\d+)/)

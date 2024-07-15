@@ -116,7 +116,7 @@ export class ProjectContainerFactory {
 
 			.addService('graphqlSchemaCache', () =>
 				new ContentApiSpecificCache<Schema, GraphQLSchemaFactoryResult>({
-					ttlSeconds: this.serverConfig.contentApi.schemaCacheTtlSeconds,
+					ttlSeconds: this.serverConfig.contentApi?.schemaCacheTtlSeconds,
 				}))
 			.addService('graphQlSchemaFactory', ({ project, graphqlSchemaCache }) => {
 				const contributors = this.plugins

@@ -24,6 +24,7 @@
 				"types": "./dist/types/index.d.ts",
 				"development": "./dist/development/index.cjs",
 				"production": "./dist/production/index.cjs",
+				"typescript": "./src/index.ts",
 				"default": "./dist/production/index.cjs"
 			}
 		}

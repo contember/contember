@@ -10,8 +10,6 @@ if [[ -z "$1" || "$1" == "engine-alpine" ]]; then
 	TAGS=""
 	for VERSION in "${ALL_VERSIONS[@]}"; do TAGS="$TAGS -t $REPO:$VERSION"; done
 	docker buildx build \
-		--build-arg LICENSE_FILE=LICENSE \
-		--build-arg SERVER_DIR=packages/engine-server \
 		--platform linux/amd64,linux/arm64 \
 		--push $TAGS \
 		-f ./scripts/docker/server-alpine.dockerfile \
@@ -23,8 +21,6 @@ if [[ -z "$1" || "$1" == "engine-debian" ]]; then
 	TAGS=""
 	for VERSION in "${ALL_VERSIONS[@]}"; do TAGS="$TAGS -t $REPO:$VERSION-debian"; done
 	docker buildx build \
-		--build-arg LICENSE_FILE=LICENSE \
-		--build-arg SERVER_DIR=packages/engine-server \
 		--platform linux/amd64,linux/arm64 \
 		--push $TAGS \
 		-f ./scripts/docker/server-debian.dockerfile \

@@ -7732,6 +7732,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"esbuild-node-externals@npm:^1.14.0":
+  version: 1.14.0
+  resolution: "esbuild-node-externals@npm:1.14.0"
+  dependencies:
+    find-up: ^5.0.0
+    tslib: ^2.4.1
+  peerDependencies:
+    esbuild: 0.12 - 0.23
+  checksum: 09ea516421b5f93980acc2d8ab51f19a98dbf8ec21ddb38d166ac10b88e690be063aca5aba7e55f1e82aa0fc174314dcb2f4ebcf057e059de29af68393e099ea
+  languageName: node
+  linkType: hard
+
 "esbuild@npm:^0.18.20":
   version: 0.18.20
   resolution: "esbuild@npm:0.18.20"
@@ -12763,6 +12775,7 @@ __metadata:
     "@typescript-eslint/parser": ^6.21.0
     "@vitejs/plugin-react": ^4.2.1
     esbuild: ^0.19.12
+    esbuild-node-externals: ^1.14.0
     eslint: ^8.57.0
     eslint-plugin-promise: ^6.4.0
     eslint-plugin-react: ^7.34.4
@@ -13871,10 +13884,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tslib@npm:^2.0.0, tslib@npm:^2.0.3, tslib@npm:^2.1.0, tslib@npm:^2.3.1, tslib@npm:^2.4.0, tslib@npm:^2.5.0":
-  version: 2.6.2
-  resolution: "tslib@npm:2.6.2"
-  checksum: 329ea56123005922f39642318e3d1f0f8265d1e7fcb92c633e0809521da75eeaca28d2cf96d7248229deb40e5c19adf408259f4b9640afd20d13aecc1430f3ad
+"tslib@npm:^2.0.0, tslib@npm:^2.0.3, tslib@npm:^2.1.0, tslib@npm:^2.3.1, tslib@npm:^2.4.0, tslib@npm:^2.4.1, tslib@npm:^2.5.0":
+  version: 2.6.3
+  resolution: "tslib@npm:2.6.3"
+  checksum: 74fce0e100f1ebd95b8995fbbd0e6c91bdd8f4c35c00d4da62e285a3363aaa534de40a80db30ecfd388ed7c313c42d930ee0eaf108e8114214b180eec3dbe6f5
   languageName: node
   linkType: hard
 

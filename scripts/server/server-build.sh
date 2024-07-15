@@ -3,4 +3,5 @@ set -e
 
 mkdir --parent server
 yarn install
-node $SERVER_DIR/esbuild.js
+node packages/engine-server/esbuild.cjs
+yarn workspaces focus --production @contember/engine-server

@@ -4,8 +4,7 @@
 	"packageManager": "yarn@3.5.1",
 	"private": true,
 	"scripts": {
-		"build": "yarn run ts:build && yarn workspaces foreach -pt run build",
-		"check": "./scripts/runChecks.sh",
+		"build": "yarn workspaces foreach -pt run pre-build && yarn run ts:build && yarn workspaces foreach -pt run build",
 		"clean": "yarn run clean:generated && yarn run clean:dependencies",
 		"clean:dependencies": "rm -rf packages/*/node_modules || true; rm -rf node_modules || true",
 		"clean:generated": "rm -rf dist || true; packages/*/dist || true; rm -rf packages/*/temp || true",
@@ -35,6 +34,7 @@
 		"@typescript-eslint/parser": "^6.21.0",
 		"@vitejs/plugin-react": "^4.2.1",
 		"esbuild": "^0.19.12",
+		"esbuild-node-externals": "^1.14.0",
 		"eslint": "^8.57.0",
 		"eslint-plugin-promise": "^6.4.0",
 		"eslint-plugin-react": "^7.34.4",

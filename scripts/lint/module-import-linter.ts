@@ -29,6 +29,8 @@ const allowedDirectoryImports = new Set([
 	'nodemailer/lib/ses-transport',
 	'crypto-js/sha256',
 	'crypto-js/enc-hex',
+	'node-pg-migrate/dist/utils.js',
+	'node-pg-migrate/dist/migration-builder.js'
 ])
 
 const processPackage = async (dir: string, projectList: ProjectList) => {

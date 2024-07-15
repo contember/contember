@@ -8,6 +8,24 @@ const packages = [
 ]
 
 const updatePackageJson = (packageJson: any, packageDir: string) => {
+	if (packageJson.exports?.['.']?.require) {
+		return {
+			...packageJson,
+			exports: {
+				...packageJson.exports,
+				'.': {
+					...packageJson.exports['.'],
+					require: {
+						"types": "./dist/types/index.d.ts",
+						"development": "./dist/development/index.cjs",
+						"production": "./dist/production/index.cjs",
+						"typescript": "./src/index.ts",
+						"default": "./dist/production/index.cjs"
+					}
+				},
+			},
+		}
+	}
 	return packageJson
 }
 

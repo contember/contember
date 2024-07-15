@@ -7,8 +7,28 @@ on:
     paths-ignore:
       - docs/**
   workflow_dispatch:
+
 jobs:
+
+  install:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          cache: 'yarn'
+          node-version: '20'
+
+      - name: Install yarn deps
+        run: |
+          yarn --version
+          yarn install --immutable
+
   check:
+    needs: [install]
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -30,27 +50,15 @@ jobs:
 
           - job_name: dedupe
             run_script: yarn dedupe --check
-
-    container: node:20-alpine
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Get yarn cache directory path
-        run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
-        id: yarn-cache-dir-path
-
-      - name: Install GNU tar
-        run: apk add --no-cache tar
-
-      - name: Set up yarn cache
-        uses: actions/cache@v3
-        id: yarn-cache
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
+          cache: 'yarn'
+          node-version: '20'
 
       - name: Install yarn deps
         run: |
@@ -61,6 +69,7 @@ jobs:
         run: ${{ matrix.run_script }}
 
   test:
+    needs: [ install ]
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -77,22 +86,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - name: Get yarn cache directory path
-        run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
-        id: yarn-cache-dir-path
-
-      - name: Install GNU tar
-        run: apk add --no-cache tar
-
-      - name: Set up yarn cache
-        uses: actions/cache@v3
-        id: yarn-cache
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-
+          cache: 'yarn'
+          node-version: '20'
       - name: Install yarn deps
         run: |
           yarn --version

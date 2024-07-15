@@ -1,3 +1,3 @@
-import { createViteCSSConfig } from '../../build/createViteCSSConfig.js'
+import { createViteCSSConfig } from '../../scripts/vite/createViteCSSConfig.js'
 
 export default createViteCSSConfig()

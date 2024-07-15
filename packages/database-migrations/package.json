@@ -1,6 +1,6 @@
 {
   "name": "@contember/database-migrations",
-  "version": "1.4.0-rc.7",
+  "version": "1.4.0-rc.8",
   "scripts": {
     "test": "vitest --dir ./tests/cases"
   },

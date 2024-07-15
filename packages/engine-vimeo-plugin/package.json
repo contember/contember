@@ -1,7 +1,7 @@
 {
   "name": "@contember/engine-vimeo-plugin",
   "license": "Apache-2.0",
-  "version": "1.4.0-rc.7",
+  "version": "1.4.0-rc.8",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
   "exports": {

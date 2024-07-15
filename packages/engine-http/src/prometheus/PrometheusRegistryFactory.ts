@@ -17,7 +17,9 @@ export class PrometheusRegistryFactory {
 		}
 		const register = prom.register
 		register.registerMetric(createContemberEngineInfoMetric(this.contemberEngineInfo))
-		prom.collectDefaultMetrics({ register })
+		if (!('Bun' in global)) {
+			prom.collectDefaultMetrics({ register })
+		}
 
 		return register
 	}

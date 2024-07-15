@@ -92,7 +92,7 @@ export class TableModifications {
 		forEachCellInColumn(editor, element, columnIndex, ([, cellPath]) => {
 			Transforms.setNodes(
 				editor,
-				{ justify: direction ?? null },
+				{ justify: direction ?? undefined },
 				{ match: node => isTableCellElement(node), at: cellPath },
 			)
 		})
@@ -108,7 +108,7 @@ export class TableModifications {
 
 		Transforms.setNodes(
 			editor,
-			{ headerScope: firstRow.headerScope === scope ? null : scope },
+			{ headerScope: firstRow.headerScope === scope ? undefined : scope },
 			{ match: node => isTableRowElement(node), at: [...tablePath, 0] },
 		)
 	}
@@ -128,7 +128,7 @@ export class TableModifications {
 		forEachCellInColumn(editor, element, columnIndex, ([, cellPath]) => {
 			Transforms.setNodes(
 				editor,
-				{ headerScope: shouldSetScope ? scope : null },
+				{ headerScope: shouldSetScope ? scope : undefined },
 				{ match: node => isTableCellElement(node), at: cellPath },
 			)
 		})

@@ -8,5 +8,6 @@
 	"references": [
 		{ "path": "../src" },
 		{ "path": "../../client-content-generator/src" },
+		{ "path": "../../schema-definition/src" },
 	]
 }

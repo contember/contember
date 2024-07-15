@@ -1,7 +1,10 @@
 {
 	"extends": "../../../tsconfig.settings.json",
 	"compilerOptions": {
-		"outDir": "../dist/types"
+		"outDir": "../dist/types",
+		"types": [
+			"vite/client"
+		]
 	},
 	"references": [
 		{ "path": "../../interface/src" },
@@ -25,6 +28,6 @@
 		{ "path": "../../react-uploader-dropzone/src" },
 		{ "path": "../../react-utils/src" },
 		{ "path": "../../utilities/src" },
-		{ "path": "../../graphql-client-tenant/src" },
+		{ "path": "../../graphql-client-tenant/src" }
 	]
 }

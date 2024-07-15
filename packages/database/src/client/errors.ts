@@ -30,12 +30,10 @@ export class ClientError extends DatabaseError {
 }
 
 export class QueryError extends DatabaseError {
-	public readonly code?: string
 	public readonly constraint?: string
 	public readonly table?: string
-	public readonly originalMessage?: string
 
-	constructor(public readonly sql: string, public readonly parameters: any, public readonly previous: Error | any) {
+	constructor(public readonly sql: string, public readonly parameters: any, public override readonly previous: Error | any) {
 		super(
 			`Database query error: ${'message' in previous ? previous.message : JSON.stringify(previous)}
 SQL: ${sql}

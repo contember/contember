@@ -6,5 +6,6 @@
 	},
 	"references": [
 		{ "path": "../src" },
+		{ "path": "../../schema-definition/src" },
 	],
 }

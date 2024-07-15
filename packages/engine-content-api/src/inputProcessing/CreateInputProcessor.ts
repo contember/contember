@@ -29,4 +29,4 @@ namespace CreateInputProcessor {
 	}
 }
 
-export { CreateInputProcessor }
+export { type CreateInputProcessor }

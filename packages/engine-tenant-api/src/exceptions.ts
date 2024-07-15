@@ -1,5 +1,5 @@
 export class ImplementationException extends Error {
-	constructor(public readonly message: string = '') {
+	constructor(message: string = '') {
 		super(message)
 	}
 }

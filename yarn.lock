@@ -1467,7 +1467,7 @@ __metadata:
     "@graphql-tools/schema": ^10.0.0
     "@types/node": ^20.9.0
     graphql: ^16.8.1
-    graphql-ts-client-api: ^3.1.14
+    graphql-ts-client-api: ^3.1.17
     graphql-ts-client-codegen: ^3.1.14
   languageName: unknown
   linkType: soft
@@ -1480,7 +1480,7 @@ __metadata:
     "@graphql-tools/schema": ^10.0.0
     "@types/node": ^20.9.0
     graphql: ^16.8.1
-    graphql-ts-client-api: ^3.1.14
+    graphql-ts-client-api: ^3.1.17
     graphql-ts-client-codegen: ^3.1.14
   languageName: unknown
   linkType: soft
@@ -9263,15 +9263,6 @@ __metadata:
   peerDependencies:
     graphql: ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
   checksum: b15162a3d62f17b9b79302445b9ee330e041582f1c7faca74b9dec5daa74272c906ec1c34e1c50592bb6215e5c3eba80a309103f6ba9e4c1cddc350c46f010df
-  languageName: node
-  linkType: hard
-
-"graphql-ts-client-api@npm:^3.1.14":
-  version: 3.1.14
-  resolution: "graphql-ts-client-api@npm:3.1.14"
-  dependencies:
-    ts-md5: ^1.2.9
-  checksum: f248a63bc8edbf7cd18be0578fb5a654f4709b9842be4858f32a615f0f35ba35e6ef9e68de85474325e093b2ab6317ee8061f9de12de36781e80839b7c1ba5ff
   languageName: node
   linkType: hard
 

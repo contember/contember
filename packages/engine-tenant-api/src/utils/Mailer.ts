@@ -6,7 +6,7 @@ import * as SendmailTransport from 'nodemailer/lib/sendmail-transport'
 import * as SESTransport from 'nodemailer/lib/ses-transport'
 import { logger } from '@contember/logger'
 
-export { MailMessage }
+export { type MailMessage }
 
 export interface SentInfo {
 	error?: any

@@ -11,7 +11,7 @@ export function useOnWindowResize(
 	const lastTimeStamp = useRef<number>(0)
 
 	useLayoutEffect(() => {
-		let timeoutID: number | undefined = undefined
+		let timeoutID: ReturnType<typeof setTimeout>
 
 		function debouncedHandler(event: Event) {
 			clearTimeout(timeoutID)

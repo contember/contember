@@ -5,6 +5,7 @@
 		"emitDeclarationOnly": false
 	},
 	"references": [
-		{ "path": "../src" }
+		{ "path": "../src" },
+		{ "path": "../../schema-definition/src" },
 	]
 }

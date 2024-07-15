@@ -9,7 +9,7 @@ export class HttpResponse {
 
 export class HttpErrorResponse extends HttpResponse {
 	constructor(
-		public readonly code: number,
+		code: number,
 		public readonly message?: string,
 	) {
 		super(

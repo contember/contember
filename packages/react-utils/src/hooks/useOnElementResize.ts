@@ -23,7 +23,7 @@ export function useOnElementResize(
 			throw new Error('Exhaustive error: Expecting element to be instance of HTMLElement')
 		}
 
-		let timeoutID: number | undefined = undefined
+		let timeoutID: ReturnType<typeof setTimeout>
 
 		function debouncedOnChange([entry]: ResizeObserverEntry[]) {
 			const timeStamp = Date.now()

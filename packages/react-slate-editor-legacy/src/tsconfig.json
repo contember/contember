@@ -1,7 +1,10 @@
 {
 	"extends": "../../../tsconfig.settings.json",
 	"compilerOptions": {
-		"outDir": "../dist/types"
+		"outDir": "../dist/types",
+		"types": [
+			"vite/client"
+		]
 	},
 	"references": [
 		{ "path": "../../binding/src" },
@@ -10,6 +13,6 @@
 		{ "path": "../../react-multipass-rendering/src" },
 		{ "path": "../../react-slate-editor-base/src" },
 		{ "path": "../../react-utils/src" },
-		{ "path": "../../utilities/src" },
+		{ "path": "../../utilities/src" }
 	]
 }

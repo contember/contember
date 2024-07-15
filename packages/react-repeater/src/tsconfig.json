@@ -1,11 +1,14 @@
 {
 	"extends": "../../../tsconfig.settings.json",
 	"compilerOptions": {
-		"outDir": "../dist/types"
+		"outDir": "../dist/types",
+		"types": [
+			"vite/client"
+		]
 	},
 	"references": [
 		{ "path": "../../binding/src" },
 		{ "path": "../../react-binding/src" },
-		{ "path": "../../react-utils/src" },
+		{ "path": "../../react-utils/src" }
 	]
 }

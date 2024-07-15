@@ -13,4 +13,4 @@ namespace Command {
 		bus: CommandBus
 	}
 }
-export { Command }
+export { type Command }

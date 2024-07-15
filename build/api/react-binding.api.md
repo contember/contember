@@ -665,10 +665,10 @@ export function useEntity(sugaredRelativeSingleEntity: string | SugaredRelativeS
 export function useEntity(sugaredRelativeSingleEntity: string | SugaredRelativeSingleEntity | undefined): EntityAccessor | undefined;
 
 // @public (undocumented)
-export const useEntityBeforePersist: (listener: EntityAccessor.EntityEventListenerMap['beforePersist']) => void;
+export const useEntityBeforePersist: (listener: EntityAccessor.EntityEventListenerMap["beforePersist"]) => void;
 
 // @public (undocumented)
-export const useEntityBeforeUpdate: (listener: EntityAccessor.EntityEventListenerMap['beforeUpdate']) => void;
+export const useEntityBeforeUpdate: (listener: EntityAccessor.EntityEventListenerMap["beforeUpdate"]) => void;
 
 // @public (undocumented)
 export function useEntityEvent(type: 'beforePersist', listener: EntityAccessor.EntityEventListenerMap['beforePersist']): void;
@@ -698,8 +698,7 @@ export function useEntityList(sugaredRelativeEntityList: string | SugaredRelativ
 export function useEntityList(sugaredRelativeEntityList: string | SugaredRelativeEntityList | undefined): EntityListAccessor | undefined;
 
 // @public (undocumented)
-export const useEntityListSubTree: (qualifiedEntityList: Alias | SugaredQualifiedEntityList | SugaredUnconstrainedQualifiedEntityList, ...treeId: [TreeRootId | undefined] | [
-]) => EntityListAccessor;
+export const useEntityListSubTree: (qualifiedEntityList: Alias | SugaredQualifiedEntityList | SugaredUnconstrainedQualifiedEntityList, ...treeId: [TreeRootId | undefined] | []) => EntityListAccessor;
 
 // @public (undocumented)
 export const useEntityListSubTreeLoader: <State>(entities: SugaredQualifiedEntityList | undefined, children: ReactNode, state?: State) => [UseEntityListSubTreeLoaderResult<State>, EntityListSubTreeLoaderState];
@@ -721,14 +720,13 @@ export function useEntityListSubTreeParameters(qualifiedEntityList: SugaredQuali
 export function useEntityListSubTreeParameters(qualifiedEntityListOrAlias: Alias | SugaredQualifiedEntityList | SugaredUnconstrainedQualifiedEntityList): Alias | SugaredQualifiedEntityList | SugaredUnconstrainedQualifiedEntityList;
 
 // @public (undocumented)
-export const useEntityPersistError: (listener: EntityAccessor.EntityEventListenerMap['persistError']) => void;
+export const useEntityPersistError: (listener: EntityAccessor.EntityEventListenerMap["persistError"]) => void;
 
 // @public (undocumented)
-export const useEntityPersistSuccess: (listener: EntityAccessor.EntityEventListenerMap['persistSuccess']) => void;
+export const useEntityPersistSuccess: (listener: EntityAccessor.EntityEventListenerMap["persistSuccess"]) => void;
 
 // @public (undocumented)
-export const useEntitySubTree: (qualifiedSingleEntity: Alias | SugaredQualifiedSingleEntity | SugaredUnconstrainedQualifiedSingleEntity, ...treeId: [TreeRootId | undefined] | [
-]) => EntityAccessor;
+export const useEntitySubTree: (qualifiedSingleEntity: Alias | SugaredQualifiedSingleEntity | SugaredUnconstrainedQualifiedSingleEntity, ...treeId: [TreeRootId | undefined] | []) => EntityAccessor;
 
 // @public (undocumented)
 export function useEntitySubTreeParameters(alias: Alias): Alias;
@@ -743,7 +741,7 @@ export function useEntitySubTreeParameters(qualifiedSingleEntityOrAlias: Alias |
 export const useEnvironment: () => Environment;
 
 // @public (undocumented)
-export const useExtendTree: () => (newFragment: ReactNode, options?: Omit<ExtendTreeOptions, 'signal'>) => Promise<TreeRootId | undefined>;
+export const useExtendTree: () => (newFragment: ReactNode, options?: Omit<ExtendTreeOptions, "signal">) => Promise<TreeRootId | undefined>;
 
 // @public (undocumented)
 export function useField<Value extends FieldValue = FieldValue>(sugaredRelativeSingleField: string | SugaredRelativeSingleField): FieldAccessor<Value>;
@@ -755,12 +753,10 @@ export function useField<Value extends FieldValue = FieldValue>(sugaredRelativeS
 export const useGetEntityByKey: () => GetEntityByKey;
 
 // @public (undocumented)
-export const useGetEntityListSubTree: () => ((parametersOrAlias: Alias | SugaredQualifiedEntityList | SugaredUnconstrainedQualifiedEntityList, ...treeId: [TreeRootId | undefined] | [
-]) => EntityListAccessor);
+export const useGetEntityListSubTree: () => ((parametersOrAlias: Alias | SugaredQualifiedEntityList | SugaredUnconstrainedQualifiedEntityList, ...treeId: [TreeRootId | undefined] | []) => EntityListAccessor);
 
 // @public (undocumented)
-export const useGetEntitySubTree: () => ((parametersOrAlias: Alias | SugaredQualifiedSingleEntity | SugaredUnconstrainedQualifiedSingleEntity, ...treeId: [TreeRootId | undefined] | [
-]) => EntityAccessor);
+export const useGetEntitySubTree: () => ((parametersOrAlias: Alias | SugaredQualifiedSingleEntity | SugaredUnconstrainedQualifiedSingleEntity, ...treeId: [TreeRootId | undefined] | []) => EntityAccessor);
 
 // @public (undocumented)
 export const useGetTreeFilters: () => (() => TreeFilter[]);
@@ -775,13 +771,13 @@ export const useLabelMiddleware: () => (it: ReactNode) => ReactNode;
 export const useMutationState: () => boolean;
 
 // @public (undocumented)
-export const useOnConnectionUpdate: (fieldName: FieldName, listener: EntityAccessor.EntityEventListenerMap['connectionUpdate']) => void;
+export const useOnConnectionUpdate: (fieldName: FieldName, listener: EntityAccessor.EntityEventListenerMap["connectionUpdate"]) => void;
 
 // @public (undocumented)
 export const usePersist: () => Persist;
 
 // @public (undocumented)
-export const useSortedEntities: (entityList: EntityListAccessor, sortableByField: SugaredFieldProps['field'] | undefined) => SortedEntities;
+export const useSortedEntities: (entityList: EntityListAccessor, sortableByField: SugaredFieldProps["field"] | undefined) => SortedEntities;
 
 // @public (undocumented)
 export const useTreeRootId: () => TreeRootId | undefined;

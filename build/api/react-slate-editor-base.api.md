@@ -34,7 +34,7 @@ import { RenderLeafProps } from 'slate-react';
 import type { Scalar } from '@contember/react-binding';
 import { Selection as Selection_2 } from 'slate';
 import type * as Slate from 'slate';
-import type { Text as Text_2 } from 'slate';
+import { Text as Text_2 } from 'slate';
 
 // @public (undocumented)
 export type AlignDirection = 'start' | 'center' | 'end' | 'justify' | undefined;
@@ -74,36 +74,36 @@ export const codeMarkPlugin: EditorMarkPlugin;
 
 // @public (undocumented)
 export const ContemberEditor: {
-    addMarks: <T extends EditorText, E extends Editor>(editor: E, marks: TextSpecifics<T>) => void;
-    canToggleMark: <T_1 extends EditorText, E_1 extends Editor>(editor: E_1, markName: string, markValue?: unknown) => boolean;
-    closest: <E_2 extends Editor>(editor: E_2, options: {
-        at?: Location_2 | undefined;
-        match: (node: Editor | EditorElement) => boolean;
+    addMarks: <T extends Text_2, E extends Editor_2>(editor: E, marks: TextSpecifics<T>) => void;
+    canToggleMark: <T extends Text_2, E extends Editor_2>(editor: E, markName: string, markValue?: unknown) => boolean;
+    closest: <E extends Editor_2>(editor: E, options: {
+        at?: Location_2;
+        match: (node: Editor_2 | Element_2) => boolean;
+    }) => NodeEntry<Editor_2 | Element_2> | undefined;
+    closestBlockEntry: <E extends Editor_2>(editor: E, options?: {
+        at?: Location_2;
+        match?: (node: Element_2) => boolean;
     }) => NodeEntry<Editor | EditorElement> | undefined;
-    closestBlockEntry: <E_3 extends Editor>(editor: E_3, options?: {
-        at?: Location_2 | undefined;
-        match?: ((node: EditorElement) => boolean) | undefined;
-    } | undefined) => NodeEntry<Editor | EditorElement> | undefined;
-    closestViableBlockContainerEntry: <E_4 extends Editor>(editor: E_4, options?: {
-        at?: Location_2 | undefined;
-    } | undefined) => NodeEntry<Editor | EditorElement> | undefined;
-    ejectElement: <E_5 extends Editor>(editor: E_5, path: Path) => void;
-    elementToSpecifics: <Element extends EditorElement = EditorElement>(element: Element) => Partial<Element>;
-    getElementDataAttributes: <Element_1 extends EditorElement = EditorElement>(element: Element_1, attributeNamePrefix?: string) => ElementDataAttributes;
-    getPreviousSibling: <E_6 extends Editor = Editor, CurrentNode extends Node_2 = Node_2, PreviousNode extends Node_2 = CurrentNode>(editor: E_6, node: CurrentNode, nodePath: Path) => NodeEntry<PreviousNode> | undefined;
-    hasMarks: <T_2 extends EditorText, E_7 extends Editor>(editor: E_7, marks: TextSpecifics<T_2>, options?: {
-        from?: Path | undefined;
-        to?: Path | undefined;
+    closestViableBlockContainerEntry: <E extends Editor_2>(editor: E, options?: {
+        at?: Location_2;
+    }) => NodeEntry<Element_2 | Editor_2> | undefined;
+    ejectElement: <E extends Editor_2>(editor: E, path: Path) => void;
+    elementToSpecifics: <Element extends Element_2 = EditorElement>(element: Element) => Partial<Element>;
+    getElementDataAttributes: <Element extends Element_2 = EditorElement>(element: Element, attributeNamePrefix?: string) => ElementDataAttributes;
+    getPreviousSibling: <E extends Editor_2 = Editor, CurrentNode extends Node_2 = Node_2, PreviousNode extends Node_2 = CurrentNode>(editor: E, node: CurrentNode, nodePath: Path) => NodeEntry<PreviousNode> | undefined;
+    hasMarks: <T extends Text_2, E extends Editor_2>(editor: E, marks: TextSpecifics<T>, options?: {
+        from?: Path;
+        to?: Path;
     }) => boolean;
-    hasParentOfType: <Editor extends Editor, Element_2 extends EditorElement>(editor: Editor, nodeEntry: NodeEntry<Node_2>, type: Element_2["type"], suchThat?: Partial<Element_2> | undefined) => boolean;
-    isElementType: <Element_3 extends EditorElement>(element: Node_2, type: Element_3["type"], suchThat?: Partial<Element_3> | undefined) => boolean;
-    permissivelyDeserializeNodes: <E_8 extends Editor>(editor: E_8, serializedElement: string, errorMessage?: string | undefined) => (EditorElement | EditorText)[];
-    removeMarks: <T_3 extends EditorText, E_9 extends Editor>(editor: E_9, marks: TextSpecifics<T_3>) => void;
-    serializeNodes: <E_10 extends Editor>(editor: E_10, elements: (EditorElement | EditorText)[], errorMessage?: string | undefined) => string;
-    strictlyDeserializeNodes: <E_11 extends Editor>(editor: E_11, serializedElement: string, errorMessage?: string | undefined) => (EditorElement | EditorText)[];
-    textToSpecifics: <Text extends EditorText = EditorText>(textNode: Text) => TextSpecifics<Text>;
-    toLatestFormat: <E_12 extends Editor>(editor: E_12, potentiallyOldNode: SerializableEditorNode) => SerializableEditorNode;
-    topLevelNodes: <E_13 extends Editor>(editor: E_13) => Generator<NodeEntry<Node_2>, void, undefined>;
+    hasParentOfType: <Editor extends Editor_2, Element extends Element_2>(editor: Editor, nodeEntry: NodeEntry<Node_2 | Element_2>, type: Element["type"], suchThat?: Partial<Element>) => boolean;
+    isElementType: <Element extends Element_2>(element: Node_2, type: Element["type"], suchThat?: Partial<Element>) => boolean;
+    permissivelyDeserializeNodes: <E extends Editor_2>(editor: E, serializedElement: string, errorMessage?: string) => Array<Element_2 | Text_2>;
+    removeMarks: <T extends Text_2, E extends Editor_2>(editor: E, marks: TextSpecifics<T>) => void;
+    serializeNodes: <E extends Editor_2>(editor: E, elements: Array<Element_2 | Text_2>, errorMessage?: string) => string;
+    strictlyDeserializeNodes: <E extends Editor_2>(editor: E, serializedElement: string, errorMessage?: string) => Array<Element_2 | Text_2>;
+    textToSpecifics: <Text extends Text_2 = EditorText>(textNode: Text) => TextSpecifics<Text>;
+    toLatestFormat: <E extends Editor_2>(editor: E, potentiallyOldNode: SerializableEditorNode) => SerializableEditorNode;
+    topLevelNodes: <E extends Editor_2>(editor: E) => Generator<NodeEntry<Node_2>, void, undefined>;
 };
 
 // @public (undocumented)
@@ -741,7 +741,7 @@ export const unorderedListElementType: "unorderedList";
 // @public (undocumented)
 export const withAnchors: ({ render }: {
     render: ElementRenderer<AnchorElement>;
-}) => <E extends Editor>(editor: E) => E;
+}) => <E extends Editor_2>(editor: E) => E;
 
 // @public (undocumented)
 export const withBold: () => EditorPlugin;
@@ -810,7 +810,7 @@ export interface WithEssentials {
 // @public (undocumented)
 export const withHeadings: ({ render }: {
     render: ElementRenderer<HeadingElement>;
-}) => <E extends Editor>(editor: E) => E;
+}) => <E extends Editor_2>(editor: E) => E;
 
 // @public (undocumented)
 export const withHighlight: () => EditorPlugin;
@@ -818,7 +818,7 @@ export const withHighlight: () => EditorPlugin;
 // @public (undocumented)
 export const withHorizontalRules: ({ render }: {
     render: ElementRenderer<HorizontalRuleElement>;
-}) => <E extends Editor>(editor: E) => E;
+}) => <E extends Editor_2>(editor: E) => E;
 
 // @public (undocumented)
 export const withItalic: () => EditorPlugin;
@@ -828,7 +828,7 @@ export const withLists: ({ renderListItem, renderUnorderedList, renderOrderedLis
     renderListItem: ElementRenderer<ListItemElement>;
     renderOrderedList: ElementRenderer<OrderedListElement>;
     renderUnorderedList: ElementRenderer<UnorderedListElement>;
-}) => <E extends Editor>(editor: E) => E;
+}) => <E extends Editor_2>(editor: E) => E;
 
 // @public (undocumented)
 export const withNewline: () => EditorPlugin;
@@ -836,7 +836,7 @@ export const withNewline: () => EditorPlugin;
 // @public (undocumented)
 export const withParagraphs: ({ render }: {
     render: ElementRenderer<ParagraphElement>;
-}) => <E extends Editor>(editor: E) => E;
+}) => <E extends Editor_2>(editor: E) => E;
 
 // @public (undocumented)
 export const withPaste: (editor: Editor_2) => void;
@@ -844,7 +844,7 @@ export const withPaste: (editor: Editor_2) => void;
 // @public (undocumented)
 export const withScrollTargets: ({ render }: {
     render: ElementRenderer<ScrollTargetElement>;
-}) => <E extends Editor>(editor: E) => E;
+}) => <E extends Editor_2>(editor: E) => E;
 
 // @public (undocumented)
 export const withStrikeThrough: () => EditorPlugin;
@@ -854,7 +854,7 @@ export const withTables: ({ renderTable, renderTableCell, renderTableRow }: {
     renderTable: ElementRenderer<TableElement>;
     renderTableCell: ElementRenderer<TableCellElement>;
     renderTableRow: ElementRenderer<TableRowElement>;
-}) => <E extends Editor>(editor: E) => E;
+}) => <E extends Editor_2>(editor: E) => E;
 
 // @public (undocumented)
 export const withUnderline: () => EditorPlugin;

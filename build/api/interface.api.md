@@ -83,7 +83,7 @@ export interface DisconnectEntityTriggerProps {
 
 // @public (undocumented)
 export const EntityBeforePersist: ({ listener }: {
-    listener: EntityAccessor.EntityEventListenerMap['beforePersist'];
+    listener: EntityAccessor.EntityEventListenerMap["beforePersist"];
 }) => null;
 
 // @public (undocumented)

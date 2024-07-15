@@ -70,7 +70,7 @@ export type RenderLeafProps<CustomLeaves extends RichTextLeaf = RichTextLeaf> = 
 };
 
 // @public
-export const RichText: <CustomElements extends RichTextElement<never, RichTextLeaf> = never, CustomLeaves extends RichTextLeaf = RichTextLeaf>({ blocks, renderElement, renderLeaf, renderBlock, attributeNamePrefix, referenceRenderers, undefinedReferenceHandler, }: RichTextProps<CustomElements, CustomLeaves>) => JSX_2.Element;
+export const RichText: <CustomElements extends RichTextElement = never, CustomLeaves extends RichTextLeaf = RichTextLeaf>({ blocks, renderElement, renderLeaf, renderBlock, attributeNamePrefix, referenceRenderers, undefinedReferenceHandler, }: RichTextProps<CustomElements, CustomLeaves>) => JSX_2.Element;
 
 // @public (undocumented)
 export interface RichTextAnchorElement<CustomElements extends RichTextElement = never, CustomLeaves extends RichTextLeaf = RichTextLeaf> extends RichTextElement<CustomElements, CustomLeaves> {
@@ -100,7 +100,7 @@ export type RichTextBlockSource<CustomElements extends RichTextElement = never, 
 };
 
 // @public
-export const RichTextBlocksRenderer: <CustomElements extends RichTextElement<never, RichTextLeaf> = never, CustomLeaves extends RichTextLeaf = RichTextLeaf>({ renderElement, renderLeaf, renderBlock, attributeNamePrefix, referenceRenderers, undefinedReferenceHandler, ...props }: RichTextBlocksRendererProps<CustomElements, CustomLeaves>) => JSX_2.Element;
+export const RichTextBlocksRenderer: <CustomElements extends RichTextElement = never, CustomLeaves extends RichTextLeaf = RichTextLeaf>({ renderElement, renderLeaf, renderBlock, attributeNamePrefix, referenceRenderers, undefinedReferenceHandler, ...props }: RichTextBlocksRendererProps<CustomElements, CustomLeaves>) => JSX_2.Element;
 
 // @public (undocumented)
 export type RichTextBlocksRendererProps<CustomElements extends RichTextElement = never, CustomLeaves extends RichTextLeaf = RichTextLeaf> = RichTextBlockSource<CustomElements, CustomLeaves> & RichTextRenderingOptions<CustomElements, CustomLeaves>;
@@ -131,7 +131,7 @@ export interface RichTextElement<CustomElements extends RichTextElement = never,
 }
 
 // @public
-export const RichTextFieldRenderer: <CustomElements extends RichTextElement<never, RichTextLeaf> = never, CustomLeaves extends RichTextLeaf = RichTextLeaf>({ renderLeaf, renderBlock, renderElement, attributeNamePrefix, undefinedReferenceHandler, ...source }: RichTextFieldRendererProps<CustomElements, CustomLeaves>) => JSX_2.Element;
+export const RichTextFieldRenderer: <CustomElements extends RichTextElement = never, CustomLeaves extends RichTextLeaf = RichTextLeaf>({ renderLeaf, renderBlock, renderElement, attributeNamePrefix, undefinedReferenceHandler, ...source }: RichTextFieldRendererProps<CustomElements, CustomLeaves>) => JSX_2.Element;
 
 // @public (undocumented)
 export type RichTextFieldRendererProps<CustomElements extends RichTextElement = never, CustomLeaves extends RichTextLeaf = RichTextLeaf> = RichTextFieldSource<CustomElements, CustomLeaves> & RichTextRenderingOptions<CustomElements, CustomLeaves>;
@@ -241,7 +241,7 @@ export interface RichTextReferenceFilledMetadata<CustomElements extends RichText
 export type RichTextReferenceMetadata<CustomElements extends RichTextElement = never, CustomLeaves extends RichTextLeaf = RichTextLeaf, Reference extends RichTextReference = RichTextReference> = RichTextReferenceFilledMetadata<CustomElements, CustomLeaves, Reference> | RichTextReferenceEmptyMetadata;
 
 // @public @deprecated (undocumented)
-export const RichTextRenderer: <CustomElements extends RichTextElement<never, RichTextLeaf> = never, CustomLeaves extends RichTextLeaf = RichTextLeaf>(props: RichTextRendererProps<CustomElements, CustomLeaves>) => ReactElement;
+export const RichTextRenderer: <CustomElements extends RichTextElement = never, CustomLeaves extends RichTextLeaf = RichTextLeaf>(props: RichTextRendererProps<CustomElements, CustomLeaves>) => ReactElement;
 
 // @public (undocumented)
 export class RichTextRendererError extends Error {
@@ -322,10 +322,10 @@ export interface RootEditorNode<CustomElements extends RichTextElement = never, 
 export type UndefinedReferenceHandler<CustomElements extends RichTextElement = never, CustomLeaves extends RichTextLeaf = RichTextLeaf, Reference extends RichTextReference = RichTextReference> = (referenceId: string) => void | RichTextReferenceMetadata<CustomElements, CustomLeaves, Reference>;
 
 // @public (undocumented)
-export const useRichTextBlocksSource: <CustomElements extends RichTextElement<never, RichTextLeaf>, CustomLeaves extends RichTextLeaf>({ deserialize, blocks, referencesField, sourceField, referenceDiscriminationField, }: RichTextBlockSource<CustomElements, CustomLeaves>) => RichTextBlock<CustomElements, CustomLeaves>[];
+export const useRichTextBlocksSource: <CustomElements extends RichTextElement, CustomLeaves extends RichTextLeaf>({ deserialize, blocks, referencesField, sourceField, referenceDiscriminationField, }: RichTextBlockSource<CustomElements, CustomLeaves>) => RichTextBlock<CustomElements, CustomLeaves>[];
 
 // @public (undocumented)
-export const useRichTextFieldSource: <CustomElements extends RichTextElement<never, RichTextLeaf>, CustomLeaves extends RichTextLeaf>({ source, deserialize, }: RichTextFieldSource<CustomElements, CustomLeaves>) => RichTextBlock<CustomElements, CustomLeaves>[];
+export const useRichTextFieldSource: <CustomElements extends RichTextElement, CustomLeaves extends RichTextLeaf>({ source, deserialize, }: RichTextFieldSource<CustomElements, CustomLeaves>) => RichTextBlock<CustomElements, CustomLeaves>[];
 
 // (No @packageDocumentation comment for this package)
 

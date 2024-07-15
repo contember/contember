@@ -37,21 +37,21 @@ export const addProjectMemberMutation: TenantApi.MutationFetcher<{
         } & {
             readonly developerMessage: string;
         } & {
-            readonly endUserMessage?: string | undefined;
+            readonly endUserMessage?: string;
         } & {
             readonly membershipValidation?: readonly ({
                 readonly code: TenantApi.MembershipValidationErrorCode;
             } & {
                 readonly role: string;
             } & {
-                readonly variable?: string | undefined;
+                readonly variable?: string;
             })[] | undefined;
         }) | undefined;
     }) | undefined;
 }, {
     readonly projectSlug: string;
     readonly identityId: string;
-    readonly memberships: readonly TenantApi.MembershipInput[];
+    readonly memberships: ReadonlyArray<TenantApi.MembershipInput>;
 }>;
 
 // @public (undocumented)
@@ -116,7 +116,7 @@ export const confirmOtpMutation: TenantApi.MutationFetcher<{
         } & {
             readonly developerMessage: string;
         } & {
-            readonly endUserMessage?: string | undefined;
+            readonly endUserMessage?: string;
         }) | undefined;
     }) | undefined;
 }, {
@@ -171,14 +171,14 @@ export const createApiKeyMutation: TenantApi.MutationFetcher<{
         } & {
             readonly developerMessage: string;
         } & {
-            readonly endUserMessage?: string | undefined;
+            readonly endUserMessage?: string;
         } & {
             readonly membershipValidation?: readonly ({
                 readonly code: TenantApi.MembershipValidationErrorCode;
             } & {
                 readonly role: string;
             } & {
-                readonly variable?: string | undefined;
+                readonly variable?: string;
             })[] | undefined;
         }) | undefined;
     } & {
@@ -186,23 +186,23 @@ export const createApiKeyMutation: TenantApi.MutationFetcher<{
             readonly apiKey: {
                 readonly id: string;
             } & {
-                readonly token?: string | undefined;
+                readonly token?: string;
             } & {
                 readonly identity: {
                     readonly id: string;
                 } & {
-                    readonly description?: string | undefined;
+                    readonly description?: string;
                 } & {
-                    readonly roles?: readonly string[] | undefined;
+                    readonly roles?: ReadonlyArray<string>;
                 };
             };
         } | undefined;
     }) | undefined;
 }, {
     readonly projectSlug: string;
-    readonly memberships: readonly TenantApi.MembershipInput[];
+    readonly memberships: ReadonlyArray<TenantApi.MembershipInput>;
     readonly description: string;
-    readonly tokenHash?: string | undefined;
+    readonly tokenHash?: string;
 }>;
 
 // Warning: (ae-forgotten-export) The symbol "createApiKeyMutationResult" needs to be exported by the entry point index.d.ts
@@ -223,29 +223,29 @@ export const createGlobalApiKeyMutation: TenantApi.MutationFetcher<{
         } & {
             readonly developerMessage: string;
         } & {
-            readonly endUserMessage?: string | undefined;
+            readonly endUserMessage?: string;
         }) | undefined;
     } & {
         readonly result?: {
             readonly apiKey: {
                 readonly id: string;
             } & {
-                readonly token?: string | undefined;
+                readonly token?: string;
             } & {
                 readonly identity: {
                     readonly id: string;
                 } & {
-                    readonly description?: string | undefined;
+                    readonly description?: string;
                 } & {
-                    readonly roles?: readonly string[] | undefined;
+                    readonly roles?: ReadonlyArray<string>;
                 };
             };
         } | undefined;
     }) | undefined;
 }, {
     readonly description: string;
-    readonly roles?: readonly string[] | undefined;
-    readonly tokenHash?: string | undefined;
+    readonly roles?: ReadonlyArray<string>;
+    readonly tokenHash?: string;
 }>;
 
 // Warning: (ae-forgotten-export) The symbol "createGlobalApiKeyMutationResult" needs to be exported by the entry point index.d.ts
@@ -262,16 +262,16 @@ export const createResetPasswordRequestMutation: TenantApi.MutationFetcher<{
         readonly ok: boolean;
     } & {
         readonly error?: ({
-            readonly code: "PERSON_NOT_FOUND";
+            readonly code: TenantApi.CreatePasswordResetRequestErrorCode;
         } & {
             readonly developerMessage: string;
         } & {
-            readonly endUserMessage?: string | undefined;
+            readonly endUserMessage?: string;
         }) | undefined;
     }) | undefined;
 }, {
     readonly email: string;
-    readonly options?: TenantApi.CreateResetPasswordRequestOptions | undefined;
+    readonly options?: TenantApi.CreateResetPasswordRequestOptions;
 }>;
 
 // @public (undocumented)
@@ -328,18 +328,18 @@ export const createSessionTokenMutation: TenantApi.MutationFetcher<{
             readonly person: {
                 readonly id: string;
             } & {
-                readonly email?: string | undefined;
+                readonly email?: string;
             } & {
-                readonly name?: string | undefined;
+                readonly name?: string;
             } & {
                 readonly otpEnabled: boolean;
             };
         }) | undefined;
     }) | undefined;
 }, {
-    readonly email?: string | undefined;
-    readonly personId?: string | undefined;
-    readonly expiration?: number | undefined;
+    readonly email?: string;
+    readonly personId?: string;
+    readonly expiration?: number;
 }>;
 
 // Warning: (ae-forgotten-export) The symbol "createSessionTokenMutationResult" needs to be exported by the entry point index.d.ts
@@ -359,11 +359,11 @@ export const disableApiKeyMutation: TenantApi.MutationFetcher<{
         readonly ok: boolean;
     } & {
         readonly error?: ({
-            readonly code: "KEY_NOT_FOUND";
+            readonly code: TenantApi.DisableApiKeyErrorCode;
         } & {
             readonly developerMessage: string;
         } & {
-            readonly endUserMessage?: string | undefined;
+            readonly endUserMessage?: string;
         }) | undefined;
     }) | undefined;
 }, {
@@ -379,11 +379,11 @@ export const disableOtpMutation: TenantApi.MutationFetcher<{
         readonly ok: boolean;
     } & {
         readonly error?: ({
-            readonly code: "OTP_NOT_ACTIVE";
+            readonly code: TenantApi.DisableOtpErrorCode;
         } & {
             readonly developerMessage: string;
         } & {
-            readonly endUserMessage?: string | undefined;
+            readonly endUserMessage?: string;
         }) | undefined;
     }) | undefined;
 }, {}>;
@@ -642,14 +642,14 @@ export const inviteMutation: TenantApi.MutationFetcher<{
         } & {
             readonly developerMessage: string;
         } & {
-            readonly endUserMessage?: string | undefined;
+            readonly endUserMessage?: string;
         } & {
             readonly membershipValidation?: readonly ({
                 readonly code: TenantApi.MembershipValidationErrorCode;
             } & {
                 readonly role: string;
             } & {
-                readonly variable?: string | undefined;
+                readonly variable?: string;
             })[] | undefined;
         }) | undefined;
     } & {
@@ -659,28 +659,28 @@ export const inviteMutation: TenantApi.MutationFetcher<{
             readonly person: {
                 readonly id: string;
             } & {
-                readonly email?: string | undefined;
+                readonly email?: string;
             } & {
-                readonly name?: string | undefined;
+                readonly name?: string;
             } & {
                 readonly otpEnabled: boolean;
             } & {
                 readonly identity: {
                     readonly id: string;
                 } & {
-                    readonly description?: string | undefined;
+                    readonly description?: string;
                 } & {
-                    readonly roles?: readonly string[] | undefined;
+                    readonly roles?: ReadonlyArray<string>;
                 };
             };
         }) | undefined;
     }) | undefined;
 }, {
     readonly email: string;
-    readonly name?: string | undefined;
+    readonly name?: string;
     readonly projectSlug: string;
-    readonly memberships: readonly TenantApi.MembershipInput[];
-    readonly options?: TenantApi.InviteOptions | undefined;
+    readonly memberships: ReadonlyArray<TenantApi.MembershipInput>;
+    readonly options?: TenantApi.InviteOptions;
 }>;
 
 // Warning: (ae-forgotten-export) The symbol "inviteMutationResult" needs to be exported by the entry point index.d.ts
@@ -878,7 +878,7 @@ export const prepareOtpMutation: TenantApi.MutationFetcher<{
         }) | undefined;
     }) | undefined;
 }, {
-    readonly label?: string | undefined;
+    readonly label?: string;
 }>;
 
 // @public (undocumented)
@@ -932,7 +932,7 @@ export const removeProjectMemberMutation: TenantApi.MutationFetcher<{
         } & {
             readonly developerMessage: string;
         } & {
-            readonly endUserMessage?: string | undefined;
+            readonly endUserMessage?: string;
         }) | undefined;
     }) | undefined;
 }, {
@@ -963,7 +963,7 @@ export const resetPasswordMutation: TenantApi.MutationFetcher<{
         } & {
             readonly developerMessage: string;
         } & {
-            readonly endUserMessage?: string | undefined;
+            readonly endUserMessage?: string;
         }) | undefined;
     }) | undefined;
 }, {
@@ -984,7 +984,7 @@ export const signInIDPMutation: TenantApi.MutationFetcher<{
         } & {
             readonly developerMessage: string;
         } & {
-            readonly endUserMessage?: string | undefined;
+            readonly endUserMessage?: string;
         }) | undefined;
     } & {
         readonly result?: ({
@@ -993,9 +993,9 @@ export const signInIDPMutation: TenantApi.MutationFetcher<{
             readonly person: {
                 readonly id: string;
             } & {
-                readonly email?: string | undefined;
+                readonly email?: string;
             } & {
-                readonly name?: string | undefined;
+                readonly name?: string;
             } & {
                 readonly otpEnabled: boolean;
             };
@@ -1004,9 +1004,9 @@ export const signInIDPMutation: TenantApi.MutationFetcher<{
 }, {
     readonly identityProvider: string;
     readonly data?: unknown;
-    readonly expiration?: number | undefined;
-    readonly idpResponse?: TenantApi.IDPResponseInput | undefined;
-    readonly redirectUrl?: string | undefined;
+    readonly expiration?: number;
+    readonly idpResponse?: TenantApi.IDPResponseInput;
+    readonly redirectUrl?: string;
     readonly sessionData?: unknown;
 }>;
 
@@ -1038,7 +1038,7 @@ export const signInMutation: TenantApi.MutationFetcher<{
         } & {
             readonly developerMessage: string;
         } & {
-            readonly endUserMessage?: string | undefined;
+            readonly endUserMessage?: string;
         }) | undefined;
     } & {
         readonly result?: ({
@@ -1047,9 +1047,9 @@ export const signInMutation: TenantApi.MutationFetcher<{
             readonly person: {
                 readonly id: string;
             } & {
-                readonly email?: string | undefined;
+                readonly email?: string;
             } & {
-                readonly name?: string | undefined;
+                readonly name?: string;
             } & {
                 readonly otpEnabled: boolean;
             };
@@ -1058,8 +1058,8 @@ export const signInMutation: TenantApi.MutationFetcher<{
 }, {
     readonly email: string;
     readonly password: string;
-    readonly expiration?: number | undefined;
-    readonly otpToken?: string | undefined;
+    readonly expiration?: number;
+    readonly otpToken?: string;
 }>;
 
 // Warning: (ae-forgotten-export) The symbol "signInResultFragment" needs to be exported by the entry point index.d.ts
@@ -1080,11 +1080,11 @@ export const signOutMutation: TenantApi.MutationFetcher<{
         } & {
             readonly developerMessage: string;
         } & {
-            readonly endUserMessage?: string | undefined;
+            readonly endUserMessage?: string;
         }) | undefined;
     }) | undefined;
 }, {
-    readonly all?: boolean | undefined;
+    readonly all?: boolean;
 }>;
 
 // @public (undocumented)
@@ -1185,21 +1185,21 @@ export const updateProjectMemberMutation: TenantApi.MutationFetcher<{
         } & {
             readonly developerMessage: string;
         } & {
-            readonly endUserMessage?: string | undefined;
+            readonly endUserMessage?: string;
         } & {
             readonly membershipValidation?: readonly ({
                 readonly code: TenantApi.MembershipValidationErrorCode;
             } & {
                 readonly role: string;
             } & {
-                readonly variable?: string | undefined;
+                readonly variable?: string;
             })[] | undefined;
         }) | undefined;
     }) | undefined;
 }, {
     readonly projectSlug: string;
     readonly identityId: string;
-    readonly memberships: readonly TenantApi.MembershipInput[];
+    readonly memberships: ReadonlyArray<TenantApi.MembershipInput>;
 }>;
 
 // @public (undocumented)
@@ -1209,7 +1209,7 @@ export type UpdateProjectMemberMutationVariables = Parameters<ReturnType<typeof 
 export const useAddProjectMemberMutation: ({ headers, apiToken }?: TenantApiOptions) => (variables: {
     readonly projectSlug: string;
     readonly identityId: string;
-    readonly memberships: readonly TenantApi.MembershipInput[];
+    readonly memberships: ReadonlyArray<TenantApi.MembershipInput>;
 }) => Promise<TenantMutationResponse<unknown, TenantApi.AddProjectMemberErrorCode>>;
 
 // @public (undocumented)
@@ -1232,21 +1232,21 @@ export const useCreateApiKeyForm: () => CreateApiKeyFormContextValue;
 // @public (undocumented)
 export const useCreateApiKeyMutation: ({ headers, apiToken }?: TenantApiOptions) => (variables: {
     readonly projectSlug: string;
-    readonly memberships: readonly TenantApi.MembershipInput[];
+    readonly memberships: ReadonlyArray<TenantApi.MembershipInput>;
     readonly description: string;
-    readonly tokenHash?: string | undefined;
+    readonly tokenHash?: string;
 }) => Promise<TenantMutationResponse<    {
 readonly apiKey: {
 readonly id: string;
 } & {
-readonly token?: string | undefined;
+readonly token?: string;
 } & {
 readonly identity: {
 readonly id: string;
 } & {
-readonly description?: string | undefined;
+readonly description?: string;
 } & {
-readonly roles?: readonly string[] | undefined;
+readonly roles?: ReadonlyArray<string>;
 };
 };
 }, TenantApi.CreateApiKeyErrorCode>>;
@@ -1254,20 +1254,20 @@ readonly roles?: readonly string[] | undefined;
 // @public (undocumented)
 export const useCreateGlobalApiKeyMutation: ({ headers, apiToken }?: TenantApiOptions) => (variables: {
     readonly description: string;
-    readonly roles?: readonly string[] | undefined;
-    readonly tokenHash?: string | undefined;
+    readonly roles?: ReadonlyArray<string>;
+    readonly tokenHash?: string;
 }) => Promise<TenantMutationResponse<    {
 readonly apiKey: {
 readonly id: string;
 } & {
-readonly token?: string | undefined;
+readonly token?: string;
 } & {
 readonly identity: {
 readonly id: string;
 } & {
-readonly description?: string | undefined;
+readonly description?: string;
 } & {
-readonly roles?: readonly string[] | undefined;
+readonly roles?: ReadonlyArray<string>;
 };
 };
 }, TenantApi.CreateApiKeyErrorCode>>;
@@ -1275,7 +1275,7 @@ readonly roles?: readonly string[] | undefined;
 // @public (undocumented)
 export const useCreateResetPasswordRequestMutation: ({ headers, apiToken }?: TenantApiOptions) => (variables: {
     readonly email: string;
-    readonly options?: TenantApi.CreateResetPasswordRequestOptions | undefined;
+    readonly options?: TenantApi.CreateResetPasswordRequestOptions;
 }) => Promise<TenantMutationResponse<unknown, "PERSON_NOT_FOUND">>;
 
 // @public (undocumented)
@@ -1283,18 +1283,18 @@ export const useCreateSessionTokenForm: () => CreateSessionTokenFormContextValue
 
 // @public (undocumented)
 export const useCreateSessionTokenMutation: ({ headers, apiToken }?: TenantApiOptions) => (variables: {
-    readonly email?: string | undefined;
-    readonly personId?: string | undefined;
-    readonly expiration?: number | undefined;
+    readonly email?: string;
+    readonly personId?: string;
+    readonly expiration?: number;
 }) => Promise<TenantMutationResponse<    {
 readonly token: string;
 } & {
 readonly person: {
 readonly id: string;
 } & {
-readonly email?: string | undefined;
+readonly email?: string;
 } & {
-readonly name?: string | undefined;
+readonly name?: string;
 } & {
 readonly otpEnabled: boolean;
 };
@@ -1337,6 +1337,8 @@ export const useInitSignInIDPMutation: ({ headers, apiToken }?: TenantApiOptions
 readonly authUrl: string;
 } & {
 readonly sessionData: unknown;
+} & {
+readonly idpConfiguration?: unknown;
 }, TenantApi.InitSignInIDPErrorCode>>;
 
 // @public (undocumented)
@@ -1345,28 +1347,28 @@ export const useInviteForm: () => InviteFormContextValue;
 // @public (undocumented)
 export const useInviteMutation: ({ headers, apiToken }?: TenantApiOptions) => (variables: {
     readonly email: string;
-    readonly name?: string | undefined;
+    readonly name?: string;
     readonly projectSlug: string;
-    readonly memberships: readonly TenantApi.MembershipInput[];
-    readonly options?: TenantApi.InviteOptions | undefined;
+    readonly memberships: ReadonlyArray<TenantApi.MembershipInput>;
+    readonly options?: TenantApi.InviteOptions;
 }) => Promise<TenantMutationResponse<    {
 readonly isNew: boolean;
 } & {
 readonly person: {
 readonly id: string;
 } & {
-readonly email?: string | undefined;
+readonly email?: string;
 } & {
-readonly name?: string | undefined;
+readonly name?: string;
 } & {
 readonly otpEnabled: boolean;
 } & {
 readonly identity: {
 readonly id: string;
 } & {
-readonly description?: string | undefined;
+readonly description?: string;
 } & {
-readonly roles?: readonly string[] | undefined;
+readonly roles?: ReadonlyArray<string>;
 };
 };
 }, TenantApi.InviteErrorCode>>;
@@ -1376,7 +1378,7 @@ export const useLoginForm: () => LoginFormContextValue;
 
 // @public (undocumented)
 export const useLogout: () => ({ noRedirect }?: {
-    noRedirect?: boolean | undefined;
+    noRedirect?: boolean;
 }) => Promise<void>;
 
 // @public (undocumented)
@@ -1396,7 +1398,7 @@ export const usePasswordResetRequestForm: () => PasswordResetRequestFormContextV
 
 // @public (undocumented)
 export const usePrepareOtpMutation: ({ headers, apiToken }?: TenantApiOptions) => (variables: {
-    readonly label?: string | undefined;
+    readonly label?: string;
 }) => Promise<TenantMutationResponse<    {
 readonly otpUri: string;
 } & {
@@ -1431,9 +1433,9 @@ readonly token: string;
 readonly person: {
 readonly id: string;
 } & {
-readonly email?: string | undefined;
+readonly email?: string;
 } & {
-readonly name?: string | undefined;
+readonly name?: string;
 } & {
 readonly otpEnabled: boolean;
 };
@@ -1443,17 +1445,17 @@ readonly otpEnabled: boolean;
 export const useSignInMutation: ({ headers, apiToken }?: TenantApiOptions) => (variables: {
     readonly email: string;
     readonly password: string;
-    readonly expiration?: number | undefined;
-    readonly otpToken?: string | undefined;
+    readonly expiration?: number;
+    readonly otpToken?: string;
 }) => Promise<TenantMutationResponse<    {
 readonly token: string;
 } & {
 readonly person: {
 readonly id: string;
 } & {
-readonly email?: string | undefined;
+readonly email?: string;
 } & {
-readonly name?: string | undefined;
+readonly name?: string;
 } & {
 readonly otpEnabled: boolean;
 };
@@ -1461,11 +1463,11 @@ readonly otpEnabled: boolean;
 
 // @public (undocumented)
 export const useSignOutMutation: ({ headers, apiToken }?: TenantApiOptions) => (variables: {
-    readonly all?: boolean | undefined;
+    readonly all?: boolean;
 }) => Promise<TenantMutationResponse<unknown, TenantApi.SignOutErrorCode>>;
 
 // @public (undocumented)
-export const useTenantApi: ({ headers, apiToken }?: TenantApiOptions) => <TData extends object, TVariables extends object>(fetcher: Fetcher<'Query' | 'Mutation', TData, TVariables>, options?: {
+export const useTenantApi: ({ headers, apiToken }?: TenantApiOptions) => <TData extends object, TVariables extends object>(fetcher: Fetcher<"Query" | "Mutation", TData, TVariables>, options?: {
     readonly variables?: TVariables;
     readonly headers?: Record<string, string>;
     readonly apiToken?: string | typeof LoginToken;
@@ -1484,7 +1486,7 @@ export const useUpdateProjectMemberForm: () => UpdateProjectMemberFormContextVal
 export const useUpdateProjectMemberMutation: ({ headers, apiToken }?: TenantApiOptions) => (variables: {
     readonly projectSlug: string;
     readonly identityId: string;
-    readonly memberships: readonly TenantApi.MembershipInput[];
+    readonly memberships: ReadonlyArray<TenantApi.MembershipInput>;
 }) => Promise<TenantMutationResponse<unknown, TenantApi.UpdateProjectMemberErrorCode>>;
 
 // (No @packageDocumentation comment for this package)

@@ -56,7 +56,7 @@ children: ReactNode;
 state: DataViewState;
 info: DataViewInfo;
 methods: DataViewMethods;
-onSelectHighlighted?: ((entity: EntityAccessor) => void) | undefined;
+onSelectHighlighted?: (entity: EntityAccessor) => void;
 }>;
 
 // @public (undocumented)
@@ -69,31 +69,31 @@ export type ControlledDataViewProps = {
 };
 
 // @public (undocumented)
-export const createBooleanFilter: (field: SugaredRelativeSingleField['field']) => DataViewFilterHandler<BooleanFilterArtifacts>;
+export const createBooleanFilter: (field: SugaredRelativeSingleField["field"]) => DataViewFilterHandler<BooleanFilterArtifacts>;
 
 // @public (undocumented)
-export const createDateFilter: (field: SugaredRelativeSingleField['field']) => DataViewFilterHandler<DateRangeFilterArtifacts>;
+export const createDateFilter: (field: SugaredRelativeSingleField["field"]) => DataViewFilterHandler<DateRangeFilterArtifacts>;
 
 // @public (undocumented)
-export const createEnumFilter: (field: SugaredRelativeSingleField['field']) => DataViewFilterHandler<EnumFilterArtifacts>;
+export const createEnumFilter: (field: SugaredRelativeSingleField["field"]) => DataViewFilterHandler<EnumFilterArtifacts>;
 
 // @public (undocumented)
 export const createGenericTextCellFilterCondition: (filter: GenericTextCellFilterArtifacts) => Input.Condition<string>;
 
 // @public (undocumented)
-export const createHasManyFilter: (field: SugaredRelativeEntityList_2['field']) => DataViewFilterHandler<RelationFilterArtifacts>;
+export const createHasManyFilter: (field: SugaredRelativeEntityList_2["field"]) => DataViewFilterHandler<RelationFilterArtifacts>;
 
 // @public (undocumented)
-export const createHasOneFilter: (field: SugaredRelativeSingleEntity['field']) => DataViewFilterHandler<RelationFilterArtifacts>;
+export const createHasOneFilter: (field: SugaredRelativeSingleEntity["field"]) => DataViewFilterHandler<RelationFilterArtifacts>;
 
 // @public (undocumented)
-export const createNumberFilter: (field: SugaredRelativeSingleField['field']) => DataViewFilterHandler<NumberFilterArtifacts>;
+export const createNumberFilter: (field: SugaredRelativeSingleField["field"]) => DataViewFilterHandler<NumberFilterArtifacts>;
 
 // @public (undocumented)
-export const createNumberRangeFilter: (field: SugaredRelativeSingleField['field']) => DataViewFilterHandler<NumberRangeFilterArtifacts>;
+export const createNumberRangeFilter: (field: SugaredRelativeSingleField["field"]) => DataViewFilterHandler<NumberRangeFilterArtifacts>;
 
 // @public (undocumented)
-export const createTextFilter: (field: SugaredRelativeSingleField['field']) => DataViewFilterHandler<TextFilterArtifacts>;
+export const createTextFilter: (field: SugaredRelativeSingleField["field"]) => DataViewFilterHandler<TextFilterArtifacts>;
 
 // @public (undocumented)
 export const createUnionTextFilter: (fields: DataViewUnionFilterFields) => DataViewFilterHandler<TextFilterArtifacts>;
@@ -173,7 +173,7 @@ export const DataViewDateFilter: React_2.NamedExoticComponent<DataViewDateFilter
 // @public (undocumented)
 export const DataViewDateFilterInput: ({ name, type, ...props }: {
     name?: string;
-    type: 'start' | 'end';
+    type: "start" | "end";
     children: ReactElement;
 }) => JSX_2.Element;
 
@@ -498,7 +498,7 @@ export const DataViewNumberFilter: React_2.NamedExoticComponent<DataViewNumberFi
 // @public (undocumented)
 export const DataViewNumberFilterInput: ({ name, type, allowFloat, ...props }: {
     name?: string;
-    type: 'from' | 'to';
+    type: "from" | "to";
     allowFloat?: boolean;
     children: ReactElement;
 }) => JSX_2.Element;
@@ -580,7 +580,7 @@ export const DataViewQueryFilterName = "_query";
 
 // @internal (undocumented)
 export const DataViewRelationFilterArgsContext: React_2.Context<{
-    options: SugaredQualifiedEntityList_2['entities'];
+    options: SugaredQualifiedEntityList_2["entities"];
 }>;
 
 // @public (undocumented)
@@ -599,7 +599,7 @@ export type DataViewRelationFilterListProps = {
 export const DataViewRelationFilterOptions: ({ children, name, ...props }: {
     name?: string;
     children: React_2.ReactNode;
-} & Omit<DataViewProps, 'entities'>) => JSX_2.Element;
+} & Omit<DataViewProps, "entities">) => JSX_2.Element;
 
 // @public (undocumented)
 export const DataViewRelationFilterState: ({ name, children, state }: {
@@ -1010,7 +1010,7 @@ export const useDataViewFetchAllData: ({ children }: {
 }>;
 
 // @public (undocumented)
-export const useDataViewFilter: <T extends Serializable>(key: string) => [T | undefined, (filter: SetStateAction<T | undefined>) => void];
+export const useDataViewFilter: <T extends DataViewFilterArtifact>(key: string) => [T | undefined, (filter: SetStateAction<T | undefined>) => void];
 
 // @public (undocumented)
 export const useDataViewFilterHandlerRegistry: () => DataViewFilterHandlerRegistry;
@@ -1031,7 +1031,7 @@ export const useDataViewGlobalKey: () => string;
 export const useDataViewHighlightIndex: () => number | null;
 
 // @public (undocumented)
-export const useDataViewKey: (props: Pick<DataViewProps, 'entities' | 'dataViewKey'>) => string;
+export const useDataViewKey: (props: Pick<DataViewProps, "entities" | "dataViewKey">) => string;
 
 // @public (undocumented)
 export const useDataViewKeyboardEventHandler: () => React_2.KeyboardEventHandler<Element>;
@@ -1080,13 +1080,13 @@ export const useDataViewRelationFilter: (name: string, entityId: EntityId_2) => 
 
 // @public (undocumented)
 export const useDataViewRelationFilterArgs: () => {
-    options: SugaredQualifiedEntityList_2['entities'];
+    options: SugaredQualifiedEntityList_2["entities"];
 };
 
 // @public (undocumented)
 export const useDataViewRelationFilterData: ({ name, children, options }: {
     name: string;
-    options: SugaredQualifiedEntityList_2['entities'];
+    options: SugaredQualifiedEntityList_2["entities"];
     children: ReactNode;
 }) => [UseEntityListSubTreeLoaderResult<unknown>, EntityListSubTreeLoaderState];
 

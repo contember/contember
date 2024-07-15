@@ -665,7 +665,7 @@ export namespace Environment {
     // (undocumented)
     export type Value = string | number | boolean | undefined | GraphQlLiteral | Filter | ReactElementLike;
     const // (undocumented)
-    createExtension: <S, R>(create: Extension<S, R>['create'], otherMethods?: Omit<Extension<S, R>, 'create'>) => Extension<S, R>;
+    createExtension: <S, R>(create: Extension<S, R>["create"], otherMethods?: Omit<Extension<S, R>, "create">) => Extension<S, R>;
     // (undocumented)
     export interface ValuesMapWithFactory {
         // (undocumented)
@@ -1361,9 +1361,9 @@ export class QueryLanguage {
     // (undocumented)
     static desugarEventListener<F extends Function>(listener: F | Set<F> | undefined): Set<F> | undefined;
     // (undocumented)
-    static desugarFilter: (input: string | Filter, environment: Environment) => Filter;
+    static desugarFilter: (input: string | Filter, environment: Environment) => Parser.ParserResult["filter"];
     // (undocumented)
-    static desugarOrderBy: (input: string | OrderBy, environment: Environment) => OrderBy;
+    static desugarOrderBy: (input: string | OrderBy, environment: Environment) => Parser.ParserResult["orderBy"];
     // (undocumented)
     static desugarParentEntityParameters(parentEntity: SugaredParentEntityParameters, environment: Environment): ParentEntityParameters;
     // (undocumented)
@@ -1383,13 +1383,13 @@ export class QueryLanguage {
     // (undocumented)
     static desugarSetOnCreate(setOnCreate: SugaredSetOnCreate, environment: Environment): UniqueWhere;
     // (undocumented)
-    static desugarTaggedMap: (input: string | ParsedTaggedMap, environment: Environment) => ParsedTaggedMap;
+    static desugarTaggedMap: (input: string | ParsedTaggedMap, environment: Environment) => Parser.ParserResult["taggedMap"];
     // (undocumented)
     static desugarUnconstrainedQualifiedEntityList({ entities, ...unsugarableEntityList }: SugaredUnconstrainedQualifiedEntityList, environment: Environment): UnconstrainedQualifiedEntityList;
     // (undocumented)
     static desugarUnconstrainedQualifiedSingleEntity({ entity, ...unsugarableSingleEntity }: SugaredUnconstrainedQualifiedSingleEntity, environment: Environment): UnconstrainedQualifiedSingleEntity;
     // (undocumented)
-    static desugarUniqueWhere: (input: string | UniqueWhere, environment: Environment) => UniqueWhere;
+    static desugarUniqueWhere: (input: string | UniqueWhere, environment: Environment) => Parser.ParserResult["uniqueWhere"];
 }
 
 // @public (undocumented)

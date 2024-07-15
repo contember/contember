@@ -4,8 +4,6 @@
 
 ```ts
 
-/// <reference types="react" />
-
 import { Context } from 'react';
 import { Editor } from 'slate';
 import { EditorElement } from '@contember/react-slate-editor-base';

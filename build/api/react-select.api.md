@@ -20,8 +20,8 @@ import { SugaredRelativeSingleField } from '@contember/react-binding';
 // @public (undocumented)
 export const MultiSelect: React_2.NamedExoticComponent<{
     children: ReactNode;
-    field: SugaredRelativeEntityList['field'];
-    options?: string | SugarableQualifiedEntityList | undefined;
+    field: SugaredRelativeEntityList["field"];
+    options?: SugaredQualifiedEntityList["entities"];
 } & SelectEvents>;
 
 // @public (undocumented)
@@ -34,8 +34,8 @@ export type MultiSelectProps = {
 // @public (undocumented)
 export const Select: React_2.NamedExoticComponent<{
     children: ReactNode;
-    field: SugaredRelativeSingleEntity['field'];
-    options?: string | SugarableQualifiedEntityList | undefined;
+    field: SugaredRelativeSingleEntity["field"];
+    options?: SugaredQualifiedEntityList["entities"];
 } & SelectEvents>;
 
 // @internal (undocumented)
@@ -113,10 +113,10 @@ export type SelectProps = {
 // @public (undocumented)
 export const SortableMultiSelect: React_2.NamedExoticComponent<{
     children: ReactNode;
-    field: SugaredRelativeEntityList['field'];
-    options?: string | SugarableQualifiedEntityList | undefined;
-    sortableBy: SugaredRelativeSingleField['field'];
-    connectAt: SugaredRelativeSingleEntity['field'];
+    field: SugaredRelativeEntityList["field"];
+    options?: SugaredQualifiedEntityList["entities"];
+    sortableBy: SugaredRelativeSingleField["field"];
+    connectAt: SugaredRelativeSingleEntity["field"];
 } & SelectEvents>;
 
 // @public (undocumented)

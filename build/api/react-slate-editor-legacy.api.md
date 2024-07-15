@@ -4,8 +4,6 @@
 
 ```ts
 
-/// <reference types="react" />
-
 import { ChildrenAnalyzer } from '@contember/react-multipass-rendering';
 import { ComponentType } from 'react';
 import { Context } from 'react';

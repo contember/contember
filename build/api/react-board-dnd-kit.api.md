@@ -4,8 +4,6 @@
 
 ```ts
 
-/// <reference types="react" />
-
 import { Active } from '@dnd-kit/core';
 import { BoardColumnNode } from '@contember/react-board';
 import { BoardItemNode } from '@contember/react-board';
@@ -48,7 +46,7 @@ export const BoardSortableColumnDragOverlay: ({ children }: {
 // @public (undocumented)
 export const BoardSortableColumnDropIndicator: ({ children, position }: {
     children: ReactNode;
-    position: 'before' | 'after';
+    position: "before" | "after";
 }) => JSX_2.Element | null;
 
 // @public (undocumented)
@@ -79,7 +77,7 @@ export const BoardSortableItemDragOverlay: ({ children }: {
 // @public (undocumented)
 export const BoardSortableItemDropIndicator: ({ children, position }: {
     children: ReactNode;
-    position: 'before' | 'after';
+    position: "before" | "after";
 }) => JSX_2.Element | null;
 
 // @public (undocumented)

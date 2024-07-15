@@ -4,8 +4,6 @@
 
 ```ts
 
-/// <reference types="react" />
-
 import { Active } from '@dnd-kit/core';
 import { ClientRect as ClientRect_2 } from '@dnd-kit/core';
 import { Context } from 'react';
@@ -38,7 +36,7 @@ export const RepeaterSortableDragOverlay: ({ children }: {
 // @public (undocumented)
 export const RepeaterSortableDropIndicator: ({ children, position }: {
     children: ReactNode;
-    position: 'before' | 'after';
+    position: "before" | "after";
 }) => JSX_2.Element | null;
 
 // @public (undocumented)

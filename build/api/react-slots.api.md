@@ -60,12 +60,12 @@ children: ReactNode;
 
 // @public (undocumented)
 export const SlotTarget: NamedExoticComponent<    {
-as?: ElementType | undefined;
+as?: ElementType;
 fallback?: ReactNode;
 name: string;
-aliases?: [string, ...string[]] | undefined;
-display?: boolean | "contents" | "block" | "flex" | "grid" | "inline" | "inline-flex" | "inline-grid" | "inline-block" | "inherit" | "initial" | "none" | "unset" | undefined;
-className?: string | undefined;
+aliases?: [string, ...string[]];
+display?: boolean | "contents" | "block" | "flex" | "grid" | "inline" | "inline-flex" | "inline-grid" | "inline-block" | "inherit" | "initial" | "none" | "unset";
+className?: string;
 }>;
 
 // @public (undocumented)
@@ -99,7 +99,7 @@ export const useSlotTargetElement: (name: string) => HTMLElement | null | undefi
 
 // @public
 export function useSlotTargetsFactory<R extends SlotTargetComponentsRecord<string>>(SlotTargets: R): <T>(slots: ReadonlyArray<keyof R & string>, override?: T) => NonNullable<T> | FunctionComponentElement<    {
-children?: ReactNode;
+children?: ReactNode | undefined;
 }> | null;
 
 // @public

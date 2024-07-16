@@ -22,9 +22,7 @@
 			}
 		},
 		"./index.css": {
-			"development": "./src/index.css",
-			"production": "./dist/assets/index.css",
-			"default": "./dist/assets/index.css"
+			"default": "./src/index.css"
 		}
 	},
 	"files": [
@@ -33,8 +31,6 @@
 	],
 	"typings": "./dist/types/index.d.ts",
 	"scripts": {
-		"build": "yarn build:js:dev && yarn build:js:prod && yarn build:css",
-		"build:css": "vite build --config vite.config.css.js",
 		"ae:build": "api-extractor run --local",
 		"ae:test": "api-extractor run"
 	},

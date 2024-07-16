@@ -24,10 +24,7 @@
 	},
 	"scripts": {
 		"generate": "gql-gen --config graphql.codegen.yml",
-		"test": "vitest --dir ./tests/cases",
-		"build": "yarn build:js:dev && yarn build:js:prod",
-		"build:js:dev": "NODE_ENV=development vite build --mode development",
-		"build:js:prod": "vite build --mode production"
+		"test": "vitest --dir ./tests/cases"
 	},
 	"dependencies": {
 		"@contember/authorization": "workspace:*",

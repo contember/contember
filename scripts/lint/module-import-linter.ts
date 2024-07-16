@@ -1,5 +1,3 @@
-import * as ts from 'typescript'
-import * as fs from 'fs/promises'
 import { join, normalize } from 'node:path'
 import glob from 'fast-glob'
 import * as fs from 'fs/promises'
@@ -16,6 +14,7 @@ const allowedUnused = new Set([
 	'pg',
 	'uuid',
 	'graphql',
+	'lodash-es,'
 ])
 
 const allowedDirectoryImports = new Set([

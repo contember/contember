@@ -6,10 +6,7 @@
 		"contember": "./dist/src/run.js"
 	},
 	"scripts": {
-		"build": "yarn build:js:dev && yarn build:js:prod && tailwindcss -i src/lib/project/docs/resources/style.css -o ./dist/src/utils/project/resources/out.css",
-		"test": "echo 'No tests'",
-		"build:js:dev": "NODE_ENV=development vite build --mode development",
-		"build:js:prod": "vite build --mode production"
+		"build": "tailwindcss -i src/lib/project/docs/resources/style.css -o ./dist/src/utils/project/resources/out.css"
 	},
 	"devDependencies": {
 		"@types/fs-extra": "^11.0.4",
@@ -41,6 +38,7 @@
 		"graphql": "^16.8.1",
 		"graphql-request": "^6.1.0",
 		"js-yaml": "^4.1.0",
+		"lodash-es": "^4.17.21",
 		"pg": "^8.11.3",
 		"preact": "^10.19.2",
 		"preact-render-to-string": "^6.3.1",

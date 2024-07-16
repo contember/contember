@@ -23,10 +23,7 @@
 		}
 	},
 	"scripts": {
-		"test": "echo 'No tests'",
-		"build": "yarn build:js:dev && yarn build:js:prod",
-		"build:js:dev": "NODE_ENV=development vite build --mode development",
-		"build:js:prod": "vite build --mode production"
+		"test": "echo 'No tests'"
 	},
 	"dependencies": {
 		"@contember/engine-plugins": "workspace:*",

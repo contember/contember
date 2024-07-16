@@ -22,12 +22,6 @@
 			}
 		}
 	},
-	"scripts": {
-		"test": "echo 'No tests'",
-		"build": "yarn build:js:dev && yarn build:js:prod",
-		"build:js:dev": "NODE_ENV=development vite build --mode development",
-		"build:js:prod": "vite build --mode production"
-	},
 	"devDependencies": {
 		"@types/js-yaml": "^4.0.9",
 		"@types/node": "^20.9.0",

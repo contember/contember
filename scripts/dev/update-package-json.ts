@@ -7,25 +7,22 @@ const packages = [
 	...fs.readdirSync(join(root, 'packages')).map(it => `packages/${it}`),
 ]
 
+// only if value matches
+const scriptsToDelete = {
+		"build": "yarn build:js:dev && yarn build:js:prod",
+		"build:js:dev": "NODE_ENV=development vite build --mode development",
+		"build:js:prod": "vite build --mode production",
+		"test": "vitest"
+}
+
 const updatePackageJson = (packageJson: any, packageDir: string) => {
-	if (packageJson.exports?.['.']?.require) {
-		return {
-			...packageJson,
-			exports: {
-				...packageJson.exports,
-				'.': {
-					...packageJson.exports['.'],
-					require: {
-						"types": "./dist/types/index.d.ts",
-						"development": "./dist/development/index.cjs",
-						"production": "./dist/production/index.cjs",
-						"typescript": "./src/index.ts",
-						"default": "./dist/production/index.cjs"
-					}
-				},
-			},
+	// delete scripts
+	for (const [key, value] of Object.entries(scriptsToDelete)) {
+		if (packageJson.scripts && packageJson.scripts[key] === value) {
+			delete packageJson.scripts[key]
 		}
 	}
+
 	return packageJson
 }
 

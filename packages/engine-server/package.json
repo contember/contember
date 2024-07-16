@@ -5,10 +5,7 @@
 	"main": "./dist/production/index.js",
 	"typings": "./dist/types/index.d.ts",
 	"scripts": {
-		"test-e2e": "vitest --dir ./tests/e2e",
-		"build": "yarn build:js:dev && yarn build:js:prod",
-		"build:js:dev": "NODE_ENV=development vite build --mode development",
-		"build:js:prod": "vite build --mode production"
+		"test-e2e": "vitest --dir ./tests/e2e"
 	},
 	"exports": {
 		".": {
@@ -39,11 +36,8 @@
 		"uuid": "^9.0.1"
 	},
 	"devDependencies": {
-		"@contember/engine-api-tester": "workspace:*",
 		"@types/koa-compress": "^4.0.6",
-		"@types/node": "^20.9.0",
-		"@types/supertest": "^2.0.16",
-		"supertest": "^6.3.3"
+		"@types/node": "^20.9.0"
 	},
 	"type": "module",
 	"files": [

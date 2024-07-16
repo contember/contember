@@ -22,11 +22,7 @@
 		}
 	},
 	"scripts": {
-		"generate": "gql-gen --config graphql-actions.codegen.yml",
-		"test": "vitest",
-		"build": "yarn build:js:dev && yarn build:js:prod",
-		"build:js:dev": "NODE_ENV=development vite build --mode development",
-		"build:js:prod": "vite build --mode production"
+		"generate": "gql-gen --config graphql-actions.codegen.yml"
 	},
 	"dependencies": {
 		"@contember/authorization": "workspace:*",

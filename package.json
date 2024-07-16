@@ -4,6 +4,9 @@
 	"packageManager": "yarn@3.5.1",
 	"private": true,
 	"scripts": {
+		"vite:build": "yarn build:js:dev && yarn build:js:prod",
+		"vite:build:js:dev": "NODE_ENV=development vite build --mode development",
+		"vite:build:js:prod": "vite build --mode production",
 		"pre-build": "yarn workspaces foreach -pt run pre-build",
 		"build": "yarn run pre-build && yarn run ts:build && yarn workspaces foreach -pt run build",
 		"clean": "yarn run clean:generated && yarn run clean:dependencies",
@@ -13,8 +16,10 @@
 		"eslint:fix": "eslint --fix \"**/*.{ts,tsx}\" ",
 		"eslint:lint": "eslint \"**/*.{ts,tsx}\" ",
 		"start": "docker-compose up --detach && yarn run contember migrations:execute . --yes",
-		"test": "yarn workspaces foreach -pt run test --run",
-		"test-e2e": "yarn workspaces foreach run test-e2e",
+		"test:browser": "vitest --project browser",
+		"test:node": "vitest --project node",
+		"test:db": "vitest --project db",
+		"test:e2e": "vitest --config ./vitest.workspace.ts",
 		"ts:build": "tsc --build",
 		"ts:watch": "tsc --build --watch",
 		"ts:clean": "tsc --build --clean",
@@ -45,11 +50,12 @@
 		"json5": "^2.2.3",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1",
+		"supertest": "^7.0.0",
 		"tsx": "^4.10.5",
 		"typedoc": "^0.25.13",
 		"typescript": "^5.4.5",
 		"vite": "^5.2.11",
-		"vitest": "^1.6.0"
+		"vitest": "^2.0.3"
 	},
 	"workspaces": [
 		"packages/*"

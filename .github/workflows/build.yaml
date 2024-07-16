@@ -40,11 +40,11 @@ jobs:
           - job_name: build
             run_script: yarn run build
 
-#          - job_name: api-exporter
-#            run_script: |
-#              yarn run pre-build
-#              yarn run ts:build
-#              yarn run ae:test
+          - job_name: api-exporter
+            run_script: |
+              yarn run pre-build
+              yarn run ts:build
+              yarn run ae:test
 
           - job_name: lint-imports
             run_script: yarn tsx ./scripts/lint/module-import-linter.ts
@@ -80,8 +80,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-#        postgres: [ 12, 13, 14, 15, 16 ]
-        postgres: [ 15 ]
+        postgres: [ 12, 13, 14, 15, 16 ]
     services:
       postgres:
         image: postgres:${{ matrix.postgres }}
@@ -114,7 +113,8 @@ jobs:
           CONTEMBER_LOGIN_TOKEN: '1111111111111111111111111111111111111111'
       - name: "Build app"
         run: |
-          scripts/server/server-build.sh
+          mkdir --parent server
+          node packages/engine-server/esbuild.cjs
 
       - name: Start server
         run: ./e2e/start-server.sh

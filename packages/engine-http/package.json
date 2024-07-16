@@ -5,7 +5,7 @@
 	"main": "./dist/production/index.js",
 	"typings": "./dist/types/index.d.ts",
 	"scripts": {
-		"test": "vitest --dir ./tests/cases && yarn build:js:prod && node --expose-gc ./tests/cases/unit/contentApiSpecificCache.tst.js"
+		"test": "node --expose-gc ./tests/cases/unit/contentApiSpecificCache.tst.js"
 	},
 	"exports": {
 		".": {

@@ -22,9 +22,6 @@
 			}
 		}
 	},
-	"scripts": {
-		"test": "echo 'No tests'"
-	},
 	"dependencies": {
 		"@contember/engine-plugins": "workspace:*",
 		"@contember/typesafe": "workspace:*"

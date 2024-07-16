@@ -1,5 +1,6 @@
 import { join } from "node:path";
-import { packages, rootDirectory } from "./packages.js";
+// @ts-ignore
+import { packages, rootDirectory } from "./packages";
 
 export const resolveConfig = {
 	dedupe: ['graphql'],

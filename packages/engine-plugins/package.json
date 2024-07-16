@@ -22,9 +22,6 @@
 			}
 		}
 	},
-	"scripts": {
-		"test": "echo 'No tests'"
-	},
 	"dependencies": {
 		"@contember/database-migrations": "workspace:*",
 		"@contember/engine-http": "workspace:*"

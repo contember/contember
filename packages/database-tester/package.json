@@ -25,9 +25,6 @@
 	"dependencies": {
 		"@contember/database": "workspace:*"
 	},
-	"scripts": {
-		"test": "echo 'No tests'"
-	},
 	"peerDependencies": {
 		"pg": "^8.9.0"
 	},

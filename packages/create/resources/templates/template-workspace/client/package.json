@@ -8,9 +8,6 @@
       "import": "./dist/src/index.js"
     }
   },
-  "scripts": {
-    "test": "echo \"No test\""
-  },
   "private": true,
   "type": "module"
 }

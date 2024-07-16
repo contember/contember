@@ -28,7 +28,6 @@
 	],
 	"typings": "./dist/types/index.d.ts",
 	"scripts": {
-		"build:js:dev": "vite build --mode development",
 		"ae:build": "api-extractor run --local",
 		"ae:test": "api-extractor run"
 	},

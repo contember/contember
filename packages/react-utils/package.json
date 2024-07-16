@@ -29,8 +29,7 @@
 	"typings": "./dist/types/index.d.ts",
 	"scripts": {
 		"ae:build": "api-extractor run --local",
-		"ae:test": "api-extractor run",
-		"test": "vitest --environment jsdom"
+		"ae:test": "api-extractor run"
 	},
 	"peerDependencies": {
 		"react": "^18 || ^19"

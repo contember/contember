@@ -22,9 +22,6 @@
 			}
 		}
 	},
-	"scripts": {
-		"test": "vitest --dir ./tests/cases"
-	},
 	"dependencies": {
 		"@contember/database": "workspace:*",
 		"@contember/database-migrations": "workspace:*",

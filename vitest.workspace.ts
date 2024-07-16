@@ -25,6 +25,14 @@ export default defineWorkspace([
 			exclude: ['packages/react-*/tests/**/*.test.{ts,tsx}', 'packages/*/tests/cases/db/**/*.test.ts'],
 			name: 'node',
 			environment: 'node',
+			// pool: 'vmThreads',
+		},
+		resolve: resolveConfig,
+	},
+	{
+		test: {
+			name: 'e2e',
+			include: ['e2e/**/*.test.ts'],
 		},
 		resolve: resolveConfig,
 	},

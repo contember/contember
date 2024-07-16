@@ -23,8 +23,7 @@
 		}
 	},
 	"scripts": {
-		"generate": "gql-gen --config graphql.codegen.yml",
-		"test": "vitest --dir ./tests/cases"
+		"generate": "gql-gen --config graphql.codegen.yml"
 	},
 	"dependencies": {
 		"@contember/database": "workspace:*",

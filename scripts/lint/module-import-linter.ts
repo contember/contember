@@ -14,7 +14,7 @@ const allowedUnused = new Set([
 	'pg',
 	'uuid',
 	'graphql',
-	'lodash-es,'
+	'lodash-es'
 ])
 
 const allowedDirectoryImports = new Set([

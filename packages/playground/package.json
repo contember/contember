@@ -7,8 +7,7 @@
 		"build": "vite build admin",
 		"contember": "docker-compose run contember-cli",
 		"deploy": "yarn run build \"$0\" && docker-compose run --no-deps contember-cli deploy \"$@\" --root ",
-		"start": "vite dev admin --port ${VITE_PORT:-3000} --host 0.0.0.0",
-		"test": "vitest --root ./ --environment jsdom"
+		"start": "vite dev admin --port ${VITE_PORT:-3000} --host 0.0.0.0"
 	},
 	"devDependencies": {
 		"@contember/binding": "workspace:*",

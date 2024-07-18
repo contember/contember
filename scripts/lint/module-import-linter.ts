@@ -14,7 +14,8 @@ const allowedUnused = new Set([
 	'pg',
 	'uuid',
 	'graphql',
-	'lodash-es'
+	'lodash-es',
+	'graphql-ts-client-api',
 ])
 
 const allowedDirectoryImports = new Set([
@@ -33,7 +34,7 @@ const allowedDirectoryImports = new Set([
 ])
 
 const processPackage = async (dir: string, projectList: ProjectList) => {
-	const files = await glob(`${dir}/src/**/*.{ts,tsx}`, { onlyFiles: true })
+	const files = await glob([`${dir}/src/**/*.{ts,tsx}`, `!${dir}/src/generated/**`], { onlyFiles: true })
 	const contents = await Promise.all(files.map(async (it): Promise<[file: string, content: string]> => [it, await fs.readFile(it, 'utf-8')]))
 	const imports = new Set<string>()
 	const errors: { file: string; message: string, type: string }[] = []

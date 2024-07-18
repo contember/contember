@@ -82,6 +82,10 @@ jobs:
       matrix:
         postgres: [ 12, 13, 14, 15, 16 ]
     services:
+      mailhog:
+        image: mailhog/mailhog
+        ports:
+          - 8025:8025
       postgres:
         image: postgres:${{ matrix.postgres }}
         env:
@@ -134,3 +138,4 @@ jobs:
           CONTEMBER_API_URL: "http://localhost:4000"
           CONTEMBER_ROOT_TOKEN: '0000000000000000000000000000000000000000'
           CONTEMBER_LOGIN_TOKEN: '1111111111111111111111111111111111111111'
+          MAILHOG_URL: "http://localhost:8025"

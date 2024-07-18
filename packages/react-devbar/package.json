@@ -25,10 +25,6 @@
 			"default": "./src/index.css"
 		}
 	},
-	"files": [
-		"dist/",
-		"src/"
-	],
 	"typings": "./dist/types/index.d.ts",
 	"scripts": {
 		"ae:build": "api-extractor run --local",

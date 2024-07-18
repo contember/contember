@@ -26,10 +26,6 @@
 			}
 		}
 	},
-	"files": [
-		"dist/",
-		"src/"
-	],
 	"typings": "./dist/types/index.d.ts",
 	"scripts": {
 		"build": "chmod +x ./dist/production/generate.cjs",

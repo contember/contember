@@ -29,9 +29,5 @@
 	"peerDependencies": {
 		"graphql": ">= 14.6.0"
 	},
-	"type": "module",
-	"files": [
-		"dist/",
-		"src/"
-	]
+	"type": "module"
 }

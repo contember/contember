@@ -29,9 +29,5 @@
 	"dependencies": {
 		"js-yaml": "^4.1.0"
 	},
-	"type": "module",
-	"files": [
-		"dist/",
-		"src/"
-	]
+	"type": "module"
 }

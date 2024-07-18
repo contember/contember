@@ -21,10 +21,6 @@
 			}
 		}
 	},
-	"files": [
-		"dist/",
-		"src/"
-	],
 	"typings": "./dist/types/index.d.ts",
 	"type": "module",
 	"sideEffects": false,

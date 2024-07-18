@@ -28,9 +28,5 @@
 	"peerDependencies": {
 		"pg": "^8.9.0"
 	},
-	"type": "module",
-	"files": [
-		"dist/",
-		"src/"
-	]
+	"type": "module"
 }

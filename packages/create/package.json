@@ -33,9 +33,5 @@
 				"default": "./dist/production/index.cjs"
 			}
 		}
-	},
-	"files": [
-		"dist/",
-		"src/"
-	]
+	}
 }

@@ -55,9 +55,5 @@
 		"graphql": ">= 14.6.0",
 		"pg": "^8.5.0"
 	},
-	"type": "module",
-	"files": [
-		"dist/",
-		"src/"
-	]
+	"type": "module"
 }

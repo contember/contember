@@ -28,9 +28,5 @@
 	"dependencies": {
 		"@contember/logger": "workspace:*"
 	},
-	"type": "module",
-	"files": [
-		"dist/",
-		"src/"
-	]
+	"type": "module"
 }

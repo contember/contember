@@ -23,10 +23,6 @@
 		}
 	},
 	"typings": "./dist/types/index.d.ts",
-	"files": [
-		"dist/",
-		"src/"
-	],
 	"peerDependencies": {
 		"vite": "^4 || ^5"
 	}

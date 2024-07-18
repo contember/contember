@@ -36,9 +36,5 @@
 		"@types/koa-compress": "^4.0.6",
 		"@types/node": "^20.9.0"
 	},
-	"type": "module",
-	"files": [
-		"dist/",
-		"src/"
-	]
+	"type": "module"
 }

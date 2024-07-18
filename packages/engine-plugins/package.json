@@ -33,9 +33,5 @@
 	"devDependencies": {
 		"graphql": "^16.8.1"
 	},
-	"type": "module",
-	"files": [
-		"dist/",
-		"src/"
-	]
+	"type": "module"
 }

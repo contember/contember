@@ -30,9 +30,5 @@
 	"dependencies": {
 		"chalk": "^4.1.2"
 	},
-	"type": "module",
-	"files": [
-		"dist/",
-		"src/"
-	]
+	"type": "module"
 }

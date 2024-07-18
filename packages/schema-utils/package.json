@@ -30,9 +30,5 @@
 		"@contember/schema-definition": "workspace:*",
 		"@types/node": "^20.9.0"
 	},
-	"type": "module",
-	"files": [
-		"dist/",
-		"src/"
-	]
+	"type": "module"
 }

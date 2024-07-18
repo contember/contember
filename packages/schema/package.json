@@ -25,9 +25,5 @@
 	"scripts": {
 		"test": "echo 'No tests'"
 	},
-	"type": "module",
-	"files": [
-		"dist/",
-		"src/"
-	]
+	"type": "module"
 }

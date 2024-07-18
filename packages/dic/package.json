@@ -22,9 +22,5 @@
 			}
 		}
 	},
-	"type": "module",
-	"files": [
-		"dist/",
-		"src/"
-	]
+	"type": "module"
 }

@@ -103,7 +103,7 @@ const executeMigrations = async (projectSlug: string, modifications: Migration.M
 }
 
 export const createTester = async (schema: Schema) => {
-	const projectSlug = 'test_' + Date.now()
+	const projectSlug = 'test_' + Math.random().toString(36).slice(2)
 	await createProject(projectSlug)
 	const migrations = createMigrations(schema)
 	await executeMigrations(projectSlug, migrations)

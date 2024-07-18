@@ -21,7 +21,4 @@ very quickly and are happy to provide any guidance.
 
 ### Local development setup
 1. Install [yarn classic](https://classic.yarnpkg.com/en/docs/install) or [yarn v3](https://yarnpkg.com/getting-started/install) if you haven't already.
-2. Run `yarn install`
-3. Run `docker-compose up`
-4. Run `test -f docker-compose.override.yaml || cp docker-compose.override.dist.yaml docker-compose.override.yaml`
-5. Run `yarn contember migrations:execute`
+2. Run `./start.sh` to start the development environment.

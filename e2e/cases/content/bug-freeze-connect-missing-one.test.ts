@@ -1,7 +1,6 @@
 import { test } from 'vitest'
-import { SchemaDefinition as def } from '@contember/schema-definition'
-import { GQL } from '../../../../src/tags'
-import { executeDbTest } from '@contember/engine-api-tester'
+import { createSchema, SchemaDefinition as def } from '@contember/schema-definition'
+import { createTester, gql } from '../../src/tester'
 
 namespace Model {
 	@def.Unique('url')
@@ -17,9 +16,9 @@ namespace Model {
 	}
 }
 test('create redirect to non-existing target', async () => {
-	await executeDbTest({
-		schema: { model: def.createModel(Model) },
-		query: GQL`
+	const tester = await createTester(createSchema(Model))
+
+	await tester(gql`
 		mutation {
   createRedirect(
     data: {
@@ -31,16 +30,16 @@ test('create redirect to non-existing target', async () => {
     errorMessage
   }
 }
-		`,
-		seed: [],
-		expectDatabase: {},
-		return: {
-			createRedirect: {
-				ok: false,
-				errorMessage: 'Execution has failed:\ninternalUrl: NotFoundOrDenied (for input {"url":"abcd"})',
+		`)
+		.expect(200)
+		.expect({
+			data: {
+				createRedirect: {
+					ok: false,
+					errorMessage: 'Execution has failed:\ninternalUrl: NotFoundOrDenied (for input {"url":"abcd"})',
+				},
 			},
-		},
-	})
+		})
 })
 
 

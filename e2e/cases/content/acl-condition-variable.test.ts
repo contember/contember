@@ -1,7 +1,7 @@
 import { assert, test } from 'vitest'
-import { createTester, gql } from '../src/tester'
+import { createTester, gql } from '../../src/tester'
 import { createSchema, SchemaDefinition as def, AclDefinition as acl } from '@contember/schema-definition'
-import { addProjectMember, signIn, signUp } from '../src/requests'
+import { addProjectMember, signIn, signUp } from '../../src/requests'
 
 namespace ArticleModel {
 	export const readerRole = acl.createRole('reader')

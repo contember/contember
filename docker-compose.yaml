@@ -14,7 +14,7 @@ services:
     volumes:
       - .:/src:cached
 
-  test-e2e:
+  test:
     image: node:20-alpine
     working_dir: /src
     volumes:
@@ -26,9 +26,8 @@ services:
       CONTEMBER_API_URL: 'http://engine:4000'
       CONTEMBER_ROOT_TOKEN: '0000000000000000000000000000000000000000'
       CONTEMBER_LOGIN_TOKEN: '1111111111111111111111111111111111111111'
-    command:
-      - yarn
-      - test:e2e
+      MAILHOG_URL: 'http://mailhog:8025'
+    entrypoint: yarn
   engine:
     image: oven/bun:canary
     working_dir: /src

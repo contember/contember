@@ -9,7 +9,7 @@ import {
 	SchemaMigrator, VERSION_LATEST,
 } from '@contember/schema-migrations'
 import { emptySchema } from '@contember/schema-utils'
-import { assert } from 'vitest'
+import { afterEach, assert, beforeEach } from 'vitest'
 
 
 export const rootToken = String(process.env.CONTEMBER_ROOT_TOKEN)
@@ -37,7 +37,7 @@ export const executeGraphql = (
 		})
 	result.on('error', e => {
 		// eslint-disable-next-line no-console
-		// console.error(e)
+		console.error(e)
 	})
 	result.on('response', e => {
 		if ('extensions' in e.body) {
@@ -114,8 +114,10 @@ const executeMigrations = async (projectSlug: string, modifications: Migration.M
 		})
 }
 
+export const rand = () => Math.random().toString(36).slice(2)
+
 export const createTester = async (schema: Schema) => {
-	const projectSlug = 'test_' + Math.random().toString(36).slice(2)
+	const projectSlug = 'test_' + rand()
 	await createProject(projectSlug)
 	const migrations = createMigrations(schema)
 	await executeMigrations(projectSlug, migrations)
@@ -128,3 +130,23 @@ export const createTester = async (schema: Schema) => {
 	queryCb.projectSlug = projectSlug
 	return queryCb
 }
+
+export const consumeMails = async () => {
+	const messages = await (await fetch(mailHogUrl + '/api/v1/messages')).json()
+	await fetch(mailHogUrl + '/api/v1/messages', {
+		method: 'DELETE',
+	})
+	return messages
+}
+
+
+const mailHogUrl = String(process.env.MAILHOG_URL)
+
+beforeEach(async () => {
+	await consumeMails()
+})
+
+afterEach(async () => {
+	const mailhogMessages = await consumeMails()
+	assert.deepStrictEqual(mailhogMessages, [])
+})

@@ -1,6 +1,9 @@
 import { executeGraphql, gql, loginToken } from './tester'
 import { assert } from 'vitest'
 import { Acl } from '@contember/schema'
+import { MembershipInput } from '../../packages/engine-tenant-api/src/schema'
+import { GraphQLTestQuery } from '../../packages/engine-tenant-api/tests/cases/integration/mocked/gql/types'
+import { GQL } from '../../packages/engine-tenant-api/tests/src/tags'
 
 export const signIn = async (email: string, password = '123456'): Promise<string> => {
 	const response = await executeGraphql(
@@ -78,4 +81,32 @@ export const addProjectMember = async (identityId: string, projectSlug: string, 
 		.expect(response => {
 			assert.deepStrictEqual(response.body.data, { addProjectMember: { ok: true, error: null } })
 		})
+}
+
+export const invite = async (variables: {
+	email: string
+	projectSlug: string
+	memberships: MembershipInput[]
+	method?: string
+}, { authorizationToken }: {authorizationToken?: string} = {}) => {
+	return await executeGraphql(
+		'/tenant',
+		gql`mutation($email: String!, $projectSlug: String!, $memberships: [MembershipInput!]!, $method: InviteMethod) {
+			invite(email: $email, projectSlug: $projectSlug, memberships: $memberships, options: {method: $method}) {
+				ok
+				errors {
+					code
+				}
+				result {
+					person {
+						id
+						identity {
+							id
+						}
+					}
+				}
+			}
+		}`,
+		{ variables, authorizationToken },
+	)
 }

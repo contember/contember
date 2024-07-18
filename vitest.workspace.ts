@@ -33,6 +33,7 @@ export default defineWorkspace([
 		test: {
 			name: 'e2e',
 			include: ['e2e/**/*.test.ts'],
+			fileParallelism: false,
 		},
 		resolve: resolveConfig,
 	},

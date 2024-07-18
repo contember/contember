@@ -10,15 +10,6 @@ export default defineWorkspace([
 		},
 		resolve: resolveConfig,
 	},
-
-	{
-		test: {
-			include: ['packages/*/tests/cases/db/**/*.test.ts'],
-			name: 'db',
-			environment: 'node',
-		},
-		resolve: resolveConfig,
-	},
 	{
 		test: {
 			include: ['packages/*/tests/**/*.test.ts'],

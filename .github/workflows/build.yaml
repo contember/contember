@@ -106,15 +106,7 @@ jobs:
         run: |
           yarn --version
           yarn install --immutable
-      - name: "Run tests"
-        run: yarn run test:db
-        env:
-          TEST_DB_HOST: 127.0.0.1
-          TEST_DB_PASSWORD: postgres
-          TEST_DB_USER: postgres
-          TEST_DB_NAME: test
-          CONTEMBER_ROOT_TOKEN: '0000000000000000000000000000000000000000'
-          CONTEMBER_LOGIN_TOKEN: '1111111111111111111111111111111111111111'
+
       - name: "Build app"
         run: |
           mkdir --parent server

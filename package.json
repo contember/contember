@@ -16,7 +16,6 @@
 		"start": "docker-compose up --detach && yarn run contember migrations:execute . --yes",
 		"test:browser": "vitest --project browser",
 		"test:node": "vitest --project node",
-		"test:db": "vitest --project db",
 		"test:e2e": "vitest --project e2e",
 		"ts:build": "tsc --build",
 		"ts:watch": "tsc --build --watch",

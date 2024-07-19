@@ -61,7 +61,7 @@ The `useRedirect` hook allows you to programmatically navigate to a different pa
 To use `useRedirect`, you can call the hook in your function component, and then use the returned callback function to navigate to the desired page.
 
 ```typescript jsx
-import { useRedirect } from '@contember/admin'
+import { useRedirect } from '@contember/interface'
 
 const MyComponent = () => {
 	const redirect = useRedirect()

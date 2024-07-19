@@ -9,25 +9,22 @@ Data binding refers to the process of binding data from a GraphQL server to a Re
 
 ## DataBinding provider
 
-In order to use data binding components in your application, you must be within a DataBindingProvider context. This context is automatically created by entity-aware pages such as `EditPage` or `ListPage`, but you can also create it manually by wrapping your component tree with a `DataBindingProvider` component.
+To use data binding components in your application, they must be placed within a **Binding** component, which serves as a **DataBindingProvider** context. This setup is crucial for enabling data management and providing UI state management. Note that the **Binding** component is part of the pre-installed UI library in Contember.
 
 ```typescript jsx
-import { DataBindingProvider, FeedbackRenderer, GenericPage } from '@contember/admin'
+import { Binding } from "@app/lib/binding";
 
 export default () => {
 	return (
-		<GenericPage>
-			<DataBindingProvider stateComponent={FeedbackRenderer}>
-				{/*databinding components here*/}
-			</DataBindingProvider>
-		</GenericPage>
+    <Binding>
+      {/*databinding components here*/}
+    </Binding>
 	)
 }
-
 ```
 
 ## Entity subtree context
-In addition to the `DataBindingProvider` context, you must also be within an entity context in order to use data binding components. Entity-aware pages such as `EditPage` or `ListPage` automatically create an entity context.
+In addition to the `DataBindingProvider` context, you must also be within an entity context in order to use data binding components.
 
 In a single DataBindingProvider context, there might be many entity subtrees. Usually, the entity-aware pages creates a single entity subtree (or entity list subtree). Others subtrees may be created by component as `SelectField`.
 

@@ -16,6 +16,9 @@
 	"type": "module",
 	"main": "./dist/production/index.js",
 	"typings": "./dist/types/index.d.ts",
+	"scripts": {
+		"pre-build": "cp --recursive ../react-ui-lib/src ./resources/templates/template-workspace/admin/lib && rm ./resources/templates/template-workspace/admin/lib/index.ts ./resources/templates/template-workspace/admin/lib/tsconfig.json"
+	},
 	"exports": {
 		".": {
 			"import": {

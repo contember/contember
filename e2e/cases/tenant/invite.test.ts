@@ -1,9 +1,7 @@
-import { test, assert } from 'vitest'
-import { Acl, Schema } from '@contember/schema'
-import { emptySchema } from '@contember/schema-utils'
+import { assert, test } from 'vitest'
+import { Acl } from '@contember/schema'
 import { consumeMails, createTester, gql, rand } from '../../src/tester'
 import { addProjectMember, invite, signIn, signUp } from '../../src/requests'
-import { testUuid } from '@contember/engine-api-tester'
 import { c, createSchema } from '@contember/schema-definition'
 
 namespace Model {

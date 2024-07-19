@@ -2,10 +2,10 @@ import { assert, describe, expect, test } from 'vitest'
 import { WebhookTargetHandler } from '../../../src/dispatch/WebhookTargetHandler'
 import { FetcherResponse } from '../../../src/dispatch/WebhookFetcher'
 import { createLogger, Logger, TestLoggerHandler } from '@contember/logger'
-import { testUuid } from '@contember/engine-api-tester'
 import { EventRow } from '../../../src/model/types'
 import { Actions, ActionsPayload } from '@contember/schema'
 import { HandledEvent } from '../../../src/dispatch/types'
+import { testUuid } from '../../src/uuid'
 
 
 const now = new Date('2024-06-20T12:00:00Z')

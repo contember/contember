@@ -1,14 +1,43 @@
 import { emptyDatabaseMetadata } from '@contember/database'
 import migration from '../../../src/migrations/2020-05-06-150000-composed-primary'
 import { createMigrationBuilder } from '@contember/database-migrations'
-import { sampleProject } from '@contember/engine-api-tester'
-import { test, assert } from 'vitest'
+import { assert, test } from 'vitest'
+import { c, createSchema } from '@contember/schema-definition'
+
+namespace SampleProject {
+	export class Author {
+		name = c.stringColumn()
+		contact = c.oneHasOne(AuthorContact, 'author')
+		posts = c.oneHasMany(Post, 'author')
+	}
+
+	export class AuthorContact {
+		email = c.stringColumn()
+		author = c.oneHasOneInverse(Author, 'contact')
+	}
+
+	export class Post {
+		title = c.stringColumn()
+		content = c.stringColumn()
+		author = c.manyHasOne(Author, 'posts')
+		tags = c.manyHasMany(Tag, 'posts')
+	}
+
+	export class Tag {
+		label = c.stringColumn()
+		posts = c.manyHasManyInverse(Post, 'tags')
+	}
+
+	export class Entry {
+		number = c.intColumn()
+	}
+}
 
 test('many-has-many-primary migration sql', async () => {
 	const builder = createMigrationBuilder()
 	await migration(builder, {
 		connection: undefined as any,
-		schemaResolver: () => Promise.resolve(sampleProject),
+		schemaResolver: () => Promise.resolve(createSchema(SampleProject)),
 		databaseMetadataResolver: () => Promise.resolve(emptyDatabaseMetadata),
 		project: {
 			slug: 'test',

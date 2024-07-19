@@ -132,9 +132,6 @@
 			"path": "./packages/dic"
 		},
 		{
-			"path": "./packages/engine-api-tester"
-		},
-		{
 			"path": "./packages/engine-actions"
 		},
 		{

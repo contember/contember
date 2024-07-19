@@ -1,7 +1,7 @@
 import { describe, it, assert } from 'vitest'
 import { createAclVariables } from '../../../src'
 import { Acl } from '@contember/schema'
-import { testUuid } from '@contember/engine-api-tester'
+import { testUuid } from '../../src/testUuid'
 
 describe('create acl variables', () => {
 

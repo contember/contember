@@ -945,7 +945,6 @@ __metadata:
     "@contember/authorization": "workspace:*"
     "@contember/database": "workspace:*"
     "@contember/database-migrations": "workspace:*"
-    "@contember/engine-api-tester": "workspace:*"
     "@contember/engine-common": "workspace:*"
     "@contember/engine-content-api": "workspace:*"
     "@contember/engine-http": "workspace:*"
@@ -971,27 +970,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@contember/engine-api-tester@workspace:*, @contember/engine-api-tester@workspace:packages/engine-api-tester":
-  version: 0.0.0-use.local
-  resolution: "@contember/engine-api-tester@workspace:packages/engine-api-tester"
-  dependencies:
-    "@contember/database": "workspace:*"
-    "@contember/database-migrations": "workspace:*"
-    "@contember/engine-content-api": "workspace:*"
-    "@contember/engine-system-api": "workspace:*"
-    "@contember/logger": "workspace:*"
-    "@contember/schema": "workspace:*"
-    "@contember/schema-definition": "workspace:*"
-    "@contember/schema-migrations": "workspace:*"
-    "@contember/schema-utils": "workspace:*"
-    "@types/node": ^20.9.0
-    graphql: ^16.8.1
-    pg: ^8.11.3
-  peerDependencies:
-    pg: ^8.9.0
-  languageName: unknown
-  linkType: soft
-
 "@contember/engine-common@workspace:*, @contember/engine-common@workspace:packages/engine-common":
   version: 0.0.0-use.local
   resolution: "@contember/engine-common@workspace:packages/engine-common"
@@ -1008,7 +986,6 @@ __metadata:
     "@contember/database": "workspace:*"
     "@contember/database-tester": "workspace:*"
     "@contember/dic": "workspace:*"
-    "@contember/engine-api-tester": "workspace:*"
     "@contember/graphql-utils": "workspace:*"
     "@contember/logger": "workspace:*"
     "@contember/schema": "workspace:*"
@@ -1134,7 +1111,6 @@ __metadata:
     "@contember/database": "workspace:*"
     "@contember/database-migrations": "workspace:*"
     "@contember/dic": "workspace:*"
-    "@contember/engine-api-tester": "workspace:*"
     "@contember/graphql-utils": "workspace:*"
     "@contember/logger": "workspace:*"
     "@contember/queryable": "workspace:*"

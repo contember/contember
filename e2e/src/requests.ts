@@ -2,8 +2,6 @@ import { executeGraphql, gql, loginToken } from './tester'
 import { assert } from 'vitest'
 import { Acl } from '@contember/schema'
 import { MembershipInput } from '../../packages/engine-tenant-api/src/schema'
-import { GraphQLTestQuery } from '../../packages/engine-tenant-api/tests/cases/integration/mocked/gql/types'
-import { GQL } from '../../packages/engine-tenant-api/tests/src/tags'
 
 export const signIn = async (email: string, password = '123456'): Promise<string> => {
 	const response = await executeGraphql(

@@ -3,8 +3,8 @@ import * as React from 'react'
 import { ReactNode } from 'react'
 import { TableCell, TableHead } from '../ui/table'
 import { DataGridColumnHeader } from './column-header'
-import { DataViewElement } from '@contember/react-dataview'
-import { formatBoolean, formatDate, formatNumber } from '../formatting'
+import { DataViewElement, DataViewEnumFilter } from '@contember/react-dataview'
+import { formatBoolean, formatDate, formatDateTime, formatNumber } from '../formatting'
 import { DataGridEnumCell, DataGridHasManyCell, DataGridHasManyCellProps, DataGridHasOneCell, DataGridHasOneCellProps } from './cells'
 import { cn } from '../utils'
 
@@ -20,14 +20,15 @@ export type DataGridTextColumnProps = {
 	field: string
 	header: ReactNode
 	children?: ReactNode
+	format?: (value: string | null) => ReactNode
 }
 
-export const DataGridTextColumn = Component<DataGridTextColumnProps>(({ field, header, children }) => (
+export const DataGridTextColumn = Component<DataGridTextColumnProps>(({ field, header, children, format }) => (
 	<DataGridColumn
 		header={header}
 		sortingField={field}
 		name={field}
-		children={children ?? <Field field={field} />}
+		children={children ?? <Field field={field} format={format} />}
 	/>
 ))
 
@@ -35,14 +36,15 @@ export type DataGridBooleanColumnProps = {
 	field: string
 	header: ReactNode
 	children?: ReactNode
+	format?: (value: boolean | null) => ReactNode
 }
 
-export const DataGridBooleanColumn = Component<DataGridBooleanColumnProps>(({ field, header, children }) => (
+export const DataGridBooleanColumn = Component<DataGridBooleanColumnProps>(({ field, header, children, format }) => (
 	<DataGridColumn
 		header={header}
 		sortingField={field}
 		name={field}
-		children={children ?? <Field field={field} format={formatBoolean} />}
+		children={children ?? <Field field={field} format={format ?? formatBoolean} />}
 	/>
 ))
 
@@ -50,14 +52,15 @@ export type DataGridNumberColumnProps = {
 	field: string
 	header: ReactNode
 	children?: ReactNode
+	format?: (value: number | null) => ReactNode
 }
 
-export const DataGridNumberColumn = Component<DataGridNumberColumnProps>(({ field, header, children }) => (
+export const DataGridNumberColumn = Component<DataGridNumberColumnProps>(({ field, header, children, format }) => (
 	<DataGridColumn
 		header={header}
 		sortingField={field}
 		name={field}
-		children={children ?? <Field field={field} format={formatNumber} />}
+		children={children ?? <Field field={field} format={format ?? formatNumber} />}
 	/>
 ))
 
@@ -65,33 +68,51 @@ export type DataGridDateColumnProps = {
 	field: string
 	header: ReactNode
 	children?: ReactNode
+	format?: (value: string | null) => ReactNode
 }
 
-export const DataGridDateColumn = Component<DataGridDateColumnProps>(({ field, header, children }) => (
+export const DataGridDateColumn = Component<DataGridDateColumnProps>(({ field, header, children, format }) => (
 	<DataGridColumn
 		header={header}
 		sortingField={field}
 		name={field}
-		children={children ?? <Field field={field} format={formatDate} />}
+		children={children ?? <Field field={field} format={format ?? formatDate} />}
 	/>
 ))
 
+
+export type DataGridDateTimeColumnProps = {
+	field: string
+	header: ReactNode
+	children?: ReactNode
+	format?: (value: string | null) => ReactNode
+}
+
+export const DataGridDateTimeColumn = Component<DataGridDateTimeColumnProps>(({ field, header, children, format }) => (
+	<DataGridColumn
+		header={header}
+		sortingField={field}
+		name={field}
+		children={children ?? <Field field={field} format={format ?? formatDateTime} />}
+	/>
+))
 
 export type DataGridEnumColumnProps = {
 	field: string
 	header: ReactNode
 	options: Record<string, ReactNode>
 	children?: ReactNode
+	tooltipActions?: ReactNode
 }
 
-export const DataGridEnumColumn = Component<DataGridEnumColumnProps>(({ field, header, options, children }) => (
+export const DataGridEnumColumn = Component<DataGridEnumColumnProps>(({ field, header, options, children, tooltipActions }) => (<>
 	<DataGridColumn
 		header={header}
 		sortingField={field}
 		name={field}
-		children={children ?? <DataGridEnumCell field={field} options={options} />}
+		children={children ?? <DataGridEnumCell field={field} options={options} tooltipActions={tooltipActions} />}
 	/>
-))
+</>))
 
 export type DataGridHasOneColumnProps =
 	& DataGridHasOneCellProps
@@ -99,6 +120,22 @@ export type DataGridHasOneColumnProps =
 		header: ReactNode
 	}
 
+
+export type DataGridUuidColumnProps = {
+	field: string
+	header: ReactNode
+	children?: ReactNode
+	format?: (value: string | null) => ReactNode
+}
+
+export const DataGridUuidColumn = Component<DataGridUuidColumnProps>(({ field, header, children, format }) => (
+	<DataGridColumn
+		header={header}
+		sortingField={field}
+		name={field}
+		children={children ?? <Field field={field} format={format} />}
+	/>
+))
 
 export const DataGridHasOneColumn = Component<DataGridHasOneColumnProps>(({ field, header, children }) => (
 	<DataGridColumn

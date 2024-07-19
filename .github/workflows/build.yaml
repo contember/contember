@@ -129,7 +129,7 @@ jobs:
           TENANT_MAILER_PORT: '1025'
           TENANT_MAILER_FROM: 'contember@localhost'
       - name: "Run E2E tests"
-        run: yarn run test:e2e
+        run: yarn run test:e2e --no-file-parallelism
         env:
           CONTEMBER_API_URL: "http://localhost:4000"
           CONTEMBER_ROOT_TOKEN: '0000000000000000000000000000000000000000'

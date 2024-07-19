@@ -7,8 +7,8 @@ import DocsCards from '../../src/components/global/DocsCards';
 
 :::note System requirements
 
-- [NPM 7](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) or later.
-- [Docker](https://docs.docker.com/install/) with [Docker Compose](https://docs.docker.com/compose/install/) version 1.27+.
+- [Yarn](https://yarnpkg.com/) or [NPM 7](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) or other package manager of your choice.
+- [Docker](https://docs.docker.com/install/) with [Docker Compose](https://docs.docker.com/compose/install/).
 - macOS, Windows (including WSL), and Linux are supported. If you're using Apple Silicon, make sure to enable Use Rosetta for x86/amd64 emulation in your Docker Desktop settings/Features in development.
 
 :::
@@ -28,7 +28,7 @@ To get the most out of Contember, we will assume that you have a basic understan
 We'll begin by creating a new Contember project using the `@contember/create` tool. Run the following command in your terminal:
 
 ```bash
-npm exec "@contember/create@latest" quickstart
+npx "@contember/create@next" quickstart
 ```
 
 This command creates a new folder called "quickstart" that contains a basic Contember setup.

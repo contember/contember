@@ -5,64 +5,40 @@ title: Building the UI
 import DocsCard from '../../src/components/global/DocsCard';
 import DocsCards from '../../src/components/global/DocsCards';
 
-Contember Interface is a React framework for building fast custom UIs. Contember Engine can work separately as an **headless GraphQL API**, but together with Interface you can quickly build interface for users that need to work with data right away.
+# Contember Interface
 
-In this example we will create an UI for managing articles. You can use any React components alongside the Interface components. Data binding makes this very easy and fast to build almost any **single page application (SPA)** imaginable.
+**Contember Interface** is a React-based framework designed to rapidly develop custom user interfaces. While the **Contember Engine** operates independently as a headless GraphQL API, integrating it with the Interface allows for swift creation of user interfaces tailored to those needing immediate data interaction.
 
-::warning
-This guide is outdated. We are working on updating it. If you have any questions, please contact us.
-:::
+In this guide, we'll demonstrate how to construct a UI for managing articles. The flexibility of Contember Interface means that you can incorporate any React components alongside the pre-built Interface components. This seamless integration facilitates data binding, simplifying the development process and enabling you to efficiently build a wide range of **single-page applications (SPAs)**.
 
-## Building user interfaces
+## Understanding the Contember Interface Core and Default UI
 
-:::note important
+The core of the Contember Interface is a headless framework, meaning it operates without a predefined user interface. However, a newly created project is pre-equipped with a default UI that utilizes the popular [shadcn/ui](https://ui.shadcn.com/) styled with Tailwind CSS. This default UI, built using the Contember Interface, serves as an excellent starting point for developing your custom UI.
+
+## Understanding Import Paths
+
+When working with Contember, it's important to understand the source of your imports:
+
+- **Interface Core Imports**: Any import from `@contember/*` packages pertains to the headless core. These imports are part of the framework's core functionality that does not impose any UI constraints.
+- **Default UI Imports**: Imports from `@app/lib/*` are associated with the default UI found in the `admin/lib` directory. This is where you'll find pre-configured components and utilities styled with Tailwind CSS and ready to use or customize in your project.
+
+
+## Opening the UI
+
+Once you launch the Contember App by navigating to [http://localhost:1480/](http://localhost:1480/), you'll be greeted with the login screen. This entry point is fully customizable to fit your project's requirements.
+
+### Development Environment Access
+
+In a development environment, you have the convenience of bypassing the standard login process. Simply click the **"Continue as default user"** button, which will automatically redirect you to the `/app` route, granting immediate access to the application.
+
+## Building the UI
 
 Before we start, make sure you already have a Contember project running on your computer. This should be a project with your data model that we made in the [designing your model](/intro/quickstart) guide.
 
-:::
 
-
-### List all articles
-
-First, we want to create a display for all articles present in our project. To achieve this, we're using the `DataGridScope` component. This component generates a table, including filters for sorting and searching data.
-
-To start, navigate to admin/pages and create a new file named articleList.tsx.
-
-```tsx title="admin/pages/articleList.tsx"
-import * as React from 'react'
-import { DataGridScope, TextCell } from '@contember/admin'
-import { SlotSources } from '../components/Slots'
-
-const { Title } = SlotSources
-
-export default () => (
-  <>
-    <Title>Articles</Title>
-    <DataGridScope entities="Article">
-      <TextCell field="title" header="Title" />
-    </DataGridScope>
-  </>
-)
-```
-
-What we've created here is a page that renders a table listing all the articles in our project. The table includes a column for the title of each article. Let's break down what's happening:
-
-1. We begin by importing the `@contember/admin` package. This package contains all necessary components and also supports TypeScript autocompletion.
-2. We also import the `SlotSources` component namespace from `../components/Slots` used to define the title of our page. To learn more about this, see the [Slots](/reference/interface/pages/slots#2-creating-your-own-slots) documentation.
-2. Next, we export the page component as the default export. This is necessary for our routing and navigation.
-3. We implement the `DataGridScope` component to display our data in a simple, easy-to-read grid format.
-4. We specify the entity we want to work with, which in this case is `Article`. This entity name should match what we defined in our model.
-5. Lastly, we use the TextCell component to add a text column, designated for the title of each article.
-
-When you navigate to localhost:1480/article-list, you should now see a list of your articles. Keep in mind, this list will be empty if no articles have been added to the data model yet.
-
-### Routing
-
-In addition to the steps above, it's important to note how routing works within this framework:
+### Exploring page routing
 
 The naming of pages (and by extension, URL paths) is automated. The name given to a page is determined by the name of the file and the function, with slashes ('/') used as separators.
-
-For example, if you have a default export from a file named `post.tsx`, the resulting page name would be `post`. If there's a function within the same file that's exported as edit, the page name would be `post/edit`.
 
 <DocsCards>
   <DocsCard header="Pages and routing" href="/reference/interface/pages/overview">
@@ -70,101 +46,148 @@ For example, if you have a default export from a file named `post.tsx`, the resu
   </DocsCard>
 </DocsCards>
 
-### Create an article
 
-Now we're moving on to creating an article. For this, we'll make a new file called `articleCreate.tsx`.
+To explore the routing and page creation capabilities in Contember, follow these steps to create a basic example page:
 
-```tsx title="admin/pages/articleCreate.tsx"
-import * as React from 'react'
-import { CreateScope, PersistButton, RichTextField, TextField } from '@contember/admin'
-import { SlotSources } from '../components/Slots'
+1. Navigate to the `admin/app/pages` directory within your project.
+2. Create a new file named `example.tsx`. Each function exported from this file will automatically be routed and can be accessed via a specific URL.
 
-const { Title, Actions } = SlotSources
+Here's a simple example to illustrate how to export a function and view it in the browser:
 
-export default () => (
+```tsx title="admin/app/pages/example.tsx"
+export const ExamplePage = () => {
+  return <h1 className="text-lg">This is an Example Page</h1>
+}
+```
+3. To view this function as a webpage, navigate to http://localhost:1480/app/example/example-page. This URL will display the message "This is an Example Page," styled using Tailwind CSS, as defined in your component.
+4. If everything is working correctly, you can delete the `example.tsx` file and proceed to create more complex pages.
+
+:::tip
+You can also export JSX elements directly from the file. This approach is useful for creating simple pages without the need for a function wrapper.
+:::
+
+
+### List all articles
+
+Now, let's create a page that lists all articles in our project.
+
+To do this, we'll create a new file named `article.tsx` in the `admin/app/pages` directory. This file will contain a simple table listing all articles in our project.
+
+```tsx title="admin/app/pages/article.tsx"
+import { Title } from "@app/lib/layout";
+import { Binding } from "@app/lib/binding";
+import { DataGrid, DataGridLoader, DataGridPagination, DataGridTable, DataGridTextColumn, DataGridToolbar, } from "@app/lib/datagrid";
+
+export const list = () => (
   <>
-    <Title>Create Article</Title>
-    <CreateScope entity="Article">
-      <TextField field="title" label="Title" />
-      <RichTextField field="content" label="Content" />
-      <Actions>
+    <Title>Articles</Title>
+    <Binding>
+      <DataGrid entities="Article">
+        <DataGridToolbar />
+        <DataGridLoader>
+          <DataGridTable>
+            <DataGridTextColumn field="title" header="Title" />
+          </DataGridTable>
+        </DataGridLoader>
+        <DataGridPagination />
+      </DataGrid>
+    </Binding>
+  </>
+);
+```
+
+What we've created here is a page that renders a table listing all the articles in our project. The table includes a column for the title of each article. Let's break down the key components:
+
+1. **Imports**: We start by importing necessary components from `@app/lib/layout` for layout configuration, and from `@app/lib/datagrid` for displaying data in a grid format.
+2. **Title Component**: This component sets the title of our page to "Articles". It uses [slots](/reference/interface/pages/slots) to display the title in the correct location.
+3. **Binding Component**: The component initializes [Data Binding](/reference/interface/data-binding/overview) for the page. It is essential for fetching and displaying data from the Contember Engine.
+4. **DataGrid Component**: Here we define the main container for our data grid. We specify "Article" as the entity type that this grid will display, which should match the entity defined in your model.
+5. **DataGridToolbar and Pagination**: These components add a toolbar and pagination functionality to our data grid, enhancing user interaction.
+6. **DataGridLoader and Table**: The `DataGridLoader` component handles the loading of data, and `DataGridTable` organizes this data into a tabular format. The `DataGridTextColumn` specifies that we want to display the "title" field of our articles.
+
+When you navigate to [http://localhost:1480/app/article/list](http://localhost:1480/app/article/list), you should now see a list of your articles. Keep in mind, this list will be empty if no articles have been added to the data model yet.
+Here's a revised version of your documentation for creating an article, properly formatted in Markdown and adjusted to improve clarity:
+
+### Create an Article
+
+Now we're moving on to creating an article. You have the option to create multiple files for each page, or you can consolidate multiple functions in a single file. In this example, we'll add the creation functionality to the same file as the listing.
+
+```tsx title="admin/app/pages/article.tsx"
+// previous imports
+//...
+// new imports
+import { PersistButton } from "@app/lib/binding";
+import { EntitySubTree, RedirectOnPersist } from "@contember/interface";
+import { Slots } from "@app/lib/layout";
+import { InputField } from "@app/lib/form";
+import { RichTextField } from "@app/lib/editor";
+
+// previous list function
+// ...
+
+export const create = () => (
+  <>
+    <Title>New Article</Title>
+    <Binding>
+      <Slots.Actions>
         <PersistButton />
-      </Actions>
-    </CreateScope>
+      </Slots.Actions>
+      <EntitySubTree entity="Article" isCreating>
+        <RedirectOnPersist to="article/list" />
+        <InputField field="title" label="Title" />
+        <RichTextField field="content" label="Content" />
+      </EntitySubTree>
+    </Binding>
   </>
 )
 ```
 
-1. First, we're creating a new file named articleCreate.tsx in the admin/pages directory.
-2. We're using the `CreateScope` component. This component allows us to create new entries for our specified entity - in this case, an Article.
-3. We're defining the entity we're adding, which is Article again.
-4. We're employing two components to capture user input: `TextField` and `RichTextField`. These components are connected to the `title` and `content` fields of our `Article` entity respectively.
+Here's a breakdown of the process:
 
-By navigating to [localhost:1480/article-create](localhost:1480/article-create), you can now create a new article. When you return to the list of articles, you'll see that your new article has been added.
+1. **File Structure**: We continue using the same file, `article.tsx`, located in the `admin/app/pages` directory. This approach keeps related functionalities together.
+2. **Components for Creating an Article**:
+- **PersistButton**: Allows users to save the new article.
+- **EntitySubTree**: Sets up a new entry creation for the specified entity, in this case, "Article".
+- **RedirectOnPersist**: Redirects to the article list view upon successful creation.
+- **InputField and RichTextField**: These are used for entering the title and content of the article. They bind directly to the corresponding fields in the Article entity.
 
-However, you'll notice the user experience isn't perfect yet. For instance, after creating an article, the application doesn't automatically switch to edit mode. To improve this, let's add an edit page next:
+By navigating to [http://localhost:1480/app/article/create](http://localhost:1480/app/article/create), you can create a new article. After creation, if you return to the list of articles, your new article will appear there.
 
-### Edit article
+![create article form](/assets/quickstart-create-page.png)
 
-Now we're going to tackle editing an article. To do this, we'll create a new page named `articleEdit`. This page will look quite similar to the create page, but it will be designed to edit an existing article:
+### Edit an Article
 
-```tsx title="admin/pages/articleEdit.tsx"
-import * as React from 'react'
-import { EditScope, PersistButton, RichTextField, TextField } from '@contember/admin'
-import { SlotSources } from '../components/Slots'
+Editing an article in Contember is similar to the creation process, with some adjustments to cater to the specifics of editing an existing entity. In this example, we will also use the same file, `article.tsx`, to maintain consistency and consolidate related functionalities.
 
-const { Title, Actions } = SlotSources
+```tsx title="admin/app/pages/article.tsx"
+// previous imports remain the same
+//...
 
-export default () => (
+// previous list and create functions
+// ...
+
+export const edit = ({ id }) => (
   <>
     <Title>Edit Article</Title>
-    <EditScope entity="Article(id = $id)">
-      <TextField field="title" label="Title" />
-      <RichTextField field="content" label="Content" />
-      <Actions>
+    <Binding>
+      <Slots.Actions>
         <PersistButton />
-      </Actions>
-    </EditScope>
+      </Slots.Actions>
+      <EntitySubTree entity={`Article(id=$id)`}>
+        <RedirectOnPersist to="article/list" />
+        <InputField field="title" label="Title" />
+        <RichTextField field="content" label="Content" />
+      </EntitySubTree>
+    </Binding>
   </>
 )
 ```
 
-Here's the breakdown of this code:
+1. **File Structure**: We are still working within `article.tsx` located in the `admin/app/pages` directory. This file now contains the list, create, and edit functions.
+2. **EntitySubTree Component Adjustment**:
+- **EntitySubTree**: Unlike the creation page, the `EntitySubTree` component in the edit function is configured with an `entity` prop that includes an ID parameter (`id`). This ensures that the form is bound to a specific existing article, which is identified by `id` parameter.
+- **ID Parameter**: The `id` is passed to the `edit` function from the URL's query, allowing the form to load the specific article's data for editing.
 
-1. We start by creating a new file named articleEdit.tsx in the `admin/pages` directory.
-2. We're using the `EditScope` component this time. This component is similar to `CreateScope` but it is used for modifying existing entities.
-3. We specify which Article entity we want to edit by providing an id: `Article(id = $id)`. This id will be dynamically populated based on the article selected for editing.
-4. Like before, we're using `TextField` and `RichTextField` components to handle editing for the title and content fields respectively.
-
-Now, with this new edit page in place, you'll be able to modify existing articles. So let's use it. We'll redirect users from our create page to the edit page after the article is successfully created.
-
-```tsx title="admin/pages/articleCreate.tsx"
-import * as React from 'react'
-import { CreateScope, PersistButton, RichTextField, TextField } from '@contember/admin'
-import { SlotSources } from '../components/Slots'
-
-const { Title, Actions } = SlotSources
-
-export default () => (
-  <>
-    <Title>Create Article</Title>
-
-    <CreateScope
-      entity="Article"
-      {/* highlight-next-line */}
-      redirectOnSuccess="articleEdit(id: $entity.id)"
-    >
-      <TextField field="title" label="Title" />
-      <RichTextField field="content" label="Content" />
-      <Actions>
-        <PersistButton />
-      </Actions>
-    </CreateScope>
-  </>
-)
-```
-
-This is done with `redirectOnSuccess` prop where we specify link to page where user should be redirected. This is our first encounter with Contember Interface query language. Now if you create a new article you're automatically redirected to the edit page.
 
 <DocsCards>
   <DocsCard header="Query language" href="/reference/interface/data-binding/query-language">
@@ -172,72 +195,209 @@ This is done with `redirectOnSuccess` prop where we specify link to page where u
   </DocsCard>
 </DocsCards>
 
-### More cells in datagrid
+### Adding an Edit Button to the DataGrid
 
-Next, let's enhance our data grid with additional cells to open detail, create new or delete an existing article.
+To enhance the usability of our article list, we can add an "Edit" button within the DataGrid. This button will allow users to navigate directly to the edit page for each article. Below is the implementation using Contember's components.
 
-```tsx title="admin/pages/articleList.tsx"
-import * as React from 'react'
-import { DataGridScope, DeleteEntityButton, GenericCell, Link, LinkButton, TextCell } from '@contember/admin'
-import { SlotSources } from '../components/Slots'
+```tsx title="admin/app/pages/article.tsx"
+// Additional imports
+import { Link } from "@contember/react-routing";
+import { AnchorButton } from "@app/lib/ui/button";
+import { DataGridActionColumn } from "@app/lib/datagrid";
 
-const { Title, Actions } = SlotSources
-
-export default () => (
-  <Title>Articles</Title>
-  {/* highlight-start */}
-  <Actions>
-    <LinkButton to="articleCreate">Add article</LinkButton>
-  </Actions>
-  {/* highlight-end */}
-  <DataGridScope entities="Article">
-    <TextCell field="title" header="Title" />
-    {/* highlight-start */}
-    <GenericCell shrunk><Link to="articleEdit(id: $entity.id)">Edit</Link></GenericCell>
-    <GenericCell shrunk><DeleteEntityButton immediatePersist /></GenericCell>
-    {/* highlight-end */}
-  </DataGridScope>
-)
+// inside the DataGrid component, before "DataGridTextColumn"
+<DataGridActionColumn>
+  <Link to={`article/edit(id: $entity.id)`}>
+    <AnchorButton>Edit</AnchorButton>
+  </Link>
+</DataGridActionColumn>
 ```
 
-Let's break this down:
+#### Breakdown of the New Components:
 
-1. We've added two new `GenericCell` components to our data grid. It's just a generic column without any functionality.
-2. The first `GenericCell` includes a [Link component](/reference/interface/pages/links/). This links to the `articleEdit` page and passes the id of the current row's entity as a parameter. This lets us navigate directly to the edit page for a specific article.
-3. The second `GenericCell` incorporates a `DeleteEntityButton`. This allows users to delete a specific article directly from the data grid.
-4. We're using the `shrunk` property on both `GenericCell` components. This keeps these cells as small as possible, ensuring that they don't take up unnecessary space in the data grid.
-5. We've also added a new `LinkButton` component to the `Actions` slot. This button links to the `articleCreate` page, allowing users to create a new article directly from the data grid.
+1. **DataGridActionColumn**: This component from `@app/lib/datagrid` is used to add action buttons like "Edit" within each row of the DataGrid.
+2. **Link Component**: Imported from `@contember/react-routing`, the Link component is a headless utility that generates a navigation URL. It uses the `to` prop to dynamically create the href for the `AnchorButton`, passing the current article's ID to the edit page route.
+3. **AnchorButton**: This button component from `@app/lib/ui/button` acts as an anchor tag (a) but styled as a button. It receives the href from the Link component through a Radix slot, providing a seamless and styled navigation experience.
 
-Now, with these additions, our data grid is more functional, providing quick access to both editing, creating and deleting articles.
+
+
+Here's how you could document the process of adding a "Delete" button to the DataGrid in your `article.tsx` file, which allows users to remove articles directly from the list view:
+
+### Adding a Delete Button to the DataGrid
+
+Incorporating a "Delete" button into the DataGrid allows users to remove articles directly from the list. This section details how to implement this functionality using components from the Contember libraries.
+
+```tsx title="admin/app/pages/article.tsx"
+// Make sure to import the necessary components
+import { DataGridActionColumn } from "@app/lib/datagrid";
+import { DeleteEntityDialog } from "@app/lib/binding";
+import { Button } from "@app/lib/ui/button";
+
+// Add the following within the DataGrid component
+<DataGridActionColumn>
+  <DeleteEntityDialog trigger={(
+    <Button variant='destructive'>
+      Delete
+    </Button>
+  )} />
+</DataGridActionColumn>
+```
+
+#### Component Overview:
+
+1. **DataGridActionColumn**: This component is part of `@app/lib/datagrid` and is used to introduce actionable items like buttons into each row of your DataGrid.
+
+2. **DeleteEntityDialog**: Sourced from `@app/lib/binding`, this component handles the deletion process. It encapsulates the delete logic and UI in a dialog, which is activated by a trigger.
+
+3. **Button Component**: This button, coming from `@app/lib/ui/button`, serves as the trigger for the DeleteEntityDialog. Set with a 'destructive' variant, it clearly indicates a deletion action, enhancing user interface intuitiveness and safety.
+
+By adding this Delete button to each row in the DataGrid, users can easily and securely delete articles. The DeleteEntityDialog ensures that deletions are handled gracefully, offering prompts and confirmations to prevent accidental data loss.
+
+
+### Extracting article form
+
+As the article form is used in multiple places, it's a good idea to extract it into a separate component. This way, you can reuse the form in the create and edit pages.
+
+```tsx title="admin/app/pages/article.tsx"
+// add Component import
+import { Component } from "@contember/interface";
+
+// define the ArticleForm component outside of the page functions
+const ArticleForm = Component(() => <>
+  <InputField field="title" label="Title" />
+  <RichTextField field="content" label="Content" />
+</>)
+```
+
+Now you can use the `ArticleForm` component in the `create` and `edit` functions:
+
+```tsx title="admin/app/pages/article.tsx"
+export const create = () => (<>
+  <Title>New Article</Title>
+  <Binding>
+    <Slots.Actions>
+    <PersistButton />
+    </Slots.Actions>
+    <EntitySubTree entity="Article" isCreating>
+      <RedirectOnPersist to="article/list" />
+      <ArticleForm />
+    </EntitySubTree>
+  </Binding>
+</>)
+```
+
+#### Breakdown of the New Components:
+
+1. **Component**: This is a higher-order component (HOC) from `@contember/interface` that ensures the component is properly integrated with the data binding system. It's essential for components that use data binding.
+2. **ArticleForm Component**: This component encapsulates the form fields for creating and editing articles. By extracting the form into a separate component, you can reuse it across multiple pages, enhancing code reusability and maintainability.
+
+### Complete code for the article.tsx file
+
+Here's the complete code for the `article.tsx` file, which includes the list, create, and edit functions, as well as the extracted `ArticleForm` component:
+
+```tsx title="admin/app/pages/article.tsx"
+import { Slots, Title } from "@app/lib/layout";
+import { Binding, DeleteEntityDialog, PersistButton } from "@app/lib/binding";
+import {
+  DataGrid,
+  DataGridActionColumn,
+  DataGridLoader,
+  DataGridPagination,
+  DataGridTable,
+  DataGridTextColumn,
+  DataGridToolbar,
+} from "@app/lib/datagrid";
+import { Component, EntitySubTree, RedirectOnPersist } from "@contember/interface";
+import { InputField } from "@app/lib/form";
+import { RichTextField } from "@app/lib/editor";
+import { Link } from "@contember/react-routing";
+import { AnchorButton, Button } from "@app/lib/ui/button";
+
+export const list = () => (
+  <>
+    <Title>Articles</Title>
+    <Binding>
+      <DataGrid entities="Article">
+        <DataGridToolbar />
+        <DataGridLoader>
+          <DataGridTable>
+            <DataGridActionColumn>
+              <Link to="article/edit(id: $entity.id)">
+                <AnchorButton>Edit</AnchorButton>
+              </Link>
+            </DataGridActionColumn>
+            <DataGridTextColumn field="title" header="Title" />
+            <DataGridActionColumn>
+              <DeleteEntityDialog trigger={(
+                <Button variant='destructive'>
+                  Delete
+                </Button>
+              )} />
+            </DataGridActionColumn>
+          </DataGridTable>
+        </DataGridLoader>
+        <DataGridPagination />
+      </DataGrid>
+    </Binding>
+  </>
+);
+
+export const create = () => (
+  <>
+    <Title>New Article</Title>
+    <Binding>
+      <Slots.Actions>
+        <PersistButton />
+      </Slots.Actions>
+      <EntitySubTree entity="Article" isCreating>
+        <RedirectOnPersist to="article/list" />
+        <ArticleForm />
+      </EntitySubTree>
+    </Binding>
+  </>
+)
+
+
+export const edit = () => (
+  <>
+    <Title>Edit Article</Title>
+    <Binding>
+      <Slots.Actions>
+        <PersistButton />
+      </Slots.Actions>
+      <EntitySubTree entity="Article(id=$id)">
+        <RedirectOnPersist to="article/list" />
+        <ArticleForm/>
+      </EntitySubTree>
+    </Binding>
+  </>
+)
+
+const ArticleForm = Component(() => <>
+  <InputField field="title" label="Title" />
+  <RichTextField field="content" label="Content" />
+</>)
+
+````
 
 ### Add pages to side menu
 
 The final step is to add our pages to the sidebar navigation. This provides easy access to all of our pages:
 
-```tsx title="admin/components/Navigation.tsx"
-import * as React from 'react'
-import { Menu } from '@contember/admin'
+```tsx title="admin/app/components/navigation.tsx"
+import { Menu, MenuItem } from "@app/lib/ui/menu";
 
 export const Navigation = () => (
   <Menu>
-    <Menu.Item>
-      <Menu.Item title="Dashboard" to="index" />
-      <Menu.Item title="Articles" to="articleList" />
-      <Menu.Item title="Create new article" to="articleCreate" />
-    </Menu.Item>
+    <MenuItem to="article/list" label="Articles" />
+    <MenuItem to="article/create" label="New article" />
   </Menu>
-)
+);
+
 ```
 
-Here's what this code does:
 
-1. We create a new `Navigation` component in the `admin/components` directory.
-2. We use the `Menu` component from `@contember/admin` to build a sidebar menu.
-3. Inside this `Menu`, we create three `Menu.Item` components. Each of these represents a link to one of our pages. The first item leads to the "Dashboard", or `index` page. The second item leads to the "Articles", or `articleList` page. The third item leads to the "Create new article", or `articleCreate` page.
-
-And that's it! You have just created a simple data model and created custom interface, so you can edit the data.
-
-![administration is running](/assets/quickstart-final.png)
+![administration is running](/assets/quickstart-list-page.png)
 
 <DocsCards>
   <DocsCard header="Going live with your project" href="/intro/deployment">

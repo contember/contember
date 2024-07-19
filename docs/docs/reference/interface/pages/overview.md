@@ -3,7 +3,7 @@ title: Routing and pages overview
 ---
 
 
-In order to define pages in Contember Interface, you need to export function components from files in the `admin/pages` directory (or its subdirectory).
+In order to define pages in Contember Interface, you need to export function components from files in the `admin/app/pages` directory (or its subdirectory).
 
 ```typescript jsx
 export default () => {

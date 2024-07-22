@@ -115,7 +115,7 @@ const DataGridRelationFieldTooltipInner = Component(({ children, actions }: { ch
 	</TooltipProvider>
 ))
 
-const DataGridRelationFilteredItemsList = ({ children }: {
+export const DataGridRelationFilteredItemsList = ({ children }: {
 	children: ReactNode
 }) => (
 	<>
@@ -155,12 +155,11 @@ const DataGridRelationFilterSelectItem = forwardRef<HTMLButtonElement, {
 		})
 
 
-const DataGridRelationFilterSelect = ({ children, queryField, label }: {
+export const DataGridRelationFilterSelect = ({ children, queryField, label }: {
 	queryField?: DataViewUnionFilterFields
 	children: ReactNode
 	label?: ReactNode
 }) => {
-	const filterFactory = useDataViewRelationFilterFactory(useDataViewFilterName())
 	return (
 		<Popover>
 			<PopoverTrigger asChild>
@@ -169,18 +168,32 @@ const DataGridRelationFilterSelect = ({ children, queryField, label }: {
 				</DataGridFilterSelectTriggerUI>
 			</PopoverTrigger>
 			<SelectPopoverContent>
-				<DataViewRelationFilterOptions queryField={queryField}>
-					<SelectListInner filterToolbar={<SelectDefaultFilter />}>
-						<DataGridRelationFilterSelectItem filterFactory={filterFactory}>
-							{children}
-						</DataGridRelationFilterSelectItem>
-					</SelectListInner>
-				</DataViewRelationFilterOptions>
-				<div>
-					<DataGridNullFilter />
-				</div>
+				<DataGridRelationFilterControls queryField={queryField}>
+					{children}
+				</DataGridRelationFilterControls>
 			</SelectPopoverContent>
 		</Popover>
 	)
 }
 
+
+export const DataGridRelationFilterControls = ({ children, queryField }: {
+	queryField?: DataViewUnionFilterFields
+	children: ReactNode
+}) => {
+	const filterFactory = useDataViewRelationFilterFactory(useDataViewFilterName())
+	return (
+		<>
+			<DataViewRelationFilterOptions queryField={queryField}>
+				<SelectListInner filterToolbar={<SelectDefaultFilter />}>
+					<DataGridRelationFilterSelectItem filterFactory={filterFactory}>
+						{children}
+					</DataGridRelationFilterSelectItem>
+				</SelectListInner>
+			</DataViewRelationFilterOptions>
+			<div>
+				<DataGridNullFilter />
+			</div>
+		</>
+	)
+}

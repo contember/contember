@@ -80,21 +80,28 @@ export const DataGridNumberFilterSelect = ({ label }: {
 			<DataGridFilterSelectTriggerUI>{label}</DataGridFilterSelectTriggerUI>
 		</PopoverTrigger>
 		<PopoverContent>
-			<div className={'relative flex flex-col gap-4'}>
-				<div className={'flex justify-center items-center'}>
-					<DataViewNumberFilterInput type={'from'}>
-						<Input className={''} inputSize={'sm'} placeholder={dict.datagrid.numberFrom} type={'number'} />
-					</DataViewNumberFilterInput>
-					<span className={'mx-4 font-bold '}>
-						–
-					</span>
-					<DataViewNumberFilterInput type={'to'}>
-						<Input className={''} inputSize={'sm'} placeholder={dict.datagrid.numberTo} type={'number'} />
-					</DataViewNumberFilterInput>
-				</div>
-
-				<DataGridNullFilter />
-			</div>
+			<DataGridNumberFilterControls />
 		</PopoverContent>
 	</Popover>
 )
+
+
+export const DataGridNumberFilterControls = () => {
+	return (
+		<div className={'flex flex-col gap-4'}>
+			<div className={'flex justify-center items-center'}>
+				<DataViewNumberFilterInput type={'from'}>
+					<Input className={''} inputSize={'sm'} placeholder={dict.datagrid.numberFrom} type={'number'} />
+				</DataViewNumberFilterInput>
+				<span className={'mx-4 font-bold '}>
+					–
+				</span>
+				<DataViewNumberFilterInput type={'to'}>
+					<Input className={''} inputSize={'sm'} placeholder={dict.datagrid.numberTo} type={'number'} />
+				</DataViewNumberFilterInput>
+			</div>
+
+			<DataGridNullFilter />
+		</div>
+	)
+}

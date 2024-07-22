@@ -13,10 +13,8 @@ export interface DataViewStaticInfo {
 
 export const collectStaticInfo = (props: DataViewProps, env: Environment): DataViewStaticInfo => {
 	const [node, envWithSelectionState] = createDataViewReactNode(props, env)
-	const filtersResult = dataViewAnalyzer.processChildren(node, envWithSelectionState)
-
-	const layoutBoxes = filtersResult.filter((it): it is DataViewLayoutBox => it instanceof DataViewLayoutBox)
-	const filterBoxes = filtersResult.filter((it): it is DataViewFilterBox => it instanceof DataViewFilterBox)
+	const filterBoxes = dataViewFilterAnalyzer.processChildren(node, envWithSelectionState)
+	const layoutBoxes = dataViewLayoutAnalyzer.processChildren(node, envWithSelectionState)
 
 	const layouts = layoutBoxes.map(it => it.props)
 	const filterTypes = getFilterTypes(props, env, filterBoxes)
@@ -76,11 +74,19 @@ const filterLeaf = new Leaf(node => new DataViewFilterBox(node.props), DataViewF
 const layoutLeaf = new Leaf(node => new DataViewLayoutBox(node.props), DataViewLayout)
 
 
-export const dataViewAnalyzer = new ChildrenAnalyzer<
-	DataViewFilterBox | DataViewLayoutBox,
+const dataViewFilterAnalyzer = new ChildrenAnalyzer<
+	DataViewFilterBox,
 	never,
 	Environment
->([filterLeaf, layoutLeaf], {
+>([filterLeaf], {
+	staticRenderFactoryName: 'staticRender',
+	staticContextFactoryName: 'generateEnvironment',
+})
+const dataViewLayoutAnalyzer = new ChildrenAnalyzer<
+	DataViewLayoutBox,
+	never,
+	Environment
+>([layoutLeaf], {
 	staticRenderFactoryName: 'staticRender',
 	staticContextFactoryName: 'generateEnvironment',
 })

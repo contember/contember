@@ -14,10 +14,6 @@ const id = Symbol('text')
 
 export const createTextFilter = (field: SugaredRelativeSingleField['field']): DataViewFilterHandler<TextFilterArtifacts> => {
 	const handler: DataViewFilterHandler<TextFilterArtifacts> = (filter, { environment }) => {
-		if (!filter.query && filter.nullCondition === undefined) {
-			return undefined
-		}
-
 		let condition = filter.query !== '' ? createGenericTextCellFilterCondition(filter) : {}
 
 		if (filter.nullCondition === true) {
@@ -37,6 +33,9 @@ export const createTextFilter = (field: SugaredRelativeSingleField['field']): Da
 	}
 
 	handler.identifier = { id, params: { field } }
+	handler.isEmpty = filter => {
+		return !filter.query && filter.nullCondition === undefined
+	}
 
 	return handler
 }

@@ -6,9 +6,6 @@ const id = Symbol('hasOne')
 
 export const createHasOneFilter = (field: SugaredRelativeSingleEntity['field']): DataViewFilterHandler<RelationFilterArtifacts> => {
 	const handler: DataViewFilterHandler<RelationFilterArtifacts> = (filter, { environment }) => {
-		if (!filter.id?.length && !filter.notId?.length && filter.nullCondition === undefined) {
-			return undefined
-		}
 		const desugared = QueryLanguage.desugarRelativeSingleEntity({ field }, environment)
 		const inclusionConditions = []
 		const exclusionConditions = []
@@ -36,6 +33,9 @@ export const createHasOneFilter = (field: SugaredRelativeSingleEntity['field']):
 	}
 
 	handler.identifier = { id, params: { field } }
+	handler.isEmpty = filter => {
+		return !filter.id?.length && !filter.notId?.length && filter.nullCondition === undefined
+	}
 
 	return handler
 }

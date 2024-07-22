@@ -26,6 +26,7 @@ export type DataViewFilterHandler<FA extends DataViewFilterArtifact = DataViewFi
 	& ((filterArtifact: FA, options: DataViewFilterHandlerOptions<FA>) => Filter | undefined)
 	& {
 		identifier?: { id: Symbol; params: any }
+		isEmpty?: (filterArtifact: FA) => boolean
 	}
 
 export type DataViewFilterHandlerRegistry = Record<string, DataViewFilterHandler<any>>

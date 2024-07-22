@@ -12,10 +12,6 @@ const id = Symbol('numberRange')
 
 export const createNumberRangeFilter = (field: SugaredRelativeSingleField['field']): DataViewFilterHandler<NumberRangeFilterArtifacts> => {
 	const handler: DataViewFilterHandler<NumberRangeFilterArtifacts> =  (filter, { environment }): Filter | undefined => {
-		if (filter.from === undefined && filter.to === undefined && filter.nullCondition === undefined) {
-			return undefined
-		}
-
 		const inclusion: Input.Condition[] = []
 		const exclusion: Input.Condition[] = []
 		if (filter.from !== undefined || filter.to !== undefined) {
@@ -43,6 +39,9 @@ export const createNumberRangeFilter = (field: SugaredRelativeSingleField['field
 		})
 	}
 	handler.identifier = { id, params: { field } }
+	handler.isEmpty = filter => {
+		return filter.from === undefined && filter.to === undefined && filter.nullCondition === undefined
+	}
 
 	return handler
 }

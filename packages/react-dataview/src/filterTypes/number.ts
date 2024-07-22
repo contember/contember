@@ -12,10 +12,6 @@ const id = Symbol('number')
 
 export const createNumberFilter = (field: SugaredRelativeSingleField['field']): DataViewFilterHandler<NumberFilterArtifacts> => {
 	const handler: DataViewFilterHandler<NumberFilterArtifacts> = (filter, { environment }) => {
-		if (filter.query === null && !filter.nullCondition) {
-			return undefined
-		}
-
 		const baseOperators = {
 			eq: 'eq',
 			gte: 'gte',
@@ -39,6 +35,9 @@ export const createNumberFilter = (field: SugaredRelativeSingleField['field']): 
 	}
 
 	handler.identifier = { id, params: { field } }
+	handler.isEmpty = filter => {
+		return filter.query === null && !filter.nullCondition
+	}
 
 	return handler
 }

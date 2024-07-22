@@ -43,6 +43,9 @@ export const createBooleanFilter = (field: SugaredRelativeSingleField['field']):
 	}
 
 	handler.identifier = { id, params: { field } }
+	handler.isEmpty = filterArtifact => {
+		return !filterArtifact.includeTrue && !filterArtifact.includeFalse && filterArtifact.nullCondition === undefined
+	}
 
 	return handler
 }

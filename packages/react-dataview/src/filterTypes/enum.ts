@@ -13,10 +13,6 @@ const id = Symbol('enum')
 export const createEnumFilter = (field: SugaredRelativeSingleField['field']): DataViewFilterHandler<EnumFilterArtifacts> => {
 	const handler: DataViewFilterHandler<EnumFilterArtifacts> = (filter, { environment }) => {
 		const { values, notValues, nullCondition } = filter
-
-		if (!values?.length && nullCondition === undefined && !notValues?.length) {
-			return undefined
-		}
 		const desugared = QueryLanguage.desugarRelativeSingleField(field, environment)
 
 		const inclusion: Input.Condition<string>[] = []
@@ -47,6 +43,9 @@ export const createEnumFilter = (field: SugaredRelativeSingleField['field']): Da
 	}
 
 	handler.identifier = { id, params: { field } }
+	handler.isEmpty = filterArtifact => {
+		return !filterArtifact.values?.length && filterArtifact.nullCondition === undefined && !filterArtifact.notValues?.length
+	}
 
 	return handler
 }

@@ -10,11 +10,8 @@ const id = Symbol('unionText')
 export const createUnionTextFilter = (fields: DataViewUnionFilterFields): DataViewFilterHandler<TextFilterArtifacts> => {
 	const filters = (Array.isArray(fields) ? fields.map(it => createTextFilter(it)) : [createTextFilter(fields)])
 
-	const handler: DataViewFilterHandler<TextFilterArtifacts> = (filter, { environment }): Filter | undefined => {
+	const handler: DataViewFilterHandler<TextFilterArtifacts> = (filter, { environment }) => {
 		if (filters.length === 0) {
-			return undefined
-		}
-		if (!filter.query) {
 			return undefined
 		}
 		return {
@@ -23,6 +20,9 @@ export const createUnionTextFilter = (fields: DataViewUnionFilterFields): DataVi
 	}
 
 	handler.identifier = { id, params: { fields } }
+	handler.isEmpty = filter => {
+		return !filter.query
+	}
 
 	return handler
 }

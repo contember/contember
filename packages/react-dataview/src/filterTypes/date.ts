@@ -31,9 +31,6 @@ const id = Symbol('date')
 
 export const createDateFilter = (field: SugaredRelativeSingleField['field']): DataViewFilterHandler<DateRangeFilterArtifacts> => {
 	const handler: DataViewFilterHandler<DateRangeFilterArtifacts> = (filter, { environment }) => {
-		if (!filter.start && !filter.end && filter.nullCondition === undefined) {
-			return undefined
-		}
 		const desugared = QueryLanguage.desugarRelativeSingleField(field, environment)
 
 		const inclusion: Input.Condition[] = []
@@ -67,6 +64,7 @@ export const createDateFilter = (field: SugaredRelativeSingleField['field']): Da
 	}
 
 	handler.identifier = { id, params: { field } }
+	handler.isEmpty = filter => !filter.start && !filter.end && filter.nullCondition === undefined
 
 	return handler
 }

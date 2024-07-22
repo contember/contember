@@ -6,10 +6,6 @@ const id = Symbol('hasMany')
 
 export const createHasManyFilter = (field: SugaredRelativeEntityList['field']): DataViewFilterHandler<RelationFilterArtifacts> => {
 	const handler: DataViewFilterHandler<RelationFilterArtifacts> = (filter, { environment }) => {
-		if (!filter.id?.length && !filter.notId?.length && filter.nullCondition === undefined) {
-			return undefined
-		}
-
 		const desugared = QueryLanguage.desugarRelativeEntityList({ field }, environment)
 
 		const inclusionConditions: Filter[] = []
@@ -56,6 +52,9 @@ export const createHasManyFilter = (field: SugaredRelativeEntityList['field']): 
 	}
 
 	handler.identifier = { id, params: { field } }
+	handler.isEmpty = filter => {
+		return !filter.id?.length && !filter.notId?.length && filter.nullCondition === undefined
+	}
 
 	return handler
 }

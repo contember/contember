@@ -30,6 +30,9 @@ export const resolveFilters = ({ filterTypes, filters, environment, entities }: 
 		if (handler === undefined) {
 			continue
 		}
+		if (handler?.isEmpty?.(value)) {
+			continue
+		}
 		const filter = handler(value, { environment })
 		if (filter === undefined) {
 			continue

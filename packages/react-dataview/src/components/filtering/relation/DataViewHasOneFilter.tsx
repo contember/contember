@@ -1,4 +1,4 @@
-import { Component, QueryLanguage, SugaredQualifiedEntityList, SugaredRelativeSingleField, useEnvironment } from '@contember/react-binding'
+import { Component, QueryLanguage, SugaredQualifiedEntityList, useEnvironment } from '@contember/react-binding'
 import * as React from 'react'
 import { useMemo } from 'react'
 import { DataViewFilterNameContext, DataViewRelationFilterArgsContext } from '../../../contexts'
@@ -31,7 +31,6 @@ export const DataViewHasOneFilter = Component< DataViewHasOneFilterProps>(({ chi
 }, ({ name, field, children }) => {
 	return <>
 		<DataViewFilter name={getFilterName(name, field)} filterHandler={createHasOneFilter(field)} />
-		{children}
 	</>
 })
 

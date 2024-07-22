@@ -1,4 +1,20 @@
-import { ArchiveIcon, BrushIcon, FormInputIcon, GripVertical, HomeIcon, KanbanIcon, KeyRoundIcon, LanguagesIcon, LockKeyholeIcon, PencilIcon, TableIcon, UploadIcon, UserIcon, UsersIcon } from 'lucide-react'
+import {
+	ArchiveIcon,
+	BrushIcon,
+	DatabaseIcon,
+	FormInputIcon,
+	GripVertical,
+	HomeIcon,
+	KanbanIcon,
+	KeyRoundIcon,
+	LanguagesIcon,
+	LockKeyholeIcon,
+	PencilIcon,
+	TableIcon,
+	UploadIcon,
+	UserIcon,
+	UsersIcon,
+} from 'lucide-react'
 import { Menu, MenuItem } from '@app/lib/ui/menu'
 
 
@@ -64,6 +80,7 @@ export const Navigation = () => {
 				<MenuItem icon={<PencilIcon size={16} />} label={'Custom components'}>
 					<MenuItem icon={line} label={'Input'} to={'custom/input'} />
 				</MenuItem>
+				<MenuItem icon={<DatabaseIcon size={16} />} label={'Auto CRUD'} to={'auto/index'} />
 			</Menu>
 		</div>
 	)

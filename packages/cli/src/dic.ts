@@ -123,11 +123,11 @@ export const createContainer = ({ env, version, runtime, workspace }: {
 		.addService('adminClient', ({ remoteProjectProvider }) =>
 			new AdminClient(remoteProjectProvider))
 		.addService('migrationFilesManager', ({ jsCodeRunner, workspace }) => {
-
+			const runJs = runtime === 'bun' ? (file: string) => import(file) : jsCodeRunner.run
 			return new MigrationFilesManager(workspace.migrationsDir, {
 				json: new JsonLoader(new MigrationParser()),
-				ts: new JsLoader(new MigrationParser(), jsCodeRunner.run),
-				js: new JsLoader(new MigrationParser(), jsCodeRunner.run),
+				ts: new JsLoader(new MigrationParser(), runJs),
+				js: new JsLoader(new MigrationParser(), runJs),
 			})
 		})
 		.addService('packageWorkspaceResolver', ({ workspace, fs }) => {

@@ -12,8 +12,8 @@ for package in dist/development/*; do
     continue
   fi
 
-  mkdir --parent packages/$package_name/dist/development
-  mkdir --parent packages/$package_name/dist/production
+  mkdir -p packages/$package_name/dist/development
+  mkdir -p packages/$package_name/dist/production
   cp -r dist/development/$package_name/* packages/$package_name/dist/development
   cp -r dist/production/$package_name/* packages/$package_name/dist/production
 done

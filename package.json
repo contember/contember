@@ -9,7 +9,7 @@
 		"vite:build": "./scripts/vite/build.sh",
 		"clean": "yarn run clean:generated && yarn run clean:dependencies",
 		"clean:dependencies": "rm -rf packages/*/node_modules || true; rm -rf node_modules || true",
-		"clean:generated": "rm -rf dist || true; packages/*/dist || true; rm -rf packages/*/temp || true",
+		"clean:generated": "rm -rf dist || true; rm -rf packages/*/dist || true; rm -rf packages/*/temp || true",
 		"contember": "docker-compose run --rm cli",
 		"eslint:fix": "eslint --fix \"**/*.{ts,tsx}\" ",
 		"eslint:lint": "eslint \"**/*.{ts,tsx}\" ",

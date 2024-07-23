@@ -17,7 +17,7 @@
 	"main": "./dist/production/index.js",
 	"typings": "./dist/types/index.d.ts",
 	"scripts": {
-		"pre-build": "cp --recursive ../react-ui-lib/src ./resources/templates/template-workspace/admin/lib && rm ./resources/templates/template-workspace/admin/lib/index.ts ./resources/templates/template-workspace/admin/lib/tsconfig.json"
+		"pre-build": "rm -rf rm ./resources/templates/template-workspace/admin/lib && cp -r ../react-ui-lib/src ./resources/templates/template-workspace/admin/lib && rm ./resources/templates/template-workspace/admin/lib/index.ts ./resources/templates/template-workspace/admin/lib/tsconfig.json"
 	},
 	"exports": {
 		".": {

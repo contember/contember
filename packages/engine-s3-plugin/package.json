@@ -1,45 +1,45 @@
 {
-	"name": "@contember/engine-s3-plugin",
-	"version": "1.4.0-rc.4",
-	"license": "Apache-2.0",
-	"main": "./dist/production/index.js",
-	"typings": "./dist/types/index.d.ts",
-	"exports": {
-		".": {
-			"import": {
-				"types": "./dist/types/index.d.ts",
-				"development": "./dist/development/index.js",
-				"production": "./dist/production/index.js",
-				"typescript": "./src/index.ts",
-				"default": "./dist/production/index.js"
-			},
-			"require": {
-				"types": "./dist/types/index.d.ts",
-				"development": "./dist/development/index.cjs",
-				"production": "./dist/production/index.cjs",
-				"typescript": "./src/index.ts",
-				"default": "./dist/production/index.cjs"
-			}
-		}
-	},
-	"dependencies": {
-		"@contember/engine-plugins": "workspace:*",
-		"@contember/graphql-utils": "workspace:*",
-		"@contember/typesafe": "workspace:*",
-		"mime-types": "^2.1.35",
-		"picomatch": "^3.0.1",
-		"qs": "^6.11.2",
-		"uuid": "^9.0.1"
-	},
-	"devDependencies": {
-		"@types/mime-types": "^2.1.4",
-		"@types/qs": "^6.9.10",
-		"@types/uuid": "^9.0.7",
-		"graphql": "^16.8.1"
-	},
-	"peerDependencies": {
-		"graphql": ">= 14.6.0",
-		"pg": "^8.9.0"
-	},
-	"type": "module"
+  "name": "@contember/engine-s3-plugin",
+  "version": "2.0.0-alpha.7",
+  "license": "Apache-2.0",
+  "main": "./dist/production/index.js",
+  "typings": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/types/index.d.ts",
+        "development": "./dist/development/index.js",
+        "production": "./dist/production/index.js",
+        "typescript": "./src/index.ts",
+        "default": "./dist/production/index.js"
+      },
+      "require": {
+        "types": "./dist/types/index.d.ts",
+        "development": "./dist/development/index.cjs",
+        "production": "./dist/production/index.cjs",
+        "typescript": "./src/index.ts",
+        "default": "./dist/production/index.cjs"
+      }
+    }
+  },
+  "dependencies": {
+    "@contember/engine-plugins": "workspace:*",
+    "@contember/graphql-utils": "workspace:*",
+    "@contember/typesafe": "workspace:*",
+    "mime-types": "^2.1.35",
+    "picomatch": "^3.0.1",
+    "qs": "^6.11.2",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/mime-types": "^2.1.4",
+    "@types/qs": "^6.9.10",
+    "@types/uuid": "^9.0.7",
+    "graphql": "^16.8.1"
+  },
+  "peerDependencies": {
+    "graphql": ">= 14.6.0",
+    "pg": "^8.9.0"
+  },
+  "type": "module"
 }

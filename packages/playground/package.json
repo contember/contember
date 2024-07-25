@@ -1,42 +1,42 @@
 {
-	"name": "@contember/playground",
-	"version": "0.0.0",
-	"type": "module",
-	"private": true,
-	"scripts": {
-		"build": "vite build admin",
-		"contember": "docker-compose run contember-cli",
-		"deploy": "yarn run build \"$0\" && docker-compose run --no-deps contember-cli deploy \"$@\" --root ",
-		"start": "vite dev admin --port ${VITE_PORT:-3000} --host 0.0.0.0"
-	},
-	"devDependencies": {
-		"@contember/binding": "workspace:*",
-		"@contember/client": "workspace:*",
-		"@contember/client-content": "workspace:*",
-		"@contember/interface": "workspace:*",
-		"@contember/react-ui-lib": "workspace:*",
-		"@contember/schema": "workspace:*",
-		"@contember/schema-definition": "workspace:*",
-		"@contember/schema-utils": "workspace:*",
-		"@contember/utilities": "workspace:*",
-		"@faker-js/faker": "^8.4.1",
-		"@radix-ui/react-separator": "^1.0.3",
-		"@radix-ui/react-toolbar": "^1.0.4",
-		"autoprefixer": "^10.4.19",
-		"graphql": "^16.8.1",
-		"lucide-react": "^0.302.0",
-		"postcss": "^8.4.38",
-		"qrcode-generator": "^1.4.4",
-		"react": "^18.3.1",
-		"react-dnd": "^16.0.1",
-		"react-dnd-html5-backend": "^16.0.1",
-		"react-dom": "^18.3.1",
-		"slate-hyperscript": "^0.100.0",
-		"tailwindcss": "^3.4.3",
-		"tailwindcss-animate": "^1.0.7",
-		"vite-tsconfig-paths": "^4.3.2"
-	},
-	"dependencies": {
-		"@sindresorhus/slugify": "^2.2.1"
-	}
+  "name": "@contember/playground",
+  "version": "2.0.0-alpha.7",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "vite build admin",
+    "contember": "docker-compose run contember-cli",
+    "deploy": "yarn run build \"$0\" && docker-compose run --no-deps contember-cli deploy \"$@\" --root ",
+    "start": "vite dev admin --port ${VITE_PORT:-3000} --host 0.0.0.0"
+  },
+  "devDependencies": {
+    "@contember/binding": "workspace:*",
+    "@contember/client": "workspace:*",
+    "@contember/client-content": "workspace:*",
+    "@contember/interface": "workspace:*",
+    "@contember/react-ui-lib": "workspace:*",
+    "@contember/schema": "workspace:*",
+    "@contember/schema-definition": "workspace:*",
+    "@contember/schema-utils": "workspace:*",
+    "@contember/utilities": "workspace:*",
+    "@faker-js/faker": "^8.4.1",
+    "@radix-ui/react-separator": "^1.0.3",
+    "@radix-ui/react-toolbar": "^1.0.4",
+    "autoprefixer": "^10.4.19",
+    "graphql": "^16.8.1",
+    "lucide-react": "^0.302.0",
+    "postcss": "^8.4.38",
+    "qrcode-generator": "^1.4.4",
+    "react": "^18.3.1",
+    "react-dnd": "^16.0.1",
+    "react-dnd-html5-backend": "^16.0.1",
+    "react-dom": "^18.3.1",
+    "slate-hyperscript": "^0.100.0",
+    "tailwindcss": "^3.4.3",
+    "tailwindcss-animate": "^1.0.7",
+    "vite-tsconfig-paths": "^4.3.2"
+  },
+  "dependencies": {
+    "@sindresorhus/slugify": "^2.2.1"
+  }
 }

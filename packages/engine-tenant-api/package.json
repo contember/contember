@@ -1,64 +1,64 @@
 {
-	"name": "@contember/engine-tenant-api",
-	"version": "1.4.0-rc.4",
-	"license": "Apache-2.0",
-	"main": "./dist/production/index.js",
-	"typings": "./dist/types/index.d.ts",
-	"exports": {
-		".": {
-			"import": {
-				"types": "./dist/types/index.d.ts",
-				"development": "./dist/development/index.js",
-				"production": "./dist/production/index.js",
-				"typescript": "./src/index.ts",
-				"default": "./dist/production/index.js"
-			},
-			"require": {
-				"types": "./dist/types/index.d.ts",
-				"development": "./dist/development/index.cjs",
-				"production": "./dist/production/index.cjs",
-				"typescript": "./src/index.ts",
-				"default": "./dist/production/index.cjs"
-			}
-		}
-	},
-	"scripts": {
-		"generate": "gql-gen --config graphql-tenant.codegen.yml"
-	},
-	"dependencies": {
-		"@contember/authorization": "workspace:*",
-		"@contember/config-loader": "workspace:*",
-		"@contember/database": "workspace:*",
-		"@contember/database-migrations": "workspace:*",
-		"@contember/dic": "workspace:*",
-		"@contember/graphql-utils": "workspace:*",
-		"@contember/logger": "workspace:*",
-		"@contember/schema": "workspace:*",
-		"@contember/schema-utils": "workspace:*",
-		"@contember/typesafe": "workspace:*",
-		"@graphql-tools/utils": "^10.0.8",
-		"graphql-tag": "^2.12.6",
-		"jose": "^5.1.1",
-		"mustache": "^4.2.0",
-		"nodemailer": "^6.9.7",
-		"openid-client": "^5.6.1",
-		"otpauth": "^9.1.5"
-	},
-	"devDependencies": {
-		"@contember/database-tester": "workspace:*",
-		"@graphql-codegen/cli": "^5.0.0",
-		"@graphql-codegen/typescript": "^4.0.1",
-		"@graphql-codegen/typescript-operations": "^4.0.1",
-		"@graphql-codegen/typescript-resolvers": "^4.0.1",
-		"@graphql-tools/schema": "^10.0.0",
-		"@types/mustache": "^4.2.5",
-		"@types/node": "^20.9.0",
-		"@types/nodemailer": "^6.4.14",
-		"graphql": "^16.8.1"
-	},
-	"peerDependencies": {
-		"graphql": ">= 14.6.0",
-		"pg": "^8.9.0"
-	},
-	"type": "module"
+  "name": "@contember/engine-tenant-api",
+  "version": "2.0.0-alpha.7",
+  "license": "Apache-2.0",
+  "main": "./dist/production/index.js",
+  "typings": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/types/index.d.ts",
+        "development": "./dist/development/index.js",
+        "production": "./dist/production/index.js",
+        "typescript": "./src/index.ts",
+        "default": "./dist/production/index.js"
+      },
+      "require": {
+        "types": "./dist/types/index.d.ts",
+        "development": "./dist/development/index.cjs",
+        "production": "./dist/production/index.cjs",
+        "typescript": "./src/index.ts",
+        "default": "./dist/production/index.cjs"
+      }
+    }
+  },
+  "scripts": {
+    "generate": "gql-gen --config graphql-tenant.codegen.yml"
+  },
+  "dependencies": {
+    "@contember/authorization": "workspace:*",
+    "@contember/config-loader": "workspace:*",
+    "@contember/database": "workspace:*",
+    "@contember/database-migrations": "workspace:*",
+    "@contember/dic": "workspace:*",
+    "@contember/graphql-utils": "workspace:*",
+    "@contember/logger": "workspace:*",
+    "@contember/schema": "workspace:*",
+    "@contember/schema-utils": "workspace:*",
+    "@contember/typesafe": "workspace:*",
+    "@graphql-tools/utils": "^10.0.8",
+    "graphql-tag": "^2.12.6",
+    "jose": "^5.1.1",
+    "mustache": "^4.2.0",
+    "nodemailer": "^6.9.7",
+    "openid-client": "^5.6.1",
+    "otpauth": "^9.1.5"
+  },
+  "devDependencies": {
+    "@contember/database-tester": "workspace:*",
+    "@graphql-codegen/cli": "^5.0.0",
+    "@graphql-codegen/typescript": "^4.0.1",
+    "@graphql-codegen/typescript-operations": "^4.0.1",
+    "@graphql-codegen/typescript-resolvers": "^4.0.1",
+    "@graphql-tools/schema": "^10.0.0",
+    "@types/mustache": "^4.2.5",
+    "@types/node": "^20.9.0",
+    "@types/nodemailer": "^6.4.14",
+    "graphql": "^16.8.1"
+  },
+  "peerDependencies": {
+    "graphql": ">= 14.6.0",
+    "pg": "^8.9.0"
+  },
+  "type": "module"
 }

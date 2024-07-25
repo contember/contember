@@ -1,40 +1,40 @@
 {
-	"name": "@contember/engine-server",
-	"version": "1.4.0-rc.4",
-	"license": "Apache-2.0",
-	"main": "./dist/production/index.js",
-	"typings": "./dist/types/index.d.ts",
-	"exports": {
-		".": {
-			"import": {
-				"types": "./dist/types/index.d.ts",
-				"development": "./dist/development/index.js",
-				"production": "./dist/production/index.js",
-				"typescript": "./src/index.ts",
-				"default": "./dist/production/index.js"
-			},
-			"require": {
-				"types": "./dist/types/index.d.ts",
-				"development": "./dist/development/index.cjs",
-				"production": "./dist/production/index.cjs",
-				"typescript": "./src/index.ts",
-				"default": "./dist/production/index.cjs"
-			}
-		}
-	},
-	"dependencies": {
-		"@contember/engine-actions": "workspace:*",
-		"@contember/engine-http": "workspace:*",
-		"@contember/engine-plugins": "workspace:*",
-		"@contember/engine-s3-plugin": "workspace:*",
-		"@contember/engine-vimeo-plugin": "workspace:*",
-		"graphql": "^16.8.1",
-		"pg": "^8.11.3",
-		"uuid": "^9.0.1"
-	},
-	"devDependencies": {
-		"@types/koa-compress": "^4.0.6",
-		"@types/node": "^20.9.0"
-	},
-	"type": "module"
+  "name": "@contember/engine-server",
+  "version": "2.0.0-alpha.7",
+  "license": "Apache-2.0",
+  "main": "./dist/production/index.js",
+  "typings": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/types/index.d.ts",
+        "development": "./dist/development/index.js",
+        "production": "./dist/production/index.js",
+        "typescript": "./src/index.ts",
+        "default": "./dist/production/index.js"
+      },
+      "require": {
+        "types": "./dist/types/index.d.ts",
+        "development": "./dist/development/index.cjs",
+        "production": "./dist/production/index.cjs",
+        "typescript": "./src/index.ts",
+        "default": "./dist/production/index.cjs"
+      }
+    }
+  },
+  "dependencies": {
+    "@contember/engine-actions": "workspace:*",
+    "@contember/engine-http": "workspace:*",
+    "@contember/engine-plugins": "workspace:*",
+    "@contember/engine-s3-plugin": "workspace:*",
+    "@contember/engine-vimeo-plugin": "workspace:*",
+    "graphql": "^16.8.1",
+    "pg": "^8.11.3",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/koa-compress": "^4.0.6",
+    "@types/node": "^20.9.0"
+  },
+  "type": "module"
 }

@@ -1,54 +1,54 @@
 {
-	"name": "@contember/engine-content-api",
-	"version": "1.4.0-rc.4",
-	"license": "Apache-2.0",
-	"main": "./dist/production/index.js",
-	"typings": "./dist/types/index.d.ts",
-	"exports": {
-		".": {
-			"import": {
-				"types": "./dist/types/index.d.ts",
-				"development": "./dist/development/index.js",
-				"production": "./dist/production/index.js",
-				"typescript": "./src/index.ts",
-				"default": "./dist/production/index.js"
-			},
-			"require": {
-				"types": "./dist/types/index.d.ts",
-				"development": "./dist/development/index.cjs",
-				"production": "./dist/production/index.cjs",
-				"typescript": "./src/index.ts",
-				"default": "./dist/production/index.cjs"
-			}
-		}
-	},
-	"scripts": {
-		"generate": "gql-gen --config graphql.codegen.yml"
-	},
-	"dependencies": {
-		"@contember/database": "workspace:*",
-		"@contember/dic": "workspace:*",
-		"@contember/graphql-utils": "workspace:*",
-		"@contember/logger": "workspace:*",
-		"@contember/schema": "workspace:*",
-		"@contember/schema-definition": "workspace:*",
-		"@contember/schema-utils": "workspace:*",
-		"fast-deep-equal": "^3.1.3"
-	},
-	"devDependencies": {
-		"@contember/database-tester": "workspace:*",
-		"@contember/schema-definition": "workspace:*",
-		"@graphql-codegen/cli": "^5.0.0",
-		"@graphql-codegen/typescript": "^4.0.1",
-		"@graphql-codegen/typescript-operations": "^4.0.1",
-		"@graphql-codegen/typescript-resolvers": "^4.0.1",
-		"@types/node": "^20.9.0",
-		"graphql": "^16.8.1",
-		"pg": "^8.11.3"
-	},
-	"peerDependencies": {
-		"graphql": ">= 14.6.0",
-		"pg": "^8.9.0"
-	},
-	"type": "module"
+  "name": "@contember/engine-content-api",
+  "version": "2.0.0-alpha.7",
+  "license": "Apache-2.0",
+  "main": "./dist/production/index.js",
+  "typings": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/types/index.d.ts",
+        "development": "./dist/development/index.js",
+        "production": "./dist/production/index.js",
+        "typescript": "./src/index.ts",
+        "default": "./dist/production/index.js"
+      },
+      "require": {
+        "types": "./dist/types/index.d.ts",
+        "development": "./dist/development/index.cjs",
+        "production": "./dist/production/index.cjs",
+        "typescript": "./src/index.ts",
+        "default": "./dist/production/index.cjs"
+      }
+    }
+  },
+  "scripts": {
+    "generate": "gql-gen --config graphql.codegen.yml"
+  },
+  "dependencies": {
+    "@contember/database": "workspace:*",
+    "@contember/dic": "workspace:*",
+    "@contember/graphql-utils": "workspace:*",
+    "@contember/logger": "workspace:*",
+    "@contember/schema": "workspace:*",
+    "@contember/schema-definition": "workspace:*",
+    "@contember/schema-utils": "workspace:*",
+    "fast-deep-equal": "^3.1.3"
+  },
+  "devDependencies": {
+    "@contember/database-tester": "workspace:*",
+    "@contember/schema-definition": "workspace:*",
+    "@graphql-codegen/cli": "^5.0.0",
+    "@graphql-codegen/typescript": "^4.0.1",
+    "@graphql-codegen/typescript-operations": "^4.0.1",
+    "@graphql-codegen/typescript-resolvers": "^4.0.1",
+    "@types/node": "^20.9.0",
+    "graphql": "^16.8.1",
+    "pg": "^8.11.3"
+  },
+  "peerDependencies": {
+    "graphql": ">= 14.6.0",
+    "pg": "^8.9.0"
+  },
+  "type": "module"
 }

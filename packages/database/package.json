@@ -1,37 +1,37 @@
 {
-	"name": "@contember/database",
-	"version": "1.4.0-rc.4",
-	"license": "Apache-2.0",
-	"main": "./dist/production/index.js",
-	"typings": "./dist/types/index.d.ts",
-	"exports": {
-		".": {
-			"import": {
-				"types": "./dist/types/index.d.ts",
-				"development": "./dist/development/index.js",
-				"production": "./dist/production/index.js",
-				"typescript": "./src/index.ts",
-				"default": "./dist/production/index.js"
-			},
-			"require": {
-				"types": "./dist/types/index.d.ts",
-				"development": "./dist/development/index.cjs",
-				"production": "./dist/production/index.cjs",
-				"typescript": "./src/index.ts",
-				"default": "./dist/production/index.cjs"
-			}
-		}
-	},
-	"dependencies": {
-		"@contember/queryable": "workspace:*"
-	},
-	"devDependencies": {
-		"@contember/database-tester": "workspace:*",
-		"@types/node": "^20.9.0",
-		"pg": "^8.11.3"
-	},
-	"peerDependencies": {
-		"pg": "^8.9.0"
-	},
-	"type": "module"
+  "name": "@contember/database",
+  "version": "2.0.0-alpha.7",
+  "license": "Apache-2.0",
+  "main": "./dist/production/index.js",
+  "typings": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/types/index.d.ts",
+        "development": "./dist/development/index.js",
+        "production": "./dist/production/index.js",
+        "typescript": "./src/index.ts",
+        "default": "./dist/production/index.js"
+      },
+      "require": {
+        "types": "./dist/types/index.d.ts",
+        "development": "./dist/development/index.cjs",
+        "production": "./dist/production/index.cjs",
+        "typescript": "./src/index.ts",
+        "default": "./dist/production/index.cjs"
+      }
+    }
+  },
+  "dependencies": {
+    "@contember/queryable": "workspace:*"
+  },
+  "devDependencies": {
+    "@contember/database-tester": "workspace:*",
+    "@types/node": "^20.9.0",
+    "pg": "^8.11.3"
+  },
+  "peerDependencies": {
+    "pg": "^8.9.0"
+  },
+  "type": "module"
 }

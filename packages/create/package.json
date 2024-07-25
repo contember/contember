@@ -1,40 +1,40 @@
 {
-	"name": "@contember/create",
-	"version": "1.4.0-rc.4",
-	"license": "Apache-2.0",
-	"bin": "dist/src/run.js",
-	"dependencies": {
-		"@contember/cli-common": "workspace:*",
-		"chalk": "^4.1.2",
-		"download-tarball": "^2.0.0",
-		"fs-extra": "^11.1.1",
-		"get-package-json-from-registry": "^2.2.2",
-		"js-yaml": "^4.1.0",
-		"npm-package-arg": "^11.0.1",
-		"registry-info": "^1.0.0"
-	},
-	"type": "module",
-	"main": "./dist/production/index.js",
-	"typings": "./dist/types/index.d.ts",
-	"scripts": {
-		"pre-build": "rm -rf rm ./resources/templates/template-workspace/admin/lib && cp -r ../react-ui-lib/src ./resources/templates/template-workspace/admin/lib && rm ./resources/templates/template-workspace/admin/lib/index.ts ./resources/templates/template-workspace/admin/lib/tsconfig.json"
-	},
-	"exports": {
-		".": {
-			"import": {
-				"types": "./dist/types/index.d.ts",
-				"development": "./dist/development/index.js",
-				"production": "./dist/production/index.js",
-				"typescript": "./src/index.ts",
-				"default": "./dist/production/index.js"
-			},
-			"require": {
-				"types": "./dist/types/index.d.ts",
-				"development": "./dist/development/index.cjs",
-				"production": "./dist/production/index.cjs",
-				"typescript": "./src/index.ts",
-				"default": "./dist/production/index.cjs"
-			}
-		}
-	}
+  "name": "@contember/create",
+  "version": "2.0.0-alpha.7",
+  "license": "Apache-2.0",
+  "bin": "dist/src/run.js",
+  "dependencies": {
+    "@contember/cli-common": "workspace:*",
+    "chalk": "^4.1.2",
+    "download-tarball": "^2.0.0",
+    "fs-extra": "^11.1.1",
+    "get-package-json-from-registry": "^2.2.2",
+    "js-yaml": "^4.1.0",
+    "npm-package-arg": "^11.0.1",
+    "registry-info": "^1.0.0"
+  },
+  "type": "module",
+  "main": "./dist/production/index.js",
+  "typings": "./dist/types/index.d.ts",
+  "scripts": {
+    "pre-build": "rm -rf rm ./resources/templates/template-workspace/admin/lib && cp -r ../react-ui-lib/src ./resources/templates/template-workspace/admin/lib && rm ./resources/templates/template-workspace/admin/lib/index.ts ./resources/templates/template-workspace/admin/lib/tsconfig.json"
+  },
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/types/index.d.ts",
+        "development": "./dist/development/index.js",
+        "production": "./dist/production/index.js",
+        "typescript": "./src/index.ts",
+        "default": "./dist/production/index.js"
+      },
+      "require": {
+        "types": "./dist/types/index.d.ts",
+        "development": "./dist/development/index.cjs",
+        "production": "./dist/production/index.cjs",
+        "typescript": "./src/index.ts",
+        "default": "./dist/production/index.cjs"
+      }
+    }
+  }
 }

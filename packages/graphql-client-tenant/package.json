@@ -1,39 +1,39 @@
 {
-	"name": "@contember/graphql-client-tenant",
-	"version": "1.4.0-rc.4",
-	"license": "Apache-2.0",
-	"type": "module",
-	"scripts": {
-		"pre-build": "tsx ./scripts/generateClient.ts && tsc --build ./src"
-	},
-	"main": "./dist/production/index.js",
-	"typings": "./dist/types/index.d.ts",
-	"exports": {
-		".": {
-			"import": {
-				"types": "./dist/types/index.d.ts",
-				"development": "./dist/development/index.js",
-				"production": "./dist/production/index.js",
-				"typescript": "./src/index.ts",
-				"default": "./dist/production/index.js"
-			},
-			"require": {
-				"types": "./dist/types/index.d.ts",
-				"development": "./dist/development/index.cjs",
-				"production": "./dist/production/index.cjs",
-				"typescript": "./src/index.ts",
-				"default": "./dist/production/index.cjs"
-			}
-		}
-	},
-	"dependencies": {
-		"graphql-ts-client-api": "^3.1.17"
-	},
-	"devDependencies": {
-		"@contember/engine-tenant-api": "workspace:*",
-		"@graphql-tools/schema": "^10.0.0",
-		"@types/node": "^20.9.0",
-		"graphql": "^16.8.1",
-		"graphql-ts-client-codegen": "^3.1.14"
-	}
+  "name": "@contember/graphql-client-tenant",
+  "version": "2.0.0-alpha.7",
+  "license": "Apache-2.0",
+  "type": "module",
+  "scripts": {
+    "pre-build": "tsx ./scripts/generateClient.ts && tsc --build ./src"
+  },
+  "main": "./dist/production/index.js",
+  "typings": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/types/index.d.ts",
+        "development": "./dist/development/index.js",
+        "production": "./dist/production/index.js",
+        "typescript": "./src/index.ts",
+        "default": "./dist/production/index.js"
+      },
+      "require": {
+        "types": "./dist/types/index.d.ts",
+        "development": "./dist/development/index.cjs",
+        "production": "./dist/production/index.cjs",
+        "typescript": "./src/index.ts",
+        "default": "./dist/production/index.cjs"
+      }
+    }
+  },
+  "dependencies": {
+    "graphql-ts-client-api": "^3.1.17"
+  },
+  "devDependencies": {
+    "@contember/engine-tenant-api": "workspace:*",
+    "@graphql-tools/schema": "^10.0.0",
+    "@types/node": "^20.9.0",
+    "graphql": "^16.8.1",
+    "graphql-ts-client-codegen": "^3.1.14"
+  }
 }

@@ -1,49 +1,49 @@
 {
-	"name": "@contember/cli",
-	"version": "1.4.0-rc.4",
-	"license": "Apache-2.0",
-	"bin": {
-		"contember": "./dist/src/run.js"
-	},
-	"scripts": {
-		"build": "tailwindcss -i src/lib/project/docs/resources/style.css -o ./dist/src/utils/project/resources/out.css"
-	},
-	"devDependencies": {
-		"@types/fs-extra": "^11.0.4",
-		"@types/js-yaml": "^4.0.9",
-		"@types/node": "^20.9.0",
-		"@types/prompts": "^2.4.8",
-		"@types/semver": "^7.5.5",
-		"autoprefixer": "^10.4.16",
-		"postcss": "^8.4.31",
-		"tailwindcss": "^3.3.5"
-	},
-	"dependencies": {
-		"@contember/cli-common": "workspace:*",
-		"@contember/config-loader": "workspace:*",
-		"@contember/database": "workspace:*",
-		"@contember/dic": "workspace:*",
-		"@contember/engine-common": "workspace:*",
-		"@contember/engine-content-api": "workspace:*",
-		"@contember/migrations-client": "workspace:*",
-		"@contember/schema": "workspace:*",
-		"@contember/schema-migrations": "workspace:*",
-		"@contember/schema-utils": "workspace:*",
-		"@contember/typesafe": "workspace:*",
-		"@graphql-tools/schema": "^10.0.0",
-		"chalk": "^4.1.2",
-		"chalk-table": "^1.0.2",
-		"esbuild": "^0.18.20",
-		"fast-glob": "^3.3.2",
-		"graphql": "^16.8.1",
-		"graphql-request": "^6.1.0",
-		"js-yaml": "^4.1.0",
-		"lodash-es": "^4.17.21",
-		"pg": "^8.11.3",
-		"preact": "^10.19.2",
-		"preact-render-to-string": "^6.3.1",
-		"prompts": "^2.4.2",
-		"semver": "^7.5.4",
-		"yawn-yaml": "^2.2.0"
-	}
+  "name": "@contember/cli",
+  "version": "2.0.0-alpha.7",
+  "license": "Apache-2.0",
+  "bin": {
+    "contember": "./dist/src/run.js"
+  },
+  "scripts": {
+    "build": "tailwindcss -i src/lib/project/docs/resources/style.css -o ./dist/src/utils/project/resources/out.css"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^20.9.0",
+    "@types/prompts": "^2.4.8",
+    "@types/semver": "^7.5.5",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.31",
+    "tailwindcss": "^3.3.5"
+  },
+  "dependencies": {
+    "@contember/cli-common": "workspace:*",
+    "@contember/config-loader": "workspace:*",
+    "@contember/database": "workspace:*",
+    "@contember/dic": "workspace:*",
+    "@contember/engine-common": "workspace:*",
+    "@contember/engine-content-api": "workspace:*",
+    "@contember/migrations-client": "workspace:*",
+    "@contember/schema": "workspace:*",
+    "@contember/schema-migrations": "workspace:*",
+    "@contember/schema-utils": "workspace:*",
+    "@contember/typesafe": "workspace:*",
+    "@graphql-tools/schema": "^10.0.0",
+    "chalk": "^4.1.2",
+    "chalk-table": "^1.0.2",
+    "esbuild": "^0.18.20",
+    "fast-glob": "^3.3.2",
+    "graphql": "^16.8.1",
+    "graphql-request": "^6.1.0",
+    "js-yaml": "^4.1.0",
+    "lodash-es": "^4.17.21",
+    "pg": "^8.11.3",
+    "preact": "^10.19.2",
+    "preact-render-to-string": "^6.3.1",
+    "prompts": "^2.4.2",
+    "semver": "^7.5.4",
+    "yawn-yaml": "^2.2.0"
+  }
 }

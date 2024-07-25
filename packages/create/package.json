@@ -1,6 +1,6 @@
 {
   "name": "@contember/create",
-  "version": "2.0.0-alpha.7",
+  "version": "2.0.0-alpha.8",
   "license": "Apache-2.0",
   "bin": "dist/src/run.js",
   "dependencies": {

@@ -4,7 +4,7 @@ set -e
 mkdir --parent dist
 yarn install
 yarn workspace @contember/cli build
-node packages/cli/esbuild.js
+node packages/cli/esbuild.cjs
 cd dist
 echo "{}" > package.json
 echo "" > yarn.lock

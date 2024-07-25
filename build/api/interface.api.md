@@ -13,6 +13,7 @@ import { JSX as JSX_2 } from 'react/jsx-runtime';
 import { NamedExoticComponent } from 'react';
 import { ReactElement } from 'react';
 import { ReactNode } from 'react';
+import { RequestParameters } from '@contember/react-routing';
 import { RouteMap } from '@contember/react-routing';
 import { RoutingLinkTarget } from '@contember/react-routing';
 import { SuccessfulPersistResult } from '@contember/react-binding';
@@ -100,8 +101,9 @@ export interface PersistTriggerProps {
 }
 
 // @public (undocumented)
-export const RedirectOnPersist: ({ to }: {
+export const RedirectOnPersist: ({ to, parameters }: {
     to: RoutingLinkTarget;
+    parameters?: RequestParameters;
 }) => null;
 
 // @public (undocumented)

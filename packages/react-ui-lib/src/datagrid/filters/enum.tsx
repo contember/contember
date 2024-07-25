@@ -13,7 +13,7 @@ export type DataGridEnumFilterProps =
 	& Omit<DataViewEnumFilterProps, 'children'>
 	& {
 		options: Record<string, ReactNode>
-		label: ReactNode
+		label?: ReactNode
 	}
 
 export const DataGridEnumFilter = Component(({ options, label, ...props }: DataGridEnumFilterProps) =>
@@ -52,7 +52,7 @@ export const DataGridEnumFieldTooltip = ({ children, actions, value, ...props }:
 )
 
 
-const DataGridEnumFilterList = ({ options }: {
+export const DataGridEnumFilterList = ({ options }: {
 	options: Record<string, ReactNode>
 }) => (
 	<>
@@ -90,26 +90,34 @@ const DataGridEnumFilterSelectItem = ({ value, children, filterFactory }: {
 	)
 
 }
-const DataGridEnumFilterSelect = ({  options, label }: {
+export const DataGridEnumFilterSelect = ({  options, label }: {
 	options: Record<string, ReactNode>
 	label?: ReactNode
 }) => {
-	const filterFactory = useDataViewEnumFilterFactory(useDataViewFilterName())
 	return (
 		<Popover>
 			<PopoverTrigger asChild>
 				<DataGridFilterSelectTriggerUI>{label}</DataGridFilterSelectTriggerUI>
 			</PopoverTrigger>
 			<PopoverContent className="p-2">
-				<div className={'relative flex flex-col gap-2'}>
-					{Object.entries(options).map(([value, label]) => (
-						<DataGridEnumFilterSelectItem value={value} key={value} filterFactory={filterFactory}>
-							{label}
-						</DataGridEnumFilterSelectItem>
-					))}
-					<DataGridNullFilter />
-				</div>
+				<DataGridEnumFilterControls options={options} />
 			</PopoverContent>
 		</Popover>
+	)
+}
+
+export const DataGridEnumFilterControls = ({ options }: {
+	options: Record<string, ReactNode>
+}) => {
+	const filterFactory = useDataViewEnumFilterFactory(useDataViewFilterName())
+	return (
+		<div className={'relative flex flex-col gap-2'}>
+			{Object.entries(options).map(([value, label]) => (
+				<DataGridEnumFilterSelectItem value={value} key={value} filterFactory={filterFactory}>
+					{label}
+				</DataGridEnumFilterSelectItem>
+			))}
+			<DataGridNullFilter />
+		</div>
 	)
 }

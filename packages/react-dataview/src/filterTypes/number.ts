@@ -8,29 +8,36 @@ export type NumberFilterArtifacts = {
 	nullCondition: boolean
 }
 
-export const createNumberFilter = (field: SugaredRelativeSingleField['field']): DataViewFilterHandler<NumberFilterArtifacts> => (filter, { environment }) => {
-	if (filter.query === null && !filter.nullCondition) {
-		return undefined
-	}
+const id = Symbol('number')
 
-	const baseOperators = {
-		eq: 'eq',
-		gte: 'gte',
-		lte: 'lte',
-	}
+export const createNumberFilter = (field: SugaredRelativeSingleField['field']): DataViewFilterHandler<NumberFilterArtifacts> => {
+	const handler: DataViewFilterHandler<NumberFilterArtifacts> = (filter, { environment }) => {
+		const baseOperators = {
+			eq: 'eq',
+			gte: 'gte',
+			lte: 'lte',
+		}
 
-	const conditions: Input.Condition[] = []
-	if (filter.query !== null) {
-		conditions.push({
-			[baseOperators[filter.mode]]: filter.query,
+		const conditions: Input.Condition[] = []
+		if (filter.query !== null) {
+			conditions.push({
+				[baseOperators[filter.mode]]: filter.query,
+			})
+		}
+		if (filter.nullCondition) {
+			conditions.push({ isNull: true })
+		}
+
+		const desugared = QueryLanguage.desugarRelativeSingleField(field, environment)
+		return wrapFilterInHasOnes(desugared.hasOneRelationPath, {
+			[desugared.field]: { or: conditions },
 		})
 	}
-	if (filter.nullCondition) {
-		conditions.push({ isNull: true })
+
+	handler.identifier = { id, params: { field } }
+	handler.isEmpty = filter => {
+		return filter.query === null && !filter.nullCondition
 	}
 
-	const desugared = QueryLanguage.desugarRelativeSingleField(field, environment)
-	return wrapFilterInHasOnes(desugared.hasOneRelationPath, {
-		[desugared.field]: { or: conditions },
-	})
+	return handler
 }

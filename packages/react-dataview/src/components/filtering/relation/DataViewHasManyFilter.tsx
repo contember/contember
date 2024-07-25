@@ -30,7 +30,6 @@ export const DataViewHasManyFilter = Component<DataViewHasManyFilterProps>(({ fi
 }, ({ name, field, children }) => {
 	return <>
 		<DataViewFilter name={getFilterName(name, field)} filterHandler={createHasManyFilter(field)} />
-		{children}
 	</>
 })
 

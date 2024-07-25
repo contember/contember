@@ -22,10 +22,12 @@ export interface DataViewFilterHandlerOptions<FA extends DataViewFilterArtifact 
 	environment: Environment
 }
 
-export type DataViewFilterHandler<FA extends DataViewFilterArtifact = DataViewFilterArtifact> = (
-	filterArtifact: FA,
-	options: DataViewFilterHandlerOptions<FA>,
-) => Filter | undefined
+export type DataViewFilterHandler<FA extends DataViewFilterArtifact = DataViewFilterArtifact> =
+	& ((filterArtifact: FA, options: DataViewFilterHandlerOptions<FA>) => Filter | undefined)
+	& {
+		identifier?: { id: Symbol; params: any }
+		isEmpty?: (filterArtifact: FA) => boolean
+	}
 
 export type DataViewFilterHandlerRegistry = Record<string, DataViewFilterHandler<any>>
 

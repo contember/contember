@@ -85,7 +85,7 @@ const DataGridDateFilterSelect = ({ label, ranges = defaultRanges }: {
 	label?: ReactNode
 	ranges?: DataGridPredefinedDateRange[]
 }) => {
-	const id = useId()
+
 	return (
 		<Popover>
 			<PopoverTrigger asChild>
@@ -98,39 +98,7 @@ const DataGridDateFilterSelect = ({ label, ranges = defaultRanges }: {
 							<DataGridRangeFilter start={start} end={end} label={label} key={`${start}-${end}`} />
 						))}
 					</div>}
-					<div className={'relative flex flex-col'}>
-						<div className={!ranges?.length ? 'flex gap-4 px-4 py-2' : 'flex flex-col px-4 py-2 gap-2'}>
-							<div className="space-y-2">
-								<div className="flex justify-between items-end h-5">
-									<Label htmlFor={`${id}-start`}>
-										{dict.datagrid.dateStart}:
-									</Label>
-									<DataViewDateFilterResetTrigger type="start">
-										<span className="text-sm text-gray-500 cursor-pointer hover:bg-gray-100 rounded p-0.5"><XIcon className="w-3 h-3" /></span>
-									</DataViewDateFilterResetTrigger>
-								</div>
-								<DataViewDateFilterInput type={'start'}>
-									<Input inputSize={'sm'} placeholder={dict.datagrid.dateStart} type={'date'} id={`${id}-start`} />
-								</DataViewDateFilterInput>
-							</div>
-							<div className="space-y-2">
-								<div className="flex justify-between items-end h-5">
-									<Label htmlFor={`${id}-end`}>
-										{dict.datagrid.dateEnd}:
-									</Label>
-									<DataViewDateFilterResetTrigger type="end">
-										<span className="text-sm text-gray-500 cursor-pointer hover:bg-gray-100 rounded p-0.5"><XIcon className="w-3 h-3" /></span>
-									</DataViewDateFilterResetTrigger>
-								</div>
-								<DataViewDateFilterInput type={'end'}>
-									<Input inputSize={'sm'} placeholder={dict.datagrid.dateEnd} type={'date'} id={`${id}-end`} />
-								</DataViewDateFilterInput>
-							</div>
-						</div>
-						<div className="mt-auto p-2 border-t">
-							<DataGridNullFilter />
-						</div>
-					</div>
+					<DataGridDateFilterControls layout={ranges?.length > 0 ? 'column' : 'row'} />
 				</div>
 			</PopoverContent>
 		</Popover>
@@ -149,5 +117,46 @@ const DataGridRangeFilter = ({ start, end, label }: DataGridPredefinedDateRange)
 				end,
 			})
 		}}>{label}</Button>
+	)
+}
+
+export const DataGridDateFilterControls = ({ layout }: { layout?: 'row' | 'column' }) => {
+	const id = useId()
+	return (
+		<div className={'flex flex-col'}>
+			<div className={layout === 'row' ? 'flex gap-4 px-4 py-2' : 'flex flex-col px-4 py-2 gap-2'}>
+				<div className="space-y-2">
+					<div className="flex justify-between items-end h-5">
+						<Label htmlFor={`${id}-start`}>
+							{dict.datagrid.dateStart}:
+						</Label>
+						<DataViewDateFilterResetTrigger type="start">
+							<span className="text-sm text-gray-500 cursor-pointer hover:bg-gray-100 rounded p-0.5"><XIcon
+								className="w-3 h-3" /></span>
+						</DataViewDateFilterResetTrigger>
+					</div>
+					<DataViewDateFilterInput type={'start'}>
+						<Input inputSize={'sm'} placeholder={dict.datagrid.dateStart} type={'date'} id={`${id}-start`} />
+					</DataViewDateFilterInput>
+				</div>
+				<div className="space-y-2">
+					<div className="flex justify-between items-end h-5">
+						<Label htmlFor={`${id}-end`}>
+							{dict.datagrid.dateEnd}:
+						</Label>
+						<DataViewDateFilterResetTrigger type="end">
+							<span className="text-sm text-gray-500 cursor-pointer hover:bg-gray-100 rounded p-0.5"><XIcon
+								className="w-3 h-3" /></span>
+						</DataViewDateFilterResetTrigger>
+					</div>
+					<DataViewDateFilterInput type={'end'}>
+						<Input inputSize={'sm'} placeholder={dict.datagrid.dateEnd} type={'date'} id={`${id}-end`} />
+					</DataViewDateFilterInput>
+				</div>
+			</div>
+			<div className="mt-auto p-2 border-t">
+				<DataGridNullFilter />
+			</div>
+		</div>
 	)
 }

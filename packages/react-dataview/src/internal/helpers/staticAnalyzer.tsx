@@ -5,6 +5,7 @@ import { EntityListSubTreeMarker, Environment, FieldMarker, HasOneRelationMarker
 import { EntityListSubTree, MarkerTreeGenerator } from '@contember/react-binding'
 import { ChildrenAnalyzer, Leaf } from '@contember/react-multipass-rendering'
 import { DataViewFilterHandler, DataViewSelectionLayout } from '../../types'
+import deepEqual from 'fast-deep-equal'
 
 export interface DataViewStaticInfo {
 	filterTypes: Record<string, DataViewFilterHandler<any>>
@@ -13,10 +14,8 @@ export interface DataViewStaticInfo {
 
 export const collectStaticInfo = (props: DataViewProps, env: Environment): DataViewStaticInfo => {
 	const [node, envWithSelectionState] = createDataViewReactNode(props, env)
-	const filtersResult = dataViewAnalyzer.processChildren(node, envWithSelectionState)
-
-	const layoutBoxes = filtersResult.filter((it): it is DataViewLayoutBox => it instanceof DataViewLayoutBox)
-	const filterBoxes = filtersResult.filter((it): it is DataViewFilterBox => it instanceof DataViewFilterBox)
+	const filterBoxes = dataViewFilterAnalyzer.processChildren(node, envWithSelectionState)
+	const layoutBoxes = dataViewLayoutAnalyzer.processChildren(node, envWithSelectionState)
 
 	const layouts = layoutBoxes.map(it => it.props)
 	const filterTypes = getFilterTypes(props, env, filterBoxes)
@@ -55,11 +54,30 @@ const getFilterTypes = (props: DataViewProps, env: Environment, filterBoxes: Dat
 
 	const queryField = getQueryField(props, env)
 
-	return {
-		...(!queryField || (Array.isArray(queryField) && queryField.length === 0) ? {} : { [DataViewQueryFilterName]: createUnionTextFilter(queryField) }),
-		...Object.fromEntries(filterBoxes.map(it => [it.props.name, it.props.filterHandler])),
-		...props.filterTypes,
+	const filterTypes: Record<string, DataViewFilterHandler<any>> = props.filterTypes ?? {}
+	if (queryField && !(DataViewQueryFilterName in filterTypes)) {
+		filterTypes[DataViewQueryFilterName] = createUnionTextFilter(queryField)
 	}
+	for (const filterBox of filterBoxes) {
+		if (filterBox.props.name in filterTypes) {
+			const existingFilter = filterTypes[filterBox.props.name]
+			if (!filterBox.props.filterHandler.identifier
+				|| !existingFilter.identifier
+				|| (filterBox.props.filterHandler.identifier.id === existingFilter.identifier.id
+					&& deepEqual(filterBox.props.filterHandler.identifier.params, existingFilter.identifier.params)
+				)) {
+				continue
+			}
+			throw new Error(`Filter with name ${filterBox.props.name} already exists with different parameters:
+#1: ${existingFilter.identifier.id.toString()} / ${JSON.stringify(existingFilter.identifier)}
+#2: ${filterBox.props.filterHandler.identifier.id.toString()} / ${JSON.stringify(filterBox.props.filterHandler.identifier)}`)
+		}
+
+
+		filterTypes[filterBox.props.name] = filterBox.props.filterHandler
+	}
+
+	return filterTypes
 }
 
 class DataViewFilterBox {
@@ -76,11 +94,19 @@ const filterLeaf = new Leaf(node => new DataViewFilterBox(node.props), DataViewF
 const layoutLeaf = new Leaf(node => new DataViewLayoutBox(node.props), DataViewLayout)
 
 
-export const dataViewAnalyzer = new ChildrenAnalyzer<
-	DataViewFilterBox | DataViewLayoutBox,
+const dataViewFilterAnalyzer = new ChildrenAnalyzer<
+	DataViewFilterBox,
 	never,
 	Environment
->([filterLeaf, layoutLeaf], {
+>([filterLeaf], {
+	staticRenderFactoryName: 'staticRender',
+	staticContextFactoryName: 'generateEnvironment',
+})
+const dataViewLayoutAnalyzer = new ChildrenAnalyzer<
+	DataViewLayoutBox,
+	never,
+	Environment
+>([layoutLeaf], {
 	staticRenderFactoryName: 'staticRender',
 	staticContextFactoryName: 'generateEnvironment',
 })

@@ -82,11 +82,11 @@ export const DataGridFilterSelectTriggerUI = forwardRef<HTMLButtonElement, { chi
 }, ref) => {
 	return (
 		<button className={'hover:underline inline-flex items-center gap-2 group px-1'} ref={ref} {...props}>
-			<span className={'text-xs font-medium'}>
+			{children && <span className={'text-xs font-medium'}>
 				{children}
-			</span>
+			</span>}
 			<span
-				className={'bg-gray-100 rounded-full border group-data-[state=open]:bg-white group-data-[state=open]:shadow-inner p-1'}
+				className={'bg-gray-100 rounded-full border group-data-[state=open]:bg-white group-data-[state=open]:shadow-inner h-5 w-5 inline-flex items-center justify-center'}
 			>
 				<PlusIcon className={'w-3 h-3'} />
 			</span>

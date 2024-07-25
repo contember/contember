@@ -38,7 +38,7 @@ import type { RelativeSingleEntity } from '@contember/binding';
 import { RelativeSingleField } from '@contember/binding';
 import type { SugaredParentEntityParameters } from '@contember/binding';
 import { SugaredQualifiedEntityList } from '@contember/binding';
-import type { SugaredQualifiedSingleEntity } from '@contember/binding';
+import { SugaredQualifiedSingleEntity } from '@contember/binding';
 import type { SugaredRelativeEntityList } from '@contember/binding';
 import type { SugaredRelativeSingleEntity } from '@contember/binding';
 import type { SugaredRelativeSingleField } from '@contember/binding';
@@ -266,6 +266,9 @@ export interface EntitySubTreeAdditionalProps {
     // (undocumented)
     variables?: Environment.ValuesMapWithFactory;
 }
+
+// @public (undocumented)
+export type EntitySubTreeLoaderState = 'initial' | 'refreshing' | 'loaded';
 
 // @public (undocumented)
 export type EntitySubTreeProps<EntityProps> = {
@@ -727,6 +730,16 @@ export const useEntityPersistSuccess: (listener: EntityAccessor.EntityEventListe
 
 // @public (undocumented)
 export const useEntitySubTree: (qualifiedSingleEntity: Alias | SugaredQualifiedSingleEntity | SugaredUnconstrainedQualifiedSingleEntity, ...treeId: [TreeRootId | undefined] | []) => EntityAccessor;
+
+// @public (undocumented)
+export const useEntitySubTreeLoader: <State>(entity: SugaredQualifiedSingleEntity | undefined, children: ReactNode, state?: State) => [UseEntitySubTreeLoaderResult<State>, EntitySubTreeLoaderState];
+
+// @public (undocumented)
+export type UseEntitySubTreeLoaderResult<State> = {
+    entity: SugaredQualifiedSingleEntity | undefined;
+    treeRootId: TreeRootId | undefined;
+    state: State | undefined;
+};
 
 // @public (undocumented)
 export function useEntitySubTreeParameters(alias: Alias): Alias;

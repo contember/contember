@@ -1,7 +1,6 @@
-import { DataView, DataViewEmpty, DataViewLoaderState, DataViewNonEmpty, DataViewProps } from '@contember/react-dataview'
+import { DataView, DataViewLoaderState, DataViewProps } from '@contember/react-dataview'
 import * as React from 'react'
 import { Fragment, ReactNode } from 'react'
-import { DataGridNoResults } from './empty'
 import { DataGridInitialLoader, DataGridOverlayLoader } from './loader'
 import { Component } from '@contember/interface'
 
@@ -42,14 +41,7 @@ export const DataGridLoader = ({ children }: DataViewBodyProps) => (
 				<DataViewLoaderState refreshing>
 					<DataGridOverlayLoader />
 				</DataViewLoaderState>
-
-				<DataViewNonEmpty>
-					{children}
-				</DataViewNonEmpty>
-
-				<DataViewEmpty>
-					<DataGridNoResults />
-				</DataViewEmpty>
+				{children}
 			</div>
 		</DataViewLoaderState>
 		<DataViewLoaderState initial>

@@ -27,38 +27,44 @@ const toLocalIsoString = (date: Date) => {
 		':' + pad(Math.abs(tzo) % 60)
 }
 
-export const createDateFilter = (field: SugaredRelativeSingleField['field']): DataViewFilterHandler<DateRangeFilterArtifacts> => (filter, { environment }) => {
-	if (!filter.start && !filter.end && filter.nullCondition === undefined) {
-		return undefined
-	}
-	const desugared = QueryLanguage.desugarRelativeSingleField(field, environment)
+const id = Symbol('date')
 
-	const inclusion: Input.Condition[] = []
-	const exclusion: Input.Condition[] = []
+export const createDateFilter = (field: SugaredRelativeSingleField['field']): DataViewFilterHandler<DateRangeFilterArtifacts> => {
+	const handler: DataViewFilterHandler<DateRangeFilterArtifacts> = (filter, { environment }) => {
+		const desugared = QueryLanguage.desugarRelativeSingleField(field, environment)
 
-	if (filter.start || filter.end) {
-		const normalizedStart = filter.start ? new Date(filter.start + 'T00:00:00') : undefined
-		const normalizedEnd = filter.end ? new Date(filter.end + 'T00:00:00') : undefined
-		normalizedEnd?.setDate(normalizedEnd.getDate() + 1)
+		const inclusion: Input.Condition[] = []
+		const exclusion: Input.Condition[] = []
 
-		inclusion.push({
-			gte: normalizedStart && !isNaN(normalizedStart.getTime()) ? toLocalIsoString(normalizedStart) : undefined,
-			lt: normalizedEnd && !isNaN(normalizedEnd.getTime()) ? toLocalIsoString(normalizedEnd) : undefined,
+		if (filter.start || filter.end) {
+			const normalizedStart = filter.start ? new Date(filter.start + 'T00:00:00') : undefined
+			const normalizedEnd = filter.end ? new Date(filter.end + 'T00:00:00') : undefined
+			normalizedEnd?.setDate(normalizedEnd.getDate() + 1)
+
+			inclusion.push({
+				gte: normalizedStart && !isNaN(normalizedStart.getTime()) ? toLocalIsoString(normalizedStart) : undefined,
+				lt: normalizedEnd && !isNaN(normalizedEnd.getTime()) ? toLocalIsoString(normalizedEnd) : undefined,
+			})
+		}
+		if (filter.nullCondition === true) {
+			inclusion.push({ isNull: true })
+		}
+		if (filter.nullCondition === false) {
+			exclusion.push({ isNull: false })
+		}
+
+		return wrapFilterInHasOnes(desugared.hasOneRelationPath, {
+			[desugared.field]: {
+				and: [
+					{ or: inclusion },
+					...exclusion,
+				],
+			},
 		})
 	}
-	if (filter.nullCondition === true) {
-		inclusion.push({ isNull: true })
-	}
-	if (filter.nullCondition === false) {
-		exclusion.push({ isNull: false })
-	}
 
-	return wrapFilterInHasOnes(desugared.hasOneRelationPath, {
-		[desugared.field]: {
-			and: [
-				{ or: inclusion },
-				...exclusion,
-			],
-		},
-	})
+	handler.identifier = { id, params: { field } }
+	handler.isEmpty = filter => !filter.start && !filter.end && filter.nullCondition === undefined
+
+	return handler
 }

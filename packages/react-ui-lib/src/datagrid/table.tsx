@@ -2,7 +2,7 @@ import { Component, Environment } from '@contember/interface'
 import { Table, TableBody, TableHeader, TableRow } from '../ui/table'
 import * as React from 'react'
 import { Fragment, ReactNode, useMemo } from 'react'
-import { DataViewEachRow, DataViewLayout } from '@contember/react-dataview'
+import { DataViewEachRow, DataViewEmpty, DataViewLayout, DataViewNonEmpty } from '@contember/react-dataview'
 import { SheetIcon } from 'lucide-react'
 import { dict } from '../dict'
 import { ChildrenAnalyzer, Leaf } from '@contember/react-multipass-rendering'
@@ -41,15 +41,22 @@ const DataGridTableRenderer = Component< DataViewTableProps>(({ children }, env)
 				</TableRow>
 			</TableHeader>
 			<TableBody>
-				<DataViewEachRow>
+				<DataViewNonEmpty>
+					<DataViewEachRow>
+						<TableRow>
+							{columns.map(({ cell, name }, i) => (
+								<Fragment key={name ?? `_${i}`}>
+									{cell}
+								</Fragment>
+							))}
+						</TableRow>
+					</DataViewEachRow>
+				</DataViewNonEmpty>
+				<DataViewEmpty>
 					<TableRow>
-						{columns.map(({ cell, name }, i) => (
-							<Fragment key={name ?? `_${i}`}>
-								{cell}
-							</Fragment>
-						))}
+						<td className="text-lg p-4 text-center text-gray-400" colSpan={columns.length}>{dict.datagrid.empty}</td>
 					</TableRow>
-				</DataViewEachRow>
+				</DataViewEmpty>
 			</TableBody>
 		</Table>
 	)

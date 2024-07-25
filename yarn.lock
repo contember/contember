@@ -830,7 +830,7 @@ __metadata:
     tailwindcss: ^3.3.5
     yawn-yaml: ^2.2.0
   bin:
-    contember: ./dist/src/run.js
+    contember: ./dist/production/run.js
   languageName: unknown
   linkType: soft
 
@@ -893,7 +893,7 @@ __metadata:
     npm-package-arg: ^11.0.1
     registry-info: ^1.0.0
   bin:
-    create: dist/src/run.js
+    create: dist/production/run.js
   languageName: unknown
   linkType: soft
 

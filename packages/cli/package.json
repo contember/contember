@@ -3,7 +3,7 @@
   "version": "2.0.0-alpha.9",
   "license": "Apache-2.0",
   "bin": {
-    "contember": "./dist/src/run.js"
+    "contember": "./dist/production/run.js"
   },
   "scripts": {
     "build": "tailwindcss -i src/lib/project/docs/resources/style.css -o ./dist/src/utils/project/resources/out.css"

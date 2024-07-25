@@ -297,7 +297,13 @@ export const DataViewFilter: ({}: DataViewFilterProps) => never;
 export type DataViewFilterArtifact = Serializable;
 
 // @public (undocumented)
-export type DataViewFilterHandler<FA extends DataViewFilterArtifact = DataViewFilterArtifact> = (filterArtifact: FA, options: DataViewFilterHandlerOptions<FA>) => Filter | undefined;
+export type DataViewFilterHandler<FA extends DataViewFilterArtifact = DataViewFilterArtifact> = ((filterArtifact: FA, options: DataViewFilterHandlerOptions<FA>) => Filter | undefined) & {
+    identifier?: {
+        id: Symbol;
+        params: any;
+    };
+    isEmpty?: (filterArtifact: FA) => boolean;
+};
 
 // @public (undocumented)
 export interface DataViewFilterHandlerOptions<FA extends DataViewFilterArtifact = DataViewFilterArtifact> {
@@ -1009,8 +1015,10 @@ export const useDataViewFetchAllData: ({ children }: {
     marker: EntityListSubTreeMarker_2;
 }>;
 
+// Warning: (ae-forgotten-export) The symbol "UseDataViewFilterResult" needs to be exported by the entry point index.d.ts
+//
 // @public (undocumented)
-export const useDataViewFilter: <T extends DataViewFilterArtifact>(key: string) => [T | undefined, (filter: SetStateAction<T | undefined>) => void];
+export const useDataViewFilter: <T extends DataViewFilterArtifact>(key: string) => UseDataViewFilterResult<T>;
 
 // @public (undocumented)
 export const useDataViewFilterHandlerRegistry: () => DataViewFilterHandlerRegistry;

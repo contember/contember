@@ -20,7 +20,7 @@ const InitSignInIDPMutation = TenantApi
 		TenantApi
 			.initSignInIDPResponse$$
 			.error(TenantApi.initSignInIDPError$$)
-			.result(TenantApi.initSignInIDPResult$$),
+			.result(TenantApi.initSignInIDPResult$.authUrl.sessionData),
 		options => options.alias('mutation'),
 	)
 

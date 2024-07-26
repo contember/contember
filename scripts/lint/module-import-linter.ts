@@ -16,6 +16,7 @@ const allowedUnused = new Set([
 	'graphql',
 	'lodash-es',
 	'graphql-ts-client-api',
+	'react-dom',
 ])
 
 const allowedDirectoryImports = new Set([

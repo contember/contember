@@ -120,7 +120,7 @@ CREATE TABLE "event_data" (
 );
 CREATE TABLE "schema" (
     "id" "schema_single" DEFAULT 'single'::"schema_single" NOT NULL,
-    "schema" "jsonb" NOT NULL,
+    "schema" "json" NOT NULL,
     "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "checksum" character(32) NOT NULL,
     "version" character varying(20) NOT NULL,

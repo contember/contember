@@ -1596,7 +1596,7 @@ export const LinkBackButton: ({ children, to }: {
 export const Loader: ({ size, ...props }: LoaderProps) => JSX_2.Element;
 
 // @public (undocumented)
-export const LoaderIcon: React_2.ForwardRefExoticComponent<Omit<LucideProps & {
+export const LoaderIcon: React_2.ForwardRefExoticComponent<Omit<Omit<LucideProps, "ref"> & React_2.RefAttributes<SVGSVGElement> & {
     asChild?: boolean;
     children?: React_2.ReactNode;
     className?: string;

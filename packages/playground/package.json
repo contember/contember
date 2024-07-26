@@ -24,7 +24,7 @@
     "@radix-ui/react-toolbar": "^1.0.4",
     "autoprefixer": "^10.4.19",
     "graphql": "^16.8.1",
-    "lucide-react": "^0.302.0",
+    "lucide-react": "^0.416.0",
     "postcss": "^8.4.38",
     "qrcode-generator": "^1.4.4",
     "react": "^18.3.1",

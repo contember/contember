@@ -1297,7 +1297,7 @@ __metadata:
     "@sindresorhus/slugify": ^2.2.1
     autoprefixer: ^10.4.19
     graphql: ^16.8.1
-    lucide-react: ^0.302.0
+    lucide-react: ^0.416.0
     postcss: ^8.4.38
     qrcode-generator: ^1.4.4
     react: ^18.3.1
@@ -1704,7 +1704,7 @@ __metadata:
     "@radix-ui/react-tooltip": ^1.0.7
     class-variance-authority: ^0.7.0
     clsx: ^1.2.1
-    lucide-react: ^0.302.0
+    lucide-react: ^0.416.0
     qrcode-generator: ^1.4.4
     react: ^18.3.1
     react-dom: ^18.3.1
@@ -9684,12 +9684,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lucide-react@npm:^0.302.0":
-  version: 0.302.0
-  resolution: "lucide-react@npm:0.302.0"
+"lucide-react@npm:^0.416.0":
+  version: 0.416.0
+  resolution: "lucide-react@npm:0.416.0"
   peerDependencies:
-    react: ^16.5.1 || ^17.0.0 || ^18.0.0
-  checksum: ca2f4df1770c218244930f7aee29226953786642ec8f9c8d51b19ba8a96f3a4bf23c7b0f5e6bc013734e583316152942dbaa4199632612fd80d6e1061ee96bda
+    react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
+  checksum: ee3909941b648546535dd416daa8a4398f480a0a2eaa37182e227cc46c240d0eb406a819c1f838c103bf4f08e765f806e2d2a336b3d8c080ea6ae87c5b05e687
   languageName: node
   linkType: hard
 

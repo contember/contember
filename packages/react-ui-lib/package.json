@@ -75,7 +75,7 @@
     "@radix-ui/react-tooltip": "^1.0.7",
     "class-variance-authority": "^0.7.0",
     "clsx": "^1.2.1",
-    "lucide-react": "^0.302.0",
+    "lucide-react": "^0.416.0",
     "qrcode-generator": "^1.4.4",
     "slate": "^0.103.0",
     "slate-react": "^0.102.0",

@@ -1,11 +1,13 @@
 import { FormContainer, FormContainerProps } from '@app/lib/form'
 import { ComponentProps, useState } from 'react'
-import { Input, Select } from '@app/lib/ui/input'
+import { Input } from '@app/lib/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@app/lib/ui/select'
 import { cn } from '@app/lib/utils'
 import * as React from 'react'
 import { FormFieldScope, FormInput, FormInputProps } from '@contember/react-form'
 import { Component, Field } from '@contember/react-binding'
 import { useField } from '@contember/react-binding'
+import { dict } from '@app/lib/dict'
 
 export type SelectOrTypeFieldProps =
 	& Omit<FormInputProps, 'children'>
@@ -24,8 +26,7 @@ export const SelectOrTypeField = Component(({ field, label, description, selectP
 	return (
 		<FormFieldScope field={field}>
 			<FormContainer description={description} label={label}>
-				{showSelect ? <Select onChange={e => {
-					const value = e.target.value
+				{showSelect ? <Select value={fieldValue ?? undefined} onValueChange={value => {
 					if (value === '___other') {
 						setShowSelect(false)
 						fieldAccessor.updateValue('')
@@ -33,14 +34,18 @@ export const SelectOrTypeField = Component(({ field, label, description, selectP
 						fieldAccessor.updateValue(value)
 
 					}
-				}} {...selectProps} className={cn('max-w-md', selectProps?.className)}>
-					<option value="">Select</option>
-					{Object.entries(options ?? {}).map(([value, label]) => (
-						<option key={value} value={value} selected={value === fieldValue}>
-							{label}
-						</option>
-					))}
-					<option value="___other">Other</option>
+				}} {...selectProps}>
+					<SelectTrigger className={cn('max-w-md')}>
+						<SelectValue placeholder={dict.select.placeholder}>{fieldValue}</SelectValue>
+					</SelectTrigger>
+					<SelectContent>
+						{Object.entries(options ?? {}).map(([value, label]) => (
+							<SelectItem key={value} value={value}>
+								{label}
+							</SelectItem>
+						))}
+						<SelectItem value="___other">Other</SelectItem>
+					</SelectContent>
 				</Select>
 					: <FormInput field={field} isNonbearing={isNonbearing} defaultValue={defaultValue}>
 						<Input required={required} {...(inputProps ?? {})} className={cn('max-w-md', inputProps?.className)} />

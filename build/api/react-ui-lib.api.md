@@ -71,7 +71,7 @@ import { RepeaterProps } from '@contember/react-repeater';
 import { RoleCondition } from '@contember/interface';
 import { RoutingLinkTarget } from '@contember/react-routing';
 import * as ScrollAreaPrimitive from '@radix-ui/react-scroll-area';
-import { SelectHTMLAttributes } from 'react';
+import * as SelectPrimitive from '@radix-ui/react-select';
 import { SlotSourceComponent } from '@contember/react-slots';
 import { SlotTargetComponent } from '@contember/react-slots';
 import { SuccessfulPersistResult } from '@contember/interface';
@@ -1965,11 +1965,16 @@ export const ScrollArea: React_2.ForwardRefExoticComponent<Omit<ScrollAreaPrimit
 export const ScrollBar: React_2.ForwardRefExoticComponent<Omit<ScrollAreaPrimitive.ScrollAreaScrollbarProps & React_2.RefAttributes<HTMLDivElement>, "ref"> & React_2.RefAttributes<HTMLDivElement>>;
 
 // @public (undocumented)
-export const Select: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLSelectElement> & SelectHTMLAttributes<HTMLSelectElement> & {
+export const Select: FC<SelectPrimitive.SelectProps>;
+
+// @public (undocumented)
+export const SelectContent: ForwardRefExoticComponent<Omit<SelectPrimitive.SelectContentProps & RefAttributes<HTMLDivElement> & {
 asChild?: boolean;
 children?: ReactNode;
 className?: string;
-}, "ref"> & RefAttributes<HTMLSelectElement>>;
+} & {
+position?: "popper" | null | undefined;
+}, "ref"> & RefAttributes<HTMLDivElement>>;
 
 // @public (undocumented)
 export const SelectCreateNewTrigger: React_2.ForwardRefExoticComponent<React_2.RefAttributes<HTMLButtonElement>>;
@@ -1996,6 +2001,9 @@ export const SelectField: React_2.NamedExoticComponent<SelectFieldProps>;
 
 // @public (undocumented)
 export type SelectFieldProps = SelectInputProps & Omit<FormContainerProps, 'children'>;
+
+// @public (undocumented)
+export const SelectGroup: ForwardRefExoticComponent<SelectPrimitive.SelectGroupProps & RefAttributes<HTMLDivElement>>;
 
 // @public (undocumented)
 export const SelectInput: React_2.NamedExoticComponent<{
@@ -2041,6 +2049,20 @@ export const SelectInputWrapperUI: React_2.ForwardRefExoticComponent<Omit<React_
 }, "ref"> & React_2.RefAttributes<HTMLDivElement>>;
 
 // @public (undocumented)
+export const SelectItem: ForwardRefExoticComponent<Omit<SelectPrimitive.SelectItemProps & RefAttributes<HTMLDivElement> & {
+asChild?: boolean;
+children?: ReactNode;
+className?: string;
+}, "ref"> & RefAttributes<HTMLDivElement>>;
+
+// @public (undocumented)
+export const SelectLabel: ForwardRefExoticComponent<Omit<SelectPrimitive.SelectLabelProps & RefAttributes<HTMLDivElement> & {
+asChild?: boolean;
+children?: ReactNode;
+className?: string;
+}, "ref"> & RefAttributes<HTMLDivElement>>;
+
+// @public (undocumented)
 export const SelectListInner: React_2.NamedExoticComponent<{
     children: ReactNode;
     filterToolbar?: ReactNode;
@@ -2075,6 +2097,37 @@ export const SelectPopoverContent: React_2.ForwardRefExoticComponent<Omit<Omit<P
     children?: React_2.ReactNode;
     className?: string;
 }, "ref"> & React_2.RefAttributes<HTMLDivElement>>;
+
+// @public (undocumented)
+export const SelectScrollDownButton: ForwardRefExoticComponent<Omit<SelectPrimitive.SelectScrollDownButtonProps & RefAttributes<HTMLDivElement> & {
+asChild?: boolean;
+children?: ReactNode;
+className?: string;
+}, "ref"> & RefAttributes<HTMLDivElement>>;
+
+// @public (undocumented)
+export const SelectScrollUpButton: ForwardRefExoticComponent<Omit<SelectPrimitive.SelectScrollUpButtonProps & RefAttributes<HTMLDivElement> & {
+asChild?: boolean;
+children?: ReactNode;
+className?: string;
+}, "ref"> & RefAttributes<HTMLDivElement>>;
+
+// @public (undocumented)
+export const SelectSeparator: ForwardRefExoticComponent<Omit<SelectPrimitive.SelectSeparatorProps & RefAttributes<HTMLDivElement> & {
+asChild?: boolean;
+children?: ReactNode;
+className?: string;
+}, "ref"> & RefAttributes<HTMLDivElement>>;
+
+// @public (undocumented)
+export const SelectTrigger: ForwardRefExoticComponent<Omit<SelectPrimitive.SelectTriggerProps & RefAttributes<HTMLButtonElement> & {
+asChild?: boolean;
+children?: ReactNode;
+className?: string;
+}, "ref"> & RefAttributes<HTMLButtonElement>>;
+
+// @public (undocumented)
+export const SelectValue: ForwardRefExoticComponent<SelectPrimitive.SelectValueProps & RefAttributes<HTMLSpanElement>>;
 
 // @public (undocumented)
 export const Sheet: React_2.FC<DialogPrimitive.DialogProps>;

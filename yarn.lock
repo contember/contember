@@ -1711,9 +1711,6 @@ __metadata:
     slate: ^0.103.0
     slate-react: ^0.102.0
     tailwind-merge: ^2.3.0
-  peerDependencies:
-    react: ^18 || ^19
-    react-dom: ^18 || ^19
   languageName: unknown
   linkType: soft
 

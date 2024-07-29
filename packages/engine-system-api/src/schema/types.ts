@@ -17,7 +17,7 @@ export type Scalars = {
 	Schema: { input: any; output: any }
 	DateTime: { input: Date; output: Date }
 	Json: { input: unknown; output: unknown }
-	PrimaryKey: { input: any; output: any }
+	PrimaryKey: { input: string | number; output: string | number }
 }
 
 export type ContentMigration = {
@@ -71,7 +71,7 @@ export type Event = {
 }
 
 export type EventFilterRow = {
-	readonly primaryKey: ReadonlyArray<Scalars['PrimaryKey']['input']>
+	readonly primaryKey: ReadonlyArray<InputMaybe<Scalars['PrimaryKey']['input']>>
 	readonly tableName: Scalars['String']['input']
 }
 

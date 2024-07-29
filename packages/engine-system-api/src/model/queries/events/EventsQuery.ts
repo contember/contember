@@ -2,6 +2,7 @@ import {
 	ConditionBuilder,
 	DatabaseQuery,
 	DatabaseQueryable,
+	Literal,
 	Operator,
 	SelectBuilder,
 	SelectBuilderSpecification, Value,
@@ -78,23 +79,20 @@ export class EventsQuery extends DatabaseQuery<ContentEvent[]> {
 				if (!this.filter.rows) {
 					return qb
 				}
-				type PrimaryKey = readonly string[]
-				const byTable: Record<string, PrimaryKey[]> = {}
-				for (const row of this.filter.rows) {
-					byTable[row.tableName] ??= []
-					byTable[row.tableName].push(row.primaryKey)
-				}
-				const rowFilters = Object.entries(byTable)
-				const ors = rowFilters.reduce(
-					(expr, [table, rowIds]) =>
-						expr.and(
-							ConditionBuilder.create()
-								.compare('table_name', Operator.eq, table)
-								.in('row_ids', rowIds.map(it => JSON.stringify(it))),
-						),
-					ConditionBuilder.create(),
-				)
-				return qb.where(ConditionBuilder.create().or(ors))
+
+				const ors: Literal[] = this.filter.rows.map(row => {
+					const builder = ConditionBuilder.create()
+						.compare('table_name', Operator.eq, row.tableName)
+
+					return row.primaryKey.reduce((expr, val, index) => {
+						if (val === null) {
+							return expr
+						}
+						return expr.raw(`"row_ids"->${index} = ?::jsonb`, JSON.stringify(val))
+					}, builder).getSql()
+				}).filter((it): it is Literal => it !== null)
+
+				return qb.where(ConditionBuilder.create().or(ConditionBuilder.create(ors)))
 			})
 
 			.limit(this.limit, this.offset)

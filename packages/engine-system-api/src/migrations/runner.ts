@@ -28,6 +28,7 @@ import _20231024140000schemanullablechecksum from './2023-10-24-140000-schema-nu
 import _20240628150000migrationsdropsequence from './2024-06-28-150000-migrations-drop-sequence'
 import _20240628153000schema from './2024-06-28-153000-schema'
 import _20240628153001schemainit from './2024-06-28-153001-schema-init'
+import _20240729150000eventdataindex from './2024-07-29-150000-event-data-index'
 import snapshot from './snapshot'
 
 import { Connection, createDatabaseIfNotExists, DatabaseConfig, DatabaseMetadataResolver } from '@contember/database'
@@ -60,6 +61,7 @@ const migrations = {
 	'2024-06-28-150000-migrations-drop-sequence': _20240628150000migrationsdropsequence,
 	'2024-06-28-153000-schema': _20240628153000schema,
 	'2024-06-28-153001-schema-init': _20240628153001schemainit,
+	'2024-07-29-150000-event-data-index': _20240729150000eventdataindex,
 }
 
 

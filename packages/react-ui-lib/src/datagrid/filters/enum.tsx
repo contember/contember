@@ -82,7 +82,7 @@ const DataGridEnumFilterSelectItem = ({ value, children, filterFactory }: {
 	const exclude = useCallback(() => setFilter('toggleExclude'), [setFilter])
 	const isIncluded = current === 'include'
 
-	const isExcluded = current == 'exclude'
+	const isExcluded = current === 'exclude'
 	return (
 		<DataGridFilterSelectItemUI onExclude={exclude} onInclude={include} isExcluded={isExcluded} isIncluded={isIncluded}>
 			{children}

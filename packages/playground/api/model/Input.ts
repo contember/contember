@@ -4,6 +4,7 @@ export const InputUnique = c.createEnum('unique')
 
 export class InputRoot {
 	unique = c.enumColumn(InputUnique).notNull().unique()
+	dummy = c.stringColumn()
 	textValue = c.stringColumn()
 	intValue = c.intColumn()
 	floatValue = c.doubleColumn()

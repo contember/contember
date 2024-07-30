@@ -2,93 +2,118 @@ import { Slots } from '@app/lib/layout'
 import { EntitySubTree, useField } from '@contember/interface'
 import { CheckboxField, InputField, RadioEnumField, TextareaField } from '@app/lib/form'
 import * as React from 'react'
-import { Button } from '@app/lib/ui/button'
+import { AnchorButton, Button } from '@app/lib/ui/button'
 import { Binding, PersistButton } from '@app/lib/binding'
 import { SelectOrTypeField } from '@app/lib-extra/select-or-type-field'
 import { FieldExists } from '@app/lib-extra/has-field'
 import { SlugField } from '@app/lib-extra/slug-field/field'
 import slugify from '@sindresorhus/slugify'
+import { useEnvironment } from '@contember/react-binding'
+import { Link } from '@contember/react-routing'
 
-export const basic = () => <>
-	<Binding>
-		<Slots.Actions>
-			<PersistButton />
-		</Slots.Actions>
-		<EntitySubTree entity={'InputRoot(unique=unique)'} setOnCreate={'(unique=unique)'}>
-			<div className={'space-y-4'}>
-				<InputField field={'textValue'} label={'Text'} description={'Hello world'} />
-				<InputField field={'intValue'} label={'Number'} />
-				<InputField field={'floatValue'} label={'Float'} />
-				<InputField field={'dateValue'} label={'Date'} />
-				<InputField field={'datetimeValue'} label={'Date time'} />
+export const Basic = () => {
+	const required = !!useEnvironment().getParameterOrElse('required', false)
+	return <>
+		<Binding>
+			<Slots.Actions>
+				<PersistButton />
+			</Slots.Actions>
+			<EntitySubTree entity={'InputRoot(unique=unique)'} setOnCreate={'(unique=unique)'}>
+				<div className={'space-y-4'}>
+					<ToggleRequired/>
+					<InputField field="dummy" label="Dummy to trigger dirty state" />
+					<InputField field={'textValue'} label={'Text'} description={'Hello world'} required={required} />
+					<InputField field={'intValue'} label={'Number'} required={required} />
+					<InputField field={'floatValue'} label={'Float'} required={required} />
+					<InputField field={'dateValue'} label={'Date'} required={required} />
+					<InputField field={'datetimeValue'} label={'Date time'} required={required} />
 
-				<FieldExists field={'nonExistingField'}>
-					<InputField field={'nonExistingField'} label={'Date time'} />
-				</FieldExists>
-			</div>
-		</EntitySubTree>
-	</Binding>
-</>
+					<FieldExists field={'nonExistingField'}>
+						<InputField field={'nonExistingField'} label={'Date time'} />
+					</FieldExists>
+				</div>
+			</EntitySubTree>
+		</Binding>
+	</>
+}
 
 
-export const selectOrType = () => <>
-	<Binding>
-		<Slots.Actions>
-			<PersistButton />
-		</Slots.Actions>
-		<EntitySubTree entity={'InputRoot(unique=unique)'} setOnCreate={'(unique=unique)'}>
-			<div className={'space-y-4'}>
-				<SelectOrTypeField field={'textValue'} label={'Text'} options={{
-					a: 'Option A',
-					b: 'Option B',
-				}} />
-			</div>
-		</EntitySubTree>
-	</Binding>
-</>
+export const SelectOrType = () => {
+	return <>
+		<Binding>
+			<Slots.Actions>
+				<PersistButton />
+			</Slots.Actions>
+			<EntitySubTree entity={'InputRoot(unique=unique)'} setOnCreate={'(unique=unique)'}>
+				<div className={'space-y-4'}>
+					<InputField field="dummy" label="Dummy to trigger dirty state" />
+					<SelectOrTypeField field={'textValue'} label={'Text'} options={{
+						a: 'Option A',
+						b: 'Option B',
+					}} />
+				</div>
+			</EntitySubTree>
+		</Binding>
+	</>
+}
 
-export const textarea = () => <>
-	<Binding>
-		<Slots.Actions>
-			<PersistButton />
-		</Slots.Actions>
-		<EntitySubTree entity={'InputRoot(unique=unique)'} setOnCreate={'(unique=unique)'}>
-			<div className={'space-y-4'}>
-				<TextareaField field={'textValue'} label={'Text'} description={'Hello world'} />
-			</div>
-		</EntitySubTree>
-	</Binding>
-</>
+export const Textarea = () => {
+	const required = !!useEnvironment().getParameterOrElse('required', false)
+	return <>
+		<Binding>
+			<Slots.Actions>
+				<PersistButton />
+			</Slots.Actions>
+			<EntitySubTree entity={'InputRoot(unique=unique)'} setOnCreate={'(unique=unique)'}>
+				<div className={'space-y-4'}>
+					<ToggleRequired />
+					<InputField field="dummy" label="Dummy to trigger dirty state" />
+					<TextareaField field={'textValue'} label={'Text'} description={'Hello world'} required={required} />
+				</div>
+			</EntitySubTree>
+		</Binding>
+	</>
+}
 
-export const checkbox = () => <>
-	<Binding>
-		<Slots.Actions>
-			<PersistButton />
-		</Slots.Actions>
-		<EntitySubTree entity={'InputRoot(unique=unique)'} setOnCreate={'(unique=unique)'}>
-			<div className={'space-y-4'}>
-				<CheckboxField field={'boolValue'} label={'Some boolean'} description={'Hello world'} />
-			</div>
-		</EntitySubTree>
-	</Binding>
-</>
+export const Checkbox = () => {
+	const required = !!useEnvironment().getParameterOrElse('required', false)
+	return <>
+		<Binding>
+			<Slots.Actions>
+				<PersistButton />
+			</Slots.Actions>
+			<EntitySubTree entity={'InputRoot(unique=unique)'} setOnCreate={'(unique=unique)'}>
+				<div className={'space-y-4'}>
+					<ToggleRequired />
+					<InputField field="dummy" label="Dummy to trigger dirty state" />
+					<CheckboxField field={'boolValue'} label={'Some boolean'} description={'Hello world'} required={required} />
+				</div>
+			</EntitySubTree>
+		</Binding>
+	</>
+}
 
-export const enumRadio = () => <>
-	<Binding>
-		<Slots.Actions>
-			<PersistButton />
-		</Slots.Actions>
-		<EntitySubTree entity={'InputRoot(unique=unique)'} setOnCreate={'(unique=unique)'}>
-			<div className={'space-y-4'}>
-				<RadioEnumField field={'enumValue'} label={'Some enum'} options={{
-					a: 'Option A',
-					b: 'Option B',
-					c: 'Option C',
-				}} />
-			</div>
-		</EntitySubTree>
-	</Binding>
-</>
+export const EnumRadio = () => {
+	const required = !!useEnvironment().getParameterOrElse('required', false)
+	return <>
+		<Binding>
+			<Slots.Actions>
+				<PersistButton />
+			</Slots.Actions>
+			<EntitySubTree entity={'InputRoot(unique=unique)'} setOnCreate={'(unique=unique)'}>
+				<div className={'space-y-4'}>
+					<ToggleRequired />
+					<InputField field="dummy" label="Dummy to trigger dirty state" />
+					<RadioEnumField field={'enumValue'} label={'Some enum'} options={{
+						a: 'Option A',
+						b: 'Option B',
+						c: 'Option C',
+					}} required={required} />
+				</div>
+			</EntitySubTree>
+		</Binding>
+	</>
+}
 
 
 const FillValue = () => {
@@ -102,6 +127,18 @@ const FillValue = () => {
 		<Button onClick={() => checkbox.updateValue(false)}>Set checkbox false</Button>
 	</>
 }
+const ToggleRequired = () => {
+	const required = !!useEnvironment().getParameterOrElse('required', false)
+
+	return (
+		<Link to={it => it ? ({ pageName: it.pageName, parameters: { required: !required ? '1' : '' } }) : it}>
+			<AnchorButton>
+				Toggle required
+			</AnchorButton>
+		</Link>
+	)
+}
+
 export const clientValidation = () => <>
 	<Binding>
 		<Slots.Actions>
@@ -109,6 +146,7 @@ export const clientValidation = () => <>
 		</Slots.Actions>
 		<EntitySubTree entity={'InputRoot(unique=unique)'} setOnCreate={'(unique=unique)'}>
 			<div className={'space-y-4'}>
+				<InputField field="dummy" label="Dummy to trigger dirty state" />
 				<div className={'pl-52 space-x-4'}>
 					<FillValue />
 				</div>

@@ -1,25 +1,31 @@
 import { Slots } from '@app/lib/layout'
 import { Binding, PersistButton } from '@app/lib/binding'
-import { EntitySubTree } from '@contember/interface'
+import { EntitySubTree, Link } from '@contember/interface'
 import * as React from 'react'
-import { Field } from '@contember/react-binding'
+import { Field, useEnvironment } from '@contember/react-binding'
 import { InputField, MultiSelectField, SelectEnumField, SelectField, SortableMultiSelectField } from '@app/lib/form'
+import { AnchorButton } from '@app/lib/ui/button'
 
 
-export const hasOne = () => <>
-	<Binding>
-		<Slots.Actions>
-			<PersistButton />
-		</Slots.Actions>
-		<EntitySubTree entity={'SelectRoot(unique=unique)'} setOnCreate={'(unique=unique)'}>
-			<div className={'space-y-4'}>
-				<SelectField field={'hasOne'} label="Has one value" initialSorting={{ name: 'asc' }}>
-					<Field field={'name'} />
-				</SelectField>
-			</div>
-		</EntitySubTree>
-	</Binding>
-</>
+export const HasOne = () => {
+	const required = !!useEnvironment().getParameterOrElse('required', false)
+	return <>
+		<Binding>
+			<Slots.Actions>
+				<PersistButton />
+			</Slots.Actions>
+			<EntitySubTree entity={'SelectRoot(unique=unique)'} setOnCreate={'(unique=unique)'}>
+				<div className={'space-y-4'}>
+					<ToggleRequired />
+					<InputField field="dummy" label="Dummy to trigger dirty state" />
+					<SelectField field={'hasOne'} label="Has one value" initialSorting={{ name: 'asc' }} required={required}>
+						<Field field={'name'} />
+					</SelectField>
+				</div>
+			</EntitySubTree>
+		</Binding>
+	</>
+}
 export const hasMany = () => <>
 	<Binding>
 		<Slots.Actions>
@@ -27,6 +33,7 @@ export const hasMany = () => <>
 		</Slots.Actions>
 		<EntitySubTree entity={'SelectRoot(unique=unique)'} setOnCreate={'(unique=unique)'}>
 			<div className={'space-y-4'}>
+				<InputField field="dummy" label="Dummy to trigger dirty state" />
 				<MultiSelectField field={'hasMany'} label="Has many values">
 					<Field field={'name'} />
 				</MultiSelectField>
@@ -41,6 +48,7 @@ export const hasManySortable = () => <>
 		</Slots.Actions>
 		<EntitySubTree entity={'SelectRoot(unique=unique)'} setOnCreate={'(unique=unique)'}>
 			<div className={'space-y-4'}>
+				<InputField field="dummy" label="Dummy to trigger dirty state" />
 				<SortableMultiSelectField field={'hasManySorted'} connectAt={'value'} sortableBy={'order'} label="Has many sortable values">
 					<Field field={'name'} />
 				</SortableMultiSelectField>
@@ -71,19 +79,37 @@ export const createNewForm = () => <>
 	</Binding>
 </>
 
-export const enumSelect = () => <>
-	<Binding>
-		<Slots.Actions>
-			<PersistButton />
-		</Slots.Actions>
-		<EntitySubTree entity={'InputRoot(unique=unique)'} setOnCreate={'(unique=unique)'}>
-			<div className={'space-y-4'}>
-				<SelectEnumField field={'enumValue'} label={'Some enum'} options={{
-					a: 'Option A',
-					b: 'Option B',
-					c: 'Option C',
-				}} />
-			</div>
-		</EntitySubTree>
-	</Binding>
-</>
+export const EnumSelect = () => {
+	const required = !!useEnvironment().getParameterOrElse('required', false)
+	return <>
+		<Binding>
+			<Slots.Actions>
+				<PersistButton />
+			</Slots.Actions>
+			<EntitySubTree entity={'InputRoot(unique=unique)'} setOnCreate={'(unique=unique)'}>
+				<div className={'space-y-4'}>
+					<ToggleRequired />
+					<InputField field="dummy" label="Dummy to trigger dirty state" />
+					<SelectEnumField field={'enumValue'} label={'Some enum'} options={{
+						a: 'Option A',
+						b: 'Option B',
+						c: 'Option C',
+					}} required={required} />
+				</div>
+			</EntitySubTree>
+		</Binding>
+	</>
+}
+
+
+const ToggleRequired = () => {
+	const required = !!useEnvironment().getParameterOrElse('required', false)
+
+	return (
+		<Link to={it => it ? ({ pageName: it.pageName, parameters: { required: !required ? '1' : '' } }) : it}>
+			<AnchorButton>
+				Toggle required
+			</AnchorButton>
+		</Link>
+	)
+}

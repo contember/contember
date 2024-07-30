@@ -58,7 +58,7 @@ export const DataViewLoader = Component(({ children, state, onSelectHighlighted 
 		return createEntityListProps(entities, resolvedFilters, orderBy, paging.itemsPerPage, paging.pageIndex)
 	}, [entities, resolvedFilters, orderBy, paging.itemsPerPage, paging.pageIndex])
 
-	const [loaderState] = useEntityListSubTreeLoader(entityListProps, children, state)
+	const [loaderState, { reload }] = useEntityListSubTreeLoader(entityListProps, children, state)
 	const innerChildren = (
 		<DataViewInteractionProvider onSelectHighlighted={onSelectHighlighted}>
 			{children}
@@ -66,18 +66,20 @@ export const DataViewLoader = Component(({ children, state, onSelectHighlighted 
 	)
 	return (
 		<DataViewLoaderStateContext.Provider value={loaderState.state === 'loading' ? 'initial' : loaderState.state}>
-			<DataViewDisplayedStateContext.Provider value={loaderState.customState}>
-				<TreeRootIdProvider treeRootId={loaderState.treeRootId}>
-					{!loaderState.entities
-						? <NonExistingEntityListSubtree children={innerChildren} />
-						: (
-							<ExistingEntityListSubtree
-								entities={loaderState.entities}
-								children={innerChildren}
-							/>
-						)
-					}</TreeRootIdProvider>
-			</DataViewDisplayedStateContext.Provider>
+			<DataViewReloadContext.Provider value={reload}>
+				<DataViewDisplayedStateContext.Provider value={loaderState.customState}>
+					<TreeRootIdProvider treeRootId={loaderState.treeRootId}>
+						{!loaderState.entities
+							? <NonExistingEntityListSubtree children={innerChildren} />
+							: (
+								<ExistingEntityListSubtree
+									entities={loaderState.entities}
+									children={innerChildren}
+								/>
+							)
+						}</TreeRootIdProvider>
+				</DataViewDisplayedStateContext.Provider>
+			</DataViewReloadContext.Provider>
 		</DataViewLoaderStateContext.Provider>
 	)
 }, ({ state, children }) => {

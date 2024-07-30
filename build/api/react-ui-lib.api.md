@@ -513,11 +513,13 @@ export const ChangeMyPasswordFormFields: () => JSX_2.Element;
 
 // @public (undocumented)
 export const CheckboxField: React_2.NamedExoticComponent<Omit<FormCheckboxProps, "children"> & Omit<FormContainerProps, "children"> & {
+    required?: boolean;
     inputProps?: Omit<React_2.InputHTMLAttributes<HTMLInputElement>, "defaultValue">;
 }>;
 
 // @public (undocumented)
 export type CheckboxFieldProps = Omit<FormCheckboxProps, 'children'> & Omit<FormContainerProps, 'children'> & {
+    required?: boolean;
     inputProps?: Omit<React_2.InputHTMLAttributes<HTMLInputElement>, 'defaultValue'>;
 };
 
@@ -1396,6 +1398,8 @@ export interface FormContainerProps {
     errors?: ReactNode;
     // (undocumented)
     label?: ReactNode;
+    // (undocumented)
+    required?: boolean;
 }
 
 // @public (undocumented)
@@ -1428,6 +1432,8 @@ className?: string;
 asChild?: boolean;
 children?: ReactNode;
 className?: string;
+} & {
+required?: boolean | null | undefined;
 }, "ref"> & RefAttributes<HTMLLabelElement>>;
 
 // @public (undocumented)
@@ -1730,7 +1736,7 @@ className?: string;
 export const MultiSelectField: React_2.NamedExoticComponent<MultiSelectFieldProps>;
 
 // @public (undocumented)
-export type MultiSelectFieldProps = MultiSelectInputProps & Omit<FormContainerProps, 'children'>;
+export type MultiSelectFieldProps = MultiSelectInputProps & Omit<FormContainerProps, 'children' | 'required'>;
 
 // @public (undocumented)
 export const MultiSelectInput: React_2.NamedExoticComponent<{
@@ -1870,6 +1876,7 @@ export const RadioEnumField: React_2.NamedExoticComponent<RadioEnumFieldProps>;
 
 // @public (undocumented)
 export type RadioEnumFieldProps = Omit<FormRadioItemProps, 'children' | 'value'> & Omit<FormContainerProps, 'children'> & {
+    required?: boolean;
     options: Record<string, ReactNode>;
     orientation?: 'horizontal' | 'vertical';
     inputProps?: Omit<React_2.InputHTMLAttributes<HTMLInputElement>, 'defaultValue'>;
@@ -1994,6 +2001,7 @@ export type SelectEnumFieldProps = Omit<FormContainerProps, 'children'> & {
     options: Record<string, React_2.ReactNode>;
     placeholder?: React_2.ReactNode;
     defaultValue?: string;
+    required?: boolean;
 };
 
 // @public (undocumented)
@@ -2014,6 +2022,7 @@ export const SelectInput: React_2.NamedExoticComponent<{
     createNewForm?: ReactNode;
     queryField?: DataViewUnionFilterFields;
     initialSorting?: DataViewSortingDirections;
+    required?: boolean;
 }>;
 
 // @public (undocumented)
@@ -2032,6 +2041,7 @@ export type SelectInputProps = {
     createNewForm?: ReactNode;
     queryField?: DataViewUnionFilterFields;
     initialSorting?: DataViewSortingDirections;
+    required?: boolean;
 };
 
 // @public (undocumented)
@@ -2230,7 +2240,7 @@ export const SlotTargets: Readonly<{
 export const SortableMultiSelectField: React_2.NamedExoticComponent<SortableMultiSelectFieldProps>;
 
 // @public (undocumented)
-export type SortableMultiSelectFieldProps = SortableMultiSelectInputProps & Omit<FormContainerProps, 'children'>;
+export type SortableMultiSelectFieldProps = SortableMultiSelectInputProps & Omit<FormContainerProps, 'children' | 'required'>;
 
 // @public (undocumented)
 export const SortableMultiSelectInput: React_2.NamedExoticComponent<{
@@ -2259,7 +2269,7 @@ export type SortableMultiSelectInputProps = {
 };
 
 // @public (undocumented)
-export const StandaloneFormContainer: ({ children, description, label, errors }: FormContainerProps) => JSX_2.Element;
+export const StandaloneFormContainer: ({ children, description, label, errors, required }: FormContainerProps) => JSX_2.Element;
 
 // @public (undocumented)
 export const Switch: React_2.ForwardRefExoticComponent<Omit<SwitchPrimitives.SwitchProps & React_2.RefAttributes<HTMLButtonElement> & {
@@ -2350,11 +2360,13 @@ maxRows?: number;
 
 // @public (undocumented)
 export const TextareaField: React_2.NamedExoticComponent<Omit<FormInputProps, "children"> & Omit<FormContainerProps, "children"> & {
+    required?: boolean;
     inputProps?: ComponentProps<typeof TextareaAutosize>;
 }>;
 
 // @public (undocumented)
 export type TextareaFieldProps = Omit<FormInputProps, 'children'> & Omit<FormContainerProps, 'children'> & {
+    required?: boolean;
     inputProps?: ComponentProps<typeof TextareaAutosize>;
 };
 

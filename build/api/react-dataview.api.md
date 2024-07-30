@@ -10,7 +10,6 @@ import { EntityAccessor as EntityAccessor_2 } from '@contember/binding';
 import { EntityId } from '@contember/react-binding';
 import { EntityId as EntityId_2 } from '@contember/binding';
 import { EntityListAccessor } from '@contember/binding';
-import { EntityListSubTreeLoaderState } from '@contember/react-binding';
 import { EntityListSubTreeMarker } from '@contember/binding';
 import { EntityListSubTreeMarker as EntityListSubTreeMarker_2 } from '@contember/react-binding';
 import { Environment } from '@contember/react-binding';
@@ -41,7 +40,8 @@ import { SugaredRelativeEntityList as SugaredRelativeEntityList_2 } from '@conte
 import { SugaredRelativeSingleEntity } from '@contember/binding';
 import { SugaredRelativeSingleField } from '@contember/binding';
 import { SugaredRelativeSingleField as SugaredRelativeSingleField_2 } from '@contember/react-binding';
-import { UseEntityListSubTreeLoaderResult } from '@contember/react-binding';
+import { UseEntityListSubTreeLoaderState } from '@contember/react-binding';
+import { UseEntityListSubTreeLoaderStateMethods } from '@contember/react-binding';
 
 // @public (undocumented)
 export type BooleanFilterArtifacts = {
@@ -473,7 +473,7 @@ export interface DataViewLayoutTriggerProps {
 export const DataViewLoaderState: ({ children, ...props }: DataViewEachRowProps) => JSX_2.Element | null;
 
 // @internal (undocumented)
-export const DataViewLoaderStateContext: React_2.Context<EntityListSubTreeLoaderState>;
+export const DataViewLoaderStateContext: React_2.Context<"initial" | "refreshing" | "loaded">;
 
 // @public (undocumented)
 export type DataViewMethods = {
@@ -620,6 +620,18 @@ export const DataViewRelationFilterTrigger: ({ name, action, ...props }: {
     children: ReactNode;
     action?: DataViewSetRelationFilterAction;
 }) => JSX_2.Element;
+
+// @internal (undocumented)
+export const DataViewReloadContext: React_2.Context<() => void>;
+
+// @public (undocumented)
+export const DataViewReloadTrigger: ({ children }: DataViewReloadTriggerProps) => JSX_2.Element;
+
+// @public (undocumented)
+export interface DataViewReloadTriggerProps {
+    // (undocumented)
+    children: ReactElement;
+}
 
 // @public (undocumented)
 export const dataViewSelectionEnvironmentExtension: Environment.Extension<DataViewSelectionValues, DataViewSelectionValues>;
@@ -1039,13 +1051,10 @@ export const useDataViewGlobalKey: () => string;
 export const useDataViewHighlightIndex: () => number | null;
 
 // @public (undocumented)
-export const useDataViewKey: (props: Pick<DataViewProps, "entities" | "dataViewKey">) => string;
-
-// @public (undocumented)
 export const useDataViewKeyboardEventHandler: () => React_2.KeyboardEventHandler<Element>;
 
 // @public (undocumented)
-export const useDataViewLoaderState: () => EntityListSubTreeLoaderState;
+export const useDataViewLoaderState: () => "initial" | "refreshing" | "loaded";
 
 // @public (undocumented)
 export const useDataViewNullFilter: (name: string) => UseDataViewNullFilterResult;
@@ -1096,7 +1105,7 @@ export const useDataViewRelationFilterData: ({ name, children, options }: {
     name: string;
     options: SugaredQualifiedEntityList_2["entities"];
     children: ReactNode;
-}) => [UseEntityListSubTreeLoaderResult<unknown>, EntityListSubTreeLoaderState];
+}) => [UseEntityListSubTreeLoaderState<unknown>, UseEntityListSubTreeLoaderStateMethods];
 
 // @public (undocumented)
 export const useDataViewRelationFilterFactory: (name: string) => (id: EntityId_2) => UseDataViewRelationFilterResult;
@@ -1106,6 +1115,9 @@ export type UseDataViewRelationFilterResult = [
 current: DataViewRelationFilterCurrent,
 set: (value: DataViewSetRelationFilterAction) => void
 ];
+
+// @public (undocumented)
+export const useDataViewReload: () => () => void;
 
 // @public (undocumented)
 export type UseDataViewResult = {

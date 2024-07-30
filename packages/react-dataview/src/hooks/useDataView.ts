@@ -1,6 +1,5 @@
 import { QueryLanguage, SugaredQualifiedEntityList } from '@contember/binding'
 import { DataViewInfo, DataViewMethods, DataViewState } from '../types/dataview'
-import { useDataViewKey } from './useDataViewKey'
 import { useCallback, useMemo, useRef } from 'react'
 import { useEnvironment } from '@contember/react-binding'
 import { useDataViewFiltering } from '../internal/hooks/useDataViewFiltering'
@@ -8,6 +7,7 @@ import { DataViewFilteringProps, DataViewPagingProps, DataViewSelectionProps, Da
 import { useDataViewSorting } from '../internal/hooks/useDataViewSorting'
 import { useDataViewPaging } from '../internal/hooks/useDataViewPaging'
 import { useDataViewSelection } from '../internal/hooks/useDataViewSelection'
+import { getDataViewKey } from '../internal/helpers/getDataViewKey'
 
 export type UseDataViewArgs =
 	& {
@@ -27,12 +27,12 @@ export type UseDataViewResult = {
 
 export const useDataView = (args: UseDataViewArgs): UseDataViewResult => {
 
-	const key = useDataViewKey(args)
-
 	const environment = useEnvironment()
-	const entities = useMemo(() =>
-		QueryLanguage.desugarQualifiedEntityList({ entities: args.entities }, environment),
-	[environment, args.entities],
+	const key = getDataViewKey(environment, args)
+
+	const entities = useMemo(
+		() => QueryLanguage.desugarQualifiedEntityList({ entities: args.entities }, environment),
+		[environment, args.entities],
 	)
 
 	const resetPageRef = useRef<() => void>(() => {

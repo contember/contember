@@ -11,6 +11,7 @@ import { DataViewStoredStateArgs, getDataViewCurrentPageStorageArgs, getDataView
 import { resolveFilters } from '../internal/hooks/useDataViewResolvedFilters'
 import { resolveOrderBy } from '../internal/hooks/useDataViewSorting'
 import { collectStaticInfo } from '../internal/helpers/staticAnalyzer'
+import { getDataViewKey } from '../internal/helpers/getDataViewKey'
 
 
 export type DataViewProps =
@@ -48,7 +49,7 @@ const getStoredValue = <V, >(storage: StateStorageOrName | StateStorageOrName[],
 }
 
 const resolveInitialState = (props: DataViewProps, env: Environment) => {
-	const dataViewKey = props.dataViewKey ?? env.getExtension(dataViewKeyEnvironmentExtension)
+	const dataViewKey = getDataViewKey(env, props)
 	const { filterTypes, layouts } = collectStaticInfo(props, env)
 
 	const pageSettingsStorage = getStoredValue(props.pagingSettingsStorage ?? 'null', ...getDataViewPagingSettingStorageArgs({ dataViewKey, initialItemsPerPage: props.initialItemsPerPage }))

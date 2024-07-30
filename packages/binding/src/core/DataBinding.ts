@@ -276,7 +276,7 @@ export class DataBinding<Node> {
 		}
 		const markerTreeRoot =  this.createMarkerTree(newFragment, options.environment ?? this.environment)
 
-		if (this.treeStore.effectivelyHasTreeRoot(markerTreeRoot)) {
+		if (!options.force && this.treeStore.effectivelyHasTreeRoot(markerTreeRoot)) {
 			// This isn't perfectly accurate as theoretically, we could already have all the data necessary but this
 			// could still be false.
 

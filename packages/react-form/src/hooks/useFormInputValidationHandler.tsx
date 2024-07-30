@@ -25,9 +25,12 @@ export const useFormInputValidationHandler = (field: FieldAccessor<any>) => {
 		const previousMessage = validationMessage.current
 		validationMessage.current = message
 
+		const accessor = accessorGetter()
 		// if there is no message, we want to clear the error
 		if (!message) {
-			accessorGetter().clearErrors()
+			if (previousMessage) {
+				clearSpecificError(accessor, previousMessage)
+			}
 			return
 		}
 		if (message === previousMessage) {
@@ -41,8 +44,8 @@ export const useFormInputValidationHandler = (field: FieldAccessor<any>) => {
 		// if the input is not focused, we want to show the error message
 		// also, even the input is focused, we want to replace the previous message
 		if (!focus || !!previousMessage) {
-			accessorGetter().clearErrors()
-			accessorGetter().addError(message)
+			accessor.clearErrors()
+			accessor.addError(message)
 		}
 	})
 
@@ -59,4 +62,11 @@ export const useFormInputValidationHandler = (field: FieldAccessor<any>) => {
 			}
 		}, [accessorGetter]),
 	}
+}
+
+const clearSpecificError = (field: FieldAccessor<any>, message: string) => {
+	const errors = field.errors?.errors ?? []
+	const error = errors.filter(e => !(e.type === 'validation' && e.message === message))
+	field.clearErrors()
+	error.forEach(e => field.addError(e))
 }

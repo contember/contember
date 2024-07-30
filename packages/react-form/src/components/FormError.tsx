@@ -8,7 +8,7 @@ export const FormError = ({ children, formatter }: {
 }) => {
 	const errors = useFormError()
 	const id = useFormFieldId()
-	const formatted = useMemo(() => formatter(errors ?? []), [errors, formatter])
+	const formatted = useMemo(() => formatter(errors ?? []).filter((it, index, arr) => arr.indexOf(it) === index), [errors, formatter])
 	if (errors === undefined || id === undefined) {
 		throw new BindingError('FormError must be used inside a FormField')
 	}

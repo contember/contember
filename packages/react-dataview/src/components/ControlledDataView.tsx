@@ -1,4 +1,4 @@
-import { ReactNode, useState } from 'react'
+import { ReactNode, useCallback, useState } from 'react'
 import {
 	DataViewChildrenContext,
 	DataViewCurrentKeyContext,
@@ -14,7 +14,7 @@ import {
 	DataViewSortingMethodsContext,
 	DataViewSortingStateContext,
 } from '../contexts'
-import { Component, EntityAccessor, EnvironmentMiddleware } from '@contember/react-binding'
+import { Component, EntityAccessor, Environment, EnvironmentMiddleware } from '@contember/react-binding'
 import { DataViewLoader } from '../internal/components/DataViewLoader'
 import { DataViewInfo, DataViewMethods, DataViewState } from '../types'
 import { dataViewSelectionEnvironmentExtension } from '../env/dataViewSelectionEnvironmentExtension'
@@ -31,6 +31,10 @@ export type ControlledDataViewProps =
 
 export const ControlledDataView = Component<ControlledDataViewProps>(({ state, info, methods, children, onSelectHighlighted }) => {
 	const [childrenStable] = useState(children)
+	const envMiddleware = useCallback(
+		(it: Environment) => it.withExtension(dataViewSelectionEnvironmentExtension, state.selection.values),
+		[state.selection.values],
+	)
 	return (
 		<DataViewChildrenContext.Provider value={childrenStable}>
 			<DataViewEntityListPropsContext.Provider value={state.entities}>
@@ -45,7 +49,7 @@ export const ControlledDataView = Component<ControlledDataViewProps>(({ state, i
 												<DataViewFilteringMethodsContext.Provider value={methods.filtering}>
 													<DataViewSelectionMethodsContext.Provider value={methods.selection}>
 														<DataViewSelectionStateContext.Provider value={state.selection}>
-															<EnvironmentMiddleware create={it => it.withExtension(dataViewSelectionEnvironmentExtension, state.selection.values)}>
+															<EnvironmentMiddleware create={envMiddleware}>
 																<DataViewLoader children={children} state={state} onSelectHighlighted={onSelectHighlighted} />
 															</EnvironmentMiddleware>
 														</DataViewSelectionStateContext.Provider>

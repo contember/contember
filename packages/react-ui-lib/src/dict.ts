@@ -78,6 +78,7 @@ export const dict = {
 	},
 
 	errors: {
+		required: 'This field is required',
 		unique: 'This value is already taken',
 		unknown: 'An unknown error has occurred',
 	},

@@ -15,20 +15,22 @@ import {
 import * as React from 'react'
 import { FormContainer, FormContainerProps } from './container'
 import { FormFieldScope, FormHasManyRelationScope, FormHasOneRelationScope, useFormFieldId } from '@contember/react-form'
-import { Component, Field, SugaredRelativeSingleField, useField } from '@contember/interface'
+import { Component, Field, SugaredRelativeSingleField, useEntity, useEntityBeforePersist, useField } from '@contember/interface'
 import { Popover, PopoverTrigger } from '../ui/popover'
 import { ChevronDownIcon, ChevronUpIcon } from 'lucide-react'
+import { useCallback } from 'react'
+import { dict } from '../dict'
 
 
 export type SelectFieldProps =
 	& SelectInputProps
 	& Omit<FormContainerProps, 'children'>
 
-export const SelectField = Component<SelectFieldProps>(({ field, label, description, children, options, queryField, placeholder, createNewForm, errors, initialSorting }) => {
+export const SelectField = Component<SelectFieldProps>(({ field, label, description, children, options, queryField, placeholder, createNewForm, errors, initialSorting, required }) => {
 	return (
 		<FormHasOneRelationScope field={field}>
-			<FormContainer description={description} label={label} errors={errors}>
-				<SelectInput field={field} queryField={queryField} options={options} placeholder={placeholder} createNewForm={createNewForm} initialSorting={initialSorting}>
+			<FormContainer description={description} label={label} errors={errors} required={required}>
+				<SelectInput field={field} queryField={queryField} options={options} placeholder={placeholder} createNewForm={createNewForm} initialSorting={initialSorting} required={required}>
 					{children}
 				</SelectInput>
 			</FormContainer>
@@ -38,7 +40,7 @@ export const SelectField = Component<SelectFieldProps>(({ field, label, descript
 
 export type MultiSelectFieldProps =
 	& MultiSelectInputProps
-	& Omit<FormContainerProps, 'children'>
+	& Omit<FormContainerProps, 'children' | 'required'>
 
 export const MultiSelectField = Component<MultiSelectFieldProps>(({ field, label, description, children, options, queryField, placeholder, createNewForm, errors, initialSorting }) => {
 	return (
@@ -54,7 +56,7 @@ export const MultiSelectField = Component<MultiSelectFieldProps>(({ field, label
 
 export type SortableMultiSelectFieldProps =
 	& SortableMultiSelectInputProps
-	& Omit<FormContainerProps, 'children'>
+	& Omit<FormContainerProps, 'children' | 'required'>
 
 export const SortableMultiSelectField = Component<SortableMultiSelectFieldProps>(({ field, label, description, children, options, queryField, placeholder, sortableBy, connectAt, createNewForm, errors, initialSorting }) => {
 	return (
@@ -75,14 +77,15 @@ export type SelectEnumFieldProps =
 		options: Record<string, React.ReactNode>
 		placeholder?: React.ReactNode
 		defaultValue?: string
+		required?: boolean
 	}
 
 export const SelectEnumField = Component<SelectEnumFieldProps>(
-	({ field, label, description, options, placeholder }) => {
+	({ field, label, description, options, placeholder, required }) => {
 		return (
 			<FormFieldScope field={field}>
-				<FormContainer description={description} label={label}>
-					<SelectEnumFieldInner field={field} options={options} placeholder={placeholder} />
+				<FormContainer description={description} label={label} required={required}>
+					<SelectEnumFieldInner field={field} options={options} placeholder={placeholder} required={required} />
 				</FormContainer>
 			</FormFieldScope>
 		)
@@ -91,9 +94,19 @@ export const SelectEnumField = Component<SelectEnumFieldProps>(
 	'SelectEnumField',
 )
 
-const SelectEnumFieldInner = ({ field, options, placeholder }: SelectEnumFieldProps) => {
+const SelectEnumFieldInner = ({ field, options, placeholder, required }: SelectEnumFieldProps) => {
 	const [open, setOpen] = React.useState(false)
 	const fieldAccessor = useField<string>(field)
+	const fieldAccessorGetter = fieldAccessor.getAccessor
+	useEntityBeforePersist(useCallback(() => {
+		if (!required) {
+			return
+		}
+		const field = fieldAccessorGetter()
+		if (!field.value) {
+			field.addError(dict.errors.required)
+		}
+	}, [fieldAccessorGetter, required]))
 	const id = useFormFieldId()
 	return (
 		<Popover open={open} onOpenChange={setOpen}>

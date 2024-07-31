@@ -145,7 +145,7 @@ const DataGridRelationFilterSelectItem = forwardRef<HTMLButtonElement, {
 			const exclude = useCallback(() => setFilter('toggleExclude'), [setFilter])
 
 			const isIncluded = current === 'include'
-			const isExcluded = current == 'exclude'
+			const isExcluded = current === 'exclude'
 
 			return (
 				<DataGridFilterSelectItemUI ref={ref} onExclude={exclude} onInclude={include} isExcluded={isExcluded} isIncluded={isIncluded} {...props}>

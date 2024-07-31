@@ -19,7 +19,7 @@ export type InputFieldProps =
 
 export const InputField = Component(({ field, label, description, inputProps, isNonbearing, defaultValue, required }: InputFieldProps) => (
 	<FormFieldScope field={field}>
-		<FormContainer description={description} label={label}>
+		<FormContainer description={description} label={label} required={required}>
 			<FormInput field={field} isNonbearing={isNonbearing} defaultValue={defaultValue}>
 				<Input required={required} {...(inputProps ?? {})} className={cn('max-w-md', inputProps?.className)} />
 			</FormInput>
@@ -31,14 +31,15 @@ export type TextareaFieldProps =
 	& Omit<FormInputProps, 'children'>
 	& Omit<FormContainerProps, 'children'>
 	& {
+		required?: boolean
 		inputProps?: ComponentProps<typeof TextareaAutosize>
 	}
 
-export const TextareaField = Component(({ field, label, description, inputProps, isNonbearing, defaultValue }: TextareaFieldProps) => (
+export const TextareaField = Component(({ field, label, description, inputProps, isNonbearing, defaultValue, required }: TextareaFieldProps) => (
 	<FormFieldScope field={field}>
-		<FormContainer description={description} label={label}>
+		<FormContainer description={description} label={label} required={required}>
 			<FormInput field={field} isNonbearing={isNonbearing} defaultValue={defaultValue}>
-				<TextareaAutosize {...(inputProps ?? {})} className={cn('max-w-md', inputProps?.className)} />
+				<TextareaAutosize required={required} {...(inputProps ?? {})} className={cn('max-w-md', inputProps?.className)} />
 			</FormInput>
 		</FormContainer>
 	</FormFieldScope>
@@ -49,18 +50,19 @@ export type CheckboxFieldProps =
 	& Omit<FormCheckboxProps, 'children'>
 	& Omit<FormContainerProps, 'children'>
 	& {
+		required?: boolean
 		inputProps?: Omit<React.InputHTMLAttributes<HTMLInputElement>, 'defaultValue'>
 	}
 
-export const CheckboxField = Component(({ field, label, description, inputProps, isNonbearing, defaultValue }: CheckboxFieldProps) => (
+export const CheckboxField = Component(({ field, label, description, inputProps, isNonbearing, defaultValue, required }: CheckboxFieldProps) => (
 	<FormFieldScope field={field}>
 		<FormContainer description={description} label={undefined}>
 			<div className="flex gap-2 items-center">
 				<FormCheckbox field={field} isNonbearing={isNonbearing} defaultValue={defaultValue}>
-					<CheckboxInput {...inputProps} />
+					<CheckboxInput required={required} {...inputProps} />
 				</FormCheckbox>
 				{label && <FormLabel>
-					<FormLabelUI>
+					<FormLabelUI required={required}>
 						{label}
 					</FormLabelUI>
 				</FormLabel>}
@@ -74,20 +76,21 @@ export type RadioEnumFieldProps =
 	& Omit<FormRadioItemProps, 'children' | 'value'>
 	& Omit<FormContainerProps, 'children'>
 	& {
+		required?: boolean
 		options: Record<string, ReactNode>
 		orientation?: 'horizontal' | 'vertical'
 		inputProps?: Omit<React.InputHTMLAttributes<HTMLInputElement>, 'defaultValue'>
 	}
 
-export const RadioEnumField = Component<RadioEnumFieldProps>(({ field, label, description, options, inputProps, orientation, defaultValue, isNonbearing  }) => {
+export const RadioEnumField = Component<RadioEnumFieldProps>(({ field, label, description, options, inputProps, orientation, defaultValue, isNonbearing, required }) => {
 	return (
 		<FormFieldScope field={field}>
-			<FormContainer description={description} label={label}>
+			<FormContainer description={description} label={label} required={required}>
 				<div className={'flex flex-wrap gap-3 data-[orientation=vertical]:flex-col'} data-orientation={orientation ?? 'vertical'}>
 					{Object.entries(options).map(([value, label]) => (
 						<FormLabelUI className="flex gap-2 items-center font-normal" key={value}>
 							<FormRadioInput field={field} value={value} defaultValue={defaultValue} isNonbearing={isNonbearing}>
-								<RadioInput {...inputProps} />
+								<RadioInput required={required} {...inputProps} />
 							</FormRadioInput>
 							{label}
 						</FormLabelUI>

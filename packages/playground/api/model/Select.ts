@@ -4,7 +4,7 @@ export const SelectUnique = c.createEnum('unique')
 
 export class SelectRoot {
     unique = c.enumColumn(SelectUnique).notNull().unique()
-
+    dummy = c.stringColumn()
     hasOne = c.oneHasOne(SelectValue)
     hasMany = c.manyHasMany(SelectValue)
     hasManySorted = c.oneHasMany(SelectItem, 'root').orderBy('order')

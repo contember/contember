@@ -10,14 +10,15 @@ export interface FormContainerProps {
 	description?: ReactNode
 	children: ReactNode
 	errors?: ReactNode
+	required?: boolean
 }
 
 
-export const StandaloneFormContainer = ({ children, description, label, errors }: FormContainerProps) => (
+export const StandaloneFormContainer = ({ children, description, label, errors, required }: FormContainerProps) => (
 	<FormContainerUI>
 		<FormLabelWrapperUI>
 			{label &&
-				<FormLabelUI>
+				<FormLabelUI required={required}>
 					{label}
 				</FormLabelUI>
 			}
@@ -34,11 +35,11 @@ export const StandaloneFormContainer = ({ children, description, label, errors }
 	</FormContainerUI>
 )
 
-export const FormContainer = Component(({ children, description, label }: FormContainerProps) => (
+export const FormContainer = Component(({ children, description, label, required }: FormContainerProps) => (
 	<FormContainerUI>
 		<FormLabelWrapperUI>
 			{label && <FormLabel>
-				<FormLabelUI>
+				<FormLabelUI required={required}>
 					{label}
 				</FormLabelUI>
 			</FormLabel>}

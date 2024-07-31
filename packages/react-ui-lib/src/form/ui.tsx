@@ -22,6 +22,15 @@ export const FormLabelWrapperUI = uic('div', {
 export const FormLabelUI = uic(Label, {
 	baseClass: 'text-left',
 	displayName: 'FormLabel',
+	variants: {
+		required: {
+			true: 'after:text-destructive after:content-[attr(data-required-content)] after:ml-1',
+			false: '',
+		},
+	},
+	defaultProps: {
+		['data-required-content']: '*',
+	} as any,
 })
 export const FormContainerUI = uic('div', {
 	baseClass: 'flex flex-col gap-2 w-full',

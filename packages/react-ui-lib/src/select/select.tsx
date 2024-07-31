@@ -1,7 +1,7 @@
 import * as React from 'react'
-import { ReactNode } from 'react'
+import { ReactNode, useCallback } from 'react'
 import { Popover, PopoverTrigger } from '../ui/popover'
-import { Component, SugaredQualifiedEntityList } from '@contember/interface'
+import { Component, SugaredQualifiedEntityList, useEntity, useEntityBeforePersist } from '@contember/interface'
 import { Button } from '../ui/button'
 import { SugaredRelativeSingleEntity } from '@contember/interface'
 import { ChevronDownIcon, XIcon } from 'lucide-react'
@@ -12,6 +12,7 @@ import { CreateEntityDialog } from './create-new'
 import { SelectDefaultFilter } from './filter'
 import { DataViewSortingDirections, DataViewUnionFilterFields } from '@contember/react-dataview'
 import { useFormFieldId } from '@contember/react-form'
+import { dict } from '../dict'
 
 export type SelectInputProps =
 	& {
@@ -22,12 +23,23 @@ export type SelectInputProps =
 		createNewForm?: ReactNode
 		queryField?: DataViewUnionFilterFields
 		initialSorting?: DataViewSortingDirections
+		required?: boolean
 	}
 
 
-export const SelectInput = Component<SelectInputProps>(({ field, queryField, options, children, placeholder, createNewForm, initialSorting }) => {
+export const SelectInput = Component<SelectInputProps>(({ field, queryField, options, children, placeholder, createNewForm, initialSorting, required }) => {
 	const [open, setOpen] = React.useState(false)
 	const id = useFormFieldId()
+	const getEntity = useEntity().getAccessor
+	useEntityBeforePersist(useCallback(() => {
+		if (!required) {
+			return
+		}
+		const entity = getEntity().getEntity({ field })
+		if (!entity.existsOnServer && !entity.hasUnpersistedChanges) {
+			entity.addError(dict.errors.required)
+		}
+	}, [field, getEntity, required]))
 
 	return (
 		<Select field={field} onSelect={() => setOpen(false)} options={options}>

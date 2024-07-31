@@ -1,0 +1,36 @@
+{
+	"formatVersion": 5,
+	"modifications": [
+		{
+			"modification": "createColumn",
+			"entityName": "InputRoot",
+			"field": {
+				"name": "dummy",
+				"columnName": "dummy",
+				"columnType": "text",
+				"nullable": true,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "patchAclSchema",
+			"patch": [
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/InputRoot/operations/read/dummy",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/InputRoot/operations/create/dummy",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/InputRoot/operations/update/dummy",
+					"value": true
+				}
+			]
+		}
+	]
+}

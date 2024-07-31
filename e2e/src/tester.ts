@@ -22,6 +22,18 @@ export const gql = (strings: TemplateStringsArray) => {
 	return strings[0]
 }
 
+let latestError: any = null
+beforeEach(() => {
+	latestError = null
+})
+
+afterEach(ctx => {
+	if (latestError !== null && ctx.task.result.state === 'fail') {
+		// eslint-disable-next-line no-console
+		console.error(latestError)
+	}
+})
+
 
 export const executeGraphql = (
 	path: string,
@@ -36,8 +48,7 @@ export const executeGraphql = (
 			variables: options.variables || {},
 		})
 	result.on('error', e => {
-		// eslint-disable-next-line no-console
-		console.error(e)
+		latestError = e
 	})
 	result.on('response', e => {
 		if ('extensions' in e.body) {

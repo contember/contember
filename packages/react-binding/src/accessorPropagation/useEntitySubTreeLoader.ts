@@ -1,40 +1,73 @@
-import { createElement, ReactNode, useEffect, useRef, useState } from 'react'
+import { createElement, ReactNode, useCallback, useEffect, useRef, useState } from 'react'
 import { SugaredQualifiedSingleEntity, TreeRootId } from '@contember/binding'
 import { useExtendTree } from './useExtendTree'
 import { EntitySubTree } from '../coreComponents'
 
-export type UseEntitySubTreeLoaderResult<State> = {
-	entity: SugaredQualifiedSingleEntity | undefined
-	treeRootId: TreeRootId | undefined
-	state: State | undefined
+export type UseEntitySubTreeLoaderStateInitial = {
+	state: 'initial'
+	entity: undefined
+	treeRootId: undefined
+	customState: undefined
+	isLoading: false
 }
 
-export type EntitySubTreeLoaderState =
-	| 'initial'
-	| 'refreshing'
-	| 'loaded'
+export type UseEntitySubTreeLoaderStateLoading = {
+	state: 'loading'
+	entity: undefined
+	treeRootId: undefined
+	customState: undefined
+	isLoading: true
+}
 
-export const useEntitySubTreeLoader = <State>(entity: SugaredQualifiedSingleEntity | undefined, children: ReactNode, state?: State): [UseEntitySubTreeLoaderResult<State>, EntitySubTreeLoaderState] => {
-	const [displayedState, setDisplayedState] = useState<UseEntitySubTreeLoaderResult<State>>({
+export type UseEntitySubTreeLoaderStateRefreshing<State> = {
+	state: 'refreshing'
+	entity: SugaredQualifiedSingleEntity
+	treeRootId: TreeRootId | undefined
+	customState: State
+	isLoading: true
+}
+
+
+export type UseEntitySubTreeLoaderStateLoaded<State> = {
+	state: 'loaded'
+	entity: SugaredQualifiedSingleEntity
+	treeRootId: TreeRootId | undefined
+	customState: State
+	isLoading: false
+}
+
+
+export type UseEntitySubTreeLoaderState<State> =
+	| UseEntitySubTreeLoaderStateInitial
+	| UseEntitySubTreeLoaderStateLoading
+	| UseEntitySubTreeLoaderStateRefreshing<State>
+	| UseEntitySubTreeLoaderStateLoaded<State>
+
+export type EntityListSubTreeLoaderState = UseEntitySubTreeLoaderState<any>['state']
+
+export type UseEntitySubTreeLoaderStateMethods = {
+	reload: () => void
+}
+
+export const useEntitySubTreeLoader = <State>(entity: SugaredQualifiedSingleEntity | undefined, children: ReactNode, state?: State): [UseEntitySubTreeLoaderState<State>, UseEntitySubTreeLoaderStateMethods] => {
+	const [displayedState, setDisplayedState] = useState<UseEntitySubTreeLoaderState<State>>({
+		state: 'initial',
+		isLoading: false,
 		entity: undefined,
 		treeRootId: undefined,
-		state: undefined,
+		customState: undefined,
 	})
 	const currentlyLoading = useRef<{
 		entity: SugaredQualifiedSingleEntity
 		state?: State
 	}>()
 
-	const [loadingState, setLoadingState] = useState<EntitySubTreeLoaderState>('initial')
 	const extendTree = useExtendTree()
+	const [reloadTrigger, setReloadTrigger] = useState<object | null>(null)
 
 	useEffect(() => {
 		(async () => {
-			if (
-				!entity
-				|| displayedState.state === state && displayedState.entity === entity
-				|| currentlyLoading.current?.entity === entity && currentlyLoading.current?.state === state
-			) {
+			if (!entity) {
 				return
 			}
 
@@ -43,27 +76,46 @@ export const useEntitySubTreeLoader = <State>(entity: SugaredQualifiedSingleEnti
 				state,
 			}
 
-			if (displayedState.entity) {
-				setLoadingState('refreshing')
-			}
+			setDisplayedState(it => {
+				if (it.state === 'initial' || it.state === 'loading') {
+					return {
+						...it,
+						isLoading: true,
+						state: 'loading',
+					}
+				} else {
+					return {
+						...it,
+						isLoading: true,
+						state: 'refreshing',
+					}
+				}
+			})
 
 			const newTreeRootId = await extendTree(
 				createElement(EntitySubTree, {
 					...entity,
 					children,
 				}),
+				{ force: reloadTrigger !== null },
 			)
+			if (currentlyLoading.current?.entity !== entity || currentlyLoading.current?.state !== state) {
+				return
+			}
 			currentlyLoading.current = undefined
 			if (newTreeRootId) {
 				setDisplayedState({
 					entity: entity,
 					treeRootId: newTreeRootId,
-					state: state,
+					state: 'loaded',
+					customState: state as State,
+					isLoading: false,
 				})
-				setLoadingState('loaded')
 			}
 		})()
-	}, [displayedState, extendTree, entity, children, state])
+	}, [extendTree, entity, children, state, reloadTrigger])
 
-	return [displayedState, loadingState]
+	return [displayedState, {
+		reload: useCallback(() => setReloadTrigger({}), []),
+	}]
 }

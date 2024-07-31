@@ -825,6 +825,8 @@ export interface ExtendTreeOptions {
     // (undocumented)
     environment?: Environment;
     // (undocumented)
+    force?: boolean;
+    // (undocumented)
     signal?: AbortSignal;
 }
 

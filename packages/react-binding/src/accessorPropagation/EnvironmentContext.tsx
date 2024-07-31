@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useCallback } from 'react'
+import { createContext, ReactNode, useCallback, useMemo } from 'react'
 import { Environment } from '@contember/binding'
 import { useEnvironment } from './useEnvironment'
 import { Component } from '../coreComponents'
@@ -14,7 +14,9 @@ export interface EnvironmentMiddlewareProps {
 export const EnvironmentMiddleware = Component(
 	({ children, create }: EnvironmentMiddlewareProps) => {
 		const env = useEnvironment()
-		return <EnvironmentContext.Provider value={create(env)}>{children}</EnvironmentContext.Provider>
+		const envWithExtension = useMemo(() => create(env), [env, create])
+
+		return <EnvironmentContext.Provider value={envWithExtension}>{children}</EnvironmentContext.Provider>
 	},
 	{
 		staticRender: ({ children }) => {

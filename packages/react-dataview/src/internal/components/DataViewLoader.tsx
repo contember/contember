@@ -3,7 +3,8 @@ import { EntityAccessor, SugaredQualifiedEntityList } from '@contember/binding'
 import {
 	Component,
 	EntityListSubTree,
-	EnvironmentContext, EnvironmentMiddleware,
+	EnvironmentContext,
+	EnvironmentMiddleware,
 	TreeRootIdProvider,
 	useEntityListSubTree,
 	useEntityListSubTreeLoader,
@@ -12,7 +13,7 @@ import {
 	DataViewDisplayedStateContext,
 	DataViewEntityListAccessorContext,
 	DataViewLoaderStateContext,
-	DataViewSelectionStateContext,
+	DataViewReloadContext,
 } from '../../contexts'
 import { DataViewState } from '../../types'
 import { dataViewSelectionEnvironmentExtension } from '../../env/dataViewSelectionEnvironmentExtension'
@@ -57,26 +58,28 @@ export const DataViewLoader = Component(({ children, state, onSelectHighlighted 
 		return createEntityListProps(entities, resolvedFilters, orderBy, paging.itemsPerPage, paging.pageIndex)
 	}, [entities, resolvedFilters, orderBy, paging.itemsPerPage, paging.pageIndex])
 
-	const [loadedEntityList, loadState] = useEntityListSubTreeLoader(entityListProps, children, state)
+	const [loaderState, { reload }] = useEntityListSubTreeLoader(entityListProps, children, state)
 	const innerChildren = (
 		<DataViewInteractionProvider onSelectHighlighted={onSelectHighlighted}>
 			{children}
 		</DataViewInteractionProvider>
 	)
 	return (
-		<DataViewLoaderStateContext.Provider value={loadState}>
-			<DataViewDisplayedStateContext.Provider value={loadedEntityList.state}>
-				<TreeRootIdProvider treeRootId={loadedEntityList.treeRootId}>
-					{!loadedEntityList.entities
-						? <NonExistingEntityListSubtree children={innerChildren} />
-						: (
-							<ExistingEntityListSubtree
-								entities={loadedEntityList.entities}
-								children={innerChildren}
-							/>
-						)
-					}</TreeRootIdProvider>
-			</DataViewDisplayedStateContext.Provider>
+		<DataViewLoaderStateContext.Provider value={loaderState.state === 'loading' ? 'initial' : loaderState.state}>
+			<DataViewReloadContext.Provider value={reload}>
+				<DataViewDisplayedStateContext.Provider value={loaderState.customState}>
+					<TreeRootIdProvider treeRootId={loaderState.treeRootId}>
+						{!loaderState.entities
+							? <NonExistingEntityListSubtree children={innerChildren} />
+							: (
+								<ExistingEntityListSubtree
+									entities={loaderState.entities}
+									children={innerChildren}
+								/>
+							)
+						}</TreeRootIdProvider>
+				</DataViewDisplayedStateContext.Provider>
+			</DataViewReloadContext.Provider>
 		</DataViewLoaderStateContext.Provider>
 	)
 }, ({ state, children }) => {

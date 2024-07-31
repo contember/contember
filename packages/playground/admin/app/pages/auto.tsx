@@ -184,8 +184,8 @@ const EntityEditContent = ({ entityName, close }: {entityName: string; close: ()
 			where: { id: entity.idOnServer! },
 		} as const,
 	}), [entity.idOnServer, entityName])
-	const [result, state] = useEntitySubTreeLoader(params, <AutoFields />)
-	if (state !== 'loaded' || !result.entity) {
+	const [result] = useEntitySubTreeLoader(params, <AutoFields />)
+	if (result.state !== 'loaded' || !result.entity) {
 		return <Loader position="static"/>
 	}
 

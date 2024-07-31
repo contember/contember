@@ -4,7 +4,7 @@ import { ReactNode } from 'react'
 import { DataGridShowFiltersContext } from './filters/mobile'
 import { DataGridToolbarUI } from './ui'
 import { Button } from '../ui/button'
-import { FilterIcon, SettingsIcon } from 'lucide-react'
+import { FilterIcon, RefreshCcwIcon, SettingsIcon } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
 import { DataGridLayoutSwitcher } from './layout-switcher'
 import { DataGridPerPageSelector } from './pagination'
@@ -13,6 +13,7 @@ import { dataAttribute } from '@contember/utilities'
 import { dict } from '../dict'
 import { DataGridAutoExport } from './export'
 import { DataGridToolbarVisibleElements } from './elements'
+import { DataViewReloadTrigger } from '@contember/react-dataview'
 
 export interface DataGridToolbarProps {
 	children?: ReactNode
@@ -51,6 +52,11 @@ export const DataGridToolbar = Component<DataGridToolbarProps>(({ children }) =>
 					</Popover>
 
 					<DataGridAutoExport />
+					<DataViewReloadTrigger>
+						<Button variant={'outline'} size={'sm'} className={'group gap-2'}>
+							<RefreshCcwIcon className={'w-4 h-4 group-data-[state=refreshing]:animate-spin '} />
+						</Button>
+					</DataViewReloadTrigger>
 				</div>
 
 				<div className="flex flex-1 flex-wrap gap-2">

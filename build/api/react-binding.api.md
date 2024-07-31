@@ -233,7 +233,7 @@ export interface EntityListSubTreeAdditionalProps {
 }
 
 // @public (undocumented)
-export type EntityListSubTreeLoaderState = 'initial' | 'refreshing' | 'loaded';
+export type EntityListSubTreeLoaderState = UseEntitySubTreeLoaderState<any>['state'];
 
 // @public (undocumented)
 export type EntityListSubTreeProps<ListProps, EntityProps> = {
@@ -266,9 +266,6 @@ export interface EntitySubTreeAdditionalProps {
     // (undocumented)
     variables?: Environment.ValuesMapWithFactory;
 }
-
-// @public (undocumented)
-export type EntitySubTreeLoaderState = 'initial' | 'refreshing' | 'loaded';
 
 // @public (undocumented)
 export type EntitySubTreeProps<EntityProps> = {
@@ -704,13 +701,50 @@ export function useEntityList(sugaredRelativeEntityList: string | SugaredRelativ
 export const useEntityListSubTree: (qualifiedEntityList: Alias | SugaredQualifiedEntityList | SugaredUnconstrainedQualifiedEntityList, ...treeId: [TreeRootId | undefined] | []) => EntityListAccessor;
 
 // @public (undocumented)
-export const useEntityListSubTreeLoader: <State>(entities: SugaredQualifiedEntityList | undefined, children: ReactNode, state?: State) => [UseEntityListSubTreeLoaderResult<State>, EntityListSubTreeLoaderState];
+export const useEntityListSubTreeLoader: <State>(entities: SugaredQualifiedEntityList | undefined, children: ReactNode, state?: State) => [UseEntityListSubTreeLoaderState<State>, UseEntityListSubTreeLoaderStateMethods];
 
 // @public (undocumented)
-export type UseEntityListSubTreeLoaderResult<State> = {
-    entities: SugaredQualifiedEntityList | undefined;
+export type UseEntityListSubTreeLoaderState<State> = UseEntityListSubTreeLoaderStateInitial | UseEntityListSubTreeLoaderStateLoading | UseEntityListSubTreeLoaderStateRefreshing<State> | UseEntityListSubTreeLoaderStateLoaded<State>;
+
+// @public (undocumented)
+export type UseEntityListSubTreeLoaderStateInitial = {
+    state: 'initial';
+    entities: undefined;
+    treeRootId: undefined;
+    customState: undefined;
+    isLoading: false;
+};
+
+// @public (undocumented)
+export type UseEntityListSubTreeLoaderStateLoaded<State> = {
+    state: 'loaded';
+    entities: SugaredQualifiedEntityList;
     treeRootId: TreeRootId | undefined;
-    state: State | undefined;
+    customState: State;
+    isLoading: false;
+};
+
+// @public (undocumented)
+export type UseEntityListSubTreeLoaderStateLoading = {
+    state: 'loading';
+    entities: undefined;
+    treeRootId: undefined;
+    customState: undefined;
+    isLoading: true;
+};
+
+// @public (undocumented)
+export type UseEntityListSubTreeLoaderStateMethods = {
+    reload: () => void;
+};
+
+// @public (undocumented)
+export type UseEntityListSubTreeLoaderStateRefreshing<State> = {
+    state: 'refreshing';
+    entities: SugaredQualifiedEntityList;
+    treeRootId: TreeRootId | undefined;
+    customState: State;
+    isLoading: true;
 };
 
 // @public (undocumented)
@@ -732,13 +766,50 @@ export const useEntityPersistSuccess: (listener: EntityAccessor.EntityEventListe
 export const useEntitySubTree: (qualifiedSingleEntity: Alias | SugaredQualifiedSingleEntity | SugaredUnconstrainedQualifiedSingleEntity, ...treeId: [TreeRootId | undefined] | []) => EntityAccessor;
 
 // @public (undocumented)
-export const useEntitySubTreeLoader: <State>(entity: SugaredQualifiedSingleEntity | undefined, children: ReactNode, state?: State) => [UseEntitySubTreeLoaderResult<State>, EntitySubTreeLoaderState];
+export const useEntitySubTreeLoader: <State>(entity: SugaredQualifiedSingleEntity | undefined, children: ReactNode, state?: State) => [UseEntitySubTreeLoaderState<State>, UseEntitySubTreeLoaderStateMethods];
 
 // @public (undocumented)
-export type UseEntitySubTreeLoaderResult<State> = {
-    entity: SugaredQualifiedSingleEntity | undefined;
+export type UseEntitySubTreeLoaderState<State> = UseEntitySubTreeLoaderStateInitial | UseEntitySubTreeLoaderStateLoading | UseEntitySubTreeLoaderStateRefreshing<State> | UseEntitySubTreeLoaderStateLoaded<State>;
+
+// @public (undocumented)
+export type UseEntitySubTreeLoaderStateInitial = {
+    state: 'initial';
+    entity: undefined;
+    treeRootId: undefined;
+    customState: undefined;
+    isLoading: false;
+};
+
+// @public (undocumented)
+export type UseEntitySubTreeLoaderStateLoaded<State> = {
+    state: 'loaded';
+    entity: SugaredQualifiedSingleEntity;
     treeRootId: TreeRootId | undefined;
-    state: State | undefined;
+    customState: State;
+    isLoading: false;
+};
+
+// @public (undocumented)
+export type UseEntitySubTreeLoaderStateLoading = {
+    state: 'loading';
+    entity: undefined;
+    treeRootId: undefined;
+    customState: undefined;
+    isLoading: true;
+};
+
+// @public (undocumented)
+export type UseEntitySubTreeLoaderStateMethods = {
+    reload: () => void;
+};
+
+// @public (undocumented)
+export type UseEntitySubTreeLoaderStateRefreshing<State> = {
+    state: 'refreshing';
+    entity: SugaredQualifiedSingleEntity;
+    treeRootId: TreeRootId | undefined;
+    customState: State;
+    isLoading: true;
 };
 
 // @public (undocumented)

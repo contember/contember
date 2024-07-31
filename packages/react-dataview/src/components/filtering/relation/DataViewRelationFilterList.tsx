@@ -13,9 +13,9 @@ export const DataViewRelationFilterList = Component(({ children, name }: DataVie
 	const { options } = useDataViewRelationFilterArgs()
 	// eslint-disable-next-line react-hooks/rules-of-hooks
 	name ??= useDataViewFilterName()
-	const [state, loadingState] = useDataViewRelationFilterData({ name, options, children })
+	const [state] = useDataViewRelationFilterData({ name, options, children })
 
-	if (loadingState === 'initial' || !state.entities) {
+	if (!state.entities) {
 		return null
 	}
 

@@ -78,10 +78,15 @@ const _DataViewEntityListPropsContext = createRequiredContext<QualifiedEntityLis
 export const DataViewEntityListPropsContext = _DataViewEntityListPropsContext[0]
 export const useDataViewEntityListProps = _DataViewEntityListPropsContext[1]
 
-const _DataViewLoaderStateContext = createRequiredContext<EntityListSubTreeLoaderState>('DataViewLoaderStateContext')
+const _DataViewLoaderStateContext = createRequiredContext<Exclude<EntityListSubTreeLoaderState, 'loading'>>('DataViewLoaderStateContext')
 /** @internal */
 export const DataViewLoaderStateContext = _DataViewLoaderStateContext[0]
 export const useDataViewLoaderState = _DataViewLoaderStateContext[1]
+
+const _DataViewReloadContext = createRequiredContext<() => void>('DataViewReloadContext')
+/** @internal */
+export const DataViewReloadContext = _DataViewReloadContext[0]
+export const useDataViewReload = _DataViewReloadContext[1]
 
 const _DataViewDisplayedContextTmp = createRequiredContext<DataViewState | undefined>('DataViewDisplayedStateContext')
 /** @internal */

@@ -36,7 +36,7 @@
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^6.21.0",
     "@vitejs/plugin-react": "^4.2.1",
-    "esbuild": "^0.19.12",
+    "esbuild": "^0.21.5",
     "esbuild-node-externals": "^1.14.0",
     "eslint": "^8.57.0",
     "eslint-plugin-promise": "^6.4.0",
@@ -48,11 +48,11 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "supertest": "^7.0.0",
-    "tsx": "^4.10.5",
+    "tsx": "^4.16.5",
     "typedoc": "^0.25.13",
     "typescript": "^5.5.4",
-    "vite": "^5.2.11",
-    "vitest": "^2.0.3"
+    "vite": "^5.3.5",
+    "vitest": "^2.0.5"
   },
   "workspaces": [
     "packages/*"

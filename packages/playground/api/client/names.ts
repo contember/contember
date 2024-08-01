@@ -319,6 +319,48 @@ export const ContemberClientNames: SchemaNames = {
         "type"
       ]
     },
+    "EditorTextArea": {
+      "name": "EditorTextArea",
+      "fields": {
+        "id": {
+          "type": "column"
+        },
+        "unique": {
+          "type": "column"
+        },
+        "data": {
+          "type": "column"
+        }
+      },
+      "scalars": [
+        "id",
+        "unique",
+        "data"
+      ]
+    },
+    "Folder": {
+      "name": "Folder",
+      "fields": {
+        "id": {
+          "type": "column"
+        },
+        "name": {
+          "type": "column"
+        },
+        "parent": {
+          "type": "one",
+          "entity": "Folder"
+        },
+        "children": {
+          "type": "many",
+          "entity": "Folder"
+        }
+      },
+      "scalars": [
+        "id",
+        "name"
+      ]
+    },
     "GridArticle": {
       "name": "GridArticle",
       "fields": {
@@ -361,6 +403,10 @@ export const ContemberClientNames: SchemaNames = {
         "comments": {
           "type": "many",
           "entity": "GridArticleComment"
+        },
+        "details": {
+          "type": "one",
+          "entity": "GridArticleDetail"
         }
       },
       "scalars": [
@@ -399,6 +445,25 @@ export const ContemberClientNames: SchemaNames = {
         "id",
         "content",
         "createdAt"
+      ]
+    },
+    "GridArticleDetail": {
+      "name": "GridArticleDetail",
+      "fields": {
+        "id": {
+          "type": "column"
+        },
+        "article": {
+          "type": "one",
+          "entity": "GridArticle"
+        },
+        "commentsCount": {
+          "type": "column"
+        }
+      },
+      "scalars": [
+        "id",
+        "commentsCount"
       ]
     },
     "GridAuthor": {
@@ -467,6 +532,9 @@ export const ContemberClientNames: SchemaNames = {
         "unique": {
           "type": "column"
         },
+        "dummy": {
+          "type": "column"
+        },
         "textValue": {
           "type": "column"
         },
@@ -498,6 +566,7 @@ export const ContemberClientNames: SchemaNames = {
       "scalars": [
         "id",
         "unique",
+        "dummy",
         "textValue",
         "intValue",
         "floatValue",
@@ -534,6 +603,159 @@ export const ContemberClientNames: SchemaNames = {
         "notNullValue",
         "uniqueValue",
         "validationValue"
+      ]
+    },
+    "LegacyEditorBlock": {
+      "name": "LegacyEditorBlock",
+      "fields": {
+        "id": {
+          "type": "column"
+        },
+        "content": {
+          "type": "one",
+          "entity": "LegacyEditorContent"
+        },
+        "order": {
+          "type": "column"
+        },
+        "data": {
+          "type": "column"
+        },
+        "references": {
+          "type": "many",
+          "entity": "LegacyEditorReference"
+        }
+      },
+      "scalars": [
+        "id",
+        "order",
+        "data"
+      ]
+    },
+    "LegacyEditorContent": {
+      "name": "LegacyEditorContent",
+      "fields": {
+        "id": {
+          "type": "column"
+        },
+        "unique": {
+          "type": "column"
+        },
+        "blocks": {
+          "type": "many",
+          "entity": "LegacyEditorBlock"
+        }
+      },
+      "scalars": [
+        "id",
+        "unique"
+      ]
+    },
+    "LegacyEditorEmbed": {
+      "name": "LegacyEditorEmbed",
+      "fields": {
+        "id": {
+          "type": "column"
+        },
+        "type": {
+          "type": "column"
+        },
+        "youtubeId": {
+          "type": "column"
+        },
+        "vimeoId": {
+          "type": "column"
+        },
+        "reference": {
+          "type": "one",
+          "entity": "LegacyEditorReference"
+        }
+      },
+      "scalars": [
+        "id",
+        "type",
+        "youtubeId",
+        "vimeoId"
+      ]
+    },
+    "LegacyEditorImage": {
+      "name": "LegacyEditorImage",
+      "fields": {
+        "id": {
+          "type": "column"
+        },
+        "url": {
+          "type": "column"
+        }
+      },
+      "scalars": [
+        "id",
+        "url"
+      ]
+    },
+    "LegacyEditorLink": {
+      "name": "LegacyEditorLink",
+      "fields": {
+        "id": {
+          "type": "column"
+        },
+        "url": {
+          "type": "column"
+        }
+      },
+      "scalars": [
+        "id",
+        "url"
+      ]
+    },
+    "LegacyEditorReference": {
+      "name": "LegacyEditorReference",
+      "fields": {
+        "id": {
+          "type": "column"
+        },
+        "block": {
+          "type": "one",
+          "entity": "LegacyEditorBlock"
+        },
+        "type": {
+          "type": "column"
+        },
+        "target": {
+          "type": "one",
+          "entity": "LegacyEditorLink"
+        },
+        "embed": {
+          "type": "one",
+          "entity": "LegacyEditorEmbed"
+        },
+        "image": {
+          "type": "one",
+          "entity": "LegacyEditorImage"
+        }
+      },
+      "scalars": [
+        "id",
+        "type"
+      ]
+    },
+    "PlateEditorContent": {
+      "name": "PlateEditorContent",
+      "fields": {
+        "id": {
+          "type": "column"
+        },
+        "unique": {
+          "type": "column"
+        },
+        "data": {
+          "type": "column"
+        }
+      },
+      "scalars": [
+        "id",
+        "unique",
+        "data"
       ]
     },
     "RepeaterItem": {
@@ -587,6 +809,9 @@ export const ContemberClientNames: SchemaNames = {
         "unique": {
           "type": "column"
         },
+        "dummy": {
+          "type": "column"
+        },
         "hasOne": {
           "type": "one",
           "entity": "SelectValue"
@@ -602,7 +827,8 @@ export const ContemberClientNames: SchemaNames = {
       },
       "scalars": [
         "id",
-        "unique"
+        "unique",
+        "dummy"
       ]
     },
     "SelectValue": {
@@ -622,6 +848,48 @@ export const ContemberClientNames: SchemaNames = {
         "id",
         "name",
         "slug"
+      ]
+    },
+    "Slug": {
+      "name": "Slug",
+      "fields": {
+        "id": {
+          "type": "column"
+        },
+        "unique": {
+          "type": "column"
+        },
+        "slug": {
+          "type": "column"
+        },
+        "title": {
+          "type": "column"
+        },
+        "category": {
+          "type": "one",
+          "entity": "SlugCategory"
+        }
+      },
+      "scalars": [
+        "id",
+        "unique",
+        "slug",
+        "title"
+      ]
+    },
+    "SlugCategory": {
+      "name": "SlugCategory",
+      "fields": {
+        "id": {
+          "type": "column"
+        },
+        "name": {
+          "type": "column"
+        }
+      },
+      "scalars": [
+        "id",
+        "name"
       ]
     },
     "UploadAudio": {

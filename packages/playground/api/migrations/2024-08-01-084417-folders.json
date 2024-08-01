@@ -1,0 +1,94 @@
+{
+	"formatVersion": 5,
+	"modifications": [
+		{
+			"modification": "createEntity",
+			"entity": {
+				"eventLog": {
+					"enabled": true
+				},
+				"name": "Folder",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "folder",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": [],
+				"indexes": []
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "Folder",
+			"field": {
+				"name": "name",
+				"columnName": "name",
+				"columnType": "text",
+				"nullable": false,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "Folder",
+			"owningSide": {
+				"type": "ManyHasOne",
+				"name": "parent",
+				"target": "Folder",
+				"joiningColumn": {
+					"columnName": "parent_id",
+					"onDelete": "restrict"
+				},
+				"nullable": true,
+				"inversedBy": "children"
+			},
+			"inverseSide": {
+				"type": "OneHasMany",
+				"name": "children",
+				"target": "Folder",
+				"ownedBy": "parent"
+			}
+		},
+		{
+			"modification": "patchAclSchema",
+			"patch": [
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/Folder",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"create": {
+								"id": true,
+								"name": true,
+								"parent": true,
+								"children": true
+							},
+							"update": {
+								"id": true,
+								"name": true,
+								"parent": true,
+								"children": true
+							},
+							"read": {
+								"id": true,
+								"name": true,
+								"parent": true,
+								"children": true
+							},
+							"delete": true,
+							"customPrimary": true
+						}
+					}
+				}
+			]
+		}
+	]
+}

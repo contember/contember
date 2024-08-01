@@ -8,15 +8,24 @@ export type BoardTaskStatus =
 	 | "todo"
 	 | "inProgress"
 	 | "done"
+export type ContentEmbedType = 
+	 | "youtube"
+	 | "vimeo"
 export type EditorReferenceType = 
 	 | "image"
 	 | "link"
+	 | "quote"
 export type GridArticleState = 
 	 | "published"
 	 | "draft"
 	 | "archived"
 export type InputUnique = 
 	 | "unique"
+export type LegacyEditorReferenceType = 
+	 | "link"
+	 | "quote"
+	 | "image"
+	 | "embed"
 export type SelectUnique = 
 	 | "unique"
 export type UploadMediaType = 
@@ -35,7 +44,15 @@ export type DimensionsItemUnique =
 	 | "unique"
 export type EditorContentUnique = 
 	 | "unique"
+export type EditorTextAreaUnique = 
+	 | "unique"
 export type InputRootEnumValue = 
 	 | "a"
 	 | "b"
 	 | "c"
+export type LegacyEditorContentUnique = 
+	 | "unique"
+export type PlateEditorContentUnique = 
+	 | "unique"
+export type SlugUnique = 
+	 | "unique"

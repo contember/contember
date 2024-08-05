@@ -476,12 +476,15 @@ export class MutationResolver {
 						logger.debug('MutationResolver: Transaction failed, rolling back', { result })
 						await mapper.db.connection.rollback()
 					} else {
-						await mapper.eventManager.fire(new BeforeCommitEvent())
-
-						logger.debug('MutationResolver: Transaction ok, committing')
 						try {
+							await mapper.eventManager.fire(new BeforeCommitEvent())
+							logger.debug('MutationResolver: Transaction ok, committing')
 							await mapper.db.connection.commit()
+							await mapper.eventManager.fire(new AfterCommitEvent())
 						} catch (e) {
+							try {
+								await mapper.db.connection.rollback()
+							} catch {}
 							const err = convertError(this.schema, this.schemaDatabaseMetadata, e)
 							const errorResponse = this.createErrorResponse([err])
 							if (!errorResponse) {
@@ -490,7 +493,6 @@ export class MutationResolver {
 							return { ...result, ...errorResponse }
 						}
 
-						await mapper.eventManager.fire(new AfterCommitEvent())
 					}
 					return result
 				})

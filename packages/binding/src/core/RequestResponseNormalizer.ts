@@ -68,7 +68,12 @@ export class RequestResponseNormalizer {
 			const { subTreePlaceholder, subTreeType, alias } = operation
 
 			const receivedData = newPersistedData[alias]
-			if (!receivedData || Array.isArray(receivedData)) {
+
+			// probably multiple operations removing same entity, resulting in no data for some of them
+			if (!receivedData) {
+				continue
+			}
+			if (Array.isArray(receivedData)) {
 				throw new BindingError()
 			}
 

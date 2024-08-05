@@ -1,4 +1,5 @@
 import * as AclDefinition from './acl/definition'
+import { Role } from './acl/definition'
 import * as ActionsDefinition from './actions/definition'
 import * as InputValidation from './validation'
 import { SchemaDefinition } from './model'
@@ -8,6 +9,20 @@ export { AllowAllPermissionFactory } from '@contember/schema-utils'
 export { PermissionsBuilder } from './acl/builder/PermissionsBuilder'
 export * from './model'
 export * from './presets'
+
+export type { Role }
+export type { VariableDefinition } from './acl/definition'
+export type {
+	ColumnDefinition,
+	FieldDefinition,
+	OneHasOneDefinition,
+	OneHasOneInverseDefinition,
+	OneHasManyDefinition,
+	ManyHasOneDefinition,
+	ManyHasManyDefinition,
+	ManyHasManyInverseDefinition,
+	EnumDefinition,
+} from './model/definition'
 
 export { AclDefinition, ActionsDefinition, SchemaDefinition, InputValidation, createSchema }
 

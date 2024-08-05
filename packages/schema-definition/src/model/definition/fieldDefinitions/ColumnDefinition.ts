@@ -1,11 +1,11 @@
 import { Model } from '@contember/schema'
-import { Interface } from '../types'
 import { CreateFieldContext, FieldDefinition } from './FieldDefinition'
 import { EnumDefinition } from '../EnumDefinition'
 import { resolveDefaultColumnType } from '@contember/schema-utils'
 
 export class ColumnDefinition extends FieldDefinition<ColumnDefinitionOptions> {
 	type = 'ColumnDefinition' as const
+
 
 	public static create(
 		type: Model.ColumnType,
@@ -18,35 +18,35 @@ export class ColumnDefinition extends FieldDefinition<ColumnDefinitionOptions> {
 	}
 
 
-	public columnName(columnName: string): Interface<ColumnDefinition> {
+	public columnName(columnName: string): ColumnDefinition {
 		return this.withOption('columnName', columnName)
 	}
 
-	public columnType(columnType: string): Interface<ColumnDefinition> {
+	public columnType(columnType: string): ColumnDefinition {
 		return this.withOption('columnType', columnType)
 	}
 
-	public nullable(): Interface<ColumnDefinition> {
+	public nullable(): ColumnDefinition {
 		return this.withOption('nullable', true)
 	}
 
-	public notNull(): Interface<ColumnDefinition> {
+	public notNull(): ColumnDefinition {
 		return this.withOption('nullable', false)
 	}
 
-	public sequence(options?: Partial<Model.ColumnTypeDefinition['sequence']>): Interface<ColumnDefinition> {
+	public sequence(options?: Partial<Model.ColumnTypeDefinition['sequence']>): ColumnDefinition {
 		return this.withOption('sequence', { precedence: 'BY DEFAULT', ...options })
 	}
 
-	public unique(options: { timing?: Model.ConstraintTiming } = {}): Interface<ColumnDefinition> {
+	public unique(options: { timing?: Model.ConstraintTiming } = {}): ColumnDefinition {
 		return this.withOption('unique', options)
 	}
 
-	public default(value: ColumnDefinition['options']['default']): Interface<ColumnDefinition> {
+	public default(value: ColumnDefinition['options']['default']): ColumnDefinition {
 		return this.withOption('default', value)
 	}
 
-	public typeAlias(alias: string): Interface<ColumnDefinition> {
+	public typeAlias(alias: string): ColumnDefinition {
 		return this.withOption('typeAlias', alias)
 	}
 
@@ -83,45 +83,49 @@ export class ColumnDefinition extends FieldDefinition<ColumnDefinitionOptions> {
 			...(typeAlias !== undefined ? { typeAlias } : {}),
 		}
 	}
+
+	protected withOption<K extends keyof ColumnDefinitionOptions>(key: K, value: ColumnDefinitionOptions[K]): ColumnDefinition {
+		return new ColumnDefinition({ ...this.options, [key]: value })
+	}
 }
 
 export function column(type: Model.ColumnType, typeOptions: ColumnTypeOptions = {}) {
 	return ColumnDefinition.create(type, typeOptions)
 }
 
-export function stringColumn() {
+export function stringColumn(): ColumnDefinition {
 	return column(Model.ColumnType.String)
 }
 
-export function intColumn() {
+export function intColumn(): ColumnDefinition {
 	return column(Model.ColumnType.Int)
 }
 
-export function boolColumn() {
+export function boolColumn(): ColumnDefinition {
 	return column(Model.ColumnType.Bool)
 }
 
-export function doubleColumn() {
+export function doubleColumn(): ColumnDefinition {
 	return column(Model.ColumnType.Double)
 }
 
-export function dateColumn() {
+export function dateColumn(): ColumnDefinition {
 	return column(Model.ColumnType.Date)
 }
 
-export function dateTimeColumn() {
+export function dateTimeColumn(): ColumnDefinition {
 	return column(Model.ColumnType.DateTime)
 }
 
-export function jsonColumn() {
+export function jsonColumn(): ColumnDefinition {
 	return column(Model.ColumnType.Json)
 }
 
-export function enumColumn(enumDefinition: EnumDefinition) {
+export function enumColumn(enumDefinition: EnumDefinition): ColumnDefinition {
 	return column(Model.ColumnType.Enum, { enumDefinition })
 }
 
-export function uuidColumn() {
+export function uuidColumn(): ColumnDefinition {
 	return column(Model.ColumnType.Uuid)
 }
 

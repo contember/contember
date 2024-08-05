@@ -2,12 +2,8 @@ import { Model } from '@contember/schema'
 import { CommonContext } from '../context'
 
 export abstract class FieldDefinition<O> {
-	constructor(public readonly options: O) {}
-
-	protected withOption<K extends keyof O>(this: any, key: K, value: O[K]): { [K in keyof this]: this[K] } {
-		return new this.constructor({ ...this.options, [key]: value })
+	constructor(public readonly options: O) {
 	}
-
 	abstract createField(context: CreateFieldContext): Model.AnyField
 }
 

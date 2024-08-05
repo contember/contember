@@ -1,14 +1,14 @@
 import { Model } from '@contember/schema'
 import { CreateFieldContext, FieldDefinition } from './FieldDefinition'
-import { EntityConstructor, Interface, RelationTarget } from '../types'
+import { EntityConstructor, RelationTarget } from '../types'
 
-export class OneHasManyDefinitionImpl extends FieldDefinition<OneHasManyDefinitionOptions> {
+export class OneHasManyDefinition extends FieldDefinition<OneHasManyDefinitionOptions> {
 	type = 'OneHasManyDefinition' as const
 
 	orderBy(
 		field: string | string[],
 		direction: Model.OrderDirection | `${Model.OrderDirection}` = Model.OrderDirection.asc,
-	): Interface<OneHasManyDefinition> {
+	): OneHasManyDefinition {
 		const path = typeof field === 'string' ? [field] : field
 		return this.withOption('orderBy', [...(this.options.orderBy || []), { path, direction: direction as Model.OrderDirection }])
 	}
@@ -22,12 +22,15 @@ export class OneHasManyDefinitionImpl extends FieldDefinition<OneHasManyDefiniti
 			...(options.orderBy ? { orderBy: options.orderBy } : {}),
 		}
 	}
+
+	protected withOption<K extends keyof OneHasManyDefinitionOptions>(key: K, value: OneHasManyDefinitionOptions[K]): OneHasManyDefinition {
+		return new OneHasManyDefinition({ ...this.options, [key]: value })
+	}
 }
 
-export type OneHasManyDefinition = Interface<OneHasManyDefinitionImpl>
 
 export function oneHasMany(target: EntityConstructor, ownedBy: string): OneHasManyDefinition {
-	return new OneHasManyDefinitionImpl({ target, ownedBy })
+	return new OneHasManyDefinition({ target, ownedBy })
 }
 
 export type OneHasManyDefinitionOptions = {

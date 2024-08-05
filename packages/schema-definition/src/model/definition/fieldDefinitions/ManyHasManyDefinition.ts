@@ -1,22 +1,22 @@
 import { Model } from '@contember/schema'
-import { EntityConstructor, Interface, RelationTarget } from '../types'
+import { EntityConstructor, RelationTarget } from '../types'
 import { CreateFieldContext, FieldDefinition } from './FieldDefinition'
 
-export class ManyHasManyDefinitionImpl extends FieldDefinition<ManyHasManyDefinitionOptions> {
+export class ManyHasManyDefinition extends FieldDefinition<ManyHasManyDefinitionOptions> {
 	type = 'ManyHasManyDefinition' as const
 
-	inversedBy(inversedBy: string): Interface<ManyHasManyDefinition> {
+	inversedBy(inversedBy: string): ManyHasManyDefinition {
 		return this.withOption('inversedBy', inversedBy)
 	}
 
-	joiningTable(joiningTable: Partial<Model.JoiningTable>): Interface<ManyHasManyDefinition> {
+	joiningTable(joiningTable: Partial<Model.JoiningTable>): ManyHasManyDefinition {
 		return this.withOption('joiningTable', joiningTable)
 	}
 
 	orderBy(
 		field: string | string[],
 		direction: Model.OrderDirection | `${Model.OrderDirection}` = Model.OrderDirection.asc,
-	): Interface<ManyHasManyDefinition> {
+	): ManyHasManyDefinition {
 		const path = typeof field === 'string' ? [field] : field
 		return this.withOption('orderBy', [...(this.options.orderBy || []), { path, direction: direction as Model.OrderDirection }])
 	}
@@ -48,12 +48,16 @@ export class ManyHasManyDefinitionImpl extends FieldDefinition<ManyHasManyDefini
 			...(options.orderBy ? { orderBy: options.orderBy } : {}),
 		}
 	}
+
+
+	protected withOption<K extends keyof ManyHasManyDefinitionOptions>(key: K, value: ManyHasManyDefinitionOptions[K]): ManyHasManyDefinition {
+		return new ManyHasManyDefinition({ ...this.options, [key]: value })
+	}
 }
 
-export type ManyHasManyDefinition = Interface<ManyHasManyDefinitionImpl>
 
 export function manyHasMany(target: EntityConstructor, inversedBy?: string): ManyHasManyDefinition {
-	return new ManyHasManyDefinitionImpl({ target, inversedBy })
+	return new ManyHasManyDefinition({ target, inversedBy })
 }
 
 export type ManyHasManyDefinitionOptions = {

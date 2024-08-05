@@ -1,5 +1,3 @@
-import { ClientErrorCodes } from './errorCodes'
-
 export class DatabaseError extends Error {
 	public readonly code?: string
 	public readonly originalMessage?: string
@@ -58,5 +56,7 @@ export class SerializationFailureError extends QueryError {}
 export class InvalidDataError extends QueryError {}
 
 export class TransactionAbortedError extends QueryError {}
+
+export class CannotCommitError extends DatabaseError {}
 
 

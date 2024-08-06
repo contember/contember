@@ -1,4 +1,4 @@
-import { Environment } from '@contember/binding'
+import { Environment } from '@contember/react-binding'
 import { ChildrenAnalyzer, Leaf } from '@contember/react-multipass-rendering'
 import { BoardItem } from '../components/BoardItem'
 import { ReactNode } from 'react'

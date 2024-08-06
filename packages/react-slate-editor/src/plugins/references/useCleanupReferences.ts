@@ -1,4 +1,4 @@
-import { EntityId, SugaredRelativeEntityList } from '@contember/binding'
+import { EntityId, SugaredRelativeEntityList } from '@contember/react-binding'
 import { useEntityBeforePersist, useEntityList } from '@contember/react-binding'
 import { useReferentiallyStableCallback } from '@contember/react-utils'
 import { Descendant, Editor, Element } from 'slate'

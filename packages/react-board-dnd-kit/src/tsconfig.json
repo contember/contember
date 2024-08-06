@@ -4,7 +4,6 @@
 		"outDir": "../dist/types"
 	},
 	"references": [
-		{ "path": "../../binding/src" },
 		{ "path": "../../react-binding/src" },
 		{ "path": "../../react-board/src" },
 		{ "path": "../../react-utils/src" },

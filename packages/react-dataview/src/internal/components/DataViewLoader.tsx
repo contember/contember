@@ -1,5 +1,5 @@
 import { memo, ReactNode, useMemo } from 'react'
-import { EntityAccessor, SugaredQualifiedEntityList } from '@contember/binding'
+import { EntityAccessor, SugaredQualifiedEntityList } from '@contember/react-binding'
 import {
 	Component,
 	EntityListSubTree,

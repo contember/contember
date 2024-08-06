@@ -1,7 +1,7 @@
 import { Entity, useEnvironment, VariableInputTransformer } from '@contember/react-binding'
 import { Element as SlateElement, type Range as SlateRange } from 'slate'
 import { ReactNode, useEffect, useState } from 'react'
-import { EntityAccessor, EntityId, OptionallyVariableFieldValue } from '@contember/binding'
+import { EntityAccessor, EntityId, OptionallyVariableFieldValue } from '@contember/react-binding'
 import { useSlate } from 'slate-react'
 import { EditorWithBlocks } from '../blockEditor'
 

@@ -5,7 +5,7 @@ import { DataViewFilterNameContext, DataViewRelationFilterArgsContext } from '..
 import { DataViewFilter } from '../DataViewFilter'
 import { getFilterName } from '../../../internal/helpers/getFilterName'
 import { createHasOneFilter } from '../../../filterTypes'
-import { SugaredRelativeSingleEntity } from '@contember/binding'
+import { SugaredRelativeSingleEntity } from '@contember/react-binding'
 import { useFieldEntityName } from '../../../internal/hooks/useFieldEntityName'
 
 export interface DataViewHasOneFilterProps {

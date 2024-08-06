@@ -4,7 +4,7 @@ import { UploaderOptionsContext, UploaderStateContext, UploaderUploadFilesContex
 import { Fragment, ReactNode, useMemo } from 'react'
 import { Component, Field, SugaredRelativeSingleEntity } from '@contember/react-binding'
 import { DiscriminatedFileTypeMap } from '../types'
-import { SugaredRelativeSingleField } from '@contember/binding'
+import { SugaredRelativeSingleField } from '@contember/react-binding'
 import { useFillDiscriminatedEntity } from '../internal/hooks/useFillDiscriminatedEntity'
 import { uploaderErrorHandler } from '../internal/utils/uploaderErrorHandler'
 import { resolveAllAcceptedMimes } from '../internal/utils/resolveAllAcceptedMimes'

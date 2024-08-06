@@ -1,4 +1,4 @@
-import { QueryLanguage, SugaredRelativeSingleField, wrapFilterInHasOnes } from '@contember/binding'
+import { QueryLanguage, SugaredRelativeSingleField, wrapFilterInHasOnes } from '@contember/react-binding'
 import { createGenericTextCellFilterCondition } from './common'
 import { DataViewFilterHandler } from '../types'
 

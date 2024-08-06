@@ -1,4 +1,4 @@
-import { QueryLanguage, SugaredQualifiedEntityList } from '@contember/binding'
+import { QueryLanguage, SugaredQualifiedEntityList } from '@contember/react-binding'
 import { DataViewInfo, DataViewMethods, DataViewState } from '../types/dataview'
 import { useCallback, useMemo, useRef } from 'react'
 import { useEnvironment } from '@contember/react-binding'

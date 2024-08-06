@@ -2,7 +2,7 @@ import React, { ReactNode, useMemo } from 'react'
 import { RepeaterAddItemIndex } from '../../types/RepeaterMethods'
 import { useRepeaterMethods } from '../../contexts'
 import { Slot } from '@radix-ui/react-slot'
-import { EntityAccessor } from '@contember/binding'
+import { EntityAccessor } from '@contember/react-binding'
 
 export type RepeaterAddItemTriggerProps = {
 	children: ReactNode

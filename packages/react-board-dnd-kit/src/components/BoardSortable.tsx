@@ -12,7 +12,7 @@ import {
 } from '@dnd-kit/core'
 import { coordinateGetter as multipleContainersCoordinateGetter } from '../internal/multipleContainersKeyboardCoordinates'
 import { BoardColumnNode, BoardItemNode, useBoardColumns, useBoardMethods } from '@contember/react-board'
-import { EntityAccessor } from '@contember/binding'
+import { EntityAccessor } from '@contember/react-binding'
 import { BoardActiveColumnContext, BoardActiveItemContext } from '../contexts'
 
 type BoardIndexItem =

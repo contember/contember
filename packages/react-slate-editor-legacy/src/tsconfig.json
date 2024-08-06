@@ -7,7 +7,6 @@
 		]
 	},
 	"references": [
-		{ "path": "../../binding/src" },
 		{ "path": "../../react-binding/src" },
 		{ "path": "../../react-repeater/src" },
 		{ "path": "../../react-multipass-rendering/src" },

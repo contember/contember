@@ -2,8 +2,14 @@ import { useMemo } from 'react'
 import { arrayMove } from './arrayMove'
 
 import { RepeaterMethods } from '../types'
-import { BindingError, EntityAccessor, EntityListAccessor, RelativeSingleField } from '@contember/binding'
-import { repairEntitiesOrder, sortEntities } from '@contember/react-binding'
+import {
+	BindingError,
+	EntityAccessor,
+	EntityListAccessor,
+	RelativeSingleField,
+	repairEntitiesOrder,
+	sortEntities,
+} from '@contember/react-binding'
 
 export const useCreateRepeaterMethods = ({ accessor, sortableBy }: {
 	accessor: EntityListAccessor

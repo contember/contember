@@ -1,4 +1,4 @@
-import { EntityAccessor } from '@contember/binding'
+import { EntityAccessor } from '@contember/react-binding'
 import { ReactNode, useEffect } from 'react'
 import * as React from 'react'
 import { DataViewKeyboardEventHandlerContext, DataViewHighlightIndexContext, useDataViewEntityListAccessor } from '../../contexts'

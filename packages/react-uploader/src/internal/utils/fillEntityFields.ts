@@ -1,5 +1,5 @@
 import { FileType, FileWithMeta } from '../../types'
-import { EntityAccessor } from '@contember/binding'
+import { EntityAccessor } from '@contember/react-binding'
 import { FileUploadResult } from '../../types/uploadClient'
 
 export const executeExtractors = async ({ fileType, file, result }: { fileType: FileType; file: FileWithMeta; result: FileUploadResult }) => {

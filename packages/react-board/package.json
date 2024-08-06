@@ -26,7 +26,6 @@
     "directory": "packages/react-board"
   },
   "dependencies": {
-    "@contember/binding": "workspace:*",
     "@contember/react-binding": "workspace:*",
     "@contember/react-multipass-rendering": "workspace:*",
     "@contember/react-utils": "workspace:*"

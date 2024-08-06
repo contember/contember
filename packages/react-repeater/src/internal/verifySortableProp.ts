@@ -1,4 +1,4 @@
-import { BindingError } from '@contember/binding'
+import { BindingError } from '@contember/react-binding'
 
 export const verifySortableProp = (props: {sortableBy?: unknown; orderBy?: unknown}) => {
 	if (

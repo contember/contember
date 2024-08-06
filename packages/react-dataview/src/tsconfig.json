@@ -5,7 +5,6 @@
 	},
 	"references": [
 		{ "path": "../../client/src" },
-		{ "path": "../../binding/src" },
 		{ "path": "../../react-binding/src" },
 		{ "path": "../../react-client/src" },
 		{ "path": "../../react-multipass-rendering/src" },

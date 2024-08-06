@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react'
 import { useDataViewFilter } from '../../index'
 import { RelationFilterArtifacts } from '../../../filterTypes'
-import { EntityId } from '@contember/binding'
+import { EntityId } from '@contember/react-binding'
 
 export type DataViewSetRelationFilterAction = 'include' | 'exclude' | 'unset' | 'toggleInclude' | 'toggleExclude'
 export type DataViewRelationFilterCurrent = 'include' | 'exclude' | 'none'

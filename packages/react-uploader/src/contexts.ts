@@ -1,6 +1,6 @@
 import { createContext, createRequiredContext } from '@contember/react-utils'
 import { UploaderFileState, UploaderState } from './types'
-import { ErrorAccessor } from '@contember/binding'
+import { ErrorAccessor } from '@contember/react-binding'
 import { UploadClient } from './types/uploadClient'
 import { UploaderOptions } from './types/options'
 

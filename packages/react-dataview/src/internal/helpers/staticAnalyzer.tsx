@@ -1,7 +1,7 @@
 import { dataViewSelectionEnvironmentExtension } from '../../env/dataViewSelectionEnvironmentExtension'
 import { createUnionTextFilter } from '../../filterTypes'
 import { DataViewFilter, DataViewFilterProps, DataViewLayout, DataViewLayoutProps, DataViewProps, DataViewQueryFilterName } from '../../components'
-import { EntityListSubTreeMarker, Environment, FieldMarker, HasOneRelationMarker, MeaningfulMarker } from '@contember/binding'
+import { EntityListSubTreeMarker, Environment, FieldMarker, HasOneRelationMarker, MeaningfulMarker } from '@contember/react-binding'
 import { EntityListSubTree, MarkerTreeGenerator } from '@contember/react-binding'
 import { ChildrenAnalyzer, Leaf } from '@contember/react-multipass-rendering'
 import { DataViewFilterHandler, DataViewSelectionLayout } from '../../types'

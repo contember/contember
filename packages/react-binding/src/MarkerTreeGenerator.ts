@@ -52,7 +52,7 @@ export class MarkerTreeGenerator {
 	}
 
 	private generatePlaceholdersByAliases(
-		hoistedSubTrees: Map<string, EntitySubTreeMarker | EntityListSubTreeMarker>,
+		hoistedSubTrees: ReadonlyMap<string, EntitySubTreeMarker | EntityListSubTreeMarker>,
 	): Map<Alias, string> {
 		const placeholders = new Map<Alias, string>()
 

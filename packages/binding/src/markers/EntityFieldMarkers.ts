@@ -4,4 +4,4 @@ import type { HasManyRelationMarker } from './HasManyRelationMarker'
 import type { HasOneRelationMarker } from './HasOneRelationMarker'
 
 export type EntityFieldMarker = FieldMarker | HasOneRelationMarker | HasManyRelationMarker
-export type EntityFieldMarkers = Map<PlaceholderName, EntityFieldMarker>
+export type EntityFieldMarkers = ReadonlyMap<PlaceholderName, EntityFieldMarker>

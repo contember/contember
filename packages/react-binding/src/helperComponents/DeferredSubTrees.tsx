@@ -98,12 +98,8 @@ export const DeferredSubTrees = Component<DeferredSubTreesProps>(
 			const fieldsWithHoistablesMarker = MarkerFactory.createEntityFieldsWithHoistablesMarker(fields, environment)
 
 			// We want to get rid of the subTrees but leave whatever relations and fields are present.
-			//
-			// Mutating from here is fine since we've literally just created it and no other code could possibly possess
-			// a reference to this.
-			fieldsWithHoistablesMarker.subTrees?.clear()
 
-			return fieldsWithHoistablesMarker
+			return new EntityFieldsWithHoistablesMarker(fieldsWithHoistablesMarker.fields, undefined, fieldsWithHoistablesMarker.parentReference)
 		},
 	},
 	'DeferredSubTree',

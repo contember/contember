@@ -116,8 +116,8 @@ export class MarkerMerger {
 	}
 
 	public static mergeSubTreePlaceholdersByAliases(
-		original: Map<Alias, PlaceholderName>,
-		fresh: Map<Alias, PlaceholderName>,
+		original: ReadonlyMap<Alias, PlaceholderName>,
+		fresh: ReadonlyMap<Alias, PlaceholderName>,
 	) {
 		const newOriginalAliases = new Map(original)
 		for (const [alias, placeholder] of fresh) {
@@ -136,9 +136,9 @@ export class MarkerMerger {
 	public static mergeEntityFields(original: SubTreeMarkers, fresh: SubTreeMarkers): SubTreeMarkers
 	public static mergeEntityFields(original: EntityFieldMarkers, fresh: EntityFieldMarkers): EntityFieldMarkers
 	public static mergeEntityFields(
-		original: Map<PlaceholderName, MeaningfulMarker>,
-		fresh: Map<PlaceholderName, MeaningfulMarker>,
-	): Map<PlaceholderName, MeaningfulMarker> {
+		original: ReadonlyMap<PlaceholderName, MeaningfulMarker>,
+		fresh: ReadonlyMap<PlaceholderName, MeaningfulMarker>,
+	): ReadonlyMap<PlaceholderName, MeaningfulMarker> {
 		if (original === fresh) {
 			return original
 		}
@@ -166,7 +166,7 @@ export class MarkerMerger {
 		if (original.size === 0) {
 			return fresh
 		}
-		const newOriginal: EntityFieldPlaceholders = new Map(original)
+		const newOriginal: Map<FieldName, PlaceholderName | Set<PlaceholderName>> = new Map(original)
 		for (const [fieldName, freshPlaceholders] of fresh) {
 			const placeholderFromOriginal = newOriginal.get(fieldName)
 

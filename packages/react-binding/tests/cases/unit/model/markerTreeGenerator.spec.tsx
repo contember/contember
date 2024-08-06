@@ -425,7 +425,7 @@ describe('Marker tree generator', () => {
 				type: 'subtree-entity-list',
 			}),
 		)
-		const subTreeMarkers: SubTreeMarkers = new Map()
+		const subTreeMarkers: Map<PlaceholderName, EntitySubTreeMarker | EntityListSubTreeMarker> = new Map()
 		subTreeMarkers.set(subTreeMarker.placeholderName, subTreeMarker)
 		subTreeMarkers.set(listSubTreeMarker.placeholderName, listSubTreeMarker)
 

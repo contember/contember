@@ -1,3 +1,3 @@
 import type { FieldName, PlaceholderName } from '../treeParameters'
 
-export type EntityFieldPlaceholders = Map<FieldName, PlaceholderName | Set<PlaceholderName>>
+export type EntityFieldPlaceholders = ReadonlyMap<FieldName, PlaceholderName | Set<PlaceholderName>>

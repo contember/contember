@@ -163,8 +163,9 @@ namespace EntityListAccessor {
 	) => void | Promise<void | PersistSuccessHandler>
 
 	export type ChildEventListenerMap = {
-		[EventType in keyof Pick<EntityAccessor.EntityEventListenerMap, 'beforeUpdate' | 'initialize' | 'update'> &
-		string as `child${Capitalize<EventType>}`]: EntityAccessor.EntityEventListenerMap[EventType]
+		childBeforeUpdate: EntityAccessor.BatchUpdatesHandler
+		childInitialize: EntityAccessor.BatchUpdatesHandler
+		childUpdate: EntityAccessor.UpdateListener
 	}
 
 	export interface RuntimeEntityListEventListenerMap {

@@ -2,7 +2,6 @@ import { GraphQlBuilder, Writable } from '@contember/client'
 import { BindingError } from '../BindingError'
 import type {
 	Alias,
-	EntityCreationParameters,
 	EntityEventListenerStore,
 	EntityListEventListenerStore,
 	ExpectedQualifiedEntityMutation,
@@ -173,16 +172,6 @@ export class TreeParameterMerger {
 		}
 	}
 
-	public static mergeEntityCreationParameters(
-		original: EntityCreationParameters,
-		fresh: EntityCreationParameters,
-	): EntityCreationParameters {
-		return {
-			// forceCreation: original.forceCreation || fresh.forceCreation,
-			isNonbearing: original.isNonbearing && fresh.isNonbearing,
-			setOnCreate: this.mergeSetOnCreate(original.setOnCreate, fresh.setOnCreate),
-		}
-	}
 
 	public static mergeSetOnCreate(original: SetOnCreate, fresh: SetOnCreate): SetOnCreate {
 		if (original === undefined && fresh === undefined) {

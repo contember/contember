@@ -1,10 +1,11 @@
-import type { SetOnCreate } from './primitives'
+export const LeafFieldDefaults = {
+	isNonbearing: false,
+} as const
 
 export const EntityCreationParametersDefaults = {
 	// forceCreation: false,
 	isNonbearing: false,
 } as const
-
 
 /*
 It can be somewhat tricky to understand how these parameters actually work. These are all only relevant when *creating
@@ -21,9 +22,12 @@ fields/relations.
 Lastly, setOnCreate comes to play. It doesn't influence whether the entity will be persisted or not but if after
 all of the above it is concluded that it will, the values from it are used.
  */
-export interface EntityCreationParameters {
-	// forceCreation: boolean
-	isNonbearing: boolean
-	setOnCreate: SetOnCreate
+export const EntityListPreferencesDefaults = {
+	initialEntityCount: 0,
 }
-
+export const QualifiedEntityParametersDefaults = {
+	expectedMutation: 'anyMutation',
+} as const
+export const RelationDefaults = {
+	expectedMutation: 'anyMutation',
+} as const

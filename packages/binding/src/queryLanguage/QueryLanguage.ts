@@ -5,7 +5,6 @@ import {
 	EntityCreationParametersDefaults,
 	EntityEventListenerStore,
 	EntityListEventListenerStore,
-	EntityListParameters,
 	EntityListPreferencesDefaults,
 	EntityName,
 	EventListenersStore,
@@ -24,7 +23,6 @@ import {
 	RelativeEntityList,
 	RelativeSingleEntity,
 	RelativeSingleField,
-	SugarableEntityListParameters,
 	SugarableHasManyRelation,
 	SugarableHasOneRelation,
 	SugaredFilter,
@@ -42,10 +40,7 @@ import {
 	UnconstrainedQualifiedSingleEntity,
 	UniqueWhere,
 	UnsugarableEntityListEventListeners,
-	UnsugarableEntityListParameters,
 	UnsugarableFieldEventListeners,
-	UnsugarableHasManyRelation,
-	UnsugarableHasOneRelation,
 	UnsugarableSingleEntityEventListeners,
 } from '../treeParameters'
 import { Parser } from './Parser'
@@ -85,20 +80,6 @@ export class QueryLanguage {
 	public static desugarOrderBy = QueryLanguage.preparePrimitiveEntryPointWithFallback('orderBy')
 	public static desugarTaggedMap = QueryLanguage.preparePrimitiveEntryPointWithFallback('taggedMap')
 
-
-	private static desugarEntityListParameters(
-		sugarablePart: SugarableEntityListParameters,
-		unsugarablePart: UnsugarableEntityListParameters,
-		environment: Environment,
-	): EntityListParameters {
-		return {
-			filter: sugarablePart.filter ? this.desugarFilter(sugarablePart.filter, environment) : undefined,
-			limit: unsugarablePart.limit,
-			offset: unsugarablePart.offset,
-			orderBy: unsugarablePart.orderBy ? this.desugarOrderBy(unsugarablePart.orderBy, environment) : undefined,
-			initialEntityCount: unsugarablePart.initialEntityCount ?? EntityListPreferencesDefaults.initialEntityCount,
-		}
-	}
 
 	public static desugarSetOnCreate(setOnCreate: SugaredSetOnCreate, environment: Environment): UniqueWhere {
 		if (Array.isArray(setOnCreate)) {
@@ -278,7 +259,7 @@ export class QueryLanguage {
 
 	private static desugarHasOneRelation(
 		sugarable: SugarableHasOneRelation,
-		unsugarable: UnsugarableHasOneRelation,
+		unsugarable: Omit<SugaredRelativeSingleEntity, 'field'>,
 		environment: Environment,
 	): HasOneRelation {
 		return {
@@ -295,7 +276,7 @@ export class QueryLanguage {
 
 	private static augmentDesugaredHasOneRelationPath(
 		path: (ParsedHasOneRelation | string)[],
-		unsugarable: UnsugarableHasOneRelation,
+		unsugarable: Omit<SugaredRelativeSingleEntity, 'field'>,
 		environment: Environment,
 	): HasOneRelation[] {
 		return path.map((desugaredHasOneRelation, i) =>
@@ -310,7 +291,7 @@ export class QueryLanguage {
 
 	private static augmentDesugaredHasManyRelation(
 		relation: ParsedHasManyRelation,
-		unsugarable: UnsugarableHasManyRelation,
+		unsugarable: Omit<SugaredRelativeEntityList, 'field'>,
 		environment: Environment,
 	): HasManyRelation {
 		const eventListeners = this.desugarEntityListEventListeners(unsugarable)
@@ -332,7 +313,7 @@ export class QueryLanguage {
 
 	private static desugarHasOneRelationPath(
 		input: SugarableHasOneRelation[] | SugarableHasOneRelation | undefined,
-		lastRelation: UnsugarableHasOneRelation,
+		lastRelation: Omit<SugaredRelativeSingleEntity, 'field'>,
 		environment: Environment,
 	): HasOneRelation[] {
 		if (input === undefined) {
@@ -360,12 +341,17 @@ export class QueryLanguage {
 
 	private static desugarHasManyRelation(
 		sugarablePart: SugarableHasManyRelation,
-		unsugarablePart: UnsugarableHasManyRelation,
+		unsugarablePart: Omit<SugaredRelativeEntityList, 'field'>,
 		environment: Environment,
 	): HasManyRelation {
 		const eventListeners = this.desugarEntityListEventListeners(unsugarablePart)
 		return {
-			...this.desugarEntityListParameters(sugarablePart, unsugarablePart, environment),
+
+			filter: sugarablePart.filter ? this.desugarFilter(sugarablePart.filter, environment) : undefined,
+			limit: unsugarablePart.limit,
+			offset: unsugarablePart.offset,
+			orderBy: unsugarablePart.orderBy ? this.desugarOrderBy(unsugarablePart.orderBy, environment) : undefined,
+			initialEntityCount: unsugarablePart.initialEntityCount ?? EntityListPreferencesDefaults.initialEntityCount,
 			expectedMutation: unsugarablePart.expectedMutation ?? RelationDefaults.expectedMutation,
 			setOnCreate: unsugarablePart.setOnCreate
 				? this.desugarSetOnCreate(unsugarablePart.setOnCreate, environment)
@@ -488,13 +474,11 @@ export class QueryLanguage {
 		return {
 			entityName,
 			hasOneRelationPath,
-			...this.desugarEntityListParameters(
-				{
-					filter,
-				},
-				unsugarableEntityList,
-				environment,
-			),
+			filter: filter ? this.desugarFilter(filter, environment) : undefined,
+			limit: unsugarableEntityList.limit,
+			offset: unsugarableEntityList.offset,
+			orderBy: unsugarableEntityList.orderBy ? this.desugarOrderBy(unsugarableEntityList.orderBy, environment) : undefined,
+			initialEntityCount: unsugarableEntityList.initialEntityCount ?? EntityListPreferencesDefaults.initialEntityCount,
 			alias: this.desugarSubTreeAlias(unsugarableEntityList.alias),
 			isCreating: false,
 			isNonbearing: unsugarableEntityList.isNonbearing ?? EntityCreationParametersDefaults.isNonbearing,
@@ -548,7 +532,11 @@ export class QueryLanguage {
 					: undefined,
 			expectedMutation: unsugarableFieldList.expectedMutation ?? QualifiedEntityParametersDefaults.expectedMutation,
 			eventListeners: this.desugarFieldEventListeners(unsugarableFieldList),
-			...this.desugarEntityListParameters({ filter }, unsugarableFieldList, environment),
+			filter: filter ? this.desugarFilter(filter, environment) : undefined,
+			limit: unsugarableFieldList.limit,
+			offset: unsugarableFieldList.offset,
+			orderBy: unsugarableFieldList.orderBy ? this.desugarOrderBy(unsugarableFieldList.orderBy, environment) : undefined,
+			initialEntityCount: unsugarableFieldList.initialEntityCount ?? EntityListPreferencesDefaults.initialEntityCount,
 		}
 	}
 

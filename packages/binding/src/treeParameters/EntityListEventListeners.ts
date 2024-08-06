@@ -1,4 +1,4 @@
-import type { EntityListAccessor } from '../accessors'
+import type { EntityAccessor, EntityListAccessor } from '../accessors'
 import type { EntityEventListenerStore } from './SingleEntityEventListeners'
 import type { EventListenersStore } from './EventListenersStore'
 
@@ -13,8 +13,3 @@ export interface EntityListEventListeners {
 	childEventListeners: EntityEventListenerStore | undefined
 }
 
-export type UnsugarableEntityListEventListeners = {
-	[EventType in keyof UnsugarableEvents & string as `on${Capitalize<EventType>}`]?:
-	| UnsugarableEvents[EventType]
-	| Set<UnsugarableEvents[EventType]>
-}

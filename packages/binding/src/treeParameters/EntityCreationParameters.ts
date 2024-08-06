@@ -1,4 +1,4 @@
-import type { SetOnCreate, SugaredSetOnCreate } from './SetOnCreate'
+import type { SetOnCreate } from './primitives'
 
 export const EntityCreationParametersDefaults = {
 	// forceCreation: false,
@@ -27,8 +27,3 @@ export interface EntityCreationParameters {
 	setOnCreate: SetOnCreate
 }
 
-export interface UnsugarableEntityCreationParameters {
-	// forceCreation?: boolean
-	isNonbearing?: boolean
-	setOnCreate?: SugaredSetOnCreate
-}

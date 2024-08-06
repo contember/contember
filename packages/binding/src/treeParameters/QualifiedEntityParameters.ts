@@ -9,12 +9,3 @@ export interface QualifiedEntityParameters {
 	entityName: EntityName
 	expectedMutation: ExpectedQualifiedEntityMutation
 }
-
-export interface SugarableQualifiedEntityParameters {
-	entityName: EntityName
-}
-
-export interface UnsugarableQualifiedEntityParameters {
-	alias?: Alias | Set<Alias>
-	expectedMutation?: ExpectedQualifiedEntityMutation
-}

@@ -4,7 +4,6 @@
 		"outDir": "../dist/types"
 	},
 	"references": [
-		{ "path": "../../binding/src" },
 		{ "path": "../../react-binding/src" },
 		{ "path": "../../react-multipass-rendering/src" },
 		{ "path": "../../react-slate-editor-base/src" },

@@ -4,7 +4,6 @@
 		"outDir": "../dist/types"
 	},
 	"references": [
-		{ "path": "../../binding/src" },
 		{ "path": "../../client/src" },
 		{ "path": "../../graphql-client/src" },
 		{ "path": "../../react-binding/src" },

@@ -1,6 +1,6 @@
 import { EditorPlugin, EditorPluginWrapperProps } from '@contember/react-slate-editor-base'
 import { useMemo } from 'react'
-import { SugaredRelativeEntityList, SugaredRelativeSingleField, TreeNodeEnvironmentFactory } from '@contember/binding'
+import { SugaredRelativeEntityList, SugaredRelativeSingleField, TreeNodeEnvironmentFactory } from '@contember/react-binding'
 import { isElementWithReference } from './elements'
 import { referenceOverrides } from './referenceOverrides'
 import { ErrorBoundary } from 'react-error-boundary'

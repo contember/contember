@@ -33,7 +33,6 @@
     "directory": "packages/react-slate-editor-base"
   },
   "dependencies": {
-    "@contember/binding": "workspace:*",
     "@contember/react-binding": "workspace:*",
     "@contember/utilities": "workspace:*",
     "@radix-ui/primitive": "^1.0.1",

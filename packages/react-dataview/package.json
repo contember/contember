@@ -33,7 +33,6 @@
     "directory": "packages/react-dataview"
   },
   "dependencies": {
-    "@contember/binding": "workspace:*",
     "@contember/client": "workspace:*",
     "@contember/react-binding": "workspace:*",
     "@contember/react-client": "workspace:*",

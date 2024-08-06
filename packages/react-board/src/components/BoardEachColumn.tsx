@@ -1,4 +1,4 @@
-import { EntityAccessor } from '@contember/binding'
+import { EntityAccessor } from '@contember/react-binding'
 import { Entity } from '@contember/react-binding'
 import { BoardCurrentColumnContext, useBoardColumns } from '../contexts'
 import { ReactNode } from 'react'

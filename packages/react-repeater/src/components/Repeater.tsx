@@ -3,7 +3,7 @@ import { verifySortableProp } from '../internal/verifySortableProp'
 import { useCreateRepeaterMethods } from '../internal/useCreateRepeaterMethods'
 import { RepeaterEntityListAccessorContext, RepeaterMethodsContext, RepeaterSortedEntitiesContext } from '../contexts'
 import { Component, EntityListSubTree, HasMany, repairEntitiesOrder, sortEntities, SugaredField, useEntityList, useEntityListSubTree, useEnvironment } from '@contember/react-binding'
-import { EntityListAccessor, QueryLanguage, SugaredQualifiedEntityList, SugaredRelativeEntityList, SugaredRelativeSingleField } from '@contember/binding'
+import { EntityListAccessor, QueryLanguage, SugaredQualifiedEntityList, SugaredRelativeEntityList, SugaredRelativeSingleField } from '@contember/react-binding'
 
 export type RepeaterRelativeProps =
 	& SugaredRelativeEntityList

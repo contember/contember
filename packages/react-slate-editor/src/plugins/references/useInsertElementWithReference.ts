@@ -4,9 +4,8 @@ import { CreateElementReferences } from './useCreateElementReference'
 import { useReferentiallyStableCallback } from '@contember/react-utils'
 import { prepareElementForInsertion } from './utils'
 import { ElementWithReference } from './elements'
-import { useSlateStatic } from 'slate-react'
 import { EditorReferenceBlocks } from '../../internal/helpers/useCreateEditorReferenceBlocks'
-import { BindingError } from '@contember/binding'
+import { BindingError } from '@contember/react-binding'
 
 export type InsertElementWithReference = (element: Partial<Element> & { type: string }, referenceDiscriminant: string, initialize?: EntityAccessor.BatchUpdatesHandler) => void
 

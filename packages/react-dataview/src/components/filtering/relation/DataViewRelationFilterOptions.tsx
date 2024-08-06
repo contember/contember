@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useDataViewFilterName, useDataViewRelationFilterArgs } from '../../../contexts'
 import { useDataViewRelationFilterFactory } from '../../../hooks'
 import { DataView, DataViewProps } from '../../DataView'
-import { EntityAccessor } from '@contember/binding'
+import { EntityAccessor } from '@contember/react-binding'
 import { useCallback } from 'react'
 
 export const DataViewRelationFilterOptions = ({ children, name, ...props }: {

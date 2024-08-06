@@ -1,4 +1,4 @@
-import { Filter, QueryLanguage, SugaredRelativeEntityList, wrapFilterInHasOnes } from '@contember/binding'
+import { Filter, QueryLanguage, SugaredRelativeEntityList, wrapFilterInHasOnes } from '@contember/react-binding'
 import { DataViewFilterHandler } from '../types'
 import { RelationFilterArtifacts } from './common'
 

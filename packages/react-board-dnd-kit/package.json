@@ -26,7 +26,6 @@
     "directory": "packages/react-board-dnd-kit"
   },
   "dependencies": {
-    "@contember/binding": "workspace:*",
     "@contember/react-binding": "workspace:*",
     "@contember/react-board": "workspace:*",
     "@contember/react-utils": "workspace:*",

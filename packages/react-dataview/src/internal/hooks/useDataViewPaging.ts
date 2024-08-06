@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useSessionStorageState, useStoredState } from '@contember/react-utils'
 import { DataViewPagingInfo, DataViewPagingMethods, DataViewPagingProps, DataViewPagingState } from '../../types'
 import { useDataViewTotalCount } from './useDataViewTotalCount'
-import { Filter, QualifiedEntityList } from '@contember/binding'
+import { Filter, QualifiedEntityList } from '@contember/react-binding'
 import { DataViewCurrentPageStoredState, getDataViewCurrentPageStorageArgs, getDataViewPagingSettingStorageArgs } from '../stateStorage'
 
 type UseDataViewPagingArgs =

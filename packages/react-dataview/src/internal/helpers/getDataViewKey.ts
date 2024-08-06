@@ -1,4 +1,4 @@
-import { Environment } from '@contember/binding'
+import { Environment } from '@contember/react-binding'
 import { DataViewProps } from '../../components'
 import { dataViewKeyEnvironmentExtension } from '../../env/dataViewKeyEnvironmentExtension'
 

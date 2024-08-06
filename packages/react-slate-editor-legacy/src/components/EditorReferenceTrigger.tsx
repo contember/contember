@@ -1,4 +1,4 @@
-import { BindingError, OptionallyVariableFieldValue, VariableInputTransformer } from '@contember/binding'
+import { BindingError, OptionallyVariableFieldValue, VariableInputTransformer } from '@contember/react-binding'
 import { ReactElement, useCallback } from 'react'
 import { useEnvironment } from '@contember/react-binding'
 import { useSlate } from 'slate-react'

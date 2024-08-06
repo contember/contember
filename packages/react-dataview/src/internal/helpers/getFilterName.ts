@@ -1,4 +1,4 @@
-import { SugaredRelativeEntityList, SugaredRelativeSingleEntity, SugaredRelativeSingleField } from '@contember/binding'
+import { SugaredRelativeEntityList, SugaredRelativeSingleEntity, SugaredRelativeSingleField } from '@contember/react-binding'
 
 export type SugaredFields =
 	| SugaredRelativeSingleField['field']

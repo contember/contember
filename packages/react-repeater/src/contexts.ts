@@ -1,6 +1,5 @@
-import { EntityListAccessor } from '@contember/binding'
-import { createRequiredContext, createContext } from '@contember/react-utils'
-import { EntityAccessor } from '@contember/react-binding'
+import { EntityAccessor, EntityListAccessor } from '@contember/react-binding'
+import { createRequiredContext } from '@contember/react-utils'
 
 import { RepeaterMethods } from './types'
 

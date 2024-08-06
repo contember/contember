@@ -2,7 +2,7 @@ import { createEditorWithEssentials } from './createEditorWithEssentials'
 import { Editor } from 'slate'
 import { EditorPlugin, EditorPluginWrapperProps } from '../types'
 import { createElement, FunctionComponent, ReactNode } from 'react'
-import { EntityAccessor } from '@contember/binding'
+import { EntityAccessor } from '@contember/react-binding'
 import { Environment } from '@contember/react-binding'
 
 

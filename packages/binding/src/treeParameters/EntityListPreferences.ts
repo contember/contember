@@ -5,7 +5,3 @@ export const EntityListPreferencesDefaults: EntityListPreferences = {
 export interface EntityListPreferences {
 	initialEntityCount: number
 }
-
-export interface UnsugarableEntityListPreferences {
-	initialEntityCount?: number
-}

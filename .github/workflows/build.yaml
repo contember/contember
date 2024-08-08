@@ -47,7 +47,7 @@ jobs:
               yarn run ae:test
 
           - job_name: lint-imports
-            run_script: yarn tsx ./scripts/lint/module-import-linter.ts
+            run_script: ./scripts/module-import-linter/run.sh
 
           - job_name: dedupe
             run_script: yarn dedupe --check

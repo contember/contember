@@ -11,29 +11,22 @@
 				"types": "./dist/types/index.d.ts",
 				"development": "./dist/development/index.js",
 				"production": "./dist/production/index.js",
+				"typescript": "./src/index.ts",
 				"default": "./dist/production/index.js"
 			},
 			"require": {
 				"types": "./dist/types/index.d.ts",
 				"development": "./dist/development/index.cjs",
 				"production": "./dist/production/index.cjs",
+				"typescript": "./src/index.ts",
 				"default": "./dist/production/index.cjs"
 			}
 		}
 	},
-	"files": [
-		"dist/",
-		"src/"
-	],
 	"typings": "./dist/types/index.d.ts",
 	"scripts": {
 		"ae:build": "api-extractor run --local",
 		"ae:test": "api-extractor run"
-	},
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/contember/interface.git",
-		"directory": "packages/.template"
 	},
 	"dependencies": {
 		"@contember/binding": "workspace:*"

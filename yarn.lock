@@ -766,16 +766,34 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@contember/binding-common@workspace:*, @contember/binding-common@workspace:packages/binding-common":
+  version: 0.0.0-use.local
+  resolution: "@contember/binding-common@workspace:packages/binding-common"
+  dependencies:
+    "@contember/client": "workspace:*"
+    "@contember/utilities": "workspace:*"
+    chevrotain: 6.5.0
+    fast-deep-equal: ^3.1.3
+    js-levenshtein: 1.1.6
+    react: ^18.3.1
+    react-dom: ^18.3.1
+    uuid: 9.0.1
+  peerDependencies:
+    react: ^18 || ^19
+    react-dom: ^18 || ^19
+  languageName: unknown
+  linkType: soft
+
 "@contember/binding@workspace:*, @contember/binding@workspace:packages/binding":
   version: 0.0.0-use.local
   resolution: "@contember/binding@workspace:packages/binding"
   dependencies:
+    "@contember/binding-common": "workspace:*"
     "@contember/client": "workspace:*"
+    "@contember/utilities": "workspace:*"
     "@types/js-levenshtein": 1.1.3
     "@types/uuid": 9.0.7
-    chevrotain: 6.5.0
     fast-deep-equal: ^3.1.3
-    js-levenshtein: 1.1.6
     uuid: 9.0.1
   languageName: unknown
   linkType: soft

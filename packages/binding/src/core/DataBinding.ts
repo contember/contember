@@ -1,32 +1,24 @@
-import {
-	ContentClient,
-	ContentQueryBuilder,
-	GraphQlClient,
-	GraphQlClientError,
-	MutationResult,
-	TransactionResult,
-	TreeFilter,
-} from '@contember/client'
+import { ContentClient, ContentQueryBuilder, GraphQlClient, GraphQlClientError, TreeFilter } from '@contember/client'
+import type { DataBindingTransactionResult, EntityId, Environment, MarkerTreeRoot, TreeRootId } from '@contember/binding-common'
 import {
 	AsyncBatchUpdatesOptions,
 	BatchUpdatesOptions,
 	BindingOperations,
+	ErrorPersistResult,
 	ExtendTreeOptions,
+	MarkerMerger,
 	PersistOptions,
 	PersistSuccessOptions,
+	ReceivedDataTree,
+	SuccessfulPersistResult,
 	TreeRootAccessor,
-} from '../accessors'
-import { ErrorPersistResult, ReceivedDataTree, ReceivedEntityData, SuccessfulPersistResult } from '../accessorTree'
-import type { Environment } from '../dao'
-import type { MarkerTreeRoot } from '../markers'
-import type { EntityId, TreeRootId } from '../treeParameters'
+} from '@contember/binding-common'
 import { assertNever, generateEnumerabilityPreventingEntropy } from '../utils'
 import { AccessorErrorManager } from './AccessorErrorManager'
 import { Config } from './Config'
 import { DirtinessTracker } from './DirtinessTracker'
 import { EventManager } from './EventManager'
 import { createBatchUpdatesOptions } from './factories'
-import { MarkerMerger } from './MarkerMerger'
 import { MutationGenerator, SubMutationOperation } from './MutationGenerator'
 import { QueryGenerator } from './QueryGenerator'
 import { StateIterator } from './state'
@@ -38,7 +30,6 @@ import type { UpdateMetadata } from './UpdateMetadata'
 import { getCombinedSignal } from './utils'
 import { createQueryBuilder } from './utils/createQueryBuilder'
 
-export type DataBindingTransactionResult = TransactionResult<Record<string, MutationResult<ReceivedEntityData>>>
 
 export class DataBinding<Node> {
 	private readonly accessorErrorManager: AccessorErrorManager

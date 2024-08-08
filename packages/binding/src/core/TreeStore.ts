@@ -1,31 +1,24 @@
-import {
-	NormalizedPersistedData,
-	PersistedEntityDataStore,
-	ReceivedDataTree,
-	SubTreeDataStore,
-	UniqueEntityId,
-} from '../accessorTree'
-import { BindingError } from '../BindingError'
-import type { Environment } from '../dao'
-import { MarkerTreeRoot, PlaceholderGenerator } from '../markers'
-import { QueryLanguage } from '../queryLanguage'
+import { NormalizedPersistedData, PersistedEntityDataStore, SubTreeDataStore } from '../accessorTree'
 import type {
 	Alias,
 	EntityId,
 	EntityName,
 	EntityRealmKey,
+	Environment,
 	FieldName,
 	PlaceholderName,
+	ReceivedDataTree,
+	Schema,
 	SugaredQualifiedEntityList,
 	SugaredQualifiedSingleEntity,
 	SugaredUnconstrainedQualifiedEntityList,
 	SugaredUnconstrainedQualifiedSingleEntity,
 	TreeRootId,
-} from '../treeParameters'
+	UniqueEntityId,
+} from '@contember/binding-common'
+import { BindingError, MarkerComparator, MarkerTreeRoot, PlaceholderGenerator, QueryLanguage } from '@contember/binding-common'
 import { assertNever } from '../utils'
-import { MarkerComparator } from './MarkerComparator'
 import { RequestResponseNormalizer } from './RequestResponseNormalizer'
-import type { Schema } from './schema'
 import type { EntityListState, EntityRealmState, EntityRealmStateStub, EntityState, RootStateNode } from './state'
 import { SubMutationOperation } from './MutationGenerator'
 

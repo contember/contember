@@ -1,13 +1,13 @@
-import type { EntityListAccessor, ErrorAccessor } from '../../accessors'
-import type { EntityListSubTreeMarker, HasManyRelationMarker } from '../../markers'
+import type { EntityListAccessor, ErrorAccessor } from '@contember/binding-common'
+import type { EntityListSubTreeMarker, HasManyRelationMarker } from '@contember/binding-common'
 import type {
 	EntityEventListenerStore,
 	EntityId,
 	EntityListEventListenerStore,
 	EntityName,
 	RemovalType,
-} from '../../treeParameters'
-import type { BijectiveIndexedMap } from '../../structures'
+} from '@contember/binding-common'
+import type { BijectiveIndexedMap } from '@contember/utilities'
 import type { EntityRealmState, EntityRealmStateStub } from './EntityRealmState'
 
 export type EntityListBlueprint =

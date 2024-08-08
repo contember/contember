@@ -1,13 +1,11 @@
 import {
-	NormalizedPersistedData,
-	PersistedEntityDataStore,
 	ReceivedDataTree,
 	ReceivedEntityData,
 	ServerId,
-} from '../accessorTree'
-import { BindingError } from '../BindingError'
-import { PRIMARY_KEY_NAME } from '../bindingTypes'
-import { EntityId } from '../treeParameters'
+} from '@contember/binding-common'
+import { BindingError } from '@contember/binding-common'
+import { PRIMARY_KEY_NAME } from '@contember/binding-common'
+import { EntityId } from '@contember/binding-common'
 import {
 	EntityFieldMarkers,
 	EntityListSubTreeMarker,
@@ -16,9 +14,10 @@ import {
 	HasManyRelationMarker,
 	HasOneRelationMarker,
 	MarkerTreeRoot,
-} from '../markers'
+} from '@contember/binding-common'
 import { SubMutationOperation } from './MutationGenerator'
 import { assertNever } from '../utils'
+import { NormalizedPersistedData, PersistedEntityDataStore } from '../accessorTree'
 
 export class RequestResponseNormalizer {
 	public static mergeInQueryResponse(

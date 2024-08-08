@@ -1,13 +1,14 @@
 import type { RelationFilter, TreeFilter } from '@contember/client'
-import { EntityListPersistedData, ServerId } from '../accessorTree'
+import { EntityListPersistedData } from '../accessorTree'
 import {
 	EntityFieldMarkersContainer,
 	EntityListSubTreeMarker,
 	EntitySubTreeMarker,
 	HasManyRelationMarker,
 	HasOneRelationMarker,
-} from '../markers'
-import type { EntityId, EntityName } from '../treeParameters'
+	ServerId,
+} from '@contember/binding-common'
+import type { EntityId, EntityName } from '@contember/binding-common'
 import { assertNever } from '../utils'
 import { StateIterator } from './state'
 import type { TreeStore } from './TreeStore'

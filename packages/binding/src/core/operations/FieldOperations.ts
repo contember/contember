@@ -1,16 +1,20 @@
 import { validate as uuidValidate } from 'uuid'
-import { ErrorAccessor, FieldAccessor } from '../../accessors'
-import { ClientGeneratedUuid, ServerId } from '../../accessorTree'
-import { BindingError } from '../../BindingError'
-import { PRIMARY_KEY_NAME } from '../../bindingTypes'
-import type { FieldValue } from '../../treeParameters'
+import type { FieldValue } from '@contember/binding-common'
+import {
+	BindingError,
+	ClientGeneratedUuid,
+	ErrorAccessor,
+	EventListenersStore,
+	FieldAccessor,
+	PRIMARY_KEY_NAME,
+	ServerId,
+} from '@contember/binding-common'
 import type { AccessorErrorManager } from '../AccessorErrorManager'
 import { EventManager } from '../EventManager'
 import { FieldState, getEntityMarker, StateIterator } from '../state'
 import type { StateInitializer } from '../StateInitializer'
 import type { TreeStore } from '../TreeStore'
 import { OperationsHelpers } from './OperationsHelpers'
-import { EventListenersStore } from '../../treeParameters'
 
 export class FieldOperations {
 	public constructor(
@@ -45,7 +49,7 @@ export class FieldOperations {
 	public updateValue<Value extends FieldValue = FieldValue>(
 		fieldState: FieldState<Value>,
 		newValue: Value | null,
-		{ agent = FieldAccessor.userAgent }: FieldAccessor.UpdateOptions = {},
+		{ agent = 'user' }: FieldAccessor.UpdateOptions = {},
 	) {
 		this.eventManager.syncOperation(() => {
 			const { placeholderName, parent } = fieldState

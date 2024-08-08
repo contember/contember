@@ -1,4 +1,4 @@
-import { Schema, SchemaRelation } from '../schema'
+import { Schema, SchemaRelation } from '@contember/binding-common'
 import { ContentQueryBuilder, SchemaEntityNames, SchemaNames } from '@contember/client'
 
 export const createQueryBuilder = (schema: Schema) => {

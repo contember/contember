@@ -1,5 +1,5 @@
-import type { EntityId, FieldValue, PlaceholderName } from '../treeParameters'
-import type { ServerId, UniqueEntityId } from './RuntimeId'
+import type { EntityId, FieldValue, PlaceholderName } from '@contember/binding-common'
+import type { ServerId, UniqueEntityId } from '@contember/binding-common'
 
 // HasMany relations are encoded as sets of entity ids.
 // HasOne relations are encoded as BoxedSingleEntityId just to make them different from actual strings.

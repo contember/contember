@@ -3,7 +3,19 @@
 	"include": [],
 	"references": [
 		{
+			"path": "./packages/authorization"
+		},
+		{
 			"path": "./packages/binding"
+		},
+		{
+			"path": "./packages/binding-common"
+		},
+		{
+			"path": "./packages/cli"
+		},
+		{
+			"path": "./packages/cli-common"
 		},
 		{
 			"path": "./packages/client"
@@ -15,16 +27,82 @@
 			"path": "./packages/client-content-generator"
 		},
 		{
+			"path": "./packages/config-loader"
+		},
+		{
+			"path": "./packages/create"
+		},
+		{
+			"path": "./packages/database"
+		},
+		{
+			"path": "./packages/database-migrations"
+		},
+		{
+			"path": "./packages/database-tester"
+		},
+		{
+			"path": "./packages/dic"
+		},
+		{
+			"path": "./packages/engine-actions"
+		},
+		{
+			"path": "./packages/engine-common"
+		},
+		{
+			"path": "./packages/engine-content-api"
+		},
+		{
+			"path": "./packages/engine-http"
+		},
+		{
+			"path": "./packages/engine-plugins"
+		},
+		{
+			"path": "./packages/engine-s3-plugin"
+		},
+		{
+			"path": "./packages/engine-server"
+		},
+		{
+			"path": "./packages/engine-system-api"
+		},
+		{
+			"path": "./packages/engine-tenant-api"
+		},
+		{
+			"path": "./packages/engine-vimeo-plugin"
+		},
+		{
 			"path": "./packages/graphql-builder"
 		},
 		{
 			"path": "./packages/graphql-client"
 		},
 		{
+			"path": "./packages/graphql-client-system"
+		},
+		{
+			"path": "./packages/graphql-client-tenant"
+		},
+		{
+			"path": "./packages/graphql-utils"
+		},
+		{
 			"path": "./packages/interface"
 		},
 		{
+			"path": "./packages/logger"
+		},
+		{
+			"path": "./packages/migrations-client"
+		},
+		{
 			"path": "./packages/playground"
+		},
+		{
+			"path": "./packages/queryable"
 		},
 		{
 			"path": "./packages/react-binding"
@@ -99,87 +177,6 @@
 			"path": "./packages/react-utils"
 		},
 		{
-			"path": "./packages/utilities"
-		},
-		{
-			"path": "./packages/vite-plugin"
-		},
-		{
-			"path": "./packages/authorization"
-		},
-		{
-			"path": "./packages/cli"
-		},
-		{
-			"path": "./packages/cli-common"
-		},
-		{
-			"path": "./packages/create"
-		},
-		{
-			"path": "./packages/config-loader"
-		},
-		{
-			"path": "./packages/database"
-		},
-		{
-			"path": "./packages/database-migrations"
-		},
-		{
-			"path": "./packages/database-tester"
-		},
-		{
-			"path": "./packages/dic"
-		},
-		{
-			"path": "./packages/engine-actions"
-		},
-		{
-			"path": "./packages/engine-common"
-		},
-		{
-			"path": "./packages/engine-content-api"
-		},
-		{
-			"path": "./packages/engine-http"
-		},
-		{
-			"path": "./packages/engine-plugins"
-		},
-		{
-			"path": "./packages/engine-s3-plugin"
-		},
-		{
-			"path": "./packages/engine-vimeo-plugin"
-		},
-		{
-			"path": "./packages/engine-server"
-		},
-		{
-			"path": "./packages/engine-system-api"
-		},
-		{
-			"path": "./packages/engine-tenant-api"
-		},
-		{
-			"path": "./packages/graphql-client-system"
-		},
-		{
-			"path": "./packages/graphql-client-tenant"
-		},
-		{
-			"path": "./packages/graphql-utils"
-		},
-		{
-			"path": "./packages/logger"
-		},
-		{
-			"path": "./packages/queryable"
-		},
-		{
-			"path": "./packages/migrations-client"
-		},
-		{
 			"path": "./packages/schema"
 		},
 		{
@@ -193,6 +190,12 @@
 		},
 		{
 			"path": "./packages/typesafe"
+		},
+		{
+			"path": "./packages/utilities"
+		},
+		{
+			"path": "./packages/vite-plugin"
 		}
 	]
 }

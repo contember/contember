@@ -1,4 +1,4 @@
-import { EntityAccessor } from '@contember/react-binding'
+import { EntityAccessor, isEntityAccessor } from '@contember/react-binding'
 import { Entity } from '@contember/react-binding'
 import { BoardCurrentColumnContext, useBoardColumns } from '../contexts'
 import { ReactNode } from 'react'
@@ -17,7 +17,7 @@ export const BoardEachColumn = ({ children }: {
 			}
 			return (
 				<BoardCurrentColumnContext.Provider value={column} key={column.id}>
-					{column.value instanceof EntityAccessor ? (
+					{isEntityAccessor(column.value) ? (
 						<Entity accessor={column.value}>
 							{children}
 						</Entity>

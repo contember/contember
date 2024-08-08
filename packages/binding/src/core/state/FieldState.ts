@@ -1,6 +1,6 @@
-import type { ErrorAccessor, FieldAccessor } from '../../accessors'
-import type { FieldMarker } from '../../markers'
-import type { FieldEventListenerStore, FieldName, FieldValue } from '../../treeParameters'
+import type { ErrorAccessor, FieldAccessor } from '@contember/binding-common'
+import type { FieldMarker } from '@contember/binding-common'
+import type { FieldEventListenerStore, FieldName, FieldValue } from '@contember/binding-common'
 import type { EntityRealmState } from './EntityRealmState'
 
 export interface FieldState<Value extends FieldValue = FieldValue> {

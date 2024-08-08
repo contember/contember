@@ -1,7 +1,7 @@
-import { memo, NamedExoticComponent, PropsWithChildren, ReactElement, ReactNode } from 'react'
+import { memo, NamedExoticComponent, PropsWithChildren, ReactNode } from 'react'
 import { useEnvironment } from '../accessorPropagation'
 import type { Environment } from '@contember/binding'
-import type { MarkerProvider, StaticRenderProvider, StaticRenderProviderProps } from './MarkerProvider'
+import type { MarkerProvider, StaticRenderProvider, StaticRenderProviderProps } from '../markers'
 import { assertNever } from '@contember/utilities'
 
 interface EnvironmentAwareFunctionComponent<P> {

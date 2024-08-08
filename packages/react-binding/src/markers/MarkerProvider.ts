@@ -1,8 +1,8 @@
-import type { ReactElement, ReactNode } from 'react'
-import type { Environment } from '@contember/binding'
+import type { ReactNode } from 'react'
 import type {
 	EntityFieldMarkersContainer,
 	EntityFieldsWithHoistablesMarker,
+	Environment,
 	FieldMarker,
 	HasManyRelationMarker,
 	HasOneRelationMarker,

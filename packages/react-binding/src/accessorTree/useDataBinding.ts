@@ -12,7 +12,7 @@ import type { AccessorTreeState } from './AccessorTreeState'
 import type { AccessorTreeStateOptions } from './AccessorTreeStateOptions'
 import { accessorTreeStateReducer } from './accessorTreeStateReducer'
 import { useIsMounted } from '@contember/react-utils'
-import { MarkerTreeGenerator } from '../MarkerTreeGenerator'
+import { MarkerTreeGenerator } from '../markers'
 import ReactDOM from 'react-dom'
 
 export const useDataBinding = ({

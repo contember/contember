@@ -1,10 +1,10 @@
-import { ErrorAccessor } from '../accessors'
+import { ErrorAccessor } from '@contember/binding-common'
 import { ErrorsPreprocessor } from './ErrorsPreprocessor'
 import { EventManager } from './EventManager'
 import { EntityListState, EntityRealmState, getEntityMarker, StateNode } from './state'
 import type { TreeStore } from './TreeStore'
 import { SubMutationOperation } from './MutationGenerator'
-import { DataBindingTransactionResult } from './DataBinding'
+import { DataBindingTransactionResult } from '@contember/binding-common'
 import { MutationError, ValidationError } from '@contember/client'
 
 export class AccessorErrorManager {

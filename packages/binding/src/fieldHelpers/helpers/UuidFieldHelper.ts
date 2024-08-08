@@ -1,5 +1,5 @@
 import { v4 as uuidV4 } from 'uuid'
-import type { FieldAccessor } from '../../accessors'
+import type { FieldAccessor } from '@contember/binding-common'
 import { FieldHelper } from './FieldHelper'
 
 class UuidFieldHelper extends FieldHelper<string> {

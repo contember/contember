@@ -1,4 +1,4 @@
-import type { FieldValue, PlaceholderName } from '../../treeParameters'
+import type { FieldValue, PlaceholderName } from '@contember/binding-common'
 import { assertNever } from '../../utils'
 import type { TreeStore } from '../TreeStore'
 import type { EntityListState } from './EntityListState'

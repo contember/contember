@@ -1,16 +1,16 @@
-import { PRIMARY_KEY_NAME } from '../bindingTypes'
 import {
 	EntityFieldMarkers,
 	EntityListSubTreeMarker,
 	EntitySubTreeMarker,
 	FieldMarker,
+	Filter,
 	HasManyRelationMarker,
 	HasOneRelationMarker,
 	MarkerTreeRoot,
-} from '../markers'
-import { assertNever, ucfirst } from '../utils'
+	PRIMARY_KEY_NAME,
+} from '@contember/binding-common'
+import { assertNever } from '../utils'
 import { ContentEntitySelection, ContentQuery, ContentQueryBuilder, replaceGraphQlLiteral } from '@contember/client'
-import { Filter } from '../treeParameters'
 
 
 export class QueryGenerator {
@@ -125,3 +125,4 @@ export class QueryGenerator {
 const resolveFilter = (input?: Filter): Filter<never> => {
 	return replaceGraphQlLiteral<unknown>(input) as Filter<never>
 }
+const ucfirst = (string: string) => `${string.charAt(0).toUpperCase()}${string.substring(1)}`

@@ -5,7 +5,7 @@ import {
 	HasManyRelationMarker,
 	HasOneRelationMarker,
 	MeaningfulMarker,
-} from '../../markers'
+} from '@contember/binding-common'
 import { assertNever } from '../../utils'
 import { TreeParameterSugarer } from './TreeParameterSugarer'
 

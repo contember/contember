@@ -1,21 +1,21 @@
 import {
 	ClientGeneratedUuid,
-	EntityListPersistedData,
 	ReceivedDataTree,
 	RuntimeId,
 	ServerId,
 	UnpersistedEntityDummyId,
-} from '../accessorTree'
-import { BindingError } from '../BindingError'
-import type { MarkerTreeRoot } from '../markers'
-import type { EntityId, PlaceholderName, TreeRootId } from '../treeParameters'
-import { assert, assertNever } from '../utils'
+} from '@contember/binding-common'
+import { BindingError } from '@contember/binding-common'
+import type { MarkerTreeRoot } from '@contember/binding-common'
+import type { EntityId, PlaceholderName, TreeRootId } from '@contember/binding-common'
+import { assertNever } from '../utils'
 import { EventManager } from './EventManager'
 import { OperationsHelpers } from './operations/OperationsHelpers'
 import type { EntityListState, EntityRealmState, EntityRealmStateStub, RootStateNode } from './state'
 import type { StateInitializer } from './StateInitializer'
 import type { TreeStore } from './TreeStore'
 import { SubMutationOperation } from './MutationGenerator'
+import { EntityListPersistedData } from '../accessorTree'
 
 export class TreeAugmenter {
 	public constructor(
@@ -84,7 +84,9 @@ export class TreeAugmenter {
 		for (const rootStates of this.treeStore.subTreeStatesByRoot.values()) {
 			for (const [rootPlaceholder, rootState] of rootStates) {
 				if (rootState.type === 'entityList') {
-					assert(rootState.blueprint.parent === undefined)
+					if (rootState.blueprint.parent !== undefined) {
+						throw new BindingError('Entity list root should not have a parent.')
+					}
 					if (!rootState.blueprint.marker.parameters.isCreating) {
 						continue
 					}
@@ -107,7 +109,9 @@ export class TreeAugmenter {
 						changesCount ? -1 * changesCount : EventManager.NO_CHANGES_DIFFERENCE,
 					)
 				} else if (rootState.type === 'entityRealm') {
-					assert(rootState.blueprint.parent === undefined)
+					if (rootState.blueprint.parent !== undefined) {
+						throw new BindingError('Entity realm root should not have a parent.')
+					}
 					if (!rootState.blueprint.marker.parameters.isCreating) {
 						continue
 					}

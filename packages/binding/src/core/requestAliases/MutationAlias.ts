@@ -1,4 +1,4 @@
-import type { RuntimeId } from '../../accessorTree'
+import type { RuntimeId } from '@contember/binding-common'
 
 export class MutationAlias {
 	public static encodeEntityId(entityId: RuntimeId): string {

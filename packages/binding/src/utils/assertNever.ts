@@ -1,4 +1,4 @@
-import { BindingError } from '../BindingError'
+import { BindingError } from '@contember/binding-common'
 
 export function assertNever(_: never): never {
 	throw new BindingError(

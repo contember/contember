@@ -1,9 +1,7 @@
-import type { RuntimeId } from '../accessorTree'
-import type { EntityFieldMarkersContainer } from '../markers'
-import type { EntityId, EntityRealmKey, PlaceholderName } from '../treeParameters'
+import type { EntityFieldMarkersContainer, EntityId, EntityRealmKey, PlaceholderName, RuntimeId } from '@contember/binding-common'
 import { assertNever } from '../utils'
 import type { EntityListState, EntityRealmBlueprint, EntityRealmState } from './state'
-import { WeakIdCache } from '../structures'
+import { WeakIdCache } from '@contember/utilities'
 
 const GLUE = '--'
 const keyEndRegex = new RegExp(`${GLUE}\\d+$`)

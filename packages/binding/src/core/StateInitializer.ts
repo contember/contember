@@ -1,14 +1,14 @@
-import { BatchUpdatesOptions, EntityAccessor, EntityListAccessor, FieldAccessor } from '../accessors'
-import { EntityFieldPersistedData, RuntimeId, ServerId, UnpersistedEntityDummyId } from '../accessorTree'
-import { BindingError } from '../BindingError'
+import { BatchUpdatesOptions, EntityAccessor, FieldAccessor } from '@contember/binding-common'
+import {  RuntimeId, ServerId, UnpersistedEntityDummyId } from '@contember/binding-common'
+import { BindingError } from '@contember/binding-common'
 import {
 	EntityListSubTreeMarker,
 	EntitySubTreeMarker,
 	FieldMarker,
 	HasManyRelationMarker,
 	HasOneRelationMarker,
-} from '../markers'
-import { BijectiveIndexedMap } from '../structures'
+} from '@contember/binding-common'
+import { BijectiveIndexedMap } from '@contember/utilities'
 import type {
 	EntityEventListenerStore,
 	EntityId,
@@ -17,8 +17,8 @@ import type {
 	FieldEventListenerStore,
 	FieldName,
 	FieldValue,
-} from '../treeParameters'
-import { EventListenersStore } from '../treeParameters'
+} from '@contember/binding-common'
+import { EventListenersStore } from '@contember/binding-common'
 import { assertNever } from '../utils'
 import type { AccessorErrorManager } from './AccessorErrorManager'
 import type { EventManager } from './EventManager'
@@ -35,8 +35,10 @@ import {
 	getEntityMarker,
 	RootStateNode,
 } from './state'
-import { TreeParameterMerger } from './TreeParameterMerger'
+import { TreeParameterMerger } from '@contember/binding-common'
 import type { TreeStore } from './TreeStore'
+import { EntityAccessorImpl, EntityListAccessorImpl, FieldAccessorImpl } from '../accessors'
+import { EntityFieldPersistedData } from '../accessorTree'
 
 export class StateInitializer {
 	private readonly fieldOperations: FieldOperations
@@ -182,7 +184,7 @@ export class StateInitializer {
 			getAccessor: () => {
 				if (entityRealm.accessor === undefined) {
 					const entity = entityRealm.entity
-					entityRealm.accessor = new EntityAccessor(
+					entityRealm.accessor = new EntityAccessorImpl(
 						entityRealm,
 						this.entityOperations,
 						entity.id,
@@ -314,7 +316,7 @@ export class StateInitializer {
 			getAccessor: () => {
 				if (entityListState.accessor === undefined) {
 					const persistedEntityIds = this.treeStore.getEntityListPersistedIds(entityListState)
-					entityListState.accessor = new EntityListAccessor(
+					entityListState.accessor = new EntityListAccessorImpl(
 						entityListState,
 						this.listOperations,
 						entityListState.entityName,
@@ -376,7 +378,7 @@ export class StateInitializer {
 				if (fieldState.accessor === undefined) {
 					const fieldSchema = this.treeStore.schema.getEntityColumn(parent.entity.entityName, fieldMarker.fieldName)
 
-					fieldState.accessor = new FieldAccessor(
+					fieldState.accessor = new FieldAccessorImpl(
 						fieldState,
 						this.fieldOperations,
 						fieldState.placeholderName,

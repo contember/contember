@@ -1,13 +1,13 @@
 import { assertNever } from '../../utils'
 import type { StateNode } from '../state'
+import type { MeaningfulMarker } from '@contember/binding-common'
 import { MarkerSugarer } from './MarkerSugarer'
-import type { RawMarkerPath } from './RawMarkerPath'
 import { TreeParameterSugarer } from './TreeParameterSugarer'
 
 export class ErrorLocator {
 	private static readonly GLUE = '.'
 
-	public static locateMarkerPath(path: RawMarkerPath): string {
+	public static locateMarkerPath(path: MeaningfulMarker[]): string {
 		return path.map(marker => MarkerSugarer.sugarMarker(marker)).join(this.GLUE)
 	}
 

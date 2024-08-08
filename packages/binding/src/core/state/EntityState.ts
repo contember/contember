@@ -1,5 +1,4 @@
-import type { RuntimeId, UnpersistedEntityDummyId } from '../../accessorTree'
-import type { EntityName, EntityRealmKey } from '../../treeParameters'
+import type { EntityName, EntityRealmKey, RuntimeId, UnpersistedEntityDummyId } from '@contember/binding-common'
 import type { EntityRealmState, EntityRealmStateStub } from './EntityRealmState'
 
 export interface EntityState {

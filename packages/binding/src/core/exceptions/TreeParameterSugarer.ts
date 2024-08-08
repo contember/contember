@@ -1,4 +1,4 @@
-import type { EntityName, FieldName, Filter, UniqueWhere } from '../../treeParameters'
+import type { EntityName, FieldName, Filter, UniqueWhere } from '@contember/binding-common'
 
 export class TreeParameterSugarer {
 	public static sugarField(fieldName: FieldName) {

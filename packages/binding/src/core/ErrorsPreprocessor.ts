@@ -1,9 +1,8 @@
-import type { ErrorAccessor } from '../accessors'
-import type { EntityId, FieldName, PlaceholderName } from '../treeParameters'
+import type { EntityId, ErrorAccessor, FieldName, PlaceholderName } from '@contember/binding-common'
+import { DataBindingTransactionResult } from '@contember/binding-common'
 import { assertNever } from '../utils'
 import { MutationAlias } from './requestAliases'
 import { SubMutationOperation } from './MutationGenerator'
-import { DataBindingTransactionResult } from './DataBinding'
 import { MutationError, MutationResult, ValidationError } from '@contember/client'
 
 class ErrorsPreprocessor {

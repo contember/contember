@@ -1,14 +1,15 @@
 import { ContentMutation, ContentQueryBuilder, GraphQlLiteral, Input, replaceGraphQlLiteral } from '@contember/client'
-import { ClientGeneratedUuid, EntityFieldPersistedData,  ReceivedEntityData, ServerId } from '../accessorTree'
-import { BindingError } from '../BindingError'
-import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
-import { EntityFieldMarkers, FieldMarker, HasManyRelationMarker, HasOneRelationMarker } from '../markers'
-import type { EntityId, EntityName, PlaceholderName, UniqueWhere } from '../treeParameters'
+import { ClientGeneratedUuid,  ReceivedEntityData, ServerId } from '@contember/binding-common'
+import { BindingError } from '@contember/binding-common'
+import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '@contember/binding-common'
+import { EntityFieldMarkers, FieldMarker, HasManyRelationMarker, HasOneRelationMarker } from '@contember/binding-common'
+import type { EntityId, EntityName, PlaceholderName, UniqueWhere } from '@contember/binding-common'
 import { assertNever, isEmptyObject } from '../utils'
 import { QueryGenerator } from './QueryGenerator'
 import { MutationAlias } from './requestAliases'
 import { EntityListState, EntityRealmState, EntityRealmStateStub, EntityState, FieldState, getEntityMarker, StateIterator } from './state'
 import type { TreeStore } from './TreeStore'
+import { EntityFieldPersistedData } from '../accessorTree'
 
 
 type ProcessedPlaceholdersByEntity = Map<EntityState, Set<PlaceholderName>>

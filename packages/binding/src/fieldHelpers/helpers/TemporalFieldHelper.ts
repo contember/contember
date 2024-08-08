@@ -1,4 +1,4 @@
-import type { FieldAccessor } from '../../accessors'
+import type { FieldAccessor } from '@contember/binding-common'
 import { FieldHelper } from './FieldHelper'
 
 class TemporalFieldHelper extends FieldHelper<string> {

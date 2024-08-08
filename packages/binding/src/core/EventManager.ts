@@ -6,10 +6,10 @@ import type {
 	FieldAccessor,
 	PersistErrorOptions,
 	PersistSuccessOptions,
-} from '../accessors'
-import type { SuccessfulPersistResult } from '../accessorTree'
-import { BindingError } from '../BindingError'
-import type { PlaceholderName } from '../treeParameters'
+} from '@contember/binding-common'
+import type { SuccessfulPersistResult } from '@contember/binding-common'
+import { BindingError } from '@contember/binding-common'
+import type { PlaceholderName } from '@contember/binding-common'
 import { assertNever } from '../utils'
 import type { Config } from './Config'
 import type { DirtinessTracker } from './DirtinessTracker'
@@ -25,7 +25,7 @@ import {
 } from './state'
 import type { TreeStore } from './TreeStore'
 import type { UpdateMetadata } from './UpdateMetadata'
-import type { EventListenersStore } from '../treeParameters'
+import type { EventListenersStore } from '@contember/binding-common'
 
 export class EventManager {
 	public static readonly NO_CHANGES_DIFFERENCE = 0

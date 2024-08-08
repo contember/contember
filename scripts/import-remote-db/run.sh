@@ -1,9 +1,9 @@
 #!/bin/bash
 set -euo pipefail
 
-docker-compose exec -T db \
+docker-compose exec -T postgres \
     bash -c "dropdb --if-exists --username \${POSTGRES_USER} ${TARGET_DB_NAME}"
-docker-compose exec -T db \
+docker-compose exec -T postgres \
     bash -c "createdb --username \${POSTGRES_USER} ${TARGET_DB_NAME}"
 
 docker run --rm --init \
@@ -14,5 +14,5 @@ docker run --rm --init \
     --network=host \
     postgres:13-alpine \
     pg_dump -v --serializable-deferrable --no-owner --no-acl | \
-docker-compose exec -T db \
+docker-compose exec -T postgres \
     bash -c "psql -q -b --username \${POSTGRES_USER} ${TARGET_DB_NAME}"

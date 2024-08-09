@@ -1,5 +1,5 @@
 {
-	"name": "@contember/binding-common",
+	"name": "@contember/binding-ng",
 	"license": "Apache-2.0",
 	"version": "0.0.0",
 	"type": "module",
@@ -29,21 +29,12 @@
 		"ae:test": "api-extractor run"
 	},
 	"dependencies": {
+		"@contember/binding-common": "workspace:*",
 		"@contember/client": "workspace:*",
-		"@contember/utilities": "workspace:*",
-		"chevrotain": "6.5.0",
 		"fast-deep-equal": "^3.1.3",
-		"js-levenshtein": "1.1.6",
-		"uuid": "10.0.0"
-	},
-	"peerDependencies": {
-		"react": "^18 || ^19",
-		"react-dom": "^18 || ^19"
+		"uuid": "9.0.1"
 	},
 	"devDependencies": {
-		"@types/js-levenshtein": "1.1.3",
-		"@types/uuid": "10.0.0",
-		"react": "^18.3.1",
-		"react-dom": "^18.3.1"
+		"@types/uuid": "9.0.7"
 	}
 }

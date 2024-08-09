@@ -16,7 +16,7 @@ import {
 	MarkerTreeRoot,
 } from '@contember/binding-common'
 import { SubMutationOperation } from './MutationGenerator'
-import { assertNever } from '../utils'
+import { assertNever } from '@contember/binding-common'
 import { NormalizedPersistedData, PersistedEntityDataStore } from '../accessorTree'
 
 export class RequestResponseNormalizer {

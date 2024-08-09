@@ -1,4 +1,5 @@
 import {
+	assertNever,
 	EntityFieldMarkers,
 	EntityListSubTreeMarker,
 	EntitySubTreeMarker,
@@ -9,7 +10,6 @@ import {
 	MarkerTreeRoot,
 	PRIMARY_KEY_NAME,
 } from '@contember/binding-common'
-import { assertNever } from '../utils'
 import { ContentEntitySelection, ContentQuery, ContentQueryBuilder, replaceGraphQlLiteral } from '@contember/client'
 
 

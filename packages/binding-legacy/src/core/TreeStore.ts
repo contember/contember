@@ -17,7 +17,7 @@ import type {
 	UniqueEntityId,
 } from '@contember/binding-common'
 import { BindingError, MarkerComparator, MarkerTreeRoot, PlaceholderGenerator, QueryLanguage } from '@contember/binding-common'
-import { assertNever } from '../utils'
+import { assertNever } from '@contember/binding-common'
 import { RequestResponseNormalizer } from './RequestResponseNormalizer'
 import type { EntityListState, EntityRealmState, EntityRealmStateStub, EntityState, RootStateNode } from './state'
 import { SubMutationOperation } from './MutationGenerator'

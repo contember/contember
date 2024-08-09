@@ -6,7 +6,7 @@ import {
 	HasOneRelationMarker,
 	MeaningfulMarker,
 } from '@contember/binding-common'
-import { assertNever } from '../../utils'
+import { assertNever } from '@contember/binding-common'
 import { TreeParameterSugarer } from './TreeParameterSugarer'
 
 export class MarkerSugarer {

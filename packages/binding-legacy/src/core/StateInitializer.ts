@@ -19,7 +19,7 @@ import type {
 	FieldValue,
 } from '@contember/binding-common'
 import { EventListenersStore } from '@contember/binding-common'
-import { assertNever } from '../utils'
+import { assertNever } from '@contember/binding-common'
 import type { AccessorErrorManager } from './AccessorErrorManager'
 import type { EventManager } from './EventManager'
 import { EntityOperations, FieldOperations, ListOperations } from './operations'

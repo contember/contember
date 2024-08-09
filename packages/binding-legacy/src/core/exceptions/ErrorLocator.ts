@@ -1,4 +1,4 @@
-import { assertNever } from '../../utils'
+import { assertNever } from '@contember/binding-common'
 import type { StateNode } from '../state'
 import type { MeaningfulMarker } from '@contember/binding-common'
 import { MarkerSugarer } from './MarkerSugarer'

@@ -12,6 +12,12 @@
 			"path": "./packages/binding-common"
 		},
 		{
+			"path": "./packages/binding-legacy"
+		},
+		{
+			"path": "./packages/binding-ng"
+		},
+		{
 			"path": "./packages/cli"
 		},
 		{

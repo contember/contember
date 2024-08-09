@@ -106,6 +106,7 @@ export class DataBinding<Node> {
 			},
 			extendTree: async (...args) => await this.extendTree(...args),
 			persist: async options => await this.persist(options),
+			fetchData: async (...args) => await this.fetchData(...args),
 		})
 		this.queryBuilder = createQueryBuilder(this.environment.getSchema())
 		this.contentClient = new ContentClient(contentApiClient)
@@ -300,6 +301,22 @@ export class DataBinding<Node> {
 				console.error(e)
 			})
 		})
+	}
+
+	public async fetchData(fragment: Node, options?: { signal?: AbortSignal; environment?: Environment }): Promise<{
+		data: ReceivedDataTree
+		markerTreeRoot: MarkerTreeRoot
+	} | undefined> {
+		const markerTreeRoot = this.createMarkerTree(fragment, options?.environment ?? this.environment)
+
+		const data = await this.fetchPersistedData(markerTreeRoot, options?.signal)
+		if (!data) {
+			return undefined
+		}
+		return {
+			data: data,
+			markerTreeRoot,
+		}
 	}
 
 	private async flushBatchedTreeExtensions() {

@@ -27,6 +27,7 @@ export const defaultBindingOperations = Object.freeze<BindingOperations<ReactNod
 	batchDeferredUpdates: getRejecter('batch deferred updates'),
 	extendTree: getRejecter('extendTree'),
 	persist: getRejecter('persist'),
+	fetchData: getRejecter('fetchData'),
 })
 
 export const BindingOperationsContext = createContext<BindingOperations<ReactNode>>(defaultBindingOperations)

@@ -15,12 +15,14 @@ export const PasswordResetFormFields = ({ hasToken }: { hasToken?: boolean }) =>
 				form={form} messages={dict.tenant.passwordReset.errorMessages}
 			/>
 
-			<TenantFormField
-				form={form} messages={dict.tenant.passwordReset.errorMessages} field="token"
-				type="text" required readOnly={hasToken} autoComplete="off"
-			>
-				{dict.tenant.passwordReset.token}
-			</TenantFormField>
+			{hasToken ? null : (
+				<TenantFormField
+					form={form} messages={dict.tenant.passwordReset.errorMessages} field="token"
+					type="text" required autoComplete="off"
+				>
+					{dict.tenant.passwordReset.token}
+				</TenantFormField>
+			)}
 
 			<TenantFormField
 				form={form} messages={dict.tenant.passwordReset.errorMessages} field="password"

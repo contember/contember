@@ -784,17 +784,37 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@contember/binding-legacy@workspace:*, @contember/binding-legacy@workspace:packages/binding-legacy":
+  version: 0.0.0-use.local
+  resolution: "@contember/binding-legacy@workspace:packages/binding-legacy"
+  dependencies:
+    "@contember/binding-common": "workspace:*"
+    "@contember/client": "workspace:*"
+    "@contember/utilities": "workspace:*"
+    "@types/uuid": 9.0.7
+    uuid: 9.0.1
+  languageName: unknown
+  linkType: soft
+
+"@contember/binding-ng@workspace:*, @contember/binding-ng@workspace:packages/binding-ng":
+  version: 0.0.0-use.local
+  resolution: "@contember/binding-ng@workspace:packages/binding-ng"
+  dependencies:
+    "@contember/binding-common": "workspace:*"
+    "@contember/client": "workspace:*"
+    "@types/uuid": 9.0.7
+    fast-deep-equal: ^3.1.3
+    uuid: 9.0.1
+  languageName: unknown
+  linkType: soft
+
 "@contember/binding@workspace:*, @contember/binding@workspace:packages/binding":
   version: 0.0.0-use.local
   resolution: "@contember/binding@workspace:packages/binding"
   dependencies:
     "@contember/binding-common": "workspace:*"
-    "@contember/client": "workspace:*"
-    "@contember/utilities": "workspace:*"
-    "@types/js-levenshtein": 1.1.3
-    "@types/uuid": 9.0.7
-    fast-deep-equal: ^3.1.3
-    uuid: 9.0.1
+    "@contember/binding-legacy": "workspace:*"
+    "@contember/binding-ng": "workspace:*"
   languageName: unknown
   linkType: soft
 

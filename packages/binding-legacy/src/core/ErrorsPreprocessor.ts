@@ -1,6 +1,6 @@
 import type { EntityId, ErrorAccessor, FieldName, PlaceholderName } from '@contember/binding-common'
 import { DataBindingTransactionResult } from '@contember/binding-common'
-import { assertNever } from '../utils'
+import { assertNever } from '@contember/binding-common'
 import { MutationAlias } from './requestAliases'
 import { SubMutationOperation } from './MutationGenerator'
 import { MutationError, MutationResult, ValidationError } from '@contember/client'

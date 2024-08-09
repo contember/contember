@@ -1,6 +1,7 @@
 import { ContentClient, ContentQueryBuilder, GraphQlClient, GraphQlClientError, TreeFilter } from '@contember/client'
 import type { DataBindingTransactionResult, EntityId, Environment, MarkerTreeRoot, TreeRootId } from '@contember/binding-common'
 import {
+	assertNever,
 	AsyncBatchUpdatesOptions,
 	BatchUpdatesOptions,
 	BindingOperations,
@@ -13,7 +14,7 @@ import {
 	SuccessfulPersistResult,
 	TreeRootAccessor,
 } from '@contember/binding-common'
-import { assertNever, generateEnumerabilityPreventingEntropy } from '../utils'
+import { generateEnumerabilityPreventingEntropy } from '../utils'
 import { AccessorErrorManager } from './AccessorErrorManager'
 import { Config } from './Config'
 import { DirtinessTracker } from './DirtinessTracker'
@@ -28,7 +29,8 @@ import { TreeFilterGenerator } from './TreeFilterGenerator'
 import { TreeStore } from './TreeStore'
 import type { UpdateMetadata } from './UpdateMetadata'
 import { getCombinedSignal } from './utils'
-import { createQueryBuilder } from './utils/createQueryBuilder'
+import { createQueryBuilder } from '@contember/binding-common'
+import { DataBindingExtendAborted } from '@contember/binding-common'
 
 
 export class DataBinding<Node> {
@@ -421,5 +423,3 @@ export class DataBinding<Node> {
 			: `${generateEnumerabilityPreventingEntropy()}-${DataBinding.getNextTreeRootIdSeed()}`
 	}
 }
-
-export const DataBindingExtendAborted = Symbol('aborted')

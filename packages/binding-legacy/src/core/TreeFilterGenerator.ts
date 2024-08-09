@@ -9,7 +9,7 @@ import {
 	ServerId,
 } from '@contember/binding-common'
 import type { EntityId, EntityName } from '@contember/binding-common'
-import { assertNever } from '../utils'
+import { assertNever } from '@contember/binding-common'
 import { StateIterator } from './state'
 import type { TreeStore } from './TreeStore'
 

@@ -8,7 +8,7 @@ import {
 import { BindingError } from '@contember/binding-common'
 import type { MarkerTreeRoot } from '@contember/binding-common'
 import type { EntityId, PlaceholderName, TreeRootId } from '@contember/binding-common'
-import { assertNever } from '../utils'
+import { assertNever } from '@contember/binding-common'
 import { EventManager } from './EventManager'
 import { OperationsHelpers } from './operations/OperationsHelpers'
 import type { EntityListState, EntityRealmState, EntityRealmStateStub, RootStateNode } from './state'

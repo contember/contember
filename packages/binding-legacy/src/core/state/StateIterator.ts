@@ -1,5 +1,5 @@
 import type { FieldValue, PlaceholderName } from '@contember/binding-common'
-import { assertNever } from '../../utils'
+import { assertNever } from '@contember/binding-common'
 import type { TreeStore } from '../TreeStore'
 import type { EntityListState } from './EntityListState'
 import type { EntityRealmState } from './EntityRealmState'

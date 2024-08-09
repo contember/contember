@@ -10,7 +10,7 @@ import type {
 import type { SuccessfulPersistResult } from '@contember/binding-common'
 import { BindingError } from '@contember/binding-common'
 import type { PlaceholderName } from '@contember/binding-common'
-import { assertNever } from '../utils'
+import { assertNever } from '@contember/binding-common'
 import type { Config } from './Config'
 import type { DirtinessTracker } from './DirtinessTracker'
 import {

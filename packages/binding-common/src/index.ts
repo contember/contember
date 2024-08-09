@@ -7,8 +7,11 @@ export * from './types'
 
 export * from './consts'
 export * from './BindingError'
+export * from './DataBindingExtendAborted'
 export * from './LocalizedBindingError'
 export * from './RuntimeId'
 export * from './utils/TreeNodeUtils'
+export * from './utils/assertNever'
+export * from './utils/createQueryBuilder'
 
 export { v4 as generateUuid } from 'uuid'

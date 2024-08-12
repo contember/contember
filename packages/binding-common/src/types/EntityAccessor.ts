@@ -40,12 +40,9 @@ interface EntityAccessor extends Errorable {
 	readonly id: EntityId
 	readonly existsOnServer: boolean
 
-	addError(error: ErrorAccessor.Error | string): () => void
+	addError: ErrorAccessor.AddError
 
-	addEventListener<Type extends keyof EntityAccessor.RuntimeEntityEventListenerMap>(
-		event: { type: Type; key?: string },
-		listener: EntityAccessor.EntityEventListenerMap[Type],
-	): () => void
+	addEventListener: EntityAccessor.AddEventListener
 
 	batchUpdates(performUpdates: EntityAccessor.BatchUpdatesHandler): void
 
@@ -132,6 +129,11 @@ namespace EntityAccessor {
 		initialize: BatchUpdatesHandler
 	}
 	export type EntityEventType = keyof EntityEventListenerMap
+
+	export type AddEventListener = <Type extends keyof EntityAccessor.RuntimeEntityEventListenerMap>(
+		event: { type: Type; key?: string },
+		listener: EntityAccessor.EntityEventListenerMap[Type],
+	) => () => void
 }
 
 export type { EntityAccessor }

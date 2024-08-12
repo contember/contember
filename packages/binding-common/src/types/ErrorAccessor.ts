@@ -11,6 +11,9 @@ namespace ErrorAccessor {
 	export type ErrorId = number
 	export type Error = ExecutionError | ValidationError
 	export type ErrorsById = Map<ErrorId, Error>
+	export type ClearError = () => void
+
+	export type AddError = (error: ErrorAccessor.Error | string) => ClearError
 
 	export type ExecutionErrors = ExecutionError[]
 

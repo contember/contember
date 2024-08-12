@@ -172,6 +172,10 @@ class Environment<Node extends Environment.AnyNode | undefined = Environment.Any
 		return new Environment({ ...this.options, dimensions: newDimensions })
 	}
 
+	hasSchema(): boolean {
+		return this.options.schema !== undefined
+	}
+
 	public getSchema(): Schema {
 		if (!this.options.schema) {
 			throw new BindingError('Schema is not set')

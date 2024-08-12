@@ -155,17 +155,14 @@ export interface HasOneRelation {
 }
 
 export type EntityListEventListenerStore = EventListenersStore<
-	keyof EntityListAccessor.EntityListEventListenerMap,
-	Partial<EntityListAccessor.EntityListEventListenerMap>
+	EntityListAccessor.EntityListEventListenerMap
 >
 
 
 export type FieldEventListenerStore<Value extends FieldValue = FieldValue> = EventListenersStore<
-	keyof FieldAccessor.FieldEventListenerMap<Value>,
-	Partial<FieldAccessor.FieldEventListenerMap<Value>>
+	FieldAccessor.FieldEventListenerMap<Value>
 >
 
 export type EntityEventListenerStore = EventListenersStore<
-	keyof EntityAccessor.EntityEventListenerMap,
 	EntityAccessor.EntityEventListenerMap
 >

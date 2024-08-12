@@ -96,21 +96,24 @@ namespace EntityListAccessor {
 		childUpdate: EntityAccessor.UpdateListener
 	}
 
-	export interface RuntimeEntityListEventListenerMap {
+	export type RuntimeEntityListEventListenerMap = {
 		beforePersist: BeforePersistHandler
 		beforeUpdate: BatchUpdatesHandler
 		persistError: PersistErrorHandler
 		persistSuccess: PersistSuccessHandler
 		update: UpdateListener
 	}
-	export interface EntityListEventListenerMap extends RuntimeEntityListEventListenerMap {
-		initialize: BatchUpdatesHandler
-	}
+	export type EntityListEventListenerMap =
+		& RuntimeEntityListEventListenerMap
+		& {
+			initialize: BatchUpdatesHandler
+		}
+
 	export type EntityListEventType = keyof EntityListEventListenerMap
 
 	export type AddEventListener = <Type extends keyof EntityListAccessor.RuntimeEntityListEventListenerMap>(
 		event: { type: Type; key?: string },
-		listener: EntityListAccessor.RuntimeEntityListEventListenerMap[Type],
+		listener: EntityListAccessor.EntityListEventListenerMap[Type],
 	) => () => void
 
 	export type AddChildEventListener = <Type extends keyof EntityAccessor.EntityEventListenerMap>(

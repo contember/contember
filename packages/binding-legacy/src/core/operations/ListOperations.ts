@@ -34,7 +34,7 @@ export class ListOperations {
 	public addEventListener<Type extends keyof EntityListAccessor.RuntimeEntityListEventListenerMap>(
 		state: EntityListState,
 		event: { type: Type; key?: string },
-		listener: EntityListAccessor.RuntimeEntityListEventListenerMap[Type],
+		listener: EntityListAccessor.EntityListEventListenerMap[Type],
 	) {
 		if (state.eventListeners === undefined) {
 			state.eventListeners = new EventListenersStore()

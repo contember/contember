@@ -96,7 +96,7 @@ export class EntityListAccessorImpl implements EntityListAccessor {
 
 	public addEventListener<Type extends keyof EntityListAccessor.RuntimeEntityListEventListenerMap>(
 		event: { type: Type; key?: string },
-		listener: EntityListAccessor.RuntimeEntityListEventListenerMap[Type],
+		listener: EntityListAccessor.EntityListEventListenerMap[Type],
 	) {
 		return this.operations.addEventListener(this.state, event, listener)
 	}

@@ -24,7 +24,7 @@ function useEntityList(
 	const getEntityByKey = useGetEntityByKey()
 	const getEntityList = useCallback(() => {
 		const parent = getEntityByKey(entityKey)
-		return parent.getRelativeEntityList(relativeEntityList!)
+		return parent.getEntityList(relativeEntityList!)
 	}, [entityKey, getEntityByKey, relativeEntityList])
 
 	if (relativeEntityList) {

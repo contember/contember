@@ -26,7 +26,7 @@ function useField<Value extends FieldValue = FieldValue>(
 	const getEntityByKey = useGetEntityByKey()
 	const getField = useCallback(() => {
 		const parent = getEntityByKey(entityKey)
-		return parent.getRelativeSingleField<Value>(relativeSingleField!)
+		return parent.getField<Value>(relativeSingleField!)
 	}, [entityKey, getEntityByKey, relativeSingleField])
 
 	if (relativeSingleField) {

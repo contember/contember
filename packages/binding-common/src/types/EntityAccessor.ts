@@ -58,26 +58,11 @@ interface EntityAccessor extends Errorable {
 	 * Please keep in mind that this method signature is literally impossible to implement safely. The generic parameter
 	 * is really just a way to succinctly write a type cast. Nothing more, really.
 	 */
-	getField<Value extends FieldValue = FieldValue>(field: SugaredRelativeSingleField | string): FieldAccessor<Value>
+	getField<Value extends FieldValue = FieldValue>(field: SugaredRelativeSingleField | string | RelativeSingleField): FieldAccessor<Value>
 
-	getEntity(entity: SugaredRelativeSingleEntity | string): EntityAccessor
+	getEntity(entity: SugaredRelativeSingleEntity | string | RelativeSingleEntity): EntityAccessor
 
-	getEntityList(entityList: SugaredRelativeEntityList | string): EntityListAccessor
-
-	/**
-	 * @todo internal only?
-	 */
-	getRelativeSingleEntity(relativeSingleEntity: RelativeSingleEntity): EntityAccessor
-
-	/**
-	 * @todo internal only?
-	 */
-	getRelativeSingleField<Value extends FieldValue = FieldValue>(field: RelativeSingleField): FieldAccessor<Value>
-
-	/**
-	 * @todo internal only?
-	 */
-	getRelativeEntityList(entityList: RelativeEntityList): EntityListAccessor
+	getEntityList(entityList: SugaredRelativeEntityList | string | RelativeEntityList): EntityListAccessor
 
 	getParent(): EntityAccessor | EntityListAccessor | undefined
 

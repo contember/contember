@@ -75,8 +75,8 @@ export const useSlugInput = ({
 
 	const handleUpdateSlug = useCallback(() => {
 		getEntityAccessor().batchUpdates(getAccessor => {
-			const targetEntity = getAccessor().getRelativeSingleEntity(desugaredField)
-			const targetField = getAccessor().getRelativeSingleField(desugaredField)
+			const targetEntity = getAccessor().getEntity(desugaredField)
+			const targetField = getAccessor().getField(desugaredField)
 			if (targetField.isTouched) {
 				return
 			}
@@ -91,7 +91,7 @@ export const useSlugInput = ({
 	}, [createSlug, desugaredField, getEntityAccessor])
 
 	useEffect(() => {
-		const targetField = getEntityAccessor().getRelativeSingleField(desugaredField)
+		const targetField = getEntityAccessor().getField(desugaredField)
 		if (targetField.value !== null) {
 			return
 		}

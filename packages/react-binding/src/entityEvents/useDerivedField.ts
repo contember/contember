@@ -28,20 +28,20 @@ export const useDerivedField = <SourceValue extends FieldValue = FieldValue>(
 	const desugaredSource = useDesugaredRelativeSingleField(sourceField)
 	const desugaredDerived = useDesugaredRelativeSingleField(derivedField)
 
-	const potentiallyStaleSourceAccessor = potentiallyStaleParent.getRelativeSingleField<SourceValue>(desugaredSource)
+	const potentiallyStaleSourceAccessor = potentiallyStaleParent.getField<SourceValue>(desugaredSource)
 	const stableGetSourceReference = potentiallyStaleSourceAccessor.getAccessor
 
 	const onBeforeUpdate = useCallback<FieldAccessor.BeforeUpdateListener<SourceValue>>(
 		sourceAccessor => {
 			stableGetEntityReference().batchUpdates(getAccessor => {
 				// This is tricky: we're deliberately getting the Entity, and not the field
-				const derivedHostEntity = getAccessor().getRelativeSingleEntity(desugaredDerived)
+				const derivedHostEntity = getAccessor().getEntity(desugaredDerived)
 
 				if (derivedHostEntity.existsOnServer) {
 					return
 				}
 
-				const derivedAccessor = getAccessor().getRelativeSingleField<SourceValue>(desugaredDerived)
+				const derivedAccessor = getAccessor().getField<SourceValue>(desugaredDerived)
 
 				if (derivedAccessor.isTouched) {
 					// Querying the user

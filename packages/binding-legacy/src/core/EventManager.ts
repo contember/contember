@@ -528,13 +528,13 @@ export class EventManager {
 	public getEventListeners<
 		State extends StateNode,
 		EventListenerTypes extends
-		Exclude<State['eventListeners'], undefined> extends EventListenersStore<infer Keys, infer Map> ? [Keys, Map] : never,
+		Exclude<State['eventListeners'], undefined> extends EventListenersStore<infer Map> ? [keyof Map, Map] : never,
 		EventType extends EventListenerTypes[0],
 	>(state: State, event: { type: EventType; key?: string }): Set<Exclude<EventListenerTypes[1][EventType], undefined>> | undefined {
 		if (!state.eventListeners) {
 			return undefined
 		}
-		return (state.eventListeners as EventListenersStore<EventType, EventListenerTypes[1]>).get(event) as Set<
+		return (state.eventListeners as EventListenersStore<EventListenerTypes[1]>).get(event) as Set<
 			Exclude<EventListenerTypes[1][EventType], undefined>
 		>
 	}
@@ -542,7 +542,7 @@ export class EventManager {
 	public getEventDispatchers<
 		State extends StateNode,
 		EventListenerTypes extends
-		Exclude<State['eventListeners'], undefined> extends EventListenersStore<infer Keys, infer Map> ? [Keys, Map] : never,
+		Exclude<State['eventListeners'], undefined> extends EventListenersStore<infer Map> ? [keyof Map, Map] : never,
 		EventType extends EventListenerTypes[0],
 	>(
 		state: State,

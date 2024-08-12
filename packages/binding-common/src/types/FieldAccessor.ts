@@ -55,14 +55,17 @@ namespace FieldAccessor {
 	) => void
 	export type UpdateListener<Value extends FieldValue = FieldValue> = (accessor: FieldAccessor<Value>) => void
 
-	export interface RuntimeFieldEventListenerMap<Value extends FieldValue = FieldValue> {
+	export type RuntimeFieldEventListenerMap<Value extends FieldValue = FieldValue> = {
 		beforeUpdate: BeforeUpdateListener<Value>
 		update: UpdateListener<Value>
 	}
-	export interface FieldEventListenerMap<Value extends FieldValue = FieldValue>
-		extends RuntimeFieldEventListenerMap<Value> {
-		initialize: InitializeListener<Value>
-	}
+
+	export type FieldEventListenerMap<Value extends FieldValue = FieldValue> =
+		& RuntimeFieldEventListenerMap<Value>
+		& {
+			initialize: InitializeListener<Value>
+		}
+
 	export type FieldEventType = keyof FieldEventListenerMap
 
 	export type AddEventListener<Value extends FieldValue = FieldValue> = <Type extends FieldEventType>(

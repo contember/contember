@@ -117,7 +117,7 @@ namespace EntityAccessor {
 		options: PersistSuccessOptions,
 	) => void | PersistSuccessHandler | Promise<void | PersistSuccessHandler>
 
-	export interface RuntimeEntityEventListenerMap {
+	export type RuntimeEntityEventListenerMap = {
 		beforePersist: BeforePersistHandler
 		beforeUpdate: BatchUpdatesHandler
 		connectionUpdate: UpdateListener
@@ -125,9 +125,11 @@ namespace EntityAccessor {
 		persistSuccess: PersistSuccessHandler
 		update: UpdateListener
 	}
-	export interface EntityEventListenerMap extends RuntimeEntityEventListenerMap {
-		initialize: BatchUpdatesHandler
-	}
+	export type EntityEventListenerMap =
+		& RuntimeEntityEventListenerMap
+		& {
+			initialize: BatchUpdatesHandler
+		}
 	export type EntityEventType = keyof EntityEventListenerMap
 
 	export type AddEventListener = <Type extends keyof EntityAccessor.RuntimeEntityEventListenerMap>(

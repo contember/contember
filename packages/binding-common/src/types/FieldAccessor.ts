@@ -24,7 +24,7 @@ interface FieldAccessor<Value extends FieldValue = FieldValue> extends Errorable
 
 	clearErrors(): void
 
-	addEventListener: FieldAccessor.AddEventListener
+	addEventListener: FieldAccessor.AddEventListener<Value>
 
 	updateValue(newValue: Value | null, options?: FieldAccessor.UpdateOptions): void
 
@@ -65,9 +65,9 @@ namespace FieldAccessor {
 	}
 	export type FieldEventType = keyof FieldEventListenerMap
 
-	export type AddEventListener = <Type extends FieldEventType>(
+	export type AddEventListener<Value extends FieldValue = FieldValue> = <Type extends FieldEventType>(
 		event: { type: Type; key?: string },
-		listener: FieldEventListenerMap[Type],
+		listener: FieldEventListenerMap<Value>[Type],
 	) => () => void
 }
 

@@ -13,7 +13,7 @@ export const addEntityAtIndex = (
 	entityList.createNewEntity((getNewlyAdded, options) => {
 		let newlyAdded = getNewlyAdded()
 
-		const sortableField = newlyAdded.getRelativeSingleField<number>(sortableByField)
+		const sortableField = newlyAdded.getField<number>(sortableByField)
 
 		sortableField.updateValue(index)
 		newlyAdded = getNewlyAdded()

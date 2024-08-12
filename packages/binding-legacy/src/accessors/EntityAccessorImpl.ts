@@ -84,7 +84,7 @@ export class EntityAccessorImpl implements EntityAccessor {
 
 	connectEntityAtField(field: SugaredRelativeSingleEntity | string, entityToConnect: EntityAccessor): void {
 		const desugared = QueryLanguage.desugarRelativeSingleEntity(field, this.environment)
-		const relativeTo = this.getRelativeSingleEntity({
+		const relativeTo = this.getEntity({
 			hasOneRelationPath: desugared.hasOneRelationPath.slice(0, -1),
 		})
 		const fieldName = desugared.hasOneRelationPath[desugared.hasOneRelationPath.length - 1].field
@@ -93,7 +93,7 @@ export class EntityAccessorImpl implements EntityAccessor {
 
 	disconnectEntityAtField(field: SugaredRelativeSingleEntity | string, initializeReplacement?: EntityAccessor.BatchUpdatesHandler): void {
 		const desugared = QueryLanguage.desugarRelativeSingleEntity(field, this.environment)
-		const relativeTo = this.getRelativeSingleEntity({
+		const relativeTo = this.getEntity({
 			hasOneRelationPath: desugared.hasOneRelationPath.slice(0, -1),
 		})
 		const fieldName = desugared.hasOneRelationPath[desugared.hasOneRelationPath.length - 1].field
@@ -120,25 +120,12 @@ export class EntityAccessorImpl implements EntityAccessor {
 	 * Please keep in mind that this method signature is literally impossible to implement safely. The generic parameter
 	 * is really just a way to succinctly write a type cast. Nothing more, really.
 	 */
-	getField<Value extends FieldValue = FieldValue>(field: SugaredRelativeSingleField | string): FieldAccessor<Value> {
-		return this.getRelativeSingleField<Value>(QueryLanguage.desugarRelativeSingleField(field, this.environment))
-	}
+	getField<Value extends FieldValue = FieldValue>(field: SugaredRelativeSingleField | string | RelativeSingleField): FieldAccessor<Value> {
+		if (typeof field === 'string' || !('hasOneRelationPath' in field)) {
+			return this.getField<Value>(QueryLanguage.desugarRelativeSingleField(field, this.environment))
+		}
 
-	getEntity(entity: SugaredRelativeSingleEntity | string): EntityAccessor {
-		return this.getRelativeSingleEntity(QueryLanguage.desugarRelativeSingleEntity(entity, this.environment))
-	}
-
-	getEntityList(entityList: SugaredRelativeEntityList | string): EntityListAccessor {
-		return this.getRelativeEntityList(QueryLanguage.desugarRelativeEntityList(entityList, this.environment))
-	}
-
-	//
-
-	/**
-	 * @see EntityAccessor.getField
-	 */
-	public getRelativeSingleField<Value extends FieldValue = FieldValue>(field: RelativeSingleField): FieldAccessor<Value> {
-		const entity = this.getRelativeSingleEntity(field)
+		const entity = this.getEntity(field)
 		const fieldPlaceholder = PlaceholderGenerator.getFieldPlaceholder(field.field)
 		const accessor = entity.fieldData.get(fieldPlaceholder)
 		if (accessor) {
@@ -154,10 +141,14 @@ export class EntityAccessorImpl implements EntityAccessor {
 		)
 	}
 
-	public getRelativeSingleEntity(relativeSingleEntity: RelativeSingleEntity): EntityAccessorImpl {
+	getEntity(entity: SugaredRelativeSingleEntity | string | RelativeSingleEntity): EntityAccessorImpl {
+		if (typeof entity === 'string' || !('hasOneRelationPath' in entity)) {
+			return this.getEntity(QueryLanguage.desugarRelativeSingleEntity(entity, this.environment))
+		}
+
 		let relativeTo: EntityAccessorImpl = this
 
-		for (const hasOneRelation of relativeSingleEntity.hasOneRelationPath) {
+		for (const hasOneRelation of entity.hasOneRelationPath) {
 			const fieldPlaceholder = PlaceholderGenerator.getHasOneRelationPlaceholder(hasOneRelation)
 			const accessor = relativeTo.fieldData.get(fieldPlaceholder)
 			if (!accessor) {
@@ -169,8 +160,12 @@ export class EntityAccessorImpl implements EntityAccessor {
 		return relativeTo
 	}
 
-	public getRelativeEntityList(entityList: RelativeEntityList): EntityListAccessor {
-		const entity = this.getRelativeSingleEntity(entityList)
+	getEntityList(entityList: SugaredRelativeEntityList | string | RelativeEntityList): EntityListAccessor {
+		if (typeof entityList === 'string' || !('hasOneRelationPath' in entityList)) {
+			return this.getEntityList(QueryLanguage.desugarRelativeEntityList(entityList, this.environment))
+		}
+
+		const entity = this.getEntity(entityList)
 		const fieldPlaceholder = PlaceholderGenerator.getHasManyRelationPlaceholder(entityList.hasManyRelation)
 		const accessor = entity.fieldData.get(fieldPlaceholder)
 		if (!accessor) {

@@ -20,7 +20,7 @@ export const ReferenceElementRenderer = memo((props: ReferenceElementRendererPro
 
 	const referencedEntity = useEntity()
 
-	const discriminationField = referencedEntity.getRelativeSingleField(props.referenceDiscriminationField)
+	const discriminationField = referencedEntity.getField(props.referenceDiscriminationField)
 	const selectedReference = getDiscriminatedDatum(props.editorReferenceBlocks, discriminationField)?.datum
 
 	if (!selectedReference) {
@@ -97,7 +97,7 @@ export const ReferenceElementRenderer = memo((props: ReferenceElementRendererPro
 				`Check the related BlockEditor props.`,
 			)
 		}
-		const embedTypeDiscriminant = referencedEntity.getRelativeSingleField(props.embedContentDiscriminationField)
+		const embedTypeDiscriminant = referencedEntity.getField(props.embedContentDiscriminationField)
 		const embedHandler = getDiscriminatedDatum(props.embedHandlers, embedTypeDiscriminant)
 		const subBlock = getDiscriminatedBlock(props.embedSubBlocks, embedTypeDiscriminant)
 

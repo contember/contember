@@ -31,7 +31,7 @@ function useEntity(...entity: [] | [string | SugaredRelativeSingleEntity | undef
 	// eslint-disable-next-line react-hooks/rules-of-hooks
 	const getEntity = useCallback(() => {
 		const parent = getEntityByKey(entityKey)
-		return parent.getRelativeSingleEntity(relativeSingleEntity!)
+		return parent.getEntity(relativeSingleEntity!)
 	}, [entityKey, getEntityByKey, relativeSingleEntity])
 
 	if (relativeSingleEntity) {

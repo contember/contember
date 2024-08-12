@@ -20,14 +20,11 @@ interface FieldAccessor<Value extends FieldValue = FieldValue> extends Errorable
 	readonly getAccessor: FieldAccessor.GetFieldAccessor<Value>
 	readonly schema: SchemaColumn
 
-	addError(error: ErrorAccessor.Error | string): () => void
+	addError(error: ErrorAccessor.Error | string): ErrorAccessor.ClearError
 
 	clearErrors(): void
 
-	addEventListener<Type extends keyof FieldAccessor.FieldEventListenerMap<Value>>(
-		event: { type: Type; key?: string },
-		listener: FieldAccessor.FieldEventListenerMap<Value>[Type],
-	): () => void
+	addEventListener: FieldAccessor.AddEventListener
 
 	updateValue(newValue: Value | null, options?: FieldAccessor.UpdateOptions): void
 
@@ -67,6 +64,11 @@ namespace FieldAccessor {
 		initialize: InitializeListener<Value>
 	}
 	export type FieldEventType = keyof FieldEventListenerMap
+
+	export type AddEventListener = <Type extends FieldEventType>(
+		event: { type: Type; key?: string },
+		listener: FieldEventListenerMap[Type],
+	) => () => void
 }
 
 export { type FieldAccessor }

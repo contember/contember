@@ -52,15 +52,9 @@ interface EntityListAccessor extends Errorable {
 
 	addError(error: ErrorAccessor.Error | string): () => void
 
-	addEventListener<Type extends keyof EntityListAccessor.RuntimeEntityListEventListenerMap>(
-		event: { type: Type; key?: string },
-		listener: EntityListAccessor.RuntimeEntityListEventListenerMap[Type],
-	): () => void
+	addEventListener: EntityListAccessor.AddEventListener
 
-	addChildEventListener<Type extends keyof EntityAccessor.EntityEventListenerMap>(
-		event: { type: Type; key?: string },
-		listener: EntityAccessor.EntityEventListenerMap[Type],
-	): () => void
+	addChildEventListener: EntityListAccessor.AddChildEventListener
 
 	batchUpdates(performUpdates: EntityListAccessor.BatchUpdatesHandler): void
 
@@ -113,6 +107,16 @@ namespace EntityListAccessor {
 		initialize: BatchUpdatesHandler
 	}
 	export type EntityListEventType = keyof EntityListEventListenerMap
+
+	export type AddEventListener = <Type extends keyof EntityListAccessor.RuntimeEntityListEventListenerMap>(
+		event: { type: Type; key?: string },
+		listener: EntityListAccessor.RuntimeEntityListEventListenerMap[Type],
+	) => () => void
+
+	export type AddChildEventListener = <Type extends keyof EntityAccessor.EntityEventListenerMap>(
+		event: { type: Type; key?: string },
+		listener: EntityAccessor.EntityEventListenerMap[Type],
+	) => () => void
 }
 
 export { type EntityListAccessor }

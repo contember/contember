@@ -4,16 +4,16 @@ import {
 	useCurrentSystemGraphQlClient,
 	useTenantGraphQlClient,
 } from '@contember/react-client'
-import { ReactNode, useCallback, useEffect, useReducer, useRef, useState } from 'react'
-import { useEnvironment } from '../accessorPropagation'
+import { ReactNode, useCallback, useEffect, useRef, useState } from 'react'
 import type { TreeRootAccessor } from '@contember/binding'
-import { DataBinding, Environment, Schema, SchemaLoader, TreeStore } from '@contember/binding'
+import { DataBinding, Environment, TreeStore } from '@contember/binding'
 import type { AccessorTreeState } from './AccessorTreeState'
 import type { AccessorTreeStateOptions } from './AccessorTreeStateOptions'
-import { accessorTreeStateReducer } from './accessorTreeStateReducer'
 import { useIsMounted } from '@contember/react-utils'
 import { MarkerTreeGenerator } from '../markers'
 import ReactDOM from 'react-dom'
+import { useEnvironmentWithSchema } from './useEnvironmentWithSchema'
+import { useEnvironment } from '../accessorPropagation'
 
 export const useDataBinding = ({
 	children,
@@ -23,21 +23,38 @@ export const useDataBinding = ({
 	const contentClient = useCurrentContentGraphQlClient()
 	const systemClient = useCurrentSystemGraphQlClient()
 	const tenantClient = useTenantGraphQlClient()
+
 	const environment = useEnvironment()
+	const environmentWithSchema = useEnvironmentWithSchema(environment)
+
 	const currentTreeStore = useRef<TreeStore>()
 	const isMountedRef = useIsMounted()
-	const [schema, setSchema] = useState<Schema>()
+
+	const [state, setState] = useState<AccessorTreeState & { binding?: DataBinding<ReactNode> }>({
+		name: 'initializing',
+		environment,
+	})
 
 	const resetDataBinding = useCallback((environment: Environment, newStore: boolean) => {
 		const onUpdate = (data: TreeRootAccessor<ReactNode>, binding: DataBinding<ReactNode>) => {
 			if (isMountedRef.current) {
-				dispatch({ type: 'setData', data, binding })
+				setState(it => it.name === 'error' || it.binding !== binding ? it : {
+					name: 'initialized',
+					environment,
+					binding,
+					data,
+				})
 			}
 		}
 
 		const onError = (error: GraphQlClientError, binding: DataBinding<ReactNode>) => {
 			if (isMountedRef.current) {
-				dispatch({ type: 'failWithError', error, binding })
+				setState(it => it.binding !== binding ? it :  {
+					name: 'error',
+					environment,
+					binding,
+					error,
+				})
 			}
 		}
 
@@ -69,45 +86,16 @@ export const useDataBinding = ({
 				skipStateUpdateAfterPersist: skipStateUpdateAfterPersist ?? false,
 			},
 		)
-		dispatch({ type: 'reset', binding, environment })
+		setState({ binding, environment, name: 'initializing' })
+
 	}, [contentClient, systemClient, tenantClient, isMountedRef, refreshOnPersist, skipStateUpdateAfterPersist])
 
-	const [state, dispatch] = useReducer(accessorTreeStateReducer, {
-		name: 'initializing',
-		environment,
-	})
 
 	useEffect(() => {
-		if (schema !== undefined) {
-			return
+		if (environmentWithSchema) {
+			resetDataBinding(environmentWithSchema, false)
 		}
-
-		(async () => {
-			try {
-				setSchema(await SchemaLoader.loadSchema(contentClient))
-
-			} catch (e) {
-				if (e instanceof GraphQlClientError) {
-					if (e.type === 'aborted') {
-						return
-					}
-					dispatch({
-						type: 'failWithError',
-						error: e,
-						binding: state.binding!,
-					})
-				} else {
-					throw e
-				}
-			}
-		})()
-	}, [contentClient, isMountedRef, schema, state.binding])
-
-	useEffect(() => {
-		if (schema) {
-			resetDataBinding(environment.withSchema(schema), false)
-		}
-	}, [resetDataBinding, schema, environment])
+	}, [resetDataBinding, environmentWithSchema])
 
 	useEffect(() => {
 		state.binding?.extendTree(children)

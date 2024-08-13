@@ -35,7 +35,7 @@ export const useBlockElementCache = ({ editor, blockList, sortableBy, contentFie
 						continue
 					}
 					const blockIndex =
-						blockEntity.getRelativeSingleField<number>(desugaredSortableByField).value!
+						blockEntity.getField<number>(desugaredSortableByField).value!
 					if (editor.children.length < blockIndex) {
 						continue
 					}
@@ -48,7 +48,7 @@ export const useBlockElementCache = ({ editor, blockList, sortableBy, contentFie
 					// would be equivalent, and if so, just use the old one. That way Slate never gets a new node and no
 					// remounting ever takes place.
 					const previousNode = editor.children[blockIndex]
-					const contentField = blockEntity.getRelativeSingleField<string>(desugaredBlockContentField)
+					const contentField = blockEntity.getField<string>(desugaredBlockContentField)
 					const currentNode = editor.deserializeNodes(
 						contentField.value!,
 						`BlockEditor: The 'contentField' of a block contains invalid data.`,

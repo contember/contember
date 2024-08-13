@@ -294,7 +294,8 @@ export class MutationGenerator {
 							})
 							continue
 						}
-						const value = fieldState.getAccessor().resolvedValue
+						const accessor = fieldState.getAccessor()
+						const value = accessor.value ?? accessor.defaultValue ?? null
 						if (value !== undefined && value !== null) {
 							result[marker.fieldName] = value
 						}
@@ -365,7 +366,8 @@ export class MutationGenerator {
 				for (const field of nonbearingFields) {
 					switch (field.type) {
 						case 'field': {
-							const value = field.fieldState.getAccessor().resolvedValue
+							const accessor = field.fieldState.getAccessor()
+							const value = accessor.value ?? accessor.defaultValue ?? null
 							if (value !== undefined) {
 								result[field.marker.fieldName] = value
 							}
@@ -526,7 +528,8 @@ export class MutationGenerator {
 			switch (fieldState.type) {
 				case 'field': {
 					if (fieldState.persistedValue !== undefined) {
-						const resolvedValue = fieldState.getAccessor().resolvedValue
+						const accessor = fieldState.getAccessor()
+						const resolvedValue = accessor.value ?? accessor.defaultValue ?? null
 						if (fieldState.persistedValue !== resolvedValue) {
 							result[placeholderName] = resolvedValue
 						}

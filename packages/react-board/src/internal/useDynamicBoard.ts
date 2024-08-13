@@ -57,7 +57,7 @@ export const useDynamicBoard = ({
 	const exitingColumnIds = useMemo(() => new Set(Array.from(columnEntities).map(it => it.id)), [columnEntities])
 
 	const getDiscriminatorValue = useCallback((entity: EntityAccessor) => {
-		const entityId = entity.getRelativeSingleEntity(desugaredDiscriminationField).id
+		const entityId = entity.getEntity(desugaredDiscriminationField).id
 		return exitingColumnIds.has(entityId) ? entityId : null
 	}, [desugaredDiscriminationField, exitingColumnIds])
 
@@ -85,7 +85,7 @@ export const useDynamicBoard = ({
 
 	const connectItemToColumn = useCallback((item: EntityAccessor, column: EntityAccessor | null) => {
 		const hasOne = desugaredDiscriminationField.hasOneRelationPath
-		const parentEntity = item.getRelativeSingleEntity({ hasOneRelationPath: hasOne.slice(0, -1) })
+		const parentEntity = item.getEntity({ hasOneRelationPath: hasOne.slice(0, -1) })
 		if (column) {
 			parentEntity.connectEntityAtField(hasOne[hasOne.length - 1].field, column)
 		} else {

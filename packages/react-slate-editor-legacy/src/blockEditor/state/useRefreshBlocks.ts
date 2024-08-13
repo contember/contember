@@ -29,7 +29,7 @@ export const useRefreshBlocks = ({ editor, sortedBlocksRef, sortableBy, contentF
 	const getParentEntityRef = useGetParentEntityRef()
 	useEntityBeforePersist(() => {
 		if (trashFakeBlockId.current) {
-			const block = getParentEntityRef.current().getRelativeEntityList(desugaredBlockList).getChildEntityById(trashFakeBlockId.current)
+			const block = getParentEntityRef.current().getEntityList(desugaredBlockList).getChildEntityById(trashFakeBlockId.current)
 			block.deleteEntity()
 			trashFakeBlockId.current = undefined
 		}
@@ -40,7 +40,7 @@ export const useRefreshBlocks = ({ editor, sortedBlocksRef, sortableBy, contentF
 		const saveBlockElement = (getBlockList: () => EntityListAccessor, id: EntityId, element: Element) => {
 			getBlockList()
 				.getChildEntityById(id)
-				.getRelativeSingleField(desugaredBlockContentField)
+				.getField(desugaredBlockContentField)
 				.updateValue(editor.serializeNodes([element]))
 			blockElementCache.set(getBlockList().getChildEntityById(id), element)
 		}
@@ -48,7 +48,7 @@ export const useRefreshBlocks = ({ editor, sortedBlocksRef, sortableBy, contentF
 			const processedAccessors: Array<EntityAccessor | undefined> = Array.from({
 				length: editor.children.length,
 			})
-			const blockList = getAccessor().getRelativeEntityList(desugaredBlockList)
+			const blockList = getAccessor().getEntityList(desugaredBlockList)
 			const getBlockList = blockList.getAccessor
 
 			let cleanupStack = () => {
@@ -87,10 +87,10 @@ export const useRefreshBlocks = ({ editor, sortedBlocksRef, sortableBy, contentF
 						const currentElement = editor.children[newBlockOrder]
 						if (
 							originalElement !== currentElement ||
-							block.getRelativeSingleField(desugaredSortableByField).value !== newBlockOrder
+							block.getField(desugaredSortableByField).value !== newBlockOrder
 						) {
 							block
-								.getRelativeSingleField(desugaredSortableByField)
+								.getField(desugaredSortableByField)
 								.updateValue(newBlockOrder)
 							saveBlockElement(getBlockList, blockId, currentElement as Element)
 						}
@@ -105,7 +105,7 @@ export const useRefreshBlocks = ({ editor, sortedBlocksRef, sortableBy, contentF
 				if (!isProcessed) {
 					const id = blockList.createNewEntity(getAccessor => {
 						const newId = getAccessor().id
-						getAccessor().getRelativeSingleField(desugaredSortableByField).updateValue(blockOrder)
+						getAccessor().getField(desugaredSortableByField).updateValue(blockOrder)
 						saveBlockElement(getBlockList, newId, child as Element)
 						blockElementPathRefs.set(newId, Editor.pathRef(editor, [topLevelIndex], { affinity: 'backward' }))
 					})
@@ -157,7 +157,7 @@ export const useRefreshBlocks = ({ editor, sortedBlocksRef, sortableBy, contentF
 				for (const [, [reference, block]] of knownReferences) {
 					if (!trashFakeBlockId.current) {
 						blockList.createNewEntity(getAccessor => {
-							getAccessor().getRelativeSingleField(desugaredSortableByField).updateValue(Number.MAX_SAFE_INTEGER)
+							getAccessor().getField(desugaredSortableByField).updateValue(Number.MAX_SAFE_INTEGER)
 							trashFakeBlockId.current = getAccessor().id
 						})
 					}

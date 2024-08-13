@@ -32,7 +32,7 @@ export const useBlockEditorOnChange = ({ refreshBlocks, editor, sortedBlocksRef,
 		const saveBlockElement = (getBlockList: () => EntityListAccessor, id: EntityId, element: Element) => {
 			getBlockList()
 				.getChildEntityById(id)
-				.getRelativeSingleField(desugaredBlockContentField)
+				.getField(desugaredBlockContentField)
 				.updateValue(editor.serializeNodes([element]))
 			blockElementCache.set(getBlockList().getChildEntityById(id), element)
 		}
@@ -54,7 +54,7 @@ export const useBlockEditorOnChange = ({ refreshBlocks, editor, sortedBlocksRef,
 						case 'remove_text':
 							const [topLevelIndex] = operation.path
 							saveBlockElement(
-								getEntity().getRelativeEntityList(desugaredBlockList).getAccessor,
+								getEntity().getEntityList(desugaredBlockList).getAccessor,
 								topLevelBlocks[topLevelIndex].id,
 								children[topLevelIndex] as Element,
 							)

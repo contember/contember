@@ -28,13 +28,9 @@ interface FieldAccessor<Value extends FieldValue = FieldValue> extends Errorable
 
 	updateValue(newValue: Value | null, options?: FieldAccessor.UpdateOptions): void
 
-	hasValue(candidate: this['value']): boolean
-
 	isTouchedBy(agent: string): boolean
 
 	isTouched: boolean
-
-	resolvedValue: Value | null
 
 	getParent(): EntityAccessor
 }

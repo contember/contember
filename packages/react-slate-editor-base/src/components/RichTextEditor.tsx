@@ -28,7 +28,7 @@ export const RichTextEditor: FunctionComponent<RichTextEditorProps> = Component(
 			() => QueryLanguage.desugarRelativeSingleField(props, environment),
 			[environment, props],
 		)
-		const fieldAccessor = useMemo(() => entity.getRelativeSingleField<string>(desugaredField), [entity, desugaredField])
+		const fieldAccessor = useMemo(() => entity.getField<string>(desugaredField), [entity, desugaredField])
 
 		// The cache is questionable, really.
 		const [contemberFieldElementCache] = useState(() => new WeakMap<FieldAccessor<string>, SlateElement[]>())
@@ -91,7 +91,7 @@ export const RichTextEditor: FunctionComponent<RichTextEditorProps> = Component(
 		const onChange = useCallback(
 			(value: Descendant[]) => {
 				getParent().batchUpdates(getAccessor => {
-					const fieldAccessor = getAccessor().getRelativeSingleField(desugaredField)
+					const fieldAccessor = getAccessor().getField(desugaredField)
 
 					if (SlateNode.string({ type: 'dummy', children: value }) === '' && fieldAccessor.valueOnServer === null) {
 						fieldAccessor.updateValue(null)
@@ -100,7 +100,7 @@ export const RichTextEditor: FunctionComponent<RichTextEditorProps> = Component(
 
 					if (SlateElement.isElement(value[0])) {
 						fieldAccessor.updateValue(serialize(value[0].children))
-						contemberFieldElementCache.set(getAccessor().getRelativeSingleField(desugaredField), value as SlateElement[])
+						contemberFieldElementCache.set(getAccessor().getField(desugaredField), value as SlateElement[])
 					}
 				})
 			},

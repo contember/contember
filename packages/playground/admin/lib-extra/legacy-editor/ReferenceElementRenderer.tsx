@@ -85,7 +85,7 @@ export const ReferenceElementRenderer = memo((props: ReferenceElementRendererPro
 		)
 	} else if (
 		props.embedReferenceDiscriminateBy !== undefined &&
-		discriminationField.hasValue(props.embedReferenceDiscriminateBy)
+		discriminationField.value === props.embedReferenceDiscriminateBy
 	) {
 		if (
 			props.embedContentDiscriminationField === undefined ||

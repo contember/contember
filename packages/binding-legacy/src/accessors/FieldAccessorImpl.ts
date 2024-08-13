@@ -40,23 +40,12 @@ export class FieldAccessorImpl<Value extends FieldValue = FieldValue> implements
 		this.operations.updateValue(this.state, newValue, options)
 	}
 
-	public hasValue(candidate: this['value']): boolean {
-		return this.value === candidate
-	}
-
 	public isTouchedBy(agent: 'user' | string) {
 		return this.touchLog?.has(agent) ?? false
 	}
 
 	public get isTouched() {
 		return this.isTouchedBy('user')
-	}
-
-	public get resolvedValue() {
-		if (this.defaultValue === undefined) {
-			return this.value
-		}
-		return this.value === null ? this.defaultValue : this.value
 	}
 
 	// helpers

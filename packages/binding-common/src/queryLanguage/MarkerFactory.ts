@@ -193,7 +193,7 @@ export class MarkerFactory {
 		return this.wrapRelativeSingleField(
 			field,
 			environment,
-			relativeSingleField => new FieldMarker(relativeSingleField.field, relativeSingleField.defaultValue, relativeSingleField.isNonbearing),
+			relativeSingleField => new FieldMarker(relativeSingleField),
 		)
 	}
 

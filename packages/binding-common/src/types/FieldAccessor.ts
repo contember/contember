@@ -28,7 +28,7 @@ interface FieldAccessor<Value extends FieldValue = FieldValue> extends Errorable
 
 	updateValue(newValue: Value | null, options?: FieldAccessor.UpdateOptions): void
 
-	isTouchedBy(agent: string): boolean
+	isTouchedBy(agent: FieldAccessor.TouchAgent): boolean
 
 	isTouched: boolean
 
@@ -36,8 +36,9 @@ interface FieldAccessor<Value extends FieldValue = FieldValue> extends Errorable
 }
 
 namespace FieldAccessor {
+	export type TouchAgent = 'user' | (string & {})
 	export interface UpdateOptions {
-		agent?: 'user' | string
+		agent?: TouchAgent
 	}
 
 	export type GetFieldAccessor<Value extends FieldValue = FieldValue> = () => FieldAccessor<Value>

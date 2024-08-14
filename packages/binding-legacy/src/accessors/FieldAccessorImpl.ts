@@ -40,7 +40,7 @@ export class FieldAccessorImpl<Value extends FieldValue = FieldValue> implements
 		this.operations.updateValue(this.state, newValue, options)
 	}
 
-	public isTouchedBy(agent: 'user' | string) {
+	public isTouchedBy(agent: 'user' | (string & {})) {
 		return this.touchLog?.has(agent) ?? false
 	}
 

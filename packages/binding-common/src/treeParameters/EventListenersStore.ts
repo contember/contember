@@ -1,5 +1,5 @@
 type AnyFunction = (...args: any[]) => any
-type GenericEventsMap = {
+export type GenericEventsMap = {
 	[K in string]: (...args: any[]) => void | AnyFunction | Promise<void | AnyFunction>
 }
 
@@ -53,17 +53,11 @@ export class EventListenersStore<Events extends GenericEventsMap> {
 		return () => eventListeners?.delete(handler)
 	}
 
-	cloneDeep(): EventListenersStore<Events> {
+	clone(): EventListenersStore<Events> {
 		const store: EventListenersStore<Events> = new EventListenersStore()
 		for (const [key, value] of this.listeners.entries()) {
 			store.listeners.set(key, new Set(value))
 		}
-		return store
-	}
-
-	clone(): EventListenersStore<Events> {
-		const store: EventListenersStore<Events> = new EventListenersStore()
-		store.listeners = new Map(this.listeners)
 		return store
 	}
 

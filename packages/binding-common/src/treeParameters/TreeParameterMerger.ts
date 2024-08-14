@@ -2,14 +2,16 @@ import { GraphQlBuilder, Writable } from '@contember/client'
 import type {
 	Alias,
 	EntityEventListenerStore,
-	EntityListEventListenerStore,
+	EventListenersStore,
 	ExpectedQualifiedEntityMutation,
 	ExpectedRelationMutation,
+	GenericEventsMap,
 	HasManyRelation,
 	HasOneRelation,
 	ParentEntityParameters,
 	QualifiedEntityList,
 	QualifiedSingleEntity,
+	RelativeSingleField,
 	SetOnCreate,
 	UnconstrainedQualifiedEntityList,
 	UnconstrainedQualifiedSingleEntity,
@@ -33,7 +35,7 @@ export class TreeParameterMerger {
 			setOnCreate: this.mergeSetOnCreate(original.setOnCreate, fresh.setOnCreate),
 			isNonbearing: original.isNonbearing && fresh.isNonbearing,
 			// forceCreation: original.forceCreation || fresh.forceCreation,
-			eventListeners: this.mergeSingleEntityEventListeners(original.eventListeners, fresh.eventListeners),
+			eventListeners: this.mergeEventStore(original.eventListeners, fresh.eventListeners),
 		}
 	}
 
@@ -61,11 +63,11 @@ export class TreeParameterMerger {
 			// forceCreation: original.forceCreation || fresh.forceCreation,
 			isNonbearing: original.isNonbearing && fresh.isNonbearing,
 			initialEntityCount: original.initialEntityCount, // Handled above
-			childEventListeners: this.mergeSingleEntityEventListeners(
+			childEventListeners: this.mergeEventStore(
 				original.childEventListeners,
 				fresh.childEventListeners,
 			),
-			eventListeners: this.mergeEntityListEventListeners(original.eventListeners, fresh.eventListeners),
+			eventListeners: this.mergeEventStore(original.eventListeners, fresh.eventListeners),
 		}
 	}
 
@@ -90,7 +92,7 @@ export class TreeParameterMerger {
 				expectedMutation: this.mergeExpectedQualifiedEntityMutation(original.expectedMutation, fresh.expectedMutation),
 				isNonbearing: original.isNonbearing && fresh.isNonbearing,
 				hasOneRelationPath: original.hasOneRelationPath, // TODO this is completely wrong.
-				eventListeners: this.mergeSingleEntityEventListeners(original.eventListeners, fresh.eventListeners),
+				eventListeners: this.mergeEventStore(original.eventListeners, fresh.eventListeners),
 			}
 		}
 		return {
@@ -107,7 +109,7 @@ export class TreeParameterMerger {
 			expectedMutation: this.mergeExpectedQualifiedEntityMutation(original.expectedMutation, fresh.expectedMutation),
 			isNonbearing: original.isNonbearing && fresh.isNonbearing,
 			hasOneRelationPath: original.hasOneRelationPath, // TODO this is completely wrong.
-			eventListeners: this.mergeSingleEntityEventListeners(original.eventListeners, fresh.eventListeners),
+			eventListeners: this.mergeEventStore(original.eventListeners, fresh.eventListeners),
 		}
 	}
 
@@ -139,11 +141,8 @@ export class TreeParameterMerger {
 				expectedMutation: this.mergeExpectedQualifiedEntityMutation(original.expectedMutation, fresh.expectedMutation),
 				isNonbearing: original.isNonbearing && fresh.isNonbearing,
 				hasOneRelationPath: original.hasOneRelationPath, // TODO this is completely wrong.
-				childEventListeners: this.mergeSingleEntityEventListeners(
-					original.childEventListeners,
-					fresh.childEventListeners,
-				),
-				eventListeners: this.mergeEntityListEventListeners(original.eventListeners, fresh.eventListeners),
+				childEventListeners: this.mergeEventStore(original.childEventListeners, fresh.childEventListeners),
+				eventListeners: this.mergeEventStore(original.eventListeners, fresh.eventListeners),
 				initialEntityCount: original.initialEntityCount, // Handled above
 			}
 		}
@@ -163,12 +162,21 @@ export class TreeParameterMerger {
 			expectedMutation: this.mergeExpectedQualifiedEntityMutation(original.expectedMutation, fresh.expectedMutation),
 			isNonbearing: original.isNonbearing && fresh.isNonbearing,
 			hasOneRelationPath: original.hasOneRelationPath, // TODO this is completely wrong.
-			childEventListeners: this.mergeSingleEntityEventListeners(
-				original.childEventListeners,
-				fresh.childEventListeners,
-			),
-			eventListeners: this.mergeEntityListEventListeners(original.eventListeners, fresh.eventListeners),
+			childEventListeners: this.mergeEventStore(original.childEventListeners, fresh.childEventListeners),
+			eventListeners: this.mergeEventStore(original.eventListeners, fresh.eventListeners),
 			initialEntityCount: original.initialEntityCount, // Handled above
+		}
+	}
+
+	public static mergeSingleField(original: Omit<RelativeSingleField, 'hasOneRelationPath'>, fresh: Omit<RelativeSingleField, 'hasOneRelationPath'>): Omit<RelativeSingleField, 'hasOneRelationPath'> {
+		if (original.defaultValue !== undefined && fresh.defaultValue !== undefined && original.defaultValue !== fresh.defaultValue) {
+			throw new BindingError(`MarkerTreeGenerator merging: multiple fields "${original.field}" with different defaultValue found: ${JSON.stringify([original.defaultValue, fresh.defaultValue])}, `)
+		}
+		return {
+			field: original.field,
+			isNonbearing: original.isNonbearing && fresh.isNonbearing,
+			defaultValue: original.defaultValue ?? fresh.defaultValue,
+			eventListeners: this.mergeEventStore(original.eventListeners, fresh.eventListeners),
 		}
 	}
 
@@ -254,7 +262,7 @@ export class TreeParameterMerger {
 			return original
 		}
 		return {
-			eventListeners: TreeParameterMerger.mergeSingleEntityEventListeners(
+			eventListeners: TreeParameterMerger.mergeEventStore(
 				original.eventListeners,
 				fresh.eventListeners,
 			),
@@ -271,57 +279,30 @@ export class TreeParameterMerger {
 
 		return {
 			...original,
-			[key]: TreeParameterMerger.mergeSingleEntityEventListeners(original[key], parentEntity.eventListeners),
+			[key]: TreeParameterMerger.mergeEventStore(original[key], parentEntity.eventListeners),
 		}
 	}
 
-	public static mergeSingleEntityEventListeners(
-		original: EntityEventListenerStore | undefined,
-		fresh: EntityEventListenerStore | undefined,
-	): EntityEventListenerStore | undefined {
+
+	private static mergeEventStore<Events extends GenericEventsMap>(
+		original: EventListenersStore<Events> | undefined,
+		fresh: EventListenersStore<Events> | undefined,
+	): EventListenersStore<Events> | undefined {
 		if (original === undefined) {
 			if (fresh === undefined) {
 				return undefined
 			}
-			return this.cloneSingleEntityEventListeners(fresh)
+			return fresh
 		}
 
 		if (fresh === undefined) {
-			return this.cloneSingleEntityEventListeners(original)
+			return original
 		}
 
-		const store = this.cloneSingleEntityEventListeners(original)
+		const store = original.clone()
 		store.append(fresh)
+
 		return store
-	}
-
-	public static mergeEntityListEventListeners(
-		original: EntityListEventListenerStore | undefined,
-		fresh: EntityListEventListenerStore | undefined,
-	): EntityListEventListenerStore | undefined {
-		if (original === undefined) {
-			if (fresh === undefined) {
-				return undefined
-			}
-			return this.cloneEntityListEventListeners(fresh)
-		}
-
-		if (fresh === undefined) {
-			return this.cloneEntityListEventListeners(original)
-		}
-
-		const store = this.cloneEntityListEventListeners(original)
-		store.append(fresh)
-		return store
-	}
-
-	public static cloneSingleEntityEventListeners(store: EntityEventListenerStore): EntityEventListenerStore {
-		// TODO is intentional, that second clone is deep?
-		return store.clone()
-	}
-
-	public static cloneEntityListEventListeners(store: EntityListEventListenerStore): EntityListEventListenerStore {
-		return store.cloneDeep()
 	}
 
 	private static mergeExpectedRelationMutation(

@@ -528,7 +528,7 @@ export class StateInitializer {
 		if (blueprintListeners === undefined) {
 			return undefined
 		}
-		return TreeParameterMerger.cloneSingleEntityEventListeners(blueprintListeners)
+		return blueprintListeners.clone()
 	}
 
 	private initializeEntityListEventListenerStore(
@@ -539,7 +539,7 @@ export class StateInitializer {
 		if (blueprintListeners === undefined) {
 			return undefined
 		}
-		return TreeParameterMerger.cloneEntityListEventListeners(blueprintListeners)
+		return blueprintListeners.clone()
 	}
 
 	private initializeEntityListChildEventListenerStore(
@@ -550,11 +550,10 @@ export class StateInitializer {
 		if (blueprintListeners === undefined) {
 			return undefined
 		}
-		return TreeParameterMerger.cloneSingleEntityEventListeners(blueprintListeners)
+		return blueprintListeners.clone()
 	}
 
 	private initializeFieldEventListenerStore(marker: FieldMarker): FieldEventListenerStore | undefined {
-		// TODO !!!
-		return undefined
+		return marker.parameters.eventListeners?.clone()
 	}
 }

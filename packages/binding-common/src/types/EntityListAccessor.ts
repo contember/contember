@@ -44,8 +44,6 @@ interface EntityListAccessor extends Errorable {
 
 	length: number
 
-	hasEntityOnServer(entityOrItsId: EntityAccessor | EntityId): boolean
-
 	deleteAll(): void
 
 	disconnectAll(): void

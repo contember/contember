@@ -1,7 +1,8 @@
 import { ComponentType, createElement, memo, ReactElement, ReactNode } from 'react'
-import { AccessorTree, AccessorTreeState, useDataBinding } from '../accessorTree'
+import { AccessorTree, AccessorTreeState, AccessorTreeStateOptions, useDataBinding } from '../accessorTree'
 import { TreeRootIdProvider } from '../accessorPropagation'
 import { EntityKeyContext } from '../accessorPropagation/EntityKeyContext'
+import { useDataBindingNg } from '../accessorTree/useDataBindingNg'
 
 export type DataBindingProviderStateComponent<StateProps> = {
 	stateComponent: ComponentType<StateProps & DataBindingStateComponentProps>
@@ -51,6 +52,34 @@ export const DataBindingProvider = memo(function DataBindingProvider<StateProps 
 		</DataBindingInnerProvider>
 	)
 }) as <StateProps>(props: DataBindingProviderProps<StateProps>) => ReactElement
+
+export type DataBindingNgProviderProps<StateProps> =
+	& {
+		children?: ReactNode
+	}
+	& DataBindingProviderStateComponent<StateProps>
+
+export const DataBindingNgProvider = memo(function DataBindingProvider<StateProps extends DataBindingStateComponentProps>(
+	props: DataBindingNgProviderProps<StateProps>,
+) {
+	const accessorTreeState = useDataBindingNg(props)
+
+	const children = createElement(
+		props.stateComponent,
+		{
+			...props.stateProps!,
+			accessorTreeState: accessorTreeState,
+		},
+		props.children,
+	)
+
+	return (
+		<DataBindingInnerProvider accessorTreeState={accessorTreeState}>
+			{children}
+		</DataBindingInnerProvider>
+	)
+}) as <StateProps>(props: DataBindingNgProviderProps<StateProps>) => ReactElement
+
 
 const DataBindingInnerProvider = (
 	{ accessorTreeState, children }: {

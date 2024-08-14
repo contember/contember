@@ -8,7 +8,6 @@ import { ReactNode, useCallback, useEffect, useRef, useState } from 'react'
 import type { TreeRootAccessor } from '@contember/binding'
 import { DataBinding, Environment, TreeStore } from '@contember/binding'
 import type { AccessorTreeState } from './AccessorTreeState'
-import type { AccessorTreeStateOptions } from './AccessorTreeStateOptions'
 import { useIsMounted } from '@contember/react-utils'
 import { MarkerTreeGenerator } from '../markers'
 import ReactDOM from 'react-dom'
@@ -19,7 +18,11 @@ export const useDataBinding = ({
 	children,
 	refreshOnPersist,
 	skipStateUpdateAfterPersist,
-}: AccessorTreeStateOptions): AccessorTreeState => {
+}: {
+	children?: ReactNode
+	refreshOnPersist?: boolean
+	skipStateUpdateAfterPersist?: boolean
+}): AccessorTreeState => {
 	const contentClient = useCurrentContentGraphQlClient()
 	const systemClient = useCurrentSystemGraphQlClient()
 	const tenantClient = useTenantGraphQlClient()

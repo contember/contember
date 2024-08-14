@@ -237,7 +237,7 @@ describe('Marker tree generator', () => {
 			environment,
 		)
 
-		const idMarker = [PRIMARY_KEY_NAME, new FieldMarker(PRIMARY_KEY_NAME)] as const
+		const idMarker = [PRIMARY_KEY_NAME, new FieldMarker({ field: PRIMARY_KEY_NAME, defaultValue: undefined, eventListeners: undefined, isNonbearing: false })] as const
 		const fooEntity = schema.getEntity('Foo')
 		const barEntity = schema.getEntity('Bar')
 		const subTreeEnv = environment.withSubTree({
@@ -285,9 +285,24 @@ describe('Marker tree generator', () => {
 				true,
 				new Map([
 					idMarker,
-					['same', new FieldMarker('same')],
-					['name', new FieldMarker('name')],
-					['surname', new FieldMarker('surname')],
+					['same', new FieldMarker({
+						field: 'same',
+						defaultValue: undefined,
+						eventListeners: undefined,
+						isNonbearing: false,
+					})],
+					['name', new FieldMarker({
+						field: 'name',
+						defaultValue: undefined,
+						eventListeners: undefined,
+						isNonbearing: false,
+					})],
+					['surname', new FieldMarker({
+						field: 'surname',
+						defaultValue: undefined,
+						eventListeners: undefined,
+						isNonbearing: false,
+					})],
 				]),
 				new Map([
 					[PRIMARY_KEY_NAME, idMarker[1].placeholderName],
@@ -318,7 +333,12 @@ describe('Marker tree generator', () => {
 				new Map<PlaceholderName, EntityFieldMarker>([
 					idMarker,
 					[innerHasMany.placeholderName, innerHasMany],
-					['hasOneField', new FieldMarker('hasOneField')],
+					['hasOneField', new FieldMarker({
+						field: 'hasOneField',
+						defaultValue: undefined,
+						eventListeners: undefined,
+						isNonbearing: false,
+					})],
 				]),
 				new Map([
 					[PRIMARY_KEY_NAME, idMarker[1].placeholderName],
@@ -349,7 +369,12 @@ describe('Marker tree generator', () => {
 				true,
 				new Map<PlaceholderName, EntityFieldMarker>([
 					idMarker,
-					['hasManyField', new FieldMarker('hasManyField')],
+					['hasManyField', new FieldMarker({
+						field: 'hasManyField',
+						defaultValue: undefined,
+						eventListeners: undefined,
+						isNonbearing: false,
+					})],
 					[hasOne.placeholderName, hasOne],
 				]),
 				new Map([
@@ -382,7 +407,12 @@ describe('Marker tree generator', () => {
 				new Map<PlaceholderName, EntityFieldMarker>([
 					idMarker,
 					[outerHasMany.placeholderName, outerHasMany],
-					['fooField', new FieldMarker('fooField')],
+					['fooField', new FieldMarker({
+						field: 'fooField',
+						defaultValue: undefined,
+						eventListeners: undefined,
+						isNonbearing: false,
+					})],
 				]),
 				new Map([
 					[PRIMARY_KEY_NAME, idMarker[1].placeholderName],
@@ -412,7 +442,12 @@ describe('Marker tree generator', () => {
 			},
 			new EntityFieldMarkersContainer(
 				true,
-				new Map<PlaceholderName, EntityFieldMarker>([idMarker, ['whatever', new FieldMarker('whatever')]]),
+				new Map<PlaceholderName, EntityFieldMarker>([idMarker, ['whatever', new FieldMarker({
+					field: 'whatever',
+					defaultValue: undefined,
+					eventListeners: undefined,
+					isNonbearing: false,
+				})]]),
 				new Map([
 					[PRIMARY_KEY_NAME, idMarker[1].placeholderName],
 					['whatever', 'whatever'],

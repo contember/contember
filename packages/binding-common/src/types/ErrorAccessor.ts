@@ -1,10 +1,7 @@
 import type { Result } from '@contember/client'
 
-class ErrorAccessor {
-	public constructor(
-		public readonly errors: ErrorAccessor.Error[],
-	) {
-	}
+interface ErrorAccessor {
+	readonly errors: ErrorAccessor.Error[]
 }
 
 namespace ErrorAccessor {

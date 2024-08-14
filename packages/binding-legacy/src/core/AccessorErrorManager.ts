@@ -69,7 +69,7 @@ export class AccessorErrorManager {
 				this.errorsByState.set(state, (errorsById = new Map()))
 			}
 			errorsById.set(errorId, error)
-			state.errors = new ErrorAccessor(Array.from(errorsById.values()))
+			state.errors = { errors: Array.from(errorsById.values()) }
 			this.eventManager.registerJustUpdated(state, EventManager.NO_CHANGES_DIFFERENCE)
 
 			return () =>
@@ -80,7 +80,7 @@ export class AccessorErrorManager {
 					}
 					errorsById.delete(errorId)
 					if (errorsById.size) {
-						state.errors = new ErrorAccessor(Array.from(errorsById.values()))
+						state.errors = { errors: Array.from(errorsById.values()) }
 					} else {
 						state.errors = undefined
 						this.errorsByState.delete(state)

@@ -1,4 +1,4 @@
-import type { FieldName, FieldValue } from '../treeParameters'
+import type { FieldName, FieldValue, RelativeSingleField } from '../treeParameters'
 import { PlaceholderGenerator } from './PlaceholderGenerator'
 
 /**
@@ -10,10 +10,20 @@ export class FieldMarker {
 	public readonly placeholderName: string
 
 	constructor(
-		public readonly fieldName: FieldName,
-		public readonly defaultValue?: FieldValue,
-		public readonly isNonbearing: boolean = false,
+		public readonly parameters: Omit<RelativeSingleField, 'hasOneRelationPath'>,
 	) {
-		this.placeholderName = PlaceholderGenerator.getFieldPlaceholder(this.fieldName)
+		this.placeholderName = PlaceholderGenerator.getFieldPlaceholder(this.parameters.field)
+	}
+
+	get fieldName(): FieldName {
+		return this.parameters.field
+	}
+
+	get isNonbearing(): boolean {
+		return this.parameters.isNonbearing
+	}
+
+	get defaultValue(): FieldValue | undefined {
+		return this.parameters.defaultValue
 	}
 }

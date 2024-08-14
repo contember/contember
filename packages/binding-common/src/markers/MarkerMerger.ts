@@ -271,18 +271,16 @@ export class MarkerMerger {
 		if (original === fresh) {
 			return original
 		}
-		if (original.defaultValue !== undefined && fresh.defaultValue !== undefined && original.defaultValue !== fresh.defaultValue) {
-			throw new BindingError(`MarkerTreeGenerator merging: multiple fields "${original.fieldName}" with different defaultValue found: ${JSON.stringify([original.defaultValue, fresh.defaultValue])}, `)
-		}
-		return new FieldMarker(
-			original.fieldName,
-			original.defaultValue ?? fresh.defaultValue,
-			original.isNonbearing && fresh.isNonbearing,
-		)
+		return new FieldMarker(TreeParameterMerger.mergeSingleField(original.parameters, fresh.parameters))
 	}
 
 	public static mergeInSystemFields(original: EntityFieldMarkersContainer | undefined): EntityFieldMarkersContainer {
-		const primaryKey = new FieldMarker(PRIMARY_KEY_NAME, undefined, true)
+		const primaryKey = new FieldMarker({
+			field: PRIMARY_KEY_NAME,
+			defaultValue: undefined,
+			isNonbearing: true,
+			eventListeners: undefined,
+		})
 		// We could potentially share this instance for all fields. Maybe sometime later.
 		const freshFields = new EntityFieldMarkersContainer(
 			false,

@@ -102,7 +102,10 @@ export const execute = async (test: Test) => {
 			executionContainer: executionContainerFactory
 				.create({
 					permissions,
-					schema: { ...schema, id: 1 },
+					schema,
+					schemaMeta: {
+						id: 1,
+					},
 					db,
 					identityVariables: test.variables || {},
 					identityId: '00000000-0000-0000-0000-000000000000',

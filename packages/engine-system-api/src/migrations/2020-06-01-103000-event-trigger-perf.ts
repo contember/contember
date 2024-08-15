@@ -16,7 +16,7 @@ const createEventStatementTrigger = (builder: MigrationBuilder, tableName: Name)
 }
 
 export default async function (builder: MigrationBuilder, args: MigrationArgs<SystemMigrationArgs>) {
-	const schema = await args.schemaResolver(args.connection)
+	const schema = (await args.schemaResolver(args.connection)).schema
 	const junctionTables = getJunctionTables(schema.model)
 	const schemas = args.project.stages.map(it => `stage_${it.slug}`)
 	builder.sql(`CREATE OR REPLACE FUNCTION "trigger_event"() RETURNS TRIGGER AS $$

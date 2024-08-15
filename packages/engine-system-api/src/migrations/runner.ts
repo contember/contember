@@ -26,10 +26,12 @@ import _20230911174000fixondelete from './2023-09-11-174000-fix-on-delete'
 import _20231019173000fixunique from './2023-10-19-173000-fix-unique'
 import _20231024140000schemanullablechecksum from './2023-10-24-140000-schema-nullable-checksum'
 import _20240628150000migrationsdropsequence from './2024-06-28-150000-migrations-drop-sequence'
+import _20240628153000schema from './2024-06-28-153000-schema'
+import _20240628153001schemainit from './2024-06-28-153001-schema-init'
 import snapshot from './snapshot'
 
 import { Connection, createDatabaseIfNotExists, DatabaseConfig, DatabaseMetadataResolver } from '@contember/database'
-import { DatabaseContextFactory, SchemaVersionBuilder } from '../model'
+import { DatabaseContextFactory, SchemaProvider } from '../model'
 import { ProjectConfig } from '../types'
 import { Logger } from '@contember/logger'
 
@@ -56,6 +58,8 @@ const migrations = {
 	'2023-10-19-173000-fix-unique': _20231019173000fixunique,
 	'2023-10-24-140000-schema-nullable-checksum': _20231024140000schemanullablechecksum,
 	'2024-06-28-150000-migrations-drop-sequence': _20240628150000migrationsdropsequence,
+	'2024-06-28-153000-schema': _20240628153000schema,
+	'2024-06-28-153001-schema-init': _20240628153001schemainit,
 }
 
 
@@ -63,7 +67,7 @@ export class SystemMigrationsRunner {
 	constructor(
 		private readonly databaseContextFactory: DatabaseContextFactory,
 		private readonly project: ProjectConfig & { db: DatabaseConfig },
-		private readonly schemaVersionBuilder: SchemaVersionBuilder,
+		private readonly schemaProvider: SchemaProvider,
 		private readonly migrationGroups: Record<string, MigrationGroup<unknown>>,
 		private readonly databaseMetadataResolver: DatabaseMetadataResolver,
 	) {
@@ -72,9 +76,9 @@ export class SystemMigrationsRunner {
 		await createDatabaseIfNotExists(this.project.db, message => typeof message === 'string' ? logger.warn(message) : logger.error(message))
 		const singleConnection = Connection.createSingle(this.project.db, err => logger.error(err))
 		await singleConnection.scope(async connection => {
-			const schemaResolver = (connection: Connection.ConnectionLike) => {
+			const schemaResolver = async (connection: Connection.ConnectionLike) => {
 				const dbContextMigrations = this.databaseContextFactory.create(connection)
-				return this.schemaVersionBuilder.buildSchema(dbContextMigrations)
+				return await this.schemaProvider.buildSchemaFromMigrations(dbContextMigrations)
 			}
 			const migrationResolver = new GroupMigrationsResolver(
 				new SnapshotMigrationResolver(snapshot, migrations),

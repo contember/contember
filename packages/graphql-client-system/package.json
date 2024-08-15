@@ -27,6 +27,7 @@
     }
   },
   "dependencies": {
+    "@contember/schema": "workspace:*",
     "graphql-ts-client-api": "^3.1.17"
   },
   "devDependencies": {

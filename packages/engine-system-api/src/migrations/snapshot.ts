@@ -8,6 +8,9 @@ CREATE TYPE "schema_migration_type" AS ENUM (
     'schema',
     'content'
 );
+CREATE TYPE "schema_single" AS ENUM (
+    'single'
+);
 CREATE FUNCTION "trigger_event"() RETURNS "trigger"
     LANGUAGE "plpgsql"
     AS $$
@@ -115,6 +118,14 @@ CREATE TABLE "event_data" (
     "identity_id" "uuid" NOT NULL,
     "transaction_id" "uuid" DEFAULT COALESCE((NULLIF("current_setting"('system.transaction_id'::"text", true), ''::"text"))::"uuid", ("set_config"('system.transaction_id'::"text", ("${randomUuidFn}"())::"text", true))::"uuid") NOT NULL
 );
+CREATE TABLE "schema" (
+    "id" "schema_single" DEFAULT 'single'::"schema_single" NOT NULL,
+    "schema" "json" NOT NULL,
+    "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "checksum" character(32) NOT NULL,
+    "version" character varying(20) NOT NULL,
+    "migration_id" integer NOT NULL
+);
 CREATE TABLE "schema_migration" (
     "id" integer NOT NULL,
     "version" character varying(20) NOT NULL,
@@ -143,6 +154,8 @@ ALTER TABLE ONLY "schema_migration"
     ADD CONSTRAINT "schema_migration_pkey" PRIMARY KEY ("id");
 ALTER TABLE ONLY "schema_migration"
     ADD CONSTRAINT "schema_migration_version_key" UNIQUE ("version");
+ALTER TABLE ONLY "schema"
+    ADD CONSTRAINT "schema_pkey" PRIMARY KEY ("id");
 ALTER TABLE ONLY "stage"
     ADD CONSTRAINT "stage_pkey" PRIMARY KEY ("id");
 ALTER TABLE ONLY "stage"
@@ -160,6 +173,8 @@ CREATE INDEX "system_schema_migration_version" ON "schema_migration" USING "btre
 CREATE INDEX "transaction_applied" ON "stage_transaction" USING "btree" ("applied_at");
 ALTER TABLE ONLY "event_data"
     ADD CONSTRAINT "event_data_schema_id_fkey" FOREIGN KEY ("schema_id") REFERENCES "schema_migration"("id");
+ALTER TABLE ONLY "schema"
+    ADD CONSTRAINT "schema_migration_id_fkey" FOREIGN KEY ("migration_id") REFERENCES "schema_migration"("id") DEFERRABLE INITIALLY DEFERRED;
 ALTER TABLE ONLY "stage_transaction"
     ADD CONSTRAINT "stage_transaction_stage_id_fkey" FOREIGN KEY ("stage_id") REFERENCES "stage"("id") ON DELETE CASCADE;
 `)

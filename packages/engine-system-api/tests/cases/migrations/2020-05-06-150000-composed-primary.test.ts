@@ -37,7 +37,15 @@ test('many-has-many-primary migration sql', async () => {
 	const builder = createMigrationBuilder()
 	await migration(builder, {
 		connection: undefined as any,
-		schemaResolver: () => Promise.resolve(createSchema(SampleProject)),
+		schemaResolver: () => Promise.resolve({
+			schema: createSchema(SampleProject),
+			meta: {
+				id: 1,
+				version: '2024-06-28-153001',
+				checksum: '_checksum_',
+				updatedAt: new Date(),
+			},
+		}),
 		databaseMetadataResolver: () => Promise.resolve(emptyDatabaseMetadata),
 		project: {
 			slug: 'test',

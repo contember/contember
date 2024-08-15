@@ -4,7 +4,7 @@ import { SystemMigrationArgs } from './types'
 import { getUniqueConstraintColumns } from '@contember/schema-migrations'
 
 export default async function (builder: MigrationBuilder, args: MigrationArgs<SystemMigrationArgs>) {
-	const schema = await args.schemaResolver(args.connection)
+	const schema = (await args.schemaResolver(args.connection)).schema
 	const stages = (await args.connection.query<{schema: string}>('SELECT schema FROM stage')).rows
 	const metadataByStage: Record<string, DatabaseMetadata> = {}
 

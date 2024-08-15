@@ -22,6 +22,18 @@ export const gql = (strings: TemplateStringsArray) => {
 	return strings[0]
 }
 
+let latestError: any = null
+beforeEach(() => {
+	latestError = null
+})
+
+afterEach(ctx => {
+	if (latestError !== null && ctx.task.result.state === 'fail') {
+		// eslint-disable-next-line no-console
+		console.error(latestError)
+	}
+})
+
 
 export const executeGraphql = (
 	path: string,
@@ -36,8 +48,7 @@ export const executeGraphql = (
 			variables: options.variables || {},
 		})
 	result.on('error', e => {
-		// eslint-disable-next-line no-console
-		console.error(e)
+		latestError = e
 	})
 	result.on('response', e => {
 		if ('extensions' in e.body) {
@@ -82,8 +93,8 @@ const createProject = async (slug: string) => {
 		.expect(200)
 }
 
-const executeMigrations = async (projectSlug: string, modifications: Migration.Modification[]) => {
-	const [version, fullName] = MigrationVersionHelper.createVersion('test')
+const executeMigrations = async (projectSlug: string, modifications: Migration.Modification[], fullName: string = '2024-07-01-120000-init') => {
+	const version = MigrationVersionHelper.extractVersion(fullName)
 	await executeGraphql(
 		'/system/' + projectSlug,
 		gql`
@@ -128,6 +139,9 @@ export const createTester = async (schema: Schema) => {
 		return executeGraphql(options.path ?? '/content/' + projectSlug + '/live', query, options)
 	}
 	queryCb.projectSlug = projectSlug
+	queryCb.migrate = async (modifications: Migration.Modification[], fullName: string) => {
+		await executeMigrations(projectSlug, modifications, fullName)
+	}
 	return queryCb
 }
 

@@ -1,10 +1,18 @@
 import { Builder } from '@contember/dic'
 import { Connection } from '@contember/database'
-import { DatabaseContext, TenantContainer, TenantContainerFactory, ProjectSchemaResolver as ProjectSchemaResolverInterface, ProjectInitializer as ProjectInitializerInterface } from '@contember/engine-tenant-api'
+import {
+	ProjectInitializer as ProjectInitializerInterface,
+	ProjectSchemaResolver as ProjectSchemaResolverInterface,
+	TenantContainer,
+	TenantContainerFactory,
+} from '@contember/engine-tenant-api'
 import { TenantConfig } from '../config/config'
 import {
-	ProjectContainerFactoryFactory, ProjectContainerResolver, ProjectInitializer,
-	ProjectInitializerProxy, ProjectSchemaResolver,
+	ProjectContainerFactoryFactory,
+	ProjectContainerResolver,
+	ProjectInitializer,
+	ProjectInitializerProxy,
+	ProjectSchemaResolver,
 	ProjectSchemaResolverProxy,
 } from '../project'
 import { SystemContainer, SystemContainerFactory } from '@contember/engine-system-api'
@@ -113,10 +121,10 @@ export class ProjectGroupContainerFactory {
 				identityFetcher)
 			.addService('systemContainer', ({ identityFetcher }) =>
 				this.systemContainerFactory.create({ identityFetcher }))
-			.addService('schemaVersionBuilder', ({ systemContainer }) =>
-				systemContainer.schemaVersionBuilder)
-			.addService('projectContainerFactory', ({  schemaVersionBuilder, logger }) =>
-				this.projectContainerFactoryFactory.create(schemaVersionBuilder, logger))
+			.addService('schemaProvider', ({ systemContainer }) =>
+				systemContainer.schemaProvider)
+			.addService('projectContainerFactory', ({ schemaProvider, logger }) =>
+				this.projectContainerFactoryFactory.create(schemaProvider, logger))
 			.addService('tenantProjectManager', ({ tenantContainer }) =>
 				tenantContainer.projectManager)
 			.addService('tenantProjectMemberManager', ({ tenantContainer }) =>

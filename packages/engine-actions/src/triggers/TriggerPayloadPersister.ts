@@ -17,12 +17,15 @@ export class TriggerPayloadPersister {
 		private readonly providers: { uuid: () => string },
 		private readonly projectSlug: string,
 		private readonly stageId: string,
-		private readonly schemaId: number,
+		private readonly schemaId?: number,
 	) {
 	}
 
 	public async persist(trigger: Actions.AnyTrigger, payloads: ActionsPayload.AnyEventPayload[]): Promise<void> {
 		const chunkSize = 100
+		if (!this.schemaId) {
+			throw new Error('Schema id is not set')
+		}
 		for (let i = 0; i < payloads.length; i += chunkSize) {
 			const chunk = payloads.slice(i, i + chunkSize)
 			await InsertBuilder.create()
@@ -35,7 +38,7 @@ export class TriggerPayloadPersister {
 					num_retries: 0,
 					state: 'created',
 					stage_id: this.stageId,
-					schema_id: this.schemaId,
+					schema_id: this.schemaId!,
 					target: trigger.target,
 					trigger: trigger.name,
 					priority: trigger.priority ?? 0,

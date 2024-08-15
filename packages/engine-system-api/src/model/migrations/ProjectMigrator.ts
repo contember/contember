@@ -6,17 +6,19 @@ import { Stage } from '../dtos'
 import { DatabaseContext } from '../database'
 import { ExecutedMigrationsResolver } from './ExecutedMigrationsResolver'
 import { MigrateErrorCode } from '../../schema'
-import { SchemaVersionBuilder } from './SchemaVersionBuilder'
-import { SchemaValidator, SchemaValidatorSkippedErrors } from '@contember/schema-utils'
+import { calculateSchemaChecksum, SchemaValidator, SchemaValidatorSkippedErrors } from '@contember/schema-utils'
 import { logger } from '@contember/logger'
 import { MigrationsDatabaseMetadataResolverStoreFactory, SchemaDatabaseMetadataResolverStore } from '../metadata'
 import { ContentMigrationQuery, MigrationInput } from './MigrationInput'
 import { ContentQueryExecutor } from '../dependencies'
+import { SchemaProvider } from './SchemaProvider'
+import { SaveSchemaCommand } from '../commands/schema/SaveSchemaCommand'
+import { ImplementationException } from '../../utils'
 
 export class ProjectMigrator {
 	constructor(
 		private readonly migrationDescriber: MigrationDescriber,
-		private readonly schemaVersionBuilder: SchemaVersionBuilder,
+		private readonly schemaProvider: SchemaProvider,
 		private readonly executedMigrationsResolver: ExecutedMigrationsResolver,
 		private readonly migrationsDatabaseMetadataResolverStoreFactory: MigrationsDatabaseMetadataResolverStoreFactory,
 		private readonly contentQueryExecutor: ContentQueryExecutor,
@@ -36,8 +38,14 @@ export class ProjectMigrator {
 		if (migrationsToExecute.length === 0) {
 			return
 		}
-		let { version, notNormalized, id, ...schema }  = await this.schemaVersionBuilder.buildSchema(db)
-		const validated = await this.validateMigrations(db, schema, version, migrationsToExecute, { ignoreOrder, skipExecuted })
+		const schemaWithMeta = await this.schemaProvider.fetch({ db })
+		let schema = schemaWithMeta.schema
+		let id = schemaWithMeta.meta.id
+
+		const validated = await this.validateMigrations(db, schema, schemaWithMeta.meta.version ?? null, migrationsToExecute, { ignoreOrder, skipExecuted })
+		if (validated.length === 0) {
+			return
+		}
 
 		const sorted = [...validated].sort((a, b) => a.version.localeCompare(b.version))
 
@@ -61,16 +69,16 @@ export class ProjectMigrator {
 					)
 				}
 			} else if (migration.type === 'content') {
-				const schemaWithId = {
-					...schema,
-					id,
+				if (!id) {
+					throw new FailedContentMigrationError(migration.version, `Cannot execute content migration without schema`)
 				}
 				for (const query of migration.queries) {
 					await this.executeContentMigration({
 						version: migration.version,
 						query,
 						db,
-						schema: schemaWithId,
+						schema,
+						schemaMeta: { id },
 						stages,
 						databaseMetadata: await metadataStore.getMetadata(db.client.schema),
 						identity,
@@ -84,6 +92,19 @@ export class ProjectMigrator {
 			}
 			id = await db.commandBus.execute(new SaveMigrationCommand(migration))
 		}
+		if (!id) {
+			throw new ImplementationException()
+		}
+
+		await db.commandBus.execute(new SaveSchemaCommand({
+			schema,
+			meta: {
+				id,
+				updatedAt: new Date(),
+				version: sorted[sorted.length - 1].version,
+				checksum: calculateSchemaChecksum(schema),
+			},
+		}))
 	}
 
 	private async executeContentMigration({ query, stages, version, ...ctx }: {
@@ -91,7 +112,8 @@ export class ProjectMigrator {
 		db: DatabaseContext
 		query: ContentMigrationQuery
 		stages: Stage[]
-		schema: Schema & { id: number }
+		schema: Schema
+		schemaMeta: { id: number }
 		project: { slug: string; systemSchema: string }
 		identity: { id: string }
 		databaseMetadata: DatabaseMetadata
@@ -120,7 +142,7 @@ export class ProjectMigrator {
 	private async validateMigrations(
 		db: DatabaseContext,
 		schema: Schema,
-		version: string,
+		version: string | null,
 		migrationsToExecute: readonly MigrationInput[],
 		{ ignoreOrder, skipExecuted }: {
 			ignoreOrder: boolean
@@ -140,7 +162,7 @@ export class ProjectMigrator {
 				}
 			}
 
-			if (migration.version < version && !ignoreOrder) {
+			if (version && migration.version < version && !ignoreOrder) {
 				throw new MustFollowLatestMigrationError(migration.version, `Must follow latest executed migration ${version}`)
 			}
 			if (migration.type === 'schema') {

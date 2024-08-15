@@ -17,14 +17,15 @@ export class SystemGraphQLContextFactory {
 			memberships.map(it => it.role),
 		)
 
-		const dbContext = projectContainer.systemDatabaseContext
-		const schema = await projectContainer.contentSchemaResolver.getSchema(dbContext)
-		const systemContext = await systemContainer.resolverContextFactory.create(
-			schema,
-			dbContext,
-			{ ...projectContainer.project, systemSchema: dbContext.client.schema },
+		const db = projectContainer.systemDatabaseContext
+		const systemContext = await systemContainer.resolverContextFactory.create({
+			db,
 			identity,
-		)
+			project: { ...projectContainer.project, systemSchema: db.client.schema },
+			getSchema: async options => {
+				 return (await projectContainer.contentSchemaResolver.getSchema({ db, ...options })).schema
+			},
+		})
 		return {
 			...systemContext,
 			onClearCache,

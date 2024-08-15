@@ -41,15 +41,15 @@ export class ExportExecutor {
 			}
 
 			for (const stage of await systemContext.queryHandler.fetch(new StagesQuery())) {
-				const contentSchema = await projectContainer.contentSchemaResolver.getSchema(systemContext, stage.slug)
-				const contentMapping = this.contentSchemaTransferMappingFactory.createContentSchemaMapping(contentSchema)
+				const contentSchema = await projectContainer.contentSchemaResolver.getSchema({ db: systemContext, stage: stage.slug })
+				const contentMapping = this.contentSchemaTransferMappingFactory.createContentSchemaMapping(contentSchema.schema)
 				const contentDatabaseClient = projectContainer.connection.createClient(stage.schema, {})
 
 				yield [
 					'importContentSchemaBegin', {
 						project: project.targetSlug ?? project.slug,
 						stage: stage.slug,
-						schemaVersion: contentSchema.version,
+						schemaVersion: contentSchema.meta.version ?? '0000-00-00-000000',
 						tables: Object.keys(contentMapping.tables),
 					},
 				]

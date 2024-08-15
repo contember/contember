@@ -1,10 +1,9 @@
-import { VersionedSchema } from '@contember/engine-system-api'
-import { Model } from '@contember/schema'
+import { Model, Schema } from '@contember/schema'
 import { acceptFieldVisitor } from '@contember/schema-utils'
 import { DbColumnSchema, DbColumnSchemaMap, TransferMapping, TransferTableMapping } from './TransferMapping'
 
 export class ContentSchemaTransferMappingFactory {
-	createContentSchemaMapping(contentSchema: VersionedSchema): TransferMapping {
+	createContentSchemaMapping(contentSchema: Schema): TransferMapping {
 		const tables: Record<string, TransferTableMapping> = {}
 
 		for (const entity of Object.values(contentSchema.model.entities)) {

@@ -16,12 +16,13 @@ export {
 	LatestTransactionIdByStageQuery,
 	ProjectInitializer,
 	ProjectMigrator,
-	SchemaVersionBuilder,
 	type Stage,
 	StageBySlugQuery,
 	StageCreator,
 	StagesQuery,
-	type VersionedSchema,
+	SchemaProvider,
+	type SchemaMeta,
+	type SchemaWithMeta,
 } from './model'
 export * from './SystemContainer'
 export * from './resolvers'

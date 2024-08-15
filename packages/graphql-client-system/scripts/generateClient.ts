@@ -14,6 +14,10 @@ const generator = new AsyncGenerator({
 	scalarTypeMap: {
 		Json: 'unknown',
 		PrimaryKey: 'number | string',
+		Schema: {
+			typeName: 'Schema',
+			importSource: './schema',
+		},
 	},
 })
 generator.generate()

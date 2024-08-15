@@ -1,11 +1,12 @@
 import { Stage } from '../../dtos'
 import { DatabaseContext } from '../../database'
-import { Schema } from '@contember/schema'
 import { ExecutionResult } from 'graphql'
 import { DatabaseMetadata } from '@contember/database'
+import { Schema } from '@contember/schema'
 
 export interface ContentQueryExecutorContext {
-	schema: Schema & { id: number }
+	schema: Schema
+	schemaMeta: { id: number }
 	identity: { id: string }
 	db: DatabaseContext
 	stage: Stage

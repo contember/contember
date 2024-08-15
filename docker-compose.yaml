@@ -66,6 +66,7 @@ services:
       - .:/src:cached
     command:
       - bun
+      - "--watch"
       - "--conditions=typescript"
       - ./packages/engine-server/src/start.ts
     healthcheck:

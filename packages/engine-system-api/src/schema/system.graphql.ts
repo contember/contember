@@ -58,7 +58,7 @@ const schema: DocumentNode = gql`
 
 	input EventFilterRow {
 		tableName: String!
-		primaryKey: [PrimaryKey!]!
+		primaryKey: [PrimaryKey]!
 	}
 
 	interface Event {

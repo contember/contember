@@ -39,8 +39,8 @@ const isReadonlyArray = (arr: any): arr is readonly any[] => Array.isArray(arr)
 export class ConditionBuilder {
 	private constructor(public readonly expressions: Literal[]) {}
 
-	public static create() {
-		return new ConditionBuilder([])
+	public static create(expressions: Literal[] = []) {
+		return new ConditionBuilder(expressions)
 	}
 
 	public static process(condition: ConditionExpression): ConditionBuilder {

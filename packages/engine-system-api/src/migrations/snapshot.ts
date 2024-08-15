@@ -168,7 +168,8 @@ CREATE INDEX "event_data_created" ON "event_data" USING "btree" ("created_at");
 CREATE INDEX "system_event2_table_name" ON "event_data" USING "btree" ("table_name");
 CREATE INDEX "system_event2_transaction" ON "event_data" USING "btree" ("transaction_id");
 CREATE INDEX "system_event2_type" ON "event_data" USING "btree" ("type");
-CREATE INDEX "system_event_row_id" ON "event_data" USING "btree" ("row_ids");
+CREATE INDEX "system_event_data_row_id_0" ON "event_data" USING "btree" ((("row_ids" -> 0)));
+CREATE INDEX "system_event_data_row_id_1" ON "event_data" USING "btree" ((("row_ids" -> 1)));
 CREATE INDEX "system_schema_migration_version" ON "schema_migration" USING "btree" ("version");
 CREATE INDEX "transaction_applied" ON "stage_transaction" USING "btree" ("applied_at");
 ALTER TABLE ONLY "event_data"

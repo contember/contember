@@ -1,39 +1,40 @@
 import { Model } from '@contember/schema'
-import { EntityConstructor, Interface, RelationTarget } from '../types'
+import { EntityConstructor, RelationTarget } from '../types'
 import { CreateFieldContext, FieldDefinition } from './FieldDefinition'
 
-export class OneHasOneDefinitionImpl extends FieldDefinition<OneHasOneDefinitionOptions> {
+export class OneHasOneDefinition extends FieldDefinition<OneHasOneDefinitionOptions> {
 	type = 'OneHasOneDefinition' as const
 
-	inversedBy(inversedBy: string): Interface<OneHasOneDefinition> {
+
+	inversedBy(inversedBy: string): OneHasOneDefinition {
 		return this.withOption('inversedBy', inversedBy)
 	}
 
-	joiningColumn(columnName: string): Interface<OneHasOneDefinition> {
+	joiningColumn(columnName: string): OneHasOneDefinition {
 		return this.withOption('joiningColumn', { ...this.joiningColumn, columnName })
 	}
 
-	onDelete(onDelete: Model.OnDelete | `${Model.OnDelete}`): Interface<OneHasOneDefinition> {
+	onDelete(onDelete: Model.OnDelete | `${Model.OnDelete}`): OneHasOneDefinition {
 		return this.withOption('joiningColumn', { ...this.joiningColumn, onDelete: onDelete as Model.OnDelete })
 	}
 
-	cascadeOnDelete(): Interface<OneHasOneDefinition> {
+	cascadeOnDelete(): OneHasOneDefinition {
 		return this.withOption('joiningColumn', { ...this.options.joiningColumn, onDelete: Model.OnDelete.cascade })
 	}
 
-	setNullOnDelete(): Interface<OneHasOneDefinition> {
+	setNullOnDelete(): OneHasOneDefinition {
 		return this.withOption('joiningColumn', { ...this.options.joiningColumn, onDelete: Model.OnDelete.setNull })
 	}
 
-	restrictOnDelete(): Interface<OneHasOneDefinition> {
+	restrictOnDelete(): OneHasOneDefinition {
 		return this.withOption('joiningColumn', { ...this.options.joiningColumn, onDelete: Model.OnDelete.restrict })
 	}
 
-	notNull(): Interface<OneHasOneDefinition> {
+	notNull(): OneHasOneDefinition {
 		return this.withOption('nullable', false)
 	}
 
-	removeOrphan(): Interface<OneHasOneDefinition> {
+	removeOrphan(): OneHasOneDefinition {
 		return this.withOption('orphanRemoval', true)
 	}
 
@@ -57,12 +58,15 @@ export class OneHasOneDefinitionImpl extends FieldDefinition<OneHasOneDefinition
 			...(options.orphanRemoval ? { orphanRemoval: true } : {}),
 		}
 	}
+
+	protected withOption<K extends keyof OneHasOneDefinitionOptions>(key: K, value: OneHasOneDefinitionOptions[K]): OneHasOneDefinition {
+		return new OneHasOneDefinition({ ...this.options, [key]: value })
+	}
 }
 
-export type OneHasOneDefinition = Interface<OneHasOneDefinitionImpl>
 
 export function oneHasOne(target: EntityConstructor, inversedBy?: string): OneHasOneDefinition {
-	return new OneHasOneDefinitionImpl({ target, inversedBy })
+	return new OneHasOneDefinition({ target, inversedBy })
 }
 
 export type OneHasOneDefinitionOptions = {

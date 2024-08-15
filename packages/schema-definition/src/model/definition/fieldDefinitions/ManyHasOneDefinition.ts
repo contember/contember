@@ -1,35 +1,35 @@
-import { EntityConstructor, Interface, RelationTarget } from '../types'
+import { EntityConstructor,  RelationTarget } from '../types'
 import { Model } from '@contember/schema'
 import { CreateFieldContext, FieldDefinition } from './FieldDefinition'
 
-export class ManyHasOneDefinitionImpl extends FieldDefinition<ManyHasOneDefinitionOptions> {
+export class ManyHasOneDefinition extends FieldDefinition<ManyHasOneDefinitionOptions> {
 	type = 'ManyHasOneDefinition' as const
 
-	inversedBy(inversedBy: string): Interface<ManyHasOneDefinition> {
+	inversedBy(inversedBy: string): ManyHasOneDefinition {
 		return this.withOption('inversedBy', inversedBy)
 	}
 
-	joiningColumn(columnName: string): Interface<ManyHasOneDefinition> {
+	joiningColumn(columnName: string): ManyHasOneDefinition {
 		return this.withOption('joiningColumn', { ...this.options.joiningColumn, columnName })
 	}
 
-	onDelete(onDelete: Model.OnDelete | `${Model.OnDelete}`): Interface<ManyHasOneDefinition> {
+	onDelete(onDelete: Model.OnDelete | `${Model.OnDelete}`): ManyHasOneDefinition {
 		return this.withOption('joiningColumn', { ...this.options.joiningColumn, onDelete: onDelete as Model.OnDelete })
 	}
 
-	cascadeOnDelete(): Interface<ManyHasOneDefinition> {
+	cascadeOnDelete(): ManyHasOneDefinition {
 		return this.withOption('joiningColumn', { ...this.options.joiningColumn, onDelete: Model.OnDelete.cascade })
 	}
 
-	setNullOnDelete(): Interface<ManyHasOneDefinition> {
+	setNullOnDelete(): ManyHasOneDefinition {
 		return this.withOption('joiningColumn', { ...this.options.joiningColumn, onDelete: Model.OnDelete.setNull })
 	}
 
-	restrictOnDelete(): Interface<ManyHasOneDefinition> {
+	restrictOnDelete(): ManyHasOneDefinition {
 		return this.withOption('joiningColumn', { ...this.options.joiningColumn, onDelete: Model.OnDelete.restrict })
 	}
 
-	notNull(): Interface<ManyHasOneDefinition> {
+	notNull(): ManyHasOneDefinition {
 		return this.withOption('nullable', false)
 	}
 
@@ -51,12 +51,14 @@ export class ManyHasOneDefinitionImpl extends FieldDefinition<ManyHasOneDefiniti
 			},
 		}
 	}
+
+	protected withOption<K extends keyof ManyHasOneDefinitionOptions>(key: K, value: ManyHasOneDefinitionOptions[K]): ManyHasOneDefinition {
+		return new ManyHasOneDefinition({ ...this.options, [key]: value })
+	}
 }
 
-export type ManyHasOneDefinition = Interface<ManyHasOneDefinitionImpl>
-
 export function manyHasOne(target: EntityConstructor, inversedBy?: string): ManyHasOneDefinition {
-	return new ManyHasOneDefinitionImpl({ target, inversedBy })
+	return new ManyHasOneDefinition({ target, inversedBy })
 }
 
 export type ManyHasOneDefinitionOptions = {

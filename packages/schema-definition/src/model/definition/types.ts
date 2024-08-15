@@ -1,7 +1,6 @@
-import { FieldDefinition } from './fieldDefinitions'
 import { EntityConstructor } from '../../utils'
+import { FieldDefinition } from './fieldDefinitions'
 
-export type Interface<T> = { [P in keyof T]: T[P] }
 export type RelationTarget = EntityConstructor
-export type FieldsDefinition = Record<string, Interface<FieldDefinition<any>>>
+export type FieldsDefinition = Record<string, FieldDefinition<any>>
 export { type EntityConstructor }

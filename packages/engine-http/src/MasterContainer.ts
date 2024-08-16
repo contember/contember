@@ -9,7 +9,7 @@ import { ProjectContainerFactoryFactory } from './project'
 import { ProjectConfigResolver } from './config/projectConfigResolver'
 import { TenantConfigResolver } from './config/tenantConfigResolver'
 import { ProjectGroupContainerFactory } from './projectGroup/ProjectGroupContainer'
-import { MultiProjectGroupResolver, ProjectGroupResolver, SingleProjectGroupResolver } from './projectGroup/ProjectGroupResolver'
+import { ProjectGroupResolver } from './projectGroup/ProjectGroupResolver'
 import { Logger } from '@contember/logger'
 import { ExecutionContainerFactory, GraphQlSchemaBuilderFactory, PermissionFactory } from '@contember/engine-content-api'
 import { createProviders, Providers } from './providers'
@@ -148,15 +148,11 @@ export class MasterContainerFactory {
 			})
 			.addService('projectGroupContainer', ({ tenantConfigResolver, projectGroupContainerFactory }) =>
 				projectGroupContainerFactory.create({ slug: undefined, config: tenantConfigResolver(undefined, {}) }))
-			.addService('projectGroupResolver', ({ projectGroupContainer, serverConfig, projectGroupContainerResolver }): ProjectGroupResolver => {
-				if (!serverConfig.projectGroup) {
-					return new SingleProjectGroupResolver(projectGroupContainer)
-				}
-
+			.addService('projectGroupResolver', ({ serverConfig, projectGroupContainerResolver }): ProjectGroupResolver => {
 				const encryptionKey = serverConfig.projectGroup?.configEncryptionKey
 					? createSecretKey(Buffer.from(serverConfig.projectGroup?.configEncryptionKey, 'hex'))
 					: undefined
-				return new MultiProjectGroupResolver(
+				return new ProjectGroupResolver(
 					serverConfig.projectGroup?.domainMapping,
 					serverConfig.projectGroup?.configHeader,
 					serverConfig.projectGroup?.configEncryptionKey ? new CryptoWrapper(encryptionKey) : undefined,

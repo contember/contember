@@ -4,22 +4,7 @@ import { IncomingMessage } from 'node:http'
 import { ProjectGroupContainerResolver } from './ProjectGroupContainerResolver'
 import { HttpErrorResponse } from '../common'
 
-export interface ProjectGroupResolver {
-	resolveContainer({ request }: { request: IncomingMessage }): Promise<ProjectGroupContainer>
-}
-
-export class SingleProjectGroupResolver {
-	constructor(
-		private readonly projectGroupContainer: ProjectGroupContainer,
-	) {
-	}
-
-	resolveContainer(): Promise<ProjectGroupContainer> {
-		return Promise.resolve(this.projectGroupContainer)
-	}
-}
-
-export class MultiProjectGroupResolver implements ProjectGroupResolver {
+export class ProjectGroupResolver {
 	private groupRegex
 	private projectGroupConfigHeader
 

@@ -1,8 +1,8 @@
 import * as pathToRegexp from 'path-to-regexp'
 import { MatchFunction, PathFunction } from 'path-to-regexp'
 import { Environment } from '@contember/react-binding'
-import { RoutingContextValue } from './RoutingContext'
-import { RequestState } from './types'
+import { RequestState, RoutingContextValue } from '../../types'
+import { PageNotFound } from '../../PageNotFound'
 
 const matchFunctionsCache: Record<string, MatchFunction> = {}
 const pathFunctionsCache: Record<string, PathFunction> = {}
@@ -121,8 +121,3 @@ export const requestStateToPath = (routing: RoutingContextValue, request: Reques
 	return (prefix + pathSegment + querySegment) || '/'
 }
 
-export class PageNotFound extends Error {
-	constructor(reason?: string) {
-		super('Page not found' + (reason && ': ' + reason))
-	}
-}

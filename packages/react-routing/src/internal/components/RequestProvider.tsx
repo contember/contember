@@ -1,43 +1,9 @@
-import { createContext, FC, ReactNode, useCallback, useContext, useEffect, useRef, useState } from 'react'
-import { PageRequest, RequestParameters, RequestState } from './types'
-import { RoutingContextValue, useRouting } from './RoutingContext'
-import { pathToRequestState, requestStateToPath } from './urlMapper'
-import { createRequiredContext } from '@contember/react-utils'
+import { FC, ReactNode, useCallback, useEffect, useRef, useState } from 'react'
+import { RequestChangeEvent, RequestChangeHandler, RequestState } from '../../types'
+import { requestStateToPath } from '../utils/urlMapper'
+import { AddRequestListenerContext, CurrentRequestContext, PushRequestContext, useRouting } from '../../contexts'
+import { populateRequest } from '../utils/populateRequest'
 
-
-export const requestChangeFactory = <P extends RequestParameters>(pageName: string, parameters?: P) =>
-	(currentState: RequestState): PageRequest<P> => ({
-		pageName,
-		parameters: parameters ?? {} as P,
-		dimensions: currentState?.dimensions || {},
-	})
-
-
-export const CurrentRequestContext = createContext<RequestState>(null)
-CurrentRequestContext.displayName = 'CurrentRequestContext'
-
-export const PushRequestContext = createContext<(req: RequestState) => void>(() => {})
-PushRequestContext.displayName = 'PushRequestContext'
-
-export class RequestChangeEvent {
-	constructor(
-		public request: RequestState | undefined,
-	) {}
-}
-export type RequestChangeHandler = (event: RequestChangeEvent) => void
-
-const [AddRequestListenerContext, useAddRequestListenerContext] = createRequiredContext<(handler: RequestChangeHandler) => () => void>('AddRequestListenerContext')
-
-export const useCurrentRequest = () => useContext(CurrentRequestContext)
-export const usePushRequest = () => useContext(PushRequestContext)
-
-export const useAddRequestChangeListener = (listener: RequestChangeHandler) => {
-	const add = useAddRequestListenerContext()
-	useEffect(() => {
-		const remove = add(listener)
-		return remove
-	}, [add, listener])
-}
 
 export const RequestProvider: FC<{ children: ReactNode }> = ({ children }) => {
 	const routing = useRouting()
@@ -51,7 +17,7 @@ export const RequestProvider: FC<{ children: ReactNode }> = ({ children }) => {
 	requestRef.current = request
 
 	const fireListeners = useCallback(async (request: RequestState) => {
-		const event = new RequestChangeEvent(request)
+		const event: RequestChangeEvent = { request }
 		for (const listener of listenersRef.current) {
 			await listener(event)
 			if (event.request === undefined) {
@@ -124,17 +90,3 @@ export const RequestProvider: FC<{ children: ReactNode }> = ({ children }) => {
 	)
 }
 
-export const populateRequest = (routing: RoutingContextValue, location: Location): RequestState => {
-	const request = pathToRequestState(routing, location.pathname, location.search)
-
-	// Replace with canonical version of the url
-	if (request !== null) {
-		const canonicalPath = requestStateToPath(routing, request)
-
-		if (canonicalPath !== location.pathname + location.search) {
-			window.history.replaceState({}, document.title, canonicalPath)
-		}
-	}
-
-	return request
-}

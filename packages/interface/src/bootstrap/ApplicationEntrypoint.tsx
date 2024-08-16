@@ -1,7 +1,7 @@
 import { Environment, EnvironmentContext, EnvironmentExtensionProvider } from '@contember/react-binding'
 import { ContemberClient, ContemberClientProps } from '@contember/react-client'
 import { ReactNode } from 'react'
-import { RequestProvider, RouteMap, RoutingContext, RoutingContextValue, RoutingProvider, SelectedDimension } from '@contember/react-routing'
+import { RouteMap, RoutingContextValue, RoutingProvider } from '@contember/react-routing'
 import { DataViewPageNameKeyProvider } from './DataViewPageNameKeyProvider'
 import { IdentityEnvironmentProvider, IdentityProvider, projectEnvironmentExtension } from '@contember/react-identity'
 

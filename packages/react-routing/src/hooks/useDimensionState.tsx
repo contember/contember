@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useCurrentRequest } from '../RequestContext'
+import { useCurrentRequest } from '../contexts'
 import { useRedirect } from './useRedirect'
 import { StateStorageOrName, useStoredState } from '@contember/react-utils'
 

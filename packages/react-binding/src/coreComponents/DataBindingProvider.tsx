@@ -1,7 +1,5 @@
 import { ComponentType, createElement, memo, ReactElement, ReactNode } from 'react'
 import { AccessorTree, AccessorTreeState, useDataBinding } from '../accessorTree'
-import { TreeRootIdProvider } from '../accessorPropagation'
-import { EntityKeyContext } from '../accessorPropagation/EntityKeyContext'
 
 export type DataBindingProviderStateComponent<StateProps> = {
 	stateComponent: ComponentType<StateProps & DataBindingStateComponentProps>
@@ -46,25 +44,8 @@ export const DataBindingProvider = memo(function DataBindingProvider<StateProps 
 		props.children,
 	)
 	return (
-		<DataBindingInnerProvider accessorTreeState={accessorTreeState}>
+		<AccessorTree state={accessorTreeState}>
 			{children}
-		</DataBindingInnerProvider>
+		</AccessorTree>
 	)
 }) as <StateProps>(props: DataBindingProviderProps<StateProps>) => ReactElement
-
-const DataBindingInnerProvider = (
-	{ accessorTreeState, children }: {
-		children: ReactNode
-		accessorTreeState: AccessorTreeState
-	},
-) => {
-	return (
-		<TreeRootIdProvider treeRootId={undefined}>
-			<EntityKeyContext.Provider value={undefined}>
-				<AccessorTree state={accessorTreeState}>
-					{children}
-				</AccessorTree>
-			</EntityKeyContext.Provider>
-		</TreeRootIdProvider>
-	)
-}

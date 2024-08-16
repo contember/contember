@@ -1,9 +1,8 @@
-import { isSpecialLinkClick } from '@contember/utilities'
-import { memo, MouseEvent as ReactMouseEvent, ReactElement, ReactNode, useCallback } from 'react'
-import { RequestParameters, RoutingLinkTarget, RoutingParameterResolver } from './types'
-import { useRoutingLink } from './useRoutingLink'
+import { dataAttribute, isSpecialLinkClick } from '@contember/utilities'
+import { memo, MouseEvent as ReactMouseEvent, ReactElement, useCallback } from 'react'
+import { RequestParameters, RoutingLinkTarget, RoutingParameterResolver } from '../types'
+import { useRoutingLink } from '../hooks'
 import { Slot } from '@radix-ui/react-slot'
-import { dataAttribute } from '@contember/utilities'
 
 export interface RoutingLinkProps {
 	children?: ReactElement

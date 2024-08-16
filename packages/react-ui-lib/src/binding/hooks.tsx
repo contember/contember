@@ -1,7 +1,7 @@
-import { ReactNode, useCallback } from 'react'
+import { useCallback } from 'react'
 import { dict } from '../dict'
 import { ToastContent, useShowToast } from '../toast'
-import { ErrorAccessor, ErrorPersistResult, SuccessfulPersistResult, usePersist } from '@contember/interface'
+import { ErrorPersistResult, SuccessfulPersistResult, usePersist } from '@contember/interface'
 import { useErrorFormatter } from '../errors'
 
 export const usePersistWithFeedback = () => {

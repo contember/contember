@@ -38,6 +38,9 @@ export interface ApplicationEntrypointProps extends ContemberClientProps {
 }
 
 // @public (undocumented)
+export type BlockNavigationOnDirtyStateResult = 'save' | 'discard' | 'cancel';
+
+// @public (undocumented)
 export const ClearFieldTrigger: NamedExoticComponent<ClearFieldTriggerProps>;
 
 // @public (undocumented)
@@ -105,6 +108,12 @@ export const RedirectOnPersist: ({ to, parameters }: {
     to: RoutingLinkTarget;
     parameters?: RequestParameters;
 }) => null;
+
+// @public (undocumented)
+export const useBlockNavigationOnDirtyState: (handler: () => Promise<BlockNavigationOnDirtyStateResult>, options?: {
+    onPersistSuccess?: (result: SuccessfulPersistResult) => void;
+    onPersistError?: (result: ErrorPersistResult) => void;
+}) => void;
 
 // @public (undocumented)
 export const useIsApplicationOutdated: ({ checkIntervalMs }?: {

@@ -1,6 +1,6 @@
-import { RoutingLinkTarget } from '../types'
 import { Environment, QueryLanguage } from '@contember/react-binding'
-import { RoutingParameter } from '../RoutingParameter'
+import { RoutingLinkTarget } from '../../types'
+import { RoutingParameter } from '../../dto'
 
 export type LinkTarget = RoutingLinkTarget
 

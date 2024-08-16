@@ -1,9 +1,9 @@
 import { ReactElement, useCallback, useMemo } from 'react'
-import { Link } from './Link'
 import { RequestChange } from '../types'
 import { dataAttribute } from '@contember/utilities'
 import { Component } from '@contember/react-binding'
-import { useCurrentRequest } from '../RequestContext'
+import { useCurrentRequest } from '../contexts'
+import { Link } from './Link'
 
 export interface DimensionLinkProps {
 	dimension: string

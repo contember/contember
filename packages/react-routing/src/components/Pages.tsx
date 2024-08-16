@@ -1,20 +1,6 @@
-import {
-	DataBindingStateComponentProps,
-	EnvironmentContext,
-	useEnvironment,
-} from '@contember/react-binding'
-import {
-	ComponentType,
-	Fragment,
-	ReactElement,
-	ReactNode,
-	Suspense,
-	isValidElement,
-	lazy,
-	useMemo,
-	useRef,
-} from 'react'
-import { useCurrentRequest } from './RequestContext'
+import { EnvironmentContext, useEnvironment } from '@contember/react-binding'
+import { ComponentType, Fragment, isValidElement, lazy, ReactElement, ReactNode, Suspense, useMemo, useRef } from 'react'
+import { useCurrentRequest } from '../contexts'
 
 export interface PageProvider<P> {
 	getPageName(props: P, fallback?: string): string
@@ -50,41 +36,6 @@ export interface PagesProps {
 }
 
 type PageActionHandler = ComponentType<{ action?: string }>
-
-function findPrefix(strings: string[]): string {
-	if (strings.length === 0) {
-		return ''
-	}
-
-	const sorted = [...strings].sort()
-	const a = sorted[0]
-	const b = sorted[sorted.length - 1]
-
-	let i = 0
-	let j = 0
-
-	while (j < a.length && a.charAt(j) === b.charAt(j)) {
-		j++
-
-		if (a.charAt(j) === '/') {
-			i = j + 1
-		}
-	}
-
-	return a.substring(0, i)
-}
-
-function disallowAction(Component: ComponentType): PageActionHandler {
-	return (props: { action?: string }) => {
-		const pageName = useCurrentRequest()?.pageName
-
-		if (props.action !== undefined) {
-			throw new Error(`No such page as ${pageName}.`)
-		}
-
-		return <Component />
-	}
-}
 
 /**
  * Pages element specifies collection of pages (component Page or component with getPageName static method).
@@ -203,6 +154,41 @@ export const Pages = ({ children, layout, ErrorBoundary = Fragment, suspenseFall
 			</Layout>
 		</EnvironmentContext.Provider>
 	)
+}
+
+function findPrefix(strings: string[]): string {
+	if (strings.length === 0) {
+		return ''
+	}
+
+	const sorted = [...strings].sort()
+	const a = sorted[0]
+	const b = sorted[sorted.length - 1]
+
+	let i = 0
+	let j = 0
+
+	while (j < a.length && a.charAt(j) === b.charAt(j)) {
+		j++
+
+		if (a.charAt(j) === '/') {
+			i = j + 1
+		}
+	}
+
+	return a.substring(0, i)
+}
+
+function disallowAction(Component: ComponentType): PageActionHandler {
+	return (props: { action?: string }) => {
+		const pageName = useCurrentRequest()?.pageName
+
+		if (props.action !== undefined) {
+			throw new Error(`No such page as ${pageName}.`)
+		}
+
+		return <Component />
+	}
 }
 
 

@@ -1,12 +1,14 @@
 import { ReactNode, useEffect } from 'react'
 import { AccessorTreeState, DataBindingProvider } from '@contember/interface'
 import { Loader } from '../ui/loader'
+import { NavigationGuardDialog } from './navigation-guard-dialog'
 
 export const Binding = ({ children }: {
 	children: ReactNode
 }) => {
 	return (
 		<DataBindingProvider stateComponent={BindingStateRenderer}>
+			<NavigationGuardDialog />
 			{children}
 		</DataBindingProvider>
 	)

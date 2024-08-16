@@ -1,24 +1,28 @@
 import { Model } from '@contember/schema'
-import { EntityConstructor, Interface, RelationTarget } from '../types'
+import { EntityConstructor, RelationTarget } from '../types'
 import { CreateFieldContext, FieldDefinition } from './FieldDefinition'
 
-export class ManyHasManyDefinitionImpl extends FieldDefinition<ManyHasManyDefinitionOptions> {
+export class ManyHasManyDefinition extends FieldDefinition<ManyHasManyDefinitionOptions> {
 	type = 'ManyHasManyDefinition' as const
 
-	inversedBy(inversedBy: string): Interface<ManyHasManyDefinition> {
+	inversedBy(inversedBy: string): ManyHasManyDefinition {
 		return this.withOption('inversedBy', inversedBy)
 	}
 
-	joiningTable(joiningTable: Partial<Model.JoiningTable>): Interface<ManyHasManyDefinition> {
+	joiningTable(joiningTable: Partial<Model.JoiningTable>): ManyHasManyDefinition {
 		return this.withOption('joiningTable', joiningTable)
 	}
 
 	orderBy(
 		field: string | string[],
 		direction: Model.OrderDirection | `${Model.OrderDirection}` = Model.OrderDirection.asc,
-	): Interface<ManyHasManyDefinition> {
+	): ManyHasManyDefinition {
 		const path = typeof field === 'string' ? [field] : field
 		return this.withOption('orderBy', [...(this.options.orderBy || []), { path, direction: direction as Model.OrderDirection }])
+	}
+
+	public description(description: string): Interface<ManyHasManyDefinition> {
+		return this.withOption('description', description)
 	}
 
 	createField({ name, conventions, entityName, entityRegistry, strictDefinitionValidator }: CreateFieldContext): Model.AnyField {
@@ -46,14 +50,19 @@ export class ManyHasManyDefinitionImpl extends FieldDefinition<ManyHasManyDefini
 			target: entityRegistry.getName(options.target),
 			joiningTable: joiningTable,
 			...(options.orderBy ? { orderBy: options.orderBy } : {}),
+			...(options.description ? { description: options.description } : {}),
 		}
+	}
+
+
+	protected withOption<K extends keyof ManyHasManyDefinitionOptions>(key: K, value: ManyHasManyDefinitionOptions[K]): ManyHasManyDefinition {
+		return new ManyHasManyDefinition({ ...this.options, [key]: value })
 	}
 }
 
-export type ManyHasManyDefinition = Interface<ManyHasManyDefinitionImpl>
 
 export function manyHasMany(target: EntityConstructor, inversedBy?: string): ManyHasManyDefinition {
-	return new ManyHasManyDefinitionImpl({ target, inversedBy })
+	return new ManyHasManyDefinition({ target, inversedBy })
 }
 
 export type ManyHasManyDefinitionOptions = {
@@ -61,4 +70,5 @@ export type ManyHasManyDefinitionOptions = {
 	inversedBy?: string
 	joiningTable?: Partial<Model.JoiningTable>
 	orderBy?: Model.OrderBy[]
+	description?: string
 }

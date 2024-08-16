@@ -1,0 +1,58 @@
+{
+	"formatVersion": 5,
+	"modifications": [
+		{
+			"modification": "updateColumnDefinition",
+			"entityName": "GridArticle",
+			"fieldName": "title",
+			"definition": {
+				"columnType": "text",
+				"nullable": true,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "updateColumnDefinition",
+			"entityName": "GridArticle",
+			"fieldName": "state",
+			"definition": {
+				"columnType": "GridArticleState",
+				"nullable": true,
+				"type": "Enum"
+			}
+		},
+		{
+			"modification": "updateColumnDefinition",
+			"entityName": "GridArticle",
+			"fieldName": "locked",
+			"definition": {
+				"columnType": "boolean",
+				"nullable": true,
+				"type": "Bool",
+				"default": false
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "GridArticle",
+			"field": {
+				"name": "views",
+				"columnName": "views",
+				"columnType": "integer",
+				"nullable": true,
+				"type": "Integer"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "GridArticle",
+			"field": {
+				"name": "publishDate",
+				"columnName": "publish_date",
+				"columnType": "date",
+				"nullable": true,
+				"type": "Date"
+			}
+		}
+	]
+}

@@ -3,7 +3,7 @@ import { test } from 'vitest'
 import { execute } from '../../../../../src/test'
 import { GQL, SQL } from '../../../../../src/tags'
 import { PermissionFactory } from '../../../../../../src'
-import { testUuid } from '@contember/engine-api-tester'
+import { testUuid } from '../../../../../src/testUuid'
 
 
 namespace RelationAclManyHasOne {

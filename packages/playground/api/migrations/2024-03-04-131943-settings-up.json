@@ -1,0 +1,19 @@
+{
+	"formatVersion": 5,
+	"modifications": [
+		{
+			"modification": "updateSettings",
+			"op": "set",
+			"key": "useExistsInHasManyFilter",
+			"value": true
+		},
+		{
+			"modification": "updateSettings",
+			"op": "set",
+			"key": "tenant",
+			"value": {
+				"inviteExpirationMinutes": 10080
+			}
+		}
+	]
+}

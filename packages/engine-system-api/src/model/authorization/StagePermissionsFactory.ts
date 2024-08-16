@@ -1,15 +1,15 @@
-import { Acl, Schema } from '@contember/schema'
+import { Acl } from '@contember/schema'
 import { Permissions } from '@contember/authorization'
-import { filterSchemaByStage } from '@contember/schema-utils'
 import { AuthorizationActions } from './AuthorizationActions'
+import { SchemaGetter } from '../SchemaGetter'
 
 export class StagePermissionsFactory {
-	constructor(private readonly schema: Schema) {}
+	constructor(private readonly getSchema: SchemaGetter) {}
 
-	public create(stage: string): Permissions {
+	public async create(stage: string): Promise<Permissions> {
 		const permissions = new Permissions()
 
-		const filteredSchema = filterSchemaByStage(this.schema, stage)
+		const filteredSchema = await this.getSchema({ stage })
 
 		const rolePermissions = this.createRolePermissions(filteredSchema.acl)
 		Object.entries(rolePermissions).forEach(([role, value]) => {

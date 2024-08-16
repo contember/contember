@@ -5,6 +5,7 @@ const schema: DocumentNode = gql`
 	scalar DateTime
 	scalar Json
 	scalar PrimaryKey
+	scalar Schema
 
 	schema {
 		query: Query
@@ -15,6 +16,7 @@ const schema: DocumentNode = gql`
 		stages: [Stage!]!
 		executedMigrations(version: String): [ExecutedMigration!]!
 		events(args: EventsArgs): [Event!]!
+		schema: Schema!
 	}
 
 	type Mutation {
@@ -56,7 +58,7 @@ const schema: DocumentNode = gql`
 
 	input EventFilterRow {
 		tableName: String!
-		primaryKey: [PrimaryKey!]!
+		primaryKey: [PrimaryKey]!
 	}
 
 	interface Event {

@@ -1,0 +1,50 @@
+{
+	"formatVersion": 5,
+	"modifications": [
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "RepeaterItem",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "repeater_item",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": [],
+				"indexes": [],
+				"eventLog": {
+					"enabled": true
+				}
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "RepeaterItem",
+			"field": {
+				"name": "title",
+				"columnName": "title",
+				"columnType": "text",
+				"nullable": false,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "RepeaterItem",
+			"field": {
+				"name": "order",
+				"columnName": "order",
+				"columnType": "integer",
+				"nullable": true,
+				"type": "Integer"
+			}
+		}
+	]
+}

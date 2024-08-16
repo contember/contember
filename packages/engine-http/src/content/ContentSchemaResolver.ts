@@ -1,28 +1,44 @@
-import { DatabaseContext, SchemaVersionBuilder, VersionedSchema } from '@contember/engine-system-api'
-import { filterSchemaByStage } from '@contember/schema-utils'
-
+import { DatabaseContext, SchemaProvider, SchemaWithMeta } from '@contember/engine-system-api'
+import { filterSchemaByStage, normalizeSchema } from '@contember/schema-utils'
+import { Schema } from '@contember/schema'
+import { ContentApiSpecificCache } from './ContentApiSpecificCache'
 
 export class ContentSchemaResolver {
-	private baseSchemaCache: VersionedSchema | undefined
-	private stageSchemaCache: { [stage: string]: VersionedSchema } = {}
+	private baseSchemaCache: SchemaWithMeta | null = null
 
-	constructor(private readonly schemaVersionBuilder: SchemaVersionBuilder) {
+	constructor(private readonly schemaProvider: SchemaProvider) {
 	}
 
 	public clearCache() {
-		this.baseSchemaCache = undefined
-		this.stageSchemaCache = {}
+		this.baseSchemaCache = null
 	}
 
-	public async getSchema(db: DatabaseContext, stage?: string): Promise<VersionedSchema> {
+	public async getSchema({ db, stage, normalize }: {
+		db: DatabaseContext
+		normalize?: boolean
+		stage?: string
+	}): Promise<SchemaWithMeta> {
 		const prevBaseSchema = this.baseSchemaCache
-		this.baseSchemaCache = await this.schemaVersionBuilder.buildSchema(db, prevBaseSchema)
-		if (prevBaseSchema !== this.baseSchemaCache) {
-			this.stageSchemaCache = {}
+		this.baseSchemaCache = await this.schemaProvider.fetch({ db, currentSchema: prevBaseSchema })
+		const finalSchema = getSchema(this.baseSchemaCache.schema, { stage, normalize })
+		return {
+			schema: finalSchema,
+			meta: this.baseSchemaCache.meta,
 		}
-		if (!stage) {
-			return this.baseSchemaCache
-		}
-		return this.stageSchemaCache[stage] ??= filterSchemaByStage(this.baseSchemaCache, stage)
 	}
+}
+
+const cache = new ContentApiSpecificCache<Schema, Schema>({})
+const getSchema = (schema: Schema, options: { stage?: string; normalize?: boolean }) => {
+	const cacheKey = [options.stage, options.normalize].join('\xff')
+	return cache.fetch(schema, cacheKey, () => {
+		const result = schema
+		if (options.normalize) {
+			return normalizeSchema(result)
+		}
+		if (options.stage) {
+			return filterSchemaByStage(result, options.stage)
+		}
+		return result
+	})
 }

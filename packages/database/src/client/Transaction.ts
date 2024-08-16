@@ -2,6 +2,7 @@ import { Connection } from './Connection'
 import { EventManager } from './EventManager'
 import { wrapIdentifier } from '../utils'
 import { Notification } from 'pg'
+import { DatabaseError, CannotCommitError } from './errors'
 
 export class Transaction implements Connection.TransactionLike {
 	public get isClosed(): boolean {
@@ -58,12 +59,16 @@ export class Transaction implements Connection.TransactionLike {
 	}
 
 	async commit(): Promise<void> {
-		await this.close('COMMIT')
+		const commitResult = await this.close('COMMIT')
+		if (commitResult.command !== 'COMMIT') {
+			throw new CannotCommitError('Unexpected commit result: ' + commitResult.command)
+		}
 	}
 
 	private async close(command: string) {
-		await this.query(command)
+		const result = await this.query(command)
 		this.state.close()
+		return result
 	}
 }
 

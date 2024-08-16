@@ -16,7 +16,7 @@ it('support nested scope', async () => {
 
 it('another scope acquires new connection', async () => {
 	const [connection, end] = createConnectionMockAlt(
-		[{ sql: 'SELECT 1', timeout: 5 }, { sql: 'SELECT 2', timeout: 5 }],
+		[{ sql: 'SELECT 1', timeout: 5  }, { sql: 'SELECT 2', timeout: 5 }],
 		[{ sql: 'SELECT 3', timeout: 5 }],
 	)
 
@@ -55,7 +55,7 @@ it('another nested scope waits for connection in a transaction', async () => {
 			{ sql: 'SELECT 1', timeout: 5 },
 			{ sql: 'SELECT 2', timeout: 5 },
 			{ sql: 'SELECT 3', timeout: 5 },
-			{ sql: 'COMMIT', timeout: 5 },
+			{ sql: 'COMMIT', timeout: 5, result: { command: 'COMMIT' } },
 		],
 	)
 	await connection.transaction(async c1 => {
@@ -111,7 +111,7 @@ it('support nested transaction / savepoints', async () => {
 		{ sql: 'SELECT 8' },
 		{ sql: 'RELEASE SAVEPOINT "savepoint_3"' },
 		{ sql: 'SELECT 9' },
-		{ sql: 'COMMIT' },
+		{ sql: 'COMMIT', result: { command: 'COMMIT' } },
 	],
 	)
 

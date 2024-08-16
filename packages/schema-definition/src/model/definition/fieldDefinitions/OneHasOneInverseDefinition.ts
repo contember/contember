@@ -1,13 +1,16 @@
 import { Model } from '@contember/schema'
-import { EntityConstructor, Interface } from '../types'
+import { EntityConstructor } from '../types'
 import { CreateFieldContext, FieldDefinition } from './FieldDefinition'
-import { RelationTarget } from '../types'
 
-export class OneHasOneInverseDefinitionImpl extends FieldDefinition<OneHasOneInverseDefinitionOptions> {
+export class OneHasOneInverseDefinition extends FieldDefinition<OneHasOneInverseDefinitionOptions> {
 	type = 'OneHasOneInverseDefinition' as const
 
-	notNull(): Interface<OneHasOneInverseDefinition> {
+	notNull() {
 		return this.withOption('nullable', false)
+	}
+
+	public description(description: string): Interface<OneHasOneInverseDefinition> {
+		return this.withOption('description', description)
 	}
 
 	createField({ name, conventions, entityRegistry }: CreateFieldContext): Model.AnyField {
@@ -18,25 +21,24 @@ export class OneHasOneInverseDefinitionImpl extends FieldDefinition<OneHasOneInv
 			target: entityRegistry.getName(options.target),
 			type: Model.RelationType.OneHasOne,
 			nullable: options.nullable === undefined ? true : options.nullable,
+			...(options.description ? { description: options.description } : {}),
 		}
+	}
+
+	protected withOption<K extends keyof OneHasOneInverseDefinitionOptions>(this: any, key: K, value: OneHasOneInverseDefinitionOptions[K]): OneHasOneInverseDefinition {
+		return new this.constructor({ ...this.options, [key]: value })
 	}
 }
 
-export type OneHasOneInverseDefinition = Interface<OneHasOneInverseDefinitionImpl>
-/** @deprecated use OneHasOneInverseDefinition */
-export type OneHasOneInversedDefinition = Interface<OneHasOneInverseDefinitionImpl>
 
 export function oneHasOneInverse(target: EntityConstructor, ownedBy: string): OneHasOneInverseDefinition {
-	return new OneHasOneInverseDefinitionImpl({ target, ownedBy })
+	return new OneHasOneInverseDefinition({ target, ownedBy })
 }
 
-/** @deprecated use oneHasOneInverse */
-export function oneHasOneInversed(target: EntityConstructor, ownedBy: string): OneHasOneInverseDefinition {
-	return new OneHasOneInverseDefinitionImpl({ target, ownedBy })
-}
 
 export type OneHasOneInverseDefinitionOptions = {
 	target: RelationTarget
 	ownedBy: string
 	nullable?: boolean
+	description?: string
 }

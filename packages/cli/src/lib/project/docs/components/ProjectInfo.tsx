@@ -17,7 +17,7 @@ export const ProjectInfo = (props: { schema: Schema; projectName: string }) => {
 						<h2 class={'font-semibold text-gray-500 mb-1'}>Entities</h2>
 						<ul class={'text-sm'}>
 							{Object.values(props.schema.model.entities).map(entity => (
-								<li>
+								<li key={entity.name}>
 									<EntityLink entity={entity.name} />
 								</li>
 							))}
@@ -27,7 +27,7 @@ export const ProjectInfo = (props: { schema: Schema; projectName: string }) => {
 						<h2 class={'font-semibold text-gray-500 mb-1'}>Enums</h2>
 						<ul class={'text-sm'}>
 							{Object.entries(props.schema.model.enums).map(([name, values]) => (
-								<li class={'mb-2'}>
+								<li class={'mb-2'} key={name}>
 									{name} <br />
 									<span class={'text-gray-700 ml-4'}>
 										{values.join(', ')}
@@ -41,7 +41,7 @@ export const ProjectInfo = (props: { schema: Schema; projectName: string }) => {
 
 			</div>
 			{Object.values(props.schema.model.entities).map(entity => (
-				<EntityInfo entity={entity} schema={props.schema} references={references}/>
+				<EntityInfo key={entity.name} entity={entity} schema={props.schema} references={references}/>
 			))}
 		</div>
 	)

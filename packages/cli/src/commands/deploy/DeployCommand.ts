@@ -28,7 +28,7 @@ export class DeployCommand extends Command<Args, Options> {
 		private readonly fs: FileSystem,
 		private readonly remoteProjectProvider: RemoteProjectProvider,
 		private readonly remoteProjectResolver: RemoteProjectResolver,
-		private readonly workspace: Promise<Workspace>,
+		private readonly workspace: Workspace,
 	) {
 		super()
 	}
@@ -59,7 +59,7 @@ export class DeployCommand extends Command<Args, Options> {
 		let adminEndpoint = input.getOption('admin')
 		const deployMigration = input.getOption('no-migrations') !== true
 		const yes = input.getOption('yes') === true
-		const projectAdminDistDir = (await this.workspace).adminDistDir
+		const projectAdminDistDir = this.workspace.adminDistDir
 		const deployAdmin = input.getOption('no-admin') !== true && !!adminEndpoint && !!projectAdminDistDir
 
 

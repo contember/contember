@@ -1,0 +1,205 @@
+{
+	"formatVersion": 5,
+	"modifications": [
+		{
+			"modification": "removeEntity",
+			"entityName": "LegacyEditorTextArea"
+		},
+		{
+			"modification": "createEnum",
+			"enumName": "EditorTextAreaUnique",
+			"values": [
+				"unique"
+			]
+		},
+		{
+			"modification": "createEnum",
+			"enumName": "PlateEditorContentUnique",
+			"values": [
+				"unique"
+			]
+		},
+		{
+			"modification": "updateEnum",
+			"enumName": "EditorReferenceType",
+			"values": [
+				"image",
+				"link",
+				"quote"
+			]
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"eventLog": {
+					"enabled": true
+				},
+				"name": "EditorTextArea",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "editor_text_area",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": [],
+				"indexes": []
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"eventLog": {
+					"enabled": true
+				},
+				"name": "PlateEditorContent",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "plate_editor_content",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": [],
+				"indexes": []
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "EditorTextArea",
+			"field": {
+				"name": "unique",
+				"columnName": "unique",
+				"columnType": "EditorTextAreaUnique",
+				"nullable": false,
+				"type": "Enum",
+				"default": "unique"
+			},
+			"fillValue": "unique"
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "EditorTextArea",
+			"field": {
+				"name": "data",
+				"columnName": "data",
+				"columnType": "text",
+				"nullable": false,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "PlateEditorContent",
+			"field": {
+				"name": "unique",
+				"columnName": "unique",
+				"columnType": "PlateEditorContentUnique",
+				"nullable": false,
+				"type": "Enum",
+				"default": "unique"
+			},
+			"fillValue": "unique"
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "PlateEditorContent",
+			"field": {
+				"name": "data",
+				"columnName": "data",
+				"columnType": "jsonb",
+				"nullable": false,
+				"type": "Json"
+			}
+		},
+		{
+			"modification": "createUniqueConstraint",
+			"entityName": "EditorTextArea",
+			"unique": {
+				"fields": [
+					"unique"
+				]
+			}
+		},
+		{
+			"modification": "createUniqueConstraint",
+			"entityName": "PlateEditorContent",
+			"unique": {
+				"fields": [
+					"unique"
+				]
+			}
+		},
+		{
+			"modification": "removeEnum",
+			"enumName": "LegacyEditorTextAreaUnique"
+		},
+		{
+			"modification": "patchAclSchema",
+			"patch": [
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/EditorTextArea",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"read": {
+								"id": true,
+								"unique": true,
+								"data": true
+							},
+							"create": {
+								"id": true,
+								"unique": true,
+								"data": true
+							},
+							"update": {
+								"id": true,
+								"unique": true,
+								"data": true
+							},
+							"delete": true,
+							"customPrimary": true
+						}
+					}
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/PlateEditorContent",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"read": {
+								"id": true,
+								"unique": true,
+								"data": true
+							},
+							"create": {
+								"id": true,
+								"unique": true,
+								"data": true
+							},
+							"update": {
+								"id": true,
+								"unique": true,
+								"data": true
+							},
+							"delete": true,
+							"customPrimary": true
+						}
+					}
+				}
+			]
+		}
+	]
+}

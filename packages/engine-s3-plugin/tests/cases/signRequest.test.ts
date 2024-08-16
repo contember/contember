@@ -1,7 +1,7 @@
 import { test, assert, expect } from 'vitest'
 import { S3ObjectAuthorizator, S3Service } from '../../src'
 
-const mocked = new Date('2021-07-02 17:22')
+const mocked = new Date('2021-07-02T17:22Z')
 const constantUuid = '9fce3907-ff2b-45bb-b4ce-eff5527dd315'
 const createS3Service = (bucket: string, prefix = '') => new S3Service(
 	{

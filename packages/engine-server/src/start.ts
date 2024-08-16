@@ -25,7 +25,7 @@ process.on('warning', message => {
 ;(async () => {
 	const isDebug = isDebugMode()
 
-	const version = getServerVersion()
+	const version = await getServerVersion()
 	printStartInfo({ version, isDebug }, logger)
 	const plugins = await loadPlugins()
 	const { serverConfig, projectConfigResolver, tenantConfigResolver } = await resolveServerConfig({ plugins, serverConfigSchema })
@@ -34,7 +34,7 @@ process.on('warning', message => {
 		process.exit(0)
 	}
 
-	const sentryhandler = createSentryLoggerHandler(serverConfig.logging.sentry?.dsn)
+	const sentryhandler = createSentryLoggerHandler(serverConfig.logging?.sentry?.dsn)
 	if (sentryhandler !== null) {
 		logger.addHandler(sentryhandler)
 	}

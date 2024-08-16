@@ -1,0 +1,15 @@
+{
+	"extends": "../../../tsconfig.settings.json",
+	"compilerOptions": {
+		"outDir": "../dist/types"
+	},
+	"references": [
+		{ "path": "../../react-binding/src" },
+		{ "path": "../../react-client/src" },
+		{ "path": "../../react-devbar/src" },
+		{ "path": "../../react-dataview/src" },
+		{ "path": "../../react-identity/src" },
+		{ "path": "../../react-routing/src" },
+		{ "path": "../../utilities/src" },
+	]
+}

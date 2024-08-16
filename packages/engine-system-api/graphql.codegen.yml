@@ -7,6 +7,8 @@ config:
   scalars:
     DateTime: Date
     Json: unknown
+    PrimaryKey: "string | number"
+    ContentSchema: unknown
 generates:
   ./src/schema/types.ts:
     config:

@@ -12,9 +12,9 @@ export class ActionsExecutionContainerHookFactory {
 
 	create(): ExecutionContainerHook {
 		return builder => {
-			return builder.setupService('mapperFactory', (mapperFactory, { whereBuilder, schema, pathFactory, systemSchema, providers, stage, project }) => {
+			return builder.setupService('mapperFactory', (mapperFactory, { whereBuilder, schema, pathFactory, systemSchema, providers, stage, project, schemaMeta }) => {
 				mapperFactory.hooks.push(mapper => {
-					const triggerPayloadPersister = new TriggerPayloadPersister(mapper, mapper.db.forSchema(systemSchema), providers, project.slug, stage.id, schema.id)
+					const triggerPayloadPersister = new TriggerPayloadPersister(mapper, mapper.db.forSchema(systemSchema), providers, project.slug, stage.id, schemaMeta.id)
 					const triggerPayloadBuilder = new TriggerPayloadBuilder(mapper)
 					const payloadManager = new TriggerPayloadManager(triggerPayloadBuilder, triggerPayloadPersister)
 					const changesFetcher = new TriggerIndirectChangesFetcher(mapper, whereBuilder, pathFactory)

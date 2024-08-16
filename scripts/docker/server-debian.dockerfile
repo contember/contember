@@ -1,5 +1,4 @@
 FROM node:20 as builder
-ARG SERVER_DIR
 
 WORKDIR /src
 COPY ./ ./
@@ -8,13 +7,13 @@ RUN test ! -f yarn.tar.gz || tar xf yarn.tar.gz -C "./.yarn/cache" .
 RUN /src/scripts/server/server-build.sh
 
 FROM node:20
-ARG LICENSE_FILE
 
 WORKDIR /src
 
 COPY --from=builder /src/server/server.js /src/
-COPY --from=builder /src/$SERVER_DIR/package.json /src/package.json
-COPY --from=builder /src/$LICENSE_FILE /src/
+COPY --from=builder /src/node_modules /src/node_modules
+COPY --from=builder /src/packages/engine-server/package.json /src/package.json
+COPY --from=builder /src/LICENSE /src/
 
 ENV NODE_ENV "production"
 ENV CONTEMBER_PORT 4000

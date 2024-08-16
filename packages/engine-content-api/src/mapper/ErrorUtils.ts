@@ -134,7 +134,7 @@ export const convertError = (
 	if (e instanceof Database.TransactionAbortedError) {
 		return new MutationSqlError([], e.originalMessage, [MutationResultHint.subSequentSqlError])
 	}
-	if (e instanceof Database.QueryError) {
+	if (e instanceof Database.QueryError || e instanceof Database.CannotCommitError) {
 		logger.error(e, { loc: 'convertError' })
 		return new MutationSqlError([], e.originalMessage, [MutationResultHint.sqlError])
 	}

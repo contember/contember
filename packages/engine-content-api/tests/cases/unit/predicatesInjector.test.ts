@@ -2,11 +2,10 @@ import { PermissionFactory, PredicateFactory, PredicatesInjector, VariableInject
 import { SchemaBuilder, SchemaDefinition as def, AclDefinition as acl, createSchema, PermissionsBuilder } from '@contember/schema-definition'
 import { Acl, Model } from '@contember/schema'
 import { describe, it, assert } from 'vitest'
-import { PermissionsFactory } from '@contember/engine-system-api/dist/src/model'
 import { WhereOptimizer } from '../../../src/mapper/select/optimizer/WhereOptimizer'
 import { ConditionOptimizer } from '../../../src/mapper/select/optimizer/ConditionOptimizer'
 import { acceptFieldVisitor, AllowAllPermissionFactory } from '@contember/schema-utils'
-import { testUuid } from '@contember/engine-api-tester'
+import { testUuid } from '../../src/testUuid'
 
 
 

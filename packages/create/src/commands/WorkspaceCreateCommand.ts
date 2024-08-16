@@ -27,7 +27,7 @@ export class WorkspaceCreateCommand extends Command<Args, Options> {
 		const workspaceName = input.getArgument('workspaceName')
 		const workspaceDirectory = join(process.cwd(), workspaceName)
 		await this.templateInstaller.installTemplate('@contember/template-workspace', workspaceDirectory, {
-			version: getPackageVersion(),
+			version: await getPackageVersion(),
 			projectName: workspaceName,
 		})
 		// eslint-disable-next-line no-console

@@ -1,13 +1,12 @@
 {
   "name": "@contember/cli",
-  "version": "1.4.0-rc.4",
+  "version": "2.0.0-alpha.12",
   "license": "Apache-2.0",
   "bin": {
-    "contember": "./dist/src/run.js"
+    "contember": "./dist/production/run.js"
   },
   "scripts": {
-    "build": "tailwindcss -i src/lib/project/docs/resources/style.css -o ./dist/src/utils/project/resources/out.css",
-    "test": "echo 'No tests'"
+    "build": "tailwindcss -i src/lib/project/docs/resources/style.css -o ./dist/src/utils/project/resources/out.css"
   },
   "devDependencies": {
     "@types/fs-extra": "^11.0.4",
@@ -39,6 +38,7 @@
     "graphql": "^16.8.1",
     "graphql-request": "^6.1.0",
     "js-yaml": "^4.1.0",
+    "lodash-es": "^4.17.21",
     "pg": "^8.11.3",
     "preact": "^10.19.2",
     "preact-render-to-string": "^6.3.1",

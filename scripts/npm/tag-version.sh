@@ -27,8 +27,8 @@ if [[ -n $(git status --porcelain) ]]; then
 fi
 
 current_branch=$(git symbolic-ref --short HEAD)
-if [[ "$current_branch" != "master" && ! "$current_branch" =~ ^v[0-9]+\.[0-9]+$ ]]; then
-    echo "Error: You must be on either the master branch or a version branch (e.g., v1.2)."
+if [[ "$current_branch" != "main" && ! "$current_branch" =~ ^v[0-9]+\.[0-9]+$ ]]; then
+    echo "Error: You must be on either the main branch or a version branch (e.g., v1.2)."
     exit 1
 fi
 

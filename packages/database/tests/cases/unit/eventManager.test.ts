@@ -27,7 +27,7 @@ test('event manager: connection and client with transaction', async () => {
 	const [connection, end] = createConnectionMockAlt([
 		{ sql: 'BEGIN' },
 		{ sql: 'SELECT 1' },
-		{ sql: 'COMMIT' },
+		{ sql: 'COMMIT', result: { command: 'COMMIT' } },
 		{ sql: 'SELECT 2' },
 		{ sql: 'SELECT 3' },
 	])
@@ -96,7 +96,7 @@ test('event manager: connection and client with transaction and savepoint', asyn
 		{ sql: 'SAVEPOINT "savepoint_1"' },
 		{ sql: 'SELECT 2' },
 		{ sql: 'RELEASE SAVEPOINT "savepoint_1"' },
-		{ sql: 'COMMIT' },
+		{ sql: 'COMMIT', result: { command: 'COMMIT' } },
 		{ sql: 'SELECT 3' },
 		{ sql: 'SELECT 4' },
 	])

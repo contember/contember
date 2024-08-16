@@ -1,0 +1,198 @@
+---
+title: Data handling with GraphQL
+toc_max_heading_level: 4
+---
+
+import DocsCard from '../../src/components/global/DocsCard';
+import DocsCards from '../../src/components/global/DocsCards';
+
+[GraphQL](https://graphql.org/) is a query language for APIs and a runtime for executing those queries with your existing data. It's designed to give the client the power to ask for exactly what they need and nothing more.
+
+Here's why we think GraphQL is great:
+
+- Precise Data Fetching: With GraphQL, you can specify exactly what data you need, which can significantly decrease the amount of data being transferred over the network and speed up your applications.
+
+- Single Request: Unlike traditional REST APIs where you might need to make multiple requests to different endpoints to gather related data, GraphQL allows you to gather that same data in a single request.
+
+- Type Safety: GraphQL schemas are strongly typed. This means each level of your query has a specific type associated with it, which helps eliminate errors and bugs that are typically harder to find.
+
+- Evolving API: GraphQL can be version-free, meaning it is easy to add fields and types to your API without breaking existing queries.
+
+In this section of the tutorial, we will cover the basics of working with GraphQL within your Contember project, helping you understand how to fetch and manipulate data efficiently.
+
+## Content and Tenant GraphQL APIs
+
+Contember offers two distinct APIs: the Content API for managing and accessing your project's content, and the Tenant API for handling projects, tokens, users, and roles.
+
+### Content API
+
+The Content API, a GraphQL API, is tailored to the structure of your project's content. It's available at the URL formatted as `https://engine-hostname/content/{project}/{stage}`, for example, `http://localhost:1481/content/my-blog/live`. Access requires an access token with adequate permissions, obtained from the Tenant API. This token, appearing something like `44d7dd8ae4a45c33eaa309716e41e1a8476cda4f`, should be passed in the Authorization header as a Bearer token.
+
+The Content API's GraphQL schema respects your project's ACL rules, meaning it will only include types, fields, and mutations permissible for the user linked to the access token. For instance, a read-only role for a mobile app would result in the API excluding all mutations for this role.
+
+Each entity allows for 3 types of queries (`get`, `list`, `paginate`) and for 4 mutations (`create`, `update`, `delete`, `upsert`).
+
+#### `get` for fetching single records by a unique field
+  ```graphql
+  query {
+    getPost(by: { id: "c4ae3a0f-d91b-42a8-ad3c-5ca6b9f407c2" }) {
+      title
+      publishedAt
+    }
+  }
+  ```
+#### `list` for a straightforward list
+  ```graphql
+  query {
+    listPost(
+      filter: {
+        publishedAt: { lte: "2019-12-20" }
+        category: { name: { eq: "Graphql" } }
+      }
+      orderBy: [{ publishedAt: asc }]
+      limit: 10
+    ) {
+      title
+      publishedAt
+    }
+  }
+  ```
+#### `paginate` for Relay-style pagination.
+  ```graphql
+  query {
+    paginatePost(
+      skip: 1
+      first: 2
+      filter: { author: { name: { eq: "John Doe" } } }
+      orderBy: [{ publishedAt: asc }]
+    ) {
+      pageInfo {
+        totalCount
+      }
+      edges {
+        node {
+          id
+          title
+          author {
+            name
+          }
+        }
+      }
+    }
+  }
+  ```
+#### `create` mutation to create new records.
+  ```graphql
+  mutation {
+    createPost(data: {title: "Hello world", publishedAt: "2019-12-20"}) {
+      ok
+      node {
+        id
+      }
+    }
+  }
+  ```
+#### `update` mutation to change existing record
+  ```graphql
+  mutation {
+    updatePost(
+      by: {id: "97644abb-0671-486b-9c51-b72b377ec1d9"}
+      data: {title: "Hello Contember"}
+    ) {
+      ok
+      node {
+        id
+      }
+    }
+  }
+  ```
+#### `delete` mutation to delete records
+  ```graphql
+  mutation {
+    deletePost(
+      by: {id: "97644abb-0671-486b-9c51-b72b377ec1d9"}
+    ) {
+      ok
+      node {
+        title
+      }
+    }
+  }
+  ```
+#### `upsert` mutation to update an existing row or a create a new one when the requested row does not exist
+  ```graphql
+  mutation {
+    upsertPost(
+      by: {slug: "hello-contember"}
+      create: {title: "Hello Contember"}
+      update: {title: "Hello Contember again!"}
+    ) {
+      ok
+      node {
+        id
+      }
+    }
+  }
+  ```
+
+The `get` query requires a `by` parameter for filtering by a primary column or any unique columns, while `list` provides options such as complex condition filtering, result ordering, and paging via a limit and offset.
+
+For a more in-depth look at the Content API, here are some advanced resources:
+
+<DocsCards>
+  <DocsCard header="GraphQL Queries" href="/reference/engine/content/queries">
+    <p>Everything you can do with queries and Contember.</p>
+  </DocsCard>
+  <DocsCard header="GraphQL Mutations" href="/reference/engine/content/mutations">
+    <p>Advanced mutations including using transactions.</p>
+  </DocsCard>
+  <DocsCard header="Storing files on S3" href="/reference/engine/content/s3">
+    <p>Mutations related to S3 compatible storage.</p>
+  </DocsCard>
+  <DocsCard header="Assume membership" href="/reference/engine/content/advanced/assume-membership">
+    <p>Allow identities to temporarily assume a different set of memberships for a single request.</p>
+  </DocsCard>
+</DocsCards>
+
+### Tenant API
+
+The Tenant API, accessible via the URL `https://engine-hostname/tenant`, necessitates a Bearer token in the Authorization header.
+
+The Tenant API facilitates user logins and registrations, membership management, and more. This basic guide won't cover this, but if you'd like to, here are the sources.
+
+<DocsCards>
+  <DocsCard header="How Tenant API works" href="/reference/engine/tenant/overview">
+    <p>Basic explanation of Tenant API functionality.</p>
+  </DocsCard>
+  <DocsCard header="Managing users" href="/reference/engine/tenant/invites">
+    <p>Invite users to your projects.</p>
+  </DocsCard>
+  <DocsCard header="Memberships" href="/reference/engine/tenant/memberships">
+    <p>Explaining relationship between users and projects.</p>
+  </DocsCard>
+  <DocsCard header="Identity providers (IdP)" href="/reference/engine/tenant/idp">
+    <p>Authenticate users using external accounts (Apple ID, Facebook, or other).</p>
+  </DocsCard>
+</DocsCards>
+
+## Querying the Content API
+
+:::note important
+
+For this part we assume that you already have a Contember project with your data model running on your machine.
+
+:::
+
+You can interact with GraphQL API anywhere. But for basic exploring we suggest using the [Insomnia](https://insomnia.rest/) application. If you created a project in previous step, here's an Insomnia project for quick exploration Just <a href="/assets/insomnia-quickstart.json" target="_blank">download the project</a> and import it into Insomnia by creating new collection and in Export/Import choose Import and choose the file you just downloaded.
+
+![Insomnia](/assets/insomnia-screen.png)
+
+Try creating a few articles with the `Create Articles` mutation and then list them with the `List Articles` query.
+
+Now let's build the UI for our data.
+
+<DocsCards>
+  <DocsCard header="Building the UI" href="/intro/interface">
+    <p>A short introduction to the power of Contember Interface.</p>
+  </DocsCard>
+</DocsCards>

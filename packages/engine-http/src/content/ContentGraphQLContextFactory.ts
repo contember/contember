@@ -20,9 +20,10 @@ export class ContentGraphQLContextFactory {
 	) {
 	}
 
-	create({ db, schema, schemaDatabaseMetadata, authResult, memberships, permissions, timer, requestDebug, systemSchema, stage, project }: {
+	create({ db, schema, schemaMeta, schemaDatabaseMetadata, authResult, memberships, permissions, timer, requestDebug, systemSchema, stage, project }: {
 		db: Client
-		schema: Schema & { id: number }
+		schema: Schema
+		schemaMeta: { id?: number }
 		schemaDatabaseMetadata: DatabaseMetadata
 		permissions: Acl.Permissions
 		authResult: AuthResult
@@ -47,6 +48,7 @@ export class ContentGraphQLContextFactory {
 			identityVariables,
 			identityId,
 			schema,
+			schemaMeta,
 			schemaDatabaseMetadata,
 			permissions,
 			systemSchema,

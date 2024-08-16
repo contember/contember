@@ -1,15 +1,26 @@
 {
   "name": "@contember/schema-definition",
-  "version": "1.4.0-rc.4",
+  "version": "2.0.0-alpha.12",
   "license": "Apache-2.0",
-  "main": "dist/src/index.js",
-  "typings": "dist/src/index.d.ts",
+  "main": "./dist/production/index.js",
+  "typings": "./dist/types/index.d.ts",
   "exports": {
-    "typescript": "./src/index.ts",
-    "default": "./dist/src/index.js"
-  },
-  "scripts": {
-    "test": "vitest --dir ./tests/cases"
+    ".": {
+      "import": {
+        "types": "./dist/types/index.d.ts",
+        "development": "./dist/development/index.js",
+        "production": "./dist/production/index.js",
+        "typescript": "./src/index.ts",
+        "default": "./dist/production/index.js"
+      },
+      "require": {
+        "types": "./dist/types/index.d.ts",
+        "development": "./dist/development/index.cjs",
+        "production": "./dist/production/index.cjs",
+        "typescript": "./src/index.ts",
+        "default": "./dist/production/index.cjs"
+      }
+    }
   },
   "dependencies": {
     "@contember/schema": "workspace:*",
@@ -21,5 +32,6 @@
   },
   "peerDependencies": {
     "graphql": ">= 14.6.0"
-  }
+  },
+  "type": "module"
 }

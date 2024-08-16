@@ -18,7 +18,7 @@ export class ContentQueryExecutorImpl implements ContentQueryExecutor {
 	) {
 	}
 
-	public async execute({ db, schema, databaseMetadata, stage, project, identity }: ContentQueryExecutorContext, { query, variables }: ContentQueryExecutorQuery): Promise<ContentQueryExecutorResult> {
+	public async execute({ db, schema, schemaMeta, databaseMetadata, stage, project, identity }: ContentQueryExecutorContext, { query, variables }: ContentQueryExecutorQuery): Promise<ContentQueryExecutorResult> {
 		const permissions = new AllowAllPermissionFactory().create(schema.model, true)
 		const authorizator = new Authorizator(permissions, true)
 		const dataSchemaBuilder = this.graphqlSchemaBuilderFactory.create(schema.model, authorizator)
@@ -31,6 +31,7 @@ export class ContentQueryExecutorImpl implements ContentQueryExecutor {
 			identityVariables: {},
 			identityId,
 			schema,
+			schemaMeta,
 			schemaDatabaseMetadata: databaseMetadata,
 			permissions,
 			systemSchema: project.systemSchema,

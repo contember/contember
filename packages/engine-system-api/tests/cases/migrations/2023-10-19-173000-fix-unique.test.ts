@@ -45,7 +45,15 @@ test('unique fix test', async () => {
 
 			],
 		})),
-		schemaResolver: () => Promise.resolve(createSchema(UniqueModel)),
+		schemaResolver: () => Promise.resolve({
+			schema: createSchema(UniqueModel),
+			meta: {
+				id: 1,
+				version: '2024-06-28-153001',
+				checksum: '_checksum_',
+				updatedAt: new Date(),
+			},
+		}),
 		project: {
 			slug: 'test',
 			stages: [

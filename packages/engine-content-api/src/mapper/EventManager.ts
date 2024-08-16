@@ -1,7 +1,6 @@
 import { Input, Model, Value } from '@contember/schema'
 import { ResolvedColumnValue } from './ColumnValue'
 import { Mapper } from './Mapper'
-import { logger } from '@contember/logger'
 
 export class BeforeInsertEvent {
 	public type = 'BeforeInsertEvent' as const
@@ -148,11 +147,8 @@ export class EventManager {
 	}
 
 	public async fire<K extends keyof EventMap>(event: EventMap[K]) {
-		(await Promise.allSettled(this.listeners[event.type].map(it => (it as EventListener<K>)(event, this.mapper))))
-			.map(it => {
-				if (it.status === 'rejected') {
-					logger.error(it.reason)
-				}
-			})
+		for (const listener of this.listeners[event.type]) {
+			await listener(event, this.mapper)
+		}
 	}
 }

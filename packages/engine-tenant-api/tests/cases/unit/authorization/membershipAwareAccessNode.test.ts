@@ -1,5 +1,5 @@
 import { test, assert } from 'vitest'
-import { testUuid } from '@contember/engine-api-tester'
+import { testUuid } from '../../../src/testUuid'
 import { AclSchemaAccessNodeFactory, PermissionActions } from '../../../../src'
 import { Acl } from '@contember/schema'
 

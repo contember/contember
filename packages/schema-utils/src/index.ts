@@ -12,6 +12,7 @@ export * from './dataUtils'
 export * from './validation'
 export * from './schemaNormalizer'
 export * from './schemaFilter'
+export * from './schemaChecksum'
 export { deepCompare, compareArraysIgnoreOrder } from './utils'
 
 export const emptySchema: Schema = {

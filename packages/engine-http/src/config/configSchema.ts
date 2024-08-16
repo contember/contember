@@ -83,56 +83,52 @@ export const tenantConfigSchema = Typesafe.intersection(
 	}),
 )
 
-export const serverConfigSchema = Typesafe.intersection(
-	Typesafe.object({
-		port: Typesafe.number,
-		http: Typesafe.partial({
-			requestBodySize: Typesafe.string,
-			suppressAccessLog: (val: unknown) => {
-				if (!val) {
-					return undefined
-				}
-				if (val === 'true' || val === '1' || val === 'on') {
-					return true
-				}
-				if (val === 'false' || val === '0' || val === 'off') {
-					return false
-				}
-				if (typeof val === 'string') {
-					return val
-				}
-				Typesafe.fail([])
-			},
-		}),
-		contentApi: Typesafe.partial({
-			schemaCacheTtlSeconds: Typesafe.integer,
-		}),
-		logging: Typesafe.union(
-			(val): { sentry?: { dsn: string } } => Typesafe.valueAt(val, ['sentry', 'dsn']) === undefined ? {} : Typesafe.fail([]),
-			Typesafe.partial({
-				sentry: Typesafe.object({
-					dsn: Typesafe.string,
-				}),
+export const serverConfigSchema = Typesafe.partial({
+	port: Typesafe.number,
+	http: Typesafe.partial({
+		requestBodySize: Typesafe.string,
+		suppressAccessLog: (val: unknown) => {
+			if (!val) {
+				return undefined
+			}
+			if (val === 'true' || val === '1' || val === 'on') {
+				return true
+			}
+			if (val === 'false' || val === '0' || val === 'off') {
+				return false
+			}
+			if (typeof val === 'string') {
+				return val
+			}
+			Typesafe.fail([])
+		},
+	}),
+	contentApi: Typesafe.partial({
+		schemaCacheTtlSeconds: Typesafe.integer,
+	}),
+	logging: Typesafe.union(
+		(val): { sentry?: { dsn: string } } => Typesafe.valueAt(val, ['sentry', 'dsn']) === undefined ? {} : Typesafe.fail([]),
+		Typesafe.partial({
+			sentry: Typesafe.object({
+				dsn: Typesafe.string,
 			}),
-		),
-	}),
-	Typesafe.partial({
-		projectGroup: (val: unknown, path: PropertyKey[] = []) => Typesafe.valueAt(val, ['domainMapping']) === undefined
-			? undefined
-			: Typesafe.intersection(
-				Typesafe.object({
-					domainMapping: Typesafe.string,
-				}),
-				Typesafe.partial({
-					configHeader: Typesafe.string,
-					configEncryptionKey: Typesafe.string,
-				}),
-			)(val, path),
-		monitoringPort: Typesafe.number,
-		workerCount: Typesafe.union(Typesafe.number, Typesafe.string),
-		applicationWorker: Typesafe.string,
-	}),
-)
+		}),
+	),
+	projectGroup: (val: unknown, path: PropertyKey[] = []) => Typesafe.valueAt(val, ['domainMapping']) === undefined
+		? undefined
+		: Typesafe.intersection(
+			Typesafe.object({
+				domainMapping: Typesafe.string,
+			}),
+			Typesafe.partial({
+				configHeader: Typesafe.string,
+				configEncryptionKey: Typesafe.string,
+			}),
+		)(val, path),
+	monitoringPort: Typesafe.number,
+	workerCount: Typesafe.union(Typesafe.number, Typesafe.string),
+	applicationWorker: Typesafe.string,
+})
 
 export const stageConfig = Typesafe.record(
 	Typesafe.string,

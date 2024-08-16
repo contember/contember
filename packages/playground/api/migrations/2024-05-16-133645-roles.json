@@ -1,0 +1,126 @@
+{
+	"formatVersion": 5,
+	"modifications": [
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "AclBranch",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "acl_branch",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": [],
+				"indexes": [],
+				"eventLog": {
+					"enabled": true
+				}
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "AclBranch",
+			"field": {
+				"name": "code",
+				"columnName": "code",
+				"columnType": "text",
+				"nullable": false,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createUniqueConstraint",
+			"entityName": "AclBranch",
+			"unique": {
+				"fields": [
+					"code"
+				]
+			}
+		},
+		{
+			"modification": "patchAclSchema",
+			"patch": [
+				{
+					"op": "add",
+					"path": "/roles/condition",
+					"value": {
+						"stages": "*",
+						"entities": {},
+						"variables": {
+							"conditionVar": {
+								"type": "condition"
+							}
+						}
+					}
+				},
+				{
+					"op": "add",
+					"path": "/roles/entity",
+					"value": {
+						"stages": "*",
+						"entities": {},
+						"variables": {
+							"branchVar": {
+								"type": "entity",
+								"entityName": "AclBranch"
+							}
+						}
+					}
+				},
+				{
+					"op": "add",
+					"path": "/roles/noVar",
+					"value": {
+						"stages": "*",
+						"entities": {},
+						"variables": {}
+					}
+				},
+				{
+					"op": "add",
+					"path": "/roles/predefined",
+					"value": {
+						"stages": "*",
+						"entities": {},
+						"variables": {
+							"predefinedVar": {
+								"type": "predefined",
+								"value": "personID"
+							}
+						}
+					}
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/AclBranch",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"read": {
+								"id": true,
+								"code": true
+							},
+							"create": {
+								"id": true,
+								"code": true
+							},
+							"update": {
+								"id": true,
+								"code": true
+							},
+							"delete": true,
+							"customPrimary": true
+						}
+					}
+				}
+			]
+		}
+	]
+}

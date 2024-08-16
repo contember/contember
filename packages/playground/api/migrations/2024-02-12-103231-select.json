@@ -1,0 +1,223 @@
+{
+	"formatVersion": 5,
+	"modifications": [
+		{
+			"modification": "createEnum",
+			"enumName": "SelectUnique",
+			"values": [
+				"unique"
+			]
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "SelectItem",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "select_item",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": [],
+				"indexes": [],
+				"eventLog": {
+					"enabled": true
+				}
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "SelectRoot",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "select_root",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": [],
+				"indexes": [],
+				"eventLog": {
+					"enabled": true
+				}
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "SelectValue",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "select_value",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": [],
+				"indexes": [],
+				"eventLog": {
+					"enabled": true
+				}
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "SelectItem",
+			"field": {
+				"name": "order",
+				"columnName": "order",
+				"columnType": "integer",
+				"nullable": true,
+				"type": "Integer"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "SelectRoot",
+			"field": {
+				"name": "unique",
+				"columnName": "unique",
+				"columnType": "SelectUnique",
+				"nullable": false,
+				"type": "Enum"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "SelectValue",
+			"field": {
+				"name": "name",
+				"columnName": "name",
+				"columnType": "text",
+				"nullable": false,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "SelectValue",
+			"field": {
+				"name": "slug",
+				"columnName": "slug",
+				"columnType": "text",
+				"nullable": false,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "SelectItem",
+			"owningSide": {
+				"type": "ManyHasOne",
+				"name": "root",
+				"target": "SelectRoot",
+				"joiningColumn": {
+					"columnName": "root_id",
+					"onDelete": "restrict"
+				},
+				"nullable": false,
+				"inversedBy": "hasManySorted"
+			},
+			"inverseSide": {
+				"type": "OneHasMany",
+				"name": "hasManySorted",
+				"target": "SelectItem",
+				"ownedBy": "root",
+				"orderBy": [
+					{
+						"path": [
+							"order"
+						],
+						"direction": "asc"
+					}
+				]
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "SelectItem",
+			"owningSide": {
+				"type": "ManyHasOne",
+				"name": "value",
+				"target": "SelectValue",
+				"joiningColumn": {
+					"columnName": "value_id",
+					"onDelete": "restrict"
+				},
+				"nullable": false
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "SelectRoot",
+			"owningSide": {
+				"type": "OneHasOne",
+				"name": "hasOne",
+				"target": "SelectValue",
+				"joiningColumn": {
+					"columnName": "has_one_id",
+					"onDelete": "restrict"
+				},
+				"nullable": true
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "SelectRoot",
+			"owningSide": {
+				"type": "ManyHasMany",
+				"name": "hasMany",
+				"target": "SelectValue",
+				"joiningTable": {
+					"tableName": "select_root_has_many",
+					"joiningColumn": {
+						"columnName": "select_root_id",
+						"onDelete": "cascade"
+					},
+					"inverseJoiningColumn": {
+						"columnName": "select_value_id",
+						"onDelete": "cascade"
+					},
+					"eventLog": {
+						"enabled": true
+					}
+				}
+			}
+		},
+		{
+			"modification": "createUniqueConstraint",
+			"entityName": "SelectRoot",
+			"unique": {
+				"fields": [
+					"unique"
+				]
+			}
+		},
+		{
+			"modification": "createUniqueConstraint",
+			"entityName": "SelectValue",
+			"unique": {
+				"fields": [
+					"slug"
+				]
+			}
+		}
+	]
+}

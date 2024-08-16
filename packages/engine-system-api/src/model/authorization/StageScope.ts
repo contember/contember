@@ -6,8 +6,8 @@ import { StagePermissionsFactory } from './StagePermissionsFactory'
 export class StageScope implements AuthorizationScope<Identity> {
 	constructor(private readonly stage: string, private readonly stagePermissionsFactory: StagePermissionsFactory) {}
 
-	getIdentityAccess(identity: Identity): Promise<AccessNode> {
-		const permissions = this.stagePermissionsFactory.create(this.stage)
+	async getIdentityAccess(identity: Identity): Promise<AccessNode> {
+		const permissions = await this.stagePermissionsFactory.create(this.stage)
 		const roles = new AccessNode.Roles(identity.roles)
 		const permissionEvaluator = new AccessEvaluator.PermissionEvaluator(permissions)
 		const node = new SwitchEvaluatorNode(roles, permissionEvaluator)

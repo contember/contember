@@ -3,7 +3,7 @@ import { PgClient } from '../../../src/client/PgClient'
 import EventEmitter from 'node:events'
 import { expect } from 'vitest'
 
-export const createConnectionMockAlt = (...queries: { sql: string; timeout?: number }[][]): [Connection, () => void] => {
+export const createConnectionMockAlt = (...queries: { sql: string; timeout?: number; result?: any }[][]): [Connection, () => void] => {
 	const connectionMocks: (PgClient & { assertEmpty: () => void })[] = []
 	for (const queriesSet of queries) {
 		connectionMocks.push(new class extends EventEmitter {
@@ -21,7 +21,7 @@ export const createConnectionMockAlt = (...queries: { sql: string; timeout?: num
 				expect(sql).toEqual(query?.sql)
 				await new Promise<void>(resolve => setTimeout(resolve, query?.timeout ?? 1))
 
-				return sql as any
+				return query?.result
 			}
 
 			assertEmpty() {

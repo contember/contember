@@ -1,4 +1,3 @@
-import { Interface } from './types'
 import { Model } from '@contember/schema'
 import { EnumDefinition } from './EnumDefinition'
 import { SchemaBuilder } from './internal'
@@ -9,6 +8,7 @@ import { DefaultNamingConventions } from '@contember/schema-utils'
 import { StrictOptions, StrictDefinitionValidator } from '../../strict'
 
 export * from './fieldDefinitions'
+export * from './DescriptionDefinition'
 export * from './EventLogDefinition'
 export * from './IndexDefinition'
 export * from './OrderByDefinition'
@@ -18,7 +18,7 @@ export * from './ViewDefinition'
 export { extendEntity, type EntityExtension } from './extensions'
 
 export abstract class Entity {
-	[key: string]: Interface<FieldDefinition<any>> | undefined
+	[key: string]: FieldDefinition<any> | undefined
 }
 
 export type ModelDefinition<M> = {

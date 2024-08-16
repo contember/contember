@@ -1,0 +1,84 @@
+---
+title: Slots
+---
+
+import CodeBlock from '@theme/CodeBlock'
+import _example_slot_define from '!!raw-loader!./_Example/slots/define'
+import _example_slot_usage from '!!raw-loader!./_Example/slots/usage'
+import _example_slot_layout from '!!raw-loader!./_Example/slots/layout'
+
+# <span className="version">Interface 1.2+</span> Slots
+
+**Use Slots to render contents of your page the other areas of the layout.**
+
+Every Contember component can [access data binding context](/reference/interface/data-binding/overview/)
+and render it to the page but this composition is limited to how the content might be rendered as is.
+
+For example you can't render a persist button to save the form in the header from the page because
+it is nested within the descendants of the page that is rendered in the layout.
+
+To overcome this limitation slots provide a way to *escape*  and render to other parts of the layout easily, even
+the parts that are not directly descendants of the page, e.g. header or footer of the layout.
+
+## What are slots?
+
+**Layout slots** are React components that can be used to render content in predefined
+places of the layout. Each `SlotSource` can render (append) its children to the target as
+[createPortal()](https://react.dev/reference/react-dom/createPortal) would do.
+
+This is useful when you want to render a button in the footer, header, sidebar or any
+other place of the layout that is not directly accessible from within inside of the rendered page.
+
+## Defining your slots
+
+Slots are made of two pair components. One component is used to render content to the portal (source)
+and the other component is used to render the content from the portal (target).
+
+To create your slot you need to create two components:
+
+- **SlotSource** – React component that will be used to [render content from pages](#1-rendering-content-to-slot-from-the-page)
+- **SlotTarget** – React component that will be used in place where you want to render content
+
+
+<CodeBlock
+	language="typescript"
+	title="admin/lib/components/slots.tsx"
+>
+	{_example_slot_define}
+</CodeBlock>
+
+## Rendering page content to a slot source
+
+By wrapping the content in the slot source component, instead of rendering it as an immediate
+descendants of the page, you will create a *portal* that will render the content to the
+target component.
+
+<CodeBlock
+	language="typescript"
+	title="admin/pages/my-page.tsx"
+>
+	{_example_slot_usage}
+</CodeBlock>
+
+
+## Placing slot targets in the layout
+
+- **useHasActiveSlotsFactory()** – Hook that returns a function that returns `true` if there is any content
+to render, otherwise it returns `false` which gives you even more control to compose layout.
+
+
+<CodeBlock
+	language="typescript"
+	title="admin/libs/components/layout.tsx"
+>
+	{_example_slot_layout}
+</CodeBlock>
+
+:::note
+Slots use `React.createPortal` under the hood. But  Slots gives you extra tools to control how your layout behaves, when there is no content to render.
+:::
+
+## Context Providers
+
+Using slots is optional. Their respective providers are included in our project templates in the application entry point.
+Once you decide to go your own way just remove the `<Slots.Provider>` from the `index.tsx` file.

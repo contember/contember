@@ -1,15 +1,29 @@
 {
   "name": "@contember/engine-http",
-  "version": "1.4.0-rc.4",
+  "version": "2.0.0-alpha.12",
   "license": "Apache-2.0",
-  "main": "dist/src/index.js",
-  "typings": "dist/src/index.d.ts",
+  "main": "./dist/production/index.js",
+  "typings": "./dist/types/index.d.ts",
   "scripts": {
-    "test": "vitest --dir ./tests/cases && node --expose-gc ./dist/tests/cases/unit/contentApiSpecificCache.tst.js"
+    "test": "node --expose-gc ./tests/cases/unit/contentApiSpecificCache.tst.js"
   },
   "exports": {
-    "typescript": "./src/index.ts",
-    "default": "./dist/src/index.js"
+    ".": {
+      "import": {
+        "types": "./dist/types/index.d.ts",
+        "development": "./dist/development/index.js",
+        "production": "./dist/production/index.js",
+        "typescript": "./src/index.ts",
+        "default": "./dist/production/index.js"
+      },
+      "require": {
+        "types": "./dist/types/index.d.ts",
+        "development": "./dist/development/index.cjs",
+        "production": "./dist/production/index.cjs",
+        "typescript": "./src/index.ts",
+        "default": "./dist/production/index.cjs"
+      }
+    }
   },
   "dependencies": {
     "@apollographql/graphql-playground-html": "^1.6.29",
@@ -55,5 +69,6 @@
   "peerDependencies": {
     "graphql": ">= 14.6.0",
     "pg": "^8.9.0"
-  }
+  },
+  "type": "module"
 }

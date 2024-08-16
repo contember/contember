@@ -1,7 +1,9 @@
 import { AsyncGenerator } from 'graphql-ts-client-codegen'
 import { makeExecutableSchema } from '@graphql-tools/schema'
-import { typeDefs } from '@contember/engine-tenant-api'
+import { default as typeDefs } from '../../engine-tenant-api/src/schema/tenant.graphql'
 import * as path from 'path'
+import { dirname } from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 const generator = new AsyncGenerator({
 	schemaLoader: async () => {
@@ -9,7 +11,7 @@ const generator = new AsyncGenerator({
 			typeDefs: typeDefs,
 		})
 	},
-	targetDir: path.join(__dirname, '../src/generated'),
+	targetDir: path.join(dirname(fileURLToPath(import.meta.url)), '../src/generated'),
 	scalarTypeMap: {
 		Json: 'unknown',
 	},

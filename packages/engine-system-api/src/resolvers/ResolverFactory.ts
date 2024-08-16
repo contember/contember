@@ -2,9 +2,10 @@ import { EventsQueryResolver, ExecutedMigrationsQueryResolver, StagesQueryResolv
 import { Event, EventType, Resolvers } from '../schema'
 import { assertNever } from '../utils'
 import { MigrateMutationResolver, MigrationAlterMutationResolver, TruncateMutationResolver } from './mutation'
-import { DateTimeType, JSONType } from '@contember/graphql-utils'
+import { DateTimeType, JSONType, createJsonLikeType } from '@contember/graphql-utils'
 import { EventOldValuesResolver } from './types'
 import { GraphQLError, GraphQLScalarType, Kind } from 'graphql'
+import { SchemaQueryResolver } from './query/SchemaQueryResolver'
 
 export class ResolverFactory {
 	public constructor(
@@ -15,6 +16,7 @@ export class ResolverFactory {
 		private readonly migrationAlterMutationResolver: MigrationAlterMutationResolver,
 		private readonly eventsQueryResolver: EventsQueryResolver,
 		private readonly eventOldValuesResolver: EventOldValuesResolver,
+		private readonly schemaQueryResolver: SchemaQueryResolver,
 	) {}
 
 	create(debugMode: boolean): Resolvers {
@@ -22,6 +24,7 @@ export class ResolverFactory {
 			DateTime: DateTimeType,
 			Json: JSONType,
 			PrimaryKey: PrimaryKeyType,
+			Schema: SchemaType,
 			Event: {
 				__resolveType: (obj: Event) => {
 					switch (obj.type) {
@@ -43,6 +46,7 @@ export class ResolverFactory {
 				stages: this.stagesQueryResolver.stages.bind(this.stagesQueryResolver),
 				executedMigrations: this.executedMigrationsQueryResolver.executedMigrations.bind(this.executedMigrationsQueryResolver),
 				events: this.eventsQueryResolver.events.bind(this.eventsQueryResolver),
+				schema: this.schemaQueryResolver.schema.bind(this.schemaQueryResolver),
 			},
 			Mutation: {
 				migrate: this.migrateMutationResolver.migrate.bind(this.migrateMutationResolver),
@@ -70,6 +74,10 @@ const parseValue = (value: any)  => {
 	}
 	throw new GraphQLError('PrimaryKey cannot represent value: ' + JSON.stringify(value))
 }
+
+const SchemaType = createJsonLikeType('Schema', 'Content schema custom scalar type')
+
+
 export const PrimaryKeyType = new GraphQLScalarType({
 	name: 'PrimaryKey',
 	description: 'PrimaryKey custom scalar type. Can be Int or String',

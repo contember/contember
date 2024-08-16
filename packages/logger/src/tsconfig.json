@@ -2,6 +2,6 @@
 	"extends": "../tsconfig.settings.json",
 	"compilerOptions": {
 		"esModuleInterop": true,
-		"outDir": "../dist/src"
+		"outDir": "../dist/types"
 	}
 }

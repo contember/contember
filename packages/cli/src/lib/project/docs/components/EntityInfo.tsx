@@ -27,27 +27,30 @@ export const EntityInfo = ({ entity, schema, references }: EntityInfoProps) => (
 							<th class={'text-left px-2 text-gray-500 font-normal w-[180px] max-w-[180px]'}>Name</th>
 							<th class={'text-left px-2 text-gray-500 font-normal w-[340px] max-w-[340px]'}>Type</th>
 							{Object.keys(schema.acl.roles).map(role => <th
+								key={role}
 								class={'text-left px-2 text-gray-500 font-normal w-[120px] max-w-[120px] text-xs truncate text-sm'}>{role}</th>)}
 						</tr>
 					</thead>
 					<tr>
 						<td></td>
 						<td></td>
-						{Object.values(schema.acl.roles).map(role => <td class={'px-2'}>
+						{Object.entries(schema.acl.roles).map(([name, role]) => <td class={'px-2'} key={name}>
 							<SinglePermission value={'D'}
 											  predicate={role.entities[entity.name]?.operations.delete} />
 						</td>)}
 					</tr>
 					{Object.values(entity.fields).map(field => (
 						<tr class={'even:bg-gray-100 target:bg-yellow-100'}
-							id={formatFieldAnchor(entity.name, field.name)}>
+							id={formatFieldAnchor(entity.name, field.name)}
+							key={field.name}
+						>
 							<td class={'px-2 font-mono truncate  w-[180px] max-w-[180px]'} title={field.name}>
 								{field.name}
 							</td>
 							<td class={'text-gray-800 px-2 font-mono w-[420px] max-w-[420px]'}>
 								<FieldType field={field} />
 							</td>
-							{Object.values(schema.acl.roles).map(role => <td class={'px-2'}>
+							{Object.entries(schema.acl.roles).map(([name, role]) => <td class={'px-2'} key={name}>
 								<FieldPermissions field={field.name}
 												  entityPermissions={role.entities[entity.name]} />
 							</td>)}
@@ -69,7 +72,7 @@ export const EntityInfo = ({ entity, schema, references }: EntityInfoProps) => (
 				<div class={'mt-2 text-sm '}>
 					{Object.entries(schema.acl.roles).map(([roleName, role]) =>
 						Object.entries(role.entities[entity.name]?.predicates ?? {}).map(([predicateName, predicate]) => (
-							<Fragment>
+							<Fragment key={roleName + '__' + predicateName}>
 								<h4>{roleName}: {predicateName}</h4>
 								<code>{JSON.stringify(predicate)}</code>
 							</Fragment>

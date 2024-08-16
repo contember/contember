@@ -1,20 +1,20 @@
 import { MigrationBuilder } from 'node-pg-migrate'
 import { Migration, RunMigration } from './Migration'
+import MigrationBuilderImpl from 'node-pg-migrate/dist/migration-builder.js'
+import { escapeValue as pgEscape } from 'node-pg-migrate/dist/utils.js'
 
 export function createMigrationBuilder(): MigrationBuilder & { getSql: () => string; getSqlSteps: () => string[] } {
-	// eslint-disable-next-line @typescript-eslint/no-var-requires
-	const builderClass = require('node-pg-migrate/dist/migration-builder').default
-	return new builderClass(
-		{},
+	const impl = 'default' in MigrationBuilderImpl ? (MigrationBuilderImpl as any).default : MigrationBuilderImpl
+	return new impl(
 		{
 			query: null,
 			select: null,
-		},
+		} as any,
+		{},
+		false,
+		{} as any,
 	)
 }
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const pgEscape = require('node-pg-migrate/dist/utils').escapeValue
 
 export function escapeValue(value: any): any {
 	return pgEscape(value)

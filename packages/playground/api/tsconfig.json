@@ -1,0 +1,18 @@
+{
+	"extends": "../../../tsconfig.settings.json",
+	"compilerOptions": {
+		"outDir": "../dist/types"
+	},
+	"references": [
+		{ "path": "../../interface/src" },
+		{ "path": "../../react-board/src" },
+		{ "path": "../../react-board/src" },
+		{ "path": "../../react-block-repeater/src" },
+		{ "path": "../../react-repeater/src" },
+		{ "path": "../../react-repeater-dnd-kit/src" },
+		{ "path": "../../react-select/src" },
+		{ "path": "../../react-dataview/src" },
+		{ "path": "../../react-uploader/src" },
+		{ "path": "../../react-uploader-dropzone/src" },
+	]
+}

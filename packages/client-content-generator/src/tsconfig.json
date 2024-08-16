@@ -1,0 +1,12 @@
+{
+	"extends": "../../../tsconfig.settings.json",
+	"compilerOptions": {
+		"outDir": "../dist/types",
+		"types": ["node"]
+	},
+	"references": [
+		{ "path": "../../client-content/src" },
+		{ "path": "../../schema/src" },
+		{ "path": "../../schema-utils/src" },
+	]
+}

@@ -3,7 +3,7 @@ import { execute, sqlTransaction } from '../../../../../src/test'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
 import { GQL, SQL } from '../../../../../src/tags'
-import { testUuid } from '@contember/engine-api-tester'
+import { testUuid } from '../../../../../src/testUuid'
 
 test('create posts and connect/create author (exists, many has one)', async () => {
 	await execute({

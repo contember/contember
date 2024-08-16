@@ -4,9 +4,7 @@ import { AllowAllPermissionFactory, emptySchema } from '@contember/schema-utils'
 import { executeGraphQlTest } from './testGraphql'
 import { Client, emptyDatabaseMetadata } from '@contember/database'
 import { createConnectionMock } from '@contember/database-tester'
-import { createUuidGenerator } from '@contember/engine-api-tester'
-import { SQL } from './tags'
-import { testUuid } from './testUuid'
+import { createUuidGenerator, testUuid } from './testUuid'
 
 export interface SqlQuery {
 	sql: string
@@ -104,7 +102,10 @@ export const execute = async (test: Test) => {
 			executionContainer: executionContainerFactory
 				.create({
 					permissions,
-					schema: { ...schema, id: 1 },
+					schema,
+					schemaMeta: {
+						id: 1,
+					},
 					db,
 					identityVariables: test.variables || {},
 					identityId: '00000000-0000-0000-0000-000000000000',

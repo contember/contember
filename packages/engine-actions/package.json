@@ -1,15 +1,28 @@
 {
   "name": "@contember/engine-actions",
   "license": "Apache-2.0",
-  "main": "dist/src/index.js",
-  "typings": "dist/src/index.d.ts",
+  "main": "./dist/production/index.js",
+  "typings": "./dist/types/index.d.ts",
   "exports": {
-    "typescript": "./src/index.ts",
-    "default": "./dist/src/index.js"
+    ".": {
+      "import": {
+        "types": "./dist/types/index.d.ts",
+        "development": "./dist/development/index.js",
+        "production": "./dist/production/index.js",
+        "typescript": "./src/index.ts",
+        "default": "./dist/production/index.js"
+      },
+      "require": {
+        "types": "./dist/types/index.d.ts",
+        "development": "./dist/development/index.cjs",
+        "production": "./dist/production/index.cjs",
+        "typescript": "./src/index.ts",
+        "default": "./dist/production/index.cjs"
+      }
+    }
   },
   "scripts": {
-    "generate": "gql-gen --config graphql-actions.codegen.yml",
-    "test": "vitest --no-threads"
+    "generate": "gql-gen --config graphql-actions.codegen.yml"
   },
   "dependencies": {
     "@contember/authorization": "workspace:*",
@@ -30,7 +43,6 @@
     "graphql-tag": "^2.12.6"
   },
   "devDependencies": {
-    "@contember/engine-api-tester": "workspace:*",
     "@graphql-codegen/cli": "^5.0.0",
     "@graphql-codegen/typescript": "^4.0.1",
     "@graphql-codegen/typescript-operations": "^4.0.1",
@@ -41,5 +53,7 @@
   "peerDependencies": {
     "graphql": ">= 14.6.0",
     "pg": "^8.5.0"
-  }
+  },
+  "type": "module",
+  "version": "2.0.0-alpha.12"
 }

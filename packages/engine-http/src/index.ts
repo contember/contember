@@ -21,6 +21,7 @@ export * from './project/ProjectContainer'
 export * from './project/ProjectContainerResolver'
 export * from './projectGroup/ProjectGroupContainer'
 export * from './projectGroup/ProjectGroupResolver'
+export { type ProjectGroupContainerResolver } from './projectGroup/ProjectGroupContainerResolver'
 
 export * from './utils/serverStartup'
 export * from './utils/serverTermination'

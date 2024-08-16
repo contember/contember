@@ -79,6 +79,9 @@ export const Navigation = () => {
 				</MenuItem>
 				<MenuItem icon={<PencilIcon size={16} />} label={'Custom components'}>
 					<MenuItem icon={line} label={'Input'} to={'custom/input'} />
+					<MenuItem icon={line} label={'Folder structure'} to={'folders'} />
+					<MenuItem icon={line} label={'Folder dataview'} to={'folders/dataview'} />
+					<MenuItem icon={line} label={'Folder combo'} to={'folders/combo'} />
 				</MenuItem>
 				<MenuItem icon={<DatabaseIcon size={16} />} label={'Auto CRUD'} to={'auto/index'} />
 			</Menu>

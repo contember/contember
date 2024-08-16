@@ -1,8 +1,10 @@
 import type { BlockType } from './enums'
 import type { BoardTaskStatus } from './enums'
+import type { ContentEmbedType } from './enums'
 import type { EditorReferenceType } from './enums'
 import type { GridArticleState } from './enums'
 import type { InputUnique } from './enums'
+import type { LegacyEditorReferenceType } from './enums'
 import type { SelectUnique } from './enums'
 import type { UploadMediaType } from './enums'
 import type { UploadOne } from './enums'
@@ -10,7 +12,11 @@ import type { BlockImagePosition } from './enums'
 import type { BlockListUnique } from './enums'
 import type { DimensionsItemUnique } from './enums'
 import type { EditorContentUnique } from './enums'
+import type { EditorTextAreaUnique } from './enums'
 import type { InputRootEnumValue } from './enums'
+import type { LegacyEditorContentUnique } from './enums'
+import type { PlateEditorContentUnique } from './enums'
+import type { SlugUnique } from './enums'
 
 export type JSONPrimitive = string | number | boolean | null
 export type JSONValue = JSONPrimitive | JSONObject | JSONArray
@@ -268,12 +274,49 @@ export type EditorReference <OverRelation extends string | never = never> = {
 	hasManyBy: {
 	}
 }
+export type EditorTextArea <OverRelation extends string | never = never> = {
+	name: 'EditorTextArea'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+		| Omit<{ unique: EditorTextAreaUnique}, OverRelation>
+	columns: {
+		id: string
+		unique: EditorTextAreaUnique
+		data: string
+	}
+	hasOne: {
+	}
+	hasMany: {
+	}
+	hasManyBy: {
+	}
+}
+export type Folder <OverRelation extends string | never = never> = {
+	name: 'Folder'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+		| Omit<{ children: Folder['unique']}, OverRelation>
+	columns: {
+		id: string
+		name: string
+	}
+	hasOne: {
+		parent: Folder
+	}
+	hasMany: {
+		children: Folder<'parent'>
+	}
+	hasManyBy: {
+		childrenByChildren: { entity: Folder; by: {children: Folder['unique']}  }
+	}
+}
 export type GridArticle <OverRelation extends string | never = never> = {
 	name: 'GridArticle'
 	unique:
 		| Omit<{ id: string}, OverRelation>
 		| Omit<{ slug: string}, OverRelation>
 		| Omit<{ comments: GridArticleComment['unique']}, OverRelation>
+		| Omit<{ details: GridArticleDetail['unique']}, OverRelation>
 	columns: {
 		id: string
 		title: string | null
@@ -287,6 +330,7 @@ export type GridArticle <OverRelation extends string | never = never> = {
 	hasOne: {
 		author: GridAuthor
 		category: GridCategory
+		details: GridArticleDetail
 	}
 	hasMany: {
 		tags: GridTag
@@ -307,6 +351,23 @@ export type GridArticleComment <OverRelation extends string | never = never> = {
 	hasOne: {
 		article: GridArticle
 		author: GridAuthor
+	}
+	hasMany: {
+	}
+	hasManyBy: {
+	}
+}
+export type GridArticleDetail <OverRelation extends string | never = never> = {
+	name: 'GridArticleDetail'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+		| Omit<{ article: GridArticle['unique']}, OverRelation>
+	columns: {
+		id: string
+		commentsCount: number
+	}
+	hasOne: {
+		article: GridArticle
 	}
 	hasMany: {
 	}
@@ -372,6 +433,7 @@ export type InputRoot <OverRelation extends string | never = never> = {
 	columns: {
 		id: string
 		unique: InputUnique
+		dummy: string | null
 		textValue: string | null
 		intValue: number | null
 		floatValue: number | null
@@ -401,6 +463,133 @@ export type InputRules <OverRelation extends string | never = never> = {
 		notNullValue: string
 		uniqueValue: string | null
 		validationValue: string | null
+	}
+	hasOne: {
+	}
+	hasMany: {
+	}
+	hasManyBy: {
+	}
+}
+export type LegacyEditorBlock <OverRelation extends string | never = never> = {
+	name: 'LegacyEditorBlock'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+		| Omit<{ references: LegacyEditorReference['unique']}, OverRelation>
+	columns: {
+		id: string
+		order: number
+		data: string
+	}
+	hasOne: {
+		content: LegacyEditorContent
+	}
+	hasMany: {
+		references: LegacyEditorReference<'block'>
+	}
+	hasManyBy: {
+		referencesByTarget: { entity: LegacyEditorReference; by: {target: LegacyEditorLink['unique']}  }
+		referencesByEmbed: { entity: LegacyEditorReference; by: {embed: LegacyEditorEmbed['unique']}  }
+	}
+}
+export type LegacyEditorContent <OverRelation extends string | never = never> = {
+	name: 'LegacyEditorContent'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+		| Omit<{ unique: LegacyEditorContentUnique}, OverRelation>
+		| Omit<{ blocks: LegacyEditorBlock['unique']}, OverRelation>
+	columns: {
+		id: string
+		unique: LegacyEditorContentUnique
+	}
+	hasOne: {
+	}
+	hasMany: {
+		blocks: LegacyEditorBlock<'content'>
+	}
+	hasManyBy: {
+		blocksByReferences: { entity: LegacyEditorBlock; by: {references: LegacyEditorReference['unique']}  }
+	}
+}
+export type LegacyEditorEmbed <OverRelation extends string | never = never> = {
+	name: 'LegacyEditorEmbed'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+		| Omit<{ reference: LegacyEditorReference['unique']}, OverRelation>
+	columns: {
+		id: string
+		type: ContentEmbedType
+		youtubeId: string | null
+		vimeoId: string | null
+	}
+	hasOne: {
+		reference: LegacyEditorReference
+	}
+	hasMany: {
+	}
+	hasManyBy: {
+	}
+}
+export type LegacyEditorImage <OverRelation extends string | never = never> = {
+	name: 'LegacyEditorImage'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+	columns: {
+		id: string
+		url: string | null
+	}
+	hasOne: {
+	}
+	hasMany: {
+	}
+	hasManyBy: {
+	}
+}
+export type LegacyEditorLink <OverRelation extends string | never = never> = {
+	name: 'LegacyEditorLink'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+	columns: {
+		id: string
+		url: string | null
+	}
+	hasOne: {
+	}
+	hasMany: {
+	}
+	hasManyBy: {
+	}
+}
+export type LegacyEditorReference <OverRelation extends string | never = never> = {
+	name: 'LegacyEditorReference'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+		| Omit<{ target: LegacyEditorLink['unique']}, OverRelation>
+		| Omit<{ embed: LegacyEditorEmbed['unique']}, OverRelation>
+	columns: {
+		id: string
+		type: LegacyEditorReferenceType
+	}
+	hasOne: {
+		block: LegacyEditorBlock
+		target: LegacyEditorLink
+		embed: LegacyEditorEmbed
+		image: LegacyEditorImage
+	}
+	hasMany: {
+	}
+	hasManyBy: {
+	}
+}
+export type PlateEditorContent <OverRelation extends string | never = never> = {
+	name: 'PlateEditorContent'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+		| Omit<{ unique: PlateEditorContentUnique}, OverRelation>
+	columns: {
+		id: string
+		unique: PlateEditorContentUnique
+		data: JSONValue
 	}
 	hasOne: {
 	}
@@ -452,6 +641,7 @@ export type SelectRoot <OverRelation extends string | never = never> = {
 	columns: {
 		id: string
 		unique: SelectUnique
+		dummy: string | null
 	}
 	hasOne: {
 		hasOne: SelectValue
@@ -472,6 +662,40 @@ export type SelectValue <OverRelation extends string | never = never> = {
 		id: string
 		name: string
 		slug: string
+	}
+	hasOne: {
+	}
+	hasMany: {
+	}
+	hasManyBy: {
+	}
+}
+export type Slug <OverRelation extends string | never = never> = {
+	name: 'Slug'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+		| Omit<{ unique: SlugUnique}, OverRelation>
+	columns: {
+		id: string
+		unique: SlugUnique
+		slug: string
+		title: string
+	}
+	hasOne: {
+		category: SlugCategory
+	}
+	hasMany: {
+	}
+	hasManyBy: {
+	}
+}
+export type SlugCategory <OverRelation extends string | never = never> = {
+	name: 'SlugCategory'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+	columns: {
+		id: string
+		name: string
 	}
 	hasOne: {
 	}
@@ -758,17 +982,29 @@ export type ContemberClientEntities = {
 	EditorImage: EditorImage
 	EditorLink: EditorLink
 	EditorReference: EditorReference
+	EditorTextArea: EditorTextArea
+	Folder: Folder
 	GridArticle: GridArticle
 	GridArticleComment: GridArticleComment
+	GridArticleDetail: GridArticleDetail
 	GridAuthor: GridAuthor
 	GridCategory: GridCategory
 	GridTag: GridTag
 	InputRoot: InputRoot
 	InputRules: InputRules
+	LegacyEditorBlock: LegacyEditorBlock
+	LegacyEditorContent: LegacyEditorContent
+	LegacyEditorEmbed: LegacyEditorEmbed
+	LegacyEditorImage: LegacyEditorImage
+	LegacyEditorLink: LegacyEditorLink
+	LegacyEditorReference: LegacyEditorReference
+	PlateEditorContent: PlateEditorContent
 	RepeaterItem: RepeaterItem
 	SelectItem: SelectItem
 	SelectRoot: SelectRoot
 	SelectValue: SelectValue
+	Slug: Slug
+	SlugCategory: SlugCategory
 	UploadAudio: UploadAudio
 	UploadFile: UploadFile
 	UploadFileMetadata: UploadFileMetadata

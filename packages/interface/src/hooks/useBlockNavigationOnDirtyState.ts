@@ -22,7 +22,7 @@ export const useBlockNavigationOnDirtyState = (handler: () => Promise<BlockNavig
 		}
 		const result = await handler()
 		if (result === 'cancel') {
-			event.request = undefined
+			event.abortNavigation()
 			return
 		}
 
@@ -32,8 +32,7 @@ export const useBlockNavigationOnDirtyState = (handler: () => Promise<BlockNavig
 				options?.onPersistSuccess?.(result)
 			} catch (e: any) {
 				options?.onPersistError?.(e)
-
-				event.request = undefined
+				event.abortNavigation()
 				return
 			}
 		}

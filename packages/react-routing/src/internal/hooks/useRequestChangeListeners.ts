@@ -10,11 +10,12 @@ export const useRequestChangeListeners = (): {
 	listenersRef.current = listeners
 
 	const fireListeners = useCallback(async (request: RequestState) => {
-		const event: RequestChangeEvent = { request }
+		let stopped = false
+		const event: RequestChangeEvent = { request, abortNavigation: () => (stopped = true) }
 		for (const listener of listenersRef.current) {
 			await listener(event)
-			if (event.request === undefined) {
-				return
+			if (stopped) {
+				return undefined
 			}
 		}
 		return event.request

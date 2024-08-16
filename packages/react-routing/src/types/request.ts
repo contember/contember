@@ -21,7 +21,8 @@ export type IncompleteRequestState = Partial<RequestState<DynamicRequestParamete
 
 
 export interface RequestChangeEvent {
-	request: RequestState | undefined
+	readonly request: RequestState
+	readonly abortNavigation: () => void
 }
 
 export type RequestChangeHandler = (event: RequestChangeEvent) => void

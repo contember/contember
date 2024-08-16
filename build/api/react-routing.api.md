@@ -8,8 +8,6 @@ import { BaseSyntheticEvent } from 'react';
 import { ComponentType } from 'react';
 import { Context } from 'react';
 import { EntityAccessor } from '@contember/react-binding';
-import { Environment } from '@contember/react-binding';
-import { FC } from 'react';
 import { FunctionComponent } from 'react';
 import { JSX as JSX_2 } from 'react/jsx-runtime';
 import { NamedExoticComponent } from 'react';
@@ -17,10 +15,10 @@ import { ReactElement } from 'react';
 import { ReactNode } from 'react';
 import { StateStorageOrName } from '@contember/react-utils';
 
-// @public (undocumented)
-export const createBindingLinkParametersResolver: (entity: EntityAccessor | undefined) => RoutingParameterResolver;
+// @internal (undocumented)
+export const AddRequestListenerContext: Context<(handler: RequestChangeHandler) => () => void>;
 
-// @public (undocumented)
+// @internal (undocumented)
 export const CurrentRequestContext: Context<RequestState>;
 
 // @public (undocumented)
@@ -50,9 +48,6 @@ export type IncompleteRequestState = Partial<RequestState<DynamicRequestParamete
 } | null;
 
 // @public (undocumented)
-export const isRoutingLinkTarget: (value: unknown) => value is RoutingLinkTarget;
-
-// @public (undocumented)
 export type LazyPageModule = () => Promise<PageModule>;
 
 // @public (undocumented)
@@ -61,18 +56,12 @@ export const Link: NamedExoticComponent<LinkProps>;
 // @public (undocumented)
 export type LinkProps = Omit<RoutingLinkProps, 'parametersResolver'>;
 
-// @public (undocumented)
-export type LinkTarget = RoutingLinkTarget;
-
 // @public
 export const Page: {
     <P = unknown>(props: PageProps<P>): JSX_2.Element | null;
     displayName: string;
     getPageName(props: PageProps<unknown>): string;
 };
-
-// @public @deprecated (undocumented)
-export const PageLink: NamedExoticComponent<LinkProps>;
 
 // @public (undocumented)
 export interface PageModule {
@@ -139,23 +128,22 @@ export interface PagesProps {
     suspenseFallback?: ReactNode;
 }
 
-// @public (undocumented)
-export const parseLinkTarget: (to: LinkTarget, env: Environment) => Exclude<LinkTarget, string>;
-
-// @public (undocumented)
-export const pathToRequestState: (routing: RoutingContextValue, path: string, query: string) => RequestState;
-
-// @public (undocumented)
-export const populateRequest: (routing: RoutingContextValue, location: Location) => RequestState;
-
-// @public (undocumented)
+// @internal (undocumented)
 export const PushRequestContext: Context<(req: RequestState) => void>;
 
 // @public (undocumented)
 export type RequestChange = (currentState: RequestState) => IncompleteRequestState | string;
 
 // @public (undocumented)
-export const requestChangeFactory: <P extends RequestParameters>(pageName: string, parameters?: P) => (currentState: RequestState) => PageRequest<P>;
+export interface RequestChangeEvent {
+    // (undocumented)
+    readonly abortNavigation: () => void;
+    // (undocumented)
+    readonly request: RequestState;
+}
+
+// @public (undocumented)
+export type RequestChangeHandler = (event: RequestChangeEvent) => void;
 
 // @public (undocumented)
 export type RequestParameters<Extra extends RoutingParameter = never> = {
@@ -166,15 +154,7 @@ export type RequestParameters<Extra extends RoutingParameter = never> = {
 export type RequestParameterValue = number | string;
 
 // @public (undocumented)
-export const RequestProvider: FC<{
-    children: ReactNode;
-}>;
-
-// @public (undocumented)
 export type RequestState<Parameters extends RequestParameters<RoutingParameter> = RequestParameters> = PageRequest<Parameters> | null;
-
-// @public (undocumented)
-export const requestStateToPath: (routing: RoutingContextValue, request: RequestState) => string;
 
 // @public (undocumented)
 export type RouteConfig<N> = RouteConfigWithMapping<N> | RouteConfigWithoutMapping;
@@ -217,10 +197,7 @@ export type RouteParamsByName<K extends RouteName, T = RouteParams> = T extends 
     name: K;
 } ? T : never;
 
-// @public (undocumented)
-export const ROUTING_BINDING_PARAMETER_PREFIX = "entity.";
-
-// @public (undocumented)
+// @internal (undocumented)
 export const RoutingContext: Context<RoutingContextValue>;
 
 // @public (undocumented)
@@ -288,10 +265,7 @@ export interface SelectedDimension {
 }
 
 // @public (undocumented)
-export const targetToRequest: (target: RoutingLinkTarget, currentRequest: RequestState) => IncompleteRequestState | null;
-
-// @public (undocumented)
-export const useBindingLinkParametersResolver: () => RoutingParameterResolver;
+export const useAddRequestChangeListener: () => (handler: RequestChangeHandler) => () => void;
 
 // @public (undocumented)
 export const useCurrentRequest: () => RequestState;
@@ -311,6 +285,9 @@ export const usePushRequest: () => (req: RequestState) => void;
 
 // @public (undocumented)
 export const useRedirect: () => (target: RoutingLinkTarget, parameters?: RequestParameters) => void;
+
+// @public (undocumented)
+export const useRegisterRequestChangeListener: (listener: RequestChangeHandler) => void;
 
 // @public (undocumented)
 export const useRouting: () => RoutingContextValue;

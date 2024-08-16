@@ -1,31 +1,18 @@
 import { FC, ReactNode, useCallback, useEffect, useRef, useState } from 'react'
-import { RequestChangeEvent, RequestChangeHandler, RequestState } from '../../types'
+import { RequestState } from '../../types'
 import { requestStateToPath } from '../utils/urlMapper'
 import { AddRequestListenerContext, CurrentRequestContext, PushRequestContext, useRouting } from '../../contexts'
 import { populateRequest } from '../utils/populateRequest'
+import { useRequestChangeListeners } from '../hooks/useRequestChangeListeners'
 
 
 export const RequestProvider: FC<{ children: ReactNode }> = ({ children }) => {
 	const routing = useRouting()
 	const [request, setRequest] = useState<RequestState>(() => populateRequest(routing, window.location))
-	const [listeners, setListeners] = useState<RequestChangeHandler[]>([])
-
-	const listenersRef = useRef(listeners)
-	listenersRef.current = listeners
+	const { fireListeners, addListener } = useRequestChangeListeners()
 
 	const requestRef = useRef(request)
 	requestRef.current = request
-
-	const fireListeners = useCallback(async (request: RequestState) => {
-		const event: RequestChangeEvent = { request }
-		for (const listener of listenersRef.current) {
-			await listener(event)
-			if (event.request === undefined) {
-				return
-			}
-		}
-		return event.request
-	}, [])
 
 	const pushHistoryState = useCallback((request: RequestState) => {
 		const newUrl = requestStateToPath(routing, request)
@@ -72,12 +59,7 @@ export const RequestProvider: FC<{ children: ReactNode }> = ({ children }) => {
 		[fireListeners, pushHistoryState],
 	)
 
-	const addListener = useCallback((handler: RequestChangeHandler) => {
-		setListeners(current => [...current, handler])
-		return () => {
-			setListeners(current => current.filter(h => h !== handler))
-		}
-	}, [])
+
 
 	return (
 		<CurrentRequestContext.Provider value={request}>

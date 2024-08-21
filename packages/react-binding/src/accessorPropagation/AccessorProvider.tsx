@@ -10,7 +10,7 @@ export interface EntityProviderProps {
 
 export function AccessorProvider(props: EntityProviderProps) {
 	return (
-		<EntityKeyContext.Provider value={props.accessor.key}>
+		<EntityKeyContext.Provider value={props.accessor.key ?? props.accessor.getAccessor}>
 			<EnvironmentContext.Provider value={props.accessor.environment}>{props.children}</EnvironmentContext.Provider>
 		</EntityKeyContext.Provider>
 	)

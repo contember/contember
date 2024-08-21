@@ -27,7 +27,7 @@ export class EntityListAccessorImpl implements EntityListAccessor {
 	 */
 	public* keys(): IterableIterator<EntityRealmKey> {
 		for (const accessor of this) {
-			yield accessor.key
+			yield accessor.key!
 		}
 	}
 

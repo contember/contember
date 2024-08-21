@@ -30,7 +30,7 @@ interface EntityAccessor extends Errorable {
 	/**
 	 * The key is a unique identifier of the entity. It is not the id of the entity.
 	 */
-	readonly key: EntityRealmKey
+	readonly key?: EntityRealmKey
 	readonly name: EntityName
 	readonly hasUnpersistedChanges: boolean
 	readonly errors: ErrorAccessor | undefined

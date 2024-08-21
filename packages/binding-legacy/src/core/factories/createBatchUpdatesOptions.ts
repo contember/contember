@@ -13,7 +13,10 @@ import type { TreeStore } from '../TreeStore'
 
 export const createBatchUpdatesOptions = (rootEnvironment: Environment, treeStore: TreeStore): BatchUpdatesOptions =>
 	Object.freeze({
-		getEntityByKey: (key: string) => {
+		getEntityByKey: (key: string | (() => EntityAccessor)) => {
+			if (typeof key === 'function') {
+				return key()
+			}
 			const realm = treeStore.entityRealmStore.get(key)
 
 			if (realm === undefined) {

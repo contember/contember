@@ -20,6 +20,9 @@ export class OperationsHelpers {
 		entityToConnect: EntityAccessor,
 	): EntityRealmState | EntityRealmStateStub {
 		const entityToConnectKey = entityToConnect.key
+		if (!entityToConnectKey) {
+			throw new BindingError(`Attempting to connect an entity without a key.`)
+		}
 		const stateToConnect = treeStore.entityRealmStore.get(entityToConnectKey)
 
 		if (stateToConnect === undefined) {

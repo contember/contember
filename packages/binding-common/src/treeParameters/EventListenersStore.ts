@@ -7,18 +7,25 @@ export class EventListenersStore<Events extends GenericEventsMap> {
 
 	constructor(
 		private readonly parentStoreGetter?: () => EventListenersStore<Events> | undefined,
-		private listeners: Map<string, Set<Events[any]>> = new Map(),
+		private listeners?: Map<string, Set<Events[any]>>,
 	) {}
 
 	set<Type extends keyof Events>(event: { type: Type; key?: string }, listeners: Set<Events[Type]>): void {
+		this.listeners ??= new Map()
 		this.listeners.set(this.formatMapEntryKey(event), listeners)
 	}
 
 	delete<Type extends keyof Events>(event: { type: Type; key?: string }) {
+		if (!this.listeners) {
+			return
+		}
 		this.listeners.delete(this.formatMapEntryKey(event))
 	}
 
 	deleteByType<Type extends keyof Events>(type: Type) {
+		if (!this.listeners) {
+			return
+		}
 		const prefix = this.formatMapEntryKey({ type, key: '' })
 		for (const eventType of this.listeners.keys()) {
 			if (eventType.startsWith(prefix)) {
@@ -28,6 +35,9 @@ export class EventListenersStore<Events extends GenericEventsMap> {
 	}
 
 	get<Type extends keyof Events>(event: { type: Type; key?: string }): Set<Events[Type]> | undefined {
+		if (!this.listeners) {
+			return undefined
+		}
 		const ownListeners = this.listeners.get(this.formatMapEntryKey(event))
 		const parentListeners = this.parentStoreGetter?.()?.get(event)
 		if (!parentListeners) {
@@ -39,6 +49,9 @@ export class EventListenersStore<Events extends GenericEventsMap> {
 	}
 
 	invoke<Type extends keyof Events>(event: { type: Type; key?: string }, ...args: Parameters<Events[Type]>): void {
+		if (!this.listeners) {
+			return
+		}
 		const listeners = this.get(event)
 		if (listeners) {
 			for (const listener of listeners) {
@@ -54,14 +67,20 @@ export class EventListenersStore<Events extends GenericEventsMap> {
 	}
 
 	clone(): EventListenersStore<Events> {
-		const store: EventListenersStore<Events> = new EventListenersStore()
+		if (!this.listeners) {
+			return new EventListenersStore<Events>(this.parentStoreGetter)
+		}
+		const store: EventListenersStore<Events> = new EventListenersStore(this.parentStoreGetter, new Map())
 		for (const [key, value] of this.listeners.entries()) {
-			store.listeners.set(key, new Set(value))
+			store.listeners!.set(key, new Set(value))
 		}
 		return store
 	}
 
 	append(other: EventListenersStore<Events>) {
+		if (!other.listeners) {
+			return
+		}
 		for (const [eventKey, otherListeners] of other.listeners) {
 			for (const listener of otherListeners) {
 				this.addInternal(eventKey, listener)
@@ -74,6 +93,7 @@ export class EventListenersStore<Events extends GenericEventsMap> {
 	}
 
 	private addInternal<Type extends keyof Events>(key: string, handler: Events[Type]) {
+		this.listeners ??= new Map()
 		let eventListeners = this.listeners.get(key)
 		if (!eventListeners) {
 			eventListeners = new Set()

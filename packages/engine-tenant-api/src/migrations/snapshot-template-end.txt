@@ -1,3 +1,6 @@
+INSERT INTO "config" (id)
+VALUES (DEFAULT);
+
 DO LANGUAGE plpgsql
 $$
 	BEGIN

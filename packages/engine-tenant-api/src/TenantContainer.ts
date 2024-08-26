@@ -79,6 +79,9 @@ import { UpdateIDPMutationResolver } from './resolvers/mutation/idp/UpdateIDPMut
 import { TenantCredentials, TenantMigrationsRunner } from './migrations'
 import { DisablePersonMutationResolver } from './resolvers/mutation/person/DisablePersonMutationResolver'
 import { MailTemplateQueryResolver } from './resolvers/query/MailTemplateQueryResolver'
+import { ConfigurationManager } from './model/service/ConfigurationManager'
+import { ConfigurationMutationResolver } from './resolvers/mutation/configuration/ConfigurationMutationResolver'
+import { ConfigurationQueryResolver } from './resolvers/query/ConfigurationQueryResolver'
 
 export interface TenantContainer {
 	projectMemberManager: ProjectMemberManager
@@ -201,6 +204,8 @@ export class TenantContainerFactory {
 				new MailTemplateManager())
 			.addService('rolesManager', () =>
 				new RolesManager())
+			.addService('configurationManager', () =>
+				new ConfigurationManager())
 
 			.addService('identityTypeResolver', ({ projectMemberManager, projectManager, permissionContextFactory }) =>
 				new IdentityTypeResolver(projectMemberManager, projectManager, permissionContextFactory))
@@ -268,6 +273,10 @@ export class TenantContainerFactory {
 				new SetProjectSecretMutationResolver(projectManager, secretManager))
 			.addService('identityGlobalRolesMutationResolver', ({ rolesManager }) =>
 				new IdentityGlobalRolesMutationResolver(rolesManager))
+			.addService('configurationMutationResolver', ({ configurationManager }) =>
+				new ConfigurationMutationResolver(configurationManager))
+			.addService('configurationQueryResolver', ({ configurationManager }) =>
+				new ConfigurationQueryResolver(configurationManager))
 			.addService('resolverContextFactory', ({ permissionContextFactory }) =>
 				new TenantResolverContextFactory(permissionContextFactory))
 			.addService('resolvers', container =>

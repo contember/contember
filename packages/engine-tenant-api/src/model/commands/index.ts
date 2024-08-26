@@ -1,5 +1,5 @@
 export * from './apiKey'
-export * from './apiKey'
+export * from './configuration'
 export * from './person'
 export * from './Command'
 export * from './CommandBus'

@@ -1,4 +1,5 @@
 export * from './apiKey'
+export * from './configuration'
 export * from './mailTemplate'
 export * from './membership'
 export * from './person'

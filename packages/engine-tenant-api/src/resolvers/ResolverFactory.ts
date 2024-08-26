@@ -31,6 +31,8 @@ import { IDPQueryResolver } from './query/IDPQueryResolver'
 import { UpdateIDPMutationResolver } from './mutation/idp/UpdateIDPMutationResolver'
 import { DisablePersonMutationResolver } from './mutation/person/DisablePersonMutationResolver'
 import { MailTemplateQueryResolver } from './query/MailTemplateQueryResolver'
+import { ConfigurationMutationResolver } from './mutation/configuration/ConfigurationMutationResolver'
+import { ConfigurationQueryResolver } from './query/ConfigurationQueryResolver'
 
 class ResolverFactory {
 	public constructor(
@@ -77,6 +79,9 @@ class ResolverFactory {
 
 			identityGlobalRolesMutationResolver: IdentityGlobalRolesMutationResolver
 
+			configurationMutationResolver: ConfigurationMutationResolver
+			configurationQueryResolver: ConfigurationQueryResolver
+
 		},
 	) { }
 
@@ -102,6 +107,7 @@ class ResolverFactory {
 				projectMemberships: this.resolvers.projectMembersQueryResolver.projectMemberships.bind(this.resolvers.projectMembersQueryResolver),
 				identityProviders: this.resolvers.idpQueryResolver.identityProviders.bind(this.resolvers.idpQueryResolver),
 				mailTemplates: this.resolvers.mailTemplateQueryResolver.mailTemplates.bind(this.resolvers.mailTemplateQueryResolver),
+				configuration: this.resolvers.configurationQueryResolver.configuration.bind(this.resolvers.configurationQueryResolver),
 				checkResetPasswordToken: () => {
 					throw new Error('not implemented')
 				},
@@ -154,6 +160,8 @@ class ResolverFactory {
 
 				addGlobalIdentityRoles: this.resolvers.identityGlobalRolesMutationResolver.addGlobalIdentityRoles.bind(this.resolvers.identityGlobalRolesMutationResolver),
 				removeGlobalIdentityRoles: this.resolvers.identityGlobalRolesMutationResolver.removeGlobalIdentityRoles.bind(this.resolvers.identityGlobalRolesMutationResolver),
+
+				configure: this.resolvers.configurationMutationResolver.configure.bind(this.resolvers.configurationMutationResolver),
 			},
 		}
 	}

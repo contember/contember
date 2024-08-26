@@ -13,6 +13,10 @@ namespace PermissionActions {
 		idp = 'idp',
 	}
 
+
+	export const CONFIGURE = Authorizator.createAction(Resources.system, 'configure')
+	export const CONFIG_VIEW = Authorizator.createAction(Resources.system, 'viewConfig')
+
 	export const IDENTITY_VIEW_PERMISSIONS = Authorizator.createAction(Resources.identity, 'viewPermissions')
 	export const IDENTITY_ADD_GLOBAL_ROLES = (roles?: readonly string[]) => Authorizator.createAction(Resources.identity, 'addGlobalRoles', { roles })
 	export const IDENTITY_REMOVE_GLOBAL_ROLES = (roles?: readonly string[]) => Authorizator.createAction(Resources.identity, 'removeGlobalRoles', { roles })

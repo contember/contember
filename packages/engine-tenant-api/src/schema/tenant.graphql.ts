@@ -20,6 +20,8 @@ const schema: DocumentNode = gql`
 
 		identityProviders: [IdentityProvider!]!
 		mailTemplates: [MailTemplateData!]!
+		
+		configuration: Config!
 	}
 
 	type Mutation {
@@ -95,6 +97,8 @@ const schema: DocumentNode = gql`
 		): CreateProjectResponse
 		setProjectSecret(projectSlug: String!, key: String!, value: String!): SetProjectSecretResponse
 		updateProject(projectSlug: String!, name: String, config: Json, mergeConfig: Boolean): UpdateProjectResponse
+		
+		configure(config: ConfigInput!): ConfigureResponse
 
 		addProjectMailTemplate(template: MailTemplate!): AddMailTemplateResponse
 		@deprecated(reason: "use addMailTemplate")
@@ -102,6 +106,49 @@ const schema: DocumentNode = gql`
 		removeProjectMailTemplate(templateIdentifier: MailTemplateIdentifier!): RemoveMailTemplateResponse
 		@deprecated(reason: "use removeMailTemplate")
 
+	}
+	
+	# === configure ===
+	
+	type Config {
+		passwordless: ConfigPasswordless!
+	}
+	
+	type ConfigPasswordless {
+		enabled: ConfigPolicy!
+		url: String
+		expirationMinutes: Int!
+	}
+	
+	input ConfigInput {
+		passwordless: ConfigPasswordlessInput
+    }
+	
+	enum ConfigPolicy {
+		always
+		never
+		optIn
+		optOut
+    }
+	
+	input ConfigPasswordlessInput {
+		enabled: ConfigPolicy
+		url: String
+		expirationMinutes: Int
+    }
+	
+	type ConfigureResponse {
+		ok: Boolean!
+		error: ConfigureError
+	}
+	
+	type ConfigureError {
+		code: ConfigureErrorCode!
+		developerMessage: String!
+	}
+	
+	enum ConfigureErrorCode {
+		INVALID_CONFIG
 	}
 
 	# === signUp ===

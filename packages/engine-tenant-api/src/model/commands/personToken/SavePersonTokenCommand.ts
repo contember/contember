@@ -2,19 +2,19 @@ import { Command } from '../Command'
 import { InsertBuilder } from '@contember/database'
 import { plusMinutes } from '../../utils/time'
 import { TokenHash } from '../../utils'
+import { PersonTokenType } from '../../type'
 
-const PASSWORD_RESET_EXPIRATION = 60
-
-export class SavePasswordResetRequestCommand implements Command<void> {
+export class SavePersonTokenCommand implements Command<void> {
 	constructor(
 		private readonly personId: string,
 		private readonly tokenHash: TokenHash,
-		private readonly expirationMinutes: number = PASSWORD_RESET_EXPIRATION,
+		private readonly type: PersonTokenType,
+		private readonly expirationMinutes: number,
 	) {}
 
 	async execute({ db, providers }: Command.Args): Promise<void> {
 		await InsertBuilder.create()
-			.into('person_password_reset')
+			.into('person_token')
 			.values({
 				id: providers.uuid(),
 				token_hash: this.tokenHash,
@@ -22,6 +22,7 @@ export class SavePasswordResetRequestCommand implements Command<void> {
 				expires_at: plusMinutes(providers.now(), this.expirationMinutes),
 				created_at: providers.now(),
 				used_at: null,
+				type: this.type,
 			})
 			.execute(db)
 	}

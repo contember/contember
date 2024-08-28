@@ -14,7 +14,7 @@ export class ResetPasswordCommand implements Command<ResetPasswordCommandRespons
 		const result =
 			(
 				await SelectBuilder.create<{ used_at: null | Date; expires_at: Date; id: string; person_id: string }>()
-					.from('person_password_reset')
+					.from('person_token')
 					.select('id')
 					.select('person_id')
 					.select('used_at')
@@ -33,7 +33,7 @@ export class ResetPasswordCommand implements Command<ResetPasswordCommandRespons
 			return new ResponseError('TOKEN_EXPIRED', `Token expired at ${result.expires_at.toISOString()}`)
 		}
 		const count = await UpdateBuilder.create()
-			.table('person_password_reset')
+			.table('person_token')
 			.where({ id: result.id })
 			.where(expr => expr.isNull('used_at'))
 			.values({

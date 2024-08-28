@@ -1,9 +1,9 @@
 import {
 	CreateIdentityCommand,
 	CreateOrUpdateProjectMembershipCommand,
-	CreatePasswordResetRequestCommand,
 	CreatePersonCommand,
-	SavePasswordResetRequestCommand,
+	CreatePersonTokenCommand,
+	SavePersonTokenCommand,
 } from '../commands'
 import { Providers } from '../providers'
 import { PersonQuery, PersonRow } from '../queries'
@@ -17,6 +17,7 @@ import { DatabaseContext, TokenHash } from '../utils'
 import { NoPassword, PasswordPlain } from '../dtos'
 import { Acl } from '@contember/schema'
 import { validateEmail } from '../utils/email'
+import { INVITATION_RESET_TOKEN_EXPIRATION_MINUTES } from '../consts/expirations'
 
 export interface InviteData {
 	email: string
@@ -29,8 +30,6 @@ export interface InviteData {
 	method?: InviteMethod
 	passwordResetTokenHash?: TokenHash
 }
-
-const INVITATION_RESET_TOKEN_EXPIRATION_MINUTES = 60 * 24
 
 export class InviteManager {
 	constructor(
@@ -76,11 +75,11 @@ export class InviteManager {
 					password: passwordWrapper,
 				}))
 				if (method === 'RESET_PASSWORD') {
-					const result = await trx.commandBus.execute(new CreatePasswordResetRequestCommand(person.id, await this.getInviteExpiration(project.slug)))
+					const result = await trx.commandBus.execute(CreatePersonTokenCommand.createPasswordResetRequest(person.id, await this.getInviteExpiration(project.slug)))
 					resetToken = result.token
 				}
 				if (passwordResetTokenHash) {
-					await trx.commandBus.execute(new SavePasswordResetRequestCommand(person.id, passwordResetTokenHash, await this.getInviteExpiration(project.slug)))
+					await trx.commandBus.execute(new SavePersonTokenCommand(person.id, passwordResetTokenHash, 'password_reset', await this.getInviteExpiration(project.slug)))
 				}
 			}
 			for (const membershipUpdate of createAppendMembershipVariables(memberships)) {

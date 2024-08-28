@@ -11,7 +11,7 @@ import { createMembershipSql } from './sql/createMembershipSql'
 import { createPersonSql } from './sql/createPersonSql'
 import { disableOneOffKeySql } from './sql/disableOneOffKeySql'
 import { test } from 'vitest'
-import { createPasswordResetSql } from './sql/createPasswordResetSql'
+import { createPersonTokenSql } from './sql/createPersonTokenSql'
 import { getMailTemplateSql } from './sql/getMailTemplateSql'
 
 test('invite a new person', async () => {
@@ -125,7 +125,7 @@ test('invite a new person with password reset', async () => {
 				getPersonByEmailSql({ email, response: null }),
 				createIdentitySql({ roles: ['person'], identityId }),
 				createPersonSql({ identityId, personId, email }),
-				createPasswordResetSql({ personId, tokenHash: '9692e67b8378a6f6753f97782d458aa757e947eab2fbdf6b5c187b74561eb78f', resetId: passwordTokenId }),
+				createPersonTokenSql({ personId, tokenHash: '9692e67b8378a6f6753f97782d458aa757e947eab2fbdf6b5c187b74561eb78f', resetId: passwordTokenId, type: 'reset_password' }),
 				createMembershipSql({ membershipId, projectId, identityId, role: 'editor' }),
 				patchVariablesSql({
 					id: variableId,

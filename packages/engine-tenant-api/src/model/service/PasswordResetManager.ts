@@ -1,4 +1,3 @@
-import { CreatePasswordResetRequestCommand, ResetPasswordCommand, ResetPasswordCommandErrorCode } from '../commands'
 import { Response, ResponseError } from '../utils/Response'
 import { getPasswordWeaknessMessage } from '../utils/password'
 import { UserMailer } from '../mailing'
@@ -7,6 +6,8 @@ import { PermissionContext } from '../authorization'
 import { ProjectManager } from './ProjectManager'
 import { DatabaseContext } from '../utils'
 import { ImplementationException } from '../../exceptions'
+import { getPreferredProject } from './helpers/getPreferredProject'
+import { CreatePersonTokenCommand, ResetPasswordCommand, ResetPasswordCommandErrorCode } from '../commands/personToken'
 
 interface MailOptions {
 	project?: string
@@ -25,16 +26,9 @@ export class PasswordResetManager {
 		person: PersonRow,
 		mailOptions: MailOptions = {},
 	): Promise<void> {
-		const result = await dbContext.commandBus.execute(new CreatePasswordResetRequestCommand(person.id))
+		const result = await dbContext.commandBus.execute(CreatePersonTokenCommand.createPasswordResetRequest(person.id))
 		const projects = await this.projectManager.getProjectsByIdentity(dbContext, person.identity_id, permissionContext)
-		const project = (() => {
-			if (projects.length === 1) {
-				return projects[0]
-			} else if (mailOptions.project) {
-				return projects.find(it => it.slug === mailOptions.project) || null
-			}
-			return null
-		})()
+		const project = getPreferredProject(projects, mailOptions.project ?? null)
 		if (!person.email) {
 			throw new ImplementationException()
 		}

@@ -33,6 +33,7 @@ import { DisablePersonMutationResolver } from './mutation/person/DisablePersonMu
 import { MailTemplateQueryResolver } from './query/MailTemplateQueryResolver'
 import { ConfigurationMutationResolver } from './mutation/configuration/ConfigurationMutationResolver'
 import { ConfigurationQueryResolver } from './query/ConfigurationQueryResolver'
+import { PasswordlessMutationResolver } from './mutation/person/PasswordlessMutationResolver'
 
 class ResolverFactory {
 	public constructor(
@@ -55,6 +56,7 @@ class ResolverFactory {
 			disableIdpMutationResolver: DisableIDPMutationResolver
 			enableIdpMutationResolver: EnableIDPMutationResolver
 			updateIdpMutationResolver: UpdateIDPMutationResolver
+			passwordlessMutationResolver: PasswordlessMutationResolver
 
 			disablePersonMutationResolver: DisablePersonMutationResolver
 
@@ -132,6 +134,10 @@ class ResolverFactory {
 				enableIDP: this.resolvers.enableIdpMutationResolver.enableIDP.bind(this.resolvers.enableIdpMutationResolver),
 				updateIDP: this.resolvers.updateIdpMutationResolver.updateIDP.bind(this.resolvers.updateIdpMutationResolver),
 				disablePerson: this.resolvers.disablePersonMutationResolver.disablePerson.bind(this.resolvers.disablePersonMutationResolver),
+
+				signInPasswordless: this.resolvers.passwordlessMutationResolver.signInPasswordless.bind(this.resolvers.passwordlessMutationResolver),
+				initSignInPasswordless: this.resolvers.passwordlessMutationResolver.initSignInPasswordless.bind(this.resolvers.passwordlessMutationResolver),
+				activatePasswordlessOtp: this.resolvers.passwordlessMutationResolver.activatePasswordlessOtp.bind(this.resolvers.passwordlessMutationResolver),
 
 				invite: this.resolvers.inviteMutationResolver.invite.bind(this.resolvers.inviteMutationResolver),
 				unmanagedInvite: this.resolvers.inviteMutationResolver.unmanagedInvite.bind(this.resolvers.inviteMutationResolver),

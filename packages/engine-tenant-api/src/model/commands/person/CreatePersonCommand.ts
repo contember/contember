@@ -40,6 +40,7 @@ export class CreatePersonCommand implements Command<Omit<PersonRow, 'roles'>> {
 			otp_uri: null,
 			otp_activated_at: null,
 			disabled_at: null,
+			passwordless_enabled: null,
 		}
 	}
 }

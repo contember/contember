@@ -1,13 +1,13 @@
 import { Command } from '../Command'
 import { computeTokenHash, generateToken } from '../../utils'
 import { SavePersonTokenCommand } from './SavePersonTokenCommand'
-import { PersonTokenType } from '../../type'
+import { PersonToken } from '../../type'
 import { PASSWORD_RESET_EXPIRATION_MINUTES } from '../../consts/expirations'
 
-export class CreatePersonTokenCommand implements Command<CreatePasswordResetRequestResult> {
+export class CreatePersonTokenCommand implements Command<CreatePersonTokenCommand.Result> {
 	private constructor(
 		private readonly personId: string,
-		private readonly type: PersonTokenType,
+		private readonly type: PersonToken.Type,
 		private readonly expirationMinutes: number,
 	) {}
 
@@ -15,19 +15,28 @@ export class CreatePersonTokenCommand implements Command<CreatePasswordResetRequ
 		return new CreatePersonTokenCommand(personId, 'password_reset', expirationMinutes)
 	}
 
-	async execute({ db, providers, bus }: Command.Args): Promise<CreatePasswordResetRequestResult> {
+	static createPasswordlessRequest(personId: string, expirationMinutes: number): CreatePersonTokenCommand {
+		return new CreatePersonTokenCommand(personId, 'passwordless', expirationMinutes)
+	}
+
+	async execute({ db, providers, bus }: Command.Args): Promise<CreatePersonTokenCommand.Result> {
 		const token = await generateToken(providers)
 		const tokenHash = computeTokenHash(token)
-		await bus.execute(new SavePersonTokenCommand(
+		const result = await bus.execute(new SavePersonTokenCommand(
 			this.personId,
 			tokenHash,
 			this.type,
 			this.expirationMinutes,
 		))
 
-		return new CreatePasswordResetRequestResult(token)
+		return { ...result, token }
 	}
 }
-export class CreatePasswordResetRequestResult {
-	constructor(public readonly token: string) {}
+
+namespace CreatePersonTokenCommand {
+	export interface Result {
+		readonly id: string
+		readonly token: string
+		readonly expiresAt: Date
+	}
 }

@@ -24,6 +24,8 @@ class PermissionsFactory {
 		permissions.allow(TenantRole.LOGIN, PermissionActions.PERSON_RESET_PASSWORD)
 		permissions.allow(TenantRole.LOGIN, PermissionActions.PERSON_CREATE_IDP_URL)
 		permissions.allow(TenantRole.LOGIN, PermissionActions.PERSON_SIGN_IN_IDP)
+		permissions.allow(TenantRole.LOGIN, PermissionActions.PERSON_PASSWORDLESS_SIGN_IN)
+		permissions.allow(TenantRole.LOGIN, PermissionActions.PERSON_REQUEST_PASSWORDLESS_SIGN_IN)
 
 		permissions.allow(TenantRole.PERSON, PermissionActions.PERSON_VIEW)
 		permissions.allow(TenantRole.PERSON, PermissionActions.PERSON_CHANGE_MY_PASSWORD)

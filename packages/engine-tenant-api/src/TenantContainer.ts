@@ -82,6 +82,8 @@ import { MailTemplateQueryResolver } from './resolvers/query/MailTemplateQueryRe
 import { ConfigurationManager } from './model/service/ConfigurationManager'
 import { ConfigurationMutationResolver } from './resolvers/mutation/configuration/ConfigurationMutationResolver'
 import { ConfigurationQueryResolver } from './resolvers/query/ConfigurationQueryResolver'
+import { PasswordlessMutationResolver } from './resolvers/mutation/person/PasswordlessMutationResolver'
+import { PasswordlessSignInManager } from './model/service/PasswordlessSignInManager'
 
 export interface TenantContainer {
 	projectMemberManager: ProjectMemberManager
@@ -206,6 +208,8 @@ export class TenantContainerFactory {
 				new RolesManager())
 			.addService('configurationManager', () =>
 				new ConfigurationManager())
+			.addService('passwordlessSignInManager', ({ apiKeyManager, configurationManager, userMailer, projectManager, otpAuthenticator }) =>
+				new PasswordlessSignInManager(apiKeyManager, configurationManager, userMailer, projectManager, otpAuthenticator))
 
 			.addService('identityTypeResolver', ({ projectMemberManager, projectManager, permissionContextFactory }) =>
 				new IdentityTypeResolver(projectMemberManager, projectManager, permissionContextFactory))
@@ -277,6 +281,8 @@ export class TenantContainerFactory {
 				new ConfigurationMutationResolver(configurationManager))
 			.addService('configurationQueryResolver', ({ configurationManager }) =>
 				new ConfigurationQueryResolver(configurationManager))
+			.addService('passwordlessMutationResolver', ({ passwordlessSignInManager, signInResponseFactory }) =>
+				new PasswordlessMutationResolver(passwordlessSignInManager, signInResponseFactory))
 			.addService('resolverContextFactory', ({ permissionContextFactory }) =>
 				new TenantResolverContextFactory(permissionContextFactory))
 			.addService('resolvers', container =>

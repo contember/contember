@@ -16,7 +16,7 @@ export const createPersonTokenSql = (args: {
 		(val: any) => val instanceof Date,
 		(val: any) => val instanceof Date,
 		null,
-		type,
+		args.type,
 	],
 	response: { rowCount: 1 },
 })

@@ -1,57 +1,28 @@
 import { Command } from '../Command'
-import { SelectBuilder, UpdateBuilder } from '@contember/database'
-import { computeTokenHash } from '../../utils'
-import { ImplementationException } from '../../../exceptions'
 import { ChangePasswordCommand } from '../person/ChangePasswordCommand'
-import { Response, ResponseError, ResponseOk } from '../../utils/Response'
+import { Response, ResponseOk } from '../../utils/Response'
+import { PersonTokenQuery } from '../../queries/personToken/PersonTokenQuery'
+import { InvalidateTokenCommand } from './InvalidateTokenCommand'
+import { validateToken } from '../../utils'
+import { PersonToken } from '../../type'
 
 export class ResetPasswordCommand implements Command<ResetPasswordCommandResponse> {
 	constructor(private readonly token: string, private readonly password: string) {}
 
 	async execute({ db, providers, bus }: Command.Args): Promise<ResetPasswordCommandResponse> {
-		const tokenHash = computeTokenHash(this.token)
-
-		const result =
-			(
-				await SelectBuilder.create<{ used_at: null | Date; expires_at: Date; id: string; person_id: string }>()
-					.from('person_token')
-					.select('id')
-					.select('person_id')
-					.select('used_at')
-					.select('expires_at')
-					.where({ token_hash: tokenHash })
-					.getResult(db)
-			)[0] || null
-		if (!result) {
-			return new ResponseError('TOKEN_NOT_FOUND', 'Token was not found')
-		}
-		if (result.used_at) {
-			return new ResponseError('TOKEN_USED', `Token was used at ${result.used_at.toISOString()}`)
-		}
 		const now = providers.now()
-		if (result.expires_at < now) {
-			return new ResponseError('TOKEN_EXPIRED', `Token expired at ${result.expires_at.toISOString()}`)
+		const token = await db.createQueryHandler().fetch(PersonTokenQuery.byToken(this.token, 'password_reset'))
+		const tokenValidationResult = validateToken({ entry: token, token: this.token, now, validationType: 'token' })
+		if (!tokenValidationResult.ok) {
+			return tokenValidationResult
 		}
-		const count = await UpdateBuilder.create()
-			.table('person_token')
-			.where({ id: result.id })
-			.where(expr => expr.isNull('used_at'))
-			.values({
-				used_at: now,
-			})
-			.execute(db)
-		if (count === 0) {
-			throw new ImplementationException()
-		}
-
-		await bus.execute(new ChangePasswordCommand(result.person_id, this.password))
+		await bus.execute(new InvalidateTokenCommand(tokenValidationResult.result.id))
+		await bus.execute(new ChangePasswordCommand(tokenValidationResult.result.person_id, this.password))
 
 		return new ResponseOk(null)
 	}
 }
 export type ResetPasswordCommandErrorCode =
-	|  'TOKEN_NOT_FOUND'
-	|  'TOKEN_USED'
-	|  'TOKEN_EXPIRED'
+	| PersonToken.TokenValidationError
 
-export type ResetPasswordCommandResponse = Response<null, ResetPasswordCommandErrorCode>
+export type ResetPasswordCommandResponse = Response<null, PersonToken.TokenValidationError>

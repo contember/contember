@@ -2,6 +2,7 @@ import { Mailer, TemplateRenderer } from '../../utils'
 import NewUserInvited from './templates/NewUserInvited.mustache'
 import ExistingUserInvited from './templates/ExistingUserInvited.mustache'
 import PasswordReset from './templates/PasswordReset.mustache'
+import PasswordlessSignIn from './templates/PasswordlessSignIn.mustache'
 import { MailTemplateData, MailTemplateIdentifier, MailType } from './type'
 import { MailTemplateQuery } from '../queries'
 import Layout from './templates/Layout.mustache'
@@ -47,6 +48,19 @@ export class UserMailer {
 		const template = (await this.getCustomTemplate(dbContext, { type: MailType.passwordReset, ...customMailOptions })) || {
 			subject: 'Password reset',
 			content: PasswordReset,
+			replyTo: null,
+		}
+		await this.sendTemplate(template, mailArguments)
+	}
+
+	async sendPasswordlessEmail(
+		dbContext: DatabaseContext,
+		mailArguments: { email: string; token: string; project?: string; projectSlug?: string; url?: string },
+		customMailOptions: { projectId: string | null; variant: string },
+	): Promise<void> {
+		const template = (await this.getCustomTemplate(dbContext, { type: MailType.passwordlessSignIn, ...customMailOptions })) || {
+			subject: 'Sign in here',
+			content: PasswordlessSignIn,
 			replyTo: null,
 		}
 		await this.sendTemplate(template, mailArguments)

@@ -10,6 +10,7 @@ import { SlugField } from '@app/lib-extra/slug-field/field'
 import slugify from '@sindresorhus/slugify'
 import { useEnvironment } from '@contember/react-binding'
 import { Link } from '@contember/react-routing'
+import { FractionalAmountField } from '@app/lib-extra/fractional-amount-field'
 
 export const Basic = () => {
 	const required = !!useEnvironment().getParameterOrElse('required', false)
@@ -31,6 +32,23 @@ export const Basic = () => {
 					<FieldExists field={'nonExistingField'}>
 						<InputField field={'nonExistingField'} label={'Date time'} />
 					</FieldExists>
+				</div>
+			</EntitySubTree>
+		</Binding>
+	</>
+}
+export const Cents = () => {
+	const required = !!useEnvironment().getParameterOrElse('required', false)
+	return <>
+		<Binding>
+			<Slots.Actions>
+				<PersistButton />
+			</Slots.Actions>
+			<EntitySubTree entity={'InputRoot(unique=unique)'} setOnCreate={'(unique=unique)'}>
+				<div className={'space-y-4'}>
+					<ToggleRequired />
+					<InputField field="dummy" label="Dummy to trigger dirty state" />
+					<FractionalAmountField field={'intValue'} label={'Cents'} required={required} fractionDigits={2} />
 				</div>
 			</EntitySubTree>
 		</Binding>

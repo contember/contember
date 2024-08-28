@@ -55,6 +55,7 @@ export const Navigation = () => {
 					<MenuItem icon={line} label={'Checkbox'} to={'input/checkbox'} />
 					<MenuItem icon={line} label={'Radio'} to={'input/enumRadio'} />
 					<MenuItem icon={line} label={'Slug'} to={'input/slug'} />
+					<MenuItem icon={line} label={'Cents field'} to={'input/cents'} />
 				</MenuItem>
 				<MenuItem icon={<ArchiveIcon size={16} />} label={'Select'}>
 					<MenuItem icon={line} label={'Has one select'} to={'select/hasOne'} />

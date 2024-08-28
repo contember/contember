@@ -1,20 +1,34 @@
 import './index.css'
 import { createErrorHandler } from '@contember/react-devbar'
 import { createRoot } from 'react-dom/client'
-import { LoginFormFields, PasswordResetRequestFormFields } from '@app/lib/tenant'
+import { LoginFormFields, PasswordResetFormFields, PasswordResetRequestFormFields } from '@app/lib/tenant'
 import { ContemberClient } from '@contember/react-client'
-import { IdentityProvider, IdentityState, IDP, IDPInitTrigger, IDPState, LoginForm, LogoutTrigger, PasswordResetForm, PasswordResetRequestForm } from '@contember/react-identity'
+import {
+	IdentityProvider,
+	IdentityState,
+	IDP,
+	IDPInitTrigger,
+	IDPState,
+	LoginForm,
+	LogoutTrigger,
+	PasswordlessSignInForm,
+	PasswordlessSignInInitForm,
+	PasswordResetForm,
+	PasswordResetRequestForm,
+	usePasswordlessOtpActivator,
+} from '@contember/react-identity'
 import { Link, RoutingProvider, useCurrentRequest, useRedirect } from '@contember/react-routing'
 import { Pages, useIdentity } from '@contember/interface'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@app/lib/ui/card'
 import { AnchorButton, Button } from '@app/lib/ui/button'
 import { MailIcon } from 'lucide-react'
-import { PasswordResetFormFields } from '@app/lib/tenant'
 import { ToastContent, Toaster, useShowToast } from '@app/lib/toast'
 import { Loader } from '@app/lib/ui/loader'
 import { Overlay } from '@app/lib/ui/overlay'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { dict } from '@app/lib/dict'
+import { PasswordlessSignInInitFormFields } from '@app/lib/tenant/forms/passwordless-signin-init'
+import { PasswordlessSignInFormFields } from '@app/lib/tenant/forms/passwordless-signin'
 
 const errorHandler = createErrorHandler((dom, react, onRecoverableError) => createRoot(dom, { onRecoverableError }).render(react))
 
@@ -29,6 +43,7 @@ const appUrl = '/app'
 
 const Login = () => {
 	const showToast = useShowToast()
+	const redirect = useRedirect()
 	return <>
 		<IDP
 			onInitError={error => showToast(<ToastContent>{dict.tenant.login.idpInitError} {error}</ToastContent>, { type: 'error' })}
@@ -59,6 +74,14 @@ const Login = () => {
 							</Button>
 						</IDPInitTrigger>
 					))}
+
+					<PasswordlessSignInInitForm onSuccess={({ result }) => {
+						redirect('magicLinkSent(request_id: $requestId)', { requestId: result.requestId })
+					}}>
+						<form>
+							<PasswordlessSignInInitFormFields />
+						</form>
+					</PasswordlessSignInInitForm>
 				</CardContent>
 				<IDPState state={['processing_init', 'processing_response', 'success']}>
 					<Loader />
@@ -211,6 +234,106 @@ const PasswordResetRequestSuccessPage = () => (
 	</Card>
 )
 
+const PasswordlessMagicLinkSentPage = () => {
+	const request = useCurrentRequest()
+	const redirect = useRedirect()
+	const requestId = request?.parameters.request_id as string | undefined
+	const [showOtp, setShowOtp] = useState(false)
+	useEffect(() => {
+		setTimeout(() => {
+			setShowOtp(true)
+		}, 5000)
+	}, [])
+	if (!requestId) {
+		return <p>Invalid request</p>
+	}
+	return (
+		<Card className="w-96">
+			<CardHeader>
+				<CardTitle className="text-2xl">{dict.tenant.passwordlessSignIn.title}</CardTitle>
+			</CardHeader>
+			<CardContent>
+				{showOtp ?  (<>
+					<p className="text-gray-600">Have a verification code? Enter it here:</p>
+					<PasswordlessSignInForm onSuccess={() => {
+						redirect('index')
+					}} requestId={requestId} validationType="otp">
+						<form>
+							<PasswordlessSignInFormFields type="otp" />
+						</form>
+					</PasswordlessSignInForm>
+				</>) : <div className="flex flex-col items-center justify-center gap-4">
+					<MailIcon className="text-gray-300 w-16 h-16" />
+					<div className="text-center">
+						An email with password reset instructions has been sent to your email address.
+					</div>
+					<div className="text-xs text-gray-600">
+						Do you have a verification code?{' '}
+						<span onClick={() => setShowOtp(true)} className="underline cursor-pointer">
+							Enter  manually
+						</span>
+					</div>
+				</div>}
+			</CardContent>
+			<CardFooter>
+				<Link to="index">
+					<AnchorButton variant="link" className="ml-auto">
+						{dict.tenant.login.backToLogin}
+					</AnchorButton>
+				</Link>
+			</CardFooter>
+		</Card>
+	)
+}
+
+
+const PasswordlessMagicLinkPage = () => {
+	const request = useCurrentRequest()
+	const redirect = useRedirect()
+	const requestId = request?.parameters.request_id as string | undefined
+	const token = request?.parameters.token as string | undefined
+	const otpActivation = usePasswordlessOtpActivator()
+	if (!requestId || !token || otpActivation.type === 'empty') {
+		return <p>Invalid request</p>
+	}
+	return (
+		<Card className="w-96">
+			<CardHeader>
+				<CardTitle className="text-2xl">{dict.tenant.passwordlessSignIn.title}</CardTitle>
+			</CardHeader>
+			<CardContent>
+				{otpActivation.type === 'otp_activating' && <Loader />}
+				{otpActivation.type === 'otp_activation_failed' && <div className="text-red-500 text-center">
+					{dict.tenant.otpActivation.errorMessages[otpActivation.error]}
+				</div>}
+				{otpActivation.type === 'otp_activated' && <div className="flex flex-col items-center gap-4">
+					<p className="text-lg text-center">
+						Enter the following code where you initiated signing in:
+					</p>
+					<div className="text-4xl font-bold border p-2 rounded font-mono">
+						{otpActivation.otp}
+					</div>
+
+				</div>}
+				{otpActivation.type === 'can_proceed_to_login' && <PasswordlessSignInForm onSuccess={() => {
+					redirect('index')
+				}} requestId={requestId} token={token?.toString()} validationType="token">
+					<form>
+						<PasswordlessSignInFormFields type="token" />
+					</form>
+				</PasswordlessSignInForm>}
+			</CardContent>
+			<CardFooter>
+				<Link to="index">
+					<AnchorButton variant="link" className="ml-auto">
+						{dict.tenant.login.backToLogin}
+					</AnchorButton>
+				</Link>
+			</CardFooter>
+		</Card>
+	)
+}
+
 const Layout = ({ children }: { children?: React.ReactNode }) => (
 	<div className="grid md:grid-cols-2 min-h-screen ">
 		<div className="bg-gray-100 p-4 flex items-center justify-center">
@@ -240,6 +363,8 @@ errorHandler(onRecoverableError => createRoot(rootEl, { onRecoverableError }).re
 						resetRequest: PasswordResetRequestPage,
 						resetRequestSuccess: PasswordResetRequestSuccessPage,
 						passwordReset: PasswordResetPage,
+						magicLinkSent: PasswordlessMagicLinkSentPage,
+						magicLink: PasswordlessMagicLinkPage,
 					}}
 				/>
 			</Toaster>

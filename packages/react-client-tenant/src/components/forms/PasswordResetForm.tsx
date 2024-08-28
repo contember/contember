@@ -77,4 +77,5 @@ const errorToField: Record<TenantApi.ResetPasswordErrorCode, keyof PasswordReset
 	TOKEN_EXPIRED: 'token',
 	TOKEN_NOT_FOUND: 'token',
 	TOKEN_USED: 'token',
+	TOKEN_INVALID: 'token',
 }

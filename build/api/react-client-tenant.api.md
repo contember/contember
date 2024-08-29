@@ -4,6 +4,7 @@
 
 ```ts
 
+import { ActivatePasswordlessOtpErrorCode } from '@contember/graphql-client-tenant';
 import { ChangeMyPasswordErrorCode } from '@contember/graphql-client-tenant';
 import { ConfirmOtpErrorCode } from '@contember/graphql-client-tenant';
 import { Context } from 'react';
@@ -26,6 +27,9 @@ import { SignInErrorCode } from '@contember/graphql-client-tenant';
 import { SignInIDPErrorCode } from '@contember/graphql-client-tenant';
 import * as TenantApi from '@contember/graphql-client-tenant';
 import { UpdateProjectMemberErrorCode } from '@contember/graphql-client-tenant';
+
+// @public (undocumented)
+export type ActivatePasswordlessOtpMutationVariables = Parameters<ReturnType<typeof useActivatePasswordlessOtpMutation>>[0];
 
 // @public (undocumented)
 export const addProjectMemberMutation: TenantApi.MutationFetcher<{
@@ -333,6 +337,8 @@ export const createSessionTokenMutation: TenantApi.MutationFetcher<{
                 readonly name?: string;
             } & {
                 readonly otpEnabled: boolean;
+            } & {
+                readonly passwordlessEnabled?: boolean;
             };
         }) | undefined;
     }) | undefined;
@@ -594,6 +600,14 @@ export type InitSignInIDPMutationVariables = {
     };
 };
 
+// Warning: (ae-forgotten-export) The symbol "InitSignInPasswordlessMutationResult_2" needs to be exported by the entry point index.d.ts
+//
+// @public (undocumented)
+export type InitSignInPasswordlessMutationResult = ModelType<typeof InitSignInPasswordlessMutationResult_2>;
+
+// @public (undocumented)
+export type InitSignInPasswordlessMutationVariables = Parameters<ReturnType<typeof useInitSignInPasswordlessMutation>>[0];
+
 // @public (undocumented)
 export const InviteForm: ({ children, onSuccess, projectSlug, initialMemberships, inviteOptions }: InviteFormProps) => JSX_2.Element;
 
@@ -664,6 +678,8 @@ export const inviteMutation: TenantApi.MutationFetcher<{
                 readonly name?: string;
             } & {
                 readonly otpEnabled: boolean;
+            } & {
+                readonly passwordlessEnabled?: boolean;
             } & {
                 readonly identity: {
                     readonly id: string;
@@ -794,6 +810,88 @@ export type OtpPrepareFormState = FormState;
 // @public (undocumented)
 export type OtpPrepareFormValues = {
     label: string;
+};
+
+// @public (undocumented)
+export type PasswordlessResponseHandlerState = {
+    type: 'empty';
+} | {
+    type: 'otp_activating';
+} | {
+    type: 'otp_activated';
+    otp: string;
+} | {
+    type: 'otp_activation_failed';
+    error: ActivatePasswordlessOtpErrorCode | 'UNKNOWN_ERROR';
+} | {
+    type: 'can_proceed_to_login';
+};
+
+// @public (undocumented)
+export const PasswordlessSignInForm: ({ children, onSuccess, requestId, validationType, token, expiration }: PasswordlessSignInFormProps) => JSX_2.Element;
+
+// @public (undocumented)
+export type PasswordlessSignInFormContextValue = FormContextValue<PasswordlessSignInFormValues, PasswordlessSignInFormErrorCode, PasswordlessSignInFormState>;
+
+// @public (undocumented)
+export type PasswordlessSignInFormError = FormError<PasswordlessSignInFormValues, PasswordlessSignInFormErrorCode>;
+
+// @public (undocumented)
+export type PasswordlessSignInFormErrorCode = TenantApi.SignInPasswordlessErrorCode | 'FIELD_REQUIRED' | 'INVALID_VALUE' | 'UNKNOWN_ERROR';
+
+// @public (undocumented)
+export interface PasswordlessSignInFormProps {
+    // (undocumented)
+    children: ReactElement;
+    // (undocumented)
+    expiration?: number;
+    // (undocumented)
+    onSuccess?: () => void;
+    // (undocumented)
+    requestId: string;
+    // (undocumented)
+    token?: string;
+    // (undocumented)
+    validationType: TenantApi.PasswordlessValidationType;
+}
+
+// @public (undocumented)
+export type PasswordlessSignInFormState = FormState | 'otp-required';
+
+// @public (undocumented)
+export type PasswordlessSignInFormValues = {
+    token: string;
+    otpToken: string;
+};
+
+// @public (undocumented)
+export const PasswordlessSignInInitForm: ({ children, onSuccess }: PasswordlessSignInInitFormProps) => JSX_2.Element;
+
+// @public (undocumented)
+export type PasswordlessSignInInitFormContextValue = FormContextValue<PasswordlessSignInInitFormValues, PasswordlessSignInInitFormErrorCode>;
+
+// @public (undocumented)
+export type PasswordlessSignInInitFormError = FormError<PasswordlessSignInInitFormValues, PasswordlessSignInInitFormErrorCode>;
+
+// @public (undocumented)
+export type PasswordlessSignInInitFormErrorCode = TenantApi.InitSignInPasswordlessErrorCode | 'FIELD_REQUIRED' | 'INVALID_VALUE' | 'UNKNOWN_ERROR';
+
+// @public (undocumented)
+export interface PasswordlessSignInInitFormProps {
+    // (undocumented)
+    children: ReactElement;
+    // (undocumented)
+    onSuccess?: (args: {
+        result: InitSignInPasswordlessMutationResult;
+    }) => void;
+}
+
+// @public (undocumented)
+export type PasswordlessSignInInitFormState = FormState;
+
+// @public (undocumented)
+export type PasswordlessSignInInitFormValues = {
+    email: string;
 };
 
 // @public (undocumented)
@@ -998,6 +1096,8 @@ export const signInIDPMutation: TenantApi.MutationFetcher<{
                 readonly name?: string;
             } & {
                 readonly otpEnabled: boolean;
+            } & {
+                readonly passwordlessEnabled?: boolean;
             };
         }) | undefined;
     }) | undefined;
@@ -1052,6 +1152,8 @@ export const signInMutation: TenantApi.MutationFetcher<{
                 readonly name?: string;
             } & {
                 readonly otpEnabled: boolean;
+            } & {
+                readonly passwordlessEnabled?: boolean;
             };
         }) | undefined;
     }) | undefined;
@@ -1069,6 +1171,14 @@ export type SignInMutationResult = ModelType<typeof signInResultFragment>;
 
 // @public (undocumented)
 export type SignInMutationVariables = Parameters<ReturnType<typeof useSignInMutation>>[0];
+
+// Warning: (ae-forgotten-export) The symbol "signInResultFragment_2" needs to be exported by the entry point index.d.ts
+//
+// @public (undocumented)
+export type SignInPasswordlessMutationResult = ModelType<typeof signInResultFragment_2>;
+
+// @public (undocumented)
+export type SignInPasswordlessMutationVariables = Parameters<ReturnType<typeof useSignInPasswordlessMutation>>[0];
 
 // @public (undocumented)
 export const signOutMutation: TenantApi.MutationFetcher<{
@@ -1206,6 +1316,13 @@ export const updateProjectMemberMutation: TenantApi.MutationFetcher<{
 export type UpdateProjectMemberMutationVariables = Parameters<ReturnType<typeof useUpdateProjectMemberMutation>>[0];
 
 // @public (undocumented)
+export const useActivatePasswordlessOtpMutation: ({ headers, apiToken }?: TenantApiOptions) => (variables: {
+    readonly requestId: string;
+    readonly token: string;
+    readonly otpHash: string;
+}) => Promise<TenantMutationResponse<unknown, TenantApi.ActivatePasswordlessOtpErrorCode>>;
+
+// @public (undocumented)
 export const useAddProjectMemberMutation: ({ headers, apiToken }?: TenantApiOptions) => (variables: {
     readonly projectSlug: string;
     readonly identityId: string;
@@ -1297,6 +1414,8 @@ readonly email?: string;
 readonly name?: string;
 } & {
 readonly otpEnabled: boolean;
+} & {
+readonly passwordlessEnabled?: boolean;
 };
 }, TenantApi.CreateSessionTokenErrorCode>>;
 
@@ -1306,7 +1425,13 @@ export const useDisableApiKeyMutation: ({ headers, apiToken }?: TenantApiOptions
 }) => Promise<TenantMutationResponse<unknown, "KEY_NOT_FOUND">>;
 
 // @public (undocumented)
+export const useDisableMyPasswordlessMutation: ({ headers, apiToken }?: TenantApiOptions) => (variables: {}) => Promise<TenantMutationResponse<unknown, TenantApi.ToggleMyPasswordlessErrorCode>>;
+
+// @public (undocumented)
 export const useDisableOtpMutation: ({ headers, apiToken }?: TenantApiOptions) => (variables: {}) => Promise<TenantMutationResponse<unknown, "OTP_NOT_ACTIVE">>;
+
+// @public (undocumented)
+export const useEnableMyPasswordlessMutation: ({ headers, apiToken }?: TenantApiOptions) => (variables: {}) => Promise<TenantMutationResponse<unknown, TenantApi.ToggleMyPasswordlessErrorCode>>;
 
 // @public (undocumented)
 export const useFetchIdentity: () => [{
@@ -1342,6 +1467,16 @@ readonly idpConfiguration?: unknown;
 }, TenantApi.InitSignInIDPErrorCode>>;
 
 // @public (undocumented)
+export const useInitSignInPasswordlessMutation: ({ headers, apiToken }?: TenantApiOptions) => (variables: {
+    readonly email: string;
+    readonly options?: TenantApi.InitSignInPasswordlessOptions;
+}) => Promise<TenantMutationResponse<    {
+readonly requestId: string;
+} & {
+readonly expiresAt: string;
+}, TenantApi.InitSignInPasswordlessErrorCode>>;
+
+// @public (undocumented)
 export const useInviteForm: () => InviteFormContextValue;
 
 // @public (undocumented)
@@ -1362,6 +1497,8 @@ readonly email?: string;
 readonly name?: string;
 } & {
 readonly otpEnabled: boolean;
+} & {
+readonly passwordlessEnabled?: boolean;
 } & {
 readonly identity: {
 readonly id: string;
@@ -1389,6 +1526,18 @@ export const useOtpConfirmForm: () => OtpConfirmFormContextValue;
 
 // @public (undocumented)
 export const useOtpPrepareForm: () => OtpPrepareFormContextValue;
+
+// @public (undocumented)
+export const usePasswordlessOtpActivator: ({ otpLength, otpChars }?: {
+    otpLength?: number;
+    otpChars?: string;
+}) => PasswordlessResponseHandlerState;
+
+// @public (undocumented)
+export const usePasswordlessSignInForm: () => PasswordlessSignInFormContextValue;
+
+// @public (undocumented)
+export const usePasswordlessSignInInitForm: () => PasswordlessSignInInitFormContextValue;
 
 // @public (undocumented)
 export const usePasswordResetForm: () => PasswordResetFormContextValue;
@@ -1438,6 +1587,8 @@ readonly email?: string;
 readonly name?: string;
 } & {
 readonly otpEnabled: boolean;
+} & {
+readonly passwordlessEnabled?: boolean;
 };
 }, TenantApi.SignInIDPErrorCode>>;
 
@@ -1458,8 +1609,33 @@ readonly email?: string;
 readonly name?: string;
 } & {
 readonly otpEnabled: boolean;
+} & {
+readonly passwordlessEnabled?: boolean;
 };
 }, TenantApi.SignInErrorCode>>;
+
+// @public (undocumented)
+export const useSignInPasswordlessMutation: ({ headers, apiToken }?: TenantApiOptions) => (variables: {
+    readonly requestId: string;
+    readonly validationType: TenantApi.PasswordlessValidationType;
+    readonly token: string;
+    readonly expiration?: number;
+    readonly mfaOtp?: string;
+}) => Promise<TenantMutationResponse<    {
+readonly token: string;
+} & {
+readonly person: {
+readonly id: string;
+} & {
+readonly email?: string;
+} & {
+readonly name?: string;
+} & {
+readonly otpEnabled: boolean;
+} & {
+readonly passwordlessEnabled?: boolean;
+};
+}, TenantApi.SignInPasswordlessErrorCode>>;
 
 // @public (undocumented)
 export const useSignOutMutation: ({ headers, apiToken }?: TenantApiOptions) => (variables: {

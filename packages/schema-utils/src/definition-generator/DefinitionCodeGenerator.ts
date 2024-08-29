@@ -22,29 +22,22 @@ export class DefinitionCodeGenerator {
 	public generate(schema: Schema) {
 		const roles = this.aclGenerator.generateRoles({ acl: schema.acl })
 		const aclVariables = this.aclGenerator.generateAclVariables({ acl: schema.acl })
-
-		const enums = Object.entries(schema.model.enums).map(([name, values]) => this.generateEnum({
-			name,
-			values,
-		})).join('')
-
+		const enums = Object.entries(schema.model.enums).map(([name, values]) => this.generateEnum({ name, values })).join('')
 		const entities = Object.values(schema.model.entities).map(entity => this.generateEntity({ entity, schema })).join('')
 
-		return `import { c } from '@contember/schema-definition'
-${roles}${aclVariables}${enums}${entities}`
+		return `import { c } from '@contember/schema-definition'\n${roles}${aclVariables}${enums}${entities}`
 	}
-
 
 	private generateEnum({ name, values }: { name: string; values: readonly string[] }): string {
 		return `\nexport const ${this.formatIdentifier(name)} = c.createEnum(${values.map(it => printJsValue(it)).join(', ')})\n`
 	}
 
 	public generateEntity({ entity, schema }: { entity: Model.Entity; schema: Schema }): string {
-		const decorators = [
-			...Object.values(entity.unique).map(constraint => this.generateUniqueConstraint({ entity, constraint })),
-			...Object.values(entity.indexes).map(index => this.generateIndex({ entity, index })),
-			this.generateView({ entity }),
-		].filter(it => !!it).map(it => `${it}\n`).join('')
+		const uniqueConstraints = Object.values(entity.unique).map(constraint => this.generateUniqueConstraint({ entity, constraint }))
+		const indexes = Object.values(entity.indexes).map(index => this.generateIndex({ entity, index }))
+		const views = this.generateView({ entity })
+
+		const decorators = [...uniqueConstraints, ...indexes, views].filter(it => !!it).map(it => `${it}\n`).join('')
 		const acl = this.aclGenerator.generateEntityAcl({ entity, schema })
 
 		return `\n${decorators}${acl}export class ${this.formatIdentifier(entity.name)} {
@@ -52,16 +45,15 @@ ${Object.values(entity.fields).map(field => this.generateField({ field, entity, 
 }\n`
 	}
 
-	private generateUniqueConstraint({ entity, constraint }: {
-		entity: Model.Entity
-		constraint: Model.UniqueConstraint
-	}): string {
+	private generateUniqueConstraint({ entity, constraint }: { entity: Model.Entity; constraint: Model.UniqueConstraint }): string {
 		const fieldsList = `${constraint.fields.map(it => printJsValue(it)).join(', ')}`
+
 		return `@c.Unique(${fieldsList})`
 	}
 
 	private generateIndex({ entity, index }: { entity: Model.Entity; index: Model.Index }): string {
 		const fieldsList = `${index.fields.map(it => printJsValue(it)).join(', ')}`
+
 		return `@c.Index(${fieldsList})`
 	}
 

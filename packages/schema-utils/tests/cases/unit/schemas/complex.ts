@@ -6,6 +6,8 @@ export const editorRole = c.createRole('editor', { stages: '*' })
 
 export const categoryEditorVariable = c.createEntityVariable('category', 'Category', editorRole)
 
+@c.Unique('title')
+@c.View(`SELECT * FROM article`)
 @c.Allow(readerRole, {
 	read: true,
 })
@@ -21,6 +23,10 @@ export class Article {
 	category = c.manyHasOne(Category)
 }
 
+@c.View(`
+SELECT * FROM article
+
+`)
 @c.Allow(readerRole, {
 	read: true,
 })

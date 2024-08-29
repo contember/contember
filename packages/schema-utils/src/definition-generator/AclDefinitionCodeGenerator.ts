@@ -98,7 +98,7 @@ export class AclDefinitionCodeGenerator {
 		if (!aclOutput.length) {
 			return ''
 		}
-		return `\n${aclOutput.join('')}`
+		return `${aclOutput.join('')}`
 	}
 
 	private getMatchingOperations({ operations, predicate, numberOfEntityFieldsWithoutId }: {

@@ -5,7 +5,7 @@ export const getPersonByIdentity = (args: {
 	identityId: string
 	response: null | { personId: string; password: string; roles: string[]; email: string; name?: string; otpUri?: string }
 }): ExpectedQuery => ({
-	sql: SQL`SELECT "person"."id", "person"."password_hash", "person"."otp_uri", "person"."otp_activated_at", "person"."identity_id", "person"."email", "person"."name", "person"."disabled_at", "identity"."roles"
+	sql: SQL`SELECT "person"."id", "person"."password_hash", "person"."otp_uri", "person"."otp_activated_at", "person"."identity_id", "person"."email", "person"."name", "person"."disabled_at", "person"."passwordless_enabled", "identity"."roles"
 	         FROM "tenant"."person"
 		              INNER JOIN "tenant"."identity" AS "identity" ON "identity"."id" = "person"."identity_id"
 	         WHERE "person"."identity_id" = ?`,

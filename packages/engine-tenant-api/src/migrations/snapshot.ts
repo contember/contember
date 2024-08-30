@@ -4,6 +4,19 @@ import { createCredentials } from './tenantCredentials'
 
 export default async function (builder: MigrationBuilder, args: TenantMigrationArgs) {
 	builder.sql(`
+CREATE TYPE "config_policy" AS ENUM (
+    'always',
+    'never',
+    'optIn',
+    'optOut'
+);
+CREATE TYPE "config_singleton" AS ENUM (
+    'singleton'
+);
+CREATE TYPE "person_token_type" AS ENUM (
+    'password_reset',
+    'passwordless'
+);
 CREATE FUNCTION "project_deleted"() RETURNS "trigger"
     LANGUAGE "plpgsql"
     AS $$
@@ -39,6 +52,12 @@ CREATE TABLE "api_key" (
     "created_at" timestamp with time zone NOT NULL,
     "expiration" integer,
     "disabled_at" timestamp with time zone
+);
+CREATE TABLE "config" (
+    "id" "config_singleton" DEFAULT 'singleton'::"config_singleton" NOT NULL,
+    "passwordless_enabled" "config_policy" DEFAULT 'never'::"config_policy" NOT NULL,
+    "passwordless_url" "text",
+    "passwordless_expiration_minutes" integer DEFAULT 5 NOT NULL
 );
 CREATE TABLE "identity" (
     "id" "uuid" NOT NULL,
@@ -77,6 +96,7 @@ CREATE TABLE "person" (
     "name" "text",
     "idp_only" boolean DEFAULT false NOT NULL,
     "disabled_at" timestamp with time zone,
+    "passwordless_enabled" boolean,
     CONSTRAINT "idp_only_no_email" CHECK ((("idp_only" = false) OR (("idp_only" = true) AND ("email" IS NULL))))
 );
 CREATE TABLE "person_identity_provider" (
@@ -86,13 +106,16 @@ CREATE TABLE "person_identity_provider" (
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "external_identifier" "text" NOT NULL
 );
-CREATE TABLE "person_password_reset" (
+CREATE TABLE "person_token" (
     "id" "uuid" NOT NULL,
     "token_hash" "text" NOT NULL,
     "person_id" "uuid" NOT NULL,
     "expires_at" timestamp with time zone NOT NULL,
     "created_at" timestamp with time zone NOT NULL,
-    "used_at" timestamp with time zone
+    "used_at" timestamp with time zone,
+    "type" "person_token_type" DEFAULT 'password_reset'::"person_token_type" NOT NULL,
+    "otp_hash" "text",
+    "otp_attempts" integer DEFAULT 0 NOT NULL
 );
 CREATE TABLE "project" (
     "id" "uuid" NOT NULL,
@@ -124,6 +147,8 @@ CREATE TABLE "project_secret" (
 );
 ALTER TABLE ONLY "api_key"
     ADD CONSTRAINT "api_key_id" PRIMARY KEY ("id");
+ALTER TABLE ONLY "config"
+    ADD CONSTRAINT "config_pkey" PRIMARY KEY ("id");
 ALTER TABLE ONLY "person"
     ADD CONSTRAINT "email_unique" UNIQUE ("email");
 ALTER TABLE ONLY "identity"
@@ -140,7 +165,7 @@ ALTER TABLE ONLY "person"
     ADD CONSTRAINT "person_identity_id_key" UNIQUE ("identity_id");
 ALTER TABLE ONLY "person_identity_provider"
     ADD CONSTRAINT "person_identity_provider_pkey" PRIMARY KEY ("id");
-ALTER TABLE ONLY "person_password_reset"
+ALTER TABLE ONLY "person_token"
     ADD CONSTRAINT "person_password_reset_id" PRIMARY KEY ("id");
 ALTER TABLE ONLY "project"
     ADD CONSTRAINT "project_id" PRIMARY KEY ("id");
@@ -161,7 +186,7 @@ CREATE INDEX "mail_template_project_index" ON "mail_template" USING "btree" ("pr
 CREATE INDEX "person_identity_id" ON "person" USING "btree" ("identity_id");
 CREATE UNIQUE INDEX "person_identity_provider_identifier" ON "person_identity_provider" USING "btree" ("identity_provider_id", "external_identifier");
 CREATE INDEX "person_identity_provider_person_id" ON "person_identity_provider" USING "btree" ("person_id");
-CREATE UNIQUE INDEX "person_password_reset_token" ON "person_password_reset" USING "btree" ("token_hash");
+CREATE UNIQUE INDEX "person_password_reset_token" ON "person_token" USING "btree" ("token_hash");
 CREATE INDEX "project_alias" ON "project" USING "gin" ((("config" -> 'alias'::"text")));
 CREATE INDEX "project_membership_identity_index" ON "project_membership" USING "btree" ("identity_id");
 CREATE UNIQUE INDEX "project_membership_unique" ON "project_membership" USING "btree" ("project_id", "identity_id", "role");
@@ -183,7 +208,7 @@ ALTER TABLE ONLY "person_identity_provider"
     ADD CONSTRAINT "person_identity_provider_idp" FOREIGN KEY ("identity_provider_id") REFERENCES "identity_provider"("id") ON DELETE CASCADE;
 ALTER TABLE ONLY "person_identity_provider"
     ADD CONSTRAINT "person_identity_provider_person" FOREIGN KEY ("person_id") REFERENCES "person"("id") ON DELETE CASCADE;
-ALTER TABLE ONLY "person_password_reset"
+ALTER TABLE ONLY "person_token"
     ADD CONSTRAINT "person_password_reset_person" FOREIGN KEY ("person_id") REFERENCES "person"("id") ON DELETE CASCADE;
 ALTER TABLE ONLY "project_membership"
     ADD CONSTRAINT "project_membership_identity" FOREIGN KEY ("identity_id") REFERENCES "identity"("id") ON DELETE CASCADE;
@@ -193,6 +218,9 @@ ALTER TABLE ONLY "project_membership_variable"
     ADD CONSTRAINT "project_membership_variable_membership" FOREIGN KEY ("membership_id") REFERENCES "project_membership"("id") ON DELETE CASCADE;
 ALTER TABLE ONLY "project_secret"
     ADD CONSTRAINT "project_secret_project" FOREIGN KEY ("project_id") REFERENCES "project"("id") ON DELETE CASCADE;
+INSERT INTO "config" (id)
+VALUES (DEFAULT);
+
 DO LANGUAGE plpgsql
 $$
 	BEGIN

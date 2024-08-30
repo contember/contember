@@ -31,6 +31,10 @@ import { IDPQueryResolver } from './query/IDPQueryResolver'
 import { UpdateIDPMutationResolver } from './mutation/idp/UpdateIDPMutationResolver'
 import { DisablePersonMutationResolver } from './mutation/person/DisablePersonMutationResolver'
 import { MailTemplateQueryResolver } from './query/MailTemplateQueryResolver'
+import { ConfigurationMutationResolver } from './mutation/configuration/ConfigurationMutationResolver'
+import { ConfigurationQueryResolver } from './query/ConfigurationQueryResolver'
+import { PasswordlessMutationResolver } from './mutation/person/PasswordlessMutationResolver'
+import { TogglePasswordlessMutationResolver } from './mutation/person/TogglePasswordlessMutationResolver'
 
 class ResolverFactory {
 	public constructor(
@@ -53,6 +57,7 @@ class ResolverFactory {
 			disableIdpMutationResolver: DisableIDPMutationResolver
 			enableIdpMutationResolver: EnableIDPMutationResolver
 			updateIdpMutationResolver: UpdateIDPMutationResolver
+			passwordlessMutationResolver: PasswordlessMutationResolver
 
 			disablePersonMutationResolver: DisablePersonMutationResolver
 
@@ -76,6 +81,11 @@ class ResolverFactory {
 			projectTypeResolver: ProjectTypeResolver
 
 			identityGlobalRolesMutationResolver: IdentityGlobalRolesMutationResolver
+
+			configurationMutationResolver: ConfigurationMutationResolver
+			configurationQueryResolver: ConfigurationQueryResolver
+
+			togglePasswordlessMutationResolver: TogglePasswordlessMutationResolver
 
 		},
 	) { }
@@ -102,6 +112,7 @@ class ResolverFactory {
 				projectMemberships: this.resolvers.projectMembersQueryResolver.projectMemberships.bind(this.resolvers.projectMembersQueryResolver),
 				identityProviders: this.resolvers.idpQueryResolver.identityProviders.bind(this.resolvers.idpQueryResolver),
 				mailTemplates: this.resolvers.mailTemplateQueryResolver.mailTemplates.bind(this.resolvers.mailTemplateQueryResolver),
+				configuration: this.resolvers.configurationQueryResolver.configuration.bind(this.resolvers.configurationQueryResolver),
 				checkResetPasswordToken: () => {
 					throw new Error('not implemented')
 				},
@@ -126,6 +137,12 @@ class ResolverFactory {
 				enableIDP: this.resolvers.enableIdpMutationResolver.enableIDP.bind(this.resolvers.enableIdpMutationResolver),
 				updateIDP: this.resolvers.updateIdpMutationResolver.updateIDP.bind(this.resolvers.updateIdpMutationResolver),
 				disablePerson: this.resolvers.disablePersonMutationResolver.disablePerson.bind(this.resolvers.disablePersonMutationResolver),
+
+				signInPasswordless: this.resolvers.passwordlessMutationResolver.signInPasswordless.bind(this.resolvers.passwordlessMutationResolver),
+				initSignInPasswordless: this.resolvers.passwordlessMutationResolver.initSignInPasswordless.bind(this.resolvers.passwordlessMutationResolver),
+				activatePasswordlessOtp: this.resolvers.passwordlessMutationResolver.activatePasswordlessOtp.bind(this.resolvers.passwordlessMutationResolver),
+				disableMyPasswordless: this.resolvers.togglePasswordlessMutationResolver.disableMyPasswordless.bind(this.resolvers.togglePasswordlessMutationResolver),
+				enableMyPasswordless: this.resolvers.togglePasswordlessMutationResolver.enableMyPasswordless.bind(this.resolvers.togglePasswordlessMutationResolver),
 
 				invite: this.resolvers.inviteMutationResolver.invite.bind(this.resolvers.inviteMutationResolver),
 				unmanagedInvite: this.resolvers.inviteMutationResolver.unmanagedInvite.bind(this.resolvers.inviteMutationResolver),
@@ -154,6 +171,8 @@ class ResolverFactory {
 
 				addGlobalIdentityRoles: this.resolvers.identityGlobalRolesMutationResolver.addGlobalIdentityRoles.bind(this.resolvers.identityGlobalRolesMutationResolver),
 				removeGlobalIdentityRoles: this.resolvers.identityGlobalRolesMutationResolver.removeGlobalIdentityRoles.bind(this.resolvers.identityGlobalRolesMutationResolver),
+
+				configure: this.resolvers.configurationMutationResolver.configure.bind(this.resolvers.configurationMutationResolver),
 			},
 		}
 	}

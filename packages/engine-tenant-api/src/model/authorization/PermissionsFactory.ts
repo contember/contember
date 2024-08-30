@@ -24,10 +24,13 @@ class PermissionsFactory {
 		permissions.allow(TenantRole.LOGIN, PermissionActions.PERSON_RESET_PASSWORD)
 		permissions.allow(TenantRole.LOGIN, PermissionActions.PERSON_CREATE_IDP_URL)
 		permissions.allow(TenantRole.LOGIN, PermissionActions.PERSON_SIGN_IN_IDP)
+		permissions.allow(TenantRole.LOGIN, PermissionActions.PERSON_PASSWORDLESS_SIGN_IN)
+		permissions.allow(TenantRole.LOGIN, PermissionActions.PERSON_REQUEST_PASSWORDLESS_SIGN_IN)
 
 		permissions.allow(TenantRole.PERSON, PermissionActions.PERSON_VIEW)
 		permissions.allow(TenantRole.PERSON, PermissionActions.PERSON_CHANGE_MY_PASSWORD)
 		permissions.allow(TenantRole.PERSON, PermissionActions.PERSON_CHANGE_MY_PROFILE)
+		permissions.allow(TenantRole.PERSON, PermissionActions.PERSON_TOGGLE_PASSWORDLESS)
 		permissions.allow(TenantRole.PERSON, PermissionActions.PERSON_SIGN_OUT)
 		permissions.allow(TenantRole.PERSON, PermissionActions.PERSON_SETUP_OTP)
 
@@ -65,6 +68,8 @@ class PermissionsFactory {
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.IDP_LIST)
 
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.ENTRYPOINT_DEPLOY)
+		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.CONFIGURE)
+		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.CONFIG_VIEW)
 
 		permissions.allow(TenantRole.PROJECT_CREATOR, PermissionActions.PROJECT_CREATE)
 		permissions.allow(TenantRole.ENTRYPOINT_DEPLOYER, PermissionActions.ENTRYPOINT_DEPLOY)

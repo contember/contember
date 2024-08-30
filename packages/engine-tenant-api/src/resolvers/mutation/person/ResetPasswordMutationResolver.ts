@@ -1,22 +1,13 @@
 import {
-	CreatePasswordResetRequestErrorCode,
 	CreatePasswordResetRequestResponse,
 	MutationCreateResetPasswordRequestArgs,
 	MutationResetPasswordArgs,
 	MutationResolvers,
-	ResetPasswordErrorCode as SchemaResetPasswordErrorCode,
 	ResetPasswordResponse,
 } from '../../../schema'
 import { GraphQLResolveInfo } from 'graphql'
 import { TenantResolverContext } from '../../TenantResolverContext'
-import {
-	PasswordResetManager,
-	PermissionActions,
-	PermissionContextFactory,
-	PersonQuery,
-	ResetPasswordCommandErrorCode,
-	ResetPasswordErrorCode,
-} from '../../../model'
+import { PasswordResetManager, PermissionActions, PermissionContextFactory, PersonQuery } from '../../../model'
 import { createErrorResponse } from '../../errorUtils'
 
 export class ResetPasswordMutationResolver implements MutationResolvers {

@@ -12,6 +12,7 @@ Contember provides three primary mail types, each serving specific communication
 - **EXISTING_USER_INVITED**: Deployed when inviting an already registered user to a new project. It's a notification template, guiding users to the new project or functionalities they've been given access to.
 
 - **RESET_PASSWORD_REQUEST**: For situations when a user forgets their password. This email directs users to reset their password, ensuring they regain access to their account.
+- **PASSWORDLESS_SIGN_IN**: For passwordless authentication, this email contains a magic link for users to sign in securely without a password.
 
 Each of these mail types comes with a straightforward default template. Additionally, in Contember Cloud setups, enhanced custom templates are present, which users can modify or overwrite based on their preferences.
 Of course! I'll include more detailed information about the GraphQL mutations by elaborating on the structure of the input.
@@ -100,6 +101,13 @@ Contember uses Mustache for dynamic content in templates. Here are the variables
   - `{{token}}`: Token for password reset.
   - `{{project}}`: Project name (if available).
   - `{{projectSlug}}`: Project identifier (if available).
+
+- **PASSWORDLESS_SIGN_IN**:
+- `{{email}}`: Recipient's email.
+- `{{token}}`: Token for passwordless sign-in.
+- `{{project}}`: Project name (if available).
+- `{{projectSlug}}`: Project identifier (if available).
+- `{{url}}`: URL for passwordless sign-in.
 
 :::note
 `projectSlug` is available since Engine 1.3+

@@ -41,7 +41,7 @@ const headers = {
 	'X-Contember-Token-Path': 'data.mutation.result.token',
 }
 
-const DEFAULT_LOGIN_EXPIRATION = 14 * 24 * 3600 // 14 days
+const DEFAULT_LOGIN_EXPIRATION = 14 * 24 * 60 // 14 days
 
 export const LoginForm = ({ children, expiration = DEFAULT_LOGIN_EXPIRATION, onSuccess }: LoginFormProps) => {
 	const login = useSignInMutation({ headers })

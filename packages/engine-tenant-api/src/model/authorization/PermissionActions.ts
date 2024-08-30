@@ -13,6 +13,10 @@ namespace PermissionActions {
 		idp = 'idp',
 	}
 
+
+	export const CONFIGURE = Authorizator.createAction(Resources.system, 'configure')
+	export const CONFIG_VIEW = Authorizator.createAction(Resources.system, 'viewConfig')
+
 	export const IDENTITY_VIEW_PERMISSIONS = Authorizator.createAction(Resources.identity, 'viewPermissions')
 	export const IDENTITY_ADD_GLOBAL_ROLES = (roles?: readonly string[]) => Authorizator.createAction(Resources.identity, 'addGlobalRoles', { roles })
 	export const IDENTITY_REMOVE_GLOBAL_ROLES = (roles?: readonly string[]) => Authorizator.createAction(Resources.identity, 'removeGlobalRoles', { roles })
@@ -26,11 +30,14 @@ namespace PermissionActions {
 	export const PERSON_SETUP_OTP = Authorizator.createAction(Resources.person, 'setupOtp')
 	export const PERSON_CHANGE_PROFILE = (roles?: readonly string[]) => Authorizator.createAction(Resources.person, 'changeProfile', { roles })
 	export const PERSON_CHANGE_MY_PROFILE = Authorizator.createAction(Resources.person, 'changeMyProfile')
+	export const PERSON_TOGGLE_PASSWORDLESS = Authorizator.createAction(Resources.person, 'togglePasswordless')
 	export const PERSON_CHANGE_PASSWORD = (roles?: readonly string[]) => Authorizator.createAction(Resources.person, 'changePassword', { roles })
 	export const PERSON_CHANGE_MY_PASSWORD = Authorizator.createAction(Resources.person, 'changeMyPassword')
 	export const PERSON_RESET_PASSWORD = Authorizator.createAction(Resources.person, 'resetPassword')
 	export const PERSON_CREATE_IDP_URL = Authorizator.createAction(Resources.person, 'createIdPUrl')
 	export const PERSON_SIGN_IN_IDP = Authorizator.createAction(Resources.person, 'signInIdp')
+	export const PERSON_REQUEST_PASSWORDLESS_SIGN_IN = Authorizator.createAction(Resources.person, 'requestPasswordlessSignIn')
+	export const PERSON_PASSWORDLESS_SIGN_IN = Authorizator.createAction(Resources.person, 'passwordlessSignIn')
 	export const PERSON_CREATE_SESSION_KEY = (roles?: readonly string[]) => Authorizator.createAction(Resources.person, 'createSessionToken', { roles })
 
 	export const PERSON_INVITE = (memberships: readonly Acl.Membership[]) => Authorizator.createAction(Resources.person, 'invite', { memberships })

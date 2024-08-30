@@ -2,7 +2,8 @@ import { TextFilterArtifactsMatchMode } from '@contember/react-dataview'
 import { InviteErrorCodes } from './tenant/hooks/useInvite'
 import { UploaderErrorType } from '@contember/react-uploader'
 import { ChangeMyPasswordFormErrorCode, CreateApiKeyFormErrorCode } from '@contember/interface'
-import { InviteFormErrorCode, LoginFormErrorCode, OtpPrepareFormErrorCode, OtpConfirmFormErrorCode, PasswordResetFormErrorCode, PasswordResetRequestFormErrorCode, UpdateProjectMemberFormErrorCode } from '@contember/react-identity'
+import { InviteFormErrorCode, LoginFormErrorCode, OtpPrepareFormErrorCode, OtpConfirmFormErrorCode, PasswordResetFormErrorCode, PasswordResetRequestFormErrorCode, UpdateProjectMemberFormErrorCode, PasswordlessSignInInitFormErrorCode, PasswordlessSignInFormErrorCode } from '@contember/react-identity'
+import { ActivatePasswordlessOtpErrorCode } from '@contember/graphql-client-tenant'
 
 export const dict = {
 	deleteEntityDialog: {
@@ -194,7 +195,7 @@ export const dict = {
 		login: {
 			email: 'Email',
 			password: 'Password',
-			otpToken: 'OTP token',
+			otpToken: '2FA OTP token',
 			forgotPassword: 'Forgot password?',
 			login: 'Login',
 			errorMessages: {
@@ -275,13 +276,14 @@ export const dict = {
 				'TOKEN_EXPIRED': 'Token expired',
 				'TOKEN_NOT_FOUND': 'Token not found',
 				'TOKEN_USED': 'Token already used',
+				'TOKEN_INVALID': 'Invalid token',
 			} satisfies Record<PasswordResetFormErrorCode, string>,
 			title: 'Reset password',
 			description: 'Enter new password below',
 			success: 'Password has been reset',
 		},
 		passwordResetRequest: {
-			email: 'Email',
+			email: 'E-mail',
 			submit: 'Request reset code',
 			errorMessages: {
 				'FIELD_REQUIRED': 'This field is required',
@@ -295,6 +297,50 @@ export const dict = {
 			checkMail: 'Please check your mailbox for instructions on how to reset your password.',
 			entryCode: 'Or enter the reset code directly.',
 		},
+		passwordlessSignInInit: {
+			email: 'E-mail',
+			submit: 'Send magic link',
+			errorMessages: {
+				'FIELD_REQUIRED': 'This field is required',
+				'INVALID_VALUE': 'Invalid value',
+				'UNKNOWN_ERROR': 'Something went wrong. Please try again later',
+				'PERSON_NOT_FOUND': 'Unknown email',
+				'PASSWORDLESS_DISABLED': 'Passwordless sign-in is not available',
+			} satisfies Record<PasswordlessSignInInitFormErrorCode, string>,
+			title: 'Sign in',
+			description: 'Enter your email below to sign in to your account',
+			success: 'Magic link has been sent',
+			checkMail: 'Please check your mailbox for instructions on how to sign in.',
+			entryCode: 'Or enter the reset code directly.',
+		},
+		passwordlessSignIn: {
+			token: 'Verification code',
+			otpToken: '2FA OTP token',
+			submit: 'Sign in',
+			errorMessages: {
+				'FIELD_REQUIRED': 'This field is required',
+				'INVALID_VALUE': 'Invalid value',
+				'UNKNOWN_ERROR': 'Something went wrong. Please try again later',
+				'INVALID_OTP_TOKEN': 'Invalid OTP token',
+				'OTP_REQUIRED': undefined,
+				'PERSON_DISABLED': 'Person disabled',
+				'TOKEN_EXPIRED': 'Token expired',
+				'TOKEN_NOT_FOUND': 'Token not found',
+				'TOKEN_USED': 'Token already used',
+				'TOKEN_INVALID': 'Invalid token',
+			} satisfies Record<PasswordlessSignInFormErrorCode, string | undefined>,
+			title: 'Sign in',
+		},
+		otpActivation: {
+			errorMessages: {
+				'TOKEN_INVALID': 'This token is not valid. Please try again.',
+				'TOKEN_USED': 'Token already used',
+				'TOKEN_NOT_FOUND': 'Token not found',
+				'TOKEN_EXPIRED': 'Token expired',
+				'UNKNOWN_ERROR': 'Something went wrong. Please try again later',
+			} satisfies Record<ActivatePasswordlessOtpErrorCode | 'UNKNOWN_ERROR', string>,
+		},
+
 		updateProjectMember: {
 			updateSuccess: 'Roles updated',
 			roles: 'Roles',

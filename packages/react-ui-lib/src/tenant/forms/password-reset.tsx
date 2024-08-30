@@ -7,6 +7,7 @@ import { dict } from '../../dict'
 
 export const PasswordResetFormFields = ({ hasToken }: { hasToken?: boolean }) => {
 	const form = usePasswordResetForm()
+	const fieldErrors = form.errors.map(it => it.field)
 	return (
 		<div className="relative flex flex-col gap-2">
 			{form.state === 'success' || form.state === 'submitting' ? <Loader position="absolute" /> : null}
@@ -15,7 +16,7 @@ export const PasswordResetFormFields = ({ hasToken }: { hasToken?: boolean }) =>
 				form={form} messages={dict.tenant.passwordReset.errorMessages}
 			/>
 
-			{hasToken ? null : (
+			{(!hasToken || fieldErrors.includes('token')) && (
 				<TenantFormField
 					form={form} messages={dict.tenant.passwordReset.errorMessages} field="token"
 					type="text" required autoComplete="off"

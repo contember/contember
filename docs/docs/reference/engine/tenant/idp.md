@@ -171,7 +171,7 @@ mutation {
 		},
 		redirectUrl: "https://my-app.dev/finish-auth",
 		sessionData: {nonce: "123456",state: "XYZ789"},
-		expiration: 3600
+		expiration: 60
 	) {
 		ok
 		error {

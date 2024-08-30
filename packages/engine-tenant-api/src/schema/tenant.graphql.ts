@@ -20,6 +20,8 @@ const schema: DocumentNode = gql`
 
 		identityProviders: [IdentityProvider!]!
 		mailTemplates: [MailTemplateData!]!
+		
+		configuration: Config!
 	}
 
 	type Mutation {
@@ -45,6 +47,14 @@ const schema: DocumentNode = gql`
 			redirectUrl: String @deprecated(reason: "use data.redirectUrl"),
 			sessionData: Json @deprecated(reason: "use data.sessionData"),
 		): SignInIDPResponse
+		
+		# passwordless sign in
+		initSignInPasswordless(email: String!, options: InitSignInPasswordlessOptions): InitSignInPasswordlessResponse
+		signInPasswordless(requestId: String!, validationType: PasswordlessValidationType!, token: String!, expiration: Int, mfaOtp: String): SignInPasswordlessResponse
+		activatePasswordlessOtp(requestId: String!, token: String!, otpHash: String!): ActivatePasswordlessOtpResponse
+
+        enableMyPasswordless: ToggleMyPasswordlessResponse
+        disableMyPasswordless: ToggleMyPasswordlessResponse
 
 		# IDP management
 		addIDP(identityProvider: String!, type: String!, configuration: Json!, options: IDPOptions): AddIDPResponse
@@ -95,6 +105,8 @@ const schema: DocumentNode = gql`
 		): CreateProjectResponse
 		setProjectSecret(projectSlug: String!, key: String!, value: String!): SetProjectSecretResponse
 		updateProject(projectSlug: String!, name: String, config: Json, mergeConfig: Boolean): UpdateProjectResponse
+		
+		configure(config: ConfigInput!): ConfigureResponse
 
 		addProjectMailTemplate(template: MailTemplate!): AddMailTemplateResponse
 		@deprecated(reason: "use addMailTemplate")
@@ -102,6 +114,49 @@ const schema: DocumentNode = gql`
 		removeProjectMailTemplate(templateIdentifier: MailTemplateIdentifier!): RemoveMailTemplateResponse
 		@deprecated(reason: "use removeMailTemplate")
 
+	}
+	
+	# === configure ===
+	
+	type Config {
+		passwordless: ConfigPasswordless!
+	}
+	
+	type ConfigPasswordless {
+		enabled: ConfigPolicy!
+		url: String
+		expirationMinutes: Int!
+	}
+	
+	input ConfigInput {
+		passwordless: ConfigPasswordlessInput
+	}
+	
+	enum ConfigPolicy {
+		always
+		never
+		optIn
+		optOut
+	}
+	
+	input ConfigPasswordlessInput {
+		enabled: ConfigPolicy
+		url: String
+		expirationMinutes: Int
+	}
+	
+	type ConfigureResponse {
+		ok: Boolean!
+		error: ConfigureError
+	}
+	
+	type ConfigureError {
+		code: ConfigureErrorCode!
+		developerMessage: String!
+	}
+	
+	enum ConfigureErrorCode {
+		INVALID_CONFIG
 	}
 
 	# === signUp ===
@@ -418,6 +473,98 @@ const schema: DocumentNode = gql`
 		initReturnsConfig: Boolean
 	}
 
+	# === passwordless sign in ===
+	
+	type InitSignInPasswordlessResponse {
+		ok: Boolean!
+		error: InitSignInPasswordlessError
+		result: InitSignInPasswordlessResult
+	}
+	
+	type InitSignInPasswordlessError {
+		code: InitSignInPasswordlessErrorCode!
+		developerMessage: String!
+	}
+	
+	enum InitSignInPasswordlessErrorCode {
+		PERSON_NOT_FOUND
+		
+		PASSWORDLESS_DISABLED
+	}
+	
+	type InitSignInPasswordlessResult {
+		requestId: String!
+		expiresAt: DateTime!
+	}
+
+	input InitSignInPasswordlessOptions {
+		mailVariant: String
+		mailProject: String
+	}
+	
+	type SignInPasswordlessResponse {
+		ok: Boolean!
+		error: SignInPasswordlessError
+		result: SignInPasswordlessResult
+	}
+	
+	enum PasswordlessValidationType {
+		otp
+		token
+	}
+	
+	type SignInPasswordlessError {
+		code: SignInPasswordlessErrorCode!
+		developerMessage: String!
+	}
+	
+	enum SignInPasswordlessErrorCode {
+		TOKEN_NOT_FOUND
+		TOKEN_INVALID
+		TOKEN_EXPIRED
+		TOKEN_USED
+		PERSON_DISABLED
+		OTP_REQUIRED
+		INVALID_OTP_TOKEN
+	}
+	
+	type SignInPasswordlessResult implements CommonSignInResult {
+		token: String!
+		person: Person!
+	}
+	
+	type ActivatePasswordlessOtpResponse {
+		ok: Boolean!
+		error: ActivatePasswordlessOtpError
+	}
+	
+	type ActivatePasswordlessOtpError {
+		code: ActivatePasswordlessOtpErrorCode!
+		developerMessage: String!
+	}
+	
+	enum ActivatePasswordlessOtpErrorCode {
+		TOKEN_NOT_FOUND
+		TOKEN_INVALID
+		TOKEN_EXPIRED
+		TOKEN_USED
+	}
+	
+	type ToggleMyPasswordlessResponse {
+		ok: Boolean!
+		error: ToggleMyPasswordlessError
+	}
+	
+	type ToggleMyPasswordlessError {
+		code: ToggleMyPasswordlessErrorCode!
+		developerMessage: String!
+	}
+	
+	enum ToggleMyPasswordlessErrorCode {
+		CANNOT_TOGGLE
+        NOT_A_PERSON
+	}
+	
 
 	# === invite ===
 
@@ -671,6 +818,7 @@ const schema: DocumentNode = gql`
 		email: String
 		name: String
 		otpEnabled: Boolean!
+		passwordlessEnabled: Boolean
 		identity: Identity!
 	}
 
@@ -831,15 +979,15 @@ const schema: DocumentNode = gql`
 
 	# === mails ===
 	
-    type MailTemplateData {
-        projectSlug: String
-        type: MailType!
-        variant: String
-        subject: String!
-        content: String!
-        useLayout: Boolean!
-        replyTo: String
-    }
+	type MailTemplateData {
+		projectSlug: String
+		type: MailType!
+		variant: String
+		subject: String!
+		content: String!
+		useLayout: Boolean!
+		replyTo: String
+	}
 	
 	input MailTemplate {
 		projectSlug: String
@@ -856,6 +1004,7 @@ const schema: DocumentNode = gql`
 		EXISTING_USER_INVITED
 		NEW_USER_INVITED
 		RESET_PASSWORD_REQUEST
+		PASSWORDLESS_SIGN_IN
 	}
 
 	input MailTemplateIdentifier {
@@ -879,7 +1028,7 @@ const schema: DocumentNode = gql`
 	enum AddMailTemplateErrorCode {
 		MISSING_VARIABLE
 		PROJECT_NOT_FOUND
-        INVALID_REPLY_EMAIL_FORMAT
+		INVALID_REPLY_EMAIL_FORMAT
 	}
 
 	type RemoveMailTemplateResponse {
@@ -908,6 +1057,7 @@ const schema: DocumentNode = gql`
 	enum CheckResetPasswordTokenCode {
 		REQUEST_NOT_FOUND
 		TOKEN_NOT_FOUND
+		TOKEN_INVALID
 		TOKEN_USED
 		TOKEN_EXPIRED
 	}
@@ -941,6 +1091,7 @@ const schema: DocumentNode = gql`
 
 	enum ResetPasswordErrorCode {
 		TOKEN_NOT_FOUND
+		TOKEN_INVALID
 		TOKEN_USED
 		TOKEN_EXPIRED
 

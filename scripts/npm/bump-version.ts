@@ -7,8 +7,13 @@ import glob from "fast-glob";
 	const dirs = [cwd, ...await glob(process.cwd() + '/packages/*', { onlyDirectories: true })]
 
 	await Promise.all(dirs.map(async (dir): Promise<void> => {
+		const packageJsonPath = `${dir}/package.json`;
 		try {
-			const packageJsonPath = `${dir}/package.json`;
+			await fs.access(packageJsonPath)
+		} catch (e) {
+			return
+		}
+		try {
 			const packageJson = JSON.parse(await fs.readFile(packageJsonPath, 'utf8'))
 			const newPackageJson = {
 				...packageJson,

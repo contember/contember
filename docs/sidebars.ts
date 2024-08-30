@@ -156,6 +156,7 @@ const sidebars: SidebarsConfig = {
 						'reference/engine/tenant/memberships',
 						'reference/engine/tenant/api-keys',
 						'reference/engine/tenant/idp',
+						'reference/engine/tenant/passwordless',
 						'reference/engine/tenant/mail-templates',
 					],
 				},

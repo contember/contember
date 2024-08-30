@@ -706,9 +706,11 @@ export type Mutation = {
 	readonly createSessionToken?: Maybe<CreateSessionTokenResponse>
 	readonly disableApiKey?: Maybe<DisableApiKeyResponse>
 	readonly disableIDP?: Maybe<DisableIdpResponse>
+	readonly disableMyPasswordless?: Maybe<ToggleMyPasswordlessResponse>
 	readonly disableOtp?: Maybe<DisableOtpResponse>
 	readonly disablePerson?: Maybe<DisablePersonResponse>
 	readonly enableIDP?: Maybe<EnableIdpResponse>
+	readonly enableMyPasswordless?: Maybe<ToggleMyPasswordlessResponse>
 	readonly initSignInIDP?: Maybe<InitSignInIdpResponse>
 	readonly initSignInPasswordless?: Maybe<InitSignInPasswordlessResponse>
 	readonly invite?: Maybe<InviteResponse>
@@ -1010,6 +1012,7 @@ export type Person = {
 	readonly identity: Identity
 	readonly name?: Maybe<Scalars['String']['output']>
 	readonly otpEnabled: Scalars['Boolean']['output']
+	readonly passwordlessEnabled?: Maybe<Scalars['Boolean']['output']>
 }
 
 export type PrepareOtpResponse = {
@@ -1360,6 +1363,22 @@ export type SignUpResult = {
 	readonly person: Person
 }
 
+export type ToggleMyPasswordlessError = {
+	readonly __typename?: 'ToggleMyPasswordlessError'
+	readonly code: ToggleMyPasswordlessErrorCode
+	readonly developerMessage: Scalars['String']['output']
+}
+
+export type ToggleMyPasswordlessErrorCode =
+  | 'CANNOT_TOGGLE'
+  | 'NOT_A_PERSON'
+
+export type ToggleMyPasswordlessResponse = {
+	readonly __typename?: 'ToggleMyPasswordlessResponse'
+	readonly error?: Maybe<ToggleMyPasswordlessError>
+	readonly ok: Scalars['Boolean']['output']
+}
+
 export type UnmanagedInviteOptions = {
 	readonly password?: InputMaybe<Scalars['String']['input']>
 	readonly resetTokenHash?: InputMaybe<Scalars['String']['input']>
@@ -1671,6 +1690,9 @@ export type ResolversTypes = {
 	SignUpResponse: ResolverTypeWrapper<SignUpResponse>
 	SignUpResult: ResolverTypeWrapper<SignUpResult>
 	String: ResolverTypeWrapper<Scalars['String']['output']>
+	ToggleMyPasswordlessError: ResolverTypeWrapper<ToggleMyPasswordlessError>
+	ToggleMyPasswordlessErrorCode: ToggleMyPasswordlessErrorCode
+	ToggleMyPasswordlessResponse: ResolverTypeWrapper<ToggleMyPasswordlessResponse>
 	UnmanagedInviteOptions: UnmanagedInviteOptions
 	UpdateIDPError: ResolverTypeWrapper<UpdateIdpError>
 	UpdateIDPErrorCode: UpdateIdpErrorCode
@@ -1810,6 +1832,8 @@ export type ResolversParentTypes = {
 	SignUpResponse: SignUpResponse
 	SignUpResult: SignUpResult
 	String: Scalars['String']['output']
+	ToggleMyPasswordlessError: ToggleMyPasswordlessError
+	ToggleMyPasswordlessResponse: ToggleMyPasswordlessResponse
 	UnmanagedInviteOptions: UnmanagedInviteOptions
 	UpdateIDPError: UpdateIdpError
 	UpdateIDPResponse: UpdateIdpResponse
@@ -2294,9 +2318,11 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 	createSessionToken?: Resolver<Maybe<ResolversTypes['CreateSessionTokenResponse']>, ParentType, ContextType, Partial<MutationCreateSessionTokenArgs>>
 	disableApiKey?: Resolver<Maybe<ResolversTypes['DisableApiKeyResponse']>, ParentType, ContextType, RequireFields<MutationDisableApiKeyArgs, 'id'>>
 	disableIDP?: Resolver<Maybe<ResolversTypes['DisableIDPResponse']>, ParentType, ContextType, RequireFields<MutationDisableIdpArgs, 'identityProvider'>>
+	disableMyPasswordless?: Resolver<Maybe<ResolversTypes['ToggleMyPasswordlessResponse']>, ParentType, ContextType>
 	disableOtp?: Resolver<Maybe<ResolversTypes['DisableOtpResponse']>, ParentType, ContextType>
 	disablePerson?: Resolver<Maybe<ResolversTypes['DisablePersonResponse']>, ParentType, ContextType, RequireFields<MutationDisablePersonArgs, 'personId'>>
 	enableIDP?: Resolver<Maybe<ResolversTypes['EnableIDPResponse']>, ParentType, ContextType, RequireFields<MutationEnableIdpArgs, 'identityProvider'>>
+	enableMyPasswordless?: Resolver<Maybe<ResolversTypes['ToggleMyPasswordlessResponse']>, ParentType, ContextType>
 	initSignInIDP?: Resolver<Maybe<ResolversTypes['InitSignInIDPResponse']>, ParentType, ContextType, RequireFields<MutationInitSignInIdpArgs, 'identityProvider'>>
 	initSignInPasswordless?: Resolver<Maybe<ResolversTypes['InitSignInPasswordlessResponse']>, ParentType, ContextType, RequireFields<MutationInitSignInPasswordlessArgs, 'email'>>
 	invite?: Resolver<Maybe<ResolversTypes['InviteResponse']>, ParentType, ContextType, RequireFields<MutationInviteArgs, 'email' | 'memberships' | 'projectSlug'>>
@@ -2324,6 +2350,7 @@ export type PersonResolvers<ContextType = any, ParentType extends ResolversParen
 	identity?: Resolver<ResolversTypes['Identity'], ParentType, ContextType>
 	name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
 	otpEnabled?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	passwordlessEnabled?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
@@ -2562,6 +2589,18 @@ export type SignUpResultResolvers<ContextType = any, ParentType extends Resolver
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
+export type ToggleMyPasswordlessErrorResolvers<ContextType = any, ParentType extends ResolversParentTypes['ToggleMyPasswordlessError'] = ResolversParentTypes['ToggleMyPasswordlessError']> = {
+	code?: Resolver<ResolversTypes['ToggleMyPasswordlessErrorCode'], ParentType, ContextType>
+	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type ToggleMyPasswordlessResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['ToggleMyPasswordlessResponse'] = ResolversParentTypes['ToggleMyPasswordlessResponse']> = {
+	error?: Resolver<Maybe<ResolversTypes['ToggleMyPasswordlessError']>, ParentType, ContextType>
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
 export type UpdateIdpErrorResolvers<ContextType = any, ParentType extends ResolversParentTypes['UpdateIDPError'] = ResolversParentTypes['UpdateIDPError']> = {
 	code?: Resolver<ResolversTypes['UpdateIDPErrorCode'], ParentType, ContextType>
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
@@ -2714,6 +2753,8 @@ export type Resolvers<ContextType = any> = {
 	SignUpError?: SignUpErrorResolvers<ContextType>
 	SignUpResponse?: SignUpResponseResolvers<ContextType>
 	SignUpResult?: SignUpResultResolvers<ContextType>
+	ToggleMyPasswordlessError?: ToggleMyPasswordlessErrorResolvers<ContextType>
+	ToggleMyPasswordlessResponse?: ToggleMyPasswordlessResponseResolvers<ContextType>
 	UpdateIDPError?: UpdateIdpErrorResolvers<ContextType>
 	UpdateIDPResponse?: UpdateIdpResponseResolvers<ContextType>
 	UpdateProjectError?: UpdateProjectErrorResolvers<ContextType>

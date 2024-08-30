@@ -84,6 +84,7 @@ import { ConfigurationMutationResolver } from './resolvers/mutation/configuratio
 import { ConfigurationQueryResolver } from './resolvers/query/ConfigurationQueryResolver'
 import { PasswordlessMutationResolver } from './resolvers/mutation/person/PasswordlessMutationResolver'
 import { PasswordlessSignInManager } from './model/service/PasswordlessSignInManager'
+import { TogglePasswordlessMutationResolver } from './resolvers/mutation/person/TogglePasswordlessMutationResolver'
 
 export interface TenantContainer {
 	projectMemberManager: ProjectMemberManager
@@ -283,6 +284,8 @@ export class TenantContainerFactory {
 				new ConfigurationQueryResolver(configurationManager))
 			.addService('passwordlessMutationResolver', ({ passwordlessSignInManager, signInResponseFactory }) =>
 				new PasswordlessMutationResolver(passwordlessSignInManager, signInResponseFactory))
+			.addService('togglePasswordlessMutationResolver', ({ configurationManager, personManager }) =>
+				new TogglePasswordlessMutationResolver(configurationManager, personManager))
 			.addService('resolverContextFactory', ({ permissionContextFactory }) =>
 				new TenantResolverContextFactory(permissionContextFactory))
 			.addService('resolvers', container =>

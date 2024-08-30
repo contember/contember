@@ -30,6 +30,7 @@ namespace PermissionActions {
 	export const PERSON_SETUP_OTP = Authorizator.createAction(Resources.person, 'setupOtp')
 	export const PERSON_CHANGE_PROFILE = (roles?: readonly string[]) => Authorizator.createAction(Resources.person, 'changeProfile', { roles })
 	export const PERSON_CHANGE_MY_PROFILE = Authorizator.createAction(Resources.person, 'changeMyProfile')
+	export const PERSON_TOGGLE_PASSWORDLESS = Authorizator.createAction(Resources.person, 'togglePasswordless')
 	export const PERSON_CHANGE_PASSWORD = (roles?: readonly string[]) => Authorizator.createAction(Resources.person, 'changePassword', { roles })
 	export const PERSON_CHANGE_MY_PASSWORD = Authorizator.createAction(Resources.person, 'changeMyPassword')
 	export const PERSON_RESET_PASSWORD = Authorizator.createAction(Resources.person, 'resetPassword')

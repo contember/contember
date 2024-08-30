@@ -53,6 +53,9 @@ const schema: DocumentNode = gql`
 		signInPasswordless(requestId: String!, validationType: PasswordlessValidationType!, token: String!, expiration: Int, mfaOtp: String): SignInPasswordlessResponse
 		activatePasswordlessOtp(requestId: String!, token: String!, otpHash: String!): ActivatePasswordlessOtpResponse
 
+        enableMyPasswordless: ToggleMyPasswordlessResponse
+        disableMyPasswordless: ToggleMyPasswordlessResponse
+
 		# IDP management
 		addIDP(identityProvider: String!, type: String!, configuration: Json!, options: IDPOptions): AddIDPResponse
 		updateIDP(identityProvider: String!, type: String, configuration: Json, options: IDPOptions, mergeConfiguration: Boolean): UpdateIDPResponse
@@ -547,6 +550,21 @@ const schema: DocumentNode = gql`
 		TOKEN_USED
 	}
 	
+	type ToggleMyPasswordlessResponse {
+		ok: Boolean!
+		error: ToggleMyPasswordlessError
+	}
+	
+	type ToggleMyPasswordlessError {
+		code: ToggleMyPasswordlessErrorCode!
+		developerMessage: String!
+	}
+	
+	enum ToggleMyPasswordlessErrorCode {
+		CANNOT_TOGGLE
+        NOT_A_PERSON
+	}
+	
 
 	# === invite ===
 
@@ -800,6 +818,7 @@ const schema: DocumentNode = gql`
 		email: String
 		name: String
 		otpEnabled: Boolean!
+		passwordlessEnabled: Boolean
 		identity: Identity!
 	}
 

@@ -3,6 +3,7 @@ import { Response, ResponseError, ResponseOk } from '../utils/Response'
 import { PersonQuery, PersonRow } from '../queries'
 import { DatabaseContext } from '../utils'
 import { EmailValidator, EmailValidatorError } from './EmailValidator'
+import { TogglePersonPasswordlessCommand } from '../commands'
 
 class PersonManager {
 	constructor(
@@ -24,6 +25,11 @@ class PersonManager {
 			}
 		}
 		await dbContext.commandBus.execute(new ChangeProfileCommand(person.id, data))
+		return new ResponseOk(null)
+	}
+
+	async togglePasswordless(dbContext: DatabaseContext, person: PersonRow, value: boolean): Promise<Response<null, never>> {
+		await dbContext.commandBus.execute(new TogglePersonPasswordlessCommand(person.id, value))
 		return new ResponseOk(null)
 	}
 

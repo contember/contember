@@ -12,7 +12,7 @@ To sign in, you need a [login token](overview.md#authorization-tokens). Once you
 
 ```graphql
 mutation {
-  signIn(email: "admin@example.com", password: "123456", expiration: 3600) {
+  signIn(email: "admin@example.com", password: "123456", expiration: 60) {
     ok
     result {
       token
@@ -68,7 +68,7 @@ For users with `super_admin` or `project_admin` roles, the `createSessionToken` 
 
 ```graphql
 mutation {
-  createSessionToken(email: "example@email.com", expiration: 3600) {
+  createSessionToken(email: "example@email.com", expiration: 60) {
     ok
     result {
       token

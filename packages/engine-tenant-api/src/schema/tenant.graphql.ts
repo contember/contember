@@ -127,20 +127,20 @@ const schema: DocumentNode = gql`
 	
 	input ConfigInput {
 		passwordless: ConfigPasswordlessInput
-    }
+	}
 	
 	enum ConfigPolicy {
 		always
 		never
 		optIn
 		optOut
-    }
+	}
 	
 	input ConfigPasswordlessInput {
 		enabled: ConfigPolicy
 		url: String
 		expirationMinutes: Int
-    }
+	}
 	
 	type ConfigureResponse {
 		ok: Boolean!
@@ -494,10 +494,10 @@ const schema: DocumentNode = gql`
 		expiresAt: DateTime!
 	}
 
-    input InitSignInPasswordlessOptions {
-        mailVariant: String
-        mailProject: String
-    }
+	input InitSignInPasswordlessOptions {
+		mailVariant: String
+		mailProject: String
+	}
 	
 	type SignInPasswordlessResponse {
 		ok: Boolean!
@@ -508,7 +508,7 @@ const schema: DocumentNode = gql`
 	enum PasswordlessValidationType {
 		otp
 		token
-    }
+	}
 	
 	type SignInPasswordlessError {
 		code: SignInPasswordlessErrorCode!
@@ -516,11 +516,11 @@ const schema: DocumentNode = gql`
 	}
 	
 	enum SignInPasswordlessErrorCode {
-        TOKEN_NOT_FOUND
-        TOKEN_INVALID
+		TOKEN_NOT_FOUND
+		TOKEN_INVALID
 		TOKEN_EXPIRED
 		TOKEN_USED
-        PERSON_DISABLED
+		PERSON_DISABLED
 		OTP_REQUIRED
 		INVALID_OTP_TOKEN
 	}
@@ -533,19 +533,19 @@ const schema: DocumentNode = gql`
 	type ActivatePasswordlessOtpResponse {
 		ok: Boolean!
 		error: ActivatePasswordlessOtpError
-    }
+	}
 	
 	type ActivatePasswordlessOtpError {
 		code: ActivatePasswordlessOtpErrorCode!
 		developerMessage: String!
-    }
+	}
 	
 	enum ActivatePasswordlessOtpErrorCode {
-        TOKEN_NOT_FOUND
-        TOKEN_INVALID
-        TOKEN_EXPIRED
-        TOKEN_USED
-    }
+		TOKEN_NOT_FOUND
+		TOKEN_INVALID
+		TOKEN_EXPIRED
+		TOKEN_USED
+	}
 	
 
 	# === invite ===
@@ -960,15 +960,15 @@ const schema: DocumentNode = gql`
 
 	# === mails ===
 	
-    type MailTemplateData {
-        projectSlug: String
-        type: MailType!
-        variant: String
-        subject: String!
-        content: String!
-        useLayout: Boolean!
-        replyTo: String
-    }
+	type MailTemplateData {
+		projectSlug: String
+		type: MailType!
+		variant: String
+		subject: String!
+		content: String!
+		useLayout: Boolean!
+		replyTo: String
+	}
 	
 	input MailTemplate {
 		projectSlug: String
@@ -1009,7 +1009,7 @@ const schema: DocumentNode = gql`
 	enum AddMailTemplateErrorCode {
 		MISSING_VARIABLE
 		PROJECT_NOT_FOUND
-        INVALID_REPLY_EMAIL_FORMAT
+		INVALID_REPLY_EMAIL_FORMAT
 	}
 
 	type RemoveMailTemplateResponse {
@@ -1038,7 +1038,7 @@ const schema: DocumentNode = gql`
 	enum CheckResetPasswordTokenCode {
 		REQUEST_NOT_FOUND
 		TOKEN_NOT_FOUND
-        TOKEN_INVALID
+		TOKEN_INVALID
 		TOKEN_USED
 		TOKEN_EXPIRED
 	}
@@ -1072,7 +1072,7 @@ const schema: DocumentNode = gql`
 
 	enum ResetPasswordErrorCode {
 		TOKEN_NOT_FOUND
-        TOKEN_INVALID
+		TOKEN_INVALID
 		TOKEN_USED
 		TOKEN_EXPIRED
 

@@ -15,12 +15,7 @@ import { ExecutionContainerFactory, GraphQlSchemaBuilderFactory, PermissionFacto
 import { createProviders, Providers } from './providers'
 import { TenantApiMiddlewareFactory, TenantGraphQLContextFactory, TenantGraphQLHandlerFactory } from './tenant'
 import { SystemApiMiddlewareFactory, SystemGraphQLContextFactory, SystemGraphQLHandlerFactory } from './system'
-import {
-	ContentApiControllerFactory,
-	ContentGraphQLContextFactory,
-	ContentQueryHandlerFactory,
-	NotModifiedChecker,
-} from './content'
+import { ContentApiControllerFactory, ContentGraphQLContextFactory, ContentQueryHandlerFactory, NotModifiedChecker } from './content'
 import { ProjectContextResolver } from './project-common'
 import {
 	ContentSchemaTransferMappingFactory,
@@ -30,7 +25,7 @@ import {
 	ImportExecutor,
 	SystemSchemaTransferMappingFactory,
 } from './transfer'
-import { homepageController, playgroundController } from './misc'
+import { homepageController } from './misc'
 import { Plugin } from './plugin/Plugin'
 import { Application } from './application'
 import { ApplicationWorkerManager } from './workers'
@@ -208,7 +203,6 @@ export class MasterContainerFactory {
 				it.addRoute('system', '/system/:projectSlug', systemApiMiddlewareFactory.create())
 				it.addRoute('transfer', '/import', importApiMiddlewareFactory.create())
 				it.addRoute('transfer', '/export', exportApiMiddlewareFactory.create())
-				it.addRoute('misc', '/playground', playgroundController)
 				it.addRoute('misc', '/', homepageController)
 
 				it.addInternalRoute('internal', '/health', () => {

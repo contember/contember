@@ -26,7 +26,6 @@
     }
   },
   "dependencies": {
-    "@apollographql/graphql-playground-html": "^1.6.29",
     "@contember/config-loader": "workspace:*",
     "@contember/database": "workspace:*",
     "@contember/database-migrations": "workspace:*",

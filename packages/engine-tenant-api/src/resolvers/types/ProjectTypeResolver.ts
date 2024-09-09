@@ -48,11 +48,11 @@ export class ProjectTypeResolver implements ProjectResolvers {
 			variables: Object.entries(getRoleVariables(role, schema.acl)).map(([name, variableDef]) => {
 				switch (variableDef.type) {
 					case Acl.VariableType.entity:
-						return { __typename: 'RoleEntityVariableDefinition', name, entityName: variableDef.entityName }
+						return { __typename: 'RoleEntityVariableDefinition' as const, name, entityName: variableDef.entityName }
 					case Acl.VariableType.predefined:
-						return { __typename: 'RolePredefinedVariableDefinition', name, value: variableDef.value }
+						return { __typename: 'RolePredefinedVariableDefinition' as const, name, value: variableDef.value }
 					case Acl.VariableType.condition:
-						return { __typename: 'RoleConditionVariableDefinition', name }
+						return { __typename: 'RoleConditionVariableDefinition' as const, name }
 				}
 			}),
 		}))

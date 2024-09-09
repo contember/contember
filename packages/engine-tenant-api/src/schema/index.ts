@@ -6,6 +6,7 @@ export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: 
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> }
 export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never }
 export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never }
+export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
 export type RequireFields<T, K extends keyof T> = Omit<T, K> & { [P in K]-?: NonNullable<T[P]> }
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
@@ -1520,7 +1521,7 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 
 
 /** Mapping of interface types */
-export type ResolversInterfaceTypes<RefType extends Record<string, unknown>> = {
+export type ResolversInterfaceTypes<_RefType extends Record<string, unknown>> = {
 	CommonSignInResult: (CreateSessionTokenResult) | (SignInIdpResult) | (SignInPasswordlessResult) | (SignInResult)
 	RoleVariableDefinition: (RoleConditionVariableDefinition) | (RoleEntityVariableDefinition) | (RolePredefinedVariableDefinition)
 }
@@ -1532,8 +1533,8 @@ export type ResolversTypes = {
 	ActivatePasswordlessOtpResponse: ResolverTypeWrapper<ActivatePasswordlessOtpResponse>
 	AddGlobalIdentityRolesError: ResolverTypeWrapper<AddGlobalIdentityRolesError>
 	AddGlobalIdentityRolesErrorCode: AddGlobalIdentityRolesErrorCode
-	AddGlobalIdentityRolesResponse: ResolverTypeWrapper<AddGlobalIdentityRolesResponse>
-	AddGlobalIdentityRolesResult: ResolverTypeWrapper<AddGlobalIdentityRolesResult>
+	AddGlobalIdentityRolesResponse: ResolverTypeWrapper<Omit<AddGlobalIdentityRolesResponse, 'result'> & { result?: Maybe<ResolversTypes['AddGlobalIdentityRolesResult']> }>
+	AddGlobalIdentityRolesResult: ResolverTypeWrapper<Omit<AddGlobalIdentityRolesResult, 'identity'> & { identity: ResolversTypes['Identity'] }>
 	AddIDPError: ResolverTypeWrapper<AddIdpError>
 	AddIDPErrorCode: AddIdpErrorCode
 	AddIDPResponse: ResolverTypeWrapper<AddIdpResponse>
@@ -1543,8 +1544,8 @@ export type ResolversTypes = {
 	AddProjectMemberError: ResolverTypeWrapper<AddProjectMemberError>
 	AddProjectMemberErrorCode: AddProjectMemberErrorCode
 	AddProjectMemberResponse: ResolverTypeWrapper<AddProjectMemberResponse>
-	ApiKey: ResolverTypeWrapper<ApiKey>
-	ApiKeyWithToken: ResolverTypeWrapper<ApiKeyWithToken>
+	ApiKey: ResolverTypeWrapper<Omit<ApiKey, 'identity'> & { identity: ResolversTypes['Identity'] }>
+	ApiKeyWithToken: ResolverTypeWrapper<Omit<ApiKeyWithToken, 'identity'> & { identity: ResolversTypes['Identity'] }>
 	Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>
 	ChangeMyPasswordError: ResolverTypeWrapper<ChangeMyPasswordError>
 	ChangeMyPasswordErrorCode: ChangeMyPasswordErrorCode
@@ -1574,16 +1575,16 @@ export type ResolversTypes = {
 	ConfirmOtpResponse: ResolverTypeWrapper<ConfirmOtpResponse>
 	CreateApiKeyError: ResolverTypeWrapper<CreateApiKeyError>
 	CreateApiKeyErrorCode: CreateApiKeyErrorCode
-	CreateApiKeyResponse: ResolverTypeWrapper<CreateApiKeyResponse>
-	CreateApiKeyResult: ResolverTypeWrapper<CreateApiKeyResult>
+	CreateApiKeyResponse: ResolverTypeWrapper<Omit<CreateApiKeyResponse, 'result'> & { result?: Maybe<ResolversTypes['CreateApiKeyResult']> }>
+	CreateApiKeyResult: ResolverTypeWrapper<Omit<CreateApiKeyResult, 'apiKey'> & { apiKey: ResolversTypes['ApiKeyWithToken'] }>
 	CreatePasswordResetRequestError: ResolverTypeWrapper<CreatePasswordResetRequestError>
 	CreatePasswordResetRequestErrorCode: CreatePasswordResetRequestErrorCode
 	CreatePasswordResetRequestResponse: ResolverTypeWrapper<CreatePasswordResetRequestResponse>
 	CreateProjectOptions: CreateProjectOptions
-	CreateProjectResponse: ResolverTypeWrapper<CreateProjectResponse>
+	CreateProjectResponse: ResolverTypeWrapper<Omit<CreateProjectResponse, 'result'> & { result?: Maybe<ResolversTypes['CreateProjectResult']> }>
 	CreateProjectResponseError: ResolverTypeWrapper<CreateProjectResponseError>
 	CreateProjectResponseErrorCode: CreateProjectResponseErrorCode
-	CreateProjectResult: ResolverTypeWrapper<CreateProjectResult>
+	CreateProjectResult: ResolverTypeWrapper<Omit<CreateProjectResult, 'deployerApiKey'> & { deployerApiKey?: Maybe<ResolversTypes['ApiKeyWithToken']> }>
 	CreateResetPasswordRequestOptions: CreateResetPasswordRequestOptions
 	CreateSessionTokenError: ResolverTypeWrapper<CreateSessionTokenError>
 	CreateSessionTokenErrorCode: CreateSessionTokenErrorCode
@@ -1608,9 +1609,9 @@ export type ResolversTypes = {
 	IDPOptions: IdpOptions
 	IDPOptionsOutput: ResolverTypeWrapper<IdpOptionsOutput>
 	IDPResponseInput: IdpResponseInput
-	Identity: ResolverTypeWrapper<Identity>
+	Identity: ResolverTypeWrapper<Omit<Identity, 'apiKey' | 'projects'> & { apiKey?: Maybe<ResolversTypes['ApiKey']>; projects: ReadonlyArray<ResolversTypes['IdentityProjectRelation']> }>
 	IdentityGlobalPermissions: ResolverTypeWrapper<IdentityGlobalPermissions>
-	IdentityProjectRelation: ResolverTypeWrapper<IdentityProjectRelation>
+	IdentityProjectRelation: ResolverTypeWrapper<Omit<IdentityProjectRelation, 'project'> & { project: ResolversTypes['Project'] }>
 	IdentityProvider: ResolverTypeWrapper<IdentityProvider>
 	InitSignInIDPError: ResolverTypeWrapper<InitSignInIdpError>
 	InitSignInIDPErrorCode: InitSignInIdpErrorCode
@@ -1640,19 +1641,19 @@ export type ResolversTypes = {
 	MembershipValidationErrorCode: MembershipValidationErrorCode
 	Mutation: ResolverTypeWrapper<{}>
 	PasswordlessValidationType: PasswordlessValidationType
-	Person: ResolverTypeWrapper<Person>
+	Person: ResolverTypeWrapper<Omit<Person, 'identity'> & { identity: ResolversTypes['Identity'] }>
 	PrepareOtpResponse: ResolverTypeWrapper<PrepareOtpResponse>
 	PrepareOtpResult: ResolverTypeWrapper<PrepareOtpResult>
-	Project: ResolverTypeWrapper<Project>
-	ProjectIdentityRelation: ResolverTypeWrapper<ProjectIdentityRelation>
+	Project: ResolverTypeWrapper<Omit<Project, 'members' | 'roles'> & { members: ReadonlyArray<ResolversTypes['ProjectIdentityRelation']>; roles: ReadonlyArray<ResolversTypes['RoleDefinition']> }>
+	ProjectIdentityRelation: ResolverTypeWrapper<Omit<ProjectIdentityRelation, 'identity'> & { identity: ResolversTypes['Identity'] }>
 	ProjectMembersFilter: ProjectMembersFilter
 	ProjectMembersInput: ProjectMembersInput
 	ProjectSecret: ProjectSecret
 	Query: ResolverTypeWrapper<{}>
 	RemoveGlobalIdentityRolesError: ResolverTypeWrapper<RemoveGlobalIdentityRolesError>
 	RemoveGlobalIdentityRolesErrorCode: RemoveGlobalIdentityRolesErrorCode
-	RemoveGlobalIdentityRolesResponse: ResolverTypeWrapper<RemoveGlobalIdentityRolesResponse>
-	RemoveGlobalIdentityRolesResult: ResolverTypeWrapper<RemoveGlobalIdentityRolesResult>
+	RemoveGlobalIdentityRolesResponse: ResolverTypeWrapper<Omit<RemoveGlobalIdentityRolesResponse, 'result'> & { result?: Maybe<ResolversTypes['RemoveGlobalIdentityRolesResult']> }>
+	RemoveGlobalIdentityRolesResult: ResolverTypeWrapper<Omit<RemoveGlobalIdentityRolesResult, 'identity'> & { identity: ResolversTypes['Identity'] }>
 	RemoveMailTemplateError: ResolverTypeWrapper<RemoveMailTemplateError>
 	RemoveMailTemplateErrorCode: RemoveMailTemplateErrorCode
 	RemoveMailTemplateResponse: ResolverTypeWrapper<RemoveMailTemplateResponse>
@@ -1663,7 +1664,7 @@ export type ResolversTypes = {
 	ResetPasswordErrorCode: ResetPasswordErrorCode
 	ResetPasswordResponse: ResolverTypeWrapper<ResetPasswordResponse>
 	RoleConditionVariableDefinition: ResolverTypeWrapper<RoleConditionVariableDefinition>
-	RoleDefinition: ResolverTypeWrapper<RoleDefinition>
+	RoleDefinition: ResolverTypeWrapper<Omit<RoleDefinition, 'variables'> & { variables: ReadonlyArray<ResolversTypes['RoleVariableDefinition']> }>
 	RoleEntityVariableDefinition: ResolverTypeWrapper<RoleEntityVariableDefinition>
 	RolePredefinedVariableDefinition: ResolverTypeWrapper<RolePredefinedVariableDefinition>
 	RoleVariableDefinition: ResolverTypeWrapper<ResolversInterfaceTypes<ResolversTypes>['RoleVariableDefinition']>
@@ -1712,16 +1713,16 @@ export type ResolversParentTypes = {
 	ActivatePasswordlessOtpError: ActivatePasswordlessOtpError
 	ActivatePasswordlessOtpResponse: ActivatePasswordlessOtpResponse
 	AddGlobalIdentityRolesError: AddGlobalIdentityRolesError
-	AddGlobalIdentityRolesResponse: AddGlobalIdentityRolesResponse
-	AddGlobalIdentityRolesResult: AddGlobalIdentityRolesResult
+	AddGlobalIdentityRolesResponse: Omit<AddGlobalIdentityRolesResponse, 'result'> & { result?: Maybe<ResolversParentTypes['AddGlobalIdentityRolesResult']> }
+	AddGlobalIdentityRolesResult: Omit<AddGlobalIdentityRolesResult, 'identity'> & { identity: ResolversParentTypes['Identity'] }
 	AddIDPError: AddIdpError
 	AddIDPResponse: AddIdpResponse
 	AddMailTemplateError: AddMailTemplateError
 	AddMailTemplateResponse: AddMailTemplateResponse
 	AddProjectMemberError: AddProjectMemberError
 	AddProjectMemberResponse: AddProjectMemberResponse
-	ApiKey: ApiKey
-	ApiKeyWithToken: ApiKeyWithToken
+	ApiKey: Omit<ApiKey, 'identity'> & { identity: ResolversParentTypes['Identity'] }
+	ApiKeyWithToken: Omit<ApiKeyWithToken, 'identity'> & { identity: ResolversParentTypes['Identity'] }
 	Boolean: Scalars['Boolean']['output']
 	ChangeMyPasswordError: ChangeMyPasswordError
 	ChangeMyPasswordResponse: ChangeMyPasswordResponse
@@ -1742,14 +1743,14 @@ export type ResolversParentTypes = {
 	ConfirmOtpError: ConfirmOtpError
 	ConfirmOtpResponse: ConfirmOtpResponse
 	CreateApiKeyError: CreateApiKeyError
-	CreateApiKeyResponse: CreateApiKeyResponse
-	CreateApiKeyResult: CreateApiKeyResult
+	CreateApiKeyResponse: Omit<CreateApiKeyResponse, 'result'> & { result?: Maybe<ResolversParentTypes['CreateApiKeyResult']> }
+	CreateApiKeyResult: Omit<CreateApiKeyResult, 'apiKey'> & { apiKey: ResolversParentTypes['ApiKeyWithToken'] }
 	CreatePasswordResetRequestError: CreatePasswordResetRequestError
 	CreatePasswordResetRequestResponse: CreatePasswordResetRequestResponse
 	CreateProjectOptions: CreateProjectOptions
-	CreateProjectResponse: CreateProjectResponse
+	CreateProjectResponse: Omit<CreateProjectResponse, 'result'> & { result?: Maybe<ResolversParentTypes['CreateProjectResult']> }
 	CreateProjectResponseError: CreateProjectResponseError
-	CreateProjectResult: CreateProjectResult
+	CreateProjectResult: Omit<CreateProjectResult, 'deployerApiKey'> & { deployerApiKey?: Maybe<ResolversParentTypes['ApiKeyWithToken']> }
 	CreateResetPasswordRequestOptions: CreateResetPasswordRequestOptions
 	CreateSessionTokenError: CreateSessionTokenError
 	CreateSessionTokenResponse: CreateSessionTokenResponse
@@ -1768,9 +1769,9 @@ export type ResolversParentTypes = {
 	IDPOptions: IdpOptions
 	IDPOptionsOutput: IdpOptionsOutput
 	IDPResponseInput: IdpResponseInput
-	Identity: Identity
+	Identity: Omit<Identity, 'apiKey' | 'projects'> & { apiKey?: Maybe<ResolversParentTypes['ApiKey']>; projects: ReadonlyArray<ResolversParentTypes['IdentityProjectRelation']> }
 	IdentityGlobalPermissions: IdentityGlobalPermissions
-	IdentityProjectRelation: IdentityProjectRelation
+	IdentityProjectRelation: Omit<IdentityProjectRelation, 'project'> & { project: ResolversParentTypes['Project'] }
 	IdentityProvider: IdentityProvider
 	InitSignInIDPError: InitSignInIdpError
 	InitSignInIDPResponse: InitSignInIdpResponse
@@ -1792,18 +1793,18 @@ export type ResolversParentTypes = {
 	MembershipInput: MembershipInput
 	MembershipValidationError: MembershipValidationError
 	Mutation: {}
-	Person: Person
+	Person: Omit<Person, 'identity'> & { identity: ResolversParentTypes['Identity'] }
 	PrepareOtpResponse: PrepareOtpResponse
 	PrepareOtpResult: PrepareOtpResult
-	Project: Project
-	ProjectIdentityRelation: ProjectIdentityRelation
+	Project: Omit<Project, 'members' | 'roles'> & { members: ReadonlyArray<ResolversParentTypes['ProjectIdentityRelation']>; roles: ReadonlyArray<ResolversParentTypes['RoleDefinition']> }
+	ProjectIdentityRelation: Omit<ProjectIdentityRelation, 'identity'> & { identity: ResolversParentTypes['Identity'] }
 	ProjectMembersFilter: ProjectMembersFilter
 	ProjectMembersInput: ProjectMembersInput
 	ProjectSecret: ProjectSecret
 	Query: {}
 	RemoveGlobalIdentityRolesError: RemoveGlobalIdentityRolesError
-	RemoveGlobalIdentityRolesResponse: RemoveGlobalIdentityRolesResponse
-	RemoveGlobalIdentityRolesResult: RemoveGlobalIdentityRolesResult
+	RemoveGlobalIdentityRolesResponse: Omit<RemoveGlobalIdentityRolesResponse, 'result'> & { result?: Maybe<ResolversParentTypes['RemoveGlobalIdentityRolesResult']> }
+	RemoveGlobalIdentityRolesResult: Omit<RemoveGlobalIdentityRolesResult, 'identity'> & { identity: ResolversParentTypes['Identity'] }
 	RemoveMailTemplateError: RemoveMailTemplateError
 	RemoveMailTemplateResponse: RemoveMailTemplateResponse
 	RemoveProjectMemberError: RemoveProjectMemberError
@@ -1811,7 +1812,7 @@ export type ResolversParentTypes = {
 	ResetPasswordError: ResetPasswordError
 	ResetPasswordResponse: ResetPasswordResponse
 	RoleConditionVariableDefinition: RoleConditionVariableDefinition
-	RoleDefinition: RoleDefinition
+	RoleDefinition: Omit<RoleDefinition, 'variables'> & { variables: ReadonlyArray<ResolversParentTypes['RoleVariableDefinition']> }
 	RoleEntityVariableDefinition: RoleEntityVariableDefinition
 	RolePredefinedVariableDefinition: RolePredefinedVariableDefinition
 	RoleVariableDefinition: ResolversInterfaceTypes<ResolversParentTypes>['RoleVariableDefinition']

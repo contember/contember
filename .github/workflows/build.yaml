@@ -42,6 +42,7 @@ jobs:
 
           - job_name: api-exporter
             run_script: |
+              yarn add @microsoft/api-extractor
               yarn run pre-build
               yarn run ts:build
               yarn run ae:test

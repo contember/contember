@@ -25,10 +25,10 @@
   "dependencies": {
     "@contember/schema": "workspace:*",
     "@contember/schema-utils": "workspace:*",
-    "reflect-metadata": "^0.1.13"
+    "reflect-metadata": "^0.1.14"
   },
   "devDependencies": {
-    "graphql": "^16.8.1"
+    "graphql": "^16.9.0"
   },
   "peerDependencies": {
     "graphql": ">= 14.6.0"

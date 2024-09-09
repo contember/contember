@@ -31,7 +31,7 @@
     "pg": "^8.9.0"
   },
   "devDependencies": {
-    "graphql": "^16.8.1"
+    "graphql": "^16.9.0"
   },
   "type": "module"
 }

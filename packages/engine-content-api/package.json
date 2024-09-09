@@ -38,9 +38,9 @@
   "devDependencies": {
     "@contember/database-tester": "workspace:*",
     "@contember/schema-definition": "workspace:*",
-    "@types/node": "^20.9.0",
-    "graphql": "^16.8.1",
-    "pg": "^8.11.3"
+    "@types/node": "^20.16.5",
+    "graphql": "^16.9.0",
+    "pg": "^8.12.0"
   },
   "peerDependencies": {
     "graphql": ">= 14.6.0",

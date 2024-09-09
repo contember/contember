@@ -60,7 +60,7 @@ export const uic = <El extends React.ElementType, Variants extends ConfigSchema 
 		}
 		let children = childrenBase
 		if (config?.wrapInner) {
-			children = React.createElement(config.wrapInner, props, children)
+			children = React.createElement(config.wrapInner, props as any, children)
 		}
 		if (config?.beforeChildren || config?.afterChildren) {
 			children = <>
@@ -71,7 +71,7 @@ export const uic = <El extends React.ElementType, Variants extends ConfigSchema 
 		}
 
 		const innerEl = <Comp ref={ref} className={twMerge(clsx(cls(props), classNameProp))} {...(config.defaultProps ?? {})} {...rest}>{children}</Comp>
-		return config?.wrapOuter ? React.createElement(config.wrapOuter, props, innerEl) : innerEl
+		return config?.wrapOuter ? React.createElement(config.wrapOuter, props as any, innerEl) : innerEl
 	})
 	component.displayName = config?.displayName
 

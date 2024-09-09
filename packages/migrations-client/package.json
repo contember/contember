@@ -33,7 +33,7 @@
     "@contember/schema-utils": "workspace:*"
   },
   "devDependencies": {
-    "@types/node": "^20.9.0"
+    "@types/node": "^20.16.5"
   },
   "type": "module"
 }

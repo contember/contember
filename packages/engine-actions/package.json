@@ -36,12 +36,12 @@
     "@contember/schema": "workspace:*",
     "@contember/schema-utils": "workspace:*",
     "@contember/typesafe": "workspace:*",
-    "@graphql-tools/schema": "^10.0.0",
+    "@graphql-tools/schema": "^10.0.6",
     "graphql-tag": "^2.12.6"
   },
   "devDependencies": {
-    "@types/ws": "^8.5.9",
-    "graphql": "^16.8.1"
+    "@types/ws": "^8.5.12",
+    "graphql": "^16.9.0"
   },
   "peerDependencies": {
     "graphql": ">= 14.6.0",

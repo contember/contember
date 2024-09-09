@@ -28,14 +28,14 @@
     "@contember/typesafe": "workspace:*",
     "mime-types": "^2.1.35",
     "picomatch": "^3.0.1",
-    "qs": "^6.11.2",
+    "qs": "^6.13.0",
     "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@types/mime-types": "^2.1.4",
-    "@types/qs": "^6.9.10",
-    "@types/uuid": "^9.0.7",
-    "graphql": "^16.8.1"
+    "@types/qs": "^6.9.15",
+    "@types/uuid": "^9.0.8",
+    "graphql": "^16.9.0"
   },
   "peerDependencies": {
     "graphql": ">= 14.6.0",

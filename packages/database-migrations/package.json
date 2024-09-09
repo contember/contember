@@ -27,7 +27,7 @@
     "node-pg-migrate": "^5.10.0"
   },
   "devDependencies": {
-    "pg": "^8.11.3"
+    "pg": "^8.12.0"
   },
   "peerDependencies": {
     "pg": "^8.9.0"

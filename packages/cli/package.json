@@ -32,7 +32,7 @@
     "@contember/schema-utils": "workspace:*",
     "@contember/typesafe": "workspace:*",
     "@graphql-tools/schema": "^10.0.6",
-    "chalk": "^4.1.2",
+    "chalk": "^5.3.0",
     "chalk-table": "^1.0.2",
     "esbuild": "^0.21.5",
     "fast-glob": "^3.3.2",

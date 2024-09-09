@@ -26,9 +26,14 @@ for (let key in json) {
 	versions[pkgName].add(version);
 }
 
+let ok = true;
 for (let pkg in versions) {
 	if (versions[pkg].size > 1 && !whitelist.includes(pkg)) {
 		console.error(`Multiple versions found for ${pkg} which is not whitelisted: ${Array.from(versions[pkg]).join(', ')}`);
-		// Handle the error as needed
+		ok = false;
 	}
+}
+
+if (!ok) {
+	process.exit(1);
 }

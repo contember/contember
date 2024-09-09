@@ -46,8 +46,8 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "supertest": "^7.0.0",
-    "tsx": "^4.19.0",
-    "typedoc": "^0.25.13",
+    "tsx": "4.16.5",
+    "typedoc": "^0.26.7",
     "typescript": "^5.5.4",
     "vite": "^5.4.3",
     "vitest": "^2.0.5"
@@ -57,7 +57,7 @@
   ],
   "resolutions": {
     "typescript": "5.5.4",
-    "graphql": "16.8.1",
+    "graphql": "16.9.0",
     "@types/node": "20.9.0",
     "rollup": "npm:@rollup/wasm-node@*"
   }

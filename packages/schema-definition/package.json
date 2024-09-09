@@ -25,7 +25,7 @@
   "dependencies": {
     "@contember/schema": "workspace:*",
     "@contember/schema-utils": "workspace:*",
-    "reflect-metadata": "^0.1.14"
+    "reflect-metadata": "^0.2.2"
   },
   "devDependencies": {
     "graphql": "^16.9.0"

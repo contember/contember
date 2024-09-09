@@ -30,7 +30,7 @@
     "@contember/engine-vimeo-plugin": "workspace:*",
     "graphql": "^16.9.0",
     "pg": "^8.12.0",
-    "uuid": "^9.0.1"
+    "uuid": "^10.0.0"
   },
   "devDependencies": {
     "@types/koa-compress": "^4.0.6",

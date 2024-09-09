@@ -40,8 +40,8 @@
     "@radix-ui/react-slot": "^1.1.0",
     "is-hotkey": "^0.2.0",
     "slate": "^0.103.0",
-    "slate-history": "^0.100.0",
-    "slate-react": "^0.102.0"
+    "slate-history": "^0.109.0",
+    "slate-react": "^0.110.0"
   },
   "peerDependencies": {
     "react": "^18 || ^19",

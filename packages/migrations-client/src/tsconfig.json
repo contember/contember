@@ -5,6 +5,7 @@
 		"outDir": "../dist/types"
 	},
 	"references": [
+		{ "path": "../../graphql-client/src" },
 		{ "path": "../../engine-common/src" },
 		{ "path": "../../schema/src" },
 		{ "path": "../../schema-migrations/src" },

@@ -27,10 +27,10 @@
   },
   "dependencies": {
     "@contember/engine-common": "workspace:*",
+    "@contember/graphql-client": "workspace:*",
     "@contember/schema": "workspace:*",
     "@contember/schema-migrations": "workspace:*",
-    "@contember/schema-utils": "workspace:*",
-    "graphql-request": "^6.1.0"
+    "@contember/schema-utils": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^20.9.0"

@@ -1,4 +1,4 @@
-import { GraphQLClient } from 'graphql-request'
+import { GraphQlClient } from '@contember/graphql-client'
 import { ExecutedMigration, ExecutedMigrationInfo } from './migrations'
 
 export type MigrateError = {
@@ -21,14 +21,10 @@ export type MigrateResponse = {
 }
 
 export class SystemClient {
-	constructor(private readonly apiClient: GraphQLClient) {}
+	constructor(private readonly apiClient: GraphQlClient) {}
 
 	public static create(baseUrl: string, projectName: string, apiToken: string): SystemClient {
-		const graphqlClient = new GraphQLClient(createSystemUrl(baseUrl, projectName), {
-			headers: {
-				Authorization: `Bearer ${apiToken}`,
-			},
-		})
+		const graphqlClient = new GraphQlClient(createSystemUrl(baseUrl, projectName), apiToken)
 		return new SystemClient(graphqlClient)
 	}
 
@@ -46,10 +42,12 @@ mutation($migrations: [Migration!]!) {
 }
 `
 		const result = (
-			await this.apiClient.request<{
+			await this.apiClient.execute<{
 				migrate: { ok: boolean; errors: { code: MigrateErrorCode; migration: string; message: string }[] }
 			}>(query, {
-				migrations,
+				variables: {
+					migrations,
+				},
 			})
 		).migrate
 		if (!result.ok) {
@@ -69,10 +67,12 @@ mutation($version: String!) {
 }
 `
 		const result = (
-			await this.apiClient.request<{
+			await this.apiClient.execute<{
 				migrationDelete: { ok: boolean; error?: { developerMessage: string } }
 			}>(query, {
-				version,
+				variables: {
+					version,
+				},
 			})
 		).migrationDelete
 		if (!result.ok) {
@@ -92,11 +92,13 @@ mutation($version: String!, $modification: MigrationModification!) {
 }
 `
 		const result = (
-			await this.apiClient.request<{
+			await this.apiClient.execute<{
 				migrationModify: { ok: boolean; error?: { developerMessage: string } }
 			}>(query, {
-				version,
-				modification,
+				variables: {
+					version,
+					modification,
+				},
 			})
 		).migrationModify
 		if (!result.ok) {
@@ -115,7 +117,7 @@ mutation($version: String!, $modification: MigrationModification!) {
 	}
 }`
 		return (
-			await this.apiClient.request<{
+			await this.apiClient.execute<{
 				executedMigrations: ExecutedMigrationInfo[]
 			}>(query, {})
 		).executedMigrations.map(it => ({ ...it, executedAt: new Date(it.executedAt) }))
@@ -134,9 +136,9 @@ mutation($version: String!, $modification: MigrationModification!) {
 }`
 		return (
 			(
-				await this.apiClient.request<{
+				await this.apiClient.execute<{
 					executedMigrations: ExecutedMigration[]
-				}>(query, { version })
+				}>(query, { variables: { version } })
 			).executedMigrations.map(it => ({ ...it, executedAt: new Date(it.executedAt) }))[0] || null
 		)
 	}

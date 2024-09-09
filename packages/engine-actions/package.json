@@ -21,9 +21,6 @@
       }
     }
   },
-  "scripts": {
-    "generate": "gql-gen --config graphql-actions.codegen.yml"
-  },
   "dependencies": {
     "@contember/authorization": "workspace:*",
     "@contember/database": "workspace:*",
@@ -43,10 +40,6 @@
     "graphql-tag": "^2.12.6"
   },
   "devDependencies": {
-    "@graphql-codegen/cli": "^5.0.0",
-    "@graphql-codegen/typescript": "^4.0.1",
-    "@graphql-codegen/typescript-operations": "^4.0.1",
-    "@graphql-codegen/typescript-resolvers": "^4.0.1",
     "@types/ws": "^8.5.9",
     "graphql": "^16.8.1"
   },

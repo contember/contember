@@ -23,7 +23,7 @@
     }
   },
   "scripts": {
-    "generate": "gql-gen --config graphql-tenant.codegen.yml"
+    "generate": "gql-gen --config graphql.codegen.yml"
   },
   "dependencies": {
     "@contember/authorization": "workspace:*",
@@ -46,10 +46,6 @@
   },
   "devDependencies": {
     "@contember/database-tester": "workspace:*",
-    "@graphql-codegen/cli": "^5.0.0",
-    "@graphql-codegen/typescript": "^4.0.1",
-    "@graphql-codegen/typescript-operations": "^4.0.1",
-    "@graphql-codegen/typescript-resolvers": "^4.0.1",
     "@graphql-tools/schema": "^10.0.0",
     "@types/mustache": "^4.2.5",
     "@types/node": "^20.9.0",

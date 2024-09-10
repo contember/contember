@@ -6,40 +6,34 @@
 
 import { ChangeEvent } from 'react';
 import { EntityAccessor } from '@contember/react-binding';
-import { EntityAccessor as EntityAccessor_2 } from '@contember/binding';
 import { EntityId } from '@contember/react-binding';
-import { EntityId as EntityId_2 } from '@contember/binding';
-import { EntityListAccessor } from '@contember/binding';
-import { EntityListSubTreeMarker } from '@contember/binding';
-import { EntityListSubTreeMarker as EntityListSubTreeMarker_2 } from '@contember/react-binding';
+import { EntityListAccessor } from '@contember/react-binding';
+import { EntityListSubTreeMarker } from '@contember/react-binding';
 import { Environment } from '@contember/react-binding';
-import { Environment as Environment_2 } from '@contember/binding';
-import { FieldMarker } from '@contember/binding';
-import { Filter } from '@contember/binding';
+import { FieldMarker } from '@contember/react-binding';
+import { Filter } from '@contember/react-binding';
 import { ForwardRefExoticComponent } from 'react';
-import { HasManyRelationMarker } from '@contember/binding';
-import { HasOneRelationMarker } from '@contember/binding';
+import { HasManyRelationMarker } from '@contember/react-binding';
+import { HasOneRelationMarker } from '@contember/react-binding';
 import { Input } from '@contember/client';
 import { JSX as JSX_2 } from 'react/jsx-runtime';
 import { JSXElementConstructor } from 'react';
 import { NamedExoticComponent } from 'react';
 import { OrderBy } from '@contember/react-binding';
-import { QualifiedEntityList } from '@contember/binding';
+import { QualifiedEntityList } from '@contember/react-binding';
 import * as React_2 from 'react';
 import { ReactElement } from 'react';
 import { ReactNode } from 'react';
+import { ReceivedEntityData } from '@contember/react-binding';
 import { RefAttributes } from 'react';
 import { Serializable } from '@contember/react-utils';
 import { SetStateAction } from 'react';
 import { StateStorageOrName } from '@contember/react-utils';
-import { SugaredOrderBy } from '@contember/binding';
+import { SugaredOrderBy } from '@contember/react-binding';
 import { SugaredQualifiedEntityList } from '@contember/react-binding';
-import { SugaredQualifiedEntityList as SugaredQualifiedEntityList_2 } from '@contember/binding';
 import { SugaredRelativeEntityList } from '@contember/react-binding';
-import { SugaredRelativeEntityList as SugaredRelativeEntityList_2 } from '@contember/binding';
-import { SugaredRelativeSingleEntity } from '@contember/binding';
-import { SugaredRelativeSingleField } from '@contember/binding';
-import { SugaredRelativeSingleField as SugaredRelativeSingleField_2 } from '@contember/react-binding';
+import { SugaredRelativeSingleEntity } from '@contember/react-binding';
+import { SugaredRelativeSingleField } from '@contember/react-binding';
 import { UseEntityListSubTreeLoaderState } from '@contember/react-binding';
 import { UseEntityListSubTreeLoaderStateMethods } from '@contember/react-binding';
 
@@ -81,7 +75,7 @@ export const createEnumFilter: (field: SugaredRelativeSingleField["field"]) => D
 export const createGenericTextCellFilterCondition: (filter: GenericTextCellFilterArtifacts) => Input.Condition<string>;
 
 // @public (undocumented)
-export const createHasManyFilter: (field: SugaredRelativeEntityList_2["field"]) => DataViewFilterHandler<RelationFilterArtifacts>;
+export const createHasManyFilter: (field: SugaredRelativeEntityList["field"]) => DataViewFilterHandler<RelationFilterArtifacts>;
 
 // @public (undocumented)
 export const createHasOneFilter: (field: SugaredRelativeSingleEntity["field"]) => DataViewFilterHandler<RelationFilterArtifacts>;
@@ -131,7 +125,7 @@ export interface DataViewBooleanFilterProps {
     // (undocumented)
     children: React_2.ReactNode;
     // (undocumented)
-    field: SugaredRelativeSingleField_2['field'];
+    field: SugaredRelativeSingleField['field'];
     // (undocumented)
     name?: string;
 }
@@ -182,7 +176,7 @@ export interface DataViewDateFilterProps {
     // (undocumented)
     children: React_2.ReactNode;
     // (undocumented)
-    field: SugaredRelativeSingleField_2['field'];
+    field: SugaredRelativeSingleField['field'];
     // (undocumented)
     name?: string;
 }
@@ -254,7 +248,7 @@ export interface DataViewEnumFilterProps {
     // (undocumented)
     children: React_2.ReactNode;
     // (undocumented)
-    field: SugaredRelativeSingleField_2['field'];
+    field: SugaredRelativeSingleField['field'];
     // (undocumented)
     name?: string;
 }
@@ -514,7 +508,7 @@ export interface DataViewNumberFilterProps {
     // (undocumented)
     children: React_2.ReactNode;
     // (undocumented)
-    field: SugaredRelativeSingleField_2['field'];
+    field: SugaredRelativeSingleField['field'];
     // (undocumented)
     name?: string;
 }
@@ -577,7 +571,7 @@ export interface DataViewPagingStateViewProps {
 // @public (undocumented)
 export type DataViewProps = {
     children: ReactNode;
-    onSelectHighlighted?: (entity: EntityAccessor_2) => void;
+    onSelectHighlighted?: (entity: EntityAccessor) => void;
     queryField?: DataViewUnionFilterFields;
 } & UseDataViewArgs;
 
@@ -586,7 +580,7 @@ export const DataViewQueryFilterName = "_query";
 
 // @internal (undocumented)
 export const DataViewRelationFilterArgsContext: React_2.Context<{
-    options: SugaredQualifiedEntityList_2["entities"];
+    options: SugaredQualifiedEntityList["entities"];
 }>;
 
 // @public (undocumented)
@@ -822,7 +816,7 @@ export interface DataViewTextFilterProps {
     // (undocumented)
     children: React_2.ReactNode;
     // (undocumented)
-    field: SugaredRelativeSingleField_2['field'];
+    field: SugaredRelativeSingleField['field'];
     // (undocumented)
     name?: string;
 }
@@ -847,7 +841,7 @@ export interface DataViewUnionTextFilterProps {
     // (undocumented)
     children: React_2.ReactNode;
     // (undocumented)
-    fields: SugaredRelativeSingleField_2['field'] | SugaredRelativeSingleField_2['field'][];
+    fields: SugaredRelativeSingleField['field'] | SugaredRelativeSingleField['field'][];
     // (undocumented)
     name: string;
 }
@@ -915,7 +909,7 @@ export type GetNewOrderBy = (newDirection: DataViewSortingDirection, options: Ge
 // @public (undocumented)
 export interface GetNewOrderByOptions {
     // (undocumented)
-    environment: Environment_2;
+    environment: Environment;
 }
 
 // @public (undocumented)
@@ -955,7 +949,7 @@ export const useDataView: (args: UseDataViewArgs) => UseDataViewResult;
 // @public (undocumented)
 export type UseDataViewArgs = {
     dataViewKey?: string;
-    entities: SugaredQualifiedEntityList_2['entities'];
+    entities: SugaredQualifiedEntityList['entities'];
 } & DataViewFilteringProps & DataViewSortingProps & DataViewPagingProps & DataViewSelectionProps;
 
 // @public (undocumented)
@@ -1023,8 +1017,8 @@ export const useDataViewEnumFilterFactory: (name: string) => (value: string) => 
 export const useDataViewFetchAllData: ({ children }: {
     children: ReactNode;
 }) => () => Promise<{
-    data: any;
-    marker: EntityListSubTreeMarker_2;
+    marker: EntityListSubTreeMarker;
+    data: ReceivedEntityData[];
 }>;
 
 // Warning: (ae-forgotten-export) The symbol "UseDataViewFilterResult" needs to be exported by the entry point index.d.ts
@@ -1093,22 +1087,22 @@ export const useDataViewPagingMethods: () => DataViewPagingMethods;
 export const useDataViewPagingState: () => DataViewPagingState;
 
 // @public (undocumented)
-export const useDataViewRelationFilter: (name: string, entityId: EntityId_2) => UseDataViewRelationFilterResult;
+export const useDataViewRelationFilter: (name: string, entityId: EntityId) => UseDataViewRelationFilterResult;
 
 // @public (undocumented)
 export const useDataViewRelationFilterArgs: () => {
-    options: SugaredQualifiedEntityList_2["entities"];
+    options: SugaredQualifiedEntityList["entities"];
 };
 
 // @public (undocumented)
 export const useDataViewRelationFilterData: ({ name, children, options }: {
     name: string;
-    options: SugaredQualifiedEntityList_2["entities"];
+    options: SugaredQualifiedEntityList["entities"];
     children: ReactNode;
 }) => [UseEntityListSubTreeLoaderState<unknown>, UseEntityListSubTreeLoaderStateMethods];
 
 // @public (undocumented)
-export const useDataViewRelationFilterFactory: (name: string) => (id: EntityId_2) => UseDataViewRelationFilterResult;
+export const useDataViewRelationFilterFactory: (name: string) => (id: EntityId) => UseDataViewRelationFilterResult;
 
 // @public (undocumented)
 export type UseDataViewRelationFilterResult = [

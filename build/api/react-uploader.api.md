@@ -6,10 +6,10 @@
 
 import { ComponentType } from 'react';
 import { Context } from 'react';
-import type { EntityAccessor } from '@contember/binding';
-import type { Environment } from '@contember/binding';
-import { ErrorAccessor } from '@contember/binding';
-import type { ErrorAccessorHolder } from '@contember/binding';
+import type { EntityAccessor } from '@contember/react-binding';
+import type { Environment } from '@contember/react-binding';
+import { ErrorAccessor } from '@contember/react-binding';
+import type { ErrorAccessorHolder } from '@contember/react-binding';
 import { GenerateUploadUrlMutationBuilder } from '@contember/client';
 import { GraphQlClient } from '@contember/graphql-client';
 import { JSX as JSX_2 } from 'react/jsx-runtime';
@@ -18,9 +18,7 @@ import { NamedExoticComponent } from 'react';
 import { ReactElement } from 'react';
 import { ReactNode } from 'react';
 import { SugaredRelativeSingleEntity } from '@contember/react-binding';
-import { SugaredRelativeSingleEntity as SugaredRelativeSingleEntity_2 } from '@contember/binding';
-import { SugaredRelativeSingleField } from '@contember/binding';
-import { SugaredRelativeSingleField as SugaredRelativeSingleField_2 } from '@contember/react-binding';
+import { SugaredRelativeSingleField } from '@contember/react-binding';
 
 // @public (undocumented)
 export type AfterUploadEvent = {
@@ -35,7 +33,7 @@ export type AnyFileTypeProps = FileType & FileUrlDataExtractorProps & GenericFil
 // @public (undocumented)
 export interface AudioFileDataExtractorProps {
     // (undocumented)
-    durationField?: SugaredRelativeSingleField_2['field'];
+    durationField?: SugaredRelativeSingleField['field'];
 }
 
 // @public (undocumented)
@@ -155,7 +153,7 @@ export interface FileUploadResult {
 // @public (undocumented)
 export interface FileUrlDataExtractorProps {
     // (undocumented)
-    urlField: SugaredRelativeSingleField_2['field'];
+    urlField: SugaredRelativeSingleField['field'];
 }
 
 // @public (undocumented)
@@ -169,13 +167,13 @@ export type FileWithMeta = {
 // @public (undocumented)
 export interface GenericFileMetadataExtractorProps {
     // (undocumented)
-    fileNameField?: SugaredRelativeSingleField_2['field'];
+    fileNameField?: SugaredRelativeSingleField['field'];
     // (undocumented)
-    fileSizeField?: SugaredRelativeSingleField_2['field'];
+    fileSizeField?: SugaredRelativeSingleField['field'];
     // (undocumented)
-    fileTypeField?: SugaredRelativeSingleField_2['field'];
+    fileTypeField?: SugaredRelativeSingleField['field'];
     // (undocumented)
-    lastModifiedField?: SugaredRelativeSingleField_2['field'];
+    lastModifiedField?: SugaredRelativeSingleField['field'];
 }
 
 // @public (undocumented)
@@ -196,9 +194,9 @@ export const getVideoFileDataExtractor: (props: VideoFileDataExtractorProps) => 
 // @public (undocumented)
 export interface ImageFileDataExtractorProps {
     // (undocumented)
-    heightField?: SugaredRelativeSingleField_2['field'];
+    heightField?: SugaredRelativeSingleField['field'];
     // (undocumented)
-    widthField?: SugaredRelativeSingleField_2['field'];
+    widthField?: SugaredRelativeSingleField['field'];
 }
 
 // @public (undocumented)
@@ -288,7 +286,7 @@ export const UploaderBase: NamedExoticComponent<UploaderBaseProps>;
 
 // @public (undocumented)
 export type UploaderBaseFieldProps = {
-    baseField?: SugaredRelativeSingleEntity_2['field'];
+    baseField?: SugaredRelativeSingleEntity['field'];
 };
 
 // @public (undocumented)
@@ -467,11 +465,11 @@ export const useUploaderUploadFiles: () => (files: File[]) => void;
 // @public (undocumented)
 export interface VideoFileDataExtractorProps {
     // (undocumented)
-    durationField?: SugaredRelativeSingleField_2['field'];
+    durationField?: SugaredRelativeSingleField['field'];
     // (undocumented)
-    heightField?: SugaredRelativeSingleField_2['field'];
+    heightField?: SugaredRelativeSingleField['field'];
     // (undocumented)
-    widthField?: SugaredRelativeSingleField_2['field'];
+    widthField?: SugaredRelativeSingleField['field'];
 }
 
 // @public (undocumented)

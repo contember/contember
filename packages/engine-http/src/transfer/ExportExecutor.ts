@@ -130,7 +130,7 @@ export class ExportExecutor {
 
 		while (resultPromise !== null) {
 			const result: Connection.Result = await resultPromise
-			resultPromise = result.rowCount < batchSize ? null : db.query(fetchSql) // pipeline
+			resultPromise = (result.rowCount ?? 0) < batchSize ? null : db.query(fetchSql) // pipeline
 			yield* result.rows
 		}
 

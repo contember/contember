@@ -36,8 +36,8 @@
     "@contember/graphql-client-tenant": "workspace:*",
     "@contember/react-client": "workspace:*",
     "@contember/react-utils": "workspace:*",
-    "@radix-ui/primitive": "^1.0.1",
-    "@radix-ui/react-slot": "^1.0.2",
+    "@radix-ui/primitive": "^1.1.0",
+    "@radix-ui/react-slot": "^1.1.0",
     "graphql-ts-client-api": "^3.1.17"
   },
   "peerDependencies": {

@@ -1,10 +1,10 @@
 import { dataAttribute } from '@contember/utilities'
-import { memo, ReactElement, ReactNode, TextareaHTMLAttributes } from 'react'
+import { ComponentType, memo, ReactElement, ReactNode, TextareaHTMLAttributes } from 'react'
 
 export interface HTMLTextAreaDivTargetProps extends TextareaHTMLAttributes<HTMLDivElement> { }
 
 export interface EditorCanvasProps<P extends HTMLTextAreaDivTargetProps> {
-	underlyingComponent: (props: P) => ReactElement
+	underlyingComponent: ComponentType<P>
 	componentProps: P
 	focusRing?: boolean
 	children?: ReactNode

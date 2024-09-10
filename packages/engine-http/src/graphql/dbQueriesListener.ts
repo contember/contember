@@ -14,7 +14,7 @@ export const createDbQueriesListener = <Context extends { requestDebug: boolean 
 		}
 		const queries: Query[] = []
 		const listener: EventManager.QueryEndCallback = ({ sql, parameters, meta }, { timing, rowCount }) =>
-			queries.push({ sql, bindings: parameters, elapsed: timing ? timing.selfDuration : 0, meta, rowCount })
+			queries.push({ sql, bindings: parameters, elapsed: timing ? timing.selfDuration : 0, meta, rowCount: rowCount ?? undefined })
 		const errorListener: EventManager.QueryErrorCallback = ({ sql, parameters, meta }, error) =>
 			queries.push({
 				sql,

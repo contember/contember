@@ -40,10 +40,10 @@
     "@contember/react-slate-editor-base": "workspace:*",
     "@contember/react-utils": "workspace:*",
     "@contember/utilities": "workspace:*",
-    "@radix-ui/react-slot": "^1.0.2",
+    "@radix-ui/react-slot": "^1.1.0",
     "react-error-boundary": "^4.0.13",
     "slate": "^0.103.0",
-    "slate-react": "^0.102.0"
+    "slate-react": "^0.110.0"
   },
   "peerDependencies": {
     "react": "^18 || ^19",

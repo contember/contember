@@ -12,6 +12,7 @@
 		{ "path": "../../config-loader/src" },
 		{ "path": "../../database/src" },
 		{ "path": "../../dic/src" },
+		{ "path": "../../graphql-client/src" },
 		{ "path": "../../engine-content-api/src" },
 		{ "path": "../../engine-common/src" },
 		{ "path": "../../schema/src" },

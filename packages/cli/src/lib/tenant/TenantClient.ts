@@ -1,4 +1,4 @@
-import { GraphQLClient } from 'graphql-request'
+import { GraphQlClient } from '@contember/graphql-client'
 
 export const createTenantApiUrl = (url: string) => {
 	if (url.endsWith('/')) {
@@ -12,14 +12,10 @@ export const createTenantApiUrl = (url: string) => {
 
 
 export class TenantClient {
-	constructor(private readonly apiClient: GraphQLClient) {}
+	constructor(private readonly apiClient: GraphQlClient) {}
 
 	public static create(url: string, apiToken: string): TenantClient {
-		const graphqlClient = new GraphQLClient(createTenantApiUrl(url), {
-			headers: {
-				Authorization: `Bearer ${apiToken}`,
-			},
-		})
+		const graphqlClient = new GraphQlClient(createTenantApiUrl(url), apiToken)
 		return new TenantClient(graphqlClient)
 	}
 
@@ -32,9 +28,9 @@ export class TenantClient {
     }
   }
 }`
-		const result = await this.apiClient.request<{
+		const result = await this.apiClient.execute<{
 			createProject: { ok: boolean; error: { code: string } }
-		}>(query, { slug })
+		}>(query, { variables: { slug } })
 		if (!result.createProject.ok) {
 			if (ignoreExisting && result.createProject.error.code === 'ALREADY_EXISTS') {
 				return

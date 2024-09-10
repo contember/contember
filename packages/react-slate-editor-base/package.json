@@ -36,18 +36,19 @@
     "@contember/binding": "workspace:*",
     "@contember/react-binding": "workspace:*",
     "@contember/utilities": "workspace:*",
-    "@radix-ui/primitive": "^1.0.1",
-    "@radix-ui/react-slot": "^1.0.2",
+    "@radix-ui/primitive": "^1.1.0",
+    "@radix-ui/react-slot": "^1.1.0",
     "is-hotkey": "^0.2.0",
     "slate": "^0.103.0",
-    "slate-history": "^0.100.0",
-    "slate-react": "^0.102.0"
+    "slate-history": "^0.109.0",
+    "slate-react": "^0.110.0"
   },
   "peerDependencies": {
     "react": "^18 || ^19",
     "react-dom": "^18 || ^19"
   },
   "devDependencies": {
+    "@types/is-hotkey": "^0.1.10",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   }

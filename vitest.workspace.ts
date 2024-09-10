@@ -6,7 +6,7 @@ export default defineWorkspace([
 		test: {
 			include: ['packages/react-*/tests/**/*.test.{ts,tsx}'],
 			name: 'browser',
-			environment: 'jsdom',
+			environment: 'happy-dom',
 		},
 		resolve: resolveConfig,
 	},

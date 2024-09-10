@@ -23,7 +23,7 @@
     }
   },
   "scripts": {
-    "generate": "gql-gen --config graphql-tenant.codegen.yml"
+    "generate": "gql-gen --config graphql.codegen.yml"
   },
   "dependencies": {
     "@contember/authorization": "workspace:*",
@@ -36,25 +36,21 @@
     "@contember/schema": "workspace:*",
     "@contember/schema-utils": "workspace:*",
     "@contember/typesafe": "workspace:*",
-    "@graphql-tools/utils": "^10.0.8",
+    "@graphql-tools/utils": "^10.5.4",
     "graphql-tag": "^2.12.6",
-    "jose": "^5.1.1",
+    "jose": "^5.8.0",
     "mustache": "^4.2.0",
-    "nodemailer": "^6.9.7",
-    "openid-client": "^5.6.1",
-    "otpauth": "^9.1.5"
+    "nodemailer": "^6.9.15",
+    "openid-client": "^5.7.0",
+    "otpauth": "^9.3.2"
   },
   "devDependencies": {
     "@contember/database-tester": "workspace:*",
-    "@graphql-codegen/cli": "^5.0.0",
-    "@graphql-codegen/typescript": "^4.0.1",
-    "@graphql-codegen/typescript-operations": "^4.0.1",
-    "@graphql-codegen/typescript-resolvers": "^4.0.1",
-    "@graphql-tools/schema": "^10.0.0",
+    "@graphql-tools/schema": "^10.0.6",
     "@types/mustache": "^4.2.5",
-    "@types/node": "^20.9.0",
-    "@types/nodemailer": "^6.4.14",
-    "graphql": "^16.8.1"
+    "@types/node": "^20.16.5",
+    "@types/nodemailer": "^6.4.15",
+    "graphql": "^16.9.0"
   },
   "peerDependencies": {
     "graphql": ">= 14.6.0",

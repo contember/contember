@@ -75,11 +75,11 @@ export class PrettyPrintLoggerHandler implements LoggerHandler {
 
 	private formatLevel(level: LogLevel): string {
 		const levelText = `${level.name}${' '.repeat(5 - level.name.length)}`
-		let color: chalk.Chalk = chalk
+		let color = chalk
 		if (level.value <= 10) {
 			color = color.dim
 		} else if (level.value <= 20) {
-			// nothhing
+			// nothing
 		} else if (level.value <= 30) {
 			color = color.yellowBright
 		} else {

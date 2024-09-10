@@ -22,9 +22,6 @@
       }
     }
   },
-  "scripts": {
-    "generate": "gql-gen --config graphql.codegen.yml"
-  },
   "dependencies": {
     "@contember/authorization": "workspace:*",
     "@contember/database": "workspace:*",
@@ -36,18 +33,14 @@
     "@contember/schema": "workspace:*",
     "@contember/schema-migrations": "workspace:*",
     "@contember/schema-utils": "workspace:*",
-    "@graphql-tools/utils": "^10.0.8",
+    "@graphql-tools/utils": "^10.5.4",
     "graphql-tag": "^2.12.6"
   },
   "devDependencies": {
     "@contember/schema-definition": "workspace:*",
-    "@graphql-codegen/cli": "^5.0.0",
-    "@graphql-codegen/typescript": "^4.0.1",
-    "@graphql-codegen/typescript-operations": "^4.0.1",
-    "@graphql-codegen/typescript-resolvers": "^4.0.1",
-    "@types/node": "^20.9.0",
-    "graphql": "^16.8.1",
-    "pg": "^8.11.3"
+    "@types/node": "^20.16.5",
+    "graphql": "^16.9.0",
+    "pg": "^8.12.0"
   },
   "peerDependencies": {
     "graphql": ">= 14.6.0",

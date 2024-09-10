@@ -1,5 +1,4 @@
-import { isAbsolute, join } from 'node:path'
-import { PackageDownloader } from './PackageDownloader'
+import { join } from 'node:path'
 import { FileSystem } from './FileSystem'
 import jsyaml from 'js-yaml'
 
@@ -12,7 +11,6 @@ export class TemplateInstaller {
 
 	constructor(
 		private readonly resourceDir: string,
-		private readonly packageDownloader: PackageDownloader,
 		private readonly fs: FileSystem,
 	) {
 	}
@@ -27,12 +25,7 @@ export class TemplateInstaller {
 		if (this.localTemplates[template]) {
 			template = this.localTemplates[template]
 		}
-		if (!isAbsolute(template)) {
-			template = await this.packageDownloader.downloadPackage(template)
-			removeTemplate = async () => {
-				await this.fs.unlink(template)
-			}
-		}
+
 		const templateConfigFile = join(template, 'contember.template.yaml')
 		if (!(await this.fs.pathExists(templateConfigFile))) {
 			throw `${template} is not a Contember template`

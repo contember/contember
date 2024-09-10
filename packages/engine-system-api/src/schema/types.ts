@@ -14,10 +14,10 @@ export type Scalars = {
 	Boolean: { input: boolean; output: boolean }
 	Int: { input: number; output: number }
 	Float: { input: number; output: number }
-	Schema: { input: any; output: any }
 	DateTime: { input: Date; output: Date }
 	Json: { input: unknown; output: unknown }
 	PrimaryKey: { input: string | number; output: string | number }
+	Schema: { input: any; output: any }
 }
 
 export type ContentMigration = {
@@ -368,7 +368,7 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 
 
 /** Mapping of interface types */
-export type ResolversInterfaceTypes<RefType extends Record<string, unknown>> = {
+export type ResolversInterfaceTypes<_RefType extends Record<string, unknown>> = {
 	Event: (CreateEvent) | (DeleteEvent) | (UpdateEvent)
 }
 
@@ -376,7 +376,6 @@ export type ResolversInterfaceTypes<RefType extends Record<string, unknown>> = {
 export type ResolversTypes = {
 	Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>
 	ContentMigration: ContentMigration
-	Schema: ResolverTypeWrapper<Scalars['Schema']['output']>
 	CreateEvent: ResolverTypeWrapper<CreateEvent>
 	DateTime: ResolverTypeWrapper<Scalars['DateTime']['output']>
 	DeleteEvent: ResolverTypeWrapper<DeleteEvent>
@@ -407,6 +406,7 @@ export type ResolversTypes = {
 	Mutation: ResolverTypeWrapper<{}>
 	PrimaryKey: ResolverTypeWrapper<Scalars['PrimaryKey']['output']>
 	Query: ResolverTypeWrapper<{}>
+	Schema: ResolverTypeWrapper<Scalars['Schema']['output']>
 	SchemaMigration: SchemaMigration
 	Stage: ResolverTypeWrapper<Stage>
 	String: ResolverTypeWrapper<Scalars['String']['output']>
@@ -418,7 +418,6 @@ export type ResolversTypes = {
 export type ResolversParentTypes = {
 	Boolean: Scalars['Boolean']['output']
 	ContentMigration: ContentMigration
-	Schema: Scalars['Schema']['output']
 	CreateEvent: CreateEvent
 	DateTime: Scalars['DateTime']['output']
 	DeleteEvent: DeleteEvent
@@ -443,15 +442,12 @@ export type ResolversParentTypes = {
 	Mutation: {}
 	PrimaryKey: Scalars['PrimaryKey']['output']
 	Query: {}
+	Schema: Scalars['Schema']['output']
 	SchemaMigration: SchemaMigration
 	Stage: Stage
 	String: Scalars['String']['output']
 	TruncateResponse: TruncateResponse
 	UpdateEvent: UpdateEvent
-}
-
-export interface SchemaScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Schema'], any> {
-	name: 'Schema'
 }
 
 export type CreateEventResolvers<ContextType = any, ParentType extends ResolversParentTypes['CreateEvent'] = ResolversParentTypes['CreateEvent']> = {
@@ -579,6 +575,10 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
 	stages?: Resolver<ReadonlyArray<ResolversTypes['Stage']>, ParentType, ContextType>
 }
 
+export interface SchemaScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Schema'], any> {
+	name: 'Schema'
+}
+
 export type StageResolvers<ContextType = any, ParentType extends ResolversParentTypes['Stage'] = ResolversParentTypes['Stage']> = {
 	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
@@ -608,7 +608,6 @@ export type UpdateEventResolvers<ContextType = any, ParentType extends Resolvers
 }
 
 export type Resolvers<ContextType = any> = {
-	Schema?: GraphQLScalarType
 	CreateEvent?: CreateEventResolvers<ContextType>
 	DateTime?: GraphQLScalarType
 	DeleteEvent?: DeleteEventResolvers<ContextType>
@@ -625,6 +624,7 @@ export type Resolvers<ContextType = any> = {
 	Mutation?: MutationResolvers<ContextType>
 	PrimaryKey?: GraphQLScalarType
 	Query?: QueryResolvers<ContextType>
+	Schema?: GraphQLScalarType
 	Stage?: StageResolvers<ContextType>
 	TruncateResponse?: TruncateResponseResolvers<ContextType>
 	UpdateEvent?: UpdateEventResolvers<ContextType>

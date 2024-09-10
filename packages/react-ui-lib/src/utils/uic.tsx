@@ -35,7 +35,7 @@ export const uiconfig = <T extends ConfigSchema | undefined>(config: Config<T, C
 export type NoInfer<T> = T & { [K in keyof T]: T[K] }
 
 export const uic = <El extends React.ElementType, Variants extends ConfigSchema | undefined  = undefined>(Component: El, config: Config<Variants, NoInfer<El>>) => {
-	const cls = cva<any>(config?.baseClass, {
+	const cls = cva<any>(config?.baseClass as any, {
 		variants: config?.variants,
 		defaultVariants: config?.defaultVariants,
 		compoundVariants: config?.compoundVariants,
@@ -60,7 +60,7 @@ export const uic = <El extends React.ElementType, Variants extends ConfigSchema 
 		}
 		let children = childrenBase
 		if (config?.wrapInner) {
-			children = React.createElement(config.wrapInner, props, children)
+			children = React.createElement(config.wrapInner, props as any, children)
 		}
 		if (config?.beforeChildren || config?.afterChildren) {
 			children = <>
@@ -71,7 +71,7 @@ export const uic = <El extends React.ElementType, Variants extends ConfigSchema 
 		}
 
 		const innerEl = <Comp ref={ref} className={twMerge(clsx(cls(props), classNameProp))} {...(config.defaultProps ?? {})} {...rest}>{children}</Comp>
-		return config?.wrapOuter ? React.createElement(config.wrapOuter, props, innerEl) : innerEl
+		return config?.wrapOuter ? React.createElement(config.wrapOuter, props as any, innerEl) : innerEl
 	})
 	component.displayName = config?.displayName
 

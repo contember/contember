@@ -4,39 +4,41 @@ export type InputMaybe<T> = Maybe<T>
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] }
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> }
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> }
+export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never }
+export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never }
 export type RequireFields<T, K extends keyof T> = Omit<T, K> & { [P in K]-?: NonNullable<T[P]> }
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
-	ID: string
-	String: string
-	Boolean: boolean
-	Int: number
-	Float: number
-	DateTime: Date
-	Json: any
-	Uuid: String
+	ID: { input: string; output: string }
+	String: { input: string; output: string }
+	Boolean: { input: boolean; output: boolean }
+	Int: { input: number; output: number }
+	Float: { input: number; output: number }
+	DateTime: { input: Date; output: Date }
+	Json: { input: any; output: any }
+	Uuid: { input: String; output: String }
 }
 
 export type Event = {
 	readonly __typename?: 'Event'
-	readonly createdAt: Scalars['DateTime']
-	readonly id: Scalars['Uuid']
-	readonly lastStateChange: Scalars['DateTime']
-	readonly log: Scalars['Json']
-	readonly numRetries: Scalars['Int']
-	readonly payload: Scalars['Json']
-	readonly resolvedAt?: Maybe<Scalars['DateTime']>
-	readonly stage: Scalars['String']
+	readonly createdAt: Scalars['DateTime']['output']
+	readonly id: Scalars['Uuid']['output']
+	readonly lastStateChange: Scalars['DateTime']['output']
+	readonly log: Scalars['Json']['output']
+	readonly numRetries: Scalars['Int']['output']
+	readonly payload: Scalars['Json']['output']
+	readonly resolvedAt?: Maybe<Scalars['DateTime']['output']>
+	readonly stage: Scalars['String']['output']
 	readonly state: EventState
-	readonly target: Scalars['String']
-	readonly transactionId: Scalars['Uuid']
-	readonly visibleAt?: Maybe<Scalars['DateTime']>
+	readonly target: Scalars['String']['output']
+	readonly transactionId: Scalars['Uuid']['output']
+	readonly visibleAt?: Maybe<Scalars['DateTime']['output']>
 }
 
 export type EventArgs = {
 	/** Max 10000 */
-	readonly limit?: InputMaybe<Scalars['Int']>
-	readonly offset?: InputMaybe<Scalars['Int']>
+	readonly limit?: InputMaybe<Scalars['Int']['input']>
+	readonly offset?: InputMaybe<Scalars['Int']['input']>
 }
 
 export type EventState =
@@ -60,7 +62,7 @@ export type MutationSetVariablesArgs = {
 
 export type ProcessBatchResponse = {
 	readonly __typename?: 'ProcessBatchResponse'
-	readonly ok: Scalars['Boolean']
+	readonly ok: Scalars['Boolean']['output']
 }
 
 export type Query = {
@@ -104,18 +106,18 @@ export type SetVariablesMode =
 
 export type SetVariablesResponse = {
 	readonly __typename?: 'SetVariablesResponse'
-	readonly ok: Scalars['Boolean']
+	readonly ok: Scalars['Boolean']['output']
 }
 
 export type Variable = {
 	readonly __typename?: 'Variable'
-	readonly name: Scalars['String']
-	readonly value: Scalars['String']
+	readonly name: Scalars['String']['output']
+	readonly value: Scalars['String']['output']
 }
 
 export type VariableInput = {
-	readonly name: Scalars['String']
-	readonly value: Scalars['String']
+	readonly name: Scalars['String']['input']
+	readonly value: Scalars['String']['input']
 }
 
 
@@ -185,42 +187,44 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 	info: GraphQLResolveInfo
 ) => TResult | Promise<TResult>
 
+
+
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
-	Boolean: ResolverTypeWrapper<Scalars['Boolean']>
-	DateTime: ResolverTypeWrapper<Scalars['DateTime']>
+	Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>
+	DateTime: ResolverTypeWrapper<Scalars['DateTime']['output']>
 	Event: ResolverTypeWrapper<Event>
 	EventArgs: EventArgs
 	EventState: EventState
-	Int: ResolverTypeWrapper<Scalars['Int']>
-	Json: ResolverTypeWrapper<Scalars['Json']>
+	Int: ResolverTypeWrapper<Scalars['Int']['output']>
+	Json: ResolverTypeWrapper<Scalars['Json']['output']>
 	Mutation: ResolverTypeWrapper<{}>
 	ProcessBatchResponse: ResolverTypeWrapper<ProcessBatchResponse>
 	Query: ResolverTypeWrapper<{}>
 	SetVariablesArgs: SetVariablesArgs
 	SetVariablesMode: SetVariablesMode
 	SetVariablesResponse: ResolverTypeWrapper<SetVariablesResponse>
-	String: ResolverTypeWrapper<Scalars['String']>
-	Uuid: ResolverTypeWrapper<Scalars['Uuid']>
+	String: ResolverTypeWrapper<Scalars['String']['output']>
+	Uuid: ResolverTypeWrapper<Scalars['Uuid']['output']>
 	Variable: ResolverTypeWrapper<Variable>
 	VariableInput: VariableInput
 }
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
-	Boolean: Scalars['Boolean']
-	DateTime: Scalars['DateTime']
+	Boolean: Scalars['Boolean']['output']
+	DateTime: Scalars['DateTime']['output']
 	Event: Event
 	EventArgs: EventArgs
-	Int: Scalars['Int']
-	Json: Scalars['Json']
+	Int: Scalars['Int']['output']
+	Json: Scalars['Json']['output']
 	Mutation: {}
 	ProcessBatchResponse: ProcessBatchResponse
 	Query: {}
 	SetVariablesArgs: SetVariablesArgs
 	SetVariablesResponse: SetVariablesResponse
-	String: Scalars['String']
-	Uuid: Scalars['Uuid']
+	String: Scalars['String']['output']
+	Uuid: Scalars['Uuid']['output']
 	Variable: Variable
 	VariableInput: VariableInput
 }

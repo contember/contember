@@ -1,5 +1,5 @@
 schema:
-  - "./src/introspection/IntrospectionSchemaDefinitionFactory.ts"
+  - "./src/introspection/introspection.schema.ts"
 documents: []
 config:
   immutableTypes: "1"
@@ -12,4 +12,4 @@ generates:
       - "typescript-operations"
 hooks:
   afterAllFileWrite:
-    - eslint --fix
+    - yarn run -T eslint --fix

@@ -1,11 +1,7 @@
-import jsdom from 'jsdom'
 import { createPortal } from 'react-dom'
 import { describe, expect, it } from 'vitest'
 import { getChildrenAsLabel } from '../../src'
 
-const { JSDOM } = jsdom
-const { window } = new JSDOM('<!doctype html><html><body></body></html>')
-global.document = window.document
 
 describe('@contember/utilities.getChildrenAsLabel', () => {
 	it('should return undefined for null or undefined children', () => {

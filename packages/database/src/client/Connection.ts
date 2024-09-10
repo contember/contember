@@ -141,7 +141,7 @@ namespace Connection {
 
 	export interface Result<Row extends Record<string, any> = Record<string, any>> {
 		readonly command?: string
-		readonly rowCount: number
+		readonly rowCount: number | null
 		readonly rows: Row[]
 		readonly timing?: {
 			selfDuration: number

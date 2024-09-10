@@ -10,7 +10,7 @@ export const snapshotMigration = (sqlFactory: (args: { randomUuidFn: string }) =
             WHERE pg_namespace.nspname = 'pg_catalog' AND pg_proc.proname = 'gen_random_uuid'
 		`)
 		let randomUuidFn: string = 'uuid_generate_v4'
-		if (hasGenRandomUuid.rowCount > 0) {
+		if ((hasGenRandomUuid.rowCount ?? 0) > 0) {
 			randomUuidFn = 'gen_random_uuid'
 		} else {
 			const hasUuidGenV4 = await args.connection.query(`

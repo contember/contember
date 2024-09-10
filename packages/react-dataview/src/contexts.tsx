@@ -12,7 +12,7 @@ import {
 	DataViewSortingState,
 	DataViewState,
 } from './types'
-import { EntityListAccessor, QualifiedEntityList, SugaredQualifiedEntityList } from '@contember/binding'
+import { EntityListAccessor, QualifiedEntityList, SugaredQualifiedEntityList } from '@contember/react-binding'
 import { EntityListSubTreeLoaderState, SugaredRelativeSingleField } from '@contember/react-binding'
 import * as React from 'react'
 import { ReactNode } from 'react'

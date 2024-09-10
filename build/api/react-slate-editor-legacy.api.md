@@ -13,9 +13,7 @@ import { Editor } from 'slate';
 import { EditorElementPlugin } from '@contember/react-slate-editor-base';
 import { Element as Element_2 } from 'slate';
 import { EntityAccessor } from '@contember/react-binding';
-import { EntityAccessor as EntityAccessor_2 } from '@contember/binding';
 import { EntityId } from '@contember/react-binding';
-import { EntityId as EntityId_2 } from '@contember/binding';
 import { Environment } from '@contember/react-binding';
 import { FieldAccessor } from '@contember/react-binding';
 import { FieldValue } from '@contember/react-binding';
@@ -23,8 +21,7 @@ import { FunctionComponent } from 'react';
 import { JSX as JSX_2 } from 'react/jsx-runtime';
 import { NamedExoticComponent } from 'react';
 import { Node as Node_2 } from 'slate';
-import type { OptionallyVariableFieldValue } from '@contember/react-binding';
-import { OptionallyVariableFieldValue as OptionallyVariableFieldValue_2 } from '@contember/binding';
+import { OptionallyVariableFieldValue } from '@contember/react-binding';
 import { Path } from 'slate';
 import { PathRef } from 'slate';
 import { Range as Range_2 } from 'slate';
@@ -118,9 +115,9 @@ export interface EditorInlineReferenceTriggerProps {
     // (undocumented)
     children: ReactNode;
     // (undocumented)
-    initializeReference?: EntityAccessor_2.BatchUpdatesHandler;
+    initializeReference?: EntityAccessor.BatchUpdatesHandler;
     // (undocumented)
-    referenceType: OptionallyVariableFieldValue_2;
+    referenceType: OptionallyVariableFieldValue;
 }
 
 // @public (undocumented)
@@ -143,7 +140,7 @@ export interface EditorReferenceTriggerProps {
     // (undocumented)
     children: ReactElement;
     // (undocumented)
-    referenceType: OptionallyVariableFieldValue_2;
+    referenceType: OptionallyVariableFieldValue;
 }
 
 // @public (undocumented)
@@ -211,7 +208,7 @@ export interface InitializeReferenceContentProps {
         createElement?: Partial<Element_2>;
     }) => void;
     // (undocumented)
-    referenceId: EntityId_2;
+    referenceId: EntityId;
     // (undocumented)
     selection: Range_2 | null;
 }

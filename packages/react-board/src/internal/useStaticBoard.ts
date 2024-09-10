@@ -27,7 +27,7 @@ export const useStaticBoard = ({
 	const desugaredDiscriminationField = useDesugaredRelativeSingleField(discriminationField)
 
 	const getDiscriminatorValue = useCallback((entity: EntityAccessor) => {
-		return entity.getRelativeSingleField<string>(desugaredDiscriminationField).value
+		return entity.getField<string>(desugaredDiscriminationField).value
 	}, [desugaredDiscriminationField])
 
 	const groupItemsByColumn = useGroupItemsByColumn(getDiscriminatorValue, desugaredSortableByField)
@@ -40,7 +40,7 @@ export const useStaticBoard = ({
 	})
 
 	const connectItemToColumn = useCallback((item: EntityAccessor, column: BoardStaticColumnValue | null) => {
-		item.getRelativeSingleField(desugaredDiscriminationField).updateValue(column?.value ?? null)
+		item.getField(desugaredDiscriminationField).updateValue(column?.value ?? null)
 	}, [desugaredDiscriminationField])
 
 	const { addItem, moveItem, removeItem } = useBoardItemsMethods({

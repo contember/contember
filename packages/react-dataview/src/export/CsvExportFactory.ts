@@ -1,4 +1,4 @@
-import { EntityListSubTreeMarker, FieldMarker, HasManyRelationMarker, HasOneRelationMarker, PRIMARY_KEY_NAME } from '@contember/binding'
+import { EntityListSubTreeMarker, FieldMarker, HasManyRelationMarker, HasOneRelationMarker, PRIMARY_KEY_NAME } from '@contember/react-binding'
 import { ExportFactory, ExportFormatterCreateOutputArgs, ExportResult } from './ExportFactory'
 import { DataViewDataForExport } from '../types'
 

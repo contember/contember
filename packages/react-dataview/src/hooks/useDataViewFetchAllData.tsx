@@ -1,17 +1,25 @@
-import { ReactNode, useCallback } from 'react'
 import * as React from 'react'
+import { ReactNode, useCallback } from 'react'
 import { useDataViewEntityListProps, useDataViewFilteringState } from '../contexts'
-import { ContentClient, useCurrentContentGraphQlClient } from '@contember/react-client'
-import { EntityListSubTree, EntityListSubTreeMarker, MarkerTreeGenerator, QueryGenerator, createQueryBuilder, useEnvironment } from '@contember/react-binding'
+import {
+	EntityListSubTree,
+	EntityListSubTreeMarker,
+	ReceivedEntityData,
+	useBindingOperations,
+	useEnvironment,
+} from '@contember/react-binding'
 import { dataViewSelectionEnvironmentExtension } from '../env/dataViewSelectionEnvironmentExtension'
 
 export const useDataViewFetchAllData = ({ children }: { children: ReactNode }) => {
 	const entityName = useDataViewEntityListProps().entityName
 	const filter = useDataViewFilteringState().filter
-	const client = useCurrentContentGraphQlClient()
 	const env = useEnvironment()
+	const bindingOperations = useBindingOperations()
 
-	return useCallback(async () => {
+	return useCallback(async (): Promise<{
+		marker: EntityListSubTreeMarker
+		data: ReceivedEntityData[]
+	}> => {
 		const entities = {
 			entityName,
 			filter,
@@ -22,21 +30,23 @@ export const useDataViewFetchAllData = ({ children }: { children: ReactNode }) =
 			</EntityListSubTree>
 		)
 
-		const gen = new MarkerTreeGenerator(node, env.withExtension(dataViewSelectionEnvironmentExtension, {}))
-		const qb = createQueryBuilder(env.getSchema())
-		const markerTree = gen.generate()
-
-		const queryGenerator = new QueryGenerator(markerTree, qb)
-		const query = queryGenerator.getReadQuery()
-		const contentClient = new ContentClient(client)
-		const marker = Array.from(markerTree.subTrees.values())[0]
-		if (!(marker instanceof EntityListSubTreeMarker)) {
+		const result = await bindingOperations.fetchData(node, {
+			environment: env.withExtension(dataViewSelectionEnvironmentExtension, {}),
+		})
+		if (!result) {
 			throw new Error()
 		}
+		const { data, markerTreeRoot } = result
+		const marker = Array.from(markerTreeRoot.subTrees.values())[0]
+		const fieldData = data[marker.placeholderName]
+		if (!(marker instanceof EntityListSubTreeMarker) || !Array.isArray(fieldData)) {
+			throw new Error()
+		}
+
 		return {
-			data: (await contentClient.query(query))[marker.placeholderName],
+			data: fieldData,
 			marker,
 		}
 
-	}, [client, children, entityName, env, filter])
+	}, [entityName, filter, children, bindingOperations, env])
 }

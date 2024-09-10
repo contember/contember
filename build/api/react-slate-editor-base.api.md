@@ -11,7 +11,7 @@ import { Editor as Editor_2 } from 'slate';
 import { EditorInterface } from 'slate';
 import { Transforms as EditorTransforms } from 'slate';
 import { Element as Element_2 } from 'slate';
-import { EntityAccessor } from '@contember/binding';
+import { EntityAccessor } from '@contember/react-binding';
 import { Environment } from '@contember/react-binding';
 import { FieldBasicProps } from '@contember/react-binding';
 import type { FocusEvent as FocusEvent_2 } from 'react';

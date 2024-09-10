@@ -1,7 +1,7 @@
 import { DataViewPagingInfo, DataViewPagingMethods, DataViewPagingState } from './paging'
 import { DataViewSortingMethods, DataViewSortingState } from './sorting'
 import { DataViewFilteringMethods, DataViewFilteringState } from './filtering'
-import { QualifiedEntityList } from '@contember/binding'
+import { QualifiedEntityList } from '@contember/react-binding'
 import { DataViewSelectionMethods, DataViewSelectionState } from './selection'
 
 export type DataViewState = {

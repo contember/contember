@@ -1,4 +1,4 @@
-import { EntityAccessor } from '@contember/binding'
+import { EntityAccessor } from '@contember/react-binding'
 
 export type RepeaterMoveItemIndex = number | 'first' | 'last' | 'previous' | 'next'
 export type RepeaterMoveItemMethod = (entity: EntityAccessor, index: RepeaterMoveItemIndex) => void

@@ -1,18 +1,11 @@
 import { useConstantValueInvariant } from '@contember/react-utils'
-import { ComponentType, ReactElement, ReactNode, useCallback } from 'react'
-import {
-	useAccessorUpdateSubscription,
-	useEntityListSubTreeParameters,
-	useGetEntityListSubTree,
-} from '../accessorPropagation'
-import { PRIMARY_KEY_NAME } from '@contember/binding'
-import { Environment } from '@contember/binding'
-import { MarkerFactory } from '@contember/binding'
+import { ComponentType, ReactElement, ReactNode } from 'react'
+import { useEntityListSubTree } from '../accessorPropagation'
 import type { SugaredQualifiedEntityList, SugaredUnconstrainedQualifiedEntityList, TreeRootId } from '@contember/binding'
+import { Environment, MarkerFactory, PRIMARY_KEY_NAME, TreeNodeEnvironmentFactory } from '@contember/binding'
 import { Component } from './Component'
 import { EntityList, EntityListBaseProps } from './EntityList'
 import { Field } from './Field'
-import { TreeNodeEnvironmentFactory } from '@contember/binding'
 
 export interface EntityListSubTreeAdditionalProps {
 	variables?: Environment.ValuesMapWithFactory
@@ -44,14 +37,7 @@ export type EntityListSubTreeProps<ListProps, EntityProps> = {
 export const EntityListSubTree = Component(
 	<ListProps, EntityProps>(props: EntityListSubTreeProps<ListProps, EntityProps>) => {
 		useConstantValueInvariant(props.isCreating, 'EntityListSubTree: cannot update isCreating')
-
-		const getSubTree = useGetEntityListSubTree()
-		const parameters = useEntityListSubTreeParameters(props)
-		const getAccessor = useCallback(
-			() => getSubTree(parameters, props.treeRootId),
-			[getSubTree, parameters, props.treeRootId],
-		)
-		const accessor = useAccessorUpdateSubscription(getAccessor)
+		const accessor = useEntityListSubTree(props, ...props.treeRootId ? [props.treeRootId] : [])
 
 		//  TODO revive top level hasOneRelationPath
 		// {parameters.value.hasOneRelationPath.length ?

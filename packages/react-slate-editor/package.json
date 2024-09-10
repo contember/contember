@@ -33,7 +33,6 @@
     "directory": "packages/react-slate-editor"
   },
   "dependencies": {
-    "@contember/binding": "workspace:*",
     "@contember/react-binding": "workspace:*",
     "@contember/react-multipass-rendering": "workspace:*",
     "@contember/react-slate-editor-base": "workspace:*",

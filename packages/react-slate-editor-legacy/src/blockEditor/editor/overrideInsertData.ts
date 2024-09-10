@@ -62,7 +62,7 @@ export const overrideInsertData = <E extends EditorWithBlocks>(editor: E, option
 
 		return editor.insertElementWithReference(partialEmbedReference, embedReferenceDiscriminateBy, getEmbedReference => {
 			getEmbedReference()
-				.getRelativeSingleField(embedContentDiscriminationField)
+				.getField(embedContentDiscriminationField)
 				.updateValue(embedHandler!.discriminateBy)
 			const reference = getEmbedReference()
 			embedHandler!.datum.populateEmbedData({

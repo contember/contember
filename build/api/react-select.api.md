@@ -7,11 +7,13 @@
 import { Context } from 'react';
 import { DataViewProps } from '@contember/react-dataview';
 import { EntityAccessor } from '@contember/react-binding';
+import { EntityName } from '@contember/react-binding';
 import { JSX as JSX_2 } from 'react/jsx-runtime';
 import { default as React_2 } from 'react';
 import { ReactElement } from 'react';
 import { ReactNode } from 'react';
-import { SugarableQualifiedEntityList } from '@contember/react-binding';
+import { SugarableHasOneRelation } from '@contember/react-binding';
+import { SugaredFilter } from '@contember/react-binding';
 import { SugaredQualifiedEntityList } from '@contember/react-binding';
 import { SugaredRelativeEntityList } from '@contember/react-binding';
 import { SugaredRelativeSingleEntity } from '@contember/react-binding';
@@ -96,7 +98,11 @@ export type SelectOptionProps = {
 };
 
 // @internal (undocumented)
-export const SelectOptionsContext: Context<string | SugarableQualifiedEntityList>;
+export const SelectOptionsContext: Context<string | {
+filter?: SugaredFilter;
+hasOneRelationPath?: SugarableHasOneRelation[] | SugarableHasOneRelation;
+entityName: EntityName;
+}>;
 
 // @public (undocumented)
 export const SelectPlaceholder: ({ children }: {
@@ -138,7 +144,11 @@ export const useSelectHandleSelect: () => SelectHandler;
 export const useSelectIsSelected: () => (entity: EntityAccessor) => boolean;
 
 // @public (undocumented)
-export const useSelectOptions: () => string | SugarableQualifiedEntityList;
+export const useSelectOptions: () => string | {
+    filter?: SugaredFilter;
+    hasOneRelationPath?: SugarableHasOneRelation[] | SugarableHasOneRelation;
+    entityName: EntityName;
+};
 
 // (No @packageDocumentation comment for this package)
 

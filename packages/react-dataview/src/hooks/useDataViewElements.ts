@@ -1,7 +1,7 @@
 import { ChildrenAnalyzer, Leaf } from '@contember/react-multipass-rendering'
 import { useDataViewChildren } from '../contexts'
 import { DataViewElement, DataViewElementProps } from '../components'
-import { Environment } from '@contember/binding'
+import { Environment } from '@contember/react-binding'
 import { useMemo } from 'react'
 import { useEnvironment } from '@contember/react-binding'
 import { DataViewSelectionValues } from '../types'

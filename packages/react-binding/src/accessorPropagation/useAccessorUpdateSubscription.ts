@@ -1,96 +1,28 @@
-import { useConstantValueInvariant } from '@contember/react-utils'
-import { useCallback, useEffect, useState } from 'react'
-import type { EntityAccessor, EntityListAccessor, FieldAccessor } from '@contember/binding'
-import type { FieldValue } from '@contember/binding'
-
-export type ForceAccessorUpdate = () => void
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 /**
  * It is VERY IMPORTANT for the parameter to be referentially stable!
  */
-function useAccessorUpdateSubscription<Value extends FieldValue = FieldValue>(
-	getFieldAccessor: () => FieldAccessor<Value>,
-): FieldAccessor<Value>
-function useAccessorUpdateSubscription(getEntityAccessor: () => EntityAccessor): EntityAccessor
-function useAccessorUpdateSubscription(getListAccessor: () => EntityListAccessor): EntityListAccessor
-function useAccessorUpdateSubscription(
-	getAccessor: () => EntityListAccessor | EntityAccessor,
-): EntityListAccessor | EntityAccessor
-function useAccessorUpdateSubscription<Value extends FieldValue = FieldValue>(
-	getFieldAccessor: () => FieldAccessor<Value>,
-	withForceUpdate: true,
-): [FieldAccessor<Value>, ForceAccessorUpdate]
-function useAccessorUpdateSubscription(
-	getEntityAccessor: () => EntityAccessor,
-	withForceUpdate: true,
-): [EntityAccessor, ForceAccessorUpdate]
-function useAccessorUpdateSubscription(
-	getListAccessor: () => EntityListAccessor,
-	withForceUpdate: true,
-): [EntityListAccessor, ForceAccessorUpdate]
-function useAccessorUpdateSubscription(
-	getAccessor: () => EntityListAccessor | EntityAccessor,
-	withForceUpdate: true,
-): [EntityListAccessor | EntityAccessor, ForceAccessorUpdate]
-function useAccessorUpdateSubscription<
-	A extends FieldAccessor<Value> | EntityListAccessor | EntityAccessor,
-	Value extends FieldValue = FieldValue,
->(getAccessor: () => A, withForceUpdate?: true): A | [A, ForceAccessorUpdate] {
-	// This is *HEAVILY* adopted from https://github.com/facebook/react/blob/master/packages/use-subscription/src/useSubscription.js
-	const [state, setState] = useState<{
-		accessor: A
-		getAccessor: () => A
-	}>(() => ({
-				accessor: getAccessor(),
-				getAccessor,
-			}))
+export const useAccessorUpdateSubscription = <Accessor extends {
+	addEventListener: (event: { type: 'update' }, cb: (accessor: Accessor) => void) => () => void
+}>(getAccessor: () => Accessor): [Accessor, {update: () => void}] => {
+	const [state, setState] = useState<Accessor>(() => getAccessor())
+	const getterRef = useRef(getAccessor)
 
-	useConstantValueInvariant(withForceUpdate, 'useAccessorUpdateSubscription: cannot change the withForceUpdate value!')
-
-	let accessor = state.accessor
-
-	if (state.getAccessor !== getAccessor) {
-		setState({
-			accessor: getAccessor(),
-			getAccessor,
-		})
+	let accessor = state
+	if (getterRef.current !== getAccessor) {
 		accessor = getAccessor()
-	}
-
-	let forceUpdate: ForceAccessorUpdate | undefined = undefined
-	if (withForceUpdate) {
-		// eslint-disable-next-line react-hooks/rules-of-hooks
-		forceUpdate = useCallback(() => {
-			setState({
-				accessor: getAccessor(),
-				getAccessor,
-			})
-		}, [getAccessor])
+		setState(accessor)
+		getterRef.current = getAccessor
 	}
 
 	useEffect(() => {
 		let isStillSubscribed = true
-
-		const unsubscribe = (
-			getAccessor().addEventListener as (
-				eventType: { type: 'update' },
-				handler: (newAccessor: FieldAccessor<Value> | EntityListAccessor | EntityAccessor) => void,
-			) => () => void
-		)({ type: 'update' }, newAccessor => {
-			if (!isStillSubscribed) {
+		const unsubscribe = getAccessor().addEventListener({ type: 'update' }, newAccessor => {
+			if (!isStillSubscribed || getterRef.current !== getAccessor) {
 				return
 			}
-
-			setState(prevState => {
-				if (prevState.getAccessor !== getAccessor || prevState.accessor === newAccessor) {
-					return prevState
-				}
-
-				return {
-					accessor: newAccessor as A,
-					getAccessor,
-				}
-			})
+			setState(newAccessor)
 		})
 
 		return () => {
@@ -99,9 +31,9 @@ function useAccessorUpdateSubscription<
 		}
 	}, [getAccessor])
 
-	if (withForceUpdate && forceUpdate) {
-		return [accessor, forceUpdate]
-	}
-	return accessor
+	const update = useCallback(() => {
+		setState(getAccessor())
+	}, [getAccessor])
+
+	return [accessor, { update }]
 }
-export { useAccessorUpdateSubscription }

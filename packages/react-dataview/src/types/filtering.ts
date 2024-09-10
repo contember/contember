@@ -1,6 +1,6 @@
 import { Serializable, StateStorageOrName } from '@contember/react-utils'
 import { Environment, SugaredFilter } from '@contember/react-binding'
-import { Filter } from '@contember/binding'
+import { Filter } from '@contember/react-binding'
 import { SetStateAction } from 'react'
 
 export type DataViewFilterArtifact = Serializable

@@ -85,7 +85,7 @@ export const createReferenceElementPlugin = (args: ReferenceElementOptions): Edi
 			} catch (e) {
 				return false
 			}
-			const discriminationField = referencedEntity.getRelativeSingleField(args.referenceDiscriminationField)
+			const discriminationField = referencedEntity.getField(args.referenceDiscriminationField)
 			const selectedReference = getDiscriminatedDatum(args.editorReferenceBlocks, discriminationField)?.datum
 
 			if (selectedReference === undefined) {

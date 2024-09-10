@@ -5,15 +5,14 @@
 ```ts
 
 import { Context } from 'react';
-import { EntityAccessor } from '@contember/binding';
-import { EntityAccessor as EntityAccessor_2 } from '@contember/react-binding';
-import { EntityListAccessor } from '@contember/binding';
+import { EntityAccessor } from '@contember/react-binding';
+import { EntityListAccessor } from '@contember/react-binding';
 import { JSX as JSX_2 } from 'react/jsx-runtime';
 import { default as React_2 } from 'react';
 import { ReactNode } from 'react';
-import { SugaredQualifiedEntityList } from '@contember/binding';
-import { SugaredRelativeEntityList } from '@contember/binding';
-import { SugaredRelativeSingleField } from '@contember/binding';
+import { SugaredQualifiedEntityList } from '@contember/react-binding';
+import { SugaredRelativeEntityList } from '@contember/react-binding';
+import { SugaredRelativeSingleField } from '@contember/react-binding';
 
 // @public (undocumented)
 export const Repeater: React_2.NamedExoticComponent<RepeaterProps>;
@@ -35,7 +34,7 @@ export type RepeaterAddItemTriggerProps = {
 };
 
 // @internal (undocumented)
-export const RepeaterCurrentEntityContext: Context<EntityAccessor_2>;
+export const RepeaterCurrentEntityContext: Context<EntityAccessor>;
 
 // @public (undocumented)
 export const RepeaterEachItem: ({ children }: {
@@ -101,10 +100,10 @@ export const RepeaterRemoveItemTrigger: ({ children }: {
 }) => JSX_2.Element;
 
 // @internal (undocumented)
-export const RepeaterSortedEntitiesContext: Context<EntityAccessor_2[]>;
+export const RepeaterSortedEntitiesContext: Context<EntityAccessor[]>;
 
 // @public (undocumented)
-export const useRepeaterCurrentEntity: () => EntityAccessor_2;
+export const useRepeaterCurrentEntity: () => EntityAccessor;
 
 // @public (undocumented)
 export const useRepeaterEntityListAccessor: () => EntityListAccessor;
@@ -113,7 +112,7 @@ export const useRepeaterEntityListAccessor: () => EntityListAccessor;
 export const useRepeaterMethods: () => RepeaterMethods;
 
 // @public (undocumented)
-export const useRepeaterSortedEntities: () => EntityAccessor_2[];
+export const useRepeaterSortedEntities: () => EntityAccessor[];
 
 // (No @packageDocumentation comment for this package)
 

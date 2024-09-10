@@ -1,0 +1,14 @@
+{
+	"extends": "../../../tsconfig.settings.json",
+	"compilerOptions": {
+		"outDir": "../dist/types",
+		"types": [
+			"vite/client"
+		]
+	},
+	"references": [
+		{ "path": "../../client/src" },
+		{ "path": "../../client-content/src" },
+		{ "path": "../../utilities/src" },
+	]
+}

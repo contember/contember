@@ -7,7 +7,6 @@
 import type { Alias } from '@contember/binding';
 import type { BindingOperations } from '@contember/binding';
 import { ComponentType } from 'react';
-import { Context } from 'react';
 import { DataBinding } from '@contember/binding';
 import { EntityAccessor } from '@contember/binding';
 import type { EntityFieldMarkersContainer } from '@contember/binding';
@@ -26,7 +25,6 @@ import type { HasManyRelationMarker } from '@contember/binding';
 import type { HasOneRelationMarker } from '@contember/binding';
 import { JSX as JSX_2 } from 'react/jsx-runtime';
 import { MarkerTreeRoot } from '@contember/binding';
-import { MemoExoticComponent } from 'react';
 import { NamedExoticComponent } from 'react';
 import type { Persist } from '@contember/binding';
 import { PropsWithChildren } from 'react';
@@ -93,14 +91,7 @@ export interface AccessorTreeStateMetadata {
 export interface AccessorTreeStateOptions {
     // (undocumented)
     children?: ReactNode;
-    // (undocumented)
-    refreshOnPersist?: boolean;
-    // (undocumented)
-    skipStateUpdateAfterPersist?: boolean;
 }
-
-// @public (undocumented)
-export const accessorTreeStateReducer: (previousState: AccessorTreeState, action: AccessorTreeStateAction) => AccessorTreeState;
 
 // @public (undocumented)
 export const addEntityAtIndex: (entityList: EntityListAccessor, sortableByField: RelativeSingleField, index: number, preprocess?: EntityAccessor.BatchUpdatesHandler) => void;
@@ -138,19 +129,17 @@ export function Component<Props extends {}, NonStaticPropNames extends keyof Pro
 export const DataBindingProvider: <StateProps>(props: DataBindingProviderProps<StateProps>) => ReactElement;
 
 // @public (undocumented)
-export type DataBindingProviderBaseProps = AccessorTreeStateOptions;
+export type DataBindingProviderProps<StateProps> = {
+    refreshOnPersist?: boolean;
+    skipStateUpdateAfterPersist?: boolean;
+    children?: ReactNode;
+} & DataBindingProviderStateComponent<StateProps>;
 
 // @public (undocumented)
-export type DataBindingProviderProps<StateProps> = DataBindingProviderBaseProps & DataBindingProviderStateComponent<StateProps>;
-
-// @public (undocumented)
-export type DataBindingProviderStateComponent<StateProps> = ({
-    stateComponent?: never;
-    stateProps?: never;
-} | {
+export type DataBindingProviderStateComponent<StateProps> = {
     stateComponent: ComponentType<StateProps & DataBindingStateComponentProps>;
     stateProps?: StateProps;
-});
+};
 
 // @public (undocumented)
 export interface DataBindingStateComponentProps {
@@ -161,7 +150,7 @@ export interface DataBindingStateComponentProps {
 }
 
 // @public (undocumented)
-export const DeferredSubTrees: NamedExoticComponent<DeferredSubTreesProps>;
+export const DeferredSubTrees: React.NamedExoticComponent<DeferredSubTreesProps>;
 
 // @public (undocumented)
 export interface DeferredSubTreesProps {
@@ -182,10 +171,10 @@ export type DimensionRendererProps = {
 };
 
 // @public (undocumented)
-export const DirtinessContext: Context<boolean>;
+export const DirtinessContext: React.Context<boolean>;
 
 // @public (undocumented)
-export const Entity: NamedExoticComponent<EntityBaseProps>;
+export const Entity: React.NamedExoticComponent<EntityBaseProps>;
 
 // @public (undocumented)
 export interface EntityBaseProps {
@@ -203,7 +192,7 @@ export interface EntityKeyProviderProps {
     // (undocumented)
     children: ReactNode;
     // (undocumented)
-    entityKey: string;
+    entityKey: string | (() => EntityAccessor);
 }
 
 // @public (undocumented)
@@ -293,7 +282,7 @@ export interface EnvironmentAwareFunctionComponent<P> {
 }
 
 // @public (undocumented)
-export const EnvironmentContext: Context<Environment<Environment.AnyNode | undefined>>;
+export const EnvironmentContext: React.Context<Environment<Environment.AnyNode | undefined>>;
 
 // @public (undocumented)
 export interface EnvironmentDeltaProvider<Props extends {} = any> {
@@ -305,7 +294,7 @@ export interface EnvironmentDeltaProvider<Props extends {} = any> {
 export const EnvironmentExtensionProvider: <S, R>(props: EnvironmentWithExtensionProps<S, R>) => ReactNode;
 
 // @public (undocumented)
-export const EnvironmentMiddleware: NamedExoticComponent<EnvironmentMiddlewareProps>;
+export const EnvironmentMiddleware: React.NamedExoticComponent<EnvironmentMiddlewareProps>;
 
 // @public (undocumented)
 export interface EnvironmentMiddlewareProps {
@@ -327,8 +316,6 @@ export interface EnvironmentWithExtensionProps<S, R> {
 
 // @public (undocumented)
 export interface ErrorAccessorTreeState {
-    // (undocumented)
-    binding: DataBinding<ReactNode>;
     // (undocumented)
     environment: Environment;
     // (undocumented)
@@ -402,9 +389,6 @@ export type FieldViewProps = FieldViewCommonProps & ({
 });
 
 // @public (undocumented)
-export type ForceAccessorUpdate = () => void;
-
-// @public (undocumented)
 export const HasMany: <ListProps, EntityProps>(props: HasManyProps<ListProps, EntityProps>) => ReactElement;
 
 // @public (undocumented)
@@ -426,7 +410,7 @@ export type HasOneProps<EntityProps = never> = SugaredRelativeSingleEntity & {
 };
 
 // @public (undocumented)
-export const If: NamedExoticComponent<IfProps>;
+export const If: React.NamedExoticComponent<IfProps>;
 
 // @public (undocumented)
 export interface IfCallbackProps {
@@ -458,8 +442,6 @@ export type IfProps = IfFilterProps | IfCallbackProps;
 // @public (undocumented)
 export interface InitializedAccessorTreeState {
     // (undocumented)
-    binding: DataBinding<ReactNode>;
-    // (undocumented)
     data: TreeRootAccessor<ReactNode>;
     // (undocumented)
     environment: Environment;
@@ -470,8 +452,6 @@ export interface InitializedAccessorTreeState {
 // @public (undocumented)
 export interface InitializingAccessorTreeState {
     // (undocumented)
-    binding?: DataBinding<ReactNode>;
-    // (undocumented)
     environment: Environment;
     // (undocumented)
     name: 'initializing';
@@ -481,7 +461,7 @@ export interface InitializingAccessorTreeState {
 export type LabelMiddleware = (label: ReactNode, environment: Environment) => ReactNode;
 
 // @public (undocumented)
-export const LabelMiddlewareContext: Context<LabelMiddleware>;
+export const LabelMiddlewareContext: React.Context<LabelMiddleware>;
 
 // @public (undocumented)
 export const LabelMiddlewareProvider: ({ value, children }: {
@@ -506,16 +486,10 @@ export class MarkerTreeGenerator {
 }
 
 // @public (undocumented)
-export const moveEntity: (entityList: EntityListAccessor, sortByField: RelativeSingleField, oldIndex: number, newIndex: number) => void;
+export const MutationStateContext: React.Context<boolean>;
 
 // @public (undocumented)
-export const moveEntityInArray: (entities: EntityAccessor[], getAccessor: EntityListAccessor.GetEntityListAccessor, sortByField: RelativeSingleField, oldIndex: number, newIndex: number) => EntityAccessor[];
-
-// @public (undocumented)
-export const MutationStateContext: Context<boolean>;
-
-// @public (undocumented)
-export const ParentEntity: NamedExoticComponent<ParentEntityProps>;
+export const ParentEntity: React.NamedExoticComponent<ParentEntityProps>;
 
 // @public (undocumented)
 export interface ParentEntityProps extends SugaredParentEntityParameters {
@@ -527,7 +501,7 @@ export interface ParentEntityProps extends SugaredParentEntityParameters {
 export const repairEntitiesOrder: (sortableByField: RelativeSingleField, sortedEntities: EntityAccessor[]) => void;
 
 // @public (undocumented)
-export const SetOrderFieldOnCreate: NamedExoticComponent<SetOrderFieldOnCreateProps>;
+export const SetOrderFieldOnCreate: React.NamedExoticComponent<SetOrderFieldOnCreateProps>;
 
 // @public (undocumented)
 export interface SetOrderFieldOnCreateOwnProps {
@@ -559,7 +533,7 @@ export interface SortedEntities {
 export const sortEntities: (entities: EntityAccessor[], sortByField: RelativeSingleField | undefined) => EntityAccessor[];
 
 // @public (undocumented)
-export const StaticRender: NamedExoticComponent<StaticRenderProps>;
+export const StaticRender: React.NamedExoticComponent<StaticRenderProps>;
 
 // @public (undocumented)
 export interface StaticRenderProps {
@@ -602,34 +576,23 @@ export interface TreeRootIdProviderProps {
 export const useAccessorTreeState: () => AccessorTreeState;
 
 // @public
-export function useAccessorUpdateSubscription<Value extends FieldValue = FieldValue>(getFieldAccessor: () => FieldAccessor<Value>): FieldAccessor<Value>;
-
-// @public (undocumented)
-export function useAccessorUpdateSubscription(getEntityAccessor: () => EntityAccessor): EntityAccessor;
-
-// @public (undocumented)
-export function useAccessorUpdateSubscription(getListAccessor: () => EntityListAccessor): EntityListAccessor;
-
-// @public (undocumented)
-export function useAccessorUpdateSubscription(getAccessor: () => EntityListAccessor | EntityAccessor): EntityListAccessor | EntityAccessor;
-
-// @public (undocumented)
-export function useAccessorUpdateSubscription<Value extends FieldValue = FieldValue>(getFieldAccessor: () => FieldAccessor<Value>, withForceUpdate: true): [FieldAccessor<Value>, ForceAccessorUpdate];
-
-// @public (undocumented)
-export function useAccessorUpdateSubscription(getEntityAccessor: () => EntityAccessor, withForceUpdate: true): [EntityAccessor, ForceAccessorUpdate];
-
-// @public (undocumented)
-export function useAccessorUpdateSubscription(getListAccessor: () => EntityListAccessor, withForceUpdate: true): [EntityListAccessor, ForceAccessorUpdate];
-
-// @public (undocumented)
-export function useAccessorUpdateSubscription(getAccessor: () => EntityListAccessor | EntityAccessor, withForceUpdate: true): [EntityListAccessor | EntityAccessor, ForceAccessorUpdate];
+export const useAccessorUpdateSubscription: <Accessor extends {
+    addEventListener: (event: {
+        type: "update";
+    }, cb: (accessor: Accessor) => void) => () => void;
+}>(getAccessor: () => Accessor) => [Accessor, {
+    update: () => void;
+}];
 
 // @public (undocumented)
 export const useBindingOperations: () => BindingOperations<ReactNode>;
 
 // @public (undocumented)
-export const useDataBinding: ({ children, refreshOnPersist, skipStateUpdateAfterPersist, }: AccessorTreeStateOptions) => AccessorTreeState;
+export const useDataBinding: ({ children, refreshOnPersist, skipStateUpdateAfterPersist, }: {
+    children?: ReactNode;
+    refreshOnPersist?: boolean;
+    skipStateUpdateAfterPersist?: boolean;
+}) => AccessorTreeState;
 
 // @public @deprecated
 export const useDerivedField: <SourceValue extends FieldValue = FieldValue>(sourceField: string | SugaredRelativeSingleField, derivedField: string | SugaredRelativeSingleField, transform?: (sourceValue: SourceValue | null) => SourceValue | null, agent?: string) => void;
@@ -689,7 +652,7 @@ export function useEntityEvent(type: 'persistSuccess', listener: EntityAccessor.
 export function useEntityEvent(type: 'update', listener: EntityAccessor.EntityEventListenerMap['update']): void;
 
 // @public (undocumented)
-export const useEntityKey: () => string;
+export const useEntityKey: () => string | (() => EntityAccessor);
 
 // @public (undocumented)
 export function useEntityList(sugaredRelativeEntityList: string | SugaredRelativeEntityList): EntityListAccessor;
@@ -861,13 +824,10 @@ export const useOnConnectionUpdate: (fieldName: FieldName, listener: EntityAcces
 export const usePersist: () => Persist;
 
 // @public (undocumented)
-export const useSortedEntities: (entityList: EntityListAccessor, sortableByField: SugaredFieldProps["field"] | undefined) => SortedEntities;
-
-// @public (undocumented)
 export const useTreeRootId: () => TreeRootId | undefined;
 
 // @public (undocumented)
-export const Variable: MemoExoticComponent<({ name, format }: VariableProps) => ReactElement>;
+export const Variable: React.MemoExoticComponent<({ name, format }: VariableProps) => ReactElement>;
 
 // @public (undocumented)
 export interface VariableProps {

@@ -23,6 +23,40 @@ export class AssertionError extends Error {
 export function assertNever(_: never): never;
 
 // @public (undocumented)
+export class BijectiveIndexedMap<K, V> implements Map<K, V> {
+    // (undocumented)
+    [Symbol.iterator](): IterableIterator<[K, V]>;
+    // (undocumented)
+    readonly [Symbol.toStringTag] = "BijectiveIndexedMap";
+    constructor(originalMap: BijectiveIndexedMap<K, V>);
+    constructor(inverse: (value: V) => K);
+    // (undocumented)
+    changeKey(oldKey: K, newKey: K): this;
+    // (undocumented)
+    changeKeyOrder(newOrder: Iterable<K>): void;
+    // (undocumented)
+    clear(): void;
+    // (undocumented)
+    delete(key: K): boolean;
+    // (undocumented)
+    entries(): IterableIterator<[K, V]>;
+    // (undocumented)
+    forEach(callback: (value: V, key: K, map: Map<K, V>) => void, thisArg?: any): void;
+    // (undocumented)
+    get(key: K): V | undefined;
+    // (undocumented)
+    has(key: K): boolean;
+    // (undocumented)
+    keys(): IterableIterator<K>;
+    // (undocumented)
+    set(key: K, value: V): this;
+    // (undocumented)
+    get size(): number;
+    // (undocumented)
+    values(): IterableIterator<V>;
+}
+
+// @public (undocumented)
 export function dataAttribute(value: unknown): string | true | undefined;
 
 // @public (undocumented)
@@ -56,6 +90,15 @@ export function isNonNegativeNumber(value: unknown): value is number;
 
 // @public (undocumented)
 export const isSpecialLinkClick: (e: MouseEvent) => boolean;
+
+// @public (undocumented)
+export class LRUCache<Key, Value> {
+    constructor(maxSize: number);
+    // (undocumented)
+    get(key: Key): Value | undefined;
+    // (undocumented)
+    set(key: Key, value: Value): void;
+}
 
 // Warning: (ae-forgotten-export) The symbol "NarrowRaw" needs to be exported by the entry point index.d.ts
 //
@@ -138,6 +181,14 @@ export function svgSizeProps(width: number, height?: number, crop?: number): Svg
 
 // @public (undocumented)
 export function toKebabCase(value: string): string;
+
+// @public (undocumented)
+export class WeakIdCache<K extends object> {
+    // (undocumented)
+    getId(key: K): string;
+    // (undocumented)
+    getOptionalKeyId(key: K | undefined): string;
+}
 
 // (No @packageDocumentation comment for this package)
 

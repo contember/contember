@@ -5,7 +5,7 @@
 ```ts
 
 import { Context } from 'react';
-import { EntityAccessor } from '@contember/binding';
+import { EntityAccessor } from '@contember/react-binding';
 import { JSX as JSX_2 } from 'react/jsx-runtime';
 import { NamedExoticComponent } from 'react';
 import { ReactNode } from 'react';

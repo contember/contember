@@ -1,4 +1,4 @@
-import { Filter, SugaredRelativeSingleField } from '@contember/binding'
+import { Filter, SugaredRelativeSingleField } from '@contember/react-binding'
 import { DataViewFilterHandler } from '../types'
 import { createTextFilter, TextFilterArtifacts } from './text'
 

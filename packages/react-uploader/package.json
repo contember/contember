@@ -28,7 +28,6 @@
     "ae:test": "api-extractor run"
   },
   "dependencies": {
-    "@contember/binding": "workspace:*",
     "@contember/client": "workspace:*",
     "@contember/graphql-client": "workspace:*",
     "@contember/react-binding": "workspace:*",

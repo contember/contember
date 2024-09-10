@@ -8,8 +8,8 @@ export const sortEntities = (
 		return entities
 	}
 	return entities.sort((a, b) => {
-		const aField = a.getRelativeSingleField<number>(sortByField)
-		const bField = b.getRelativeSingleField<number>(sortByField)
+		const aField = a.getField<number>(sortByField)
+		const bField = b.getField<number>(sortByField)
 
 		return (aField.value ?? Number.MAX_SAFE_INTEGER) - (bField.value ?? Number.MAX_SAFE_INTEGER)
 	})

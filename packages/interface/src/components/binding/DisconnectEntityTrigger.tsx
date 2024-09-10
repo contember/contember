@@ -1,6 +1,7 @@
 import { ComponentType, ReactNode, useCallback } from 'react'
 import { Slot } from '@radix-ui/react-slot'
-import { BindingError, EntityListAccessor, ErrorPersistResult, SuccessfulPersistResult, SugaredRelativeSingleEntity, useEntity, useMutationState, usePersist } from '@contember/react-binding'
+import { BindingError, EntityListAccessor, ErrorPersistResult,
+	isEntityListAccessor, SuccessfulPersistResult, SugaredRelativeSingleEntity, useEntity, useMutationState, usePersist } from '@contember/react-binding'
 
 
 const SlotButton = Slot as ComponentType<React.ButtonHTMLAttributes<HTMLButtonElement>>
@@ -25,7 +26,7 @@ export const DisconnectEntityTrigger = ({ immediatePersist, onPersistError, onPe
 			if (!parent) {
 				throw new BindingError('Cannot disconnect root entity')
 			}
-			if (parent instanceof EntityListAccessor) {
+			if (isEntityListAccessor(parent)) {
 				parent.disconnectEntity(entity)
 			} else {
 				const subTreeNode = entity.environment.getSubTreeNode()

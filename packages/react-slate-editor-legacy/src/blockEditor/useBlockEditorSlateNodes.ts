@@ -53,7 +53,7 @@ export const useBlockEditorSlateNodes = ({
 			if (existingBlockElement) {
 				return existingBlockElement
 			}
-			const contentField = entity.getRelativeSingleField(desugaredContentField)
+			const contentField = entity.getField(desugaredContentField)
 
 			let blockElement: SlateElement
 

@@ -1,4 +1,4 @@
-import { QueryLanguage, SugaredRelativeSingleField, wrapFilterInHasOnes } from '@contember/binding'
+import { QueryLanguage, SugaredRelativeSingleField, wrapFilterInHasOnes } from '@contember/react-binding'
 import { DataViewFilterHandler } from '../types'
 import { Input } from '@contember/client'
 

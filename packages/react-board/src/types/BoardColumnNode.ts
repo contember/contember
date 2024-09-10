@@ -1,5 +1,5 @@
 import { ReactNode } from 'react'
-import { EntityAccessor } from '@contember/binding'
+import { EntityAccessor } from '@contember/react-binding'
 import { BoardItemNode } from './BoardItemNode'
 
 export type BoardStaticColumnValue = {

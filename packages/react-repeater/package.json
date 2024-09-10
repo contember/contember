@@ -28,7 +28,6 @@
     "ae:test": "api-extractor run"
   },
   "dependencies": {
-    "@contember/binding": "workspace:*",
     "@contember/react-binding": "workspace:*",
     "@contember/react-utils": "workspace:*",
     "@radix-ui/react-slot": "^1.1.0"

@@ -1,4 +1,4 @@
-import { Environment, SugaredOrderBy } from '@contember/binding'
+import { Environment, SugaredOrderBy } from '@contember/react-binding'
 import { OrderBy } from '@contember/react-binding'
 import { StateStorageOrName } from '@contember/react-utils'
 

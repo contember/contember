@@ -12,7 +12,7 @@ import {
 } from '@dnd-kit/core'
 import { coordinateGetter as multipleContainersCoordinateGetter } from '../internal/multipleContainersKeyboardCoordinates'
 import { BoardColumnNode, BoardItemNode, useBoardColumns, useBoardMethods } from '@contember/react-board'
-import { EntityAccessor } from '@contember/binding'
+import { EntityAccessor, isEntityAccessor } from '@contember/react-binding'
 import { BoardActiveColumnContext, BoardActiveItemContext } from '../contexts'
 
 type BoardIndexItem =
@@ -72,7 +72,7 @@ export const BoardSortable = ({ children }: {
 			return
 		}
 
-		if (activeItem.type === 'column' && activeItem.column.value instanceof EntityAccessor) {
+		if (activeItem.type === 'column' && isEntityAccessor(activeItem.column.value)) {
 			moveColumn?.(activeItem.column.value, overItem?.column.index ?? columns.length)
 			return
 		}

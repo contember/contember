@@ -1,8 +1,7 @@
 import { Editor, Element, Path } from 'slate'
 import { FunctionComponent, ReactNode } from 'react'
 import { RenderElementProps, RenderLeafProps } from 'slate-react'
-import { Environment } from '@contember/react-binding'
-import { EntityAccessor } from '@contember/binding'
+import { EntityAccessor, Environment } from '@contember/react-binding'
 
 export type EditorPluginWrapperProps = { children?: ReactNode; editor: Editor }
 export type EditorPlugin = ((editor: Editor) => void) | {

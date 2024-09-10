@@ -62,7 +62,7 @@ export const FieldView = Component<FieldViewProps>(
 		const desugaredFields = useArrayMapMemo(fields, desugarField)
 
 		const retrieveField = useCallback(
-			(desugaredRsf: RelativeSingleField) => entityAccessor.getRelativeSingleField(desugaredRsf),
+			(desugaredRsf: RelativeSingleField) => entityAccessor.getField(desugaredRsf),
 			[entityAccessor],
 		)
 		const accessors = useArrayMapMemo(desugaredFields, retrieveField)

@@ -9,10 +9,8 @@ import { Editor } from 'slate';
 import { EditorElement } from '@contember/react-slate-editor-base';
 import { EditorPlugin } from '@contember/react-slate-editor-base';
 import { Element as Element_2 } from 'slate';
-import { EntityAccessor } from '@contember/binding';
-import { EntityAccessor as EntityAccessor_2 } from '@contember/react-binding';
-import { EntityId } from '@contember/binding';
-import { EntityId as EntityId_2 } from '@contember/react-binding';
+import { EntityAccessor } from '@contember/react-binding';
+import { EntityId } from '@contember/react-binding';
 import type { FunctionComponent } from 'react';
 import { JSX as JSX_2 } from 'react/jsx-runtime';
 import { NamedExoticComponent } from 'react';
@@ -21,9 +19,8 @@ import { Range as Range_2 } from 'slate';
 import { ReactElement } from 'react';
 import { ReactNode } from 'react';
 import { RenderElementProps } from 'slate-react';
-import { SugaredRelativeEntityList } from '@contember/binding';
+import { SugaredRelativeEntityList } from '@contember/react-binding';
 import { SugaredRelativeSingleField } from '@contember/react-binding';
-import { SugaredRelativeSingleField as SugaredRelativeSingleField_2 } from '@contember/binding';
 
 // @public
 export const Block: FunctionComponent<BlockProps>;
@@ -129,7 +126,7 @@ export interface InitializeReferenceContentProps {
 // @public (undocumented)
 export interface ReferencesPluginArgs {
     // (undocumented)
-    discriminationField: SugaredRelativeSingleField_2['field'];
+    discriminationField: SugaredRelativeSingleField['field'];
     // (undocumented)
     field: SugaredRelativeEntityList['field'];
 }

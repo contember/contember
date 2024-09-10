@@ -1,4 +1,4 @@
-import { EntityListSubTreeMarker, HasManyRelationMarker, HasOneRelationMarker } from '@contember/binding'
+import { EntityListSubTreeMarker, HasManyRelationMarker, HasOneRelationMarker } from '@contember/react-binding'
 
 export interface ExportFormatterCreateOutputArgs {
 	data: any[]

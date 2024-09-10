@@ -7,6 +7,8 @@
 		]
 	},
 	"references": [
-		{ "path": "../../client/src" }
+		{ "path": "../../binding-common/src" },
+		{ "path": "../../binding-legacy/src" },
+		{ "path": "../../binding-ng/src" },
 	]
 }

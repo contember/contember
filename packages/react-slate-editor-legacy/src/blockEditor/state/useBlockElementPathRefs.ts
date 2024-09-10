@@ -22,7 +22,7 @@ export const useBlockElementPathRefs = ({ editor, blockList }: {
 					ref.unref()
 				}
 				blockElementPathRefs.clear()
-				const blocks = getEntity().getRelativeEntityList(desugaredBlockList)
+				const blocks = getEntity().getEntityList(desugaredBlockList)
 				let blockIndex = 0
 				for (const topLevelBlock of blocks) {
 					blockElementPathRefs.set(topLevelBlock.id, Editor.pathRef(editor, [blockIndex++], { affinity: 'backward' }))

@@ -1,11 +1,13 @@
 import { Model } from '@contember/schema'
 import { acceptEveryFieldVisitor, acceptFieldVisitor } from '@contember/schema-utils'
 
+import { getEnumTypeName } from './utils'
+
 export class EntityTypeSchemaGenerator {
 	generate(model: Model.Schema): string {
 		let code = ''
 		for (const enumName of Object.keys(model.enums)) {
-			code += `import type { ${enumName} } from './enums'\n`
+			code += `import type { ${getEnumTypeName(enumName)} } from './enums'\n`
 		}
 
 		code += `
@@ -141,7 +143,7 @@ const uniqueType = (model: Model.Schema, entity: Model.Entity, field: Model.AnyF
 const columnToTsType = (column: Model.AnyColumn): string => {
 	switch (column.type) {
 		case Model.ColumnType.Enum:
-			return column.columnType
+			return getEnumTypeName(column.columnType)
 		case Model.ColumnType.String:
 			return 'string'
 		case Model.ColumnType.Int:

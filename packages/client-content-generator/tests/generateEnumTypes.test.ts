@@ -8,7 +8,7 @@ test('generate enums', () => {
 		entities: {},
 		enums: {
 			OrderStatus: ['new', 'paid', 'cancelled'],
-			OrderType: ['normal', 'express'],
+			orderType: ['normal', 'express'],
 		},
 	})).toMatchInlineSnapshot(`
 		"export type OrderStatus = 

@@ -35,7 +35,7 @@ export const uiconfig = <T extends ConfigSchema | undefined>(config: Config<T, C
 export type NoInfer<T> = T & { [K in keyof T]: T[K] }
 
 export const uic = <El extends React.ElementType, Variants extends ConfigSchema | undefined  = undefined>(Component: El, config: Config<Variants, NoInfer<El>>) => {
-	const cls = cva<any>(config?.baseClass, {
+	const cls = cva<any>(config?.baseClass as any, {
 		variants: config?.variants,
 		defaultVariants: config?.defaultVariants,
 		compoundVariants: config?.compoundVariants,

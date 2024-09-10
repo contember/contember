@@ -30,6 +30,7 @@
 	},
 	"dependencies": {
 		"@contember/client": "workspace:*",
+		"@contember/client-content": "workspace:*",
 		"@contember/utilities": "workspace:*",
 		"chevrotain": "6.5.0",
 		"fast-deep-equal": "^3.1.3",

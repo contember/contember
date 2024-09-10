@@ -27,9 +27,5 @@
 	"scripts": {
 		"ae:build": "api-extractor run --local",
 		"ae:test": "api-extractor run"
-	},
-	"dependencies": {
-	},
-	"devDependencies": {
 	}
 }

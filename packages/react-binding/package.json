@@ -29,7 +29,9 @@
   },
   "dependencies": {
     "@contember/binding": "workspace:*",
+    "@contember/binding-common": "workspace:*",
     "@contember/client": "workspace:*",
+    "@contember/graphql-client": "workspace:*",
     "@contember/react-client": "workspace:*",
     "@contember/react-utils": "workspace:*",
     "@contember/utilities": "workspace:*"

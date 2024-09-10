@@ -8,6 +8,7 @@
 	},
 	"references": [
 		{ "path": "../../client/src" },
+		{ "path": "../../client-content/src" },
 		{ "path": "../../utilities/src" },
 	]
 }

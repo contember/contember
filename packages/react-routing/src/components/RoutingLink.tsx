@@ -19,10 +19,12 @@ export const RoutingLink = memo<RoutingLinkProps>(({ to, parametersResolver, par
 	const { navigate, isActive: active, href } = useRoutingLink(to, parametersResolver, parameters)
 
 	const innerOnClick = useCallback((e?: ReactMouseEvent<HTMLElement, MouseEvent>) => {
-		if (e) {
-			if (e.isDefaultPrevented() || isSpecialLinkClick(e.nativeEvent)) {
-				return
-			}
+		if (e && (
+			e.isDefaultPrevented()
+			|| isSpecialLinkClick(e.nativeEvent)
+			|| e.currentTarget.getAttribute('target') === '_blank'
+		)) {
+			return
 		}
 		navigate(e)
 	}, [navigate])

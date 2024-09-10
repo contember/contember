@@ -1,4 +1,3 @@
-import { join, normalize } from 'node:path'
 import glob from 'fast-glob'
 import * as fs from 'fs/promises'
 import { existsSync } from 'fs'
@@ -89,8 +88,9 @@ const processPackage = async (dir: string, projectList: ProjectList) => {
 	}
 
 	if (errors.length > 0) {
-		for (const { file, message } of errors.sort((a, b) => a.type.localeCompare(b.type) || a.message.localeCompare(b.message))) {
-			console.log(`${file}:\n${message}\n`)
+		console.log(`${dir}:\n`)
+		for (const { message } of errors.sort((a, b) => a.type.localeCompare(b.type) || a.message.localeCompare(b.message))) {
+			console.log(`${message}`)
 		}
 		console.log('')
 		return false

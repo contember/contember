@@ -36,7 +36,7 @@ export const DataGridToolbar = Component<DataGridToolbarProps>(({ children }) =>
 					</Button>
 
 					<Popover>
-						<PopoverTrigger>
+						<PopoverTrigger asChild>
 							<Button variant={'outline'} size={'sm'} className={'gap-2'}>
 								<SettingsIcon className={'w-4 h-4'} />
 							</Button>

@@ -39,7 +39,7 @@ export const DimensionsSwitcher = Component(({ options, dimension, children, slu
 			<DataViewLoaderState loaded>
 
 				<Popover>
-					<PopoverTrigger>
+					<PopoverTrigger asChild>
 						<Button variant={'outline'} size="sm">
 							<DimensionSwitcherCurrentValues dimension={dimension} slugField={slugField}>
 								{children}

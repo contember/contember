@@ -83,7 +83,7 @@ export const MembershipsControl = ({ setMemberships, memberships, roles }: Membe
 			})}
 			<div>
 				{remainingRoles.length ? <DropdownMenu>
-					<DropdownMenuTrigger>
+					<DropdownMenuTrigger asChild>
 						<Button variant="outline"><PlusIcon className="w-3 h-3" /></Button>
 					</DropdownMenuTrigger>
 					<DropdownMenuContent>

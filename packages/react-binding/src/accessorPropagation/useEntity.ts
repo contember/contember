@@ -22,7 +22,7 @@ function useEntity(...entity: [] | [string | SugaredRelativeSingleEntity | undef
 		// eslint-disable-next-line react-hooks/rules-of-hooks
 		const getEntityAccessor = useCallback(() => getEntityByKey(entityKey), [entityKey, getEntityByKey])
 		// eslint-disable-next-line react-hooks/rules-of-hooks
-		return useAccessorUpdateSubscription(getEntityAccessor)
+		return useAccessorUpdateSubscription(getEntityAccessor)[0]
 	}
 	const sugaredRelativeSingleEntity = entity[0]
 
@@ -41,11 +41,11 @@ function useEntity(...entity: [] | [string | SugaredRelativeSingleEntity | undef
 			'Cannot change the length of the hasOneRelation path!',
 		)
 		// eslint-disable-next-line react-hooks/rules-of-hooks
-		const [entity, forceUpdate] = useAccessorUpdateSubscription(getEntity, true)
+		const [entity, { update }] = useAccessorUpdateSubscription(getEntity)
 
 		if (relativeSingleEntity.hasOneRelationPath.length) {
 			// eslint-disable-next-line react-hooks/rules-of-hooks
-			useOnConnectionUpdate(relativeSingleEntity.hasOneRelationPath[0].field, forceUpdate)
+			useOnConnectionUpdate(relativeSingleEntity.hasOneRelationPath[0].field, update)
 		}
 
 		return entity

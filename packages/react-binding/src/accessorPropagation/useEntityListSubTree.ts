@@ -23,5 +23,5 @@ export const useEntityListSubTree = (
 	// 	throw new BindingError(`useEntityListSubTree: cannot use hasOneRelationPath!`)
 	// }
 
-	return useAccessorUpdateSubscription(getAccessor)
+	return useAccessorUpdateSubscription(getAccessor)[0]
 }

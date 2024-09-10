@@ -34,11 +34,11 @@ function useEntityList(
 			'Cannot change the length of the hasOneRelation path!',
 		)
 		// eslint-disable-next-line react-hooks/rules-of-hooks
-		const [entityList, forceUpdate] = useAccessorUpdateSubscription(getEntityList, true)
+		const [entityList, { update }] = useAccessorUpdateSubscription(getEntityList)
 
 		if (relativeEntityList.hasOneRelationPath.length) {
 			// eslint-disable-next-line react-hooks/rules-of-hooks
-			useOnConnectionUpdate(relativeEntityList.hasOneRelationPath[0].field, forceUpdate)
+			useOnConnectionUpdate(relativeEntityList.hasOneRelationPath[0].field, update)
 		}
 
 		return entityList

@@ -36,11 +36,11 @@ function useField<Value extends FieldValue = FieldValue>(
 			'Cannot change the length of the hasOneRelation path!',
 		)
 		// eslint-disable-next-line react-hooks/rules-of-hooks
-		const [field, forceUpdate] = useAccessorUpdateSubscription<Value>(getField, true)
+		const [field, { update }] = useAccessorUpdateSubscription(getField)
 
 		if (relativeSingleField.hasOneRelationPath.length) {
 			// eslint-disable-next-line react-hooks/rules-of-hooks
-			useOnConnectionUpdate(relativeSingleField.hasOneRelationPath[0].field, forceUpdate)
+			useOnConnectionUpdate(relativeSingleField.hasOneRelationPath[0].field, update)
 		}
 
 		return field

@@ -1326,7 +1326,7 @@ export interface EditorCanvasProps<P extends HTMLTextAreaDivTargetProps> {
     // (undocumented)
     focusRing?: boolean;
     // (undocumented)
-    underlyingComponent: (props: P) => ReactElement;
+    underlyingComponent: ComponentType<P>;
 }
 
 // @public (undocumented)

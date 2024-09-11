@@ -1,4 +1,4 @@
-import type { GraphQlClientFailedRequestMetadata } from '@contember/client'
+import type { GraphQlClientError } from '@contember/client'
 
 export type ApiRequestState<SuccessData> =
 	| {
@@ -21,5 +21,5 @@ export type ApiRequestState<SuccessData> =
 		isLoading: false
 		isFinished: true
 		readyState: 'networkError'
-		data: GraphQlClientFailedRequestMetadata
+		data: GraphQlClientError
 	  }

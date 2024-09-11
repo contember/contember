@@ -1,4 +1,4 @@
-import type { GraphQlClientFailedRequestMetadata } from '@contember/client'
+import type { GraphQlClientError } from '@contember/client'
 
 export type ApiRequestAction<SuccessData> =
 	| {
@@ -13,5 +13,5 @@ export type ApiRequestAction<SuccessData> =
 	  }
 	| {
 		type: 'resolveWithError'
-		error: GraphQlClientFailedRequestMetadata
+		error: GraphQlClientError
 	  }

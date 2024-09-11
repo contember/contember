@@ -37,7 +37,7 @@ export class MarkerFactory {
 		environment: Environment,
 	): EntityFieldsWithHoistablesMarker {
 
-		const qualifiedSingleEntity: QualifiedSingleEntity = QueryLanguage.desugarQualifiedSingleEntity(entity, environment, { missingSetOnCreate: 'fillAndWarn' })
+		const qualifiedSingleEntity: QualifiedSingleEntity = QueryLanguage.desugarQualifiedSingleEntity(entity, environment)
 
 		return this.createSubTreeMarker(qualifiedSingleEntity, 'eventListeners', EntitySubTreeMarker, fields, environment)
 	}

@@ -58,7 +58,7 @@ export class TreeNodeEnvironmentFactory {
 			entity = QueryLanguage.desugarUnconstrainedQualifiedSingleEntity(sugaredEntityList, environment)
 
 		} else {
-			entity = QueryLanguage.desugarQualifiedSingleEntity(sugaredEntityList, environment, { missingSetOnCreate: 'fill' })
+			entity = QueryLanguage.desugarQualifiedSingleEntity(sugaredEntityList, environment)
 			rootWhere = whereToFilter(entity.where)
 			expectedCardinality = entity.setOnCreate ? 'zero-or-one' : 'one'
 		}

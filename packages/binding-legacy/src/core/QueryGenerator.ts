@@ -4,13 +4,12 @@ import {
 	EntityListSubTreeMarker,
 	EntitySubTreeMarker,
 	FieldMarker,
-	Filter,
 	HasManyRelationMarker,
 	HasOneRelationMarker,
 	MarkerTreeRoot,
 	PRIMARY_KEY_NAME,
 } from '@contember/binding-common'
-import { ContentEntitySelection, ContentQuery, ContentQueryBuilder, replaceGraphQlLiteral } from '@contember/client'
+import { ContentEntitySelection, ContentQuery, ContentQueryBuilder } from '@contember/client'
 
 
 export class QueryGenerator {
@@ -42,8 +41,8 @@ export class QueryGenerator {
 		return this.qb.get(
 			subTree.entityName,
 			{
-				by: replaceGraphQlLiteral(subTree.parameters.where),
-				filter: resolveFilter(subTree.parameters.filter),
+				by: subTree.parameters.where,
+				filter: subTree.parameters.filter,
 			},
 			it =>  QueryGenerator.registerQueryPart(subTree.fields.markers, it),
 		)
@@ -56,8 +55,8 @@ export class QueryGenerator {
 		return this.qb.list(
 			subTree.entityName,
 			{
-				filter: resolveFilter(subTree.parameters.filter),
-				orderBy: replaceGraphQlLiteral(subTree.parameters.orderBy),
+				filter: subTree.parameters.filter,
+				orderBy: subTree.parameters.orderBy,
 				offset: subTree.parameters.offset,
 				limit: subTree.parameters.limit,
 			},
@@ -82,8 +81,8 @@ export class QueryGenerator {
 					selection = selection.$(
 						relationField,
 						{
-							by: replaceGraphQlLiteral(relation.reducedBy),
-							filter: resolveFilter(relation.filter),
+							by: relation.reducedBy,
+							filter: relation.filter,
 							as: fieldValue.placeholderName,
 						},
 						it => QueryGenerator.registerQueryPart(fieldValue.fields.markers, it),
@@ -92,7 +91,7 @@ export class QueryGenerator {
 					selection = selection.$(
 						relation.field,
 						{
-							filter: resolveFilter(relation.filter),
+							filter: relation.filter,
 							as: fieldValue.placeholderName,
 						},
 						it => QueryGenerator.registerQueryPart(fieldValue.fields.markers, it),
@@ -106,8 +105,8 @@ export class QueryGenerator {
 					relation.field,
 					{
 						as: fieldValue.placeholderName,
-						filter: resolveFilter(relation.filter),
-						orderBy: replaceGraphQlLiteral(relation.orderBy),
+						filter: relation.filter,
+						orderBy: relation.orderBy,
 						offset: relation.offset,
 						limit: relation.limit,
 					},
@@ -122,7 +121,4 @@ export class QueryGenerator {
 	}
 }
 
-const resolveFilter = (input?: Filter): Filter<never> => {
-	return replaceGraphQlLiteral<unknown>(input) as Filter<never>
-}
 const ucfirst = (string: string) => `${string.charAt(0).toUpperCase()}${string.substring(1)}`

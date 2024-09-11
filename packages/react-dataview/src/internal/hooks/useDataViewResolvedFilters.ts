@@ -2,7 +2,6 @@ import { Environment, Filter, QualifiedEntityList } from '@contember/react-bindi
 import { useMemo } from 'react'
 import { useEnvironment } from '@contember/react-binding'
 import { DataViewFilterHandlerRegistry, DataViewFilteringArtifacts } from '../../types'
-import { replaceGraphQlLiteral } from '@contember/client'
 
 export type UseDataViewResolvedFiltersArgs = {
 	filters: DataViewFilteringArtifacts
@@ -40,5 +39,5 @@ export const resolveFilters = ({ filterTypes, filters, environment, entities }: 
 		ands.push(filter)
 	}
 
-	return replaceGraphQlLiteral<unknown>({ and: [...ands, entities.filter ?? {}] }) as Filter<never>
+	return { and: [...ands, entities.filter ?? {}] }
 }

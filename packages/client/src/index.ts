@@ -1,16 +1,6 @@
-import * as CrudQueryBuilderTmp from './crudQueryBuilder'
-
-import * as GraphQlBuilderTmp from './graphQlBuilder'
-
-export { GraphQlLiteral } from './graphQlBuilder'
-
-export namespace GraphQlBuilder {
-	export import GraphqlLiteral = GraphQlBuilderTmp.GraphQlLiteral
-	export import GraphQlLiteral = GraphQlBuilderTmp.GraphQlLiteral
-}
-
+import { Input } from '@contember/schema'
 export namespace CrudQueryBuilder {
-	export type OrderDirection = CrudQueryBuilderTmp.OrderDirection
+	export type OrderDirection = `${Input.OrderDirection}`
 }
 
 export * from './content'

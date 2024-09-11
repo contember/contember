@@ -1,6 +1,3 @@
-import type { GraphQlLiteral } from './GraphQlLiteral'
-
-
 export namespace QueryBuilder {
 	export interface Object {
 		[key: string]: Value
@@ -8,6 +5,6 @@ export namespace QueryBuilder {
 
 	export interface List extends Array<Value> {}
 
-	export type AtomicValue = string | null | number | boolean | GraphQlLiteral
+	export type AtomicValue = string | null | number | boolean
 	export type Value = AtomicValue | Object | List
 }

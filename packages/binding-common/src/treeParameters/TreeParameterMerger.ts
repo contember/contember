@@ -1,4 +1,4 @@
-import { GraphQlBuilder, Writable } from '@contember/client'
+import { Writable } from '@contember/client'
 import type {
 	Alias,
 	EntityEventListenerStore,
@@ -197,23 +197,8 @@ export class TreeParameterMerger {
 			if (field in originalCopy) {
 				const fromOriginal = originalCopy[field]
 				const fromFresh = fresh[field]
-
-				if (fromOriginal instanceof GraphQlBuilder.GraphQlLiteral) {
-					if (fromFresh instanceof GraphQlBuilder.GraphQlLiteral) {
-						if (fromOriginal.value === fromFresh.value) {
-							// Good, do nothing.
-							continue
-						} else {
-							throw new BindingError() // TODO msg
-						}
-					} else {
-						throw new BindingError() // TODO msg
-					}
-				}
 				if (typeof fromOriginal === 'object') {
-					if (fromFresh instanceof GraphQlBuilder.GraphQlLiteral) {
-						throw new BindingError() // TODO msg
-					} else if (typeof fromFresh === 'object') {
+					if (typeof fromFresh === 'object') {
 						const merged = this.mergeSetOnCreate(fromOriginal, fromFresh)
 						if (merged !== undefined) {
 							originalCopy[field] = merged

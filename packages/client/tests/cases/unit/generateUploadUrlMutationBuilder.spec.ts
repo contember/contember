@@ -1,6 +1,5 @@
 import { expect, it, describe } from 'vitest'
 import { GenerateUploadUrlMutationBuilder } from '../../../src/content'
-import { GraphQlLiteral } from '../../../src/graphQlBuilder'
 
 describe('generate upload url mutation builder', () => {
 	it('correctly creates a simple mutation', () => {

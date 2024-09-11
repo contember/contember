@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest'
 import { evaluateCondition } from '../../../../src/helperComponents/helpers/evaluateCondition'
-import { GraphQlLiteral } from '@contember/client'
 
 describe('evaluate condition', () => {
 	it('always', () => {
@@ -56,9 +55,6 @@ describe('evaluate condition', () => {
 		expect(evaluateCondition('a', { eq: 'a' })).toEqual(true)
 	})
 
-	it('eq graphql literal OK', () => {
-		expect(evaluateCondition('a', { eq: new GraphQlLiteral('a') })).toEqual(true)
-	})
 
 	it('eq NOK', () => {
 		expect(evaluateCondition('a', { eq: 'B' })).toEqual(false)

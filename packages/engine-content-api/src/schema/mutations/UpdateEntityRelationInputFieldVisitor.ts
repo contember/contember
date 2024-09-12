@@ -123,11 +123,16 @@ export class UpdateEntityRelationInputFieldVisitor implements Model.ColumnVisito
 			}
 			: undefined
 
+		const connectOrCreateInput = createInput && whereInputType
+			? { type: this.connectOrCreateRelationInputProvider.getInput(entity.name, relation.name) }
+			: undefined
+
 		const fields = {
 			[Input.UpdateRelationOperation.create]: createInput,
 			[Input.UpdateRelationOperation.update]: updateSpecifiedInput,
 			[Input.UpdateRelationOperation.upsert]: upsertInput,
 			[Input.UpdateRelationOperation.connect]: whereInput,
+			[Input.UpdateRelationOperation.connectOrCreate]: connectOrCreateInput,
 			[Input.UpdateRelationOperation.disconnect]: whereInput,
 			[Input.UpdateRelationOperation.delete]: whereInput,
 		}

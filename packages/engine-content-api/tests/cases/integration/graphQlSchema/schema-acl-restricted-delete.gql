@@ -255,6 +255,7 @@ input RootUpdateREntityRelationInput {
   update: RootUpdateRRelationInput
   upsert: RootUpsertRRelationInput
   connect: OneHasManyEntityUniqueWhere
+  connectOrCreate: RootConnectOrCreateRRelationInput
   disconnect: OneHasManyEntityUniqueWhere
   alias: String
 }

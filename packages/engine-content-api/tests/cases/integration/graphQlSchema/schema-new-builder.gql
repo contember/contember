@@ -440,6 +440,7 @@ input AuthorUpdatePostsEntityRelationInput {
   update: AuthorUpdatePostsRelationInput
   upsert: AuthorUpsertPostsRelationInput
   connect: PostUniqueWhere
+  connectOrCreate: AuthorConnectOrCreatePostsRelationInput
   disconnect: PostUniqueWhere
   delete: PostUniqueWhere
   alias: String
@@ -463,6 +464,7 @@ input PostUpdateCategoriesEntityRelationInput {
   update: PostUpdateCategoriesRelationInput
   upsert: PostUpsertCategoriesRelationInput
   connect: CategoryUniqueWhere
+  connectOrCreate: PostConnectOrCreateCategoriesRelationInput
   disconnect: CategoryUniqueWhere
   delete: CategoryUniqueWhere
   alias: String
@@ -489,6 +491,7 @@ input PostUpdateLocalesEntityRelationInput {
   update: PostUpdateLocalesRelationInput
   upsert: PostUpsertLocalesRelationInput
   connect: PostLocaleUniqueWhere
+  connectOrCreate: PostConnectOrCreateLocalesRelationInput
   disconnect: PostLocaleUniqueWhere
   delete: PostLocaleUniqueWhere
   alias: String
@@ -664,6 +667,7 @@ input CategoryUpdatePostsEntityRelationInput {
   update: CategoryUpdatePostsRelationInput
   upsert: CategoryUpsertPostsRelationInput
   connect: PostUniqueWhere
+  connectOrCreate: CategoryConnectOrCreatePostsRelationInput
   disconnect: PostUniqueWhere
   delete: PostUniqueWhere
   alias: String

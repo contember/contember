@@ -312,6 +312,7 @@ input FrontPageUpdateInHouseVideosEntityRelationInput {
   update: FrontPageUpdateInHouseVideosRelationInput
   upsert: FrontPageUpsertInHouseVideosRelationInput
   connect: VideoUniqueWhere
+  connectOrCreate: FrontPageConnectOrCreateInHouseVideosRelationInput
   disconnect: VideoUniqueWhere
   delete: VideoUniqueWhere
   alias: String

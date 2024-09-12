@@ -8,5 +8,5 @@ export default async function (builder: MigrationBuilder, args: MigrationArgs<Sy
 		return
 	}
 	builder.sql(`INSERT INTO schema(schema, checksum, version, migration_id) 
-VALUES(${escapeValue(JSON.stringify(schema))}, ${escapeValue(schema.meta.checksum)}, ${escapeValue(schema.meta.version)}, ${schema.meta.id})`)
+VALUES(${escapeValue(JSON.stringify(schema.schema))}, ${escapeValue(schema.meta.checksum)}, ${escapeValue(schema.meta.version)}, ${schema.meta.id})`)
 }

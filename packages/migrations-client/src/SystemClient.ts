@@ -24,7 +24,7 @@ export class SystemClient {
 	constructor(private readonly apiClient: GraphQlClient) {}
 
 	public static create(baseUrl: string, projectName: string, apiToken: string): SystemClient {
-		const graphqlClient = new GraphQlClient(createSystemUrl(baseUrl, projectName), apiToken)
+		const graphqlClient = new GraphQlClient({ url: createSystemUrl(baseUrl, projectName), apiToken })
 		return new SystemClient(graphqlClient)
 	}
 

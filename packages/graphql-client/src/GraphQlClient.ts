@@ -2,7 +2,11 @@ import { GraphQlClientError, GraphQlErrorType } from './GraphQlClientError'
 import { GraphQlClientRequestOptions } from './GraphQlClientRequestOptions'
 
 export class GraphQlClient {
-	constructor(public readonly apiUrl: string, private readonly apiToken?: string) { }
+	constructor(
+		public readonly apiUrl: string,
+		private readonly apiToken?: string,
+		private readonly fetch = defaultFetcher,
+	) { }
 
 	async execute<T = unknown>(query: string, options: GraphQlClientRequestOptions = {}): Promise<T> {
 		let body: string | null = null
@@ -85,7 +89,7 @@ ${query}`
 			resolvedHeaders['Authorization'] = `Bearer ${resolvedToken}`
 		}
 
-		return await fetch(this.apiUrl, {
+		return await this.fetch(this.apiUrl, {
 			method: 'POST',
 			headers: resolvedHeaders,
 			signal,
@@ -94,3 +98,4 @@ ${query}`
 	}
 }
 
+const defaultFetcher = async (url: string, options: RequestInit) => fetch(url, options)

@@ -141,6 +141,7 @@ export const createGraphQLQueryHandler = <Context>({
 			if (e instanceof GraphQLError) {
 				return respond(e instanceof ForbiddenError ? 403 : 400, { errors: [e] })
 			}
+			logger.error(e)
 			return respond(500, { errors: [{ message: 'Internal error' }] })
 		}
 	}

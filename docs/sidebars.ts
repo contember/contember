@@ -179,10 +179,18 @@ const sidebars: SidebarsConfig = {
 		'reference/cli',
 		{
 			type: 'category',
-			label: 'Guides',
+			label: 'Contember Cloud',
 			collapsed: true,
 			items: [
 				'guides/deploy-contember',
+				'cloud/permissions',
+			],
+		},
+		{
+			type: 'category',
+			label: 'Guides',
+			collapsed: true,
+			items: [
 				'guides/deploy-github-actions',
 				'guides/self-hosted-contember',
 				'guides/seo',

@@ -59,3 +59,13 @@ It's important to note that the Project Developer and Project Guest roles are di
 | Manage billing                | <span class="acl-y">YES</span> | <span class="acl-n">NO</span>  | <span class="acl-y">YES</span> | <span class="acl-n">NO</span>  | <span class="acl-n">NO</span>  | <span class="acl-n">NO</span>  | <span class="acl-n">NO</span>  |
 
 </div>
+
+
+## Relation to Contember Engine Roles
+
+The roles and permissions in Contember Cloud are distinct from those in Contember Engine's Project Group and Tenant API. In Contember Cloud, roles are specifically tied to managing organizations and projects within the Cloud Selfcare. In contrast, roles in Contember Engine govern access to the project's APIs (Tenant, Content, System).
+
+Assigning a role in Contember Cloud does **not** automatically assign the same role in Contember Engine. The roles in each system are managed independently and do not influence each other.
+
+The only exception occurs when a Project Group is created in Contember Cloud. In this case, the `project_admin` global role, which is the highest possible role within Contember Engine running in the Cloud, is automatically granted to the creator. This role allows the user to perform almost all tasks (except for certain system-level actions reserved for the `super_admin` role, which is only available in self-hosted environments and not in Contember Cloud). The `project_admin` can then assign this
+role to others using the Tenant API's mutations, such as `addGlobalIdentityRole` or `createGlobalApiKey`.

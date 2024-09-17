@@ -124,6 +124,9 @@ export class UpdateInputVisitor<Result> implements
 			if (isIt<Input.CreateRelationInput>(element, 'create')) {
 				result = processor.create({ ...context, input: element.create, index: i, alias })
 			}
+			if (isIt<Input.ConnectOrCreateRelationInput>(element, 'connectOrCreate')) {
+				result = processor.connectOrCreate({ ...context, input: element.connectOrCreate, index: i, alias })
+			}
 			if (isIt<Input.DeleteSpecifiedRelationInput>(element, 'delete')) {
 				result = processor.delete({ ...context, input: element.delete, index: i, alias })
 			}

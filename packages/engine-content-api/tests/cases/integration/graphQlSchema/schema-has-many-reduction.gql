@@ -295,6 +295,7 @@ input PostUpdateLocalesEntityRelationInput {
   update: PostUpdateLocalesRelationInput
   upsert: PostUpsertLocalesRelationInput
   connect: PostLocaleUniqueWhere
+  connectOrCreate: PostConnectOrCreateLocalesRelationInput
   disconnect: PostLocaleUniqueWhere
   delete: PostLocaleUniqueWhere
   alias: String

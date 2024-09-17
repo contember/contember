@@ -1,5 +1,4 @@
 import { createHash } from 'node:crypto'
-import { resolve } from 'node:path'
 import { Plugin } from 'vite'
 
 type ContemberOptions = {
@@ -25,12 +24,13 @@ export function contember(options?: ContemberOptions): Plugin {
 				base: '/',
 				...config,
 				build: {
+					sourcemap: true,
 					...config.build,
 					rollupOptions: {
 						...config.build?.rollupOptions,
 						input: config.build?.rollupOptions?.input ?? {
-							root: resolve(__dirname, './index.html'),
-							app: resolve(__dirname, `.${appPath}/index.html`),
+							root: './index.html',
+							app: `.${appPath}/index.html`,
 						},
 					},
 				},

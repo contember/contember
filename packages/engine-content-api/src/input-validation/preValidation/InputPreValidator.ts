@@ -158,14 +158,12 @@ export class InputPreValidator {
 
 	private async validateRelations(
 		entity: Model.Entity,
-		visitor: Model.FieldVisitor<Promise<ValidationResult | ValidationResult[] | undefined>>,
-	): Promise<FieldValidationResult[]> {
+		visitor: Model.FieldVisitor<Promise<ValidationResult[]>>,
+	): Promise<ValidationResult> {
 		const validateRelationsResult = acceptEveryFieldVisitor(this.model, entity, visitor)
 
 		return (await Promise.all(Object.values(validateRelationsResult)))
-			.filter((value): value is FieldValidationResult[] | FieldValidationResult[][] => value !== undefined)
-			.reduce<(FieldValidationResult[] | FieldValidationResult)[]>((res, it) => [...res, ...it], [])
-			.reduce<FieldValidationResult[]>((res, it) => [...res, ...(Array.isArray(it) ? it : [it])], [])
+			.flatMap(it => it.flat())
 	}
 
 	private getApplicableRules(changedFields: string[], entityRules: Validation.EntityRules): Validation.EntityRules {

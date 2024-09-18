@@ -83,7 +83,7 @@ export class OneHasOneOwningUpdateInputProcessor {
 		{ targetEntity, targetRelation, relation, input }: Model.OneHasOneOwningContext & { input: Input.CreateDataInput },
 		currentInverseSide: Input.PrimaryValue | undefined,
 		result: MutationResultList,
-	) {
+	): Promise<Input.PrimaryValue | AbortDataManipulation> {
 		if (targetRelation && !targetRelation.nullable && !relation.orphanRemoval && currentInverseSide) {
 			result.push(new MutationConstraintViolationError([], ConstraintType.notNull))
 			return AbortDataManipulation
@@ -103,7 +103,7 @@ export class OneHasOneOwningUpdateInputProcessor {
 		currentInverseSide: Input.PrimaryValue | undefined,
 		newInverseSide: Input.PrimaryValue,
 		result: MutationResultList,
-	) {
+	): Promise<undefined | Input.PrimaryValue | AbortDataManipulation> {
 
 		if (currentInverseSide === newInverseSide) {
 			result.push(new MutationNothingToDo([], NothingToDoReason.alreadyExists))

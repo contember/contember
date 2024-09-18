@@ -203,22 +203,18 @@ export const getUpdatePrimary = (result: MutationResultList) =>
 		? result[0].primary
 		: undefined
 
-export const flattenResult = (result: (MutationResultList | MutationResultList[])[]): MutationResultList =>
-	result
-		.reduce<(MutationResult | MutationResult[])[]>((acc, it) => [...acc, ...it], [])
-		.reduce<MutationResultList>((acc, it) => (Array.isArray(it) ? [...acc, ...it] : [...acc, it]), [])
-
-export type ResultListNotFlatten = MutationResultList | MutationResultList[]
-
 export const collectResults = async (
 	schema: Model.Schema,
 	schemaDatabaseMetadata: DatabaseMetadata,
-	mainPromise: Promise<ResultListNotFlatten | undefined> | undefined,
-	otherPromises: (Promise<ResultListNotFlatten | undefined> | undefined)[],
+	mainPromise: Promise<MutationResultList>,
+	otherPromises: Promise<MutationResultList[]>[],
 ): Promise<MutationResultList> => {
 	let index = 0
-	const allPromises: Promise<{ index: number; value: ResultListNotFlatten }>[] = [mainPromise, ...otherPromises]
-		.filter((it): it is Promise<ResultListNotFlatten> => !!it)
+	const normalizedOtherPromises = otherPromises.map(it => it.then(it => it.flat()))
+	const allPromises: Promise<{ index: number; value: MutationResultList }>[] = [
+		mainPromise,
+		...normalizedOtherPromises,
+	]
 		.map(it =>
 			it //
 				.catch(e => [convertError(schema, schemaDatabaseMetadata, e)])
@@ -235,8 +231,5 @@ export const collectResults = async (
 
 	const values = getFulfilledValues(results)
 	const sortedValues = [values[0], ...values.slice(1).sort((a, b) => a.index - b.index)]
-
-	return flattenResult(
-		sortedValues.map(it => it.value).filter((it): it is MutationResultList | MutationResultList[] => !!it),
-	)
+	return sortedValues.map(it => it.value).flat()
 }

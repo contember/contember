@@ -43,7 +43,7 @@ export class Inserter {
 			this.schema,
 			data,
 		)
-		const promises = acceptEveryFieldVisitor<Promise<MutationResultList | MutationResultList[] | undefined>>(
+		const promises = acceptEveryFieldVisitor<Promise<MutationResultList[]>>(
 			this.schema,
 			entity,
 			visitor,

@@ -12,7 +12,6 @@ import {
 	MutationResultList,
 	MutationUpdateOk,
 	NothingToDoReason,
-	ResultListNotFlatten,
 	RowValues,
 } from '../Result'
 import { UpdateBuilder } from './UpdateBuilder'
@@ -44,7 +43,7 @@ export class Updater {
 
 		const updateVisitor = new SqlUpdateInputProcessor(primaryValue, data, updateBuilder, mapper)
 		const visitor = new UpdateInputVisitor<MutationResultList>(updateVisitor, this.schema, data)
-		const promises = acceptEveryFieldVisitor<Promise<ResultListNotFlatten | undefined>>(this.schema, entity, visitor)
+		const promises = acceptEveryFieldVisitor<Promise<MutationResultList[]>>(this.schema, entity, visitor)
 
 		const okResultFactory = (values: RowValues) => new MutationUpdateOk([], entity, primaryValue, data, values)
 		const mutationResultPromise = Updater.executeUpdate(updateBuilder, mapper, okResultFactory)

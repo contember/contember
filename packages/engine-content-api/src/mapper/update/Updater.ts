@@ -1,19 +1,11 @@
-import { SqlUpdateInputProcessor } from './SqlUpdateInputProcessor'
+import { SqlUpdateInputProcessor, SqlUpdateInputProcessorResult } from './SqlUpdateInputProcessor'
 import { UpdateInputVisitor } from '../../inputProcessing'
 import { Input, Model } from '@contember/schema'
 import { PredicateFactory } from '../../acl'
 import { UpdateBuilderFactory } from './UpdateBuilderFactory'
 import { Mapper } from '../Mapper'
-import { acceptEveryFieldVisitor } from '@contember/schema-utils'
-import {
-	collectResults,
-	MutationNoResultError,
-	MutationNothingToDo,
-	MutationResultList,
-	MutationUpdateOk,
-	NothingToDoReason,
-	RowValues,
-} from '../Result'
+import { acceptFieldVisitor } from '@contember/schema-utils'
+import { MutationNoResultError, MutationNothingToDo, MutationResultList, MutationUpdateOk, NothingToDoReason, RowValues } from '../Result'
 import { UpdateBuilder } from './UpdateBuilder'
 import { rowDataToFieldValues } from '../ColumnValue'
 import { DatabaseMetadata } from '@contember/database'
@@ -41,18 +33,57 @@ export class Updater {
 			updateBuilder.addOldWhere(filter)
 		}
 
-		const updateVisitor = new SqlUpdateInputProcessor(primaryValue, data, updateBuilder, mapper)
-		const visitor = new UpdateInputVisitor<MutationResultList>(updateVisitor, this.schema, data)
-		const promises = acceptEveryFieldVisitor<Promise<MutationResultList[]>>(this.schema, entity, visitor)
+		const visitor = new UpdateInputVisitor<SqlUpdateInputProcessorResult>(
+			new SqlUpdateInputProcessor(primaryValue, data, updateBuilder, mapper),
+			this.schema,
+			data,
+		)
+		const resultList: MutationResultList = []
+		const postUpdates: Exclude<SqlUpdateInputProcessorResult, MutationResultList>[] = []
 
-		const okResultFactory = (values: RowValues) => new MutationUpdateOk([], entity, primaryValue, data, values)
-		const mutationResultPromise = Updater.executeUpdate(updateBuilder, mapper, okResultFactory)
-		const otherPromises = Object.values(promises)
-		if (otherPromises.length === 0) {
-			return await mutationResultPromise
-		} else {
-			return await collectResults(this.schema, this.schemaDatabaseMetadata, mutationResultPromise, otherPromises)
+		for (const key of Object.keys(data)) {
+			const resultSet = await acceptFieldVisitor(
+				this.schema,
+				entity,
+				key,
+				visitor,
+			)
+			for (const result of resultSet) {
+				if (typeof result === 'function') {
+					postUpdates.push(result)
+				} else {
+					for (const resultItem of await result) {
+						resultList.push(resultItem)
+						if (resultItem.error) {
+							return resultList
+						}
+					}
+				}
+			}
 		}
+
+		const result = await updateBuilder.execute(mapper)
+
+		if (!result.executed) {
+			resultList.unshift(new MutationNothingToDo([], NothingToDoReason.noData))
+		} else if (result.affectedRows !== 1) {
+			return [new MutationNoResultError([])]
+		} else {
+			const okResult = new MutationUpdateOk([], entity, primaryValue, data, rowDataToFieldValues(result.values))
+			resultList.unshift(okResult)
+		}
+
+		for (const postUpdate of postUpdates) {
+			const postInsertResult = await postUpdate({ primary: primaryValue })
+			for (const result of postInsertResult) {
+				resultList.push(result)
+				if (result.error) {
+					return resultList
+				}
+			}
+		}
+
+		return resultList
 	}
 
 	public async updateCb(
@@ -63,27 +94,16 @@ export class Updater {
 	): Promise<MutationResultList> {
 		const updateBuilder = this.updateBuilderFactory.create(entity, primaryValue)
 
-		const okResultFactory = (values: RowValues) => new MutationUpdateOk([], entity, primaryValue, {}, values)
 		builderCb(updateBuilder)
 
-		return Updater.executeUpdate(updateBuilder, mapper, okResultFactory)
-	}
-
-	private static async executeUpdate(
-		updateBuilder: UpdateBuilder,
-		mapper: Mapper,
-		okResultFactory: (values: RowValues) => MutationUpdateOk,
-	): Promise<MutationResultList> {
 		const result = await updateBuilder.execute(mapper)
-		if (result.aborted) {
-			return [new MutationNothingToDo([], NothingToDoReason.aborted)]
-		}
+
 		if (!result.executed) {
 			return [new MutationNothingToDo([], NothingToDoReason.noData)]
 		}
 		if (result.affectedRows !== 1) {
 			return [new MutationNoResultError([])]
 		}
-		return [okResultFactory(rowDataToFieldValues(result.values))]
+		return [new MutationUpdateOk([], entity, primaryValue, {}, rowDataToFieldValues(result.values))]
 	}
 }

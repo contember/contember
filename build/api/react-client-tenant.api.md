@@ -335,10 +335,6 @@ export const createSessionTokenMutation: TenantApi.MutationFetcher<{
                 readonly email?: string;
             } & {
                 readonly name?: string;
-            } & {
-                readonly otpEnabled: boolean;
-            } & {
-                readonly passwordlessEnabled?: boolean;
             };
         }) | undefined;
     }) | undefined;
@@ -676,10 +672,6 @@ export const inviteMutation: TenantApi.MutationFetcher<{
                 readonly email?: string;
             } & {
                 readonly name?: string;
-            } & {
-                readonly otpEnabled: boolean;
-            } & {
-                readonly passwordlessEnabled?: boolean;
             } & {
                 readonly identity: {
                     readonly id: string;
@@ -1094,10 +1086,6 @@ export const signInIDPMutation: TenantApi.MutationFetcher<{
                 readonly email?: string;
             } & {
                 readonly name?: string;
-            } & {
-                readonly otpEnabled: boolean;
-            } & {
-                readonly passwordlessEnabled?: boolean;
             };
         }) | undefined;
     }) | undefined;
@@ -1150,10 +1138,6 @@ export const signInMutation: TenantApi.MutationFetcher<{
                 readonly email?: string;
             } & {
                 readonly name?: string;
-            } & {
-                readonly otpEnabled: boolean;
-            } & {
-                readonly passwordlessEnabled?: boolean;
             };
         }) | undefined;
     }) | undefined;
@@ -1412,10 +1396,6 @@ readonly id: string;
 readonly email?: string;
 } & {
 readonly name?: string;
-} & {
-readonly otpEnabled: boolean;
-} & {
-readonly passwordlessEnabled?: boolean;
 };
 }, TenantApi.CreateSessionTokenErrorCode>>;
 
@@ -1495,10 +1475,6 @@ readonly id: string;
 readonly email?: string;
 } & {
 readonly name?: string;
-} & {
-readonly otpEnabled: boolean;
-} & {
-readonly passwordlessEnabled?: boolean;
 } & {
 readonly identity: {
 readonly id: string;
@@ -1585,10 +1561,6 @@ readonly id: string;
 readonly email?: string;
 } & {
 readonly name?: string;
-} & {
-readonly otpEnabled: boolean;
-} & {
-readonly passwordlessEnabled?: boolean;
 };
 }, TenantApi.SignInIDPErrorCode>>;
 
@@ -1607,10 +1579,6 @@ readonly id: string;
 readonly email?: string;
 } & {
 readonly name?: string;
-} & {
-readonly otpEnabled: boolean;
-} & {
-readonly passwordlessEnabled?: boolean;
 };
 }, TenantApi.SignInErrorCode>>;
 
@@ -1630,10 +1598,6 @@ readonly id: string;
 readonly email?: string;
 } & {
 readonly name?: string;
-} & {
-readonly otpEnabled: boolean;
-} & {
-readonly passwordlessEnabled?: boolean;
 };
 }, TenantApi.SignInPasswordlessErrorCode>>;
 

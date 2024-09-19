@@ -2,7 +2,7 @@ import * as TenantApi from '@contember/graphql-client-tenant'
 import { ModelType } from 'graphql-ts-client-api'
 import { createTenantMutation } from '../../useTenantMutation'
 
-const createSessionTokenMutationResult = TenantApi.createSessionTokenResult$.token.person(TenantApi.person$$)
+const createSessionTokenMutationResult = TenantApi.createSessionTokenResult$.token.person(TenantApi.person$.id.email.name)
 
 export type CreateSessionTokenMutationResult = ModelType<typeof createSessionTokenMutationResult>
 

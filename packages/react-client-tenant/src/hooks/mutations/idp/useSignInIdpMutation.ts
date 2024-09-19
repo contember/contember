@@ -3,7 +3,7 @@ import { LoginToken } from '../../useTenantApi'
 import { createTenantMutation } from '../../useTenantMutation'
 import { ModelType } from 'graphql-ts-client-api'
 
-const signInIdpFragment = TenantApi.signInIDPResult$$.person(TenantApi.person$$)
+const signInIdpFragment = TenantApi.signInIDPResult$$.person(TenantApi.person$.id.email.name)
 
 export type SignInIDPMutationResult = ModelType<typeof signInIdpFragment>
 

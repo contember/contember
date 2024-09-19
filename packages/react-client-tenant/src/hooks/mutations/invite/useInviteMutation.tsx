@@ -3,7 +3,7 @@ import { ModelType } from 'graphql-ts-client-api'
 import { createTenantMutation } from '../../useTenantMutation'
 
 const inviteMutationResult = TenantApi.inviteResult$$
-	.person(TenantApi.person$$.identity(TenantApi.identity$$))
+	.person(TenantApi.person$.id.email.name.identity(TenantApi.identity$$))
 
 export type InviteMutationResult = ModelType<typeof inviteMutationResult>
 

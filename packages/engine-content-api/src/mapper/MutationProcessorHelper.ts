@@ -1,22 +1,30 @@
 import { MutationResultList, prependPath } from './Result'
 import { Model } from '@contember/schema'
 
-export const hasManyProcessor = <Context extends { relation: Model.AnyRelation; index: number; alias?: string }>(
-	innerProcessor: (context: Context) => Promise<MutationResultList>,
+export const hasManyProcessor = <Context extends { relation: Model.AnyRelation; index: number; alias?: string }, Args>(
+	innerProcessor: (context: Context) => Promise<MutationResultList | ((args: Args) => Promise<MutationResultList>)>,
 ) => {
-	return async (context: Context): Promise<MutationResultList> => {
+	return async (context: Context): Promise<MutationResultList | ((args: Args) => Promise<MutationResultList>)> => {
 		const { relation, index, alias } = context
 		const path = [{ field: relation.name }, { index, alias }]
-		return prependPath(path, await innerProcessor(context))
+		const innerResult = await innerProcessor(context)
+		if (typeof innerResult === 'function') {
+			return async (it: Args) => prependPath(path, await innerResult(it))
+		}
+		return prependPath(path, innerResult)
 	}
 }
 
-export const hasOneProcessor = <Context extends { relation: Model.AnyRelation }>(
-	innerProcessor: (context: Context) => Promise<MutationResultList>,
+export const hasOneProcessor = <Context extends { relation: Model.AnyRelation }, Args>(
+	innerProcessor: (context: Context) => Promise<MutationResultList | ((args: Args) => Promise<MutationResultList>)>,
 ) => {
-	return async (context: Context): Promise<MutationResultList> => {
+	return async (context: Context): Promise<MutationResultList | ((args: Args) => Promise<MutationResultList>)> => {
 		const { relation } = context
 		const path = [{ field: relation.name }]
-		return prependPath(path, await innerProcessor(context))
+		const innerResult = await innerProcessor(context)
+		if (typeof innerResult === 'function') {
+			return async (it: Args) => prependPath(path, await innerResult(it))
+		}
+		return prependPath(path, innerResult)
 	}
 }

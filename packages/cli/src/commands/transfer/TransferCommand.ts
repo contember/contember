@@ -15,6 +15,7 @@ type Options = {
 	'include-system'?: boolean
 	'no-gzip-transfer'?: boolean
 	yes: boolean
+	'exclude-table'?: string[]
 }
 
 export class TransferCommand extends Command<Args, Options> {
@@ -32,6 +33,7 @@ export class TransferCommand extends Command<Args, Options> {
 		configuration.option('include-system').valueNone()
 		configuration.option('no-gzip-transfer').valueNone()
 		configuration.option('yes').valueNone()
+		configuration.option('exclude-table').valueArray()
 	}
 
 	protected async execute(input: Input<Args, Options>): Promise<void | number> {
@@ -68,6 +70,7 @@ export class TransferCommand extends Command<Args, Options> {
 		const exportResponse = (await this.dataTransferClient.dataExport({
 			project: sourceProject,
 			includeSystem,
+			excludeTables: input.getOption('exclude-table') ?? [],
 			gzip: gzipTransfer,
 		}))
 		const ungzipedResponse = gzipTransfer ? exportResponse.pipe(createGunzip()) : exportResponse

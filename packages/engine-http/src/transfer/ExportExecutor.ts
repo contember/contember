@@ -18,6 +18,7 @@ export const ExportRequest = Typesafe.object({
 		}),
 		Typesafe.partial({
 			targetSlug: Typesafe.string,
+			excludeTables: Typesafe.array(Typesafe.string),
 		}),
 	)),
 })
@@ -35,14 +36,18 @@ export class ExportExecutor {
 			const systemContext = projectContainer.systemDatabaseContext
 
 			if (project.system) {
-				const systemMapping = this.systemSchemaTransferMappingFactory.build()
+				const systemMapping = this.systemSchemaTransferMappingFactory.build({
+					excludeTables: project.excludeTables ?? [],
+				})
 				yield ['importSystemSchemaBegin', { project: project.targetSlug ?? project.slug, tables: Object.keys(systemMapping.tables) }]
 				yield* this.exportSchema(systemContext.client, systemMapping)
 			}
 
 			for (const stage of await systemContext.queryHandler.fetch(new StagesQuery())) {
 				const contentSchema = await projectContainer.contentSchemaResolver.getSchema({ db: systemContext, stage: stage.slug })
-				const contentMapping = this.contentSchemaTransferMappingFactory.createContentSchemaMapping(contentSchema.schema)
+				const contentMapping = this.contentSchemaTransferMappingFactory.createContentSchemaMapping(contentSchema.schema, {
+					excludeTables: project.excludeTables ?? [],
+				})
 				const contentDatabaseClient = projectContainer.connection.createClient(stage.schema, {})
 
 				yield [

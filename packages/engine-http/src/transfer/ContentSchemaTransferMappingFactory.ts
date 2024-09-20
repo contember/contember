@@ -3,11 +3,13 @@ import { acceptFieldVisitor } from '@contember/schema-utils'
 import { DbColumnSchema, DbColumnSchemaMap, TransferMapping, TransferTableMapping } from './TransferMapping'
 
 export class ContentSchemaTransferMappingFactory {
-	createContentSchemaMapping(contentSchema: Schema): TransferMapping {
+	createContentSchemaMapping(contentSchema: Schema, options: {
+		excludeTables?: readonly string[]
+	} = {}): TransferMapping {
 		const tables: Record<string, TransferTableMapping> = {}
 
 		for (const entity of Object.values(contentSchema.model.entities)) {
-			if (entity.view === undefined) {
+			if (entity.view === undefined && !options.excludeTables?.includes(entity.tableName)) {
 				tables[entity.tableName] = {
 					name: entity.tableName,
 					columns: this.buildDbColumnSchemaMap(contentSchema.model, entity),
@@ -17,7 +19,9 @@ export class ContentSchemaTransferMappingFactory {
 
 		for (const entity of Object.values(contentSchema.model.entities)) {
 			for (const joiningTable of this.collectManyHasManyOwned(contentSchema.model, entity)) {
-				tables[joiningTable.name] = joiningTable
+				if (!options.excludeTables?.includes(joiningTable.name)) {
+					tables[joiningTable.name] = joiningTable
+				}
 			}
 		}
 

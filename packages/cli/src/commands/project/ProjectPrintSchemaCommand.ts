@@ -9,7 +9,7 @@ import {
 } from '@contember/engine-content-api'
 import { printSchema } from 'graphql'
 import { mergeSchemas } from '@graphql-tools/schema'
-import { normalizeSchema } from '@contember/schema-utils'
+import { emptySchema, normalizeSchema } from '@contember/schema-utils'
 import { SchemaLoader } from '../../lib/schema/SchemaLoader'
 import { SchemaVersionBuilder } from '@contember/migrations-client'
 import { validateSchemaAndPrintErrors } from '../../lib/schema/SchemaValidationHelper'
@@ -22,6 +22,10 @@ type Options = {
 	normalize?: boolean
 	format?: 'graphql' | 'introspection' | 'schema'
 	source?: 'migrations' | 'definition'
+	['omit-acl']?: boolean
+	['omit-validation']?: boolean
+	['omit-actions']?: boolean
+	['omit-settings']?: boolean
 }
 
 export class ProjectPrintSchemaCommand extends Command<Args, Options> {
@@ -38,6 +42,10 @@ export class ProjectPrintSchemaCommand extends Command<Args, Options> {
 		configuration.option('source').valueRequired().description('migrations|definition')
 		configuration.option('role').valueArray()
 		configuration.option('normalize').valueNone()
+		configuration.option('omit-acl').valueNone()
+		configuration.option('omit-validation').valueNone()
+		configuration.option('omit-actions').valueNone()
+		configuration.option('omit-settings').valueNone()
 	}
 
 	protected async execute(input: Input<Args, Options>): Promise<number> {
@@ -48,13 +56,21 @@ export class ProjectPrintSchemaCommand extends Command<Args, Options> {
 			? await this.schemaVersionBuilder.buildSchema()
 			: await this.schemaLoader.loadSchema()
 
-		if (!validateSchemaAndPrintErrors(schema, 'Defined schema is invalid:')) {
+		const filteredSchema = {
+			model: schema.model,
+			acl: input.getOption('omit-acl') ? emptySchema.acl : schema.acl,
+			validation: input.getOption('omit-validation') ? emptySchema.validation : schema.validation,
+			actions: input.getOption('omit-actions') ? emptySchema.actions : schema.actions,
+			settings: input.getOption('omit-settings') ? emptySchema.settings : schema.settings,
+		}
+
+		if (!validateSchemaAndPrintErrors(filteredSchema, 'Defined schema is invalid:')) {
 			return 1
 		}
 
 		const permissionFactory = new PermissionFactory()
 		const inputRoles = input.getOption('role')
-		const schemaNormalized = input.getOption('normalize') ? normalizeSchema(schema) : schema
+		const schemaNormalized = input.getOption('normalize') ? normalizeSchema(filteredSchema) : filteredSchema
 		const permissions = permissionFactory.create(schemaNormalized, inputRoles || ['admin'])
 		const schemaBuilderFactory = new GraphQlSchemaBuilderFactory()
 		const authorizator = new Authorizator(permissions, schemaNormalized.acl.customPrimary ?? false)

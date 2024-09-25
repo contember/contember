@@ -97,12 +97,14 @@ export interface EditorReferenceMethods {
 export const EditorReferenceMethodsContext: Context<EditorReferenceMethods>;
 
 // @public (undocumented)
-export const EditorReferenceTrigger: ({ referenceType, ...props }: EditorReferenceTriggerProps) => JSX_2.Element;
+export const EditorReferenceTrigger: ({ referenceType, initialize, ...props }: EditorReferenceTriggerProps) => JSX_2.Element;
 
 // @public (undocumented)
 export interface EditorReferenceTriggerProps {
     // (undocumented)
     children: ReactElement;
+    // (undocumented)
+    initialize?: EntityAccessor.BatchUpdatesHandler;
     // (undocumented)
     referenceType: string;
 }

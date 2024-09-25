@@ -21,10 +21,10 @@ class GenerateUploadUrlMutationBuilder {
 		for (const alias in parameters) {
 			const fileParameters = parameters[alias]
 			if (fileParameters.suffix || fileParameters.fileName || fileParameters.extension) {
-				const value = replaceGraphQlLiteral(fileParameters)
+				const { contentType, prefix, expiration, acl, size, suffix, fileName, extension } = replaceGraphQlLiteral(fileParameters)
 				selectionItems.push(new GraphQlField(alias, 'generateUploadUrl', {
 					input: {
-						value: value,
+						value: { contentType, prefix, expiration, acl, size, suffix, fileName, extension },
 						graphQlType: 'S3GenerateSignedUploadInput',
 					},
 				}, GenerateUploadUrlMutationBuilder.generateUploadUrlFields))

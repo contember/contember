@@ -23,6 +23,9 @@ export class MarkerTreeGenerator {
 	public generate(): MarkerTreeRoot {
 		const analyzer = new MarkerStaticAnalyzer()
 		const collectedMarkers = analyzer.processChildren(this.sourceTree, this.environment)
+		if (collectedMarkers === undefined) {
+			return new MarkerTreeRoot(new Map(), new Map())
+		}
 
 		if (collectedMarkers instanceof EntityFieldMarkersContainer) {
 			throw new BindingError()

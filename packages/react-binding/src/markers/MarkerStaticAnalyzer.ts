@@ -16,8 +16,12 @@ export class MarkerStaticAnalyzer {
 	public processChildren(
 		children: ReactNode,
 		env: Environment,
-	): EntityFieldsWithHoistablesMarker | EntityFieldMarkersContainer {
-		return IncrementalMarkerBuilder.build(this.processNode(children, env, []))
+	): EntityFieldsWithHoistablesMarker | EntityFieldMarkersContainer | undefined {
+		const markers = this.processNode(children, env, [])
+		if (markers.length === 0) {
+			return undefined
+		}
+		return IncrementalMarkerBuilder.build(markers)
 	}
 
 	private processNode(

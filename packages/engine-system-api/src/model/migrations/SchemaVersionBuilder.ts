@@ -20,20 +20,20 @@ export class SchemaVersionBuilder {
 		if (newMigrations.length === 0) {
 			return after ?? emptyVersionedSchema
 		}
+		let schema = after?.notNormalized ?? emptyVersionedSchema.notNormalized
 
-		const schema = newMigrations.reduce(
-			(schema, migration) => {
-				if (migration.type !== 'schema') {
-					return schema
-				}
-				return ({
-					...this.schemaMigrator.applyModifications(schema, migration.modifications, migration.formatVersion),
-					version: migration.version,
-					id: migration.id,
-				})
-			},
-			after?.notNormalized ?? emptyVersionedSchema.notNormalized,
-		)
+		for (const migration of newMigrations) {
+			if (migration.type !== 'schema') {
+				continue
+			}
+			schema = {
+				...this.schemaMigrator.applyModifications(schema, migration.modifications, migration.formatVersion),
+				version: migration.version,
+				id: migration.id,
+			}
+			await new Promise(resolve => setImmediate(resolve))
+		}
+
 		const normalized = normalizeSchema(schema)
 		return {
 			...normalized,

@@ -1080,6 +1080,8 @@ export const signInIDPMutation: TenantApi.MutationFetcher<{
         readonly result?: ({
             readonly token: string;
         } & {
+            readonly idpResponse?: unknown;
+        } & {
             readonly person: {
                 readonly id: string;
             } & {
@@ -1554,6 +1556,8 @@ export const useResetPasswordMutation: ({ headers, apiToken }?: TenantApiOptions
 // @public (undocumented)
 export const useSignInIDPMutation: ({ headers, apiToken }?: TenantApiOptions) => (variables: SignInIDPMutationVariables) => Promise<TenantMutationResponse<    {
 readonly token: string;
+} & {
+readonly idpResponse?: unknown;
 } & {
 readonly person: {
 readonly id: string;

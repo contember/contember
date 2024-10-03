@@ -1,5 +1,5 @@
 import { Client, Issuer } from 'openid-client'
-import { IdentityProviderHandler, IDPClaim, InitIDPAuthResult } from '../IdentityProviderHandler'
+import { IdentityProviderHandler, IDPResponse, InitIDPAuthResult } from '../IdentityProviderHandler'
 import { InvalidIDPConfigurationError } from '../InvalidIDPConfigurationError'
 import { catchTypesafe } from './helpers'
 import { OIDCConfiguration, OIDCInitData, OIDCResponseData } from './OIDCTypes'
@@ -21,7 +21,7 @@ export class OIDCProvider implements IdentityProviderHandler<OIDCConfiguration> 
 		})
 	}
 
-	public async processResponse(configuration: OIDCConfiguration, data: unknown): Promise<IDPClaim> {
+	public async processResponse(configuration: OIDCConfiguration, data: unknown): Promise<IDPResponse> {
 		const responseData = catchTypesafe(OIDCResponseData, IDPValidationError)(data)
 		const client = await this.createOIDCClient(configuration)
 		return await handleOIDCResponse(client, responseData)

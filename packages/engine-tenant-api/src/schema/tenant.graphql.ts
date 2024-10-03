@@ -391,6 +391,7 @@ const schema: DocumentNode = gql`
 	type SignInIDPResult implements CommonSignInResult {
 		token: String!
 		person: Person!
+		idpResponse: Json
 	}
 
 	type AddIDPResponse {

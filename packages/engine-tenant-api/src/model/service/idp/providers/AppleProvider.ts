@@ -1,5 +1,5 @@
 import * as Typesafe from '@contember/typesafe'
-import { IdentityProviderHandler, IDPClaim, InitIDPAuthResult } from '../IdentityProviderHandler'
+import { IdentityProviderHandler, IDPResponse, InitIDPAuthResult } from '../IdentityProviderHandler'
 import { OIDCConfiguration, OIDCConfigurationOptions, OIDCInitData, OIDCResponseData, OIDCSessionData } from './OIDCTypes'
 import { catchTypesafe } from './helpers'
 import { IDPValidationError } from '../IDPValidationError'
@@ -36,7 +36,7 @@ export class AppleProvider implements IdentityProviderHandler<AppleConfiguration
 		})
 	}
 
-	public async processResponse(configuration: AppleConfiguration, data: unknown): Promise<IDPClaim> {
+	public async processResponse(configuration: AppleConfiguration, data: unknown): Promise<IDPResponse> {
 		const responseData = catchTypesafe(OIDCResponseData, IDPValidationError)(data)
 		const client = await this.createOIDCClient(configuration)
 		return await handleOIDCResponse(client, responseData)

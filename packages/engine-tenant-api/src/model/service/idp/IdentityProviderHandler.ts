@@ -3,17 +3,17 @@ export interface InitIDPAuthResult {
 	sessionData: unknown
 }
 
-export interface IDPClaim {
+export type IDPResponse = {
 	externalIdentifier: string
 	email?: string
 	name?: string
-}
+} & Record<string, unknown>
 
 export interface IdentityProviderHandler<Configuration extends {}> {
 
 	initAuth: (configuration: Configuration, data: unknown) => Promise<InitIDPAuthResult>
 
-	processResponse: (configuration: Configuration, responseData: unknown) =>  Promise<IDPClaim>
+	processResponse: (configuration: Configuration, responseData: unknown) =>  Promise<IDPResponse>
 
 	validateConfiguration: (config: unknown) => Configuration
 

@@ -55,7 +55,10 @@ export class IDPMutationResolver implements MutationResolvers {
 		return {
 			ok: true,
 			errors: [],
-			result: await this.signInResponseFactory.createResponse(signIn.result, context),
+			result: {
+				...await this.signInResponseFactory.createResponse(signIn.result, context),
+				idpResponse: signIn.result.idpResponse,
+			},
 		}
 	}
 }

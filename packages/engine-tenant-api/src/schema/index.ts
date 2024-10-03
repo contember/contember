@@ -1138,6 +1138,7 @@ export type SignInIdpResponse = {
 
 export type SignInIdpResult = CommonSignInResult & {
 	readonly __typename?: 'SignInIDPResult'
+	readonly idpResponse?: Maybe<Scalars['Json']['output']>
 	readonly person: Person
 	readonly token: Scalars['String']['output']
 }
@@ -2238,6 +2239,7 @@ export type SignInIdpResponseResolvers<ContextType = any, ParentType extends Res
 }
 
 export type SignInIdpResultResolvers<ContextType = any, ParentType extends ResolversParentTypes['SignInIDPResult'] = ResolversParentTypes['SignInIDPResult']> = {
+	idpResponse?: Resolver<Maybe<ResolversTypes['Json']>, ParentType, ContextType>
 	person?: Resolver<ResolversTypes['Person'], ParentType, ContextType>
 	token?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>

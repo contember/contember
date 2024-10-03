@@ -16,7 +16,7 @@ export class OIDCProvider implements IdentityProviderHandler<OIDCConfiguration> 
 		const initData = catchTypesafe(OIDCInitData, IDPValidationError)(data)
 		const client = await this.createOIDCClient(configuration)
 		return await initOIDCAuth(client, {
-			claims: configuration.claims,
+			scope: configuration.scope ?? configuration.claims,
 			...initData,
 		})
 	}

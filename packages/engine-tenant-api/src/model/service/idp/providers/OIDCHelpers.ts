@@ -8,13 +8,13 @@ custom.setHttpOptionsDefaults({
 	timeout: 5000,
 })
 
-export const initOIDCAuth = async (client: Client, { redirectUrl, claims, responseMode }: { redirectUrl: string; claims?: string; responseMode?: string }): Promise<InitIDPAuthResult> => {
+export const initOIDCAuth = async (client: Client, { redirectUrl, scope, responseMode }: { redirectUrl: string; scope?: string; responseMode?: string }): Promise<InitIDPAuthResult> => {
 	const nonce = generators.nonce()
 	const state = generators.state()
 	const url = client.authorizationUrl({
 		redirect_uri: redirectUrl,
 		response_mode: responseMode,
-		scope: claims ?? 'openid email',
+		scope: scope ?? 'openid email',
 		nonce,
 		state,
 	})

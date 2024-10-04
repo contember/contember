@@ -2,19 +2,19 @@ import { Client, custom, errors, generators } from 'openid-client'
 import { OIDCResponseData } from './OIDCTypes'
 import { IDPValidationError } from '../IDPValidationError'
 import { IDPResponseError } from '../IDPResponseError'
-import { IDPClaim, InitIDPAuthResult } from '../IdentityProviderHandler'
+import { IDPResponse, InitIDPAuthResult } from '../IdentityProviderHandler'
 
 custom.setHttpOptionsDefaults({
 	timeout: 5000,
 })
 
-export const initOIDCAuth = async (client: Client, { redirectUrl, claims, responseMode }: { redirectUrl: string; claims?: string; responseMode?: string }): Promise<InitIDPAuthResult> => {
+export const initOIDCAuth = async (client: Client, { redirectUrl, scope, responseMode }: { redirectUrl: string; scope?: string; responseMode?: string }): Promise<InitIDPAuthResult> => {
 	const nonce = generators.nonce()
 	const state = generators.state()
 	const url = client.authorizationUrl({
 		redirect_uri: redirectUrl,
 		response_mode: responseMode,
-		scope: claims ?? 'openid email',
+		scope: scope ?? 'openid email',
 		nonce,
 		state,
 	})
@@ -25,7 +25,7 @@ export const initOIDCAuth = async (client: Client, { redirectUrl, claims, respon
 	}
 }
 
-export const handleOIDCResponse = async (client: Client, { sessionData, redirectUrl, ...otherData }: OIDCResponseData): Promise<IDPClaim> => {
+export const handleOIDCResponse = async (client: Client, { sessionData, redirectUrl, ...otherData }: OIDCResponseData): Promise<IDPResponse> => {
 	const params = 'parameters' in otherData ? otherData.parameters : client.callbackParams(otherData.url)
 	if (params.state && !sessionData?.state) {
 		throw new IDPValidationError(`state is present in parameters, but missing in session data`)
@@ -33,10 +33,10 @@ export const handleOIDCResponse = async (client: Client, { sessionData, redirect
 	try {
 		const result = await client.callback(redirectUrl, params, sessionData)
 		const claims = result.claims()
+		const { at_hash, c_hash, nonce, ...claimsWithoutHashes } = claims
 		return {
 			externalIdentifier: claims.sub,
-			email: claims.email,
-			name: claims.name,
+			...claimsWithoutHashes,
 		}
 	} catch (e: any) {
 		if (e instanceof errors.RPError) {

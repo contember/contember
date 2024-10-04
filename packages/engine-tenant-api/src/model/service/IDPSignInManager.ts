@@ -1,6 +1,6 @@
 import { ApiKeyManager } from './apiKey'
 import { IdentityProviderBySlugQuery, PersonByIdPQuery, PersonQuery, PersonRow } from '../queries'
-import { IDPClaim, IDPHandlerRegistry, IDPResponseError, IDPValidationError } from './idp'
+import { IDPResponse, IDPHandlerRegistry, IDPResponseError, IDPValidationError } from './idp'
 import { Response, ResponseError, ResponseOk } from '../utils/Response'
 import { InitSignInIdpErrorCode, InitSignInIdpResult, SignInIdpErrorCode } from '../../schema'
 import { DatabaseContext } from '../utils'
@@ -28,7 +28,7 @@ class IDPSignInManager {
 			}
 			const providerService = this.idpRegistry.getHandler(provider.type)
 			const validatedConfig = providerService.validateConfiguration(provider.configuration)
-			let claim: IDPClaim
+			let claim: IDPResponse
 			try {
 				claim = await providerService.processResponse(
 					validatedConfig,
@@ -54,7 +54,7 @@ class IDPSignInManager {
 			}
 
 			const sessionToken = await this.apiKeyManager.createSessionApiKey(db, personRow.identity_id, expiration)
-			return new ResponseOk({ person: personRow, token: sessionToken })
+			return new ResponseOk({ person: personRow, token: sessionToken, idpResponse: claim })
 		})
 	}
 
@@ -84,7 +84,7 @@ class IDPSignInManager {
 		}
 	}
 
-	private async resolvePerson(db: DatabaseContext, claim: IDPClaim, provider: IdentityProviderRow): Promise<PersonRow | null> {
+	private async resolvePerson(db: DatabaseContext, claim: IDPResponse, provider: IdentityProviderRow): Promise<PersonRow | null> {
 		const personByIdPQuery = new PersonByIdPQuery(provider.id, claim.externalIdentifier)
 		const personByIdp = await db.queryHandler.fetch(personByIdPQuery)
 		if (personByIdp) {
@@ -108,7 +108,7 @@ class IDPSignInManager {
 		return null
 	}
 
-	private async signUp(db: DatabaseContext, { email, name, externalIdentifier }: IDPClaim, provider: IdentityProviderRow): Promise<PersonRow> {
+	private async signUp(db: DatabaseContext, { email, name, externalIdentifier }: IDPResponse, provider: IdentityProviderRow): Promise<PersonRow> {
 		const roles = [TenantRole.PERSON]
 		const identityId = await db.commandBus.execute(new CreateIdentityCommand(roles))
 		const newPerson = await db.commandBus.execute(new CreatePersonCommand({
@@ -125,7 +125,7 @@ class IDPSignInManager {
 		}
 	}
 
-	private async saveIdpIdentifier(db: DatabaseContext, provider: IdentityProviderRow, claim: IDPClaim, person: PersonRow) {
+	private async saveIdpIdentifier(db: DatabaseContext, provider: IdentityProviderRow, claim: IDPResponse, person: PersonRow) {
 		await db.commandBus.execute(new CreatePersonIdentityProviderIdentifierCommand(provider.id, person.id, claim.externalIdentifier))
 	}
 }
@@ -136,6 +136,7 @@ namespace IDPSignInManager {
 	interface SignInIDPResult {
 		readonly person: PersonRow
 		readonly token: string
+		readonly idpResponse?: Record<string, unknown>
 	}
 
 	export type SignInIDPResponse = Response<SignInIDPResult, SignInIdpErrorCode>

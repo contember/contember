@@ -1,6 +1,6 @@
 import * as Typesafe from '@contember/typesafe'
 import { Client, Issuer } from 'openid-client'
-import { IdentityProviderHandler, IDPClaim, InitIDPAuthResult } from '../IdentityProviderHandler'
+import { IdentityProviderHandler, IDPResponse, InitIDPAuthResult } from '../IdentityProviderHandler'
 import { IDPValidationError } from '../IDPValidationError'
 import { InvalidIDPConfigurationError } from '../InvalidIDPConfigurationError'
 import { catchTypesafe } from './helpers'
@@ -80,12 +80,12 @@ export class FacebookProvider implements IdentityProviderHandler<FacebookConfigu
 		const initData = catchTypesafe(OIDCInitData, IDPValidationError)(data)
 		const client = await this.createOIDCClient(configuration)
 		return await initOIDCAuth(client, {
-			claims: configuration.claims,
+			scope: configuration.scope ?? configuration.claims,
 			...initData,
 		})
 	}
 
-	public async processResponse(configuration: FacebookConfiguration, data: unknown): Promise<IDPClaim> {
+	public async processResponse(configuration: FacebookConfiguration, data: unknown): Promise<IDPResponse> {
 		const responseData = catchTypesafe(FacebookResponseData, IDPValidationError)(data)
 
 		if (!('authResponse' in responseData)) {

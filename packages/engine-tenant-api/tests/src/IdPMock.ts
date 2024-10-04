@@ -1,4 +1,4 @@
-import { IdentityProviderHandler, IDPClaim, InitIDPAuthResult } from '../../src'
+import { IdentityProviderHandler, IDPResponse, InitIDPAuthResult } from '../../src'
 
 export class IdPMock implements IdentityProviderHandler<any> {
 	initAuth(configuration: any, data: unknown): Promise<InitIDPAuthResult> {
@@ -8,7 +8,7 @@ export class IdPMock implements IdentityProviderHandler<any> {
 		})
 	}
 
-	processResponse(configuration: any, responseData: any): Promise<IDPClaim> {
+	processResponse(configuration: any, responseData: any): Promise<IDPResponse> {
 		return Promise.resolve({
 			externalIdentifier: configuration.externalIdentifier,
 			email: configuration.email,

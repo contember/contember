@@ -1,139 +1,141 @@
 import * as React from 'react'
 import { ComponentType, ReactNode } from 'react'
-import { Component, Field, SugaredRelativeSingleField, useEntity, useField } from '@contember/interface'
-import { AudioFileDataExtractorProps, FileUrlDataExtractorProps, GenericFileMetadataExtractorProps, ImageFileDataExtractorProps, VideoFileDataExtractorProps } from '@contember/react-uploader'
+import { Component, Field, FieldView, StaticRender, SugaredRelativeSingleEntity, SugaredRelativeSingleField } from '@contember/interface'
+import {
+	AudioFileDataExtractorProps,
+	FileUrlDataExtractorProps,
+	GenericFileMetadataExtractorProps,
+	ImageFileDataExtractorProps,
+	UploaderBase,
+	VideoFileDataExtractorProps,
+} from '@contember/react-uploader'
 import { formatBytes, formatDate, formatDuration } from '../formatting'
 import { Button } from '../ui/button'
-import { FileIcon, InfoIcon, TrashIcon } from 'lucide-react'
+import { EditIcon, FileIcon, InfoIcon, TrashIcon } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
 import { formatImageResizeUrl } from '../images'
+
+export type BaseFileViewProps = {
+	baseField?: SugaredRelativeSingleEntity['field']
+	actions?: ReactNode
+	edit?: ReactNode
+	noDestroy?: boolean
+	DestroyAction?: ComponentType<{ children: ReactNode }>
+}
+
 
 export type UploadedImageViewProps =
 	& FileUrlDataExtractorProps
 	& GenericFileMetadataExtractorProps
 	& ImageFileDataExtractorProps
-	& {
-		DestroyAction?: ComponentType<{ children: ReactNode }>
-	}
+	& BaseFileViewProps
 
-export const UploadedImageView = Component<UploadedImageViewProps>(({ DestroyAction, ...props }) => {
-	const url = useField<string>(props.urlField).value
-	return (
-		<div className="flex items-center justify-center h-40 w-40 rounded-md group relative">
-			{url && <img src={formatImageResizeUrl(url)} className="max-w-full max-h-full" />}
-			<FileActions DestroyAction={DestroyAction}>
-				<ImageMetadata {...props} />
-			</FileActions>
-		</div>
-	)
-}, props => {
-	return <>
-		<Field field={props.urlField} />
-		<ImageMetadata {...props} />
-	</>
-})
+export const UploadedImageView = Component<UploadedImageViewProps>(({ DestroyAction, edit, actions, baseField,  ...props }) => (
+	<div className="flex items-center justify-center h-40 rounded-md group relative">
+		<UploaderBase baseField={baseField}>
+			<ImagePreview urlField={props.urlField} />
+		</UploaderBase>
+		<FileActions baseField={baseField} DestroyAction={DestroyAction} metadata={<ImageMetadata {...props} />} edit={edit} actions={actions} />
+	</div>
+))
 
-const ImageMetadata = Component(({ heightField, widthField, ...props }: UploadedImageViewProps) => {
-	return (
-		<Metadata {...props}>
-			<DimensionsMeta widthField={widthField} heightField={heightField} />
-		</Metadata>
-	)
-})
+const ImagePreview = Component((props: FileUrlDataExtractorProps) => (
+	<FieldView<string> field={props.urlField} render={({ value: url }) => (
+		!url ? null : <img src={formatImageResizeUrl(url, { width: 400 })} className="max-w-full max-h-full" />
+	)} />
+))
+
+const ImageMetadata = Component(({ heightField, widthField, ...props }: UploadedImageViewProps) => (
+	<Metadata {...props}>
+		<DimensionsMeta widthField={widthField} heightField={heightField} />
+	</Metadata>
+))
+
 
 
 export type UploadedAudioViewProps =
 	& FileUrlDataExtractorProps
 	& GenericFileMetadataExtractorProps
 	& AudioFileDataExtractorProps
-	& {
-		DestroyAction?: ComponentType<{ children: ReactNode }>
-	}
+	& BaseFileViewProps
 
-export const UploadedAudioView = Component<UploadedAudioViewProps>(({ DestroyAction, ...props }) => {
-	const url = useField<string>(props.urlField).value
-	return (
-		<div className="flex items-end justify-center h-40 max-w-80 rounded-md group">
-			{url && <audio src={url} controls className="max-w-full max-h-full" controlsList="nodownload noremoteplayback noplaybackrate" />}
-			<FileActions DestroyAction={DestroyAction}>
-				<AudioMetadata {...props} />
-			</FileActions>
-		</div>
-	)
-}, props => {
-	return <>
-		<Field field={props.urlField} />
-		<AudioMetadata {...props} />
-	</>
-})
+export const UploadedAudioView = Component<UploadedAudioViewProps>(({ DestroyAction, edit, actions, baseField, ...props }) => (
+	<div className="flex items-end justify-center h-40 max-w-80 rounded-md group">
+		<UploaderBase baseField={baseField}>
+			<AudioPreview urlField={props.urlField} />
+		</UploaderBase>
+		<FileActions baseField={baseField} DestroyAction={DestroyAction} metadata={<AudioMetadata {...props} />} edit={edit}
+						 actions={actions} />
+	</div>
+))
 
-const AudioMetadata = ({ durationField, ...props }: UploadedAudioViewProps) => {
-	return (
-		<Metadata {...props}>
-			<MetaField field={durationField} label="Duration:" format={formatDuration} />
-		</Metadata>
-	)
-}
+const AudioPreview = Component(({ urlField }: FileUrlDataExtractorProps) => (
+	<FieldView<string> field={urlField} render={({ value: url }) => (
+		!url ? null : <audio src={url} controls className="max-w-full max-h-full" controlsList="nodownload noremoteplayback noplaybackrate" />
+	)} />
+))
+
+const AudioMetadata = Component(({ durationField, ...props }: UploadedAudioViewProps) => (
+	<Metadata {...props}>
+		<MetaField field={durationField} label="Duration:" format={formatDuration} />
+	</Metadata>
+))
+
 
 
 export type UploadedVideoViewProps =
 	& FileUrlDataExtractorProps
 	& GenericFileMetadataExtractorProps
 	& VideoFileDataExtractorProps
-	& {
-		DestroyAction?: ComponentType<{ children: ReactNode }>
-	}
+	& BaseFileViewProps
 
-export const UploadedVideoView = Component<UploadedVideoViewProps>(({ DestroyAction, ...props }) => {
-	const url = useField<string>(props.urlField).value
-	return (
-		<div className="flex items-center justify-center h-40 max-w-60 rounded-md group">
-			{url && <video src={url} controls className="max-w-full max-h-full" controlsList="nodownload noremoteplayback noplaybackrate" />}
-			<FileActions DestroyAction={DestroyAction}>
-				<VideoMetadata {...props} />
-			</FileActions>
-		</div>
-	)
-}, props => {
-	return <>
-		<Field field={props.urlField} />
-		<VideoMetadata {...props} />
-	</>
-})
+export const UploadedVideoView = Component<UploadedVideoViewProps>(({ DestroyAction, edit, actions, baseField, ...props }) => (
+	<div className="flex items-center justify-center h-40 max-w-60 rounded-md group">
+		<UploaderBase baseField={baseField}>
+			<VideoPreview urlField={props.urlField} />
+		</UploaderBase>
+		<FileActions baseField={baseField} DestroyAction={DestroyAction} metadata={<VideoMetadata {...props} />} edit={edit} actions={actions} />
+	</div>
+))
 
-const VideoMetadata = Component(({ durationField, widthField, heightField, ...props }: UploadedVideoViewProps) => {
-	return (
-		<Metadata {...props}>
-			<MetaField field={durationField} label="Duration:" format={formatDuration} />
-			<DimensionsMeta widthField={widthField} heightField={heightField} />
-		</Metadata>
-	)
-})
+const VideoPreview = Component(({ urlField }: FileUrlDataExtractorProps) => (
+	<FieldView<string> field={urlField} render={({ value: url }) => (
+		!url ? null : <video src={url} controls className="max-w-full max-h-full" controlsList="nodownload noremoteplayback noplaybackrate" />
+	)} />
+))
+
+const VideoMetadata = Component(({ durationField, widthField, heightField, ...props }: UploadedVideoViewProps) => (
+	<Metadata {...props}>
+		<MetaField field={durationField} label="Duration:" format={formatDuration} />
+		<DimensionsMeta widthField={widthField} heightField={heightField} />
+	</Metadata>
+))
+
+
 
 export type UploadedAnyViewProps =
 	& FileUrlDataExtractorProps
 	& GenericFileMetadataExtractorProps
-	& {
-		DestroyAction?: ComponentType<{ children: ReactNode }>
-	}
+	& BaseFileViewProps
 
-export const UploadedAnyView = Component<UploadedAnyViewProps>(({ DestroyAction, ...props }) => {
-	const url = useField<string>(props.urlField).value
-	return (
-		<div className="flex h-40 w-40 rounded-md group">
-			<a href={url ?? '#'} target="_blank" rel="noreferrer" className="text-blue-600 hover:text-blue-700 underline overflow-hidden whitespace-nowrap overflow-ellipsis flex flex-col group/anchor flex-1 items-center justify-center">
-				<FileIcon className="h-16 w-16 text-gray-400 group-hover/anchor:text-gray-500 transition-all" />
-				{props.fileNameField ? <span><Field field={props.fileNameField} /></span> : null}
-			</a>
-			<FileActions DestroyAction={DestroyAction}>
-				<Metadata {...props} />
-			</FileActions>
-		</div>
-	)
-}, () => {
-	// todo
-	return null
-})
+export const UploadedAnyView = Component<UploadedAnyViewProps>(({ DestroyAction, edit, actions, baseField, ...props }) => (
+	<div className="flex h-40 w-40 rounded-md group">
+		<UploaderBase baseField={baseField}>
+			<AnyFilePreview {...props} />
+		</UploaderBase>
+		<FileActions baseField={baseField} DestroyAction={DestroyAction} metadata={<Metadata {...props} />} edit={edit} actions={actions} />
+	</div>
+))
+
+const AnyFilePreview = Component(({ urlField, fileNameField }: FileUrlDataExtractorProps & GenericFileMetadataExtractorProps) => <>
+	<FieldView<string> field={urlField} render={({ value: url }) => (
+		url ? <a href={url ?? '#'} target="_blank" rel="noreferrer"
+			className="text-blue-600 hover:text-blue-700 underline overflow-hidden whitespace-nowrap overflow-ellipsis flex flex-col group/anchor flex-1 items-center justify-center">
+			<FileIcon className="h-16 w-16 text-gray-400 group-hover/anchor:text-gray-500 transition-all" />
+			{fileNameField ? <span><Field field={fileNameField} /></span> : null}
+		</a> : null)} />
+	<StaticRender>{fileNameField ? <span><Field field={fileNameField} /></span> : null}</StaticRender>
+</>)
 
 
 type MetadataProps =
@@ -143,45 +145,33 @@ type MetadataProps =
 		children?: ReactNode
 	}
 
-const Metadata = Component(({ children, urlField, fileSizeField, fileNameField, lastModifiedField, fileTypeField }: MetadataProps) => {
-	return (
-		<div className="grid grid-cols-[6rem_1fr] gap-2">
-			<MetaField field={fileSizeField} label="Size:" format={formatBytes} />
-			<MetaField field={fileTypeField} label="Type:" />
-			<MetaField field={fileNameField} label="File name:" />
-			{children}
-			<MetaField field={lastModifiedField} label="Date:" format={formatDate} />
-			<MetaField field={urlField} label="URL:" format={url => (
-				<a href={url} target="_blank" rel="noreferrer" className="text-blue-600 underline overflow-hidden whitespace-nowrap overflow-ellipsis">
-					{url.replace(/^(.{15}).*(.{15})$/, '$1…$2')}
-				</a>
-			)} />
-		</div>
-	)
-})
+const Metadata = Component(({ children, urlField, fileSizeField, fileNameField, lastModifiedField, fileTypeField }: MetadataProps) => (
+	<div className="grid grid-cols-[6rem_1fr] gap-2">
+		<MetaField field={fileSizeField} label="Size:" format={formatBytes} />
+		<MetaField field={fileTypeField} label="Type:" />
+		<MetaField field={fileNameField} label="File name:" />
+		{children}
+		<MetaField field={lastModifiedField} label="Date:" format={formatDate} />
+		<MetaField field={urlField} label="URL:" format={url => (
+			<a href={url} target="_blank" rel="noreferrer"
+				   className="text-blue-600 underline overflow-hidden whitespace-nowrap overflow-ellipsis">
+				{url.replace(/^(.{15}).*(.{15})$/, '$1…$2')}
+			</a>
+		)} />
+	</div>
+))
 
 const DimensionsMeta = Component(({ widthField, heightField }: {
 	widthField?: SugaredRelativeSingleField['field']
 	heightField?: SugaredRelativeSingleField['field']
 }) => {
-	const entity = useEntity()
 	if (!widthField || !heightField) {
 		return null
 	}
-	const width = entity.getField<number>(widthField).value
-	const height = entity.getField<number>(heightField).value
-
-	return (
-		<>
-			<span className="font-semibold text-right">Dimensions:</span>
-			<span>{width} x {height} px</span>
-		</>
-	)
-}, ({ widthField, heightField }) => {
-	return <>
-		{widthField && <Field field={widthField} />}
-		{heightField && <Field field={heightField} />}
-	</>
+	return <FieldView<number, number> fields={[widthField, heightField]} render={(width, height) => <>
+		<span className="font-semibold text-right">Dimensions:</span>
+		<span>{width.value} x {height.value} px</span>
+	</>}/>
 })
 
 interface MetaFieldProps {
@@ -189,44 +179,49 @@ interface MetaFieldProps {
 	label: ReactNode
 	format?: (value: any) => ReactNode
 }
-const MetaField = Component<MetaFieldProps>(({ field, label, format = it => it }) => {
-	const entity = useEntity()
-	return field ? (
-		<>
-			<span className="font-semibold text-right">{label}</span>
-			<span>
-				{format(entity.getField(field).value)}
-			</span>
-		</>
-	) : null
-}, ({ field }) => {
-	return field ? <Field field={field} /> : null
-})
+const MetaField = Component<MetaFieldProps>(({ field, label, format = it => it }) => (
+	!field ? null : <FieldView<any> field={field} render={value => <>
+		<span className="font-semibold text-right">{label}</span>
+		<span>{format(value)}</span>
+	</>} />
+))
 
 
-const FileActions = ({ DestroyAction, children }: {
-	children: ReactNode
-	DestroyAction?: ComponentType<{ children: ReactNode }>
-}) => {
+const FileActions = Component(({ DestroyAction, metadata, actions, edit, baseField, noDestroy }: {
+	metadata?: ReactNode
+} & BaseFileViewProps) => {
 	return (
-		<div className="absolute -top-2 -right-1 p-0.5 bg-gray-200 border border-gray-300 rounded shadow flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-			<Popover>
+		<div className="absolute -top-2 -right-1 p-0.5 bg-gray-200 border border-gray-300 rounded shadow flex gap-2 opacity-0 transition-opacity group-hover:opacity-100">
+			{actions}
+			{edit && <Popover>
 				<PopoverTrigger asChild>
 					<Button variant={'ghost'} size={'sm'} className={'p-0.5 h-5 w-5'} onClick={e => e.stopPropagation()}>
-						<InfoIcon className="h-3 w-3" />
+						<EditIcon className="h-4 w-4" />
 					</Button>
 				</PopoverTrigger>
 				<PopoverContent>
-					<div className="text-sm">
-						{children}
-					</div>
+					{edit}
 				</PopoverContent>
-			</Popover>
-			{DestroyAction && <DestroyAction>
+			</Popover>}
+			<UploaderBase baseField={baseField}>
+				{metadata && <Popover>
+					<PopoverTrigger asChild>
+						<Button variant={'ghost'} size={'sm'} className={'p-0.5 h-5 w-5'} onClick={e => e.stopPropagation()}>
+							<InfoIcon className="h-4 w-4" />
+						</Button>
+					</PopoverTrigger>
+					<PopoverContent>
+						<div className="text-sm">
+							{metadata}
+						</div>
+					</PopoverContent>
+				</Popover>}
+			</UploaderBase>
+			{!noDestroy && DestroyAction ? <DestroyAction>
 				<Button variant={'ghost'} size={'sm'} className={'p-0.5 h-5 w-5 text-red-500'}>
-					<TrashIcon className="h-3 w-3" />
+					<TrashIcon className="h-4 w-4" />
 				</Button>
-			</DestroyAction>}
+			</DestroyAction> : null}
 		</div>
 	)
-}
+})

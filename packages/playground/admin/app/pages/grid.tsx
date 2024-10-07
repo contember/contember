@@ -18,6 +18,8 @@ import {
 	DataGridHasOneColumn,
 	DataGridHasOneFilter,
 	DataGridHasOneTooltip,
+	DataGridIsDefinedColumn,
+	DataGridIsDefinedFilter,
 	DataGridLoader,
 	DataGridNumberColumn,
 	DataGridNumberFilter,
@@ -156,6 +158,7 @@ const CustomGridColumn = Component(() => {
 
 		<DataGridBooleanColumn header="Locked" field="locked" />
 		<DataGridNumberColumn header="Views" field="views" />
+		<DataGridIsDefinedColumn header="Is published" field="publishedAt" filterName="publishedAt__defined" />
 
 		<DataGridActionColumn>
 			<GridDropdown />
@@ -168,6 +171,7 @@ const CustomGridFilters = Component(() => {
 		<>
 			<DataGridQueryFilter />
 			<DataGridEnumFilter field={'state'} options={GridArticleStateLabels} label="State" />
+			<DataGridIsDefinedFilter field={'publishedAt'} label="Is published" name="publishedAt__defined" />
 			<DataGridDateFilter
 				field={'publishedAt'}
 				label="Published at"

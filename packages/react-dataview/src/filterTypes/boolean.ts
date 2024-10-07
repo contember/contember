@@ -1,51 +1,40 @@
-import { QueryLanguage, SugaredRelativeSingleField, wrapFilterInHasOnes } from '@contember/react-binding'
 import { Input } from '@contember/client'
-import { DataViewFilterHandler } from '../types'
+import { createFieldFilterHandler } from './createFilterHandler'
 
 export type BooleanFilterArtifacts = {
 	includeTrue?: boolean
 	includeFalse?: boolean
 	nullCondition?: boolean
 }
-const id = Symbol('boolean')
 
-export const createBooleanFilter = (field: SugaredRelativeSingleField['field']): DataViewFilterHandler<BooleanFilterArtifacts> => {
-	const handler: DataViewFilterHandler<BooleanFilterArtifacts> = (filterArtifact, { environment }) => {
+export const createBooleanFilter = createFieldFilterHandler<BooleanFilterArtifacts>({
+	createCondition: filter => {
 		const inclusion: Input.Condition[] = []
 		const exclusion: Input.Condition[] = []
-		if (filterArtifact.includeTrue) {
+		if (filter.includeTrue) {
 			inclusion.push({ eq: true })
 		}
-		if (filterArtifact.includeFalse) {
+		if (filter.includeFalse) {
 			inclusion.push({ eq: false })
 		}
-		if (filterArtifact.nullCondition === true) {
+		if (filter.nullCondition === true) {
 			inclusion.push({ isNull: true })
 		}
-		if (filterArtifact.nullCondition === false) {
+		if (filter.nullCondition === false) {
 			exclusion.push({ isNull: false })
 		}
 
 		if (inclusion.length === 0 && exclusion.length === 0) {
 			return undefined
 		}
-
-		const desugared = QueryLanguage.desugarRelativeSingleField(field, environment)
-
-		return wrapFilterInHasOnes(desugared.hasOneRelationPath, {
-			[desugared.field]: {
-				and: [
-					{ or: inclusion },
-					...exclusion,
-				],
-			},
-		})
-	}
-
-	handler.identifier = { id, params: { field } }
-	handler.isEmpty = filterArtifact => {
-		return !filterArtifact.includeTrue && !filterArtifact.includeFalse && filterArtifact.nullCondition === undefined
-	}
-
-	return handler
-}
+		return {
+			and: [
+				{ or: inclusion },
+				...exclusion,
+			],
+		}
+	},
+	isEmpty: filter => {
+		return !filter.includeTrue && !filter.includeFalse && filter.nullCondition === undefined
+	},
+})

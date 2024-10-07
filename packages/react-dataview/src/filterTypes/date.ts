@@ -1,6 +1,5 @@
-import { QueryLanguage, SugaredRelativeSingleField, wrapFilterInHasOnes } from '@contember/react-binding'
 import { Input } from '@contember/client'
-import { DataViewFilterHandler } from '../types'
+import { createFieldFilterHandler } from './createFilterHandler'
 
 export type DateRangeFilterArtifacts = {
 	start?: string
@@ -27,12 +26,8 @@ const toLocalIsoString = (date: Date) => {
 		':' + pad(Math.abs(tzo) % 60)
 }
 
-const id = Symbol('date')
-
-export const createDateFilter = (field: SugaredRelativeSingleField['field']): DataViewFilterHandler<DateRangeFilterArtifacts> => {
-	const handler: DataViewFilterHandler<DateRangeFilterArtifacts> = (filter, { environment }) => {
-		const desugared = QueryLanguage.desugarRelativeSingleField(field, environment)
-
+export const createDateFilter = createFieldFilterHandler<DateRangeFilterArtifacts>({
+	createCondition: filter => {
 		const inclusion: Input.Condition[] = []
 		const exclusion: Input.Condition[] = []
 
@@ -53,18 +48,12 @@ export const createDateFilter = (field: SugaredRelativeSingleField['field']): Da
 			exclusion.push({ isNull: false })
 		}
 
-		return wrapFilterInHasOnes(desugared.hasOneRelationPath, {
-			[desugared.field]: {
-				and: [
-					{ or: inclusion },
-					...exclusion,
-				],
-			},
-		})
-	}
-
-	handler.identifier = { id, params: { field } }
-	handler.isEmpty = filter => !filter.start && !filter.end && filter.nullCondition === undefined
-
-	return handler
-}
+		return {
+			and: [
+				{ or: inclusion },
+				...exclusion,
+			],
+		}
+	},
+	isEmpty: filter => !filter.start && !filter.end && filter.nullCondition === undefined,
+})

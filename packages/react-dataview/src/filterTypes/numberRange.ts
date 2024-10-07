@@ -1,6 +1,5 @@
-import { Filter, QueryLanguage, SugaredRelativeSingleField, wrapFilterInHasOnes } from '@contember/react-binding'
-import { DataViewFilterHandler } from '../types'
 import { Input } from '@contember/client'
+import { createFieldFilterHandler } from './createFilterHandler'
 
 export type NumberRangeFilterArtifacts = {
 	from?: number
@@ -8,10 +7,8 @@ export type NumberRangeFilterArtifacts = {
 	nullCondition?: boolean
 }
 
-const id = Symbol('numberRange')
-
-export const createNumberRangeFilter = (field: SugaredRelativeSingleField['field']): DataViewFilterHandler<NumberRangeFilterArtifacts> => {
-	const handler: DataViewFilterHandler<NumberRangeFilterArtifacts> =  (filter, { environment }): Filter | undefined => {
+export const createNumberRangeFilter = createFieldFilterHandler<NumberRangeFilterArtifacts>({
+	createCondition: filter => {
 		const inclusion: Input.Condition[] = []
 		const exclusion: Input.Condition[] = []
 		if (filter.from !== undefined || filter.to !== undefined) {
@@ -28,20 +25,14 @@ export const createNumberRangeFilter = (field: SugaredRelativeSingleField['field
 			exclusion.push({ isNull: false })
 		}
 
-		const desugared = QueryLanguage.desugarRelativeSingleField(field, environment)
-		return wrapFilterInHasOnes(desugared.hasOneRelationPath, {
-			[desugared.field]: {
-				and: [
-					{ or: inclusion },
-					...exclusion,
-				],
-			},
-		})
-	}
-	handler.identifier = { id, params: { field } }
-	handler.isEmpty = filter => {
+		return {
+			and: [
+				{ or: inclusion },
+				...exclusion,
+			],
+		}
+	},
+	isEmpty: filter => {
 		return filter.from === undefined && filter.to === undefined && filter.nullCondition === undefined
-	}
-
-	return handler
-}
+	},
+})

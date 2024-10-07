@@ -1,3 +1,5 @@
+export * from './createFilterHandler'
+
 export * from './boolean'
 export * from './common'
 export * from './date'

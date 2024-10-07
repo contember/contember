@@ -1,6 +1,5 @@
-import { QueryLanguage, SugaredRelativeSingleField, wrapFilterInHasOnes } from '@contember/react-binding'
 import { Input } from '@contember/client'
-import { DataViewFilterHandler } from '../types'
+import { createFieldFilterHandler } from './createFilterHandler'
 
 export type EnumFilterArtifacts = {
 	values?: string[]
@@ -8,12 +7,9 @@ export type EnumFilterArtifacts = {
 	nullCondition?: boolean
 }
 
-const id = Symbol('enum')
-
-export const createEnumFilter = (field: SugaredRelativeSingleField['field']): DataViewFilterHandler<EnumFilterArtifacts> => {
-	const handler: DataViewFilterHandler<EnumFilterArtifacts> = (filter, { environment }) => {
+export const createEnumFilter = createFieldFilterHandler<EnumFilterArtifacts>({
+	createCondition: filter => {
 		const { values, notValues, nullCondition } = filter
-		const desugared = QueryLanguage.desugarRelativeSingleField(field, environment)
 
 		const inclusion: Input.Condition<string>[] = []
 		const exclusion: Input.Condition<string>[] = []
@@ -30,22 +26,14 @@ export const createEnumFilter = (field: SugaredRelativeSingleField['field']): Da
 		if (notValues?.length) {
 			exclusion.push({ notIn: notValues })
 		}
-
-
-		return wrapFilterInHasOnes(desugared.hasOneRelationPath, {
-			[desugared.field]: {
-				and: [
-					{ or: inclusion },
-					...exclusion,
-				],
-			},
-		})
-	}
-
-	handler.identifier = { id, params: { field } }
-	handler.isEmpty = filterArtifact => {
+		return {
+			and: [
+				{ or: inclusion },
+				...exclusion,
+			],
+		}
+	},
+	isEmpty: filterArtifact => {
 		return !filterArtifact.values?.length && filterArtifact.nullCondition === undefined && !filterArtifact.notValues?.length
-	}
-
-	return handler
-}
+	},
+})

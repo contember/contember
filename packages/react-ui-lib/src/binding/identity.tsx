@@ -4,13 +4,17 @@ import { dict } from '../dict'
 import { Button } from '../ui/button'
 import { Card, CardContent } from '../ui/card'
 import { CircleAlert } from 'lucide-react'
+import { useEffect } from 'react'
 
 export const IdentityLoader = ({ children }: {
 	children: React.ReactNode
 }) => {
 	return <>
-		<IdentityState state={['loading', 'none', 'cleared']}>
+		<IdentityState state={['loading']}>
 			<Loader />
+		</IdentityState>
+		<IdentityState state={['none', 'cleared']}>
+			<Redirect />
 		</IdentityState>
 		<IdentityState state={'failed'}>
 			<div className="flex justify-center items-center h-screen bg-gray-100">
@@ -35,4 +39,11 @@ export const IdentityLoader = ({ children }: {
 			{children}
 		</IdentityState>
 	</>
+}
+
+const Redirect = () => {
+	useEffect(() => {
+		window.location.href = '/'
+	})
+	return null
 }

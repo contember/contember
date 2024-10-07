@@ -184,7 +184,7 @@ export const ApiKeyList: (props: {
 export const AudioField: React_2.NamedExoticComponent<AudioFieldProps>;
 
 // @public (undocumented)
-export type AudioFieldProps = BaseFieldProps & AudioFileTypeProps;
+export type AudioFieldProps = BaseUploadFieldProps & AudioFileTypeProps;
 
 // @public (undocumented)
 export const AudioRepeaterField: React_2.NamedExoticComponent<AudioRepeaterFieldProps>;
@@ -219,13 +219,30 @@ export const baseEditorPlugins: {
 };
 
 // @public (undocumented)
-export type BaseFieldProps = Omit<FormContainerProps, 'children'> & UploaderBaseFieldProps & {
+export type BaseFileRepeaterFieldProps = Omit<FormContainerProps, 'children'> & RepeaterProps & UploaderBaseFieldProps & {
     dropzonePlaceholder?: ReactNode;
+    actions?: ReactNode;
+    edit?: ReactNode;
+    noDestroy?: boolean;
 };
 
 // @public (undocumented)
-export type BaseFileRepeaterFieldProps = Omit<FormContainerProps, 'children'> & RepeaterProps & UploaderBaseFieldProps & {
+export type BaseFileViewProps = {
+    baseField?: SugaredRelativeSingleEntity['field'];
+    actions?: ReactNode;
+    edit?: ReactNode;
+    noDestroy?: boolean;
+    DestroyAction?: ComponentType<{
+        children: ReactNode;
+    }>;
+};
+
+// @public (undocumented)
+export type BaseUploadFieldProps = Omit<FormContainerProps, 'children'> & UploaderBaseFieldProps & {
     dropzonePlaceholder?: ReactNode;
+    actions?: ReactNode;
+    edit?: ReactNode;
+    noDestroy?: boolean;
 };
 
 // @public (undocumented)
@@ -1356,7 +1373,7 @@ export const FeedbackTrigger: (props: {
 export const FileField: React_2.NamedExoticComponent<FileFieldProps>;
 
 // @public (undocumented)
-export type FileFieldProps = BaseFieldProps & AnyFileTypeProps;
+export type FileFieldProps = BaseUploadFieldProps & AnyFileTypeProps;
 
 // @public (undocumented)
 export const FileRepeaterField: React_2.NamedExoticComponent<FileRepeaterFieldProps>;
@@ -1463,7 +1480,7 @@ export const IdentityLoader: ({ children }: {
 export const ImageField: React_2.NamedExoticComponent<ImageFieldProps>;
 
 // @public (undocumented)
-export type ImageFieldProps = BaseFieldProps & ImageFileTypeProps;
+export type ImageFieldProps = BaseUploadFieldProps & ImageFileTypeProps;
 
 // @public (undocumented)
 export const ImageRepeaterField: React_2.NamedExoticComponent<ImageRepeaterFieldProps>;
@@ -2585,41 +2602,25 @@ export const UpdateProjectMemberFormFields: ({ projectSlug }: {
 export const UploadedAnyView: React_2.NamedExoticComponent<UploadedAnyViewProps>;
 
 // @public (undocumented)
-export type UploadedAnyViewProps = FileUrlDataExtractorProps & GenericFileMetadataExtractorProps & {
-    DestroyAction?: ComponentType<{
-        children: ReactNode;
-    }>;
-};
+export type UploadedAnyViewProps = FileUrlDataExtractorProps & GenericFileMetadataExtractorProps & BaseFileViewProps;
 
 // @public (undocumented)
 export const UploadedAudioView: React_2.NamedExoticComponent<UploadedAudioViewProps>;
 
 // @public (undocumented)
-export type UploadedAudioViewProps = FileUrlDataExtractorProps & GenericFileMetadataExtractorProps & AudioFileDataExtractorProps & {
-    DestroyAction?: ComponentType<{
-        children: ReactNode;
-    }>;
-};
+export type UploadedAudioViewProps = FileUrlDataExtractorProps & GenericFileMetadataExtractorProps & AudioFileDataExtractorProps & BaseFileViewProps;
 
 // @public (undocumented)
 export const UploadedImageView: React_2.NamedExoticComponent<UploadedImageViewProps>;
 
 // @public (undocumented)
-export type UploadedImageViewProps = FileUrlDataExtractorProps & GenericFileMetadataExtractorProps & ImageFileDataExtractorProps & {
-    DestroyAction?: ComponentType<{
-        children: ReactNode;
-    }>;
-};
+export type UploadedImageViewProps = FileUrlDataExtractorProps & GenericFileMetadataExtractorProps & ImageFileDataExtractorProps & BaseFileViewProps;
 
 // @public (undocumented)
 export const UploadedVideoView: React_2.NamedExoticComponent<UploadedVideoViewProps>;
 
 // @public (undocumented)
-export type UploadedVideoViewProps = FileUrlDataExtractorProps & GenericFileMetadataExtractorProps & VideoFileDataExtractorProps & {
-    DestroyAction?: ComponentType<{
-        children: ReactNode;
-    }>;
-};
+export type UploadedVideoViewProps = FileUrlDataExtractorProps & GenericFileMetadataExtractorProps & VideoFileDataExtractorProps & BaseFileViewProps;
 
 // @public (undocumented)
 export const UploaderDropzone: ({ inactiveOnUpload, dropzonePlaceholder }: {
@@ -2725,7 +2726,7 @@ export type VariableRendererProps = {
 export const VideoField: React_2.NamedExoticComponent<VideoFieldProps>;
 
 // @public (undocumented)
-export type VideoFieldProps = BaseFieldProps & VideoFileTypeProps;
+export type VideoFieldProps = BaseUploadFieldProps & VideoFileTypeProps;
 
 // @public (undocumented)
 export const VideoRepeaterField: React_2.NamedExoticComponent<VideoRepeaterFieldProps>;

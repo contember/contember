@@ -8,7 +8,6 @@ import {
 	FileType,
 	FileUrlDataExtractorProps,
 	ImageFileTypeProps,
-	MultiUploader,
 	Uploader,
 	UploaderBase,
 	UploaderBaseFieldProps,
@@ -21,108 +20,72 @@ import { ReactNode, useId, useMemo, useState } from 'react'
 import { FormContainer, FormContainerProps } from './container'
 import { Component, DisconnectEntityTrigger, EntityView, useEntity } from '@contember/interface'
 import { FormErrorContext, FormFieldIdContext } from '@contember/react-form'
-import {
-	UploadedAnyView,
-	UploadedAudioView,
-	UploadedImageView,
-	UploadedVideoView,
-	UploaderDropzone,
-	UploaderItemUI,
-	UploaderRepeaterDragOverlayUI,
-	UploaderRepeaterHandleUI,
-	UploaderRepeaterItemsWrapperUI,
-	UploaderRepeaterItemUI,
-} from '../upload'
+import { UploadedAnyView, UploadedAudioView, UploadedImageView, UploadedVideoView, UploaderDropzone, UploaderItemUI } from '../upload'
 import { UploaderProgress } from '../upload/upload-progress'
-import { Repeater, RepeaterProps, RepeaterRemoveItemTrigger } from '@contember/react-repeater'
-import { RepeaterSortable, RepeaterSortableDragOverlay, RepeaterSortableEachItem, RepeaterSortableItemActivator, RepeaterSortableItemNode } from '@contember/react-repeater-dnd-kit'
-import { UploaderRepeaterDropIndicator } from '../upload/repeater'
 
-export type BaseFieldProps =
+export type BaseUploadFieldProps =
 	& Omit<FormContainerProps, 'children'>
 	& UploaderBaseFieldProps
 	& {
 		dropzonePlaceholder?: ReactNode
+		actions?: ReactNode
+		edit?: ReactNode
+		noDestroy?: boolean
 	}
 
 
-
 export type ImageFieldProps =
-	& BaseFieldProps
+	& BaseUploadFieldProps
 	& ImageFileTypeProps
 
-export const ImageField = Component<ImageFieldProps>(props => {
-	return (
-		<UploadFieldInner {...props} fileType={createImageFileType(props)}>
-			<UploaderItemUI>
-				{props.children ?? (
-					<UploaderBase baseField={props.baseField}>
-						<UploadedImageView {...props} DestroyAction={DisconnectEntityTrigger} />
-					</UploaderBase>
-				)}
-			</UploaderItemUI>
-		</UploadFieldInner>
-	)
-})
+export const ImageField = Component<ImageFieldProps>(props => (
+	<UploadFieldInner {...props} fileType={createImageFileType(props)}>
+		{props.children ?? (
+			<UploadedImageView {...props} DestroyAction={DisconnectEntityTrigger} />
+		)}
+	</UploadFieldInner>
+))
 
 export type AudioFieldProps =
-	& BaseFieldProps
+	& BaseUploadFieldProps
 	& AudioFileTypeProps
 
-export const AudioField = Component<AudioFieldProps>(props => {
-	return (
-		<UploadFieldInner {...props} fileType={createAudioFileType(props)}>
-			<UploaderItemUI>
-				{props.children ?? (
-					<UploaderBase baseField={props.baseField}>
-						<UploadedAudioView {...props} DestroyAction={DisconnectEntityTrigger} />
-					</UploaderBase>
-				)}
-			</UploaderItemUI>
-		</UploadFieldInner>
-	)
-})
+export const AudioField = Component<AudioFieldProps>(props => (
+	<UploadFieldInner {...props} fileType={createAudioFileType(props)}>
+		{props.children ?? (
+			<UploadedAudioView {...props} DestroyAction={DisconnectEntityTrigger} />
+		)}
+	</UploadFieldInner>
+))
 
 
 export type VideoFieldProps =
-	& BaseFieldProps
+	& BaseUploadFieldProps
 	& VideoFileTypeProps
 
-export const VideoField = Component<VideoFieldProps>(props => {
-	return (
-		<UploadFieldInner {...props} fileType={createVideoFileType(props)}>
-			<UploaderItemUI>
-				{props.children ?? (
-					<UploaderBase baseField={props.baseField}>
-						<UploadedVideoView {...props} DestroyAction={DisconnectEntityTrigger} />
-					</UploaderBase>
-				)}
-			</UploaderItemUI>
-		</UploadFieldInner>
-	)
-})
+export const VideoField = Component<VideoFieldProps>(props => (
+	<UploadFieldInner {...props} fileType={createVideoFileType(props)}>
+		{props.children ?? (
+			<UploadedVideoView {...props} DestroyAction={DisconnectEntityTrigger} />
+		)}
+	</UploadFieldInner>
+))
 
 export type FileFieldProps =
-	& BaseFieldProps
+	& BaseUploadFieldProps
 	& AnyFileTypeProps
 
-export const FileField = Component<FileFieldProps>(props => {
-	return (
-		<UploadFieldInner {...props} fileType={createAnyFileType(props)}>
-			<UploaderItemUI>
-				{props.children ?? (
-					<UploaderBase baseField={props.baseField}>
-						<UploadedAnyView {...props} DestroyAction={DisconnectEntityTrigger} />
-					</UploaderBase>
-				)}
-			</UploaderItemUI>
-		</UploadFieldInner>
-	)
-})
+export const FileField = Component<FileFieldProps>(props => (
+	<UploadFieldInner {...props} fileType={createAnyFileType(props)}>
+		{props.children ?? (
+			<UploadedAnyView {...props} DestroyAction={DisconnectEntityTrigger} />
+		)}
+	</UploadFieldInner>
+))
 
 
 type UploadFieldInnerProps =
-	& BaseFieldProps
+	& BaseUploadFieldProps
 	& FileUrlDataExtractorProps
 	& {
 		fileType: FileType
@@ -157,14 +120,16 @@ const UploadFieldInner = Component((({ baseField, label, description, children, 
 								</UploaderHasFile>
 							</UploaderBase>
 
-							<EntityView render={entity => {
-								entity = baseField ? entity.getEntity({ field: baseField }) : entity
-								if (entity.getField(urlField).value === null) {
-									return <UploaderDropzone inactiveOnUpload dropzonePlaceholder={dropzonePlaceholder} />
-								} else {
-									return children
-								}
-							}} />
+							<UploaderItemUI>
+								<EntityView render={entity => {
+									entity = baseField ? entity.getEntity({ field: baseField }) : entity
+									if (entity.getField(urlField).value === null) {
+										return <UploaderDropzone inactiveOnUpload dropzonePlaceholder={dropzonePlaceholder} />
+									} else {
+										return children
+									}
+								}} />
+							</UploaderItemUI>
 						</Uploader>
 					</div>
 				</FormContainer>
@@ -177,150 +142,3 @@ const UploadFieldInner = Component((({ baseField, label, description, children, 
 		<Uploader baseField={baseField} fileType={fileType}></Uploader>
 	</>
 })
-
-export type BaseFileRepeaterFieldProps =
-	& Omit<FormContainerProps, 'children'>
-	& RepeaterProps
-	& UploaderBaseFieldProps
-	& {
-		dropzonePlaceholder?: ReactNode
-	}
-
-export type ImageRepeaterFieldProps =
-	& BaseFileRepeaterFieldProps
-	& ImageFileTypeProps
-
-export const ImageRepeaterField = Component<ImageRepeaterFieldProps>(props => <>
-	<FileRepeaterFieldInner {...props} fileType={createImageFileType(props)}>
-		{props.children ?? (
-			<UploaderBase baseField={props.baseField}>
-				<UploadedImageView {...props} DestroyAction={RepeaterRemoveItemTrigger} />
-			</UploaderBase>
-		)}
-	</FileRepeaterFieldInner>
-</>)
-
-
-export type AudioRepeaterFieldProps =
-	& BaseFileRepeaterFieldProps
-	& AudioFileTypeProps
-
-export const AudioRepeaterField = Component<AudioRepeaterFieldProps>(props => <>
-	<FileRepeaterFieldInner {...props} fileType={createAudioFileType(props)}>
-		{props.children ?? (
-			<UploaderBase baseField={props.baseField}>
-				<UploadedAudioView {...props} DestroyAction={RepeaterRemoveItemTrigger} />
-			</UploaderBase>
-		)}
-	</FileRepeaterFieldInner>
-</>)
-
-
-export type VideoRepeaterFieldProps =
-	& BaseFileRepeaterFieldProps
-	& VideoFileTypeProps
-
-export const VideoRepeaterField = Component<VideoRepeaterFieldProps>(props => <>
-	<FileRepeaterFieldInner {...props} fileType={createVideoFileType(props)}>
-		{props.children ?? (
-			<UploaderBase baseField={props.baseField}>
-				<UploadedVideoView {...props} DestroyAction={RepeaterRemoveItemTrigger} />
-			</UploaderBase>
-		)}
-	</FileRepeaterFieldInner>
-</>)
-
-
-export type FileRepeaterFieldProps =
-	& BaseFileRepeaterFieldProps
-	& AnyFileTypeProps
-
-export const FileRepeaterField = Component<FileRepeaterFieldProps>(props => <>
-	<FileRepeaterFieldInner {...props} fileType={createAnyFileType(props)}>
-		{props.children ?? (
-			<UploaderBase baseField={props.baseField}>
-				<UploadedAnyView {...props} DestroyAction={RepeaterRemoveItemTrigger} />
-			</UploaderBase>
-		)}
-	</FileRepeaterFieldInner>
-</>)
-
-
-type FileRepeaterFieldInnerProps =
-	& BaseFileRepeaterFieldProps
-	& {
-		fileType: FileType
-		children: ReactNode
-	}
-
-const FileRepeaterFieldInner = Component<FileRepeaterFieldInnerProps>(({ baseField, label, description, children, fileType, dropzonePlaceholder, ...props }) => {
-
-	const defaultUploader = useS3Client()
-	const [fileTypeStable] = useState(fileType)
-	const fileTypeWithUploader = useMemo(
-		() => ({ ...fileTypeStable, uploader: fileTypeStable?.uploader ?? defaultUploader }),
-		[defaultUploader, fileTypeStable],
-	)
-
-	// const entity = useEntity()
-	// const errors = type.extractors?.flatMap(it => it.getErrorsHolders?.({
-	// 	environment,
-	// 	entity,
-	// }) ?? []).flatMap(it => it.errors?.errors ?? [])
-
-	const id = useId()
-	return (
-		<FormFieldIdContext.Provider value={id}>
-			<FormErrorContext.Provider value={[]}>
-				<FormContainer description={description} label={label}>
-					<Repeater {...props} initialEntityCount={0}>
-						<UploaderRepeaterItemsWrapperUI>
-
-							<MultiUploader baseField={baseField} fileType={fileTypeWithUploader}>
-								<UploaderHasFile>
-									<UploaderProgress />
-								</UploaderHasFile>
-								<UploaderDropzone dropzonePlaceholder={dropzonePlaceholder} />
-							</MultiUploader>
-
-							<RepeaterSortable>
-
-
-								<RepeaterSortableEachItem>
-									<div className="flex">
-										<UploaderRepeaterDropIndicator position={'before'} />
-										<RepeaterSortableItemNode>
-											<UploaderRepeaterItemUI>
-												<RepeaterSortableItemActivator>
-													<UploaderRepeaterHandleUI />
-												</RepeaterSortableItemActivator>
-												{children}
-											</UploaderRepeaterItemUI>
-										</RepeaterSortableItemNode>
-										<UploaderRepeaterDropIndicator position={'after'} />
-									</div>
-
-
-								</RepeaterSortableEachItem>
-
-								<RepeaterSortableDragOverlay>
-									<UploaderRepeaterDragOverlayUI>
-										{children}
-									</UploaderRepeaterDragOverlayUI>
-								</RepeaterSortableDragOverlay>
-
-							</RepeaterSortable>
-						</UploaderRepeaterItemsWrapperUI>
-					</Repeater>
-				</FormContainer>
-			</FormErrorContext.Provider>
-		</FormFieldIdContext.Provider>
-	)
-}, ({ baseField, label, description, children, fileType, ...props }) => {
-	return <>
-		<Repeater {...props} initialEntityCount={0}>
-			<MultiUploader baseField={baseField} fileType={fileType} />
-			{children}
-		</Repeater>
-	</>
-}, 'FileRepeaterFieldInner')

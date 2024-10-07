@@ -21,7 +21,7 @@ import { Link, RoutingProvider, useCurrentRequest, useRedirect } from '@contembe
 import { Pages, useIdentity } from '@contember/interface'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@app/lib/ui/card'
 import { AnchorButton, Button } from '@app/lib/ui/button'
-import { MailIcon } from 'lucide-react'
+import { CircleAlert, MailIcon } from 'lucide-react'
 import { ToastContent, Toaster, useShowToast } from '@app/lib/toast'
 import { Loader } from '@app/lib/ui/loader'
 import { Overlay } from '@app/lib/ui/overlay'
@@ -127,14 +127,17 @@ const IndexPage = () => {
 			</IdentityState>
 			<IdentityState state="failed">
 				<Overlay>
-					<div className="bg-gray-100 flex flex-col gap-4 items-center justify-center p-16 rounded-lg shadow-lg border">
-						<p className="text-lg">
-							Failed to load identity.
-						</p>
-						<LogoutTrigger>
-							<Button className="w-full" variant="outline">Logout</Button>
-						</LogoutTrigger>
-					</div>
+					<Card className="w-72">
+						<CardContent className="flex flex-col items-center gap-2">
+							<CircleAlert className="h-12 w-12 text-destructive" />
+							<p className="text-center text-lg text-gray-600">
+								{dict.identityLoader.fail}
+							</p>
+							<LogoutTrigger>
+								<Button>Login again</Button>
+							</LogoutTrigger>
+						</CardContent>
+					</Card>
 				</Overlay>
 			</IdentityState>
 		</IdentityProvider>

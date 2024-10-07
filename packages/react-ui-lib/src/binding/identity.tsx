@@ -1,6 +1,9 @@
-import { IdentityState } from '@contember/react-identity'
+import { IdentityState, LogoutTrigger } from '@contember/react-identity'
 import { Loader } from '../ui/loader'
 import { dict } from '../dict'
+import { Button } from '../ui/button'
+import { Card, CardContent } from '../ui/card'
+import { CircleAlert } from 'lucide-react'
 
 export const IdentityLoader = ({ children }: {
 	children: React.ReactNode
@@ -10,7 +13,23 @@ export const IdentityLoader = ({ children }: {
 			<Loader />
 		</IdentityState>
 		<IdentityState state={'failed'}>
-			{dict.identityLoader.fail}
+			<div className="flex justify-center items-center h-screen bg-gray-100">
+				<Card className="w-72">
+					<CardContent className="flex flex-col items-center gap-2">
+						<CircleAlert className="h-12 w-12 text-destructive" />
+						<p className="text-center text-lg text-gray-600">
+							{dict.identityLoader.fail}
+						</p>
+						<div className="flex gap-2">
+							<Button onClick={() => window.location.reload()} variant="secondary">Try reload</Button>
+							<LogoutTrigger>
+								<Button>Login again</Button>
+							</LogoutTrigger>
+						</div>
+					</CardContent>
+				</Card>
+
+			</div>
 		</IdentityState>
 		<IdentityState state={'success'}>
 			{children}

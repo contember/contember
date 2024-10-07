@@ -1,4 +1,4 @@
-import { ContentClient, ContentQueryBuilder, GraphQlClient, GraphQlClientError, TreeFilter } from '@contember/client'
+import { ContentClient, ContentQueryBuilder, GraphQlClient, GraphQlClientError } from '@contember/client'
 import type { DataBindingTransactionResult, EntityId, Environment, MarkerTreeRoot, TreeRootId } from '@contember/binding-common'
 import {
 	assertNever,
@@ -25,7 +25,6 @@ import { QueryGenerator } from './QueryGenerator'
 import { StateIterator } from './state'
 import { StateInitializer } from './StateInitializer'
 import { TreeAugmenter } from './TreeAugmenter'
-import { TreeFilterGenerator } from './TreeFilterGenerator'
 import { TreeStore } from './TreeStore'
 import type { UpdateMetadata } from './UpdateMetadata'
 import { getCombinedSignal } from './utils'
@@ -97,10 +96,6 @@ export class DataBinding<Node> {
 		// TODO move this elsewhere
 		this.bindingOperations = Object.freeze<BindingOperations<Node>>({
 			...this.asyncBatchUpdatesOptions,
-			getTreeFilters: (): TreeFilter[] => {
-				const generator = new TreeFilterGenerator(this.treeStore)
-				return generator.generateTreeFilter()
-			},
 			batchDeferredUpdates: performUpdates => {
 				this.eventManager.syncTransaction(() => performUpdates(this.bindingOperations))
 			},

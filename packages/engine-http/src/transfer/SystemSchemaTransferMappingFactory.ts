@@ -5,10 +5,12 @@ import { Compiler, Operator, wrapIdentifier } from '@contember/database'
 import { ImportError } from './ImportExecutor'
 
 export class SystemSchemaTransferMappingFactory {
-	build(): TransferMapping {
+	build(args: {
+		excludeTables?: readonly string[]
+	} = {}): TransferMapping {
 		return {
 			tables: this.associateByName([
-				this.buildEventDataMapping(),
+				this.buildEventDataMapping(args),
 				this.buildStageTransactionDataMapping(),
 			]),
 		}
@@ -90,7 +92,9 @@ export class SystemSchemaTransferMappingFactory {
 		}
 	}
 
-	private buildEventDataMapping(): TransferTableMapping {
+	private buildEventDataMapping({ excludeTables = [] }: {
+		excludeTables?: readonly string[]
+	}): TransferTableMapping {
 		return {
 			name: 'event_data',
 
@@ -130,6 +134,12 @@ export class SystemSchemaTransferMappingFactory {
 						undefined,
 						expr => expr.compareColumns(['schema_migration', 'id'], Operator.eq, ['event_data', 'schema_id']),
 					)
+					.match(it => {
+						if (excludeTables.length === 0) {
+							return it
+						}
+						return it.where(expr => expr.not(it => it.in('table_name', excludeTables)))
+					})
 					.createQuery(namespaceContext)
 			},
 

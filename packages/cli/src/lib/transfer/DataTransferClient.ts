@@ -60,8 +60,9 @@ export class DataTransferClient {
 	}
 
 
-	dataExport = async ({ project: { name: project, token, endpoint: baseUrl }, gzip, includeSystem }: {
+	dataExport = async ({ project: { name: project, token, endpoint: baseUrl }, gzip, includeSystem, excludeTables }: {
 		project: RemoteProject
+		excludeTables?: string[]
 		includeSystem: boolean
 		gzip: boolean
 	}) => {
@@ -73,7 +74,7 @@ export class DataTransferClient {
 				'Content-type': 'application/json',
 			},
 			body: JSON.stringify({
-				projects: [{ slug: project, system: includeSystem }],
+				projects: [{ slug: project, system: includeSystem, excludeTables }],
 			}),
 		})
 	}

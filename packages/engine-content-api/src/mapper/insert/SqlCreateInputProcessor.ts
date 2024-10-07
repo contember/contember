@@ -2,37 +2,38 @@ import { Input, Model, Value } from '@contember/schema'
 import { Mapper } from '../Mapper'
 import { InsertBuilder } from './InsertBuilder'
 import { Providers, resolveColumnValue } from '@contember/schema-utils'
-import * as Context from '../../inputProcessing'
 import { CreateInputProcessor } from '../../inputProcessing'
 import { MutationResultList } from '../Result'
 import { hasManyProcessor, hasOneProcessor } from '../MutationProcessorHelper'
-import { OneHasOneInverseCreateInputProcessor } from '../relations/OneHasOneInverseCreateInputProcessor'
-import { OneHasOneOwningCreateInputProcessor } from '../relations/OneHasOneOwningCreateInputProcessor'
-import { ManyHasManyInputProcessor } from '../relations/ManyHasManyInputProcessor'
-import { ManyHasOneInputProcessor } from '../relations/ManyHasOneInputProcessor'
-import { OneHasManyInputProcessor } from '../relations/OneHasManyInputProcessor'
+import { OneHasOneInverseCreateInputProcessor } from './relations/OneHasOneInverseCreateInputProcessor'
+import { OneHasOneOwningCreateInputProcessor } from './relations/OneHasOneOwningCreateInputProcessor'
+import { OneHasManyCreateInputProcessor } from './relations/OneHasManyCreateInputProcessor'
+import { ManyHasOneCreateInputProcessor } from './relations/ManyHasOneCreateInputProcessor'
+import { ManyHasManyCreateInputProcessor } from './relations/ManyHasManyCreateInputProcessor'
 
-export class SqlCreateInputProcessor implements CreateInputProcessor<MutationResultList> {
+
+export type SqlCreateInputProcessorResult = MutationResultList | ((ctx: { primary: Input.PrimaryValue }) => Promise<MutationResultList>)
+export class SqlCreateInputProcessor implements CreateInputProcessor<SqlCreateInputProcessorResult> {
 
 	private oneHasOneInverseCreateInputProcessor:  OneHasOneInverseCreateInputProcessor
 	private oneHasOneOwningCreateInputProcessor:  OneHasOneOwningCreateInputProcessor
-	private oneHasManyCreateInputProcessor:  OneHasManyInputProcessor
-	private manyHasOneCreateInputProcessor:  ManyHasOneInputProcessor
-	private manyHasManyCreateInputProcessor:  ManyHasManyInputProcessor
+	private oneHasManyCreateInputProcessor:  OneHasManyCreateInputProcessor
+	private manyHasOneCreateInputProcessor: ManyHasOneCreateInputProcessor
+	private manyHasManyCreateInputProcessor: ManyHasManyCreateInputProcessor
 
 	constructor(
 		private readonly insertBuilder: InsertBuilder,
 		private readonly mapper: Mapper,
 		private readonly providers: Providers,
 	) {
-		this.oneHasOneInverseCreateInputProcessor = new OneHasOneInverseCreateInputProcessor(this.insertBuilder, this.mapper)
-		this.oneHasOneOwningCreateInputProcessor = new OneHasOneOwningCreateInputProcessor(this.insertBuilder, this.mapper)
-		this.oneHasManyCreateInputProcessor = new OneHasManyInputProcessor(this.mapper)
-		this.manyHasOneCreateInputProcessor = new ManyHasOneInputProcessor(this.mapper)
-		this.manyHasManyCreateInputProcessor = new ManyHasManyInputProcessor(this.mapper)
+		this.oneHasOneInverseCreateInputProcessor = new OneHasOneInverseCreateInputProcessor(this.mapper)
+		this.oneHasOneOwningCreateInputProcessor = new OneHasOneOwningCreateInputProcessor(this.mapper, this.insertBuilder)
+		this.oneHasManyCreateInputProcessor = new OneHasManyCreateInputProcessor(this.mapper)
+		this.manyHasOneCreateInputProcessor = new ManyHasOneCreateInputProcessor(this.mapper, this.insertBuilder)
+		this.manyHasManyCreateInputProcessor = new ManyHasManyCreateInputProcessor(this.mapper)
 	}
 
-	public async column(context: Model.ColumnContext & { input: Input.ColumnValue | undefined }): Promise<MutationResultList> {
+	public async column(context: Model.ColumnContext & { input: Input.ColumnValue | undefined }): Promise<SqlCreateInputProcessorResult> {
 		this.insertBuilder.addFieldValue(
 			context.column.name,
 			((): Value.GenericValueLike<Value.AtomicValue | undefined> => {
@@ -42,90 +43,36 @@ export class SqlCreateInputProcessor implements CreateInputProcessor<MutationRes
 		return []
 	}
 
-	manyHasManyInverse: CreateInputProcessor<MutationResultList>['manyHasManyInverse'] = {
-		connect: hasManyProcessor(async ctx => {
-			const primary = await this.insertBuilder.insert
-			if (!primary) {
-				return []
-			}
-			return this.manyHasManyCreateInputProcessor.connect(ctx, primary)
-		}),
-		create: hasManyProcessor(async ctx => {
-			const primary = await this.insertBuilder.insert
-			if (!primary) {
-				return []
-			}
-			return this.manyHasManyCreateInputProcessor.create(ctx, primary)
-		}),
-		connectOrCreate: hasManyProcessor(async ctx => {
-			const primary = await this.insertBuilder.insert
-			if (!primary) {
-				return []
-			}
-			return this.manyHasManyCreateInputProcessor.connectOrCreate(ctx, primary)
-		}),
+	manyHasManyInverse: CreateInputProcessor<SqlCreateInputProcessorResult>['manyHasManyInverse'] = {
+		connect: hasManyProcessor(ctx => this.manyHasManyCreateInputProcessor.connect(ctx)),
+		create: hasManyProcessor(ctx => this.manyHasManyCreateInputProcessor.create(ctx)),
+		connectOrCreate: hasManyProcessor(ctx => this.manyHasManyCreateInputProcessor.connectOrCreate(ctx)),
 	}
 
-	manyHasManyOwning: CreateInputProcessor<MutationResultList>['manyHasManyOwning'] = {
-		connect: hasManyProcessor(async ctx => {
-			const primary = await this.insertBuilder.insert
-			if (!primary) {
-				return []
-			}
-			return this.manyHasManyCreateInputProcessor.connect(ctx, primary)
-		}),
-		create: hasManyProcessor(async ctx => {
-			const primary = await this.insertBuilder.insert
-			if (!primary) {
-				return []
-			}
-			return this.manyHasManyCreateInputProcessor.create(ctx, primary)
-		}),
-		connectOrCreate: hasManyProcessor(async ctx => {
-			const primary = await this.insertBuilder.insert
-			if (!primary) {
-				return []
-			}
-			return this.manyHasManyCreateInputProcessor.connectOrCreate(ctx, primary)
-		}),
+	manyHasManyOwning: CreateInputProcessor<SqlCreateInputProcessorResult>['manyHasManyOwning'] = {
+		connect: hasManyProcessor(ctx => this.manyHasManyCreateInputProcessor.connect(ctx)),
+		create: hasManyProcessor(ctx => this.manyHasManyCreateInputProcessor.create(ctx)),
+		connectOrCreate: hasManyProcessor(ctx => this.manyHasManyCreateInputProcessor.connectOrCreate(ctx)),
 	}
 
-	manyHasOne: CreateInputProcessor<MutationResultList>['manyHasOne'] = {
+	manyHasOne: CreateInputProcessor<SqlCreateInputProcessorResult>['manyHasOne'] = {
 		nothing: async ctx => {
 			this.insertBuilder.addFieldValue(ctx.relation.name, null)
 			return []
 		},
-		connect: hasOneProcessor(ctx => this.manyHasOneCreateInputProcessor.connect(ctx, this.insertBuilder)),
-		create: hasOneProcessor(ctx => this.manyHasOneCreateInputProcessor.create(ctx, this.insertBuilder)),
-		connectOrCreate: hasOneProcessor(ctx => this.manyHasOneCreateInputProcessor.connectOrCreate(ctx, this.insertBuilder)),
+		connect: hasOneProcessor(ctx => this.manyHasOneCreateInputProcessor.connect(ctx)),
+		create: hasOneProcessor(ctx => this.manyHasOneCreateInputProcessor.create(ctx)),
+		connectOrCreate: hasOneProcessor(ctx => this.manyHasOneCreateInputProcessor.connectOrCreate(ctx)),
 	}
 
-	oneHasMany: CreateInputProcessor<MutationResultList>['oneHasMany'] = {
-		connect: hasManyProcessor(async ctx => {
-			const primary = await this.insertBuilder.insert
-			if (!primary) {
-				return []
-			}
-			return this.oneHasManyCreateInputProcessor.connect(ctx, primary)
-		}),
-		create: hasManyProcessor(async ctx => {
-			const primary = await this.insertBuilder.insert
-			if (!primary) {
-				return []
-			}
-			return this.oneHasManyCreateInputProcessor.create(ctx, primary)
-		}),
-		connectOrCreate: hasManyProcessor(async ctx => {
-			const primary = await this.insertBuilder.insert
-			if (!primary) {
-				return []
-			}
-			return this.oneHasManyCreateInputProcessor.connectOrCreate(ctx, primary)
-		}),
+	oneHasMany: CreateInputProcessor<SqlCreateInputProcessorResult>['oneHasMany'] = {
+		connect: hasManyProcessor(ctx => this.oneHasManyCreateInputProcessor.connect(ctx)),
+		create: hasManyProcessor(ctx => this.oneHasManyCreateInputProcessor.create(ctx)),
+		connectOrCreate: hasManyProcessor(ctx => this.oneHasManyCreateInputProcessor.connectOrCreate(ctx)),
 	}
 
 
-	oneHasOneOwning: CreateInputProcessor<MutationResultList>['oneHasOneOwning'] = {
+	oneHasOneOwning: CreateInputProcessor<SqlCreateInputProcessorResult>['oneHasOneOwning'] = {
 		nothing: async ctx => {
 			this.insertBuilder.addFieldValue(ctx.relation.name, null)
 			return []
@@ -135,7 +82,7 @@ export class SqlCreateInputProcessor implements CreateInputProcessor<MutationRes
 		connectOrCreate: hasOneProcessor(ctx => this.oneHasOneOwningCreateInputProcessor.connectOrCreate(ctx)),
 	}
 
-	oneHasOneInverse: CreateInputProcessor<MutationResultList>['oneHasOneInverse'] = {
+	oneHasOneInverse: CreateInputProcessor<SqlCreateInputProcessorResult>['oneHasOneInverse'] = {
 		connect: hasOneProcessor(ctx => this.oneHasOneInverseCreateInputProcessor.connect(ctx)),
 		create: hasOneProcessor(ctx => this.oneHasOneInverseCreateInputProcessor.create(ctx)),
 		connectOrCreate: hasOneProcessor(ctx => this.oneHasOneInverseCreateInputProcessor.connectOrCreate(ctx)),

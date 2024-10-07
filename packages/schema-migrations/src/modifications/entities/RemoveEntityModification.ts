@@ -18,7 +18,7 @@ import {
 	ModificationHandlerOptions,
 } from '../ModificationHandler'
 import { VERSION_ACL_PATCH, VERSION_REMOVE_REFERENCING_RELATIONS } from '../ModificationVersions'
-import { isRelation, PredicateDefinitionProcessor } from '@contember/schema-utils'
+import { acceptEveryFieldVisitor, isRelation, PredicateDefinitionProcessor } from '@contember/schema-utils'
 import { removeFieldModification } from '../fields'
 
 export class RemoveEntityModificationHandler implements ModificationHandler<RemoveEntityModificationData> {
@@ -40,6 +40,17 @@ export class RemoveEntityModificationHandler implements ModificationHandler<Remo
 				removeFieldHandler.createSql(builder, options)
 			})
 		}
+		acceptEveryFieldVisitor(this.schema.model, entity, {
+			visitManyHasManyOwning: ({ relation }) => {
+				builder.dropTable(relation.joiningTable.tableName)
+			},
+			visitManyHasManyInverse: () => {},
+			visitColumn: () => {},
+			visitOneHasOneInverse: () => {},
+			visitOneHasOneOwning: () => {},
+			visitManyHasOne: () => {},
+			visitOneHasMany: () => {},
+		})
 		builder.dropTable(entity.tableName)
 	}
 

@@ -119,3 +119,77 @@ testMigrations('remove a view', {
 	sql: SQL`
 	DROP VIEW "author";`,
 })
+
+
+namespace EntityWithManyHasManyOriginalSchema {
+
+	export class Book {
+		title = def.stringColumn()
+		tags = def.manyHasMany(Tag, 'books')
+	}
+
+	export class Tag {
+		name = def.stringColumn()
+		books = def.manyHasManyInverse(Book, 'tags')
+	}
+}
+testMigrations('remove junction table, when both entities are removed', {
+	original: createSchema(EntityWithManyHasManyOriginalSchema),
+	updated: {},
+	diff: [
+		{
+			modification: 'removeEntity',
+			entityName: 'Book',
+		},
+		{
+			modification: 'removeEntity',
+			entityName: 'Tag',
+		},
+	],
+	sql: SQL`DROP TABLE "book_tags";
+DROP TABLE "book"; 
+DROP TABLE "tag";`,
+})
+
+
+namespace EntityWithManyHasManyUpdatedSchema {
+
+	export class Tag {
+		name = def.stringColumn()
+	}
+}
+testMigrations('remove junction table, when owning entity is removed', {
+	original: createSchema(EntityWithManyHasManyOriginalSchema),
+	updated: createSchema(EntityWithManyHasManyUpdatedSchema),
+	diff: [
+		{
+			modification: 'removeEntity',
+			entityName: 'Book',
+		},
+
+	],
+	sql: SQL`DROP TABLE "book_tags";
+DROP TABLE "book";`,
+})
+
+
+namespace EntityWithManyHasMany2UpdatedSchema {
+
+	export class Book {
+		title = def.stringColumn()
+	}
+}
+testMigrations('remove junction table, when inverse entity is removed', {
+	original: createSchema(EntityWithManyHasManyOriginalSchema),
+	updated: createSchema(EntityWithManyHasMany2UpdatedSchema),
+	diff: [
+		{
+			modification: 'removeEntity',
+			entityName: 'Tag',
+		},
+
+	],
+	sql: SQL`
+DROP TABLE "book_tags";
+DROP TABLE "tag";`,
+})

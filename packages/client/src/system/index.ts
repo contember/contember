@@ -1,2 +1,2 @@
-export * from './events'
+export {}
 export * from './formatSystemApiRelativeUrl'

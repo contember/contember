@@ -1,8 +1,3 @@
-import { Input } from '@contember/schema'
-export namespace CrudQueryBuilder {
-	export type OrderDirection = `${Input.OrderDirection}`
-}
-
 export * from './content'
 export * from './system'
 export * from './tenant'

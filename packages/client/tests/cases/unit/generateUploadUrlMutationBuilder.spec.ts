@@ -1,5 +1,5 @@
 import { expect, it, describe } from 'vitest'
-import { GenerateUploadUrlMutationBuilder } from '../../../src/content'
+import { GenerateUploadUrlMutationBuilder } from '../../../src'
 
 describe('generate upload url mutation builder', () => {
 	it('correctly creates a simple mutation', () => {

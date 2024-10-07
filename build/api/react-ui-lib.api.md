@@ -880,6 +880,35 @@ export const DataGridHasOneTooltip: React_2.NamedExoticComponent<DataViewHasOneF
 export const DataGridInitialLoader: () => JSX_2.Element;
 
 // @public (undocumented)
+export const DataGridIsDefinedColumn: React_2.NamedExoticComponent<DataGridIsDefinedColumnProps>;
+
+// @public (undocumented)
+export type DataGridIsDefinedColumnProps = {
+    field: string;
+    header: ReactNode;
+    children?: ReactNode;
+    format?: (value: boolean) => ReactNode;
+    filter?: ReactNode;
+    filterName?: string;
+};
+
+// @public (undocumented)
+export const DataGridIsDefinedFilter: React_2.NamedExoticComponent<Omit<DataViewBooleanFilterProps, "children"> & {
+    label: ReactNode;
+}>;
+
+// @public (undocumented)
+export const DataGridIsDefinedFilterControls: () => JSX_2.Element;
+
+// @public (undocumented)
+export const DataGridIsDefinedFilterList: () => JSX_2.Element;
+
+// @public (undocumented)
+export const DataGridIsDefinedFilterSelect: ({ label }: {
+    label?: ReactNode;
+}) => JSX_2.Element;
+
+// @public (undocumented)
 export const DataGridLayoutSwitcher: () => JSX_2.Element;
 
 // @public (undocumented)

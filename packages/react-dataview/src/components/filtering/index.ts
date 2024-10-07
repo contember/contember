@@ -1,5 +1,6 @@
 export * from './relation'
 export * from './boolean'
+export * from './isDefined'
 export * from './enum'
 export * from './date'
 export * from './number'

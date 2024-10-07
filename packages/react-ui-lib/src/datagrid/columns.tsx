@@ -10,6 +10,7 @@ import {
 	DataViewEnumFilter,
 	DataViewHasManyFilter,
 	DataViewHasOneFilter,
+	DataViewIsDefinedFilter,
 	DataViewNumberFilter,
 	DataViewTextFilter,
 } from '@contember/react-dataview'
@@ -25,6 +26,8 @@ import {
 	DataGridRelationFilteredItemsList,
 	DataGridTextFilterInner,
 } from './filters'
+import { CheckIcon, XIcon } from 'lucide-react'
+import { DataGridIsDefinedFilterControls } from './filters/defined'
 
 export const DataGridActionColumn = Component<{ children: ReactNode }>(({ children }) => (
 	<DataGridColumnLeaf
@@ -172,6 +175,34 @@ export const DataGridEnumColumn = Component<DataGridEnumColumnProps>(({ field, h
 		</DataViewEnumFilter>}
 	/>
 </>))
+
+
+export type DataGridIsDefinedColumnProps = {
+	field: string
+	header: ReactNode
+	children?: ReactNode
+	format?: (value: boolean) => ReactNode
+	filter?: ReactNode
+	filterName?: string
+}
+
+export const DataGridIsDefinedColumn = Component<DataGridIsDefinedColumnProps>(({ field, header, children, format, filter, filterName }) => (
+	<DataGridColumn
+		header={header}
+		name={field}
+		children={children ?? <Field field={field} format={it => {
+			if (format) {
+				return format(it !== null)
+			}
+			return it !== null ? <CheckIcon size={16} /> : <XIcon size={16} />
+		}} />}
+		filterName={filterName ?? field}
+		filter={filter ?? <DataViewIsDefinedFilter field={field} name={filterName}>
+			<DataGridIsDefinedFilterControls />
+		</DataViewIsDefinedFilter>}
+	/>
+))
+
 
 export type DataGridUuidColumnProps = {
 	field: string

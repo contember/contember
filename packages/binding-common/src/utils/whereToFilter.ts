@@ -1,4 +1,4 @@
-import type { Input, Writable } from '@contember/schema'
+import type { Input, Writable } from '@contember/client'
 
 export const whereToFilter = (
 	by: Input.UniqueWhere,

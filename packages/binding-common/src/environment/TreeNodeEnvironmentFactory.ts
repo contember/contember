@@ -10,8 +10,8 @@ import {
 	SugaredUnconstrainedQualifiedSingleEntity,
 } from '../treeParameters'
 import { QueryLanguage } from '../queryLanguage'
-import { whereToFilter } from '@contember/client'
 import { TreeNodeUtils } from '../utils/TreeNodeUtils'
+import { whereToFilter } from '../utils/whereToFilter'
 
 export class TreeNodeEnvironmentFactory {
 

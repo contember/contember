@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react'
 import { Identity, IdentityMethods, IdentityStateValue } from '../types'
-import { useSessionToken } from '@contember/react-client'
+import { GraphQlClientError, useSessionToken } from '@contember/react-client'
 import { useLogoutInternal } from '../internal/hooks/useLogoutInternal'
 import { useMeQuery } from './queries'
 
@@ -36,9 +36,8 @@ export const useFetchIdentity = (): [{ state: IdentityStateValue; identity: Iden
 			})
 		} catch (e) {
 			console.error(e)
-			if (typeof e === 'object' && e !== null && 'status' in e && (e as { status?: unknown }).status === 401) {
+			if (e instanceof GraphQlClientError && e.response?.status === 401) {
 				logout({ noRedirect: true })
-				setIdentityState({ state: 'cleared', identity: undefined })
 			} else {
 				setIdentityState({ state: 'failed', identity: undefined })
 			}

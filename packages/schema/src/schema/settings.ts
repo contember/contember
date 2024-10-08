@@ -5,6 +5,7 @@ export namespace Settings {
 
 	export type ContentSettings = {
 		readonly shortDateResponse?: boolean
+		readonly fullDateTimeResponse?: boolean
 		readonly useExistsInHasManyFilter?: boolean
 	}
 

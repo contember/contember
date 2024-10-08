@@ -113,8 +113,12 @@ export function dateColumn(): ColumnDefinition {
 	return column(Model.ColumnType.Date)
 }
 
-export function dateTimeColumn(): ColumnDefinition {
-	return column(Model.ColumnType.DateTime)
+export function dateTimeColumn(args?: { precision?: number }): ColumnDefinition {
+	const col = column(Model.ColumnType.DateTime)
+	if (!args?.precision) {
+		return col
+	}
+	return col.columnType(`${resolveDefaultColumnType(Model.ColumnType.DateTime)}(${args.precision})`)
 }
 
 export function jsonColumn(): ColumnDefinition {

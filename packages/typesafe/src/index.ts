@@ -381,8 +381,8 @@ export const preprocess = <Input extends Json>(inner: Type<Input>, transform: (i
 	return inner(transform(input), path)
 }
 
-export const transform = <Input extends Json, Result extends Json>(inner: Type<Input>, transform: (value: Input, input: unknown) => Result) => (input: unknown, path: PropertyKey[] = []): Result => {
-	return transform(inner(input, path), input)
+export const transform = <Input extends Json, Result extends Json>(inner: Type<Input>, transform: (value: Input, input: unknown, path: PropertyKey[]) => Result) => (input: unknown, path: PropertyKey[] = []): Result => {
+	return transform(inner(input, path), input, path)
 }
 
 export const coalesce = <T extends Json, F extends Json>(inner: Type<T>, fallback: F): Type<T | F> => {

@@ -9,6 +9,7 @@ export const settingsSchema = Typesafe.partial({
 	}),
 	content: Typesafe.partial({
 		useExistsInHasManyFilter: Typesafe.boolean,
+		fullDateTimeResponse: Typesafe.boolean,
 		shortDateResponse: Typesafe.boolean,
 	}),
 })

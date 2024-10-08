@@ -24,6 +24,9 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 		if (column.type === Model.ColumnType.Date && this.settings.shortDateResponse) {
 			selectFrom += '::text'
 		}
+		if (column.type === Model.ColumnType.DateTime && this.settings.fullDateTimeResponse) {
+			selectFrom += '::text'
+		}
 
 		this.executionContext.addColumn({
 			query: qb => qb.select(new Literal(selectFrom), columnAlias),

@@ -1,6 +1,2 @@
 export * from './dataAttribute'
-export * from './getElementDimensions'
-export * from './getSizeFromResizeObserverEntry'
-export * from './shouldCancelStart'
-export * from './stateDataAttributes'
 export * from './svgSizeProps'

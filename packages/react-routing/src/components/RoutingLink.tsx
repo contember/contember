@@ -1,4 +1,4 @@
-import { dataAttribute, isSpecialLinkClick } from '@contember/utilities'
+import { dataAttribute } from '@contember/utilities'
 import { memo, MouseEvent as ReactMouseEvent, ReactElement, useCallback } from 'react'
 import { RequestParameters, RoutingLinkTarget, RoutingParameterResolver } from '../types'
 import { useRoutingLink } from '../hooks'
@@ -10,6 +10,8 @@ export interface RoutingLinkProps {
 	parametersResolver?: RoutingParameterResolver
 	parameters?: RequestParameters
 }
+
+const isSpecialLinkClick = (e: MouseEvent): boolean => e.metaKey || e.altKey || e.ctrlKey || e.shiftKey
 /**
  * Low level link. Usually, you should use {@link Link}
  *

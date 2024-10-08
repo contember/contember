@@ -1,0 +1,20 @@
+{
+	"formatVersion": 5,
+	"modifications": [
+		{
+			"modification": "updateSettings",
+			"op": "unset",
+			"key": "useExistsInHasManyFilter"
+		},
+		{
+			"modification": "updateSettings",
+			"op": "set",
+			"key": "content",
+			"value": {
+				"useExistsInHasManyFilter": true,
+				"fullDateTimeResponse": true,
+				"shortDateResponse": true
+			}
+		}
+	]
+}

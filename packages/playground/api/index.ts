@@ -14,5 +14,5 @@ export default createSchema(model, schema => ({
 			},
 		},
 	},
-	settings: settingsPresets['v1.3'],
+	settings: settingsPresets['v2.0'],
 }))

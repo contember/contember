@@ -1616,8 +1616,9 @@ className?: string;
 }, "ref"> & RefAttributes<HTMLDivElement>>;
 
 // @public (undocumented)
-export const InviteFormFields: ({ projectSlug }: {
+export const InviteFormFields: ({ projectSlug, roles }: {
     projectSlug: string;
+    roles?: RolesConfig;
 }) => JSX_2.Element;
 
 // @public (undocumented)
@@ -1686,7 +1687,7 @@ export interface MemberDeleteProps {
 }
 
 // @public (undocumented)
-export const MemberList: ({ filter, labels, tableColumns, controller, tableHeaders }: MemberListProps) => JSX_2.Element;
+export const MemberList: ({ filter, labels, tableColumns, controller, tableHeaders, roles }: MemberListProps) => JSX_2.Element;
 
 // @public (undocumented)
 export interface MemberListController {
@@ -1708,6 +1709,8 @@ export interface MemberListProps {
         deleted: string;
         deleteFailed: string;
     };
+    // (undocumented)
+    roles?: RolesConfig;
     // (undocumented)
     tableColumns: (it: ProjectMembersQueryResult[number]) => ReactNode;
     // (undocumented)
@@ -1900,6 +1903,7 @@ export const PersonList: (props: {
     controller?: {
         current?: MemberListController;
     };
+    roles?: RolesConfig;
 }) => JSX_2.Element;
 
 // @public (undocumented)
@@ -2623,8 +2627,9 @@ export const uic: <El extends React_2.ElementType, Variants extends ConfigSchema
 export const uiconfig: <T extends ConfigSchema | undefined>(config: Config<T, ComponentType<{}>>) => Config<T, React_2.ComponentType<{}>>;
 
 // @public (undocumented)
-export const UpdateProjectMemberFormFields: ({ projectSlug }: {
+export const UpdateProjectMemberFormFields: ({ projectSlug, roles }: {
     projectSlug: string;
+    roles?: RolesConfig;
 }) => JSX_2.Element;
 
 // @public (undocumented)

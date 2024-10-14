@@ -42,7 +42,6 @@ import type { SugaredRelativeSingleEntity } from '@contember/binding';
 import type { SugaredRelativeSingleField } from '@contember/binding';
 import type { SugaredUnconstrainedQualifiedEntityList } from '@contember/binding';
 import type { SugaredUnconstrainedQualifiedSingleEntity } from '@contember/binding';
-import type { TreeFilter } from '@contember/client';
 import type { TreeRootAccessor } from '@contember/binding';
 import { TreeRootId } from '@contember/binding';
 
@@ -804,9 +803,6 @@ export const useGetEntityListSubTree: () => ((parametersOrAlias: Alias | Sugared
 
 // @public (undocumented)
 export const useGetEntitySubTree: () => ((parametersOrAlias: Alias | SugaredQualifiedSingleEntity | SugaredUnconstrainedQualifiedSingleEntity, ...treeId: [TreeRootId | undefined] | []) => EntityAccessor);
-
-// @public (undocumented)
-export const useGetTreeFilters: () => (() => TreeFilter[]);
 
 // @public (undocumented)
 export const useHasEntity: () => boolean;

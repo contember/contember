@@ -4,21 +4,6 @@
 
 ```ts
 
-import { ReactNode } from 'react';
-
-// @public (undocumented)
-export type AsProp<C extends React.ElementType> = {
-    as?: C;
-};
-
-// @public (undocumented)
-export function assert<In, Out extends In>(that: string | undefined, value: In, predicate: Predicate<In, Out>): asserts value is Out;
-
-// @public (undocumented)
-export class AssertionError extends Error {
-    constructor(value: unknown, that?: string);
-}
-
 // @public (undocumented)
 export function assertNever(_: never): never;
 
@@ -59,37 +44,8 @@ export class BijectiveIndexedMap<K, V> implements Map<K, V> {
 // @public (undocumented)
 export function dataAttribute(value: unknown): string | true | undefined;
 
-// @public (undocumented)
-export const dateToStringWithoutTimezone: (date: Date, { includeTime }?: {
-    includeTime?: boolean;
-}) => string;
-
 // @internal
 export function deprecate(removal: SemverString, condition: boolean, deprecated: string, replacement: string | null): void;
-
-// @public
-export type ExtendableProps<ExtendedProps = {}, OverrideProps = {}> = OverrideProps & Omit<ExtendedProps, keyof OverrideProps>;
-
-// @public
-export function getElementDimensions(element: HTMLElement): Promise<DOMRectReadOnly>;
-
-// @public
-export function getElementDimensionsCallback(element: HTMLElement, callback: (dimensions: DOMRectReadOnly) => void): void;
-
-// @public (undocumented)
-export function getSizeFromResizeObserverEntryFactory(box: ResizeObserverOptions['box']): (entry: ResizeObserverEntry) => {
-    height: number;
-    width: number;
-};
-
-// @public
-export type InheritableElementProps<C extends React.ElementType, Props = {}> = ExtendableProps<PropsOf<C>, Props>;
-
-// @public (undocumented)
-export function isNonNegativeNumber(value: unknown): value is number;
-
-// @public (undocumented)
-export const isSpecialLinkClick: (e: MouseEvent) => boolean;
 
 // @public (undocumented)
 export class LRUCache<Key, Value> {
@@ -100,71 +56,8 @@ export class LRUCache<Key, Value> {
     set(key: Key, value: Value): void;
 }
 
-// Warning: (ae-forgotten-export) The symbol "NarrowRaw" needs to be exported by the entry point index.d.ts
-//
-// @public (undocumented)
-export type Narrow<A extends any> = A extends [] ? A : NarrowRaw<A>;
-
-// @public
-export type Narrowable = string | number | bigint | boolean;
-
-// @public
-export type NonOptional<T> = {
-    [P in keyof Required<T>]: Pick<T, P> extends Required<Pick<T, P>> ? T[P] : (T[P] | undefined);
-};
-
-// @public (undocumented)
-export function omit<T extends Object, K extends keyof T>(object: T, properties: ReadonlyArray<K>, strict?: boolean): Omit<T, K>;
-
-// @public (undocumented)
-export type PartialExcept<T, K extends keyof T> = Pick<T, K> & Partial<Omit<T, K>>;
-
-// @public (undocumented)
-export type PartialSome<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
-
-// @public (undocumented)
-export function pick<T extends Object, K extends keyof T>(object: T, properties: ReadonlyArray<K>): Pick<T, K>;
-
-// @public
-export type PolymorphicComponent<T extends React.ElementType, P = {}> = (<C extends React.ElementType = T>(props: PolymorphicComponentPropsWithRef<C, P>) => ReactNode) & {
-    displayName?: string | undefined;
-};
-
-// @public
-export type PolymorphicComponentProps<C extends React.ElementType, Props = {}> = InheritableElementProps<C, Props & AsProp<C>>;
-
-// @public
-export type PolymorphicComponentPropsWithRef<C extends React.ElementType, Props = {}> = PolymorphicComponentProps<C, Props> & {
-    ref?: PolymorphicRef<C>;
-};
-
-// @public
-export type PolymorphicRef<C extends React.ElementType> = React.ComponentPropsWithRef<C>['ref'];
-
-// @public (undocumented)
-export type Predicate<T, U extends T> = (value: T) => value is U;
-
-// @public (undocumented)
-export type PropsOf<C extends keyof JSX.IntrinsicElements | React.JSXElementConstructor<any>> = JSX.LibraryManagedAttributes<C, React.ComponentPropsWithoutRef<C>>;
-
-// @public
-export function px<V extends number | false | null | undefined>(value?: V): string;
-
-// @public
-export function range(start: number, end: number, step?: number): number[];
-
 // @public (undocumented)
 export type SemverString = `${number}.${number}.${number}`;
-
-// @public (undocumented)
-export const shouldCancelStart: (event: {
-    target?: unknown;
-}) => boolean;
-
-// @public (undocumented)
-export function stateDataAttributes(state: Record<string, unknown>): {
-    [k: string]: string | true | undefined;
-};
 
 // @public (undocumented)
 export interface SvgSizeProps {
@@ -178,9 +71,6 @@ export interface SvgSizeProps {
 
 // @public (undocumented)
 export function svgSizeProps(width: number, height?: number, crop?: number): SvgSizeProps;
-
-// @public (undocumented)
-export function toKebabCase(value: string): string;
 
 // @public (undocumented)
 export class WeakIdCache<K extends object> {

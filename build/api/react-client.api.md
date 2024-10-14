@@ -6,7 +6,8 @@
 
 import { Context } from 'react';
 import { GraphQlClient } from '@contember/client';
-import type { GraphQlClientFailedRequestMetadata } from '@contember/client';
+import { GraphQlClient as GraphQlClient_2 } from '@contember/graphql-client';
+import type { GraphQlClientError } from '@contember/client';
 import type { GraphQlClientRequestOptions } from '@contember/client';
 import type { GraphQlClientVariables } from '@contember/client';
 import { NamedExoticComponent } from 'react';
@@ -24,7 +25,7 @@ export type ApiRequestAction<SuccessData> = {
     data: SuccessData;
 } | {
     type: 'resolveWithError';
-    error: GraphQlClientFailedRequestMetadata;
+    error: GraphQlClientError;
 };
 
 // @public (undocumented)
@@ -51,7 +52,7 @@ export type ApiRequestState<SuccessData> = {
     isLoading: false;
     isFinished: true;
     readyState: 'networkError';
-    data: GraphQlClientFailedRequestMetadata;
+    data: GraphQlClientError;
 };
 
 // @public (undocumented)
@@ -151,13 +152,13 @@ export const useStageSlug: () => string | undefined;
 export const useSystemApiRequest: <SuccessData>() => UseApiRequestResult<SuccessData>;
 
 // @public (undocumented)
-export const useSystemGraphQlClient: (projectSlug: string) => GraphQlClient;
+export const useSystemGraphQlClient: (projectSlug: string) => GraphQlClient_2;
 
 // @public (undocumented)
 export const useTenantApiRequest: <SuccessData>() => UseApiRequestResult<SuccessData>;
 
 // @public (undocumented)
-export const useTenantGraphQlClient: () => GraphQlClient;
+export const useTenantGraphQlClient: () => GraphQlClient_2;
 
 
 export * from "@contember/client";

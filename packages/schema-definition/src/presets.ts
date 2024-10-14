@@ -18,7 +18,19 @@ const v1_4preset: Settings.Schema = {
 	},
 }
 
+const v2_0preset: Settings.Schema = {
+	tenant: {
+		inviteExpirationMinutes: 60 * 24 * 7, // 7 days
+	},
+	content: {
+		shortDateResponse: true,
+		fullDateTimeResponse: true,
+		useExistsInHasManyFilter: true,
+	},
+}
+
 export const settingsPresets = {
 	'v1.3': v1_3preset,
 	'v1.4': v1_4preset,
+	'v2.0': v2_0preset,
 }

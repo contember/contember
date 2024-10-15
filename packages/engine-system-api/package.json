@@ -33,12 +33,12 @@
     "@contember/schema": "workspace:*",
     "@contember/schema-migrations": "workspace:*",
     "@contember/schema-utils": "workspace:*",
-    "@graphql-tools/utils": "^10.5.4",
+    "@graphql-tools/utils": "^10.5.5",
     "graphql-tag": "^2.12.6"
   },
   "devDependencies": {
     "@contember/schema-definition": "workspace:*",
-    "@types/node": "^20.16.5",
+    "@types/node": "^20.16.11",
     "graphql": "^16.9.0",
     "pg": "^8.12.0"
   },

@@ -34,7 +34,7 @@
   },
   "devDependencies": {
     "@types/koa-compress": "^4.0.6",
-    "@types/node": "^20.16.5"
+    "@types/node": "^20.16.11"
   },
   "type": "module"
 }

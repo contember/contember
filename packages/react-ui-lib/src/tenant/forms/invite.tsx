@@ -2,12 +2,14 @@ import { InviteFormErrorCode, useInviteForm } from '@contember/react-identity'
 import { Button } from '../../ui/button'
 import { Loader } from '../../ui/loader'
 import { TenantFormError, TenantFormField, TenantFormLabel } from './common'
-import { MembershipsControl, useIntrospectionRolesConfig } from './memberships-control'
+import { MembershipsControl, RolesConfig, useIntrospectionRolesConfig } from './memberships-control'
 import { dict } from '../../dict'
 
 
-export const InviteFormFields = ({ projectSlug }: {projectSlug: string}) => {
+export const InviteFormFields = ({ projectSlug, roles }: {projectSlug: string; roles?: RolesConfig}) => {
 	const form = useInviteForm()
+	// eslint-disable-next-line react-hooks/rules-of-hooks
+	const rolesResolved = roles ?? useIntrospectionRolesConfig(projectSlug)
 	return (
 		<div className="relative flex flex-col gap-2">
 			{form.state === 'submitting' ? <Loader position="absolute" /> : null}
@@ -35,7 +37,7 @@ export const InviteFormFields = ({ projectSlug }: {projectSlug: string}) => {
 			<MembershipsControl
 				memberships={form.values.memberships}
 				setMemberships={it => form.setValue('memberships', it)}
-				roles={useIntrospectionRolesConfig(projectSlug)}
+				roles={rolesResolved}
 			/>
 
 			<Button type="submit" className="w-full" disabled={form.state === 'submitting'}>

@@ -12,7 +12,7 @@ import { ToastContent, useShowToast } from '../../toast'
 import { dict } from '../../dict'
 import { MemberDeleteDialog } from './member-delete-dialog'
 import { Dialog, DialogContent, DialogTrigger } from '../../ui/dialog'
-import { UpdateProjectMemberFormFields } from '../forms'
+import { RolesConfig, UpdateProjectMemberFormFields } from '../forms'
 
 const perPage = 20
 
@@ -26,13 +26,14 @@ export interface MemberListProps {
 	tableColumns: (it: ProjectMembersQueryResult[number]) => ReactNode
 	tableHeaders: string[]
 	controller?: { current?: MemberListController }
+	roles?: RolesConfig
 }
 
 export interface MemberListController {
 	refresh: () => void
 }
 
-export const MemberList = ({ filter, labels, tableColumns, controller, tableHeaders }: MemberListProps) => {
+export const MemberList = ({ filter, labels, tableColumns, controller, tableHeaders, roles }: MemberListProps) => {
 	const projectSlug = useProjectSlug()!
 	const [page, setPage] = useState(0)
 
@@ -97,7 +98,7 @@ export const MemberList = ({ filter, labels, tableColumns, controller, tableHead
 										onError={onDeleteError}
 										title={labels.deleteConfirmation}
 									/>
-									<EditMembershipDialog projectSlug={projectSlug} identityId={it.identity.id} onSuccess={refresh} />
+									<EditMembershipDialog projectSlug={projectSlug} identityId={it.identity.id} onSuccess={refresh} roles={roles} />
 
 								</TableCell>
 							</TableRow>
@@ -118,7 +119,7 @@ export const MemberList = ({ filter, labels, tableColumns, controller, tableHead
 	}
 }
 
-const EditMembershipDialog = ({ projectSlug, identityId, onSuccess }: { projectSlug: string; identityId: string; onSuccess: () => void }) => {
+const EditMembershipDialog = ({ projectSlug, identityId, onSuccess, roles }: { projectSlug: string; identityId: string; onSuccess: () => void; roles?: RolesConfig }) => {
 
 	const showToast = useShowToast()
 	const [open, setOpen] = useState(false)
@@ -138,7 +139,7 @@ const EditMembershipDialog = ({ projectSlug, identityId, onSuccess }: { projectS
 					}}
 				>
 					<form className="grid gap-4">
-						<UpdateProjectMemberFormFields projectSlug={projectSlug} />
+						<UpdateProjectMemberFormFields projectSlug={projectSlug} roles={roles} />
 					</form>
 				</UpdateProjectMemberForm>
 			</DialogContent>

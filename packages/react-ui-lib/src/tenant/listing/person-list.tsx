@@ -3,11 +3,12 @@ import * as React from 'react'
 import { TableCell } from '../../ui/table'
 import { dict } from '../../dict'
 import { MemberList, MemberListController } from './member-list'
+import { RolesConfig } from '../forms'
 
 const filter: ProjectMembersFilter = {
 	memberType: 'PERSON',
 }
-export const PersonList = (props: { controller?: { current?: MemberListController } }) => (
+export const PersonList = (props: { controller?: { current?: MemberListController }; roles?: RolesConfig }) => (
 	<MemberList
 		{...props}
 		filter={filter}

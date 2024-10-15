@@ -7,6 +7,5 @@
 		]
 	},
 	"references": [
-		{ "path": "../../utilities/src" }
 	]
 }

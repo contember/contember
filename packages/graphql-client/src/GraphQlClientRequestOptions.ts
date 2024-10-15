@@ -1,11 +1,19 @@
-export interface GraphQlClientRequestOptions {
-	variables?: GraphQlClientVariables
-	apiToken?: string
-	signal?: AbortSignal
-	headers?: Record<string, string>
-	onBeforeRequest?: (query: { query: string; variables: GraphQlClientVariables }) => void
-	onResponse?: (response: Response) => void
-	onData?: (json: unknown) => void
+export interface GraphQlClientBaseOptions {
+	readonly apiToken?: string
+	readonly headers?: Record<string, string>
+	readonly onBeforeRequest?: (query: { query: string; variables: GraphQlClientVariables }) => void
+	readonly onResponse?: (response: Response) => void
+	readonly onData?: (json: unknown) => void
+}
+
+export interface GraphQlClientOptions extends GraphQlClientBaseOptions {
+	readonly url: string
+	readonly fetcher?: (input: RequestInfo, init?: RequestInit) => Promise<Response>
+}
+
+export interface GraphQlClientRequestOptions extends GraphQlClientBaseOptions{
+	readonly variables?: GraphQlClientVariables
+	readonly signal?: AbortSignal
 }
 
 export interface GraphQlClientVariables {

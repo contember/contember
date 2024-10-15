@@ -2,7 +2,6 @@ import { BindingError } from '../BindingError'
 import type { Filter } from '../treeParameters'
 import equal from 'fast-deep-equal/es6/index.js'
 import { Schema, SchemaColumn, SchemaEntity, SchemaRelation } from '../schema'
-import { GraphQlLiteral } from '@contember/client'
 
 class Environment<Node extends Environment.AnyNode | undefined = Environment.AnyNode | undefined> {
 	private constructor(
@@ -251,7 +250,7 @@ namespace Environment {
 		props: any
 	}
 
-	export type Value = string | number | boolean | undefined | GraphQlLiteral | Filter | ReactElementLike
+	export type Value = string | number | boolean | undefined | Filter | ReactElementLike
 
 	export type ResolvedValue = Value
 

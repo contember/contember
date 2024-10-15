@@ -1,7 +1,4 @@
-import { GraphQlLiteral } from '../../graphQlBuilder'
 import { GraphQlField, GraphQlPrintResult, GraphQlQueryPrinter, GraphQlSelectionSetItem } from '@contember/graphql-builder'
-import { GraphQlBuilder } from '../../index'
-import { replaceGraphQlLiteral } from '../replaceGraphQlLiteral'
 
 class GenerateUploadUrlMutationBuilder {
 	private static generateUploadUrlFields = [
@@ -21,7 +18,7 @@ class GenerateUploadUrlMutationBuilder {
 		for (const alias in parameters) {
 			const fileParameters = parameters[alias]
 			if (fileParameters.suffix || fileParameters.fileName || fileParameters.extension) {
-				const { contentType, prefix, expiration, acl, size, suffix, fileName, extension } = replaceGraphQlLiteral(fileParameters)
+				const { contentType, prefix, expiration, acl, size, suffix, fileName, extension } = fileParameters
 				selectionItems.push(new GraphQlField(alias, 'generateUploadUrl', {
 					input: {
 						value: { contentType, prefix, expiration, acl, size, suffix, fileName, extension },
@@ -44,7 +41,7 @@ class GenerateUploadUrlMutationBuilder {
 					},
 					acl: {
 						graphQlType: 'S3Acl',
-						value: fileParameters.acl instanceof GraphQlBuilder.GraphqlLiteral ? fileParameters.acl?.value : fileParameters.acl,
+						value: fileParameters.acl,
 					},
 				}, GenerateUploadUrlMutationBuilder.generateUploadUrlFields))
 			}
@@ -60,7 +57,6 @@ namespace GenerateUploadUrlMutationBuilder {
 		| 'PUBLIC_READ'
 		| 'PRIVATE'
 		| 'NONE'
-		| GraphQlLiteral<'PUBLIC_READ' | 'PRIVATE' | 'NONE'>
 
 	export type FileParameters = {
 		contentType: string

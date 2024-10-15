@@ -1,5 +1,4 @@
 import { expect, it, describe } from 'vitest'
-import { GraphQlBuilder } from '@contember/client'
 import { Environment } from '../../../../src/environment'
 import { Parser } from '../../../../src/queryLanguage'
 
@@ -26,8 +25,8 @@ describe('query language parser', () => {
 			ab: 456,
 			a: 123,
 			x: 'x',
-			lit: new GraphQlBuilder.GraphQlLiteral('lit'),
-			literal: new GraphQlBuilder.GraphQlLiteral('literal'),
+			lit: 'lit',
+			literal: 'literal',
 		})
 		expect(
 			Parser.parseQueryLanguageExpression(

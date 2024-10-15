@@ -6,13 +6,32 @@
 
 // @public (undocumented)
 export class GraphQlClient {
-    constructor(apiUrl: string, apiToken?: string | undefined);
+    constructor(options: GraphQlClientOptions);
     // (undocumented)
-    readonly apiUrl: string;
+    get apiUrl(): string;
     // (undocumented)
     protected doExecute(query: string, { apiToken, signal, variables, headers }?: GraphQlClientRequestOptions): Promise<Response>;
     // (undocumented)
     execute<T = unknown>(query: string, options?: GraphQlClientRequestOptions): Promise<T>;
+    // (undocumented)
+    withOptions(options: Partial<GraphQlClientOptions>): GraphQlClient;
+}
+
+// @public (undocumented)
+export interface GraphQlClientBaseOptions {
+    // (undocumented)
+    readonly apiToken?: string;
+    // (undocumented)
+    readonly headers?: Record<string, string>;
+    // (undocumented)
+    readonly onBeforeRequest?: (query: {
+        query: string;
+        variables: GraphQlClientVariables;
+    }) => void;
+    // (undocumented)
+    readonly onData?: (json: unknown) => void;
+    // (undocumented)
+    readonly onResponse?: (response: Response) => void;
 }
 
 // @public (undocumented)
@@ -31,24 +50,19 @@ export class GraphQlClientError extends Error {
 }
 
 // @public (undocumented)
-export interface GraphQlClientRequestOptions {
+export interface GraphQlClientOptions extends GraphQlClientBaseOptions {
     // (undocumented)
-    apiToken?: string;
+    readonly fetcher?: (input: RequestInfo, init?: RequestInit) => Promise<Response>;
     // (undocumented)
-    headers?: Record<string, string>;
+    readonly url: string;
+}
+
+// @public (undocumented)
+export interface GraphQlClientRequestOptions extends GraphQlClientBaseOptions {
     // (undocumented)
-    onBeforeRequest?: (query: {
-        query: string;
-        variables: GraphQlClientVariables;
-    }) => void;
+    readonly signal?: AbortSignal;
     // (undocumented)
-    onData?: (json: unknown) => void;
-    // (undocumented)
-    onResponse?: (response: Response) => void;
-    // (undocumented)
-    signal?: AbortSignal;
-    // (undocumented)
-    variables?: GraphQlClientVariables;
+    readonly variables?: GraphQlClientVariables;
 }
 
 // @public (undocumented)

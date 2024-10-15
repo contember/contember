@@ -1,4 +1,4 @@
-import { ContentMutation, ContentQueryBuilder, GraphQlLiteral, Input, replaceGraphQlLiteral } from '@contember/client'
+import { ContentMutation, ContentQueryBuilder, Input } from '@contember/client'
 import { ClientGeneratedUuid,  ReceivedEntityData, ServerId } from '@contember/binding-common'
 import { BindingError } from '@contember/binding-common'
 import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '@contember/binding-common'
@@ -418,12 +418,11 @@ export class MutationGenerator {
 					if (
 						typeof field === 'string' ||
 						typeof field === 'number' ||
-						field === null ||
-						field instanceof GraphQlLiteral
+						field === null
 					) {
-						result[key] = field instanceof GraphQlLiteral ? field.value : field
+						result[key] = field
 					} else {
-						result[key] = { connect: replaceGraphQlLiteral(field) }
+						result[key] = { connect: field }
 					}
 				}
 			}
@@ -697,7 +696,7 @@ export class MutationGenerator {
 				return [{
 					alias,
 					update: {
-						by: replaceGraphQlLiteral(reducedBy),
+						by: reducedBy,
 						data: updateData,
 					},
 				}]
@@ -707,7 +706,7 @@ export class MutationGenerator {
 				// TODO also potentially do something about the current entity
 				return [{
 					alias,
-					delete: replaceGraphQlLiteral(reducedBy),
+					delete: reducedBy,
 				}]
 			}
 			if (runtimeId.existsOnServer) {
@@ -716,7 +715,7 @@ export class MutationGenerator {
 				return [
 					{
 						alias,
-						disconnect: replaceGraphQlLiteral(reducedBy),
+						disconnect: reducedBy,
 					},
 					{
 						alias,
@@ -729,7 +728,7 @@ export class MutationGenerator {
 			if (createInput === undefined) {
 				return [{
 					alias,
-					disconnect: replaceGraphQlLiteral(reducedBy),
+					disconnect: reducedBy,
 				}]
 			}
 			return [{

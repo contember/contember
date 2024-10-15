@@ -1,6 +1,6 @@
 import type {
 	GraphQlClient,
-	GraphQlClientFailedRequestMetadata,
+	GraphQlClientError,
 	GraphQlClientRequestOptions,
 	GraphQlClientVariables,
 } from '@contember/client'
@@ -40,7 +40,7 @@ export const useApiRequest = <SuccessData>(client: GraphQlClient): UseApiRequest
 				type: 'initialize',
 			})
 			return client
-				.sendRequest<SuccessData>(query, {
+				.execute<SuccessData>(query, {
 					...options,
 					variables,
 				})
@@ -51,7 +51,7 @@ export const useApiRequest = <SuccessData>(client: GraphQlClient): UseApiRequest
 					})
 					return data
 				})
-				.catch((error: GraphQlClientFailedRequestMetadata) => {
+				.catch((error: GraphQlClientError) => {
 					dispatch({
 						type: 'resolveWithError',
 						error,

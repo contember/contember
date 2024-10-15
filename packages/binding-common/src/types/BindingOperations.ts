@@ -1,4 +1,3 @@
-import type { TreeFilter } from '@contember/client'
 import type { AsyncBatchUpdatesOptions } from './AsyncBatchUpdatesOptions'
 import type { BatchUpdatesOptions } from './BatchUpdatesOptions'
 import type { ExtendTree } from './ExtendTree'
@@ -16,8 +15,6 @@ export type BatchDeferredUpdates = (performUpdates: (bindingOperations: BatchUpd
 
 export interface BindingOperations<Node> extends AsyncBatchUpdatesOptions {
 	// addEventListener: ...
-	getTreeFilters: () => TreeFilter[]
-
 	extendTree: ExtendTree<Node>
 	fetchData: FetchData<Node>
 	batchDeferredUpdates: BatchDeferredUpdates

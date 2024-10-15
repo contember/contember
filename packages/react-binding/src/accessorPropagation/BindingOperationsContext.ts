@@ -23,7 +23,6 @@ export const defaultBindingOperations = Object.freeze<BindingOperations<ReactNod
 	getEntityListSubTree: getRejecter('retrieve an entity list sub tree'),
 	getEntitySubTree: getRejecter('retrieve a single entity sub tree'),
 	getEntityByKey: getRejecter('retrieve an entity by key'),
-	getTreeFilters: getRejecter('retrieve tree filters'),
 	batchDeferredUpdates: getRejecter('batch deferred updates'),
 	extendTree: getRejecter('extendTree'),
 	persist: getRejecter('persist'),

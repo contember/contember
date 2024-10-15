@@ -43,7 +43,6 @@ import {
 	UnsugarableSingleEntityEventListeners,
 } from '../treeParameters'
 import { Parser } from './Parser'
-import { GraphQlLiteral } from '@contember/client'
 import { ParsedHasManyRelation, ParsedHasOneRelation } from './ParserResults'
 import { TokenRegExps } from './tokenList'
 import { TreeParameterMerger } from '../treeParameters/TreeParameterMerger'
@@ -544,7 +543,6 @@ export class QueryLanguage {
 	public static desugarQualifiedSingleEntity(
 		{ entity, ...unsugarableSingleEntity }: SugaredQualifiedSingleEntity,
 		environment: Environment,
-		options: { missingSetOnCreate?: 'fill' | 'fillAndWarn' } = {},
 	): QualifiedSingleEntity {
 		let entityName: EntityName
 		let where: UniqueWhere
@@ -582,16 +580,6 @@ export class QueryLanguage {
 				? this.desugarSetOnCreate(unsugarableSingleEntity.setOnCreate, environment)
 				: undefined
 
-		// todo: remove deprecated code
-		if (!setOnCreate && options.missingSetOnCreate) {
-			const whereValues = Object.values(where)
-			if (whereValues.length === 1 && whereValues[0] instanceof GraphQlLiteral) {
-				setOnCreate = where
-				if (import.meta.env.DEV && options.missingSetOnCreate === 'fillAndWarn') {
-					console.warn('Automatic creation of singleton entities in EditPage is deprecated. Please use setOnCreate prop.')
-				}
-			}
-		}
 
 		const isNonbearing: boolean =
 			unsugarableSingleEntity.isNonbearing !== undefined

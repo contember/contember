@@ -1,7 +1,10 @@
-import { px } from '@contember/utilities'
 import { useCallback, useLayoutEffect } from 'react'
 import { RefObjectOrElement, unwrapRefValue } from './unwrapRefValue'
 import { useOnElementResize } from './useOnElementResize'
+
+function px<V extends number | false | null | undefined>(value?: V): string {
+	return typeof value === 'number' && !(isNaN(value) || value === Infinity || value === -Infinity) ? value + 'px' : ''
+}
 
 export const useAutoHeightTextArea = (
 	textAreaRef: RefObjectOrElement<HTMLTextAreaElement>,

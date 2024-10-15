@@ -1,15 +1,25 @@
 import { GraphQlClientError, GraphQlErrorType } from './GraphQlClientError'
-import { GraphQlClientRequestOptions } from './GraphQlClientRequestOptions'
+import { GraphQlClientOptions, GraphQlClientRequestOptions } from './GraphQlClientRequestOptions'
 
 export class GraphQlClient {
-	constructor(public readonly apiUrl: string, private readonly apiToken?: string) { }
+	constructor(
+		private readonly options: GraphQlClientOptions,
+	) { }
+
+	get apiUrl(): string {
+		return this.options.url
+	}
+
+	withOptions(options: Partial<GraphQlClientOptions>): GraphQlClient {
+		return new GraphQlClient({ ...this.options, ...options })
+	}
 
 	async execute<T = unknown>(query: string, options: GraphQlClientRequestOptions = {}): Promise<T> {
 		let body: string | null = null
 		let response: Response | null = null
 		const createError = (type: GraphQlErrorType, errors?: any[], cause?: unknown) => {
 			const request = {
-				url: this.apiUrl,
+				url: this.options.url,
 				query,
 				variables: options.variables ?? {},
 			}
@@ -24,6 +34,7 @@ ${query}`
 			return new GraphQlClientError(`GraphQL request failed: ${type}`, type, request, response ?? undefined, errors, details, cause)
 		}
 
+		this.options?.onBeforeRequest?.({ query, variables: options.variables ?? {} })
 		options?.onBeforeRequest?.({ query, variables: options.variables ?? {} })
 
 		try {
@@ -33,6 +44,7 @@ ${query}`
 			throw createError(aborted ? 'aborted' : 'network error', undefined, e)
 		}
 
+		this.options?.onResponse?.(response)
 		options?.onResponse?.(response)
 
 		body = await response.text()
@@ -43,6 +55,7 @@ ${query}`
 		} catch (e) {
 			throw createError('invalid response body', undefined, e)
 		}
+		this.options?.onData?.(data)
 		options?.onData?.(data)
 
 		if (response.status === 401) {
@@ -77,15 +90,16 @@ ${query}`
 	): Promise<Response> {
 		const resolvedHeaders: Record<string, string> = {
 			'Content-Type': 'application/json',
+			...this.options.headers,
 			...headers,
 		}
-		const resolvedToken = apiToken ?? this.apiToken
+		const resolvedToken = apiToken ?? this.options.apiToken
 
 		if (resolvedToken !== undefined) {
 			resolvedHeaders['Authorization'] = `Bearer ${resolvedToken}`
 		}
 
-		return await fetch(this.apiUrl, {
+		return await (this.options.fetcher ?? defaultFetcher)(this.options.url, {
 			method: 'POST',
 			headers: resolvedHeaders,
 			signal,
@@ -94,3 +108,4 @@ ${query}`
 	}
 }
 
+const defaultFetcher = async (url: string, options: RequestInit) => fetch(url, options)

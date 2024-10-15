@@ -15,7 +15,7 @@ export class TenantClient {
 	constructor(private readonly apiClient: GraphQlClient) {}
 
 	public static create(url: string, apiToken: string): TenantClient {
-		const graphqlClient = new GraphQlClient(createTenantApiUrl(url), apiToken)
+		const graphqlClient = new GraphQlClient({ url: createTenantApiUrl(url), apiToken })
 		return new TenantClient(graphqlClient)
 	}
 

@@ -1,5 +1,5 @@
 import { expect, it, describe } from 'vitest'
-import { whereToFilter, GraphQlBuilder } from '../../../src'
+import { whereToFilter } from '../../../src'
 
 describe('whereToFilter', () => {
 	it('complex by', () => {
@@ -10,7 +10,6 @@ describe('whereToFilter', () => {
 						baz: '123',
 						xyz: 456,
 					},
-					abc: new GraphQlBuilder.GraphQlLiteral('myLiteral'),
 				},
 			}),
 		).toEqual({
@@ -19,7 +18,6 @@ describe('whereToFilter', () => {
 					baz: { eq: '123' },
 					xyz: { eq: 456 },
 				},
-				abc: { eq: new GraphQlBuilder.GraphQlLiteral('myLiteral') },
 			},
 		})
 	})

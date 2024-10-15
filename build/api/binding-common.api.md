@@ -5,19 +5,15 @@
 ```ts
 
 import { ContentQueryBuilder } from '@contember/client-content';
-import type { CrudQueryBuilder } from '@contember/client';
 import { EmbeddedActionsParser } from 'chevrotain';
 import { v4 as generateUuid } from 'uuid';
-import { GraphQlBuilder } from '@contember/client';
 import type { GraphQlClient } from '@contember/client';
 import type { GraphQlClientRequestOptions } from '@contember/client';
-import { GraphQlLiteral } from '@contember/client';
 import { Input } from '@contember/client';
 import { MutationResult } from '@contember/client';
 import type { Result } from '@contember/client';
 import { TokenType } from 'chevrotain';
 import { TransactionResult } from '@contember/client';
-import type { TreeFilter } from '@contember/client';
 
 // @public (undocumented)
 export type Alias = string;
@@ -80,8 +76,6 @@ export interface BindingOperations<Node> extends AsyncBatchUpdatesOptions {
     extendTree: ExtendTree<Node>;
     // (undocumented)
     fetchData: FetchData<Node>;
-    // (undocumented)
-    getTreeFilters: () => TreeFilter[];
     // (undocumented)
     persist: Persist;
 }
@@ -560,7 +554,7 @@ export namespace Environment {
     // (undocumented)
     export type SubTreeNode = SubTreeEntityNode | SubTreeEntityListNode;
     // (undocumented)
-    export type Value = string | number | boolean | undefined | GraphQlLiteral | Filter | ReactElementLike;
+    export type Value = string | number | boolean | undefined | Filter | ReactElementLike;
     const // (undocumented)
     createExtension: <S, R>(create: Extension<S, R>["create"], otherMethods?: Omit<Extension<S, R>, "create">) => Extension<S, R>;
     // (undocumented)
@@ -794,7 +788,7 @@ export type FieldName = string;
 export type FieldValue = JsonValue;
 
 // @public (undocumented)
-export type Filter<T = GraphQlLiteral> = Input.Where<Input.Condition<Input.ColumnValue<T>>>;
+export type Filter<T = never> = Input.Where<Input.Condition<Input.ColumnValue<T>>>;
 
 export { generateUuid }
 
@@ -1059,7 +1053,7 @@ export type Offset = number;
 export type OptionallyVariableFieldValue = FieldValue | VariableFieldValue;
 
 // @public (undocumented)
-export type OrderBy = Input.OrderBy<CrudQueryBuilder.OrderDirection>[];
+export type OrderBy = Input.OrderBy<`${Input.OrderDirection}`>[];
 
 // @public (undocumented)
 export interface OwningRelation extends BaseRelation {
@@ -1088,7 +1082,7 @@ export namespace Parser {
     // (undocumented)
     export namespace AST {
         // (undocumented)
-        export type ColumnValue = Input.ColumnValue<GraphQlBuilder.GraphQlLiteral>;
+        export type ColumnValue = Input.ColumnValue;
         // (undocumented)
         export type Condition = Input.Condition<ColumnValue>;
         // (undocumented)
@@ -1297,9 +1291,7 @@ export class QueryLanguage {
     // (undocumented)
     static desugarQualifiedFieldList({ fields, ...unsugarableFieldList }: SugaredQualifiedFieldList, environment: Environment): QualifiedFieldList;
     // (undocumented)
-    static desugarQualifiedSingleEntity({ entity, ...unsugarableSingleEntity }: SugaredQualifiedSingleEntity, environment: Environment, options?: {
-        missingSetOnCreate?: 'fill' | 'fillAndWarn';
-    }): QualifiedSingleEntity;
+    static desugarQualifiedSingleEntity({ entity, ...unsugarableSingleEntity }: SugaredQualifiedSingleEntity, environment: Environment): QualifiedSingleEntity;
     // (undocumented)
     static desugarRelativeEntityList(sugaredRelativeEntityList: string | SugaredRelativeEntityList, environment: Environment): RelativeEntityList;
     // (undocumented)
@@ -1918,7 +1910,7 @@ export type UniqueEntityId = string & {
 };
 
 // @public (undocumented)
-export type UniqueWhere<T = GraphQlBuilder.GraphQlLiteral> = Input.UniqueWhere<T>;
+export type UniqueWhere<T = never> = Input.UniqueWhere<T>;
 
 // @public (undocumented)
 export class UnpersistedEntityDummyId implements RuntimeIdSpec {
@@ -1980,6 +1972,9 @@ export class VariableInputTransformer {
     // (undocumented)
     static transformVariableFieldValue(variableFieldValue: VariableFieldValue, environment: Environment): FieldValue;
 }
+
+// @public (undocumented)
+export const whereToFilter: (by: Input.UniqueWhere) => Input.Where<Input.Condition<Input.ColumnValue>>;
 
 // @public (undocumented)
 export const wrapFilterInHasOnes: (path: HasOneRelation[], filter: Filter) => Filter;

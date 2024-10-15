@@ -1,15 +1,8 @@
-import { GraphQlLiteral, Input } from '@contember/client'
+import { Input } from '@contember/client'
 import { FieldValue } from '@contember/binding'
 import { BindingError } from '@contember/binding'
 
-const unwrapGraphqlLiteral = (value: Input.ColumnValue<GraphQlLiteral>): any => {
-	if (value instanceof GraphQlLiteral) {
-		return value.value
-	}
-	return value
-}
-
-export const evaluateCondition = (value: FieldValue | null, condition: Input.Condition<Input.ColumnValue<GraphQlLiteral>>) => {
+export const evaluateCondition = (value: FieldValue | null, condition: Input.Condition<Input.ColumnValue>) => {
 	const handlers: {
 		[K in keyof Required<Input.Condition<any>>]: (
 			param: Exclude<Input.Condition<any>[K], undefined>,
@@ -18,21 +11,21 @@ export const evaluateCondition = (value: FieldValue | null, condition: Input.Con
 		and: expr => expr.every(it => evaluateCondition(value, it)),
 		or: expr => expr.some(it => evaluateCondition(value, it)),
 		not: expr => !evaluateCondition(value, expr),
-		eq: expr => value === unwrapGraphqlLiteral(expr),
-		notEq: expr => value !== unwrapGraphqlLiteral(expr),
+		eq: expr => value === expr,
+		notEq: expr => value !== expr,
 		isNull: expr => (value === null) === expr,
-		in: expr => expr.map(unwrapGraphqlLiteral).includes(value),
-		notIn: expr => !expr.map(unwrapGraphqlLiteral).includes(value),
-		lt: expr => value !== null && value < unwrapGraphqlLiteral(expr),
-		lte: expr => value !== null && value <= unwrapGraphqlLiteral(expr),
-		gt: expr => value !== null && value > unwrapGraphqlLiteral(expr),
-		gte: expr => value !== null && value >= unwrapGraphqlLiteral(expr),
-		contains: expr => typeof value === 'string' && value.includes(unwrapGraphqlLiteral(expr)),
-		startsWith: expr => typeof value === 'string' && value.startsWith(unwrapGraphqlLiteral(expr)),
-		endsWith: expr => typeof value === 'string' && value.endsWith(unwrapGraphqlLiteral(expr)),
-		containsCI: expr => typeof value === 'string' && value.toLowerCase().includes(unwrapGraphqlLiteral(expr).toLowerCase()),
-		startsWithCI: expr => typeof value === 'string' && value.toLowerCase().startsWith(unwrapGraphqlLiteral(expr).toLowerCase()),
-		endsWithCI: expr => typeof value === 'string' && value.toLowerCase().endsWith(unwrapGraphqlLiteral(expr).toLowerCase()),
+		in: expr => expr.includes(value),
+		notIn: expr => !expr.includes(value),
+		lt: expr => value !== null && value < expr,
+		lte: expr => value !== null && value <= expr,
+		gt: expr => value !== null && value > expr,
+		gte: expr => value !== null && value >= expr,
+		contains: expr => typeof value === 'string' && value.includes(expr),
+		startsWith: expr => typeof value === 'string' && value.startsWith(expr),
+		endsWith: expr => typeof value === 'string' && value.endsWith(expr),
+		containsCI: expr => typeof value === 'string' && value.toLowerCase().includes(expr.toLowerCase()),
+		startsWithCI: expr => typeof value === 'string' && value.toLowerCase().startsWith(expr.toLowerCase()),
+		endsWithCI: expr => typeof value === 'string' && value.toLowerCase().endsWith(expr.toLowerCase()),
 		never: () => false,
 		always: () => true,
 		// deprecated

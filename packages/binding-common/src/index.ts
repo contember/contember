@@ -13,5 +13,6 @@ export * from './RuntimeId'
 export * from './utils/TreeNodeUtils'
 export * from './utils/assertNever'
 export * from './utils/createQueryBuilder'
+export * from './utils/whereToFilter'
 
 export { v4 as generateUuid } from 'uuid'

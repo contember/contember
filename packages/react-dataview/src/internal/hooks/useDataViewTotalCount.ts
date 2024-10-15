@@ -1,5 +1,5 @@
 import { createQueryBuilder, Filter, QualifiedEntityList, useEnvironment } from '@contember/react-binding'
-import { ContentClient, GraphQlClientError, replaceGraphQlLiteral } from '@contember/client'
+import { ContentClient, GraphQlClientError } from '@contember/client'
 import { useCurrentContentGraphQlClient } from '@contember/react-client'
 import { useEffect, useState } from 'react'
 import { useAbortController } from '@contember/react-utils'

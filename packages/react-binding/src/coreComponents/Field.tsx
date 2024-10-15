@@ -1,4 +1,3 @@
-import { GraphQlBuilder } from '@contember/client'
 import type { ReactElement, ReactNode } from 'react'
 import { useField } from '../accessorPropagation'
 import { MarkerFactory } from '@contember/binding'
@@ -28,7 +27,6 @@ export const Field = Component(
 		}
 
 		if (
-			field.value instanceof GraphQlBuilder.GraphQlLiteral ||
 			field.value === null ||
 			typeof field.value === 'boolean'
 		) {

@@ -1,6 +1,6 @@
-import type { CrudQueryBuilder, Input } from '@contember/client'
+import type { Input } from '@contember/client'
 
-export type OrderBy = Input.OrderBy<CrudQueryBuilder.OrderDirection>[]
+export type OrderBy = Input.OrderBy<`${Input.OrderDirection}`>[]
 
 // E.g. items.order asc, items.content.name asc
 export type SugaredOrderBy = OrderBy | string

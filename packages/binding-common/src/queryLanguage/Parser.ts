@@ -1,4 +1,4 @@
-import { GraphQlBuilder, Input, Writable } from '@contember/client'
+import { Input, Writable } from '@contember/client'
 import { EmbeddedActionsParser, Lexer } from 'chevrotain'
 import { Environment } from '../environment'
 import type { EntityName, FieldName, Filter, OrderBy, UniqueWhere } from '../treeParameters'
@@ -303,7 +303,7 @@ class Parser extends EmbeddedActionsParser {
 				ALT: () => {
 					const variable = this.SUBRULE(this.variable)
 					return this.ACTION(() => {
-						if (typeof variable !== 'object' || variable instanceof GraphQlBuilder.GraphQlLiteral) {
+						if (typeof variable !== 'object') {
 							throw new QueryLanguageError(`Invalid filter value '${JSON.stringify(variable)}'`)
 						}
 						return variable
@@ -479,7 +479,7 @@ class Parser extends EmbeddedActionsParser {
 					},
 				})
 				this.CONSUME(tokens.Equals)
-				const primaryValue = this.SUBRULE<Input.PrimaryValue<GraphQlBuilder.GraphQlLiteral>>(this.primaryValue)
+				const primaryValue = this.SUBRULE<Input.PrimaryValue>(this.primaryValue)
 
 				this.ACTION(() => {
 					let nestedWhere = where
@@ -498,7 +498,7 @@ class Parser extends EmbeddedActionsParser {
 							if (nestedField in nestedWhere) {
 								const existingWhere = nestedWhere[nestedField]
 
-								if (typeof existingWhere === 'object' && !(existingWhere instanceof GraphQlBuilder.GraphQlLiteral)) {
+								if (typeof existingWhere === 'object') {
 									nestedWhere = existingWhere
 								} else {
 									throw new QueryLanguageError(
@@ -637,7 +637,7 @@ class Parser extends EmbeddedActionsParser {
 		])
 	})
 
-	private primaryValue = this.RULE<Input.PrimaryValue<GraphQlBuilder.GraphQlLiteral>>('primaryValue', () => {
+	private primaryValue = this.RULE<Input.PrimaryValue>('primaryValue', () => {
 		return this.OR([
 			{
 				ALT: () => this.SUBRULE(this.string),
@@ -654,8 +654,7 @@ class Parser extends EmbeddedActionsParser {
 					return this.ACTION(() => {
 						if (
 							typeof variableValue === 'string' ||
-							typeof variableValue === 'number' ||
-							variableValue instanceof GraphQlBuilder.GraphQlLiteral
+							typeof variableValue === 'number'
 						) {
 							return variableValue
 						}
@@ -772,8 +771,7 @@ class Parser extends EmbeddedActionsParser {
 			}
 
 			if (Parser.environment.hasVariable(variableName)) {
-				const value = Parser.environment.getVariable(variableName)
-				return value instanceof GraphQlBuilder.GraphQlLiteral ? value.value : value
+				return Parser.environment.getVariable(variableName)
 			}
 			if (Parser.environment.hasParameter(variableName)) {
 				return Parser.environment.getParameter(variableName)
@@ -882,7 +880,7 @@ namespace Parser {
 	export namespace AST {
 		export type FieldWhere = Input.FieldWhere<Condition>
 
-		export type ColumnValue = Input.ColumnValue<GraphQlBuilder.GraphQlLiteral>
+		export type ColumnValue = Input.ColumnValue
 
 		export type Condition = Input.Condition<ColumnValue>
 

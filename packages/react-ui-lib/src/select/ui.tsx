@@ -74,6 +74,9 @@ export const MultiSelectItemRemoveButtonUI = uic('span', {
 
 export const SelectPopoverContent = uic(PopoverContent, {
 	baseClass: 'group w-[max(16rem,var(--radix-popover-trigger-width))]',
+	defaultProps: {
+		onWheel: e => e.stopPropagation(),
+	},
 })
 
 

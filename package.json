@@ -48,7 +48,7 @@
     "supertest": "^7.0.0",
     "tsx": "4.16.5",
     "typedoc": "^0.26.9",
-    "typescript": "^5.5.4",
+    "typescript": "^5.6.3",
     "vite": "^5.4.9",
     "vitest": "^2.0.5"
   },
@@ -56,9 +56,9 @@
     "packages/*"
   ],
   "resolutions": {
-    "typescript": "5.5.4",
+    "typescript": "5.6.3",
     "graphql": "16.9.0",
-    "@types/node": "20.9.0",
+    "@types/node": "20.16.11",
     "rollup": "npm:@rollup/wasm-node@*"
   }
 }

@@ -24,6 +24,6 @@ export class LRUCache<Key, Value> {
 	}
 
 	private getOldestKey(): Key {
-		return this.cache.keys().next().value
+		return this.cache.keys().next().value!
 	}
 }

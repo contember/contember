@@ -110,23 +110,23 @@ export class BijectiveIndexedMap<K, V> implements Map<K, V> {
 		}
 	}
 
-	public *[Symbol.iterator](): IterableIterator<[K, V]> {
+	public *[Symbol.iterator](): MapIterator<[K, V]> {
 		yield* this.entries()
 	}
 
-	public *entries(): IterableIterator<[K, V]> {
+	public *entries(): MapIterator<[K, V]> {
 		for (const value of this.values()) {
 			yield [this.inverse(value), value]
 		}
 	}
 
-	public *keys(): IterableIterator<K> {
+	public *keys(): MapIterator<K> {
 		for (const value of this.values()) {
 			yield this.inverse(value)
 		}
 	}
 
-	public *values(): IterableIterator<V> {
+	public *values(): MapIterator<V> {
 		for (const value of this.valueStore.values()) {
 			if (value === undefined) {
 				continue

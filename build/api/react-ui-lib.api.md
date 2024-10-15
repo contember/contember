@@ -166,7 +166,7 @@ export const AlertDialogTrigger: React_2.ForwardRefExoticComponent<AlertDialogPr
 // @public (undocumented)
 export const AnchorButton: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLAnchorElement> & AnchorHTMLAttributes<HTMLAnchorElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 } & {
 variant?: "link" | "default" | "destructive" | "outline" | "secondary" | "ghost" | null | undefined;
@@ -301,35 +301,35 @@ export const BlockRepeaterContent: () => JSX_2.Element;
 // @public (undocumented)
 export const BlockRepeaterDragOverlayUI: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLDivElement> & HTMLAttributes<HTMLDivElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLDivElement>>;
 
 // @public (undocumented)
 export const BlockRepeaterHandleUI: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLButtonElement> & ButtonHTMLAttributes<HTMLButtonElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLButtonElement>>;
 
 // @public (undocumented)
 export const BlockRepeaterItemActions: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLDivElement> & HTMLAttributes<HTMLDivElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLDivElement>>;
 
 // @public (undocumented)
 export const BlockRepeaterItemsWrapperUI: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLDivElement> & HTMLAttributes<HTMLDivElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLDivElement>>;
 
 // @public (undocumented)
 export const BlockRepeaterItemUI: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLDivElement> & HTMLAttributes<HTMLDivElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLDivElement>>;
 
@@ -341,49 +341,49 @@ sortableBy: DefaultBlockRepeaterProps["sortableBy"];
 // @public (undocumented)
 export const BoardCardUI: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLDivElement> & HTMLAttributes<HTMLDivElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLDivElement>>;
 
 // @public (undocumented)
 export const BoardColumnHandleUI: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLButtonElement> & ButtonHTMLAttributes<HTMLButtonElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLButtonElement>>;
 
 // @public (undocumented)
 export const BoardColumnHeaderUI: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLDivElement> & HTMLAttributes<HTMLDivElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLDivElement>>;
 
 // @public (undocumented)
 export const BoardColumnUI: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLDivElement> & HTMLAttributes<HTMLDivElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLDivElement>>;
 
 // @public (undocumented)
 export const BoardDragOverlayUI: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLDivElement> & HTMLAttributes<HTMLDivElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLDivElement>>;
 
 // @public (undocumented)
 export const BoardItemHandleUI: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLButtonElement> & ButtonHTMLAttributes<HTMLButtonElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLButtonElement>>;
 
 // @public (undocumented)
 export const BoardItemsWrapperUI: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLDivElement> & HTMLAttributes<HTMLDivElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLDivElement>>;
 
@@ -417,14 +417,14 @@ children: ReactNode;
 // @public (undocumented)
 export const BoardWrapperUI: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLDivElement> & HTMLAttributes<HTMLDivElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLDivElement>>;
 
 // @public (undocumented)
 export const Button: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLButtonElement> & ButtonHTMLAttributes<HTMLButtonElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 } & {
 variant?: "link" | "default" | "destructive" | "outline" | "secondary" | "ghost" | null | undefined;
@@ -486,42 +486,42 @@ export const buttonConfig: {
 // @public (undocumented)
 export const Card: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLDivElement> & HTMLAttributes<HTMLDivElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLDivElement>>;
 
 // @public (undocumented)
 export const CardContent: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLDivElement> & HTMLAttributes<HTMLDivElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLDivElement>>;
 
 // @public (undocumented)
 export const CardDescription: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLParagraphElement> & HTMLAttributes<HTMLParagraphElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLParagraphElement>>;
 
 // @public (undocumented)
 export const CardFooter: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLDivElement> & HTMLAttributes<HTMLDivElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLDivElement>>;
 
 // @public (undocumented)
 export const CardHeader: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLDivElement> & HTMLAttributes<HTMLDivElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLDivElement>>;
 
 // @public (undocumented)
 export const CardTitle: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLHeadingElement> & HTMLAttributes<HTMLHeadingElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLHeadingElement>>;
 
@@ -543,7 +543,7 @@ export type CheckboxFieldProps = Omit<FormCheckboxProps, 'children'> & Omit<Form
 // @public (undocumented)
 export const CheckboxInput: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLInputElement> & InputHTMLAttributes<HTMLInputElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLInputElement>>;
 
@@ -1228,7 +1228,7 @@ export interface DimensionsSwitcherProps {
 // @public (undocumented)
 export const Divider: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLHRElement> & HTMLAttributes<HTMLHRElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 } & {
 gap?: boolean | null | undefined;
@@ -1328,7 +1328,7 @@ export const DropDownTriggerButton: React_2.ForwardRefExoticComponent<Omit<React
 // @public (undocumented)
 export const DropIndicator: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLDivElement> & HTMLAttributes<HTMLDivElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 } & {
 placement?: "left" | "right" | "top" | "bottom" | null | undefined;
@@ -1455,32 +1455,32 @@ export interface FormContainerProps {
 // @public (undocumented)
 export const FormContainerUI: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLDivElement> & HTMLAttributes<HTMLDivElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLDivElement>>;
 
 // @public (undocumented)
 export const FormDescriptionUI: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLParagraphElement> & HTMLAttributes<HTMLParagraphElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLParagraphElement>>;
 
 // @public (undocumented)
 export const FormErrorUI: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLParagraphElement> & HTMLAttributes<HTMLParagraphElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLParagraphElement>>;
 
 // @public (undocumented)
 export const FormLabelUI: ForwardRefExoticComponent<Omit<Omit<LabelProps & RefAttributes<HTMLLabelElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLLabelElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 } & {
 required?: boolean | null | undefined;
@@ -1489,14 +1489,14 @@ required?: boolean | null | undefined;
 // @public (undocumented)
 export const FormLabelWrapperUI: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLDivElement> & HTMLAttributes<HTMLDivElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLDivElement>>;
 
 // @public (undocumented)
 export const FormLayout: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLDivElement> & HTMLAttributes<HTMLDivElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLDivElement>>;
 
@@ -1540,7 +1540,7 @@ export interface ImageResizeOptions {
 // @public (undocumented)
 export const Input: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLInputElement> & InputHTMLAttributes<HTMLInputElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 } & {
 variant?: "default" | "ghost" | null | undefined;
@@ -1550,7 +1550,7 @@ inputSize?: "default" | "sm" | "lg" | null | undefined;
 // @public
 export const InputBare: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLInputElement> & InputHTMLAttributes<HTMLInputElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLInputElement>>;
 
@@ -1615,7 +1615,7 @@ export type InputFieldProps = Omit<FormInputProps, 'children'> & Omit<FormContai
 // @public (undocumented)
 export const InputLike: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLDivElement> & HTMLAttributes<HTMLDivElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLDivElement>>;
 
@@ -1633,7 +1633,7 @@ export const ItemDropIndicator: ({ position }: {
 // @public (undocumented)
 export const Label: ForwardRefExoticComponent<Omit<LabelPrimitive.LabelProps & RefAttributes<HTMLLabelElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLLabelElement>>;
 
@@ -1756,14 +1756,14 @@ export const MenuItem: ({ icon, label, to, subItems, lvl, role, children }: Menu
 // @public (undocumented)
 export const MenuItemIconUI: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLSpanElement> & HTMLAttributes<HTMLSpanElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLSpanElement>>;
 
 // @public (undocumented)
 export const MenuItemUI: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLAnchorElement> & AnchorHTMLAttributes<HTMLAnchorElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLAnchorElement>>;
 
@@ -1781,7 +1781,7 @@ export interface MenuListProps {
 // @public (undocumented)
 export const MenuSubMenuUI: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLDivElement> & HTMLAttributes<HTMLDivElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLDivElement>>;
 
@@ -1942,7 +1942,7 @@ export type RadioEnumFieldProps = Omit<FormRadioItemProps, 'children' | 'value'>
 // @public (undocumented)
 export const RadioInput: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLInputElement> & InputHTMLAttributes<HTMLInputElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLInputElement>>;
 
@@ -1955,7 +1955,7 @@ export const RepeaterAddItemButton: ({ children, index }: {
 // @public (undocumented)
 export const RepeaterDragOverlayUI: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLDivElement> & HTMLAttributes<HTMLDivElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLDivElement>>;
 
@@ -1967,21 +1967,21 @@ export const RepeaterDropIndicator: ({ position }: {
 // @public (undocumented)
 export const RepeaterHandleUI: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLButtonElement> & ButtonHTMLAttributes<HTMLButtonElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLButtonElement>>;
 
 // @public (undocumented)
 export const RepeaterItemActions: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLDivElement> & HTMLAttributes<HTMLDivElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLDivElement>>;
 
 // @public (undocumented)
 export const RepeaterItemUI: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLDivElement> & HTMLAttributes<HTMLDivElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLDivElement>>;
 
@@ -1993,7 +1993,7 @@ export const RepeaterRemoveItemButton: ({ children }: {
 // @public (undocumented)
 export const RepeaterWrapperUI: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLDivElement> & HTMLAttributes<HTMLDivElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLDivElement>>;
 
@@ -2034,7 +2034,7 @@ export const Select: FC<SelectPrimitive.SelectProps>;
 // @public (undocumented)
 export const SelectContent: ForwardRefExoticComponent<Omit<SelectPrimitive.SelectContentProps & RefAttributes<HTMLDivElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 } & {
 position?: "popper" | null | undefined;
@@ -2121,14 +2121,14 @@ export const SelectInputWrapperUI: React_2.ForwardRefExoticComponent<Omit<React_
 // @public (undocumented)
 export const SelectItem: ForwardRefExoticComponent<Omit<SelectPrimitive.SelectItemProps & RefAttributes<HTMLDivElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLDivElement>>;
 
 // @public (undocumented)
 export const SelectLabel: ForwardRefExoticComponent<Omit<SelectPrimitive.SelectLabelProps & RefAttributes<HTMLDivElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLDivElement>>;
 
@@ -2171,28 +2171,28 @@ export const SelectPopoverContent: React_2.ForwardRefExoticComponent<Omit<Omit<P
 // @public (undocumented)
 export const SelectScrollDownButton: ForwardRefExoticComponent<Omit<SelectPrimitive.SelectScrollDownButtonProps & RefAttributes<HTMLDivElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLDivElement>>;
 
 // @public (undocumented)
 export const SelectScrollUpButton: ForwardRefExoticComponent<Omit<SelectPrimitive.SelectScrollUpButtonProps & RefAttributes<HTMLDivElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLDivElement>>;
 
 // @public (undocumented)
 export const SelectSeparator: ForwardRefExoticComponent<Omit<SelectPrimitive.SelectSeparatorProps & RefAttributes<HTMLDivElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLDivElement>>;
 
 // @public (undocumented)
 export const SelectTrigger: ForwardRefExoticComponent<Omit<SelectPrimitive.SelectTriggerProps & RefAttributes<HTMLButtonElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLButtonElement>>;
 
@@ -2341,77 +2341,77 @@ export const Switch: React_2.ForwardRefExoticComponent<Omit<SwitchPrimitives.Swi
 // @public (undocumented)
 export const Table: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLTableElement> & TableHTMLAttributes<HTMLTableElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLTableElement>>;
 
 // @public (undocumented)
 export const TableBody: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLTableSectionElement> & HTMLAttributes<HTMLTableSectionElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLTableSectionElement>>;
 
 // @public (undocumented)
 export const TableCaption: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLElement> & HTMLAttributes<HTMLElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLElement>>;
 
 // @public (undocumented)
 export const TableCell: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLTableDataCellElement> & TdHTMLAttributes<HTMLTableDataCellElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLTableDataCellElement>>;
 
 // @public (undocumented)
 export const TableFooter: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLTableSectionElement> & HTMLAttributes<HTMLTableSectionElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLTableSectionElement>>;
 
 // @public (undocumented)
 export const TableHead: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLTableHeaderCellElement> & ThHTMLAttributes<HTMLTableHeaderCellElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLTableHeaderCellElement>>;
 
 // @public (undocumented)
 export const TableHeader: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLTableSectionElement> & HTMLAttributes<HTMLTableSectionElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLTableSectionElement>>;
 
 // @public (undocumented)
 export const TableRow: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLTableRowElement> & HTMLAttributes<HTMLTableRowElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLTableRowElement>>;
 
 // @public (undocumented)
 export const TableWrapper: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLDivElement> & HTMLAttributes<HTMLDivElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLDivElement>>;
 
 // @public (undocumented)
 export const Textarea: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLTextAreaElement> & TextareaHTMLAttributes<HTMLTextAreaElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLTextAreaElement>>;
 
 // @public (undocumented)
 export const TextareaAutosize: ForwardRefExoticComponent<Omit<Omit<ClassAttributes<HTMLTextAreaElement> & TextareaHTMLAttributes<HTMLTextAreaElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLTextAreaElement> & {
 minRows?: number;
@@ -2612,7 +2612,7 @@ export const Tooltip: FC<TooltipPrimitive.TooltipProps>;
 // @public (undocumented)
 export const TooltipContent: ForwardRefExoticComponent<Omit<TooltipPrimitive.TooltipContentProps & RefAttributes<HTMLDivElement> & {
 asChild?: boolean;
-children?: ReactNode;
+children?: React.ReactNode;
 className?: string;
 } & {
 variant?: "default" | "seamless" | "blurred" | null | undefined;

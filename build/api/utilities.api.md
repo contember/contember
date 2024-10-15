@@ -10,7 +10,7 @@ export function assertNever(_: never): never;
 // @public (undocumented)
 export class BijectiveIndexedMap<K, V> implements Map<K, V> {
     // (undocumented)
-    [Symbol.iterator](): IterableIterator<[K, V]>;
+    [Symbol.iterator](): MapIterator<[K, V]>;
     // (undocumented)
     readonly [Symbol.toStringTag] = "BijectiveIndexedMap";
     constructor(originalMap: BijectiveIndexedMap<K, V>);
@@ -24,7 +24,7 @@ export class BijectiveIndexedMap<K, V> implements Map<K, V> {
     // (undocumented)
     delete(key: K): boolean;
     // (undocumented)
-    entries(): IterableIterator<[K, V]>;
+    entries(): MapIterator<[K, V]>;
     // (undocumented)
     forEach(callback: (value: V, key: K, map: Map<K, V>) => void, thisArg?: any): void;
     // (undocumented)
@@ -32,13 +32,13 @@ export class BijectiveIndexedMap<K, V> implements Map<K, V> {
     // (undocumented)
     has(key: K): boolean;
     // (undocumented)
-    keys(): IterableIterator<K>;
+    keys(): MapIterator<K>;
     // (undocumented)
     set(key: K, value: V): this;
     // (undocumented)
     get size(): number;
     // (undocumented)
-    values(): IterableIterator<V>;
+    values(): MapIterator<V>;
 }
 
 // @public (undocumented)

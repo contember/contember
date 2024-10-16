@@ -116,7 +116,7 @@ export interface FormRadioItemProps {
     // (undocumented)
     isNonbearing?: boolean;
     // (undocumented)
-    value: string;
+    value: string | null | number | boolean;
 }
 
 // @public (undocumented)

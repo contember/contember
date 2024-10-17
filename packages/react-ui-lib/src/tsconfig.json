@@ -17,7 +17,6 @@
 		{ "path": "../../react-identity/src" },
 		{ "path": "../../react-multipass-rendering/src" },
 		{ "path": "../../react-repeater/src" },
-		{ "path": "../../react-routing/src" },
 		{ "path": "../../react-repeater-dnd-kit/src" },
 		{ "path": "../../react-form/src" },
 		{ "path": "../../react-select/src" },

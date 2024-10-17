@@ -1203,7 +1203,6 @@ __metadata:
     "@contember/react-multipass-rendering": "workspace:*"
     "@contember/react-repeater": "workspace:*"
     "@contember/react-repeater-dnd-kit": "workspace:*"
-    "@contember/react-routing": "workspace:*"
     "@contember/react-select": "workspace:*"
     "@contember/react-slate-editor": "workspace:*"
     "@contember/react-slate-editor-base": "workspace:*"

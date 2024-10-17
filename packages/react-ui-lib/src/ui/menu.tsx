@@ -1,7 +1,6 @@
-import { Link, RoutingLinkTarget } from '@contember/react-routing'
-import { ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { uic } from '../utils'
-import { RoleCondition, useProjectUserRoles } from '@contember/interface'
+import { type RoleCondition, useProjectUserRoles, Link, type RoutingLinkTarget } from '@contember/interface'
 import { createContext } from '@contember/react-utils'
 
 export const MenuItemUI = uic('a', {

@@ -72,6 +72,7 @@ import { RoleCondition } from '@contember/interface';
 import { RoutingLinkTarget } from '@contember/interface';
 import * as ScrollAreaPrimitive from '@radix-ui/react-scroll-area';
 import * as SelectPrimitive from '@radix-ui/react-select';
+import { SetStateAction } from 'react';
 import { SlotSourceComponent } from '@contember/react-slots';
 import { SlotTargetComponent } from '@contember/react-slots';
 import { SuccessfulPersistResult } from '@contember/interface';
@@ -93,7 +94,7 @@ import { VideoFileDataExtractorProps } from '@contember/react-uploader';
 import { VideoFileTypeProps } from '@contember/react-uploader';
 
 // @public (undocumented)
-export const AlertDialog: React_2.FC<AlertDialogPrimitive.AlertDialogProps>;
+export const AlertDialog: React_2.ComponentType<AlertDialogPrimitive.AlertDialogProps>;
 
 // @public (undocumented)
 export const AlertDialogAction: React_2.ForwardRefExoticComponent<Omit<AlertDialogPrimitive.AlertDialogActionProps & React_2.RefAttributes<HTMLButtonElement> & {
@@ -1153,7 +1154,7 @@ export type DeleteEntityDialogProps = {
 };
 
 // @public (undocumented)
-export const Dialog: React_2.FC<DialogPrimitive.DialogProps>;
+export const Dialog: React_2.ComponentType<DialogPrimitive.DialogProps>;
 
 // @public (undocumented)
 export const DialogClose: React_2.ForwardRefExoticComponent<DialogPrimitive.DialogCloseProps & React_2.RefAttributes<HTMLButtonElement>>;
@@ -1235,7 +1236,7 @@ gap?: boolean | null | undefined;
 }, "ref"> & RefAttributes<HTMLHRElement>>;
 
 // @public (undocumented)
-export const DropdownMenu: React_2.FC<DropdownMenuPrimitive.DropdownMenuProps>;
+export const DropdownMenu: React_2.ComponentType<DropdownMenuPrimitive.DropdownMenuProps>;
 
 // @public (undocumented)
 export const DropdownMenuCheckboxItem: React_2.ForwardRefExoticComponent<Omit<DropdownMenuPrimitive.DropdownMenuCheckboxItemProps & React_2.RefAttributes<HTMLDivElement> & {
@@ -1911,7 +1912,7 @@ export const PersonList: (props: {
 }) => JSX_2.Element;
 
 // @public (undocumented)
-export const Popover: React_2.FC<PopoverPrimitive.PopoverProps>;
+export const Popover: React_2.ComponentType<PopoverPrimitive.PopoverProps>;
 
 // @public (undocumented)
 export const PopoverAnchor: React_2.ForwardRefExoticComponent<PopoverPrimitive.PopoverAnchorProps & React_2.RefAttributes<HTMLDivElement>>;
@@ -2029,7 +2030,7 @@ export const ScrollArea: React_2.ForwardRefExoticComponent<Omit<ScrollAreaPrimit
 export const ScrollBar: React_2.ForwardRefExoticComponent<Omit<ScrollAreaPrimitive.ScrollAreaScrollbarProps & React_2.RefAttributes<HTMLDivElement>, "ref"> & React_2.RefAttributes<HTMLDivElement>>;
 
 // @public (undocumented)
-export const Select: FC<SelectPrimitive.SelectProps>;
+export const Select: ComponentType<SelectPrimitive.SelectProps>;
 
 // @public (undocumented)
 export const SelectContent: ForwardRefExoticComponent<Omit<SelectPrimitive.SelectContentProps & RefAttributes<HTMLDivElement> & {
@@ -2200,7 +2201,7 @@ className?: string;
 export const SelectValue: ForwardRefExoticComponent<SelectPrimitive.SelectValueProps & RefAttributes<HTMLSpanElement>>;
 
 // @public (undocumented)
-export const Sheet: React_2.FC<DialogPrimitive.DialogProps>;
+export const Sheet: React_2.ComponentType<DialogPrimitive.DialogProps>;
 
 // @public (undocumented)
 export const SheetClose: React_2.ForwardRefExoticComponent<DialogPrimitive.DialogCloseProps & React_2.RefAttributes<HTMLButtonElement>>;
@@ -2731,6 +2732,15 @@ export const UploaderRepeaterItemUI: React_2.ForwardRefExoticComponent<Omit<Reac
 }, "ref"> & React_2.RefAttributes<HTMLDivElement>>;
 
 // @public (undocumented)
+export const useAlertDialogOpenState: () => [boolean, (value: React_2.SetStateAction<boolean>) => void];
+
+// @public (undocumented)
+export const useDialogOpenState: () => [boolean, (value: React_2.SetStateAction<boolean>) => void];
+
+// @public (undocumented)
+export const useDropdownMenuOpenState: () => [boolean, (value: React_2.SetStateAction<boolean>) => void];
+
+// @public (undocumented)
 export const useIntrospectionRolesConfig: (projectSlug: string) => RolesConfig | undefined;
 
 // @public (undocumented)
@@ -2747,6 +2757,12 @@ export const usePersistSuccessHandler: () => (result: SuccessfulPersistResult) =
 
 // @public (undocumented)
 export const usePersistWithFeedback: () => () => Promise<void>;
+
+// @public (undocumented)
+export const useSelectOpenState: () => [boolean, (value: SetStateAction<boolean>) => void];
+
+// @public (undocumented)
+export const useSheetOpenState: () => [boolean, (value: React_2.SetStateAction<boolean>) => void];
 
 // @public (undocumented)
 export const useShowToast: () => (content: ReactNode, options?: ToastOptions) => ToastMethods;

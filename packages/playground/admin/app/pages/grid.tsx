@@ -49,7 +49,14 @@ export const simpleGrid = () => {
 
 			<Binding>
 
-				<DataGrid entities="GridArticle">
+				<DataGrid
+					entities="GridArticle"
+					initialSelection={{
+						visibility: {
+							state: false,
+						},
+					}}
+				>
 
 					<DataGridToolbar>
 						<DataGridQueryFilter />

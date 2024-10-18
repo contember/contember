@@ -24,8 +24,7 @@ export const collectStaticInfo = (props: DataViewProps, env: Environment): DataV
 }
 
 const createDataViewReactNode = (props: DataViewProps, env: Environment) => {
-	const selectionState = props.initialSelection && typeof props.initialSelection !== 'function' ? props.initialSelection : {}
-	const envWithSelectionState = env.withExtension(dataViewSelectionEnvironmentExtension, selectionState)
+	const envWithSelectionState = env.withExtension(dataViewSelectionEnvironmentExtension, {})
 	const entityListSubTree = <EntityListSubTree entities={props.entities} alias="__dataview_static">{props.children}</EntityListSubTree>
 	return [entityListSubTree, envWithSelectionState] as const
 }

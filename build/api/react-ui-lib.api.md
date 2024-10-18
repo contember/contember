@@ -1927,7 +1927,10 @@ export const RadioEnumField: React_2.NamedExoticComponent<RadioEnumFieldProps>;
 // @public (undocumented)
 export type RadioEnumFieldProps = Omit<FormRadioItemProps, 'children' | 'value'> & Omit<FormContainerProps, 'children'> & {
     required?: boolean;
-    options: Record<string, ReactNode>;
+    options: Record<string, ReactNode> | Array<{
+        value: null | string | number | boolean;
+        label: React_2.ReactNode;
+    }>;
     orientation?: 'horizontal' | 'vertical';
     inputProps?: Omit<React_2.InputHTMLAttributes<HTMLInputElement>, 'defaultValue'>;
 };
@@ -2048,7 +2051,10 @@ export const SelectEnumField: React_2.NamedExoticComponent<SelectEnumFieldProps>
 // @public (undocumented)
 export type SelectEnumFieldProps = Omit<FormContainerProps, 'children'> & {
     field: SugaredRelativeSingleField['field'];
-    options: Record<string, React_2.ReactNode>;
+    options: Record<string, React_2.ReactNode> | {
+        value: null | string | number | boolean;
+        label: React_2.ReactNode;
+    }[];
     placeholder?: React_2.ReactNode;
     defaultValue?: string;
     required?: boolean;

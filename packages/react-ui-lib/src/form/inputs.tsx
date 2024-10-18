@@ -6,7 +6,7 @@ import { TextareaAutosize } from '../ui/textarea'
 import { FormLabelUI } from './ui'
 import { FormCheckbox, FormCheckboxProps, FormFieldScope, FormInput, FormInputProps, FormLabel, FormRadioInput, FormRadioItemProps } from '@contember/react-form'
 import { FormContainer, FormContainerProps } from './container'
-import { Component } from '@contember/interface'
+import { Component, Field } from '@contember/interface'
 
 
 export type InputFieldProps =
@@ -77,26 +77,38 @@ export type RadioEnumFieldProps =
 	& Omit<FormContainerProps, 'children'>
 	& {
 		required?: boolean
-		options: Record<string, ReactNode>
+		options: Record<string, ReactNode> | Array<{ value: null | string | number | boolean; label: React.ReactNode }>
 		orientation?: 'horizontal' | 'vertical'
 		inputProps?: Omit<React.InputHTMLAttributes<HTMLInputElement>, 'defaultValue'>
 	}
 
-export const RadioEnumField = Component<RadioEnumFieldProps>(({ field, label, description, options, inputProps, orientation, defaultValue, isNonbearing, required }) => {
+export const RadioEnumField = Component<RadioEnumFieldProps>(({ field, label, description, required, ...rest }) => {
 	return (
 		<FormFieldScope field={field}>
 			<FormContainer description={description} label={label} required={required}>
-				<div className={'flex flex-wrap gap-3 data-[orientation=vertical]:flex-col'} data-orientation={orientation ?? 'vertical'}>
-					{Object.entries(options).map(([value, label]) => (
-						<FormLabelUI className="flex gap-2 items-center font-normal" key={value}>
-							<FormRadioInput field={field} value={value} defaultValue={defaultValue} isNonbearing={isNonbearing}>
-								<RadioInput required={required} {...inputProps} />
-							</FormRadioInput>
-							{label}
-						</FormLabelUI>
-					))}
-				</div>
+				<RadioEnumFieldInner field={field} required={required} {...rest} />
 			</FormContainer>
 		</FormFieldScope>
 	)
-})
+}, ({ field }) => <Field field={field} />)
+
+type RadioEnumFieldInnerProps = Pick<RadioEnumFieldProps, 'field' | 'options' | 'orientation' | 'inputProps' | 'defaultValue' | 'isNonbearing' | 'required'>
+
+const RadioEnumFieldInner: React.FC<RadioEnumFieldInnerProps> = ({ field, inputProps, isNonbearing, required, options, orientation, defaultValue }) => {
+	const normalizedOptions = React.useMemo(() => {
+		return Array.isArray(options) ? options : Object.entries(options).map(([value, label]) => ({ value, label }))
+	}, [options])
+
+	return (
+		<div className={'flex flex-wrap gap-3 data-[orientation=vertical]:flex-col'} data-orientation={orientation ?? 'vertical'}>
+			{normalizedOptions.map(({ value, label }) => (
+				<FormLabelUI className="flex gap-2 items-center font-normal" key={value?.toString()}>
+					<FormRadioInput field={field} value={value} defaultValue={defaultValue} isNonbearing={isNonbearing}>
+						<RadioInput required={required} {...inputProps} />
+					</FormRadioInput>
+					{label}
+				</FormLabelUI>
+			))}
+		</div>
+	)
+}

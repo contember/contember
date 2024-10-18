@@ -26,6 +26,9 @@ export const dict = {
 	toast: {
 		showDetails: 'Show details',
 	},
+	input: {
+		noValue: 'No value',
+	},
 	datagrid: {
 		na: 'N/A',
 		dateStart: 'From',

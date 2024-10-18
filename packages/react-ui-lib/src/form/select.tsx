@@ -18,7 +18,7 @@ import { FormFieldScope, FormHasManyRelationScope, FormHasOneRelationScope, useF
 import { Component, Field, SugaredRelativeSingleField, useEntity, useEntityBeforePersist, useField } from '@contember/interface'
 import { Popover, PopoverTrigger } from '../ui/popover'
 import { ChevronDownIcon, ChevronUpIcon } from 'lucide-react'
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
 import { dict } from '../dict'
 
 
@@ -74,7 +74,7 @@ export type SelectEnumFieldProps =
 	& Omit<FormContainerProps, 'children'>
 	& {
 		field: SugaredRelativeSingleField['field']
-		options: Record<string, React.ReactNode>
+		options: Record<string, React.ReactNode> | { value: null | string | number | boolean; label: React.ReactNode }[]
 		placeholder?: React.ReactNode
 		defaultValue?: string
 		required?: boolean
@@ -96,7 +96,7 @@ export const SelectEnumField = Component<SelectEnumFieldProps>(
 
 const SelectEnumFieldInner = ({ field, options, placeholder, required }: SelectEnumFieldProps) => {
 	const [open, setOpen] = React.useState(false)
-	const fieldAccessor = useField<string>(field)
+	const fieldAccessor = useField(field)
 	const fieldAccessorGetter = fieldAccessor.getAccessor
 	useEntityBeforePersist(useCallback(() => {
 		if (!required) {
@@ -108,12 +108,19 @@ const SelectEnumFieldInner = ({ field, options, placeholder, required }: SelectE
 		}
 	}, [fieldAccessorGetter, required]))
 	const id = useFormFieldId()
+	const normalizedOptions = useMemo(() => {
+		return Array.isArray(options) ? options : Object.entries(options).map(([value, label]) => ({ value, label }))
+	}, [options])
+	const selectedValue = useMemo(() => {
+		return normalizedOptions.find(it => it.value === fieldAccessor.value)
+	}, [fieldAccessor.value, normalizedOptions])
+
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
 			<SelectInputWrapperUI>
 				<PopoverTrigger asChild>
 					<SelectInputUI id={id ? `${id}-input` : undefined}>
-						{fieldAccessor.value ? options[fieldAccessor.value] : placeholder ?? <SelectDefaultPlaceholderUI />}
+						{selectedValue?.label ?? placeholder ?? <SelectDefaultPlaceholderUI />}
 						<SelectInputActionsUI>
 							{open ? <ChevronUpIcon /> : <ChevronDownIcon />}
 						</SelectInputActionsUI>
@@ -121,8 +128,8 @@ const SelectEnumFieldInner = ({ field, options, placeholder, required }: SelectE
 				</PopoverTrigger>
 			</SelectInputWrapperUI>
 			<SelectPopoverContent>
-				{Object.entries(options).map(([value, label]) => (
-					<SelectListItemUI key={value} onClick={() => {
+				{normalizedOptions.map(({ value, label }) => (
+					<SelectListItemUI key={value?.toString()} onClick={() => {
 						fieldAccessor.updateValue(value)
 						setOpen(false)
 					}}>

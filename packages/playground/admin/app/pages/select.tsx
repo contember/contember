@@ -95,6 +95,16 @@ export const EnumSelect = () => {
 						b: 'Option B',
 						c: 'Option C',
 					}} required={required} />
+					<SelectEnumField field={'enumValue'} label={'Enum with boolean, numbers and null'} options={[
+						{ value: 'a', label: 'Option A' },
+						{ value: 'b', label: 'Option B' },
+						{ value: 'c', label: 'Option C' },
+						{ value: true, label: 'True' },
+						{ value: false, label: 'False' },
+						{ value: 1, label: 'One' },
+						{ value: 2, label: 'Two' },
+						{ value: null, label: 'No value' },
+					]} required={required} />
 				</div>
 			</EntitySubTree>
 		</Binding>

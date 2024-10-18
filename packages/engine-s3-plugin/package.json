@@ -1,6 +1,6 @@
 {
   "name": "@contember/engine-s3-plugin",
-  "version": "2.0.0-alpha.19",
+  "version": "2.0.0-alpha.20",
   "license": "Apache-2.0",
   "main": "./dist/production/index.js",
   "typings": "./dist/types/index.d.ts",

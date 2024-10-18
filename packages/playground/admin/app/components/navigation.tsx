@@ -32,6 +32,7 @@ export const Navigation = () => {
 				<MenuItem icon={<BrushIcon size={16} />} label={'UI'}>
 					<MenuItem icon={line} label={'Buttons'} to={'ui/button'} />
 					<MenuItem icon={line} label={'Toasts'} to={'ui/toast'} />
+					<MenuItem icon={line} label={'Dialog'} to={'ui/dialog'} />
 				</MenuItem>
 				<MenuItem icon={<KanbanIcon size={16} />} label={'Kanban'}>
 					<MenuItem icon={line} label={'Dynamic columns'} to={'board/assignee'} />

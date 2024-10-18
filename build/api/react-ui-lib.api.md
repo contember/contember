@@ -69,7 +69,7 @@ import { RenderElementProps } from 'slate-react';
 import { RepeaterAddItemIndex } from '@contember/react-repeater';
 import { RepeaterProps } from '@contember/react-repeater';
 import { RoleCondition } from '@contember/interface';
-import { RoutingLinkTarget } from '@contember/react-routing';
+import { RoutingLinkTarget } from '@contember/interface';
 import * as ScrollAreaPrimitive from '@radix-ui/react-scroll-area';
 import * as SelectPrimitive from '@radix-ui/react-select';
 import { SlotSourceComponent } from '@contember/react-slots';
@@ -1143,10 +1143,14 @@ export type DefaultRepeaterProps = {
 } & RepeaterProps;
 
 // @public (undocumented)
-export const DeleteEntityDialog: ({ trigger, immediatePersist }: {
+export const DeleteEntityDialog: FC<DeleteEntityDialogProps>;
+
+// @public (undocumented)
+export type DeleteEntityDialogProps = {
     trigger: ReactElement;
     immediatePersist?: boolean;
-}) => JSX_2.Element;
+    onSuccessRedirectTo?: RoutingLinkTarget;
+};
 
 // @public (undocumented)
 export const Dialog: React_2.FC<DialogPrimitive.DialogProps>;

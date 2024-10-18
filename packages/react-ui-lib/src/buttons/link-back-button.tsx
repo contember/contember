@@ -1,7 +1,7 @@
 import { ReactNode } from 'react'
 import { AnchorButton } from '../ui/button'
 import { ArrowLeftIcon } from 'lucide-react'
-import { Link, RoutingLinkTarget } from '@contember/react-routing'
+import { Link, type RoutingLinkTarget } from '@contember/interface'
 import { Slots } from '../layout'
 
 export const LinkBackButton = ({ children, to }: {

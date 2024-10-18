@@ -40,6 +40,7 @@ export const Navigation = () => {
 				<MenuItem icon={<GripVertical size={16} />} label={'Repeater'}>
 					<MenuItem icon={line} label={'Sortable repeater'} to={'repeater'} />
 					<MenuItem icon={line} label={'Non-sortable repeater'} to={'repeater/nonSortable'} />
+					<MenuItem icon={line} label={'Repeater on relation'} to={'repeater/onRelation'} />
 					<MenuItem icon={line} label={'Block repeater'} to={'blocks'} />
 					<MenuItem icon={line} label={'Block repeater w/o dual render'} to={'blocks/withoutDualRender'} />
 				</MenuItem>

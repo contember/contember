@@ -1,9 +1,10 @@
 import * as React from 'react'
 import { Binding, DeleteEntityDialog, PersistButton } from '@app/lib/binding'
 import { Slots } from '@app/lib/layout'
-import { Field } from '@contember/interface'
+import { EntitySubTree, Field } from '@contember/interface'
 import { DefaultRepeater, RepeaterItemActions, RepeaterRemoveItemButton } from '@app/lib/repeater'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger, DropDownTriggerButton } from '@app/lib/ui/dropdown'
+import { InputField, SelectField } from '@app/lib/form'
 
 const repeaterDropdown = (
 	<DropdownMenu>
@@ -25,13 +26,38 @@ export default <>
 	<Binding>
 		<Slots.Actions><PersistButton /></Slots.Actions>
 		<DefaultRepeater entities={'RepeaterItem'} sortableBy={'order'} title="Foo items" addButtonPosition="around">
-			<Field field={'title'} />
+			<InputField field={'title'} />
+			<SelectField field={'relation'} >
+				<Field field={'id'} /> /
+				<Field field={'name'} />
+			</SelectField>
 
 			<RepeaterItemActions>
 				{repeaterDropdown}
 				<RepeaterRemoveItemButton />
 			</RepeaterItemActions>
 		</DefaultRepeater>
+	</Binding>
+</>
+
+export const onRelation = <>
+	<Binding>
+		<Slots.Actions><PersistButton /></Slots.Actions>
+		<EntitySubTree entity="RepeaterRoot(unique=unique)" setOnCreate="(unique=unique)">
+			<DefaultRepeater field={'items'} sortableBy={'order'} title="Foo items" addButtonPosition="around">
+				<Field field={'id'} /><br/>
+				<InputField field={'title'} />
+				<SelectField field={'relation'}>
+					<Field field={'id'} /> /
+					<Field field={'name'} />
+				</SelectField>
+
+				<RepeaterItemActions>
+					{repeaterDropdown}
+					<RepeaterRemoveItemButton />
+				</RepeaterItemActions>
+			</DefaultRepeater>
+		</EntitySubTree>
 	</Binding>
 </>
 

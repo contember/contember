@@ -1,0 +1,216 @@
+{
+	"formatVersion": 5,
+	"modifications": [
+		{
+			"modification": "createEnum",
+			"enumName": "RepeaterRootUnique",
+			"values": [
+				"unique"
+			]
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"eventLog": {
+					"enabled": true
+				},
+				"name": "RepeaterRelation",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "repeater_relation",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": [],
+				"indexes": []
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"eventLog": {
+					"enabled": true
+				},
+				"name": "RepeaterRoot",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "repeater_root",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": [],
+				"indexes": []
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "RepeaterRelation",
+			"field": {
+				"name": "name",
+				"columnName": "name",
+				"columnType": "text",
+				"nullable": false,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "RepeaterRoot",
+			"field": {
+				"name": "unique",
+				"columnName": "unique",
+				"columnType": "RepeaterRootUnique",
+				"nullable": false,
+				"type": "Enum"
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "RepeaterItem",
+			"owningSide": {
+				"type": "ManyHasOne",
+				"name": "relation",
+				"target": "RepeaterRelation",
+				"joiningColumn": {
+					"columnName": "relation_id",
+					"onDelete": "restrict"
+				},
+				"nullable": true
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "RepeaterItem",
+			"owningSide": {
+				"type": "ManyHasOne",
+				"name": "root",
+				"target": "RepeaterRoot",
+				"joiningColumn": {
+					"columnName": "root_id",
+					"onDelete": "restrict"
+				},
+				"nullable": true,
+				"inversedBy": "items"
+			},
+			"inverseSide": {
+				"type": "OneHasMany",
+				"name": "items",
+				"target": "RepeaterItem",
+				"ownedBy": "root",
+				"orderBy": [
+					{
+						"path": [
+							"order"
+						],
+						"direction": "asc"
+					}
+				]
+			}
+		},
+		{
+			"modification": "createUniqueConstraint",
+			"entityName": "RepeaterRoot",
+			"unique": {
+				"fields": [
+					"unique"
+				]
+			}
+		},
+		{
+			"modification": "patchAclSchema",
+			"patch": [
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/RepeaterRelation",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"read": {
+								"id": true,
+								"name": true
+							},
+							"create": {
+								"id": true,
+								"name": true
+							},
+							"update": {
+								"id": true,
+								"name": true
+							},
+							"delete": true,
+							"customPrimary": true
+						}
+					}
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/RepeaterRoot",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"read": {
+								"id": true,
+								"unique": true,
+								"items": true
+							},
+							"create": {
+								"id": true,
+								"unique": true,
+								"items": true
+							},
+							"update": {
+								"id": true,
+								"unique": true,
+								"items": true
+							},
+							"delete": true,
+							"customPrimary": true
+						}
+					}
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/RepeaterItem/operations/read/relation",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/RepeaterItem/operations/read/root",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/RepeaterItem/operations/create/relation",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/RepeaterItem/operations/create/root",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/RepeaterItem/operations/update/relation",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/RepeaterItem/operations/update/root",
+					"value": true
+				}
+			]
+		}
+	]
+}

@@ -1,5 +1,6 @@
 import {
 	ClientGeneratedUuid,
+	HasOneRelationMarker,
 	ReceivedDataTree,
 	RuntimeId,
 	ServerId,
@@ -11,7 +12,7 @@ import type { EntityId, PlaceholderName, TreeRootId } from '@contember/binding-c
 import { assertNever } from '@contember/binding-common'
 import { EventManager } from './EventManager'
 import { OperationsHelpers } from './operations/OperationsHelpers'
-import type { EntityListState, EntityRealmState, EntityRealmStateStub, RootStateNode } from './state'
+import { EntityListState, EntityRealmState, EntityRealmStateStub, getEntityMarker, RootStateNode } from './state'
 import type { StateInitializer } from './StateInitializer'
 import type { TreeStore } from './TreeStore'
 import { SubMutationOperation } from './MutationGenerator'
@@ -213,13 +214,11 @@ export class TreeAugmenter {
 	}
 
 	private updateEntityListPersistedData(state: EntityListState, newPersistedIds: EntityListPersistedData) {
-		const persistedWithoutState: EntityId[] = []
-
-		// TODO This isn't particularly efficient. We should probably use something like diff-sequence here.
+		const persistedWithoutState = new Set<EntityId>()
 
 		for (const persistedId of newPersistedIds) {
 			if (!state.children.has(persistedId)) {
-				persistedWithoutState.push(persistedId)
+				persistedWithoutState.add(persistedId)
 			}
 		}
 		for (const [stateId, child] of state.children) {
@@ -231,19 +230,14 @@ export class TreeAugmenter {
 					childRuntimeId instanceof ServerId ||
 					childRuntimeId instanceof ClientGeneratedUuid ||
 					// No persisted entity id to allocate to this so that's a goodbye.
-					persistedWithoutState.length === 0
+					persistedWithoutState.size === 0 ||
+					// not a persisted entity
+					child.type === 'entityRealmStub' ||
+					// We couldn't find a matching persisted entity
+					!this.tryAssignIdToMatching(child, persistedWithoutState)
 				) {
 					state.getAccessor().disconnectEntity(child.getAccessor())
 					continue
-				} else {
-					const drawnId = persistedWithoutState.shift()!
-					OperationsHelpers.changeRealmId(
-						this.treeStore,
-						this.eventManager,
-						this.stateInitializer,
-						child,
-						new ServerId(drawnId, child.entity.entityName),
-					)
 				}
 			} else if (childRuntimeId instanceof ClientGeneratedUuid) {
 				OperationsHelpers.changeRealmId(
@@ -266,5 +260,161 @@ export class TreeAugmenter {
 		}
 		// All that remains now is the order.
 		state.children.changeKeyOrder(newPersistedIds)
+	}
+
+	private tryAssignIdToMatching(realm: EntityRealmState, ids: Set<EntityId>) {
+		for (const candidateId of ids) {
+			if (this.isEntityMatching(realm, candidateId)) {
+				OperationsHelpers.changeRealmId(
+					this.treeStore,
+					this.eventManager,
+					this.stateInitializer,
+					realm,
+					new ServerId(candidateId, realm.entity.entityName),
+				)
+				ids.delete(candidateId)
+				return true
+			}
+		}
+		return false
+	}
+
+	private isEntityMatching(realm: EntityRealmState, id: EntityId) {
+		const uniqueId = ServerId.formatUniqueValue(id, realm.entity.entityName)
+		const persistedData = this.treeStore.persistedEntityData.get(uniqueId)
+		const pathBack = this.treeStore.getPathBackToParent(realm)
+		for (const [placeholderName, child] of realm.children) {
+			const childData = persistedData?.get(placeholderName)
+
+			switch (child.type) {
+				case 'field': {
+					if (childData instanceof ServerId || childData instanceof Set) {
+						throw new BindingError()
+					}
+					const value = child.value ?? child.fieldMarker.defaultValue ?? null
+					if (value !== null && childData !== value) {
+						return false
+					}
+					break
+				}
+				case 'entityRealm':
+				case 'entityRealmStub': {
+					if (!(childData instanceof ServerId) && childData !== undefined && childData !== null) {
+						throw new BindingError()
+					}
+					if (child.entity.id.existsOnServer || child.entity.id instanceof ClientGeneratedUuid) {
+						if (child.entity.id.value !== childData?.value) {
+							return false
+						}
+					} else if (childData) {
+						const marker = getEntityMarker(child)
+						if (!(marker instanceof HasOneRelationMarker)) {
+							throw new BindingError()
+						}
+						if (pathBack?.fieldBackToParent === marker.parameters.field) {
+							continue
+						}
+						if (child.type !== 'entityRealm' || !this.isEntityMatching(child, childData.value)) {
+							return false
+						}
+					} else if (child.type === 'entityRealmStub') {
+						break
+					} else {
+						if (!this.isEmptyEntity(child)) {
+							return false
+						}
+					}
+					break
+				}
+				case 'entityList': {
+					if (childData !== undefined && !(childData instanceof Set)) {
+						throw new BindingError()
+					}
+					if (!childData){
+						break
+					}
+					if (childData?.size !== child.children.size) {
+						return false
+					}
+					const remainingIds = new Set(childData)
+
+					// first check items with known ids
+					for (const childItem of child.children.values()) {
+						if ((childItem.entity.id.existsOnServer || childItem.entity.id instanceof ClientGeneratedUuid)) {
+							if (!childData.has(childItem.entity.id.value)) {
+								return false
+							}
+							remainingIds.delete(childItem.entity.id.value)
+						}
+					}
+
+					// then check items with unknown ids
+					for (const childItem of child.children.values()) {
+						if (!(childItem.entity.id.existsOnServer || childItem.entity.id instanceof ClientGeneratedUuid) && childItem.type === 'entityRealm') {
+							let hasMatch = false
+							for (const id of remainingIds) {
+								if (this.isEntityMatching(childItem, id)) {
+									remainingIds.delete(id)
+									hasMatch = true
+									break
+								}
+							}
+							if (!hasMatch) {
+								return false
+							}
+						}
+					}
+
+					if (remainingIds.size !== 0) {
+						return false
+					}
+					break
+				}
+				default: {
+					return assertNever(child)
+				}
+			}
+		}
+		return true
+	}
+
+	private isEmptyEntity(entity: EntityRealmState) {
+		const pathBack = this.treeStore.getPathBackToParent(entity)
+		for (const [placeholderName, child] of entity.children) {
+			if (child.type === 'field') {
+				if (child.fieldMarker.isNonbearing) {
+					continue
+				}
+				if ((child.value !== null || child.fieldMarker.defaultValue !== null)) {
+					return false
+				}
+			} else if (child.type === 'entityRealm') {
+				const marker = getEntityMarker(child)
+				const isNonBearing = marker.parameters.isNonbearing
+				if (isNonBearing) {
+					continue
+				}
+
+				if (!(marker instanceof HasOneRelationMarker)) {
+					throw new BindingError()
+				}
+				if (pathBack?.fieldBackToParent === marker.parameters.field) {
+					continue
+				}
+				if (!this.isEmptyEntity(child)) {
+					return false
+				}
+			} else if (child.type === 'entityList') {
+				if (child.blueprint.marker.parameters.isNonbearing) {
+					continue
+				}
+				for (const childItem of child.children.values()) {
+					if (childItem.type === 'entityRealm' && !this.isEmptyEntity(childItem)) {
+						return false
+					}
+				}
+			}
+		}
+		return true
 	}
 }

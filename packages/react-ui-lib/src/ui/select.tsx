@@ -1,8 +1,9 @@
 import * as SelectPrimitive from '@radix-ui/react-select'
 import { Check, ChevronDown, ChevronUp } from 'lucide-react'
 import { uic } from '../utils'
+import { createComponentOpenHooks } from '../utils/createComponentOpenHooks'
 
-export const Select = SelectPrimitive.Root
+export const { Component: Select, useOpen: useSelectOpenState } = createComponentOpenHooks(SelectPrimitive.Root)
 
 export const SelectGroup = SelectPrimitive.Group
 

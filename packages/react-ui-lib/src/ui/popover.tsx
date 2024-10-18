@@ -1,8 +1,9 @@
 import * as React from 'react'
 import * as PopoverPrimitive from '@radix-ui/react-popover'
 import { cn } from '../utils'
+import { createComponentOpenHooks } from '../utils/createComponentOpenHooks'
 
-const Popover = PopoverPrimitive.Root
+const { Component: Popover, useOpen: usePopoverOpenstate } = createComponentOpenHooks(PopoverPrimitive.Root)
 
 const PopoverTrigger = PopoverPrimitive.Trigger
 

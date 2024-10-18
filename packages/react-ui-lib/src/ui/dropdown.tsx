@@ -4,8 +4,9 @@ import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu'
 import { Check, ChevronRight, Circle, MoreHorizontalIcon } from 'lucide-react'
 import { cn, uic } from '../utils'
 import { buttonConfig } from './button'
+import { createComponentOpenHooks } from '../utils/createComponentOpenHooks'
 
-export const DropdownMenu = DropdownMenuPrimitive.Root
+export const { Component: DropdownMenu, useOpen: useDropdownMenuOpenState } = createComponentOpenHooks(DropdownMenuPrimitive.Root)
 
 export const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger
 

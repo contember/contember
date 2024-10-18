@@ -24,7 +24,7 @@
   },
   "devDependencies": {
     "@types/js-yaml": "^4.0.9",
-    "@types/node": "^20.16.5",
+    "@types/node": "^20.16.11",
     "@types/npm-package-arg": "^6.1.4"
   },
   "dependencies": {

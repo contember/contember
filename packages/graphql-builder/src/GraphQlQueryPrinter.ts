@@ -43,6 +43,9 @@ export class GraphQlQueryPrinter {
 		const printed = new Set()
 		while (this.usedFragments.size > 0) {
 			const fragmentName = this.usedFragments.values().next().value
+			if (!fragmentName) {
+				break
+			}
 			this.usedFragments.delete(fragmentName)
 			if (printed.has(fragmentName)) {
 				continue

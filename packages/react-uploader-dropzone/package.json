@@ -33,7 +33,7 @@
     "@contember/react-utils": "workspace:*",
     "@contember/utilities": "workspace:*",
     "@radix-ui/react-slot": "^1.1.0",
-    "react-dropzone": "^14.2.3"
+    "react-dropzone": "^14.2.9"
   },
   "peerDependencies": {
     "react": "^18 || ^19",

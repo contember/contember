@@ -6,8 +6,8 @@ import { UserError } from '../exception'
 import { ImplementationException } from '../exception'
 
 export class CreateInputVisitor<Result> implements
-	Model.ColumnVisitor<Promise<Result | Result[] | undefined>>,
-	Model.RelationByTypeVisitor<Promise<Result | Result[] | undefined>> {
+	Model.ColumnVisitor<Promise<Result[]>>,
+	Model.RelationByTypeVisitor<Promise<Result[]>> {
 
 	constructor(
 		private readonly createInputProcessor: CreateInputProcessor<Result>,
@@ -15,11 +15,11 @@ export class CreateInputVisitor<Result> implements
 		private readonly data: Input.CreateDataInput,
 	) {}
 
-	public visitColumn(context: Model.ColumnContext): Promise<Result> {
-		return this.createInputProcessor.column({
+	public async visitColumn(context: Model.ColumnContext): Promise<Result[]> {
+		return [await this.createInputProcessor.column({
 			...context,
 			input: this.data[context.column.name] as Input.ColumnValue,
-		})
+		})]
 	}
 
 	public visitManyHasManyInverse(context: Model.ManyHasManyInverseContext) {
@@ -70,27 +70,27 @@ export class CreateInputVisitor<Result> implements
 		)
 	}
 
-	private processRelationInput<Context>(
+	private async processRelationInput<Context>(
 		processor: CreateInputProcessor.HasOneRelationProcessor<Context, Result>,
 		context: Context,
 		input: Input.CreateOneRelationInput | undefined,
-	): Promise<undefined | Result> {
+	): Promise<Result[]> {
 		if (input === undefined || input === null) {
 			if (processor.nothing) {
-				return processor.nothing({ ...context, input: undefined })
+				return [await processor.nothing({ ...context, input: undefined })]
 			}
-			return Promise.resolve(undefined)
+			return Promise.resolve([])
 		}
 		input = filterObject(input, (k, v) => v !== null && v !== undefined)
 		this.verifyOperations(input)
 		if (isIt<Input.ConnectRelationInput>(input, 'connect')) {
-			return processor.connect({ ...context, input: input.connect })
+			return [await processor.connect({ ...context, input: input.connect })]
 		}
 		if (isIt<Input.CreateRelationInput>(input, 'create')) {
-			return processor.create({ ...context, input: input.create })
+			return [await processor.create({ ...context, input: input.create })]
 		}
 		if (isIt<Input.ConnectOrCreateRelationInput>(input, 'connectOrCreate')) {
-			return processor.connectOrCreate({ ...context, input: input.connectOrCreate })
+			return [await processor.connectOrCreate({ ...context, input: input.connectOrCreate })]
 		}
 		throw new ImplementationException()
 	}
@@ -99,9 +99,9 @@ export class CreateInputVisitor<Result> implements
 		processor: CreateInputProcessor.HasManyRelationProcessor<Context, Result>,
 		context: Context,
 		input: Input.CreateManyRelationInput | undefined,
-	): Promise<undefined | Result[]> {
+	): Promise<Result[]> {
 		if (input === undefined || input === null) {
-			return Promise.resolve(undefined)
+			return Promise.resolve([])
 		}
 		const results: Result[] = []
 		let i = 0

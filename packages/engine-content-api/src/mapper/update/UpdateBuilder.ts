@@ -1,28 +1,21 @@
 import { tuple } from '../../utils'
 import { Acl, Input, Model, Value } from '@contember/schema'
 import { acceptEveryFieldVisitor, getColumnName, getColumnType } from '@contember/schema-utils'
-import { Client, Operator, QueryBuilder, UpdateBuilder as DbUpdateBuilder, Value as DbValue } from '@contember/database'
+import { Operator, QueryBuilder, UpdateBuilder as DbUpdateBuilder, Value as DbValue } from '@contember/database'
 import { PathFactory, WhereBuilder } from '../select'
 import { ColumnValue, ResolvedColumnValue, resolveGenericValue, resolveRowData } from '../ColumnValue'
 import { PredicateFactory } from '../../acl'
-import { AbortDataManipulation, DataManipulationBuilder } from '../DataManipulationBuilder'
-import { AfterUpdateEvent, BeforeUpdateEvent, EventManager } from '../EventManager'
+import { AfterUpdateEvent, BeforeUpdateEvent } from '../EventManager'
 import { Mapper } from '../Mapper'
 
 export interface UpdateResult {
 	values: ResolvedColumnValue[]
 	executed: boolean
-	aborted: boolean
 	affectedRows: number | null
 }
 
-export class UpdateBuilder implements DataManipulationBuilder {
-	private resolver: (value: number | null) => void = () => {
-		throw new Error('UpdateBuilder: Resolver called too soon')
-	}
-	public readonly update: Promise<number | null> = new Promise(resolve => (this.resolver = resolve))
-
-	private rowData: Map<string, ColumnValue<AbortDataManipulation>> = new Map()
+export class UpdateBuilder {
+	private rowData: Map<string, ColumnValue> = new Map()
 
 	private newWhere: { and: Input.OptionalWhere[] } = { and: [] }
 	private oldWhere: { and: Input.OptionalWhere[] } = { and: [] }
@@ -38,8 +31,8 @@ export class UpdateBuilder implements DataManipulationBuilder {
 
 	public addFieldValue(
 		fieldName: string,
-		value: Value.GenericValueLike<Value.AtomicValue<AbortDataManipulation | undefined>>,
-	): Promise<Value.AtomicValue<AbortDataManipulation | undefined>> {
+		value: Value.GenericValueLike<Value.AtomicValue<undefined>>,
+	): Promise<Value.AtomicValue<undefined>> {
 		const columnName = getColumnName(this.schema, this.entity, fieldName)
 		const columnType = getColumnType(this.schema, this.entity, fieldName)
 		const resolvedValue = resolveGenericValue(value)
@@ -63,14 +56,9 @@ export class UpdateBuilder implements DataManipulationBuilder {
 
 	public async execute(mapper: Mapper): Promise<UpdateResult> {
 		try {
-			const resolvedData = await resolveRowData<AbortDataManipulation>([...this.rowData.values()])
+			const resolvedData = await resolveRowData([...this.rowData.values()])
 			if (Object.keys(resolvedData).length === 0) {
-				this.resolver(null)
-				return { values: [], affectedRows: null, executed: false, aborted: false }
-			}
-			if (resolvedData.find(it => it.resolvedValue === AbortDataManipulation)) {
-				this.resolver(null)
-				return { values: [], affectedRows: null, executed: false, aborted: true }
+				return { values: [], affectedRows: null, executed: false }
 			}
 			const oldColSuffix = '_old__'
 
@@ -134,7 +122,6 @@ export class UpdateBuilder implements DataManipulationBuilder {
 			await mapper.eventManager.fire(beforeEvent)
 
 			const result = await qb.execute(mapper.db)
-			this.resolver(result.length)
 
 			if (result.length === 1) {
 				const eventData = (resolvedData as ResolvedColumnValue[]).map(it => ({
@@ -146,9 +133,8 @@ export class UpdateBuilder implements DataManipulationBuilder {
 				await mapper.eventManager.fire(afterUpdateEvent)
 			}
 
-			return { values: resolvedData as ResolvedColumnValue[], affectedRows: result.length, executed: true, aborted: false }
+			return { values: resolvedData as ResolvedColumnValue[], affectedRows: result.length, executed: true }
 		} catch (e) {
-			this.resolver(null)
 			throw e
 		}
 	}

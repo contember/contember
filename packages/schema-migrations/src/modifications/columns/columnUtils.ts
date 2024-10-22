@@ -36,7 +36,7 @@ export const formatSeedExpression = ({ model, entity, columnType, fillValue, cop
 	copyValue?: string
 }): string | null => {
 	if (fillValue !== undefined) {
-		return escapeValue(fillValue)
+		return escapeValue(fillValue).toString()
 	} else if (copyValue !== undefined) {
 		const copyFrom = getColumnName(model, entity, copyValue)
 		return `${wrapIdentifier(copyFrom)}::${columnType}`

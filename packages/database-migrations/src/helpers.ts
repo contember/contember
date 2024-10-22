@@ -16,7 +16,7 @@ export function createMigrationBuilder(): MigrationBuilder & { getSql: () => str
 	)
 }
 
-export function escapeValue(value: any): any {
+export function escapeValue(value: any): string | number {
 	return pgEscape(value)
 }
 

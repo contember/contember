@@ -73,8 +73,6 @@ export const dict = {
 		confirmNew: 'Confirm',
 		cancelNew: 'Cancel',
 		search: 'Search',
-		paginationPreviousPage: 'Previous page',
-		paginationNextPage: 'Next page',
 		placeholder: 'Select',
 	},
 	backButton: {

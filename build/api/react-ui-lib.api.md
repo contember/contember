@@ -2160,9 +2160,6 @@ export type SelectListProps = {
 };
 
 // @public (undocumented)
-export const SelectPagination: () => JSX_2.Element | null;
-
-// @public (undocumented)
 export const SelectPopoverContent: React_2.ForwardRefExoticComponent<Omit<Omit<PopoverContentProps & React_2.RefAttributes<HTMLDivElement>, "ref"> & React_2.RefAttributes<HTMLDivElement> & {
     asChild?: boolean;
     children?: React_2.ReactNode;

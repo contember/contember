@@ -22,7 +22,7 @@ export const DataGridColumnHeader = Component(({ sortingField, hidingName, child
 	}
 
 	if (!sortingField && !hidingName && !filter) {
-		return <div>{children}</div>
+		return <div className="text-xs">{children}</div>
 	}
 
 	return (

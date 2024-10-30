@@ -1,6 +1,6 @@
 import { DataView, DataViewLoaderState, DataViewProps } from '@contember/react-dataview'
 import * as React from 'react'
-import { Fragment, ReactNode } from 'react'
+import { ReactNode } from 'react'
 import { DataGridInitialLoader, DataGridOverlayLoader } from './loader'
 import { Component } from '@contember/interface'
 

@@ -1,6 +1,7 @@
 import { MembershipInput } from '@contember/graphql-client-tenant'
+import { dict } from '../../dict'
 import { Button } from '../../ui/button'
-import { PlusIcon, TrashIcon } from 'lucide-react'
+import { PlusIcon, XIcon } from 'lucide-react'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../ui/dropdown'
 import { Fragment, ReactNode, useMemo } from 'react'
 import { useProjectRolesDefinitionQuery, useTenantQueryLoader } from '@contember/react-client-tenant'
@@ -30,14 +31,34 @@ export const MembershipsControl = ({ setMemberships, memberships, roles }: Membe
 
 	return (
 		<div className="flex flex-col gap-4">
+			{remainingRoles.length ? <div>
+				<DropdownMenu>
+					<DropdownMenuTrigger asChild>
+						<Button variant="outline" className="flex gap-2"><PlusIcon className="w-4 h-4"/>{dict.tenant.invite.addRole}</Button>
+					</DropdownMenuTrigger>
+					<DropdownMenuContent>
+						{remainingRoles.map(role => <DropdownMenuItem
+							key={role}
+							onClick={() => setMemberships([...memberships, {
+								role: role,
+								variables: [],
+							}])}
+						>{roles?.[role].label}</DropdownMenuItem>)}
+					</DropdownMenuContent>
+				</DropdownMenu>
+			</div> : null}
 			{memberships.map(membership => {
 				const role = roles?.[membership.role]
 				return (
-					<div key={membership.role} className="border rounded p-4">
-						<div className="flex justify-between">
+					<div key={membership.role} className="border rounded px-4 py-2">
+						<div className="flex justify-between items-center">
 							<h2 className="font-semibold">{role?.label ?? membership.role}</h2>
-							<Button onClick={() => setMemberships(memberships.filter(it => it.role !== membership.role))} variant="destructive" type="button">
-								<TrashIcon className="w-3 h-3" />
+							<Button
+								onClick={() => setMemberships(memberships.filter(it => it.role !== membership.role))}
+								variant="ghost"
+								type="button"
+							>
+								<XIcon className="w-4 h-4"/>
 							</Button>
 						</div>
 						<div>
@@ -61,7 +82,8 @@ export const MembershipsControl = ({ setMemberships, memberships, roles }: Membe
 															],
 														}),
 													)
-												}} />
+												}}
+											/>
 										</div>
 									</Fragment>
 								)
@@ -81,16 +103,6 @@ export const MembershipsControl = ({ setMemberships, memberships, roles }: Membe
 					</div>
 				)
 			})}
-			<div>
-				{remainingRoles.length ? <DropdownMenu>
-					<DropdownMenuTrigger asChild>
-						<Button variant="outline"><PlusIcon className="w-3 h-3" /></Button>
-					</DropdownMenuTrigger>
-					<DropdownMenuContent>
-						{remainingRoles.map(role => <DropdownMenuItem key={role} onClick={() => setMemberships([...memberships, { role: role, variables: [] }])}>{roles?.[role].label}</DropdownMenuItem>)}
-					</DropdownMenuContent>
-				</DropdownMenu> : null}
-			</div>
 		</div>
 	)
 }

@@ -65,7 +65,7 @@ export const Members = () => {
 								memberListController.current?.refresh()
 							}}
 						>
-							<form className="grid gap-4">
+							<form>
 								<InviteFormFields projectSlug={projectSlug} />
 							</form>
 						</InviteForm>

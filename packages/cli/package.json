@@ -6,7 +6,7 @@
     "contember": "./dist/production/run.js"
   },
   "scripts": {
-    "build": "tailwindcss -i src/lib/project/docs/resources/style.css -o ./dist/src/utils/project/resources/out.css"
+    "build": "tailwindcss -i src/lib/project/docs/resources/style.css -o ./dist/resources/out.css"
   },
   "devDependencies": {
     "@types/fs-extra": "^11.0.4",

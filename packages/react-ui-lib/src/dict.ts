@@ -167,6 +167,7 @@ export const dict = {
 			name: 'Name',
 			roles: 'Roles',
 			submit: 'Invite',
+			addRole: 'Add new role',
 			errorMessages: {
 				'FIELD_REQUIRED': 'This field is required',
 				'UNKNOWN_ERROR': 'Something went wrong. Please try again later',

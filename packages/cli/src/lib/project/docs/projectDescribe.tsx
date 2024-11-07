@@ -3,13 +3,12 @@ import { h } from 'preact'
 import render from 'preact-render-to-string'
 import { ProjectInfo } from './components/ProjectInfo'
 import { readFile } from 'node:fs/promises'
-import { dirname } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { packageRoot } from '../../../consts'
 
 export const renderProjectInfoHtml = async (schema: Schema, projectName: string) => {
 	const html = render(<ProjectInfo schema={schema} projectName={projectName} />)
 
-	const css = await readFile(dirname(fileURLToPath(import.meta.url)) + '/resources/out.css')
+	const css = await readFile(packageRoot + '/dist/resources/out.css')
 	return `<!DOCTYPE html>
 <html lang="en">
 <head>

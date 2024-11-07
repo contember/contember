@@ -1,28 +1,20 @@
 import { Acl, Input, Model, Value } from '@contember/schema'
-import { Client, InsertBuilder as DbInsertBuilder, QueryBuilder, Value as DbValue } from '@contember/database'
+import { InsertBuilder as DbInsertBuilder, QueryBuilder, Value as DbValue } from '@contember/database'
 import { PathFactory, WhereBuilder } from '../select'
 import { getColumnName, getColumnType } from '@contember/schema-utils'
 import { ColumnValue, ResolvedColumnValue, resolveGenericValue, resolveRowData } from '../ColumnValue'
-import { ImplementationException } from '../../exception'
 import { PredicateFactory } from '../../acl'
-import { AbortDataManipulation, DataManipulationBuilder } from '../DataManipulationBuilder'
-import { AfterInsertEvent, BeforeInsertEvent, EventManager } from '../EventManager'
+import { AfterInsertEvent, BeforeInsertEvent } from '../EventManager'
 import { Mapper } from '../Mapper'
 
 export interface InsertResult {
 	values: ResolvedColumnValue[]
 	executed: boolean
-	aborted: boolean
 	primaryValue: Value.PrimaryValue | null
 }
 
-export class InsertBuilder implements DataManipulationBuilder {
-	private resolver: (value: Value.PrimaryValue | null) => void = () => {
-		throw new ImplementationException('InsertBuilder: Resolver called too soon')
-	}
-	public readonly insert: Promise<Value.PrimaryValue | null> = new Promise(resolve => (this.resolver = resolve))
-
-	private rowData: Map<string, ColumnValue<AbortDataManipulation | undefined>> = new Map()
+export class InsertBuilder {
+	private rowData: Map<string, ColumnValue<undefined>> = new Map()
 	private where: { and: Input.OptionalWhere[] } = { and: [] }
 
 	constructor(
@@ -35,8 +27,8 @@ export class InsertBuilder implements DataManipulationBuilder {
 
 	public addFieldValue(
 		fieldName: string,
-		value: Value.GenericValueLike<Value.AtomicValue<AbortDataManipulation | undefined>>,
-	): Promise<Value.AtomicValue<AbortDataManipulation | undefined>> {
+		value: Value.GenericValueLike<Value.AtomicValue<undefined>>,
+	): Promise<Value.AtomicValue<undefined>> {
 		const columnName = getColumnName(this.schema, this.entity, fieldName)
 		const columnType = getColumnType(this.schema, this.entity, fieldName)
 		const resolvedValue = resolveGenericValue(value)
@@ -53,17 +45,13 @@ export class InsertBuilder implements DataManipulationBuilder {
 		this.where.and.push(where)
 	}
 
-	public async getResolvedData(): Promise<ResolvedColumnValue<AbortDataManipulation>[]> {
+	public async getResolvedData(): Promise<ResolvedColumnValue[]> {
 		return resolveRowData([...this.rowData.values()])
 	}
 
 	public async execute(mapper: Mapper): Promise<InsertResult> {
 		try {
 			const resolvedData = await this.getResolvedData()
-			if (resolvedData.find(it => it.resolvedValue === AbortDataManipulation)) {
-				this.resolver(null)
-				return { aborted: true, executed: false, primaryValue: null, values: [] }
-			}
 
 			const insertData = resolvedData.reduce<QueryBuilder.ColumnExpressionMap>(
 				(result, item) => ({ ...result, [item.columnName]: expr => expr.select(['root_', item.columnName]) }),
@@ -95,10 +83,8 @@ export class InsertBuilder implements DataManipulationBuilder {
 			beforeInsertEvent.afterEvent = afterInsertEvent
 			await mapper.eventManager.fire(afterInsertEvent)
 
-			this.resolver(result)
-			return { values: resolvedData as ResolvedColumnValue[], executed: true, primaryValue: result, aborted: false }
+			return { values: resolvedData as ResolvedColumnValue[], executed: true, primaryValue: result }
 		} catch (e) {
-			this.resolver(null)
 			throw e
 		}
 	}

@@ -1,20 +1,11 @@
-import {
-	collectResults,
-	MutationCreateOk,
-	MutationNoResultError,
-	MutationNothingToDo,
-	MutationResultList,
-	NothingToDoReason,
-	RowValues,
-} from '../Result'
+import { MutationCreateOk, MutationNoResultError, MutationNothingToDo, MutationResultList, NothingToDoReason } from '../Result'
 import { CreateInputVisitor } from '../../inputProcessing'
-import { SqlCreateInputProcessor } from './SqlCreateInputProcessor'
+import { SqlCreateInputProcessor, SqlCreateInputProcessorResult } from './SqlCreateInputProcessor'
 import { Mapper } from '../Mapper'
-import { Input, Model, Value } from '@contember/schema'
-import { acceptEveryFieldVisitor, Providers } from '@contember/schema-utils'
+import { Input, Model } from '@contember/schema'
+import { acceptFieldVisitor, Providers } from '@contember/schema-utils'
 import { InsertBuilderFactory } from './InsertBuilderFactory'
 import { InsertBuilder } from './InsertBuilder'
-import { tryMutation } from '../ErrorUtils'
 import { rowDataToFieldValues } from '../ColumnValue'
 import { DatabaseMetadata } from '@contember/database'
 
@@ -34,45 +25,67 @@ export class Inserter {
 		builderCb: (builder: InsertBuilder) => void,
 	): Promise<MutationResultList> {
 		const insertBuilder = this.insertBuilderFactory.create(entity)
-		// eslint-disable-next-line promise/catch-or-return
-		insertBuilder.insert.then(id => id && insertIdCallback(String(id)))
 
 		insertBuilder.addPredicates(Object.keys(data))
-		const visitor = new CreateInputVisitor<MutationResultList>(
+
+		const visitor = new CreateInputVisitor<SqlCreateInputProcessorResult>(
 			new SqlCreateInputProcessor(insertBuilder, mapper, this.providers),
 			this.schema,
 			data,
 		)
-		const promises = acceptEveryFieldVisitor<Promise<MutationResultList | MutationResultList[] | undefined>>(
-			this.schema,
-			entity,
-			visitor,
-		)
+
+		const resultList: MutationResultList = []
+		const postInserts: Exclude<SqlCreateInputProcessorResult, MutationResultList>[] = []
+
+		const keys = new Set([
+			entity.primary,
+			...Object.keys(data),
+			...Object.keys(entity.fields),
+		])
+
+		for (const key of keys.values()) {
+			const resultSet = await acceptFieldVisitor(
+				this.schema,
+				entity,
+				key,
+				visitor,
+			)
+			for (const result of resultSet) {
+				if (typeof result === 'function') {
+					postInserts.push(result)
+				} else {
+					for (const resultItem of await result) {
+						resultList.push(resultItem)
+						if (resultItem.error) {
+							return resultList
+						}
+					}
+				}
+			}
+		}
+
 		builderCb(insertBuilder)
+		const insertResult = await insertBuilder.execute(mapper)
 
-		const okResultFactory = (primary: Value.PrimaryValue, values: RowValues) =>
-			new MutationCreateOk([], entity, primary, data, values)
-		const insertPromise = this.executeInsert(insertBuilder, mapper, okResultFactory)
+		if (insertResult.primaryValue === null) {
+			return [new MutationNoResultError([]), ...resultList]
+		}
+		insertIdCallback(String(insertResult.primaryValue))
 
-		return await collectResults(this.schema, this.schemaDatabaseMetadata, insertPromise, Object.values(promises))
-	}
+		const okResult = new MutationCreateOk([], entity, insertResult.primaryValue, data, rowDataToFieldValues(insertResult.values))
+		resultList.unshift(okResult)
 
-	private async executeInsert(
-		insertBuilder: InsertBuilder,
-		mapper: Mapper,
-		okResultFactory: (primary: Value.PrimaryValue, values: RowValues) => MutationCreateOk,
-	): Promise<MutationResultList> {
-		return tryMutation(this.schema, this.schemaDatabaseMetadata, async () => {
-			const result = await insertBuilder.execute(mapper)
-			if (result.aborted) {
-				return [new MutationNothingToDo([], NothingToDoReason.aborted)]
+		for (const postInsert of postInserts) {
+			const postInsertResult = await postInsert({ primary: insertResult.primaryValue })
+			for (const result of postInsertResult) {
+				resultList.push(result)
+				if (result.error) {
+					return resultList
+				}
 			}
+		}
 
-			if (result.primaryValue === null) {
-				return [new MutationNoResultError([])]
-			}
-			return [okResultFactory(result.primaryValue, rowDataToFieldValues(result.values))]
-		})
+		return resultList
 	}
 }
 

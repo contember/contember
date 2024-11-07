@@ -49,22 +49,22 @@ test('insert posts with locales (one has many)', async () => {
 				},
 				{
 					sql: SQL`with "root_" as
-						(select ? :: uuid as "post_id", ? :: uuid as "id", ? :: text as "locale", ? :: text as "title")
-						insert into "public"."post_locale" ("post_id", "id", "locale", "title")
-						select "root_"."post_id", "root_"."id", "root_"."locale", "root_"."title"
+						(select ? :: uuid as "id", ? :: text as "locale", ? :: text as "title", ? :: uuid as "post_id")
+						insert into "public"."post_locale" ("id", "locale", "title", "post_id")
+						select "root_"."id", "root_"."locale", "root_"."title", "root_"."post_id"
             from "root_"
 						returning "id"`,
-					parameters: [testUuid(1), testUuid(2), 'cs', 'Ahoj svete'],
+					parameters: [testUuid(2), 'cs', 'Ahoj svete', testUuid(1)],
 					response: { rows: [{ id: testUuid(2) }] },
 				},
 				{
 					sql: SQL`with "root_" as
-						(select ? :: uuid as "post_id", ? :: uuid as "id", ? :: text as "locale", ? :: text as "title")
-						insert into "public"."post_locale" ("post_id", "id", "locale", "title")
-						select "root_"."post_id", "root_"."id", "root_"."locale", "root_"."title"
+						(select ? :: uuid as "id", ? :: text as "locale", ? :: text as "title", ? :: uuid as "post_id")
+						insert into "public"."post_locale" ("id", "locale", "title", "post_id")
+						select "root_"."id", "root_"."locale", "root_"."title", "root_"."post_id"
             from "root_"
 						returning "id"`,
-					parameters: [testUuid(1), testUuid(3), 'en', 'Hello world'],
+					parameters: [testUuid(3), 'en', 'Hello world', testUuid(1)],
 					response: { rows: [{ id: testUuid(3) }] },
 				},
 				{

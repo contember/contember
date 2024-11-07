@@ -68,12 +68,12 @@ test('upsert - not exists (composed unique)', async () => {
 				},
 				{
 					sql: SQL`with "root_" as
-							(select ? :: uuid as "id", ? :: text as "title", ? :: text as "locale", ? :: uuid as "post_id")
-							insert into "public"."post_locale" ("id", "title", "locale", "post_id")
-							select "root_"."id", "root_"."title", "root_"."locale", "root_"."post_id"
+							(select ? :: uuid as "id", ? :: text as "title", ? :: uuid as "post_id", ? :: text as "locale")
+							insert into "public"."post_locale" ("id", "title", "post_id", "locale")
+							select "root_"."id", "root_"."title", "root_"."post_id", "root_"."locale"
               from "root_"
 							returning "id"`,
-					parameters: [testUuid(1), 'World', null, testUuid(2)],
+					parameters: [testUuid(1), 'World', testUuid(2), null],
 					response: { rows: [{ id: testUuid(1) }] },
 				},
 			]),

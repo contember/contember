@@ -1,8 +1,4 @@
 import { Input, Model, Value } from '@contember/schema'
-import { convertError } from './ErrorUtils'
-import { getFulfilledValues, getRejections } from '../utils'
-import { DatabaseMetadata, SerializationFailureError } from '@contember/database'
-import { logger } from '@contember/logger'
 
 export enum MutationResultType {
 	ok = 'ok',
@@ -44,6 +40,7 @@ export type MutationResultList = MutationResult[]
 type Path = ({ field: string } | { index: number; alias?: string })[]
 
 interface MutationResultInterface {
+	error: boolean
 	result: MutationResultType
 	paths: Path[]
 	message?: string
@@ -53,6 +50,7 @@ interface MutationResultInterface {
 export type RowValues = { [fieldName: string]: Value.FieldValue }
 
 export class MutationUpdateOk implements MutationResultInterface {
+	error = false
 	result = MutationResultType.ok as const
 	type = ModificationType.update as const
 	hints: MutationResultHint[] = []
@@ -68,6 +66,7 @@ export class MutationUpdateOk implements MutationResultInterface {
 }
 
 export class MutationCreateOk implements MutationResultInterface {
+	error = false
 	result = MutationResultType.ok as const
 	type = ModificationType.create as const
 	hints: MutationResultHint[] = []
@@ -82,6 +81,7 @@ export class MutationCreateOk implements MutationResultInterface {
 }
 
 export class MutationDeleteOk implements MutationResultInterface {
+	error = false
 	result = MutationResultType.ok as const
 	type = ModificationType.delete as const
 	hints: MutationResultHint[] = []
@@ -94,6 +94,7 @@ export class MutationDeleteOk implements MutationResultInterface {
 }
 
 export class MutationJunctionUpdateOk implements MutationResultInterface {
+	error = false
 	result = MutationResultType.ok as const
 	type = ModificationType.junctionUpdate as const
 	hints: MutationResultHint[] = []
@@ -116,6 +117,7 @@ export enum NothingToDoReason {
 }
 
 export class MutationNothingToDo implements MutationResultInterface {
+	error = false
 	result = MutationResultType.nothingToDo as const
 	hints: MutationResultHint[] = []
 
@@ -128,6 +130,7 @@ export enum InputErrorKind {
 }
 
 export class MutationInputError implements MutationResultInterface {
+	error = true
 	result = MutationResultType.inputError as const
 
 	constructor(
@@ -139,6 +142,7 @@ export class MutationInputError implements MutationResultInterface {
 }
 
 export class MutationSqlError implements MutationResultInterface {
+	error = true
 	result = MutationResultType.sqlError as const
 
 	constructor(
@@ -155,6 +159,7 @@ export enum ConstraintType {
 }
 
 export class MutationConstraintViolationError implements MutationResultInterface {
+	error = true
 	result = MutationResultType.constraintViolationError as const
 
 	constructor(
@@ -167,6 +172,7 @@ export class MutationConstraintViolationError implements MutationResultInterface
 
 // maybe denied by acl
 export class MutationEntryNotFoundError implements MutationResultInterface {
+	error = true
 	result = MutationResultType.notFoundError as const
 	hints: MutationResultHint[] = []
 	message: string
@@ -178,6 +184,7 @@ export class MutationEntryNotFoundError implements MutationResultInterface {
 
 // possibly denied by acl
 export class MutationNoResultError implements MutationResultInterface {
+	error = true
 	result = MutationResultType.noResultError as const
 
 	constructor(
@@ -197,46 +204,3 @@ export const getInsertPrimary = (result: MutationResultList) =>
 	result[0] && result[0].result === MutationResultType.ok && result[0].type === ModificationType.create
 		? result[0].primary
 		: undefined
-
-export const getUpdatePrimary = (result: MutationResultList) =>
-	result[0] && result[0].result === MutationResultType.ok && result[0].type === ModificationType.update
-		? result[0].primary
-		: undefined
-
-export const flattenResult = (result: (MutationResultList | MutationResultList[])[]): MutationResultList =>
-	result
-		.reduce<(MutationResult | MutationResult[])[]>((acc, it) => [...acc, ...it], [])
-		.reduce<MutationResultList>((acc, it) => (Array.isArray(it) ? [...acc, ...it] : [...acc, it]), [])
-
-export type ResultListNotFlatten = MutationResultList | MutationResultList[]
-
-export const collectResults = async (
-	schema: Model.Schema,
-	schemaDatabaseMetadata: DatabaseMetadata,
-	mainPromise: Promise<ResultListNotFlatten | undefined> | undefined,
-	otherPromises: (Promise<ResultListNotFlatten | undefined> | undefined)[],
-): Promise<MutationResultList> => {
-	let index = 0
-	const allPromises: Promise<{ index: number; value: ResultListNotFlatten }>[] = [mainPromise, ...otherPromises]
-		.filter((it): it is Promise<ResultListNotFlatten> => !!it)
-		.map(it =>
-			it //
-				.catch(e => [convertError(schema, schemaDatabaseMetadata, e)])
-				.then(value => ({ value, index: index++ })),
-		)
-	const results = await Promise.allSettled(allPromises)
-	const failures = getRejections(results)
-	if (failures.length > 0) {
-		if (failures.length > 1 && !failures.every(it => it instanceof SerializationFailureError)) {
-			failures.slice(1).map(e => logger.error(e))
-		}
-		throw failures[0]
-	}
-
-	const values = getFulfilledValues(results)
-	const sortedValues = [values[0], ...values.slice(1).sort((a, b) => a.index - b.index)]
-
-	return flattenResult(
-		sortedValues.map(it => it.value).filter((it): it is MutationResultList | MutationResultList[] => !!it),
-	)
-}

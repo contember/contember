@@ -1,4 +1,5 @@
 export * from './highlight'
+export * from './infiniteLoad'
 export * from './paging'
 export * from './sorting'
 export * from './selection'

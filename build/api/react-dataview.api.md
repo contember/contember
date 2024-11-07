@@ -441,6 +441,30 @@ export interface DataViewHighlightRowProps {
     onHighlight?: (event: DataViewHighlightEvent) => void;
 }
 
+// @internal (undocumented)
+export const DataViewInfiniteLoadAccessorsContext: React_2.Context<EntityListAccessor[]>;
+
+// @public (undocumented)
+export const DataViewInfiniteLoadEachRow: React_2.NamedExoticComponent<{
+    children: ReactNode;
+}>;
+
+// @public (undocumented)
+export const DataViewInfiniteLoadProvider: React_2.NamedExoticComponent<{
+    children: ReactNode;
+}>;
+
+// @public (undocumented)
+export const DataViewInfiniteLoadScrollObserver: () => JSX_2.Element;
+
+// @public (undocumented)
+export const DataViewInfiniteLoadTrigger: React_2.ForwardRefExoticComponent<{
+    children: ReactElement;
+} & React_2.RefAttributes<HTMLElement>>;
+
+// @internal (undocumented)
+export const DataViewInfiniteLoadTriggerContext: React_2.Context<(() => void) | undefined>;
+
 // @public (undocumented)
 export type DataViewInfo = {
     paging: DataViewPagingInfo;
@@ -1082,6 +1106,12 @@ export const useDataViewGlobalKey: () => string;
 
 // @public (undocumented)
 export const useDataViewHighlightIndex: () => number | null;
+
+// @public (undocumented)
+export const useDataViewInfiniteLoadAccessors: () => EntityListAccessor[];
+
+// @public (undocumented)
+export const useDataViewInfiniteLoadTrigger: () => (() => void) | undefined;
 
 // @public (undocumented)
 export const useDataViewKeyboardEventHandler: () => React_2.KeyboardEventHandler<Element>;

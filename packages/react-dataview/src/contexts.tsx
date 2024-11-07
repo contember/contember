@@ -132,3 +132,13 @@ const DataViewChildrenContext_ = createRequiredContext<ReactNode>('DataViewChild
 /** @internal */
 export const DataViewChildrenContext = DataViewChildrenContext_[0]
 export const useDataViewChildren = DataViewChildrenContext_[1]
+
+const DataViewInfiniteLoadAccessorsContext_ = createRequiredContext<EntityListAccessor[]>('DataViewInfiniteLoadAccessorsContext')
+/** @internal */
+export const DataViewInfiniteLoadAccessorsContext = DataViewInfiniteLoadAccessorsContext_[0]
+export const useDataViewInfiniteLoadAccessors = DataViewInfiniteLoadAccessorsContext_[1]
+
+const DataViewInfiniteLoadTriggerContext_ = createRequiredContext<(() => void) | undefined>('DataViewInfiniteLoadTriggerContext')
+/** @internal */
+export const DataViewInfiniteLoadTriggerContext = DataViewInfiniteLoadTriggerContext_[0]
+export const useDataViewInfiniteLoadTrigger = DataViewInfiniteLoadTriggerContext_[1]

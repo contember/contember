@@ -138,7 +138,7 @@ export class StateInitializer {
 			} else if (field instanceof HasOneRelationMarker) {
 				let runtimeId: RuntimeId
 				let subCopyFrom: EntityRealmState | undefined = undefined
-				if (pathBack?.fieldBackToParent === field.parameters.field) {
+				if (pathBack?.fieldBackToParent === field.parameters.field && !field.parameters.reducedBy) {
 					runtimeId = pathBack.parent.entity.id
 				} else {
 					const value = copyFrom.children.get(placeholderName)
@@ -246,7 +246,7 @@ export class StateInitializer {
 				this.initializeFromHasManyRelationMarker(entityRealm, field, fieldDatum instanceof Set ? fieldDatum : new Set())
 			} else if (field instanceof HasOneRelationMarker) {
 				let runtimeId: RuntimeId
-				if (pathBack?.fieldBackToParent === field.parameters.field) {
+				if (pathBack?.fieldBackToParent === field.parameters.field && !field.parameters.reducedBy) {
 					runtimeId = pathBack.parent.entity.id
 				} else {
 					runtimeId = fieldDatum instanceof ServerId ? fieldDatum : new UnpersistedEntityDummyId()

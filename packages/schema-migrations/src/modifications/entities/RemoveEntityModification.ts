@@ -1,5 +1,5 @@
 import { MigrationBuilder } from '@contember/database-migrations'
-import { Acl, Schema } from '@contember/schema'
+import { Acl, Model, Schema } from '@contember/schema'
 import {
 	removeField,
 	SchemaUpdater,
@@ -18,7 +18,7 @@ import {
 	ModificationHandlerOptions,
 } from '../ModificationHandler'
 import { VERSION_ACL_PATCH, VERSION_REMOVE_REFERENCING_RELATIONS } from '../ModificationVersions'
-import { acceptEveryFieldVisitor, isRelation, PredicateDefinitionProcessor } from '@contember/schema-utils'
+import { acceptEveryFieldVisitor, isInverseRelation, isRelation, PredicateDefinitionProcessor } from '@contember/schema-utils'
 import { removeFieldModification } from '../fields'
 
 export class RemoveEntityModificationHandler implements ModificationHandler<RemoveEntityModificationData> {
@@ -110,7 +110,8 @@ export class RemoveEntityModificationHandler implements ModificationHandler<Remo
 	private getFieldsToRemove(schema: Schema): [entity: string, field: string][] {
 		return Object.values(schema.model.entities).flatMap(entity =>
 			Object.values(entity.fields)
-				.filter(field => isRelation(field) && field.target === this.data.entityName)
+				.filter((field): field is Model.AnyRelation => isRelation(field) && field.target === this.data.entityName)
+				.filter(field => !isInverseRelation(field) || entity.name !== this.data.entityName) // skip self-referencing inverse relations
 				.map((field): [string, string] => [entity.name, field.name]),
 		)
 	}

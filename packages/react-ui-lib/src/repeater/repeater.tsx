@@ -18,22 +18,22 @@ import {
 } from '@contember/react-repeater-dnd-kit'
 import { GripVerticalIcon, PlusCircleIcon, Trash2Icon } from 'lucide-react'
 import { Button } from '../ui/button'
-import { uic } from '../utils/uic'
+import { uic } from '../utils'
 import { DropIndicator } from '../ui/sortable'
 import { dict } from '../dict'
 import { ReactNode } from 'react'
 
 export const RepeaterWrapperUI = uic('div', {
-	baseClass: 'flex flex-col gap-2 p-4 pr-8 relative shadow-sm bg-white rounded border border-gray-300',
+	baseClass: 'flex flex-col gap-2 relative shadow-sm bg-white mb-4',
 })
 export const RepeaterItemUI = uic('div', {
-	baseClass: 'rounded border border-gray-300 p-4 relative',
+	baseClass: 'rounded border bg-gray-50 border-gray-200 p-4 relative group',
 })
 export const RepeaterDragOverlayUI = uic('div', {
 	baseClass: 'rounded border border-gray-300 p-4 relative bg-opacity-60 bg-gray-100 backdrop-blur-sm',
 })
 export const RepeaterHandleUI = uic('button', {
-	baseClass: 'absolute top-1/2 -left-6 h-6 w-6 flex justify-end align-center opacity-10 hover:opacity-100 transition-opacity -translate-y-1/2',
+	baseClass: 'absolute top-1/2 -left-7 h-6 w-6 flex justify-end align-center opacity-10 group-hover:opacity-30 hover:!opacity-100 transition-opacity -translate-y-1/2',
 	beforeChildren: <GripVerticalIcon size={16}/>,
 })
 

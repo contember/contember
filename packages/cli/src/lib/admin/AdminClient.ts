@@ -14,7 +14,7 @@ export class AdminClient {
 		if (!response.ok) {
 			const project = this.remoteProjectProvider.get()
 			const maskedToken = maskToken(project.token)
-			throw `Failed to deploy admin, POST request to ${project.endpoint}/_deploy with token ${maskedToken} returned status ${response.status} ${response.statusText}\n${await response.text()}`
+			throw `Failed to deploy admin, POST request to ${project.adminEndpoint}/_deploy with token ${maskedToken} returned status ${response.status} ${response.statusText}\n${await response.text()}`
 		}
 	}
 

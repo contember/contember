@@ -193,3 +193,25 @@ testMigrations('remove junction table, when inverse entity is removed', {
 DROP TABLE "book_tags";
 DROP TABLE "tag";`,
 })
+
+
+namespace EntityWithSelfReferencingRelationOriginalSchema {
+
+	export class Person {
+		name = def.stringColumn()
+		parent = def.manyHasOne(Person, 'children')
+		children = def.oneHasMany(Person, 'parent')
+	}
+}
+
+testMigrations('remove self-referencing relation', {
+	original: createSchema(EntityWithSelfReferencingRelationOriginalSchema),
+	updated: {},
+	diff: [
+		{
+			modification: 'removeEntity',
+			entityName: 'Person',
+		},
+	],
+	sql: SQL`ALTER TABLE "person" DROP "parent_id"; DROP TABLE "person";`,
+})

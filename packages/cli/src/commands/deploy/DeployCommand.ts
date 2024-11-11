@@ -50,24 +50,25 @@ export class DeployCommand extends Command<Args, Options> {
 	protected async execute(input: Input<Args, Options>): Promise<void | number> {
 
 		const dsn = input.getArgument('dsn')
-		const remoteProject = this.remoteProjectResolver.resolve(dsn)
+		const adminEndpoint = input.getOption('admin')
+		const remoteProject = this.remoteProjectResolver.resolve(dsn, adminEndpoint)
 		if (!remoteProject) {
 			throw `Project not defined. Please provide DSN or environment variables CONTEMBER_*`
 		}
 		this.remoteProjectProvider.setRemoteProject(remoteProject)
 
-		let adminEndpoint = input.getOption('admin')
 		const deployMigration = input.getOption('no-migrations') !== true
 		const yes = input.getOption('yes') === true
 		const projectAdminDistDir = this.workspace.adminDistDir
-		const deployAdmin = input.getOption('no-admin') !== true && !!adminEndpoint && !!projectAdminDistDir
+
+		const deployAdmin = input.getOption('no-admin') !== true && !!remoteProject.adminEndpoint && !!projectAdminDistDir
 
 
 		console.log('')
 		console.log('Contember project deployment configuration:')
 		console.log(`Target project name: ${remoteProject.name}`)
 		console.log(`API URL: ${remoteProject.endpoint}`)
-		console.log(`Admin URL: ${adminEndpoint ?? 'none'}`)
+		console.log(`Admin URL: ${remoteProject.adminEndpoint ?? 'none'}`)
 		console.log(`Deploy token: ${maskToken(remoteProject.token)}`)
 		console.log('')
 
@@ -113,7 +114,7 @@ export class DeployCommand extends Command<Args, Options> {
 		console.log('')
 		console.log('Deployment successful')
 		console.log(`API URL: ${remoteProject.endpoint}`)
-		console.log(`Admin URL: ${adminEndpoint ?? 'none'}`)
+		console.log(`Admin URL: ${remoteProject.adminEndpoint ?? 'none'}`)
 
 		return 0
 	}

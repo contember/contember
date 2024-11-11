@@ -8,7 +8,7 @@ export class RemoteProjectResolver {
 	) {
 	}
 
-	resolve(identifier?: string): RemoteProject | undefined {
+	resolve(identifier?: string, adminEndpoint?: string): RemoteProject | undefined {
 		let endpoint: string | undefined
 		let token: string | undefined
 		let project: string | undefined
@@ -25,6 +25,11 @@ export class RemoteProjectResolver {
 			return undefined
 		}
 
-		return new RemoteProject(project, endpoint, token)
+		if (!adminEndpoint && (endpoint.endsWith('.contember.cloud') || !endpoint.includes('://api-'))) {
+			adminEndpoint = endpoint
+			endpoint += '/_api'
+		}
+
+		return new RemoteProject(project, endpoint, token, adminEndpoint)
 	}
 }

@@ -25,7 +25,9 @@ export const DataGrid = Component(({ children, ...props }: DataGridProps) => {
 			{...dataGridDefaultStorages}
 			{...props}
 		>
-			{children}
+			<div>
+				{children}
+			</div>
 		</DataView>
 	)
 })

@@ -62,7 +62,7 @@ const LayoutLeftPanelOpenerUI = uic('a', { baseClass: 'hidden lg:block absolute 
 const LayoutRightPanelCloserUI = uic('a', { baseClass: 'hidden lg:flex self-end absolute top-1 right-1 opacity-0 text-gray-400 hover:opacity-100 transition-opacity cursor-pointer' })
 const LayoutRightPanelOpenerUI = uic('a', { baseClass: 'absolute top-1 right-1' })
 const LayoutSwitcherUI = uic('a', { baseClass: 'hidden lg:flex self-end absolute top-1 right-1 opacity-20 text-gray-400 hover:opacity-100 transition-opacity cursor-pointer' })
-
+const LayoutContentWrapperUI = uic('div', { baseClass: 'flex flex-col gap-12' })
 
 export const LayoutComponent = ({ children, ...rest }: PropsWithChildren<{}>) => {
 	const isActive = useHasActiveSlotsFactory()
@@ -138,9 +138,9 @@ export const LayoutComponent = ({ children, ...rest }: PropsWithChildren<{}>) =>
 							</div>
 						</LayoutCenterTopUI>
 
-						<div>
+						<LayoutContentWrapperUI>
 							{children}
-						</div>
+						</LayoutContentWrapperUI>
 					</LayoutCenterPanelUI>
 					{hasRightSidebar ?
 						<LayoutRightSidebarUI visibility={rightSidebarVisibility ? 'show' : 'hidden'}>

@@ -1,15 +1,21 @@
 import {
 	BindingError,
-	EntityAccessor, EntityId, EntityListAccessor, SugaredFieldProps, SugaredRelativeEntityList,
-	useDesugaredRelativeEntityList, useDesugaredRelativeSingleField,
+	EntityAccessor,
+	EntityId,
+	EntityListAccessor,
+	SugaredFieldProps,
+	SugaredRelativeEntityList,
+	useDesugaredRelativeEntityList,
+	useDesugaredRelativeSingleField,
 	useEntityBeforePersist,
 } from '@contember/react-binding'
 import { Descendant, Editor, Element as SlateElement, Element } from 'slate'
 import { isElementWithReference } from '../elements'
 import { useGetParentEntityRef } from '../useGetParentEntityRef'
-import { MutableRefObject, useCallback, useRef } from 'react'
+import { MutableRefObject, useCallback } from 'react'
 import { BlockElementCache } from './useBlockElementCache'
 import { BlockElementPathRefs } from './useBlockElementPathRefs'
+import { isInitialSlateState } from '../utils/isInitialSlateState'
 
 export const useRefreshBlocks = ({ editor, sortedBlocksRef, sortableBy, contentField, blockList, blockElementCache, blockElementPathRefs, referencesField, monolithicReferencesMode, trashFakeBlockId }: {
 	editor: Editor
@@ -49,6 +55,9 @@ export const useRefreshBlocks = ({ editor, sortedBlocksRef, sortableBy, contentF
 				length: editor.children.length,
 			})
 			const blockList = getAccessor().getEntityList(desugaredBlockList)
+			if (blockList.length === 0 && isInitialSlateState(editor.children)) {
+				return
+			}
 			const getBlockList = blockList.getAccessor
 
 			let cleanupStack = () => {

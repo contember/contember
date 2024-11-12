@@ -25,7 +25,7 @@ export const initOIDCAuth = async (client: Client, { redirectUrl, claims, respon
 	}
 }
 
-export const handleOIDCResponse = async (client: Client, { sessionData, redirectUrl, ...otherData }: OIDCResponseData, fetchUserInfo?: boolean): Promise<IDPResponse> => {
+export const handleOIDCResponse = async (client: Client, { sessionData, redirectUrl, ...otherData }: OIDCResponseData, fetchUserInfo?: boolean, returnOIDCResult?: boolean): Promise<IDPResponse> => {
 	const params = 'parameters' in otherData ? otherData.parameters : client.callbackParams(otherData.url)
 	if (params.state && !sessionData?.state) {
 		throw new IDPValidationError(`state is present in parameters, but missing in session data`)
@@ -35,9 +35,11 @@ export const handleOIDCResponse = async (client: Client, { sessionData, redirect
 		const claims = result.claims()
 		const { at_hash, c_hash, nonce, ...claimsWithoutHashes } = claims
 		const userInfo = fetchUserInfo ? await client.userinfo(result) : {}
+		const oidcResult = returnOIDCResult ? result : {}
 
 		return {
 			externalIdentifier: claims.sub,
+			...oidcResult,
 			...claimsWithoutHashes,
 			...userInfo,
 		}

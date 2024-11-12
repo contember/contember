@@ -12,6 +12,7 @@ export const OIDCConfigurationOptions = Typesafe.partial({
 	additionalAuthorizedParties: Typesafe.array(Typesafe.string),
 	idTokenSignedResponseAlg: Typesafe.string,
 	fetchUserInfo: Typesafe.boolean,
+	returnOIDCResult: Typesafe.boolean,
 })
 export const BaseOIDCConfiguration = Typesafe.intersection(
 	Typesafe.object({

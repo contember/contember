@@ -25,7 +25,12 @@ export const SortableBlock = ({ children, element }: { children: ReactNode; elem
 		id: entity?.id,
 	})
 	if (!entity) {
-		return null
+		return <>
+			<div className="p-4">
+				<BlockeEditorHandle />
+				{children}
+			</div>
+		</>
 	}
 
 	return (

@@ -220,18 +220,6 @@ export const DataViewEachRow: ({ children }: {
 }) => JSX_2.Element | null;
 
 // @public (undocumented)
-export interface DataViewEachRowProps {
-    // (undocumented)
-    children: ReactNode;
-    // (undocumented)
-    initial?: boolean;
-    // (undocumented)
-    loaded?: boolean;
-    // (undocumented)
-    refreshing?: boolean;
-}
-
-// @public (undocumented)
 export const DataViewElement: NamedExoticComponent<DataViewElementProps>;
 
 // @public (undocumented)
@@ -522,10 +510,22 @@ export interface DataViewLayoutTriggerProps {
 }
 
 // @public (undocumented)
-export const DataViewLoaderState: ({ children, ...props }: DataViewEachRowProps) => JSX_2.Element | null;
+export const DataViewLoaderState: ({ children, ...props }: DataViewLoaderStateProps) => JSX_2.Element | null;
 
 // @internal (undocumented)
 export const DataViewLoaderStateContext: React_2.Context<"initial" | "refreshing" | "loaded">;
+
+// @public (undocumented)
+export interface DataViewLoaderStateProps {
+    // (undocumented)
+    children: ReactNode;
+    // (undocumented)
+    initial?: boolean;
+    // (undocumented)
+    loaded?: boolean;
+    // (undocumented)
+    refreshing?: boolean;
+}
 
 // @public (undocumented)
 export type DataViewMethods = {

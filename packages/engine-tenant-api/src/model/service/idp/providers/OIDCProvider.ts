@@ -24,7 +24,12 @@ export class OIDCProvider implements IdentityProviderHandler<OIDCConfiguration> 
 	public async processResponse(configuration: OIDCConfiguration, data: unknown): Promise<IDPResponse> {
 		const responseData = catchTypesafe(OIDCResponseData, IDPValidationError)(data)
 		const client = await this.createOIDCClient(configuration)
-		return await handleOIDCResponse(client, responseData, configuration.fetchUserInfo)
+		return await handleOIDCResponse(
+			client,
+			responseData,
+			configuration.fetchUserInfo,
+			configuration.returnOIDCResult,
+		)
 	}
 
 

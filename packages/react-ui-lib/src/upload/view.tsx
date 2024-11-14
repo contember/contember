@@ -216,12 +216,12 @@ const FileActions = Component(({ DestroyAction, metadata, actions, edit, baseFie
 						</div>
 					</PopoverContent>
 				</Popover>}
+				{!noDestroy && DestroyAction ? <DestroyAction>
+					<Button variant={'ghost'} size={'sm'} className={'p-0.5 h-5 w-5 text-red-500'}>
+						<TrashIcon className="h-4 w-4" />
+					</Button>
+				</DestroyAction> : null}
 			</UploaderBase>
-			{!noDestroy && DestroyAction ? <DestroyAction>
-				<Button variant={'ghost'} size={'sm'} className={'p-0.5 h-5 w-5 text-red-500'}>
-					<TrashIcon className="h-4 w-4" />
-				</Button>
-			</DestroyAction> : null}
 		</div>
 	)
 })

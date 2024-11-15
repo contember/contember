@@ -11,6 +11,7 @@ import {
 } from '@contember/react-binding'
 import { MutableRefObject, useCallback } from 'react'
 import { useGetReferenceEntityList } from './useGetReferenceEntityList'
+import { RefreshBlocks } from '../state/useRefreshBlocks'
 
 export type CreateElementReferences = (
 	editor: Editor,
@@ -24,7 +25,7 @@ export const useCreateElementReference = ({ monolithicReferencesMode, sortedBloc
 	monolithicReferencesMode?: boolean
 	sortedBlocksRef: MutableRefObject<EntityAccessor[]>
 	referenceDiscriminationField?: SugaredFieldProps['field']
-	refreshBlocks: () => void
+	refreshBlocks: RefreshBlocks
 }): CreateElementReferences => {
 	const getReferenceList = useGetReferenceEntityList({ monolithicReferencesMode, sortedBlocksRef, referencesField })
 
@@ -39,12 +40,12 @@ export const useCreateElementReference = ({ monolithicReferencesMode, sortedBloc
 const useCreateElementReferenceInternal = ({ referenceDiscriminationField, getReferenceList, refreshBlocks }: {
 	referenceDiscriminationField: SugaredFieldProps['field']
 	getReferenceList: (path: Slate.Path) => EntityListAccessor
-	refreshBlocks: () => void
+	refreshBlocks: RefreshBlocks
 }): CreateElementReferences => {
 	const bindingOperations = useBindingOperations()
 	return useCallback((editor, path, referenceDiscriminant, initialize) => {
 		const referenceUuid = generateUuid()
-		refreshBlocks()
+		refreshBlocks({ forceInitialBlock: true })
 
 		const references = getReferenceList(path)
 		Editor.withoutNormalizing(editor, () => {

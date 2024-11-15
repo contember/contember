@@ -24,6 +24,9 @@ export class RemoteProjectResolver {
 		if (!project || !endpoint || !token) {
 			return undefined
 		}
+		if (endpoint.endsWith('/')) {
+			endpoint = endpoint.slice(0, -1)
+		}
 
 		if (!adminEndpoint && endpoint.endsWith('.contember.cloud') && !endpoint.includes('://api-')) {
 			adminEndpoint = endpoint

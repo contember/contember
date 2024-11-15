@@ -19,7 +19,10 @@ export const getEditorReferenceBlocks = (children: ReactNode, env: Environment):
 		ContentOutletProps,
 		never,
 		Environment
-	>([outletLeaf])
+	>([outletLeaf], {
+		staticRenderFactoryName: 'staticRender',
+		staticContextFactoryName: 'generateEnvironment',
+	})
 
 	return Object.fromEntries(blocks.map(
 		(props): EditorReferenceBlock => ({

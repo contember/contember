@@ -17,6 +17,9 @@ import { BlockElementCache } from './useBlockElementCache'
 import { BlockElementPathRefs } from './useBlockElementPathRefs'
 import { isInitialSlateState } from '../utils/isInitialSlateState'
 
+
+export type RefreshBlocks = (args?: { forceInitialBlock?: boolean }) => void
+
 export const useRefreshBlocks = ({ editor, sortedBlocksRef, sortableBy, contentField, blockList, blockElementCache, blockElementPathRefs, referencesField, monolithicReferencesMode, trashFakeBlockId }: {
 	editor: Editor
 	sortedBlocksRef: MutableRefObject<EntityAccessor[]>
@@ -41,7 +44,7 @@ export const useRefreshBlocks = ({ editor, sortedBlocksRef, sortableBy, contentF
 		}
 	})
 
-	return useCallback(() => {
+	return useCallback<RefreshBlocks>((args = {}) => {
 		const { children } = editor
 		const saveBlockElement = (getBlockList: () => EntityListAccessor, id: EntityId, element: Element) => {
 			getBlockList()
@@ -55,7 +58,7 @@ export const useRefreshBlocks = ({ editor, sortedBlocksRef, sortableBy, contentF
 				length: editor.children.length,
 			})
 			const blockList = getAccessor().getEntityList(desugaredBlockList)
-			if (blockList.length === 0 && isInitialSlateState(editor.children)) {
+			if (blockList.length === 0 && isInitialSlateState(editor.children) && !args.forceInitialBlock) {
 				return
 			}
 			const getBlockList = blockList.getAccessor

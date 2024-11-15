@@ -395,6 +395,149 @@ export const ContemberClientNames: SchemaNames = {
         "name"
       ]
     },
+    "FormArticle": {
+      "name": "FormArticle",
+      "fields": {
+        "id": {
+          "type": "column"
+        },
+        "state": {
+          "type": "column"
+        },
+        "locked": {
+          "type": "column"
+        },
+        "internalName": {
+          "type": "column"
+        },
+        "publishedAt": {
+          "type": "column"
+        },
+        "author": {
+          "type": "one",
+          "entity": "FormAuthor"
+        },
+        "tags": {
+          "type": "many",
+          "entity": "FormTag"
+        },
+        "locales": {
+          "type": "many",
+          "entity": "FormArticleLocale"
+        },
+        "notes": {
+          "type": "many",
+          "entity": "FormNote"
+        }
+      },
+      "scalars": [
+        "id",
+        "state",
+        "locked",
+        "internalName",
+        "publishedAt"
+      ]
+    },
+    "FormArticleLocale": {
+      "name": "FormArticleLocale",
+      "fields": {
+        "id": {
+          "type": "column"
+        },
+        "locale": {
+          "type": "column"
+        },
+        "article": {
+          "type": "one",
+          "entity": "FormArticle"
+        },
+        "title": {
+          "type": "column"
+        },
+        "content": {
+          "type": "column"
+        },
+        "slug": {
+          "type": "column"
+        }
+      },
+      "scalars": [
+        "id",
+        "locale",
+        "title",
+        "content",
+        "slug"
+      ]
+    },
+    "FormAuthor": {
+      "name": "FormAuthor",
+      "fields": {
+        "id": {
+          "type": "column"
+        },
+        "name": {
+          "type": "column"
+        },
+        "slug": {
+          "type": "column"
+        },
+        "articles": {
+          "type": "many",
+          "entity": "FormArticle"
+        }
+      },
+      "scalars": [
+        "id",
+        "name",
+        "slug"
+      ]
+    },
+    "FormNote": {
+      "name": "FormNote",
+      "fields": {
+        "id": {
+          "type": "column"
+        },
+        "article": {
+          "type": "one",
+          "entity": "FormArticle"
+        },
+        "createdAt": {
+          "type": "column"
+        },
+        "text": {
+          "type": "column"
+        }
+      },
+      "scalars": [
+        "id",
+        "createdAt",
+        "text"
+      ]
+    },
+    "FormTag": {
+      "name": "FormTag",
+      "fields": {
+        "id": {
+          "type": "column"
+        },
+        "name": {
+          "type": "column"
+        },
+        "slug": {
+          "type": "column"
+        },
+        "articles": {
+          "type": "many",
+          "entity": "FormArticle"
+        }
+      },
+      "scalars": [
+        "id",
+        "name",
+        "slug"
+      ]
+    },
     "GridArticle": {
       "name": "GridArticle",
       "fields": {

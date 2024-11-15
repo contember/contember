@@ -1,0 +1,598 @@
+{
+	"formatVersion": 5,
+	"modifications": [
+		{
+			"modification": "createEnum",
+			"enumName": "FormArticleState",
+			"values": [
+				"published",
+				"draft",
+				"archived"
+			]
+		},
+		{
+			"modification": "createEnum",
+			"enumName": "FormArticleLocaleLocale",
+			"values": [
+				"cs",
+				"en"
+			]
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"eventLog": {
+					"enabled": true
+				},
+				"name": "FormArticle",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "form_article",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": [],
+				"indexes": []
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"eventLog": {
+					"enabled": true
+				},
+				"name": "FormArticleLocale",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "form_article_locale",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": [],
+				"indexes": []
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"eventLog": {
+					"enabled": true
+				},
+				"name": "FormAuthor",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "form_author",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": [],
+				"indexes": []
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"eventLog": {
+					"enabled": true
+				},
+				"name": "FormNote",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "form_note",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": [],
+				"indexes": []
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"eventLog": {
+					"enabled": true
+				},
+				"name": "FormTag",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "form_tag",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": [],
+				"indexes": []
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "FormArticle",
+			"field": {
+				"name": "state",
+				"columnName": "state",
+				"columnType": "FormArticleState",
+				"nullable": true,
+				"type": "Enum"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "FormArticle",
+			"field": {
+				"name": "locked",
+				"columnName": "locked",
+				"columnType": "boolean",
+				"nullable": true,
+				"type": "Bool",
+				"default": false
+			},
+			"fillValue": false,
+			"valueMigrationStrategy": "using"
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "FormArticle",
+			"field": {
+				"name": "publishedAt",
+				"columnName": "published_at",
+				"columnType": "timestamptz",
+				"nullable": true,
+				"type": "DateTime"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "FormArticle",
+			"field": {
+				"name": "internalName",
+				"columnName": "internal_name",
+				"columnType": "text",
+				"nullable": false,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "FormArticleLocale",
+			"field": {
+				"name": "locale",
+				"columnName": "locale",
+				"columnType": "FormArticleLocaleLocale",
+				"nullable": false,
+				"type": "Enum"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "FormArticleLocale",
+			"field": {
+				"name": "title",
+				"columnName": "title",
+				"columnType": "text",
+				"nullable": true,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "FormArticleLocale",
+			"field": {
+				"name": "content",
+				"columnName": "content",
+				"columnType": "text",
+				"nullable": true,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "FormArticleLocale",
+			"field": {
+				"name": "slug",
+				"columnName": "slug",
+				"columnType": "text",
+				"nullable": false,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "FormAuthor",
+			"field": {
+				"name": "name",
+				"columnName": "name",
+				"columnType": "text",
+				"nullable": false,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "FormAuthor",
+			"field": {
+				"name": "slug",
+				"columnName": "slug",
+				"columnType": "text",
+				"nullable": false,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "FormNote",
+			"field": {
+				"name": "text",
+				"columnName": "text",
+				"columnType": "text",
+				"nullable": false,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "FormNote",
+			"field": {
+				"name": "createdAt",
+				"columnName": "created_at",
+				"columnType": "timestamptz",
+				"nullable": false,
+				"type": "DateTime",
+				"default": "now"
+			},
+			"fillValue": "now",
+			"valueMigrationStrategy": "using"
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "FormTag",
+			"field": {
+				"name": "name",
+				"columnName": "name",
+				"columnType": "text",
+				"nullable": false,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "FormTag",
+			"field": {
+				"name": "slug",
+				"columnName": "slug",
+				"columnType": "text",
+				"nullable": false,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "FormArticle",
+			"owningSide": {
+				"type": "ManyHasOne",
+				"name": "author",
+				"target": "FormAuthor",
+				"joiningColumn": {
+					"columnName": "author_id",
+					"onDelete": "set null"
+				},
+				"nullable": true,
+				"inversedBy": "articles"
+			},
+			"inverseSide": {
+				"type": "OneHasMany",
+				"name": "articles",
+				"target": "FormArticle",
+				"ownedBy": "author"
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "FormArticle",
+			"owningSide": {
+				"type": "ManyHasMany",
+				"name": "tags",
+				"target": "FormTag",
+				"joiningTable": {
+					"eventLog": {
+						"enabled": true
+					},
+					"tableName": "form_article_tags",
+					"joiningColumn": {
+						"columnName": "form_article_id",
+						"onDelete": "cascade"
+					},
+					"inverseJoiningColumn": {
+						"columnName": "form_tag_id",
+						"onDelete": "cascade"
+					}
+				},
+				"inversedBy": "articles"
+			},
+			"inverseSide": {
+				"type": "ManyHasMany",
+				"name": "articles",
+				"target": "FormArticle",
+				"ownedBy": "tags"
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "FormArticleLocale",
+			"owningSide": {
+				"type": "ManyHasOne",
+				"name": "article",
+				"target": "FormArticle",
+				"joiningColumn": {
+					"columnName": "article_id",
+					"onDelete": "cascade"
+				},
+				"nullable": false,
+				"inversedBy": "locales"
+			},
+			"inverseSide": {
+				"type": "OneHasMany",
+				"name": "locales",
+				"target": "FormArticleLocale",
+				"ownedBy": "article"
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "FormNote",
+			"owningSide": {
+				"type": "ManyHasOne",
+				"name": "article",
+				"target": "FormArticle",
+				"joiningColumn": {
+					"columnName": "article_id",
+					"onDelete": "cascade"
+				},
+				"nullable": false,
+				"inversedBy": "notes"
+			},
+			"inverseSide": {
+				"type": "OneHasMany",
+				"name": "notes",
+				"target": "FormNote",
+				"ownedBy": "article"
+			}
+		},
+		{
+			"modification": "createUniqueConstraint",
+			"entityName": "FormArticleLocale",
+			"unique": {
+				"fields": [
+					"slug"
+				]
+			}
+		},
+		{
+			"modification": "createUniqueConstraint",
+			"entityName": "FormArticleLocale",
+			"unique": {
+				"fields": [
+					"article",
+					"locale"
+				]
+			}
+		},
+		{
+			"modification": "createUniqueConstraint",
+			"entityName": "FormAuthor",
+			"unique": {
+				"fields": [
+					"slug"
+				]
+			}
+		},
+		{
+			"modification": "createUniqueConstraint",
+			"entityName": "FormTag",
+			"unique": {
+				"fields": [
+					"slug"
+				]
+			}
+		},
+		{
+			"modification": "patchAclSchema",
+			"patch": [
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/FormArticle",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"create": {
+								"id": true,
+								"state": true,
+								"locked": true,
+								"publishedAt": true,
+								"author": true,
+								"tags": true,
+								"locales": true,
+								"notes": true,
+								"internalName": true
+							},
+							"update": {
+								"id": true,
+								"state": true,
+								"locked": true,
+								"publishedAt": true,
+								"author": true,
+								"tags": true,
+								"locales": true,
+								"notes": true,
+								"internalName": true
+							},
+							"read": {
+								"id": true,
+								"state": true,
+								"locked": true,
+								"publishedAt": true,
+								"author": true,
+								"tags": true,
+								"locales": true,
+								"notes": true,
+								"internalName": true
+							},
+							"delete": true,
+							"customPrimary": true
+						}
+					}
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/FormArticleLocale",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"create": {
+								"id": true,
+								"locale": true,
+								"article": true,
+								"title": true,
+								"content": true,
+								"slug": true
+							},
+							"update": {
+								"id": true,
+								"locale": true,
+								"article": true,
+								"title": true,
+								"content": true,
+								"slug": true
+							},
+							"read": {
+								"id": true,
+								"locale": true,
+								"article": true,
+								"title": true,
+								"content": true,
+								"slug": true
+							},
+							"delete": true,
+							"customPrimary": true
+						}
+					}
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/FormAuthor",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"create": {
+								"id": true,
+								"name": true,
+								"slug": true,
+								"articles": true
+							},
+							"update": {
+								"id": true,
+								"name": true,
+								"slug": true,
+								"articles": true
+							},
+							"read": {
+								"id": true,
+								"name": true,
+								"slug": true,
+								"articles": true
+							},
+							"delete": true,
+							"customPrimary": true
+						}
+					}
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/FormNote",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"create": {
+								"id": true,
+								"article": true,
+								"text": true,
+								"createdAt": true
+							},
+							"update": {
+								"id": true,
+								"article": true,
+								"text": true,
+								"createdAt": true
+							},
+							"read": {
+								"id": true,
+								"article": true,
+								"text": true,
+								"createdAt": true
+							},
+							"delete": true,
+							"customPrimary": true
+						}
+					}
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/FormTag",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"create": {
+								"id": true,
+								"name": true,
+								"slug": true,
+								"articles": true
+							},
+							"update": {
+								"id": true,
+								"name": true,
+								"slug": true,
+								"articles": true
+							},
+							"read": {
+								"id": true,
+								"name": true,
+								"slug": true,
+								"articles": true
+							},
+							"delete": true,
+							"customPrimary": true
+						}
+					}
+				}
+			]
+		}
+	]
+}

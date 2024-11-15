@@ -3,6 +3,7 @@ import type { BoardTaskStatus } from './enums'
 import type { ContentEmbedType } from './enums'
 import type { EditorReferenceType } from './enums'
 import type { ExtendTreeUnique } from './enums'
+import type { FormArticleState } from './enums'
 import type { GridArticleState } from './enums'
 import type { InputUnique } from './enums'
 import type { LegacyEditorReferenceType } from './enums'
@@ -14,6 +15,7 @@ import type { BlockListUnique } from './enums'
 import type { DimensionsItemUnique } from './enums'
 import type { EditorContentUnique } from './enums'
 import type { EditorTextAreaUnique } from './enums'
+import type { FormArticleLocaleLocale } from './enums'
 import type { InputRootEnumValue } from './enums'
 import type { LegacyEditorContentUnique } from './enums'
 import type { PlateEditorContentUnique } from './enums'
@@ -342,6 +344,109 @@ export type Folder <OverRelation extends string | never = never> = {
 	}
 	hasManyBy: {
 		childrenByChildren: { entity: Folder; by: {children: Folder['unique']}  }
+	}
+}
+export type FormArticle <OverRelation extends string | never = never> = {
+	name: 'FormArticle'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+		| Omit<{ locales: FormArticleLocale['unique']}, OverRelation>
+		| Omit<{ notes: FormNote['unique']}, OverRelation>
+	columns: {
+		id: string
+		state: FormArticleState | null
+		locked: boolean | null
+		internalName: string
+		publishedAt: string | null
+	}
+	hasOne: {
+		author: FormAuthor
+	}
+	hasMany: {
+		tags: FormTag
+		locales: FormArticleLocale<'article'>
+		notes: FormNote<'article'>
+	}
+	hasManyBy: {
+		localesByLocale: { entity: FormArticleLocale; by: {locale: FormArticleLocaleLocale}  }
+		localesBySlug: { entity: FormArticleLocale; by: {slug: string}  }
+	}
+}
+export type FormArticleLocale <OverRelation extends string | never = never> = {
+	name: 'FormArticleLocale'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+		| Omit<{ slug: string}, OverRelation>
+		| Omit<{ article: FormArticle['unique'], locale: FormArticleLocaleLocale}, OverRelation>
+	columns: {
+		id: string
+		locale: FormArticleLocaleLocale
+		title: string | null
+		content: string | null
+		slug: string
+	}
+	hasOne: {
+		article: FormArticle
+	}
+	hasMany: {
+	}
+	hasManyBy: {
+	}
+}
+export type FormAuthor <OverRelation extends string | never = never> = {
+	name: 'FormAuthor'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+		| Omit<{ slug: string}, OverRelation>
+		| Omit<{ articles: FormArticle['unique']}, OverRelation>
+	columns: {
+		id: string
+		name: string
+		slug: string
+	}
+	hasOne: {
+	}
+	hasMany: {
+		articles: FormArticle<'author'>
+	}
+	hasManyBy: {
+		articlesByLocales: { entity: FormArticle; by: {locales: FormArticleLocale['unique']}  }
+		articlesByNotes: { entity: FormArticle; by: {notes: FormNote['unique']}  }
+	}
+}
+export type FormNote <OverRelation extends string | never = never> = {
+	name: 'FormNote'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+	columns: {
+		id: string
+		createdAt: string
+		text: string
+	}
+	hasOne: {
+		article: FormArticle
+	}
+	hasMany: {
+	}
+	hasManyBy: {
+	}
+}
+export type FormTag <OverRelation extends string | never = never> = {
+	name: 'FormTag'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+		| Omit<{ slug: string}, OverRelation>
+	columns: {
+		id: string
+		name: string
+		slug: string
+	}
+	hasOne: {
+	}
+	hasMany: {
+		articles: FormArticle
+	}
+	hasManyBy: {
 	}
 }
 export type GridArticle <OverRelation extends string | never = never> = {
@@ -1053,6 +1158,11 @@ export type ContemberClientEntities = {
 	ExtendTreeMany: ExtendTreeMany
 	ExtendTreeSingle: ExtendTreeSingle
 	Folder: Folder
+	FormArticle: FormArticle
+	FormArticleLocale: FormArticleLocale
+	FormAuthor: FormAuthor
+	FormNote: FormNote
+	FormTag: FormTag
 	GridArticle: GridArticle
 	GridArticleComment: GridArticleComment
 	GridArticleDetail: GridArticleDetail

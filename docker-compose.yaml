@@ -61,6 +61,7 @@ services:
       DEFAULT_S3_PREFIX: 'data'
       DEFAULT_S3_KEY: 'contember'
       DEFAULT_S3_SECRET: 'contember'
+      DEFAULT_S3_ENDPOINT: 'http://localhost:3003'
       CONTEMBER_PACKAGE_JSON: /src/packages/engine-server/package.json
     volumes:
       - .:/src:cached

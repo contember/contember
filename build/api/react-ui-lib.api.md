@@ -580,7 +580,7 @@ export const createDataGridDateRange: (label: ReactNode, dayDeltaStart: number, 
 export const createEnumFormatter: (enumValues: Record<string, string>) => (value: string | null) => string | null;
 
 // @public (undocumented)
-export const DataGrid: React_2.NamedExoticComponent<Omit<DataViewProps, "children" | "filterTypes"> & {
+export const DataGrid: React_2.NamedExoticComponent<Omit<DataViewProps, "children"> & {
     children: ReactNode;
 }>;
 
@@ -913,7 +913,13 @@ export const DataGridIsDefinedFilterSelect: ({ label }: {
 export const DataGridLayoutSwitcher: () => JSX_2.Element;
 
 // @public (undocumented)
-export const DataGridLoader: ({ children }: DataViewBodyProps) => JSX_2.Element;
+export const DataGridLoader: ({ children }: DataGridLoaderProps) => JSX_2.Element;
+
+// @public (undocumented)
+export interface DataGridLoaderProps {
+    // (undocumented)
+    children: ReactNode;
+}
 
 // @public (undocumented)
 export const DataGridNoResults: () => JSX_2.Element;
@@ -968,7 +974,7 @@ export type DataGridPredefinedDateRange = {
 };
 
 // @public (undocumented)
-export type DataGridProps = Omit<DataViewProps, 'children' | 'filterTypes'> & {
+export type DataGridProps = Omit<DataViewProps, 'children'> & {
     children: ReactNode;
 };
 
@@ -1101,12 +1107,6 @@ export type DataGridUuidColumnProps = {
 };
 
 // @public (undocumented)
-export interface DataViewBodyProps {
-    // (undocumented)
-    children: ReactNode;
-}
-
-// @public (undocumented)
 export interface DataViewTableProps {
     // (undocumented)
     children: ReactNode;
@@ -1130,12 +1130,27 @@ export type DefaultBoardProps = {
 } & BoardProps;
 
 // @public (undocumented)
+export const DefaultDataGrid: React_2.NamedExoticComponent<Omit<DataViewProps, "children"> & {
+    children: ReactNode;
+    toolbar?: ReactNode;
+}>;
+
+// @public (undocumented)
+export type DefaultDataGridProps = Omit<DataViewProps, 'children'> & {
+    children: ReactNode;
+    toolbar?: ReactNode;
+};
+
+// @public (undocumented)
 export const DefaultDropdown: ({ children }: {
     children: ReactNode;
 }) => JSX_2.Element;
 
 // @public (undocumented)
 export const DefaultRepeater: NamedExoticComponent<DefaultRepeaterProps>;
+
+// @public (undocumented)
+export const DefaultRepeaterInner: NamedExoticComponent<DefaultRepeaterProps>;
 
 // @public (undocumented)
 export type DefaultRepeaterProps = {

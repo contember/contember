@@ -6,7 +6,7 @@ import { Component } from '@contember/interface'
 
 
 export type DataGridProps =
-	& Omit<DataViewProps, 'children' | 'filterTypes'>
+	& Omit<DataViewProps, 'children'>
 	& {
 		children: ReactNode
 	}

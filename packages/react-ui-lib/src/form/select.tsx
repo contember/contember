@@ -13,12 +13,12 @@ import {
 	SortableMultiSelectInputProps,
 } from '../select'
 import * as React from 'react'
+import { useCallback, useMemo } from 'react'
 import { FormContainer, FormContainerProps } from './container'
 import { FormFieldScope, FormHasManyRelationScope, FormHasOneRelationScope, useFormFieldId } from '@contember/react-form'
-import { Component, Field, SugaredRelativeSingleField, useEntity, useEntityBeforePersist, useField } from '@contember/interface'
+import { Component, Field, RecursionTerminator, SugaredRelativeSingleField, useEntityBeforePersist, useField } from '@contember/interface'
 import { Popover, PopoverTrigger } from '../ui/popover'
 import { ChevronDownIcon, ChevronUpIcon } from 'lucide-react'
-import { useCallback, useMemo } from 'react'
 import { dict } from '../dict'
 
 
@@ -26,15 +26,17 @@ export type SelectFieldProps =
 	& SelectInputProps
 	& Omit<FormContainerProps, 'children'>
 
-export const SelectField = Component<SelectFieldProps>(({ field, label, description, children, options, queryField, placeholder, createNewForm, errors, initialSorting, required }) => {
+export const SelectField = Component<SelectFieldProps>(({ field, label, description, children, options, queryField, placeholder, createNewForm, errors, initialSorting, required }, env) => {
 	return (
-		<FormHasOneRelationScope field={field}>
-			<FormContainer description={description} label={label} errors={errors} required={required}>
-				<SelectInput field={field} queryField={queryField} options={options} placeholder={placeholder} createNewForm={createNewForm} initialSorting={initialSorting} required={required}>
-					{children}
-				</SelectInput>
-			</FormContainer>
-		</FormHasOneRelationScope>
+		<RecursionTerminator field={{ field, kind: 'hasOne' }}>
+			<FormHasOneRelationScope field={field}>
+				<FormContainer description={description} label={label} errors={errors} required={required}>
+					<SelectInput field={field} queryField={queryField} options={options} placeholder={placeholder} createNewForm={createNewForm} initialSorting={initialSorting} required={required}>
+						{children}
+					</SelectInput>
+				</FormContainer>
+			</FormHasOneRelationScope>
+		</RecursionTerminator>
 	)
 })
 
@@ -44,13 +46,15 @@ export type MultiSelectFieldProps =
 
 export const MultiSelectField = Component<MultiSelectFieldProps>(({ field, label, description, children, options, queryField, placeholder, createNewForm, errors, initialSorting }) => {
 	return (
-		<FormHasManyRelationScope field={field}>
-			<FormContainer description={description} label={label} errors={errors}>
-				<MultiSelectInput field={field} queryField={queryField} options={options} placeholder={placeholder} createNewForm={createNewForm} initialSorting={initialSorting}>
-					{children}
-				</MultiSelectInput>
-			</FormContainer>
-		</FormHasManyRelationScope>
+		<RecursionTerminator field={{ field, kind: 'hasMany' }}>
+			<FormHasManyRelationScope field={field}>
+				<FormContainer description={description} label={label} errors={errors}>
+					<MultiSelectInput field={field} queryField={queryField} options={options} placeholder={placeholder} createNewForm={createNewForm} initialSorting={initialSorting}>
+						{children}
+					</MultiSelectInput>
+				</FormContainer>
+			</FormHasManyRelationScope>
+		</RecursionTerminator>
 	)
 })
 

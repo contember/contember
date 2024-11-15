@@ -1,4 +1,4 @@
-import { Component } from '@contember/interface'
+import { Component, RecursionTerminator } from '@contember/interface'
 import {
 	Repeater,
 	RepeaterAddItemIndex,
@@ -79,7 +79,18 @@ export type DefaultRepeaterProps =
 	}
 	& RepeaterProps
 
-export const DefaultRepeater = Component<DefaultRepeaterProps>(({ title, children, addButtonPosition = 'after', ...props }) => {
+export const DefaultRepeater = Component<DefaultRepeaterProps>(props => {
+	if ('field' in props) {
+		return (
+			<RecursionTerminator field={{ field: props.field, kind: 'hasMany' }}>
+				<DefaultRepeaterInner {...props}/>
+			</RecursionTerminator>
+		)
+	}
+	return <DefaultRepeaterInner {...props}/>
+})
+
+export const DefaultRepeaterInner = Component<DefaultRepeaterProps>(({ title, children, addButtonPosition = 'after', ...props }) => {
 	const isSortable = props.sortableBy !== undefined
 
 	if (!isSortable) {

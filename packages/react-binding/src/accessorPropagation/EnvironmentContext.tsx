@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useCallback, useMemo } from 'react'
+import { ComponentType, createContext, ReactNode, useCallback, useMemo } from 'react'
 import { Environment } from '@contember/binding'
 import { useEnvironment } from './useEnvironment'
 import { Component } from '../coreComponents'
@@ -6,15 +6,20 @@ import { Component } from '../coreComponents'
 export const EnvironmentContext = createContext<Environment>(Environment.create())
 EnvironmentContext.displayName = 'EnvironmentContext'
 
-export interface EnvironmentMiddlewareProps {
+export interface EnvironmentMiddlewareProps<T extends unknown[]> {
 	children: ReactNode
-	create: (env: Environment) => Environment
+	create: (env: Environment, args: T) => Environment
+	args?: T
 }
 
-export const EnvironmentMiddleware = Component(
-	({ children, create }: EnvironmentMiddlewareProps) => {
+export const EnvironmentMiddleware = Component<EnvironmentMiddlewareProps<unknown[]>>(
+	({ children, create, args }) => {
 		const env = useEnvironment()
-		const envWithExtension = useMemo(() => create(env), [env, create])
+		const envWithExtension = useMemo(
+			() => create(env, args ?? []),
+			// eslint-disable-next-line react-hooks/exhaustive-deps
+			[env, create, ...(args ?? [])],
+		)
 
 		return <EnvironmentContext.Provider value={envWithExtension}>{children}</EnvironmentContext.Provider>
 	},
@@ -22,11 +27,11 @@ export const EnvironmentMiddleware = Component(
 		staticRender: ({ children }) => {
 			return <>{children}</>
 		},
-		generateEnvironment: ({ create }, env) => {
-			return create(env)
+		generateEnvironment: ({ create, args }, env) => {
+			return create(env, args ?? [])
 		},
 	},
-)
+) as <T extends unknown[]>(props: EnvironmentMiddlewareProps<T>) => ReactNode
 
 export interface EnvironmentWithExtensionProps<S, R> {
 	children: ReactNode

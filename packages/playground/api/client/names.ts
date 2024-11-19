@@ -361,6 +361,56 @@ export const ContemberClientNames: SchemaNames = {
         "name"
       ]
     },
+    "GanttActivity": {
+      "name": "GanttActivity",
+      "fields": {
+        "id": {
+          "type": "column"
+        },
+        "name": {
+          "type": "column"
+        },
+        "startTime": {
+          "type": "column"
+        },
+        "endTime": {
+          "type": "column"
+        },
+        "discriminator": {
+          "type": "one",
+          "entity": "GanttDiscriminator"
+        }
+      },
+      "scalars": [
+        "id",
+        "name",
+        "startTime",
+        "endTime"
+      ]
+    },
+    "GanttDiscriminator": {
+      "name": "GanttDiscriminator",
+      "fields": {
+        "id": {
+          "type": "column"
+        },
+        "slug": {
+          "type": "column"
+        },
+        "name": {
+          "type": "column"
+        },
+        "activities": {
+          "type": "many",
+          "entity": "GanttActivity"
+        }
+      },
+      "scalars": [
+        "id",
+        "slug",
+        "name"
+      ]
+    },
     "GridArticle": {
       "name": "GridArticle",
       "fields": {
@@ -764,8 +814,16 @@ export const ContemberClientNames: SchemaNames = {
         "id": {
           "type": "column"
         },
+        "root": {
+          "type": "one",
+          "entity": "RepeaterRoot"
+        },
         "title": {
           "type": "column"
+        },
+        "relation": {
+          "type": "one",
+          "entity": "RepeaterRelation"
         },
         "order": {
           "type": "column"
@@ -775,6 +833,40 @@ export const ContemberClientNames: SchemaNames = {
         "id",
         "title",
         "order"
+      ]
+    },
+    "RepeaterRelation": {
+      "name": "RepeaterRelation",
+      "fields": {
+        "id": {
+          "type": "column"
+        },
+        "name": {
+          "type": "column"
+        }
+      },
+      "scalars": [
+        "id",
+        "name"
+      ]
+    },
+    "RepeaterRoot": {
+      "name": "RepeaterRoot",
+      "fields": {
+        "id": {
+          "type": "column"
+        },
+        "unique": {
+          "type": "column"
+        },
+        "items": {
+          "type": "many",
+          "entity": "RepeaterItem"
+        }
+      },
+      "scalars": [
+        "id",
+        "unique"
       ]
     },
     "SelectItem": {

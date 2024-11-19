@@ -17,7 +17,6 @@ export class InputRoot {
 }
 
 export class InputRules {
-	unique = c.enumColumn(InputUnique).notNull().unique()
 	notNullValue = c.stringColumn().notNull()
 	uniqueValue = c.stringColumn().unique()
 	@c.AssertPattern(/^[a-z]+$/, 'Invalid value')

@@ -1,0 +1,17 @@
+{
+	"formatVersion": 5,
+	"modifications": [
+		{
+			"modification": "removeUniqueConstraint",
+			"entityName": "InputRules",
+			"fields": [
+				"unique"
+			]
+		},
+		{
+			"modification": "removeField",
+			"entityName": "InputRules",
+			"fieldName": "unique"
+		}
+	]
+}

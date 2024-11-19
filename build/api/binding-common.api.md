@@ -680,6 +680,8 @@ export interface ExtendTreeOptions {
     // (undocumented)
     force?: boolean;
     // (undocumented)
+    onError?: (error: Error) => void;
+    // (undocumented)
     signal?: AbortSignal;
 }
 

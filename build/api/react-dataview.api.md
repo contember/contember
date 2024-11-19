@@ -513,12 +513,14 @@ export interface DataViewLayoutTriggerProps {
 export const DataViewLoaderState: ({ children, ...props }: DataViewLoaderStateProps) => JSX_2.Element | null;
 
 // @internal (undocumented)
-export const DataViewLoaderStateContext: React_2.Context<"initial" | "refreshing" | "loaded">;
+export const DataViewLoaderStateContext: React_2.Context<"initial" | "failed" | "refreshing" | "loaded">;
 
 // @public (undocumented)
 export interface DataViewLoaderStateProps {
     // (undocumented)
     children: ReactNode;
+    // (undocumented)
+    failed?: boolean;
     // (undocumented)
     initial?: boolean;
     // (undocumented)
@@ -1117,7 +1119,7 @@ export const useDataViewInfiniteLoadTrigger: () => (() => void) | undefined;
 export const useDataViewKeyboardEventHandler: () => React_2.KeyboardEventHandler<Element>;
 
 // @public (undocumented)
-export const useDataViewLoaderState: () => "initial" | "refreshing" | "loaded";
+export const useDataViewLoaderState: () => "initial" | "failed" | "refreshing" | "loaded";
 
 // @public (undocumented)
 export const useDataViewNullFilter: (name: string) => UseDataViewNullFilterResult;

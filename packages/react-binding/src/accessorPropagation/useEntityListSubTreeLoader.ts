@@ -38,12 +38,22 @@ export type UseEntityListSubTreeLoaderStateLoaded<State> = {
 	isLoading: false
 }
 
+export type UseEntityListSubTreeLoaderStateFailed = {
+	state: 'failed'
+	error: unknown
+	entities: undefined
+	treeRootId: undefined
+	customState: undefined
+	isLoading: false
+}
+
 
 export type UseEntityListSubTreeLoaderState<State> =
 	| UseEntityListSubTreeLoaderStateInitial
 	| UseEntityListSubTreeLoaderStateLoading
 	| UseEntityListSubTreeLoaderStateRefreshing<State>
 	| UseEntityListSubTreeLoaderStateLoaded<State>
+	| UseEntityListSubTreeLoaderStateFailed
 
 export type UseEntityListSubTreeLoaderStateMethods = {
 	reload: () => void
@@ -81,7 +91,7 @@ export const useEntityListSubTreeLoader = <State>(entities: SugaredQualifiedEnti
 			}
 
 			setDisplayedState(it => {
-				if (it.state === 'initial' || it.state === 'loading') {
+				if (it.state === 'initial' || it.state === 'loading' || it.state === 'failed') {
 					return {
 						...it,
 						isLoading: true,
@@ -101,17 +111,31 @@ export const useEntityListSubTreeLoader = <State>(entities: SugaredQualifiedEnti
 					...resolvedEntities,
 					children,
 				}),
-				{ force: reloadTrigger !== null },
+				{
+					force: reloadTrigger !== null,
+					onError: e => {
+						console.error(e)
+
+						currentlyLoading.current = undefined
+
+						setDisplayedState({
+							state: 'failed',
+							error: e,
+							entities: undefined,
+							treeRootId: undefined,
+							customState: undefined,
+							isLoading: false,
+						})
+					},
+				},
 			)
-			if (currentlyLoading.current?.entities !== resolvedEntities || currentlyLoading.current?.state !== state) {
-				return
-			}
-			currentlyLoading.current = undefined
+
 			if (newTreeRootId) {
+				currentlyLoading.current = undefined
 				setDisplayedState({
+					state: 'loaded',
 					entities: resolvedEntities,
 					treeRootId: newTreeRootId,
-					state: 'loaded',
 					customState: state as State,
 					isLoading: false,
 				})

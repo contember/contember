@@ -69,7 +69,9 @@ export class EventManager {
 			try {
 				resolve(await this.asyncOperation(operation))
 			} catch (e) {
-				console.error('PersistError', e)
+				if (!(typeof e === 'object' && e !== null && 'type' in e && e.type === 'invalidInput')) {
+					console.error('PersistError', e)
+				}
 				reject(e)
 			} finally {
 				this.ongoingPersistOperation = undefined

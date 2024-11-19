@@ -235,9 +235,6 @@ export class AccessorErrorManager {
 				// eslint-disable-next-line no-console
 				console.table(normalizedErrors)
 			}
-			if (treeDatum.errorMessage) {
-				console.error(treeDatum.errorMessage)
-			}
 		}
 	}
 }

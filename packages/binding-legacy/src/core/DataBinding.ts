@@ -157,7 +157,8 @@ export class DataBinding<Node> {
 				return await this.processSuccessfulPersistResult(response, operations, onPersistSuccess)
 			} else {
 				if (response.errorMessage) {
-					console.error(response.errorMessage)
+					// eslint-disable-next-line no-console
+					console.debug(response.errorMessage)
 				}
 
 				this.eventManager.syncTransaction(() => this.accessorErrorManager.replaceErrors(response, operations))

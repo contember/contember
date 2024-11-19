@@ -256,9 +256,10 @@ export class DataBinding<Node> {
 		newFragment: Node
 		newTreeRootId: TreeRootId | undefined
 		options: ExtendTreeOptions
-		reject: () => void
-		resolve: (newRootId: TreeRootId | undefined) => void
+		onError?: (error: Error) => void
 	}> = new Set()
+
+	private flushResult: Promise<boolean> | undefined
 
 	public async extendTree(newFragment: Node, options: ExtendTreeOptions = {}): Promise<TreeRootId | undefined> {
 		if (options.signal?.aborted) {
@@ -277,25 +278,26 @@ export class DataBinding<Node> {
 			})
 		}
 
-		return await new Promise((resolve, reject) => {
+		return await new Promise(async (resolve, reject) => {
+			const treeRootId = this.getNewTreeRootId()
 			this.pendingExtensions.add({
 				markerTreeRoot,
 				newFragment,
-				newTreeRootId: this.getNewTreeRootId(),
+				newTreeRootId: treeRootId,
 				options,
-				reject: () => reject(DataBindingExtendAborted),
-				resolve,
+				onError: options.onError,
 			})
-			const pendingExtensionsCount = this.pendingExtensions.size
+			this.flushResult ??= (async () => {
+				await Promise.resolve()
+				this.flushResult = undefined
+				return await this.flushBatchedTreeExtensions()
+			})()
 
-			Promise.resolve().then(() => {
-				if (pendingExtensionsCount < this.pendingExtensions.size) {
-					return
-				}
-				return this.flushBatchedTreeExtensions()
-			}).catch(e => {
-				console.error(e)
-			})
+			if (!(await this.flushResult) || options.signal?.aborted) {
+				return reject(DataBindingExtendAborted)
+			}
+
+			resolve(treeRootId)
 		})
 	}
 
@@ -305,25 +307,28 @@ export class DataBinding<Node> {
 	} | undefined> {
 		const markerTreeRoot = this.createMarkerTree(fragment, options?.environment ?? this.environment)
 
-		const data = await this.fetchPersistedData(markerTreeRoot, options?.signal)
-		if (!data) {
-			return undefined
-		}
-		return {
-			data: data,
-			markerTreeRoot,
+		try {
+			const data = await this.fetchPersistedData(markerTreeRoot, options?.signal)
+			if (!data) {
+				return undefined
+			}
+			return {
+				data: data,
+				markerTreeRoot,
+			}
+		} catch (e) {
+			if (e instanceof GraphQlClientError && e.type === 'aborted') {
+				return undefined
+			}
+			throw e
 		}
 	}
 
-	private async flushBatchedTreeExtensions() {
+	private async flushBatchedTreeExtensions(): Promise<boolean> {
 		// This is an async operation so we just take whatever pendingExtensions there are now and let any new ones
 		// accumulate in an empty set.
 		const pendingExtensions = Array.from(this.pendingExtensions).filter(extension => {
-			if (extension.options.signal?.aborted) {
-				extension.reject()
-				return false
-			}
-			return true
+			return !extension.options.signal?.aborted
 		})
 		this.pendingExtensions.clear()
 
@@ -338,15 +343,33 @@ export class DataBinding<Node> {
 		)
 
 		if (aggregateMarkerTreeRoot === undefined) {
-			return
+			return false
 		}
 
 		const aggregateSignal = getCombinedSignal(pendingExtensions.map(extension => extension.options.signal))
 
-		const aggregatePersistedData = await this.fetchPersistedData(aggregateMarkerTreeRoot, aggregateSignal)
+		let aggregatePersistedData: ReceivedDataTree
+		try {
+			aggregatePersistedData = await this.fetchPersistedData(aggregateMarkerTreeRoot, aggregateSignal)
+		} catch (e) {
+			if (e instanceof GraphQlClientError) {
+				if (e.type === 'aborted') {
+					return false
+				}
+				for (const extension of pendingExtensions) {
+					extension.onError?.(e)
+				}
+				if (!pendingExtensions.every(it => !!it.onError)) {
+					this.onError(e, this)
+				}
+				return false
+			} else {
+				throw e
+			}
+		}
 
-		if (aggregateSignal?.aborted || aggregatePersistedData === undefined) {
-			return
+		if (aggregateSignal?.aborted) {
+			return false
 		}
 
 		this.eventManager.syncOperation(() => {
@@ -354,34 +377,25 @@ export class DataBinding<Node> {
 
 			for (const extension of pendingExtensions) {
 				this.treeAugmenter.extendTreeStates(extension.newTreeRootId, extension.markerTreeRoot)
-				extension.resolve(extension.newTreeRootId)
 			}
 		})
+		return true
 	}
 
 	private async fetchPersistedData(
 		tree: MarkerTreeRoot,
 		signal?: AbortSignal,
-	): Promise<ReceivedDataTree | undefined> {
+	): Promise<ReceivedDataTree> {
 		const queryGenerator = new QueryGenerator(tree, this.queryBuilder)
 		const query = queryGenerator.getReadQuery()
 
-		try {
-			return await this.contentClient.query(query, {
-				signal,
-				onBeforeRequest: ({ query, variables }) => {
-					// eslint-disable-next-line no-console
-					console.debug(query, variables)
-				},
-			})
-		} catch (e) {
-			if (e instanceof GraphQlClientError) {
-				if (e.type === 'aborted') {
-					return undefined
-				}
-				this.onError(e, this)
-			}
-		}
+		return await this.contentClient.query(query, {
+			signal,
+			onBeforeRequest: ({ query, variables }) => {
+				// eslint-disable-next-line no-console
+				console.debug(query, variables)
+			},
+		})
 	}
 
 	private resetTreeAfterSuccessfulPersist() {

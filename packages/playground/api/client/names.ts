@@ -538,6 +538,75 @@ export const ContemberClientNames: SchemaNames = {
         "slug"
       ]
     },
+    "GanttActivity": {
+      "name": "GanttActivity",
+      "fields": {
+        "id": {
+          "type": "column"
+        },
+        "name": {
+          "type": "column"
+        },
+        "startTime": {
+          "type": "column"
+        },
+        "endTime": {
+          "type": "column"
+        },
+        "discriminator": {
+          "type": "one",
+          "entity": "GanttDiscriminator"
+        },
+        "category": {
+          "type": "one",
+          "entity": "GanttCategory"
+        }
+      },
+      "scalars": [
+        "id",
+        "name",
+        "startTime",
+        "endTime"
+      ]
+    },
+    "GanttCategory": {
+      "name": "GanttCategory",
+      "fields": {
+        "id": {
+          "type": "column"
+        },
+        "name": {
+          "type": "column"
+        }
+      },
+      "scalars": [
+        "id",
+        "name"
+      ]
+    },
+    "GanttDiscriminator": {
+      "name": "GanttDiscriminator",
+      "fields": {
+        "id": {
+          "type": "column"
+        },
+        "slug": {
+          "type": "column"
+        },
+        "name": {
+          "type": "column"
+        },
+        "activities": {
+          "type": "many",
+          "entity": "GanttActivity"
+        }
+      },
+      "scalars": [
+        "id",
+        "slug",
+        "name"
+      ]
+    },
     "GridArticle": {
       "name": "GridArticle",
       "fields": {

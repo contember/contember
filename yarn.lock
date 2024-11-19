@@ -823,6 +823,7 @@ __metadata:
     "@contember/schema-definition": "workspace:*"
     "@contember/schema-utils": "workspace:*"
     "@contember/utilities": "workspace:*"
+    "@dnd-kit/modifiers": ^7.0.0
     "@faker-js/faker": ^9.0.3
     "@radix-ui/react-separator": ^1.1.0
     "@radix-ui/react-toolbar": ^1.1.0
@@ -1396,6 +1397,19 @@ __metadata:
     react: ">=16.8.0"
     react-dom: ">=16.8.0"
   checksum: 3b8f46d2f4d2723abad4721c7bc4d1df2c4f6f26ce54673243666212cfa6f34f33e3255b53144a847da469dc736c966c19e4c45330f967ce8c01f8f878ec7f5b
+  languageName: node
+  linkType: hard
+
+"@dnd-kit/modifiers@npm:^7.0.0":
+  version: 7.0.0
+  resolution: "@dnd-kit/modifiers@npm:7.0.0"
+  dependencies:
+    "@dnd-kit/utilities": ^3.2.2
+    tslib: ^2.0.0
+  peerDependencies:
+    "@dnd-kit/core": ^6.1.0
+    react: ">=16.8.0"
+  checksum: 176f76a552a2692a205f7fe647c836aa7ded7f0fdc3370407f3633c153139fe838cb85e59cbc3b156377cc8fe3fb7b72af15b97ed3de15cec904eae35f0c36e6
   languageName: node
   linkType: hard
 

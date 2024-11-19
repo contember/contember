@@ -23,8 +23,7 @@
     "ae:build": "yarn workspaces foreach -pt run ae:build",
     "ae:update": "yarn run ts:build --clean && yarn run ts:build && yarn run ae:build",
     "ae:test": "yarn workspaces foreach -pt run ae:test",
-    "tag-version": "./scripts/npm/tag-version.sh $@",
-    "playground:generate-client": "yarn run --silent contember project:print-schema --format=schema | tsx ./packages/client-content-generator/src/generate.ts - ./packages/playground/api/client/"
+    "tag-version": "./scripts/npm/tag-version.sh $@"
   },
   "devDependencies": {
     "@actions/core": "^1.10.1",

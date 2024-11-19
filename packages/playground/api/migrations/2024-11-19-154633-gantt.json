@@ -1,0 +1,202 @@
+{
+	"formatVersion": 5,
+	"modifications": [
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "GanttActivity",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "gantt_activity",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": [],
+				"indexes": [],
+				"eventLog": {
+					"enabled": true
+				}
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "GanttDiscriminator",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "gantt_discriminator",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": [],
+				"indexes": [],
+				"eventLog": {
+					"enabled": true
+				}
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "GanttActivity",
+			"field": {
+				"name": "name",
+				"columnName": "name",
+				"columnType": "text",
+				"nullable": true,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "GanttActivity",
+			"field": {
+				"name": "startTime",
+				"columnName": "start_time",
+				"columnType": "timestamptz",
+				"nullable": true,
+				"type": "DateTime"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "GanttActivity",
+			"field": {
+				"name": "endTime",
+				"columnName": "end_time",
+				"columnType": "timestamptz",
+				"nullable": true,
+				"type": "DateTime"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "GanttDiscriminator",
+			"field": {
+				"name": "slug",
+				"columnName": "slug",
+				"columnType": "text",
+				"nullable": true,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "GanttDiscriminator",
+			"field": {
+				"name": "name",
+				"columnName": "name",
+				"columnType": "text",
+				"nullable": true,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "GanttActivity",
+			"owningSide": {
+				"type": "ManyHasOne",
+				"name": "discriminator",
+				"target": "GanttDiscriminator",
+				"joiningColumn": {
+					"columnName": "discriminator_id",
+					"onDelete": "restrict"
+				},
+				"nullable": true,
+				"inversedBy": "activities"
+			},
+			"inverseSide": {
+				"type": "OneHasMany",
+				"name": "activities",
+				"target": "GanttActivity",
+				"ownedBy": "discriminator"
+			}
+		},
+		{
+			"modification": "createUniqueConstraint",
+			"entityName": "GanttDiscriminator",
+			"unique": {
+				"fields": [
+					"slug"
+				]
+			}
+		},
+		{
+			"modification": "patchAclSchema",
+			"patch": [
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/GanttActivity",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"read": {
+								"id": true,
+								"name": true,
+								"startTime": true,
+								"endTime": true,
+								"discriminator": true
+							},
+							"create": {
+								"id": true,
+								"name": true,
+								"startTime": true,
+								"endTime": true,
+								"discriminator": true
+							},
+							"update": {
+								"id": true,
+								"name": true,
+								"startTime": true,
+								"endTime": true,
+								"discriminator": true
+							},
+							"delete": true,
+							"customPrimary": true
+						}
+					}
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/GanttDiscriminator",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"read": {
+								"id": true,
+								"slug": true,
+								"name": true,
+								"activities": true
+							},
+							"create": {
+								"id": true,
+								"slug": true,
+								"name": true,
+								"activities": true
+							},
+							"update": {
+								"id": true,
+								"slug": true,
+								"name": true,
+								"activities": true
+							},
+							"delete": true,
+							"customPrimary": true
+						}
+					}
+				}
+			]
+		}
+	]
+}

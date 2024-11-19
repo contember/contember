@@ -182,7 +182,7 @@ interface MetaFieldProps {
 const MetaField = Component<MetaFieldProps>(({ field, label, format = it => it }) => (
 	!field ? null : <FieldView<any> field={field} render={value => <>
 		<span className="font-semibold text-right">{label}</span>
-		<span>{format(value)}</span>
+		<span>{format(value.value)}</span>
 	</>} />
 ))
 

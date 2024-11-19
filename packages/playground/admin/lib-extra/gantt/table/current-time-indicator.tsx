@@ -20,7 +20,7 @@ export const CurrentTimeIndicator = ({ slotLength, blockSize, startTime }: Curre
 
 		const updateCurrentTimePosition = () => {
 			const currentDate = new Date()
-			const filteredDate = new Date(filter?.start ?? '')
+			const filteredDate = new Date(filter.start ?? '')
 			const isToday = currentDate.toDateString() === filteredDate.toDateString()
 
 			if (!isToday) {
@@ -33,8 +33,17 @@ export const CurrentTimeIndicator = ({ slotLength, blockSize, startTime }: Curre
 		}
 
 		updateCurrentTimePosition()
-		const interval = setInterval(updateCurrentTimePosition, 60000)
-		return () => clearInterval(interval)
+
+		const now = new Date()
+		const msUntilNextMinute = (60 - now.getSeconds()) * 1000
+
+		const timeout = setTimeout(() => {
+			updateCurrentTimePosition()
+			const interval = setInterval(updateCurrentTimePosition, 60000)
+			return () => clearInterval(interval)
+		}, msUntilNextMinute)
+
+		return () => clearTimeout(timeout)
 	}, [filter, slotLength, blockSize.width, startTime])
 
 	if (currentTimePosition === null) {

@@ -2,7 +2,12 @@ import { useEffect, useState } from 'react'
 import { ErrorType, ProcessedError } from '../ui/DevError'
 
 export const parseStacktrace = async (e: Error) => {
-	const StackTracey = (await import('stacktracey')).default
+	let StackTracey
+	try {
+		StackTracey = (await import('stacktracey')).default
+	} catch {
+		return undefined
+	}
 	return (await new StackTracey(e).withSourcesAsync()).items.map(it => ({
 		filename: it.fileShort,
 		line: it.line,

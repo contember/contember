@@ -28,7 +28,7 @@ export const ActivityCommonForm = Component<ActivityCommonFormProps>(
 		const endTimeFieldAccessor = entity.getField<string>(endTimeField)
 		const discriminatorToConnect = discriminator && useEntitySubTree('discriminatorToConnect')
 
-		// biome-ignore lint/correctness/useExhaustiveDependencies: run on load
+
 		useEffect(() => {
 			if (time && filteredDay) {
 				const startTime = new Date(`${filteredDay}T${time}:00`)
@@ -42,6 +42,7 @@ export const ActivityCommonForm = Component<ActivityCommonFormProps>(
 			if (discriminatorToConnect) {
 				entity.connectEntityAtField(discriminationField, discriminatorToConnect)
 			}
+			// eslint-disable-next-line react-hooks/exhaustive-deps
 		}, [])
 
 		return (

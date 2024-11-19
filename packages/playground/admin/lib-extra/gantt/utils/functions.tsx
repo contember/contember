@@ -1,4 +1,4 @@
-import { HoursMinString, SlotsLengthType } from '@app/lib-extra/gantt/utils/types';
+import { HoursMinString, SlotsLengthType } from '@app/lib-extra/gantt/utils/types'
 
 
 export const isoStringDateToMinutes = (isoString: string) => {

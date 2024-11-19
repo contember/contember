@@ -13,11 +13,11 @@ export const CurrentTimeIndicator = ({ slotLength, blockSize, startTime }: Curre
 	const [filter] = useDataViewFilter<DateRangeFilterArtifacts>('startTime')
 	const [currentTimePosition, setCurrentTimePosition] = useState<number | null>(null)
 
-	if (!filter?.start) {
-		return
-	}
-
 	useEffect(() => {
+		if (!filter?.start) {
+			return
+		}
+
 		const updateCurrentTimePosition = () => {
 			const currentDate = new Date()
 			const filteredDate = new Date(filter?.start ?? '')

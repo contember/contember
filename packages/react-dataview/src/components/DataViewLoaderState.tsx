@@ -6,6 +6,7 @@ export interface DataViewLoaderStateProps {
 	loaded?: boolean
 	refreshing?: boolean
 	initial?: boolean
+	failed?: boolean
 }
 
 export const DataViewLoaderState = ({ children, ...props }: DataViewLoaderStateProps) => {

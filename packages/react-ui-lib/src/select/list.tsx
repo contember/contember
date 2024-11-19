@@ -53,6 +53,9 @@ export const SelectListInner = Component(({ children, filterToolbar }: SelectLis
 					<DataViewLoaderState initial>
 						<Loader position={'static'} size={'sm'} />
 					</DataViewLoaderState>
+					<DataViewLoaderState failed>
+						<div>Failed to load data</div>
+					</DataViewLoaderState>
 				</div>
 			</DataViewKeyboardEventHandler>
 		</DataViewInfiniteLoadProvider>

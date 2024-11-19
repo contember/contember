@@ -49,6 +49,9 @@ export const DataGridLoader = ({ children }: DataViewBodyProps) => (
 		<DataViewLoaderState initial>
 			<DataGridInitialLoader />
 		</DataViewLoaderState>
+		<DataViewLoaderState failed>
+			<div>Failed to load data</div>
+		</DataViewLoaderState>
 	</>
 )
 

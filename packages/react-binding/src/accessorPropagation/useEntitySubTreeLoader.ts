@@ -2,6 +2,7 @@ import { createElement, ReactNode, useCallback, useEffect, useRef, useState } fr
 import { SugaredQualifiedSingleEntity, TreeRootId } from '@contember/binding'
 import { useExtendTree } from './useExtendTree'
 import { EntitySubTree } from '../coreComponents'
+import { useObjectMemo } from '@contember/react-utils'
 
 export type UseEntitySubTreeLoaderStateInitial = {
 	state: 'initial'
@@ -49,6 +50,8 @@ export type UseEntitySubTreeLoaderStateMethods = {
 	reload: () => void
 }
 
+const emptyObject = {} as SugaredQualifiedSingleEntity
+
 export const useEntitySubTreeLoader = <State>(entity: SugaredQualifiedSingleEntity | undefined, children: ReactNode, state?: State): [UseEntitySubTreeLoaderState<State>, UseEntitySubTreeLoaderStateMethods] => {
 	const [displayedState, setDisplayedState] = useState<UseEntitySubTreeLoaderState<State>>({
 		state: 'initial',
@@ -64,15 +67,17 @@ export const useEntitySubTreeLoader = <State>(entity: SugaredQualifiedSingleEnti
 
 	const extendTree = useExtendTree()
 	const [reloadTrigger, setReloadTrigger] = useState<object | null>(null)
+	const memoizedEntity = useObjectMemo(entity ?? emptyObject)
+	const resolvedEntity = entity ? memoizedEntity : undefined
 
 	useEffect(() => {
 		(async () => {
-			if (!entity) {
+			if (!resolvedEntity) {
 				return
 			}
 
 			currentlyLoading.current = {
-				entity,
+				entity: resolvedEntity,
 				state,
 			}
 
@@ -94,18 +99,18 @@ export const useEntitySubTreeLoader = <State>(entity: SugaredQualifiedSingleEnti
 
 			const newTreeRootId = await extendTree(
 				createElement(EntitySubTree, {
-					...entity,
+					...resolvedEntity,
 					children,
 				}),
 				{ force: reloadTrigger !== null },
 			)
-			if (currentlyLoading.current?.entity !== entity || currentlyLoading.current?.state !== state) {
+			if (currentlyLoading.current?.entity !== resolvedEntity || currentlyLoading.current?.state !== state) {
 				return
 			}
 			currentlyLoading.current = undefined
 			if (newTreeRootId) {
 				setDisplayedState({
-					entity: entity,
+					entity: resolvedEntity,
 					treeRootId: newTreeRootId,
 					state: 'loaded',
 					customState: state as State,
@@ -113,7 +118,7 @@ export const useEntitySubTreeLoader = <State>(entity: SugaredQualifiedSingleEnti
 				})
 			}
 		})()
-	}, [extendTree, entity, children, state, reloadTrigger])
+	}, [extendTree, resolvedEntity, children, state, reloadTrigger])
 
 	return [displayedState, {
 		reload: useCallback(() => setReloadTrigger({}), []),

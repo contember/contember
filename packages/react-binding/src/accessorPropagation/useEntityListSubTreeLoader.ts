@@ -3,6 +3,7 @@ import { SugaredQualifiedEntityList, TreeRootId } from '@contember/binding'
 import { useExtendTree } from './useExtendTree'
 import { EntityListSubTree } from '../coreComponents'
 import { useEnvironment } from './useEnvironment'
+import { useObjectMemo } from '@contember/react-utils'
 
 export type UseEntityListSubTreeLoaderStateInitial = {
 	state: 'initial'
@@ -48,6 +49,8 @@ export type UseEntityListSubTreeLoaderStateMethods = {
 	reload: () => void
 }
 
+const emptyObject = {} as SugaredQualifiedEntityList
+
 export const useEntityListSubTreeLoader = <State>(entities: SugaredQualifiedEntityList | undefined, children: ReactNode, state?: State): [UseEntityListSubTreeLoaderState<State>, UseEntityListSubTreeLoaderStateMethods] => {
 	const [displayedState, setDisplayedState] = useState<UseEntityListSubTreeLoaderState<State>>({
 		state: 'initial',
@@ -63,15 +66,17 @@ export const useEntityListSubTreeLoader = <State>(entities: SugaredQualifiedEnti
 
 	const extendTree = useExtendTree()
 	const [reloadTrigger, setReloadTrigger] = useState<object | null>(null)
+	const memoizedEntities = useObjectMemo(entities ?? emptyObject)
+	const resolvedEntities = entities ? memoizedEntities : undefined
 
 	useEffect(() => {
 		(async () => {
-			if (!entities) {
+			if (!resolvedEntities) {
 				return
 			}
 
 			currentlyLoading.current = {
-				entities,
+				entities: resolvedEntities,
 				state,
 			}
 
@@ -93,18 +98,18 @@ export const useEntityListSubTreeLoader = <State>(entities: SugaredQualifiedEnti
 
 			const newTreeRootId = await extendTree(
 				createElement(EntityListSubTree, {
-					...entities,
+					...resolvedEntities,
 					children,
 				}),
 				{ force: reloadTrigger !== null },
 			)
-			if (currentlyLoading.current?.entities !== entities || currentlyLoading.current?.state !== state) {
+			if (currentlyLoading.current?.entities !== resolvedEntities || currentlyLoading.current?.state !== state) {
 				return
 			}
 			currentlyLoading.current = undefined
 			if (newTreeRootId) {
 				setDisplayedState({
-					entities: entities,
+					entities: resolvedEntities,
 					treeRootId: newTreeRootId,
 					state: 'loaded',
 					customState: state as State,
@@ -112,7 +117,7 @@ export const useEntityListSubTreeLoader = <State>(entities: SugaredQualifiedEnti
 				})
 			}
 		})()
-	}, [extendTree, entities, children, state, reloadTrigger])
+	}, [extendTree, resolvedEntities, children, state, reloadTrigger])
 
 	return [
 		displayedState,

@@ -338,6 +338,40 @@ export const ContemberClientNames: SchemaNames = {
         "data"
       ]
     },
+    "ExtendTreeMany": {
+      "name": "ExtendTreeMany",
+      "fields": {
+        "id": {
+          "type": "column"
+        },
+        "value": {
+          "type": "column"
+        }
+      },
+      "scalars": [
+        "id",
+        "value"
+      ]
+    },
+    "ExtendTreeSingle": {
+      "name": "ExtendTreeSingle",
+      "fields": {
+        "id": {
+          "type": "column"
+        },
+        "unique": {
+          "type": "column"
+        },
+        "value": {
+          "type": "column"
+        }
+      },
+      "scalars": [
+        "id",
+        "unique",
+        "value"
+      ]
+    },
     "Folder": {
       "name": "Folder",
       "fields": {
@@ -764,8 +798,16 @@ export const ContemberClientNames: SchemaNames = {
         "id": {
           "type": "column"
         },
+        "root": {
+          "type": "one",
+          "entity": "RepeaterRoot"
+        },
         "title": {
           "type": "column"
+        },
+        "relation": {
+          "type": "one",
+          "entity": "RepeaterRelation"
         },
         "order": {
           "type": "column"
@@ -775,6 +817,40 @@ export const ContemberClientNames: SchemaNames = {
         "id",
         "title",
         "order"
+      ]
+    },
+    "RepeaterRelation": {
+      "name": "RepeaterRelation",
+      "fields": {
+        "id": {
+          "type": "column"
+        },
+        "name": {
+          "type": "column"
+        }
+      },
+      "scalars": [
+        "id",
+        "name"
+      ]
+    },
+    "RepeaterRoot": {
+      "name": "RepeaterRoot",
+      "fields": {
+        "id": {
+          "type": "column"
+        },
+        "unique": {
+          "type": "column"
+        },
+        "items": {
+          "type": "many",
+          "entity": "RepeaterItem"
+        }
+      },
+      "scalars": [
+        "id",
+        "unique"
       ]
     },
     "SelectItem": {

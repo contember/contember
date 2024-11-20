@@ -1,0 +1,157 @@
+{
+	"formatVersion": 5,
+	"modifications": [
+		{
+			"modification": "createEnum",
+			"enumName": "ExtendTreeUnique",
+			"values": [
+				"unique"
+			]
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "ExtendTreeMany",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "extend_tree_many",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": [],
+				"indexes": [],
+				"eventLog": {
+					"enabled": true
+				}
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "ExtendTreeSingle",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "extend_tree_single",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": [],
+				"indexes": [],
+				"eventLog": {
+					"enabled": true
+				}
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "ExtendTreeMany",
+			"field": {
+				"name": "value",
+				"columnName": "value",
+				"columnType": "text",
+				"nullable": false,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "ExtendTreeSingle",
+			"field": {
+				"name": "unique",
+				"columnName": "unique",
+				"columnType": "ExtendTreeUnique",
+				"nullable": false,
+				"type": "Enum",
+				"default": "unique"
+			},
+			"fillValue": "unique",
+			"valueMigrationStrategy": "using"
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "ExtendTreeSingle",
+			"field": {
+				"name": "value",
+				"columnName": "value",
+				"columnType": "text",
+				"nullable": false,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createUniqueConstraint",
+			"entityName": "ExtendTreeSingle",
+			"unique": {
+				"fields": [
+					"unique"
+				]
+			}
+		},
+		{
+			"modification": "patchAclSchema",
+			"patch": [
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/ExtendTreeMany",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"read": {
+								"id": true,
+								"value": true
+							},
+							"create": {
+								"id": true,
+								"value": true
+							},
+							"update": {
+								"id": true,
+								"value": true
+							},
+							"delete": true,
+							"customPrimary": true
+						}
+					}
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/ExtendTreeSingle",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"read": {
+								"id": true,
+								"unique": true,
+								"value": true
+							},
+							"create": {
+								"id": true,
+								"unique": true,
+								"value": true
+							},
+							"update": {
+								"id": true,
+								"unique": true,
+								"value": true
+							},
+							"delete": true,
+							"customPrimary": true
+						}
+					}
+				}
+			]
+		}
+	]
+}

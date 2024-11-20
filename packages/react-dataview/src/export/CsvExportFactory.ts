@@ -49,7 +49,7 @@ export class CsvExportFactory implements ExportFactory {
 	}
 
 	protected formatValue(value: any) {
-		const stringValue = Array.isArray(value) ? value.join(';') : String((value ?? ''))
+		const stringValue = Array.isArray(value) ? value.join(';') : (value !== null && typeof value === 'object') ? JSON.stringify(value) : String((value ?? ''))
 		if (stringValue.includes(',') || stringValue.includes('\n')) {
 			return '"' + stringValue.replace(/"/g, '""') + '"'
 		}

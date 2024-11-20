@@ -28,6 +28,7 @@
     "ae:test": "api-extractor run"
   },
   "dependencies": {
+    "@contember/react-utils": "workspace:*",
     "@contember/utilities": "workspace:*"
   },
   "peerDependencies": {

@@ -1021,6 +1021,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@contember/react-multipass-rendering@workspace:packages/react-multipass-rendering"
   dependencies:
+    "@contember/react-utils": "workspace:*"
     "@contember/utilities": "workspace:*"
   peerDependencies:
     react: ^18 || ^19

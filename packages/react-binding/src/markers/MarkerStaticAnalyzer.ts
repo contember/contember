@@ -9,6 +9,7 @@ import {
 	HasOneRelationMarker,
 } from '@contember/binding'
 import { IncrementalMarkerBuilder } from './IncrementalMarkerBuilder'
+import { withDummyDispatcher } from '@contember/react-utils'
 
 type Markers = FieldMarker | HasOneRelationMarker | EntityFieldMarkersContainer | EntityFieldsWithHoistablesMarker | HasManyRelationMarker
 
@@ -17,7 +18,7 @@ export class MarkerStaticAnalyzer {
 		children: ReactNode,
 		env: Environment,
 	): EntityFieldsWithHoistablesMarker | EntityFieldMarkersContainer | undefined {
-		const markers = this.processNode(children, env, [])
+		const markers = withDummyDispatcher(() => this.processNode(children, env, []))
 		if (markers.length === 0) {
 			return undefined
 		}

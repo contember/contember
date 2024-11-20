@@ -1,5 +1,6 @@
 import { assertNever } from '@contember/utilities'
-import type { ElementType, ReactElement, ReactNode } from 'react'
+import { ElementType, ReactElement, ReactNode, useReducer } from 'react'
+import * as React from 'react'
 import type { BranchNodeList } from './BranchNodeList'
 import { ChildrenAnalyzerError } from './ChildrenAnalyzerError'
 import type { ChildrenAnalyzerOptions } from './ChildrenAnalyzerOptions'
@@ -14,6 +15,7 @@ import type {
 	UnconstrainedLeafRepresentationFactory,
 	ValidFactoryName,
 } from './nodeSpecs'
+import { withDummyDispatcher } from '@contember/react-utils'
 
 export class ChildrenAnalyzer<
 	AllLeavesRepresentation = any,
@@ -66,17 +68,19 @@ export class ChildrenAnalyzer<
 		children: ReactNode,
 		initialStaticContext: StaticContext,
 	): Array<AllLeavesRepresentation | AllBranchNodesRepresentation> {
+		return withDummyDispatcher(() => this.doProcessChildren(children, initialStaticContext))
+	}
+
+	private doProcessChildren(
+		children: ReactNode,
+		initialStaticContext: StaticContext,
+	): Array<AllLeavesRepresentation | AllBranchNodesRepresentation> {
+
 		const processed = this.processNode(children, initialStaticContext, [])
 
-		const rawResult: Array<AllLeavesRepresentation | AllBranchNodesRepresentation | undefined> = Array.isArray(
-			processed,
-		)
-			? processed
-			: [processed]
+		const rawResult = Array.isArray(processed) ? processed : [processed]
 
-		return rawResult.filter(
-			(item): item is AllLeavesRepresentation | AllBranchNodesRepresentation => item !== undefined,
-		)
+		return rawResult.filter((item): item is AllLeavesRepresentation | AllBranchNodesRepresentation => item !== undefined)
 	}
 
 	private processNode(
@@ -258,3 +262,4 @@ export class ChildrenAnalyzer<
 		return processedChildren
 	}
 }
+

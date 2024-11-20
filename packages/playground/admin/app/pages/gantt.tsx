@@ -21,7 +21,7 @@ export default () => (
 				// initial filter to show date with mock data
 				initialFilters={() => {
 					const r = {
-						startDate: {
+						startTime: {
 							start: '2024-11-19',
 						},
 					}

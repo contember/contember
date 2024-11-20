@@ -1,4 +1,5 @@
 export * from './context'
+export * from './dispatcher'
 export * from './debug-context'
 export * from './hooks'
 export * from './referentiallyStable'

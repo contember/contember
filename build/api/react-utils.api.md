@@ -231,6 +231,9 @@ export function useWindowSize(): {
 // @public (undocumented)
 export type ValueInitializer<V extends Serializable> = (storedValue: V | undefined) => V;
 
+// @public (undocumented)
+export const withDummyDispatcher: <T>(cb: () => T) => T;
+
 // (No @packageDocumentation comment for this package)
 
 ```

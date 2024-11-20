@@ -219,7 +219,7 @@ export const GanttChartTable = Component<GanttChartTableProps>(
 					setEditedActivity={setEditedActivity}
 					timeSlots={timeSlots}
 					slotsLength={slotsLength}
-					form={createActivityForm}
+					form={editActivityForm}
 					{...props}
 				/>
 			</div>

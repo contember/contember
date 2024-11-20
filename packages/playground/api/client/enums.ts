@@ -1,58 +1,60 @@
-export type BlockType = 
+export type BlockType =
 	 | "text"
 	 | "image"
 	 | "textWithImage"
 	 | "hero"
-export type BoardTaskStatus = 
+export type BoardTaskStatus =
 	 | "backlog"
 	 | "todo"
 	 | "inProgress"
 	 | "done"
-export type ContentEmbedType = 
+export type ContentEmbedType =
 	 | "youtube"
 	 | "vimeo"
-export type EditorReferenceType = 
+export type EditorReferenceType =
 	 | "image"
 	 | "link"
 	 | "quote"
-export type GridArticleState = 
+export type GridArticleState =
 	 | "published"
 	 | "draft"
 	 | "archived"
-export type InputUnique = 
+export type InputUnique =
 	 | "unique"
-export type LegacyEditorReferenceType = 
+export type LegacyEditorReferenceType =
 	 | "link"
 	 | "quote"
 	 | "image"
 	 | "embed"
-export type SelectUnique = 
+export type SelectUnique =
 	 | "unique"
-export type UploadMediaType = 
+export type UploadMediaType =
 	 | "image"
 	 | "video"
 	 | "audio"
 	 | "file"
-export type UploadOne = 
+export type UploadOne =
 	 | "unique"
-export type BlockImagePosition = 
+export type BlockImagePosition =
 	 | "left"
 	 | "right"
-export type BlockListUnique = 
+export type BlockListUnique =
 	 | "unique"
-export type DimensionsItemUnique = 
+export type DimensionsItemUnique =
 	 | "unique"
-export type EditorContentUnique = 
+export type EditorContentUnique =
 	 | "unique"
-export type EditorTextAreaUnique = 
+export type EditorTextAreaUnique =
 	 | "unique"
-export type InputRootEnumValue = 
+export type InputRootEnumValue =
 	 | "a"
 	 | "b"
 	 | "c"
-export type LegacyEditorContentUnique = 
+export type LegacyEditorContentUnique =
 	 | "unique"
-export type PlateEditorContentUnique = 
+export type PlateEditorContentUnique =
 	 | "unique"
-export type SlugUnique = 
+export type RepeaterRootUnique =
+	 | "unique"
+export type SlugUnique =
 	 | "unique"

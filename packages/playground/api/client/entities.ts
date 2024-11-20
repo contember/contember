@@ -16,6 +16,7 @@ import type { EditorTextAreaUnique } from './enums'
 import type { InputRootEnumValue } from './enums'
 import type { LegacyEditorContentUnique } from './enums'
 import type { PlateEditorContentUnique } from './enums'
+import type { RepeaterRootUnique } from './enums'
 import type { SlugUnique } from './enums'
 
 export type JSONPrimitive = string | number | boolean | null
@@ -308,6 +309,43 @@ export type Folder <OverRelation extends string | never = never> = {
 	}
 	hasManyBy: {
 		childrenByChildren: { entity: Folder; by: {children: Folder['unique']}  }
+	}
+}
+export type GanttActivity <OverRelation extends string | never = never> = {
+	name: 'GanttActivity'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+	columns: {
+		id: string
+		name: string | null
+		startTime: string | null
+		endTime: string | null
+	}
+	hasOne: {
+		discriminator: GanttDiscriminator
+	}
+	hasMany: {
+	}
+	hasManyBy: {
+	}
+}
+export type GanttDiscriminator <OverRelation extends string | never = never> = {
+	name: 'GanttDiscriminator'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+		| Omit<{ slug: string}, OverRelation>
+		| Omit<{ activities: GanttActivity['unique']}, OverRelation>
+	columns: {
+		id: string
+		slug: string | null
+		name: string | null
+	}
+	hasOne: {
+	}
+	hasMany: {
+		activities: GanttActivity<'discriminator'>
+	}
+	hasManyBy: {
 	}
 }
 export type GridArticle <OverRelation extends string | never = never> = {
@@ -608,8 +646,43 @@ export type RepeaterItem <OverRelation extends string | never = never> = {
 		order: number | null
 	}
 	hasOne: {
+		root: RepeaterRoot
+		relation: RepeaterRelation
 	}
 	hasMany: {
+	}
+	hasManyBy: {
+	}
+}
+export type RepeaterRelation <OverRelation extends string | never = never> = {
+	name: 'RepeaterRelation'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+	columns: {
+		id: string
+		name: string
+	}
+	hasOne: {
+	}
+	hasMany: {
+	}
+	hasManyBy: {
+	}
+}
+export type RepeaterRoot <OverRelation extends string | never = never> = {
+	name: 'RepeaterRoot'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+		| Omit<{ unique: RepeaterRootUnique}, OverRelation>
+		| Omit<{ items: RepeaterItem['unique']}, OverRelation>
+	columns: {
+		id: string
+		unique: RepeaterRootUnique
+	}
+	hasOne: {
+	}
+	hasMany: {
+		items: RepeaterItem<'root'>
 	}
 	hasManyBy: {
 	}
@@ -984,6 +1057,8 @@ export type ContemberClientEntities = {
 	EditorReference: EditorReference
 	EditorTextArea: EditorTextArea
 	Folder: Folder
+	GanttActivity: GanttActivity
+	GanttDiscriminator: GanttDiscriminator
 	GridArticle: GridArticle
 	GridArticleComment: GridArticleComment
 	GridArticleDetail: GridArticleDetail
@@ -1000,6 +1075,8 @@ export type ContemberClientEntities = {
 	LegacyEditorReference: LegacyEditorReference
 	PlateEditorContent: PlateEditorContent
 	RepeaterItem: RepeaterItem
+	RepeaterRelation: RepeaterRelation
+	RepeaterRoot: RepeaterRoot
 	SelectItem: SelectItem
 	SelectRoot: SelectRoot
 	SelectValue: SelectValue

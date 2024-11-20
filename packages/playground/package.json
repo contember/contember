@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "build": "vite build admin",
-    "contember": "docker-compose run contember-cli",
+    "contember": "docker compose run contember-cli",
     "deploy": "yarn run build \"$0\" && docker-compose run --no-deps contember-cli deploy \"$@\" --root ",
     "start": "vite dev admin --port ${VITE_PORT:-3000} --host 0.0.0.0"
   },
@@ -37,6 +37,7 @@
     "vite-tsconfig-paths": "^5.0.1"
   },
   "dependencies": {
+    "@dnd-kit/modifiers": "^7.0.0",
     "@sindresorhus/slugify": "^2.2.1"
   }
 }

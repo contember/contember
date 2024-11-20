@@ -680,6 +680,8 @@ export interface ExtendTreeOptions {
     // (undocumented)
     force?: boolean;
     // (undocumented)
+    onError?: (error: Error) => void;
+    // (undocumented)
     signal?: AbortSignal;
 }
 
@@ -690,7 +692,7 @@ export type FetchData<Node> = (fragment: Node, options?: {
 }) => Promise<{
     data: ReceivedDataTree;
     markerTreeRoot: MarkerTreeRoot;
-} | undefined>;
+}>;
 
 // @public (undocumented)
 export interface FieldAccessor<Value extends FieldValue = FieldValue> extends Errorable {

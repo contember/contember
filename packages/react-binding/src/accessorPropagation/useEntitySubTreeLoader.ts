@@ -37,12 +37,22 @@ export type UseEntitySubTreeLoaderStateLoaded<State> = {
 	isLoading: false
 }
 
+export type UseEntitySubTreeLoaderStateFailed = {
+	state: 'failed'
+	error: unknown
+	entity: undefined
+	treeRootId: undefined
+	customState: undefined
+	isLoading: false
+}
+
 
 export type UseEntitySubTreeLoaderState<State> =
 	| UseEntitySubTreeLoaderStateInitial
 	| UseEntitySubTreeLoaderStateLoading
 	| UseEntitySubTreeLoaderStateRefreshing<State>
 	| UseEntitySubTreeLoaderStateLoaded<State>
+	| UseEntitySubTreeLoaderStateFailed
 
 export type EntityListSubTreeLoaderState = UseEntitySubTreeLoaderState<any>['state']
 
@@ -82,7 +92,7 @@ export const useEntitySubTreeLoader = <State>(entity: SugaredQualifiedSingleEnti
 			}
 
 			setDisplayedState(it => {
-				if (it.state === 'initial' || it.state === 'loading') {
+				if (it.state === 'initial' || it.state === 'loading' || it.state === 'failed') {
 					return {
 						...it,
 						isLoading: true,
@@ -102,17 +112,32 @@ export const useEntitySubTreeLoader = <State>(entity: SugaredQualifiedSingleEnti
 					...resolvedEntity,
 					children,
 				}),
-				{ force: reloadTrigger !== null },
+				{
+					force: reloadTrigger !== null,
+					onError: e => {
+						console.error(e)
+
+						currentlyLoading.current = undefined
+
+						setDisplayedState({
+							state: 'failed',
+							error: e,
+							entity: undefined,
+							treeRootId: undefined,
+							customState: undefined,
+							isLoading: false,
+						})
+					},
+				},
 			)
-			if (currentlyLoading.current?.entity !== resolvedEntity || currentlyLoading.current?.state !== state) {
-				return
-			}
-			currentlyLoading.current = undefined
+
+
 			if (newTreeRootId) {
+				currentlyLoading.current = undefined
 				setDisplayedState({
+					state: 'loaded',
 					entity: resolvedEntity,
 					treeRootId: newTreeRootId,
-					state: 'loaded',
 					customState: state as State,
 					isLoading: false,
 				})
@@ -120,7 +145,10 @@ export const useEntitySubTreeLoader = <State>(entity: SugaredQualifiedSingleEnti
 		})()
 	}, [extendTree, resolvedEntity, children, state, reloadTrigger])
 
-	return [displayedState, {
-		reload: useCallback(() => setReloadTrigger({}), []),
-	}]
+	return [
+		displayedState,
+		{
+			reload: useCallback(() => setReloadTrigger({}), []),
+		},
+	]
 }

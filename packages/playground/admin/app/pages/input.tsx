@@ -11,6 +11,7 @@ import slugify from '@sindresorhus/slugify'
 import { TreeRootIdProvider, useEnvironment } from '@contember/react-binding'
 import { Link } from '@contember/react-routing'
 import { FractionalAmountField } from '@app/lib-extra/fractional-amount-field'
+import { DefaultRepeater } from '@app/lib/repeater'
 
 export const Basic = () => {
 	const required = !!useEnvironment().getParameterOrElse('required', false)
@@ -209,3 +210,20 @@ export const slug = () => <>
 		</EntitySubTree>
 	</Binding>
 </>
+
+
+export const serverRules = () => <>
+	<Binding>
+		<Slots.Actions>
+			<PersistButton />
+		</Slots.Actions>
+		<DefaultRepeater entities={'InputRules'} orderBy="id">
+			<div className={'space-y-4'}>
+				<InputField field={'notNullValue'} label={'Not null'} />
+				<InputField field={'uniqueValue'} label={'Unique value'} />
+				<InputField field={'validationValue'} label={'Validation value'} />
+			</div>
+		</DefaultRepeater>
+	</Binding>
+</>
+

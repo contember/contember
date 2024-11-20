@@ -666,7 +666,17 @@ export const useEntityListSubTree: (qualifiedEntityList: Alias | SugaredQualifie
 export const useEntityListSubTreeLoader: <State>(entities: SugaredQualifiedEntityList | undefined, children: ReactNode, state?: State) => [UseEntityListSubTreeLoaderState<State>, UseEntityListSubTreeLoaderStateMethods];
 
 // @public (undocumented)
-export type UseEntityListSubTreeLoaderState<State> = UseEntityListSubTreeLoaderStateInitial | UseEntityListSubTreeLoaderStateLoading | UseEntityListSubTreeLoaderStateRefreshing<State> | UseEntityListSubTreeLoaderStateLoaded<State>;
+export type UseEntityListSubTreeLoaderState<State> = UseEntityListSubTreeLoaderStateInitial | UseEntityListSubTreeLoaderStateLoading | UseEntityListSubTreeLoaderStateRefreshing<State> | UseEntityListSubTreeLoaderStateLoaded<State> | UseEntityListSubTreeLoaderStateFailed;
+
+// @public (undocumented)
+export type UseEntityListSubTreeLoaderStateFailed = {
+    state: 'failed';
+    error: unknown;
+    entities: undefined;
+    treeRootId: undefined;
+    customState: undefined;
+    isLoading: false;
+};
 
 // @public (undocumented)
 export type UseEntityListSubTreeLoaderStateInitial = {
@@ -731,7 +741,17 @@ export const useEntitySubTree: (qualifiedSingleEntity: Alias | SugaredQualifiedS
 export const useEntitySubTreeLoader: <State>(entity: SugaredQualifiedSingleEntity | undefined, children: ReactNode, state?: State) => [UseEntitySubTreeLoaderState<State>, UseEntitySubTreeLoaderStateMethods];
 
 // @public (undocumented)
-export type UseEntitySubTreeLoaderState<State> = UseEntitySubTreeLoaderStateInitial | UseEntitySubTreeLoaderStateLoading | UseEntitySubTreeLoaderStateRefreshing<State> | UseEntitySubTreeLoaderStateLoaded<State>;
+export type UseEntitySubTreeLoaderState<State> = UseEntitySubTreeLoaderStateInitial | UseEntitySubTreeLoaderStateLoading | UseEntitySubTreeLoaderStateRefreshing<State> | UseEntitySubTreeLoaderStateLoaded<State> | UseEntitySubTreeLoaderStateFailed;
+
+// @public (undocumented)
+export type UseEntitySubTreeLoaderStateFailed = {
+    state: 'failed';
+    error: unknown;
+    entity: undefined;
+    treeRootId: undefined;
+    customState: undefined;
+    isLoading: false;
+};
 
 // @public (undocumented)
 export type UseEntitySubTreeLoaderStateInitial = {

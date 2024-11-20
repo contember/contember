@@ -489,11 +489,9 @@ export type InputRules <OverRelation extends string | never = never> = {
 	name: 'InputRules'
 	unique:
 		| Omit<{ id: string}, OverRelation>
-		| Omit<{ unique: InputUnique}, OverRelation>
 		| Omit<{ uniqueValue: string}, OverRelation>
 	columns: {
 		id: string
-		unique: InputUnique
 		notNullValue: string
 		uniqueValue: string | null
 		validationValue: string | null

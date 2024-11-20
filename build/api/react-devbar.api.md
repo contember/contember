@@ -101,7 +101,7 @@ export const parseStacktrace: (e: Error) => Promise<{
     callee: string;
     thirdParty: boolean;
     sourceCodeLines: string[] | undefined;
-}[]>;
+}[] | undefined>;
 
 // @public (undocumented)
 export interface ProcessedError {

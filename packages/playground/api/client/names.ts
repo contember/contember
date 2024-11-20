@@ -618,9 +618,6 @@ export const ContemberClientNames: SchemaNames = {
         "id": {
           "type": "column"
         },
-        "unique": {
-          "type": "column"
-        },
         "notNullValue": {
           "type": "column"
         },
@@ -633,7 +630,6 @@ export const ContemberClientNames: SchemaNames = {
       },
       "scalars": [
         "id",
-        "unique",
         "notNullValue",
         "uniqueValue",
         "validationValue"

@@ -36,7 +36,7 @@ export const useDataViewTotalCount = ({ entities: { entityName }, filter }: UseD
 				if ((e instanceof GraphQlClientError && e.type === 'aborted') || (e instanceof Error && e.name === 'AbortError')) {
 					return
 				}
-				throw e
+				console.error(e)
 			}
 
 		})()

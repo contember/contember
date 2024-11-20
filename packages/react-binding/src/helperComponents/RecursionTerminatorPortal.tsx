@@ -1,4 +1,4 @@
-import { BindingError, Environment, TreeNodeEnvironmentFactory } from '@contember/binding-common'
+import { BindingError, Environment, TreeNodeEnvironmentFactory } from '@contember/binding'
 import { Component } from '../coreComponents'
 import { recursionTerminatorEnvironmentExtension, RecursionTerminatorProps } from './RecursionTerminator'
 import { EnvironmentMiddleware } from '../accessorPropagation'

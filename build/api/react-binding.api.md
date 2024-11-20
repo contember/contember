@@ -13,7 +13,6 @@ import type { EntityFieldMarkersContainer } from '@contember/binding';
 import type { EntityFieldsWithHoistablesMarker } from '@contember/binding';
 import { EntityListAccessor } from '@contember/binding';
 import { Environment } from '@contember/binding';
-import { Environment as Environment_2 } from '@contember/binding-common';
 import { ExtendTreeOptions } from '@contember/binding';
 import type { FieldAccessor } from '@contember/binding';
 import type { FieldMarker } from '@contember/binding';
@@ -38,10 +37,8 @@ import { RelativeSingleField } from '@contember/binding';
 import type { SugaredParentEntityParameters } from '@contember/binding';
 import { SugaredQualifiedEntityList } from '@contember/binding';
 import { SugaredQualifiedSingleEntity } from '@contember/binding';
-import type { SugaredRelativeEntityList } from '@contember/binding';
-import { SugaredRelativeEntityList as SugaredRelativeEntityList_2 } from '@contember/binding-common';
-import type { SugaredRelativeSingleEntity } from '@contember/binding';
-import { SugaredRelativeSingleEntity as SugaredRelativeSingleEntity_2 } from '@contember/binding-common';
+import { SugaredRelativeEntityList } from '@contember/binding';
+import { SugaredRelativeSingleEntity } from '@contember/binding';
 import type { SugaredRelativeSingleField } from '@contember/binding';
 import type { SugaredUnconstrainedQualifiedEntityList } from '@contember/binding';
 import type { SugaredUnconstrainedQualifiedSingleEntity } from '@contember/binding';
@@ -505,15 +502,15 @@ export interface ParentEntityProps extends SugaredParentEntityParameters {
 export const RecursionTerminator: React.NamedExoticComponent<RecursionTerminatorProps>;
 
 // @public (undocumented)
-export const recursionTerminatorEnvironmentExtension: Environment_2.Extension<RecursionTerminatorOptions, RecursionTerminatorOptions | undefined>;
+export const recursionTerminatorEnvironmentExtension: Environment.Extension<RecursionTerminatorOptions, RecursionTerminatorOptions | undefined>;
 
 // @public (undocumented)
 export interface RecursionTerminatorOptions {
     // (undocumented)
     shouldTerminate?: (args: {
-        node: Environment_2.AnyNode;
+        node: Environment.AnyNode;
         field: string;
-        environment: Environment_2;
+        environment: Environment;
     }) => boolean | undefined;
 }
 
@@ -527,10 +524,10 @@ export interface RecursionTerminatorProps {
     // (undocumented)
     field: {
         kind: 'hasOne';
-        field: SugaredRelativeSingleEntity_2['field'];
+        field: SugaredRelativeSingleEntity['field'];
     } | {
         kind: 'hasMany';
-        field: SugaredRelativeEntityList_2['field'];
+        field: SugaredRelativeEntityList['field'];
     };
 }
 

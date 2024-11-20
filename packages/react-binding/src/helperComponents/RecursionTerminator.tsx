@@ -4,7 +4,7 @@ import {
 	SugaredRelativeEntityList,
 	SugaredRelativeSingleEntity,
 	TokenRegExps,
-} from '@contember/binding-common'
+} from '@contember/binding'
 import { ReactNode, useMemo } from 'react'
 import { Component } from '../coreComponents'
 

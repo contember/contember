@@ -122,7 +122,7 @@ const SelectEnumFieldInner = ({ field, options, placeholder, required }: SelectE
 					<SelectInputUI id={id ? `${id}-input` : undefined}>
 						{selectedValue?.label ?? placeholder ?? <SelectDefaultPlaceholderUI />}
 						<SelectInputActionsUI>
-							{open ? <ChevronUpIcon /> : <ChevronDownIcon />}
+							{open ? <ChevronUpIcon className={'w-4 h-4'} /> : <ChevronDownIcon className={'w-4 h-4'} />}
 						</SelectInputActionsUI>
 					</SelectInputUI>
 				</PopoverTrigger>

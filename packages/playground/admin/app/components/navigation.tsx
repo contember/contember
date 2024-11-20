@@ -7,7 +7,7 @@ import {
 	HomeIcon,
 	KanbanIcon,
 	KeyRoundIcon,
-	LanguagesIcon,
+	LanguagesIcon, LoaderIcon,
 	LockKeyholeIcon,
 	PencilIcon,
 	TableIcon,
@@ -87,6 +87,10 @@ export const Navigation = () => {
 					<MenuItem icon={line} label={'Folder combo'} to={'folders/combo'} />
 				</MenuItem>
 				<MenuItem icon={<DatabaseIcon size={16} />} label={'Auto CRUD'} to={'auto/index'} />
+				<MenuItem icon={<LoaderIcon size={16} />} label={'Extend tree'}>
+					<MenuItem icon={line} label={'Entity subtree'} to={'extendTree/single'} />
+					<MenuItem icon={line} label={'Entity list subtree'} to={'extendTree/many'} />
+				</MenuItem>
 			</Menu>
 		</div>
 	)

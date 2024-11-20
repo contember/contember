@@ -2,6 +2,7 @@ import type { BlockType } from './enums'
 import type { BoardTaskStatus } from './enums'
 import type { ContentEmbedType } from './enums'
 import type { EditorReferenceType } from './enums'
+import type { ExtendTreeUnique } from './enums'
 import type { GridArticleState } from './enums'
 import type { InputUnique } from './enums'
 import type { LegacyEditorReferenceType } from './enums'
@@ -16,6 +17,7 @@ import type { EditorTextAreaUnique } from './enums'
 import type { InputRootEnumValue } from './enums'
 import type { LegacyEditorContentUnique } from './enums'
 import type { PlateEditorContentUnique } from './enums'
+import type { RepeaterRootUnique } from './enums'
 import type { SlugUnique } from './enums'
 
 export type JSONPrimitive = string | number | boolean | null
@@ -283,6 +285,38 @@ export type EditorTextArea <OverRelation extends string | never = never> = {
 		id: string
 		unique: EditorTextAreaUnique
 		data: string
+	}
+	hasOne: {
+	}
+	hasMany: {
+	}
+	hasManyBy: {
+	}
+}
+export type ExtendTreeMany <OverRelation extends string | never = never> = {
+	name: 'ExtendTreeMany'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+	columns: {
+		id: string
+		value: string
+	}
+	hasOne: {
+	}
+	hasMany: {
+	}
+	hasManyBy: {
+	}
+}
+export type ExtendTreeSingle <OverRelation extends string | never = never> = {
+	name: 'ExtendTreeSingle'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+		| Omit<{ unique: ExtendTreeUnique}, OverRelation>
+	columns: {
+		id: string
+		unique: ExtendTreeUnique
+		value: string
 	}
 	hasOne: {
 	}
@@ -608,8 +642,43 @@ export type RepeaterItem <OverRelation extends string | never = never> = {
 		order: number | null
 	}
 	hasOne: {
+		root: RepeaterRoot
+		relation: RepeaterRelation
 	}
 	hasMany: {
+	}
+	hasManyBy: {
+	}
+}
+export type RepeaterRelation <OverRelation extends string | never = never> = {
+	name: 'RepeaterRelation'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+	columns: {
+		id: string
+		name: string
+	}
+	hasOne: {
+	}
+	hasMany: {
+	}
+	hasManyBy: {
+	}
+}
+export type RepeaterRoot <OverRelation extends string | never = never> = {
+	name: 'RepeaterRoot'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+		| Omit<{ unique: RepeaterRootUnique}, OverRelation>
+		| Omit<{ items: RepeaterItem['unique']}, OverRelation>
+	columns: {
+		id: string
+		unique: RepeaterRootUnique
+	}
+	hasOne: {
+	}
+	hasMany: {
+		items: RepeaterItem<'root'>
 	}
 	hasManyBy: {
 	}
@@ -983,6 +1052,8 @@ export type ContemberClientEntities = {
 	EditorLink: EditorLink
 	EditorReference: EditorReference
 	EditorTextArea: EditorTextArea
+	ExtendTreeMany: ExtendTreeMany
+	ExtendTreeSingle: ExtendTreeSingle
 	Folder: Folder
 	GridArticle: GridArticle
 	GridArticleComment: GridArticleComment
@@ -1000,6 +1071,8 @@ export type ContemberClientEntities = {
 	LegacyEditorReference: LegacyEditorReference
 	PlateEditorContent: PlateEditorContent
 	RepeaterItem: RepeaterItem
+	RepeaterRelation: RepeaterRelation
+	RepeaterRoot: RepeaterRoot
 	SelectItem: SelectItem
 	SelectRoot: SelectRoot
 	SelectValue: SelectValue

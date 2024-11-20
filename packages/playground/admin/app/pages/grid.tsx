@@ -1,4 +1,4 @@
-import { Component, Field, HasMany, HasOne, If } from '@contember/interface'
+import { Component, EntityListSubTree, Field, HasMany, HasOne, If } from '@contember/interface'
 import { Slots } from '@app/lib/layout'
 import { DataViewEachRow, DataViewElement, DataViewLayout } from '@contember/react-dataview'
 import {

@@ -8,7 +8,7 @@ import { SelectOrTypeField } from '@app/lib-extra/select-or-type-field'
 import { FieldExists } from '@app/lib-extra/has-field'
 import { SlugField } from '@app/lib-extra/slug-field/field'
 import slugify from '@sindresorhus/slugify'
-import { useEnvironment } from '@contember/react-binding'
+import { TreeRootIdProvider, useEnvironment } from '@contember/react-binding'
 import { Link } from '@contember/react-routing'
 import { FractionalAmountField } from '@app/lib-extra/fractional-amount-field'
 

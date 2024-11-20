@@ -15,6 +15,8 @@ export type EditorReferenceType =
 	 | "image"
 	 | "link"
 	 | "quote"
+export type ExtendTreeUnique = 
+	 | "unique"
 export type GridArticleState = 
 	 | "published"
 	 | "draft"
@@ -53,6 +55,8 @@ export type InputRootEnumValue =
 export type LegacyEditorContentUnique = 
 	 | "unique"
 export type PlateEditorContentUnique = 
+	 | "unique"
+export type RepeaterRootUnique = 
 	 | "unique"
 export type SlugUnique = 
 	 | "unique"

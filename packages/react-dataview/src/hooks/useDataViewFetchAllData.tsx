@@ -2,8 +2,11 @@ import * as React from 'react'
 import { ReactNode, useCallback } from 'react'
 import { useDataViewEntityListProps, useDataViewFilteringState } from '../contexts'
 import {
+	Component,
+	EntityFieldsWithHoistablesMarker,
 	EntityListSubTree,
 	EntityListSubTreeMarker,
+	MarkerFactory,
 	ReceivedEntityData,
 	useBindingOperations,
 	useEnvironment,
@@ -26,7 +29,9 @@ export const useDataViewFetchAllData = ({ children }: { children: ReactNode }) =
 		}
 		const node = (
 			<EntityListSubTree entities={entities}>
-				{children}
+				<OmitSubTrees>
+					{children}
+				</OmitSubTrees>
 			</EntityListSubTree>
 		)
 
@@ -50,3 +55,17 @@ export const useDataViewFetchAllData = ({ children }: { children: ReactNode }) =
 
 	}, [entityName, filter, children, bindingOperations, env])
 }
+
+const OmitSubTrees = Component<{ children: ReactNode }>(
+	props => {
+		return null
+	},
+	{
+		staticRender: props => <>{props.children}</>,
+		generateBranchMarker: (props, fields, environment) => {
+			const fieldsWithHoistablesMarker = MarkerFactory.createEntityFieldsWithHoistablesMarker(fields, environment)
+
+			return new EntityFieldsWithHoistablesMarker(fieldsWithHoistablesMarker.fields, undefined, fieldsWithHoistablesMarker.parentReference)
+		},
+	},
+)

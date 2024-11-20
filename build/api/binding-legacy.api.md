@@ -94,7 +94,7 @@ export class DataBinding<Node> {
     }): Promise<{
         data: ReceivedDataTree;
         markerTreeRoot: MarkerTreeRoot;
-    } | undefined>;
+    }>;
 }
 
 // @public (undocumented)

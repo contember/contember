@@ -35,13 +35,9 @@ export const useDataViewFetchAllData = ({ children }: { children: ReactNode }) =
 			</EntityListSubTree>
 		)
 
-		const result = await bindingOperations.fetchData(node, {
+		const { data, markerTreeRoot } = await bindingOperations.fetchData(node, {
 			environment: env.withExtension(dataViewSelectionEnvironmentExtension, {}),
 		})
-		if (!result) {
-			throw new Error()
-		}
-		const { data, markerTreeRoot } = result
 		const marker = Array.from(markerTreeRoot.subTrees.values())[0]
 		const fieldData = data[marker.placeholderName]
 		if (!(marker instanceof EntityListSubTreeMarker) || !Array.isArray(fieldData)) {

@@ -9,7 +9,7 @@ import { MarkerTreeRoot } from '../markers'
 export type FetchData<Node> = (fragment: Node, options?: { signal?: AbortSignal; environment?: Environment }) => Promise<{
 	data: ReceivedDataTree
 	markerTreeRoot: MarkerTreeRoot
-} | undefined>
+}>
 
 export type BatchDeferredUpdates = (performUpdates: (bindingOperations: BatchUpdatesOptions) => void) => void
 

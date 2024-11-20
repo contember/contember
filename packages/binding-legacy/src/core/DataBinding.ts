@@ -304,23 +304,13 @@ export class DataBinding<Node> {
 	public async fetchData(fragment: Node, options?: { signal?: AbortSignal; environment?: Environment }): Promise<{
 		data: ReceivedDataTree
 		markerTreeRoot: MarkerTreeRoot
-	} | undefined> {
+	}> {
 		const markerTreeRoot = this.createMarkerTree(fragment, options?.environment ?? this.environment)
+		const data = await this.fetchPersistedData(markerTreeRoot, options?.signal)
 
-		try {
-			const data = await this.fetchPersistedData(markerTreeRoot, options?.signal)
-			if (!data) {
-				return undefined
-			}
-			return {
-				data: data,
-				markerTreeRoot,
-			}
-		} catch (e) {
-			if (e instanceof GraphQlClientError && e.type === 'aborted') {
-				return undefined
-			}
-			throw e
+		return {
+			data: data,
+			markerTreeRoot,
 		}
 	}
 

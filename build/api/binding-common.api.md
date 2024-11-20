@@ -692,7 +692,7 @@ export type FetchData<Node> = (fragment: Node, options?: {
 }) => Promise<{
     data: ReceivedDataTree;
     markerTreeRoot: MarkerTreeRoot;
-} | undefined>;
+}>;
 
 // @public (undocumented)
 export interface FieldAccessor<Value extends FieldValue = FieldValue> extends Errorable {

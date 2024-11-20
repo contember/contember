@@ -1,11 +1,25 @@
 import * as React from 'react'
 import { ReactNode, useCallback } from 'react'
 import { Popover, PopoverTrigger } from '../ui/popover'
-import { Component, SugaredQualifiedEntityList, useEntity, useEntityBeforePersist } from '@contember/interface'
+import {
+	Component,
+	RecursionTerminatorPortal,
+	SugaredQualifiedEntityList,
+	SugaredRelativeSingleEntity,
+	useEntity,
+	useEntityBeforePersist,
+} from '@contember/interface'
 import { Button } from '../ui/button'
-import { SugaredRelativeSingleEntity } from '@contember/interface'
 import { ChevronDownIcon, XIcon } from 'lucide-react'
-import { SelectCreateNewTrigger, SelectDefaultPlaceholderUI, SelectInputActionsUI, SelectInputUI, SelectInputWrapperUI, SelectListItemUI, SelectPopoverContent } from './ui'
+import {
+	SelectCreateNewTrigger,
+	SelectDefaultPlaceholderUI,
+	SelectInputActionsUI,
+	SelectInputUI,
+	SelectInputWrapperUI,
+	SelectListItemUI,
+	SelectPopoverContent,
+} from './ui'
 import { SelectListInner } from './list'
 import { Select, SelectDataView, SelectEachValue, SelectItemTrigger, SelectOption, SelectPlaceholder } from '@contember/react-select'
 import { CreateEntityDialog } from './create-new'
@@ -82,9 +96,11 @@ export const SelectInput = Component<SelectInputProps>(({ field, queryField, opt
 					</SelectPopoverContent>
 				</Popover>
 				{createNewForm && (
-					<CreateEntityDialog trigger={<SelectCreateNewTrigger />}>
-						{createNewForm}
-					</CreateEntityDialog>
+					<RecursionTerminatorPortal field={{ field, kind: 'hasOne' }}>
+						<CreateEntityDialog trigger={<SelectCreateNewTrigger />}>
+							{createNewForm}
+						</CreateEntityDialog>
+					</RecursionTerminatorPortal>
 				)}
 			</div>
 		</Select>
@@ -96,4 +112,3 @@ export const SelectInput = Component<SelectInputProps>(({ field, queryField, opt
 		</Select>
 	)
 })
-

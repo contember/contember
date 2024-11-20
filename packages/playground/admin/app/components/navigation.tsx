@@ -10,7 +10,7 @@ import {
 	LanguagesIcon, LoaderIcon,
 	LockKeyholeIcon,
 	PencilIcon,
-	TableIcon,
+	TableIcon, TextCursorIcon,
 	UploadIcon,
 	UserIcon,
 	UsersIcon,
@@ -48,6 +48,10 @@ export const Navigation = () => {
 				<MenuItem icon={<TableIcon size={16} />} label={'Grid'}>
 					<MenuItem icon={line} label={'Complex grid'} to={'grid'} />
 					<MenuItem icon={line} label={'Simple grid'} to={'grid/simpleGrid'} />
+				</MenuItem>
+				<MenuItem icon={<TextCursorIcon size={16} />} label={'Forms'}>
+					<MenuItem icon={line} label={'Index'} to={'form'} />
+					<MenuItem icon={line} label={'Create'} to={'form/createArticle'} />
 				</MenuItem>
 				<MenuItem icon={<FormInputIcon size={16} />} label={'Inputs'}>
 					<MenuItem icon={line} label={'Basic inputs'} to={'input/basic'} />

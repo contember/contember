@@ -853,7 +853,6 @@ __metadata:
   resolution: "@contember/react-binding@workspace:packages/react-binding"
   dependencies:
     "@contember/binding": "workspace:*"
-    "@contember/binding-common": "workspace:*"
     "@contember/client": "workspace:*"
     "@contember/graphql-client": "workspace:*"
     "@contember/react-client": "workspace:*"

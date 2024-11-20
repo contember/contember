@@ -14,7 +14,7 @@ import {
 } from './ui'
 import { ChevronDownIcon } from 'lucide-react'
 import { Popover, PopoverTrigger } from '../ui/popover'
-import { Component, SugaredQualifiedEntityList, SugaredRelativeEntityList } from '@contember/interface'
+import { Component, RecursionTerminatorPortal, SugaredQualifiedEntityList, SugaredRelativeEntityList } from '@contember/interface'
 import { SelectDefaultFilter } from './filter'
 import { SelectListInner } from './list'
 import { MultiSelect, SelectDataView, SelectEachValue, SelectItemTrigger, SelectOption, SelectPlaceholder } from '@contember/react-select'
@@ -79,9 +79,11 @@ export const MultiSelectInput = Component<MultiSelectInputProps>(({ field, query
 					</SelectPopoverContent>
 				</Popover>
 				{createNewForm && (
-					<CreateEntityDialog trigger={<SelectCreateNewTrigger />}>
-						{createNewForm}
-					</CreateEntityDialog>
+					<RecursionTerminatorPortal field={{ field, kind: 'hasMany' }}>
+						<CreateEntityDialog trigger={<SelectCreateNewTrigger />}>
+							{createNewForm}
+						</CreateEntityDialog>
+					</RecursionTerminatorPortal>
 				)}
 			</div>
 		</MultiSelect>

@@ -17,6 +17,10 @@ export type EditorReferenceType =
 	 | "quote"
 export type ExtendTreeUnique = 
 	 | "unique"
+export type FormArticleState = 
+	 | "published"
+	 | "draft"
+	 | "archived"
 export type GridArticleState = 
 	 | "published"
 	 | "draft"
@@ -48,6 +52,9 @@ export type EditorContentUnique =
 	 | "unique"
 export type EditorTextAreaUnique = 
 	 | "unique"
+export type FormArticleLocaleLocale = 
+	 | "cs"
+	 | "en"
 export type InputRootEnumValue = 
 	 | "a"
 	 | "b"

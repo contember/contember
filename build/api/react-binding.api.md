@@ -37,8 +37,8 @@ import { RelativeSingleField } from '@contember/binding';
 import type { SugaredParentEntityParameters } from '@contember/binding';
 import { SugaredQualifiedEntityList } from '@contember/binding';
 import { SugaredQualifiedSingleEntity } from '@contember/binding';
-import type { SugaredRelativeEntityList } from '@contember/binding';
-import type { SugaredRelativeSingleEntity } from '@contember/binding';
+import { SugaredRelativeEntityList } from '@contember/binding';
+import { SugaredRelativeSingleEntity } from '@contember/binding';
 import type { SugaredRelativeSingleField } from '@contember/binding';
 import type { SugaredUnconstrainedQualifiedEntityList } from '@contember/binding';
 import type { SugaredUnconstrainedQualifiedSingleEntity } from '@contember/binding';
@@ -293,14 +293,16 @@ export interface EnvironmentDeltaProvider<Props extends {} = any> {
 export const EnvironmentExtensionProvider: <S, R>(props: EnvironmentWithExtensionProps<S, R>) => ReactNode;
 
 // @public (undocumented)
-export const EnvironmentMiddleware: React.NamedExoticComponent<EnvironmentMiddlewareProps>;
+export const EnvironmentMiddleware: <T extends unknown[]>(props: EnvironmentMiddlewareProps<T>) => ReactNode;
 
 // @public (undocumented)
-export interface EnvironmentMiddlewareProps {
+export interface EnvironmentMiddlewareProps<T extends unknown[]> {
+    // (undocumented)
+    args?: T;
     // (undocumented)
     children: ReactNode;
     // (undocumented)
-    create: (env: Environment) => Environment;
+    create: (env: Environment, args: T) => Environment;
 }
 
 // @public (undocumented)
@@ -494,6 +496,39 @@ export const ParentEntity: React.NamedExoticComponent<ParentEntityProps>;
 export interface ParentEntityProps extends SugaredParentEntityParameters {
     // (undocumented)
     children?: ReactNode;
+}
+
+// @public (undocumented)
+export const RecursionTerminator: React.NamedExoticComponent<RecursionTerminatorProps>;
+
+// @public (undocumented)
+export const recursionTerminatorEnvironmentExtension: Environment.Extension<RecursionTerminatorOptions, RecursionTerminatorOptions | undefined>;
+
+// @public (undocumented)
+export interface RecursionTerminatorOptions {
+    // (undocumented)
+    shouldTerminate?: (args: {
+        node: Environment.AnyNode;
+        field: string;
+        environment: Environment;
+    }) => boolean | undefined;
+}
+
+// @public (undocumented)
+export const RecursionTerminatorPortal: React.NamedExoticComponent<RecursionTerminatorProps>;
+
+// @public (undocumented)
+export interface RecursionTerminatorProps {
+    // (undocumented)
+    children: ReactNode;
+    // (undocumented)
+    field: {
+        kind: 'hasOne';
+        field: SugaredRelativeSingleEntity['field'];
+    } | {
+        kind: 'hasMany';
+        field: SugaredRelativeEntityList['field'];
+    };
 }
 
 // @public (undocumented)

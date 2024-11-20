@@ -1,12 +1,15 @@
-import { DataView, DataViewLoaderState, DataViewProps } from '@contember/react-dataview'
+import { DataView, DataViewProps } from '@contember/react-dataview'
 import * as React from 'react'
 import { ReactNode } from 'react'
-import { DataGridInitialLoader, DataGridOverlayLoader } from './loader'
 import { Component } from '@contember/interface'
+import { DataGridToolbar } from './toolbar'
+import { DataGridLoader } from './loader'
+import { DataGridTable } from './table'
+import { DataGridPagination } from './pagination'
 
 
 export type DataGridProps =
-	& Omit<DataViewProps, 'children' | 'filterTypes'>
+	& Omit<DataViewProps, 'children'>
 	& {
 		children: ReactNode
 	}
@@ -32,27 +35,27 @@ export const DataGrid = Component(({ children, ...props }: DataGridProps) => {
 	)
 })
 
-export interface DataViewBodyProps {
-	children: ReactNode
-}
+export type DefaultDataGridProps =
+	& Omit<DataViewProps, 'children'>
+	& {
+		children: ReactNode
+		toolbar?: ReactNode
+	}
 
-export const DataGridLoader = ({ children }: DataViewBodyProps) => (
-	<>
-		<DataViewLoaderState refreshing loaded>
-			<div className="relative">
-				<DataViewLoaderState refreshing>
-					<DataGridOverlayLoader />
-				</DataViewLoaderState>
-				{children}
-			</div>
-		</DataViewLoaderState>
-		<DataViewLoaderState initial>
-			<DataGridInitialLoader />
-		</DataViewLoaderState>
-		<DataViewLoaderState failed>
-			<div>Failed to load data</div>
-		</DataViewLoaderState>
-	</>
-)
+export const DefaultDataGrid = Component(({ children, toolbar,  ...props }: DefaultDataGridProps) => {
+	return (
+		<DataGrid {...props}>
+			<DataGridToolbar>
+				{toolbar}
+			</DataGridToolbar>
 
+			<DataGridLoader>
+				<DataGridTable>
+					{children}
+				</DataGridTable>
+			</DataGridLoader>
 
+			<DataGridPagination />
+		</DataGrid>
+	)
+})

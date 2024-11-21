@@ -3,6 +3,7 @@ import { ContemberEditor } from '../../../editor'
 import { isTableCellElement, TableCellElement, tableCellElementPlugin } from './TableCellElement'
 import { getTableElementColumnCount, getTableElementRowCount, isTableElement, TableElement, tableElementPlugin } from './TableElement'
 import { getTableCellCoordinates, selectTableCellContents } from './TableElementSelection'
+import { tableHTMLDeserializer } from './TableHtmlDeserializer'
 import { TableModifications } from './TableModifications'
 import { isTableRowElement, TableRowElement, tableRowElementPlugin } from './TableRowElement'
 import { ElementRenderer } from '../../../types'
@@ -23,6 +24,8 @@ export const withTables = ({ renderTable, renderTableCell, renderTableRow }: {
 	editor.registerElement(tableElementPlugin({ render: renderTable }))
 	editor.registerElement(tableCellElementPlugin({ render: renderTableCell }))
 	editor.registerElement(tableRowElementPlugin({ render: renderTableRow }))
+
+	editor.htmlDeserializer.registerPlugin(tableHTMLDeserializer)
 
 	Object.assign<Editor, Partial<Editor>>(editor, {
 		insertBreak: () => {

@@ -72,7 +72,7 @@ export class TriggerHandler {
 	private async directUpdateHandler(event: AfterUpdateEvent) {
 		const updateListeners = this.listenersStore.getUpdateListeners(event.entity.name)
 		updateListeners.map(listener => {
-			if (event.data.some(it => listener.fields.has(it.fieldName))) {
+			if (event.data.some(it => listener.fields.has(it.fieldName) && it.resolvedValue !== it.old)) {
 				this.payloadManager.add({
 					listener,
 					entity: event.entity,
@@ -119,7 +119,7 @@ export class TriggerHandler {
 	private async indirectChangesUpdatesHandlerInner(event: AfterUpdateEvent | BeforeUpdateEvent, type: 'fields' | 'relations') {
 		const indirectEntityListeners = this.listenersStore.getIndirectListeners(event.entity.name)
 		const promises = indirectEntityListeners.map(listener => {
-			if (event.data.some(val => listener[type].has(val.fieldName))) {
+			if (event.data.some(val => listener[type].has(val.fieldName) && (!('old' in val) || val.resolvedValue !== val.old))) {
 				return this.collectDeepChanges(event, listener, {
 					[event.entity.primary]: { eq: event.id },
 				})

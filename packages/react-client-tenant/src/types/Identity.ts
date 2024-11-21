@@ -1,5 +1,6 @@
 export interface Identity {
 	readonly id: string
+	readonly roles: readonly string[]
 	readonly person?: Person
 	readonly projects: IdentityProject[]
 	readonly permissions: {

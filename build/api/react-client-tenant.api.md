@@ -450,6 +450,8 @@ export interface Identity {
     readonly person?: Person;
     // (undocumented)
     readonly projects: IdentityProject[];
+    // (undocumented)
+    readonly roles: readonly string[];
 }
 
 // @internal (undocumented)

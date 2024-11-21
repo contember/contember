@@ -25,6 +25,7 @@ export const useFetchIdentity = (): [{ state: IdentityStateValue; identity: Iden
 				state: 'success',
 				identity: {
 					id: response.id,
+					roles: response.roles ?? [],
 					person: person ?? undefined,
 					projects: projects.map(it => ({
 						name: it.project.name,

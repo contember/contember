@@ -21,7 +21,7 @@ export function DevErrorInner({ error, level = 1 }: DevErrorInnerProps) {
 						<h1 className={className('errorName')}>{errorObject.name}</h1>
 						{error.cause && <a href={`#error-${level}`} className={className('causeLink')}>caused by &gt;</a>}
 						{errorObject.message && <h2 className={className('errorMessage')}>{errorObject.message}</h2>}
-						{'details' in errorObject && <h3 className={className('errorDetails')}>{(errorObject as any).details}</h3>}
+						{'details' in errorObject && <div className={className('errorDetails')}>{(errorObject as any).details}</div>}
 					</>
 				) : (
 					<h1 className={className('errorName')}>Unknown error</h1>

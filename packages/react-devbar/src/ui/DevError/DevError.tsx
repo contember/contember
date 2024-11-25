@@ -7,7 +7,6 @@ export interface DevErrorProps extends DevErrorInnerProps {
 const className = (cls?: string | null) => cls ? `cui-devError-${cls}` : 'cui-devError'
 
 export function DevError(props: DevErrorProps) {
-
 	return (
 		<div className={className()}>
 			<div className={className('in')}>

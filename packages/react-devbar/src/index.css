@@ -174,7 +174,7 @@
 
 
 .cui-devError {
-    position: absolute;
+    position: fixed;
     top: 0;
     right: 0;
     bottom: 0;
@@ -198,8 +198,13 @@
     box-shadow: 3px 3px 10px rgba(50, 50, 50, 0.5);
     display: flex;
     flex-direction: column;
+    overflow: hidden;
+}
+
+.cui-devError-content {
     overflow: auto;
 }
+
 
 .cui-devError-header {
     background: #CD1818;
@@ -229,7 +234,6 @@
     margin-top: 0.5em;
     font-size: 1em;
     white-space: pre;
-    overflow-x: scroll;
 }
 
 .cui-devError-causeLink {
@@ -382,4 +386,8 @@
     border-radius: 10px;
     padding: 1em 2em;
     cursor: pointer;
+}
+
+.cui-devError-body {
+    overflow: hidden;
 }

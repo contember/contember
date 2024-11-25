@@ -1,6 +1,7 @@
 import { EnvironmentContext, useEnvironment } from '@contember/react-binding'
 import { ComponentType, Fragment, isValidElement, lazy, ReactElement, ReactNode, Suspense, useMemo, useRef } from 'react'
 import { useCurrentRequest } from '../contexts'
+import { pageNameIn } from '../internal/utils/urlMapper'
 
 export interface PageProvider<P> {
 	getPageName(props: P, fallback?: string): string
@@ -62,7 +63,7 @@ export const Pages = ({ children, layout, ErrorBoundary = Fragment, suspenseFall
 			} else {
 				const modules = Object.entries(children).filter(([k, v]) => isLazyPageModule(k, v) || isEagerPageModule(k, v))
 				const modulesPrefix = findPrefix(modules.map(it => it[0]))
-				const getPageNameFromFile = (name: string) => name.slice(modulesPrefix.length, -4)
+				const getPageNameFromFile = (name: string) => pageNameIn(name.slice(modulesPrefix.length, -4))
 
 				return new Map(Object.entries(children).flatMap(([k, v]): [string, PageActionHandler][] => {
 					if (isLazyPageModule(k, v)) { // children={import.meta.glob('./pages/**/*.tsx')}

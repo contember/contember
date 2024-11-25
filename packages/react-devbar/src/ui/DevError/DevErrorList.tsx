@@ -1,5 +1,6 @@
 import { DevErrorInner } from './DevErrorInner'
 import { ProcessedError } from './types'
+import { useEffect } from 'react'
 
 export interface DevErrorListProps {
 	currentError: ProcessedError
@@ -22,6 +23,13 @@ export function DevErrorList({
 	onNext,
 	onPrevious,
 }: DevErrorListProps) {
+	useEffect(() => {
+		document.body.classList.add('cui-devError-body')
+		return () => {
+			document.body.classList.remove('cui-devError-body')
+		}
+	}, [])
+
 	return (
 		<div className={className()}>
 			<div className={className('in')}>
@@ -50,8 +58,9 @@ export function DevErrorList({
 						</div>
 					</div>
 				</div>
-
-				<DevErrorInner error={currentError} />
+				<div className={className('content')}>
+					<DevErrorInner error={currentError} />
+				</div>
 			</div>
 		</div>
 	)

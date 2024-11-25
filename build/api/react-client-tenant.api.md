@@ -111,6 +111,45 @@ export const changeMyPasswordMutation: TenantApi.MutationFetcher<{
 export type ChangeMyPasswordMutationVariables = Parameters<ReturnType<typeof useChangeMyPasswordMutation>>[0];
 
 // @public (undocumented)
+export const changeMyProfile: TenantApi.MutationFetcher<{
+    readonly mutation?: ({
+        readonly ok: boolean;
+    } & {
+        readonly error?: ({
+            readonly code: TenantApi.ChangeMyProfileErrorCode;
+        } & {
+            readonly developerMessage: string;
+        }) | undefined;
+    }) | undefined;
+}, {
+    readonly email?: string;
+    readonly name?: string;
+}>;
+
+// @public (undocumented)
+export type ChangeMyProfileMutationVariables = Parameters<ReturnType<typeof useChangeMyProfileMutation>>[0];
+
+// @public (undocumented)
+export const changeProfile: TenantApi.MutationFetcher<{
+    readonly mutation?: ({
+        readonly ok: boolean;
+    } & {
+        readonly error?: ({
+            readonly code: TenantApi.ChangeProfileErrorCode;
+        } & {
+            readonly developerMessage: string;
+        }) | undefined;
+    }) | undefined;
+}, {
+    readonly personId: string;
+    readonly email?: string;
+    readonly name?: string;
+}>;
+
+// @public (undocumented)
+export type ChangeProfileMutationVariables = Parameters<ReturnType<typeof useChangeProfileMutation>>[0];
+
+// @public (undocumented)
 export const confirmOtpMutation: TenantApi.MutationFetcher<{
     readonly mutation?: ({
         readonly ok: boolean;
@@ -1325,6 +1364,19 @@ export const useChangeMyPasswordMutation: ({ headers, apiToken }?: TenantApiOpti
     readonly currentPassword: string;
     readonly newPassword: string;
 }) => Promise<TenantMutationResponse<unknown, TenantApi.ChangeMyPasswordErrorCode>>;
+
+// @public (undocumented)
+export const useChangeMyProfileMutation: ({ headers, apiToken }?: TenantApiOptions) => (variables: {
+    readonly email?: string;
+    readonly name?: string;
+}) => Promise<TenantMutationResponse<unknown, TenantApi.ChangeMyProfileErrorCode>>;
+
+// @public (undocumented)
+export const useChangeProfileMutation: ({ headers, apiToken }?: TenantApiOptions) => (variables: {
+    readonly personId: string;
+    readonly email?: string;
+    readonly name?: string;
+}) => Promise<TenantMutationResponse<unknown, TenantApi.ChangeProfileErrorCode>>;
 
 // @public (undocumented)
 export const useConfirmOtpMutation: ({ headers, apiToken }?: TenantApiOptions) => (variables: {

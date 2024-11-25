@@ -51,9 +51,13 @@ export class MarkerStaticAnalyzer {
 			return this.processNode(node.props.children, env, componentPath)
 		}
 
-		componentPath = [...componentPath, node]
-
 		const nodeDisplayName = 'displayName' in node.type ? (node.type.displayName as string) : '???'
+
+		componentPath = [...componentPath, node]
+		if (componentPath.length > 1000) {
+			wrapError(new ChildrenAnalyzerError('Component path too long, likely a circular reference'), nodeDisplayName, '[NONE]', componentPath)
+		}
+
 
 		try {
 			if ('generateEnvironment' in node.type) {

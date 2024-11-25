@@ -23,7 +23,7 @@ export class TriggerPayloadBuilder {
 		const selections = await this.fetchSelection(filteredEvents)
 		const triggerType = filteredEvents[0].listener.trigger.type
 		if (triggerType === 'basic') {
-			return filteredEvents.map(it => ({ trigger: it.listener.trigger.name, ...this.buildBaseEventPayloads(it, selections[it.primary]) }))
+			return filteredEvents.map(it => ({ trigger: it.listener.trigger.name, ...this.buildBaseEventPayloads(it, it.selection ?? selections[it.primary]) }))
 		}
 		if (triggerType === 'watch') {
 			return this.buildWatchEventPayloads(filteredEvents, selections)

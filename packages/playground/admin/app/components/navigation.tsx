@@ -52,7 +52,7 @@ export const Navigation = () => {
 				</MenuItem>
 				<MenuItem icon={<TextCursorIcon size={16} />} label={'Forms'}>
 					<MenuItem icon={line} label={'Index'} to={'form'} />
-					<MenuItem icon={line} label={'Create'} to={'form/createArticle'} />
+					<MenuItem icon={line} label={'Create'} to={'form/articleCreate'} />
 				</MenuItem>
 				<MenuItem icon={<FormInputIcon size={16} />} label={'Inputs'}>
 					<MenuItem icon={line} label={'Basic inputs'} to={'input/basic'} />

@@ -40,7 +40,6 @@ class Environment<Node extends Environment.AnyNode | undefined = Environment.Any
 		return new Environment({
 			...options,
 			node: SubTree,
-			parent: this,
 		})
 	}
 

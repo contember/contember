@@ -4,7 +4,7 @@ import { recursionTerminatorEnvironmentExtension, RecursionTerminatorProps } fro
 import { EnvironmentMiddleware } from '../accessorPropagation'
 
 export const RecursionTerminatorPortal = Component<RecursionTerminatorProps>(({ field, children }) => {
-	return <EnvironmentMiddleware args={[field]} create={createEnvWithExtension} >{children}</EnvironmentMiddleware>
+	return <EnvironmentMiddleware args={[field]} create={createEnvWithExtension}>{children}</EnvironmentMiddleware>
 })
 
 const createEnvWithExtension = (env: Environment, [{ field, kind }]: [field: RecursionTerminatorProps['field']]) => {
@@ -18,9 +18,6 @@ const createEnvWithExtension = (env: Environment, [{ field, kind }]: [field: Rec
 	}
 	return env.withExtension(recursionTerminatorEnvironmentExtension, {
 		shouldTerminate: args => {
-			if (args.environment.getParent().getSubTreeNode() !== env.getSubTreeNode()) {
-				return undefined
-			}
 			const currentNode = args.node
 			if (currentNode.type !== 'subtree-entity' || currentNode.entity.name !== parentNode.field.targetEntity) {
 				return undefined

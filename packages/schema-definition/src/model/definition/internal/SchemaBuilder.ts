@@ -32,6 +32,12 @@ export class SchemaBuilder {
 		const entities = Object.entries(this.entityRegistry.entities).map(([entityName, definition]): Model.Entity => {
 			const definitionInstance: FieldsDefinition = new definition()
 
+			Object.entries(definitionInstance).forEach(([fieldName, fieldDefinition]) => {
+				if (typeof fieldDefinition !== 'object' || !('createField' in fieldDefinition)) {
+					throw `Entity "${entityName}": field "${fieldName}" does not contain expected field definition. Check that you are correctly invoking methods of the definition builder.`
+				}
+			})
+
 			const primaryName = this.conventions.getPrimaryField()
 
 			const entity: Model.Entity = {

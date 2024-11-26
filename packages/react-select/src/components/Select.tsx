@@ -9,6 +9,7 @@ export type SelectProps =
 		children: ReactNode
 		field: SugaredRelativeSingleEntity['field']
 		options?: SugaredQualifiedEntityList['entities']
+		isNonbearing?: boolean
 	}
 	& SelectEvents
 
@@ -45,9 +46,9 @@ export const Select = Component(({ field, children, onUnselect, onSelect, option
 			</SelectIsSelectedContext.Provider>
 		</SelectCurrentEntitiesContext.Provider>
 	)
-}, ({ field, children }) => {
+}, ({ field, children, isNonbearing }) => {
 	return (
-		<HasOne field={field} expectedMutation="connectOrDisconnect">
+		<HasOne field={field} expectedMutation="connectOrDisconnect" isNonbearing={isNonbearing}>
 			{children}
 		</HasOne>
 	)

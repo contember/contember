@@ -38,6 +38,7 @@ export const Select: React_2.NamedExoticComponent<{
     children: ReactNode;
     field: SugaredRelativeSingleEntity["field"];
     options?: SugaredQualifiedEntityList["entities"];
+    isNonbearing?: boolean;
 } & SelectEvents>;
 
 // @internal (undocumented)
@@ -114,6 +115,7 @@ export type SelectProps = {
     children: ReactNode;
     field: SugaredRelativeSingleEntity['field'];
     options?: SugaredQualifiedEntityList['entities'];
+    isNonbearing?: boolean;
 } & SelectEvents;
 
 // @public (undocumented)

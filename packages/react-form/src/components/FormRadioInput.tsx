@@ -3,7 +3,7 @@ import { dataAttribute } from '@contember/utilities'
 import { Slot } from '@radix-ui/react-slot'
 import * as React from 'react'
 import { ChangeEventHandler, useCallback } from 'react'
-import { useFormError, useFormFieldId } from '../contexts'
+import { useFormFieldState } from '../contexts'
 import { useFormInputValidationHandler } from '../hooks'
 
 const SlotInput = Slot as React.ForwardRefExoticComponent<React.RefAttributes<HTMLInputElement> & React.InputHTMLAttributes<HTMLInputElement>>
@@ -17,9 +17,13 @@ export interface FormRadioItemProps {
 }
 
 export const FormRadioInput = Component<FormRadioItemProps>(({ field, value, defaultValue, isNonbearing, ...props }) => {
-	const id = useFormFieldId()
 	const accessor = useField(field)
-	const errors = useFormError() ?? accessor.errors?.errors ?? []
+
+	const formState = useFormFieldState()
+	const id = formState?.id
+	const hasErrors = (formState?.errors.length ?? accessor.errors?.errors?.length ?? 0) > 0
+	const dirty = formState?.dirty ?? accessor.hasUnpersistedChanges
+
 	const accessorGetter = accessor.getAccessor
 	const { ref, onFocus, onBlur } = useFormInputValidationHandler(accessor)
 
@@ -33,9 +37,10 @@ export const FormRadioInput = Component<FormRadioItemProps>(({ field, value, def
 			type="radio"
 			value={typeof value === 'string' ? value : undefined}
 			checked={accessor.value === value}
-			data-invalid={dataAttribute(errors.length > 0)}
+			data-invalid={dataAttribute(hasErrors)}
+			data-dirty={dataAttribute(dirty)}
 			name={id + '-input'}
-			id={`${id}-input-${value}`}
+			id={id ? `${id}-input` : undefined}
 			onFocus={onFocus}
 			onBlur={onBlur}
 			onChange={handleChange}

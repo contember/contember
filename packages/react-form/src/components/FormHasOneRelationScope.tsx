@@ -1,24 +1,22 @@
 import * as React from 'react'
-import { useId } from 'react'
-import { FormErrorContext, FormFieldIdContext } from '../contexts'
 import { SugaredRelativeSingleEntity, useEntity } from '@contember/react-binding'
-
-const emptyArr: [] = []
+import { FormFieldStateProvider } from './FormFieldStateProvider'
 
 export type FormHasOneRelationScopeProps = {
 	field: SugaredRelativeSingleEntity['field']
 	children: React.ReactNode
+	required?: boolean
 }
 
-export const FormHasOneRelationScope = ({ field, children }: FormHasOneRelationScopeProps) => {
-	const id = useId()
+export const FormHasOneRelationScope = ({ field, children, required }: FormHasOneRelationScopeProps) => {
 	const entityRelation = useEntity({ field })
-	const errors = entityRelation.errors?.errors
 	return (
-		<FormFieldIdContext.Provider value={id}>
-			<FormErrorContext.Provider value={errors ?? emptyArr}>
-				{children}
-			</FormErrorContext.Provider>
-		</FormFieldIdContext.Provider>
+		<FormFieldStateProvider
+			errors={entityRelation.errors?.errors}
+			dirty={entityRelation.hasUnpersistedChanges}
+			required={required}
+		>
+			{children}
+		</FormFieldStateProvider>
 	)
 }

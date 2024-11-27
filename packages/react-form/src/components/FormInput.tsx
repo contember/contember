@@ -4,7 +4,7 @@ import { Slot } from '@radix-ui/react-slot'
 import { Component, Field, OptionallyVariableFieldValue, SugaredRelativeSingleField, useField } from '@contember/react-binding'
 import { dataAttribute } from '@contember/utilities'
 import { useFormInputHandler } from '../internal/useFormInputHandler'
-import { useFormError, useFormFieldId } from '../contexts'
+import { useFormFieldState } from '../contexts'
 import { useFormInputValidationHandler } from '../hooks/useFormInputValidationHandler'
 import { FormInputHandler } from '../types'
 
@@ -21,9 +21,14 @@ export interface FormInputProps {
 }
 
 export const FormInput = Component<FormInputProps>(({ field, isNonbearing, defaultValue, formatValue: formatValueIn, parseValue: parseValueIn, ...props }) => {
-	const id = useFormFieldId()
 	const accessor = useField(field)
-	const errors = useFormError() ?? accessor.errors?.errors ?? []
+
+	const formState = useFormFieldState()
+	const id = formState?.id
+	const hasErrors = (formState?.errors.length ?? accessor.errors?.errors?.length ?? 0) > 0
+	const dirty = formState?.dirty ?? accessor.hasUnpersistedChanges
+	const required = formState?.required ?? !accessor.schema.nullable
+
 	const { parseValue, formatValue, defaultInputProps } = useFormInputHandler(accessor, { formatValue: formatValueIn, parseValue: parseValueIn })
 	const accessorGetter = accessor.getAccessor
 	const { ref, onFocus, onBlur } = useFormInputValidationHandler(accessor)
@@ -32,7 +37,9 @@ export const FormInput = Component<FormInputProps>(({ field, isNonbearing, defau
 		<SlotInput
 			ref={ref}
 			value={formatValue(accessor.value)}
-			data-invalid={dataAttribute(errors.length > 0)}
+			data-invalid={dataAttribute(hasErrors)}
+			data-dirty={dataAttribute(dirty)}
+			data-required={dataAttribute(required)}
 			onFocus={onFocus}
 			onBlur={onBlur}
 			onChange={useCallback<ChangeEventHandler<HTMLInputElement>>(e => {
@@ -40,7 +47,7 @@ export const FormInput = Component<FormInputProps>(({ field, isNonbearing, defau
 			}, [accessorGetter, parseValue])}
 			{...defaultInputProps}
 			id={id ? `${id}-input` : undefined}
-			required={!accessor.schema.nullable}
+			required={required}
 			{...props}
 		/>
 	)

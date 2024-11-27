@@ -36,6 +36,7 @@ import { Editable } from 'slate-react';
 import { Editor } from 'slate';
 import { EditorPlugin } from '@contember/react-slate-editor-base';
 import { EditorPlugin as EditorPlugin_2 } from '@contember/react-slate-editor';
+import { ErrorAccessor } from '@contember/interface';
 import { ErrorPersistResult } from '@contember/interface';
 import { FC } from 'react';
 import { FileUrlDataExtractorProps } from '@contember/react-uploader';
@@ -61,6 +62,7 @@ import * as ProgressPrimitive from '@radix-ui/react-progress';
 import { ProjectMembersFilter } from '@contember/graphql-client-tenant';
 import { ProjectMembersQueryResult } from '@contember/react-client-tenant';
 import { PropsWithChildren } from 'react';
+import { Provider } from 'react';
 import * as React_2 from 'react';
 import { ReactElement } from 'react';
 import { ReactNode } from 'react';
@@ -717,7 +719,7 @@ export const DataGridEnumCell: React_2.NamedExoticComponent<DataGridEnumCellProp
 export type DataGridEnumCellProps = {
     field: SugaredRelativeSingleField['field'];
     filterName?: string;
-    options: Record<string, ReactNode>;
+    options?: Record<string, ReactNode>;
     tooltipActions?: ReactNode;
 };
 
@@ -728,7 +730,7 @@ export const DataGridEnumColumn: React_2.NamedExoticComponent<DataGridEnumColumn
 export type DataGridEnumColumnProps = {
     field: string;
     header: ReactNode;
-    options: Record<string, ReactNode>;
+    options?: Record<string, ReactNode>;
     children?: ReactNode;
     filter?: ReactNode;
     tooltipActions?: ReactNode;
@@ -743,29 +745,29 @@ export const DataGridEnumFieldTooltip: ({ children, actions, value, ...props }: 
 
 // @public (undocumented)
 export const DataGridEnumFilter: React_2.NamedExoticComponent<Omit<DataViewEnumFilterProps, "children"> & {
-    options: Record<string, ReactNode>;
+    options?: Record<string, ReactNode>;
     label?: ReactNode;
 }>;
 
 // @public (undocumented)
 export const DataGridEnumFilterControls: ({ options }: {
-    options: Record<string, ReactNode>;
+    options?: Record<string, ReactNode>;
 }) => JSX_2.Element;
 
 // @public (undocumented)
 export const DataGridEnumFilterList: ({ options }: {
-    options: Record<string, ReactNode>;
+    options?: Record<string, ReactNode>;
 }) => JSX_2.Element;
 
 // @public (undocumented)
 export type DataGridEnumFilterProps = Omit<DataViewEnumFilterProps, 'children'> & {
-    options: Record<string, ReactNode>;
+    options?: Record<string, ReactNode>;
     label?: ReactNode;
 };
 
 // @public (undocumented)
 export const DataGridEnumFilterSelect: ({ options, label }: {
-    options: Record<string, ReactNode>;
+    options?: Record<string, ReactNode>;
     label?: ReactNode;
 }) => JSX_2.Element;
 
@@ -1414,9 +1416,21 @@ export interface EditorInlineToolbarProps {
 }
 
 // @public (undocumented)
+export type EnumOptionsFormatter = (enumName: string) => Record<string, ReactNode>;
+
+// @public (undocumented)
+export const EnumOptionsFormatterProvider: Provider<EnumOptionsFormatter>;
+
+// @public (undocumented)
 export const FeedbackTrigger: (props: {
     children: ReactElement;
 }) => JSX_2.Element;
+
+// @public (undocumented)
+export type FieldLabelFormatter = (entityName: string, fieldName: string) => ReactNode | null;
+
+// @public (undocumented)
+export const FieldLabelFormatterProvider: Provider<FieldLabelFormatter>;
 
 // @public (undocumented)
 export const FileField: React_2.NamedExoticComponent<FileFieldProps>;
@@ -1461,7 +1475,7 @@ export interface FormContainerProps {
     // (undocumented)
     description?: ReactNode;
     // (undocumented)
-    errors?: ReactNode;
+    errors?: ErrorAccessor.Error[] | ReactNode;
     // (undocumented)
     label?: ReactNode;
     // (undocumented)
@@ -1559,8 +1573,8 @@ asChild?: boolean;
 children?: React.ReactNode;
 className?: string;
 } & {
-variant?: "default" | "ghost" | null | undefined;
 inputSize?: "default" | "sm" | "lg" | null | undefined;
+variant?: "default" | "ghost" | null | undefined;
 }, "ref"> & RefAttributes<HTMLInputElement>>;
 
 // @public
@@ -1574,28 +1588,28 @@ className?: string;
 export const inputConfig: {
     baseClass?: ClassValue;
     variants?: {
-        variant: {
-            default: string;
-            ghost: string;
-        };
         inputSize: {
             default: string;
             sm: string;
             lg: string;
         };
+        variant: {
+            default: string;
+            ghost: string;
+        };
     } | undefined;
     passVariantProps?: string[];
     defaultProps?: Partial<{}> | undefined;
     defaultVariants?: {
-        variant?: "default" | "ghost" | null | undefined;
         inputSize?: "default" | "sm" | "lg" | null | undefined;
+        variant?: "default" | "ghost" | null | undefined;
     } | undefined;
     compoundVariants?: (({
-        variant?: "default" | "ghost" | null | undefined;
         inputSize?: "default" | "sm" | "lg" | null | undefined;
+        variant?: "default" | "ghost" | null | undefined;
     } | {
-        variant?: "default" | "ghost" | ("default" | "ghost")[] | undefined;
         inputSize?: "default" | "sm" | "lg" | ("default" | "sm" | "lg")[] | undefined;
+        variant?: "default" | "ghost" | ("default" | "ghost")[] | undefined;
     }) & {
         className?: string;
     })[] | undefined;
@@ -1603,14 +1617,14 @@ export const inputConfig: {
     wrapOuter?: ComponentType<    {
     children?: ReactNode;
     } & {
-    variant?: "default" | "ghost" | null | undefined;
     inputSize?: "default" | "sm" | "lg" | null | undefined;
+    variant?: "default" | "ghost" | null | undefined;
     }> | undefined;
     wrapInner?: ComponentType<    {
     children?: ReactNode;
     } & {
-    variant?: "default" | "ghost" | null | undefined;
     inputSize?: "default" | "sm" | "lg" | null | undefined;
+    variant?: "default" | "ghost" | null | undefined;
     }> | undefined;
     beforeChildren?: ReactElement;
     afterChildren?: ReactElement;
@@ -1947,7 +1961,7 @@ export const RadioEnumField: React_2.NamedExoticComponent<RadioEnumFieldProps>;
 // @public (undocumented)
 export type RadioEnumFieldProps = Omit<FormRadioItemProps, 'children' | 'value'> & Omit<FormContainerProps, 'children'> & {
     required?: boolean;
-    options: Record<string, ReactNode> | Array<{
+    options?: Record<string, ReactNode> | Array<{
         value: null | string | number | boolean;
         label: React_2.ReactNode;
     }>;
@@ -2071,7 +2085,7 @@ export const SelectEnumField: React_2.NamedExoticComponent<SelectEnumFieldProps>
 // @public (undocumented)
 export type SelectEnumFieldProps = Omit<FormContainerProps, 'children'> & {
     field: SugaredRelativeSingleField['field'];
-    options: Record<string, React_2.ReactNode> | {
+    options?: Record<string, React_2.ReactNode> | {
         value: null | string | number | boolean;
         label: React_2.ReactNode;
     }[];
@@ -2341,8 +2355,8 @@ export type SortableMultiSelectInputProps = {
     initialSorting?: DataViewSortingDirections;
 };
 
-// @public (undocumented)
-export const StandaloneFormContainer: ({ children, description, label, errors, required }: FormContainerProps) => JSX_2.Element;
+// @public @deprecated (undocumented)
+export const StandaloneFormContainer: React_2.NamedExoticComponent<FormContainerProps>;
 
 // @public (undocumented)
 export const Switch: React_2.ForwardRefExoticComponent<Omit<SwitchPrimitives.SwitchProps & React_2.RefAttributes<HTMLButtonElement> & {
@@ -2751,6 +2765,12 @@ export const useDialogOpenState: () => [boolean, (value: React_2.SetStateAction<
 
 // @public (undocumented)
 export const useDropdownMenuOpenState: () => [boolean, (value: React_2.SetStateAction<boolean>) => void];
+
+// @public (undocumented)
+export const useEnumOptionsFormatter: () => EnumOptionsFormatter;
+
+// @public (undocumented)
+export const useFieldLabelFormatter: () => FieldLabelFormatter;
 
 // @public (undocumented)
 export const useIntrospectionRolesConfig: (projectSlug: string) => RolesConfig | undefined;

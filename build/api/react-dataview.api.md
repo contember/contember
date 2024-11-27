@@ -248,6 +248,11 @@ export const DataViewEntityListPropsContext: React_2.Context<QualifiedEntityList
 // @public (undocumented)
 export const DataViewEnumFilter: React_2.NamedExoticComponent<DataViewEnumFilterProps>;
 
+// @internal (undocumented)
+export const DataViewEnumFilterArgsContext: React_2.Context<{
+    enumName: string;
+}>;
+
 // @public (undocumented)
 export type DataViewEnumFilterCurrent = 'include' | 'exclude' | 'none';
 
@@ -1074,6 +1079,11 @@ set: (value: DataViewSetEnumFilterAction) => void
 
 // @public (undocumented)
 export const useDataViewEnumFilter: (name: string, value: string) => UseDataViewEnumFilter;
+
+// @public (undocumented)
+export const useDataViewEnumFilterArgs: () => {
+    enumName: string;
+};
 
 // @public (undocumented)
 export const useDataViewEnumFilterFactory: (name: string) => (value: string) => UseDataViewEnumFilter;

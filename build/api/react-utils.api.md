@@ -8,6 +8,7 @@ import { Context } from 'react';
 import { DispatchWithoutAction } from 'react';
 import { MutableRefObject } from 'react';
 import { NamedExoticComponent } from 'react';
+import type { Provider } from 'react';
 import { ReactNode } from 'react';
 import { RefCallback } from 'react';
 import { RefObject } from 'react';
@@ -18,10 +19,10 @@ export type ComposedRefCallback<T> = RefCallback<T> & {
 };
 
 // @public (undocumented)
-export function createContext<T>(name: string, initialValue: T): [Context<T>, () => T];
+export function createContext<T>(name: string, initialValue: T): [Context<T>, () => T, Provider<T>];
 
 // @public (undocumented)
-export function createRequiredContext<T>(displayName: string): [Context<T>, () => T];
+export function createRequiredContext<T>(displayName: string): [Context<T>, () => T, Provider<T>];
 
 // @public (undocumented)
 export const DebugChildren: NamedExoticComponent<DebugChildrenProps>;

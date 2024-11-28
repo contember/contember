@@ -7,7 +7,11 @@ export class EnumTypeSchemaGenerator {
 		for (const [enumName, values] of Object.entries(model.enums)) {
 			code += `export type ${getEnumTypeName(enumName)} = ${values.map(it => '\n\t | ' + JSON.stringify(it)).join('')}\n`
 		}
-
-		return code || 'export {}\n'
+		code += `export type ContemberClientEnums = {\n`
+		for (const enumName of Object.keys(model.enums)) {
+			code += `\t${enumName}: ${getEnumTypeName(enumName)}\n`
+		}
+		code += '}\n\n'
+		return code
 	}
 }

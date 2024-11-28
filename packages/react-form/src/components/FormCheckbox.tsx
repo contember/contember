@@ -26,7 +26,7 @@ export const FormCheckbox = Component<FormCheckboxProps>(({ field, isNonbearing,
 	const accessor = useField<boolean>(field)
 
 	const formState = useFormFieldState()
-	const id = formState?.id
+	const id = formState?.htmlId
 	const hasErrors = (formState?.errors.length ?? accessor.errors?.errors?.length ?? 0) > 0
 	const dirty = formState?.dirty ?? accessor.hasUnpersistedChanges
 	const value = accessor.value

@@ -24,7 +24,7 @@ export const FormInput = Component<FormInputProps>(({ field, isNonbearing, defau
 	const accessor = useField(field)
 
 	const formState = useFormFieldState()
-	const id = formState?.id
+	const id = formState?.htmlId
 	const hasErrors = (formState?.errors.length ?? accessor.errors?.errors?.length ?? 0) > 0
 	const dirty = formState?.dirty ?? accessor.hasUnpersistedChanges
 	const required = formState?.required ?? !accessor.schema.nullable

@@ -11,13 +11,13 @@ export const FormLabel = (props: {
 	if (!formState) {
 		throw new BindingError('FormError must be used inside a FormField')
 	}
-	const { errors, id, dirty, required } = formState
+	const { errors, htmlId, dirty, required } = formState
 	return (
 		<Slot
 			data-invalid={dataAttribute(errors.length > 0)}
 			data-dirty={dataAttribute(dirty)}
 			data-required={dataAttribute(required)}
-			{...{ htmlFor: `${id}-input` }}
+			{...(htmlId ? { htmlFor: `${htmlId}-input` } : {})}
 			{...props}
 		/>
 	)

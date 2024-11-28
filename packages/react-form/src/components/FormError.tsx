@@ -10,12 +10,12 @@ export const FormError = ({ children, formatter }: {
 	if (!formState) {
 		throw new BindingError('FormError must be used inside a FormField')
 	}
-	const { errors, id } = formState
+	const { errors, htmlId } = formState
 	const formatted = useMemo(() => formatter(errors ?? []).filter((it, index, arr) => arr.indexOf(it) === index), [errors, formatter])
 	return formatted.map((it, index) => {
 		return cloneElement(children, {
 			key: index,
-			...{ id: `${id}-error-${index}` },
+			...(htmlId ? { id: `${htmlId}-error-${index}` } : {}),
 			children: it,
 		})
 	})

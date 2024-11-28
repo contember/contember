@@ -20,7 +20,7 @@ export const FormRadioInput = Component<FormRadioItemProps>(({ field, value, def
 	const accessor = useField(field)
 
 	const formState = useFormFieldState()
-	const id = formState?.id
+	const id = formState?.htmlId
 	const hasErrors = (formState?.errors.length ?? accessor.errors?.errors?.length ?? 0) > 0
 	const dirty = formState?.dirty ?? accessor.hasUnpersistedChanges
 
@@ -39,7 +39,7 @@ export const FormRadioInput = Component<FormRadioItemProps>(({ field, value, def
 			checked={accessor.value === value}
 			data-invalid={dataAttribute(hasErrors)}
 			data-dirty={dataAttribute(dirty)}
-			name={id + '-input'}
+			name={id ? id + '-input' : undefined}
 			id={id ? `${id}-input` : undefined}
 			onFocus={onFocus}
 			onBlur={onBlur}

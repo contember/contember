@@ -8,8 +8,13 @@ export type FormInputHandler = {
 }
 
 export type FormFieldState = {
-	id: string
+	htmlId: string
 	errors: ErrorAccessor.Error[]
 	required: boolean
 	dirty: boolean
+	field?: {
+		entityName: string
+		fieldName: string
+		enumName?: string
+	}
 }

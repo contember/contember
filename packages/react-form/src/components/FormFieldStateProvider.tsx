@@ -1,20 +1,20 @@
 import { ErrorAccessor } from '@contember/react-binding'
-import { useDebugValue, useEffect, useId, useMemo } from 'react'
+import { useEffect, useId, useMemo } from 'react'
 import { FormFieldStateContext, useFormFieldState } from '../contexts'
+import { FormFieldState } from '../types'
 
 const emptyArr: [] = []
 
-export type FormFieldStateProvider = {
-	errors?: ErrorAccessor.Error[]
-	required?: boolean
-	dirty?: boolean
-	id?: string
-	children: React.ReactNode
-}
-export const FormFieldStateProvider = ({ children, required = false, errors = emptyArr, dirty = false, id }: FormFieldStateProvider) => {
+export type FormFieldStateProvider =
+	& Partial<FormFieldState>
+	& {
+		children: React.ReactNode
+	}
+
+export const FormFieldStateProvider = ({ children, required = false, errors = emptyArr, dirty = false, htmlId, field }: FormFieldStateProvider) => {
 	const generatedId = useId()
-	id ??= generatedId
-	const value = useMemo(() => ({ id, required, errors, dirty }), [id, required, errors, dirty])
+	htmlId ??= generatedId
+	const value = useMemo(() => ({ htmlId, required, errors, dirty, field }), [htmlId, required, errors, dirty, field])
 	return <FormFieldStateContext.Provider value={value}>{children}</FormFieldStateContext.Provider>
 }
 
@@ -40,7 +40,7 @@ export const FormFieldIdContext = {
 			}, [])
 		}
 		return (
-			<FormFieldStateProvider {...state} id={value}>
+			<FormFieldStateProvider {...state} htmlId={value}>
 				{children}
 			</FormFieldStateProvider>
 		)

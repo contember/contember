@@ -10,7 +10,7 @@ export const useFormFieldState = FormFieldStateContext_[1]
 /**
  * @deprecated use `useFormState` instead
  */
-export const useFormFieldId = () => useFormFieldState()?.id
+export const useFormFieldId = () => useFormFieldState()?.htmlId
 
 /**
  * @deprecated use `useFormState` instead

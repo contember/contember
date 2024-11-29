@@ -1,5 +1,7 @@
-import { BoardTaskStatus, GridArticleState } from '../../api/client'
+import { BoardTaskStatus, ContemberClientEntities, ContemberClientEnums, GridArticleState, ContemberClientNames } from '../../api/client'
 import { createEnumFormatter } from '@app/lib/formatting'
+import { ReactNode } from 'react'
+import { EnumOptionsFormatter, FieldLabelFormatter } from '@app/lib/labels'
 
 export const BoardTaskStatusLabels: Record<BoardTaskStatus, string> = {
 	backlog: 'Backlog',
@@ -17,3 +19,75 @@ export const GridArticleStateLabels: Record<GridArticleState, string> = {
 
 export const formatGridArticleState = createEnumFormatter(GridArticleStateLabels)
 
+export const fieldLabels = {
+	FormArticle: {
+		internalName: 'Internal Name',
+		author: 'Author',
+		locked: 'Locked',
+		notes: 'Notes',
+		state: 'State',
+		publishedAt: 'Published At',
+		locales: 'Locales',
+		tags: 'Tags',
+	},
+	FormTag: {
+		name: 'Name',
+		articles: 'Articles',
+		slug: 'Slug',
+	},
+	FormNote: {
+		article: 'Article',
+		createdAt: 'Created At',
+		text: 'Text',
+	},
+	FormAuthor: {
+		articles: 'Articles',
+		name: 'Name',
+		slug: 'Slug',
+	},
+	FormArticleLocale: {
+		article: 'Article',
+		slug: 'Slug',
+		content: 'Content',
+		title: 'Title',
+		locale: 'Locale',
+	},
+} satisfies {
+	[E in keyof ContemberClientEntities]?: {
+		[F in (keyof ContemberClientEntities[E]['columns']) | (keyof ContemberClientEntities[E]['hasOne']) | (keyof ContemberClientEntities[E]['hasMany'])]?: ReactNode
+	}
+}
+
+export const fieldLabelFormatter: FieldLabelFormatter = (entityName, fieldName) => {
+	return (fieldLabels as any)[entityName]?.[fieldName] ?? fieldName
+}
+
+
+export const enumLabels = {
+	GridArticleState: {
+		published: 'Published',
+		draft: 'Draft',
+		archived: 'Archived',
+	},
+	InputRootEnumValue: {
+		a: 'A',
+		b: 'B',
+		c: 'C',
+	},
+	FormArticleState: {
+		archived: 'Archived',
+		draft: 'Draft',
+		published: 'Published',
+	},
+} satisfies {
+	[E in keyof ContemberClientEnums]?: {
+		[K in ContemberClientEnums[E]]?: string
+	}
+}
+
+export const enumOptionsFormatter: EnumOptionsFormatter = enumName => {
+	if (!(enumName in enumLabels)) {
+		return Object.fromEntries(Object.values(ContemberClientNames.enums[enumName]).map(value => [value, value]))
+	}
+	return (enumLabels as any)[enumName] ?? {}
+}

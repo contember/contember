@@ -67,3 +67,29 @@ export type RepeaterRootUnique =
 	 | "unique"
 export type SlugUnique = 
 	 | "unique"
+export type ContemberClientEnums = {
+	BlockType: BlockType
+	BoardTaskStatus: BoardTaskStatus
+	ContentEmbedType: ContentEmbedType
+	EditorReferenceType: EditorReferenceType
+	ExtendTreeUnique: ExtendTreeUnique
+	FormArticleState: FormArticleState
+	GridArticleState: GridArticleState
+	InputUnique: InputUnique
+	LegacyEditorReferenceType: LegacyEditorReferenceType
+	SelectUnique: SelectUnique
+	UploadMediaType: UploadMediaType
+	UploadOne: UploadOne
+	BlockImagePosition: BlockImagePosition
+	BlockListUnique: BlockListUnique
+	DimensionsItemUnique: DimensionsItemUnique
+	EditorContentUnique: EditorContentUnique
+	EditorTextAreaUnique: EditorTextAreaUnique
+	FormArticleLocaleLocale: FormArticleLocaleLocale
+	InputRootEnumValue: InputRootEnumValue
+	LegacyEditorContentUnique: LegacyEditorContentUnique
+	PlateEditorContentUnique: PlateEditorContentUnique
+	RepeaterRootUnique: RepeaterRootUnique
+	SlugUnique: SlugUnique
+}
+

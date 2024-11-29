@@ -1446,5 +1446,99 @@ export const ContemberClientNames: SchemaNames = {
         "duration"
       ]
     }
+  },
+  "enums": {
+    "BlockType": [
+      "text",
+      "image",
+      "textWithImage",
+      "hero"
+    ],
+    "BoardTaskStatus": [
+      "backlog",
+      "todo",
+      "inProgress",
+      "done"
+    ],
+    "ContentEmbedType": [
+      "youtube",
+      "vimeo"
+    ],
+    "EditorReferenceType": [
+      "image",
+      "link",
+      "quote"
+    ],
+    "ExtendTreeUnique": [
+      "unique"
+    ],
+    "FormArticleState": [
+      "published",
+      "draft",
+      "archived"
+    ],
+    "GridArticleState": [
+      "published",
+      "draft",
+      "archived"
+    ],
+    "InputUnique": [
+      "unique"
+    ],
+    "LegacyEditorReferenceType": [
+      "link",
+      "quote",
+      "image",
+      "embed"
+    ],
+    "SelectUnique": [
+      "unique"
+    ],
+    "UploadMediaType": [
+      "image",
+      "video",
+      "audio",
+      "file"
+    ],
+    "UploadOne": [
+      "unique"
+    ],
+    "BlockImagePosition": [
+      "left",
+      "right"
+    ],
+    "BlockListUnique": [
+      "unique"
+    ],
+    "DimensionsItemUnique": [
+      "unique"
+    ],
+    "EditorContentUnique": [
+      "unique"
+    ],
+    "EditorTextAreaUnique": [
+      "unique"
+    ],
+    "FormArticleLocaleLocale": [
+      "cs",
+      "en"
+    ],
+    "InputRootEnumValue": [
+      "a",
+      "b",
+      "c"
+    ],
+    "LegacyEditorContentUnique": [
+      "unique"
+    ],
+    "PlateEditorContentUnique": [
+      "unique"
+    ],
+    "RepeaterRootUnique": [
+      "unique"
+    ],
+    "SlugUnique": [
+      "unique"
+    ]
   }
 }

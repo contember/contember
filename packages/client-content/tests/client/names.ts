@@ -112,5 +112,6 @@ export const ContemberClientNames: SchemaNames = {
         "name"
       ]
     }
-  }
+  },
+  "enums": {}
 }

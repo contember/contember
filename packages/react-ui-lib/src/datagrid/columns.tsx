@@ -15,7 +15,7 @@ import {
 	DataViewTextFilter,
 } from '@contember/react-dataview'
 import { formatBoolean, formatDate, formatDateTime, formatNumber } from '../formatting'
-import { DataGridEnumCell, DataGridHasManyCell, DataGridHasManyCellProps, DataGridHasOneCell, DataGridHasOneCellProps } from './cells'
+import { DataGridEnumCell, DataGridHasManyCell, DataGridHasOneCell } from './cells'
 import { cn } from '../utils'
 import {
 	DataGridBooleanFilterControls,
@@ -155,7 +155,7 @@ export const DataGridDateTimeColumn = Component<DataGridDateTimeColumnProps>(({ 
 export type DataGridEnumColumnProps = {
 	field: string
 	header: ReactNode
-	options: Record<string, ReactNode>
+	options?: Record<string, ReactNode>
 	children?: ReactNode
 	filter?: ReactNode
 	tooltipActions?: ReactNode

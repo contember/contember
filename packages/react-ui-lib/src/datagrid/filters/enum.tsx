@@ -1,18 +1,35 @@
 import * as React from 'react'
 import { ReactNode, useCallback } from 'react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../../ui/tooltip'
-import { DataViewEnumFilter, DataViewEnumFilterProps, DataViewEnumFilterTrigger, DataViewNullFilterTrigger, UseDataViewEnumFilter, useDataViewEnumFilterFactory, useDataViewFilterName } from '@contember/react-dataview'
+import {
+	DataViewEnumFilter,
+	DataViewEnumFilterProps,
+	DataViewEnumFilterTrigger,
+	DataViewNullFilterTrigger,
+	UseDataViewEnumFilter,
+	useDataViewEnumFilterArgs,
+	useDataViewEnumFilterFactory,
+	useDataViewFilterName,
+} from '@contember/react-dataview'
 import { Component } from '@contember/interface'
 import { Popover, PopoverContent, PopoverTrigger } from '../../ui/popover'
-import { DataGridActiveFilterUI, DataGridExcludeActionButtonUI, DataGridFilterActionButtonUI, DataGridFilterSelectItemUI, DataGridFilterSelectTriggerUI, DataGridSingleFilterUI } from '../ui'
+import {
+	DataGridActiveFilterUI,
+	DataGridExcludeActionButtonUI,
+	DataGridFilterActionButtonUI,
+	DataGridFilterSelectItemUI,
+	DataGridFilterSelectTriggerUI,
+	DataGridSingleFilterUI,
+} from '../ui'
 import { DataGridNullFilter } from './common'
 import { dict } from '../../dict'
 import { DataGridFilterMobileHiding } from './mobile'
+import { useEnumOptionsFormatter } from '../../labels'
 
 export type DataGridEnumFilterProps =
 	& Omit<DataViewEnumFilterProps, 'children'>
 	& {
-		options: Record<string, ReactNode>
+		options?: Record<string, ReactNode>
 		label?: ReactNode
 	}
 
@@ -53,24 +70,27 @@ export const DataGridEnumFieldTooltip = ({ children, actions, value, ...props }:
 
 
 export const DataGridEnumFilterList = ({ options }: {
-	options: Record<string, ReactNode>
-}) => (
-	<>
-		{Object.entries(options).map(([value, label]) => (
-			<DataViewEnumFilterTrigger action={'unset'} value={value} key={value}>
-				<DataGridActiveFilterUI>
-					{label}
-				</DataGridActiveFilterUI>
-			</DataViewEnumFilterTrigger>
-		))}
+	options?: Record<string, ReactNode>
+}) => {
+	const resolvedOptions = useEnumOptions(options)
+	return (
+		<>
+			{Object.entries(resolvedOptions).map(([value, label]) => (
+				<DataViewEnumFilterTrigger action={'unset'} value={value} key={value}>
+					<DataGridActiveFilterUI>
+						{label}
+					</DataGridActiveFilterUI>
+				</DataViewEnumFilterTrigger>
+			))}
 
-		<DataViewNullFilterTrigger action={'unset'}>
-			<DataGridActiveFilterUI>
-				<span className={'italic'}>{dict.datagrid.na}</span>
-			</DataGridActiveFilterUI>
-		</DataViewNullFilterTrigger>
-	</>
-)
+			<DataViewNullFilterTrigger action={'unset'}>
+				<DataGridActiveFilterUI>
+					<span className={'italic'}>{dict.datagrid.na}</span>
+				</DataGridActiveFilterUI>
+			</DataViewNullFilterTrigger>
+		</>
+	)
+}
 const DataGridEnumFilterSelectItem = ({ value, children, filterFactory }: {
 	value: string
 	children: ReactNode
@@ -91,7 +111,7 @@ const DataGridEnumFilterSelectItem = ({ value, children, filterFactory }: {
 
 }
 export const DataGridEnumFilterSelect = ({  options, label }: {
-	options: Record<string, ReactNode>
+	options?: Record<string, ReactNode>
 	label?: ReactNode
 }) => {
 	return (
@@ -107,12 +127,13 @@ export const DataGridEnumFilterSelect = ({  options, label }: {
 }
 
 export const DataGridEnumFilterControls = ({ options }: {
-	options: Record<string, ReactNode>
+	options?: Record<string, ReactNode>
 }) => {
 	const filterFactory = useDataViewEnumFilterFactory(useDataViewFilterName())
+	const resolvedOptions = useEnumOptions(options)
 	return (
 		<div className={'relative flex flex-col gap-2'}>
-			{Object.entries(options).map(([value, label]) => (
+			{Object.entries(resolvedOptions).map(([value, label]) => (
 				<DataGridEnumFilterSelectItem value={value} key={value} filterFactory={filterFactory}>
 					{label}
 				</DataGridEnumFilterSelectItem>
@@ -120,4 +141,10 @@ export const DataGridEnumFilterControls = ({ options }: {
 			<DataGridNullFilter />
 		</div>
 	)
+}
+
+const useEnumOptions = (preferred: Record<string, ReactNode> | undefined): Record<string, ReactNode> => {
+	const enumOptionsProvider = useEnumOptionsFormatter()
+	const enumName = useDataViewEnumFilterArgs().enumName
+	return preferred ?? enumOptionsProvider(enumName)
 }

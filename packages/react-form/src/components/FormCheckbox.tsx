@@ -1,7 +1,14 @@
 import * as React from 'react'
 import { ChangeEventHandler, ReactElement, useCallback, useEffect } from 'react'
-import { Component, Field, OptionallyVariableFieldValue, SugaredRelativeSingleField, TreeNodeEnvironmentFactory, useField } from '@contember/react-binding'
-import { useFormError, useFormFieldId } from '../contexts'
+import {
+	Component,
+	Field,
+	OptionallyVariableFieldValue,
+	SugaredRelativeSingleField,
+	TreeNodeEnvironmentFactory,
+	useField,
+} from '@contember/react-binding'
+import { useFormFieldState } from '../contexts'
 import { dataAttribute } from '@contember/utilities'
 import { useFormInputValidationHandler } from '../hooks'
 import { Slot } from '@radix-ui/react-slot'
@@ -16,10 +23,13 @@ export interface FormCheckboxProps {
 }
 
 export const FormCheckbox = Component<FormCheckboxProps>(({ field, isNonbearing, defaultValue, ...props }) => {
-	const id = useFormFieldId()
 	const accessor = useField<boolean>(field)
+
+	const formState = useFormFieldState()
+	const id = formState?.htmlId
+	const hasErrors = (formState?.errors.length ?? accessor.errors?.errors?.length ?? 0) > 0
+	const dirty = formState?.dirty ?? accessor.hasUnpersistedChanges
 	const value = accessor.value
-	const errors = useFormError() ?? accessor.errors?.errors ?? []
 	const accessorGetter = accessor.getAccessor
 	const { ref, onFocus, onBlur } = useFormInputValidationHandler(accessor)
 	const [checkboxRef, setCheckboxRef] = React.useState<HTMLInputElement | null>(null)
@@ -40,8 +50,9 @@ export const FormCheckbox = Component<FormCheckboxProps>(({ field, isNonbearing,
 			type="checkbox"
 			checked={accessor.value === true}
 			data-state={value === null ? 'indeterminate' : (value ? 'checked' : 'unchecked')}
-			data-invalid={dataAttribute(errors.length > 0)}
-			id={`${id}-input`}
+			data-invalid={dataAttribute(hasErrors)}
+			data-dirty={dataAttribute(dirty)}
+			id={id ? `${id}-input` : undefined}
 			onFocus={onFocus}
 			onBlur={onBlur}
 			onChange={useCallback<ChangeEventHandler<HTMLInputElement>>(e => {

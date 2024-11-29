@@ -1,24 +1,28 @@
 import * as React from 'react'
-import { useId } from 'react'
-import { FormErrorContext, FormFieldIdContext } from '../contexts'
-import { SugaredRelativeSingleEntity, useEntity } from '@contember/react-binding'
-
-const emptyArr: [] = []
+import { HasOneRelationMarker, SugaredRelativeSingleEntity, useEntity } from '@contember/react-binding'
+import { FormFieldStateProvider } from './FormFieldStateProvider'
+import { useMemo } from 'react'
 
 export type FormHasOneRelationScopeProps = {
 	field: SugaredRelativeSingleEntity['field']
 	children: React.ReactNode
+	required?: boolean
 }
 
-export const FormHasOneRelationScope = ({ field, children }: FormHasOneRelationScopeProps) => {
-	const id = useId()
+export const FormHasOneRelationScope = ({ field, children, required }: FormHasOneRelationScopeProps) => {
 	const entityRelation = useEntity({ field })
-	const errors = entityRelation.errors?.errors
+	const marker = entityRelation.getMarker() as HasOneRelationMarker
+	const fieldName = marker.parameters.field
+	const entityName = entityRelation.getParent()!.name
+	const fieldInfo = useMemo(() => ({ entityName, fieldName }), [entityName, fieldName])
 	return (
-		<FormFieldIdContext.Provider value={id}>
-			<FormErrorContext.Provider value={errors ?? emptyArr}>
-				{children}
-			</FormErrorContext.Provider>
-		</FormFieldIdContext.Provider>
+		<FormFieldStateProvider
+			errors={entityRelation.errors?.errors}
+			dirty={entityRelation.hasUnpersistedChanges}
+			required={required}
+			field={fieldInfo}
+		>
+			{children}
+		</FormFieldStateProvider>
 	)
 }

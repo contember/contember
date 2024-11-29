@@ -1,24 +1,29 @@
 import * as React from 'react'
-import { useId } from 'react'
-import { FormErrorContext, FormFieldIdContext } from '../contexts'
+import { useMemo } from 'react'
 import { SugaredRelativeSingleField, useField } from '@contember/react-binding'
-
-const emptyArr: [] = []
+import { FormFieldStateProvider } from './FormFieldStateProvider'
 
 export type FormFieldScopeProps = {
 	field: SugaredRelativeSingleField['field']
 	children: React.ReactNode
+	required?: boolean
 }
 
-export const FormFieldScope = ({ field, children }: FormFieldScopeProps) => {
-	const id = useId()
+export const FormFieldScope = ({ field, children, required }: FormFieldScopeProps) => {
 	const fieldAccessor = useField({ field })
-	const errors = fieldAccessor.errors?.errors
+	const entityName = fieldAccessor.getParent().name
+	const fieldName = fieldAccessor.fieldName
+	const enumName = fieldAccessor.schema.enumName ?? undefined
+	const fieldInfo = useMemo(() => ({ entityName, fieldName, enumName }), [entityName, fieldName, enumName])
+
 	return (
-		<FormFieldIdContext.Provider value={id}>
-			<FormErrorContext.Provider value={errors ?? emptyArr}>
-				{children}
-			</FormErrorContext.Provider>
-		</FormFieldIdContext.Provider>
+		<FormFieldStateProvider
+			errors={fieldAccessor.errors?.errors}
+			required={required ?? !fieldAccessor.schema.nullable}
+			dirty={fieldAccessor.hasUnpersistedChanges}
+			field={fieldInfo}
+		>
+			{children}
+		</FormFieldStateProvider>
 	)
 }

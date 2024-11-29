@@ -15,12 +15,12 @@ import {
 import * as React from 'react'
 import { useCallback, useMemo } from 'react'
 import { FormContainer, FormContainerProps } from './container'
-import { FormFieldScope, FormHasManyRelationScope, FormHasOneRelationScope, useFormFieldId } from '@contember/react-form'
+import { FormFieldScope, FormHasManyRelationScope, FormHasOneRelationScope, useFormFieldId, useFormFieldState } from '@contember/react-form'
 import { Component, Field, RecursionTerminator, SugaredRelativeSingleField, useEntityBeforePersist, useField } from '@contember/interface'
 import { Popover, PopoverTrigger } from '../ui/popover'
 import { ChevronDownIcon, ChevronUpIcon } from 'lucide-react'
 import { dict } from '../dict'
-
+import { useEnumOptionsFormatter } from '../labels'
 
 export type SelectFieldProps =
 	& SelectInputProps
@@ -78,7 +78,7 @@ export type SelectEnumFieldProps =
 	& Omit<FormContainerProps, 'children'>
 	& {
 		field: SugaredRelativeSingleField['field']
-		options: Record<string, React.ReactNode> | { value: null | string | number | boolean; label: React.ReactNode }[]
+		options?: Record<string, React.ReactNode> | { value: null | string | number | boolean; label: React.ReactNode }[]
 		placeholder?: React.ReactNode
 		defaultValue?: string
 		required?: boolean
@@ -112,12 +112,19 @@ const SelectEnumFieldInner = ({ field, options, placeholder, required }: SelectE
 		}
 	}, [fieldAccessorGetter, required]))
 	const id = useFormFieldId()
+	const enumLabelsFormatter = useEnumOptionsFormatter()
+	const enumName = useFormFieldState()?.field?.enumName
+	options ??= enumName ? enumLabelsFormatter(enumName) : undefined
+	if (!options) {
+		throw new Error('SelectEnumFields: options are required')
+	}
 	const normalizedOptions = useMemo(() => {
 		return Array.isArray(options) ? options : Object.entries(options).map(([value, label]) => ({ value, label }))
 	}, [options])
 	const selectedValue = useMemo(() => {
 		return normalizedOptions.find(it => it.value === fieldAccessor.value)
 	}, [fieldAccessor.value, normalizedOptions])
+
 
 	return (
 		<Popover open={open} onOpenChange={setOpen}>

@@ -17,7 +17,7 @@ import * as React from 'react'
 import { ReactNode, useId, useMemo, useState } from 'react'
 import { FormContainer, FormContainerProps } from './container'
 import { Component } from '@contember/interface'
-import { FormErrorContext, FormFieldIdContext } from '@contember/react-form'
+import { FormErrorContext, FormFieldIdContext, FormFieldStateProvider } from '@contember/react-form'
 import {
 	UploadedAnyView,
 	UploadedAudioView,
@@ -134,52 +134,49 @@ const FileRepeaterFieldInner = Component<FileRepeaterFieldInnerProps>(({
 	// 	entity,
 	// }) ?? []).flatMap(it => it.errors?.errors ?? [])
 
-	const id = useId()
 	return (
-		<FormFieldIdContext.Provider value={id}>
-			<FormErrorContext.Provider value={[]}>
-				<FormContainer description={description} label={label}>
-					<Repeater {...props} initialEntityCount={0}>
-						<UploaderRepeaterItemsWrapperUI>
+		<FormFieldStateProvider>
+			<FormContainer description={description} label={label}>
+				<Repeater {...props} initialEntityCount={0}>
+					<UploaderRepeaterItemsWrapperUI>
 
-							<MultiUploader baseField={baseField} fileType={fileTypeWithUploader}>
-								<UploaderHasFile>
-									<UploaderProgress />
-								</UploaderHasFile>
-								<UploaderDropzone dropzonePlaceholder={dropzonePlaceholder} />
-							</MultiUploader>
+						<MultiUploader baseField={baseField} fileType={fileTypeWithUploader}>
+							<UploaderHasFile>
+								<UploaderProgress />
+							</UploaderHasFile>
+							<UploaderDropzone dropzonePlaceholder={dropzonePlaceholder} />
+						</MultiUploader>
 
-							<RepeaterSortable>
+						<RepeaterSortable>
 
-								<RepeaterSortableEachItem>
-									<div className="flex">
-										<UploaderRepeaterDropIndicator position={'before'} />
-										<RepeaterSortableItemNode>
-											<UploaderRepeaterItemUI>
-												<RepeaterSortableItemActivator>
-													<UploaderRepeaterHandleUI />
-												</RepeaterSortableItemActivator>
-												{children}
-											</UploaderRepeaterItemUI>
-										</RepeaterSortableItemNode>
-										<UploaderRepeaterDropIndicator position={'after'} />
-									</div>
+							<RepeaterSortableEachItem>
+								<div className="flex">
+									<UploaderRepeaterDropIndicator position={'before'} />
+									<RepeaterSortableItemNode>
+										<UploaderRepeaterItemUI>
+											<RepeaterSortableItemActivator>
+												<UploaderRepeaterHandleUI />
+											</RepeaterSortableItemActivator>
+											{children}
+										</UploaderRepeaterItemUI>
+									</RepeaterSortableItemNode>
+									<UploaderRepeaterDropIndicator position={'after'} />
+								</div>
 
 
-								</RepeaterSortableEachItem>
+							</RepeaterSortableEachItem>
 
-								<RepeaterSortableDragOverlay>
-									<UploaderRepeaterDragOverlayUI>
-										{children}
-									</UploaderRepeaterDragOverlayUI>
-								</RepeaterSortableDragOverlay>
+							<RepeaterSortableDragOverlay>
+								<UploaderRepeaterDragOverlayUI>
+									{children}
+								</UploaderRepeaterDragOverlayUI>
+							</RepeaterSortableDragOverlay>
 
-							</RepeaterSortable>
-						</UploaderRepeaterItemsWrapperUI>
-					</Repeater>
-				</FormContainer>
-			</FormErrorContext.Provider>
-		</FormFieldIdContext.Provider>
+						</RepeaterSortable>
+					</UploaderRepeaterItemsWrapperUI>
+				</Repeater>
+			</FormContainer>
+		</FormFieldStateProvider>
 	)
 }, ({ baseField, label, description, children, fileType, ...props }) => {
 	return <>

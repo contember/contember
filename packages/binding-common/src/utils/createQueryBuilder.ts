@@ -25,6 +25,7 @@ export const createQueryBuilder = (schema: Schema) => {
 				})),
 			}]
 		})),
+		enums: Object.fromEntries(schema.getEntityNames().map(it => [it, schema.getEnumValues(it)])),
 	}
 
 	return new ContentQueryBuilder(schemaNames)

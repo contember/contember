@@ -427,7 +427,7 @@ export type QueryExecutorOptions = GraphQlClientRequestOptions;
 // @public (undocumented)
 export type SchemaEntityNames<Name extends string> = {
     readonly name: Name;
-    readonly scalars: string[];
+    readonly scalars: readonly string[];
     readonly fields: {
         readonly [fieldName: string]: {
             readonly type: 'column';
@@ -440,8 +440,11 @@ export type SchemaEntityNames<Name extends string> = {
 
 // @public (undocumented)
 export type SchemaNames = {
-    entities: {
-        [entityName: string]: SchemaEntityNames<string>;
+    readonly entities: {
+        readonly [entityName: string]: SchemaEntityNames<string>;
+    };
+    readonly enums: {
+        readonly [enumName: string]: readonly string[];
     };
 };
 

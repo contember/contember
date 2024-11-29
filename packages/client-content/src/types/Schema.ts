@@ -2,7 +2,7 @@ import { JSONObject } from '@contember/schema'
 
 export type SchemaEntityNames<Name extends string> = {
 	readonly name: Name
-	readonly scalars: string[]
+	readonly scalars: readonly string[]
 	readonly fields: {
 		readonly [fieldName: string]:
 			| {
@@ -16,8 +16,11 @@ export type SchemaEntityNames<Name extends string> = {
 }
 
 export type SchemaNames = {
-	entities: {
-		[entityName: string]: SchemaEntityNames<string>
+	readonly entities: {
+		readonly [entityName: string]: SchemaEntityNames<string>
+	}
+	readonly enums: {
+		readonly [enumName: string]: readonly string[]
 	}
 }
 

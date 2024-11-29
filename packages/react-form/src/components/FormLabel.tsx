@@ -1,21 +1,23 @@
 import * as React from 'react'
 import { Slot } from '@radix-ui/react-slot'
 import { dataAttribute } from '@contember/utilities'
-import { useFormError, useFormFieldId } from '../contexts'
+import { useFormFieldState } from '../contexts'
 import { BindingError } from '@contember/react-binding'
 
 export const FormLabel = (props: {
 	children: React.ReactElement
 }) => {
-	const id = useFormFieldId()
-	const errors = useFormError()
-	if (errors === undefined || id === undefined) {
-		throw new BindingError('FormLabel must be used inside a FormField')
+	const formState = useFormFieldState()
+	if (!formState) {
+		throw new BindingError('FormError must be used inside a FormField')
 	}
+	const { errors, htmlId, dirty, required } = formState
 	return (
 		<Slot
 			data-invalid={dataAttribute(errors.length > 0)}
-			{...{ htmlFor: `${id}-input` }}
+			data-dirty={dataAttribute(dirty)}
+			data-required={dataAttribute(required)}
+			{...(htmlId ? { htmlFor: `${htmlId}-input` } : {})}
 			{...props}
 		/>
 	)

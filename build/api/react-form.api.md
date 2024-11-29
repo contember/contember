@@ -6,6 +6,7 @@
 
 import { Context } from 'react';
 import { ErrorAccessor } from '@contember/react-binding';
+import { ErrorAccessor as ErrorAccessor_2 } from '@contember/binding-common';
 import { FieldAccessor } from '@contember/react-binding';
 import { JSX as JSX_2 } from 'react/jsx-runtime';
 import { JSXElementConstructor } from 'react';
@@ -38,37 +39,74 @@ export const FormError: ({ children, formatter }: {
     children: ReactElement;
 }) => ReactElement<any, string | JSXElementConstructor<any>>[];
 
-// @internal (undocumented)
-export const FormErrorContext: Context<ErrorAccessor.Error[] | undefined>;
+// @public @deprecated (undocumented)
+export const FormErrorContext: {
+    Provider: ({ children, value }: {
+        children: React.ReactNode;
+        value: ErrorAccessor.Error[];
+    }) => JSX_2.Element;
+};
 
-// @internal (undocumented)
-export const FormFieldIdContext: Context<string | undefined>;
+// @public @deprecated (undocumented)
+export const FormFieldIdContext: {
+    Provider: ({ children, value }: {
+        children: React.ReactNode;
+        value: string;
+    }) => JSX_2.Element;
+};
 
 // @public (undocumented)
-export const FormFieldScope: ({ field, children }: FormFieldScopeProps) => JSX_2.Element;
+export const FormFieldScope: ({ field, children, required }: FormFieldScopeProps) => JSX_2.Element;
 
 // @public (undocumented)
 export type FormFieldScopeProps = {
     field: SugaredRelativeSingleField['field'];
     children: React_2.ReactNode;
+    required?: boolean;
 };
 
 // @public (undocumented)
-export const FormHasManyRelationScope: ({ field, children }: FormHasManyRelationScopeProps) => JSX_2.Element;
+export type FormFieldState = {
+    htmlId: string;
+    errors: ErrorAccessor.Error[];
+    required: boolean;
+    dirty: boolean;
+    field?: {
+        entityName: string;
+        fieldName: string;
+        enumName?: string;
+    };
+};
+
+// @public (undocumented)
+export const FormFieldStateContext: Context<FormFieldState | undefined>;
+
+// @public (undocumented)
+export type FormFieldStateProvider = Partial<FormFieldState> & {
+    children: React.ReactNode;
+};
+
+// @public (undocumented)
+export const FormFieldStateProvider: ({ children, required, errors, dirty, htmlId, field }: FormFieldStateProvider) => JSX_2.Element;
+
+// @public (undocumented)
+export const FormHasManyRelationScope: ({ field, children, required }: FormHasManyRelationScopeProps) => JSX_2.Element;
 
 // @public (undocumented)
 export type FormHasManyRelationScopeProps = {
     field: SugaredRelativeEntityList['field'];
     children: React_2.ReactNode;
+    required?: boolean;
 };
 
 // @public (undocumented)
-export const FormHasOneRelationScope: ({ field, children }: FormHasOneRelationScopeProps) => JSX_2.Element;
+export const FormHasOneRelationScope: ({ field, children, required }: FormHasOneRelationScopeProps) => JSX_2.Element;
 
 // @public (undocumented)
 export type FormHasOneRelationScopeProps = {
     field: SugaredRelativeSingleEntity['field'];
     children: React_2.ReactNode;
+    required?: boolean;
 };
 
 // @public (undocumented)
@@ -119,11 +157,14 @@ export interface FormRadioItemProps {
     value: string | null | number | boolean;
 }
 
-// @public (undocumented)
-export const useFormError: () => ErrorAccessor.Error[] | undefined;
+// @public @deprecated (undocumented)
+export const useFormError: () => ErrorAccessor_2.Error[] | undefined;
+
+// @public @deprecated (undocumented)
+export const useFormFieldId: () => string | undefined;
 
 // @public (undocumented)
-export const useFormFieldId: () => string | undefined;
+export const useFormFieldState: () => FormFieldState | undefined;
 
 // @public (undocumented)
 export const useFormInputValidationHandler: (field: FieldAccessor<any>) => {

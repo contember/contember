@@ -4,9 +4,20 @@ import { CheckboxInput, Input, RadioInput } from '../ui/input'
 import { cn } from '../utils'
 import { TextareaAutosize } from '../ui/textarea'
 import { FormLabelUI } from './ui'
-import { FormCheckbox, FormCheckboxProps, FormFieldScope, FormInput, FormInputProps, FormLabel, FormRadioInput, FormRadioItemProps } from '@contember/react-form'
+import {
+	FormCheckbox,
+	FormCheckboxProps,
+	FormFieldScope,
+	FormInput,
+	FormInputProps,
+	FormLabel,
+	FormRadioInput,
+	FormRadioItemProps,
+	useFormFieldState,
+} from '@contember/react-form'
 import { FormContainer, FormContainerProps } from './container'
 import { Component, Field } from '@contember/interface'
+import { useEnumOptionsFormatter } from '../labels'
 
 
 export type InputFieldProps =
@@ -77,7 +88,7 @@ export type RadioEnumFieldProps =
 	& Omit<FormContainerProps, 'children'>
 	& {
 		required?: boolean
-		options: Record<string, ReactNode> | Array<{ value: null | string | number | boolean; label: React.ReactNode }>
+		options?: Record<string, ReactNode> | Array<{ value: null | string | number | boolean; label: React.ReactNode }>
 		orientation?: 'horizontal' | 'vertical'
 		inputProps?: Omit<React.InputHTMLAttributes<HTMLInputElement>, 'defaultValue'>
 	}
@@ -95,6 +106,13 @@ export const RadioEnumField = Component<RadioEnumFieldProps>(({ field, label, de
 type RadioEnumFieldInnerProps = Pick<RadioEnumFieldProps, 'field' | 'options' | 'orientation' | 'inputProps' | 'defaultValue' | 'isNonbearing' | 'required'>
 
 const RadioEnumFieldInner: React.FC<RadioEnumFieldInnerProps> = ({ field, inputProps, isNonbearing, required, options, orientation, defaultValue }) => {
+	const enumLabelsFormatter = useEnumOptionsFormatter()
+	const enumName = useFormFieldState()?.field?.enumName
+	options ??= enumName ? enumLabelsFormatter(enumName) : undefined
+	if (!options) {
+		throw new Error('RadioEnumField: options are required')
+	}
+
 	const normalizedOptions = React.useMemo(() => {
 		return Array.isArray(options) ? options : Object.entries(options).map(([value, label]) => ({ value, label }))
 	}, [options])

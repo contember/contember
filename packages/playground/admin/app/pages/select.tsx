@@ -90,11 +90,7 @@ export const EnumSelect = () => {
 				<div className={'space-y-4'}>
 					<ToggleRequired />
 					<InputField field="dummy" label="Dummy to trigger dirty state" />
-					<SelectEnumField field={'enumValue'} label={'Some enum'} options={{
-						a: 'Option A',
-						b: 'Option B',
-						c: 'Option C',
-					}} required={required} />
+					<SelectEnumField field={'enumValue'} label={'Some enum'} required={required} />
 					<SelectEnumField field={'enumValue'} label={'Enum with boolean, numbers and null'} options={[
 						{ value: 'a', label: 'Option A' },
 						{ value: 'b', label: 'Option B' },

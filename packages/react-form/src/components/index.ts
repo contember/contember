@@ -1,6 +1,7 @@
 export * from './FormError'
 export * from './FormCheckbox'
 export * from './FormFieldScope'
+export * from './FormFieldStateProvider'
 export * from './FormHasOneRelationScope'
 export * from './FormHasManyRelationScope'
 export * from './FormInput'

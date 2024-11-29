@@ -142,3 +142,11 @@ const DataViewInfiniteLoadTriggerContext_ = createRequiredContext<(() => void) |
 /** @internal */
 export const DataViewInfiniteLoadTriggerContext = DataViewInfiniteLoadTriggerContext_[0]
 export const useDataViewInfiniteLoadTrigger = DataViewInfiniteLoadTriggerContext_[1]
+
+
+const DataViewEnumFilterArgsContext_ = createRequiredContext<{
+	enumName: string
+}>('DataViewEnumFilterArgsContext')
+/** @internal */
+export const DataViewEnumFilterArgsContext = DataViewEnumFilterArgsContext_[0]
+export const useDataViewEnumFilterArgs = DataViewEnumFilterArgsContext_[1]

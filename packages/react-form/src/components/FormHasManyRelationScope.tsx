@@ -1,24 +1,29 @@
-import { SugaredRelativeEntityList, useEntityList } from '@contember/react-binding'
+import { HasManyRelationMarker, SugaredRelativeEntityList, useEntityList } from '@contember/react-binding'
 import * as React from 'react'
-import { useId } from 'react'
-import { FormErrorContext, FormFieldIdContext } from '../contexts'
-
-const emptyArr: [] = []
+import { FormFieldStateProvider } from './FormFieldStateProvider'
+import { useMemo } from 'react'
 
 export type FormHasManyRelationScopeProps = {
 	field: SugaredRelativeEntityList['field']
 	children: React.ReactNode
+	required?: boolean
 }
 
-export const FormHasManyRelationScope = ({ field, children }: FormHasManyRelationScopeProps) => {
-	const id = useId()
+export const FormHasManyRelationScope = ({ field, children, required }: FormHasManyRelationScopeProps) => {
 	const entityRelation = useEntityList({ field })
-	const errors = entityRelation.errors?.errors
+	const entityName = entityRelation.getParent()!.name
+	const marker = entityRelation.getMarker() as HasManyRelationMarker
+	const fieldName = marker.parameters.field
+	const fieldInfo = useMemo(() => ({ entityName, fieldName }), [entityName, fieldName])
+
 	return (
-		<FormFieldIdContext.Provider value={id}>
-			<FormErrorContext.Provider value={errors ?? emptyArr}>
-				{children}
-			</FormErrorContext.Provider>
-		</FormFieldIdContext.Provider>
+		<FormFieldStateProvider
+			errors={entityRelation.errors?.errors}
+			dirty={entityRelation.hasUnpersistedChanges}
+			required={required}
+			field={fieldInfo}
+		>
+			{children}
+		</FormFieldStateProvider>
 	)
 }

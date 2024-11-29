@@ -34,6 +34,9 @@ export class NameSchemaGenerator {
 					return [entity.name, { name: entity.name, fields, scalars }]
 				}),
 			),
+			enums: Object.fromEntries(
+				Object.entries(model.enums).map(([name, enumType]) => [name, enumType]),
+			),
 		}
 	}
 }

@@ -16,10 +16,10 @@ import {
 	VideoFileTypeProps,
 } from '@contember/react-uploader'
 import * as React from 'react'
-import { ReactNode, useId, useMemo, useState } from 'react'
+import { ReactNode, useMemo, useState } from 'react'
 import { FormContainer, FormContainerProps } from './container'
 import { Component, DisconnectEntityTrigger, EntityView, useEntity } from '@contember/interface'
-import { FormErrorContext, FormFieldIdContext } from '@contember/react-form'
+import { FormFieldStateProvider } from '@contember/react-form'
 import { UploadedAnyView, UploadedAudioView, UploadedImageView, UploadedVideoView, UploaderDropzone, UploaderItemUI } from '../upload'
 import { UploaderProgress } from '../upload/upload-progress'
 
@@ -106,35 +106,32 @@ const UploadFieldInner = Component((({ baseField, label, description, children, 
 	// 	entity,
 	// }) ?? []).flatMap(it => it.errors?.errors ?? [])
 
-	const id = useId()
 	return (
-		<FormFieldIdContext.Provider value={id}>
-			<FormErrorContext.Provider value={[]}>
-				<FormContainer description={description} label={label}>
-					<div className="flex">
+		<FormFieldStateProvider>
+			<FormContainer description={description} label={label}>
+				<div className="flex">
 
-						<Uploader baseField={baseField} fileType={fileTypeWithUploader}>
-							<UploaderBase baseField={baseField}>
-								<UploaderHasFile>
-									<UploaderProgress />
-								</UploaderHasFile>
-							</UploaderBase>
+					<Uploader baseField={baseField} fileType={fileTypeWithUploader}>
+						<UploaderBase baseField={baseField}>
+							<UploaderHasFile>
+								<UploaderProgress />
+							</UploaderHasFile>
+						</UploaderBase>
 
-							<UploaderItemUI>
-								<EntityView render={entity => {
-									entity = baseField ? entity.getEntity({ field: baseField }) : entity
-									if (entity.getField(urlField).value === null) {
-										return <UploaderDropzone inactiveOnUpload dropzonePlaceholder={dropzonePlaceholder} />
-									} else {
-										return children
-									}
-								}} />
-							</UploaderItemUI>
-						</Uploader>
-					</div>
-				</FormContainer>
-			</FormErrorContext.Provider>
-		</FormFieldIdContext.Provider>
+						<UploaderItemUI>
+							<EntityView render={entity => {
+								entity = baseField ? entity.getEntity({ field: baseField }) : entity
+								if (entity.getField(urlField).value === null) {
+									return <UploaderDropzone inactiveOnUpload dropzonePlaceholder={dropzonePlaceholder} />
+								} else {
+									return children
+								}
+							}} />
+						</UploaderItemUI>
+					</Uploader>
+				</div>
+			</FormContainer>
+		</FormFieldStateProvider>
 	)
 }), ({ fileType, children, baseField }) => {
 	return <>

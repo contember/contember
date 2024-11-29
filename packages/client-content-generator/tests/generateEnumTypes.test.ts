@@ -18,6 +18,11 @@ test('generate enums', () => {
 		export type OrderType = 
 			 | "normal"
 			 | "express"
+		export type ContemberClientEnums = {
+			OrderStatus: OrderStatus
+			orderType: OrderType
+		}
+
 		"
 	`)
 })

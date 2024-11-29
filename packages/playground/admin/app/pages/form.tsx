@@ -158,13 +158,13 @@ export const ArticleForm = Component(() => {
 			<ArticleNoteForm />
 		</DefaultRepeater>
 		<Slots.Sidebar>
-			<InputField field="internalName" label="Internal name" required />
-			<CheckboxField field="locked" label="Locked" />
-			<InputField field="publishedAt" label="Published at" />
-			<MultiSelectField field="tags" label="Tags" createNewForm={<ArticleTagForm />}>
+			<InputField field="internalName" required />
+			<CheckboxField field="locked" />
+			<InputField field="publishedAt" />
+			<MultiSelectField field="tags" createNewForm={<ArticleTagForm />}>
 				<Field field="name" />
 			</MultiSelectField>
-			<SelectField field="author" label="Author" createNewForm={<ArticleAuthorForm />}>
+			<SelectField field="author" createNewForm={<ArticleAuthorForm />}>
 				<Field field="name" />
 			</SelectField>
 
@@ -174,41 +174,40 @@ export const ArticleForm = Component(() => {
 
 export const ArticleLocaleForm = Component(() => {
 	return <>
-		<SelectField field="article" label="Article" createNewForm={<ArticleForm />}>
+		<SelectField field="article"createNewForm={<ArticleForm />}>
 			<Field field="internalName" />
 		</SelectField>
-		<InputField field="title" label="Title" required />
-		<SlugField field="slug" label="Slug" derivedFrom="title" slugify={slugify} />
-		<TextareaField field="content" label="Content" />
+		<InputField field="title" required />
+		<SlugField field="slug" derivedFrom="title" slugify={slugify} />
+		<TextareaField field="content" />
 	</>
 })
 
 export const ArticleNoteForm = Component(() => {
 	return <>
-		<SelectField field="article" label="Article" createNewForm={<ArticleForm />}>
+		<SelectField field="article" createNewForm={<ArticleForm />}>
 			<Field field="internalName" />
 		</SelectField>
-		<InputField field="text" label="Note" />
-		<TextareaField field="text" label="Note" />
+		<TextareaField field="text" />
 	</>
 })
 
 export const ArticleTagForm = Component(() => {
 	return <>
-		<MultiSelectField field="articles" label="Article" createNewForm={<ArticleForm />}>
+		<MultiSelectField field="articles" createNewForm={<ArticleForm />}>
 			<Field field="internalName" />
 		</MultiSelectField>
-		<InputField field="name" label="Name" required />
-		<SlugField field="slug" label="Slug" derivedFrom="name" slugify={slugify} />
+		<InputField field="name" required />
+		<SlugField field="slug" derivedFrom="name" slugify={slugify} />
 	</>
 })
 
 export const ArticleAuthorForm = Component(() => {
 	return <>
-		<MultiSelectField field="articles" label="Article" createNewForm={<ArticleForm />}>
+		<MultiSelectField field="articles" createNewForm={<ArticleForm />}>
 			<Field field="internalName" />
 		</MultiSelectField>
-		<InputField field="name" label="Name" required />
-		<SlugField field="slug" label="Slug" derivedFrom="name" slugify={slugify} />
+		<InputField field="name" required />
+		<SlugField field="slug" derivedFrom="name" slugify={slugify} />
 	</>
 })

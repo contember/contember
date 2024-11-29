@@ -1,9 +1,9 @@
-import type { Context } from 'react'
+import type { Context, Provider } from 'react'
 import { createContext, useContext } from 'react'
 
 const EmptyContextSymbol = Symbol('EmptyContextSymbol')
 
-export function createRequiredContext<T>(displayName: string): [Context<T>, () => T] {
+export function createRequiredContext<T>(displayName: string): [Context<T>, () => T, Provider<T>] {
 	const RequiredContext = createContext<T>(EmptyContextSymbol as T)
 	RequiredContext.displayName = displayName
 
@@ -17,5 +17,5 @@ export function createRequiredContext<T>(displayName: string): [Context<T>, () =
 		return context
 	}
 
-	return [RequiredContext, useRequiredContext]
+	return [RequiredContext, useRequiredContext, RequiredContext.Provider]
 }

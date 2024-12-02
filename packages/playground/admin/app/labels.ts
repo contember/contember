@@ -52,6 +52,10 @@ export const fieldLabels = {
 		title: 'Title',
 		locale: 'Locale',
 	},
+	GridArticle: {
+		state: 'State',
+		author: 'Author',
+	},
 } satisfies {
 	[E in keyof ContemberClientEntities]?: {
 		[F in (keyof ContemberClientEntities[E]['columns']) | (keyof ContemberClientEntities[E]['hasOne']) | (keyof ContemberClientEntities[E]['hasMany'])]?: ReactNode

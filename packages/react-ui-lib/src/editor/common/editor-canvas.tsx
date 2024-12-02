@@ -18,7 +18,7 @@ export const EditorCanvas = memo(<P extends HTMLTextAreaDivTargetProps>({
 }: EditorCanvasProps<P>) => {
 
 	return (
-		<div data-focus-ring={dataAttribute(focusRing)} className={'relative w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-within:outline-none focus-within:ring-1 focus-within:ring-ring disabled:cursor-not-allowed disabled:opacity-50'}>
+		<div data-focus-ring={dataAttribute(focusRing)} className={'relative w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-within:outline-none focus-within:ring-1 focus-within:ring-ring disabled:cursor-not-allowed disabled:opacity-50'}>
 			<Component className="outline-none" {...props} />
 			{children}
 		</div>

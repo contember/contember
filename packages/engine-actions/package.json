@@ -48,5 +48,5 @@
     "pg": "^8.5.0"
   },
   "type": "module",
-  "version": "2.0.0-alpha.29"
+  "version": "2.0.0-alpha.30"
 }

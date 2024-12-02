@@ -5,12 +5,15 @@ import { useMemo } from 'react'
 
 export type FormHasManyRelationScopeProps = {
 	field: SugaredRelativeEntityList['field']
+	orderBy?: SugaredRelativeEntityList['orderBy']
+	limit?: SugaredRelativeEntityList['limit']
+	offset?: SugaredRelativeEntityList['offset']
 	children: React.ReactNode
 	required?: boolean
 }
 
-export const FormHasManyRelationScope = ({ field, children, required }: FormHasManyRelationScopeProps) => {
-	const entityRelation = useEntityList({ field })
+export const FormHasManyRelationScope = ({ children, required, ...props }: FormHasManyRelationScopeProps) => {
+	const entityRelation = useEntityList(props)
 	const entityName = entityRelation.getParent()!.name
 	const marker = entityRelation.getMarker() as HasManyRelationMarker
 	const fieldName = marker.parameters.field

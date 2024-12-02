@@ -1424,6 +1424,8 @@ export class Schema {
     // (undocumented)
     getEntityRelation(entityName: EntityName, fieldName: FieldName): SchemaRelation;
     // (undocumented)
+    getEnumNames(): string[];
+    // (undocumented)
     getEnumValues(enumName: SchemaEnumName): string[];
 }
 

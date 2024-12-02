@@ -608,7 +608,7 @@ export const DataGridBooleanColumn: React_2.NamedExoticComponent<DataGridBoolean
 // @public (undocumented)
 export type DataGridBooleanColumnProps = {
     field: string;
-    header: ReactNode;
+    header?: ReactNode;
     children?: ReactNode;
     format?: (value: boolean | null) => ReactNode;
     filter?: ReactNode;
@@ -650,7 +650,7 @@ export interface DataGridColumnLeafProps {
     // (undocumented)
     cell: ReactNode;
     // (undocumented)
-    header: ReactNode;
+    header?: ReactNode;
     // (undocumented)
     name?: string;
 }
@@ -674,7 +674,7 @@ export const DataGridDateColumn: React_2.NamedExoticComponent<DataGridDateColumn
 // @public (undocumented)
 export type DataGridDateColumnProps = {
     field: string;
-    header: ReactNode;
+    header?: ReactNode;
     children?: ReactNode;
     format?: (value: string | null) => ReactNode;
     filter?: ReactNode;
@@ -703,7 +703,7 @@ export const DataGridDateTimeColumn: React_2.NamedExoticComponent<DataGridDateTi
 // @public (undocumented)
 export type DataGridDateTimeColumnProps = {
     field: string;
-    header: ReactNode;
+    header?: ReactNode;
     children?: ReactNode;
     format?: (value: string | null) => ReactNode;
     filter?: ReactNode;
@@ -729,7 +729,7 @@ export const DataGridEnumColumn: React_2.NamedExoticComponent<DataGridEnumColumn
 // @public (undocumented)
 export type DataGridEnumColumnProps = {
     field: string;
-    header: ReactNode;
+    header?: ReactNode;
     options?: Record<string, ReactNode>;
     children?: ReactNode;
     filter?: ReactNode;
@@ -824,7 +824,7 @@ export type DataGridHasManyColumnProps = {
     field: SugaredRelativeEntityList['field'];
     filterName?: string;
     children: ReactNode;
-    header: ReactNode;
+    header?: ReactNode;
     filter?: ReactNode;
     tooltipActions?: ReactNode;
 };
@@ -862,7 +862,7 @@ export type DataGridHasOneColumnProps = {
     field: SugaredRelativeSingleEntity['field'];
     filterName?: string;
     children: ReactNode;
-    header: ReactNode;
+    header?: ReactNode;
     filter?: ReactNode;
     tooltipActions?: ReactNode;
 };
@@ -888,7 +888,7 @@ export const DataGridIsDefinedColumn: React_2.NamedExoticComponent<DataGridIsDef
 // @public (undocumented)
 export type DataGridIsDefinedColumnProps = {
     field: string;
-    header: ReactNode;
+    header?: ReactNode;
     children?: ReactNode;
     format?: (value: boolean) => ReactNode;
     filter?: ReactNode;
@@ -932,7 +932,7 @@ export const DataGridNumberColumn: React_2.NamedExoticComponent<DataGridNumberCo
 // @public (undocumented)
 export type DataGridNumberColumnProps = {
     field: string;
-    header: ReactNode;
+    header?: ReactNode;
     children?: ReactNode;
     format?: (value: number | null) => ReactNode;
     filter?: ReactNode;
@@ -1020,7 +1020,7 @@ export const DataGridTextColumn: React_2.NamedExoticComponent<DataGridTextColumn
 // @public (undocumented)
 export type DataGridTextColumnProps = {
     field: string;
-    header: ReactNode;
+    header?: ReactNode;
     children?: ReactNode;
     format?: (value: string | null) => ReactNode;
     filter?: ReactNode;
@@ -1103,7 +1103,7 @@ export const DataGridUuidColumn: React_2.NamedExoticComponent<DataGridUuidColumn
 // @public (undocumented)
 export type DataGridUuidColumnProps = {
     field: string;
-    header: ReactNode;
+    header?: ReactNode;
     children?: ReactNode;
     format?: (value: string | null) => ReactNode;
 };

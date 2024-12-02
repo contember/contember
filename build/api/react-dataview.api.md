@@ -26,6 +26,9 @@ import { ReactElement } from 'react';
 import { ReactNode } from 'react';
 import { ReceivedEntityData } from '@contember/react-binding';
 import { RefAttributes } from 'react';
+import { SchemaColumn } from '@contember/react-binding';
+import { SchemaEntity } from '@contember/react-binding';
+import { SchemaRelation } from '@contember/react-binding';
 import { Serializable } from '@contember/react-utils';
 import { SetStateAction } from 'react';
 import { StateStorageOrName } from '@contember/react-utils';
@@ -1212,6 +1215,24 @@ export const useDataViewSortingMethods: () => DataViewSortingMethods;
 
 // @public (undocumented)
 export const useDataViewSortingState: () => DataViewSortingState;
+
+// @public (undocumented)
+export const useDataViewTargetFieldSchema: (field: SugaredRelativeSingleField["field"]) => {
+    field: SchemaColumn;
+    entity: SchemaEntity;
+};
+
+// @public (undocumented)
+export const useDataViewTargetHasManySchema: (field: SugaredRelativeEntityList["field"]) => {
+    field: SchemaRelation;
+    entity: SchemaEntity;
+};
+
+// @public (undocumented)
+export const useDataViewTargetHasOneSchema: (field: SugaredRelativeSingleEntity["field"]) => {
+    field: SchemaRelation;
+    entity: SchemaEntity;
+};
 
 // @public (undocumented)
 export const useDataViewTextFilterInput: ({ name, debounceMs }: {

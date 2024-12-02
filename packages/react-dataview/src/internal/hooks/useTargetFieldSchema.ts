@@ -9,7 +9,7 @@ export const useDataViewTargetFieldSchemaInternal = (fields: string[]) => {
 	return useMemo(() => {
 		const schema = environment.getSchema()
 		let entity = schema.getEntity(entityName)
-		for (let i = 0; i < fields.length - 2; i++) {
+		for (let i = 0; i < fields.length - 1; i++) {
 			const targetField = schema.getEntityRelation(entity.name, fields[i])
 			entity = schema.getEntity(targetField.targetEntity)
 		}

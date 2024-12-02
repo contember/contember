@@ -9,6 +9,7 @@ import { Button } from '../../ui/button'
 import { dict } from '../../dict'
 import { Component } from '@contember/interface'
 import { DataGridFilterMobileHiding } from './mobile'
+import { DataViewFieldLabel } from '../labels'
 
 
 type DataGridBooleanFilterProps =
@@ -21,7 +22,7 @@ export const DataGridBooleanFilter = Component(({ label, ...props }: DataGridBoo
 	<DataViewBooleanFilter {...props}>
 		<DataGridFilterMobileHiding>
 			<DataGridSingleFilterUI>
-				<DataGridBooleanFilterSelect label={label} />
+				<DataGridBooleanFilterSelect label={label ?? <DataViewFieldLabel field={props.field} />} />
 				<DataGridBooleanFilterList />
 			</DataGridSingleFilterUI>
 		</DataGridFilterMobileHiding>

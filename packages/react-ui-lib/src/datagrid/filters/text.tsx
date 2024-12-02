@@ -24,6 +24,7 @@ import { DataGridNullFilter } from './common'
 import { dict } from '../../dict'
 import { Component } from '@contember/interface'
 import { DataGridFilterMobileHiding } from './mobile'
+import { DataViewFieldLabel } from '../labels'
 
 
 export type DataGridTextFilterProps =
@@ -35,7 +36,7 @@ export type DataGridTextFilterProps =
 export const DataGridTextFilter = Component(({ label, ...props }: DataGridTextFilterProps) => (
 	<DataViewTextFilter {...props}>
 		<DataGridFilterMobileHiding>
-			<DataGridTextFilterInner label={label} />
+			<DataGridTextFilterInner label={label ?? <DataViewFieldLabel field={props.field} />} />
 		</DataGridFilterMobileHiding>
 	</DataViewTextFilter>
 ))

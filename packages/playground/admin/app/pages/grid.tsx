@@ -133,7 +133,7 @@ const CustomGridColumn = Component(() => {
 
 		<DataGridTextColumn header="Title" field="title" />
 
-		<DataGridEnumColumn header="State" field="state" />
+		<DataGridEnumColumn field="state" />
 
 		<DataGridDateColumn header="Published at" field="publishedAt" />
 
@@ -177,7 +177,7 @@ const CustomGridFilters = Component(() => {
 	return (
 		<>
 			<DataGridQueryFilter />
-			<DataGridEnumFilter field={'state'} label="State" />
+			<DataGridEnumFilter field={'state'} />
 			<DataGridIsDefinedFilter field={'publishedAt'} label="Is published" name="publishedAt__defined" />
 			<DataGridDateFilter
 				field={'publishedAt'}

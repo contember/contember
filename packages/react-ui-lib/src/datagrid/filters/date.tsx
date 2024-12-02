@@ -12,6 +12,7 @@ import { DataGridFilterMobileHiding } from './mobile'
 import { Button } from '../../ui/button'
 import { Label } from '../../ui/label'
 import { XIcon } from 'lucide-react'
+import { DataViewFieldLabel } from '../labels'
 
 export type DataGridDateFilterProps =
 	& Omit<DataViewDateFilterProps, 'children'>
@@ -24,7 +25,7 @@ export const DataGridDateFilter = Component(({ label, ranges, ...props }: DataGr
 	<DataViewDateFilter {...props}>
 		<DataGridFilterMobileHiding>
 			<DataGridSingleFilterUI>
-				<DataGridDateFilterSelect label={label} ranges={ranges} />
+				<DataGridDateFilterSelect label={label ?? <DataViewFieldLabel field={props.field} />} ranges={ranges} />
 				<DataGridDateFilterList />
 			</DataGridSingleFilterUI>
 		</DataGridFilterMobileHiding>

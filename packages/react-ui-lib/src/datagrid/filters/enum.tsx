@@ -25,6 +25,7 @@ import { DataGridNullFilter } from './common'
 import { dict } from '../../dict'
 import { DataGridFilterMobileHiding } from './mobile'
 import { useEnumOptionsFormatter } from '../../labels'
+import { DataViewFieldLabel } from '../labels'
 
 export type DataGridEnumFilterProps =
 	& Omit<DataViewEnumFilterProps, 'children'>
@@ -38,7 +39,7 @@ export const DataGridEnumFilter = Component(({ options, label, ...props }: DataG
 		<DataViewEnumFilter {...props}>
 			<DataGridFilterMobileHiding>
 				<DataGridSingleFilterUI>
-					<DataGridEnumFilterSelect options={options} label={label} />
+					<DataGridEnumFilterSelect options={options} label={label ?? <DataViewFieldLabel field={props.field} />} />
 					<DataGridEnumFilterList options={options} />
 				</DataGridSingleFilterUI>
 			</DataGridFilterMobileHiding>

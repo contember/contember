@@ -28,6 +28,7 @@ import {
 } from './filters'
 import { CheckIcon, XIcon } from 'lucide-react'
 import { DataGridIsDefinedFilterControls } from './filters/defined'
+import { DataViewFieldLabel, DataViewHasManyLabel, DataViewHasOneLabel } from './labels'
 
 export const DataGridActionColumn = Component<{ children: ReactNode }>(({ children }) => (
 	<DataGridColumnLeaf
@@ -39,7 +40,7 @@ export const DataGridActionColumn = Component<{ children: ReactNode }>(({ childr
 
 export type DataGridTextColumnProps = {
 	field: string
-	header: ReactNode
+	header?: ReactNode
 	children?: ReactNode
 	format?: (value: string | null) => ReactNode
 	filter?: ReactNode
@@ -47,7 +48,7 @@ export type DataGridTextColumnProps = {
 
 export const DataGridTextColumn = Component<DataGridTextColumnProps>(({ field, header, children, format, filter }) => (
 	<DataGridColumn
-		header={header}
+		header={header ?? <DataViewFieldLabel field={field}/>}
 		sortingField={field}
 		name={field}
 		children={children ?? <Field field={field} format={format} />}
@@ -60,7 +61,7 @@ export const DataGridTextColumn = Component<DataGridTextColumnProps>(({ field, h
 
 export type DataGridBooleanColumnProps = {
 	field: string
-	header: ReactNode
+	header?: ReactNode
 	children?: ReactNode
 	format?: (value: boolean | null) => ReactNode
 	filter?: ReactNode
@@ -68,7 +69,7 @@ export type DataGridBooleanColumnProps = {
 
 export const DataGridBooleanColumn = Component<DataGridBooleanColumnProps>(({ field, header, children, format, filter }) => (
 	<DataGridColumn
-		header={header}
+		header={header ?? <DataViewFieldLabel field={field} />}
 		sortingField={field}
 		name={field}
 		children={children ?? <Field field={field} format={format ?? formatBoolean} />}
@@ -83,7 +84,7 @@ export const DataGridBooleanColumn = Component<DataGridBooleanColumnProps>(({ fi
 
 export type DataGridNumberColumnProps = {
 	field: string
-	header: ReactNode
+	header?: ReactNode
 	children?: ReactNode
 	format?: (value: number | null) => ReactNode
 	filter?: ReactNode
@@ -91,7 +92,7 @@ export type DataGridNumberColumnProps = {
 
 export const DataGridNumberColumn = Component<DataGridNumberColumnProps>(({ field, header, children, format, filter }) => (
 	<DataGridColumn
-		header={header}
+		header={header ?? <DataViewFieldLabel field={field} />}
 		sortingField={field}
 		name={field}
 		children={children ?? <Field field={field} format={format ?? formatNumber} />}
@@ -106,7 +107,7 @@ export const DataGridNumberColumn = Component<DataGridNumberColumnProps>(({ fiel
 
 export type DataGridDateColumnProps = {
 	field: string
-	header: ReactNode
+	header?: ReactNode
 	children?: ReactNode
 	format?: (value: string | null) => ReactNode
 	filter?: ReactNode
@@ -114,7 +115,7 @@ export type DataGridDateColumnProps = {
 
 export const DataGridDateColumn = Component<DataGridDateColumnProps>(({ field, header, children, format, filter }) => (
 	<DataGridColumn
-		header={header}
+		header={header ?? <DataViewFieldLabel field={field} />}
 		sortingField={field}
 		name={field}
 		children={children ?? <Field field={field} format={format ?? formatDate} />}
@@ -130,7 +131,7 @@ export const DataGridDateColumn = Component<DataGridDateColumnProps>(({ field, h
 
 export type DataGridDateTimeColumnProps = {
 	field: string
-	header: ReactNode
+	header?: ReactNode
 	children?: ReactNode
 	format?: (value: string | null) => ReactNode
 	filter?: ReactNode
@@ -138,7 +139,7 @@ export type DataGridDateTimeColumnProps = {
 
 export const DataGridDateTimeColumn = Component<DataGridDateTimeColumnProps>(({ field, header, children, format, filter }) => (
 	<DataGridColumn
-		header={header}
+		header={header ?? <DataViewFieldLabel field={field} />}
 		sortingField={field}
 		name={field}
 		children={children ?? <Field field={field} format={format ?? formatDateTime} />}
@@ -154,7 +155,7 @@ export const DataGridDateTimeColumn = Component<DataGridDateTimeColumnProps>(({ 
 
 export type DataGridEnumColumnProps = {
 	field: string
-	header: ReactNode
+	header?: ReactNode
 	options?: Record<string, ReactNode>
 	children?: ReactNode
 	filter?: ReactNode
@@ -163,7 +164,7 @@ export type DataGridEnumColumnProps = {
 
 export const DataGridEnumColumn = Component<DataGridEnumColumnProps>(({ field, header, options, children, tooltipActions, filter }) => (<>
 	<DataGridColumn
-		header={header}
+		header={header ?? <DataViewFieldLabel field={field} />}
 		sortingField={field}
 		name={field}
 		children={children ?? <DataGridEnumCell field={field} options={options} tooltipActions={tooltipActions} />}
@@ -179,7 +180,7 @@ export const DataGridEnumColumn = Component<DataGridEnumColumnProps>(({ field, h
 
 export type DataGridIsDefinedColumnProps = {
 	field: string
-	header: ReactNode
+	header?: ReactNode
 	children?: ReactNode
 	format?: (value: boolean) => ReactNode
 	filter?: ReactNode
@@ -188,7 +189,7 @@ export type DataGridIsDefinedColumnProps = {
 
 export const DataGridIsDefinedColumn = Component<DataGridIsDefinedColumnProps>(({ field, header, children, format, filter, filterName }) => (
 	<DataGridColumn
-		header={header}
+		header={header ?? <DataViewFieldLabel field={field} />}
 		name={field}
 		children={children ?? <Field field={field} format={it => {
 			if (format) {
@@ -206,7 +207,7 @@ export const DataGridIsDefinedColumn = Component<DataGridIsDefinedColumnProps>((
 
 export type DataGridUuidColumnProps = {
 	field: string
-	header: ReactNode
+	header?: ReactNode
 	children?: ReactNode
 	format?: (value: string | null) => ReactNode
 }
@@ -214,7 +215,7 @@ export type DataGridUuidColumnProps = {
 
 export const DataGridUuidColumn = Component<DataGridUuidColumnProps>(({ field, header, children, format }) => (
 	<DataGridColumn
-		header={header}
+		header={header ?? <DataViewFieldLabel field={field} />}
 		sortingField={field}
 		name={field}
 		children={children ?? <Field field={field} format={format} />}
@@ -225,14 +226,14 @@ export type DataGridHasOneColumnProps = {
 	field: SugaredRelativeSingleEntity['field']
 	filterName?: string
 	children: ReactNode
-	header: ReactNode
+	header?: ReactNode
 	filter?: ReactNode
 	tooltipActions?: ReactNode
 }
 
 export const DataGridHasOneColumn = Component<DataGridHasOneColumnProps>(({ field, header, children, filter, filterName, tooltipActions }) => (
 	<DataGridColumn
-		header={header}
+		header={header ?? <DataViewHasOneLabel field={field} />}
 		name={typeof field === 'string' ? field : undefined}
 		children={<DataGridHasOneCell field={field} filterName={filterName} tooltipActions={tooltipActions}>{children}</DataGridHasOneCell>}
 		filterName={filterName ?? (typeof field === 'string' ? field : undefined)}
@@ -255,14 +256,14 @@ export type DataGridHasManyColumnProps = {
 	field: SugaredRelativeEntityList['field']
 	filterName?: string
 	children: ReactNode
-	header: ReactNode
+	header?: ReactNode
 	filter?: ReactNode
 	tooltipActions?: ReactNode
 }
 
 export const DataGridHasManyColumn = Component<DataGridHasManyColumnProps>(({ field, header, children, filter, filterName, tooltipActions }) => (
 	<DataGridColumn
-		header={header}
+		header={header ?? <DataViewHasManyLabel field={field} />}
 		name={typeof field === 'string' ? field : undefined}
 		children={<DataGridHasManyCell field={field} filterName={filterName} tooltipActions={tooltipActions}>{children}</DataGridHasManyCell>}
 		filterName={filterName ?? (typeof field === 'string' ? field : undefined)}
@@ -317,7 +318,7 @@ export const DataGridColumn = Component<DataGridColumnProps>(({ children, header
 })
 
 export interface DataGridColumnLeafProps {
-	header: ReactNode
+	header?: ReactNode
 	cell: ReactNode
 	name?: string
 }

@@ -2,13 +2,13 @@ import * as React from 'react'
 import { ReactNode } from 'react'
 import { DataViewBooleanFilterProps, DataViewIsDefinedFilter, DataViewNullFilterTrigger } from '@contember/react-dataview'
 import { Popover, PopoverContent, PopoverTrigger } from '../../ui/popover'
-import { DataGridActiveFilterUI, DataGridFilterSelectTriggerUI, DataGridSingleFilterUI } from '../ui'
+import { DataGridFilterSelectTriggerUI, DataGridSingleFilterUI } from '../ui'
 import { dict } from '../../dict'
 import { Component } from '@contember/interface'
 import { DataGridFilterMobileHiding } from './mobile'
 import { CheckIcon, XIcon } from 'lucide-react'
 import { Button } from '../../ui/button'
-import { cn } from '../../utils'
+import { DataViewFieldLabel } from '../labels'
 
 
 type DataGridIsDefinedFilterProps =
@@ -21,7 +21,7 @@ export const DataGridIsDefinedFilter = Component(({ label, ...props }: DataGridI
 	<DataViewIsDefinedFilter {...props}>
 		<DataGridFilterMobileHiding>
 			<DataGridSingleFilterUI>
-				<DataGridIsDefinedFilterSelect label={label} />
+				<DataGridIsDefinedFilterSelect label={label ?? <DataViewFieldLabel field={props.field} />} />
 				<DataGridIsDefinedFilterList />
 			</DataGridSingleFilterUI>
 		</DataGridFilterMobileHiding>

@@ -9,18 +9,27 @@ import {
 	DataViewNullFilterTrigger,
 	DataViewRelationFilterList,
 	DataViewRelationFilterOptions,
-	DataViewRelationFilterTrigger, DataViewUnionFilterFields,
+	DataViewRelationFilterTrigger,
+	DataViewUnionFilterFields,
 	useDataViewFilterName,
 	useDataViewRelationFilterFactory,
 	UseDataViewRelationFilterResult,
 } from '@contember/react-dataview'
 import { Component, EntityId, StaticRender, useEntity } from '@contember/interface'
 import { Popover, PopoverTrigger } from '../../ui/popover'
-import { DataGridActiveFilterUI, DataGridExcludeActionButtonUI, DataGridFilterActionButtonUI, DataGridFilterSelectItemUI, DataGridFilterSelectTriggerUI, DataGridSingleFilterUI } from '../ui'
+import {
+	DataGridActiveFilterUI,
+	DataGridExcludeActionButtonUI,
+	DataGridFilterActionButtonUI,
+	DataGridFilterSelectItemUI,
+	DataGridFilterSelectTriggerUI,
+	DataGridSingleFilterUI,
+} from '../ui'
 import { DataGridNullFilter } from './common'
 import { SelectDefaultFilter, SelectListInner, SelectPopoverContent } from '../../select'
 import { dict } from '../../dict'
 import { DataGridFilterMobileHiding } from './mobile'
+import { DataViewHasManyLabel, DataViewHasOneLabel } from '../labels'
 
 
 type DataGridRelationFilterInnerProps = {
@@ -35,7 +44,7 @@ export type DataGridHasOneFilterProps =
 export const DataGridHasOneFilter = Component(({ label, children, ...props }: DataGridHasOneFilterProps) => (
 	<DataViewHasOneFilter {...props}>
 		<DataGridFilterMobileHiding>
-			<DataGridRelationFilterInner label={label}>
+			<DataGridRelationFilterInner label={label ?? <DataViewHasOneLabel field={props.field} />}>
 				{children}
 			</DataGridRelationFilterInner>
 		</DataGridFilterMobileHiding>
@@ -50,7 +59,7 @@ export type DataGridHasManyFilterProps =
 export const DataGridHasManyFilter = Component(({ label, children, ...props }: DataGridHasManyFilterProps) => (
 	<DataViewHasManyFilter {...props} >
 		<DataGridFilterMobileHiding>
-			<DataGridRelationFilterInner label={label}>
+			<DataGridRelationFilterInner label={label ?? <DataViewHasManyLabel field={props.field} />}>
 				{children}
 			</DataGridRelationFilterInner>
 		</DataGridFilterMobileHiding>

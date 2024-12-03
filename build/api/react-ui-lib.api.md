@@ -72,6 +72,7 @@ import { RepeaterAddItemIndex } from '@contember/react-repeater';
 import { RepeaterProps } from '@contember/react-repeater';
 import { RoleCondition } from '@contember/interface';
 import { RoutingLinkTarget } from '@contember/interface';
+import { SchemaColumn } from '@contember/interface';
 import * as ScrollAreaPrimitive from '@radix-ui/react-scroll-area';
 import * as SelectPrimitive from '@radix-ui/react-select';
 import { SetStateAction } from 'react';
@@ -1463,6 +1464,9 @@ export const formatDuration: (duration: number) => string;
 export const formatImageResizeUrl: (src: string, options?: ImageResizeOptions) => string;
 
 // @public (undocumented)
+export const formatJson: (value: any) => string;
+
+// @public (undocumented)
 export const formatNumber: (value: number | null) => string | null;
 
 // @public (undocumented)
@@ -1529,6 +1533,9 @@ asChild?: boolean;
 children?: React.ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLDivElement>>;
+
+// @public (undocumented)
+export const getFormatter: (schema: SchemaColumn) => ((date: string | null) => string | null) | ((value: boolean | null) => string | null) | ((value: number | null) => string | null) | ((value: any) => any);
 
 // @public (undocumented)
 export interface HTMLTextAreaDivTargetProps extends TextareaHTMLAttributes<HTMLDivElement> {

@@ -90,11 +90,14 @@ export type FormFieldStateProvider = Partial<FormFieldState> & {
 export const FormFieldStateProvider: ({ children, required, errors, dirty, htmlId, field }: FormFieldStateProvider) => JSX_2.Element;
 
 // @public (undocumented)
-export const FormHasManyRelationScope: ({ field, children, required }: FormHasManyRelationScopeProps) => JSX_2.Element;
+export const FormHasManyRelationScope: ({ children, required, ...props }: FormHasManyRelationScopeProps) => JSX_2.Element;
 
 // @public (undocumented)
 export type FormHasManyRelationScopeProps = {
     field: SugaredRelativeEntityList['field'];
+    orderBy?: SugaredRelativeEntityList['orderBy'];
+    limit?: SugaredRelativeEntityList['limit'];
+    offset?: SugaredRelativeEntityList['offset'];
     children: React_2.ReactNode;
     required?: boolean;
 };

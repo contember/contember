@@ -10,19 +10,32 @@ import {
 	SelectCreateNewTrigger,
 	SelectDefaultPlaceholderUI,
 	SelectInputActionsUI,
-	SelectInputUI, SelectInputWrapperUI,
-	SelectListItemUI,
+	SelectInputUI,
+	SelectInputWrapperUI,
 	SelectPopoverContent,
 } from './ui'
 import { Popover, PopoverTrigger } from '../ui/popover'
 import { ChevronDownIcon } from 'lucide-react'
-import { SelectListInner } from './list'
-import { RepeaterSortable, RepeaterSortableDragOverlay, RepeaterSortableDropIndicator, RepeaterSortableEachItem, RepeaterSortableItemActivator, RepeaterSortableItemNode } from '@contember/react-repeater-dnd-kit'
-import { Component, HasOne, SugaredQualifiedEntityList, SugaredRelativeEntityList, SugaredRelativeSingleEntity, SugaredRelativeSingleField } from '@contember/interface'
-import { SelectDataView, SelectItemTrigger, SelectOption, SelectPlaceholder, SortableMultiSelect } from '@contember/react-select'
+import { DefaultSelectDataView } from './list'
+import {
+	RepeaterSortable,
+	RepeaterSortableDragOverlay,
+	RepeaterSortableDropIndicator,
+	RepeaterSortableEachItem,
+	RepeaterSortableItemActivator,
+	RepeaterSortableItemNode,
+} from '@contember/react-repeater-dnd-kit'
+import {
+	Component,
+	HasOne,
+	SugaredQualifiedEntityList,
+	SugaredRelativeEntityList,
+	SugaredRelativeSingleEntity,
+	SugaredRelativeSingleField,
+} from '@contember/interface'
+import { SelectItemTrigger, SelectPlaceholder, SortableMultiSelect } from '@contember/react-select'
 import { CreateEntityDialog } from './create-new'
 import { DataViewSortingDirections, DataViewUnionFilterFields } from '@contember/react-dataview'
-import { SelectDefaultFilter } from './filter'
 import { useFormFieldId } from '@contember/react-form'
 
 const MultiSortableSelectDropIndicator = ({ position }: { position: 'before' | 'after' }) => (
@@ -99,17 +112,9 @@ export const SortableMultiSelectInput = Component<SortableMultiSelectInputProps>
 					</SelectInputWrapperUI>
 
 					<SelectPopoverContent>
-						<SelectDataView initialSorting={initialSorting} queryField={queryField}>
-							<SelectListInner filterToolbar={<SelectDefaultFilter />}>
-								<SelectOption>
-									<SelectItemTrigger>
-										<SelectListItemUI>
-											{children}
-										</SelectListItemUI>
-									</SelectItemTrigger>
-								</SelectOption>
-							</SelectListInner>
-						</SelectDataView>
+						<DefaultSelectDataView initialSorting={initialSorting} queryField={queryField}>
+							{children}
+						</DefaultSelectDataView>
 					</SelectPopoverContent>
 				</Popover>
 				{createNewForm && (

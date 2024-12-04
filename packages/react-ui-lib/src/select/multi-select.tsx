@@ -9,15 +9,13 @@ import {
 	SelectInputActionsUI,
 	SelectInputUI,
 	SelectInputWrapperUI,
-	SelectListItemUI,
 	SelectPopoverContent,
 } from './ui'
 import { ChevronDownIcon } from 'lucide-react'
 import { Popover, PopoverTrigger } from '../ui/popover'
 import { Component, RecursionTerminatorPortal, SugaredQualifiedEntityList, SugaredRelativeEntityList } from '@contember/interface'
-import { SelectDefaultFilter } from './filter'
-import { SelectListInner } from './list'
-import { MultiSelect, SelectDataView, SelectEachValue, SelectItemTrigger, SelectOption, SelectPlaceholder } from '@contember/react-select'
+import { DefaultSelectDataView } from './list'
+import { MultiSelect, SelectEachValue, SelectItemTrigger, SelectPlaceholder } from '@contember/react-select'
 import { CreateEntityDialog } from './create-new'
 import { DataViewSortingDirections, DataViewUnionFilterFields } from '@contember/react-dataview'
 import { useFormFieldId } from '@contember/react-form'
@@ -35,6 +33,7 @@ export type MultiSelectInputProps =
 
 export const MultiSelectInput = Component<MultiSelectInputProps>(({ field, queryField, options, children, placeholder, createNewForm, initialSorting }) => {
 	const id = useFormFieldId()
+
 	return (
 		<MultiSelect field={field} options={options}>
 			<div className="flex gap-1 items-center">
@@ -65,17 +64,9 @@ export const MultiSelectInput = Component<MultiSelectInputProps>(({ field, query
 
 					</SelectInputWrapperUI>
 					<SelectPopoverContent>
-						<SelectDataView initialSorting={initialSorting} queryField={queryField}>
-							<SelectListInner filterToolbar={<SelectDefaultFilter />}>
-								<SelectOption>
-									<SelectItemTrigger>
-										<SelectListItemUI>
-											{children}
-										</SelectListItemUI>
-									</SelectItemTrigger>
-								</SelectOption>
-							</SelectListInner>
-						</SelectDataView>
+						<DefaultSelectDataView initialSorting={initialSorting} queryField={queryField}>
+							{children}
+						</DefaultSelectDataView>
 					</SelectPopoverContent>
 				</Popover>
 				{createNewForm && (

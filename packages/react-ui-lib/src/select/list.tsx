@@ -11,12 +11,44 @@ import {
 	DataViewInfiniteLoadTrigger,
 	DataViewKeyboardEventHandler,
 	DataViewLoaderState,
+	DataViewSortingDirections,
+	DataViewUnionFilterFields,
 } from '@contember/react-dataview'
 import { useOnHighlight } from './highlight'
 import { Component } from '@contember/interface'
 import { Button } from '../ui/button'
 import { ArrowBigDownDash } from 'lucide-react'
+import { SelectDefaultFilter } from './filter'
+import { SelectListItemUI } from './ui'
+import { SelectDataView, SelectItemTrigger, SelectOption } from '@contember/react-select'
 
+export interface DefaultSelectDataViewProps {
+	queryField?: DataViewUnionFilterFields
+	initialSorting?: DataViewSortingDirections
+	children: ReactNode
+}
+
+export const DefaultSelectDataView = Component< DefaultSelectDataViewProps>(({ children, initialSorting, queryField }) => {
+	return <>
+		<SelectDataView initialSorting={initialSorting} queryField={queryField}>
+			<DefaultSelectDataViewRenderer>
+				{children}
+			</DefaultSelectDataViewRenderer>
+		</SelectDataView>
+	</>
+})
+
+const DefaultSelectDataViewRenderer = Component<{children: ReactNode}>(({ children }) => <>
+	<SelectListInner filterToolbar={<SelectDefaultFilter />}>
+		<SelectOption>
+			<SelectItemTrigger>
+				<SelectListItemUI>
+					{children}
+				</SelectListItemUI>
+			</SelectItemTrigger>
+		</SelectOption>
+	</SelectListInner>
+</>)
 
 export type SelectListProps =
 	& {

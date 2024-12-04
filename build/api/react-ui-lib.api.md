@@ -1162,6 +1162,19 @@ export type DefaultRepeaterProps = {
 } & RepeaterProps;
 
 // @public (undocumented)
+export const DefaultSelectDataView: React_2.NamedExoticComponent<DefaultSelectDataViewProps>;
+
+// @public (undocumented)
+export interface DefaultSelectDataViewProps {
+    // (undocumented)
+    children: ReactNode;
+    // (undocumented)
+    initialSorting?: DataViewSortingDirections;
+    // (undocumented)
+    queryField?: DataViewUnionFilterFields;
+}
+
+// @public (undocumented)
 export const DeleteEntityDialog: FC<DeleteEntityDialogProps>;
 
 // @public (undocumented)
@@ -2081,7 +2094,7 @@ position?: "popper" | null | undefined;
 export const SelectCreateNewTrigger: React_2.ForwardRefExoticComponent<React_2.RefAttributes<HTMLButtonElement>>;
 
 // @public (undocumented)
-export const SelectDefaultFilter: () => JSX_2.Element;
+export const SelectDefaultFilter: React_2.MemoExoticComponent<() => JSX_2.Element>;
 
 // @public (undocumented)
 export const SelectDefaultPlaceholderUI: () => JSX_2.Element;

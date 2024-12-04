@@ -43,7 +43,8 @@ export const IdentityLoader = ({ children }: {
 
 const Redirect = () => {
 	useEffect(() => {
-		window.location.href = '/'
+		const backlink = window.location.pathname + window.location.search
+		window.location.href = `/?backlink=${encodeURIComponent(backlink)}` // redirect to login with backlink
 	})
 	return null
 }

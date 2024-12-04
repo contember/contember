@@ -23,7 +23,8 @@ export interface BindingStateRendererProps {
 function BindingStateRenderer({ accessorTreeState, children }: BindingStateRendererProps) {
 	useEffect(() => {
 		if (accessorTreeState.name === 'error' && accessorTreeState.error.type === 'unauthorized') {
-			window.location.href = '/' // redirect to login
+			const backlink = window.location.pathname + window.location.search
+			window.location.href = `/?backlink=${encodeURIComponent(backlink)}` // redirect to login with backlink
 		}
 	}, [accessorTreeState])
 

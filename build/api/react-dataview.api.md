@@ -1061,7 +1061,7 @@ export interface UseDataViewDateFilterInputResult {
 }
 
 // @public (undocumented)
-export const useDataViewDisplayedState: <T extends DataViewState>() => T;
+export const useDataViewDisplayedState: <T extends DataViewState>() => T | undefined;
 
 // @public (undocumented)
 export const useDataViewElements: ({ selection }?: {

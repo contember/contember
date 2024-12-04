@@ -5,62 +5,48 @@ import {
 	DataViewInfiniteLoadTriggerContext,
 	useDataViewDisplayedState,
 	useDataViewEntityListAccessor,
-	useDataViewFilteringState,
 	useDataViewPagingInfo,
 	useDataViewPagingMethods,
-	useDataViewPagingState,
-	useDataViewSortingState,
 } from '../../contexts'
-import { Component, EntityListAccessor } from '@contember/react-binding'
+import { Component, EntityListAccessor, EntityListSubTreeMarker, QualifiedEntityList } from '@contember/react-binding'
+import deepEqual from 'fast-deep-equal'
 
 export const DataViewInfiniteLoadProvider = Component(({ children }: {
 	children: ReactNode
 }) => {
 	const entityList = useDataViewEntityListAccessor()
-	const displayedState = useDataViewDisplayedState()
-	const filteringState = useDataViewFilteringState()
-	const sortingState = useDataViewSortingState()
-	const pagingState = useDataViewPagingState()
+	const displayedPage = useDataViewDisplayedState()?.paging.pageIndex
 	const { goToPage } = useDataViewPagingMethods()
 	const { pagesCount } = useDataViewPagingInfo()
 
 	const [accessors, setAccessors] = useState<EntityListAccessor[]>([])
 
-	const isInfiniteScroll = useRef(false)
-	const stateChanged = useRef(false)
+	const expectedInfiniteScrollPage = useRef<number | null>(null)
+	const previousEntityListParams = useRef<QualifiedEntityList | null>(null)
+
 
 	useEffect(() => {
-		stateChanged.current = true
-	}, [filteringState])
-
-	useEffect(() => {
-		stateChanged.current = true
-	}, [sortingState])
-
-	useEffect(() => {
-		if (isInfiniteScroll.current) {
-			isInfiniteScroll.current = false
+		if (!entityList) {
 			return
 		}
-		stateChanged.current = true
-	}, [pagingState])
+		const entityListParams = (entityList.getMarker() as EntityListSubTreeMarker).parameters as QualifiedEntityList
+		const isInfiniteLoad = displayedPage === expectedInfiniteScrollPage.current
+			&& previousEntityListParams.current
+			&& deepEqual(previousEntityListParams.current.filter, entityListParams.filter)
+			&& deepEqual(previousEntityListParams.current.orderBy, entityListParams.orderBy)
+			&& previousEntityListParams.current.limit === entityListParams.limit
+			&& previousEntityListParams.current.offset === ((entityListParams.offset ?? 0) - (entityListParams.limit ?? 0))
 
-	useEffect(() => {
-		if (entityList) {
-			if (stateChanged.current) {
-				setAccessors([entityList])
-			} else {
-				setAccessors(it => [...it, entityList])
-			}
-			stateChanged.current = false
-		}
-	}, [entityList])
+		setAccessors(it => isInfiniteLoad ? [...it, entityList] : [entityList])
+		expectedInfiniteScrollPage.current = null
+		previousEntityListParams.current = entityListParams
+	}, [entityList, displayedPage])
 
 
-	const nextPage = displayedState ? displayedState.paging.pageIndex + 1 : 0
+	const nextPage = (displayedPage ?? -1) + 1
 
 	const loadMore = useCallback(() => {
-		isInfiniteScroll.current = true
+		expectedInfiniteScrollPage.current = nextPage
 		goToPage(nextPage)
 	}, [goToPage, nextPage])
 

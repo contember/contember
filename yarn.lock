@@ -921,6 +921,20 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@contember/react-client-content@workspace:packages/react-client-content":
+  version: 0.0.0-use.local
+  resolution: "@contember/react-client-content@workspace:packages/react-client-content"
+  dependencies:
+    "@contember/client-content": "workspace:*"
+    "@contember/react-client": "workspace:*"
+    react: ^18.3.1
+    react-dom: ^18.3.1
+  peerDependencies:
+    react: ^18 || ^19
+    react-dom: ^18 || ^19
+  languageName: unknown
+  linkType: soft
+
 "@contember/react-client-tenant@workspace:*, @contember/react-client-tenant@workspace:packages/react-client-tenant":
   version: 0.0.0-use.local
   resolution: "@contember/react-client-tenant@workspace:packages/react-client-tenant"

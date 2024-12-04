@@ -1,3 +1,4 @@
+import { SchemaColumn } from '@contember/interface'
 import { dict } from '../dict'
 
 export const formatDate = (date: string | null) => {
@@ -57,4 +58,26 @@ export const formatDuration = (duration: number) => {
 	const minutes = Math.floor(duration / 60)
 	const seconds = duration % 60
 	return `${minutes}:${seconds.toString().padStart(2, '0')}`
+}
+
+export const formatJson = (value: any) => {
+	return JSON.stringify(value, null, 2)
+}
+
+export const getFormatter = (schema: SchemaColumn) => {
+	switch (schema.type) {
+		case 'Date':
+			return formatDate
+		case 'DateTime':
+			return formatDateTime
+		case 'Bool':
+			return formatBoolean
+		case 'Integer':
+		case 'Float':
+			return formatNumber
+		case 'Json':
+			return formatJson
+		default:
+			return (value: any) => value
+	}
 }

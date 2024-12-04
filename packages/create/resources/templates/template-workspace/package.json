@@ -1,11 +1,11 @@
 {
   "private": true,
   "scripts": {
-    "contember": "docker-compose run --rm contember-cli",
+    "contember": "docker compose run --rm contember-cli",
     "start": "yarn run contember:start-engine && yarn run client:generate && yarn contember:start-admin",
     "build": "yarn run ts:build && yarn run contember:build-admin \"$0\" && yarn run contember:build-api",
-    "deploy": "yarn run build \"$0\" && docker-compose run --no-deps contember-cli deploy \"$@\" --root",
-    "contember:start-engine": "docker-compose up --detach && yarn run contember migrations:execute --yes",
+    "deploy": "yarn run build \"$0\" && docker compose run --no-deps contember-cli deploy \"$@\" --root",
+    "contember:start-engine": "docker compose up --detach && yarn run contember migrations:execute --yes",
     "contember:start-admin": "yarn workspace @app/admin dev",
     "contember:build-admin": "tsc --project admin && yarn workspace @app/admin build \"$0\"",
     "contember:build-api": "tsc --project api",

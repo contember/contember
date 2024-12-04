@@ -10,7 +10,7 @@ export interface DataViewLayoutProps {
 }
 
 export const DataViewLayout = Component<DataViewLayoutProps>(({ name, children }) => {
-	const selection = useDataViewDisplayedState().selection
+	const selection = useDataViewDisplayedState()?.selection
 	const value = selection?.values?.layout
 
 	return !value || value === name ? <>{children}</> : null

@@ -91,7 +91,7 @@ export const useDataViewReload = _DataViewReloadContext[1]
 const _DataViewDisplayedContextTmp = createRequiredContext<DataViewState | undefined>('DataViewDisplayedStateContext')
 /** @internal */
 export const DataViewDisplayedStateContext = _DataViewDisplayedContextTmp[0]
-export const useDataViewDisplayedState = _DataViewDisplayedContextTmp[1] as <T extends DataViewState>() => T
+export const useDataViewDisplayedState = _DataViewDisplayedContextTmp[1] as <T extends DataViewState>() => T | undefined
 
 const _DataViewSelectionStateContext = createRequiredContext<DataViewSelectionState>('DataViewSelectionStateContext')
 /** @internal */

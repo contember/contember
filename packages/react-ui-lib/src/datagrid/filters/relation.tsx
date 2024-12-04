@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { forwardRef, ReactNode, useCallback } from 'react'
+import { forwardRef, ReactNode, useCallback, useMemo } from 'react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../../ui/tooltip'
 import {
 	DataViewHasManyFilter,
@@ -30,6 +30,7 @@ import { SelectDefaultFilter, SelectListInner, SelectPopoverContent } from '../.
 import { dict } from '../../dict'
 import { DataGridFilterMobileHiding } from './mobile'
 import { DataViewHasManyLabel, DataViewHasOneLabel } from '../labels'
+import { createRequiredContext } from '@contember/react-utils'
 
 
 type DataGridRelationFilterInnerProps = {
@@ -143,25 +144,31 @@ export const DataGridRelationFilteredItemsList = ({ children }: {
 	</>
 )
 
-const DataGridRelationFilterSelectItem = forwardRef<HTMLButtonElement, {
+const [, useFilterFactory, FilterFactoryContextProvider] = createRequiredContext<(value: EntityId) => UseDataViewRelationFilterResult>('FilterFactoryContext')
+
+type DataGridRelationFilterSelectItemProps = {
 	children: ReactNode
-	filterFactory: (value: EntityId) => UseDataViewRelationFilterResult
-}>(({ children, filterFactory, ...props }, ref) => {
-			const entity = useEntity()
-			const [current, setFilter] = filterFactory(entity.id)
+}
+const DataGridRelationFilterSelectItem = forwardRef<HTMLButtonElement, DataGridRelationFilterSelectItemProps>(({
+	children,
+	...props
+}, ref) => {
+	const entity = useEntity()
+	const filterFactory = useFilterFactory()
+	const [current, setFilter] = filterFactory(entity.id)
 
-			const include = useCallback(() => setFilter('toggleInclude'), [setFilter])
-			const exclude = useCallback(() => setFilter('toggleExclude'), [setFilter])
+	const include = useCallback(() => setFilter('toggleInclude'), [setFilter])
+	const exclude = useCallback(() => setFilter('toggleExclude'), [setFilter])
 
-			const isIncluded = current === 'include'
-			const isExcluded = current === 'exclude'
+	const isIncluded = current === 'include'
+	const isExcluded = current === 'exclude'
 
-			return (
-				<DataGridFilterSelectItemUI ref={ref} onExclude={exclude} onInclude={include} isExcluded={isExcluded} isIncluded={isIncluded} {...props}>
-					{children}
-				</DataGridFilterSelectItemUI>
-			)
-		})
+	return (
+		<DataGridFilterSelectItemUI ref={ref} onExclude={exclude} onInclude={include} isExcluded={isExcluded} isIncluded={isIncluded} {...props}>
+			{children}
+		</DataGridFilterSelectItemUI>
+	)
+})
 
 
 export const DataGridRelationFilterSelect = ({ children, queryField, label }: {
@@ -190,19 +197,30 @@ export const DataGridRelationFilterControls = ({ children, queryField }: {
 	queryField?: DataViewUnionFilterFields
 	children: ReactNode
 }) => {
+	const inner = useMemo(() => <DataGridRelationFilterControlsInner>{children}</DataGridRelationFilterControlsInner>, [children])
 	const filterFactory = useDataViewRelationFilterFactory(useDataViewFilterName())
 	return (
-		<>
+		<FilterFactoryContextProvider value={filterFactory}>
 			<DataViewRelationFilterOptions queryField={queryField}>
-				<SelectListInner filterToolbar={<SelectDefaultFilter />}>
-					<DataGridRelationFilterSelectItem filterFactory={filterFactory}>
-						{children}
-					</DataGridRelationFilterSelectItem>
-				</SelectListInner>
+				{inner}
 			</DataViewRelationFilterOptions>
 			<div>
 				<DataGridNullFilter />
 			</div>
-		</>
+		</FilterFactoryContextProvider>
 	)
 }
+
+type DataGridRelationFilterControlsInnerProps = {
+	children: ReactNode
+}
+const DataGridRelationFilterControlsInner = Component<DataGridRelationFilterControlsInnerProps>(({ children }) => {
+
+	return <>
+		<SelectListInner filterToolbar={<SelectDefaultFilter />}>
+			<DataGridRelationFilterSelectItem>
+				{children}
+			</DataGridRelationFilterSelectItem>
+		</SelectListInner>
+	</>
+})

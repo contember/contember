@@ -73,7 +73,9 @@ export const SelectListInner = Component(({ children, filterToolbar }: SelectLis
 										{children}
 									</DataViewHighlightRow>
 								</DataViewInfiniteLoadEachRow>
-								<DataViewInfiniteLoadScrollObserver />
+								<DataViewLoaderState loaded>
+									<DataViewInfiniteLoadScrollObserver />
+								</DataViewLoaderState>
 								<DataViewInfiniteLoadTrigger>
 									<Button size="sm" variant="ghost" className="disabled:hidden">
 										<ArrowBigDownDash size={16} />

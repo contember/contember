@@ -17,13 +17,11 @@ import {
 	SelectInputActionsUI,
 	SelectInputUI,
 	SelectInputWrapperUI,
-	SelectListItemUI,
 	SelectPopoverContent,
 } from './ui'
-import { SelectListInner } from './list'
-import { Select, SelectDataView, SelectEachValue, SelectItemTrigger, SelectOption, SelectPlaceholder } from '@contember/react-select'
+import { DefaultSelectDataView } from './list'
+import { Select, SelectEachValue, SelectItemTrigger, SelectPlaceholder } from '@contember/react-select'
 import { CreateEntityDialog } from './create-new'
-import { SelectDefaultFilter } from './filter'
 import { DataViewSortingDirections, DataViewUnionFilterFields } from '@contember/react-dataview'
 import { useFormFieldId } from '@contember/react-form'
 import { dict } from '../dict'
@@ -82,17 +80,9 @@ export const SelectInput = Component<SelectInputProps>(({ field, queryField, opt
 						</SelectInputActionsUI>
 					</SelectInputWrapperUI>
 					<SelectPopoverContent>
-						<SelectDataView initialSorting={initialSorting} queryField={queryField}>
-							<SelectListInner filterToolbar={<SelectDefaultFilter />}>
-								<SelectOption>
-									<SelectItemTrigger>
-										<SelectListItemUI>
-											{children}
-										</SelectListItemUI>
-									</SelectItemTrigger>
-								</SelectOption>
-							</SelectListInner>
-						</SelectDataView>
+						<DefaultSelectDataView initialSorting={initialSorting} queryField={queryField}>
+							{children}
+						</DefaultSelectDataView>
 					</SelectPopoverContent>
 				</Popover>
 				{createNewForm && (

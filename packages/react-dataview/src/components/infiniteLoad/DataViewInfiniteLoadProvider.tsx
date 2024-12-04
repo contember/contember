@@ -66,7 +66,7 @@ export const DataViewInfiniteLoadProvider = Component(({ children }: {
 
 	return <>
 		<DataViewInfiniteLoadAccessorsContext.Provider value={accessors}>
-			<DataViewInfiniteLoadTriggerContext.Provider value={pagesCount !== undefined && nextPage >= pagesCount ? undefined : loadMore}>
+			<DataViewInfiniteLoadTriggerContext.Provider value={pagesCount === undefined || nextPage >= pagesCount ? undefined : loadMore}>
 				{children}
 			</DataViewInfiniteLoadTriggerContext.Provider>
 		</DataViewInfiniteLoadAccessorsContext.Provider>

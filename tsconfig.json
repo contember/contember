@@ -126,6 +126,9 @@
 			"path": "./packages/react-client"
 		},
 		{
+			"path": "./packages/react-client-content"
+		},
+		{
 			"path": "./packages/react-client-tenant"
 		},
 		{

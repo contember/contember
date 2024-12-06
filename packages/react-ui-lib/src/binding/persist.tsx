@@ -1,10 +1,9 @@
-import { PersistTrigger, SugaredRelativeSingleField, useField } from '@contember/interface'
+import { PersistTrigger, SugaredRelativeSingleField, useEntity, useField, usePersist } from '@contember/interface'
+import { Slot } from '@radix-ui/react-slot'
+import { ReactElement, ReactNode, useEffect } from 'react'
+import { dict } from '../dict'
 import { Button } from '../ui/button'
 import { Loader } from '../ui/loader'
-import { ReactElement, ReactNode, useEffect } from 'react'
-import { Slot } from '@radix-ui/react-slot'
-import { usePersist } from '@contember/interface'
-import { dict } from '../dict'
 import { usePersistErrorHandler, usePersistFeedbackHandlers, usePersistWithFeedback } from './hooks'
 
 export const FeedbackTrigger = (props: { children: ReactElement }) => {
@@ -65,6 +64,31 @@ export const PersistOnFieldChange = ({ field }: {
 			}
 		})
 	}, [getField, onError, triggerPersist])
+
+	return null
+}
+
+export const PersistOnRelationChange = ({ field }: { field: string }) => {
+	const triggerPersist = usePersist()
+	const onError = usePersistErrorHandler()
+	const getEntity = useEntity().getAccessor
+
+	useEffect(() => {
+		let persisting = false
+		return getEntity().addEventListener({ type: 'connectionUpdate', key: field }, async () => {
+			if (persisting) {
+				return
+			}
+
+			persisting = true
+			try {
+				await Promise.resolve()
+				await triggerPersist().catch(onError)
+			} finally {
+				persisting = false
+			}
+		})
+	}, [getEntity, onError, triggerPersist, field])
 
 	return null
 }

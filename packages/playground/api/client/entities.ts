@@ -564,6 +564,22 @@ export type GridTag <OverRelation extends string | never = never> = {
 	hasManyBy: {
 	}
 }
+export type HooksValue <OverRelation extends string | never = never> = {
+	name: 'HooksValue'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+	columns: {
+		id: string
+		createdAt: string
+		value: number
+	}
+	hasOne: {
+	}
+	hasMany: {
+	}
+	hasManyBy: {
+	}
+}
 export type InputRoot <OverRelation extends string | never = never> = {
 	name: 'InputRoot'
 	unique:
@@ -1169,6 +1185,7 @@ export type ContemberClientEntities = {
 	GridAuthor: GridAuthor
 	GridCategory: GridCategory
 	GridTag: GridTag
+	HooksValue: HooksValue
 	InputRoot: InputRoot
 	InputRules: InputRules
 	LegacyEditorBlock: LegacyEditorBlock

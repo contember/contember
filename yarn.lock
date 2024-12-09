@@ -817,6 +817,7 @@ __metadata:
     "@contember/client": "workspace:*"
     "@contember/client-content": "workspace:*"
     "@contember/interface": "workspace:*"
+    "@contember/react-client-content": "workspace:*"
     "@contember/react-ui-lib": "workspace:*"
     "@contember/schema": "workspace:*"
     "@contember/schema-definition": "workspace:*"
@@ -912,6 +913,21 @@ __metadata:
   dependencies:
     "@contember/react-binding": "workspace:*"
     "@contember/react-multipass-rendering": "workspace:*"
+    "@contember/react-utils": "workspace:*"
+    react: ^18.3.1
+    react-dom: ^18.3.1
+  peerDependencies:
+    react: ^18 || ^19
+    react-dom: ^18 || ^19
+  languageName: unknown
+  linkType: soft
+
+"@contember/react-client-content@workspace:*, @contember/react-client-content@workspace:packages/react-client-content":
+  version: 0.0.0-use.local
+  resolution: "@contember/react-client-content@workspace:packages/react-client-content"
+  dependencies:
+    "@contember/client-content": "workspace:*"
+    "@contember/react-client": "workspace:*"
     "@contember/react-utils": "workspace:*"
     react: ^18.3.1
     react-dom: ^18.3.1

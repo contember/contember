@@ -9,7 +9,7 @@ import {
 	KeyRoundIcon,
 	LanguagesIcon, LoaderIcon,
 	LockKeyholeIcon,
-	PencilIcon,
+	PencilIcon, PlugIcon,
 	TableIcon, TextCursorIcon,
 	UploadIcon,
 	UserIcon,
@@ -96,6 +96,10 @@ export const Navigation = () => {
 				<MenuItem icon={<LoaderIcon size={16} />} label={'Extend tree'}>
 					<MenuItem icon={line} label={'Entity subtree'} to={'extendTree/single'} />
 					<MenuItem icon={line} label={'Entity list subtree'} to={'extendTree/many'} />
+				</MenuItem>
+				<MenuItem icon={<PlugIcon size={16} />} label={'Hooks'}>
+					<MenuItem icon={line} label={'Content API'} to={'hooks/contentApi'} />
+
 				</MenuItem>
 			</Menu>
 		</div>

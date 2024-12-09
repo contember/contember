@@ -700,6 +700,25 @@ export const ContemberClientNames: SchemaNames = {
         "slug"
       ]
     },
+    "HooksValue": {
+      "name": "HooksValue",
+      "fields": {
+        "id": {
+          "type": "column"
+        },
+        "createdAt": {
+          "type": "column"
+        },
+        "value": {
+          "type": "column"
+        }
+      },
+      "scalars": [
+        "id",
+        "createdAt",
+        "value"
+      ]
+    },
     "InputRoot": {
       "name": "InputRoot",
       "fields": {

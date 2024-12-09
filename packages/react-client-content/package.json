@@ -30,7 +30,8 @@
 	},
 	"dependencies": {
 		"@contember/client-content": "workspace:*",
-		"@contember/react-client": "workspace:*"
+		"@contember/react-client": "workspace:*",
+		"@contember/react-utils": "workspace:*"
 	},
 	"peerDependencies": {
 		"react": "^18 || ^19",

@@ -6,5 +6,6 @@
 	"references": [
 		{ "path": "../../client-content/src" },
 		{ "path": "../../react-client/src" },
+		{ "path": "../../react-utils/src" },
 	]
 }

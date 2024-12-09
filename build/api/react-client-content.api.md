@@ -4,22 +4,77 @@
 
 ```ts
 
-import { ContentClient } from '@contember/client-content';
+import { ContentClient } from '@contember/react-client';
 import { ContentMutation } from '@contember/client-content';
 import { ContentQuery } from '@contember/client-content';
 import { QueryExecutorOptions } from '@contember/client-content';
 
 // @public (undocumented)
-export const useContentClient: () => {
-    useQuery: QueryOverloads;
-    useMutation: MutationOverloads;
-    client: ContentClient;
+export type ContentMutationOptions<T> = QueryExecutorOptions;
+
+// @public (undocumented)
+export type ContentMutationResult<Result, Variables extends Record<string, any>> = readonly [
+state: ContentMutationState<Result>,
+mutate: (variables: Variables) => Promise<Result>
+];
+
+// @public (undocumented)
+export type ContentMutationState<Result> = {
+    state: 'initial';
+} | {
+    state: 'loading';
+} | {
+    state: 'error';
+    error: unknown;
+} | {
+    state: 'success';
+    data: Result;
 };
 
-// Warnings were encountered during analysis:
-//
-// src/hooks/use-content-client.ts:6:30 - (ae-forgotten-export) The symbol "QueryOverloads" needs to be exported by the entry point index.d.ts
-// src/hooks/use-content-client.ts:6:30 - (ae-forgotten-export) The symbol "MutationOverloads" needs to be exported by the entry point index.d.ts
+// @public (undocumented)
+export type ContentQueryOptions = QueryExecutorOptions;
+
+// @public (undocumented)
+export type ContentQueryResult<T> = readonly [
+state: ContentQueryState<T>,
+meta: () => void
+];
+
+// @public (undocumented)
+export type ContentQueryState<Result> = {
+    state: 'loading';
+} | {
+    state: 'error';
+    error: unknown;
+} | {
+    state: 'success';
+    data: Result;
+} | {
+    state: 'refreshing';
+    data: Result;
+};
+
+// @public (undocumented)
+export const useContentClient: () => ContentClient;
+
+// @public (undocumented)
+export function useContentMutation<Value, Variables extends Record<string, any>>(mutationFn: (variables: Variables) => ContentMutation<Value>, options?: ContentMutationOptions<Value>): ContentMutationResult<Value, Variables>;
+
+// @public (undocumented)
+export function useContentMutation<Value, Variables extends Record<string, any>>(mutationFn: (variables: Variables) => ContentMutation<Value>[], options?: ContentMutationOptions<Value[]>): ContentMutationResult<Value[], Variables>;
+
+// @public (undocumented)
+export function useContentMutation<Values extends Record<string, any>, Variables extends Record<string, any>>(mutationFn: (variables: Variables) => {
+    [K in keyof Values]: ContentMutation<Values[K]> | ContentQuery<Values[K]>;
+}, options?: ContentMutationOptions<Values>): ContentMutationResult<Values, Variables>;
+
+// @public (undocumented)
+export function useContentQuery<Value>(query: ContentQuery<Value>, options?: ContentQueryOptions): ContentQueryResult<Value>;
+
+// @public (undocumented)
+export function useContentQuery<Values extends Record<string, any>>(queries: {
+    [K in keyof Values]: ContentQuery<Values[K]>;
+}, options?: ContentQueryOptions): ContentQueryResult<Values>;
 
 // (No @packageDocumentation comment for this package)
 

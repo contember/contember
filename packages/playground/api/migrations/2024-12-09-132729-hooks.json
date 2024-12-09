@@ -1,0 +1,87 @@
+{
+	"formatVersion": 5,
+	"modifications": [
+		{
+			"modification": "createEntity",
+			"entity": {
+				"eventLog": {
+					"enabled": true
+				},
+				"name": "HooksValue",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "hooks_value",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": [],
+				"indexes": []
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "HooksValue",
+			"field": {
+				"name": "value",
+				"columnName": "value",
+				"columnType": "integer",
+				"nullable": false,
+				"type": "Integer",
+				"default": 0
+			},
+			"fillValue": 0,
+			"valueMigrationStrategy": "using"
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "HooksValue",
+			"field": {
+				"name": "createdAt",
+				"columnName": "created_at",
+				"columnType": "timestamptz",
+				"nullable": false,
+				"type": "DateTime",
+				"default": "now"
+			},
+			"fillValue": "now",
+			"valueMigrationStrategy": "using"
+		},
+		{
+			"modification": "patchAclSchema",
+			"patch": [
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/HooksValue",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"read": {
+								"id": true,
+								"value": true,
+								"createdAt": true
+							},
+							"create": {
+								"id": true,
+								"value": true,
+								"createdAt": true
+							},
+							"update": {
+								"id": true,
+								"value": true,
+								"createdAt": true
+							},
+							"delete": true,
+							"customPrimary": true
+						}
+					}
+				}
+			]
+		}
+	]
+}

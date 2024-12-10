@@ -449,6 +449,59 @@ export type FormTag <OverRelation extends string | never = never> = {
 	hasManyBy: {
 	}
 }
+export type GanttActivity <OverRelation extends string | never = never> = {
+	name: 'GanttActivity'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+	columns: {
+		id: string
+		name: string | null
+		startTime: string | null
+		endTime: string | null
+	}
+	hasOne: {
+		discriminator: GanttDiscriminator
+		category: GanttCategory
+	}
+	hasMany: {
+	}
+	hasManyBy: {
+	}
+}
+export type GanttCategory <OverRelation extends string | never = never> = {
+	name: 'GanttCategory'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+	columns: {
+		id: string
+		name: string | null
+	}
+	hasOne: {
+	}
+	hasMany: {
+	}
+	hasManyBy: {
+	}
+}
+export type GanttDiscriminator <OverRelation extends string | never = never> = {
+	name: 'GanttDiscriminator'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+		| Omit<{ slug: string}, OverRelation>
+		| Omit<{ activities: GanttActivity['unique']}, OverRelation>
+	columns: {
+		id: string
+		slug: string | null
+		name: string | null
+	}
+	hasOne: {
+	}
+	hasMany: {
+		activities: GanttActivity<'discriminator'>
+	}
+	hasManyBy: {
+	}
+}
 export type GridArticle <OverRelation extends string | never = never> = {
 	name: 'GridArticle'
 	unique:
@@ -1179,6 +1232,9 @@ export type ContemberClientEntities = {
 	FormAuthor: FormAuthor
 	FormNote: FormNote
 	FormTag: FormTag
+	GanttActivity: GanttActivity
+	GanttCategory: GanttCategory
+	GanttDiscriminator: GanttDiscriminator
 	GridArticle: GridArticle
 	GridArticleComment: GridArticleComment
 	GridArticleDetail: GridArticleDetail

@@ -3,6 +3,7 @@ import {
 	BrushIcon,
 	DatabaseIcon,
 	FormInputIcon,
+	GanttChartIcon,
 	GripVertical,
 	HomeIcon,
 	KanbanIcon,
@@ -35,7 +36,8 @@ export const Navigation = () => {
 					<MenuItem icon={line} label={'Dialog'} to={'ui/dialog'} />
 					<MenuItem icon={line} label={'Property list'} to={'ui/propertyList'} />
 				</MenuItem>
-				<MenuItem icon={<KanbanIcon size={16} />} label={'Kanban'}>
+				<MenuItem icon={<GanttChartIcon size={16} />} label={'Gantt'} to={'gantt'}/>
+				<MenuItem icon={<KanbanIcon size={16} />} label={'Kanban'} >
 					<MenuItem icon={line} label={'Dynamic columns'} to={'board/assignee'} />
 					<MenuItem icon={line} label={'Static columns'} to={'board/status'} />
 				</MenuItem>

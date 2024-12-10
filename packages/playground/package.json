@@ -39,6 +39,7 @@
     "vite-tsconfig-paths": "^5.0.1"
   },
   "dependencies": {
+    "@dnd-kit/modifiers": "^7.0.0",
     "@sindresorhus/slugify": "^2.2.1"
   }
 }

@@ -32,7 +32,9 @@ export const dict = {
 	datagrid: {
 		na: 'N/A',
 		dateStart: 'From',
+		yesterday: 'Yesterday',
 		today: 'Today',
+		tomorrow: 'Tomorrow',
 		dateEnd: 'To',
 		numberFrom: 'From',
 		numberTo: 'To',

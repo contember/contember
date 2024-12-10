@@ -1,0 +1,96 @@
+{
+	"formatVersion": 5,
+	"modifications": [
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "GanttCategory",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "gantt_category",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": [],
+				"indexes": [],
+				"eventLog": {
+					"enabled": true
+				}
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "GanttCategory",
+			"field": {
+				"name": "name",
+				"columnName": "name",
+				"columnType": "text",
+				"nullable": true,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "GanttActivity",
+			"owningSide": {
+				"type": "ManyHasOne",
+				"name": "category",
+				"target": "GanttCategory",
+				"joiningColumn": {
+					"columnName": "category_id",
+					"onDelete": "restrict"
+				},
+				"nullable": true
+			}
+		},
+		{
+			"modification": "patchAclSchema",
+			"patch": [
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/GanttCategory",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"read": {
+								"id": true,
+								"name": true
+							},
+							"create": {
+								"id": true,
+								"name": true
+							},
+							"update": {
+								"id": true,
+								"name": true
+							},
+							"delete": true,
+							"customPrimary": true
+						}
+					}
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/GanttActivity/operations/read/category",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/GanttActivity/operations/create/category",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/GanttActivity/operations/update/category",
+					"value": true
+				}
+			]
+		}
+	]
+}

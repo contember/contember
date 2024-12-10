@@ -128,14 +128,19 @@ export class ListOperations {
 		this.eventManager.syncOperation(() => {
 			// TODO disable this at the top-level.
 			const persistedEntityIds = this.treeStore.getEntityListPersistedIds(listState)
+
+			if (!listState.children.has(childEntity.id)) {
+				throw new BindingError(
+					`Entity list doesn't include an entity with id '${childEntity.id}' and so it cannot remove it.`,
+				)
+			}
+
 			for (const state of StateIterator.eachSiblingRealmChild(this.treeStore, listState)) {
 				const disconnectedChildIdValue = childEntity.id
 				const disconnectedChildRealm = state.children.get(disconnectedChildIdValue)
 
 				if (disconnectedChildRealm === undefined) {
-					throw new BindingError(
-						`Entity list doesn't include an entity with id '${disconnectedChildIdValue}' and so it cannot remove it.`,
-					)
+					continue
 				}
 
 				this.treeStore.disposeOfRealm(disconnectedChildRealm)

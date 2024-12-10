@@ -1,8 +1,7 @@
 import { GanttChartProvider } from '@app/lib-extra/gantt/gantt-chart-provider'
-import { DataGridInitialLoader, DataGridOverlayLoader, DataGridProps, DataViewBodyProps, dataGridDefaultStorages } from '@app/lib/datagrid'
+import { DataGridInitialLoader, DataGridOverlayLoader, DataGridProps, dataGridDefaultStorages } from '@app/lib/datagrid'
 import { dict } from '@app/lib/dict'
 import { Component } from '@contember/interface'
-// biome-ignore lint/suspicious/noShadowRestrictedNames: <explanation>
 import { DataView, DataViewLayout, DataViewLoaderState } from '@contember/react-dataview'
 import { LayoutGridIcon } from 'lucide-react'
 import * as React from 'react'
@@ -16,7 +15,7 @@ export const GanttChart = Component(({ children, ...props }: DataGridProps) => {
 	)
 })
 
-export const GanttChartLoader = ({ children }: DataViewBodyProps) => (
+export const GanttChartLoader = ({ children }: { children: ReactNode }) => (
 	<>
 		<DataViewLoaderState refreshing loaded>
 			<div className="relative">

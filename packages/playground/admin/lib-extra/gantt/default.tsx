@@ -1,7 +1,7 @@
-import { GanttChartDateFilter } from '@app/lib-extra/gantt/filters/date'
-import { GanttChart, GanttChartLoader, GanttChartTableWrapper } from '@app/lib-extra/gantt/gantt-chart'
-import { GanttChartToolbar } from '@app/lib-extra/gantt/gantt-chart-toolbar'
-import { GanttChartTable, GanttChartTableProps } from '@app/lib-extra/gantt/table/gantt-chart-table'
+import { GanttChartDateFilter } from './filters/date'
+import { GanttChart, GanttChartLoader, GanttChartTableWrapper } from './gantt-chart'
+import { GanttChartToolbar } from './gantt-chart-toolbar'
+import { GanttChartTable, GanttChartTableProps } from './table/gantt-chart-table'
 import { DataGridProps } from '@app/lib/datagrid'
 import { Component } from '@contember/interface'
 

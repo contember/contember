@@ -4,7 +4,7 @@ import { useCallback } from 'react'
 
 const InviteFetcher = TenantApi.inviteResponse$$
 	.error(TenantApi.inviteError$$)
-	.result(TenantApi.inviteResult$$.person(TenantApi.person$$.identity(TenantApi.identity$$.id)))
+	.result(TenantApi.inviteResult$$.person(TenantApi.person$.id.email.name.identity(TenantApi.identity$$)))
 
 export type InviteErrorCodes = TenantApi.InviteErrorCode
 

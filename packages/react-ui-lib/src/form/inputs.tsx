@@ -101,7 +101,7 @@ export const RadioEnumField = Component<RadioEnumFieldProps>(({ field, label, de
 			</FormContainer>
 		</FormFieldScope>
 	)
-}, ({ field }) => <Field field={field} />)
+}, ({ field, isNonbearing, defaultValue }) => <Field field={field} isNonbearing={isNonbearing} defaultValue={defaultValue} />)
 
 type RadioEnumFieldInnerProps = Pick<RadioEnumFieldProps, 'field' | 'options' | 'orientation' | 'inputProps' | 'defaultValue' | 'isNonbearing' | 'required'>
 

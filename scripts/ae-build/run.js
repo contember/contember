@@ -2,8 +2,10 @@ import {CompilerState, Extractor, ExtractorConfig} from '@microsoft/api-extracto
 import * as path from 'path'
 import * as fs from 'fs'
 
-const files = await fs.promises.readdir('./build/api')
-const packageNames = files.map(it => it.replace(/\.api\.md$/, ''))
+const packageNames = (await fs.promises.readdir('./build/api'))
+	.map(it => it.replace(/\.api\.md$/, '')).filter(it => it !== 'react-ui-lib' && !it.startsWith('ui-lib-'))
+const uiPackages = (await fs.promises.readdir('packages/react-ui-lib/src'))
+	.filter(it => !it.includes('.') && it !== 'ui')
 
 const config = ExtractorConfig.loadFile('./build/api-extractor.json')
 const baseConfig = ExtractorConfig.prepare({
@@ -13,12 +15,29 @@ const baseConfig = ExtractorConfig.prepare({
 	packageJsonFullPath: path.resolve(`./package.json`),
 })
 
-const configs = packageNames.map(pckg => ExtractorConfig.prepare({
-	configObject: config,
-	projectFolderLookupToken: path.resolve('./packages/' + pckg),
-	configObjectFullPath: path.resolve('./build/api-extractor.json'),
-	packageJsonFullPath: path.resolve(`./packages/${pckg}/package.json`),
-}))
+const configs = [
+	...packageNames.map(pckg => ExtractorConfig.prepare({
+		configObject: config,
+		projectFolderLookupToken: path.resolve('./packages/' + pckg),
+		configObjectFullPath: path.resolve('./build/api-extractor.json'),
+		packageJsonFullPath: path.resolve(`./packages/${pckg}/package.json`),
+	})),
+	...uiPackages.map(pckg => ExtractorConfig.prepare({
+		configObject: {
+			...config,
+			mainEntryPointFilePath: path.resolve(`packages/react-ui-lib/dist/types/${pckg}/index.d.ts`),
+			apiReport: {
+				...config.apiReport,
+				reportFileName: `ui-lib-${pckg}`,
+			}
+		},
+		projectFolderLookupToken: path.resolve('./packages/react-ui-lib'),
+		configObjectFullPath: path.resolve('./build/api-extractor.json'),
+		packageJsonFullPath: path.resolve(`./packages/react-ui-lib/package.json`),
+	})),
+]
+
+
 const state = CompilerState.create(baseConfig, {
 	additionalEntryPoints: configs.map(it => it.mainEntryPointFilePath),
 })

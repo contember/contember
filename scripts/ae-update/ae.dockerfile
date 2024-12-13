@@ -6,6 +6,7 @@ COPY package.json /src
 COPY yarn.lock /src
 COPY .yarnrc.yml /src
 COPY .yarn/ /src/.yarn/
+RUN apk add --no-cache bash
 RUN yarn install --immutable
 RUN yarn add @microsoft/api-extractor
 RUN yarn pre-build

@@ -29,7 +29,13 @@ fi
 
 if [[ -z "$1" || "$1" == "cli" ]]; then
 	REPO="contember/cli"
-	TAGS="-t $REPO:latest"
+
+	TAGS=""
 	for VERSION in "${ALL_VERSIONS[@]}"; do TAGS="$TAGS -t $REPO:$VERSION"; done
-	docker buildx build --platform linux/amd64,linux/arm64 --push $TAGS -f ./packages/cli/Dockerfile .
+	docker buildx build --platform linux/amd64,linux/arm64 --push $TAGS -f ./scripts/cli-docker-build/bun.dockerfile .
+
+
+	TAGS=""
+  for VERSION in "${ALL_VERSIONS[@]}"; do TAGS="$TAGS -t $REPO:$VERSION-node"; done
+  docker buildx build --platform linux/amd64,linux/arm64 --push $TAGS -f ./scripts/cli-docker-build/node.dockerfile .
 fi

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-node ./server/server.js &
+bun ./server/server.js &
 
 max_retry=20
 counter=0

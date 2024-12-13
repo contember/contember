@@ -3,7 +3,6 @@ FROM node:20 as builder
 WORKDIR /src
 COPY ./ ./
 
-RUN test ! -f yarn.tar.gz || tar xf yarn.tar.gz -C "./.yarn/cache" .
 RUN /src/scripts/server/server-build.sh
 
 FROM node:20

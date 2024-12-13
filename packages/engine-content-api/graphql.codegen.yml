@@ -12,4 +12,4 @@ generates:
       - "typescript-operations"
 hooks:
   afterAllFileWrite:
-    - yarn run -T eslint --fix
+    - bun run -T eslint --fix

@@ -12,24 +12,20 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          cache: 'yarn'
-          node-version: '20'
+      - uses: oven-sh/setup-bun@v2
 
-      - name: Install yarn deps
+      - name: Install deps
         run: |
-          yarn --version
-          yarn install --immutable
+          bun --version
+          bun install --frozen-lockfile
       - name: Build
         run: |
-          yarn pre-build
-          yarn workspace @contember/playground build
+          bun run pre-build
+          bun run --filter=@contember/playground build
         env:
           VITE_CONTEMBER_ADMIN_PROJECT_NAME: playground2
           VITE_CONTEMBER_ADMIN_SESSION_TOKEN: ${{ secrets.PLAYGROUND_SESSION_TOKEN }}
 
       - name: Deploy
         run: |
-          yarn run contember deploy ${{ secrets.PLAYGROUND_DSN }} --root --yes
+          bun run contember deploy ${{ secrets.PLAYGROUND_DSN }} --root --yes

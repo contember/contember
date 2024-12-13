@@ -15,7 +15,7 @@ services:
       - .:/src:cached
 
   test:
-    image: node:20-alpine
+    image: oven/bun:canary
     working_dir: /src
     volumes:
       - .:/src:cached
@@ -27,7 +27,7 @@ services:
       CONTEMBER_ROOT_TOKEN: '0000000000000000000000000000000000000000'
       CONTEMBER_LOGIN_TOKEN: '1111111111111111111111111111111111111111'
       MAILHOG_URL: 'http://mailhog:8025'
-    entrypoint: yarn
+    entrypoint: bun
   engine:
     image: oven/bun:canary
     working_dir: /src

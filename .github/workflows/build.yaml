@@ -16,16 +16,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          cache: 'yarn'
-          node-version: '20'
+      - uses: oven-sh/setup-bun@v2
 
-      - name: Install yarn deps
+
+      - name: Install deps
         run: |
-          yarn --version
-          yarn install --immutable
+          bun --version
+          bun install --frozen-lockfile
 
   check:
     needs: [ install ]
@@ -35,42 +32,36 @@ jobs:
         include:
 
           - job_name: eslint
-            run_script: yarn run eslint:lint
+            run_script: bun run eslint:lint
 
           - job_name: build
-            run_script: yarn run build
+            run_script: bun run build
 
           - job_name: api-exporter
             run_script: |
-              yarn add @microsoft/api-extractor
-              yarn run pre-build
-              yarn run ts:build
-              yarn run ae:test
+              bun add @microsoft/api-extractor ajv
+              bun run pre-build
+              bun run ts:build
+              bun run ae:test
 
           - job_name: lint-imports
             run_script: ./scripts/lint-module-import/run.sh
 
-          - job_name: dedupe
-            run_script: yarn dedupe --check
           - job_name: test
             run_script: |
-                yarn run test:browser
-                yarn run test:node
+                bun run test:browser
+                bun run test:node
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          cache: 'yarn'
-          node-version: '20'
+      - uses: oven-sh/setup-bun@v2
 
-      - name: Install yarn deps
+      - name: Install deps
         run: |
-          yarn --version
-          yarn install --immutable
+          bun --version
+          bun install --frozen-lockfile
 
       - name: Run ${{ matrix.job_name }}
         run: ${{ matrix.run_script }}
@@ -99,20 +90,16 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          cache: 'yarn'
-          node-version: '20'
-      - name: Install yarn deps
+      - uses: oven-sh/setup-bun@v2
+      - name: Install deps
         run: |
-          yarn --version
-          yarn install --immutable
+          bun --version
+          bun install --frozen-lockfile
 
       - name: "Build app"
         run: |
           mkdir --parent server
-          node packages/engine-server/esbuild.cjs
+          bun packages/engine-server/esbuild.cjs
 
       - name: Start server
         run: ./e2e/start-server.sh
@@ -130,7 +117,7 @@ jobs:
           TENANT_MAILER_PORT: '1025'
           TENANT_MAILER_FROM: 'contember@localhost'
       - name: "Run E2E tests"
-        run: yarn run test:e2e --no-file-parallelism
+        run: bun run test:e2e --no-file-parallelism
         env:
           CONTEMBER_API_URL: "http://localhost:4000"
           CONTEMBER_ROOT_TOKEN: '0000000000000000000000000000000000000000'

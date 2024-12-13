@@ -2,7 +2,7 @@ import { executeTenantTest } from '../../../src/testTenant'
 import { GQL } from '../../../src/tags'
 import { testUuid } from '../../../src/testUuid'
 import { disableApiKey } from './sql/disableApiKeySql'
-import { test } from 'vitest'
+import { test } from 'bun:test'
 
 test('disable api key', async () => {
 	const apiKeyId = testUuid(1)

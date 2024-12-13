@@ -1,10 +1,12 @@
+import { describe } from 'bun:test'
 import { testMigrations } from '../../src/tests'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
 import { SQL } from '../../src/tags'
 import { ForeignKeyDeleteAction, createDatabaseMetadata } from '@contember/database'
+import { } from 'bun:test'
 
-testMigrations('update relation ondelete to cascade', {
+describe('update relation ondelete to cascade', () => testMigrations({
 	original: {
 		model: new SchemaBuilder()
 			.entity('Post', entity =>
@@ -49,4 +51,4 @@ ALTER TABLE "post" ADD FOREIGN KEY ("category_id") REFERENCES "category"("id") O
 		indexes: [],
 		uniqueConstraints: [],
 	}),
-})
+}))

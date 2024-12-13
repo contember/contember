@@ -1,6 +1,6 @@
 import { NullLoggerHandler, withLogger, createLogger } from '@contember/logger'
 import { graphql, GraphQLSchema } from 'graphql'
-import { assert } from 'vitest'
+import { expect } from 'bun:test'
 
 export interface Test {
 	schema: GraphQLSchema
@@ -27,5 +27,5 @@ export const executeGraphQlTest = async (test: Test) => {
 		rawResponse.errors = (rawResponse.errors as any).map(({ message }: any) => ({ message }))
 	}
 	const response = JSON.parse(JSON.stringify(rawResponse))
-	assert.deepStrictEqual(response, test.return)
+	expect(response).toStrictEqual(test.return)
 }

@@ -1,9 +1,10 @@
 import { createSchema, SchemaDefinition as def } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
 import { SQL } from '../../src/tags'
+import { describe } from 'bun:test'
 import { testMigrations } from '../../src/tests'
 
-testMigrations('create a column with default value', {
+describe('create a column with default value', () => testMigrations({
 	original: createSchema({
 		Author: class Author {
 			email = def.stringColumn().unique()
@@ -34,9 +35,9 @@ testMigrations('create a column with default value', {
 UPDATE "author" SET "name" = $pga$unnamed author$pga$;
 SET CONSTRAINTS ALL IMMEDIATE; SET CONSTRAINTS ALL DEFERRED;
 ALTER TABLE "author" ALTER "name" SET NOT NULL;`,
-})
+}))
 
-testMigrations('create a column with copy value', {
+describe('create a column with copy value', () => testMigrations({
 	original: createSchema({
 		Author: class Author {
 			email = def.stringColumn().unique()
@@ -67,10 +68,10 @@ testMigrations('create a column with copy value', {
 UPDATE "author" SET "name" = "email"::text;
 SET CONSTRAINTS ALL IMMEDIATE; SET CONSTRAINTS ALL DEFERRED;
 ALTER TABLE "author" ALTER "name" SET NOT NULL;`,
-})
+}))
 
 
-testMigrations('create a column with default value with "using"', {
+describe('create a column with default value with "using"', () => testMigrations({
 	original: createSchema({
 		Author: class Author {
 			email = def.stringColumn().unique()
@@ -170,4 +171,4 @@ ALTER TABLE "author" ALTER "active" SET DATA TYPE boolean USING false,
 ALTER "active" SET NOT NULL; ALTER TABLE "author" ADD "created_at" timestamptz; 
 ALTER TABLE "author" ALTER "created_at" SET DATA TYPE timestamptz USING $pga$2024-01-01 10:00$pga$, ALTER "created_at" SET NOT NULL;
 `,
-})
+}))

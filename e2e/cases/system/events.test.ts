@@ -1,4 +1,4 @@
-import { assert, test } from 'vitest'
+import { expect, test } from 'bun:test'
 import { createTester, gql } from '../../src/tester'
 import { createSchema, SchemaDefinition as def } from '@contember/schema-definition'
 
@@ -62,9 +62,9 @@ test('System API: events query by part of tuple', async () => {
 		},
 	)
 		.expect(response => {
-			assert.isArray(response.body.data.events)
-			assert.equal(response.body.data.events.length, 1)
-			assert.equal(response.body.data.events[0].tableName, 'article_tags')
+			expect(response.body.data.events).toBeArray()
+			expect(response.body.data.events).toHaveLength(1)
+			expect(response.body.data.events[0].tableName).toBe('article_tags')
 		})
 		.expect(200)
 })

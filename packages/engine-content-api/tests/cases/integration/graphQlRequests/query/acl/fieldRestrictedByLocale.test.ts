@@ -1,6 +1,6 @@
 import { SchemaBuilder } from '@contember/schema-definition'
 import { Acl, Model } from '@contember/schema'
-import { test } from 'vitest'
+import { test } from 'bun:test'
 import { execute } from '../../../../../src/test'
 import { GQL, SQL } from '../../../../../src/tags'
 import { testUuid } from '../../../../../src/testUuid'

@@ -1,4 +1,4 @@
-import { expect, test } from 'vitest'
+import { expect, test } from 'bun:test'
 import { c, createSchema, settingsPresets } from '../../../src'
 
 namespace SimpleModel {
@@ -17,85 +17,83 @@ test('basic createSchema test', () => {
 		settings: settingsPresets['v1.3'],
 	}))
 
-	expect(schema).toMatchInlineSnapshot(`
-		{
-		  "acl": {
-		    "roles": {
-		      "public": {
-		        "entities": {
-		          "Book": {
-		            "operations": {
-		              "read": {
-		                "title": true,
-		              },
-		            },
-		            "predicates": {},
-		          },
-		        },
-		        "stages": "*",
-		        "variables": {},
-		      },
-		    },
-		  },
-		  "actions": {
-		    "targets": {},
-		    "triggers": {},
-		  },
-		  "model": {
-		    "entities": {
-		      "Book": {
-		        "eventLog": {
-		          "enabled": true,
-		        },
-		        "fields": {
-		          "id": {
-		            "columnName": "id",
-		            "columnType": "uuid",
-		            "name": "id",
-		            "nullable": false,
-		            "type": "Uuid",
-		          },
-		          "title": {
-		            "columnName": "title",
-		            "columnType": "text",
-		            "name": "title",
-		            "nullable": true,
-		            "type": "String",
-		          },
-		        },
-		        "indexes": [],
-		        "name": "Book",
-		        "primary": "id",
-		        "primaryColumn": "id",
-		        "tableName": "book",
-		        "unique": [],
-		      },
-		    },
-		    "enums": {},
-		  },
-		  "settings": {
-		    "tenant": {
-		      "inviteExpirationMinutes": 10080,
-		    },
-		    "useExistsInHasManyFilter": true,
-		  },
-		  "validation": {
-		    "Book": {
-		      "title": [
-		        {
-		          "message": {
-		            "text": "test",
-		          },
-		          "validator": {
-		            "args": [],
-		            "operation": "defined",
-		          },
-		        },
-		      ],
-		    },
-		  },
-		}
-	`)
+	expect(schema as any).toStrictEqual({
+		'acl': {
+			'roles': {
+				'public': {
+					'entities': {
+						'Book': {
+							'operations': {
+								'read': {
+									'title': true,
+								},
+							},
+							'predicates': {},
+						},
+					},
+					'stages': '*',
+					'variables': {},
+				},
+			},
+		},
+		'actions': {
+			'targets': {},
+			'triggers': {},
+		},
+		'model': {
+			'entities': {
+				'Book': {
+					'eventLog': {
+						'enabled': true,
+					},
+					'fields': {
+						'id': {
+							'columnName': 'id',
+							'columnType': 'uuid',
+							'name': 'id',
+							'nullable': false,
+							'type': 'Uuid',
+						},
+						'title': {
+							'columnName': 'title',
+							'columnType': 'text',
+							'name': 'title',
+							'nullable': true,
+							'type': 'String',
+						},
+					},
+					'indexes': [],
+					'name': 'Book',
+					'primary': 'id',
+					'primaryColumn': 'id',
+					'tableName': 'book',
+					'unique': [],
+				},
+			},
+			'enums': {},
+		},
+		'settings': {
+			'tenant': {
+				'inviteExpirationMinutes': 10080,
+			},
+			'useExistsInHasManyFilter': true,
+		},
+		'validation': {
+			'Book': {
+				'title': [
+					{
+						'message': {
+							'text': 'test',
+						},
+						'validator': {
+							'args': [],
+							'operation': 'defined',
+						},
+					},
+				],
+			},
+		},
+	})
 })
 
 

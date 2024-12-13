@@ -1,0 +1,17 @@
+// Bun Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`generate enums 1`] = `
+"export type OrderStatus = 
+\t | "new"
+\t | "paid"
+\t | "cancelled"
+export type OrderType = 
+\t | "normal"
+\t | "express"
+export type ContemberClientEnums = {
+\tOrderStatus: OrderStatus
+\torderType: OrderType
+}
+
+"
+`;

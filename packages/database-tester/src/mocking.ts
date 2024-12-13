@@ -1,5 +1,6 @@
 import { Client, Connection, DatabaseConfig, EventManager } from '@contember/database'
-import { assert } from 'vitest'
+import { expect } from 'bun:test'
+import { isDeepStrictEqual } from 'node:util'
 
 export interface ExpectedQuery {
 	sql: string
@@ -39,18 +40,27 @@ ${JSON.stringify(parameters, undefined, '  ')}
 
 Expected:
 ${expected.sql}`
-		assert.equal(actualSql, expectedSql, expectedMsg)
+		if (actualSql !== expectedSql) {
+			expect().fail(actualSql)
+		}
+
 		const evm = this.eventManager
 		if (expected.parameters) {
-			assert.lengthOf((parameters || []), expected.parameters.length, expectedMsg)
+			if ((parameters?.length ?? 0) !== expected.parameters.length) {
+				expect().fail(expectedMsg)
+			}
 
 			for (let index in expected.parameters) {
 				const expectedParameter = expected.parameters[index]
 				const actualParameter = (parameters || [])[index]
 				if (typeof expectedParameter === 'function') {
-					assert.deepStrictEqual(expectedParameter(actualParameter), true, expectedMsg)
+					if (!expectedParameter(actualParameter)) {
+						expect().fail(expectedMsg)
+					}
 				} else {
-					assert.deepStrictEqual(actualParameter, expectedParameter, expectedMsg)
+					if (!isDeepStrictEqual(expectedParameter, actualParameter)) {
+						expect().fail(expectedMsg)
+					}
 				}
 			}
 		}

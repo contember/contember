@@ -1,0 +1,30 @@
+// Bun Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`builder fetch field 1`] = `
+{
+  "query": 
+"query {
+\ttest
+}
+"
+,
+  "variables": {},
+}
+`;
+
+exports[`builder variable deduplication 1`] = `
+{
+  "query": 
+"query($Json_0: Json) {
+\tb: test(variable: $Json_0)
+\ta: test(variable: $Json_0)
+}
+"
+,
+  "variables": {
+    "Json_0": {
+      "foo": "bar",
+    },
+  },
+}
+`;

@@ -1,7 +1,8 @@
 import { PredicateFactory, VariableInjector } from '../../../src/acl'
 import { SchemaDefinition as def } from '@contember/schema-definition'
 import { Acl, Model } from '@contember/schema'
-import { assert, describe, it } from 'vitest'
+import { describe, it } from 'bun:test'
+import { assert } from '../../src/assert'
 
 namespace TestModel {
 	export class Author {

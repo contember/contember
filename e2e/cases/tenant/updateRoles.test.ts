@@ -1,4 +1,4 @@
-import { assert, test } from 'vitest'
+import { expect, test } from 'bun:test'
 import { createTester, gql, rand } from '../../src/tester'
 import { emptySchema } from '@contember/schema-utils'
 import { TenantRole } from '@contember/engine-tenant-api'
@@ -33,9 +33,9 @@ test('manage global roles', async () => {
 		},
 	)
 		.expect(200)
-	assert.isOk(result.body.data.signUp.ok)
+	expect(result.body.data.signUp.ok).toBeTruthy()
 	const identity = result.body.data.signUp.result.person.identity.id
-	assert.deepStrictEqual(result.body.data.signUp.result.person.identity.roles, [TenantRole.PERSON])
+	expect(result.body.data.signUp.result.person.identity.roles).toStrictEqual([TenantRole.PERSON])
 
 	await tester(gql`
 			mutation($identityId: String!) {

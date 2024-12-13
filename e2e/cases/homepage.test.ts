@@ -1,4 +1,4 @@
-import { test } from 'vitest'
+import { test } from 'bun:test'
 import supertest from 'supertest'
 import { apiUrl } from '../src/tester'
 

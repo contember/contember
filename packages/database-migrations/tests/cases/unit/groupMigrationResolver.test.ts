@@ -1,4 +1,4 @@
-import { assert, describe, test } from 'vitest'
+import { describe, expect, test } from 'bun:test'
 import { GroupMigrationsResolver, Migration } from '../../../src'
 
 describe('group migration resolver', () => {
@@ -12,7 +12,7 @@ describe('group migration resolver', () => {
 				resolveMigrations: () => [new Migration('2023-07-26-104001-abcd', runner, null)],
 			},
 		})
-		assert.deepEqual(resolver.resolveMigrations({ runMigrations: [] }), [
+		expect(resolver.resolveMigrations({ runMigrations: [] })).toStrictEqual([
 			new Migration('2023-07-26-104000-xyz', runner, null),
 			new Migration('2023-07-26-104001-abcd', runner, 'someGroup'),
 		])
@@ -26,7 +26,7 @@ describe('group migration resolver', () => {
 				resolveMigrations: () => [new Migration('2023-07-26-104000-abcd', () => null, null)],
 			},
 		})
-		assert.deepEqual(resolver.resolveMigrations({ runMigrations: [] }).map(it => it.name), [
+		expect(resolver.resolveMigrations({ runMigrations: [] }).map(it => it.name)).toStrictEqual([
 			'2023-07-26-104000-xyz',
 			'2023-07-26-104000-abcd',
 		])
@@ -54,10 +54,10 @@ describe('group migration resolver', () => {
 				{ name: 'xyz', group: 'someGroup' },
 			],
 		})
-		assert.deepEqual(baseRunMigrations, [
+		expect(baseRunMigrations).toStrictEqual([
 			{ name: 'abc', group: null },
 		])
-		assert.deepEqual(groupRunMigrations, [
+		expect(groupRunMigrations).toStrictEqual([
 			{ name: 'xyz', group: 'someGroup' },
 		])
 	})

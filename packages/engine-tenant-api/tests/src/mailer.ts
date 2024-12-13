@@ -1,5 +1,5 @@
 import { Mailer, MailMessage, SentInfo } from '../../src/utils'
-import { assert } from 'vitest'
+import { expect } from 'bun:test'
 
 export type ExpectedMessage = { subject: string }
 
@@ -17,16 +17,15 @@ export const createMockedMailer = (): MockedMailer => {
 
 		expectMessage(expected: ExpectedMessage) {
 			const actual = mails.shift()
-			assert.ok(actual)
 			if (!actual) {
 				throw new Error('No email to consume')
 			}
-			assert.equal(actual.subject, expected.subject)
+			expect(actual.subject).toEqual(expected.subject)
 			return actual
 		}
 
 		expectEmpty() {
-			assert.equal(mails.length, 0)
+			expect(mails.length).toEqual(0)
 		}
 	})()
 }

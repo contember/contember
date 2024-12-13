@@ -10,7 +10,7 @@ import { createIdentitySql } from './sql/createIdentitySql'
 import { createMembershipSql } from './sql/createMembershipSql'
 import { createPersonSql } from './sql/createPersonSql'
 import { disableOneOffKeySql } from './sql/disableOneOffKeySql'
-import { test } from 'vitest'
+import { test } from 'bun:test'
 import { createPersonTokenSql } from './sql/createPersonTokenSql'
 import { getMailTemplateSql } from './sql/getMailTemplateSql'
 

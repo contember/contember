@@ -1,9 +1,10 @@
+import { describe } from 'bun:test'
 import { testMigrations } from '../../src/tests'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
 import { SQL } from '../../src/tags'
 
-testMigrations('remove enum', {
+describe('remove enum', () => testMigrations({
 	original: {
 		model: new SchemaBuilder()
 			.entity('Post', e =>
@@ -33,4 +34,4 @@ testMigrations('remove enum', {
 	sql: SQL`ALTER TABLE "post"
 		DROP "status";
 	DROP DOMAIN "postStatus";`,
-})
+}))

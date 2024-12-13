@@ -7,7 +7,7 @@ import { createIdentitySql } from './sql/createIdentitySql'
 import { getPersonByEmailSql } from './sql/getPersonByEmailSql'
 import { sqlTransaction } from './sql/sqlTransaction'
 import { disableOneOffKeySql } from './sql/disableOneOffKeySql'
-import { test } from 'vitest'
+import { test } from 'bun:test'
 
 test('signs up a new user', async () => {
 	const email = 'john@doe.com'

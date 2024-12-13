@@ -1,10 +1,14 @@
-import { test, assert } from 'vitest'
+import { test, expect } from 'bun:test'
 import { CryptoWrapper } from '../../../src'
 import * as crypto from 'node:crypto'
 
 const encryptionKey = crypto.createSecretKey(Buffer.from('0000000000000000000000000000000000000000000000000000000000000000', 'hex'))
 const iv = Buffer.alloc(16).fill('a')
 const algorithm = CryptoWrapper.cryptoAlgo
+
+const assert  = {
+	strictEqual: (a: any, b: any) => expect(a).toBe(b),
+}
 
 const encryptOld = (data: Buffer) => {
 	const cipher = crypto.createCipheriv(algorithm, encryptionKey, iv)
@@ -70,6 +74,6 @@ test('encryption v2: corrupted auth key', async () => {
 	} catch (e) {
 		err = e
 	}
-	assert.equal('Unsupported state or unable to authenticate data', err.message)
+	assert.strictEqual('Unsupported state or unable to authenticate data', err.message)
 })
 

@@ -3,7 +3,7 @@ import { testUuid } from '../../../src/testUuid'
 import { getPersonByIdentity } from './sql/getPersonByIdentity'
 import { confirmOtpMutation } from './gql/confirmOtp'
 import { ConfirmOtpErrorCode } from '../../../../src/schema'
-import { test } from 'vitest'
+import { test } from 'bun:test'
 import { OtpAuthenticator } from '../../../../src'
 import { Buffer } from 'buffer'
 

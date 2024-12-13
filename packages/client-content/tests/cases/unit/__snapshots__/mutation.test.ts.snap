@@ -1,0 +1,1198 @@
+// Bun Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`mutations in trx create trx 1`] = `
+"mutation($MutationTransactionOptions_0: MutationTransactionOptions, $AuthorCreateInput_1: AuthorCreateInput!) {
+\tmut: transaction(options: $MutationTransactionOptions_0) {
+\t\tok
+\t\terrorMessage
+\t\terrors {
+\t\t\t... MutationError
+\t\t}
+\t\tvalidation {
+\t\t\t... ValidationResult
+\t\t}
+\t\tmut: createAuthor(data: $AuthorCreateInput_1) {
+\t\t\tok
+\t\t\terrorMessage
+\t\t\terrors {
+\t\t\t\t... MutationError
+\t\t\t}
+\t\t\tvalidation {
+\t\t\t\t... ValidationResult
+\t\t\t}
+\t\t}
+\t}
+}
+fragment MutationError on _MutationError {
+\tpaths {
+\t\t... on _FieldPathFragment {
+\t\t\tfield
+\t\t}
+\t\t... on _IndexPathFragment {
+\t\t\tindex
+\t\t\talias
+\t\t}
+\t}
+\tmessage
+\ttype
+}
+fragment ValidationResult on _ValidationResult {
+\tvalid
+\terrors {
+\t\tpath {
+\t\t\t... on _FieldPathFragment {
+\t\t\t\tfield
+\t\t\t}
+\t\t\t... on _IndexPathFragment {
+\t\t\t\tindex
+\t\t\t\talias
+\t\t\t}
+\t\t}
+\t\tmessage {
+\t\t\ttext
+\t\t}
+\t}
+}
+"
+`;
+
+exports[`mutations in trx mutation with a node 1`] = `
+"mutation($MutationTransactionOptions_0: MutationTransactionOptions, $AuthorCreateInput_1: AuthorCreateInput!) {
+\tmut: transaction(options: $MutationTransactionOptions_0) {
+\t\tok
+\t\terrorMessage
+\t\terrors {
+\t\t\t... MutationError
+\t\t}
+\t\tvalidation {
+\t\t\t... ValidationResult
+\t\t}
+\t\tmut: createAuthor(data: $AuthorCreateInput_1) {
+\t\t\tok
+\t\t\terrorMessage
+\t\t\terrors {
+\t\t\t\t... MutationError
+\t\t\t}
+\t\t\tvalidation {
+\t\t\t\t... ValidationResult
+\t\t\t}
+\t\t\tnode {
+\t\t\t\tid
+\t\t\t}
+\t\t}
+\t}
+}
+fragment MutationError on _MutationError {
+\tpaths {
+\t\t... on _FieldPathFragment {
+\t\t\tfield
+\t\t}
+\t\t... on _IndexPathFragment {
+\t\t\tindex
+\t\t\talias
+\t\t}
+\t}
+\tmessage
+\ttype
+}
+fragment ValidationResult on _ValidationResult {
+\tvalid
+\terrors {
+\t\tpath {
+\t\t\t... on _FieldPathFragment {
+\t\t\t\tfield
+\t\t\t}
+\t\t\t... on _IndexPathFragment {
+\t\t\t\tindex
+\t\t\t\talias
+\t\t\t}
+\t\t}
+\t\tmessage {
+\t\t\ttext
+\t\t}
+\t}
+}
+"
+`;
+
+exports[`mutations in trx mutation with a node 2`] = `
+{
+  "AuthorCreateInput_1": {
+    "email": "xx@localhost",
+    "name": "John",
+  },
+  "MutationTransactionOptions_0": {},
+}
+`;
+
+exports[`mutations in trx update 1`] = `
+"mutation($MutationTransactionOptions_0: MutationTransactionOptions, $AuthorUniqueWhere_1: AuthorUniqueWhere!, $AuthorUpdateInput_2: AuthorUpdateInput!) {
+\tmut: transaction(options: $MutationTransactionOptions_0) {
+\t\tok
+\t\terrorMessage
+\t\terrors {
+\t\t\t... MutationError
+\t\t}
+\t\tvalidation {
+\t\t\t... ValidationResult
+\t\t}
+\t\tmut: updateAuthor(by: $AuthorUniqueWhere_1, data: $AuthorUpdateInput_2) {
+\t\t\tok
+\t\t\terrorMessage
+\t\t\terrors {
+\t\t\t\t... MutationError
+\t\t\t}
+\t\t\tvalidation {
+\t\t\t\t... ValidationResult
+\t\t\t}
+\t\t}
+\t}
+}
+fragment MutationError on _MutationError {
+\tpaths {
+\t\t... on _FieldPathFragment {
+\t\t\tfield
+\t\t}
+\t\t... on _IndexPathFragment {
+\t\t\tindex
+\t\t\talias
+\t\t}
+\t}
+\tmessage
+\ttype
+}
+fragment ValidationResult on _ValidationResult {
+\tvalid
+\terrors {
+\t\tpath {
+\t\t\t... on _FieldPathFragment {
+\t\t\t\tfield
+\t\t\t}
+\t\t\t... on _IndexPathFragment {
+\t\t\t\tindex
+\t\t\t\talias
+\t\t\t}
+\t\t}
+\t\tmessage {
+\t\t\ttext
+\t\t}
+\t}
+}
+"
+`;
+
+exports[`mutations in trx update 2`] = `
+{
+  "AuthorUniqueWhere_1": {
+    "id": "ca7a9b84-efbb-435d-a063-da11f205335a",
+  },
+  "AuthorUpdateInput_2": {
+    "email": "xx@localhost",
+    "name": "John",
+  },
+  "MutationTransactionOptions_0": {},
+}
+`;
+
+exports[`mutations in trx delete 1`] = `
+"mutation($MutationTransactionOptions_0: MutationTransactionOptions, $AuthorUniqueWhere_1: AuthorUniqueWhere!) {
+\tmut: transaction(options: $MutationTransactionOptions_0) {
+\t\tok
+\t\terrorMessage
+\t\terrors {
+\t\t\t... MutationError
+\t\t}
+\t\tvalidation {
+\t\t\t... ValidationResult
+\t\t}
+\t\tmut: deleteAuthor(by: $AuthorUniqueWhere_1) {
+\t\t\tok
+\t\t\terrorMessage
+\t\t\terrors {
+\t\t\t\t... MutationError
+\t\t\t}
+\t\t}
+\t}
+}
+fragment MutationError on _MutationError {
+\tpaths {
+\t\t... on _FieldPathFragment {
+\t\t\tfield
+\t\t}
+\t\t... on _IndexPathFragment {
+\t\t\tindex
+\t\t\talias
+\t\t}
+\t}
+\tmessage
+\ttype
+}
+fragment ValidationResult on _ValidationResult {
+\tvalid
+\terrors {
+\t\tpath {
+\t\t\t... on _FieldPathFragment {
+\t\t\t\tfield
+\t\t\t}
+\t\t\t... on _IndexPathFragment {
+\t\t\t\tindex
+\t\t\t\talias
+\t\t\t}
+\t\t}
+\t\tmessage {
+\t\t\ttext
+\t\t}
+\t}
+}
+"
+`;
+
+exports[`mutations in trx delete 2`] = `
+{
+  "AuthorUniqueWhere_1": {
+    "id": "ca7a9b84-efbb-435d-a063-da11f205335a",
+  },
+  "MutationTransactionOptions_0": {},
+}
+`;
+
+exports[`mutations in trx upsert 1`] = `
+"mutation($MutationTransactionOptions_0: MutationTransactionOptions, $AuthorUniqueWhere_1: AuthorUniqueWhere!, $AuthorCreateInput_2: AuthorCreateInput!, $AuthorUpdateInput_3: AuthorUpdateInput!) {
+\tmut: transaction(options: $MutationTransactionOptions_0) {
+\t\tok
+\t\terrorMessage
+\t\terrors {
+\t\t\t... MutationError
+\t\t}
+\t\tvalidation {
+\t\t\t... ValidationResult
+\t\t}
+\t\tmut: upsertAuthor(by: $AuthorUniqueWhere_1, create: $AuthorCreateInput_2, update: $AuthorUpdateInput_3) {
+\t\t\tok
+\t\t\terrorMessage
+\t\t\terrors {
+\t\t\t\t... MutationError
+\t\t\t}
+\t\t\tvalidation {
+\t\t\t\t... ValidationResult
+\t\t\t}
+\t\t}
+\t}
+}
+fragment MutationError on _MutationError {
+\tpaths {
+\t\t... on _FieldPathFragment {
+\t\t\tfield
+\t\t}
+\t\t... on _IndexPathFragment {
+\t\t\tindex
+\t\t\talias
+\t\t}
+\t}
+\tmessage
+\ttype
+}
+fragment ValidationResult on _ValidationResult {
+\tvalid
+\terrors {
+\t\tpath {
+\t\t\t... on _FieldPathFragment {
+\t\t\t\tfield
+\t\t\t}
+\t\t\t... on _IndexPathFragment {
+\t\t\t\tindex
+\t\t\t\talias
+\t\t\t}
+\t\t}
+\t\tmessage {
+\t\t\ttext
+\t\t}
+\t}
+}
+"
+`;
+
+exports[`mutations in trx upsert 2`] = `
+{
+  "AuthorCreateInput_2": {
+    "email": "xx@localhost",
+    "name": "John",
+  },
+  "AuthorUniqueWhere_1": {
+    "id": "ca7a9b84-efbb-435d-a063-da11f205335a",
+  },
+  "AuthorUpdateInput_3": {
+    "email": "xx@localhost",
+    "name": "John",
+  },
+  "MutationTransactionOptions_0": {},
+}
+`;
+
+exports[`mutations in trx multiple mutations as array 1`] = `
+"mutation($MutationTransactionOptions_0: MutationTransactionOptions, $AuthorCreateInput_1: AuthorCreateInput!, $AuthorCreateInput_2: AuthorCreateInput!) {
+\tmut: transaction(options: $MutationTransactionOptions_0) {
+\t\tok
+\t\terrorMessage
+\t\terrors {
+\t\t\t... MutationError
+\t\t}
+\t\tvalidation {
+\t\t\t... ValidationResult
+\t\t}
+\t\tmut_0: createAuthor(data: $AuthorCreateInput_1) {
+\t\t\tok
+\t\t\terrorMessage
+\t\t\terrors {
+\t\t\t\t... MutationError
+\t\t\t}
+\t\t\tvalidation {
+\t\t\t\t... ValidationResult
+\t\t\t}
+\t\t}
+\t\tmut_1: createAuthor(data: $AuthorCreateInput_2) {
+\t\t\tok
+\t\t\terrorMessage
+\t\t\terrors {
+\t\t\t\t... MutationError
+\t\t\t}
+\t\t\tvalidation {
+\t\t\t\t... ValidationResult
+\t\t\t}
+\t\t}
+\t}
+}
+fragment MutationError on _MutationError {
+\tpaths {
+\t\t... on _FieldPathFragment {
+\t\t\tfield
+\t\t}
+\t\t... on _IndexPathFragment {
+\t\t\tindex
+\t\t\talias
+\t\t}
+\t}
+\tmessage
+\ttype
+}
+fragment ValidationResult on _ValidationResult {
+\tvalid
+\terrors {
+\t\tpath {
+\t\t\t... on _FieldPathFragment {
+\t\t\t\tfield
+\t\t\t}
+\t\t\t... on _IndexPathFragment {
+\t\t\t\tindex
+\t\t\t\talias
+\t\t\t}
+\t\t}
+\t\tmessage {
+\t\t\ttext
+\t\t}
+\t}
+}
+"
+`;
+
+exports[`mutations in trx multiple mutations as array: 
+\t\t\t{
+\t\t\t  "AuthorCreateInput_1": {
+\t\t\t    "email": "xx@localhost",
+\t\t\t    "name": "John",
+\t\t\t  },
+\t\t\t  "AuthorCreateInput_2": {
+\t\t\t    "email": "xx@localhost",
+\t\t\t    "name": "John",
+\t\t\t  },
+\t\t\t  "MutationTransactionOptions_0": {},
+\t\t\t}
+\t\t 1`] = `
+{
+  "AuthorCreateInput_1": {
+    "email": "xx@localhost",
+    "name": "John",
+  },
+  "AuthorCreateInput_2": {
+    "email": "xx@localhost",
+    "name": "John",
+  },
+  "MutationTransactionOptions_0": {},
+}
+`;
+
+exports[`mutations in trx multiple named mutations trx: 
+\t\t\t"mutation($MutationTransactionOptions_0: MutationTransactionOptions, $AuthorCreateInput_1: AuthorCreateInput!, $PostCreateInput_2: PostCreateInput!) {
+\t\t\t\tmut: transaction(options: $MutationTransactionOptions_0) {
+\t\t\t\t\tok
+\t\t\t\t\terrorMessage
+\t\t\t\t\terrors {
+\t\t\t\t\t\t... MutationError
+\t\t\t\t\t}
+\t\t\t\t\tvalidation {
+\t\t\t\t\t\t... ValidationResult
+\t\t\t\t\t}
+\t\t\t\t\tcreateAuthor(data: $AuthorCreateInput_1) {
+\t\t\t\t\t\tok
+\t\t\t\t\t\terrorMessage
+\t\t\t\t\t\terrors {
+\t\t\t\t\t\t\t... MutationError
+\t\t\t\t\t\t}
+\t\t\t\t\t\tvalidation {
+\t\t\t\t\t\t\t... ValidationResult
+\t\t\t\t\t\t}
+\t\t\t\t\t}
+\t\t\t\t\tcreatePost(data: $PostCreateInput_2) {
+\t\t\t\t\t\tok
+\t\t\t\t\t\terrorMessage
+\t\t\t\t\t\terrors {
+\t\t\t\t\t\t\t... MutationError
+\t\t\t\t\t\t}
+\t\t\t\t\t\tvalidation {
+\t\t\t\t\t\t\t... ValidationResult
+\t\t\t\t\t\t}
+\t\t\t\t\t}
+\t\t\t\t}
+\t\t\t}
+\t\t\tfragment MutationError on _MutationError {
+\t\t\t\tpaths {
+\t\t\t\t\t... on _FieldPathFragment {
+\t\t\t\t\t\tfield
+\t\t\t\t\t}
+\t\t\t\t\t... on _IndexPathFragment {
+\t\t\t\t\t\tindex
+\t\t\t\t\t\talias
+\t\t\t\t\t}
+\t\t\t\t}
+\t\t\t\tmessage
+\t\t\t\ttype
+\t\t\t}
+\t\t\tfragment ValidationResult on _ValidationResult {
+\t\t\t\tvalid
+\t\t\t\terrors {
+\t\t\t\t\tpath {
+\t\t\t\t\t\t... on _FieldPathFragment {
+\t\t\t\t\t\t\tfield
+\t\t\t\t\t\t}
+\t\t\t\t\t\t... on _IndexPathFragment {
+\t\t\t\t\t\t\tindex
+\t\t\t\t\t\t\talias
+\t\t\t\t\t\t}
+\t\t\t\t\t}
+\t\t\t\t\tmessage {
+\t\t\t\t\t\ttext
+\t\t\t\t\t}
+\t\t\t\t}
+\t\t\t}
+\t\t\t"
+\t\t 1`] = `
+"mutation($MutationTransactionOptions_0: MutationTransactionOptions, $AuthorCreateInput_1: AuthorCreateInput!, $PostCreateInput_2: PostCreateInput!) {
+\tmut: transaction(options: $MutationTransactionOptions_0) {
+\t\tok
+\t\terrorMessage
+\t\terrors {
+\t\t\t... MutationError
+\t\t}
+\t\tvalidation {
+\t\t\t... ValidationResult
+\t\t}
+\t\tcreateAuthor(data: $AuthorCreateInput_1) {
+\t\t\tok
+\t\t\terrorMessage
+\t\t\terrors {
+\t\t\t\t... MutationError
+\t\t\t}
+\t\t\tvalidation {
+\t\t\t\t... ValidationResult
+\t\t\t}
+\t\t}
+\t\tcreatePost(data: $PostCreateInput_2) {
+\t\t\tok
+\t\t\terrorMessage
+\t\t\terrors {
+\t\t\t\t... MutationError
+\t\t\t}
+\t\t\tvalidation {
+\t\t\t\t... ValidationResult
+\t\t\t}
+\t\t}
+\t}
+}
+fragment MutationError on _MutationError {
+\tpaths {
+\t\t... on _FieldPathFragment {
+\t\t\tfield
+\t\t}
+\t\t... on _IndexPathFragment {
+\t\t\tindex
+\t\t\talias
+\t\t}
+\t}
+\tmessage
+\ttype
+}
+fragment ValidationResult on _ValidationResult {
+\tvalid
+\terrors {
+\t\tpath {
+\t\t\t... on _FieldPathFragment {
+\t\t\t\tfield
+\t\t\t}
+\t\t\t... on _IndexPathFragment {
+\t\t\t\tindex
+\t\t\t\talias
+\t\t\t}
+\t\t}
+\t\tmessage {
+\t\t\ttext
+\t\t}
+\t}
+}
+"
+`;
+
+exports[`mutations in trx multiple named mutations trx: 
+\t\t\t{
+\t\t\t  "AuthorCreateInput_1": {
+\t\t\t    "email": "xx@localhost",
+\t\t\t    "name": "John",
+\t\t\t  },
+\t\t\t  "MutationTransactionOptions_0": {},
+\t\t\t  "PostCreateInput_2": {
+\t\t\t    "publishedAt": "now",
+\t\t\t  },
+\t\t\t}
+\t\t 1`] = `
+{
+  "AuthorCreateInput_1": {
+    "email": "xx@localhost",
+    "name": "John",
+  },
+  "MutationTransactionOptions_0": {},
+  "PostCreateInput_2": {
+    "publishedAt": "now",
+  },
+}
+`;
+
+exports[`mutations in trx mutation and query combo trx 1`] = `
+"mutation($MutationTransactionOptions_0: MutationTransactionOptions, $PostCreateInput_1: PostCreateInput!, $PostUniqueWhere_2: PostUniqueWhere!) {
+\tmut: transaction(options: $MutationTransactionOptions_0) {
+\t\tok
+\t\terrorMessage
+\t\terrors {
+\t\t\t... MutationError
+\t\t}
+\t\tvalidation {
+\t\t\t... ValidationResult
+\t\t}
+\t\tcreatePost(data: $PostCreateInput_1) {
+\t\t\tok
+\t\t\terrorMessage
+\t\t\terrors {
+\t\t\t\t... MutationError
+\t\t\t}
+\t\t\tvalidation {
+\t\t\t\t... ValidationResult
+\t\t\t}
+\t\t}
+\t\tpost: query {
+\t\t\tvalue: getPost(by: $PostUniqueWhere_2) {
+\t\t\t\tid
+\t\t\t\tpublishedAt
+\t\t\t}
+\t\t}
+\t}
+}
+fragment MutationError on _MutationError {
+\tpaths {
+\t\t... on _FieldPathFragment {
+\t\t\tfield
+\t\t}
+\t\t... on _IndexPathFragment {
+\t\t\tindex
+\t\t\talias
+\t\t}
+\t}
+\tmessage
+\ttype
+}
+fragment ValidationResult on _ValidationResult {
+\tvalid
+\terrors {
+\t\tpath {
+\t\t\t... on _FieldPathFragment {
+\t\t\t\tfield
+\t\t\t}
+\t\t\t... on _IndexPathFragment {
+\t\t\t\tindex
+\t\t\t\talias
+\t\t\t}
+\t\t}
+\t\tmessage {
+\t\t\ttext
+\t\t}
+\t}
+}
+"
+`;
+
+exports[`mutations in trx mutation and query combo trx 2`] = `
+{
+  "MutationTransactionOptions_0": {},
+  "PostCreateInput_1": {
+    "publishedAt": "now",
+  },
+  "PostUniqueWhere_2": {
+    "id": "ca7a9b84-efbb-435d-a063-da11f205335a",
+  },
+}
+`;
+
+exports[`mutations without trx create 1`] = `
+"mutation($AuthorCreateInput_0: AuthorCreateInput!) {
+\tmut: createAuthor(data: $AuthorCreateInput_0) {
+\t\tok
+\t\terrorMessage
+\t\terrors {
+\t\t\t... MutationError
+\t\t}
+\t\tvalidation {
+\t\t\t... ValidationResult
+\t\t}
+\t}
+}
+fragment MutationError on _MutationError {
+\tpaths {
+\t\t... on _FieldPathFragment {
+\t\t\tfield
+\t\t}
+\t\t... on _IndexPathFragment {
+\t\t\tindex
+\t\t\talias
+\t\t}
+\t}
+\tmessage
+\ttype
+}
+fragment ValidationResult on _ValidationResult {
+\tvalid
+\terrors {
+\t\tpath {
+\t\t\t... on _FieldPathFragment {
+\t\t\t\tfield
+\t\t\t}
+\t\t\t... on _IndexPathFragment {
+\t\t\t\tindex
+\t\t\t\talias
+\t\t\t}
+\t\t}
+\t\tmessage {
+\t\t\ttext
+\t\t}
+\t}
+}
+"
+`;
+
+exports[`mutations without trx create 2`] = `
+{
+  "AuthorCreateInput_0": {
+    "email": "xx@localhost",
+    "name": "John",
+  },
+}
+`;
+
+exports[`mutations without trx mutation with a node 1`] = `
+"mutation($AuthorCreateInput_0: AuthorCreateInput!) {
+\tmut: createAuthor(data: $AuthorCreateInput_0) {
+\t\tok
+\t\terrorMessage
+\t\terrors {
+\t\t\t... MutationError
+\t\t}
+\t\tvalidation {
+\t\t\t... ValidationResult
+\t\t}
+\t\tnode {
+\t\t\tid
+\t\t}
+\t}
+}
+fragment MutationError on _MutationError {
+\tpaths {
+\t\t... on _FieldPathFragment {
+\t\t\tfield
+\t\t}
+\t\t... on _IndexPathFragment {
+\t\t\tindex
+\t\t\talias
+\t\t}
+\t}
+\tmessage
+\ttype
+}
+fragment ValidationResult on _ValidationResult {
+\tvalid
+\terrors {
+\t\tpath {
+\t\t\t... on _FieldPathFragment {
+\t\t\t\tfield
+\t\t\t}
+\t\t\t... on _IndexPathFragment {
+\t\t\t\tindex
+\t\t\t\talias
+\t\t\t}
+\t\t}
+\t\tmessage {
+\t\t\ttext
+\t\t}
+\t}
+}
+"
+`;
+
+exports[`mutations without trx mutation with a node 2`] = `
+{
+  "AuthorCreateInput_0": {
+    "email": "xx@localhost",
+    "name": "John",
+  },
+}
+`;
+
+exports[`mutations without trx update 1`] = `
+"mutation($AuthorUniqueWhere_0: AuthorUniqueWhere!, $AuthorUpdateInput_1: AuthorUpdateInput!) {
+\tmut: updateAuthor(by: $AuthorUniqueWhere_0, data: $AuthorUpdateInput_1) {
+\t\tok
+\t\terrorMessage
+\t\terrors {
+\t\t\t... MutationError
+\t\t}
+\t\tvalidation {
+\t\t\t... ValidationResult
+\t\t}
+\t}
+}
+fragment MutationError on _MutationError {
+\tpaths {
+\t\t... on _FieldPathFragment {
+\t\t\tfield
+\t\t}
+\t\t... on _IndexPathFragment {
+\t\t\tindex
+\t\t\talias
+\t\t}
+\t}
+\tmessage
+\ttype
+}
+fragment ValidationResult on _ValidationResult {
+\tvalid
+\terrors {
+\t\tpath {
+\t\t\t... on _FieldPathFragment {
+\t\t\t\tfield
+\t\t\t}
+\t\t\t... on _IndexPathFragment {
+\t\t\t\tindex
+\t\t\t\talias
+\t\t\t}
+\t\t}
+\t\tmessage {
+\t\t\ttext
+\t\t}
+\t}
+}
+"
+`;
+
+exports[`mutations without trx update 2`] = `
+{
+  "AuthorUniqueWhere_0": {
+    "id": "ca7a9b84-efbb-435d-a063-da11f205335a",
+  },
+  "AuthorUpdateInput_1": {
+    "email": "xx@localhost",
+    "name": "John",
+  },
+}
+`;
+
+exports[`mutations without trx delete 1`] = `
+"mutation($AuthorUniqueWhere_0: AuthorUniqueWhere!) {
+\tmut: deleteAuthor(by: $AuthorUniqueWhere_0) {
+\t\tok
+\t\terrorMessage
+\t\terrors {
+\t\t\t... MutationError
+\t\t}
+\t}
+}
+fragment MutationError on _MutationError {
+\tpaths {
+\t\t... on _FieldPathFragment {
+\t\t\tfield
+\t\t}
+\t\t... on _IndexPathFragment {
+\t\t\tindex
+\t\t\talias
+\t\t}
+\t}
+\tmessage
+\ttype
+}
+"
+`;
+
+exports[`mutations without trx delete 2`] = `
+{
+  "AuthorUniqueWhere_0": {
+    "id": "ca7a9b84-efbb-435d-a063-da11f205335a",
+  },
+}
+`;
+
+exports[`mutations without trx upsert 1`] = `
+"mutation($AuthorUniqueWhere_0: AuthorUniqueWhere!, $AuthorCreateInput_1: AuthorCreateInput!, $AuthorUpdateInput_2: AuthorUpdateInput!) {
+\tmut: upsertAuthor(by: $AuthorUniqueWhere_0, create: $AuthorCreateInput_1, update: $AuthorUpdateInput_2) {
+\t\tok
+\t\terrorMessage
+\t\terrors {
+\t\t\t... MutationError
+\t\t}
+\t\tvalidation {
+\t\t\t... ValidationResult
+\t\t}
+\t}
+}
+fragment MutationError on _MutationError {
+\tpaths {
+\t\t... on _FieldPathFragment {
+\t\t\tfield
+\t\t}
+\t\t... on _IndexPathFragment {
+\t\t\tindex
+\t\t\talias
+\t\t}
+\t}
+\tmessage
+\ttype
+}
+fragment ValidationResult on _ValidationResult {
+\tvalid
+\terrors {
+\t\tpath {
+\t\t\t... on _FieldPathFragment {
+\t\t\t\tfield
+\t\t\t}
+\t\t\t... on _IndexPathFragment {
+\t\t\t\tindex
+\t\t\t\talias
+\t\t\t}
+\t\t}
+\t\tmessage {
+\t\t\ttext
+\t\t}
+\t}
+}
+"
+`;
+
+exports[`mutations without trx upsert 2`] = `
+{
+  "AuthorCreateInput_1": {
+    "email": "xx@localhost",
+    "name": "John",
+  },
+  "AuthorUniqueWhere_0": {
+    "id": "ca7a9b84-efbb-435d-a063-da11f205335a",
+  },
+  "AuthorUpdateInput_2": {
+    "email": "xx@localhost",
+    "name": "John",
+  },
+}
+`;
+
+exports[`mutations without trx multiple mutations as array 1`] = `
+"mutation($AuthorCreateInput_0: AuthorCreateInput!, $AuthorCreateInput_1: AuthorCreateInput!) {
+\tmut_0: createAuthor(data: $AuthorCreateInput_0) {
+\t\tok
+\t\terrorMessage
+\t\terrors {
+\t\t\t... MutationError
+\t\t}
+\t\tvalidation {
+\t\t\t... ValidationResult
+\t\t}
+\t}
+\tmut_1: createAuthor(data: $AuthorCreateInput_1) {
+\t\tok
+\t\terrorMessage
+\t\terrors {
+\t\t\t... MutationError
+\t\t}
+\t\tvalidation {
+\t\t\t... ValidationResult
+\t\t}
+\t}
+}
+fragment MutationError on _MutationError {
+\tpaths {
+\t\t... on _FieldPathFragment {
+\t\t\tfield
+\t\t}
+\t\t... on _IndexPathFragment {
+\t\t\tindex
+\t\t\talias
+\t\t}
+\t}
+\tmessage
+\ttype
+}
+fragment ValidationResult on _ValidationResult {
+\tvalid
+\terrors {
+\t\tpath {
+\t\t\t... on _FieldPathFragment {
+\t\t\t\tfield
+\t\t\t}
+\t\t\t... on _IndexPathFragment {
+\t\t\t\tindex
+\t\t\t\talias
+\t\t\t}
+\t\t}
+\t\tmessage {
+\t\t\ttext
+\t\t}
+\t}
+}
+"
+`;
+
+exports[`mutations without trx multiple mutations as array 2`] = `
+{
+  "AuthorCreateInput_0": {
+    "email": "xx@localhost",
+    "name": "John",
+  },
+  "AuthorCreateInput_1": {
+    "email": "xx@localhost",
+    "name": "John",
+  },
+}
+`;
+
+exports[`mutations without trx multiple named mutations 1`] = `
+"mutation($AuthorCreateInput_0: AuthorCreateInput!, $PostCreateInput_1: PostCreateInput!) {
+\tcreateAuthor(data: $AuthorCreateInput_0) {
+\t\tok
+\t\terrorMessage
+\t\terrors {
+\t\t\t... MutationError
+\t\t}
+\t\tvalidation {
+\t\t\t... ValidationResult
+\t\t}
+\t}
+\tcreatePost(data: $PostCreateInput_1) {
+\t\tok
+\t\terrorMessage
+\t\terrors {
+\t\t\t... MutationError
+\t\t}
+\t\tvalidation {
+\t\t\t... ValidationResult
+\t\t}
+\t}
+}
+fragment MutationError on _MutationError {
+\tpaths {
+\t\t... on _FieldPathFragment {
+\t\t\tfield
+\t\t}
+\t\t... on _IndexPathFragment {
+\t\t\tindex
+\t\t\talias
+\t\t}
+\t}
+\tmessage
+\ttype
+}
+fragment ValidationResult on _ValidationResult {
+\tvalid
+\terrors {
+\t\tpath {
+\t\t\t... on _FieldPathFragment {
+\t\t\t\tfield
+\t\t\t}
+\t\t\t... on _IndexPathFragment {
+\t\t\t\tindex
+\t\t\t\talias
+\t\t\t}
+\t\t}
+\t\tmessage {
+\t\t\ttext
+\t\t}
+\t}
+}
+"
+`;
+
+exports[`mutations without trx multiple named mutations 2`] = `
+{
+  "AuthorCreateInput_0": {
+    "email": "xx@localhost",
+    "name": "John",
+  },
+  "PostCreateInput_1": {
+    "publishedAt": "now",
+  },
+}
+`;
+
+exports[`mutations without trx mutation and query combo 1`] = `
+"mutation($PostCreateInput_0: PostCreateInput!, $PostUniqueWhere_1: PostUniqueWhere!) {
+\tcreatePost(data: $PostCreateInput_0) {
+\t\tok
+\t\terrorMessage
+\t\terrors {
+\t\t\t... MutationError
+\t\t}
+\t\tvalidation {
+\t\t\t... ValidationResult
+\t\t}
+\t}
+\tpost: query {
+\t\tvalue: getPost(by: $PostUniqueWhere_1) {
+\t\t\tid
+\t\t\tpublishedAt
+\t\t}
+\t}
+}
+fragment MutationError on _MutationError {
+\tpaths {
+\t\t... on _FieldPathFragment {
+\t\t\tfield
+\t\t}
+\t\t... on _IndexPathFragment {
+\t\t\tindex
+\t\t\talias
+\t\t}
+\t}
+\tmessage
+\ttype
+}
+fragment ValidationResult on _ValidationResult {
+\tvalid
+\terrors {
+\t\tpath {
+\t\t\t... on _FieldPathFragment {
+\t\t\t\tfield
+\t\t\t}
+\t\t\t... on _IndexPathFragment {
+\t\t\t\tindex
+\t\t\t\talias
+\t\t\t}
+\t\t}
+\t\tmessage {
+\t\t\ttext
+\t\t}
+\t}
+}
+"
+`;
+
+exports[`mutations without trx mutation and query combo 2`] = `
+{
+  "PostCreateInput_0": {
+    "publishedAt": "now",
+  },
+  "PostUniqueWhere_1": {
+    "id": "ca7a9b84-efbb-435d-a063-da11f205335a",
+  },
+}
+`;
+
+exports[`mutations without trx update locale relation 1`] = `
+"mutation($PostUniqueWhere_0: PostUniqueWhere!, $PostUpdateInput_1: PostUpdateInput!) {
+\tmut: updatePost(by: $PostUniqueWhere_0, data: $PostUpdateInput_1) {
+\t\tok
+\t\terrorMessage
+\t\terrors {
+\t\t\t... MutationError
+\t\t}
+\t\tvalidation {
+\t\t\t... ValidationResult
+\t\t}
+\t}
+}
+fragment MutationError on _MutationError {
+\tpaths {
+\t\t... on _FieldPathFragment {
+\t\t\tfield
+\t\t}
+\t\t... on _IndexPathFragment {
+\t\t\tindex
+\t\t\talias
+\t\t}
+\t}
+\tmessage
+\ttype
+}
+fragment ValidationResult on _ValidationResult {
+\tvalid
+\terrors {
+\t\tpath {
+\t\t\t... on _FieldPathFragment {
+\t\t\t\tfield
+\t\t\t}
+\t\t\t... on _IndexPathFragment {
+\t\t\t\tindex
+\t\t\t\talias
+\t\t\t}
+\t\t}
+\t\tmessage {
+\t\t\ttext
+\t\t}
+\t}
+}
+"
+`;
+
+exports[`mutations without trx update locale relation 2`] = `
+{
+  "PostUniqueWhere_0": {
+    "id": "ca7a9b84-efbb-435d-a063-da11f205335a",
+  },
+  "PostUpdateInput_1": {
+    "locales": [
+      {
+        "update": {
+          "by": {
+            "locale": {
+              "code": "cs",
+            },
+          },
+          "data": {
+            "title": "cs title",
+          },
+        },
+      },
+    ],
+    "publishedAt": "now",
+  },
+}
+`;
+
+exports[`mutations in trx create trx 2`] = `
+{
+  "AuthorCreateInput_1": {
+    "email": "xx@localhost",
+    "name": "John",
+  },
+  "MutationTransactionOptions_0": {},
+}
+`;

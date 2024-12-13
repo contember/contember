@@ -1,8 +1,11 @@
-import { assert, it } from 'vitest'
+import {  it, expect } from 'bun:test'
 import { createTenantConfigResolver } from '../../../src/config/tenantConfigResolver'
 import { configTemplate } from '../../../src/config/configTemplate'
 import { createProjectConfigResolver } from '../../../src/config/projectConfigResolver'
 
+const assert = {
+	deepEqual: (a: any, b: any) => expect(a).toStrictEqual(b),
+}
 const env = {
 	DEFAULT_DB_POOL_IDLE_TIMEOUT_MS: '60000',
 	DEFAULT_DB_POOL_MAX_CONNECTIONS: '1000',

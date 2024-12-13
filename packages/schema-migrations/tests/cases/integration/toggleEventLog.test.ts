@@ -1,4 +1,5 @@
 import { createSchema, SchemaDefinition as def } from '@contember/schema-definition'
+import { describe } from 'bun:test'
 import { testMigrations } from '../../src/tests'
 import { SQL } from '../../src/tags'
 
@@ -16,7 +17,7 @@ namespace EventLogDisabled {
 }
 
 
-testMigrations('event log - disable', {
+describe('event log - disable', () => testMigrations({
 	original: createSchema(EventLogNoConfig),
 	updated: createSchema(EventLogDisabled),
 	diff: [
@@ -28,9 +29,9 @@ testMigrations('event log - disable', {
 	],
 	sql: SQL `DROP TRIGGER "log_event" ON "author";
 	DROP TRIGGER "log_event_trx" ON "author";`,
-})
+}))
 
-testMigrations('event log - enable', {
+describe('event log - enable', () => testMigrations({
 	original: createSchema(EventLogDisabled),
 	updated: createSchema(EventLogNoConfig),
 	diff: [
@@ -51,4 +52,4 @@ testMigrations('event log - enable', {
 		DEFERRABLE INITIALLY DEFERRED
 		FOR EACH ROW
 	EXECUTE PROCEDURE "system"."trigger_event_commit"();`,
-})
+}))

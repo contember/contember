@@ -1,10 +1,10 @@
 import { executeTenantTest } from '../../../src/testTenant'
 import { testUuid } from '../../../src/testUuid'
 import { updatePersonProfileNameSql, updatePersonProfileEmailSql, updatePersonProfileNameAndEmailSql } from './sql/updatePesonNameSql'
-import { test } from 'vitest'
+import { test } from 'bun:test'
 import { changeMyProfileMutation } from './gql/changeMyProfile'
 import { getPersonByIdentity } from './sql/getPersonByIdentity'
-import { authenticatedIdentityId } from '../../../src/testTenantDb'
+import { authenticatedIdentityId } from '../../../src/testTenant'
 import { getPersonByEmailSql } from './sql/getPersonByEmailSql'
 
 test('changes my name', async () => {

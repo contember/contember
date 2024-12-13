@@ -1,8 +1,9 @@
-import { describe, it, assert } from 'vitest'
+import { describe, it } from 'bun:test'
 import { ConditionOptimizer } from '../../../src/mapper/select/optimizer/ConditionOptimizer'
 import { SchemaDefinition as def } from '@contember/schema-definition'
 import { WhereOptimizer } from '../../../src/mapper/select/optimizer/WhereOptimizer'
 import { acceptFieldVisitor } from '@contember/schema-utils'
+import { assert } from '../../src/assert'
 
 namespace TestModel {
 	export class Author {

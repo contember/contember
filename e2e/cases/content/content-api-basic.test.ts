@@ -1,4 +1,4 @@
-import { assert, test } from 'vitest'
+import { expect, test } from 'bun:test'
 import { createTester, gql } from '../../src/tester'
 import { createSchema, SchemaDefinition as def } from '@contember/schema-definition'
 
@@ -21,7 +21,7 @@ test('Content API: create & read tag', async () => {
 		`,
 	)
 		.expect(response => {
-			assert.deepStrictEqual(response.body.data, {
+			expect(response.body.data).toStrictEqual({
 				createTag: {
 					ok: true,
 				},
@@ -39,7 +39,7 @@ test('Content API: create & read tag', async () => {
 		`,
 	)
 		.expect(response => {
-			assert.deepStrictEqual(response.body.data, {
+			expect(response.body.data).toStrictEqual({
 				listTag: [
 					{
 						label: 'graphql',

@@ -1,4 +1,4 @@
-import { assert, test } from 'vitest'
+import { expect, test } from 'bun:test'
 import { testUuid } from '../../../src/testUuid'
 import { MembershipMatcher } from '../../../../src'
 
@@ -21,7 +21,7 @@ test('admin can assign editor role with matching variable', async () => {
 		},
 	])
 
-	assert.ok(matcher.matches(createMembership('editor', siteIdA)))
+	expect(matcher.matches(createMembership('editor', siteIdA))).toBeTrue()
 })
 
 test('admin cannot assign editor role with matching variable, but in a different role', async () => {
@@ -40,7 +40,7 @@ test('admin cannot assign editor role with matching variable, but in a different
 		},
 	])
 
-	assert.notOk(matcher.matches(createMembership('editor', siteIdB)))
+	expect(matcher.matches(createMembership('editor', siteIdB))).toBeFalse()
 })
 
 test('admin cannot assign editor role with different variable', async () => {
@@ -54,7 +54,7 @@ test('admin cannot assign editor role with different variable', async () => {
 			},
 		},
 	])
-	assert.notOk(matcher.matches(createMembership('editor', siteIdB)))
+	expect(matcher.matches(createMembership('editor', siteIdB))).toBeFalse()
 })
 
 test('editor cannot assign editor role', async () => {
@@ -64,7 +64,7 @@ test('editor cannot assign editor role', async () => {
 			matchRule: {},
 		},
 	])
-	assert.notOk(matcher.matches(createMembership('editor', siteIdB)))
+	expect(matcher.matches(createMembership('editor', siteIdB))).toBeFalse()
 })
 
 test('admin can assign editor role with any variable', async () => {
@@ -78,7 +78,7 @@ test('admin can assign editor role with any variable', async () => {
 			},
 		},
 	])
-	assert.ok(matcher.matches(createMembership('editor', siteIdB)))
+	expect(matcher.matches(createMembership('editor', siteIdB))).toBeTrue()
 })
 
 test('admin cannot assign editor role with any variable', async () => {
@@ -90,7 +90,7 @@ test('admin cannot assign editor role with any variable', async () => {
 			},
 		},
 	])
-	assert.notOk(matcher.matches(createMembership('editor', siteIdA)))
+	expect(matcher.matches(createMembership('editor', siteIdA))).toBeFalse()
 })
 
 test('admin can assign editor role without variable', async () => {
@@ -102,7 +102,7 @@ test('admin can assign editor role without variable', async () => {
 			},
 		},
 	])
-	assert.ok(matcher.matches(createMembership('editor')))
+	expect(matcher.matches(createMembership('editor'))).toBeTrue()
 })
 
 test('admin can assign editor role with any variable', async () => {
@@ -116,7 +116,7 @@ test('admin can assign editor role with any variable', async () => {
 			},
 		},
 	])
-	assert.ok(matcher.matches(createMembership('editor', siteIdB)))
+	expect(matcher.matches(createMembership('editor', siteIdB))).toBeTrue()
 })
 
 test('admin cannot assign editor role if only one variable matches', async () => {
@@ -132,5 +132,5 @@ test('admin cannot assign editor role if only one variable matches', async () =>
 			},
 		},
 	])
-	assert.notOk(matcher.matches({ role: 'editor', variables: [{ name: 'site', values: [siteIdA] }, { name: 'locale', values: ['XXX'] }] }))
+	expect(matcher.matches({ role: 'editor', variables: [{ name: 'site', values: [siteIdA] }, { name: 'locale', values: ['XXX'] }] })).toBeFalse()
 })

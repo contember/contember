@@ -1,4 +1,4 @@
-import { test, assert } from 'vitest'
+import { test, expect } from 'bun:test'
 import { testUuid } from '../../../src/testUuid'
 import { AclSchemaAccessNodeFactory, PermissionActions } from '../../../../src'
 import { Acl } from '@contember/schema'
@@ -35,18 +35,18 @@ const aclEvaluator = { evaluate: () => Promise.reject() }
 test('admin can assign editor role with matching variable', async () => {
 	const node = new AclSchemaAccessNodeFactory().create(aclSchemaAdminCanManageEditorWithMatchingVariables, adminOfSiteA)
 
-	assert.ok(await node.isAllowed(aclEvaluator, PermissionActions.PROJECT_ADD_MEMBER(editorOfSiteA)))
+	expect(await node.isAllowed(aclEvaluator, PermissionActions.PROJECT_ADD_MEMBER(editorOfSiteA))).toBeTrue()
 })
 
 test('admin cannot assign editor role with different variable', async () => {
 	const node = new AclSchemaAccessNodeFactory().create(aclSchemaAdminCanManageEditorWithMatchingVariables, adminOfSiteA)
-	assert.notOk(await node.isAllowed(aclEvaluator, PermissionActions.PROJECT_ADD_MEMBER(editorOfSiteB)))
+	expect(await node.isAllowed(aclEvaluator, PermissionActions.PROJECT_ADD_MEMBER(editorOfSiteB))).toBeFalse()
 })
 
 test('admin can invite editor role with matching variable', async () => {
 	const node = new AclSchemaAccessNodeFactory().create(aclSchemaAdminCanManageEditorWithMatchingVariables, adminOfSiteA)
 
-	assert.ok(await node.isAllowed(aclEvaluator, PermissionActions.PERSON_INVITE(editorOfSiteA)))
+	expect(await node.isAllowed(aclEvaluator, PermissionActions.PERSON_INVITE(editorOfSiteA))).toBeTrue()
 })
 
 
@@ -71,11 +71,11 @@ const aclSchemaForInviteOnly: Acl.Schema = {
 test('admin can invite public. cannot manage public, cannot invite lorem', async () => {
 	const node = new AclSchemaAccessNodeFactory().create(aclSchemaForInviteOnly, [{ role: 'admin', variables: [] }])
 
-	assert.ok(await node.isAllowed(aclEvaluator, PermissionActions.PERSON_INVITE([{ role: 'public', variables: [] }])))
+	expect(await node.isAllowed(aclEvaluator, PermissionActions.PERSON_INVITE([{ role: 'public', variables: [] }]))).toBeTrue()
 
-	assert.notOk(await node.isAllowed(aclEvaluator, PermissionActions.PERSON_INVITE([{ role: 'lorem', variables: [] }])))
+	expect(await node.isAllowed(aclEvaluator, PermissionActions.PERSON_INVITE([{ role: 'lorem', variables: [] }]))).toBeFalse()
 
-	assert.notOk(await node.isAllowed(aclEvaluator, PermissionActions.PROJECT_REMOVE_MEMBER([{ role: 'public', variables: [] }])))
+	expect(await node.isAllowed(aclEvaluator, PermissionActions.PROJECT_REMOVE_MEMBER([{ role: 'public', variables: [] }]))).toBeFalse()
 })
 
 
@@ -97,7 +97,7 @@ const aclSchemaForViewOnly: Acl.Schema = {
 test('admin can view lorem, but cannot manage it', async () => {
 	const node = new AclSchemaAccessNodeFactory().create(aclSchemaForViewOnly, [{ role: 'admin', variables: [] }])
 
-	assert.ok(await node.isAllowed(aclEvaluator, PermissionActions.PROJECT_VIEW_MEMBER([{ role: 'lorem', variables: [] }])))
+	expect(await node.isAllowed(aclEvaluator, PermissionActions.PROJECT_VIEW_MEMBER([{ role: 'lorem', variables: [] }]))).toBeTrue()
 
-	assert.notOk(await node.isAllowed(aclEvaluator, PermissionActions.PROJECT_REMOVE_MEMBER([{ role: 'lorem', variables: [] }])))
+	expect(await node.isAllowed(aclEvaluator, PermissionActions.PROJECT_REMOVE_MEMBER([{ role: 'lorem', variables: [] }]))).toBeFalse()
 })

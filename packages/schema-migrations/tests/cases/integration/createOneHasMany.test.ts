@@ -1,9 +1,10 @@
+import { describe } from 'bun:test'
 import { testMigrations } from '../../src/tests'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
 import { SQL } from '../../src/tags'
 
-testMigrations('create one has many relation (post with locales)', {
+describe('create one has many relation (post with locales)', () => testMigrations({
 	original: { model: new SchemaBuilder().entity('Post', e => e).buildSchema() },
 	updated: {
 		model: new SchemaBuilder()
@@ -122,4 +123,4 @@ testMigrations('create one has many relation (post with locales)', {
 	CREATE INDEX ON "post_locale" ("post_id");
 	ALTER TABLE "post_locale"
 		ADD UNIQUE ("post_id", "locale");`,
-})
+}))

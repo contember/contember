@@ -1,4 +1,4 @@
-import { assert, test } from 'vitest'
+import { expect, test } from 'bun:test'
 import { createTester } from '../../src/tester'
 import { createSchema, SchemaDefinition as def } from '@contember/schema-definition'
 import { emptySchema } from '@contember/schema-utils'
@@ -24,8 +24,9 @@ test('System API: migrate project', async () => {
 	}`)
 		.expect(400)
 		.expect(response => {
-			assert.deepStrictEqual(
+			expect(
 				response.body.errors[0].message,
+			).toBe(
 				'Cannot query field "listTag" on type "Query".',
 			)
 		})
@@ -44,7 +45,7 @@ test('System API: migrate project', async () => {
 		path: `/system/${tester.projectSlug}`,
 	})
 		.expect(response => {
-			assert.deepStrictEqual(response.body.data, {
+			expect(response.body.data).toStrictEqual({
 				schema,
 			})
 		})

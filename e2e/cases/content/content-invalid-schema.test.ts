@@ -1,4 +1,4 @@
-import { assert, test } from 'vitest'
+import { expect, test } from 'bun:test'
 import { createSchema, SchemaDefinition as def } from '@contember/schema-definition'
 import { createTester, gql } from '../../src/tester'
 
@@ -23,8 +23,9 @@ test('Content API: invalid schema error', async () => {
 	)
 		.expect(400)
 		.expect(response => {
-			assert.deepStrictEqual(
+			expect(
 				response.body.errors[0].message,
+			).toEqual(
 				'Cannot query field "createFoo" on type "Mutation". Did you mean "createTag"?',
 			)
 		})

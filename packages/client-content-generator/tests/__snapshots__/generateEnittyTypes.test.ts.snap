@@ -1,0 +1,278 @@
+// Bun Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`generate entities generate for scalars 1`] = `
+"
+export type JSONPrimitive = string | number | boolean | null
+export type JSONValue = JSONPrimitive | JSONObject | JSONArray
+export type JSONObject = { readonly [K in string]?: JSONValue }
+export type JSONArray = readonly JSONValue[]
+
+export type Foo <OverRelation extends string | never = never> = {
+\tname: 'Foo'
+\tunique:
+\t\t| Omit<{ id: string}, OverRelation>
+\tcolumns: {
+\t\tid: string
+\t\tstringCol: string | null
+\t\tintCol: number | null
+\t\tdoubleCol: number | null
+\t\tdateCol: string | null
+\t\tdatetimeCol: string | null
+\t\tbooleanCol: boolean | null
+\t\tjsonCol: JSONValue | null
+\t\tuuidCol: string | null
+\t}
+\thasOne: {
+\t}
+\thasMany: {
+\t}
+\thasManyBy: {
+\t}
+}
+
+export type ContemberClientEntities = {
+\tFoo: Foo
+}
+
+export type ContemberClientSchema = {
+\tentities: ContemberClientEntities
+}
+"
+`;
+
+exports[`generate entities generate for has enum 1`] = `
+"import type { FooEnumCol } from './enums'
+
+export type JSONPrimitive = string | number | boolean | null
+export type JSONValue = JSONPrimitive | JSONObject | JSONArray
+export type JSONObject = { readonly [K in string]?: JSONValue }
+export type JSONArray = readonly JSONValue[]
+
+export type Foo <OverRelation extends string | never = never> = {
+\tname: 'Foo'
+\tunique:
+\t\t| Omit<{ id: string}, OverRelation>
+\tcolumns: {
+\t\tid: string
+\t\tenumCol: FooEnumCol | null
+\t}
+\thasOne: {
+\t}
+\thasMany: {
+\t}
+\thasManyBy: {
+\t}
+}
+
+export type ContemberClientEntities = {
+\tFoo: Foo
+}
+
+export type ContemberClientSchema = {
+\tentities: ContemberClientEntities
+}
+"
+`;
+
+exports[`generate entities generate one has one 1`] = `
+"
+export type JSONPrimitive = string | number | boolean | null
+export type JSONValue = JSONPrimitive | JSONObject | JSONArray
+export type JSONObject = { readonly [K in string]?: JSONValue }
+export type JSONArray = readonly JSONValue[]
+
+export type Foo <OverRelation extends string | never = never> = {
+\tname: 'Foo'
+\tunique:
+\t\t| Omit<{ id: string}, OverRelation>
+\t\t| Omit<{ oneHasOneInverseRel: Bar['unique']}, OverRelation>
+\tcolumns: {
+\t\tid: string
+\t}
+\thasOne: {
+\t\toneHasOneInverseRel: Bar
+\t}
+\thasMany: {
+\t}
+\thasManyBy: {
+\t}
+}
+export type Bar <OverRelation extends string | never = never> = {
+\tname: 'Bar'
+\tunique:
+\t\t| Omit<{ id: string}, OverRelation>
+\t\t| Omit<{ oneHasOneOwningRel: Foo['unique']}, OverRelation>
+\tcolumns: {
+\t\tid: string
+\t}
+\thasOne: {
+\t\toneHasOneOwningRel: Foo
+\t}
+\thasMany: {
+\t}
+\thasManyBy: {
+\t}
+}
+
+export type ContemberClientEntities = {
+\tFoo: Foo
+\tBar: Bar
+}
+
+export type ContemberClientSchema = {
+\tentities: ContemberClientEntities
+}
+"
+`;
+
+exports[`generate entities generate one has many 1`] = `
+"
+export type JSONPrimitive = string | number | boolean | null
+export type JSONValue = JSONPrimitive | JSONObject | JSONArray
+export type JSONObject = { readonly [K in string]?: JSONValue }
+export type JSONArray = readonly JSONValue[]
+
+export type Foo <OverRelation extends string | never = never> = {
+\tname: 'Foo'
+\tunique:
+\t\t| Omit<{ id: string}, OverRelation>
+\t\t| Omit<{ oneHasManyRel: Bar['unique']}, OverRelation>
+\tcolumns: {
+\t\tid: string
+\t}
+\thasOne: {
+\t}
+\thasMany: {
+\t\toneHasManyRel: Bar<'manyHasOneRel'>
+\t}
+\thasManyBy: {
+\t}
+}
+export type Bar <OverRelation extends string | never = never> = {
+\tname: 'Bar'
+\tunique:
+\t\t| Omit<{ id: string}, OverRelation>
+\tcolumns: {
+\t\tid: string
+\t}
+\thasOne: {
+\t\tmanyHasOneRel: Foo
+\t}
+\thasMany: {
+\t}
+\thasManyBy: {
+\t}
+}
+
+export type ContemberClientEntities = {
+\tFoo: Foo
+\tBar: Bar
+}
+
+export type ContemberClientSchema = {
+\tentities: ContemberClientEntities
+}
+"
+`;
+
+exports[`generate entities generate many has many 1`] = `
+"
+export type JSONPrimitive = string | number | boolean | null
+export type JSONValue = JSONPrimitive | JSONObject | JSONArray
+export type JSONObject = { readonly [K in string]?: JSONValue }
+export type JSONArray = readonly JSONValue[]
+
+export type Foo <OverRelation extends string | never = never> = {
+\tname: 'Foo'
+\tunique:
+\t\t| Omit<{ id: string}, OverRelation>
+\tcolumns: {
+\t\tid: string
+\t}
+\thasOne: {
+\t}
+\thasMany: {
+\t\tmanyHasManyRel: Bar
+\t}
+\thasManyBy: {
+\t}
+}
+export type Bar <OverRelation extends string | never = never> = {
+\tname: 'Bar'
+\tunique:
+\t\t| Omit<{ id: string}, OverRelation>
+\tcolumns: {
+\t\tid: string
+\t}
+\thasOne: {
+\t}
+\thasMany: {
+\t\tmanyHasManyInverseRel: Foo
+\t}
+\thasManyBy: {
+\t}
+}
+
+export type ContemberClientEntities = {
+\tFoo: Foo
+\tBar: Bar
+}
+
+export type ContemberClientSchema = {
+\tentities: ContemberClientEntities
+}
+"
+`;
+
+exports[`generate entities generate reduced has by 1`] = `
+"
+export type JSONPrimitive = string | number | boolean | null
+export type JSONValue = JSONPrimitive | JSONObject | JSONArray
+export type JSONObject = { readonly [K in string]?: JSONValue }
+export type JSONArray = readonly JSONValue[]
+
+export type Foo <OverRelation extends string | never = never> = {
+\tname: 'Foo'
+\tunique:
+\t\t| Omit<{ id: string}, OverRelation>
+\t\t| Omit<{ locales: FooLocale['unique']}, OverRelation>
+\tcolumns: {
+\t\tid: string
+\t}
+\thasOne: {
+\t}
+\thasMany: {
+\t\tlocales: FooLocale<'foo'>
+\t}
+\thasManyBy: {
+\t\tlocalesByLocale: { entity: FooLocale; by: {locale: string}  }
+\t}
+}
+export type FooLocale <OverRelation extends string | never = never> = {
+\tname: 'FooLocale'
+\tunique:
+\t\t| Omit<{ id: string}, OverRelation>
+\t\t| Omit<{ locale: string, foo: Foo['unique']}, OverRelation>
+\tcolumns: {
+\t\tid: string
+\t\tlocale: string
+\t}
+\thasOne: {
+\t\tfoo: Foo
+\t}
+\thasMany: {
+\t}
+\thasManyBy: {
+\t}
+}
+
+export type ContemberClientEntities = {
+\tFoo: Foo
+\tFooLocale: FooLocale
+}
+
+export type ContemberClientSchema = {
+\tentities: ContemberClientEntities
+}
+"
+`;

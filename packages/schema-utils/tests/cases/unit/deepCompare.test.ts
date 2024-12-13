@@ -1,4 +1,4 @@
-import { assert, describe, test } from 'vitest'
+import { expect, describe, test } from 'bun:test'
 import { compareArraysIgnoreOrder } from '../../../src'
 
 describe('deep compare', () => {
@@ -10,7 +10,7 @@ describe('deep compare', () => {
 			{ lorem: 'ipsum' },
 			{ foo: 'bar' },
 		], [])
-		assert.deepStrictEqual(actual, [])
+		expect(actual).toStrictEqual([])
 	})
 
 	test('compare array ignore order - missing in A', () => {
@@ -21,7 +21,7 @@ describe('deep compare', () => {
 			{ lorem: 'ipsum' },
 			{ foo: 'bar' },
 		], [])
-		assert.deepStrictEqual(actual, [{
+		expect(actual).toStrictEqual([{
 			path: [],
 			message: 'Array item: {"lorem":"ipsum"} not found in [{"foo":"bar"}]',
 		}])
@@ -35,7 +35,7 @@ describe('deep compare', () => {
 			{ lorem: 'ipsum' },
 			{ lorem: 'ipsum' },
 		], [])
-		assert.deepStrictEqual(actual, [{
+		expect(actual).toStrictEqual([{
 			path: [],
 			message: 'Array item: {"foo":"bar"} not found in [{"lorem":"ipsum"},{"lorem":"ipsum"}]',
 		}],

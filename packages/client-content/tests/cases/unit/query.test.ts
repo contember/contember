@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'vitest'
+import { describe, expect, test } from 'bun:test'
 import { createClient } from '../../lib'
 import { Input } from '@contember/schema'
 import OrderDirection = Input.OrderDirection
@@ -11,10 +11,12 @@ describe('queries', () => {
 		const [client, calls] = createClient({
 			authors: [
 				{
+					id: '1',
 					name: 'John',
 					email: 'foo@localhost',
 				},
 				{
+					id: '2',
 					name: 'John',
 					email: 'bar@localhost',
 				},
@@ -23,30 +25,23 @@ describe('queries', () => {
 		const result = await client.query({
 			authors: qb.list('Author', {}, it => it.$$()),
 		})
-		expect(result).toEqual({
+		expect(result).toStrictEqual({
 			authors: [
 				{
+					id: '1',
 					name: 'John',
 					email: 'foo@localhost',
 				},
 				{
+					id: '2',
 					name: 'John',
 					email: 'bar@localhost',
 				},
 			],
 		})
 		expect(calls).toHaveLength(1)
-		expect(calls[0].query).toMatchInlineSnapshot(`
-			"query {
-				authors: listAuthor {
-					id
-					name
-					email
-				}
-			}
-			"
-		`)
-		expect(calls[0].variables).toMatchInlineSnapshot('{}')
+		expect(calls[0].query).toMatchSnapshot()
+		expect(calls[0].variables).toStrictEqual({})
 	})
 
 	test('multiple queries', async () => {
@@ -76,7 +71,7 @@ describe('queries', () => {
 			authors: qb.list('Author', {}, it => it.$$()),
 			posts: qb.list('Post', {}, it => it.$$()),
 		})
-		expect(result).toEqual({
+		expect(result as any).toStrictEqual({
 			authors: [
 				{
 					name: 'John',
@@ -99,21 +94,8 @@ describe('queries', () => {
 			],
 		})
 		expect(calls).toHaveLength(1)
-		expect(calls[0].query).toMatchInlineSnapshot(`
-			"query {
-				authors: listAuthor {
-					id
-					name
-					email
-				}
-				posts: listPost {
-					id
-					publishedAt
-				}
-			}
-			"
-		`)
-		expect(calls[0].variables).toMatchInlineSnapshot('{}')
+		expect(calls[0].query).toMatchSnapshot()
+		expect(calls[0].variables).toEqual({})
 	})
 
 
@@ -132,7 +114,7 @@ describe('queries', () => {
 		})
 
 		const result = await client.query(qb.list('Post', {}, it => it.$$()))
-		expect(result).toEqual([
+		expect(result as any).toStrictEqual([
 			{
 				title: 'Post 1',
 				content: 'Content 1',
@@ -143,16 +125,8 @@ describe('queries', () => {
 			},
 		])
 		expect(calls).toHaveLength(1)
-		expect(calls[0].query).toMatchInlineSnapshot(`
-			"query {
-				value: listPost {
-					id
-					publishedAt
-				}
-			}
-			"
-		`)
-		expect(calls[0].variables).toMatchInlineSnapshot('{}')
+		expect(calls[0].query).toMatchSnapshot()
+		expect(calls[0].variables).toEqual({})
 	})
 
 
@@ -162,25 +136,8 @@ describe('queries', () => {
 			authors: qb.list('Author', {}, it => it.$$().$('posts', {}, it => it.$$().$('tags', {}, it => it.$$()))),
 		})
 		expect(calls).toHaveLength(1)
-		expect(calls[0].query).toMatchInlineSnapshot(`
-			"query {
-				authors: listAuthor {
-					id
-					name
-					email
-					posts {
-						id
-						publishedAt
-						tags {
-							id
-							name
-						}
-					}
-				}
-			}
-			"
-		`)
-		expect(calls[0].variables).toMatchInlineSnapshot('{}')
+		expect(calls[0].query).toMatchSnapshot()
+		expect(calls[0].variables).toEqual({})
 	})
 	test('nested object args', async () => {
 		const [client, calls] = createClient()
@@ -191,32 +148,17 @@ describe('queries', () => {
 			}, it => it.$$())),
 		})
 		expect(calls).toHaveLength(1)
-		expect(calls[0].query).toMatchInlineSnapshot(`
-			"query($PostWhere_0: PostWhere, $Int_1: Int) {
-				authors: listAuthor {
-					id
-					name
-					email
-					posts(filter: $PostWhere_0, limit: $Int_1) {
-						id
-						publishedAt
-					}
-				}
-			}
-			"
-		`)
-		expect(calls[0].variables).toMatchInlineSnapshot(`
-			{
-			  "Int_1": 10,
-			  "PostWhere_0": {
-			    "tags": {
-			      "name": {
-			        "eq": "foo",
-			      },
-			    },
-			  },
-			}
-		`)
+		expect(calls[0].query).toMatchSnapshot()
+		expect(calls[0].variables).toStrictEqual({
+			'Int_1': 10,
+			'PostWhere_0': {
+				'tags': {
+					'name': {
+						'eq': 'foo',
+					},
+				},
+			},
+		})
 	})
 
 
@@ -231,7 +173,7 @@ describe('queries', () => {
 			}, it => it.$$()),
 		})
 		expect(calls).toHaveLength(1)
-		expect(calls[0].query).toMatchInlineSnapshot(`
+		expect(calls[0].query).toMatchSnapshot(`
 			"query($AuthorWhere_0: AuthorWhere, $AuthorOrderBy_1: [AuthorOrderBy!], $Int_2: Int, $Int_3: Int) {
 				authors: listAuthor(filter: $AuthorWhere_0, orderBy: $AuthorOrderBy_1, limit: $Int_2, offset: $Int_3) {
 					id
@@ -241,22 +183,22 @@ describe('queries', () => {
 			}
 			"
 		`)
-		expect(calls[0].variables).toMatchInlineSnapshot(`
+		expect(calls[0].variables).toStrictEqual(
 			{
-			  "AuthorOrderBy_1": [
-			    {
-			      "name": "asc",
-			    },
-			  ],
-			  "AuthorWhere_0": {
-			    "name": {
-			      "eq": "John",
-			    },
-			  },
-			  "Int_2": 10,
-			  "Int_3": 20,
-			}
-		`)
+				'AuthorOrderBy_1': [
+					{
+						'name': 'asc',
+					},
+				],
+				'AuthorWhere_0': {
+					'name': {
+						'eq': 'John',
+					},
+				},
+				'Int_2': 10,
+				'Int_3': 20,
+			},
+		)
 	})
 
 
@@ -268,23 +210,12 @@ describe('queries', () => {
 			}, it => it.$$()),
 		})
 		expect(calls).toHaveLength(1)
-		expect(calls[0].query).toMatchInlineSnapshot(`
-			"query($AuthorUniqueWhere_0: AuthorUniqueWhere!) {
-				authors: getAuthor(by: $AuthorUniqueWhere_0) {
-					id
-					name
-					email
-				}
-			}
-			"
-		`)
-		expect(calls[0].variables).toMatchInlineSnapshot(`
-			{
-			  "AuthorUniqueWhere_0": {
-			    "id": "ca7a9b84-efbb-435d-a063-da11f205335a",
-			  },
-			}
-		`)
+		expect(calls[0].query).toMatchSnapshot()
+		expect(calls[0].variables).toEqual({
+			'AuthorUniqueWhere_0': {
+				'id': 'ca7a9b84-efbb-435d-a063-da11f205335a',
+			},
+		})
 	})
 
 	test('top level list transform', async () => {
@@ -309,7 +240,7 @@ describe('queries', () => {
 				})),
 			),
 		})
-		expect(result).toEqual({
+		expect(result as any).toStrictEqual({
 			authors: [
 				{
 					name: 'John',
@@ -342,7 +273,7 @@ describe('queries', () => {
 				})),
 			),
 		})
-		expect(result).toEqual({
+		expect(result as any).toStrictEqual({
 			author: {
 				name: 'John',
 				email: 'foo@localhost',
@@ -377,7 +308,7 @@ describe('queries', () => {
 				}))),
 			),
 		})
-		expect(result).toEqual({
+		expect(result as any).toStrictEqual({
 			author: {
 				name: 'John',
 				email: 'foo@localhost',
@@ -421,7 +352,7 @@ describe('queries', () => {
 				.$('author', author),
 			),
 		})
-		expect(result).toEqual({
+		expect(result as any).toStrictEqual({
 			post: {
 				publishedAt: '2021-01-01T00:00:00Z',
 				author: {
@@ -452,7 +383,7 @@ describe('queries', () => {
 				}))),
 			),
 		})
-		expect(result).toEqual({
+		expect(result as any).toStrictEqual({
 			post: {
 				publishedAt: '2021-01-01T00:00:00Z',
 				localesByLocale: {
@@ -495,7 +426,7 @@ describe('queries', () => {
 				})),
 			),
 		})
-		expect(result).toEqual({
+		expect(result as any).toStrictEqual({
 			author: {
 				name: 'John',
 				email: 'foo@localhost',

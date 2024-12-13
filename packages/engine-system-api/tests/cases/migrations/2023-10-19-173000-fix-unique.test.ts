@@ -1,6 +1,6 @@
 import migration from '../../../src/migrations/2023-10-19-173000-fix-unique'
 import { createMigrationBuilder } from '@contember/database-migrations'
-import { assert, test } from 'vitest'
+import { expect, test } from 'bun:test'
 import { c, createSchema } from '@contember/schema-definition'
 import { createConnectionMock } from '@contember/database-tester'
 import { createDatabaseMetadata } from '@contember/database'
@@ -65,8 +65,9 @@ test('unique fix test', async () => {
 			systemSchema: 'system',
 		},
 	})
-	assert.equal(
+	expect(
 		builder.getSql(),
+	).toEqual(
 		`ALTER TABLE "stage_live"."foo" DROP CONSTRAINT "invalid1";
 ALTER TABLE "stage_live"."foo" DROP CONSTRAINT "invalid2";
 `,

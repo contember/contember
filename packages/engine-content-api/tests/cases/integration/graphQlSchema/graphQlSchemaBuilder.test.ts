@@ -10,7 +10,7 @@ import {
 } from '@contember/schema-definition'
 import { Authorizator, GraphQlSchemaBuilderFactory } from '../../../../src'
 import * as model from './model'
-import { assert, describe, it } from 'vitest'
+import { expect, describe, it } from 'bun:test'
 import { dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -42,7 +42,7 @@ const testSchema = async (test: Test) => {
 		`,
 	})
 	const errors = (result.errors || []).map(it => it.message)
-	assert.deepEqual(errors, [])
+	expect(errors).toStrictEqual([])
 
 	const textSchema = printSchema(graphQlSchema) + '\n'
 
@@ -55,7 +55,7 @@ const testSchema = async (test: Test) => {
 		throw new Error(`Schema file ${filename} not found, creating with current schema`)
 	}
 	if (expectedSchema) {
-		assert.deepEqual(textSchema, expectedSchema)
+		expect(textSchema).toStrictEqual(expectedSchema)
 	}
 }
 describe('GraphQL schema builder', () => {
@@ -328,7 +328,7 @@ describe('GraphQL schema builder', () => {
 	it('basic schema with new builder', async () => {
 		const schema1 = SchemaDefinition.createModel(model)
 		const relation = schema1.entities['Author'].fields['posts']
-		assert.deepEqual((relation as Model.OneHasManyRelation).orderBy, [
+		expect((relation as Model.OneHasManyRelation).orderBy).toStrictEqual([
 			{ path: ['publishedAt'], direction: Model.OrderDirection.desc },
 		])
 		await testSchema({

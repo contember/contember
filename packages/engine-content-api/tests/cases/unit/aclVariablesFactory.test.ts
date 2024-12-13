@@ -1,4 +1,4 @@
-import { describe, it, assert } from 'vitest'
+import { describe, it, expect } from 'bun:test'
 import { createAclVariables } from '../../../src'
 import { Acl } from '@contember/schema'
 import { testUuid } from '../../src/testUuid'
@@ -7,7 +7,7 @@ describe('create acl variables', () => {
 
 	const definition: Acl.EntityVariable = { type: Acl.VariableType.entity, entityName: 'Author' }
 	it('prefix from memberships', () => {
-		assert.deepStrictEqual(createAclVariables({
+		expect(createAclVariables({
 			roles: {
 				author: {
 					stages: '*',
@@ -18,14 +18,14 @@ describe('create acl variables', () => {
 					},
 				},
 			},
-		}, [{ role: 'author', variables: [{ name: 'authorID', condition: { in: [testUuid(2)] } }] }]), {
+		}, [{ role: 'author', variables: [{ name: 'authorID', condition: { in: [testUuid(2)] } }] }])).toStrictEqual({
 			author__authorID: { in: [testUuid(2)] },
 		})
 	})
 
 
 	it('undefined variable', () => {
-		assert.deepStrictEqual(createAclVariables({
+		expect(createAclVariables({
 			roles: {
 				author: {
 					stages: '*',
@@ -36,7 +36,7 @@ describe('create acl variables', () => {
 				},
 			},
 		}, [{ role: 'author', variables: [] }],
-		), {
+		)).toStrictEqual({
 			author__authorID: { never: true },
 		})
 	})

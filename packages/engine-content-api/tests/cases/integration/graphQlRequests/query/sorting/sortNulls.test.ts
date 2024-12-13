@@ -1,4 +1,4 @@
-import { test } from 'vitest'
+import { test } from 'bun:test'
 import { execute } from '../../../../../src/test'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { GQL, SQL } from '../../../../../src/tags'

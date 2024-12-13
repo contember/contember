@@ -81,7 +81,7 @@ class PoolConnection {
 	public disposed = false
 	public uses = 0
 	public createdAt = Date.now()
-	public timerId: NodeJS.Timeout | undefined
+	public timerId: ReturnType<typeof setTimeout> | null = null
 
 	constructor(
 		public readonly client: PgClient,

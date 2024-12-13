@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'vitest'
+import { describe, expect, test } from 'bun:test'
 import { BuiltinElements } from '../src'
 import { renderHook } from '@testing-library/react'
 import { useRichTextBlocksSource } from '../src/hooks/useRichTextBlocksSource'
@@ -30,34 +30,32 @@ describe('useRichTextBlocksSource', () => {
 			referencesField: 'references',
 			referenceDiscriminationField: 'type',
 		}))
-		expect(result.current).toMatchInlineSnapshot(`
-			[
-			  {
-			    "content": {
-			      "children": [
-			        {
-			          "children": [
-			            {
-			              "text": "Foo bar",
-			            },
-			          ],
-			          "referenceId": "74bfb183-3adf-4cc1-8e8e-6d5cd700cadd",
-			          "type": "reference",
-			        },
-			      ],
-			      "formatVersion": 1,
-			    },
-			    "id": undefined,
-			    "references": {
-			      "74bfb183-3adf-4cc1-8e8e-6d5cd700cadd": {
-			        "id": "74bfb183-3adf-4cc1-8e8e-6d5cd700cadd",
-			        "type": "image",
-			        "url": "https://example.com/image.png",
-			      },
-			    },
-			  },
-			]
-		`)
+		expect(result.current).toStrictEqual([
+			{
+				'content': {
+					'children': [
+						{
+							'children': [
+								{
+									'text': 'Foo bar',
+								},
+							],
+							'referenceId': '74bfb183-3adf-4cc1-8e8e-6d5cd700cadd',
+							'type': 'reference',
+						},
+					],
+					'formatVersion': 1,
+				},
+				'id': undefined,
+				'references': {
+					'74bfb183-3adf-4cc1-8e8e-6d5cd700cadd': {
+						'id': '74bfb183-3adf-4cc1-8e8e-6d5cd700cadd',
+						'type': 'image',
+						'url': 'https://example.com/image.png',
+					},
+				},
+			},
+		])
 	})
 
 })

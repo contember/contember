@@ -1,9 +1,10 @@
+import { describe } from 'bun:test'
 import { testMigrations } from '../../src/tests'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
 import { SQL } from '../../src/tags'
 
-testMigrations('patch acl', {
+describe('patch acl', () => testMigrations({
 	original: {
 		model: new SchemaBuilder()
 			.entity('Site', entity => entity.column('name', c => c.type(Model.ColumnType.String)))
@@ -58,4 +59,4 @@ testMigrations('patch acl', {
 		},
 	],
 	sql: SQL``,
-})
+}))

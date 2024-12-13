@@ -7,7 +7,7 @@ import { sqlTransaction } from './sql/sqlTransaction'
 import { getProjectMembershipSql } from './sql/getProjectMembershipSql'
 import { createMembershipSql } from './sql/createMembershipSql'
 import { updateProjectMemberMutation } from './gql/updateProjectMember'
-import { test } from 'vitest'
+import { test } from 'bun:test'
 
 test('update project member', async () => {
 	const identityId = testUuid(6)

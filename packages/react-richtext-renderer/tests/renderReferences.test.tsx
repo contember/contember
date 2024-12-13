@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'vitest'
+import { describe, expect, test } from 'bun:test'
 import { RichText } from '../src'
 import { render } from '@testing-library/react'
 
@@ -21,12 +21,8 @@ describe('reference render', () => {
 			referenceRenderers={{
 				image: ({ reference }) => <img src={reference.url} />,
 			}}
-		/>).container.firstChild)
-			.toMatchInlineSnapshot(`
-				<img
-				  src="https://example.com/image.png"
-				/>
-			`)
+		/>).container.innerHTML)
+			.toEqual(`<img src="https://example.com/image.png">`)
 	})
 
 	test('nested reference', () => {
@@ -46,18 +42,8 @@ describe('reference render', () => {
 			referenceRenderers={{
 				link: ({ reference }) => <a href={reference.url} />,
 			}}
-		/>).container.firstChild)
-			.toMatchInlineSnapshot(`
-				<p
-				  data-contember-type="paragraph"
-				>
-				  Lorem ipsum 
-				  <a
-				    href="https://example.com/"
-				  />
-				   sit amet.
-				</p>
-			`)
+		/>).container.innerHTML)
+			.toEqual(`<p data-contember-type="paragraph">Lorem ipsum <a href="https://example.com/"></a> sit amet.</p>`)
 	})
 
 
@@ -96,17 +82,7 @@ describe('reference render', () => {
 			referenceRenderers={{
 				link: ({ reference }) => <a href={reference.url} />,
 			}}
-		/>).container.firstChild,
-		).toMatchInlineSnapshot(`
-			<p
-			  data-contember-type="paragraph"
-			>
-			  Lorem ipsum 
-			  <div>
-			    err
-			  </div>
-			   sit amet.
-			</p>
-		`)
+		/>).container.innerHTML,
+		).toEqual(`<p data-contember-type="paragraph">Lorem ipsum <div>err</div> sit amet.</p>`)
 	})
 })

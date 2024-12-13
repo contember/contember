@@ -1,4 +1,4 @@
-import { assert, test } from 'vitest'
+import { test, expect } from 'bun:test'
 import { Acl } from '@contember/schema'
 import { consumeMails, createTester, gql, rand } from '../../src/tester'
 import { addProjectMember, invite, signIn, signUp } from '../../src/requests'
@@ -63,10 +63,10 @@ test('admin can invite a user with a membership', async () => {
 			},
 		],
 	})
-	assert.isOk(result.body.data.invite.ok)
+	expect(result.body.data.invite.ok).toBeTruthy()
 	const mail = await consumeMails()
-	assert.lengthOf(mail, 1)
-	assert.equal(mail[0].Content.Headers.Subject[0], 'You have been invited to ' + tester.projectSlug)
+	expect(mail).toHaveLength(1)
+	expect(mail[0].Content.Headers.Subject[0]).toBe('You have been invited to ' + tester.projectSlug)
 	const identity = result.body.data.invite.result.person.identity.id
 
 	await tester(gql`
@@ -137,10 +137,10 @@ test('superEditor can invite a user with a membership', async () => {
 			},
 		],
 	}, { authorizationToken: authKey })
-	assert.isOk(result.body.data.invite.ok)
+	expect(result.body.data.invite.ok).toBeTruthy()
 	const mail = await consumeMails()
-	assert.lengthOf(mail, 1)
-	assert.equal(mail[0].Content.Headers.Subject[0], 'You have been invited to ' + tester.projectSlug)
+	expect(mail).toHaveLength(1)
+	expect(mail[0].Content.Headers.Subject[0]).toBe('You have been invited to ' + tester.projectSlug)
 })
 
 test('superEditor cannot invite a user with different variables', async () => {
@@ -169,8 +169,8 @@ test('superEditor cannot invite a user with different variables', async () => {
 			},
 		],
 	}, { authorizationToken: authKey })
-	assert.isNull(result.body.data.invite)
-	assert.equal(result.body.errors[0].message, 'You are not allowed to invite a person')
+	expect(result.body.data.invite).toBeNull()
+	expect(result.body.errors[0].message).toBe('You are not allowed to invite a person')
 })
 
 test('editor cannot invite a user with a membership', async () => {
@@ -196,6 +196,6 @@ test('editor cannot invite a user with a membership', async () => {
 			},
 		],
 	}, { authorizationToken: authKey })
-	assert.isNull(result.body.data.invite)
-	assert.equal(result.body.errors[0].message, 'You are not allowed to invite a person')
+	expect(result.body.data.invite).toBeNull()
+	expect(result.body.errors[0].message).toBe('You are not allowed to invite a person')
 })

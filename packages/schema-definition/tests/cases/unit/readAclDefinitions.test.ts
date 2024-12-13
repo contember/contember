@@ -1,5 +1,6 @@
-import { expect, test } from 'vitest'
+import { expect, test } from 'bun:test'
 import { c, createSchema } from '../../../src'
+import { Acl } from '@contember/schema'
 
 namespace SimpleModel {
 	export const publicRole = c.createRole('public')
@@ -12,16 +13,14 @@ namespace SimpleModel {
 
 test('simple definitions', () => {
 	const schema = createSchema(SimpleModel)
-	expect(schema.acl.roles.public.entities.Book).toMatchInlineSnapshot(`
-		{
-		  "operations": {
-		    "read": {
-		      "title": true,
-		    },
-		  },
-		  "predicates": {},
-		}
-	`)
+	expect(schema.acl.roles.public.entities.Book).toStrictEqual({
+		'operations': {
+			'read': {
+				'title': true,
+			},
+		},
+		'predicates': {},
+	})
 })
 
 
@@ -36,17 +35,15 @@ namespace RoleOptions {
 
 test('role options', () => {
 	const schema = createSchema(RoleOptions)
-	expect(schema.acl.roles.public).toMatchInlineSnapshot(`
-		{
-		  "debug": true,
-		  "entities": {},
-		  "s3": {
-		    "foo": "bar",
-		  },
-		  "stages": "*",
-		  "variables": {},
-		}
-	`)
+	expect(schema.acl.roles.public).toStrictEqual({
+		'debug': true,
+		'entities': {},
+		's3': {
+			'foo': 'bar',
+		},
+		'stages': '*',
+		'variables': {},
+	})
 })
 
 
@@ -65,23 +62,21 @@ namespace ModelWithPredicate {
 
 test('definition with a predicate', () => {
 	const schema = createSchema(ModelWithPredicate)
-	expect(schema.acl.roles.public.entities.Book).toMatchInlineSnapshot(`
-		{
-		  "operations": {
-		    "read": {
-		      "isPublished": "isPublished_eq_true",
-		      "title": "isPublished_eq_true",
-		    },
-		  },
-		  "predicates": {
-		    "isPublished_eq_true": {
-		      "isPublished": {
-		        "eq": true,
-		      },
-		    },
-		  },
-		}
-	`)
+	expect(schema.acl.roles.public.entities.Book).toStrictEqual({
+		'operations': {
+			'read': {
+				'isPublished': 'isPublished_eq_true',
+				'title': 'isPublished_eq_true',
+			},
+		},
+		'predicates': {
+			'isPublished_eq_true': {
+				'isPublished': {
+					'eq': true,
+				},
+			},
+		},
+	})
 })
 
 namespace ModelWithPredicateOnField {
@@ -99,22 +94,20 @@ namespace ModelWithPredicateOnField {
 
 test('definition with a predicate on field', () => {
 	const schema = createSchema(ModelWithPredicateOnField)
-	expect(schema.acl.roles.public.entities.Book).toMatchInlineSnapshot(`
-		{
-		  "operations": {
-		    "read": {
-		      "title": "isPublished_eq_true",
-		    },
-		  },
-		  "predicates": {
-		    "isPublished_eq_true": {
-		      "isPublished": {
-		        "eq": true,
-		      },
-		    },
-		  },
-		}
-	`)
+	expect(schema.acl.roles.public.entities.Book).toStrictEqual({
+		'operations': {
+			'read': {
+				'title': 'isPublished_eq_true',
+			},
+		},
+		'predicates': {
+			'isPublished_eq_true': {
+				'isPublished': {
+					'eq': true,
+				},
+			},
+		},
+	})
 })
 
 
@@ -135,28 +128,28 @@ namespace ModelWithModificationAcl {
 
 test('definition with update, create, delete predicates', () => {
 	const schema = createSchema(ModelWithModificationAcl)
-	expect(schema.acl.roles.public.entities.Book).toMatchInlineSnapshot(`
+	expect(schema.acl.roles.public.entities.Book).toStrictEqual(
 		{
-		  "operations": {
-		    "create": {
-		      "isPublished": "isPublished_eq_true",
-		      "title": "isPublished_eq_true",
+		  'operations': {
+		    'create': {
+		      'isPublished': 'isPublished_eq_true',
+		      'title': 'isPublished_eq_true',
 		    },
-		    "delete": "isPublished_eq_true",
-		    "update": {
-		      "isPublished": "isPublished_eq_true",
-		      "title": "isPublished_eq_true",
+		    'delete': 'isPublished_eq_true',
+		    'update': {
+		      'isPublished': 'isPublished_eq_true',
+		      'title': 'isPublished_eq_true',
 		    },
 		  },
-		  "predicates": {
-		    "isPublished_eq_true": {
-		      "isPublished": {
-		        "eq": true,
+		  'predicates': {
+		    'isPublished_eq_true': {
+		      'isPublished': {
+		        'eq': true,
 		      },
 		    },
 		  },
-		}
-	`)
+		},
+	)
 })
 
 
@@ -179,31 +172,31 @@ namespace ModelWithMultiplePredicates {
 
 test('definition with multiple predicates on a single field', () => {
 	const schema = createSchema(ModelWithMultiplePredicates)
-	expect(schema.acl.roles.public.entities.Book).toMatchInlineSnapshot(`
+	expect(schema.acl.roles.public.entities.Book).toStrictEqual(
 		{
-		  "operations": {
-		    "read": {
-		      "title": "or_isPublished_eq_false_isPub",
+		  'operations': {
+		    'read': {
+		      'title': 'or_isPublished_eq_false_isPub',
 		    },
 		  },
-		  "predicates": {
-		    "or_isPublished_eq_false_isPub": {
-		      "or": [
+		  'predicates': {
+		    'or_isPublished_eq_false_isPub': {
+		      'or': [
 		        {
-		          "isPublished": {
-		            "eq": false,
+		          'isPublished': {
+		            'eq': false,
 		          },
 		        },
 		        {
-		          "isPublished": {
-		            "eq": true,
+		          'isPublished': {
+		            'eq': true,
 		          },
 		        },
 		      ],
 		    },
 		  },
-		}
-	`)
+		},
+	)
 })
 
 
@@ -230,46 +223,46 @@ namespace ModelWithJoinedPredicateCollision {
 
 test('definition with collision', () => {
 	const schema = createSchema(ModelWithJoinedPredicateCollision)
-	expect(schema.acl.roles.public.entities.Book).toMatchInlineSnapshot(`
+	expect(schema.acl.roles.public.entities.Book).toStrictEqual(
 		{
-		  "operations": {
-		    "read": {
-		      "isPublishedLoremIpsumDolorSitAmet": "or_isPublishedLoremIpsumDolor_1",
-		      "title": "or_isPublishedLoremIpsumDolor",
+		  'operations': {
+		    'read': {
+		      'isPublishedLoremIpsumDolorSitAmet': 'or_isPublishedLoremIpsumDolor_1',
+		      'title': 'or_isPublishedLoremIpsumDolor',
 		    },
 		  },
-		  "predicates": {
-		    "or_isPublishedLoremIpsumDolor": {
-		      "or": [
+		  'predicates': {
+		    'or_isPublishedLoremIpsumDolor': {
+		      'or': [
 		        {
-		          "isPublishedLoremIpsumDolorSitAmet": {
-		            "eq": false,
+		          'isPublishedLoremIpsumDolorSitAmet': {
+		            'eq': false,
 		          },
 		        },
 		        {
-		          "isPublishedLoremIpsumDolorSitAmet": {
-		            "eq": true,
+		          'isPublishedLoremIpsumDolorSitAmet': {
+		            'eq': true,
 		          },
 		        },
 		      ],
 		    },
-		    "or_isPublishedLoremIpsumDolor_1": {
-		      "or": [
+		    'or_isPublishedLoremIpsumDolor_1': {
+		      'or': [
 		        {
-		          "isPublishedLoremIpsumDolorSitAmet": {
-		            "eq": false,
+		          'isPublishedLoremIpsumDolorSitAmet': {
+		            'eq': false,
 		          },
 		        },
 		        {
-		          "isPublishedLoremIpsumDolorSitAmet": {
-		            "eq": false,
+		          'isPublishedLoremIpsumDolorSitAmet': {
+		            'eq': false,
 		          },
 		        },
 		      ],
 		    },
 		  },
-		}
-	`)
+		},
+	)
 })
 
 
@@ -288,38 +281,38 @@ namespace ModelWithMultipleRolesForSinglePredicate {
 
 test('definition with multiple roles in single predicate', () => {
 	const schema = createSchema(ModelWithMultipleRolesForSinglePredicate)
-	expect(schema.acl.roles).toMatchInlineSnapshot(`
+	expect(schema.acl.roles).toStrictEqual(
 		{
-		  "admin": {
-		    "entities": {
-		      "Book": {
-		        "operations": {
-		          "read": {
-		            "title": true,
+		  'admin': {
+		    'entities': {
+		      'Book': {
+		        'operations': {
+		          'read': {
+		            'title': true,
 		          },
 		        },
-		        "predicates": {},
+		        'predicates': {},
 		      },
 		    },
-		    "stages": "*",
-		    "variables": {},
+		    'stages': '*',
+		    'variables': {},
 		  },
-		  "public": {
-		    "entities": {
-		      "Book": {
-		        "operations": {
-		          "read": {
-		            "title": true,
+		  'public': {
+		    'entities': {
+		      'Book': {
+		        'operations': {
+		          'read': {
+		            'title': true,
 		          },
 		        },
-		        "predicates": {},
+		        'predicates': {},
 		      },
 		    },
-		    "stages": "*",
-		    "variables": {},
+		    'stages': '*',
+		    'variables': {},
 		  },
-		}
-	`)
+		},
+	)
 })
 
 namespace ModelWithAclPredicateReferences {
@@ -345,40 +338,40 @@ namespace ModelWithAclPredicateReferences {
 
 test('definition with predicate references', () => {
 	const schema = createSchema(ModelWithAclPredicateReferences)
-	expect(schema.acl.roles.public.entities).toMatchInlineSnapshot(`
+	expect(schema.acl.roles.public.entities).toStrictEqual(
 		{
-		  "Book": {
-		    "operations": {
-		      "read": {
-		        "title": "isPublished_eq_true",
+		  'Book': {
+		    'operations': {
+		      'read': {
+		        'title': 'isPublished_eq_true',
 		      },
 		    },
-		    "predicates": {
-		      "isPublished_eq_true": {
-		        "isPublished": {
-		          "eq": true,
+		    'predicates': {
+		      'isPublished_eq_true': {
+		        'isPublished': {
+		          'eq': true,
 		        },
 		      },
 		    },
 		  },
-		  "BookReview": {
-		    "operations": {
-		      "read": {
-		        "content": "book_isPublished_eq_true",
+		  'BookReview': {
+		    'operations': {
+		      'read': {
+		        'content': 'book_isPublished_eq_true',
 		      },
 		    },
-		    "predicates": {
-		      "book_isPublished_eq_true": {
-		        "book": {
-		          "isPublished": {
-		            "eq": true,
+		    'predicates': {
+		      'book_isPublished_eq_true': {
+		        'book': {
+		          'isPublished': {
+		            'eq': true,
 		          },
 		        },
 		      },
 		    },
 		  },
-		}
-	`)
+		},
+	)
 })
 
 
@@ -397,31 +390,31 @@ namespace ModelWithVariables {
 
 test('definition with variables', () => {
 	const schema = createSchema(ModelWithVariables)
-	expect(schema.acl.roles.manager).toMatchInlineSnapshot(`
+	expect(schema.acl.roles.manager).toStrictEqual(
 		{
-		  "entities": {
-		    "Book": {
-		      "operations": {
-		        "read": {
-		          "title": "id_bookId",
+		  'entities': {
+		    'Book': {
+		      'operations': {
+		        'read': {
+		          'title': 'id_bookId',
 		        },
 		      },
-		      "predicates": {
-		        "id_bookId": {
-		          "id": "bookId",
+		      'predicates': {
+		        'id_bookId': {
+		          'id': 'bookId',
 		        },
 		      },
 		    },
 		  },
-		  "stages": "*",
-		  "variables": {
-		    "bookId": {
-		      "entityName": "Book",
-		      "type": "entity",
+		  'stages': '*',
+		  'variables': {
+		    'bookId': {
+		      'entityName': 'Book',
+		      'type': Acl.VariableType.entity,
 		    },
 		  },
-		}
-	`)
+		},
+	)
 })
 
 namespace ModelWithAllowCustomPrimary {
@@ -435,14 +428,14 @@ namespace ModelWithAllowCustomPrimary {
 
 test('allow custom primary', () => {
 	const schema = createSchema(ModelWithAllowCustomPrimary)
-	expect(schema.acl.roles.public.entities.Book).toMatchInlineSnapshot(`
+	expect(schema.acl.roles.public.entities.Book).toStrictEqual(
 		{
-		  "operations": {
-		    "customPrimary": true,
+		  'operations': {
+		    'customPrimary': true,
 		  },
-		  "predicates": {},
-		}
-	`)
+		  'predicates': {},
+		},
+	)
 })
 
 namespace ModelWithAllowCustomPrimaryAllRoles {
@@ -456,14 +449,14 @@ namespace ModelWithAllowCustomPrimaryAllRoles {
 
 test('allow custom primary', () => {
 	const schema = createSchema(ModelWithAllowCustomPrimaryAllRoles)
-	expect(schema.acl.roles.public.entities.Book).toMatchInlineSnapshot(`
+	expect(schema.acl.roles.public.entities.Book).toStrictEqual(
 		{
-		  "operations": {
-		    "customPrimary": true,
+		  'operations': {
+		    'customPrimary': true,
 		  },
-		  "predicates": {},
-		}
-	`)
+		  'predicates': {},
+		},
+	)
 })
 
 
@@ -513,32 +506,30 @@ namespace ModelWithPredefinedVariables {
 
 test('definition with predefined variables', () => {
 	const schema = createSchema(ModelWithPredefinedVariables)
-	expect(schema.acl.roles.customer).toMatchInlineSnapshot(`
-		{
-		  "entities": {
-		    "Order": {
-		      "operations": {
-		        "read": {
-		          "personId": "personId_person",
-		          "valueCents": "personId_person",
-		        },
-		      },
-		      "predicates": {
-		        "personId_person": {
-		          "personId": "person",
-		        },
-		      },
-		    },
-		  },
-		  "stages": "*",
-		  "variables": {
-		    "person": {
-		      "type": "predefined",
-		      "value": "personID",
-		    },
-		  },
-		}
-	`)
+	expect(schema.acl.roles.customer).toStrictEqual({
+		'entities': {
+			'Order': {
+				'operations': {
+					'read': {
+						'personId': 'personId_person',
+						'valueCents': 'personId_person',
+					},
+				},
+				'predicates': {
+					'personId_person': {
+						'personId': 'person',
+					},
+				},
+			},
+		},
+		'stages': '*',
+		'variables': {
+			'person': {
+				'type': Acl.VariableType.predefined,
+				'value': 'personID',
+			},
+		},
+	})
 })
 
 namespace InvalidModel {
@@ -566,14 +557,12 @@ namespace ExplicitIdPredicate {
 
 test('explicit ID predicate', () => {
 	const schema = createSchema(ExplicitIdPredicate)
-	expect(schema.acl.roles.public.entities.Book).toMatchInlineSnapshot(`
-		{
-		  "operations": {
-		    "read": {
-		      "id": true,
-		    },
-		  },
-		  "predicates": {},
-		}
-	`)
+	expect(schema.acl.roles.public.entities.Book).toStrictEqual({
+		'operations': {
+			'read': {
+				'id': true,
+			},
+		},
+		'predicates': {},
+	})
 })

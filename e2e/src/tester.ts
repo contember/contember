@@ -9,7 +9,7 @@ import {
 	SchemaMigrator, VERSION_LATEST,
 } from '@contember/schema-migrations'
 import { emptySchema } from '@contember/schema-utils'
-import { afterEach, assert, beforeEach } from 'vitest'
+import { afterEach, describe, beforeEach, expect } from 'bun:test'
 
 
 export const rootToken = String(process.env.CONTEMBER_ROOT_TOKEN)
@@ -28,10 +28,10 @@ beforeEach(() => {
 })
 
 afterEach(ctx => {
-	if (latestError !== null && ctx.task.result.state === 'fail') {
-		// eslint-disable-next-line no-console
-		console.error(latestError)
-	}
+	// if (latestError !== null && ctx.task.result.state === 'fail') {
+	// 	// eslint-disable-next-line no-console
+	// 	console.error(latestError)
+	// }
 })
 
 
@@ -162,5 +162,5 @@ beforeEach(async () => {
 
 afterEach(async () => {
 	const mailhogMessages = await consumeMails()
-	assert.deepStrictEqual(mailhogMessages, [])
+	expect(mailhogMessages).toHaveLength(0)
 })

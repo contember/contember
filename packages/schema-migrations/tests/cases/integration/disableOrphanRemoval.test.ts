@@ -1,9 +1,10 @@
+import { describe } from 'bun:test'
 import { testMigrations } from '../../src/tests'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
 import { SQL } from '../../src/tags'
 
-testMigrations('disable orphan removal', {
+describe('disable orphan removal', () => testMigrations({
 	original: {
 		model: new SchemaBuilder()
 			.entity('Post', entity =>
@@ -30,4 +31,4 @@ testMigrations('disable orphan removal', {
 		},
 	],
 	sql: SQL``,
-})
+}))

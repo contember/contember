@@ -1,5 +1,5 @@
 import { createSchema } from '@contember/schema-definition'
-import { expect, test } from 'vitest'
+import { expect, test } from 'bun:test'
 import * as basic from './schemas/basic'
 import * as complex from './schemas/complex'
 import * as relations from './schemas/relations'

@@ -6,7 +6,7 @@ import { createMembershipSql } from './sql/createMembershipSql'
 import { createMembershipVariableSql } from './sql/createMembershipVariableSql'
 import { getProjectMembershipSql } from './sql/getProjectMembershipSql'
 import { sqlTransaction } from './sql/sqlTransaction'
-import { test } from 'vitest'
+import { test } from 'bun:test'
 
 test('add project member', async () => {
 	const languageId = testUuid(999)

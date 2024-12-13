@@ -1,9 +1,10 @@
 import { SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
 import { SQL } from '../../src/tags'
+import { describe } from 'bun:test'
 import { testMigrations } from '../../src/tests'
 
-testMigrations('create many has one relation (post with author)', {
+describe('create many has one relation (post with author)', () => testMigrations({
 	original: {
 		model: new SchemaBuilder()
 			.entity('Author', e => e.column('name', c => c.type(Model.ColumnType.String)))
@@ -90,4 +91,4 @@ testMigrations('create many has one relation (post with author)', {
 	ALTER TABLE "post"
 		ADD FOREIGN KEY ("author_id") REFERENCES "author"("id") ON DELETE CASCADE DEFERRABLE INITIALLY IMMEDIATE;
 	CREATE INDEX ON "post" ("author_id");`,
-})
+}))

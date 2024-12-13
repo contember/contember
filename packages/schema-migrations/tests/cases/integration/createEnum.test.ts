@@ -1,9 +1,10 @@
+import { describe } from 'bun:test'
 import { testMigrations } from '../../src/tests'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
 import { SQL } from '../../src/tags'
 
-testMigrations('create enum', {
+describe('create enum', () => testMigrations({
 	original: {
 		model: new SchemaBuilder()
 			.entity('Post', e => e.column('title', c => c.type(Model.ColumnType.String)))
@@ -40,4 +41,4 @@ testMigrations('create enum', {
 	sql: SQL`CREATE DOMAIN "postStatus" AS text CONSTRAINT "poststatus_check" CHECK (VALUE IN('publish','draft'));
 	ALTER TABLE "post"
 		ADD "status" "postStatus";`,
-})
+}))

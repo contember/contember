@@ -1,4 +1,4 @@
-import { test } from 'vitest'
+import { test } from 'bun:test'
 import { execute, sqlTransaction } from '../../../../../src/test'
 import { GQL } from '../../../../../src/tags'
 import { testUuid } from '../../../../../src/testUuid'

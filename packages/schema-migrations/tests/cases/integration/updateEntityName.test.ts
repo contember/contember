@@ -1,9 +1,10 @@
+import { describe } from 'bun:test'
 import { testMigrations } from '../../src/tests'
 import { SchemaBuilder, c, createSchema } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
 import { SQL } from '../../src/tags'
 
-testMigrations('rename entity without renaming a table', {
+describe('rename entity without renaming a table', () => testMigrations({
 	original: {
 		model: new SchemaBuilder()
 			.entity('Author', e => e.tableName('user').column('name', c => c.type(Model.ColumnType.String)))
@@ -25,9 +26,9 @@ testMigrations('rename entity without renaming a table', {
 	],
 	sql: SQL``,
 	noDiff: true,
-})
+}))
 
-testMigrations('rename entity and table', {
+describe('rename entity and table', () => testMigrations({
 	original: {
 		model: new SchemaBuilder()
 			.entity('Author', e => e.column('name', c => c.type(Model.ColumnType.String)))
@@ -49,10 +50,10 @@ testMigrations('rename entity and table', {
 	sql: SQL`ALTER TABLE "author"
 		RENAME TO "user";`,
 	noDiff: true,
-})
+}))
 
 
-testMigrations('rename entity with one-has-one (constraint)', {
+describe('rename entity with one-has-one (constraint)', () => testMigrations({
 	original: {
 		model: new SchemaBuilder()
 			.entity('Author', e => e.oneHasOne('content', r => r.target('Content')))
@@ -74,9 +75,9 @@ testMigrations('rename entity with one-has-one (constraint)', {
 	],
 	sql: SQL``,
 	noDiff: true,
-})
+}))
 
-testMigrations('rename table with acl', {
+describe('rename table with acl', () => testMigrations({
 	original: {
 		model: new SchemaBuilder()
 			.entity('Site', entity => entity.column('name', c => c.type(Model.ColumnType.String)))
@@ -132,4 +133,4 @@ testMigrations('rename table with acl', {
 	],
 	sql: SQL``,
 	noDiff: true,
-})
+}))

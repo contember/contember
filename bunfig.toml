@@ -1,1 +1,2 @@
-jsxImportSource = "preact"
+[test]
+preload = "./buntest.ts"

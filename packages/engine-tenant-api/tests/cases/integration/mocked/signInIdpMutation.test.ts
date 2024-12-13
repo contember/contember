@@ -1,6 +1,6 @@
 import { executeTenantTest } from '../../../src/testTenant'
 import { testUuid } from '../../../src/testUuid'
-import { test } from 'vitest'
+import { test } from 'bun:test'
 import { signInIDP } from './gql/signInIdp'
 import { sqlTransaction } from './sql/sqlTransaction'
 import { getIdpBySlugSql } from './sql/getIdpBySlugSql'

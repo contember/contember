@@ -1,9 +1,10 @@
+import { describe } from 'bun:test'
 import { testMigrations } from '../../src/tests'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { Acl, Model } from '@contember/schema'
 import { SQL } from '../../src/tags'
 
-testMigrations('rename a field', {
+describe('rename a field', () => testMigrations({
 	original: {
 		model: new SchemaBuilder()
 			.entity('Author', e => e.column('firstName', c => c.type(Model.ColumnType.String).columnName('name')))
@@ -24,9 +25,9 @@ testMigrations('rename a field', {
 	],
 	sql: SQL``,
 	noDiff: true,
-})
+}))
 
-testMigrations('rename a field with column', {
+describe('rename a field with column', () => testMigrations({
 	original: {
 		model: new SchemaBuilder()
 			.entity('Author', e => e.column('firstName', c => c.type(Model.ColumnType.String)))
@@ -48,11 +49,11 @@ testMigrations('rename a field with column', {
 	],
 	sql: SQL`ALTER TABLE "author" RENAME "first_name" TO "name";`,
 	noDiff: true,
-})
+}))
 
 
 
-testMigrations('rename a field with one-has-one', {
+describe('rename a field with one-has-one', () => testMigrations({
 	original: {
 		model: new SchemaBuilder()
 			.entity('Author', e => e.oneHasOne('content', r => r.target('Content')))
@@ -75,9 +76,9 @@ testMigrations('rename a field with one-has-one', {
 	],
 	sql: SQL``,
 	noDiff: true,
-})
+}))
 
-testMigrations('rename a relation', {
+describe('rename a relation', () => testMigrations({
 	original: {
 		model: new SchemaBuilder()
 			.entity('Post', e => e.column('title').manyHasOne('user', r => r.target('Author').inversedBy('posts')))
@@ -102,10 +103,10 @@ testMigrations('rename a relation', {
 	],
 	sql: SQL``,
 	noDiff: true,
-})
+}))
 
 
-testMigrations('rename a relation with joining column', {
+describe('rename a relation with joining column', () => testMigrations({
 	original: {
 		model: new SchemaBuilder()
 			.entity('Post', e => e.column('title').manyHasOne('user', r => r.target('Author').inversedBy('posts')))
@@ -131,10 +132,10 @@ testMigrations('rename a relation with joining column', {
 	],
 	sql: SQL`ALTER TABLE "post" RENAME "user_id" TO "author_id";`,
 	noDiff: true,
-})
+}))
 
 
-testMigrations('rename relation with acl', {
+describe('rename relation with acl', () => testMigrations({
 	original: {
 		model: new SchemaBuilder()
 			.entity('Post', e => e.column('title').manyHasOne('user', r => r.target('Author').inversedBy('posts')))
@@ -231,4 +232,4 @@ testMigrations('rename relation with acl', {
 	],
 	sql: SQL``,
 	noDiff: true,
-})
+}))

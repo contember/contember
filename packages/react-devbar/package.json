@@ -11,6 +11,7 @@
         "types": "./dist/types/index.d.ts",
         "development": "./dist/development/index.js",
         "production": "./dist/production/index.js",
+        "typescript": "./src/index.ts",
         "default": "./dist/production/index.js"
       },
       "require": {
@@ -20,9 +21,6 @@
         "typescript": "./src/index.ts",
         "default": "./dist/production/index.cjs"
       }
-    },
-    "./index.css": {
-      "default": "./src/index.css"
     }
   },
   "typings": "./dist/types/index.d.ts",

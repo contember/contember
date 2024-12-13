@@ -1,7 +1,8 @@
 import { Input, Model } from '@contember/schema'
 import { OrderByHelper } from '../../../src/mapper'
 import { ObjectNode } from '../../../src/inputProcessing'
-import { describe, it, assert } from 'vitest'
+import { describe, it } from 'bun:test'
+import { assert } from '../../src/assert'
 
 const entity: Model.Entity = {
 	name: 'Foo',
@@ -66,7 +67,7 @@ describe('order by helper', () => {
 		const objectNode = new ObjectNode('test', 'test', [], {}, {}, [])
 
 		const newNode = OrderByHelper.appendDefaultOrderBy(entity, objectNode, [])
-		assert.isUndefined(newNode.args.orderBy)
+		assert.equal(newNode.args.orderBy, undefined)
 	})
 
 	it('set default order by without defined order', () => {

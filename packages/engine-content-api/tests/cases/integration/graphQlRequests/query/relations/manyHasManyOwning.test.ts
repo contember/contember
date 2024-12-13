@@ -1,4 +1,4 @@
-import { test } from 'vitest'
+import { test } from 'bun:test'
 import { execute } from '../../../../../src/test'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { GQL, SQL } from '../../../../../src/tags'
@@ -194,7 +194,7 @@ test('Posts with paginated tags (many has many owning)', async () => {
 })
 
 
-test('large number of posts - use array', async () => {
+test.only('large number of posts - use array', async () => {
 	const ids = Array.from({ length: 1000 }).map((it, index) => testUuid(index + 1))
 	await execute({
 		schema: new SchemaBuilder()

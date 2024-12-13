@@ -49,8 +49,7 @@ jobs:
 
           - job_name: test
             run_script: |
-                bun run test:browser
-                bun run test:node
+                bun run test
 
     steps:
       - name: Checkout code
@@ -76,6 +75,8 @@ jobs:
     services:
       mailhog:
         image: mailhog/mailhog
+        env:
+          MH_CORS_ORIGIN: "*"
         ports:
           - 8025:8025
           - 1025:1025

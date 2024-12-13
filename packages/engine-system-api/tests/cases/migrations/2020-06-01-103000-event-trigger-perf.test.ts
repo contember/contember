@@ -1,6 +1,6 @@
 import migration from '../../../src/migrations/2020-06-01-103000-event-trigger-perf'
 import { createMigrationBuilder } from '@contember/database-migrations'
-import { assert, test } from 'vitest'
+import { expect, test } from 'bun:test'
 import { emptyDatabaseMetadata } from '@contember/database'
 import { c, createSchema } from '@contember/schema-definition'
 
@@ -62,8 +62,9 @@ test('event-trigger-performance sql', async () => {
 			],
 		},
 	})
-	assert.equal(
+	expect(
 		builder.getSql(),
+	).toEqual(
 		`CREATE OR REPLACE FUNCTION "trigger_event"() RETURNS TRIGGER AS $$
 DECLARE
     DECLARE new_event_type TEXT;

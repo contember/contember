@@ -1,3 +1,4 @@
+import { describe } from 'bun:test'
 import { testMigrations } from '../../src/tests'
 import { SQL } from '../../src/tags'
 import { createSchema, SchemaDefinition as def } from '@contember/schema-definition'
@@ -17,7 +18,7 @@ namespace SchemaWithIndex {
 }
 
 
-testMigrations('create index', {
+describe('create index', () => testMigrations({
 	original: createSchema(SchemaWithoutIndex),
 	updated: createSchema(SchemaWithIndex),
 	diff: [
@@ -28,10 +29,10 @@ testMigrations('create index', {
 		},
 	],
 	sql: SQL`CREATE INDEX ON "article" ("title");`,
-})
+}))
 
 
-testMigrations('drop index', {
+describe('drop index', () => testMigrations({
 	original: createSchema(SchemaWithIndex),
 	updated: createSchema(SchemaWithoutIndex),
 	diff: [
@@ -51,4 +52,4 @@ testMigrations('drop index', {
 		}],
 		uniqueConstraints: [],
 	}),
-})
+}))

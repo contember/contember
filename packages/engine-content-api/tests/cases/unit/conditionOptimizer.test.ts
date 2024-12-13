@@ -1,5 +1,11 @@
-import { describe, it, assert } from 'vitest'
+import { describe, it, expect } from 'bun:test'
 import { ConditionOptimizer } from '../../../src/mapper/select/optimizer/ConditionOptimizer'
+
+const assert = {
+	deepStrictEqual: (a: any, b: any) => {
+		expect(a).toEqual(b)
+	},
+}
 
 describe('condition optimizer', () => {
 	const optimizer = new ConditionOptimizer()

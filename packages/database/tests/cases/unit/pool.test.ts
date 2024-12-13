@@ -1,25 +1,19 @@
-import { expect, it, beforeAll } from 'vitest'
+import { expect, it, beforeAll } from 'bun:test'
 import { ClientErrorCodes, Pool, PoolLogger } from '../../../src'
 import { Client as PgClient } from 'pg'
 import EventEmitter from 'node:events'
 
 const createPoolLogger = () => {
 	const logger: PoolLogger & {messages: string; clear: () => void} = (message, pool) => {
-		logger.messages += `${pool.connecting}${pool.active}${pool.idle} ${pool.pending}: ${message}\n`
+		logger.messages += `\t\t${pool.connecting}${pool.active}${pool.idle} ${pool.pending}: ${message}\n`
 	}
-	logger.messages = '\nCAI P\n'
-	logger.clear = () => logger.messages = 'CAI P\n'
+	logger.messages = '\n\t\tCAI P\n'
+	logger.clear = () => logger.messages = '\n\t\tCAI P\n'
 	return logger
 }
 
 const timeout = async (ms = 1) => await new Promise(resolve => setTimeout(resolve, ms))
 
-beforeAll(() => {
-	expect.addSnapshotSerializer({
-		test: val => typeof val === 'string',
-		print: val => String(val),
-	})
-})
 
 it('acquires and releases new connection from pool', async () => {
 	const logger = createPoolLogger()
@@ -30,7 +24,7 @@ it('acquires and releases new connection from pool', async () => {
 	const connection = await pool.acquire()
 	await pool.release(connection)
 	await timeout()
-	expect(logger.messages).toMatchInlineSnapshot(`
+	expect(logger.messages).toEqual(`
 		CAI P
 		000 1: Item added to a queue.
 		000 1: Creating a new connection
@@ -39,7 +33,7 @@ it('acquires and releases new connection from pool', async () => {
 		010 0: Not connecting, queue is empty.
 		010 0: Releasing a connection.
 		001 0: Connection is idle and available.
-	`)
+`)
 })
 
 
@@ -53,7 +47,7 @@ it('disposes connection when maxIdle is reached', async () => {
 	const connection = await pool.acquire()
 	await pool.release(connection)
 	await timeout()
-	expect(logger.messages).toMatchInlineSnapshot(`
+	expect(logger.messages).toEqual(`
 		CAI P
 		000 1: Item added to a queue.
 		000 1: Creating a new connection
@@ -62,7 +56,7 @@ it('disposes connection when maxIdle is reached', async () => {
 		010 0: Not connecting, queue is empty.
 		010 0: Releasing a connection.
 		000 0: Too many idle connections, connection disposed.
-	`)
+`)
 })
 
 it('disposes connection after max uses', async () => {
@@ -75,7 +69,7 @@ it('disposes connection after max uses', async () => {
 	const connection = await pool.acquire()
 	await pool.release(connection)
 	await timeout()
-	expect(logger.messages).toMatchInlineSnapshot(`
+	expect(logger.messages).toEqual(`
 		CAI P
 		000 1: Item added to a queue.
 		000 1: Creating a new connection
@@ -85,7 +79,7 @@ it('disposes connection after max uses', async () => {
 		010 0: Releasing a connection.
 		000 0: Not connecting, queue is empty.
 		000 0: Connection has reached max age or usage and was disposed.
-	`)
+`)
 })
 
 it('disposes errored connection', async () => {
@@ -98,7 +92,7 @@ it('disposes errored connection', async () => {
 	const connection = await pool.acquire()
 	await pool.dispose(connection)
 	await timeout()
-	expect(logger.messages).toMatchInlineSnapshot(`
+	expect(logger.messages).toEqual(`
 		CAI P
 		000 1: Item added to a queue.
 		000 1: Creating a new connection
@@ -108,7 +102,7 @@ it('disposes errored connection', async () => {
 		010 0: Releasing and disposing a connection.
 		000 0: Not connecting, queue is empty.
 		000 0: Connection errored and was disposed.
-	`)
+`)
 })
 
 
@@ -121,10 +115,10 @@ it('time outs when waiting for a connection', async () => {
 		logError: () => null,
 		acquireTimeoutMs: 2,
 	})
-	await expect(pool.acquire.bind(pool)).rejects.toThrowError('Failed to acquire a connection')
+	await expect(pool.acquire()).rejects.toThrowError('Failed to acquire a connection')
 	await timeout(4)
 
-	expect(logger.messages).toMatchInlineSnapshot(`
+	expect(logger.messages).toEqual(`
 		CAI P
 		000 1: Item added to a queue.
 		000 1: Creating a new connection
@@ -132,7 +126,7 @@ it('time outs when waiting for a connection', async () => {
 		000 0: Connection established
 		001 0: Connection is idle and available.
 		001 0: Not connecting, queue is empty.
-	`)
+`)
 })
 
 
@@ -148,12 +142,12 @@ it('acquires idle connection from pool', async () => {
 	const connection2 = await pool.acquire()
 	await pool.release(connection2)
 	await timeout()
-	expect(logger.messages).toMatchInlineSnapshot(`
+	expect(logger.messages).toEqual(`
 		CAI P
 		010 0: Item fulfilled with an idle connection.
 		010 0: Releasing a connection.
 		001 0: Connection is idle and available.
-	`)
+`)
 })
 
 it('acquires multiple new connections from pool', async () => {
@@ -167,7 +161,7 @@ it('acquires multiple new connections from pool', async () => {
 	await pool.release(conn1)
 	await pool.release(conn2)
 	await timeout()
-	expect(logger.messages).toMatchInlineSnapshot(`
+	expect(logger.messages).toEqual(`
 		CAI P
 		000 1: Item added to a queue.
 		000 1: Creating a new connection
@@ -183,7 +177,7 @@ it('acquires multiple new connections from pool', async () => {
 		011 0: Connection is idle and available.
 		011 0: Releasing a connection.
 		002 0: Connection is idle and available.
-	`)
+`)
 })
 
 
@@ -197,7 +191,7 @@ it('releases idle connection', async () => {
 	const conn1 = await pool.acquire()
 	await pool.release(conn1)
 	await timeout(4)
-	expect(logger.messages).toMatchInlineSnapshot(`
+	expect(logger.messages).toEqual(`
 		CAI P
 		000 1: Item added to a queue.
 		000 1: Creating a new connection
@@ -207,7 +201,7 @@ it('releases idle connection', async () => {
 		010 0: Releasing a connection.
 		001 0: Connection is idle and available.
 		000 0: Idle connection disposed after timeout.
-	`)
+`)
 })
 
 
@@ -225,7 +219,7 @@ it('waits for idle connection when pool is full', async () => {
 	const conn2 = await pool.acquire()
 	await pool.release(conn2)
 	await timeout()
-	expect(logger.messages).toMatchInlineSnapshot(`
+	expect(logger.messages).toEqual(`
 		CAI P
 		000 1: Item added to a queue.
 		000 1: Creating a new connection
@@ -238,7 +232,7 @@ it('waits for idle connection when pool is full', async () => {
 		010 0: Queued item fulfilled with released connection.
 		010 0: Releasing a connection.
 		001 0: Connection is idle and available.
-	`)
+`)
 })
 
 
@@ -255,7 +249,7 @@ it('tries to reconnect on recoverable error', async () => {
 	pgClientMock.connections.push(createRecoverableErrorPromise(), createRecoverableErrorPromise())
 	await pool.acquire()
 	await timeout()
-	expect(logger.messages).toMatchInlineSnapshot(`
+	expect(logger.messages).toEqual(`
 		CAI P
 		000 1: Item added to a queue.
 		000 1: Creating a new connection
@@ -270,7 +264,7 @@ it('tries to reconnect on recoverable error', async () => {
 		000 1: Connection established
 		010 0: Queued item fulfilled with new connection.
 		010 0: Not connecting, queue is empty.
-	`)
+`)
 })
 
 
@@ -287,9 +281,9 @@ it('fails to reconnect on recoverable error', async () => {
 		acquireTimeoutMs: 30,
 	})
 	pgClientMock.connections.push(createRecoverableErrorPromise(), createRecoverableErrorPromise())
-	await expect(async () => await pool.acquire()).rejects.toThrowError('Failed to acquire a connection. Last error: too many connection')
+	await expect(pool.acquire()).rejects.toThrowError('Failed to acquire a connection. Last error: too many connection')
 	await timeout(20)
-	expect(logger.messages).toMatchInlineSnapshot(`
+	expect(logger.messages).toEqual(`
 		CAI P
 		000 1: Item added to a queue.
 		000 1: Creating a new connection
@@ -302,7 +296,7 @@ it('fails to reconnect on recoverable error', async () => {
 		100 0: Queued item timed out
 		000 0: Retrying
 		000 0: Not connecting, queue is empty.
-	`)
+`)
 })
 
 it('fails to reconnect on unrecoverable error', async () => {
@@ -315,15 +309,15 @@ it('fails to reconnect on unrecoverable error', async () => {
 		logError: () => null,
 	})
 	pgClientMock.connections.push(createErrorPromise())
-	await expect(async () => await pool.acquire()).rejects.toThrowError('Database client connection error: my err')
+	await expect(pool.acquire()).rejects.toThrowError('Database client connection error: my err')
 	await timeout()
-	expect(logger.messages).toMatchInlineSnapshot(`
+	expect(logger.messages).toEqual(`
 		CAI P
 		000 1: Item added to a queue.
 		000 1: Creating a new connection
 		100 1: Connection error occurred: my err
 		000 0: Connecting failed, rejecting pending item
-	`)
+`)
 })
 
 
@@ -374,7 +368,7 @@ it('rate limit', async () => {
 	await pool.dispose(conn2)
 	await timeout(10)
 	const conn3 = await pool.acquire()
-	expect(logger.messages).toMatchInlineSnapshot(`
+	expect(logger.messages).toEqual(`
 		CAI P
 		000 1: Item added to a queue.
 		000 1: Creating a new connection
@@ -395,5 +389,5 @@ it('rate limit', async () => {
 		000 1: Connection established
 		010 0: Queued item fulfilled with new connection.
 		010 0: Not connecting, queue is empty.
-	`)
+`)
 })

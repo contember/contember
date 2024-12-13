@@ -11,8 +11,9 @@ import { getEntity } from '@contember/schema-utils'
 import { Mapper } from '../../../src/mapper'
 import { createMock } from '../../src/utils'
 import { testUuid } from '../../src/testUuid'
-import { describe, it, assert } from 'vitest'
+import { describe, it } from 'bun:test'
 import { SchemaDefinition as def } from '@contember/schema-definition'
+import { assert } from '../../src/assert'
 
 type PrimaryValueExpectation = { entity: string; where: Input.UniqueWhere; result: Value.PrimaryValue }
 type SelectExpectation = {

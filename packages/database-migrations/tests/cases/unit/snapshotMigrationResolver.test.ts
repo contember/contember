@@ -1,4 +1,4 @@
-import { assert, describe, test } from 'vitest'
+import { expect, describe, test } from 'bun:test'
 import { SnapshotMigrationResolver, Migration } from '../../../src'
 
 describe('snapshot migration resolver', () => {
@@ -9,7 +9,7 @@ describe('snapshot migration resolver', () => {
 			'2023-07-26-105500-yy': () => null,
 		})
 
-		assert.deepEqual(resolver.resolveMigrations({ runMigrations: [] }), [
+		expect(resolver.resolveMigrations({ runMigrations: [] })).toStrictEqual([
 			new Migration('2023-07-26-105500-snapshot', snapshotRunner),
 		])
 	})
@@ -24,7 +24,7 @@ describe('snapshot migration resolver', () => {
 			'2023-07-26-105700-yy': () => null,
 		})
 
-		assert.deepEqual(resolver.resolveMigrations({ runMigrations: [] }), [
+		expect(resolver.resolveMigrations({ runMigrations: [] })).toStrictEqual([
 			new Migration('2023-07-26-105700-snapshot', snapshotRunner),
 		])
 	})
@@ -38,7 +38,7 @@ describe('snapshot migration resolver', () => {
 			'2023-07-26-105500-yy': yyRunner,
 		})
 
-		assert.deepEqual(resolver.resolveMigrations({ runMigrations: [{ name: '2023-07-26-105000-xx', group: null }] }), [
+		expect(resolver.resolveMigrations({ runMigrations: [{ name: '2023-07-26-105000-xx', group: null }] })).toStrictEqual([
 			new Migration('2023-07-26-105000-xx', xxRunner),
 			new Migration('2023-07-26-105500-yy', yyRunner),
 		])
@@ -56,7 +56,7 @@ describe('snapshot migration resolver', () => {
 			'2023-07-26-105700-zz': zzRunner,
 		})
 
-		assert.deepEqual(resolver.resolveMigrations({ runMigrations: [{ name: '2023-07-26-105000-snapshot', group: null }] }), [
+		expect(resolver.resolveMigrations({ runMigrations: [{ name: '2023-07-26-105000-snapshot', group: null }] })).toStrictEqual([
 			new Migration('2023-07-26-105000-snapshot', snapshotRunner),
 			new Migration('2023-07-26-105500-yy', yyRunner),
 			new Migration('2023-07-26-105700-zz', zzRunner),

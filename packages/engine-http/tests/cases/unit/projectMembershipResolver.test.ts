@@ -1,5 +1,5 @@
 
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'bun:test'
 import { ProjectMembershipFetcher, ProjectMembershipResolver } from '../../../src'
 import { createMock } from '../../utils'
 import { Acl } from '@contember/schema'
@@ -31,7 +31,7 @@ describe('membership resolver', () => {
 				},
 			},
 		})
-		expect(resolvedMembership.effective).deep.eq([{ role: 'test', variables: [] }])
+		expect(resolvedMembership.effective).toStrictEqual([{ role: 'test', variables: [] }])
 	})
 
 
@@ -60,7 +60,7 @@ describe('membership resolver', () => {
 				},
 			},
 		})
-		expect(resolvedMembership.effective).deep.eq([{ role: 'test', variables: [] }])
+		expect(resolvedMembership.effective).toStrictEqual([{ role: 'test', variables: [] }])
 	})
 
 	it('should return assumed membership', async () => {
@@ -105,7 +105,7 @@ describe('membership resolver', () => {
 				},
 			},
 		})
-		expect(resolvedMembership.effective).deep.eq([{ role: 'test', variables: [{ name: 'lang', condition: { eq: 'cs' } }] }])
+		expect(resolvedMembership.effective).toStrictEqual([{ role: 'test', variables: [{ name: 'lang', condition: { eq: 'cs' } }] }])
 	})
 
 	it('should return assumed membership from a body', async () => {
@@ -155,7 +155,7 @@ describe('membership resolver', () => {
 				},
 			},
 		})
-		expect(resolvedMembership.effective).deep.eq([{
+		expect(resolvedMembership.effective).toStrictEqual([{
 			role: 'test',
 			variables: [{ name: 'lang', condition: { eq: 'cs' } }],
 		}])

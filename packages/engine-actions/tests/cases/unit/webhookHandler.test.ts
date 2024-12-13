@@ -1,4 +1,4 @@
-import { assert, describe, expect, test } from 'vitest'
+import { describe, expect, test } from 'bun:test'
 import { WebhookTargetHandler } from '../../../src/dispatch/WebhookTargetHandler'
 import { FetcherResponse } from '../../../src/dispatch/WebhookFetcher'
 import { createLogger, Logger, TestLoggerHandler } from '@contember/logger'
@@ -8,6 +8,10 @@ import { HandledEvent } from '../../../src/dispatch/types'
 import { testUuid } from '../../src/uuid'
 
 
+const assert = {
+	equal: (a: any, b: any) => expect(a).toEqual(b),
+	deepStrictEqual: (a: any, b: any) => expect(a).toStrictEqual(b),
+}
 const now = new Date('2024-06-20T12:00:00Z')
 const createTestEvent = (i = 0, row: Partial<EventRow> = {}): EventRow => ({
 	created_at: now,

@@ -3,30 +3,32 @@ import { forwardRef, ReactElement, useCallback } from 'react'
 import { Slot } from '@radix-ui/react-slot'
 import { composeEventHandlers } from '@radix-ui/primitive'
 import { dataAttribute } from '@contember/utilities'
-import { DataViewNullFilterState, DataViewSetNullFilterAction, useDataViewNullFilter } from '../../../hooks'
+import { DataViewEnumFilterCurrent, DataViewSetEnumFilterAction, useDataViewEnumFilter } from '../../../hooks'
 import { useDataViewFilterName } from '../../../contexts'
 
-export type DataViewNullFilterTriggerAttributes = {
+export type DataViewEnumFilterTriggerAttributes = {
 	['data-active']?: ''
-	['data-current']: DataViewNullFilterState
+	['data-current']: DataViewEnumFilterCurrent
 }
 
-const SlotType = Slot as React.ForwardRefExoticComponent<React.ButtonHTMLAttributes<HTMLButtonElement> & React.RefAttributes<HTMLButtonElement> & DataViewNullFilterTriggerAttributes>
+const SlotType = Slot as React.ForwardRefExoticComponent<React.ButtonHTMLAttributes<HTMLButtonElement> & React.RefAttributes<HTMLButtonElement> & DataViewEnumFilterTriggerAttributes>
 
-export type DataViewNullFilterTriggerProps = {
+export type DataViewEnumFilterTriggerProps = {
 	name?: string
+	value: string
 	children: ReactElement
-	action: DataViewSetNullFilterAction
+	action?: DataViewSetEnumFilterAction
 }
 
 /**
  *
- * A trigger component for managing null filters in a data view.
+ * A trigger component for managing enum filters in a data view.
  *
  * ### Props
+ * - **`value`**: Specifies the enum value this button represents.
  * - **`action`**: Determines how the filter behaves when the button is clicked:
- *   - `'include'`: Sets the filter to include null values.
- *   - `'exclude'`: Sets the filter to exclude null values.
+ *   - `'include'`: Sets the filter to include the value.
+ *   - `'exclude'`: Sets the filter to exclude the value.
  *   - `'unset'`: Removes the filter.
  *   - `'toggleInclude'`: Toggles the value in the inclusion filter.
  *   - `'toggleExclude'`: Toggles the value in the exclusion filter.
@@ -34,24 +36,24 @@ export type DataViewNullFilterTriggerProps = {
  * - **`children`**: The button element.
  *
  * ### Data Attributes (applied to `Slot`)
- * - **`data-active`**: Present if the current filter state matches the action.
+ * - **`data-active`**: Present if the `value` matches the current filter state and action.
  * - **`data-current`**: Indicates the current filter state, which can be:
- *   - `'include'`: Null values are included in the filter.
- *   - `'exclude'`: Null values are excluded from the filter.
+ *   - `'include'`: The filter includes the specified `value`.
+ *   - `'exclude'`: The filter excludes the specified `value`.
  *   - `'none'`: The filter is not active.
  *
  * ### Example
  * ```tsx
- * <DataViewNullFilterTrigger action="toggleInclude">
- *     <button>Include Nulls</button>
- * </DataViewNullFilterTrigger>
+ * <DataViewEnumFilterTrigger value="optionA" action="toggleInclude">
+ *     <button>Include Option A</button>
+ * </DataViewEnumFilterTrigger>
  * ```
  */
-export const DataViewNullFilterTrigger = forwardRef<HTMLButtonElement, DataViewNullFilterTriggerProps>(
-	({ name, action, ...props }: DataViewNullFilterTriggerProps, ref) => {
+export const DataViewEnumFilterTrigger = forwardRef<HTMLButtonElement, DataViewEnumFilterTriggerProps>(
+	({ name, action = 'include', value, ...props }: DataViewEnumFilterTriggerProps, ref) => {
 		// eslint-disable-next-line react-hooks/rules-of-hooks
 		name ??= useDataViewFilterName()
-		const [current, setFilter] = useDataViewNullFilter(name)
+		const [current, setFilter] = useDataViewEnumFilter(name, value)
 		const toggleFilter = useCallback(() => {
 			setFilter(action)
 		}, [action, setFilter])
@@ -69,9 +71,9 @@ export const DataViewNullFilterTrigger = forwardRef<HTMLButtonElement, DataViewN
 	},
 )
 
-DataViewNullFilterTrigger.displayName = 'DataViewNullFilterTrigger'
+DataViewEnumFilterTrigger.displayName = 'DataViewEnumFilterTrigger'
 
-const actionToState: Record<DataViewSetNullFilterAction, DataViewNullFilterState> = {
+const actionToState: Record<DataViewSetEnumFilterAction, DataViewEnumFilterCurrent> = {
 	exclude: 'exclude',
 	include: 'include',
 	unset: 'none',

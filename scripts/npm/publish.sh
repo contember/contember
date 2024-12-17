@@ -1,5 +1,11 @@
 #!/bin/bash
 set -e
+npm config set //registry.npmjs.org/:_authToken "$NPM_AUTH_TOKEN"
 
-yarn config set npmAuthToken "$NPM_AUTH_TOKEN"
-yarn workspaces foreach -pt --no-private npm publish --tag $NPM_TAG  --access public
+for dir in packages/*; do
+  if [ -f "$dir/package.json" ]; then
+    if ! grep -q '"private": true' "$dir/package.json"; then
+      (cd "$dir" && bun publish --tag "$NPM_TAG" --access public)
+    fi
+  fi
+done

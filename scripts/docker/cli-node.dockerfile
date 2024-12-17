@@ -2,6 +2,7 @@ FROM oven/bun:1.1.39-alpine as builder
 
 WORKDIR /src
 COPY ./ ./
+RUN apk add --no-cache bash
 RUN bun install
 RUN /src/scripts/cli-build/run.sh --esbuild
 

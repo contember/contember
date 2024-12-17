@@ -85,6 +85,7 @@ jobs:
       - name: Start server
         run: ./e2e/start-server.sh
         env:
+          NODE_ENV: production
           DEFAULT_DB_HOST: 127.0.0.1
           DEFAULT_DB_PASSWORD: postgres
           DEFAULT_DB_USER: postgres

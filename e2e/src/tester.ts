@@ -85,10 +85,10 @@ const createProject = async (slug: string) => {
 			},
 		})
 		.expect(response => {
-			assert.isOk(response.body)
-			assert.isOk(response.body.data)
-			assert.isOk(response.body.data.createProject)
-			assert.isOk(response.body.data.createProject.ok)
+			expect(response.body).toBeTruthy()
+			expect(response.body.data).toBeTruthy()
+			expect(response.body.data.createProject).toBeTruthy()
+			expect(response.body.data.createProject.ok).toBeTruthy()
 		})
 		.expect(200)
 }
@@ -116,7 +116,7 @@ const executeMigrations = async (projectSlug: string, modifications: Migration.M
 			},
 		})
 		.expect(response => {
-			assert.deepStrictEqual(response.body.data, {
+			expect(response.body.data).toStrictEqual({
 				migrate: {
 					error: null,
 					ok: true,

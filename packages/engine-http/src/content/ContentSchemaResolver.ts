@@ -32,12 +32,12 @@ const cache = new ContentApiSpecificCache<Schema, Schema>({})
 const getSchema = (schema: Schema, options: { stage?: string; normalize?: boolean }) => {
 	const cacheKey = [options.stage, options.normalize].join('\xff')
 	return cache.fetch(schema, cacheKey, () => {
-		const result = schema
+		let result = schema
 		if (options.normalize) {
-			return normalizeSchema(result)
+			result = normalizeSchema(result)
 		}
 		if (options.stage) {
-			return filterSchemaByStage(result, options.stage)
+			result = filterSchemaByStage(result, options.stage)
 		}
 		return result
 	})

@@ -1,7 +1,8 @@
-FROM oven/bun:latest as builder
+FROM oven/bun:1.1.39-alpine as builder
 
 WORKDIR /src
 COPY ./ ./
+RUN bun install
 RUN /src/scripts/cli-build/run.sh --esbuild
 
 FROM node:20-alpine

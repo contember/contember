@@ -1,10 +1,11 @@
-FROM oven/bun:latest as builder
+FROM oven/bun:1.1.39-alpine as builder
 
 WORKDIR /src
 COPY ./ ./
+RUN bun install
 RUN /src/scripts/cli-build/run.sh
 
-FROM oven/bun:1.1.38
+FROM oven/bun:1.1.39-alpine
 
 WORKDIR /src
 ENV NODE_ENV "production"

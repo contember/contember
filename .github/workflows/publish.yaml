@@ -36,7 +36,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        image: [cli, engine-alpine, engine-debian]
+        image: [cli, engine]
     steps:
       - uses: actions/checkout@v4
 

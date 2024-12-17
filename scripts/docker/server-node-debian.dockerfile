@@ -1,8 +1,8 @@
-FROM node:20 as builder
+FROM oven/bun:1.1.39-debian as builder
 
 WORKDIR /src
 COPY ./ ./
-
+RUN bun install
 RUN /src/scripts/server-build/run.sh
 
 FROM node:20

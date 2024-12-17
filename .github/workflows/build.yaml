@@ -79,6 +79,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
+      - name: Install deps
+        run: |
+          bun --version
+          bun install --frozen-lockfile
       - name: "Build server"
         run: ./scripts/server-build/run.sh
 

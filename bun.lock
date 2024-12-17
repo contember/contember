@@ -29,11 +29,11 @@
     },
     "packages/authorization": {
       "name": "@contember/authorization",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
     },
     "packages/binding": {
       "name": "@contember/binding",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
       "dependencies": {
         "@contember/binding-common": "packages/binding-common",
         "@contember/binding-legacy": "packages/binding-legacy",
@@ -42,7 +42,7 @@
     },
     "packages/binding-common": {
       "name": "@contember/binding-common",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
       "dependencies": {
         "@contember/client": "packages/client",
         "@contember/client-content": "packages/client-content",
@@ -65,7 +65,7 @@
     },
     "packages/binding-legacy": {
       "name": "@contember/binding-legacy",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
       "dependencies": {
         "@contember/binding-common": "packages/binding-common",
         "@contember/client": "packages/client",
@@ -78,11 +78,11 @@
     },
     "packages/binding-ng": {
       "name": "@contember/binding-ng",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
     },
     "packages/cli": {
       "name": "@contember/cli",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
       "dependencies": {
         "@contember/cli-common": "packages/cli-common",
         "@contember/config-loader": "packages/config-loader",
@@ -126,7 +126,7 @@
     },
     "packages/cli-common": {
       "name": "@contember/cli-common",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
       "dependencies": {
         "chalk": "^5.3.0",
       },
@@ -138,7 +138,7 @@
     },
     "packages/client": {
       "name": "@contember/client",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
       "dependencies": {
         "@contember/client-content": "packages/client-content",
         "@contember/graphql-builder": "packages/graphql-builder",
@@ -148,7 +148,7 @@
     },
     "packages/client-content": {
       "name": "@contember/client-content",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
       "dependencies": {
         "@contember/graphql-builder": "packages/graphql-builder",
         "@contember/graphql-client": "packages/graphql-client",
@@ -160,7 +160,7 @@
     },
     "packages/client-content-generator": {
       "name": "@contember/client-content-generator",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
       "dependencies": {
         "@contember/client-content": "packages/client-content",
         "@contember/schema": "packages/schema",
@@ -173,7 +173,7 @@
     },
     "packages/config-loader": {
       "name": "@contember/config-loader",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
       "dependencies": {
         "js-yaml": "^4.1.0",
       },
@@ -184,7 +184,7 @@
     },
     "packages/create": {
       "name": "@contember/create",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
       "dependencies": {
         "@contember/cli-common": "packages/cli-common",
         "chalk": "^5.3.0",
@@ -194,7 +194,7 @@
     },
     "packages/database": {
       "name": "@contember/database",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
       "dependencies": {
         "@contember/queryable": "packages/queryable",
       },
@@ -209,7 +209,7 @@
     },
     "packages/database-migrations": {
       "name": "@contember/database-migrations",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
       "dependencies": {
         "@contember/database": "packages/database",
         "node-pg-migrate": "^5.10.0",
@@ -223,7 +223,7 @@
     },
     "packages/database-tester": {
       "name": "@contember/database-tester",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
       "dependencies": {
         "@contember/database": "packages/database",
       },
@@ -233,11 +233,11 @@
     },
     "packages/dic": {
       "name": "@contember/dic",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
     },
     "packages/engine-actions": {
       "name": "@contember/engine-actions",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
       "dependencies": {
         "@contember/authorization": "packages/authorization",
         "@contember/database": "packages/database",
@@ -268,7 +268,7 @@
     },
     "packages/engine-common": {
       "name": "@contember/engine-common",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
       "dependencies": {
         "@contember/logger": "packages/logger",
       },
@@ -278,7 +278,7 @@
     },
     "packages/engine-content-api": {
       "name": "@contember/engine-content-api",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
       "dependencies": {
         "@contember/database": "packages/database",
         "@contember/dic": "packages/dic",
@@ -303,7 +303,7 @@
     },
     "packages/engine-http": {
       "name": "@contember/engine-http",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
       "dependencies": {
         "@contember/config-loader": "packages/config-loader",
         "@contember/database": "packages/database",
@@ -351,7 +351,7 @@
     },
     "packages/engine-plugins": {
       "name": "@contember/engine-plugins",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
       "dependencies": {
         "@contember/database-migrations": "packages/database-migrations",
         "@contember/engine-http": "packages/engine-http",
@@ -366,7 +366,7 @@
     },
     "packages/engine-s3-plugin": {
       "name": "@contember/engine-s3-plugin",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
       "dependencies": {
         "@contember/engine-plugins": "packages/engine-plugins",
         "@contember/graphql-utils": "packages/graphql-utils",
@@ -389,7 +389,7 @@
     },
     "packages/engine-server": {
       "name": "@contember/engine-server",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
       "dependencies": {
         "@contember/engine-actions": "packages/engine-actions",
         "@contember/engine-http": "packages/engine-http",
@@ -407,7 +407,7 @@
     },
     "packages/engine-system-api": {
       "name": "@contember/engine-system-api",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
       "dependencies": {
         "@contember/authorization": "packages/authorization",
         "@contember/database": "packages/database",
@@ -435,7 +435,7 @@
     },
     "packages/engine-tenant-api": {
       "name": "@contember/engine-tenant-api",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
       "dependencies": {
         "@contember/authorization": "packages/authorization",
         "@contember/config-loader": "packages/config-loader",
@@ -470,7 +470,7 @@
     },
     "packages/engine-vimeo-plugin": {
       "name": "@contember/engine-vimeo-plugin",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
       "dependencies": {
         "@contember/engine-plugins": "packages/engine-plugins",
         "@contember/typesafe": "packages/typesafe",
@@ -486,18 +486,18 @@
     },
     "packages/graphql-builder": {
       "name": "@contember/graphql-builder",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
       "dependencies": {
         "@contember/schema": "packages/schema",
       },
     },
     "packages/graphql-client": {
       "name": "@contember/graphql-client",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
     },
     "packages/graphql-client-system": {
       "name": "@contember/graphql-client-system",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
       "dependencies": {
         "@contember/schema": "packages/schema",
         "graphql-ts-client-api": "^3.1.17",
@@ -512,7 +512,7 @@
     },
     "packages/graphql-client-tenant": {
       "name": "@contember/graphql-client-tenant",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
       "dependencies": {
         "graphql-ts-client-api": "^3.1.17",
       },
@@ -526,7 +526,7 @@
     },
     "packages/graphql-utils": {
       "name": "@contember/graphql-utils",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
       "devDependencies": {
         "@types/node": "^20.16.11",
         "graphql": "^16.9.0",
@@ -537,7 +537,7 @@
     },
     "packages/interface": {
       "name": "@contember/interface",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
       "dependencies": {
         "@contember/react-binding": "packages/react-binding",
         "@contember/react-client": "packages/react-client",
@@ -560,7 +560,7 @@
     },
     "packages/logger": {
       "name": "@contember/logger",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
       "dependencies": {
         "chalk": "^5.3.0",
       },
@@ -570,7 +570,7 @@
     },
     "packages/migrations-client": {
       "name": "@contember/migrations-client",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
       "dependencies": {
         "@contember/engine-common": "packages/engine-common",
         "@contember/graphql-client": "packages/graphql-client",
@@ -584,7 +584,7 @@
     },
     "packages/playground": {
       "name": "@contember/playground",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
       "dependencies": {
         "@sindresorhus/slugify": "^2.2.1",
       },
@@ -620,11 +620,11 @@
     },
     "packages/queryable": {
       "name": "@contember/queryable",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
     },
     "packages/react-binding": {
       "name": "@contember/react-binding",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
       "dependencies": {
         "@contember/binding": "packages/binding",
         "@contember/client": "packages/client",
@@ -646,7 +646,7 @@
     },
     "packages/react-block-repeater": {
       "name": "@contember/react-block-repeater",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
       "dependencies": {
         "@contember/react-binding": "packages/react-binding",
         "@contember/react-multipass-rendering": "packages/react-multipass-rendering",
@@ -665,7 +665,7 @@
     },
     "packages/react-board": {
       "name": "@contember/react-board",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
       "dependencies": {
         "@contember/react-binding": "packages/react-binding",
         "@contember/react-multipass-rendering": "packages/react-multipass-rendering",
@@ -682,7 +682,7 @@
     },
     "packages/react-board-dnd-kit": {
       "name": "@contember/react-board-dnd-kit",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
       "dependencies": {
         "@contember/react-binding": "packages/react-binding",
         "@contember/react-board": "packages/react-board",
@@ -704,7 +704,7 @@
     },
     "packages/react-client": {
       "name": "@contember/react-client",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
       "dependencies": {
         "@contember/client": "packages/client",
         "@contember/react-richtext-renderer": "packages/react-richtext-renderer",
@@ -715,7 +715,7 @@
     },
     "packages/react-client-content": {
       "name": "@contember/react-client-content",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
       "dependencies": {
         "@contember/client-content": "packages/client-content",
         "@contember/react-client": "packages/react-client",
@@ -732,7 +732,7 @@
     },
     "packages/react-client-tenant": {
       "name": "@contember/react-client-tenant",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
       "dependencies": {
         "@contember/graphql-client-tenant": "packages/graphql-client-tenant",
         "@contember/react-client": "packages/react-client",
@@ -752,7 +752,7 @@
     },
     "packages/react-dataview": {
       "name": "@contember/react-dataview",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
       "dependencies": {
         "@contember/client": "packages/client",
         "@contember/react-binding": "packages/react-binding",
@@ -774,7 +774,7 @@
     },
     "packages/react-devbar": {
       "name": "@contember/react-devbar",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
       "dependencies": {
         "@contember/react-utils": "packages/react-utils",
         "@contember/utilities": "packages/utilities",
@@ -793,7 +793,7 @@
     },
     "packages/react-form": {
       "name": "@contember/react-form",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
       "dependencies": {
         "@contember/react-binding": "packages/react-binding",
         "@contember/react-utils": "packages/react-utils",
@@ -811,7 +811,7 @@
     },
     "packages/react-identity": {
       "name": "@contember/react-identity",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
       "dependencies": {
         "@contember/react-binding": "packages/react-binding",
         "@contember/react-client": "packages/react-client",
@@ -828,7 +828,7 @@
     },
     "packages/react-multipass-rendering": {
       "name": "@contember/react-multipass-rendering",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
       "dependencies": {
         "@contember/utilities": "packages/utilities",
       },
@@ -838,7 +838,7 @@
     },
     "packages/react-repeater": {
       "name": "@contember/react-repeater",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
       "dependencies": {
         "@contember/react-binding": "packages/react-binding",
         "@contember/react-utils": "packages/react-utils",
@@ -855,7 +855,7 @@
     },
     "packages/react-repeater-dnd-kit": {
       "name": "@contember/react-repeater-dnd-kit",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
       "dependencies": {
         "@contember/react-binding": "packages/react-binding",
         "@contember/react-repeater": "packages/react-repeater",
@@ -876,7 +876,7 @@
     },
     "packages/react-richtext-renderer": {
       "name": "@contember/react-richtext-renderer",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
       "devDependencies": {
         "@testing-library/dom": "^10.4.0",
         "@testing-library/react": "^16.0.1",
@@ -888,7 +888,7 @@
     },
     "packages/react-routing": {
       "name": "@contember/react-routing",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
       "dependencies": {
         "@contember/react-binding": "packages/react-binding",
         "@contember/react-utils": "packages/react-utils",
@@ -907,7 +907,7 @@
     },
     "packages/react-select": {
       "name": "@contember/react-select",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
       "dependencies": {
         "@contember/react-binding": "packages/react-binding",
         "@contember/react-dataview": "packages/react-dataview",
@@ -927,7 +927,7 @@
     },
     "packages/react-slate-editor": {
       "name": "@contember/react-slate-editor",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
       "dependencies": {
         "@contember/react-binding": "packages/react-binding",
         "@contember/react-multipass-rendering": "packages/react-multipass-rendering",
@@ -949,7 +949,7 @@
     },
     "packages/react-slate-editor-base": {
       "name": "@contember/react-slate-editor-base",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
       "dependencies": {
         "@contember/react-binding": "packages/react-binding",
         "@contember/utilities": "packages/utilities",
@@ -972,7 +972,7 @@
     },
     "packages/react-slate-editor-legacy": {
       "name": "@contember/react-slate-editor-legacy",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
       "dependencies": {
         "@contember/react-binding": "packages/react-binding",
         "@contember/react-multipass-rendering": "packages/react-multipass-rendering",
@@ -996,7 +996,7 @@
     },
     "packages/react-slots": {
       "name": "@contember/react-slots",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
       "dependencies": {
         "@contember/react-utils": "packages/react-utils",
         "@contember/utilities": "packages/utilities",
@@ -1012,7 +1012,7 @@
     },
     "packages/react-ui-lib": {
       "name": "@contember/react-ui-lib",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
       "dependencies": {
         "@contember/graphql-client-tenant": "packages/graphql-client-tenant",
         "@contember/interface": "packages/interface",
@@ -1066,7 +1066,7 @@
     },
     "packages/react-uploader": {
       "name": "@contember/react-uploader",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
       "dependencies": {
         "@contember/client": "packages/client",
         "@contember/graphql-client": "packages/graphql-client",
@@ -1086,7 +1086,7 @@
     },
     "packages/react-uploader-dropzone": {
       "name": "@contember/react-uploader-dropzone",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
       "dependencies": {
         "@contember/react-binding": "packages/react-binding",
         "@contember/react-uploader": "packages/react-uploader",
@@ -1106,7 +1106,7 @@
     },
     "packages/react-utils": {
       "name": "@contember/react-utils",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
       "dependencies": {
         "fast-deep-equal": "^3.1.3",
       },
@@ -1116,11 +1116,11 @@
     },
     "packages/schema": {
       "name": "@contember/schema",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
     },
     "packages/schema-definition": {
       "name": "@contember/schema-definition",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
       "dependencies": {
         "@contember/schema": "packages/schema",
         "@contember/schema-utils": "packages/schema-utils",
@@ -1135,7 +1135,7 @@
     },
     "packages/schema-migrations": {
       "name": "@contember/schema-migrations",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
       "dependencies": {
         "@contember/database": "packages/database",
         "@contember/database-migrations": "packages/database-migrations",
@@ -1154,7 +1154,7 @@
     },
     "packages/schema-utils": {
       "name": "@contember/schema-utils",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
       "dependencies": {
         "@contember/schema": "packages/schema",
         "@contember/typesafe": "packages/typesafe",
@@ -1166,21 +1166,21 @@
     },
     "packages/typesafe": {
       "name": "@contember/typesafe",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
       "devDependencies": {
         "@types/node": "^20.16.11",
       },
     },
     "packages/utilities": {
       "name": "@contember/utilities",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
       "peerDependencies": {
         "react": "^18 || ^19",
       },
     },
     "packages/vite-plugin": {
       "name": "@contember/vite-plugin",
-      "version": "2.0.0-alpha.32",
+      "version": "2.0.0-alpha.33",
       "peerDependencies": {
         "vite": "^4 || ^5",
       },

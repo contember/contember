@@ -9,23 +9,8 @@ on:
   workflow_dispatch:
 
 jobs:
-
-  install:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - uses: oven-sh/setup-bun@v2
-
-
-      - name: Install deps
-        run: |
-          bun --version
-          bun install --frozen-lockfile
-
   check:
-    needs: [ install ]
+    needs: [ ]
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -35,7 +20,9 @@ jobs:
             run_script: bun run eslint:lint
 
           - job_name: build
-            run_script: bun run build
+            run_script: |
+              bun run pre-build
+              bun run ts:build
 
           - job_name: api-exporter
             run_script: |
@@ -67,7 +54,7 @@ jobs:
 
 
   test-db:
-    needs: [ install ]
+    needs: [ ]
     runs-on: ubuntu-latest
     strategy:
       matrix:

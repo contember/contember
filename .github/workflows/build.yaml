@@ -79,15 +79,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
-      - name: Install deps
-        run: |
-          bun --version
-          bun install --frozen-lockfile
-
-      - name: "Build app"
-        run: |
-          mkdir --parent server
-          bun packages/engine-server/esbuild.cjs
+      - name: "Build server"
+        run: ./scripts/server-build/run.sh
 
       - name: Start server
         run: ./e2e/start-server.sh

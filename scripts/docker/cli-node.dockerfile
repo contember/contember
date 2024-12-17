@@ -2,7 +2,7 @@ FROM oven/bun:latest as builder
 
 WORKDIR /src
 COPY ./ ./
-RUN /src/scripts/cli-docker-build/build.sh --esbuild
+RUN /src/scripts/cli-build/run.sh --esbuild
 
 FROM node:20-alpine
 

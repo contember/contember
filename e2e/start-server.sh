@@ -1,6 +1,6 @@
 #!/bin/bash
 
-bun ./server/server.js &
+bun ./dist/start.js &
 
 max_retry=20
 counter=0

@@ -2,7 +2,7 @@ FROM oven/bun:latest as builder
 
 WORKDIR /src
 COPY ./ ./
-RUN /src/scripts/cli-docker-build/build.sh
+RUN /src/scripts/cli-build/run.sh
 
 FROM oven/bun:1.1.38
 

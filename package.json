@@ -45,7 +45,6 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "supertest": "^7.0.0",
-    "typedoc": "^0.26.9",
     "typescript": "^5.6.3",
     "vite": "^5.4.9",
     "vitest": "^2.0.5"

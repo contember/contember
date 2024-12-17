@@ -1,4 +1,4 @@
-import { assert, describe, test } from 'vitest'
+import { expect, describe, test } from 'bun:test'
 import { modelSchema } from '../../../src/type-schema'
 import { Model } from '@contember/schema'
 
@@ -51,7 +51,7 @@ describe('model schema', () => {
 				},
 				enums: {},
 			}
-			assert.deepStrictEqual(modelSchema(model), model)
+			expect(modelSchema(model)).toStrictEqual(model)
 		})
 	}
 
@@ -81,7 +81,7 @@ describe('model schema', () => {
 				},
 				enums: {},
 			}
-			assert.throw(() => modelSchema(model), `value at path /entities/Test/fields/column: all variants of union has failed:
+			expect(() => modelSchema(model)).toThrow(`value at path /entities/Test/fields/column: all variants of union has failed:
             value at path /entities/Test/fields/column/columnType: must be valid column type, "${dataType.replaceAll('"', '\\"')}" given`)
 		})
 	}

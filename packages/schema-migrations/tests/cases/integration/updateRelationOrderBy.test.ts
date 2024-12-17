@@ -1,9 +1,10 @@
+import { describe } from 'bun:test'
 import { testMigrations } from '../../src/tests'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
 import { SQL } from '../../src/tags'
 
-testMigrations('update relation order by', {
+describe('update relation order by', () => testMigrations({
 	original: {
 		model: new SchemaBuilder()
 			.entity('Menu', e =>
@@ -41,4 +42,4 @@ testMigrations('update relation order by', {
 		},
 	],
 	sql: SQL``,
-})
+}))

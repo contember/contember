@@ -3,7 +3,7 @@ import { execute } from '../../src/test'
 import { GQL, SQL } from '../../src/tags'
 import { testUuid } from '../../src/testUuid'
 import { SchemaBuilder } from '@contember/schema-definition'
-import { test } from 'vitest'
+import { test } from 'bun:test'
 
 const schema = new SchemaBuilder()
 	.entity('Location', entity =>

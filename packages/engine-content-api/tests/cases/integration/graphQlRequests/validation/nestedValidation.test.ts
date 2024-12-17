@@ -1,7 +1,7 @@
 import { createSchema, testCreate, testUpdate } from './utils'
 import { InputValidation as v, SchemaDefinition as d } from '@contember/schema-definition'
 import { testUuid } from '../../../../src/testUuid'
-import { describe, it } from 'vitest'
+import { describe, it } from 'bun:test'
 
 describe('Nested validations', () => {
 

@@ -1,4 +1,4 @@
-import { expect, test } from 'vitest'
+import { expect, test } from 'bun:test'
 import { LaxSchemaConverter } from '../../../src'
 
 test('lax schema converter basic', () => {
@@ -54,7 +54,7 @@ test('lax schema converter one-has-many', () => {
 			},
 		},
 	)
-	expect(converter2.convert()).deep.eq(schema1)
+	expect(converter2.convert()).toStrictEqual(schema1)
 })
 
 
@@ -93,7 +93,7 @@ test('lax schema converter many-has-many', () => {
 			},
 		},
 	)
-	expect(converter2.convert()).deep.eq(schema1)
+	expect(converter2.convert()).toStrictEqual(schema1)
 })
 
 
@@ -132,6 +132,6 @@ test('lax schema converter one-has-one', () => {
 			},
 		},
 	)
-	expect(converter2.convert()).deep.eq(schema1)
+	expect(converter2.convert()).toStrictEqual(schema1)
 })
 

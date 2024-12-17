@@ -1,6 +1,7 @@
 import { testMigrations } from '../../src/tests.js'
 import { SQL } from '../../src/tags.js'
 import { createSchema, SchemaDefinition as def } from '@contember/schema-definition'
+import { describe } from 'bun:test'
 
 namespace ViewEntityOriginalSchema {
 
@@ -23,7 +24,7 @@ namespace ViewEntityUpdatedSchema {
 }
 
 
-testMigrations('create view', {
+describe('create view', () => testMigrations({
 	original: createSchema(ViewEntityOriginalSchema),
 	updated: createSchema(ViewEntityUpdatedSchema),
 	diff: [
@@ -84,7 +85,7 @@ testMigrations('create view', {
 		},
 	],
 	sql: SQL`CREATE VIEW "author_stats" AS SELECT 1;`,
-})
+}))
 
 
 namespace ViewAddRelationOriginalSchema {
@@ -117,7 +118,7 @@ namespace ViewAddRelationUpdateSchema {
 }
 
 
-testMigrations('create a relation and a view', {
+describe('create a relation and a view', () => testMigrations({
 	original: createSchema(ViewAddRelationOriginalSchema), updated: createSchema(ViewAddRelationUpdateSchema), diff: [
 		{
 			modification: 'createRelation',
@@ -154,5 +155,5 @@ testMigrations('create a relation and a view', {
 ALTER TABLE "article" ADD FOREIGN KEY ("category_id") REFERENCES "category"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE; 
 CREATE INDEX ON "article" ("category_id"); 
 CREATE VIEW "article_stats" AS SELECT 1;`,
-})
+}))
 

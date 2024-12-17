@@ -1,9 +1,10 @@
+import { describe } from 'bun:test'
 import { testMigrations } from '../../src/tests'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
 import { SQL } from '../../src/tags'
 
-testMigrations('make column not null', {
+describe('make column not null', () => testMigrations({
 	original: {
 		model: new SchemaBuilder()
 			.entity('Author', e => e.column('name', c => c.type(Model.ColumnType.String)))
@@ -28,4 +29,4 @@ testMigrations('make column not null', {
 	],
 	sql: SQL`ALTER TABLE "author"
 		ALTER "name" SET NOT NULL;`,
-})
+}))

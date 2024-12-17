@@ -21,5 +21,5 @@ sed "${SED_FLAGS[@]}" "s/.template/$PACKAGE_NAME/g" packages/$PACKAGE_NAME/packa
 sed "${SED_FLAGS[@]}" "s/.template/$PACKAGE_NAME/g" packages/$PACKAGE_NAME/tests/example.test.ts
 
 # Run yarn commands
-yarn
-yarn tsx "$DIR/update-tsconfig.ts"
+bun install
+bun run "$DIR/update-tsconfig.ts"

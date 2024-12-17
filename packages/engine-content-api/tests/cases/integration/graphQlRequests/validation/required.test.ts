@@ -1,7 +1,7 @@
 import { InputValidation as v, SchemaDefinition as d } from '@contember/schema-definition'
 import { createSchema, testCreate, testUpdate } from './utils'
 import { testUuid } from '../../../../src/testUuid'
-import { describe, it, assert } from 'vitest'
+import { describe, it } from 'bun:test'
 
 describe('Required validation', () => {
 

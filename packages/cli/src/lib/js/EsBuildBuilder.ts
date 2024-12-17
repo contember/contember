@@ -1,8 +1,8 @@
 import { JsBuilder } from './JsBuilder'
-import * as esbuild from 'esbuild'
 
 export class EsBuildBuilder implements JsBuilder {
 	async build(path: string): Promise<string> {
+		const esbuild = await import('esbuild')
 		const response = await esbuild.build({
 			entryPoints: [path],
 			platform: 'node',

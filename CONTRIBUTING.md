@@ -6,7 +6,7 @@ We're glad you're interested in contributing. Here's a guide to help you get sta
 
 - A GitHub account
 - Git installed on your computer
-- Node.js and Yarn installed
+- Bun installed
 - Docker and Docker Compose installed
 - A code editor of your choice (e.g. Visual Studio Code or WebStorm)
 

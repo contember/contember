@@ -1,10 +1,11 @@
+import { describe } from 'bun:test'
 import { testMigrations } from '../../src/tests'
 import { createSchema, SchemaBuilder } from '@contember/schema-definition'
 import { Acl, Model } from '@contember/schema'
 import { SQL } from '../../src/tags'
 import { SchemaDefinition as def } from '@contember/schema-definition'
 
-testMigrations('remove an entity', {
+describe('remove an entity', () => testMigrations({
 	original: {
 		model: new SchemaBuilder()
 			.entity('Author', e => e.column('name', c => c.type(Model.ColumnType.String)))
@@ -27,9 +28,9 @@ testMigrations('remove an entity', {
 		},
 	],
 	sql: SQL`ALTER TABLE "post" DROP "author_id"; DROP TABLE "author";`,
-})
+}))
 
-testMigrations('remove entity with acl', {
+describe('remove entity with acl', () => testMigrations({
 	original: {
 		model: new SchemaBuilder()
 			.entity('Site', entity => entity.column('name', c => c.type(Model.ColumnType.String)))
@@ -99,7 +100,7 @@ testMigrations('remove entity with acl', {
 		},
 	],
 	sql: SQL`ALTER TABLE "post" DROP "site_id"; DROP TABLE "site";`,
-})
+}))
 
 namespace ViewEntityOriginalSchema {
 	@def.View("SELECT null as id, 'John' AS name")
@@ -107,7 +108,7 @@ namespace ViewEntityOriginalSchema {
 		name = def.stringColumn()
 	}
 }
-testMigrations('remove a view', {
+describe('remove a view', () => testMigrations({
 	original: createSchema(ViewEntityOriginalSchema),
 	updated: {},
 	diff: [
@@ -118,7 +119,7 @@ testMigrations('remove a view', {
 	],
 	sql: SQL`
 	DROP VIEW "author";`,
-})
+}))
 
 
 namespace EntityWithManyHasManyOriginalSchema {
@@ -133,7 +134,7 @@ namespace EntityWithManyHasManyOriginalSchema {
 		books = def.manyHasManyInverse(Book, 'tags')
 	}
 }
-testMigrations('remove junction table, when both entities are removed', {
+describe('remove junction table, when both entities are removed', () => testMigrations({
 	original: createSchema(EntityWithManyHasManyOriginalSchema),
 	updated: {},
 	diff: [
@@ -149,7 +150,7 @@ testMigrations('remove junction table, when both entities are removed', {
 	sql: SQL`DROP TABLE "book_tags";
 DROP TABLE "book"; 
 DROP TABLE "tag";`,
-})
+}))
 
 
 namespace EntityWithManyHasManyUpdatedSchema {
@@ -158,7 +159,7 @@ namespace EntityWithManyHasManyUpdatedSchema {
 		name = def.stringColumn()
 	}
 }
-testMigrations('remove junction table, when owning entity is removed', {
+describe('remove junction table, when owning entity is removed', () => testMigrations({
 	original: createSchema(EntityWithManyHasManyOriginalSchema),
 	updated: createSchema(EntityWithManyHasManyUpdatedSchema),
 	diff: [
@@ -170,7 +171,7 @@ testMigrations('remove junction table, when owning entity is removed', {
 	],
 	sql: SQL`DROP TABLE "book_tags";
 DROP TABLE "book";`,
-})
+}))
 
 
 namespace EntityWithManyHasMany2UpdatedSchema {
@@ -179,7 +180,7 @@ namespace EntityWithManyHasMany2UpdatedSchema {
 		title = def.stringColumn()
 	}
 }
-testMigrations('remove junction table, when inverse entity is removed', {
+describe('remove junction table, when inverse entity is removed', () => testMigrations({
 	original: createSchema(EntityWithManyHasManyOriginalSchema),
 	updated: createSchema(EntityWithManyHasMany2UpdatedSchema),
 	diff: [
@@ -192,7 +193,7 @@ testMigrations('remove junction table, when inverse entity is removed', {
 	sql: SQL`
 DROP TABLE "book_tags";
 DROP TABLE "tag";`,
-})
+}))
 
 
 namespace EntityWithSelfReferencingRelationOriginalSchema {
@@ -204,7 +205,7 @@ namespace EntityWithSelfReferencingRelationOriginalSchema {
 	}
 }
 
-testMigrations('remove self-referencing relation', {
+describe('remove self-referencing relation', () => testMigrations({
 	original: createSchema(EntityWithSelfReferencingRelationOriginalSchema),
 	updated: {},
 	diff: [
@@ -214,4 +215,4 @@ testMigrations('remove self-referencing relation', {
 		},
 	],
 	sql: SQL`ALTER TABLE "person" DROP "parent_id"; DROP TABLE "person";`,
-})
+}))

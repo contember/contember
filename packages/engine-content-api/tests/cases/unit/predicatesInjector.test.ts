@@ -1,11 +1,12 @@
 import { PermissionFactory, PredicateFactory, PredicatesInjector, VariableInjector } from '../../../src/acl'
 import { SchemaBuilder, SchemaDefinition as def, AclDefinition as acl, createSchema, PermissionsBuilder } from '@contember/schema-definition'
 import { Acl, Model } from '@contember/schema'
-import { describe, it, assert } from 'vitest'
+import { describe, it } from 'bun:test'
 import { WhereOptimizer } from '../../../src/mapper/select/optimizer/WhereOptimizer'
 import { ConditionOptimizer } from '../../../src/mapper/select/optimizer/ConditionOptimizer'
 import { acceptFieldVisitor, AllowAllPermissionFactory } from '@contember/schema-utils'
 import { testUuid } from '../../src/testUuid'
+import { assert } from '../../src/assert'
 
 
 

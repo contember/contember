@@ -12,6 +12,7 @@
         "types": "./dist/types/index.d.ts",
         "development": "./dist/development/index.js",
         "production": "./dist/production/index.js",
+        "typescript": "./src/index.ts",
         "default": "./dist/production/index.js"
       },
       "require": {

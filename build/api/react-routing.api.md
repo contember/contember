@@ -58,7 +58,7 @@ export type LinkProps = Omit<RoutingLinkProps, 'parametersResolver'>;
 
 // @public
 export const Page: {
-    <P = unknown>(props: PageProps<P>): JSX_2.Element | null;
+    <P>(props: PageProps<P>): JSX_2.Element | null;
     displayName: string;
     getPageName(props: PageProps<unknown>): string;
 };

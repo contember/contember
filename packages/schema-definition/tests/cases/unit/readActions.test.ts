@@ -1,5 +1,5 @@
 import { c } from '../../../src'
-import { expect, test } from 'vitest'
+import { expect, test } from 'bun:test'
 import { createActions } from '../../../src/actions/definition'
 
 namespace SimpleActions {
@@ -50,35 +50,5 @@ namespace SimpleActions {
 }
 
 test('read actions schema', () => {
-	expect(createActions(SimpleActions)).toMatchInlineSnapshot(`
-		{
-		  "targets": {
-		    "book_watch_target": {
-		      "name": "book_watch_target",
-		      "type": "webhook",
-		      "url": "%webhookUrl%/book/updated",
-		    },
-		  },
-		  "triggers": {
-		    "book_watch": {
-		      "entity": "Book",
-		      "name": "book_watch",
-		      "priority": 100,
-		      "selection": undefined,
-		      "target": "book_watch_target",
-		      "type": "watch",
-		      "watch": [
-		        "title",
-		        [
-		          "tags",
-		          {},
-		          [
-		            "name",
-		          ],
-		        ],
-		      ],
-		    },
-		  },
-		}
-	`)
+	expect(createActions(SimpleActions)).toMatchSnapshot()
 })

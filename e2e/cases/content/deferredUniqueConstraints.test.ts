@@ -1,5 +1,5 @@
 import { c, createSchema } from '@contember/schema-definition'
-import { test } from 'vitest'
+import { test } from 'bun:test'
 import { createTester, gql } from '../../src/tester'
 
 namespace DeferredUniqueModel {

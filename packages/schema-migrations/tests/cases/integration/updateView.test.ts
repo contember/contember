@@ -1,3 +1,4 @@
+import { describe } from 'bun:test'
 import { testMigrations } from '../../src/tests'
 import { SQL } from '../../src/tags'
 import { createSchema, SchemaDefinition as def } from '@contember/schema-definition'
@@ -37,7 +38,7 @@ namespace ViewEntityUpdatedSchema1 {
 }
 
 
-testMigrations('update a view 1', {
+describe('update a view 1', () => testMigrations({
 	original: createSchema(ViewEntityOriginalSchema),
 	updated: createSchema(ViewEntityUpdatedSchema1),
 	diff: [
@@ -165,7 +166,7 @@ DROP VIEW "author";
 CREATE VIEW "author" AS SELECT null as id, 'Jack' AS name;
 CREATE VIEW "author2" AS SELECT * FROM author;
 CREATE VIEW "author3" AS SELECT * FROM author2;`,
-})
+}))
 
 
 namespace ViewEntityUpdatedSchema2 {
@@ -185,7 +186,7 @@ namespace ViewEntityUpdatedSchema2 {
 	}
 }
 
-testMigrations('update a view 2', {
+describe('update a view 2', () => testMigrations({
 	original: createSchema(ViewEntityOriginalSchema),
 	updated: createSchema(ViewEntityUpdatedSchema2),
 	diff: [
@@ -275,7 +276,7 @@ DROP VIEW "author2";
 CREATE VIEW "author2" AS SELECT id, name FROM author;
 CREATE VIEW "author3" AS SELECT * FROM author2;
 `,
-})
+}))
 
 
 namespace ViewEntityUpdatedSchema3 {
@@ -295,7 +296,7 @@ namespace ViewEntityUpdatedSchema3 {
 	}
 }
 
-testMigrations('update a view 3', {
+describe('update a view 3', () => testMigrations({
 	original: createSchema(ViewEntityOriginalSchema),
 	updated: createSchema(ViewEntityUpdatedSchema3),
 	diff: [
@@ -342,7 +343,7 @@ testMigrations('update a view 3', {
 	],
 	sql: SQL`DROP VIEW "author3";
 CREATE VIEW "author3" AS SELECT id, name FROM author2;`,
-})
+}))
 
 
 namespace ViewEntityUpdatedSchema4 {
@@ -362,7 +363,7 @@ namespace ViewEntityUpdatedSchema4 {
 	}
 }
 
-testMigrations('update a view 4', {
+describe('update a view 4', () => testMigrations({
 	original: createSchema(ViewEntityOriginalSchema),
 	updated: createSchema(ViewEntityUpdatedSchema4),
 	diff: [
@@ -490,4 +491,4 @@ DROP VIEW "author";
 CREATE VIEW "author" AS SELECT null as id, 'Jack' AS name;
 CREATE VIEW "author2" AS SELECT id, name FROM author;
 CREATE VIEW "author3" AS SELECT id, name FROM author2;`,
-})
+}))

@@ -1,7 +1,7 @@
 import { Client, ConflictActionType, EventManager, LimitByGroupWrapper, LockType, Operator } from '../../../src'
 import { createConnectionMock } from '@contember/database-tester'
 import { SQL } from '../../src/tags'
-import { test } from 'vitest'
+import { test } from 'bun:test'
 
 interface Test {
 	query: (wrapper: Client) => void

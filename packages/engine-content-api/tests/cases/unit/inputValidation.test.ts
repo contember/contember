@@ -10,7 +10,8 @@ import {
 	ValidationContext,
 } from '../../../src/input-validation'
 import { FieldNode, ObjectNode } from '../../../src/inputProcessing'
-import { describe, it, assert } from 'vitest'
+import { describe, expect, it } from 'bun:test'
+import { assert } from '../../src/assert'
 
 describe('input validation tests', () => {
 
@@ -33,7 +34,7 @@ describe('input validation tests', () => {
 
 		const context = ValidationContext.createRootContext(author)
 
-		assert.ok(evaluateValidation(context, rule))
+		expect(evaluateValidation(context, rule)).toBeTrue()
 	})
 
 	it('evaluates collection length rule', () => {
@@ -45,7 +46,7 @@ describe('input validation tests', () => {
 
 		const context = ValidationContext.createRootContext(author)
 
-		assert.ok(evaluateValidation(context, rule))
+		expect(evaluateValidation(context, rule)).toBeTrue()
 	})
 
 	it('collects dependencies', () => {
@@ -178,7 +179,7 @@ describe('input validation tests', () => {
 
 			const context = ValidationContext.createRootContext(author)
 
-			assert.isNull(evaluateValidation(context, rule))
+			expect(evaluateValidation(context, rule)).toBeNull()
 		})
 
 		it('trinary "and" results in a false', () => {
@@ -194,7 +195,7 @@ describe('input validation tests', () => {
 
 			const context = ValidationContext.createRootContext(author)
 
-			assert.notOk(evaluateValidation(context, rule))
+			expect(evaluateValidation(context, rule)).toBeFalsy()
 		})
 		it('trinary "and" results in a true', () => {
 			const rule = validation.rules.and(
@@ -209,7 +210,7 @@ describe('input validation tests', () => {
 
 			const context = ValidationContext.createRootContext(author)
 
-			assert.ok(evaluateValidation(context, rule))
+			expect(evaluateValidation(context, rule)).toBeTrue()
 		})
 	})
 })

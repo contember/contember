@@ -1,5 +1,5 @@
 import { AclDefinition as acl, createSchema, SchemaDefinition as def } from '@contember/schema-definition'
-import { test } from 'vitest'
+import { test } from 'bun:test'
 import { execute } from '../../../../../src/test'
 import { GQL, SQL } from '../../../../../src/tags'
 import { PermissionFactory } from '../../../../../../src'

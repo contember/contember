@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'vitest'
+import { describe, expect, test } from 'bun:test'
 import { render } from '@testing-library/react'
 import { BuiltinElements, RichText } from '../src'
 
@@ -19,16 +19,8 @@ describe('paragraph rendering', () => {
 				text: 'Hello',
 				isBold: true,
 			}],
-		})]} />).container.firstChild)
-			.toMatchInlineSnapshot(`
-				<p
-				  data-contember-type="paragraph"
-				>
-				  <b>
-				    Hello
-				  </b>
-				</p>
-			`)
+		})]} />).container.innerHTML)
+			.toEqual(`<p data-contember-type="paragraph"><b>Hello</b></p>`)
 	})
 
 	test('render table', () => {
@@ -43,24 +35,8 @@ describe('paragraph rendering', () => {
 					}],
 				}],
 			}],
-		})]} />).container.firstChild)
-			.toMatchInlineSnapshot(`
-				<table
-				  data-contember-type="table"
-				>
-				  <tbody>
-				    <tr
-				      data-contember-type="tableRow"
-				    >
-				      <td
-				        data-contember-type="tableCell"
-				      >
-				        Hello
-				      </td>
-				    </tr>
-				  </tbody>
-				</table>
-			`)
+		})]} />).container.innerHTML)
+			.toEqual(`<table data-contember-type="table"><tbody><tr data-contember-type="tableRow"><td data-contember-type="tableCell">Hello</td></tr></tbody></table>`)
 	})
 
 	test('render table with header', () => {
@@ -76,26 +52,8 @@ describe('paragraph rendering', () => {
 					}],
 				}],
 			}],
-		})]} />).container.firstChild)
-			.toMatchInlineSnapshot(`
-				<table
-				  data-contember-type="table"
-				>
-				  <thead>
-				    <tr
-				      data-contember-headerscope="table"
-				      data-contember-type="tableRow"
-				    >
-				      <td
-				        data-contember-type="tableCell"
-				      >
-				        Hello
-				      </td>
-				    </tr>
-				  </thead>
-				  <tbody />
-				</table>
-			`)
+		})]} />).container.innerHTML)
+			.toEqual(`<table data-contember-type="table"><thead><tr data-contember-type="tableRow" data-contember-headerscope="table"><td data-contember-type="tableCell">Hello</td></tr></thead><tbody></tbody></table>`)
 	})
 
 	test('render heading', () => {
@@ -105,15 +63,8 @@ describe('paragraph rendering', () => {
 			children: [{
 				text: 'Hello',
 			}],
-		})]} />).container.firstChild)
-			.toMatchInlineSnapshot(`
-				<h1
-				  data-contember-level="1"
-				  data-contember-type="heading"
-				>
-				  Hello
-				</h1>
-			`)
+		})]} />).container.innerHTML)
+			.toEqual(`<h1 data-contember-type="heading" data-contember-level="1">Hello</h1>`)
 	})
 
 	test('render list', () => {
@@ -125,18 +76,8 @@ describe('paragraph rendering', () => {
 					text: 'Hello',
 				}],
 			}],
-		})]} />).container.firstChild)
-			.toMatchInlineSnapshot(`
-				<ul
-				  data-contember-type="unorderedList"
-				>
-				  <li
-				    data-contember-type="listItem"
-				  >
-				    Hello
-				  </li>
-				</ul>
-			`)
+		})]} />).container.innerHTML)
+			.toEqual(`<ul data-contember-type="unorderedList"><li data-contember-type="listItem">Hello</li></ul>`)
 	})
 
 	test('render ordered list', () => {
@@ -148,18 +89,8 @@ describe('paragraph rendering', () => {
 					text: 'Hello',
 				}],
 			}],
-		})]} />).container.firstChild)
-			.toMatchInlineSnapshot(`
-				<ol
-				  data-contember-type="orderedList"
-				>
-				  <li
-				    data-contember-type="listItem"
-				  >
-				    Hello
-				  </li>
-				</ol>
-			`)
+		})]} />).container.innerHTML)
+			.toEqual(`<ol data-contember-type="orderedList"><li data-contember-type="listItem">Hello</li></ol>`)
 	})
 
 	test('custom element', () => {
@@ -189,19 +120,7 @@ describe('paragraph rendering', () => {
 				return <blockquote data-contember-type="blockquote">{it.children}</blockquote>
 			}
 			return it.fallback
-		}} />).container.firstChild)
-			.toMatchInlineSnapshot(`
-				<blockquote
-				  data-contember-type="blockquote"
-				>
-				  <h1
-				    data-contember-level="1"
-				    data-contember-type="heading"
-				  >
-				    Hello
-				  </h1>
-				  Hello
-				</blockquote>
-			`)
+		}} />).container.innerHTML)
+			.toEqual(`<blockquote data-contember-type="blockquote"><h1 data-contember-type="heading" data-contember-level="1">Hello</h1>Hello</blockquote>`)
 	})
 })

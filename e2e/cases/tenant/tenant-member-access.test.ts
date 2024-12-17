@@ -1,4 +1,4 @@
-import { assert, test } from 'vitest'
+import { expect, test } from 'bun:test'
 import { createSchema, SchemaDefinition as def } from '@contember/schema-definition'
 import { createTester, gql } from '../../src/tester'
 import { addProjectMember, signIn, signUp } from '../../src/requests'
@@ -52,7 +52,7 @@ test('Tenant API: sign up, add to a project and check project access', async () 
 		{ authorizationToken: authKey },
 	)
 		.expect(response => {
-			assert.deepStrictEqual(response.body.data, { listTag: [] })
+			expect(response.body.data).toStrictEqual({ listTag: [] })
 		})
 		.expect(200)
 })

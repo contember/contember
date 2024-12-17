@@ -1,4 +1,4 @@
-import { expect, it, describe } from 'vitest'
+import { expect, it, describe } from 'bun:test'
 import {
 	EntityFieldMarker,
 	EntityFieldMarkersContainer,
@@ -295,12 +295,18 @@ describe('Marker tree generator', () => {
 						field: 'name',
 						defaultValue: undefined,
 						eventListeners: undefined,
+						// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+						// @ts-ignore
+						hasOneRelationPath: [],
 						isNonbearing: false,
 					})],
 					['surname', new FieldMarker({
 						field: 'surname',
 						defaultValue: undefined,
 						eventListeners: undefined,
+						// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+						// @ts-ignore
+						hasOneRelationPath: [],
 						isNonbearing: false,
 					})],
 				]),
@@ -323,8 +329,8 @@ describe('Marker tree generator', () => {
 				isNonbearing: false,
 				reducedBy: undefined,
 				eventListeners: new EventListenersStore(undefined, new Map([
-					['initialize', new Set([onInit7, onInit8])],
 					['beforePersist', new Set([onBeforePersist2])],
+					['initialize', new Set([onInit7, onInit8])],
 				])),
 				expectedMutation: 'anyMutation',
 			},
@@ -337,6 +343,9 @@ describe('Marker tree generator', () => {
 						field: 'hasOneField',
 						defaultValue: undefined,
 						eventListeners: undefined,
+						// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+						// @ts-ignore
+						hasOneRelationPath: [],
 						isNonbearing: false,
 					})],
 				]),
@@ -348,6 +357,7 @@ describe('Marker tree generator', () => {
 			),
 			hasOneEnv,
 		)
+
 
 
 		const outerHasMany = new HasManyRelationMarker(
@@ -373,6 +383,9 @@ describe('Marker tree generator', () => {
 						field: 'hasManyField',
 						defaultValue: undefined,
 						eventListeners: undefined,
+						// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+						// @ts-ignore
+						hasOneRelationPath: [],
 						isNonbearing: false,
 					})],
 					[hasOne.placeholderName, hasOne],
@@ -396,8 +409,8 @@ describe('Marker tree generator', () => {
 				setOnCreate: undefined,
 				// forceCreation: false,
 				eventListeners: new EventListenersStore(undefined, new Map([
-					['initialize', new Set([onInit1, onInit2, onInit3, onInit4])],
 					['beforePersist', new Set([onBeforePersist1])],
+					['initialize', new Set([onInit1, onInit2, onInit3, onInit4])],
 				])),
 				expectedMutation: 'anyMutation',
 				alias: undefined,
@@ -411,6 +424,9 @@ describe('Marker tree generator', () => {
 						field: 'fooField',
 						defaultValue: undefined,
 						eventListeners: undefined,
+						// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+						// @ts-ignore
+						hasOneRelationPath: [],
 						isNonbearing: false,
 					})],
 				]),
@@ -446,6 +462,9 @@ describe('Marker tree generator', () => {
 					field: 'whatever',
 					defaultValue: undefined,
 					eventListeners: undefined,
+					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+					// @ts-ignore
+					hasOneRelationPath: [],
 					isNonbearing: false,
 				})]]),
 				new Map([
@@ -516,7 +535,7 @@ describe('Marker tree generator', () => {
 			.withSchema(schema)
 		const first = new MarkerTreeGenerator(nodes, env.withVariables({ foo: 'bar' })).generate()
 		const second = new MarkerTreeGenerator(nodes, env.withVariables({ foo: 'lorem' })).generate()
-		expect(Array.from(first.subTrees.keys())[0]).eq('lst_1280905461')
-		expect(Array.from(second.subTrees.keys())[0]).eq('lst_1855766319')
+		expect(Array.from(first.subTrees.keys())[0]).toEqual('lst_1280905461')
+		expect(Array.from(second.subTrees.keys())[0]).toEqual('lst_1855766319')
 	})
 })

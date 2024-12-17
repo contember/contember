@@ -1,20 +1,16 @@
-FROM node:20-alpine as builder
+FROM oven/bun:1.1.39-alpine as builder
 
 WORKDIR /src
-RUN apk --no-cache add bash
-RUN apk --no-cache add build-base python3
 COPY ./ ./
-
-RUN test ! -f yarn.tar.gz || tar xf yarn.tar.gz -C "./.yarn/cache" .
-RUN /src/scripts/server/server-build.sh
+RUN bun install
+RUN /src/scripts/server-build/run.sh
 
 FROM node:20-alpine
 
 WORKDIR /src
 RUN apk --no-cache add curl
 
-COPY --from=builder /src/server/server.js /src/
-COPY --from=builder /src/node_modules /src/node_modules
+COPY --from=builder /src/dist/start.js /src/server.js
 COPY --from=builder /src/packages/engine-server/package.json /src/package.json
 COPY --from=builder /src/LICENSE /src/
 

@@ -1,4 +1,4 @@
-import { assert, test } from 'vitest'
+import { expect, test } from 'bun:test'
 import { Model } from '@contember/schema'
 import { ModelValidator } from '../../../src'
 import { c, createSchema } from '@contember/schema-definition'
@@ -64,7 +64,7 @@ test('"meta" collision', () => {
 		},
 	}
 	const validator = new ModelValidator(model)
-	assert.deepStrictEqual(validator.validate(), [
+	expect(validator.validate()).toStrictEqual([
 		{
 			code: 'MODEL_NAME_COLLISION',
 			message: 'entity FooMeta collides with entity Foo, because a GraphQL type with "Meta" suffix is created for every entity',
@@ -83,7 +83,7 @@ namespace ColumnNameCollision {
 test('column name collision', () => {
 	const schema = createSchema(ColumnNameCollision)
 	const validator = new ModelValidator(schema.model)
-	assert.deepStrictEqual(validator.validate(), [
+	expect(validator.validate()).toStrictEqual([
 		{
 			code: 'MODEL_NAME_COLLISION',
 			message: 'Column name "rel_id" on field "relId" collides with a column name on field "rel".',

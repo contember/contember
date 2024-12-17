@@ -33,7 +33,7 @@ export class OtpAuthenticator {
 	}
 
 	public async create(user: string, label: string): Promise<OtpData> {
-		const secret = new Secret({ buffer: await this.providers.randomBytes(20) })
+		const secret = new Secret({ buffer: (await this.providers.randomBytes(20)) as any })
 		const totp = new TOTP({
 			label: user,
 			issuer: label,

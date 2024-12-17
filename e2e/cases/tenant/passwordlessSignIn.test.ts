@@ -1,4 +1,4 @@
-import { assert, test } from 'vitest'
+import { expect, test } from 'bun:test'
 import { consumeMails, createTester, gql, loginToken, rand } from '../../src/tester'
 import { emptySchema } from '@contember/schema-utils'
 import { signUp } from '../../src/requests'
@@ -35,12 +35,11 @@ test('sign in using magic link', async () => {
 	const requestId = initResult.body.data.initSignInPasswordless.result.requestId
 
 	const mails = await consumeMails()
-	assert.lengthOf(mails, 1)
+	expect(mails).toHaveLength(1)
 
 	const matches = mails[0].Raw.Data.match(/token&#x3D;(\w+)/)
 	const token = matches?.[1] as string
-	assert.lengthOf(token, 40)
-
+	expect(token).toHaveLength(40)
 
 	// invalid token
 	await tester(gql`

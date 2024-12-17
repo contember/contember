@@ -10,7 +10,7 @@ import { createIdentitySql } from './sql/createIdentitySql'
 import { createApiKeySql } from './sql/createApiKeySql'
 import { getProjectMembershipSql } from './sql/getProjectMembershipSql'
 import { sqlTransaction } from './sql/sqlTransaction'
-import { test } from 'vitest'
+import { test } from 'bun:test'
 
 test('create api key', async () => {
 	const languageId = testUuid(999)

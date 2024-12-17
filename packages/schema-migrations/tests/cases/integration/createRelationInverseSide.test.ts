@@ -1,10 +1,11 @@
+import { describe } from 'bun:test'
 import { testMigrations } from '../../src/tests'
 import { Model } from '@contember/schema'
 import { SQL } from '../../src/tags'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { createDatabaseMetadata, ForeignKeyDeleteAction } from '@contember/database'
 
-testMigrations('create inverse side relation (post with locales)', {
+describe('create inverse side relation (post with locales)', () => testMigrations({
 	original: {
 		model: new SchemaBuilder()
 			.entity('Post', e => e)
@@ -30,9 +31,9 @@ testMigrations('create inverse side relation (post with locales)', {
 		},
 	],
 	sql: SQL``,
-})
+}))
 
-testMigrations('create inverse side relation together with changing onDelete behaviour', {
+describe('create inverse side relation together with changing onDelete behaviour', () => testMigrations({
 	original: {
 		model: new SchemaBuilder()
 			.entity('Post', e => e)
@@ -82,4 +83,4 @@ testMigrations('create inverse side relation together with changing onDelete beh
 		indexes: [],
 		uniqueConstraints: [],
 	}),
-})
+}))

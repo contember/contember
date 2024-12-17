@@ -1,7 +1,7 @@
 import { emptyDatabaseMetadata } from '@contember/database'
 import migration from '../../../src/migrations/2020-05-06-150000-composed-primary'
 import { createMigrationBuilder } from '@contember/database-migrations'
-import { assert, test } from 'vitest'
+import { expect, test } from 'bun:test'
 import { c, createSchema } from '@contember/schema-definition'
 
 namespace SampleProject {
@@ -62,8 +62,9 @@ test('many-has-many-primary migration sql', async () => {
 			],
 		},
 	})
-	assert.equal(
+	expect(
 		builder.getSql(),
+	).toEqual(
 		`ALTER TABLE "stage_prod"."post_tags"
   DROP "id";
 ALTER TABLE "stage_prod"."post_tags" DROP CONSTRAINT "post_tags_uniq_post_id_tag_id";

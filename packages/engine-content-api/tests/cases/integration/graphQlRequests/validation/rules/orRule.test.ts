@@ -1,6 +1,6 @@
 import { InputValidation as v, SchemaDefinition as d } from '@contember/schema-definition'
 import { createSchema, testCreate } from '../utils'
-import { describe, it, assert } from 'vitest'
+import { describe, it } from 'bun:test'
 class Item {
 	@v.assert(v.rules.or(v.rules.pattern(/.+@.+/), v.rules.minLength(5)), 'failure')
 	value = d.stringColumn()

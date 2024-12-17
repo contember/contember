@@ -50,9 +50,9 @@ if [[ "$current_branch" =~ ^v[0-9]+\.[0-9]+$ ]]; then
     fi
 fi
 
-yarn tsx ./scripts/npm/bump-version.ts "$@"
+bun run ./scripts/npm/bump-version.ts "$@"
 
-yarn install
+bun install
 
 git add .
 git commit -m "v$1"

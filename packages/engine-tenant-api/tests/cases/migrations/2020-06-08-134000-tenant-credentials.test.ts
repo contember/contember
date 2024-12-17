@@ -1,6 +1,6 @@
 import migration from '../../../src/migrations/2020-06-08-134000-tenant-credentials'
 import { createMigrationBuilder } from '@contember/database-migrations'
-import { test, assert } from 'vitest'
+import { test, expect } from 'bun:test'
 
 let uuidNum = 0
 export const testUuid = () => '123e4567-e89b-12d3-a456-' + (uuidNum++).toString().padStart(12, '0')
@@ -15,8 +15,9 @@ test('generate sql with root token and login token', async () => {
 			uuid: testUuid,
 		},
 	})
-	assert.equal(
+	expect(
 		builder.getSql(),
+	).toEqual(
 		`
 			WITH identity AS (
 			    INSERT INTO identity(id, parent_id, roles, description, created_at)
@@ -69,8 +70,9 @@ test('generate sql with both root user and token', async () => {
 			uuid: testUuid,
 		},
 	})
-	assert.equal(
+	expect(
 		builder.getSql(),
+	).toEqual(
 		`
 			WITH identity AS (
 				INSERT INTO identity(id, parent_id, roles, description, created_at)

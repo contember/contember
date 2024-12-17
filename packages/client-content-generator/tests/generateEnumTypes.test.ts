@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'vitest'
+import { describe, expect, test } from 'bun:test'
 import { EnumTypeSchemaGenerator } from '../src'
 
 
@@ -10,19 +10,5 @@ test('generate enums', () => {
 			OrderStatus: ['new', 'paid', 'cancelled'],
 			orderType: ['normal', 'express'],
 		},
-	})).toMatchInlineSnapshot(`
-		"export type OrderStatus = 
-			 | "new"
-			 | "paid"
-			 | "cancelled"
-		export type OrderType = 
-			 | "normal"
-			 | "express"
-		export type ContemberClientEnums = {
-			OrderStatus: OrderStatus
-			orderType: OrderType
-		}
-
-		"
-	`)
+	})).toMatchSnapshot()
 })

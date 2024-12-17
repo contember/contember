@@ -9,7 +9,7 @@ import {
 	SchemaMigrator, VERSION_LATEST,
 } from '@contember/schema-migrations'
 import { emptySchema } from '@contember/schema-utils'
-import { afterEach, assert, beforeEach } from 'vitest'
+import { afterEach, describe, beforeEach, expect } from 'bun:test'
 
 
 export const rootToken = String(process.env.CONTEMBER_ROOT_TOKEN)
@@ -28,10 +28,10 @@ beforeEach(() => {
 })
 
 afterEach(ctx => {
-	if (latestError !== null && ctx.task.result.state === 'fail') {
-		// eslint-disable-next-line no-console
-		console.error(latestError)
-	}
+	// if (latestError !== null && ctx.task.result.state === 'fail') {
+	// 	// eslint-disable-next-line no-console
+	// 	console.error(latestError)
+	// }
 })
 
 
@@ -85,10 +85,10 @@ const createProject = async (slug: string) => {
 			},
 		})
 		.expect(response => {
-			assert.isOk(response.body)
-			assert.isOk(response.body.data)
-			assert.isOk(response.body.data.createProject)
-			assert.isOk(response.body.data.createProject.ok)
+			expect(response.body).toBeTruthy()
+			expect(response.body.data).toBeTruthy()
+			expect(response.body.data.createProject).toBeTruthy()
+			expect(response.body.data.createProject.ok).toBeTruthy()
 		})
 		.expect(200)
 }
@@ -116,7 +116,7 @@ const executeMigrations = async (projectSlug: string, modifications: Migration.M
 			},
 		})
 		.expect(response => {
-			assert.deepStrictEqual(response.body.data, {
+			expect(response.body.data).toStrictEqual({
 				migrate: {
 					error: null,
 					ok: true,
@@ -162,5 +162,5 @@ beforeEach(async () => {
 
 afterEach(async () => {
 	const mailhogMessages = await consumeMails()
-	assert.deepStrictEqual(mailhogMessages, [])
+	expect(mailhogMessages).toHaveLength(0)
 })

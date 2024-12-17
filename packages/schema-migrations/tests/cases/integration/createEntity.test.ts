@@ -1,10 +1,11 @@
 import { createSchema, SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
 import { SQL } from '../../src/tags'
+import { describe } from 'bun:test'
 import { testMigrations } from '../../src/tests'
 import { SchemaDefinition as def } from '@contember/schema-definition'
 
-testMigrations('create a table (no relations, unique on column)', {
+describe('create a table (no relations, unique on column)', () => testMigrations({
 	original: {  },
 	updated: {
 		model: new SchemaBuilder()
@@ -101,7 +102,7 @@ testMigrations('create a table (no relations, unique on column)', {
 		ADD "registered_at" date;
 	ALTER TABLE "author"
 		ADD UNIQUE ("email");`,
-})
+}))
 
 namespace ViewEntityUpdatedSchema {
 	@def.View("SELECT null as id, 'John' AS name")
@@ -109,7 +110,7 @@ namespace ViewEntityUpdatedSchema {
 		name = def.stringColumn()
 	}
 }
-testMigrations('create a view', {
+describe('create a view', () => testMigrations({
 	original: {},
 	updated: createSchema(ViewEntityUpdatedSchema),
 	diff: [
@@ -146,4 +147,4 @@ testMigrations('create a view', {
 		},
 	],
 	sql: SQL`CREATE VIEW "author" AS SELECT null as id, 'John' AS name;`,
-})
+}))

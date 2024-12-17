@@ -11,12 +11,11 @@ jobs:
 
       - name: Setup node
         uses: actions/setup-node@v3
-        with:
-          node-version: 20
-          cache: 'yarn'
-
-      - name: "Install yarn deps"
-        run: yarn install
+      - uses: oven-sh/setup-bun@v2
+      - name: Install deps
+        run: |
+          bun --version
+          bun install --frozen-lockfile
 
       - name: Extract version
         id: versions
@@ -25,7 +24,7 @@ jobs:
           version: ${{ github.ref }}
 
       - name: "Build app"
-        run: yarn run build
+        run: bun run build
 
       - name: "Publish NPM"
         run: bash ./scripts/npm/publish.sh
@@ -37,7 +36,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        image: [cli, engine-alpine, engine-debian]
+        image: [cli, engine]
     steps:
       - uses: actions/checkout@v4
 
@@ -47,14 +46,11 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
 
-      - name: Setup node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 20
-          cache: 'yarn'
-
-      - name: "Install yarn deps"
-        run: yarn install
+      - uses: oven-sh/setup-bun@v2
+      - name: Install deps
+        run: |
+          bun --version
+          bun install --frozen-lockfile
 
       - name: Extract version
         id: versions

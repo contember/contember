@@ -1,3 +1,4 @@
+import { describe } from 'bun:test'
 import { testMigrations } from '../../src/tests'
 import { SQL } from '../../src/tags'
 import { createSchema, SchemaDefinition as def } from '@contember/schema-definition'
@@ -25,24 +26,27 @@ namespace ConvertMHOtoOHOSchemaUpdated {
 	}
 }
 
-
-testMigrations('convert one has many to one has one', {
-	original: createSchema(ConvertMHOtoOHOSchemaOrig),
-	updated: createSchema(ConvertMHOtoOHOSchemaUpdated),
-	diff: [{
-		entityName: 'ArticleReview',
-		fieldName: 'article',
-		modification: 'convertOneHasManyToOneHasOneRelation',
-		newInverseSideFieldName: 'review',
-	}],
-	sql: SQL`DROP INDEX "article_review_article_id_idx"; ALTER TABLE "article_review" ADD UNIQUE ("article_id");`,
-	databaseMetadata: createDatabaseMetadata({
-		foreignKeys: [],
-		indexes: [{
-			indexName: 'article_review_article_id_idx',
-			columnNames: ['article_id'],
-			tableName: 'article_review',
+describe('convert one has many to one has one', () => {
+	testMigrations({
+		original: createSchema(ConvertMHOtoOHOSchemaOrig),
+		updated: createSchema(ConvertMHOtoOHOSchemaUpdated),
+		diff: [{
+			entityName: 'ArticleReview',
+			fieldName: 'article',
+			modification: 'convertOneHasManyToOneHasOneRelation',
+			newInverseSideFieldName: 'review',
 		}],
-		uniqueConstraints: [],
-	}),
+		sql: SQL`DROP INDEX "article_review_article_id_idx";
+        ALTER TABLE "article_review"
+            ADD UNIQUE ("article_id");`,
+		databaseMetadata: createDatabaseMetadata({
+			foreignKeys: [],
+			indexes: [{
+				indexName: 'article_review_article_id_idx',
+				columnNames: ['article_id'],
+				tableName: 'article_review',
+			}],
+			uniqueConstraints: [],
+		}),
+	})
 })

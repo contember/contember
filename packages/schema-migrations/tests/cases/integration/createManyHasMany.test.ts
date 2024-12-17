@@ -1,9 +1,10 @@
+import { describe } from 'bun:test'
 import { testMigrations } from '../../src/tests'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
 import { SQL } from '../../src/tags'
 
-testMigrations('create many has many relation (post with categories)', {
+describe('create many has many relation (post with categories)', () => testMigrations({
 	original: {
 		model: new SchemaBuilder()
 			.entity('Post', e => e.column('title', c => c.type(Model.ColumnType.String)))
@@ -109,4 +110,4 @@ testMigrations('create many has many relation (post with categories)', {
 		DEFERRABLE INITIALLY DEFERRED
 		FOR EACH ROW
 	EXECUTE PROCEDURE "system"."trigger_event_commit"();`,
-})
+}))

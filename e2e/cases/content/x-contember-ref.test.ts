@@ -1,4 +1,4 @@
-import { assert, test } from 'vitest'
+import {  expect, test } from 'bun:test'
 import { createTester, gql } from '../../src/tester'
 import { createSchema, SchemaDefinition as def } from '@contember/schema-definition'
 
@@ -34,7 +34,7 @@ test('Content API: X-Contember-Ref header', async () => {
 	)
 		.set('X-Contember-Ref', 'None')
 		.expect(response => {
-			assert.deepStrictEqual(response.body.data, {
+			expect(response.body.data).toStrictEqual({
 				listTag: [
 					{
 						label: 'typescript',

@@ -3,7 +3,7 @@ import { testUuid } from '../../../src/testUuid'
 import { GQL, SQL } from '../../../src/tags'
 import { disableApiKey } from './sql/disableApiKeySql'
 import { getPersonByIdentity } from './sql/getPersonByIdentity'
-import { test } from 'vitest'
+import { test } from 'bun:test'
 import { getApiKeySql } from './sql/getApiKeySql'
 import { ApiKey } from '../../../../src'
 

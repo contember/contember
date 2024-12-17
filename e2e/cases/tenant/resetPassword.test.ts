@@ -1,4 +1,4 @@
-import { assert, test } from 'vitest'
+import { expect, test } from 'bun:test'
 import { consumeMails, createTester, gql, loginToken, rand } from '../../src/tester'
 import { emptySchema } from '@contember/schema-utils'
 import { signIn, signUp } from '../../src/requests'
@@ -29,11 +29,11 @@ test('execute password reset', async () => {
 			},
 		})
 	const mails = await consumeMails()
-	assert.lengthOf(mails, 1)
+	expect(mails).toHaveLength(1)
 
 	const matches = mails[0].Raw.Data.match(/<code>(.+)<\/code>/)
 	const token = matches?.[1] as string
-	assert.lengthOf(token, 40)
+	expect(token).toHaveLength(40)
 
 	await tester(gql`
 		mutation($token: String!, $password: String!) {
@@ -77,6 +77,6 @@ test('execute password reset', async () => {
 		})
 
 	const authToken = await signIn(email, password)
-	assert.lengthOf(authToken, 40)
+	expect(authToken).toHaveLength(40)
 
 })

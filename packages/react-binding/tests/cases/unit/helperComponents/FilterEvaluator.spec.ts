@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'bun:test'
 import { FilterEvaluator } from '../../../../src/helperComponents/helpers/FilterEvaluator'
 import { schema } from './schema'
 import { EntityAccessor } from '../../../../src'

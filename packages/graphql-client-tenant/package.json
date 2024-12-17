@@ -4,7 +4,7 @@
   "license": "Apache-2.0",
   "type": "module",
   "scripts": {
-    "pre-build": "tsx ./scripts/generateClient.ts && tsc --build ./src"
+    "pre-build": "bun ./scripts/generateClient.ts && tsc --build ./src"
   },
   "main": "./dist/production/index.js",
   "typings": "./dist/types/index.d.ts",

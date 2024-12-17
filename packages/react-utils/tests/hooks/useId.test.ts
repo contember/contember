@@ -1,5 +1,5 @@
 import { renderHook } from '@testing-library/react-hooks'
-import { describe, expect, test } from 'vitest'
+import { describe, expect, test } from 'bun:test'
 import { useId } from '../../src'
 
 describe('@contember/utilities', () => {

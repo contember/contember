@@ -1,7 +1,8 @@
 import { VariableInjector } from '../../../src/acl'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { Acl, Model } from '@contember/schema'
-import { assert, describe, it } from 'vitest'
+import { describe, it } from 'bun:test'
+import { assert } from '../../src/assert'
 
 describe('Variable injector', () => {
 

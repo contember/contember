@@ -1,9 +1,10 @@
+import { describe } from 'bun:test'
 import { testMigrations } from '../../src/tests'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
 import { SQL } from '../../src/tags'
 
-testMigrations('create one has one relation (site with settings)', {
+describe('create one has one relation (site with settings)', () => testMigrations({
 	original: {},
 	updated: {
 		model: new SchemaBuilder()
@@ -146,4 +147,4 @@ testMigrations('create one has one relation (site with settings)', {
 	ALTER TABLE "site"
 		ADD UNIQUE ("setting_id");
 		`,
-})
+}))

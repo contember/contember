@@ -1,7 +1,7 @@
 import { executeTenantTest } from '../../../src/testTenant'
 import { GQL } from '../../../src/tags'
 import { testUuid } from '../../../src/testUuid'
-import { test } from 'vitest'
+import { test } from 'bun:test'
 import { getPersonByIdSql } from './sql/getPersonByIdSql'
 
 test('get person by id query', async () => {

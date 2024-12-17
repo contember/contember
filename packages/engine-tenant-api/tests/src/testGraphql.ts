@@ -1,5 +1,5 @@
 import { graphql, GraphQLSchema } from 'graphql'
-import { assert } from 'vitest'
+import { expect } from 'bun:test'
 
 export interface Test {
 	schema: GraphQLSchema
@@ -24,6 +24,6 @@ export const executeGraphQlTest = async (test: Test) => {
 	if (typeof test.return === 'function') {
 		test.return(responseNormalized)
 	} else {
-		assert.deepStrictEqual(responseNormalized, test.return)
+		expect(responseNormalized).toStrictEqual(test.return)
 	}
 }

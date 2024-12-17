@@ -1,11 +1,9 @@
-FROM node:20-alpine as build
+FROM oven/bun:latest as build
 WORKDIR /src
 COPY package.json /src
-COPY yarn.lock /src
-COPY .yarnrc.yml /src
-COPY .yarn/ /src/.yarn/
-RUN yarn install
-RUN yarn add graphql @graphql-codegen/cli @graphql-codegen/typescript @graphql-codegen/typescript-operations @graphql-codegen/typescript-resolvers
+COPY bun.lock /src
+RUN bun install install
+RUN bun add graphql @graphql-codegen/cli @graphql-codegen/typescript @graphql-codegen/typescript-operations @graphql-codegen/typescript-resolvers
 COPY . /src
 ARG PACKAGE
 WORKDIR /src/packages/$PACKAGE

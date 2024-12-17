@@ -1,4 +1,4 @@
-import { describe, test } from 'vitest'
+import { describe, test } from 'bun:test'
 
 describe('@contember/binding-legacy', function () {
 	test('@contember/binding-legacy', function () { })

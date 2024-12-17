@@ -1,4 +1,4 @@
-import { assert, test, describe } from 'vitest'
+import { expect, test, describe } from 'bun:test'
 import { conditionSchema } from '../../../src/type-schema'
 import { Model } from '@contember/schema'
 import { createSchema, SchemaDefinition as def } from '@contember/schema-definition'
@@ -27,7 +27,7 @@ describe('where schema', () => {
 		const where = {
 			title: { eq: 'foo' },
 		}
-		assert.deepStrictEqual(whereSchema({ schema, entity: schema.entities.Article })(where), where)
+		expect(whereSchema({ schema, entity: schema.entities.Article })(where)).toStrictEqual(where)
 	})
 
 	test('where with and / or /not', () => {
@@ -40,7 +40,7 @@ describe('where schema', () => {
 				},
 			],
 		}
-		assert.deepStrictEqual(whereSchema({ schema, entity: schema.entities.Article })(where), where)
+		expect(whereSchema({ schema, entity: schema.entities.Article })(where)).toStrictEqual(where)
 	})
 
 
@@ -48,17 +48,17 @@ describe('where schema', () => {
 		const where = {
 			tags: { name: { eq: 'xx' } },
 		}
-		assert.deepStrictEqual(whereSchema({ schema, entity: schema.entities.Article })(where), where)
+		expect(whereSchema({ schema, entity: schema.entities.Article })(where)).toStrictEqual(where)
 	})
 
 	test('undefined field', () => {
 		const where = {
 			name: { eq: 'foo' },
 		}
-		assert.throw(() => whereSchema({
+		expect(() => whereSchema({
 			schema,
 			entity: schema.entities.Article,
-		})(where), 'value at root: extra property name found')
+		})(where)).toThrow('value at root: extra property name found')
 	})
 
 
@@ -69,10 +69,10 @@ describe('where schema', () => {
 
 			},
 		}
-		assert.throw(() => whereSchema({
+		expect(() => whereSchema({
 			schema,
 			entity: schema.entities.Article,
-		})(where), 'value at path /tags: extra property caption found')
+		})(where)).toThrow('value at path /tags: extra property caption found')
 	})
 
 
@@ -80,10 +80,10 @@ describe('where schema', () => {
 		const where = {
 			title: { xx: 'foo' },
 		}
-		assert.throw(() => whereSchema({
+		expect(() => whereSchema({
 			schema,
 			entity: schema.entities.Article,
-		})(where), 'value at path /title: extra property xx found')
+		})(where)).toThrow('value at path /title: extra property xx found')
 	})
 
 })

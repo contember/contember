@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'vitest'
+import { describe, expect, test } from 'bun:test'
 import { BuiltinLeaves, RichText } from '../src'
 import { render } from '@testing-library/react'
 
@@ -16,61 +16,37 @@ describe('leaf rendering', () => {
 	})
 
 	test('render bold', () => {
-		expect(render(<RichText blocks={[createLeafBlock('Hello', 'isBold')]} />).container.firstChild)
-			.toMatchInlineSnapshot(`
-			<b>
-			  Hello
-			</b>
-		`)
+		expect(render(<RichText blocks={[createLeafBlock('Hello', 'isBold')]} />).container.innerHTML)
+			.toEqual(`<b>Hello</b>`)
 	})
 
 	test('render code', () => {
-		expect(render(<RichText blocks={[createLeafBlock('Hello', 'isCode')]} />).container.firstChild)
-			.toMatchInlineSnapshot(`
-				<code>
-				  Hello
-				</code>
-			`)
+		expect(render(<RichText blocks={[createLeafBlock('Hello', 'isCode')]} />).container.innerHTML)
+			.toEqual(`<code>Hello</code>`)
 	})
 
 
 	test('render highlighted', () => {
-		expect(render(<RichText blocks={[createLeafBlock('Hello', 'isHighlighted')]} />).container.firstChild)
-			.toMatchInlineSnapshot(`
-				<em>
-				  Hello
-				</em>
-			`)
+		expect(render(<RichText blocks={[createLeafBlock('Hello', 'isHighlighted')]} />).container.innerHTML)
+			.toEqual(`<em>Hello</em>`)
 	})
 
 
 	test('render italic', () => {
-		expect(render(<RichText blocks={[createLeafBlock('Hello', 'isItalic')]} />).container.firstChild)
-			.toMatchInlineSnapshot(`
-				<i>
-				  Hello
-				</i>
-			`)
+		expect(render(<RichText blocks={[createLeafBlock('Hello', 'isItalic')]} />).container.innerHTML)
+			.toEqual(`<i>Hello</i>`)
 	})
 
 
 	test('render underline', () => {
-		expect(render(<RichText blocks={[createLeafBlock('Hello', 'isUnderlined')]} />).container.firstChild)
-			.toMatchInlineSnapshot(`
-				<u>
-				  Hello
-				</u>
-			`)
+		expect(render(<RichText blocks={[createLeafBlock('Hello', 'isUnderlined')]} />).container.innerHTML)
+			.toEqual(`<u>Hello</u>`)
 	})
 
 
 	test('render struck through', () => {
-		expect(render(<RichText blocks={[createLeafBlock('Hello', 'isStruckThrough')]} />).container.firstChild)
-			.toMatchInlineSnapshot(`
-				<s>
-				  Hello
-				</s>
-			`)
+		expect(render(<RichText blocks={[createLeafBlock('Hello', 'isStruckThrough')]} />).container.innerHTML)
+			.toEqual(`<s>Hello</s>`)
 	})
 
 
@@ -86,14 +62,8 @@ describe('leaf rendering', () => {
 			},
 			id: '1',
 			references: undefined,
-		}]} />).container.firstChild)
-			.toMatchInlineSnapshot(`
-				<b>
-				  <i>
-				    Hello
-				  </i>
-				</b>
-			`)
+		}]} />).container.innerHTML)
+			.toEqual(`<b><i>Hello</i></b>`)
 	})
 
 	test('render custom leaf', () => {
@@ -102,11 +72,7 @@ describe('leaf rendering', () => {
 				return <sup>{it.fallback}</sup>
 			}
 			return it.fallback
-		}} />).container.firstChild)
-			.toMatchInlineSnapshot(`
-				<sup>
-				  Hello
-				</sup>
-			`)
+		}} />).container.innerHTML)
+			.toEqual(`<sup>Hello</sup>`)
 	})
 })

@@ -1,9 +1,13 @@
 import { TriggerListenerBuilder, TriggerListeners } from '../../../src/triggers'
 import { SchemaDefinition as def } from '@contember/schema-definition'
 import { Actions, Model } from '@contember/schema'
-import { assert, test } from 'vitest'
+import { expect, test } from 'bun:test'
 
 
+const assert = {
+	equal: (a: any, b: any) => expect(a).toEqual(b),
+	deepStrictEqual: (a: any, b: any) => expect(a).toStrictEqual(b),
+}
 const createTrigger = (watchNode: Actions.SelectionNode): Actions.AnyTrigger => ({
 	type: 'watch',
 	entity: 'Author',

@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { assertType, describe, expect, expectTypeOf, test } from 'vitest'
+import { describe, expect, test } from 'bun:test'
 import { ContentClientInput } from '../../../src'
 import { ContemberClientEntities, FragmentOf, FragmentType, queryBuilder } from '../../client'
+import { expectTypeOf } from 'expect-type'
 
 const qb = queryBuilder
 describe('ts types', () => {
@@ -16,7 +17,7 @@ describe('ts types', () => {
 		const postFragment = qb.fragment('Post')
 
 		// @ts-expect-error
-		assertType(postFragment.$('author', qb.fragment('Post')))
+		postFragment.$('author', qb.fragment('Post'))
 	})
 
 	test('where - valid', async () => {

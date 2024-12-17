@@ -1,6 +1,9 @@
+// eslint-disable-next-line @typescript-eslint/triple-slash-reference
+/// <reference path="../../types/prom-client/index.d.ts" />
 import prom from 'prom-client'
 import { Connection, EventManager, PoolStats, poolStatsDescription } from '@contember/database'
 import { CustomMetric } from './CustomMetric'
+
 
 const labelNames = ['contember_project' as const, 'contember_module' as const, 'contember_project_group' as const, 'database_instance']
 type LabelNames = typeof labelNames[number]

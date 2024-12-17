@@ -1,7 +1,7 @@
 import { Migration, ModificationHandlerFactory, SchemaDiffer, SchemaMigrator, VERSION_LATEST } from '../../src'
 import { Schema } from '@contember/schema'
 import { createMigrationBuilder } from '@contember/database-migrations'
-import { assert, describe, it } from 'vitest'
+import { expect, describe, it, test } from 'bun:test'
 import { emptySchema } from '@contember/schema-utils'
 import { DatabaseMetadata, emptyDatabaseMetadata } from '@contember/database'
 
@@ -29,7 +29,7 @@ export function testDiffSchemas(
 		{ skipRecreateValidation: true },
 	)
 	try {
-		assert.deepStrictEqual(actualDiff, expectedDiff)
+		expect(actualDiff).toStrictEqual(expectedDiff)
 	} catch (e) {
 		// eslint-disable-next-line no-console
 		console.log(JSON.stringify(actualDiff))
@@ -40,7 +40,7 @@ export function testDiffSchemas(
 		actualDiff,
 		VERSION_LATEST,
 	)
-	assert.deepStrictEqual(schema, {
+	expect(schema).toStrictEqual({
 		...emptySchema,
 		...updated,
 	})
@@ -57,7 +57,7 @@ export function testApplyDiff(
 		VERSION_LATEST,
 	)
 
-	assert.deepStrictEqual(actualSchema, {
+	expect(actualSchema).toStrictEqual({
 		...emptySchema,
 		...expected,
 	})
@@ -83,22 +83,20 @@ export function testGenerateSql(
 		schema = modificationHandler.getSchemaUpdater()({ schema })
 	}
 	const actual = builder.getSql().replace(/\s+/g, ' ').trim()
-	assert.equal(actual, expectedSql)
+	expect(actual).toEqual(expectedSql)
 }
 
-export function testMigrations(title: string, { original, updated, diff, noDiff, sql, databaseMetadata }: TestContext) {
-	describe(title, () => {
-		it('diff schemas', () => {
-			if (noDiff) {
-				return
-			}
-			testDiffSchemas(original, updated, diff)
-		})
-		it('apply diff', () => {
-			testApplyDiff(original, updated, diff)
-		})
-		it('generate sql', () => {
-			testGenerateSql(original, diff, sql, databaseMetadata)
-		})
+export function testMigrations({ original, updated, diff, noDiff, sql, databaseMetadata }: TestContext) {
+	test('diff schemas', () => {
+		if (noDiff) {
+			return
+		}
+		testDiffSchemas(original, updated, diff)
+	})
+	test('apply diff', () => {
+		testApplyDiff(original, updated, diff)
+	})
+	test('generate sql', () => {
+		testGenerateSql(original, diff, sql, databaseMetadata)
 	})
 }

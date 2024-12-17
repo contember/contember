@@ -1,5 +1,5 @@
 import { createLogger, TestLoggerHandler } from '@contember/logger'
-import { assert, test, expect } from 'vitest'
+import { test, expect } from 'bun:test'
 import { Runnable, RunnableArgs, Running, Supervisor } from '../../src'
 
 const shouldNotHappenCallback = () => {
@@ -32,7 +32,7 @@ test('supervisor: start - end', async () => {
 		onError: shouldNotHappenCallback,
 	})
 	await running.end()
-	assert.deepEqual(testLogger.messages.map(it => it.message), [
+	expect(testLogger.messages.map(it => it.message)).toStrictEqual([
 		'Starting runnable',
 		'Runnable started',
 		'Runnable terminated',
@@ -67,7 +67,7 @@ test('supervisor: retry start', async () => {
 		onError: shouldNotHappenCallback,
 	})
 	await running.end()
-	assert.deepEqual(testLogger.messages.map(it => it.message), [
+	expect(testLogger.messages.map(it => it.message)).toStrictEqual([
 		'Starting runnable #1',
 		'Runnable #1 failed to start',
 		'Runnable crashed, restarting in 1 ms ...',
@@ -100,7 +100,7 @@ test('supervisor: failed to start', async () => {
 		onError: shouldNotHappenCallback,
 	})
 	await expect(runningPromise).rejects.toThrow('failed to start')
-	assert.deepEqual(testLogger.messages.map(it => it.message), [
+	expect(testLogger.messages.map(it => it.message)).toStrictEqual([
 		'Starting runnable',
 		'Runnable crashed, stopping: failed to start',
 	])
@@ -136,7 +136,7 @@ test('supervisor: crash after start, restarts', async () => {
 	})
 	await new Promise(resolve => setTimeout(resolve, 100))
 	await running.end()
-	assert.deepEqual(testLogger.messages.map(it => it.message), [
+	expect(testLogger.messages.map(it => it.message)).toStrictEqual([
 		'Starting runnable #1',
 		'Runnable crashed, restarting in 1 ms ...',
 		'Restarting runnable now',
@@ -181,7 +181,7 @@ test('supervisor: failed to restart', async () => {
 
 	await expect(errorPromise).rejects.toThrow('failed to restart')
 
-	assert.deepEqual(testLogger.messages.map(it => it.message), [
+	expect(testLogger.messages.map(it => it.message)).toStrictEqual([
 		'Starting runnable #1',
 		'Runnable crashed, restarting in 1 ms ...',
 		'Restarting runnable now',

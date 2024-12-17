@@ -1,10 +1,11 @@
 import { c, createSchema } from '@contember/schema-definition'
 import { SQL } from '../../src/tags'
+import { describe } from 'bun:test'
 import { testMigrations } from '../../src/tests'
 import { createUniqueConstraintModification, removeUniqueConstraintModification } from '../../../src'
 import { createDatabaseMetadata } from '@contember/database'
 
-testMigrations('create unique (immediate)', {
+describe('create unique (immediate)', () => testMigrations({
 	original: createSchema({
 		Author: class Author {
 			email = c.stringColumn()
@@ -24,9 +25,9 @@ testMigrations('create unique (immediate)', {
 		}),
 	],
 	sql: SQL`ALTER TABLE "author" ADD UNIQUE ("email");`,
-})
+}))
 
-testMigrations('create unique (deferrable)', {
+describe('create unique (deferrable)', () => testMigrations({
 	original: createSchema({
 		Author: class Author {
 			email = c.stringColumn()
@@ -48,10 +49,10 @@ testMigrations('create unique (deferrable)', {
 	],
 	sql: SQL`ALTER TABLE "author"
         ADD UNIQUE ("email") DEFERRABLE;`,
-})
+}))
 
 
-testMigrations('create unique (deferred)', {
+describe('create unique (deferred)', () => testMigrations({
 	original: createSchema({
 		Author: class Author {
 			email = c.stringColumn()
@@ -74,10 +75,10 @@ testMigrations('create unique (deferred)', {
 	],
 	sql: SQL`ALTER TABLE "author"
         ADD UNIQUE ("email") INITIALLY DEFERRED;`,
-})
+}))
 
 
-testMigrations('change unique timing', {
+describe('change unique timing', () => testMigrations({
 	original: createSchema({
 		Author: class Author {
 			email = c.stringColumn().unique()
@@ -114,7 +115,7 @@ ALTER TABLE "author" ADD UNIQUE ("email") DEFERRABLE;`,
 			deferrable: false,
 		}],
 	}),
-})
+}))
 
 
 namespace SchemaWithUniqueDecorator {
@@ -125,7 +126,7 @@ namespace SchemaWithUniqueDecorator {
 	}
 }
 
-testMigrations('create unique using decorator', {
+describe('create unique using decorator', () => testMigrations({
 	original: createSchema({
 		Author: class Author {
 			email = c.stringColumn()
@@ -143,4 +144,4 @@ testMigrations('create unique using decorator', {
 	],
 	sql: SQL`ALTER TABLE "author"
         ADD UNIQUE ("email") INITIALLY DEFERRED;`,
-})
+}))

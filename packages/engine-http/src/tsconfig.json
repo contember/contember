@@ -2,7 +2,7 @@
 	"extends": "../tsconfig.settings.json",
 	"compilerOptions": {
 		"outDir": "../dist/types",
-		"esModuleInterop": true
+		"esModuleInterop": true,
 	},
 	"references": [
 		{ "path": "../../config-loader/src" },

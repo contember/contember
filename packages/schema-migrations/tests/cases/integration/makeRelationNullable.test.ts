@@ -1,9 +1,10 @@
+import { describe } from 'bun:test'
 import { testMigrations } from '../../src/tests'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
 import { SQL } from '../../src/tags'
 
-testMigrations('make relation nullable', {
+describe('make relation nullable', () => testMigrations({
 	original: {
 		model: new SchemaBuilder()
 			.entity('Post', entity =>
@@ -31,9 +32,9 @@ testMigrations('make relation nullable', {
 	],
 	sql: SQL`ALTER TABLE "post"
 		ALTER "category_id" DROP NOT NULL;`,
-})
+}))
 
-testMigrations('make inverse relation nullable', {
+describe('make inverse relation nullable', () => testMigrations({
 	original: {
 		model: new SchemaBuilder()
 			.entity('Post', entity => entity.column('name', c => c.type(Model.ColumnType.String)))
@@ -54,4 +55,4 @@ testMigrations('make inverse relation nullable', {
 		},
 	],
 	sql: SQL``,
-})
+}))

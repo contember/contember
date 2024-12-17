@@ -1,10 +1,11 @@
-import { describe, it, assert } from 'vitest'
+import { describe, it } from 'bun:test'
 import { ConditionOptimizer } from '../../../src/mapper/select/optimizer/ConditionOptimizer'
 import { createSchema, SchemaDefinition as def } from '@contember/schema-definition'
 import { WhereOptimizer } from '../../../src/mapper/select/optimizer/WhereOptimizer'
 import { ConditionBuilder, JoinBuilder, PathFactory, WhereBuilder } from '../../../src/mapper'
 import { Compiler, SelectBuilder } from '@contember/database'
 import { Input, Schema } from '@contember/schema'
+import { assert } from '../../src/assert'
 
 namespace WhereBuilderModel {
 	export class Author {

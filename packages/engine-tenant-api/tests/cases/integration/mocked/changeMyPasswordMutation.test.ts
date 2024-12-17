@@ -1,10 +1,10 @@
 import { executeTenantTest } from '../../../src/testTenant'
 import { testUuid } from '../../../src/testUuid'
 import { updatePersonPasswordSql } from './sql/updatePesonPasswordSql'
-import { test } from 'vitest'
+import { test } from 'bun:test'
 import { changeMyPasswordMutation } from './gql/changeMyPassword'
 import { getPersonByIdentity } from './sql/getPersonByIdentity'
-import { authenticatedIdentityId } from '../../../src/testTenantDb'
+import { authenticatedIdentityId } from '../../../src/testTenant'
 
 test('changes my password', async () => {
 	const personId = testUuid(1)

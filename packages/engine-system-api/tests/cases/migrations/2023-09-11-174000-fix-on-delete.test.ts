@@ -1,6 +1,6 @@
 import migration from '../../../src/migrations/2023-09-11-174000-fix-on-delete'
 import { createMigrationBuilder } from '@contember/database-migrations'
-import { assert, test } from 'vitest'
+import { expect, test } from 'bun:test'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { emptySchema } from '@contember/schema-utils'
 import { Model } from '@contember/schema'
@@ -58,8 +58,8 @@ test('table-on-delete test', async () => {
 			],
 		},
 	})
-	assert.equal(
-		builder.getSql(),
+	expect(
+		builder.getSql()).toEqual(
 		`ALTER TABLE "stage_live"."post" DROP CONSTRAINT "fk_post_author_id_author_id";
 ALTER TABLE "stage_live"."post"
 					ADD FOREIGN KEY ("author_id") 
@@ -120,8 +120,9 @@ test('table-on-delete test valid', async () => {
 			],
 		},
 	})
-	assert.equal(
+	expect(
 		builder.getSql(),
+	).toEqual(
 		`\n`,
 	)
 })

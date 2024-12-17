@@ -1,17 +1,15 @@
-FROM node:20 as builder
+FROM oven/bun:1.1.39-debian as builder
 
 WORKDIR /src
 COPY ./ ./
-
-RUN test ! -f yarn.tar.gz || tar xf yarn.tar.gz -C "./.yarn/cache" .
-RUN /src/scripts/server/server-build.sh
+RUN bun install
+RUN /src/scripts/server-build/run.sh
 
 FROM node:20
 
 WORKDIR /src
 
-COPY --from=builder /src/server/server.js /src/
-COPY --from=builder /src/node_modules /src/node_modules
+COPY --from=builder /src/dist/start.js /src/server.js
 COPY --from=builder /src/packages/engine-server/package.json /src/package.json
 COPY --from=builder /src/LICENSE /src/
 

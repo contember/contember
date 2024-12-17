@@ -1,4 +1,4 @@
-import { expect, it } from 'vitest'
+import { expect, it } from 'bun:test'
 import { MutexDeadlockError } from '../../../src/utils'
 import { createConnectionMockAlt } from './createConnectionMockAlt'
 
@@ -148,7 +148,7 @@ it('support nested transaction / savepoints', async () => {
 it('detects deadlock', async () => {
 	const [connection, end] = createConnectionMockAlt([])
 
-	await expect(async () => await connection.scope(async c1 => c1.scope(async () => await c1.query('SELECT 1')))).rejects.toThrow(MutexDeadlockError)
+	await expect(connection.scope(async c1 => c1.scope(async () => await c1.query('SELECT 1')))).rejects.toThrow(MutexDeadlockError)
 	end()
 })
 

@@ -50,7 +50,7 @@ const processPackage = async (dir: string, projectList: ProjectList) => {
 				if (module === '.' || module === '..') {
 					errors.push({ file, message: `Dot import ("${module}") is forbidden`, type: 'forbidden_import' })
 				}
-				if (!module.startsWith('node:') && !module.startsWith('.') && !globalModules.has(module)) {
+				if (!module.startsWith('node:') && !module.startsWith('bun:') && !module.startsWith('.') && !globalModules.has(module)) {
 					const moduleMatch = module.match(/^((?:@[\w_-]+\/)?[.\w_-]+)(\/.+)?$/)
 					if (!moduleMatch) {
 						throw new Error(`Invalid module ${module}`)

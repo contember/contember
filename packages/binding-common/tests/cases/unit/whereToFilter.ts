@@ -1,4 +1,4 @@
-import { expect, it, describe } from 'vitest'
+import { expect, it, describe } from 'bun:test'
 import { whereToFilter } from '../../../src'
 
 describe('whereToFilter', () => {

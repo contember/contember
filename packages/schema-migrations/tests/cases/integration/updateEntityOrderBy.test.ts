@@ -1,3 +1,4 @@
+import { describe } from 'bun:test'
 import { testMigrations } from '../../src/tests'
 import { createSchema, SchemaBuilder, SchemaDefinition as def } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
@@ -17,7 +18,7 @@ namespace SchemaWithOrderBy {
 	}
 }
 
-testMigrations('update entity add order by', {
+describe('update entity add order by', () => testMigrations({
 	original: createSchema(SchemaWithoutOrderBy),
 	updated: createSchema(SchemaWithOrderBy),
 	diff: [
@@ -28,9 +29,9 @@ testMigrations('update entity add order by', {
 		},
 	],
 	sql: SQL``,
-})
+}))
 
-testMigrations('update entity remove order by', {
+describe('update entity remove order by', () => testMigrations({
 	original: createSchema(SchemaWithOrderBy),
 	updated: createSchema(SchemaWithoutOrderBy),
 	diff: [
@@ -40,4 +41,4 @@ testMigrations('update entity remove order by', {
 		},
 	],
 	sql: SQL``,
-})
+}))

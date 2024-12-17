@@ -1,3 +1,4 @@
+import { describe } from 'bun:test'
 import { testMigrations } from '../../src/tests'
 import { createSchema, SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
@@ -6,7 +7,7 @@ import { SchemaDefinition as def } from '@contember/schema-definition'
 import { createDatabaseMetadata } from '@contember/database'
 
 
-testMigrations('remove relation (many has one)', {
+describe('remove relation (many has one)', () => testMigrations({
 	original: {
 		model: new SchemaBuilder()
 			.entity('Author', e => e.column('name', c => c.type(Model.ColumnType.String)))
@@ -32,9 +33,9 @@ testMigrations('remove relation (many has one)', {
 	],
 	sql: SQL`ALTER TABLE "post"
 		DROP "author_id";`,
-})
+}))
 
-testMigrations('remove relation (one has many)', {
+describe('remove relation (one has many)', () => testMigrations({
 	original: {
 		model: new SchemaBuilder()
 			.entity('Post', e => e.oneHasMany('locales', r => r.target('PostLocale').ownerNotNull().ownedBy('post')))
@@ -79,9 +80,9 @@ testMigrations('remove relation (one has many)', {
 			deferred: false,
 		}],
 	}),
-})
+}))
 
-testMigrations('remove relation (many has many)', {
+describe('remove relation (many has many)', () => testMigrations({
 	original: {
 		model: new SchemaBuilder()
 			.entity('Post', e =>
@@ -104,9 +105,9 @@ testMigrations('remove relation (many has many)', {
 		},
 	],
 	sql: SQL`DROP TABLE "post_categories";`,
-})
+}))
 
-testMigrations('remove relation (one has one)', {
+describe('remove relation (one has one)', () => testMigrations({
 	original: {
 		model: new SchemaBuilder()
 			.entity('Site', entity =>
@@ -131,9 +132,9 @@ testMigrations('remove relation (one has one)', {
 		},
 	],
 	sql: SQL`ALTER TABLE "site" DROP "setting_id";`,
-})
+}))
 
-testMigrations('remove relation inverse side', {
+describe('remove relation inverse side', () => testMigrations({
 	original: {
 		model: new SchemaBuilder()
 			.entity('Site', entity =>
@@ -160,7 +161,7 @@ testMigrations('remove relation inverse side', {
 		},
 	],
 	sql: SQL``,
-})
+}))
 
 
 namespace DropIndexOrigSchema {
@@ -191,7 +192,7 @@ namespace DropIndexUpSchema {
 }
 
 
-testMigrations('test drop index / unique when removing a field', {
+describe('test drop index / unique when removing a field', () => testMigrations({
 	original: createSchema(DropIndexOrigSchema),
 	updated: createSchema(DropIndexUpSchema),
 	diff: [{
@@ -215,5 +216,5 @@ testMigrations('test drop index / unique when removing a field', {
 ALTER TABLE "article" ADD "author" text;
 ALTER TABLE "article" ADD UNIQUE ("title", "author");
 CREATE INDEX ON "article" ("title", "author");`,
-})
+}))
 

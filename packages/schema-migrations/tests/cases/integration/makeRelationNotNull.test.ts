@@ -1,9 +1,10 @@
+import { describe } from 'bun:test'
 import { testMigrations } from '../../src/tests'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
 import { SQL } from '../../src/tags'
 
-testMigrations('make relation not null', {
+describe('make relation not null', () => testMigrations({
 	original: {
 		model: new SchemaBuilder()
 			.entity('Post', entity =>
@@ -31,4 +32,4 @@ testMigrations('make relation not null', {
 	],
 	sql: SQL`ALTER TABLE "post"
 		ALTER "category_id" SET NOT NULL;`,
-})
+}))

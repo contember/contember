@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'vitest'
+import { describe, expect, test } from 'bun:test'
 import { GraphQlField, GraphQlQueryPrinter } from '../../../src'
 
 describe('builder', () => {
@@ -8,15 +8,7 @@ describe('builder', () => {
 		const result = printer.printDocument('query', [
 			new GraphQlField(null, 'test', {}),
 		],  {})
-		expect(result).toMatchInlineSnapshot(`
-			{
-			  "query": "query {
-				test
-			}
-			",
-			  "variables": {},
-			}
-		`)
+		expect(result).toMatchSnapshot()
 	})
 
 	test('variable deduplication', async () => {
@@ -30,20 +22,7 @@ describe('builder', () => {
 				variable: { graphQlType: 'Json', value: someValue },
 			}),
 		],  {})
-		expect(result).toMatchInlineSnapshot(`
-			{
-			  "query": "query($Json_0: Json) {
-				b: test(variable: $Json_0)
-				a: test(variable: $Json_0)
-			}
-			",
-			  "variables": {
-			    "Json_0": {
-			      "foo": "bar",
-			    },
-			  },
-			}
-		`)
+		expect(result).toMatchSnapshot()
 
 	})
 })

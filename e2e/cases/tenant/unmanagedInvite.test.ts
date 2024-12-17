@@ -1,4 +1,4 @@
-import { test } from 'vitest'
+import { test } from 'bun:test'
 import { createTester, gql, rand } from '../../src/tester'
 import { createSchema } from '@contember/schema-definition'
 import { Acl } from '@contember/schema'

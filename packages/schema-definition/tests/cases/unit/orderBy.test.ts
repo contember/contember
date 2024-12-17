@@ -1,7 +1,11 @@
 import { Model } from '@contember/schema'
-import { assert, describe, expect, test, vi } from 'vitest'
+import { describe, expect, test } from 'bun:test'
 import { c, createSchema } from '../../../src'
 
+
+const assert = {
+	deepEqual: (a: any, b: any) => expect(a).toStrictEqual(b),
+}
 namespace OrderByModel {
 	@c.OrderBy('title')
 	export class Entity1 {
@@ -68,8 +72,9 @@ describe('order by', () => {
 
 	test('deprecated orderBy', () => {
 
-		const consoleMock = vi.spyOn(console, 'warn').mockImplementation(() => {
-		})
+		const origWarn = console.warn
+		let msg = ''
+		console.warn = (m: string) => msg = m
 
 		const schema = createSchema(LegacyOrderBy)
 
@@ -79,10 +84,9 @@ describe('order by', () => {
 			{ path: ['order'], direction: Model.OrderDirection.asc },
 		])
 
-		expect(consoleMock).toHaveBeenCalledOnce()
-		expect(consoleMock).toHaveBeenLastCalledWith('DEPRECATED: The "order by" property for the entity Entity5 has already been defined. Using multiple decorators can lead to unexpected order. Please provide an array containing all the \'order by\' items as an input.')
+		expect(msg).toBe('DEPRECATED: The "order by" property for the entity Entity5 has already been defined. Using multiple decorators can lead to unexpected order. Please provide an array containing all the \'order by\' items as an input.')
 
-		consoleMock.mockReset()
+		console.warn = origWarn
 	})
 })
 

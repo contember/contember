@@ -1,8 +1,7 @@
 import { executeGraphql, gql, loginToken } from './tester'
-import { assert } from 'vitest'
 import { Acl } from '@contember/schema'
 import { MembershipInput } from '../../packages/engine-tenant-api/src/schema'
-
+import { expect } from 'bun:test'
 export const signIn = async (email: string, password = '123456'): Promise<string> => {
 	const response = await executeGraphql(
 		'/tenant',
@@ -77,7 +76,7 @@ export const addProjectMember = async (identityId: string, projectSlug: string, 
 	)
 		.expect(200)
 		.expect(response => {
-			assert.deepStrictEqual(response.body.data, { addProjectMember: { ok: true, error: null } })
+			expect(response.body.data).toStrictEqual({ addProjectMember: { ok: true, error: null } })
 		})
 }
 

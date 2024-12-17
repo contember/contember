@@ -1,4 +1,4 @@
-import { assert, test } from 'vitest'
+import { expect, test } from 'bun:test'
 import { MembershipResolver, MembershipValidationErrorType } from '../../../src'
 import { Acl } from '@contember/schema'
 
@@ -17,8 +17,8 @@ test('read membership with entity variable', () => {
 	}, [
 		{ role: 'editor', variables: [{ name: 'localeID', values: [id1] }] },
 	], MembershipResolver.UnknownIdentity)
-	assert.lengthOf(result.errors, 0)
-	assert.deepStrictEqual(result.memberships, [
+	expect(result.errors).toStrictEqual([])
+	expect(result.memberships).toStrictEqual([
 		{ role: 'editor', variables: [{ name: 'localeID', condition: { in: [id1] } }] },
 	])
 })
@@ -37,13 +37,13 @@ test('read fails when variable is not provided', () => {
 	}, [
 		{ role: 'editor', variables: [] },
 	], MembershipResolver.UnknownIdentity)
-	assert.deepStrictEqual(result.errors, [{
+	expect(result.errors).toEqual([{
 		error: MembershipValidationErrorType.VARIABLE_EMPTY,
 		role: 'editor',
 		variable: 'localeID',
 	}])
 
-	assert.deepStrictEqual(result.memberships, [
+	expect(result.memberships).toStrictEqual([
 		{ role: 'editor', variables: [{ name: 'localeID', condition: { never: true } }] },
 	])
 })
@@ -64,8 +64,8 @@ test('read membership with predefined variable', () => {
 	], {
 		identityId: id1,
 	})
-	assert.lengthOf(result.errors, 0)
-	assert.deepStrictEqual(result.memberships, [
+	expect(result.errors).toStrictEqual([])
+	expect(result.memberships).toStrictEqual([
 		{ role: 'editor', variables: [{ name: 'self', condition: { in: [id1] } }] },
 	])
 })
@@ -84,8 +84,8 @@ test('read membership with condition variable', () => {
 	}, [
 		{ role: 'editor', variables: [{ name: 'cond', values: [JSON.stringify({ eq: 'foo' })] }] },
 	], MembershipResolver.UnknownIdentity)
-	assert.lengthOf(result.errors, 0)
-	assert.deepStrictEqual(result.memberships, [
+	expect(result.errors).toStrictEqual([])
+	expect(result.memberships).toStrictEqual([
 		{ role: 'editor', variables: [{ name: 'cond', condition: { eq: 'foo' } }] },
 	])
 })
@@ -105,13 +105,13 @@ test('fails on invalid condition', () => {
 		{ role: 'editor', variables: [{ name: 'cond', values: [JSON.stringify('abcd')] }] },
 	], MembershipResolver.UnknownIdentity)
 
-	assert.deepStrictEqual(result.errors, [{
+	expect(result.errors).toEqual([{
 		error: MembershipValidationErrorType.VARIABLE_INVALID,
 		role: 'editor',
 		variable: 'cond',
 	}])
 
-	assert.deepStrictEqual(result.memberships, [
+	expect(result.memberships).toStrictEqual([
 		{ role: 'editor', variables: [{ name: 'cond', condition: { never: true } }] },
 	])
 })
@@ -127,13 +127,13 @@ test('fails on undefined role', () => {
 		identityId: id1,
 	})
 
-	assert.deepStrictEqual(result.errors, [{
+	expect(result.errors).toEqual([{
 		error: MembershipValidationErrorType.ROLE_NOT_FOUND,
 		role: 'editor',
 		variable: undefined,
 	}])
 
-	assert.deepStrictEqual(result.memberships, [])
+	expect(result.memberships).toStrictEqual([])
 })
 
 test('fails on undefined variable', () => {
@@ -149,13 +149,13 @@ test('fails on undefined variable', () => {
 		{ role: 'editor', variables: [{ name: 'cond', values: [JSON.stringify('abcd')] }] },
 	], MembershipResolver.UnknownIdentity)
 
-	assert.deepStrictEqual(result.errors, [{
+	expect(result.errors).toEqual([{
 		error: MembershipValidationErrorType.VARIABLE_NOT_FOUND,
 		role: 'editor',
 		variable: 'cond',
 	}])
 
-	assert.deepStrictEqual(result.memberships, [
+	expect(result.memberships).toStrictEqual([
 		{ role: 'editor', variables: [] },
 	])
 })
@@ -175,9 +175,9 @@ test('use fallback value', () => {
 	}, [
 		{ role: 'editor', variables: [] },
 	], MembershipResolver.UnknownIdentity)
-	assert.deepStrictEqual(result.errors, [])
+	expect(result.errors).toStrictEqual([])
 
-	assert.deepStrictEqual(result.memberships, [
+	expect(result.memberships).toStrictEqual([
 		{ role: 'editor', variables: [{ name: 'localeID', condition: { always: true } }] },
 	])
 })

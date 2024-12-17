@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-NODE_ENV=development yarn vite build --mode development --config scripts/vite/vite.build.ts
-yarn vite build --mode production --config scripts/vite/vite.build.ts
+NODE_ENV=development bun run vite build --mode development --config scripts/vite/vite.build.ts
+bun run vite build --mode production --config scripts/vite/vite.build.ts
 
 # in ./dist, there will be development and production builds for each package, we need to copy to individual packages
 # so ./dist/production/react-binding will be copied to ./packages/react-binding/dist/production

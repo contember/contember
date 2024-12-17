@@ -1,4 +1,4 @@
-import { assert, test } from 'vitest'
+import { expect, test } from 'bun:test'
 import { createTester, gql } from '../../src/tester'
 import { createSchema, SchemaDefinition as def, AclDefinition as acl } from '@contember/schema-definition'
 import { addProjectMember, signIn, signUp } from '../../src/requests'
@@ -34,7 +34,7 @@ test('ACL: condition variable', async () => {
 		`,
 	)
 		.expect(response => {
-			assert.deepStrictEqual(response.body.data, {
+			expect(response.body.data).toStrictEqual({
 				articleA: {
 					ok: true,
 				},
@@ -62,7 +62,7 @@ test('ACL: condition variable', async () => {
 		{ authorizationToken: authKey },
 	)
 		.expect(response => {
-			assert.deepStrictEqual(response.body.data, {
+			expect(response.body.data).toStrictEqual({
 				listArticle: [
 					{
 						publishedAt: '2022-02-01T00:00:00.000Z',

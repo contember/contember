@@ -2,7 +2,7 @@ import { authenticatedIdentityId, executeTenantTest } from '../../../src/testTen
 import { testUuid } from '../../../src/testUuid'
 import { prepareOtpMutation } from './gql/prepareOtp'
 import { getPersonByIdentity } from './sql/getPersonByIdentity'
-import { test, assert } from 'vitest'
+import { test, expect } from 'bun:test'
 
 test('prepare otp', async () => {
 	const personId = testUuid(1)
@@ -27,8 +27,8 @@ test('prepare otp', async () => {
 			},
 		],
 		return: (response: any) => {
-			assert.ok(response.data.prepareOtp.ok)
-			assert.match(response.data.prepareOtp.result.otpUri, /otpauth:.+/)
+			expect(response.data.prepareOtp.ok).toEqual(true)
+			expect(response.data.prepareOtp.result.otpUri).toMatch(/otpauth:.+/)
 		},
 	})
 })

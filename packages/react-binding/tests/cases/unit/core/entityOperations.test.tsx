@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'bun:test'
 import { EntitySubTree, Field, HasOne } from '../../../../src'
 import { createBinding } from '../../../lib/bindingFactory'
 import { c, createSchema } from '@contember/schema-definition'
@@ -26,11 +26,11 @@ describe('entity operations', () => {
 		const entity = Array.from(treeStore.subTreeStatesByRoot.get(undefined)!.values())[0]
 		assert(entity.type === 'entityRealm')
 
-		expect(entity.unpersistedChangesCount).eq(0)
+		expect(entity.unpersistedChangesCount).toEqual(0)
 		entity.getAccessor().getField('fooField').updateValue('bar')
-		expect(entity.unpersistedChangesCount).eq(1)
+		expect(entity.unpersistedChangesCount).toEqual(1)
 		entity.getAccessor().getField('fooField').updateValue(null)
-		expect(entity.unpersistedChangesCount).eq(0)
+		expect(entity.unpersistedChangesCount).toEqual(0)
 	})
 
 	it('fails when relation not defined in static render', () => {

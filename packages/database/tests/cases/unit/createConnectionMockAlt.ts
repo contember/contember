@@ -1,7 +1,7 @@
 import { Connection, Pool } from '../../../src'
 import { PgClient } from '../../../src/client/PgClient'
 import EventEmitter from 'node:events'
-import { expect } from 'vitest'
+import { expect } from 'bun:test'
 
 export const createConnectionMockAlt = (...queries: { sql: string; timeout?: number; result?: any }[][]): [Connection, () => void] => {
 	const connectionMocks: (PgClient & { assertEmpty: () => void })[] = []
@@ -18,14 +18,14 @@ export const createConnectionMockAlt = (...queries: { sql: string; timeout?: num
 			async query(sql: string) {
 				const query = queriesSet.shift()
 				expect(query).toBeDefined()
-				expect(sql).toEqual(query?.sql)
+				expect(sql).toEqual(query?.sql as string)
 				await new Promise<void>(resolve => setTimeout(resolve, query?.timeout ?? 1))
 
 				return query?.result
 			}
 
 			assertEmpty() {
-				expect(queriesSet).deep.eq([])
+				expect(queriesSet).toStrictEqual([])
 			}
 		})
 	}

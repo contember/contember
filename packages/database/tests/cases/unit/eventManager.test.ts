@@ -1,5 +1,5 @@
 import { EventManager } from '../../../src'
-import { assert, test } from 'vitest'
+import { expect, test } from 'bun:test'
 import { createConnectionMockAlt } from './createConnectionMockAlt'
 
 test('event manager: connection and client', async () => {
@@ -14,7 +14,7 @@ test('event manager: connection and client', async () => {
 	client.eventManager.on(EventManager.Event.queryStart, ({ sql }) => events.push({ sql, source: 'client' }))
 	await client.query('SELECT 1')
 	await connection.query('SELECT 2')
-	assert.deepStrictEqual(events, [
+	expect(events).toStrictEqual([
 		{ sql: 'SELECT 1', source: 'client' },
 		{ sql: 'SELECT 1', source: 'connection' },
 		{ sql: 'SELECT 2', source: 'connection' },
@@ -43,7 +43,7 @@ test('event manager: connection and client with transaction', async () => {
 	})
 	await client.query('SELECT 2')
 	await connection.query('SELECT 3')
-	assert.deepStrictEqual(events, [
+	expect(events).toStrictEqual([
 		{ sql: 'BEGIN', source: 'client' },
 		{ sql: 'BEGIN', source: 'connection' },
 		{ sql: 'SELECT 1', source: 'transaction' },
@@ -77,7 +77,7 @@ test('event manager: connection and client with scopes', async () => {
 	})
 	await client.query('SELECT 2')
 	await connection.query('SELECT 3')
-	assert.deepStrictEqual(events, [
+	expect(events).toStrictEqual([
 		{ sql: 'SELECT 1', source: 'scoped' },
 		{ sql: 'SELECT 1', source: 'client' },
 		{ sql: 'SELECT 1', source: 'connection' },
@@ -117,7 +117,7 @@ test('event manager: connection and client with transaction and savepoint', asyn
 	})
 	await client.query('SELECT 3')
 	await connection.query('SELECT 4')
-	assert.deepStrictEqual(events, [
+	expect(events).toStrictEqual([
 		{ sql: 'BEGIN', source: 'client' },
 		{ sql: 'BEGIN', source: 'connection' },
 		{ sql: 'SELECT 1', source: 'transaction' },

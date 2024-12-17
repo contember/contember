@@ -1,4 +1,4 @@
-import { expect, it, describe } from 'vitest'
+import { expect, it, describe } from 'bun:test'
 import { Environment } from '../../../../src/environment'
 import { Parser } from '../../../../src/queryLanguage'
 

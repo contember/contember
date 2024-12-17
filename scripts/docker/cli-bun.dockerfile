@@ -1,13 +1,11 @@
-FROM node:20-alpine as builder
+FROM oven/bun:1.1.39-alpine as builder
 
 WORKDIR /src
-RUN apk --no-cache add bash
-RUN apk --no-cache add build-base python3
 COPY ./ ./
-RUN test ! -f yarn.tar.gz || tar xf yarn.tar.gz -C "./.yarn/cache" .
-RUN /src/packages/cli/build.sh
+RUN bun install
+RUN /src/scripts/cli-build/run.sh
 
-FROM node:20-alpine
+FROM oven/bun:1.1.39-alpine
 
 WORKDIR /src
 ENV NODE_ENV "production"
@@ -17,4 +15,4 @@ COPY --from=builder /src/packages/cli/dist/resources/ /opt/contember/dist/resour
 COPY --from=builder /src/packages/cli/package.json /opt/contember/package.json
 RUN ln -s /opt/contember/run.js /usr/bin/contember
 ENV CONTEMBER_CLI_PACKAGE_ROOT /opt/contember
-ENTRYPOINT ["node", "/opt/contember/run.js"]
+ENTRYPOINT ["bun", "/opt/contember/run.js"]

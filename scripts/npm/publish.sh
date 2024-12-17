@@ -1,6 +1,7 @@
 #!/bin/bash
 set -e
-npm config set //registry.npmjs.org/:_authToken "$NPM_AUTH_TOKEN"
+
+echo "//registry.npmjs.org/:_authToken=$NPM_AUTH_TOKEN" > .npmrc
 
 for dir in packages/*; do
   if [ -f "$dir/package.json" ]; then

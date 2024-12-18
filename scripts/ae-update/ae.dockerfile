@@ -1,11 +1,11 @@
-FROM oven/bun:latest as build
+FROM oven/bun:latest AS build
 
 WORKDIR /src
 COPY . /src
 COPY package.json /src
 COPY bun.lock /src
 RUN bun install --frozen-lockfile
-RUN bun add @microsoft/api-extractor
+RUN bun add @microsoft/api-extractor ajv
 RUN bun run pre-build
 RUN bun run ts:build
 RUN bun run ae:build

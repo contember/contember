@@ -15,8 +15,7 @@ import { ReactNode } from 'react';
 export const createErrorHandler: (renderer: ErrorReactRenderer) => TryRun;
 
 // @public (undocumented)
-export const DevBar: ({ breakpoint, children, brand, }: PropsWithChildren<{
-    brand?: ReactNode;
+export const DevBar: ({ breakpoint, children, }: PropsWithChildren<{
     breakpoint?: number;
 }>) => JSX_2.Element;
 
@@ -63,13 +62,10 @@ export interface DevErrorProps extends DevErrorInnerProps {
     source: string;
 }
 
+// Warning: (ae-forgotten-export) The symbol "DevPanelProps" needs to be exported by the entry point index.d.ts
+//
 // @public (undocumented)
-export const DevPanel: ({ heading, icon, children, preview }: {
-    icon: ReactNode;
-    heading: ReactNode;
-    children: ReactNode;
-    preview?: ReactNode;
-}) => JSX_2.Element;
+export const DevPanel: ({ heading, icon, children, preview }: DevPanelProps) => JSX_2.Element;
 
 // @public (undocumented)
 export type ErrorReactRenderer = (domElement: Element, reactElement: ReactElement, onRecoverableError: (e: any) => void) => void;

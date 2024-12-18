@@ -43,17 +43,17 @@ export function DevErrorList({
 								</p>
 								<div className={className('switcherButtons')}>
 									<button className={className('switcherButton')} onClick={onPrevious}>
-										ᐊ
+										←
 									</button>
 									<button className={className('switcherButton')} onClick={onNext}>
-										ᐅ
+										→
 									</button>
 								</div>
 							</div>
 						) : null}
 						<div className={className('close')}>
 							<button className={className('closeButton')} onClick={onClose}>
-								🗙
+								✕
 							</button>
 						</div>
 					</div>

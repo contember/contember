@@ -1,26 +1,22 @@
 import {
 	useId,
 	useOnElementClickOutsideCallback,
-	useOnElementMouseEnterDelayedCallback,
 	useReferentiallyStableCallback,
 	useWindowSize,
 } from '@contember/react-utils'
 import { dataAttribute } from '@contember/utilities'
-import { PropsWithChildren, ReactNode, useEffect, useRef, useState } from 'react'
+import { PropsWithChildren, ReactNode, useCallback, useEffect, useRef, useState } from 'react'
 
 const className = (cls: string | null) => cls ? `cui-devBar-${cls}` : 'cui-devBar'
 
 export const DevBar = ({
 	breakpoint = 768,
 	children,
-	brand,
 }: PropsWithChildren<{
-	brand?: ReactNode
 	breakpoint?: number
 }>) => {
-	const [expanded, setExpanded] = useState(true)
+	const [expanded, setExpanded] = useState(false)
 	const isSmallScreen = useWindowSize().width < breakpoint
-	const toggleButtonRef = useRef<HTMLButtonElement>(null)
 
 	const handleToggle = useReferentiallyStableCallback(() => {
 		setExpanded(expanded => !expanded)
@@ -32,16 +28,7 @@ export const DevBar = ({
 				event.preventDefault()
 				event.stopPropagation()
 
-				if (expanded) {
-					setExpanded(false)
-					toggleButtonRef.current?.blur()
-				} else {
-					if (toggleButtonRef.current !== document.activeElement) {
-						toggleButtonRef.current?.focus()
-					} else {
-						toggleButtonRef.current?.blur()
-					}
-				}
+				handleToggle()
 			}
 		}
 
@@ -54,7 +41,6 @@ export const DevBar = ({
 	useOnElementClickOutsideCallback(devBarContentRef, () => {
 		if (expanded) {
 			setExpanded(false)
-			toggleButtonRef.current?.blur()
 		}
 	})
 
@@ -62,125 +48,114 @@ export const DevBar = ({
 
 	return (
 		<section
-			data-transparent
-			data-overrides-lucide-icons
+			data-transparent="true"
+			data-overrides-lucide-icons="true"
 			data-expanded={dataAttribute(expanded)}
 			data-small-screen={dataAttribute(isSmallScreen)}
 			className={className(null)}
-			onKeyDown={event => {
-				if (event.code === 'Escape') {
-					event.preventDefault()
-					event.stopPropagation()
-
-					if (expanded) {
-						setExpanded(false)
-					} else if (document.activeElement && document.activeElement instanceof HTMLElement) {
-						document.activeElement.blur()
-					}
-				}
-			}}
 		>
-			<style>{`svg { pointer-events: none }`}</style>
 			<div ref={devBarContentRef} className={className('content')}>
 				<div
-					data-expanded={dataAttribute(expanded)}
+					data-expanded={true}
 					id={id}
 					role="dialog"
 					style={{ display: 'contents' }}
 				>
-					<div className={className('brand')}>
-						{brand}
-
-					</div>
-
 					<div className={className('panels')}>
 						{children}
 					</div>
-
 				</div>
-
-				<button
-					ref={toggleButtonRef}
-					id="dev-bar-toggle-button"
-					aria-label="Toggle Contember Developer Toolbar"
-					aria-controls={id}
-					aria-expanded={expanded}
-					className={className('close')}
-					onClick={handleToggle}
-					tabIndex={0}
-				>
-					{expanded ? '🗙' : 'ᐸ'}
-				</button>
 			</div>
 		</section>
 	)
 }
 
-export const DevPanel = ({ heading, icon, children, preview }: {
+interface DevPanelProps {
 	icon: ReactNode
 	heading: ReactNode
 	children: ReactNode
 	preview?: ReactNode
-}) => {
+}
+
+export const DevPanel = ({ heading, icon, children, preview }: DevPanelProps) => {
 	const id = `cui-devBar-panel-${useId()}`
-	const [expanded, setExpanded] = useState(false)
-	const mouseEnterTimeStampRef = useRef<ReturnType<typeof Date.now> | undefined>(undefined)
+	const dialogRef = useRef<HTMLDialogElement>(null)
+	const triggerRef = useRef<HTMLButtonElement>(null)
 
-	const devPanelRef = useRef<HTMLDivElement>(null)
+	const handleOpen = useCallback(() => {
+		dialogRef.current?.showModal()
+	}, [])
 
-	useOnElementMouseEnterDelayedCallback(devPanelRef, useReferentiallyStableCallback(({ type }) => {
-		if (type === 'mouseenter') {
-			mouseEnterTimeStampRef.current = Date.now() + 300
-			setExpanded(true)
+	const handleClose = useCallback(() => {
+		dialogRef.current?.close()
+	}, [])
+
+	useEffect(() => {
+		const dialog = dialogRef.current
+		if (!dialog) return
+
+		const handleClickOutside = (event: MouseEvent) => {
+			const rect = dialog.getBoundingClientRect()
+			const isInDialog = (
+				rect.top <= event.clientY &&
+				event.clientY <= rect.top + rect.height &&
+				rect.left <= event.clientX &&
+				event.clientX <= rect.left + rect.width
+			)
+
+			if (!isInDialog) {
+				dialog.close()
+			}
 		}
-	}))
+
+		dialog.addEventListener('click', handleClickOutside)
+		return () => dialog.removeEventListener('click', handleClickOutside)
+	}, [])
+
+	useEffect(() => {
+		const handleEscape = (event: KeyboardEvent) => {
+			if (event.key === 'Escape') {
+				handleClose()
+			}
+		}
+
+		document.addEventListener('keydown', handleEscape)
+		return () => document.removeEventListener('keydown', handleEscape)
+	}, [handleClose])
 
 	return (
-		<div
-			ref={devPanelRef}
-			data-expanded={dataAttribute(expanded)}
-			className={className('trigger')}
-			onMouseLeave={useReferentiallyStableCallback(() => {
-				setExpanded(false)
-			})}
-			onKeyDown={useReferentiallyStableCallback(event => {
-				if (expanded && event.code === 'Escape') {
-					event.preventDefault()
-					event.stopPropagation()
-					setExpanded(false)
-				}
-			})}
-		>
+		<div className={className('trigger')}>
 			<button
+				ref={triggerRef}
 				tabIndex={0}
 				aria-haspopup="dialog"
 				aria-controls={id}
-				aria-expanded={expanded}
 				className={className('trigger-label')}
-				onClick={useReferentiallyStableCallback(() => {
-					if (mouseEnterTimeStampRef.current && Date.now() < mouseEnterTimeStampRef.current) {
-						return
-					} else {
-						setExpanded(expanded => !expanded)
-						mouseEnterTimeStampRef.current = undefined
-					}
-				})}
+				onClick={handleOpen}
 			>
 				{icon}
-				<span className={className('trigger-label-text')}>{preview ?? heading}</span>
+				<span className={className('trigger-label-text')}>
+					{preview ?? heading}
+				</span>
 			</button>
-			{expanded && (
-				<div tabIndex={0} id={id} role="dialog" className={className('panel')}>
-					<div className={className('panel-content')}>
-						<h2 className="h4">
-							{heading}
-						</h2>
-						<div className={className('panel-body')}>
-							{children}
-						</div>
+
+			<dialog ref={dialogRef} id={id} className={className('panel')}>
+				<div className={className('panel-content')}>
+					<div className={className('panel-header')}>
+						<h2 className="h4">{heading}</h2>
+						<button
+							onClick={handleClose}
+							className={className('close-button')}
+							aria-label="Close"
+						>
+							✕
+						</button>
+					</div>
+					<div className={className('panel-body')}>
+						{children}
 					</div>
 				</div>
-			)}
+			</dialog>
 		</div>
 	)
 }

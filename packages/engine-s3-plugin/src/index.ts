@@ -15,11 +15,8 @@ export default class S3 implements Plugin<Project3Config> {
 		return new S3ConfigProcessor()
 	}
 
-	getSchemaContributor({ project, providers }: SchemaContributorArgs<Project3Config>) {
-		if (!project.s3) {
-			return undefined
-		}
+	getSchemaContributor({ providers }: SchemaContributorArgs) {
 		const s3ServiceFactory = new S3ServiceFactory()
-		return new S3SchemaContributor(project.s3, s3ServiceFactory, providers)
+		return new S3SchemaContributor(s3ServiceFactory, providers)
 	}
 }

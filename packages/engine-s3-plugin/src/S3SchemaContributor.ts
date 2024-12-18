@@ -1,4 +1,5 @@
 import {
+	GraphQLError,
 	GraphQLFieldConfig,
 	GraphQLInt,
 	GraphQLNonNull,
@@ -8,7 +9,7 @@ import {
 	GraphQLString,
 } from 'graphql'
 import { S3Service, S3ServiceFactory } from './S3Service'
-import { resolveS3Config, S3Config } from './Config'
+import { Project3Config, resolveS3Config, S3Config } from './Config'
 import { GraphQLSchemaContributor, GraphQLSchemaContributorContext, Providers } from '@contember/engine-plugins'
 import * as types from './S3SchemaTypes'
 import { S3Acl, S3GenerateSignedUploadInput, S3SignedRead, S3SignedUpload } from './S3SchemaTypes'
@@ -35,13 +36,16 @@ export type S3SchemaAcl = Record<
 
 export class S3SchemaContributor implements GraphQLSchemaContributor {
 	constructor(
-		private readonly s3Config: S3Config | undefined,
 		private readonly s3Factory: S3ServiceFactory,
 		private readonly providers: Providers,
 	) {}
 
+	getCacheKey?({ project }: GraphQLSchemaContributorContext): string {
+		return project.s3 ? 'yes' : 'no'
+	}
+
 	createSchema(context: GraphQLSchemaContributorContext): GraphQLSchemaConfig | undefined {
-		if (!this.s3Config) {
+		if (!context.project.s3) {
 			return undefined
 		}
 		const rules = context.identity.projectRoles.flatMap(it =>
@@ -61,11 +65,9 @@ export class S3SchemaContributor implements GraphQLSchemaContributor {
 			return undefined
 		}
 
-		const s3Config = resolveS3Config(this.s3Config)
 		const authorizator = new S3ObjectAuthorizator(uploadRules, readRules)
-		const s3 = this.s3Factory.create(s3Config, this.providers, authorizator)
-		const uploadMutation = this.createUploadMutation(s3)
-		const readMutation = this.createReadMutation(s3)
+		const uploadMutation = this.createUploadMutation(authorizator)
+		const readMutation = this.createReadMutation(authorizator)
 		const mutation = {
 			generateUploadUrl: uploadMutation as GraphQLFieldConfig<any, any, any>,
 			generateReadUrl: readMutation,
@@ -86,7 +88,8 @@ export class S3SchemaContributor implements GraphQLSchemaContributor {
 		}
 	}
 
-	private createReadMutation(s3: S3Service): GraphQLFieldConfig<any, any, any> {
+	private createReadMutation(authorizator: S3ObjectAuthorizator): GraphQLFieldConfig<any, { project: Project3Config }, any> {
+
 		return {
 			type: new GraphQLNonNull(S3SignedRead),
 			args: {
@@ -97,13 +100,18 @@ export class S3SchemaContributor implements GraphQLSchemaContributor {
 					type: GraphQLInt,
 				},
 			},
-			resolve: async (parent: any, args: { objectKey: string; expiration?: number }) => {
+			resolve: async (parent: any, args: { objectKey: string; expiration?: number }, ctx: { project: Project3Config }) => {
+				if (!ctx.project.s3) {
+					throw new GraphQLError('S3 is not configured for this project')
+				}
+				const s3Config = resolveS3Config(ctx.project.s3)
+				const s3 = this.s3Factory.create(s3Config, this.providers, authorizator)
 				return s3.getSignedReadUrl({ objectKey: args.objectKey, expiration: args.expiration ?? null })
 			},
 		} as GraphQLFieldConfig<any, any, any>
 	}
 
-	private createUploadMutation(s3: S3Service): GraphQLFieldConfig<any, any, any> {
+	private createUploadMutation(authorizator: S3ObjectAuthorizator): GraphQLFieldConfig<any, any, any> {
 		return {
 			type: new GraphQLNonNull(S3SignedUpload),
 			args: {
@@ -116,7 +124,13 @@ export class S3SchemaContributor implements GraphQLSchemaContributor {
 			resolve: async (
 				parent: any,
 				args: { input?: Partial<S3GenerateSignedUploadInput>; contentType?: string; acl?: S3Acl; expiration?: number; prefix?: string },
+				ctx: { project: Project3Config },
 			) => {
+				if (!ctx.project.s3) {
+					throw new GraphQLError('S3 is not configured for this project')
+				}
+				const s3Config = resolveS3Config(ctx.project.s3)
+				const s3 = this.s3Factory.create(s3Config, this.providers, authorizator)
 				return s3.getSignedUploadUrl({
 					acl: args.input?.acl ?? args.acl ?? null,
 					contentDisposition: args.input?.contentDisposition ?? null,

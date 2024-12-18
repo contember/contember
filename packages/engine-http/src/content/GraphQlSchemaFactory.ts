@@ -12,6 +12,7 @@ import { GraphQLFieldConfig, GraphQLNamedType, GraphQLSchema } from 'graphql'
 import { GraphQLSchemaContributor } from './GraphQLSchemaContributor'
 import { Identity } from './Identity'
 import { ContentApiSpecificCache } from './ContentApiSpecificCache'
+import { ProjectConfig } from '../project/config'
 
 export interface GraphQLSchemaFactoryResult {
 	permissions: Acl.Permissions
@@ -27,10 +28,12 @@ export class GraphQlSchemaFactory {
 		private readonly schemaContributors: GraphQLSchemaContributor[],
 	) {}
 
-	public create(schema: Schema, identity: Identity): GraphQLSchemaFactoryResult {
+	public create(schema: Schema, identity: Identity, project: ProjectConfig): GraphQLSchemaFactoryResult {
 		const rolesKey = [...identity.projectRoles].sort().join('\xff')
+		const contributorsKey = this.schemaContributors.map(it => it.getCacheKey?.({ schema, identity, project }) ?? '').join('\xff')
+		const cacheKey = `${rolesKey}\xff\xff${contributorsKey}`
 
-		return this.cache.fetch(schema, rolesKey, () => {
+		return this.cache.fetch(schema, cacheKey, () => {
 			const permissions = this.permissionFactory.create(schema, identity.projectRoles)
 
 			const authorizator = new Authorizator(permissions, schema.acl.customPrimary ?? false)
@@ -45,7 +48,7 @@ export class GraphQlSchemaFactory {
 			const introspectionSchema = introspectionSchemaFactory.createConfig()
 
 			const otherSchemas = this.schemaContributors
-				.map(it => it.createSchema({ schema, identity }))
+				.map(it => it.createSchema({ schema, identity, project }))
 				.filter(<T>(it: T | undefined): it is T => it !== undefined)
 
 			const queries = new Map<string, GraphQLFieldConfig<any, Context, any>>()

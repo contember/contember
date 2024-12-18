@@ -14,11 +14,8 @@ export default class VimeoPlugin implements Plugin<ProjectVimeoConfig> {
 		return new VimeoConfigProcessor()
 	}
 
-	getSchemaContributor({ project }: SchemaContributorArgs<ProjectVimeoConfig>) {
-		if (!project.vimeo) {
-			return undefined
-		}
+	getSchemaContributor() {
 		const vimeoServiceFactory = new VimeoServiceFactory()
-		return new VimeoSchemaContributor(project.vimeo, vimeoServiceFactory)
+		return new VimeoSchemaContributor(vimeoServiceFactory)
 	}
 }

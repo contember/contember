@@ -11,6 +11,7 @@ import { ProjectConfig } from '../project/config'
 export type ExtendedGraphqlContext = Context & {
 	identityId: string
 	requestDebug: boolean
+	project: { slug: string }
 }
 
 export class ContentGraphQLContextFactory {
@@ -63,6 +64,7 @@ export class ContentGraphQLContextFactory {
 			executionContainer,
 			timer,
 			requestDebug,
+			project,
 		}
 	}
 }

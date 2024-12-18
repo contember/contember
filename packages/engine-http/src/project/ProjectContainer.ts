@@ -1,22 +1,20 @@
 import { Builder } from '@contember/dic'
 import { Connection, DatabaseMetadataResolver } from '@contember/database'
 import {
+	DatabaseContext,
 	DatabaseContextFactory,
 	ProjectInitializer,
 	SchemaProvider,
 	StageCreator,
 	SystemMigrationsRunner,
-	DatabaseContext,
 } from '@contember/engine-system-api'
 import { GraphQlSchemaBuilderFactory, PermissionFactory } from '@contember/engine-content-api'
 import { Logger } from '@contember/logger'
 import { ProjectConfig } from './config'
-import { ContentSchemaResolver, GraphQLSchemaContributor, GraphQlSchemaFactory, GraphQLSchemaFactoryResult } from '../content'
+import { ContentSchemaResolver } from '../content'
 import { Providers } from '../providers'
 import { Plugin } from '../plugin/Plugin'
 import { ServerConfig } from '../config/config'
-import { ContentApiSpecificCache } from '../content/ContentApiSpecificCache'
-import { Schema } from '@contember/schema'
 import { ProjectDatabaseMetadataResolver } from './ProjectDatabaseMetadataResolver'
 
 export interface ProjectContainer {
@@ -27,7 +25,6 @@ export interface ProjectContainer {
 	logger: Logger
 	connection: Connection
 	readConnection: Connection
-	graphQlSchemaFactory: GraphQlSchemaFactory
 	contentSchemaResolver: ContentSchemaResolver
 	projectInitializer: ProjectInitializer
 	projectDatabaseMetadataResolver: ProjectDatabaseMetadataResolver
@@ -37,9 +34,6 @@ export class ProjectContainerFactoryFactory {
 	constructor(
 		private readonly plugins: Plugin[],
 		private readonly providers: Providers,
-		private readonly serverConfig: ServerConfig,
-		private readonly graphQlSchemaBuilderFactory: GraphQlSchemaBuilderFactory,
-		private readonly permissionFactory: PermissionFactory,
 		private readonly databaseMetadataResolver: DatabaseMetadataResolver,
 	) {
 	}
@@ -50,9 +44,6 @@ export class ProjectContainerFactoryFactory {
 			schemaProvider,
 			this.providers,
 			logger,
-			this.serverConfig,
-			this.graphQlSchemaBuilderFactory,
-			this.permissionFactory,
 			this.databaseMetadataResolver,
 		)
 	}
@@ -68,9 +59,6 @@ export class ProjectContainerFactory {
 		private readonly schemaProvider: SchemaProvider,
 		private readonly providers: Providers,
 		private readonly logger: Logger,
-		private readonly serverConfig: ServerConfig,
-		private readonly graphQlSchemaBuilderFactory: GraphQlSchemaBuilderFactory,
-		private readonly permissionFactory: PermissionFactory,
 		private readonly databaseMetadataResolver: DatabaseMetadataResolver,
 	) {}
 
@@ -85,7 +73,6 @@ export class ProjectContainerFactory {
 				'systemDatabaseContext',
 				'systemReadDatabaseContext',
 				'contentSchemaResolver',
-				'graphQlSchemaFactory',
 				'projectInitializer',
 				'logger',
 				'projectDatabaseMetadataResolver',
@@ -114,21 +101,7 @@ export class ProjectContainerFactory {
 				}, err => logger.error(err))
 			})
 
-			.addService('graphqlSchemaCache', () =>
-				new ContentApiSpecificCache<Schema, GraphQLSchemaFactoryResult>({
-					ttlSeconds: this.serverConfig.contentApi?.schemaCacheTtlSeconds,
-				}))
-			.addService('graphQlSchemaFactory', ({ project, graphqlSchemaCache }) => {
-				const contributors = this.plugins
-					.map(it => (it.getSchemaContributor ? it.getSchemaContributor({ project, providers: this.providers }) : null))
-					.filter((it): it is GraphQLSchemaContributor => !!it)
-				return new GraphQlSchemaFactory(
-					graphqlSchemaCache,
-					this.graphQlSchemaBuilderFactory,
-					this.permissionFactory,
-					contributors,
-				)
-			})
+
 			.addService('contentSchemaResolver', () =>
 				new ContentSchemaResolver(this.schemaProvider))
 			.addService('systemSchemaName', ({ project }) =>

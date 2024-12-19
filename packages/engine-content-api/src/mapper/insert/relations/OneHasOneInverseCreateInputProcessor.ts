@@ -4,6 +4,7 @@ import { CheckedPrimary } from '../../CheckedPrimary'
 import { Input, Model } from '@contember/schema'
 import { CreateInputProcessor } from '../../../inputProcessing'
 import { SqlCreateInputProcessorResult } from '../SqlCreateInputProcessor'
+import { MapperInput } from '../../types'
 
 type Context = Model.OneHasOneInverseContext
 
@@ -14,13 +15,11 @@ export class OneHasOneInverseCreateInputProcessor implements CreateInputProcesso
 	) {
 	}
 
-	public async connect(context: Context & { input: Input.UniqueWhere }) {
+	public async connect(context: Context & { input: Input.UniqueWhere | CheckedPrimary }) {
 		return async ({ primary }: { primary: Input.PrimaryValue }) => {
 			const { targetEntity, input } = context
-			const owner = await this.mapper.getPrimaryValue(targetEntity, input)
-			if (!owner) {
-				return [new MutationEntryNotFoundError([], input)]
-			}
+			const [owner, err] = await this.mapper.getPrimaryValue(targetEntity, input)
+			if (err) return [err]
 
 			return await this.connectInternal({ ...context, input: new CheckedPrimary(owner) }, primary)
 		}
@@ -28,7 +27,7 @@ export class OneHasOneInverseCreateInputProcessor implements CreateInputProcesso
 
 
 	public async create(
-		{ input, targetRelation, targetEntity }: Context & { input: Input.CreateDataInput },
+		{ input, targetRelation, targetEntity }: Context & { input: MapperInput.CreateDataInput },
 	) {
 		return async ({ primary }: { primary: Input.PrimaryValue }) => {
 			return await this.mapper.insert(targetEntity, input, builder => {
@@ -39,10 +38,10 @@ export class OneHasOneInverseCreateInputProcessor implements CreateInputProcesso
 	}
 
 	public async connectOrCreate(
-		{ input, ...context }: Context & { input: Input.ConnectOrCreateInput },
+		{ input, ...context }: Context & { input: MapperInput.ConnectOrCreateInput },
 	) {
 		return async ({ primary }: { primary: Input.PrimaryValue }) => {
-			const owner = await this.mapper.getPrimaryValue(context.targetEntity, input.connect)
+			const [owner] = await this.mapper.getPrimaryValue(context.targetEntity, input.connect)
 			if (owner) {
 				return await this.connectInternal({ ...context, input: new CheckedPrimary(owner) }, primary)
 			}
@@ -80,7 +79,7 @@ export class OneHasOneInverseCreateInputProcessor implements CreateInputProcesso
 	}
 
 	private async createInternal(
-		context: Context & { input: Input.CreateDataInput },
+		context: Context & { input: MapperInput.CreateDataInput },
 		primary: Input.PrimaryValue,
 	) {
 		return await this.mapper.insert(context.targetEntity, context.input, builder => {

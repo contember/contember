@@ -4,6 +4,8 @@ import { Mapper } from '../../Mapper'
 import { CreateInputProcessor } from '../../../inputProcessing'
 import { SqlCreateInputProcessorResult } from '../SqlCreateInputProcessor'
 import { InsertBuilder } from '../InsertBuilder'
+import { CheckedPrimary } from '../../CheckedPrimary'
+import { MapperInput } from '../../types'
 
 type Context = Model.ManyHasOneContext
 
@@ -15,18 +17,16 @@ export class ManyHasOneCreateInputProcessor implements CreateInputProcessor.HasM
 	) {
 	}
 	public async connect(
-		{ targetEntity, relation, input }: Context & { input: Input.UniqueWhere },
+		{ targetEntity, relation, input }: Context & { input: Input.UniqueWhere | CheckedPrimary },
 	) {
-		const value = await this.mapper.getPrimaryValue(targetEntity, input)
-		if (!value) {
-			return [new MutationEntryNotFoundError([], input)]
-		}
+		const [value, err] = await this.mapper.getPrimaryValue(targetEntity, input)
+		if (err) return [err]
 		this.insertBuilder.addFieldValue(relation.name, value)
 		return []
 	}
 
 	public async create(
-		{ relation, targetEntity, input }: Context & { input: Input.CreateDataInput },
+		{ relation, targetEntity, input }: Context & { input: MapperInput.CreateDataInput },
 	) {
 		const insertResult = await this.mapper.insert(targetEntity, input)
 		const value = getInsertPrimary(insertResult)
@@ -38,9 +38,9 @@ export class ManyHasOneCreateInputProcessor implements CreateInputProcessor.HasM
 	}
 
 	public async connectOrCreate(
-		{ input: { connect, create }, relation, targetEntity }: Context & { input: Input.ConnectOrCreateInput },
+		{ input: { connect, create }, relation, targetEntity }: Context & { input: MapperInput.ConnectOrCreateInput },
 	) {
-		const value = await this.mapper.getPrimaryValue(targetEntity, connect)
+		const [value] = await this.mapper.getPrimaryValue(targetEntity, connect)
 		if (value) {
 			this.insertBuilder.addFieldValue(relation.name, value)
 		} else {

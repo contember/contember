@@ -9,6 +9,7 @@ import { ManyHasManyUpdateInputProcessor } from './relations/ManyHasManyUpdateIn
 import { UpdateInputProcessor } from '../../inputProcessing'
 import { MutationResultList } from '../Result'
 import { ManyHasOneUpdateInputProcessor } from './relations/ManyHasOneUpdateInputProcessor'
+import { MapperInput } from '../types'
 
 export type SqlUpdateInputProcessorResult = MutationResultList | ((ctx: { primary: Input.PrimaryValue}) => Promise<MutationResultList>)
 
@@ -21,7 +22,7 @@ export class SqlUpdateInputProcessor implements UpdateInputProcessor<SqlUpdateIn
 
 	constructor(
 		private readonly primaryValue: Input.PrimaryValue,
-		private readonly data: Input.UpdateDataInput,
+		private readonly data: MapperInput.UpdateDataInput,
 		private readonly updateBuilder: UpdateBuilder,
 		private readonly mapper: Mapper,
 	) {

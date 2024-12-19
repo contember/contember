@@ -14,6 +14,7 @@ import { Mapper } from '../../Mapper'
 import { UpdateBuilder } from '../../update/UpdateBuilder'
 import { CheckedPrimary } from '../../CheckedPrimary'
 import { SqlUpdateInputProcessorResult } from '../SqlUpdateInputProcessor'
+import { MapperInput } from '../../types'
 
 type Context = Model.OneHasOneOwningContext
 
@@ -25,12 +26,10 @@ export class OneHasOneOwningUpdateInputProcessor implements UpdateInputProcessor
 	) {
 	}
 
-	public async connect(context: Model.OneHasOneOwningContext & { input: Input.UniqueWhere }) {
+	public async connect(context: Model.OneHasOneOwningContext & { input: Input.UniqueWhere | CheckedPrimary }) {
 		const { entity, relation, targetEntity, targetRelation, input } = context
-		const newInverseSide = await this.mapper.getPrimaryValue(targetEntity, input)
-		if (!newInverseSide) {
-			return [new MutationEntryNotFoundError([], input)]
-		}
+		const [newInverseSide, err] = await this.mapper.getPrimaryValue(targetEntity, input)
+		if (err) return [err]
 		const currentInverseSide = await this.getCurrentInverseSide(targetRelation, relation, entity)
 		const currentOwnerResult = await this.handleStateBeforeConnect(context, currentInverseSide, newInverseSide)
 		if (currentOwnerResult.some(it => it.error)
@@ -49,7 +48,7 @@ export class OneHasOneOwningUpdateInputProcessor implements UpdateInputProcessor
 		}
 	}
 
-	public async create(context: Model.OneHasOneOwningContext & { input: Input.CreateDataInput }) {
+	public async create(context: Model.OneHasOneOwningContext & { input: MapperInput.CreateDataInput }) {
 		const { entity, relation, targetEntity, targetRelation } = context
 		const currentInverseSide = await this.getCurrentInverseSide(targetRelation, relation, entity)
 		const createResult = await this.createInternal(context, currentInverseSide)
@@ -67,10 +66,10 @@ export class OneHasOneOwningUpdateInputProcessor implements UpdateInputProcessor
 		}
 	}
 
-	public async connectOrCreate({ input: { connect, create }, ...context }: Model.OneHasOneOwningContext & { input: Input.ConnectOrCreateInput }) {
+	public async connectOrCreate({ input: { connect, create }, ...context }: Model.OneHasOneOwningContext & { input: MapperInput.ConnectOrCreateInput }) {
 		const { relation, targetRelation, targetEntity, entity } = context
 		const currentInverseSide = await this.getCurrentInverseSide(targetRelation, relation, entity)
-		const newInverseSide = await this.mapper.getPrimaryValue(targetEntity, connect)
+		const [newInverseSide] = await this.mapper.getPrimaryValue(targetEntity, connect)
 
 		if (newInverseSide) {
 			const currentOwnerResult = await this.handleStateBeforeConnect(context, currentInverseSide, newInverseSide)
@@ -103,7 +102,7 @@ export class OneHasOneOwningUpdateInputProcessor implements UpdateInputProcessor
 		}
 	}
 
-	public async update({ entity, relation, targetEntity, input }: Model.OneHasOneOwningContext & { input: Input.UpdateDataInput }) {
+	public async update({ entity, relation, targetEntity, input }: Model.OneHasOneOwningContext & { input: MapperInput.UpdateDataInput }) {
 		return async () => {
 			const inversePrimary = await this.mapper.selectField(
 				entity,
@@ -113,7 +112,7 @@ export class OneHasOneOwningUpdateInputProcessor implements UpdateInputProcessor
 			if (!inversePrimary) {
 				return [new MutationNothingToDo([], NothingToDoReason.emptyRelation)]
 			}
-			return await this.mapper.update(targetEntity, { [targetEntity.primary]: inversePrimary }, input)
+			return await this.mapper.update(targetEntity, new CheckedPrimary(inversePrimary), input)
 		}
 	}
 
@@ -130,7 +129,7 @@ export class OneHasOneOwningUpdateInputProcessor implements UpdateInputProcessor
 		}
 
 		return async () => {
-			return await this.mapper.update(targetEntity, { [targetEntity.primary]: primary }, update)
+			return await this.mapper.update(targetEntity, new CheckedPrimary(primary), update)
 		}
 	}
 
@@ -149,7 +148,7 @@ export class OneHasOneOwningUpdateInputProcessor implements UpdateInputProcessor
 
 		if (relation.orphanRemoval && inversePrimary) {
 			return async () => {
-				return await this.mapper.delete(targetEntity, { [targetEntity.primary]: inversePrimary })
+				return await this.mapper.delete(targetEntity, new CheckedPrimary(inversePrimary))
 			}
 		}
 
@@ -175,7 +174,7 @@ export class OneHasOneOwningUpdateInputProcessor implements UpdateInputProcessor
 	}
 
 	private async createInternal(
-		{ targetEntity, targetRelation, relation, input }: Model.OneHasOneOwningContext & { input: Input.CreateDataInput },
+		{ targetEntity, targetRelation, relation, input }: Model.OneHasOneOwningContext & { input: MapperInput.CreateDataInput },
 		currentInverseSide: Input.PrimaryValue | undefined,
 	): Promise<MutationResultList> {
 		if (targetRelation && !targetRelation.nullable && !relation.orphanRemoval && currentInverseSide) {
@@ -209,7 +208,7 @@ export class OneHasOneOwningUpdateInputProcessor implements UpdateInputProcessor
 			return [new MutationNothingToDo([], NothingToDoReason.alreadyExists)]
 		}
 
-		const currentOwnerOfNewInverseSide = await this.mapper.getPrimaryValue(entity, {
+		const [currentOwnerOfNewInverseSide] = await this.mapper.getPrimaryValue(entity, {
 			[relation.name]: { [targetEntity.primary]: newInverseSide },
 		})
 
@@ -229,9 +228,7 @@ export class OneHasOneOwningUpdateInputProcessor implements UpdateInputProcessor
 
 			return await this.mapper.updateInternal(
 				entity,
-				{
-					[entity.primary]: currentOwnerOfNewInverseSide,
-				},
+				new CheckedPrimary(currentOwnerOfNewInverseSide),
 				builder => {
 					builder.addPredicates([relation.name])
 					builder.addFieldValue(relation.name, null)

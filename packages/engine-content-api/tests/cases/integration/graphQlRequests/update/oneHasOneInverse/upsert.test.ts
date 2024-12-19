@@ -78,6 +78,15 @@ test('upsert - not exists', async () => {
 					},
 				},
 				{
+					sql: SQL`select "root_"."id"
+                       from "public"."site" as "root_"
+                       where "root_"."setting_id" = ?`,
+					parameters: [settingId],
+					response: {
+						rows: [],
+					},
+				},
+				{
 					sql: SQL`with "root_" as
 							(select ? :: uuid as "id", ? :: text as "name", ? :: uuid as "setting_id")
 							insert into "public"."site" ("id", "name", "setting_id")

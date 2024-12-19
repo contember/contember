@@ -41,7 +41,7 @@ ${JSON.stringify(parameters, undefined, '  ')}
 Expected:
 ${expected.sql}`
 		if (actualSql !== expectedSql) {
-			expect().fail(actualSql)
+			expect().fail(expectedMsg)
 		}
 
 		const evm = this.eventManager

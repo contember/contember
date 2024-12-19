@@ -10,6 +10,8 @@ import { Mapper } from '../../Mapper'
 import { Input, Model } from '@contember/schema'
 import { CreateInputProcessor } from '../../../inputProcessing'
 import { SqlCreateInputProcessorResult } from '../SqlCreateInputProcessor'
+import { CheckedPrimary } from '../../CheckedPrimary'
+import { MapperInput } from '../../types'
 
 type Context = Model.OneHasOneOwningContext
 
@@ -20,12 +22,10 @@ export class OneHasOneOwningCreateInputProcessor implements CreateInputProcessor
 	) {
 	}
 
-	public async connect(context: Context & { input: Input.UniqueWhere }) {
+	public async connect(context: Context & { input: Input.UniqueWhere | CheckedPrimary }) {
 		const { input, relation, targetEntity } = context
-		const inverseSide = await this.mapper.getPrimaryValue(targetEntity, input)
-		if (!inverseSide) {
-			return [new MutationEntryNotFoundError([], input)]
-		}
+		const [inverseSide, err] = await this.mapper.getPrimaryValue(targetEntity, input)
+		if (err) return [err]
 		const disconnectResult = await this.disconnectCurrentOwner({ ...context, input: inverseSide })
 		if (disconnectResult.some(it => it.error)) {
 			return disconnectResult
@@ -34,7 +34,7 @@ export class OneHasOneOwningCreateInputProcessor implements CreateInputProcessor
 		return disconnectResult
 	}
 
-	public async create(context: Context & { input: Input.CreateDataInput }) {
+	public async create(context: Context & { input: MapperInput.CreateDataInput }) {
 		const insertResult = await this.mapper.insert(context.targetEntity, context.input)
 		const primary = getInsertPrimary(insertResult)
 		if (!primary) {
@@ -44,8 +44,8 @@ export class OneHasOneOwningCreateInputProcessor implements CreateInputProcessor
 		return []
 	}
 
-	public async connectOrCreate({ input, ...context }: Context & { input: Input.ConnectOrCreateInput }) {
-		const inverseSide = await this.mapper.getPrimaryValue(context.targetEntity, input.connect)
+	public async connectOrCreate({ input, ...context }: Context & { input: MapperInput.ConnectOrCreateInput }) {
+		const [inverseSide] = await this.mapper.getPrimaryValue(context.targetEntity, input.connect)
 		if (inverseSide) {
 			this.insertBuilder.addFieldValue(context.relation.name, inverseSide)
 			const disconnectResult = await this.disconnectCurrentOwner({ ...context, input: inverseSide })
@@ -67,7 +67,7 @@ export class OneHasOneOwningCreateInputProcessor implements CreateInputProcessor
 	private async disconnectCurrentOwner(
 		{ entity, relation, targetEntity, input }: Context & { input: Input.PrimaryValue },
 	): Promise<MutationResultList> {
-		const currentOwnerOfInverseSide = await this.mapper.getPrimaryValue(entity, {
+		const [currentOwnerOfInverseSide] = await this.mapper.getPrimaryValue(entity, {
 			[relation.name]: { [targetEntity.primary]: input },
 		})
 		if (!currentOwnerOfInverseSide) {

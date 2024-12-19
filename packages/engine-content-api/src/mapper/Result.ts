@@ -1,4 +1,5 @@
 import { Input, Model, Value } from '@contember/schema'
+import { MapperInput } from './types'
 
 export enum MutationResultType {
 	ok = 'ok',
@@ -59,7 +60,7 @@ export class MutationUpdateOk implements MutationResultInterface {
 		public readonly paths: Path[],
 		public readonly entity: Model.Entity,
 		public readonly primary: Value.PrimaryValue,
-		public readonly input: Input.UpdateDataInput,
+		public readonly input: MapperInput.UpdateDataInput,
 		public readonly values: RowValues,
 		public readonly oldValues?: RowValues,
 	) {}
@@ -75,7 +76,7 @@ export class MutationCreateOk implements MutationResultInterface {
 		public readonly paths: Path[],
 		public readonly entity: Model.Entity,
 		public readonly primary: Value.PrimaryValue,
-		public readonly input: Input.CreateDataInput,
+		public readonly input: MapperInput.CreateDataInput,
 		public readonly values: RowValues,
 	) {}
 }

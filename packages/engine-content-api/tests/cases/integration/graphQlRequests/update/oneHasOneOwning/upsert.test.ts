@@ -32,11 +32,6 @@ test('upsert - exists', async () => {
 					},
 				},
 				{
-					sql: SQL`select "root_"."id" from "public"."site_setting" as "root_" where "root_"."id" = ?`,
-					parameters: [testUuid(1)],
-					response: { rows: [{ id: testUuid(1) }] },
-				},
-				{
 					sql: SQL`with "newData_" as (select ? :: text as "url", "root_"."url" as "url_old__", "root_"."id"  from "public"."site_setting" as "root_"  where "root_"."id" = ?) 
 						update  "public"."site_setting" set  "url" =  "newData_"."url"   from "newData_"  where "site_setting"."id" = "newData_"."id"  returning "url_old__"`,
 					parameters: ['http://mangoweb.cz', testUuid(1)],

@@ -25,7 +25,6 @@ import { ImplementationException } from '../exception'
 import { EventManager } from './EventManager'
 
 export class Mapper<ConnectionType extends Connection.ConnectionLike = Connection.ConnectionLike> {
-	private primaryKeyCache: Record<string, Promise<string> | string> = {}
 	private systemVariablesSetupDone: Promise<void> | undefined
 	public readonly deletedEntities = new DeletedEntitiesStorage()
 	public readonly mutex = new Mutex()
@@ -245,8 +244,6 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 
 	private insertInternal(entity: Model.Entity, data: Input.CreateDataInput, builderCb: (builder: InsertBuilder) => void = () => {}) {
 		return this.inserter.insert(this, entity, data, id => {
-			const where = { [entity.primary]: id }
-			this.primaryKeyCache[this.hashWhere(entity.name, where)] = id
 		}, builderCb)
 	}
 
@@ -321,22 +318,7 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		if (where instanceof CheckedPrimary) {
 			return where.primaryValue
 		}
-		const hash = this.hashWhere(entity.name, where)
-		if (this.primaryKeyCache[hash]) {
-			return this.primaryKeyCache[hash]
-		}
-		const primaryPromise = this.selectField(entity, where, entity.primary)
-		this.primaryKeyCache[hash] = primaryPromise
-		const primaryValue = await primaryPromise
-		const uniqueFields = Object.keys(where)
-		if (primaryValue && (uniqueFields.length !== 1 || uniqueFields[0] !== entity.primary)) {
-			this.primaryKeyCache[this.hashWhere(entity.name, { [entity.primary]: primaryValue })] = primaryValue
-		}
-		return primaryValue
-	}
-
-	private hashWhere(entityName: string, where: Input.UniqueWhere): string {
-		return JSON.stringify([entityName, where])
+		return await this.selectField(entity, where, entity.primary)
 	}
 
 	private async setupSystemVariables() {

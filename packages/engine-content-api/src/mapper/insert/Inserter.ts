@@ -1,13 +1,14 @@
-import { MutationCreateOk, MutationNoResultError, MutationNothingToDo, MutationResultList, NothingToDoReason } from '../Result'
+import { MutationCreateOk, MutationNoResultError, MutationResultList } from '../Result'
 import { CreateInputVisitor } from '../../inputProcessing'
 import { SqlCreateInputProcessor, SqlCreateInputProcessorResult } from './SqlCreateInputProcessor'
 import { Mapper } from '../Mapper'
-import { Input, Model } from '@contember/schema'
+import { Model } from '@contember/schema'
 import { acceptFieldVisitor, Providers } from '@contember/schema-utils'
 import { InsertBuilderFactory } from './InsertBuilderFactory'
 import { InsertBuilder } from './InsertBuilder'
 import { rowDataToFieldValues } from '../ColumnValue'
 import { DatabaseMetadata } from '@contember/database'
+import { MapperInput } from '../types'
 
 export class Inserter {
 	constructor(
@@ -20,7 +21,7 @@ export class Inserter {
 	public async insert(
 		mapper: Mapper,
 		entity: Model.Entity,
-		data: Input.CreateDataInput,
+		data: MapperInput.CreateDataInput,
 		insertIdCallback: (id: string) => void,
 		builderCb: (builder: InsertBuilder) => void,
 	): Promise<MutationResultList> {

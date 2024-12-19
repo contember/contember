@@ -11,7 +11,7 @@ import { EntityRulesResolver } from '../EntityRulesResolver'
 import { FieldValidationResult, ValidationResult } from '../InputValidator'
 import { UpdateInputPreValidationProcessor } from './UpdateInputPreValidationProcessor'
 import { ColumnValueResolver } from '../ColumnValueResolver'
-import { Mapper } from '../../mapper'
+import { Mapper, MapperInput } from '../../mapper'
 import { Dependencies, DependencyCollector } from '../dependencies'
 import { DependencyMerger } from '../dependencies'
 import { NotSupportedError } from '../exceptions'
@@ -20,7 +20,7 @@ import { ValidationDataSelector } from '../ValidationDataSelector'
 export interface CreateValidationArgs {
 	mapper: Mapper
 	entity: Model.Entity
-	data: Input.CreateDataInput
+	data: MapperInput.CreateDataInput
 	path: ValidationPath
 	overRelation: Model.AnyRelation | null
 }
@@ -29,7 +29,7 @@ export interface UpdateValidationArgs {
 	mapper: Mapper
 	entity: Model.Entity
 	where: Input.UniqueWhere
-	data: Input.UpdateDataInput
+	data: MapperInput.UpdateDataInput
 	path: ValidationPath
 }
 
@@ -76,7 +76,7 @@ export class InputPreValidator {
 		return [...fieldsResult, ...relationResult]
 	}
 
-	private createContextForCreate(entity: Model.Entity, data: Input.CreateDataInput): ValidationContext.NodeContext {
+	private createContextForCreate(entity: Model.Entity, data: MapperInput.CreateDataInput): ValidationContext.NodeContext {
 		const nodeData = acceptEveryFieldVisitor(this.model, entity, {
 			visitColumn: ({ entity, column }) => {
 				const value = data[column.name] as Input.ColumnValue | undefined
@@ -84,7 +84,7 @@ export class InputPreValidator {
 				return validationValue === undefined ? null : validationValue
 			},
 			visitHasOne: ({ relation }) => {
-				const value = data[relation.name] as Input.CreateOneRelationInput | undefined
+				const value = data[relation.name] as MapperInput.CreateOneRelationInput | undefined
 				return value ? true : null
 			},
 			// more complex validation on relations are not possible in pre-validation phase
@@ -97,7 +97,7 @@ export class InputPreValidator {
 		mapper: Mapper,
 		entity: Model.Entity,
 		where: Input.UniqueWhere,
-		data: Input.UpdateDataInput,
+		data: MapperInput.UpdateDataInput,
 		dependencies: Dependencies,
 	): Promise<ValidationContext.NodeContext> {
 		const inputNodeData = acceptEveryFieldVisitor(this.model, entity, {
@@ -105,7 +105,7 @@ export class InputPreValidator {
 				return data[column.name] as Input.ColumnValue | undefined
 			},
 			visitHasOne: ({ relation }) => {
-				const value = data[relation.name] as Input.CreateOneRelationInput | Input.UpdateOneRelationInput | undefined | null
+				const value = data[relation.name] as MapperInput.CreateOneRelationInput | MapperInput.UpdateOneRelationInput | undefined | null
 				if (value === undefined || value === null) {
 					return undefined
 				}

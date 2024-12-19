@@ -33,7 +33,7 @@ const createDataSelectorMock = (primaryValues: PrimaryValueExpectation[], select
 			}
 			assert.deepStrictEqual(entity.name, entry.entity)
 			assert.deepStrictEqual(where, entry.where)
-			return entry.result
+			return [entry.result, undefined]
 		},
 		select: async (
 			mapper: Mapper,

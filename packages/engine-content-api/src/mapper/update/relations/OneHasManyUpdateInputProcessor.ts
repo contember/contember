@@ -3,6 +3,8 @@ import { Input, Model } from '@contember/schema'
 import { Mapper } from '../../Mapper'
 import { MutationResultType } from '../../Result'
 import { SqlUpdateInputProcessorResult } from '../SqlUpdateInputProcessor'
+import { CheckedPrimary } from '../../CheckedPrimary'
+import { MapperInput } from '../../types'
 
 type Context = Model.OneHasManyContext
 
@@ -13,33 +15,33 @@ export class OneHasManyUpdateInputProcessor implements UpdateInputProcessor.HasM
 	}
 
 	public async connect(
-		{ entity, targetEntity, targetRelation, input }: Context & { input: Input.UniqueWhere },
+		{ entity, targetEntity, targetRelation, input }: Context & { input: Input.UniqueWhere | CheckedPrimary },
 	) {
 		return async ({ primary }: { primary: Input.PrimaryValue }) => {
 			return await this.mapper.update(targetEntity, input, {
-				[targetRelation.name]: { connect: { [entity.primary]: primary } },
+				[targetRelation.name]: { connect: new CheckedPrimary(primary) },
 			})
 		}
 	}
 
 	public async create(
-		{ entity, targetEntity, targetRelation, input }: Context & { input: Input.CreateDataInput },
+		{ entity, targetEntity, targetRelation, input }: Context & { input: MapperInput.CreateDataInput },
 	) {
 		return async ({ primary }: { primary: Input.PrimaryValue }) => {
 			return await this.mapper.insert(targetEntity, {
 				...input,
-				[targetRelation.name]: { connect: { [entity.primary]: primary } },
+				[targetRelation.name]: { connect: new CheckedPrimary(primary) },
 			})
 		}
 	}
 
 	public async connectOrCreate(
-		{ entity, targetRelation, targetEntity, input: { connect, create } }: Context & { input: Input.ConnectOrCreateInput },
+		{ entity, targetRelation, targetEntity, input: { connect, create } }: Context & { input: MapperInput.ConnectOrCreateInput },
 	) {
 		return async ({ primary }: { primary: Input.PrimaryValue }) => {
 			const connectData = {
 				[targetRelation.name]: {
-					connect: { [entity.primary]: primary },
+					connect: new CheckedPrimary(primary),
 				},
 			}
 			return await this.mapper.upsert(targetEntity, connect, connectData, {
@@ -79,7 +81,7 @@ export class OneHasManyUpdateInputProcessor implements UpdateInputProcessor.HasM
 			if (result[0].result === MutationResultType.notFoundError) {
 				return await this.mapper.insert(targetEntity, {
 					...create,
-					[targetRelation.name]: { connect: { [entity.primary]: primary } },
+					[targetRelation.name]: { connect: new CheckedPrimary(primary) },
 				})
 			}
 			return result

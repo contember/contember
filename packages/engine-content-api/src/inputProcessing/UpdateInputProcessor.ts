@@ -1,4 +1,6 @@
 import { Input, Model } from '@contember/schema'
+import { CheckedPrimary } from '../mapper/CheckedPrimary'
+import { MapperInput } from '../mapper'
 
 
 interface UpdateInputProcessor<Result = void> {
@@ -18,22 +20,22 @@ interface UpdateInputProcessor<Result = void> {
 }
 
 namespace UpdateInputProcessor {
-	export type UpsertInput = { update: Input.UpdateDataInput; create: Input.CreateDataInput }
-	export type UpdateManyInput = { where: Input.UniqueWhere; data: Input.UpdateDataInput }
+	export type UpsertInput = { update: MapperInput.UpdateDataInput; create: MapperInput.CreateDataInput }
+	export type UpdateManyInput = { where: Input.UniqueWhere; data: MapperInput.UpdateDataInput }
 	export type UpsertManyInput = {
 		where: Input.UniqueWhere
-		update: Input.UpdateDataInput
-		create: Input.CreateDataInput
+		update: MapperInput.UpdateDataInput
+		create: MapperInput.CreateDataInput
 	}
 
 	export interface HasOneRelationInputProcessor<Context, Result> {
-		connect(context: Context & { input: Input.UniqueWhere }): Promise<Result>
+		connect(context: Context & { input: Input.UniqueWhere | CheckedPrimary }): Promise<Result>
 
-		create(context: Context & { input: Input.CreateDataInput }): Promise<Result>
+		create(context: Context & { input: MapperInput.CreateDataInput }): Promise<Result>
 
-		connectOrCreate(context: Context & { input: Input.ConnectOrCreateInput }): Promise<Result>
+		connectOrCreate(context: Context & { input: MapperInput.ConnectOrCreateInput }): Promise<Result>
 
-		update(context: Context & { input: Input.UpdateDataInput }): Promise<Result>
+		update(context: Context & { input: MapperInput.UpdateDataInput }): Promise<Result>
 
 		upsert(context: Context & { input: UpdateInputProcessor.UpsertInput }): Promise<Result>
 
@@ -43,11 +45,11 @@ namespace UpdateInputProcessor {
 	}
 
 	export interface HasManyRelationInputProcessor<Context, Result> {
-		connect(context: Context & { input: Input.UniqueWhere; index: number; alias?: string }): Promise<Result>
+		connect(context: Context & { input: Input.UniqueWhere | CheckedPrimary; index: number; alias?: string }): Promise<Result>
 
-		create(context: Context & { input: Input.CreateDataInput; index: number; alias?: string }): Promise<Result>
+		create(context: Context & { input: MapperInput.CreateDataInput; index: number; alias?: string }): Promise<Result>
 
-		connectOrCreate(context: Context & { input: Input.ConnectOrCreateInput; index: number; alias?: string }): Promise<Result>
+		connectOrCreate(context: Context & { input: MapperInput.ConnectOrCreateInput; index: number; alias?: string }): Promise<Result>
 
 		update(context: Context & { input: UpdateInputProcessor.UpdateManyInput; index: number; alias?: string }): Promise<Result>
 

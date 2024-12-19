@@ -1,7 +1,8 @@
 import { Input, Model } from '@contember/schema'
-import { filterObject, isIt } from '../utils'
+import { filterObject } from '../utils'
 import { UpdateInputProcessor } from './UpdateInputProcessor'
 import { ImplementationException, UserError } from '../exception'
+import { MapperInput } from '../mapper'
 
 export class UpdateInputVisitor<Result> implements
 	Model.ColumnVisitor<Promise<Result[]>>,
@@ -10,7 +11,7 @@ export class UpdateInputVisitor<Result> implements
 	constructor(
 		private readonly updateInputProcessor: UpdateInputProcessor<Result>,
 		private readonly schema: Model.Schema,
-		private readonly data: Input.UpdateDataInput,
+		private readonly data: MapperInput.UpdateDataInput,
 	) {}
 
 	public async visitColumn({ entity, column }: Model.ColumnContext): Promise<Result[]> {
@@ -25,7 +26,7 @@ export class UpdateInputVisitor<Result> implements
 		return this.processManyRelationInput(
 			this.updateInputProcessor.manyHasManyInverse,
 			context,
-			this.data[context.relation.name] as Input.CreateManyRelationInput,
+			this.data[context.relation.name] as MapperInput.CreateManyRelationInput,
 		)
 	}
 
@@ -33,7 +34,7 @@ export class UpdateInputVisitor<Result> implements
 		return this.processManyRelationInput(
 			this.updateInputProcessor.manyHasManyOwning,
 			context,
-			this.data[context.relation.name] as Input.CreateManyRelationInput,
+			this.data[context.relation.name] as MapperInput.CreateManyRelationInput,
 		)
 	}
 
@@ -41,7 +42,7 @@ export class UpdateInputVisitor<Result> implements
 		return this.processRelationInput(
 			this.updateInputProcessor.manyHasOne,
 			context,
-			this.data[context.relation.name] as Input.CreateOneRelationInput,
+			this.data[context.relation.name] as MapperInput.CreateOneRelationInput,
 		)
 	}
 
@@ -49,7 +50,7 @@ export class UpdateInputVisitor<Result> implements
 		return this.processManyRelationInput(
 			this.updateInputProcessor.oneHasMany,
 			context,
-			this.data[context.relation.name] as Input.CreateManyRelationInput,
+			this.data[context.relation.name] as MapperInput.CreateManyRelationInput,
 		)
 	}
 
@@ -57,7 +58,7 @@ export class UpdateInputVisitor<Result> implements
 		return this.processRelationInput(
 			this.updateInputProcessor.oneHasOneInverse,
 			context,
-			this.data[context.relation.name] as Input.CreateOneRelationInput,
+			this.data[context.relation.name] as MapperInput.CreateOneRelationInput,
 		)
 	}
 
@@ -65,39 +66,39 @@ export class UpdateInputVisitor<Result> implements
 		return this.processRelationInput(
 			this.updateInputProcessor.oneHasOneOwning,
 			context,
-			this.data[context.relation.name] as Input.CreateOneRelationInput,
+			this.data[context.relation.name] as MapperInput.CreateOneRelationInput,
 		)
 	}
 
 	private async processRelationInput<Context>(
 		processor: UpdateInputProcessor.HasOneRelationInputProcessor<Context, Result>,
 		context: Context,
-		input: Input.UpdateOneRelationInput | undefined,
+		input: MapperInput.UpdateOneRelationInput | undefined,
 	): Promise< Result[]> {
 		if (input === undefined || input === null) {
 			return Promise.resolve([])
 		}
 		input = filterObject(input, (k, v) => v !== null && v !== undefined)
 		this.verifyOperations(input)
-		if (isIt<Input.ConnectRelationInput>(input, 'connect')) {
+		if ('connect' in input) {
 			return [await processor.connect({ ...context, input: input.connect })]
 		}
-		if (isIt<Input.CreateRelationInput>(input, 'create')) {
+		if ('create' in input) {
 			return [await processor.create({ ...context, input: input.create })]
 		}
-		if (isIt<Input.ConnectOrCreateRelationInput>(input, 'connectOrCreate')) {
+		if ('connectOrCreate' in input) {
 			return [await processor.connectOrCreate({ ...context, input: input.connectOrCreate })]
 		}
-		if (isIt<Input.DeleteRelationInput>(input, 'delete')) {
+		if ('delete' in input) {
 			return [await processor.delete({ ...context, input: undefined })]
 		}
-		if (isIt<Input.DisconnectRelationInput>(input, 'disconnect')) {
+		if ('disconnect' in input) {
 			return [await processor.disconnect({ ...context, input: undefined })]
 		}
-		if (isIt<Input.UpdateRelationInput>(input, 'update')) {
+		if ('update' in input) {
 			return [await processor.update({ ...context, input: input.update })]
 		}
-		if (isIt<Input.UpsertRelationInput>(input, 'upsert')) {
+		if ('upsert' in input) {
 			return [await processor.upsert({ ...context, input: input.upsert })]
 		}
 		throw new ImplementationException()
@@ -106,7 +107,7 @@ export class UpdateInputVisitor<Result> implements
 	private async processManyRelationInput<Context>(
 		processor: UpdateInputProcessor.HasManyRelationInputProcessor<Context, Result>,
 		context: Context,
-		input: Input.UpdateManyRelationInput | undefined,
+		input: MapperInput.UpdateManyRelationInput | undefined,
 	): Promise<Result[]> {
 		if (input === undefined || input === null) {
 			return Promise.resolve([])
@@ -118,22 +119,22 @@ export class UpdateInputVisitor<Result> implements
 			element = filterObject(element, (k, v) => v !== null && v !== undefined)
 			this.verifyOperations(element)
 			let result
-			if (isIt<Input.ConnectRelationInput>(element, 'connect')) {
+			if ('connect' in element) {
 				result = processor.connect({ ...context, input: element.connect, index: i, alias })
 			}
-			if (isIt<Input.CreateRelationInput>(element, 'create')) {
+			if ('create' in element) {
 				result = processor.create({ ...context, input: element.create, index: i, alias })
 			}
-			if (isIt<Input.ConnectOrCreateRelationInput>(element, 'connectOrCreate')) {
+			if ('connectOrCreate' in element) {
 				result = processor.connectOrCreate({ ...context, input: element.connectOrCreate, index: i, alias })
 			}
-			if (isIt<Input.DeleteSpecifiedRelationInput>(element, 'delete')) {
+			if ('delete' in element) {
 				result = processor.delete({ ...context, input: element.delete, index: i, alias })
 			}
-			if (isIt<Input.DisconnectSpecifiedRelationInput>(element, 'disconnect')) {
+			if ('disconnect' in element) {
 				result = processor.disconnect({ ...context, input: element.disconnect, index: i, alias })
 			}
-			if (isIt<Input.UpdateSpecifiedRelationInput>(element, 'update')) {
+			if ('update' in element) {
 				result = processor.update({
 					...context,
 					input: { where: element.update.by, data: element.update.data },
@@ -141,7 +142,7 @@ export class UpdateInputVisitor<Result> implements
 					alias,
 				})
 			}
-			if (isIt<Input.UpsertSpecifiedRelationInput>(element, 'upsert')) {
+			if ('upsert' in element) {
 				result = processor.upsert({
 					...context,
 					input: { where: element.upsert.by, update: element.upsert.update, create: element.upsert.create },

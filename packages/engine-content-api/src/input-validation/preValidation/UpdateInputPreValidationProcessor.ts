@@ -1,7 +1,7 @@
 import { UpdateInputProcessor } from '../../inputProcessing'
 import { Input, Model } from '@contember/schema'
 import { appendRelationToPath, ValidationPath } from '../ValidationPath'
-import { Mapper } from '../../mapper'
+import { Mapper, MapperInput } from '../../mapper'
 import { InputPreValidator } from './InputPreValidator'
 
 type Result = any
@@ -79,7 +79,7 @@ export class UpdateInputPreValidationProcessor implements UpdateInputProcessor<R
 		targetEntity: Model.Entity
 		relation: Model.AnyRelation
 		targetRelation: Model.AnyRelation | null
-		input: Input.CreateDataInput
+		input: MapperInput.CreateDataInput
 		index?: number
 		alias?: string
 	}) {
@@ -124,7 +124,7 @@ export class UpdateInputPreValidationProcessor implements UpdateInputProcessor<R
 	async processUpdate(context: {
 		targetEntity: Model.Entity
 		relation: Model.AnyRelation
-		input: Input.UpdateDataInput
+		input: MapperInput.UpdateDataInput
 		targetRelation: Model.AnyRelation | null
 		index?: number
 		alias?: string

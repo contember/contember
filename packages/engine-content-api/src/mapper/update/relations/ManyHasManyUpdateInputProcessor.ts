@@ -3,6 +3,8 @@ import { Input, Model } from '@contember/schema'
 import { getInsertPrimary, MutationEntryNotFoundError } from '../../Result'
 import { Mapper } from '../../Mapper'
 import { SqlUpdateInputProcessorResult } from '../../update'
+import { CheckedPrimary } from '../../CheckedPrimary'
+import { MapperInput } from '../../types'
 
 type Context = Model.ManyHasManyOwningContext | Model.ManyHasManyInverseContext
 
@@ -13,19 +15,17 @@ export class ManyHasManyUpdateInputProcessor implements UpdateInputProcessor.Has
 	}
 
 	public async connect(
-		{ entity, targetEntity, relation, targetRelation, input }: Context & { input: Input.UniqueWhere },
+		{ entity, targetEntity, relation, targetRelation, input }: Context & { input: Input.UniqueWhere | CheckedPrimary },
 	) {
 		return async ({ primary }: { primary: Input.PrimaryValue }) => {
-			const otherPrimary = await this.mapper.getPrimaryValue(targetEntity, input)
-			if (!otherPrimary) {
-				return [new MutationEntryNotFoundError([], input)]
-			}
+			const [otherPrimary, err] = await this.mapper.getPrimaryValue(targetEntity, input)
+			if (err) return [err]
 			return await this.mapper.connectJunction(entity, relation, primary, otherPrimary)
 		}
 	}
 
 	public async create(
-		{ entity, targetEntity, relation, input }: Context & { input: Input.CreateDataInput },
+		{ entity, targetEntity, relation, input }: Context & { input: MapperInput.CreateDataInput },
 	) {
 		return async ({ primary }: { primary: Input.PrimaryValue }) => {
 			const insertResult = await this.mapper.insert(targetEntity, input)
@@ -41,10 +41,10 @@ export class ManyHasManyUpdateInputProcessor implements UpdateInputProcessor.Has
 	}
 
 	public async connectOrCreate(
-		context: Context & { input: Input.ConnectOrCreateInput },
+		context: Context & { input: MapperInput.ConnectOrCreateInput },
 	) {
 		return async ({ primary }: { primary: Input.PrimaryValue }) => {
-			let otherPrimary = await this.mapper.getPrimaryValue(context.targetEntity, context.input.connect)
+			let [otherPrimary] = await this.mapper.getPrimaryValue(context.targetEntity, context.input.connect)
 			if (!otherPrimary) {
 				const insertResult = await this.mapper.insert(context.targetEntity, context.input.create)
 				otherPrimary = getInsertPrimary(insertResult)
@@ -60,12 +60,10 @@ export class ManyHasManyUpdateInputProcessor implements UpdateInputProcessor.Has
 		{ entity, targetEntity, relation, input: { where, data } }: Context & { input: UpdateInputProcessor.UpdateManyInput },
 	) {
 		return async ({ primary }: { primary: Input.PrimaryValue }) => {
-			const otherPrimary = await this.mapper.getPrimaryValue(targetEntity, where)
-			if (!otherPrimary) {
-				return [new MutationEntryNotFoundError([], where)]
-			}
+			const [otherPrimary, err] = await this.mapper.getPrimaryValue(targetEntity, where)
+			if (err) return [err]
 			return [
-				...(await this.mapper.update(targetEntity, { [targetEntity.primary]: otherPrimary }, data)),
+				...(await this.mapper.update(targetEntity, new CheckedPrimary(otherPrimary), data)),
 				...(await this.mapper.connectJunction(entity, relation, primary, otherPrimary)),
 			]
 		}
@@ -75,9 +73,9 @@ export class ManyHasManyUpdateInputProcessor implements UpdateInputProcessor.Has
 		{ entity, relation, targetEntity, input: { create, update, where } }: Context & { input: UpdateInputProcessor.UpsertManyInput },
 	) {
 		return async ({ primary }: { primary: Input.PrimaryValue }) => {
-			const otherPrimary = await this.mapper.getPrimaryValue(targetEntity, where)
+			const [otherPrimary] = await this.mapper.getPrimaryValue(targetEntity, where)
 			if (otherPrimary) {
-				const updateResult = await this.mapper.update(targetEntity, { [targetEntity.primary]: otherPrimary }, update)
+				const updateResult = await this.mapper.update(targetEntity, new CheckedPrimary(otherPrimary), update)
 				const connectResult = await this.mapper.connectJunction(entity, relation, primary, otherPrimary)
 				return [...updateResult, ...connectResult]
 			} else {
@@ -97,10 +95,8 @@ export class ManyHasManyUpdateInputProcessor implements UpdateInputProcessor.Has
 		{ entity, targetEntity, relation, input }: Context & { input: Input.UniqueWhere },
 	) {
 		return async ({ primary }: { primary: Input.PrimaryValue }) => {
-			const otherPrimary = await this.mapper.getPrimaryValue(targetEntity, input)
-			if (!otherPrimary) {
-				return [new MutationEntryNotFoundError([], input)]
-			}
+			const [otherPrimary, err] = await this.mapper.getPrimaryValue(targetEntity, input)
+			if (err) return [err]
 
 			return await this.mapper.disconnectJunction(entity, relation, primary, otherPrimary)
 		}

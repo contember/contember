@@ -1,4 +1,6 @@
 import { Input, Model } from '@contember/schema'
+import { CheckedPrimary } from '../mapper/CheckedPrimary'
+import { MapperInput } from '../mapper'
 
 interface CreateInputProcessor<Result = void> {
 	column(context: Model.ColumnContext & { input: Input.ColumnValue | undefined }): Promise<Result>
@@ -17,15 +19,15 @@ namespace CreateInputProcessor {
 
 	export interface HasOneRelationProcessor<Context, Result> {
 		nothing?: (context: Context & { input: undefined }) => Promise<Result>
-		connect: (context: Context & { input: Input.UniqueWhere }) => Promise<Result>
-		create: (context: Context & { input: Input.CreateDataInput }) => Promise<Result>
-		connectOrCreate: (context: Context & { input: Input.ConnectOrCreateInput }) => Promise<Result>
+		connect: (context: Context & { input: Input.UniqueWhere | CheckedPrimary }) => Promise<Result>
+		create: (context: Context & { input: MapperInput.CreateDataInput }) => Promise<Result>
+		connectOrCreate: (context: Context & { input: MapperInput.ConnectOrCreateInput }) => Promise<Result>
 	}
 
 	export interface HasManyRelationProcessor<Context, Result> {
-		connect: (context: Context & { input: Input.UniqueWhere } & { index: number; alias?: string }) => Promise<Result>
-		create: (context: Context & { input: Input.CreateDataInput } & { index: number; alias?: string }) => Promise<Result>
-		connectOrCreate: (context: Context & { input: Input.ConnectOrCreateInput } & { index: number; alias?: string }) => Promise<Result>
+		connect: (context: Context & { input: Input.UniqueWhere | CheckedPrimary } & { index: number; alias?: string }) => Promise<Result>
+		create: (context: Context & { input: MapperInput.CreateDataInput } & { index: number; alias?: string }) => Promise<Result>
+		connectOrCreate: (context: Context & { input: MapperInput.ConnectOrCreateInput } & { index: number; alias?: string }) => Promise<Result>
 	}
 }
 

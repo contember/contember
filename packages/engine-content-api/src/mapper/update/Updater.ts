@@ -5,10 +5,11 @@ import { PredicateFactory } from '../../acl'
 import { UpdateBuilderFactory } from './UpdateBuilderFactory'
 import { Mapper } from '../Mapper'
 import { acceptFieldVisitor } from '@contember/schema-utils'
-import { MutationNoResultError, MutationNothingToDo, MutationResultList, MutationUpdateOk, NothingToDoReason, RowValues } from '../Result'
+import { MutationNoResultError, MutationNothingToDo, MutationResultList, MutationUpdateOk, NothingToDoReason } from '../Result'
 import { UpdateBuilder } from './UpdateBuilder'
 import { rowDataToFieldValues } from '../ColumnValue'
 import { DatabaseMetadata } from '@contember/database'
+import { MapperInput } from '../types'
 
 export class Updater {
 	constructor(
@@ -22,7 +23,7 @@ export class Updater {
 		mapper: Mapper,
 		entity: Model.Entity,
 		primaryValue: Input.PrimaryValue,
-		data: Input.UpdateDataInput,
+		data: MapperInput.UpdateDataInput,
 		filter?: Input.OptionalWhere,
 	): Promise<MutationResultList> {
 		const updateBuilder = this.updateBuilderFactory.create(entity, primaryValue)

@@ -1,5 +1,6 @@
 import {
 	GraphQLBoolean,
+	GraphQLError,
 	GraphQLFieldConfig,
 	GraphQLInt,
 	GraphQLList,
@@ -8,8 +9,8 @@ import {
 	GraphQLSchemaConfig,
 	GraphQLString,
 } from 'graphql'
-import { VimeoService, VimeoServiceFactory } from './VimeoService'
-import { VimeoConfig } from './Config'
+import { VimeoServiceFactory } from './VimeoService'
+import { ProjectVimeoConfig } from './Config'
 import { GraphQLSchemaContributor, GraphQLSchemaContributorContext } from '@contember/engine-plugins'
 
 interface VimeoAcl {
@@ -18,12 +19,15 @@ interface VimeoAcl {
 
 export class VimeoSchemaContributor implements GraphQLSchemaContributor {
 	constructor(
-		private readonly vimeoConfig: VimeoConfig | undefined,
 		private readonly vimeoServiceFactory: VimeoServiceFactory,
 	) {}
 
+	getCacheKey?(context: GraphQLSchemaContributorContext): string {
+		return context.project.vimeo ? 'yes' : 'no'
+	}
+
 	createSchema(context: GraphQLSchemaContributorContext): GraphQLSchemaConfig | undefined {
-		if (!this.vimeoConfig) {
+		if (!context.project.vimeo) {
 			return undefined
 		}
 
@@ -35,9 +39,7 @@ export class VimeoSchemaContributor implements GraphQLSchemaContributor {
 			return undefined
 		}
 
-		const vimeoService = this.vimeoServiceFactory.create(this.vimeoConfig)
-
-		const uploadMutation = this.createMutation(vimeoService)
+		const uploadMutation = this.createMutation()
 		const mutation = {
 			generateVimeoUploadUrl: uploadMutation as GraphQLFieldConfig<any, any, any>,
 		}
@@ -57,7 +59,7 @@ export class VimeoSchemaContributor implements GraphQLSchemaContributor {
 		}
 	}
 
-	private createMutation(vimeoService: VimeoService): GraphQLFieldConfig<any, any, any> {
+	private createMutation(): GraphQLFieldConfig<any, any, any> {
 		return {
 			type: new GraphQLNonNull(
 				new GraphQLObjectType({
@@ -97,7 +99,11 @@ export class VimeoSchemaContributor implements GraphQLSchemaContributor {
 					type: new GraphQLNonNull(GraphQLInt),
 				},
 			},
-			resolve: async (parent: any, args: { size: number }) => {
+			resolve: async (parent: any, args: { size: number }, ctx: { project: ProjectVimeoConfig }) => {
+				if (!ctx.project.vimeo) {
+					throw new GraphQLError('Vimeo is not configured for this project')
+				}
+				const vimeoService = this.vimeoServiceFactory.create(ctx.project.vimeo)
 				return await vimeoService.getUploadUrl(args.size)
 			},
 		}

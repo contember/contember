@@ -1,7 +1,10 @@
 import { DatabaseContext, SchemaProvider, SchemaWithMeta } from '@contember/engine-system-api'
-import { filterSchemaByStage, normalizeSchema } from '@contember/schema-utils'
+import { calculateSchemaChecksum, filterSchemaByStage, normalizeSchema } from '@contember/schema-utils'
 import { Schema } from '@contember/schema'
 import { ContentApiSpecificCache } from './ContentApiSpecificCache'
+import { createMemoizer } from '../utils/memoizeObject'
+
+const memoizedSchema = createMemoizer(calculateSchemaChecksum)
 
 export class ContentSchemaResolver {
 	private baseSchemaCache: SchemaWithMeta | null = null
@@ -19,7 +22,11 @@ export class ContentSchemaResolver {
 		stage?: string
 	}): Promise<SchemaWithMeta> {
 		const prevBaseSchema = this.baseSchemaCache
-		this.baseSchemaCache = await this.schemaProvider.fetch({ db, currentSchema: prevBaseSchema })
+		const { schema, meta } = await this.schemaProvider.fetch({ db, currentSchema: prevBaseSchema })
+		this.baseSchemaCache = {
+			schema: memoizedSchema(schema),
+			meta: meta,
+		}
 		const finalSchema = getSchema(this.baseSchemaCache.schema, { stage, normalize })
 		return {
 			schema: finalSchema,
@@ -42,3 +49,4 @@ const getSchema = (schema: Schema, options: { stage?: string; normalize?: boolea
 		return result
 	})
 }
+

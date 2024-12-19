@@ -40,6 +40,7 @@ export class ContentQueryExecutorImpl implements ContentQueryExecutor {
 		})
 
 		const ctx: ExtendedGraphqlContext = {
+			project,
 			db: db.client.forSchema(stage.schema),
 			identityVariables: {},
 			identityId,

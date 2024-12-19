@@ -7,6 +7,7 @@ import { ContentGraphQLContextFactory } from './ContentGraphQLContextFactory'
 import { ContentQueryHandler, ContentQueryHandlerFactory } from './ContentQueryHandlerFactory'
 import { GraphQLSchema } from 'graphql'
 import { GraphQLKoaState } from '../graphql'
+import { GraphQlSchemaFactory } from './GraphQlSchemaFactory'
 
 const debugHeader = 'x-contember-debug'
 
@@ -16,6 +17,7 @@ export class ContentApiControllerFactory {
 		private readonly contentGraphqlContextFactory: ContentGraphQLContextFactory,
 		private readonly handlerFactory: ContentQueryHandlerFactory,
 		private readonly projectContextResolver: ProjectContextResolver,
+		private readonly graphQlSchemaFactory: GraphQlSchemaFactory,
 	) {
 	}
 
@@ -79,9 +81,9 @@ export class ContentApiControllerFactory {
 
 			const { schema: graphQlSchema, permissions } = await timer(
 				'GraphQLSchemaCreate',
-				() => projectContainer.graphQlSchemaFactory.create(schema, {
+				() => this.graphQlSchemaFactory.create(schema, {
 					projectRoles: projectRoles,
-				}),
+				}, project),
 			)
 
 

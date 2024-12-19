@@ -15,7 +15,10 @@ import { ExecutionContainerFactory, GraphQlSchemaBuilderFactory, PermissionFacto
 import { createProviders, Providers } from './providers'
 import { TenantApiMiddlewareFactory, TenantGraphQLContextFactory, TenantGraphQLHandlerFactory } from './tenant'
 import { SystemApiMiddlewareFactory, SystemGraphQLContextFactory, SystemGraphQLHandlerFactory } from './system'
-import { ContentApiControllerFactory, ContentGraphQLContextFactory, ContentQueryHandlerFactory, NotModifiedChecker } from './content'
+import {
+	ContentApiControllerFactory, ContentGraphQLContextFactory, ContentQueryHandlerFactory, GraphQLSchemaContributor, GraphQlSchemaFactory,
+	GraphQLSchemaFactoryResult, NotModifiedChecker,
+} from './content'
 import { ProjectContextResolver } from './project-common'
 import {
 	ContentSchemaTransferMappingFactory,
@@ -39,6 +42,8 @@ import { ProjectGroupContainerMetricsHook } from './prometheus/ProjectGroupConta
 import { createColllectHttpMetricsMiddleware, createShowMetricsMiddleware } from './prometheus'
 import { createSecretKey } from 'node:crypto'
 import { CryptoWrapper } from './utils/CryptoWrapper'
+import { ContentApiSpecificCache } from './content/ContentApiSpecificCache'
+import { Schema } from '@contember/schema'
 
 export type ProcessType =
 	| 'singleNode'
@@ -120,8 +125,24 @@ export class MasterContainerFactory {
 				new PermissionFactory())
 			.addService('databaseMetadataResolver', () =>
 				new DatabaseMetadataResolver())
-			.addService('projectContainerFactoryFactory', ({ plugins, providers, serverConfig, graphQlSchemaBuilderFactory, contentPermissionFactory, databaseMetadataResolver }) =>
-				new ProjectContainerFactoryFactory(plugins, providers, serverConfig, graphQlSchemaBuilderFactory, contentPermissionFactory, databaseMetadataResolver))
+			.addService('graphqlSchemaCache', ({ serverConfig }) =>
+				new ContentApiSpecificCache<Schema, GraphQLSchemaFactoryResult>({
+					ttlSeconds: serverConfig.contentApi?.schemaCacheTtlSeconds,
+				}))
+			.addService('graphQlSchemaFactory', ({ plugins, providers, graphqlSchemaCache, contentPermissionFactory, graphQlSchemaBuilderFactory }) => {
+				const contributors = plugins
+					.map(it => (it.getSchemaContributor ? it.getSchemaContributor({ providers }) : null))
+					.filter((it): it is GraphQLSchemaContributor => !!it)
+
+				return new GraphQlSchemaFactory(
+					graphqlSchemaCache,
+					graphQlSchemaBuilderFactory,
+					contentPermissionFactory,
+					contributors,
+				)
+			})
+			.addService('projectContainerFactoryFactory', ({ plugins, providers, databaseMetadataResolver }) =>
+				new ProjectContainerFactoryFactory(plugins, providers, databaseMetadataResolver))
 			.addService('tenantGraphQLHandlerFactory', () =>
 				new TenantGraphQLHandlerFactory())
 			.addService('systemGraphQLHandlerFactory', ({ debugMode }) =>
@@ -163,8 +184,8 @@ export class MasterContainerFactory {
 				new ContentQueryHandlerFactory(debugMode))
 			.addService('projectContextResolver', () =>
 				new ProjectContextResolver())
-			.addService('contentApiMiddlewareFactory', ({ projectContextResolver, notModifiedChecker, contentGraphqlContextFactory, contentQueryHandlerFactory }) =>
-				new ContentApiControllerFactory(notModifiedChecker, contentGraphqlContextFactory, contentQueryHandlerFactory, projectContextResolver))
+			.addService('contentApiMiddlewareFactory', ({ projectContextResolver, notModifiedChecker, contentGraphqlContextFactory, contentQueryHandlerFactory, graphQlSchemaFactory }) =>
+				new ContentApiControllerFactory(notModifiedChecker, contentGraphqlContextFactory, contentQueryHandlerFactory, projectContextResolver, graphQlSchemaFactory))
 			.addService('tenantGraphQLContextFactory', () =>
 				new TenantGraphQLContextFactory())
 			.addService('tenantApiMiddlewareFactory', ({ debugMode, projectGroupResolver, tenantGraphQLContextFactory }) =>

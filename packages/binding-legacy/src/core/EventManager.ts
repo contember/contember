@@ -3,14 +3,14 @@ import type {
 	BatchUpdatesOptions,
 	EntityAccessor,
 	EntityListAccessor,
+	EventListenersStore,
 	FieldAccessor,
 	PersistErrorOptions,
 	PersistSuccessOptions,
+	PlaceholderName,
+	SuccessfulPersistResult,
 } from '@contember/binding-common'
-import type { SuccessfulPersistResult } from '@contember/binding-common'
-import { BindingError } from '@contember/binding-common'
-import type { PlaceholderName } from '@contember/binding-common'
-import { assertNever } from '@contember/binding-common'
+import { assertNever, BindingError } from '@contember/binding-common'
 import type { Config } from './Config'
 import type { DirtinessTracker } from './DirtinessTracker'
 import {
@@ -25,7 +25,6 @@ import {
 } from './state'
 import type { TreeStore } from './TreeStore'
 import type { UpdateMetadata } from './UpdateMetadata'
-import type { EventListenersStore } from '@contember/binding-common'
 
 export class EventManager {
 	public static readonly NO_CHANGES_DIFFERENCE = 0
@@ -52,7 +51,7 @@ export class EventManager {
 		private readonly onUpdate: (metadata: UpdateMetadata) => void,
 		private readonly treeStore: TreeStore,
 		private readonly batchedUpdates: (callback: () => any) => void,
-	) {}
+	) { }
 
 	public async persistOperation(operation: () => Promise<SuccessfulPersistResult>): Promise<SuccessfulPersistResult> {
 		if (this.transactionDepth > 0) {
@@ -117,8 +116,8 @@ export class EventManager {
 		if (this.isFrozenWhileUpdating) {
 			throw new BindingError(
 				`Trying to perform an update while the whole accessor tree is already updating. This is most likely caused ` +
-					`by updating the accessor tree while rendering or from within the 'update' event handler, which is a no-op. ` +
-					`If you wish to mutate the tree in reaction to other changes, use the 'beforeUpdate' event.`,
+				`by updating the accessor tree while rendering or from within the 'update' event handler, which is a no-op. ` +
+				`If you wish to mutate the tree in reaction to other changes, use the 'beforeUpdate' event.`,
 			)
 		}
 
@@ -219,7 +218,7 @@ export class EventManager {
 					if (justUpdated.unpersistedChangesCount < 0) {
 						console.error(
 							`We have *JUST* reached a completely invalid state. From now on, anything can (and likely will) ` +
-								`go wrong. This is definitely a bug. Please try to report whatever led to this situation.`,
+							`go wrong. This is definitely a bug. Please try to report whatever led to this situation.`,
 						)
 					}
 				}
@@ -409,7 +408,7 @@ export class EventManager {
 				if (callbackQueue.length) {
 					throw new BindingError(
 						`Exceeded the ${eventType} settle limit. Your code likely contains a deadlock. ` +
-							`If that's not the case, raise the settle limit from DataBindingProvider.`,
+						`If that's not the case, raise the settle limit from DataBindingProvider.`,
 					)
 				}
 			}
@@ -455,7 +454,7 @@ export class EventManager {
 			}
 			throw new BindingError(
 				`Maximum stabilization limit of updates caused by 'beforeUpdate' exceeded. ` +
-					`This likely means there is an infinite feedback loop in your code.`,
+				`This likely means there is an infinite feedback loop in your code.`,
 			)
 		})
 	}
@@ -569,7 +568,7 @@ export class EventManager {
 		if (import.meta.env.DEV) {
 			throw new BindingError(
 				`A ${handler} handler returned a promise that rejected. ` +
-					`This is a no-op that will fail silently in production.`,
+				`This is a no-op that will fail silently in production.`,
 			)
 		}
 	}

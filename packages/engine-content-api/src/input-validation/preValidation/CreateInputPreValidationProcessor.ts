@@ -1,7 +1,7 @@
 import { CreateInputProcessor } from '../../inputProcessing'
 import { Input, Model } from '@contember/schema'
 import { appendRelationToPath, ValidationPath } from '../ValidationPath'
-import { Mapper } from '../../mapper'
+import { Mapper, MapperInput } from '../../mapper'
 import { InputPreValidator } from './InputPreValidator'
 
 type Result = any
@@ -51,7 +51,7 @@ export class CreateInputPreValidationProcessor implements CreateInputProcessor<R
 	async validateCreate(context: {
 		targetEntity: Model.Entity
 		relation: Model.AnyRelation
-		input: Input.CreateDataInput
+		input: MapperInput.CreateDataInput
 		targetRelation: Model.AnyRelation | null
 		index?: number
 		alias?: string

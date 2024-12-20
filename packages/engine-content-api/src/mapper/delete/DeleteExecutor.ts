@@ -50,10 +50,8 @@ export class DeleteExecutor {
 		filter?: Input.OptionalWhere,
 	): Promise<MutationResultList> {
 		return mapper.mutex.execute(async () => {
-			const primaryValue = await mapper.getPrimaryValue(entity, by)
-			if (!primaryValue) {
-				return [new MutationEntryNotFoundError([], by as Input.UniqueWhere)]
-			}
+			const [primaryValue, err] = await mapper.getPrimaryValue(entity, by)
+			if (err) return [err]
 
 			if (mapper.deletedEntities.isDeleted(entity.name, primaryValue)) {
 				return [new MutationNothingToDo([], NothingToDoReason.alreadyDeleted)]

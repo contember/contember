@@ -1,9 +1,8 @@
-import { isIt } from '../utils'
+import { filterObject } from '../utils'
 import { Input, Model } from '@contember/schema'
 import { CreateInputProcessor } from './CreateInputProcessor'
-import { filterObject } from '../utils'
-import { UserError } from '../exception'
-import { ImplementationException } from '../exception'
+import { ImplementationException, UserError } from '../exception'
+import { MapperInput } from '../mapper'
 
 export class CreateInputVisitor<Result> implements
 	Model.ColumnVisitor<Promise<Result[]>>,
@@ -12,7 +11,7 @@ export class CreateInputVisitor<Result> implements
 	constructor(
 		private readonly createInputProcessor: CreateInputProcessor<Result>,
 		private readonly schema: Model.Schema,
-		private readonly data: Input.CreateDataInput,
+		private readonly data: MapperInput.CreateDataInput,
 	) {}
 
 	public async visitColumn(context: Model.ColumnContext): Promise<Result[]> {
@@ -26,7 +25,7 @@ export class CreateInputVisitor<Result> implements
 		return this.processManyRelationInput(
 			this.createInputProcessor.manyHasManyInverse,
 			context,
-			this.data[context.relation.name] as Input.CreateManyRelationInput,
+			this.data[context.relation.name] as MapperInput.CreateManyRelationInput,
 		)
 	}
 
@@ -34,7 +33,7 @@ export class CreateInputVisitor<Result> implements
 		return this.processManyRelationInput(
 			this.createInputProcessor.manyHasManyOwning,
 			context,
-			this.data[context.relation.name] as Input.CreateManyRelationInput,
+			this.data[context.relation.name] as MapperInput.CreateManyRelationInput,
 		)
 	}
 
@@ -42,7 +41,7 @@ export class CreateInputVisitor<Result> implements
 		return this.processRelationInput(
 			this.createInputProcessor.manyHasOne,
 			context,
-			this.data[context.relation.name] as Input.CreateOneRelationInput,
+			this.data[context.relation.name] as MapperInput.CreateOneRelationInput,
 		)
 	}
 
@@ -50,7 +49,7 @@ export class CreateInputVisitor<Result> implements
 		return this.processManyRelationInput(
 			this.createInputProcessor.oneHasMany,
 			context,
-			this.data[context.relation.name] as Input.CreateManyRelationInput,
+			this.data[context.relation.name] as MapperInput.CreateManyRelationInput,
 		)
 	}
 
@@ -58,7 +57,7 @@ export class CreateInputVisitor<Result> implements
 		return this.processRelationInput(
 			this.createInputProcessor.oneHasOneInverse,
 			context,
-			this.data[context.relation.name] as Input.CreateOneRelationInput,
+			this.data[context.relation.name] as MapperInput.CreateOneRelationInput,
 		)
 	}
 
@@ -66,14 +65,14 @@ export class CreateInputVisitor<Result> implements
 		return this.processRelationInput(
 			this.createInputProcessor.oneHasOneOwning,
 			context,
-			this.data[context.relation.name] as Input.CreateOneRelationInput,
+			this.data[context.relation.name] as MapperInput.CreateOneRelationInput,
 		)
 	}
 
 	private async processRelationInput<Context>(
 		processor: CreateInputProcessor.HasOneRelationProcessor<Context, Result>,
 		context: Context,
-		input: Input.CreateOneRelationInput | undefined,
+		input: MapperInput.CreateOneRelationInput | undefined,
 	): Promise<Result[]> {
 		if (input === undefined || input === null) {
 			if (processor.nothing) {
@@ -83,13 +82,13 @@ export class CreateInputVisitor<Result> implements
 		}
 		input = filterObject(input, (k, v) => v !== null && v !== undefined)
 		this.verifyOperations(input)
-		if (isIt<Input.ConnectRelationInput>(input, 'connect')) {
+		if ('connect' in input) {
 			return [await processor.connect({ ...context, input: input.connect })]
 		}
-		if (isIt<Input.CreateRelationInput>(input, 'create')) {
+		if ('create' in input) {
 			return [await processor.create({ ...context, input: input.create })]
 		}
-		if (isIt<Input.ConnectOrCreateRelationInput>(input, 'connectOrCreate')) {
+		if ('connectOrCreate' in input) {
 			return [await processor.connectOrCreate({ ...context, input: input.connectOrCreate })]
 		}
 		throw new ImplementationException()
@@ -98,7 +97,7 @@ export class CreateInputVisitor<Result> implements
 	private async processManyRelationInput<Context>(
 		processor: CreateInputProcessor.HasManyRelationProcessor<Context, Result>,
 		context: Context,
-		input: Input.CreateManyRelationInput | undefined,
+		input: MapperInput.CreateManyRelationInput | undefined,
 	): Promise<Result[]> {
 		if (input === undefined || input === null) {
 			return Promise.resolve([])
@@ -110,13 +109,13 @@ export class CreateInputVisitor<Result> implements
 			element = filterObject(element, (k, v) => v !== null && v !== undefined)
 			this.verifyOperations(element)
 			let result
-			if (isIt<Input.ConnectRelationInput>(element, 'connect')) {
+			if ('connect' in element) {
 				result = processor.connect({ ...context, input: element.connect, index: i++, alias })
 			}
-			if (isIt<Input.CreateRelationInput>(element, 'create')) {
+			if ('create' in element) {
 				result = processor.create({ ...context, input: element.create, index: i++, alias })
 			}
-			if (isIt<Input.ConnectOrCreateRelationInput>(element, 'connectOrCreate')) {
+			if ('connectOrCreate' in element) {
 				result = processor.connectOrCreate({ ...context, input: element.connectOrCreate, index: i++, alias })
 			}
 			if (result !== undefined) {

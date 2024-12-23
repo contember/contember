@@ -430,6 +430,22 @@ export const DataGridQueryFilter: React_2.NamedExoticComponent<{
 }>;
 
 // @public (undocumented)
+export const dataGridRanges: {
+    yesterday: DataGridPredefinedDateRange;
+    today: DataGridPredefinedDateRange;
+    tomorrow: DataGridPredefinedDateRange;
+    thisWeek: DataGridPredefinedDateRange;
+    lastWeek: DataGridPredefinedDateRange;
+    nextWeek: DataGridPredefinedDateRange;
+    thisMonth: DataGridPredefinedDateRange;
+    lastMonth: DataGridPredefinedDateRange;
+    nextMonth: DataGridPredefinedDateRange;
+    thisYear: DataGridPredefinedDateRange;
+    lastYear: DataGridPredefinedDateRange;
+    nextYear: DataGridPredefinedDateRange;
+};
+
+// @public (undocumented)
 export const DataGridRelationFilterControls: ({ children, queryField }: {
     queryField?: DataViewUnionFilterFields;
     children: ReactNode;

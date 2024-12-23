@@ -1,17 +1,15 @@
-import { Slots } from '@app/lib/layout'
-import { EntitySubTree, useField } from '@contember/interface'
-import { CheckboxField, InputField, RadioEnumField, TextareaField } from '@app/lib/form'
-import * as React from 'react'
-import { AnchorButton, Button } from '@app/lib/ui/button'
-import { Binding, PersistButton } from '@app/lib/binding'
-import { SelectOrTypeField } from '@app/lib-extra/select-or-type-field'
-import { FieldExists } from '@app/lib-extra/has-field'
-import { SlugField } from '@app/lib-extra/slug-field/field'
-import slugify from '@sindresorhus/slugify'
-import { TreeRootIdProvider, useEnvironment } from '@contember/react-binding'
-import { Link } from '@contember/react-routing'
 import { FractionalAmountField } from '@app/lib-extra/fractional-amount-field'
+import { FieldExists } from '@app/lib-extra/has-field'
+import { SelectOrTypeField } from '@app/lib-extra/select-or-type-field'
+import { SlugField } from '@app/lib-extra/slug-field/field'
+import { Binding, PersistButton } from '@app/lib/binding'
+import { CheckboxField, InputField, InputFieldProps, RadioEnumField, TextareaField } from '@app/lib/form'
+import { Slots } from '@app/lib/layout'
 import { DefaultRepeater } from '@app/lib/repeater'
+import { AnchorButton, Button } from '@app/lib/ui/button'
+import { Component, EntitySubTree, Field, Link, useEntityBeforePersist, useEnvironment, useField } from '@contember/interface'
+import slugify from '@sindresorhus/slugify'
+import * as React from 'react'
 
 export const Basic = () => {
 	const required = !!useEnvironment().getParameterOrElse('required', false)
@@ -22,7 +20,7 @@ export const Basic = () => {
 			</Slots.Actions>
 			<EntitySubTree entity={'InputRoot(unique=unique)'} setOnCreate={'(unique=unique)'}>
 				<div className={'space-y-4'}>
-					<ToggleRequired/>
+					<ToggleRequired />
 					<InputField field="dummy" label="Dummy to trigger dirty state" />
 					<InputField field={'textValue'} label={'Text'} description={'Hello world'} required={required} />
 					<InputField field={'intValue'} label={'Number'} required={required} />
@@ -223,3 +221,30 @@ export const serverRules = () => <>
 	</Binding>
 </>
 
+export const CustomError = () => <>
+	<Binding>
+		<Slots.Actions>
+			<PersistButton />
+		</Slots.Actions>
+		<EntitySubTree entity={'InputRoot(unique=unique)'} setOnCreate={'(unique=unique)'}>
+			<div className={'space-y-4'}>
+				<InputFieldWithCustomError field={'textValue'} label={'Text'} description={'Hello world'} />
+			</div>
+		</EntitySubTree>
+	</Binding>
+</>
+
+const InputFieldWithCustomError = Component<InputFieldProps>(
+	() => {
+		useEntityBeforePersist(entityAccessor => {
+			const field = entityAccessor().getField('textValue')
+
+			if (field.value != 'Hello world') {
+				field.addError('You must enter "Hello world"')
+			}
+		})
+
+		return <InputField field={'textValue'} label={'Text'} description={'Try to write anything but "Hello world"'} />
+	},
+	() => <Field field={'textValue'} />,
+)

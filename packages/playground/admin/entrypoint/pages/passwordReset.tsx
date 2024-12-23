@@ -1,8 +1,8 @@
-import { ToastContent, useShowToast } from '@app/lib/toast'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@app/lib/ui/card'
-import { dict } from '@app/lib/dict'
-import { PasswordResetFormFields } from '@app/lib/tenant'
-import { AnchorButton } from '@app/lib/ui/button'
+import { ToastContent, useShowToast } from '~/lib/toast'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '~/lib/ui/card'
+import { dict } from '~/lib/dict'
+import { PasswordResetFormFields } from '~/lib/tenant'
+import { AnchorButton } from '~/lib/ui/button'
 import { Link, PasswordResetForm, useCurrentRequest, useRedirect } from '@contember/interface'
 
 export default () => {

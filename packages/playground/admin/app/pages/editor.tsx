@@ -1,8 +1,8 @@
-import { Binding, PersistButton } from '@app/lib/binding'
-import { Slots } from '@app/lib/layout'
+import { Binding, PersistButton } from '~/lib/binding'
+import { Slots } from '~/lib/layout'
 import * as React from 'react'
 import { Component, EntitySubTree, HasOne, useEntity, useField } from '@contember/interface'
-import { Toggle } from '@app/lib/ui/toggle'
+import { Toggle } from '~/lib/ui/toggle'
 import {
 	AlignCenterIcon,
 	AlignJustifyIcon,
@@ -54,22 +54,22 @@ import {
 	underlineMark,
 	unorderedListElementType,
 } from '@contember/react-slate-editor'
-import { ImageField, InputField } from '@app/lib/form'
-import { Popover, PopoverContent, PopoverTrigger } from '@app/lib/ui/popover'
-import { Button } from '@app/lib/ui/button'
+import { ImageField, InputField } from '~/lib/form'
+import { Popover, PopoverContent, PopoverTrigger } from '~/lib/ui/popover'
+import { Button } from '~/lib/ui/button'
 import { PopoverClose } from '@radix-ui/react-popover'
-import { uic } from '@app/lib/utils'
+import { uic } from '~/lib/utils'
 import { useSlateStatic } from 'slate-react'
-import { BlockEditorField, EditorBlock, EditorBlockContent, EditorBlockToolbar, EditorInlineToolbar, RichTextField } from '@app/lib/editor'
+import { BlockEditorField, EditorBlock, EditorBlockContent, EditorBlockToolbar, EditorInlineToolbar, RichTextField } from '~/lib/editor'
 
-export const richtext = () => <>
+export const Richtext = () => <>
 	<Binding>
 		<Slots.Actions>
 			<PersistButton />
 		</Slots.Actions>
-		<EntitySubTree entity={'EditorTextArea(unique=unique)'} setOnCreate={'(unique=unique)'}>
-			<div className={'space-y-4'}>
-				<RichTextField field={'data'} label="Rich text field">
+		<EntitySubTree entity="EditorTextArea(unique = unique)" setOnCreate="(unique = unique)">
+			<div className="space-y-4">
+				<RichTextField field="data" label="Rich text field">
 					<EditorInlineToolbar>
 						<EditorMarkTrigger mark={boldMark}><Toggle><BoldIcon className="h-3 w-3" /></Toggle></EditorMarkTrigger>
 						<EditorMarkTrigger mark={italicMark}><Toggle><ItalicIcon className="h-3 w-3" /></Toggle></EditorMarkTrigger>
@@ -89,18 +89,17 @@ const BlockButton = uic('button', {
 	baseClass: 'bg-white p-2 inline-flex flex-col hover:bg-gray-100 border rounded-md w-32 items-center justify-center',
 })
 
-export const blocks = () => <>
+export const Blocks = () => <>
 	<Binding>
 		<Slots.Actions>
 			<PersistButton />
 		</Slots.Actions>
-		<EntitySubTree entity={'EditorContent(unique=unique)'} setOnCreate={'(unique=unique)'}>
-			<div className={'space-y-4'}>
+		<EntitySubTree entity="EditorContent(unique = unique)" setOnCreate="(unique = unique)">
+			<div className="space-y-4">
 				<BlockEditorField
-					field={'data'}
+					field="data"
 					referencesField="references"
 					referenceDiscriminationField="type"
-
 					plugins={[
 						editor => {
 							editor.registerElement({
@@ -159,7 +158,7 @@ export const blocks = () => <>
 					</EditorBlock>
 
 					<EditorBlock name="image" label="Image">
-						<ImageField baseField={'image'} urlField="url" />
+						<ImageField baseField="image" urlField="url" />
 					</EditorBlock>
 				</BlockEditorField>
 			</div>
@@ -185,7 +184,7 @@ const ConfirmReferenceButton = () => {
 	return (
 		<PopoverClose asChild>
 			<EditorWrapNodeTrigger
-				elementType={'link'}
+				elementType="link"
 				suchThat={{ referenceId: reference.id }}
 			>
 				<Button>Insert</Button>

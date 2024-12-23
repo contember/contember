@@ -1,8 +1,8 @@
+import { Binding, PersistButton, PersistOnFieldChange } from '~/lib/binding'
+import { DefaultBoard } from '~/lib/board/board'
+import { Slots } from '~/lib/layout'
 import { Field } from '@contember/interface'
-import { Slots } from '@app/lib/layout'
 import { BoardColumnLabel } from '@contember/react-board'
-import { Binding, PersistButton, PersistOnFieldChange } from '@app/lib/binding'
-import { DefaultBoard } from '@app/lib/board/board'
 
 const statusList = [
 	{ value: 'backlog', label: 'Backlog' },
@@ -11,65 +11,58 @@ const statusList = [
 	{ value: 'done', label: 'Done' },
 ]
 
-
-export const assignee = () => <>
+export const Assignee = () => <>
 	<Binding>
 		<Slots.Actions>
 			<PersistButton />
 		</Slots.Actions>
 
 		<DefaultBoard
-			entities={'BoardTask'}
-
-			columns={'BoardUser'}
-			columnsSortableBy={'order'}
-
-			discriminationField={'assignee'}
-
-			sortableBy={'order'}
-			sortScope={'board'}
-
+			entities="BoardTask"
+			columns="BoardUser"
+			columnsSortableBy="order"
+			discriminationField="assignee"
+			sortableBy="order"
+			sortScope="board"
 			columnHeader={
-				<div className={'text-lg font-semibold'}>
-					<Field field={'name'} />
+				<div className="text-lg font-semibold">
+					<Field field="name" />
 				</div>
 			}
 			nullColumnHeader={
-				<div className={'text-lg font-semibold italic'}>
+				<div className="text-lg font-semibold italic">
 					Without assignee
 				</div>}
-			children={<Field field={'title'} />}
-		/>
-
+		>
+			<Field field="title" />
+		</DefaultBoard>
 	</Binding>
 </>
-export const status = () => <>
+export const Status = () => <>
 	<Binding>
-		<Slots.Actions><PersistButton /></Slots.Actions>
-
+		<Slots.Actions>
+			<PersistButton />
+		</Slots.Actions>
 
 		<DefaultBoard
-			entities={'BoardTask'}
-
+			entities="BoardTask"
 			columns={statusList}
-			discriminationField={'status'}
-
-			sortableBy={'order'}
-			sortScope={'board'}
+			discriminationField="status"
+			sortableBy="order"
+			sortScope="board"
 			columnHeader={
-				<div className={'text-lg font-semibold'}>
+				<div className="text-lg font-semibold">
 					<BoardColumnLabel />
 				</div>
 			}
 			nullColumnHeader={
-				<div className={'text-lg font-semibold italic'}>
+				<div className="text-lg font-semibold italic">
 					Without status
 				</div>}
-
 		>
 			<PersistOnFieldChange field="status" />
 			<PersistOnFieldChange field="order" />
-			<Field field={'title'} />
+			<Field field="title" />
 		</DefaultBoard>
 	</Binding>
 </>

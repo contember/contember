@@ -1,14 +1,23 @@
-import { Component, Entity, EntityListSubTree, Field, useEntity, useEntityListSubTree } from '@contember/interface'
-import { SugaredQualifiedEntityList, TreeRootIdProvider, useEntityListSubTreeLoader } from '@contember/react-binding'
+import { Binding } from '~/lib/binding'
+import { DataGrid, DataGridLoader, DataGridToolbar } from '~/lib/datagrid'
+import { Button } from '~/lib/ui/button'
+import { Dialog, DialogContent, DialogTrigger } from '~/lib/ui/dialog'
+import { Loader } from '~/lib/ui/loader'
+import {
+	Component,
+	Entity,
+	EntityListSubTree,
+	Field,
+	type SugaredQualifiedEntityList,
+	TreeRootIdProvider,
+	useEntity,
+	useEntityListSubTree,
+	useEntityListSubTreeLoader,
+} from '@contember/interface'
+import { DataViewEachRow, DataViewLayout } from '@contember/react-dataview'
+import { ChevronDownIcon, ChevronUpIcon, RowsIcon, SearchIcon } from 'lucide-react'
 import * as React from 'react'
 import { useMemo, useState } from 'react'
-import { Button } from '@app/lib/ui/button'
-import { ChevronDownIcon, ChevronUpIcon, RowsIcon, SearchIcon } from 'lucide-react'
-import { Loader } from '@app/lib/ui/loader'
-import { Binding } from '@app/lib/binding'
-import { DataGrid, DataGridLoader, DataGridToolbar } from '@app/lib/datagrid'
-import { DataViewEachRow, DataViewLayout } from '@contember/react-dataview'
-import { Dialog, DialogContent, DialogTrigger } from '@app/lib/ui/dialog'
 
 // --- folders - custom component using useEntityListSubTreeLoader
 export default () => {
@@ -21,7 +30,7 @@ export default () => {
 	)
 }
 
-const FolderList = Component<{parent: string | null}>(({ parent }) => {
+const FolderList = Component<{ parent: string | null }>(({ parent }) => {
 	const entitiesProp = useMemo(() => formatEntities(parent), [parent])
 	const entities = useEntityListSubTree(entitiesProp)
 	if (entities.length === 0) {
@@ -30,7 +39,7 @@ const FolderList = Component<{parent: string | null}>(({ parent }) => {
 	return (
 		<div className="grid gap-2">
 			{Array.from(entities).map(entity => (
-				<Entity accessor={entity} key={entity.id} >
+				<Entity accessor={entity} key={entity.id}>
 					<Folder />
 				</Entity>
 			))}
@@ -44,7 +53,7 @@ const FolderList = Component<{parent: string | null}>(({ parent }) => {
 	)
 })
 
-const FolderLoader = ({ parent }: {parent: string}) => {
+const FolderLoader = ({ parent }: { parent: string }) => {
 	const entities = useMemo(() => formatEntities(parent), [parent])
 	const [loaderState] = useEntityListSubTreeLoader(entities, useMemo(() => <Folder />, []))
 	if (loaderState.state !== 'loaded') {
@@ -64,7 +73,7 @@ const Folder = Component(() => {
 		<>
 			<div className="flex gap-2 border rounded">
 				<Button size="sm" variant="ghost" onClick={() => setExpanded(!expanded)}>
-					{!expanded ? <ChevronDownIcon size={16} /> : <ChevronUpIcon size={16}/>}
+					{!expanded ? <ChevronDownIcon size={16} /> : <ChevronUpIcon size={16} />}
 				</Button>
 				<span><Field field="name" /></span>
 			</div>
@@ -81,7 +90,7 @@ const Folder = Component(() => {
 
 // --- folders - custom component using DataView
 
-export const dataview = () => {
+export const Dataview = () => {
 	return (
 		<Binding>
 			<DataViewGrid parent={null} />
@@ -90,8 +99,7 @@ export const dataview = () => {
 }
 
 
-
-const DataViewGrid = Component<{parent: string | null}>(({ parent }) => {
+const DataViewGrid = Component<{ parent: string | null }>(({ parent }) => {
 	return (
 		<DataGrid
 			entities={formatEntities(parent).entities}
@@ -101,10 +109,12 @@ const DataViewGrid = Component<{parent: string | null}>(({ parent }) => {
 			<DataGridToolbar />
 
 			<DataGridLoader>
-				<DataViewLayout name="rows" label={<>
-					<RowsIcon className={'w-3 h-3'} />
-					<span>Rows</span>
-				</>}>
+				<DataViewLayout name="rows" label={(
+					<>
+						<RowsIcon className={'w-3 h-3'} />
+						<span>Rows</span>
+					</>
+				)}>
 					<div className="grid gap-2">
 						<DataViewEachRow>
 							<DataViewFolderRow />
@@ -144,7 +154,7 @@ export const DialogGrid = () => {
 			<Dialog>
 				<DialogTrigger asChild>
 					<Button className="gap-2">
-						<SearchIcon/> Search
+						<SearchIcon /> Search
 					</Button>
 				</DialogTrigger>
 				<DialogContent className="h-[60vh]">
@@ -159,17 +169,19 @@ export const DialogGrid = () => {
 const DialogDataGrid = Component(() => {
 	return (
 		<DataGrid
-			entities={'Folder'}
+			entities="Folder"
 			initialSorting={{ name: 'asc' }}
 			initialItemsPerPage={20}
 		>
 			<DataGridToolbar />
 
 			<DataGridLoader>
-				<DataViewLayout name="rows" label={<>
-					<RowsIcon className={'w-3 h-3'} />
-					<span>Rows</span>
-				</>}>
+				<DataViewLayout name="rows" label={(
+					<>
+						<RowsIcon className="w-3 h-3" />
+						<span>Rows</span>
+					</>
+				)}>
 					<div className="grid gap-2">
 						<DataViewEachRow>
 							<div className="flex gap-2 border rounded">

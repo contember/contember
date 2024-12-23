@@ -1,10 +1,10 @@
 import * as React from 'react'
-import { Binding, DeleteEntityDialog, PersistButton } from '@app/lib/binding'
-import { Slots } from '@app/lib/layout'
+import { Binding, DeleteEntityDialog, PersistButton } from '~/lib/binding'
+import { Slots } from '~/lib/layout'
 import { EntitySubTree, Field } from '@contember/interface'
-import { DefaultRepeater, RepeaterItemActions, RepeaterRemoveItemButton } from '@app/lib/repeater'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger, DropDownTriggerButton } from '@app/lib/ui/dropdown'
-import { InputField, SelectField } from '@app/lib/form'
+import { DefaultRepeater, RepeaterItemActions, RepeaterRemoveItemButton } from '~/lib/repeater'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger, DropDownTriggerButton } from '~/lib/ui/dropdown'
+import { InputField, SelectField } from '~/lib/form'
 
 const repeaterDropdown = (
 	<DropdownMenu>

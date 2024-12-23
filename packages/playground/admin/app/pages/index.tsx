@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Binding } from '@app/lib/binding'
+import { Binding } from '~/lib/binding'
 
 export default () => {
 	return <Binding>Hello!</Binding>

@@ -1,13 +1,13 @@
-import { FormContainer, FormContainerProps } from '@app/lib/form'
+import { FormContainer, FormContainerProps } from '~/lib/form'
 import { ComponentProps, useState } from 'react'
-import { Input } from '@app/lib/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@app/lib/ui/select'
-import { cn } from '@app/lib/utils'
+import { Input } from '~/lib/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/lib/ui/select'
+import { cn } from '~/lib/utils'
 import * as React from 'react'
 import { FormFieldScope, FormInput, FormInputProps } from '@contember/react-form'
 import { Component, Field } from '@contember/react-binding'
 import { useField } from '@contember/react-binding'
-import { dict } from '@app/lib/dict'
+import { dict } from '~/lib/dict'
 
 export type SelectOrTypeFieldProps =
 	& Omit<FormInputProps, 'children'>

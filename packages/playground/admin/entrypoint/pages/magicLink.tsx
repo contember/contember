@@ -1,8 +1,8 @@
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@app/lib/ui/card'
-import { dict } from '@app/lib/dict'
-import { Loader } from '@app/lib/ui/loader'
-import { PasswordlessSignInFormFields } from '@app/lib/tenant/forms/passwordless-signin'
-import { AnchorButton } from '@app/lib/ui/button'
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '~/lib/ui/card'
+import { dict } from '~/lib/dict'
+import { Loader } from '~/lib/ui/loader'
+import { PasswordlessSignInFormFields } from '~/lib/tenant/forms/passwordless-signin'
+import { AnchorButton } from '~/lib/ui/button'
 import { Link, PasswordlessSignInForm, useCurrentRequest, usePasswordlessOtpActivator, useRedirect } from '@contember/interface'
 
 export default () => {

@@ -1,20 +1,4 @@
-import {
-	Component,
-	Field,
-	HasOne,
-	PRIMARY_KEY_NAME,
-	Schema,
-	SchemaColumnType,
-	SchemaEntity,
-	SchemaRelation,
-	useEntity,
-	useEntityPersistSuccess,
-	useEntitySubTreeLoader,
-	useEnvironment,
-} from '@contember/react-binding'
-import { Binding, DeleteEntityDialog, PersistButton } from '@app/lib/binding'
-import { EntitySubTree, Link, RedirectOnPersist } from '@contember/interface'
-import { AnchorButton, Button } from '@app/lib/ui/button'
+import { Binding, DeleteEntityDialog, PersistButton } from '~/lib/binding'
 import {
 	DataGrid,
 	DataGridActionColumn,
@@ -31,9 +15,7 @@ import {
 	DataGridTextColumn,
 	DataGridToolbar,
 	DataGridUuidColumn,
-} from '@app/lib/datagrid'
-import { PencilIcon, TrashIcon } from 'lucide-react'
-import { MouseEvent, ReactNode, useCallback, useMemo, useState } from 'react'
+} from '~/lib/datagrid'
 import {
 	CheckboxField,
 	InputField,
@@ -43,12 +25,32 @@ import {
 	SortableMultiSelectField,
 	StandaloneFormContainer,
 	TextareaField,
-} from '@app/lib/form'
-import { formatBoolean, formatDate, formatDateTime, formatNumber } from '@app/lib/formatting'
-import { Slots } from '@app/lib/layout'
-import { Dialog, DialogContent, DialogTrigger } from '@app/lib/ui/dialog'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@app/lib/ui/tooltip'
-import { Loader } from '@app/lib/ui/loader'
+} from '~/lib/form'
+import { formatBoolean, formatDate, formatDateTime, formatNumber } from '~/lib/formatting'
+import { Slots } from '~/lib/layout'
+import { AnchorButton, Button } from '~/lib/ui/button'
+import { Dialog, DialogContent, DialogTrigger } from '~/lib/ui/dialog'
+import { Loader } from '~/lib/ui/loader'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '~/lib/ui/tooltip'
+import {
+	Component,
+	EntitySubTree,
+	Field,
+	HasOne,
+	Link,
+	PRIMARY_KEY_NAME,
+	RedirectOnPersist,
+	Schema,
+	SchemaColumnType,
+	SchemaEntity,
+	SchemaRelation,
+	useEntity,
+	useEntityPersistSuccess,
+	useEntitySubTreeLoader,
+	useEnvironment,
+} from '@contember/interface'
+import { PencilIcon, TrashIcon } from 'lucide-react'
+import { MouseEvent, ReactNode, useCallback, useMemo, useState } from 'react'
 
 export const Index = () => {
 	return (
@@ -62,10 +64,11 @@ const EntityList = () => {
 	const env = useEnvironment()
 	const entities = env.getSchema().getEntityNames()
 	entities.sort()
+
 	return (
 		<div className="flex flex-col gap-1 items-start">
 			{entities.map(entityName => (
-				<Link key={entityName} to={`auto/list(entity: $entityName)`} parameters={{ entityName }}>
+				<Link key={entityName} to="auto/list(entity: $entityName)" parameters={{ entityName }}>
 					<AnchorButton variant="link">{entityName}</AnchorButton>
 				</Link>
 			))}
@@ -74,12 +77,16 @@ const EntityList = () => {
 }
 
 export const List = () => {
-	const entityName = useEnvironment().getParameter('entity') as string
+	const entityName = useEnvironment().getParameter('entity')
+
+	if (!entityName || typeof entityName === 'number') {
+		return <div>Entity not found</div>
+	}
 
 	return <>
 		<Binding>
 			<Slots.Actions>
-				<Link to={`auto/create(entity: $entityName)`} parameters={{ entityName }}>
+				<Link to="auto/create(entity: $entityName)" parameters={{ entityName }}>
 					<AnchorButton>New {entityName}</AnchorButton>
 				</Link>
 			</Slots.Actions>
@@ -97,7 +104,11 @@ export const List = () => {
 }
 
 export const Create = () => {
-	const entityName = useEnvironment().getParameter('entity') as string
+	const entityName = useEnvironment().getParameter('entity')
+
+	if (!entityName || typeof entityName === 'number') {
+		return <div>Entity not found</div>
+	}
 
 	return (
 		<Binding>
@@ -144,7 +155,7 @@ const EntityColumns = Component<{ entityName: string }>(({ entityName }, env) =>
 })
 
 
-const EntityEditDialog = ({ entityName }: {entityName: string}) => {
+const EntityEditDialog = ({ entityName }: { entityName: string }) => {
 	const [open, setOpen] = useState(false)
 	return (
 		<TooltipProvider>
@@ -158,7 +169,7 @@ const EntityEditDialog = ({ entityName }: {entityName: string}) => {
 						</DialogTrigger>
 					</TooltipTrigger>
 					<TooltipContent>
-						<Link to={`auto/edit(entity: $entityName, id: $entity.id)`} parameters={{ entityName }}>
+						<Link to="auto/edit(entity: $entityName, id: $entity.id)" parameters={{ entityName }}>
 							<AnchorButton size="sm" variant="ghost">
 								Open
 							</AnchorButton>
@@ -173,7 +184,7 @@ const EntityEditDialog = ({ entityName }: {entityName: string}) => {
 	)
 }
 
-const EntityEditContent = ({ entityName, close }: {entityName: string; close: () => void}) => {
+const EntityEditContent = ({ entityName, close }: { entityName: string; close: () => void }) => {
 	const entity = useEntity()
 	useEntityPersistSuccess(() => {
 		close()
@@ -186,7 +197,7 @@ const EntityEditContent = ({ entityName, close }: {entityName: string; close: ()
 	}), [entity.idOnServer, entityName])
 	const [result] = useEntitySubTreeLoader(params, <AutoFields />)
 	if (result.state !== 'loaded' || !result.entity) {
-		return <Loader position="static"/>
+		return <Loader position="static" />
 	}
 
 	return (
@@ -304,7 +315,8 @@ const EntityColumn = Component<{ entityName: string; fieldName: string }>(({ ent
 		const targetEntity = schema.getEntity(targetField.targetEntity)
 		const humanFieldName = getHumanFriendlyField(targetEntity)
 		let optionLabel = <EntityFieldLabel field={humanFieldName} />
-		optionLabel = connectingEntity ? <HasOne field={connectingEntity.field.name}>{optionLabel}</HasOne> : optionLabel
+		optionLabel = connectingEntity ?
+			<HasOne field={connectingEntity.field.name}>{optionLabel}</HasOne> : optionLabel
 
 		if (fieldSchema.type === 'OneHasOne' || fieldSchema.type === 'ManyHasOne') {
 			return (

@@ -1,4 +1,6 @@
-import { Binding } from '@app/lib/binding'
+import { Binding } from '~/lib/binding'
+import { Button } from '~/lib/ui/button'
+import { Loader } from '~/lib/ui/loader'
 import {
 	Component,
 	EntityListSubTree,
@@ -7,10 +9,8 @@ import {
 	TreeRootIdProvider,
 	useEntityListSubTreeLoader,
 	useEntitySubTreeLoader,
-} from '@contember/react-binding'
+} from '@contember/interface'
 import { useMemo } from 'react'
-import { Loader } from '@app/lib/ui/loader'
-import { Button } from '@app/lib/ui/button'
 
 export const Single = () => <>
 	<Binding>
@@ -25,21 +25,25 @@ const LoadSingle = () => {
 		{ entity }, // you may also pass "undefined" to load nothing
 		useMemo(() => (<Value />), []), // make sure the children is memoized
 	)
-	if (state.state === 'loaded' || state.state === 'refreshing') {
-		return (
-			<TreeRootIdProvider treeRootId={state.treeRootId}>
-				<div>
-					<Button onClick={reload} variant="secondary">Reload</Button>
-					<div>
-						<EntitySubTree entity={entity}>
-							<Value />
-						</EntitySubTree>
-					</div>
-				</div>
-			</TreeRootIdProvider>
-		)
+
+	const isContentReady = state.state === 'loaded' || state.state === 'refreshing'
+
+	if (!isContentReady) {
+		return <Loader position="static" />
 	}
-	return <Loader position="static" />
+
+	return (
+		<TreeRootIdProvider treeRootId={state.treeRootId}>
+			<div>
+				<Button onClick={reload} variant="secondary">Reload</Button>
+				<div>
+					<EntitySubTree entity={entity}>
+						<Value />
+					</EntitySubTree>
+				</div>
+			</div>
+		</TreeRootIdProvider>
+	)
 }
 
 export const Many = () => <>
@@ -54,23 +58,28 @@ const LoadMany = () => {
 		{ entities },  // you may also pass "undefined" to load nothing
 		useMemo(() => (<Value />), []), // make sure the children is memoized
 	)
-	if (state.state === 'loaded' || state.state === 'refreshing') {
-		return (
-			<TreeRootIdProvider treeRootId={state.treeRootId}>
-				<div>
-					<Button onClick={reload} variant="secondary">Reload</Button>
-					<div>
-						<EntityListSubTree entities={entities}>
-							<div>
-								<Value />
-							</div>
-						</EntityListSubTree>
-					</div>
-				</div>
-			</TreeRootIdProvider>
-		)
+
+	const isContentReady = state.state === 'loaded' || state.state === 'refreshing'
+
+	if (!isContentReady) {
+		return <Loader position="static" />
 	}
-	return <Loader position="static" />
+
+	return (
+		<TreeRootIdProvider treeRootId={state.treeRootId}>
+			<div>
+				<Button onClick={reload} variant="secondary">Reload</Button>
+				<div>
+					<EntityListSubTree entities={entities}>
+						<div>
+							<Value />
+						</div>
+					</EntityListSubTree>
+				</div>
+			</div>
+		</TreeRootIdProvider>
+	)
+
 }
 
 const Value = Component(() => <Field field="value" />)

@@ -15,7 +15,7 @@ import {
 	UserIcon,
 	UsersIcon,
 } from 'lucide-react'
-import { Menu, MenuItem } from '@app/lib/ui/menu'
+import { Menu, MenuItem } from '~/lib/ui/menu'
 
 
 export const Navigation = () => {

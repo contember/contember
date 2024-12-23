@@ -1,7 +1,7 @@
 import { BoardTaskStatus, ContemberClientEntities, ContemberClientEnums, GridArticleState, ContemberClientNames } from '../../api/client'
-import { createEnumFormatter } from '@app/lib/formatting'
+import { createEnumFormatter } from '~/lib/formatting'
 import { ReactNode } from 'react'
-import { EnumOptionsFormatter, FieldLabelFormatter } from '@app/lib/labels'
+import { EnumOptionsFormatter, FieldLabelFormatter } from '~/lib/labels'
 
 export const BoardTaskStatusLabels: Record<BoardTaskStatus, string> = {
 	backlog: 'Backlog',

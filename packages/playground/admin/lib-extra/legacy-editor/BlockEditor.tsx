@@ -1,5 +1,5 @@
 import { ReactNode, useCallback } from 'react'
-import { EditorCanvas, EditorEditableCanvas } from '@app/lib/editor'
+import { EditorCanvas, EditorEditableCanvas } from '~/lib/editor'
 import { BlockEditor, BlockEditorProps } from '@contember/react-slate-editor-legacy'
 import { Component } from '@contember/interface'
 import { SortableBlock } from './SortableBlock'

@@ -1,13 +1,12 @@
-import { Binding, PersistButton } from '@app/lib/binding'
-import { Slots } from '@app/lib/layout'
-import { DataGridTextColumn, DefaultDataGrid } from '@app/lib/datagrid'
-import { Link } from '@contember/react-routing'
-import { AnchorButton } from '@app/lib/ui/button'
-import { Component, EntitySubTree, EnvironmentMiddleware, Field, Variable } from '@contember/react-binding'
-import { CheckboxField, InputField, MultiSelectField, SelectField, SortableMultiSelectField, TextareaField } from '@app/lib/form'
-import { DefaultRepeater } from '@app/lib/repeater'
-import { SideDimensions } from '@app/lib/dimensions'
-import { SlugField } from '@app/lib-extra/slug-field/field'
+import { SlugField } from '~/lib-extra/slug-field/field'
+import { Binding, PersistButton } from '~/lib/binding'
+import { DataGridTextColumn, DefaultDataGrid } from '~/lib/datagrid'
+import { SideDimensions } from '~/lib/dimensions'
+import { CheckboxField, InputField, MultiSelectField, SelectField, TextareaField } from '~/lib/form'
+import { Slots } from '~/lib/layout'
+import { DefaultRepeater } from '~/lib/repeater'
+import { AnchorButton } from '~/lib/ui/button'
+import { Component, EntitySubTree, EnvironmentMiddleware, Field, Link, Variable } from '@contember/interface'
 import slugify from '@sindresorhus/slugify'
 
 export default () => <>
@@ -58,7 +57,7 @@ export const ArticleCreate = () => <>
 	<Binding>
 		<Slots.Title>Create article</Slots.Title>
 		<Slots.Actions>
-			<PersistButton/>
+			<PersistButton />
 			<Link to="form">
 				<AnchorButton>Back to list</AnchorButton>
 			</Link>
@@ -78,7 +77,7 @@ export const ArticleEdit = () => <>
 				<AnchorButton>Back to list</AnchorButton>
 			</Link>
 		</Slots.Actions>
-		<EntitySubTree entity="FormArticle(id=$id)">
+		<EntitySubTree entity="FormArticle(id = $id)">
 			<ArticleForm />
 		</EntitySubTree>
 	</Binding>
@@ -109,7 +108,7 @@ export const TagEdit = () => <>
 				<AnchorButton>Back to list</AnchorButton>
 			</Link>
 		</Slots.Actions>
-		<EntitySubTree entity="FormTag(id=$id)">
+		<EntitySubTree entity="FormTag(id = $id)">
 			<ArticleTagForm />
 		</EntitySubTree>
 	</Binding>
@@ -139,7 +138,7 @@ export const AuthorEdit = () => <>
 				<AnchorButton>Back to list</AnchorButton>
 			</Link>
 		</Slots.Actions>
-		<EntitySubTree entity="FormAuthor(id=$id)">
+		<EntitySubTree entity="FormAuthor(id = $id)">
 			<ArticleAuthorForm />
 		</EntitySubTree>
 	</Binding>
@@ -149,7 +148,7 @@ export const AuthorEdit = () => <>
 export const ArticleForm = Component(() => {
 	return <>
 		<EnvironmentMiddleware create={it => it.withDimensions({ locale: ['cs', 'en'] })}>
-			<SideDimensions dimension="locale" field="locales(locale=$currentLocale)" as="currentLocale">
+			<SideDimensions dimension="locale" field="locales(locale = $currentLocale)" as="currentLocale">
 				<h2 className="text-2xl"><Variable name="currentLocale" /></h2>
 				<ArticleLocaleForm />
 			</SideDimensions>
@@ -174,7 +173,7 @@ export const ArticleForm = Component(() => {
 
 export const ArticleLocaleForm = Component(() => {
 	return <>
-		<SelectField field="article"createNewForm={<ArticleForm />}>
+		<SelectField field="article" createNewForm={<ArticleForm />}>
 			<Field field="internalName" />
 		</SelectField>
 		<InputField field="title" required />

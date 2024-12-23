@@ -1,4 +1,4 @@
-import { Button } from '@app/lib/ui/button'
+import { Button } from '~/lib/ui/button'
 import { useContentMutation, useContentQuery } from '@contember/react-client-content'
 import { queryBuilder } from '../../../api/client'
 

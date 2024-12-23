@@ -1,7 +1,7 @@
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@app/lib/ui/card'
-import { dict } from '@app/lib/dict'
-import { PasswordResetRequestFormFields } from '@app/lib/tenant'
-import { AnchorButton } from '@app/lib/ui/button'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '~/lib/ui/card'
+import { dict } from '~/lib/dict'
+import { PasswordResetRequestFormFields } from '~/lib/tenant'
+import { AnchorButton } from '~/lib/ui/button'
 import { Link, PasswordResetRequestForm, useRedirect } from '@contember/interface'
 
 

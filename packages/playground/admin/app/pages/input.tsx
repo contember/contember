@@ -185,18 +185,18 @@ export const clientValidation = () => <>
 </>
 
 
-export const slug = () => <>
+export const Slug = () => <>
 	<Binding>
 		<Slots.Actions>
 			<PersistButton />
 		</Slots.Actions>
-		<EntitySubTree entity={'Slug(unique=unique)'} setOnCreate={'(unique=unique)'}>
-			<div className={'space-y-4'}>
-				<InputField field={'title'} label={'Title'} />
+		<EntitySubTree entity="Slug(unique = unique)" setOnCreate="(unique = unique)">
+			<div className="space-y-4">
+				<InputField field="title" label="Title" />
 				<SlugField
 					slugify={slugify}
-					field={'slug'}
-					label={'Slug'}
+					field="slug"
+					label="Slug"
 					derivedFrom="title"
 					unpersistedHardPrefix="http://google.com"
 					persistedHardPrefix="/article/"
@@ -208,7 +208,7 @@ export const slug = () => <>
 </>
 
 
-export const serverRules = () => <>
+export const ServerRules = () => <>
 	<Binding>
 		<Slots.Actions>
 			<PersistButton />

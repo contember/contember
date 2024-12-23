@@ -1,13 +1,13 @@
-import { Loader } from '@app/lib/ui/loader'
-import { Overlay } from '@app/lib/ui/overlay'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@app/lib/ui/card'
+import { Loader } from '~/lib/ui/loader'
+import { Overlay } from '~/lib/ui/overlay'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/lib/ui/card'
 import { CircleAlert } from 'lucide-react'
-import { dict } from '@app/lib/dict'
-import { Button } from '@app/lib/ui/button'
+import { dict } from '~/lib/dict'
+import { Button } from '~/lib/ui/button'
 import { useEffect } from 'react'
 import { IdentityProvider, IdentityState, LogoutTrigger, useIdentity } from '@contember/interface'
-import { Login } from '@app/entrypoint/components/login'
-import { entrypointConfig } from '@app/entrypoint/config'
+import { Login } from '~/entrypoint/components/login'
+import { entrypointConfig } from '~/entrypoint/config'
 
 export default () => {
 	return (

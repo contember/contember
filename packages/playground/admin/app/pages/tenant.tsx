@@ -1,9 +1,9 @@
 import { ChangeMyPasswordForm, CreateApiKeyForm, InviteForm } from '@contember/react-identity'
-import { Card, CardContent, CardHeader, CardTitle } from '@app/lib/ui/card'
-import { ApiKeyList, ChangeMyPasswordFormFields, CreateApiKeyFormFields, InviteFormFields, MemberListController, OtpSetup, PersonList } from '@app/lib/tenant'
-import { ToastContent, useShowToast } from '@app/lib/toast'
+import { Card, CardContent, CardHeader, CardTitle } from '~/lib/ui/card'
+import { ApiKeyList, ChangeMyPasswordFormFields, CreateApiKeyFormFields, InviteFormFields, MemberListController, OtpSetup, PersonList } from '~/lib/tenant'
+import { ToastContent, useShowToast } from '~/lib/toast'
 import { useProjectSlug } from '@contember/react-client'
-import { Input } from '@app/lib/ui/input'
+import { Input } from '~/lib/ui/input'
 import { useRef } from 'react'
 
 export const Security = () => {

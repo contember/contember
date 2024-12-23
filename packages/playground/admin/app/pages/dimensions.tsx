@@ -1,10 +1,10 @@
-import { Slots } from '@app/lib/layout'
-import { Binding, PersistButton } from '@app/lib/binding'
+import { Slots } from '~/lib/layout'
+import { Binding, PersistButton } from '~/lib/binding'
 import * as React from 'react'
-import { DimensionsSwitcher, SideDimensions } from '@app/lib/dimensions'
+import { DimensionsSwitcher, SideDimensions } from '~/lib/dimensions'
 import { EntitySubTree, Field, Variable } from '@contember/interface'
-import { InputField, TextareaField } from '@app/lib/form'
-import { Card, CardContent, CardHeader, CardTitle } from '@app/lib/ui/card'
+import { InputField, TextareaField } from '~/lib/form'
+import { Card, CardContent, CardHeader, CardTitle } from '~/lib/ui/card'
 
 export default () => {
 	return <>
@@ -21,8 +21,8 @@ export default () => {
 
 		<Binding>
 			<Slots.Actions><PersistButton /></Slots.Actions>
-			<EntitySubTree entity="DimensionsItem(unique=unique)">
-				<SideDimensions dimension="locale" as="currentLocale" field="locales(locale.code=$currentLocale)">
+			<EntitySubTree entity="DimensionsItem(unique = unique)">
+				<SideDimensions dimension="locale" as="currentLocale" field="locales(locale.code = $currentLocale)">
 					<Card>
 						<CardHeader>
 							<CardTitle><Variable name="currentLocale" /></CardTitle>

@@ -1,5 +1,5 @@
-import { Binding, PersistButton } from '@app/lib/binding'
-import { Slots } from '@app/lib/layout'
+import { Binding, PersistButton } from '~/lib/binding'
+import { Slots } from '~/lib/layout'
 import * as React from 'react'
 import { Component, EntitySubTree, FieldView, HasMany, HasOne, useEntity } from '@contember/interface'
 import {
@@ -14,7 +14,7 @@ import {
 	EmbedHandlers,
 	referenceElementType,
 } from '@contember/react-slate-editor-legacy'
-import { Toggle } from '@app/lib/ui/toggle'
+import { Toggle } from '~/lib/ui/toggle'
 import {
 	AlignCenterIcon,
 	AlignJustifyIcon,
@@ -60,13 +60,13 @@ import {
 	underlineMark,
 	unorderedListElementType,
 } from '@contember/react-slate-editor'
-import { ImageField, InputField } from '@app/lib/form'
-import { Popover, PopoverContent, PopoverTrigger } from '@app/lib/ui/popover'
-import { Button } from '@app/lib/ui/button'
+import { ImageField, InputField } from '~/lib/form'
+import { Popover, PopoverContent, PopoverTrigger } from '~/lib/ui/popover'
+import { Button } from '~/lib/ui/button'
 import { PopoverClose } from '@radix-ui/react-popover'
-import { uic } from '@app/lib/utils'
+import { uic } from '~/lib/utils'
 import { useSlateStatic } from 'slate-react'
-import { baseEditorPlugins, EditorBlockToolbar, EditorInlineToolbar } from '@app/lib/editor'
+import { baseEditorPlugins, EditorBlockToolbar, EditorInlineToolbar } from '~/lib/editor'
 import { BlockEditorField } from '../../lib-extra/legacy-editor/BlockEditor'
 
 

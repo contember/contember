@@ -1,5 +1,5 @@
-import { Dialog, DialogContent, useDialogOpenState } from '@app/lib/ui/dialog'
-import { Button } from '@app/lib/ui/button'
+import { Dialog, DialogContent, useDialogOpenState } from '~/lib/ui/dialog'
+import { Button } from '~/lib/ui/button'
 
 export default () => {
 	return <>

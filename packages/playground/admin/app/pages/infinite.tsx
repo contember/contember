@@ -1,5 +1,5 @@
-import { Binding } from '@app/lib/binding'
-import { Slots } from '@app/lib/layout'
+import { Binding } from '~/lib/binding'
+import { Slots } from '~/lib/layout'
 import * as React from 'react'
 import { Fragment } from 'react'
 import {
@@ -10,9 +10,9 @@ import {
 	DataViewInfiniteLoadTrigger,
 } from '@contember/react-dataview'
 import { Field } from '@contember/interface'
-import { Button } from '@app/lib/ui/button'
-import { DataGridLoader, DataGridPagination, DataGridToolbar } from '@app/lib/datagrid'
-import { Card, CardHeader, CardTitle } from '@app/lib/ui/card'
+import { Button } from '~/lib/ui/button'
+import { DataGridLoader, DataGridPagination, DataGridToolbar } from '~/lib/datagrid'
+import { Card, CardHeader, CardTitle } from '~/lib/ui/card'
 
 export default () => {
 	return <>

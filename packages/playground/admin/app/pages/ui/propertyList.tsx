@@ -1,4 +1,4 @@
-import { PropertyItem, PropertyList } from '@app/lib/ui/property-list'
+import { PropertyItem, PropertyList } from '~/lib/ui/property-list'
 
 export default () => {
 	return (<>

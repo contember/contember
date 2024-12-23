@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@app/lib/ui/card'
-import { dict } from '@app/lib/dict'
-import { PasswordlessSignInFormFields } from '@app/lib/tenant/forms/passwordless-signin'
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '~/lib/ui/card'
+import { dict } from '~/lib/dict'
+import { PasswordlessSignInFormFields } from '~/lib/tenant/forms/passwordless-signin'
 import { MailIcon } from 'lucide-react'
-import { AnchorButton } from '@app/lib/ui/button'
+import { AnchorButton } from '~/lib/ui/button'
 import { Link, useCurrentRequest, useRedirect } from '@contember/interface'
 import { PasswordlessSignInForm } from '@contember/react-identity'
 

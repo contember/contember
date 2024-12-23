@@ -1,9 +1,9 @@
 import { ContemberClient } from '@contember/react-client'
 import { PageModule, RoutingProvider } from '@contember/react-routing'
 import { Pages } from '@contember/interface'
-import { Toaster } from '@app/lib/toast'
-import { Layout } from '@app/entrypoint/components/layout'
-import { entrypointConfig } from '@app/entrypoint/config'
+import { Toaster } from '~/lib/toast'
+import { Layout } from '~/entrypoint/components/layout'
+import { entrypointConfig } from '~/entrypoint/config'
 
 
 export const Entrypoint = () => (<>

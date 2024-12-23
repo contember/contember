@@ -1,7 +1,14 @@
-import { PropertyItem, PropertyList } from '@app/lib/ui/property-list'
+import { BrushIcon } from 'lucide-react'
+import { Title } from '~/app/components/title'
+import { Slots } from '~/lib/layout'
+import { PropertyItem, PropertyList } from '~/lib/ui/property-list'
 
-export default () => {
-	return (<>
+export default () => (
+	<>
+		<Slots.Title>
+			<Title icon={<BrushIcon />}>Property list</Title>
+		</Slots.Title>
+
 		<PropertyList>
 			<PropertyItem label="Name">
 				John Doe
@@ -13,5 +20,5 @@ export default () => {
 				Office
 			</PropertyItem>
 		</PropertyList>
-	</>)
-}
+	</>
+)

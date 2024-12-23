@@ -1,20 +1,6 @@
-import {
-	Component,
-	Field,
-	HasOne,
-	PRIMARY_KEY_NAME,
-	Schema,
-	SchemaColumnType,
-	SchemaEntity,
-	SchemaRelation,
-	useEntity,
-	useEntityPersistSuccess,
-	useEntitySubTreeLoader,
-	useEnvironment,
-} from '@contember/react-binding'
-import { Binding, DeleteEntityDialog, PersistButton } from '@app/lib/binding'
-import { EntitySubTree, Link, RedirectOnPersist } from '@contember/interface'
-import { AnchorButton, Button } from '@app/lib/ui/button'
+import { Title } from '~/app/components/title'
+import { Binding, DeleteEntityDialog, PersistButton } from '~/lib/binding'
+import { BackButton } from '~/lib/buttons'
 import {
 	DataGrid,
 	DataGridActionColumn,
@@ -31,9 +17,7 @@ import {
 	DataGridTextColumn,
 	DataGridToolbar,
 	DataGridUuidColumn,
-} from '@app/lib/datagrid'
-import { PencilIcon, TrashIcon } from 'lucide-react'
-import { MouseEvent, ReactNode, useCallback, useMemo, useState } from 'react'
+} from '~/lib/datagrid'
 import {
 	CheckboxField,
 	InputField,
@@ -43,16 +27,40 @@ import {
 	SortableMultiSelectField,
 	StandaloneFormContainer,
 	TextareaField,
-} from '@app/lib/form'
-import { formatBoolean, formatDate, formatDateTime, formatNumber } from '@app/lib/formatting'
-import { Slots } from '@app/lib/layout'
-import { Dialog, DialogContent, DialogTrigger } from '@app/lib/ui/dialog'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@app/lib/ui/tooltip'
-import { Loader } from '@app/lib/ui/loader'
+} from '~/lib/form'
+import { formatBoolean, formatDate, formatDateTime, formatNumber } from '~/lib/formatting'
+import { Slots } from '~/lib/layout'
+import { AnchorButton, Button } from '~/lib/ui/button'
+import { Dialog, DialogContent, DialogTrigger } from '~/lib/ui/dialog'
+import { Loader } from '~/lib/ui/loader'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '~/lib/ui/tooltip'
+import {
+	Component,
+	EntitySubTree,
+	Field,
+	HasOne,
+	Link,
+	PRIMARY_KEY_NAME,
+	RedirectOnPersist,
+	Schema,
+	SchemaColumnType,
+	SchemaEntity,
+	SchemaRelation,
+	useEntity,
+	useEntityPersistSuccess,
+	useEntitySubTreeLoader,
+	useEnvironment,
+} from '@contember/interface'
+import { DatabaseIcon, PencilIcon, TrashIcon } from 'lucide-react'
+import { MouseEvent, ReactNode, useCallback, useMemo, useState } from 'react'
 
 export const Index = () => {
 	return (
 		<Binding>
+			<Slots.Title>
+				<Title icon={<DatabaseIcon />}>Auto CRUD</Title>
+			</Slots.Title>
+
 			<EntityList />
 		</Binding>
 	)
@@ -62,10 +70,11 @@ const EntityList = () => {
 	const env = useEnvironment()
 	const entities = env.getSchema().getEntityNames()
 	entities.sort()
+
 	return (
 		<div className="flex flex-col gap-1 items-start">
 			{entities.map(entityName => (
-				<Link key={entityName} to={`auto/list(entity: $entityName)`} parameters={{ entityName }}>
+				<Link key={entityName} to="auto/list(entity: $entityName)" parameters={{ entityName }}>
 					<AnchorButton variant="link">{entityName}</AnchorButton>
 				</Link>
 			))}
@@ -74,15 +83,28 @@ const EntityList = () => {
 }
 
 export const List = () => {
-	const entityName = useEnvironment().getParameter('entity') as string
+	const entityName = useEnvironment().getParameter('entity')
+
+	if (!entityName || typeof entityName === 'number') {
+		return <div>Entity not found</div>
+	}
 
 	return <>
 		<Binding>
+			<Slots.Back>
+				<BackButton />
+			</Slots.Back>
+
+			<Slots.Title>
+				<Title>{entityName}</Title>
+			</Slots.Title>
+
 			<Slots.Actions>
-				<Link to={`auto/create(entity: $entityName)`} parameters={{ entityName }}>
+				<Link to="auto/create(entity: $entityName)" parameters={{ entityName }}>
 					<AnchorButton>New {entityName}</AnchorButton>
 				</Link>
 			</Slots.Actions>
+
 			<DataGrid entities={entityName}>
 				<DataGridToolbar />
 				<DataGridLoader>
@@ -97,13 +119,26 @@ export const List = () => {
 }
 
 export const Create = () => {
-	const entityName = useEnvironment().getParameter('entity') as string
+	const entityName = useEnvironment().getParameter('entity')
+
+	if (!entityName || typeof entityName === 'number') {
+		return <div>Entity not found</div>
+	}
 
 	return (
 		<Binding>
+			<Slots.Back>
+				<BackButton />
+			</Slots.Back>
+
+			<Slots.Title>
+				<Title>New {entityName}</Title>
+			</Slots.Title>
+
 			<Slots.Actions>
 				<PersistButton />
 			</Slots.Actions>
+
 			<EntitySubTree entity={entityName} isCreating>
 				<RedirectOnPersist to={`auto/list(entity: "${entityName}")`} />
 				<AutoFields />
@@ -117,10 +152,19 @@ export const Edit = () => {
 
 	return (
 		<Binding>
+			<Slots.Back>
+				<BackButton />
+			</Slots.Back>
+
+			<Slots.Title>
+				<Title>Edit {entityName}</Title>
+			</Slots.Title>
+
 			<Slots.Actions>
 				<PersistButton />
 			</Slots.Actions>
-			<EntitySubTree entity={`${entityName}(id=$id)`}>
+
+			<EntitySubTree entity={`${entityName}(id = $id)`}>
 				<RedirectOnPersist to={`auto/list(entity: "${entityName}")`} />
 				<AutoFields />
 			</EntitySubTree>
@@ -130,6 +174,7 @@ export const Edit = () => {
 
 const EntityColumns = Component<{ entityName: string }>(({ entityName }, env) => {
 	const entitySchema = env.getSchema().getEntity(entityName)
+
 	return (<>
 		<DataGridActionColumn>
 			<EntityEditDialog entityName={entityName} />
@@ -144,8 +189,9 @@ const EntityColumns = Component<{ entityName: string }>(({ entityName }, env) =>
 })
 
 
-const EntityEditDialog = ({ entityName }: {entityName: string}) => {
+const EntityEditDialog = ({ entityName }: { entityName: string }) => {
 	const [open, setOpen] = useState(false)
+
 	return (
 		<TooltipProvider>
 			<Dialog open={open} onOpenChange={setOpen}>
@@ -158,7 +204,7 @@ const EntityEditDialog = ({ entityName }: {entityName: string}) => {
 						</DialogTrigger>
 					</TooltipTrigger>
 					<TooltipContent>
-						<Link to={`auto/edit(entity: $entityName, id: $entity.id)`} parameters={{ entityName }}>
+						<Link to="auto/edit(entity: $entityName, id: $entity.id)" parameters={{ entityName }}>
 							<AnchorButton size="sm" variant="ghost">
 								Open
 							</AnchorButton>
@@ -173,7 +219,7 @@ const EntityEditDialog = ({ entityName }: {entityName: string}) => {
 	)
 }
 
-const EntityEditContent = ({ entityName, close }: {entityName: string; close: () => void}) => {
+const EntityEditContent = ({ entityName, close }: { entityName: string; close: () => void }) => {
 	const entity = useEntity()
 	useEntityPersistSuccess(() => {
 		close()
@@ -185,8 +231,9 @@ const EntityEditContent = ({ entityName, close }: {entityName: string; close: ()
 		} as const,
 	}), [entity.idOnServer, entityName])
 	const [result] = useEntitySubTreeLoader(params, <AutoFields />)
+
 	if (result.state !== 'loaded' || !result.entity) {
-		return <Loader position="static"/>
+		return <Loader position="static" />
 	}
 
 	return (
@@ -203,97 +250,87 @@ const EntityColumn = Component<{ entityName: string; fieldName: string }>(({ ent
 	const fieldSchema = schema.getEntityField(entityName, fieldName)
 
 	if (fieldSchema.__typename === '_Column') {
-		if (fieldSchema.type === 'String') {
-			return (
-				<DataGridTextColumn
-					header={fieldSchema.name}
-					field={fieldSchema.name}
-					format={it => (
-						<ClickToEdit
-							view={formatString(fieldSchema.type, it)}
-							edit={<TextareaField field={fieldSchema.name} label={undefined} />}
-						/>
-					)}
-				/>
-			)
+		switch (fieldSchema.type) {
+			case 'String':
+				return (
+					<DataGridTextColumn
+						header={fieldSchema.name}
+						field={fieldSchema.name}
+						format={it => (
+							<ClickToEdit
+								view={formatString(fieldSchema.type, it)}
+								edit={<TextareaField field={fieldSchema.name} label={undefined} />}
+							/>
+						)}
+					/>
+				)
+			case 'Uuid':
+				return <DataGridUuidColumn header={fieldSchema.name} field={fieldSchema.name} />
+			case 'Bool':
+				return (
+					<DataGridBooleanColumn
+						header={fieldSchema.name}
+						field={fieldSchema.name}
+						format={it => (
+							<ClickToEdit
+								view={formatBoolean(it)}
+								edit={<CheckboxField field={fieldSchema.name} label={undefined} />}
+							/>
+						)}
+					/>
+				)
+			case 'Enum':
+				const enumValues = schema.getEnumValues(fieldSchema.enumName!)
 
-		} else if (fieldSchema.type === 'Uuid') {
-			return (
-				<DataGridUuidColumn
-					header={fieldSchema.name}
-					field={fieldSchema.name}
-				/>
-			)
-
-		} else if (fieldSchema.type === 'Bool') {
-			return (
-				<DataGridBooleanColumn
-					header={fieldSchema.name}
-					field={fieldSchema.name}
-					format={it => (
-						<ClickToEdit
-							view={formatBoolean(it)}
-							edit={<CheckboxField field={fieldSchema.name} label={undefined} />}
-						/>
-					)}
-				/>
-			)
-
-		} else if (fieldSchema.type === 'Enum') {
-			const enumValues = schema.getEnumValues(fieldSchema.enumName!)
-
-			return (
-				<DataGridEnumColumn
-					header={fieldSchema.name}
-					field={fieldSchema.name}
-					options={Object.fromEntries(enumValues.map(it => [it, it]))}
-				/>
-			)
-
-		} else if (fieldSchema.type === 'Integer' || fieldSchema.type === 'Double') {
-			return (
-				<DataGridNumberColumn
-					header={fieldSchema.name}
-					field={fieldSchema.name}
-					format={it => (
-						<ClickToEdit
-							view={formatNumber(it)}
-							edit={<InputField field={fieldSchema.name} label={undefined} />}
-						/>
-					)}
-				/>
-			)
-
-		} else if (fieldSchema.type === 'Date') {
-			return (
-				<DataGridDateColumn
-					header={fieldSchema.name}
-					field={fieldSchema.name}
-					format={it => (
-						<ClickToEdit
-							view={formatDate(it)}
-							edit={<InputField field={fieldSchema.name} label={undefined} />}
-						/>
-					)}
-				/>
-			)
-
-		} else if (fieldSchema.type === 'DateTime') {
-			return (
-				<DataGridDateTimeColumn
-					header={fieldSchema.name}
-					field={fieldSchema.name}
-					format={it => (
-						<ClickToEdit
-							view={formatDateTime(it)}
-							edit={<InputField field={fieldSchema.name} label={undefined} />}
-						/>
-					)}
-				/>
-			)
-
-		} else {
-			return <></>
+				return (
+					<DataGridEnumColumn
+						header={fieldSchema.name}
+						field={fieldSchema.name}
+						options={Object.fromEntries(enumValues.map(it => [it, it]))}
+					/>
+				)
+			case 'Integer':
+			case 'Double':
+				return (
+					<DataGridNumberColumn
+						header={fieldSchema.name}
+						field={fieldSchema.name}
+						format={it => (
+							<ClickToEdit
+								view={formatNumber(it)}
+								edit={<InputField field={fieldSchema.name} label={undefined} />}
+							/>
+						)}
+					/>
+				)
+			case 'Date':
+				return (
+					<DataGridDateColumn
+						header={fieldSchema.name}
+						field={fieldSchema.name}
+						format={it => (
+							<ClickToEdit
+								view={formatDate(it)}
+								edit={<InputField field={fieldSchema.name} label={undefined} />}
+							/>
+						)}
+					/>
+				)
+			case 'DateTime':
+				return (
+					<DataGridDateTimeColumn
+						header={fieldSchema.name}
+						field={fieldSchema.name}
+						format={it => (
+							<ClickToEdit
+								view={formatDateTime(it)}
+								edit={<InputField field={fieldSchema.name} label={undefined} />}
+							/>
+						)}
+					/>
+				)
+			default:
+				return null
 		}
 
 	} else {
@@ -304,7 +341,8 @@ const EntityColumn = Component<{ entityName: string; fieldName: string }>(({ ent
 		const targetEntity = schema.getEntity(targetField.targetEntity)
 		const humanFieldName = getHumanFriendlyField(targetEntity)
 		let optionLabel = <EntityFieldLabel field={humanFieldName} />
-		optionLabel = connectingEntity ? <HasOne field={connectingEntity.field.name}>{optionLabel}</HasOne> : optionLabel
+		optionLabel = connectingEntity ?
+			<HasOne field={connectingEntity.field.name}>{optionLabel}</HasOne> : optionLabel
 
 		if (fieldSchema.type === 'OneHasOne' || fieldSchema.type === 'ManyHasOne') {
 			return (
@@ -355,97 +393,90 @@ const EntityField = Component<AutoFieldProps>(
 
 			if (field.name === 'id') {
 				return <InputField {...common} inputProps={{ readOnly: true }} />
-
-			} else if (field.type === 'String') {
-				return <TextareaField {...common} inputProps={{ minRows: 1 }} />
-
-			} else if (field.type === 'Uuid') {
-				return <InputField {...common} />
-
-			} else if (field.type === 'Bool') {
-				return <CheckboxField {...common} />
-
-			} else if (field.type === 'Integer') {
-				return <InputField {...common} />
-
-			} else if (field.type === 'Double') {
-				return <InputField {...common} />
-
-			} else if (field.type === 'Date') {
-				return <InputField {...common} />
-
-			} else if (field.type === 'DateTime') {
-				return <InputField {...common} />
-
-			} else if (field.type === 'Enum') {
-				const enumValues = schema.getEnumValues(field.enumName!)
-				const options = Object.fromEntries(enumValues.map(it => [it, it]))
-				return <SelectEnumField {...common} options={options} />
-
-			} else if (field.type === 'Json') {
-				return (
-					<TextareaField {...common} inputProps={{ minRows: 1 }} />
-				)
-			} else {
-				return <StandaloneFormContainer label={field.name}>Unsupported field type {field.type}</StandaloneFormContainer>
 			}
 
-		} else {
-			const sortableBy = resolveSortableBy(schema, field)
-			const connectingEntity = resolveConnectingEntity(schema, field, sortableBy)
+			switch (field.type) {
+				case 'String':
+					return <TextareaField {...common} inputProps={{ minRows: 1 }} />
+				case 'Uuid':
+					return <InputField {...common} />
+				case 'Bool':
+					return <CheckboxField {...common} />
+				case 'Integer':
+					return <InputField {...common} />
+				case 'Double':
+					return <InputField {...common} />
+				case 'Date':
+					return <InputField {...common} />
+				case 'DateTime':
+					return <InputField {...common} />
+				case 'Enum':
+					const enumValues = schema.getEnumValues(field.enumName!)
+					const options = Object.fromEntries(enumValues.map(it => [it, it]))
 
-			const targetField = connectingEntity ? connectingEntity.field : field
-			const targetEntity = schema.getEntity(targetField.targetEntity)
-			const humanFieldName = getHumanFriendlyField(targetEntity)
-			const optionLabel = <EntityFieldLabel field={humanFieldName} />
-			const otherSide = targetField.side === 'owning' ? targetField.inversedBy : targetField.ownedBy
-			const excludedFields = [otherSide, sortableBy].filter(it => it) as string[]
-
-			const createNewForm = excludedEntities === undefined || !excludedEntities.includes(targetEntity.name)
-				? <AutoFields excludedFields={excludedFields} excludedEntities={excludedEntities} />
-				: undefined
-
-			if (field.type === 'OneHasOne' || field.type === 'ManyHasOne') {
-				return (
-					<SelectField
-						field={field.name}
-						label={field.name}
-						options={targetEntity.name}
-						queryField={[humanFieldName]}
-						createNewForm={createNewForm}
-					>
-						{optionLabel}
-					</SelectField>
-				)
-
-			} else if (connectingEntity && sortableBy) {
-				return (
-					<SortableMultiSelectField
-						field={field.name}
-						label={field.name}
-						options={targetEntity.name}
-						queryField={[humanFieldName]}
-						sortableBy={sortableBy}
-						createNewForm={createNewForm}
-						connectAt={connectingEntity.field.name}
-					>
-						{optionLabel}
-					</SortableMultiSelectField>
-				)
-			} else {
-				return (
-					<MultiSelectField
-						field={field.name}
-						label={field.name}
-						options={targetEntity.name}
-						queryField={[humanFieldName]}
-						createNewForm={createNewForm}
-					>
-						{optionLabel}
-					</MultiSelectField>
-				)
+					return <SelectEnumField {...common} options={options} />
+				case 'Json':
+					return <TextareaField {...common} inputProps={{ minRows: 1 }} />
+				default:
+					return <StandaloneFormContainer label={field.name}>Unsupported field type {field.type}</StandaloneFormContainer>
 			}
 		}
+
+		const sortableBy = resolveSortableBy(schema, field)
+		const connectingEntity = resolveConnectingEntity(schema, field, sortableBy)
+
+		const targetField = connectingEntity ? connectingEntity.field : field
+		const targetEntity = schema.getEntity(targetField.targetEntity)
+		const humanFieldName = getHumanFriendlyField(targetEntity)
+		const optionLabel = <EntityFieldLabel field={humanFieldName} />
+		const otherSide = targetField.side === 'owning' ? targetField.inversedBy : targetField.ownedBy
+		const excludedFields = [otherSide, sortableBy].filter(it => it) as string[]
+
+		const createNewForm = excludedEntities === undefined || !excludedEntities.includes(targetEntity.name)
+			? <AutoFields excludedFields={excludedFields} excludedEntities={excludedEntities} />
+			: undefined
+
+		if (field.type === 'OneHasOne' || field.type === 'ManyHasOne') {
+			return (
+				<SelectField
+					field={field.name}
+					label={field.name}
+					options={targetEntity.name}
+					queryField={[humanFieldName]}
+					createNewForm={createNewForm}
+				>
+					{optionLabel}
+				</SelectField>
+			)
+		}
+
+		if (connectingEntity && sortableBy) {
+			return (
+				<SortableMultiSelectField
+					field={field.name}
+					label={field.name}
+					options={targetEntity.name}
+					queryField={[humanFieldName]}
+					sortableBy={sortableBy}
+					createNewForm={createNewForm}
+					connectAt={connectingEntity.field.name}
+				>
+					{optionLabel}
+				</SortableMultiSelectField>
+			)
+		}
+
+		return (
+			<MultiSelectField
+				field={field.name}
+				label={field.name}
+				options={targetEntity.name}
+				queryField={[humanFieldName]}
+				createNewForm={createNewForm}
+			>
+				{optionLabel}
+			</MultiSelectField>
+		)
 	},
 )
 

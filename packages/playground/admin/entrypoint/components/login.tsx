@@ -1,10 +1,10 @@
-import { ToastContent, useShowToast } from '@app/lib/toast'
-import { dict } from '@app/lib/dict'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@app/lib/ui/card'
-import { AnchorButton, Button } from '@app/lib/ui/button'
-import { LoginFormFields } from '@app/lib/tenant'
-import { PasswordlessSignInInitFormFields } from '@app/lib/tenant/forms/passwordless-signin-init'
-import { Loader } from '@app/lib/ui/loader'
+import { ToastContent, useShowToast } from '~/lib/toast'
+import { dict } from '~/lib/dict'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/lib/ui/card'
+import { AnchorButton, Button } from '~/lib/ui/button'
+import { LoginFormFields } from '~/lib/tenant'
+import { PasswordlessSignInInitFormFields } from '~/lib/tenant/forms/passwordless-signin-init'
+import { Loader } from '~/lib/ui/loader'
 import { IDP, IDPInitTrigger, IDPState, LoginForm, PasswordlessSignInInitForm, useRedirect } from '@contember/interface'
 
 export const Login = ({ idps, hasTokenFromEnv, appUrl, magicLink }: {

@@ -3,11 +3,11 @@ import { BlockProps, EditorWithBlocks, EmbedHandler, getDiscriminatedBlock, getD
 import { memo, MouseEvent as ReactMouseEvent, ReactNode, useCallback } from 'react'
 import { Transforms } from 'slate'
 import { ReactEditor, RenderElementProps, useSelected, useSlateStatic } from 'slate-react'
-import { Card, CardContent, CardHeader, CardTitle } from '@app/lib/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '~/lib/ui/card'
 import { PencilIcon, TrashIcon } from 'lucide-react'
-import { Button } from '@app/lib/ui/button'
-import { Popover, PopoverContent, PopoverTrigger } from '@app/lib/ui/popover'
-import { BlockElement } from '@app/lib/editor'
+import { Button } from '~/lib/ui/button'
+import { Popover, PopoverContent, PopoverTrigger } from '~/lib/ui/popover'
+import { BlockElement } from '~/lib/editor'
 
 export interface ReferenceElementRendererProps extends RenderElementProps, ReferenceElementOptions {
 	element: ReferenceElement

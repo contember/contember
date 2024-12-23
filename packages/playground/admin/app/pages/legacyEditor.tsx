@@ -1,6 +1,6 @@
-import { Binding, PersistButton } from '@app/lib/binding'
-import { Slots } from '@app/lib/layout'
-import * as React from 'react'
+import { Title } from '~/app/components/title'
+import { Binding, PersistButton } from '~/lib/binding'
+import { Slots } from '~/lib/layout'
 import { Component, EntitySubTree, FieldView, HasMany, HasOne, useEntity } from '@contember/interface'
 import {
 	Block,
@@ -14,7 +14,7 @@ import {
 	EmbedHandlers,
 	referenceElementType,
 } from '@contember/react-slate-editor-legacy'
-import { Toggle } from '@app/lib/ui/toggle'
+import { Toggle } from '~/lib/ui/toggle'
 import {
 	AlignCenterIcon,
 	AlignJustifyIcon,
@@ -33,7 +33,7 @@ import {
 	ListIcon,
 	ListOrderedIcon,
 	LocateIcon,
-	MinusIcon,
+	MinusIcon, PencilIcon,
 	PilcrowIcon,
 	QuoteIcon,
 	StrikethroughIcon,
@@ -60,14 +60,14 @@ import {
 	underlineMark,
 	unorderedListElementType,
 } from '@contember/react-slate-editor'
-import { ImageField, InputField } from '@app/lib/form'
-import { Popover, PopoverContent, PopoverTrigger } from '@app/lib/ui/popover'
-import { Button } from '@app/lib/ui/button'
+import { ImageField, InputField } from '~/lib/form'
+import { Popover, PopoverContent, PopoverTrigger } from '~/lib/ui/popover'
+import { Button } from '~/lib/ui/button'
 import { PopoverClose } from '@radix-ui/react-popover'
-import { uic } from '@app/lib/utils'
+import { uic } from '~/lib/utils'
 import { useSlateStatic } from 'slate-react'
-import { baseEditorPlugins, EditorBlockToolbar, EditorInlineToolbar } from '@app/lib/editor'
-import { BlockEditorField } from '../../lib-extra/legacy-editor/BlockEditor'
+import { baseEditorPlugins, EditorBlockToolbar, EditorInlineToolbar } from '~/lib/editor'
+import { BlockEditorField } from '~/lib-extra/legacy-editor/BlockEditor'
 
 
 const BlockButton = uic('button', {
@@ -76,15 +76,20 @@ const BlockButton = uic('button', {
 
 const plugins = baseEditorPlugins
 
-export const blocks = () => <>
+export const Blocks = () => <>
 	<Binding>
+		<Slots.Title>
+			<Title icon={<PencilIcon />}>Legacy block editor</Title>
+		</Slots.Title>
+
 		<Slots.Actions>
 			<PersistButton />
 		</Slots.Actions>
-		<EntitySubTree entity={'LegacyEditorContent(unique=unique)'} setOnCreate={'(unique=unique)'}>
-			<div className={'space-y-4'}>
+
+		<EntitySubTree entity="LegacyEditorContent(unique = unique)" setOnCreate="(unique = unique)">
+			<div className="space-y-4">
 				<BlockEditorField
-					field={'blocks'}
+					field="blocks"
 					contentField="data"
 					referencesField="references"
 					referenceDiscriminationField="type"
@@ -176,7 +181,7 @@ export const blocks = () => <>
 						<Block discriminateBy="vimeo" label="Vimeo" />
 					</Block>
 					<Block discriminateBy="image" label="Image">
-						<ImageField baseField={'image'} urlField="url" />
+						<ImageField baseField="image" urlField="url" />
 					</Block>
 				</BlockEditorField>
 			</div>

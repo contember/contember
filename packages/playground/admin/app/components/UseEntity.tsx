@@ -1,12 +1,8 @@
 import { Component, EntityAccessor, useEntity } from '@contember/interface'
-import React from 'react'
+import { ReactNode } from 'react'
 
-export const UseEntity = Component<{ render: (accessor?: EntityAccessor) => React.ReactNode }>(({ render }) => {
+export const UseEntity = Component<{ render: (accessor?: EntityAccessor) => ReactNode }>(({ render }) => {
 	const entity = useEntity()
+
 	return <>{render(entity)}</>
-},
-({ render }) => {
-	return <>
-		{render()}
-	</>
-})
+}, ({ render }) => <>{render()}</>)

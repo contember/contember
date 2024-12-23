@@ -1,8 +1,8 @@
-import { Binding, PersistButton } from '@app/lib/binding'
-import { Slots } from '@app/lib/layout'
-import * as React from 'react'
+import { Title } from '~/app/components/title'
+import { Binding, PersistButton } from '~/lib/binding'
+import { Slots } from '~/lib/layout'
 import { Component, EntitySubTree, HasOne, useEntity, useField } from '@contember/interface'
-import { Toggle } from '@app/lib/ui/toggle'
+import { Toggle } from '~/lib/ui/toggle'
 import {
 	AlignCenterIcon,
 	AlignJustifyIcon,
@@ -21,7 +21,7 @@ import {
 	ListIcon,
 	ListOrderedIcon,
 	LocateIcon,
-	MinusIcon,
+	MinusIcon, PencilIcon,
 	PilcrowIcon,
 	QuoteIcon,
 	StrikethroughIcon,
@@ -54,53 +54,64 @@ import {
 	underlineMark,
 	unorderedListElementType,
 } from '@contember/react-slate-editor'
-import { ImageField, InputField } from '@app/lib/form'
-import { Popover, PopoverContent, PopoverTrigger } from '@app/lib/ui/popover'
-import { Button } from '@app/lib/ui/button'
+import { ImageField, InputField } from '~/lib/form'
+import { Popover, PopoverContent, PopoverTrigger } from '~/lib/ui/popover'
+import { Button } from '~/lib/ui/button'
 import { PopoverClose } from '@radix-ui/react-popover'
-import { uic } from '@app/lib/utils'
+import { uic } from '~/lib/utils'
 import { useSlateStatic } from 'slate-react'
-import { BlockEditorField, EditorBlock, EditorBlockContent, EditorBlockToolbar, EditorInlineToolbar, RichTextField } from '@app/lib/editor'
+import { BlockEditorField, EditorBlock, EditorBlockContent, EditorBlockToolbar, EditorInlineToolbar, RichTextField } from '~/lib/editor'
 
-export const richtext = () => <>
+export const Richtext = () => (
 	<Binding>
+		<Slots.Title>
+			<Title icon={<PencilIcon />}>Rich text field</Title>
+		</Slots.Title>
+
 		<Slots.Actions>
 			<PersistButton />
 		</Slots.Actions>
-		<EntitySubTree entity={'EditorTextArea(unique=unique)'} setOnCreate={'(unique=unique)'}>
-			<div className={'space-y-4'}>
-				<RichTextField field={'data'} label="Rich text field">
-					<EditorInlineToolbar>
-						<EditorMarkTrigger mark={boldMark}><Toggle><BoldIcon className="h-3 w-3" /></Toggle></EditorMarkTrigger>
-						<EditorMarkTrigger mark={italicMark}><Toggle><ItalicIcon className="h-3 w-3" /></Toggle></EditorMarkTrigger>
-						<EditorMarkTrigger mark={underlineMark}><Toggle><UnderlineIcon className="h-3 w-3" /></Toggle></EditorMarkTrigger>
-						<EditorElementTrigger elementType={anchorElementType}><Toggle><LinkIcon className="h-3 w-3" /></Toggle></EditorElementTrigger>
-						<EditorGenericTrigger {...createAlignHandler('start')}><Toggle><AlignLeftIcon className="h-3 w-3" /></Toggle></EditorGenericTrigger>
-						<EditorGenericTrigger {...createAlignHandler('end')}><Toggle><AlignRightIcon className="h-3 w-3" /></Toggle></EditorGenericTrigger>
-						<EditorGenericTrigger {...createAlignHandler('center')}><Toggle><AlignCenterIcon className="h-3 w-3" /></Toggle></EditorGenericTrigger>
-					</EditorInlineToolbar>
-				</RichTextField>
+
+		<EntitySubTree entity="EditorTextArea(unique = unique)" setOnCreate="(unique = unique)">
+			<div className="space-y-4">
+				<div className="max-w-md">
+					<RichTextField field="data" label="Rich text field">
+						<EditorInlineToolbar>
+							<EditorMarkTrigger mark={boldMark}><Toggle><BoldIcon className="h-3 w-3" /></Toggle></EditorMarkTrigger>
+							<EditorMarkTrigger mark={italicMark}><Toggle><ItalicIcon className="h-3 w-3" /></Toggle></EditorMarkTrigger>
+							<EditorMarkTrigger mark={underlineMark}><Toggle><UnderlineIcon className="h-3 w-3" /></Toggle></EditorMarkTrigger>
+							<EditorElementTrigger elementType={anchorElementType}><Toggle><LinkIcon className="h-3 w-3" /></Toggle></EditorElementTrigger>
+							<EditorGenericTrigger {...createAlignHandler('start')}><Toggle><AlignLeftIcon className="h-3 w-3" /></Toggle></EditorGenericTrigger>
+							<EditorGenericTrigger {...createAlignHandler('end')}><Toggle><AlignRightIcon className="h-3 w-3" /></Toggle></EditorGenericTrigger>
+							<EditorGenericTrigger {...createAlignHandler('center')}><Toggle><AlignCenterIcon className="h-3 w-3" /></Toggle></EditorGenericTrigger>
+						</EditorInlineToolbar>
+					</RichTextField>
+				</div>
 			</div>
 		</EntitySubTree>
 	</Binding>
-</>
+)
 
 const BlockButton = uic('button', {
 	baseClass: 'bg-white p-2 inline-flex flex-col hover:bg-gray-100 border rounded-md w-32 items-center justify-center',
 })
 
-export const blocks = () => <>
+export const Blocks = () => (
 	<Binding>
+		<Slots.Title>
+			<Title icon={<PencilIcon />}>Block editor</Title>
+		</Slots.Title>
+
 		<Slots.Actions>
 			<PersistButton />
 		</Slots.Actions>
-		<EntitySubTree entity={'EditorContent(unique=unique)'} setOnCreate={'(unique=unique)'}>
-			<div className={'space-y-4'}>
+
+		<EntitySubTree entity="EditorContent(unique = unique)" setOnCreate="(unique = unique)">
+			<div className="space-y-4">
 				<BlockEditorField
-					field={'data'}
+					field="data"
 					referencesField="references"
 					referenceDiscriminationField="type"
-
 					plugins={[
 						editor => {
 							editor.registerElement({
@@ -159,15 +170,14 @@ export const blocks = () => <>
 					</EditorBlock>
 
 					<EditorBlock name="image" label="Image">
-						<ImageField baseField={'image'} urlField="url" />
+						<ImageField baseField="image" urlField="url" />
 					</EditorBlock>
 				</BlockEditorField>
 			</div>
 			<EditorJson />
 		</EntitySubTree>
 	</Binding>
-</>
-
+)
 
 const EditorJson = () => {
 	const data = useField('data')
@@ -185,7 +195,7 @@ const ConfirmReferenceButton = () => {
 	return (
 		<PopoverClose asChild>
 			<EditorWrapNodeTrigger
-				elementType={'link'}
+				elementType="link"
 				suchThat={{ referenceId: reference.id }}
 			>
 				<Button>Insert</Button>
@@ -197,6 +207,7 @@ const ConfirmReferenceButton = () => {
 
 const LinkElement = (props: EditorRenderElementProps) => {
 	const editor = useSlateStatic()
+
 	return (
 		<span {...props.attributes}>
 			<span className="bg-gray-50 border-b border-b-blue-300">
@@ -212,7 +223,7 @@ const LinkElement = (props: EditorRenderElementProps) => {
 						<div className="flex gap-2 items-center">
 							<LinkField field="link" />
 
-							<Button onClick={() => EditorTransforms.unwrapNodes(editor, { at: [], match: node => node === props.element })} variant="destructive" size="sm">
+							<Button variant="destructive" size="sm" onClick={() => EditorTransforms.unwrapNodes(editor, { at: [], match: node => node === props.element })}>
 								<TrashIcon className="w-3 h-3"/>
 							</Button>
 						</div>
@@ -224,10 +235,8 @@ const LinkElement = (props: EditorRenderElementProps) => {
 }
 
 
-export const LinkField = Component<{ field: string }>(({ field }) => {
-	return (
-		<HasOne field={field}>
-			<InputField field="url" />
-		</HasOne>
-	)
-})
+export const LinkField = Component<{ field: string }>(({ field }) => (
+	<HasOne field={field}>
+		<InputField field="url" />
+	</HasOne>
+))

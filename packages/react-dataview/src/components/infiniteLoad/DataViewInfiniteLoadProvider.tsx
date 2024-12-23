@@ -29,7 +29,9 @@ export const DataViewInfiniteLoadProvider = Component(({ children }: {
 		if (!entityList) {
 			return
 		}
+
 		const entityListParams = (entityList.getMarker() as EntityListSubTreeMarker).parameters as QualifiedEntityList
+
 		const isInfiniteLoad = displayedPage === expectedInfiniteScrollPage.current
 			&& previousEntityListParams.current
 			&& deepEqual(previousEntityListParams.current.filter, entityListParams.filter)

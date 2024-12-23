@@ -2,7 +2,7 @@ import { Acl, Input, Model, Value } from '@contember/schema'
 import { InsertBuilder as DbInsertBuilder, QueryBuilder, Value as DbValue } from '@contember/database'
 import { PathFactory, WhereBuilder } from '../select'
 import { getColumnName, getColumnType } from '@contember/schema-utils'
-import { ColumnValue } from '../ColumnValue'
+import { ColumnValue, normalizeDbValue } from '../ColumnValue'
 import { PredicateFactory } from '../../acl'
 import { AfterInsertEvent, BeforeInsertEvent } from '../EventManager'
 import { Mapper } from '../Mapper'
@@ -58,7 +58,13 @@ export class InsertBuilder {
 				.with('root_', qb => {
 					return resolvedData.reduce(
 						(qb, value) =>
-							qb.select(expr => expr.selectValue(value.value as DbValue, value.columnType), value.columnName),
+							qb.select(
+								expr => expr.selectValue(
+									normalizeDbValue(value.value, value.columnType),
+									value.columnType,
+								),
+								value.columnName,
+							),
 						qb,
 					)
 				})

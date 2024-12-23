@@ -3,7 +3,7 @@ import { Acl, Input, Model, Value } from '@contember/schema'
 import { acceptEveryFieldVisitor, getColumnName, getColumnType } from '@contember/schema-utils'
 import { Operator, QueryBuilder, UpdateBuilder as DbUpdateBuilder, Value as DbValue } from '@contember/database'
 import { PathFactory, WhereBuilder } from '../select'
-import { ColumnValue } from '../ColumnValue'
+import { ColumnValue, normalizeDbValue } from '../ColumnValue'
 import { PredicateFactory } from '../../acl'
 import { AfterUpdateEvent, BeforeUpdateEvent } from '../EventManager'
 import { Mapper } from '../Mapper'
@@ -38,6 +38,7 @@ export class UpdateBuilder {
 		}
 		const columnName = getColumnName(this.schema, this.entity, fieldName)
 		const columnType = getColumnType(this.schema, this.entity, fieldName)
+
 		this.rowData.set(columnName, { columnName, value, columnType, fieldName })
 	}
 
@@ -68,7 +69,13 @@ export class UpdateBuilder {
 					qb = resolvedData.reduce(
 						(qb, value) =>
 							qb
-								.select(expr => expr.selectValue(value.value, value.columnType), value.columnName)
+								.select(
+									expr => expr.selectValue(
+										normalizeDbValue(value.value, value.columnType),
+										value.columnType,
+									),
+									value.columnName,
+								)
 								.select(['root_', value.columnName], value.columnName + oldColSuffix),
 						qb,
 					)

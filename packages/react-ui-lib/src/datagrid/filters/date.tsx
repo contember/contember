@@ -45,23 +45,28 @@ export const DataGridDateFilter = Component(({ label, ranges, ...props }: DataGr
 
 const DataGridDateFilterRange = () => {
 	const [artifact] = useDataViewFilter<DateRangeFilterArtifacts>(useDataViewFilterName())
+
 	if (!artifact) {
 		return null
 	}
+
 	const { start, end } = artifact
 	const startFormatted = start ? formatDate(start) : undefined
 	const endFormatted = end ? formatDate(end) : undefined
+
 	if (startFormatted !== undefined && endFormatted !== undefined) {
 		return `${startFormatted} – ${endFormatted}`
 	}
+
 	if (startFormatted !== undefined) {
 		return `≥ ${startFormatted}`
 	}
+
 	if (endFormatted !== undefined) {
 		return `≤ ${endFormatted}`
 	}
-	return undefined
 
+	return undefined
 }
 
 
@@ -118,7 +123,6 @@ const DataGridDateFilterSelect = ({ label, ranges = defaultRanges }: {
 	label?: ReactNode
 	ranges?: DataGridPredefinedDateRange[]
 }) => {
-
 	return (
 		<Popover>
 			<PopoverTrigger asChild>
@@ -144,17 +148,20 @@ const DataGridRangeFilter = ({ start, end, label }: DataGridPredefinedDateRange)
 	const [filter, setFilter] = useDataViewFilter<DateRangeFilterArtifacts>(name)
 	const isActive = filter?.start === start && filter?.end === end
 	return (
-		<Button variant="outline" size="sm" className={isActive ? 'shadow-inner bg-gray-100' : ''} onClick={() => {
-			setFilter({
-				start,
-				end,
-			})
-		}}>{label}</Button>
+		<Button
+			variant="outline"
+			size="sm"
+			className={cn({ 'shadow-inner bg-gray-100': isActive })}
+			onClick={() => {
+				setFilter({ start, end })
+			}}
+		>{label}</Button>
 	)
 }
 
 export const DataGridDateFilterControls = ({ layout }: { layout?: 'row' | 'column' }) => {
 	const id = useId()
+
 	return (
 		<div className={'flex flex-col'}>
 			<div className={layout === 'row' ? 'flex gap-4 px-4 py-2' : 'flex flex-col px-4 py-2 gap-2'}>
@@ -164,8 +171,9 @@ export const DataGridDateFilterControls = ({ layout }: { layout?: 'row' | 'colum
 							{dict.datagrid.dateStart}:
 						</Label>
 						<DataViewDateFilterResetTrigger type="start">
-							<span className="text-sm text-gray-500 cursor-pointer hover:bg-gray-100 rounded p-0.5"><XIcon
-								className="w-3 h-3" /></span>
+							<span className="text-sm text-gray-500 cursor-pointer hover:bg-gray-100 rounded p-0.5">
+								<XIcon className="w-3 h-3" />
+							</span>
 						</DataViewDateFilterResetTrigger>
 					</div>
 					<DataViewDateFilterInput type={'start'}>
@@ -178,8 +186,9 @@ export const DataGridDateFilterControls = ({ layout }: { layout?: 'row' | 'colum
 							{dict.datagrid.dateEnd}:
 						</Label>
 						<DataViewDateFilterResetTrigger type="end">
-							<span className="text-sm text-gray-500 cursor-pointer hover:bg-gray-100 rounded p-0.5"><XIcon
-								className="w-3 h-3" /></span>
+							<span className="text-sm text-gray-500 cursor-pointer hover:bg-gray-100 rounded p-0.5">
+								<XIcon className="w-3 h-3" />
+							</span>
 						</DataViewDateFilterResetTrigger>
 					</div>
 					<DataViewDateFilterInput type={'end'}>

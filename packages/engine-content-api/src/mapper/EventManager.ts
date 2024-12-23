@@ -1,6 +1,6 @@
 import { Input, Model, Value } from '@contember/schema'
-import { ResolvedColumnValue } from './ColumnValue'
 import { Mapper } from './Mapper'
+import { ColumnValue } from './ColumnValue'
 
 export class BeforeInsertEvent {
 	public type = 'BeforeInsertEvent' as const
@@ -9,7 +9,7 @@ export class BeforeInsertEvent {
 
 	constructor(
 		public readonly entity: Model.Entity,
-		public readonly data: ResolvedColumnValue[],
+		public readonly data: ColumnValue[],
 	) {
 	}
 }
@@ -19,7 +19,7 @@ export class AfterInsertEvent {
 
 	constructor(
 		public readonly entity: Model.Entity,
-		public readonly data: ResolvedColumnValue[],
+		public readonly data: ColumnValue[],
 		public readonly id: Input.PrimaryValue,
 	) {
 	}
@@ -33,7 +33,7 @@ export class BeforeUpdateEvent {
 
 	constructor(
 		public readonly entity: Model.Entity,
-		public readonly data: ResolvedColumnValue[],
+		public readonly data: ColumnValue[],
 		public readonly id: Input.PrimaryValue,
 	) {
 	}
@@ -46,13 +46,13 @@ export class AfterUpdateEvent {
 
 	constructor(
 		public readonly entity: Model.Entity,
-		public readonly data: (ResolvedColumnValue & { old: Value.FieldValue })[],
+		public readonly data: (ColumnValue & { old: Value.FieldValue })[],
 		public readonly id: Input.PrimaryValue,
 	) {
 	}
 	get hasChanges() {
 		// todo: deep equals
-		return this._hasChanges = this.data.some(it => it.resolvedValue !== it.old)
+		return this._hasChanges = this.data.some(it => it.value !== it.old)
 	}
 }
 

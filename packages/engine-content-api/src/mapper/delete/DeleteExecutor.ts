@@ -77,8 +77,7 @@ export class DeleteExecutor {
 						columnName: Object.keys(entry.values)[0],
 						fieldName: Object.keys(entry.input)[0],
 						columnType: 'text',
-						resolvedValue: null,
-						value: Promise.resolve(null),
+						value: null,
 					}], entry.primary)
 					entryToEventMap.set(entry, beforeUpdateEvent)
 					await mapper.eventManager.fire(beforeUpdateEvent)
@@ -97,8 +96,7 @@ export class DeleteExecutor {
 						columnName: Object.keys(entry.values)[0],
 						fieldName: Object.keys(entry.input)[0],
 						columnType: 'text',
-						resolvedValue: null,
-						value: Promise.resolve(null),
+						value: null,
 						old: Object.values(entry.oldValues ?? {})[0],
 					}]
 					const afterEvent = new AfterUpdateEvent(entry.entity, data, entry.primary)

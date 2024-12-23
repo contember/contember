@@ -24,7 +24,7 @@ import {
 	DataGridNumberColumn,
 	DataGridNumberFilter,
 	DataGridPagination,
-	DataGridQueryFilter,
+	DataGridQueryFilter, dataGridRanges,
 	DataGridTable,
 	DataGridTextColumn,
 	DataGridTiles,
@@ -177,7 +177,8 @@ const CustomGridFilters = Component(() => {
 				field="publishedAt"
 				label="Published at"
 				ranges={[
-					createDataGridDateRange('Today', 0, 0),
+					dataGridRanges.today,
+					dataGridRanges.yesterday,
 					createDataGridDateRange('Last 7 days', -7, 0),
 					createDataGridDateRange('Last 30 days', -30, 0),
 					createDataGridDateRange('Last 90 days', -90, 0),

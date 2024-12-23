@@ -65,6 +65,7 @@ export const Navigation = () => {
 					<MenuItem icon={line} label="Slug" to="input/slug" />
 					<MenuItem icon={line} label="Cents field" to="input/cents" />
 					<MenuItem icon={line} label="Server rules" to="input/serverRules" />
+					<MenuItem icon={line} label="Custom error" to="input/customError" />
 				</MenuItem>
 				<MenuItem icon={<ArchiveIcon size={16} />} label="Select">
 					<MenuItem icon={line} label="Has one select" to="select/hasOne" />

@@ -1,36 +1,22 @@
 import { Value } from '@contember/schema'
-import { getFulfilledValues, getRejections } from '../utils'
 
-export type ColumnValue<E = never> = {
-	value: PromiseLike<Value.FieldValue<E> | undefined>
+export type ColumnValue = {
+	value: Value.FieldValue
 	fieldName: string
 	columnName: string
 	columnType: string
 }
 
-export type ResolvedColumnValue<E = never> = ColumnValue<E> & {
-	resolvedValue: Value.FieldValue<E>
-}
 
-export const resolveGenericValue = <T>(value: Value.GenericValueLike<T>): Promise<T> => {
-	if (value instanceof Function) {
-		value = value()
+export const rowDataToFieldValues = (values: ColumnValue[]): Record<string, Value.FieldValue> =>
+	Object.fromEntries(values.map(it => [it.fieldName, it.value]))
+
+export const normalizeDbValue = (value: Value.FieldValue, type: string): Value.FieldValue => {
+	if (value === null) {
+		return null
 	}
-	return Promise.resolve(value)
-}
-
-export const resolveRowData = async <E>(
-	values: ColumnValue<E>[],
-): Promise<ResolvedColumnValue<Exclude<E, undefined>>[]> => {
-	const valuePromises = values.map(async (it): Promise<ResolvedColumnValue<E | undefined>> => ({ ...it, resolvedValue: await it.value }))
-	const settledValues = await Promise.allSettled(valuePromises)
-	const failed = getRejections(settledValues)
-	if (failed.length > 0) {
-		throw failed[0]
+	if ((type === 'jsonb' || type === 'json') && typeof value === 'object') {
+		return JSON.stringify(value)
 	}
-	const fulfilled = getFulfilledValues(settledValues)
-	return fulfilled.filter((it): it is ResolvedColumnValue<Exclude<E, undefined>> => it.resolvedValue !== undefined)
+	return value
 }
-
-export const rowDataToFieldValues = (values: ResolvedColumnValue[]): Record<string, Value.AtomicValue> =>
-	values.reduce((acc, { fieldName, value }) => ({ ...acc, [fieldName]: value }), {})

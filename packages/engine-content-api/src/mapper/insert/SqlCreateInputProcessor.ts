@@ -36,9 +36,7 @@ export class SqlCreateInputProcessor implements CreateInputProcessor<SqlCreateIn
 	public async column(context: Model.ColumnContext & { input: Input.ColumnValue | undefined }): Promise<SqlCreateInputProcessorResult> {
 		this.insertBuilder.addFieldValue(
 			context.column.name,
-			((): Value.GenericValueLike<Value.AtomicValue | undefined> => {
-				return resolveColumnValue(context, this.providers)
-			})(),
+			resolveColumnValue(context, this.providers),
 		)
 		return []
 	}

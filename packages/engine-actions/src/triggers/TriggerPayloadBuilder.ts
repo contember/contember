@@ -71,7 +71,7 @@ export class TriggerPayloadBuilder {
 					entity: event.cause.entity.name,
 					id: event.cause.id,
 					selection,
-					values: Object.fromEntries(event.cause.data.map(it => [it.fieldName, it.resolvedValue])),
+					values: Object.fromEntries(event.cause.data.map(it => [it.fieldName, it.value])),
 					path: 'path' in event.listener ? event.listener.path : undefined,
 				}
 			case 'AfterUpdateEvent':
@@ -85,7 +85,7 @@ export class TriggerPayloadBuilder {
 					entity: event.cause.entity.name,
 					id: event.cause.id,
 					selection,
-					values: Object.fromEntries(event.cause.data.map(it => [it.fieldName, it.resolvedValue])),
+					values: Object.fromEntries(event.cause.data.map(it => [it.fieldName, it.value])),
 					path: 'path' in event.listener ? event.listener.path : undefined,
 					old: Object.fromEntries(afterEvent.data.map(it => [it.fieldName, it.old])),
 				}

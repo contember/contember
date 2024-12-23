@@ -2,19 +2,19 @@ import { Acl, Input, Model, Value } from '@contember/schema'
 import { InsertBuilder as DbInsertBuilder, QueryBuilder, Value as DbValue } from '@contember/database'
 import { PathFactory, WhereBuilder } from '../select'
 import { getColumnName, getColumnType } from '@contember/schema-utils'
-import { ColumnValue, ResolvedColumnValue, resolveGenericValue, resolveRowData } from '../ColumnValue'
+import { ColumnValue } from '../ColumnValue'
 import { PredicateFactory } from '../../acl'
 import { AfterInsertEvent, BeforeInsertEvent } from '../EventManager'
 import { Mapper } from '../Mapper'
 
 export interface InsertResult {
-	values: ResolvedColumnValue[]
+	values: ColumnValue[]
 	executed: boolean
 	primaryValue: Value.PrimaryValue | null
 }
 
 export class InsertBuilder {
-	private rowData: Map<string, ColumnValue<undefined>> = new Map()
+	private rowData: Map<string, ColumnValue> = new Map()
 	private where: { and: Input.OptionalWhere[] } = { and: [] }
 
 	constructor(
@@ -27,13 +27,14 @@ export class InsertBuilder {
 
 	public addFieldValue(
 		fieldName: string,
-		value: Value.GenericValueLike<Value.AtomicValue<undefined>>,
-	): Promise<Value.AtomicValue<undefined>> {
+		value: Value.FieldValue | undefined,
+	): void {
+		if (value === undefined) {
+			return
+		}
 		const columnName = getColumnName(this.schema, this.entity, fieldName)
 		const columnType = getColumnType(this.schema, this.entity, fieldName)
-		const resolvedValue = resolveGenericValue(value)
-		this.rowData.set(columnName, { columnName, value: resolvedValue, columnType, fieldName })
-		return resolvedValue
+		this.rowData.set(columnName, { columnName, value, columnType, fieldName })
 	}
 
 	public addPredicates(fields: string[]): void {
@@ -45,13 +46,9 @@ export class InsertBuilder {
 		this.where.and.push(where)
 	}
 
-	public async getResolvedData(): Promise<ResolvedColumnValue[]> {
-		return resolveRowData([...this.rowData.values()])
-	}
-
 	public async execute(mapper: Mapper): Promise<InsertResult> {
 		try {
-			const resolvedData = await this.getResolvedData()
+			const resolvedData = [...this.rowData.values()]
 
 			const insertData = resolvedData.reduce<QueryBuilder.ColumnExpressionMap>(
 				(result, item) => ({ ...result, [item.columnName]: expr => expr.select(['root_', item.columnName]) }),
@@ -61,7 +58,7 @@ export class InsertBuilder {
 				.with('root_', qb => {
 					return resolvedData.reduce(
 						(qb, value) =>
-							qb.select(expr => expr.selectValue(value.resolvedValue as DbValue, value.columnType), value.columnName),
+							qb.select(expr => expr.selectValue(value.value as DbValue, value.columnType), value.columnName),
 						qb,
 					)
 				})
@@ -73,17 +70,17 @@ export class InsertBuilder {
 				})
 				.returning(this.entity.primaryColumn)
 
-			const beforeInsertEvent = new BeforeInsertEvent(this.entity, resolvedData as ResolvedColumnValue[])
+			const beforeInsertEvent = new BeforeInsertEvent(this.entity, resolvedData)
 			await mapper.eventManager.fire(beforeInsertEvent)
 
 			const returning = (await qb.execute(mapper.db)).map(it => it[this.entity.primaryColumn])
 			const result = returning.length === 1 ? returning[0] : null
 
-			const afterInsertEvent = new AfterInsertEvent(this.entity, resolvedData as ResolvedColumnValue[], result)
+			const afterInsertEvent = new AfterInsertEvent(this.entity, resolvedData, result)
 			beforeInsertEvent.afterEvent = afterInsertEvent
 			await mapper.eventManager.fire(afterInsertEvent)
 
-			return { values: resolvedData as ResolvedColumnValue[], executed: true, primaryValue: result }
+			return { values: resolvedData, executed: true, primaryValue: result }
 		} catch (e) {
 			throw e
 		}

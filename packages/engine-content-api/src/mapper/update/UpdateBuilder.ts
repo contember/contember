@@ -3,13 +3,13 @@ import { Acl, Input, Model, Value } from '@contember/schema'
 import { acceptEveryFieldVisitor, getColumnName, getColumnType } from '@contember/schema-utils'
 import { Operator, QueryBuilder, UpdateBuilder as DbUpdateBuilder, Value as DbValue } from '@contember/database'
 import { PathFactory, WhereBuilder } from '../select'
-import { ColumnValue, ResolvedColumnValue, resolveGenericValue, resolveRowData } from '../ColumnValue'
+import { ColumnValue } from '../ColumnValue'
 import { PredicateFactory } from '../../acl'
 import { AfterUpdateEvent, BeforeUpdateEvent } from '../EventManager'
 import { Mapper } from '../Mapper'
 
 export interface UpdateResult {
-	values: ResolvedColumnValue[]
+	values: ColumnValue[]
 	executed: boolean
 	affectedRows: number | null
 }
@@ -31,13 +31,14 @@ export class UpdateBuilder {
 
 	public addFieldValue(
 		fieldName: string,
-		value: Value.GenericValueLike<Value.AtomicValue<undefined>>,
-	): Promise<Value.AtomicValue<undefined>> {
+		value: Value.FieldValue | undefined,
+	): void {
+		if (value === undefined) {
+			return
+		}
 		const columnName = getColumnName(this.schema, this.entity, fieldName)
 		const columnType = getColumnType(this.schema, this.entity, fieldName)
-		const resolvedValue = resolveGenericValue(value)
-		this.rowData.set(columnName, { columnName, value: resolvedValue, columnType, fieldName })
-		return resolvedValue
+		this.rowData.set(columnName, { columnName, value, columnType, fieldName })
 	}
 
 	public addNewWhere(where: Input.OptionalWhere): void {
@@ -56,7 +57,7 @@ export class UpdateBuilder {
 
 	public async execute(mapper: Mapper): Promise<UpdateResult> {
 		try {
-			const resolvedData = await resolveRowData([...this.rowData.values()])
+			const resolvedData = [...this.rowData.values()]
 			if (Object.keys(resolvedData).length === 0) {
 				return { values: [], affectedRows: null, executed: false }
 			}
@@ -67,7 +68,7 @@ export class UpdateBuilder {
 					qb = resolvedData.reduce(
 						(qb, value) =>
 							qb
-								.select(expr => expr.selectValue(value.resolvedValue as DbValue, value.columnType), value.columnName)
+								.select(expr => expr.selectValue(value.value, value.columnType), value.columnName)
 								.select(['root_', value.columnName], value.columnName + oldColSuffix),
 						qb,
 					)
@@ -118,13 +119,13 @@ export class UpdateBuilder {
 				})
 
 
-			const beforeEvent = new BeforeUpdateEvent(this.entity, resolvedData as ResolvedColumnValue[], this.primary)
+			const beforeEvent = new BeforeUpdateEvent(this.entity, resolvedData, this.primary)
 			await mapper.eventManager.fire(beforeEvent)
 
 			const result = await qb.execute(mapper.db)
 
 			if (result.length === 1) {
-				const eventData = (resolvedData as ResolvedColumnValue[]).map(it => ({
+				const eventData = (resolvedData).map(it => ({
 					...it,
 					old: result[0][it.columnName + oldColSuffix],
 				}))
@@ -133,7 +134,7 @@ export class UpdateBuilder {
 				await mapper.eventManager.fire(afterUpdateEvent)
 			}
 
-			return { values: resolvedData as ResolvedColumnValue[], affectedRows: result.length, executed: true }
+			return { values: resolvedData, affectedRows: result.length, executed: true }
 		} catch (e) {
 			throw e
 		}

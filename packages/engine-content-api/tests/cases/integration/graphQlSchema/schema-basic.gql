@@ -29,6 +29,7 @@ type Author {
   name: String
   posts(filter: PostWhere, orderBy: [PostOrderBy!], offset: Int, limit: Int): [Post!]!
   postsByLocales(by: AuthorPostsByLocalesUniqueWhere!, filter: PostWhere): Post
+  postsBy(by: AuthorPostsUniqueWhere!, filter: PostWhere): Post
   paginatePosts(filter: PostWhere, orderBy: [PostOrderBy!], skip: Int, first: Int): PostConnection!
 }
 
@@ -52,6 +53,7 @@ type Post {
   publishedAt: DateTime
   locales(filter: PostLocaleWhere, orderBy: [PostLocaleOrderBy!], offset: Int, limit: Int): [PostLocale!]!
   categories(filter: CategoryWhere, orderBy: [CategoryOrderBy!], offset: Int, limit: Int): [Category!]!
+  localesBy(by: PostLocalesUniqueWhere!, filter: PostLocaleWhere): PostLocale
   paginateLocales(filter: PostLocaleWhere, orderBy: [PostLocaleOrderBy!], skip: Int, first: Int): PostLocaleConnection!
   paginateCategories(filter: CategoryWhere, orderBy: [CategoryOrderBy!], skip: Int, first: Int): CategoryConnection!
 }
@@ -235,6 +237,10 @@ input CategoryOrderBy {
   name: OrderDirection
 }
 
+input PostLocalesUniqueWhere {
+  id: UUID
+}
+
 type PostLocaleConnection {
   pageInfo: PageInfo!
   edges: [PostLocaleEdge!]!
@@ -259,6 +265,11 @@ input AuthorPostsByLocalesUniqueWhere {
 
 input PostLocaleUniqueWhere {
   id: UUID
+}
+
+input AuthorPostsUniqueWhere {
+  id: UUID
+  locales: PostLocaleUniqueWhere
 }
 
 input AuthorUniqueWhere {

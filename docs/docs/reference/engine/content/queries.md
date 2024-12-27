@@ -369,12 +369,13 @@ query {
 }
 ```
 
+## Narrowed Has Many
 
-## Narrowed has many
+The **narrowed has-many** feature allows you to efficiently filter a "has-many" relation by one or more fields of a compound unique key, where one part of the unique key references the entity you are querying. This lets you access a specific record within the "has-many" relation using a simplified query structure.
 
-You can use the narrowed has many to filter a "has many" relation by a field of a compound unique key, where the second part of the unique key references the entity that you are querying. This allows you to access a specific record within the "has many" relation.
 
-For example, consider the following schema:
+### Example Schema: Categories and Translations
+
 ```typescript
 export class Category {
 	translations = c.oneHasMany(CategoryTranslation, 'category')
@@ -389,18 +390,47 @@ export class CategoryTranslation {
 }
 ```
 
-With this schema, you can use the following GraphQL query to access a specific translation for a category, filtered by the "locale" field:
+In this schema:
 
-```
+- The `translations` field defines a `has-many` relationship between `Category` and `CategoryTranslation`.
+- The `CategoryTranslation` entity has a compound unique key (`category`, `locale`) that ensures uniqueness for translations by category and locale.
+
+---
+
+### Querying with Narrowed Has Many
+
+#### Specific Narrowed Field
+
+Contember automatically generates a narrowed field for each unique component of the relationship. In this case, it generates `translationsByLocale`, allowing you to filter the `translations` relation by the `locale` field:
+
+```graphql
 query {
 	listCategory {
 		id
-		translationsByLocale(by: {locale: "en"}) {
+		translationsByLocale(by: { locale: "en" }) {
 			name
+		}
 	}
 }
 ```
-This will return single translation for the specified locale for each category in the result set, even though the relation is defined as "has many".
+
+This query returns the translation for the specified `locale` (`"en"`) for each category in the result set, even though the relation is defined as `has-many`.
+
+#### <span className="version">Engine 2.0+</span> Universal Narrowed Field
+
+To provide more flexibility, Contember also generates a **universal narrowed field**, named `<relationName>By` (e.g., `translationsBy`). This field allows querying by **all fields in the unique key** except for the back-referencing field, which is auto-completed. The same query can be written as:
+
+```graphql
+query {
+	listCategory {
+		id
+		translationsBy(by: { locale: "en" }) {
+			name
+		}
+	}
+}
+```
+
 
 ## Transactions
 

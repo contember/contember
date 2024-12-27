@@ -54,6 +54,40 @@ export class HasManyToHasOneRelationReducerFieldVisitor implements
 			return []
 		}
 		const uniqueConstraints = getFieldsForUniqueWhere(this.schema, targetEntity)
+
+		const uniqueKeys: (readonly string[])[] = uniqueConstraints
+			.map(it => it.filter(it => it !== targetRelation.name))
+			.filter(it => it.length > 0)
+			.filter(uniqueKey => uniqueKey
+				.every(it =>
+					acceptFieldVisitor(this.schema, targetEntity.name, it, new FieldAccessVisitor(Acl.Operation.read, this.authorizator)),
+				))
+
+		const graphQlName = relation.name + GqlTypeName`By`
+		const uniqueWhere: GraphQLInputObjectType = new GraphQLInputObjectType({
+			name: GqlTypeName`${entity.name}${relation.name}UniqueWhere`,
+			fields: () => {
+				return this.whereTypeProvider.getUniqueWhereFields(targetEntity, uniqueKeys)
+			},
+		})
+
+		const entityType = this.entityTypeProvider.getEntity(targetEntity.name)
+		const universalUnique: Result | null = graphQlName in entity.fields ? null : [
+			graphQlName,
+			{
+				type: entityType,
+				extensions: {
+					relationName: relation.name,
+					extensionKey: HasManyToHasOneReducer.extensionName,
+				},
+				args: {
+					by: { type: new GraphQLNonNull(uniqueWhere) },
+					filter: { type: this.whereTypeProvider.getEntityWhereType(targetEntity.name) },
+				},
+				resolve: aliasAwareResolver,
+			},
+		]
+
 		const composedUnique = uniqueConstraints
 			.filter(fields => fields.length === 2) //todo support all uniques
 			.filter(fields => fields.includes(targetRelation.name))
@@ -89,8 +123,6 @@ export class HasManyToHasOneRelationReducerFieldVisitor implements
 					},
 				})
 
-				const entityType = this.entityTypeProvider.getEntity(targetEntity.name)
-
 				return [
 					graphQlName,
 					{
@@ -107,6 +139,7 @@ export class HasManyToHasOneRelationReducerFieldVisitor implements
 					},
 				]
 			})
+			.concat([universalUnique])
 			.filter((it): it is Result => it !== null)
 	}
 }

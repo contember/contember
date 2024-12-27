@@ -1,5 +1,4 @@
 export * from './ClearFieldTrigger'
-export * from './DeleteEntityTrigger'
 export * from './DisconnectEntityTrigger'
 export * from './EntityBeforePersist'
 export * from './RedirectOnPersist'

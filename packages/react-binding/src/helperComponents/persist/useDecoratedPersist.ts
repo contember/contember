@@ -1,6 +1,7 @@
 import { useCallback } from 'react'
 import { usePersist } from '../../accessorPropagation'
 import { ErrorPersistResult, isErrorPersistResult, SuccessfulPersistResult } from '@contember/binding'
+import { useReferentiallyStableCallback } from '@contember/react-utils'
 
 export interface UseDecoratedPersistOptions {
 	onPersistSuccess?: (result: SuccessfulPersistResult) => void
@@ -10,7 +11,7 @@ export interface UseDecoratedPersistOptions {
 export const useDecoratedPersist = ({ onPersistSuccess, onPersistError }: UseDecoratedPersistOptions = {}) => {
 	const triggerPersist = usePersist()
 
-	return useCallback(async () => {
+	return useReferentiallyStableCallback(async () => {
 		try {
 			const result = await triggerPersist()
 			onPersistSuccess?.(result)
@@ -21,5 +22,5 @@ export const useDecoratedPersist = ({ onPersistSuccess, onPersistError }: UseDec
 				throw e
 			}
 		}
-	}, [onPersistError, onPersistSuccess, triggerPersist])
+	})
 }

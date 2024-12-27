@@ -1,4 +1,4 @@
-import { Component, DeleteEntityTrigger, PersistTrigger, StaticRender, useEntity } from '@contember/interface'
+import { Component, DeleteEntityTrigger, PersistTrigger, StaticRender, SuccessfulPersistResult, useEntity } from '@contember/interface'
 import {
 	BlockRepeater,
 	BlockRepeaterAddItemTrigger,
@@ -16,8 +16,8 @@ import {
 } from '@contember/react-repeater-dnd-kit'
 import { createRequiredContext } from '@contember/react-utils'
 import { GripVerticalIcon, PlusCircleIcon, TrashIcon } from 'lucide-react'
-import { useId, useState } from 'react'
-import { FeedbackTrigger } from '../binding'
+import { useCallback, useId, useState } from 'react'
+import { usePersistSuccessHandler } from '../binding'
 import { dict } from '../dict'
 import { RepeaterDropIndicator, RepeaterRemoveItemButton } from '../repeater'
 import { Button } from '../ui/button'
@@ -208,6 +208,11 @@ const BlockRepeaterEditSheetInner = ({ open, setOpen }: { open: boolean; setOpen
 	const block = useBlockRepeaterCurrentBlock()
 	const form = block?.form
 	const editMode = useBlockRepeaterEditMode()
+	const persistSuccess = usePersistSuccessHandler()
+	const onSuccess = useCallback((result: SuccessfulPersistResult) => {
+		persistSuccess(result)
+		setOpen(false)
+	}, [persistSuccess, setOpen])
 
 	if (!form || editMode) {
 		return null
@@ -242,13 +247,9 @@ const BlockRepeaterEditSheetInner = ({ open, setOpen }: { open: boolean; setOpen
 					<SheetClose asChild>
 						<Button variant="link">Close</Button>
 					</SheetClose>
-					<FeedbackTrigger>
-						<PersistTrigger>
-							<SheetClose asChild>
-								<Button variant="link">Close & save</Button>
-							</SheetClose>
-						</PersistTrigger>
-					</FeedbackTrigger>
+					<PersistTrigger onPersistSuccess={onSuccess}>
+						<Button variant="link">Close & save</Button>
+					</PersistTrigger>
 				</SheetFooter>
 			</SheetContent>
 		</Sheet>

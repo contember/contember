@@ -1,27 +1,20 @@
-import { PersistTrigger, SugaredRelativeSingleField, useEntity, useField, usePersist } from '@contember/interface'
-import { Slot } from '@radix-ui/react-slot'
-import { ReactElement, ReactNode, useEffect } from 'react'
+import { PersistTrigger } from '@contember/interface'
+import { ReactNode } from 'react'
 import { dict } from '../dict'
 import { Button } from '../ui/button'
 import { Loader } from '../ui/loader'
-import { usePersistErrorHandler, usePersistFeedbackHandlers, usePersistWithFeedback } from './hooks'
-
-export const FeedbackTrigger = (props: { children: ReactElement }) => {
-	return <Slot {...props} {...usePersistFeedbackHandlers()} />
-}
+import { usePersistSuccessHandler } from './hooks'
 
 export const PersistButton = ({ label }: {
 	label?: ReactNode
 }) => {
 	return (
-		<FeedbackTrigger>
-			<PersistTrigger>
-				<Button className="group">
-					<Loader size="sm" position="absolute" className="hidden group-data-[loading]:block" />
-					{label ?? dict.persist.persistButton}
-				</Button>
-			</PersistTrigger>
-		</FeedbackTrigger>
+		<PersistTrigger onPersistSuccess={usePersistSuccessHandler()}>
+			<Button className="group">
+				<Loader size="sm" position="absolute" className="hidden group-data-[loading]:block" />
+				{label ?? dict.persist.persistButton}
+			</Button>
+		</PersistTrigger>
 	)
 }
 

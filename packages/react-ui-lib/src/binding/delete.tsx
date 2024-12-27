@@ -14,7 +14,6 @@ import {
 	AlertDialogTrigger,
 } from '../ui/alert-dialog'
 import { Button } from '../ui/button'
-import { FeedbackTrigger } from './persist'
 
 export type DeleteEntityDialogProps = {
 	trigger: ReactElement
@@ -39,16 +38,14 @@ export const DeleteEntityDialog: FC<DeleteEntityDialogProps> = ({ trigger, immed
 					</AlertDialogHeader>
 					<AlertDialogFooter>
 						<AlertDialogCancel>{dict.deleteEntityDialog.cancelButton}</AlertDialogCancel>
-						<FeedbackTrigger>
-							<DeleteEntityTrigger
-								immediatePersist={immediatePersist ?? true}
-								onPersistSuccess={handlePersistSuccess}
-							>
-								<AlertDialogAction asChild>
-									<Button variant={'destructive'}>{dict.deleteEntityDialog.confirmButton}</Button>
-								</AlertDialogAction>
-							</DeleteEntityTrigger>
-						</FeedbackTrigger>
+						<DeleteEntityTrigger
+							immediatePersist={immediatePersist ?? true}
+							onPersistSuccess={handlePersistSuccess}
+						>
+							<AlertDialogAction asChild>
+								<Button variant={'destructive'}>{dict.deleteEntityDialog.confirmButton}</Button>
+							</AlertDialogAction>
+						</DeleteEntityTrigger>
 					</AlertDialogFooter>
 				</AlertDialogContent>
 			</AlertDialog>

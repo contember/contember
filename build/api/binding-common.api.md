@@ -71,6 +71,8 @@ export class BindingError extends Error {
 // @public (undocumented)
 export interface BindingOperations<Node> extends AsyncBatchUpdatesOptions {
     // (undocumented)
+    addEventListener: <Type extends keyof DataBindingEventListenerMap>(event: Type, listener: DataBindingEventListenerMap[Type]) => () => void;
+    // (undocumented)
     batchDeferredUpdates: BatchDeferredUpdates;
     // (undocumented)
     extendTree: ExtendTree<Node>;
@@ -93,6 +95,12 @@ export class ClientGeneratedUuid implements RuntimeIdSpec {
 
 // @public (undocumented)
 export const createQueryBuilder: (schema: Schema) => ContentQueryBuilder;
+
+// @public (undocumented)
+export type DataBindingEventListenerMap = {
+    persistSuccess: (result: SuccessfulPersistResult) => void | Promise<void>;
+    persistError: (result: ErrorPersistResult) => void | Promise<void>;
+};
 
 // @public (undocumented)
 export const DataBindingExtendAborted: unique symbol;
@@ -917,6 +925,9 @@ export const isEntityAccessor: (accessor: unknown) => accessor is EntityAccessor
 
 // @public (undocumented)
 export const isEntityListAccessor: (accessor: unknown) => accessor is EntityListAccessor;
+
+// @public (undocumented)
+export const isErrorPersistResult: (result: unknown) => result is ErrorPersistResult;
 
 // @public (undocumented)
 export const isFieldAccessor: (accessor: unknown) => accessor is FieldAccessor;

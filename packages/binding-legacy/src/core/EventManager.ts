@@ -132,9 +132,9 @@ export class EventManager {
 			this.isFrozenWhileUpdating = true
 			this.triggerBeforeFlushEvents()
 			this.onUpdate(newMetadata)
-			this.flushPendingAccessorUpdates(Array.from(this.rootsWithPendingUpdates))
-
+			const rootStates = Array.from(this.rootsWithPendingUpdates)
 			this.rootsWithPendingUpdates.clear()
+			this.flushPendingAccessorUpdates(rootStates)
 			this.isFrozenWhileUpdating = false
 			this.previousMetadata = newMetadata
 		})

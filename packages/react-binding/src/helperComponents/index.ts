@@ -9,3 +9,5 @@ export * from './RecursionTerminatorPortal'
 export * from './StaticRender'
 export * from './SugaredField'
 export * from './Variable'
+
+export * from './persist'

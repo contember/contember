@@ -34,7 +34,8 @@
     "@contember/graphql-client": "workspace:*",
     "@contember/react-client": "workspace:*",
     "@contember/react-utils": "workspace:*",
-    "@contember/utilities": "workspace:*"
+    "@contember/utilities": "workspace:*",
+    "@radix-ui/react-slot": "^1.1.0"
   },
   "peerDependencies": {
     "react": "^18 || ^19",

@@ -30,6 +30,7 @@ import {
 	DataGridTiles,
 	DataGridToolbar,
 	DataGridTooltipLabel,
+	DefaultDataGrid,
 } from '~/lib/datagrid'
 import * as React from 'react'
 import { DefaultDropdown, DropdownMenuItem, DropdownMenuSeparator } from '~/lib/ui/dropdown'
@@ -49,7 +50,7 @@ export const SimpleGrid = () => {
 
 			<Binding>
 
-				<DataGrid
+				<DefaultDataGrid
 					entities="GridArticle"
 					initialSelection={{
 						visibility: {
@@ -57,21 +58,10 @@ export const SimpleGrid = () => {
 						},
 					}}
 				>
-
-					<DataGridToolbar>
-						<DataGridQueryFilter />
-					</DataGridToolbar>
-
-					<DataGridLoader>
-						<DataGridTable>
-							<DataGridActionColumn><Button>Show detail</Button></DataGridActionColumn>
-							<DataGridTextColumn header="Title" field="title" />
-							<DataGridEnumColumn header="State" field="state" options={GridArticleStateLabels} />
-						</DataGridTable>
-					</DataGridLoader>
-
-					<DataGridPagination />
-				</DataGrid>
+					<DataGridActionColumn><Button>Show detail</Button></DataGridActionColumn>
+					<DataGridTextColumn header="Title" field="title" />
+					<DataGridEnumColumn header="State" field="state" options={GridArticleStateLabels} />
+				</DefaultDataGrid>
 			</Binding>
 		</>
 	)

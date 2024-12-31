@@ -8,6 +8,7 @@ import { ChangeEvent } from 'react';
 import { EntityAccessor } from '@contember/react-binding';
 import { EntityId } from '@contember/react-binding';
 import { EntityListAccessor } from '@contember/react-binding';
+import { EntityListSubTreeLoaderState } from '@contember/react-binding';
 import { EntityListSubTreeMarker } from '@contember/react-binding';
 import { Environment } from '@contember/react-binding';
 import { FieldMarker } from '@contember/react-binding';
@@ -32,7 +33,6 @@ import { SchemaRelation } from '@contember/react-binding';
 import { Serializable } from '@contember/react-utils';
 import { SetStateAction } from 'react';
 import { StateStorageOrName } from '@contember/react-utils';
-import { SugaredOrderBy } from '@contember/react-binding';
 import { SugaredQualifiedEntityList } from '@contember/react-binding';
 import { SugaredRelativeEntityList } from '@contember/react-binding';
 import { SugaredRelativeSingleEntity } from '@contember/react-binding';
@@ -48,23 +48,22 @@ export type BooleanFilterArtifacts = {
     nullCondition?: boolean;
 };
 
-// @public (undocumented)
-export const ControlledDataView: NamedExoticComponent<    {
-children: ReactNode;
-state: DataViewState;
-info: DataViewInfo;
-methods: DataViewMethods;
-onSelectHighlighted?: (entity: EntityAccessor) => void;
-}>;
+// @public
+export const ControlledDataView: NamedExoticComponent<ControlledDataViewProps>;
 
 // @public (undocumented)
-export type ControlledDataViewProps = {
+export interface ControlledDataViewProps {
+    // (undocumented)
     children: ReactNode;
-    state: DataViewState;
+    // (undocumented)
     info: DataViewInfo;
+    // (undocumented)
     methods: DataViewMethods;
+    // (undocumented)
     onSelectHighlighted?: (entity: EntityAccessor) => void;
-};
+    // (undocumented)
+    state: DataViewState;
+}
 
 // @public (undocumented)
 export const createBooleanFilter: (field: SugaredRelativeSingleField_2["field"]) => DataViewFilterHandler<BooleanFilterArtifacts>;
@@ -77,13 +76,13 @@ export const createEnumFilter: (field: SugaredRelativeSingleField_2["field"]) =>
 
 // @public
 export const createFieldFilterHandler: <FA extends DataViewFilterArtifact = Serializable>({ createCondition, isEmpty }: {
-    createCondition: ((filterArtifact: FA, options: DataViewFilterHandlerOptions<FA>) => Input.Condition | undefined);
+    createCondition: ((filterArtifact: FA, options: DataViewFilterHandlerOptions) => Input.Condition | undefined);
     isEmpty?: (filterArtifact: FA) => boolean;
 }) => (field: SugaredRelativeSingleField["field"]) => DataViewFilterHandler<FA>;
 
 // @public (undocumented)
 export const createFilterHandler: <FA extends DataViewFilterArtifact = Serializable>({ createFilter, isEmpty, identifier }: {
-    createFilter: ((filterArtifact: FA, options: DataViewFilterHandlerOptions<FA>) => Filter | undefined);
+    createFilter: ((filterArtifact: FA, options: DataViewFilterHandlerOptions) => Filter | undefined);
     isEmpty?: (filterArtifact: FA) => boolean;
     identifier?: {
         id: Symbol;
@@ -133,11 +132,11 @@ export class CsvExportFactory implements ExportFactory {
     protected formatValue(value: any): string;
 }
 
-// @public (undocumented)
+// @public
 const DataView_2: NamedExoticComponent<DataViewProps>;
 export { DataView_2 as DataView }
 
-// @public (undocumented)
+// @public
 export const DataViewBooleanFilter: React_2.NamedExoticComponent<DataViewBooleanFilterProps>;
 
 // @public (undocumented)
@@ -145,30 +144,44 @@ export type DataViewBooleanFilterCurrent = 'include' | 'none';
 
 // @public (undocumented)
 export interface DataViewBooleanFilterProps {
-    // (undocumented)
     children: React_2.ReactNode;
-    // (undocumented)
     field: SugaredRelativeSingleField['field'];
-    // (undocumented)
     name?: string;
 }
 
-// @public (undocumented)
-export const DataViewBooleanFilterTrigger: ({ name, action, value, ...props }: {
-    name?: string;
-    value: boolean;
-    children: ReactNode;
-    action?: DataViewSetBooleanFilterAction;
-}) => JSX_2.Element;
+// @public
+export const DataViewBooleanFilterTrigger: React_2.ForwardRefExoticComponent<DataViewBooleanFilterTriggerProps & React_2.RefAttributes<HTMLButtonElement>>;
 
 // @public (undocumented)
-export const DataViewChangePageTrigger: ForwardRefExoticComponent<DataViewChangePageTriggerProps & RefAttributes<HTMLElement>>;
+export interface DataViewBooleanFilterTriggerAttributes {
+    // (undocumented)
+    ['data-active']?: '';
+    // (undocumented)
+    ['data-current']: DataViewBooleanFilterCurrent;
+}
+
+// @public (undocumented)
+export interface DataViewBooleanFilterTriggerProps {
+    action?: DataViewSetBooleanFilterAction;
+    children: ReactElement;
+    name?: string;
+    value: boolean;
+}
+
+// @public
+export const DataViewChangePageTrigger: ForwardRefExoticComponent<DataViewChangePageTriggerProps & RefAttributes<HTMLButtonElement>>;
+
+// @public (undocumented)
+export interface DataViewChangePageTriggerAttributes {
+    // (undocumented)
+    ['data-active']?: '';
+    // (undocumented)
+    ['data-current']?: string;
+}
 
 // @public (undocumented)
 export interface DataViewChangePageTriggerProps {
-    // (undocumented)
     children: React.ReactNode;
-    // (undocumented)
     page: number | 'first' | 'last' | 'next' | 'previous';
 }
 
@@ -184,60 +197,56 @@ export type DataViewDataForExport = {
     values: any[];
 }[];
 
-// @public (undocumented)
+// @public
 export const DataViewDateFilter: React_2.NamedExoticComponent<DataViewDateFilterProps>;
 
-// @public (undocumented)
-export const DataViewDateFilterInput: ({ name, type, ...props }: {
-    name?: string;
-    type: "start" | "end";
-    children: ReactElement;
-}) => JSX_2.Element;
+// @public
+export const DataViewDateFilterInput: React_2.ForwardRefExoticComponent<DataViewDateFilterInputProps & React_2.RefAttributes<HTMLInputElement>>;
 
 // @public (undocumented)
-export interface DataViewDateFilterProps {
-    // (undocumented)
-    children: React_2.ReactNode;
-    // (undocumented)
-    field: SugaredRelativeSingleField['field'];
-    // (undocumented)
+export interface DataViewDateFilterInputProps {
+    children: ReactElement;
     name?: string;
+    type: 'start' | 'end';
 }
 
 // @public (undocumented)
-export const DataViewDateFilterResetTrigger: ({ name, type, ...props }: DataViewDateFilterResetTriggerProps) => JSX_2.Element | null;
+export interface DataViewDateFilterProps {
+    children: React_2.ReactNode;
+    field: SugaredRelativeSingleField['field'];
+    name?: string;
+}
+
+// @public
+export const DataViewDateFilterResetTrigger: React_2.ForwardRefExoticComponent<DataViewDateFilterResetTriggerProps & React_2.RefAttributes<HTMLButtonElement>>;
 
 // @public (undocumented)
-export type DataViewDateFilterResetTriggerProps = {
-    name?: string;
+export interface DataViewDateFilterResetTriggerProps {
     children: ReactElement;
+    name?: string;
     type?: 'start' | 'end';
-};
+}
 
 // @internal (undocumented)
 export const DataViewDisplayedStateContext: React_2.Context<DataViewState | undefined>;
 
-// @public (undocumented)
+// @public
 export const DataViewEachRow: ({ children }: {
     children: ReactNode;
 }) => JSX_2.Element | null;
 
-// @public (undocumented)
+// @public
 export const DataViewElement: NamedExoticComponent<DataViewElementProps>;
 
 // @public (undocumented)
 export interface DataViewElementProps {
-    // (undocumented)
     children: React.ReactNode;
-    // (undocumented)
     fallback?: boolean;
-    // (undocumented)
     label?: ReactNode;
-    // (undocumented)
     name: string;
 }
 
-// @public (undocumented)
+// @public
 export const DataViewEmpty: ({ children }: {
     children: ReactNode;
 }) => JSX_2.Element | null;
@@ -248,7 +257,7 @@ export const DataViewEntityListAccessorContext: React_2.Context<EntityListAccess
 // @internal (undocumented)
 export const DataViewEntityListPropsContext: React_2.Context<QualifiedEntityList>;
 
-// @public (undocumented)
+// @public
 export const DataViewEnumFilter: React_2.NamedExoticComponent<DataViewEnumFilterProps>;
 
 // @internal (undocumented)
@@ -261,11 +270,8 @@ export type DataViewEnumFilterCurrent = 'include' | 'exclude' | 'none';
 
 // @public (undocumented)
 export interface DataViewEnumFilterProps {
-    // (undocumented)
     children: React_2.ReactNode;
-    // (undocumented)
     field: SugaredRelativeSingleField['field'];
-    // (undocumented)
     name?: string;
 }
 
@@ -277,37 +283,44 @@ export const DataViewEnumFilterState: ({ name, children, state, value }: {
     state?: DataViewEnumFilterCurrent | DataViewEnumFilterCurrent[];
 }) => JSX_2.Element | null;
 
-// @public (undocumented)
-export const DataViewEnumFilterTrigger: ({ name, action, value, ...props }: {
-    name?: string;
-    value: string;
-    children: ReactNode;
-    action?: DataViewSetEnumFilterAction;
-}) => JSX_2.Element;
+// @public
+export const DataViewEnumFilterTrigger: React_2.ForwardRefExoticComponent<DataViewEnumFilterTriggerProps & React_2.RefAttributes<HTMLButtonElement>>;
 
 // @public (undocumented)
-export const DataViewExportTrigger: ({ fields, children, baseName, exportFactory }: DataViewExportTriggerProps) => JSX_2.Element;
-
-// @public (undocumented)
-export interface DataViewExportTriggerProps {
+export interface DataViewEnumFilterTriggerAttributes {
     // (undocumented)
-    baseName?: string;
+    ['data-active']?: '';
     // (undocumented)
-    children: ReactElement;
-    // (undocumented)
-    exportFactory?: ExportFactory;
-    // (undocumented)
-    fields?: ReactNode;
+    ['data-current']: DataViewEnumFilterCurrent;
 }
 
 // @public (undocumented)
+export interface DataViewEnumFilterTriggerProps {
+    action?: DataViewSetEnumFilterAction;
+    children: ReactElement;
+    name?: string;
+    value: string;
+}
+
+// @public
+export const DataViewExportTrigger: React_2.ForwardRefExoticComponent<DataViewExportTriggerProps & React_2.RefAttributes<HTMLButtonElement>>;
+
+// @public (undocumented)
+export interface DataViewExportTriggerProps {
+    baseName?: string;
+    children: ReactElement;
+    exportFactory?: ExportFactory;
+    fields?: ReactNode;
+}
+
+// @public
 export const DataViewFilter: NamedExoticComponent<DataViewFilterProps>;
 
 // @public (undocumented)
 export type DataViewFilterArtifact = Serializable;
 
-// @public (undocumented)
-export type DataViewFilterHandler<FA extends DataViewFilterArtifact = DataViewFilterArtifact> = ((filterArtifact: FA, options: DataViewFilterHandlerOptions<FA>) => Filter | undefined) & {
+// @public
+export type DataViewFilterHandler<FA extends DataViewFilterArtifact = DataViewFilterArtifact> = ((filterArtifact: FA, options: DataViewFilterHandlerOptions) => Filter | undefined) & {
     identifier?: {
         id: Symbol;
         params: any;
@@ -316,7 +329,7 @@ export type DataViewFilterHandler<FA extends DataViewFilterArtifact = DataViewFi
 };
 
 // @public (undocumented)
-export interface DataViewFilterHandlerOptions<FA extends DataViewFilterArtifact = DataViewFilterArtifact> {
+export interface DataViewFilterHandlerOptions {
     // (undocumented)
     environment: Environment;
 }
@@ -330,9 +343,9 @@ export const DataViewFilterHandlerRegistryContext: React_2.Context<DataViewFilte
 // @public (undocumented)
 export type DataViewFilteringArtifacts = Record<string, DataViewFilterArtifact>;
 
-// @public (undocumented)
+// @public
 export type DataViewFilteringMethods = {
-    setFilter: <FA extends DataViewFilterArtifact = DataViewFilterArtifact>(key: string, filter: SetStateAction<FA | undefined>) => void;
+    setFilter: DataViewSetFilter;
 };
 
 // @internal (undocumented)
@@ -345,7 +358,7 @@ export type DataViewFilteringProps = {
     filteringStateStorage?: StateStorageOrName;
 };
 
-// @public (undocumented)
+// @public
 export type DataViewFilteringState = {
     artifact: DataViewFilteringArtifacts;
     filter: Filter<never>;
@@ -359,59 +372,56 @@ export const DataViewFilteringStateContext: React_2.Context<DataViewFilteringSta
 export const DataViewFilterNameContext: React_2.Context<string>;
 
 // @public (undocumented)
-export type DataViewFilterProps = {
-    name: string;
-    filterHandler: DataViewFilterHandler<any>;
+export interface DataViewFilterProps {
+    // (undocumented)
     children?: React.ReactNode;
-};
+    // (undocumented)
+    filterHandler: DataViewFilterHandler<any>;
+    // (undocumented)
+    name: string;
+}
+
+// @public
+export const DataViewFilterScope: ({ name, children }: DataViewFilterScopeProps) => JSX_2.Element;
 
 // @public (undocumented)
-export const DataViewFilterScope: ({ name, children }: {
-    name: string;
+export interface DataViewFilterScopeProps {
+    // (undocumented)
     children: React.ReactNode;
-}) => JSX_2.Element;
+    name: string;
+}
 
 // @internal (undocumented)
 export const DataViewGlobalKeyContext: React_2.Context<string>;
 
-// @public (undocumented)
+// @public
 export const DataViewHasFilterType: ({ name, children }: DataViewHasFilterTypeProps) => JSX_2.Element | null;
 
 // @public (undocumented)
 export interface DataViewHasFilterTypeProps {
-    // (undocumented)
     children: React.ReactNode;
-    // (undocumented)
     name: string;
 }
 
-// @public (undocumented)
+// @public
 export const DataViewHasManyFilter: React_2.NamedExoticComponent<DataViewHasManyFilterProps>;
 
 // @public (undocumented)
 export interface DataViewHasManyFilterProps {
-    // (undocumented)
     children: React_2.ReactNode;
-    // (undocumented)
     field: SugaredRelativeEntityList['field'];
-    // (undocumented)
     name?: string;
-    // (undocumented)
     options?: SugaredQualifiedEntityList['entities'];
 }
 
-// @public (undocumented)
+// @public
 export const DataViewHasOneFilter: React_2.NamedExoticComponent<DataViewHasOneFilterProps>;
 
 // @public (undocumented)
 export interface DataViewHasOneFilterProps {
-    // (undocumented)
     children: React_2.ReactNode;
-    // (undocumented)
     field: SugaredRelativeSingleEntity['field'];
-    // (undocumented)
     name?: string;
-    // (undocumented)
     options?: SugaredQualifiedEntityList['entities'];
 }
 
@@ -426,7 +436,7 @@ export interface DataViewHighlightEvent {
 // @internal (undocumented)
 export const DataViewHighlightIndexContext: React_2.Context<number | null>;
 
-// @public (undocumented)
+// @public
 export const DataViewHighlightRow: React_2.ForwardRefExoticComponent<DataViewHighlightRowProps & React_2.RefAttributes<HTMLElement>>;
 
 // @public (undocumented)
@@ -453,10 +463,10 @@ export const DataViewInfiniteLoadProvider: React_2.NamedExoticComponent<{
 // @public (undocumented)
 export const DataViewInfiniteLoadScrollObserver: () => JSX_2.Element;
 
-// @public (undocumented)
+// @public
 export const DataViewInfiniteLoadTrigger: React_2.ForwardRefExoticComponent<{
     children: ReactElement;
-} & React_2.RefAttributes<HTMLElement>>;
+} & React_2.RefAttributes<HTMLButtonElement>>;
 
 // @internal (undocumented)
 export const DataViewInfiniteLoadTriggerContext: React_2.Context<(() => void) | undefined>;
@@ -466,20 +476,17 @@ export type DataViewInfo = {
     paging: DataViewPagingInfo;
 };
 
-// @public (undocumented)
+// @public
 export const DataViewIsDefinedFilter: NamedExoticComponent<DataViewIsDefinedFilterProps>;
 
 // @public (undocumented)
 export interface DataViewIsDefinedFilterProps {
-    // (undocumented)
     children: React.ReactNode;
-    // (undocumented)
     field: SugaredRelativeSingleField['field'];
-    // (undocumented)
     name?: string;
 }
 
-// @public (undocumented)
+// @public
 export const DataViewKeyboardEventHandler: React_2.ForwardRefExoticComponent<{
     children: ReactNode;
 } & React_2.RefAttributes<HTMLElement>>;
@@ -487,37 +494,40 @@ export const DataViewKeyboardEventHandler: React_2.ForwardRefExoticComponent<{
 // @internal (undocumented)
 export const DataViewKeyboardEventHandlerContext: React_2.Context<React_2.KeyboardEventHandler<Element>>;
 
-// @public (undocumented)
+// @public
 export const DataViewKeyProvider: ({ children, value }: {
     children: React.ReactNode;
     value: string;
 }) => JSX_2.Element;
 
-// @public (undocumented)
+// @public
 export const DataViewLayout: NamedExoticComponent<DataViewLayoutProps>;
 
 // @public (undocumented)
 export interface DataViewLayoutProps {
-    // (undocumented)
     children: ReactNode;
-    // (undocumented)
     label?: ReactNode;
-    // (undocumented)
     name: string;
 }
 
-// @public (undocumented)
-export const DataViewLayoutTrigger: ({ name, ...props }: DataViewLayoutTriggerProps) => JSX_2.Element;
+// @public
+export const DataViewLayoutTrigger: ForwardRefExoticComponent<DataViewLayoutTriggerProps & RefAttributes<HTMLButtonElement>>;
 
 // @public (undocumented)
-export interface DataViewLayoutTriggerProps {
+export interface DataViewLayoutTriggerAttributes {
     // (undocumented)
-    children: ReactElement;
+    ['data-active']?: '';
     // (undocumented)
-    name: string | undefined;
+    ['data-current']?: string;
 }
 
 // @public (undocumented)
+export interface DataViewLayoutTriggerProps {
+    children: ReactElement;
+    name: string | undefined;
+}
+
+// @public
 export const DataViewLoaderState: ({ children, ...props }: DataViewLoaderStateProps) => JSX_2.Element | null;
 
 // @internal (undocumented)
@@ -527,13 +537,9 @@ export const DataViewLoaderStateContext: React_2.Context<"initial" | "failed" | 
 export interface DataViewLoaderStateProps {
     // (undocumented)
     children: ReactNode;
-    // (undocumented)
     failed?: boolean;
-    // (undocumented)
     initial?: boolean;
-    // (undocumented)
     loaded?: boolean;
-    // (undocumented)
     refreshing?: boolean;
 }
 
@@ -545,7 +551,7 @@ export type DataViewMethods = {
     selection: DataViewSelectionMethods;
 };
 
-// @public (undocumented)
+// @public
 export const DataViewNonEmpty: ({ children }: {
     children: ReactNode;
 }) => JSX_2.Element | null;
@@ -553,44 +559,55 @@ export const DataViewNonEmpty: ({ children }: {
 // @public (undocumented)
 export type DataViewNullFilterState = 'include' | 'exclude' | 'none';
 
-// @public (undocumented)
-export const DataViewNullFilterTrigger: ({ name, action, ...props }: {
-    name?: string;
-    children: ReactNode;
-    action: DataViewSetNullFilterAction;
-}) => JSX_2.Element;
+// @public
+export const DataViewNullFilterTrigger: React_2.ForwardRefExoticComponent<DataViewNullFilterTriggerProps & React_2.RefAttributes<HTMLButtonElement>>;
 
 // @public (undocumented)
-export const DataViewNumberFilter: React_2.NamedExoticComponent<DataViewNumberFilterProps>;
-
-// @public (undocumented)
-export const DataViewNumberFilterInput: ({ name, type, allowFloat, ...props }: {
-    name?: string;
-    type: "from" | "to";
-    allowFloat?: boolean;
-    children: ReactElement;
-}) => JSX_2.Element;
-
-// @public (undocumented)
-export interface DataViewNumberFilterProps {
+export interface DataViewNullFilterTriggerAttributes {
     // (undocumented)
-    children: React_2.ReactNode;
+    ['data-active']?: '';
     // (undocumented)
-    field: SugaredRelativeSingleField['field'];
-    // (undocumented)
-    name?: string;
+    ['data-current']: DataViewNullFilterState;
 }
 
 // @public (undocumented)
-export const DataViewNumberFilterResetTrigger: ({ name, ...props }: DataViewNumberFilterResetTriggerProps) => JSX_2.Element | null;
-
-// @public (undocumented)
-export type DataViewNumberFilterResetTriggerProps = {
-    name?: string;
+export interface DataViewNullFilterTriggerProps {
+    action: DataViewSetNullFilterAction;
     children: ReactElement;
-};
+    name?: string;
+}
+
+// @public
+export const DataViewNumberFilter: React_2.NamedExoticComponent<DataViewNumberFilterProps>;
+
+// @public
+export const DataViewNumberFilterInput: React_2.ForwardRefExoticComponent<DataViewNumberFilterInputProps & React_2.RefAttributes<HTMLInputElement>>;
 
 // @public (undocumented)
+export interface DataViewNumberFilterInputProps {
+    allowFloat?: boolean;
+    children: ReactElement;
+    name?: string;
+    type: 'from' | 'to';
+}
+
+// @public (undocumented)
+export interface DataViewNumberFilterProps {
+    children: React_2.ReactNode;
+    field: SugaredRelativeSingleField['field'];
+    name?: string;
+}
+
+// @public
+export const DataViewNumberFilterResetTrigger: React_2.ForwardRefExoticComponent<DataViewNumberFilterResetTriggerProps & React_2.RefAttributes<HTMLButtonElement>>;
+
+// @public (undocumented)
+export interface DataViewNumberFilterResetTriggerProps {
+    children: ReactElement;
+    name?: string;
+}
+
+// @public
 export type DataViewPagingInfo = {
     totalCount: number | undefined;
     pagesCount: number | undefined;
@@ -599,7 +616,7 @@ export type DataViewPagingInfo = {
 // @internal (undocumented)
 export const DataViewPagingInfoContext: React_2.Context<DataViewPagingInfo>;
 
-// @public (undocumented)
+// @public
 export type DataViewPagingMethods = {
     goToPage: (page: number | 'first' | 'next' | 'previous' | 'last') => void;
     setItemsPerPage: (newItemsPerPage: number | null) => void;
@@ -610,15 +627,12 @@ export const DataViewPagingMethodsContext: React_2.Context<DataViewPagingMethods
 
 // @public (undocumented)
 export interface DataViewPagingProps {
-    // (undocumented)
     currentPageStateStorage?: StateStorageOrName;
-    // (undocumented)
     initialItemsPerPage?: number | null;
-    // (undocumented)
     pagingSettingsStorage?: StateStorageOrName;
 }
 
-// @public (undocumented)
+// @public
 export type DataViewPagingState = {
     pageIndex: number;
     itemsPerPage: number | null;
@@ -627,12 +641,11 @@ export type DataViewPagingState = {
 // @internal (undocumented)
 export const DataViewPagingStateContext: React_2.Context<DataViewPagingState>;
 
-// @public (undocumented)
+// @public
 export const DataViewPagingStateView: ({ render }: DataViewPagingStateViewProps) => JSX_2.Element;
 
 // @public (undocumented)
 export interface DataViewPagingStateViewProps {
-    // (undocumented)
     render: (props: DataViewPagingState & DataViewPagingInfo) => ReactNode;
 }
 
@@ -654,44 +667,60 @@ export const DataViewRelationFilterArgsContext: React_2.Context<{
 // @public (undocumented)
 export type DataViewRelationFilterCurrent = 'include' | 'exclude' | 'none';
 
-// @public (undocumented)
+// @public
 export const DataViewRelationFilterList: React_2.NamedExoticComponent<DataViewRelationFilterListProps>;
 
 // @public (undocumented)
-export type DataViewRelationFilterListProps = {
-    name?: string;
+export interface DataViewRelationFilterListProps {
     children: ReactNode;
-};
+    name?: string;
+}
 
-// @public (undocumented)
+// @public
 export const DataViewRelationFilterOptions: ({ children, name, ...props }: {
     name?: string;
     children: React_2.ReactNode;
 } & Omit<DataViewProps, "entities">) => JSX_2.Element;
 
-// @public (undocumented)
+// @public
 export const DataViewRelationFilterState: ({ name, children, state }: {
     name?: string;
     children: ReactNode;
     state?: DataViewRelationFilterCurrent | DataViewRelationFilterCurrent[];
 }) => JSX_2.Element | null;
 
+// @public
+export const DataViewRelationFilterTrigger: React_2.ForwardRefExoticComponent<DataViewRelationFilterTriggerProps & React_2.RefAttributes<HTMLButtonElement>>;
+
 // @public (undocumented)
-export const DataViewRelationFilterTrigger: ({ name, action, ...props }: {
-    name?: string;
-    children: ReactNode;
+export interface DataViewRelationFilterTriggerAttributes {
+    // (undocumented)
+    ['data-active']?: '';
+    // (undocumented)
+    ['data-current']: DataViewRelationFilterCurrent;
+}
+
+// @public (undocumented)
+export interface DataViewRelationFilterTriggerProps {
     action?: DataViewSetRelationFilterAction;
-}) => JSX_2.Element;
+    children: ReactElement;
+    name?: string;
+}
 
 // @internal (undocumented)
 export const DataViewReloadContext: React_2.Context<() => void>;
 
+// @public
+export const DataViewReloadTrigger: React_2.ForwardRefExoticComponent<DataViewReloadTriggerProps & React_2.RefAttributes<HTMLButtonElement>>;
+
 // @public (undocumented)
-export const DataViewReloadTrigger: ({ children }: DataViewReloadTriggerProps) => JSX_2.Element;
+export interface DataViewReloadTriggerAttributes {
+    // (undocumented)
+    ['data-state']: EntityListSubTreeLoaderState;
+}
 
 // @public (undocumented)
 export interface DataViewReloadTriggerProps {
-    // (undocumented)
     children: ReactElement;
 }
 
@@ -720,7 +749,7 @@ export type DataViewSelectionProps = {
     layouts?: DataViewSelectionLayout[];
 };
 
-// @public (undocumented)
+// @public
 export type DataViewSelectionState = {
     values: DataViewSelectionValues;
     layouts: DataViewSelectionLayout[];
@@ -741,19 +770,22 @@ export type DataViewSelectionValues = {
 export type DataViewSetBooleanFilterAction = 'include' | 'unset' | 'toggle';
 
 // @public (undocumented)
-export type DataViewSetColumnFilter<FA extends DataViewFilterArtifact = DataViewFilterArtifact> = (key: string, columnFilter: FA | undefined) => void;
-
-// @public (undocumented)
 export type DataViewSetColumnSorting = (key: string, columnOrderBy: DataViewSortingDirectionAction, append?: boolean) => void;
 
 // @public (undocumented)
 export type DataViewSetEnumFilterAction = 'include' | 'exclude' | 'unset' | 'toggleInclude' | 'toggleExclude';
 
 // @public (undocumented)
-export type DataViewSetFilter<FA extends DataViewFilterArtifact = DataViewFilterArtifact> = (filter: FA | undefined) => void;
+export type DataViewSetFilter = <FA extends DataViewFilterArtifact = DataViewFilterArtifact>(key: string, filter: SetStateAction<FA | undefined>) => void;
+
+// @public
+export const DataViewSetItemsPerPageTrigger: ForwardRefExoticComponent<DataViewSetItemsPerPageTriggerProps & RefAttributes<HTMLButtonElement>>;
 
 // @public (undocumented)
-export const DataViewSetItemsPerPageTrigger: ForwardRefExoticComponent<DataViewSetItemsPerPageTriggerProps & RefAttributes<HTMLElement>>;
+export interface DataViewSetItemsPerPageTriggerAttributes {
+    // (undocumented)
+    ['data-active']?: '';
+}
 
 // @public (undocumented)
 export interface DataViewSetItemsPerPageTriggerProps {
@@ -770,9 +802,6 @@ export type DataViewSetNullFilterAction = 'include' | 'exclude' | 'unset' | 'tog
 export type DataViewSetRelationFilterAction = 'include' | 'exclude' | 'unset' | 'toggleInclude' | 'toggleExclude';
 
 // @public (undocumented)
-export type DataViewSetSorting = (setOrderBy: DataViewSortingDirectionAction, append?: boolean) => void;
-
-// @public (undocumented)
 export type DataViewSortingDirection = 'asc' | 'desc' | null;
 
 // @public (undocumented)
@@ -781,13 +810,7 @@ export type DataViewSortingDirectionAction = DataViewSortingDirection | 'next' |
 // @public (undocumented)
 export type DataViewSortingDirections = Record<string, Exclude<DataViewSortingDirection, null>>;
 
-// @public (undocumented)
-export type DataViewSortingHandler = {};
-
-// @public (undocumented)
-export type DataViewSortingHandlerRegistry = Record<string, DataViewSortingHandler>;
-
-// @public (undocumented)
+// @public
 export type DataViewSortingMethods = {
     setOrderBy: DataViewSetColumnSorting;
 };
@@ -801,7 +824,7 @@ export type DataViewSortingProps = {
     sortingStateStorage?: StateStorageOrName;
 };
 
-// @public (undocumented)
+// @public
 export type DataViewSortingState = {
     directions: DataViewSortingDirections;
     orderBy: OrderBy;
@@ -825,19 +848,25 @@ export interface DataViewSortingSwitchProps {
     none?: ReactNode;
 }
 
+// @public
+export const DataViewSortingTrigger: ForwardRefExoticComponent<DataViewSortingTriggerProps & RefAttributes<HTMLButtonElement>>;
+
 // @public (undocumented)
-export const DataViewSortingTrigger: ({ action, field, ...props }: DataViewSortingTriggerProps) => JSX_2.Element;
+export interface DataViewSortingTriggerAttributes {
+    // (undocumented)
+    ['data-active']?: '';
+    // (undocumented)
+    ['data-current']: DataViewSortingDirection | 'none';
+}
 
 // @public (undocumented)
 export interface DataViewSortingTriggerProps {
     // (undocumented)
     action?: DataViewSortingDirectionAction;
     // (undocumented)
-    children: React.ReactNode;
+    children: ReactElement;
     // (undocumented)
     field: string;
-    // (undocumented)
-    toggle?: boolean;
 }
 
 // @public (undocumented)
@@ -850,72 +879,77 @@ export type DataViewState = {
     selection: DataViewSelectionState;
 };
 
-// @public (undocumented)
+// @public
 export const DataViewTextFilter: React_2.NamedExoticComponent<DataViewTextFilterProps>;
 
-// @public (undocumented)
-export const DataViewTextFilterInput: ({ name, debounceMs, ...props }: {
-    name?: string;
-    debounceMs?: number;
-    children: ReactElement;
-}) => JSX_2.Element;
+// @public
+export const DataViewTextFilterInput: React_2.ForwardRefExoticComponent<DataViewTextFilterInputProps & React_2.RefAttributes<HTMLInputElement>>;
 
 // @public (undocumented)
+export interface DataViewTextFilterInputProps {
+    children: ReactElement;
+    debounceMs?: number;
+    name?: string;
+}
+
+// @public
 export const DataViewTextFilterMatchModeLabel: ({ name, render }: DataViewTextFilterMatchModeLabelProps) => JSX_2.Element;
 
 // @public (undocumented)
-export type DataViewTextFilterMatchModeLabelProps = {
+export interface DataViewTextFilterMatchModeLabelProps {
     name?: string;
     render: ((mode: TextFilterArtifactsMatchMode) => ReactNode) | Record<TextFilterArtifactsMatchMode, ReactNode>;
-};
+}
+
+// @public
+export const DataViewTextFilterMatchModeTrigger: React_2.ForwardRefExoticComponent<DataViewTextFilterMatchModeTriggerProps & React_2.RefAttributes<HTMLButtonElement>>;
 
 // @public (undocumented)
-export const DataViewTextFilterMatchModeTrigger: ({ name, children, mode }: DataViewTextFilterMatchModeTriggerProps) => JSX_2.Element;
-
-// @public (undocumented)
-export type DataViewTextFilterMatchModeTriggerProps = {
-    name?: string;
+export interface DataViewTextFilterMatchModeTriggerProps {
     children: ReactElement;
     mode: TextFilterArtifactsMatchMode;
-};
-
-// @public (undocumented)
-export interface DataViewTextFilterProps {
-    // (undocumented)
-    children: React_2.ReactNode;
-    // (undocumented)
-    field: SugaredRelativeSingleField['field'];
-    // (undocumented)
     name?: string;
 }
 
 // @public (undocumented)
-export const DataViewTextFilterResetTrigger: ({ name, ...props }: DataViewTextFilterResetTriggerProps) => JSX_2.Element | null;
+export interface DataViewTextFilterProps {
+    children: React_2.ReactNode;
+    field: SugaredRelativeSingleField['field'];
+    name?: string;
+}
+
+// @public
+export const DataViewTextFilterResetTrigger: React_2.ForwardRefExoticComponent<DataViewTextFilterResetTriggerProps & React_2.RefAttributes<HTMLButtonElement>>;
 
 // @public (undocumented)
-export type DataViewTextFilterResetTriggerProps = {
-    name?: string;
+export interface DataViewTextFilterResetTriggerProps {
     children: ReactElement;
-};
+    name?: string;
+}
 
 // @public (undocumented)
 export type DataViewUnionFilterFields = SugaredRelativeSingleField['field'] | SugaredRelativeSingleField['field'][];
 
-// @public (undocumented)
+// @public
 export const DataViewUnionTextFilter: React_2.NamedExoticComponent<DataViewUnionTextFilterProps>;
 
 // @public (undocumented)
 export interface DataViewUnionTextFilterProps {
-    // (undocumented)
     children: React_2.ReactNode;
-    // (undocumented)
     fields: SugaredRelativeSingleField['field'] | SugaredRelativeSingleField['field'][];
-    // (undocumented)
     name: string;
 }
 
+// @public
+export const DataViewVisibilityTrigger: ForwardRefExoticComponent<DataViewVisibilityTriggerProps & RefAttributes<HTMLButtonElement>>;
+
 // @public (undocumented)
-export const DataViewVisibilityTrigger: ({ name, value, fallbackValue, ...props }: DataViewVisibilityTriggerProps) => JSX_2.Element;
+export interface DataViewVisibilityTriggerAttributes {
+    // (undocumented)
+    ['data-active']?: '';
+    // (undocumented)
+    ['data-current']?: '';
+}
 
 // @public (undocumented)
 export interface DataViewVisibilityTriggerProps {
@@ -972,15 +1006,6 @@ export type GenericTextCellFilterArtifacts = {
 };
 
 // @public (undocumented)
-export type GetNewOrderBy = (newDirection: DataViewSortingDirection, options: GetNewOrderByOptions) => SugaredOrderBy | undefined;
-
-// @public (undocumented)
-export interface GetNewOrderByOptions {
-    // (undocumented)
-    environment: Environment;
-}
-
-// @public (undocumented)
 export type IsDefinedFilterArtifacts = {
     nullCondition?: boolean;
 };
@@ -1016,7 +1041,7 @@ export type TextFilterArtifacts = {
 // @public (undocumented)
 export type TextFilterArtifactsMatchMode = 'matches' | 'matchesExactly' | 'startsWith' | 'endsWith' | 'doesNotMatch';
 
-// @public (undocumented)
+// @public
 export const useDataView: (args: UseDataViewArgs) => UseDataViewResult;
 
 // @public (undocumented)
@@ -1037,7 +1062,7 @@ export const useDataViewBooleanFilter: (name: string, value: boolean) => UseData
 // @public (undocumented)
 export const useDataViewBooleanFilterFactory: (name: string) => (value: boolean) => UseDataViewBooleanFilter;
 
-// @public (undocumented)
+// @public
 export const useDataViewChildren: () => React_2.ReactNode;
 
 // @public (undocumented)
@@ -1060,18 +1085,18 @@ export interface UseDataViewDateFilterInputResult {
     value: string;
 }
 
-// @public (undocumented)
+// @public
 export const useDataViewDisplayedState: <T extends DataViewState>() => T | undefined;
 
-// @public (undocumented)
+// @public
 export const useDataViewElements: ({ selection }?: {
     selection?: DataViewSelectionValues;
 }) => DataViewElementProps[];
 
-// @public (undocumented)
+// @public
 export const useDataViewEntityListAccessor: () => EntityListAccessor | undefined;
 
-// @public (undocumented)
+// @public
 export const useDataViewEntityListProps: () => QualifiedEntityList;
 
 // @public (undocumented)
@@ -1083,7 +1108,7 @@ set: (value: DataViewSetEnumFilterAction) => void
 // @public (undocumented)
 export const useDataViewEnumFilter: (name: string, value: string) => UseDataViewEnumFilter;
 
-// @public (undocumented)
+// @public
 export const useDataViewEnumFilterArgs: () => {
     enumName: string;
 };
@@ -1091,7 +1116,7 @@ export const useDataViewEnumFilterArgs: () => {
 // @public (undocumented)
 export const useDataViewEnumFilterFactory: (name: string) => (value: string) => UseDataViewEnumFilter;
 
-// @public (undocumented)
+// @public
 export const useDataViewFetchAllData: ({ children }: {
     children: ReactNode;
 }) => () => Promise<{
@@ -1099,27 +1124,34 @@ export const useDataViewFetchAllData: ({ children }: {
     data: ReceivedEntityData[];
 }>;
 
-// Warning: (ae-forgotten-export) The symbol "UseDataViewFilterResult" needs to be exported by the entry point index.d.ts
-//
-// @public (undocumented)
+// @public
 export const useDataViewFilter: <T extends DataViewFilterArtifact>(key: string) => UseDataViewFilterResult<T>;
 
 // @public (undocumented)
 export const useDataViewFilterHandlerRegistry: () => DataViewFilterHandlerRegistry;
 
-// @public (undocumented)
+// @public
 export const useDataViewFilteringMethods: () => DataViewFilteringMethods;
 
-// @public (undocumented)
+// @public
 export const useDataViewFilteringState: () => DataViewFilteringState;
 
-// @public (undocumented)
+// @public
 export const useDataViewFilterName: () => string;
+
+// @public (undocumented)
+export type UseDataViewFilterResult<T extends DataViewFilterArtifact> = [
+state: T | undefined,
+action: (filter: SetStateAction<T | undefined>) => void,
+meta: {
+    isEmpty?: boolean;
+}
+];
 
 // @public (undocumented)
 export const useDataViewGlobalKey: () => string;
 
-// @public (undocumented)
+// @public
 export const useDataViewHighlightIndex: () => number | null;
 
 // @public (undocumented)
@@ -1131,7 +1163,7 @@ export const useDataViewInfiniteLoadTrigger: () => (() => void) | undefined;
 // @public (undocumented)
 export const useDataViewKeyboardEventHandler: () => React_2.KeyboardEventHandler<Element>;
 
-// @public (undocumented)
+// @public
 export const useDataViewLoaderState: () => "initial" | "failed" | "refreshing" | "loaded";
 
 // @public (undocumented)
@@ -1161,13 +1193,13 @@ export interface UseDataViewNumberFilterInputResult {
     value: string;
 }
 
-// @public (undocumented)
+// @public
 export const useDataViewPagingInfo: () => DataViewPagingInfo;
 
-// @public (undocumented)
+// @public
 export const useDataViewPagingMethods: () => DataViewPagingMethods;
 
-// @public (undocumented)
+// @public
 export const useDataViewPagingState: () => DataViewPagingState;
 
 // @public (undocumented)
@@ -1194,7 +1226,7 @@ current: DataViewRelationFilterCurrent,
 set: (value: DataViewSetRelationFilterAction) => void
 ];
 
-// @public (undocumented)
+// @public
 export const useDataViewReload: () => () => void;
 
 // @public (undocumented)
@@ -1204,31 +1236,31 @@ export type UseDataViewResult = {
     methods: DataViewMethods;
 };
 
-// @public (undocumented)
+// @public
 export const useDataViewSelectionMethods: () => DataViewSelectionMethods;
 
-// @public (undocumented)
+// @public
 export const useDataViewSelectionState: () => DataViewSelectionState;
 
-// @public (undocumented)
+// @public
 export const useDataViewSortingMethods: () => DataViewSortingMethods;
 
-// @public (undocumented)
+// @public
 export const useDataViewSortingState: () => DataViewSortingState;
 
-// @public (undocumented)
+// @public
 export const useDataViewTargetFieldSchema: (field: SugaredRelativeSingleField["field"]) => {
     field: SchemaColumn;
     entity: SchemaEntity;
 };
 
-// @public (undocumented)
+// @public
 export const useDataViewTargetHasManySchema: (field: SugaredRelativeEntityList["field"]) => {
     field: SchemaRelation;
     entity: SchemaEntity;
 };
 
-// @public (undocumented)
+// @public
 export const useDataViewTargetHasOneSchema: (field: SugaredRelativeSingleEntity["field"]) => {
     field: SchemaRelation;
     entity: SchemaEntity;

@@ -42,7 +42,13 @@ export class BijectiveIndexedMap<K, V> implements Map<K, V> {
 }
 
 // @public (undocumented)
-export function dataAttribute(value: unknown): string | true | undefined;
+export function dataAttribute(value: boolean | null | undefined): '' | undefined;
+
+// @public (undocumented)
+export function dataAttribute<const T extends string>(value: T): T;
+
+// @public (undocumented)
+export function dataAttribute(value: boolean | string | number | undefined | null): string | undefined;
 
 // @internal
 export function deprecate(removal: SemverString, condition: boolean, deprecated: string, replacement: string | null): void;

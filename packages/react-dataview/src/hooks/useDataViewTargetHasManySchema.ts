@@ -2,6 +2,9 @@ import { useMemo } from 'react'
 import { useDataViewTargetFieldSchemaInternal } from '../internal/hooks/useTargetFieldSchema'
 import { QueryLanguage, SugaredRelativeEntityList, useEnvironment } from '@contember/react-binding'
 
+/**
+ * Utility hook for getting schema of a has-many relation field.
+ */
 export const useDataViewTargetHasManySchema = (field: SugaredRelativeEntityList['field']) => {
 	const environment = useEnvironment()
 	const fields = useMemo(() => {

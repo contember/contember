@@ -2,13 +2,17 @@ import { DataViewFilterArtifact } from '../types'
 import { useDataViewFilteringMethods, useDataViewFilteringState } from '../contexts'
 import { SetStateAction, useCallback } from 'react'
 
-type UseDataViewFilterResult<T extends DataViewFilterArtifact> = [
+export type UseDataViewFilterResult<T extends DataViewFilterArtifact> = [
 	state: T | undefined,
 	action: (filter: SetStateAction<T | undefined>) => void,
 	meta: {
 		isEmpty?: boolean
 	},
 ]
+
+/**
+ * Hook for accessing state and methods for a specific data view filter.
+ */
 export const useDataViewFilter = <T extends DataViewFilterArtifact>(key: string): UseDataViewFilterResult<T> => {
 	const filteringState = useDataViewFilteringState()
 	const state = filteringState.artifact[key] as T | undefined

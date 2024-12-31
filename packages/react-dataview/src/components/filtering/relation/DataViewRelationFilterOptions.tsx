@@ -5,6 +5,9 @@ import { DataView, DataViewProps } from '../../DataView'
 import { EntityAccessor } from '@contember/react-binding'
 import { useCallback } from 'react'
 
+/**
+ * Initializes a data view for selecting relation filter options.
+ */
 export const DataViewRelationFilterOptions = ({ children, name, ...props }: {
 	name?: string
 	children: React.ReactNode

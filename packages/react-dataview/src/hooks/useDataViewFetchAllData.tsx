@@ -13,6 +13,9 @@ import {
 } from '@contember/react-binding'
 import { dataViewSelectionEnvironmentExtension } from '../env/dataViewSelectionEnvironmentExtension'
 
+/**
+ * Hook for fetching all data matching the current filter. Used for exporting data.
+ */
 export const useDataViewFetchAllData = ({ children }: { children: ReactNode }) => {
 	const entityName = useDataViewEntityListProps().entityName
 	const filter = useDataViewFilteringState().filter

@@ -4,11 +4,33 @@ import { Component, EntityListSubTree } from '@contember/react-binding'
 import { useDataViewRelationFilterData } from '../../../hooks'
 import { useDataViewFilterName, useDataViewRelationFilterArgs } from '../../../contexts'
 
-export type DataViewRelationFilterListProps = {
+export interface DataViewRelationFilterListProps {
+	/**
+	 * The name of the relation filter.
+	 */
 	name?: string
+
+	/**
+	 * The content to render for each entity.
+	 */
 	children: ReactNode
 }
 
+/**
+ * Renders a list of active entities in a relation filter.
+ *
+ * ## Props
+ * - name, children
+ *
+ * See {@link DataViewRelationFilterListProps} for details.
+ *
+ * ## Example
+ * ```tsx
+ * <DataViewRelationFilterList>
+ *     <Field field="name" />
+ * </DataViewRelationFilterList>
+ * ```
+ */
 export const DataViewRelationFilterList = Component(({ children, name }: DataViewRelationFilterListProps) => {
 	const { options } = useDataViewRelationFilterArgs()
 	// eslint-disable-next-line react-hooks/rules-of-hooks

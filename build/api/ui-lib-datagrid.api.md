@@ -12,44 +12,36 @@ import { DataViewHasOneFilterProps } from '@contember/react-dataview';
 import { DataViewNumberFilterProps } from '@contember/react-dataview';
 import { DataViewProps } from '@contember/react-dataview';
 import { DataViewTextFilterProps } from '@contember/react-dataview';
-import { DataViewUnionFilterFields } from '@contember/react-dataview';
 import { DataViewUnionTextFilterProps } from '@contember/react-dataview';
 import { JSX as JSX_2 } from 'react/jsx-runtime';
-import { NamedExoticComponent } from 'react';
 import * as React_2 from 'react';
 import { ReactNode } from 'react';
 import { SugaredRelativeEntityList } from '@contember/interface';
 import { SugaredRelativeSingleEntity } from '@contember/interface';
 import { SugaredRelativeSingleField } from '@contember/interface';
 
-// @public (undocumented)
+// @public
 export const createDataGridDateRange: (label: ReactNode, dayDeltaStart: number, dayDeltaEnd: number) => DataGridPredefinedDateRange;
 
-// @public (undocumented)
+// @public
 export const DataGrid: React_2.NamedExoticComponent<Omit<DataViewProps, "children"> & {
     children: ReactNode;
 }>;
 
-// @public (undocumented)
+// @public
 export const DataGridActionColumn: React_2.NamedExoticComponent<{
     children: ReactNode;
 }>;
 
 // @public
-export const DataGridActiveFilterUI: React_2.ForwardRefExoticComponent<{
-    children: ReactNode;
-    className?: string;
-} & React_2.RefAttributes<HTMLButtonElement>>;
-
-// @public (undocumented)
 export const DataGridAutoExport: ({ fields }: {
     fields?: ReactNode;
 }) => JSX_2.Element;
 
-// @public (undocumented)
+// @public
 export const DataGridBooleanColumn: React_2.NamedExoticComponent<DataGridBooleanColumnProps>;
 
-// @public (undocumented)
+// @public
 export type DataGridBooleanColumnProps = {
     field: string;
     header?: ReactNode;
@@ -58,48 +50,20 @@ export type DataGridBooleanColumnProps = {
     filter?: ReactNode;
 };
 
-// @public (undocumented)
+// @public
 export const DataGridBooleanFilter: React_2.NamedExoticComponent<Omit<DataViewBooleanFilterProps, "children"> & {
     label: ReactNode;
 }>;
 
-// @public (undocumented)
-export const DataGridBooleanFilterControls: () => JSX_2.Element;
+// @public
+export type DataGridBooleanFilterProps = Omit<DataViewBooleanFilterProps, 'children'> & {
+    label: ReactNode;
+};
 
-// @public (undocumented)
-export const DataGridBooleanFilterList: () => JSX_2.Element;
-
-// @public (undocumented)
-export const DataGridBooleanFilterSelect: ({ label }: {
-    label?: ReactNode;
-}) => JSX_2.Element;
-
-// @public (undocumented)
+// @public
 export const DataGridColumn: React_2.NamedExoticComponent<DataGridColumnProps>;
 
-// @public (undocumented)
-export const DataGridColumnHeader: NamedExoticComponent<    {
-sortingField?: string;
-hidingName?: string;
-filterName?: string;
-filter?: ReactNode;
-children: ReactNode;
-}>;
-
-// @public (undocumented)
-export const DataGridColumnLeaf: React_2.NamedExoticComponent<DataGridColumnLeafProps>;
-
-// @public (undocumented)
-export interface DataGridColumnLeafProps {
-    // (undocumented)
-    cell: ReactNode;
-    // (undocumented)
-    header?: ReactNode;
-    // (undocumented)
-    name?: string;
-}
-
-// @public (undocumented)
+// @public
 export type DataGridColumnProps = {
     children: ReactNode;
     header?: ReactNode;
@@ -112,10 +76,10 @@ export type DataGridColumnProps = {
     filterName?: string;
 };
 
-// @public (undocumented)
+// @public
 export const DataGridDateColumn: React_2.NamedExoticComponent<DataGridDateColumnProps>;
 
-// @public (undocumented)
+// @public
 export type DataGridDateColumnProps = {
     field: string;
     header?: ReactNode;
@@ -124,27 +88,22 @@ export type DataGridDateColumnProps = {
     filter?: ReactNode;
 };
 
-// @public (undocumented)
+// @public
 export const DataGridDateFilter: React_2.NamedExoticComponent<Omit<DataViewDateFilterProps, "children"> & {
     label: ReactNode;
     ranges?: DataGridPredefinedDateRange[];
 }>;
 
-// @public (undocumented)
-export const DataGridDateFilterControls: ({ layout }: {
-    layout?: "row" | "column";
-}) => JSX_2.Element;
-
-// @public (undocumented)
+// @public
 export type DataGridDateFilterProps = Omit<DataViewDateFilterProps, 'children'> & {
     label: ReactNode;
     ranges?: DataGridPredefinedDateRange[];
 };
 
-// @public (undocumented)
+// @public
 export const DataGridDateTimeColumn: React_2.NamedExoticComponent<DataGridDateTimeColumnProps>;
 
-// @public (undocumented)
+// @public
 export type DataGridDateTimeColumnProps = {
     field: string;
     header?: ReactNode;
@@ -153,13 +112,10 @@ export type DataGridDateTimeColumnProps = {
     filter?: ReactNode;
 };
 
-// @public (undocumented)
-export const dataGridDefaultStorages: Partial<DataGridProps>;
-
-// @public (undocumented)
+// @public
 export const DataGridEnumCell: React_2.NamedExoticComponent<DataGridEnumCellProps>;
 
-// @public (undocumented)
+// @public
 export type DataGridEnumCellProps = {
     field: SugaredRelativeSingleField['field'];
     filterName?: string;
@@ -167,10 +123,10 @@ export type DataGridEnumCellProps = {
     tooltipActions?: ReactNode;
 };
 
-// @public (undocumented)
+// @public
 export const DataGridEnumColumn: React_2.NamedExoticComponent<DataGridEnumColumnProps>;
 
-// @public (undocumented)
+// @public
 export type DataGridEnumColumnProps = {
     field: string;
     header?: ReactNode;
@@ -180,79 +136,32 @@ export type DataGridEnumColumnProps = {
     tooltipActions?: ReactNode;
 };
 
-// @public (undocumented)
-export const DataGridEnumFieldTooltip: ({ children, actions, value, ...props }: Omit<DataViewEnumFilterProps, "children"> & {
+// @public
+export const DataGridEnumFieldTooltip: ({ children, actions, value, ...props }: DataGridEnumFieldTooltipProps & {
     children: ReactNode;
     value: string;
     actions?: ReactNode;
 }) => JSX_2.Element;
 
-// @public (undocumented)
+// @public
+export type DataGridEnumFieldTooltipProps = Omit<DataViewEnumFilterProps, 'children'>;
+
+// @public
 export const DataGridEnumFilter: React_2.NamedExoticComponent<Omit<DataViewEnumFilterProps, "children"> & {
     options?: Record<string, ReactNode>;
     label?: ReactNode;
 }>;
 
-// @public (undocumented)
-export const DataGridEnumFilterControls: ({ options }: {
-    options?: Record<string, ReactNode>;
-}) => JSX_2.Element;
-
-// @public (undocumented)
-export const DataGridEnumFilterList: ({ options }: {
-    options?: Record<string, ReactNode>;
-}) => JSX_2.Element;
-
-// @public (undocumented)
+// @public
 export type DataGridEnumFilterProps = Omit<DataViewEnumFilterProps, 'children'> & {
     options?: Record<string, ReactNode>;
     label?: ReactNode;
 };
 
-// @public (undocumented)
-export const DataGridEnumFilterSelect: ({ options, label }: {
-    options?: Record<string, ReactNode>;
-    label?: ReactNode;
-}) => JSX_2.Element;
-
 // @public
-export const DataGridExcludeActionButtonUI: React_2.ForwardRefExoticComponent<React_2.RefAttributes<HTMLButtonElement>>;
-
-// @public
-export const DataGridFilterActionButtonUI: React_2.ForwardRefExoticComponent<React_2.RefAttributes<HTMLButtonElement>>;
-
-// @public (undocumented)
-export const DataGridFilterMobileHiding: ({ name, children }: {
-    name?: string;
-    children: ReactNode;
-}) => JSX_2.Element;
-
-// @public (undocumented)
-export interface DataGridFilterSelectItemProps {
-    // (undocumented)
-    children: ReactNode;
-    // (undocumented)
-    isExcluded: boolean;
-    // (undocumented)
-    isIncluded: boolean;
-    // (undocumented)
-    onExclude: () => void;
-    // (undocumented)
-    onInclude: () => void;
-}
-
-// @public (undocumented)
-export const DataGridFilterSelectItemUI: React_2.ForwardRefExoticComponent<DataGridFilterSelectItemProps & React_2.RefAttributes<HTMLButtonElement>>;
-
-// @public (undocumented)
-export const DataGridFilterSelectTriggerUI: React_2.ForwardRefExoticComponent<{
-    children: ReactNode;
-} & React_2.RefAttributes<HTMLButtonElement>>;
-
-// @public (undocumented)
 export const DataGridHasManyCell: React_2.NamedExoticComponent<DataGridHasManyCellProps>;
 
-// @public (undocumented)
+// @public
 export type DataGridHasManyCellProps = {
     field: SugaredRelativeEntityList['field'];
     filterName?: string;
@@ -260,10 +169,10 @@ export type DataGridHasManyCellProps = {
     tooltipActions?: ReactNode;
 };
 
-// @public (undocumented)
+// @public
 export const DataGridHasManyColumn: React_2.NamedExoticComponent<DataGridHasManyColumnProps>;
 
-// @public (undocumented)
+// @public
 export type DataGridHasManyColumnProps = {
     field: SugaredRelativeEntityList['field'];
     filterName?: string;
@@ -273,24 +182,31 @@ export type DataGridHasManyColumnProps = {
     tooltipActions?: ReactNode;
 };
 
-// Warning: (ae-forgotten-export) The symbol "DataGridRelationFilterInnerProps" needs to be exported by the entry point index.d.ts
-//
-// @public (undocumented)
-export const DataGridHasManyFilter: React_2.NamedExoticComponent<DataViewHasManyFilterProps & DataGridRelationFilterInnerProps>;
-
-// @public (undocumented)
-export type DataGridHasManyFilterProps = DataViewHasManyFilterProps & DataGridRelationFilterInnerProps;
-
-// @public (undocumented)
-export const DataGridHasManyTooltip: React_2.NamedExoticComponent<DataViewHasManyFilterProps & {
+// @public
+export const DataGridHasManyFilter: React_2.NamedExoticComponent<DataViewHasManyFilterProps & {
     children: ReactNode;
-    actions?: ReactNode;
+    label: ReactNode;
 }>;
 
-// @public (undocumented)
+// @public
+export type DataGridHasManyFilterProps = DataViewHasManyFilterProps & {
+    children: ReactNode;
+    label: ReactNode;
+};
+
+// @public
+export const DataGridHasManyTooltip: React_2.NamedExoticComponent<DataGridHasManyTooltipProps>;
+
+// @public
+export type DataGridHasManyTooltipProps = DataViewHasManyFilterProps & {
+    children: ReactNode;
+    actions?: ReactNode;
+};
+
+// @public
 export const DataGridHasOneCell: React_2.NamedExoticComponent<DataGridHasOneCellProps>;
 
-// @public (undocumented)
+// @public
 export type DataGridHasOneCellProps = {
     field: SugaredRelativeSingleEntity['field'];
     filterName?: string;
@@ -298,10 +214,10 @@ export type DataGridHasOneCellProps = {
     tooltipActions?: ReactNode;
 };
 
-// @public (undocumented)
+// @public
 export const DataGridHasOneColumn: React_2.NamedExoticComponent<DataGridHasOneColumnProps>;
 
-// @public (undocumented)
+// @public
 export type DataGridHasOneColumnProps = {
     field: SugaredRelativeSingleEntity['field'];
     filterName?: string;
@@ -311,25 +227,31 @@ export type DataGridHasOneColumnProps = {
     tooltipActions?: ReactNode;
 };
 
-// @public (undocumented)
-export const DataGridHasOneFilter: React_2.NamedExoticComponent<DataViewHasOneFilterProps & DataGridRelationFilterInnerProps>;
-
-// @public (undocumented)
-export type DataGridHasOneFilterProps = DataViewHasOneFilterProps & DataGridRelationFilterInnerProps;
-
-// @public (undocumented)
-export const DataGridHasOneTooltip: React_2.NamedExoticComponent<DataViewHasOneFilterProps & {
+// @public
+export const DataGridHasOneFilter: React_2.NamedExoticComponent<DataViewHasOneFilterProps & {
     children: ReactNode;
-    actions?: ReactNode;
+    label: ReactNode;
 }>;
 
-// @public (undocumented)
-export const DataGridInitialLoader: () => JSX_2.Element;
+// @public
+export type DataGridHasOneFilterProps = DataViewHasOneFilterProps & {
+    children: ReactNode;
+    label: ReactNode;
+};
 
-// @public (undocumented)
+// @public
+export const DataGridHasOneTooltip: React_2.NamedExoticComponent<DataGridHasOneTooltipProps>;
+
+// @public
+export type DataGridHasOneTooltipProps = DataViewHasOneFilterProps & {
+    children: ReactNode;
+    actions?: ReactNode;
+};
+
+// @public
 export const DataGridIsDefinedColumn: React_2.NamedExoticComponent<DataGridIsDefinedColumnProps>;
 
-// @public (undocumented)
+// @public
 export type DataGridIsDefinedColumnProps = {
     field: string;
     header?: ReactNode;
@@ -339,29 +261,25 @@ export type DataGridIsDefinedColumnProps = {
     filterName?: string;
 };
 
-// @public (undocumented)
+// @public
 export const DataGridIsDefinedFilter: React_2.NamedExoticComponent<Omit<DataViewBooleanFilterProps, "children"> & {
     label: ReactNode;
 }>;
 
-// @public (undocumented)
-export const DataGridIsDefinedFilterControls: () => JSX_2.Element;
+// @public
+export type DataGridIsDefinedFilterProps = Omit<DataViewBooleanFilterProps, 'children'> & {
+    label: ReactNode;
+};
 
-// @public (undocumented)
-export const DataGridIsDefinedFilterList: () => JSX_2.Element;
-
-// @public (undocumented)
-export const DataGridIsDefinedFilterSelect: ({ label }: {
-    label?: ReactNode;
-}) => JSX_2.Element;
-
-// @public (undocumented)
+// @public
 export const DataGridLayoutSwitcher: () => JSX_2.Element;
 
-// @public (undocumented)
-export const DataGridLoader: ({ children }: DataGridLoaderProps) => JSX_2.Element;
+// @public
+export const DataGridLoader: ({ children }: {
+    children: ReactNode;
+}) => JSX_2.Element;
 
-// @public (undocumented)
+// @public
 export interface DataGridLoaderProps {
     // (undocumented)
     children: ReactNode;
@@ -370,10 +288,10 @@ export interface DataGridLoaderProps {
 // @public (undocumented)
 export const DataGridNoResults: () => JSX_2.Element;
 
-// @public (undocumented)
+// @public
 export const DataGridNumberColumn: React_2.NamedExoticComponent<DataGridNumberColumnProps>;
 
-// @public (undocumented)
+// @public
 export type DataGridNumberColumnProps = {
     field: string;
     header?: ReactNode;
@@ -382,31 +300,17 @@ export type DataGridNumberColumnProps = {
     filter?: ReactNode;
 };
 
-// @public (undocumented)
+// @public
 export const DataGridNumberFilter: React_2.NamedExoticComponent<Omit<DataViewNumberFilterProps, "children"> & {
     label: ReactNode;
 }>;
 
-// @public (undocumented)
-export const DataGridNumberFilterControls: () => JSX_2.Element;
-
-// @public (undocumented)
-export const DataGridNumberFilterList: () => JSX_2.Element;
-
-// @public (undocumented)
+// @public
 export type DataGridNumberFilterProps = Omit<DataViewNumberFilterProps, 'children'> & {
     label: ReactNode;
 };
 
-// @public (undocumented)
-export const DataGridNumberFilterSelect: ({ label }: {
-    label?: ReactNode;
-}) => JSX_2.Element;
-
-// @public (undocumented)
-export const DataGridOverlayLoader: () => JSX_2.Element;
-
-// @public (undocumented)
+// @public
 export const DataGridPagination: () => JSX_2.Element;
 
 // @public (undocumented)
@@ -419,49 +323,26 @@ export type DataGridPredefinedDateRange = {
     label: ReactNode;
 };
 
-// @public (undocumented)
+// @public
 export type DataGridProps = Omit<DataViewProps, 'children'> & {
     children: ReactNode;
 };
 
-// @public (undocumented)
-export const DataGridQueryFilter: React_2.NamedExoticComponent<{
+// @public
+export const DataGridQueryFilter: React_2.NamedExoticComponent<DataGridQueryFilterProps>;
+
+// @public
+export type DataGridQueryFilterProps = {
     label?: React_2.ReactNode;
-}>;
+};
 
-// @public (undocumented)
-export const DataGridRelationFilterControls: ({ children, queryField }: {
-    queryField?: DataViewUnionFilterFields;
-    children: ReactNode;
-}) => JSX_2.Element;
-
-// @public (undocumented)
-export const DataGridRelationFilteredItemsList: ({ children }: {
-    children: ReactNode;
-}) => JSX_2.Element;
-
-// @public (undocumented)
-export const DataGridRelationFilterSelect: ({ children, queryField, label }: {
-    queryField?: DataViewUnionFilterFields;
-    children: ReactNode;
-    label?: ReactNode;
-}) => JSX_2.Element;
-
-// @public (undocumented)
-export const DataGridShowFiltersContext: React_2.Context<boolean>;
-
-// @public (undocumented)
-export const DataGridSingleFilterUI: React_2.ForwardRefExoticComponent<{
-    children: ReactNode;
-} & React_2.RefAttributes<HTMLDivElement>>;
-
-// @public (undocumented)
+// @public
 export const DataGridTable: React_2.NamedExoticComponent<DataViewTableProps>;
 
-// @public (undocumented)
+// @public
 export const DataGridTextColumn: React_2.NamedExoticComponent<DataGridTextColumnProps>;
 
-// @public (undocumented)
+// @public
 export type DataGridTextColumnProps = {
     field: string;
     header?: ReactNode;
@@ -470,25 +351,20 @@ export type DataGridTextColumnProps = {
     filter?: ReactNode;
 };
 
-// @public (undocumented)
+// @public
 export const DataGridTextFilter: React_2.NamedExoticComponent<Omit<DataViewTextFilterProps, "children"> & {
     label?: React_2.ReactNode;
 }>;
 
-// @public (undocumented)
-export const DataGridTextFilterInner: ({ label }: {
-    label?: React_2.ReactNode;
-}) => JSX_2.Element;
-
-// @public (undocumented)
+// @public
 export type DataGridTextFilterProps = Omit<DataViewTextFilterProps, 'children'> & {
     label?: React_2.ReactNode;
 };
 
-// @public (undocumented)
+// @public
 export const DataGridTiles: React_2.NamedExoticComponent<DataGridTilesProps>;
 
-// @public (undocumented)
+// @public
 export interface DataGridTilesProps {
     // (undocumented)
     children: React_2.ReactNode;
@@ -496,55 +372,29 @@ export interface DataGridTilesProps {
     className?: string;
 }
 
-// @public (undocumented)
+// @public
 export const DataGridToolbar: React_2.NamedExoticComponent<DataGridToolbarProps>;
 
-// @public (undocumented)
+// @public
 export interface DataGridToolbarProps {
     // (undocumented)
     children?: ReactNode;
 }
 
-// @public (undocumented)
-export const DataGridToolbarUI: React_2.ForwardRefExoticComponent<Omit<React_2.ClassAttributes<HTMLDivElement> & React_2.HTMLAttributes<HTMLDivElement> & {
-    asChild?: boolean;
-    children?: React_2.ReactNode;
-    className?: string;
-}, "ref"> & React_2.RefAttributes<HTMLDivElement>>;
-
-// @public (undocumented)
-export const DataGridToolbarVisibleElements: ({ elements }: DataGridToolbarVisibleElementsProps) => JSX_2.Element | null;
-
-// @public (undocumented)
-export interface DataGridToolbarVisibleElementsProps {
-    // (undocumented)
-    elements?: {
-        name: string;
-        label: ReactNode;
-    }[];
-}
-
-// @public (undocumented)
-export const DataGridTooltipLabel: React_2.ForwardRefExoticComponent<Omit<React_2.ClassAttributes<HTMLSpanElement> & React_2.HTMLAttributes<HTMLSpanElement> & {
-    asChild?: boolean;
-    children?: React_2.ReactNode;
-    className?: string;
-}, "ref"> & React_2.RefAttributes<HTMLSpanElement>>;
-
-// @public (undocumented)
+// @public
 export const DataGridUnionTextFilter: React_2.NamedExoticComponent<Omit<DataViewUnionTextFilterProps, "children"> & {
     label?: React_2.ReactNode;
 }>;
 
-// @public (undocumented)
+// @public
 export type DataGridUnionTextFilterProps = Omit<DataViewUnionTextFilterProps, 'children'> & {
     label?: React_2.ReactNode;
 };
 
-// @public (undocumented)
+// @public
 export const DataGridUuidColumn: React_2.NamedExoticComponent<DataGridUuidColumnProps>;
 
-// @public (undocumented)
+// @public
 export type DataGridUuidColumnProps = {
     field: string;
     header?: ReactNode;
@@ -552,19 +402,19 @@ export type DataGridUuidColumnProps = {
     format?: (value: string | null) => ReactNode;
 };
 
-// @public (undocumented)
+// @public
 export interface DataViewTableProps {
     // (undocumented)
     children: ReactNode;
 }
 
-// @public (undocumented)
+// @public
 export const DefaultDataGrid: React_2.NamedExoticComponent<Omit<DataViewProps, "children"> & {
     children: ReactNode;
     toolbar?: ReactNode;
 }>;
 
-// @public (undocumented)
+// @public
 export type DefaultDataGridProps = Omit<DataViewProps, 'children'> & {
     children: ReactNode;
     toolbar?: ReactNode;

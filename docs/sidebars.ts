@@ -84,6 +84,32 @@ const sidebars: SidebarsConfig = {
 						'reference/interface/data-binding/custom-components',
 					],
 				},
+				{
+					type: 'category',
+					label: 'Headless Components',
+					collapsed: true,
+					items: [
+						{
+							type: 'doc',
+							id: 'reference/interface/headless-components/overview',
+							label: 'Overview',
+						},
+						'reference/interface/headless-components/dataview',
+					],
+				},
+				{
+					type: 'category',
+					label: 'UI Components',
+					collapsed: true,
+					items: [
+						{
+							type: 'doc',
+							id: 'reference/interface/ui-components/overview',
+							label: 'Overview',
+						},
+						'reference/interface/ui-components/datagrid',
+					],
+				},
 			],
 		},
 		{

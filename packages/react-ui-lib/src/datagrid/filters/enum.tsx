@@ -27,6 +27,9 @@ import { DataGridFilterMobileHiding } from './mobile'
 import { useEnumOptionsFormatter } from '../../labels'
 import { DataViewFieldLabel } from '../labels'
 
+/**
+ * Props for {@link DataGridEnumFilter}.
+ */
 export type DataGridEnumFilterProps =
 	& Omit<DataViewEnumFilterProps, 'children'>
 	& {
@@ -34,6 +37,17 @@ export type DataGridEnumFilterProps =
 		label?: ReactNode
 	}
 
+/**
+ * Enum filter for DataGrid with default UI.
+ *
+ * ## Props {@link DataGridEnumFilterProps}
+ * field, label, ?name, ?options
+ *
+ * ## Example
+ * ```tsx
+ * <DataGridEnumFilter field={'status'} />
+ * ```
+ */
 export const DataGridEnumFilter = Component(({ options, label, ...props }: DataGridEnumFilterProps) =>
 	(
 		<DataViewEnumFilter {...props}>
@@ -46,7 +60,18 @@ export const DataGridEnumFilter = Component(({ options, label, ...props }: DataG
 		</DataViewEnumFilter>
 	))
 
-export const DataGridEnumFieldTooltip = ({ children, actions, value, ...props }: Omit<DataViewEnumFilterProps, 'children'> & { children: ReactNode; value: string; actions?: ReactNode }) => (
+/**
+ * Props for {@link DataGridEnumFieldTooltip}.
+ */
+export type DataGridEnumFieldTooltipProps = Omit<DataViewEnumFilterProps, 'children'>
+/**
+ * Component for rendering a value with a tooltip that allows to include/exclude the value from the filter.
+ * Used in {@link DataGridEnumColumn} but can be used in custom columns as well.
+ *
+ * ## Props {@link DataGridEnumFieldTooltipProps}
+ * field, label, ?name, ?options
+ */
+export const DataGridEnumFieldTooltip = ({ children, actions, value, ...props }: DataGridEnumFieldTooltipProps & { children: ReactNode; value: string; actions?: ReactNode }) => (
 	<DataViewEnumFilter {...props}>
 		<TooltipProvider>
 			<Tooltip>
@@ -70,7 +95,7 @@ export const DataGridEnumFieldTooltip = ({ children, actions, value, ...props }:
 )
 
 
-export const DataGridEnumFilterList = ({ options }: {
+const DataGridEnumFilterList = ({ options }: {
 	options?: Record<string, ReactNode>
 }) => {
 	const resolvedOptions = useEnumOptions(options)
@@ -111,7 +136,7 @@ const DataGridEnumFilterSelectItem = ({ value, children, filterFactory }: {
 	)
 
 }
-export const DataGridEnumFilterSelect = ({  options, label }: {
+const DataGridEnumFilterSelect = ({  options, label }: {
 	options?: Record<string, ReactNode>
 	label?: ReactNode
 }) => {
@@ -127,6 +152,9 @@ export const DataGridEnumFilterSelect = ({  options, label }: {
 	)
 }
 
+/**
+ * @internal
+ */
 export const DataGridEnumFilterControls = ({ options }: {
 	options?: Record<string, ReactNode>
 }) => {

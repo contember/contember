@@ -6,12 +6,26 @@ import { DataViewEachRow, DataViewEmpty, DataViewLayout, DataViewNonEmpty } from
 import { SheetIcon } from 'lucide-react'
 import { dict } from '../dict'
 import { ChildrenAnalyzer, Leaf } from '@contember/react-multipass-rendering'
-import { DataGridColumnLeaf, DataGridColumnLeafProps } from './columns'
 
+import { DataGridColumnLeaf, DataGridColumnLeafProps } from './column-leaf'
+
+/**
+ * Props for the {@link DataGridTable} component.
+ */
 export interface DataViewTableProps {
 	children: ReactNode
 }
 
+/**
+ * Table layout for DataView.
+ *
+ * ## Example
+ * ```tsx
+ * <DataGridTable>
+ *     <DataGridTextColumn header="Title" field="title" />
+ * </DataGridTable>
+ * ```
+ */
 export const DataGridTable = Component<DataViewTableProps>(({ children }) => {
 	return (
 		<DataViewLayout name="table" label={<>

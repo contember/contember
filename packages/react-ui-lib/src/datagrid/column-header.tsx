@@ -7,14 +7,22 @@ import { dict } from '../dict'
 import { Component } from '@contember/interface'
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
 
-
-export const DataGridColumnHeader = Component(({ sortingField, hidingName, children, filter, filterName }: {
+/**
+ * Props for {@link DataGridColumnHeader}.
+ */
+export type DataGridColumnHeaderProps = {
 	sortingField?: string
 	hidingName?: string
 	filterName?: string
 	filter?: ReactNode
 	children: ReactNode
-}) => {
+}
+
+/**
+ * Column header for data grid.
+ * Contains filtering, sorting and hiding controls.
+ */
+export const DataGridColumnHeader = Component(({ sortingField, hidingName, children, filter, filterName }: DataGridColumnHeaderProps) => {
 	let hasFilter = false
 	if (filterName) {
 		const [, , { isEmpty }] = useDataViewFilter(filterName)

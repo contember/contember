@@ -32,16 +32,28 @@ import { DataGridFilterMobileHiding } from './mobile'
 import { DataViewHasManyLabel, DataViewHasOneLabel } from '../labels'
 import { createRequiredContext } from '@contember/react-utils'
 
-
-type DataGridRelationFilterInnerProps = {
-	children: ReactNode
-	label: ReactNode
-}
-
+/**
+ * Props for {@link DataGridHasOneFilter}.
+ */
 export type DataGridHasOneFilterProps =
 	& DataViewHasOneFilterProps
-	& DataGridRelationFilterInnerProps
-
+	& {
+		children: ReactNode
+		label: ReactNode
+	}
+/**
+ * Has one filter for DataGrid with default UI.
+ *
+ * ## Props {@link DataGridHasOneFilterProps}
+ * field, label, children, ?name, ?options
+ *
+ * ## Example
+ * ```tsx
+ * <DataGridHasOneFilter field={'author'} label="Author">
+ *     <Field field="name" />
+ * </DataGridHasOneFilter>
+ * ```
+ */
 export const DataGridHasOneFilter = Component(({ label, children, ...props }: DataGridHasOneFilterProps) => (
 	<DataViewHasOneFilter {...props}>
 		<DataGridFilterMobileHiding>
@@ -52,11 +64,28 @@ export const DataGridHasOneFilter = Component(({ label, children, ...props }: Da
 	</DataViewHasOneFilter>
 ))
 
-
+/**
+ * Props for {@link DataGridHasManyFilter}.
+ */
 export type DataGridHasManyFilterProps =
 	& DataViewHasManyFilterProps
-	& DataGridRelationFilterInnerProps
-
+	& {
+		children: ReactNode
+		label: ReactNode
+	}
+/**
+ * Has many filter for DataGrid with default UI.
+ *
+ * ## Props {@link DataGridHasManyFilterProps}
+ * field, label, children, ?name, ?options
+ *
+ * ## Example
+ * ```tsx
+ * <DataGridHasManyFilter field={'tags'} label="Tags">
+ *     <Field field="name" />
+ * </DataGridHasManyFilter>
+ * ```
+ */
 export const DataGridHasManyFilter = Component(({ label, children, ...props }: DataGridHasManyFilterProps) => (
 	<DataViewHasManyFilter {...props} >
 		<DataGridFilterMobileHiding>
@@ -67,7 +96,10 @@ export const DataGridHasManyFilter = Component(({ label, children, ...props }: D
 	</DataViewHasManyFilter>
 ))
 
-const DataGridRelationFilterInner = Component(({ children, label }: DataGridRelationFilterInnerProps) => {
+const DataGridRelationFilterInner = Component(({ children, label }: {
+	children: ReactNode
+	label: ReactNode
+}) => {
 	return (
 		<DataGridSingleFilterUI>
 			<DataGridRelationFilterSelect label={label}>
@@ -80,7 +112,39 @@ const DataGridRelationFilterInner = Component(({ children, label }: DataGridRela
 	)
 }, () => null)
 
-export const DataGridHasOneTooltip = Component(({ children, actions, ...props }: DataViewHasOneFilterProps & { children: ReactNode; actions?: ReactNode }) => (<>
+/**
+ * Props for {@link DataGridHasOneTooltip}.
+ */
+export type DataGridHasOneTooltipProps =
+	& DataViewHasOneFilterProps
+	& {
+		children: ReactNode
+		/**
+		 * Custom actions to render in the tooltip.
+		 */
+		actions?: ReactNode
+	}
+
+/**
+ * Component for rendering a value with a tooltip that allows to include/exclude the value from the filter.
+ * Used in DataGridHasOneColumn, but can be used in custom columns as well.
+ *
+ * ## Props {@link DataGridHasOneTooltipProps}
+ * field, children, ?name, ?options, ?actions
+ *
+ * ## Example
+ * ```tsx
+ * <HasOne field="category">
+ * <DataGridHasOneTooltip field={'category'}>
+ *     <button className="text-lg font-semibold text-gray-600">
+ *        <Field field="category.name" />
+ *     </button>
+ *  </button>
+ * </DataGridHasOneTooltip>
+ * </HasOne>
+ * ```
+ */
+export const DataGridHasOneTooltip = Component<DataGridHasOneTooltipProps>(({ children, actions, ...props }) => (<>
 	<DataViewHasOneFilter {...props}>
 		<DataGridRelationFieldTooltipInner actions={actions}>
 			{children}
@@ -91,7 +155,38 @@ export const DataGridHasOneTooltip = Component(({ children, actions, ...props }:
 	</StaticRender>
 </>))
 
-export const DataGridHasManyTooltip = Component<DataViewHasManyFilterProps & { children: ReactNode; actions?: ReactNode }>(({ children, actions, ...props }, env) => {
+/**
+ * Props for {@link DataGridHasManyTooltip}.
+ */
+export type DataGridHasManyTooltipProps =
+	& DataViewHasManyFilterProps
+	& {
+		children: ReactNode
+		/**
+		 * Custom actions to render in the tooltip.
+		 */
+		actions?: ReactNode
+	}
+
+/**
+ * Component for rendering a value with a tooltip that allows to include/exclude the value from the filter.
+ * Used in DataGridHasManyColumn, but can be used in custom columns as well.
+ *
+ * ## Props {@link DataGridHasManyTooltipProps}
+ * field, children, ?name, ?options, ?actions
+ *
+ * ## Example
+ * ```tsx
+ * <HasMany field="tags">
+ *     <DataGridHasManyTooltip field={'tags'}>
+ *         <button className="text-sm border rounded px-2 py-1">
+ *             <Field field="name" />
+ *         </button>
+ *     </DataGridHasManyTooltip>
+ * </HasMany>
+ * ```
+ */
+export const DataGridHasManyTooltip = Component<DataGridHasManyTooltipProps>(({ children, actions, ...props }) => {
 	return (<>
 		<DataViewHasManyFilter {...props}>
 			<DataGridRelationFieldTooltipInner actions={actions}>
@@ -125,6 +220,9 @@ const DataGridRelationFieldTooltipInner = Component(({ children, actions }: { ch
 	</TooltipProvider>
 ))
 
+/**
+ * @internal
+ */
 export const DataGridRelationFilteredItemsList = ({ children }: {
 	children: ReactNode
 }) => (
@@ -171,7 +269,7 @@ const DataGridRelationFilterSelectItem = forwardRef<HTMLButtonElement, DataGridR
 })
 
 
-export const DataGridRelationFilterSelect = ({ children, queryField, label }: {
+const DataGridRelationFilterSelect = ({ children, queryField, label }: {
 	queryField?: DataViewUnionFilterFields
 	children: ReactNode
 	label?: ReactNode
@@ -192,7 +290,9 @@ export const DataGridRelationFilterSelect = ({ children, queryField, label }: {
 	)
 }
 
-
+/**
+ * @internal
+ */
 export const DataGridRelationFilterControls = ({ children, queryField }: {
 	queryField?: DataViewUnionFilterFields
 	children: ReactNode

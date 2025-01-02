@@ -20,12 +20,25 @@ import { Component } from '@contember/interface'
 import { DataGridFilterMobileHiding } from './mobile'
 import { DataViewFieldLabel } from '../labels'
 
+/**
+ * Props for {@link DataGridNumberFilter}.
+ */
 export type DataGridNumberFilterProps =
 	& Omit<DataViewNumberFilterProps, 'children'>
 	& {
 		label: ReactNode
 	}
-
+/**
+ * Number filter for DataGrid with default UI.
+ *
+ * ## Props {@link DataGridNumberFilterProps}
+ * field, label, ?name
+ *
+ * ## Example
+ * ```tsx
+ * <DataGridNumberFilter field={'views'} label="Views" />
+ * ```
+ */
 export const DataGridNumberFilter = Component(({ label, ...props }: DataGridNumberFilterProps) => (
 	<DataViewNumberFilter {...props}>
 		<DataGridFilterMobileHiding>
@@ -56,7 +69,7 @@ const DataGridNumberFilterRange = () => {
 }
 
 
-export const DataGridNumberFilterList = () => (
+const DataGridNumberFilterList = () => (
 	<>
 		<DataViewNumberFilterResetTrigger>
 			<DataGridActiveFilterUI>
@@ -73,7 +86,7 @@ export const DataGridNumberFilterList = () => (
 )
 
 
-export const DataGridNumberFilterSelect = ({ label }: {
+const DataGridNumberFilterSelect = ({ label }: {
 	label?: ReactNode
 }) => (
 	<Popover>
@@ -86,7 +99,9 @@ export const DataGridNumberFilterSelect = ({ label }: {
 	</Popover>
 )
 
-
+/**
+ * @internal
+ */
 export const DataGridNumberFilterControls = () => {
 	return (
 		<div className={'flex flex-col gap-4'}>

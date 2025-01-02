@@ -29,7 +29,6 @@ import {
 	DataGridTextColumn,
 	DataGridTiles,
 	DataGridToolbar,
-	DataGridTooltipLabel,
 	DefaultDataGrid,
 } from '~/lib/datagrid'
 import * as React from 'react'
@@ -146,9 +145,9 @@ const CustomGridColumn = Component(() => {
 				<HasMany field="comments">
 					<HasOne field="author">
 						<DataGridHasManyTooltip field="comments.author">
-							<DataGridTooltipLabel>
+							<span className="cursor-pointer border-dashed border-b border-b-gray-400 hover:border-gray-800">
 								<Field field="name" />
-							</DataGridTooltipLabel>
+							</span>
 						</DataGridHasManyTooltip>
 					</HasOne>
 				</HasMany>
@@ -249,11 +248,13 @@ const CustomGridRow = Component(() => (
 			<div className="flex gap-2">
 
 				<DataViewElement name="category" label="Category">
-					<DataGridHasOneTooltip field="category">
-						<button className="text-lg font-semibold text-gray-600">
-							<Field field="category.name" />
-						</button>
-					</DataGridHasOneTooltip>
+					<HasOne field="category">
+						<DataGridHasOneTooltip field="category">
+							<button className="text-lg font-semibold text-gray-600">
+								<Field field="name" />
+							</button>
+						</DataGridHasOneTooltip>
+					</HasOne>
 				</DataViewElement>
 
 				<span className="text-lg font-bold"><Field field="title" /></span>

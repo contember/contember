@@ -2,7 +2,6 @@ import { useDataViewFilter, useDataViewFilteringState, useDataViewFilterName } f
 import * as React from 'react'
 import { createContext, ReactNode, useContext } from 'react'
 
-
 export const DataGridShowFiltersContext = createContext(true)
 
 export const DataGridFilterMobileHiding = ({ name,  children }: { name?: string; children: ReactNode }) => {

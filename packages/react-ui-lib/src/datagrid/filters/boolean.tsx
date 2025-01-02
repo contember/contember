@@ -11,13 +11,26 @@ import { Component } from '@contember/interface'
 import { DataGridFilterMobileHiding } from './mobile'
 import { DataViewFieldLabel } from '../labels'
 
-
-type DataGridBooleanFilterProps =
+/**
+ * Props for {@link DataGridBooleanFilter}.
+ */
+export type DataGridBooleanFilterProps =
 	& Omit<DataViewBooleanFilterProps, 'children'>
 	& {
 		label: ReactNode
 	}
 
+/**
+ * Boolean filter for DataGrid with default UI.
+ *
+ * ## Props {@link DataGridBooleanFilterProps}
+ * field, label, ?name
+ *
+ * ## Example
+ * ```tsx
+ * <DataGridBooleanFilter field={'locked'} label="Locked" />
+ * ```
+ */
 export const DataGridBooleanFilter = Component(({ label, ...props }: DataGridBooleanFilterProps) => (
 	<DataViewBooleanFilter {...props}>
 		<DataGridFilterMobileHiding>
@@ -29,7 +42,7 @@ export const DataGridBooleanFilter = Component(({ label, ...props }: DataGridBoo
 	</DataViewBooleanFilter>
 ))
 
-export const DataGridBooleanFilterList = () => (
+const DataGridBooleanFilterList = () => (
 	<>
 		{[true, false].map(value => (
 			<DataViewBooleanFilterTrigger action={'unset'} value={value} key={value.toString()}>
@@ -48,7 +61,7 @@ export const DataGridBooleanFilterList = () => (
 )
 
 
-export const DataGridBooleanFilterSelect = ({ label }: {
+const DataGridBooleanFilterSelect = ({ label }: {
 	label?: ReactNode
 }) => (
 	<Popover>
@@ -61,6 +74,9 @@ export const DataGridBooleanFilterSelect = ({ label }: {
 	</Popover>
 )
 
+/**
+ * @internal
+ */
 export const DataGridBooleanFilterControls = () => {
 	return (
 		<div className={'flex flex-col gap-2'}>

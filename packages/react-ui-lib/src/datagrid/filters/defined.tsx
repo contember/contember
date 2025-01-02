@@ -10,13 +10,26 @@ import { CheckIcon, XIcon } from 'lucide-react'
 import { Button } from '../../ui/button'
 import { DataViewFieldLabel } from '../labels'
 
-
-type DataGridIsDefinedFilterProps =
+/**
+ * Props for {@link DataGridIsDefinedFilter}.
+ */
+export type DataGridIsDefinedFilterProps =
 	& Omit<DataViewBooleanFilterProps, 'children'>
 	& {
 		label: ReactNode
 	}
 
+/**
+ * Is defined filter for DataGrid with default UI.
+ *
+ * ## Props {@link DataGridIsDefinedFilterProps}
+ * field, label, ?name
+ *
+ * ## Example
+ * ```tsx
+ * <DataGridIsDefinedFilter field={'deletedAt'} label="Is Deleted?" />
+ * ```
+ */
 export const DataGridIsDefinedFilter = Component(({ label, ...props }: DataGridIsDefinedFilterProps) => (
 	<DataViewIsDefinedFilter {...props}>
 		<DataGridFilterMobileHiding>
@@ -28,7 +41,7 @@ export const DataGridIsDefinedFilter = Component(({ label, ...props }: DataGridI
 	</DataViewIsDefinedFilter>
 ))
 
-export const DataGridIsDefinedFilterList = () => (
+const DataGridIsDefinedFilterList = () => (
 	<>
 		<DataViewNullFilterTrigger action={'unset'}>
 			<Button variant={'outline'} size="sm" className={'space-x-1 data-[current="none"]:hidden data-[current="include"]:hidden h-6'}>
@@ -52,7 +65,7 @@ export const DataGridIsDefinedFilterList = () => (
 )
 
 
-export const DataGridIsDefinedFilterSelect = ({ label }: {
+const DataGridIsDefinedFilterSelect = ({ label }: {
 	label?: ReactNode
 }) => (
 	<Popover>
@@ -65,6 +78,9 @@ export const DataGridIsDefinedFilterSelect = ({ label }: {
 	</Popover>
 )
 
+/**
+ * @internal
+ */
 export const DataGridIsDefinedFilterControls = () => {
 	return (
 		<div className={'flex flex-col gap-2'}>

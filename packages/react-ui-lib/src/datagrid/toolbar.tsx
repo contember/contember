@@ -15,10 +15,29 @@ import { DataGridAutoExport } from './export'
 import { DataGridToolbarVisibleElements } from './elements'
 import { DataViewReloadTrigger } from '@contember/react-dataview'
 
+/**
+ * Props for the {@link DataGridToolbar} component.
+ */
 export interface DataGridToolbarProps {
 	children?: ReactNode
 }
 
+/**
+ * Toolbar for DataGrid with default UI.
+ * It contains
+ * 	- filters (with default DataGridQueryFilter, which can be replaced by custom filters in children)
+ * 	- settings (layout switcher, visible elements, per page selector)
+ * 	- export button
+ * 	- reload button
+ *
+ * ## Example
+ * ```tsx
+ * <DataGridToolbar>
+ *     <DataGridQueryFilter />
+ *     <DataGridTextFilter field={'name'} label="Name" />
+ * </DataGridToolbar>
+ * ```
+ */
 export const DataGridToolbar = Component<DataGridToolbarProps>(({ children }) => {
 	const [showFilters, setShowFilters] = React.useState(false)
 	return (

@@ -545,7 +545,6 @@
         "@contember/react-devbar": "packages/react-devbar",
         "@contember/react-identity": "packages/react-identity",
         "@contember/react-routing": "packages/react-routing",
-        "@contember/utilities": "packages/utilities",
         "@radix-ui/react-slot": "^1.1.0",
         "stacktracey": "^2.1.8",
       },
@@ -1306,7 +1305,7 @@
 
     "@contember/graphql-utils": ["@contember/graphql-utils@workspace:packages/graphql-utils", { "devDependencies": { "@types/node": "^20.16.11", "graphql": "^16.9.0" }, "peerDependencies": { "graphql": ">= 14.6.0" } }],
 
-    "@contember/interface": ["@contember/interface@workspace:packages/interface", { "dependencies": { "@contember/react-binding": "packages/react-binding", "@contember/react-client": "packages/react-client", "@contember/react-dataview": "packages/react-dataview", "@contember/react-devbar": "packages/react-devbar", "@contember/react-identity": "packages/react-identity", "@contember/react-routing": "packages/react-routing", "@contember/utilities": "packages/utilities", "@radix-ui/react-slot": "^1.1.0", "stacktracey": "^2.1.8" }, "devDependencies": { "react": "^18.3.1", "react-dom": "^18.3.1" }, "peerDependencies": { "react": "^18 || ^19", "react-dom": "^18 || ^19" } }],
+    "@contember/interface": ["@contember/interface@workspace:packages/interface", { "dependencies": { "@contember/react-binding": "packages/react-binding", "@contember/react-client": "packages/react-client", "@contember/react-dataview": "packages/react-dataview", "@contember/react-devbar": "packages/react-devbar", "@contember/react-identity": "packages/react-identity", "@contember/react-routing": "packages/react-routing", "@radix-ui/react-slot": "^1.1.0", "stacktracey": "^2.1.8" }, "devDependencies": { "react": "^18.3.1", "react-dom": "^18.3.1" }, "peerDependencies": { "react": "^18 || ^19", "react-dom": "^18 || ^19" } }],
 
     "@contember/logger": ["@contember/logger@workspace:packages/logger", { "dependencies": { "chalk": "^5.3.0" }, "devDependencies": { "@types/node": "^20.16.11" } }],
 

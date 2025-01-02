@@ -1,12 +1,12 @@
-import { FormContainer, FormContainerProps } from '@app/lib/form'
+import { FormContainer, FormContainerProps } from '~/lib/form'
 import * as React from 'react'
 import { ComponentProps, forwardRef, ReactNode } from 'react'
-import { Input, InputBare, InputLike } from '@app/lib/ui/input'
-import { cn } from '@app/lib/utils'
+import { Input, InputBare, InputLike } from '~/lib/ui/input'
+import { cn } from '~/lib/utils'
 import { FormFieldScope, FormInputProps } from '@contember/react-form'
 import { Component } from '@contember/interface'
 import { ExternalLinkIcon } from 'lucide-react'
-import { FormSlugInput, SlugInputOwnProps } from '@app/lib-extra/slug-field/FormSlugInput'
+import { FormSlugInput, SlugInputOwnProps } from '~/lib-extra/slug-field/FormSlugInput'
 
 export type SlugFieldProps =
 	& Omit<FormInputProps, 'children'>

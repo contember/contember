@@ -4,14 +4,9 @@
 		"noEmit": true,
 		"emitDeclarationOnly": false,
 		"paths": {
-			"@app/lib/ui/*": [
-				"../../react-ui-lib/src/ui/*"
-			],
-			"@app/lib/*": [
+			"~/*": ["./*"],
+			"~/lib/*": [
 				"../../react-ui-lib/src/*"
-			],
-			"@app/*": [
-				"./*"
 			]
 		}
 	},

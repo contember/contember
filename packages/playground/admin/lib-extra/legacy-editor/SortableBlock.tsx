@@ -6,8 +6,8 @@ import { useSortable } from '@dnd-kit/sortable'
 import { RepeaterCurrentEntityContext, RepeaterSortableItemActivator, RepeaterSortableItemContext, RepeaterSortableItemNode } from '@contember/react-repeater-dnd-kit'
 import { Entity } from '@contember/interface'
 import { GripVerticalIcon } from 'lucide-react'
-import { RepeaterDropIndicator } from '@app/lib/repeater'
-import { uic } from '@app/lib/utils'
+import { RepeaterDropIndicator } from '~/lib/repeater'
+import { uic } from '~/lib/utils'
 
 export const BlockeEditorHandle = uic('span', {
 	baseClass: 'absolute top-1/2 -left-3 h-6 w-6 flex justify-end items-center opacity-10 hover:opacity-100 transition-opacity -translate-y-1/2 cursor-grab',

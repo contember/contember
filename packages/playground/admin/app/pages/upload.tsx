@@ -1,19 +1,18 @@
 import { EntitySubTree, StaticRender, useEntity } from '@contember/react-binding'
-import * as React from 'react'
 import { useState } from 'react'
-import { Binding, PersistButton } from '@app/lib/binding'
-import { Slots } from '@app/lib/layout'
-import { AudioField, FileField, ImageField, ImageRepeaterField, VideoField } from '@app/lib/form'
-import { Dialog, DialogContent, DialogTrigger } from '@app/lib/ui/dialog'
-import { Button } from '@app/lib/ui/button'
-import { DataGrid, DataGridColumn, DataGridLoader, DataGridPagination, DataGridTable, DataGridTextColumn, DataGridTiles, DataGridToolbar } from '@app/lib/datagrid'
-import { UploadedImageView, UploaderDropzoneAreaUI } from '@app/lib/upload'
-import { UseEntity } from '@app/app/components/UseEntity'
+import { Binding, PersistButton } from '~/lib/binding'
+import { Slots } from '~/lib/layout'
+import { AudioField, FileField, ImageField, ImageRepeaterField, VideoField } from '~/lib/form'
+import { Dialog, DialogContent, DialogTrigger } from '~/lib/ui/dialog'
+import { Button } from '~/lib/ui/button'
+import { DataGrid, DataGridColumn, DataGridLoader, DataGridPagination, DataGridTable, DataGridTextColumn, DataGridTiles, DataGridToolbar } from '~/lib/datagrid'
+import { UploadedImageView, UploaderDropzoneAreaUI } from '~/lib/upload'
+import { UseEntity } from '~/app/components/UseEntity'
 import { EntityAccessor, Field } from '@contember/interface'
 import { FileUrlDataExtractorProps, GenericFileMetadataExtractorProps, ImageFileDataExtractorProps } from '@contember/react-uploader'
 import { UploadIcon } from 'lucide-react'
-import { dict } from '@app/lib/dict'
-
+import { dict } from '~/lib/dict'
+import { Title } from '../components/title'
 
 const imageFields: FileUrlDataExtractorProps & GenericFileMetadataExtractorProps & ImageFileDataExtractorProps = {
 	urlField: 'url',
@@ -86,10 +85,16 @@ const SelectImageInner = ({ connect, closeOnSelect }: { connect: (entity: Entity
 	)
 }
 
-export const image = () => <>
-
+export const Image = () => (
 	<Binding>
-		<Slots.Actions><PersistButton /></Slots.Actions>
+		<Slots.Title>
+			<Title icon={<UploadIcon />}>Image upload</Title>
+		</Slots.Title>
+
+		<Slots.Actions>
+			<PersistButton />
+		</Slots.Actions>
+
 		<EntitySubTree entity="UploadRoot(unique = unique)" setOnCreate="(unique = unique)">
 			<ImageField
 				baseField="image"
@@ -98,11 +103,11 @@ export const image = () => <>
 				description="Some description of the image file."
 				dropzonePlaceholder={(
 					<UploaderDropzoneAreaUI className="w-60">
-						<UploadIcon className={'w-12 h-12 text-gray-400'} />
-						<div className={'font-semibold text-sm'}>{dict.uploader.dropFiles}</div>
-						<div className={'text-xs'}>{dict.uploader.or}</div>
-						<div className={'flex gap-2 items-center text-xs'}>
-							<Button size={'sm'} variant={'outline'}>{dict.uploader.browseFiles}</Button>
+						<UploadIcon className="w-12 h-12 text-gray-400" />
+						<div className="font-semibold text-sm">{dict.uploader.dropFiles}</div>
+						<div className="text-xs">{dict.uploader.or}</div>
+						<div className="flex gap-2 items-center text-xs">
+							<Button size="sm" variant="outline">{dict.uploader.browseFiles}</Button>
 							<div onClick={e => e.stopPropagation()}>
 								<SelectImage />
 							</div>
@@ -112,13 +117,19 @@ export const image = () => <>
 			/>
 		</EntitySubTree>
 	</Binding>
-</>
+)
 
 
-export const imageTrivial = () => <>
-
+export const ImageTrivial = () => (
 	<Binding>
-		<Slots.Actions><PersistButton /></Slots.Actions>
+		<Slots.Title>
+			<Title icon={<UploadIcon />}>Image w/o meta upload</Title>
+		</Slots.Title>
+
+		<Slots.Actions>
+			<PersistButton />
+		</Slots.Actions>
+
 		<EntitySubTree entity="UploadRoot(unique = unique)" setOnCreate="(unique = unique)">
 			<ImageField
 				baseField="imageTrivial"
@@ -128,12 +139,18 @@ export const imageTrivial = () => <>
 			/>
 		</EntitySubTree>
 	</Binding>
-</>
+)
 
-export const audio = () => <>
-
+export const Audio = () => (
 	<Binding>
-		<Slots.Actions><PersistButton /></Slots.Actions>
+		<Slots.Title>
+			<Title icon={<UploadIcon />}>Audio upload</Title>
+		</Slots.Title>
+
+		<Slots.Actions>
+			<PersistButton />
+		</Slots.Actions>
+
 		<EntitySubTree entity="UploadRoot(unique = unique)" setOnCreate="(unique = unique)">
 			<AudioField
 				baseField="audio"
@@ -148,12 +165,18 @@ export const audio = () => <>
 			/>
 		</EntitySubTree>
 	</Binding>
-</>
+)
 
-export const video = () => <>
-
+export const Video = () => (
 	<Binding>
-		<Slots.Actions><PersistButton /></Slots.Actions>
+		<Slots.Title>
+			<Title icon={<UploadIcon />}>Video upload</Title>
+		</Slots.Title>
+
+		<Slots.Actions>
+			<PersistButton />
+		</Slots.Actions>
+
 		<EntitySubTree entity="UploadRoot(unique = unique)" setOnCreate="(unique = unique)">
 			<VideoField
 				baseField="video"
@@ -170,12 +193,18 @@ export const video = () => <>
 			/>
 		</EntitySubTree>
 	</Binding>
-</>
+)
 
-export const any = () => <>
-
+export const Any = () => (
 	<Binding>
-		<Slots.Actions><PersistButton /></Slots.Actions>
+		<Slots.Title>
+			<Title icon={<UploadIcon />}>Generic file upload</Title>
+		</Slots.Title>
+
+		<Slots.Actions>
+			<PersistButton />
+		</Slots.Actions>
+
 		<EntitySubTree entity="UploadRoot(unique = unique)" setOnCreate="(unique = unique)">
 			<FileField
 				baseField="file"
@@ -189,13 +218,18 @@ export const any = () => <>
 			/>
 		</EntitySubTree>
 	</Binding>
-</>
+)
 
-
-export const imageList = () => <>
-
+export const ImageList = () => (
 	<Binding>
-		<Slots.Actions><PersistButton /></Slots.Actions>
+		<Slots.Title>
+			<Title icon={<UploadIcon />}>Image repeater upload</Title>
+		</Slots.Title>
+
+		<Slots.Actions>
+			<PersistButton />
+		</Slots.Actions>
+
 		<EntitySubTree entity="UploadRoot(unique = unique)" setOnCreate="(unique = unique)">
 			<ImageRepeaterField
 				field="imageList.items"
@@ -206,11 +240,11 @@ export const imageList = () => <>
 				description="Some description of the image file."
 				dropzonePlaceholder={(
 					<UploaderDropzoneAreaUI className="w-60">
-						<UploadIcon className={'w-12 h-12 text-gray-400'} />
-						<div className={'font-semibold text-sm'}>{dict.uploader.dropFiles}</div>
-						<div className={'text-xs'}>{dict.uploader.or}</div>
-						<div className={'flex gap-2 items-center text-xs'}>
-							<Button size={'sm'} variant={'outline'}>{dict.uploader.browseFiles}</Button>
+						<UploadIcon className="w-12 h-12 text-gray-400" />
+						<div className="font-semibold text-sm">{dict.uploader.dropFiles}</div>
+						<div className="text-xs">{dict.uploader.or}</div>
+						<div className="flex gap-2 items-center text-xs">
+							<Button size="sm" variant="outline">{dict.uploader.browseFiles}</Button>
 							<div onClick={e => e.stopPropagation()}>
 								<SelectImageRepeater />
 							</div>
@@ -220,4 +254,4 @@ export const imageList = () => <>
 			/>
 		</EntitySubTree>
 	</Binding>
-</>
+)

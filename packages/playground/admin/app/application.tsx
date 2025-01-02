@@ -1,14 +1,14 @@
-import { Layout } from '@app/app/components/layout'
+import { Layout } from '~/app/components/layout'
 import { ApplicationEntrypoint, PageModule, Pages } from '@contember/interface'
-import { getConfig } from '@app/app/config'
-import { Toaster } from '@app/lib/toast'
+import { getConfig } from '~/app/config'
+import { Toaster } from '~/lib/toast'
 import { LogInIcon } from 'lucide-react'
-import { LoginWithEmail } from '@app/lib/dev'
-import { OutdatedApplicationDialog } from '@app/lib/outdated-application-dialog'
+import { LoginWithEmail } from '~/lib/dev'
+import { OutdatedApplicationDialog } from '~/lib/outdated-application-dialog'
 import { SlotsProvider } from '@contember/react-slots'
 import { DevBar, DevPanel } from '@contember/react-devbar'
-import { EnumOptionsFormatterProvider, FieldLabelFormatterProvider } from '@app/lib/labels'
-import { enumOptionsFormatter, fieldLabelFormatter } from '@app/app/labels'
+import { EnumOptionsFormatterProvider, FieldLabelFormatterProvider } from '~/lib/labels'
+import { enumOptionsFormatter, fieldLabelFormatter } from '~/app/labels'
 
 
 export const Application = () => {

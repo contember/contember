@@ -1,5 +1,8 @@
-import { Button } from '@app/lib/ui/button'
 import { useContentMutation, useContentQuery } from '@contember/react-client-content'
+import { PlugIcon } from 'lucide-react'
+import { Title } from '~/app/components/title'
+import { Slots } from '~/lib/layout'
+import { Button } from '~/lib/ui/button'
 import { queryBuilder } from '../../../api/client'
 
 const listHooksValue = queryBuilder.list('HooksValue', {
@@ -10,8 +13,7 @@ export const ContentApi = () => {
 	const [items, refreshList] = useContentQuery(listHooksValue)
 
 	const [addItemState, addItemMutation] = useContentMutation(
-		() =>
-			queryBuilder.create('HooksValue', { data: { value: 0 } }),
+		() => queryBuilder.create('HooksValue', { data: { value: 0 } }),
 		{ onResponse: refreshList },
 	)
 
@@ -28,20 +30,58 @@ export const ContentApi = () => {
 	)
 
 	const mutating = addItemState.state === 'loading' || updateValueState.state === 'loading' || deleteValueState.state === 'loading'
+	const isLoading = items.state === 'loading' || items.state === 'refreshing'
 
-	return <>
-		<div className="flex gap-2 mb-4 justify-end">
-			<Button onClick={() => addItemMutation({})} disabled={mutating}>New item</Button>
-			<Button onClick={refreshList} disabled={items.state === 'loading' || items.state === 'refreshing'}>Refresh</Button>
-		</div>
+	return (
+		<div>
+			<Slots.Title>
+				<Title icon={<PlugIcon />}>Content API</Title>
+			</Slots.Title>
 
-		{'data' in items && items.data.map(item => (
-			<div key={item.id} className="flex gap-2">
-				<span>{item.value}</span>
-				<Button size="sm" disabled={mutating} onClick={() => updateValueMutation({ id: item.id, value: item.value + 1 })}>+</Button>
-				<Button size="sm" disabled={mutating} onClick={() => updateValueMutation({ id: item.id, value: item.value - 1 })}>-</Button>
-				<Button size="sm" variant="destructive" disabled={mutating} onClick={() => deleteValueMutation({ id: item.id })}>Delete</Button>
+			<Slots.Actions>
+				<Button variant="secondary" onClick={refreshList} disabled={isLoading}>Refresh</Button>
+				<Button onClick={() => addItemMutation({})} disabled={mutating}>New item</Button>
+			</Slots.Actions>
+
+			<div className="space-y-4">
+				{'data' in items && items.data.length ? items.data.map(item => (
+					<div
+						key={item.id}
+						className="flex items-center gap-3 p-4 bg-white even:bg-gray-50 rounded-lg"
+					>
+						<div className="flex gap-2">
+							<Button
+								size="sm"
+								variant="secondary"
+								disabled={mutating}
+								onClick={() => updateValueMutation({ id: item.id, value: item.value + 1 })}
+							>
+								+
+							</Button>
+							<Button
+								size="sm"
+								variant="secondary"
+								disabled={mutating}
+								onClick={() => updateValueMutation({ id: item.id, value: item.value - 1 })}
+							>
+								-
+							</Button>
+						</div>
+
+						<span className="text-lg font-medium w-12 text-center">{item.value}</span>
+
+						<Button
+							size="sm"
+							variant="destructive"
+							disabled={mutating}
+							onClick={() => deleteValueMutation({ id: item.id })}
+							className="ml-auto"
+						>
+							Delete
+						</Button>
+					</div>
+				)) : <div className="p-4 bg-white rounded-lg">Try to add new item</div>}
 			</div>
-		))}
-	</>
+		</div>
+	)
 }

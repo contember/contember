@@ -1,10 +1,11 @@
-import * as React from 'react'
-import { Binding, DeleteEntityDialog, PersistButton } from '@app/lib/binding'
-import { Slots } from '@app/lib/layout'
+import { GripVertical } from 'lucide-react'
+import { Title } from '~/app/components/title'
+import { Binding, DeleteEntityDialog, PersistButton } from '~/lib/binding'
+import { Slots } from '~/lib/layout'
 import { EntitySubTree, Field } from '@contember/interface'
-import { DefaultRepeater, RepeaterItemActions, RepeaterRemoveItemButton } from '@app/lib/repeater'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger, DropDownTriggerButton } from '@app/lib/ui/dropdown'
-import { InputField, SelectField } from '@app/lib/form'
+import { DefaultRepeater, RepeaterItemActions, RepeaterRemoveItemButton } from '~/lib/repeater'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger, DropDownTriggerButton } from '~/lib/ui/dropdown'
+import { InputField, SelectField } from '~/lib/form'
 
 const repeaterDropdown = (
 	<DropdownMenu>
@@ -22,14 +23,22 @@ const repeaterDropdown = (
 	</DropdownMenu>
 )
 
-export default <>
+export default () => (
 	<Binding>
-		<Slots.Actions><PersistButton /></Slots.Actions>
-		<DefaultRepeater entities={'RepeaterItem'} sortableBy={'order'} title="Foo items" addButtonPosition="around">
-			<InputField field={'title'} />
-			<SelectField field={'relation'} >
-				<Field field={'id'} /> /
-				<Field field={'name'} />
+		<Slots.Title>
+			<Title icon={<GripVertical />}>Sortable repeater</Title>
+		</Slots.Title>
+
+		<Slots.Actions>
+			<PersistButton />
+		</Slots.Actions>
+
+		<DefaultRepeater entities="RepeaterItem" sortableBy="order" title="Foo items" addButtonPosition="around">
+			<InputField field="title" />
+
+			<SelectField field="relation" >
+				<Field field="id" /> /
+				<Field field="name" />
 			</SelectField>
 
 			<RepeaterItemActions>
@@ -38,18 +47,25 @@ export default <>
 			</RepeaterItemActions>
 		</DefaultRepeater>
 	</Binding>
-</>
+)
 
-export const onRelation = <>
+export const OnRelation = () => (
 	<Binding>
-		<Slots.Actions><PersistButton /></Slots.Actions>
-		<EntitySubTree entity="RepeaterRoot(unique=unique)" setOnCreate="(unique=unique)">
-			<DefaultRepeater field={'items'} sortableBy={'order'} title="Foo items" addButtonPosition="around">
-				<Field field={'id'} /><br/>
-				<InputField field={'title'} />
-				<SelectField field={'relation'}>
-					<Field field={'id'} /> /
-					<Field field={'name'} />
+		<Slots.Title>
+			<Title icon={<GripVertical />}>Repeater on relation</Title>
+		</Slots.Title>
+
+		<Slots.Actions>
+			<PersistButton />
+		</Slots.Actions>
+
+		<EntitySubTree entity="RepeaterRoot(unique = unique)" setOnCreate="(unique = unique)">
+			<DefaultRepeater field="items" sortableBy="order" title="Foo items" addButtonPosition="around">
+				<Field field="id" /><br/>
+				<InputField field="title" />
+				<SelectField field="relation">
+					<Field field="id" /> /
+					<Field field="name" />
 				</SelectField>
 
 				<RepeaterItemActions>
@@ -59,14 +75,20 @@ export const onRelation = <>
 			</DefaultRepeater>
 		</EntitySubTree>
 	</Binding>
-</>
+)
 
-
-export const nonSortable = <>
+export const NonSortable = () => (
 	<Binding>
-		<Slots.Actions><PersistButton /></Slots.Actions>
-		<DefaultRepeater entities={'RepeaterItem'} orderBy="order">
-			<Field field={'title'} />
+		<Slots.Title>
+			<Title icon={<GripVertical />}>Non-sortable repeater</Title>
+		</Slots.Title>
+
+		<Slots.Actions>
+			<PersistButton />
+		</Slots.Actions>
+
+		<DefaultRepeater entities="RepeaterItem" orderBy="order">
+			<Field field="title" />
 
 			<RepeaterItemActions>
 				{repeaterDropdown}
@@ -74,4 +96,4 @@ export const nonSortable = <>
 			</RepeaterItemActions>
 		</DefaultRepeater>
 	</Binding>
-</>
+)

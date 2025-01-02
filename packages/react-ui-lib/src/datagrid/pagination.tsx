@@ -7,6 +7,14 @@ import { DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../u
 import { dictFormat } from '../dict'
 import { dict } from '../dict'
 
+/**
+ * Pagination controls UI for DataView.
+ *
+ * ## Example
+ * ```tsx
+ * <DataGridPagination />
+ * ```
+ */
 export const DataGridPagination = () => (
 	<div className="flex gap-6 lg:gap-8 justify-between mt-4">
 		<div className="">

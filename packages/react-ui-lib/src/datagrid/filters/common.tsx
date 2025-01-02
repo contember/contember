@@ -4,6 +4,9 @@ import { useDataViewFilterName, useDataViewNullFilter } from '@contember/react-d
 import { DataGridFilterSelectItemUI } from '../ui'
 import { dict } from '../../dict'
 
+/**
+ * @internal
+ */
 export const DataGridNullFilter = ({ name }: {
 	name?: string
 }) => {

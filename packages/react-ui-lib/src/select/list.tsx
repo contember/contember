@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { ReactNode } from 'react'
 import { ScrollArea } from '../ui/scroll-area'
-import { DataGridOverlayLoader } from '../datagrid'
 import { Loader } from '../ui/loader'
 import {
 	DataViewHighlightRow,
@@ -65,7 +64,7 @@ export const SelectListInner = Component(({ children, filterToolbar }: SelectLis
 					<ScrollArea className={'max-h-96'}>
 						<div className={'flex flex-col gap-1'}>
 							<DataViewLoaderState refreshing>
-								<DataGridOverlayLoader />
+								<Loader position={'absolute'} />
 							</DataViewLoaderState>
 							<DataViewLoaderState refreshing loaded>
 								<DataViewInfiniteLoadEachRow>

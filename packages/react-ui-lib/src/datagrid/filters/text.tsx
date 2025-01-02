@@ -26,13 +26,26 @@ import { Component } from '@contember/interface'
 import { DataGridFilterMobileHiding } from './mobile'
 import { DataViewFieldLabel } from '../labels'
 
-
+/**
+ * Props for {@link DataGridTextFilter}.
+ */
 export type DataGridTextFilterProps =
 	& Omit<DataViewTextFilterProps, 'children'>
 	& {
 		label?: React.ReactNode
 	}
 
+/**
+ * Text filter for DataGrid with default UI.
+ *
+ * ## Props {@link DataGridTextFilterProps}
+ * field, label, ?name
+ *
+ * ## Example
+ * ```tsx
+ * <DataGridTextFilter field={'name'} label="Name" />
+ * ```
+ */
 export const DataGridTextFilter = Component(({ label, ...props }: DataGridTextFilterProps) => (
 	<DataViewTextFilter {...props}>
 		<DataGridFilterMobileHiding>
@@ -41,12 +54,26 @@ export const DataGridTextFilter = Component(({ label, ...props }: DataGridTextFi
 	</DataViewTextFilter>
 ))
 
+/**
+ * Props for {@link DataGridUnionTextFilter}.
+ */
 export type DataGridUnionTextFilterProps =
 	& Omit<DataViewUnionTextFilterProps, 'children'>
 	& {
 		label?: React.ReactNode
 	}
 
+/**
+ * Text filter which filters multiple fields at once for DataGrid with default UI.
+ *
+ * ## Props {@link DataGridUnionTextFilterProps}
+ * fields, label, ?name
+ *
+ * ## Example
+ * ```tsx
+ * <DataGridUnionTextFilter fields={['name', 'description']} label="Name or description" />
+ * ```
+ */
 export const DataGridUnionTextFilter = Component(({ label, ...props }: DataGridUnionTextFilterProps) => (
 	<DataViewUnionTextFilter {...props}>
 		<DataGridFilterMobileHiding>
@@ -54,10 +81,22 @@ export const DataGridUnionTextFilter = Component(({ label, ...props }: DataGridU
 		</DataGridFilterMobileHiding>
 	</DataViewUnionTextFilter>
 ))
-
-export const DataGridQueryFilter = Component(({ label }: {
+/**
+ * Props for {@link DataGridQueryFilter}.
+ */
+export type DataGridQueryFilterProps = {
 	label?: React.ReactNode
-}) => (
+}
+
+/**
+ * Universal text filter for DataGrid with default UI. By default, it filters all text fields.
+ *
+ * ## Example
+ * ```tsx
+ * <DataGridQueryFilter label="Search" />
+ * ```
+ */
+export const DataGridQueryFilter = Component(({ label }: DataGridQueryFilterProps) => (
 	<DataViewHasFilterType name={DataViewQueryFilterName}>
 		<DataViewFilterScope name={DataViewQueryFilterName}>
 			<DataGridFilterMobileHiding>
@@ -67,6 +106,9 @@ export const DataGridQueryFilter = Component(({ label }: {
 	</DataViewHasFilterType>
 ))
 
+/**
+ * @internal
+ */
 export const DataGridTextFilterInner = ({ label }: {
 	label?: React.ReactNode
 }) => {

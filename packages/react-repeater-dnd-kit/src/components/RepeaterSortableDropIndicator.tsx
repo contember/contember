@@ -1,6 +1,9 @@
 import React, { ReactNode } from 'react'
 import { useRepeaterSortableItem } from '../contexts'
 
+/**
+ * Renders a child element when the repeater item is being dragged over the drop indicator.
+ */
 export const RepeaterSortableDropIndicator = ({ children, position }: {
 	children: ReactNode
 	position: 'before' | 'after'

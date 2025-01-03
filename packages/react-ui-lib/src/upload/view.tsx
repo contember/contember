@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { ComponentType, ReactNode } from 'react'
+import { ComponentType, ReactElement, ReactNode } from 'react'
 import { Component, Field, FieldView, StaticRender, SugaredRelativeSingleEntity, SugaredRelativeSingleField } from '@contember/interface'
 import {
 	AudioFileDataExtractorProps,
@@ -20,7 +20,7 @@ export type BaseFileViewProps = {
 	actions?: ReactNode
 	edit?: ReactNode
 	noDestroy?: boolean
-	DestroyAction?: ComponentType<{ children: ReactNode }>
+	DestroyAction?: ComponentType<{ children: ReactElement }>
 }
 
 

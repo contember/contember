@@ -61,6 +61,9 @@ export const RepeaterAddItemButton = ({ children, index }: { children?: React.Re
 	</RepeaterAddItemTrigger>
 )
 
+/**
+ * A button that removes the item from the repeater.
+ */
 export const RepeaterRemoveItemButton = ({ children }: { children?: React.ReactNode }) => (
 	<RepeaterRemoveItemTrigger>
 		<Button variant={'link'} size={'sm'} className={'gap-1 px-0 group/button'}>
@@ -71,6 +74,9 @@ export const RepeaterRemoveItemButton = ({ children }: { children?: React.ReactN
 	</RepeaterRemoveItemTrigger>
 )
 
+/**
+ * A container for actions that can be performed on a repeater item. Placed in the top right corner of the item.
+ */
 export const RepeaterItemActions = uic('div', {
 	baseClass: 'absolute top-1 right-2 flex gap-2',
 })
@@ -78,10 +84,29 @@ export const RepeaterItemActions = uic('div', {
 export type DefaultRepeaterProps =
 	& {
 		title?: ReactNode
+		/**
+		 * Position of the add button.
+		 */
 		addButtonPosition?: 'none' | 'after' | 'before' | 'around'
 	}
 	& RepeaterProps
 
+/**
+ * DefaultRepeater is a wrapper around Repeater that provides a default UI for a list of items.
+ *
+ * ## Props {@link DefaultRepeaterProps}
+ * - field or entities, sortableBy or orderBy, addButtonPosition, title
+ *
+ * ## Example
+ * ```tsx
+ * <DefaultRepeater entities="RepeaterItem" sortableBy="order" title="Foo items" addButtonPosition="around">
+ * 	<InputField field="title" />
+ * 	<RepeaterItemActions>
+ * 		<RepeaterRemoveItemButton />
+ * 	</RepeaterItemActions>
+ * </DefaultRepeater>
+ * ```
+ */
 export const DefaultRepeater = Component<DefaultRepeaterProps>(props => {
 	if ('field' in props) {
 		return (

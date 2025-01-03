@@ -33,6 +33,7 @@
     "@contember/react-multipass-rendering": "workspace:*",
     "@contember/react-repeater": "workspace:*",
     "@contember/react-utils": "workspace:*",
+    "@radix-ui/primitive": "^1.1.0",
     "@radix-ui/react-slot": "^1.1.0"
   },
   "peerDependencies": {

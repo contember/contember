@@ -21,7 +21,7 @@ export const executeGraphQlTest = async (test: Test) => {
 		})
 	})
 	if ('errors' in rawResponse) {
-		if (rawResponse.errors?.length === 1 && 'originalError' in (rawResponse.errors as any)[0]) {
+		if (rawResponse.errors?.length === 1 && (rawResponse.errors as any)[0].originalError) {
 			throw (rawResponse.errors as any)[0].originalError
 		}
 		rawResponse.errors = (rawResponse.errors as any).map(({ message }: any) => ({ message }))

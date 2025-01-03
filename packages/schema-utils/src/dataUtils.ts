@@ -60,9 +60,9 @@ export const resolveColumnValue = (
 		input: Input.ColumnValue | undefined
 	},
 	providers: Providers,
-): Value.AtomicValue | undefined => {
+): Value.FieldValue | undefined => {
 	if (input !== undefined) {
-		return input as Value.AtomicValue
+		return input
 	}
 	if (entity.primary === column.name) {
 		return resolvePrimaryGenerator(column, providers)()

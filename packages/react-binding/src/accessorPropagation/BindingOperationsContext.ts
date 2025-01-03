@@ -27,6 +27,7 @@ export const defaultBindingOperations = Object.freeze<BindingOperations<ReactNod
 	extendTree: getRejecter('extendTree'),
 	persist: getRejecter('persist'),
 	fetchData: getRejecter('fetchData'),
+	addEventListener: getRejecter('addEventListener'),
 })
 
 export const BindingOperationsContext = createContext<BindingOperations<ReactNode>>(defaultBindingOperations)

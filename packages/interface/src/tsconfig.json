@@ -10,6 +10,5 @@
 		{ "path": "../../react-dataview/src" },
 		{ "path": "../../react-identity/src" },
 		{ "path": "../../react-routing/src" },
-		{ "path": "../../utilities/src" },
 	]
 }

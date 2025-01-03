@@ -55,14 +55,18 @@ export class EventManager {
 	) {}
 
 	public async persistOperation(operation: () => Promise<SuccessfulPersistResult>): Promise<SuccessfulPersistResult> {
+		if (this.ongoingPersistOperation !== undefined) {
+			if (this.isMutating) {
+				throw new BindingError(`Cannot trigger a persist whilst another one is ongoing!`)
+			}
+			return await this.ongoingPersistOperation
+		}
 		if (this.transactionDepth > 0) {
 			throw new BindingError(`Cannot trigger a persist whilst batching updates!`)
 		}
-		const ongoingOperation = this.ongoingPersistOperation
-		if (ongoingOperation !== undefined) {
-			return await ongoingOperation
-		}
 		return await (this.ongoingPersistOperation = new Promise<SuccessfulPersistResult>(async (resolve, reject) => {
+			await Promise.resolve()
+
 			this.isMutating = true
 			this.flushUpdates() // Let the world know that we're mutating
 
@@ -132,8 +136,8 @@ export class EventManager {
 			this.isFrozenWhileUpdating = true
 			this.triggerBeforeFlushEvents()
 			this.onUpdate(newMetadata)
-			this.flushPendingAccessorUpdates(Array.from(this.rootsWithPendingUpdates))
-
+			const rootStates = Array.from(this.rootsWithPendingUpdates)
+			this.flushPendingAccessorUpdates(rootStates)
 			this.rootsWithPendingUpdates.clear()
 			this.isFrozenWhileUpdating = false
 			this.previousMetadata = newMetadata

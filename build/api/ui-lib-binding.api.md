@@ -8,11 +8,10 @@ import { AccessorTreeState } from '@contember/interface';
 import { ErrorPersistResult } from '@contember/interface';
 import type { FC } from 'react';
 import { JSX as JSX_2 } from 'react/jsx-runtime';
-import { ReactElement } from 'react';
+import type { ReactElement } from 'react';
 import { ReactNode } from 'react';
 import { RoutingLinkTarget } from '@contember/interface';
 import { SuccessfulPersistResult } from '@contember/interface';
-import { SugaredRelativeSingleField } from '@contember/interface';
 
 // @public (undocumented)
 export const Binding: ({ children }: {
@@ -38,11 +37,6 @@ export type DeleteEntityDialogProps = {
 };
 
 // @public (undocumented)
-export const FeedbackTrigger: (props: {
-    children: ReactElement;
-}) => JSX_2.Element;
-
-// @public (undocumented)
 export const IdentityLoader: ({ children }: {
     children: React.ReactNode;
 }) => JSX_2.Element;
@@ -53,19 +47,10 @@ export const PersistButton: ({ label }: {
 }) => JSX_2.Element;
 
 // @public (undocumented)
-export const PersistOnCmdS: () => null;
-
-// @public (undocumented)
-export const PersistOnFieldChange: ({ field }: {
-    field: SugaredRelativeSingleField["field"];
-}) => null;
-
-// @public (undocumented)
 export const usePersistErrorHandler: () => (result: ErrorPersistResult) => void;
 
 // @public (undocumented)
 export const usePersistFeedbackHandlers: () => {
-    onPersistError: (result: ErrorPersistResult) => void;
     onPersistSuccess: (result: SuccessfulPersistResult) => void;
 };
 
@@ -73,7 +58,7 @@ export const usePersistFeedbackHandlers: () => {
 export const usePersistSuccessHandler: () => (result: SuccessfulPersistResult) => void;
 
 // @public (undocumented)
-export const usePersistWithFeedback: () => () => Promise<void>;
+export const usePersistWithFeedback: () => () => Promise<void | null>;
 
 // (No @packageDocumentation comment for this package)
 

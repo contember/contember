@@ -1,11 +1,12 @@
 import { ContentClient, ContentQueryBuilder, GraphQlClient, GraphQlClientError } from '@contember/client'
-import type { DataBindingTransactionResult, EntityId, Environment, MarkerTreeRoot, TreeRootId } from '@contember/binding-common'
+import type { DataBindingEventListenerMap, DataBindingTransactionResult, EntityId, Environment, MarkerTreeRoot, TreeRootId } from '@contember/binding-common'
 import {
 	assertNever,
 	AsyncBatchUpdatesOptions,
 	BatchUpdatesOptions,
 	BindingOperations,
 	ErrorPersistResult,
+	EventListenersStore,
 	ExtendTreeOptions,
 	MarkerMerger,
 	PersistOptions,
@@ -44,6 +45,7 @@ export class DataBinding<Node> {
 	private readonly treeAugmenter: TreeAugmenter
 	private readonly queryBuilder: ContentQueryBuilder
 	private readonly contentClient: ContentClient
+	private readonly eventListenerStore = new EventListenersStore<DataBindingEventListenerMap>()
 
 	// private treeRootListeners: {
 	// 	eventListeners: {}
@@ -96,6 +98,7 @@ export class DataBinding<Node> {
 		// TODO move this elsewhere
 		this.bindingOperations = Object.freeze<BindingOperations<Node>>({
 			...this.asyncBatchUpdatesOptions,
+			addEventListener: (type, listener) => this.eventListenerStore.add({ type }, listener),
 			batchDeferredUpdates: performUpdates => {
 				this.eventManager.syncTransaction(() => performUpdates(this.bindingOperations))
 			},
@@ -122,10 +125,7 @@ export class DataBinding<Node> {
 			const mutationResult = generator.getPersistMutation()
 
 			if (mutationResult.operations.length === 0) {
-				await this.processEmptyPersistMutation(onPersistSuccess)
-				return {
-					type: 'nothingToPersist',
-				}
+				return await this.processEmptyPersistMutation(onPersistSuccess)
 			}
 
 			const { mutations, operations } = mutationResult
@@ -144,7 +144,7 @@ export class DataBinding<Node> {
 			} catch (e) {
 				if (e instanceof GraphQlClientError) {
 					this.onError(e, this)
-					this.persistFail({
+					throw await this.persistFail({
 						errors: [e],
 						type: 'invalidResponse',
 					})
@@ -165,7 +165,7 @@ export class DataBinding<Node> {
 
 				await this.eventManager.triggerOnPersistError(this.bindingOperations)
 				await onPersistError?.(this.bindingOperations)
-				this.persistFail({
+				throw await this.persistFail({
 					errors: this.accessorErrorManager.getErrors(),
 					type: 'invalidInput',
 					response,
@@ -179,15 +179,14 @@ export class DataBinding<Node> {
 		if (this.accessorErrorManager.hasErrors()) {
 			await this.eventManager.triggerOnPersistError(this.bindingOperations)
 			await onPersistError?.(this.bindingOperations)
-			this.persistFail({
+			throw await this.persistFail({
 				errors: this.accessorErrorManager.getErrors(),
 				type: 'invalidInput',
-			},
-			)
+			})
 		}
 	}
 
-	private async processEmptyPersistMutation(onPersistSuccess: PersistOptions['onPersistSuccess']): Promise<void> {
+	private async processEmptyPersistMutation(onPersistSuccess: PersistOptions['onPersistSuccess']): Promise<SuccessfulPersistResult> {
 		this.dirtinessTracker.reset() // TODO This ideally shouldn't be necessary but given the current limitations, this makes for better UX.
 		const persistSuccessOptions: PersistSuccessOptions = {
 			...this.bindingOperations,
@@ -195,6 +194,9 @@ export class DataBinding<Node> {
 		}
 		await this.eventManager.triggerOnPersistSuccess(persistSuccessOptions)
 		await onPersistSuccess?.(persistSuccessOptions)
+		const result: SuccessfulPersistResult = { type: 'nothingToPersist' }
+		await this.eventListenerStore.invoke({ type: 'persistSuccess' }, result)
+		return result
 	}
 
 	private async processSuccessfulPersistResult(mutationData: DataBindingTransactionResult, operations: SubMutationOperation[], onPersistSuccess: PersistOptions['onPersistSuccess']) {
@@ -222,6 +224,7 @@ export class DataBinding<Node> {
 				}
 				await this.eventManager.triggerOnPersistSuccess(persistSuccessOptions)
 				await onPersistSuccess?.(persistSuccessOptions)
+				await this.eventListenerStore.invoke({ type: 'persistSuccess' }, result)
 
 				this.treeAugmenter.resetCreatingSubTrees()
 			})
@@ -238,8 +241,9 @@ export class DataBinding<Node> {
 		return result
 	}
 
-	private persistFail(error: ErrorPersistResult): never {
-		throw error
+	private async persistFail(error: ErrorPersistResult): Promise<ErrorPersistResult> {
+		await this.eventListenerStore.invoke({ type: 'persistError' }, error)
+		return error
 	}
 
 	private resolvedOnUpdate = ({ isMutating }: UpdateMetadata) => {

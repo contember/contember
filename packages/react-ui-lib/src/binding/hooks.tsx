@@ -6,18 +6,17 @@ import { useErrorFormatter } from '../errors'
 
 export const usePersistWithFeedback = () => {
 	const triggerPersist = usePersist()
-	const { onPersistSuccess, onPersistError } = usePersistFeedbackHandlers()
+	const { onPersistSuccess } = usePersistFeedbackHandlers()
 	return useCallback(() => {
 		return triggerPersist()
 			.then(onPersistSuccess)
-			.catch(onPersistError)
-	}, [onPersistError, onPersistSuccess, triggerPersist])
+			.catch(() => null)
+	}, [onPersistSuccess, triggerPersist])
 }
 
 
 export const usePersistFeedbackHandlers = () => {
 	return {
-		onPersistError: usePersistErrorHandler(),
 		onPersistSuccess: usePersistSuccessHandler(),
 	}
 }

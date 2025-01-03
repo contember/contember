@@ -1,9 +1,9 @@
 import { KanbanIcon } from 'lucide-react'
 import { Title } from '~/app/components/title'
-import { Binding, PersistButton, PersistOnFieldChange } from '~/lib/binding'
+import { Binding, PersistButton } from '~/lib/binding'
 import { DefaultBoard } from '~/lib/board/board'
 import { Slots } from '~/lib/layout'
-import { Field } from '@contember/interface'
+import { Field, PersistOnFieldChange, PersistOnHasOneChange } from '@contember/interface'
 import { BoardColumnLabel } from '@contember/react-board'
 
 const statusList = [
@@ -40,8 +40,11 @@ export const Assignee = () => (
 					Without assignee
 				</div>}
 		>
-			<Field field="title" />
+			<PersistOnHasOneChange field="assignee" />
+			<PersistOnFieldChange field="order" />
+			<Field field={'title'} />
 		</DefaultBoard>
+
 	</Binding>
 )
 

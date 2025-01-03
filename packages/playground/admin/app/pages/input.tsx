@@ -1,5 +1,5 @@
 import { EntitySubTree, useField } from '@contember/interface'
-import { useEnvironment } from '@contember/react-binding'
+import { Component, Field, useEntityBeforePersist, useEnvironment } from '@contember/react-binding'
 import slugify from '@sindresorhus/slugify'
 import { FormInputIcon } from 'lucide-react'
 import { Title } from '~/app/components/title'
@@ -9,7 +9,7 @@ import { FieldExists } from '~/lib-extra/has-field'
 import { SelectOrTypeField } from '~/lib-extra/select-or-type-field'
 import { SlugField } from '~/lib-extra/slug-field/field'
 import { Binding, PersistButton } from '~/lib/binding'
-import { CheckboxField, InputField, RadioEnumField, TextareaField } from '~/lib/form'
+import { CheckboxField, InputField, InputFieldProps, RadioEnumField, TextareaField } from '~/lib/form'
 import { Slots } from '~/lib/layout'
 import { DefaultRepeater } from '~/lib/repeater'
 import { Button } from '~/lib/ui/button'
@@ -309,3 +309,30 @@ export const ServerRules = () => (
 	</Binding>
 )
 
+export const CustomError = () => <>
+	<Binding>
+		<Slots.Actions>
+			<PersistButton />
+		</Slots.Actions>
+		<EntitySubTree entity={'InputRoot(unique=unique)'} setOnCreate={'(unique=unique)'}>
+			<div className={'space-y-4'}>
+				<InputFieldWithCustomError field={'textValue'} label={'Text'} description={'Hello world'} />
+			</div>
+		</EntitySubTree>
+	</Binding>
+</>
+
+const InputFieldWithCustomError = Component<InputFieldProps>(
+	() => {
+		useEntityBeforePersist(entityAccessor => {
+			const field = entityAccessor().getField('textValue')
+
+			if (field.value != 'Hello world') {
+				field.addError('You must enter "Hello world"')
+			}
+		})
+
+		return <InputField field={'textValue'} label={'Text'} description={'Try to write anything but "Hello world"'} />
+	},
+	() => <Field field={'textValue'} />,
+)

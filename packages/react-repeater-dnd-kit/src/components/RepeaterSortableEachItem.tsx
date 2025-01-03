@@ -4,6 +4,10 @@ import { RepeaterEachItem, useRepeaterSortedEntities } from '@contember/react-re
 import { RepeaterSortableItemContext } from '../contexts'
 import { useEntity } from '@contember/react-binding'
 
+/**
+ * Iterates over all entities in the repeater and renders the children for each entity.
+ * Also sets up the dnd-kit sortable context for the repeater items.
+ */
 export const RepeaterSortableEachItem = ({ children }: {
 	children: ReactNode
 }) => {

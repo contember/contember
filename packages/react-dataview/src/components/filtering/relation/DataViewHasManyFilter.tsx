@@ -8,12 +8,44 @@ import { createHasManyFilter } from '../../../filterTypes'
 import { useFieldEntityName } from '../../../internal/hooks/useFieldEntityName'
 
 export interface DataViewHasManyFilterProps {
+	/**
+	 * The field to filter by.
+	 */
 	field: SugaredRelativeEntityList['field']
+
+	/**
+	 * An optional custom name for the filter.
+	 * Defaults to the field name if not provided.
+	 */
 	name?: string
+
+	/**
+	 * Optional list of entities to filter by.
+	 * If not provided, the filter will use the entity associated with the field.
+	 */
 	options?: SugaredQualifiedEntityList['entities']
+
+	/**
+	 * The content or UI controls to render inside the filter.
+	 */
 	children: React.ReactNode
 }
 
+/**
+ * Provides a has-many filter within a data view, including context and a filter handler.
+ *
+ * ## Props
+ * - field, name, options, children
+ *
+ * See {@link DataViewHasManyFilterProps} for details.
+ *
+ * ## Example
+ * ```tsx
+ * <DataViewHasManyFilter field="tags">
+ *     //  Filter controls here 
+ * <DataViewFilterName>
+ * ```
+ */
 export const DataViewHasManyFilter = Component<DataViewHasManyFilterProps>(({ field, children, options, name }) => {
 	const nameResolved = getFilterName(name, field)
 	const optionsResolved = useDataViewHasManyFilterOptions({ options, field })

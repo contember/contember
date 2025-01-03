@@ -13,7 +13,7 @@ type UseDataViewPagingArgs =
 	}
 	& DataViewPagingProps
 
-export const DATA_VIEW_DEFAULT_ITEMS_PER_PAGE = 50
+
 
 export const useDataViewPaging = ({ dataViewKey, initialItemsPerPage, pagingSettingsStorage, currentPageStateStorage, ...args }: UseDataViewPagingArgs): {
 	state: DataViewPagingState

@@ -5,6 +5,9 @@ import { DragOverlay } from '@dnd-kit/core'
 import { AccessorTree, Entity, useAccessorTreeState } from '@contember/react-binding'
 import { RepeaterCurrentEntityContext } from '@contember/react-repeater'
 
+/**
+ * Component for rendering the repeater item being dragged.
+ */
 export const RepeaterSortableDragOverlay = ({ children }: {
 	children: ReactNode
 }) => {

@@ -27,21 +27,21 @@ import { Sheet, SheetClose, SheetContent, SheetFooter, SheetHeader, SheetTitle }
 import { Switch } from '../ui/switch'
 import { uic } from '../utils'
 
-export const BlockRepeaterItemsWrapperUI = uic('div', {
+const BlockRepeaterItemsWrapperUI = uic('div', {
 	baseClass: 'rounded border border-gray-300 px-4 py-8 flex flex-col',
 })
-export const BlockRepeaterItemUI = uic('div', {
+const BlockRepeaterItemUI = uic('div', {
 	baseClass: 'relative border-t transition-all group',
 })
-export const BlockRepeaterDragOverlayUI = uic('div', {
+const BlockRepeaterDragOverlayUI = uic('div', {
 	baseClass: 'rounded border border-gray-300 p-4 relative bg-opacity-60 bg-gray-100 backdrop-blur-sm',
 })
-export const BlockRepeaterHandleUI = uic('button', {
+const BlockRepeaterHandleUI = uic('button', {
 	baseClass: 'absolute top-1/2 -left-6 h-6 w-6 flex justify-end align-center opacity-10 hover:opacity-100 transition-opacity -translate-y-1/2',
 	beforeChildren: <GripVerticalIcon size={16} />,
 })
 
-export const BlockRepeaterItemActions = uic('div', {
+const BlockRepeaterItemActions = uic('div', {
 	baseClass: 'absolute top-1 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity',
 })
 
@@ -54,6 +54,43 @@ export type DefaultBlockRepeaterProps =
 
 const [BlockRepeaterEditModeContext, useBlockRepeaterEditMode] = createRequiredContext<boolean>('BlockRepeaterEditMode')
 
+/**
+ *  The `DefaultBlockRepeater` component is a versatile and customizable block repeater shipped with a UI.
+ *  It allows for the creation and management of repeatable content blocks within a form.
+ * Supports two modes of operation:
+ *   - **Inline Edit Mode**: By providing only `children`, the blocks can be edited inline.
+ *   - **Dual-Mode**: By providing both `form` and `children`, the component supports a dual-mode where blocks can be edited in a separate form view.
+ *
+ * ## Props {@link DefaultBlockRepeaterProps}
+ * - field or entities, sortableBy, discriminationField, children
+ *
+ * ## Example
+ * ```tsx
+ * <DefaultBlockRepeater field="blocks" sortableBy="order" discriminationField="type">
+ *   <Block
+ *     name="text"
+ *     label={<><TextIcon /> Text</>}
+ *     form={<>
+ *       <InputField field="title" label="Title" />
+ *       <TextareaField field="content" label="Content" />
+ *     </>}
+ *     children={<>
+ *       <div className="flex">
+ *         <div className="w-64 space-y-2">
+ *           <h2 className="text-xl font-bold">
+ *             <Field field="title" />
+ *           </h2>
+ *           <p>
+ *             <Field field="content" />
+ *           </p>
+ *         </div>
+ *       </div>
+ *     </>
+ *     }
+ *   />
+ * </DefaultBlockRepeater>
+ * ```
+ */
 export const DefaultBlockRepeater = Component<DefaultBlockRepeaterProps>(({ children, ...props }) => {
 	const [editMode, setEditMode] = useState(false)
 	return (
@@ -91,7 +128,7 @@ const ToggleEditMode = ({ setEditMode, editMode }: { setEditMode: (value: boolea
 	)
 }
 
-export const BlockRepeaterSortable = Component<{
+const BlockRepeaterSortable = Component<{
 	sortableBy: DefaultBlockRepeaterProps['sortableBy']
 }>(({ sortableBy }) => {
 	return (
@@ -129,7 +166,7 @@ export const BlockRepeaterSortable = Component<{
 	)
 })
 
-export const BlockRepeaterAddButtons = ({ index }: { index?: RepeaterAddItemIndex }) => {
+const BlockRepeaterAddButtons = ({ index }: { index?: RepeaterAddItemIndex }) => {
 	const { blocks } = useBlockRepeaterConfig()
 	return (
 		<div className="grid grid-cols-[repeat(auto-fill,minmax(110px,1fr))] gap-2">
@@ -150,7 +187,7 @@ export const BlockRepeaterAddButtons = ({ index }: { index?: RepeaterAddItemInde
 }
 
 
-export const BlockRepeaterContent = () => {
+const BlockRepeaterContent = () => {
 	const entity = useEntity()
 	const block = useBlockRepeaterCurrentBlock()
 	const children = block?.children

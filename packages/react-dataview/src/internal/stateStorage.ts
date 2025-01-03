@@ -5,6 +5,7 @@ export const dataViewKeyFallback = 'dataview'
 export type DataViewStoredStateArgs<V> = [key: [string, string], valueInitializer: (storedValue: V | undefined) => V]
 
 export type DataViewPagingSettingStoredState = Pick<DataViewPagingState, 'itemsPerPage'>
+export const DATA_VIEW_DEFAULT_ITEMS_PER_PAGE = 50
 export const getDataViewPagingSettingStorageArgs = ({ dataViewKey, initialItemsPerPage }: {
 	dataViewKey?: string
 	initialItemsPerPage?: DataViewPagingProps['initialItemsPerPage']
@@ -12,7 +13,7 @@ export const getDataViewPagingSettingStorageArgs = ({ dataViewKey, initialItemsP
 	return [
 		[dataViewKey ?? dataViewKeyFallback, 'itemsPerPage'],
 		val => val ?? {
-			itemsPerPage: initialItemsPerPage ?? 50,
+			itemsPerPage: initialItemsPerPage ?? DATA_VIEW_DEFAULT_ITEMS_PER_PAGE,
 		},
 	]
 }

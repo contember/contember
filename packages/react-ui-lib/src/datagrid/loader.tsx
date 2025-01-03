@@ -3,11 +3,27 @@ import { ReactNode } from 'react'
 import { Loader } from '../ui/loader'
 import { DataViewLoaderState } from '@contember/react-dataview'
 
+/**
+ * Props for the {@link DataGridLoader} component.
+ */
 export interface DataGridLoaderProps {
 	children: ReactNode
 }
 
-export const DataGridLoader = ({ children }: DataGridLoaderProps) => (
+/**
+ * A component that provides a loading state for a data grid.
+ * It displays different loaders based on the current loading state.
+ *
+ * ## Example
+ * ```tsx
+ * <DataGridLoader>
+ *     <DataGridTable>
+ *         <DataGridTextColumn header="Title" field="title" />
+ *     </DataGridTable>
+ * </DataGridLoader>
+ * ```
+ */
+export const DataGridLoader = ({ children }: { children: ReactNode }) => (
 	<>
 		<DataViewLoaderState refreshing loaded>
 			<div className="relative">
@@ -27,10 +43,10 @@ export const DataGridLoader = ({ children }: DataGridLoaderProps) => (
 )
 
 
-export const DataGridOverlayLoader = () => (
+const DataGridOverlayLoader = () => (
 	<Loader position={'absolute'} />
 )
 
-export const DataGridInitialLoader = () => (
+const DataGridInitialLoader = () => (
 	<Loader position={'static'} />
 )

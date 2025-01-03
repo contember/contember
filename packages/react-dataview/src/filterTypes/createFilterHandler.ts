@@ -3,7 +3,7 @@ import { DataViewFilterArtifact, DataViewFilterHandler, DataViewFilterHandlerOpt
 import { Input } from '@contember/client'
 
 export const createFilterHandler = <FA extends DataViewFilterArtifact = DataViewFilterArtifact>({ createFilter, isEmpty, identifier }: {
-	createFilter: ((filterArtifact: FA, options: DataViewFilterHandlerOptions<FA>) => Filter | undefined)
+	createFilter: ((filterArtifact: FA, options: DataViewFilterHandlerOptions) => Filter | undefined)
 	isEmpty?: (filterArtifact: FA) => boolean
 	identifier?: { id: Symbol; params: any }
 }): DataViewFilterHandler<FA> => {
@@ -19,7 +19,7 @@ export const createFilterHandler = <FA extends DataViewFilterArtifact = DataView
  * Simplifies the creation of a filter handler for a field filter.
  */
 export const createFieldFilterHandler = <FA extends DataViewFilterArtifact = DataViewFilterArtifact>({ createCondition, isEmpty }: {
-	createCondition: ((filterArtifact: FA, options: DataViewFilterHandlerOptions<FA>) => Input.Condition | undefined)
+	createCondition: ((filterArtifact: FA, options: DataViewFilterHandlerOptions) => Input.Condition | undefined)
 	isEmpty?: (filterArtifact: FA) => boolean
 }) => {
 	const id = Symbol()

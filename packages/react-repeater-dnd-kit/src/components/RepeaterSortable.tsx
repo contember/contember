@@ -5,6 +5,37 @@ import { RepeaterActiveEntityContext } from '../contexts'
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { useRepeaterMethods, useRepeaterSortedEntities } from '@contember/react-repeater'
 
+/**
+ * Initializes dnd-kit based sorting for the repeater.
+ * Using the props, you can customize the behavior of the sorting and hook into the drag events.
+ *
+ * ## Example
+ * ```tsx
+ * <Repeater {...}>
+ *   <RepeaterSortable>
+ *     <RepeaterSortableEachItem>
+ *       <div>
+ *         <RepeaterSortableDropIndicator position={'before'}><div>Drop here</div></RepeaterSortableDropIndicator>
+ *         <RepeaterSortableItemNode>
+ *           <div>
+ *             <RepeaterSortableItemActivator>
+ *               <span/>
+ *             </RepeaterSortableItemActivator>
+ *             {children}
+ *           </div>
+ *         </RepeaterSortableItemNode>
+ *         <RepeaterSortableDropIndicator position={'afer'}><div>Drop here</div></RepeaterSortableDropIndicator>
+ *       </div>
+ *     </RepeaterSortableEachItem>
+ *     <RepeaterSortableDragOverlay>
+ *       <div>
+ *         {children}
+ *       </div>
+ *     </RepeaterSortableDragOverlay>
+ *   </RepeaterSortable>
+ * </Repeater>
+ * ```
+ */
 export const RepeaterSortable = ({ children, onDragStart, onDragEnd: onDragEndIn, onDragCancel: onDragCancelIn, ...props }: {
 	children: ReactNode
 } & DndContextProps) => {

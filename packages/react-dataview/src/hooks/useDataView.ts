@@ -11,7 +11,13 @@ import { getDataViewKey } from '../internal/helpers/getDataViewKey'
 
 export type UseDataViewArgs =
 	& {
+		/**
+		 * Data view key. If not provided, it will be generated from the entities and global key.
+		 */
 		dataViewKey?: string
+		/**
+		 * List of entities to display in the data view.
+		 */
 		entities: SugaredQualifiedEntityList['entities']
 	}
 	& DataViewFilteringProps
@@ -25,6 +31,10 @@ export type UseDataViewResult = {
 	methods: DataViewMethods
 }
 
+/**
+ * Low-level hook for initializing a data view with fine-grained control over its state. Use together with {@link ControlledDataView}.
+ * Use with caution, prefer the {@link DataView} component for most use cases.
+ */
 export const useDataView = (args: UseDataViewArgs): UseDataViewResult => {
 
 	const environment = useEnvironment()

@@ -12,6 +12,12 @@ export default () => (
 		</Slots.Title>
 
 		<div>
+			<p className="max-w-md">
+				The dialog component based on Radix UI primitives. It provides a simple way to create a dialog with a header, content, and footer.
+			</p>
+			<p className="max-w-md">Additionally, it can be controlled by a <code>useDialogOpenState</code> hook.</p>
+		</div>
+		<div>
 			<Dialog>
 				<CustomDialogState />
 				<CustomDialogTrigger />

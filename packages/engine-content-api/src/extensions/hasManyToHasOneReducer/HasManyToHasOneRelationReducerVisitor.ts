@@ -65,7 +65,7 @@ export class HasManyToHasOneRelationReducerFieldVisitor implements
 
 		const graphQlName = relation.name + GqlTypeName`By`
 		const uniqueWhere: GraphQLInputObjectType = new GraphQLInputObjectType({
-			name: GqlTypeName`${entity.name}${relation.name}UniqueWhere`,
+			name: GqlTypeName`${entity.name}${relation.name}ByUniqueWhere`,
 			fields: () => {
 				return this.whereTypeProvider.getUniqueWhereFields(targetEntity, uniqueKeys)
 			},

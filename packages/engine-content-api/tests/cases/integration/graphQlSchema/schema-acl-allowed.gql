@@ -38,7 +38,7 @@ type Root {
   id: UUID!
   foo: String
   r(filter: OneHasManyEntityWhere, orderBy: [OneHasManyEntityOrderBy!], offset: Int, limit: Int): [OneHasManyEntity!]!
-  rBy(by: RootRUniqueWhere!, filter: OneHasManyEntityWhere): OneHasManyEntity
+  rBy(by: RootRByUniqueWhere!, filter: OneHasManyEntityWhere): OneHasManyEntity
   paginateR(filter: OneHasManyEntityWhere, orderBy: [OneHasManyEntityOrderBy!], skip: Int, first: Int): OneHasManyEntityConnection!
 }
 
@@ -126,7 +126,7 @@ input RootOrderBy {
   foo: OrderDirection
 }
 
-input RootRUniqueWhere {
+input RootRByUniqueWhere {
   id: UUID
 }
 

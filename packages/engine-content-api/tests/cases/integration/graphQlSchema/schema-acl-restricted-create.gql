@@ -35,7 +35,7 @@ type Root {
   _meta: RootMeta
   id: UUID!
   r(filter: OneHasManyEntityWhere, orderBy: [OneHasManyEntityOrderBy!], offset: Int, limit: Int): [OneHasManyEntity!]!
-  rBy(by: RootRUniqueWhere!, filter: OneHasManyEntityWhere): OneHasManyEntity
+  rBy(by: RootRByUniqueWhere!, filter: OneHasManyEntityWhere): OneHasManyEntity
   paginateR(filter: OneHasManyEntityWhere, orderBy: [OneHasManyEntityOrderBy!], skip: Int, first: Int): OneHasManyEntityConnection!
 }
 
@@ -120,7 +120,7 @@ input RootOrderBy {
   id: OrderDirection
 }
 
-input RootRUniqueWhere {
+input RootRByUniqueWhere {
   id: UUID
 }
 

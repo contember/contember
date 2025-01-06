@@ -41,7 +41,7 @@ type Post {
   publishedAt: DateTime
   locales(filter: PostLocaleWhere, orderBy: [PostLocaleOrderBy!], offset: Int, limit: Int): [PostLocale!]!
   localesByLocale(by: PostLocalesByLocaleUniqueWhere!, filter: PostLocaleWhere): PostLocale
-  localesBy(by: PostLocalesUniqueWhere!, filter: PostLocaleWhere): PostLocale
+  localesBy(by: PostLocalesByUniqueWhere!, filter: PostLocaleWhere): PostLocale
   paginateLocales(filter: PostLocaleWhere, orderBy: [PostLocaleOrderBy!], skip: Int, first: Int): PostLocaleConnection!
 }
 
@@ -153,7 +153,7 @@ input PostLocalesByLocaleUniqueWhere {
   locale: String
 }
 
-input PostLocalesUniqueWhere {
+input PostLocalesByUniqueWhere {
   id: UUID
   locale: String
 }

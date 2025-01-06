@@ -11,6 +11,7 @@ import { GenericFileMetadataExtractorProps } from '@contember/react-uploader';
 import { ImageFileDataExtractorProps } from '@contember/react-uploader';
 import { JSX as JSX_2 } from 'react/jsx-runtime';
 import * as React_2 from 'react';
+import { ReactElement } from 'react';
 import { ReactNode } from 'react';
 import { SugaredRelativeSingleEntity } from '@contember/interface';
 import { VideoFileDataExtractorProps } from '@contember/react-uploader';
@@ -22,7 +23,7 @@ export type BaseFileViewProps = {
     edit?: ReactNode;
     noDestroy?: boolean;
     DestroyAction?: ComponentType<{
-        children: ReactNode;
+        children: ReactElement;
     }>;
 };
 

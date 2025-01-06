@@ -5,64 +5,9 @@
 ```ts
 
 import { BlockRepeaterProps } from '@contember/react-block-repeater';
-import { ButtonHTMLAttributes } from 'react';
-import { ClassAttributes } from 'react';
-import { ForwardRefExoticComponent } from 'react';
-import { HTMLAttributes } from 'react';
-import { JSX as JSX_2 } from 'react/jsx-runtime';
 import { NamedExoticComponent } from 'react';
-import { RefAttributes } from 'react';
-import { RepeaterAddItemIndex } from '@contember/react-repeater';
 
-// @public (undocumented)
-export const BlockRepeaterAddButtons: ({ index }: {
-    index?: RepeaterAddItemIndex;
-}) => JSX_2.Element;
-
-// @public (undocumented)
-export const BlockRepeaterContent: () => JSX_2.Element;
-
-// @public (undocumented)
-export const BlockRepeaterDragOverlayUI: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLDivElement> & HTMLAttributes<HTMLDivElement> & {
-asChild?: boolean;
-children?: React.ReactNode;
-className?: string;
-}, "ref"> & RefAttributes<HTMLDivElement>>;
-
-// @public (undocumented)
-export const BlockRepeaterHandleUI: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLButtonElement> & ButtonHTMLAttributes<HTMLButtonElement> & {
-asChild?: boolean;
-children?: React.ReactNode;
-className?: string;
-}, "ref"> & RefAttributes<HTMLButtonElement>>;
-
-// @public (undocumented)
-export const BlockRepeaterItemActions: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLDivElement> & HTMLAttributes<HTMLDivElement> & {
-asChild?: boolean;
-children?: React.ReactNode;
-className?: string;
-}, "ref"> & RefAttributes<HTMLDivElement>>;
-
-// @public (undocumented)
-export const BlockRepeaterItemsWrapperUI: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLDivElement> & HTMLAttributes<HTMLDivElement> & {
-asChild?: boolean;
-children?: React.ReactNode;
-className?: string;
-}, "ref"> & RefAttributes<HTMLDivElement>>;
-
-// @public (undocumented)
-export const BlockRepeaterItemUI: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLDivElement> & HTMLAttributes<HTMLDivElement> & {
-asChild?: boolean;
-children?: React.ReactNode;
-className?: string;
-}, "ref"> & RefAttributes<HTMLDivElement>>;
-
-// @public (undocumented)
-export const BlockRepeaterSortable: NamedExoticComponent<    {
-sortableBy: DefaultBlockRepeaterProps["sortableBy"];
-}>;
-
-// @public (undocumented)
+// @public
 export const DefaultBlockRepeater: NamedExoticComponent<BlockRepeaterProps>;
 
 // @public (undocumented)

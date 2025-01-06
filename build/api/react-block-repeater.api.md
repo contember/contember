@@ -14,36 +14,28 @@ import { RepeaterAddItemIndex } from '@contember/react-repeater';
 import { RepeaterProps } from '@contember/react-repeater';
 import { SugaredRelativeSingleField } from '@contember/react-binding';
 
-// @public (undocumented)
+// @public
 export const Block: NamedExoticComponent<BlockProps>;
 
-// @public (undocumented)
+// @public
 export interface BlockProps {
-    // (undocumented)
     children: ReactNode;
-    // (undocumented)
     form?: ReactNode;
-    // (undocumented)
     label?: ReactNode;
-    // (undocumented)
     name: string;
 }
 
-// @public (undocumented)
+// @public
 export const BlockRepeater: NamedExoticComponent<BlockRepeaterProps>;
 
-// @public (undocumented)
+// @public
 export const BlockRepeaterAddItemTrigger: ({ preprocess, index, type, ...props }: BlockRepeaterAddItemTriggerProps) => JSX_2.Element;
 
-// @public (undocumented)
+// @public
 export interface BlockRepeaterAddItemTriggerProps {
-    // (undocumented)
     children: ReactElement;
-    // (undocumented)
     index?: RepeaterAddItemIndex;
-    // (undocumented)
     preprocess?: EntityAccessor.BatchUpdatesHandler;
-    // (undocumented)
     type: string;
 }
 
@@ -53,7 +45,7 @@ discriminatedBy: SugaredRelativeSingleField["field"];
 blocks: BlocksMap;
 }>;
 
-// @public (undocumented)
+// @public
 export type BlockRepeaterProps = {
     sortableBy: RepeaterProps['sortableBy'];
     discriminationField: SugaredRelativeSingleField['field'];
@@ -62,13 +54,13 @@ export type BlockRepeaterProps = {
 // @public (undocumented)
 export type BlocksMap = Record<string, BlockProps>;
 
-// @public (undocumented)
+// @public
 export const useBlockRepeaterConfig: () => {
     discriminatedBy: SugaredRelativeSingleField["field"];
     blocks: BlocksMap;
 };
 
-// @public (undocumented)
+// @public
 export const useBlockRepeaterCurrentBlock: () => BlockProps | undefined;
 
 // (No @packageDocumentation comment for this package)

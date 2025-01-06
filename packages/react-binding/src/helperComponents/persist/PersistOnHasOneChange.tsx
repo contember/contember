@@ -5,11 +5,35 @@ import { useEntity, useEnvironment } from '../../accessorPropagation'
 import { Component, HasOne } from '../../coreComponents'
 
 export type PersistOnHasOneChangeProps = {
+
+	/**
+	 * The relation field that should trigger persist when changed.
+	 */
 	field: SugaredRelativeSingleEntity['field']
+
+	/**
+	 * Callback that is called when persist is successful.
+	 */
 	onPersistSuccess?: (result: SuccessfulPersistResult) => void
+
+	/**
+	 * Callback that is called when an error occurs during persist.
+	 */
 	onPersistError?: (result: ErrorPersistResult) => void
 }
 
+/**
+ * Triggers persist when the specified relation field changes.
+ * This only works for has-one relation fields, for scalar fields, see {@link PersistOnFieldChange}.
+ *
+ * ## Props {@link PersistOnHasOneChangeProps}
+ * - field, ?onPersistError, ?onPersistSuccess
+ *
+ * ## Example
+ * ```tsx
+ * <PersistOnHasOneChange field="author" />
+ * ```
+ */
 export const PersistOnHasOneChange = Component<PersistOnHasOneChangeProps>(({ field, onPersistError, onPersistSuccess }) => {
 	const doPersist = useDecoratedPersist({ onPersistError, onPersistSuccess })
 	const env = useEnvironment()

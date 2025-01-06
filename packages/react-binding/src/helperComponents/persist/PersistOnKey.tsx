@@ -3,7 +3,13 @@ import { useEffect } from 'react'
 import { useDecoratedPersist } from './useDecoratedPersist'
 
 export type PersistOnKeyProps = {
+	/**
+	 * Callback that is called when persist is successful.
+	 */
 	onPersistSuccess?: (result: SuccessfulPersistResult) => void
+	/**
+	 * Callback that is called when an error occurs during persist.
+	 */
 	onPersistError?: (result: ErrorPersistResult) => void
 	/**
 	 * Optional function that decides whether a given KeyboardEvent
@@ -12,6 +18,17 @@ export type PersistOnKeyProps = {
 	isHotkey?: (event: KeyboardEvent) => boolean
 }
 
+/**
+ * Triggers persist when the specified hotkey is pressed.
+ *
+ * ## Props {@link PersistOnKeyProps}
+ * - ?isHotkey, ?onPersistError, ?onPersistSuccess
+ *
+ * ## Example
+ * ```tsx
+ * <PersistOnKey />
+ * ```
+ */
 export const PersistOnKey = ({
 	onPersistSuccess,
 	onPersistError,

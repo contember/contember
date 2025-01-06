@@ -1,3 +1,4 @@
+export * from './useDataBindingEvent'
 export * from './useDerivedField'
 export * from './useEntityBeforePersist'
 export * from './useEntityBeforeUpdate'

@@ -1,7 +1,8 @@
 import { ReactNode, useEffect } from 'react'
-import { AccessorTreeState, DataBindingProvider } from '@contember/interface'
+import { AccessorTreeState, DataBindingProvider, useDataBindingEvent } from '@contember/interface'
 import { Loader } from '../ui/loader'
 import { NavigationGuardDialog } from './navigation-guard-dialog'
+import { usePersistErrorHandler } from './hooks'
 
 export const Binding = ({ children }: {
 	children: ReactNode
@@ -9,9 +10,15 @@ export const Binding = ({ children }: {
 	return (
 		<DataBindingProvider stateComponent={BindingStateRenderer}>
 			<NavigationGuardDialog />
+			<PersistErrorHandler />
 			{children}
 		</DataBindingProvider>
 	)
+}
+
+const PersistErrorHandler = () => {
+	useDataBindingEvent('persistError', usePersistErrorHandler())
+	return null
 }
 
 export interface BindingStateRendererProps {

@@ -8,11 +8,13 @@ import type { Alias } from '@contember/binding';
 import type { BindingOperations } from '@contember/binding';
 import { ComponentType } from 'react';
 import { DataBinding } from '@contember/binding';
+import { DataBindingEventListenerMap } from '@contember/binding';
 import { EntityAccessor } from '@contember/binding';
 import type { EntityFieldMarkersContainer } from '@contember/binding';
 import type { EntityFieldsWithHoistablesMarker } from '@contember/binding';
 import { EntityListAccessor } from '@contember/binding';
 import { Environment } from '@contember/binding';
+import { ErrorPersistResult } from '@contember/binding';
 import { ExtendTreeOptions } from '@contember/binding';
 import type { FieldAccessor } from '@contember/binding';
 import type { FieldMarker } from '@contember/binding';
@@ -34,12 +36,13 @@ import { ReactNode } from 'react';
 import type { RelativeEntityList } from '@contember/binding';
 import type { RelativeSingleEntity } from '@contember/binding';
 import { RelativeSingleField } from '@contember/binding';
+import { SuccessfulPersistResult } from '@contember/binding';
 import type { SugaredParentEntityParameters } from '@contember/binding';
 import { SugaredQualifiedEntityList } from '@contember/binding';
 import { SugaredQualifiedSingleEntity } from '@contember/binding';
 import { SugaredRelativeEntityList } from '@contember/binding';
 import { SugaredRelativeSingleEntity } from '@contember/binding';
-import type { SugaredRelativeSingleField } from '@contember/binding';
+import { SugaredRelativeSingleField } from '@contember/binding';
 import type { SugaredUnconstrainedQualifiedEntityList } from '@contember/binding';
 import type { SugaredUnconstrainedQualifiedSingleEntity } from '@contember/binding';
 import type { TreeRootAccessor } from '@contember/binding';
@@ -157,6 +160,17 @@ export interface DeferredSubTreesProps {
     children: ReactNode;
     // (undocumented)
     fallback: ReactNode;
+}
+
+// @public
+export const DeleteEntityTrigger: ({ immediatePersist, onPersistError, onPersistSuccess, ...props }: DeleteEntityTriggerProps) => JSX_2.Element;
+
+// @public (undocumented)
+export interface DeleteEntityTriggerProps {
+    children: ReactElement;
+    immediatePersist?: boolean;
+    onPersistError?: (result: ErrorPersistResult) => void;
+    onPersistSuccess?: (result: SuccessfulPersistResult) => void;
 }
 
 // @public (undocumented)
@@ -498,6 +512,55 @@ export interface ParentEntityProps extends SugaredParentEntityParameters {
     children?: ReactNode;
 }
 
+// @public
+export const PersistOnFieldChange: React.NamedExoticComponent<PersistOnFieldChangeProps>;
+
+// @public (undocumented)
+export type PersistOnFieldChangeProps = {
+    field: SugaredRelativeSingleField['field'];
+    onPersistSuccess?: (result: SuccessfulPersistResult) => void;
+    onPersistError?: (result: ErrorPersistResult) => void;
+};
+
+// @public
+export const PersistOnHasOneChange: React.NamedExoticComponent<PersistOnHasOneChangeProps>;
+
+// @public (undocumented)
+export type PersistOnHasOneChangeProps = {
+    field: SugaredRelativeSingleEntity['field'];
+    onPersistSuccess?: (result: SuccessfulPersistResult) => void;
+    onPersistError?: (result: ErrorPersistResult) => void;
+};
+
+// @public
+export const PersistOnKey: ({ onPersistSuccess, onPersistError, isHotkey, }: PersistOnKeyProps) => null;
+
+// @public (undocumented)
+export type PersistOnKeyProps = {
+    onPersistSuccess?: (result: SuccessfulPersistResult) => void;
+    onPersistError?: (result: ErrorPersistResult) => void;
+    isHotkey?: (event: KeyboardEvent) => boolean;
+};
+
+// @public
+export const PersistTrigger: ({ onPersistError, onPersistSuccess, ...props }: PersistTriggerProps) => JSX_2.Element;
+
+// @public (undocumented)
+export interface PersistTriggerAttributes {
+    // (undocumented)
+    ['data-dirty']?: '';
+    // (undocumented)
+    ['data-loading']?: '';
+}
+
+// @public (undocumented)
+export interface PersistTriggerProps {
+    children: ReactElement;
+    // (undocumented)
+    onPersistError?: (result: ErrorPersistResult) => void;
+    onPersistSuccess?: (result: SuccessfulPersistResult) => void;
+}
+
 // @public (undocumented)
 export const RecursionTerminator: React.NamedExoticComponent<RecursionTerminatorProps>;
 
@@ -627,6 +690,9 @@ export const useDataBinding: ({ children, refreshOnPersist, skipStateUpdateAfter
     refreshOnPersist?: boolean;
     skipStateUpdateAfterPersist?: boolean;
 }) => AccessorTreeState;
+
+// @public (undocumented)
+export const useDataBindingEvent: <Type extends keyof DataBindingEventListenerMap>(event: Type, listener: DataBindingEventListenerMap[Type]) => void;
 
 // @public @deprecated
 export const useDerivedField: <SourceValue extends FieldValue = FieldValue>(sourceField: string | SugaredRelativeSingleField, derivedField: string | SugaredRelativeSingleField, transform?: (sourceValue: SourceValue | null) => SourceValue | null, agent?: string) => void;

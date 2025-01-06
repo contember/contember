@@ -26,3 +26,7 @@ export interface InvalidResponseResult {
 export type SuccessfulPersistResult = NothingToPersistPersistResult | JustSuccessPersistResult
 
 export type ErrorPersistResult = InvalidInputPersistResult  | InvalidResponseResult
+
+export const isErrorPersistResult = (result: unknown): result is ErrorPersistResult => {
+	return typeof result === 'object' && result !== null && 'type' in result && (result.type === 'invalidInput' || result.type === 'invalidResponse')
+}

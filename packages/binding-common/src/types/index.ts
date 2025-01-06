@@ -1,6 +1,7 @@
 export * from './AsyncBatchUpdatesOptions'
 export * from './BatchUpdatesOptions'
 export * from './BindingOperations'
+export * from './DataBindingEvents'
 export * from './DataBindingTransactionResult'
 export * from './EntityAccessor'
 export * from './EntityListAccessor'

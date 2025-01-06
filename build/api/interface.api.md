@@ -11,7 +11,6 @@ import { Environment } from '@contember/react-binding';
 import { ErrorPersistResult } from '@contember/react-binding';
 import { JSX as JSX_2 } from 'react/jsx-runtime';
 import { NamedExoticComponent } from 'react';
-import { ReactElement } from 'react';
 import { ReactNode } from 'react';
 import { RequestParameters } from '@contember/react-routing';
 import { RouteMap } from '@contember/react-routing';
@@ -54,21 +53,6 @@ export interface ClearFieldTriggerProps {
 export { createErrorHandler }
 
 // @public (undocumented)
-export const DeleteEntityTrigger: ({ immediatePersist, onPersistError, onPersistSuccess, ...props }: DeleteEntityTriggerProps) => JSX_2.Element;
-
-// @public (undocumented)
-export interface DeleteEntityTriggerProps {
-    // (undocumented)
-    children: ReactNode;
-    // (undocumented)
-    immediatePersist?: boolean;
-    // (undocumented)
-    onPersistError?: (result: ErrorPersistResult) => void;
-    // (undocumented)
-    onPersistSuccess?: (result: SuccessfulPersistResult) => void;
-}
-
-// @public (undocumented)
 export const DisconnectEntityTrigger: ({ immediatePersist, onPersistError, onPersistSuccess, field, ...props }: DisconnectEntityTriggerProps) => JSX_2.Element;
 
 // @public (undocumented)
@@ -89,19 +73,6 @@ export interface DisconnectEntityTriggerProps {
 export const EntityBeforePersist: ({ listener }: {
     listener: EntityAccessor.EntityEventListenerMap["beforePersist"];
 }) => null;
-
-// @public (undocumented)
-export const PersistTrigger: ({ onPersistError, onPersistSuccess, ...props }: PersistTriggerProps) => JSX_2.Element;
-
-// @public (undocumented)
-export interface PersistTriggerProps {
-    // (undocumented)
-    children: ReactElement;
-    // (undocumented)
-    onPersistError?: (result: ErrorPersistResult) => void;
-    // (undocumented)
-    onPersistSuccess?: (result: SuccessfulPersistResult) => void;
-}
 
 // @public (undocumented)
 export const RedirectOnPersist: ({ to, parameters }: {

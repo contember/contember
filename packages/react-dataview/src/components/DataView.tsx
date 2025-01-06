@@ -1,13 +1,18 @@
 import { ReactNode, useState } from 'react'
-import { Component, QueryLanguage } from '@contember/react-binding'
+import { Component, EntityAccessor, Environment, QueryLanguage } from '@contember/react-binding'
 import { useDataView, UseDataViewArgs } from '../hooks'
 import { ControlledDataView } from './ControlledDataView'
 import { DataViewLoader } from '../internal/components/DataViewLoader'
-import { EntityAccessor, Environment } from '@contember/react-binding'
 import { DataViewUnionFilterFields } from '../filterTypes'
 import { getStateStorage, StateStorageOrName } from '@contember/react-utils'
-import { dataViewKeyEnvironmentExtension } from '../env/dataViewKeyEnvironmentExtension'
-import { DataViewStoredStateArgs, getDataViewCurrentPageStorageArgs, getDataViewFilteringStorageArgs, getDataViewPagingSettingStorageArgs, getDataViewSelectionStorageArgs, getDataViewSortingStorageArgs } from '../internal/stateStorage'
+import {
+	DataViewStoredStateArgs,
+	getDataViewCurrentPageStorageArgs,
+	getDataViewFilteringStorageArgs,
+	getDataViewPagingSettingStorageArgs,
+	getDataViewSelectionStorageArgs,
+	getDataViewSortingStorageArgs,
+} from '../internal/stateStorage'
 import { resolveFilters } from '../internal/hooks/useDataViewResolvedFilters'
 import { resolveOrderBy } from '../internal/hooks/useDataViewSorting'
 import { collectStaticInfo } from '../internal/helpers/staticAnalyzer'
@@ -24,6 +29,16 @@ export type DataViewProps =
 
 export const DataViewQueryFilterName = '_query'
 
+/**
+ * The root component for DataView. It initializes the DataView state and provides the DataView context.
+ *
+ * ## Example
+ * ```tsx
+ * <DataView entities={'Post'}>
+ *     // DataView content here
+ * </DataView>
+ * ```
+ */
 export const DataView = Component<DataViewProps>((props, env) => {
 	const [{ filterTypes, layouts }] = useState(() => {
 		return collectStaticInfo(props, env)

@@ -12,6 +12,9 @@ const LayoutSwitchButton = uic(Button, {
 	},
 })
 
+/**
+ * Layout switcher UI for data grid. Displays buttons for each layout.
+ */
 export const DataGridLayoutSwitcher = () => {
 	const layouts = useDataViewSelectionState().layouts
 

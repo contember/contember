@@ -5,6 +5,15 @@ import * as React from 'react'
 import { ReactNode, useMemo } from 'react'
 import { dict } from '../dict'
 
+/**
+ * Button for exporting data grid to CSV.
+ * If no fields are provided, all fields will be exported.
+ *
+ * ## Example
+ * ```tsx
+ * <DataGridExport />
+ * ```
+ */
 export const DataGridAutoExport = ({ fields }: { fields?: ReactNode }) => {
 	return (
 		<DataViewExportTrigger fields={fields}>

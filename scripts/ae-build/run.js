@@ -17,10 +17,17 @@ const baseConfig = ExtractorConfig.prepare({
 
 const configs = [
 	...packageNames.map(pckg => ExtractorConfig.prepare({
-		configObject: config,
+		configObject: {
+			...config,
+			dtsRollup: {
+				...config.dtsRollup,
+				untrimmedFilePath: path.resolve('build/api/' + pckg + '.d.ts'),
+			},
+		},
 		projectFolderLookupToken: path.resolve('./packages/' + pckg),
 		configObjectFullPath: path.resolve('./build/api-extractor.json'),
 		packageJsonFullPath: path.resolve(`./packages/${pckg}/package.json`),
+
 	})),
 	...uiPackages.map(pckg => ExtractorConfig.prepare({
 		configObject: {
@@ -29,6 +36,10 @@ const configs = [
 			apiReport: {
 				...config.apiReport,
 				reportFileName: `ui-lib-${pckg}`,
+			},
+			dtsRollup: {
+				...config.dtsRollup,
+				untrimmedFilePath: path.resolve('build/api/ui-lib-' + pckg + '.d.ts'),
 			}
 		},
 		projectFolderLookupToken: path.resolve('./packages/react-ui-lib'),

@@ -8,4 +8,8 @@ const BlockRepeaterConfigContext_ = createRequiredContext<{
 }>('BlockRepeaterConfigContext')
 /** @internal */
 export const BlockRepeaterConfigContext = BlockRepeaterConfigContext_[0]
+
+/**
+ * Returns configuration of the block repeater (discrimination field and blocks map).
+ */
 export const useBlockRepeaterConfig = BlockRepeaterConfigContext_[1]

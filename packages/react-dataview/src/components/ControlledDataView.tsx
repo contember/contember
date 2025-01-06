@@ -20,15 +20,18 @@ import { DataViewInfo, DataViewMethods, DataViewState } from '../types'
 import { dataViewSelectionEnvironmentExtension } from '../env/dataViewSelectionEnvironmentExtension'
 
 
-export type ControlledDataViewProps =
-	& {
-		children: ReactNode
-		state: DataViewState
-		info: DataViewInfo
-		methods: DataViewMethods
-		onSelectHighlighted?: (entity: EntityAccessor) => void
-	}
+export interface ControlledDataViewProps {
+	children: ReactNode
+	state: DataViewState
+	info: DataViewInfo
+	methods: DataViewMethods
+	onSelectHighlighted?: (entity: EntityAccessor) => void
+}
 
+/**
+ * Low-level component for initializing a data view with fine-grained control over its state. Use together with {@link useDataView}.
+ * Use with caution, prefer the {@link DataView} component for most use cases.
+ */
 export const ControlledDataView = Component<ControlledDataViewProps>(({ state, info, methods, children, onSelectHighlighted }) => {
 	const [childrenStable] = useState(children)
 	const envMiddleware = useCallback(

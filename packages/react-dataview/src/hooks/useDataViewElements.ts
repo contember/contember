@@ -7,6 +7,10 @@ import { useEnvironment } from '@contember/react-binding'
 import { DataViewSelectionValues } from '../types'
 import { dataViewSelectionEnvironmentExtension } from '../env/dataViewSelectionEnvironmentExtension'
 
+/**
+ * Hook for getting all DataView elements from the children.
+ * Used for visibility toggling.
+ */
 export const useDataViewElements = ({ selection }: {
 	selection?: DataViewSelectionValues
 } = {}) => {

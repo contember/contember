@@ -9,7 +9,7 @@ import {
 	KeyRoundIcon,
 	LanguagesIcon, LoaderIcon,
 	LockKeyholeIcon,
-	PencilIcon, PlugIcon,
+	PencilIcon, PencilOffIcon, PlugIcon,
 	TableIcon, TextCursorIcon,
 	UploadIcon,
 	UserIcon,
@@ -101,6 +101,9 @@ export const Navigation = () => {
 				</MenuItem>
 				<MenuItem icon={<PlugIcon size={16} />} label="Hooks">
 					<MenuItem icon={line} label="Content API" to="hooks/contentApi" />
+				</MenuItem>
+				<MenuItem icon={<PencilOffIcon size={16} />} label={'Headless'}>
+					<MenuItem icon={line} label={'Dataview'} to={'dataview'} />
 				</MenuItem>
 			</Menu>
 		</div>

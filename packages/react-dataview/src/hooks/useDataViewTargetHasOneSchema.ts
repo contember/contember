@@ -2,6 +2,9 @@ import { useMemo } from 'react'
 import { useDataViewTargetFieldSchemaInternal } from '../internal/hooks/useTargetFieldSchema'
 import { QueryLanguage, SugaredRelativeSingleEntity, useEnvironment } from '@contember/react-binding'
 
+/**
+ * Utility hook for getting schema of a has-one relation field.
+ */
 export const useDataViewTargetHasOneSchema = (field: SugaredRelativeSingleEntity['field']) => {
 	const environment = useEnvironment()
 	const fields = useMemo(() => {

@@ -14,6 +14,7 @@ import { JSX as JSX_2 } from 'react/jsx-runtime';
 import { MutableRefObject } from 'react';
 import { Over } from '@dnd-kit/core';
 import { default as React_2 } from 'react';
+import { ReactElement } from 'react';
 import { ReactNode } from 'react';
 import { SortableData } from '@dnd-kit/sortable';
 import { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities';
@@ -23,30 +24,30 @@ import { UniqueIdentifier } from '@dnd-kit/core';
 // @internal (undocumented)
 export const RepeaterActiveEntityContext: Context<EntityAccessor | undefined>;
 
-// @public (undocumented)
+// @public
 export const RepeaterSortable: ({ children, onDragStart, onDragEnd: onDragEndIn, onDragCancel: onDragCancelIn, ...props }: {
     children: ReactNode;
 } & DndContextProps) => JSX_2.Element;
 
-// @public (undocumented)
+// @public
 export const RepeaterSortableDragOverlay: ({ children }: {
     children: ReactNode;
 }) => JSX_2.Element | null;
 
-// @public (undocumented)
+// @public
 export const RepeaterSortableDropIndicator: ({ children, position }: {
     children: ReactNode;
     position: "before" | "after";
 }) => JSX_2.Element | null;
 
-// @public (undocumented)
+// @public
 export const RepeaterSortableEachItem: ({ children }: {
     children: ReactNode;
 }) => JSX_2.Element;
 
-// @public (undocumented)
+// @public
 export const RepeaterSortableItemActivator: React_2.ForwardRefExoticComponent<{
-    children: ReactNode;
+    children: ReactElement;
 } & React_2.RefAttributes<HTMLElement>>;
 
 // @internal (undocumented)
@@ -76,15 +77,15 @@ transform: Transform | null;
 transition: string | undefined;
 }>;
 
-// @public (undocumented)
+// @public
 export const RepeaterSortableItemNode: ({ children }: {
-    children: ReactNode;
+    children: ReactElement;
 }) => JSX_2.Element;
 
-// @public (undocumented)
+// @public
 export const useRepeaterActiveEntity: () => EntityAccessor | undefined;
 
-// @public (undocumented)
+// @public
 export const useRepeaterSortableItem: () => {
     active: Active | null;
     activeIndex: number;

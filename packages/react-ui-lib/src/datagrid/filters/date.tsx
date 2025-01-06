@@ -14,6 +14,11 @@ import { Label } from '../../ui/label'
 import { XIcon } from 'lucide-react'
 import { DataViewFieldLabel } from '../labels'
 
+export type DataGridPredefinedDateRange = { start: string; end: string; label: ReactNode }
+
+/**
+ * Props for {@link DataGridDateFilter}.
+ */
 export type DataGridDateFilterProps =
 	& Omit<DataViewDateFilterProps, 'children'>
 	& {
@@ -21,6 +26,17 @@ export type DataGridDateFilterProps =
 		ranges?: DataGridPredefinedDateRange[]
 	}
 
+/**
+ * Date filter for DataGrid with default UI.
+ *
+ * ## Props {@link DataGridDateFilterProps}
+ * field, label, ?ranges, ?name
+ *
+ * ## Example
+ * ```tsx
+ * <DataGridDateFilter field={'createdAt'} label="Created at" />
+ * ```
+ */
 export const DataGridDateFilter = Component(({ label, ranges, ...props }: DataGridDateFilterProps) => (
 	<DataViewDateFilter {...props}>
 		<DataGridFilterMobileHiding>
@@ -70,6 +86,9 @@ const DataGridDateFilterList = () => (
 	</>
 )
 
+/**
+ * Utility function to create a predefined date range
+ */
 export const createDataGridDateRange = (label: ReactNode, dayDeltaStart: number, dayDeltaEnd: number): DataGridPredefinedDateRange => {
 	const start = new Date(new Date().setDate(new Date().getDate() + dayDeltaStart))
 	const end = new Date(new Date().setDate(new Date().getDate() + dayDeltaEnd))
@@ -106,7 +125,7 @@ const DataGridDateFilterSelect = ({ label, ranges = defaultRanges }: {
 	)
 }
 
-export type DataGridPredefinedDateRange = { start: string; end: string; label: ReactNode }
+
 const DataGridRangeFilter = ({ start, end, label }: DataGridPredefinedDateRange) => {
 	const name = useDataViewFilterName()
 	const [filter, setFilter] = useDataViewFilter<DateRangeFilterArtifacts>(name)
@@ -121,6 +140,9 @@ const DataGridRangeFilter = ({ start, end, label }: DataGridPredefinedDateRange)
 	)
 }
 
+/**
+ * @internal
+ */
 export const DataGridDateFilterControls = ({ layout }: { layout?: 'row' | 'column' }) => {
 	const id = useId()
 	return (

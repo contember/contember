@@ -17,6 +17,9 @@ export interface DataViewHighlightRowProps {
 	onHighlight?: (event: DataViewHighlightEvent) => void
 }
 
+/**
+ * A component that highlights the current entity in a data view.
+ */
 export const DataViewHighlightRow = forwardRef<HTMLElement, DataViewHighlightRowProps>(({ onHighlight, ...props }, ref) => {
 	const highlightIndex = useDataViewHighlightIndex()
 	const accessor = useDataViewEntityListAccessor()

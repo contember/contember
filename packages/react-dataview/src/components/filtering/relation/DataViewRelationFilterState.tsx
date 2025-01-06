@@ -5,6 +5,10 @@ import { DataViewRelationFilterCurrent, useDataViewRelationFilter } from '../../
 import { useEntity } from '@contember/react-binding'
 import { useDataViewFilterName } from '../../../contexts'
 
+/**
+ * Conditionally renders its children based on the current relation filter state.
+ * If children is a valid React element, it will be wrapped in a Slot component with the current state as a `data-current` attribute.
+ */
 export const DataViewRelationFilterState = ({ name, children, state }: {
 	name?: string
 	children: ReactNode

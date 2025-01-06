@@ -87,7 +87,7 @@ export const NonSortable = () => (
 			<PersistButton />
 		</Slots.Actions>
 
-		<DefaultRepeater entities="RepeaterItem" orderBy="order">
+		<DefaultRepeater entities="RepeaterItem" orderBy="order" title="Foo items">
 			<Field field="title" />
 
 			<RepeaterItemActions>

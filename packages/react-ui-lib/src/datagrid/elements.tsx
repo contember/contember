@@ -5,6 +5,9 @@ import { ReactNode } from 'react'
 import { DataViewVisibilityTrigger, useDataViewElements } from '@contember/react-dataview'
 import { ScrollArea } from '../ui/scroll-area'
 
+/**
+ * Props for {@link DataGridToolbarVisibleElements}.
+ */
 export interface DataGridToolbarVisibleElementsProps {
 	elements?: {
 		name: string
@@ -12,6 +15,9 @@ export interface DataGridToolbarVisibleElementsProps {
 	}[]
 }
 
+/**
+ * Control for toggling visibility of columns in data grid.
+ */
 export const DataGridToolbarVisibleElements = ({ elements }: DataGridToolbarVisibleElementsProps) => {
 	const globalElements = useDataViewElements()
 

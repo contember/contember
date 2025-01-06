@@ -29,7 +29,7 @@ type Author {
   name: String
   posts(filter: PostWhere, orderBy: [PostOrderBy!], offset: Int, limit: Int): [Post!]!
   postsByLocales(by: AuthorPostsByLocalesUniqueWhere!, filter: PostWhere): Post
-  postsBy(by: AuthorPostsByUniqueWhere!, filter: PostWhere): Post
+  postsBy(by: PostsOfAuthorByUniqueWhere!, filter: PostWhere): Post
   paginatePosts(filter: PostWhere, orderBy: [PostOrderBy!], skip: Int, first: Int): PostConnection!
 }
 
@@ -55,7 +55,7 @@ type Post {
   author(filter: AuthorWhere): Author
   locales(filter: PostLocaleWhere, orderBy: [PostLocaleOrderBy!], offset: Int, limit: Int): [PostLocale!]!
   localesByLocale(by: PostLocalesByLocaleUniqueWhere!, filter: PostLocaleWhere): PostLocale
-  localesBy(by: PostLocalesByUniqueWhere!, filter: PostLocaleWhere): PostLocale
+  localesBy(by: LocalesOfPostByUniqueWhere!, filter: PostLocaleWhere): PostLocale
   paginateCategories(filter: CategoryWhere, orderBy: [CategoryOrderBy!], skip: Int, first: Int): CategoryConnection!
   paginateLocales(filter: PostLocaleWhere, orderBy: [PostLocaleOrderBy!], skip: Int, first: Int): PostLocaleConnection!
 }
@@ -293,7 +293,7 @@ input PostLocalesByLocaleUniqueWhere {
   locale: Locale
 }
 
-input PostLocalesByUniqueWhere {
+input LocalesOfPostByUniqueWhere {
   id: UUID
   locale: Locale
 }
@@ -331,7 +331,7 @@ input PostUniqueWhere {
   locales: PostLocaleUniqueWhere
 }
 
-input AuthorPostsByUniqueWhere {
+input PostsOfAuthorByUniqueWhere {
   id: UUID
   locales: PostLocaleUniqueWhere
 }

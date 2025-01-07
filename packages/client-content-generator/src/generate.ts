@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import * as fs from 'node:fs/promises'
 import { resolve, join } from 'node:path'
 import { ContemberClientGenerator } from './ContemberClientGenerator';

@@ -1,6 +1,6 @@
 import prompts from 'prompts'
 import { MigrationPrinter } from './MigrationPrinter'
-import { isSchemaMigration, MigrationExecutor, SchemaVersionBuilder } from '@contember/migrations-client'
+import { isSchemaMigration, MigrationExecutor, MigrationToExecuteOkStatus, SchemaVersionBuilder } from '@contember/migrations-client'
 import { MigrationsStatusFacade } from './MigrationsStatusFacade'
 import { MigrationVersionHelper } from '@contember/engine-common'
 import { RemoteProject } from '../project/RemoteProject'
@@ -26,7 +26,7 @@ export class MigrationExecutionFacade {
 		until,
 		additionalMessage,
 	}: {
-		requireConfirmation: boolean
+		requireConfirmation: boolean | ((migrations: MigrationToExecuteOkStatus[]) => boolean)
 		force?: boolean
 		until?: string
 		additionalMessage?: string
@@ -46,7 +46,7 @@ export class MigrationExecutionFacade {
 		migrations.forEach(it => console.log(it.name))
 		additionalMessage && console.log(additionalMessage)
 
-		if (requireConfirmation) {
+		if (typeof requireConfirmation === 'function' ? requireConfirmation(migrations) : requireConfirmation) {
 			if (!process.stdin.isTTY) {
 				throw 'TTY not available. Pass --yes option to confirm execution.'
 			}

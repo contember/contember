@@ -95,7 +95,7 @@ export class MigrationDiffCommand extends Command<Args, Options> {
 		if (shouldExecute) {
 			await this.migrationExecutorFacade.execute({
 				force: false,
-				requireConfirmation: !yes,
+				requireConfirmation: migrations => migrations.length !== 1 && !yes,
 			})
 		}
 	}

@@ -150,7 +150,9 @@ export const createContainer = ({ env, version, runtime, workspace }: {
 		.addService('schemaVersionBuilder', ({ migrationsResolver, schemaMigrator }) =>
 			new SchemaVersionBuilder(migrationsResolver, schemaMigrator))
 		.addService('schemaDiffer', ({ schemaMigrator }) =>
-			new SchemaDiffer(schemaMigrator))
+			new SchemaDiffer(schemaMigrator, {
+				maxPatchSize: env.migrationsOptions?.maxPatchSize,
+			}))
 		.addService('migrationCreator', ({ migrationFilesManager, schemaDiffer }) =>
 			new MigrationCreator(migrationFilesManager, schemaDiffer, {
 				json: JSON.stringify({ formatVersion: VERSION_LATEST, modifications: [] }, undefined, '\t') + '\n',

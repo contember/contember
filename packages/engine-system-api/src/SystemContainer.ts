@@ -80,8 +80,6 @@ export class SystemContainerFactory {
 				new AccessEvaluator.PermissionEvaluator(new PermissionsFactory().create()))
 			.addService('authorizator', ({ accessEvaluator }): Authorizator =>
 				new Authorizator.Default(accessEvaluator))
-			.addService('schemaDiffer', ({ schemaMigrator }) =>
-				new SchemaDiffer(schemaMigrator))
 			.addService('migrationDescriber', ({ modificationHandlerFactory }) =>
 				new MigrationDescriber(modificationHandlerFactory))
 			.addService('databaseMetadataResolver', () =>

@@ -6,6 +6,9 @@ export interface CliEnv {
 	dockerComposeFile?: string
 	dsn?: string
 	dir?: string
+	migrationsOptions?: {
+		maxPatchSize?: number
+	}
 }
 
 export const readCliEnv = (): CliEnv => {
@@ -17,5 +20,8 @@ export const readCliEnv = (): CliEnv => {
 		projectName: process.env.CONTEMBER_PROJECT_NAME,
 		dockerComposeFile: process.env.COMPOSE_FILE,
 		dsn: process.env.CONTEMBER_DSN,
+		migrationsOptions: {
+			maxPatchSize: process.env.CONTEMBER_MIGRATIONS_MAX_PATCH_SIZE ? parseInt(process.env.CONTEMBER_MIGRATIONS_MAX_PATCH_SIZE) : undefined,
+		},
 	}
 }

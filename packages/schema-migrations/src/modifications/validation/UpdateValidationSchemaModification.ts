@@ -33,12 +33,19 @@ export const updateValidationSchemaModification = createModificationType({
 })
 
 export class UpdateValidationSchemaDiffer implements Differ {
+	constructor(
+		private readonly options?: {
+			maxPatchSize?: number
+		},
+	) {
+	}
+
 	createDiff(originalSchema: Schema, updatedSchema: Schema) {
 		if (deepEqual(originalSchema.validation, updatedSchema.validation)) {
 			return []
 		}
 		const patch = createPatch(originalSchema.validation, updatedSchema.validation)
-		if (patch.length <= 20) {
+		if (patch.length <= (this.options?.maxPatchSize ?? 100)) {
 			return [patchValidationSchemaModification.createModification({ patch })]
 		}
 		return [updateValidationSchemaModification.createModification({ schema: updatedSchema.validation })]

@@ -48,7 +48,12 @@ import { ConvertOneHasManyToOneHasOneRelationDiffer } from './modifications/rela
 type DiffOptions = { skipRecreateValidation?: boolean; skipInitialSchemaValidation?: boolean }
 
 export class SchemaDiffer {
-	constructor(private readonly schemaMigrator: SchemaMigrator) {}
+	constructor(
+		private readonly schemaMigrator: SchemaMigrator,
+		private readonly options?: {
+			maxPatchSize?: number
+		},
+	) {}
 
 	diffSchemas(originalSchema: Schema, updatedSchema: Schema, {
 		skipInitialSchemaValidation = false,
@@ -99,8 +104,8 @@ export class SchemaDiffer {
 			new CreateUniqueConstraintDiffer(),
 			new CreateIndexDiffer(),
 			new RemoveEnumDiffer(),
-			new UpdateAclSchemaDiffer(),
-			new UpdateValidationSchemaDiffer(),
+			new UpdateAclSchemaDiffer(this.options),
+			new UpdateValidationSchemaDiffer(this.options),
 			new UpdateEntityOrderByDiffer(),
 			new UpdateTargetDiffer(),
 			new CreateTargetDiffer(),

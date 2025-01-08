@@ -10,27 +10,7 @@
     "js-yaml": "^4.1.0"
   },
   "type": "module",
-  "main": "./dist/production/index.js",
-  "typings": "./dist/types/index.d.ts",
   "scripts": {
     "pre-build": "rm -rf rm ./resources/templates/template-workspace/admin/lib && cp -r ../react-ui-lib/src ./resources/templates/template-workspace/admin/lib && rm ./resources/templates/template-workspace/admin/lib/index.ts ./resources/templates/template-workspace/admin/lib/tsconfig.json"
-  },
-  "exports": {
-    ".": {
-      "import": {
-        "types": "./dist/types/index.d.ts",
-        "development": "./dist/development/index.js",
-        "production": "./dist/production/index.js",
-        "typescript": "./src/index.ts",
-        "default": "./dist/production/index.js"
-      },
-      "require": {
-        "types": "./dist/types/index.d.ts",
-        "development": "./dist/development/index.cjs",
-        "production": "./dist/production/index.cjs",
-        "typescript": "./src/index.ts",
-        "default": "./dist/production/index.cjs"
-      }
-    }
   }
 }

@@ -1,5 +1,7 @@
-import { join } from 'node:path'
+import { findPackageRoot } from '@contember/cli-common'
 import { dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
-export const packageRoot = process.env.CONTEMBER_CLI_PACKAGE_ROOT || join(dirname(fileURLToPath(import.meta.url)), '../')
+
+const currentFilePath = dirname(fileURLToPath(import.meta.url))
+export const packageRoot = process.env.CONTEMBER_CLI_PACKAGE_ROOT || findPackageRoot(currentFilePath)
 export const contemberDockerImages = ['contember/engine', 'contember/engine-ee', 'contember/cli']

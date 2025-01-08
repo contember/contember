@@ -106,7 +106,7 @@ export class MigrationAmendCommand extends Command<Args, Options> {
 			await systemClient.migrate([intermediateResult.migration], force)
 			await systemClient.migrationDelete(intermediateResult.migration.version)
 
-			if (!newMigrationResult) {
+			if (!newMigrationResult && await this.shouldRemove()) {
 				await this.migrationCreator.removeMigration(amendMigration.name)
 				await systemClient.migrationDelete(amendMigration.version)
 				console.log('Latest migration was removed')
@@ -115,8 +115,8 @@ export class MigrationAmendCommand extends Command<Args, Options> {
 			const newMigration = {
 				name: amendMigration.name,
 				version: amendMigration.version,
-				formatVersion: newMigrationResult.migration.formatVersion,
-				modifications: newMigrationResult.migration.modifications,
+				formatVersion: newMigrationResult?.migration.formatVersion ?? amendMigration.formatVersion,
+				modifications: newMigrationResult?.migration.modifications ?? [],
 			}
 			await this.migrationCreator.saveMigration(newMigration)
 			await systemClient.migrationModify(amendMigration.version, newMigration)
@@ -146,5 +146,18 @@ export class MigrationAmendCommand extends Command<Args, Options> {
 			],
 		})
 		return action === 'yes'
+	}
+
+	private async shouldRemove(): Promise<boolean> {
+		const { action } = await prompts({
+			type: 'select',
+			name: 'action',
+			message: 'The amendment results in a no-op migration because the changes introduced by the latest migration were reverted.\nYou can choose to remove the latest migration or to modify it so it is empty.',
+			choices: [
+				{ value: 'remove', title: 'Remove latest migration' },
+				{ value: 'keep', title: 'Keep latest migration and make it empty' },
+			],
+		})
+		return action === 'remove'
 	}
 }

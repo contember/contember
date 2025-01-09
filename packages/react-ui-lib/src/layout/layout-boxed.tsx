@@ -85,6 +85,10 @@ export const LayoutBoxedComponent = ({ children, ...rest }: PropsWithChildren<{}
 		setLeftSidebarVisibility(it => it === 'show' ? 'auto' : it)
 	}, [request])
 
+	useEffect(() => {
+		window.scrollTo({ top: 0 })
+	}, [request?.pageName])
+
 	const [rightSidebarVisibility, setRightSidebarVisibility] = useState<'show' | 'hidden'>('show')
 
 	const hasRightSidebar = isActive('SidebarRightHeader', 'SidebarRightBody', 'SidebarRightFooter', 'Sidebar')

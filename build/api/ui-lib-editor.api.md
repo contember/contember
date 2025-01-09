@@ -18,6 +18,7 @@ import * as React_2 from 'react';
 import { ReactElement } from 'react';
 import { ReactNode } from 'react';
 import { RenderElementProps } from 'slate-react';
+import { RichTextFieldRendererProps } from '@contember/react-client';
 import { SugaredRelativeEntityList } from '@contember/interface';
 import { SugaredRelativeSingleField } from '@contember/interface';
 import { TextareaHTMLAttributes } from 'react';
@@ -152,6 +153,14 @@ export type RichTextFieldProps = {
     field: SugaredRelativeSingleField['field'];
     children: ReactNode;
 } & Omit<FormContainerProps, 'children'>;
+
+// @public (undocumented)
+export type RichTextRendererProps = {
+    field: SugaredRelativeSingleField['field'];
+} & Omit<RichTextFieldRendererProps, 'source'>;
+
+// @public (undocumented)
+export const RichTextView: NamedExoticComponent<RichTextRendererProps>;
 
 // (No @packageDocumentation comment for this package)
 

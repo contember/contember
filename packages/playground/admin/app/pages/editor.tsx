@@ -60,7 +60,15 @@ import { Button } from '~/lib/ui/button'
 import { PopoverClose } from '@radix-ui/react-popover'
 import { uic } from '~/lib/utils'
 import { useSlateStatic } from 'slate-react'
-import { BlockEditorField, EditorBlock, EditorBlockContent, EditorBlockToolbar, EditorInlineToolbar, RichTextField } from '~/lib/editor'
+import {
+	BlockEditorField,
+	EditorBlock,
+	EditorBlockContent,
+	EditorBlockToolbar,
+	EditorInlineToolbar,
+	RichTextField,
+	RichTextView,
+} from '~/lib/editor'
 
 export const Richtext = () => (
 	<Binding>
@@ -87,6 +95,8 @@ export const Richtext = () => (
 						</EditorInlineToolbar>
 					</RichTextField>
 				</div>
+				<h3>Preview</h3>
+				<RichTextView field="data" />
 			</div>
 		</EntitySubTree>
 	</Binding>

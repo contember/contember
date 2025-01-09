@@ -23,7 +23,7 @@ jobs:
           bun run pre-build
           bun run --filter=@contember/playground build
         env:
-          VITE_CONTEMBER_ADMIN_PROJECT_NAME: playground2
+          VITE_CONTEMBER_ADMIN_PROJECT_NAME: playground
           VITE_CONTEMBER_ADMIN_SESSION_TOKEN: ${{ secrets.PLAYGROUND_SESSION_TOKEN }}
 
       - name: Deploy

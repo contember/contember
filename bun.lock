@@ -614,7 +614,7 @@
         "slate-hyperscript": "^0.100.0",
         "tailwindcss": "^3.4.14",
         "tailwindcss-animate": "^1.0.7",
-        "vite": "^6.0.7",
+        "vite": "^5.4.9",
         "vite-tsconfig-paths": "^5.0.1",
       },
     },
@@ -1319,7 +1319,7 @@
 
     "@contember/migrations-client": ["@contember/migrations-client@workspace:packages/migrations-client", { "dependencies": { "@contember/engine-common": "packages/engine-common", "@contember/graphql-client": "packages/graphql-client", "@contember/schema": "packages/schema", "@contember/schema-migrations": "packages/schema-migrations", "@contember/schema-utils": "packages/schema-utils" }, "devDependencies": { "@types/node": "^20.16.11" } }],
 
-    "@contember/playground": ["@contember/playground@workspace:packages/playground", { "dependencies": { "@sindresorhus/slugify": "^2.2.1" }, "devDependencies": { "@contember/binding": "packages/binding", "@contember/client": "packages/client", "@contember/client-content": "packages/client-content", "@contember/interface": "packages/interface", "@contember/react-client-content": "packages/react-client-content", "@contember/react-ui-lib": "packages/react-ui-lib", "@contember/schema": "packages/schema", "@contember/schema-definition": "packages/schema-definition", "@contember/schema-utils": "packages/schema-utils", "@contember/utilities": "packages/utilities", "@contember/vite-plugin": "packages/vite-plugin", "@faker-js/faker": "^9.0.3", "@radix-ui/react-separator": "^1.1.0", "@radix-ui/react-toolbar": "^1.1.0", "autoprefixer": "^10.4.20", "graphql": "^16.9.0", "lucide-react": "^0.453.0", "postcss": "^8.4.47", "qrcode-generator": "^1.4.4", "react": "^18.3.1", "react-dnd": "^16.0.1", "react-dnd-html5-backend": "^16.0.1", "react-dom": "^18.3.1", "slate-hyperscript": "^0.100.0", "tailwindcss": "^3.4.14", "tailwindcss-animate": "^1.0.7", "vite": "^6.0.7", "vite-tsconfig-paths": "^5.0.1" } }],
+    "@contember/playground": ["@contember/playground@workspace:packages/playground", { "dependencies": { "@sindresorhus/slugify": "^2.2.1" }, "devDependencies": { "@contember/binding": "packages/binding", "@contember/client": "packages/client", "@contember/client-content": "packages/client-content", "@contember/interface": "packages/interface", "@contember/react-client-content": "packages/react-client-content", "@contember/react-ui-lib": "packages/react-ui-lib", "@contember/schema": "packages/schema", "@contember/schema-definition": "packages/schema-definition", "@contember/schema-utils": "packages/schema-utils", "@contember/utilities": "packages/utilities", "@contember/vite-plugin": "packages/vite-plugin", "@faker-js/faker": "^9.0.3", "@radix-ui/react-separator": "^1.1.0", "@radix-ui/react-toolbar": "^1.1.0", "autoprefixer": "^10.4.20", "graphql": "^16.9.0", "lucide-react": "^0.453.0", "postcss": "^8.4.47", "qrcode-generator": "^1.4.4", "react": "^18.3.1", "react-dnd": "^16.0.1", "react-dnd-html5-backend": "^16.0.1", "react-dom": "^18.3.1", "slate-hyperscript": "^0.100.0", "tailwindcss": "^3.4.14", "tailwindcss-animate": "^1.0.7", "vite": "^5.4.9", "vite-tsconfig-paths": "^5.0.1" } }],
 
     "@contember/queryable": ["@contember/queryable@workspace:packages/queryable", {}],
 
@@ -2726,8 +2726,6 @@
     "@contember/binding-legacy/@types/uuid": ["@types/uuid@9.0.8", "", {}, "sha512-jg+97EGIcY9AGHJJRaaPVgetKDsrTgbRjQ5Msgjh/DQKEFl0DtyRr/VCOyD1T2R1MNeWPK/u7JoGhlDZnKBAfA=="],
 
     "@contember/binding-legacy/uuid": ["uuid@9.0.1", "", { "bin": { "uuid": "dist/bin/uuid" } }, "sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA=="],
-
-    "@contember/playground/vite": ["vite@6.0.7", "", { "dependencies": { "esbuild": "^0.24.2", "postcss": "^8.4.49", "rollup": "^4.23.0" }, "optionalDependencies": { "fsevents": "~2.3.3" }, "peerDependencies": { "@types/node": "^18.0.0 || ^20.0.0 || >=22.0.0", "jiti": ">=1.21.0", "less": "*", "lightningcss": "^1.21.0", "sass": "*", "sass-embedded": "*", "stylus": "*", "sugarss": "*", "terser": "^5.16.0", "tsx": "^4.8.1", "yaml": "^2.4.2" }, "optionalPeers": ["@types/node", "jiti", "less", "lightningcss", "sass", "sass-embedded", "stylus", "sugarss", "terser", "tsx", "yaml"], "bin": { "vite": "bin/vite.js" } }, "sha512-RDt8r/7qx9940f8FcOIAH9PTViRrghKaK2K1jY3RaAURrEUbm9Du1mJ72G+jlhtG3WwodnfzY8ORQZbBavZEAQ=="],
 
     "@contember/react-block-repeater/@radix-ui/primitive": ["@radix-ui/primitive@1.1.1", "", {}, "sha512-SJ31y+Q/zAyShtXJc8x83i9TYdbAfHZ++tUZnvjJJqFjzsdUnKsxPL6IEtBlxKkU7yzer//GQtZSV4GbldL3YA=="],
 

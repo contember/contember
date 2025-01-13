@@ -18,9 +18,7 @@ export const useIsMobile = () => {
 		if (mql.addEventListener) {
 			mql.addEventListener('change', onChange)
 			return () => mql.removeEventListener('change', onChange)
-		}
-
-		else {
+		} else {
 			mql.addListener(onChange)
 			return () => mql.removeListener(onChange)
 		}

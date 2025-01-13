@@ -1,102 +1,145 @@
-import type { ReactNode } from 'react'
-import { uic } from '../utils'
-import { type RoleCondition, useProjectUserRoles, Link, type RoutingLinkTarget } from '@contember/interface'
+import {
+	Link,
+	type RoleCondition,
+	type RoutingLinkTarget,
+	useCurrentRequest,
+	useProjectUserRoles,
+} from '@contember/interface'
 import { createContext } from '@contember/react-utils'
+import { VariantProps } from 'class-variance-authority'
+import { ChevronRight } from 'lucide-react'
+import { Children, isValidElement, ReactNode, useMemo } from 'react'
+import { cn } from '../utils'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './collapsible'
+import { SidebarMenu, SidebarMenuButton, sidebarMenuButtonVariants, SidebarMenuItem, SidebarMenuSub } from './sidebar'
 
-export const MenuItemUI = uic('a', {
-	baseClass: 'flex justify-start py-2.5 px-2.5 w-full gap-2 rounded text-sm items-center transition-all duration-200',
-})
-
-export const MenuItemIconUI = uic('span', {
-	baseClass: 'w-4 text-gray-400 inline-flex items-center justify-center',
-})
-
-export const MenuSubMenuUI = uic('div', {
-	baseClass: 'ml-2',
-})
-
-export type MenuItem = {
+export type MenuItemProps = {
 	icon?: ReactNode
 	label: ReactNode
 	to?: RoutingLinkTarget
-	/** @deprecated use children instead */
-	subItems?: MenuItem[]
-	lvl?: number
-	role?: RoleCondition
 	children?: ReactNode
-}
+	role?: RoleCondition
+	expandedByDefault?: boolean
+} & VariantProps<typeof sidebarMenuButtonVariants>
 
 interface MenuContextValue {
 	level: number
 }
 
-const [MenuContext, useMenuContext] = createContext<MenuContextValue | null>('MenuContext', null)
-export const Menu = ({ children }: {
-	children?: ReactNode
-}) => {
+const [MenuContext, useMenuContext] = createContext<MenuContextValue>('MenuContext', { level: 0 })
+
+const useIsActiveMenuItem = (to?: RoutingLinkTarget): boolean => {
+	const pageName = useCurrentRequest()?.pageName
+
+	if (!to || !pageName) {
+		return false
+	}
+
+	return typeof to === 'string'
+		? pageName === to
+		: 'pageName' in to && pageName === to.pageName
+}
+
+const useHasActiveChild = (children: ReactNode) => {
+	const currentRequest = useCurrentRequest()
+	const pageName = currentRequest?.pageName
+
+	return useMemo(() => {
+		if (!pageName || !children) return false
+
+		const isMatchingPage = (to: string | { pageName: string }): boolean => {
+			return typeof to === 'string'
+				? pageName === to
+				: 'pageName' in to && pageName === to.pageName
+		}
+
+		const checkChild = (child: ReactNode): boolean => {
+			if (!isValidElement(child)) return false
+
+			const { to, children: grandChildren } = child.props
+
+			if (to && isMatchingPage(to)) return true
+
+			if (!grandChildren) return false
+
+			return Children.toArray(grandChildren).some(checkChild)
+		}
+
+		return Children.toArray(children).some(checkChild)
+	}, [children, pageName])
+}
+
+export const Menu = ({ children }: { children: ReactNode }) => {
 	return (
 		<MenuContext.Provider value={{ level: 0 }}>
-			<div className={'flex flex-col'}>
+			<SidebarMenu>
 				{children}
-			</div>
+			</SidebarMenu>
 		</MenuContext.Provider>
 	)
 }
 
-export interface MenuListProps {
-	items: MenuItem[]
-	lvl?: number
-}
+// Explicitly defined classes for each level of collapsible
+const rotateClasses = [
+	'group-data-[state=open]/collapsible-0:rotate-90',
+	'group-data-[state=open]/collapsible-1:rotate-90',
+	'group-data-[state=open]/collapsible-2:rotate-90',
+	'group-data-[state=open]/collapsible-3:rotate-90',
+	'group-data-[state=open]/collapsible-4:rotate-90',
+	'group-data-[state=open]/collapsible-5:rotate-90',
+]
 
-/**
- * @deprecated use Menu instead
- */
-export const MenuList = ({ items, lvl = 0 }: MenuListProps) => {
-	return (
-		<div className={'flex flex-col'}>
-			{items.map((item, index) => (
-				<MenuItem key={index} {...item} lvl={lvl} />
-			))}
-		</div>
-	)
-}
-
-export const MenuItem = ({ icon, label, to, subItems, lvl, role, children }: MenuItem) => {
+export const MenuItem = ({ icon, label, to, children, role, expandedByDefault, ...menuButtonProps }: MenuItemProps) => {
+	const isActive = useIsActiveMenuItem(to)
+	const hasActiveChild = useHasActiveChild(children)
 	const projectRoles = useProjectUserRoles()
-	const menu = useMenuContext()
-	lvl ??= menu?.level ?? 0
+	const { level } = useMenuContext()
+
+	if (level >= 5) {
+		console.error('Menu nesting level exceeded 5. Chevron icon will not work properly. Please adjust rotateClasses in menu.tsx')
+	}
+
 	if (role && !(typeof role === 'string' ? projectRoles.has(role) : role(projectRoles))) {
 		return null
 	}
 
-	return (
-		<div>
-			{to ? (
-				<Link to={to}>
-					<MenuItemUI className={'hover:bg-gray-100 cursor-pointer'}>
-						<MenuItemIconUI>{icon}</MenuItemIconUI>
-						<span className={lvl === 0 ? 'font-medium' : ''}>{label}</span>
-					</MenuItemUI>
-				</Link>
-			) : (
-				<MenuItemUI>
-					<MenuItemIconUI>{icon}</MenuItemIconUI>
-					<span className={lvl === 0 ? 'font-medium' : ''}>{label}</span>
-				</MenuItemUI>
-			)}
-			{subItems && (
-				<MenuSubMenuUI>
-					<MenuList items={subItems} lvl={lvl + 1}/>
-				</MenuSubMenuUI>
-			)}
+	const hasChildren = Boolean(children)
 
-			{children && (
-				<MenuSubMenuUI>
-					<MenuContext.Provider value={{ level: lvl + 1 }}>
-						{children}
-					</MenuContext.Provider>
-				</MenuSubMenuUI>
-			)}
-		</div>
+	if (!hasChildren && to) {
+		return (
+			<SidebarMenuItem>
+				<Link to={to}>
+					<SidebarMenuButton isActive={isActive} tooltip={label} {...menuButtonProps}>
+						{icon}
+						<span>{label}</span>
+					</SidebarMenuButton>
+				</Link>
+			</SidebarMenuItem>
+		)
+	}
+
+	return (
+		<Collapsible defaultOpen={expandedByDefault || hasActiveChild} className={`group/collapsible-${level}`}>
+			<SidebarMenuItem>
+				<CollapsibleTrigger asChild>
+					<SidebarMenuButton isActive={isActive} tooltip={label} {...menuButtonProps}>
+						{icon}
+						<span>{label}</span>
+						{hasChildren && (
+							<ChevronRight className={cn(`ml-auto transition-transform duration-200`, rotateClasses[level])} />
+						)}
+					</SidebarMenuButton>
+				</CollapsibleTrigger>
+				{hasChildren && (
+					<CollapsibleContent className="collapsible-animate">
+						<SidebarMenuSub>
+							<MenuContext.Provider value={{ level: level + 1 }}>
+								{children}
+							</MenuContext.Provider>
+						</SidebarMenuSub>
+					</CollapsibleContent>
+				)}
+			</SidebarMenuItem>
+		</Collapsible>
 	)
 }

@@ -2,8 +2,8 @@ version: '3.7'
 services:
 
   playground:
-    image: node:20-alpine
-    command: 'npm run start'
+    image: oven/bun:canary
+    command: 'bun run start'
 
     environment:
       NODE_ENV: 'development'

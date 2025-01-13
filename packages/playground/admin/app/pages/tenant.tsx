@@ -1,13 +1,21 @@
+import { useProjectSlug } from '@contember/react-client'
 import { ChangeMyPasswordForm, CreateApiKeyForm, InviteForm } from '@contember/react-identity'
 import { KeyRoundIcon, LockKeyholeIcon, UsersIcon } from 'lucide-react'
+import { useRef } from 'react'
 import { Title } from '~/app/components/title'
 import { Slots } from '~/lib/layout'
-import { Card, CardContent, CardHeader, CardTitle } from '~/lib/ui/card'
-import { ApiKeyList, ChangeMyPasswordFormFields, CreateApiKeyFormFields, InviteFormFields, MemberListController, OtpSetup, PersonList } from '~/lib/tenant'
+import {
+	ApiKeyList,
+	ChangeMyPasswordFormFields,
+	CreateApiKeyFormFields,
+	InviteFormFields,
+	MemberListController,
+	OtpSetup,
+	PersonList,
+} from '~/lib/tenant'
 import { ToastContent, useShowToast } from '~/lib/toast'
-import { useProjectSlug } from '@contember/react-client'
+import { Card, CardContent, CardHeader, CardTitle } from '~/lib/ui/card'
 import { Input } from '~/lib/ui/input'
-import { useRef } from 'react'
 
 export const Security = () => {
 	const showToast = useShowToast()
@@ -18,13 +26,14 @@ export const Security = () => {
 				<Title icon={<LockKeyholeIcon />}>Security</Title>
 			</Slots.Title>
 
-			<div className="flex flex-col items-center gap-4">
+			<div className="flex flex-col gap-4">
 				<Card className="w-[40rem] max-w-full">
 					<CardHeader>
 						<CardTitle className="text-2xl">Change Password</CardTitle>
 					</CardHeader>
 					<CardContent>
-						<ChangeMyPasswordForm onSuccess={() => showToast(<ToastContent>Password changed</ToastContent>, { type: 'success' })}>
+						<ChangeMyPasswordForm onSuccess={() => showToast(
+							<ToastContent>Password changed</ToastContent>, { type: 'success' })}>
 							<form className="grid gap-4">
 								<ChangeMyPasswordFormFields />
 							</form>
@@ -56,38 +65,36 @@ export const Members = () => {
 				<Title icon={<UsersIcon />}>Members</Title>
 			</Slots.Title>
 
-			<div className="grid md:grid-cols-2 gap-4">
-				<div>
-					<Card className="w-[40rem] max-w-full">
-						<CardHeader>
-							<CardTitle className="text-2xl">Members</CardTitle>
-						</CardHeader>
-						<CardContent>
-							<PersonList controller={memberListController} />
-						</CardContent>
-					</Card>
-				</div>
-				<div>
-					<Card className="w-[40rem] max-w-full">
-						<CardHeader>
-							<CardTitle className="text-2xl">Invite</CardTitle>
-						</CardHeader>
-						<CardContent>
-							<InviteForm
-								projectSlug={projectSlug}
-								initialMemberships={[{ role: 'admin', variables: [] }]}
-								onSuccess={args => {
-									showToast(<ToastContent>Invitation sent to {args.result.person?.email}</ToastContent>, { type: 'success' })
-									memberListController.current?.refresh()
-								}}
-							>
-								<form>
-									<InviteFormFields projectSlug={projectSlug} />
-								</form>
-							</InviteForm>
-						</CardContent>
-					</Card>
-				</div>
+			<div className="flex flex-col gap-4">
+				<Card className="w-[40rem] max-w-full">
+					<CardHeader>
+						<CardTitle className="text-2xl">Invite</CardTitle>
+					</CardHeader>
+					<CardContent>
+						<InviteForm
+							projectSlug={projectSlug}
+							initialMemberships={[{ role: 'admin', variables: [] }]}
+							onSuccess={args => {
+								showToast(
+									<ToastContent>Invitation sent to {args.result.person?.email}</ToastContent>, { type: 'success' })
+								memberListController.current?.refresh()
+							}}
+						>
+							<form>
+								<InviteFormFields projectSlug={projectSlug} />
+							</form>
+						</InviteForm>
+					</CardContent>
+				</Card>
+				<Card className="w-[40rem] max-w-full">
+					<CardHeader>
+						<CardTitle className="text-2xl">Members</CardTitle>
+					</CardHeader>
+					<CardContent>
+						<PersonList controller={memberListController} />
+					</CardContent>
+				</Card>
+
 			</div>
 		</>
 	)

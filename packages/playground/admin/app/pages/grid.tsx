@@ -77,6 +77,10 @@ export default () => {
 
 			<Binding>
 
+				<Slots.Actions>
+					<Button>Add article</Button>
+				</Slots.Actions>
+
 				<DataGrid
 					entities="GridArticle"
 					initialSorting={{
@@ -105,7 +109,6 @@ export default () => {
 						)}>
 							<DataViewEachRow>
 								<CustomGridRow />
-
 							</DataViewEachRow>
 						</DataViewLayout>
 

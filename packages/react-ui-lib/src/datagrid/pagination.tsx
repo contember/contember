@@ -16,7 +16,7 @@ import { dict } from '../dict'
  * ```
  */
 export const DataGridPagination = () => (
-	<div className="flex gap-6 lg:gap-8 justify-between mt-4">
+	<div className="flex gap-6 lg:gap-8 justify-between mt-4 sticky bottom-0 z-50 bg-white p-4 border-t border-gray-200">
 		<div className="">
 			<DataViewPagingStateView render={it => <>
 				<div className={'flex gap-2 items-center'}>

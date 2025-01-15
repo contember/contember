@@ -7,10 +7,6 @@ export default () => (
 			<h1>Welcome to Contember playground</h1>
 		</Slots.Title>
 
-		<Slots.Actions>
-			<PersistButton />
-		</Slots.Actions>
-
 		<div className="prose prose-lg max-w-2xl">
 			<div className="space-y-6">
 				<p className="text-gray-700">

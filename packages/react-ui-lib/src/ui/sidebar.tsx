@@ -116,14 +116,45 @@ export const SidebarProvider = ({
 SidebarProvider.displayName = 'SidebarProvider'
 
 export const SidebarLayout = uic('div', {
-	baseClass: 'group/sidebar-wrapper flex min-h-svh w-full has-[[data-variant=inset]]:bg-sidebar',
+	baseClass: 'group/sidebar-wrapper grid min-h-svh w-full has-[[data-variant=inset]]:bg-sidebar max-h-screen max-w-[100vw] overflow-y-auto',
+	// Add grid template columns
 	style: {
+		'gridTemplateColumns': 'auto 1fr auto', // This creates two columns: one for sidebar, one for content
 		'--sidebar-width': SIDEBAR_WIDTH,
 		'--sidebar-width-large': SIDEBAR_WIDTH_LARGE,
 		'--sidebar-width-icon': SIDEBAR_WIDTH_ICON,
 		'--sidebar-width-icon-large': SIDEBAR_WIDTH_ICON_LARGE,
 	} as React.CSSProperties,
 	displayName: 'SidebarLayout',
+})
+
+export const SidebarInset = uic('main', {
+	baseClass: [
+		'relative min-h-svh grid',
+		'grid-cols-1 grid-rows-[auto_1fr]', // Single column layout
+		'bg-background',
+		'peer-data-[variant=inset]:min-h-[calc(100svh-theme(spacing.4))] md:peer-data-[variant=inset]:m-2 md:peer-data-[state=collapsed]:peer-data-[variant=inset]:ml-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow',
+	],
+	displayName: 'SidebarInset',
+})
+
+export const SidebarInsetHeader = uic('header', {
+	baseClass: [
+		'bg-background z-50 flex justify-between h-16 shrink-0 items-center gap-2 border-b mb-4',
+		'transition-[width,height] ease-linear',
+		'group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12',
+	],
+	displayName: 'SidebarInsetHeader',
+})
+
+export const SidebarInsetContent = uic('div', {
+	baseClass: 'overflow-y-auto px-4',
+	displayName: 'SidebarInsetContent',
+})
+
+export const SidebarInsetHeaderActions = uic('div', {
+	baseClass: 'flex justify-end items-center gap-2 px-4',
+	displayName: 'SidebarInsetHeaderAction',
 })
 
 const SidebarNone = uic('div', {
@@ -133,14 +164,14 @@ const SidebarNone = uic('div', {
 
 const SidebarDesktopGap = uic('div', {
 	baseClass: [
-		'duration-200 relative h-svh w-[--sidebar-width] 2xl:w-[--sidebar-width-large] bg-transparent transition-[width] ease-linear',
+		'duration-200 relative w-[--sidebar-width] 2xl:w-[--sidebar-width-large] bg-transparent transition-[width] ease-linear',
 		'group-data-[collapsible=offcanvas]:w-0',
 		'group-data-[side=right]:rotate-180',
 	],
 	variants: {
 		variant: {
 			floating: 'group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)_+_theme(spacing.4))] 2xl:group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon-large)_+_theme(spacing.4))]',
-			inset: 'group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)_+_theme(spacing.4))] 2xl:group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon-large)_+_theme(spacing.4))]',
+			inset: 'group-data-[collapsible=icon]:w-5',
 			sidebar: 'group-data-[collapsible=icon]:w-[--sidebar-width-icon] 2xl:group-data-[collapsible=icon]:w-[--sidebar-width-icon-large]',
 		},
 	},
@@ -148,20 +179,23 @@ const SidebarDesktopGap = uic('div', {
 })
 
 const SidebarInner = uic('div', {
-	baseClass: 'duration-200 fixed inset-y-0 z-10 hidden h-svh w-[--sidebar-width] 2xl:w-[--sidebar-width-large] transition-[left,right,width] ease-linear md:flex',
+	baseClass: 'duration-200 fixed inset-y-0 z-10 hidden h-svh transition-[left,right,width] ease-linear md:block',
 	variants: {
 		side: {
 			left: 'left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)] 2xl:group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width-large)*-1)]',
 			right: 'right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)] 2xl:group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width-large)*-1)]',
 		},
 		variant: {
-			floating: 'p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)_+_theme(spacing.4)_+2px)] 2xl:group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon-large)_+_theme(spacing.4)_+2px)]',
-			inset: 'p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)_+_theme(spacing.4)_+2px)] 2xl:group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon-large)_+_theme(spacing.4)_+2px)]',
-			sidebar: 'group-data-[collapsible=icon]:w-[--sidebar-width-icon] group-data-[side=left]:border-r group-data-[side=right]:border-l 2xl:group-data-[collapsible=icon]:w-[--sidebar-width-icon-large]',
+			floating: 'p-2 w-[--sidebar-width] 2xl:w-[--sidebar-width-large] group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)_+_theme(spacing.4)_+2px)] 2xl:group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon-large)_+_theme(spacing.4)_+2px)]',
+			inset: 'p-2 w-[--sidebar-width] 2xl:w-[--sidebar-width-large] group-data-[collapsible=icon]:w-5',
+			sidebar: 'w-[--sidebar-width] 2xl:w-[--sidebar-width-large] group-data-[collapsible=icon]:w-[--sidebar-width-icon] group-data-[side=left]:border-r group-data-[side=right]:border-l 2xl:group-data-[collapsible=icon]:w-[--sidebar-width-icon-large]',
 		},
 	},
+	variantsAsDataAttrs: ['variant', 'side'],
 	wrapInner: ({ children }) =>
-		<div data-sidebar="sidebar" className="flex h-full w-full flex-col bg-sidebar">{children}</div>,
+		<div data-sidebar="sidebar" className="grid h-full w-full grid-rows-[auto_1fr_auto]">
+			{children}
+		</div>,
 	displayName: 'SidebarInner',
 })
 
@@ -202,7 +236,7 @@ export const Sidebar = forwardRef<HTMLDivElement, SidebarProps>(
 		return (
 			<div
 				ref={ref}
-				className="group peer hidden md:block text-sidebar-foreground"
+				className="group peer hidden md:block text-sidebar-foreground bg-sidebar"
 				data-state={state}
 				data-collapsible={state === 'collapsed' ? collapsible : ''}
 				data-variant={variant}
@@ -264,14 +298,6 @@ export const SidebarRail = forwardRef<HTMLButtonElement, ComponentProps<'button'
 	)
 })
 SidebarRail.displayName = 'SidebarRail'
-
-export const SidebarInset = uic('main', {
-	baseClass: [
-		'relative flex min-h-svh flex-1 flex-col bg-background',
-		'peer-data-[variant=inset]:min-h-[calc(100svh-theme(spacing.4))] md:peer-data-[variant=inset]:m-2 md:peer-data-[state=collapsed]:peer-data-[variant=inset]:ml-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow',
-	],
-	displayName: 'SidebarInset',
-})
 
 export const SidebarInput = uic(Input, {
 	baseClass: 'h-8 w-full bg-background shadow-none focus-visible:ring-2 focus-visible:ring-sidebar-ring',

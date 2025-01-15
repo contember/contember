@@ -1,11 +1,11 @@
 import { Component, Environment } from '@contember/interface'
-import { Table, TableBody, TableHeader, TableRow } from '../ui/table'
+import { DataViewEachRow, DataViewEmpty, DataViewLayout, DataViewNonEmpty } from '@contember/react-dataview'
+import { ChildrenAnalyzer, Leaf } from '@contember/react-multipass-rendering'
+import { SheetIcon } from 'lucide-react'
 import * as React from 'react'
 import { Fragment, ReactNode, useMemo } from 'react'
-import { DataViewEachRow, DataViewEmpty, DataViewLayout, DataViewNonEmpty } from '@contember/react-dataview'
-import { SheetIcon } from 'lucide-react'
 import { dict } from '../dict'
-import { ChildrenAnalyzer, Leaf } from '@contember/react-multipass-rendering'
+import { Table, TableBody, TableHeader, TableRow } from '../ui/table'
 
 import { DataGridColumnLeaf, DataGridColumnLeafProps } from './column-leaf'
 
@@ -28,11 +28,14 @@ export interface DataViewTableProps {
  */
 export const DataGridTable = Component<DataViewTableProps>(({ children }) => {
 	return (
-		<DataViewLayout name="table" label={<>
-			<SheetIcon className={'w-3 h-3'} />
-			<span>{dict.datagrid.showTable}</span>
-		</>}>
-			<div className={'rounded-md border overflow-x-auto'}>
+		<DataViewLayout
+			name="table"
+			label={<>
+				<SheetIcon className="w-3 h-3" />
+				<span>{dict.datagrid.showTable}</span>
+			</>}
+		>
+			<div className="relative rounded-md border overflow-y-auto">
 				<DataGridTableRenderer>
 					{children}
 				</DataGridTableRenderer>
@@ -41,7 +44,7 @@ export const DataGridTable = Component<DataViewTableProps>(({ children }) => {
 	)
 })
 
-const DataGridTableRenderer = Component< DataViewTableProps>(({ children }, env) => {
+const DataGridTableRenderer = Component<DataViewTableProps>(({ children }, env) => {
 	const columns = useMemo(() => datagridColumnsAnalyzer.processChildren(children, env), [children, env])
 	return (
 		<Table>

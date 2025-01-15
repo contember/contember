@@ -111,18 +111,7 @@ export const ApiKeys = () => {
 				<Title icon={<KeyRoundIcon />}>API keys</Title>
 			</Slots.Title>
 
-			<div className="grid md:grid-cols-2 gap-4">
-				<div>
-					<Card className="w-[40rem] max-w-full">
-						<CardHeader>
-							<CardTitle className="text-2xl">API keys</CardTitle>
-						</CardHeader>
-						<CardContent>
-							<ApiKeyList controller={memberListController} />
-						</CardContent>
-					</Card>
-				</div>
-
+			<div className="flex flex-col gap-4">
 				<div>
 					<Card className="w-[40rem] max-w-full">
 						<CardHeader>
@@ -145,6 +134,16 @@ export const ApiKeys = () => {
 									<CreateApiKeyFormFields projectSlug={projectSlug} />
 								</form>
 							</CreateApiKeyForm>
+						</CardContent>
+					</Card>
+				</div>
+				<div>
+					<Card className="w-[40rem] max-w-full">
+						<CardHeader>
+							<CardTitle className="text-2xl">API keys</CardTitle>
+						</CardHeader>
+						<CardContent>
+							<ApiKeyList controller={memberListController} />
 						</CardContent>
 					</Card>
 				</div>

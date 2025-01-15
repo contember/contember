@@ -149,5 +149,5 @@ export const DataGridFilterSelectItemUI = forwardRef<HTMLButtonElement, DataGrid
 
 
 export const DataGridToolbarUI = uic('div', {
-	baseClass: 'flex flex-col md:flex-row gap-2 md:items-end mb-4 items-stretch',
+	baseClass: 'flex flex-col md:flex-row gap-2 md:items-end mb-4 items-stretch sticky top-0 z-50 bg-white p-4 pt-0 border-b border-gray-200',
 })

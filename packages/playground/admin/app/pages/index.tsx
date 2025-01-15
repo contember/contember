@@ -1,4 +1,4 @@
-import { Binding } from '~/lib/binding'
+import { Binding, PersistButton } from '~/lib/binding'
 import { Slots } from '~/lib/layout'
 
 export default () => (
@@ -6,6 +6,10 @@ export default () => (
 		<Slots.Title>
 			<h1>Welcome to Contember playground</h1>
 		</Slots.Title>
+
+		<Slots.Actions>
+			<PersistButton />
+		</Slots.Actions>
 
 		<div className="prose prose-lg max-w-2xl">
 			<div className="space-y-6">

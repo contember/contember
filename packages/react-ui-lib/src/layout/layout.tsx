@@ -59,8 +59,10 @@ export const LayoutComponent = ({ children }: PropsWithChildren) => (
 						<SlotTargets.Actions />
 					</div>
 				</header>
-				<div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-					{children}
+				<div className="flex-1 overflow-auto">
+					<div className="flex flex-col gap-4 p-4 pt-0 overflow-x-auto">
+						{children}
+					</div>
 				</div>
 			</SidebarInset>
 		</SidebarLayout>

@@ -1,5 +1,4 @@
-import { Link, useIdentity } from '@contember/interface'
-import { LogoutTrigger } from '@contember/react-identity'
+import { Link, LogoutTrigger, useIdentity } from '@contember/interface'
 import {
 	ArchiveIcon,
 	BadgeCheckIcon,
@@ -40,6 +39,7 @@ import {
 import { Menu, MenuItem } from '~/lib/ui/menu'
 import { SidebarMenuButton } from '~/lib/ui/sidebar'
 import { useIsMobile } from '~/lib/utils/use-mobile'
+
 
 const menuItemSize = 'lg'
 const menuSubItemSize = 'default'
@@ -134,6 +134,9 @@ export const UserNavigation = () => {
 	const isMobile = useIsMobile()
 	const identity = useIdentity()
 
+	const userEmail = identity?.person?.email
+	const userInitial = userEmail?.substr(0, 1).toLocaleUpperCase()
+
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
@@ -141,13 +144,13 @@ export const UserNavigation = () => {
 					size="lg"
 					className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
 				>
-					<Avatar className="h-8 w-8 rounded-lg">
-						<AvatarFallback avatarFallbackColorString={identity?.person?.email} className="rounded-lg">
-							{identity?.person?.email?.substr(0, 2).toLocaleUpperCase()}
+					<Avatar className="icon h-6 w-6 rounded-lg">
+						<AvatarFallback avatarFallbackColorString={userEmail} className="rounded-lg">
+							{userInitial}
 						</AvatarFallback>
 					</Avatar>
 					<div className="grid flex-1 text-left text-sm leading-tight">
-						<span className="truncate font-semibold">{identity?.person?.email}</span>
+						<span className="truncate font-semibold">{userEmail}</span>
 					</div>
 					<ChevronsUpDown className="ml-auto size-4" />
 				</SidebarMenuButton>
@@ -161,12 +164,12 @@ export const UserNavigation = () => {
 				<DropdownMenuLabel className="p-0 font-normal">
 					<div className="flex items-center gap-2 pl-3 pr-1 py-1.5 text-left text-sm">
 						<Avatar className="h-8 w-8 rounded-lg">
-							<AvatarFallback avatarFallbackColorString={identity?.person?.email} className="rounded-lg">
-								{identity?.person?.email?.substr(0, 2).toLocaleUpperCase()}
+							<AvatarFallback avatarFallbackColorString={userEmail} className="rounded-lg">
+								{userInitial}
 							</AvatarFallback>
 						</Avatar>
 						<div className="grid flex-1 text-left text-sm leading-tight">
-							<span className="truncate font-semibold">{identity?.person?.email}</span>
+							<span className="truncate font-semibold">{userEmail}</span>
 						</div>
 					</div>
 				</DropdownMenuLabel>

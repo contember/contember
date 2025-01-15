@@ -1,33 +1,16 @@
 import * as AvatarPrimitive from '@radix-ui/react-avatar'
 import { ComponentPropsWithoutRef, ElementRef, forwardRef } from 'react'
-import { cn } from '../utils'
+import { cn, uic } from '../utils'
 
-const Avatar = forwardRef<
-	ElementRef<typeof AvatarPrimitive.Root>,
-	ComponentPropsWithoutRef<typeof AvatarPrimitive.Root>
->(({ className, ...props }, ref) => (
-	<AvatarPrimitive.Root
-		ref={ref}
-		className={cn(
-			'relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full',
-			className,
-		)}
-		{...props}
-	/>
-))
-Avatar.displayName = AvatarPrimitive.Root.displayName
+export const Avatar = uic(AvatarPrimitive.Root, {
+	baseClass: 'relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full',
+	displayName: AvatarPrimitive.Root.displayName,
+})
 
-const AvatarImage = forwardRef<
-	ElementRef<typeof AvatarPrimitive.Image>,
-	ComponentPropsWithoutRef<typeof AvatarPrimitive.Image>
->(({ className, ...props }, ref) => (
-	<AvatarPrimitive.Image
-		ref={ref}
-		className={cn('aspect-square h-full w-full', className)}
-		{...props}
-	/>
-))
-AvatarImage.displayName = AvatarPrimitive.Image.displayName
+export const AvatarImage = uic(AvatarPrimitive.Image, {
+	baseClass: 'aspect-square h-full w-full',
+	displayName: AvatarPrimitive.Image.displayName,
+})
 
 const useGenerateAvatarFallbackColor = (name?: string) => {
 	if (!name) return 'hsl(0, 80%, 80%)'
@@ -38,7 +21,7 @@ const useGenerateAvatarFallbackColor = (name?: string) => {
 	return `hsl(${hue}, 80%, 80%)`
 }
 
-const AvatarFallback = forwardRef<
+export const AvatarFallback = forwardRef<
 	ElementRef<typeof AvatarPrimitive.Fallback>,
 	ComponentPropsWithoutRef<typeof AvatarPrimitive.Fallback> & { avatarFallbackColorString?: string }
 >(({ className, avatarFallbackColorString, ...props }, ref) => {
@@ -49,7 +32,7 @@ const AvatarFallback = forwardRef<
 			ref={ref}
 			style={{ backgroundColor }}
 			className={cn(
-				'flex h-full w-full items-center justify-center rounded-full bg-muted',
+				'flex h-full w-full items-center justify-center rounded-full bg-muted text-sm font-bold',
 				className,
 			)}
 			{...props}
@@ -57,5 +40,3 @@ const AvatarFallback = forwardRef<
 	)
 })
 AvatarFallback.displayName = AvatarPrimitive.Fallback.displayName
-
-export { Avatar, AvatarImage, AvatarFallback }

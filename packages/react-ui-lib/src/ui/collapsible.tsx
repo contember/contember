@@ -1,9 +1,11 @@
 import * as CollapsiblePrimitive from '@radix-ui/react-collapsible'
+import { createComponentOpenHooks } from '../utils/createComponentOpenHooks'
 
-const Collapsible = CollapsiblePrimitive.Root
+export const {
+	Component: Collapsible,
+	useOpen: useCollapsibleOpenState,
+} = createComponentOpenHooks(CollapsiblePrimitive.Root)
 
-const CollapsibleTrigger = CollapsiblePrimitive.CollapsibleTrigger
+export const CollapsibleTrigger = CollapsiblePrimitive.CollapsibleTrigger
 
-const CollapsibleContent = CollapsiblePrimitive.CollapsibleContent
-
-export { Collapsible, CollapsibleTrigger, CollapsibleContent }
+export const CollapsibleContent = CollapsiblePrimitive.CollapsibleContent

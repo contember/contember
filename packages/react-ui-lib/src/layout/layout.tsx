@@ -1,4 +1,5 @@
 import { Link } from '@contember/interface'
+import { dataAttribute } from '@contember/utilities'
 import { PropsWithChildren } from 'react'
 import { Separator } from '../ui/separator'
 import {
@@ -26,6 +27,7 @@ export const LayoutComponent = ({ children }: PropsWithChildren) => (
 						<SidebarMenuButton
 							size="lg"
 							className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+							data-active={dataAttribute(false)}
 						>
 							<SlotTargets.Logo />
 						</SidebarMenuButton>

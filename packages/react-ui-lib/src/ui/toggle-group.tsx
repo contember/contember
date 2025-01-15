@@ -1,8 +1,7 @@
-import * as React from 'react'
 import * as ToggleGroupPrimitive from '@radix-ui/react-toggle-group'
+import * as React from 'react'
+import { cn, uic } from '../utils'
 import { toggleConfig, ToggleProps } from './toggle'
-import { cn } from '../utils/cn'
-import { uic } from '../utils/uic'
 
 const ToggleGroupContext = React.createContext<ToggleProps>({
 	size: 'default',

@@ -1128,6 +1128,7 @@
       "dependencies": {
         "@contember/schema": "packages/schema",
         "@contember/schema-utils": "packages/schema-utils",
+        "fast-deep-equal": "^3.1.3",
         "reflect-metadata": "^0.2.2",
       },
       "devDependencies": {
@@ -1371,7 +1372,7 @@
 
     "@contember/schema": ["@contember/schema@workspace:packages/schema", {}],
 
-    "@contember/schema-definition": ["@contember/schema-definition@workspace:packages/schema-definition", { "dependencies": { "@contember/schema": "packages/schema", "@contember/schema-utils": "packages/schema-utils", "reflect-metadata": "^0.2.2" }, "devDependencies": { "graphql": "^16.9.0" }, "peerDependencies": { "graphql": ">= 14.6.0" } }],
+    "@contember/schema-definition": ["@contember/schema-definition@workspace:packages/schema-definition", { "dependencies": { "@contember/schema": "packages/schema", "@contember/schema-utils": "packages/schema-utils", "fast-deep-equal": "^3.1.3", "reflect-metadata": "^0.2.2" }, "devDependencies": { "graphql": "^16.9.0" }, "peerDependencies": { "graphql": ">= 14.6.0" } }],
 
     "@contember/schema-migrations": ["@contember/schema-migrations@workspace:packages/schema-migrations", { "dependencies": { "@contember/database": "packages/database", "@contember/database-migrations": "packages/database-migrations", "@contember/engine-common": "packages/engine-common", "@contember/schema": "packages/schema", "@contember/schema-utils": "packages/schema-utils", "fast-deep-equal": "^3.1.3", "rfc6902": "^5.1.1" }, "devDependencies": { "@contember/schema-definition": "packages/schema-definition" }, "peerDependencies": { "pg": "^8.9.0" } }],
 

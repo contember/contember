@@ -1,4 +1,4 @@
-import { isDeepStrictEqual } from 'node:util'
+import deepEqual from 'fast-deep-equal'
 
 import { Acl, Input, Model, Writable } from '@contember/schema'
 import { PredicateDefinitionProcessor } from '@contember/schema-utils'
@@ -88,7 +88,7 @@ export class EntityPredicatesResolver {
 			if (!(predicateName in this.predicates)) {
 				this.predicates[predicateName] = predicate
 				break
-			} else if (isDeepStrictEqual(predicate, this.predicates[predicateName])) {
+			} else if (deepEqual(predicate, this.predicates[predicateName])) {
 				break
 			} else {
 				predicateName = `${origName}_${i}`

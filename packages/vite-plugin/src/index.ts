@@ -73,3 +73,5 @@ export function contember(options?: ContemberOptions): Plugin {
 			},
 	})
 }
+
+export default contember

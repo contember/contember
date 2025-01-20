@@ -202,8 +202,8 @@ export const createContainer = ({ env, version, runtime, workspace }: {
 			new MigrationStatusCommand(migrationsStatusFacade, migrationFilesManager, systemClientProvider, migrationPrinter))
 		.addService('versionCommand', ({ version }) =>
 			new VersionCommand(version))
-		.addService('projectGenerateDocumentationCommand', ({ schemaLoader }) =>
-			new ProjectGenerateDocumentationCommand(schemaLoader))
+		.addService('projectGenerateDocumentationCommand', ({ schemaLoader, schemaVersionBuilder }) =>
+			new ProjectGenerateDocumentationCommand(schemaLoader, schemaVersionBuilder))
 		.addService('projectPrintSchemaCommand', ({ schemaLoader, schemaVersionBuilder }) =>
 			new ProjectPrintSchemaCommand(schemaLoader, schemaVersionBuilder))
 		.addService('projectValidateCommand', ({ schemaLoader, migrationsValidator, migrationsResolver, schemaDiffer, schemaVersionBuilder }) =>

@@ -87,7 +87,7 @@ export default () => {
 						publishedAt: 'asc',
 					}}
 				>
-					<DataGridToolbar>
+					<DataGridToolbar sticky>
 						<CustomGridFilters />
 					</DataGridToolbar>
 
@@ -114,7 +114,7 @@ export default () => {
 
 					</DataGridLoader>
 
-					<DataGridPagination />
+					<DataGridPagination sticky />
 				</DataGrid>
 			</Binding>
 		</>
@@ -216,9 +216,11 @@ const CustomGridTile = Component(() => (
 		<div className="absolute top-0 right-0">
 			<GridDropdown />
 		</div>
+
 		<h2 className="text-lg font-semibold">
 			<Field field="title" />
 		</h2>
+
 		<div className="text-sm text-gray-500">
 			<Field field="state" />
 		</div>
@@ -247,9 +249,9 @@ const CustomGridRow = Component(() => (
 				<LockIcon className="w-4 h-4" />
 			</If>
 		</div>
+
 		<div className="flex flex-col">
 			<div className="flex gap-2">
-
 				<DataViewElement name="category" label="Category">
 					<HasOne field="category">
 						<DataGridHasOneTooltip field="category">
@@ -261,6 +263,7 @@ const CustomGridRow = Component(() => (
 				</DataViewElement>
 
 				<span className="text-lg font-bold"><Field field="title" /></span>
+
 				<DataViewElement name="tags" label="Tags">
 					<HasMany field="tags">
 						<DataGridHasManyTooltip field="tags">
@@ -275,8 +278,8 @@ const CustomGridRow = Component(() => (
 				published <Field field="publishedAt" format={formatDate} /> by <span className="font-semibold"><Field field="author.name" /></span>
 			</div>
 		</div>
-		<div className="flex flex-col text-gray-500 text-sm ml-auto">
 
+		<div className="flex flex-col text-gray-500 text-sm ml-auto">
 			<div className="inline-flex gap-2">
 				<EyeIcon className="w-4 h-4" />
 				<Field<number> field="views" format={it => it ?? 0} />
@@ -288,7 +291,6 @@ const CustomGridRow = Component(() => (
 		</div>
 	</div>
 ))
-
 
 const GridDropdown = () => (
 	<DefaultDropdown>

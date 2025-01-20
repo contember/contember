@@ -13,7 +13,9 @@ import { DataViewNumberFilterProps } from '@contember/react-dataview';
 import { DataViewProps } from '@contember/react-dataview';
 import { DataViewTextFilterProps } from '@contember/react-dataview';
 import { DataViewUnionTextFilterProps } from '@contember/react-dataview';
+import { FC } from 'react';
 import { JSX as JSX_2 } from 'react/jsx-runtime';
+import { NamedExoticComponent } from 'react';
 import * as React_2 from 'react';
 import { ReactNode } from 'react';
 import { SugaredRelativeEntityList } from '@contember/interface';
@@ -24,8 +26,8 @@ import { SugaredRelativeSingleField } from '@contember/interface';
 export const createDataGridDateRange: (label: ReactNode, dayDeltaStart: number, dayDeltaEnd: number) => DataGridPredefinedDateRange;
 
 // @public
-export const DataGrid: React_2.NamedExoticComponent<Omit<DataViewProps, "children"> & {
-    children: ReactNode;
+export const DataGrid: NamedExoticComponent<Omit<DataViewProps, "children"> & {
+children: ReactNode;
 }>;
 
 // @public
@@ -310,8 +312,10 @@ export type DataGridNumberFilterProps = Omit<DataViewNumberFilterProps, 'childre
     label: ReactNode;
 };
 
+// Warning: (ae-forgotten-export) The symbol "DataGridPaginationProps" needs to be exported by the entry point index.d.ts
+//
 // @public
-export const DataGridPagination: () => JSX_2.Element;
+export const DataGridPagination: FC<DataGridPaginationProps>;
 
 // @public (undocumented)
 export const DataGridPerPageSelector: () => JSX_2.Element;
@@ -379,6 +383,8 @@ export const DataGridToolbar: React_2.NamedExoticComponent<DataGridToolbarProps>
 export interface DataGridToolbarProps {
     // (undocumented)
     children?: ReactNode;
+    // (undocumented)
+    sticky?: boolean;
 }
 
 // @public
@@ -409,9 +415,9 @@ export interface DataViewTableProps {
 }
 
 // @public
-export const DefaultDataGrid: React_2.NamedExoticComponent<Omit<DataViewProps, "children"> & {
-    children: ReactNode;
-    toolbar?: ReactNode;
+export const DefaultDataGrid: NamedExoticComponent<Omit<DataViewProps, "children"> & {
+children: ReactNode;
+toolbar?: ReactNode;
 }>;
 
 // @public

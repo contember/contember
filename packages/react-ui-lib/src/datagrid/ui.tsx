@@ -1,10 +1,8 @@
-import * as React from 'react'
-import { forwardRef, ReactEventHandler, ReactNode, useCallback } from 'react'
 import { CheckSquareIcon, FilterIcon, FilterXIcon, PlusIcon, SquareIcon, XIcon } from 'lucide-react'
-import { Button } from '../ui/button'
-import { cn } from '../utils/cn'
+import { forwardRef, ReactEventHandler, ReactNode, useCallback } from 'react'
 import { dict } from '../dict'
-import { uic } from '../utils/uic'
+import { Button } from '../ui/button'
+import { cn, uic } from '../utils'
 
 export const DataGridTooltipLabel = uic('span', {
 	baseClass: 'cursor-pointer border-dashed border-b border-b-gray-400 hover:border-gray-800',
@@ -16,13 +14,13 @@ export const DataGridTooltipLabel = uic('span', {
 export const DataGridFilterActionButtonUI = forwardRef<HTMLButtonElement, {}>((props: {}, ref) => {
 	return (
 		<Button
-			variant={'outline'}
-			size={'sm'}
-			className={'space-x-1 data-[active]:text-blue-600 data-[active]:bg-gray-50 data-[active]:shadow-inner'}
+			variant="outline"
+			size="sm"
+			className="space-x-1 data-[active]:text-blue-600 data-[active]:bg-gray-50 data-[active]:shadow-inner"
 			ref={ref}
 			{...props}
 		>
-			<FilterIcon className={'w-3 h-3'} />
+			<FilterIcon className="w-3 h-3" />
 			<span>{dict.datagrid.filter}</span>
 		</Button>
 	)
@@ -34,13 +32,13 @@ export const DataGridFilterActionButtonUI = forwardRef<HTMLButtonElement, {}>((p
 export const DataGridExcludeActionButtonUI = forwardRef<HTMLButtonElement, {}>((props: {}, ref) => {
 	return (
 		<Button
-			variant={'outline'}
-			size={'sm'}
-			className={'space-x-1 data-[active]:text-blue-600 data-[active]:bg-gray-50 data-[active]:shadow-inner'}
+			variant="outline"
+			size="sm"
+			className="space-x-1 data-[active]:text-blue-600 data-[active]:bg-gray-50 data-[active]:shadow-inner"
 			ref={ref}
 			{...props}
 		>
-			<FilterXIcon className={'w-3 h-3'} />
+			<FilterXIcon className="w-3 h-3" />
 			<span>{dict.datagrid.exclude}</span>
 		</Button>
 	)
@@ -55,7 +53,7 @@ export const DataGridActiveFilterUI = forwardRef<HTMLButtonElement, {
 }>(({ children, className, ...props }, ref) => {
 	return (
 		<Button
-			variant={'outline'}
+			variant="outline"
 			size="sm"
 			className={cn('space-x-1 data-[current="none"]:hidden data-[current="exclude"]:line-through h-6', className)}
 			ref={ref}
@@ -64,7 +62,7 @@ export const DataGridActiveFilterUI = forwardRef<HTMLButtonElement, {
 			<span>
 				{children}
 			</span>
-			<XIcon className={'w-2 h-2'} />
+			<XIcon className="w-2 h-2" />
 		</Button>
 	)
 })
@@ -72,7 +70,7 @@ export const DataGridActiveFilterUI = forwardRef<HTMLButtonElement, {
 
 export const DataGridSingleFilterUI = forwardRef<HTMLDivElement, { children: ReactNode }>((props, ref) => {
 	return (
-		<div className={'flex flex-wrap gap-2 rounded bg-gray-50 items-center text-sm px-2 py-1.5 border'} ref={ref} {...props} />
+		<div className="flex flex-wrap gap-2 rounded bg-gray-50 items-center text-sm px-2 py-1.5 border" ref={ref} {...props} />
 	)
 })
 
@@ -81,14 +79,14 @@ export const DataGridFilterSelectTriggerUI = forwardRef<HTMLButtonElement, { chi
 	...props
 }, ref) => {
 	return (
-		<button className={'hover:underline inline-flex items-center gap-2 group px-1'} ref={ref} {...props}>
-			{children && <span className={'text-xs font-medium'}>
+		<button className="hover:underline inline-flex items-center gap-2 group px-1" ref={ref} {...props}>
+			{children && <span className="text-xs font-medium">
 				{children}
 			</span>}
 			<span
-				className={'bg-gray-100 rounded-full border group-data-[state=open]:bg-white group-data-[state=open]:shadow-inner h-5 w-5 inline-flex items-center justify-center'}
+				className="bg-gray-100 rounded-full border group-data-[state=open]:bg-white group-data-[state=open]:shadow-inner h-5 w-5 inline-flex items-center justify-center"
 			>
-				<PlusIcon className={'w-3 h-3'} />
+				<PlusIcon className="w-3 h-3" />
 			</span>
 		</button>
 	)
@@ -121,14 +119,14 @@ export const DataGridFilterSelectItemUI = forwardRef<HTMLButtonElement, DataGrid
 	}, [onExclude])
 
 	return (
-		<div className={'relative flex gap-1 justify-between items-center'}>
+		<div className="relative flex gap-1 justify-between items-center">
 			<Button
 				ref={ref}
 				onClick={include}
-				size={'sm'}
-				className={'pl-1 w-full text-left justify-start gap-1 data-[highlighted]:bg-gray-200'}
-				variant={'ghost'} {...props}>
-				{isIncluded ? <CheckSquareIcon className={'w-3 h-3'}/> : <SquareIcon className={'w-3 h-3'}/>}
+				size="sm"
+				className="pl-1 w-full text-left justify-start gap-1 data-[highlighted]:bg-gray-200"
+				variant="ghost" {...props}>
+				{isIncluded ? <CheckSquareIcon className="w-3 h-3" /> : <SquareIcon className="w-3 h-3" />}
 				<span className={cn('font-normal', isIncluded && 'text-blue-700')}>
 					{children}
 				</span>
@@ -140,7 +138,7 @@ export const DataGridFilterSelectItemUI = forwardRef<HTMLButtonElement, DataGrid
 					isExcluded ? 'bg-red-300 shadow-inner' : '',
 				)}
 			>
-				<FilterXIcon className={'h-3 w-3'}/>
+				<FilterXIcon className="h-3 w-3" />
 			</button>
 		</div>
 
@@ -149,5 +147,10 @@ export const DataGridFilterSelectItemUI = forwardRef<HTMLButtonElement, DataGrid
 
 
 export const DataGridToolbarUI = uic('div', {
-	baseClass: 'flex flex-col md:flex-row gap-2 md:items-end mb-4 items-stretch sticky top-0 z-50 bg-white p-4 pt-0 border-b border-gray-200',
+	baseClass: 'flex flex-col md:flex-row gap-2 md:items-end mb-4 items-stretch',
+	variants: {
+		sticky: {
+			true: 'sticky top-0 z-50 border-b bg-white border-gray-200 pb-4',
+		},
+	},
 })

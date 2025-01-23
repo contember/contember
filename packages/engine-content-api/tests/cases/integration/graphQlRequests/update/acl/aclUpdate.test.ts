@@ -1,6 +1,6 @@
 import { test } from 'bun:test'
 import { execute, failedTransaction, sqlTransaction } from '../../../../../src/test'
-import { SchemaBuilder } from '@contember/schema-definition'
+import { c, createSchema, SchemaBuilder } from '@contember/schema-definition'
 import {  Model } from '@contember/schema'
 import { GQL, SQL } from '../../../../../src/tags'
 import { testUuid } from '../../../../../src/testUuid'
@@ -255,3 +255,70 @@ test('update m:n', async () => {
 	})
 })
 
+
+
+namespace ConnectWithAclOnRead {
+	export const editor = c.createRole('editor')
+
+	@c.Allow(editor, {
+		read: ['id'],
+		update: ['id', 'category'],
+	})
+	export class Article {
+		category = c.manyHasOne(Category)
+	}
+
+	@c.Allow(editor, {
+		when: { isPublic: { eq: true } },
+		read: ['id', 'slug'],
+	})
+	export class Category {
+		isPublic = c.boolColumn().notNull()
+		slug = c.stringColumn().notNull().unique()
+	}
+
+}
+
+test('connect category', async () => {
+	const schema = createSchema(ConnectWithAclOnRead)
+
+	await execute({
+		schema: schema.model,
+		query: GQL`mutation {
+        updateArticle(
+            by: {id: "${testUuid(1)}"},
+            data: {category: {connect: {slug: "abcd"}}}
+          ) {
+          ok
+        }
+      }`,
+		permissions: schema.acl.roles.editor.entities,
+		executes: [
+			...sqlTransaction([
+				{
+					sql: SQL`select "root_"."id" from "public"."article" as "root_" where "root_"."id" = ?`,
+					parameters: [testUuid(1)],
+					response: { rows: [{ id: testUuid(1) }] },
+				},
+				{
+					sql: SQL`select "root_"."id"  from "public"."category" as "root_"  where "root_"."slug" = ? and "root_"."is_public" = ?`,
+					parameters: ['abcd', true],
+					response: { rows: [{ id: testUuid(2) }] },
+				},
+				{
+					sql: SQL`with "newData_" as (select ? :: uuid as "category_id", "root_"."category_id" as "category_id_old__", "root_"."id" from "public"."article" as "root_"  where "root_"."id" = ?) 
+update "public"."article" set  "category_id" =  "newData_"."category_id" from "newData_"  where "article"."id" = "newData_"."id"  returning "category_id_old__"`,
+					parameters: [testUuid(2), testUuid(1)],
+					response: { rows: [{ category_id_old__: null }] },
+				},
+			]),
+		],
+		return: {
+			data: {
+				updateArticle: {
+					ok: true,
+				},
+			},
+		},
+	})
+})

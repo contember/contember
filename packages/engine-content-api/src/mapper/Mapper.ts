@@ -50,7 +50,8 @@ export class Mapper {
 			.from(entity.tableName, 'root_')
 			.select(['root_', columnName])
 		const expandedWhere = this.uniqueWhereExpander.expand(entity, where)
-		const builtQb = this.whereBuilder.build(qb, entity, this.pathFactory.create([]), expandedWhere)
+		const withPredicates = this.predicatesInjector.inject(entity, expandedWhere)
+		const builtQb = this.whereBuilder.build(qb, entity, this.pathFactory.create([]), withPredicates)
 		const result = await builtQb.getResult(this.db)
 
 		return result[0] !== undefined ? result[0][columnName] : undefined

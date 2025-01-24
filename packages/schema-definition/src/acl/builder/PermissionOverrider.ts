@@ -33,6 +33,12 @@ export default class PermissionOverrider {
 					: {
 						customPrimary: overrides.operations.customPrimary ?? original.operations.customPrimary,
 					  }),
+				...(original.operations.noRoot || overrides.operations.noRoot ? {
+					noRoot: [
+						...(original.operations.noRoot || []),
+						...(overrides.operations.noRoot || []),
+					],
+				} : {}),
 			},
 		}
 	}

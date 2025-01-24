@@ -119,8 +119,9 @@ export const updateAclFieldPermissions =
 				read: value => updater(value, entityName, Acl.Operation.read),
 				delete: value => value,
 				customPrimary: value => value,
+				noRoot: value => value,
 			}
-			const types: (keyof Acl.EntityOperations)[] = ['create', 'update', 'read', 'delete', 'customPrimary']
+			const types: (keyof Acl.EntityOperations)[] = ['create', 'update', 'read', 'delete', 'customPrimary', 'noRoot']
 			for (const key of types) {
 				if (key in entityPermissions.operations) {
 					operations[key] = handlers[key](entityPermissions.operations[key] as any) as any

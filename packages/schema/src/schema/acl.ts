@@ -72,6 +72,7 @@ export namespace Acl {
 		readonly customPrimary?: boolean
 		readonly update?: FieldPermissions
 		readonly delete?: Predicate
+		readonly noRoot?: readonly `${Operation}`[]
 	}
 
 	export type FieldPermissions = { readonly [field: string]: Predicate }

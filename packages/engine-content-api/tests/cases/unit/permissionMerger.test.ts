@@ -550,4 +550,124 @@ describe('Permission merger', () => {
 	})
 
 
+
+	it('prefer permissions with root allowed', () => {
+		execute({
+			acl: {
+				roles: {
+					role1: {
+						variables: {},
+						entities: {
+							Entity2: {
+								predicates: {
+									foo: { xyz: { lorem: { eq: 'foo' } } },
+								},
+								operations: {
+									read: {
+										title: 'foo',
+									},
+									noRoot: ['read'],
+								},
+							},
+						},
+					},
+					role2: {
+						variables: {},
+						entities: {
+							Entity2: {
+								predicates: {
+									foo: { xyz: { lorem: { eq: 'bar' } } },
+								},
+								operations: {
+									read: {
+										title: 'foo',
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			roles: ['role1', 'role2'],
+			result: {
+				Entity2: {
+					operations: {
+						read: {
+							title: 'foo_',
+							id: 'foo_',
+						},
+					},
+					predicates: {
+						foo_: {
+							xyz: {
+								lorem: { eq: 'bar' },
+							},
+						},
+					},
+				},
+			},
+		})
+	})
+
+
+	it('merge permissions with no root', () => {
+		execute({
+			acl: {
+				roles: {
+					role1: {
+						variables: {},
+						entities: {
+							Entity2: {
+								predicates: {
+									foo: { xyz: { lorem: { eq: 'foo' } } },
+								},
+								operations: {
+									read: {
+										title: 'foo',
+									},
+									noRoot: ['read'],
+								},
+							},
+						},
+					},
+					role2: {
+						variables: {},
+						entities: {
+							Entity2: {
+								predicates: {
+									foo: { xyz: { lorem: { eq: 'bar' } } },
+								},
+								operations: {
+									read: {
+										title: 'foo',
+									},
+									noRoot: ['read'],
+								},
+							},
+						},
+					},
+				},
+			},
+			roles: ['role1', 'role2'],
+			result: {
+				Entity2: {
+					operations: {
+						noRoot: ['read'],
+						read: {
+							title: '__merge__foo__foo',
+							id: '__merge__foo__foo',
+						},
+					},
+					predicates: {
+						__merge__foo__foo: {
+							or: [
+								{ xyz: { lorem: { eq: 'foo' } } },
+								{ xyz: { lorem: { eq: 'bar' } } },
+							],
+						},
+					},
+				},
+			},
+		})
+	})
 })

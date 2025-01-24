@@ -53,7 +53,12 @@ export class AclFactory {
 
 			const predicatesResolver = EntityPredicatesResolver.create(rolePermissions, this.model, entity)
 
-			const entityOperations: Writable<Acl.EntityOperations> = {}
+			const entityOperations: Writable<Acl.EntityOperations> = {
+			}
+			const noRootOptions = this.getNoRootOptions(entity, rolePermissions.get(entityName))
+			if (noRootOptions?.length) {
+				entityOperations.noRoot = noRootOptions
+			}
 			for (const op of ['create', 'update', 'read'] as const) {
 				const fieldPermissions: Writable<Acl.FieldPermissions> = {}
 				for (const field of Object.keys(entity.fields)) {
@@ -76,8 +81,32 @@ export class AclFactory {
 			return [entityName, {
 				predicates: predicatesResolver.getUsedPredicates(),
 				operations: entityOperations,
+
 			}]
 		}))
+	}
+
+
+	getNoRootOptions(entity: Model.Entity, permissions?: EntityPermissions): Acl.EntityOperations['noRoot'] {
+		const allowedRoot = new Set<Acl.Operation>()
+		const disallowedRoot = new Set<Acl.Operation>()
+		for (const def of permissions?.definitions ?? []) {
+			const noRoot = def.through === true
+			for (const op of ['create', 'read', 'update', 'delete'] as const) {
+				if (def[op]) {
+					const currentSet = noRoot ? disallowedRoot : allowedRoot
+					currentSet.add(op as Acl.Operation)
+
+					const otherSet = noRoot ? allowedRoot : disallowedRoot
+
+					if (otherSet.has(op as Acl.Operation)) {
+						throw new Error(`Operation ${op} cannot be both allowed and disallowed on root on entity ${entity.name}`)
+					}
+				}
+			}
+
+		}
+		return [...disallowedRoot.values()]
 	}
 
 	private createVariables(role: Role, variables: VariableDefinition[]): Acl.Variables {

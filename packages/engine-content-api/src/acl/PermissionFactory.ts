@@ -116,6 +116,7 @@ export class PermissionFactory {
 		if (left.operations.customPrimary || right.operations.customPrimary) {
 			operations.customPrimary = true
 		}
+		const noRoot: `${Acl.Operation}`[] = []
 
 		const operationNames: (keyof Pick<Acl.EntityOperations, 'create' | 'read' | 'update'>)[] = [
 			'create',
@@ -124,8 +125,14 @@ export class PermissionFactory {
 		]
 
 		for (let operation of operationNames) {
-			const leftFieldPermissions: Acl.FieldPermissions = left.operations[operation] || {}
-			const rightFieldPermissions: Acl.FieldPermissions = right.operations[operation] || {}
+			const leftNoRoot = left.operations.noRoot?.includes(operation) || false
+			const rightNoRoot = right.operations.noRoot?.includes(operation) || false
+			if (leftNoRoot && rightNoRoot) {
+				noRoot.push(operation)
+			}
+
+			const leftFieldPermissions: Acl.FieldPermissions = leftNoRoot && !rightNoRoot ? {} : (left.operations[operation] || {})
+			const rightFieldPermissions: Acl.FieldPermissions = rightNoRoot && !leftNoRoot ? {} : (right.operations[operation] || {})
 			const [operationPredicates, fieldPermissions] = this.mergeFieldPermissions(
 				left.predicates,
 				leftFieldPermissions,
@@ -149,6 +156,9 @@ export class PermissionFactory {
 		} else if (predicateDefinition !== undefined && typeof predicate === 'string') {
 			predicates[predicate] = predicateDefinition
 			operations.delete = predicate
+		}
+		if (noRoot.length > 0) {
+			operations.noRoot = noRoot
 		}
 
 		return {

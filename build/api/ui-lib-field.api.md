@@ -7,7 +7,7 @@
 import { NamedExoticComponent } from 'react';
 import { SugaredRelativeSingleField } from '@contember/interface';
 
-// @public (undocumented)
+// @public
 export const FormattedField: NamedExoticComponent<FormattedFieldProps>;
 
 // @public (undocumented)

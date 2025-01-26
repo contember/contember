@@ -5,9 +5,34 @@ import { Button } from '../ui/button'
 import { Loader } from '../ui/loader'
 import { usePersistSuccessHandler } from './hooks'
 
-export const PersistButton = ({ label }: {
+export type PersistButtonProps = {
+	/** Custom button text (default: dictionary.persist.persistButton) */
 	label?: ReactNode
-}) => {
+}
+
+/**
+ * PersistButton component - Universal save button with loading state
+ *
+ * #### Purpose
+ * Provides a consistent UI element for triggering data persistence with visual feedback
+ *
+ * #### Features
+ * - Integrated loading spinner during save operations
+ * - Success feedback via toast notifications
+ * - Customizable button label
+ * - Automatic disabled state during persistence
+ *
+ * #### Example: Basic usage
+ * ```tsx
+ * <PersistButton />
+ * ```
+ *
+ * #### Example: Custom label
+ * ```tsx
+ * <PersistButton label="Save Article" />
+ * ```
+ */
+export const PersistButton = ({ label }: PersistButtonProps) => {
 	return (
 		<PersistTrigger onPersistSuccess={usePersistSuccessHandler()}>
 			<Button className="group">

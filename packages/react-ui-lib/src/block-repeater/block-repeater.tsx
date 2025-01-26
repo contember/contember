@@ -61,10 +61,10 @@ const [BlockRepeaterEditModeContext, useBlockRepeaterEditMode] = createRequiredC
  *   - **Inline Edit Mode**: By providing only `children`, the blocks can be edited inline.
  *   - **Dual-Mode**: By providing both `form` and `children`, the component supports a dual-mode where blocks can be edited in a separate form view.
  *
- * ## Props {@link DefaultBlockRepeaterProps}
+ * #### Props {@link DefaultBlockRepeaterProps}
  * - field or entities, sortableBy, discriminationField, children
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <DefaultBlockRepeater field="blocks" sortableBy="order" discriminationField="type">
  *   <Block

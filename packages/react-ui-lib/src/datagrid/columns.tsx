@@ -32,17 +32,19 @@ import { DataViewFieldLabel, DataViewHasManyLabel, DataViewHasOneLabel } from '.
 import { DataGridColumnLeaf } from './column-leaf'
 
 /**
- * Renders a column with action buttons. Should be used in a {@link DataGridTable}.
+ * `DataGridActionColumn` renders a column with action buttons in a `DataGridTable`.
+ * It is typically used to provide interactive controls such as edit, delete, or custom actions.
  *
- * ## Example
+ * #### Example: Basic usage with a button
  * ```tsx
  * <DataGridTable>
- *     <DataGridActionColumn>
- *         <Button>Click me</Button>
- *     </DataGridActionColumn>
+ *   <DataGridActionColumn>
+ *     <Button variant="outline">Click me</Button>
+ *   </DataGridActionColumn>
  * </DataGridTable>
  * ```
  */
+
 export const DataGridActionColumn = Component<{ children: ReactNode }>(({ children }) => (
 	<DataGridColumnLeaf
 		header={<TableHead className="w-0"></TableHead>}

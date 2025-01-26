@@ -12,7 +12,6 @@ import {
 	ChevronsRightIcon,
 	Loader2Icon,
 } from 'lucide-react'
-import { FC } from 'react'
 import { dict, dictFormat } from '../dict'
 import { Button } from '../ui/button'
 import { DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown'
@@ -27,19 +26,20 @@ const PaginationWrapper = uic('div', {
 	},
 })
 
-interface DataGridPaginationProps {
+type DataGridPaginationProps = {
 	sticky?: boolean
 }
 
 /**
- * Pagination controls UI for DataView.
+ * `DataGridPagination` provides pagination controls for navigating through pages in a `DataView`.
+ * It includes buttons for navigating to the first, previous, next, and last pages.
  *
- * ## Example
+ * #### Example: Basic Usage
  * ```tsx
  * <DataGridPagination />
  * ```
  */
-export const DataGridPagination: FC<DataGridPaginationProps> = ({ sticky }) => (
+export const DataGridPagination = ({ sticky }: DataGridPaginationProps) => (
 	<PaginationWrapper sticky={sticky}>
 		<div>
 			<DataViewPagingStateView render={it => <>
@@ -105,7 +105,15 @@ export const DataGridPagination: FC<DataGridPaginationProps> = ({ sticky }) => (
 	</PaginationWrapper>
 )
 
-
+/**
+ * `DataGridPerPageSelector` allows users to set the number of items displayed per page
+ * in a `DataView`. It provides a dropdown menu with preset options.
+ *
+ * #### Example: Basic Usage
+ * ```tsx
+ * <DataGridPerPageSelector />
+ * ```
+ */
 export const DataGridPerPageSelector = () => (
 	<div>
 		<p className="text-gray-400 text-xs font-semibold mb-1">{dict.datagrid.paginationRowsPerPage}</p>

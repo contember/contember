@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { ReactNode } from 'react'
 import { ScrollArea } from '../ui/scroll-area'
 import { Loader } from '../ui/loader'

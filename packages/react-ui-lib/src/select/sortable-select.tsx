@@ -49,7 +49,9 @@ const MultiSortableSelectDropIndicator = ({ position }: { position: 'before' | '
 export type SortableMultiSelectInputProps =
 	& {
 		field: SugaredRelativeEntityList['field']
+		/** Field name used to store sort order */
 		sortableBy: SugaredRelativeSingleField['field']
+		/** Field name used to connect the selected entity */
 		connectAt: SugaredRelativeSingleEntity['field']
 		children: ReactNode
 		options?: SugaredQualifiedEntityList['entities']

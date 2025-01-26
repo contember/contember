@@ -1,6 +1,5 @@
-import { SugaredRelativeSingleField, TreeNodeEnvironmentFactory, useEnvironment } from '@contember/interface'
 import { createContext } from '@contember/react-utils'
-import { ReactNode, useMemo } from 'react'
+import { ReactNode } from 'react'
 
 export type EnumOptionsFormatter = (enumName: string) => Record<string, ReactNode>
 

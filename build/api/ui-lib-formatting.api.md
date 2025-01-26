@@ -6,34 +6,34 @@
 
 import { SchemaColumn } from '@contember/interface';
 
-// @public (undocumented)
+// @public
 export const createEnumFormatter: (enumValues: Record<string, string>) => (value: string | null) => string | null;
 
-// @public (undocumented)
+// @public
 export const formatBoolean: (value: boolean | null) => string | null;
 
-// @public (undocumented)
+// @public
 export const formatBytes: (bytes: number, decimals?: number) => string;
 
-// @public (undocumented)
+// @public
 export const formatDate: (date: string | null) => string | null;
 
-// @public (undocumented)
+// @public
 export const formatDateTime: (date: string | null) => string | null;
 
-// @public (undocumented)
+// @public
 export const formatDuration: (duration: number) => string;
 
-// @public (undocumented)
+// @public
 export const formatJson: (value: any) => string;
 
-// @public (undocumented)
+// @public
 export const formatNumber: (value: number | null) => string | null;
 
-// @public (undocumented)
+// @public
 export const getFormatter: (schema: SchemaColumn) => ((date: string | null) => string | null) | ((value: boolean | null) => string | null) | ((value: number | null) => string | null) | ((value: any) => any);
 
-// @public (undocumented)
+// @public
 export const withFallback: <T>(formatter: (value: T) => string, fallback: string) => (value: T | null) => string;
 
 // (No @packageDocumentation comment for this package)

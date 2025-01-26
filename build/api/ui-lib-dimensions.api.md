@@ -5,43 +5,33 @@
 ```ts
 
 import { DataViewSortingDirections } from '@contember/react-dataview';
-import * as React_2 from 'react';
+import { NamedExoticComponent } from 'react';
 import { ReactNode } from 'react';
 import { SugaredQualifiedEntityList } from '@contember/interface';
 import { SugaredRelativeSingleEntity } from '@contember/interface';
 import { SugaredRelativeSingleField } from '@contember/interface';
 
-// @public (undocumented)
-export const DimensionsSwitcher: React_2.NamedExoticComponent<DimensionsSwitcherProps>;
+// @public
+export const DimensionsSwitcher: NamedExoticComponent<DimensionsSwitcherProps>;
 
-// @public (undocumented)
+// @public
 export interface DimensionsSwitcherProps {
-    // (undocumented)
     children: ReactNode;
-    // (undocumented)
     dimension: string;
-    // (undocumented)
     isMulti?: boolean;
-    // (undocumented)
     options: SugaredQualifiedEntityList['entities'];
-    // (undocumented)
     orderBy?: DataViewSortingDirections;
-    // (undocumented)
     slugField: SugaredRelativeSingleField['field'];
 }
 
-// @public (undocumented)
-export const SideDimensions: React_2.NamedExoticComponent<SideDimensionsProps>;
+// @public
+export const SideDimensions: NamedExoticComponent<SideDimensionsProps>;
 
-// @public (undocumented)
+// @public
 export interface SideDimensionsProps {
-    // (undocumented)
     as: string;
-    // (undocumented)
     children: ReactNode;
-    // (undocumented)
     dimension: string;
-    // (undocumented)
     field: SugaredRelativeSingleEntity['field'];
 }
 

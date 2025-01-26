@@ -2,8 +2,7 @@ import { Component } from '@contember/interface'
 import { DataViewReloadTrigger } from '@contember/react-dataview'
 import { dataAttribute } from '@contember/utilities'
 import { FilterIcon, RefreshCcwIcon, SettingsIcon } from 'lucide-react'
-import * as React from 'react'
-import { ReactNode } from 'react'
+import { ReactNode, useState } from 'react'
 import { dict } from '../dict'
 import { Button } from '../ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
@@ -18,31 +17,28 @@ import { DataGridToolbarUI } from './ui'
 /**
  * Props for the {@link DataGridToolbar} component.
  */
-export interface DataGridToolbarProps {
+export type DataGridToolbarProps = {
 	children?: ReactNode
-
-	// UI props from DataGridToolbarUI
+	/**
+	 * UI props from {@link DataGridToolbarUI}
+	 */
 	sticky?: boolean
 }
 
 /**
- * Toolbar for DataGrid with default UI.
- * It contains
- * 	- filters (with default DataGridQueryFilter, which can be replaced by custom filters in children)
- * 	- settings (layout switcher, visible elements, per page selector)
- * 	- export button
- * 	- reload button
+ * `DataGridToolbar` provides a toolbar for `DataGrid` with default UI components.
+ * It includes filtering, layout settings, export functionality, and a reload button.
  *
- * ## Example
+ * #### Example: Basic usage with custom filters
  * ```tsx
  * <DataGridToolbar>
- *     <DataGridQueryFilter />
- *     <DataGridTextFilter field={'name'} label="Name" />
+ *   <DataGridQueryFilter />
+ *   <DataGridTextFilter field="name" label="Name" />
  * </DataGridToolbar>
  * ```
  */
 export const DataGridToolbar = Component<DataGridToolbarProps>(({ children, sticky }) => {
-	const [showFilters, setShowFilters] = React.useState(false)
+	const [showFilters, setShowFilters] = useState(false)
 
 	return (
 		<DataGridShowFiltersContext.Provider value={showFilters}>
@@ -83,13 +79,9 @@ export const DataGridToolbar = Component<DataGridToolbarProps>(({ children, stic
 				</div>
 
 				<div className="flex flex-1 flex-wrap gap-2">
-					{children ?? <>
-						<DataGridQueryFilter />
-					</>}
+					{children ?? <DataGridQueryFilter />}
 				</div>
 			</DataGridToolbarUI>
 		</DataGridShowFiltersContext.Provider>
 	)
-}, ({ children }) => <>
-	{children}
-</>)
+}, ({ children }) => <>{children}</>)

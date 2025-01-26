@@ -24,43 +24,48 @@ const dataGridDefaultStorages: Partial<DataGridProps> = {
 }
 
 /**
- * Base DataGrid component. The UI is up to you.
+ * `DataGrid` is a flexible data display component that provides sorting, filtering, selection,
+ * and pagination capabilities. The UI is customizable, allowing you to define how data is presented.
  *
- * ## Props {@link DataGridProps}
- * Primary: children, entities
- * Optional: queryField, filterTypes, dataViewKey, onSelectHighlighted
- * Initial values:  initialFilters, initialSorting, initialSelection, initialItemsPerPage
- * Storage settings: filteringStateStorage, sortingStateStorage, currentPageStateStorage, selectionStateStorage, pagingSettingsStorage
+ * #### Props {@link DataGridProps}
+ * - **Primary:** `children`, `entities`
+ * - **Optional:** `queryField`, `filterTypes`, `dataViewKey`, `onSelectHighlighted`
+ * - **Initial values:** `initialFilters`, `initialSorting`, `initialSelection`, `initialItemsPerPage`
+ * - **Storage settings:** `filteringStateStorage`, `sortingStateStorage`, `currentPageStateStorage`, `selectionStateStorage`, `pagingSettingsStorage`
  *
- * ## Example
+ * #### Example: Basic Usage
  * ```tsx
  * <DataGrid
- *     entities="GridArticle"
+ *     entities="Project"
  *     initialSorting={{
- *         publishedAt: 'asc',
+ *         createdAt: 'asc',
  *     }}
  * >
  *     <DataGridToolbar>
  *         <DataGridQueryFilter />
- *         <DataGridEnumFilter field={'state'} />
- *          <DataGridHasOneFilter field={'author'} label="Author">
+ *         <DataGridEnumFilter field="state" />
+ *         <DataGridHasOneFilter field="author" label="Author">
  *             <Field field="name" />
  *         </DataGridHasOneFilter>
  *     </DataGridToolbar>
  *     <DataGridLoader>
  *         <DataGridTable>
- *             <DataGridActionColumn><Button>Show detail</Button></DataGridActionColumn>
+ *             <DataGridActionColumn>
+ *                 <Button>Show detail</Button>
+ *             </DataGridActionColumn>
  *             <DataGridTextColumn header="Title" field="title" />
  *             <DataGridEnumColumn field="state" />
- *             <DataGridDateColumn header="Published at" field="publishedAt" />
- *             <DataGridHasOneColumn header="Author" field="author">
+ *             <DataGridDateColumn header="Created at" field="createdAt" />
+ *             <DataGridHasOneColumn header="Company" field="company">
  *                 <Field field="name" />
  *             </DataGridHasOneColumn>
  *         </DataGridTable>
+ *
  *         <DataGridTiles>
  *             <MyCustomTile />
  *         </DataGridTiles>
- *         <DataViewLayout name="rows" label='Rows'>
+ *
+ *         <DataViewLayout name="rows" label="Rows">
  *             <DataViewEachRow>
  *                 <MyCustomRow />
  *             </DataViewEachRow>
@@ -94,14 +99,17 @@ export type DefaultDataGridProps =
 	}
 
 /**
- * Default DataGrid with toolbar, loader, table and pagination.
+ * `DefaultDataGrid` is a pre-configured `DataGrid` component that includes a toolbar, loader, table, and pagination.
+ * It provides a structured layout for displaying data with minimal configuration.
  *
- * ## Example
+ * #### Example: Basic Usage
  * ```tsx
- * <DefaultDataGrid entities="GridArticle">
- *     <DataGridActionColumn><Button>Show detail</Button></DataGridActionColumn>
+ * <DefaultDataGrid entities="Project">
+ *     <DataGridActionColumn>
+ *         <Button>Show detail</Button>
+ *     </DataGridActionColumn>
  *     <DataGridTextColumn header="Title" field="title" />
- *     <DataGridEnumColumn header="State" field="state" options={GridArticleStateLabels} />
+ *     <DataGridEnumColumn header="State" field="state" />
  * </DefaultDataGrid>
  * ```
  */

@@ -133,11 +133,14 @@ export type RolesConfig = {
     };
 };
 
+// @public
+export const UpdateProjectMemberFormFields: ({ projectSlug, roles }: UpdateProjectMemberFormFieldsProps) => JSX_2.Element;
+
 // @public (undocumented)
-export const UpdateProjectMemberFormFields: ({ projectSlug, roles }: {
+export type UpdateProjectMemberFormFieldsProps = {
     projectSlug: string;
     roles?: RolesConfig;
-}) => JSX_2.Element;
+};
 
 // @public (undocumented)
 export const useIntrospectionRolesConfig: (projectSlug: string) => RolesConfig | undefined;

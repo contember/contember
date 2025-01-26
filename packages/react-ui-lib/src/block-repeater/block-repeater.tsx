@@ -1,4 +1,11 @@
-import { Component, DeleteEntityTrigger, PersistTrigger, StaticRender, SuccessfulPersistResult, useEntity } from '@contember/interface'
+import {
+	Component,
+	DeleteEntityTrigger,
+	PersistTrigger,
+	StaticRender,
+	SuccessfulPersistResult,
+	useEntity,
+} from '@contember/interface'
 import {
 	BlockRepeater,
 	BlockRepeaterAddItemTrigger,
@@ -27,6 +34,11 @@ import { Sheet, SheetClose, SheetContent, SheetFooter, SheetHeader, SheetTitle }
 import { Switch } from '../ui/switch'
 import { uic } from '../utils'
 
+/**
+ * Props for {@link DefaultBlockRepeater} component.
+ */
+export type DefaultBlockRepeaterProps = BlockRepeaterProps
+
 const BlockRepeaterItemsWrapperUI = uic('div', {
 	baseClass: 'rounded-sm border border-gray-300 px-4 py-8 flex flex-col',
 })
@@ -49,69 +61,7 @@ const BlockRepeaterContentWrapperUI = uic('div', {
 	baseClass: 'flex flex-col gap-2',
 })
 
-export type DefaultBlockRepeaterProps =
-	& BlockRepeaterProps
-
 const [BlockRepeaterEditModeContext, useBlockRepeaterEditMode] = createRequiredContext<boolean>('BlockRepeaterEditMode')
-
-/**
- *  The `DefaultBlockRepeater` component is a versatile and customizable block repeater shipped with a UI.
- *  It allows for the creation and management of repeatable content blocks within a form.
- * Supports two modes of operation:
- *   - **Inline Edit Mode**: By providing only `children`, the blocks can be edited inline.
- *   - **Dual-Mode**: By providing both `form` and `children`, the component supports a dual-mode where blocks can be edited in a separate form view.
- *
- * ## Props {@link DefaultBlockRepeaterProps}
- * - field or entities, sortableBy, discriminationField, children
- *
- * ## Example
- * ```tsx
- * <DefaultBlockRepeater field="blocks" sortableBy="order" discriminationField="type">
- *   <Block
- *     name="text"
- *     label={<><TextIcon /> Text</>}
- *     form={<>
- *       <InputField field="title" label="Title" />
- *       <TextareaField field="content" label="Content" />
- *     </>}
- *     children={<>
- *       <div className="flex">
- *         <div className="w-64 space-y-2">
- *           <h2 className="text-xl font-bold">
- *             <Field field="title" />
- *           </h2>
- *           <p>
- *             <Field field="content" />
- *           </p>
- *         </div>
- *       </div>
- *     </>
- *     }
- *   />
- * </DefaultBlockRepeater>
- * ```
- */
-export const DefaultBlockRepeater = Component<DefaultBlockRepeaterProps>(({ children, ...props }) => {
-	const [editMode, setEditMode] = useState(false)
-	return (
-		<BlockRepeater {...props}>
-			<StaticRender>
-				{children}
-			</StaticRender>
-			<BlockRepeaterEditModeContext.Provider value={editMode}>
-				<BlockRepeaterContentWrapperUI>
-					<ToggleEditMode setEditMode={setEditMode} editMode={editMode} />
-					<BlockRepeaterSortable sortableBy={props.sortableBy} />
-					<div className="mt-4">
-						<BlockRepeaterAddButtons />
-					</div>
-				</BlockRepeaterContentWrapperUI>
-			</BlockRepeaterEditModeContext.Provider>
-		</BlockRepeater>
-	)
-}, props => {
-	return <BlockRepeater {...props} />
-})
 
 const ToggleEditMode = ({ setEditMode, editMode }: { setEditMode: (value: boolean) => void; editMode: boolean }) => {
 	const id = useId()
@@ -128,9 +78,7 @@ const ToggleEditMode = ({ setEditMode, editMode }: { setEditMode: (value: boolea
 	)
 }
 
-const BlockRepeaterSortable = Component<{
-	sortableBy: DefaultBlockRepeaterProps['sortableBy']
-}>(({ sortableBy }) => {
+const BlockRepeaterSortable = Component<{ sortableBy: DefaultBlockRepeaterProps['sortableBy'] }>(({ sortableBy }) => {
 	return (
 		<RepeaterSortable>
 			<BlockRepeaterItemsWrapperUI>
@@ -266,11 +214,7 @@ const BlockRepeaterEditSheetInner = ({ open, setOpen }: { open: boolean; setOpen
 						{block.label}
 						<DeleteEntityTrigger>
 							<SheetClose asChild>
-								<Button
-									variant="destructive"
-									className="ml-auto"
-									size="sm"
-								>
+								<Button variant="destructive" className="ml-auto" size="sm">
 									<TrashIcon className="w-3 h-3" />
 								</Button>
 							</SheetClose>
@@ -292,3 +236,63 @@ const BlockRepeaterEditSheetInner = ({ open, setOpen }: { open: boolean; setOpen
 		</Sheet>
 	)
 }
+
+/**
+ * `DefaultBlockRepeater` component is a versatile and customizable block repeater shipped with a UI.
+ * It allows for the creation and management of repeatable content blocks within a form.
+ *
+ * Supports two modes of operation:
+ *   - **Inline Edit Mode**: By providing only `children`, the blocks can be edited inline.
+ *   - **Dual-Mode**: By providing both `form` and `children`, the component supports a dual-mode where blocks can be edited in a separate form view.
+ *
+ * #### Props {@link DefaultBlockRepeaterProps}
+ * - field or entities, sortableBy, discriminationField, children
+ *
+ * #### Example
+ * ```tsx
+ * <DefaultBlockRepeater field="blocks" sortableBy="order" discriminationField="type">
+ *   <Block
+ *     name="text"
+ *     label={<><TextIcon /> Text</>}
+ *     form={<>
+ *       <InputField field="title" label="Title" />
+ *       <TextareaField field="content" label="Content" />
+ *     </>}
+ *     children={<>
+ *       <div className="flex">
+ *         <div className="w-64 space-y-2">
+ *           <h2 className="text-xl font-bold">
+ *             <Field field="title" />
+ *           </h2>
+ *           <p>
+ *             <Field field="content" />
+ *           </p>
+ *         </div>
+ *       </div>
+ *     </>
+ *     }
+ *   />
+ * </DefaultBlockRepeater>
+ * ```
+ */
+export const DefaultBlockRepeater = Component<DefaultBlockRepeaterProps>(({ children, ...props }) => {
+	const [editMode, setEditMode] = useState(false)
+	return (
+		<BlockRepeater {...props}>
+			<StaticRender>
+				{children}
+			</StaticRender>
+			<BlockRepeaterEditModeContext.Provider value={editMode}>
+				<BlockRepeaterContentWrapperUI>
+					<ToggleEditMode setEditMode={setEditMode} editMode={editMode} />
+					<BlockRepeaterSortable sortableBy={props.sortableBy} />
+					<div className="mt-4">
+						<BlockRepeaterAddButtons />
+					</div>
+				</BlockRepeaterContentWrapperUI>
+			</BlockRepeaterEditModeContext.Provider>
+		</BlockRepeater>
+	)
+}, props => {
+	return <BlockRepeater {...props} />
+})

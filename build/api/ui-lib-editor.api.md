@@ -14,7 +14,6 @@ import { ErrorAccessor } from '@contember/interface';
 import { JSX as JSX_2 } from 'react/jsx-runtime';
 import { MemoExoticComponent } from 'react';
 import { NamedExoticComponent } from 'react';
-import * as React_2 from 'react';
 import { ReactElement } from 'react';
 import { ReactNode } from 'react';
 import { RenderElementProps } from 'slate-react';
@@ -23,7 +22,7 @@ import { SugaredRelativeEntityList } from '@contember/interface';
 import { SugaredRelativeSingleField } from '@contember/interface';
 import { TextareaHTMLAttributes } from 'react';
 
-// @public (undocumented)
+// @public
 export const baseEditorPlugins: {
     anchor: <E extends Editor>(editor: E) => E;
     paragraph: <E extends Editor>(editor: E) => E;
@@ -41,7 +40,7 @@ export const baseEditorPlugins: {
     underline: EditorPlugin;
 };
 
-// @public (undocumented)
+// @public
 export const BlockEditorField: NamedExoticComponent<BlockEditorFieldProps>;
 
 // @public (undocumented)
@@ -57,7 +56,7 @@ export const BlockEditorInner: ({ children, placeholder }: {
     children: ReactNode;
 }) => JSX_2.Element;
 
-// @public (undocumented)
+// @public
 export const blockEditorPlugins: EditorPlugin_2[];
 
 // @public (undocumented)
@@ -73,21 +72,17 @@ export interface BlockElementProps extends RenderElementProps {
     withBoundaries?: boolean;
 }
 
-// @public (undocumented)
+// @public
 export const EditorBlock: NamedExoticComponent<EditorBlockProps>;
 
-// @public (undocumented)
+// @public
 export const EditorBlockContent: NamedExoticComponent<    {}>;
 
 // @public (undocumented)
 export interface EditorBlockProps {
-    // (undocumented)
     alternate?: ReactNode;
-    // (undocumented)
     children: ReactNode;
-    // (undocumented)
     label: ReactNode;
-    // (undocumented)
     name: string;
 }
 
@@ -140,10 +135,10 @@ export interface EditorInlineToolbarProps {
 export interface HTMLTextAreaDivTargetProps extends TextareaHTMLAttributes<HTMLDivElement> {
 }
 
-// @public (undocumented)
-export const RichTextField: React_2.NamedExoticComponent<RichTextFieldProps>;
+// @public
+export const RichTextField: NamedExoticComponent<RichTextFieldProps>;
 
-// @public (undocumented)
+// @public
 export const richTextFieldPlugins: EditorPlugin_2[];
 
 // Warning: (ae-forgotten-export) The symbol "FormContainerProps" needs to be exported by the entry point index.d.ts
@@ -159,7 +154,7 @@ export type RichTextRendererProps = {
     field: SugaredRelativeSingleField['field'];
 } & Omit<RichTextFieldRendererProps, 'source'>;
 
-// @public (undocumented)
+// @public
 export const RichTextView: NamedExoticComponent<RichTextRendererProps>;
 
 // (No @packageDocumentation comment for this package)

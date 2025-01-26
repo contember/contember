@@ -8,19 +8,24 @@ import { JSX as JSX_2 } from 'react/jsx-runtime';
 import { ReactNode } from 'react';
 import { RoutingLinkTarget } from '@contember/interface';
 
-// @public (undocumented)
-export const BackButton: ({ label }: BackButtonProps) => JSX_2.Element;
+// @public
+export const BackButton: ({ label, children }: BackButtonProps) => JSX_2.Element;
 
 // @public (undocumented)
 export type BackButtonProps = {
     label?: string;
+    children?: ReactNode;
 };
 
+// @public
+export const LinkBackButton: ({ children, label, to }: LinkBackButtonProps) => JSX_2.Element;
+
 // @public (undocumented)
-export const LinkBackButton: ({ children, to }: {
-    children: ReactNode;
+export type LinkBackButtonProps = {
+    children?: ReactNode;
+    label: ReactNode;
     to: RoutingLinkTarget;
-}) => JSX_2.Element;
+};
 
 // (No @packageDocumentation comment for this package)
 

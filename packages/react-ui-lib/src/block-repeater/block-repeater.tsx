@@ -1,4 +1,11 @@
-import { Component, DeleteEntityTrigger, PersistTrigger, StaticRender, SuccessfulPersistResult, useEntity } from '@contember/interface'
+import {
+	Component,
+	DeleteEntityTrigger,
+	PersistTrigger,
+	StaticRender,
+	SuccessfulPersistResult,
+	useEntity,
+} from '@contember/interface'
 import {
 	BlockRepeater,
 	BlockRepeaterAddItemTrigger,
@@ -49,22 +56,25 @@ const BlockRepeaterContentWrapperUI = uic('div', {
 	baseClass: 'flex flex-col gap-2',
 })
 
-export type DefaultBlockRepeaterProps =
-	& BlockRepeaterProps
+/**
+ * Props for {@link DefaultBlockRepeater} component.
+ */
+export type DefaultBlockRepeaterProps = BlockRepeaterProps
 
 const [BlockRepeaterEditModeContext, useBlockRepeaterEditMode] = createRequiredContext<boolean>('BlockRepeaterEditMode')
 
 /**
- *  The `DefaultBlockRepeater` component is a versatile and customizable block repeater shipped with a UI.
- *  It allows for the creation and management of repeatable content blocks within a form.
+ * `DefaultBlockRepeater` component is a versatile and customizable block repeater shipped with a UI.
+ * It allows for the creation and management of repeatable content blocks within a form.
+ *
  * Supports two modes of operation:
  *   - **Inline Edit Mode**: By providing only `children`, the blocks can be edited inline.
  *   - **Dual-Mode**: By providing both `form` and `children`, the component supports a dual-mode where blocks can be edited in a separate form view.
  *
- * ## Props {@link DefaultBlockRepeaterProps}
+ * #### Props {@link DefaultBlockRepeaterProps}
  * - field or entities, sortableBy, discriminationField, children
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <DefaultBlockRepeater field="blocks" sortableBy="order" discriminationField="type">
  *   <Block
@@ -266,11 +276,7 @@ const BlockRepeaterEditSheetInner = ({ open, setOpen }: { open: boolean; setOpen
 						{block.label}
 						<DeleteEntityTrigger>
 							<SheetClose asChild>
-								<Button
-									variant="destructive"
-									className="ml-auto"
-									size="sm"
-								>
+								<Button variant="destructive" className="ml-auto" size="sm">
 									<TrashIcon className="w-3 h-3" />
 								</Button>
 							</SheetClose>

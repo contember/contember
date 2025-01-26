@@ -58,6 +58,24 @@ const builtInStorages = {
 
 export type StateStorageOrName = StateStorage | 'url' | 'session' | 'local' | 'null'
 
+/**
+ * Provides a persistent state using different storage options (URL, sessionStorage, localStorage, or custom storage).
+ *
+ * This hook allows storing state in different storage mechanisms and retrieves it upon initialization.
+ * It also updates the storage whenever the state is changed.
+ *
+ * #### Example: Using session storage
+ * ```tsx
+ * const [count, setCount] = useSessionStorageState(['app', 'counter'], storedValue => storedValue ?? 0);
+ *
+ * return (
+ *   <div>
+ *     <p>Count: {count}</p>
+ *     <button onClick={() => setCount(prev => prev + 1)}>Increment</button>
+ *   </div>
+ * );
+ * ```
+ */
 export const useStoredState = <V extends Serializable>(storageOrName: StateStorageOrName | StateStorageOrName[], key: StateStorageKey, initializeValue: ValueInitializer<V>): [V, SetState<V>] => {
 	const storage = useMemo(() => {
 		return getStateStorage(storageOrName)
@@ -79,10 +97,26 @@ export const useStoredState = <V extends Serializable>(storageOrName: StateStora
 	]
 }
 
+/**
+ * A specialized hook for persisting state in sessionStorage.
+ *
+ * #### Example: Using session storage
+ * ```tsx
+ * const [theme, setTheme] = useSessionStorageState(['app', 'theme'], storedValue => storedValue ?? 'light');
+ * ```
+ */
 export const useSessionStorageState = <V extends Serializable>(key: StateStorageKey, initializeValue: ValueInitializer<V>): [V, SetState<V>] => {
 	return useStoredState<V>(sessionStateStorage, key, initializeValue)
 }
 
+/**
+ * A specialized hook for persisting state in localStorage.
+ *
+ * #### Example: Using local storage
+ * ```tsx
+ * const [username, setUsername] = useLocalStorageState(['user', 'name'], storedValue => storedValue ?? 'Guest');
+ * ```
+ */
 export const useLocalStorageState = <V extends Serializable>(key: StateStorageKey, initializeValue: ValueInitializer<V>): [V, SetState<V>] => {
 	return useStoredState<V>(localStateStorage, key, initializeValue)
 }

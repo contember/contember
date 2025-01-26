@@ -4,18 +4,6 @@ import { Loader } from '../ui/loader'
 import { NavigationGuardDialog } from './navigation-guard-dialog'
 import { usePersistErrorHandler } from './hooks'
 
-export const Binding = ({ children }: {
-	children: ReactNode
-}) => {
-	return (
-		<DataBindingProvider stateComponent={BindingStateRenderer}>
-			<NavigationGuardDialog />
-			<PersistErrorHandler />
-			{children}
-		</DataBindingProvider>
-	)
-}
-
 const PersistErrorHandler = () => {
 	useDataBindingEvent('persistError', usePersistErrorHandler())
 	return null
@@ -26,8 +14,7 @@ export interface BindingStateRendererProps {
 	children?: ReactNode
 }
 
-
-function BindingStateRenderer({ accessorTreeState, children }: BindingStateRendererProps) {
+const BindingStateRenderer = ({ accessorTreeState, children }: BindingStateRendererProps) => {
 	useEffect(() => {
 		if (accessorTreeState.name === 'error' && accessorTreeState.error.type === 'unauthorized') {
 			const backlink = window.location.pathname + window.location.search
@@ -53,3 +40,39 @@ function BindingStateRenderer({ accessorTreeState, children }: BindingStateRende
 	return <>{children}</>
 }
 
+/**
+ * Props for the {@link Binding} component.
+ */
+export type BindingProps = {
+	/**
+	 * The content to be wrapped by the Binding component.
+	 */
+	children: ReactNode
+}
+
+/**
+ * Props {@link BindingProps}.
+ *
+ * `Binding` component - Core data management wrapper for Contember applications
+ *
+ * #### Subcomponents
+ * - {@link NavigationGuardDialog}: Prevents accidental navigation with unsaved changes
+ *
+ * #### Example
+ * ```tsx
+ * <Binding>
+ *   <EntitySubTree entity="Article(id: $id)">
+ *     <ArticleForm />
+ *   </EntitySubTree>
+ * </Binding>
+ * ```
+ */
+export const Binding = ({ children }: BindingProps) => {
+	return (
+		<DataBindingProvider stateComponent={BindingStateRenderer}>
+			<NavigationGuardDialog />
+			<PersistErrorHandler />
+			{children}
+		</DataBindingProvider>
+	)
+}

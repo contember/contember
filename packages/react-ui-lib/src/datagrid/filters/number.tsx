@@ -28,15 +28,15 @@ export type DataGridNumberFilterProps =
 	& {
 		label: ReactNode
 	}
+
 /**
- * Number filter for DataGrid with default UI.
+ * Props {@link DataGridNumberFilterProps}
  *
- * ## Props {@link DataGridNumberFilterProps}
- * field, label, ?name
+ * `DataGridNumberFilter` provides a number filter UI for `DataGrid`, allowing users to filter numerical values efficiently.
  *
  * ## Example
  * ```tsx
- * <DataGridNumberFilter field={'views'} label="Views" />
+ * <DataGridNumberFilter field="views" label="Views" />
  * ```
  */
 export const DataGridNumberFilter = Component(({ label, ...props }: DataGridNumberFilterProps) => (

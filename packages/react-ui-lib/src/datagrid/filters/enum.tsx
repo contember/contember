@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { ReactNode, useCallback } from 'react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../../ui/tooltip'
 import {
@@ -31,82 +30,130 @@ import { DataViewFieldLabel } from '../labels'
 /**
  * Props for {@link DataGridEnumFilter}.
  */
-export type DataGridEnumFilterProps =
-	& Omit<DataViewEnumFilterProps, 'children'>
-	& {
-		options?: Record<string, ReactNode>
-		label?: ReactNode
-	}
+export interface DataGridEnumFilterProps extends Omit<DataViewEnumFilterProps, 'children'> {
+	/**
+	 * Options for the filter.
+	 */
+	options?: Record<string, ReactNode>
+	/**
+	 * Label for the filter.
+	 */
+	label?: ReactNode
+}
 
 /**
- * Enum filter for DataGrid with default UI.
+ * Props {@link DataGridEnumFilterProps}
  *
- * ## Props {@link DataGridEnumFilterProps}
- * field, label, ?name, ?options
+ * `DataGridEnumFilter` is an enum-based filter component for `DataGrid` with a default UI.
+ * It allows filtering records based on predefined enum values.
  *
- * ## Example
+ * #### Example: Basic usage
  * ```tsx
- * <DataGridEnumFilter field={'status'} />
+ * <DataGridEnumFilter field="status" />
+ * ```
+ *
+ * #### Example: With custom enum options
+ * ```tsx
+ * <DataGridEnumFilter
+ *   field="status"
+ *   options={[
+ *     { value: 'active', label: 'Active' },
+ *     { value: 'inactive', label: 'Inactive' }
+ *   ]}
+ * />
  * ```
  */
-export const DataGridEnumFilter = Component(({ options, label, ...props }: DataGridEnumFilterProps) =>
-	(
-		<DataViewEnumFilter {...props}>
-			<DataGridFilterMobileHiding>
-				<DataGridSingleFilterUI>
-					<DataGridEnumFilterSelect options={options} label={label ?? <DataViewFieldLabel field={props.field} />} />
-					<DataGridEnumFilterList options={options} />
-				</DataGridSingleFilterUI>
-			</DataGridFilterMobileHiding>
-		</DataViewEnumFilter>
-	))
+export const DataGridEnumFilter = Component(({ options, label, ...props }: DataGridEnumFilterProps) => (
+	<DataViewEnumFilter {...props}>
+		<DataGridFilterMobileHiding>
+			<DataGridSingleFilterUI>
+				<DataGridEnumFilterSelect options={options} label={label ?? <DataViewFieldLabel field={props.field} />} />
+				<DataGridEnumFilterList options={options} />
+			</DataGridSingleFilterUI>
+		</DataGridFilterMobileHiding>
+	</DataViewEnumFilter>
+))
 
 
 /**
  * Props for {@link DataGridEnumListFilter}.
  */
-export type DataGridEnumListFilterProps =
-	& Omit<DataViewEnumFilterProps, 'children'>
-	& {
-		options?: Record<string, ReactNode>
-		label?: ReactNode
-	}
-
+export interface DataGridEnumListFilterProps extends Omit<DataViewEnumFilterProps, 'children'> {
+	/**
+	 * Options for the filter.
+	 */
+	options?: Record<string, ReactNode>
+	/**
+	 * Label for the filter.
+	 */
+	label?: ReactNode
+}
 
 /**
- * Enum list filter for DataGrid with default UI.
+ * Props {@link DataGridEnumListFilterProps}
  *
- * ## Props {@link DataGridEnumListFilterProps}
- * field, label, ?name, ?options
+ * `DataGridEnumListFilter` is a multi-select enum filter component for `DataGrid` with a default UI.
+ * It allows filtering records by selecting multiple predefined enum values.
  *
- * ## Example
+ * - Wraps `DataViewEnumListFilter` to handle multi-selection filtering.
+ * - Uses `DataGridSingleFilterUI` for a structured filter layout.
+ * - Supports custom labels or defaults to the field's label.
+ * - Accepts an `options` prop to define available enum values.
+ *
+ * #### Example: Basic usage
  * ```tsx
- * <DataGridEnumFilter field={'status'} />
+ * <DataGridEnumListFilter field="status" />
+ * ```
+ *
+ * #### Example: With custom enum options
+ * ```tsx
+ * <DataGridEnumListFilter
+ *   field="status"
+ *   options={[
+ *     { value: 'active', label: 'Active' },
+ *     { value: 'inactive', label: 'Inactive' },
+ *     { value: 'pending', label: 'Pending' }
+ *   ]}
+ * />
  * ```
  */
-export const DataGridEnumListFilter = Component(({ options, label, ...props }: DataGridEnumListFilterProps) =>
-	(
-		<DataViewEnumListFilter {...props}>
-			<DataGridFilterMobileHiding>
-				<DataGridSingleFilterUI>
-					<DataGridEnumFilterSelect options={options} label={label ?? <DataViewFieldLabel field={props.field} />} />
-					<DataGridEnumFilterList options={options} />
-				</DataGridSingleFilterUI>
-			</DataGridFilterMobileHiding>
-		</DataViewEnumListFilter>
-	))
+export const DataGridEnumListFilter = Component(({ options, label, ...props }: DataGridEnumListFilterProps) => (
+	<DataViewEnumListFilter {...props}>
+		<DataGridFilterMobileHiding>
+			<DataGridSingleFilterUI>
+				<DataGridEnumFilterSelect options={options} label={label ?? <DataViewFieldLabel field={props.field} />} />
+				<DataGridEnumFilterList options={options} />
+			</DataGridSingleFilterUI>
+		</DataGridFilterMobileHiding>
+	</DataViewEnumListFilter>
+))
 
 
 /**
  * Props for {@link DataGridEnumFieldTooltip}.
  */
 export type DataGridEnumFieldTooltipProps = Omit<DataViewEnumFilterProps, 'children'>
+
 /**
- * Component for rendering a value with a tooltip that allows to include/exclude the value from the filter.
- * Used in {@link DataGridEnumColumn} but can be used in custom columns as well.
+ * Props {@link DataGridEnumFieldTooltipProps}
  *
- * ## Props {@link DataGridEnumFieldTooltipProps}
- * field, label, ?name, ?options
+ * `DataGridEnumFieldTooltip` renders a value with a tooltip that allows users to include or exclude
+ * the value from the filter. It is primarily used in {@link DataGridEnumColumn}, but can be
+ * utilized in custom columns as well.
+ *
+ * #### Example: Basic usage inside a custom column
+ * ```tsx
+ * <DataGridEnumFieldTooltip value="active">
+ *   <span>Active</span>
+ * </DataGridEnumFieldTooltip>
+ * ```
+ *
+ * #### Example: With additional actions
+ * ```tsx
+ * <DataGridEnumFieldTooltip value="inactive" actions={<CustomActionButton />}>
+ *   <span>Inactive</span>
+ * </DataGridEnumFieldTooltip>
+ * ```
  */
 export const DataGridEnumFieldTooltip = ({ children, actions, value, ...props }: DataGridEnumFieldTooltipProps & { children: ReactNode; value: string; actions?: ReactNode }) => (
 	<DataViewEnumFilter {...props}>
@@ -131,11 +178,9 @@ export const DataGridEnumFieldTooltip = ({ children, actions, value, ...props }:
 	</DataViewEnumFilter>
 )
 
-
-const DataGridEnumFilterList = ({ options }: {
-	options?: Record<string, ReactNode>
-}) => {
+const DataGridEnumFilterList = ({ options }: { options?: Record<string, ReactNode> }) => {
 	const resolvedOptions = useEnumOptions(options)
+
 	return (
 		<>
 			{Object.entries(resolvedOptions).map(([value, label]) => (
@@ -154,49 +199,45 @@ const DataGridEnumFilterList = ({ options }: {
 		</>
 	)
 }
-const DataGridEnumFilterSelectItem = ({ value, children, filterFactory }: {
+
+type DataGridEnumFilterSelectItemProps = {
 	value: string
 	children: ReactNode
 	filterFactory: (value: string) => UseDataViewEnumFilter
-}) => {
+}
 
+const DataGridEnumFilterSelectItem = ({ value, children, filterFactory }: DataGridEnumFilterSelectItemProps) => {
 	const [current, setFilter] = filterFactory(value)
 	const include = useCallback(() => setFilter('toggleInclude'), [setFilter])
 	const exclude = useCallback(() => setFilter('toggleExclude'), [setFilter])
 	const isIncluded = current === 'include'
-
 	const isExcluded = current === 'exclude'
+
 	return (
 		<DataGridFilterSelectItemUI onExclude={exclude} onInclude={include} isExcluded={isExcluded} isIncluded={isIncluded}>
 			{children}
 		</DataGridFilterSelectItemUI>
 	)
+}
 
-}
-const DataGridEnumFilterSelect = ({  options, label }: {
-	options?: Record<string, ReactNode>
-	label?: ReactNode
-}) => {
-	return (
-		<Popover>
-			<PopoverTrigger asChild>
-				<DataGridFilterSelectTriggerUI>{label}</DataGridFilterSelectTriggerUI>
-			</PopoverTrigger>
-			<PopoverContent className="p-2">
-				<DataGridEnumFilterControls options={options} />
-			</PopoverContent>
-		</Popover>
-	)
-}
+const DataGridEnumFilterSelect = ({ options, label }: { options?: Record<string, ReactNode>; label?: ReactNode }) => (
+	<Popover>
+		<PopoverTrigger asChild>
+			<DataGridFilterSelectTriggerUI>{label}</DataGridFilterSelectTriggerUI>
+		</PopoverTrigger>
+		<PopoverContent className="p-2">
+			<DataGridEnumFilterControls options={options} />
+		</PopoverContent>
+	</Popover>
+)
 
 /**
  * @internal
  */
-export const DataGridEnumFilterControls = ({ options }: {
-	options?: Record<string, ReactNode>
-}) => {
+export const DataGridEnumFilterControls = ({ options }: { options?: Record<string, ReactNode> }) => {
 	const filterFactory = useDataViewEnumFilterFactory(useDataViewFilterName())
 	const resolvedOptions = useEnumOptions(options)
+
 	return (
 		<div className={'relative flex flex-col gap-2'}>
 			{Object.entries(resolvedOptions).map(([value, label]) => (
@@ -212,5 +253,6 @@ export const DataGridEnumFilterControls = ({ options }: {
 const useEnumOptions = (preferred: Record<string, ReactNode> | undefined): Record<string, ReactNode> => {
 	const enumOptionsProvider = useEnumOptionsFormatter()
 	const enumName = useDataViewEnumFilterArgs().enumName
+
 	return preferred ?? enumOptionsProvider(enumName)
 }

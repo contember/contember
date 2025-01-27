@@ -1,11 +1,10 @@
-import { DataView, DataViewProps } from '@contember/react-dataview'
-import * as React from 'react'
-import { ReactNode } from 'react'
 import { Component } from '@contember/interface'
-import { DataGridToolbar } from './toolbar'
+import { DataView, DataViewProps } from '@contember/react-dataview'
+import { ReactNode } from 'react'
 import { DataGridLoader } from './loader'
-import { DataGridTable } from './table'
 import { DataGridPagination } from './pagination'
+import { DataGridTable } from './table'
+import { DataGridToolbar } from './toolbar'
 
 /**
  * Props for {@link DataGrid}.
@@ -109,7 +108,7 @@ export type DefaultDataGridProps =
 export const DefaultDataGrid = Component(({ children, toolbar, ...props }: DefaultDataGridProps) => {
 	return (
 		<DataGrid {...props}>
-			<DataGridToolbar>
+			<DataGridToolbar sticky>
 				{toolbar}
 			</DataGridToolbar>
 
@@ -119,7 +118,7 @@ export const DefaultDataGrid = Component(({ children, toolbar, ...props }: Defau
 				</DataGridTable>
 			</DataGridLoader>
 
-			<DataGridPagination />
+			<DataGridPagination sticky />
 		</DataGrid>
 	)
 })

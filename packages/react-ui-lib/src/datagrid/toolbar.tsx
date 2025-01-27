@@ -1,25 +1,28 @@
 import { Component } from '@contember/interface'
+import { DataViewReloadTrigger } from '@contember/react-dataview'
+import { dataAttribute } from '@contember/utilities'
+import { FilterIcon, RefreshCcwIcon, SettingsIcon } from 'lucide-react'
 import * as React from 'react'
 import { ReactNode } from 'react'
-import { DataGridShowFiltersContext } from './filters/mobile'
-import { DataGridToolbarUI } from './ui'
+import { dict } from '../dict'
 import { Button } from '../ui/button'
-import { FilterIcon, RefreshCcwIcon, SettingsIcon } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
+import { DataGridToolbarVisibleElements } from './elements'
+import { DataGridAutoExport } from './export'
+import { DataGridQueryFilter } from './filters'
+import { DataGridShowFiltersContext } from './filters/mobile'
 import { DataGridLayoutSwitcher } from './layout-switcher'
 import { DataGridPerPageSelector } from './pagination'
-import { DataGridQueryFilter } from './filters'
-import { dataAttribute } from '@contember/utilities'
-import { dict } from '../dict'
-import { DataGridAutoExport } from './export'
-import { DataGridToolbarVisibleElements } from './elements'
-import { DataViewReloadTrigger } from '@contember/react-dataview'
+import { DataGridToolbarUI } from './ui'
 
 /**
  * Props for the {@link DataGridToolbar} component.
  */
 export interface DataGridToolbarProps {
 	children?: ReactNode
+
+	// UI props from DataGridToolbarUI
+	sticky?: boolean
 }
 
 /**
@@ -38,16 +41,17 @@ export interface DataGridToolbarProps {
  * </DataGridToolbar>
  * ```
  */
-export const DataGridToolbar = Component<DataGridToolbarProps>(({ children }) => {
+export const DataGridToolbar = Component<DataGridToolbarProps>(({ children, sticky }) => {
 	const [showFilters, setShowFilters] = React.useState(false)
+
 	return (
 		<DataGridShowFiltersContext.Provider value={showFilters}>
-			<DataGridToolbarUI>
+			<DataGridToolbarUI sticky={sticky}>
 				<div className="ml-auto flex gap-2 items-center sm:order-1">
 					<Button
-						variant={'outline'}
-						size={'sm'}
-						className={'gap-2 sm:hidden data-[active]:bg-gray-50 data-[active]:shadow-inner'}
+						variant="outline"
+						size="sm"
+						className="gap-2 sm:hidden data-[active]:bg-gray-50 data-[active]:shadow-inner"
 						data-active={dataAttribute(showFilters)}
 						onClick={() => setShowFilters(!showFilters)}
 					>
@@ -56,8 +60,8 @@ export const DataGridToolbar = Component<DataGridToolbarProps>(({ children }) =>
 
 					<Popover>
 						<PopoverTrigger asChild>
-							<Button variant={'outline'} size={'sm'} className={'gap-2'}>
-								<SettingsIcon className={'w-4 h-4'} />
+							<Button variant="outline" size="sm" className="gap-2">
+								<SettingsIcon className="w-4 h-4" />
 							</Button>
 						</PopoverTrigger>
 						<PopoverContent className="w-64">
@@ -72,8 +76,8 @@ export const DataGridToolbar = Component<DataGridToolbarProps>(({ children }) =>
 
 					<DataGridAutoExport />
 					<DataViewReloadTrigger>
-						<Button variant={'outline'} size={'sm'} className={'group gap-2'}>
-							<RefreshCcwIcon className={'w-4 h-4 group-data-[state=refreshing]:animate-spin '} />
+						<Button variant="outline" size="sm" className="group gap-2">
+							<RefreshCcwIcon className="w-4 h-4 group-data-[state=refreshing]:animate-spin " />
 						</Button>
 					</DataViewReloadTrigger>
 				</div>

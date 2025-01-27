@@ -20,6 +20,7 @@
     "@contember/schema-definition": "workspace:*",
     "@contember/schema-utils": "workspace:*",
     "@contember/utilities": "workspace:*",
+    "@contember/vite-plugin": "workspace:*",
     "@faker-js/faker": "^9.0.3",
     "@radix-ui/react-separator": "^1.1.0",
     "@radix-ui/react-toolbar": "^1.1.0",

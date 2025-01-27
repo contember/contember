@@ -50,7 +50,11 @@ export function contember(options?: ContemberOptions): Plugin {
 			? undefined
 			: {
 				order: 'post',
-				handler: html => {
+				handler: (html, ctx) => {
+					if (ctx.server && options?.buildVersion !== true) {
+						return { html, tags: [] }
+					}
+
 					const fileHash = createHash('md5').update(html).digest().toString('hex')
 					return ({
 						html,
@@ -69,3 +73,5 @@ export function contember(options?: ContemberOptions): Plugin {
 			},
 	})
 }
+
+export default contember

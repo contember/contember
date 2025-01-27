@@ -1,7 +1,6 @@
-
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-	content: ['./**/*.{html,js,tsx,ts}', '../react-ui-lib/src/**/*.{html,js,tsx,ts}'],
+	content: ['./admin/**/*.{html,js,tsx,ts}', '../react-ui-lib/src/**/*.{html,js,tsx,ts}'],
 	darkMode: ['class'],
 	theme: {
 		container: {
@@ -45,6 +44,16 @@ module.exports = {
 				card: {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))',
+				},
+				sidebar: {
+					'DEFAULT': 'hsl(var(--sidebar-background))',
+					'foreground': 'hsl(var(--sidebar-foreground))',
+					'primary': 'hsl(var(--sidebar-primary))',
+					'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
+					'accent': 'hsl(var(--sidebar-accent))',
+					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
+					'border': 'hsl(var(--sidebar-border))',
+					'ring': 'hsl(var(--sidebar-ring))',
 				},
 			},
 			borderRadius: {

@@ -12,6 +12,7 @@ export const [, Slots, SlotTargets] = createSlotComponents([
 	'ContentHeader',
 	'Sidebar',
 	'Actions',
+	'UserNavigation',
 ])
 export const Title = memo<{ children: ReactNode }>(({ children }) => {
 	const titleText = useChildrenAsLabel(children)

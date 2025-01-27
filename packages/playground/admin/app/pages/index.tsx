@@ -1,4 +1,4 @@
-import { Binding } from '~/lib/binding'
+import { Binding, PersistButton } from '~/lib/binding'
 import { Slots } from '~/lib/layout'
 
 export default () => (

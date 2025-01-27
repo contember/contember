@@ -21,7 +21,8 @@
         "typescript": "./src/index.ts",
         "default": "./dist/production/index.cjs"
       }
-    }
+    },
+    "./src": "./src/index.ts"
   },
   "typings": "./dist/types/index.d.ts",
   "peerDependencies": {

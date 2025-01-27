@@ -1,12 +1,15 @@
-import * as React from 'react'
-import { ReactNode } from 'react'
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu'
 import { Check, ChevronRight, Circle, MoreHorizontalIcon } from 'lucide-react'
-import { cn, uic } from '../utils'
-import { buttonConfig } from './button'
+import * as React from 'react'
+import { ReactNode } from 'react'
+import { uic } from '../utils'
 import { createComponentOpenHooks } from '../utils/createComponentOpenHooks'
+import { buttonConfig } from './button'
 
-export const { Component: DropdownMenu, useOpen: useDropdownMenuOpenState } = createComponentOpenHooks(DropdownMenuPrimitive.Root)
+export const {
+	Component: DropdownMenu,
+	useOpen: useDropdownMenuOpenState,
+} = createComponentOpenHooks(DropdownMenuPrimitive.Root)
 
 export const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger
 
@@ -85,7 +88,7 @@ export const DropdownMenuShortcut = uic('span', {
 
 export const DropDownTriggerButton = uic('button', {
 	...buttonConfig,
-	baseClass: cn(buttonConfig.baseClass, ' flex h-8 w-8 p-0 data-[state=open]:bg-muted'),
+	baseClass: [buttonConfig.baseClass, 'flex h-8 w-8 p-0 data-[state=open]:bg-muted'],
 	defaultVariants: {
 		variant: 'ghost',
 	},
@@ -96,14 +99,13 @@ export const DropDownTriggerButton = uic('button', {
 	</>,
 })
 
-export const DefaultDropdown = ({ children }: {
-	children: ReactNode
-}) => (<DropdownMenu>
-	<DropdownMenuTrigger asChild>
-		<DropDownTriggerButton />
-	</DropdownMenuTrigger>
-	<DropdownMenuContent className="w-[160px]">
-		{children}
-	</DropdownMenuContent>
-</DropdownMenu>
+export const DefaultDropdown = ({ children }: { children: ReactNode }) => (
+	<DropdownMenu>
+		<DropdownMenuTrigger asChild>
+			<DropDownTriggerButton />
+		</DropdownMenuTrigger>
+		<DropdownMenuContent className="w-[160px]">
+			{children}
+		</DropdownMenuContent>
+	</DropdownMenu>
 )

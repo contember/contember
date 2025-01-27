@@ -1,11 +1,35 @@
-import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon, ChevronsLeftIcon, ChevronsRightIcon, Loader2Icon } from 'lucide-react'
-
-import { Button } from '../ui/button'
-import { DataViewChangePageTrigger, DataViewPagingStateView, DataViewSetItemsPerPageTrigger } from '@contember/react-dataview'
+import {
+	DataViewChangePageTrigger,
+	DataViewPagingStateView,
+	DataViewSetItemsPerPageTrigger,
+} from '@contember/react-dataview'
 import { DropdownMenu } from '@radix-ui/react-dropdown-menu'
+import {
+	ChevronDownIcon,
+	ChevronLeftIcon,
+	ChevronRightIcon,
+	ChevronsLeftIcon,
+	ChevronsRightIcon,
+	Loader2Icon,
+} from 'lucide-react'
+import { FC } from 'react'
+import { dict, dictFormat } from '../dict'
+import { Button } from '../ui/button'
 import { DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown'
-import { dictFormat } from '../dict'
-import { dict } from '../dict'
+import { uic } from '../utils'
+
+const PaginationWrapper = uic('div', {
+	baseClass: 'flex gap-6 lg:gap-8 items-center justify-between mt-4 pb-4',
+	variants: {
+		sticky: {
+			true: 'sticky bottom-0 z-50 bg-white pt-4 border-t border-gray-200',
+		},
+	},
+})
+
+interface DataGridPaginationProps {
+	sticky?: boolean
+}
 
 /**
  * Pagination controls UI for DataView.
@@ -15,12 +39,12 @@ import { dict } from '../dict'
  * <DataGridPagination />
  * ```
  */
-export const DataGridPagination = () => (
-	<div className="flex gap-6 lg:gap-8 justify-between mt-4">
-		<div className="">
+export const DataGridPagination: FC<DataGridPaginationProps> = ({ sticky }) => (
+	<PaginationWrapper sticky={sticky}>
+		<div>
 			<DataViewPagingStateView render={it => <>
-				<div className={'flex gap-2 items-center'}>
-					<div className={'font-normal text-sm text-gray-500'}>
+				<div className="flex gap-2 items-center">
+					<div className="font-normal text-sm text-gray-500">
 						{it.totalCount === undefined ? <Loader2Icon className="animate-spin h-3 w-3 inline-block" />
 							: dictFormat(dict.datagrid.pageRowsCount, {
 								totalCount: it.totalCount.toString(),
@@ -32,8 +56,8 @@ export const DataGridPagination = () => (
 		</div>
 		<div className="flex items-center space-x-2">
 			<DataViewPagingStateView render={it => <>
-				<div className={'flex gap-2 items-center'}>
-					<div className={'text-sm'}>
+				<div className="flex gap-2 items-center">
+					<div className="text-sm">
 						{dictFormat(it.pagesCount !== undefined ? dict.datagrid.pageInfo : dict.datagrid.pageInfoShort, {
 							page: (it.pageIndex + 1).toString(),
 							pagesCount: it.pagesCount?.toString() ?? '',
@@ -78,7 +102,7 @@ export const DataGridPagination = () => (
 				</Button>
 			</DataViewChangePageTrigger>
 		</div>
-	</div>
+	</PaginationWrapper>
 )
 
 

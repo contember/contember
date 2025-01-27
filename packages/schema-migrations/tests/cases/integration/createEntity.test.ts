@@ -148,3 +148,54 @@ describe('create a view', () => testMigrations({
 	],
 	sql: SQL`CREATE VIEW "author" AS SELECT null as id, 'John' AS name;`,
 }))
+
+namespace SchemaWithCustomIdName {
+	export class Author {
+		id = def.uuidColumn().notNull().columnName('author_id')
+		name = def.stringColumn()
+	}
+}
+describe('custom primary key name', () => testMigrations({
+	original: {},
+	updated: createSchema(SchemaWithCustomIdName),
+	diff: [
+		{
+			modification: 'createEntity',
+			entity: {
+				fields: {
+					id: {
+						columnName: 'author_id',
+						name: 'id',
+						nullable: false,
+						type: Model.ColumnType.Uuid,
+						columnType: 'uuid',
+					},
+				},
+				name: 'Author',
+				primary: 'id',
+				primaryColumn: 'author_id',
+				tableName: 'author',
+				unique: [],
+				eventLog: {
+					enabled: true,
+				},
+				indexes: [],
+			},
+		},
+		{
+			modification: 'createColumn',
+			entityName: 'Author',
+			field: {
+				columnName: 'name',
+				name: 'name',
+				nullable: true,
+				type: Model.ColumnType.String,
+				columnType: 'text',
+			},
+		},
+	],
+	sql: SQL`CREATE TABLE "author" ( "author_id" uuid PRIMARY KEY NOT NULL ); 
+CREATE TRIGGER "log_event" AFTER INSERT OR UPDATE OR DELETE ON "author" FOR EACH ROW EXECUTE PROCEDURE "system"."trigger_event"($pga$author_id$pga$); 
+CREATE CONSTRAINT TRIGGER "log_event_trx" AFTER INSERT OR UPDATE OR DELETE ON "author" DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE PROCEDURE "system"."trigger_event_commit"(); 
+ALTER TABLE "author" ADD "name" text;`,
+}))

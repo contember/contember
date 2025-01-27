@@ -36,7 +36,7 @@ A variable is defined for a certain *role* and is injected into a predicate at e
 2. **Predefined variables**
 
 - Built-in variables `identityID` and `personID`
-- You can define your own references to these IDs using `createPredefinedVariable` (e.g., `personID` → `'person'`).
+- You can define your own references to these IDs using `createPredefinedVariable`
 
 3. **Condition variables**
 
@@ -44,7 +44,9 @@ A variable is defined for a certain *role* and is injected into a predicate at e
 
 All variable values are managed via the [Tenant API Memberships](/reference/engine/tenant/memberships.md) or the “Assume Membership” feature.
 
+:::note
 After changing ACL definitions, remember to create and apply a migration.
+:::
 
 ---
 
@@ -61,7 +63,8 @@ Creates a named role in your schema. You use the `roleName` in the [Tenant API f
     - `tenant`: permissions in the Tenant API (like `invite`, `manage`, etc.)
     - `system`: permissions in the System API (like `history`)
     - `stages`: by default `'*'`, meaning all stages
-    - `debug`, `s3`, or any other custom properties you want to store in the ACL
+    - `debug`: allows debugging GraphQL queries 
+    - `s3`, see [S3 ACL](/reference/engine/content/s3)
 
 - **Example**:
 
@@ -129,7 +132,7 @@ Defines a variable referencing a **built-in** value (`identityID` or `personID`)
 
 ### `createConditionVariable(variableName, roleOrRoles[, fallback])`
 
-Defines a **condition variable** that can store an arbitrary complex condition (e.g., date range or numeric bounds). The condition must be passed as a serialized JSON via Tenant API membership or “Assume Membership”.
+Defines a **condition variable** that can store an arbitrary complex condition (e.g., date range or numeric bounds). The condition must be passed as a serialized JSON via Tenant API membership or using [assume membership](/reference/engine/content/advanced/assume-membership).
 
 - **Arguments**
 
@@ -148,8 +151,6 @@ Defines a **condition variable** that can store an arbitrary complex condition (
     readerRole
   )
   ```
-
----
 
 ## Applying ACL Rules with the `@c.Allow` Decorator
 
@@ -179,7 +180,7 @@ Most of the time, you will declare ACL rules directly in your schema using the `
 - **`roleOrRoles`**: A single role (e.g., `editorRole`) or an array of roles.
 - **`when`** (optional): A predicate (filter condition) that must be true for this rule to apply.
   - If you define multiple `@c.Allow` decorators with different `when`, they are combined with logical `OR`.
-- `**,**** **`\*\*\*\*\*\*, \*\*\*\*\*\***`create`**:
+- **`read`, `update`, `create`**: Specifies which fields are allowed for the given operation.
   - `true` means “all fields.”
   - A string[] means “these specific fields.”
   - If omitted or `false`, the operation is disallowed by this rule (but can still be granted by another rule).
@@ -187,6 +188,7 @@ Most of the time, you will declare ACL rules directly in your schema using the `
 - **`through`**:
   - If `true`, means that *root-level* access for the operation is **disallowed**, but the operation is still allowed **through relations**.
   - If you set `through: true`, you are effectively restricting direct queries (like listBook) or direct mutations (e..g updateBook) on the root. However, you can still access this entity if you traverse from a parent entity that *does* allow a root-level operation.
+  - You cannot mix "through" for the same operation in a conflicting way
 
 #### Multiple `@c.Allow` Decorators
 
@@ -297,9 +299,6 @@ export class Product {
 - `update` of `name` is **not** allowed at the root query/mutation because `through: true` prevents direct updates.
 - If an upstream entity relation to `Product` is allowed to update it, then the user can update `name` **through** that relation—provided the `category` is `isActive: true` or `isActive: false`.
 
-> **Important:** If you define some rules that allow an operation at the root, and others that only allow it “through,” the more permissive set effectively controls the final outcome. You cannot “mix” them for the same operation in a conflicting way (or you’ll get a schema error).
-
----
 
 ## `@c.AllowCustomPrimary`
 
@@ -323,40 +322,6 @@ export class Order {
 - This example enables the client to specify the `id` of an `Order` when creating or updating it.
 - No additional ACL rules are required to allow this behavior.
 
----
-
-## Operations Overview
-
-In Contember’s ACL, the main operations are:
-
-- **read**: Querying data
-- **create**: Creating new rows
-- **update**: Updating existing rows
-- **delete**: Deleting rows entirely
-- **customPrimary**: Allows client-side generated IDs for primary keys, controlled via `@c.AllowCustomPrimary()`.
-
-You specify these operations in `@c.Allow` decorators on your entity. For example:
-
-```ts
-@c.Allow(role, {
-  when: { status: { eq: 'active' } },
-  read: true,
-  create: ['name', 'price'],
-  update: ['price'],
-  delete: true,
-})
-export class Product {
-  name = c.stringColumn()
-  price = c.floatColumn()
-  status = c.stringColumn()
-}
-```
-
-- `read`, `create`, `update` can be either a boolean (`true` for all fields, or `false`/omitted for none) or an array of field names.
-- `delete` is strictly boolean.
-- If you specify multiple `@c.Allow` decorators for the same role on the same entity, the system merges them with `OR`.
-
----
 
 ## Summary
 

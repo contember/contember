@@ -10,5 +10,13 @@ export default defineConfig(() => {
 	return ({
 		plugins: [tsconfigPaths({ root: './' }), react(), contember()],
 		resolve: resolveConfig,
+		build: {
+			rollupOptions: {
+				input: {
+					root: './admin/index.html',
+					app: `./admin/app/index.html`,
+				},
+			},
+		},
 	})
 })

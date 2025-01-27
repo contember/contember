@@ -34,16 +34,14 @@ export const FormContainer = Component(({ children, description, label, required
 			<div>
 				{children}
 			</div>
-			<div>
-				{description && <FormDescriptionUI>
-					{description}
-				</FormDescriptionUI>}
+			{(description || errorsNode || state?.errors?.length || errorsList?.length) ? <div>
+				{description && <FormDescriptionUI>{description}</FormDescriptionUI>}
 
 				<FormError formatter={useErrorFormatter()}>
 					<FormErrorUI />
 				</FormError>
 				{errorsNode}
-			</div>
+			</div> : null}
 		</FormContainerUI>
 	</>
 	return state !== undefined

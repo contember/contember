@@ -4,7 +4,7 @@ import { FormContainerUI, FormDescriptionUI, FormErrorUI, FormLabelUI, FormLabel
 import { useErrorFormatter } from '../errors'
 import { Component, ErrorAccessor } from '@contember/interface'
 import { FormError, FormFieldStateProvider, FormLabel, useFormFieldState } from '@contember/react-form'
-import { useFieldLabelFormatter } from '../labels'
+import { FormFieldLabel } from './labels'
 
 export interface FormContainerProps {
 	label?: ReactNode
@@ -19,8 +19,7 @@ export const FormContainer = Component(({ children, description, label, required
 	const errorsNode = Array.isArray(errors) ? undefined : errors
 	const errorsList = Array.isArray(errors) ? errors : []
 	const state = useFormFieldState()
-	const fieldLabelFormatter = useFieldLabelFormatter()
-	label ??= state?.field ? fieldLabelFormatter(state.field.entityName, state.field.fieldName) : undefined
+	label ??= <FormFieldLabel />
 
 	const inner = <>
 		<FormContainerUI>

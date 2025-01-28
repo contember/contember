@@ -2,7 +2,7 @@ version: '3.7'
 services:
 
   playground:
-    image: oven/bun:canary
+    image: oven/bun:1.1.45
     command: 'bun run start'
 
     environment:
@@ -15,7 +15,7 @@ services:
       - .:/src:cached
 
   test:
-    image: oven/bun:canary
+    image: oven/bun:1.1.45
     working_dir: /src
     volumes:
       - .:/src:cached
@@ -29,7 +29,7 @@ services:
       MAILHOG_URL: 'http://mailhog:8025'
     entrypoint: bun
   engine:
-    image: oven/bun:canary
+    image: oven/bun:1.1.45
     working_dir: /src
 
     environment:
@@ -83,7 +83,7 @@ services:
 
 
   cli:
-    image: oven/bun:canary
+    image: oven/bun:1.1.45
     working_dir: /src/packages/playground
     deploy:
       replicas: 0

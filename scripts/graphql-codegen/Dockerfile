@@ -1,4 +1,4 @@
-FROM oven/bun:latest as build
+FROM oven/bun:1.1.45 as build
 WORKDIR /src
 COPY package.json /src
 COPY bun.lock /src

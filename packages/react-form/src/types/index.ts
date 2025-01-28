@@ -1,9 +1,14 @@
 import { ErrorAccessor } from '@contember/react-binding'
 import * as React from 'react'
 
-export type FormInputHandler = {
-	parseValue: (value: string) => any
-	formatValue: (value: any) => string
+export type FormInputHandlerContext<State = unknown> = {
+	state?: State
+	setState: (state: State) => void
+}
+
+export type FormInputHandler<State = unknown> = {
+	parseValue: (value: string, ctx: FormInputHandlerContext<State>) => any
+	formatValue: (value: any, ctx: FormInputHandlerContext<State>) => string
 	defaultInputProps?: React.InputHTMLAttributes<HTMLInputElement>
 }
 

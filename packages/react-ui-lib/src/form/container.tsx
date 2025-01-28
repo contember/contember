@@ -14,7 +14,40 @@ export interface FormContainerProps {
 	required?: boolean
 }
 
-
+/**
+ * FormContainer component for wrapping form elements with consistent styling and functionality.
+ *
+ * #### Features
+ * - Automatic label generation from field name when not provided
+ * - Error message display handling
+ * - Required indicator support
+ * - Description text support
+ * - Automatic form state management when not in a FormField context
+ *
+ * #### Example: Basic usage
+ * ```tsx
+ * <FormContainer label="Username" description="Enter your login name">
+ *   <InputField field="username" />
+ * </FormContainer>
+ * ```
+ *
+ * #### Example: With custom error handling
+ * ```tsx
+ * <FormContainer
+ *   label="Email"
+ *   errors={customErrors}
+ * >
+ *   <InputField field="email" />
+ * </FormContainer>
+ * ```
+ *
+ * #### Example: Auto-generated label
+ * ```tsx
+ * <FormContainer>
+ *   <InputField field="createdAt" />
+ * </FormContainer>
+ * ```
+ */
 export const FormContainer = Component(({ children, description, label, required, errors }: FormContainerProps) => {
 	const errorsNode = Array.isArray(errors) ? undefined : errors
 	const errorsList = Array.isArray(errors) ? errors : []
@@ -57,5 +90,24 @@ export const FormContainer = Component(({ children, description, label, required
 
 /**
  * @deprecated use `FormContainer` instead
+ *
+ * StandaloneFormContainer component.
+ *
+ * #### Deprecation Notice
+ * This component is deprecated and will be removed in future versions.
+ * Use `FormContainer` instead.
+ *
+ * #### Migration Example
+ * ```tsx
+ * // Old:
+ * <StandaloneFormContainer label="Name">
+ *   <InputField field="name" />
+ * </StandaloneFormContainer>
+ *
+ * // New:
+ * <FormContainer label="Name">
+ *   <InputField field="name" />
+ * </FormContainer>
+ * ```
  */
 export const StandaloneFormContainer = FormContainer

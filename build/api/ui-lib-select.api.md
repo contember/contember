@@ -28,7 +28,7 @@ export interface DefaultSelectDataViewProps {
     queryField?: DataViewUnionFilterFields;
 }
 
-// @public (undocumented)
+// @public
 export const MultiSelectInput: React_2.NamedExoticComponent<{
     field: SugaredRelativeEntityList["field"];
     options?: SugaredQualifiedEntityList["entities"];
@@ -94,7 +94,7 @@ export const SelectDefaultFilter: React_2.MemoExoticComponent<() => JSX_2.Elemen
 // @public (undocumented)
 export const SelectDefaultPlaceholderUI: () => JSX_2.Element;
 
-// @public (undocumented)
+// @public
 export const SelectInput: React_2.NamedExoticComponent<{
     field: SugaredRelativeSingleEntity["field"];
     children: ReactNode;

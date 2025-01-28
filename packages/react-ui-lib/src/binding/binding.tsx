@@ -4,18 +4,6 @@ import { Loader } from '../ui/loader'
 import { NavigationGuardDialog } from './navigation-guard-dialog'
 import { usePersistErrorHandler } from './hooks'
 
-export const Binding = ({ children }: {
-	children: ReactNode
-}) => {
-	return (
-		<DataBindingProvider stateComponent={BindingStateRenderer}>
-			<NavigationGuardDialog />
-			<PersistErrorHandler />
-			{children}
-		</DataBindingProvider>
-	)
-}
-
 const PersistErrorHandler = () => {
 	useDataBindingEvent('persistError', usePersistErrorHandler())
 	return null
@@ -26,8 +14,7 @@ export interface BindingStateRendererProps {
 	children?: ReactNode
 }
 
-
-function BindingStateRenderer({ accessorTreeState, children }: BindingStateRendererProps) {
+const BindingStateRenderer = ({ accessorTreeState, children }: BindingStateRendererProps) => {
 	useEffect(() => {
 		if (accessorTreeState.name === 'error' && accessorTreeState.error.type === 'unauthorized') {
 			const backlink = window.location.pathname + window.location.search
@@ -53,3 +40,43 @@ function BindingStateRenderer({ accessorTreeState, children }: BindingStateRende
 	return <>{children}</>
 }
 
+/**
+ * Binding component - Core data management wrapper for Contember applications
+ *
+ * #### Purpose
+ * Provides essential data binding, error handling, and navigation protection for application screens
+ *
+ * #### Features
+ * - Wraps content with DataBindingProvider
+ * - Automatic loading state handling
+ * - Navigation loss prevention
+ * - Global error handling:
+ *   - Unauthorized redirects
+ *   - Persistence error toasts
+ *   - Development error boundaries
+ *
+ * #### Subcomponents
+ * 1. `NavigationGuardDialog`: Prevents accidental navigation with unsaved changes
+ * 2. `PersistErrorHandler`: Shows error toasts for persistence failures
+ * 3. `BindingStateRenderer`: Handles loading/error states
+ *
+ * #### Example
+ * ```tsx
+ * <Binding>
+ *   <EntitySubTree entity="Article(id: $id)">
+ *     <ArticleForm />
+ *   </EntitySubTree>
+ * </Binding>
+ * ```
+ */
+export const Binding = ({ children }: {
+	children: ReactNode
+}) => {
+	return (
+		<DataBindingProvider stateComponent={BindingStateRenderer}>
+			<NavigationGuardDialog />
+			<PersistErrorHandler />
+			{children}
+		</DataBindingProvider>
+	)
+}

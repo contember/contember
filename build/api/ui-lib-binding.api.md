@@ -13,7 +13,7 @@ import { ReactNode } from 'react';
 import { RoutingLinkTarget } from '@contember/interface';
 import { SuccessfulPersistResult } from '@contember/interface';
 
-// @public (undocumented)
+// @public
 export const Binding: ({ children }: {
     children: ReactNode;
 }) => JSX_2.Element;
@@ -26,7 +26,7 @@ export interface BindingStateRendererProps {
     children?: ReactNode;
 }
 
-// @public (undocumented)
+// @public
 export const DeleteEntityDialog: FC<DeleteEntityDialogProps>;
 
 // @public (undocumented)
@@ -36,28 +36,31 @@ export type DeleteEntityDialogProps = {
     onSuccessRedirectTo?: RoutingLinkTarget;
 };
 
-// @public (undocumented)
+// @public
 export const IdentityLoader: ({ children }: {
     children: React.ReactNode;
 }) => JSX_2.Element;
 
-// @public (undocumented)
-export const PersistButton: ({ label }: {
-    label?: ReactNode;
-}) => JSX_2.Element;
+// @public
+export const PersistButton: ({ label }: PersistButtonProps) => JSX_2.Element;
 
 // @public (undocumented)
+export type PersistButtonProps = {
+    label?: ReactNode;
+};
+
+// @public
 export const usePersistErrorHandler: () => (result: ErrorPersistResult) => void;
 
-// @public (undocumented)
+// @public
 export const usePersistFeedbackHandlers: () => {
     onPersistSuccess: (result: SuccessfulPersistResult) => void;
 };
 
-// @public (undocumented)
+// @public
 export const usePersistSuccessHandler: () => (result: SuccessfulPersistResult) => void;
 
-// @public (undocumented)
+// @public
 export const usePersistWithFeedback: () => () => Promise<void | null>;
 
 // (No @packageDocumentation comment for this package)

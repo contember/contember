@@ -14,23 +14,76 @@ import {
 	useEntity,
 } from '@contember/interface'
 import { DataView, DataViewEachRow, DataViewLoaderState, DataViewSortingDirections, useDataViewEntityListAccessor } from '@contember/react-dataview'
-import * as React from 'react'
-import { ReactNode, useMemo } from 'react'
 import { CheckIcon } from 'lucide-react'
+import { ReactNode, useMemo } from 'react'
+import { Button } from '../ui/button'
 import { Loader } from '../ui/loader'
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
-import { Button } from '../ui/button'
 
 export interface DimensionsSwitcherProps {
+	/**
+	 * Entity list for dimension options
+	 * */
 	options: SugaredQualifiedEntityList['entities']
+	/**
+	 * Specifies initial sorting of the options (e.g., `{ label: 'desc' }`).
+	 * */
 	orderBy?: DataViewSortingDirections
+	/**
+	 * The name of the dimension to switch.
+	 * */
 	dimension: string
+	/**
+	 * Child components or fields to render within the dimension selector.
+	 * */
 	children: ReactNode
+	/**
+	 * Field containing unique dimension identifiers
+	 * */
 	slugField: SugaredRelativeSingleField['field']
+	/**
+	 * Enables multi-selection mode.
+	 * */
 	isMulti?: boolean
 }
 
-export const DimensionsSwitcher = Component(({ options, dimension, children, slugField, orderBy, isMulti }: DimensionsSwitcherProps) => {
+/**
+ * DimensionsSwitcher - Interactive dimension selection UI with popover.
+ * Provides a configurable interface for switching between different dimensions.
+ * Can be customized with initial sorting, multi-selection, and dynamic data options.
+ *
+ * #### Example: Basic usage
+ * ```tsx
+ * <DimensionsSwitcher
+ *   dimension="locale"
+ *   slugField="code"
+ *   options="DimensionsLocale"
+ * >
+ *   <Field field="label" />
+ * </DimensionsSwitcher>
+ * ```
+ *
+ * #### Example: With initial sorting and multi-selection
+ * ```tsx
+ * <DimensionsSwitcher
+ *   dimension="locale"
+ *   slugField="code"
+ *   options="DimensionsLocale"
+ *   orderBy={{ label: 'desc' }}
+ *   isMulti
+ * >
+ *   <Field field="label" />
+ * </DimensionsSwitcher>
+ * ```
+ */
+export const DimensionsSwitcher = Component(({
+	options,
+	dimension,
+	children,
+	slugField,
+	orderBy,
+	isMulti,
+}: DimensionsSwitcherProps) => {
 	return (
 		<DataView entities={options} initialSorting={orderBy}>
 			<DataViewLoaderState initial refreshing>
@@ -64,7 +117,11 @@ export const DimensionsSwitcher = Component(({ options, dimension, children, slu
 	)
 })
 
-const DimensionSwitcherCurrentValues = ({ children, dimension, slugField }: { children: ReactNode; dimension: string; slugField: SugaredRelativeSingleField['field'] }) => {
+const DimensionSwitcherCurrentValues = ({ children, dimension, slugField }: {
+	children: ReactNode
+	dimension: string
+	slugField: SugaredRelativeSingleField['field']
+}) => {
 	const entitiesBySlug = useDimensionEntitiesBySlug(slugField)
 
 	const currentDimensionValue = useDimensionState({
@@ -89,7 +146,12 @@ const DimensionSwitcherCurrentValues = ({ children, dimension, slugField }: { ch
 }
 
 
-const DimensionSwitcherItem = ({ children, dimension, slugField, isMulti }: { children: ReactNode; dimension: string; slugField: SugaredRelativeSingleField['field']; isMulti?: boolean }) => {
+const DimensionSwitcherItem = ({ children, dimension, slugField, isMulti }: {
+	children: ReactNode
+	dimension: string
+	slugField: SugaredRelativeSingleField['field']
+	isMulti?: boolean
+}) => {
 	const entity = useEntity()
 	const slugValue = entity.getField<string>(slugField).value
 	if (!slugValue) {
@@ -114,6 +176,24 @@ export interface SideDimensionsProps {
 	children: ReactNode
 }
 
+/**
+ * SideDimensions component - Contextual content renderer for active dimensions
+ *
+ * #### Purpose
+ * Displays dimension-specific content based on current selection
+ *
+ * #### Features
+ * - Responsive layout container
+ * - Automatic dimension context propagation
+ * - Requires HasOne relationship configuration
+ *
+ * #### Example
+ * ```tsx
+ * <SideDimensions dimension="locale" as="currentLocale" field="locales(locale.code = $currentLocale)">
+ *   <InputField field="title" />
+ * </SideDimensions>
+ * ```
+ */
 export const SideDimensions = Component<SideDimensionsProps>(({ dimension, children, as, field }) => {
 	return (
 		<div className="flex mt-4 gap-4">

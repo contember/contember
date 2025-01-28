@@ -2,14 +2,14 @@ import { uic, uiconfig } from '../utils'
 
 export const inputConfig = uiconfig({
 	baseClass: `
-		flex w-full bg-background 
-		file:border-0 file:bg-transparent file:text-sm file:font-medium 
-		placeholder:text-muted-foreground 
-		focus-visible:outline-none  
-		disabled:cursor-not-allowed disabled:opacity-50 
+		flex w-full bg-background
+		file:border-0 file:bg-transparent file:text-sm file:font-medium
+		placeholder:text-muted-foreground
+		focus-visible:outline-none
+		disabled:cursor-not-allowed disabled:opacity-50
 		read-only:bg-gray-100
 		` /*data-[dirty]:border-yellow-500 focus-visible:data-[dirty]:border-input*/ + `
-		data-[invalid]:border-destructive data-[invalid]:ring-destructive 
+		data-[invalid]:border-destructive data-[invalid]:ring-destructive
 	`,
 	variants: {
 		inputSize: {

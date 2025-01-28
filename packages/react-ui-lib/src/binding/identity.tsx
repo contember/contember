@@ -1,11 +1,46 @@
 import { IdentityState, LogoutTrigger } from '@contember/react-identity'
-import { Loader } from '../ui/loader'
+import { CircleAlert } from 'lucide-react'
+import { useEffect } from 'react'
 import { dict } from '../dict'
 import { Button } from '../ui/button'
 import { Card, CardContent } from '../ui/card'
-import { CircleAlert } from 'lucide-react'
-import { useEffect } from 'react'
+import { Loader } from '../ui/loader'
 
+/**
+ * IdentityLoader component - Authentication state manager for Contember applications
+ *
+ * #### Purpose
+ * Handles authentication flow and renders appropriate UI for different identity states
+ *
+ * #### States Handling
+ * 1. **Loading**: Shows loading spinner during authentication check
+ * 2. **Unauthenticated**: Redirects to login page with return URL
+ * 3. **Failed Authentication**: Displays error recovery options
+ * 4. **Authenticated**: Renders children content
+ *
+ * #### Features
+ * - Automatic redirect to login page for unauthenticated users
+ * - Error recovery UI with reload and re-login options
+ * - Maintains return URL (backlink) for post-login navigation
+ * - Visual feedback for all authentication states
+ *
+ * #### Example: Basic usage
+ * ```tsx
+ * <IdentityLoader>
+ *   <ProtectedDashboard />
+ * </IdentityLoader>
+ * ```
+ *
+ * #### Security Features
+ * - Encodes return URL for safe redirects
+ * - Immediate session invalidation on logout
+ * - Prevents flash of protected content
+ *
+ * #### UI Components
+ * - Loading spinner during checks
+ * - Error card with recovery options
+ * - Integrated logout functionality
+ */
 export const IdentityLoader = ({ children }: {
 	children: React.ReactNode
 }) => {
@@ -25,9 +60,9 @@ export const IdentityLoader = ({ children }: {
 							{dict.identityLoader.fail}
 						</p>
 						<div className="flex gap-2">
-							<Button onClick={() => window.location.reload()} variant="secondary">Try reload</Button>
+							<Button onClick={() => window.location.reload()} variant="secondary">{dict.identityLoader.tryReload}</Button>
 							<LogoutTrigger>
-								<Button>Login again</Button>
+								<Button>{dict.identityLoader.loginAgain}</Button>
 							</LogoutTrigger>
 						</div>
 					</CardContent>

@@ -1,4 +1,4 @@
-FROM oven/bun:1.1.45-debian as builder
+FROM oven/bun:1.2.1-debian as builder
 
 WORKDIR /src
 COPY ./ ./

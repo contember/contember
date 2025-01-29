@@ -204,7 +204,7 @@
 	inset: 0;
 	width: 100vw;
 	height: 100vh;
-	z-index: 50;
+	z-index: 16777271;
 	display: flex;
 	justify-content: center;
 	align-items: flex-start;

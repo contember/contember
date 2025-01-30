@@ -129,6 +129,7 @@ export const rand = () => Math.random().toString(36).slice(2)
 
 export const createTester = async (schema: Schema) => {
 	const projectSlug = 'test_' + rand()
+	// console.log(`Creating project ${projectSlug}`)
 	await createProject(projectSlug)
 	const migrations = createMigrations(schema)
 	await executeMigrations(projectSlug, migrations)

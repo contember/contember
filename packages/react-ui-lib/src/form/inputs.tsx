@@ -18,6 +18,7 @@ import {
 import { FormContainer, FormContainerProps } from './container'
 import { Component, Field } from '@contember/interface'
 import { useEnumOptionsFormatter } from '../labels'
+import { FormFieldLabel } from './labels'
 
 
 export type InputFieldProps =
@@ -67,16 +68,14 @@ export type CheckboxFieldProps =
 
 export const CheckboxField = Component(({ field, label, description, inputProps, isNonbearing, defaultValue, required }: CheckboxFieldProps) => (
 	<FormFieldScope field={field}>
-		<FormContainer description={description} label={undefined}>
+		<FormContainer description={description} label={false}>
 			<div className="flex gap-2 items-center">
 				<FormCheckbox field={field} isNonbearing={isNonbearing} defaultValue={defaultValue}>
 					<CheckboxInput required={required} {...inputProps} />
 				</FormCheckbox>
-				{label && <FormLabel>
-					<FormLabelUI required={required}>
-						{label}
-					</FormLabelUI>
-				</FormLabel>}
+				<FormLabel>
+					<FormLabelUI required={required}>{label ?? <FormFieldLabel />}</FormLabelUI>
+				</FormLabel>
 			</div>
 		</FormContainer>
 	</FormFieldScope>

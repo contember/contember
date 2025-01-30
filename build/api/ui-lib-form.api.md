@@ -254,8 +254,8 @@ export type VideoRepeaterFieldProps = BaseFileRepeaterFieldProps & VideoFileType
 
 // Warnings were encountered during analysis:
 //
-// src/form/inputs.tsx:28:3 - (ae-forgotten-export) The symbol "Input" needs to be exported by the entry point index.d.ts
-// src/form/inputs.tsx:46:3 - (ae-forgotten-export) The symbol "TextareaAutosize" needs to be exported by the entry point index.d.ts
+// src/form/inputs.tsx:29:3 - (ae-forgotten-export) The symbol "Input" needs to be exported by the entry point index.d.ts
+// src/form/inputs.tsx:47:3 - (ae-forgotten-export) The symbol "TextareaAutosize" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

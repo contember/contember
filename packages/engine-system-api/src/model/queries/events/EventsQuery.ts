@@ -71,7 +71,7 @@ export class EventsQuery extends DatabaseQuery<ContentEvent[]> {
 			})
 			.match(createInMatcher('type', this.filter.types?.map(it => it.toLowerCase())))
 			.match(createInMatcher('table_name', this.filter.tables))
-			.match(createInMatcher('transaction_id', this.filter.transactions))
+			.match(createInMatcher(['event_data', 'transaction_id'], this.filter.transactions))
 			.match(createInMatcher('identity_id', this.filter.identities))
 			.match(createDateMatcher('created_at', this.filter.createdAt ?? undefined))
 			.match(createDateMatcher('applied_at', this.filter.appliedAt ?? undefined))

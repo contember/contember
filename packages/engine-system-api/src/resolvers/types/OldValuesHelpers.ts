@@ -7,5 +7,5 @@ export const oldValuesLoaderFactory = (db: DatabaseContext) =>
 		async ids => {
 			return db.queryHandler.fetch(new OldValuesQuery(ids))
 		},
-		(id, items) => items[id],
+		(id, items) => items[id] ?? {},
 	)

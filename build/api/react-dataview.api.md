@@ -618,6 +618,7 @@ export const DataViewPagingInfoContext: React_2.Context<DataViewPagingInfo>;
 
 // @public
 export type DataViewPagingMethods = {
+    refreshTotalCount: () => void;
     goToPage: (page: number | 'first' | 'next' | 'previous' | 'last') => void;
     setItemsPerPage: (newItemsPerPage: number | null) => void;
 };

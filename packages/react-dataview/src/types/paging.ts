@@ -4,11 +4,18 @@ import { StateStorageOrName } from '@contember/react-utils'
  * Methods for paging. Available using {@link useDataViewPagingMethods}.
  */
 export type DataViewPagingMethods = {
+
+	/**
+	 * Refresh the total count of items.
+	 */
+	refreshTotalCount: () => void
+
 	/**
 	 * Go to a specific page.
 	 * Can be 'first', 'next', 'previous', 'last' or a number (0-based).
 	 */
 	goToPage: (page: number | 'first' | 'next' | 'previous' | 'last') => void
+
 	/**
 	 * Change the number of items per page.
 	 */

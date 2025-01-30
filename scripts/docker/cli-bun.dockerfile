@@ -1,4 +1,4 @@
-FROM oven/bun:1.1.39-alpine as builder
+FROM oven/bun:1.2.1-alpine as builder
 
 WORKDIR /src
 COPY ./ ./
@@ -6,7 +6,7 @@ RUN apk add --no-cache bash
 RUN bun install
 RUN /src/scripts/cli-build/run.sh
 
-FROM oven/bun:1.1.39-alpine
+FROM oven/bun:1.2.1-alpine
 
 WORKDIR /src
 ENV NODE_ENV "production"

@@ -50,7 +50,7 @@ export const useDataViewPaging = ({ dataViewKey, initialItemsPerPage, pagingSett
 	})
 
 	const itemsPerPage = pagingState.itemsPerPage
-	const totalCount = useDataViewTotalCount(args)
+	const [totalCount, { refresh }] = useDataViewTotalCount(args)
 	const pagesCount = totalCount !== undefined && itemsPerPage !== null ? Math.ceil(totalCount / itemsPerPage) : undefined
 	useEffect(() => {
 		setPagingInfo({
@@ -64,6 +64,7 @@ export const useDataViewPaging = ({ dataViewKey, initialItemsPerPage, pagingSett
 		info: pagingInfo,
 		methods: useMemo(() => {
 			return {
+				refreshTotalCount: refresh,
 				setItemsPerPage: (newItemsPerPage: number | null) => {
 					setPagingSettingsState(val => {
 						if (val.itemsPerPage === newItemsPerPage) {
@@ -107,6 +108,6 @@ export const useDataViewPaging = ({ dataViewKey, initialItemsPerPage, pagingSett
 					})
 				},
 			}
-		}, [pagesCount, setCurrentPageState, setPagingSettingsState]),
+		}, [pagesCount, refresh, setCurrentPageState, setPagingSettingsState]),
 	}
 }

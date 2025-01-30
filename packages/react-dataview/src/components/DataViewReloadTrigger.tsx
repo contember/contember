@@ -1,7 +1,7 @@
 import * as React from 'react'
-import { forwardRef, ReactElement } from 'react'
+import { forwardRef, ReactElement, useCallback } from 'react'
 import { Slot } from '@radix-ui/react-slot'
-import { useDataViewLoaderState, useDataViewReload } from '../contexts'
+import { useDataViewLoaderState, useDataViewPagingMethods, useDataViewReload } from '../contexts'
 import { dataAttribute } from '@contember/utilities'
 import { EntityListSubTreeLoaderState } from '@contember/react-binding'
 import { composeEventHandlers } from '@radix-ui/primitive'
@@ -39,13 +39,17 @@ export const DataViewReloadTrigger = forwardRef<HTMLButtonElement, DataViewReloa
 	({ children, ...props }: DataViewReloadTriggerProps, ref) => {
 		const reload = useDataViewReload()
 		const state = useDataViewLoaderState()
+		const { refreshTotalCount } = useDataViewPagingMethods()
 
 		const { onClick, ...otherProps } = props as React.ButtonHTMLAttributes<HTMLButtonElement>
 
 		return (
 			<SlotType
 				ref={ref}
-				onClick={composeEventHandlers(onClick, reload)}
+				onClick={composeEventHandlers(onClick, useCallback(() => {
+					refreshTotalCount()
+					reload()
+				}, [reload, refreshTotalCount]))}
 				data-state={dataAttribute(state)}
 				{...otherProps}
 			>

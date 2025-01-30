@@ -1,4 +1,4 @@
-import type { EntityFieldMarkersContainer, EntityId, EntityRealmKey, PlaceholderName, RuntimeId } from '@contember/binding-common'
+import { ClientGeneratedUuid, EntityFieldMarkersContainer, EntityId, EntityRealmKey, PlaceholderName, RuntimeId } from '@contember/binding-common'
 import { assertNever } from '@contember/binding-common'
 import type { EntityListState, EntityRealmBlueprint, EntityRealmState } from './state'
 import { WeakIdCache } from '@contember/utilities'
@@ -20,7 +20,7 @@ export class RealmKeyGenerator {
 	private static generateKey(
 		parent: EntityRealmState | EntityListState | undefined,
 		placeholderName: PlaceholderName,
-		id: EntityId,
+		id: string,
 		container: EntityFieldMarkersContainer,
 	): EntityRealmKey {
 		// The static prefix serves to really emphasize that this is *NOT* just a uuid
@@ -45,7 +45,7 @@ export class RealmKeyGenerator {
 		return this.generateKey(
 			parent,
 			placeholderName,
-			id.value,
+			(id instanceof ClientGeneratedUuid ? 'C-' : '') + id.value.toString(),
 			blueprint.type === 'listEntity' ? blueprint.parent.blueprint.marker.fields : blueprint.marker.fields,
 		)
 	}

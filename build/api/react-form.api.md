@@ -116,10 +116,16 @@ export type FormHasOneRelationScopeProps = {
 export const FormInput: React_2.NamedExoticComponent<FormInputProps>;
 
 // @public (undocumented)
-export type FormInputHandler = {
-    parseValue: (value: string) => any;
-    formatValue: (value: any) => string;
+export type FormInputHandler<State = unknown> = {
+    parseValue: (value: string, ctx: FormInputHandlerContext<State>) => any;
+    formatValue: (value: any, ctx: FormInputHandlerContext<State>) => string;
     defaultInputProps?: React_2.InputHTMLAttributes<HTMLInputElement>;
+};
+
+// @public (undocumented)
+export type FormInputHandlerContext<State = unknown> = {
+    state?: State;
+    setState: (state: State) => void;
 };
 
 // @public (undocumented)

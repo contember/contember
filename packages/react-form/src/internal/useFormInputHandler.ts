@@ -16,7 +16,7 @@ export const useFormInputHandler = (field: FieldAccessor, { formatValue, parseVa
 	}, [field.getAccessor, field.schema, formatValue, parseValue])
 }
 
-type ColumnTypeHandlerFactory = (column: SchemaColumn, getAccessor: FieldAccessor.GetFieldAccessor) => FormInputHandler
+type ColumnTypeHandlerFactory = (column: SchemaColumn, getAccessor: FieldAccessor.GetFieldAccessor) => FormInputHandler<any>
 
 const defaultHandlerFactory: ColumnTypeHandlerFactory = (schema, field) => ({
 	parseValue: (value: string) => {
@@ -45,15 +45,21 @@ const ColumnTypeHandlerFactories: Record<SchemaKnownColumnType, ColumnTypeHandle
 			type: 'number',
 		},
 	}),
-	Double: () => ({
-		parseValue: (value: string) => {
+	Double: (): FormInputHandler<{ rawValue: string; parsedValue: number | null }> => ({
+		parseValue: (value: string, ctx) => {
 			if (value === '') {
+				ctx.setState({ rawValue: '', parsedValue: null })
 				return null
 			}
 			const parsed = parseFloat(value)
-			return isNaN(parsed) ? null : parsed
+			const parsedValue = isNaN(parsed) ? null : parsed
+			ctx.setState({ rawValue: value, parsedValue })
+			return parsedValue
 		},
-		formatValue: (value: number | null) => {
+		formatValue: (value: number | null, ctx) => {
+			if (value === ctx.state?.parsedValue) {
+				return ctx.state.rawValue
+			}
 			return value === null ? '' : value.toString(10)
 		},
 		defaultInputProps: {

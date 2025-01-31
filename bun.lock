@@ -1,5 +1,5 @@
 {
-  "lockfileVersion": 0,
+  "lockfileVersion": 1,
   "workspaces": {
     "": {
       "devDependencies": {
@@ -28,24 +28,24 @@
     },
     "packages/authorization": {
       "name": "@contember/authorization",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
     },
     "packages/binding": {
       "name": "@contember/binding",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
       "dependencies": {
-        "@contember/binding-common": "packages/binding-common",
-        "@contember/binding-legacy": "packages/binding-legacy",
-        "@contember/binding-ng": "packages/binding-ng",
+        "@contember/binding-common": "workspace:*",
+        "@contember/binding-legacy": "workspace:*",
+        "@contember/binding-ng": "workspace:*",
       },
     },
     "packages/binding-common": {
       "name": "@contember/binding-common",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
       "dependencies": {
-        "@contember/client": "packages/client",
-        "@contember/client-content": "packages/client-content",
-        "@contember/utilities": "packages/utilities",
+        "@contember/client": "workspace:*",
+        "@contember/client-content": "workspace:*",
+        "@contember/utilities": "workspace:*",
         "chevrotain": "6.5.0",
         "fast-deep-equal": "^3.1.3",
         "js-levenshtein": "1.1.6",
@@ -64,11 +64,11 @@
     },
     "packages/binding-legacy": {
       "name": "@contember/binding-legacy",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
       "dependencies": {
-        "@contember/binding-common": "packages/binding-common",
-        "@contember/client": "packages/client",
-        "@contember/utilities": "packages/utilities",
+        "@contember/binding-common": "workspace:*",
+        "@contember/client": "workspace:*",
+        "@contember/utilities": "workspace:*",
         "uuid": "9.0.1",
       },
       "devDependencies": {
@@ -77,24 +77,27 @@
     },
     "packages/binding-ng": {
       "name": "@contember/binding-ng",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
     },
     "packages/cli": {
       "name": "@contember/cli",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
+      "bin": {
+        "contember": "./dist/production/run.js"
+      },
       "dependencies": {
-        "@contember/cli-common": "packages/cli-common",
-        "@contember/config-loader": "packages/config-loader",
-        "@contember/database": "packages/database",
-        "@contember/dic": "packages/dic",
-        "@contember/engine-common": "packages/engine-common",
-        "@contember/engine-content-api": "packages/engine-content-api",
-        "@contember/graphql-client": "packages/graphql-client",
-        "@contember/migrations-client": "packages/migrations-client",
-        "@contember/schema": "packages/schema",
-        "@contember/schema-migrations": "packages/schema-migrations",
-        "@contember/schema-utils": "packages/schema-utils",
-        "@contember/typesafe": "packages/typesafe",
+        "@contember/cli-common": "workspace:*",
+        "@contember/config-loader": "workspace:*",
+        "@contember/database": "workspace:*",
+        "@contember/dic": "workspace:*",
+        "@contember/engine-common": "workspace:*",
+        "@contember/engine-content-api": "workspace:*",
+        "@contember/graphql-client": "workspace:*",
+        "@contember/migrations-client": "workspace:*",
+        "@contember/schema": "workspace:*",
+        "@contember/schema-migrations": "workspace:*",
+        "@contember/schema-utils": "workspace:*",
+        "@contember/typesafe": "workspace:*",
         "@graphql-tools/schema": "^10.0.7",
         "chalk": "^5.3.0",
         "chalk-table": "^1.0.2",
@@ -125,7 +128,7 @@
     },
     "packages/cli-common": {
       "name": "@contember/cli-common",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
       "dependencies": {
         "chalk": "^5.3.0",
       },
@@ -137,43 +140,46 @@
     },
     "packages/client": {
       "name": "@contember/client",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
       "dependencies": {
-        "@contember/client-content": "packages/client-content",
-        "@contember/graphql-builder": "packages/graphql-builder",
-        "@contember/graphql-client": "packages/graphql-client",
-        "@contember/schema": "packages/schema",
+        "@contember/client-content": "workspace:*",
+        "@contember/graphql-builder": "workspace:*",
+        "@contember/graphql-client": "workspace:*",
+        "@contember/schema": "workspace:*",
       },
     },
     "packages/client-content": {
       "name": "@contember/client-content",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
       "dependencies": {
-        "@contember/graphql-builder": "packages/graphql-builder",
-        "@contember/graphql-client": "packages/graphql-client",
-        "@contember/schema": "packages/schema",
+        "@contember/graphql-builder": "workspace:*",
+        "@contember/graphql-client": "workspace:*",
+        "@contember/schema": "workspace:*",
       },
       "devDependencies": {
-        "@contember/client-content-generator": "packages/client-content-generator",
+        "@contember/client-content-generator": "workspace:*",
         "expect-type": "^1.1.0",
       },
     },
     "packages/client-content-generator": {
       "name": "@contember/client-content-generator",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
+      "bin": {
+        "contember-client-generator": "./dist/production/generate.cjs"
+      },
       "dependencies": {
-        "@contember/client-content": "packages/client-content",
-        "@contember/schema": "packages/schema",
-        "@contember/schema-utils": "packages/schema-utils",
+        "@contember/client-content": "workspace:*",
+        "@contember/schema": "workspace:*",
+        "@contember/schema-utils": "workspace:*",
       },
       "devDependencies": {
-        "@contember/schema-definition": "packages/schema-definition",
+        "@contember/schema-definition": "workspace:*",
         "@types/node": "^20.16.11",
       },
     },
     "packages/config-loader": {
       "name": "@contember/config-loader",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
       "dependencies": {
         "js-yaml": "^4.1.0",
       },
@@ -184,9 +190,10 @@
     },
     "packages/create": {
       "name": "@contember/create",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
+      "bin": "dist/production/run.js",
       "dependencies": {
-        "@contember/cli-common": "packages/cli-common",
+        "@contember/cli-common": "workspace:*",
         "chalk": "^5.3.0",
         "fs-extra": "^11.2.0",
         "js-yaml": "^4.1.0",
@@ -194,12 +201,12 @@
     },
     "packages/database": {
       "name": "@contember/database",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
       "dependencies": {
-        "@contember/queryable": "packages/queryable",
+        "@contember/queryable": "workspace:*",
       },
       "devDependencies": {
-        "@contember/database-tester": "packages/database-tester",
+        "@contember/database-tester": "workspace:*",
         "@types/node": "^20.16.11",
         "pg": "^8.12.0",
       },
@@ -209,9 +216,9 @@
     },
     "packages/database-migrations": {
       "name": "@contember/database-migrations",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
       "dependencies": {
-        "@contember/database": "packages/database",
+        "@contember/database": "workspace:*",
         "node-pg-migrate": "^5.10.0",
       },
       "devDependencies": {
@@ -223,9 +230,9 @@
     },
     "packages/database-tester": {
       "name": "@contember/database-tester",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
       "dependencies": {
-        "@contember/database": "packages/database",
+        "@contember/database": "workspace:*",
       },
       "peerDependencies": {
         "pg": "^8.9.0",
@@ -233,26 +240,26 @@
     },
     "packages/dic": {
       "name": "@contember/dic",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
     },
     "packages/engine-actions": {
       "name": "@contember/engine-actions",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
       "dependencies": {
-        "@contember/authorization": "packages/authorization",
-        "@contember/database": "packages/database",
-        "@contember/database-migrations": "packages/database-migrations",
-        "@contember/engine-common": "packages/engine-common",
-        "@contember/engine-content-api": "packages/engine-content-api",
-        "@contember/engine-http": "packages/engine-http",
-        "@contember/engine-plugins": "packages/engine-plugins",
-        "@contember/engine-system-api": "packages/engine-system-api",
-        "@contember/engine-tenant-api": "packages/engine-tenant-api",
-        "@contember/graphql-utils": "packages/graphql-utils",
-        "@contember/logger": "packages/logger",
-        "@contember/schema": "packages/schema",
-        "@contember/schema-utils": "packages/schema-utils",
-        "@contember/typesafe": "packages/typesafe",
+        "@contember/authorization": "workspace:*",
+        "@contember/database": "workspace:*",
+        "@contember/database-migrations": "workspace:*",
+        "@contember/engine-common": "workspace:*",
+        "@contember/engine-content-api": "workspace:*",
+        "@contember/engine-http": "workspace:*",
+        "@contember/engine-plugins": "workspace:*",
+        "@contember/engine-system-api": "workspace:*",
+        "@contember/engine-tenant-api": "workspace:*",
+        "@contember/graphql-utils": "workspace:*",
+        "@contember/logger": "workspace:*",
+        "@contember/schema": "workspace:*",
+        "@contember/schema-utils": "workspace:*",
+        "@contember/typesafe": "workspace:*",
         "@graphql-tools/schema": "^10.0.7",
         "graphql-tag": "^2.12.6",
       },
@@ -268,9 +275,9 @@
     },
     "packages/engine-common": {
       "name": "@contember/engine-common",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
       "dependencies": {
-        "@contember/logger": "packages/logger",
+        "@contember/logger": "workspace:*",
       },
       "devDependencies": {
         "@types/node": "^20.16.11",
@@ -278,20 +285,20 @@
     },
     "packages/engine-content-api": {
       "name": "@contember/engine-content-api",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
       "dependencies": {
-        "@contember/database": "packages/database",
-        "@contember/dic": "packages/dic",
-        "@contember/graphql-utils": "packages/graphql-utils",
-        "@contember/logger": "packages/logger",
-        "@contember/schema": "packages/schema",
-        "@contember/schema-definition": "packages/schema-definition",
-        "@contember/schema-utils": "packages/schema-utils",
+        "@contember/database": "workspace:*",
+        "@contember/dic": "workspace:*",
+        "@contember/graphql-utils": "workspace:*",
+        "@contember/logger": "workspace:*",
+        "@contember/schema": "workspace:*",
+        "@contember/schema-definition": "workspace:*",
+        "@contember/schema-utils": "workspace:*",
         "fast-deep-equal": "^3.1.3",
       },
       "devDependencies": {
-        "@contember/database-tester": "packages/database-tester",
-        "@contember/schema-definition": "packages/schema-definition",
+        "@contember/database-tester": "workspace:*",
+        "@contember/schema-definition": "workspace:*",
         "@types/node": "^20.16.11",
         "graphql": "^16.9.0",
         "pg": "^8.12.0",
@@ -303,22 +310,22 @@
     },
     "packages/engine-http": {
       "name": "@contember/engine-http",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
       "dependencies": {
-        "@contember/config-loader": "packages/config-loader",
-        "@contember/database": "packages/database",
-        "@contember/database-migrations": "packages/database-migrations",
-        "@contember/dic": "packages/dic",
-        "@contember/engine-common": "packages/engine-common",
-        "@contember/engine-content-api": "packages/engine-content-api",
-        "@contember/engine-system-api": "packages/engine-system-api",
-        "@contember/engine-tenant-api": "packages/engine-tenant-api",
-        "@contember/graphql-utils": "packages/graphql-utils",
-        "@contember/logger": "packages/logger",
-        "@contember/schema": "packages/schema",
-        "@contember/schema-migrations": "packages/schema-migrations",
-        "@contember/schema-utils": "packages/schema-utils",
-        "@contember/typesafe": "packages/typesafe",
+        "@contember/config-loader": "workspace:*",
+        "@contember/database": "workspace:*",
+        "@contember/database-migrations": "workspace:*",
+        "@contember/dic": "workspace:*",
+        "@contember/engine-common": "workspace:*",
+        "@contember/engine-content-api": "workspace:*",
+        "@contember/engine-system-api": "workspace:*",
+        "@contember/engine-tenant-api": "workspace:*",
+        "@contember/graphql-utils": "workspace:*",
+        "@contember/logger": "workspace:*",
+        "@contember/schema": "workspace:*",
+        "@contember/schema-migrations": "workspace:*",
+        "@contember/schema-utils": "workspace:*",
+        "@contember/typesafe": "workspace:*",
         "@graphql-tools/merge": "^9.0.8",
         "@graphql-tools/schema": "^10.0.7",
         "@koa/cors": "^5.0.0",
@@ -351,10 +358,10 @@
     },
     "packages/engine-plugins": {
       "name": "@contember/engine-plugins",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
       "dependencies": {
-        "@contember/database-migrations": "packages/database-migrations",
-        "@contember/engine-http": "packages/engine-http",
+        "@contember/database-migrations": "workspace:*",
+        "@contember/engine-http": "workspace:*",
       },
       "devDependencies": {
         "graphql": "^16.9.0",
@@ -366,11 +373,11 @@
     },
     "packages/engine-s3-plugin": {
       "name": "@contember/engine-s3-plugin",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
       "dependencies": {
-        "@contember/engine-plugins": "packages/engine-plugins",
-        "@contember/graphql-utils": "packages/graphql-utils",
-        "@contember/typesafe": "packages/typesafe",
+        "@contember/engine-plugins": "workspace:*",
+        "@contember/graphql-utils": "workspace:*",
+        "@contember/typesafe": "workspace:*",
         "mime-types": "^2.1.35",
         "picomatch": "^4.0.2",
         "qs": "^6.13.0",
@@ -389,13 +396,13 @@
     },
     "packages/engine-server": {
       "name": "@contember/engine-server",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
       "dependencies": {
-        "@contember/engine-actions": "packages/engine-actions",
-        "@contember/engine-http": "packages/engine-http",
-        "@contember/engine-plugins": "packages/engine-plugins",
-        "@contember/engine-s3-plugin": "packages/engine-s3-plugin",
-        "@contember/engine-vimeo-plugin": "packages/engine-vimeo-plugin",
+        "@contember/engine-actions": "workspace:*",
+        "@contember/engine-http": "workspace:*",
+        "@contember/engine-plugins": "workspace:*",
+        "@contember/engine-s3-plugin": "workspace:*",
+        "@contember/engine-vimeo-plugin": "workspace:*",
         "graphql": "^16.9.0",
         "pg": "^8.12.0",
         "uuid": "^10.0.0",
@@ -407,23 +414,23 @@
     },
     "packages/engine-system-api": {
       "name": "@contember/engine-system-api",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
       "dependencies": {
-        "@contember/authorization": "packages/authorization",
-        "@contember/database": "packages/database",
-        "@contember/database-migrations": "packages/database-migrations",
-        "@contember/dic": "packages/dic",
-        "@contember/graphql-utils": "packages/graphql-utils",
-        "@contember/logger": "packages/logger",
-        "@contember/queryable": "packages/queryable",
-        "@contember/schema": "packages/schema",
-        "@contember/schema-migrations": "packages/schema-migrations",
-        "@contember/schema-utils": "packages/schema-utils",
+        "@contember/authorization": "workspace:*",
+        "@contember/database": "workspace:*",
+        "@contember/database-migrations": "workspace:*",
+        "@contember/dic": "workspace:*",
+        "@contember/graphql-utils": "workspace:*",
+        "@contember/logger": "workspace:*",
+        "@contember/queryable": "workspace:*",
+        "@contember/schema": "workspace:*",
+        "@contember/schema-migrations": "workspace:*",
+        "@contember/schema-utils": "workspace:*",
         "@graphql-tools/utils": "^10.5.5",
         "graphql-tag": "^2.12.6",
       },
       "devDependencies": {
-        "@contember/schema-definition": "packages/schema-definition",
+        "@contember/schema-definition": "workspace:*",
         "@types/node": "^20.16.11",
         "graphql": "^16.9.0",
         "pg": "^8.12.0",
@@ -435,18 +442,18 @@
     },
     "packages/engine-tenant-api": {
       "name": "@contember/engine-tenant-api",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
       "dependencies": {
-        "@contember/authorization": "packages/authorization",
-        "@contember/config-loader": "packages/config-loader",
-        "@contember/database": "packages/database",
-        "@contember/database-migrations": "packages/database-migrations",
-        "@contember/dic": "packages/dic",
-        "@contember/graphql-utils": "packages/graphql-utils",
-        "@contember/logger": "packages/logger",
-        "@contember/schema": "packages/schema",
-        "@contember/schema-utils": "packages/schema-utils",
-        "@contember/typesafe": "packages/typesafe",
+        "@contember/authorization": "workspace:*",
+        "@contember/config-loader": "workspace:*",
+        "@contember/database": "workspace:*",
+        "@contember/database-migrations": "workspace:*",
+        "@contember/dic": "workspace:*",
+        "@contember/graphql-utils": "workspace:*",
+        "@contember/logger": "workspace:*",
+        "@contember/schema": "workspace:*",
+        "@contember/schema-utils": "workspace:*",
+        "@contember/typesafe": "workspace:*",
         "@graphql-tools/utils": "^10.5.5",
         "graphql-tag": "^2.12.6",
         "jose": "^5.8.0",
@@ -456,7 +463,7 @@
         "otpauth": "^9.3.4",
       },
       "devDependencies": {
-        "@contember/database-tester": "packages/database-tester",
+        "@contember/database-tester": "workspace:*",
         "@graphql-tools/schema": "^10.0.7",
         "@types/mustache": "^4.2.5",
         "@types/node": "^20.16.11",
@@ -470,10 +477,10 @@
     },
     "packages/engine-vimeo-plugin": {
       "name": "@contember/engine-vimeo-plugin",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
       "dependencies": {
-        "@contember/engine-plugins": "packages/engine-plugins",
-        "@contember/typesafe": "packages/typesafe",
+        "@contember/engine-plugins": "workspace:*",
+        "@contember/typesafe": "workspace:*",
       },
       "devDependencies": {
         "@types/node": "^20.16.11",
@@ -486,24 +493,24 @@
     },
     "packages/graphql-builder": {
       "name": "@contember/graphql-builder",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
       "dependencies": {
-        "@contember/schema": "packages/schema",
+        "@contember/schema": "workspace:*",
       },
     },
     "packages/graphql-client": {
       "name": "@contember/graphql-client",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
     },
     "packages/graphql-client-system": {
       "name": "@contember/graphql-client-system",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
       "dependencies": {
-        "@contember/schema": "packages/schema",
+        "@contember/schema": "workspace:*",
         "graphql-ts-client-api": "^3.1.17",
       },
       "devDependencies": {
-        "@contember/engine-system-api": "packages/engine-system-api",
+        "@contember/engine-system-api": "workspace:*",
         "@graphql-tools/schema": "^10.0.7",
         "@types/node": "^20.16.11",
         "graphql": "^16.9.0",
@@ -512,12 +519,12 @@
     },
     "packages/graphql-client-tenant": {
       "name": "@contember/graphql-client-tenant",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
       "dependencies": {
         "graphql-ts-client-api": "^3.1.17",
       },
       "devDependencies": {
-        "@contember/engine-tenant-api": "packages/engine-tenant-api",
+        "@contember/engine-tenant-api": "workspace:*",
         "@graphql-tools/schema": "^10.0.7",
         "@types/node": "^20.16.11",
         "graphql": "^16.9.0",
@@ -526,7 +533,7 @@
     },
     "packages/graphql-utils": {
       "name": "@contember/graphql-utils",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
       "devDependencies": {
         "@types/node": "^20.16.11",
         "graphql": "^16.9.0",
@@ -537,14 +544,14 @@
     },
     "packages/interface": {
       "name": "@contember/interface",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
       "dependencies": {
-        "@contember/react-binding": "packages/react-binding",
-        "@contember/react-client": "packages/react-client",
-        "@contember/react-dataview": "packages/react-dataview",
-        "@contember/react-devbar": "packages/react-devbar",
-        "@contember/react-identity": "packages/react-identity",
-        "@contember/react-routing": "packages/react-routing",
+        "@contember/react-binding": "workspace:*",
+        "@contember/react-client": "workspace:*",
+        "@contember/react-dataview": "workspace:*",
+        "@contember/react-devbar": "workspace:*",
+        "@contember/react-identity": "workspace:*",
+        "@contember/react-routing": "workspace:*",
         "@radix-ui/react-slot": "^1.1.0",
         "stacktracey": "^2.1.8",
       },
@@ -559,7 +566,7 @@
     },
     "packages/logger": {
       "name": "@contember/logger",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
       "dependencies": {
         "chalk": "^5.3.0",
       },
@@ -569,13 +576,13 @@
     },
     "packages/migrations-client": {
       "name": "@contember/migrations-client",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
       "dependencies": {
-        "@contember/engine-common": "packages/engine-common",
-        "@contember/graphql-client": "packages/graphql-client",
-        "@contember/schema": "packages/schema",
-        "@contember/schema-migrations": "packages/schema-migrations",
-        "@contember/schema-utils": "packages/schema-utils",
+        "@contember/engine-common": "workspace:*",
+        "@contember/graphql-client": "workspace:*",
+        "@contember/schema": "workspace:*",
+        "@contember/schema-migrations": "workspace:*",
+        "@contember/schema-utils": "workspace:*",
       },
       "devDependencies": {
         "@types/node": "^20.16.11",
@@ -583,22 +590,22 @@
     },
     "packages/playground": {
       "name": "@contember/playground",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
       "dependencies": {
         "@sindresorhus/slugify": "^2.2.1",
       },
       "devDependencies": {
-        "@contember/binding": "packages/binding",
-        "@contember/client": "packages/client",
-        "@contember/client-content": "packages/client-content",
-        "@contember/interface": "packages/interface",
-        "@contember/react-client-content": "packages/react-client-content",
-        "@contember/react-ui-lib": "packages/react-ui-lib",
-        "@contember/schema": "packages/schema",
-        "@contember/schema-definition": "packages/schema-definition",
-        "@contember/schema-utils": "packages/schema-utils",
-        "@contember/utilities": "packages/utilities",
-        "@contember/vite-plugin": "packages/vite-plugin",
+        "@contember/binding": "workspace:*",
+        "@contember/client": "workspace:*",
+        "@contember/client-content": "workspace:*",
+        "@contember/interface": "workspace:*",
+        "@contember/react-client-content": "workspace:*",
+        "@contember/react-ui-lib": "workspace:*",
+        "@contember/schema": "workspace:*",
+        "@contember/schema-definition": "workspace:*",
+        "@contember/schema-utils": "workspace:*",
+        "@contember/utilities": "workspace:*",
+        "@contember/vite-plugin": "workspace:*",
         "@faker-js/faker": "^9.0.3",
         "@radix-ui/react-separator": "^1.1.0",
         "@radix-ui/react-toolbar": "^1.1.0",
@@ -620,18 +627,18 @@
     },
     "packages/queryable": {
       "name": "@contember/queryable",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
     },
     "packages/react-binding": {
       "name": "@contember/react-binding",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
       "dependencies": {
-        "@contember/binding": "packages/binding",
-        "@contember/client": "packages/client",
-        "@contember/graphql-client": "packages/graphql-client",
-        "@contember/react-client": "packages/react-client",
-        "@contember/react-utils": "packages/react-utils",
-        "@contember/utilities": "packages/utilities",
+        "@contember/binding": "workspace:*",
+        "@contember/client": "workspace:*",
+        "@contember/graphql-client": "workspace:*",
+        "@contember/react-client": "workspace:*",
+        "@contember/react-utils": "workspace:*",
+        "@contember/utilities": "workspace:*",
         "@radix-ui/primitive": "^0.1.0",
         "@radix-ui/react-slot": "^1.1.0",
       },
@@ -648,12 +655,12 @@
     },
     "packages/react-block-repeater": {
       "name": "@contember/react-block-repeater",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
       "dependencies": {
-        "@contember/react-binding": "packages/react-binding",
-        "@contember/react-multipass-rendering": "packages/react-multipass-rendering",
-        "@contember/react-repeater": "packages/react-repeater",
-        "@contember/react-utils": "packages/react-utils",
+        "@contember/react-binding": "workspace:*",
+        "@contember/react-multipass-rendering": "workspace:*",
+        "@contember/react-repeater": "workspace:*",
+        "@contember/react-utils": "workspace:*",
         "@radix-ui/primitive": "^1.1.0",
         "@radix-ui/react-slot": "^1.1.0",
       },
@@ -668,11 +675,11 @@
     },
     "packages/react-board": {
       "name": "@contember/react-board",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
       "dependencies": {
-        "@contember/react-binding": "packages/react-binding",
-        "@contember/react-multipass-rendering": "packages/react-multipass-rendering",
-        "@contember/react-utils": "packages/react-utils",
+        "@contember/react-binding": "workspace:*",
+        "@contember/react-multipass-rendering": "workspace:*",
+        "@contember/react-utils": "workspace:*",
       },
       "devDependencies": {
         "react": "^18.3.1",
@@ -685,12 +692,12 @@
     },
     "packages/react-board-dnd-kit": {
       "name": "@contember/react-board-dnd-kit",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
       "dependencies": {
-        "@contember/react-binding": "packages/react-binding",
-        "@contember/react-board": "packages/react-board",
-        "@contember/react-utils": "packages/react-utils",
-        "@contember/utilities": "packages/utilities",
+        "@contember/react-binding": "workspace:*",
+        "@contember/react-board": "workspace:*",
+        "@contember/react-utils": "workspace:*",
+        "@contember/utilities": "workspace:*",
         "@dnd-kit/core": "^6.1.0",
         "@dnd-kit/sortable": "^8.0.0",
         "@radix-ui/react-portal": "^1.1.2",
@@ -707,10 +714,10 @@
     },
     "packages/react-client": {
       "name": "@contember/react-client",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
       "dependencies": {
-        "@contember/client": "packages/client",
-        "@contember/react-richtext-renderer": "packages/react-richtext-renderer",
+        "@contember/client": "workspace:*",
+        "@contember/react-richtext-renderer": "workspace:*",
       },
       "peerDependencies": {
         "react": "^18 || ^19",
@@ -718,11 +725,11 @@
     },
     "packages/react-client-content": {
       "name": "@contember/react-client-content",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
       "dependencies": {
-        "@contember/client-content": "packages/client-content",
-        "@contember/react-client": "packages/react-client",
-        "@contember/react-utils": "packages/react-utils",
+        "@contember/client-content": "workspace:*",
+        "@contember/react-client": "workspace:*",
+        "@contember/react-utils": "workspace:*",
       },
       "devDependencies": {
         "react": "^18.3.1",
@@ -735,11 +742,11 @@
     },
     "packages/react-client-tenant": {
       "name": "@contember/react-client-tenant",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
       "dependencies": {
-        "@contember/graphql-client-tenant": "packages/graphql-client-tenant",
-        "@contember/react-client": "packages/react-client",
-        "@contember/react-utils": "packages/react-utils",
+        "@contember/graphql-client-tenant": "workspace:*",
+        "@contember/react-client": "workspace:*",
+        "@contember/react-utils": "workspace:*",
         "@radix-ui/primitive": "^1.1.0",
         "@radix-ui/react-slot": "^1.1.0",
         "graphql-ts-client-api": "^3.1.17",
@@ -755,14 +762,14 @@
     },
     "packages/react-dataview": {
       "name": "@contember/react-dataview",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
       "dependencies": {
-        "@contember/client": "packages/client",
-        "@contember/react-binding": "packages/react-binding",
-        "@contember/react-client": "packages/react-client",
-        "@contember/react-multipass-rendering": "packages/react-multipass-rendering",
-        "@contember/react-utils": "packages/react-utils",
-        "@contember/utilities": "packages/utilities",
+        "@contember/client": "workspace:*",
+        "@contember/react-binding": "workspace:*",
+        "@contember/react-client": "workspace:*",
+        "@contember/react-multipass-rendering": "workspace:*",
+        "@contember/react-utils": "workspace:*",
+        "@contember/utilities": "workspace:*",
         "@radix-ui/primitive": "^1.1.0",
         "@radix-ui/react-slot": "^1.1.0",
         "fast-deep-equal": "^3.1.3",
@@ -778,10 +785,10 @@
     },
     "packages/react-devbar": {
       "name": "@contember/react-devbar",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
       "dependencies": {
-        "@contember/react-utils": "packages/react-utils",
-        "@contember/utilities": "packages/utilities",
+        "@contember/react-utils": "workspace:*",
+        "@contember/utilities": "workspace:*",
         "buffer": "6.0.3",
       },
       "devDependencies": {
@@ -797,11 +804,11 @@
     },
     "packages/react-form": {
       "name": "@contember/react-form",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
       "dependencies": {
-        "@contember/react-binding": "packages/react-binding",
-        "@contember/react-utils": "packages/react-utils",
-        "@contember/utilities": "packages/utilities",
+        "@contember/react-binding": "workspace:*",
+        "@contember/react-utils": "workspace:*",
+        "@contember/utilities": "workspace:*",
         "@radix-ui/react-slot": "^1.1.0",
       },
       "devDependencies": {
@@ -815,11 +822,11 @@
     },
     "packages/react-identity": {
       "name": "@contember/react-identity",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
       "dependencies": {
-        "@contember/react-binding": "packages/react-binding",
-        "@contember/react-client": "packages/react-client",
-        "@contember/react-client-tenant": "packages/react-client-tenant",
+        "@contember/react-binding": "workspace:*",
+        "@contember/react-client": "workspace:*",
+        "@contember/react-client-tenant": "workspace:*",
       },
       "devDependencies": {
         "react": "^18.3.1",
@@ -832,9 +839,9 @@
     },
     "packages/react-multipass-rendering": {
       "name": "@contember/react-multipass-rendering",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
       "dependencies": {
-        "@contember/utilities": "packages/utilities",
+        "@contember/utilities": "workspace:*",
       },
       "peerDependencies": {
         "react": "^18 || ^19",
@@ -842,10 +849,10 @@
     },
     "packages/react-repeater": {
       "name": "@contember/react-repeater",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
       "dependencies": {
-        "@contember/react-binding": "packages/react-binding",
-        "@contember/react-utils": "packages/react-utils",
+        "@contember/react-binding": "workspace:*",
+        "@contember/react-utils": "workspace:*",
         "@radix-ui/primitive": "^1.1.0",
         "@radix-ui/react-slot": "^1.1.0",
       },
@@ -860,11 +867,11 @@
     },
     "packages/react-repeater-dnd-kit": {
       "name": "@contember/react-repeater-dnd-kit",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
       "dependencies": {
-        "@contember/react-binding": "packages/react-binding",
-        "@contember/react-repeater": "packages/react-repeater",
-        "@contember/react-utils": "packages/react-utils",
+        "@contember/react-binding": "workspace:*",
+        "@contember/react-repeater": "workspace:*",
+        "@contember/react-utils": "workspace:*",
         "@dnd-kit/core": "^6.1.0",
         "@dnd-kit/sortable": "^8.0.0",
         "@radix-ui/react-portal": "^1.1.2",
@@ -881,7 +888,7 @@
     },
     "packages/react-richtext-renderer": {
       "name": "@contember/react-richtext-renderer",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
       "devDependencies": {
         "@testing-library/dom": "^10.4.0",
         "@testing-library/react": "^16.0.1",
@@ -893,11 +900,11 @@
     },
     "packages/react-routing": {
       "name": "@contember/react-routing",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
       "dependencies": {
-        "@contember/react-binding": "packages/react-binding",
-        "@contember/react-utils": "packages/react-utils",
-        "@contember/utilities": "packages/utilities",
+        "@contember/react-binding": "workspace:*",
+        "@contember/react-utils": "workspace:*",
+        "@contember/utilities": "workspace:*",
         "@radix-ui/react-slot": "^1.1.0",
         "path-to-regexp": "^6.2.2",
       },
@@ -912,13 +919,13 @@
     },
     "packages/react-select": {
       "name": "@contember/react-select",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
       "dependencies": {
-        "@contember/react-binding": "packages/react-binding",
-        "@contember/react-dataview": "packages/react-dataview",
-        "@contember/react-repeater": "packages/react-repeater",
-        "@contember/react-utils": "packages/react-utils",
-        "@contember/utilities": "packages/utilities",
+        "@contember/react-binding": "workspace:*",
+        "@contember/react-dataview": "workspace:*",
+        "@contember/react-repeater": "workspace:*",
+        "@contember/react-utils": "workspace:*",
+        "@contember/utilities": "workspace:*",
         "@radix-ui/react-slot": "^1.1.0",
       },
       "devDependencies": {
@@ -932,12 +939,12 @@
     },
     "packages/react-slate-editor": {
       "name": "@contember/react-slate-editor",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
       "dependencies": {
-        "@contember/react-binding": "packages/react-binding",
-        "@contember/react-multipass-rendering": "packages/react-multipass-rendering",
-        "@contember/react-slate-editor-base": "packages/react-slate-editor-base",
-        "@contember/react-utils": "packages/react-utils",
+        "@contember/react-binding": "workspace:*",
+        "@contember/react-multipass-rendering": "workspace:*",
+        "@contember/react-slate-editor-base": "workspace:*",
+        "@contember/react-utils": "workspace:*",
         "@radix-ui/react-slot": "^1.1.0",
         "react-error-boundary": "^4.0.13",
         "slate": "^0.103.0",
@@ -954,10 +961,10 @@
     },
     "packages/react-slate-editor-base": {
       "name": "@contember/react-slate-editor-base",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
       "dependencies": {
-        "@contember/react-binding": "packages/react-binding",
-        "@contember/utilities": "packages/utilities",
+        "@contember/react-binding": "workspace:*",
+        "@contember/utilities": "workspace:*",
         "@radix-ui/primitive": "^1.1.0",
         "@radix-ui/react-slot": "^1.1.0",
         "is-hotkey": "^0.2.0",
@@ -977,14 +984,14 @@
     },
     "packages/react-slate-editor-legacy": {
       "name": "@contember/react-slate-editor-legacy",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
       "dependencies": {
-        "@contember/react-binding": "packages/react-binding",
-        "@contember/react-multipass-rendering": "packages/react-multipass-rendering",
-        "@contember/react-repeater": "packages/react-repeater",
-        "@contember/react-slate-editor-base": "packages/react-slate-editor-base",
-        "@contember/react-utils": "packages/react-utils",
-        "@contember/utilities": "packages/utilities",
+        "@contember/react-binding": "workspace:*",
+        "@contember/react-multipass-rendering": "workspace:*",
+        "@contember/react-repeater": "workspace:*",
+        "@contember/react-slate-editor-base": "workspace:*",
+        "@contember/react-utils": "workspace:*",
+        "@contember/utilities": "workspace:*",
         "@radix-ui/react-slot": "^1.1.0",
         "react-error-boundary": "^4.0.13",
         "slate": "^0.103.0",
@@ -1001,10 +1008,10 @@
     },
     "packages/react-slots": {
       "name": "@contember/react-slots",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
       "dependencies": {
-        "@contember/react-utils": "packages/react-utils",
-        "@contember/utilities": "packages/utilities",
+        "@contember/react-utils": "workspace:*",
+        "@contember/utilities": "workspace:*",
       },
       "devDependencies": {
         "react": "^18.3.1",
@@ -1017,29 +1024,29 @@
     },
     "packages/react-ui-lib": {
       "name": "@contember/react-ui-lib",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
       "dependencies": {
-        "@contember/graphql-client-tenant": "packages/graphql-client-tenant",
-        "@contember/interface": "packages/interface",
-        "@contember/react-block-repeater": "packages/react-block-repeater",
-        "@contember/react-board": "packages/react-board",
-        "@contember/react-board-dnd-kit": "packages/react-board-dnd-kit",
-        "@contember/react-client": "packages/react-client",
-        "@contember/react-client-tenant": "packages/react-client-tenant",
-        "@contember/react-dataview": "packages/react-dataview",
-        "@contember/react-form": "packages/react-form",
-        "@contember/react-identity": "packages/react-identity",
-        "@contember/react-multipass-rendering": "packages/react-multipass-rendering",
-        "@contember/react-repeater": "packages/react-repeater",
-        "@contember/react-repeater-dnd-kit": "packages/react-repeater-dnd-kit",
-        "@contember/react-select": "packages/react-select",
-        "@contember/react-slate-editor": "packages/react-slate-editor",
-        "@contember/react-slate-editor-base": "packages/react-slate-editor-base",
-        "@contember/react-slots": "packages/react-slots",
-        "@contember/react-uploader": "packages/react-uploader",
-        "@contember/react-uploader-dropzone": "packages/react-uploader-dropzone",
-        "@contember/react-utils": "packages/react-utils",
-        "@contember/utilities": "packages/utilities",
+        "@contember/graphql-client-tenant": "workspace:*",
+        "@contember/interface": "workspace:*",
+        "@contember/react-block-repeater": "workspace:*",
+        "@contember/react-board": "workspace:*",
+        "@contember/react-board-dnd-kit": "workspace:*",
+        "@contember/react-client": "workspace:*",
+        "@contember/react-client-tenant": "workspace:*",
+        "@contember/react-dataview": "workspace:*",
+        "@contember/react-form": "workspace:*",
+        "@contember/react-identity": "workspace:*",
+        "@contember/react-multipass-rendering": "workspace:*",
+        "@contember/react-repeater": "workspace:*",
+        "@contember/react-repeater-dnd-kit": "workspace:*",
+        "@contember/react-select": "workspace:*",
+        "@contember/react-slate-editor": "workspace:*",
+        "@contember/react-slate-editor-base": "workspace:*",
+        "@contember/react-slots": "workspace:*",
+        "@contember/react-uploader": "workspace:*",
+        "@contember/react-uploader-dropzone": "workspace:*",
+        "@contember/react-utils": "workspace:*",
+        "@contember/utilities": "workspace:*",
         "@dnd-kit/core": "^6.1.0",
         "@dnd-kit/sortable": "^8.0.0",
         "@radix-ui/react-alert-dialog": "^1.1.2",
@@ -1073,14 +1080,14 @@
     },
     "packages/react-uploader": {
       "name": "@contember/react-uploader",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
       "dependencies": {
-        "@contember/client": "packages/client",
-        "@contember/graphql-client": "packages/graphql-client",
-        "@contember/react-binding": "packages/react-binding",
-        "@contember/react-client": "packages/react-client",
-        "@contember/react-repeater": "packages/react-repeater",
-        "@contember/react-utils": "packages/react-utils",
+        "@contember/client": "workspace:*",
+        "@contember/graphql-client": "workspace:*",
+        "@contember/react-binding": "workspace:*",
+        "@contember/react-client": "workspace:*",
+        "@contember/react-repeater": "workspace:*",
+        "@contember/react-utils": "workspace:*",
       },
       "devDependencies": {
         "react": "^18.3.1",
@@ -1093,12 +1100,12 @@
     },
     "packages/react-uploader-dropzone": {
       "name": "@contember/react-uploader-dropzone",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
       "dependencies": {
-        "@contember/react-binding": "packages/react-binding",
-        "@contember/react-uploader": "packages/react-uploader",
-        "@contember/react-utils": "packages/react-utils",
-        "@contember/utilities": "packages/utilities",
+        "@contember/react-binding": "workspace:*",
+        "@contember/react-uploader": "workspace:*",
+        "@contember/react-utils": "workspace:*",
+        "@contember/utilities": "workspace:*",
         "@radix-ui/react-slot": "^1.1.0",
         "react-dropzone": "^14.2.9",
       },
@@ -1113,7 +1120,7 @@
     },
     "packages/react-utils": {
       "name": "@contember/react-utils",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
       "dependencies": {
         "fast-deep-equal": "^3.1.3",
       },
@@ -1123,14 +1130,14 @@
     },
     "packages/schema": {
       "name": "@contember/schema",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
     },
     "packages/schema-definition": {
       "name": "@contember/schema-definition",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
       "dependencies": {
-        "@contember/schema": "packages/schema",
-        "@contember/schema-utils": "packages/schema-utils",
+        "@contember/schema": "workspace:*",
+        "@contember/schema-utils": "workspace:*",
         "fast-deep-equal": "^3.1.3",
         "reflect-metadata": "^0.2.2",
       },
@@ -1143,18 +1150,18 @@
     },
     "packages/schema-migrations": {
       "name": "@contember/schema-migrations",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
       "dependencies": {
-        "@contember/database": "packages/database",
-        "@contember/database-migrations": "packages/database-migrations",
-        "@contember/engine-common": "packages/engine-common",
-        "@contember/schema": "packages/schema",
-        "@contember/schema-utils": "packages/schema-utils",
+        "@contember/database": "workspace:*",
+        "@contember/database-migrations": "workspace:*",
+        "@contember/engine-common": "workspace:*",
+        "@contember/schema": "workspace:*",
+        "@contember/schema-utils": "workspace:*",
         "fast-deep-equal": "^3.1.3",
         "rfc6902": "^5.1.1",
       },
       "devDependencies": {
-        "@contember/schema-definition": "packages/schema-definition",
+        "@contember/schema-definition": "workspace:*",
       },
       "peerDependencies": {
         "pg": "^8.9.0",
@@ -1162,33 +1169,33 @@
     },
     "packages/schema-utils": {
       "name": "@contember/schema-utils",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
       "dependencies": {
-        "@contember/schema": "packages/schema",
-        "@contember/typesafe": "packages/typesafe",
+        "@contember/schema": "workspace:*",
+        "@contember/typesafe": "workspace:*",
       },
       "devDependencies": {
-        "@contember/schema-definition": "packages/schema-definition",
+        "@contember/schema-definition": "workspace:*",
         "@types/node": "^20.16.11",
       },
     },
     "packages/typesafe": {
       "name": "@contember/typesafe",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
       "devDependencies": {
         "@types/node": "^20.16.11",
       },
     },
     "packages/utilities": {
       "name": "@contember/utilities",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
       "peerDependencies": {
         "react": "^18 || ^19",
       },
     },
     "packages/vite-plugin": {
       "name": "@contember/vite-plugin",
-      "version": "2.0.0-beta.2",
+      "version": "2.0.0-beta.3",
       "peerDependencies": {
         "vite": "^4 || ^5",
       },
@@ -1251,141 +1258,141 @@
 
     "@babel/types": ["@babel/types@7.26.3", "", { "dependencies": { "@babel/helper-string-parser": "^7.25.9", "@babel/helper-validator-identifier": "^7.25.9" } }, "sha512-vN5p+1kl59GVKMvTHt55NzzmYVxprfJD+ql7U9NFIfKCBkYE55LYtS+WtPlaYOyzydrKI8Nezd+aZextrd+FMA=="],
 
-    "@contember/authorization": ["@contember/authorization@workspace:packages/authorization", {}],
+    "@contember/authorization": ["@contember/authorization@workspace:packages/authorization"],
 
-    "@contember/binding": ["@contember/binding@workspace:packages/binding", { "dependencies": { "@contember/binding-common": "packages/binding-common", "@contember/binding-legacy": "packages/binding-legacy", "@contember/binding-ng": "packages/binding-ng" } }],
+    "@contember/binding": ["@contember/binding@workspace:packages/binding"],
 
-    "@contember/binding-common": ["@contember/binding-common@workspace:packages/binding-common", { "dependencies": { "@contember/client": "packages/client", "@contember/client-content": "packages/client-content", "@contember/utilities": "packages/utilities", "chevrotain": "6.5.0", "fast-deep-equal": "^3.1.3", "js-levenshtein": "1.1.6", "uuid": "10.0.0" }, "devDependencies": { "@types/js-levenshtein": "1.1.3", "@types/uuid": "10.0.0", "react": "^18.3.1", "react-dom": "^18.3.1" }, "peerDependencies": { "react": "^18 || ^19", "react-dom": "^18 || ^19" } }],
+    "@contember/binding-common": ["@contember/binding-common@workspace:packages/binding-common"],
 
-    "@contember/binding-legacy": ["@contember/binding-legacy@workspace:packages/binding-legacy", { "dependencies": { "@contember/binding-common": "packages/binding-common", "@contember/client": "packages/client", "@contember/utilities": "packages/utilities", "uuid": "9.0.1" }, "devDependencies": { "@types/uuid": "9.0.8" } }],
+    "@contember/binding-legacy": ["@contember/binding-legacy@workspace:packages/binding-legacy"],
 
-    "@contember/binding-ng": ["@contember/binding-ng@workspace:packages/binding-ng", {}],
+    "@contember/binding-ng": ["@contember/binding-ng@workspace:packages/binding-ng"],
 
-    "@contember/cli": ["@contember/cli@workspace:packages/cli", { "dependencies": { "@contember/cli-common": "packages/cli-common", "@contember/config-loader": "packages/config-loader", "@contember/database": "packages/database", "@contember/dic": "packages/dic", "@contember/engine-common": "packages/engine-common", "@contember/engine-content-api": "packages/engine-content-api", "@contember/graphql-client": "packages/graphql-client", "@contember/migrations-client": "packages/migrations-client", "@contember/schema": "packages/schema", "@contember/schema-migrations": "packages/schema-migrations", "@contember/schema-utils": "packages/schema-utils", "@contember/typesafe": "packages/typesafe", "@graphql-tools/schema": "^10.0.7", "chalk": "^5.3.0", "chalk-table": "^1.0.2", "fast-glob": "^3.3.2", "graphql": "^16.9.0", "js-yaml": "^4.1.0", "lodash-es": "^4.17.21", "pg": "^8.12.0", "preact": "^10.23.2", "preact-render-to-string": "^6.5.11", "prompts": "^2.4.2", "semver": "^7.6.3", "yawn-yaml": "^2.3.0" }, "devDependencies": { "@types/fs-extra": "^11.0.4", "@types/js-yaml": "^4.0.9", "@types/node": "^20.16.11", "@types/prompts": "^2.4.9", "@types/semver": "^7.5.8", "autoprefixer": "^10.4.20", "postcss": "^8.4.47", "tailwindcss": "^3.4.14" }, "peerDependencies": { "esbuild": "*" }, "bin": { "contember": "./dist/production/run.js" } }],
+    "@contember/cli": ["@contember/cli@workspace:packages/cli"],
 
-    "@contember/cli-common": ["@contember/cli-common@workspace:packages/cli-common", { "dependencies": { "chalk": "^5.3.0" }, "devDependencies": { "@types/js-yaml": "^4.0.9", "@types/node": "^20.16.11", "@types/npm-package-arg": "^6.1.4" } }],
+    "@contember/cli-common": ["@contember/cli-common@workspace:packages/cli-common"],
 
-    "@contember/client": ["@contember/client@workspace:packages/client", { "dependencies": { "@contember/client-content": "packages/client-content", "@contember/graphql-builder": "packages/graphql-builder", "@contember/graphql-client": "packages/graphql-client", "@contember/schema": "packages/schema" } }],
+    "@contember/client": ["@contember/client@workspace:packages/client"],
 
-    "@contember/client-content": ["@contember/client-content@workspace:packages/client-content", { "dependencies": { "@contember/graphql-builder": "packages/graphql-builder", "@contember/graphql-client": "packages/graphql-client", "@contember/schema": "packages/schema" }, "devDependencies": { "@contember/client-content-generator": "packages/client-content-generator", "expect-type": "^1.1.0" } }],
+    "@contember/client-content": ["@contember/client-content@workspace:packages/client-content"],
 
-    "@contember/client-content-generator": ["@contember/client-content-generator@workspace:packages/client-content-generator", { "dependencies": { "@contember/client-content": "packages/client-content", "@contember/schema": "packages/schema", "@contember/schema-utils": "packages/schema-utils" }, "devDependencies": { "@contember/schema-definition": "packages/schema-definition", "@types/node": "^20.16.11" }, "bin": { "contember-client-generator": "./dist/production/generate.cjs" } }],
+    "@contember/client-content-generator": ["@contember/client-content-generator@workspace:packages/client-content-generator"],
 
-    "@contember/config-loader": ["@contember/config-loader@workspace:packages/config-loader", { "dependencies": { "js-yaml": "^4.1.0" }, "devDependencies": { "@types/js-yaml": "^4.0.9", "@types/node": "^20.16.11" } }],
+    "@contember/config-loader": ["@contember/config-loader@workspace:packages/config-loader"],
 
-    "@contember/create": ["@contember/create@workspace:packages/create", { "dependencies": { "@contember/cli-common": "packages/cli-common", "chalk": "^5.3.0", "fs-extra": "^11.2.0", "js-yaml": "^4.1.0" }, "bin": "dist/production/run.js" }],
+    "@contember/create": ["@contember/create@workspace:packages/create"],
 
-    "@contember/database": ["@contember/database@workspace:packages/database", { "dependencies": { "@contember/queryable": "packages/queryable" }, "devDependencies": { "@contember/database-tester": "packages/database-tester", "@types/node": "^20.16.11", "pg": "^8.12.0" }, "peerDependencies": { "pg": "^8.9.0" } }],
+    "@contember/database": ["@contember/database@workspace:packages/database"],
 
-    "@contember/database-migrations": ["@contember/database-migrations@workspace:packages/database-migrations", { "dependencies": { "@contember/database": "packages/database", "node-pg-migrate": "^5.10.0" }, "devDependencies": { "pg": "^8.12.0" }, "peerDependencies": { "pg": "^8.9.0" } }],
+    "@contember/database-migrations": ["@contember/database-migrations@workspace:packages/database-migrations"],
 
-    "@contember/database-tester": ["@contember/database-tester@workspace:packages/database-tester", { "dependencies": { "@contember/database": "packages/database" }, "peerDependencies": { "pg": "^8.9.0" } }],
+    "@contember/database-tester": ["@contember/database-tester@workspace:packages/database-tester"],
 
-    "@contember/dic": ["@contember/dic@workspace:packages/dic", {}],
+    "@contember/dic": ["@contember/dic@workspace:packages/dic"],
 
-    "@contember/engine-actions": ["@contember/engine-actions@workspace:packages/engine-actions", { "dependencies": { "@contember/authorization": "packages/authorization", "@contember/database": "packages/database", "@contember/database-migrations": "packages/database-migrations", "@contember/engine-common": "packages/engine-common", "@contember/engine-content-api": "packages/engine-content-api", "@contember/engine-http": "packages/engine-http", "@contember/engine-plugins": "packages/engine-plugins", "@contember/engine-system-api": "packages/engine-system-api", "@contember/engine-tenant-api": "packages/engine-tenant-api", "@contember/graphql-utils": "packages/graphql-utils", "@contember/logger": "packages/logger", "@contember/schema": "packages/schema", "@contember/schema-utils": "packages/schema-utils", "@contember/typesafe": "packages/typesafe", "@graphql-tools/schema": "^10.0.7", "graphql-tag": "^2.12.6" }, "devDependencies": { "@types/bun": "^1.1.10", "@types/ws": "^8.5.12", "graphql": "^16.9.0" }, "peerDependencies": { "graphql": ">= 14.6.0", "pg": "^8.5.0" } }],
+    "@contember/engine-actions": ["@contember/engine-actions@workspace:packages/engine-actions"],
 
-    "@contember/engine-common": ["@contember/engine-common@workspace:packages/engine-common", { "dependencies": { "@contember/logger": "packages/logger" }, "devDependencies": { "@types/node": "^20.16.11" } }],
+    "@contember/engine-common": ["@contember/engine-common@workspace:packages/engine-common"],
 
-    "@contember/engine-content-api": ["@contember/engine-content-api@workspace:packages/engine-content-api", { "dependencies": { "@contember/database": "packages/database", "@contember/dic": "packages/dic", "@contember/graphql-utils": "packages/graphql-utils", "@contember/logger": "packages/logger", "@contember/schema": "packages/schema", "@contember/schema-definition": "packages/schema-definition", "@contember/schema-utils": "packages/schema-utils", "fast-deep-equal": "^3.1.3" }, "devDependencies": { "@contember/database-tester": "packages/database-tester", "@contember/schema-definition": "packages/schema-definition", "@types/node": "^20.16.11", "graphql": "^16.9.0", "pg": "^8.12.0" }, "peerDependencies": { "graphql": ">= 14.6.0", "pg": "^8.9.0" } }],
+    "@contember/engine-content-api": ["@contember/engine-content-api@workspace:packages/engine-content-api"],
 
-    "@contember/engine-http": ["@contember/engine-http@workspace:packages/engine-http", { "dependencies": { "@contember/config-loader": "packages/config-loader", "@contember/database": "packages/database", "@contember/database-migrations": "packages/database-migrations", "@contember/dic": "packages/dic", "@contember/engine-common": "packages/engine-common", "@contember/engine-content-api": "packages/engine-content-api", "@contember/engine-system-api": "packages/engine-system-api", "@contember/engine-tenant-api": "packages/engine-tenant-api", "@contember/graphql-utils": "packages/graphql-utils", "@contember/logger": "packages/logger", "@contember/schema": "packages/schema", "@contember/schema-migrations": "packages/schema-migrations", "@contember/schema-utils": "packages/schema-utils", "@contember/typesafe": "packages/typesafe", "@graphql-tools/merge": "^9.0.8", "@graphql-tools/schema": "^10.0.7", "@koa/cors": "^5.0.0", "@sentry/node": "^7.119.2", "bcryptjs": "^2.4.3", "koa": "^2.15.3", "koa-bodyparser": "^4.4.1", "koa-compress": "^5.1.1", "lru-cache": "^11.0.1", "path-to-regexp": "^6.2.2", "prom-client": "^12.0.0", "uuid": "^10.0.0", "ws": "^8.18.0" }, "devDependencies": { "@types/bcryptjs": "^2.4.6", "@types/koa": "^2.15.0", "@types/koa-bodyparser": "^4.3.12", "@types/koa__cors": "^5.0.0", "@types/lru-cache": "^7.10.10", "@types/node": "^20.16.11", "@types/uuid": "^10.0.0", "@types/ws": "^8.5.12", "graphql": "^16.9.0" }, "peerDependencies": { "graphql": ">= 14.6.0", "pg": "^8.9.0" } }],
+    "@contember/engine-http": ["@contember/engine-http@workspace:packages/engine-http"],
 
-    "@contember/engine-plugins": ["@contember/engine-plugins@workspace:packages/engine-plugins", { "dependencies": { "@contember/database-migrations": "packages/database-migrations", "@contember/engine-http": "packages/engine-http" }, "devDependencies": { "graphql": "^16.9.0" }, "peerDependencies": { "graphql": ">= 14.6.0", "pg": "^8.9.0" } }],
+    "@contember/engine-plugins": ["@contember/engine-plugins@workspace:packages/engine-plugins"],
 
-    "@contember/engine-s3-plugin": ["@contember/engine-s3-plugin@workspace:packages/engine-s3-plugin", { "dependencies": { "@contember/engine-plugins": "packages/engine-plugins", "@contember/graphql-utils": "packages/graphql-utils", "@contember/typesafe": "packages/typesafe", "mime-types": "^2.1.35", "picomatch": "^4.0.2", "qs": "^6.13.0", "uuid": "^10.0.0" }, "devDependencies": { "@types/mime-types": "^2.1.4", "@types/qs": "^6.9.16", "@types/uuid": "^10.0.0", "graphql": "^16.9.0" }, "peerDependencies": { "graphql": ">= 14.6.0", "pg": "^8.9.0" } }],
+    "@contember/engine-s3-plugin": ["@contember/engine-s3-plugin@workspace:packages/engine-s3-plugin"],
 
-    "@contember/engine-server": ["@contember/engine-server@workspace:packages/engine-server", { "dependencies": { "@contember/engine-actions": "packages/engine-actions", "@contember/engine-http": "packages/engine-http", "@contember/engine-plugins": "packages/engine-plugins", "@contember/engine-s3-plugin": "packages/engine-s3-plugin", "@contember/engine-vimeo-plugin": "packages/engine-vimeo-plugin", "graphql": "^16.9.0", "pg": "^8.12.0", "uuid": "^10.0.0" }, "devDependencies": { "@types/koa-compress": "^4.0.6", "@types/node": "^20.16.11" } }],
+    "@contember/engine-server": ["@contember/engine-server@workspace:packages/engine-server"],
 
-    "@contember/engine-system-api": ["@contember/engine-system-api@workspace:packages/engine-system-api", { "dependencies": { "@contember/authorization": "packages/authorization", "@contember/database": "packages/database", "@contember/database-migrations": "packages/database-migrations", "@contember/dic": "packages/dic", "@contember/graphql-utils": "packages/graphql-utils", "@contember/logger": "packages/logger", "@contember/queryable": "packages/queryable", "@contember/schema": "packages/schema", "@contember/schema-migrations": "packages/schema-migrations", "@contember/schema-utils": "packages/schema-utils", "@graphql-tools/utils": "^10.5.5", "graphql-tag": "^2.12.6" }, "devDependencies": { "@contember/schema-definition": "packages/schema-definition", "@types/node": "^20.16.11", "graphql": "^16.9.0", "pg": "^8.12.0" }, "peerDependencies": { "graphql": ">= 14.6.0", "pg": "^8.9.0" } }],
+    "@contember/engine-system-api": ["@contember/engine-system-api@workspace:packages/engine-system-api"],
 
-    "@contember/engine-tenant-api": ["@contember/engine-tenant-api@workspace:packages/engine-tenant-api", { "dependencies": { "@contember/authorization": "packages/authorization", "@contember/config-loader": "packages/config-loader", "@contember/database": "packages/database", "@contember/database-migrations": "packages/database-migrations", "@contember/dic": "packages/dic", "@contember/graphql-utils": "packages/graphql-utils", "@contember/logger": "packages/logger", "@contember/schema": "packages/schema", "@contember/schema-utils": "packages/schema-utils", "@contember/typesafe": "packages/typesafe", "@graphql-tools/utils": "^10.5.5", "graphql-tag": "^2.12.6", "jose": "^5.8.0", "mustache": "^4.2.0", "nodemailer": "^6.9.15", "openid-client": "^5.7.0", "otpauth": "^9.3.4" }, "devDependencies": { "@contember/database-tester": "packages/database-tester", "@graphql-tools/schema": "^10.0.7", "@types/mustache": "^4.2.5", "@types/node": "^20.16.11", "@types/nodemailer": "^6.4.16", "graphql": "^16.9.0" }, "peerDependencies": { "graphql": ">= 14.6.0", "pg": "^8.9.0" } }],
+    "@contember/engine-tenant-api": ["@contember/engine-tenant-api@workspace:packages/engine-tenant-api"],
 
-    "@contember/engine-vimeo-plugin": ["@contember/engine-vimeo-plugin@workspace:packages/engine-vimeo-plugin", { "dependencies": { "@contember/engine-plugins": "packages/engine-plugins", "@contember/typesafe": "packages/typesafe" }, "devDependencies": { "@types/node": "^20.16.11", "graphql": "^16.9.0" }, "peerDependencies": { "graphql": ">= 14.6.0", "pg": "^8.9.0" } }],
+    "@contember/engine-vimeo-plugin": ["@contember/engine-vimeo-plugin@workspace:packages/engine-vimeo-plugin"],
 
-    "@contember/graphql-builder": ["@contember/graphql-builder@workspace:packages/graphql-builder", { "dependencies": { "@contember/schema": "packages/schema" } }],
+    "@contember/graphql-builder": ["@contember/graphql-builder@workspace:packages/graphql-builder"],
 
-    "@contember/graphql-client": ["@contember/graphql-client@workspace:packages/graphql-client", {}],
+    "@contember/graphql-client": ["@contember/graphql-client@workspace:packages/graphql-client"],
 
-    "@contember/graphql-client-system": ["@contember/graphql-client-system@workspace:packages/graphql-client-system", { "dependencies": { "@contember/schema": "packages/schema", "graphql-ts-client-api": "^3.1.17" }, "devDependencies": { "@contember/engine-system-api": "packages/engine-system-api", "@graphql-tools/schema": "^10.0.7", "@types/node": "^20.16.11", "graphql": "^16.9.0", "graphql-ts-client-codegen": "^3.1.17" } }],
+    "@contember/graphql-client-system": ["@contember/graphql-client-system@workspace:packages/graphql-client-system"],
 
-    "@contember/graphql-client-tenant": ["@contember/graphql-client-tenant@workspace:packages/graphql-client-tenant", { "dependencies": { "graphql-ts-client-api": "^3.1.17" }, "devDependencies": { "@contember/engine-tenant-api": "packages/engine-tenant-api", "@graphql-tools/schema": "^10.0.7", "@types/node": "^20.16.11", "graphql": "^16.9.0", "graphql-ts-client-codegen": "^3.1.17" } }],
+    "@contember/graphql-client-tenant": ["@contember/graphql-client-tenant@workspace:packages/graphql-client-tenant"],
 
-    "@contember/graphql-utils": ["@contember/graphql-utils@workspace:packages/graphql-utils", { "devDependencies": { "@types/node": "^20.16.11", "graphql": "^16.9.0" }, "peerDependencies": { "graphql": ">= 14.6.0" } }],
+    "@contember/graphql-utils": ["@contember/graphql-utils@workspace:packages/graphql-utils"],
 
-    "@contember/interface": ["@contember/interface@workspace:packages/interface", { "dependencies": { "@contember/react-binding": "packages/react-binding", "@contember/react-client": "packages/react-client", "@contember/react-dataview": "packages/react-dataview", "@contember/react-devbar": "packages/react-devbar", "@contember/react-identity": "packages/react-identity", "@contember/react-routing": "packages/react-routing", "@radix-ui/react-slot": "^1.1.0", "stacktracey": "^2.1.8" }, "devDependencies": { "react": "^18.3.1", "react-dom": "^18.3.1" }, "peerDependencies": { "react": "^18 || ^19", "react-dom": "^18 || ^19" } }],
+    "@contember/interface": ["@contember/interface@workspace:packages/interface"],
 
-    "@contember/logger": ["@contember/logger@workspace:packages/logger", { "dependencies": { "chalk": "^5.3.0" }, "devDependencies": { "@types/node": "^20.16.11" } }],
+    "@contember/logger": ["@contember/logger@workspace:packages/logger"],
 
-    "@contember/migrations-client": ["@contember/migrations-client@workspace:packages/migrations-client", { "dependencies": { "@contember/engine-common": "packages/engine-common", "@contember/graphql-client": "packages/graphql-client", "@contember/schema": "packages/schema", "@contember/schema-migrations": "packages/schema-migrations", "@contember/schema-utils": "packages/schema-utils" }, "devDependencies": { "@types/node": "^20.16.11" } }],
+    "@contember/migrations-client": ["@contember/migrations-client@workspace:packages/migrations-client"],
 
-    "@contember/playground": ["@contember/playground@workspace:packages/playground", { "dependencies": { "@sindresorhus/slugify": "^2.2.1" }, "devDependencies": { "@contember/binding": "packages/binding", "@contember/client": "packages/client", "@contember/client-content": "packages/client-content", "@contember/interface": "packages/interface", "@contember/react-client-content": "packages/react-client-content", "@contember/react-ui-lib": "packages/react-ui-lib", "@contember/schema": "packages/schema", "@contember/schema-definition": "packages/schema-definition", "@contember/schema-utils": "packages/schema-utils", "@contember/utilities": "packages/utilities", "@contember/vite-plugin": "packages/vite-plugin", "@faker-js/faker": "^9.0.3", "@radix-ui/react-separator": "^1.1.0", "@radix-ui/react-toolbar": "^1.1.0", "autoprefixer": "^10.4.20", "graphql": "^16.9.0", "lucide-react": "^0.453.0", "postcss": "^8.4.47", "qrcode-generator": "^1.4.4", "react": "^18.3.1", "react-dnd": "^16.0.1", "react-dnd-html5-backend": "^16.0.1", "react-dom": "^18.3.1", "slate-hyperscript": "^0.100.0", "tailwindcss": "^3.4.14", "tailwindcss-animate": "^1.0.7", "vite": "^5.4.9", "vite-tsconfig-paths": "^5.0.1" } }],
+    "@contember/playground": ["@contember/playground@workspace:packages/playground"],
 
-    "@contember/queryable": ["@contember/queryable@workspace:packages/queryable", {}],
+    "@contember/queryable": ["@contember/queryable@workspace:packages/queryable"],
 
-    "@contember/react-binding": ["@contember/react-binding@workspace:packages/react-binding", { "dependencies": { "@contember/binding": "packages/binding", "@contember/client": "packages/client", "@contember/graphql-client": "packages/graphql-client", "@contember/react-client": "packages/react-client", "@contember/react-utils": "packages/react-utils", "@contember/utilities": "packages/utilities", "@radix-ui/primitive": "^0.1.0", "@radix-ui/react-slot": "^1.1.0" }, "devDependencies": { "@types/js-levenshtein": "1.1.3", "@types/uuid": "10.0.0", "react": "^18.3.1", "react-dom": "^18.3.1" }, "peerDependencies": { "react": "^18 || ^19", "react-dom": "^18 || ^19" } }],
+    "@contember/react-binding": ["@contember/react-binding@workspace:packages/react-binding"],
 
-    "@contember/react-block-repeater": ["@contember/react-block-repeater@workspace:packages/react-block-repeater", { "dependencies": { "@contember/react-binding": "packages/react-binding", "@contember/react-multipass-rendering": "packages/react-multipass-rendering", "@contember/react-repeater": "packages/react-repeater", "@contember/react-utils": "packages/react-utils", "@radix-ui/primitive": "^1.1.0", "@radix-ui/react-slot": "^1.1.0" }, "devDependencies": { "react": "^18.3.1", "react-dom": "^18.3.1" }, "peerDependencies": { "react": "^18 || ^19", "react-dom": "^18 || ^19" } }],
+    "@contember/react-block-repeater": ["@contember/react-block-repeater@workspace:packages/react-block-repeater"],
 
-    "@contember/react-board": ["@contember/react-board@workspace:packages/react-board", { "dependencies": { "@contember/react-binding": "packages/react-binding", "@contember/react-multipass-rendering": "packages/react-multipass-rendering", "@contember/react-utils": "packages/react-utils" }, "devDependencies": { "react": "^18.3.1", "react-dom": "^18.3.1" }, "peerDependencies": { "react": "^18 || ^19", "react-dom": "^18 || ^19" } }],
+    "@contember/react-board": ["@contember/react-board@workspace:packages/react-board"],
 
-    "@contember/react-board-dnd-kit": ["@contember/react-board-dnd-kit@workspace:packages/react-board-dnd-kit", { "dependencies": { "@contember/react-binding": "packages/react-binding", "@contember/react-board": "packages/react-board", "@contember/react-utils": "packages/react-utils", "@contember/utilities": "packages/utilities", "@dnd-kit/core": "^6.1.0", "@dnd-kit/sortable": "^8.0.0", "@radix-ui/react-portal": "^1.1.2", "@radix-ui/react-slot": "^1.1.0" }, "devDependencies": { "react": "^18.3.1", "react-dom": "^18.3.1" }, "peerDependencies": { "react": "^18 || ^19", "react-dom": "^18 || ^19" } }],
+    "@contember/react-board-dnd-kit": ["@contember/react-board-dnd-kit@workspace:packages/react-board-dnd-kit"],
 
-    "@contember/react-client": ["@contember/react-client@workspace:packages/react-client", { "dependencies": { "@contember/client": "packages/client", "@contember/react-richtext-renderer": "packages/react-richtext-renderer" }, "peerDependencies": { "react": "^18 || ^19" } }],
+    "@contember/react-client": ["@contember/react-client@workspace:packages/react-client"],
 
-    "@contember/react-client-content": ["@contember/react-client-content@workspace:packages/react-client-content", { "dependencies": { "@contember/client-content": "packages/client-content", "@contember/react-client": "packages/react-client", "@contember/react-utils": "packages/react-utils" }, "devDependencies": { "react": "^18.3.1", "react-dom": "^18.3.1" }, "peerDependencies": { "react": "^18 || ^19", "react-dom": "^18 || ^19" } }],
+    "@contember/react-client-content": ["@contember/react-client-content@workspace:packages/react-client-content"],
 
-    "@contember/react-client-tenant": ["@contember/react-client-tenant@workspace:packages/react-client-tenant", { "dependencies": { "@contember/graphql-client-tenant": "packages/graphql-client-tenant", "@contember/react-client": "packages/react-client", "@contember/react-utils": "packages/react-utils", "@radix-ui/primitive": "^1.1.0", "@radix-ui/react-slot": "^1.1.0", "graphql-ts-client-api": "^3.1.17" }, "devDependencies": { "react": "^18.3.1", "react-dom": "^18.3.1" }, "peerDependencies": { "react": "^18 || ^19", "react-dom": "^18 || ^19" } }],
+    "@contember/react-client-tenant": ["@contember/react-client-tenant@workspace:packages/react-client-tenant"],
 
-    "@contember/react-dataview": ["@contember/react-dataview@workspace:packages/react-dataview", { "dependencies": { "@contember/client": "packages/client", "@contember/react-binding": "packages/react-binding", "@contember/react-client": "packages/react-client", "@contember/react-multipass-rendering": "packages/react-multipass-rendering", "@contember/react-utils": "packages/react-utils", "@contember/utilities": "packages/utilities", "@radix-ui/primitive": "^1.1.0", "@radix-ui/react-slot": "^1.1.0", "fast-deep-equal": "^3.1.3" }, "devDependencies": { "react": "^18.3.1", "react-dom": "^18.3.1" }, "peerDependencies": { "react": "^18 || ^19", "react-dom": "^18 || ^19" } }],
+    "@contember/react-dataview": ["@contember/react-dataview@workspace:packages/react-dataview"],
 
-    "@contember/react-devbar": ["@contember/react-devbar@workspace:packages/react-devbar", { "dependencies": { "@contember/react-utils": "packages/react-utils", "@contember/utilities": "packages/utilities", "buffer": "6.0.3" }, "devDependencies": { "@types/react": "^18.3.11", "@types/react-dom": "^18.3.1", "react": "^18.3.1", "react-dom": "^18.3.1" }, "peerDependencies": { "react": "^18 || ^19", "react-dom": "^18 || ^19" } }],
+    "@contember/react-devbar": ["@contember/react-devbar@workspace:packages/react-devbar"],
 
-    "@contember/react-form": ["@contember/react-form@workspace:packages/react-form", { "dependencies": { "@contember/react-binding": "packages/react-binding", "@contember/react-utils": "packages/react-utils", "@contember/utilities": "packages/utilities", "@radix-ui/react-slot": "^1.1.0" }, "devDependencies": { "react": "^18.3.1", "react-dom": "^18.3.1" }, "peerDependencies": { "react": "^18 || ^19", "react-dom": "^18 || ^19" } }],
+    "@contember/react-form": ["@contember/react-form@workspace:packages/react-form"],
 
-    "@contember/react-identity": ["@contember/react-identity@workspace:packages/react-identity", { "dependencies": { "@contember/react-binding": "packages/react-binding", "@contember/react-client": "packages/react-client", "@contember/react-client-tenant": "packages/react-client-tenant" }, "devDependencies": { "react": "^18.3.1", "react-dom": "^18.3.1" }, "peerDependencies": { "react": "^18 || ^19", "react-dom": "^18 || ^19" } }],
+    "@contember/react-identity": ["@contember/react-identity@workspace:packages/react-identity"],
 
-    "@contember/react-multipass-rendering": ["@contember/react-multipass-rendering@workspace:packages/react-multipass-rendering", { "dependencies": { "@contember/utilities": "packages/utilities" }, "peerDependencies": { "react": "^18 || ^19" } }],
+    "@contember/react-multipass-rendering": ["@contember/react-multipass-rendering@workspace:packages/react-multipass-rendering"],
 
-    "@contember/react-repeater": ["@contember/react-repeater@workspace:packages/react-repeater", { "dependencies": { "@contember/react-binding": "packages/react-binding", "@contember/react-utils": "packages/react-utils", "@radix-ui/primitive": "^1.1.0", "@radix-ui/react-slot": "^1.1.0" }, "devDependencies": { "react": "^18.3.1", "react-dom": "^18.3.1" }, "peerDependencies": { "react": "^18 || ^19", "react-dom": "^18 || ^19" } }],
+    "@contember/react-repeater": ["@contember/react-repeater@workspace:packages/react-repeater"],
 
-    "@contember/react-repeater-dnd-kit": ["@contember/react-repeater-dnd-kit@workspace:packages/react-repeater-dnd-kit", { "dependencies": { "@contember/react-binding": "packages/react-binding", "@contember/react-repeater": "packages/react-repeater", "@contember/react-utils": "packages/react-utils", "@dnd-kit/core": "^6.1.0", "@dnd-kit/sortable": "^8.0.0", "@radix-ui/react-portal": "^1.1.2", "@radix-ui/react-slot": "^1.1.0" }, "devDependencies": { "react": "^18.3.1", "react-dom": "^18.3.1" }, "peerDependencies": { "react": "^18 || ^19", "react-dom": "^18 || ^19" } }],
+    "@contember/react-repeater-dnd-kit": ["@contember/react-repeater-dnd-kit@workspace:packages/react-repeater-dnd-kit"],
 
-    "@contember/react-richtext-renderer": ["@contember/react-richtext-renderer@workspace:packages/react-richtext-renderer", { "devDependencies": { "@testing-library/dom": "^10.4.0", "@testing-library/react": "^16.0.1", "@testing-library/react-hooks": "^8.0.1" }, "peerDependencies": { "react": "^18 || ^19" } }],
+    "@contember/react-richtext-renderer": ["@contember/react-richtext-renderer@workspace:packages/react-richtext-renderer"],
 
-    "@contember/react-routing": ["@contember/react-routing@workspace:packages/react-routing", { "dependencies": { "@contember/react-binding": "packages/react-binding", "@contember/react-utils": "packages/react-utils", "@contember/utilities": "packages/utilities", "@radix-ui/react-slot": "^1.1.0", "path-to-regexp": "^6.2.2" }, "devDependencies": { "react": "^18.3.1", "react-dom": "^18.3.1" }, "peerDependencies": { "react": "^18 || ^19", "react-dom": "^18 || ^19" } }],
+    "@contember/react-routing": ["@contember/react-routing@workspace:packages/react-routing"],
 
-    "@contember/react-select": ["@contember/react-select@workspace:packages/react-select", { "dependencies": { "@contember/react-binding": "packages/react-binding", "@contember/react-dataview": "packages/react-dataview", "@contember/react-repeater": "packages/react-repeater", "@contember/react-utils": "packages/react-utils", "@contember/utilities": "packages/utilities", "@radix-ui/react-slot": "^1.1.0" }, "devDependencies": { "react": "^18.3.1", "react-dom": "^18.3.1" }, "peerDependencies": { "react": "^18 || ^19", "react-dom": "^18 || ^19" } }],
+    "@contember/react-select": ["@contember/react-select@workspace:packages/react-select"],
 
-    "@contember/react-slate-editor": ["@contember/react-slate-editor@workspace:packages/react-slate-editor", { "dependencies": { "@contember/react-binding": "packages/react-binding", "@contember/react-multipass-rendering": "packages/react-multipass-rendering", "@contember/react-slate-editor-base": "packages/react-slate-editor-base", "@contember/react-utils": "packages/react-utils", "@radix-ui/react-slot": "^1.1.0", "react-error-boundary": "^4.0.13", "slate": "^0.103.0", "slate-react": "^0.110.1" }, "devDependencies": { "react": "^18.3.1", "react-dom": "^18.3.1" }, "peerDependencies": { "react": "^18 || ^19", "react-dom": "^18 || ^19" } }],
+    "@contember/react-slate-editor": ["@contember/react-slate-editor@workspace:packages/react-slate-editor"],
 
-    "@contember/react-slate-editor-base": ["@contember/react-slate-editor-base@workspace:packages/react-slate-editor-base", { "dependencies": { "@contember/react-binding": "packages/react-binding", "@contember/utilities": "packages/utilities", "@radix-ui/primitive": "^1.1.0", "@radix-ui/react-slot": "^1.1.0", "is-hotkey": "^0.2.0", "slate": "^0.103.0", "slate-history": "^0.109.0", "slate-react": "^0.110.1" }, "devDependencies": { "@types/is-hotkey": "^0.1.10", "react": "^18.3.1", "react-dom": "^18.3.1" }, "peerDependencies": { "react": "^18 || ^19", "react-dom": "^18 || ^19" } }],
+    "@contember/react-slate-editor-base": ["@contember/react-slate-editor-base@workspace:packages/react-slate-editor-base"],
 
-    "@contember/react-slate-editor-legacy": ["@contember/react-slate-editor-legacy@workspace:packages/react-slate-editor-legacy", { "dependencies": { "@contember/react-binding": "packages/react-binding", "@contember/react-multipass-rendering": "packages/react-multipass-rendering", "@contember/react-repeater": "packages/react-repeater", "@contember/react-slate-editor-base": "packages/react-slate-editor-base", "@contember/react-utils": "packages/react-utils", "@contember/utilities": "packages/utilities", "@radix-ui/react-slot": "^1.1.0", "react-error-boundary": "^4.0.13", "slate": "^0.103.0", "slate-react": "^0.110.1" }, "devDependencies": { "react": "^18.3.1", "react-dom": "^18.3.1" }, "peerDependencies": { "react": "^18 || ^19", "react-dom": "^18 || ^19" } }],
+    "@contember/react-slate-editor-legacy": ["@contember/react-slate-editor-legacy@workspace:packages/react-slate-editor-legacy"],
 
-    "@contember/react-slots": ["@contember/react-slots@workspace:packages/react-slots", { "dependencies": { "@contember/react-utils": "packages/react-utils", "@contember/utilities": "packages/utilities" }, "devDependencies": { "react": "^18.3.1", "react-dom": "^18.3.1" }, "peerDependencies": { "react": "^18 || ^19", "react-dom": "^18 || ^19" } }],
+    "@contember/react-slots": ["@contember/react-slots@workspace:packages/react-slots"],
 
-    "@contember/react-ui-lib": ["@contember/react-ui-lib@workspace:packages/react-ui-lib", { "dependencies": { "@contember/graphql-client-tenant": "packages/graphql-client-tenant", "@contember/interface": "packages/interface", "@contember/react-block-repeater": "packages/react-block-repeater", "@contember/react-board": "packages/react-board", "@contember/react-board-dnd-kit": "packages/react-board-dnd-kit", "@contember/react-client": "packages/react-client", "@contember/react-client-tenant": "packages/react-client-tenant", "@contember/react-dataview": "packages/react-dataview", "@contember/react-form": "packages/react-form", "@contember/react-identity": "packages/react-identity", "@contember/react-multipass-rendering": "packages/react-multipass-rendering", "@contember/react-repeater": "packages/react-repeater", "@contember/react-repeater-dnd-kit": "packages/react-repeater-dnd-kit", "@contember/react-select": "packages/react-select", "@contember/react-slate-editor": "packages/react-slate-editor", "@contember/react-slate-editor-base": "packages/react-slate-editor-base", "@contember/react-slots": "packages/react-slots", "@contember/react-uploader": "packages/react-uploader", "@contember/react-uploader-dropzone": "packages/react-uploader-dropzone", "@contember/react-utils": "packages/react-utils", "@contember/utilities": "packages/utilities", "@dnd-kit/core": "^6.1.0", "@dnd-kit/sortable": "^8.0.0", "@radix-ui/react-alert-dialog": "^1.1.2", "@radix-ui/react-avatar": "^1.1.2", "@radix-ui/react-collapsible": "^1.1.1", "@radix-ui/react-dialog": "^1.1.2", "@radix-ui/react-dropdown-menu": "^2.1.2", "@radix-ui/react-label": "^2.1.0", "@radix-ui/react-popover": "^1.1.2", "@radix-ui/react-portal": "^1.1.2", "@radix-ui/react-progress": "^1.1.0", "@radix-ui/react-scroll-area": "^1.2.0", "@radix-ui/react-select": "^2.1.2", "@radix-ui/react-separator": "^1.1.1", "@radix-ui/react-slot": "^1.1.0", "@radix-ui/react-switch": "^1.1.1", "@radix-ui/react-toast": "^1.2.2", "@radix-ui/react-toggle": "^1.1.0", "@radix-ui/react-toggle-group": "^1.1.0", "@radix-ui/react-tooltip": "^1.1.3", "class-variance-authority": "^0.7.0", "clsx": "^2.1.1", "lucide-react": "^0.453.0", "qrcode-generator": "^1.4.4", "react": "^18.3.1", "react-dom": "^18.3.1", "slate": "^0.103.0", "slate-react": "^0.110.1", "tailwind-merge": "^2.5.4" } }],
+    "@contember/react-ui-lib": ["@contember/react-ui-lib@workspace:packages/react-ui-lib"],
 
-    "@contember/react-uploader": ["@contember/react-uploader@workspace:packages/react-uploader", { "dependencies": { "@contember/client": "packages/client", "@contember/graphql-client": "packages/graphql-client", "@contember/react-binding": "packages/react-binding", "@contember/react-client": "packages/react-client", "@contember/react-repeater": "packages/react-repeater", "@contember/react-utils": "packages/react-utils" }, "devDependencies": { "react": "^18.3.1", "react-dom": "^18.3.1" }, "peerDependencies": { "react": "^18 || ^19", "react-dom": "^18 || ^19" } }],
+    "@contember/react-uploader": ["@contember/react-uploader@workspace:packages/react-uploader"],
 
-    "@contember/react-uploader-dropzone": ["@contember/react-uploader-dropzone@workspace:packages/react-uploader-dropzone", { "dependencies": { "@contember/react-binding": "packages/react-binding", "@contember/react-uploader": "packages/react-uploader", "@contember/react-utils": "packages/react-utils", "@contember/utilities": "packages/utilities", "@radix-ui/react-slot": "^1.1.0", "react-dropzone": "^14.2.9" }, "devDependencies": { "react": "^18.3.1", "react-dom": "^18.3.1" }, "peerDependencies": { "react": "^18 || ^19", "react-dom": "^18 || ^19" } }],
+    "@contember/react-uploader-dropzone": ["@contember/react-uploader-dropzone@workspace:packages/react-uploader-dropzone"],
 
-    "@contember/react-utils": ["@contember/react-utils@workspace:packages/react-utils", { "dependencies": { "fast-deep-equal": "^3.1.3" }, "peerDependencies": { "react": "^18 || ^19" } }],
+    "@contember/react-utils": ["@contember/react-utils@workspace:packages/react-utils"],
 
-    "@contember/schema": ["@contember/schema@workspace:packages/schema", {}],
+    "@contember/schema": ["@contember/schema@workspace:packages/schema"],
 
-    "@contember/schema-definition": ["@contember/schema-definition@workspace:packages/schema-definition", { "dependencies": { "@contember/schema": "packages/schema", "@contember/schema-utils": "packages/schema-utils", "fast-deep-equal": "^3.1.3", "reflect-metadata": "^0.2.2" }, "devDependencies": { "graphql": "^16.9.0" }, "peerDependencies": { "graphql": ">= 14.6.0" } }],
+    "@contember/schema-definition": ["@contember/schema-definition@workspace:packages/schema-definition"],
 
-    "@contember/schema-migrations": ["@contember/schema-migrations@workspace:packages/schema-migrations", { "dependencies": { "@contember/database": "packages/database", "@contember/database-migrations": "packages/database-migrations", "@contember/engine-common": "packages/engine-common", "@contember/schema": "packages/schema", "@contember/schema-utils": "packages/schema-utils", "fast-deep-equal": "^3.1.3", "rfc6902": "^5.1.1" }, "devDependencies": { "@contember/schema-definition": "packages/schema-definition" }, "peerDependencies": { "pg": "^8.9.0" } }],
+    "@contember/schema-migrations": ["@contember/schema-migrations@workspace:packages/schema-migrations"],
 
-    "@contember/schema-utils": ["@contember/schema-utils@workspace:packages/schema-utils", { "dependencies": { "@contember/schema": "packages/schema", "@contember/typesafe": "packages/typesafe" }, "devDependencies": { "@contember/schema-definition": "packages/schema-definition", "@types/node": "^20.16.11" } }],
+    "@contember/schema-utils": ["@contember/schema-utils@workspace:packages/schema-utils"],
 
-    "@contember/typesafe": ["@contember/typesafe@workspace:packages/typesafe", { "devDependencies": { "@types/node": "^20.16.11" } }],
+    "@contember/typesafe": ["@contember/typesafe@workspace:packages/typesafe"],
 
-    "@contember/utilities": ["@contember/utilities@workspace:packages/utilities", { "peerDependencies": { "react": "^18 || ^19" } }],
+    "@contember/utilities": ["@contember/utilities@workspace:packages/utilities"],
 
-    "@contember/vite-plugin": ["@contember/vite-plugin@workspace:packages/vite-plugin", { "peerDependencies": { "vite": "^4 || ^5" } }],
+    "@contember/vite-plugin": ["@contember/vite-plugin@workspace:packages/vite-plugin"],
 
     "@dnd-kit/accessibility": ["@dnd-kit/accessibility@3.1.1", "", { "dependencies": { "tslib": "^2.0.0" }, "peerDependencies": { "react": ">=16.8.0" } }, "sha512-2P+YgaXF+gRsIihwwY1gCsQSYnu9Zyj2py8kY5fFvUM1qm2WA2u639R6YNVfU4GWr+ZM5mqEsfHZZLoRONbemw=="],
 

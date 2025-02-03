@@ -566,3 +566,79 @@ test('explicit ID predicate', () => {
 		'predicates': {},
 	})
 })
+
+namespace NoRoot {
+	export const publicRole = c.createRole('public')
+
+	@c.Allow(publicRole, {
+		read: ['id'],
+	})
+	@c.Allow(publicRole, {
+		when: { foo: { eq: 2 } },
+		through: true,
+		update: ['id'],
+	})
+	@c.Allow(publicRole, {
+		when: { foo: { eq: 1 } },
+		through: true,
+		update: ['id'],
+	})
+	export class Book {
+		title = c.stringColumn()
+		foo = c.intColumn()
+	}
+}
+
+test('no root - valid', () => {
+	const schema = createSchema(NoRoot)
+	expect(schema.acl.roles.public.entities.Book).toStrictEqual({
+		operations: {
+			noRoot: [Acl.Operation.update],
+			read: {
+				id: true,
+			},
+			update: {
+				id: 'or_foo_eq_1_foo_eq_2',
+			},
+		},
+		predicates: {
+			or_foo_eq_1_foo_eq_2: {
+				or: [
+					{
+						foo: {
+							eq: 1,
+						},
+					},
+					{
+						foo: {
+							eq: 2,
+						},
+					},
+				],
+			},
+		},
+	})
+})
+
+
+namespace NoRootInvalid {
+	export const publicRole = c.createRole('public')
+
+	@c.Allow(publicRole, {
+		when: { foo: { eq: 2 } },
+		through: true,
+		update: ['id'],
+	})
+	@c.Allow(publicRole, {
+		when: { foo: { eq: 1 } },
+		update: ['id'],
+	})
+	export class Book {
+		title = c.stringColumn()
+		foo = c.intColumn()
+	}
+}
+
+test('no root - invalid combo', () => {
+	expect(() => createSchema(NoRootInvalid)).toThrow('Operation update cannot be both allowed and disallowed on root on entity Book')
+})

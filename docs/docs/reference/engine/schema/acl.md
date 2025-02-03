@@ -2,148 +2,336 @@
 title: Permissions and ACL
 ---
 
-Contember provides an easy way to create user roles with granular permission.
+## Permissions and ACL
 
-Using our declarative ACL, you can define not only row and column level permissions, but also cell level. In other words, you can define different conditions for accessing individual fields of a single row.
+Contember provides a straightforward way to create user roles with granular permissions. Using our declarative ACL, you can define:
 
-In ACL definition, you use same filters you know from [Content API filters](/reference/engine/content/queries.md), so you can traverse through relations and build complex cross-entity rules.
+- **Row-level permissions**: which rows (records) a role may see or modify
+- **Column-level permissions**: which fields (columns) of a record are visible or writable
+- **Cell-level permissions**: different conditions on individual fields within the same row
 
-## Terminology
+Under the hood, Contember translates your rules into *predicates* and merges them when multiple rules apply.
 
-### Variable
+### Underlying Concepts
 
-Variable is defined for certain _role_ and its value injected to _predicate_ when a predicate is evaluated.
+#### Filters and Predicates
 
-#### Entity variable
+Contember uses the same filters for ACL conditions as those in the [Content API filters](/reference/engine/content/queries.md). You can thus traverse relations, join multiple conditions with logical operators (e.g., `AND`, `OR`), and define even very complex ACL rules.
 
-Entity variables are stored in Tenant API within a [membership](/reference/engine/tenant/memberships.md). Usually some kind of dimension by which you split your data - e.g. a site or a language, or even a category.
+A **predicate** is basically a condition describing under what circumstances a role can access or modify data. Predicates can reference:
 
-#### Predefined variables
+- **Columns** directly (e.g., `hiddenAt.isNull = true`)
+- **Variables** (which represent dynamic values provided at runtime)
+- **Other predicates** (e.g., referencing a relation’s “read” predicate)
 
-There are two predefined variables - `identityID` with an ID of identity associated with current request and `personID` with ID of person. `personID` will be empty if the request is executed with token which is not associated with a person.
+#### Variables
 
-#### Condition variables
+A variable is defined for a certain *role* and is injected into a predicate at evaluation time. They let you parameterize your ACL rules.
 
-Allows injecting arbitrary [column condition](/reference/engine/content/queries.md#comparison-operators) into a predicate. This enables the creation of more complex predicates, such as those for date ranges.
+1. **Entity variable**
+
+- Points to an entity (e.g., `Category`)
+- Useful for scenarios where each user has access to a particular “dimension” (e.g., site, language, category ID, etc.)
+
+2. **Predefined variables**
+
+- Built-in variables `identityID` and `personID`
+- You can define your own references to these IDs using `createPredefinedVariable`
+
+3. **Condition variables**
+
+- Represent more complex [column conditions](/reference/engine/content/queries.md#comparison-operators) that can be injected at runtime (e.g., a date range).
+
+All variable values are managed via the [Tenant API Memberships](/reference/engine/tenant/memberships.md) or the “Assume Membership” feature.
 
 :::note
-Variable values representing the condition must be passed as a serialized JSON string, for both the Tenant API for membership management and for the assume membership feature.
+After changing ACL definitions, remember to create and apply a migration.
 :::
 
-### Predicates
+---
 
-Predicates are defined on entity level of given role. It is basically a condition, which is evaluated, when you try to access a field.
+## Defining Roles and Variables
 
-### Operations
+### `createRole(roleName, options?)`
 
-There are following kinds of operations - `read`, `update`, `create` and `delete`. For each you can set up the rules.
+Creates a named role in your schema. You use the `roleName` in the [Tenant API for memberships](/reference/engine/tenant/memberships.md).
 
-:::note
-Note that for a "delete" operation you can't set rules on each field, because you are deleting a row as a whole.
-:::
+- **Arguments**
 
-## ACL definition
+  - `roleName`: string identifier for the role
+  - `options?`: optional settings for that role. You can configure e.g.:
+    - `tenant`: permissions in the Tenant API (like `invite`, `manage`, etc.)
+    - `system`: permissions in the System API (like `history`)
+    - `stages`: by default `'*'`, meaning all stages
+    - `debug`: allows debugging GraphQL queries 
+    - `s3`, see [S3 ACL](/reference/engine/content/s3)
 
-ACL definition API provides an easy way to define ACL rules directly within model definition by attaching a decorators to entities. For some cases, you might prefer a [low level definition API](#low-level-definition).
+- **Example**:
 
------
+  ```ts
+  import { c } from '@contember/schema-definition'
+  export const editorRole = c.createRole('editor', {
+    tenant: {
+      invite: true,
+    },
+    system: {
+      history: true,
+    },
+  })
+  ```
 
-### `createRole`: Defining a role {#create-role}
-A function for defining an ACL role.
-```typescript
-createRole(roleName, options)
+### `createEntityVariable(variableName, entityName, roleOrRoles[, fallback])`
+
+Defines an **entity variable** that will hold an ID or a list of IDs referencing a particular entity. Useful when you want to scope a role to specific rows (e.g., “editor can only manage rows in Category #123”).
+
+- **Arguments**
+
+  - `variableName`: unique identifier for the variable (within the same role)
+  - `entityName`: the entity name (e.g., `"Category"`)
+  - `roleOrRoles`: either a single role or an array of roles
+  - `fallback?`: optional fallback condition (e.g., `"never"` or a condition like `{ id: { eq: SOME_ID } }`) if no variable is supplied
+
+- **Example**:
+
+  ```ts
+  import { c } from '@contember/schema-definition'
+  import { moderatorRole } from './roles'
+
+  export const categoryIdVariable = c.createEntityVariable(
+    'categoryId', 
+    'Category', 
+    moderatorRole
+  )
+  ```
+
+### `createPredefinedVariable(variableName, value, roleOrRoles[, fallback])`
+
+Defines a variable referencing a **built-in** value (`identityID` or `personID`).
+
+- **Arguments**
+
+  - `variableName`: unique identifier for the variable (within the same role)
+  - `value`: must be `"identityID"` or `"personID"`
+  - `roleOrRoles`: the target role(s)
+  - `fallback?`: optional fallback if no predefined variable is available
+
+- **Example**:
+
+  ```ts
+  import { c } from '@contember/schema-definition'
+  import { readerRole } from './roles'
+
+  // Creates a variable called 'person',
+  // which will be replaced by the personID during runtime:
+  export const personVariable = c.createPredefinedVariable(
+    'person',
+    'personID',
+    readerRole,
+  )
+  ```
+
+### `createConditionVariable(variableName, roleOrRoles[, fallback])`
+
+Defines a **condition variable** that can store an arbitrary complex condition (e.g., date range or numeric bounds). The condition must be passed as a serialized JSON via Tenant API membership or using [assume membership](/reference/engine/content/advanced/assume-membership).
+
+- **Arguments**
+
+  - `variableName`: the variable name
+  - `roleOrRoles`: the target role(s)
+  - `fallback?`: optional fallback condition
+
+- **Example**:
+
+  ```ts
+  import { c } from '@contember/schema-definition'
+  import { readerRole } from './roles'
+
+  export const subscriptionVariable = c.createConditionVariable(
+    'subscription', 
+    readerRole
+  )
+  ```
+
+## Applying ACL Rules with the `@c.Allow` Decorator
+
+Most of the time, you will declare ACL rules directly in your schema using the `@c.Allow` decorator on your entities. This high-level API covers typical scenarios such as:
+
+- Granting **read**, **create**, **update**, **delete** operations
+- Providing **conditions** (`when`)
+- Restricting access to certain **fields** (columns)
+- Allowing/disallowing **root-level** operations with `through`
+
+### Usage
+
+```ts
+@c.Allow(
+  roleOrRoles, 
+  {
+    when?: Filter,       // Condition for this rule
+    read?: boolean | string[], 
+    update?: boolean | string[],
+    create?: boolean | string[],
+    delete?: boolean,
+    through?: boolean,   // Disallow direct (root-level) operation if set to true
+  }
+)
 ```
 
-#### Function arguments:
-- `roleName`: a role identifier. You use this name in [Tenant API](/reference/engine/tenant/memberships.md)
-- `options`: optional argument, where you can define [tenant](#tenant-permissions) and [system](#system-api-permissions) permissions.
+- **`roleOrRoles`**: A single role (e.g., `editorRole`) or an array of roles.
+- **`when`** (optional): A predicate (filter condition) that must be true for this rule to apply.
+  - If you define multiple `@c.Allow` decorators with different `when`, they are combined with logical `OR`.
+- **`read`, `update`, `create`**: Specifies which fields are allowed for the given operation.
+  - `true` means “all fields.”
+  - A string[] means “these specific fields.”
+  - If omitted or `false`, the operation is disallowed by this rule (but can still be granted by another rule).
+- **`delete`**: A boolean. If `true`, allows deleting the entire row under the given `when` condition; if omitted or `false`, it does not allow deletion.
+- **`through`**:
+  - If `true`, means that *root-level* access for the operation is **disallowed**, but the operation is still allowed **through relations**.
+  - If you set `through: true`, you are effectively restricting direct queries (like listBook) or direct mutations (e..g updateBook) on the root. However, you can still access this entity if you traverse from a parent entity that *does* allow a root-level operation.
+  - You cannot mix "through" for the same operation in a conflicting way
 
-Each role must be exported from schema definition using `export const ...`
+#### Multiple `@c.Allow` Decorators
 
-#### Example: creating editorRole
-```typescript
+When you use multiple `@c.Allow` decorators on the same entity for the same role:
+
+- The fields or operations they allow are combined in an **OR** manner.
+- Predicates (`when`) are likewise combined with `OR`.
+
+This means that if any of your rules says “OK” for a particular field or operation, it is allowed.
+
+### Examples
+
+#### 1. Simple Read-Only Access
+
+```ts
 import { c } from '@contember/schema-definition'
-export const editorRole = c.createRole('editor')
-```
 
-#### Example: creating editorRole with additional options
-```typescript
-import { c } from '@contember/schema-definition'
-export const editorRole = c.createRole('editor', {
-	tenant: {
-		invite: true,
-		// ...
-	},
-	system: {
-		history: true,
-		// ...
-	}
+export const publicRole = c.createRole('public')
+
+@c.Allow(publicRole, {
+  read: ['title'],
 })
+export class Book {
+  title = c.stringColumn()
+}
 ```
 
------
+- `public` can read only the `title` column.
+- Attempting to read other columns on `Book` is disallowed unless another rule grants it.
 
-### `createEntityVariable`: Defining an entity variable {#create-entity-variable}
+#### 2. Conditional Visibility
 
-```typescript
-createEntityVariable(variableName, entityName, role[, fallback])
+```ts
+@c.Allow(publicRole, {
+  when: { isPublished: { eq: true } },
+  read: true,
+})
+export class Book {
+  title = c.stringColumn()
+  isPublished = c.boolColumn()
+}
 ```
 
-#### Function arguments:
-- `variableName`: a variable identifier. It must be unique for given role. You use this name in [Tenant API](/reference/engine/tenant/memberships.md)
-- `entityName`: an entity name, for which we define this variable
-- `role`: a role reference (created using [createRole](#createrole)), for which this variable is defined. You can also pass an array of roles.
-- `fallback`: optional fallback condition, when a variable is not passed
+- Allows reading **all** columns, but only if `isPublished = true` for that row.
+
+#### 3. Multiple Conditions (OR)
+
+```ts
+@c.Allow(publicRole, {
+  when: { isReleased: { eq: true } },
+  read: ['title'],
+})
+@c.Allow(publicRole, {
+  when: { isArchived: { eq: true } },
+  read: ['title'],
+})
+export class Book {
+  title = c.stringColumn()
+  isReleased = c.boolColumn()
+  isArchived = c.boolColumn()
+}
+```
+
+- `public` may read `title` if `isReleased = true` **OR** `isArchived = true`.
+
+#### 4. Update Access with a Relation Condition
+
+```ts
+import { c } from '@contember/schema-definition'
+import { moderatorRole, categoryIdVariable } from './roles'
+
+@c.Allow(moderatorRole, {
+  when: { article: { category: { id: categoryIdVariable } } },
+  update: ['hiddenAt', 'content'],
+})
+export class Comment {
+  article = c.manyHasOne(Article)
+  content = c.stringColumn()
+  hiddenAt = c.dateTimeColumn()
+}
+```
+
+- A user in the `moderator` role can update the `hiddenAt` and `content` fields of any comment belonging to an article in a category whose ID matches the `categoryId` variable.
+
+#### 5. Restricting Root-Level Access with `through`
+
+```ts
+@c.Allow(publicRole, {
+  read: ['id'],
+})
+@c.Allow(publicRole, {
+  when: { category: { isActive: { eq: true } } },
+  through: true,
+  update: ['name'],
+})
+@c.Allow(publicRole, {
+  when: { category: { isActive: { eq: false } } },
+  through: true,
+  update: ['name'],
+})
+export class Product {
+  name = c.stringColumn()
+  category = c.manyHasOne(Category)
+}
+```
+
+- `read` of `id` is allowed at root level.
+- `update` of `name` is **not** allowed at the root query/mutation because `through: true` prevents direct updates.
+- If an upstream entity relation to `Product` is allowed to update it, then the user can update `name` **through** that relation—provided the `category` is `isActive: true` or `isActive: false`.
 
 
-#### Example: defining categoryId entity variable
-```typescript
+## `@c.AllowCustomPrimary`
+
+The `@c.AllowCustomPrimary` decorator allows client-generated IDs to be used as primary keys when creating or updating entities. This is particularly useful for use cases like synchronizing data between external systems or generating unique identifiers outside of Contember.
+
+- Unlike `@c.Allow`, this decorator must be applied directly to the entity class without specifying roles or conditions.
+
+### Example
+
+```ts
 import { c } from '@contember/schema-definition'
 
-export const categoryIdVariable = c.createEntityVariable('categoryId', 'Category', editorRole)
+@c.AllowCustomPrimary()
+export class Order {
+  id = c.uuidColumn().notNull()
+  amount = c.intColumn()
+  customer = c.manyHasOne(Customer)
+}
 ```
 
-### `createPredefinedVariable`: Defining a predefined variable {#create-predefined-variable}
-
-```typescript
-createConditionVariable(variableName, value, role[, fallback])
-```
-
-#### Function arguments:
-
-- `variableName`: a variable identifier. It must be unique for given role. You use this name in [Tenant API](/reference/engine/tenant/memberships.md)
-- `value`: a value type passed to a variable, can be either `identityID` or `personID`
-- `role`: a role reference (created using [createRole](#createrole)), for which this variable is defined. You can also pass an array of roles.
-- `fallback`: optional fallback condition, when a variable is not passed
-
-#### Example: defining personVariable predefined variable
-
-```typescript
-import { c } from '@contember/schema-definition'
-
-export const personVariable = c.createPredefinedVariable('person', 'personID', readerRole)
-```
-
-### `createConditionVariable`: Defining a condition variable {#create-condition-variable}
-
-```typescript
-createConditionVariable(variableName, role[, fallback])
-```
-
-#### Function arguments:
-
-- `variableName`: a variable identifier. It must be unique for given role. You use this name in [Tenant API](/reference/engine/tenant/memberships.md)
-- `role`: a role reference (created using [createRole](#createrole)), for which this variable is defined. You can also pass an array of roles.
-- `fallback`: optional fallback condition, when a variable is not passed
+- This example enables the client to specify the `id` of an `Order` when creating or updating it.
+- No additional ACL rules are required to allow this behavior.
 
 
-#### Example: defining subscriptionVariable condition variable
+## Summary
 
-```typescript
-import { c } from '@contember/schema-definition'
+- **Roles** define top-level scopes of permissions.
+- **Variables** parametrize predicates so each user within a role can have different row scoping or dynamic conditions.
+- **@c.Allow** is the primary method to specify which operations a role can perform on which columns/fields, optionally restricted by predicates (`when`) or limiting root-level vs. relation-level access (`through`).
+- **@c.AllowCustomPrimary** enables client-generated IDs for primary keys, useful for specific workflows.
+- **Predicates** combine multiple conditions using `AND` or `OR` behind the scenes, giving flexible, fine-grained control.
 
-export const subscriptionVariable = c.createConditionVariable('subscription', readerRole)
-```
+This reference should help you set up ACLs that fit most scenarios. For more specialized needs (or advanced usage like partial row visibility, advanced condition variables, or low-level ACL definition), see the [low-level ACL definition](/reference/engine/schema/acl.md#low-level-definition) or reach out to the Contember community.
 
 :::note
 Each variable must be exported from schema definition using `export const ...`

@@ -1,0 +1,308 @@
+type Query {
+  getArticle(by: ArticleUniqueWhere!, filter: ArticleWhere): Article
+  listArticle(filter: ArticleWhere, orderBy: [ArticleOrderBy!], offset: Int, limit: Int): [Article!]!
+  paginateArticle(filter: ArticleWhere, orderBy: [ArticleOrderBy!], skip: Int, first: Int): ArticleConnection!
+  validateCreateArticle(data: ArticleCreateInput!): _ValidationResult!
+  validateUpdateArticle(by: ArticleUniqueWhere!, data: ArticleUpdateInput!): _ValidationResult!
+  validateCreateImage(data: ImageCreateInput!): _ValidationResult!
+  validateUpdateImage(by: ImageUniqueWhere!, data: ImageUpdateInput!): _ValidationResult!
+  transaction: QueryTransaction
+  _info: Info
+}
+
+type Article {
+  _meta: ArticleMeta
+  id: UUID!
+  title: String
+  coverImage(filter: ImageWhere): Image
+}
+
+type ArticleMeta {
+  id: FieldMeta
+  title: FieldMeta
+  coverImage: FieldMeta
+}
+
+type FieldMeta {
+  readable: Boolean
+  updatable: Boolean
+}
+
+scalar UUID
+
+type Image {
+  _meta: ImageMeta
+  id: UUID!
+  url: String
+}
+
+type ImageMeta {
+  id: FieldMeta
+  url: FieldMeta
+}
+
+input ImageWhere {
+  id: UUIDCondition
+  url: StringCondition
+  and: [ImageWhere]
+  or: [ImageWhere]
+  not: ImageWhere
+}
+
+input UUIDCondition {
+  and: [UUIDCondition!]
+  or: [UUIDCondition!]
+  not: UUIDCondition
+  null: Boolean
+  isNull: Boolean
+  eq: UUID
+  notEq: UUID
+  in: [UUID!]
+  notIn: [UUID!]
+  lt: UUID
+  lte: UUID
+  gt: UUID
+  gte: UUID
+}
+
+input StringCondition {
+  and: [StringCondition!]
+  or: [StringCondition!]
+  not: StringCondition
+  null: Boolean
+  isNull: Boolean
+  eq: String
+  notEq: String
+  in: [String!]
+  notIn: [String!]
+  lt: String
+  lte: String
+  gt: String
+  gte: String
+  contains: String
+  startsWith: String
+  endsWith: String
+  containsCI: String
+  startsWithCI: String
+  endsWithCI: String
+}
+
+input ArticleUniqueWhere {
+  id: UUID
+  coverImage: ImageUniqueWhere
+}
+
+input ImageUniqueWhere {
+  id: UUID
+}
+
+input ArticleWhere {
+  id: UUIDCondition
+  title: StringCondition
+  coverImage: ImageWhere
+  and: [ArticleWhere]
+  or: [ArticleWhere]
+  not: ArticleWhere
+}
+
+input ArticleOrderBy {
+  _random: Boolean
+  _randomSeeded: Int
+  id: OrderDirection
+  title: OrderDirection
+  coverImage: ImageOrderBy
+}
+
+enum OrderDirection {
+  asc
+  desc
+  ascNullsFirst
+  descNullsLast
+}
+
+input ImageOrderBy {
+  _random: Boolean
+  _randomSeeded: Int
+  id: OrderDirection
+  url: OrderDirection
+}
+
+type ArticleConnection {
+  pageInfo: PageInfo!
+  edges: [ArticleEdge!]!
+}
+
+type PageInfo {
+  totalCount: Int!
+}
+
+type ArticleEdge {
+  node: Article!
+}
+
+type _ValidationResult {
+  valid: Boolean!
+  errors: [_ValidationError!]!
+}
+
+type _ValidationError {
+  path: [_PathFragment!]!
+  message: _ValidationMessage!
+}
+
+union _PathFragment = _FieldPathFragment | _IndexPathFragment
+
+type _FieldPathFragment {
+  field: String!
+}
+
+type _IndexPathFragment {
+  index: Int!
+  alias: String
+}
+
+type _ValidationMessage {
+  text: String!
+}
+
+input ArticleCreateInput {
+  title: String
+  coverImage: ArticleCreateCoverImageEntityRelationInput
+  _dummy_field_: Boolean
+}
+
+input ArticleCreateCoverImageEntityRelationInput {
+  connect: ImageUniqueWhere
+  create: ImageCreateInput
+  connectOrCreate: ArticleConnectOrCreateCoverImageRelationInput
+}
+
+input ImageCreateInput {
+  url: String
+  _dummy_field_: Boolean
+}
+
+input ArticleConnectOrCreateCoverImageRelationInput {
+  connect: ImageUniqueWhere!
+  create: ImageCreateInput!
+}
+
+input ArticleUpdateInput {
+  title: String
+  coverImage: ArticleUpdateCoverImageEntityRelationInput
+  _dummy_field_: Boolean
+}
+
+input ArticleUpdateCoverImageEntityRelationInput {
+  connect: ImageUniqueWhere
+  create: ImageCreateInput
+  connectOrCreate: ArticleConnectOrCreateCoverImageRelationInput
+  update: ImageUpdateInput
+  upsert: ArticleUpsertCoverImageRelationInput
+  disconnect: Boolean
+  delete: Boolean
+}
+
+input ImageUpdateInput {
+  url: String
+  _dummy_field_: Boolean
+}
+
+input ArticleUpsertCoverImageRelationInput {
+  update: ImageUpdateInput!
+  create: ImageCreateInput!
+}
+
+type QueryTransaction {
+  getArticle(by: ArticleUniqueWhere!, filter: ArticleWhere): Article
+  listArticle(filter: ArticleWhere, orderBy: [ArticleOrderBy!], offset: Int, limit: Int): [Article!]!
+  paginateArticle(filter: ArticleWhere, orderBy: [ArticleOrderBy!], skip: Int, first: Int): ArticleConnection!
+  validateCreateArticle(data: ArticleCreateInput!): _ValidationResult!
+  validateUpdateArticle(by: ArticleUniqueWhere!, data: ArticleUpdateInput!): _ValidationResult!
+  validateCreateImage(data: ImageCreateInput!): _ValidationResult!
+  validateUpdateImage(by: ImageUniqueWhere!, data: ImageUpdateInput!): _ValidationResult!
+}
+
+type Info {
+  description: String
+}
+
+type Mutation {
+  createArticle(data: ArticleCreateInput!): ArticleCreateResult!
+  deleteArticle(by: ArticleUniqueWhere!, filter: ArticleWhere): ArticleDeleteResult!
+  updateArticle(by: ArticleUniqueWhere!, filter: ArticleWhere, data: ArticleUpdateInput!): ArticleUpdateResult!
+  upsertArticle(by: ArticleUniqueWhere!, filter: ArticleWhere, update: ArticleUpdateInput!, create: ArticleCreateInput!): ArticleUpsertResult!
+  transaction(options: MutationTransactionOptions): MutationTransaction!
+  query: Query!
+}
+
+type ArticleCreateResult implements MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: Article
+  validation: _ValidationResult!
+}
+
+interface MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+}
+
+type _MutationError {
+  path: [_PathFragment!]! @deprecated(reason: "Use `paths`.")
+  paths: [[_PathFragment!]!]!
+  type: _MutationErrorType!
+  message: String
+}
+
+enum _MutationErrorType {
+  NotNullConstraintViolation
+  UniqueConstraintViolation
+  ForeignKeyConstraintViolation
+  NotFoundOrDenied
+  NonUniqueWhereInput
+  InvalidDataInput
+  SqlError
+}
+
+type ArticleDeleteResult implements MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: Article
+}
+
+type ArticleUpdateResult implements MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: Article
+  validation: _ValidationResult!
+}
+
+type ArticleUpsertResult implements MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: Article
+  validation: _ValidationResult!
+}
+
+type MutationTransaction {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  validation: _ValidationResult!
+  createArticle(data: ArticleCreateInput!): ArticleCreateResult!
+  deleteArticle(by: ArticleUniqueWhere!, filter: ArticleWhere): ArticleDeleteResult!
+  updateArticle(by: ArticleUniqueWhere!, filter: ArticleWhere, data: ArticleUpdateInput!): ArticleUpdateResult!
+  upsertArticle(by: ArticleUniqueWhere!, filter: ArticleWhere, update: ArticleUpdateInput!, create: ArticleCreateInput!): ArticleUpsertResult!
+  query: Query
+}
+
+input MutationTransactionOptions {
+  deferForeignKeyConstraints: Boolean
+  deferUniqueConstraints: Boolean
+}

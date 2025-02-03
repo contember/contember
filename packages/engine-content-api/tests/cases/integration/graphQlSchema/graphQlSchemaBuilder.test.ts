@@ -6,9 +6,11 @@ import {
 	AllowAllPermissionFactory,
 	SchemaBuilder,
 	SchemaDefinition,
+	c,
+	createSchema,
 	SchemaDefinition as def,
 } from '@contember/schema-definition'
-import { Authorizator, GraphQlSchemaBuilderFactory } from '../../../../src'
+import { Authorizator, GraphQlSchemaBuilderFactory, PermissionFactory } from '../../../../src'
 import * as model from './model'
 import { expect, describe, it } from 'bun:test'
 import { dirname } from 'node:path'
@@ -387,11 +389,51 @@ describe('GraphQL schema builder', () => {
 			graphQlSchemaFile: 'schema-view-entity.gql',
 		})
 	})
+
+	it.only('no root ops', async () => {
+		const schema = createSchema(NoRootOperation)
+		console.log(schema.acl.roles.editor.entities.Image)
+
+		await testSchema({
+			schema: () => schema.model,
+			permissions: () => {
+				const factory = new PermissionFactory()
+				return factory.create(schema, ['editor'])
+			},
+			graphQlSchemaFile: 'schema-no-root-ops.gql',
+		})
+	})
 })
 
 namespace ViewEntity {
 	@def.View("SELECT null as id, 'John' AS name")
 	export class Author {
 		name = def.stringColumn()
+	}
+}
+
+namespace NoRootOperation {
+	export const editorRole = c.createRole('editor')
+
+	@c.Allow(editorRole, {
+		read: true,
+		create: true,
+		delete: true,
+		update: true,
+	})
+	export class Article {
+		title = c.stringColumn()
+		coverImage = c.oneHasOne(Image)
+	}
+
+	@c.Allow(editorRole, {
+		through: true,
+		read: true,
+		create: true,
+		delete: true,
+		update: true,
+	})
+	export class Image {
+		url = c.stringColumn()
 	}
 }

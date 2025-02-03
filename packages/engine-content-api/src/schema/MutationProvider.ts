@@ -41,6 +41,9 @@ export class MutationProvider {
 	}
 
 	protected getCreateMutation(entity: Model.Entity): FieldConfig<Input.CreateInput> | undefined {
+		if (this.authorizator.isRootOperationDisallowed(entity.name, Acl.Operation.create)) {
+			return undefined
+		}
 		const entityName = entity.name
 		const dataType = this.createEntityInputProvider.getInput(entityName)
 		if (dataType === undefined) {
@@ -66,6 +69,9 @@ export class MutationProvider {
 
 	protected getDeleteMutation(entity: Model.Entity): FieldConfig<Input.DeleteInput> | undefined {
 		const entityName = entity.name
+		if (this.authorizator.isRootOperationDisallowed(entityName, Acl.Operation.delete)) {
+			return undefined
+		}
 		if (entity.view) {
 			return undefined
 		}
@@ -99,6 +105,9 @@ export class MutationProvider {
 	}
 
 	protected getUpdateMutation(entity: Model.Entity): FieldConfig<Input.UpdateInput> | undefined {
+		if (this.authorizator.isRootOperationDisallowed(entity.name, Acl.Operation.update)) {
+			return undefined
+		}
 		const entityName = entity.name
 		const dataType = this.updateEntityInputProvider.getInput(entityName)
 		if (dataType === undefined) {
@@ -133,6 +142,10 @@ export class MutationProvider {
 	}
 
 	private getUpsertMutation(entity: Model.Entity): FieldConfig<Input.UpsertInput> | undefined {
+		if (this.authorizator.isRootOperationDisallowed(entity.name, Acl.Operation.update)
+			|| this.authorizator.isRootOperationDisallowed(entity.name, Acl.Operation.create)) {
+			return undefined
+		}
 		const entityName = entity.name
 		const createInput = this.createEntityInputProvider.getInput(entityName)
 		if (createInput === undefined) {

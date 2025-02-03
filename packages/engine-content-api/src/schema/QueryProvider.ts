@@ -22,6 +22,9 @@ export class QueryProvider {
 		if (this.authorizator.getEntityPermission(Acl.Operation.read, entity.name) === 'no') {
 			return {}
 		}
+		if (this.authorizator.isRootOperationDisallowed(entity.name, Acl.Operation.read)) {
+			return {}
+		}
 		return {
 			['get' + entity.name]: this.getByUniqueQuery(entity),
 			['list' + entity.name]: this.getListQuery(entity),

@@ -10,6 +10,7 @@ export type WhenDefinition = Acl.PredicateDefinition<PredicateExtra>
 
 export interface AllowDefinition<E> {
 	when?: WhenDefinition
+	through?: true
 	name?: string
 	create?: true | ('id' | keyof E)[]
 	update?: true | ('id' | keyof E)[]

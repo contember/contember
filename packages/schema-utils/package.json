@@ -1,6 +1,6 @@
 {
   "name": "@contember/schema-utils",
-  "version": "2.0.0-beta.3",
+  "version": "2.0.0-beta.4",
   "license": "Apache-2.0",
   "main": "./dist/production/index.js",
   "typings": "./dist/types/index.d.ts",

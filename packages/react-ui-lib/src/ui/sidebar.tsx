@@ -430,13 +430,13 @@ export const sidebarMenuButtonVariants = cva(
 	},
 )
 
-type SidebarMenuButtonProps = ComponentProps<'button'> & {
+type SidebarMenuButtonProps = ComponentProps<'a'> & {
 	asChild?: boolean
 	isActive?: boolean
 	tooltip?: ReactNode
 } & VariantProps<typeof sidebarMenuButtonVariants>
 
-export const SidebarMenuButton = forwardRef<HTMLButtonElement, SidebarMenuButtonProps>(
+export const SidebarMenuButton = forwardRef<HTMLAnchorElement, SidebarMenuButtonProps>(
 	(
 		{
 			asChild = false,
@@ -449,7 +449,7 @@ export const SidebarMenuButton = forwardRef<HTMLButtonElement, SidebarMenuButton
 		},
 		ref,
 	) => {
-		const Comp = asChild ? Slot : 'button'
+		const Comp = asChild ? Slot : 'a'
 		const { isMobile, state } = useSidebar()
 
 		const button = (

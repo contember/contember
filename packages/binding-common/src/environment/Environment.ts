@@ -245,12 +245,7 @@ class Environment<Node extends Environment.AnyNode | undefined = Environment.Any
 namespace Environment {
 	export type Name = string
 
-	export type ReactElementLike = {
-		type: any
-		props: any
-	}
-
-	export type Value = string | number | boolean | undefined | Filter | ReactElementLike
+	export type Value = unknown
 
 	export type ResolvedValue = Value
 

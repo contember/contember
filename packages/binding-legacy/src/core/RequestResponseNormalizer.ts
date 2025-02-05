@@ -39,7 +39,7 @@ export class RequestResponseNormalizer {
 					const id = this.processEntityData(persistedEntityDataStore, data, marker.fields.markers)
 					subTreeDataStore.set(placeholder, id)
 				}
-			} else if (EntityListSubTreeMarker) {
+			} else if (marker instanceof EntityListSubTreeMarker) {
 				const subTreeListIds = new Set<EntityId>()
 				if (!Array.isArray(data)) {
 					throw new BindingError()

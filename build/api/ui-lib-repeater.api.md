@@ -21,6 +21,7 @@ export const DefaultRepeater: NamedExoticComponent<DefaultRepeaterProps>;
 export type DefaultRepeaterProps = {
     title?: ReactNode;
     addButtonPosition?: 'none' | 'after' | 'before' | 'around';
+    addButtonLabel?: ReactNode;
 } & RepeaterProps;
 
 // @public (undocumented)

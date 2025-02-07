@@ -127,9 +127,11 @@ export class CsvExportFactory implements ExportFactory {
     // (undocumented)
     protected flattenData(data: any[], marker: EntityListSubTreeMarker | HasOneRelationMarker | HasManyRelationMarker): DataViewDataForExport;
     // (undocumented)
+    protected flattenJson(obj: object, prefix?: string): Record<string, unknown>;
+    // (undocumented)
     protected formatOutput(data: DataViewDataForExport): string;
     // (undocumented)
-    protected formatValue(value: any): string;
+    protected formatValue(value: unknown): string;
 }
 
 // @public

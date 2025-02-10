@@ -225,8 +225,6 @@
 }
 
 .cui-devError-header {
-	position: sticky;
-	top: 0;
 	background: #cd1818;
 	color: #ffffff;
 	padding: 0.5em 1em;

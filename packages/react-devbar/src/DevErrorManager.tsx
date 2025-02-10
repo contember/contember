@@ -70,6 +70,19 @@ export function DevErrorManager(props: DevErrorManagerProps) {
 
 	const currentError = errors[errIndex]
 	const processedError = useProcessedError(currentError?.error)
+
+	useEffect(() => {
+		if (import.meta.hot) {
+			const cb = () => {
+				setOpen(false)
+			}
+			import.meta.hot.on('vite:afterUpdate', cb)
+			return () => {
+				import.meta.hot?.off('vite:afterUpdate', cb)
+			}
+		}
+	}, [])
+
 	if (!currentError) {
 		return null
 	}

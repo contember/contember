@@ -89,8 +89,9 @@ export function DevErrorManager(props: DevErrorManagerProps) {
 	const onPrevious = () => setErrorIndex(it => Math.max(0, it - 1))
 	const onNext = () => setErrorIndex(it => Math.min(errors.length - 1, it + 1))
 	const onClose = () => setOpen(false)
+	const onClear = () => setErrors([])
 	if (!open) {
-		return <DevErrorBadge errorCount={errors.length} onOpen={() => setOpen(true)} />
+		return <DevErrorBadge errorCount={errors.length} onOpen={() => setOpen(true)} onClear={onClear} />
 	}
 	return (
 		<DevErrorList
@@ -101,6 +102,7 @@ export function DevErrorManager(props: DevErrorManagerProps) {
 			onPrevious={onPrevious}
 			onNext={onNext}
 			onClose={onClose}
+			onClear={onClear}
 		/>
 	)
 }

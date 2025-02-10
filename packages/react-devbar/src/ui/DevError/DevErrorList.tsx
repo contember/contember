@@ -10,6 +10,7 @@ export interface DevErrorListProps {
 	onPrevious: () => void
 	onNext: () => void
 	onClose: () => void
+	onClear: () => void
 }
 
 const className = (cls?: string | null) => cls ? `cui-devError-${cls}` : 'cui-devError'
@@ -22,6 +23,7 @@ export function DevErrorList({
 	onClose,
 	onNext,
 	onPrevious,
+	onClear,
 }: DevErrorListProps) {
 	useEffect(() => {
 		document.body.classList.add('cui-devError-body')
@@ -56,6 +58,11 @@ export function DevErrorList({
 								✕
 							</button>
 						</div>
+					</div>
+					<div className={className('close')}>
+						<button className={className('closeButton')} onClick={onClear}>
+							Clear errors
+						</button>
 					</div>
 				</div>
 				<div className={className('content')}>

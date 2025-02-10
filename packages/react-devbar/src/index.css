@@ -419,7 +419,7 @@
 	position: fixed;
 	bottom: 1.25rem;
 	left: 1.25rem;
-	z-index: 50;
+	z-index: 16777270;
 }
 
 .cui-devErrorBadge-button {

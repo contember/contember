@@ -23,18 +23,20 @@ export const DevBar: ({ breakpoint, children, }: PropsWithChildren<{
 export function DevError(props: DevErrorProps): JSX_2.Element;
 
 // @public (undocumented)
-export function DevErrorBadge({ errorCount, onOpen }: DevErrorBadgeProps): JSX_2.Element;
+export function DevErrorBadge({ errorCount, onOpen, onClear }: DevErrorBadgeProps): JSX_2.Element;
 
 // @public (undocumented)
 export interface DevErrorBadgeProps {
     // (undocumented)
     errorCount: number;
     // (undocumented)
+    onClear: () => void;
+    // (undocumented)
     onOpen: () => void;
 }
 
 // @public (undocumented)
-export function DevErrorList({ currentError, currentErrorIndex, currentErrorSource, errorCount, onClose, onNext, onPrevious, }: DevErrorListProps): JSX_2.Element;
+export function DevErrorList({ currentError, currentErrorIndex, currentErrorSource, errorCount, onClose, onNext, onPrevious, onClear, }: DevErrorListProps): JSX_2.Element;
 
 // @public (undocumented)
 export interface DevErrorListProps {
@@ -46,6 +48,8 @@ export interface DevErrorListProps {
     currentErrorSource: string;
     // (undocumented)
     errorCount: number;
+    // (undocumented)
+    onClear: () => void;
     // (undocumented)
     onClose: () => void;
     // (undocumented)

@@ -3,16 +3,19 @@ import { AccessorTreeState, DataBindingProvider, useDataBindingEvent } from '@co
 import { Loader } from '../ui/loader'
 import { NavigationGuardDialog } from './navigation-guard-dialog'
 import { usePersistErrorHandler } from './hooks'
+import { ErrorBoundary } from '../errors/error-boundary'
 
 export const Binding = ({ children }: {
 	children: ReactNode
 }) => {
 	return (
-		<DataBindingProvider stateComponent={BindingStateRenderer}>
-			<NavigationGuardDialog />
-			<PersistErrorHandler />
-			{children}
-		</DataBindingProvider>
+		<ErrorBoundary>
+			<DataBindingProvider stateComponent={BindingStateRenderer}>
+				<NavigationGuardDialog />
+				<PersistErrorHandler />
+				{children}
+			</DataBindingProvider>
+		</ErrorBoundary>
 	)
 }
 

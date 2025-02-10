@@ -25,6 +25,15 @@ export interface TypedEntitySelection<TSchema extends SchemaTypeLike, TEntityNam
 	): TypedEntitySelection<TSchema, TEntityName, TEntity, TValue & {
 		[key in TAlias extends null ? TKey : TAlias]: TypedEntitySelectionResult<TEntity, TKey, TNestedValue>
 	}>
+
+
+	meta<
+		TField extends (keyof TEntity['columns'] | keyof TEntity['hasMany'] | keyof TEntity['hasOne'])
+	>(
+		field: TField,
+		flags: ('readable' | 'updatable')[],
+	): TypedEntitySelection<TSchema, TEntityName, TEntity, TValue>
+
 }
 
 export type TypedEntitySelectionCallback<

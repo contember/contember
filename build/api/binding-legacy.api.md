@@ -146,6 +146,11 @@ export class EntityAccessorImpl implements EntityAccessor {
     getEntityList(entityList: SugaredRelativeEntityList | string | RelativeEntityList): EntityListAccessor;
     getField<Value extends FieldValue = FieldValue>(field: SugaredRelativeSingleField | string | RelativeSingleField): FieldAccessor<Value>;
     // (undocumented)
+    getFieldMeta(field: string): {
+        readable: boolean | undefined;
+        updatable: boolean | undefined;
+    };
+    // (undocumented)
     getMarker(): HasOneRelationMarker | EntitySubTreeMarker | HasManyRelationMarker | EntityListSubTreeMarker;
     // (undocumented)
     getParent(): EntityAccessor | EntityListAccessor | undefined;
@@ -163,7 +168,14 @@ export class EntityAccessorImpl implements EntityAccessor {
 }
 
 // @public (undocumented)
-export type EntityFieldPersistedData = FieldValue | ServerId | EntityListPersistedData;
+export type EntityFieldPersistedData<Value extends EntityFieldPersistedValue = EntityFieldPersistedValue> = {
+    readable: boolean | undefined;
+    updatable: boolean | undefined;
+    value: Value;
+};
+
+// @public (undocumented)
+export type EntityFieldPersistedValue = FieldValue | ServerId | EntityListPersistedData;
 
 // @public (undocumented)
 export class EntityListAccessorImpl implements EntityListAccessor {

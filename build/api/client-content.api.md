@@ -258,6 +258,8 @@ export class ContentEntitySelection {
     transformFn?: ((value: any, ctx: ContentTransformContext) => any) | undefined);
     // @internal (undocumented)
     readonly context: ContentEntitySelectionContext<string>;
+    // (undocumented)
+    meta(field: string, flags: ('readable' | 'updatable')[]): ContentEntitySelection;
     // @internal (undocumented)
     readonly selectionSet: GraphQlSelectionSet;
     // (undocumented)
@@ -519,6 +521,8 @@ export interface TypedEntitySelection<TSchema extends SchemaTypeLike, TEntityNam
     }>;
     // @internal (undocumented)
     readonly context: ContentEntitySelectionContext<TEntityName>;
+    // (undocumented)
+    meta<TField extends (keyof TEntity['columns'] | keyof TEntity['hasMany'] | keyof TEntity['hasOne'])>(field: TField, flags: ('readable' | 'updatable')[]): TypedEntitySelection<TSchema, TEntityName, TEntity, TValue>;
     // (undocumented)
     transform<T>(cb: (value: TValue) => T): TypedEntitySelection<TSchema, TEntityName, TEntity, T>;
 }

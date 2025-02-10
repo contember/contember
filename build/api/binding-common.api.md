@@ -138,6 +138,11 @@ export interface EntityAccessor extends Errorable {
     getEntityList(entityList: SugaredRelativeEntityList | string | RelativeEntityList): EntityListAccessor;
     getField<Value extends FieldValue = FieldValue>(field: SugaredRelativeSingleField | string | RelativeSingleField): FieldAccessor<Value>;
     // (undocumented)
+    getFieldMeta(field: string): {
+        readable?: boolean;
+        updatable?: boolean;
+    };
+    // (undocumented)
     getMarker(): HasManyRelationMarker | HasOneRelationMarker | EntitySubTreeMarker | EntityListSubTreeMarker;
     // (undocumented)
     getParent(): EntityAccessor | EntityListAccessor | undefined;
@@ -775,6 +780,9 @@ export class FieldMarker {
 }
 
 // @public (undocumented)
+export type FieldMeta = ('readable' | 'updatable')[];
+
+// @public (undocumented)
 export type FieldName = string;
 
 // @public (undocumented)
@@ -820,6 +828,8 @@ export interface HasManyRelation {
     // (undocumented)
     limit: Limit | undefined;
     // (undocumented)
+    meta: FieldMeta;
+    // (undocumented)
     offset: Offset | undefined;
     // (undocumented)
     orderBy: OrderBy | undefined;
@@ -854,6 +864,8 @@ export interface HasOneRelation {
     filter: Filter | undefined;
     // (undocumented)
     isNonbearing: boolean;
+    // (undocumented)
+    meta: FieldMeta;
     // (undocumented)
     reducedBy: UniqueWhere | undefined;
     // (undocumented)
@@ -1345,6 +1357,12 @@ export interface ReceivedDataTree {
 // @public (undocumented)
 export type ReceivedEntityData = {
     __typename: string;
+    _meta?: {
+        [fieldName: string]: {
+            readable?: boolean;
+            updatable?: boolean;
+        };
+    };
     id: EntityId;
 } & {
     [fieldName: string]: ReceivedFieldData;
@@ -1378,6 +1396,7 @@ export type RelativeSingleField = {
     hasOneRelationPath: HasOneRelation[];
     defaultValue: FieldValue | undefined;
     isNonbearing: boolean;
+    meta: FieldMeta;
     eventListeners: FieldEventListenerStore | undefined;
 };
 
@@ -1661,6 +1680,8 @@ export interface SugaredRelativeEntityList extends UnsugarableEntityListEventLis
     orderBy?: SugaredOrderBy;
     // (undocumented)
     setOnCreate?: SugaredSetOnCreate;
+    // (undocumented)
+    withMeta?: FieldMeta;
 }
 
 // @public (undocumented)
@@ -1673,6 +1694,8 @@ export interface SugaredRelativeSingleEntity extends UnsugarableSingleEntityEven
     isNonbearing?: boolean;
     // (undocumented)
     setOnCreate?: SugaredSetOnCreate;
+    // (undocumented)
+    withMeta?: FieldMeta;
 }
 
 // @public (undocumented)
@@ -1685,6 +1708,8 @@ export interface SugaredRelativeSingleField extends UnsugarableFieldEventListene
     };
     // (undocumented)
     isNonbearing?: boolean;
+    // (undocumented)
+    withMeta?: FieldMeta;
 }
 
 // @public (undocumented)

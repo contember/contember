@@ -1,5 +1,6 @@
 import { c } from '@contember/schema-definition'
 
+export const adminRole = c.createRole('admin')
 export const noVarRole = c.createRole('noVar')
 export const predefinedVariableRole = c.createRole('predefined')
 export const conditionVariableRole = c.createRole('condition')
@@ -11,4 +12,26 @@ export const conditionVar = c.createConditionVariable('conditionVar', conditionV
 
 export class AclBranch {
 	code = c.stringColumn().notNull().unique()
+}
+@c.Allow(adminRole, {
+	read: ['canRead', 'canEdit', 'canReadSecondary'],
+})
+@c.Allow(adminRole, {
+	when: { canRead: { eq: true } },
+	read: ['primaryValue'],
+})
+@c.Allow(adminRole, {
+	when: { canEdit: { eq: true } },
+	update: ['primaryValue'],
+})
+@c.Allow(adminRole, {
+	when: { canReadSecondary: { eq: true } },
+	read: ['secondaryValue'],
+})
+export class AclRestrictedValue {
+	canEdit = c.boolColumn().notNull()
+	canRead = c.boolColumn().notNull()
+	canReadSecondary = c.boolColumn().notNull()
+	primaryValue = c.stringColumn()
+	secondaryValue = c.stringColumn()
 }

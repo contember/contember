@@ -16,6 +16,37 @@ export const ContemberClientNames: SchemaNames = {
         "code"
       ]
     },
+    "AclRestrictedValue": {
+      "name": "AclRestrictedValue",
+      "fields": {
+        "id": {
+          "type": "column"
+        },
+        "canEdit": {
+          "type": "column"
+        },
+        "canRead": {
+          "type": "column"
+        },
+        "canReadSecondary": {
+          "type": "column"
+        },
+        "primaryValue": {
+          "type": "column"
+        },
+        "secondaryValue": {
+          "type": "column"
+        }
+      },
+      "scalars": [
+        "id",
+        "canEdit",
+        "canRead",
+        "canReadSecondary",
+        "primaryValue",
+        "secondaryValue"
+      ]
+    },
     "Block": {
       "name": "Block",
       "fields": {

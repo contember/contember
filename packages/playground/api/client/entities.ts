@@ -43,6 +43,25 @@ export type AclBranch <OverRelation extends string | never = never> = {
 	hasManyBy: {
 	}
 }
+export type AclRestrictedValue <OverRelation extends string | never = never> = {
+	name: 'AclRestrictedValue'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+	columns: {
+		id: string
+		canEdit: boolean
+		canRead: boolean
+		canReadSecondary: boolean
+		primaryValue: string | null
+		secondaryValue: string | null
+	}
+	hasOne: {
+	}
+	hasMany: {
+	}
+	hasManyBy: {
+	}
+}
 export type Block <OverRelation extends string | never = never> = {
 	name: 'Block'
 	unique:
@@ -1157,6 +1176,7 @@ export type UploadVideo <OverRelation extends string | never = never> = {
 
 export type ContemberClientEntities = {
 	AclBranch: AclBranch
+	AclRestrictedValue: AclRestrictedValue
 	Block: Block
 	BlockImage: BlockImage
 	BlockList: BlockList

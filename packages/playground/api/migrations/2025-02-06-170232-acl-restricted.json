@@ -1,0 +1,123 @@
+{
+	"formatVersion": 6,
+	"modifications": [
+		{
+			"modification": "createEntity",
+			"entity": {
+				"eventLog": {
+					"enabled": true
+				},
+				"name": "AclRestrictedValue",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "acl_restricted_value",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": [],
+				"indexes": []
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "AclRestrictedValue",
+			"field": {
+				"name": "canEdit",
+				"columnName": "can_edit",
+				"columnType": "boolean",
+				"nullable": false,
+				"type": "Bool"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "AclRestrictedValue",
+			"field": {
+				"name": "canRead",
+				"columnName": "can_read",
+				"columnType": "boolean",
+				"nullable": false,
+				"type": "Bool"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "AclRestrictedValue",
+			"field": {
+				"name": "canReadSecondary",
+				"columnName": "can_read_secondary",
+				"columnType": "boolean",
+				"nullable": false,
+				"type": "Bool"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "AclRestrictedValue",
+			"field": {
+				"name": "primaryValue",
+				"columnName": "primary_value",
+				"columnType": "text",
+				"nullable": true,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "AclRestrictedValue",
+			"field": {
+				"name": "secondaryValue",
+				"columnName": "secondary_value",
+				"columnType": "text",
+				"nullable": true,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "patchAclSchema",
+			"patch": [
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/AclRestrictedValue",
+					"value": {
+						"predicates": {
+							"canReadSecondary_eq_true": {
+								"canReadSecondary": {
+									"eq": true
+								}
+							},
+							"canEdit_eq_true": {
+								"canEdit": {
+									"eq": true
+								}
+							},
+							"canRead_eq_true": {
+								"canRead": {
+									"eq": true
+								}
+							}
+						},
+						"operations": {
+							"read": {
+								"primaryValue": "canRead_eq_true",
+								"secondaryValue": "canReadSecondary_eq_true",
+								"canEdit": true,
+								"canRead": true,
+								"canReadSecondary": true
+							},
+							"update": {
+								"primaryValue": "canEdit_eq_true"
+							}
+						}
+					}
+				}
+			]
+		}
+	]
+}

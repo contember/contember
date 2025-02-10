@@ -11,14 +11,7 @@ export class ErrorBus {
 
 		if (!this.listener) {
 			this.queue.push(boxedError)
-			this.queue.push(boxedError)
-			this.queue.push(boxedError)
-			this.queue.push(boxedError)
-
 		} else {
-			this.listener(boxedError)
-			this.listener(boxedError)
-			this.listener(boxedError)
 			this.listener(boxedError)
 		}
 	}
@@ -37,6 +30,22 @@ export interface DevErrorManagerProps {
 	bus: ErrorBus
 }
 
+const compareErrors = (a: ErrorType, b: ErrorType) => {
+	if (typeof a !== 'object' || typeof b !== 'object' || a === null || b === null) {
+		return false
+	}
+	if (!('stack' in a) || !('stack' in b) || !('message' in a) || !('message' in b)) {
+		return false
+	}
+	if (a.message !== b.message) {
+		return false
+	}
+	if (a.stack !== b.stack) {
+		return false
+	}
+	return true
+}
+
 export function DevErrorManager(props: DevErrorManagerProps) {
 	const [errors, setErrors] = useState<{ error: ErrorType; source: string }[]>([])
 	const [errIndex, setErrorIndex] = useState(0)
@@ -47,7 +56,9 @@ export function DevErrorManager(props: DevErrorManagerProps) {
 			return props.bus.register(err => {
 				setTimeout(
 					() => {
-						setErrors(errors => [err, ...errors])
+						setErrors(errors => {
+							return !errors.find(it => compareErrors(it.error, err.error)) ? [err, ...errors] : errors
+						})
 						setOpen(true)
 					},
 					0,

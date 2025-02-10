@@ -3,7 +3,7 @@ import {
 	EntityFieldMarkers,
 	EntityListSubTreeMarker,
 	EntitySubTreeMarker,
-	FieldMarker,
+	FieldMarker, FieldMeta,
 	HasManyRelationMarker,
 	HasOneRelationMarker,
 	MarkerTreeRoot,
@@ -115,9 +115,17 @@ export class QueryGenerator {
 			} else {
 				assertNever(fieldValue)
 			}
+			selection = QueryGenerator.withMetaField(selection, fieldValue.parameters.field, fieldValue.parameters.meta)
 		}
 
 		return selection
+	}
+
+	private static withMetaField(selection: ContentEntitySelection, fieldName: string, metaField: FieldMeta): ContentEntitySelection {
+		if (metaField.length === 0) {
+			return selection
+		}
+		return selection.meta(fieldName, metaField)
 	}
 }
 

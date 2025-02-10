@@ -90,6 +90,7 @@ export type RelativeSingleField = {
 
 	defaultValue: FieldValue | undefined
 	isNonbearing: boolean
+	meta: FieldMeta
 
 	eventListeners: FieldEventListenerStore | undefined
 }
@@ -136,6 +137,7 @@ export interface HasManyRelation {
 	initialEntityCount: number
 	isNonbearing: boolean
 	setOnCreate: SetOnCreate
+	meta: FieldMeta
 
 	eventListeners: EntityListEventListenerStore | undefined
 	childEventListeners: EntityEventListenerStore | undefined
@@ -150,9 +152,12 @@ export interface HasOneRelation {
 	expectedMutation: ExpectedRelationMutation
 	isNonbearing: boolean
 	setOnCreate: SetOnCreate
+	meta: FieldMeta
 
 	eventListeners: EntityEventListenerStore | undefined
 }
+
+export type FieldMeta = ('readable' | 'updatable')[]
 
 export type EntityListEventListenerStore = EventListenersStore<
 	EntityListAccessor.EntityListEventListenerMap

@@ -38,7 +38,7 @@ import {
 import { TreeParameterMerger } from '@contember/binding-common'
 import type { TreeStore } from './TreeStore'
 import { EntityAccessorImpl, EntityListAccessorImpl, FieldAccessorImpl } from '../accessors'
-import { EntityFieldPersistedData } from '../accessorTree'
+import { EntityFieldPersistedData, EntityFieldPersistedValue } from '../accessorTree'
 
 export class StateInitializer {
 	private readonly fieldOperations: FieldOperations
@@ -232,7 +232,7 @@ export class StateInitializer {
 		const pathBack = this.treeStore.getPathBackToParent(entityRealm)
 
 		for (const [placeholderName, field] of marker.fields.markers) {
-			const fieldDatum = persistedData?.get(placeholderName)
+			const fieldDatum = persistedData?.get(placeholderName)?.value
 
 			if (field instanceof FieldMarker) {
 				this.initializeFromFieldMarker(entityRealm, field, fieldDatum)
@@ -403,7 +403,7 @@ export class StateInitializer {
 	private initializeFromFieldMarker(
 		parent: EntityRealmState,
 		field: FieldMarker,
-		persistedValue: EntityFieldPersistedData | undefined,
+		persistedValue: EntityFieldPersistedValue | undefined,
 		copyFromState?: FieldState,
 	) {
 		if (persistedValue instanceof Set) {

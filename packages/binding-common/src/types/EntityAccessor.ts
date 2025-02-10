@@ -67,6 +67,8 @@ interface EntityAccessor extends Errorable {
 	getParent(): EntityAccessor | EntityListAccessor | undefined
 
 	getMarker(): HasManyRelationMarker | HasOneRelationMarker | EntitySubTreeMarker | EntityListSubTreeMarker
+
+	getFieldMeta(field: string): { readable?: boolean; updatable?: boolean }
 }
 
 namespace EntityAccessor {

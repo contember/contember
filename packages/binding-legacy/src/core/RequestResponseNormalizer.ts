@@ -17,7 +17,7 @@ import {
 } from '@contember/binding-common'
 import { SubMutationOperation } from './MutationGenerator'
 import { assertNever } from '@contember/binding-common'
-import { NormalizedPersistedData, PersistedEntityDataStore } from '../accessorTree'
+import { NormalizedPersistedData, PersistedEntityDataStore, SingleEntityPersistedData } from '../accessorTree'
 
 export class RequestResponseNormalizer {
 	public static mergeInQueryResponse(
@@ -121,22 +121,38 @@ export class RequestResponseNormalizer {
 
 	private static processEntityData(entityMap: PersistedEntityDataStore, entityData: ReceivedEntityData, fields: EntityFieldMarkers): ServerId {
 		const id = this.extractId(entityData)
-		const presentEntityData = entityMap.get(id.uniqueValue) ?? new Map()
+		const presentEntityData: SingleEntityPersistedData = entityMap.get(id.uniqueValue) ?? new Map()
 		entityMap.set(id.uniqueValue, presentEntityData)
 
 		for (const [placeholder, field] of fields) {
 			const value = entityData[placeholder]
+			const metaFlags = {
+				readable: entityData._meta?.[field.parameters.field]?.readable ?? undefined,
+				updatable: entityData._meta?.[field.parameters.field]?.updatable ?? undefined,
+			}
 			if (field instanceof FieldMarker) {
-				presentEntityData.set(placeholder, value)
+				presentEntityData.set(placeholder, {
+					value,
+					...metaFlags,
+				})
 			} else if (field instanceof HasOneRelationMarker) {
 				if (value === null) {
-					presentEntityData.set(placeholder, null)
+					presentEntityData.set(placeholder, {
+						value: null,
+						...metaFlags,
+					})
 				} else {
-					presentEntityData.set(placeholder, this.processEntityData(entityMap, value as ReceivedEntityData, field.fields.markers))
+					presentEntityData.set(placeholder, {
+						value: this.processEntityData(entityMap, value as ReceivedEntityData, field.fields.markers),
+						...metaFlags,
+					})
 				}
 			} else if (field instanceof HasManyRelationMarker) {
-				const ids = presentEntityData.get(placeholder) ?? new Set()
-				presentEntityData.set(placeholder, ids)
+				const ids = presentEntityData.get(placeholder)?.value ?? new Set()
+				presentEntityData.set(placeholder, {
+					value: ids,
+					...metaFlags,
+				})
 				if (!(ids instanceof Set)) {
 					throw new BindingError()
 				}

@@ -5,6 +5,7 @@ import type {
 	EventListenersStore,
 	ExpectedQualifiedEntityMutation,
 	ExpectedRelationMutation,
+	FieldMeta,
 	GenericEventsMap,
 	HasManyRelation,
 	HasOneRelation,
@@ -34,6 +35,7 @@ export class TreeParameterMerger {
 			expectedMutation: this.mergeExpectedRelationMutation(original.expectedMutation, fresh.expectedMutation),
 			setOnCreate: this.mergeSetOnCreate(original.setOnCreate, fresh.setOnCreate),
 			isNonbearing: original.isNonbearing && fresh.isNonbearing,
+			meta: this.mergeFieldMeta(original.meta, fresh.meta),
 			// forceCreation: original.forceCreation || fresh.forceCreation,
 			eventListeners: this.mergeEventStore(original.eventListeners, fresh.eventListeners),
 		}
@@ -60,6 +62,7 @@ export class TreeParameterMerger {
 			// Not encoded within the placeholder
 			expectedMutation: this.mergeExpectedRelationMutation(original.expectedMutation, fresh.expectedMutation),
 			setOnCreate: this.mergeSetOnCreate(original.setOnCreate, fresh.setOnCreate),
+			meta: this.mergeFieldMeta(original.meta, fresh.meta),
 			// forceCreation: original.forceCreation || fresh.forceCreation,
 			isNonbearing: original.isNonbearing && fresh.isNonbearing,
 			initialEntityCount: original.initialEntityCount, // Handled above
@@ -176,6 +179,7 @@ export class TreeParameterMerger {
 			field: original.field,
 			isNonbearing: original.isNonbearing && fresh.isNonbearing,
 			defaultValue: original.defaultValue ?? fresh.defaultValue,
+			meta: this.mergeFieldMeta(original.meta, fresh.meta),
 			eventListeners: this.mergeEventStore(original.eventListeners, fresh.eventListeners),
 		}
 	}
@@ -333,5 +337,13 @@ export class TreeParameterMerger {
 			return original
 		}
 		return this.mergeSets(original, fresh)
+	}
+
+
+	private static mergeFieldMeta(
+		original: FieldMeta,
+		fresh: FieldMeta,
+	): FieldMeta {
+		return [...original, ...fresh].filter((key, index, array) => array.indexOf(key) === index)
 	}
 }

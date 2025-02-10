@@ -1,5 +1,5 @@
 import { EntitySubTree, useField } from '@contember/interface'
-import { Component, Field, useEntityBeforePersist, useEnvironment } from '@contember/react-binding'
+import { Component, Field, StaticRender, useEntityBeforePersist, useEnvironment } from '@contember/react-binding'
 import slugify from '@sindresorhus/slugify'
 import { FormInputIcon } from 'lucide-react'
 import { Title } from '~/app/components/title'

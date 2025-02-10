@@ -280,6 +280,7 @@ export class MarkerMerger {
 			defaultValue: undefined,
 			isNonbearing: true,
 			eventListeners: undefined,
+			meta: [],
 		})
 		// We could potentially share this instance for all fields. Maybe sometime later.
 		const freshFields = new EntityFieldMarkersContainer(

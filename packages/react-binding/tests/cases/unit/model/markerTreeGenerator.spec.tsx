@@ -237,7 +237,7 @@ describe('Marker tree generator', () => {
 			environment,
 		)
 
-		const idMarker = [PRIMARY_KEY_NAME, new FieldMarker({ field: PRIMARY_KEY_NAME, defaultValue: undefined, eventListeners: undefined, isNonbearing: false })] as const
+		const idMarker = [PRIMARY_KEY_NAME, new FieldMarker({ field: PRIMARY_KEY_NAME, defaultValue: undefined, eventListeners: undefined, isNonbearing: false, meta: [] })] as const
 		const fooEntity = schema.getEntity('Foo')
 		const barEntity = schema.getEntity('Bar')
 		const subTreeEnv = environment.withSubTree({
@@ -280,6 +280,7 @@ describe('Marker tree generator', () => {
 				childEventListeners: new EventListenersStore(undefined, new Map([['initialize', new Set([onInit5, onInit6])]])),
 				eventListeners: new EventListenersStore(undefined, new Map([['beforePersist', new Set([onBeforePersist3])]])),
 				expectedMutation: 'anyMutation',
+				meta: [],
 			},
 			new EntityFieldMarkersContainer(
 				true,
@@ -290,6 +291,7 @@ describe('Marker tree generator', () => {
 						defaultValue: undefined,
 						eventListeners: undefined,
 						isNonbearing: false,
+						meta: [],
 					})],
 					['name', new FieldMarker({
 						field: 'name',
@@ -299,6 +301,7 @@ describe('Marker tree generator', () => {
 						// @ts-ignore
 						hasOneRelationPath: [],
 						isNonbearing: false,
+						meta: [],
 					})],
 					['surname', new FieldMarker({
 						field: 'surname',
@@ -308,6 +311,7 @@ describe('Marker tree generator', () => {
 						// @ts-ignore
 						hasOneRelationPath: [],
 						isNonbearing: false,
+						meta: [],
 					})],
 				]),
 				new Map([
@@ -333,6 +337,7 @@ describe('Marker tree generator', () => {
 					['initialize', new Set([onInit7, onInit8])],
 				])),
 				expectedMutation: 'anyMutation',
+				meta: [],
 			},
 			new EntityFieldMarkersContainer(
 				true,
@@ -347,6 +352,7 @@ describe('Marker tree generator', () => {
 						// @ts-ignore
 						hasOneRelationPath: [],
 						isNonbearing: false,
+						meta: [],
 					})],
 				]),
 				new Map([
@@ -374,6 +380,7 @@ describe('Marker tree generator', () => {
 				childEventListeners: undefined,
 				eventListeners: undefined,
 				expectedMutation: 'anyMutation',
+				meta: [],
 			},
 			new EntityFieldMarkersContainer(
 				true,
@@ -387,6 +394,7 @@ describe('Marker tree generator', () => {
 						// @ts-ignore
 						hasOneRelationPath: [],
 						isNonbearing: false,
+						meta: [],
 					})],
 					[hasOne.placeholderName, hasOne],
 				]),
@@ -428,6 +436,7 @@ describe('Marker tree generator', () => {
 						// @ts-ignore
 						hasOneRelationPath: [],
 						isNonbearing: false,
+						meta: [],
 					})],
 				]),
 				new Map([
@@ -466,6 +475,7 @@ describe('Marker tree generator', () => {
 					// @ts-ignore
 					hasOneRelationPath: [],
 					isNonbearing: false,
+					meta: [],
 				})]]),
 				new Map([
 					[PRIMARY_KEY_NAME, idMarker[1].placeholderName],

@@ -244,4 +244,12 @@ export class EntityAccessorImpl implements EntityAccessor {
 	getMarker() {
 		return getEntityMarker(this.state)
 	}
+
+	getFieldMeta(field: string) {
+		const fieldData = this.dataFromServer?.get(field)
+		return {
+			readable: fieldData?.readable,
+			updatable: fieldData?.updatable,
+		}
+	}
 }

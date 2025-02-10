@@ -269,6 +269,7 @@ export class QueryLanguage {
 			reducedBy: sugarable.reducedBy ? this.desugarUniqueWhere(sugarable.reducedBy, environment) : undefined,
 			setOnCreate: unsugarable.setOnCreate ? this.desugarSetOnCreate(unsugarable.setOnCreate, environment) : undefined,
 			isNonbearing: unsugarable.isNonbearing ?? EntityCreationParametersDefaults.isNonbearing,
+			meta: unsugarable.withMeta ?? [],
 			// forceCreation: unsugarable.forceCreation ?? EntityCreationParametersDefaults.forceCreation,
 			eventListeners: this.desugarSingleEntityEventListeners(unsugarable),
 		}
@@ -303,6 +304,7 @@ export class QueryLanguage {
 			// forceCreation: unsugarable.forceCreation ?? EntityCreationParametersDefaults.forceCreation,
 			initialEntityCount: unsugarable.initialEntityCount ?? EntityListPreferencesDefaults.initialEntityCount,
 			setOnCreate: unsugarable.setOnCreate ? this.desugarSetOnCreate(unsugarable.setOnCreate, environment) : undefined,
+			meta: unsugarable.withMeta ?? [],
 			orderBy: unsugarable.orderBy ? this.desugarOrderBy(unsugarable.orderBy, environment) : undefined,
 			offset: unsugarable.offset,
 			limit: unsugarable.limit,
@@ -356,6 +358,7 @@ export class QueryLanguage {
 			setOnCreate: unsugarablePart.setOnCreate
 				? this.desugarSetOnCreate(unsugarablePart.setOnCreate, environment)
 				: undefined,
+			meta: unsugarablePart.withMeta ?? [],
 			field: sugarablePart.field,
 			isNonbearing: unsugarablePart.isNonbearing ?? EntityCreationParametersDefaults.isNonbearing,
 			// forceCreation: unsugarablePart.forceCreation ?? EntityCreationParametersDefaults.forceCreation,
@@ -690,6 +693,7 @@ export class QueryLanguage {
 			hasOneRelationPath,
 			field: fieldName,
 			isNonbearing: unsugarableField.isNonbearing ?? LeafFieldDefaults.isNonbearing,
+			meta: unsugarableField.withMeta ?? [],
 			defaultValue:
 				unsugarableField.defaultValue !== undefined
 					? VariableInputTransformer.transformValue(unsugarableField.defaultValue, environment)

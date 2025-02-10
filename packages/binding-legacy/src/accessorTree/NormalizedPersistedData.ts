@@ -4,7 +4,13 @@ import type { ServerId, UniqueEntityId } from '@contember/binding-common'
 // HasMany relations are encoded as sets of entity ids.
 // HasOne relations are encoded as BoxedSingleEntityId just to make them different from actual strings.
 //		Not sure whether that is a reasonable precaution or just pure overhead.
-export type EntityFieldPersistedData = FieldValue | ServerId | EntityListPersistedData
+export type EntityFieldPersistedValue = FieldValue | ServerId | EntityListPersistedData
+
+export type EntityFieldPersistedData<Value extends EntityFieldPersistedValue = EntityFieldPersistedValue> = {
+	readable: boolean | undefined
+	updatable: boolean | undefined
+	value: Value
+}
 
 export type SingleEntityPersistedData = Map<PlaceholderName, EntityFieldPersistedData>
 

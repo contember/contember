@@ -577,7 +577,7 @@ export class MutationGenerator {
 					if (pathBack?.fieldBackToParent === marker.parameters.field) {
 						continue
 					}
-					const persistedEntityIds = entityData?.get?.(placeholderName) ?? new Set()
+					const persistedEntityIds = entityData?.get?.(placeholderName)?.value ?? new Set()
 
 					if (!(persistedEntityIds instanceof Set)) {
 						continue

@@ -5,6 +5,12 @@ export type ReceivedFieldData = FieldValue | ReceivedEntityData | Array<Received
 export type ReceivedEntityData =
 	& {
 		__typename: string
+		_meta?: {
+			[fieldName: string]: {
+				readable?: boolean
+				updatable?: boolean
+			}
+		}
 		id: EntityId
 	}
 	& {

@@ -14,6 +14,7 @@ import type {
 	SugaredUniqueWhere,
 } from './primitives'
 import type { EntityAccessor, EntityListAccessor, FieldAccessor } from '../types'
+import { FieldMeta } from './Normalized'
 
 export interface SugaredParentEntityParameters extends UnsugarableSingleEntityEventListeners {
 }
@@ -73,6 +74,7 @@ export interface SugaredRelativeEntityList extends UnsugarableEntityListEventLis
 	initialEntityCount?: number
 	isNonbearing?: boolean
 	setOnCreate?: SugaredSetOnCreate
+	withMeta?: FieldMeta
 }
 
 
@@ -86,6 +88,7 @@ export interface SugaredRelativeSingleEntity extends UnsugarableSingleEntityEven
 	expectedMutation?: ExpectedRelationMutation
 	isNonbearing?: boolean
 	setOnCreate?: SugaredSetOnCreate
+	withMeta?: FieldMeta
 }
 
 
@@ -100,6 +103,7 @@ export interface SugaredRelativeSingleField extends UnsugarableFieldEventListene
 
 	defaultValue?: OptionallyVariableFieldValue
 	isNonbearing?: boolean
+	withMeta?: FieldMeta
 }
 
 export interface SugaredQualifiedFieldList extends UnsugarableFieldEventListeners {

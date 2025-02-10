@@ -99,6 +99,24 @@ export class ContentEntitySelection {
 		return new ContentEntitySelection(this.context, nodes)
 	}
 
+	meta(field: string, flags: ('readable' | 'updatable')[]): ContentEntitySelection {
+		const metaField = this.selectionSet.find((it): it is GraphQlField => it instanceof GraphQlField && it.name === '_meta')
+		const selectionWithoutMeta = metaField ? this.selectionSet.filter(it => it !== metaField) : this.selectionSet
+
+		const flagFields: GraphQlField[] = []
+		for (const flag of flags) {
+			flagFields.push(new GraphQlField(null, flag))
+		}
+
+		return new ContentEntitySelection(this.context, [
+			...selectionWithoutMeta,
+			new GraphQlField(null, '_meta', undefined, [
+				...metaField?.selectionSet ?? [],
+				new GraphQlField(null, field, undefined, flagFields),
+			]),
+		])
+	}
+
 
 	transform(transform: (value: any, context: ContentTransformContext) => any): ContentEntitySelection {
 		return new ContentEntitySelection(this.context, this.selectionSet, !this.transformFn ? transform : (value, ctx) => {

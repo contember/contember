@@ -418,20 +418,12 @@ export class Environment<Node extends Environment.AnyNode | undefined = Environm
     getSubTree(): Environment.SubTreeNode;
     // (undocumented)
     getSubTreeNode(): Node & Environment.AnyNode;
-    // @deprecated (undocumented)
-    getValue<V extends Environment.Value = Environment.Value>(key: string): V;
-    // @deprecated (undocumented)
-    getValueOrElse<F, V extends Environment.Value = Environment.Value>(key: string, fallback: F): V | F;
     // (undocumented)
     getVariable<V extends Environment.Value = Environment.Value>(key: string): V;
     // (undocumented)
     getVariableOrElse<F, V extends Environment.Value = Environment.Value>(key: string, fallback: F): V | F;
     // (undocumented)
     hasDimension(dimensionName: string): boolean;
-    // Warning: (tsdoc-missing-deprecation-message) The @deprecated block must include a deprecation message, e.g. describing the recommended alternative
-    //
-    // @deprecated (undocumented)
-    hasName(key: string): boolean;
     // (undocumented)
     hasParameter(key: string): boolean;
     // (undocumented)
@@ -474,10 +466,6 @@ export namespace Environment {
         // (undocumented)
         [key: string]: Value;
     }
-    // Warning: (tsdoc-missing-deprecation-message) The @deprecated block must include a deprecation message, e.g. describing the recommended alternative
-    //
-    // @deprecated (undocumented)
-    export type DeltaFactory = ValuesMapWithFactory;
     // (undocumented)
     export interface EntityListNode {
         // (undocumented)
@@ -526,11 +514,6 @@ export namespace Environment {
         [K in string]?: string | number;
     };
     // (undocumented)
-    export type ReactElementLike = {
-        type: any;
-        props: any;
-    };
-    // (undocumented)
     export type ResolvedValue = Value;
     // (undocumented)
     export interface SelectedDimensions {
@@ -562,14 +545,14 @@ export namespace Environment {
     // (undocumented)
     export type SubTreeNode = SubTreeEntityNode | SubTreeEntityListNode;
     // (undocumented)
-    export type Value = string | number | boolean | undefined | Filter | ReactElementLike;
-    const // (undocumented)
-    createExtension: <S, R>(create: Extension<S, R>["create"], otherMethods?: Omit<Extension<S, R>, "create">) => Extension<S, R>;
+    export type Value = unknown;
     // (undocumented)
     export interface ValuesMapWithFactory {
         // (undocumented)
         [key: string]: ((environment: Environment) => Value) | Value;
     }
+    const // (undocumented)
+    createExtension: <S, R>(create: Extension<S, R>["create"], otherMethods?: Omit<Extension<S, R>, "create">) => Extension<S, R>;
 }
 
 // @public (undocumented)

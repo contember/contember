@@ -73,23 +73,6 @@ class Environment<Node extends Environment.AnyNode | undefined = Environment.Any
 		return (this.options.variables[key] as V) ?? fallback
 	}
 
-	/** @deprecated use getVariable or getParameter */
-	public getValue<V extends Environment.Value = Environment.Value>(key: string): V {
-		console.warn('Environment.getValue() is deprecated, use Environment.getVariable() or Environment.getParameter() instead.')
-		return this.getVariableOrElse(key, undefined) ?? this.getParameterOrElse(key, undefined) as V
-	}
-
-	/** @deprecated use getVariableOrElse or getParameterOrElse */
-	public getValueOrElse<F, V extends Environment.Value = Environment.Value>(key: string, fallback: F): V | F {
-		console.warn('Environment.getValueOrElse() is deprecated, use Environment.getVariableOrElse() or Environment.getParameterOrElse() instead.')
-		return this.getVariableOrElse(key, undefined) ?? this.getParameterOrElse(key, fallback) as any
-	}
-
-	/** @deprecated */
-	public hasName(key: string): boolean {
-		console.warn('Environment.hasName() is deprecated, use Environment.hasVariable() or Environment.hasParameter() instead.')
-		return key in this.options.variables || key in this.options.parameters
-	}
 
 	public withVariables(variables: Environment.ValuesMapWithFactory | undefined): Environment {
 		if (variables === undefined) {
@@ -97,9 +80,6 @@ class Environment<Node extends Environment.AnyNode | undefined = Environment.Any
 		}
 		const newVariables = { ...this.options.variables }
 		for (const [newName, newValue] of Object.entries(variables)) {
-			if (newName === 'labelMiddleware') {
-				throw new BindingError('You cannot pass labelMiddleware to withVariables method. Use withLabelMiddleware instead.')
-			}
 			const resolvedValue = typeof newValue === 'function' ? newValue(this) : newValue
 			if (resolvedValue === undefined) {
 				delete newVariables[newName]
@@ -245,12 +225,7 @@ class Environment<Node extends Environment.AnyNode | undefined = Environment.Any
 namespace Environment {
 	export type Name = string
 
-	export type ReactElementLike = {
-		type: any
-		props: any
-	}
-
-	export type Value = string | number | boolean | undefined | Filter | ReactElementLike
+	export type Value = unknown
 
 	export type ResolvedValue = Value
 
@@ -337,9 +312,6 @@ namespace Environment {
 			...otherMethods,
 		}
 	}
-
-	/** @deprecated */
-	export type DeltaFactory = ValuesMapWithFactory
 }
 
 export { Environment }

@@ -62,7 +62,7 @@ export class ConditionBuilder {
 		return this.processConditionExpression(ConditionBuilder.process(condition), ['and', true])
 	}
 
-	compare(columnName: QueryBuilder.ColumnIdentifier, operator: Operator, value: Value | Literal): ConditionBuilder {
+	compare(columnName: QueryBuilder.ColumnIdentifier, operator: Operator | `${Operator}`, value: Value | Literal): ConditionBuilder {
 		if (!(Object.values(Operator) as string[]).includes(operator)) {
 			throw new Error(`Operator ${operator} is not supported`)
 		}
@@ -80,7 +80,7 @@ export class ConditionBuilder {
 		return this.compareColumns(columnName1, Operator.eq, columnName2)
 	}
 
-	compareColumns(columnName1: QueryBuilder.ColumnIdentifier, operator: Operator, columnName2: QueryBuilder.ColumnIdentifier) {
+	compareColumns(columnName1: QueryBuilder.ColumnIdentifier, operator: Operator | `${Operator}`, columnName2: QueryBuilder.ColumnIdentifier) {
 		return this.with(new Literal(ConditionBuilder.createOperatorSql(formatColumnIdentifier(columnName1), formatColumnIdentifier(columnName2), operator)))
 	}
 
@@ -147,7 +147,7 @@ export class ConditionBuilder {
 		return this
 	}
 
-	private static createOperatorSql(left: string, right: string, operator: Operator): string {
+	private static createOperatorSql(left: string, right: string, operator: Operator | `${Operator}`): string {
 		if (!(Object.values(Operator) as string[]).includes(operator)) {
 			throw new Error(`Operator ${operator} is not supported`)
 		}

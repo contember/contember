@@ -390,9 +390,8 @@ describe('GraphQL schema builder', () => {
 		})
 	})
 
-	it.only('no root ops', async () => {
+	it('no root ops', async () => {
 		const schema = createSchema(NoRootOperation)
-		console.log(schema.acl.roles.editor.entities.Image)
 
 		await testSchema({
 			schema: () => schema.model,

@@ -1,16 +1,16 @@
 import { QueryBuilder } from './QueryBuilder'
 import { Literal } from '../Literal'
 import { Value } from '../types'
-import { ConditionBuilder, ConditionCallback, ConditionExpression } from './ConditionBuilder'
+import { ConditionBuilder, ConditionExpression } from './ConditionBuilder'
 import { WindowFunction } from './WindowFunction'
 import { CaseStatement } from './CaseStatement'
-import { toFqnWrap } from './formatUtils'
+import { formatColumnIdentifier } from '../utils'
 
 export class ColumnExpressionFactory {
 	constructor() {}
 
 	public select(columnName: QueryBuilder.ColumnIdentifier): Literal {
-		return new Literal(toFqnWrap(columnName))
+		return new Literal(formatColumnIdentifier(columnName))
 	}
 
 	public selectValue(value: Value, type?: string): Literal {

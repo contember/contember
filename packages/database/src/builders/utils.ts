@@ -1,9 +1,7 @@
 import { Literal } from '../Literal'
 import { QueryBuilder } from './QueryBuilder'
 import { ColumnExpressionFactory } from './ColumnExpressionFactory'
-import { toFqnWrap } from './formatUtils'
-
-export { toFqnWrap }
+import { formatColumnIdentifier } from '../utils'
 
 export function resolveValues(values: QueryBuilder.Values): QueryBuilder.ResolvedValues {
 	return Object.entries(values)
@@ -23,7 +21,7 @@ export function columnExpressionToLiteral(
 	if (typeof expr === 'function') {
 		return expr(new ColumnExpressionFactory())
 	} else if (typeof expr === 'string' || Array.isArray(expr)) {
-		return new Literal(toFqnWrap(expr))
+		return new Literal(formatColumnIdentifier(expr))
 	}
 	return expr
 }

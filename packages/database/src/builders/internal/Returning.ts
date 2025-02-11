@@ -1,7 +1,7 @@
 import { QueryBuilder } from '../'
 import { Literal } from '../../Literal'
 import { Connection } from '../../client'
-import { toFqnWrap } from '../utils'
+import { formatColumnIdentifier } from '../../utils'
 
 class Returning {
 	constructor(private readonly columns: (QueryBuilder.ColumnIdentifier | Literal)[] = []) {}
@@ -10,7 +10,7 @@ class Returning {
 		if (this.columns.length === 0) {
 			return new Literal('')
 		}
-		const columns = this.columns.map(it => (it instanceof Literal ? it : new Literal(toFqnWrap(it))))
+		const columns = this.columns.map(it => (it instanceof Literal ? it : new Literal(formatColumnIdentifier(it))))
 		return new Literal(' returning ').appendAll(columns, ', ')
 	}
 

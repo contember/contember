@@ -6,6 +6,7 @@ export class GridArticle {
 	title = c.stringColumn()
 	slug = c.stringColumn().notNull().unique()
 	state = c.enumColumn(GridArticleState)
+	target = c.enumColumn(c.createEnum('a', 'b', 'c')).list()
 	locked = c.boolColumn().default(false)
 	publishedAt = c.dateTimeColumn()
 	publishDate = c.dateColumn()

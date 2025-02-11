@@ -59,6 +59,10 @@ export type InputRootEnumValue =
 	 | "a"
 	 | "b"
 	 | "c"
+export type InputRootEnumArrayValue = 
+	 | "a"
+	 | "b"
+	 | "c"
 export type LegacyEditorContentUnique = 
 	 | "unique"
 export type PlateEditorContentUnique = 
@@ -87,6 +91,7 @@ export type ContemberClientEnums = {
 	EditorTextAreaUnique: EditorTextAreaUnique
 	FormArticleLocaleLocale: FormArticleLocaleLocale
 	InputRootEnumValue: InputRootEnumValue
+	InputRootEnumArrayValue: InputRootEnumArrayValue
 	LegacyEditorContentUnique: LegacyEditorContentUnique
 	PlateEditorContentUnique: PlateEditorContentUnique
 	RepeaterRootUnique: RepeaterRootUnique

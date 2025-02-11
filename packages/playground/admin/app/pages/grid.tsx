@@ -11,7 +11,7 @@ import {
 	DataGridDateColumn,
 	DataGridDateFilter,
 	DataGridEnumColumn,
-	DataGridEnumFilter,
+	DataGridEnumFilter, DataGridEnumListColumn,
 	DataGridHasManyColumn,
 	DataGridHasManyFilter,
 	DataGridHasManyTooltip,
@@ -128,6 +128,7 @@ const CustomGridColumn = Component(() => {
 		<DataGridTextColumn header="Title" field="title" />
 
 		<DataGridEnumColumn field="state" />
+		<DataGridEnumListColumn field="target" options={{ a: 'A', b: 'B', c: 'C' }} />
 
 		<DataGridDateColumn header="Published at" field="publishedAt" />
 

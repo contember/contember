@@ -1,0 +1,46 @@
+{
+	"formatVersion": 6,
+	"modifications": [
+		{
+			"modification": "createEnum",
+			"enumName": "GridArticleTarget",
+			"values": [
+				"a",
+				"b",
+				"c"
+			]
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "GridArticle",
+			"field": {
+				"name": "target",
+				"columnName": "target",
+				"columnType": "GridArticleTarget",
+				"nullable": true,
+				"type": "Enum",
+				"list": true
+			}
+		},
+		{
+			"modification": "patchAclSchema",
+			"patch": [
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/GridArticle/operations/create/target",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/GridArticle/operations/update/target",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/GridArticle/operations/read/target",
+					"value": true
+				}
+			]
+		}
+	]
+}

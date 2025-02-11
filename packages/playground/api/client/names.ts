@@ -788,6 +788,15 @@ export const ContemberClientNames: SchemaNames = {
         },
         "uuidValue": {
           "type": "column"
+        },
+        "stringArrayValue": {
+          "type": "column"
+        },
+        "enumArrayValue": {
+          "type": "column"
+        },
+        "intArrayValue": {
+          "type": "column"
         }
       },
       "scalars": [
@@ -802,7 +811,10 @@ export const ContemberClientNames: SchemaNames = {
         "datetimeValue",
         "jsonValue",
         "enumValue",
-        "uuidValue"
+        "uuidValue",
+        "stringArrayValue",
+        "enumArrayValue",
+        "intArrayValue"
       ]
     },
     "InputRules": {
@@ -1574,6 +1586,11 @@ export const ContemberClientNames: SchemaNames = {
       "en"
     ],
     "InputRootEnumValue": [
+      "a",
+      "b",
+      "c"
+    ],
+    "InputRootEnumArrayValue": [
       "a",
       "b",
       "c"

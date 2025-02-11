@@ -57,7 +57,12 @@ export class OrderByTypeProvider {
 			}
 
 			const field = acceptFieldVisitor(this.schema, name, fieldName, {
-				visitColumn: () => ({ type: this.orderDirectionEnum }),
+				visitColumn: ({ column }) => {
+					if (column.list) {
+						return undefined
+					}
+					return ({ type: this.orderDirectionEnum })
+				},
 				visitHasOne: ({ relation }) => ({ type: this.getEntityOrderByType(relation.target) }),
 				visitHasMany: () => undefined,
 			} as Model.FieldVisitor<GraphQLInputFieldConfig | undefined>)

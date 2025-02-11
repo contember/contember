@@ -1,0 +1,257 @@
+type Query {
+  getFoo(by: FooUniqueWhere!, filter: FooWhere): Foo
+  listFoo(filter: FooWhere, orderBy: [FooOrderBy!], offset: Int, limit: Int): [Foo!]!
+  paginateFoo(filter: FooWhere, orderBy: [FooOrderBy!], skip: Int, first: Int): FooConnection!
+  validateCreateFoo(data: FooCreateInput!): _ValidationResult!
+  validateUpdateFoo(by: FooUniqueWhere!, data: FooUpdateInput!): _ValidationResult!
+  transaction: QueryTransaction
+  _info: Info
+}
+
+type Foo {
+  _meta: FooMeta
+  id: UUID!
+  stringArrayValue: [String!]
+  enumArrayValue: [FooEnumArrayValue!]
+  intArrayValue: [Int!]
+}
+
+type FooMeta {
+  id: FieldMeta
+  stringArrayValue: FieldMeta
+  enumArrayValue: FieldMeta
+  intArrayValue: FieldMeta
+}
+
+type FieldMeta {
+  readable: Boolean
+  updatable: Boolean
+}
+
+scalar UUID
+
+enum FooEnumArrayValue {
+  a
+  b
+  c
+}
+
+input FooUniqueWhere {
+  id: UUID
+}
+
+input FooWhere {
+  id: UUIDCondition
+  stringArrayValue: StringListCondition
+  enumArrayValue: FooEnumArrayValueEnumListCondition
+  intArrayValue: IntListCondition
+  and: [FooWhere]
+  or: [FooWhere]
+  not: FooWhere
+}
+
+input UUIDCondition {
+  and: [UUIDCondition!]
+  or: [UUIDCondition!]
+  not: UUIDCondition
+  null: Boolean
+  isNull: Boolean
+  eq: UUID
+  notEq: UUID
+  in: [UUID!]
+  notIn: [UUID!]
+  lt: UUID
+  lte: UUID
+  gt: UUID
+  gte: UUID
+}
+
+input StringListCondition {
+  and: [StringListCondition!]
+  or: [StringListCondition!]
+  not: StringListCondition
+  null: Boolean
+  isNull: Boolean
+  minLength: Int
+  maxLength: Int
+  includes: String
+}
+
+input FooEnumArrayValueEnumListCondition {
+  and: [FooEnumArrayValueEnumListCondition!]
+  or: [FooEnumArrayValueEnumListCondition!]
+  not: FooEnumArrayValueEnumListCondition
+  null: Boolean
+  isNull: Boolean
+  minLength: Int
+  maxLength: Int
+  includes: FooEnumArrayValue
+}
+
+input IntListCondition {
+  and: [IntListCondition!]
+  or: [IntListCondition!]
+  not: IntListCondition
+  null: Boolean
+  isNull: Boolean
+  minLength: Int
+  maxLength: Int
+  includes: Int
+}
+
+input FooOrderBy {
+  _random: Boolean
+  _randomSeeded: Int
+  id: OrderDirection
+}
+
+enum OrderDirection {
+  asc
+  desc
+  ascNullsFirst
+  descNullsLast
+}
+
+type FooConnection {
+  pageInfo: PageInfo!
+  edges: [FooEdge!]!
+}
+
+type PageInfo {
+  totalCount: Int!
+}
+
+type FooEdge {
+  node: Foo!
+}
+
+type _ValidationResult {
+  valid: Boolean!
+  errors: [_ValidationError!]!
+}
+
+type _ValidationError {
+  path: [_PathFragment!]!
+  message: _ValidationMessage!
+}
+
+union _PathFragment = _FieldPathFragment | _IndexPathFragment
+
+type _FieldPathFragment {
+  field: String!
+}
+
+type _IndexPathFragment {
+  index: Int!
+  alias: String
+}
+
+type _ValidationMessage {
+  text: String!
+}
+
+input FooCreateInput {
+  stringArrayValue: [String!]
+  enumArrayValue: [FooEnumArrayValue!]
+  intArrayValue: [Int!]
+  _dummy_field_: Boolean
+}
+
+input FooUpdateInput {
+  stringArrayValue: [String!]
+  enumArrayValue: [FooEnumArrayValue!]
+  intArrayValue: [Int!]
+  _dummy_field_: Boolean
+}
+
+type QueryTransaction {
+  getFoo(by: FooUniqueWhere!, filter: FooWhere): Foo
+  listFoo(filter: FooWhere, orderBy: [FooOrderBy!], offset: Int, limit: Int): [Foo!]!
+  paginateFoo(filter: FooWhere, orderBy: [FooOrderBy!], skip: Int, first: Int): FooConnection!
+  validateCreateFoo(data: FooCreateInput!): _ValidationResult!
+  validateUpdateFoo(by: FooUniqueWhere!, data: FooUpdateInput!): _ValidationResult!
+}
+
+type Info {
+  description: String
+}
+
+type Mutation {
+  createFoo(data: FooCreateInput!): FooCreateResult!
+  deleteFoo(by: FooUniqueWhere!, filter: FooWhere): FooDeleteResult!
+  updateFoo(by: FooUniqueWhere!, filter: FooWhere, data: FooUpdateInput!): FooUpdateResult!
+  upsertFoo(by: FooUniqueWhere!, filter: FooWhere, update: FooUpdateInput!, create: FooCreateInput!): FooUpsertResult!
+  transaction(options: MutationTransactionOptions): MutationTransaction!
+  query: Query!
+}
+
+type FooCreateResult implements MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: Foo
+  validation: _ValidationResult!
+}
+
+interface MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+}
+
+type _MutationError {
+  path: [_PathFragment!]! @deprecated(reason: "Use `paths`.")
+  paths: [[_PathFragment!]!]!
+  type: _MutationErrorType!
+  message: String
+}
+
+enum _MutationErrorType {
+  NotNullConstraintViolation
+  UniqueConstraintViolation
+  ForeignKeyConstraintViolation
+  NotFoundOrDenied
+  NonUniqueWhereInput
+  InvalidDataInput
+  SqlError
+}
+
+type FooDeleteResult implements MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: Foo
+}
+
+type FooUpdateResult implements MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: Foo
+  validation: _ValidationResult!
+}
+
+type FooUpsertResult implements MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: Foo
+  validation: _ValidationResult!
+}
+
+type MutationTransaction {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  validation: _ValidationResult!
+  createFoo(data: FooCreateInput!): FooCreateResult!
+  deleteFoo(by: FooUniqueWhere!, filter: FooWhere): FooDeleteResult!
+  updateFoo(by: FooUniqueWhere!, filter: FooWhere, data: FooUpdateInput!): FooUpdateResult!
+  upsertFoo(by: FooUniqueWhere!, filter: FooWhere, update: FooUpdateInput!, create: FooCreateInput!): FooUpsertResult!
+  query: Query
+}
+
+input MutationTransactionOptions {
+  deferForeignKeyConstraints: Boolean
+  deferUniqueConstraints: Boolean
+}

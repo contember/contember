@@ -130,7 +130,8 @@ const columnSchema = Typesafe.intersection(
 	}),
 	Typesafe.partial({
 		typeAlias: Typesafe.string,
-		default: Typesafe.union(Typesafe.string, Typesafe.number, Typesafe.boolean, Typesafe.null_),
+		list: Typesafe.boolean,
+		default: Typesafe.anyJson,
 		sequence: intersectionSchema as Typesafe.Type<Model.AnyColumn['sequence']>,
 	}),
 )

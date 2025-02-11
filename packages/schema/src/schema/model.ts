@@ -54,6 +54,7 @@ export namespace Model {
 		& Field<T>
 		& {
 			readonly columnType: string
+			readonly list?: boolean
 			readonly typeAlias?: string
 			readonly nullable: boolean
 			readonly default?: JSONValue

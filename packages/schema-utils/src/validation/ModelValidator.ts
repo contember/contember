@@ -1,6 +1,6 @@
 import { Model } from '@contember/schema'
 import { ErrorBuilder, ValidationError } from './errors'
-import { acceptEveryFieldVisitor, getTargetEntity, isInverseRelation, isOwningRelation } from '../model'
+import { acceptEveryFieldVisitor, getTargetEntity, isColumn, isInverseRelation, isOwningRelation } from '../model'
 
 const IDENTIFIER_PATTERN = /^[_a-zA-Z][_a-zA-Z0-9]*$/
 const RESERVED_WORDS = ['and', 'or', 'not']
@@ -52,18 +52,20 @@ export class ModelValidator {
 			}
 		}
 		this.validateUniqueConstraints(
-			entity.unique,
-			new Set(Object.keys(entity.fields)),
+			entity,
 			errors.for('unique'),
 		)
 		this.validateColumnNamesCollision(entity, errors)
 	}
 
-	private validateUniqueConstraints(uniqueConstraints: Model.Entity['unique'], fields: Set<string>, errors: ErrorBuilder): void {
-		for (const constraint of uniqueConstraints) {
+	private validateUniqueConstraints(entity: Model.Entity, errors: ErrorBuilder): void {
+		for (const constraint of entity.unique) {
 			for (const field of constraint.fields) {
-				if (!fields.has(field)) {
+				const fieldDef = entity.fields[field]
+				if (!fieldDef) {
 					errors.add('MODEL_UNDEFINED_FIELD', `Referenced field ${field} in a constraint does not exists`)
+				} else if (isColumn(fieldDef) && fieldDef.list) {
+					errors.add('MODEL_INVALID_FIELD', `Field ${field} in a unique constraint cannot be an array`)
 				}
 			}
 		}

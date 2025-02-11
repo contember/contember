@@ -62,7 +62,6 @@ const testSchema = async (test: Test) => {
 }
 describe('GraphQL schema builder', () => {
 
-
 	it('basic schema', async () => {
 		await testSchema({
 			schema: builder =>
@@ -400,6 +399,23 @@ describe('GraphQL schema builder', () => {
 				return factory.create(schema, ['editor'])
 			},
 			graphQlSchemaFile: 'schema-no-root-ops.gql',
+		})
+	})
+
+
+	it('array', async () => {
+		const schema = createSchema({
+			Foo: class Foo {
+				stringArrayValue = c.stringColumn().list()
+				enumArrayValue = c.enumColumn(c.createEnum('a', 'b', 'c')).list()
+				intArrayValue = c.intColumn().list()
+			},
+		})
+
+		await testSchema({
+			schema: () => schema.model,
+			permissions: schema => new AllowAllPermissionFactory().create(schema),
+			graphQlSchemaFile: 'schema-array.gql',
 		})
 	})
 })

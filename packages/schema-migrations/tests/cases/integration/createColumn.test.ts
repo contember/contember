@@ -172,3 +172,30 @@ ALTER "active" SET NOT NULL; ALTER TABLE "author" ADD "created_at" timestamptz;
 ALTER TABLE "author" ALTER "created_at" SET DATA TYPE timestamptz USING $pga$2024-01-01 10:00$pga$, ALTER "created_at" SET NOT NULL;
 `,
 }))
+
+describe('create list column', () => testMigrations({
+	original: createSchema({
+		Author: class Author {
+		},
+	}),
+	updated: createSchema({
+		Author: class Author {
+			emails = def.stringColumn().list()
+		},
+	}),
+	diff: [
+		{
+			modification: 'createColumn',
+			entityName: 'Author',
+			field: {
+				columnName: 'emails',
+				name: 'emails',
+				nullable: true,
+				type: Model.ColumnType.String,
+				columnType: 'text',
+				list: true,
+			},
+		},
+	],
+	sql: SQL`ALTER TABLE "author" ADD "emails" text[];`,
+}))

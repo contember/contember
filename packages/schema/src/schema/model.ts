@@ -1,4 +1,5 @@
 import { Input } from './input'
+import { JSONValue } from './json'
 
 export namespace Model {
 
@@ -55,7 +56,7 @@ export namespace Model {
 			readonly columnType: string
 			readonly typeAlias?: string
 			readonly nullable: boolean
-			readonly default?: string | number | boolean | null
+			readonly default?: JSONValue
 			readonly sequence?: {
 				readonly precedence: 'ALWAYS' | 'BY DEFAULT'
 				readonly start?: number

@@ -1492,7 +1492,7 @@ export type SchemaField = SchemaRelation | SchemaColumn;
 export type SchemaFields = Map<FieldName, SchemaField>;
 
 // @public (undocumented)
-export type SchemaKnownColumnType = 'Bool' | 'Date' | 'DateTime' | 'Double' | 'Enum' | 'Integer' | 'String' | 'Uuid';
+export type SchemaKnownColumnType = 'Bool' | 'Date' | 'DateTime' | 'Double' | 'Enum' | 'Integer' | 'String' | 'Uuid' | 'Time';
 
 // @public (undocumented)
 export class SchemaLoader {

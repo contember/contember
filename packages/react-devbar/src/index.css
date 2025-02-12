@@ -225,8 +225,6 @@
 }
 
 .cui-devError-header {
-	position: sticky;
-	top: 0;
 	background: #cd1818;
 	color: #ffffff;
 	padding: 0.5em 1em;
@@ -421,7 +419,7 @@
 	position: fixed;
 	bottom: 1.25rem;
 	left: 1.25rem;
-	z-index: 50;
+	z-index: 16777270;
 }
 
 .cui-devErrorBadge-button {

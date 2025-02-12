@@ -61,6 +61,26 @@ const testSchema = async (test: Test) => {
 	}
 }
 describe('GraphQL schema builder', () => {
+	it('column types', async () => {
+		await testSchema({
+			schema: () => createSchema({
+				Columns: class Columns {
+					string = c.stringColumn()
+					int = c.intColumn()
+					float = c.doubleColumn()
+					boolean = c.boolColumn()
+					date = c.dateColumn()
+					dateTime = c.dateTimeColumn()
+					json = c.jsonColumn()
+					uuid = c.uuidColumn()
+					time = c.timeColumn()
+					enum = c.enumColumn(c.createEnum('a', 'b', 'c'))
+				},
+			}).model,
+			permissions: schema => new AllowAllPermissionFactory().create(schema),
+			graphQlSchemaFile: 'schema-column-types.gql',
+		})
+	})
 
 	it('basic schema', async () => {
 		await testSchema({

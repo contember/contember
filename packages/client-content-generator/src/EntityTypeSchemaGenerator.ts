@@ -155,6 +155,8 @@ const columnToTsType = (column: Model.AnyColumn): string => {
 				return 'boolean'
 			case Model.ColumnType.DateTime:
 				return 'string'
+			case Model.ColumnType.Time:
+				return 'string'
 			case Model.ColumnType.Date:
 				return 'string'
 			case Model.ColumnType.Json:

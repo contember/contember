@@ -17,6 +17,8 @@ export const resolveDefaultColumnType = (type: Exclude<Model.ColumnType, Model.C
 			return 'timestamptz'
 		case Model.ColumnType.Date:
 			return 'date'
+		case Model.ColumnType.Time:
+			return 'time'
 		case Model.ColumnType.Json:
 			return 'jsonb'
 		default:

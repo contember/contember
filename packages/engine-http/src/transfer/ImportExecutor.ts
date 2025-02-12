@@ -358,6 +358,7 @@ export class ImportExecutor {
 			case Model.ColumnType.Bool: return Typesafe.boolean
 			case Model.ColumnType.Enum: return Typesafe.string // TODO
 			case Model.ColumnType.DateTime: return Typesafe.string // TODO
+			case Model.ColumnType.Time: return Typesafe.string // TODO
 			case Model.ColumnType.Date: return Typesafe.string // TODO
 			case Model.ColumnType.Json: return Typesafe.string
 		}

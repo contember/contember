@@ -42,6 +42,7 @@ export namespace Model {
 		Enum = 'Enum',
 		DateTime = 'DateTime',
 		Date = 'Date',
+		Time = 'Time',
 		Json = 'Json',
 	}
 

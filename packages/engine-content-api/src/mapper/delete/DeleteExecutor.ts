@@ -299,7 +299,7 @@ export class DeleteExecutor {
 			.from(entity.tableName, 'root_')
 			.select(['root_', entity.primaryColumn], 'id')
 			.select(['root_', relation.joiningColumn.columnName], 'ref')
-			.where(expr => expr.in(relation.joiningColumn.columnName, values))
+			.where(expr => expr.in(['root_', relation.joiningColumn.columnName], values))
 	}
 
 	private filterPlannedForDelete<R extends {id: Input.PrimaryValue}>(state: DeleteState, entity: Model.Entity, values: R[]): R[] {

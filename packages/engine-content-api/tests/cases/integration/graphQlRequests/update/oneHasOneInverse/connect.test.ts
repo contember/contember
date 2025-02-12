@@ -228,7 +228,7 @@ test('connect - different owner & orphan removal enabled', async () => {
 					response: { rows: [{ id: testUuid(4), allowed: true }] },
 				},
 				{
-					sql: 'select "root_"."id" as "id", "root_"."setting_id" as "ref" from "public"."site" as "root_" where "setting_id" in (?)',
+					sql: 'select "root_"."id" as "id", "root_"."setting_id" as "ref" from "public"."site" as "root_" where "root_"."setting_id" in (?)',
 					parameters: [testUuid(4)],
 					response: { rows: [] },
 				},

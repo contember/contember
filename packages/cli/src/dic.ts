@@ -54,6 +54,7 @@ import {
 	CommandManager,
 	CommandRunner,
 	Npm,
+	Bun,
 	PackageWorkspaceResolver,
 	Pnpm,
 	Yarn,
@@ -137,6 +138,7 @@ export const createContainer = ({ env, version, runtime, workspace }: {
 				new YarnClassic(fs, commandRunner),
 				new Pnpm(fs, commandRunner),
 				new Npm(fs, commandRunner),
+				new Bun(fs, commandRunner),
 			])
 		})
 		.addService('dockerComposeManager', ({ workspace, env, fs, yamlHandler }) =>

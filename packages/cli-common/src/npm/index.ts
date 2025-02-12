@@ -1,5 +1,6 @@
 export * from './CommandRunner'
 export * from './PackageWorkspace'
+export * from './packageManagers/Bun'
 export * from './packageManagers/Npm'
 export * from './packageManagers/Pnpm'
 export * from './packageManagers/Yarn'

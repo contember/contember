@@ -37,7 +37,7 @@ test('delete', async () => {
 					response: { rows: [{ id: testUuid(1), allowed: true }] },
 				},
 				{
-					sql: SQL`select "root_"."id" as "id", "root_"."setting_id" as "ref", true as "allowed" from "public"."site" as "root_" where "setting_id" in (?)`,
+					sql: SQL`select "root_"."id" as "id", "root_"."setting_id" as "ref", true as "allowed" from "public"."site" as "root_" where "root_"."setting_id" in (?)`,
 					parameters: [testUuid(1)],
 					response: { rows: [{ id: testUuid(2), ref: testUuid(1), allowed: true }] },
 				},
@@ -93,7 +93,7 @@ test('delete denied', async () => {
 					response: { rows: [{ id: testUuid(1), allowed: true }] },
 				},
 				{
-					sql: SQL`select "root_"."id" as "id", "root_"."setting_id" as "ref", true as "allowed" from "public"."site" as "root_" where "setting_id" in (?)`,
+					sql: SQL`select "root_"."id" as "id", "root_"."setting_id" as "ref", true as "allowed" from "public"."site" as "root_" where "root_"."setting_id" in (?)`,
 					parameters: [testUuid(1)],
 					response: { rows: [{ id: testUuid(2), ref: testUuid(1), allowed: false }] },
 				},

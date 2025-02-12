@@ -32,7 +32,7 @@ test('delete author and with restrict on posts', async () => {
 					response: { rows: [{ id: testUuid(1), allowed: true }] },
 				},
 				{
-					sql: SQL`select "root_"."id" as "id", "root_"."author_id" as "ref" from "public"."post" as "root_" where "author_id" in (?)`,
+					sql: SQL`select "root_"."id" as "id", "root_"."author_id" as "ref" from "public"."post" as "root_" where "root_"."author_id" in (?)`,
 					parameters: [testUuid(1)],
 					response: { rows: [] },
 				},
@@ -82,7 +82,7 @@ test('delete author with restrict on posts - declined', async () => {
 					response: { rows: [{ id: testUuid(1), allowed: true }] },
 				},
 				{
-					sql: SQL`select "root_"."id" as "id", "root_"."author_id" as "ref" from "public"."post" as "root_" where "author_id" in (?)`,
+					sql: SQL`select "root_"."id" as "id", "root_"."author_id" as "ref" from "public"."post" as "root_" where "root_"."author_id" in (?)`,
 					parameters: [testUuid(1)],
 					response: { rows: [{ id: testUuid(2), ref: testUuid(1) }] },
 				},

@@ -53,7 +53,7 @@ test('delete post and orphaned content', async () => {
 					},
 				},
 				{
-					sql: SQL`select "root_"."id" as "id", "root_"."content_id" as "ref" from "public"."post" as "root_" where "content_id" in (?)`,
+					sql: SQL`select "root_"."id" as "id", "root_"."content_id" as "ref" from "public"."post" as "root_" where "root_"."content_id" in (?)`,
 					parameters: [testUuid(2)],
 					response: {
 						rows: [{ id: testUuid(1), ref: testUuid(2) }],

@@ -35,12 +35,12 @@ test('delete author with posts and locales cascade delete', async () => {
 					response: { rows: [{ id: testUuid(1), allowed: true }] },
 				},
 				{
-					sql: SQL`select "root_"."id" as "id", "root_"."author_id" as "ref", true as "allowed" from "public"."post" as "root_" where "author_id" in (?)`,
+					sql: SQL`select "root_"."id" as "id", "root_"."author_id" as "ref", true as "allowed" from "public"."post" as "root_" where "root_"."author_id" in (?)`,
 					parameters: [testUuid(1)],
 					response: { rows: [{ id: testUuid(2), allowed: true }] },
 				},
 				{
-					sql: SQL`select "root_"."id" as "id", "root_"."post_id" as "ref", true as "allowed" from "public"."post_locales" as "root_" where "post_id" in (?)`,
+					sql: SQL`select "root_"."id" as "id", "root_"."post_id" as "ref", true as "allowed" from "public"."post_locales" as "root_" where "root_"."post_id" in (?)`,
 					parameters: [testUuid(2)],
 					response: { rows: [{ id: testUuid(3), allowed: true }] },
 				},
@@ -90,7 +90,7 @@ test('delete author with posts (denied) ', async () => {
 					response: { rows: [{ id: testUuid(1), allowed: true }] },
 				},
 				{
-					sql: SQL`select "root_"."id" as "id", "root_"."author_id" as "ref", true as "allowed" from "public"."post" as "root_" where "author_id" in (?)`,
+					sql: SQL`select "root_"."id" as "id", "root_"."author_id" as "ref", true as "allowed" from "public"."post" as "root_" where "root_"."author_id" in (?)`,
 					parameters: [testUuid(1)],
 					response: { rows: [{ id: testUuid(2), ref: testUuid(1), allowed: false }] },
 				},

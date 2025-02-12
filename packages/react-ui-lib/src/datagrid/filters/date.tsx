@@ -102,26 +102,27 @@ const DataGridDateFilterList = () => (
 	</>
 )
 
-/**
- * Utility function to create a predefined date range
- */
-export const createDataGridDateRange = (label: ReactNode, dayDeltaStart: number, dayDeltaEnd: number): DataGridPredefinedDateRange => {
-	const start = new Date(new Date().setDate(new Date().getDate() + dayDeltaStart))
-	const end = new Date(new Date().setDate(new Date().getDate() + dayDeltaEnd))
-	return {
-		label,
-		start: `${start.getFullYear()}-${String(start.getMonth() + 1).padStart(2, '0')}-${String(start.getDate()).padStart(2, '0')}`,
-		end: `${end.getFullYear()}-${String(end.getMonth() + 1).padStart(2, '0')}-${String(end.getDate()).padStart(2, '0')}`,
-	}
-}
-
 const now = Temporal.Now.plainDateISO()
 const lastMonth = now.subtract({ months: 1 })
 const nextMonth = now.add({ months: 1 })
 const lastYear = now.subtract({ years: 1 })
 const nextYear = now.add({ years: 1 })
 
-export const dataGridRanges = {
+/**
+ * Utility function to create a predefined date range
+ */
+export const createDataGridDateRange = (label: ReactNode, dayDeltaStart: number, dayDeltaEnd: number): DataGridPredefinedDateRange => {
+	const start = now.add({ days: dayDeltaStart })
+	const end = now.add({ days: dayDeltaEnd })
+
+	return {
+		label,
+		start: start.toString(),
+		end: end.toString(),
+	}
+}
+
+export const dataGridDateRanges = {
 	yesterday: createDataGridDateRange(dict.datagrid.yesterday, -1, -1),
 	today: createDataGridDateRange(dict.datagrid.today, 0, 0),
 	tomorrow: createDataGridDateRange(dict.datagrid.tomorrow, 1, 1),
@@ -136,9 +137,7 @@ export const dataGridRanges = {
 	nextYear: createDataGridDateRange(dict.datagrid.nextYear, 1 - now.dayOfYear + nextYear.daysInYear, now.daysInYear - now.dayOfYear + nextYear.daysInYear),
 }
 
-const defaultRanges = [createDataGridDateRange(dict.datagrid.today, 0, 0)]
-
-const DataGridDateFilterSelect = ({ label, ranges = defaultRanges }: {
+const DataGridDateFilterSelect = ({ label, ranges = [dataGridDateRanges.today] }: {
 	label?: ReactNode
 	ranges?: DataGridPredefinedDateRange[]
 }) => {

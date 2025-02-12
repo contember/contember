@@ -1,0 +1,36 @@
+{
+	"formatVersion": 6,
+	"modifications": [
+		{
+			"modification": "createColumn",
+			"entityName": "InputRoot",
+			"field": {
+				"name": "timeValue",
+				"columnName": "time_value",
+				"columnType": "time",
+				"nullable": true,
+				"type": "Time"
+			}
+		},
+		{
+			"modification": "patchAclSchema",
+			"patch": [
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/InputRoot/operations/create/timeValue",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/InputRoot/operations/update/timeValue",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/InputRoot/operations/read/timeValue",
+					"value": true
+				}
+			]
+		}
+	]
+}

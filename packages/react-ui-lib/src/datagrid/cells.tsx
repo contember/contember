@@ -142,3 +142,50 @@ export const DataGridEnumCell = Component(({ field, options, filterName, tooltip
 		}} />
 	)
 }, ({ field }) => <Field field={field} />, 'DataGridEnumCell')
+
+
+/**
+ * Props for {@link DataGridEnumListCell}.
+ */
+export type DataGridEnumListCellProps = {
+	/**
+	 * Field to be displayed.
+	 */
+	field: SugaredRelativeSingleField['field']
+
+	/**
+	 * Filter identifier. If not provided, the filter is resolved from the field name.
+	 */
+	filterName?: string
+
+	/**
+	 * Enum options to be displayed in the tooltip. If not provided, the options are resolved from the enum.
+	 */
+	options?: Record<string, ReactNode>
+	/**
+	 * Custom actions to be displayed in the tooltip.
+	 */
+	tooltipActions?: ReactNode
+}
+
+/**
+ * Renders a cell with an enum list.
+ * Contains a tooltip with filter actions.
+ */
+export const DataGridEnumListCell = Component(({ field, options, filterName, tooltipActions }: DataGridEnumListCellProps) => {
+	const enumOptionsProvider = useEnumOptionsFormatter()
+	return (
+		<div className={'flex flex-wrap gap-2'}>
+			<FieldView<string[]> field={field} render={it => {
+				const resolvedOptions = options ?? enumOptionsProvider(it.schema.enumName!)
+				return it.value?.map(value => (
+					<DataGridEnumFieldTooltip key={value} value={value} field={field} name={filterName} actions={tooltipActions}>
+						<DataGridTooltipLabel>
+							{resolvedOptions[value]}
+						</DataGridTooltipLabel>
+					</DataGridEnumFieldTooltip>
+				)) ?? null
+			}} />
+		</div>
+	)
+}, ({ field }) => <Field field={field} />, 'DataGridEnumListCell')

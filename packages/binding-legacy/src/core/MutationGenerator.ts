@@ -10,7 +10,7 @@ import { QueryGenerator } from './QueryGenerator'
 import { MutationAlias } from './requestAliases'
 import { EntityListState, EntityRealmState, EntityRealmStateStub, EntityState, FieldState, getEntityMarker, StateIterator } from './state'
 import type { TreeStore } from './TreeStore'
-import { EntityFieldPersistedData } from '../accessorTree'
+import { EntityFieldPersistedData, EntityFieldPersistedValue } from '../accessorTree'
 
 
 type ProcessedPlaceholdersByEntity = Map<EntityState, Set<PlaceholderName>>
@@ -546,7 +546,7 @@ export class MutationGenerator {
 					}
 					const reducedBy = marker.parameters.reducedBy
 
-					const persistedValue = entityData?.get?.(placeholderName)
+					const persistedValue = entityData?.get?.(placeholderName)?.value
 					if (reducedBy === undefined) {
 
 						const relationData = this.getUpdateOneRelationInput(currentState, fieldState, persistedValue, processedPlaceholdersByEntity, placeholderName)
@@ -604,7 +604,7 @@ export class MutationGenerator {
 	private getUpdateOneRelationInput(
 		currentState: EntityRealmState,
 		fieldState: EntityRealmState | EntityRealmStateStub,
-		persistedValue: EntityFieldPersistedData | undefined,
+		persistedValue: EntityFieldPersistedValue | undefined,
 		processedPlaceholdersByEntity: ProcessedPlaceholdersByEntity,
 		placeholderName: PlaceholderName,
 	): Input.UpdateOneRelationInput | undefined {
@@ -675,7 +675,7 @@ export class MutationGenerator {
 	private getUpdateManyRelationForReducedInput(
 		currentState: EntityRealmState,
 		fieldState: EntityRealmState | EntityRealmStateStub,
-		persistedValue: EntityFieldPersistedData | undefined,
+		persistedValue: EntityFieldPersistedValue | undefined,
 		processedPlaceholdersByEntity: ProcessedPlaceholdersByEntity,
 		placeholderName: PlaceholderName,
 		reducedBy: UniqueWhere,

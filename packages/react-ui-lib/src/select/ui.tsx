@@ -34,7 +34,7 @@ export const SelectInputActionsUI = uic('span', {
 })
 
 export const SelectListItemUI = uic(Button, {
-	baseClass: 'w-full text-left justify-start gap-1 data-[highlighted]:bg-gray-200 data-[selected]:bg-gray-100 group relative h-auto',
+	baseClass: 'w-full text-left justify-start gap-1 data-[highlighted]:bg-gray-200 data-[selected]:bg-gray-100 group relative min-h-8 h-auto',
 	defaultProps: {
 		variant: 'ghost',
 		size: 'sm',

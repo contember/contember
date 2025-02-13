@@ -13,6 +13,24 @@ test('Content API: X-Contember-Ref header', async () => {
 
 	const tester = await createTester(createSchema(TagModel))
 
+	// Check that X-Contember-Ref work for empty schema
+	await tester(
+		gql`
+			query {
+				listTag(filter: { label: { eq: "typescript" } }) {
+					label
+				}
+			}
+		`,
+	)
+		.set('X-Contember-Ref', 'None')
+		.expect(response => {
+			assert.deepStrictEqual(response.body.data, {
+				listTag: [],
+			})
+		})
+		.expect(200)
+
 	await tester(
 		gql`
 			mutation {

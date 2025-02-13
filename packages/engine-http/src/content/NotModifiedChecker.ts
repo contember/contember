@@ -31,6 +31,11 @@ export class NotModifiedChecker {
 			return queryHandler.fetch(new LatestTransactionIdByStageQuery(stageId))
 		})
 
+		// No content transaction found
+		if (latestRef === null) {
+			return null
+		}
+
 		return {
 			isModified: latestRef !== requestRef,
 			setResponseHeader: res => {

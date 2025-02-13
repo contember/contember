@@ -1,12 +1,11 @@
 import { DatabaseQuery, DatabaseQueryable, SelectBuilder } from '@contember/database'
-import { ImplementationException } from '../../../utils'
 
-export class LatestTransactionIdByStageQuery extends DatabaseQuery<string> {
+export class LatestTransactionIdByStageQuery extends DatabaseQuery<string | null> {
 	constructor(private readonly stageId: string) {
 		super()
 	}
 
-	async fetch(queryable: DatabaseQueryable): Promise<string> {
+	async fetch(queryable: DatabaseQueryable): Promise<string | null> {
 		const rows = await SelectBuilder.create<{ transaction_id: string }>()
 			.from('stage_transaction')
 			.select('transaction_id')
@@ -15,9 +14,6 @@ export class LatestTransactionIdByStageQuery extends DatabaseQuery<string> {
 			.limit(1)
 			.getResult(queryable.db)
 
-		if (rows.length !== 1) {
-			throw new ImplementationException()
-		}
-		return rows[0].transaction_id
+		return rows.length === 0 ? null : rows[0].transaction_id
 	}
 }

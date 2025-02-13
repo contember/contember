@@ -183,7 +183,7 @@ export class TreeStore {
 
 		if (blueprint.parent) {
 			const entityData = this.persistedEntityData.get(blueprint.parent.entity.id.uniqueValue)
-			return (entityData?.get(blueprint.marker.placeholderName) as Set<string> | undefined) ?? emptyEntityIdSet
+			return (entityData?.get(blueprint.marker.placeholderName)?.value as Set<string> | undefined) ?? emptyEntityIdSet
 		} else {
 			return (this.subTreePersistedData.get(blueprint.marker.placeholderName) as Set<string>) ?? emptyEntityIdSet
 		}

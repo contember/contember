@@ -123,7 +123,7 @@ export class EntityOperations {
 						changesDelta -= previouslyConnectedState.unpersistedChangesCount
 					}
 
-					const persistedId = persistedData?.get(targetHasOneMarker.placeholderName)
+					const persistedId = persistedData?.get(targetHasOneMarker.placeholderName)?.value
 					if (persistedId instanceof ServerId && persistedId.value === stateToConnect.entity.id.value) {
 						changesDelta-- // It was removed from the list but now we're adding it back.
 					} else if (persistedId instanceof ServerId && persistedId.value === previouslyConnectedState.entity.id.value) {
@@ -184,7 +184,7 @@ export class EntityOperations {
 					if (stateToDisconnect.type === 'entityRealm') {
 						changesDelta -= stateToDisconnect.unpersistedChangesCount
 					}
-					const persistedId = persistedData?.get(targetHasOneMarker.placeholderName)
+					const persistedId = persistedData?.get(targetHasOneMarker.placeholderName)?.value
 
 					if (persistedId instanceof ServerId) {
 						if (persistedId.value === stateToDisconnect.entity.id.value) {

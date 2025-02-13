@@ -169,7 +169,7 @@ export class TreeAugmenter {
 		const persistedData = realmId.existsOnServer ? this.treeStore.persistedEntityData.get(realmId.uniqueValue) : undefined
 
 		for (const [placeholderName, child] of realm.children) {
-			const childData = persistedData?.get(placeholderName)
+			const childData = persistedData?.get(placeholderName)?.value
 
 			switch (child.type) {
 				case 'field': {
@@ -284,7 +284,7 @@ export class TreeAugmenter {
 		const persistedData = this.treeStore.persistedEntityData.get(uniqueId)
 		const pathBack = this.treeStore.getPathBackToParent(realm)
 		for (const [placeholderName, child] of realm.children) {
-			const childData = persistedData?.get(placeholderName)
+			const childData = persistedData?.get(placeholderName)?.value
 
 			switch (child.type) {
 				case 'field': {

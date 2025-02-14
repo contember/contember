@@ -550,6 +550,186 @@ describe('Permission merger', () => {
 	})
 
 
+	it('merge noRootOperations', () => {
+		execute({
+			acl: {
+				roles: {
+					role1: {
+						variables: {},
+						entities: {
+							Entity2: {
+								predicates: {},
+								operations: {
+									read: {
+										title: true,
+									},
+									noRoot: ['read'],
+								},
+							},
+						},
+					},
+					role2: {
+						variables: {},
+						entities: {
+							Entity2: {
+								predicates: {},
+								operations: {
+									read: {
+										title: true,
+									},
+									update: {
+										title: true,
+									},
+									noRoot: ['read', 'update'],
+								},
+							},
+						},
+					},
+				},
+			},
+			roles: ['role1', 'role2'],
+			result: {
+				Entity2: {
+					operations: {
+						update: {
+							id: true,
+							title: true,
+						},
+						read: {
+							id: true,
+							title: true,
+						},
+						noRoot: ['read', 'update'],
+					},
+					predicates: {},
+				},
+			},
+		})
+	})
+
+
+	it('merge delete #1', () => {
+		execute({
+			acl: {
+				roles: {
+					role1: {
+						variables: {},
+						entities: {
+							Entity2: {
+								predicates: {},
+								operations: {
+									delete: true,
+									noRoot: ['delete'],
+								},
+							},
+						},
+					},
+					role2: {
+						variables: {},
+						entities: {
+							Entity2: {
+								predicates: {},
+								operations: {},
+							},
+						},
+					},
+				},
+			},
+			roles: ['role1', 'role2'],
+			result: {
+				Entity2: {
+					operations: {
+						delete: true,
+						noRoot: ['delete'],
+					},
+					predicates: {},
+				},
+			},
+		})
+	})
+
+
+	it('merge delete #2', () => {
+		execute({
+			acl: {
+				roles: {
+					role1: {
+						variables: {},
+						entities: {
+							Entity2: {
+								predicates: {},
+								operations: {
+									delete: true,
+									noRoot: ['delete'],
+								},
+							},
+						},
+					},
+					role2: {
+						variables: {},
+						entities: {
+							Entity2: {
+								predicates: {},
+								operations: {
+									delete: true,
+								},
+							},
+						},
+					},
+				},
+			},
+			roles: ['role1', 'role2'],
+			result: {
+				Entity2: {
+					operations: {
+						delete: true,
+					},
+					predicates: {},
+				},
+			},
+		})
+	})
+
+	it('merge delete #2', () => {
+		execute({
+			acl: {
+				roles: {
+					role1: {
+						variables: {},
+						entities: {
+							Entity2: {
+								predicates: {},
+								operations: {
+									delete: true,
+									noRoot: ['delete'],
+								},
+							},
+						},
+					},
+					role2: {
+						variables: {},
+						entities: {
+							Entity2: {
+								predicates: {},
+								operations: {},
+							},
+						},
+					},
+				},
+			},
+			roles: ['role1', 'role2'],
+			result: {
+				Entity2: {
+					operations: {
+						delete: true,
+						noRoot: ['delete'],
+					},
+					predicates: {},
+				},
+			},
+		})
+	})
+
 
 	it('prefer permissions with root allowed', () => {
 		execute({

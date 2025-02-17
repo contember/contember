@@ -8,29 +8,26 @@ import { dict } from '../dict'
 
 
 export const SelectInputWrapperUI = uic('div', {
-	baseClass: `
-		w-full max-w-md
-		relative
-		`,
+	baseClass: 'w-full max-w-md relative',
 })
 
 export const SelectInputUI = uic('button', {
-	baseClass: `
-		flex gap-2 flex-wrap items-center
-		w-full min-h-10
-		p-2 py-1 pr-6
-		bg-background
-		rounded-md border border-input ring-offset-background
-		text-sm
-		cursor-pointer
-		hover:border-gray-400
-		placeholder:text-muted-foreground
-		focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2
-		disabled:cursor-not-allowed disabled:opacity-50
-		`,
+	baseClass: [
+		'flex gap-2 justify-between items-center',
+		'w-full min-h-10',
+		'px-2 py-1',
+		'bg-background',
+		'rounded-md border border-input ring-offset-background',
+		'text-sm text-left',
+		'cursor-pointer',
+		'hover:border-gray-400',
+		'placeholder:text-muted-foreground',
+		'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+		'disabled:cursor-not-allowed disabled:opacity-50',
+	],
 })
 export const SelectInputActionsUI = uic('span', {
-	baseClass: 'absolute right-2 top-1/2 -translate-y-1/2 flex gap-1 items-center',
+	baseClass: 'flex gap-1 items-center',
 })
 
 export const SelectListItemUI = uic(Button, {

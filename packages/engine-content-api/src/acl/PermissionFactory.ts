@@ -76,7 +76,7 @@ export class PermissionFactory {
 				let idPermissions: Acl.Predicate = fieldPermissions[entity.primary] || false
 
 				for (let predicateReference of predicateReferences) {
-					const [predicateDefinition, predicate] = this.mergePredicates(
+					const { predicateDefinition, predicate } = this.mergePredicates(
 						entityPredicates,
 						idPermissions,
 						entityPredicates,
@@ -118,45 +118,36 @@ export class PermissionFactory {
 		}
 		const noRoot: `${Acl.Operation}`[] = []
 
-		const operationNames: (keyof Pick<Acl.EntityOperations, 'create' | 'read' | 'update'>)[] = [
+		for (let operation of [
 			'create',
 			'read',
 			'update',
-		]
+		] as const) {
 
-		for (let operation of operationNames) {
-			const leftNoRoot = left.operations.noRoot?.includes(operation) || false
-			const rightNoRoot = right.operations.noRoot?.includes(operation) || false
-			if (leftNoRoot && rightNoRoot) {
+			const { predicates: opPredicates, permissions: fieldPermissions, noRoot: opNoRoot } = this.mergeOperationPermissions(left, right, operation)
+
+			if (opNoRoot) {
 				noRoot.push(operation)
 			}
 
-			const leftFieldPermissions: Acl.FieldPermissions = leftNoRoot && !rightNoRoot ? {} : (left.operations[operation] || {})
-			const rightFieldPermissions: Acl.FieldPermissions = rightNoRoot && !leftNoRoot ? {} : (right.operations[operation] || {})
-			const [operationPredicates, fieldPermissions] = this.mergeFieldPermissions(
-				left.predicates,
-				leftFieldPermissions,
-				right.predicates,
-				rightFieldPermissions,
-			)
-			predicates = { ...predicates, ...operationPredicates }
+			predicates = { ...predicates, ...opPredicates }
 			if (Object.keys(fieldPermissions).length > 0) {
 				operations[operation] = fieldPermissions
 			}
 		}
 
-		const [predicateDefinition, predicate] = this.mergePredicates(
-			left.predicates,
-			left.operations.delete || false,
-			right.predicates,
-			right.operations.delete || false,
-		)
+		const { predicateDefinition, predicate, noRoot: opNoRoot } = this.mergeDeletePermissions(left, right)
+		if (opNoRoot) {
+			noRoot.push('delete')
+		}
 		if (predicate === true) {
 			operations.delete = true
 		} else if (predicateDefinition !== undefined && typeof predicate === 'string') {
 			predicates[predicate] = predicateDefinition
 			operations.delete = predicate
 		}
+
+
 		if (noRoot.length > 0) {
 			operations.noRoot = noRoot
 		}
@@ -167,62 +158,134 @@ export class PermissionFactory {
 		}
 	}
 
+
+	private mergeOperationPermissions(left: Acl.EntityPermissions, right: Acl.EntityPermissions, operation: 'create' | 'read' | 'update'): {
+		noRoot: boolean
+		predicates: Acl.PredicateMap
+		permissions: Acl.FieldPermissions
+	} {
+		const { noRoot, leftPermissions, rightPermissions } = this.resolveNoRoot(left, right, operation)
+		return {
+			noRoot,
+			...this.mergeFieldPermissions(
+				left.predicates,
+				leftPermissions,
+				right.predicates,
+				rightPermissions,
+			),
+		}
+	}
+
+	private mergeDeletePermissions(left: Acl.EntityPermissions, right: Acl.EntityPermissions): {
+		noRoot: boolean
+		predicate: Acl.PredicateReference | boolean
+		predicateDefinition: Acl.PredicateDefinition | undefined
+	} {
+		const { noRoot, leftPermissions, rightPermissions } = this.resolveNoRoot(left, right, 'delete')
+
+		return {
+			noRoot,
+			...this.mergePredicates(
+				left.predicates,
+				leftPermissions,
+				right.predicates,
+				rightPermissions,
+			),
+		}
+	}
+
+	private resolveNoRoot<const Op extends`${Acl.Operation}`>(left: Acl.EntityPermissions, right: Acl.EntityPermissions, operation: Op): {
+		noRoot: boolean
+		leftPermissions: Acl.EntityPermissions['operations'][Op] | undefined
+		rightPermissions: Acl.EntityPermissions['operations'][Op] | undefined
+	} {
+		const leftRootForbidden = left.operations.noRoot?.includes(operation) || false
+		const rightRootForbidden = right.operations.noRoot?.includes(operation) || false
+		const leftPermissions = left.operations[operation]
+		const rightPermissions = right.operations[operation]
+
+		const rootForbidden = (leftRootForbidden && rightRootForbidden)
+			|| (leftRootForbidden && !rightPermissions)
+			|| (rightRootForbidden && !leftPermissions)
+
+		const resolvedLeftPermissions = !rootForbidden && leftRootForbidden ? undefined : leftPermissions
+		const resolvedRightPermissions = !rootForbidden && rightRootForbidden ? undefined : rightPermissions
+
+		return {
+			noRoot: rootForbidden,
+			leftPermissions: resolvedLeftPermissions,
+			rightPermissions: resolvedRightPermissions,
+		}
+	}
+
 	private mergeFieldPermissions(
 		leftPredicates: Acl.PredicateMap,
-		leftFieldPermissions: Acl.FieldPermissions,
+		leftFieldPermissions: Acl.FieldPermissions | undefined = {},
 		rightPredicates: Acl.PredicateMap,
-		rightFieldPermissions: Acl.FieldPermissions,
-	): [Acl.PredicateMap, Acl.FieldPermissions] {
-		const fields: Writable<Acl.FieldPermissions> = {}
+		rightFieldPermissions: Acl.FieldPermissions | undefined = {},
+	): {predicates: Acl.PredicateMap; permissions: Acl.FieldPermissions} {
+		const permissions: Writable<Acl.FieldPermissions> = {}
 		const predicates: Writable<Acl.PredicateMap> = {}
 
 		for (let field in { ...leftFieldPermissions, ...rightFieldPermissions }) {
-			const [predicateDefinition, predicate] = this.mergePredicates(
+			const { predicateDefinition, predicate } = this.mergePredicates(
 				leftPredicates,
 				leftFieldPermissions[field] || false,
 				rightPredicates,
 				rightFieldPermissions[field] || false,
 			)
 			if (predicate === true) {
-				fields[field] = true
+				permissions[field] = true
 			} else if (predicateDefinition !== undefined && typeof predicate === 'string') {
-				fields[field] = predicate
+				permissions[field] = predicate
 				predicates[predicate] = predicateDefinition
 			}
 		}
 
-		return [predicates, fields]
+		return { predicates, permissions }
 	}
 
 	private mergePredicates(
 		leftPredicates: Acl.PredicateMap,
-		leftReference: Acl.Predicate,
+		leftReference: Acl.Predicate | undefined = false,
 		rightPredicates: Acl.PredicateMap,
-		rightReference: Acl.Predicate,
-	): [Acl.PredicateDefinition, Acl.PredicateReference] | [undefined, boolean] {
+		rightReference: Acl.Predicate | undefined = false,
+	): {
+		predicate: Acl.PredicateReference | boolean
+		predicateDefinition: Acl.PredicateDefinition | undefined
+	} {
 		if (leftReference === true || rightReference === true) {
-			return [undefined, true]
+			return {
+				predicate: true,
+				predicateDefinition: undefined,
+			}
 		}
 
 		if (leftReference !== false && rightReference !== false) {
 			const leftPredicate: Acl.PredicateDefinition = leftPredicates[leftReference]
 			const rightPredicate: Acl.PredicateDefinition = rightPredicates[rightReference]
 			if (leftPredicate === rightPredicate) {
-				return [leftPredicate, leftReference]
+				return {
+					predicate: leftReference,
+					predicateDefinition: leftPredicate,
+				}
 			}
 
 			let predicateName = '__merge__' + leftReference + '__' + rightReference
 			while (leftPredicates[predicateName]) {
 				predicateName += '_'
 			}
-			return [
-				{
+			return {
+				predicate: predicateName,
+				predicateDefinition: {
 					or: [leftPredicate, rightPredicate],
 				} as Acl.PredicateDefinition,
-				predicateName,
-			]
+			}
 		} else if (leftReference !== false) {
-			return [leftPredicates[leftReference], leftReference]
+			return {
+				predicate: leftReference,
+				predicateDefinition: leftPredicates[leftReference],
+			}
 		} else if (rightReference !== false) {
 			let predicateName = rightReference
 			if (rightPredicates !== leftPredicates) {
@@ -230,9 +293,15 @@ export class PermissionFactory {
 					predicateName += '_'
 				}
 			}
-			return [rightPredicates[rightReference], predicateName]
+			return {
+				predicate: predicateName,
+				predicateDefinition: rightPredicates[rightReference],
+			}
 		} else {
-			return [undefined, false]
+			return {
+				predicate: false,
+				predicateDefinition: undefined,
+			}
 		}
 	}
 }

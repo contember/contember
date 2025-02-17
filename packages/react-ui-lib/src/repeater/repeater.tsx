@@ -27,13 +27,13 @@ const RepeaterWrapperUI = uic('div', {
 	baseClass: 'flex flex-col gap-2 relative bg-white mb-4',
 })
 const RepeaterItemUI = uic('div', {
-	baseClass: 'rounded border bg-gray-50 border-gray-200 p-4 relative group',
+	baseClass: 'rounded border bg-gray-50 border-gray-200 p-4 relative group/repeater-item',
 })
 const RepeaterDragOverlayUI = uic('div', {
 	baseClass: 'rounded border border-gray-300 p-4 relative bg-opacity-60 bg-gray-100 backdrop-blur-sm',
 })
 const RepeaterHandleUI = uic('button', {
-	baseClass: 'absolute top-1/2 -left-7 h-6 w-6 flex justify-end align-center opacity-10 group-hover:opacity-30 hover:!opacity-100 transition-opacity -translate-y-1/2',
+	baseClass: 'absolute top-1/2 -left-7 h-6 w-6 flex justify-end align-center opacity-10 group-hover/repeater-item:opacity-30 hover:!opacity-100 transition-opacity -translate-y-1/2',
 	beforeChildren: <GripVerticalIcon size={16} />,
 })
 const RepeaterEmptyUI = uic('div', {

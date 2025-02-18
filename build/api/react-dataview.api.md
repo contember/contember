@@ -74,6 +74,9 @@ export const createDateFilter: (field: SugaredRelativeSingleField_2["field"]) =>
 // @public (undocumented)
 export const createEnumFilter: (field: SugaredRelativeSingleField_2["field"]) => DataViewFilterHandler<EnumFilterArtifacts>;
 
+// @public (undocumented)
+export const createEnumListFilter: (field: SugaredRelativeSingleField_2["field"]) => DataViewFilterHandler<EnumListFilterArtifacts>;
+
 // @public
 export const createFieldFilterHandler: <FA extends DataViewFilterArtifact = Serializable>({ createCondition, isEmpty }: {
     createCondition: ((filterArtifact: FA, options: DataViewFilterHandlerOptions) => Input.Condition | undefined);
@@ -300,6 +303,16 @@ export interface DataViewEnumFilterTriggerProps {
     children: ReactElement;
     name?: string;
     value: string;
+}
+
+// @public
+export const DataViewEnumListFilter: React_2.NamedExoticComponent<DataViewEnumListFilterProps>;
+
+// @public (undocumented)
+export interface DataViewEnumListFilterProps {
+    children: React_2.ReactNode;
+    field: SugaredRelativeSingleField['field'];
+    name?: string;
 }
 
 // @public
@@ -973,6 +986,13 @@ export type DateRangeFilterArtifacts = {
 
 // @public (undocumented)
 export type EnumFilterArtifacts = {
+    values?: string[];
+    notValues?: string[];
+    nullCondition?: boolean;
+};
+
+// @public (undocumented)
+export type EnumListFilterArtifacts = {
     values?: string[];
     notValues?: string[];
     nullCondition?: boolean;

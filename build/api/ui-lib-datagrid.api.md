@@ -161,6 +161,30 @@ export type DataGridEnumFilterProps = Omit<DataViewEnumFilterProps, 'children'> 
 };
 
 // @public
+export const DataGridEnumListCell: React_2.NamedExoticComponent<DataGridEnumListCellProps>;
+
+// @public
+export type DataGridEnumListCellProps = {
+    field: SugaredRelativeSingleField['field'];
+    filterName?: string;
+    options?: Record<string, ReactNode>;
+    tooltipActions?: ReactNode;
+};
+
+// @public
+export const DataGridEnumListColumn: React_2.NamedExoticComponent<DataGridEnumListColumnProps>;
+
+// @public
+export type DataGridEnumListColumnProps = {
+    field: string;
+    header?: ReactNode;
+    options?: Record<string, ReactNode>;
+    children?: ReactNode;
+    filter?: ReactNode;
+    tooltipActions?: ReactNode;
+};
+
+// @public
 export const DataGridHasManyCell: React_2.NamedExoticComponent<DataGridHasManyCellProps>;
 
 // @public

@@ -66,18 +66,18 @@ export const SelectInput = Component<SelectInputProps>(({ field, queryField, opt
 								<SelectEachValue>
 									{children}
 								</SelectEachValue>
+								<SelectInputActionsUI>
+									<SelectEachValue>
+										<SelectItemTrigger>
+											<Button size="xs" variant="ghost" onClick={event => event.stopPropagation()}>
+												<XIcon className="w-4 h-4" />
+											</Button>
+										</SelectItemTrigger>
+									</SelectEachValue>
+									<ChevronDownIcon className="w-4 h-4" />
+								</SelectInputActionsUI>
 							</SelectInputUI>
 						</PopoverTrigger>
-						<SelectInputActionsUI>
-							<SelectEachValue>
-								<SelectItemTrigger>
-									<Button size={'xs'} variant={'ghost'}>
-										<XIcon className={'w-4 h-4'} />
-									</Button>
-								</SelectItemTrigger>
-							</SelectEachValue>
-							<ChevronDownIcon className={'w-4 h-4'} />
-						</SelectInputActionsUI>
 					</SelectInputWrapperUI>
 					<SelectPopoverContent>
 						<DefaultSelectDataView initialSorting={initialSorting} queryField={queryField}>

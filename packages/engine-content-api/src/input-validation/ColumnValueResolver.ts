@@ -9,7 +9,7 @@ export class ColumnValueResolver {
 			return '00000000-0000-0000-0000-000000000000'
 		}
 		try {
-			return resolveColumnValue(context, this.providers)
+			return resolveColumnValue(context, this.providers, {})
 		} catch (e) {
 			if (e instanceof NoDataError) {
 				return undefined

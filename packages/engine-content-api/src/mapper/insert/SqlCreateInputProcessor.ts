@@ -25,6 +25,7 @@ export class SqlCreateInputProcessor implements CreateInputProcessor<SqlCreateIn
 		private readonly insertBuilder: InsertBuilder,
 		private readonly mapper: Mapper,
 		private readonly providers: Providers,
+		private readonly options: { uuidVersion?: 4 | 7 } = {},
 	) {
 		this.oneHasOneInverseCreateInputProcessor = new OneHasOneInverseCreateInputProcessor(this.mapper)
 		this.oneHasOneOwningCreateInputProcessor = new OneHasOneOwningCreateInputProcessor(this.mapper, this.insertBuilder)
@@ -36,7 +37,7 @@ export class SqlCreateInputProcessor implements CreateInputProcessor<SqlCreateIn
 	public async column(context: Model.ColumnContext & { input: Input.ColumnValue | undefined }): Promise<SqlCreateInputProcessorResult> {
 		this.insertBuilder.addFieldValue(
 			context.column.name,
-			resolveColumnValue(context, this.providers),
+			resolveColumnValue(context, this.providers, this.options),
 		)
 		return []
 	}

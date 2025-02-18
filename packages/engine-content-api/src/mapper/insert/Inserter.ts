@@ -16,6 +16,7 @@ export class Inserter {
 		private readonly schemaDatabaseMetadata: DatabaseMetadata,
 		private readonly insertBuilderFactory: InsertBuilderFactory,
 		private readonly providers: Providers,
+		private readonly options: { uuidVersion?: 4 | 7 },
 	) {}
 
 	public async insert(
@@ -30,7 +31,7 @@ export class Inserter {
 		insertBuilder.addPredicates(Object.keys(data))
 
 		const visitor = new CreateInputVisitor<SqlCreateInputProcessorResult>(
-			new SqlCreateInputProcessor(insertBuilder, mapper, this.providers),
+			new SqlCreateInputProcessor(insertBuilder, mapper, this.providers, this.options),
 			this.schema,
 			data,
 		)

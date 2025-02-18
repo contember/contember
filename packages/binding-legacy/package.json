@@ -32,9 +32,6 @@
     "@contember/binding-common": "workspace:*",
     "@contember/client": "workspace:*",
     "@contember/utilities": "workspace:*",
-    "uuid": "9.0.1"
-  },
-  "devDependencies": {
-    "@types/uuid": "9.0.8"
+    "uuid": "^11.0.5"
   }
 }

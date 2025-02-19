@@ -93,11 +93,11 @@ export class InviteManager {
 				if (isNew) {
 					await this.mailer.sendNewUserInvitedMail(
 						trx,
-						{ email, project: project.name, projectSlug: project.slug, password: generatedPassword, token: resetToken },
+						{ email, project: project.name, projectSlug: project.slug, password: generatedPassword, token: resetToken, memberships },
 						customMailOptions,
 					)
 				} else {
-					await this.mailer.sendExistingUserInvitedEmail(trx, { email, project: project.name, projectSlug: project.slug }, customMailOptions)
+					await this.mailer.sendExistingUserInvitedEmail(trx, { email, project: project.name, projectSlug: project.slug, memberships }, customMailOptions)
 				}
 			}
 			return new ResponseOk(new InviteResult(person, isNew))

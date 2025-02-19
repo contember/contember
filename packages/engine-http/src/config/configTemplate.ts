@@ -41,8 +41,10 @@ export const configTemplate: any = {
 			host: '%?tenant.env.MAILER_HOST::string%',
 			port: '%?tenant.env.MAILER_PORT::number%',
 			secure: '%?tenant.env.MAILER_SECURE::bool%',
+			requireTLS: '%?tenant.env.MAILER_REQUIRE_TLS::bool%',
 			user: '%?tenant.env.MAILER_USER%',
 			password: '%?tenant.env.MAILER_PASSWORD%',
+			webhook: '%?tenant.env.MAILER_WEBHOOK%',
 		},
 		credentials: {
 			rootEmail: '%?env.CONTEMBER_ROOT_EMAIL%',

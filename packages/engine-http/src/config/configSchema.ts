@@ -61,6 +61,18 @@ export const tenantConfigSchema = Typesafe.intersection(
 			port: Typesafe.number,
 			user: Typesafe.string,
 			password: Typesafe.string,
+
+			webhook: Typesafe.union(
+				Typesafe.string,
+				Typesafe.intersection(
+					Typesafe.object({
+						url: Typesafe.string,
+					}),
+					Typesafe.partial({
+						headers: Typesafe.record(Typesafe.string, Typesafe.string),
+					}),
+				),
+			),
 		}), (value, input): MailerOptions & Typesafe.JsonObject => {
 			return {
 				...(input as any),

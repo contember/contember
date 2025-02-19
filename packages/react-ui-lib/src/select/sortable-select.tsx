@@ -1,30 +1,3 @@
-import { cn } from '../utils/cn'
-import { DropIndicator } from '../ui/sortable'
-import * as React from 'react'
-import { ReactNode } from 'react'
-import {
-	MultiSelectItemDragOverlayUI,
-	MultiSelectItemRemoveButtonUI,
-	MultiSelectItemUI,
-	MultiSelectSortableItemContentUI,
-	SelectCreateNewTrigger,
-	SelectDefaultPlaceholderUI,
-	SelectInputActionsUI,
-	SelectInputUI,
-	SelectInputWrapperUI,
-	SelectPopoverContent,
-} from './ui'
-import { Popover, PopoverTrigger } from '../ui/popover'
-import { ChevronDownIcon } from 'lucide-react'
-import { DefaultSelectDataView } from './list'
-import {
-	RepeaterSortable,
-	RepeaterSortableDragOverlay,
-	RepeaterSortableDropIndicator,
-	RepeaterSortableEachItem,
-	RepeaterSortableItemActivator,
-	RepeaterSortableItemNode,
-} from '@contember/react-repeater-dnd-kit'
 import {
 	Component,
 	HasOne,
@@ -33,10 +6,37 @@ import {
 	SugaredRelativeSingleEntity,
 	SugaredRelativeSingleField,
 } from '@contember/interface'
-import { SelectItemTrigger, SelectPlaceholder, SortableMultiSelect } from '@contember/react-select'
-import { CreateEntityDialog } from './create-new'
 import { DataViewSortingDirections, DataViewUnionFilterFields } from '@contember/react-dataview'
 import { useFormFieldId } from '@contember/react-form'
+import {
+	RepeaterSortable,
+	RepeaterSortableDragOverlay,
+	RepeaterSortableDropIndicator,
+	RepeaterSortableEachItem,
+	RepeaterSortableItemActivator,
+	RepeaterSortableItemNode,
+} from '@contember/react-repeater-dnd-kit'
+import { SelectItemTrigger, SelectPlaceholder, SortableMultiSelect } from '@contember/react-select'
+import { ChevronDownIcon } from 'lucide-react'
+import { ReactNode } from 'react'
+import { Popover, PopoverTrigger } from '../ui/popover'
+import { DropIndicator } from '../ui/sortable'
+import { cn } from '../utils'
+import { CreateEntityDialog } from './create-new'
+import { DefaultSelectDataView } from './list'
+import {
+	MultiSelectItemDragOverlayUI,
+	MultiSelectItemRemoveButtonUI,
+	MultiSelectItemUI,
+	MultiSelectItemWrapperUI,
+	MultiSelectSortableItemContentUI,
+	SelectCreateNewTrigger,
+	SelectDefaultPlaceholderUI,
+	SelectInputActionsUI,
+	SelectInputUI,
+	SelectInputWrapperUI,
+	SelectPopoverContent,
+} from './ui'
 
 const MultiSortableSelectDropIndicator = ({ position }: { position: 'before' | 'after' }) => (
 	<div className={cn('relative', position === 'before' ? '-translate-x-0.5' : 'translate-x-1.5')}>
@@ -72,37 +72,39 @@ export const SortableMultiSelectInput = Component<SortableMultiSelectInputProps>
 									{placeholder ?? <SelectDefaultPlaceholderUI />}
 								</SelectPlaceholder>
 
-								<RepeaterSortable>
-									<RepeaterSortableEachItem>
-										<div className={'flex'}>
-											<MultiSortableSelectDropIndicator position={'before'} />
-											<RepeaterSortableItemNode>
-												<MultiSelectItemUI>
-													<HasOne field={connectAt}>
-														<RepeaterSortableItemActivator>
-															<MultiSelectSortableItemContentUI>
-																{children}
-															</MultiSelectSortableItemContentUI>
-														</RepeaterSortableItemActivator>
+								<MultiSelectItemWrapperUI>
+									<RepeaterSortable>
+										<RepeaterSortableEachItem>
+											<div className={'flex'}>
+												<MultiSortableSelectDropIndicator position={'before'} />
+												<RepeaterSortableItemNode>
+													<MultiSelectItemUI>
+														<HasOne field={connectAt}>
+															<RepeaterSortableItemActivator>
+																<MultiSelectSortableItemContentUI>
+																	{children}
+																</MultiSelectSortableItemContentUI>
+															</RepeaterSortableItemActivator>
 
-														<SelectItemTrigger>
-															<MultiSelectItemRemoveButtonUI onClick={e => e.stopPropagation()} />
-														</SelectItemTrigger>
-													</HasOne>
-												</MultiSelectItemUI>
-											</RepeaterSortableItemNode>
-											<MultiSortableSelectDropIndicator position={'after'} />
-										</div>
-									</RepeaterSortableEachItem>
+															<SelectItemTrigger>
+																<MultiSelectItemRemoveButtonUI onClick={e => e.stopPropagation()} />
+															</SelectItemTrigger>
+														</HasOne>
+													</MultiSelectItemUI>
+												</RepeaterSortableItemNode>
+												<MultiSortableSelectDropIndicator position={'after'} />
+											</div>
+										</RepeaterSortableEachItem>
 
-									<RepeaterSortableDragOverlay>
-										<MultiSelectItemDragOverlayUI>
-											<HasOne field={connectAt}>
-												{children}
-											</HasOne>
-										</MultiSelectItemDragOverlayUI>
-									</RepeaterSortableDragOverlay>
-								</RepeaterSortable>
+										<RepeaterSortableDragOverlay>
+											<MultiSelectItemDragOverlayUI>
+												<HasOne field={connectAt}>
+													{children}
+												</HasOne>
+											</MultiSelectItemDragOverlayUI>
+										</RepeaterSortableDragOverlay>
+									</RepeaterSortable>
+								</MultiSelectItemWrapperUI>
 
 								<SelectInputActionsUI>
 									<ChevronDownIcon className={'w-4 h-4'} />

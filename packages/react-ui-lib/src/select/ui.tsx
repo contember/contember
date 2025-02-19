@@ -40,7 +40,9 @@ export const SelectListItemUI = uic(Button, {
 })
 
 export const SelectDefaultPlaceholderUI = () => <span className={'text-gray-400'}>{dict.select.placeholder}</span>
-
+export const MultiSelectItemWrapperUI = uic('div', {
+	baseClass: 'flex flex-wrap gap-1 items-center justify-start',
+})
 export const MultiSelectItemUI = uic('span', {
 	baseClass: 'flex items-stretch border rounded hover:shadow transition-all',
 })

@@ -7,6 +7,7 @@
 import { DataViewSortingDirections } from '@contember/react-dataview';
 import { DataViewUnionFilterFields } from '@contember/react-dataview';
 import { JSX as JSX_2 } from 'react/jsx-runtime';
+import { NamedExoticComponent } from 'react';
 import { PopoverContentProps } from '@radix-ui/react-popover';
 import * as React_2 from 'react';
 import { ReactNode } from 'react';
@@ -77,6 +78,13 @@ export const MultiSelectItemUI: React_2.ForwardRefExoticComponent<Omit<React_2.C
     children?: React_2.ReactNode;
     className?: string;
 }, "ref"> & React_2.RefAttributes<HTMLSpanElement>>;
+
+// @public (undocumented)
+export const MultiSelectItemWrapperUI: React_2.ForwardRefExoticComponent<Omit<React_2.ClassAttributes<HTMLDivElement> & React_2.HTMLAttributes<HTMLDivElement> & {
+    asChild?: boolean;
+    children?: React_2.ReactNode;
+    className?: string;
+}, "ref"> & React_2.RefAttributes<HTMLDivElement>>;
 
 // @public (undocumented)
 export const MultiSelectSortableItemContentUI: React_2.ForwardRefExoticComponent<Omit<React_2.ClassAttributes<HTMLSpanElement> & React_2.HTMLAttributes<HTMLSpanElement> & {
@@ -173,16 +181,16 @@ export const SelectPopoverContent: React_2.ForwardRefExoticComponent<Omit<Omit<P
 }, "ref"> & React_2.RefAttributes<HTMLDivElement>>;
 
 // @public (undocumented)
-export const SortableMultiSelectInput: React_2.NamedExoticComponent<{
-    field: SugaredRelativeEntityList["field"];
-    sortableBy: SugaredRelativeSingleField["field"];
-    connectAt: SugaredRelativeSingleEntity["field"];
-    children: ReactNode;
-    options?: SugaredQualifiedEntityList["entities"];
-    placeholder?: ReactNode;
-    createNewForm?: ReactNode;
-    queryField?: DataViewUnionFilterFields;
-    initialSorting?: DataViewSortingDirections;
+export const SortableMultiSelectInput: NamedExoticComponent<    {
+field: SugaredRelativeEntityList["field"];
+sortableBy: SugaredRelativeSingleField["field"];
+connectAt: SugaredRelativeSingleEntity["field"];
+children: ReactNode;
+options?: SugaredQualifiedEntityList["entities"];
+placeholder?: ReactNode;
+createNewForm?: ReactNode;
+queryField?: DataViewUnionFilterFields;
+initialSorting?: DataViewSortingDirections;
 }>;
 
 // @public (undocumented)

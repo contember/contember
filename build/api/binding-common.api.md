@@ -1447,7 +1447,7 @@ export interface SchemaColumn {
     // (undocumented)
     __typename: '_Column';
     // (undocumented)
-    defaultValue: string | number | boolean | null;
+    defaultValue: any;
     // (undocumented)
     enumName: SchemaEnumName | null;
     // (undocumented)

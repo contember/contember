@@ -226,3 +226,30 @@ describe('set not null and fill with "using"', () => testMigrations({
 	],
 	sql: SQL` ALTER TABLE "author" ALTER "name" SET DATA TYPE text USING COALESCE("name"::text, $pga$unnamed$pga$), ALTER "name" SET NOT NULL;`,
 }))
+
+
+describe('change string to array string', () => testMigrations({
+	original: createSchema({
+		Author: class Author {
+			email = def.stringColumn()
+		},
+	}),
+	updated: createSchema({
+		Author: class Author {
+			email = def.stringColumn().list()
+		},
+	}),
+	diff: [
+		updateColumnDefinitionModification.createModification({
+			entityName: 'Author',
+			fieldName: 'email',
+			definition: {
+				type: Model.ColumnType.String,
+				columnType: 'text',
+				nullable: true,
+				list: true,
+			},
+		}),
+	],
+	sql: SQL`ALTER TABLE "author" ALTER "email" SET DATA TYPE text[] USING ARRAY["email"]::text[];`,
+}))

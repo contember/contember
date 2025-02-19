@@ -7,7 +7,7 @@ import {
 	DataViewBooleanFilter,
 	DataViewDateFilter,
 	DataViewElement,
-	DataViewEnumFilter,
+	DataViewEnumFilter, DataViewEnumListFilter,
 	DataViewHasManyFilter,
 	DataViewHasOneFilter,
 	DataViewIsDefinedFilter,
@@ -15,7 +15,7 @@ import {
 	DataViewTextFilter,
 } from '@contember/react-dataview'
 import { formatBoolean, formatDate, formatDateTime, formatNumber } from '../formatting'
-import { DataGridEnumCell, DataGridHasManyCell, DataGridHasOneCell } from './cells'
+import { DataGridEnumCell, DataGridEnumListCell, DataGridHasManyCell, DataGridHasOneCell } from './cells'
 import { cn } from '../utils'
 import {
 	DataGridBooleanFilterControls,
@@ -369,6 +369,69 @@ export const DataGridEnumColumn = Component<DataGridEnumColumnProps>(({ field, h
 		</DataViewEnumFilter>}
 	/>
 </>))
+
+
+
+/**
+ * Props for {@link DataGridEnumListColumn}.
+ */
+export type DataGridEnumListColumnProps = {
+
+	/**
+	 * Displayed field.
+	 */
+	field: string
+
+	/**
+	 * Custom header. If not provided, the label formatter is used.
+	 */
+	header?: ReactNode
+
+	/**
+	 * Enum options for value formatting and filter options. If not provided, the options are resolved from the enum.
+	 */
+	options?: Record<string, ReactNode>
+
+	/**
+	 * Custom cell content. If not provided, the field value with a tooltip is displayed.
+	 */
+	children?: ReactNode
+
+	/**
+	 * Custom filter. If not provided, a default enum filter is used.
+	 */
+	filter?: ReactNode
+
+	/**
+	 * Additional actions in the tooltip.
+	 */
+	tooltipActions?: ReactNode
+}
+
+/**
+ * Renders a column with enum list content. Should be used in a {@link DataGridTable}.
+ *
+ * ## Example
+ * ```tsx
+ * <DataGridTable>
+ *     <DataGridEnumListColumn field="target" />
+ * </DataGridTable>
+ * ```
+ */
+export const DataGridEnumListColumn = Component<DataGridEnumListColumnProps>(({ field, header, options, children, tooltipActions, filter }) => (<>
+	<DataGridColumn
+		header={header ?? <DataViewFieldLabel field={field} />}
+		name={field}
+		children={children ?? <DataGridEnumListCell field={field} options={options} tooltipActions={tooltipActions} />}
+		filterName={field}
+		filter={filter ?? <DataViewEnumListFilter field={field}>
+			<div className="max-w-60 border rounded p-2">
+				<DataGridEnumFilterControls options={options} />
+			</div>
+		</DataViewEnumListFilter>}
+	/>
+</>))
+
 
 /**
  * Props for {@link DataGridIsDefinedColumn}.

@@ -19,3 +19,11 @@ export const prependSchema = (tableExpression: string | Literal, schema: string,
 			: `${wrapIdentifier(schema)}.${wrapIdentifier(tableExpression)}`,
 	)
 }
+
+export function formatColumnIdentifier(columnName: string | [string, string]): string {
+	if (typeof columnName === 'string') {
+		return columnName === '*' ? '*' : wrapIdentifier(columnName)
+	}
+	const columnExpr = columnName[1] === '*' ? '*' : wrapIdentifier(columnName[1])
+	return `${wrapIdentifier(columnName[0])}.${columnExpr}`
+}

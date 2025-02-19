@@ -26,6 +26,10 @@ export class ColumnDefinition extends FieldDefinition<ColumnDefinitionOptions> {
 		return this.withOption('columnType', columnType)
 	}
 
+	public list(): ColumnDefinition {
+		return this.withOption('list', true)
+	}
+
 	public nullable(): ColumnDefinition {
 		return this.withOption('nullable', true)
 	}
@@ -51,11 +55,12 @@ export class ColumnDefinition extends FieldDefinition<ColumnDefinitionOptions> {
 	}
 
 	createField({ name, conventions, enumRegistry, entityName }: CreateFieldContext): Model.AnyField {
-		const { type, nullable, columnName, enumDefinition, default: defaultValue, columnType, typeAlias, sequence } = this.options
+		const { type, nullable, columnName, enumDefinition, default: defaultValue, columnType, typeAlias, sequence, list } = this.options
 		const common = {
 			name: name,
 			columnName: columnName || conventions.getColumnName(name),
 			nullable: nullable === undefined ? true : nullable,
+			...(list ? { list } : {}),
 			...(defaultValue !== undefined ? { default: defaultValue } : {}),
 			...(sequence !== undefined ? { sequence } : {}),
 		}
@@ -139,6 +144,7 @@ export type ColumnTypeOptions = {
 export type ColumnDefinitionOptions = {
 	type: Model.ColumnType
 	columnType?: string
+	list?: boolean
 	typeAlias?: string
 	columnName?: string
 	unique?: { timing?: Model.ConstraintTiming }

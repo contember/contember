@@ -78,6 +78,11 @@ export const enumLabels = {
 		b: 'B',
 		c: 'C',
 	},
+	InputRootEnumArrayValue: {
+		a: 'A',
+		b: 'B',
+		c: 'C',
+	},
 	FormArticleState: {
 		archived: 'Archived',
 		draft: 'Draft',

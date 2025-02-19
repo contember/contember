@@ -1,9 +1,10 @@
 import { EntitySubTree, useField } from '@contember/interface'
-import { Component, Field, StaticRender, useEntityBeforePersist, useEnvironment } from '@contember/react-binding'
+import { Component, Field, useEntityBeforePersist, useEnvironment } from '@contember/react-binding'
 import slugify from '@sindresorhus/slugify'
 import { FormInputIcon } from 'lucide-react'
 import { Title } from '~/app/components/title'
 import { ToggleRequired } from '~/app/components/toggle-required'
+import { CheckboxListEnumField } from '~/lib-extra/checkboxlist-enum-field'
 import { FractionalAmountField } from '~/lib-extra/fractional-amount-field'
 import { FieldExists } from '~/lib-extra/has-field'
 import { SelectOrTypeField } from '~/lib-extra/select-or-type-field'
@@ -183,6 +184,28 @@ export const EnumRadio = () => {
 	)
 }
 
+
+export const CheckboxList = () => {
+	return (
+		<Binding>
+			<Slots.Title>
+				<Title icon={<FormInputIcon />}>Checkbox list</Title>
+			</Slots.Title>
+
+			<Slots.Actions>
+				<PersistButton />
+			</Slots.Actions>
+
+			<EntitySubTree entity="InputRoot(unique = unique)" setOnCreate="(unique = unique)">
+				<div className="space-y-4">
+					<CheckboxListEnumField field="enumArrayValue" label="Some enum" />
+					<Divider />
+					<InputField field="dummy" label="Dummy to trigger dirty state" />
+				</div>
+			</EntitySubTree>
+		</Binding>
+	)
+}
 
 const FillValue = () => {
 	const textField = useField('textValue')

@@ -14,6 +14,10 @@ export class InputRoot {
 	jsonValue = c.jsonColumn()
 	enumValue = c.enumColumn(c.createEnum('a', 'b', 'c'))
 	uuidValue = c.uuidColumn()
+
+	stringArrayValue = c.stringColumn().list()
+	enumArrayValue = c.enumColumn(c.createEnum('a', 'b', 'c')).list()
+	intArrayValue = c.intColumn().list()
 }
 
 export class InputRules {

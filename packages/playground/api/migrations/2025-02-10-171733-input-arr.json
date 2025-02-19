@@ -1,0 +1,100 @@
+{
+	"formatVersion": 6,
+	"modifications": [
+		{
+			"modification": "createEnum",
+			"enumName": "InputRootEnumArrayValue",
+			"values": [
+				"a",
+				"b",
+				"c"
+			]
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "InputRoot",
+			"field": {
+				"columnType": "text",
+				"nullable": true,
+				"type": "String",
+				"list": true,
+				"name": "stringArrayValue",
+				"columnName": "string_array_value"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "InputRoot",
+			"field": {
+				"columnType": "InputRootEnumArrayValue",
+				"nullable": true,
+				"type": "Enum",
+				"list": true,
+				"name": "enumArrayValue",
+				"columnName": "enum_array_value"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "InputRoot",
+			"field": {
+				"columnType": "integer",
+				"nullable": true,
+				"type": "Integer",
+				"list": true,
+				"name": "intArrayValue",
+				"columnName": "int_array_value"
+			}
+		},
+		{
+			"modification": "patchAclSchema",
+			"patch": [
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/InputRoot/operations/create/stringArrayValue",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/InputRoot/operations/create/enumArrayValue",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/InputRoot/operations/create/intArrayValue",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/InputRoot/operations/update/stringArrayValue",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/InputRoot/operations/update/enumArrayValue",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/InputRoot/operations/update/intArrayValue",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/InputRoot/operations/read/stringArrayValue",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/InputRoot/operations/read/enumArrayValue",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/InputRoot/operations/read/intArrayValue",
+					"value": true
+				}
+			]
+		}
+	]
+}

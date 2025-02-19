@@ -1,13 +1,13 @@
 import { With } from './internal/With'
 import { Where } from './internal/Where'
-import { aliasLiteral } from '../utils'
+import { aliasLiteral, formatColumnIdentifier } from '../utils'
 import { Compiler } from './Compiler'
 import { QueryBuilder } from './QueryBuilder'
 import { Client, Connection } from '../client'
 import { Literal } from '../Literal'
-import { ConditionBuilder, ConditionCallback, ConditionExpression } from './ConditionBuilder'
+import { ConditionBuilder, ConditionExpression } from './ConditionBuilder'
 import { LockModifier, LockType } from './LockType'
-import { columnExpressionToLiteral, toFqnWrap } from './utils'
+import { columnExpressionToLiteral } from './utils'
 import { createSubQueryLiteralFactory, SubQueryExpression, SubQueryLiteralFactory } from './internal/Subqueries'
 
 export type SelectBuilderSpecification = <Result>(qb: SelectBuilder<Result>) => SelectBuilder<Result>
@@ -87,7 +87,7 @@ class SelectBuilder<Result = SelectBuilder.Result> implements With.Aware, Where.
 		expression: QueryBuilder.ColumnIdentifier | Literal,
 		direction: SelectBuilder.OrderByDirection = 'asc',
 	): SelectBuilder<Result> {
-		const literal = expression instanceof Literal ? expression : new Literal(toFqnWrap(expression))
+		const literal = expression instanceof Literal ? expression : new Literal(formatColumnIdentifier(expression))
 		return this.withOption('orderBy', [...this.options.orderBy, [literal, direction]])
 	}
 

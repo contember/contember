@@ -17,6 +17,7 @@ import type { EditorContentUnique } from './enums'
 import type { EditorTextAreaUnique } from './enums'
 import type { FormArticleLocaleLocale } from './enums'
 import type { InputRootEnumValue } from './enums'
+import type { InputRootEnumArrayValue } from './enums'
 import type { LegacyEditorContentUnique } from './enums'
 import type { PlateEditorContentUnique } from './enums'
 import type { RepeaterRootUnique } from './enums'
@@ -617,6 +618,9 @@ export type InputRoot <OverRelation extends string | never = never> = {
 		jsonValue: JSONValue | null
 		enumValue: InputRootEnumValue | null
 		uuidValue: string | null
+		stringArrayValue: (readonly string[]) | null
+		enumArrayValue: readonly InputRootEnumArrayValue[] | null
+		intArrayValue: (readonly number[]) | null
 	}
 	hasOne: {
 	}

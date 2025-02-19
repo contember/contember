@@ -15,6 +15,7 @@ export * from './types'
 export {
 	asyncIterableTransaction,
 	wrapIdentifier,
+	formatColumnIdentifier,
 	retryTransaction,
 	ConstraintHelper,
 	withDatabaseAdvisoryLock,

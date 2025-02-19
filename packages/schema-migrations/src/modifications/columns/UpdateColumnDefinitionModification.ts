@@ -20,11 +20,14 @@ export class UpdateColumnDefinitionModificationHandler implements ModificationHa
 		const newColumn = this.data.definition
 
 		const hasNewSequence = !oldColumn.sequence && newColumn.sequence
-		const hasNewType = newColumn.columnType !== oldColumn.columnType
+		const oldColumnType = getColumnSqlType(oldColumn)
 		const columnType = getColumnSqlType(newColumn)
+		const hasNewType = columnType !== oldColumnType
 		const hasNullableChanged = oldColumn.nullable !== newColumn.nullable
 
-		const usingCast = `${wrapIdentifier(oldColumn.columnName)}::${columnType}`
+		const columnNameWrapped = wrapIdentifier(oldColumn.columnName)
+		const isChangedToArray = !oldColumn.list && newColumn.list
+		const usingCast = (isChangedToArray ? `ARRAY[${columnNameWrapped}]` : columnNameWrapped) + `::${columnType}`
 
 		const seedExpression = formatSeedExpression({
 			model: this.schema.model,

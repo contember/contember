@@ -5,6 +5,7 @@ import {
 	DataViewEnumFilter,
 	DataViewEnumFilterProps,
 	DataViewEnumFilterTrigger,
+	DataViewEnumListFilter,
 	DataViewNullFilterTrigger,
 	UseDataViewEnumFilter,
 	useDataViewEnumFilterArgs,
@@ -59,6 +60,42 @@ export const DataGridEnumFilter = Component(({ options, label, ...props }: DataG
 			</DataGridFilterMobileHiding>
 		</DataViewEnumFilter>
 	))
+
+
+/**
+ * Props for {@link DataGridEnumListFilter}.
+ */
+export type DataGridEnumListFilterProps =
+	& Omit<DataViewEnumFilterProps, 'children'>
+	& {
+		options?: Record<string, ReactNode>
+		label?: ReactNode
+	}
+
+
+/**
+ * Enum list filter for DataGrid with default UI.
+ *
+ * ## Props {@link DataGridEnumListFilterProps}
+ * field, label, ?name, ?options
+ *
+ * ## Example
+ * ```tsx
+ * <DataGridEnumFilter field={'status'} />
+ * ```
+ */
+export const DataGridEnumListFilter = Component(({ options, label, ...props }: DataGridEnumListFilterProps) =>
+	(
+		<DataViewEnumListFilter {...props}>
+			<DataGridFilterMobileHiding>
+				<DataGridSingleFilterUI>
+					<DataGridEnumFilterSelect options={options} label={label ?? <DataViewFieldLabel field={props.field} />} />
+					<DataGridEnumFilterList options={options} />
+				</DataGridSingleFilterUI>
+			</DataGridFilterMobileHiding>
+		</DataViewEnumListFilter>
+	))
+
 
 /**
  * Props for {@link DataGridEnumFieldTooltip}.

@@ -2,9 +2,9 @@ import { Value } from '../types'
 import { Literal } from '../Literal'
 import { QueryBuilder } from './QueryBuilder'
 import { SelectBuilder } from './SelectBuilder'
-import { toFqnWrap } from './formatUtils'
 import { Compiler } from './Compiler'
 import { createSubQueryLiteralFactory, SubQueryExpression } from './internal/Subqueries'
+import { formatColumnIdentifier } from '../utils'
 
 export type ConditionCallback = (builder: ConditionBuilder) => ConditionBuilder
 export type ConditionExpression = ConditionBuilder | ConditionCallback
@@ -19,13 +19,12 @@ export enum Operator {
 	'contains' = 'contains',
 	'startsWith' = 'startsWith',
 	'endsWith' = 'endsWith',
-
 	'containsCI' = 'containsCI',
 	'startsWithCI' = 'startsWithCI',
 	'endsWithCI' = 'endsWithCI',
 }
 
-const likeOperators = [
+const likeOperators: string[] = [
 	Operator.contains,
 	Operator.containsCI,
 	Operator.startsWith,
@@ -63,8 +62,8 @@ export class ConditionBuilder {
 		return this.processConditionExpression(ConditionBuilder.process(condition), ['and', true])
 	}
 
-	compare(columnName: QueryBuilder.ColumnIdentifier, operator: Operator, value: Value): ConditionBuilder {
-		if (!Object.values(Operator).includes(operator)) {
+	compare(columnName: QueryBuilder.ColumnIdentifier, operator: Operator | `${Operator}`, value: Value | Literal): ConditionBuilder {
+		if (!(Object.values(Operator) as string[]).includes(operator)) {
 			throw new Error(`Operator ${operator} is not supported`)
 		}
 
@@ -74,30 +73,30 @@ export class ConditionBuilder {
 			}
 			value = value.replace(/([\\%_])/g, v => '\\' + v)
 		}
-		return this.with(new Literal(ConditionBuilder.createOperatorSql(toFqnWrap(columnName), '?', operator), [value]))
+		return this.with(new Literal(ConditionBuilder.createOperatorSql(formatColumnIdentifier(columnName), '?', operator), [value]))
 	}
 
 	columnsEq(columnName1: QueryBuilder.ColumnIdentifier, columnName2: QueryBuilder.ColumnIdentifier): ConditionBuilder {
 		return this.compareColumns(columnName1, Operator.eq, columnName2)
 	}
 
-	compareColumns(columnName1: QueryBuilder.ColumnIdentifier, operator: Operator, columnName2: QueryBuilder.ColumnIdentifier) {
-		return this.with(new Literal(ConditionBuilder.createOperatorSql(toFqnWrap(columnName1), toFqnWrap(columnName2), operator)))
+	compareColumns(columnName1: QueryBuilder.ColumnIdentifier, operator: Operator | `${Operator}`, columnName2: QueryBuilder.ColumnIdentifier) {
+		return this.with(new Literal(ConditionBuilder.createOperatorSql(formatColumnIdentifier(columnName1), formatColumnIdentifier(columnName2), operator)))
 	}
 
 	in(columnName: QueryBuilder.ColumnIdentifier, values: ReadonlyArray<Value> | SelectBuilder<SelectBuilder.Result>, columnType?: string): ConditionBuilder {
 		if (!isReadonlyArray(values)) {
 			// todo: replace placeholder with some kind of callback
 			const query = values.createQuery(new Compiler.Context(Compiler.SCHEMA_PLACEHOLDER, new Set()))
-			return this.with(new Literal(`${toFqnWrap(columnName)} in (${query.sql})`, query.parameters))
+			return this.with(new Literal(`${formatColumnIdentifier(columnName)} in (${query.sql})`, query.parameters))
 		}
 		values = values.filter(it => it !== undefined)
 		if (columnType && values.length > 100) {
-			return this.with(new Literal(`${toFqnWrap(columnName)} = any(?::${columnType}[])`, [values]))
+			return this.with(new Literal(`${formatColumnIdentifier(columnName)} = any(?::${columnType}[])`, [values]))
 		}
 		if (values.length > 0) {
 			const parameters = values.map(() => '?').join(', ')
-			return this.with(new Literal(`${toFqnWrap(columnName)} in (${parameters})`, values))
+			return this.with(new Literal(`${formatColumnIdentifier(columnName)} in (${parameters})`, values))
 		}
 		return this.raw('false')
 	}
@@ -114,11 +113,11 @@ export class ConditionBuilder {
 	}
 
 	isNull(columnName: QueryBuilder.ColumnIdentifier): ConditionBuilder {
-		return this.with(new Literal(`${toFqnWrap(columnName)} is null`))
+		return this.with(new Literal(`${formatColumnIdentifier(columnName)} is null`))
 	}
 
 	isNotNull(columnName: QueryBuilder.ColumnIdentifier): ConditionBuilder {
-		return this.with(new Literal(`${toFqnWrap(columnName)} is not null`))
+		return this.with(new Literal(`${formatColumnIdentifier(columnName)} is not null`))
 	}
 
 	raw(sql: string, ...bindings: Value[]): ConditionBuilder {
@@ -148,8 +147,8 @@ export class ConditionBuilder {
 		return this
 	}
 
-	private static createOperatorSql(left: string, right: string, operator: Operator): string {
-		if (!Object.values(Operator).includes(operator)) {
+	private static createOperatorSql(left: string, right: string, operator: Operator | `${Operator}`): string {
+		if (!(Object.values(Operator) as string[]).includes(operator)) {
 			throw new Error(`Operator ${operator} is not supported`)
 		}
 		switch (operator) {

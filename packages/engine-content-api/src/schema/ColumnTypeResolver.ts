@@ -1,4 +1,4 @@
-import { GraphQLBoolean, GraphQLEnumType, GraphQLFloat, GraphQLInt, GraphQLScalarType, GraphQLString } from 'graphql'
+import { GraphQLBoolean, GraphQLEnumType, GraphQLFloat, GraphQLInt, GraphQLList, GraphQLNonNull, GraphQLScalarType, GraphQLString } from 'graphql'
 import { Model } from '@contember/schema'
 import { EnumsProvider } from './EnumsProvider'
 import { CustomTypesProvider } from './CustomTypesProvider'
@@ -6,6 +6,8 @@ import { ImplementationException } from '../exception'
 import { singletonFactory } from '../utils'
 
 type ScalarType = Exclude<Model.ColumnType, Model.ColumnType.Enum>
+
+export type ColumnGraphQLType = GraphQLScalarType | GraphQLEnumType | GraphQLList<GraphQLNonNull<GraphQLScalarType | GraphQLEnumType>>
 
 export class ColumnTypeResolver {
 	private schema: Model.Schema
@@ -36,7 +38,15 @@ export class ColumnTypeResolver {
 		}
 	}
 
-	public getType(column: Model.AnyColumn): GraphQLScalarType | GraphQLEnumType {
+	public getType(column: Model.AnyColumn): [type: ColumnGraphQLType, baseType: GraphQLScalarType | GraphQLEnumType] {
+		const baseType = this.getBaseType(column)
+		return [
+			column.list ? new GraphQLList(new GraphQLNonNull(baseType)) : baseType,
+			baseType,
+		]
+	}
+
+	private getBaseType(column: Model.AnyColumn): GraphQLScalarType | GraphQLEnumType {
 		if (column.typeAlias) {
 			if (column.type === Model.ColumnType.Enum) {
 				throw new Error('GraphQL type alias cannot be specified for enum type')
@@ -62,7 +72,7 @@ export class ColumnTypeResolver {
 		}
 	}
 
-	public getScalarType(type: ScalarType): GraphQLScalarType {
+	private getScalarType(type: ScalarType): GraphQLScalarType {
 		switch (type) {
 			case Model.ColumnType.Int:
 				return GraphQLInt

@@ -14,16 +14,16 @@ export class FieldTypeVisitor implements Model.ColumnVisitor<GraphQLOutputType>,
 	}
 
 	public visitColumn({ column, entity }: Model.ColumnContext): GraphQLOutputType {
-		const basicType = this.columnTypeResolver.getType(column)
+		const [type] = this.columnTypeResolver.getType(column)
 		const fieldPredicate = this.authorizator.getFieldPredicate(Acl.Operation.read, entity.name, column.name)
 		const idPredicate = this.authorizator.getFieldPredicate(Acl.Operation.read, entity.name, entity.primary)
 		if (!fieldPredicate || !idPredicate) {
 			throw new ImplementationException()
 		}
 		if (!column.nullable && (fieldPredicate === true || fieldPredicate === idPredicate)) {
-			return new GraphQLNonNull(basicType)
+			return new GraphQLNonNull(type)
 		}
-		return basicType
+		return type
 	}
 
 	public visitHasMany({ relation }: Model.AnyHasManyRelationContext): GraphQLOutputType {

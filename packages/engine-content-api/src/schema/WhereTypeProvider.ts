@@ -83,7 +83,7 @@ export class WhereTypeProvider {
 						}
 						return { type: uniqueWhere }
 					},
-					visitColumn: ({ column }) => ({ type: this.columnTypeResolver.getType(column) }),
+					visitColumn: ({ column }) => ({ type: this.columnTypeResolver.getType(column)[0] }),
 				})
 			}
 		}

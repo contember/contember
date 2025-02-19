@@ -172,27 +172,43 @@ export namespace Input {
 	export type OrderBy<T = OrderDirection> = OrderByFields<T> & { _random?: boolean; _randomSeeded?: number }
 
 	export type Condition<T = Value.FieldValue> = {
+		// boolean
 		readonly and?: readonly Condition<T>[]
 		readonly or?: readonly Condition<T>[]
 		readonly not?: Condition<T>
+
+		// null
+		readonly isNull?: boolean
+
+		// basic
 		readonly eq?: T
 		readonly notEq?: T
-		readonly null?: boolean // deprecated
-		readonly isNull?: boolean
 		readonly in?: readonly T[]
 		readonly notIn?: readonly T[]
 		readonly lt?: T
 		readonly lte?: T
 		readonly gt?: T
 		readonly gte?: T
-		readonly never?: true
-		readonly always?: true
+
+		// array
+		readonly minLength?: number
+		readonly maxLength?: number
+		readonly includes?: T
+
+		// string only
 		readonly contains?: string
 		readonly startsWith?: string
 		readonly endsWith?: string
 		readonly containsCI?: string
 		readonly startsWithCI?: string
 		readonly endsWithCI?: string
+
+		// special
+		readonly never?: true
+		readonly always?: true
+
+		// deprecated
+		readonly null?: boolean
 	}
 
 	export type UniqueWhere<E = never> = {

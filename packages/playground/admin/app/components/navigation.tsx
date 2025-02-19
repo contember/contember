@@ -84,6 +84,7 @@ export const Navigation = () => (
 			<MenuItem label="Client validation" to="input/clientValidation" size={menuSubItemSize} />
 			<MenuItem label="Checkbox" to="input/checkbox" size={menuSubItemSize} />
 			<MenuItem label="Radio" to="input/enumRadio" size={menuSubItemSize} />
+			<MenuItem label="Checkbox list" to="input/checkboxList" size={menuSubItemSize} />
 			<MenuItem label="Slug" to="input/slug" size={menuSubItemSize} />
 			<MenuItem label="Cents field" to="input/cents" size={menuSubItemSize} />
 			<MenuItem label="Server rules" to="input/serverRules" size={menuSubItemSize} />

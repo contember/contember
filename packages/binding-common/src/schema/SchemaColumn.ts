@@ -4,7 +4,7 @@ import type { SchemaEnumName } from './SchemaEnums'
 
 export interface SchemaColumn {
 	__typename: '_Column'
-	defaultValue: string | number | boolean | null // JSON
+	defaultValue: any
 	name: FieldName
 	nullable: boolean
 	type: SchemaColumnType

@@ -1,5 +1,5 @@
-import { Input } from '@contember/schema'
-import { QueryBuilder, ConditionBuilder as SqlConditionBuilder, Operator } from '@contember/database'
+import { Input, Model } from '@contember/schema'
+import { QueryBuilder, ConditionBuilder as SqlConditionBuilder, Operator, Literal, formatColumnIdentifier, Compiler } from '@contember/database'
 import { UserError } from '../../exception'
 
 export class ConditionBuilder {
@@ -7,7 +7,7 @@ export class ConditionBuilder {
 		builder: SqlConditionBuilder,
 		tableName: string,
 		columnName: string,
-		columnType: string,
+		columnType: Pick<Model.AnyColumn, 'type' | 'list' | 'columnType'>,
 		condition: Input.Condition<any> | null,
 	): SqlConditionBuilder {
 		if (condition === null) {
@@ -37,21 +37,35 @@ export class ConditionBuilder {
 			and: (builder, expressions) => builder.and(builder2 => expressions.reduce((builder3, expr) => this.build(builder3, tableName, columnName, columnType, expr), builder2)),
 			or: (builder, expressions) => builder.or(builder2 => expressions.reduce((builder3, expr) => this.build(builder3, tableName, columnName, columnType, expr), builder2)),
 			not: (builder, expression) => builder.not(builder2 => this.build(builder2, tableName, columnName, columnType, expression)),
+
+			isNull: (builder, value) => value ? builder.isNull(columnIdentifier) : builder.not(clause => clause.isNull(columnIdentifier)),
+
 			eq: (builder, value) => builder.compare(columnIdentifier, Operator.eq, value),
 			notEq: (builder, value) => builder.compare(columnIdentifier, Operator.notEq, value),
-			isNull: (builder, value) => value ? builder.isNull(columnIdentifier) : builder.not(clause => clause.isNull(columnIdentifier)),
-			in: (builder, values) => builder.in(columnIdentifier, values, columnType),
+			in: (builder, values) => builder.in(columnIdentifier, values, columnType.columnType),
 			notIn: (builder, values) => builder.not(builder2 => builder2.in(columnIdentifier, values)),
 			lt: (builder, value) => builder.compare(columnIdentifier, Operator.lt, value),
 			lte: (builder, value) => builder.compare(columnIdentifier, Operator.lte, value),
 			gt: (builder, value) => builder.compare(columnIdentifier, Operator.gt, value),
 			gte: (builder, value) => builder.compare(columnIdentifier, Operator.gte, value),
+
+			includes: (builder, value) => {
+				const cast = columnType.type === Model.ColumnType.Enum
+					? `${Compiler.SCHEMA_PLACEHOLDER}."${columnType.columnType}"`
+					: columnType.columnType
+
+				return builder.raw(`${formatColumnIdentifier(columnIdentifier)} @> ARRAY[?]::${cast}[]`, value)
+			},
+			maxLength: (builder, value) => builder.raw(`array_length(${formatColumnIdentifier(columnIdentifier)}, 1) <= ?`, value),
+			minLength: (builder, value) => builder.raw(`array_length(${formatColumnIdentifier(columnIdentifier)}, 1) >= ?`, value),
+
 			contains: (builder, value) => builder.compare(columnIdentifier, Operator.contains, value),
 			startsWith: (builder, value) => builder.compare(columnIdentifier, Operator.startsWith, value),
 			endsWith: (builder, value) => builder.compare(columnIdentifier, Operator.endsWith, value),
 			containsCI: (builder, value) => builder.compare(columnIdentifier, Operator.containsCI, value),
 			startsWithCI: (builder, value) => builder.compare(columnIdentifier, Operator.startsWithCI, value),
 			endsWithCI: (builder, value) => builder.compare(columnIdentifier, Operator.endsWithCI, value),
+
 			never: builder => builder.raw('false'),
 			always: builder => builder.raw('true'),
 

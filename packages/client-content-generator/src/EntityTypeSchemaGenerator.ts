@@ -141,30 +141,33 @@ const uniqueType = (model: Model.Schema, entity: Model.Entity, field: Model.AnyF
 
 
 const columnToTsType = (column: Model.AnyColumn): string => {
-	switch (column.type) {
-		case Model.ColumnType.Enum:
-			return getEnumTypeName(column.columnType)
-		case Model.ColumnType.String:
-			return 'string'
-		case Model.ColumnType.Int:
-			return 'number'
-		case Model.ColumnType.Double:
-			return 'number'
-		case Model.ColumnType.Bool:
-			return 'boolean'
-		case Model.ColumnType.DateTime:
-			return 'string'
-		case Model.ColumnType.Date:
-			return 'string'
-		case Model.ColumnType.Json:
-			return 'JSONValue'
-		case Model.ColumnType.Uuid:
-			return 'string'
-		default:
-			((_: never) => {
-				throw new Error(`Unknown type ${_}`)
-			})(column.type)
-	}
+	const baseType = (() => {
+		switch (column.type) {
+			case Model.ColumnType.Enum:
+				return getEnumTypeName(column.columnType)
+			case Model.ColumnType.String:
+				return 'string'
+			case Model.ColumnType.Int:
+				return 'number'
+			case Model.ColumnType.Double:
+				return 'number'
+			case Model.ColumnType.Bool:
+				return 'boolean'
+			case Model.ColumnType.DateTime:
+				return 'string'
+			case Model.ColumnType.Date:
+				return 'string'
+			case Model.ColumnType.Json:
+				return 'JSONValue'
+			case Model.ColumnType.Uuid:
+				return 'string'
+			default:
+				((_: never) => {
+					throw new Error(`Unknown type ${_}`)
+				})(column.type)
+		}
+	})()
+	return column.list ? `readonly ${baseType}[]` : baseType
 }
 
 const getFieldsForUniqueWhere = (schema: Model.Schema, entity: Model.Entity): readonly (readonly string[])[] => {

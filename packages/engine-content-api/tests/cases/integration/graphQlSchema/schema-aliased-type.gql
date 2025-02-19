@@ -70,6 +70,12 @@ input AuthorNameCondition {
   lte: AuthorName
   gt: AuthorName
   gte: AuthorName
+  contains: String
+  startsWith: String
+  endsWith: String
+  containsCI: String
+  startsWithCI: String
+  endsWithCI: String
 }
 
 input AuthorOrderBy {

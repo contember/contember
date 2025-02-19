@@ -1,9 +1,23 @@
+import {
+	Component,
+	RecursionTerminatorPortal,
+	SugaredQualifiedEntityList,
+	SugaredRelativeEntityList,
+} from '@contember/interface'
+import { DataViewSortingDirections, DataViewUnionFilterFields } from '@contember/react-dataview'
+import { useFormFieldId } from '@contember/react-form'
+import { MultiSelect, SelectEachValue, SelectItemTrigger, SelectPlaceholder } from '@contember/react-select'
+import { ChevronDownIcon } from 'lucide-react'
 import * as React from 'react'
 import { ReactNode } from 'react'
+import { Popover, PopoverTrigger } from '../ui/popover'
+import { CreateEntityDialog } from './create-new'
+import { DefaultSelectDataView } from './list'
 import {
 	MultiSelectItemContentUI,
 	MultiSelectItemRemoveButtonUI,
 	MultiSelectItemUI,
+	MultiSelectItemWrapperUI,
 	SelectCreateNewTrigger,
 	SelectDefaultPlaceholderUI,
 	SelectInputActionsUI,
@@ -11,14 +25,6 @@ import {
 	SelectInputWrapperUI,
 	SelectPopoverContent,
 } from './ui'
-import { ChevronDownIcon } from 'lucide-react'
-import { Popover, PopoverTrigger } from '../ui/popover'
-import { Component, RecursionTerminatorPortal, SugaredQualifiedEntityList, SugaredRelativeEntityList } from '@contember/interface'
-import { DefaultSelectDataView } from './list'
-import { MultiSelect, SelectEachValue, SelectItemTrigger, SelectPlaceholder } from '@contember/react-select'
-import { CreateEntityDialog } from './create-new'
-import { DataViewSortingDirections, DataViewUnionFilterFields } from '@contember/react-dataview'
-import { useFormFieldId } from '@contember/react-form'
 
 export type MultiSelectInputProps =
 	& {
@@ -45,19 +51,21 @@ export const MultiSelectInput = Component<MultiSelectInputProps>(({ field, query
 									{placeholder ?? <SelectDefaultPlaceholderUI />}
 								</SelectPlaceholder>
 
-								<SelectEachValue>
-									<MultiSelectItemUI>
-										<MultiSelectItemContentUI>
-											{children}
-										</MultiSelectItemContentUI>
-										<SelectItemTrigger>
-											<MultiSelectItemRemoveButtonUI onClick={e => e.stopPropagation()} />
-										</SelectItemTrigger>
-									</MultiSelectItemUI>
-								</SelectEachValue>
+								<MultiSelectItemWrapperUI>
+									<SelectEachValue>
+										<MultiSelectItemUI>
+											<MultiSelectItemContentUI>
+												{children}
+											</MultiSelectItemContentUI>
+											<SelectItemTrigger>
+												<MultiSelectItemRemoveButtonUI onClick={e => e.stopPropagation()} />
+											</SelectItemTrigger>
+										</MultiSelectItemUI>
+									</SelectEachValue>
+								</MultiSelectItemWrapperUI>
 
 								<SelectInputActionsUI>
-									<ChevronDownIcon className={'w-4 h-4'} />
+									<ChevronDownIcon className="w-4 h-4" />
 								</SelectInputActionsUI>
 							</SelectInputUI>
 						</PopoverTrigger>

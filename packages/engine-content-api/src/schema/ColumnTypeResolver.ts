@@ -86,6 +86,8 @@ export class ColumnTypeResolver {
 				return GraphQLBoolean
 			case Model.ColumnType.DateTime:
 				return this.customTypeProvider.dateTimeType
+			case Model.ColumnType.Time:
+				return this.customTypeProvider.timeType
 			case Model.ColumnType.Date:
 				return this.customTypeProvider.dateType
 			case Model.ColumnType.Json:

@@ -11,6 +11,7 @@ export class InputRoot {
 	boolValue = c.boolColumn()
 	dateValue = c.dateColumn()
 	datetimeValue = c.dateTimeColumn()
+	timeValue = c.timeColumn()
 	jsonValue = c.jsonColumn()
 	enumValue = c.enumColumn(c.createEnum('a', 'b', 'c'))
 	uuidValue = c.uuidColumn()

@@ -1,0 +1,420 @@
+type Query {
+  getColumns(by: ColumnsUniqueWhere!, filter: ColumnsWhere): Columns
+  listColumns(filter: ColumnsWhere, orderBy: [ColumnsOrderBy!], offset: Int, limit: Int): [Columns!]!
+  paginateColumns(filter: ColumnsWhere, orderBy: [ColumnsOrderBy!], skip: Int, first: Int): ColumnsConnection!
+  validateCreateColumns(data: ColumnsCreateInput!): _ValidationResult!
+  validateUpdateColumns(by: ColumnsUniqueWhere!, data: ColumnsUpdateInput!): _ValidationResult!
+  transaction: QueryTransaction
+  _info: Info
+}
+
+type Columns {
+  _meta: ColumnsMeta
+  id: UUID!
+  string: String
+  int: Int
+  float: Float
+  boolean: Boolean
+  date: Date
+  dateTime: DateTime
+  json: Json
+  uuid: UUID
+  time: Time
+  enum: ColumnsEnum
+}
+
+type ColumnsMeta {
+  id: FieldMeta
+  string: FieldMeta
+  int: FieldMeta
+  float: FieldMeta
+  boolean: FieldMeta
+  date: FieldMeta
+  dateTime: FieldMeta
+  json: FieldMeta
+  uuid: FieldMeta
+  time: FieldMeta
+  enum: FieldMeta
+}
+
+type FieldMeta {
+  readable: Boolean
+  updatable: Boolean
+}
+
+scalar UUID
+
+scalar Date
+
+scalar DateTime
+
+"""JSON custom scalar type"""
+scalar Json
+
+scalar Time
+
+enum ColumnsEnum {
+  a
+  b
+  c
+}
+
+input ColumnsUniqueWhere {
+  id: UUID
+}
+
+input ColumnsWhere {
+  id: UUIDCondition
+  string: StringCondition
+  int: IntCondition
+  float: FloatCondition
+  boolean: BooleanCondition
+  date: DateCondition
+  dateTime: DateTimeCondition
+  json: JsonCondition
+  uuid: UUIDCondition
+  time: TimeCondition
+  enum: ColumnsEnumEnumCondition
+  and: [ColumnsWhere]
+  or: [ColumnsWhere]
+  not: ColumnsWhere
+}
+
+input UUIDCondition {
+  and: [UUIDCondition!]
+  or: [UUIDCondition!]
+  not: UUIDCondition
+  null: Boolean
+  isNull: Boolean
+  eq: UUID
+  notEq: UUID
+  in: [UUID!]
+  notIn: [UUID!]
+  lt: UUID
+  lte: UUID
+  gt: UUID
+  gte: UUID
+}
+
+input StringCondition {
+  and: [StringCondition!]
+  or: [StringCondition!]
+  not: StringCondition
+  null: Boolean
+  isNull: Boolean
+  eq: String
+  notEq: String
+  in: [String!]
+  notIn: [String!]
+  lt: String
+  lte: String
+  gt: String
+  gte: String
+  contains: String
+  startsWith: String
+  endsWith: String
+  containsCI: String
+  startsWithCI: String
+  endsWithCI: String
+}
+
+input IntCondition {
+  and: [IntCondition!]
+  or: [IntCondition!]
+  not: IntCondition
+  null: Boolean
+  isNull: Boolean
+  eq: Int
+  notEq: Int
+  in: [Int!]
+  notIn: [Int!]
+  lt: Int
+  lte: Int
+  gt: Int
+  gte: Int
+}
+
+input FloatCondition {
+  and: [FloatCondition!]
+  or: [FloatCondition!]
+  not: FloatCondition
+  null: Boolean
+  isNull: Boolean
+  eq: Float
+  notEq: Float
+  in: [Float!]
+  notIn: [Float!]
+  lt: Float
+  lte: Float
+  gt: Float
+  gte: Float
+}
+
+input BooleanCondition {
+  and: [BooleanCondition!]
+  or: [BooleanCondition!]
+  not: BooleanCondition
+  null: Boolean
+  isNull: Boolean
+  eq: Boolean
+  notEq: Boolean
+  in: [Boolean!]
+  notIn: [Boolean!]
+  lt: Boolean
+  lte: Boolean
+  gt: Boolean
+  gte: Boolean
+}
+
+input DateCondition {
+  and: [DateCondition!]
+  or: [DateCondition!]
+  not: DateCondition
+  null: Boolean
+  isNull: Boolean
+  eq: Date
+  notEq: Date
+  in: [Date!]
+  notIn: [Date!]
+  lt: Date
+  lte: Date
+  gt: Date
+  gte: Date
+}
+
+input DateTimeCondition {
+  and: [DateTimeCondition!]
+  or: [DateTimeCondition!]
+  not: DateTimeCondition
+  null: Boolean
+  isNull: Boolean
+  eq: DateTime
+  notEq: DateTime
+  in: [DateTime!]
+  notIn: [DateTime!]
+  lt: DateTime
+  lte: DateTime
+  gt: DateTime
+  gte: DateTime
+}
+
+input JsonCondition {
+  and: [JsonCondition!]
+  or: [JsonCondition!]
+  not: JsonCondition
+  null: Boolean
+  isNull: Boolean
+}
+
+input TimeCondition {
+  and: [TimeCondition!]
+  or: [TimeCondition!]
+  not: TimeCondition
+  null: Boolean
+  isNull: Boolean
+  eq: Time
+  notEq: Time
+  in: [Time!]
+  notIn: [Time!]
+  lt: Time
+  lte: Time
+  gt: Time
+  gte: Time
+}
+
+input ColumnsEnumEnumCondition {
+  and: [ColumnsEnumEnumCondition!]
+  or: [ColumnsEnumEnumCondition!]
+  not: ColumnsEnumEnumCondition
+  null: Boolean
+  isNull: Boolean
+  eq: ColumnsEnum
+  notEq: ColumnsEnum
+  in: [ColumnsEnum!]
+  notIn: [ColumnsEnum!]
+  lt: ColumnsEnum
+  lte: ColumnsEnum
+  gt: ColumnsEnum
+  gte: ColumnsEnum
+}
+
+input ColumnsOrderBy {
+  _random: Boolean
+  _randomSeeded: Int
+  id: OrderDirection
+  string: OrderDirection
+  int: OrderDirection
+  float: OrderDirection
+  boolean: OrderDirection
+  date: OrderDirection
+  dateTime: OrderDirection
+  json: OrderDirection
+  uuid: OrderDirection
+  time: OrderDirection
+  enum: OrderDirection
+}
+
+enum OrderDirection {
+  asc
+  desc
+  ascNullsFirst
+  descNullsLast
+}
+
+type ColumnsConnection {
+  pageInfo: PageInfo!
+  edges: [ColumnsEdge!]!
+}
+
+type PageInfo {
+  totalCount: Int!
+}
+
+type ColumnsEdge {
+  node: Columns!
+}
+
+type _ValidationResult {
+  valid: Boolean!
+  errors: [_ValidationError!]!
+}
+
+type _ValidationError {
+  path: [_PathFragment!]!
+  message: _ValidationMessage!
+}
+
+union _PathFragment = _FieldPathFragment | _IndexPathFragment
+
+type _FieldPathFragment {
+  field: String!
+}
+
+type _IndexPathFragment {
+  index: Int!
+  alias: String
+}
+
+type _ValidationMessage {
+  text: String!
+}
+
+input ColumnsCreateInput {
+  string: String
+  int: Int
+  float: Float
+  boolean: Boolean
+  date: Date
+  dateTime: DateTime
+  json: Json
+  uuid: UUID
+  time: Time
+  enum: ColumnsEnum
+  _dummy_field_: Boolean
+}
+
+input ColumnsUpdateInput {
+  string: String
+  int: Int
+  float: Float
+  boolean: Boolean
+  date: Date
+  dateTime: DateTime
+  json: Json
+  uuid: UUID
+  time: Time
+  enum: ColumnsEnum
+  _dummy_field_: Boolean
+}
+
+type QueryTransaction {
+  getColumns(by: ColumnsUniqueWhere!, filter: ColumnsWhere): Columns
+  listColumns(filter: ColumnsWhere, orderBy: [ColumnsOrderBy!], offset: Int, limit: Int): [Columns!]!
+  paginateColumns(filter: ColumnsWhere, orderBy: [ColumnsOrderBy!], skip: Int, first: Int): ColumnsConnection!
+  validateCreateColumns(data: ColumnsCreateInput!): _ValidationResult!
+  validateUpdateColumns(by: ColumnsUniqueWhere!, data: ColumnsUpdateInput!): _ValidationResult!
+}
+
+type Info {
+  description: String
+}
+
+type Mutation {
+  createColumns(data: ColumnsCreateInput!): ColumnsCreateResult!
+  deleteColumns(by: ColumnsUniqueWhere!, filter: ColumnsWhere): ColumnsDeleteResult!
+  updateColumns(by: ColumnsUniqueWhere!, filter: ColumnsWhere, data: ColumnsUpdateInput!): ColumnsUpdateResult!
+  upsertColumns(by: ColumnsUniqueWhere!, filter: ColumnsWhere, update: ColumnsUpdateInput!, create: ColumnsCreateInput!): ColumnsUpsertResult!
+  transaction(options: MutationTransactionOptions): MutationTransaction!
+  query: Query!
+}
+
+type ColumnsCreateResult implements MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: Columns
+  validation: _ValidationResult!
+}
+
+interface MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+}
+
+type _MutationError {
+  path: [_PathFragment!]! @deprecated(reason: "Use `paths`.")
+  paths: [[_PathFragment!]!]!
+  type: _MutationErrorType!
+  message: String
+}
+
+enum _MutationErrorType {
+  NotNullConstraintViolation
+  UniqueConstraintViolation
+  ForeignKeyConstraintViolation
+  NotFoundOrDenied
+  NonUniqueWhereInput
+  InvalidDataInput
+  SqlError
+}
+
+type ColumnsDeleteResult implements MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: Columns
+}
+
+type ColumnsUpdateResult implements MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: Columns
+  validation: _ValidationResult!
+}
+
+type ColumnsUpsertResult implements MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: Columns
+  validation: _ValidationResult!
+}
+
+type MutationTransaction {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  validation: _ValidationResult!
+  createColumns(data: ColumnsCreateInput!): ColumnsCreateResult!
+  deleteColumns(by: ColumnsUniqueWhere!, filter: ColumnsWhere): ColumnsDeleteResult!
+  updateColumns(by: ColumnsUniqueWhere!, filter: ColumnsWhere, data: ColumnsUpdateInput!): ColumnsUpdateResult!
+  upsertColumns(by: ColumnsUniqueWhere!, filter: ColumnsWhere, update: ColumnsUpdateInput!, create: ColumnsCreateInput!): ColumnsUpsertResult!
+  query: Query
+}
+
+input MutationTransactionOptions {
+  deferForeignKeyConstraints: Boolean
+  deferUniqueConstraints: Boolean
+}

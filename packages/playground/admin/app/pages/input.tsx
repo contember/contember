@@ -37,6 +37,7 @@ export const Basic = () => {
 					<InputField field="intValue" label="Number" required={required} />
 					<InputField field="floatValue" label="Float" required={required} />
 					<InputField field="dateValue" label="Date" required={required} />
+					<InputField field="timeValue" label="Time" required={required} />
 					<InputField field="datetimeValue" label="Date time" required={required} />
 
 					<FieldExists field="nonExistingField">

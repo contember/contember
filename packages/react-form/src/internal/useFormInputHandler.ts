@@ -100,6 +100,20 @@ const ColumnTypeHandlerFactories: Record<SchemaKnownColumnType, ColumnTypeHandle
 			type: 'datetime-local',
 		},
 	}),
+	Time: () => ({
+		parseValue: (value: string) => {
+			if (value === '') {
+				return null
+			}
+			return value
+		},
+		formatValue: (value: string | null) => {
+			return value ?? ''
+		},
+		defaultInputProps: {
+			type: 'time',
+		},
+	}),
 	Bool: undefined,
 	Enum: undefined,
 	Uuid: undefined,

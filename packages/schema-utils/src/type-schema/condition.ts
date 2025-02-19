@@ -67,6 +67,7 @@ const resolveColumnTypeSchema = (type: Model.ColumnType) => {
 		// todo: validate format of string-like inputs uuid, date, enum
 		case Model.ColumnType.Date:
 		case Model.ColumnType.DateTime:
+		case Model.ColumnType.Time:
 		case Model.ColumnType.Uuid:
 		case Model.ColumnType.Enum:
 		case Model.ColumnType.String:

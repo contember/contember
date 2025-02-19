@@ -25,8 +25,12 @@ export const resolveDefaultValue = (column: Model.AnyColumn, providers: Pick<Pro
 			break
 		case Model.ColumnType.DateTime:
 		case Model.ColumnType.Date:
+		case Model.ColumnType.Time:
 			if (column.default === 'now') {
 				return providers.now().toISOString()
+			}
+			if (typeof column.default !== 'undefined') {
+				return column.default
 			}
 			break
 		case Model.ColumnType.Uuid:

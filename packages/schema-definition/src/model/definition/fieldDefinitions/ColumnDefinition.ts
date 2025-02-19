@@ -118,6 +118,10 @@ export function dateColumn(): ColumnDefinition {
 	return column(Model.ColumnType.Date)
 }
 
+export function timeColumn(): ColumnDefinition {
+	return column(Model.ColumnType.Time)
+}
+
 export function dateTimeColumn(args?: { precision?: number }): ColumnDefinition {
 	const col = column(Model.ColumnType.DateTime)
 	if (!args?.precision) {

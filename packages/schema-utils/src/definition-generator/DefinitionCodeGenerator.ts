@@ -234,6 +234,7 @@ const ColumnToMethodMapping: {
 	[Model.ColumnType.Bool]: 'boolColumn',
 	[Model.ColumnType.Date]: 'dateColumn',
 	[Model.ColumnType.DateTime]: 'dateTimeColumn',
+	[Model.ColumnType.Time]: 'timeColumn',
 	[Model.ColumnType.Json]: 'jsonColumn',
 	[Model.ColumnType.Double]: 'doubleColumn',
 	[Model.ColumnType.Uuid]: 'uuidColumn',

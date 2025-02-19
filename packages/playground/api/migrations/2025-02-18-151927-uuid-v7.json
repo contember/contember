@@ -1,0 +1,16 @@
+{
+	"formatVersion": 6,
+	"modifications": [
+		{
+			"modification": "updateSettings",
+			"op": "set",
+			"key": "content",
+			"value": {
+				"useExistsInHasManyFilter": true,
+				"fullDateTimeResponse": true,
+				"shortDateResponse": true,
+				"uuidVersion": 7
+			}
+		}
+	]
+}

@@ -1,10 +1,10 @@
-import { v4 as uuidv4 } from 'uuid'
+import { v4 as uuidv4, v7 as uuidv7 } from 'uuid'
 import bcrypt from 'bcryptjs'
 import crypto, { BinaryLike } from 'node:crypto'
 
 
 export const createProviders = () => ({
-	uuid: () => uuidv4(),
+	uuid: ({ version = 4 }: { version?: 4 | 7 } = {}) => version === 4 ? uuidv4() : uuidv7(),
 	now: () => new Date(),
 	bcrypt: async (value: string) => await bcrypt.hash(value, 10),
 	bcryptCompare: (data: any, hash: string) => bcrypt.compare(data, hash),

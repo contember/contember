@@ -169,7 +169,7 @@ export class ExecutionContainerFactory {
 			.addService('updater', ({ predicateFactory, updateBuilderFactory, schema, schemaDatabaseMetadata }) =>
 				new Updater(schema.model, schemaDatabaseMetadata, predicateFactory, updateBuilderFactory))
 			.addService('inserter', ({  insertBuilderFactory, providers, schema, schemaDatabaseMetadata }) =>
-				new Inserter(schema.model, schemaDatabaseMetadata, insertBuilderFactory, providers))
+				new Inserter(schema.model, schemaDatabaseMetadata, insertBuilderFactory, providers, { uuidVersion: schema.settings.content?.uuidVersion }))
 			.addService('mapperFactory', ({ predicatesInjector, selectBuilderFactory, uniqueWhereExpander, whereBuilder, junctionTableManager, deleteExecutor, updater, inserter, pathFactory, providers, schema, schemaDatabaseMetadata }) => {
 				return new MapperFactory(
 					db,

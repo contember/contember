@@ -1,7 +1,7 @@
 import { Input, Model, Value } from '@contember/schema'
 
 export interface Providers {
-	uuid: () => string
+	uuid: (args?: { version?: 4 | 7 }) => string
 	now: () => Date
 }
 
@@ -42,13 +42,6 @@ export const resolveDefaultValue = (column: Model.AnyColumn, providers: Pick<Pro
 	throw new NoDataError(`No data for column ${column.name}`)
 }
 
-export const resolvePrimaryGenerator = (column: Model.AnyColumn, providers: Providers): (() => Input.PrimaryValue | undefined) => {
-	if (column.type === Model.ColumnType.Uuid) {
-		return providers.uuid
-	}
-	return () => undefined
-}
-
 export const resolveColumnValue = (
 	{
 		entity,
@@ -60,12 +53,18 @@ export const resolveColumnValue = (
 		input: Input.ColumnValue | undefined
 	},
 	providers: Providers,
+	options: {
+		uuidVersion?: 4 | 7
+	},
 ): Value.FieldValue | undefined => {
 	if (input !== undefined) {
 		return input
 	}
 	if (entity.primary === column.name) {
-		return resolvePrimaryGenerator(column, providers)()
+		if (column.type === Model.ColumnType.Uuid) {
+			return providers.uuid({ version: options.uuidVersion })
+		}
+		return undefined
 	}
 
 	return resolveDefaultValue(column, providers)

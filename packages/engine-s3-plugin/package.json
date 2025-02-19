@@ -29,12 +29,11 @@
     "mime-types": "^2.1.35",
     "picomatch": "^4.0.2",
     "qs": "^6.13.0",
-    "uuid": "^10.0.0"
+    "uuid": "^11.0.5"
   },
   "devDependencies": {
     "@types/mime-types": "^2.1.4",
     "@types/qs": "^6.9.16",
-    "@types/uuid": "^10.0.0",
     "graphql": "^16.9.0"
   },
   "peerDependencies": {

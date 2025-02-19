@@ -51,7 +51,7 @@
     "lru-cache": "^11.0.1",
     "path-to-regexp": "^6.2.2",
     "prom-client": "^12.0.0",
-    "uuid": "^10.0.0",
+    "uuid": "^11.0.5",
     "ws": "^8.18.0"
   },
   "devDependencies": {
@@ -61,7 +61,6 @@
     "@types/koa__cors": "^5.0.0",
     "@types/lru-cache": "^7.10.10",
     "@types/node": "^20.16.11",
-    "@types/uuid": "^10.0.0",
     "@types/ws": "^8.5.12",
     "graphql": "^16.9.0"
   },

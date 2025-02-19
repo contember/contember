@@ -7,6 +7,7 @@ export namespace Settings {
 		readonly shortDateResponse?: boolean
 		readonly fullDateTimeResponse?: boolean
 		readonly useExistsInHasManyFilter?: boolean
+		readonly uuidVersion?: 4 | 7
 	}
 
 	export type Schema = {

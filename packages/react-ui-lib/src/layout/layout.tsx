@@ -13,7 +13,7 @@ import {
 	SidebarInset,
 	SidebarInsetContent,
 	SidebarInsetHeader,
-	SidebarInsetHeaderActions,
+	SidebarInsetHeaderActions, SidebarInsetHeaderContent,
 	SidebarLayout,
 	SidebarMenuButton,
 	SidebarProvider,
@@ -62,8 +62,10 @@ export const LayoutComponent = ({ children }: PropsWithChildren) => {
 							<Separator orientation="vertical" className="mr-2 h-4" />
 
 							<SlotTargets.Back />
-							<SlotTargets.Title />
 						</SidebarInsetHeaderActions>
+						<SidebarInsetHeaderContent>
+							<SlotTargets.Title />
+						</SidebarInsetHeaderContent>
 						<SidebarInsetHeaderActions>
 							<SlotTargets.Actions />
 						</SidebarInsetHeaderActions>

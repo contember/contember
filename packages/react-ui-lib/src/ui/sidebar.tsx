@@ -140,7 +140,7 @@ export const SidebarInset = uic('main', {
 
 export const SidebarInsetHeader = uic('header', {
 	baseClass: [
-		'bg-background z-50 flex justify-between h-16 shrink-0 items-center gap-2 border-b mb-4',
+		'bg-background z-50 flex justify-between h-16 shrink-0 items-center gap-2 border-b px-4',
 		'transition-[width,height] ease-linear',
 		'group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12',
 	],
@@ -148,13 +148,18 @@ export const SidebarInsetHeader = uic('header', {
 })
 
 export const SidebarInsetContent = uic('div', {
-	baseClass: 'overflow-y-auto px-4',
+	baseClass: 'overflow-y-auto p-4',
 	displayName: 'SidebarInsetContent',
 })
 
 export const SidebarInsetHeaderActions = uic('div', {
-	baseClass: 'flex justify-end items-center gap-2 px-4',
+	baseClass: 'flex justify-end items-center gap-2',
 	displayName: 'SidebarInsetHeaderAction',
+})
+
+export const SidebarInsetHeaderContent = uic('div', {
+	baseClass: 'flex-1 overflow-x-hidden',
+	displayName: 'SidebarInsetHeaderContent',
 })
 
 const SidebarNone = uic('div', {

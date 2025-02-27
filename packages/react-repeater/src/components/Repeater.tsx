@@ -1,5 +1,4 @@
-import React, { useEffect, useMemo } from 'react'
-import { verifySortableProp } from '../internal/verifySortableProp'
+import { ReactNode, useEffect, useMemo } from 'react'
 import { useCreateRepeaterMethods } from '../internal/useCreateRepeaterMethods'
 import { RepeaterEntityListAccessorContext, RepeaterMethodsContext, RepeaterSortedEntitiesContext } from '../contexts'
 import { Component, EntityListSubTree, HasMany, repairEntitiesOrder, sortEntities, SugaredField, useEntityList, useEntityListSubTree, useEnvironment } from '@contember/react-binding'
@@ -8,14 +7,14 @@ import { EntityListAccessor, QueryLanguage, SugaredQualifiedEntityList, SugaredR
 export type RepeaterRelativeProps =
 	& SugaredRelativeEntityList
 	& {
-		children?: React.ReactNode
+		children?: ReactNode
 		sortableBy?: SugaredRelativeSingleField['field']
 	}
 
 export type RepeaterQualifiedProps =
 	& SugaredQualifiedEntityList
 	& {
-		children?: React.ReactNode
+		children?: ReactNode
 		sortableBy?: SugaredRelativeSingleField['field']
 	}
 
@@ -27,13 +26,10 @@ export type RepeaterProps =
  * @group Blocks and repeaters
  */
 export const Repeater = Component<RepeaterProps>(props => {
-	if (import.meta.env.DEV) {
-		verifySortableProp(props)
-	}
-
 	if ('entities' in props) {
 		return <RepeaterQualified {...props} />
 	}
+
 	return <RepeaterRelative {...props} />
 })
 

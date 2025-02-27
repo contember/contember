@@ -8,15 +8,16 @@ import { Context } from 'react';
 import { EntityAccessor } from '@contember/react-binding';
 import { EntityListAccessor } from '@contember/react-binding';
 import { JSX as JSX_2 } from 'react/jsx-runtime';
-import { default as React_2 } from 'react';
+import { NamedExoticComponent } from 'react';
 import { ReactElement } from 'react';
 import { ReactNode } from 'react';
+import { SugaredOrderBy } from '@contember/react-binding';
 import { SugaredQualifiedEntityList } from '@contember/react-binding';
 import { SugaredRelativeEntityList } from '@contember/react-binding';
 import { SugaredRelativeSingleField } from '@contember/react-binding';
 
 // @public (undocumented)
-export const Repeater: React_2.NamedExoticComponent<RepeaterProps>;
+export const Repeater: NamedExoticComponent<RepeaterProps>;
 
 // @public (undocumented)
 export type RepeaterAddItemIndex = number | 'first' | 'last' | undefined;
@@ -87,13 +88,15 @@ export type RepeaterProps = RepeaterQualifiedProps | RepeaterRelativeProps;
 
 // @public (undocumented)
 export type RepeaterQualifiedProps = SugaredQualifiedEntityList & {
-    children?: React_2.ReactNode;
+    children?: ReactNode;
+    orderBy?: SugaredOrderBy;
     sortableBy?: SugaredRelativeSingleField['field'];
 };
 
 // @public (undocumented)
 export type RepeaterRelativeProps = SugaredRelativeEntityList & {
-    children?: React_2.ReactNode;
+    children?: ReactNode;
+    orderBy?: SugaredOrderBy;
     sortableBy?: SugaredRelativeSingleField['field'];
 };
 

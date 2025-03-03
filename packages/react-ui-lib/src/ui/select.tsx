@@ -72,6 +72,7 @@ export const SelectItem = uic(SelectPrimitive.Item, {
 		</span>
 	),
 	displayName: SelectPrimitive.Item.displayName,
+	wrapInner: ({ children }) => <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>,
 })
 
 export const SelectSeparator = uic(SelectPrimitive.Separator, {

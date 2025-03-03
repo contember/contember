@@ -6,7 +6,7 @@
         "@actions/core": "^1.10.1",
         "@happy-dom/global-registrator": "^15.7.4",
         "@types/bun": "^1.1.10",
-        "@types/node": "^20.16.11",
+        "@types/node": "^20.17.22",
         "@types/react": "^18.3.11",
         "@types/react-dom": "^18.3.1",
         "@typescript-eslint/eslint-plugin": "^6.21.0",
@@ -22,7 +22,7 @@
         "react": "^18.3.1",
         "react-dom": "^18.3.1",
         "supertest": "^7.0.0",
-        "typescript": "^5.6.3",
+        "typescript": "^5.8.2",
         "vite": "^5.4.9",
       },
     },
@@ -111,7 +111,7 @@
       "devDependencies": {
         "@types/fs-extra": "^11.0.4",
         "@types/js-yaml": "^4.0.9",
-        "@types/node": "^20.16.11",
+        "@types/node": "^20.17.22",
         "@types/prompts": "^2.4.9",
         "@types/semver": "^7.5.8",
         "autoprefixer": "^10.4.20",
@@ -130,7 +130,7 @@
       },
       "devDependencies": {
         "@types/js-yaml": "^4.0.9",
-        "@types/node": "^20.16.11",
+        "@types/node": "^20.17.22",
         "@types/npm-package-arg": "^6.1.4",
       },
     },
@@ -170,7 +170,7 @@
       },
       "devDependencies": {
         "@contember/schema-definition": "workspace:*",
-        "@types/node": "^20.16.11",
+        "@types/node": "^20.17.22",
       },
     },
     "packages/config-loader": {
@@ -181,7 +181,7 @@
       },
       "devDependencies": {
         "@types/js-yaml": "^4.0.9",
-        "@types/node": "^20.16.11",
+        "@types/node": "^20.17.22",
       },
     },
     "packages/create": {
@@ -203,7 +203,7 @@
       },
       "devDependencies": {
         "@contember/database-tester": "workspace:*",
-        "@types/node": "^20.16.11",
+        "@types/node": "^20.17.22",
         "pg": "^8.12.0",
       },
       "peerDependencies": {
@@ -276,7 +276,7 @@
         "@contember/logger": "workspace:*",
       },
       "devDependencies": {
-        "@types/node": "^20.16.11",
+        "@types/node": "^20.17.22",
       },
     },
     "packages/engine-content-api": {
@@ -295,7 +295,7 @@
       "devDependencies": {
         "@contember/database-tester": "workspace:*",
         "@contember/schema-definition": "workspace:*",
-        "@types/node": "^20.16.11",
+        "@types/node": "^20.17.22",
         "graphql": "^16.9.0",
         "pg": "^8.12.0",
       },
@@ -342,7 +342,7 @@
         "@types/koa-bodyparser": "^4.3.12",
         "@types/koa__cors": "^5.0.0",
         "@types/lru-cache": "^7.10.10",
-        "@types/node": "^20.16.11",
+        "@types/node": "^20.17.22",
         "@types/ws": "^8.5.12",
         "graphql": "^16.9.0",
       },
@@ -403,7 +403,7 @@
       },
       "devDependencies": {
         "@types/koa-compress": "^4.0.6",
-        "@types/node": "^20.16.11",
+        "@types/node": "^20.17.22",
       },
     },
     "packages/engine-system-api": {
@@ -425,7 +425,7 @@
       },
       "devDependencies": {
         "@contember/schema-definition": "workspace:*",
-        "@types/node": "^20.16.11",
+        "@types/node": "^20.17.22",
         "graphql": "^16.9.0",
         "pg": "^8.12.0",
       },
@@ -460,7 +460,7 @@
         "@contember/database-tester": "workspace:*",
         "@graphql-tools/schema": "^10.0.7",
         "@types/mustache": "^4.2.5",
-        "@types/node": "^20.16.11",
+        "@types/node": "^20.17.22",
         "@types/nodemailer": "^6.4.16",
         "graphql": "^16.9.0",
       },
@@ -477,7 +477,7 @@
         "@contember/typesafe": "workspace:*",
       },
       "devDependencies": {
-        "@types/node": "^20.16.11",
+        "@types/node": "^20.17.22",
         "graphql": "^16.9.0",
       },
       "peerDependencies": {
@@ -506,7 +506,7 @@
       "devDependencies": {
         "@contember/engine-system-api": "workspace:*",
         "@graphql-tools/schema": "^10.0.7",
-        "@types/node": "^20.16.11",
+        "@types/node": "^20.17.22",
         "graphql": "^16.9.0",
         "graphql-ts-client-codegen": "^3.1.17",
       },
@@ -520,7 +520,7 @@
       "devDependencies": {
         "@contember/engine-tenant-api": "workspace:*",
         "@graphql-tools/schema": "^10.0.7",
-        "@types/node": "^20.16.11",
+        "@types/node": "^20.17.22",
         "graphql": "^16.9.0",
         "graphql-ts-client-codegen": "^3.1.17",
       },
@@ -529,7 +529,7 @@
       "name": "@contember/graphql-utils",
       "version": "2.1.0-alpha.1",
       "devDependencies": {
-        "@types/node": "^20.16.11",
+        "@types/node": "^20.17.22",
         "graphql": "^16.9.0",
       },
       "peerDependencies": {
@@ -565,7 +565,7 @@
         "chalk": "^5.3.0",
       },
       "devDependencies": {
-        "@types/node": "^20.16.11",
+        "@types/node": "^20.17.22",
       },
     },
     "packages/migrations-client": {
@@ -579,7 +579,7 @@
         "@contember/schema-utils": "workspace:*",
       },
       "devDependencies": {
-        "@types/node": "^20.16.11",
+        "@types/node": "^20.17.22",
       },
     },
     "packages/playground": {
@@ -1169,14 +1169,14 @@
       },
       "devDependencies": {
         "@contember/schema-definition": "workspace:*",
-        "@types/node": "^20.16.11",
+        "@types/node": "^20.17.22",
       },
     },
     "packages/typesafe": {
       "name": "@contember/typesafe",
       "version": "2.1.0-alpha.1",
       "devDependencies": {
-        "@types/node": "^20.16.11",
+        "@types/node": "^20.17.22",
       },
     },
     "packages/utilities": {
@@ -1195,9 +1195,9 @@
     },
   },
   "overrides": {
-    "typescript": "5.6.3",
+    "typescript": "5.8.2",
     "rollup": "npm:@rollup/wasm-node@*",
-    "@types/node": "20.16.11",
+    "@types/node": "20.17.22",
     "graphql": "16.9.0",
   },
   "packages": {
@@ -1691,7 +1691,7 @@
 
     "@types/mustache": ["@types/mustache@4.2.5", "", {}, "sha512-PLwiVvTBg59tGFL/8VpcGvqOu3L4OuveNvPi0EYbWchRdEVP++yRUXJPFl+CApKEq13017/4Nf7aQ5lTtHUNsA=="],
 
-    "@types/node": ["@types/node@20.16.11", "", { "dependencies": { "undici-types": "~6.19.2" } }, "sha512-y+cTCACu92FyA5fgQSAI8A1H429g7aSK2HsO7K4XYUWc4dY5IUz55JSDIYT6/VsOLfGy8vmvQYC2hfb0iF16Uw=="],
+    "@types/node": ["@types/node@20.17.22", "", { "dependencies": { "undici-types": "~6.19.2" } }, "sha512-9RV2zST+0s3EhfrMZIhrz2bhuhBwxgkbHEwP2gtGWPjBzVQjifMzJ9exw7aDZhR1wbpj8zBrfp3bo8oJcGiUUw=="],
 
     "@types/node-fetch": ["@types/node-fetch@2.6.12", "", { "dependencies": { "@types/node": "*", "form-data": "^4.0.0" } }, "sha512-8nneRWKCg3rMtF69nLQJnOYUcbafYeFSjqkw3jCRLsqkWFlHaoQrr5mXmofFGOx3DKn7UfmBMyov8ySvLRVldA=="],
 
@@ -2635,7 +2635,7 @@
 
     "typed-array-length": ["typed-array-length@1.0.7", "", { "dependencies": { "call-bind": "^1.0.7", "for-each": "^0.3.3", "gopd": "^1.0.1", "is-typed-array": "^1.1.13", "possible-typed-array-names": "^1.0.0", "reflect.getprototypeof": "^1.0.6" } }, "sha512-3KS2b+kL7fsuk/eJZ7EQdnEmQoaho/r6KUef7hxvltNA5DR8NAUM+8wJMbJyZ4G9/7i3v5zPBIMN5aybAh2/Jg=="],
 
-    "typescript": ["typescript@5.6.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-hjcS1mhfuyi4WW8IWtjP7brDrG2cuDZukyrYrSauoXGNgx0S7zceP07adYkJycEr56BOUTNPzbInooiN3fn1qw=="],
+    "typescript": ["typescript@5.8.2", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-aJn6wq13/afZp/jT9QZmwEjDqqvSGp1VT5GVg+f/t6/oVyrgXM6BY1h9BRh/O5p3PlUPAe+WuiEZOmb/49RqoQ=="],
 
     "unbox-primitive": ["unbox-primitive@1.1.0", "", { "dependencies": { "call-bound": "^1.0.3", "has-bigints": "^1.0.2", "has-symbols": "^1.1.0", "which-boxed-primitive": "^1.1.1" } }, "sha512-nWJ91DjeOkej/TA8pXQ3myruKpKEYgqvpw9lz4OPHj/NWFNluYrjbz9j01CJ8yKQd2g4jFoOkINCTW2I5LEEyw=="],
 

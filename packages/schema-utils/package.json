@@ -28,7 +28,7 @@
   },
   "devDependencies": {
     "@contember/schema-definition": "workspace:*",
-    "@types/node": "^20.16.11"
+    "@types/node": "^20.17.22"
   },
   "type": "module"
 }

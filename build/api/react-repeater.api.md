@@ -83,7 +83,7 @@ export const RepeaterNotEmpty: ({ children }: {
     children: ReactNode;
 }) => JSX_2.Element | null;
 
-// @public (undocumented)
+// @public
 export type RepeaterProps = RepeaterQualifiedProps | RepeaterRelativeProps;
 
 // @public (undocumented)

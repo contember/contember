@@ -13,7 +13,6 @@ import { DataViewNumberFilterProps } from '@contember/react-dataview';
 import { DataViewProps } from '@contember/react-dataview';
 import { DataViewTextFilterProps } from '@contember/react-dataview';
 import { DataViewUnionTextFilterProps } from '@contember/react-dataview';
-import { FC } from 'react';
 import { JSX as JSX_2 } from 'react/jsx-runtime';
 import { NamedExoticComponent } from 'react';
 import * as React_2 from 'react';
@@ -53,10 +52,12 @@ export type DataGridBooleanColumnProps = {
 };
 
 // @public
-export const DataGridBooleanFilter: React_2.NamedExoticComponent<Omit<DataViewBooleanFilterProps, "children"> & {
-    label: ReactNode;
+export const DataGridBooleanFilter: NamedExoticComponent<Omit<DataViewBooleanFilterProps, "children"> & {
+label: ReactNode;
 }>;
 
+// Warning: (ae-unresolved-link) The @link reference could not be resolved: The package "@contember/react-ui-lib" does not have an export "DataViewBooleanFilterProps"
+//
 // @public
 export type DataGridBooleanFilterProps = Omit<DataViewBooleanFilterProps, 'children'> & {
     label: ReactNode;
@@ -91,9 +92,9 @@ export type DataGridDateColumnProps = {
 };
 
 // @public
-export const DataGridDateFilter: React_2.NamedExoticComponent<Omit<DataViewDateFilterProps, "children"> & {
-    label: ReactNode;
-    ranges?: DataGridPredefinedDateRange[];
+export const DataGridDateFilter: NamedExoticComponent<Omit<DataViewDateFilterProps, "children"> & {
+label: ReactNode;
+ranges?: DataGridPredefinedDateRange[];
 }>;
 
 // @public
@@ -149,9 +150,9 @@ export const DataGridEnumFieldTooltip: ({ children, actions, value, ...props }: 
 export type DataGridEnumFieldTooltipProps = Omit<DataViewEnumFilterProps, 'children'>;
 
 // @public
-export const DataGridEnumFilter: React_2.NamedExoticComponent<Omit<DataViewEnumFilterProps, "children"> & {
-    options?: Record<string, ReactNode>;
-    label?: ReactNode;
+export const DataGridEnumFilter: NamedExoticComponent<Omit<DataViewEnumFilterProps, "children"> & {
+options?: Record<string, ReactNode>;
+label?: ReactNode;
 }>;
 
 // @public
@@ -209,9 +210,9 @@ export type DataGridHasManyColumnProps = {
 };
 
 // @public
-export const DataGridHasManyFilter: React_2.NamedExoticComponent<DataViewHasManyFilterProps & {
-    children: ReactNode;
-    label: ReactNode;
+export const DataGridHasManyFilter: NamedExoticComponent<DataViewHasManyFilterProps & {
+children: ReactNode;
+label: ReactNode;
 }>;
 
 // @public
@@ -221,7 +222,7 @@ export type DataGridHasManyFilterProps = DataViewHasManyFilterProps & {
 };
 
 // @public
-export const DataGridHasManyTooltip: React_2.NamedExoticComponent<DataGridHasManyTooltipProps>;
+export const DataGridHasManyTooltip: NamedExoticComponent<DataGridHasManyTooltipProps>;
 
 // @public
 export type DataGridHasManyTooltipProps = DataViewHasManyFilterProps & {
@@ -254,9 +255,9 @@ export type DataGridHasOneColumnProps = {
 };
 
 // @public
-export const DataGridHasOneFilter: React_2.NamedExoticComponent<DataViewHasOneFilterProps & {
-    children: ReactNode;
-    label: ReactNode;
+export const DataGridHasOneFilter: NamedExoticComponent<DataViewHasOneFilterProps & {
+children: ReactNode;
+label: ReactNode;
 }>;
 
 // @public
@@ -266,7 +267,7 @@ export type DataGridHasOneFilterProps = DataViewHasOneFilterProps & {
 };
 
 // @public
-export const DataGridHasOneTooltip: React_2.NamedExoticComponent<DataGridHasOneTooltipProps>;
+export const DataGridHasOneTooltip: NamedExoticComponent<DataGridHasOneTooltipProps>;
 
 // @public
 export type DataGridHasOneTooltipProps = DataViewHasOneFilterProps & {
@@ -288,8 +289,8 @@ export type DataGridIsDefinedColumnProps = {
 };
 
 // @public
-export const DataGridIsDefinedFilter: React_2.NamedExoticComponent<Omit<DataViewBooleanFilterProps, "children"> & {
-    label: ReactNode;
+export const DataGridIsDefinedFilter: NamedExoticComponent<Omit<DataViewBooleanFilterProps, "children"> & {
+label: ReactNode;
 }>;
 
 // @public
@@ -301,9 +302,7 @@ export type DataGridIsDefinedFilterProps = Omit<DataViewBooleanFilterProps, 'chi
 export const DataGridLayoutSwitcher: () => JSX_2.Element;
 
 // @public
-export const DataGridLoader: ({ children }: {
-    children: ReactNode;
-}) => JSX_2.Element;
+export const DataGridLoader: ({ children }: DataGridLoaderProps) => JSX_2.Element;
 
 // @public
 export interface DataGridLoaderProps {
@@ -339,12 +338,12 @@ export type DataGridNumberFilterProps = Omit<DataViewNumberFilterProps, 'childre
 // Warning: (ae-forgotten-export) The symbol "DataGridPaginationProps" needs to be exported by the entry point index.d.ts
 //
 // @public
-export const DataGridPagination: FC<DataGridPaginationProps>;
+export const DataGridPagination: ({ sticky }: DataGridPaginationProps) => JSX_2.Element;
 
-// @public (undocumented)
+// @public
 export const DataGridPerPageSelector: () => JSX_2.Element;
 
-// @public (undocumented)
+// @public
 export type DataGridPredefinedDateRange = {
     start: string;
     end: string;
@@ -365,7 +364,7 @@ export type DataGridQueryFilterProps = {
 };
 
 // @public
-export const DataGridTable: React_2.NamedExoticComponent<DataViewTableProps>;
+export const DataGridTable: NamedExoticComponent<DataViewTableProps>;
 
 // @public
 export const DataGridTextColumn: React_2.NamedExoticComponent<DataGridTextColumnProps>;
@@ -390,26 +389,22 @@ export type DataGridTextFilterProps = Omit<DataViewTextFilterProps, 'children'> 
 };
 
 // @public
-export const DataGridTiles: React_2.NamedExoticComponent<DataGridTilesProps>;
+export const DataGridTiles: NamedExoticComponent<DataGridTilesProps>;
 
 // @public
-export interface DataGridTilesProps {
-    // (undocumented)
-    children: React_2.ReactNode;
-    // (undocumented)
+export type DataGridTilesProps = {
+    children: React.ReactNode;
     className?: string;
-}
+};
 
 // @public
-export const DataGridToolbar: React_2.NamedExoticComponent<DataGridToolbarProps>;
+export const DataGridToolbar: NamedExoticComponent<DataGridToolbarProps>;
 
 // @public
-export interface DataGridToolbarProps {
-    // (undocumented)
+export type DataGridToolbarProps = {
     children?: ReactNode;
-    // (undocumented)
     sticky?: boolean;
-}
+};
 
 // @public
 export const DataGridUnionTextFilter: React_2.NamedExoticComponent<Omit<DataViewUnionTextFilterProps, "children"> & {
@@ -433,10 +428,9 @@ export type DataGridUuidColumnProps = {
 };
 
 // @public
-export interface DataViewTableProps {
-    // (undocumented)
+export type DataViewTableProps = {
     children: ReactNode;
-}
+};
 
 // @public
 export const DefaultDataGrid: NamedExoticComponent<Omit<DataViewProps, "children"> & {
@@ -449,6 +443,10 @@ export type DefaultDataGridProps = Omit<DataViewProps, 'children'> & {
     children: ReactNode;
     toolbar?: ReactNode;
 };
+
+// Warnings were encountered during analysis:
+//
+// src/datagrid/toolbar.tsx:25:2 - (ae-unresolved-link) The @link reference could not be resolved: The package "@contember/react-ui-lib" does not have an export "DataGridToolbarUI"
 
 // (No @packageDocumentation comment for this package)
 

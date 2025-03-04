@@ -608,6 +608,12 @@ export class MutationGenerator {
 
 			const plannedDeletion = currentState.plannedHasOneDeletions?.get(placeholderName)
 			if (plannedDeletion !== undefined) {
+				const key = `${persistedValue.entityName}#${persistedValue.value}`
+				if (this.processedDeletes.has(key)) {
+					return undefined
+				}
+				this.processedDeletes.add(key)
+
 				// It's planned for deletion.
 				// TODO also potentially do something about the current entity
 				return {
@@ -682,7 +688,11 @@ export class MutationGenerator {
 			}
 			const plannedDeletion = currentState.plannedHasOneDeletions?.get(placeholderName)
 			if (plannedDeletion !== undefined) {
-				// TODO also potentially do something about the current entity
+				const key = `${persistedValue.entityName}#${persistedValue.value}`
+				if (this.processedDeletes.has(key)) {
+					return undefined
+				}
+				this.processedDeletes.add(key)
 				return [{
 					alias,
 					delete: reducedBy,
@@ -776,6 +786,11 @@ export class MutationGenerator {
 			for (const [removedId, removalType] of fieldState.plannedRemovals) {
 				const alias = MutationAlias.encodeEntityId(new ServerId(removedId, fieldState.entityName))
 				if (removalType === 'delete') {
+					const key = `${fieldState.entityName}#${removedId}`
+					if (this.processedDeletes.has(key)) {
+						continue
+					}
+					this.processedDeletes.add(key)
 
 					input.push({
 						alias,

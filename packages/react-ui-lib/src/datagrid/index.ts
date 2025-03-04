@@ -27,6 +27,7 @@ export {
 	DataGridHasOneFilter,
 	type DataGridHasOneTooltipProps,
 	DataGridHasOneTooltip,
+	dataGridDateRanges,
 } from './filters'
 
 export * from './cells'

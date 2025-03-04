@@ -4,10 +4,6 @@ import { IDPValidationError } from '../IDPValidationError'
 import { IDPResponseError } from '../IDPResponseError'
 import { IDPResponse, InitIDPAuthResult } from '../IdentityProviderHandler'
 
-custom.setHttpOptionsDefaults({
-	timeout: 5000,
-})
-
 export const initOIDCAuth = async (client: Client, { redirectUrl, claims, responseMode }: { redirectUrl: string; claims?: string; responseMode?: string }): Promise<InitIDPAuthResult> => {
 	const nonce = generators.nonce()
 	const state = generators.state()

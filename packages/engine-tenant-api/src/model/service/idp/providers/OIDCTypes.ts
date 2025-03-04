@@ -13,6 +13,7 @@ export const OIDCConfigurationOptions = Typesafe.partial({
 	idTokenSignedResponseAlg: Typesafe.string,
 	fetchUserInfo: Typesafe.boolean,
 	returnOIDCResult: Typesafe.boolean,
+	timeout: Typesafe.number,
 })
 export const BaseOIDCConfiguration = Typesafe.intersection(
 	Typesafe.object({

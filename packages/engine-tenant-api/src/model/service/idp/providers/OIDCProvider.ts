@@ -1,4 +1,4 @@
-import { Client, Issuer } from 'openid-client'
+import { Client, custom, Issuer } from 'openid-client'
 import { IdentityProviderHandler, IDPResponse, InitIDPAuthResult } from '../IdentityProviderHandler'
 import { InvalidIDPConfigurationError } from '../InvalidIDPConfigurationError'
 import { catchTypesafe } from './helpers'
@@ -6,6 +6,7 @@ import { OIDCConfiguration, OIDCInitData, OIDCResponseData } from './OIDCTypes'
 import { handleOIDCResponse, initOIDCAuth } from './OIDCHelpers'
 import { IDPValidationError } from '../IDPValidationError'
 
+const DEFAULT_OIDC_TIMEOUT = 5000
 
 export class OIDCProvider implements IdentityProviderHandler<OIDCConfiguration> {
 	private issuerCache: Record<string, Issuer<Client>> = {}
@@ -40,7 +41,7 @@ export class OIDCProvider implements IdentityProviderHandler<OIDCConfiguration> 
 	private async createOIDCClient(configuration: OIDCConfiguration): Promise<Client> {
 		this.issuerCache[configuration.url] ??= await Issuer.discover(configuration.url)
 
-		return new this.issuerCache[configuration.url].Client(
+		const client = new this.issuerCache[configuration.url].Client(
 			{
 				client_id: configuration.clientId,
 				client_secret: configuration.clientSecret,
@@ -52,5 +53,9 @@ export class OIDCProvider implements IdentityProviderHandler<OIDCConfiguration> 
 				additionalAuthorizedParties: [...(configuration.additionalAuthorizedParties ?? [])],
 			},
 		)
+
+		client[custom.http_options] = () => ({ timeout: configuration.timeout ?? DEFAULT_OIDC_TIMEOUT })
+
+		return client
 	}
 }

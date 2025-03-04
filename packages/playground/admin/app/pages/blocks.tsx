@@ -1,7 +1,7 @@
 import { Title } from '~/app/components/title'
 import { Binding, PersistButton } from '~/lib/binding'
 import { DefaultBlockRepeater } from '~/lib/block-repeater'
-import { ImageField, InputField, RadioEnumField, TextareaField } from '~/lib/form'
+import { ImageField, InputField, RadioEnumField, SelectField, TextareaField } from '~/lib/form'
 import { Slots } from '~/lib/layout'
 import { UploadedImageView } from '~/lib/upload'
 import { cn } from '~/lib/utils'
@@ -20,6 +20,10 @@ export default () => (
 		</Slots.Actions>
 
 		<EntitySubTree entity="BlockList(unique = unique)" setOnCreate="(unique = unique)">
+			<SelectField field="primaryBlock" label="Primary">
+				<Field field="title" />
+			</SelectField>
+
 			<DefaultBlockRepeater field="blocks" sortableBy="order" discriminationField="type">
 				<Block
 					name="text"

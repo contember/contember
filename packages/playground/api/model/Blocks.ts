@@ -3,6 +3,7 @@ import { c } from '@contember/schema-definition'
 export class BlockList {
 	unique = c.enumColumn(c.createEnum('unique')).default('unique').notNull().unique()
 	blocks = c.oneHasMany(Block, 'list').orderBy('order')
+	primaryBlock = c.manyHasOne(Block).setNullOnDelete()
 }
 
 export const BlockType = c.createEnum(

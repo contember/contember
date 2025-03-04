@@ -1,0 +1,39 @@
+{
+	"formatVersion": 6,
+	"modifications": [
+		{
+			"modification": "createRelation",
+			"entityName": "BlockList",
+			"owningSide": {
+				"type": "ManyHasOne",
+				"name": "primaryBlock",
+				"target": "Block",
+				"joiningColumn": {
+					"columnName": "primary_block_id",
+					"onDelete": "set null"
+				},
+				"nullable": true
+			}
+		},
+		{
+			"modification": "patchAclSchema",
+			"patch": [
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/BlockList/operations/create/primaryBlock",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/BlockList/operations/update/primaryBlock",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/BlockList/operations/read/primaryBlock",
+					"value": true
+				}
+			]
+		}
+	]
+}

@@ -121,8 +121,7 @@ export class DataBinding<Node> {
 
 			await this.checkErrorsBeforePersist(onPersistError)
 
-			const generator = new MutationGenerator(this.treeStore, this.queryBuilder)
-			const mutationResult = generator.getPersistMutation()
+			const mutationResult = MutationGenerator.getPersistMutation(this.treeStore, this.queryBuilder)
 
 			if (mutationResult.operations.length === 0) {
 				return await this.processEmptyPersistMutation(onPersistSuccess)

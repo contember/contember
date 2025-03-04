@@ -36,18 +36,22 @@ export type PersistMutationResult = {
 export class MutationGenerator {
 
 	private aliasCounter = 1
+	private processedPlaceholdersByEntity: ProcessedPlaceholdersByEntity = new Map()
+	private processedDeletes = new Set<string>()
 
-	public constructor(
+	private constructor(
 		private readonly treeStore: TreeStore,
 		private readonly qb: ContentQueryBuilder,
 	) {
 	}
 
-	public getPersistMutation(): PersistMutationResult {
+	public static getPersistMutation(treeStore: TreeStore, qb: ContentQueryBuilder): PersistMutationResult {
+		return new MutationGenerator(treeStore, qb).getPersistMutation()
+	}
+
+	private getPersistMutation(): PersistMutationResult {
 		const mutations: Record<string, ContentMutation<any>> = {}
 		const operations: SubMutationOperation[] = []
-		const processedPlaceholdersByEntity: ProcessedPlaceholdersByEntity = new Map()
-		const processedDeletes = new Set<string>()
 
 		for (const [treeRootId, rootStates] of this.treeStore.subTreeStatesByRoot.entries()) {
 			for (const [placeholderName, subTreeState] of Array.from(rootStates.entries()).reverse()) {
@@ -59,7 +63,6 @@ export class MutationGenerator {
 						continue
 					}
 					const subMutation = this.createMutation(
-						processedPlaceholdersByEntity,
 						placeholderName,
 						'single',
 						subTreeState.entity.id.value,
@@ -79,7 +82,6 @@ export class MutationGenerator {
 							continue
 						}
 						const subMutation = this.createMutation(
-							processedPlaceholdersByEntity,
 							placeholderName,
 							'list',
 							childState.entity.id.value,
@@ -97,10 +99,10 @@ export class MutationGenerator {
 							}
 							if (removalType === 'delete') {
 								const key = `${subTreeState.entityName}#${removedId}`
-								if (processedDeletes.has(key)) {
+								if (this.processedDeletes.has(key)) {
 									continue
 								}
-								processedDeletes.add(key)
+								this.processedDeletes.add(key)
 								const alias = this.createAlias()
 								mutations[alias] = this.createDeleteMutation(
 									subTreeState.entityName,
@@ -122,7 +124,6 @@ export class MutationGenerator {
 	}
 
 	private createMutation(
-		processedPlaceholdersByEntity: ProcessedPlaceholdersByEntity,
 		subTreePlaceholder: PlaceholderName,
 		subTreeType: 'list' | 'single',
 		entityId: EntityId,
@@ -153,7 +154,6 @@ export class MutationGenerator {
 			]
 		} else if (!realmState.entity.id.existsOnServer) {
 			const builder = this.createCreateMutation(
-				processedPlaceholdersByEntity,
 				realmState,
 				fieldMarkers,
 			)
@@ -173,7 +173,6 @@ export class MutationGenerator {
 			]
 		}
 		const builder = this.createUpdateMutation(
-			processedPlaceholdersByEntity,
 			realmState,
 			fieldMarkers,
 		)
@@ -203,11 +202,10 @@ export class MutationGenerator {
 	}
 
 	private createUpdateMutation(
-		processedPlaceholdersByEntity: ProcessedPlaceholdersByEntity,
 		entityRealm: EntityRealmState,
 		fieldMarkers: EntityFieldMarkers,
 	): ContentMutation<any> | undefined {
-		const input = this.getUpdateDataInput(processedPlaceholdersByEntity, entityRealm)
+		const input = this.getUpdateDataInput(entityRealm)
 
 		if (input === undefined) {
 			return undefined
@@ -228,14 +226,10 @@ export class MutationGenerator {
 	}
 
 	private createCreateMutation(
-		processedPlaceholdersByEntity: ProcessedPlaceholdersByEntity,
 		entityRealm: EntityRealmState,
 		fieldMarkers: EntityFieldMarkers,
 	): ContentMutation<any> | undefined {
-		const input = this.getCreateDataInput(
-			processedPlaceholdersByEntity,
-			entityRealm,
-		)
+		const input = this.getCreateDataInput(entityRealm)
 		if (input === undefined) {
 			return undefined
 		}
@@ -246,13 +240,12 @@ export class MutationGenerator {
 	}
 
 	private getCreateDataInput(
-		processedPlaceholdersByEntity: ProcessedPlaceholdersByEntity,
 		currentState: EntityRealmState | EntityRealmStateStub,
 	): Input.CreateDataInput | undefined {
-		let processedPlaceholders = processedPlaceholdersByEntity.get(currentState.entity)
+		let processedPlaceholders = this.processedPlaceholdersByEntity.get(currentState.entity)
 
 		if (processedPlaceholders === undefined) {
-			processedPlaceholdersByEntity.set(currentState.entity, (processedPlaceholders = new Set()))
+			this.processedPlaceholdersByEntity.set(currentState.entity, (processedPlaceholders = new Set()))
 		}
 
 		if (currentState.type === 'entityRealmStub') {
@@ -318,7 +311,7 @@ export class MutationGenerator {
 							})
 							continue
 						}
-						const input = this.getCreateOneRelationInput(processedPlaceholdersByEntity, fieldState, marker)
+						const input = this.getCreateOneRelationInput(fieldState, marker)
 						if (input !== undefined) {
 							const current = result[marker.parameters.field]
 							if (Array.isArray(input) && Array.isArray(current)) {
@@ -345,7 +338,7 @@ export class MutationGenerator {
 							})
 							continue
 						}
-						const input = this.getCreateManyRelationInput(processedPlaceholdersByEntity, fieldState)
+						const input = this.getCreateManyRelationInput(fieldState)
 						if (input !== undefined) {
 							const current = result[marker.parameters.field]
 							if (Array.isArray(current)) {
@@ -375,7 +368,6 @@ export class MutationGenerator {
 						}
 						case 'hasOne': {
 							const input = this.getCreateOneRelationInput(
-								processedPlaceholdersByEntity,
 								field.fieldState,
 								field.marker,
 							)
@@ -391,7 +383,6 @@ export class MutationGenerator {
 						}
 						case 'hasMany': {
 							const input = this.getCreateManyRelationInput(
-								processedPlaceholdersByEntity,
 								field.fieldState,
 							)
 							if (input !== undefined) {
@@ -432,7 +423,6 @@ export class MutationGenerator {
 	}
 
 	private getCreateOneRelationInput(
-		processedPlaceholdersByEntity: ProcessedPlaceholdersByEntity,
 		fieldState: EntityRealmState | EntityRealmStateStub,
 		marker: HasOneRelationMarker,
 	): Input.CreateOneRelationInput | Input.CreateManyRelationInput | undefined {
@@ -440,11 +430,11 @@ export class MutationGenerator {
 		const runtimeId = fieldState.entity.id
 
 		if (reducedBy === undefined) {
-			if (this.shouldConnectInsteadOfCreate(processedPlaceholdersByEntity, fieldState)) {
+			if (this.shouldConnectInsteadOfCreate(fieldState)) {
 				return { connect: { [PRIMARY_KEY_NAME]: runtimeId.value } }
 			}
 
-			const createData = this.getCreateDataInput(processedPlaceholdersByEntity, fieldState)
+			const createData = this.getCreateDataInput(fieldState)
 			if (createData === undefined) {
 				return undefined
 			}
@@ -452,32 +442,29 @@ export class MutationGenerator {
 		}
 
 		const alias = MutationAlias.encodeEntityId(runtimeId)
-		if (this.shouldConnectInsteadOfCreate(processedPlaceholdersByEntity, fieldState)) {
+		if (this.shouldConnectInsteadOfCreate(fieldState)) {
 			// TODO also potentially update
 			return [{ connect: { [PRIMARY_KEY_NAME]: runtimeId.value }, alias }]
 		}
-		const createData = this.getCreateDataInput(processedPlaceholdersByEntity, fieldState)
+		const createData = this.getCreateDataInput(fieldState)
 		if (createData === undefined) {
 			return undefined
 		}
 		return [{ create: createData, alias }]
 	}
 
-	private getCreateManyRelationInput(
-		processedPlaceholdersByEntity: ProcessedPlaceholdersByEntity,
-		fieldState: EntityListState,
-	): Input.CreateManyRelationInput | undefined {
+	private getCreateManyRelationInput(fieldState: EntityListState): Input.CreateManyRelationInput | undefined {
 		const result: Input.CreateManyRelationInput = []
 		for (const entityRealm of fieldState.children.values()) {
 			const runtimeId = entityRealm.entity.id
 			const alias = MutationAlias.encodeEntityId(runtimeId)
-			if (this.shouldConnectInsteadOfCreate(processedPlaceholdersByEntity, entityRealm)) {
+			if (this.shouldConnectInsteadOfCreate(entityRealm)) {
 				result.push({
 					alias,
 					connect: { [PRIMARY_KEY_NAME]: runtimeId.value },
 				})
 			} else {
-				const createData = this.getCreateDataInput(processedPlaceholdersByEntity, entityRealm)
+				const createData = this.getCreateDataInput(entityRealm)
 				if (createData === undefined) {
 					continue
 				}
@@ -490,24 +477,18 @@ export class MutationGenerator {
 		return result.length === 0 ? undefined : result
 	}
 
-	private shouldConnectInsteadOfCreate(
-		processedPlaceholdersByEntity: ProcessedPlaceholdersByEntity,
-		currentState: EntityRealmState | EntityRealmStateStub,
-	): boolean {
+	private shouldConnectInsteadOfCreate(currentState: EntityRealmState | EntityRealmStateStub): boolean {
 		const runtimeId = currentState.entity.id
-		const processedPlaceholders = processedPlaceholdersByEntity.get(currentState.entity)
+		const processedPlaceholders = this.processedPlaceholdersByEntity.get(currentState.entity)
 
 		return runtimeId.existsOnServer || (runtimeId instanceof ClientGeneratedUuid && (processedPlaceholders?.has(PRIMARY_KEY_NAME) ?? false))
 	}
 
-	private getUpdateDataInput(
-		processedPlaceholdersByEntity: ProcessedPlaceholdersByEntity,
-		currentState: EntityRealmState,
-	): Input.UpdateDataInput | undefined {
-		let processedPlaceholders = processedPlaceholdersByEntity.get(currentState.entity)
+	private getUpdateDataInput(currentState: EntityRealmState): Input.UpdateDataInput | undefined {
+		let processedPlaceholders = this.processedPlaceholdersByEntity.get(currentState.entity)
 
 		if (processedPlaceholders === undefined) {
-			processedPlaceholdersByEntity.set(currentState.entity, (processedPlaceholders = new Set()))
+			this.processedPlaceholdersByEntity.set(currentState.entity, (processedPlaceholders = new Set()))
 		}
 
 		const pathBack = this.treeStore.getPathBackToParent(currentState)
@@ -549,14 +530,14 @@ export class MutationGenerator {
 					const persistedValue = entityData?.get?.(placeholderName)?.value
 					if (reducedBy === undefined) {
 
-						const relationData = this.getUpdateOneRelationInput(currentState, fieldState, persistedValue, processedPlaceholdersByEntity, placeholderName)
+						const relationData = this.getUpdateOneRelationInput(currentState, fieldState, persistedValue, placeholderName)
 						if (relationData !== undefined) {
 							result[marker.parameters.field] = relationData
 						}
 
 
 					} else {
-						const relationData = this.getUpdateManyRelationForReducedInput(currentState, fieldState, persistedValue, processedPlaceholdersByEntity, placeholderName, reducedBy)
+						const relationData = this.getUpdateManyRelationForReducedInput(currentState, fieldState, persistedValue, placeholderName, reducedBy)
 						if (relationData !== undefined) {
 							const current = result[marker.parameters.field]
 							if (Array.isArray(current)) {
@@ -582,7 +563,7 @@ export class MutationGenerator {
 					if (!(persistedEntityIds instanceof Set)) {
 						continue
 					}
-					const relationData = this.getUpdateManyRelationInput(fieldState, persistedEntityIds, processedPlaceholdersByEntity)
+					const relationData = this.getUpdateManyRelationInput(fieldState, persistedEntityIds)
 					if (relationData !== undefined) {
 						const current = result[marker.parameters.field]
 						if (Array.isArray(current)) {
@@ -605,7 +586,6 @@ export class MutationGenerator {
 		currentState: EntityRealmState,
 		fieldState: EntityRealmState | EntityRealmStateStub,
 		persistedValue: EntityFieldPersistedValue | undefined,
-		processedPlaceholdersByEntity: ProcessedPlaceholdersByEntity,
 		placeholderName: PlaceholderName,
 	): Input.UpdateOneRelationInput | undefined {
 		const runtimeId = fieldState.entity.id
@@ -615,7 +595,7 @@ export class MutationGenerator {
 				if (fieldState.type === 'entityRealmStub') {
 					return undefined// …unless we're dealing with a stub. There cannot be any updates there.
 				}
-				const input = this.getUpdateDataInput(processedPlaceholdersByEntity, fieldState)
+				const input = this.getUpdateDataInput(fieldState)
 				if (input === undefined) {
 					return undefined
 				}
@@ -628,6 +608,12 @@ export class MutationGenerator {
 
 			const plannedDeletion = currentState.plannedHasOneDeletions?.get(placeholderName)
 			if (plannedDeletion !== undefined) {
+				const key = `${persistedValue.entityName}#${persistedValue.value}`
+				if (this.processedDeletes.has(key)) {
+					return undefined
+				}
+				this.processedDeletes.add(key)
+
 				// It's planned for deletion.
 				// TODO also potentially do something about the current entity
 				return {
@@ -643,7 +629,7 @@ export class MutationGenerator {
 
 			}
 			// The currently present entity doesn't exist on the server. Try if creating yields anything…
-			const createInput = this.getCreateDataInput(processedPlaceholdersByEntity, fieldState)
+			const createInput = this.getCreateDataInput(fieldState)
 			if (createInput !== undefined) {
 				return {
 					create: createInput,
@@ -662,7 +648,7 @@ export class MutationGenerator {
 				connect: { [PRIMARY_KEY_NAME]: runtimeId.value },
 			}
 		} else {
-			const input = this.getCreateDataInput(processedPlaceholdersByEntity, fieldState)
+			const input = this.getCreateDataInput(fieldState)
 			if (input === undefined) {
 				return undefined
 			}
@@ -676,7 +662,6 @@ export class MutationGenerator {
 		currentState: EntityRealmState,
 		fieldState: EntityRealmState | EntityRealmStateStub,
 		persistedValue: EntityFieldPersistedValue | undefined,
-		processedPlaceholdersByEntity: ProcessedPlaceholdersByEntity,
 		placeholderName: PlaceholderName,
 		reducedBy: UniqueWhere,
 	): Input.UpdateManyRelationInput | undefined {
@@ -689,7 +674,7 @@ export class MutationGenerator {
 				if (fieldState.type === 'entityRealmStub') {
 					return undefined
 				}
-				const updateData = this.getUpdateDataInput(processedPlaceholdersByEntity, fieldState)
+				const updateData = this.getUpdateDataInput(fieldState)
 				if (updateData === undefined) {
 					return undefined
 				}
@@ -703,7 +688,11 @@ export class MutationGenerator {
 			}
 			const plannedDeletion = currentState.plannedHasOneDeletions?.get(placeholderName)
 			if (plannedDeletion !== undefined) {
-				// TODO also potentially do something about the current entity
+				const key = `${persistedValue.entityName}#${persistedValue.value}`
+				if (this.processedDeletes.has(key)) {
+					return undefined
+				}
+				this.processedDeletes.add(key)
 				return [{
 					alias,
 					delete: reducedBy,
@@ -723,7 +712,7 @@ export class MutationGenerator {
 					},
 				]
 			}
-			const createInput = this.getCreateDataInput(processedPlaceholdersByEntity, fieldState)
+			const createInput = this.getCreateDataInput(fieldState)
 
 			if (createInput === undefined) {
 				return [{
@@ -741,7 +730,7 @@ export class MutationGenerator {
 				connect: { [PRIMARY_KEY_NAME]: runtimeId.value },
 			}]
 		} else {
-			const createInput = this.getCreateDataInput(processedPlaceholdersByEntity, fieldState)
+			const createInput = this.getCreateDataInput(fieldState)
 			if (createInput === undefined) {
 				return undefined
 			}
@@ -755,7 +744,6 @@ export class MutationGenerator {
 	private getUpdateManyRelationInput(
 		fieldState: EntityListState,
 		persistedEntityIds: Set<EntityId>,
-		processedPlaceholdersByEntity: ProcessedPlaceholdersByEntity,
 	): Input.UpdateManyRelationInput | undefined {
 
 		const input: Input.UpdateManyRelationInput = []
@@ -766,7 +754,7 @@ export class MutationGenerator {
 			if (runtimeId.existsOnServer) {
 				if (persistedEntityIds.has(runtimeId.value)) {
 					if (childState.type !== 'entityRealmStub') {
-						const dataInput = this.getUpdateDataInput(processedPlaceholdersByEntity, childState)
+						const dataInput = this.getUpdateDataInput(childState)
 
 						if (dataInput !== undefined) {
 							input.push({
@@ -785,7 +773,7 @@ export class MutationGenerator {
 					})
 				}
 			} else {
-				const dataInput = this.getCreateDataInput(processedPlaceholdersByEntity, childState)
+				const dataInput = this.getCreateDataInput(childState)
 				if (dataInput !== undefined) {
 					input.push({
 						alias,
@@ -798,6 +786,11 @@ export class MutationGenerator {
 			for (const [removedId, removalType] of fieldState.plannedRemovals) {
 				const alias = MutationAlias.encodeEntityId(new ServerId(removedId, fieldState.entityName))
 				if (removalType === 'delete') {
+					const key = `${fieldState.entityName}#${removedId}`
+					if (this.processedDeletes.has(key)) {
+						continue
+					}
+					this.processedDeletes.add(key)
 
 					input.push({
 						alias,

@@ -25,7 +25,7 @@ test('Content API: X-Contember-Ref header', async () => {
 	)
 		.set('X-Contember-Ref', 'None')
 		.expect(response => {
-			expect(response.body.data).toStrictEqual({
+			assert.deepStrictEqual(response.body.data, {
 				listTag: [],
 			})
 		})

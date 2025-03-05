@@ -1,5 +1,5 @@
 {
-  "version": "1.4.8",
+  "version": "1.4.9",
   "packageManager": "yarn@3.5.1",
   "private": true,
   "scripts": {

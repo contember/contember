@@ -17,49 +17,49 @@ import { RefAttributes } from 'react';
 // @public (undocumented)
 export const BoardCardUI: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLDivElement> & HTMLAttributes<HTMLDivElement> & {
 asChild?: boolean;
-children?: React.ReactNode;
+children?: ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLDivElement>>;
 
 // @public (undocumented)
 export const BoardColumnHandleUI: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLButtonElement> & ButtonHTMLAttributes<HTMLButtonElement> & {
 asChild?: boolean;
-children?: React.ReactNode;
+children?: ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLButtonElement>>;
 
 // @public (undocumented)
 export const BoardColumnHeaderUI: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLDivElement> & HTMLAttributes<HTMLDivElement> & {
 asChild?: boolean;
-children?: React.ReactNode;
+children?: ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLDivElement>>;
 
 // @public (undocumented)
 export const BoardColumnUI: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLDivElement> & HTMLAttributes<HTMLDivElement> & {
 asChild?: boolean;
-children?: React.ReactNode;
+children?: ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLDivElement>>;
 
 // @public (undocumented)
 export const BoardDragOverlayUI: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLDivElement> & HTMLAttributes<HTMLDivElement> & {
 asChild?: boolean;
-children?: React.ReactNode;
+children?: ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLDivElement>>;
 
 // @public (undocumented)
 export const BoardItemHandleUI: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLButtonElement> & ButtonHTMLAttributes<HTMLButtonElement> & {
 asChild?: boolean;
-children?: React.ReactNode;
+children?: ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLButtonElement>>;
 
 // @public (undocumented)
 export const BoardItemsWrapperUI: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLDivElement> & HTMLAttributes<HTMLDivElement> & {
 asChild?: boolean;
-children?: React.ReactNode;
+children?: ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLDivElement>>;
 
@@ -93,7 +93,7 @@ children: ReactNode;
 // @public (undocumented)
 export const BoardWrapperUI: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLDivElement> & HTMLAttributes<HTMLDivElement> & {
 asChild?: boolean;
-children?: React.ReactNode;
+children?: ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLDivElement>>;
 

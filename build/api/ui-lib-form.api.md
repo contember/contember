@@ -103,32 +103,32 @@ export interface FormContainerProps {
 // @public (undocumented)
 export const FormContainerUI: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLDivElement> & HTMLAttributes<HTMLDivElement> & {
 asChild?: boolean;
-children?: React.ReactNode;
+children?: ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLDivElement>>;
 
 // @public (undocumented)
 export const FormDescriptionUI: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLParagraphElement> & HTMLAttributes<HTMLParagraphElement> & {
 asChild?: boolean;
-children?: React.ReactNode;
+children?: ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLParagraphElement>>;
 
 // @public (undocumented)
 export const FormErrorUI: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLParagraphElement> & HTMLAttributes<HTMLParagraphElement> & {
 asChild?: boolean;
-children?: React.ReactNode;
+children?: ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLParagraphElement>>;
 
 // @public (undocumented)
 export const FormLabelUI: ForwardRefExoticComponent<Omit<Omit<LabelProps & RefAttributes<HTMLLabelElement> & {
 asChild?: boolean;
-children?: React.ReactNode;
+children?: ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLLabelElement> & {
 asChild?: boolean;
-children?: React.ReactNode;
+children?: ReactNode;
 className?: string;
 } & {
 required?: boolean | null | undefined;
@@ -137,14 +137,14 @@ required?: boolean | null | undefined;
 // @public (undocumented)
 export const FormLabelWrapperUI: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLDivElement> & HTMLAttributes<HTMLDivElement> & {
 asChild?: boolean;
-children?: React.ReactNode;
+children?: ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLDivElement>>;
 
 // @public (undocumented)
 export const FormLayout: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLDivElement> & HTMLAttributes<HTMLDivElement> & {
 asChild?: boolean;
-children?: React.ReactNode;
+children?: ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLDivElement>>;
 

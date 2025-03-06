@@ -13,7 +13,7 @@ import * as ToastPrimitives from '@radix-ui/react-toast';
 // @public (undocumented)
 export const Toast: React_2.ForwardRefExoticComponent<Omit<ToastPrimitives.ToastProps & React_2.RefAttributes<HTMLLIElement> & {
     asChild?: boolean;
-    children?: React_2.ReactNode;
+    children?: ReactNode;
     className?: string;
 } & {
     variant?: "error" | "success" | "warning" | "info" | null | undefined;
@@ -22,7 +22,7 @@ export const Toast: React_2.ForwardRefExoticComponent<Omit<ToastPrimitives.Toast
 // @public (undocumented)
 export const ToastAction: React_2.ForwardRefExoticComponent<Omit<ToastPrimitives.ToastActionProps & React_2.RefAttributes<HTMLButtonElement> & {
     asChild?: boolean;
-    children?: React_2.ReactNode;
+    children?: ReactNode;
     className?: string;
 }, "ref"> & React_2.RefAttributes<HTMLButtonElement>>;
 
@@ -47,7 +47,7 @@ export interface ToastData {
 // @public (undocumented)
 export const ToastDescription: React_2.ForwardRefExoticComponent<Omit<ToastPrimitives.ToastDescriptionProps & React_2.RefAttributes<HTMLDivElement> & {
     asChild?: boolean;
-    children?: React_2.ReactNode;
+    children?: ReactNode;
     className?: string;
 }, "ref"> & React_2.RefAttributes<HTMLDivElement>>;
 
@@ -100,7 +100,7 @@ export interface ToastOptions {
 // @public (undocumented)
 export const ToastTitle: React_2.ForwardRefExoticComponent<Omit<ToastPrimitives.ToastTitleProps & React_2.RefAttributes<HTMLDivElement> & {
     asChild?: boolean;
-    children?: React_2.ReactNode;
+    children?: ReactNode;
     className?: string;
 }, "ref"> & React_2.RefAttributes<HTMLDivElement>>;
 

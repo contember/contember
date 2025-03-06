@@ -116,10 +116,9 @@ export const SidebarProvider = ({
 SidebarProvider.displayName = 'SidebarProvider'
 
 export const SidebarLayout = uic('div', {
-	baseClass: 'group/sidebar-wrapper grid min-h-svh w-full has-[[data-variant=inset]]:bg-sidebar max-h-screen max-w-[100vw] overflow-y-auto',
+	baseClass: 'group/sidebar-wrapper grid min-h-svh w-full has-[[data-variant=inset]]:bg-sidebar max-h-screen max-w-[100vw] overflow-y-auto md:grid-cols-[auto_1fr_auto]',
 	// Add grid template columns
 	style: {
-		'gridTemplateColumns': 'auto 1fr auto', // This creates two columns: one for sidebar, one for content
 		'--sidebar-width': SIDEBAR_WIDTH,
 		'--sidebar-width-large': SIDEBAR_WIDTH_LARGE,
 		'--sidebar-width-icon': SIDEBAR_WIDTH_ICON,

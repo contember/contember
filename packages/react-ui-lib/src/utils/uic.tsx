@@ -2,9 +2,9 @@ import { dataAttribute } from '@contember/utilities'
 import { Slot } from '@radix-ui/react-slot'
 import { cva } from 'class-variance-authority'
 import { ClassValue, clsx } from 'clsx'
-import * as React from 'react'
-import { ComponentType, ReactElement, ReactNode } from 'react'
+import { ComponentType, createElement, forwardRef, ReactNode, useMemo } from 'react'
 import { twMerge } from 'tailwind-merge'
+import { useObjectMemo } from '@contember/react-utils'
 
 type StringToBoolean<T> = T extends 'true' | 'false' ? boolean : T
 type ConfigSchema = Record<string, Record<string, ClassValue>>
@@ -33,8 +33,8 @@ type Config<T extends ConfigSchema | undefined, El extends React.ElementType> = 
 	displayName?: string
 	wrapOuter?: ComponentType<{ children?: ReactNode } & ConfigVariants<T>>
 	wrapInner?: ComponentType<{ children?: ReactNode } & ConfigVariants<T>>
-	beforeChildren?: ReactElement
-	afterChildren?: ReactElement
+	beforeChildren?: ReactNode
+	afterChildren?: ReactNode
 	style?: React.CSSProperties
 }
 
@@ -42,70 +42,77 @@ export const uiconfig = <T extends ConfigSchema | undefined>(config: Config<T, C
 
 export type NoInfer<T> = T & { [K in keyof T]: T[K] }
 
-const falsyToString = (value: any) => typeof value === 'boolean' ? `${value}` : value === 0 ? '0' : value
 export const uic = <El extends React.ElementType, Variants extends ConfigSchema | undefined = undefined>(Component: El, config: Config<Variants, NoInfer<El>>) => {
 	const cls = cva<any>(config?.baseClass as any, {
 		variants: config?.variants,
 		defaultVariants: config?.defaultVariants,
 		compoundVariants: config?.compoundVariants,
 	})
+	const passVariantProps = config?.passVariantProps ? new Set(config.passVariantProps) : undefined
 
-	const component = React.forwardRef<React.ElementRef<El>, React.ComponentProps<El> & {
+	const component = forwardRef<React.ElementRef<El>, React.ComponentProps<El> & {
 		asChild?: boolean
-		children?: React.ReactNode
+		children?: ReactNode
 		className?: string
 	} & ConfigVariants<Variants>>((props, ref) => {
 		const { className: classNameProp, children: childrenBase, ...rest } = props
 
+		const variants: Record<string, string> = {}
+
 		for (const key in config?.variants) {
-			if (key in rest && !config?.passVariantProps?.includes(key)) {
+			variants[key] = (rest as any)[key]
+			if (key in rest && !passVariantProps?.has(key)) {
 				delete (rest as any)[key]
 			}
 		}
+
+		const variantsMemoized = useObjectMemo(variants)
 
 		const dataAttrs: Partial<Record<DataAttr<Variants>, DataAttrValue>> = {}
 		if (config?.variantsAsDataAttrs && config.variants) {
 			for (const key of config.variantsAsDataAttrs) {
 				const keyAsString = key.toString()
-				const variantValue = rest[key as any] ?? falsyToString(config.defaultVariants?.[key])
+				const variantValue = rest[key as any] ?? (config.defaultVariants?.[key] as string | null | undefined | boolean)
 
 				dataAttrs[`data-${keyAsString}` as DataAttr<Variants>] = dataAttribute(variantValue)
 			}
 		}
+		const style = useMemo(() => config?.style ? { ...config.style, ...(rest.style || {}) } : rest.style, [rest.style])
+		const finalClassName = useMemo(() => twMerge(clsx(cls(variantsMemoized), classNameProp)), [variantsMemoized, classNameProp])
 
-		let Comp: React.ElementType = Component
+		let FinalComponent: React.ElementType = Component
 		if (props.asChild && typeof Component === 'string') {
-			Comp = Slot
+			FinalComponent = Slot
 			delete (rest as any).asChild
 		}
 
 		let children = childrenBase
 		if (config?.wrapInner) {
-			children = React.createElement(config.wrapInner, props as any, children)
+			children = createElement(config.wrapInner, props as any, children)
 		}
 
 		if (config?.beforeChildren || config?.afterChildren) {
-			children = <>
-				{config?.beforeChildren}
-				{children}
-				{config?.afterChildren}
-			</>
+			children = [
+				config?.beforeChildren,
+				children,
+				config?.afterChildren,
+			]
 		}
 
-		const style = config?.style ? { ...config.style, ...(rest.style || {}) } : rest.style
 
-		const innerEl =
-			<Comp
+		const innerEl = (
+			<FinalComponent
 				ref={ref}
-				className={twMerge(clsx(cls(props), classNameProp))}
+				className={finalClassName}
 				{...(config.defaultProps ?? {})}
 				{...dataAttrs}
 				{...rest}
 				style={style}
 			>
 				{children}
-			</Comp>
-		return config?.wrapOuter ? React.createElement(config.wrapOuter, props as any, innerEl) : innerEl
+			</FinalComponent>
+		)
+		return config?.wrapOuter ? createElement(config.wrapOuter, props as any, innerEl) : innerEl
 	})
 	component.displayName = config?.displayName
 

@@ -7,4 +7,7 @@ export type CommonContext = {
 	enumRegistry: EnumRegistry
 	entityRegistry: EntityRegistry
 	strictDefinitionValidator: StrictDefinitionValidator
+	options: {
+		defaultCollation?: string
+	}
 }

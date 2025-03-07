@@ -3,7 +3,7 @@ import { c } from '@contember/schema-definition'
 export const GridArticleState = c.createEnum('published', 'draft', 'archived')
 
 export class GridArticle {
-	title = c.stringColumn()
+	title = c.stringColumn().collation('und-x-icu')
 	slug = c.stringColumn().notNull().unique()
 	state = c.enumColumn(GridArticleState)
 	target = c.enumColumn(c.createEnum('a', 'b', 'c')).list()
@@ -19,7 +19,7 @@ export class GridArticle {
 }
 
 export class GridTag {
-	name = c.stringColumn().notNull()
+	name = c.stringColumn().notNull().collation('cs-x-icu')
 	slug = c.stringColumn().notNull().unique()
 }
 

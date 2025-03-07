@@ -133,6 +133,7 @@ const columnSchema = Typesafe.intersection(
 		list: Typesafe.boolean,
 		default: Typesafe.anyJson,
 		sequence: intersectionSchema as Typesafe.Type<Model.AnyColumn['sequence']>,
+		collation: Typesafe.string as Typesafe.Type<Model.AnyColumn['collation']>,
 	}),
 )
 const columnSchemaCheck: Typesafe.Equals<Model.AnyColumn, ReturnType<typeof columnSchema>> = true

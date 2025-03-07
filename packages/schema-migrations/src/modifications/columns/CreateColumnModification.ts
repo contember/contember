@@ -33,6 +33,7 @@ export class CreateColumnModificationHandler implements ModificationHandler<Crea
 				type: columnType,
 				notNull: !column.nullable && seedExpression === null,
 				sequenceGenerated: column.sequence,
+				collation: column.collation,
 			},
 		})
 

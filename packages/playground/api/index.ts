@@ -18,4 +18,6 @@ export default createSchema(model, schema => ({
 		},
 	},
 	settings: settingsPresets.latest,
-}))
+}), {
+	// defaultCollation: 'und-x-icu',
+})

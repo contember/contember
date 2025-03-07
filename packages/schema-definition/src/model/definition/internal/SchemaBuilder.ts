@@ -18,6 +18,9 @@ export class SchemaBuilder {
 	constructor(
 		private readonly conventions: NamingConventions,
 		private readonly strictDefinitionValidator: StrictDefinitionValidator = new StrictDefinitionValidator({}),
+		private readonly options: {
+			defaultCollation?: string
+		},
 	) {}
 
 	public addEntity(name: string, entity: EntityConstructor): void {
@@ -52,6 +55,7 @@ export class SchemaBuilder {
 						enumRegistry: this.enumRegistry,
 						entityRegistry: this.entityRegistry,
 						strictDefinitionValidator: this.strictDefinitionValidator,
+						options: this.options,
 					})
 				})
 				.reduce<Model.Entity['fields']>((acc, field) => {
@@ -82,6 +86,7 @@ export class SchemaBuilder {
 				conventions: this.conventions,
 				enumRegistry: this.enumRegistry,
 				strictDefinitionValidator: this.strictDefinitionValidator,
+				options: this.options,
 			})
 		})
 

@@ -115,6 +115,7 @@ export class ImportExecutor {
 		const mapping = this.contentSchemaTransferMappingFactory.createContentSchemaMapping(contentSchema.schema)
 
 		return await contentDatabaseClient.transaction(async db => {
+			await this.disableStatementTimeout(db)
 			await this.disableTriggers(db, options.tables)
 			await this.lockTables(db, options.tables)
 			await this.truncateTables(db, options.tables)
@@ -149,6 +150,7 @@ export class ImportExecutor {
 		const mapping = this.systemSchemaTransferMappingFactory.build()
 
 		return await systemDatabaseContext.client.transaction(async db => {
+			await this.disableStatementTimeout(db)
 			await this.truncateTables(db, options.tables)
 
 			const metadata = await this.databaseMetadataResolver.resolveMetadata(db, db.schema)
@@ -282,6 +284,11 @@ export class ImportExecutor {
 	private async truncateTables(db: Client, tableNames: readonly string[]) {
 		const tableNamesQuoted = tableNames.map(it => `${wrapIdentifier(db.schema)}.${wrapIdentifier(it)}`)
 		await db.query(`TRUNCATE ${tableNamesQuoted.join(', ')}`)
+	}
+
+
+	private async disableStatementTimeout(db: Client) {
+		await db.query('SET LOCAL statement_timeout = 0')
 	}
 
 	private async insertRows(db: Client, context: InsertContext) {

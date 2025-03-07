@@ -46,7 +46,7 @@ export class MigrationStatusCommand extends Command<Args, Options> {
 		const onlyToExecute = input.getOption('only-to-execute')
 		const restoreMissing = input.getOption('restore-missing')
 
-		let status = await this.migrationsStatusFacade.resolveMigrationsStatus({})
+		let status = await this.migrationsStatusFacade.resolveMigrationsStatus({ allowError: true })
 
 		if (restoreMissing) {
 			const missing = status.errorMigrations.filter(it => it.state === MigrationState.EXECUTED_MISSING)

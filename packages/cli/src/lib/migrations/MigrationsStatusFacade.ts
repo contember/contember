@@ -11,11 +11,11 @@ export class MigrationsStatusFacade {
 	}
 
 
-	public resolveMigrationsStatus = async ({ force }: { force?: boolean }) => {
+	public resolveMigrationsStatus = async ({ force, allowError }: { force?: boolean; allowError?: boolean }) => {
 		const executedMigrations = await this.systemClientProvider.get().listExecutedMigrations()
 		const localMigrations = await this.migrationsResolver.getMigrationFiles()
 		const status = await this.migrationsStatusResolver.getMigrationsStatus(executedMigrations, localMigrations, force)
-		if (status.errorMigrations.length > 0) {
+		if (status.errorMigrations.length > 0 && !allowError) {
 			console.error(createMigrationStatusTable(status.errorMigrations))
 			if (!force) {
 				throw `Cannot execute migrations`

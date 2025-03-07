@@ -38,7 +38,7 @@ export const RepeaterDropIndicator: ({ position }: {
 // @public
 export const RepeaterItemActions: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLDivElement> & HTMLAttributes<HTMLDivElement> & {
 asChild?: boolean;
-children?: React.ReactNode;
+children?: ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLDivElement>>;
 

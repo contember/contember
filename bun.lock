@@ -79,7 +79,7 @@
       "name": "@contember/cli",
       "version": "2.1.0-alpha.1",
       "bin": {
-        "contember": "./dist/production/run.js"
+        "contember": "./dist/production/run.js",
       },
       "dependencies": {
         "@contember/cli-common": "workspace:*",
@@ -161,7 +161,7 @@
       "name": "@contember/client-content-generator",
       "version": "2.1.0-alpha.1",
       "bin": {
-        "contember-client-generator": "./dist/production/generate.cjs"
+        "contember-client-generator": "./dist/production/generate.cjs",
       },
       "dependencies": {
         "@contember/client-content": "workspace:*",

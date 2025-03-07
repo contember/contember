@@ -1,0 +1,27 @@
+{
+	"formatVersion": 6,
+	"modifications": [
+		{
+			"modification": "updateColumnDefinition",
+			"entityName": "GridArticle",
+			"fieldName": "title",
+			"definition": {
+				"columnType": "text",
+				"nullable": true,
+				"type": "String",
+				"collation": "und-x-icu"
+			}
+		},
+		{
+			"modification": "updateColumnDefinition",
+			"entityName": "GridTag",
+			"fieldName": "name",
+			"definition": {
+				"columnType": "text",
+				"nullable": false,
+				"type": "String",
+				"collation": "cs-x-icu"
+			}
+		}
+	]
+}

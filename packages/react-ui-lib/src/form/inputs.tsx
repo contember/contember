@@ -29,10 +29,10 @@ export type InputFieldProps =
 		inputProps?: ComponentProps<typeof Input>
 	}
 
-export const InputField = Component(({ field, label, description, inputProps, isNonbearing, defaultValue, required }: InputFieldProps) => (
+export const InputField = Component(({ field, label, description, inputProps, isNonbearing, defaultValue, required, parseValue, formatValue }: InputFieldProps) => (
 	<FormFieldScope field={field}>
 		<FormContainer description={description} label={label} required={required}>
-			<FormInput field={field} isNonbearing={isNonbearing} defaultValue={defaultValue}>
+			<FormInput field={field} isNonbearing={isNonbearing} defaultValue={defaultValue} parseValue={parseValue} formatValue={formatValue}>
 				<Input required={required} {...(inputProps ?? {})} className={cn('max-w-md', inputProps?.className)} />
 			</FormInput>
 		</FormContainer>

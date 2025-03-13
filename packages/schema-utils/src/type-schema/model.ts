@@ -156,6 +156,7 @@ const viewSchemaInner = Typesafe.intersection(
 	Typesafe.partial({
 		dependencies: Typesafe.array(Typesafe.string),
 		idSource: Typesafe.array(Typesafe.string),
+		materialized: Typesafe.boolean,
 	}),
 )
 const viewSchemaCheck: Typesafe.Equals<Model.View, ReturnType<typeof viewSchemaInner>> = true

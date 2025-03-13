@@ -20,6 +20,7 @@ export namespace Model {
 		readonly sql: string
 		readonly dependencies?: readonly string[]
 		readonly idSource?: readonly string[]
+		readonly materialized?: boolean
 	}
 
 	export type EventLogConfig = {

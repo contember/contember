@@ -17,11 +17,16 @@ export class RemoveUniqueConstraintModificationHandler implements ModificationHa
 
 	public createSql(builder: MigrationBuilder, { databaseMetadata, invalidateDatabaseMetadata }: ModificationHandlerCreateSqlOptions): void {
 		const entity = this.schema.model.entities[this.data.entityName]
-		if (entity.view) {
+		const unique = this.getUnique()
+
+		const shouldExecuteSql =
+			!entity.view
+			|| (unique.index && entity.view.materialized)
+
+		if (!shouldExecuteSql) {
 			return
 		}
 
-		const unique = this.getUnique()
 
 		const columns = getUniqueConstraintColumns({
 			entity,

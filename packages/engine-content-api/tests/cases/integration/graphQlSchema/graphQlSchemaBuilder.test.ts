@@ -29,7 +29,7 @@ const testSchema = async (test: Test) => {
 	const schema = schemaResult instanceof SchemaBuilder ? schemaResult.buildSchema() : schemaResult
 	const schemaWithAcl = { ...schema, acl: { roles: {}, variables: {} } }
 	const permissions = test.permissions(schemaWithAcl)
-	const authorizator = new Authorizator(permissions, false)
+	const authorizator = new Authorizator(permissions, false, false)
 	const graphQlSchemaBuilder = schemaFactory.create(schemaWithAcl, authorizator)
 	const graphQlSchema = graphQlSchemaBuilder.build()
 

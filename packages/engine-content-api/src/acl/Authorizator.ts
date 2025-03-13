@@ -7,6 +7,7 @@ export class Authorizator {
 	constructor(
 		private readonly permissions: Acl.Permissions,
 		private readonly defaultCustomPrimary: boolean,
+		private readonly allowRefreshMaterializedView: boolean,
 	) {
 	}
 
@@ -55,5 +56,9 @@ export class Authorizator {
 
 	isRootOperationDisallowed(entity: string, operation: Acl.Operation): boolean {
 		return this.permissions?.[entity]?.operations?.noRoot?.includes(operation) ?? false
+	}
+
+	isRefreshMaterializedViewAllowed(entity: string): boolean {
+		return this.permissions?.[entity]?.operations?.refreshMaterializedView ?? this.allowRefreshMaterializedView
 	}
 }

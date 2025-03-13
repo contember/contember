@@ -13,7 +13,13 @@ export class CreateViewModificationHandler implements ModificationHandler<Create
 		if (!entity.view) {
 			throw new Error()
 		}
-		builder.createView(entity.tableName, {}, entity.view.sql)
+		if (entity.view.materialized) {
+			builder.createMaterializedView(entity.tableName, {
+				data: this.data.noData !== true,
+			}, entity.view.sql)
+		} else {
+			builder.createView(entity.tableName, {}, entity.view.sql)
+		}
 	}
 
 	public getSchemaUpdater(): SchemaUpdater {
@@ -58,7 +64,11 @@ export class CreateViewDiffer implements Differ {
 				cascadeCreate(updatedSchema.model.entities[dependency])
 			}
 			modifications.push(createViewModification.createModification({
-				entity: entity,
+				entity: {
+					...entity,
+					indexes: [],
+					unique: [],
+				},
 			}))
 		}
 		for (const view of newViews) {
@@ -70,4 +80,5 @@ export class CreateViewDiffer implements Differ {
 
 export interface CreateViewModificationData {
 	entity: PossibleEntityShapeInMigrations
+	noData?: boolean
 }

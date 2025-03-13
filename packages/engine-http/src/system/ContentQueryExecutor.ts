@@ -20,7 +20,7 @@ export class ContentQueryExecutorImpl implements ContentQueryExecutor {
 
 	public async execute({ db, schema, schemaMeta, databaseMetadata, stage, project, identity }: ContentQueryExecutorContext, { query, variables }: ContentQueryExecutorQuery): Promise<ContentQueryExecutorResult> {
 		const permissions = new AllowAllPermissionFactory().create(schema.model, true)
-		const authorizator = new Authorizator(permissions, true)
+		const authorizator = new Authorizator(permissions, true, false)
 		const dataSchemaBuilder = this.graphqlSchemaBuilderFactory.create(schema.model, authorizator)
 		const dataSchema = dataSchemaBuilder.build()
 

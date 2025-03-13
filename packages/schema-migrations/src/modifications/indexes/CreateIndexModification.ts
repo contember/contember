@@ -16,7 +16,7 @@ export class CreateIndexModificationHandler implements ModificationHandler<Creat
 
 	public createSql(builder: MigrationBuilder, { databaseMetadata, invalidateDatabaseMetadata }: ModificationHandlerCreateSqlOptions): void {
 		const entity = this.schema.model.entities[this.data.entityName]
-		if (entity.view) {
+		if (entity.view && !entity.view.materialized) {
 			return
 		}
 		const fields = this.data.index.fields

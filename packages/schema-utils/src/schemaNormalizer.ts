@@ -24,6 +24,7 @@ export const normalizeSchema = <S extends Schema>(schema: S): S => {
 					content: {
 						export: true,
 						import: true,
+						refreshMaterializedView: true,
 						...adminRoleDefinition.content,
 					},
 					system: {
@@ -47,6 +48,7 @@ export const normalizeSchema = <S extends Schema>(schema: S): S => {
 					content: {
 						export: true,
 						import: true,
+						refreshMaterializedView: true,
 						...contentAdminRoleDefinition.content,
 					},
 					system: {

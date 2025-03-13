@@ -73,7 +73,11 @@ export class ProjectPrintSchemaCommand extends Command<Args, Options> {
 		const schemaNormalized = input.getOption('normalize') ? normalizeSchema(filteredSchema) : filteredSchema
 		const permissions = permissionFactory.create(schemaNormalized, inputRoles || ['admin'])
 		const schemaBuilderFactory = new GraphQlSchemaBuilderFactory()
-		const authorizator = new Authorizator(permissions, schemaNormalized.acl.customPrimary ?? false)
+		const authorizator = new Authorizator(
+			permissions,
+			schemaNormalized.acl.customPrimary ?? false,
+			Object.values(schemaNormalized.acl.roles).some(it => it.content?.refreshMaterializedView),
+		)
 		const introspection = new IntrospectionSchemaFactory(
 			schemaNormalized.model,
 			new EntityRulesResolver(schemaNormalized.validation, schemaNormalized.model),

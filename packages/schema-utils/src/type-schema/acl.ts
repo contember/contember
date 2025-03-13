@@ -39,6 +39,7 @@ const contentPermissionsSchema = Typesafe.partial({
 	assumeMembership: membershipMatchRuleSchema,
 	export: Typesafe.boolean,
 	import: Typesafe.boolean,
+	refreshMaterializedView: Typesafe.boolean,
 })
 const contentSchemaCheck: Typesafe.Equals<Acl.ContentPermissions, ReturnType<typeof contentPermissionsSchema>> = true
 
@@ -95,6 +96,7 @@ const entityOperationsSchema = Typesafe.partial({
 	update: fieldPermissionsSchema,
 	delete: Typesafe.union(Typesafe.string, Typesafe.boolean),
 	customPrimary: Typesafe.boolean,
+	refreshMaterializedView: Typesafe.boolean,
 	noRoot: Typesafe.array(Typesafe.enumeration('create', 'read', 'update', 'delete')),
 })
 

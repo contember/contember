@@ -24,6 +24,7 @@ export class UpdateColumnDefinitionModificationHandler implements ModificationHa
 		const columnType = getColumnSqlType(newColumn)
 		const hasNewType = columnType !== oldColumnType
 		const hasNullableChanged = oldColumn.nullable !== newColumn.nullable
+		const hasNewCollation = newColumn.collation !== oldColumn.collation
 
 		const columnNameWrapped = wrapIdentifier(oldColumn.columnName)
 		const isChangedToArray = !oldColumn.list && newColumn.list
@@ -41,7 +42,8 @@ export class UpdateColumnDefinitionModificationHandler implements ModificationHa
 		const migrateWithUpdate = hasSeed && this.data.valueMigrationStrategy !== 'using'
 
 		builder.alterColumn(entity.tableName, oldColumn.columnName, {
-			type: hasNewSequence || hasNewType || migrateWithUsing ? columnType : undefined,
+			collation: hasNewCollation ? wrapIdentifier(newColumn.collation || 'default') : undefined,
+			type: hasNewCollation || hasNewSequence || hasNewType || migrateWithUsing ? columnType : undefined,
 			notNull: hasNullableChanged && (!migrateWithUpdate || newColumn.nullable) ? !newColumn.nullable : undefined,
 			using: (() => {
 				if (hasNewSequence) {

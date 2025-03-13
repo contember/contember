@@ -16,7 +16,7 @@
     "postcss": "^8",
     "tailwindcss": "^3",
     "tailwindcss-animate": "^1.0.7",
-    "vite": "^5"
+    "vite": "^6"
   },
   "dependencies": {
     "@contember/client-content": "{version}",

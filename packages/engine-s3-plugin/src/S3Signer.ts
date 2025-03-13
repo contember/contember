@@ -48,7 +48,7 @@ export class S3Signer {
 		const parts = ['AWS4-HMAC-SHA256', nowFormatted, this.getScope(nowFormatted), hash(canonicalRequest)]
 
 		const signature = [nowFormatted.substring(0, 8), this.region, 's3', 'aws4_request', parts.join('\n')]
-			.reduce((acc, x) => hmac(acc, x), Buffer.from('AWS4' + this.config.credentials.secret))
+			.reduce<Buffer>((acc, x) => hmac(acc, x), Buffer.from('AWS4' + this.config.credentials.secret))
 			.toString('hex')
 		return uris.endpoint + path + '?' + (queryString + '&X-Amz-Signature=' + signature).split('&').sort().join('&')
 	}

@@ -97,6 +97,8 @@ jobs:
           DEFAULT_DB_PASSWORD: postgres
           DEFAULT_DB_USER: postgres
           DEFAULT_DB_PORT: 5432
+          DEFAULT_DB_STATEMENT_TIMEOUT_MS: 3000
+          DEFAULT_DB_QUERY_TIMEOUT_MS: 3000
           TENANT_DB_NAME: test_tenant
           CONTEMBER_PORT: 4000
           CONTEMBER_MONITORING_PORT: 4001

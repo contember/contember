@@ -54,8 +54,15 @@ export class ColumnDefinition extends FieldDefinition<ColumnDefinitionOptions> {
 		return this.withOption('typeAlias', alias)
 	}
 
-	createField({ name, conventions, enumRegistry, entityName }: CreateFieldContext): Model.AnyField {
-		const { type, nullable, columnName, enumDefinition, default: defaultValue, columnType, typeAlias, sequence, list } = this.options
+	/**
+	 * Collation for string columns
+	 */
+	public collation(collation: Model.Collation): ColumnDefinition {
+		return this.withOption('collation', collation)
+	}
+
+	createField({ name, conventions, enumRegistry, entityName, options }: CreateFieldContext): Model.AnyField {
+		const { type, nullable, columnName, enumDefinition, default: defaultValue, columnType, typeAlias, sequence, list, collation = options.defaultCollation } = this.options
 		const common = {
 			name: name,
 			columnName: columnName || conventions.getColumnName(name),
@@ -63,6 +70,7 @@ export class ColumnDefinition extends FieldDefinition<ColumnDefinitionOptions> {
 			...(list ? { list } : {}),
 			...(defaultValue !== undefined ? { default: defaultValue } : {}),
 			...(sequence !== undefined ? { sequence } : {}),
+			...(type === Model.ColumnType.String && collation !== undefined ? { collation } : {}),
 		}
 		if (type === Model.ColumnType.Enum) {
 			if (typeAlias) {
@@ -155,4 +163,6 @@ export type ColumnDefinitionOptions = {
 	nullable?: boolean
 	default?: Model.ColumnTypeDefinition['default']
 	sequence?: Model.ColumnTypeDefinition['sequence']
+	collation?: Model.Collation
 } & ColumnTypeOptions
+

@@ -60,7 +60,7 @@
     "@types/koa-bodyparser": "^4.3.12",
     "@types/koa__cors": "^5.0.0",
     "@types/lru-cache": "^7.10.10",
-    "@types/node": "^20.16.11",
+    "@types/node": "^20.17.22",
     "@types/ws": "^8.5.12",
     "graphql": "^16.9.0"
   },

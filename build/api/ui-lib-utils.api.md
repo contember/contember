@@ -5,10 +5,13 @@
 ```ts
 
 import { ClassValue } from 'clsx';
+import { ComponentProps } from 'react';
 import { ComponentType } from 'react';
-import * as React_2 from 'react';
-import { ReactElement } from 'react';
+import { ElementRef } from 'react';
+import { ForwardRefExoticComponent } from 'react';
+import { PropsWithoutRef } from 'react';
 import { ReactNode } from 'react';
+import { RefAttributes } from 'react';
 
 // @public (undocumented)
 export const cn: (...inputs: ClassValue[]) => string;
@@ -30,14 +33,14 @@ export { NoInfer_2 as NoInfer }
 // Warning: (ae-forgotten-export) The symbol "Config" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
-export const uic: <El extends React_2.ElementType, Variants extends ConfigSchema | undefined = undefined>(Component: El, config: Config<Variants, NoInfer_2<El>>) => React_2.ForwardRefExoticComponent<React_2.PropsWithoutRef<React_2.ComponentProps<El> & {
-    asChild?: boolean;
-    children?: React_2.ReactNode;
-    className?: string;
-} & ConfigVariants<Variants>> & React_2.RefAttributes<React_2.ElementRef<El>>>;
+export const uic: <El extends React.ElementType, Variants extends ConfigSchema | undefined = undefined>(Component: El, config: Config<Variants, NoInfer_2<El>>) => ForwardRefExoticComponent<PropsWithoutRef<ComponentProps<El> & {
+asChild?: boolean;
+children?: ReactNode;
+className?: string;
+} & ConfigVariants<Variants>> & RefAttributes<ElementRef<El>>>;
 
 // @public (undocumented)
-export const uiconfig: <T extends ConfigSchema | undefined>(config: Config<T, ComponentType<{}>>) => Config<T, React_2.ComponentType<{}>>;
+export const uiconfig: <T extends ConfigSchema | undefined>(config: Config<T, ComponentType<{}>>) => Config<T, ComponentType<{}>>;
 
 // (No @packageDocumentation comment for this package)
 

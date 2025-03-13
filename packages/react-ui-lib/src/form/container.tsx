@@ -20,6 +20,7 @@ export const FormContainer = Component(({ children, description, label, required
 	const errorsList = Array.isArray(errors) ? errors : []
 	const state = useFormFieldState()
 	label ??= <FormFieldLabel />
+	const errorFormatter = useErrorFormatter()
 
 	const inner = <>
 		<FormContainerUI>
@@ -36,7 +37,7 @@ export const FormContainer = Component(({ children, description, label, required
 			{(description || errorsNode || state?.errors?.length || errorsList?.length) ? <div>
 				{description && <FormDescriptionUI>{description}</FormDescriptionUI>}
 
-				<FormError formatter={useErrorFormatter()}>
+				<FormError formatter={errorFormatter}>
 					<FormErrorUI />
 				</FormError>
 				{errorsNode}

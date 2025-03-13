@@ -26,10 +26,12 @@ export type ModelDefinition<M> = {
 
 export function createModel<M extends ModelDefinition<M>>(definitions: M, options: {
 	strictDefinitionValidator?: StrictDefinitionValidator
+	defaultCollation?: string
 } = {}): Model.Schema {
 	const schemaBuilder = new SchemaBuilder(
 		new DefaultNamingConventions(),
 		options.strictDefinitionValidator,
+		{ defaultCollation: options.defaultCollation },
 	)
 	for (const [name, definition] of Object.entries(definitions)) {
 		if (definition instanceof EnumDefinition) {

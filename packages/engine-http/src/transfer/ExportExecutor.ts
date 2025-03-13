@@ -68,6 +68,7 @@ export class ExportExecutor {
 		// eslint-disable-next-line @typescript-eslint/no-this-alias
 		const that = this
 		yield* asyncIterableTransaction(db, async function* (db) {
+			await db.query('SET LOCAL statement_timeout = 0')
 			await db.query('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ ONLY DEFERRABLE')
 			for (const table of Object.values(mapping.tables)) {
 				yield* that.exportSequences(db, table)

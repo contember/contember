@@ -4,14 +4,13 @@ import { getEntity } from '@contember/schema-utils'
 import { EntityPredicatesResolver } from './EntityPredicateResolver'
 import { AllowDefinition } from '../permissions'
 import {
-	allowCustomPrimaryAllRolesStore,
-	allowCustomPrimaryStore,
 	allowDefinitionsStore,
 	EntityPermissionsDefinition,
 } from './stores'
 import { Role } from '../roles'
 import {  VariableDefinition } from '../variables'
 import { filterEntityDefinition } from '../../../utils'
+import { applyEntityAclExtensions } from '../aclExtensions'
 
 export class AclFactory {
 	constructor(
@@ -36,7 +35,7 @@ export class AclFactory {
 					{
 						...role.options,
 						stages: role.options.stages ?? '*',
-						entities: this.createPermissions(rolePermissions),
+						entities: this.createPermissions(rolePermissions, Object.fromEntries(entityLikeDefinition), role),
 						variables: this.createVariables(role, variables),
 					},
 				]
@@ -44,46 +43,49 @@ export class AclFactory {
 		}
 	}
 
-	private createPermissions(rolePermissions: PermissionsByEntity | undefined): Acl.Permissions {
-		if (!rolePermissions) {
-			return {}
+	private createPermissions(rolePermissions: PermissionsByEntity | undefined, entityLikeDefinition: Record<string, { new(): any }>, role: Role): Acl.Permissions {
+		return Object.fromEntries(Object.values(this.model.entities).map((entity): [string, Acl.EntityPermissions] | undefined => {
+			const permissions = rolePermissions ? this.createPermissionsFromAllow(rolePermissions, entity) : { predicates: {}, operations: {} }
+			const isEmpty = rolePermissions === undefined
+			const withExtensions = applyEntityAclExtensions(entityLikeDefinition[entity.name], { entity, permissions, role })
+			if (isEmpty && withExtensions === permissions) {
+				return undefined
+			}
+			return [
+				entity.name,
+				withExtensions,
+			]
+		}).filter(<T>(it: T | undefined): it is T => it !== undefined))
+	}
+
+	private createPermissionsFromAllow(rolePermissions: PermissionsByEntity, entity: Model.Entity): Acl.EntityPermissions {
+		const predicatesResolver = EntityPredicatesResolver.create(rolePermissions, this.model, entity)
+
+		const entityOperations: Writable<Acl.EntityOperations> = {}
+		const noRootOptions = this.getNoRootOptions(entity, rolePermissions.get(entity.name))
+		if (noRootOptions?.length) {
+			entityOperations.noRoot = noRootOptions
 		}
-		return Object.fromEntries(Array.from(rolePermissions.keys()).map((entityName): [string, Acl.EntityPermissions] => {
-			const entity = getEntity(this.model, entityName)
-
-			const predicatesResolver = EntityPredicatesResolver.create(rolePermissions, this.model, entity)
-
-			const entityOperations: Writable<Acl.EntityOperations> = {
-			}
-			const noRootOptions = this.getNoRootOptions(entity, rolePermissions.get(entityName))
-			if (noRootOptions?.length) {
-				entityOperations.noRoot = noRootOptions
-			}
-			for (const op of ['create', 'update', 'read'] as const) {
-				const fieldPermissions: Writable<Acl.FieldPermissions> = {}
-				for (const field of Object.keys(entity.fields)) {
-					const predicate = predicatesResolver.createFieldPredicate(op, field, field === entity.primary)
-					if (predicate !== undefined) {
-						fieldPermissions[field] = predicate
-					}
-				}
-				if (Object.keys(fieldPermissions).length > 0) {
-					entityOperations[op] = fieldPermissions
+		for (const op of ['create', 'update', 'read'] as const) {
+			const fieldPermissions: Writable<Acl.FieldPermissions> = {}
+			for (const field of Object.keys(entity.fields)) {
+				const predicate = predicatesResolver.createFieldPredicate(op, field, field === entity.primary)
+				if (predicate !== undefined) {
+					fieldPermissions[field] = predicate
 				}
 			}
-			const delPredicate = predicatesResolver.createFieldPredicate('delete', '', false)
-			if (delPredicate !== undefined) {
-				entityOperations.delete = delPredicate
+			if (Object.keys(fieldPermissions).length > 0) {
+				entityOperations[op] = fieldPermissions
 			}
-			if (rolePermissions.get(entityName)?.allowCustomPrimary) {
-				entityOperations.customPrimary = true
-			}
-			return [entityName, {
-				predicates: predicatesResolver.getUsedPredicates(),
-				operations: entityOperations,
-
-			}]
-		}))
+		}
+		const delPredicate = predicatesResolver.createFieldPredicate('delete', '', false)
+		if (delPredicate !== undefined) {
+			entityOperations.delete = delPredicate
+		}
+		return {
+			predicates: predicatesResolver.getUsedPredicates(),
+			operations: entityOperations,
+		}
 	}
 
 
@@ -123,7 +125,6 @@ export class AclFactory {
 				const rolePermissions: PermissionsByEntity = groupedPermissions.get(role) ?? new Map()
 				groupedPermissions.set(role, rolePermissions)
 				const entityPermissions = rolePermissions.get(name) ?? {
-					allowCustomPrimary: false,
 					definitions: [],
 				}
 				rolePermissions.set(name, entityPermissions)
@@ -137,11 +138,6 @@ export class AclFactory {
 				const entityPermissions = initEntityPermissions(role)
 				entityPermissions.definitions.push(definition)
 			}
-
-			const rolesWithCustomPrimary = allowCustomPrimaryAllRolesStore.get(entity) ? roles : allowCustomPrimaryStore.get(entity)
-			for (const role of rolesWithCustomPrimary) {
-				initEntityPermissions(role).allowCustomPrimary = true
-			}
 		}
 
 		return groupedPermissions
@@ -149,6 +145,6 @@ export class AclFactory {
 }
 
 
-export type EntityPermissions = { definitions: AllowDefinition<any>[]; allowCustomPrimary: boolean }
+export type EntityPermissions = { definitions: AllowDefinition<any>[] }
 export type PermissionsByEntity = Map<string, EntityPermissions>
 export type PermissionsByRoleAndEntity = Map<Role, PermissionsByEntity>

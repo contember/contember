@@ -15,7 +15,7 @@ export class CreateUniqueConstraintModificationHandler implements ModificationHa
 	constructor(private readonly data: CreateUniqueConstraintModificationData, private readonly schema: Schema) {
 	}
 
-	public createSql(builder: MigrationBuilder, { databaseMetadata, invalidateDatabaseMetadata }: ModificationHandlerCreateSqlOptions): void {
+	public createSql(builder: MigrationBuilder, { invalidateDatabaseMetadata }: ModificationHandlerCreateSqlOptions): void {
 		const entity = this.schema.model.entities[this.data.entityName]
 		if (entity.view) {
 			return
@@ -30,14 +30,20 @@ export class CreateUniqueConstraintModificationHandler implements ModificationHa
 		const tableNameId = wrapIdentifier(entity.tableName)
 		const columnNameIds = columns.map(wrapIdentifier)
 
-		let checkModifier = ''
-		if (this.data.unique.timing === 'deferred') {
-			checkModifier = ' INITIALLY DEFERRED'
-		} else if (this.data.unique.timing === 'deferrable') {
-			checkModifier = ' DEFERRABLE'
+		if ('index' in this.data.unique && this.data.unique.index) {
+			const nulls = this.data.unique.nulls === 'not distinct' ? ' NULLS NOT DISTINCT' : ' NULLS DISTINCT'
+			builder.sql(`CREATE UNIQUE INDEX ON ${tableNameId} (${columnNameIds.join(', ')})${nulls}`)
+		} else {
+			let checkModifier = ''
+			if (this.data.unique.timing === 'deferred') {
+				checkModifier = ' INITIALLY DEFERRED'
+			} else if (this.data.unique.timing === 'deferrable') {
+				checkModifier = ' DEFERRABLE'
+			}
+
+			builder.sql(`ALTER TABLE ${tableNameId} ADD UNIQUE (${columnNameIds.join(', ')})${checkModifier}`)
 		}
 
-		builder.sql(`ALTER TABLE ${tableNameId} ADD UNIQUE (${columnNameIds.join(', ')})${checkModifier}`)
 
 		invalidateDatabaseMetadata()
 	}
@@ -56,7 +62,7 @@ export class CreateUniqueConstraintModificationHandler implements ModificationHa
 
 	describe({ createdEntities }: { createdEntities: string[] }) {
 		return {
-			message: `Create unique constraint (${this.data.unique.fields.join(', ')}) on entity ${this.data.entityName}`,
+			message: `Create unique ${this.data.unique.index ? 'index' : 'constraint'} (${this.data.unique.fields.join(', ')}) on entity ${this.data.entityName}`,
 			failureWarning: !createdEntities.includes(this.data.entityName)
 				? 'Make sure no conflicting rows exists, otherwise this may fail in runtime.'
 				: undefined,
@@ -72,7 +78,7 @@ export const createUniqueConstraintModification = createModificationType({
 
 export interface CreateUniqueConstraintModificationData {
 	entityName: string
-	unique: Model.UniqueConstraint
+	unique: Model.UniqueConstraint | Model.UniqueIndex
 }
 
 export class CreateUniqueConstraintDiffer implements Differ {

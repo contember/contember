@@ -67,7 +67,7 @@ export class CreateIndexDiffer implements Differ {
 	createDiff(originalSchema: Schema, updatedSchema: Schema) {
 		return Object.values(updatedSchema.model.entities).flatMap(entity =>
 			entity.indexes
-				.filter(it => !originalSchema.model.entities[entity.name].indexes.find(idx => deepEqual(idx.fields, it.fields)))
+				.filter(it => !originalSchema.model.entities[entity.name].indexes.find(idx => deepEqual(idx, it)))
 				.map(index => createIndexModification.createModification({
 					entityName: entity.name,
 					index,

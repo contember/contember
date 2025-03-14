@@ -7,5 +7,5 @@ export type PossibleEntityShapeInMigrations =
 	& {
 		eventLog?: Model.Entity['eventLog']
 		indexes?: (readonly  Model.Index[]) | Readonly<Record<string, Model.Index>>
-		unique: (readonly  Model.UniqueConstraint[]) | Readonly<Record<string, Model.UniqueConstraint>>
+		unique: (readonly  (Model.UniqueConstraint | Model.UniqueIndex)[]) | Readonly<Record<string, Model.UniqueConstraint>>
 	}

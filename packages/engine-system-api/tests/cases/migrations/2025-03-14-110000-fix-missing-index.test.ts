@@ -28,7 +28,7 @@ test('unique fix test', async () => {
 		databaseMetadataResolver: () => Promise.resolve(createDatabaseMetadata({
 			foreignKeys: [],
 			indexes: [
-				{ indexName: 'valid1', tableName: 'foo', columnNames: ['col_a', 'col_b'] },
+				{ indexName: 'valid1', tableName: 'foo', columnNames: ['col_a', 'col_b'], unique: false },
 			],
 			uniqueConstraints: [],
 		})),

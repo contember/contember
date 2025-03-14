@@ -9,7 +9,7 @@ export namespace Model {
 		readonly primaryColumn: string
 		readonly tableName: string
 		readonly fields: { readonly [name: string]: AnyField }
-		readonly unique: UniqueConstraints
+		readonly unique: Uniques
 		readonly indexes: Indexes
 		readonly view?: View
 		readonly eventLog: EventLogConfig
@@ -213,13 +213,22 @@ export namespace Model {
 		readonly entities: { readonly [name: string]: Entity }
 	}
 
-	export type UniqueConstraints = readonly UniqueConstraint[]
+	export type Unique = UniqueIndex | UniqueConstraint
+	export type Uniques = readonly (Unique)[]
 
 	export type ConstraintTiming = 'deferrable' | 'deferred'
+
 	export type UniqueConstraint = {
 		readonly fields: readonly string[]
 		readonly timing?: ConstraintTiming // empty means not deferrable
 		readonly name?: string
+		readonly index?: false
+	}
+	export type NullsDistinctBehaviour = 'distinct' | 'not distinct'
+	export type UniqueIndex = {
+		readonly fields: readonly string[]
+		readonly index: true
+		readonly nulls?: NullsDistinctBehaviour // empty means distinct
 	}
 
 	export type Indexes = readonly Index[]

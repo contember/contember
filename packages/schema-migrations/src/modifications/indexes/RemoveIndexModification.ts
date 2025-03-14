@@ -27,7 +27,7 @@ export class RemoveIndexModificationHandler implements ModificationHandler<Remov
 			model: this.schema.model,
 		})
 
-		const indexNames = databaseMetadata.indexes.filter({ tableName: entity.tableName, columnNames: columns }).getNames()
+		const indexNames = databaseMetadata.indexes.filter({ tableName: entity.tableName, columnNames: columns, unique: false }).getNames()
 
 		for (const name of indexNames) {
 			builder.sql(`DROP INDEX ${wrapIdentifier(name)}`)
@@ -94,7 +94,7 @@ export class RemoveIndexDiffer implements Differ {
 						if (!updatedEntity) {
 							return false
 						}
-						return !updatedEntity.indexes.find(index => deepEqual(index.fields, it.fields))
+						return !updatedEntity.indexes.find(index => deepEqual(index, it))
 					},
 				)
 				.map(index =>

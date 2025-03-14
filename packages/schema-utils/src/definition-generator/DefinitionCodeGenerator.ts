@@ -45,7 +45,7 @@ ${Object.values(entity.fields).map(field => this.generateField({ field, entity, 
 }\n`
 	}
 
-	private generateUniqueConstraint({ entity, constraint }: { entity: Model.Entity; constraint: Model.UniqueConstraint }): string {
+	private generateUniqueConstraint({ entity, constraint }: { entity: Model.Entity; constraint: Model.UniqueConstraint | Model.UniqueIndex }): string {
 		const fieldsList = `${constraint.fields.map(it => printJsValue(it)).join(', ')}`
 
 		return `@c.Unique(${fieldsList})`

@@ -103,7 +103,7 @@ export class SchemaBuilder {
 		})
 	}
 
-	private createUnique(entityName: string, fieldDefinitions: FieldsDefinition): Model.UniqueConstraints {
+	private createUnique(entityName: string, fieldDefinitions: FieldsDefinition): Model.Uniques {
 		const unique: Model.UniqueConstraint[] = []
 		for (const [fieldName, definition] of Object.entries(fieldDefinitions)) {
 			if (definition.options.unique) {

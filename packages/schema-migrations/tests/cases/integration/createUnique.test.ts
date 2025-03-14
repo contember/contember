@@ -92,7 +92,9 @@ describe('change unique timing', () => testMigrations({
 	diff: [
 		removeUniqueConstraintModification.createModification({
 			entityName: 'Author',
-			fields: ['email'],
+			unique: {
+				fields: ['email'],
+			},
 		}),
 		createUniqueConstraintModification.createModification({
 			entityName: 'Author',
@@ -144,4 +146,31 @@ describe('create unique using decorator', () => testMigrations({
 	],
 	sql: SQL`ALTER TABLE "author"
         ADD UNIQUE ("email") INITIALLY DEFERRED;`,
+}))
+
+namespace AuthorWithUniqueIndex {
+	@c.Unique({ fields: ['email'], index: true, nulls: 'not distinct' })
+	export class Author {
+		email = c.stringColumn()
+	}
+}
+
+describe('create unique index', () => testMigrations({
+	original: createSchema({
+		Author: class Author {
+			email = c.stringColumn()
+		},
+	}),
+	updated: createSchema(AuthorWithUniqueIndex),
+	diff: [
+		createUniqueConstraintModification.createModification({
+			entityName: 'Author',
+			unique: {
+				fields: ['email'],
+				index: true,
+				nulls: 'not distinct',
+			},
+		}),
+	],
+	sql: SQL`CREATE UNIQUE INDEX ON "author" ("email") NULLS NOT DISTINCT;`,
 }))

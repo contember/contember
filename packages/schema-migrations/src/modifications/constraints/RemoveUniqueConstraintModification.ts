@@ -1,5 +1,5 @@
 import { MigrationBuilder } from '@contember/database-migrations'
-import { Schema } from '@contember/schema'
+import { Model, Schema } from '@contember/schema'
 import { SchemaUpdater, updateEntity, updateModel } from '../utils/schemaUpdateUtils'
 import {
 	createModificationType,
@@ -21,28 +21,46 @@ export class RemoveUniqueConstraintModificationHandler implements ModificationHa
 			return
 		}
 
-		const fields = this.getFields()
+		const unique = this.getUnique()
 
 		const columns = getUniqueConstraintColumns({
 			entity,
-			fields: fields,
+			fields: unique.fields,
 			model: this.schema.model,
 		})
 
-		const constraintNames = databaseMetadata.uniqueConstraints.filter({ tableName: entity.tableName, columnNames: columns }).getNames()
+		if (unique.index) {
+			const indexNames = databaseMetadata.indexes.filter({
+				tableName: entity.tableName,
+				columnNames: columns,
+				unique: true,
+			}).getNames()
 
-		for (const name of constraintNames) {
-			builder.sql(`ALTER TABLE ${wrapIdentifier(entity.tableName)} DROP CONSTRAINT ${wrapIdentifier(name)}`)
+			for (const name of indexNames) {
+				builder.sql(`DROP INDEX ${wrapIdentifier(name)}`)
+			}
+
+		} else {
+
+			const constraintNames = databaseMetadata.uniqueConstraints.filter({
+				tableName: entity.tableName,
+				columnNames: columns,
+			}).getNames()
+
+			for (const name of constraintNames) {
+				builder.sql(`ALTER TABLE ${wrapIdentifier(entity.tableName)} DROP CONSTRAINT ${wrapIdentifier(name)}`)
+			}
 		}
+
 
 		invalidateDatabaseMetadata()
 	}
 
 	public getSchemaUpdater(): SchemaUpdater {
-		const fields = this.getFields()
+		const thisUnique = this.getUnique()
 		return updateModel(
 			updateEntity(this.data.entityName, ({ entity }) => {
-				const unique = entity.unique.filter(it => !deepEqual(it.fields, fields))
+				const unique = entity.unique.filter(it => !deepEqual(it, thisUnique))
 				return {
 					...entity,
 					unique,
@@ -52,20 +70,23 @@ export class RemoveUniqueConstraintModificationHandler implements ModificationHa
 	}
 
 	describe() {
-		const fields = this.getFields()
-		return { message: `Remove unique constraint (${fields.join(', ')}) on entity ${this.data.entityName}` }
+		const unique = this.getUnique()
+		return { message: `Remove unique ${unique.index ? 'index' : 'constraint'} (${unique.fields.join(', ')}) on entity ${this.data.entityName}` }
 	}
 
-	getFields() {
+	getUnique(): Model.Unique {
+		if ('unique' in this.data) {
+			return this.data.unique
+		}
 		const entity = this.schema.model.entities[this.data.entityName]
-		const fields = 'constraintName' in this.data
-			? entity.unique.find(it => it.name === this.data.constraintName)?.fields
-			: this.data.fields
+		const unique = 'constraintName' in this.data
+			? entity.unique.find(it => 'name' in it && it.name === this.data.constraintName)
+			: entity.unique.find(it => deepEqual(it.fields, this.data.fields))
 
-		if (!fields) {
+		if (!unique) {
 			throw new Error()
 		}
-		return fields
+		return unique
 	}
 }
 
@@ -75,6 +96,13 @@ export const removeUniqueConstraintModification = createModificationType({
 })
 
 export type RemoveUniqueConstraintModificationData =
+	| {
+		entityName: string
+		fields?: never
+		constraintName?: never
+		unique: Model.Unique
+	}
+	// deprecated
 	| {
 		entityName: string
 		constraintName: string
@@ -96,12 +124,12 @@ export class RemoveUniqueConstraintDiffer implements Differ {
 					if (!updatedEntity) {
 						return false
 					}
-					return !updatedEntity.unique.find(uniq => deepEqual(uniq.fields, it.fields) && it.timing === uniq.timing)
+					return !updatedEntity.unique.find(uniq => deepEqual(uniq, it))
 				})
 				.map(unique =>
 					removeUniqueConstraintModification.createModification({
 						entityName: entity.name,
-						fields: unique.fields,
+						unique: unique,
 					}),
 				),
 		)

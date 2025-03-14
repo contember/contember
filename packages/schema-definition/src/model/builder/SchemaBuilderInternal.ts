@@ -158,7 +158,7 @@ export default class SchemaBuilderInternal {
 		entityName: string,
 		options: EntityBuilder.EntityOptions,
 		fieldOptions: FieldBuilder.Map,
-	): Model.UniqueConstraints {
+	): Model.Uniques {
 		const unique: Model.UniqueConstraint[] = []
 
 		for (const singleUnique of options.unique || []) {

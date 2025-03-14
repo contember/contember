@@ -45,6 +45,7 @@ describe('convert one has many to one has one', () => {
 				indexName: 'article_review_article_id_idx',
 				columnNames: ['article_id'],
 				tableName: 'article_review',
+				unique: false,
 			}],
 			uniqueConstraints: [],
 		}),

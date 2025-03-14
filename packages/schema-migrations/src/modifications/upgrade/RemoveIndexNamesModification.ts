@@ -14,7 +14,13 @@ export class RemoveIndexNamesModificationHandler implements ModificationHandler<
 				return {
 					...entity,
 					indexes: entity.indexes.map(({ name, ...other }) => other),
-					unique: entity.unique.map(({ name, ...other }) => other),
+					unique: entity.unique.map(it => {
+						if ('name' in it) {
+							const { name, ...other } = it
+							return other
+						}
+						return it
+					}),
 				}
 			}),
 		)
@@ -36,7 +42,7 @@ export type RemoveIndexNamesModificationData = {}
 export class RemoveIndexNamesDiffer implements Differ {
 	createDiff(originalSchema: Schema) {
 		const hasNames = !!Object.values(originalSchema.model.entities).find(it => {
-			return it.indexes.find(it => !!it.name) || it.unique.find(it => !!it.name)
+			return it.indexes.find(it => !!it.name) || it.unique.find(it => 'name' in it && !!it.name)
 		})
 		if (hasNames) {
 			return [removeIndexNamesModification.createModification({})]

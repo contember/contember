@@ -4,6 +4,8 @@ import { RelationFetcher } from '../RelationFetcher'
 import { SelectExecutionHandlerContext } from '../SelectExecutionHandler'
 import { PredicateFactory } from '../../../acl'
 import { Literal, wrapIdentifier } from '@contember/database'
+import { ColumnValueGetter } from '../SelectHydrator'
+import { Providers } from '@contember/schema-utils'
 
 export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVisitor<void> {
 	constructor(
@@ -13,6 +15,7 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 		private readonly executionContext: SelectExecutionHandlerContext,
 		private readonly relationPath: Model.AnyRelationContext[],
 		private readonly settings: Settings.ContentSettings,
+		private readonly providers: Providers,
 	) {}
 
 	visitColumn({ entity, column }: Model.ColumnContext): void {
@@ -31,9 +34,15 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 			selectFrom += '::text[]'
 		}
 
+		let columnValueGetter: ColumnValueGetter | undefined = undefined
+		if (entity.view && column.name === entity.primary && column.type === Model.ColumnType.Uuid) {
+			columnValueGetter = row => row[columnAlias] ?? (this.providers.uuid({ version: this.settings.uuidVersion }))
+		}
+
 		this.executionContext.addColumn({
 			query: qb => qb.select(new Literal(selectFrom), columnAlias),
 			predicate: this.getRequiredPredicate(entity, column),
+			valueGetter: columnValueGetter,
 		})
 	}
 

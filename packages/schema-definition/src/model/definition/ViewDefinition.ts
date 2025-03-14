@@ -1,7 +1,11 @@
 import { extendEntity } from './extensions'
 import { EntityConstructor } from './types'
+import { DecoratorFunction } from '../../utils'
 
-export const View = (sql: string, { dependencies }: { dependencies?: (() => EntityConstructor[]) | EntityConstructor[] } = {}) =>
+export const View = <T>(sql: string, { dependencies, idSource }: {
+	dependencies?: (() => EntityConstructor[]) | EntityConstructor[]
+	idSource?: readonly ((keyof T) & string)[]
+} = {}): DecoratorFunction<T> =>
 	extendEntity(({ entity, entityRegistry }) => {
 		const dependenciesResolved = typeof dependencies === 'function' ? dependencies() : dependencies
 		if (dependenciesResolved?.some(it => it === undefined)) {
@@ -19,6 +23,7 @@ dependencies: () => [MyEntity]
 			view: {
 				sql,
 				...(dependenciesResolved ? { dependencies: dependenciesResolved.map(it => entityRegistry.getName(it)) } : {}),
+				...(idSource ? { idSource } : {}),
 			},
 		})
 	})

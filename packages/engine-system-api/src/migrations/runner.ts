@@ -29,6 +29,7 @@ import _20240628150000migrationsdropsequence from './2024-06-28-150000-migration
 import _20240628153000schema from './2024-06-28-153000-schema'
 import _20240628153001schemainit from './2024-06-28-153001-schema-init'
 import _20240729150000eventdataindex from './2024-07-29-150000-event-data-index'
+import _20250314110000fixmissingindex from './2025-03-14-110000-fix-missing-index'
 import snapshot from './snapshot'
 
 import { Connection, createDatabaseIfNotExists, DatabaseConfig, DatabaseMetadataResolver } from '@contember/database'
@@ -62,6 +63,7 @@ const migrations = {
 	'2024-06-28-153000-schema': _20240628153000schema,
 	'2024-06-28-153001-schema-init': _20240628153001schemainit,
 	'2024-07-29-150000-event-data-index': _20240729150000eventdataindex,
+	'2025-03-14-110000-fix-missing-index': _20250314110000fixmissingindex,
 }
 
 

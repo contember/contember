@@ -199,3 +199,72 @@ CREATE TRIGGER "log_event" AFTER INSERT OR UPDATE OR DELETE ON "author" FOR EACH
 CREATE CONSTRAINT TRIGGER "log_event_trx" AFTER INSERT OR UPDATE OR DELETE ON "author" DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE PROCEDURE "system"."trigger_event_commit"(); 
 ALTER TABLE "author" ADD "name" text;`,
 }))
+
+namespace SchemaWithIndex {
+	@def.Index('name')
+	export class Author {
+		name = def.stringColumn()
+	}
+}
+describe('entity with index', () => testMigrations({
+	original: {},
+	updated: createSchema(SchemaWithIndex),
+	diff: [
+		{
+			modification: 'createEntity',
+			entity: {
+				fields: {
+					id: {
+						columnName: 'id',
+						name: 'id',
+						nullable: false,
+						type: Model.ColumnType.Uuid,
+						columnType: 'uuid',
+					},
+				},
+				name: 'Author',
+				primary: 'id',
+				primaryColumn: 'id',
+				tableName: 'author',
+				unique: [],
+				eventLog: {
+					enabled: true,
+				},
+				indexes: [],
+			},
+		},
+		{
+			modification: 'createColumn',
+			entityName: 'Author',
+			field: {
+				columnName: 'name',
+				name: 'name',
+				nullable: true,
+				type: Model.ColumnType.String,
+				columnType: 'text',
+			},
+		},
+		{
+			modification: 'createIndex',
+			entityName: 'Author',
+			index: { fields: ['name'] },
+		},
+	],
+	sql: SQL`CREATE TABLE "author"
+             (
+                 "id" uuid PRIMARY KEY NOT NULL
+             );
+    CREATE TRIGGER "log_event"
+        AFTER INSERT OR UPDATE OR DELETE
+        ON "author"
+        FOR EACH ROW
+    EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+    CREATE CONSTRAINT TRIGGER "log_event_trx"
+        AFTER INSERT OR UPDATE OR DELETE
+        ON "author" DEFERRABLE INITIALLY DEFERRED
+        FOR EACH ROW
+    EXECUTE PROCEDURE "system"."trigger_event_commit"();
+    ALTER TABLE "author"
+        ADD "name" text;
+	CREATE INDEX ON "author" ("name");`,
+}))

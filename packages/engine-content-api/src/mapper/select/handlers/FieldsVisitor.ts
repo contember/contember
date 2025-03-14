@@ -4,6 +4,8 @@ import { RelationFetcher } from '../RelationFetcher'
 import { SelectExecutionHandlerContext } from '../SelectExecutionHandler'
 import { PredicateFactory } from '../../../acl'
 import { Literal, wrapIdentifier } from '@contember/database'
+import { ColumnValueGetter } from '../SelectHydrator'
+import { v7 } from 'uuid'
 
 export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVisitor<void> {
 	constructor(
@@ -31,9 +33,15 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 			selectFrom += '::text[]'
 		}
 
+		let columnValueGetter: ColumnValueGetter | undefined = undefined
+		if (entity.view && column.name === entity.primary && column.type === Model.ColumnType.Uuid) {
+			columnValueGetter = row => row[columnAlias] ?? v7()
+		}
+
 		this.executionContext.addColumn({
 			query: qb => qb.select(new Literal(selectFrom), columnAlias),
 			predicate: this.getRequiredPredicate(entity, column),
+			valueGetter: columnValueGetter,
 		})
 	}
 

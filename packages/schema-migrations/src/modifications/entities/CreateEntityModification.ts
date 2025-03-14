@@ -86,6 +86,7 @@ export class CreateEntityDiffer implements Differ {
 							[entity.primary]: entity.fields[entity.primary],
 						},
 						unique: [],
+						indexes: [],
 					},
 				}),
 			)

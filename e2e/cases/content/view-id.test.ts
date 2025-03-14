@@ -33,3 +33,38 @@ test('read view with generated id', async () => {
 		.expect(200)
 
 })
+
+namespace ViewIdComputedTest {
+	@c.View(`
+SELECT 
+	null as id, 
+	1 as value,
+	'bar' as value2
+`, {
+		idSource: ['value', 'value2'],
+	})
+	export class Foo {
+		value = def.intColumn()
+		value2 = def.stringColumn()
+	}
+}
+
+test('read view with computed id', async () => {
+	const tester = await createTester(createSchema(ViewIdComputedTest))
+
+	await tester(
+		gql`
+            query {
+                listFoo {
+                    id
+                }
+            }
+		`,
+	)
+		.expect(response => {
+			expect(response.body.data.listFoo).toHaveLength(1)
+			expect(response.body.data.listFoo[0].id).toBe('15f0dc32-0141-8ac0-9b97-42e33730fb35')
+		})
+		.expect(200)
+
+})

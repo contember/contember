@@ -15,6 +15,7 @@ import { QueryProvider } from './QueryProvider'
 import { ValidationQueriesProvider } from './ValidationQueriesProvider'
 import { Context } from '../types'
 import { ResultSchemaTypeProvider } from './ResultSchemaTypeProvider'
+import { RefreshViewMutationProvider } from './RefreshViewMutationProvider'
 
 type BuildArgs = {
 	queries?: Map<string, GraphQLFieldConfig<any, Context, any>>
@@ -29,6 +30,7 @@ export class GraphQlSchemaBuilder {
 		private readonly validationQueriesProvider: ValidationQueriesProvider,
 		private readonly mutationProvider: MutationProvider,
 		private readonly resultSchemaTypeProvider: ResultSchemaTypeProvider,
+		private readonly refreshViewMutationProvider: RefreshViewMutationProvider,
 	) {}
 
 	public build(args: BuildArgs = {}): GraphQLSchema {
@@ -117,6 +119,12 @@ export class GraphQlSchemaBuilder {
 				resolve: (parent, args, context: Context, info) => context.executionContainer.readResolver.resolveQuery(info),
 			})
 		}
+
+		const refreshViewMutation = this.refreshViewMutationProvider.getMutation()
+		if (refreshViewMutation) {
+			mutations.set('refreshMaterializedView', refreshViewMutation)
+		}
+
 		const infoType = new GraphQLObjectType({
 			name: 'Info',
 			fields: () => ({

@@ -29,6 +29,7 @@ import { PaginatedHasManyFieldProvider } from '../extensions/paginatedHasMany/Pa
 import { PaginatedHasManyFieldProviderVisitor } from '../extensions/paginatedHasMany/PaginatedHasManyFieldProviderVisitor'
 import { Builder } from '@contember/dic'
 import { ConnectOrCreateRelationInputProvider } from './mutations/ConnectOrCreateRelationInputProvider'
+import { RefreshViewMutationProvider } from './RefreshViewMutationProvider'
 
 export class GraphQlSchemaBuilderFactory {
 	constructor() {}
@@ -101,8 +102,10 @@ export class GraphQlSchemaBuilderFactory {
 				new MutationProvider(authorizator, whereTypeProvider, entityTypeProvider, createEntityInputProvider, updateEntityInputProvider, resultSchemaTypeProvider))
 			.addService('validationQueriesProvider', ({ whereTypeProvider, createEntityInputProvider, updateEntityInputProvider, resultSchemaTypeProvider }) =>
 				new ValidationQueriesProvider(whereTypeProvider, createEntityInputProvider, updateEntityInputProvider, resultSchemaTypeProvider))
-			.addService('graphQlSchemaBuilder', ({ schema, queryProvider, validationQueriesProvider, mutationProvider, resultSchemaTypeProvider }) =>
-				new GraphQlSchemaBuilder(schema, queryProvider, validationQueriesProvider, mutationProvider, resultSchemaTypeProvider))
+			.addService('refreshViewMutationProvider', ({ schema, authorizator }) =>
+				new RefreshViewMutationProvider(schema, authorizator))
+			.addService('graphQlSchemaBuilder', ({ schema, queryProvider, validationQueriesProvider, mutationProvider, resultSchemaTypeProvider, refreshViewMutationProvider }) =>
+				new GraphQlSchemaBuilder(schema, queryProvider, validationQueriesProvider, mutationProvider, resultSchemaTypeProvider, refreshViewMutationProvider))
 			.setupService('createEntityInputProvider', (it, { createEntityInputProviderAccessor }) => {
 				createEntityInputProviderAccessor.set(it)
 			})

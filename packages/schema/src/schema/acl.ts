@@ -69,10 +69,12 @@ export namespace Acl {
 	export type EntityOperations = {
 		readonly read?: FieldPermissions
 		readonly create?: FieldPermissions
-		readonly customPrimary?: boolean
 		readonly update?: FieldPermissions
 		readonly delete?: Predicate
 		readonly noRoot?: readonly `${Operation}`[]
+
+		readonly customPrimary?: boolean
+		readonly refreshMaterializedView?: boolean
 	}
 
 	export type FieldPermissions = { readonly [field: string]: Predicate }
@@ -131,6 +133,7 @@ export namespace Acl {
 		readonly assumeMembership?: MembershipMatchRule
 		readonly export?: boolean
 		readonly import?: boolean
+		readonly refreshMaterializedView?: boolean
 	}
 
 	export interface BaseRolePermissions {

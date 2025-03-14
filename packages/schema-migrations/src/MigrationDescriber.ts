@@ -1,5 +1,5 @@
 import {
-	createEntityModification,
+	createEntityModification, createViewModification,
 	emptyModificationDescriptionContext,
 	ModificationDescription,
 	ModificationDescriptionContext,
@@ -62,7 +62,7 @@ export class MigrationDescriber {
 		const result = []
 		const createdEntities = []
 		for (const modification of migration.modifications) {
-			if (modification.modification === createEntityModification.id) {
+			if (modification.modification === createEntityModification.id || modification.modification === createViewModification.id) {
 				createdEntities.push(modification.entity.name)
 			}
 			const description = this.describeModification(

@@ -60,8 +60,8 @@ export class ModelValidator {
 
 	private validateUniqueConstraints(entity: Model.Entity, errors: ErrorBuilder): void {
 		for (const constraint of entity.unique) {
-			if (entity.view && !constraint.index) {
-				errors.add('MODEL_INVALID_CONSTRAINT', 'Unique constraint on view entity must be an index. Please set index: true')
+			if (entity.view?.materialized && !constraint.index) {
+				errors.add('MODEL_INVALID_CONSTRAINT', 'For materialized views, Unique must be defined as an index. Please set index: true.')
 			}
 			for (const field of constraint.fields) {
 				const fieldDef = entity.fields[field]

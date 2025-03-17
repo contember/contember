@@ -36,7 +36,11 @@ export class GraphQlSchemaFactory {
 		return this.cache.fetch(schema, cacheKey, () => {
 			const permissions = this.permissionFactory.create(schema, identity.projectRoles)
 
-			const authorizator = new Authorizator(permissions, schema.acl.customPrimary ?? false)
+			const authorizator = new Authorizator(
+				permissions,
+				schema.acl.customPrimary ?? false,
+				Object.values(schema.acl.roles).some(it => it.content?.refreshMaterializedView),
+			)
 			const dataSchemaBuilder = this.graphqlSchemaBuilderFactory.create(schema.model, authorizator)
 			const introspectionSchemaFactory = new IntrospectionSchemaDefinitionFactory(
 				new IntrospectionSchemaFactory(

@@ -119,6 +119,7 @@ export const updateAclFieldPermissions =
 				read: value => updater(value, entityName, Acl.Operation.read),
 				delete: value => value,
 				customPrimary: value => value,
+				refreshMaterializedView: value => value,
 				noRoot: value => value,
 			}
 			const types: (keyof Acl.EntityOperations)[] = ['create', 'update', 'read', 'delete', 'customPrimary', 'noRoot']

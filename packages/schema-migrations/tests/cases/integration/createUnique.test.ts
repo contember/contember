@@ -174,3 +174,64 @@ describe('create unique index', () => testMigrations({
 	],
 	sql: SQL`CREATE UNIQUE INDEX ON "author" ("email") NULLS NOT DISTINCT;`,
 }))
+
+namespace ViewWithUniqueIndexOriginal {
+	@c.View(`select 1 as id, 'foo@localhost' as email)`)
+	export class Author {
+		email = c.stringColumn()
+	}
+}
+
+namespace ViewWithUniqueIndexUpdated {
+	@c.View(`select 1 as id, 'foo@localhost' as email)`)
+	@c.Unique({ fields: ['email'], index: true })
+	export class Author {
+		email = c.stringColumn()
+	}
+}
+
+describe('create unique index', () => testMigrations({
+	original: createSchema(ViewWithUniqueIndexOriginal),
+	updated: createSchema(ViewWithUniqueIndexUpdated),
+	diff: [
+		createUniqueConstraintModification.createModification({
+			entityName: 'Author',
+			unique: {
+				fields: ['email'],
+				index: true,
+			},
+		}),
+	],
+	sql: SQL``,
+}))
+
+
+namespace MaterializedViewWithUniqueIndexOriginal {
+	@c.View(`select 1 as id, 'foo@localhost' as email)`, { materialized: true })
+	export class Author {
+		email = c.stringColumn()
+	}
+}
+
+namespace MaterializedViewWithUniqueIndexUpdated {
+	@c.View(`select 1 as id, 'foo@localhost' as email)`, { materialized: true })
+	@c.Unique({ fields: ['email'], index: true })
+	export class Author {
+		email = c.stringColumn()
+	}
+}
+
+describe('create unique index', () => testMigrations({
+	original: createSchema(MaterializedViewWithUniqueIndexOriginal),
+	updated: createSchema(MaterializedViewWithUniqueIndexUpdated),
+	diff: [
+		createUniqueConstraintModification.createModification({
+			entityName: 'Author',
+			unique: {
+				fields: ['email'],
+				index: true,
+			},
+		}),
+	],
+	sql: SQL`CREATE UNIQUE INDEX ON "author" ("email") NULLS DISTINCT;`,
+}))

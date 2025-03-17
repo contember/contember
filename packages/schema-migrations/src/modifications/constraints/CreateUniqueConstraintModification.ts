@@ -17,7 +17,10 @@ export class CreateUniqueConstraintModificationHandler implements ModificationHa
 
 	public createSql(builder: MigrationBuilder, { invalidateDatabaseMetadata }: ModificationHandlerCreateSqlOptions): void {
 		const entity = this.schema.model.entities[this.data.entityName]
-		if (entity.view) {
+		const shouldExecuteSql =
+			!entity.view
+			|| (this.data.unique.index && entity.view.materialized)
+		if (!shouldExecuteSql) {
 			return
 		}
 		const fields = this.data.unique.fields

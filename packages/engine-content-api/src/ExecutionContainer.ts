@@ -28,7 +28,7 @@ import {
 import { Builder } from '@contember/dic'
 import { Acl, Model, Schema } from '@contember/schema'
 import { Client, DatabaseMetadata, SelectBuilder as DbSelectBuilder } from '@contember/database'
-import { Providers } from '@contember/schema-utils'
+import { ParsedMembership, Providers } from '@contember/schema-utils'
 import { PaginatedHasManyExecutionHandler } from './extensions/paginatedHasMany/PaginatedHasManyExecutionHandler'
 import { PaginatedHasManyFieldProvider } from './extensions/paginatedHasMany/PaginatedHasManyFieldProvider'
 import { WhereOptimizer } from './mapper/select/optimizer/WhereOptimizer'
@@ -41,6 +41,7 @@ import {
 	QueryAstFactory,
 	ValidationDataSelector,
 } from './input-validation'
+import { RefreshViewResolver } from './resolvers/RefreshViewResolver'
 
 export type ExecutionContainerArgs = {
 	schema: Schema
@@ -59,6 +60,7 @@ export interface ExecutionContainer {
 	readResolver: ReadResolver
 	mutationResolver: MutationResolver
 	validationResolver: ValidationResolver
+	refreshViewResolver: RefreshViewResolver
 }
 
 export type ExecutionContainerBuilder = ReturnType<ExecutionContainerFactory['createBuilderInternal']>
@@ -209,10 +211,12 @@ export class ExecutionContainerFactory {
 				new MutationResolver(schema.model, mapperFactory, inputPreValidator, queryAstFactory, schemaDatabaseMetadata))
 			.addService('validationResolver', ({ inputPreValidator, mapperFactory }) =>
 				new ValidationResolver(mapperFactory, inputPreValidator))
+			.addService('refreshViewResolver', ({ schema, mapperFactory }) =>
+				new RefreshViewResolver(schema, mapperFactory))
 	}
 
 	public create(args: ExecutionContainerArgs): ExecutionContainer {
-		return this.createBuilder(args).build().pick('validationResolver', 'readResolver', 'mutationResolver')
+		return this.createBuilder(args).build().pick('validationResolver', 'readResolver', 'mutationResolver', 'refreshViewResolver')
 	}
 }
 

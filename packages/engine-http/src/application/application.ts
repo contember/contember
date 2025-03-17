@@ -14,6 +14,7 @@ import stream, { Duplex, Readable } from 'node:stream'
 import { ProjectGroupResolver } from '../projectGroup/ProjectGroupResolver'
 import { ProjectGroupContainer } from '../projectGroup/ProjectGroupContainer'
 import { URL } from 'node:url'
+import { cpuUsage, memoryUsage } from 'node:process'
 
 type Route<C> = { match: RequestMatcher; controller: C; module: string }
 export class Application {
@@ -332,6 +333,8 @@ export class Application {
 	private createTimer() {
 		const times: EventTime[] = []
 		const globalStart = new Date().getTime()
+		const cpuUsageStart = cpuUsage()
+		const memoryUsageStart = memoryUsage()
 		const timer: Timer = (name: string, cb) => {
 			const start = new Date().getTime()
 			const time: EventTime = { label: name, start: start - globalStart }
@@ -361,12 +364,21 @@ export class Application {
 				const timeLabel = total > 500 ? 'TIME_SLOW' : 'TIME_OK'
 				const shouldSuppress = this.suppressAccessLog === true || !ctx.req.url || (this.suppressAccessLog !== false && this.suppressAccessLog.test(ctx.req.url))
 
+				const cpuUsageEnd = cpuUsage()
+				const memoryUsageEnd = memoryUsage()
+
+				const cpuUsageDiffMs = (cpuUsageEnd.user - cpuUsageStart.user) / 1000
+				const memoryUsageDiff = memoryUsageEnd.heapUsed - memoryUsageStart.heapUsed
+
 				const level = shouldSuppress ? 'debug' : 'info'
 				ctx.logger.log(level, !ctx.response ? 'Connection established' : ctx.response.statusCode < 400 ? `Request successful` : 'Request failed', {
 					status: ctx.response?.statusCode,
 					timeLabel: timeLabel,
 					totalTimeMs: total,
 					events: times,
+					cpuUsageDiffMs,
+					memoryUsageDiff,
+					responseBodySize: ctx.body && typeof ctx.body === 'string' ? ctx.body.length : undefined,
 				})
 			}
 

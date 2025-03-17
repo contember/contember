@@ -19,6 +19,7 @@ export namespace Model {
 	export type View = {
 		readonly sql: string
 		readonly dependencies?: readonly string[]
+		readonly idSource?: readonly string[]
 	}
 
 	export type EventLogConfig = {

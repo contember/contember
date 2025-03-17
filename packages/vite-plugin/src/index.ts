@@ -19,6 +19,33 @@ export type ContemberOptions = {
 	appPath?: string
 }
 
+const extractProjectNameFromDsn = (dsn: string | undefined) => {
+	if (!dsn) return null
+
+	try {
+		return new URL(dsn).username || null
+	} catch (e) {
+		console.warn('Invalid Contember DSN format:', dsn)
+		return null
+	}
+}
+
+const createBuildVersionTag = (html: string): {
+	tag: string
+	injectTo: 'head'
+	attrs: Record<string, string>
+} => {
+	const fileHash = createHash('md5').update(html).digest('hex')
+	return {
+		tag: 'meta',
+		injectTo: 'head',
+		attrs: {
+			name: 'contember-build-version',
+			content: fileHash,
+		},
+	}
+}
+
 /**
  * ## Contember Vite Plugin
  *
@@ -41,7 +68,7 @@ export type ContemberOptions = {
  * });
  * ```
  */
-export function contember(options?: ContemberOptions): Plugin {
+export const contember = (options?: ContemberOptions): Plugin => {
 	const {
 		appPath = '/app',
 		buildVersion = process.env.NODE_ENV === 'production',
@@ -49,23 +76,16 @@ export function contember(options?: ContemberOptions): Plugin {
 	} = options || {}
 
 	const normalizedAppPath = appPath.startsWith('/') ? appPath : `/${appPath}`
-	const contemberDsn = process.argv.find(it => it.includes('contember://'))
-	let projectName = null
+	const contemberDsn = process.argv.find(it => it.includes('contember://')) || process.env.CONTEMBER_DSN
+	const projectName = extractProjectNameFromDsn(contemberDsn)
 
-	if (contemberDsn) {
-		try {
-			projectName = new URL(contemberDsn).username
-		} catch (e) {
-			console.warn('Invalid Contember DSN format:', contemberDsn)
-		}
-	}
-
-	const defineConfig = projectName ? {
-		'import.meta.env.VITE_CONTEMBER_ADMIN_PROJECT_NAME': JSON.stringify(projectName),
-	} : {}
+	const defineConfig = projectName
+		? { 'import.meta.env.VITE_CONTEMBER_ADMIN_PROJECT_NAME': JSON.stringify(projectName) }
+		: {}
 
 	return {
 		name: 'contember',
+
 		config(config) {
 			return {
 				define: defineConfig,
@@ -85,18 +105,21 @@ export function contember(options?: ContemberOptions): Plugin {
 			}
 		},
 
-		configureServer(serve) {
-			if (!disableMiddleware) {
-				serve.middlewares.use((req, res, next) => {
-					const [pathname] = req.url?.split('?') ?? []
+		configureServer(server) {
+			if (disableMiddleware) return
 
-					if (pathname === normalizedAppPath ||
-						(pathname.startsWith(`${normalizedAppPath}/`) && !pathname.match(/\.\w+$/))) {
-						req.url = `${normalizedAppPath}/`
-					}
-					next()
-				})
-			}
+			server.middlewares.use((req, res, next) => {
+				const [pathname] = req.url?.split('?') ?? []
+
+				const isSpaRoute = pathname === normalizedAppPath ||
+					(pathname.startsWith(`${normalizedAppPath}/`) && !pathname.match(/\.\w+$/))
+
+				if (isSpaRoute) {
+					req.url = `${normalizedAppPath}/`
+				}
+
+				next()
+			})
 		},
 
 		transformIndexHtml: buildVersion
@@ -108,19 +131,9 @@ export function contember(options?: ContemberOptions): Plugin {
 						return { html, tags: [] }
 					}
 
-					const fileHash = createHash('md5').update(html).digest('hex')
 					return {
 						html,
-						tags: [
-							{
-								tag: 'meta',
-								injectTo: 'head',
-								attrs: {
-									name: 'contember-build-version',
-									content: fileHash,
-								},
-							},
-						],
+						tags: [createBuildVersionTag(html)],
 					}
 				},
 			}

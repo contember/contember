@@ -5,6 +5,7 @@ import { Model } from '@contember/schema'
 import { SQL } from '../../src/tags'
 import { SchemaDefinition as def } from '@contember/schema-definition'
 import { createDatabaseMetadata } from '@contember/database'
+import { removeUniqueConstraintModification } from '../../../src'
 
 
 describe('remove relation (many has one)', () => testMigrations({
@@ -56,11 +57,12 @@ describe('remove relation (one has many)', () => testMigrations({
 			.buildSchema(),
 	},
 	diff: [
-		{
+		removeUniqueConstraintModification.createModification({
 			entityName: 'PostLocale',
-			fields: ['post', 'locale'],
-			modification: 'removeUniqueConstraint',
-		},
+			unique: {
+				fields: ['post', 'locale'],
+			},
+		}),
 		{
 			modification: 'removeField',
 			entityName: 'PostLocale',

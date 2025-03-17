@@ -162,7 +162,7 @@ const viewSchemaCheck: Typesafe.Equals<Model.View, ReturnType<typeof viewSchemaI
 const viewSchema: Typesafe.Type<Model.View> = viewSchemaInner
 
 
-const indexLike: Typesafe.Type<{readonly fields: readonly string[]; readonly name?: string | undefined}> = Typesafe.intersection(
+const indexSchemaBase = Typesafe.intersection(
 	Typesafe.object({
 		fields: Typesafe.array(Typesafe.string),
 	}),
@@ -170,22 +170,37 @@ const indexLike: Typesafe.Type<{readonly fields: readonly string[]; readonly nam
 		name: Typesafe.string,
 	}),
 )
+const indexCheck: Typesafe.Equals<Model.Index, ReturnType<typeof indexSchemaBase>> = true
 
 const indexesSchema = Typesafe.coalesce<Model.Indexes, Model.Indexes>(
 	Typesafe.preprocess(
-		Typesafe.array(indexLike),
+		Typesafe.array(indexSchemaBase),
 		it => it?.constructor === Object ? Object.values(it) : it,
 	),
 	[],
 )
 
 const uniqueConstraint = Typesafe.intersection(
-	indexLike,
+	Typesafe.object({
+		fields: Typesafe.array(Typesafe.string),
+	}),
 	Typesafe.partial({
 		timing: Typesafe.enumeration('deferrable', 'deferred'),
+		name: Typesafe.string,
+		index: Typesafe.literal(false),
+	}),
+)
+const uniqueIndex = Typesafe.intersection(
+	Typesafe.object({
+		fields: Typesafe.array(Typesafe.string),
+		index: Typesafe.literal(true),
+	}),
+	Typesafe.partial({
+		nulls: Typesafe.enumeration('distinct', 'not distinct'),
 	}),
 )
 const uniqueConstraintCheck: Typesafe.Equals<Model.UniqueConstraint, ReturnType<typeof uniqueConstraint>> = true
+const uniqueIndexCheck: Typesafe.Equals<Model.UniqueIndex, ReturnType<typeof uniqueIndex>> = true
 
 const entitySchema = Typesafe.intersection(
 	Typesafe.object({
@@ -194,8 +209,8 @@ const entitySchema = Typesafe.intersection(
 		primaryColumn: Typesafe.string,
 		tableName: Typesafe.string,
 		fields: Typesafe.record(Typesafe.string, fieldSchema),
-		unique: Typesafe.preprocess<Model.UniqueConstraints>(
-			Typesafe.array(uniqueConstraint),
+		unique: Typesafe.preprocess<Model.Uniques>(
+			Typesafe.array(Typesafe.union(uniqueConstraint, uniqueIndex)),
 			it => it?.constructor === Object ? Object.values(it) : it,
 		),
 		indexes: indexesSchema,

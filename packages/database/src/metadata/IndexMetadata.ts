@@ -4,6 +4,7 @@ export interface IndexMetadata {
 	indexName: string
 	tableName: string
 	columnNames: string[]
+	unique: boolean
 }
 
 export type IndexFilter = Partial<IndexMetadata>
@@ -31,6 +32,9 @@ export class IndexMetadataSet {
 				return false
 			}
 			if (filter.columnNames !== undefined && !stringArrayEquals(it.columnNames, filter.columnNames)) {
+				return false
+			}
+			if (filter.unique !== undefined && it.unique !== filter.unique) {
 				return false
 			}
 			return true

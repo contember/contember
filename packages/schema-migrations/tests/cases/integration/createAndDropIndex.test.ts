@@ -49,6 +49,7 @@ describe('drop index', () => testMigrations({
 			tableName: 'article',
 			columnNames: ['title'],
 			indexName: 'idx_article_title',
+			unique: false,
 		}],
 		uniqueConstraints: [],
 	}),

@@ -35,6 +35,7 @@ export class DatabaseMetadataResolver {
 				indexName: it.index_name,
 				tableName: it.table_name,
 				columnNames: it.columns,
+				unique: it.is_unique,
 			}))
 
 		return createDatabaseMetadata({
@@ -81,7 +82,8 @@ export class DatabaseMetadataResolver {
             SELECT
                 MAX(idx_class.relname) AS index_name,
                 MAX(table_class.relname) AS table_name,
-                JSONB_AGG(DISTINCT pg_attribute.attname) AS columns
+                JSONB_AGG(DISTINCT pg_attribute.attname) AS columns,
+                BOOL_OR(indisunique) AS is_unique
             FROM pg_index
             JOIN pg_class AS table_class
                 ON pg_index.indrelid = table_class.oid
@@ -93,7 +95,6 @@ export class DatabaseMetadataResolver {
                 ON pg_attribute.attrelid = table_class.oid AND pg_attribute.attnum = ANY (pg_index.indkey)
             WHERE pg_namespace.nspname = ?
               AND indisprimary = FALSE
-              AND indisunique = FALSE
             GROUP BY pg_index.indexrelid
 		`, [schema]))
 			.rows
@@ -135,5 +136,6 @@ type IndexRow = {
 	index_name: string
 	table_name: string
 	columns: string[]
+	is_unique: boolean
 }
 

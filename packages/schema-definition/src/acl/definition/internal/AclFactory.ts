@@ -46,7 +46,7 @@ export class AclFactory {
 	private createPermissions(rolePermissions: PermissionsByEntity | undefined, entityLikeDefinition: Record<string, { new(): any }>, role: Role): Acl.Permissions {
 		return Object.fromEntries(Object.values(this.model.entities).map((entity): [string, Acl.EntityPermissions] | undefined => {
 			const permissions = rolePermissions ? this.createPermissionsFromAllow(rolePermissions, entity) : { predicates: {}, operations: {} }
-			const isEmpty = rolePermissions === undefined
+			const isEmpty = !rolePermissions?.has(entity.name)
 			const withExtensions = applyEntityAclExtensions(entityLikeDefinition[entity.name], { entity, permissions, role })
 			if (isEmpty && withExtensions === permissions) {
 				return undefined

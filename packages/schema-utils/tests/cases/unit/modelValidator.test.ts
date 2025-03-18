@@ -91,3 +91,22 @@ test('column name collision', () => {
 		},
 	])
 })
+
+
+namespace ViewRelations {
+	@c.View('SELECT 1')
+	export class Foo {
+		bars = c.oneHasMany(Bar, 'foo')
+	}
+
+	@c.View('SELECT 1')
+	export class Bar {
+		foo = c.manyHasOne(Foo, 'bars')
+	}
+}
+
+test('view relations', () => {
+	const schema = createSchema(ViewRelations)
+	const validator = new ModelValidator(schema.model)
+	expect(validator.validate()).toStrictEqual([])
+})

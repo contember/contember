@@ -60,8 +60,8 @@ export class ModelValidator {
 
 	private validateUniqueConstraints(entity: Model.Entity, errors: ErrorBuilder): void {
 		for (const constraint of entity.unique) {
-			if (entity.view && !constraint.index) {
-				errors.add('MODEL_INVALID_CONSTRAINT', 'Unique constraint on view entity must be an index. Please set index: true')
+			if (entity.view?.materialized && !constraint.index) {
+				errors.add('MODEL_INVALID_CONSTRAINT', 'For materialized views, Unique must be defined as an index. Please set index: true.')
 			}
 			for (const field of constraint.fields) {
 				const fieldDef = entity.fields[field]
@@ -195,11 +195,6 @@ export class ModelValidator {
 			}
 		} else {
 			const inversedBy = field.inversedBy
-			if (targetEntity.view) {
-				if ('joiningColumn' in field) {
-					return errors.add('MODEL_INVALID_VIEW_USAGE', `View entity ${targetEntity.name} cannot be referenced from an owning relation. Try switching the owning side.`)
-				}
-			}
 			if (inversedBy) {
 				const targetField = targetEntity.fields[inversedBy]
 				const relationDescription = `Target relation ${targetEntityName}::${inversedBy}:`

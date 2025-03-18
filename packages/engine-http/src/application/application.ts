@@ -14,6 +14,8 @@ import stream, { Duplex, Readable } from 'node:stream'
 import { ProjectGroupResolver } from '../projectGroup/ProjectGroupResolver'
 import { ProjectGroupContainer } from '../projectGroup/ProjectGroupContainer'
 import { URL } from 'node:url'
+import { cpuUsage, memoryUsage } from 'node:process'
+import { performance } from 'node:perf_hooks'
 
 type Route<C> = { match: RequestMatcher; controller: C; module: string }
 export class Application {
@@ -139,7 +141,7 @@ export class Application {
 			const ws = await new Promise<WebSocket>(resolve => wss.handleUpgrade(req, socket, head, (ws, request) => {
 				resolve(ws)
 			}))
-			const wsEstablished = new Date().getTime()
+			const wsEstablished = performance.now()
 			webSocketContext = {
 				ws,
 				abortSignal,
@@ -155,14 +157,14 @@ export class Application {
 			requestLogger.debug('Websocket connection established')
 			ws.on('error', e => {
 				requestLogger.error(e, {
-					websocketOpenMs: new Date().getTime() - wsEstablished,
+					websocketOpenMs: performance.now() - wsEstablished,
 				})
 			})
 
 			return new Promise<void>(resolve => {
 				ws.on('close', () => {
 					requestLogger.debug('Websocket connection closed', {
-						websocketOpenMs: new Date().getTime() - wsEstablished,
+						websocketOpenMs: performance.now() - wsEstablished,
 					})
 					resolve()
 				})
@@ -331,10 +333,12 @@ export class Application {
 
 	private createTimer() {
 		const times: EventTime[] = []
-		const globalStart = new Date().getTime()
+		const globalStart = performance.now()
+		const cpuUsageStart = cpuUsage()
+		const memoryUsageStart = memoryUsage()
 		const timer: Timer = (name: string, cb) => {
-			const start = new Date().getTime()
-			const time: EventTime = { label: name, start: start - globalStart }
+			const start = performance.now()
+			const time: EventTime = { label: name, start: Math.round(start - globalStart) }
 			times.push(time)
 			const res = cb()
 
@@ -344,7 +348,7 @@ export class Application {
 						await res
 					} catch {
 					} finally {
-						time.duration = new Date().getTime() - start
+						time.duration = Math.round(performance.now() - start)
 					}
 				})()
 			}
@@ -357,16 +361,24 @@ export class Application {
 			}
 
 			const emit = () => {
-				const total = new Date().getTime() - globalStart
+				const total = performance.now() - globalStart
 				const timeLabel = total > 500 ? 'TIME_SLOW' : 'TIME_OK'
 				const shouldSuppress = this.suppressAccessLog === true || !ctx.req.url || (this.suppressAccessLog !== false && this.suppressAccessLog.test(ctx.req.url))
 
+				const cpuUsageEnd = cpuUsage()
+				const memoryUsageEnd = memoryUsage()
+
+				const cpuUsageDiffMs = (cpuUsageEnd.user - cpuUsageStart.user) / 1000
+				const memoryUsageDiff = memoryUsageEnd.heapUsed - memoryUsageStart.heapUsed
 				const level = shouldSuppress ? 'debug' : 'info'
 				ctx.logger.log(level, !ctx.response ? 'Connection established' : ctx.response.statusCode < 400 ? `Request successful` : 'Request failed', {
 					status: ctx.response?.statusCode,
 					timeLabel: timeLabel,
-					totalTimeMs: total,
+					totalTimeMs: Math.round(total),
 					events: times,
+					cpuUsageDiffMs,
+					memoryUsageDiff,
+					responseBodySize: ctx.body && typeof ctx.body === 'string' ? ctx.body.length : undefined,
 				})
 			}
 

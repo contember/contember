@@ -195,11 +195,6 @@ export class ModelValidator {
 			}
 		} else {
 			const inversedBy = field.inversedBy
-			if (targetEntity.view) {
-				if ('joiningColumn' in field) {
-					return errors.add('MODEL_INVALID_VIEW_USAGE', `View entity ${targetEntity.name} cannot be referenced from an owning relation. Try switching the owning side.`)
-				}
-			}
 			if (inversedBy) {
 				const targetField = targetEntity.fields[inversedBy]
 				const relationDescription = `Target relation ${targetEntityName}::${inversedBy}:`

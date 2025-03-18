@@ -242,6 +242,14 @@ export const DataViewEachRow: ({ children }: {
 export const DataViewElement: NamedExoticComponent<DataViewElementProps>;
 
 // @public (undocumented)
+export type DataViewElementData = {
+    name: string;
+    label?: ReactNode;
+    fallback?: boolean;
+    children?: DataViewElementData[];
+};
+
+// @public (undocumented)
 export interface DataViewElementProps {
     children: React.ReactNode;
     fallback?: boolean;
@@ -1112,7 +1120,7 @@ export const useDataViewDisplayedState: <T extends DataViewState>() => T | undef
 // @public
 export const useDataViewElements: ({ selection }?: {
     selection?: DataViewSelectionValues;
-}) => DataViewElementProps[];
+}) => DataViewElementData[];
 
 // @public
 export const useDataViewEntityListAccessor: () => EntityListAccessor | undefined;

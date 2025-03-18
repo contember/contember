@@ -60,6 +60,14 @@ export const SimpleGrid = () => {
 					<DataGridActionColumn><Button>Show detail</Button></DataGridActionColumn>
 					<DataGridTextColumn header="Title" field="title" />
 					<DataGridEnumColumn header="State" field="state" options={GridArticleStateLabels} />
+					<DataGridColumn header="test" hidingName="test">
+						<DataViewElement label="Foo" name="foo">
+							<Field field="title" />
+						</DataViewElement>
+						<DataViewElement label="Bar" name="bar">
+							bar
+						</DataViewElement>
+					</DataGridColumn>
 				</DefaultDataGrid>
 			</Binding>
 		</>
@@ -222,21 +230,43 @@ const CustomGridTile = Component(() => (
 			<Field field="title" />
 		</h2>
 
-		<div className="text-sm text-gray-500">
-			<Field field="state" />
-		</div>
-
-		<div className="flex -mx-2">
-			<DataViewElement name="tags" label="Tags">
-				<HasMany field="tags">
-					<DataGridHasManyTooltip field="tags">
-						<Button variant="ghost" size="sm">
+		<DataViewElement name="details" label="Details">
+			<DataViewElement name="category" label="Category">
+				<HasOne field="category">
+					<div>
+						<DataGridHasOneTooltip field="category">
 							<Field field="name" />
-						</Button>
-					</DataGridHasManyTooltip>
-				</HasMany>
+						</DataGridHasOneTooltip>
+					</div>
+				</HasOne>
 			</DataViewElement>
-		</div>
+			<DataViewElement name="author" label="Author">
+				<HasOne field="author">
+					<div>
+						<DataGridHasOneTooltip field="author">
+							<Field field="name" />
+						</DataGridHasOneTooltip>
+					</div>
+				</HasOne>
+			</DataViewElement>
+			<DataViewElement name="state" label="State">
+				<div className="text-sm text-gray-500">
+					<Field field="state" />
+				</div>
+			</DataViewElement>
+
+			<DataViewElement name="tags" label="Tags">
+				<div className="flex -mx-2">
+					<HasMany field="tags">
+						<DataGridHasManyTooltip field="tags">
+							<Button variant="ghost" size="sm">
+								<Field field="name" />
+							</Button>
+						</DataGridHasManyTooltip>
+					</HasMany>
+				</div>
+			</DataViewElement>
+		</DataViewElement>
 	</div>
 ))
 

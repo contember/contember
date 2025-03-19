@@ -102,6 +102,22 @@ export type DataGridDateFilterProps = Omit<DataViewDateFilterProps, 'children'> 
     ranges?: DataGridPredefinedDateRange[];
 };
 
+// @public (undocumented)
+export const dataGridDateRanges: {
+    yesterday: DataGridPredefinedDateRange;
+    today: DataGridPredefinedDateRange;
+    tomorrow: DataGridPredefinedDateRange;
+    thisWeek: DataGridPredefinedDateRange;
+    lastWeek: DataGridPredefinedDateRange;
+    nextWeek: DataGridPredefinedDateRange;
+    thisMonth: DataGridPredefinedDateRange;
+    lastMonth: DataGridPredefinedDateRange;
+    nextMonth: DataGridPredefinedDateRange;
+    thisYear: DataGridPredefinedDateRange;
+    lastYear: DataGridPredefinedDateRange;
+    nextYear: DataGridPredefinedDateRange;
+};
+
 // @public
 export const DataGridDateTimeColumn: React_2.NamedExoticComponent<DataGridDateTimeColumnProps>;
 

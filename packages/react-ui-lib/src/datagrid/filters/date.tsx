@@ -1,18 +1,29 @@
+import { Component } from '@contember/interface'
+import {
+	DataViewDateFilter,
+	DataViewDateFilterInput,
+	DataViewDateFilterProps,
+	DataViewDateFilterResetTrigger,
+	DataViewNullFilterTrigger,
+	DateRangeFilterArtifacts,
+	useDataViewFilter,
+	useDataViewFilterName,
+} from '@contember/react-dataview'
+import { XIcon } from 'lucide-react'
 import * as React from 'react'
 import { ReactNode, useId } from 'react'
-import { DataViewDateFilter, DataViewDateFilterInput, DataViewDateFilterProps, DataViewDateFilterResetTrigger, DataViewNullFilterTrigger, DateRangeFilterArtifacts, useDataViewFilter, useDataViewFilterName } from '@contember/react-dataview'
-import { Component } from '@contember/interface'
-import { Popover, PopoverContent, PopoverTrigger } from '../../ui/popover'
-import { DataGridActiveFilterUI, DataGridFilterSelectTriggerUI, DataGridSingleFilterUI } from '../ui'
-import { Input } from '../../ui/input'
-import { formatDate } from '../../formatting/formatting'
+import { Temporal } from 'temporal-polyfill'
 import { dict } from '../../dict'
+import { formatDate } from '../../formatting'
+import { Button } from '../../ui/button'
+import { Input } from '../../ui/input'
+import { Label } from '../../ui/label'
+import { Popover, PopoverContent, PopoverTrigger } from '../../ui/popover'
+import { cn } from '../../utils'
+import { DataViewFieldLabel } from '../labels'
+import { DataGridActiveFilterUI, DataGridFilterSelectTriggerUI, DataGridSingleFilterUI } from '../ui'
 import { DataGridNullFilter } from './common'
 import { DataGridFilterMobileHiding } from './mobile'
-import { Button } from '../../ui/button'
-import { Label } from '../../ui/label'
-import { XIcon } from 'lucide-react'
-import { DataViewFieldLabel } from '../labels'
 
 export type DataGridPredefinedDateRange = { start: string; end: string; label: ReactNode }
 
@@ -50,23 +61,28 @@ export const DataGridDateFilter = Component(({ label, ranges, ...props }: DataGr
 
 const DataGridDateFilterRange = () => {
 	const [artifact] = useDataViewFilter<DateRangeFilterArtifacts>(useDataViewFilterName())
+
 	if (!artifact) {
 		return null
 	}
+
 	const { start, end } = artifact
 	const startFormatted = start ? formatDate(start) : undefined
 	const endFormatted = end ? formatDate(end) : undefined
+
 	if (startFormatted !== undefined && endFormatted !== undefined) {
 		return `${startFormatted} – ${endFormatted}`
 	}
+
 	if (startFormatted !== undefined) {
 		return `≥ ${startFormatted}`
 	}
+
 	if (endFormatted !== undefined) {
 		return `≤ ${endFormatted}`
 	}
-	return undefined
 
+	return undefined
 }
 
 
@@ -86,26 +102,45 @@ const DataGridDateFilterList = () => (
 	</>
 )
 
+const now = Temporal.Now.plainDateISO()
+const lastMonth = now.subtract({ months: 1 })
+const nextMonth = now.add({ months: 1 })
+const lastYear = now.subtract({ years: 1 })
+const nextYear = now.add({ years: 1 })
+
 /**
  * Utility function to create a predefined date range
  */
 export const createDataGridDateRange = (label: ReactNode, dayDeltaStart: number, dayDeltaEnd: number): DataGridPredefinedDateRange => {
-	const start = new Date(new Date().setDate(new Date().getDate() + dayDeltaStart))
-	const end = new Date(new Date().setDate(new Date().getDate() + dayDeltaEnd))
+	const start = now.add({ days: dayDeltaStart })
+	const end = now.add({ days: dayDeltaEnd })
+
 	return {
 		label,
-		start: `${start.getFullYear()}-${String(start.getMonth() + 1).padStart(2, '0')}-${String(start.getDate()).padStart(2, '0')}`,
-		end: `${end.getFullYear()}-${String(end.getMonth() + 1).padStart(2, '0')}-${String(end.getDate()).padStart(2, '0')}`,
+		start: start.toString(),
+		end: end.toString(),
 	}
 }
 
-const defaultRanges = [createDataGridDateRange(dict.datagrid.today, 0, 0)]
+export const dataGridDateRanges = {
+	yesterday: createDataGridDateRange(dict.datagrid.yesterday, -1, -1),
+	today: createDataGridDateRange(dict.datagrid.today, 0, 0),
+	tomorrow: createDataGridDateRange(dict.datagrid.tomorrow, 1, 1),
+	thisWeek: createDataGridDateRange(dict.datagrid.thisWeek, 1 - now.dayOfWeek, 6 - now.dayOfWeek),
+	lastWeek: createDataGridDateRange(dict.datagrid.lastWeek, 1 - now.dayOfWeek - 7, 6 - now.dayOfWeek - 7),
+	nextWeek: createDataGridDateRange(dict.datagrid.nextWeek, 1 - now.dayOfWeek + 7, 6 - now.dayOfWeek + 7),
+	thisMonth: createDataGridDateRange(dict.datagrid.thisMonth, 1 - now.day, now.daysInMonth - now.day),
+	lastMonth: createDataGridDateRange(dict.datagrid.lastMonth, 1 - now.day - lastMonth.daysInMonth, -now.day),
+	nextMonth: createDataGridDateRange(dict.datagrid.nextMonth, 1 - now.day + nextMonth.daysInMonth, now.daysInMonth - now.day + nextMonth.daysInMonth),
+	thisYear: createDataGridDateRange(dict.datagrid.thisYear, 1 - now.dayOfYear, now.daysInYear - now.dayOfYear),
+	lastYear: createDataGridDateRange(dict.datagrid.lastYear, 1 - now.dayOfYear - lastYear.daysInYear, -now.dayOfYear),
+	nextYear: createDataGridDateRange(dict.datagrid.nextYear, 1 - now.dayOfYear + nextYear.daysInYear, now.daysInYear - now.dayOfYear + nextYear.daysInYear),
+}
 
-const DataGridDateFilterSelect = ({ label, ranges = defaultRanges }: {
+const DataGridDateFilterSelect = ({ label, ranges = [dataGridDateRanges.today] }: {
 	label?: ReactNode
 	ranges?: DataGridPredefinedDateRange[]
 }) => {
-
 	return (
 		<Popover>
 			<PopoverTrigger asChild>
@@ -131,12 +166,14 @@ const DataGridRangeFilter = ({ start, end, label }: DataGridPredefinedDateRange)
 	const [filter, setFilter] = useDataViewFilter<DateRangeFilterArtifacts>(name)
 	const isActive = filter?.start === start && filter?.end === end
 	return (
-		<Button variant="outline" size="sm" className={isActive ? 'shadow-inner bg-gray-100' : ''} onClick={() => {
-			setFilter({
-				start,
-				end,
-			})
-		}}>{label}</Button>
+		<Button
+			variant="outline"
+			size="sm"
+			className={cn({ 'shadow-inner bg-gray-100': isActive })}
+			onClick={() => {
+				setFilter({ start, end })
+			}}
+		>{label}</Button>
 	)
 }
 
@@ -145,6 +182,7 @@ const DataGridRangeFilter = ({ start, end, label }: DataGridPredefinedDateRange)
  */
 export const DataGridDateFilterControls = ({ layout }: { layout?: 'row' | 'column' }) => {
 	const id = useId()
+
 	return (
 		<div className={'flex flex-col'}>
 			<div className={layout === 'row' ? 'flex gap-4 px-4 py-2' : 'flex flex-col px-4 py-2 gap-2'}>
@@ -154,8 +192,9 @@ export const DataGridDateFilterControls = ({ layout }: { layout?: 'row' | 'colum
 							{dict.datagrid.dateStart}:
 						</Label>
 						<DataViewDateFilterResetTrigger type="start">
-							<span className="text-sm text-gray-500 cursor-pointer hover:bg-gray-100 rounded p-0.5"><XIcon
-								className="w-3 h-3" /></span>
+							<span className="text-sm text-gray-500 cursor-pointer hover:bg-gray-100 rounded p-0.5">
+								<XIcon className="w-3 h-3" />
+							</span>
 						</DataViewDateFilterResetTrigger>
 					</div>
 					<DataViewDateFilterInput type={'start'}>
@@ -168,8 +207,9 @@ export const DataGridDateFilterControls = ({ layout }: { layout?: 'row' | 'colum
 							{dict.datagrid.dateEnd}:
 						</Label>
 						<DataViewDateFilterResetTrigger type="end">
-							<span className="text-sm text-gray-500 cursor-pointer hover:bg-gray-100 rounded p-0.5"><XIcon
-								className="w-3 h-3" /></span>
+							<span className="text-sm text-gray-500 cursor-pointer hover:bg-gray-100 rounded p-0.5">
+								<XIcon className="w-3 h-3" />
+							</span>
 						</DataViewDateFilterResetTrigger>
 					</div>
 					<DataViewDateFilterInput type={'end'}>

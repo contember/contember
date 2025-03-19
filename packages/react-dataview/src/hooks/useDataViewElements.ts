@@ -1,9 +1,8 @@
-import { ChildrenAnalyzer, Leaf } from '@contember/react-multipass-rendering'
+import { BranchNode, ChildrenAnalyzer } from '@contember/react-multipass-rendering'
 import { useDataViewChildren } from '../contexts'
-import { DataViewElement, DataViewElementProps } from '../components'
-import { Environment } from '@contember/react-binding'
-import { useMemo, useState } from 'react'
-import { useEnvironment } from '@contember/react-binding'
+import { DataViewElement } from '../components'
+import { Environment, useEnvironment } from '@contember/react-binding'
+import { ReactNode, useMemo, useState } from 'react'
 import { DataViewSelectionValues } from '../types'
 import { dataViewSelectionEnvironmentExtension } from '../env/dataViewSelectionEnvironmentExtension'
 
@@ -13,24 +12,33 @@ import { dataViewSelectionEnvironmentExtension } from '../env/dataViewSelectionE
  */
 export const useDataViewElements = ({ selection }: {
 	selection?: DataViewSelectionValues
-} = {}) => {
+} = {}): DataViewElementData[] => {
 	const children = useDataViewChildren()
 	const env = useEnvironment()
 
 	const [analyzer] = useState(() => {
-		const elementLeaf = new Leaf(node => node.props, DataViewElement)
+		const elementNode = new BranchNode((node, child: undefined | DataViewElementData | DataViewElementData[], env: Environment): DataViewElementData => {
+			return {
+				name: node.props.name,
+				label: node.props.label,
+				fallback: node.props.fallback,
+				children: Array.isArray(child) ? child : child ? [child] : [],
+			}
+		}, DataViewElement, {
+			childrenAreOptional: true,
+		})
 
 		return new ChildrenAnalyzer<
-			DataViewElementProps,
 			never,
+			DataViewElementData,
 			Environment
-		>([elementLeaf], {
+		>([], [elementNode], {
 			staticRenderFactoryName: 'staticRender',
 			staticContextFactoryName: 'generateEnvironment',
 		})
 	})
 
-	return useMemo(() => {
+	return useMemo((): DataViewElementData[] => {
 		const envWithSelection = selection ? env.withExtension(dataViewSelectionEnvironmentExtension, selection) : env
 
 		const elements = analyzer.processChildren(children, envWithSelection)
@@ -40,3 +48,9 @@ export const useDataViewElements = ({ selection }: {
 	}, [analyzer, children, env, selection])
 }
 
+export type DataViewElementData = {
+	name: string
+	label?: ReactNode
+	fallback?: boolean
+	children?: DataViewElementData[]
+}

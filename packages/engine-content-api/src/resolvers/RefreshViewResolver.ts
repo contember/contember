@@ -1,7 +1,6 @@
 import { Schema } from '@contember/schema'
 import { MapperFactory } from '../mapper'
 import { wrapIdentifier } from '@contember/database'
-import { Authorizator } from '../acl'
 
 export class RefreshViewResolver {
 	constructor(
@@ -16,7 +15,7 @@ export class RefreshViewResolver {
 		if (!entityModel) {
 			throw new Error(`Entity ${entity} not found`)
 		}
-		await mapper.db.query(`REFRESH MATERIALIZED VIEW ${wrapIdentifier(entityModel.tableName)}`)
+		await mapper.db.query(`REFRESH MATERIALIZED VIEW ${wrapIdentifier(mapper.db.schema)}.${wrapIdentifier(entityModel.tableName)}`)
 
 		return { ok: true }
 	}

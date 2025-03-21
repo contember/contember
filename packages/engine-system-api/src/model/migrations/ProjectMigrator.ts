@@ -227,7 +227,7 @@ export class ProjectMigrator {
 	}
 
 	private async executeOnStage(db: Client, stage: Stage, sql: string, migrationVersion: string) {
-		await db.query('SET search_path TO ' + wrapIdentifier(stage.schema))
+		await db.query('SET LOCAL search_path TO ' + wrapIdentifier(stage.schema))
 		try {
 			await db.query(sql)
 		} catch (e) {

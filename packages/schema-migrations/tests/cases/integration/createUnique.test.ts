@@ -233,5 +233,5 @@ describe('create unique index', () => testMigrations({
 			},
 		}),
 	],
-	sql: SQL`CREATE UNIQUE INDEX ON "author" ("email") NULLS DISTINCT;`,
+	sql: SQL`CREATE UNIQUE INDEX ON "author" ("email");`,
 }))

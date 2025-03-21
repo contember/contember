@@ -1,7 +1,7 @@
 {
   "name": "@contember/react-slate-editor",
   "license": "Apache-2.0",
-  "version": "2.1.0-alpha.4",
+  "version": "2.1.0-alpha.5",
   "type": "module",
   "sideEffects": false,
   "main": "./dist/production/index.js",

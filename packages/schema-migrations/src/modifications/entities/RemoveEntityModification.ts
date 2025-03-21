@@ -31,7 +31,11 @@ export class RemoveEntityModificationHandler implements ModificationHandler<Remo
 	public createSql(builder: MigrationBuilder, options: ModificationHandlerCreateSqlOptions): void {
 		const entity = this.schema.model.entities[this.data.entityName]
 		if (entity.view) {
-			builder.dropView(entity.tableName)
+			if (entity.view.materialized) {
+				builder.dropMaterializedView(entity.tableName)
+			} else {
+				builder.dropView(entity.tableName)
+			}
 			return
 		}
 		if (this.options.formatVersion >= VERSION_REMOVE_REFERENCING_RELATIONS) {

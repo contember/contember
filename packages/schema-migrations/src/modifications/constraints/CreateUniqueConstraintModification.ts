@@ -34,7 +34,7 @@ export class CreateUniqueConstraintModificationHandler implements ModificationHa
 		const columnNameIds = columns.map(wrapIdentifier)
 
 		if ('index' in this.data.unique && this.data.unique.index) {
-			const nulls = this.data.unique.nulls === 'not distinct' ? ' NULLS NOT DISTINCT' : ' NULLS DISTINCT'
+			const nulls = this.data.unique.nulls === 'not distinct' ? ' NULLS NOT DISTINCT' : ''
 			builder.sql(`CREATE UNIQUE INDEX ON ${tableNameId} (${columnNameIds.join(', ')})${nulls}`)
 		} else {
 			let checkModifier = ''

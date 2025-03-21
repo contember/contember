@@ -1,5 +1,5 @@
 import { Model } from '@contember/schema'
-import { GraphQLBoolean, GraphQLEnumType, GraphQLFieldConfig, GraphQLObjectType } from 'graphql'
+import { GraphQLBoolean, GraphQLEnumType, GraphQLFieldConfig, GraphQLInputObjectType, GraphQLObjectType } from 'graphql'
 import { Context } from '../types'
 import { Authorizator } from '../acl'
 
@@ -22,6 +22,12 @@ export class RefreshViewMutationProvider {
 			values: Object.fromEntries(materializedViews.map(it => [it.name, { value: it.name }])),
 		})
 
+		const refreshViewOptions = new GraphQLInputObjectType({
+			name: 'RefreshMaterializedViewOptions',
+			fields: {
+				concurrently: { type: GraphQLBoolean },
+			},
+		})
 		return {
 			type: new GraphQLObjectType({
 				name: 'RefreshMaterializedViewResponse',
@@ -31,9 +37,10 @@ export class RefreshViewMutationProvider {
 			}),
 			args: {
 				name: { type: materializedViewsEnum },
+				options: { type: refreshViewOptions },
 			},
 			resolve: async (parent, args, context) => {
-				return await context.executionContainer.refreshViewResolver.resolve(args.name)
+				return await context.executionContainer.refreshViewResolver.resolve(args.name, args.options)
 			},
 		}
 	}

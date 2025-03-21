@@ -13,7 +13,9 @@ namespace MaterializedViewTest {
 	@c.View(`SELECT '${id}'::uuid AS id, COALESCE(SUM(value), 0) AS sum FROM value`, {
 		materialized: true,
 	})
+	@c.Unique({ fields: ['id'], index: true })
 	export class Stats {
+		id = c.uuidColumn().notNull()
 		sum = c.intColumn()
 	}
 }
@@ -62,7 +64,7 @@ test('Content API: materialized view', async () => {
 	await tester(
 		gql`
 			mutation {
-                refreshMaterializedView(name: Stats) {
+                refreshMaterializedView(name: Stats, options: {concurrently: true}) {
 					ok
                 }
 			}

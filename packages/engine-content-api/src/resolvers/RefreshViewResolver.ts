@@ -9,13 +9,14 @@ export class RefreshViewResolver {
 	) {
 	}
 
-	public async resolve(entity: string): Promise<{ ok: boolean }> {
+	public async resolve(entity: string, options?: { concurrently?: boolean }): Promise<{ ok: boolean }> {
 		const mapper = this.mapperFactory.create()
 		const entityModel = this.schema.model.entities[entity]
 		if (!entityModel) {
 			throw new Error(`Entity ${entity} not found`)
 		}
-		await mapper.db.query(`REFRESH MATERIALIZED VIEW ${wrapIdentifier(mapper.db.schema)}.${wrapIdentifier(entityModel.tableName)}`)
+		const concurrently = options?.concurrently ? ' CONCURRENTLY' : ''
+		await mapper.db.query(`REFRESH MATERIALIZED VIEW${concurrently} ${wrapIdentifier(mapper.db.schema)}.${wrapIdentifier(entityModel.tableName)}`)
 
 		return { ok: true }
 	}

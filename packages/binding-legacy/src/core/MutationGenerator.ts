@@ -496,48 +496,75 @@ export class MutationGenerator {
 
 		const result: Input.UpdateDataInput = {}
 
-		for (const [placeholderName, fieldState] of currentState.children) {
-			if (placeholderName === PRIMARY_KEY_NAME || placeholderName === TYPENAME_KEY_NAME) {
-				continue
-			}
-			if (processedPlaceholders.has(placeholderName)) {
-				continue
-			}
-			processedPlaceholders.add(placeholderName)
-
-			switch (fieldState.type) {
-				case 'field': {
-					if (fieldState.persistedValue !== undefined) {
-						const accessor = fieldState.getAccessor()
-						const resolvedValue = accessor.value ?? accessor.defaultValue ?? null
-						if (fieldState.persistedValue !== resolvedValue) {
-							result[placeholderName] = resolvedValue
-						}
-					}
-					break
+		for (const siblingState of StateIterator.eachSiblingRealm(currentState)) {
+			for (const [placeholderName, fieldState] of siblingState.children) {
+				if (placeholderName === PRIMARY_KEY_NAME || placeholderName === TYPENAME_KEY_NAME) {
+					continue
 				}
-				case 'entityRealmStub':
-				case 'entityRealm': {
-					const marker = getEntityMarker(fieldState)
-					if (!(marker instanceof HasOneRelationMarker)) {
-						throw new BindingError()
-					}
-					if (pathBack?.fieldBackToParent === marker.parameters.field) {
-						continue
-					}
-					const reducedBy = marker.parameters.reducedBy
+				if (processedPlaceholders.has(placeholderName)) {
+					continue
+				}
+				processedPlaceholders.add(placeholderName)
 
-					const persistedValue = entityData?.get?.(placeholderName)?.value
-					if (reducedBy === undefined) {
-
-						const relationData = this.getUpdateOneRelationInput(currentState, fieldState, persistedValue, placeholderName)
-						if (relationData !== undefined) {
-							result[marker.parameters.field] = relationData
+				switch (fieldState.type) {
+					case 'field': {
+						if (fieldState.persistedValue !== undefined) {
+							const accessor = fieldState.getAccessor()
+							const resolvedValue = accessor.value ?? accessor.defaultValue ?? null
+							if (fieldState.persistedValue !== resolvedValue) {
+								result[placeholderName] = resolvedValue
+							}
 						}
+						break
+					}
+					case 'entityRealmStub':
+					case 'entityRealm': {
+						const marker = getEntityMarker(fieldState)
+						if (!(marker instanceof HasOneRelationMarker)) {
+							throw new BindingError()
+						}
+						if (pathBack?.fieldBackToParent === marker.parameters.field) {
+							continue
+						}
+						const reducedBy = marker.parameters.reducedBy
+
+						const persistedValue = entityData?.get?.(placeholderName)?.value
+						if (reducedBy === undefined) {
+
+							const relationData = this.getUpdateOneRelationInput(currentState, fieldState, persistedValue, placeholderName)
+							if (relationData !== undefined) {
+								result[marker.parameters.field] = relationData
+							}
 
 
-					} else {
-						const relationData = this.getUpdateManyRelationForReducedInput(currentState, fieldState, persistedValue, placeholderName, reducedBy)
+						} else {
+							const relationData = this.getUpdateManyRelationForReducedInput(currentState, fieldState, persistedValue, placeholderName, reducedBy)
+							if (relationData !== undefined) {
+								const current = result[marker.parameters.field]
+								if (Array.isArray(current)) {
+									current.push(...relationData)
+								} else {
+									result[marker.parameters.field] = relationData
+								}
+							}
+
+						}
+						break
+					}
+					case 'entityList': {
+						const marker = fieldState.blueprint.marker
+						if (!(marker instanceof HasManyRelationMarker)) {
+							throw new BindingError()
+						}
+						if (pathBack?.fieldBackToParent === marker.parameters.field) {
+							continue
+						}
+						const persistedEntityIds = entityData?.get?.(placeholderName)?.value ?? new Set()
+
+						if (!(persistedEntityIds instanceof Set)) {
+							continue
+						}
+						const relationData = this.getUpdateManyRelationInput(fieldState, persistedEntityIds)
 						if (relationData !== undefined) {
 							const current = result[marker.parameters.field]
 							if (Array.isArray(current)) {
@@ -546,36 +573,11 @@ export class MutationGenerator {
 								result[marker.parameters.field] = relationData
 							}
 						}
-
+						break
 					}
-					break
+					default:
+						return assertNever(fieldState)
 				}
-				case 'entityList': {
-					const marker = fieldState.blueprint.marker
-					if (!(marker instanceof HasManyRelationMarker)) {
-						throw new BindingError()
-					}
-					if (pathBack?.fieldBackToParent === marker.parameters.field) {
-						continue
-					}
-					const persistedEntityIds = entityData?.get?.(placeholderName)?.value ?? new Set()
-
-					if (!(persistedEntityIds instanceof Set)) {
-						continue
-					}
-					const relationData = this.getUpdateManyRelationInput(fieldState, persistedEntityIds)
-					if (relationData !== undefined) {
-						const current = result[marker.parameters.field]
-						if (Array.isArray(current)) {
-							current.push(...relationData)
-						} else {
-							result[marker.parameters.field] = relationData
-						}
-					}
-					break
-				}
-				default:
-					return assertNever(fieldState)
 			}
 		}
 

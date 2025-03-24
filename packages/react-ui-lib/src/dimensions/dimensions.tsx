@@ -4,8 +4,10 @@ import {
 	DimensionRenderer,
 	Entity,
 	EntityAccessor,
+	Environment,
 	Field,
 	HasOne,
+	LabelMiddlewareProvider,
 	StaticRender,
 	SugaredQualifiedEntityList,
 	SugaredRelativeSingleEntity,
@@ -14,12 +16,12 @@ import {
 	useEntity,
 } from '@contember/interface'
 import { DataView, DataViewEachRow, DataViewLoaderState, DataViewSortingDirections, useDataViewEntityListAccessor } from '@contember/react-dataview'
-import * as React from 'react'
 import { ReactNode, useMemo } from 'react'
 import { CheckIcon } from 'lucide-react'
 import { Loader } from '../ui/loader'
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
 import { Button } from '../ui/button'
+import { DimensionLabelUI, DimensionLabelWrapperUI } from '../ui/dimension'
 
 export interface DimensionsSwitcherProps {
 	options: SugaredQualifiedEntityList['entities']
@@ -112,17 +114,25 @@ export interface SideDimensionsProps {
 	as: string
 	field: SugaredRelativeSingleEntity['field']
 	children: ReactNode
+	labelMiddleware?: (label: ReactNode, dimensionVariable: ReactNode, environment: Environment) => ReactNode
 }
 
-export const SideDimensions = Component<SideDimensionsProps>(({ dimension, children, as, field }) => {
+export const SideDimensions = Component<SideDimensionsProps>(({ dimension, children, as, field, labelMiddleware }) => {
 	return (
 		<div className="flex mt-4 gap-4">
 			<DimensionRenderer dimension={dimension} as={as}>
-				<HasOne field={field}>
-					<div className="flex-1">
-						{children}
-					</div>
-				</HasOne>
+				<LabelMiddlewareProvider value={(label: ReactNode, environment: Environment) => {
+					const dimensionVariable = environment.getVariableOrElse(as, null) as string | null
+					const dimensionLabel = <DimensionLabelWrapperUI>{label}<DimensionLabelUI>{dimensionVariable}</DimensionLabelUI></DimensionLabelWrapperUI>
+
+					return labelMiddleware ? labelMiddleware(label, dimensionVariable, environment) : dimensionLabel
+				}}>
+					<HasOne field={field}>
+						<div className="flex-1">
+							{children}
+						</div>
+					</HasOne>
+				</LabelMiddlewareProvider>
 			</DimensionRenderer>
 		</div>
 	)

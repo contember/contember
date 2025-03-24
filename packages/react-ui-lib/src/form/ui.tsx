@@ -2,7 +2,7 @@ import { uic } from '../utils/uic'
 import { Label } from '../ui/label'
 
 export const FormLayout = uic('div', {
-	baseClass: 'flex flex-col gap-2 mx-4',
+	baseClass: 'flex flex-col gap-2 mx-4 max-w-lg',
 	displayName: 'FormLayout',
 })
 

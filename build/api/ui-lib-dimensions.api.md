@@ -5,45 +5,49 @@
 ```ts
 
 import { DataViewSortingDirections } from '@contember/react-dataview';
-import * as React_2 from 'react';
+import { JSX as JSX_2 } from 'react/jsx-runtime';
+import { NamedExoticComponent } from 'react';
 import { ReactNode } from 'react';
 import { SugaredQualifiedEntityList } from '@contember/interface';
 import { SugaredRelativeSingleEntity } from '@contember/interface';
 import { SugaredRelativeSingleField } from '@contember/interface';
 
 // @public (undocumented)
-export const DimensionsSwitcher: React_2.NamedExoticComponent<DimensionsSwitcherProps>;
+export const DimensionLabel: ({ label, dimensionValue }: {
+    label: ReactNode;
+    dimensionValue: ReactNode;
+}) => JSX_2.Element;
 
 // @public (undocumented)
-export interface DimensionsSwitcherProps {
-    // (undocumented)
-    children: ReactNode;
-    // (undocumented)
-    dimension: string;
-    // (undocumented)
-    isMulti?: boolean;
-    // (undocumented)
+export const DimensionsSwitcher: NamedExoticComponent<DimensionsSwitcherProps>;
+
+// @public (undocumented)
+export type DimensionsSwitcherProps = {
     options: SugaredQualifiedEntityList['entities'];
-    // (undocumented)
     orderBy?: DataViewSortingDirections;
-    // (undocumented)
-    slugField: SugaredRelativeSingleField['field'];
-}
-
-// @public (undocumented)
-export const SideDimensions: React_2.NamedExoticComponent<SideDimensionsProps>;
-
-// @public (undocumented)
-export interface SideDimensionsProps {
-    // (undocumented)
-    as: string;
-    // (undocumented)
-    children: ReactNode;
-    // (undocumented)
     dimension: string;
-    // (undocumented)
+    children: ReactNode;
+    slugField: SugaredRelativeSingleField['field'];
+    isMulti?: boolean;
+};
+
+// @public (undocumented)
+export type RenderLabelProps = {
+    label: ReactNode;
+    dimensionValue: string | null;
+};
+
+// @public (undocumented)
+export const SideDimensions: NamedExoticComponent<SideDimensionsProps>;
+
+// @public (undocumented)
+export type SideDimensionsProps = {
+    dimension: string;
+    as: string;
     field: SugaredRelativeSingleEntity['field'];
-}
+    children: ReactNode;
+    renderLabel?: ({ label, dimensionValue }: RenderLabelProps) => ReactNode;
+};
 
 // (No @packageDocumentation comment for this package)
 

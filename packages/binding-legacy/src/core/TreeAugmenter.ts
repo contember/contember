@@ -178,7 +178,7 @@ export class TreeAugmenter {
 					}
 
 					if (child.persistedValue !== childData) {
-						const shouldChangeBothValues = child.persistedValue === child.value
+						const shouldChangeBothValues = (child.persistedValue ?? null) === child.value
 
 						child.persistedValue = childData
 						if (shouldChangeBothValues) {

@@ -10,7 +10,7 @@ import { RemoteProjectProvider } from '../../lib/project/RemoteProjectProvider'
 import { RemoteProjectResolver } from '../../lib/project/RemoteProjectResolver'
 
 type Args = {
-	dsn: string
+	dsn?: string
 }
 
 type Options = {
@@ -35,7 +35,7 @@ export class DeployCommand extends Command<Args, Options> {
 
 	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Deploy Contember project')
-		configuration.argument('dsn')
+		configuration.argument('dsn').optional()
 
 		configuration.option('admin').valueRequired()
 		configuration.option('root').valueNone()

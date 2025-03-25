@@ -14,6 +14,9 @@ export default async function (builder: MigrationBuilder, args: MigrationArgs<Sy
 		if (entity.indexes.length === 0) {
 			continue
 		}
+		if (entity.view) {
+			continue
+		}
 
 		for (const stage of stages) {
 			const databaseMetadata = metadataByStage[stage.schema] ??= await args.databaseMetadataResolver(args.connection, stage.schema)

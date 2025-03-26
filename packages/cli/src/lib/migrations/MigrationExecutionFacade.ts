@@ -88,6 +88,7 @@ export class MigrationExecutionFacade {
 				apiToken: project.token,
 				apiBaseUrl: project.endpoint,
 				projectName: project.name,
+				schemaVersionBuilder: this.schemaVersionBuilder,
 			},
 			log: message => console.log(message),
 			force,

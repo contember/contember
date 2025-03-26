@@ -15,7 +15,7 @@ export class MigrationExecutor {
 	}: {
 		client: SystemClient
 		migrations: MigrationToExecuteOkStatus[]
-		contentMigrationFactoryArgs: ContentMigrationFactoryArgs
+		contentMigrationFactoryArgs: Omit<ContentMigrationFactoryArgs, 'migration'>
 		log: (message: string) => void
 		force?: boolean
 	}): Promise<void> {
@@ -66,7 +66,10 @@ export class MigrationExecutor {
 			const migrationContent = await migration.localMigration.getContent()
 			if (migrationContent.type === 'factory') {
 				await executeMigrations()
-				const result = await migrationContent.factory(contentMigrationFactoryArgs)
+				const result = await migrationContent.factory({
+					...contentMigrationFactoryArgs,
+					migration: migration.localMigration,
+				})
 				migrationsToRun.push(result)
 				await executeMigrations()
 			} else {

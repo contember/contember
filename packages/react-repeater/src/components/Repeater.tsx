@@ -5,18 +5,18 @@ import { Component, EntityListSubTree, HasMany, repairEntitiesOrder, sortEntitie
 import { EntityListAccessor, QueryLanguage, SugaredQualifiedEntityList, SugaredRelativeEntityList, SugaredRelativeSingleField, SugaredOrderBy } from '@contember/react-binding'
 
 export type RepeaterRelativeProps =
-	& SugaredRelativeEntityList
+	& Omit<SugaredRelativeEntityList, 'orderBy'>
 	& {
 		children?: ReactNode
-		orderBy?: SugaredOrderBy
+		orderBy?: SugaredOrderBy | false
 		sortableBy?: SugaredRelativeSingleField['field']
 	}
 
 export type RepeaterQualifiedProps =
-	& SugaredQualifiedEntityList
+	& Omit<SugaredQualifiedEntityList, 'orderBy'>
 	& {
 		children?: ReactNode
-		orderBy?: SugaredOrderBy
+		orderBy?: SugaredOrderBy | false
 		sortableBy?: SugaredRelativeSingleField['field']
 	}
 
@@ -45,7 +45,7 @@ const RepeaterRelative = Component(
 		const desugarSortableBy = useSortableBy(props.sortableBy)
 		const entityList = useEntityList({
 			...props,
-			orderBy: props.orderBy ?? desugarSortableBy?.field,
+			orderBy: props.orderBy === false ? undefined : props.orderBy ?? desugarSortableBy?.field,
 		})
 
 		return (
@@ -60,7 +60,7 @@ const RepeaterRelative = Component(
 			: undefined
 
 		return (
-			<HasMany {...props} orderBy={props.orderBy ?? desugarSortableBy?.field}>
+			<HasMany {...props} orderBy={props.orderBy === false ? undefined : props.orderBy ?? desugarSortableBy?.field}>
 				{props.children}
 				{props.sortableBy && <SugaredField field={props.sortableBy} isNonbearing />}
 			</HasMany>
@@ -74,7 +74,7 @@ const RepeaterQualified = Component(
 		const desugarSortableBy = useSortableBy(props.sortableBy)
 		const entityList = useEntityListSubTree({
 			...props,
-			orderBy: props.orderBy ?? desugarSortableBy?.field,
+			orderBy: props.orderBy === false ? undefined : props.orderBy ?? desugarSortableBy?.field,
 		})
 
 		return (
@@ -89,7 +89,7 @@ const RepeaterQualified = Component(
 			: undefined
 
 		return (
-			<EntityListSubTree {...props} orderBy={props.orderBy ?? desugarSortableBy?.field}>
+			<EntityListSubTree {...props} orderBy={props.orderBy === false ? undefined : props.orderBy ?? desugarSortableBy?.field}>
 				{props.children}
 				{props.sortableBy && <SugaredField field={props.sortableBy} isNonbearing />}
 			</EntityListSubTree>

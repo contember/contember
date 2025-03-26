@@ -1,6 +1,6 @@
 import { MigrationFileLoader } from './MigrationFileLoader'
 import { MigrationParser } from './MigrationParser'
-import { ContentMigration, MigrationContent, MigrationFile } from './MigrationFile'
+import { ContentMigration, ContentMigrationFactoryArgs, MigrationContent, MigrationFile } from './MigrationFile'
 
 export class JsLoader implements MigrationFileLoader {
 	constructor(
@@ -11,10 +11,6 @@ export class JsLoader implements MigrationFileLoader {
 
 
 	public async load(file: MigrationFile): Promise<MigrationContent> {
-
-		// const code = await buildJs(file.path)
-		// const fn = new Function(`var module = {}; ((module) => { ${code} })(module); return module`)
-
 		const exports = await this.jsExecutor(file.path)
 		if (!('default' in exports) && !('query' in exports) && !('queries' in exports)) {
 			throw `export "default" or "query" is required in ${file.path}`
@@ -25,8 +21,8 @@ export class JsLoader implements MigrationFileLoader {
 
 		return {
 			type: 'factory',
-			factory: async (): Promise<ContentMigration> => {
-				const result = await exports.default()
+			factory: async (args: ContentMigrationFactoryArgs): Promise<ContentMigration> => {
+				const result = await exports.default(args)
 				const migration = this.migrationParser.parse(file, result ?? { queries: [] })
 				if (migration.type !== 'content') {
 					throw new Error()

@@ -87,16 +87,16 @@ export const RepeaterNotEmpty: ({ children }: {
 export type RepeaterProps = RepeaterQualifiedProps | RepeaterRelativeProps;
 
 // @public (undocumented)
-export type RepeaterQualifiedProps = SugaredQualifiedEntityList & {
+export type RepeaterQualifiedProps = Omit<SugaredQualifiedEntityList, 'orderBy'> & {
     children?: ReactNode;
-    orderBy?: SugaredOrderBy;
+    orderBy?: SugaredOrderBy | false;
     sortableBy?: SugaredRelativeSingleField['field'];
 };
 
 // @public (undocumented)
-export type RepeaterRelativeProps = SugaredRelativeEntityList & {
+export type RepeaterRelativeProps = Omit<SugaredRelativeEntityList, 'orderBy'> & {
     children?: ReactNode;
-    orderBy?: SugaredOrderBy;
+    orderBy?: SugaredOrderBy | false;
     sortableBy?: SugaredRelativeSingleField['field'];
 };
 

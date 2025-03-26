@@ -1,5 +1,6 @@
 import { Migration } from '@contember/schema-migrations'
 import { JSONObject } from './utils/json'
+import { SchemaVersionBuilder } from './SchemaVersionBuilder'
 
 export interface MigrationFile {
 	path: string
@@ -36,6 +37,8 @@ export type ContentMigrationFactoryArgs = {
 	apiBaseUrl: string
 	projectName: string
 	apiToken: string
+	migration: MigrationFile
+	schemaVersionBuilder: SchemaVersionBuilder
 }
 
 export type ContentMigrationFactory = {

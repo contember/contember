@@ -71,7 +71,7 @@ export const SortableMultiSelect = Component(({ field, children, sortableBy, con
 	}, [selectedEntities])
 
 	return (
-		<Repeater field={field} sortableBy={sortableBy} initialEntityCount={0}>
+		<Repeater field={field} sortableBy={sortableBy} initialEntityCount={0} orderBy={false}>
 			<SelectCurrentEntitiesContext.Provider value={entitiesArr}>
 				<SelectIsSelectedContext.Provider value={isSelected}>
 					<SelectHandleSelectContext.Provider value={handler}>
@@ -85,7 +85,7 @@ export const SortableMultiSelect = Component(({ field, children, sortableBy, con
 	)
 }, ({ children, field, sortableBy, connectAt }) => {
 	return (
-		<Repeater field={field} sortableBy={sortableBy} initialEntityCount={0}>
+		<Repeater field={field} sortableBy={sortableBy} initialEntityCount={0} orderBy={false}>
 			<HasOne field={connectAt} expectedMutation="connectOrDisconnect">
 				{children}
 			</HasOne>

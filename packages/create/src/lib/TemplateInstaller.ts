@@ -12,7 +12,7 @@ export class TemplateInstaller {
 		private readonly fs: FileSystem,
 	) {
 		this.localTemplates = {
-			['default']: join(this.resourceDir, 'templates/template-workspace'),
+			['default']: join(this.resourceDir, 'templates/default'),
 		}
 	}
 

@@ -5,14 +5,15 @@ import jsyaml from 'js-yaml'
 
 export class TemplateInstaller {
 
-	private localTemplates: Record<string, string> = {
-		['@contember/template-workspace']: join(this.resourceDir, 'templates/template-workspace'),
-	}
+	private localTemplates: Record<string, string>
 
 	constructor(
 		private readonly resourceDir: string,
 		private readonly fs: FileSystem,
 	) {
+		this.localTemplates = {
+			['default']: join(this.resourceDir, 'templates/template-workspace'),
+		}
 	}
 
 	installTemplate = async (
@@ -46,7 +47,8 @@ export class TemplateInstaller {
 		await this.fs.copy(template, targetDir, {
 			filter: src => !src.startsWith(nodeModulesDir) && !skippedFiles.has(src),
 		})
-		await removeTemplate()
+
+		removeTemplate()
 
 		if (config.patchPackageJson) {
 			await this.replaceFileContent(join(targetDir, 'package.json'), content => {

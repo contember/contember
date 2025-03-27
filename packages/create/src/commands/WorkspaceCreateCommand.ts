@@ -3,12 +3,14 @@ import { join } from 'node:path'
 import chalk from 'chalk'
 import { TemplateInstaller } from '../lib/TemplateInstaller'
 import { getPackageVersion } from '../lib/version'
+import { detectPackageManager } from '../lib/packageManagerDetector'
 
 type Args = {
-	workspaceName: string
+	projectName: string
 }
 
 type Options = {
+	template: string
 }
 
 export class WorkspaceCreateCommand extends Command<Args, Options> {
@@ -19,42 +21,56 @@ export class WorkspaceCreateCommand extends Command<Args, Options> {
 	}
 
 	protected configure(configuration: CommandConfiguration<Args, Options>): void {
-		configuration.description('Creates a new Contember workspace')
-		configuration.argument('workspaceName')
+		configuration.description('Creates a new Contember project')
+		configuration.argument('projectName')
+		configuration.option('template').shortcut('t')
 	}
 
 	protected async execute(input: Input<Args, Options>): Promise<void> {
-		const workspaceName = input.getArgument('workspaceName')
-		const workspaceDirectory = join(process.cwd(), workspaceName)
-		await this.templateInstaller.installTemplate('@contember/template-workspace', workspaceDirectory, {
+		const projectName = input.getArgument('projectName')
+		const projectDirectory = join(process.cwd(), projectName)
+		const packageManager = detectPackageManager()
+
+		await this.templateInstaller.installTemplate(input.getOption('template') ?? 'default', projectDirectory, {
 			version: await getPackageVersion(),
-			projectName: workspaceName,
+			projectName: projectName,
+			packageManager: packageManager,
 		})
+
 		// eslint-disable-next-line no-console
-		console.log(createDocs(workspaceDirectory, workspaceName))
+		console.log(createDocs(projectDirectory, projectName, packageManager))
 	}
 }
 
-const createDocs = (workspaceDirectory: string, workspaceName: string) => `
-Contember workspace was successfully created inside the directory ${workspaceDirectory}
+const createDocs = (projectDirectory: string, projectName: string, packageManager: string) => `
+Contember project successfully created in ${projectDirectory}
 
-You can now enter this directory:
-$ ${chalk.greenBright(`cd ${workspaceName}`)}
+Next steps:
 
-Install NPM dependencies:
-$ ${chalk.greenBright(`yarn install`)}
+1. Navigate to the project directory:
+   $ ${chalk.green(`cd ${projectName}`)}
 
-And start the Contember stack:
-$ ${chalk.greenBright('yarn start')}
+2. Install dependencies:
+   $ ${chalk.green(`${packageManager} install`)}
 
-The following services will be accessible:
+3. Start the Contember stack:
+   $ ${chalk.green(`${packageManager} start`)}
 
-- Contember Admin at http://localhost:1480
-- Contember Engine endpoints at http://localhost:1481 (you can authorize with token 0000000000000000000000000000000000000000)
-- Adminer database management tool at http://localhost:1485
-- Minio local S3 provider at http://localhost:1483 (you can sign in with contember / contember credentials)
-- MailHog testing SMTP at http://localhost:1484
-- PostgreSQL database at localhost:1482 (you can sign in with contember / contember credentials)
+Available services:
 
-If you have any issues or questions, just ask here: https://github.com/contember/engine/discussions
+${chalk.bold('UI & Admin')}
+- Contember Admin         ${chalk.blue('http://localhost:1480')}
+
+${chalk.bold('API & Backend')}
+- Contember Engine API    ${chalk.blue('http://localhost:1481')}
+  Auth token:             0000000000000000000000000000000000000000
+
+${chalk.bold('Development Tools')}
+- PostgreSQL database     ${chalk.blue('http://localhost:1482')}    ${chalk.grey('credentials: contember / contember')}
+- Minio S3 storage        ${chalk.blue('http://localhost:1483')}
+- Mailpit SMTP testing    ${chalk.blue('http://localhost:1484')}
+- Adminer DB manager      ${chalk.blue('http://localhost:1485')}
+- Minio Dashboard         ${chalk.blue('http://localhost:1486')}    ${chalk.grey('credentials: contember / contember')}
+
+${chalk.bold('Need help?')} Ask the community: https://github.com/orgs/contember/discussions
 `

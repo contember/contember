@@ -70,7 +70,7 @@ export const DataGridActiveFilterUI = forwardRef<HTMLButtonElement, {
 
 export const DataGridSingleFilterUI = forwardRef<HTMLDivElement, { children: ReactNode }>((props, ref) => {
 	return (
-		<div className="flex flex-wrap gap-2 rounded bg-gray-50 items-center text-sm px-2 py-1.5 border" ref={ref} {...props} />
+		<div className="flex flex-wrap gap-2 rounded-sm bg-gray-50 items-center text-sm px-2 py-1.5 border border-gray-200" ref={ref} {...props} />
 	)
 })
 
@@ -84,7 +84,7 @@ export const DataGridFilterSelectTriggerUI = forwardRef<HTMLButtonElement, { chi
 				{children}
 			</span>}
 			<span
-				className="bg-gray-100 rounded-full border group-data-[state=open]:bg-white group-data-[state=open]:shadow-inner h-5 w-5 inline-flex items-center justify-center"
+				className="bg-gray-100 rounded-full border border-gray-200 group-data-[state=open]:bg-background group-data-[state=open]:shadow-inner h-5 w-5 inline-flex items-center justify-center"
 			>
 				<PlusIcon className="w-3 h-3" />
 			</span>
@@ -134,7 +134,7 @@ export const DataGridFilterSelectItemUI = forwardRef<HTMLButtonElement, DataGrid
 			<button
 				onClick={exclude}
 				className={cn(
-					'p-1 border rounded hover:bg-red-200',
+					'p-1 border border-gray-200 rounded-sm hover:bg-red-200',
 					isExcluded ? 'bg-red-300 shadow-inner' : '',
 				)}
 			>
@@ -150,7 +150,7 @@ export const DataGridToolbarUI = uic('div', {
 	baseClass: 'flex flex-col md:flex-row gap-2 md:items-end mb-4 items-stretch',
 	variants: {
 		sticky: {
-			true: 'sticky top-0 z-50 border-b bg-white border-gray-200 pb-4',
+			true: 'sticky -top-4 z-50 bg-background border-b border-gray-200 py-4',
 		},
 	},
 })

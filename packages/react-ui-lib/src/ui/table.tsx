@@ -11,7 +11,7 @@ export const Table = uic('table', {
 })
 
 export const TableHeader = uic('thead', {
-	baseClass: '[&_tr]:border-b',
+	baseClass: '[&_tr]:border-b border-gray-200',
 	displayName: 'TableHeader',
 })
 
@@ -21,12 +21,12 @@ export const TableBody = uic('tbody', {
 })
 
 export const TableFooter = uic('tfoot', {
-	baseClass: 'border-t bg-muted/50 font-medium [&>tr]:last:border-b-0',
+	baseClass: 'border-t border-gray-200 bg-muted/50 font-medium [&>tr]:last:border-b-0',
 	displayName: 'TableFooter',
 })
 
 export const TableRow = uic('tr', {
-	baseClass: 'border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted',
+	baseClass: 'border-b border-gray-200 transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted',
 	displayName: 'TableRow',
 })
 

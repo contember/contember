@@ -87,7 +87,7 @@ export default () => (
 						render={it => {
 							return (
 								<div className="flex">
-									<div className={cn('border', it.getField('imagePosition').value === 'right' ? 'order-2' : '')}>
+									<div className={cn('border border-gray-200', it.getField('imagePosition').value === 'right' ? 'order-2' : '')}>
 										<HasOne field="image">
 											<UploadedImageView urlField="url" />
 										</HasOne>

@@ -22,7 +22,7 @@ const PaginationWrapper = uic('div', {
 	baseClass: 'flex gap-6 lg:gap-8 items-center justify-between mt-4 pb-4',
 	variants: {
 		sticky: {
-			true: 'sticky bottom-0 z-50 bg-white pt-4 border-t border-gray-200',
+			true: 'sticky bottom-0 z-50 bg-background pt-4 border-t border-gray-200',
 		},
 	},
 })

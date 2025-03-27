@@ -28,13 +28,13 @@ import { Switch } from '../ui/switch'
 import { uic } from '../utils'
 
 const BlockRepeaterItemsWrapperUI = uic('div', {
-	baseClass: 'rounded border border-gray-300 px-4 py-8 flex flex-col',
+	baseClass: 'rounded-sm border border-gray-300 px-4 py-8 flex flex-col',
 })
 const BlockRepeaterItemUI = uic('div', {
-	baseClass: 'relative border-t transition-all group',
+	baseClass: 'relative border-t border-gray-200 transition-all group',
 })
 const BlockRepeaterDragOverlayUI = uic('div', {
-	baseClass: 'rounded border border-gray-300 p-4 relative bg-opacity-60 bg-gray-100 backdrop-blur-sm',
+	baseClass: 'rounded-sm border border-gray-300 p-4 relative bg-gray-100/60 backdrop-blur-xs',
 })
 const BlockRepeaterHandleUI = uic('button', {
 	baseClass: 'absolute top-1/2 -left-6 h-6 w-6 flex justify-end align-center opacity-10 hover:opacity-100 transition-opacity -translate-y-1/2',
@@ -224,7 +224,7 @@ const BlockRepeaterAddItemBefore = ({ sortableBy }: { sortableBy: DefaultBlockRe
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
-				<Button className="absolute top-0 right-1/2 -translate-x-1/2 -translate-y-1/2 bg-white" variant="ghost">
+				<Button className="absolute top-0 right-1/2 -translate-x-1/2 -translate-y-1/2 bg-background" variant="ghost">
 					<PlusCircleIcon className="w-4 h-4  opacity-25 hover:opacity-100 transition-opacity" />
 				</Button>
 			</DropdownMenuTrigger>

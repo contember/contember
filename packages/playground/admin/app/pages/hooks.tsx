@@ -39,8 +39,10 @@ export const ContentApi = () => {
 			</Slots.Title>
 
 			<Slots.Actions>
-				<Button variant="secondary" onClick={refreshList} disabled={isLoading}>Refresh</Button>
-				<Button onClick={() => addItemMutation({})} disabled={mutating}>New item</Button>
+				<>
+					<Button variant="secondary" onClick={refreshList} disabled={isLoading}>Refresh</Button>
+					<Button onClick={() => addItemMutation({})} disabled={mutating}>New item</Button>
+				</>
 			</Slots.Actions>
 
 			<div className="space-y-4">

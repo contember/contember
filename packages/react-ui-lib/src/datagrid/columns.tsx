@@ -148,7 +148,7 @@ export const DataGridBooleanColumn = Component<DataGridBooleanColumnProps>(({ fi
 		children={children ?? <Field field={field} format={format ?? formatBoolean} />}
 		filterName={field}
 		filter={filter ?? <DataViewBooleanFilter field={field}>
-			<div className="border rounded p-2">
+			<div className="border border-gray-200 rounded-sm p-2">
 				<DataGridBooleanFilterControls />
 			</div>
 		</DataViewBooleanFilter>}
@@ -199,7 +199,7 @@ export const DataGridNumberColumn = Component<DataGridNumberColumnProps>(({ fiel
 		children={children ?? <Field field={field} format={format ?? formatNumber} />}
 		filterName={field}
 		filter={filter ?? <DataViewNumberFilter field={field}>
-			<div className="border rounded max-w-60 p-2">
+			<div className="border border-gray-200 rounded-sm max-w-60 p-2">
 				<DataGridNumberFilterControls/>
 			</div>
 		</DataViewNumberFilter>}
@@ -249,7 +249,7 @@ export const DataGridDateColumn = Component<DataGridDateColumnProps>(({ field, h
 		children={children ?? <Field field={field} format={format ?? formatDate} />}
 		filterName={field}
 		filter={filter ?? <DataViewDateFilter field={field}>
-			<div className="border rounded">
+			<div className="border border-gray-200 rounded-sm">
 				<DataGridDateFilterControls layout="row"/>
 			</div>
 		</DataViewDateFilter>}
@@ -300,7 +300,7 @@ export const DataGridDateTimeColumn = Component<DataGridDateTimeColumnProps>(({ 
 		children={children ?? <Field field={field} format={format ?? formatDateTime} />}
 		filterName={field}
 		filter={filter ?? <DataViewDateFilter field={field}>
-			<div className="border rounded">
+			<div className="border border-gray-200 rounded-sm">
 				<DataGridDateFilterControls layout="row" />
 			</div>
 		</DataViewDateFilter>}
@@ -363,7 +363,7 @@ export const DataGridEnumColumn = Component<DataGridEnumColumnProps>(({ field, h
 		children={children ?? <DataGridEnumCell field={field} options={options} tooltipActions={tooltipActions} />}
 		filterName={field}
 		filter={filter ?? <DataViewEnumFilter field={field}>
-			<div className="max-w-60 border rounded p-2">
+			<div className="max-w-60 border border-gray-200 rounded-sm p-2">
 				<DataGridEnumFilterControls options={options} />
 			</div>
 		</DataViewEnumFilter>}
@@ -425,7 +425,7 @@ export const DataGridEnumListColumn = Component<DataGridEnumListColumnProps>(({ 
 		children={children ?? <DataGridEnumListCell field={field} options={options} tooltipActions={tooltipActions} />}
 		filterName={field}
 		filter={filter ?? <DataViewEnumListFilter field={field}>
-			<div className="max-w-60 border rounded p-2">
+			<div className="max-w-60 border border-gray-200 rounded-sm p-2">
 				<DataGridEnumFilterControls options={options} />
 			</div>
 		</DataViewEnumListFilter>}
@@ -574,7 +574,7 @@ export const DataGridHasOneColumn = Component<DataGridHasOneColumnProps>(({ fiel
 		children={<DataGridHasOneCell field={field} filterName={filterName} tooltipActions={tooltipActions}>{children}</DataGridHasOneCell>}
 		filterName={filterName ?? (typeof field === 'string' ? field : undefined)}
 		filter={filter ?? <DataViewHasOneFilter field={field} name={filterName}>
-			<div className="border rounded p-2 max-w-60 flex flex-col gap-2">
+			<div className="border border-gray-200 rounded-sm p-2 max-w-60 flex flex-col gap-2">
 				<div className="flex flex-wrap gap-2">
 					<DataGridRelationFilteredItemsList>
 						{children}
@@ -637,7 +637,7 @@ export const DataGridHasManyColumn = Component<DataGridHasManyColumnProps>(({ fi
 		children={<DataGridHasManyCell field={field} filterName={filterName} tooltipActions={tooltipActions}>{children}</DataGridHasManyCell>}
 		filterName={filterName ?? (typeof field === 'string' ? field : undefined)}
 		filter={filter ?? <DataViewHasManyFilter field={field} name={filterName}>
-			<div className="border rounded p-2 max-w-60 flex flex-col gap-2">
+			<div className="border border-gray-200 rounded-sm p-2 max-w-60 flex flex-col gap-2">
 				<div className="flex flex-wrap gap-2">
 					<DataGridRelationFilteredItemsList>
 						{children}

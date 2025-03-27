@@ -55,7 +55,7 @@ const SelectImageInner = ({ connect, closeOnSelect }: { connect: (entity: Entity
 					<DataGridLoader>
 						<DataGridTiles className="md:grid-cols-[repeat(auto-fill,minmax(10rem,1fr))]">
 							<UseEntity render={it => (
-								<div className="relative border rounded shadow hover:shadow-md hover:border-yellow-500" onClick={() => {
+								<div className="relative border rounded border-gray-200 shadow hover:shadow-md hover:border-yellow-500" onClick={() => {
 									it && connect(it)
 									closeOnSelect && setOpen(false)
 								}}>

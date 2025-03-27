@@ -11,7 +11,7 @@
 /packages/**/dist
 /packages/**/temp
 /**/tsconfig.tsbuildinfo
-/packages/create/resources/templates/template-workspace/admin/lib
+/packages/create/resources/templates/default/admin/lib
 
 # env / config
 /docker-compose.override.yaml

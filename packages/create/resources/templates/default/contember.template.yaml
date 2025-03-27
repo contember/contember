@@ -1,0 +1,12 @@
+type: workspace
+replaceVariables:
+  - package.json
+  - api/package.json
+  - admin/package.json
+  - client/package.json
+  - docker-compose.yaml
+  - README.md
+  - client/README.md
+  - api/README.md
+rename:
+  .gitignore.dist: .gitignore

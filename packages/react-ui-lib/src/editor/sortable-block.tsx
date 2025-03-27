@@ -40,7 +40,7 @@ export const SortableBlock = ({ children, element }: { children: ReactNode; elem
 		{isActive && contentRef.current && <Portal>
 			<DragOverlay>
 				<div className="opacity-80 flex">
-					<div className="p-4 bg-white bg-opacity-80 backdrop-blur-sm"
+					<div className="p-4 bg-background/80 backdrop-blur-xs"
 						// deliberately using innerHTML to avoid firing React events
 						dangerouslySetInnerHTML={{ __html: contentRef.current.innerHTML }}/>
 				</div>

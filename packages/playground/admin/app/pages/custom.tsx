@@ -35,7 +35,7 @@ const UseFieldComponent = Component<MyComponentProps>(
 		return (
 			<div className="flex gap-4 items-center">
 				<Button onClick={decrement}>Decrement</Button>
-				<div className={'w-8 h-8 border flex justify-center items-center'}>
+				<div className={'w-8 h-8 border border-gray-200 flex justify-center items-center'}>
 					<div>{field.value}</div>
 				</div>
 				<Button onClick={increment}>Increment</Button>

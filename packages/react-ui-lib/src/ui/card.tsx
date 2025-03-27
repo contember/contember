@@ -1,7 +1,7 @@
 import { uic } from '../utils'
 
 export const Card = uic('div', {
-	baseClass: 'rounded-xl border bg-card text-card-foreground shadow',
+	baseClass: 'rounded-xl border border-gray-200 bg-card text-card-foreground shadow-sm',
 })
 
 export const CardHeader = uic('div', {

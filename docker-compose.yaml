@@ -2,7 +2,7 @@ version: '3.7'
 services:
 
   playground:
-    image: oven/bun:1.2.1
+    image: oven/bun:1.2.6
     command: 'bun run start'
 
     environment:
@@ -15,7 +15,7 @@ services:
       - .:/src:cached
 
   test:
-    image: oven/bun:1.2.1
+    image: oven/bun:1.2.6
     working_dir: /src
     volumes:
       - .:/src:cached
@@ -32,7 +32,7 @@ services:
       - "--conditions=typescript"
       - "test"
   engine:
-    image: oven/bun:1.2.1
+    image: oven/bun:1.2.6
     working_dir: /src
 
     environment:
@@ -88,7 +88,7 @@ services:
 
 
   cli:
-    image: oven/bun:1.2.1
+    image: oven/bun:1.2.6
     working_dir: /src/packages/playground
     deploy:
       replicas: 0

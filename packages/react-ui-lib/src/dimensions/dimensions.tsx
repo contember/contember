@@ -79,7 +79,7 @@ const DimensionSwitcherCurrentValues = ({ children, dimension, slugField }: { ch
 		<div className="flex gap-1">
 			{values.map(it => (
 				<Entity key={it.key} accessor={it}>
-					<div className={'gap-1 group text-black text-left inline-flex items-center px-1 text-sm border-b'}>
+					<div className={'gap-1 group text-black text-left inline-flex items-center px-1 text-sm border-b border-gray-200'}>
 						<span>{children}</span>
 					</div>
 				</Entity>
@@ -98,7 +98,7 @@ const DimensionSwitcherItem = ({ children, dimension, slugField, isMulti }: { ch
 
 	return (
 		<DimensionLink dimension={dimension} value={slugValue} action={isMulti ? 'toggle' : 'set'}>
-			<a className={'gap-1 group text-gray-800 text-left inline-flex items-center px-1 py-1 text-sm rounded transition-all hover:bg-accent hover:text-accent-foreground group data-[active]:text-black'}>
+			<a className={'gap-1 group text-gray-800 text-left inline-flex items-center px-1 py-1 text-sm rounded-sm transition-all hover:bg-accent hover:text-accent-foreground group data-[active]:text-black'}>
 				<CheckIcon className={'w-3 h-3 hidden group-data-[active]:block'} />
 				<span className={'w-3 h-3 group-data-[active]:hidden'} />
 				<span>{children}</span>

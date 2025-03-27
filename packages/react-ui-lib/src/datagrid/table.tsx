@@ -35,7 +35,7 @@ export const DataGridTable = Component<DataViewTableProps>(({ children }) => {
 				<span>{dict.datagrid.showTable}</span>
 			</>}
 		>
-			<div className="relative rounded-md border overflow-y-auto">
+			<div className="relative rounded-md border border-gray-200 overflow-y-auto">
 				<DataGridTableRenderer>
 					{children}
 				</DataGridTableRenderer>

@@ -18,7 +18,7 @@ export const Overlay = ({ position = 'fixed',  className, children, showImmediat
 
 	return (
 		<div className={cn(
-			'z-50 bg-white bg-opacity-50 backdrop-blur-sm transition-all duration-300 delay-200',
+			'z-50 bg-background/50 backdrop-blur-xs transition-all duration-300 delay-200',
 			show ? 'opacity-100' : 'opacity-0',
 			position === 'fixed' && 'w-full h-full fixed top-0 left-0',
 			position === 'absolute' && 'w-full h-full absolute top-0 left-0',

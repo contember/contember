@@ -7,9 +7,7 @@ import { entrypointConfig } from '~/entrypoint/config'
 
 
 export const Entrypoint = () => (<>
-	<ContemberClient
-		{...entrypointConfig.clientConfig}
-	>
+	<ContemberClient {...entrypointConfig.clientConfig}>
 		<RoutingProvider pageInQuery>
 			<Toaster>
 				<Pages

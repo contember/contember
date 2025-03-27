@@ -31,7 +31,7 @@ const TenantFormSingleError = ({ error, developerMessage }: { error: string; dev
 		<FormErrorUI>{error}</FormErrorUI>
 		{/*{developerMessage && <div>*/}
 		{/*	{showDeveloperMessage*/}
-		{/*		? <div className="mt-1 text-xs font-light font-mono bg-gray-50 shadow-inner p-2 rounded border">{developerMessage}</div>*/}
+		{/*		? <div className="mt-1 text-xs font-light font-mono bg-gray-50 shadow-inner p-2 rounded-sm border">{developerMessage}</div>*/}
 		{/*		: <button className="text-xs underline" onClick={() => setShowDeveloperMessage(!showDeveloperMessage)}>Show details</button>}*/}
 		{/*</div>}*/}
 	</>

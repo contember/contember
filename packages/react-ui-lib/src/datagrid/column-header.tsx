@@ -57,7 +57,7 @@ export const DataGridColumnHeader = Component(({ sortingField, hidingName, child
 					<div className="flex flex-col gap-1">
 
 						{(sortingField || hidingName) && <>
-							<div className="flex gap-2 border rounded p-1">
+							<div className="flex gap-2 border border-gray-200 rounded-sm p-1">
 								{sortingField && <><DataViewSortingTrigger field={sortingField} action="toggleAsc">
 									<Button variant="ghost" className={'data-[active]:text-blue-600 cursor-pointer flex-1'} size="sm">
 										<ArrowDownAZIcon className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />

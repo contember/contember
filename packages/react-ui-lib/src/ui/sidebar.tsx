@@ -139,7 +139,7 @@ export const SidebarInset = uic('main', {
 
 export const SidebarInsetHeader = uic('header', {
 	baseClass: [
-		'bg-background z-50 flex justify-between h-16 shrink-0 items-center gap-2 border-b mb-4',
+		'bg-background z-50 flex justify-between h-16 shrink-0 items-center gap-2 border-b border-gray-200',
 		'transition-[width,height] ease-linear',
 		'group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12',
 	],
@@ -147,7 +147,7 @@ export const SidebarInsetHeader = uic('header', {
 })
 
 export const SidebarInsetContent = uic('div', {
-	baseClass: 'overflow-y-auto px-4',
+	baseClass: 'overflow-y-auto p-4',
 	displayName: 'SidebarInsetContent',
 })
 
@@ -157,13 +157,13 @@ export const SidebarInsetHeaderActions = uic('div', {
 })
 
 const SidebarNone = uic('div', {
-	baseClass: 'flex h-full w-[--sidebar-width] 2xl:w-[--sidebar-width-large] flex-col bg-sidebar text-sidebar-foreground',
+	baseClass: 'flex h-full w-(--sidebar-width) 2xl:w-(--sidebar-width-large) flex-col bg-sidebar text-sidebar-foreground',
 	displayName: 'SidebarNone',
 })
 
 const SidebarDesktopGap = uic('div', {
 	baseClass: [
-		'duration-200 relative w-[--sidebar-width] 2xl:w-[--sidebar-width-large] bg-transparent transition-[width] ease-linear',
+		'duration-200 relative w-(--sidebar-width) 2xl:w-(--sidebar-width-large) bg-transparent transition-[width] ease-linear',
 		'group-data-[collapsible=offcanvas]:w-0',
 		'group-data-[side=right]:rotate-180',
 	],
@@ -171,7 +171,7 @@ const SidebarDesktopGap = uic('div', {
 		variant: {
 			floating: 'group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)_+_theme(spacing.4))] 2xl:group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon-large)_+_theme(spacing.4))]',
 			inset: 'group-data-[collapsible=icon]:w-5',
-			sidebar: 'group-data-[collapsible=icon]:w-[--sidebar-width-icon] 2xl:group-data-[collapsible=icon]:w-[--sidebar-width-icon-large]',
+			sidebar: 'group-data-[collapsible=icon]:w-(--sidebar-width-icon) 2xl:group-data-[collapsible=icon]:w-(--sidebar-width-icon-large)',
 		},
 	},
 	displayName: 'SidebarDesktopGap',
@@ -185,9 +185,9 @@ const SidebarInner = uic('div', {
 			right: 'right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)] 2xl:group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width-large)*-1)]',
 		},
 		variant: {
-			floating: 'p-2 w-[--sidebar-width] 2xl:w-[--sidebar-width-large] group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)_+_theme(spacing.4)_+2px)] 2xl:group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon-large)_+_theme(spacing.4)_+2px)]',
-			inset: 'p-2 w-[--sidebar-width] 2xl:w-[--sidebar-width-large] group-data-[collapsible=icon]:w-5',
-			sidebar: 'w-[--sidebar-width] 2xl:w-[--sidebar-width-large] group-data-[collapsible=icon]:w-[--sidebar-width-icon] group-data-[side=left]:border-r group-data-[side=right]:border-l 2xl:group-data-[collapsible=icon]:w-[--sidebar-width-icon-large]',
+			floating: 'p-2 w-(--sidebar-width) 2xl:w-(--sidebar-width-large) group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)_+_theme(spacing.4)_+2px)] 2xl:group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon-large)_+_theme(spacing.4)_+2px)]',
+			inset: 'p-2 w-(--sidebar-width) 2xl:w-(--sidebar-width-large) group-data-[collapsible=icon]:w-5',
+			sidebar: 'w-(--sidebar-width) 2xl:w-(--sidebar-width-large) group-data-[collapsible=icon]:w-(--sidebar-width-icon) group-data-[side=left]:border-r group-data-[side=left]:border-gray-200 group-data-[side=right]:border-l 2xl:group-data-[collapsible=icon]:w-(--sidebar-width-icon-large)',
 		},
 	},
 	variantsAsDataAttrs: ['variant', 'side'],
@@ -222,7 +222,7 @@ export const Sidebar = forwardRef<HTMLDivElement, SidebarProps>(
 					<SheetContent
 						data-sidebar="sidebar"
 						data-mobile={dataAttribute(true)}
-						className="w-[--sidebar-width] 2xl:w-[--sidebar-width-large] bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden"
+						className="w-(--sidebar-width) 2xl:w-(--sidebar-width-large) bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden"
 						style={{ '--sidebar-width': SIDEBAR_WIDTH_MOBILE } as CSSProperties}
 						side={side}
 					>
@@ -348,7 +348,7 @@ export const SidebarGroup = uic('div', {
 
 export const SidebarGroupLabel = uic('div', {
 	baseClass: [
-		'duration-200 flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium text-sidebar-foreground/70 outline-none ring-sidebar-ring transition-[margin,opa] ease-linear focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0',
+		'duration-200 flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium text-sidebar-foreground/70 outline-hidden ring-sidebar-ring transition-[margin,opa] ease-linear focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0',
 		'group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0',
 	],
 	defaultProps: {
@@ -359,7 +359,7 @@ export const SidebarGroupLabel = uic('div', {
 
 export const SidebarGroupAction = uic('button', {
 	baseClass: [
-		'absolute right-3 top-3.5 flex aspect-square w-5 items-center justify-center rounded-md p-0 text-sidebar-foreground outline-none ring-sidebar-ring transition-transform hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0',
+		'absolute right-3 top-3.5 flex aspect-square w-5 items-center justify-center rounded-md p-0 text-sidebar-foreground outline-hidden ring-sidebar-ring transition-transform hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0',
 		// Increases the hit area of the button on mobile.
 		'after:absolute after:-inset-2 after:md:hidden',
 		'group-data-[collapsible=icon]:hidden',
@@ -396,7 +396,7 @@ export const SidebarMenuItem = uic('li', {
 
 export const sidebarMenuButtonVariants = cva(
 	[
-		'peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm outline-none ring-sidebar-ring',
+		'peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm outline-hidden ring-sidebar-ring',
 		'transition-[width,height,padding]',
 		'hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
 		'focus-visible:ring-2',
@@ -482,7 +482,7 @@ SidebarMenuButton.displayName = 'SidebarMenuButton'
 
 export const SidebarMenuAction = uic('button', {
 	baseClass: [
-		'absolute right-1 top-1.5 flex aspect-square w-5 items-center justify-center rounded-md p-0 text-sidebar-foreground outline-none ring-sidebar-ring transition-transform hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2',
+		'absolute right-1 top-1.5 flex aspect-square w-5 items-center justify-center rounded-md p-0 text-sidebar-foreground outline-hidden ring-sidebar-ring transition-transform hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2',
 		'peer-hover/menu-button:text-sidebar-accent-foreground',
 		'[&>svg]:size-4 [&>svg]:shrink-0',
 		// Increases the hit area of the button on mobile.
@@ -540,7 +540,7 @@ export const SidebarMenuSkeleton = forwardRef<HTMLDivElement, SidebarMenuSkeleto
 			{showIcon && <Skeleton className="size-4 rounded-md" data-sidebar="menu-skeleton-icon" />}
 			<Skeleton
 				style={{ '--skeleton-width': width } as CSSProperties}
-				className="h-4 flex-1 max-w-[--skeleton-width]"
+				className="h-4 flex-1 max-w-(--skeleton-width)"
 				data-sidebar="menu-skeleton-text"
 			/>
 		</div>

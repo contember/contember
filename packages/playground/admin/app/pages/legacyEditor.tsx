@@ -71,7 +71,7 @@ import { BlockEditorField } from '~/lib-extra/legacy-editor/BlockEditor'
 
 
 const BlockButton = uic('button', {
-	baseClass: 'bg-white p-2 inline-flex flex-col hover:bg-gray-100 border rounded-md w-32 items-center justify-center',
+	baseClass: 'bg-white p-2 inline-flex flex-col hover:bg-gray-100 border border-gray-200 rounded-md w-32 items-center justify-center',
 })
 
 const plugins = baseEditorPlugins
@@ -229,7 +229,7 @@ const LinkElement = (props: EditorRenderElementProps) => {
 				<Popover
 				>
 					<PopoverTrigger asChild>
-						<button className="hover:bg-gray-200 p-1.5 border rounded"><LinkIcon className="w-2 h-2" /></button>
+						<button className="hover:bg-gray-200 p-1.5 border border-gray-200 rounded"><LinkIcon className="w-2 h-2" /></button>
 					</PopoverTrigger>
 					<PopoverContent>
 						<div className="flex gap-2 items-center">

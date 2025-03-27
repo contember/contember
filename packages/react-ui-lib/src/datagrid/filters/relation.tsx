@@ -179,7 +179,7 @@ export type DataGridHasManyTooltipProps =
  * ```tsx
  * <HasMany field="tags">
  *     <DataGridHasManyTooltip field={'tags'}>
- *         <button className="text-sm border rounded px-2 py-1">
+ *         <button className="text-sm border border-gray-200 rounded-sm px-2 py-1">
  *             <Field field="name" />
  *         </button>
  *     </DataGridHasManyTooltip>

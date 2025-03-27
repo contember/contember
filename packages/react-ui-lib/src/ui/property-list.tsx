@@ -2,7 +2,7 @@ import { ReactNode } from 'react'
 import { uic } from '../utils'
 
 export const PropertyList = uic('div', {
-	baseClass: 'relative overflow-auto bg-gray-50/50 max-w-lg border rounded-md grid grid-cols-[max-content,1fr]',
+	baseClass: 'relative overflow-auto bg-gray-50/50 max-w-lg border border-gray-200 rounded-md grid grid-cols-[max-content_1fr]',
 	displayName: 'PropertyList',
 })
 
@@ -11,12 +11,12 @@ export const PropertyRow = uic('div', {
 })
 
 export const PropertyLabel = uic('div', {
-	baseClass: 'text-sm min-w-32 border-b group-last:border-b-none px-4 py-3',
+	baseClass: 'text-sm min-w-32 border-b border-gray-200 group-last:border-b-none px-4 py-3',
 	displayName: 'PropertyLabel',
 })
 
 export const PropertyValue = uic('div', {
-	baseClass: 'text-sm font-semibold border-b group-last:border-b-none px-4 py-3',
+	baseClass: 'text-sm font-semibold border-b border-gray-200 group-last:border-b-none px-4 py-3',
 	displayName: 'PropertyValue',
 })
 

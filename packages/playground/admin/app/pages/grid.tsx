@@ -221,7 +221,7 @@ const CustomGridFilters = Component(() => {
 
 
 const CustomGridTile = Component(() => (
-	<div className="bg-white rounded-md p-4 shadow-md relative flex flex-col gap-2 border hover:shadow-xl transition-all duration-200">
+	<div className="bg-white rounded-md p-4 shadow-md relative flex flex-col gap-2 border border-gray-200 hover:shadow-xl transition-all duration-200">
 		<div className="absolute top-0 right-0">
 			<GridDropdown />
 		</div>
@@ -298,7 +298,7 @@ const CustomGridRow = Component(() => (
 				<DataViewElement name="tags" label="Tags">
 					<HasMany field="tags">
 						<DataGridHasManyTooltip field="tags">
-							<button className="text-sm border rounded px-2 py-1">
+							<button className="text-sm border border-gray-200 rounded px-2 py-1">
 								<Field field="name" />
 							</button>
 						</DataGridHasManyTooltip>

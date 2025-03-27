@@ -71,7 +71,7 @@ const EditorBlockUi = ({ blockProps, renderBlockProps }: {
 
 	return (
 		<BlockElement element={element} attributes={attributes} withBoundaries>
-			<div className="group -ml-3 p-3 border border-transparent rounded-md hover:shadow-md hover:border-gray-200 transition-all">
+			<div className="group -ml-3 p-3 border border-gray-200 border-transparent rounded-md hover:shadow-md hover:border-gray-200 transition-all">
 				<div contentEditable={false}>
 					<div className="flex">
 						<div className="text-gray-400 text-xs font-semibold">

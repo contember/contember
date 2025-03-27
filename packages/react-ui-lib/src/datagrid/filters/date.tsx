@@ -113,7 +113,7 @@ const DataGridDateFilterSelect = ({ label, ranges = defaultRanges }: {
 			</PopoverTrigger>
 			<PopoverContent className="p-0">
 				<div className="flex">
-					{ranges?.length > 0 && <div className="flex flex-col gap-2 bg-gray-50 p-4 border-r">
+					{ranges?.length > 0 && <div className="flex flex-col gap-2 bg-gray-50 p-4 border-r border-gray-200">
 						{ranges.map(({ start, end, label }) => (
 							<DataGridRangeFilter start={start} end={end} label={label} key={`${start}-${end}`} />
 						))}
@@ -154,7 +154,7 @@ export const DataGridDateFilterControls = ({ layout }: { layout?: 'row' | 'colum
 							{dict.datagrid.dateStart}:
 						</Label>
 						<DataViewDateFilterResetTrigger type="start">
-							<span className="text-sm text-gray-500 cursor-pointer hover:bg-gray-100 rounded p-0.5"><XIcon
+							<span className="text-sm text-gray-500 cursor-pointer hover:bg-gray-100 rounded-sm p-0.5"><XIcon
 								className="w-3 h-3" /></span>
 						</DataViewDateFilterResetTrigger>
 					</div>
@@ -168,7 +168,7 @@ export const DataGridDateFilterControls = ({ layout }: { layout?: 'row' | 'colum
 							{dict.datagrid.dateEnd}:
 						</Label>
 						<DataViewDateFilterResetTrigger type="end">
-							<span className="text-sm text-gray-500 cursor-pointer hover:bg-gray-100 rounded p-0.5"><XIcon
+							<span className="text-sm text-gray-500 cursor-pointer hover:bg-gray-100 rounded-sm p-0.5"><XIcon
 								className="w-3 h-3" /></span>
 						</DataViewDateFilterResetTrigger>
 					</div>
@@ -177,7 +177,7 @@ export const DataGridDateFilterControls = ({ layout }: { layout?: 'row' | 'colum
 					</DataViewDateFilterInput>
 				</div>
 			</div>
-			<div className="mt-auto p-2 border-t">
+			<div className="mt-auto p-2 border-t border-gray-200">
 				<DataGridNullFilter />
 			</div>
 		</div>

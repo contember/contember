@@ -4,9 +4,9 @@ import { ComponentProps, forwardRef, useRef } from 'react'
 
 export const Textarea = uic('textarea', {
 	baseClass: `
-		w-full bg-background rounded-md border border-input px-3 py-2 text-sm shadow-sm 
-		placeholder:text-muted-foreground 
-		focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring 
+		w-full bg-background rounded-md border border-input px-3 py-2 text-sm shadow-xs
+		placeholder:text-muted-foreground
+		focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring
 		disabled:cursor-not-allowed disabled:opacity-50
 		read-only:bg-gray-100
 		` /*data-[dirty]:border-yellow-500 focus-visible:data-[dirty]:border-input*/ + `

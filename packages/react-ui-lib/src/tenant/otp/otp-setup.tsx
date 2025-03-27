@@ -30,7 +30,7 @@ export const OtpSetup = () => {
 			>
 				<form>
 					{person.otpEnabled && <>
-						<div className="border-destructive border p-4 mb-4 rounded">
+						<div className="border border-destructive p-4 mb-4 rounded-sm">
 							{dict.tenant.otpSetup.alreadyHaveOtp}
 						</div>
 					</>}

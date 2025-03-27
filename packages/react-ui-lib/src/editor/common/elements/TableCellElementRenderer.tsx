@@ -9,7 +9,7 @@ export function TableCellElementRenderer(props: TableCellElementRendererProps) {
 	return (
 		<td
 			{...props.attributes}
-			className="border min-w-40"
+			className="border border-gray-200 min-w-40"
 			// attributes={props.attributes}
 			// justify={props.element.justify}
 			// headerScope={props.element.headerScope}

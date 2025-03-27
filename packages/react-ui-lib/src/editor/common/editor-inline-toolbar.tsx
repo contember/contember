@@ -53,7 +53,7 @@ export const EditorInlineToolbar = memo(({ children }: EditorInlineToolbarProps)
 	return (
 		<>
 			<div className="absolute p-2" ref={ref}>
-				<div className="p-1 rounded-xl shadow-md border bg-white space-x-1">{children}</div>
+				<div className="p-1 rounded-xl shadow-md border border-gray-200 bg-background space-x-1">{children}</div>
 			</div>
 		</>
 	)

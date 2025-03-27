@@ -27,13 +27,13 @@ export const BoardColumnHeaderUI = uic('div', {
 	baseClass: 'px-4 py-1 border-b border-gray-100',
 })
 export const BoardCardUI = uic('div', {
-	baseClass: 'rounded border bg-card text-card-foreground shadow-sm p-4 relative hover:shadow-md transition-all duration-200',
+	baseClass: 'rounded-sm border border-gray-200 bg-card text-card-foreground shadow-xs p-4 relative hover:shadow-md transition-all duration-200',
 })
 export const BoardColumnUI = uic('div', {
-	baseClass: 'rounded-lg border bg-card text-card-foreground shadow-md relative min-w-48 data-[sortable-over="item"]:bg-yellow-100 hover:shadow-lg transition-all duration-200',
+	baseClass: 'rounded-lg border border-gray-200 bg-card text-card-foreground shadow-md relative min-w-48 data-[sortable-over="item"]:bg-yellow-100 hover:shadow-lg transition-all duration-200',
 })
 export const BoardDragOverlayUI = uic('div', {
-	baseClass: 'rounded border border-gray-300 p-4 relative bg-opacity-60 bg-gray-100 backdrop-blur-sm',
+	baseClass: 'rounded-sm border border-gray-200 border-gray-300 p-4 relative bg-gray-100/60 backdrop-blur-xs',
 })
 export const BoardItemHandleUI = uic('button', {
 	baseClass: 'absolute top-0 right-0 h-5 w-5 flex justify-center items-center opacity-10 hover:opacity-100 transition-opacity',

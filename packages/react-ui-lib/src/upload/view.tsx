@@ -130,7 +130,7 @@ export const UploadedAnyView = Component<UploadedAnyViewProps>(({ DestroyAction,
 const AnyFilePreview = Component(({ urlField, fileNameField }: FileUrlDataExtractorProps & GenericFileMetadataExtractorProps) => <>
 	<FieldView<string> field={urlField} render={({ value: url }) => (
 		url ? <a href={url ?? '#'} target="_blank" rel="noreferrer"
-			className="text-blue-600 hover:text-blue-700 underline overflow-hidden whitespace-nowrap overflow-ellipsis flex flex-col group/anchor flex-1 items-center justify-center">
+			className="text-blue-600 hover:text-blue-700 underline overflow-hidden whitespace-nowrap text-ellipsis flex flex-col group/anchor flex-1 items-center justify-center">
 			<FileIcon className="h-16 w-16 text-gray-400 group-hover/anchor:text-gray-500 transition-all" />
 			{fileNameField ? <span><Field field={fileNameField} /></span> : null}
 		</a> : null)} />
@@ -154,7 +154,7 @@ const Metadata = Component(({ children, urlField, fileSizeField, fileNameField, 
 		<MetaField field={lastModifiedField} label="Date:" format={formatDate} />
 		<MetaField field={urlField} label="URL:" format={url => (
 			<a href={url} target="_blank" rel="noreferrer"
-				   className="text-blue-600 underline overflow-hidden whitespace-nowrap overflow-ellipsis">
+				   className="text-blue-600 underline overflow-hidden whitespace-nowrap text-ellipsis">
 				{url.replace(/^(.{15}).*(.{15})$/, '$1…$2')}
 			</a>
 		)} />
@@ -191,7 +191,7 @@ const FileActions = Component(({ DestroyAction, metadata, actions, edit, baseFie
 	metadata?: ReactNode
 } & BaseFileViewProps) => {
 	return (
-		<div className="absolute -top-2 -right-1 p-0.5 bg-gray-200 border border-gray-300 rounded shadow flex gap-2 opacity-0 transition-opacity group-hover:opacity-100">
+		<div className="absolute -top-2 -right-1 p-0.5 bg-gray-200 border border-gray-300 rounded-sm shadow-sm flex gap-2 opacity-0 transition-opacity group-hover:opacity-100">
 			{actions}
 			{edit && <Popover>
 				<PopoverTrigger asChild>

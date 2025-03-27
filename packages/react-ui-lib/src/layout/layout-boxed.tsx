@@ -32,13 +32,13 @@ const LayoutMaxWidthUI = uic('div', {
 		layout: 'default',
 	},
 })
-const LayoutBoxUI = uic('div', { baseClass: 'rounded-xl shadow-lg border bg-white gap-1 flex flex-col lg:flex-row mt-4 relative min-h-[calc(100vh-10rem)]' })
+const LayoutBoxUI = uic('div', { baseClass: 'rounded-xl shadow-lg border border-gray-200 bg-background gap-1 flex flex-col lg:flex-row mt-4 relative min-h-[calc(100vh-10rem)]' })
 
 const LayoutCenterPanelUI = uic('div', { baseClass: 'flex flex-col flex-2 p-4 gap-2 w-full flex-auto overflow-hidden' })
-const LayoutCenterTopUI = uic('div', { baseClass: 'flex justify-between pb-4 mb-4 border-b' })
+const LayoutCenterTopUI = uic('div', { baseClass: 'flex justify-between pb-4 mb-4 border-b border-gray-200' })
 
 const LayoutLeftSidebarUI = uic('div', {
-	baseClass: 'flex-col lg:border-r bg-neutral-50 border-r-gray-300 lg:w-96 flex-auto gap-2 relative rounded-l-xl',
+	baseClass: 'flex-col lg:border-r border-r-gray-300 bg-gray-50 lg:w-96 flex-auto gap-2 relative rounded-l-xl',
 	variants: {
 		visibility: {
 			show: 'flex',
@@ -127,7 +127,7 @@ export const LayoutBoxedComponent = ({ children, ...rest }: PropsWithChildren<{}
 								<SlotTargets.Navigation />
 							</div>
 
-							<div className={'mt-auto rounded-bl py-2 px-2 border-t'}>
+							<div className={'mt-auto rounded-bl py-2 px-2 border-t border-gray-200'}>
 								<LogoutTrigger>
 									<Button variant={'ghost'} size="sm" className="gap-2 hover:underline">
 										<LogOutIcon className="w-3 h-3 text-gray-500" /> {dict.logout}

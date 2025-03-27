@@ -25,7 +25,7 @@ export const DataGridToolbarVisibleElements = ({ elements }: DataGridToolbarVisi
 	return (
 		<div>
 			<p className="text-gray-400 text-xs font-semibold mb-1">{dict.datagrid.visibleFields}</p>
-			<div className="flex flex-col bg-gray-50 p-2 border rounded shadow-inner">
+			<div className="flex flex-col bg-gray-50 p-2 border border-gray-200 rounded-sm shadow-inner">
 				<ScrollArea className={'max-h-48'}>
 					<div className="flex flex-col">
 						<DataGridToolbarVisibleElementsList elements={resolvedElements} />
@@ -45,7 +45,7 @@ const DataGridToolbarVisibleElementsList = ({ elements }: { elements: DataViewEl
 		return (
 			<Fragment key={element.name}>
 				<DataViewVisibilityTrigger key={element.name} name={element.name} value={it => !(it ?? true)}>
-					<button className={'gap-2 group text-gray-400 data-[current]:text-black text-left inline-flex items-center p-0.5 text-sm rounded hover:bg-white'}>
+					<button className={'gap-2 group text-gray-400 data-[current]:text-black text-left inline-flex items-center p-0.5 text-sm rounded-sm hover:bg-background'}>
 						<EyeIcon className={'w-3 h-3 hidden group-data-[current]:block'} />
 						<EyeOffIcon className={'w-3 h-3 block group-data-[current]:hidden'} />
 						<span>{element.label}</span>

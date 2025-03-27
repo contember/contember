@@ -81,7 +81,7 @@ const Folder = Component(
 
 		return (
 			<>
-				<div className="flex gap-2 border rounded items-center">
+				<div className="flex gap-2 border border-gray-200 rounded items-center">
 					<Button size="sm" variant="ghost" onClick={() => setExpanded(!expanded)}>
 						{!expanded ? <ChevronDownIcon size={16} /> : <ChevronUpIcon size={16} />}
 					</Button>
@@ -143,14 +143,14 @@ const DataViewFolderRow = Component(
 		const parent = useEntity().idOnServer as string
 		return (
 			<>
-				<div className="flex gap-2 border rounded items-center">
+				<div className="flex gap-2 border border-gray-200 rounded items-center">
 					<Button size="sm" variant="ghost" onClick={() => setExpanded(!expanded)}>
 						{!expanded ? <ChevronDownIcon size={16} /> : <ChevronUpIcon size={16} />}
 					</Button>
 					<span><Field field="name" /></span>
 				</div>
 
-				{expanded && <div className="ml-4 mt-4 border rounded p-2"><DataViewGrid parent={parent} /></div>}
+				{expanded && <div className="ml-4 mt-4 border rounded border-gray-200 p-2"><DataViewGrid parent={parent} /></div>}
 			</>
 		)
 	},
@@ -203,7 +203,7 @@ const DialogDataGrid = Component(() => {
 				)}>
 					<div className="grid gap-2">
 						<DataViewEachRow>
-							<div className="flex gap-2 border rounded">
+							<div className="flex gap-2 border border-gray-200 rounded">
 								<span><Field field="name" /></span>
 							</div>
 						</DataViewEachRow>

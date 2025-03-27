@@ -22,7 +22,7 @@ export const SelectInputUI = uic('button', {
 		'cursor-pointer',
 		'hover:border-gray-400',
 		'placeholder:text-muted-foreground',
-		'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+		'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
 		'disabled:cursor-not-allowed disabled:opacity-50',
 	],
 })
@@ -44,16 +44,16 @@ export const MultiSelectItemWrapperUI = uic('div', {
 	baseClass: 'flex flex-wrap gap-1 items-center justify-start',
 })
 export const MultiSelectItemUI = uic('span', {
-	baseClass: 'flex items-stretch border rounded hover:shadow transition-all',
+	baseClass: 'flex items-stretch border border-gray-200 rounded-sm hover:shadow-sm transition-all',
 })
 export const MultiSelectItemContentUI = uic('span', {
-	baseClass: 'rounded-l px-2 py-1 bg-white  ',
+	baseClass: 'rounded-l px-2 py-1 bg-background  ',
 })
 export const MultiSelectSortableItemContentUI = uic('span', {
-	baseClass: 'rounded-l px-2 py-1 bg-white hover:bg-gray-50 cursor-move transition-all',
+	baseClass: 'rounded-l px-2 py-1 bg-background hover:bg-gray-50 cursor-move transition-all',
 })
 export const MultiSelectItemDragOverlayUI = uic('span', {
-	baseClass: 'rounded px-2 py-1 bg-gray-100 inline-flex gap-2 items-center bg-opacity-20 backdrop-blur text-sm border shadow',
+	baseClass: 'rounded-sm px-2 py-1 bg-gray-100/20 inline-flex gap-2 items-center backdrop-blur-sm text-sm border border-gray-200 shadow-sm',
 })
 
 export const MultiSelectItemRemoveButtonUI = uic('span', {

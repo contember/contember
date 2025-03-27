@@ -45,7 +45,7 @@ export const UploaderFileProgressUI = ({ file, progress, info, actions }: { file
 	const extension = file.name.split('.').pop()?.toUpperCase()
 
 	return (
-		<div className="border-t p-2 flex-1">
+		<div className="border-t border-gray-200 p-2 flex-1">
 			<div className="flex items-center gap-2">
 				<div className="relative">
 					<FileIcon className="w-10 h-10 text-gray-400" />

@@ -10,6 +10,7 @@ export class FileSystem {
 	readDir = fs.readdir
 	copy = copy
 	unlink = fs.unlink
+	remove = fs.rm
 	pathExists = async (path: string) => {
 		try {
 			await access(path)

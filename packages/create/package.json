@@ -6,11 +6,15 @@
   "dependencies": {
     "@contember/cli-common": "workspace:*",
     "chalk": "^5.3.0",
+    "degit": "^2.8.4",
     "fs-extra": "^11.2.0",
     "js-yaml": "^4.1.0"
   },
   "type": "module",
   "scripts": {
     "pre-build": "rm -rf rm ./resources/templates/default/admin/lib && cp -r ../react-ui-lib/src ./resources/templates/default/admin/lib && rm ./resources/templates/default/admin/lib/index.ts ./resources/templates/default/admin/lib/tsconfig.json"
+  },
+  "devDependencies": {
+    "@types/degit": "^2.8.6"
   }
 }

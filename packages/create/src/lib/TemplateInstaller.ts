@@ -1,6 +1,7 @@
 import { join } from 'node:path'
 import { FileSystem } from './FileSystem'
 import jsyaml from 'js-yaml'
+import degit from 'degit'
 
 
 export class TemplateInstaller {
@@ -21,15 +22,35 @@ export class TemplateInstaller {
 		targetDir: string,
 		variables: Record<string, string> = {},
 	) => {
-		let removeTemplate = () => {
-		}
+		let removeTemplate = () => { }
+
 		if (this.localTemplates[template]) {
 			template = this.localTemplates[template]
+		} else {
+			const tmpDir = await this.fs.createTempDir()
+
+			try {
+				const emitter = degit(template, { cache: false, force: true, verbose: true })
+				await emitter.clone(tmpDir)
+
+				removeTemplate = () => {
+					try {
+						this.fs.remove(tmpDir, { recursive: true, force: true })
+					} catch (error) {
+						console.error(`Failed to clean up template: ${error}`)
+					}
+				}
+
+				template = tmpDir
+			} catch (error) {
+				throw new Error(`Failed to clone template from repository: ${error}`)
+			}
 		}
 
 		const templateConfigFile = join(template, 'contember.template.yaml')
 		if (!(await this.fs.pathExists(templateConfigFile))) {
-			throw `${template} is not a Contember template`
+			removeTemplate()
+			throw new Error(`${template} is not a Contember template`)
 		}
 		const config = (await this.readYaml(templateConfigFile)) as {
 			type?: string

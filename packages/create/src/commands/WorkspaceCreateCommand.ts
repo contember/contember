@@ -23,15 +23,16 @@ export class WorkspaceCreateCommand extends Command<Args, Options> {
 	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Creates a new Contember project')
 		configuration.argument('projectName')
-		configuration.option('template').shortcut('t')
+		configuration.option('template').shortcut('t').valueRequired().description('Template name or remote source')
 	}
 
 	protected async execute(input: Input<Args, Options>): Promise<void> {
 		const projectName = input.getArgument('projectName')
 		const projectDirectory = join(process.cwd(), projectName)
 		const packageManager = detectPackageManager()
+		const template = input.getOption('template') ?? 'default'
 
-		await this.templateInstaller.installTemplate(input.getOption('template') ?? 'default', projectDirectory, {
+		await this.templateInstaller.installTemplate(template, projectDirectory, {
 			version: await getPackageVersion(),
 			projectName: projectName,
 			packageManager: packageManager,

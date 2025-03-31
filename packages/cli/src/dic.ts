@@ -66,6 +66,8 @@ import { RemoteProjectProvider } from './lib/project/RemoteProjectProvider'
 import { SystemClientProvider } from './lib/SystemClientProvider'
 import { TenantClientProvider } from './lib/TenantClientProvider'
 import { Workspace } from './lib/workspace/Workspace'
+import { ActionsListVariablesCommand } from './commands/actions/ActionsListVariablesCommand'
+import { ActionsSetVariablesCommand } from './commands/actions/ActionsSetVariablesCommand'
 
 const jsSample = `
 export const query = \`\`
@@ -218,6 +220,10 @@ export const createContainer = ({ env, version, runtime, workspace }: {
 			new TransferCommand(remoteProjectResolver, dataTransferClient))
 		.addService('workspaceUpdateCommand', ({ packageWorkspaceResolver, dockerComposeManager }) =>
 			new WorkspaceUpdateApiCommand(packageWorkspaceResolver, dockerComposeManager))
+		.addService('actionsListVariables', ({ remoteProjectResolver }) =>
+			new ActionsListVariablesCommand(remoteProjectResolver))
+		.addService('actionsSetVariables', ({ remoteProjectResolver }) =>
+			new ActionsSetVariablesCommand(remoteProjectResolver))
 		.addService('commandList', dic => {
 			const commands: CommandFactoryList = {
 				['deploy']: () => dic.deployCommand,
@@ -236,6 +242,8 @@ export const createContainer = ({ env, version, runtime, workspace }: {
 				['project:validate']: () => dic.projectValidateCommand,
 				['project:print-schema']: () => dic.projectPrintSchemaCommand,
 				['project:generate-doc']: () => dic.projectGenerateDocumentationCommand,
+				['actions:list-variables']: () => dic.actionsListVariables,
+				['actions:set-variables']: () => dic.actionsSetVariables,
 			}
 			return commands
 		})

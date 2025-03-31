@@ -2,8 +2,9 @@ import { Client, InsertBuilder } from '@contember/database'
 import { Mapper } from '@contember/engine-content-api'
 import { Actions, ActionsPayload } from '@contember/schema'
 import { EventRow } from '../model/types'
+import { notify } from '../utils/notifyChannel'
 
-export const NOTIFY_CHANNEL_NAME = 'actions_event'
+
 type EventRowToInsert = Omit<EventRow, 'created_at' | 'visible_at' | 'last_state_change' | 'log'> & {
 	created_at: string | Date
 	visible_at: string | Date
@@ -49,6 +50,6 @@ export class TriggerPayloadPersister {
 				.execute(this.client)
 		}
 
-		await this.client.query('SELECT pg_notify(?, ?)', [NOTIFY_CHANNEL_NAME, this.projectSlug])
+		await notify(this.client, this.projectSlug)
 	}
 }

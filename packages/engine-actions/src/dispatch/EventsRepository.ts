@@ -114,7 +114,7 @@ export class EventsRepository {
 	}
 
 	private async markFailed(db: Client, event: HandledEvent): Promise<void> {
-		const numRetries = event.row.num_retries
+		const numRetries = event.row.num_retries + 1
 		const now = new Date()
 		const nextAttempt = new Date()
 		nextAttempt.setTime(nextAttempt.getTime() + (event.target?.initialRepeatIntervalMs ?? DEFAULT_REPEAT_INTERVAL_MS) * Math.pow(2, event.row.num_retries))
@@ -122,7 +122,7 @@ export class EventsRepository {
 			.table('actions_event')
 			.values<EventRow>({
 				last_state_change: now,
-				num_retries: event.row.num_retries + 1,
+				num_retries: numRetries,
 				log: JSON.stringify([...event.row.log, event.result]) as any,
 				...(numRetries < (event.target?.maxAttempts ?? DEFAULT_MAX_ATTEMPTS) ? {
 					state: 'retrying',

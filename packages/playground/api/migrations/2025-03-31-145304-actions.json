@@ -1,0 +1,87 @@
+{
+	"formatVersion": 6,
+	"modifications": [
+		{
+			"modification": "createEntity",
+			"entity": {
+				"eventLog": {
+					"enabled": true
+				},
+				"name": "ActionsEntry",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "actions_entry",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"columnType": "uuid",
+						"nullable": false,
+						"type": "Uuid"
+					}
+				},
+				"unique": [],
+				"indexes": []
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "ActionsEntry",
+			"field": {
+				"name": "value",
+				"columnName": "value",
+				"columnType": "text",
+				"nullable": true,
+				"type": "String"
+			}
+		},
+		{
+			"modification": "patchAclSchema",
+			"patch": [
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/ActionsEntry",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"read": {
+								"id": true,
+								"value": true
+							},
+							"create": {
+								"id": true,
+								"value": true
+							},
+							"update": {
+								"id": true,
+								"value": true
+							},
+							"delete": true,
+							"customPrimary": true
+						}
+					}
+				}
+			]
+		},
+		{
+			"modification": "createTarget",
+			"target": {
+				"type": "webhook",
+				"name": "ActionsEntry_target",
+				"url": "{{url}}/webhook"
+			}
+		},
+		{
+			"modification": "createTrigger",
+			"trigger": {
+				"type": "watch",
+				"name": "ActionsEntry",
+				"entity": "ActionsEntry",
+				"watch": [
+					"value"
+				],
+				"target": "ActionsEntry_target"
+			}
+		}
+	]
+}

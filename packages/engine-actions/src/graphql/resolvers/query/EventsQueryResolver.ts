@@ -13,6 +13,7 @@ import { Client, DatabaseQuery } from '@contember/database'
 import { EventsInProcessingQuery } from '../../../model/EventsInProcessingQuery'
 import { FailedEventsQuery } from '../../../model/FailedEventsQuery'
 import { ActionsAuthorizationActions } from '../../../authorization'
+import { EventByIdQuery } from '../../../model/EventByIdQuery'
 
 export class EventsQueryResolver implements QueryResolvers<ActionsContext> {
 	async eventsInProcessing(parent: unknown, { args }: QueryEventsInProcessingArgs, ctx: ActionsContext) {
@@ -31,6 +32,16 @@ export class EventsQueryResolver implements QueryResolvers<ActionsContext> {
 		await ctx.requireAccess(ActionsAuthorizationActions.EVENTS_VIEW)
 
 		return await this.fetchEvents(ctx.db, new FailedEventsQuery(args ?? {}))
+	}
+
+	async event(parent: unknown, { id }: { id: string }, ctx: ActionsContext): Promise<Event | null> {
+		await ctx.requireAccess(ActionsAuthorizationActions.EVENTS_VIEW)
+		const stages = await this.fetchStagesMap(ctx.db)
+		const result = await ctx.db.queryHandler.fetch(new EventByIdQuery(id))
+		if (!result) {
+			return null
+		}
+		return this.mapEventRows([result], stages)[0]
 	}
 
 	private async fetchEvents(db: DatabaseContext, query: DatabaseQuery<EventRow[]>) {

@@ -3,7 +3,7 @@ import { EventDispatcher } from './EventDispatcher'
 import { ContentSchemaResolver } from '@contember/engine-http'
 import { Runnable, RunnableArgs, Running } from '@contember/engine-common'
 import { Listener } from '@contember/database'
-import { NOTIFY_CHANNEL_NAME } from '../triggers/TriggerPayloadPersister'
+import { NOTIFY_CHANNEL_NAME } from '../utils/notifyChannel'
 
 
 export class ProjectDispatcherFactory {

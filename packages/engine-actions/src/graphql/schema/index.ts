@@ -16,7 +16,7 @@ export type Scalars = {
 	Float: { input: number; output: number }
 	DateTime: { input: Date; output: Date }
 	Json: { input: any; output: any }
-	Uuid: { input: String; output: String }
+	Uuid: { input: string; output: string }
 }
 
 export type Event = {
@@ -52,12 +52,24 @@ export type EventState =
 export type Mutation = {
 	readonly __typename?: 'Mutation'
 	readonly processBatch: ProcessBatchResponse
+	readonly retryEvent: RetryEventResponse
 	readonly setVariables: SetVariablesResponse
+	readonly stopEvent: StopEventResponse
+}
+
+
+export type MutationRetryEventArgs = {
+	id: Scalars['Uuid']['input']
 }
 
 
 export type MutationSetVariablesArgs = {
 	args: SetVariablesArgs
+}
+
+
+export type MutationStopEventArgs = {
+	id: Scalars['Uuid']['input']
 }
 
 export type ProcessBatchResponse = {
@@ -67,10 +79,16 @@ export type ProcessBatchResponse = {
 
 export type Query = {
 	readonly __typename?: 'Query'
+	readonly event?: Maybe<Event>
 	readonly eventsInProcessing: ReadonlyArray<Event>
 	readonly eventsToProcess: ReadonlyArray<Event>
 	readonly failedEvents: ReadonlyArray<Event>
 	readonly variables: ReadonlyArray<Variable>
+}
+
+
+export type QueryEventArgs = {
+	id: Scalars['Uuid']['input']
 }
 
 
@@ -86,6 +104,11 @@ export type QueryEventsToProcessArgs = {
 
 export type QueryFailedEventsArgs = {
 	args?: InputMaybe<EventArgs>
+}
+
+export type RetryEventResponse = {
+	readonly __typename?: 'RetryEventResponse'
+	readonly ok: Scalars['Boolean']['output']
 }
 
 export type SetVariablesArgs = {
@@ -106,6 +129,11 @@ export type SetVariablesMode =
 
 export type SetVariablesResponse = {
 	readonly __typename?: 'SetVariablesResponse'
+	readonly ok: Scalars['Boolean']['output']
+}
+
+export type StopEventResponse = {
+	readonly __typename?: 'StopEventResponse'
 	readonly ok: Scalars['Boolean']['output']
 }
 
@@ -201,9 +229,11 @@ export type ResolversTypes = {
 	Mutation: ResolverTypeWrapper<{}>
 	ProcessBatchResponse: ResolverTypeWrapper<ProcessBatchResponse>
 	Query: ResolverTypeWrapper<{}>
+	RetryEventResponse: ResolverTypeWrapper<RetryEventResponse>
 	SetVariablesArgs: SetVariablesArgs
 	SetVariablesMode: SetVariablesMode
 	SetVariablesResponse: ResolverTypeWrapper<SetVariablesResponse>
+	StopEventResponse: ResolverTypeWrapper<StopEventResponse>
 	String: ResolverTypeWrapper<Scalars['String']['output']>
 	Uuid: ResolverTypeWrapper<Scalars['Uuid']['output']>
 	Variable: ResolverTypeWrapper<Variable>
@@ -221,8 +251,10 @@ export type ResolversParentTypes = {
 	Mutation: {}
 	ProcessBatchResponse: ProcessBatchResponse
 	Query: {}
+	RetryEventResponse: RetryEventResponse
 	SetVariablesArgs: SetVariablesArgs
 	SetVariablesResponse: SetVariablesResponse
+	StopEventResponse: StopEventResponse
 	String: Scalars['String']['output']
 	Uuid: Scalars['Uuid']['output']
 	Variable: Variable
@@ -255,7 +287,9 @@ export interface JsonScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
 	processBatch?: Resolver<ResolversTypes['ProcessBatchResponse'], ParentType, ContextType>
+	retryEvent?: Resolver<ResolversTypes['RetryEventResponse'], ParentType, ContextType, RequireFields<MutationRetryEventArgs, 'id'>>
 	setVariables?: Resolver<ResolversTypes['SetVariablesResponse'], ParentType, ContextType, RequireFields<MutationSetVariablesArgs, 'args'>>
+	stopEvent?: Resolver<ResolversTypes['StopEventResponse'], ParentType, ContextType, RequireFields<MutationStopEventArgs, 'id'>>
 }
 
 export type ProcessBatchResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['ProcessBatchResponse'] = ResolversParentTypes['ProcessBatchResponse']> = {
@@ -264,13 +298,24 @@ export type ProcessBatchResponseResolvers<ContextType = any, ParentType extends 
 }
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
+	event?: Resolver<Maybe<ResolversTypes['Event']>, ParentType, ContextType, RequireFields<QueryEventArgs, 'id'>>
 	eventsInProcessing?: Resolver<ReadonlyArray<ResolversTypes['Event']>, ParentType, ContextType, Partial<QueryEventsInProcessingArgs>>
 	eventsToProcess?: Resolver<ReadonlyArray<ResolversTypes['Event']>, ParentType, ContextType, Partial<QueryEventsToProcessArgs>>
 	failedEvents?: Resolver<ReadonlyArray<ResolversTypes['Event']>, ParentType, ContextType, Partial<QueryFailedEventsArgs>>
 	variables?: Resolver<ReadonlyArray<ResolversTypes['Variable']>, ParentType, ContextType>
 }
 
+export type RetryEventResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['RetryEventResponse'] = ResolversParentTypes['RetryEventResponse']> = {
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
 export type SetVariablesResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['SetVariablesResponse'] = ResolversParentTypes['SetVariablesResponse']> = {
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type StopEventResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['StopEventResponse'] = ResolversParentTypes['StopEventResponse']> = {
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
@@ -292,7 +337,9 @@ export type Resolvers<ContextType = any> = {
 	Mutation?: MutationResolvers<ContextType>
 	ProcessBatchResponse?: ProcessBatchResponseResolvers<ContextType>
 	Query?: QueryResolvers<ContextType>
+	RetryEventResponse?: RetryEventResponseResolvers<ContextType>
 	SetVariablesResponse?: SetVariablesResponseResolvers<ContextType>
+	StopEventResponse?: StopEventResponseResolvers<ContextType>
 	Uuid?: GraphQLScalarType
 	Variable?: VariableResolvers<ContextType>
 }

@@ -7,5 +7,6 @@ export interface ActionsContext {
 	logger: Logger
 	db: DatabaseContext
 	contentSchemaResolver: ContentSchemaResolver
+	project: { slug: string }
 	requireAccess: (action: Authorizator.Action, message?: string) => Promise<void>
 }

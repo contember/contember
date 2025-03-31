@@ -21,7 +21,7 @@ export class ActionsSetVariablesCommand extends Command<Args, Options> {
 	}
 
 	protected configure(configuration: CommandConfiguration<Args, Options>): void {
-		configuration.description('Show action variables')
+		configuration.description('Set action variables')
 		configuration.option('project').valueRequired()
 		configuration.option('merge').valueNone().description('merges with new values (default behaviour)')
 		configuration.option('set').valueNone().description('replaces all variables')

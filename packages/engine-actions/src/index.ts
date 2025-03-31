@@ -7,7 +7,7 @@ import { MasterContainerBuilder, MasterContainerHook } from '@contember/engine-h
 import { ActionsApiMiddlewareFactory } from './graphql/http/ActionsApiMiddlewareFactory'
 import { ActionsGraphQLHandlerFactory } from './graphql/http/ActionsGraphQLHandlerFactory'
 import { ResolversFactory } from './graphql/resolvers/ResolversFactory'
-import { EventsQueryResolver, ProcessBatchMutationResolver, SetVariablesMutationResolver } from './graphql/resolvers'
+import { EventsQueryResolver, ProcessBatchMutationResolver, RetryEventMutationResolver, SetVariablesMutationResolver, StopEventMutationResolver } from './graphql/resolvers'
 import { EventDispatcher } from './dispatch/EventDispatcher'
 import { EventsRepository } from './dispatch/EventsRepository'
 import { TargetHandlerResolver } from './dispatch/TargetHandlerResolver'
@@ -50,11 +50,13 @@ export default class ActionsPlugin implements Plugin {
 				.addService('actions_variableManager', () => {
 					return new VariablesManager()
 				})
-				.addService('actions_eventDispatcher', ({ actions_variableManager }) => {
-					const eventsRepository = new EventsRepository()
+				.addService('actions_eventRepository', () => {
+					return new EventsRepository()
+				})
+				.addService('actions_eventDispatcher', ({ actions_eventRepository, actions_variableManager }) => {
 					const webhookTargetHandler = new WebhookTargetHandler(new WebhookFetcherNative())
 					const targetHandlerResolver = new TargetHandlerResolver(webhookTargetHandler)
-					return new EventDispatcher(eventsRepository, actions_variableManager, targetHandlerResolver)
+					return new EventDispatcher(actions_eventRepository, actions_variableManager, targetHandlerResolver)
 				})
 				.addService('actions_dispatchWorkerSupervisorFactory', ({ actions_eventDispatcher }) => {
 					const projectDispatcherFactory = new ProjectDispatcherFactory(actions_eventDispatcher)
@@ -63,7 +65,7 @@ export default class ActionsPlugin implements Plugin {
 				.addService('actions_authorizator', () => {
 					return new Authorizator.Default(new AccessEvaluator.PermissionEvaluator(new ActionsPermissionsFactory().create()))
 				})
-				.setupService('application', (it, { projectContextResolver, debugMode, actions_eventDispatcher, actions_dispatchWorkerSupervisorFactory, actions_variableManager, actions_authorizator }) => {
+				.setupService('application', (it, { projectContextResolver, debugMode, actions_eventRepository, actions_eventDispatcher, actions_dispatchWorkerSupervisorFactory, actions_variableManager, actions_authorizator }) => {
 					const handlerFactory = new ActionsGraphQLHandlerFactory()
 					const eventsQueryResolver = new EventsQueryResolver()
 					const processBatchMutationResolver = new ProcessBatchMutationResolver(actions_eventDispatcher)
@@ -74,6 +76,8 @@ export default class ActionsPlugin implements Plugin {
 						processBatchMutationResolver,
 						variablesQueryResolver,
 						setVariablesMutationResolver,
+						new RetryEventMutationResolver(actions_eventRepository),
+						new StopEventMutationResolver(actions_eventRepository),
 					)
 
 					const actionsContextResolver = new ActionsContextResolver(debugMode, projectContextResolver)

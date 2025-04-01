@@ -1,6 +1,6 @@
 {
   "name": "@contember/authorization",
-  "version": "2.1.0-alpha.11",
+  "version": "2.1.0-alpha.12",
   "license": "Apache-2.0",
   "main": "./dist/production/index.js",
   "typings": "./dist/types/index.d.ts",

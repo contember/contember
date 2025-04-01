@@ -11,7 +11,6 @@ import { JSX as JSX_2 } from 'react/jsx-runtime';
 import { NamedExoticComponent } from 'react';
 import { ReactElement } from 'react';
 import { ReactNode } from 'react';
-import { SugaredOrderBy } from '@contember/react-binding';
 import { SugaredQualifiedEntityList } from '@contember/react-binding';
 import { SugaredRelativeEntityList } from '@contember/react-binding';
 import { SugaredRelativeSingleField } from '@contember/react-binding';
@@ -87,16 +86,14 @@ export const RepeaterNotEmpty: ({ children }: {
 export type RepeaterProps = RepeaterQualifiedProps | RepeaterRelativeProps;
 
 // @public (undocumented)
-export type RepeaterQualifiedProps = Omit<SugaredQualifiedEntityList, 'orderBy'> & {
+export type RepeaterQualifiedProps = SugaredQualifiedEntityList & {
     children?: ReactNode;
-    orderBy?: SugaredOrderBy | false;
     sortableBy?: SugaredRelativeSingleField['field'];
 };
 
 // @public (undocumented)
-export type RepeaterRelativeProps = Omit<SugaredRelativeEntityList, 'orderBy'> & {
+export type RepeaterRelativeProps = SugaredRelativeEntityList & {
     children?: ReactNode;
-    orderBy?: SugaredOrderBy | false;
     sortableBy?: SugaredRelativeSingleField['field'];
 };
 

@@ -167,7 +167,7 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 
 		return (
 			<OuterWrapper>
-				<Repeater {...blockListProps} sortableBy={sortableBy}>
+				<Repeater {...blockListProps} sortableBy={sortableBy} orderBy={false}>
 
 					<ReferencesProvider getReferencedEntity={getReferencedEntity}>
 						<SortedBlocksContext.Provider value={sortedBlocks}>

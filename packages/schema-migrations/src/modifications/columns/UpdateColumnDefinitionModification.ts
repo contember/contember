@@ -28,7 +28,9 @@ export class UpdateColumnDefinitionModificationHandler implements ModificationHa
 
 		const columnNameWrapped = wrapIdentifier(oldColumn.columnName)
 		const isChangedToArray = !oldColumn.list && newColumn.list
-		const usingCast = (isChangedToArray ? `ARRAY[${columnNameWrapped}]` : columnNameWrapped) + `::${columnType}`
+		const usingCast = isChangedToArray
+			? `CASE WHEN ${columnNameWrapped} IS NULL THEN ${newColumn.nullable ? 'NULL' : `ARRAY[]::${columnType}`} ELSE ARRAY[${columnNameWrapped}]::${columnType} END`
+			: `${columnNameWrapped}::${columnType}`
 
 		const seedExpression = formatSeedExpression({
 			model: this.schema.model,

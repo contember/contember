@@ -11,6 +11,7 @@ import {
 import { EventRow, HandledEvent } from './types'
 import { Actions } from '@contember/schema'
 import { eventsToProcessSpecification, eventsToProcessStateSpecification } from '../model/EventsToProcessSpecification'
+import { notify } from '../utils/notifyChannel'
 
 
 const ACK_TIMEOUT_MS = 1_000 * 60 * 10 // 10 minutes
@@ -87,15 +88,33 @@ export class EventsRepository {
 		})
 	}
 
-	public async requeue(db: Client, events: EventRow[]): Promise<void> {
+	public async requeue(db: Client, events: string[]): Promise<void> {
 		await UpdateBuilder.create()
 			.table('actions_event')
 			.values<EventRow>({
-				state: it => it.raw('CASE WHEN num_retries = 0 THEN ? ELSE ? END', 'created', 'retrying'),
+				state: it => it.raw(`
+					CASE 
+					WHEN num_retries = 0 THEN 
+						?::__SCHEMA__.actions_trigger_state 
+					ELSE 
+					?::__SCHEMA__.actions_trigger_state END
+				`, 'created', 'retrying'),
 				last_state_change: new Date(),
 				visible_at: new Date(),
 			})
-			.where(it => it.in('id', events.map(it => it.id)))
+			.where(it => it.in('id', events))
+			.execute(db)
+	}
+
+	public async markStopped(db: Client, events: string[]): Promise<void> {
+		await UpdateBuilder.create()
+			.table('actions_event')
+			.values<EventRow>({
+				state: 'stopped',
+				last_state_change: new Date(),
+				resolved_at: new Date(),
+			})
+			.where(it => it.in('id', events))
 			.execute(db)
 	}
 
@@ -114,7 +133,7 @@ export class EventsRepository {
 	}
 
 	private async markFailed(db: Client, event: HandledEvent): Promise<void> {
-		const numRetries = event.row.num_retries
+		const numRetries = event.row.num_retries + 1
 		const now = new Date()
 		const nextAttempt = new Date()
 		nextAttempt.setTime(nextAttempt.getTime() + (event.target?.initialRepeatIntervalMs ?? DEFAULT_REPEAT_INTERVAL_MS) * Math.pow(2, event.row.num_retries))
@@ -122,7 +141,7 @@ export class EventsRepository {
 			.table('actions_event')
 			.values<EventRow>({
 				last_state_change: now,
-				num_retries: event.row.num_retries + 1,
+				num_retries: numRetries,
 				log: JSON.stringify([...event.row.log, event.result]) as any,
 				...(numRetries < (event.target?.maxAttempts ?? DEFAULT_MAX_ATTEMPTS) ? {
 					state: 'retrying',

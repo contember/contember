@@ -36,9 +36,7 @@ export interface GraphQlClientBaseOptions {
 
 // @public (undocumented)
 export class GraphQlClientError extends Error {
-    constructor(message: string, type: GraphQlErrorType, request: GraphQlErrorRequest, response?: Response | undefined, errors?: readonly any[] | undefined, details?: string | undefined, cause?: unknown);
-    // (undocumented)
-    readonly details?: string | undefined;
+    constructor(message: string, type: GraphQlErrorType, request: GraphQlErrorRequest, response?: Response | undefined, errors?: readonly any[] | undefined, cause?: unknown);
     // (undocumented)
     readonly errors?: readonly any[] | undefined;
     // (undocumented)

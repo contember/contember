@@ -17,7 +17,6 @@ export class GraphQlClientError extends Error {
 		public readonly request: GraphQlErrorRequest,
 		public readonly response?: Response,
 		public readonly errors?: readonly any[],
-		public readonly details?: string,
 		cause?: unknown,
 	) {
 		super(message)

@@ -24,14 +24,16 @@ export class GraphQlClient {
 				variables: options.variables ?? {},
 			}
 
-			const details = `HTTP response: ${response ? (response.status + ' ' + response.statusText) : '<no response>'}
+			const message = `GraphQL request failed: ${type}
+			
+HTTP response: ${response ? (response.status + ' ' + response.statusText) : '<no response>'}
 HTTP body: 
 ${body !== null ? body : '<no body>'}
 
 GraphQL query: 
 ${query}`
 
-			return new GraphQlClientError(`GraphQL request failed: ${type}`, type, request, response ?? undefined, errors, details, cause)
+			return new GraphQlClientError(message, type, request, response ?? undefined, errors, cause)
 		}
 
 		this.options?.onBeforeRequest?.({ query, variables: options.variables ?? {} })

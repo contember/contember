@@ -99,13 +99,15 @@ export namespace Acl {
 			readonly variables?: MembershipVariablesMatchRule
 		}
 
-	export type MembershipMatchRule = {
-		readonly [role: string]: MembershipRoleMatchRule
-	}
+	export type MembershipMatchRule =
+		| boolean
+		| {
+			readonly [role: string]: MembershipRoleMatchRule
+		}
 
 	export type TenantPermissions = {
-		readonly invite?: boolean | MembershipMatchRule
-		readonly unmanagedInvite?: boolean | MembershipMatchRule
+		readonly invite?: MembershipMatchRule
+		readonly unmanagedInvite?:MembershipMatchRule
 		readonly view?: MembershipMatchRule
 		readonly manage?: MembershipMatchRule
 	}

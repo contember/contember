@@ -2,7 +2,7 @@ import { Acl, Model } from '@contember/schema'
 import * as Typesafe from '@contember/typesafe'
 import { conditionSchema } from './condition'
 
-const membershipMatchRuleSchema = Typesafe.record(
+const membershipMatchRuleSchema = Typesafe.union(Typesafe.boolean, Typesafe.record(
 	Typesafe.string,
 	Typesafe.union(
 		Typesafe.literal(true),
@@ -16,7 +16,7 @@ const membershipMatchRuleSchema = Typesafe.record(
 			),
 		}),
 	),
-)
+))
 
 const tenantPermissionsSchema = Typesafe.partial({
 	invite: Typesafe.union(Typesafe.boolean, membershipMatchRuleSchema),

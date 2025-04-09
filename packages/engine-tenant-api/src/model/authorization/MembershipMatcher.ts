@@ -12,6 +12,12 @@ export class MembershipMatcher {
 
 	matches(membership: Acl.Membership): boolean {
 		return this.memberships.some(invokerMembership => {
+			if (invokerMembership.matchRule === true) {
+				return true
+			}
+			if (!invokerMembership.matchRule) {
+				return false
+			}
 			const matchRule = invokerMembership.matchRule[membership.role]
 			if (!matchRule) {
 				return false

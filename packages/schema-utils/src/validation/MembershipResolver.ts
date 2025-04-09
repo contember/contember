@@ -14,6 +14,7 @@ export class MembershipResolver {
 			identityId: string
 			personId?: string
 		},
+		isAssumed: boolean,
 	): MembershipReadResult {
 		const errors: MembershipValidationError[] = []
 		const parsed: ParsedMembership[] = []
@@ -25,7 +26,7 @@ export class MembershipResolver {
 			}
 			const roleVariables = getRoleVariables(membership.role, acl)
 			for (const variable of membership.variables) {
-				if (!roleVariables[variable.name] || roleVariables[variable.name].type === Acl.VariableType.predefined) {
+				if (!roleVariables[variable.name] || (!isAssumed && roleVariables[variable.name].type === Acl.VariableType.predefined)) {
 					errors.push(
 						new MembershipValidationError(
 							membership.role,
@@ -35,7 +36,7 @@ export class MembershipResolver {
 					)
 				}
 			}
-			const [membershipErrors, parsedVariables] = this.readMembershipVariables(roleVariables, membership, identity)
+			const [membershipErrors, parsedVariables] = this.readMembershipVariables(roleVariables, membership, identity, isAssumed)
 			errors.push(...membershipErrors)
 			parsed.push({
 				role: membership.role,
@@ -48,19 +49,23 @@ export class MembershipResolver {
 	private readMembershipVariables(roleVariables: Acl.Variables, membership: Acl.Membership, identity: {
 		identityId: string
 		personId?: string
-	}): [MembershipValidationError[], ParsedMembershipVariable[]] {
+	}, isAssumed: boolean): [MembershipValidationError[], ParsedMembershipVariable[]] {
 		const errors: MembershipValidationError[] = []
 		const parsedVariables: ParsedMembershipVariable[] = []
 		for (const [name, variable] of Object.entries(roleVariables)) {
+			const inputVariable = membership.variables.find(it => it.name === name)
 			if (variable.type === Acl.VariableType.predefined) {
 				switch (variable.value) {
 					case 'identityID':
-						parsedVariables.push({ name, condition: { in: [identity.identityId] } })
+						parsedVariables.push({
+							name,
+							condition: { in: isAssumed && inputVariable ? inputVariable.values : [identity.identityId] },
+						})
 						break
 					case 'personID':
 						parsedVariables.push({
 							name,
-							condition: { in: identity.personId ? [identity.personId] : [] },
+							condition: { in: isAssumed && inputVariable ? inputVariable.values : identity.personId ? [identity.personId] : [] },
 						})
 						break
 					default:
@@ -71,7 +76,6 @@ export class MembershipResolver {
 				continue
 			}
 
-			const inputVariable = membership.variables.find(it => it.name === name)
 			if (!inputVariable) {
 				if (variable.fallback) {
 					parsedVariables.push({ name, condition: variable.fallback })

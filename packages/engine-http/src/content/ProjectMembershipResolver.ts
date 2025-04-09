@@ -53,7 +53,7 @@ export class ProjectMembershipResolver {
 				throwNotAllowed()
 			}
 
-			const parsedMemberships = membershipResolver.resolve(acl, assumedMemberships, identity)
+			const parsedMemberships = membershipResolver.resolve(acl, assumedMemberships, identity, true)
 			if (parsedMemberships.errors.length > 0) {
 				throw new HttpErrorResponse(
 					400,
@@ -73,7 +73,7 @@ export class ProjectMembershipResolver {
 		return {
 			effective: [
 				// intentionally ignoring validation errors of stored memberships
-				...membershipResolver.resolve(acl, explicitMemberships, identity).memberships,
+				...membershipResolver.resolve(acl, explicitMemberships, identity, false).memberships,
 				...implicitRolesToAssign.map(it => ({ role: it, variables: [] })),
 			],
 			fetched: explicitMemberships,

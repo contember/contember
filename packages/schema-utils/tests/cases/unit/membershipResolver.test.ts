@@ -3,6 +3,7 @@ import { MembershipResolver, MembershipValidationErrorType } from '../../../src'
 import { Acl } from '@contember/schema'
 
 const id1 = 'bff057b3-11f7-4bc7-abe3-1f2ef266824d'
+const id2 = '1cdb828f-62f0-4ae5-9b2c-e53b3e7584ef'
 test('read membership with entity variable', () => {
 	const reader = new MembershipResolver()
 	const result = reader.resolve({
@@ -16,7 +17,7 @@ test('read membership with entity variable', () => {
 		},
 	}, [
 		{ role: 'editor', variables: [{ name: 'localeID', values: [id1] }] },
-	], MembershipResolver.UnknownIdentity)
+	], MembershipResolver.UnknownIdentity, false)
 	expect(result.errors).toStrictEqual([])
 	expect(result.memberships).toStrictEqual([
 		{ role: 'editor', variables: [{ name: 'localeID', condition: { in: [id1] } }] },
@@ -36,7 +37,7 @@ test('read fails when variable is not provided', () => {
 		},
 	}, [
 		{ role: 'editor', variables: [] },
-	], MembershipResolver.UnknownIdentity)
+	], MembershipResolver.UnknownIdentity, false)
 	expect(result.errors).toEqual([{
 		error: MembershipValidationErrorType.VARIABLE_EMPTY,
 		role: 'editor',
@@ -63,7 +64,7 @@ test('read membership with predefined variable', () => {
 		{ role: 'editor', variables: [] },
 	], {
 		identityId: id1,
-	})
+	}, false)
 	expect(result.errors).toStrictEqual([])
 	expect(result.memberships).toStrictEqual([
 		{ role: 'editor', variables: [{ name: 'self', condition: { in: [id1] } }] },
@@ -83,12 +84,70 @@ test('read membership with condition variable', () => {
 		},
 	}, [
 		{ role: 'editor', variables: [{ name: 'cond', values: [JSON.stringify({ eq: 'foo' })] }] },
-	], MembershipResolver.UnknownIdentity)
+	], MembershipResolver.UnknownIdentity, false)
 	expect(result.errors).toStrictEqual([])
 	expect(result.memberships).toStrictEqual([
 		{ role: 'editor', variables: [{ name: 'cond', condition: { eq: 'foo' } }] },
 	])
 })
+
+test('fails when trying to override predefined variable with stored', () => {
+	const reader = new MembershipResolver()
+	const result = reader.resolve({
+		roles: {
+			editor: {
+				variables: {
+					self: { type: Acl.VariableType.predefined, value: 'identityID' },
+				},
+				entities: {},
+			},
+		},
+	}, [
+		{
+			role: 'editor', variables: [
+				{ name: 'self', values: [id2] },
+			],
+		},
+	], {
+		identityId: id1,
+	}, false)
+	expect(result.errors).toEqual([{
+		error: MembershipValidationErrorType.VARIABLE_NOT_FOUND,
+		role: 'editor',
+		variable: 'self',
+	}])
+	expect(result.memberships).toStrictEqual([
+		{ role: 'editor', variables: [{ name: 'self', condition: { in: [id1] } }] },
+	])
+})
+
+
+test('read overridden predefined variable with assume', () => {
+	const reader = new MembershipResolver()
+	const result = reader.resolve({
+		roles: {
+			editor: {
+				variables: {
+					self: { type: Acl.VariableType.predefined, value: 'identityID' },
+				},
+				entities: {},
+			},
+		},
+	}, [
+		{
+			role: 'editor', variables: [
+				{ name: 'self', values: [id2] },
+			],
+		},
+	], {
+		identityId: id1,
+	}, true)
+	expect(result.errors).toEqual([])
+	expect(result.memberships).toStrictEqual([
+		{ role: 'editor', variables: [{ name: 'self', condition: { in: [id2] } }] },
+	])
+})
+
 
 test('fails on invalid condition', () => {
 	const reader = new MembershipResolver()
@@ -103,7 +162,7 @@ test('fails on invalid condition', () => {
 		},
 	}, [
 		{ role: 'editor', variables: [{ name: 'cond', values: [JSON.stringify('abcd')] }] },
-	], MembershipResolver.UnknownIdentity)
+	], MembershipResolver.UnknownIdentity, false)
 
 	expect(result.errors).toEqual([{
 		error: MembershipValidationErrorType.VARIABLE_INVALID,
@@ -125,7 +184,7 @@ test('fails on undefined role', () => {
 		{ role: 'editor', variables: [{ name: 'cond', values: [JSON.stringify('abcd')] }] },
 	], {
 		identityId: id1,
-	})
+	}, false)
 
 	expect(result.errors).toEqual([{
 		error: MembershipValidationErrorType.ROLE_NOT_FOUND,
@@ -147,7 +206,7 @@ test('fails on undefined variable', () => {
 		},
 	}, [
 		{ role: 'editor', variables: [{ name: 'cond', values: [JSON.stringify('abcd')] }] },
-	], MembershipResolver.UnknownIdentity)
+	], MembershipResolver.UnknownIdentity, false)
 
 	expect(result.errors).toEqual([{
 		error: MembershipValidationErrorType.VARIABLE_NOT_FOUND,
@@ -174,7 +233,7 @@ test('use fallback value', () => {
 		},
 	}, [
 		{ role: 'editor', variables: [] },
-	], MembershipResolver.UnknownIdentity)
+	], MembershipResolver.UnknownIdentity, false)
 	expect(result.errors).toStrictEqual([])
 
 	expect(result.memberships).toStrictEqual([

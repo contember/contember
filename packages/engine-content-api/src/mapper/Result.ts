@@ -202,6 +202,6 @@ export const prependPath = (path: Path, results: MutationResultList): MutationRe
 	}))
 
 export const getInsertPrimary = (result: MutationResultList) =>
-	result[0] && result[0].result === MutationResultType.ok && result[0].type === ModificationType.create
+	!result.some(it => it.error) && result[0] && result[0].result === MutationResultType.ok && result[0].type === ModificationType.create
 		? result[0].primary
 		: undefined

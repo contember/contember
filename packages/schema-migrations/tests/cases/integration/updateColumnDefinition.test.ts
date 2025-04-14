@@ -251,5 +251,32 @@ describe('change string to array string', () => testMigrations({
 			},
 		}),
 	],
-	sql: SQL`ALTER TABLE "author" ALTER "email" SET DATA TYPE text[] USING ARRAY["email"]::text[];`,
+	sql: SQL`ALTER TABLE "author" ALTER "email" SET DATA TYPE text[] USING CASE WHEN "email" IS NULL THEN NULL ELSE ARRAY["email"]::text[] END;`,
+}))
+
+describe('change string to array string not null', () => testMigrations({
+	original: createSchema({
+		Author: class Author {
+			email = def.stringColumn().notNull()
+		},
+	}),
+	updated: createSchema({
+		Author: class Author {
+			email = def.stringColumn().list().notNull()
+		},
+	}),
+	diff: [
+		updateColumnDefinitionModification.createModification({
+			entityName: 'Author',
+			fieldName: 'email',
+			definition: {
+				type: Model.ColumnType.String,
+				columnType: 'text',
+				nullable: false,
+				list: true,
+			},
+		}),
+	],
+	sql: SQL`ALTER TABLE "author"
+        ALTER "email" SET DATA TYPE text[] USING CASE WHEN "email" IS NULL THEN ARRAY[]::text[] ELSE ARRAY["email"]::text[] END;`,
 }))

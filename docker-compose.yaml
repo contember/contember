@@ -1,4 +1,3 @@
-version: '3.7'
 services:
 
   playground:
@@ -105,9 +104,9 @@ services:
       - bun
       - "--conditions=typescript"
       - /src/packages/cli/src/run.ts
-    depends_on:
-      engine:
-        condition: service_healthy
+#    depends_on:
+#      engine:
+#        condition: service_healthy
 
 
   minio:

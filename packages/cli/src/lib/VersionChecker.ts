@@ -46,17 +46,13 @@ export class VersionChecker {
 				if (!def.image) {
 					continue
 				}
-				const [image, version] = def.image.split(':')
-				if (!version || !contemberDockerImages.includes(image)) {
+				const [image, tag] = def.image.split(':')
+				if (!tag || !contemberDockerImages.includes(image)) {
 					continue
 				}
-				const versionParts = version.split(/[.-]/)
-				if (versionParts[versionParts.length - 1] === 'debian') {
-					versionParts.pop()
-				}
-				const cliVersionParts = cliVersion.split(/[.-]/).slice(0, versionParts.length)
-				if (versionParts.join('.') !== cliVersionParts.join('.')) {
-					errors.push(`Docker service ${name} with image ${image}:${version} does not match version of CLI ${cliVersion}.`)
+
+				if (extractVersion(tag) !== cliVersion) {
+					errors.push(`Docker service ${name} with image ${image}:${tag} does not match version of CLI ${cliVersion}.`)
 				}
 			}
 		}
@@ -68,4 +64,12 @@ Please make sure all dependencies are up to date.\nIf you are really certain abo
 		}
 	}
 
+}
+
+
+const extractVersion = (tag: string) => {
+	// e.g.
+	// 2.1.0-alpha.15-foo-bar => 2.1.0-alpha.15
+	// 2.1.0-debian => 2.1.0
+	return tag.match(/^\d+\.\d+\.\d+(-\w+\.\d+)?/)?.[0] ?? tag
 }

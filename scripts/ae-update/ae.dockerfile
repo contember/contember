@@ -1,4 +1,4 @@
-FROM oven/bun:1.2.1 AS build
+FROM oven/bun:1.2.9 AS build
 
 WORKDIR /src
 COPY . /src

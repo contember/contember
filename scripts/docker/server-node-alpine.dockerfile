@@ -1,4 +1,4 @@
-FROM oven/bun:1.2.1-alpine as builder
+FROM oven/bun:1.2.9-alpine as builder
 
 WORKDIR /src
 COPY ./ ./

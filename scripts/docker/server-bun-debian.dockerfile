@@ -1,11 +1,11 @@
-FROM oven/bun:1.2.1-debian as builder
+FROM oven/bun:1.2.9-debian as builder
 
 WORKDIR /src
 COPY ./ ./
 RUN bun install
 RUN /src/scripts/server-build/run.sh
 
-FROM oven/bun:1.2.1-debian
+FROM oven/bun:1.2.9-debian
 
 WORKDIR /src
 

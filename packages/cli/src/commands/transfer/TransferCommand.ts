@@ -6,6 +6,7 @@ import { readStream } from '../../lib/stream'
 import { createGunzip } from 'node:zlib'
 import { RemoteProjectResolver } from '../../lib/project/RemoteProjectResolver'
 import { DataTransferClient } from '../../lib/transfer/DataTransferClient'
+import { Duplex, Readable } from 'node:stream'
 
 type Args = {
 	source: string
@@ -73,16 +74,16 @@ export class TransferCommand extends Command<Args, Options> {
 			excludeTables: input.getOption('exclude-table') ?? [],
 			gzip: gzipTransfer,
 		}))
-		const ungzipedResponse = gzipTransfer ? exportResponse.pipe(createGunzip()) : exportResponse
+		const stream = Readable.fromWeb(exportResponse.body! as any)
 		const importResponse = await this.dataTransferClient.dataImport({
-			stream: ungzipedResponse,
+			stream: stream,
 			project: targetProject,
 			printProgress: printProgressLine,
 			gzip: gzipTransfer,
 		})
 		console.log('')
 
-		const responseData = JSON.parse((await readStream(importResponse)).toString())
+		const responseData = await importResponse.json()
 		if (responseData.ok) {
 			console.log('Transfer done.')
 		} else {

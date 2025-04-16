@@ -6,6 +6,7 @@ import { printProgressLine } from '../../lib/transfer/stdio'
 import { createGunzip, createGzip } from 'node:zlib'
 import { RemoteProjectResolver } from '../../lib/project/RemoteProjectResolver'
 import { DataTransferClient } from '../../lib/transfer/DataTransferClient'
+import { Readable } from 'node:stream'
 
 type Args = {
 	source?: string
@@ -64,12 +65,16 @@ export class ExportCommand extends Command<Args, Options> {
 			includeSystem,
 			gzip: gzipTransfer,
 		})
+		if (!response.body) {
+			throw new Error('Response does not contain a readable stream.')
+		}
 
 		let transferred = 0
 		let start = Date.now()
 		let lastMbReported = 0
 		console.log('')
-		response.on('data', chunk => {
+		const stream = Readable.fromWeb(response.body as any)
+		stream.on('data', chunk => {
 			transferred += chunk.length
 			const currentMb = Math.floor(transferred / 1024 / 1024)
 			if (currentMb > lastMbReported) {
@@ -82,9 +87,9 @@ export class ExportCommand extends Command<Args, Options> {
 		const fileName = input.getOption('output') ?? `${project.name}.jsonl${gzipOutput ? '.gz' : ''}`
 		const fileStream = createWriteStream(fileName)
 
-		const responseStream = gzipOutput === gzipTransfer
-			? response
-			: response.pipe(gzipOutput ? createGzip() : createGunzip())
+		const responseStream = !gzipOutput
+			? stream
+			: stream.pipe(createGzip())
 
 		await pipeline(responseStream, fileStream)
 

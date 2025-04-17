@@ -11,8 +11,8 @@ export const createEnumListFilter = createFieldFilterHandler<EnumListFilterArtif
 	createCondition: filter => {
 		const { values, notValues, nullCondition } = filter
 
-		const inclusion: Input.Condition<string>[] = []
-		const exclusion: Input.Condition<string>[] = []
+		const inclusion: Input.Condition<string[]>[] = []
+		const exclusion: Input.Condition<string[]>[] = []
 
 		if (nullCondition === true) {
 			inclusion.push({ isNull: true })

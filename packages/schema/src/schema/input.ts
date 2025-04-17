@@ -193,7 +193,7 @@ export namespace Input {
 		// array
 		readonly minLength?: number
 		readonly maxLength?: number
-		readonly includes?: T
+		readonly includes?: T extends (infer U)[] ? U : never
 
 		// string only
 		readonly contains?: string

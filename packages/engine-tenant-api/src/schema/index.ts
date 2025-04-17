@@ -226,11 +226,55 @@ export type CommonSignInResult = {
 
 export type Config = {
 	readonly __typename?: 'Config'
+	readonly login: ConfigLogin
+	readonly password: ConfigPassword
 	readonly passwordless: ConfigPasswordless
 }
 
 export type ConfigInput = {
+	readonly login?: InputMaybe<ConfigLoginInput>
+	readonly password?: InputMaybe<ConfigPasswordInput>
 	readonly passwordless?: InputMaybe<ConfigPasswordlessInput>
+}
+
+export type ConfigLogin = {
+	readonly __typename?: 'ConfigLogin'
+	readonly attemptWindowMs: Scalars['Int']['output']
+	readonly baseBackoffMs: Scalars['Int']['output']
+	readonly defaultTokenExpirationMinutes: Scalars['Int']['output']
+	readonly maxBackoffMs: Scalars['Int']['output']
+	readonly maxTokenExpirationMinutes?: Maybe<Scalars['Int']['output']>
+	readonly revealUserExists: Scalars['Boolean']['output']
+}
+
+export type ConfigLoginInput = {
+	readonly attemptWindowMs?: InputMaybe<Scalars['Int']['input']>
+	readonly baseBackoffMs?: InputMaybe<Scalars['Int']['input']>
+	readonly defaultTokenExpirationMinutes?: InputMaybe<Scalars['Int']['input']>
+	readonly maxBackoffMs?: InputMaybe<Scalars['Int']['input']>
+	readonly maxTokenExpirationMinutes?: InputMaybe<Scalars['Int']['input']>
+	readonly revealUserExists?: InputMaybe<Scalars['Boolean']['input']>
+}
+
+export type ConfigPassword = {
+	readonly __typename?: 'ConfigPassword'
+	readonly checkBlacklist: Scalars['Boolean']['output']
+	readonly minLength: Scalars['Int']['output']
+	readonly pattern?: Maybe<Scalars['String']['output']>
+	readonly requireDigit: Scalars['Int']['output']
+	readonly requireLowercase: Scalars['Int']['output']
+	readonly requireSpecial: Scalars['Int']['output']
+	readonly requireUppercase: Scalars['Int']['output']
+}
+
+export type ConfigPasswordInput = {
+	readonly checkBlacklist?: InputMaybe<Scalars['Boolean']['input']>
+	readonly minLength?: InputMaybe<Scalars['Int']['input']>
+	readonly pattern?: InputMaybe<Scalars['String']['input']>
+	readonly requireDigit?: InputMaybe<Scalars['Int']['input']>
+	readonly requireLowercase?: InputMaybe<Scalars['Int']['input']>
+	readonly requireSpecial?: InputMaybe<Scalars['Int']['input']>
+	readonly requireUppercase?: InputMaybe<Scalars['Int']['input']>
 }
 
 export type ConfigPasswordless = {
@@ -1565,6 +1609,10 @@ export type ResolversTypes = {
 	CommonSignInResult: ResolverTypeWrapper<ResolversInterfaceTypes<ResolversTypes>['CommonSignInResult']>
 	Config: ResolverTypeWrapper<Config>
 	ConfigInput: ConfigInput
+	ConfigLogin: ResolverTypeWrapper<ConfigLogin>
+	ConfigLoginInput: ConfigLoginInput
+	ConfigPassword: ResolverTypeWrapper<ConfigPassword>
+	ConfigPasswordInput: ConfigPasswordInput
 	ConfigPasswordless: ResolverTypeWrapper<ConfigPasswordless>
 	ConfigPasswordlessInput: ConfigPasswordlessInput
 	ConfigPolicy: ConfigPolicy
@@ -1737,6 +1785,10 @@ export type ResolversParentTypes = {
 	CommonSignInResult: ResolversInterfaceTypes<ResolversParentTypes>['CommonSignInResult']
 	Config: Config
 	ConfigInput: ConfigInput
+	ConfigLogin: ConfigLogin
+	ConfigLoginInput: ConfigLoginInput
+	ConfigPassword: ConfigPassword
+	ConfigPasswordInput: ConfigPasswordInput
 	ConfigPasswordless: ConfigPasswordless
 	ConfigPasswordlessInput: ConfigPasswordlessInput
 	ConfigureError: ConfigureError
@@ -1993,7 +2045,30 @@ export type CommonSignInResultResolvers<ContextType = any, ParentType extends Re
 }
 
 export type ConfigResolvers<ContextType = any, ParentType extends ResolversParentTypes['Config'] = ResolversParentTypes['Config']> = {
+	login?: Resolver<ResolversTypes['ConfigLogin'], ParentType, ContextType>
+	password?: Resolver<ResolversTypes['ConfigPassword'], ParentType, ContextType>
 	passwordless?: Resolver<ResolversTypes['ConfigPasswordless'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type ConfigLoginResolvers<ContextType = any, ParentType extends ResolversParentTypes['ConfigLogin'] = ResolversParentTypes['ConfigLogin']> = {
+	attemptWindowMs?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
+	baseBackoffMs?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
+	defaultTokenExpirationMinutes?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
+	maxBackoffMs?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
+	maxTokenExpirationMinutes?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>
+	revealUserExists?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type ConfigPasswordResolvers<ContextType = any, ParentType extends ResolversParentTypes['ConfigPassword'] = ResolversParentTypes['ConfigPassword']> = {
+	checkBlacklist?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	minLength?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
+	pattern?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	requireDigit?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
+	requireLowercase?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
+	requireSpecial?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
+	requireUppercase?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
@@ -2674,6 +2749,8 @@ export type Resolvers<ContextType = any> = {
 	CheckResetPasswordTokenResult?: CheckResetPasswordTokenResultResolvers<ContextType>
 	CommonSignInResult?: CommonSignInResultResolvers<ContextType>
 	Config?: ConfigResolvers<ContextType>
+	ConfigLogin?: ConfigLoginResolvers<ContextType>
+	ConfigPassword?: ConfigPasswordResolvers<ContextType>
 	ConfigPasswordless?: ConfigPasswordlessResolvers<ContextType>
 	ConfigureError?: ConfigureErrorResolvers<ContextType>
 	ConfigureResponse?: ConfigureResponseResolvers<ContextType>

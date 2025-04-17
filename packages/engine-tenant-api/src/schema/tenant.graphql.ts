@@ -120,6 +120,8 @@ const schema: DocumentNode = gql`
 	
 	type Config {
 		passwordless: ConfigPasswordless!
+		password: ConfigPassword!
+		login: ConfigLogin!
 	}
 	
 	type ConfigPasswordless {
@@ -128,8 +130,29 @@ const schema: DocumentNode = gql`
 		expirationMinutes: Int!
 	}
 	
+	type ConfigPassword {
+		minLength: Int!
+		requireUppercase: Int!
+		requireLowercase: Int!
+		requireDigit: Int!
+		requireSpecial: Int!
+		pattern: String
+		checkBlacklist: Boolean!
+    }
+	
+	type ConfigLogin {
+		baseBackoffMs: Int!
+		maxBackoffMs: Int!
+		attemptWindowMs: Int!
+		revealUserExists: Boolean!
+		defaultTokenExpirationMinutes: Int!
+		maxTokenExpirationMinutes: Int
+    }
+	
 	input ConfigInput {
 		passwordless: ConfigPasswordlessInput
+		password: ConfigPasswordInput
+		login: ConfigLoginInput
 	}
 	
 	enum ConfigPolicy {
@@ -144,6 +167,25 @@ const schema: DocumentNode = gql`
 		url: String
 		expirationMinutes: Int
 	}
+	
+	input ConfigPasswordInput {
+		minLength: Int
+		requireUppercase: Int
+		requireLowercase: Int
+		requireDigit: Int
+		requireSpecial: Int
+		pattern: String
+		checkBlacklist: Boolean
+    }
+	
+	input ConfigLoginInput {
+		baseBackoffMs: Int
+		maxBackoffMs: Int
+		attemptWindowMs: Int
+		revealUserExists: Boolean
+		defaultTokenExpirationMinutes: Int
+		maxTokenExpirationMinutes: Int
+    }
 	
 	type ConfigureResponse {
 		ok: Boolean!

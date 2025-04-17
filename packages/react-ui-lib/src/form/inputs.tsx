@@ -1,7 +1,5 @@
-import * as React from 'react'
-import { ComponentProps, ReactNode } from 'react'
+import { ComponentProps, ReactNode, useMemo } from 'react'
 import { CheckboxInput, Input, RadioInput } from '../ui/input'
-import { cn } from '../utils'
 import { TextareaAutosize } from '../ui/textarea'
 import { FormLabelUI } from './ui'
 import {
@@ -33,7 +31,7 @@ export const InputField = Component(({ field, label, description, inputProps, is
 	<FormFieldScope field={field}>
 		<FormContainer description={description} label={label} required={required}>
 			<FormInput field={field} isNonbearing={isNonbearing} defaultValue={defaultValue} parseValue={parseValue} formatValue={formatValue}>
-				<Input required={required} {...(inputProps ?? {})} className={cn('max-w-md', inputProps?.className)} />
+				<Input required={required} {...(inputProps ?? {})} />
 			</FormInput>
 		</FormContainer>
 	</FormFieldScope>
@@ -51,7 +49,7 @@ export const TextareaField = Component(({ field, label, description, inputProps,
 	<FormFieldScope field={field}>
 		<FormContainer description={description} label={label} required={required}>
 			<FormInput field={field} isNonbearing={isNonbearing} defaultValue={defaultValue}>
-				<TextareaAutosize required={required} {...(inputProps ?? {})} className={cn('max-w-md', inputProps?.className)} />
+				<TextareaAutosize required={required} {...(inputProps ?? {})} />
 			</FormInput>
 		</FormContainer>
 	</FormFieldScope>
@@ -112,7 +110,7 @@ const RadioEnumFieldInner: React.FC<RadioEnumFieldInnerProps> = ({ field, inputP
 		throw new Error('RadioEnumField: options are required')
 	}
 
-	const normalizedOptions = React.useMemo(() => {
+	const normalizedOptions = useMemo(() => {
 		return Array.isArray(options) ? options : Object.entries(options).map(([value, label]) => ({ value, label }))
 	}, [options])
 

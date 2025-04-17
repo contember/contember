@@ -12,7 +12,7 @@ import { DatabaseContext, TokenHash } from '../../utils'
 import { ApiKeyService, CreateApiKeyResponse } from './ApiKeyService'
 import assert from 'node:assert'
 import { Acl } from '@contember/schema'
-import { ApiKeyByIdQuery, ApiKeyByTokenQuery, ApiKeyRow } from '../../queries'
+import { ApiKeyByIdQuery, ApiKeyByTokenQuery, ApiKeyRow, ConfigurationQuery } from '../../queries'
 
 export class ApiKeyManager {
 	constructor(
@@ -56,7 +56,10 @@ export class ApiKeyManager {
 	}
 
 	async createSessionApiKey(dbContext: DatabaseContext, identityId: string, expiration?: number): Promise<string> {
-		const command = new CreateApiKeyCommand({ type: ApiKey.Type.SESSION, identityId, expiration })
+		const config = await dbContext.queryHandler.fetch(new ConfigurationQuery())
+		const expirationResolved = expiration ?? config.login.defaultTokenExpirationMinutes
+		const expirationCapped = config.login.maxTokenExpirationMinutes ? Math.min(expirationResolved, config.login.maxTokenExpirationMinutes) : expirationResolved
+		const command = new CreateApiKeyCommand({ type: ApiKey.Type.SESSION, identityId, expiration: expirationCapped })
 		const token = (await dbContext.commandBus.execute(command)).token
 		assert(token !== undefined)
 		return token

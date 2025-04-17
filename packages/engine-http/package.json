@@ -45,6 +45,7 @@
     "@koa/cors": "^5.0.0",
     "@sentry/node": "^7.119.2",
     "bcryptjs": "^2.4.3",
+    "ipaddr.js": "^2.2.0",
     "koa": "^2.15.3",
     "koa-bodyparser": "^4.4.1",
     "koa-compress": "^5.1.1",

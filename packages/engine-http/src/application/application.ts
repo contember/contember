@@ -16,6 +16,7 @@ import { ProjectGroupContainer } from '../projectGroup/ProjectGroupContainer'
 import { URL } from 'node:url'
 import { cpuUsage, memoryUsage } from 'node:process'
 import { performance } from 'node:perf_hooks'
+import { getClientIP } from '../utils/remoteAddress'
 
 type Route<C> = { match: RequestMatcher; controller: C; module: string }
 export class Application {
@@ -118,13 +119,14 @@ export class Application {
 		let webSocketContext: WebSocketContext | null = null
 		let requestLogger = this.logger
 		const { timer, send: sendTimer } = this.createTimer()
+		const clientIp = getClientIP(req)
 		try {
 			const url = new URL(req.url ?? '/', `http://${req.headers.host}`)
 			const matchedRequest = this.matchRequest(this.websocketRoutes, url)
 			if (!matchedRequest) {
 				throw new HttpErrorResponse(404, 'Route not found')
 			}
-			requestLogger = this.createRequestLogger(req, undefined, matchedRequest.module)
+			requestLogger = this.createRequestLogger(req, undefined, matchedRequest.module, clientIp)
 
 			const groupContainer = await this.projectGroupResolver.resolveContainer({ request: req })
 
@@ -149,6 +151,7 @@ export class Application {
 				timer,
 				url,
 				request: req,
+				clientIp,
 				authResult,
 				params: matchedRequest.params,
 				projectGroup: groupContainer,
@@ -195,7 +198,8 @@ export class Application {
 			}
 		}
 		let httpContext: HttpContext | null = null
-		let requestLogger = this.createRequestLogger(ctx.req, ctx.request.body, matchedRequest?.module)
+		const clientIp = getClientIP(ctx.req)
+		let requestLogger = this.createRequestLogger(ctx.req, ctx.request.body, matchedRequest?.module, clientIp)
 		const { timer, send: sendTimer } = this.createTimer()
 
 		try {
@@ -223,12 +227,12 @@ export class Application {
 				user: authResult?.identityId,
 			})
 
-
 			const response = await requestLogger.scope(async logger => {
 				httpContext = {
 					koa: ctx,
 					body: ctx.request.body,
 					url: ctx.request.URL,
+					clientIp,
 					logger,
 					timer,
 					request: ctx.req,
@@ -268,6 +272,7 @@ export class Application {
 			const response = await this.logger.scope(async logger => {
 				return await matchedRequest.controller({
 					koa: ctx,
+					clientIp: getClientIP(ctx.req),
 					body: ctx.request.body,
 					url: ctx.request.URL,
 					logger,
@@ -319,12 +324,13 @@ export class Application {
 		)
 	}
 
-	private createRequestLogger(request: IncomingMessage, body: any, module?: string): Logger {
+	private createRequestLogger(request: IncomingMessage, body: any, module?: string, remoteAddress?: string): Logger {
 		return this.logger.child({
 			method: request.method,
 			uri: request.url,
 			requestId: Math.random().toString().substring(2),
 			module,
+			remoteAddress,
 			[LoggerRequestBody]: body,
 		}, {
 			handler: FingerCrossedLoggerHandler.factory(),
@@ -425,6 +431,7 @@ export type BaseRequestContext = {
 	request: IncomingMessage
 	url: URL
 	params: Params
+	clientIp: string
 }
 
 export type ApplicationContext =

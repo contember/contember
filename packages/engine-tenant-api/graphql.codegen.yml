@@ -14,4 +14,4 @@ generates:
       - "typescript-resolvers"
 hooks:
   afterAllFileWrite:
-    - yarn run -T eslint --fix
+    - bun run eslint --fix

@@ -8,11 +8,45 @@ import * as TenantApi from '@contember/graphql-client-tenant'
 import { useReferentiallyStableCallback } from '@contember/react-utils'
 import { dict } from '../../dict'
 
-export const useInviteUser = ({ emailField, personIdField, memberships }: {
-	personIdField: string
+export type InviteUserOptions = {
+	/** The name of the field containing the invitee's email address. */
 	emailField: string
+	/** The name of the field containing the person ID. */
+	personIdField: string
+	/** An array of memberships to be assigned to the invitee. */
 	memberships: TenantApi.MembershipInput[]
-}) => {
+}
+
+/**
+ * `useInviteUser` is a React hook for managing user invitations within a Contember project.
+ * It integrates with the tenant API and project-specific configurations to invite users dynamically
+ * based on entity accessor fields.
+ *
+ * #### Example: Inviting a User
+ * ```tsx
+ * import { useInviteUser } from './useInviteUser'
+ *
+ * const InviteUserButton = ({ entityAccessor }: { entityAccessor: EntityAccessor }) => {
+ *   const inviteUser = useInviteUser({
+ *     emailField: 'email',
+ *     personIdField: 'personId',
+ *     memberships: [{ role: 'admin', variables: {} }],
+ *   })
+ *
+ *   const handleInvite = async () => {
+ *     try {
+ *       await inviteUser(() => entityAccessor)
+ *       console.log('Invitation sent successfully')
+ *     } catch (error) {
+ *       console.error('Failed to send invitation:', error)
+ *     }
+ *   }
+ *
+ *   return <button onClick={handleInvite}>Invite User</button>
+ * };
+ * ```
+ */
+export const useInviteUser = ({ emailField, personIdField, memberships }: InviteUserOptions) => {
 	const invite = useInvite()
 	const project = useProjectSlug()
 	const toast = useShowToast()

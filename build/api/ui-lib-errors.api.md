@@ -7,7 +7,7 @@
 import { ErrorAccessor } from '@contember/interface';
 import { ReactNode } from 'react';
 
-// @public (undocumented)
+// @public
 export const useErrorFormatter: () => (errors: ErrorAccessor.Error[]) => ReactNode[];
 
 // (No @packageDocumentation comment for this package)

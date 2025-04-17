@@ -5,16 +5,19 @@
 ```ts
 
 import { JSX as JSX_2 } from 'react/jsx-runtime';
-import { PropsWithChildren } from 'react';
+import { ReactNode } from 'react';
 
-// @public (undocumented)
-export interface CommentProps extends PropsWithChildren {
+// Warning: (ae-unresolved-link) The @link reference could not be resolved: The package "@contember/react-ui-lib" does not have an export "Comment"
+//
+// @public
+export interface CommentProps {
+    children: ReactNode;
 }
 
-// @public (undocumented)
+// @public
 export const LoginWithEmail: () => JSX_2.Element;
 
-// @public (undocumented)
+// @public
 export const Todo: ({ children }: CommentProps) => JSX_2.Element | null;
 
 // (No @packageDocumentation comment for this package)

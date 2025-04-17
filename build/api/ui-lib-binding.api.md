@@ -4,7 +4,6 @@
 
 ```ts
 
-import { AccessorTreeState } from '@contember/interface';
 import { ErrorPersistResult } from '@contember/interface';
 import type { FC } from 'react';
 import { JSX as JSX_2 } from 'react/jsx-runtime';
@@ -13,51 +12,59 @@ import { ReactNode } from 'react';
 import { RoutingLinkTarget } from '@contember/interface';
 import { SuccessfulPersistResult } from '@contember/interface';
 
-// @public (undocumented)
+// @public
 export const Binding: ({ children }: {
     children: ReactNode;
 }) => JSX_2.Element;
 
-// @public (undocumented)
-export interface BindingStateRendererProps {
-    // (undocumented)
-    accessorTreeState: AccessorTreeState;
-    // (undocumented)
-    children?: ReactNode;
-}
+// @public
+export type BindingProps = {
+    children: ReactNode;
+};
 
-// @public (undocumented)
+// @public
 export const DeleteEntityDialog: FC<DeleteEntityDialogProps>;
 
-// @public (undocumented)
+// @public
 export type DeleteEntityDialogProps = {
     trigger: ReactElement;
     immediatePersist?: boolean;
     onSuccessRedirectTo?: RoutingLinkTarget;
 };
 
-// @public (undocumented)
-export const IdentityLoader: ({ children }: {
-    children: React.ReactNode;
-}) => JSX_2.Element;
+// @public
+export const IdentityLoader: ({ children }: IdentityLoaderProps) => JSX_2.Element;
 
-// @public (undocumented)
-export const PersistButton: ({ label }: {
+// @public
+export type IdentityLoaderProps = {
+    children: ReactNode;
+};
+
+// Warning: (ae-unresolved-link) The @link reference could not be resolved: The package "@contember/react-ui-lib" does not have an export "useBlockNavigationOnDirtyState"
+//
+// @public
+export const NavigationGuardDialog: () => JSX_2.Element;
+
+// @public
+export const PersistButton: ({ label }: PersistButtonProps) => JSX_2.Element;
+
+// @public
+export type PersistButtonProps = {
     label?: ReactNode;
-}) => JSX_2.Element;
+};
 
-// @public (undocumented)
+// @public
 export const usePersistErrorHandler: () => (result: ErrorPersistResult) => void;
 
-// @public (undocumented)
+// @public
 export const usePersistFeedbackHandlers: () => {
     onPersistSuccess: (result: SuccessfulPersistResult) => void;
 };
 
-// @public (undocumented)
+// @public
 export const usePersistSuccessHandler: () => (result: SuccessfulPersistResult) => void;
 
-// @public (undocumented)
+// @public
 export const usePersistWithFeedback: () => () => Promise<void | null>;
 
 // (No @packageDocumentation comment for this package)

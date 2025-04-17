@@ -139,6 +139,7 @@ export type ChangeMyPasswordError = {
 	readonly __typename?: 'ChangeMyPasswordError'
 	readonly code: ChangeMyPasswordErrorCode
 	readonly developerMessage: Scalars['String']['output']
+	readonly weakPasswordReasons?: Maybe<ReadonlyArray<WeakPasswordReason>>
 }
 
 export type ChangeMyPasswordErrorCode =
@@ -176,6 +177,7 @@ export type ChangePasswordError = {
 	readonly developerMessage: Scalars['String']['output']
 	/** @deprecated Field no longer supported */
 	readonly endUserMessage?: Maybe<Scalars['String']['output']>
+	readonly weakPasswordReasons?: Maybe<ReadonlyArray<WeakPasswordReason>>
 }
 
 export type ChangePasswordErrorCode =
@@ -1213,6 +1215,7 @@ export type ResetPasswordError = {
 	readonly developerMessage: Scalars['String']['output']
 	/** @deprecated Field no longer supported */
 	readonly endUserMessage?: Maybe<Scalars['String']['output']>
+	readonly weakPasswordReasons?: Maybe<ReadonlyArray<WeakPasswordReason>>
 }
 
 export type ResetPasswordErrorCode =
@@ -1388,6 +1391,7 @@ export type SignUpError = {
 	readonly developerMessage: Scalars['String']['output']
 	/** @deprecated Field no longer supported */
 	readonly endPersonMessage?: Maybe<Scalars['String']['output']>
+	readonly weakPasswordReasons?: Maybe<ReadonlyArray<WeakPasswordReason>>
 }
 
 export type SignUpErrorCode =
@@ -1496,6 +1500,15 @@ export type VariableEntryInput = {
 	readonly name: Scalars['String']['input']
 	readonly values: ReadonlyArray<Scalars['String']['input']>
 }
+
+export type WeakPasswordReason =
+  | 'BLACKLISTED'
+  | 'INVALID_PATTERN'
+  | 'MISSING_DIGIT'
+  | 'MISSING_LOWERCASE'
+  | 'MISSING_SPECIAL'
+  | 'MISSING_UPPERCASE'
+  | 'TOO_SHORT'
 
 
 
@@ -1755,6 +1768,7 @@ export type ResolversTypes = {
 	UpdateProjectResponse: ResolverTypeWrapper<UpdateProjectResponse>
 	VariableEntry: ResolverTypeWrapper<VariableEntry>
 	VariableEntryInput: VariableEntryInput
+	WeakPasswordReason: WeakPasswordReason
 }
 
 /** Mapping between all available schema types and the resolvers parents */
@@ -1986,6 +2000,7 @@ export type ApiKeyWithTokenResolvers<ContextType = any, ParentType extends Resol
 export type ChangeMyPasswordErrorResolvers<ContextType = any, ParentType extends ResolversParentTypes['ChangeMyPasswordError'] = ResolversParentTypes['ChangeMyPasswordError']> = {
 	code?: Resolver<ResolversTypes['ChangeMyPasswordErrorCode'], ParentType, ContextType>
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	weakPasswordReasons?: Resolver<Maybe<ReadonlyArray<ResolversTypes['WeakPasswordReason']>>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
@@ -2011,6 +2026,7 @@ export type ChangePasswordErrorResolvers<ContextType = any, ParentType extends R
 	code?: Resolver<ResolversTypes['ChangePasswordErrorCode'], ParentType, ContextType>
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	endUserMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	weakPasswordReasons?: Resolver<Maybe<ReadonlyArray<ResolversTypes['WeakPasswordReason']>>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
@@ -2521,6 +2537,7 @@ export type ResetPasswordErrorResolvers<ContextType = any, ParentType extends Re
 	code?: Resolver<ResolversTypes['ResetPasswordErrorCode'], ParentType, ContextType>
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	endUserMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	weakPasswordReasons?: Resolver<Maybe<ReadonlyArray<ResolversTypes['WeakPasswordReason']>>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
@@ -2651,6 +2668,7 @@ export type SignUpErrorResolvers<ContextType = any, ParentType extends Resolvers
 	code?: Resolver<ResolversTypes['SignUpErrorCode'], ParentType, ContextType>
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	endPersonMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	weakPasswordReasons?: Resolver<Maybe<ReadonlyArray<ResolversTypes['WeakPasswordReason']>>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 

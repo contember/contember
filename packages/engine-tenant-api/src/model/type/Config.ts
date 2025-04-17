@@ -1,5 +1,6 @@
 import { ConfigPolicy } from '../../schema'
 
+export { type Config } from '../../schema'
 export type ConfigRow = {
 	passwordless_enabled: ConfigPolicy
 	passwordless_url: string | null

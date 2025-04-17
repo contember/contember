@@ -3,7 +3,7 @@ import { InviteErrorCodes } from './tenant/hooks/useInvite'
 import { UploaderErrorType } from '@contember/react-uploader'
 import { ChangeMyPasswordFormErrorCode, CreateApiKeyFormErrorCode } from '@contember/interface'
 import { InviteFormErrorCode, LoginFormErrorCode, OtpPrepareFormErrorCode, OtpConfirmFormErrorCode, PasswordResetFormErrorCode, PasswordResetRequestFormErrorCode, UpdateProjectMemberFormErrorCode, PasswordlessSignInInitFormErrorCode, PasswordlessSignInFormErrorCode } from '@contember/react-identity'
-import { ActivatePasswordlessOtpErrorCode } from '@contember/graphql-client-tenant'
+import { ActivatePasswordlessOtpErrorCode, WeakPasswordReason } from '@contember/graphql-client-tenant'
 
 export const dict = {
 	deleteEntityDialog: {

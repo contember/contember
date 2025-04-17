@@ -211,6 +211,7 @@ const schema: DocumentNode = gql`
 
 	type SignUpError {
 		code: SignUpErrorCode!
+        weakPasswordReasons: [WeakPasswordReason!]
 		developerMessage: String!
 		endPersonMessage: String @deprecated
 	}
@@ -349,6 +350,7 @@ const schema: DocumentNode = gql`
 
 	type ChangePasswordError {
 		code: ChangePasswordErrorCode!
+		weakPasswordReasons: [WeakPasswordReason!]
 		developerMessage: String!
 		endUserMessage: String @deprecated
 	}
@@ -357,6 +359,16 @@ const schema: DocumentNode = gql`
 		PERSON_NOT_FOUND
 		TOO_WEAK
 	}
+	
+	enum WeakPasswordReason {
+		TOO_SHORT
+		MISSING_UPPERCASE
+		MISSING_LOWERCASE
+		MISSING_DIGIT
+		MISSING_SPECIAL
+		INVALID_PATTERN
+		BLACKLISTED
+    }
 
 
 	# === changeMyPassword ===
@@ -368,6 +380,7 @@ const schema: DocumentNode = gql`
 
 	type ChangeMyPasswordError {
 		code: ChangeMyPasswordErrorCode!
+        weakPasswordReasons: [WeakPasswordReason!]
 		developerMessage: String!
 	}
 
@@ -1128,6 +1141,7 @@ const schema: DocumentNode = gql`
 	}
 	type ResetPasswordError {
 		code: ResetPasswordErrorCode!
+        weakPasswordReasons: [WeakPasswordReason!]
 		developerMessage: String!
 		endUserMessage: String @deprecated
 	}

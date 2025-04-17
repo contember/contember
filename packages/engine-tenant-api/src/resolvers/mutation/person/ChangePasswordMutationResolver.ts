@@ -1,12 +1,4 @@
-import {
-	ChangeMyPasswordErrorCode,
-	ChangeMyPasswordResponse,
-	ChangePasswordErrorCode,
-	ChangePasswordResponse,
-	MutationChangeMyPasswordArgs,
-	MutationChangePasswordArgs,
-	MutationResolvers,
-} from '../../../schema'
+import { ChangeMyPasswordResponse, ChangePasswordResponse, MutationChangeMyPasswordArgs, MutationChangePasswordArgs, MutationResolvers } from '../../../schema'
 import { GraphQLResolveInfo } from 'graphql'
 import { TenantResolverContext } from '../../TenantResolverContext'
 import { IdentityScope, PasswordChangeManager, PermissionActions, PersonQuery } from '../../../model'
@@ -36,7 +28,7 @@ export class ChangePasswordMutationResolver implements MutationResolvers {
 		const result = await this.passwordChangeManager.changePassword(context.db, args.personId, args.password)
 
 		if (!result.ok) {
-			return createErrorResponse(result.error, result.errorMessage)
+			return createErrorResponse(result)
 		}
 
 		return { ok: true, errors: [] }
@@ -59,7 +51,7 @@ export class ChangePasswordMutationResolver implements MutationResolvers {
 		const result = await this.passwordChangeManager.changeMyPassword(context.db, person, args.currentPassword, args.newPassword)
 
 		if (!result.ok) {
-			return createErrorResponse(result.error, result.errorMessage)
+			return createErrorResponse(result)
 		}
 
 		return { ok: true }

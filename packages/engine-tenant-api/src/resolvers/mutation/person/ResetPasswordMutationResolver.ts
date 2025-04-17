@@ -57,6 +57,6 @@ export class ResetPasswordMutationResolver implements MutationResolvers {
 		if (result.ok) {
 			return { ok: true, errors: [] }
 		}
-		return createErrorResponse(result.error, result.errorMessage)
+		return createErrorResponse(result)
 	}
 }

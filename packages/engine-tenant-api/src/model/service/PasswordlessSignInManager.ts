@@ -1,5 +1,5 @@
 import { ApiKeyManager } from './apiKey'
-import { PersonQuery, PersonRow } from '../queries'
+import { ConfigurationQuery, PersonQuery, PersonRow } from '../queries'
 import { Response, ResponseError, ResponseOk } from '../utils/Response'
 import {
 	ActivatePasswordlessOtpErrorCode,
@@ -39,7 +39,7 @@ class PasswordlessSignInManager {
 		mailProject?: string
 	}): Promise<PasswordlessSignInManager.InitSignInPasswordlessResponse> {
 		return db.transaction(async (db): Promise<PasswordlessSignInManager.InitSignInPasswordlessResponse> => {
-			const configuration = await this.configurationManager.fetchConfiguration(db)
+			const configuration = await db.queryHandler.fetch(new ConfigurationQuery())
 			if (configuration.passwordless.enabled === 'never') {
 				return new ResponseError('PASSWORDLESS_DISABLED', 'Passwordless sign-in is disabled')
 			}

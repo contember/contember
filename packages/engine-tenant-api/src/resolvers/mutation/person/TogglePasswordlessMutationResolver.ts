@@ -1,7 +1,7 @@
 import { MutationResolvers, ToggleMyPasswordlessResponse } from '../../../schema'
 import { ConfigurationManager } from '../../../model/service/ConfigurationManager'
 import { TenantResolverContext } from '../../TenantResolverContext'
-import { PermissionActions, PersonManager, PersonQuery } from '../../../model'
+import { ConfigurationQuery, PermissionActions, PersonManager, PersonQuery } from '../../../model'
 import { createErrorResponse } from '../../errorUtils'
 
 export class TogglePasswordlessMutationResolver implements Pick<MutationResolvers, 'enableMyPasswordless' | 'disableMyPasswordless'> {
@@ -31,7 +31,7 @@ export class TogglePasswordlessMutationResolver implements Pick<MutationResolver
 			action: PermissionActions.PERSON_TOGGLE_PASSWORDLESS,
 			message: 'You are not allowed to enable passwordless',
 		})
-		const config = await this.configurationManager.fetchConfiguration(context.db)
+		const config = await await context.db.queryHandler.fetch(new ConfigurationQuery())
 		if (config.passwordless?.enabled === 'always' || config.passwordless?.enabled === 'never') {
 			return createErrorResponse('CANNOT_TOGGLE', 'Passwordless is configured globally and cannot be toggled')
 		}

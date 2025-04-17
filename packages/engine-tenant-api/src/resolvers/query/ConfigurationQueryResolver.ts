@@ -1,5 +1,5 @@
 import { Config, QueryResolvers } from '../../schema'
-import { PermissionActions } from '../../model'
+import { ConfigurationQuery, PermissionActions } from '../../model'
 import { TenantResolverContext } from '../TenantResolverContext'
 import { ConfigurationManager } from '../../model/service/ConfigurationManager'
 
@@ -16,6 +16,6 @@ export class ConfigurationQueryResolver implements Pick<QueryResolvers, 'configu
 			message: 'You are not allowed to view configuration',
 		})
 
-		return await this.configurationManager.fetchConfiguration(context.db)
+		return await context.db.queryHandler.fetch(new ConfigurationQuery())
 	}
 }

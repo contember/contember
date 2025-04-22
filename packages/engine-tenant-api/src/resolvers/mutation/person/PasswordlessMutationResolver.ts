@@ -7,7 +7,7 @@ import {
 	SignInPasswordlessResponse,
 } from '../../../schema'
 import { TenantResolverContext } from '../../TenantResolverContext'
-import { PermissionActions } from '../../../model'
+import { ConfigurationQuery, PermissionActions } from '../../../model'
 import { createErrorResponse } from '../../errorUtils'
 import { SignInResponseFactory } from '../../responseHelpers/SignInResponseFactory'
 import { PasswordlessSignInManager } from '../../../model/service/PasswordlessSignInManager'
@@ -39,6 +39,14 @@ export class PasswordlessMutationResolver implements Pick<MutationResolvers, 'in
 			response: result,
 		})
 		if (!result.ok) {
+			if (result.error === 'PERSON_NOT_FOUND') {
+				const configuration = await context.db.queryHandler.fetch(new ConfigurationQuery())
+				if (!configuration.login.revealUserExists) {
+					// If the user does not exist, we don't want to reveal that
+					return createErrorResponse('PASSWORDLESS_DISABLED', 'Passwordless sign-in is disabled for this person')
+				}
+			}
+
 			return createErrorResponse(result.error, result.errorMessage)
 		}
 		return { ok: true, result: result.result }

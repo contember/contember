@@ -1284,6 +1284,7 @@ export type SignInError = {
 }
 
 export type SignInErrorCode =
+  | 'INVALID_CREDENTIALS'
   | 'INVALID_OTP_TOKEN'
   | 'INVALID_PASSWORD'
   | 'NO_PASSWORD_SET'

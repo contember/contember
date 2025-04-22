@@ -248,6 +248,7 @@ const schema: DocumentNode = gql`
 	}
 
 	enum SignInErrorCode {
+		INVALID_CREDENTIALS
 		UNKNOWN_EMAIL
 		INVALID_PASSWORD
 		PERSON_DISABLED

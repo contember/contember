@@ -209,6 +209,7 @@ export const dict = {
 				'NO_PASSWORD_SET': 'No password set',
 				'PERSON_DISABLED': 'Person disabled',
 				'UNKNOWN_EMAIL': 'Unknown email',
+				'INVALID_CREDENTIALS': 'Invalid credentials',
 				'OTP_REQUIRED': undefined,
 			} satisfies Record<LoginFormErrorCode, string | undefined>,
 			idpInitError: 'Failed to initialize IdP login:',

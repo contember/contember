@@ -7,7 +7,7 @@ import {
 } from '../../../schema'
 import { GraphQLResolveInfo } from 'graphql'
 import { TenantResolverContext } from '../../TenantResolverContext'
-import { PasswordResetManager, PermissionActions, PermissionContextFactory, PersonQuery } from '../../../model'
+import { ConfigurationQuery, PasswordResetManager, PermissionActions, PermissionContextFactory, PersonQuery } from '../../../model'
 import { createErrorResponse } from '../../errorUtils'
 import { ResponseError, ResponseOk } from '../../../model/utils/Response'
 
@@ -35,6 +35,13 @@ export class ResetPasswordMutationResolver implements MutationResolvers {
 				response: responseError,
 				personInput: args.email,
 			})
+
+			const configuration = await context.db.queryHandler.fetch(new ConfigurationQuery())
+			if (!configuration.login.revealUserExists) {
+				// If the user does not exist, we do not want to leak this information
+				return { ok: true, errors: [] }
+			}
+
 			return createErrorResponse(responseError)
 		}
 

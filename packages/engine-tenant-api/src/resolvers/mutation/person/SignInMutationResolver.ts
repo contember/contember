@@ -1,6 +1,6 @@
 import { CreateSessionTokenResponse, MutationCreateSessionTokenArgs, MutationResolvers, MutationSignInArgs, SignInResponse } from '../../../schema'
 import { TenantResolverContext } from '../../TenantResolverContext'
-import { PermissionActions, PersonUniqueIdentifier, SignInManager } from '../../../model'
+import { ConfigurationQuery, PermissionActions, PersonUniqueIdentifier, SignInManager } from '../../../model'
 import { createErrorResponse } from '../../errorUtils'
 import { SignInResponseFactory } from '../../responseHelpers/SignInResponseFactory'
 import { UserInputError } from '@contember/graphql-utils'
@@ -29,7 +29,13 @@ export class SignInMutationResolver implements MutationResolvers {
 			response,
 		})
 
+
 		if (!response.ok) {
+			const configuration = await context.db.queryHandler.fetch(new ConfigurationQuery())
+			if (!configuration.login.revealUserExists && ['NO_PASSWORD_SET', 'NO_PASSWORD_SET', 'PERSON_DISABLED', 'INVALID_PASSWORD'].includes(response.error)) {
+				// if the user does not exist, we don't want to reveal that, so we return a generic error
+				return createErrorResponse('INVALID_CREDENTIALS', 'Invalid credentials')
+			}
 			return createErrorResponse(response.error, response.errorMessage)
 		}
 

@@ -106,5 +106,6 @@ const errorToField: Record<TenantApi.SignInErrorCode, keyof LoginFormValues | un
 	'UNKNOWN_EMAIL': 'email',
 	'PERSON_DISABLED': 'email',
 	'INVALID_OTP_TOKEN': 'otpToken',
+	'INVALID_CREDENTIALS': 'password',
 	'OTP_REQUIRED': undefined,
 }

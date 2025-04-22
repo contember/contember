@@ -13,7 +13,7 @@ import { ProjectGroupResolver } from './projectGroup/ProjectGroupResolver'
 import { Logger } from '@contember/logger'
 import { ExecutionContainerFactory, GraphQlSchemaBuilderFactory, PermissionFactory } from '@contember/engine-content-api'
 import { createProviders, Providers } from './providers'
-import { TenantApiMiddlewareFactory, TenantGraphQLContextFactory, TenantGraphQLHandlerFactory } from './tenant'
+import { TenantApiMiddlewareFactory, TenantGraphQLHandlerFactory } from './tenant'
 import { SystemApiMiddlewareFactory, SystemGraphQLContextFactory, SystemGraphQLHandlerFactory } from './system'
 import {
 	ContentApiControllerFactory, ContentGraphQLContextFactory, ContentQueryHandlerFactory, GraphQLSchemaContributor, GraphQlSchemaFactory,
@@ -186,10 +186,8 @@ export class MasterContainerFactory {
 				new ProjectContextResolver())
 			.addService('contentApiMiddlewareFactory', ({ projectContextResolver, notModifiedChecker, contentGraphqlContextFactory, contentQueryHandlerFactory, graphQlSchemaFactory }) =>
 				new ContentApiControllerFactory(notModifiedChecker, contentGraphqlContextFactory, contentQueryHandlerFactory, projectContextResolver, graphQlSchemaFactory))
-			.addService('tenantGraphQLContextFactory', () =>
-				new TenantGraphQLContextFactory())
-			.addService('tenantApiMiddlewareFactory', ({ debugMode, projectGroupResolver, tenantGraphQLContextFactory }) =>
-				new TenantApiMiddlewareFactory(debugMode, projectGroupResolver, tenantGraphQLContextFactory))
+			.addService('tenantApiMiddlewareFactory', () =>
+				new TenantApiMiddlewareFactory())
 			.addService('systemGraphQLContextFactory', () =>
 				new SystemGraphQLContextFactory())
 			.addService('systemApiMiddlewareFactory', ({ debugMode, systemGraphQLContextFactory, projectContextResolver }) =>

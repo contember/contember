@@ -5,6 +5,7 @@ import { Providers } from '../providers'
 import { DatabaseContext } from '../utils'
 import { Response, ResponseError, ResponseOk } from '../utils/Response'
 import { ImplementationException } from '../../exceptions'
+import { AuthLogService } from './AuthLogService'
 
 class SignInManager {
 	constructor(
@@ -14,39 +15,49 @@ class SignInManager {
 	) {}
 
 	async signIn(dbContext: DatabaseContext, email: string, password: string, expiration?: number, otpCode?: string): Promise<SignInResponse> {
-		const personRow = await dbContext.queryHandler.fetch(PersonQuery.byEmail(email))
+		const person = await dbContext.queryHandler.fetch(PersonQuery.byEmail(email))
 
-		if (personRow === null) {
-			return new ResponseError('UNKNOWN_EMAIL', `Person with email ${email} not found`)
+		if (person === null) {
+			return new ResponseError('UNKNOWN_EMAIL', `Person with email ${email} not found`, {
+				[AuthLogService.Key]: new AuthLogService.Bag({
+					personInput: email,
+				}),
+			})
 		}
 
-		if (!personRow.password_hash) {
-			return new ResponseError('NO_PASSWORD_SET', `No password set`)
+		const authLogData = {
+			[AuthLogService.Key]: new AuthLogService.Bag({
+				personInput: email,
+				personId: person.id,
+			}),
+		}
+		if (!person.password_hash) {
+			return new ResponseError('NO_PASSWORD_SET', `No password set`, authLogData)
 		}
 
-		if (personRow.disabled_at !== null) {
-			return new ResponseError('PERSON_DISABLED', `Person is disabled`)
+		if (person.disabled_at !== null) {
+			return new ResponseError('PERSON_DISABLED', `Person is disabled`, authLogData)
 		}
 
-		const passwordValid = await this.providers.bcryptCompare(password, personRow.password_hash)
+		const passwordValid = await this.providers.bcryptCompare(password, person.password_hash)
 
 		if (!passwordValid) {
-			return new ResponseError('INVALID_PASSWORD', `Password does not match`)
+			return new ResponseError('INVALID_PASSWORD', `Password does not match`, authLogData)
 		}
 
-		if (personRow.otp_uri && personRow.otp_activated_at) {
+		if (person.otp_uri && person.otp_activated_at) {
 			if (!otpCode) {
-				return new ResponseError('OTP_REQUIRED', `2FA is enabled. OTP token is required`)
+				return new ResponseError('OTP_REQUIRED', `2FA is enabled. OTP token is required`, authLogData)
 			}
 
-			if (!this.otpAuthenticator.validate({ uri: personRow.otp_uri }, otpCode)) {
-				return new ResponseError('INVALID_OTP_TOKEN', 'OTP token validation has failed')
+			if (!this.otpAuthenticator.validate({ uri: person.otp_uri }, otpCode)) {
+				return new ResponseError('INVALID_OTP_TOKEN', 'OTP token validation has failed', authLogData)
 			}
 		}
 
-		const sessionToken = await this.apiKeyManager.createSessionApiKey(dbContext, personRow.identity_id, expiration)
+		const sessionToken = await this.apiKeyManager.createSessionApiKey(dbContext, person.identity_id, expiration)
 
-		return new ResponseOk(new SignInResult(personRow, sessionToken))
+		return new ResponseOk({ person, token: sessionToken, ...authLogData })
 	}
 
 	async createSessionToken(
@@ -55,38 +66,62 @@ class SignInManager {
 		expiration?: number,
 		verifier?: (person: PersonRow) => Promise<void>,
 	): Promise<CreateSessionTokenResponse> {
-		const personRow = await dbContext.queryHandler.fetch(PersonQuery.byUniqueIdentifier(personIdentifier))
+		const person = await dbContext.queryHandler.fetch(PersonQuery.byUniqueIdentifier(personIdentifier))
 
-		if (personRow === null) {
+		if (person === null) {
 			if (personIdentifier.type === 'email') {
-				return new ResponseError('UNKNOWN_EMAIL', `Person with email ${personIdentifier.email} not found`)
+				return new ResponseError('UNKNOWN_EMAIL', `Person with email ${personIdentifier.email} not found`, {
+					[AuthLogService.Key]: new AuthLogService.Bag({
+						personInput: personIdentifier.email,
+					}),
+				})
 
 			} else if (personIdentifier.type === 'id') {
-				return new ResponseError('UNKNOWN_PERSON_ID', `Person with id ${personIdentifier.id} not found`)
+				return new ResponseError('UNKNOWN_PERSON_ID', `Person with id ${personIdentifier.id} not found`, {
+					[AuthLogService.Key]: new AuthLogService.Bag({
+						personInput: personIdentifier.id,
+					}),
+				})
 			}
 
 			throw new ImplementationException()
 		}
 
-		if (personRow.disabled_at !== null) {
-			return new ResponseError('PERSON_DISABLED', `Person with id ${personRow.id} is disabled`)
+		const inputValue = personIdentifier.type === 'email' ? personIdentifier.email : personIdentifier.id
+		if (person.disabled_at !== null) {
+			return new ResponseError('PERSON_DISABLED', `Person with id ${person.id} is disabled`, {
+				[AuthLogService.Key]: new AuthLogService.Bag({
+					personId: person.id,
+					personInput: inputValue,
+				}),
+			})
 		}
 
-		await verifier?.(personRow)
+		await verifier?.(person)
 
-		const sessionToken = await this.apiKeyManager.createSessionApiKey(dbContext, personRow.identity_id, expiration)
-		return new ResponseOk(new SignInResult(personRow, sessionToken))
+		const sessionToken = await this.apiKeyManager.createSessionApiKey(dbContext, person.identity_id, expiration)
+		return new ResponseOk({
+			person,
+			token: sessionToken,
+			[AuthLogService.Key]: new AuthLogService.Bag({
+				personId: person.id,
+				personInput: inputValue,
+			}),
+		})
 	}
 }
 
-export class SignInResult {
-	constructor(
-		public readonly person: PersonRow,
-		public readonly token: string,
-	) {}
+export interface SignInResult {
+	readonly person: PersonRow
+	readonly token: string
+	[AuthLogService.Key]: AuthLogService.Bag
 }
 
-export type SignInResponse = Response<SignInResult, SignInErrorCode>
-export type CreateSessionTokenResponse = Response<SignInResult, CreateSessionTokenErrorCode>
+export type SignInResponse = Response<SignInResult, SignInErrorCode, {
+	[AuthLogService.Key]: AuthLogService.Bag
+}>
+export type CreateSessionTokenResponse = Response<SignInResult, CreateSessionTokenErrorCode, {
+	[AuthLogService.Key]: AuthLogService.Bag
+}>
 
 export { SignInManager }

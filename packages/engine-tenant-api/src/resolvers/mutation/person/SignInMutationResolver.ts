@@ -1,10 +1,4 @@
-import {
-	CreateSessionTokenResponse,
-	MutationCreateSessionTokenArgs,
-	MutationResolvers,
-	MutationSignInArgs,
-	SignInResponse,
-} from '../../../schema'
+import { CreateSessionTokenResponse, MutationCreateSessionTokenArgs, MutationResolvers, MutationSignInArgs, SignInResponse } from '../../../schema'
 import { TenantResolverContext } from '../../TenantResolverContext'
 import { PermissionActions, PersonUniqueIdentifier, SignInManager } from '../../../model'
 import { createErrorResponse } from '../../errorUtils'
@@ -30,6 +24,10 @@ export class SignInMutationResolver implements MutationResolvers {
 			args.expiration || undefined,
 			args.otpToken || undefined,
 		)
+		await context.logAuthAction({
+			type: 'login',
+			response,
+		})
 
 		if (!response.ok) {
 			return createErrorResponse(response.error, response.errorMessage)
@@ -65,10 +63,15 @@ export class SignInMutationResolver implements MutationResolvers {
 				message: 'You are not allowed to create a session key for this person.',
 			}),
 		)
+		await context.logAuthAction({
+			type: 'create_session_token',
+			response: response,
+		})
 
 		if (!response.ok) {
 			return createErrorResponse(response.error, response.errorMessage)
 		}
+
 		return {
 			ok: true,
 			result: await this.signInResponseFactory.createResponse(response.result, context),

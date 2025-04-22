@@ -86,6 +86,7 @@ import { PasswordlessMutationResolver } from './resolvers/mutation/person/Passwo
 import { PasswordlessSignInManager } from './model/service/PasswordlessSignInManager'
 import { TogglePasswordlessMutationResolver } from './resolvers/mutation/person/TogglePasswordlessMutationResolver'
 import { PasswordStrengthValidator } from './model/service/PasswordStrengthValidator'
+import { AuthLogService } from './model/service/AuthLogService'
 
 export interface TenantContainer {
 	projectMemberManager: ProjectMemberManager
@@ -212,8 +213,8 @@ export class TenantContainerFactory {
 				new RolesManager())
 			.addService('configurationManager', () =>
 				new ConfigurationManager())
-			.addService('passwordlessSignInManager', ({ apiKeyManager, configurationManager, userMailer, projectManager, otpAuthenticator }) =>
-				new PasswordlessSignInManager(apiKeyManager, configurationManager, userMailer, projectManager, otpAuthenticator))
+			.addService('passwordlessSignInManager', ({ apiKeyManager, userMailer, projectManager, otpAuthenticator }) =>
+				new PasswordlessSignInManager(apiKeyManager, userMailer, projectManager, otpAuthenticator))
 
 			.addService('identityTypeResolver', ({ projectMemberManager, projectManager, permissionContextFactory }) =>
 				new IdentityTypeResolver(projectMemberManager, projectManager, permissionContextFactory))
@@ -289,8 +290,10 @@ export class TenantContainerFactory {
 				new PasswordlessMutationResolver(passwordlessSignInManager, signInResponseFactory))
 			.addService('togglePasswordlessMutationResolver', ({ configurationManager, personManager }) =>
 				new TogglePasswordlessMutationResolver(configurationManager, personManager))
-			.addService('resolverContextFactory', ({ permissionContextFactory }) =>
-				new TenantResolverContextFactory(permissionContextFactory))
+			.addService('authLogService', () =>
+				new AuthLogService())
+			.addService('resolverContextFactory', ({ permissionContextFactory, authLogService }) =>
+				new TenantResolverContextFactory(permissionContextFactory, authLogService))
 			.addService('resolvers', container =>
 				new ResolverFactory(container).create())
 			.addService('connection', () =>

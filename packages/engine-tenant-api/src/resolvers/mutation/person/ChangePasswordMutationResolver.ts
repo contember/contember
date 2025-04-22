@@ -25,10 +25,15 @@ export class ChangePasswordMutationResolver implements MutationResolvers {
 			action: PermissionActions.PERSON_CHANGE_PASSWORD(person.roles),
 			message: 'You are not allowed to change password',
 		})
-		const result = await this.passwordChangeManager.changePassword(context.db, args.personId, args.password)
+		const response = await this.passwordChangeManager.changePassword(context.db, person, args.password)
+		await context.logAuthAction({
+			type: 'password_change',
+			response,
+			personId: person.id,
+		})
 
-		if (!result.ok) {
-			return createErrorResponse(result)
+		if (!response.ok) {
+			return createErrorResponse(response)
 		}
 
 		return { ok: true, errors: [] }
@@ -48,10 +53,15 @@ export class ChangePasswordMutationResolver implements MutationResolvers {
 			action: PermissionActions.PERSON_CHANGE_MY_PASSWORD,
 			message: 'You are not allowed to change password',
 		})
-		const result = await this.passwordChangeManager.changeMyPassword(context.db, person, args.currentPassword, args.newPassword)
+		const response = await this.passwordChangeManager.changeMyPassword(context.db, person, args.currentPassword, args.newPassword)
+		await context.logAuthAction({
+			type: 'password_change',
+			response: response,
+			personId: person.id,
+		})
 
-		if (!result.ok) {
-			return createErrorResponse(result)
+		if (!response.ok) {
+			return createErrorResponse(response)
 		}
 
 		return { ok: true }

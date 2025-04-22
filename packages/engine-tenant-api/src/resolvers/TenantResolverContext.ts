@@ -1,5 +1,6 @@
 import { DatabaseContext, Identity, PermissionContext } from '../model'
 import { Logger } from '@contember/logger'
+import { AuthLogService } from '../model/service/AuthLogService'
 
 export interface TenantResolverContext {
 	readonly apiKeyId: string
@@ -9,4 +10,5 @@ export interface TenantResolverContext {
 	readonly requireAccess: PermissionContext['requireAccess']
 	readonly db: DatabaseContext
 	readonly logger: Logger
+	readonly logAuthAction: (entry: AuthLogService.LogArgs) => Promise<void>
 }

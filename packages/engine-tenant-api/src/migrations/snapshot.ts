@@ -4,6 +4,21 @@ import { createCredentials } from './tenantCredentials'
 
 export default async function (builder: MigrationBuilder, args: TenantMigrationArgs) {
 	builder.sql(`
+CREATE TYPE "auth_log_type" AS ENUM (
+    'login',
+    'create_session_token',
+    'idp_login',
+    'password_reset_init',
+    'password_reset',
+    'password_change',
+    'email_change',
+    '2fa_disable',
+    '2fa_enable',
+    'passwordless_login_init',
+    'passwordless_login_exchange',
+    'passwordless_login',
+    'person_disable'
+);
 CREATE TYPE "config_policy" AS ENUM (
     'always',
     'never',
@@ -112,6 +127,22 @@ CREATE TABLE "person" (
     "passwordless_enabled" boolean,
     CONSTRAINT "idp_only_no_email" CHECK ((("idp_only" = false) OR (("idp_only" = true) AND ("email" IS NULL))))
 );
+CREATE TABLE "person_auth_log" (
+    "id" "uuid" NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "invoked_by_id" "uuid",
+    "person_id" "uuid",
+    "person_token_id" "uuid",
+    "person_input_identifier" "text",
+    "type" "auth_log_type" NOT NULL,
+    "success" boolean NOT NULL,
+    "error_code" "text",
+    "error_message" "text",
+    "ip_address" "inet",
+    "user_agent" "text",
+    "identity_provider_id" "uuid",
+    "metadata" "jsonb"
+);
 CREATE TABLE "person_identity_provider" (
     "id" "uuid" NOT NULL,
     "person_id" "uuid" NOT NULL,
@@ -172,6 +203,8 @@ ALTER TABLE ONLY "identity_provider"
     ADD CONSTRAINT "identity_provider_slug_key" UNIQUE ("slug");
 ALTER TABLE ONLY "mail_template"
     ADD CONSTRAINT "mail_template_pkey" PRIMARY KEY ("id");
+ALTER TABLE ONLY "person_auth_log"
+    ADD CONSTRAINT "person_auth_log_pkey" PRIMARY KEY ("id");
 ALTER TABLE ONLY "person"
     ADD CONSTRAINT "person_id" PRIMARY KEY ("id");
 ALTER TABLE ONLY "person"
@@ -196,6 +229,7 @@ CREATE INDEX "identity_parent_id" ON "identity" USING "btree" ("parent_id");
 CREATE UNIQUE INDEX "mail_template_identifier" ON "mail_template" USING "btree" ("project_id", "mail_type", "variant") WHERE ("project_id" IS NOT NULL);
 CREATE UNIQUE INDEX "mail_template_identifier_global" ON "mail_template" USING "btree" ("mail_type", "variant") WHERE ("project_id" IS NULL);
 CREATE INDEX "mail_template_project_index" ON "mail_template" USING "btree" ("project_id");
+CREATE INDEX "person_auth_log_person_input_identifier_created_at_idx" ON "person_auth_log" USING "btree" ("person_input_identifier", "created_at" DESC);
 CREATE INDEX "person_identity_id" ON "person" USING "btree" ("identity_id");
 CREATE UNIQUE INDEX "person_identity_provider_identifier" ON "person_identity_provider" USING "btree" ("identity_provider_id", "external_identifier");
 CREATE INDEX "person_identity_provider_person_id" ON "person_identity_provider" USING "btree" ("person_id");
@@ -215,6 +249,14 @@ ALTER TABLE ONLY "identity"
     ADD CONSTRAINT "identity_parent_id_fkey" FOREIGN KEY ("parent_id") REFERENCES "identity"("id");
 ALTER TABLE ONLY "mail_template"
     ADD CONSTRAINT "mail_template_project" FOREIGN KEY ("project_id") REFERENCES "project"("id") ON DELETE CASCADE;
+ALTER TABLE ONLY "person_auth_log"
+    ADD CONSTRAINT "person_auth_log_identity_provider_id_fkey" FOREIGN KEY ("identity_provider_id") REFERENCES "identity_provider"("id") ON DELETE SET NULL;
+ALTER TABLE ONLY "person_auth_log"
+    ADD CONSTRAINT "person_auth_log_invoked_by_id_fkey" FOREIGN KEY ("invoked_by_id") REFERENCES "identity"("id") ON DELETE SET NULL;
+ALTER TABLE ONLY "person_auth_log"
+    ADD CONSTRAINT "person_auth_log_person_id_fkey" FOREIGN KEY ("person_id") REFERENCES "person"("id") ON DELETE SET NULL;
+ALTER TABLE ONLY "person_auth_log"
+    ADD CONSTRAINT "person_auth_log_person_token_id_fkey" FOREIGN KEY ("person_token_id") REFERENCES "person_token"("id") ON DELETE SET NULL;
 ALTER TABLE ONLY "person"
     ADD CONSTRAINT "person_identity_id_fkey" FOREIGN KEY ("identity_id") REFERENCES "identity"("id");
 ALTER TABLE ONLY "person_identity_provider"

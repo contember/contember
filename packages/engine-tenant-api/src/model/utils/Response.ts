@@ -1,4 +1,6 @@
-export type Response<Result, Error, ErrorMetadata = undefined> = ResponseOk<Result> | (Error extends never ? never : ResponseError<Error, ErrorMetadata>)
+export type Response<Result, Error, ErrorMetadata extends {} | undefined = undefined> =
+	| ResponseOk<Result>
+	| (Error extends never ? never : ResponseError<Error, ErrorMetadata>)
 
 export class ResponseOk<Result> {
 	public readonly ok = true
@@ -6,7 +8,7 @@ export class ResponseOk<Result> {
 	constructor(public readonly result: Result) {}
 }
 
-export class ResponseError<const Error, Metadata = undefined> {
+export class ResponseError<const Error, Metadata extends {} | undefined = undefined> {
 	public readonly ok = false
 
 	constructor(
@@ -15,3 +17,4 @@ export class ResponseError<const Error, Metadata = undefined> {
 		public readonly metadata?: Metadata,
 	) {}
 }
+

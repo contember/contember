@@ -114,6 +114,7 @@ export const executeTenantTest = async (test: Test) => {
 			authenticatedApiKeyId,
 		),
 		logger: createLogger(new JsonStreamLoggerHandler(process.stderr)),
+		logAuthAction: () => Promise.resolve(),
 		db: databaseContext,
 	}
 

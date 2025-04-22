@@ -25,6 +25,7 @@ export class TenantApiMiddlewareFactory {
 						const db = tenantContainer.databaseContext
 						const context = resolverContextFactory.create(
 							authResult,
+							{ ip: clientIp, userAgent: koa.request.headers['user-agent'] },
 							db,
 							logger,
 						)

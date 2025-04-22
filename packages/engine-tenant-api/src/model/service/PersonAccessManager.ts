@@ -1,4 +1,4 @@
-import { PersonQuery } from '../queries'
+import { PersonQuery, PersonRow } from '../queries'
 import { DatabaseContext } from '../utils'
 import { DisablePersonCommand } from '../commands/person/DisablePersonCommand'
 import { ApiKeyManager } from './apiKey'
@@ -9,37 +9,18 @@ class PersonAccessManager {
 
 	constructor(private readonly apiKeyManager: ApiKeyManager) {}
 
-	async disablePerson(dbContext: DatabaseContext, personId: string): Promise<PersonDisableAccessResponse> {
-		const result = await dbContext.transaction(async trx => {
-			const personRow = await trx.queryHandler.fetch(
-				PersonQuery.byId(personId),
-			)
-
-			if (personRow === null) {
-				return 'PERSON_NOT_FOUND'
-			}
-
-			if (personRow.disabled_at !== null) {
-				return 'PERSON_ALREADY_DISABLED'
+	async disablePerson(dbContext: DatabaseContext, person: PersonRow): Promise<PersonDisableAccessResponse> {
+		return await dbContext.transaction(async trx => {
+			if (person.disabled_at !== null) {
+				return new ResponseError('PERSON_ALREADY_DISABLED', 'Person is already disabled')
 			}
 
 			// Deactivate person & invalidate all api keys associated with person identity
-			await this.disablePersonAccount(trx, personRow.id)
-			await this.disableIdentityApiKeys(trx, personRow.identity_id)
+			await this.disablePersonAccount(trx, person.id)
+			await this.disableIdentityApiKeys(trx, person.identity_id)
 
-			return null
+			return new ResponseOk(null)
 		})
-
-		switch (result) {
-			case null:
-				return new ResponseOk(null)
-
-			case 'PERSON_ALREADY_DISABLED':
-				return new ResponseError(result, 'Person is already disable')
-
-			case 'PERSON_NOT_FOUND':
-				return new ResponseError(result, 'Person not found')
-		}
 	}
 
 	private async disablePersonAccount(dbContext: DatabaseContext, personId: string) {

@@ -49,6 +49,10 @@ export class IDPMutationResolver implements MutationResolvers {
 			},
 			args.expiration ?? undefined,
 		)
+		await context.logAuthAction({
+			type: 'idp_login',
+			response: signIn,
+		})
 		if (!signIn.ok) {
 			return createErrorResponse(signIn.error, signIn.errorMessage)
 		}

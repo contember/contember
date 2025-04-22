@@ -10,6 +10,7 @@ import { TenantResolverContext } from '../../TenantResolverContext'
 import { OtpManager, PermissionActions, PersonQuery, PersonRow } from '../../../model'
 import { ImplementationException } from '../../../exceptions'
 import { createErrorResponse } from '../../errorUtils'
+import { ResponseError, ResponseOk } from '../../../model/utils/Response'
 
 export class OtpMutationResolver implements MutationResolvers {
 	constructor(private readonly otpManager: OtpManager) {}
@@ -17,6 +18,13 @@ export class OtpMutationResolver implements MutationResolvers {
 	async prepareOtp(parent: any, args: MutationPrepareOtpArgs, context: TenantResolverContext): Promise<PrepareOtpResponse> {
 		const person = await this.getPersonFromContext(context)
 		const otp = await this.otpManager.prepareOtp(context.db, person, args.label || 'Contember')
+		if (person.otp_activated_at) {
+			await context.logAuthAction({
+				type: '2fa_disable',
+				response: new ResponseOk(null),
+				personId: person.id,
+			})
+		}
 		return {
 			ok: true,
 			result: {
@@ -35,9 +43,20 @@ export class OtpMutationResolver implements MutationResolvers {
 			)
 		}
 		if (!this.otpManager.verifyOtp(person, args.otpToken)) {
-			return createErrorResponse('INVALID_OTP_TOKEN', 'Provided token is not correct.')
+			const responseError = new ResponseError('INVALID_OTP_TOKEN', 'Provided token is not correct.')
+			await context.logAuthAction({
+				type: '2fa_enable',
+				response: responseError,
+				personId: person.id,
+			})
+			return createErrorResponse(responseError)
 		}
 		await this.otpManager.confirmOtp(context.db, person)
+		await context.logAuthAction({
+			type: '2fa_enable',
+			response: new ResponseOk(null),
+			personId: person.id,
+		})
 		return {
 			ok: true,
 			errors: [],
@@ -50,6 +69,11 @@ export class OtpMutationResolver implements MutationResolvers {
 			return createErrorResponse('OTP_NOT_ACTIVE', 'OTP is not active, you cannot disable it.')
 		}
 		await this.otpManager.disableOtp(context.db, person)
+		await context.logAuthAction({
+			type: '2fa_disable',
+			response: new ResponseOk(null),
+			personId: person.id,
+		})
 		return {
 			ok: true,
 			errors: [],

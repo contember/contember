@@ -38,6 +38,12 @@ export class ChangeProfileMutationResolver implements Pick<MutationResolvers, 'c
 			email: args.email,
 			name: args.name === '' ? null : args.name,
 		})
+		if (args.email) {
+			await context.logAuthAction({
+				type: 'email_change',
+				response: result,
+			})
+		}
 
 		if (!result.ok) {
 			return createErrorResponse(result.error, result.errorMessage)
@@ -70,6 +76,13 @@ export class ChangeProfileMutationResolver implements Pick<MutationResolvers, 'c
 			email: args.email,
 			name: args.name === '' ? null : args.name,
 		})
+		if (args.email) {
+			await context.logAuthAction({
+				type: 'email_change',
+				response: result,
+				personId: person.id,
+			})
+		}
 
 		if (!result.ok) {
 			return createErrorResponse(result.error, result.errorMessage)

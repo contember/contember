@@ -1,6 +1,7 @@
 import { TenantResolverContext } from './TenantResolverContext'
 import { DatabaseContext, PermissionContext, PermissionContextFactory } from '../model'
 import { Logger } from '@contember/logger'
+import { AuthLogService } from '../model/service/AuthLogService'
 
 export const createResolverContext = (permissionContext: PermissionContext, apiKeyId: string) => {
 	return {
@@ -15,10 +16,12 @@ export const createResolverContext = (permissionContext: PermissionContext, apiK
 export class TenantResolverContextFactory {
 	constructor(
 		private readonly permissionContextFactory: PermissionContextFactory,
+		private readonly authLogService: AuthLogService,
 	) {}
 
 	public create(
 		authContext: { apiKeyId: string; identityId: string; roles: string[] },
+		httpInfo: { ip: string; userAgent?: string },
 		db: DatabaseContext,
 		logger: Logger,
 	): TenantResolverContext {
@@ -28,6 +31,13 @@ export class TenantResolverContextFactory {
 		})
 		return {
 			...createResolverContext(permissionContext, authContext.apiKeyId),
+			logAuthAction: async data => {
+				await this.authLogService.logAuthAction(db, {
+					identityId: authContext.identityId,
+					userAgent: httpInfo.userAgent,
+					clientIp: httpInfo.ip,
+				}, data)
+			},
 			db,
 			logger,
 		}

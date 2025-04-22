@@ -39,6 +39,7 @@ import _20230901165000idpreturnconfig from './2023-09-01-165000-idp-return-confi
 import _20240620140000mailreply from './2024-06-20-140000-mail-reply'
 import _20240826120000passwordless from './2024-08-26-120000-passwordless'
 import _20250416180000configup from './2025-04-16-180000-config-up'
+import _20250417160000authlog from './2025-04-17-160000-auth-log'
 import snapshot from './snapshot'
 import { computeTokenHash, Providers } from '../model'
 import { Logger } from '@contember/logger'
@@ -90,6 +91,7 @@ const migrations = {
 	'2024-06-20-140000-mail-reply': _20240620140000mailreply,
 	'2024-08-26-120000-passwordless': _20240826120000passwordless,
 	'2025-04-16-180000-config-up': _20250416180000configup,
+	'2025-04-17-160000-auth-log': _20250417160000authlog,
 }
 
 export class TenantMigrationsRunner {

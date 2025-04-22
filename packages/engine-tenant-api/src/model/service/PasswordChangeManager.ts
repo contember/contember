@@ -12,13 +12,13 @@ class PasswordChangeManager {
 		private readonly passwordStrengthVerifier: PasswordStrengthValidator,
 	) {}
 
-	async changePassword(dbContext: DatabaseContext, personId: string, password: string): Promise<PasswordChangeManager.PasswordChangeResponse<ChangePasswordErrorCode>> {
+	async changePassword(dbContext: DatabaseContext, person: PersonRow, password: string): Promise<PasswordChangeManager.PasswordChangeResponse<ChangePasswordErrorCode>> {
 		const config = await dbContext.queryHandler.fetch(new ConfigurationQuery())
 		const passwordVerifyResult = await this.passwordStrengthVerifier.verify(password, config.password, 'TOO_WEAK')
 		if (!passwordVerifyResult.ok) {
 			return passwordVerifyResult
 		}
-		await dbContext.commandBus.execute(new ChangePasswordCommand(personId, password))
+		await dbContext.commandBus.execute(new ChangePasswordCommand(person.id, password))
 		return new ResponseOk(null)
 	}
 

@@ -34,6 +34,10 @@ export class PasswordlessMutationResolver implements Pick<MutationResolvers, 'in
 			mailVariant: args.options?.mailVariant ?? undefined,
 			mailProject: args.options?.mailProject ?? undefined,
 		})
+		await context.logAuthAction({
+			type: 'passwordless_login_init',
+			response: result,
+		})
 		if (!result.ok) {
 			return createErrorResponse(result.error, result.errorMessage)
 		}
@@ -52,6 +56,10 @@ export class PasswordlessMutationResolver implements Pick<MutationResolvers, 'in
 			mfaOtp: args.mfaOtp ?? undefined,
 			validationType: args.validationType,
 			expiration: args.expiration ?? undefined,
+		})
+		await context.logAuthAction({
+			type: 'passwordless_login',
+			response: signIn,
 		})
 		if (!signIn.ok) {
 			return createErrorResponse(signIn.error, signIn.errorMessage)
@@ -72,6 +80,10 @@ export class PasswordlessMutationResolver implements Pick<MutationResolvers, 'in
 			requestId: args.requestId,
 			token: args.token,
 			otpHash: args.otpHash,
+		})
+		await context.logAuthAction({
+			type: 'passwordless_login_exchange',
+			response: result,
 		})
 		if (!result.ok) {
 			return createErrorResponse(result.error, result.errorMessage)

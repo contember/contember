@@ -37,6 +37,10 @@ const configs = [
 				...config.apiReport,
 				reportFileName: `ui-lib-${pckg}`,
 			},
+			docModel: {
+				...config.docModel,
+				apiJsonFilePath: path.resolve(`build/api/ui-lib-${pckg}.api.json`),
+			},
 			dtsRollup: {
 				...config.dtsRollup,
 				untrimmedFilePath: path.resolve('build/api/ui-lib-' + pckg + '.d.ts'),

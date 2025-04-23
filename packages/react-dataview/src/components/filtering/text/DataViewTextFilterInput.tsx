@@ -32,7 +32,7 @@ export interface DataViewTextFilterInputProps {
  *
  * See {@link DataViewTextFilterInputProps} for details.
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <DataViewTextFilterInput debounceMs={300}>
  *     <input placeholder="Search..." />

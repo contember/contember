@@ -4,7 +4,7 @@ import { useRepeaterSortedEntities } from '../contexts'
 /**
  * Renders the children only if the repeater is not empty.
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <RepeaterNotEmpty>
  *     <p>Items:</p>

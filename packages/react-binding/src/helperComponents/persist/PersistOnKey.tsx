@@ -24,7 +24,7 @@ export type PersistOnKeyProps = {
  * ## Props {@link PersistOnKeyProps}
  * - ?isHotkey, ?onPersistError, ?onPersistSuccess
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <PersistOnKey />
  * ```

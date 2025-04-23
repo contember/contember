@@ -29,7 +29,7 @@ export type PersistOnHasOneChangeProps = {
  * ## Props {@link PersistOnHasOneChangeProps}
  * - field, ?onPersistError, ?onPersistSuccess
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <PersistOnHasOneChange field="author" />
  * ```

@@ -31,7 +31,7 @@ export interface DataViewTextFilterProps {
  *
  * See {@link DataViewTextFilterProps} for details.
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <DataViewTextFilter field="name">
  *   //  Filter controls here 

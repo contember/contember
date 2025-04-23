@@ -31,7 +31,7 @@ export interface DataViewLoaderStateProps {
  *
  * See {@link DataViewLoaderStateProps} for more details.
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <DataViewLoaderState loaded>
  *     <p>Data loaded</p>

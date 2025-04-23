@@ -28,7 +28,7 @@ export interface DataViewLayoutProps {
  *
  * See {@link DataViewLayoutProps} for details.
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <DataViewLayout name={'grid'} label="Grid">
  *     //  Grid layout content here 

@@ -36,7 +36,7 @@ export interface DataViewEnumFilterProps {
  *
  * See {@link DataViewEnumFilterProps} for details.
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <DataViewEnumFilter field="status">
  *   //  Filter controls here 

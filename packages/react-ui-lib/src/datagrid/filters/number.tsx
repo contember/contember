@@ -34,7 +34,7 @@ export type DataGridNumberFilterProps =
  *
  * `DataGridNumberFilter` provides a number filter UI for `DataGrid`, allowing users to filter numerical values efficiently.
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <DataGridNumberFilter field="views" label="Views" />
  * ```

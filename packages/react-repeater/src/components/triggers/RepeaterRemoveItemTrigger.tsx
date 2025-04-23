@@ -23,7 +23,7 @@ export interface RepeaterRemoveItemTriggerProps {
  * ## Props {@link RepeaterRemoveItemTriggerProps}
  * - children
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <RepeaterRemoveItemTrigger>
  *   <button>Remove Item</button>

@@ -35,7 +35,7 @@ export interface RepeaterMoveItemTriggerProps {
  * ## Props {@link RepeaterMoveItemTriggerProps}
  * - children, index
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <RepeaterMoveItemTrigger index={'previous'}>
  *   <button>Move Item Up</button>

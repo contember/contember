@@ -25,7 +25,7 @@ export interface DataViewSetItemsPerPageTriggerProps {
  * ## Data Attributes (applied to `Slot`)
  * - **`data-active`**: Present if the current items-per-page value matches the trigger's `value`.
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <DataViewSetItemsPerPageTrigger value={10}>
  *     <button>Show 10 Items</button>

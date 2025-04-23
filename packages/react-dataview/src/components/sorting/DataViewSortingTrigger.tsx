@@ -51,7 +51,7 @@ const actionToState: Record<Exclude<DataViewSortingDirectionAction, null>, DataV
  *   - `'desc'`: Sorted in descending order.
  *   - `'none'`: No sorting applied.
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <DataViewSortingTrigger field="name" action="next">
  *     <button>Sort by Name</button>

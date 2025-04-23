@@ -39,7 +39,7 @@ export interface DataViewHasManyFilterProps {
  *
  * See {@link DataViewHasManyFilterProps} for details.
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <DataViewHasManyFilter field="tags">
  *     //  Filter controls here 

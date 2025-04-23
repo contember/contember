@@ -29,7 +29,7 @@ export type PersistOnFieldChangeProps = {
  * ## Props {@link PersistOnFieldChangeProps}
  * - field, ?onPersistError, ?onPersistSuccess
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <PersistOnFieldChange field="name" />
  * ```

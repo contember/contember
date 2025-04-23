@@ -1,0 +1,80 @@
+---
+title: NavigationGuardDialog
+sidebar_label: NavigationGuardDialog
+---
+
+# NavigationGuardDialog
+
+## Overview
+`NavigationGuardDialog` prompts users before they leave a page with unsaved changes.  
+It works with `useBlockNavigationOnDirtyState` to avoid accidental data loss.
+
+## Styling Guidelines
+* All examples use Tailwind CSS.  
+* No special Contember theme classes are required.
+
+## Core Concepts
+* Detect unsaved (“dirty”) state with `useBlockNavigationOnDirtyState`.
+* Show a modal dialog when navigation is blocked.
+* Offer save, discard, or cancel actions.
+
+## Quick Start
+```tsx
+import { NavigationGuardDialog } from '@contember/react-components'
+
+export const Page = () => (
+	<>
+		{/* …your page content… */}
+		<NavigationGuardDialog />
+	</>
+)
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+_None_
+
+## Sub-Components / Building Blocks
+### useBlockNavigationOnDirtyState
+Hook that marks the page as “dirty” and blocks navigation until changes are saved or discarded.
+
+## Examples
+```tsx
+import { useState } from 'react'
+import { useBlockNavigationOnDirtyState, NavigationGuardDialog } from '@contember/react-components'
+
+export const ArticleEditor = () => {
+	const [content, setContent] = useState('')
+	const isDirty = content.length > 0
+
+	useBlockNavigationOnDirtyState(isDirty)
+
+	return (
+		<div className="p-6 flex flex-col gap-4">
+			<textarea
+				className="border rounded p-2 w-full"
+				value={content}
+				onChange={e => setContent(e.target.value)}
+				placeholder="Start typing…"
+			/>
+			<NavigationGuardDialog />
+		</div>
+	)
+}
+```
+The textarea sets the page to a “dirty” state.  
+Trying to navigate away triggers `NavigationGuardDialog`.
+
+## Best Practices & Gotchas
+* Mount `NavigationGuardDialog` once, near the end of the component tree.
+* Keep dialog content short and action‑oriented.
+* Always pair the dialog with `useBlockNavigationOnDirtyState`.
+* Do not rely on browser “beforeunload” alone; users may have it disabled.
+
+## Further Reading
+* `useBlockNavigationOnDirtyState` hook  
+* Form handling with Contember  
+
+<!-- End of Generated Documentation -->

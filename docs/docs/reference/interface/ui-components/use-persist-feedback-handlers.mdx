@@ -1,0 +1,90 @@
+---
+title: usePersistFeedbackHandlers
+sidebar_label: usePersistFeedbackHandlers
+---
+
+# usePersistFeedbackHandlers
+
+## Overview
+`usePersistFeedbackHandlers` is a React hook that centralizes persistence‑related feedback logic.  
+It currently exposes a single success handler suited for calls like `persistData`.
+
+The hook is primarily consumed by `usePersistWithFeedback`, but you can call it directly in any async workflow.
+
+## Styling Guidelines
+* All snippets use Tailwind CSS.  
+* No Contember‑specific theme classes are required for this hook.
+
+## Core Concepts
+* Redux‑like separation of side‑effects from UI.
+* A single source of truth for persistence success feedback.
+* Easy composition with existing async functions or mutations.
+
+## Quick Start
+```tsx
+import { usePersistFeedbackHandlers } from '@contember/react'
+
+export const SaveButton = () => {
+	const { onPersistSuccess } = usePersistFeedbackHandlers()
+
+	const handleClick = () => {
+		persistData().then(onPersistSuccess)
+	}
+
+	return (
+		<button
+			onClick={handleClick}
+			className="px-4 py-2 bg-blue-600 text-white rounded"
+		>
+			Save
+		</button>
+	)
+}
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+_None_
+
+## Sub-Components / Building Blocks
+### onPersistSuccess
+A callback you pass to any promise that performs data persistence.  
+The handler usually triggers a success toast or similar UI notification.
+
+## Examples
+
+### Integrating with a form submit
+```tsx
+const { onPersistSuccess } = usePersistFeedbackHandlers()
+
+const handleSubmit = async (values: FormValues) => {
+	await saveForm(values).then(onPersistSuccess)
+}
+```
+The form leverages the shared handler, so you maintain consistent UX across pages.
+
+### Chaining multiple async calls
+```tsx
+const { onPersistSuccess } = usePersistFeedbackHandlers()
+
+const handleComplexSave = async () => {
+	await uploadAssets()
+	await saveMetadata().then(onPersistSuccess)
+}
+```
+You can reuse the handler in any branch, preventing duplicated toast logic.
+
+## Best Practices & Gotchas
+* Always call the handler **after** the promise resolves.
+* Do not mutate UI state inside the handler; keep it focused on feedback.
+* Memoize long‑running callbacks with `useCallback` when passing to children.
+* The hook currently returns only a success handler; plan for future additions.
+
+## Further Reading
+* `usePersistWithFeedback`
+* Contember form hooks
+* Toast and notification components in your design system
+
+<!-- End of Generated Documentation -->

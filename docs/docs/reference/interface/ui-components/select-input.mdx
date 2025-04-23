@@ -1,0 +1,94 @@
+---
+title: SelectInput
+sidebar_label: SelectInput
+---
+
+## Overview
+SelectInput renders a selectable input field with rich Contember features.  
+It can create new entities, validate selection, and support in‑list sorting.
+
+## Styling Guidelines
+* All code samples use Tailwind CSS.  
+* The component itself needs no special Contember theme classes.
+
+## Core Concepts
+* Field mapping ties the selection to a specific entity column.
+* `options` define pre‑filtered choices using Contember filter objects.
+* `createNewForm` lets users add missing records inline.
+* Validation occurs when `required` is true.
+* Children decide which entity fields show inside the dropdown.
+
+## Quick Start
+```tsx
+import { SelectInput, Field } from '@contember/admin'
+
+export const CategorySelect = () => (
+  <div className="w-64">
+    <SelectInput
+      field="category"
+      placeholder="Select a category"
+      options={[
+        { field: 'id', operator: 'eq', value: '1', label: 'Option 1' },
+        { field: 'id', operator: 'eq', value: '2', label: 'Option 2' },
+      ]}
+      required
+    >
+      <Field field="label" />
+    </SelectInput>
+  </div>
+)
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| field | string | Yes | — | Entity field that stores the relation. |
+| placeholder | string | No | — | Text shown when no value is selected. |
+| options | Array&lt;{ field: string; operator: string; value: string; label: string }&gt; | No | `[]` | Static list of selectable filters. |
+| createNewForm | ReactNode | No | — | JSX rendered when the user chooses “create new”. |
+| required | boolean | No | `false` | Forces at least one selection. |
+| children | ReactNode | Yes | — | Components that display option content. |
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+
+### Entity Creation Workflow
+```tsx
+import { SelectInput, Field } from '@contember/admin'
+
+const CategoryCreateForm = () => <div className="p-4">Form for creating a new category</div>
+
+export const CategorySelectWithCreate = () => (
+  <SelectInput
+    field="category"
+    placeholder="Pick or create a category"
+    options={[
+      { field: 'id', operator: 'eq', value: '1', label: 'Books' },
+      { field: 'id', operator: 'eq', value: '2', label: 'Music' },
+    ]}
+    createNewForm={<CategoryCreateForm />}
+    required
+  >
+    <Field field="label" />
+  </SelectInput>
+)
+```
+The example lets users add a category when the desired option is missing. The inline form appears without leaving the page.
+
+## Best Practices & Gotchas
+* Wrap the component in a sized container to control width.
+* Keep `options` small; large static arrays slow rendering.
+* Provide `placeholder` to improve accessibility.
+* Always include a child `<Field>` so users see meaningful labels.
+
+## Further Reading
+* Field component
+* Contember Filtering
+* Form Validation
+
+<!-- End of Generated Documentation -->

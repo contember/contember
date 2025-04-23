@@ -1,0 +1,91 @@
+---
+title: RepeaterItemActions
+sidebar_label: RepeaterItemActions
+---
+
+# RepeaterItemActions
+
+## Overview
+`RepeaterItemActions` groups buttons or menus that operate on a single repeater item.  
+Place it in the upper‑right corner of the item to keep actions consistent and discoverable.
+
+## Styling Guidelines
+* All snippets use Tailwind CSS.  
+* The default Contember admin theme already styles the container; no extra theme classes are required.
+
+## Core Concepts
+* Repeater items need a consistent action area.  
+* `RepeaterItemActions` renders its children inline.  
+* Combine it with `RepeaterRemoveItemButton` or custom dropdowns.  
+* Position the component inside a `DefaultRepeater` item layout.
+
+## Quick Start
+```tsx
+import { DefaultRepeater, RepeaterItemActions, RepeaterRemoveItemButton } from '~/lib/repeater'
+
+<DefaultRepeater entities="Task" title="Tasks">
+  {/* Your fields here */}
+  <RepeaterItemActions className="flex gap-2">
+    <RepeaterRemoveItemButton />
+  </RepeaterItemActions>
+</DefaultRepeater>
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| _None_ | | | | |
+
+_Inherited props_  
+_None_
+
+## Sub-Components / Building Blocks
+
+### RepeaterRemoveItemButton
+Built‑in button that deletes the current repeater item. Place it inside `RepeaterItemActions`.
+
+## Examples
+
+### Non‑sortable repeater with a dropdown
+```tsx
+import { DefaultRepeater, RepeaterItemActions, RepeaterRemoveItemButton } from '~/lib/repeater'
+
+<DefaultRepeater entities="RepeaterItem" orderBy="order" title="Foo items">
+  <Field field="title" />
+
+  <RepeaterItemActions className="flex gap-2">
+    {repeaterDropdown}
+    <RepeaterRemoveItemButton />
+  </RepeaterItemActions>
+</DefaultRepeater>
+```
+The dropdown contains extra item tools. The remove button stays visible.
+
+### Sortable repeater
+```tsx
+<DefaultRepeater entities="RepeaterItem" sortableBy="order" title="Foo items" addButtonPosition="around">
+  <InputField field="title" />
+
+  <RepeaterItemActions className="flex gap-2">
+    {repeaterDropdown}
+    <RepeaterRemoveItemButton />
+  </RepeaterItemActions>
+</DefaultRepeater>
+```
+Because `sortableBy` is set, drag handles appear, but action positioning stays identical.
+
+## Best Practices & Gotchas
+* Keep only essential controls in the action area to avoid clutter.  
+* Use a `flex gap-2` utility for predictable spacing.  
+* Do not nest complex forms inside `RepeaterItemActions`; keep interactions simple.  
+* Always pair destructive actions with confirmation if data loss is possible.
+
+## Further Reading
+* `DefaultRepeater` – the parent list component.  
+* `RepeaterRemoveItemButton` – common destructive action.  
+* Contember Repeater guide in the docs.  
+
+<!-- End of Generated Documentation -->

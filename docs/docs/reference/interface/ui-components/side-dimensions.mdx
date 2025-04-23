@@ -1,0 +1,109 @@
+---
+title: SideDimensions
+sidebar_label: SideDimensions
+---
+
+## Overview
+`SideDimensions` renders content for a single dimension inside a flexible side panel.  
+It wraps your fields with `DimensionRenderer` and a `HasOne` relationship, so you can edit translated or versioned data in isolation.
+
+## Styling Guidelines
+* All examples use Tailwind utility classes.  
+* No Contember‑specific theme classes are required for `SideDimensions`.
+
+## Core Concepts
+* Dimension context – switch data by dimension (`locale`, `stage`, etc.).
+* `as` variable – expose the selected dimension value to descendant components.
+* Has‑one filtering – limit rendered entity by the `field` filter.
+* Composition – place any form fields or layout components as children.
+
+## Quick Start
+```tsx
+import { SideDimensions } from '~/lib/dimensions'
+
+<SideDimensions
+  dimension="locale"
+  as="currentLocale"
+  field="locales(locale.code = $currentLocale)"
+>
+  <h2 className="mb-4 font-semibold">
+    <Variable name="currentLocale" />
+  </h2>
+  <InputField field="title" className="w-full" />
+</SideDimensions>
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| dimension | `string` | Yes | – | Name of the dimension to render. |
+| as | `string` | Yes | – | Variable name that stores the selected dimension value. |
+| field | `string \| SugarableHasOneRelation \| SugarableHasOneRelation[]` | Yes | – | Field or filter used to locate the dimension entity. |
+| children | `React.ReactNode` | Yes | – | Elements rendered inside the dimension context. |
+
+## Sub‑Components / Building Blocks
+_None_
+
+## Examples
+
+### Side panel translation editor
+```tsx
+<Binding>
+  <EntitySubTree entity="Article(unique = unique)">
+    <SideDimensions
+      dimension="locale"
+      as="currentLocale"
+      field="locales(locale.code = $currentLocale)"
+    >
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle>
+            <Variable name="currentLocale" />
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <InputField field="title" />
+          <TextareaField field="content" />
+        </CardContent>
+      </Card>
+    </SideDimensions>
+  </EntitySubTree>
+</Binding>
+```
+The component:
+* Switches the `Article` translation by locale.  
+* Binds `currentLocale` for display in the header.  
+* Lets you edit `title` and `content` for each locale separately.
+
+### Environment middleware with inline heading
+```tsx
+<EnvironmentMiddleware create={it => it.withDimensions({ locale: ['cs', 'en'] })}>
+  <SideDimensions
+    dimension="locale"
+    field="locales(locale = $currentLocale)"
+    as="currentLocale"
+  >
+    <h2 className="text-2xl mb-4">
+      <Variable name="currentLocale" />
+    </h2>
+    <ArticleLocaleForm />
+  </SideDimensions>
+</EnvironmentMiddleware>
+```
+This pattern renders locale‑specific forms while an environment middleware supplies both available locales.
+
+## Best Practices & Gotchas
+* Always set both `dimension` and `as`; without `as` descendants cannot read the selected value.
+* Keep the `field` filter as specific as possible to avoid accidental entity creation.
+* Combine with `DimensionsSwitcher` to let users change the dimension.
+* Wrap heavy content in cards to preserve side panel spacing.
+
+## Further Reading
+* `DimensionsSwitcher` – user interface for selecting dimensions.  
+* `DimensionRenderer` – low‑level renderer used internally.  
+* Contember docs – Dimensions & Localization guide.
+
+<!-- End of Generated Documentation -->

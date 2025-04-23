@@ -1,0 +1,121 @@
+---
+title: DefaultBlockRepeater
+sidebar_label: DefaultBlockRepeater
+---
+
+# DefaultBlockRepeater
+
+## Overview
+`DefaultBlockRepeater` lets you create and manage repeatable content blocks inside a Contember form.  
+You can edit blocks inline or switch to a dual‑mode that opens a dedicated form for each block.
+
+## Styling Guidelines
+* All examples use Tailwind for layout and spacing.  
+* No special Contember theme classes are required—apply your own Tailwind utilities.
+
+## Core Concepts
+* Define a collection of blocks with the `field` (or `entities`) prop.  
+* Provide a `discriminationField` so Contember knows which block type is stored.  
+* Use `sortableBy` to enable drag‑and‑drop reordering.  
+* Wrap each block definition in a `<Block>` element.  
+* Inline edit = only `children`. Dual‑mode = both `form` and `children`.
+
+## Quick Start
+```tsx
+import { DefaultBlockRepeater, Block } from '~/lib/block-repeater'
+
+<DefaultBlockRepeater
+  field="blocks"
+  sortableBy="order"
+  discriminationField="type"
+>
+  <Block name="text" label="Text">
+    {/* Inline edit – no separate form view */}
+    <InputField field="content" label="Content" />
+  </Block>
+</DefaultBlockRepeater>
+```
+
+## Detailed Guide
+_Optional section omitted._
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| field | Unknown | No | — | Relation field holding the block list. |
+| entities | Unknown | No | — | Alternative to `field` when working with queried entities. |
+| sortableBy | Unknown | No | — | Field used for drag‑and‑drop ordering. |
+| discriminationField | Unknown | Yes | — | Field storing the block type discriminator. |
+| children | ReactNode | Yes | — | One or more `<Block>` elements. |
+| *Inherited props* | — | — | — | _None_ |
+
+## Sub-Components / Building Blocks
+### Block
+Defines a single block type.  
+Props include `name`, `label`, plus optional `form` and `children` for dual‑mode editing.
+
+### EntityView
+Renders entities using a render prop. Commonly used for complex visualisation inside a block.
+
+### StaticRender
+Outputs static content (e.g., a colour field) without entering edit mode.
+
+## Examples
+### Dual‑mode repeater with four block types
+```tsx
+<DefaultBlockRepeater field="blocks" sortableBy="order" discriminationField="type">
+  <Block
+    name="text"
+    label={<><TextIcon /> Text</>}
+    form={
+      <>
+        <InputField field="title" label="Title" />
+        <TextareaField field="content" label="Content" />
+      </>
+    }
+  >
+    {/* Preview */}
+    <h2 className="text-xl font-bold"><Field field="title" /></h2>
+    <p><Field field="content" /></p>
+  </Block>
+
+  {/* Additional blocks: image, textWithImage, hero */}
+  {/* ...see source for full code... */}
+</DefaultBlockRepeater>
+```
+Use this pattern when authors need a focused form for each block.
+
+### Inline‑only repeater in a persisted entity tree
+```tsx
+<Binding>
+  <EntitySubTree entity="BlockList(unique = unique)" setOnCreate="(unique = unique)">
+    <DefaultBlockRepeater
+      field="blocks"
+      sortableBy="order"
+      discriminationField="type"
+    >
+      <Block name="text" label={<><TextIcon /> Text</>}>
+        <InputField field="title" label="Title" />
+        <TextareaField field="content" label="Content" />
+      </Block>
+      {/* ...other blocks... */}
+    </DefaultBlockRepeater>
+  </EntitySubTree>
+</Binding>
+```
+Embed the repeater in any Contember binding context for instant persistence.
+
+## Best Practices & Gotchas
+* Always set `discriminationField`; omission breaks block recognition.  
+* Keep block previews lightweight—avoid heavy queries inside `children`.  
+* Use Tailwind `space-y-*` utilities for vertical rhythm between blocks.  
+* When many block types share fields, extract common forms into separate components.  
+* Sorting relies on `sortableBy`; ensure the underlying column exists in the schema.
+
+## Further Reading
+* Block component  
+* EntityView & StaticRender utilities  
+* Contember Form Binding basics  
+* Tailwind styling in Contember UI
+
+<!-- End of Generated Documentation -->

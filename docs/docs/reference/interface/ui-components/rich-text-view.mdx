@@ -1,0 +1,132 @@
+---
+title: RichTextView
+sidebar_label: RichTextView
+---
+
+# RichTextView
+
+## Overview
+RichTextView displays rich‑text content stored in a Contember field.  
+It parses the JSON structure safely and renders semantic HTML using Contember’s rich‑text engine.
+
+## Styling Guidelines
+* All examples use Tailwind CSS.  
+* No Contember‑specific theme classes are required, but you can wrap the output in `prose` or similar typography utilities.
+
+## Core Concepts
+* Rich‑text data is stored as JSON in a field.
+* RichTextView converts that JSON to React elements.
+* You may supply custom `renderLeaf`, `renderElement`, or `referenceRenderers` to change output.
+* When the field is empty, the component renders nothing.
+
+## Quick Start
+```tsx
+import { RichTextView } from '~/lib/editor'
+
+export default () => (
+  <div className="prose max-w-none">
+    <RichTextView field="content" />
+  </div>
+)
+```
+
+## Detailed Guide
+```tsx
+const renderLeaf = (leaf: Leaf) => {
+  let node = <>{leaf.text}</>
+  if (leaf.isBold) node = <strong>{node}</strong>
+  if (leaf.isItalic) node = <em>{node}</em>
+  if (leaf.isUnderlined) node = <u>{node}</u>
+  return node
+}
+
+const renderElement = (
+  element: RichTextElement,
+  leafRenderer: LeafRenderer,
+) => {
+  if (isLeaf(element)) return leafRenderer(element)
+
+  if (element.type === 'anchor') {
+    const children = element.children.map((child, i) => (
+      <Fragment key={i}>
+        {isLeaf(child) && leafRenderer(child)}
+      </Fragment>
+    ))
+    return <a href={element.href}>{children}</a>
+  }
+  return null
+}
+
+<RichTextView
+  field="content"
+  renderLeaf={renderLeaf}
+  renderElement={renderElement}
+  referenceRenderers={{
+    image: ({ reference }) => <img src={reference.url} />,
+  }}
+/>
+```
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| field | `string` | Yes | – | Contember field path containing the rich‑text JSON. |
+| renderLeaf | `(leaf) => ReactNode` | No | – | Custom renderer for leaf nodes (text runs). |
+| renderElement | `(element, leafRenderer) => ReactNode` | No | – | Custom renderer for non‑leaf nodes. |
+| referenceRenderers | `Record<string, (props) => ReactNode>` | No | – | Functions that render entity references (e.g., images). |
+| **Inherited HTML attributes** | _varies_ | No | – | Props accepted by the underlying HTML element. |
+
+## Sub‑Components / Building Blocks
+_None_
+
+## Examples
+
+### Preview next to an editor
+```tsx
+() => (
+  <Binding>
+    <EntitySubTree entity="Article(unique = unique)" setOnCreate="(unique = unique)">
+      <div className="grid grid-cols-2 gap-8">
+        <RichTextField field="body" label="Body" />
+        <div className="prose">
+          <h3>Preview</h3>
+          <RichTextView field="body" />
+        </div>
+      </div>
+    </EntitySubTree>
+  </Binding>
+)
+```
+The editor and viewer share the same field. You see live results while editing.
+
+### Rendering images from entity references
+```tsx
+<RichTextView
+  field="content"
+  referenceRenderers={{
+    image: ({ reference }) => (
+      <figure className="my-4">
+        <img src={reference.url} className="rounded" />
+        {reference.caption && (
+          <figcaption className="text-sm text-gray-500">{reference.caption}</figcaption>
+        )}
+      </figure>
+    ),
+  }}
+/>
+```
+You override the default renderer for `image` references to add captions and Tailwind styling.
+
+## Best Practices & Gotchas
+* Wrap the component in `prose` for instant typography.
+* Provide only the renderers you need; missing ones fall back to defaults.
+* Memoize heavy render functions to avoid re‑renders.
+* The component renders nothing when the field is empty—handle that state if necessary.
+* Ensure your field stores valid rich‑text JSON; malformed data causes runtime errors.
+
+## Further Reading
+* `RichTextField` – editable counterpart of this component.
+* `EditorInlineToolbar`, `EditorMarkTrigger` – tools to build rich‑text editors.
+* Contember rich‑text schema documentation.
+
+<!-- End of Generated Documentation -->

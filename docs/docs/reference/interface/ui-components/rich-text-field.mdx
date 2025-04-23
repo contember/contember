@@ -1,0 +1,116 @@
+---
+title: RichTextField
+sidebar_label: RichTextField
+---
+
+# RichTextField
+
+## Overview
+RichTextField embeds a rich‑text editor into a Contember form.  
+It integrates with Contember’s field management and offers basic formatting like bold, italic, and code.
+
+The editor is plugin‑based, supports custom placeholders, and becomes read‑only during ongoing mutations.
+
+## Styling Guidelines
+* All code samples use Tailwind CSS.  
+* No additional Contember theme classes are required by default.
+
+## Core Concepts
+* Form binding via the `field` prop.
+* Plugin architecture for marks, elements, and toolbars.
+* Read‑only lock while the form mutates.
+* Optional custom placeholder text.
+
+## Quick Start
+```tsx
+import { RichTextField } from '~/lib/editor'
+
+<RichTextField field="content" className="max-w-md" />
+```
+
+## Detailed Guide
+```tsx
+import {
+	RichTextField,
+	EditorInlineToolbar,
+	EditorMarkTrigger,
+} from '~/lib/editor'
+import { BoldIcon, ItalicIcon, underlineMark, italicMark, boldMark } from '~/icons'
+
+<RichTextField
+	field="articleBody"
+	label="Article body"
+	placeholder="Enter your text here"
+	className="space-y-2"
+/>
+```
+
+```tsx
+<RichTextField field="articleBody">
+	<EditorInlineToolbar className="flex gap-2">
+		<EditorMarkTrigger mark={boldMark}><BoldIcon className="h-4 w-4" /></EditorMarkTrigger>
+		<EditorMarkTrigger mark={italicMark}><ItalicIcon className="h-4 w-4" /></EditorMarkTrigger>
+		<EditorMarkTrigger mark={underlineMark}><UnderlineIcon className="h-4 w-4" /></EditorMarkTrigger>
+	</EditorInlineToolbar>
+</RichTextField>
+```
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| field | string &#124; { field: string; hasOneRelationPath?: SugarableHasOneRelation \| SugarableHasOneRelation[] } | Yes | — | Form field name for storing content |
+| label | React.ReactNode | Yes | — | Visible label shown above the editor |
+| description | React.ReactNode | Yes | — | Helper text rendered below the editor |
+| errors | React.ReactNode &#124; ErrorAccessor.Error[] | Yes | — | Validation errors for the field |
+| required | boolean | Yes | — | Marks the input as mandatory |
+| children | React.ReactNode | Yes | — | Toolbar, triggers, or other custom nodes (inherited) |
+
+## Sub-Components / Building Blocks
+### EditorInlineToolbar
+Interactive area that hosts formatting triggers.
+
+### EditorMarkTrigger
+Button that toggles a mark (e.g., bold, italic).
+
+### EditorElementTrigger
+Switches block‑level elements like links or headings.
+
+### EditorGenericTrigger
+Runs custom editor commands such as alignment changes.
+
+### RichTextView
+Read‑only renderer for stored rich text.
+
+## Examples
+### Full Form With Preview
+```tsx
+<Binding>
+	<EntitySubTree entity="Article(id = 1)">
+		<div className="space-y-4 max-w-2xl">
+			<RichTextField field="body" label="Body text">
+				<EditorInlineToolbar className="flex gap-2">
+					<EditorMarkTrigger mark={boldMark}><BoldIcon className="h-3 w-3" /></EditorMarkTrigger>
+					<EditorMarkTrigger mark={italicMark}><ItalicIcon className="h-3 w-3" /></EditorMarkTrigger>
+				</EditorInlineToolbar>
+			</RichTextField>
+
+			<h3 className="text-lg font-medium">Preview</h3>
+			<RichTextView field="body" className="prose" />
+		</div>
+	</EntitySubTree>
+</Binding>
+```
+This pattern stores rich text in the `body` field and instantly renders a preview.
+
+## Best Practices & Gotchas
+* Wrap toolbars inside `RichTextField` to access editor context.
+* Keep the editor in a `max-w-*` container to control layout.
+* Avoid heavy plugins that bloat bundle size.
+* Use `RichTextView` for display—never reuse the editing component.
+
+## Further Reading
+* BlockEditorField – for block‑based editing.  
+* PersistButton – saving entity data.  
+* ErrorAccessor – advanced error handling.
+
+<!-- End of Generated Documentation -->

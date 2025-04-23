@@ -14,6 +14,8 @@ export type BackButtonLabelProps = {
 }
 
 /**
+ * Props {@link BackButtonLabelProps}.
+ *
  * `BackButtonLabel` is a presentational component that renders a back arrow icon
  * alongside a label. Typically used inside `BackButton` for consistent styling.
  *
@@ -45,6 +47,8 @@ export type BackButtonProps = {
 } & BackButtonLabelProps
 
 /**
+ * Props {@link BackButtonProps}.
+ *
  * `BackButton` is a navigation button that returns the user to the previous page using the browser's history API.
  * It provides a default label but allows customization via the `label` prop or `children`.
  *

@@ -1,4 +1,3 @@
-import * as path from 'path'
 import * as fs from 'fs'
 import { Glob } from 'bun'
 
@@ -59,11 +58,4 @@ export async function findComponentFiles(sourceDir: string, pattern?: string): P
 	}
 }
 
-// You can add other utility functions here as needed, for example:
-/**
-	* Extracts a base component name from a file path.
-	* Example: /path/to/MyComponent.tsx -> MyComponent
-	*/
-export function getComponentNameFromPath(filePath: string): string {
-	return path.basename(filePath, path.extname(filePath))
-}
+export const kebabCase = (str: string) => str.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()

@@ -11,22 +11,12 @@ const DEFAULT_CONFIG: Partial<DocsConfig> = {
 	overrides: {},
 }
 
-/**
-	* Loads the configuration from `docs.config.ts` located in the parent directory
-	* relative to this script file, merges it with defaults, and performs validation.
-	*
-	* Assumes the script is run from the `docs-generator` directory or its parent.
-	*/
 export function loadConfig(): DocsConfig {
-	// Determine the expected path to docs.config.ts
-	// This assumes docs.config.ts is one level up from the 'src' directory.
-	// Adjust if your build process places files differently.
-	const configPath = path.resolve(__dirname, './docs.config.js') // Look for compiled JS version
-	const configPathTs = path.resolve(__dirname, './docs.config.ts') // Or TS version if using ts-node
+	const configPath = path.resolve(__dirname, './docs.config.js')
+	const configPathTs = path.resolve(__dirname, './docs.config.ts')
 
 	let userConfig: Partial<DocsConfig> = {}
 
-	// Try loading the compiled JS config first, then TS (for ts-node execution)
 	if (fs.existsSync(configPath)) {
 		try {
 			// eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -39,12 +29,7 @@ export function loadConfig(): DocsConfig {
 			// Decide if you want to throw or continue with defaults
 		}
 	} else if (fs.existsSync(configPathTs)) {
-		// This branch primarily works when running directly with ts-node
-		// If compiling first, the .ts file might not be available at runtime
 		try {
-			// Dynamically importing TS might require specific ts-node setup or flags.
-			// Using require might work if ts-node/register is used.
-			// For simplicity, let's stick to requiring, assuming ts-node handles it.
 			// eslint-disable-next-line @typescript-eslint/no-var-requires
 			const configModule = require(configPathTs)
 			userConfig = configModule.default || configModule
@@ -77,16 +62,10 @@ export function loadConfig(): DocsConfig {
 	if (!mergedConfig.sourceDir) {
 		throw new Error('Configuration error: `sourceDir` is required in docs.config.ts')
 	}
-	if (!mergedConfig.apiExtractorReportPath) {
-		throw new Error('Configuration error: `apiExtractorReportPath` is required in docs.config.ts')
-	}
 
-	// Resolve paths relative to the presumed project root (parent of docs-generator)
-	// This makes paths in config relative to the project, not the script location.
-	const projectRoot = path.resolve(__dirname, '../../') // Assumes docs-generator is in the project root
+	const projectRoot = path.resolve(__dirname, '../../')
 	mergedConfig.sourceDir = path.resolve(projectRoot, mergedConfig.sourceDir)
-	mergedConfig.apiExtractorReportPath = path.resolve(projectRoot, mergedConfig.apiExtractorReportPath)
-	mergedConfig.outputDir = path.resolve(projectRoot, 'docs-generator', mergedConfig.outputDir) // Output relative to docs-generator unless specified differently
+	mergedConfig.outputDir = path.resolve(projectRoot, mergedConfig.outputDir)
 
 	// Ensure output directory exists
 	try {

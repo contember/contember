@@ -4,7 +4,9 @@ export interface ComponentSourceData {
 	jsdoc?: string
 	props?: Record<string, PropData>
 	examples?: string[]
+	originalExamplesCount?: number
 	links?: string[]
+	imports?: string[]
 }
 
 export interface PropData {

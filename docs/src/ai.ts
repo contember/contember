@@ -27,7 +27,7 @@ export const buildPrompt = (
 11. **Further Reading** – Related components / concepts.
 
 ### 2. Writing Style
-* Use active voice and second person (“you”).
+* Use active voice and second person ("you").
 * Keep sentences < 24 words.
 * Prefer bullet lists over long paragraphs.
 * Code fences: \` \`\`\`tsx \`\`\` for TS/JSX, \` \`\`\`bash \`\`\` for CLI.
@@ -37,7 +37,7 @@ export const buildPrompt = (
 
 ### 3. Output Rules
 * **Do not** invent props or examples that are not present in the source data.
-* If a section has no content, write “_None_”.
+* If a section has no content, write "_None_".
 * End the document with \`<!-- End of Generated Documentation -->\`.
 
 --- Source Data ---\n`)
@@ -60,18 +60,76 @@ export const buildPrompt = (
 	}
 	lines.push('')
 
-	lines.push(`## Examples (from source)`)
+	// Add import examples if available
+	if ((data as any).imports && (data as any).imports.length) {
+		lines.push(`## Import Examples (from playground)`)
+		const imports = (data as any).imports as string[]
+		imports.forEach(importStatement => {
+			lines.push('```tsx')
+			lines.push(importStatement.trim())
+			lines.push('```')
+		})
+		lines.push('')
+	}
+
+	// Split examples by source
+	const sourceExamples: string[] = []
+	const playgroundExamples: string[] = []
+
+	// Categorize examples by source vs playground
+	// We need to identify playground examples vs source examples
 	if (data.examples?.length) {
-		data.examples.forEach(example => {
-			// ► CHANGED – ensure each stored example is trimmed (no leading blank lines)
+		// Check if we have more examples than would normally come from source
+		const originalCount = (data as any).originalExamplesCount || 0
+
+		data.examples.forEach((example, index) => {
+			// Use a simple heuristic - source examples are typically shorter and come first
+			// If we know the original count, use that, otherwise use length as a heuristic
+			if (originalCount > 0) {
+				// If we know exactly how many original examples there were
+				if (index < originalCount) {
+					sourceExamples.push(example)
+				} else {
+					playgroundExamples.push(example)
+				}
+			} else {
+				// Use a length-based heuristic if we don't know the count
+				// Playground examples are usually longer (more complete components/functions)
+				if (example.length > 500) {
+					playgroundExamples.push(example)
+				} else {
+					sourceExamples.push(example)
+				}
+			}
+		})
+	}
+
+	// Add source examples first
+	lines.push(`## Examples (from source code)`)
+	if (sourceExamples.length > 0) {
+		sourceExamples.forEach(example => {
+			// Ensure each stored example is trimmed
 			lines.push('```tsx')
 			lines.push(example.trim())
 			lines.push('```')
-		});
+		})
 	} else {
-		lines.push('_No examples provided._')
+		lines.push('_No examples provided in source code._')
 	}
 	lines.push('')
+
+	// Add playground examples (real-world usage)
+	if (playgroundExamples.length > 0) {
+		lines.push(`## Real-World Examples (from playground)`)
+		playgroundExamples.forEach((example, index) => {
+			lines.push(`### Example ${index + 1}`)
+			lines.push('```tsx')
+			lines.push(example.trim())
+			lines.push('```')
+		})
+		lines.push('_These examples show how the component is used in real Contember applications. Use them for reference on component integration patterns._')
+		lines.push('')
+	}
 
 	if (override?.notes) {
 		lines.push(`## Additional Notes/Context\n${override.notes}\n`)

@@ -4,9 +4,11 @@ import { findComponentFiles, kebabCase } from './utils'
 import { generateMarkdownWithAI } from './ai'
 import { writeMarkdownFile } from './writer'
 import { ComponentParser } from './parser'
+import { PlaygroundExampleFinder } from './playground-parser'
 
 async function main() {
 	const parser = new ComponentParser()
+	const playgroundFinder = new PlaygroundExampleFinder()
 
 	// eslint-disable-next-line no-console
 	console.log('Starting documentation generation...')
@@ -60,6 +62,46 @@ async function main() {
 					// eslint-disable-next-line no-console
 					console.log(` -> Output file ${outputFilePath} already exists. Skipping generation.`)
 					continue // Skip to the next component
+				}
+
+				// Find usage examples from the playground
+				if (config.contextDir) {
+					// eslint-disable-next-line no-console
+					console.log(` -> Finding real-world usage examples for ${sourceData.componentName} in playground...`)
+
+					// Find component usage examples in the playground
+					const playgroundExamples = await playgroundFinder.findComponentExamples(
+						sourceData.componentName,
+						config.contextDir,
+					)
+
+					// Find component import statements in the playground
+					const importExamples = await playgroundFinder.findComponentImports(
+						sourceData.componentName,
+						config.contextDir,
+					)
+
+					// Add these examples to the sourceData
+					if (playgroundExamples.length > 0 || importExamples.length > 0) {
+						// eslint-disable-next-line no-console
+						console.log(` -> Found ${playgroundExamples.length} usage examples and ${importExamples.length} import examples`)
+
+						// Track the original examples count before adding playground examples
+						const originalExamplesCount = sourceData.examples?.length || 0
+						sourceData.originalExamplesCount = originalExamplesCount
+
+						// Add playground examples to the existing examples (or create the array if it doesn't exist)
+						sourceData.examples = sourceData.examples || []
+						sourceData.examples = [...sourceData.examples, ...playgroundExamples]
+
+						// Add playground import examples under a special "imports" property
+						if (importExamples.length > 0) {
+							sourceData.imports = importExamples
+						}
+					} else {
+						// eslint-disable-next-line no-console
+						console.log(` -> No playground examples found for ${sourceData.componentName}`)
+					}
 				}
 
 				// eslint-disable-next-line no-console

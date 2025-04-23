@@ -1,0 +1,112 @@
+---
+title: EditorBlock
+sidebar_label: EditorBlock
+---
+
+# EditorBlock
+
+## Overview
+EditorBlock lets you register reusable content blocks inside a Slate‑powered rich‑text editor.  
+You define a unique `name`, human‑readable `label`, and the JSX that renders inside the block.
+
+The component also supports an optional alternate configuration UI shown in a pop‑over. Drag‑and‑drop is built‑in, so authors can reorder blocks effortlessly.
+
+## Styling Guidelines
+* All code samples use Tailwind CSS classes.
+* No additional Contember theme classes are required for basic usage.
+
+## Core Concepts
+* Register each block with a unique `name`.
+* `label` appears in the UI so authors recognise the block type.
+* Everything rendered inside the block comes from the `children` prop.
+* Supply `alternate` when you need a secondary configuration panel.
+* Combine with `<BlockEditorField>` and toolbars for a full editing experience.
+
+## Quick Start
+```tsx
+import {
+  BlockEditorField,
+  EditorBlock,
+  EditorBlockToolbar,
+  EditorReferenceTrigger,
+} from '~/lib/editor'
+import { ImageIcon } from 'lucide-react'
+
+const PostEditor = () => (
+  <BlockEditorField
+    field="data"
+    referencesField="references"
+    referenceDiscriminationField="type"
+    className="space-y-4"
+  >
+    <EditorBlockToolbar className="flex gap-2">
+      <EditorReferenceTrigger referenceType="image">
+        <button className="btn btn-primary flex items-center gap-1">
+          <ImageIcon size={16} /> Image
+        </button>
+      </EditorReferenceTrigger>
+    </EditorBlockToolbar>
+
+    <EditorBlock name="image" label="Image">
+      <ImageField baseField="image" urlField="url" />
+    </EditorBlock>
+  </BlockEditorField>
+)
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| name | string | Yes | — | Unique block type identifier |
+| label | React.ReactNode | Yes | — | Display name for block type |
+| children | React.ReactNode | Yes | — | Primary block content |
+| alternate | React.ReactNode | No | — | Alternate configuration UI (optional) |
+
+## Sub‑Components / Building Blocks
+### EditorBlockContent
+Placeholder component that renders the default rich‑text area inside a block.
+
+### EditorBlockToolbar
+Horizontal toolbar that sits above the editor.
+
+### EditorInlineToolbar
+Contextual toolbar that appears near selected text.
+
+### EditorReferenceTrigger
+Button or element that inserts a reference block (e.g., image).
+
+## Examples
+### Quote Block
+```tsx
+<EditorBlock name="quote" label="Quote">
+  <EditorBlockContent />
+</EditorBlock>
+```
+This block provides a simple rich‑text area styled as a quote.
+
+### Image Block
+```tsx
+<EditorBlock name="image" label="Image">
+  <ImageField baseField="image" urlField="url" />
+</EditorBlock>
+```
+Authors can upload or select an image. The block stores both the file and its URL.
+
+## Best Practices & Gotchas
+* Keep `name` stable—changing it breaks existing content.
+* Wrap each `<EditorBlock>` inside a single `<BlockEditorField>`.
+* Add Tailwind classes directly via `className`; avoid global CSS.
+* Provide a concise `label` so the toolbar stays readable.
+* Use `alternate` sparingly; too many modals confuse authors.
+
+## Further Reading
+* BlockEditorField
+* EditorBlockToolbar
+* EditorInlineToolbar
+* RichTextField
+* Contember references and discriminators
+
+<!-- End of Generated Documentation -->

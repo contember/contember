@@ -1,0 +1,163 @@
+---
+title: baseEditorPlugins
+sidebar_label: baseEditorPlugins
+---
+
+# baseEditorPlugins
+
+## Overview
+`baseEditorPlugins` bundles the default plugin set for Contember’s Slate‑powered rich‑text editors.  
+The collection covers structural elements (paragraphs, headings, tables) and common inline formatting (bold, code, underline).
+
+You import it once and cherry‑pick only the plugins you need. This keeps every editor lean and predictable.
+
+## Styling Guidelines
+* All code samples use Tailwind CSS utility classes.  
+* Renderer outputs follow Contember’s default prose theme (`prose`, `prose-headings`, `prose-code`).
+
+## Core Concepts
+* Plugins map Slate nodes or marks to React renderers.  
+* You compose an editor by passing an array of plugins.  
+* Structural plugins render block elements; inline plugins add text styles.  
+* Order in the `plugins` array does not matter—each plugin registers itself.  
+* Renderers rely on Tailwind’s `prose` classes for typography.
+
+## Quick Start
+```tsx
+import { baseEditorPlugins } from '~/lib/editor'
+import { RichTextEditor } from '@contember/react-slate'
+
+export default function Demo() {
+  return (
+    <RichTextEditor
+      className="prose max-w-none"
+      plugins={[
+        baseEditorPlugins.paragraph,
+        baseEditorPlugins.bold,
+        baseEditorPlugins.italic,
+      ]}
+    />
+  )
+}
+```
+
+## Detailed Guide
+```tsx
+import { baseEditorPlugins, EditorBlockToolbar, EditorInlineToolbar } from '~/lib/editor'
+
+/* Full‑featured editor with toolbars */
+export function ArticleEditor() {
+  const plugins = [
+    baseEditorPlugins.paragraph,
+    baseEditorPlugins.heading,
+    baseEditorPlugins.list,
+    baseEditorPlugins.table,
+    baseEditorPlugins.bold,
+    baseEditorPlugins.italic,
+    baseEditorPlugins.underline,
+    baseEditorPlugins.code,
+    baseEditorPlugins.strikeThrough,
+  ]
+
+  return (
+    <div className="border rounded-md p-4">
+      <RichTextEditor
+        className="prose max-w-none"
+        plugins={plugins}
+      >
+        <EditorInlineToolbar />
+        <EditorBlockToolbar />
+      </RichTextEditor>
+    </div>
+  )
+}
+```
+
+## Props Reference
+_None_
+
+## Sub-Components / Building Blocks
+### anchor
+Handles links. Uses `AnchorRenderer`.
+
+### paragraph
+Default text block. Uses `ParagraphRenderer`.
+
+### heading
+Renders `h1`–`h6` via `HeadingRenderer`.
+
+### list
+Renders ordered and unordered lists.  
+Includes `ListItemRenderer`, `OrderedListRenderer`, `UnorderedListRenderer`.
+
+### horizontalRule
+Inserts `<hr>` through `HorizontalRuleRenderer`.
+
+### scrollTarget
+Adds in‑page anchor targets with `ScrollTargetRenderer`.
+
+### table
+Full table support with:
+* `TableElementRenderer`
+* `TableRowElementRenderer`
+* `TableCellElementRenderer`
+
+### bold
+Wraps text in `<strong>`.
+
+### code
+Inline code via `<code>`.
+
+### highlight
+Highlights text with a `<mark>`.
+
+### italic
+Italic text with `<em>`.
+
+### newline
+Adds manual `<br>` breaks.
+
+### strikeThrough
+Applies `<del>` styling.
+
+### underline
+Applies `<u>` styling.
+
+## Examples
+Add scroll targets to headings:
+```tsx
+<RichTextEditor
+  className="prose max-w-none"
+  plugins={[
+    baseEditorPlugins.heading,
+    baseEditorPlugins.scrollTarget,
+  ]}
+/>
+```
+The `scrollTarget` plugin injects an `id` into each heading, making in‑page navigation trivial.
+
+Enable code snippets inside list items:
+```tsx
+<RichTextEditor
+  className="prose max-w-none"
+  plugins={[
+    baseEditorPlugins.list,
+    baseEditorPlugins.code,
+  ]}
+/>
+```
+You can now paste code inside bullet points without breaking formatting.
+
+## Best Practices & Gotchas
+* Include only the plugins you need to avoid bloat.  
+* Add `horizontalRule` only if your typography design supports `<hr>`.  
+* Always pair `link` toolbar buttons with the `anchor` plugin.  
+* Tables need custom CSS for overflow on mobile.  
+* Do not mix `newline` and `paragraph` for long texts; pick one.
+
+## Further Reading
+* `RichTextEditor` component  
+* `EditorInlineToolbar` and `EditorBlockToolbar`  
+* Slate.js plugin architecture  
+
+<!-- End of Generated Documentation -->

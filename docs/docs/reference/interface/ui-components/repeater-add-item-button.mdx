@@ -1,0 +1,84 @@
+---
+title: RepeaterAddItemButton
+sidebar_label: RepeaterAddItemButton
+---
+
+# RepeaterAddItemButton
+
+## Overview
+`RepeaterAddItemButton` renders a button that inserts a new item into a repeater at a given index.  
+It wraps `RepeaterAddItemTrigger`, so you gain built‑in logic while controlling the visual output.
+
+## Styling Guidelines
+* All snippets use Tailwind CSS utility classes.  
+* No special Contember theme classes are required.
+
+## Core Concepts
+* A repeater is a dynamic list of form fields.  
+* `RepeaterAddItemButton` delegates insertion logic to `RepeaterAddItemTrigger`.  
+* You can supply custom `children` to define the button’s appearance.  
+* Omit `index` to append the item; provide an integer to insert at a specific position.
+
+## Quick Start
+```tsx
+import { RepeaterAddItemButton } from '@contember/react-repeater';
+
+export const ContactsForm = () => (
+	<RepeaterAddItemButton>
+		<span className="inline-flex items-center gap-1 text-blue-600">
+			<svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+				<path d="M10 5v10m5-5H5" />
+			</svg>
+			Add contact
+		</span>
+	</RepeaterAddItemButton>
+);
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+| Name    | Type | Required | Default | Description |
+|---------|------|----------|---------|-------------|
+| children | React.ReactNode | No | Plus icon + localized label | Content rendered inside the button. |
+| index | RepeaterAddItemIndex | No | `undefined` (item appended) | Position where the new item is inserted. |
+| *Inherited props from `RepeaterAddItemTrigger`* | — | — | — | _See that component for details._ |
+
+## Sub-Components / Building Blocks
+### RepeaterAddItemTrigger
+Lower‑level trigger handling the actual insertion. Use it for full control when `RepeaterAddItemButton` is too opinionated.
+
+## Examples
+### Insert at end of list
+```tsx
+<RepeaterAddItemButton>
+	<span className="text-green-600">Add row</span>
+</RepeaterAddItemButton>
+```
+The item appears after the current last entry.
+
+### Insert at arbitrary position
+```tsx
+{items.map((_, i) => (
+	<div key={i} className="flex items-center gap-2">
+		<ItemFields index={i} />
+		<RepeaterAddItemButton index={i + 1}>
+			<span className="text-gray-500">+ below</span>
+		</RepeaterAddItemButton>
+	</div>
+))}
+```
+You insert a new item immediately after row `i`.
+
+## Best Practices & Gotchas
+* Use descriptive labels; avoid bare icons for accessibility.  
+* Keep `index` in bounds—passing `length + 1` has no effect.  
+* Supply lightweight children; heavy trees re‑render on every add.
+
+## Further Reading
+* RepeaterAddItemTrigger  
+* RepeaterRemoveItemButton  
+* Contember Repeater guide  
+
+<!-- End of Generated Documentation -->

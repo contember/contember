@@ -1,0 +1,109 @@
+---
+title: DimensionsSwitcher
+sidebar_label: DimensionsSwitcher
+---
+
+# DimensionsSwitcher
+
+## Overview
+`DimensionsSwitcher` lets you switch between multiple data dimensions (for example, languages or markets).  
+You provide an entity list, slug field, and child fields; the component renders selectable options.
+
+It supports optional initial sorting and multi‑selection, making it suitable for both simple and complex editing screens.
+
+## Styling Guidelines
+* All examples use Tailwind CSS utility classes.  
+* The component itself adds no styles; wrap it in Tailwind‑styled containers as needed.  
+* No special Contember theme classes are required.
+
+## Core Concepts
+* Dimension – arbitrary context key (e.g., `locale`) stored in Contember dimensions.
+* `options` – entity list supplying selectable records.
+* `slugField` – unique identifier field of each option.
+* Child fields – what renders inside each option (commonly a `Field` component).
+* `orderBy` – optional initial sorting of options.
+* Multi‑selection – enabled with `isMulti`.
+
+## Quick Start
+```tsx
+import { DimensionsSwitcher } from '~/lib/dimensions'
+
+<div className="flex gap-2">
+  <DimensionsSwitcher
+    dimension="locale"
+    slugField="code"
+    options="DimensionsLocale"
+  >
+    <Field field="label" />
+  </DimensionsSwitcher>
+</div>
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| options | `string \| { filter?: SugaredFilter; hasOneRelationPath?: SugarableHasOneRelation \| SugarableHasOneRelation[]; entityName: string; }` | Yes | – | Entity list for dimension options |
+| orderBy | `DataViewSortingDirections` | No | – | Initial sorting, e.g., `{ label: 'desc' }` |
+| dimension | `string` | Yes | – | Name of the dimension to switch |
+| children | `React.ReactNode` | Yes | – | Components rendered inside each option |
+| slugField | `string \| { field: string; hasOneRelationPath?: SugarableHasOneRelation \| SugarableHasOneRelation[]; }` | Yes | – | Field containing unique dimension identifiers |
+| isMulti | `boolean` | No | `false` | Enables multi‑selection mode |
+
+## Sub‑Components / Building Blocks
+_None_
+
+## Examples
+
+### 1. Sorted, Multi‑Select Locale Switcher
+```tsx
+<DimensionsSwitcher
+  dimension="locale"
+  slugField="code"
+  options="DimensionsLocale"
+  orderBy={{ label: 'desc' }}
+  isMulti
+>
+  <Field field="label" />
+</DimensionsSwitcher>
+```
+The user can pick several locales, ordered alphabetically descending by label.
+
+### 2. Editing Localised Content with SideDimensions
+```tsx
+<Binding>
+  <EntitySubTree entity="DimensionsItem(unique = unique)">
+    <SideDimensions
+      dimension="locale"
+      as="currentLocale"
+      field="locales(locale.code = $currentLocale)"
+    >
+      <Card>
+        <CardHeader>
+          <CardTitle><Variable name="currentLocale" /></CardTitle>
+        </CardHeader>
+        <CardContent>
+          <InputField field="title" />
+          <TextareaField field="content" />
+        </CardContent>
+      </Card>
+    </SideDimensions>
+  </EntitySubTree>
+</Binding>
+```
+You combine `DimensionsSwitcher` with `SideDimensions` to edit per‑locale fields while switching locales in real time.
+
+## Best Practices & Gotchas
+* Always pass a stable `slugField`; unreliable slugs break selection tracking.
+* Wrap the component in Tailwind layouts instead of adding props that do not exist.
+* Use `orderBy` sparingly; client sorting can confuse users if server returns different order.
+* Enable `isMulti` only when downstream components understand multiple dimension values.
+
+## Further Reading
+* `SideDimensions` – render entity subtrees for the currently selected dimension.
+* Contember Guide – Working with Dimensions.  
+* `Field`, `InputField`, `TextareaField` components for displaying entity fields.
+
+<!-- End of Generated Documentation -->

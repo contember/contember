@@ -1,0 +1,100 @@
+---
+title: LoginWithEmail
+sidebar_label: LoginWithEmail
+---
+
+# LoginWithEmail
+
+## Overview
+`LoginWithEmail` authenticates users by email.  
+It works with session tokens to establish a signed‑in state.
+
+## Styling Guidelines
+* All examples use Tailwind.
+* The component itself has no required Contember theme classes.
+
+## Core Concepts
+* Email‑based authentication flow.
+* Session token creation and storage.
+* Drop‑in usage: no props required.
+* Composition inside application shells, DevBars, or standalone pages.
+
+## Quick Start
+```tsx
+import { LoginWithEmail } from '~/lib/dev'
+
+export default function Page() {
+	return (
+		<div className="flex min-h-screen items-center justify-center bg-gray-50">
+			<LoginWithEmail />
+		</div>
+	)
+}
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+_None_
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+
+### Embedded in a DevBar
+```tsx
+import { DevBar, DevPanel } from '@contember/ui-devbar'
+import { LogInIcon } from 'lucide-react'
+import { LoginWithEmail } from '~/lib/dev'
+
+export function DevTools() {
+	return (
+		<DevBar>
+			<DevPanel heading="Login" icon={<LogInIcon />}>
+				<LoginWithEmail />
+			</DevPanel>
+		</DevBar>
+	)
+}
+```
+You embed the component in a development toolbar.  
+Developers can switch accounts without leaving the page.
+
+### Full Application Shell
+```tsx
+<ApplicationEntrypoint {...getConfig()}>
+	<>
+		<Toaster>
+			<Pages
+				layout={Layout}
+				children={import.meta.glob('./pages/**/*.tsx', { eager: true })}
+			/>
+			{import.meta.env.DEV && (
+				<DevBar>
+					<DevPanel heading="Login" icon={<LogInIcon />}>
+						<LoginWithEmail />
+					</DevPanel>
+				</DevBar>
+			)}
+		</Toaster>
+		<OutdatedApplicationDialog />
+	</>
+</ApplicationEntrypoint>
+```
+This pattern places the login form in a conditional DevBar during development.  
+Production builds omit the panel.
+
+## Best Practices & Gotchas
+* Keep the component high in the tree to avoid nested authentication prompts.
+* Wrap it in `Suspense` if you load authentication logic lazily.
+* Do not place it inside forms; it manages its own submit events.
+* Avoid styling overrides that hide default validation states.
+
+## Further Reading
+* `ApplicationEntrypoint`
+* `DevBar` and `DevPanel`
+* Contember authentication docs
+
+<!-- End of Generated Documentation -->

@@ -1,0 +1,104 @@
+---
+title: usePersistWithFeedback
+sidebar_label: usePersistWithFeedback
+---
+
+# usePersistWithFeedback
+
+## Overview
+`usePersistWithFeedback` lets you persist Contember data and show automatic toast notifications.  
+The hook returns a callback that saves pending mutations, then shows a success or error message.
+
+## Styling Guidelines
+* All examples use Tailwind.  
+* The hook itself needs no Contember‑specific theme classes.
+
+## Core Concepts
+* Trigger persistence from any UI element.
+* Await the mutation queue managed by Contember.
+* Show toast feedback without extra code.
+* Keep components stateless by delegating save logic to the hook.
+
+## Quick Start
+```tsx
+import { usePersistWithFeedback } from '@contember/react'
+import { Button } from '@contember/ui' // optional
+
+export const SaveButton = () => {
+  const persistWithFeedback = usePersistWithFeedback()
+
+  return (
+    <button
+      className="px-4 py-2 bg-primary-600 text-white rounded"
+      onClick={() => persistWithFeedback()}
+    >
+      Save changes
+    </button>
+  )
+}
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+_None_
+
+## Sub‑Components / Building Blocks
+_None_
+
+## Examples
+
+### Form footer with autosave prompt
+```tsx
+import { usePersistWithFeedback } from '@contember/react'
+
+export const FormFooter = () => {
+  const persistWithFeedback = usePersistWithFeedback()
+
+  return (
+    <div className="flex justify-end gap-4 border-t pt-4">
+      <span className="text-sm text-gray-500">All changes are local until you save.</span>
+      <button
+        className="px-3 py-1.5 bg-green-600 text-white rounded"
+        onClick={persistWithFeedback}
+      >
+        Save now
+      </button>
+    </div>
+  )
+}
+```
+The footer warns users that data lives only in the browser.  
+`persistWithFeedback` flushes changes and shows a toast.
+
+### Toolbar shortcut
+```tsx
+import { usePersistWithFeedback } from '@contember/react'
+import { useHotkeys } from 'react-hotkeys-hook'
+
+export const SaveHotkey = () => {
+  const persist = usePersistWithFeedback()
+
+  useHotkeys('ctrl+s, cmd+s', e => {
+    e.preventDefault()
+    persist()
+  })
+
+  return null
+}
+```
+You wire the hook to a keyboard shortcut, improving editor ergonomics.
+
+## Best Practices & Gotchas
+* Call the returned function inside UI events, not during render.
+* Await the promise if you need post‑save logic.
+* Combine with optimistic UI only when network latency is low.
+* Do not wrap the hook in conditionals; follow React Rules of Hooks.
+
+## Further Reading
+* `usePersist` – low‑level variant without toasts.  
+* Contember Toast API.  
+* Data mutations and transaction queue.
+
+<!-- End of Generated Documentation -->

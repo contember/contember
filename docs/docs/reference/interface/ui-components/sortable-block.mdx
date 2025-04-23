@@ -1,0 +1,109 @@
+---
+title: SortableBlock
+sidebar_label: SortableBlock
+---
+
+# SortableBlock
+
+## Overview
+SortableBlock wraps Slate editor blocks and makes them draggable.  
+You add it to a block plugin to let users reorder content with a mouse or touch.
+
+The component gives instant visual feedback and draws an overlay while you drag.  
+It never mutates Slate state by itself; it only forwards events to the `withSortable` plugin.
+
+## Styling Guidelines
+* All examples use Tailwind CSS.  
+* SortableBlock adds no Contember‑specific theme classes, so you style it freely.
+
+## Core Concepts
+* Slate renders each editor block through a React component.  
+* `SortableBlock` must receive the exact Slate `element` instance.  
+* Drag handles, outlines, and cursor styles are up to you; SortableBlock only manages DOM events.  
+* The accompanying `withSortable` plugin updates Slate when the drag ends.
+
+## Quick Start
+```tsx
+import { SortableBlock } from './SortableBlock'
+
+<SortableBlock element={slateElement} className="border p-4 rounded bg-white shadow">
+  <p className="text-gray-800">Drag me up or down.</p>
+</SortableBlock>
+```
+
+## Detailed Guide
+1. Create the plugin.
+```tsx
+import { BlockEditor } from '@contember/react-slate'
+import { withSortable } from '@contember/react-sortable'
+import { SortableBlock } from './SortableBlock'
+
+const plugins = [
+  withSortable({ render: SortableBlock }),
+]
+```
+
+2. Mount the editor.
+```tsx
+<BlockEditor plugins={plugins} className="prose mx-auto" />
+```
+
+3. Style hover and drag states.
+```tsx
+<style jsx>{`
+  [data-sortable-dragging] {
+    @apply opacity-50 cursor-grabbing;
+  }
+`}</style>
+```
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| children | React.ReactNode | Yes | — | Block content to render |
+| element | Slate.BaseElement | Yes | — | Slate Element object containing block data |
+
+_Inherited props: None_
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+
+### Custom Drag Handle
+```tsx
+<SortableBlock element={element} className="relative pl-8">
+  <button
+    className="absolute left-0 top-1/2 -translate-y-1/2 cursor-grab text-gray-400 hover:text-gray-600"
+    data-sortable-handle
+  >
+    ⋮⋮
+  </button>
+  <BlockContent />
+</SortableBlock>
+```
+The `data-sortable-handle` attribute limits drag initiation to the button, avoiding accidental drags on inputs.
+
+### Restrict Dragging to Same Section
+```tsx
+const sortable = withSortable({
+  render: SortableBlock,
+  canDrop: (source, destination) => source.sectionId === destination.sectionId,
+})
+```
+You pass a `canDrop` function to the plugin, not to `SortableBlock`.  
+The block now drags only inside its original section.
+
+## Best Practices & Gotchas
+* Always pass the same `element` instance you received in `renderElement`.  
+* Memoize heavy child components; dragging triggers re‑renders.  
+* Add a visible drag handle to improve usability on touch devices.  
+* Avoid absolute positioning inside the block; the overlay copies computed styles.  
+* Do not mutate the Slate element inside SortableBlock.
+
+## Further Reading
+* withSortable plugin documentation  
+* BlockEditor component  
+* Slate `renderElement` pattern
+
+<!-- End of Generated Documentation -->

@@ -1,0 +1,103 @@
+---
+title: DeleteEntityDialog
+sidebar_label: DeleteEntityDialog
+---
+
+# DeleteEntityDialog
+
+## Overview
+`DeleteEntityDialog` shows a confirmation dialog before deleting the current entity.  
+It handles deletion, optional persistence timing, and optional redirect after success.
+
+## Styling Guidelines
+* All examples use Tailwind.
+* No special Contember theme classes are required.
+
+## Core Concepts
+* The dialog opens from any `trigger` element you provide.
+* Deletion can persist immediately or wait for a later global persist.
+* You can redirect after successful deletion with `onSuccessRedirectTo`.
+
+## Quick Start
+```tsx
+import { DeleteEntityDialog } from '~/lib/binding'
+import { Button } from '~/components/ui'
+
+export default () => (
+  <DeleteEntityDialog
+    trigger={<Button className="bg-red-600 text-white px-4 py-2 rounded">Delete</Button>}
+  />
+)
+```
+
+## Detailed Guide
+### Immediate vs. delayed persistence
+```tsx
+// Deletes and persists right away (default)
+<DeleteEntityDialog trigger={<Button className="text-red-600">Delete now</Button>} />
+
+// Marks for deletion; call <PersistButton /> later
+<DeleteEntityDialog
+  immediatePersist={false}
+  trigger={<Button className="text-yellow-600">Mark for deletion</Button>}
+/>
+```
+
+### Redirect after deletion
+```tsx
+<DeleteEntityDialog
+  onSuccessRedirectTo="users"
+  trigger={<Button className="bg-red-600 text-white">Delete & go back</Button>}
+/>
+```
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| trigger | React.ReactElement | Yes | — | Element that opens the dialog |
+| immediatePersist | boolean | No | true | If true, deletion is persisted immediately |
+| onSuccessRedirectTo | RoutingLinkTarget | No | — | Route to navigate to after successful deletion |
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+### Delete button in a data grid
+Displays the dialog inside an action column.
+```tsx
+<DataGridActionColumn>
+  <DeleteEntityDialog trigger={
+    <Button size="sm" variant="destructive" className="flex items-center gap-1">
+      <TrashIcon size={16} /> Delete
+    </Button>
+  } />
+</DataGridActionColumn>
+```
+
+### Dropdown menu item
+Triggers the dialog from a context menu.
+```tsx
+<DefaultDropdown>
+  <DropdownMenuItem>Edit</DropdownMenuItem>
+  <DropdownMenuItem>Make a copy</DropdownMenuItem>
+  <DropdownMenuSeparator />
+  <DeleteEntityDialog trigger={
+    <DropdownMenuItem onSelect={e => e.preventDefault()}>
+      Delete
+    </DropdownMenuItem>
+  } />
+</DefaultDropdown>
+```
+
+## Best Practices & Gotchas
+* Keep `immediatePersist` true unless you use a global persist workflow.
+* Prevent default on menu items to avoid double triggers.
+* Combine with `PersistButton` when using delayed persistence.
+* Always provide clear destructive styling on the trigger.
+
+## Further Reading
+* PersistButton
+* EntityEditDialog
+* DataGridActionColumn
+
+<!-- End of Generated Documentation -->

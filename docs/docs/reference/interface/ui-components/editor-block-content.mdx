@@ -1,0 +1,76 @@
+---
+title: EditorBlockContent
+sidebar_label: EditorBlockContent
+---
+
+# EditorBlockContent
+
+## Overview
+`EditorBlockContent` renders the editable area inside a block.  
+It manages `contentEditable`, placeholder text, and padding so you can focus on authoring.
+
+## Styling Guidelines
+* All examples use Tailwind CSS.  
+* No special Contember theme classes are required.
+
+## Core Concepts
+* Editable region lives inside each `EditorBlock`.
+* Placeholder appears when the block is empty.
+* Component handles focus and text‑presence detection.
+* You may style the area with standard Tailwind utilities.
+
+## Quick Start
+```tsx
+import { EditorBlock, EditorBlockContent } from '~/lib/editor'
+
+export default () => (
+	<EditorBlock name="paragraph" label="Paragraph" className="border p-4">
+		<EditorBlockContent className="prose max-w-none" />
+	</EditorBlock>
+)
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| _None_ | — | No | — | Component exposes no custom props. |
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+
+### Quoted block with custom background
+```tsx
+import {
+	EditorBlock,
+	EditorBlockContent,
+} from '~/lib/editor'
+
+export const QuoteBlock = () => (
+	<EditorBlock
+		name="quote"
+		label="Quote"
+		className="bg-gray-50 border-l-4 border-blue-500 p-4"
+	>
+		<EditorBlockContent className="italic text-gray-700" />
+	</EditorBlock>
+)
+```
+The block gets left border styling, while `EditorBlockContent` handles inline editing and placeholder logic.
+
+## Best Practices & Gotchas
+* Wrap `EditorBlockContent` only inside `EditorBlock`.
+* Add padding on the parent block, not on the content, to keep placeholder aligned.
+* Use `prose` or similar Tailwind typography classes for rich text.
+* Do not set `contentEditable` manually; the component does that for you.
+
+## Further Reading
+* `EditorBlock`
+* `EditorBlockToolbar`
+* `RichTextField`
+
+<!-- End of Generated Documentation -->

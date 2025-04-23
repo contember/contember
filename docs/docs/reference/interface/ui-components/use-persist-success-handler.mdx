@@ -1,0 +1,85 @@
+---
+title: usePersistSuccessHandler
+sidebar_label: usePersistSuccessHandler
+---
+
+## Overview
+`usePersistSuccessHandler` is a small React hook that displays a toast after data is successfully persisted.  
+The hook returns a callback you call with the persistence result; it then shows the correct success message.
+
+## Styling Guidelines
+* All code samples use Tailwind CSS utility classes.  
+* The hook itself has no visual output and requires no Contember‑specific theme classes.
+
+## Core Concepts
+* Treat persistence as an asynchronous side effect.  
+* Decouple UI feedback (toast) from the code that performs the request.  
+* Keep success handling logic reusable across multiple save operations.
+
+## Quick Start
+```tsx
+import { usePersistSuccessHandler } from '@contember/react'
+
+export const SaveButton = () => {
+	const handleSuccess = usePersistSuccessHandler()
+
+	const save = async () => {
+		const result = await persistData() // your API call
+		handleSuccess(result)
+	}
+
+	return (
+		<button onClick={save} className="px-4 py-2 bg-blue-600 text-white rounded">
+			Save
+		</button>
+	)
+}
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+_None_
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+
+### Updating a user profile
+```tsx
+import { usePersistSuccessHandler } from '@contember/react'
+
+export const ProfileForm = () => {
+	const handleSuccess = usePersistSuccessHandler()
+
+	const onSubmit = async (data: ProfileInput) => {
+		const result = await api.updateProfile(data)
+		handleSuccess(result)
+	}
+
+	return (
+		<form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+			{/* form fields */}
+			<button type="submit" className="bg-green-600 text-white px-4 py-2 rounded">
+				Update profile
+			</button>
+		</form>
+	)
+}
+```
+`handleSuccess` shows a toast (e.g. “Profile updated”) when the API responds successfully.
+
+## Best Practices & Gotchas
+* Always call the returned callback inside your `then`/`catch` chain or `try`/`await` block after a successful request.  
+* Do not call the handler on failed requests; pair it with proper error handling.  
+* Keep the hook at the top level of your component—never inside loops or conditions.  
+* If your project uses a custom toast system, ensure `usePersistSuccessHandler` is wired to it once, not per component.
+
+## Further Reading
+* Toast/notification utilities in your design system.  
+* Error handling hooks such as `usePersistErrorHandler`.  
+* Data mutation patterns in React Query or SWR.
+
+<!-- End of Generated Documentation -->

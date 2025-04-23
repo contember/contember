@@ -19,7 +19,9 @@ export const buildPrompt = (
 3. **Core Concepts** – Bullet list of ideas the reader must grasp.
 4. **Quick Start** – Smallest functional example (Tailwind classes included).
 5. **Detailed Guide** *(optional)* – Walkthrough with multiple snippets.
-6. **Props Reference** – Markdown table with columns **Name | Type | Required | Default | Description**. List inherited props last.
+6. **Props Reference** – Markdown table with columns **Name | Type | Required | Default | Description**.
+    - *Required* must be the literal text **“Yes”** or **“No”**—no emojis, ticks, or booleans.
+    - List inherited props last.
 7. **Sub-Components / Building Blocks** – Filters, Triggers, Hooks, etc. Give each its own \`### <Name>\` heading.
 8. **Examples** – Focused, real-world scenarios with explanations under each code block.
 9. **Best Practices & Gotchas** – Bullet list.

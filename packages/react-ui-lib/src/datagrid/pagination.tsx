@@ -26,11 +26,19 @@ const PaginationWrapper = uic('div', {
 	},
 })
 
-type DataGridPaginationProps = {
+/**
+ * Props for {@link DataGridPagination} component.
+ */
+export type DataGridPaginationProps = {
+	/**
+	 * Optional sticky position (default: false)
+	 * */
 	sticky?: boolean
 }
 
 /**
+ * Props {@link DataGridPaginationProps}
+ *
  * `DataGridPagination` provides pagination controls for navigating through pages in a `DataView`.
  * It includes buttons for navigating to the first, previous, next, and last pages.
  *

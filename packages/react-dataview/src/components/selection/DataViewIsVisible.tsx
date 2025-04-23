@@ -33,7 +33,7 @@ export interface DataViewElementProps {
  *
  * See {@link DataViewElementProps} for details.
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <DataViewElement name={'category'} label="Category">
  *     //  Category content here 

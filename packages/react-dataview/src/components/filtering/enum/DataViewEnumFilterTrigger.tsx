@@ -56,7 +56,7 @@ export interface DataViewEnumFilterTriggerProps {
  *   - `'exclude'`: The filter excludes the specified `value`.
  *   - `'none'`: The filter is not active.
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <DataViewEnumFilterTrigger value="optionA" action="toggleInclude">
  *     <button>Include Option A</button>

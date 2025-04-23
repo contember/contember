@@ -28,7 +28,7 @@ export interface DataViewReloadTriggerProps {
  * ## Data Attributes (applied to `Slot`)
  * - **`data-state`**: Reflects the current state of the data view loader (e.g., `'loading'`, `'loaded'`, `'failed'`, `'refreshing'`, `'initial'`).
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <DataViewReloadTrigger>
  *     <button>Reload</button>

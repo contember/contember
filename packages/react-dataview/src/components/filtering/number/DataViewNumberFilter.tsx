@@ -31,7 +31,7 @@ export interface DataViewNumberFilterProps {
  *
  * See {@link DataViewNumberFilterProps} for details.
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <DataViewNumberFilter field="price">
  *   //  Filter controls here 

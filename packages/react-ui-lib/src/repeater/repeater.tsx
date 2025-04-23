@@ -155,7 +155,7 @@ export type DefaultRepeaterProps =
  *
  * DefaultRepeater is a wrapper around Repeater that provides a default UI for a list of items.
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <DefaultRepeater entities="RepeaterItem" sortableBy="order" title="Foo items" addButtonPosition="around">
  * 	<InputField field="title" />

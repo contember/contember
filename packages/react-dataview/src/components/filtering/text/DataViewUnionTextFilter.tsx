@@ -35,7 +35,7 @@ export interface DataViewUnionTextFilterProps {
  *
  * See {@link DataViewUnionTextFilterProps} for details.
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <DataViewUnionTextFilter name="search" fields={['title', 'description']}>
  *   //  Filter controls here

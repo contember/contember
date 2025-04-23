@@ -14,7 +14,7 @@ const SlotType = Slot as React.ForwardRefExoticComponent<React.ButtonHTMLAttribu
  * ## Props
  * - **`children`**: The button or element used as the trigger.
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <DataViewInfiniteLoadTrigger>
  *     <button>Load More</button>

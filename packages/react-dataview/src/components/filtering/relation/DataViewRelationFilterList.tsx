@@ -24,7 +24,7 @@ export interface DataViewRelationFilterListProps {
  *
  * See {@link DataViewRelationFilterListProps} for details.
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <DataViewRelationFilterList>
  *     <Field field="name" />

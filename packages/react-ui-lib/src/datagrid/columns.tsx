@@ -85,7 +85,7 @@ export type DataGridTextColumnProps = {
 /**
  * Renders a column with text content and column controls in a header. Should be used in a {@link DataGridTable}.
  *
- * ## Example
+ * #### Example: Basic Usage
  * ```tsx
  * <DataGridTable>
  *     <DataGridTextColumn field="title" />
@@ -135,7 +135,7 @@ export type DataGridBooleanColumnProps = {
 /**
  * Renders a column with boolean content. Should be used in a {@link DataGridTable}.
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <DataGridTable>
  *     <DataGridBooleanColumn field="isPublished" />
@@ -186,7 +186,7 @@ export type DataGridNumberColumnProps = {
 /**
  * Renders a column with number content. Should be used in a {@link DataGridTable}.
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <DataGridTable>
  *     <DataGridNumberColumn field="price" format={it => it.toFixed(2)} />
@@ -236,7 +236,7 @@ export type DataGridDateColumnProps = {
 /**
  * Renders a column with date content. Should be used in a {@link DataGridTable}.
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <DataGridTable>
  *     <DataGridDateColumn field="createdAt" />
@@ -287,7 +287,7 @@ export type DataGridDateTimeColumnProps = {
 /**
  * Renders a column with date-time content. Should be used in a {@link DataGridTable}.
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <DataGridTable>
  *     <DataGridDateTimeColumn field="createdAt" />
@@ -349,7 +349,7 @@ export type DataGridEnumColumnProps = {
 /**
  * Renders a column with enum content. Should be used in a {@link DataGridTable}.
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <DataGridTable>
  *     <DataGridEnumColumn field="status" />
@@ -413,7 +413,7 @@ export type DataGridEnumListColumnProps = {
 /**
  * Renders a column with enum list content. Should be used in a {@link DataGridTable}.
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <DataGridTable>
  *     <DataGridEnumListColumn field="target" />
@@ -468,7 +468,7 @@ export type DataGridIsDefinedColumnProps = {
 /**
  * Renders a column with is-defined content. Should be used in a {@link DataGridTable}.
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <DataGridTable>
  *     <DataGridIsDefinedColumn field="coverImage.url" />
@@ -560,7 +560,7 @@ export type DataGridHasOneColumnProps = {
 /**
  * Renders a column with has-one relation content. Should be used in a {@link DataGridTable}.
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <DataGridTable>
  *     <DataGridHasOneColumn field="author">
@@ -623,7 +623,7 @@ export type DataGridHasManyColumnProps = {
 /**
  * Renders a column with has-many relation content. Should be used in a {@link DataGridTable}.
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <DataGridTable>
  *     <DataGridHasManyColumn field="tags">

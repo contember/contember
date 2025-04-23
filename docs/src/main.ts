@@ -58,58 +58,6 @@ async function main() {
 				const outputFilePath = path.join(config.outputDir, `${kebabCase(sourceData.componentName)}.mdx`)
 				const outputFileExists = await Bun.file(outputFilePath).exists()
 
-				// Check if we need to regenerate documentation based on examples count or modified time
-				let regenerate = !outputFileExists
-				let existingContent: string | null = null
-
-				if (outputFileExists && sourceData.examples) {
-					// Read the existing file to check if examples count has changed
-					try {
-						existingContent = await Bun.file(outputFilePath).text()
-		
-						// Look for any examples count marker in the file
-						const examplesMarker = existingContent.match(/<!-- Examples count: (\d+) -->/)
-						// eslint-disable-next-line no-console
-						console.log(` -> Checking examples count marker in existing file...`)
-		
-						if (examplesMarker && examplesMarker[1]) {
-							const existingExamplesCount = parseInt(examplesMarker[1], 10)
-							const currentExamplesCount = sourceData.examples.length
-			
-							// eslint-disable-next-line no-console
-							console.log(` -> Found examples count marker: ${existingExamplesCount}, current count: ${currentExamplesCount}`)
-			
-							// Regenerate if examples count has changed
-							if (existingExamplesCount !== currentExamplesCount) {
-								// eslint-disable-next-line no-console
-								console.log(` -> Examples count changed from ${existingExamplesCount} to ${currentExamplesCount}. Regenerating documentation.`)
-								regenerate = true
-				
-								// Store the previous content for reference
-								sourceData.previousDocContent = existingContent
-							}
-						} else {
-							// If no marker found, regenerate to include the marker
-							// eslint-disable-next-line no-console
-							console.log(` -> No examples count marker found in existing file. File will be regenerated.`)
-							regenerate = true
-
-							// Store the previous content for reference
-							sourceData.previousDocContent = existingContent
-						}
-					} catch (error) {
-						console.warn(`Error reading existing file ${outputFilePath}:`, error)
-						// If we can't read the file, assume we need to regenerate
-						regenerate = true
-					}
-				}
-
-				if (!regenerate) {
-					// eslint-disable-next-line no-console
-					console.log(` -> Output file ${outputFilePath} already exists with same examples count. Skipping generation.`)
-					continue // Skip to the next component
-				}
-
 				if (config.contextDir) {
 					// eslint-disable-next-line no-console
 					console.log(` -> Finding real-world usage examples for ${sourceData.componentName} in playground...`)
@@ -146,6 +94,58 @@ async function main() {
 						// eslint-disable-next-line no-console
 						console.log(` -> No playground examples found for ${sourceData.componentName}`)
 					}
+				}
+
+				// Now that we have all examples, check if regeneration is needed
+				let regenerate = !outputFileExists
+				let existingContent: string | null = null
+
+				if (outputFileExists && sourceData.examples) {
+					// Read the existing file to check if examples count has changed
+					try {
+						existingContent = await Bun.file(outputFilePath).text()
+
+						// Look for any examples count marker in the file
+						const examplesMarker = existingContent.match(/<!-- Examples count: (\d+) -->/)
+						// eslint-disable-next-line no-console
+						console.log(` -> Checking examples count marker in existing file...`)
+
+						if (examplesMarker && examplesMarker[1]) {
+							const existingExamplesCount = parseInt(examplesMarker[1], 10)
+							const currentExamplesCount = sourceData.examples.length
+
+							// eslint-disable-next-line no-console
+							console.log(` -> Found examples count marker: ${existingExamplesCount}, current count: ${currentExamplesCount}`)
+
+							// Regenerate if examples count has changed
+							if (existingExamplesCount !== currentExamplesCount) {
+								// eslint-disable-next-line no-console
+								console.log(` -> Examples count changed from ${existingExamplesCount} to ${currentExamplesCount}. Regenerating documentation.`)
+								regenerate = true
+
+								// Store the previous content for reference
+								sourceData.previousDocContent = existingContent
+							}
+						} else {
+							// If no marker found, regenerate to include the marker
+							// eslint-disable-next-line no-console
+							console.log(` -> No examples count marker found in existing file. File will be regenerated.`)
+							regenerate = true
+
+							// Store the previous content for reference
+							sourceData.previousDocContent = existingContent
+						}
+					} catch (error) {
+						console.warn(`Error reading existing file ${outputFilePath}:`, error)
+						// If we can't read the file, assume we need to regenerate
+						regenerate = true
+					}
+				}
+
+				if (!regenerate) {
+					// eslint-disable-next-line no-console
+					console.log(` -> Output file ${outputFilePath} already exists with same examples count. Skipping generation.`)
+					continue // Skip to the next component
 				}
 
 				// eslint-disable-next-line no-console

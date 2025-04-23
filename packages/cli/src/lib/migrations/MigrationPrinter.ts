@@ -50,7 +50,7 @@ export class MigrationPrinter {
 	}
 
 	printStatusTable = (migrations: AnyMigrationStatus[]) => {
-		const table = chalkTable(
+		return chalkTable(
 			{
 				columns: ['status', 'migration', 'info'],
 			},
@@ -78,12 +78,17 @@ export class MigrationPrinter {
 						}
 					case MigrationState.TO_EXECUTE_ERROR:
 						return { status: chalk.bgRedBright.white('ERROR'), migration: it.name, info: it.errorMessage }
+					case MigrationState.SKIP_EMPTY:
+						return {
+							status: chalk.bgYellow.white('Skip'),
+							migration: it.name,
+							info: `Skipped because empty`,
+						}
 					default:
 						assertNever(it)
 				}
 			}),
 		)
-		console.log(table)
 	}
 
 }

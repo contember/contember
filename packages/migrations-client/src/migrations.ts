@@ -14,6 +14,7 @@ export interface ExecutedMigration extends Migration {
 export enum MigrationState {
 	TO_EXECUTE_OK = 'to_execute_ok',
 	TO_EXECUTE_ERROR = 'to_execute_error',
+	SKIP_EMPTY = 'skip_empty',
 	EXECUTED_OK = 'executed_ok',
 	EXECUTED_ERROR = 'executed_error',
 	EXECUTED_MISSING = 'executed_missing',
@@ -34,21 +35,26 @@ interface MigrationToExecuteInvalidStatus extends MigrationStatusBase<MigrationS
 	errorMessage: string
 }
 
-interface MigrationExecutedOkStatus extends MigrationStatusBase<MigrationState.EXECUTED_OK>{
+interface MigrationExecutedOkStatus extends MigrationStatusBase<MigrationState.EXECUTED_OK> {
 	executedMigration: ExecutedMigrationInfo
 	localMigration: MigrationFile
 }
 
-interface MigrationExecutedMissingStatus extends MigrationStatusBase<MigrationState.EXECUTED_MISSING>{
+interface MigrationExecutedMissingStatus extends MigrationStatusBase<MigrationState.EXECUTED_MISSING> {
 	executedMigration: ExecutedMigrationInfo
 	errorMessage: string
 }
 
-interface MigrationExecutedErrorStatus extends MigrationStatusBase<MigrationState.EXECUTED_ERROR>{
+interface MigrationExecutedErrorStatus extends MigrationStatusBase<MigrationState.EXECUTED_ERROR> {
 	executedMigration: ExecutedMigrationInfo
 	localMigration: MigrationFile
 	errorMessage: string
 }
+
+export interface MigrationSkipStatus extends MigrationStatusBase<MigrationState.SKIP_EMPTY> {
+	localMigration: MigrationFile
+}
+
 
 export type ErrorMigrationStatus =
 	| MigrationToExecuteInvalidStatus
@@ -59,6 +65,7 @@ export type AnyMigrationStatus =
 	| ErrorMigrationStatus
 	| MigrationToExecuteOkStatus
 	| MigrationExecutedOkStatus
+	| MigrationSkipStatus
 
 const isErrorMigrationStatus = (migration: AnyMigrationStatus): migration is ErrorMigrationStatus =>
 	[MigrationState.EXECUTED_ERROR, MigrationState.EXECUTED_MISSING, MigrationState.TO_EXECUTE_ERROR].includes(
@@ -122,6 +129,16 @@ export class MigrationsStatusResolver {
 		const latestExecuted = sortedExecuted.length > 0 ? sortedExecuted[sortedExecuted.length - 1] : null
 		for (const localMigration of localMigrations) {
 			if (allMigrations.find(it => it.version === localMigration.version)) {
+				continue
+			}
+			const migrationContent = await localMigration.getContent()
+			if (isSchemaMigration(migrationContent) && migrationContent.modifications.length === 0) {
+				allMigrations.push({
+					state: MigrationState.SKIP_EMPTY,
+					localMigration,
+					version: localMigration.version,
+					name: localMigration.name,
+				})
 				continue
 			}
 

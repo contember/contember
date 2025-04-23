@@ -78,7 +78,7 @@ export class MigrationStatusCommand extends Command<Args, Options> {
 				  ])
 				: status.allMigrations
 
-		this.migrationPrinter.printStatusTable(filtered)
+		console.log(this.migrationPrinter.printStatusTable(filtered))
 
 		const hasErrors = status.errorMigrations.length > 0
 

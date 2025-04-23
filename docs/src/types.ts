@@ -1,3 +1,11 @@
+export type RegenerationReason = {
+	isUpdate: boolean
+	originalExamplesCount: number
+	newExamplesCount: number
+	playgroundExamplesAdded: number
+	hasNewImports: boolean
+}
+
 export interface ComponentSourceData {
 	componentName: string
 	filePath: string
@@ -5,8 +13,10 @@ export interface ComponentSourceData {
 	props?: Record<string, PropData>
 	examples?: string[]
 	originalExamplesCount?: number
+	previousDocContent?: string
 	links?: string[]
 	imports?: string[]
+	regenerationReason?: RegenerationReason
 }
 
 export interface PropData {

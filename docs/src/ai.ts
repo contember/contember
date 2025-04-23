@@ -71,39 +71,25 @@ export const buildPrompt = (
 		lines.push('')
 	}
 
-	// Split examples by source
 	const sourceExamples: string[] = []
 	const playgroundExamples: string[] = []
 
-	// Categorize examples by source vs playground
-	// We need to identify playground examples vs source examples
 	if (data.examples?.length) {
-		// Check if we have more examples than would normally come from source
-		const originalCount = (data as any).originalExamplesCount || 0
+		const originalCount = data.originalExamplesCount || 0
 
-		data.examples.forEach((example, index) => {
-			// Use a simple heuristic - source examples are typically shorter and come first
-			// If we know the original count, use that, otherwise use length as a heuristic
-			if (originalCount > 0) {
-				// If we know exactly how many original examples there were
+		if (originalCount > 0) {
+			data.examples.forEach((example, index) => {
 				if (index < originalCount) {
 					sourceExamples.push(example)
 				} else {
 					playgroundExamples.push(example)
 				}
-			} else {
-				// Use a length-based heuristic if we don't know the count
-				// Playground examples are usually longer (more complete components/functions)
-				if (example.length > 500) {
-					playgroundExamples.push(example)
-				} else {
-					sourceExamples.push(example)
-				}
-			}
-		})
+			})
+		} else {
+			sourceExamples.push(...data.examples)
+		}
 	}
 
-	// Add source examples first
 	lines.push(`## Examples (from source code)`)
 	if (sourceExamples.length > 0) {
 		sourceExamples.forEach(example => {
@@ -117,7 +103,6 @@ export const buildPrompt = (
 	}
 	lines.push('')
 
-	// Add playground examples (real-world usage)
 	if (playgroundExamples.length > 0) {
 		lines.push(`## Real-World Examples (from playground)`)
 		playgroundExamples.forEach((example, index) => {
@@ -134,6 +119,46 @@ export const buildPrompt = (
 		lines.push(`## Additional Notes/Context\n${override.notes}\n`)
 	}
 
+	if (data.previousDocContent) {
+		const regenerationReason = data.regenerationReason || {
+			isUpdate: true,
+			originalExamplesCount: 0,
+			newExamplesCount: data.examples?.length || 0,
+			playgroundExamplesAdded: 0,
+			hasNewImports: false,
+		}
+		const playgroundExamplesAdded = regenerationReason.playgroundExamplesAdded || 0
+		const hasNewImports = regenerationReason.hasNewImports || false
+
+		// Create a specific reason message based on what changed
+		let changeReason = 'Documentation is being regenerated because:'
+		if (playgroundExamplesAdded > 0) {
+			changeReason += `\n- ${playgroundExamplesAdded} new playground example(s) have been added.`
+		}
+		if (hasNewImports) {
+			changeReason += '\n- New import examples are now available.'
+		}
+
+		lines.push(`## Previous Documentation Version
+The following is the previous version of the documentation for this component.
+Use it as a reference to maintain consistency in style and any custom explanations.
+Only update parts that need to change due to new examples or information.
+
+${changeReason}
+
+Important instructions:
+1. Preserve the structure, custom explanations, and insights from the previous version.
+2. Keep any manually written sections that aren't directly tied to examples.
+3. Update the examples section with the new examples provided above.
+4. Update any descriptions that reference the examples or API if they've changed.
+5. The number of examples has changed, so make sure to incorporate all the new examples properly.
+
+\`\`\`markdown
+${(data as any).previousDocContent}
+\`\`\`
+`)
+	}
+
 	lines.push(`--- Generated Documentation ---`)
 
 	return lines.join('\n')
@@ -144,6 +169,22 @@ export async function generateMarkdownWithAI(
 	override?: ComponentOverride,
 	aiConfig?: DocsConfig['ai'],
 ): Promise<string | null> {
+	// Add regeneration reason if updating existing doc
+	if (sourceData.previousDocContent) {
+		// Calculate what changed to provide context to the AI
+		const originalExamplesCount = sourceData.originalExamplesCount || 0
+		const totalExamplesCount = sourceData.examples?.length || 0
+		const playgroundExamplesCount = totalExamplesCount - originalExamplesCount
+
+		sourceData.regenerationReason = {
+			isUpdate: true,
+			originalExamplesCount,
+			newExamplesCount: totalExamplesCount,
+			playgroundExamplesAdded: playgroundExamplesCount,
+			hasNewImports: !!sourceData.imports && sourceData.imports.length > 0,
+		}
+	}
+
 	const prompt = buildPrompt(sourceData, override)
 
 	const model = aiConfig?.model || 'gpt-3.5-turbo'
@@ -155,12 +196,28 @@ export async function generateMarkdownWithAI(
 	// ---
 
 	try {
+		// Create system prompt with specific instructions for updating docs
+		let systemPrompt = 'You are an expert technical writer generating Markdown documentation for React components for a Docusaurus site.'
+
+		// Add specific instructions if we're updating existing documentation
+		if ((sourceData as any).previousDocContent) {
+			systemPrompt += `
+
+When updating existing documentation:
+1. Maintain the same overall structure and headings.
+2. Preserve any custom explanations or insights from the previous version.
+3. Integrate new examples in the appropriate sections.
+4. Update any outdated information based on new examples.
+5. Keep the same writing style and tone.
+6. Ensure the documentation remains coherent as a whole.`
+		}
+
 		const completion = await openai.chat.completions.create({
 			model: model,
 			messages: [
 				{
 					role: 'system',
-					content: 'You are an expert technical writer generating Markdown documentation for React components for a Docusaurus site.',
+					content: systemPrompt,
 				},
 				{ role: 'user', content: prompt },
 			],
@@ -184,9 +241,9 @@ export async function generateMarkdownWithAI(
 		// ensure the frontmatter is correct, etc.
 		let finalContent = content.trim()
 
-		// Add Docusaurus frontmatter (if the AI didn't include it reliably)
 		const title = override?.title || sourceData.componentName
 		const sidebarLabel = sourceData.componentName
+		const examplesCount = sourceData.examples?.length || 0
 		const frontmatter = `---
 title: ${title}
 sidebar_label: ${sidebarLabel}
@@ -194,17 +251,52 @@ sidebar_label: ${sidebarLabel}
 
 `
 
-		// Add frontmatter if it's not already present
-		if (!finalContent.startsWith('---')) {
+		if (finalContent.startsWith('---')) {
+			const frontmatterEnd = finalContent.indexOf('---', 3)
+			if (frontmatterEnd > 0) {
+				finalContent = frontmatter + finalContent.substring(frontmatterEnd + 3).trim()
+			} else {
+				finalContent = frontmatter + finalContent
+			}
+		} else {
 			finalContent = frontmatter + finalContent
 		}
 
+		const editedByHumanTag = `<!-- Edited by human: false -->`
+		const examplesCountTag = `<!-- Examples count: ${examplesCount} -->`
+		const editedByHumanRegex = /<!--\s*Edited by human:\s*(true|false)\s*-->\n*/
+		const examplesCountRegex = /<!--\s*Examples count:\s*\d+\s*-->\n*/
+
+		const frontmatterEndIndex = finalContent.indexOf('---', 3)
+		let insertPosition = 0
+		if (frontmatterEndIndex > 0) {
+			const newlineAfterFrontmatter = finalContent.indexOf('\n', frontmatterEndIndex + 3)
+			if (newlineAfterFrontmatter > 0) {
+				insertPosition = newlineAfterFrontmatter + 1 // Insert after the newline
+			} else {
+				insertPosition = finalContent.length
+				finalContent += '\n' // Add a newline if missing
+			}
+		} else {
+			insertPosition = 0
+		}
+
+		let contentBeforeInsert = finalContent.substring(0, insertPosition)
+		let contentAfterInsert = finalContent.substring(insertPosition)
+
+		contentAfterInsert = contentAfterInsert.replace(editedByHumanRegex, '')
+		contentAfterInsert = contentAfterInsert.replace(examplesCountRegex, '')
+
+		finalContent =
+			contentBeforeInsert.trimEnd() + '\n\n' +
+			editedByHumanTag + '\n' +
+			examplesCountTag + '\n\n' +
+			contentAfterInsert.trimStart()
 
 		return finalContent
 
 	} catch (error) {
 		console.error(`Error calling OpenAI API for ${sourceData.componentName}:`, error)
-		// Consider more specific error handling (e.g., rate limits, auth errors)
 		return null // Indicate failure
 	}
 }

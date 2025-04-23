@@ -4,6 +4,8 @@ import { ConfigurationQuery, PermissionActions, PersonUniqueIdentifier, SignInMa
 import { createErrorResponse } from '../../errorUtils'
 import { SignInResponseFactory } from '../../responseHelpers/SignInResponseFactory'
 import { UserInputError } from '@contember/graphql-utils'
+import { NextLoginAttemptQuery } from '../../../model/queries/authLog/NextLoginAttemptQuery'
+import { ResponseError } from '../../../model/utils/Response'
 
 export class SignInMutationResolver implements MutationResolvers {
 	constructor(
@@ -16,6 +18,13 @@ export class SignInMutationResolver implements MutationResolvers {
 			action: PermissionActions.PERSON_SIGN_IN,
 			message: 'You are not allowed to sign in',
 		})
+
+		const nextAllowedSignIn = await context.db.queryHandler.fetch(new NextLoginAttemptQuery(args.email))
+		if (nextAllowedSignIn > new Date()) {
+			return createErrorResponse(new ResponseError('RATE_LIMIT_EXCEEDED', `Too many attempts, please try again later.`, {
+				retryAfter: Math.ceil((nextAllowedSignIn.getTime() - Date.now()) / 1000),
+			}))
+		}
 
 		const response = await this.signInManager.signIn(
 			context.db,

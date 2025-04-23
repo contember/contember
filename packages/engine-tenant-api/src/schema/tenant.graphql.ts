@@ -248,6 +248,7 @@ const schema: DocumentNode = gql`
 		code: SignInErrorCode!
 		developerMessage: String!
 		endUserMessage: String @deprecated
+		retryAfter: Int
 	}
 
 	enum SignInErrorCode {
@@ -258,6 +259,7 @@ const schema: DocumentNode = gql`
 		NO_PASSWORD_SET
 		OTP_REQUIRED
 		INVALID_OTP_TOKEN
+		RATE_LIMIT_EXCEEDED
 	}
 
 	type SignInResult implements CommonSignInResult {

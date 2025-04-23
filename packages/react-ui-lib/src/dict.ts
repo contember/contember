@@ -210,6 +210,7 @@ export const dict = {
 				'PERSON_DISABLED': 'Person disabled',
 				'UNKNOWN_EMAIL': 'Unknown email',
 				'INVALID_CREDENTIALS': 'Invalid credentials',
+				'RATE_LIMIT_EXCEEDED': 'Too many failed attempts, please try again later',
 				'OTP_REQUIRED': undefined,
 			} satisfies Record<LoginFormErrorCode, string | undefined>,
 			idpInitError: 'Failed to initialize IdP login:',

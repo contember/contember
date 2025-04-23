@@ -1284,6 +1284,7 @@ export type SignInError = {
 	readonly developerMessage: Scalars['String']['output']
 	/** @deprecated Field no longer supported */
 	readonly endUserMessage?: Maybe<Scalars['String']['output']>
+	readonly retryAfter?: Maybe<Scalars['Int']['output']>
 }
 
 export type SignInErrorCode =
@@ -1293,6 +1294,7 @@ export type SignInErrorCode =
   | 'NO_PASSWORD_SET'
   | 'OTP_REQUIRED'
   | 'PERSON_DISABLED'
+  | 'RATE_LIMIT_EXCEEDED'
   | 'UNKNOWN_EMAIL'
 
 export type SignInIdpError = {
@@ -2602,6 +2604,7 @@ export type SignInErrorResolvers<ContextType = any, ParentType extends Resolvers
 	code?: Resolver<ResolversTypes['SignInErrorCode'], ParentType, ContextType>
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	endUserMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	retryAfter?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 

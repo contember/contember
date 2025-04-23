@@ -1,16 +1,15 @@
 ---
 title: usePersistWithFeedback
-sidebar_label: usePersistWithFeedback
 ---
 
 # usePersistWithFeedback
 
 ## Overview
-`usePersistWithFeedback` lets you persist Contember data and show automatic toast notifications.  
+`usePersistWithFeedback` lets you persist Contember data and show automatic toast notifications.
 The hook returns a callback that saves pending mutations, then shows a success or error message.
 
 ## Styling Guidelines
-* All examples use Tailwind.  
+* All examples use Tailwind.
 * The hook itself needs no Contember‑specific theme classes.
 
 ## Core Concepts
@@ -69,7 +68,7 @@ export const FormFooter = () => {
   )
 }
 ```
-The footer warns users that data lives only in the browser.  
+The footer warns users that data lives only in the browser.
 `persistWithFeedback` flushes changes and shows a toast.
 
 ### Toolbar shortcut
@@ -97,8 +96,8 @@ You wire the hook to a keyboard shortcut, improving editor ergonomics.
 * Do not wrap the hook in conditionals; follow React Rules of Hooks.
 
 ## Further Reading
-* `usePersist` – low‑level variant without toasts.  
-* Contember Toast API.  
+* `usePersist` – low‑level variant without toasts.
+* Contember Toast API.
 * Data mutations and transaction queue.
 
 <!-- End of Generated Documentation -->

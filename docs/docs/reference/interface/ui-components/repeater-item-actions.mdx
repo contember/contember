@@ -1,6 +1,5 @@
 ---
 title: RepeaterItemActions
-sidebar_label: RepeaterItemActions
 ---
 <!-- Examples count: 3 -->
 
@@ -8,17 +7,17 @@ sidebar_label: RepeaterItemActions
 # RepeaterItemActions
 
 ## Overview
-`RepeaterItemActions` wraps buttons or menus that act on a single repeater item.  
+`RepeaterItemActions` wraps buttons or menus that act on a single repeater item.
 Place it in the upper‑right corner of each item to keep actions consistent and discoverable.
 
 ## Styling Guidelines
-* All snippets use Tailwind CSS.  
+* All snippets use Tailwind CSS.
 * The default Contember admin theme already styles the container; no extra theme classes are required.
 
 ## Core Concepts
-* Repeater items need a unified action area.  
-* `RepeaterItemActions` renders its children inline.  
-* Combine it with `RepeaterRemoveItemButton` or custom dropdowns.  
+* Repeater items need a unified action area.
+* `RepeaterItemActions` renders its children inline.
+* Combine it with `RepeaterRemoveItemButton` or custom dropdowns.
 * Position the component inside a `DefaultRepeater` item layout.
 
 ## Quick Start
@@ -41,7 +40,7 @@ _None_
 |------|------|----------|---------|-------------|
 | _None_ | | | | |
 
-_Inherited props_  
+_Inherited props_
 _None_
 
 ## Sub-Components / Building Blocks
@@ -103,14 +102,14 @@ Built‑in button that deletes the current repeater item. Place it inside `Repea
 When the list is static (`orderBy` only), the action area remains the interaction hub for each row.
 
 ## Best Practices & Gotchas
-* Keep only essential controls in the action area to avoid clutter.  
-* Use `className="flex gap-2"` for predictable spacing.  
-* Avoid nesting complex forms inside `RepeaterItemActions`; keep interactions simple.  
+* Keep only essential controls in the action area to avoid clutter.
+* Use `className="flex gap-2"` for predictable spacing.
+* Avoid nesting complex forms inside `RepeaterItemActions`; keep interactions simple.
 * Pair destructive actions with confirmation if data loss is possible.
 
 ## Further Reading
-* `DefaultRepeater` – parent list component.  
-* `RepeaterRemoveItemButton` – common destructive action.  
-* Contember Repeater guide in the docs.  
+* `DefaultRepeater` – parent list component.
+* `RepeaterRemoveItemButton` – common destructive action.
+* Contember Repeater guide in the docs.
 
 <!-- End of Generated Documentation -->

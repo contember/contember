@@ -1,6 +1,5 @@
 ---
 title: baseEditorPlugins
-sidebar_label: baseEditorPlugins
 ---
 <!-- Examples count: 1 -->
 
@@ -8,20 +7,20 @@ sidebar_label: baseEditorPlugins
 # baseEditorPlugins
 
 ## Overview
-`baseEditorPlugins` bundles the default plugin set for Contember’s Slate‑powered rich‑text editors.  
+`baseEditorPlugins` bundles the default plugin set for Contember’s Slate‑powered rich‑text editors.
 The collection covers structural elements (paragraphs, headings, tables) and common inline formatting (bold, code, underline).
 
 You import it once and cherry‑pick only the plugins you need. This keeps every editor lean and predictable.
 
 ## Styling Guidelines
-* All code samples use Tailwind CSS utility classes.  
+* All code samples use Tailwind CSS utility classes.
 * Renderer outputs follow Contember’s default prose theme (`prose`, `prose-headings`, `prose-code`).
 
 ## Core Concepts
-* Plugins map Slate nodes or marks to React renderers.  
-* You compose an editor by passing an array of plugins.  
-* Structural plugins render block elements; inline plugins add text styles.  
-* Order in the `plugins` array does not matter—each plugin registers itself.  
+* Plugins map Slate nodes or marks to React renderers.
+* You compose an editor by passing an array of plugins.
+* Structural plugins render block elements; inline plugins add text styles.
+* Order in the `plugins` array does not matter—each plugin registers itself.
 * Renderers rely on Tailwind’s `prose` classes for typography.
 
 ## Quick Start
@@ -89,7 +88,7 @@ Default text block. Uses `ParagraphRenderer`.
 Renders `h1`–`h6` via `HeadingRenderer`.
 
 ### list
-Renders ordered and unordered lists.  
+Renders ordered and unordered lists.
 Includes `ListItemRenderer`, `OrderedListRenderer`, `UnorderedListRenderer`.
 
 ### horizontalRule
@@ -165,15 +164,15 @@ Enable code snippets inside list items:
 You can now paste code inside bullet points without breaking formatting.
 
 ## Best Practices & Gotchas
-* Include only the plugins you need to avoid bloat.  
-* Add `horizontalRule` only if your typography design supports `<hr>`.  
-* Always pair link toolbar buttons with the `anchor` plugin.  
-* Tables need custom CSS for overflow on mobile.  
+* Include only the plugins you need to avoid bloat.
+* Add `horizontalRule` only if your typography design supports `<hr>`.
+* Always pair link toolbar buttons with the `anchor` plugin.
+* Tables need custom CSS for overflow on mobile.
 * Do not mix `newline` and `paragraph` for long texts; pick one.
 
 ## Further Reading
-* `RichTextEditor` component  
-* `EditorInlineToolbar` and `EditorBlockToolbar`  
-* Slate.js plugin architecture  
+* `RichTextEditor` component
+* `EditorInlineToolbar` and `EditorBlockToolbar`
+* Slate.js plugin architecture
 
 <!-- End of Generated Documentation -->

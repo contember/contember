@@ -1,6 +1,5 @@
 ---
 title: RepeaterDropIndicator
-sidebar_label: RepeaterDropIndicator
 ---
 <!-- Examples count: 2 -->
 
@@ -8,17 +7,17 @@ sidebar_label: RepeaterDropIndicator
 # RepeaterDropIndicator
 
 ## Overview
-`RepeaterDropIndicator` shows users where a dragged repeater item will land.  
+`RepeaterDropIndicator` shows users where a dragged repeater item will land.
 It positions itself **before** or **after** the current item based on the `position` prop.
 
 ## Styling Guidelines
-* All examples use Tailwind CSS utility classes.  
+* All examples use Tailwind CSS utility classes.
 * The component needs no special Contember theme classes.
 
 ## Core Concepts
-* Drop indicators improve drag‑and‑drop clarity.  
-* `position` decides if the line renders above or below the item.  
-* You use the indicator inside sortable repeater items.  
+* Drop indicators improve drag‑and‑drop clarity.
+* `position` decides if the line renders above or below the item.
+* You use the indicator inside sortable repeater items.
 * The component itself is visual only; it holds no logic.
 
 ## Quick Start
@@ -35,7 +34,7 @@ export const SimpleDropZone = () => (
 ```
 
 ## Detailed Guide
-Place the indicator at both ends of every sortable item.  
+Place the indicator at both ends of every sortable item.
 Wrap the whole row in `relative` so the absolutely positioned line anchors correctly.
 
 ```tsx
@@ -89,9 +88,9 @@ _None_
 	</RepeaterCurrentEntityContext.Provider>
 </Entity>
 ```
-Explanation:  
-* `relative` ensures the indicator spans the full item width.  
-* Two instances cover both insertion points.  
+Explanation:
+* `relative` ensures the indicator spans the full item width.
+* Two instances cover both insertion points.
 * Context providers keep the item reactive to order changes.
 
 ### Same Editor Pattern With Explicit Path Lookup
@@ -115,19 +114,19 @@ Explanation:
 	</RepeaterCurrentEntityContext.Provider>
 </Entity>
 ```
-Explanation:  
-* Demonstrates recalculating the Slate path before rendering.  
-* The indicator usage stays identical; only surrounding logic differs.  
+Explanation:
+* Demonstrates recalculating the Slate path before rendering.
+* The indicator usage stays identical; only surrounding logic differs.
 
 ## Best Practices & Gotchas
-* Render both **before** and **after** indicators for consistent UX.  
-* Wrap the parent with `relative` positioning.  
-* Keep the indicator thin and contrasting.  
+* Render both **before** and **after** indicators for consistent UX.
+* Wrap the parent with `relative` positioning.
+* Keep the indicator thin and contrasting.
 * Do not attach drag logic to the indicator itself.
 
 ## Further Reading
-* `RepeaterSortableItemActivator` – handle for dragging.  
-* `RepeaterSortableItemNode` – wrapper that receives sortable props.  
+* `RepeaterSortableItemActivator` – handle for dragging.
+* `RepeaterSortableItemNode` – wrapper that receives sortable props.
 * `useSortable` – hook powering the reorder logic.
 
 <!-- End of Generated Documentation -->

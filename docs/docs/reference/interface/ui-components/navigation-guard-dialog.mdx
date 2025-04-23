@@ -1,16 +1,15 @@
 ---
 title: NavigationGuardDialog
-sidebar_label: NavigationGuardDialog
 ---
 
 # NavigationGuardDialog
 
 ## Overview
-`NavigationGuardDialog` prompts users before they leave a page with unsaved changes.  
+`NavigationGuardDialog` prompts users before they leave a page with unsaved changes.
 It works with `useBlockNavigationOnDirtyState` to avoid accidental data loss.
 
 ## Styling Guidelines
-* All examples use Tailwind CSS.  
+* All examples use Tailwind CSS.
 * No special Contember theme classes are required.
 
 ## Core Concepts
@@ -64,7 +63,7 @@ export const ArticleEditor = () => {
 	)
 }
 ```
-The textarea sets the page to a “dirty” state.  
+The textarea sets the page to a “dirty” state.
 Trying to navigate away triggers `NavigationGuardDialog`.
 
 ## Best Practices & Gotchas
@@ -74,7 +73,7 @@ Trying to navigate away triggers `NavigationGuardDialog`.
 * Do not rely on browser “beforeunload” alone; users may have it disabled.
 
 ## Further Reading
-* `useBlockNavigationOnDirtyState` hook  
-* Form handling with Contember  
+* `useBlockNavigationOnDirtyState` hook
+* Form handling with Contember
 
 <!-- End of Generated Documentation -->

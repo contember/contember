@@ -1,6 +1,5 @@
 ---
 title: BlockEditorField
-sidebar_label: BlockEditorField
 ---
 
 <!-- Edited by human: false -->
@@ -9,21 +8,21 @@ sidebar_label: BlockEditorField
 ## BlockEditorField
 
 ### Overview
-BlockEditorField is a rich‑text editor that lets you create structured content with drag‑and‑drop blocks.  
+BlockEditorField is a rich‑text editor that lets you create structured content with drag‑and‑drop blocks.
 It integrates Slate.js, supports entity references, and exposes an extensible plugin system.
 
 The component stores your content in one field, references in another, and discriminates reference types through a third field. It handles collision detection and measurements for smooth block reordering.
 
 ### Styling Guidelines
-* All examples use Tailwind classes.  
+* All examples use Tailwind classes.
 * The editor itself needs no special Contember theme classes out of the box.
 
 ### Core Concepts
-* **Blocks** – Self‑contained content chunks like images or quotes.  
-* **Entity references** – Links to other entities stored in `referencesField`.  
-* **Discrimination field** – Distinguishes reference types (`referenceDiscriminationField`).  
-* **Plugins** – Extend the editor with custom elements or marks.  
-* **Toolbars** – Inline and block toolbars expose triggers for marks, elements, and references.  
+* **Blocks** – Self‑contained content chunks like images or quotes.
+* **Entity references** – Links to other entities stored in `referencesField`.
+* **Discrimination field** – Distinguishes reference types (`referenceDiscriminationField`).
+* **Plugins** – Extend the editor with custom elements or marks.
+* **Toolbars** – Inline and block toolbars expose triggers for marks, elements, and references.
 * **Drag‑and‑drop** – Reorder blocks visually; order is saved automatically.
 
 ### Quick Start
@@ -82,7 +81,7 @@ export const ArticleEditor = () => (
 	{/* toolbars & blocks */}
 </BlockEditorField>
 ```
-* Register an element or mark inside the `plugins` array.  
+* Register an element or mark inside the `plugins` array.
 * Each function receives the Slate editor instance.
 
 #### Separating inline and block toolbars
@@ -278,17 +277,17 @@ Adds quote references, scroll targets, and horizontal rules to the toolbar.
 Shows nested blocks, embed handlers, and sortable ordering—ideal for media‑rich pages.
 
 ### Best Practices & Gotchas
-* Always pass `referencesField` and `referenceDiscriminationField`; the editor fails without them.  
-* Keep `plugins` pure; avoid side effects outside the Slate editor instance.  
-* Wrap toolbar buttons in Contember triggers; plain buttons will not modify the editor.  
-* Store only serializable data in `field`; avoid functions or DOM nodes.  
-* Use Tailwind utilities like `prose` to style the output consistently.  
+* Always pass `referencesField` and `referenceDiscriminationField`; the editor fails without them.
+* Keep `plugins` pure; avoid side effects outside the Slate editor instance.
+* Wrap toolbar buttons in Contember triggers; plain buttons will not modify the editor.
+* Store only serializable data in `field`; avoid functions or DOM nodes.
+* Use Tailwind utilities like `prose` to style the output consistently.
 * Re‑rendering the parent component resets toolbar selection; memoize large toolbars if needed.
 
 ### Further Reading
-* EditorBlock  
-* EditorInlineToolbar  
-* RichTextField & RichTextView  
-* Contember Slate Plugin API  
+* EditorBlock
+* EditorInlineToolbar
+* RichTextField & RichTextView
+* Contember Slate Plugin API
 
 <!-- End of Generated Documentation -->

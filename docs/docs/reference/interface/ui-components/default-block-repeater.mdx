@@ -1,6 +1,5 @@
 ---
 title: DefaultBlockRepeater
-sidebar_label: DefaultBlockRepeater
 ---
 
 <!-- Edited by human: false -->
@@ -9,18 +8,18 @@ sidebar_label: DefaultBlockRepeater
 # DefaultBlockRepeater
 
 ## Overview
-`DefaultBlockRepeater` lets you create and manage repeatable content blocks inside a Contember form.  
+`DefaultBlockRepeater` lets you create and manage repeatable content blocks inside a Contember form.
 You can edit blocks inline or switch to a dual‑mode that opens a dedicated form for each block.
 
 ## Styling Guidelines
-* All examples use Tailwind for layout and spacing.  
+* All examples use Tailwind for layout and spacing.
 * No special Contember theme classes are required—apply your own Tailwind utilities.
 
 ## Core Concepts
-* Define a collection of blocks with the `field` (or `entities`) prop.  
-* Provide a `discriminationField` so Contember knows which block type is stored.  
-* Use `sortableBy` to enable drag‑and‑drop reordering.  
-* Wrap each block definition in a `<Block>` element.  
+* Define a collection of blocks with the `field` (or `entities`) prop.
+* Provide a `discriminationField` so Contember knows which block type is stored.
+* Use `sortableBy` to enable drag‑and‑drop reordering.
+* Wrap each block definition in a `<Block>` element.
 * Inline edit = only `children`. Dual‑mode = both `form` and `children`.
 
 ## Quick Start
@@ -54,7 +53,7 @@ _None_
 
 ## Sub-Components / Building Blocks
 ### Block
-Defines a single block type.  
+Defines a single block type.
 Props include `name`, `label`, plus optional `form` and `children` for dual‑mode editing.
 
 ### EntityView
@@ -254,16 +253,16 @@ import { DefaultBlockRepeater, Block } from '~/lib/block-repeater'
 Embed the repeater in any Contember binding context for instant persistence.
 
 ## Best Practices & Gotchas
-* Always set `discriminationField`; omission breaks block recognition.  
-* Keep block previews lightweight—avoid heavy queries inside `children`.  
-* Use Tailwind `space-y-*` utilities for vertical rhythm between blocks.  
-* When many block types share fields, extract common forms into separate components.  
+* Always set `discriminationField`; omission breaks block recognition.
+* Keep block previews lightweight—avoid heavy queries inside `children`.
+* Use Tailwind `space-y-*` utilities for vertical rhythm between blocks.
+* When many block types share fields, extract common forms into separate components.
 * Sorting relies on `sortableBy`; ensure the underlying column exists in the schema.
 
 ## Further Reading
-* Block component  
-* EntityView & StaticRender utilities  
-* Contember Form Binding basics  
+* Block component
+* EntityView & StaticRender utilities
+* Contember Form Binding basics
 * Tailwind styling in Contember UI
 
 <!-- End of Generated Documentation -->

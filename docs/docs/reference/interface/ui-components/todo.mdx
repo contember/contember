@@ -1,19 +1,18 @@
 ---
 title: Todo
-sidebar_label: Todo
 ---
 
 <!-- Edited by human: false -->
 <!-- Examples count: 1 -->
 
 ## Overview
-`Todo` marks unfinished UI work during development.  
+`Todo` marks unfinished UI work during development.
 It renders your message in a highlighted banner only when `import.meta.env.DEV` is `true`.
 
 Use it to keep TODO notes visible without shipping them to production.
 
 ## Styling Guidelines
-* All examples use Tailwind classes.  
+* All examples use Tailwind classes.
 * `Todo` does not require Contember theme classes, but you can add any Tailwind utilities.
 
 ## Core Concepts
@@ -33,7 +32,7 @@ export const Dashboard = () => (
 ```
 
 ## Detailed Guide
-When `import.meta.env.DEV` is `false`, `Todo` returns `null` and renders nothing.  
+When `import.meta.env.DEV` is `false`, `Todo` returns `null` and renders nothing.
 This keeps production bundles clean.
 
 ```tsx
@@ -82,13 +81,13 @@ export const PaymentSettings = () => (
 The note appears only in development, reminding you to finish payment integration.
 
 ## Best Practices & Gotchas
-* Wrap only short, actionable messages.  
-* Remove or resolve each TODO before release.  
-* Style with Tailwind to match your design system.  
+* Wrap only short, actionable messages.
+* Remove or resolve each TODO before release.
+* Style with Tailwind to match your design system.
 * Do not rely on `Todo` for runtime feature flags; use proper environment checks instead.
 
 ## Further Reading
-* Contember “Environment Detection” guide  
-* React conditional rendering patterns  
+* Contember “Environment Detection” guide
+* React conditional rendering patterns
 
 <!-- End of Generated Documentation -->

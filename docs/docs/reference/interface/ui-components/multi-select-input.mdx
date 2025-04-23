@@ -3,6 +3,9 @@ title: MultiSelectInput
 sidebar_label: MultiSelectInput
 ---
 
+<!-- Edited by human: false -->
+<!-- Examples count: 1 -->
+
 # MultiSelectInput
 
 ## Overview
@@ -10,12 +13,12 @@ sidebar_label: MultiSelectInput
 You can filter, sort, and even create new entities without leaving the form.
 
 ## Styling Guidelines
-* All snippets use Tailwind for layout and spacing.  
+* All examples use Tailwind for spacing and width.  
 * No special Contember theme classes are required.
 
 ## Core Concepts
-* Select multiple entities in one form field.  
-* Filter option list with Contember query operators.  
+* Select multiple entities in one field.  
+* Filter the option list with Contember query operators.  
 * Sort options ascending or descending.  
 * Render an inline form to create a missing entity.
 
@@ -37,11 +40,11 @@ import { MultiSelectInput, Field } from '@contember/admin'
 ```
 
 ## Detailed Guide
-1. Pass the `field` prop with the relation name (e.g., `"tags"`).  
-2. Provide `options` as an array of Contember filter objects with `label`.  
+1. Pass `field` with the relation name (e.g., `"tags"`).  
+2. Provide `options` as an array of filter objects with `label`.  
 3. Add a `<Field>` child to decide what the dropdown shows.  
 4. Set `initialSorting="ASC"` or `"DESC"` when order matters.  
-5. Supply `createNewForm` with a component to enable inline creation.
+5. Supply `createNewForm` to enable inline creation.
 
 ```tsx
 <MultiSelectInput
@@ -76,7 +79,25 @@ Use any `<Field>` from `@contember/admin` as a child.
 It controls which column appears in the dropdown.
 
 ## Examples
-### Inline tag creation
+### Basic usage with inline entity creation
+```tsx
+<MultiSelectInput
+  field="tags"
+  placeholder="Select tags"
+  options={[
+    { field: 'id', operator: 'eq', value: '1', label: 'Tag 1' },
+    { field: 'id', operator: 'eq', value: '2', label: 'Tag 2' },
+  ]}
+  createNewForm={<div>Form to create a new tag</div>}
+  initialSorting="ASC"
+  className="w-full"
+>
+  <Field field="name" />
+</MultiSelectInput>
+```
+Users pick existing tags or add a new one without leaving the dropdown.
+
+### Inline tag creation with custom form
 ```tsx
 <MultiSelectInput
   field="tags"
@@ -86,7 +107,7 @@ It controls which column appears in the dropdown.
   <Field field="name" />
 </MultiSelectInput>
 ```
-The form appears inside the dropdown when users need a new tag.
+The custom form appears inside the dropdown when users need a new tag.
 
 ### Server‑side filtered list
 ```tsx
@@ -100,17 +121,17 @@ The form appears inside the dropdown when users need a new tag.
   <Field field="title" />
 </MultiSelectInput>
 ```
-You limit choices to in‑stock products for faster selection.
+The component offers only in‑stock products, improving selection speed.
 
 ## Best Practices & Gotchas
-* Keep `options` small to avoid long network requests.  
+* Keep `options` small to avoid long requests.  
 * Always add a `<Field>` child or the dropdown shows raw IDs.  
-* Use `createNewForm` sparingly; too many inline forms overwhelm users.  
-* Wrap long labels with Tailwind `truncate` to keep the list tidy.
+* Use `createNewForm` sparingly; too many forms overwhelm users.  
+* Apply Tailwind `truncate` to wrap long labels.
 
 ## Further Reading
-* `SelectInput` – single value variant.  
-* Contember Filters – building complex option queries.  
-* Form Blocks – composing reusable inline creation forms.
+* `SelectInput` – single‑value variant.  
+* Contember Filters – build complex option queries.  
+* Form Blocks – compose reusable inline creation forms.
 
 <!-- End of Generated Documentation -->

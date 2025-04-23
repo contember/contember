@@ -3,6 +3,9 @@ title: DefaultBlockRepeater
 sidebar_label: DefaultBlockRepeater
 ---
 
+<!-- Edited by human: false -->
+<!-- Examples count: 3 -->
+
 # DefaultBlockRepeater
 
 ## Overview
@@ -37,7 +40,7 @@ import { DefaultBlockRepeater, Block } from '~/lib/block-repeater'
 ```
 
 ## Detailed Guide
-_Optional section omitted._
+_None_
 
 ## Props Reference
 | Name | Type | Required | Default | Description |
@@ -63,6 +66,8 @@ Outputs static content (e.g., a colour field) without entering edit mode.
 ## Examples
 ### Dual‑mode repeater with four block types
 ```tsx
+import { DefaultBlockRepeater, Block } from '~/lib/block-repeater'
+
 <DefaultBlockRepeater field="blocks" sortableBy="order" discriminationField="type">
   <Block
     name="text"
@@ -73,32 +78,175 @@ Outputs static content (e.g., a colour field) without entering edit mode.
         <TextareaField field="content" label="Content" />
       </>
     }
+    children={
+      <>
+        <div className="flex">
+          <div className="w-64 space-y-2">
+            <h2 className="text-xl font-bold">
+              <Field field="title" />
+            </h2>
+            <p>
+              <Field field="content" />
+            </p>
+          </div>
+        </div>
+      </>
+    }
+  />
+
+  <Block
+    name="image"
+    label={<><ImageIcon /> Image</>}
+    form={
+      <>
+        <InputField field="title" label="Title" />
+        <ImageField baseField="image" urlField="url" label="Image" />
+      </>
+    }
+    children={
+      <>
+        <div className="flex">
+          <div className="flex flex-col gap-2">
+            <div className="space-y-2">
+              <h2 className="text-xl font-bold">
+                <Field field="title" />
+              </h2>
+              <div className="border">
+                <HasOne field="image">
+                  <UploadedImageView urlField="url" />
+                </HasOne>
+              </div>
+            </div>
+          </div>
+        </div>
+      </>
+    }
+  />
+
+  <Block
+    name="textWithImage"
+    label={<><ColumnsIcon /> Image with text</>}
+    form={
+      <>
+        <InputField field="title" label="Title" />
+        <TextareaField field="content" label="Content" />
+        <ImageField baseField="image" urlField="url" label="Image" />
+        <RadioEnumField field="imagePosition" options={{ left: 'Left', right: 'Right' }} />
+      </>
+    }
   >
-    {/* Preview */}
-    <h2 className="text-xl font-bold"><Field field="title" /></h2>
-    <p><Field field="content" /></p>
+    <EntityView
+      render={it => (
+        <div className="flex">
+          <div
+            className={cn(
+              'border border-gray-200',
+              it.getField('imagePosition').value === 'right' ? 'order-2' : '',
+            )}
+          >
+            <HasOne field="image">
+              <UploadedImageView urlField="url" />
+            </HasOne>
+          </div>
+          <div className="w-64 px-4 space-y-2">
+            <h2 className="text-xl font-bold">
+              <Field field="title" />
+            </h2>
+            <p>
+              <Field field="content" />
+            </p>
+          </div>
+        </div>
+      )}
+    />
   </Block>
 
-  {/* Additional blocks: image, textWithImage, hero */}
-  {/* ...see source for full code... */}
+  <Block
+    name="hero"
+    label={<><AlertOctagonIcon /> Hero</>}
+    form={
+      <>
+        <InputField field="title" label="Title" />
+        <TextareaField field="content" label="Content" />
+        <InputField field="color" label="Color" inputProps={{ type: 'color' }} />
+      </>
+    }
+  >
+    <StaticRender>
+      <Field field="color" />
+    </StaticRender>
+    <EntityView
+      render={it => (
+        <div className="flex">
+          <div
+            className="w-96 p-4 gap-2 flex flex-col items-center"
+            style={{
+              backgroundColor: it.getField<string>('color').value ?? undefined,
+              color: getTextColor(it.getField<string>('color').value ?? ''),
+            }}
+          >
+            <h2 className="text-4xl font-bold">
+              <Field field="title" />
+            </h2>
+            <p className="text-xl">
+              <Field field="content" />
+            </p>
+          </div>
+        </div>
+      )}
+    />
+  </Block>
 </DefaultBlockRepeater>
 ```
 Use this pattern when authors need a focused form for each block.
 
 ### Inline‑only repeater in a persisted entity tree
 ```tsx
+import { DefaultBlockRepeater, Block } from '~/lib/block-repeater'
+
 <Binding>
+  <Slots.Title>
+    <Title>Repeater: Block repeater w/o dual render</Title>
+  </Slots.Title>
+
+  <Slots.Actions>
+    <PersistButton />
+  </Slots.Actions>
+
   <EntitySubTree entity="BlockList(unique = unique)" setOnCreate="(unique = unique)">
-    <DefaultBlockRepeater
-      field="blocks"
-      sortableBy="order"
-      discriminationField="type"
-    >
+    <DefaultBlockRepeater field="blocks" sortableBy="order" discriminationField="type">
       <Block name="text" label={<><TextIcon /> Text</>}>
         <InputField field="title" label="Title" />
         <TextareaField field="content" label="Content" />
       </Block>
-      {/* ...other blocks... */}
+
+      <Block name="image" label={<><ImageIcon /> Image</>}>
+        <InputField field="title" label="Title" />
+        <ImageField baseField="image" urlField="url" label="Image" />
+      </Block>
+
+      <Block
+        name="textWithImage"
+        label={
+          <>
+            <span className="inline-flex gap-1">
+              <ImageIcon /> <TextIcon />
+            </span>
+            Image with text
+          </>
+        }
+      >
+        <InputField field="title" label="Title" />
+        <TextareaField field="content" label="Content" />
+        <ImageField baseField="image" urlField="url" label="Image" />
+        <RadioEnumField field="imagePosition" options={{ left: 'Left', right: 'Right' }} />
+      </Block>
+
+      <Block name="hero" label={<><AlertOctagonIcon /> Hero</>}>
+        <InputField field="title" label="Title" />
+        <TextareaField field="content" label="Content" />
+        <InputField field="color" label="Color" inputProps={{ type: 'color' }} />
+      </Block>
     </DefaultBlockRepeater>
   </EntitySubTree>
 </Binding>

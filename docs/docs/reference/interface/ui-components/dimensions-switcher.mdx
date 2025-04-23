@@ -3,13 +3,16 @@ title: DimensionsSwitcher
 sidebar_label: DimensionsSwitcher
 ---
 
+<!-- Edited by human: false -->
+<!-- Examples count: 3 -->
+
 # DimensionsSwitcher
 
 ## Overview
-`DimensionsSwitcher` lets you switch between multiple data dimensions (for example, languages or markets).  
-You provide an entity list, slug field, and child fields; the component renders selectable options.
+`DimensionsSwitcher` lets you switch between multiple data dimensions such as languages or markets.  
+You provide an entity list, a slug field, and child fields; the component renders selectable options.
 
-It supports optional initial sorting and multi‑selection, making it suitable for both simple and complex editing screens.
+It supports optional initial sorting and multi‑selection, so you can handle both simple and complex editing screens.
 
 ## Styling Guidelines
 * All examples use Tailwind CSS utility classes.  
@@ -17,7 +20,7 @@ It supports optional initial sorting and multi‑selection, making it suitable f
 * No special Contember theme classes are required.
 
 ## Core Concepts
-* Dimension – arbitrary context key (e.g., `locale`) stored in Contember dimensions.
+* Dimension – arbitrary context key (for example, `locale`) stored in Contember dimensions.
 * `options` – entity list supplying selectable records.
 * `slugField` – unique identifier field of each option.
 * Child fields – what renders inside each option (commonly a `Field` component).
@@ -57,7 +60,19 @@ _None_
 
 ## Examples
 
-### 1. Sorted, Multi‑Select Locale Switcher
+### 1. Basic Locale Switcher
+```tsx
+<DimensionsSwitcher
+  dimension="locale"
+  slugField="code"
+  options="DimensionsLocale"
+>
+  <Field field="label" />
+</DimensionsSwitcher>
+```
+You render a simple list of locales. The user can switch the current locale with one click.
+
+### 2. Sorted, Multi‑Select Locale Switcher
 ```tsx
 <DimensionsSwitcher
   dimension="locale"
@@ -69,36 +84,61 @@ _None_
   <Field field="label" />
 </DimensionsSwitcher>
 ```
-The user can pick several locales, ordered alphabetically descending by label.
+You allow selecting several locales. Options are sorted alphabetically descending by label.
 
-### 2. Editing Localised Content with SideDimensions
+### 3. Full Page Integration with SideDimensions
 ```tsx
-<Binding>
-  <EntitySubTree entity="DimensionsItem(unique = unique)">
-    <SideDimensions
-      dimension="locale"
-      as="currentLocale"
-      field="locales(locale.code = $currentLocale)"
-    >
-      <Card>
-        <CardHeader>
-          <CardTitle><Variable name="currentLocale" /></CardTitle>
-        </CardHeader>
-        <CardContent>
-          <InputField field="title" />
-          <TextareaField field="content" />
-        </CardContent>
-      </Card>
-    </SideDimensions>
-  </EntitySubTree>
-</Binding>
+<>
+  <Slots.Title>
+    <Title icon={<LanguagesIcon />}>Dimensions</Title>
+  </Slots.Title>
+
+  <Binding>
+    <div>
+      <DimensionsSwitcher
+        options="DimensionsLocale"
+        slugField="code"
+        dimension="locale"
+        isMulti
+      >
+        <Field field="label" />
+      </DimensionsSwitcher>
+    </div>
+  </Binding>
+
+  <Binding>
+    <Slots.Actions>
+      <PersistButton />
+    </Slots.Actions>
+
+    <EntitySubTree entity="DimensionsItem(unique = unique)">
+      <SideDimensions
+        dimension="locale"
+        as="currentLocale"
+        field="locales(locale.code = $currentLocale)"
+      >
+        <Card>
+          <CardHeader>
+            <CardTitle><Variable name="currentLocale" /></CardTitle>
+          </CardHeader>
+
+          <CardContent>
+            <InputField field="title" />
+            <TextareaField field="content" />
+          </CardContent>
+        </Card>
+      </SideDimensions>
+    </EntitySubTree>
+  </Binding>
+</>
 ```
-You combine `DimensionsSwitcher` with `SideDimensions` to edit per‑locale fields while switching locales in real time.
+You combine `DimensionsSwitcher` with `SideDimensions`, `PersistButton`, and header slots.  
+Users pick one or more locales, edit locale‑specific fields, and persist changes.
 
 ## Best Practices & Gotchas
 * Always pass a stable `slugField`; unreliable slugs break selection tracking.
 * Wrap the component in Tailwind layouts instead of adding props that do not exist.
-* Use `orderBy` sparingly; client sorting can confuse users if server returns different order.
+* Use `orderBy` sparingly; client sorting can confuse users if the server returns a different order.
 * Enable `isMulti` only when downstream components understand multiple dimension values.
 
 ## Further Reading

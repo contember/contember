@@ -3,6 +3,9 @@ title: SideDimensions
 sidebar_label: SideDimensions
 ---
 
+<!-- Edited by human: false -->
+<!-- Examples count: 3 -->
+
 ## Overview
 `SideDimensions` renders content for a single dimension inside a flexible side panel.  
 It wraps your fields with `DimensionRenderer` and a `HasOne` relationship, so you can edit translated or versioned data in isolation.
@@ -49,34 +52,53 @@ _None_
 
 ## Examples
 
-### Side panel translation editor
+### Full translation editor with locale switcher
 ```tsx
-<Binding>
-  <EntitySubTree entity="Article(unique = unique)">
-    <SideDimensions
-      dimension="locale"
-      as="currentLocale"
-      field="locales(locale.code = $currentLocale)"
-    >
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle>
-            <Variable name="currentLocale" />
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <InputField field="title" />
-          <TextareaField field="content" />
-        </CardContent>
-      </Card>
-    </SideDimensions>
-  </EntitySubTree>
-</Binding>
+<>
+  <Slots.Title>
+    <Title icon={<LanguagesIcon />}>Dimensions</Title>
+  </Slots.Title>
+
+  <Binding>
+    <div>
+      <DimensionsSwitcher
+        options="DimensionsLocale"
+        slugField="code"
+        dimension="locale"
+        isMulti
+      >
+        <Field field="label" />
+      </DimensionsSwitcher>
+    </div>
+  </Binding>
+
+  <Binding>
+    <Slots.Actions><PersistButton /></Slots.Actions>
+    <EntitySubTree entity="DimensionsItem(unique = unique)">
+      <SideDimensions
+        dimension="locale"
+        as="currentLocale"
+        field="locales(locale.code = $currentLocale)"
+      >
+        <Card>
+          <CardHeader>
+            <CardTitle><Variable name="currentLocale" /></CardTitle>
+          </CardHeader>
+          <CardContent>
+            <InputField field="title" />
+            <TextareaField field="content" />
+          </CardContent>
+        </Card>
+      </SideDimensions>
+    </EntitySubTree>
+  </Binding>
+</>
 ```
-The component:
-* Switches the `Article` translation by locale.  
-* Binds `currentLocale` for display in the header.  
-* Lets you edit `title` and `content` for each locale separately.
+Explanation  
+* `DimensionsSwitcher` lets users pick one or more locales.  
+* `SideDimensions` renders the form for the selected locale only.  
+* `currentLocale` is available for headings or conditional logic.  
+* The layout remains isolated inside a card.
 
 ### Environment middleware with inline heading
 ```tsx
@@ -92,8 +114,27 @@ The component:
     <ArticleLocaleForm />
   </SideDimensions>
 </EnvironmentMiddleware>
+
+<DefaultRepeater field="notes" orderBy="createdAt" initialEntityCount={1}>
+  <ArticleNoteForm />
+</DefaultRepeater>
+
+<Slots.Sidebar>
+  <InputField field="internalName" required />
+  <CheckboxField field="locked" />
+  <InputField field="publishedAt" />
+  <MultiSelectField field="tags" createNewForm={<ArticleTagForm />}>
+    <Field field="name" />
+  </MultiSelectField>
+  <SelectField field="author" createNewForm={<ArticleAuthorForm />}>
+    <Field field="name" />
+  </SelectField>
+</Slots.Sidebar>
 ```
-This pattern renders locale‑specific forms while an environment middleware supplies both available locales.
+Explanation  
+* The environment middleware pre‑loads both locales.  
+* `SideDimensions` switches the locale form without extra UI.  
+* Unrelated forms (`notes`, sidebar inputs) coexist with the dimension‑aware part.
 
 ## Best Practices & Gotchas
 * Always set both `dimension` and `as`; without `as` descendants cannot read the selected value.

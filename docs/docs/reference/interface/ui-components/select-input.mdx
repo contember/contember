@@ -3,6 +3,9 @@ title: SelectInput
 sidebar_label: SelectInput
 ---
 
+<!-- Edited by human: false -->
+<!-- Examples count: 1 -->
+
 ## Overview
 SelectInput renders a selectable input field with rich Contember features.  
 It can create new entities, validate selection, and support in‑list sorting.
@@ -56,6 +59,27 @@ _None_
 _None_
 
 ## Examples
+
+### Basic Usage with Inline Entity Creation
+```tsx
+import { SelectInput, Field } from '@contember/admin'
+
+export const CategorySelectBasic = () => (
+  <SelectInput
+    field="category"
+    placeholder="Select a category"
+    options={[
+      { field: 'id', operator: 'eq', value: '1', label: 'Option 1' },
+      { field: 'id', operator: 'eq', value: '2', label: 'Option 2' },
+    ]}
+    createNewForm={<div>Form for creating a new category</div>}
+    required
+  >
+    <Field field="label" />
+  </SelectInput>
+)
+```
+This minimal example shows you how to let users pick or create a category in one place.
 
 ### Entity Creation Workflow
 ```tsx

@@ -1,8 +1,8 @@
 import { DocsConfig } from './types'
 
 const config: DocsConfig = {
-	sourceDir: './packages/react-ui-lib/src/binding',
-	contextDir: './packages/playground/admin',
+	sourceDir: './packages/react-ui-lib/src/datagrid',
+	contextDir: '../packages/playground/admin',
 	componentFilePattern: '**/*.tsx',
 	outputDir: './docs/docs/reference/interface/ui-components',
 	ai: {

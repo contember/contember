@@ -37,7 +37,7 @@ export interface DataViewHasOneFilterProps {
  *
  * See {@link DataViewHasOneFilterProps} for details.
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <DataViewHasOneFilter field="author">
  *     //  Filter controls here 

@@ -2,11 +2,13 @@
 title: EditorBlockContent
 sidebar_label: EditorBlockContent
 ---
+<!-- Examples count: 2 -->
+
 
 # EditorBlockContent
 
 ## Overview
-`EditorBlockContent` renders the editable area inside a block.  
+`EditorBlockContent` renders the editable region inside a block.  
 It manages `contentEditable`, placeholder text, and padding so you can focus on authoring.
 
 ## Styling Guidelines
@@ -43,6 +45,18 @@ _None_
 
 ## Examples
 
+### Minimal quoted block
+```tsx
+import { EditorBlock, EditorBlockContent } from '~/lib/editor'
+
+export const MinimalQuoteBlock = () => (
+	<EditorBlock name="quote" label="Quote" className="border-l-4 pl-4">
+		<EditorBlockContent />
+	</EditorBlock>
+)
+```
+This mirrors playground usage. You get inline editing without extra styling complexity.
+
 ### Quoted block with custom background
 ```tsx
 import {
@@ -60,7 +74,7 @@ export const QuoteBlock = () => (
 	</EditorBlock>
 )
 ```
-The block gets left border styling, while `EditorBlockContent` handles inline editing and placeholder logic.
+The block gets left‑border styling, while `EditorBlockContent` handles inline editing and placeholder logic.
 
 ## Best Practices & Gotchas
 * Wrap `EditorBlockContent` only inside `EditorBlock`.

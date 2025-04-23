@@ -3,13 +3,16 @@ title: RichTextField
 sidebar_label: RichTextField
 ---
 
+<!-- Edited by human: false -->
+<!-- Examples count: 3 -->
+
 # RichTextField
 
 ## Overview
 RichTextField embeds a rich‑text editor into a Contember form.  
 It integrates with Contember’s field management and offers basic formatting like bold, italic, and code.
 
-The editor is plugin‑based, supports custom placeholders, and becomes read‑only during ongoing mutations.
+The editor relies on a plugin architecture, supports custom placeholders, and becomes read‑only during ongoing mutations.
 
 ## Styling Guidelines
 * All code samples use Tailwind CSS.  
@@ -20,6 +23,7 @@ The editor is plugin‑based, supports custom placeholders, and becomes read‑o
 * Plugin architecture for marks, elements, and toolbars.
 * Read‑only lock while the form mutates.
 * Optional custom placeholder text.
+* Toolbar triggers must sit inside the editor to get context.
 
 ## Quick Start
 ```tsx
@@ -35,7 +39,14 @@ import {
 	EditorInlineToolbar,
 	EditorMarkTrigger,
 } from '~/lib/editor'
-import { BoldIcon, ItalicIcon, underlineMark, italicMark, boldMark } from '~/icons'
+import {
+	BoldIcon,
+	ItalicIcon,
+	UnderlineIcon,
+	boldMark,
+	italicMark,
+	underlineMark,
+} from '~/icons'
 
 <RichTextField
 	field="articleBody"
@@ -58,7 +69,7 @@ import { BoldIcon, ItalicIcon, underlineMark, italicMark, boldMark } from '~/ico
 ## Props Reference
 | Name | Type | Required | Default | Description |
 |------|------|----------|---------|-------------|
-| field | string &#124; { field: string; hasOneRelationPath?: SugarableHasOneRelation \| SugarableHasOneRelation[] } | Yes | — | Form field name for storing content |
+| field | string &#124; { field: string; hasOneRelationPath?: SugarableHasOneRelation \| SugarableHasOneRelation[] } | Yes | — | Form field name for storing content |
 | label | React.ReactNode | Yes | — | Visible label shown above the editor |
 | description | React.ReactNode | Yes | — | Helper text rendered below the editor |
 | errors | React.ReactNode &#124; ErrorAccessor.Error[] | Yes | — | Validation errors for the field |
@@ -100,16 +111,54 @@ Read‑only renderer for stored rich text.
 	</EntitySubTree>
 </Binding>
 ```
-This pattern stores rich text in the `body` field and instantly renders a preview.
+Stores rich text in the `body` field and instantly renders a preview.
+
+### Rich Text With Alignment and Link
+```tsx
+<Binding>
+	<Slots.Title>
+		<Title icon={<PencilIcon />}>Rich text field</Title>
+	</Slots.Title>
+
+	<Slots.Actions>
+		<PersistButton />
+	</Slots.Actions>
+
+	<EntitySubTree entity="EditorTextArea(unique = unique)" setOnCreate="(unique = unique)">
+		<div className="space-y-4">
+			<div className="max-w-md">
+				<RichTextField field="data" label="Rich text field">
+					<EditorInlineToolbar className="flex gap-2">
+						<EditorMarkTrigger mark={boldMark}><Toggle><BoldIcon className="h-3 w-3" /></Toggle></EditorMarkTrigger>
+						<EditorMarkTrigger mark={italicMark}><Toggle><ItalicIcon className="h-3 w-3" /></Toggle></EditorMarkTrigger>
+						<EditorMarkTrigger mark={underlineMark}><Toggle><UnderlineIcon className="h-3 w-3" /></Toggle></EditorMarkTrigger>
+
+						<EditorElementTrigger elementType={anchorElementType}><Toggle><LinkIcon className="h-3 w-3" /></Toggle></EditorElementTrigger>
+
+						<EditorGenericTrigger {...createAlignHandler('start')}><Toggle><AlignLeftIcon className="h-3 w-3" /></Toggle></EditorGenericTrigger>
+						<EditorGenericTrigger {...createAlignHandler('center')}><Toggle><AlignCenterIcon className="h-3 w-3" /></Toggle></EditorGenericTrigger>
+						<EditorGenericTrigger {...createAlignHandler('end')}><Toggle><AlignRightIcon className="h-3 w-3" /></Toggle></EditorGenericTrigger>
+					</EditorInlineToolbar>
+				</RichTextField>
+			</div>
+
+			<h3>Preview</h3>
+			<RichTextView field="data" />
+		</div>
+	</EntitySubTree>
+</Binding>
+```
+Adds alignment controls and a link trigger. The preview below shows the stored content in real time.
 
 ## Best Practices & Gotchas
-* Wrap toolbars inside `RichTextField` to access editor context.
+* Place toolbars inside `RichTextField` to gain editor context.
 * Keep the editor in a `max-w-*` container to control layout.
 * Avoid heavy plugins that bloat bundle size.
 * Use `RichTextView` for display—never reuse the editing component.
+* Wrap rich‑text editing inside a `Binding` context so mutations propagate.
 
 ## Further Reading
-* BlockEditorField – for block‑based editing.  
+* BlockEditorField – block‑based editing.  
 * PersistButton – saving entity data.  
 * ErrorAccessor – advanced error handling.
 

@@ -2,19 +2,21 @@
 title: RepeaterRemoveItemButton
 sidebar_label: RepeaterRemoveItemButton
 ---
+<!-- Examples count: 3 -->
+
 
 ## Overview
 `RepeaterRemoveItemButton` renders a button that removes the current repeater item.  
-It wraps `RepeaterRemoveItemTrigger`, so you can replace the default trash icon with any child element.
+It wraps `RepeaterRemoveItemTrigger`, so you can replace the default trash icon (which turns red on hover) with any child element.
 
 ## Styling Guidelines
 * All examples use Tailwind CSS.  
 * No special Contember theme classes are required; inherit your project’s design tokens.
 
 ## Core Concepts
-* Contember repeaters manage collections of entities.
-* Triggers encapsulate data mutations (add, remove, reorder).
-* `RepeaterRemoveItemButton` is a trigger shortcut wrapped in a button.
+* Contember repeaters manage collections of entities.  
+* Triggers encapsulate data mutations (add, remove, reorder).  
+* `RepeaterRemoveItemButton` is a trigger shortcut wrapped in a button.  
 * You can override the default icon by passing `children`.
 
 ## Quick Start
@@ -81,7 +83,7 @@ Low‑level trigger used by the button. Import from `~/lib/repeater` if you need
 	</RepeaterItemActions>
 </DefaultRepeater>
 ```
-The button removes the current row while the repeater stays sortable.
+The button removes the current row while the repeater remains sortable.
 
 ### Repeater on a relation field
 ```tsx
@@ -102,10 +104,23 @@ The button removes the current row while the repeater stays sortable.
 ```
 Use the same button pattern even when the repeater points to a relation.
 
+### Non‑sortable repeater
+```tsx
+<DefaultRepeater entities="RepeaterItem" orderBy="order" title="Foo items">
+	<Field field="title" />
+
+	<RepeaterItemActions className="flex gap-2">
+		{repeaterDropdown}
+		<RepeaterRemoveItemButton />
+	</RepeaterItemActions>
+</DefaultRepeater>
+```
+Even without sorting, the button cleanly removes the selected item.
+
 ## Best Practices & Gotchas
-* Keep destructive actions visually distinct (e.g., red icon).
-* Wrap the button in `RepeaterItemActions` to maintain layout.
-* Do not attach extra `onClick`; use `children` for custom UI only.
+* Keep destructive actions visually distinct (e.g., red icon).  
+* Wrap the button in `RepeaterItemActions` to maintain layout.  
+* Do not attach extra `onClick`; use `children` for custom UI only.  
 * Removing an item does not persist until you press `PersistButton`.
 
 ## Further Reading

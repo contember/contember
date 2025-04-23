@@ -2,6 +2,8 @@
 title: DefaultRepeater
 sidebar_label: DefaultRepeater
 ---
+<!-- Examples count: 6 -->
+
 
 ## Overview
 DefaultRepeater wraps `Repeater` and renders a ready‑made UI for managing a list of entities.  
@@ -23,7 +25,7 @@ It handles ordering, add/remove buttons, and item actions so you can focus on fo
 import { DefaultRepeater, RepeaterItemActions, RepeaterRemoveItemButton } from '~/lib/repeater'
 
 export const NotesForm = () => (
-	<DefaultRepeater entities="Note" sortableBy="order">
+	<DefaultRepeater entities="Note" sortableBy="order" addButtonPosition="around">
 		<InputField field="title" className="w-full" />
 		<RepeaterItemActions>
 			<RepeaterRemoveItemButton className="text-red-600" />
@@ -87,6 +89,126 @@ A single blank entity is inserted automatically, saving one click for users.
 </DefaultRepeater>
 ```
 Items follow the `createdAt` order delegated to the backend; users cannot reorder them.
+
+### Internationalized notes form
+```tsx
+<>
+	<EnvironmentMiddleware create={it => it.withDimensions({ locale: ['cs', 'en'] })}>
+		<SideDimensions dimension="locale" field="locales(locale = $currentLocale)" as="currentLocale">
+			<h2 className="text-2xl"><Variable name="currentLocale" /></h2>
+			<ArticleLocaleForm />
+		</SideDimensions>
+	</EnvironmentMiddleware>
+
+	<DefaultRepeater field="notes" orderBy="createdAt" initialEntityCount={1}>
+		<ArticleNoteForm />
+	</DefaultRepeater>
+</>
+```
+The form duplicates note editing for each locale and starts with one blank note per locale.
+
+### Admin form with server rules
+```tsx
+<Binding>
+	<Slots.Title>
+		<Title icon={<FormInputIcon />}>Server rules</Title>
+	</Slots.Title>
+
+	<Slots.Actions>
+		<PersistButton />
+	</Slots.Actions>
+
+	<DefaultRepeater entities="InputRules" orderBy="id">
+		<div className="space-y-4">
+			<InputField field="notNullValue" label="Not null" />
+			<InputField field="uniqueValue" label="Unique value" />
+			<InputField field="validationValue" label="Validation value" />
+		</div>
+	</DefaultRepeater>
+</Binding>
+```
+An admin page collects validation rules; items are ordered by `id` without drag‑and‑drop.
+
+### Sortable repeater with custom actions
+```tsx
+<Binding>
+	<Slots.Title>
+		<Title icon={<GripVertical />}>Sortable repeater</Title>
+	</Slots.Title>
+
+	<Slots.Actions>
+		<PersistButton />
+	</Slots.Actions>
+
+	<DefaultRepeater entities="RepeaterItem" sortableBy="order" title="Foo items" addButtonPosition="around">
+		<InputField field="title" />
+
+		<SelectField field="relation">
+			<Field field="id" /> /
+			<Field field="name" />
+		</SelectField>
+
+		<RepeaterItemActions>
+			{repeaterDropdown}
+			<RepeaterRemoveItemButton />
+		</RepeaterItemActions>
+	</DefaultRepeater>
+</Binding>
+```
+Users can drag items by the grip icon while dropdown and delete buttons live inside `RepeaterItemActions`.
+
+### Repeater on nested relation
+```tsx
+<Binding>
+	<Slots.Title>
+		<Title icon={<GripVertical />}>Repeater on relation</Title>
+	</Slots.Title>
+
+	<Slots.Actions>
+		<PersistButton />
+	</Slots.Actions>
+
+	<EntitySubTree entity="RepeaterRoot(unique = unique)" setOnCreate="(unique = unique)">
+		<DefaultRepeater field="items" sortableBy="order" title="Foo items" addButtonPosition="around">
+			<Field field="id" /><br/>
+			<InputField field="title" />
+			<SelectField field="relation">
+				<Field field="id" /> /
+				<Field field="name" />
+			</SelectField>
+
+			<RepeaterItemActions>
+				{repeaterDropdown}
+				<RepeaterRemoveItemButton />
+			</RepeaterItemActions>
+		</DefaultRepeater>
+	</EntitySubTree>
+</Binding>
+```
+The repeater edits a relation inside `EntitySubTree`; new items inherit the `unique` column from the parent entity.
+
+### Non‑sortable repeater with dropdown actions
+```tsx
+<Binding>
+	<Slots.Title>
+		<Title icon={<GripVertical />}>Non-sortable repeater</Title>
+	</Slots.Title>
+
+	<Slots.Actions>
+		<PersistButton />
+	</Slots.Actions>
+
+	<DefaultRepeater entities="RepeaterItem" orderBy="order" title="Foo items">
+		<Field field="title" />
+
+		<RepeaterItemActions>
+			{repeaterDropdown}
+			<RepeaterRemoveItemButton />
+		</RepeaterItemActions>
+	</DefaultRepeater>
+</Binding>
+```
+Items follow the backend order and still expose dropdown and delete actions.
 
 ## Best Practices & Gotchas
 * Always choose either `sortableBy` or `orderBy`, not both.  

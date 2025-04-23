@@ -2,25 +2,27 @@
 title: EditorBlock
 sidebar_label: EditorBlock
 ---
+<!-- Examples count: 3 -->
+
 
 # EditorBlock
 
 ## Overview
-EditorBlock lets you register reusable content blocks inside a Slate‑powered rich‑text editor.  
-You define a unique `name`, human‑readable `label`, and the JSX that renders inside the block.
+EditorBlock registers reusable content blocks inside a Slate‑powered rich‑text editor.  
+You pass a unique `name`, a human‑readable `label`, and JSX defining the block body.
 
-The component also supports an optional alternate configuration UI shown in a pop‑over. Drag‑and‑drop is built‑in, so authors can reorder blocks effortlessly.
+The component supports an optional alternate pop‑over for configuration. Drag‑and‑drop works out of the box, so authors reorder blocks effortlessly.
 
 ## Styling Guidelines
-* All code samples use Tailwind CSS classes.
-* No additional Contember theme classes are required for basic usage.
+* All examples use Tailwind CSS.
+* No Contember theme classes are required for basic usage.
 
 ## Core Concepts
-* Register each block with a unique `name`.
-* `label` appears in the UI so authors recognise the block type.
-* Everything rendered inside the block comes from the `children` prop.
-* Supply `alternate` when you need a secondary configuration panel.
-* Combine with `<BlockEditorField>` and toolbars for a full editing experience.
+* Give every block a stable, unique `name`.
+* `label` appears in toolbars and pop‑overs.
+* Render block internals through the `children` prop.
+* Provide `alternate` to show a secondary settings UI.
+* Wrap blocks with `<BlockEditorField>` for persistence and references.
 
 ## Quick Start
 ```tsx
@@ -29,6 +31,7 @@ import {
   EditorBlock,
   EditorBlockToolbar,
   EditorReferenceTrigger,
+  EditorBlockContent,
 } from '~/lib/editor'
 import { ImageIcon } from 'lucide-react'
 
@@ -67,16 +70,16 @@ _None_
 
 ## Sub‑Components / Building Blocks
 ### EditorBlockContent
-Placeholder component that renders the default rich‑text area inside a block.
+Renders a default rich‑text area inside a block.
 
 ### EditorBlockToolbar
-Horizontal toolbar that sits above the editor.
+Horizontal toolbar displayed above the editor.
 
 ### EditorInlineToolbar
-Contextual toolbar that appears near selected text.
+Contextual toolbar appearing near selected text.
 
 ### EditorReferenceTrigger
-Button or element that inserts a reference block (e.g., image).
+Element that inserts a reference block, such as an image.
 
 ## Examples
 ### Quote Block
@@ -85,7 +88,7 @@ Button or element that inserts a reference block (e.g., image).
   <EditorBlockContent />
 </EditorBlock>
 ```
-This block provides a simple rich‑text area styled as a quote.
+This block gives authors a rich‑text area styled as a quote.
 
 ### Image Block
 ```tsx
@@ -93,14 +96,14 @@ This block provides a simple rich‑text area styled as a quote.
   <ImageField baseField="image" urlField="url" />
 </EditorBlock>
 ```
-Authors can upload or select an image. The block stores both the file and its URL.
+Authors upload or select an image. The block stores the file and URL.
 
 ## Best Practices & Gotchas
-* Keep `name` stable—changing it breaks existing content.
-* Wrap each `<EditorBlock>` inside a single `<BlockEditorField>`.
-* Add Tailwind classes directly via `className`; avoid global CSS.
-* Provide a concise `label` so the toolbar stays readable.
-* Use `alternate` sparingly; too many modals confuse authors.
+* Keep `name` constant; changing it breaks stored content.
+* Always nest `<EditorBlock>` inside one `<BlockEditorField>`.
+* Prefer Tailwind classes via `className`; avoid global CSS.
+* Use short `label`s to keep toolbars readable.
+* Use `alternate` only for advanced settings to reduce UI complexity.
 
 ## Further Reading
 * BlockEditorField

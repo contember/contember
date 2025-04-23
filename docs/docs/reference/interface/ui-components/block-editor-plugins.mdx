@@ -2,11 +2,13 @@
 title: blockEditorPlugins
 sidebar_label: blockEditorPlugins
 ---
+<!-- Examples count: 1 -->
+
 
 # blockEditorPlugins
 
 ## Overview
-`blockEditorPlugins` bundles advanced Slate plugins that bring structural editing to Contember’s `BlockEditor`. You gain block-level formatting, lists, tables and drag‑and‑drop sorting without extra wiring.
+`blockEditorPlugins` bundles advanced Slate plugins that bring structural editing to Contember’s `BlockEditor`. You gain block‑level formatting, lists, tables, scroll targets, and drag‑and‑drop sorting without extra wiring.
 
 Use the preset when you need rich, section‑based documents rather than plain text fields.
 
@@ -16,7 +18,7 @@ Use the preset when you need rich, section‑based documents rather than plain t
 
 ## Core Concepts
 * Plugin preset — a ready‑made array passed to `BlockEditor`.
-* Structural blocks — headings, paragraphs, lists, rules and tables.
+* Structural blocks — headings, paragraphs, lists, rules, tables, and scroll targets.
 * Drag‑and‑drop — powered by `withSortable` and rendered by `SortableBlock`.
 * Declarative sections — each sortable block receives a unique `name` to map data.
 
@@ -43,12 +45,20 @@ _None_
 ## Sub-Components / Building Blocks
 
 ### SortableBlock
-Renders the draggable handle and wraps each block so users can reorder them.
+Renders the draggable handle and wraps each block so you can reorder them.
 
 ### withSortable
 Higher‑order plugin that injects sortability into editor nodes. It is already included inside `blockEditorPlugins`.
 
 ## Examples
+
+### Minimal Setup
+```tsx
+<BlockEditor plugins={blockEditorPlugins}>
+  <SortableBlock name="section" />
+</BlockEditor>
+```
+Use this when you want the lightest possible configuration. The preset still adds headings, lists, tables, and scroll targets.
 
 ### Page Builder with Sections and Tables
 ```tsx
@@ -56,7 +66,7 @@ Higher‑order plugin that injects sortability into editor nodes. It is already 
   <SortableBlock name="section" className="mb-8" />
 </BlockEditor>
 ```
-This setup lets authors insert headings, lists or tables inside each section and reorder sections by dragging the handle.
+This setup lets authors insert headings, lists, or tables inside each section and reorder sections by dragging the handle.
 
 ### Horizontal Rule Divider
 ```tsx

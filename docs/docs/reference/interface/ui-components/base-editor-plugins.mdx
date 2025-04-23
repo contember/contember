@@ -2,6 +2,8 @@
 title: baseEditorPlugins
 sidebar_label: baseEditorPlugins
 ---
+<!-- Examples count: 1 -->
+
 
 # baseEditorPlugins
 
@@ -124,6 +126,20 @@ Applies `<del>` styling.
 Applies `<u>` styling.
 
 ## Examples
+Create an editor with the most common plugins:
+```tsx
+<RichTextEditor
+  className="prose max-w-none"
+  plugins={[
+    baseEditorPlugins.paragraph,
+    baseEditorPlugins.heading,
+    baseEditorPlugins.bold,
+    baseEditorPlugins.italic,
+  ]}
+/>
+```
+Use this as a starting point. Add more plugins as your content grows.
+
 Add scroll targets to headings:
 ```tsx
 <RichTextEditor
@@ -151,7 +167,7 @@ You can now paste code inside bullet points without breaking formatting.
 ## Best Practices & Gotchas
 * Include only the plugins you need to avoid bloat.  
 * Add `horizontalRule` only if your typography design supports `<hr>`.  
-* Always pair `link` toolbar buttons with the `anchor` plugin.  
+* Always pair link toolbar buttons with the `anchor` plugin.  
 * Tables need custom CSS for overflow on mobile.  
 * Do not mix `newline` and `paragraph` for long texts; pick one.
 

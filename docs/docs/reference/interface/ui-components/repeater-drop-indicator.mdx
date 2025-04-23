@@ -2,6 +2,8 @@
 title: RepeaterDropIndicator
 sidebar_label: RepeaterDropIndicator
 ---
+<!-- Examples count: 2 -->
+
 
 # RepeaterDropIndicator
 
@@ -91,6 +93,31 @@ Explanation:
 * `relative` ensures the indicator spans the full item width.  
 * Two instances cover both insertion points.  
 * Context providers keep the item reactive to order changes.
+
+### Same Editor Pattern With Explicit Path Lookup
+```tsx
+<Entity key={entity.key} accessor={entity}>
+	<RepeaterCurrentEntityContext.Provider value={entity}>
+		<RepeaterSortableItemContext.Provider value={sortable}>
+			<div className="relative">
+				<RepeaterDropIndicator position="before" />
+				<RepeaterSortableItemNode>
+					<div className="p-4">
+						<RepeaterSortableItemActivator>
+							<BlockEditorHandle />
+						</RepeaterSortableItemActivator>
+						{children}
+					</div>
+				</RepeaterSortableItemNode>
+				<RepeaterDropIndicator position="after" />
+			</div>
+		</RepeaterSortableItemContext.Provider>
+	</RepeaterCurrentEntityContext.Provider>
+</Entity>
+```
+Explanation:  
+* Demonstrates recalculating the Slate path before rendering.  
+* The indicator usage stays identical; only surrounding logic differs.  
 
 ## Best Practices & Gotchas
 * Render both **before** and **after** indicators for consistent UX.  

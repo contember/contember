@@ -2,10 +2,12 @@
 title: richTextFieldPlugins
 sidebar_label: richTextFieldPlugins
 ---
+<!-- Examples count: 1 -->
+
 
 ## Overview
 `richTextFieldPlugins` is a predefined array of Slate plugins that adds essential inline formatting to Contember’s `RichTextEditor`.  
-You use it when you need links, emphasis, code blocks, highlights, and other common text styles without hand‑crafting every Slate plugin yourself.
+Use it when you need links, emphasis, code blocks, highlights, and other common text styles without hand‑crafting every Slate plugin yourself.
 
 ## Styling Guidelines
 * All code examples use Tailwind CSS.  
@@ -13,7 +15,7 @@ You use it when you need links, emphasis, code blocks, highlights, and other com
 
 ## Core Concepts
 * Slate plugins extend editor behavior.
-* `richTextFieldPlugins` is an array; you pass it to `RichTextEditor` via the `plugins` prop.
+* `richTextFieldPlugins` is an array; pass it to `RichTextEditor` via the `plugins` prop.
 * The plugins cover links, bold/italic/underline, strikethrough, code blocks, highlights, and manual line breaks.
 * Order matters: Contember already arranges the plugins in a safe sequence.
 
@@ -44,6 +46,31 @@ _None_
 _None_
 
 ## Examples
+
+### Playground snippet
+```tsx
+import { RichTextEditor, richTextFieldPlugins } from '@contember/react';
+
+export default function Playground() {
+	return <RichTextEditor plugins={richTextFieldPlugins} />;
+}
+```
+The editor renders with all basic inline tools and no extra styling. Ideal for quick prototyping.
+
+### Minimal usage with styling
+```tsx
+import { RichTextEditor, richTextFieldPlugins } from '@contember/react';
+
+export default function MinimalEditor() {
+	return (
+		<RichTextEditor
+			plugins={richTextFieldPlugins}
+			className="border rounded p-2"
+		/>
+	);
+}
+```
+This example adds minimal borders and padding for better visual clarity.
 
 ### Blog post body with save button
 ```tsx
@@ -85,4 +112,5 @@ export default function BlogPostBody({ onSave }: { onSave: (value: unknown) => v
 * `RichTextEditor` component
 * Slate documentation – plugin architecture
 * Contember UI theme guidelines  
+
 <!-- End of Generated Documentation -->

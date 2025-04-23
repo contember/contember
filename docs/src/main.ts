@@ -1,23 +1,19 @@
 import * as path from 'path'
 import { loadConfig } from './config'
-import { findComponentFiles } from './utils'
+import { findComponentFiles, kebabCase } from './utils'
 import { generateMarkdownWithAI } from './ai'
 import { writeMarkdownFile } from './writer'
-import { ComponentSourceData } from './types'
-import { parseApiExtractorMd, parseComponentSource } from './parser'
+import { ComponentParser } from './parser'
 
 async function main() {
+	const parser = new ComponentParser()
+
 	// eslint-disable-next-line no-console
 	console.log('Starting documentation generation...')
 
 	const config = loadConfig()
 	// eslint-disable-next-line no-console
 	console.log('Configuration loaded.')
-
-	// Get path to API Extractor MD file
-	const apiMdPath = config.apiExtractorReportPath.replace('.api.json', '.api.md')
-	// eslint-disable-next-line no-console
-	console.log('Using API Extractor MD file:', apiMdPath)
 
 	// 2. Find Component Files
 	const componentFiles = await findComponentFiles(config.sourceDir, config.componentFilePattern)
@@ -31,17 +27,15 @@ async function main() {
 	}
 
 	let totalComponents = 0
+	// Track processed components to avoid duplicates
+	const processedComponents = new Set<string>()
 
 	for (const filePath of componentFiles) {
 		// eslint-disable-next-line no-console
 		console.log(`\nProcessing file: ${filePath}`)
 
 		try {
-			// 3a. Aggregate Sources (Parse JSDoc, find props in API MD)
-			const componentsData: ComponentSourceData[] = await parseComponentSource(
-				filePath,
-				apiMdPath,
-			)
+			const componentsData = await parser.parseComponentSource(filePath, processedComponents)
 
 			if (componentsData.length === 0) {
 				console.warn(`No components found in ${filePath}. Skipping.`)
@@ -50,14 +44,24 @@ async function main() {
 
 			totalComponents += componentsData.length
 			// eslint-disable-next-line no-console
-			console.log(` -> Found ${componentsData.length} component(s) in file`)
+			console.log(` -> Found ${componentsData.length} component(s) in file. [${componentsData.map(c => c.componentName).join(', ')}]`)
 
 			// Process each component in the file
 			for (const sourceData of componentsData) {
 				// eslint-disable-next-line no-console
 				console.log(`\n -> Processing component: ${sourceData.componentName}`)
 
-				// 3b. Enrich with AI
+				processedComponents.add(sourceData.componentName)
+
+				const outputFilePath = path.join(config.outputDir, `${kebabCase(sourceData.componentName)}.mdx`)
+				const outputFileExists = await Bun.file(outputFilePath).exists()
+
+				if (outputFileExists) {
+					// eslint-disable-next-line no-console
+					console.log(` -> Output file ${outputFilePath} already exists. Skipping generation.`)
+					continue // Skip to the next component
+				}
+
 				// eslint-disable-next-line no-console
 				console.log(` -> Generating documentation with AI for ${sourceData.componentName}...`)
 				const markdownContent = await generateMarkdownWithAI(
@@ -73,8 +77,6 @@ async function main() {
 				// eslint-disable-next-line no-console
 				console.log(` -> AI generation successful for ${sourceData.componentName}.`)
 
-				// 3c. Output to Markdown
-				const outputFilePath = path.join(config.outputDir, `${sourceData.componentName}.mdx`)
 				await writeMarkdownFile(outputFilePath, markdownContent)
 				// eslint-disable-next-line no-console
 				console.log(` -> Markdown file written to ${outputFilePath}`)

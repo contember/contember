@@ -1,286 +1,345 @@
-import { Project, Node } from 'ts-morph'
-import * as fs from 'fs'
+import { Project, Node, JSDoc, SyntaxKind, JSDocTag, TypeAliasDeclaration, InterfaceDeclaration } from 'ts-morph'
+import * as path from 'path'
 import { ComponentSourceData, PropData } from './types'
 
-interface ParsedApiComponent {
-	name: string
-	kind: 'const' | 'interface' | 'type' | 'class'
-	docComment?: string
-	props?: Record<string, PropData>
-}
+export class ComponentParser {
+	private tsMorphProject: Project | null = null
 
-let tsMorphProject: Project | null = null
-
-/**
- * Parses an API Extractor markdown file to extract component information.
- */
-export function parseApiExtractorMd(mdPath: string): Map<string, ParsedApiComponent> {
-	try {
-		if (!fs.existsSync(mdPath)) {
-			console.error(`API Extractor MD file not found at: ${mdPath}`)
-			return new Map()
-		}
-
-		const content = fs.readFileSync(mdPath, 'utf-8')
-		// eslint-disable-next-line no-console
-		console.log('Read API MD file, length:', content.length)
-
-		const components = new Map<string, ParsedApiComponent>()
-
-		// Find the TypeScript section between ```ts and ```
-		const tsSectionMatch = content.match(/```ts\s*([\s\S]*?)```/)
-		if (!tsSectionMatch) {
-			console.warn('No TypeScript section found in API MD file')
-			return components
-		}
-
-		const tsSection = tsSectionMatch[1]
-		// eslint-disable-next-line no-console
-		console.log('Found TypeScript section:', tsSection)
-
-		let currentComponent: ParsedApiComponent | null = null
-		let currentDocComment = ''
-		let isReadingProps = false
-
-		// Process line by line
-		const lines = tsSection.split('\n')
-		for (let i = 0; i < lines.length; i++) {
-			const line = lines[i].trim()
-
-			// Skip empty lines and package documentation comment
-			if (!line || line === '// (No @packageDocumentation comment for this package)') continue
-
-			// Debug line processing
-			// eslint-disable-next-line no-console
-			console.log('Processing line:', line)
-
-			// Collect doc comments
-			if (line.startsWith('//')) {
-				const commentText = line.substring(2).trim()
-				if (commentText.startsWith('@public')) continue
-				if (commentText) {
-					currentDocComment += (currentDocComment ? '\\n' : '') + commentText
-				}
-				continue
-			}
-
-			// Parse export declarations
-			if (line.startsWith('export')) {
-				// Save previous component if exists
-				if (currentComponent && !isReadingProps) {
-					// eslint-disable-next-line no-console
-					console.log(`Adding component to map: ${currentComponent.name}`)
-					components.set(currentComponent.name, currentComponent)
-				}
-
-				currentComponent = null
-				isReadingProps = false
-				const declaration = line.trim()
-
-				// Handle different export types
-				if (declaration.includes('interface')) {
-					const match = declaration.match(/interface\s+(\w+Props)\s*\{/)
-					if (match) {
-						const name = match[1]
-						currentComponent = {
-							name,
-							kind: 'interface',
-							docComment: currentDocComment,
-							props: {},
-						}
-						isReadingProps = true
-						// eslint-disable-next-line no-console
-						console.log(`Found props interface: ${name}`)
-					}
-				} else if (declaration.includes('const')) {
-					const match = declaration.match(/const\s+(\w+):/)
-					if (match) {
-						const name = match[1]
-						currentComponent = {
-							name,
-							kind: 'const',
-							docComment: currentDocComment,
-						}
-						// eslint-disable-next-line no-console
-						console.log(`Found component: ${name}`)
-					}
-				}
-
-				currentDocComment = ''
-			} else if (isReadingProps && currentComponent?.kind === 'interface' && line.includes(':')) {
-				const [propName, ...typeParts] = line.split(':')
-				const cleanPropName = propName.trim().replace('?', '')
-				const type = typeParts.join(':').trim().replace(';', '')
-				const required = !propName.includes('?')
-
-				if (currentComponent.props) {
-					currentComponent.props[cleanPropName] = {
-						name: cleanPropName,
-						type,
-						required,
-						description: currentDocComment,
-					}
-					// eslint-disable-next-line no-console
-					console.log(`Added prop ${cleanPropName} to ${currentComponent.name}`)
-				}
-				currentDocComment = ''
-			} else if (line === '}' && isReadingProps) {
-				// End of props interface
-				if (currentComponent) {
-					// eslint-disable-next-line no-console
-					console.log(`Adding props interface to map: ${currentComponent.name}`)
-					components.set(currentComponent.name, currentComponent)
-				}
-				isReadingProps = false
-				currentComponent = null
-			}
-		}
-
-		// Add the last component if exists and it's not a props interface
-		if (currentComponent && !isReadingProps) {
-			// eslint-disable-next-line no-console
-			console.log(`Adding final component to map: ${currentComponent.name}`)
-			components.set(currentComponent.name, currentComponent)
-		}
-
-		// Debug output
-		// eslint-disable-next-line no-console
-		console.log('Found components:', Array.from(components.keys()))
-
-		return components
-
-	} catch (error) {
-		console.error(`Error parsing API Extractor MD file ${mdPath}:`, error)
-		return new Map()
-	}
-}
-
-/**
- * Finds all exported components in a source file and parses their documentation.
- */
-export async function parseComponentSource(
-	filePath: string,
-	apiMdPath: string,
-): Promise<ComponentSourceData[]> {
-	try {
-		// Initialize ts-morph project once
-		if (!tsMorphProject) {
-			tsMorphProject = new Project({
+	private ensureTsMorphProject(): Project {
+		if (!this.tsMorphProject) {
+			this.tsMorphProject = new Project({
 				skipAddingFilesFromTsConfig: true,
 				compilerOptions: {
 					allowJs: true,
 					declaration: true,
+					jsx: 4, // React JSX
 				},
 			})
 		}
+		return this.tsMorphProject
+	}
 
-		// Add or update the source file in the project
-		const sourceFile = tsMorphProject.addSourceFileAtPath(filePath)
-		sourceFile.refreshFromFileSystemSync() // Ensure we have the latest content
+	public async parseComponentSource(
+		filePath: string,
+		skipComponents?: Set<string>,
+	): Promise<ComponentSourceData[]> {
+		if (path.basename(filePath) === 'index.ts') {
+			// eslint-disable-next-line no-console
+			console.log(`Skipping ${filePath} file`)
+			return []
+		}
 
-		// Parse the API MD file
-		const apiComponents = parseApiExtractorMd(apiMdPath)
-
-		// Get all exports from the source file
-		const exportedDeclarations = sourceFile.getExportedDeclarations()
 		const results: ComponentSourceData[] = []
+		try {
+			const project = this.ensureTsMorphProject()
+			const sourceFile = project.addSourceFileAtPath(filePath)
+			sourceFile.refreshFromFileSystemSync()
 
-		// Debug exports
-		// eslint-disable-next-line no-console
-		console.log('Exported declarations:', Array.from(exportedDeclarations.keys()))
+			const propsTypeMap = new Map<string, Record<string, PropData>>()
+			const exportedDeclarations = sourceFile.getExportedDeclarations()
 
-		for (const [name, declarations] of exportedDeclarations) {
-			const declaration = declarations[0]
+			for (const [name, declarations] of Array.from(exportedDeclarations.entries())) {
+				if (declarations.length === 0) continue
+				const declaration = declarations[0]
 
-			// Skip if it's not a component (interface, type, etc.)
-			if (!Node.isVariableDeclaration(declaration) &&
-				!Node.isFunctionDeclaration(declaration) &&
-				!Node.isClassDeclaration(declaration)) {
-				continue
+				if (Node.isTypeAliasDeclaration(declaration) || Node.isInterfaceDeclaration(declaration)) {
+					if (name.endsWith('Props')) {
+						const propData = this.extractPropsFromTypeOrInterface(declaration)
+						propsTypeMap.set(name, propData)
+					}
+				}
 			}
 
-			// Get component information from the API MD
-			const apiComponent = apiComponents.get(name)
+			for (const [name, declarations] of Array.from(exportedDeclarations.entries())) {
+				if (skipComponents?.has(name)) {
+					// eslint-disable-next-line no-console
+					console.log(`Skipping already processed component: ${name} in ${filePath}`)
+					continue
+				}
 
-			if (!apiComponent) {
-				console.warn(`Component ${name} not found in API MD file.`)
-				continue
+				if (declarations.length === 0) continue
+				const declaration = declarations[0]
+
+				// Skip prop types
+				if (name.endsWith('Props')) {
+					continue
+				}
+
+				const isPotentialComponent = Node.isVariableDeclaration(declaration) ||
+					Node.isFunctionDeclaration(declaration) ||
+					Node.isClassDeclaration(declaration)
+
+				if (!isPotentialComponent) {
+					continue
+				}
+
+				const jsDocNode = this.getJSDocNode(declaration)
+				if (!jsDocNode) {
+					continue // Skip components without JSDoc
+				}
+
+				const jsdoc = jsDocNode.getFullText().trim()
+				const examples = this.getJSDocExamples(jsDocNode)
+				const links = this.getJSDocLinks(jsDocNode)
+				const propsName = `${name}Props`
+				let props: Record<string, PropData> = {}
+
+				if (propsTypeMap.has(propsName)) {
+					props = propsTypeMap.get(propsName) || {}
+				} else {
+					const linkedPropsType = this.findLinkedPropsType(jsDocNode)
+					if (linkedPropsType && propsTypeMap.has(linkedPropsType)) {
+						props = propsTypeMap.get(linkedPropsType) || {}
+					}
+				}
+
+				results.push({
+					componentName: name,
+					filePath,
+					jsdoc,
+					props,
+					links,
+					examples,
+				})
 			}
-
-			// Skip if it's not a component in the API
-			if (apiComponent.kind !== 'const' && apiComponent.kind !== 'class') {
-				continue
-			}
-
-			// eslint-disable-next-line no-console
-			console.log(`Processing component ${name} from source file`)
-
-			let jsdoc: string | undefined
-			let examples: string[] = []
-
-			if (Node.isJSDocable(declaration)) {
-				jsdoc = getJSDocComment(declaration)
-				const jsDocNode = declaration.getJsDocs()[0]
-				examples = getJSDocExamples(jsDocNode)
-			}
-
-			// Find corresponding props interface
-			const propsInterfaceName = `${name}Props`
-			const propsComponent = apiComponents.get(propsInterfaceName)
-			const props = propsComponent?.props || apiComponent?.props
-
-			results.push({
-				componentName: name,
-				filePath,
-				jsdoc: jsdoc || apiComponent?.docComment,
-				props,
-				examples,
-			})
-
-			// eslint-disable-next-line no-console
-			console.log(`Added component ${name} to results`)
+		} catch (error) {
+			console.error(`Error parsing component source file ${filePath}:`, error)
+			// Return empty array on error
 		}
 
 		return results
-
-	} catch (error) {
-		console.error(`Error parsing component file ${filePath}:`, error)
-		return []
 	}
-}
 
-/**
- * Extracts the primary JSDoc comment block from a node.
- */
-function getJSDocComment(node: Node): string | undefined {
-	if (Node.isJSDocable(node)) {
-		const jsDocs = node.getJsDocs()
-		if (jsDocs.length > 0) {
-			// Return the full text of the first JSDoc block
-			return jsDocs[0].getFullText()
-		}
-	}
-	// Handle VariableStatement if the JSDoc is attached there
-	const parent = node.getParent()
-	if (Node.isVariableDeclaration(node) && parent && Node.isVariableDeclarationList(parent)) {
-		const statement = parent.getParent()
-		if (statement && Node.isVariableStatement(statement)) {
-			const jsDocs = statement.getJsDocs()
+	private getJSDocNode(node: Node): JSDoc | undefined {
+		if (Node.isJSDocable(node)) {
+			const jsDocs = node.getJsDocs()
 			if (jsDocs.length > 0) {
-				return jsDocs[0].getFullText()
+				return jsDocs[jsDocs.length - 1] // Return the last JSDoc block (closest to the node)
 			}
 		}
-	}
-	return undefined
-}
 
-/**
- * Extracts @example tags from a JSDoc comment.
- */
-function getJSDocExamples(jsDocNode: import('ts-morph').JSDoc | undefined): string[] {
-	if (!jsDocNode) return []
-	return jsDocNode.getTags()
-		.filter(tag => tag.getTagName() === 'example')
-		.map(tag => tag.getCommentText()?.trim()) // Get text after @example
-		.filter((text): text is string => !!text) // Filter out undefined/empty
+		// For VariableDeclaration, check its VariableStatement ancestor
+		if (Node.isVariableDeclaration(node)) {
+			const variableStatement = node.getFirstAncestorByKind(SyntaxKind.VariableStatement)
+			if (variableStatement && Node.isJSDocable(variableStatement)) {
+				const jsDocs = variableStatement.getJsDocs()
+				if (jsDocs.length > 0) {
+					return jsDocs[jsDocs.length - 1] // Return the last JSDoc block
+				}
+			}
+		}
+
+		return undefined
+	}
+
+	private getJSDocLinks(jsDocNode: JSDoc | undefined): string[] {
+		if (!jsDocNode) return []
+
+		const links: string[] = []
+
+		// Extract {@link ...} references from the description
+		const description = jsDocNode.getDescription() || ''
+		const linkRegex = /{@link\s+([^}]+)}/g
+		let match
+		while ((match = linkRegex.exec(description)) !== null) {
+			links.push(match[1].trim())
+		}
+
+		// Extract @link tag content
+		jsDocNode.getTags()
+			.filter((tag): tag is JSDocTag => tag.getTagName() === 'link')
+			.forEach(tag => {
+				const commentText = tag.getCommentText()?.trim()
+				if (commentText) {
+					links.push(commentText)
+				}
+			})
+
+		return links
+	}
+
+	private findLinkedPropsType(jsDocNode: JSDoc | undefined): string | undefined {
+		if (!jsDocNode) return undefined
+
+		// Try to find "Props {@link TypeName}" pattern in description
+		const description = jsDocNode.getDescription() || ''
+
+		// First line often has "Props {@link SomeProps}." pattern
+		const propsLinkRegex = /Props\s+{@link\s+([^}]+)}\s*\./
+		const match = description.match(propsLinkRegex)
+
+		if (match) return match[1]
+
+		// Try other patterns
+		const altLinkRegex = /{@link\s+([^}]+Props)}/
+		const altMatch = description.match(altLinkRegex)
+
+		return altMatch ? altMatch[1] : undefined
+	}
+
+	private getJSDocExamples(jsDocNode: JSDoc | undefined): string[] {
+		if (!jsDocNode) return []
+
+		const examples = new Set<string>()
+		const codeBlockRegex = /```(?:tsx?|jsx?|ts|js)?\s*([\s\S]*?)```/g
+
+		// Extract examples from @example tags
+		jsDocNode.getTags()
+			.filter((tag): tag is JSDocTag => tag.getTagName() === 'example')
+			.forEach(tag => {
+				const commentText = tag.getCommentText()?.trim()
+				if (commentText) {
+					examples.add(commentText)
+				}
+			})
+
+		// Extract examples from JSDoc description
+		const mainComment = jsDocNode.getDescription()?.trim()
+		if (mainComment) {
+			// Look for heading-style examples like "#### Example: Something"
+			const exampleHeadingRegex = /(#{1,6}\s*Example:.*?)(#{1,6}|$)/g
+			let headingMatch
+
+			while ((headingMatch = exampleHeadingRegex.exec(mainComment)) !== null) {
+				const exampleSection = headingMatch[1].trim()
+				if (exampleSection) {
+					examples.add(exampleSection)
+				}
+			}
+
+			// If none found with headings, try to extract standalone code blocks
+			if (examples.size === 0) {
+				let codeMatch
+				codeBlockRegex.lastIndex = 0
+				while ((codeMatch = codeBlockRegex.exec(mainComment)) !== null) {
+					if (codeMatch[0]) {
+						examples.add(codeMatch[0])
+					}
+				}
+			}
+		}
+
+		return Array.from(examples)
+	}
+
+	private extractPropsFromTypeOrInterface(declaration: TypeAliasDeclaration | InterfaceDeclaration): Record<string, PropData> {
+		const props: Record<string, PropData> = {}
+
+		if (Node.isInterfaceDeclaration(declaration)) {
+			// Handle interface props
+			const properties = declaration.getProperties()
+			properties.forEach(property => {
+				const name = property.getName()
+				const type = property.getType().getText()
+				const isOptional = property.hasQuestionToken()
+
+				// Get property JSDoc
+				const jsDocNode = this.getJSDocNode(property)
+				const description = jsDocNode?.getDescription()?.trim()
+
+				// Get default value from @default tag if it exists
+				const defaultValue = jsDocNode?.getTags()
+					.find(tag => tag.getTagName() === 'default')
+					?.getCommentText()?.trim()
+
+				props[name] = {
+					name,
+					type,
+					description,
+					required: !isOptional,
+					defaultValue,
+				}
+			})
+		} else if (Node.isTypeAliasDeclaration(declaration)) {
+			// Handle type alias props
+			const typeText = declaration.getTypeNode()?.getText() || ''
+
+			// Handle object type directly defined in the type alias
+			if (typeText.startsWith('{')) {
+				// Extract properties from inline object type definition
+				const typeMembers = declaration.getTypeNode()?.forEachChildAsArray() || []
+
+				typeMembers.forEach(member => {
+					if (Node.isPropertySignature(member)) {
+						const name = member.getName()
+						const type = member.getType().getText()
+						const isOptional = member.hasQuestionToken()
+
+						// Get JSDoc for this property
+						const jsDocNode = this.getJSDocNode(member)
+						const description = jsDocNode?.getDescription()?.trim()
+
+						props[name] = {
+							name,
+							type,
+							description,
+							required: !isOptional,
+						}
+					}
+				})
+			}
+
+			// Handle intersection types
+			if (typeText.includes('&')) {
+				const type = declaration.getType()
+				if (type.isIntersection()) {
+					const intersectionTypes = type.getIntersectionTypes()
+					for (const intersectedType of intersectionTypes) {
+						this.extractPropsFromType(intersectedType, props)
+					}
+				}
+			}
+		}
+
+		return props
+	}
+
+	private extractPropsFromType(type: any, props: Record<string, PropData>): void {
+		try {
+			if (type.getProperties) {
+				const properties = type.getProperties()
+				for (const prop of properties) {
+					const name = prop.getName()
+					const propType = prop.getDeclarations()?.[0]?.getType().getText() || 'any'
+
+					// Skip if we already have this property
+					if (props[name]) continue
+
+					// Try to determine if it's optional
+					let isOptional = false
+					try {
+						const valueDecl = prop.getValueDeclaration()
+						if (valueDecl) {
+							isOptional = valueDecl.getChildrenOfKind(SyntaxKind.QuestionToken).length > 0
+						}
+					} catch (err) {
+						// If we can't determine, assume it's required
+						isOptional = false
+					}
+
+					// Try to get JSDoc for the property
+					let description: string | undefined
+
+					try {
+						const valueDecl = prop.getValueDeclaration()
+						if (valueDecl && Node.isJSDocable(valueDecl)) {
+							const jsDoc = valueDecl.getJsDocs()[0]
+							description = jsDoc?.getDescription()?.trim()
+						}
+					} catch (err) {
+						// If we can't get the description, leave undefined
+					}
+
+					props[name] = {
+						name,
+						type: propType,
+						description,
+						required: !isOptional,
+					}
+				}
+			}
+		} catch (error) {
+			console.error('Error extracting props from type:', error)
+		}
+	}
 }

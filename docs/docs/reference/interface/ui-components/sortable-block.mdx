@@ -2,15 +2,15 @@
 title: SortableBlock
 sidebar_label: SortableBlock
 ---
+<!-- Examples count: 1 -->
+
 
 # SortableBlock
 
 ## Overview
-SortableBlock wraps Slate editor blocks and makes them draggable.  
-You add it to a block plugin to let users reorder content with a mouse or touch.
+SortableBlock wraps a Slate editor block and makes it draggable. You add it to a block plugin so users can reorder content with a mouse or touch.
 
-The component gives instant visual feedback and draws an overlay while you drag.  
-It never mutates Slate state by itself; it only forwards events to the `withSortable` plugin.
+The component shows visual feedback with an overlay while you drag. It never mutates Slate state; it only forwards events to the `withSortable` plugin.
 
 ## Styling Guidelines
 * All examples use Tailwind CSS.  
@@ -20,7 +20,7 @@ It never mutates Slate state by itself; it only forwards events to the `withSort
 * Slate renders each editor block through a React component.  
 * `SortableBlock` must receive the exact Slate `element` instance.  
 * Drag handles, outlines, and cursor styles are up to you; SortableBlock only manages DOM events.  
-* The accompanying `withSortable` plugin updates Slate when the drag ends.
+* The `withSortable` plugin updates Slate when the drag ends.
 
 ## Quick Start
 ```tsx
@@ -70,6 +70,14 @@ _None_
 
 ## Examples
 
+### Basic Usage
+```tsx
+<SortableBlock element={slateElement}>
+  <BlockContent />
+</SortableBlock>
+```
+Use the bare component when you want default drag behavior and handle styling elsewhere.
+
 ### Custom Drag Handle
 ```tsx
 <SortableBlock element={element} className="relative pl-8">
@@ -91,8 +99,7 @@ const sortable = withSortable({
   canDrop: (source, destination) => source.sectionId === destination.sectionId,
 })
 ```
-You pass a `canDrop` function to the plugin, not to `SortableBlock`.  
-The block now drags only inside its original section.
+You pass a `canDrop` function to the plugin, not to `SortableBlock`. The block now drags only inside its original section.
 
 ## Best Practices & Gotchas
 * Always pass the same `element` instance you received in `renderElement`.  

@@ -2,12 +2,14 @@
 title: RichTextView
 sidebar_label: RichTextView
 ---
+<!-- Examples count: 3 -->
+
 
 # RichTextView
 
 ## Overview
-RichTextView displays rich‑text content stored in a Contember field.  
-It parses the JSON structure safely and renders semantic HTML using Contember’s rich‑text engine.
+RichTextView displays formatted rich‑text stored in a Contember field.  
+It safely parses JSON and renders semantic React elements through Contember’s rich‑text engine.
 
 ## Styling Guidelines
 * All examples use Tailwind CSS.  
@@ -16,8 +18,8 @@ It parses the JSON structure safely and renders semantic HTML using Contember’
 ## Core Concepts
 * Rich‑text data is stored as JSON in a field.
 * RichTextView converts that JSON to React elements.
-* You may supply custom `renderLeaf`, `renderElement`, or `referenceRenderers` to change output.
-* When the field is empty, the component renders nothing.
+* You can supply `renderLeaf`, `renderElement`, or `referenceRenderers` to change output.
+* The component renders nothing when the field is empty.
 
 ## Quick Start
 ```tsx
@@ -76,7 +78,7 @@ const renderElement = (
 | referenceRenderers | `Record<string, (props) => ReactNode>` | No | – | Functions that render entity references (e.g., images). |
 | **Inherited HTML attributes** | _varies_ | No | – | Props accepted by the underlying HTML element. |
 
-## Sub‑Components / Building Blocks
+## Sub-Components / Building Blocks
 _None_
 
 ## Examples
@@ -97,7 +99,7 @@ _None_
   </Binding>
 )
 ```
-The editor and viewer share the same field. You see live results while editing.
+You place the editor and viewer side by side. You see live results while editing.
 
 ### Rendering images from entity references
 ```tsx
@@ -117,12 +119,49 @@ The editor and viewer share the same field. You see live results while editing.
 ```
 You override the default renderer for `image` references to add captions and Tailwind styling.
 
+### Inline toolbar with live preview
+```tsx
+() => (
+  <Binding>
+    <Slots.Title>
+      <Title icon={<PencilIcon />}>Rich text field</Title>
+    </Slots.Title>
+
+    <Slots.Actions>
+      <PersistButton />
+    </Slots.Actions>
+
+    <EntitySubTree entity="EditorTextArea(unique = unique)" setOnCreate="(unique = unique)">
+      <div className="space-y-4">
+        <div className="max-w-md">
+          <RichTextField field="data" label="Rich text field">
+            <EditorInlineToolbar>
+              <EditorMarkTrigger mark={boldMark}><Toggle><BoldIcon className="h-3 w-3" /></Toggle></EditorMarkTrigger>
+              <EditorMarkTrigger mark={italicMark}><Toggle><ItalicIcon className="h-3 w-3" /></Toggle></EditorMarkTrigger>
+              <EditorMarkTrigger mark={underlineMark}><Toggle><UnderlineIcon className="h-3 w-3" /></Toggle></EditorMarkTrigger>
+              <EditorElementTrigger elementType={anchorElementType}><Toggle><LinkIcon className="h-3 w-3" /></Toggle></EditorElementTrigger>
+              <EditorGenericTrigger {...createAlignHandler('start')}><Toggle><AlignLeftIcon className="h-3 w-3" /></Toggle></EditorGenericTrigger>
+              <EditorGenericTrigger {...createAlignHandler('end')}><Toggle><AlignRightIcon className="h-3 w-3" /></Toggle></EditorGenericTrigger>
+              <EditorGenericTrigger {...createAlignHandler('center')}><Toggle><AlignCenterIcon className="h-3 w-3" /></Toggle></EditorGenericTrigger>
+            </EditorInlineToolbar>
+          </RichTextField>
+        </div>
+
+        <h3>Preview</h3>
+        <RichTextView field="data" />
+      </div>
+    </EntitySubTree>
+  </Binding>
+)
+```
+You build an inline toolbar for formatting and show a live preview rendered by RichTextView.
+
 ## Best Practices & Gotchas
 * Wrap the component in `prose` for instant typography.
 * Provide only the renderers you need; missing ones fall back to defaults.
-* Memoize heavy render functions to avoid re‑renders.
-* The component renders nothing when the field is empty—handle that state if necessary.
-* Ensure your field stores valid rich‑text JSON; malformed data causes runtime errors.
+* Memoize heavy render functions to avoid unnecessary re‑renders.
+* Handle the empty state because the component renders nothing when the field is empty.
+* Store valid rich‑text JSON; malformed data causes runtime errors.
 
 ## Further Reading
 * `RichTextField` – editable counterpart of this component.

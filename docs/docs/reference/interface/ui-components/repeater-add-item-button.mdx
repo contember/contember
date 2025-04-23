@@ -2,22 +2,24 @@
 title: RepeaterAddItemButton
 sidebar_label: RepeaterAddItemButton
 ---
+<!-- Examples count: 0 -->
+
 
 # RepeaterAddItemButton
 
 ## Overview
 `RepeaterAddItemButton` renders a button that inserts a new item into a repeater at a given index.  
-It wraps `RepeaterAddItemTrigger`, so you gain built‑in logic while controlling the visual output.
+It wraps `RepeaterAddItemTrigger`, letting you focus on visuals while the trigger handles insertion logic.
 
 ## Styling Guidelines
-* All snippets use Tailwind CSS utility classes.  
-* No special Contember theme classes are required.
+* All examples use Tailwind CSS utility classes.  
+* No Contember‑specific theme classes are required.
 
 ## Core Concepts
 * A repeater is a dynamic list of form fields.  
 * `RepeaterAddItemButton` delegates insertion logic to `RepeaterAddItemTrigger`.  
-* You can supply custom `children` to define the button’s appearance.  
-* Omit `index` to append the item; provide an integer to insert at a specific position.
+* You can provide custom `children` to style the button.  
+* Omit `index` to append; pass an integer to insert at a specific position.
 
 ## Quick Start
 ```tsx
@@ -39,8 +41,8 @@ export const ContactsForm = () => (
 _None_
 
 ## Props Reference
-| Name    | Type | Required | Default | Description |
-|---------|------|----------|---------|-------------|
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
 | children | React.ReactNode | No | Plus icon + localized label | Content rendered inside the button. |
 | index | RepeaterAddItemIndex | No | `undefined` (item appended) | Position where the new item is inserted. |
 | *Inherited props from `RepeaterAddItemTrigger`* | — | — | — | _See that component for details._ |
@@ -56,7 +58,7 @@ Lower‑level trigger handling the actual insertion. Use it for full control whe
 	<span className="text-green-600">Add row</span>
 </RepeaterAddItemButton>
 ```
-The item appears after the current last entry.
+The new item appears after the current last entry.
 
 ### Insert at arbitrary position
 ```tsx
@@ -69,11 +71,11 @@ The item appears after the current last entry.
 	</div>
 ))}
 ```
-You insert a new item immediately after row `i`.
+You insert a new item immediately after row `i`.
 
 ## Best Practices & Gotchas
-* Use descriptive labels; avoid bare icons for accessibility.  
-* Keep `index` in bounds—passing `length + 1` has no effect.  
+* Use descriptive labels; avoid icon‑only buttons for accessibility.  
+* Keep `index` within bounds—passing `length + 1` has no effect.  
 * Supply lightweight children; heavy trees re‑render on every add.
 
 ## Further Reading

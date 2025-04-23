@@ -3,6 +3,9 @@ title: BlockEditorField
 sidebar_label: BlockEditorField
 ---
 
+<!-- Edited by human: false -->
+<!-- Examples count: 4 -->
+
 ## BlockEditorField
 
 ### Overview
@@ -31,7 +34,7 @@ import {
 	EditorBlockToolbar,
 	EditorReferenceTrigger,
 	BlockButton,
-} from '~/lib/editor'
+} from '~/lib/editor' // or '~/lib-extra/legacy-editor/BlockEditor'
 import { ImageIcon } from '@radix-ui/react-icons'
 
 export const ArticleEditor = () => (
@@ -162,25 +165,117 @@ Generic trigger for arbitrary editor commands.
 	</EditorBlock>
 </BlockEditorField>
 ```
-This setup provides image references, tables, bold/italic marks, and a quote block.
+Provides image references, tables, bold/italic marks, and a quote block.
 
-#### Rich editor with embeds
+#### Playground – Advanced toolbar (Example 1)
+```tsx
+<BlockEditorField
+	field="data"
+	referencesField="references"
+	referenceDiscriminationField="type"
+	plugins={[
+		editor => {
+			editor.registerElement({
+				type: 'link',
+				isInline: true,
+				render: LinkElement,
+			})
+		},
+	]}
+>
+	<EditorBlockToolbar>
+		<EditorReferenceTrigger referenceType="quote"><BlockButton><QuoteIcon /> Quote</BlockButton></EditorReferenceTrigger>
+		<EditorReferenceTrigger referenceType="image"><BlockButton><ImageIcon /> Image</BlockButton></EditorReferenceTrigger>
+		<EditorElementTrigger elementType={tableElementType}><BlockButton><TableIcon /> Table</BlockButton></EditorElementTrigger>
+		<EditorElementTrigger elementType={scrollTargetElementType}><BlockButton><LocateIcon /> Scroll target</BlockButton></EditorElementTrigger>
+		<EditorElementTrigger elementType={horizontalRuleElementType}><BlockButton><MinusIcon  /> Horizontal rule</BlockButton></EditorElementTrigger>
+	</EditorBlockToolbar>
+
+	<EditorInlineToolbar>
+		{/* identical inline triggers as detailed guide */}
+	</EditorInlineToolbar>
+
+	<EditorBlock name="quote" label="Quote">
+		<EditorBlockContent />
+	</EditorBlock>
+
+	<EditorBlock name="image" label="Image">
+		<ImageField baseField="image" urlField="url" />
+	</EditorBlock>
+</BlockEditorField>
+```
+Adds quote references, scroll targets, and horizontal rules to the toolbar.
+
+#### Playground – Complex embeds (Example 2)
 ```tsx
 <BlockEditorField
 	field="blocks"
+	contentField="data"
 	referencesField="references"
 	referenceDiscriminationField="type"
-	plugins={[plugins.heading, plugins.list, plugins.bold /* … */]}
+	sortableBy="order"
+	embedReferenceDiscriminateBy="embed"
+	embedContentDiscriminationField="embed.type"
+	embedHandlers={[
+		new EmbedHandlers.YouTube({
+			discriminateBy: 'youtube',
+			youTubeIdField: 'embed.youtubeId',
+		}),
+		new EmbedHandlers.Vimeo({
+			discriminateBy: 'vimeo',
+			vimeoIdField: 'embed.vimeoId',
+		}),
+	]}
+	plugins={[
+		plugins.anchor,
+		plugins.paragraph,
+		plugins.heading,
+		plugins.list,
+		plugins.horizontalRule,
+		plugins.scrollTarget,
+		plugins.table,
+		plugins.bold,
+		plugins.code,
+		plugins.highlight,
+		plugins.italic,
+		plugins.newline,
+		plugins.strikeThrough,
+		plugins.underline,
+		editor => {
+			editor.registerElement({
+				type: 'link',
+				isInline: true,
+				render: LinkElement,
+			})
+		},
+	]}
 >
-	{/* toolbars identical to previous example */}
+	<EditorBlockToolbar>
+		<EditorReferenceTrigger referenceType="quote"><BlockButton><QuoteIcon /> Quote</BlockButton></EditorReferenceTrigger>
+		<EditorReferenceTrigger referenceType="image"><BlockButton><ImageIcon /> Image</BlockButton></EditorReferenceTrigger>
+		<EditorElementTrigger elementType={tableElementType}><BlockButton><TableIcon /> Table</BlockButton></EditorElementTrigger>
+		<EditorElementTrigger elementType={scrollTargetElementType}><BlockButton><LocateIcon /> Scroll target</BlockButton></EditorElementTrigger>
+		<EditorElementTrigger elementType={horizontalRuleElementType}><BlockButton><MinusIcon /> Horizontal rule</BlockButton></EditorElementTrigger>
+	</EditorBlockToolbar>
 
+	<EditorInlineToolbar>
+		{/* inline triggers identical to Example 1 */}
+	</EditorInlineToolbar>
+
+	<Block discriminateBy="quote" label="Quote">
+		<BlockEditor.ContentOutlet placeholder="Type here..." />
+	</Block>
 	<Block discriminateBy="embed" label="Embed">
+		<Block discriminateBy="spotify" label="Spotify" />
 		<Block discriminateBy="youtube" label="YouTube" />
 		<Block discriminateBy="vimeo" label="Vimeo" />
 	</Block>
+	<Block discriminateBy="image" label="Image">
+		<ImageField baseField="image" urlField="url" />
+	</Block>
 </BlockEditorField>
 ```
-You can nest blocks to build complex embed workflows such as grouped video providers.
+Shows nested blocks, embed handlers, and sortable ordering—ideal for media‑rich pages.
 
 ### Best Practices & Gotchas
 * Always pass `referencesField` and `referenceDiscriminationField`; the editor fails without them.  

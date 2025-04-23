@@ -58,46 +58,90 @@ async function main() {
 				const outputFilePath = path.join(config.outputDir, `${kebabCase(sourceData.componentName)}.mdx`)
 				const outputFileExists = await Bun.file(outputFilePath).exists()
 
-				if (outputFileExists) {
+				// Check if we need to regenerate documentation based on examples count or modified time
+				let regenerate = !outputFileExists
+				let existingContent: string | null = null
+
+				if (outputFileExists && sourceData.examples) {
+					// Read the existing file to check if examples count has changed
+					try {
+						existingContent = await Bun.file(outputFilePath).text()
+		
+						// Look for any examples count marker in the file
+						const examplesMarker = existingContent.match(/<!-- Examples count: (\d+) -->/)
+						// eslint-disable-next-line no-console
+						console.log(` -> Checking examples count marker in existing file...`)
+		
+						if (examplesMarker && examplesMarker[1]) {
+							const existingExamplesCount = parseInt(examplesMarker[1], 10)
+							const currentExamplesCount = sourceData.examples.length
+			
+							// eslint-disable-next-line no-console
+							console.log(` -> Found examples count marker: ${existingExamplesCount}, current count: ${currentExamplesCount}`)
+			
+							// Regenerate if examples count has changed
+							if (existingExamplesCount !== currentExamplesCount) {
+								// eslint-disable-next-line no-console
+								console.log(` -> Examples count changed from ${existingExamplesCount} to ${currentExamplesCount}. Regenerating documentation.`)
+								regenerate = true
+				
+								// Store the previous content for reference
+								sourceData.previousDocContent = existingContent
+							}
+						} else {
+							// If no marker found, regenerate to include the marker
+							// eslint-disable-next-line no-console
+							console.log(` -> No examples count marker found in existing file. File will be regenerated.`)
+							regenerate = true
+
+							// Store the previous content for reference
+							sourceData.previousDocContent = existingContent
+						}
+					} catch (error) {
+						console.warn(`Error reading existing file ${outputFilePath}:`, error)
+						// If we can't read the file, assume we need to regenerate
+						regenerate = true
+					}
+				}
+
+				if (!regenerate) {
 					// eslint-disable-next-line no-console
-					console.log(` -> Output file ${outputFilePath} already exists. Skipping generation.`)
+					console.log(` -> Output file ${outputFilePath} already exists with same examples count. Skipping generation.`)
 					continue // Skip to the next component
 				}
 
-				// Find usage examples from the playground
 				if (config.contextDir) {
 					// eslint-disable-next-line no-console
 					console.log(` -> Finding real-world usage examples for ${sourceData.componentName} in playground...`)
 
-					// Find component usage examples in the playground
 					const playgroundExamples = await playgroundFinder.findComponentExamples(
 						sourceData.componentName,
 						config.contextDir,
 					)
 
-					// Find component import statements in the playground
 					const importExamples = await playgroundFinder.findComponentImports(
 						sourceData.componentName,
 						config.contextDir,
 					)
 
-					// Add these examples to the sourceData
 					if (playgroundExamples.length > 0 || importExamples.length > 0) {
 						// eslint-disable-next-line no-console
 						console.log(` -> Found ${playgroundExamples.length} usage examples and ${importExamples.length} import examples`)
 
-						// Track the original examples count before adding playground examples
 						const originalExamplesCount = sourceData.examples?.length || 0
 						sourceData.originalExamplesCount = originalExamplesCount
 
-						// Add playground examples to the existing examples (or create the array if it doesn't exist)
+						const sourceExamples = [...(sourceData.examples || [])]
+
 						sourceData.examples = sourceData.examples || []
 						sourceData.examples = [...sourceData.examples, ...playgroundExamples]
 
-						// Add playground import examples under a special "imports" property
 						if (importExamples.length > 0) {
 							sourceData.imports = importExamples
 						}
+
+						// eslint-disable-next-line no-console
+						console.log(` -> Total examples count now: ${sourceData.examples.length} (${originalExamplesCount} from source + ${playgroundExamples.length} from playground)`)
 					} else {
 						// eslint-disable-next-line no-console
 						console.log(` -> No playground examples found for ${sourceData.componentName}`)

@@ -3,6 +3,9 @@ title: LoginWithEmail
 sidebar_label: LoginWithEmail
 ---
 
+<!-- Edited by human: false -->
+<!-- Examples count: 2 -->
+
 # LoginWithEmail
 
 ## Overview
@@ -43,6 +46,17 @@ _None_
 
 ## Examples
 
+### Basic Usage
+```tsx
+import { LoginWithEmail } from '~/lib/dev'
+
+export function Login() {
+	return <LoginWithEmail />
+}
+```
+Render the component wherever you need a simple login form.  
+It handles validation and submission internally.
+
 ### Embedded in a DevBar
 ```tsx
 import { DevBar, DevPanel } from '@contember/ui-devbar'
@@ -52,39 +66,68 @@ import { LoginWithEmail } from '~/lib/dev'
 export function DevTools() {
 	return (
 		<DevBar>
-			<DevPanel heading="Login" icon={<LogInIcon />}>
+			<DevPanel heading="Login" icon={<LogInIcon />} >
 				<LoginWithEmail />
 			</DevPanel>
 		</DevBar>
 	)
 }
 ```
-You embed the component in a development toolbar.  
-Developers can switch accounts without leaving the page.
+Place the login form in a development toolbar.  
+You can switch accounts without leaving the current page.
 
-### Full Application Shell
+### Full Application Entrypoint
 ```tsx
-<ApplicationEntrypoint {...getConfig()}>
-	<>
-		<Toaster>
-			<Pages
-				layout={Layout}
-				children={import.meta.glob('./pages/**/*.tsx', { eager: true })}
-			/>
-			{import.meta.env.DEV && (
-				<DevBar>
-					<DevPanel heading="Login" icon={<LogInIcon />}>
-						<LoginWithEmail />
-					</DevPanel>
-				</DevBar>
-			)}
-		</Toaster>
-		<OutdatedApplicationDialog />
-	</>
-</ApplicationEntrypoint>
+import { ApplicationEntrypoint } from '@contember/react-client'
+import { Pages } from '@contember/react-pages'
+import { Toaster } from '@contember/ui'
+import { DevBar, DevPanel } from '@contember/ui-devbar'
+import { LogInIcon } from 'lucide-react'
+import { LoginWithEmail } from '~/lib/dev'
+import { Layout } from './Layout'
+import { OutdatedApplicationDialog } from './OutdatedApplicationDialog'
+import { SlotsProvider } from '@contember/ui-slots'
+import { FieldLabelFormatterProvider } from '@contember/react-form'
+import { EnumOptionsFormatterProvider } from '@contember/react-form'
+import { getConfig } from './config'
+
+export function App() {
+	return (
+		<FieldLabelFormatterProvider value={fieldLabelFormatter}>
+			<EnumOptionsFormatterProvider value={enumOptionsFormatter}>
+				<SlotsProvider>
+					<ApplicationEntrypoint
+						{...getConfig()}
+						children={
+							<>
+								<Toaster>
+									<Pages
+										layout={Layout}
+										children={import.meta.glob<PageModule>(
+											'./pages/**/*.tsx',
+											{ eager: true },
+										)}
+									/>
+									{import.meta.env.DEV && (
+										<DevBar>
+											<DevPanel heading="Login" icon={<LogInIcon />}>
+												<LoginWithEmail />
+											</DevPanel>
+										</DevBar>
+									)}
+								</Toaster>
+								<OutdatedApplicationDialog />
+							</>
+						}
+					/>
+				</SlotsProvider>
+			</EnumOptionsFormatterProvider>
+		</FieldLabelFormatterProvider>
+	)
+}
 ```
-This pattern places the login form in a conditional DevBar during development.  
-Production builds omit the panel.
+In this real‑world setup you conditionally show the login panel only during development.  
+Production builds do not include the DevBar, keeping the UI clean.
 
 ## Best Practices & Gotchas
 * Keep the component high in the tree to avoid nested authentication prompts.

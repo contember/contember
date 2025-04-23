@@ -3,10 +3,13 @@ title: CreateEntityDialog
 sidebar_label: CreateEntityDialog
 ---
 
+<!-- Edited by human: false -->
+<!-- Examples count: 1 -->
+
 # CreateEntityDialog
 
 ## Overview
-`CreateEntityDialog` is a modal that lets you create a new entity without leaving the current screen.  
+`CreateEntityDialog` is a modal component that lets you create a new entity without leaving the current screen.  
 You pass a trigger element (for example, a button) and any form or content you want inside the dialog.
 
 ## Styling Guidelines
@@ -34,10 +37,10 @@ import { Button } from './ui'
 _None_
 
 ## Props Reference
-| Name    | Type                                                                                       | Required | Default | Description                             |
-|---------|--------------------------------------------------------------------------------------------|----------|---------|-----------------------------------------|
-| trigger | React.ReactElement<any, string &#124; React.JSXElementConstructor<any>>                   | Yes      | —       | Element that opens the dialog.          |
-| children| React.ReactNode                                                                            | Yes      | —       | Content rendered inside the dialog.     |
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| trigger | React.ReactElement<any, string &#124; React.JSXElementConstructor<any>> | Yes | — | Element that opens the dialog. |
+| children | React.ReactNode | Yes | — | Content rendered inside the dialog. |
 | *Inherited props* | — | — | — | _None_ |
 
 ## Sub‑Components / Building Blocks
@@ -45,7 +48,20 @@ _None_
 
 ## Examples
 
-### 1. Dialog with Confirmation Toast
+### 1. Basic Dialog
+```tsx
+import { CreateEntityDialog } from '@contember/react'
+import { Button } from './ui'
+
+<CreateEntityDialog
+  trigger={<Button className="bg-blue-600 text-white px-4 py-2 rounded">Create New Entity</Button>}
+>
+  <EntityForm />
+</CreateEntityDialog>
+```
+Use this as the minimal setup when you only need a modal wrapper around an existing form.
+
+### 2. Dialog with Confirmation Toast
 ```tsx
 import { CreateEntityDialog } from '@contember/react'
 import { Button } from './ui'
@@ -60,9 +76,9 @@ import { toast } from 'react-hot-toast'
   />
 </CreateEntityDialog>
 ```
-Use this when you want user feedback after creation.
+Show a toast from the nested form’s `onSuccess` handler to confirm the action.
 
-### 2. Inline List Refresh
+### 3. Inline List Refresh
 ```tsx
 const CompaniesPage = () => {
   const [reloadKey, setReloadKey] = useState(0)
@@ -80,7 +96,7 @@ const CompaniesPage = () => {
   )
 }
 ```
-The list reloads once the form inside the dialog succeeds.
+Update the surrounding list by bumping a `key` once the dialog form succeeds.
 
 ## Best Practices & Gotchas
 * Keep the dialog form concise; long forms feel cramped in modals.

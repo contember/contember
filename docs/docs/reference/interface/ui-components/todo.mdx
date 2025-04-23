@@ -3,6 +3,9 @@ title: Todo
 sidebar_label: Todo
 ---
 
+<!-- Edited by human: false -->
+<!-- Examples count: 1 -->
+
 ## Overview
 `Todo` marks unfinished UI work during development.  
 It renders your message in a highlighted banner only when `import.meta.env.DEV` is `true`.
@@ -56,6 +59,17 @@ export const ProfilePage = () => (
 _None_
 
 ## Examples
+```tsx
+import { Todo } from "@contember/react-components"
+
+export const AuthReminder = () => (
+	<Todo className="rounded bg-orange-100 px-3 py-2 text-orange-900">
+		Implement authentication logic
+	</Todo>
+)
+```
+This basic example shows the minimal usage of `Todo` without extra decoration.
+
 ```tsx
 import { Todo } from "@contember/react-components"
 

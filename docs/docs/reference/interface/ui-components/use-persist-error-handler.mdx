@@ -1,21 +1,20 @@
 ---
 title: usePersistErrorHandler
-sidebar_label: usePersistErrorHandler
 ---
 
 # usePersistErrorHandler
 
 ## Overview
-`usePersistErrorHandler` is a React hook that centralizes how you surface persistence errors.  
+`usePersistErrorHandler` is a React hook that centralizes how you surface persistence errors.
 It returns a callback that catches an error and displays a toast notification with the appropriate message.
 
 ## Styling Guidelines
-* All examples use Tailwind classes.  
+* All examples use Tailwind classes.
 * Toast components rely on the default Contember theme; no extra classes are required.
 
 ## Core Concepts
-* You call the returned handler inside a `try / catch` block.  
-* The hook maps technical persistence errors to user‑friendly toast notifications.  
+* You call the returned handler inside a `try / catch` block.
+* The hook maps technical persistence errors to user‑friendly toast notifications.
 * Toasts are rendered through the Contember toast system already present in the app shell.
 
 ## Quick Start
@@ -70,14 +69,14 @@ const handleSubmit = async (values: FormValues) => {
 The form passes any thrown error to `handleError`. The user sees an immediate toast describing what went wrong.
 
 ## Best Practices & Gotchas
-* Always wrap persistence calls in `try / catch`; do not rely on implicit error handling.  
-* Place the hook close to the component performing the persistence for clearer code.  
-* Do not swallow the error after calling `handleError` if upstream logic depends on the rejection.  
+* Always wrap persistence calls in `try / catch`; do not rely on implicit error handling.
+* Place the hook close to the component performing the persistence for clearer code.
+* Do not swallow the error after calling `handleError` if upstream logic depends on the rejection.
 * Keep toast messages short; the hook already provides a concise default.
 
 ## Further Reading
-* Contember Toast system  
-* Persisting data with Contember client SDK  
+* Contember Toast system
+* Persisting data with Contember client SDK
 * Error boundaries in React
 
 <!-- End of Generated Documentation -->

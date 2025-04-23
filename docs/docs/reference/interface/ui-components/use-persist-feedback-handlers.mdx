@@ -1,18 +1,17 @@
 ---
 title: usePersistFeedbackHandlers
-sidebar_label: usePersistFeedbackHandlers
 ---
 
 # usePersistFeedbackHandlers
 
 ## Overview
-`usePersistFeedbackHandlers` is a React hook that centralizes persistence‑related feedback logic.  
+`usePersistFeedbackHandlers` is a React hook that centralizes persistence‑related feedback logic.
 It currently exposes a single success handler suited for calls like `persistData`.
 
 The hook is primarily consumed by `usePersistWithFeedback`, but you can call it directly in any async workflow.
 
 ## Styling Guidelines
-* All snippets use Tailwind CSS.  
+* All snippets use Tailwind CSS.
 * No Contember‑specific theme classes are required for this hook.
 
 ## Core Concepts
@@ -50,7 +49,7 @@ _None_
 
 ## Sub-Components / Building Blocks
 ### onPersistSuccess
-A callback you pass to any promise that performs data persistence.  
+A callback you pass to any promise that performs data persistence.
 The handler usually triggers a success toast or similar UI notification.
 
 ## Examples

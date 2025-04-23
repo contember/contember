@@ -1,17 +1,16 @@
 ---
 title: SideDimensions
-sidebar_label: SideDimensions
 ---
 
 <!-- Edited by human: false -->
 <!-- Examples count: 3 -->
 
 ## Overview
-`SideDimensions` renders content for a single dimension inside a flexible side panel.  
+`SideDimensions` renders content for a single dimension inside a flexible side panel.
 It wraps your fields with `DimensionRenderer` and a `HasOne` relationship, so you can edit translated or versioned data in isolation.
 
 ## Styling Guidelines
-* All examples use Tailwind utility classes.  
+* All examples use Tailwind utility classes.
 * No Contember‑specific theme classes are required for `SideDimensions`.
 
 ## Core Concepts
@@ -94,10 +93,10 @@ _None_
   </Binding>
 </>
 ```
-Explanation  
-* `DimensionsSwitcher` lets users pick one or more locales.  
-* `SideDimensions` renders the form for the selected locale only.  
-* `currentLocale` is available for headings or conditional logic.  
+Explanation
+* `DimensionsSwitcher` lets users pick one or more locales.
+* `SideDimensions` renders the form for the selected locale only.
+* `currentLocale` is available for headings or conditional logic.
 * The layout remains isolated inside a card.
 
 ### Environment middleware with inline heading
@@ -131,9 +130,9 @@ Explanation
   </SelectField>
 </Slots.Sidebar>
 ```
-Explanation  
-* The environment middleware pre‑loads both locales.  
-* `SideDimensions` switches the locale form without extra UI.  
+Explanation
+* The environment middleware pre‑loads both locales.
+* `SideDimensions` switches the locale form without extra UI.
 * Unrelated forms (`notes`, sidebar inputs) coexist with the dimension‑aware part.
 
 ## Best Practices & Gotchas
@@ -143,8 +142,8 @@ Explanation
 * Wrap heavy content in cards to preserve side panel spacing.
 
 ## Further Reading
-* `DimensionsSwitcher` – user interface for selecting dimensions.  
-* `DimensionRenderer` – low‑level renderer used internally.  
+* `DimensionsSwitcher` – user interface for selecting dimensions.
+* `DimensionRenderer` – low‑level renderer used internally.
 * Contember docs – Dimensions & Localization guide.
 
 <!-- End of Generated Documentation -->

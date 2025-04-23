@@ -246,7 +246,6 @@ When updating existing documentation:
 		const examplesCount = sourceData.examples?.length || 0
 		const frontmatter = `---
 title: ${title}
-sidebar_label: ${sidebarLabel}
 ---
 
 `

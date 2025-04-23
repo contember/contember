@@ -1,23 +1,22 @@
 ---
 title: DefaultRepeater
-sidebar_label: DefaultRepeater
 ---
 <!-- Examples count: 6 -->
 
 
 ## Overview
-DefaultRepeater wraps `Repeater` and renders a ready‑made UI for managing a list of entities.  
+DefaultRepeater wraps `Repeater` and renders a ready‑made UI for managing a list of entities.
 It handles ordering, add/remove buttons, and item actions so you can focus on form fields.
 
 ## Styling Guidelines
-* All snippets use TailwindCSS utility classes.  
+* All snippets use TailwindCSS utility classes.
 * No Contember‑specific theme classes are required; integrate with your existing Tailwind setup.
 
 ## Core Concepts
-* DefaultRepeater manages an entity collection for you.  
-* You can make the list sortable by passing `sortableBy`.  
-* Place form fields inside DefaultRepeater to edit each item.  
-* Use `RepeaterItemActions` to place per‑item controls (e.g., delete).  
+* DefaultRepeater manages an entity collection for you.
+* You can make the list sortable by passing `sortableBy`.
+* Place form fields inside DefaultRepeater to edit each item.
+* Use `RepeaterItemActions` to place per‑item controls (e.g., delete).
 * The component forwards every prop of the underlying `Repeater`.
 
 ## Quick Start
@@ -211,15 +210,15 @@ The repeater edits a relation inside `EntitySubTree`; new items inherit the `uni
 Items follow the backend order and still expose dropdown and delete actions.
 
 ## Best Practices & Gotchas
-* Always choose either `sortableBy` or `orderBy`, not both.  
-* Nest DefaultRepeater under `EntitySubTree` when editing relations.  
-* Wrap destructive buttons in `RepeaterItemActions` for consistent spacing.  
-* Remember to persist the form with `PersistButton` to save ordering changes.  
+* Always choose either `sortableBy` or `orderBy`, not both.
+* Nest DefaultRepeater under `EntitySubTree` when editing relations.
+* Wrap destructive buttons in `RepeaterItemActions` for consistent spacing.
+* Remember to persist the form with `PersistButton` to save ordering changes.
 * Large lists may benefit from virtual scrolling; DefaultRepeater does not handle this.
 
 ## Further Reading
-* Repeater – the lower‑level component that DefaultRepeater wraps.  
-* EntitySubTree – editing nested relations in Contember forms.  
-* PersistButton – saving mutations triggered by Repeaters.  
+* Repeater – the lower‑level component that DefaultRepeater wraps.
+* EntitySubTree – editing nested relations in Contember forms.
+* PersistButton – saving mutations triggered by Repeaters.
 
 <!-- End of Generated Documentation -->

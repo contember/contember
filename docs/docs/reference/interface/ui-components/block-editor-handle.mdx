@@ -1,16 +1,15 @@
 ---
 title: BlockEditorHandle
-sidebar_label: BlockEditorHandle
 ---
 <!-- Examples count: 1 -->
 
 
 ## Overview
-BlockEditorHandle renders a small drag handle inside a block‑editor layout.  
+BlockEditorHandle renders a small drag handle inside a block‑editor layout.
 You use it to reorder blocks via drag‑and‑drop in Contember’s sortable block editor.
 
 ## Styling Guidelines
-* All snippets use Tailwind classes.  
+* All snippets use Tailwind classes.
 * The component itself has no required Contember theme classes, but you should add cursor and spacing utilities for better UX.
 
 ## Core Concepts
@@ -33,8 +32,8 @@ export const MyBlock = () => (
 ```
 
 ## Detailed Guide
-1. Place `<BlockEditorHandle />` as the first child of your block container.  
-2. Apply `cursor-move` so users know they can drag.  
+1. Place `<BlockEditorHandle />` as the first child of your block container.
+2. Apply `cursor-move` so users know they can drag.
 3. Use padding to enlarge the hit‑area for accessibility.
 
 ```tsx
@@ -85,14 +84,14 @@ const PageForm = () => (
 The handle enables drag‑and‑drop ordering without extra configuration.
 
 ## Best Practices & Gotchas
-* Always wrap the handle in a `flex` container so it keeps its size.  
-* Add `cursor-grab` or `cursor-move` to signal interactivity.  
-* Increase padding for touch devices.  
+* Always wrap the handle in a `flex` container so it keeps its size.
+* Add `cursor-grab` or `cursor-move` to signal interactivity.
+* Increase padding for touch devices.
 * Do not nest multiple handles inside one block.
 
 ## Further Reading
-* `SortableBlocksField` – container that makes blocks sortable.  
-* `BlockEditor` – high‑level editor for rich content.  
+* `SortableBlocksField` – container that makes blocks sortable.
+* `BlockEditor` – high‑level editor for rich content.
 * Tailwind utility documentation.
 
 <!-- End of Generated Documentation -->

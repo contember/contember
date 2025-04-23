@@ -1,22 +1,21 @@
 ---
 title: IdentityLoader
-sidebar_label: IdentityLoader
 ---
 
 ## Overview
-`IdentityLoader` manages user‑identity loading inside your React app.  
+`IdentityLoader` manages user‑identity loading inside your React app.
 It shows nothing until the identity is fetched, then renders children or a fallback UI on failure.
 
 The component centralises authentication state so you avoid manual loading checks in every view.
 
 ## Styling Guidelines
-* All examples use TailwindCSS classes.  
+* All examples use TailwindCSS classes.
 * No special Contember theme classes are required.
 
 ## Core Concepts
-* Identity status can be loading, error, or ready.  
-* The component blocks rendering until identity is ready.  
-* It forwards no visual props—styling happens inside your children.  
+* Identity status can be loading, error, or ready.
+* The component blocks rendering until identity is ready.
+* It forwards no visual props—styling happens inside your children.
 * Place it high in the tree, usually around global layout.
 
 ## Quick Start
@@ -86,14 +85,14 @@ const Shell = ({ children }: React.PropsWithChildren) => (
 The wrapper blocks rendering until Contember confirms the current identity, avoiding flashes of unauthenticated UI.
 
 ## Best Practices & Gotchas
-* Place `IdentityLoader` once at the top; nesting offers no benefit.  
-* Do not render it conditionally; mount it immediately.  
-* Keep heavyweight loading indicators inside your layout, not in `IdentityLoader`.  
+* Place `IdentityLoader` once at the top; nesting offers no benefit.
+* Do not render it conditionally; mount it immediately.
+* Keep heavyweight loading indicators inside your layout, not in `IdentityLoader`.
 * Remember that children may render `null` while loading; design layouts accordingly.
 
 ## Further Reading
-* Contember authentication guide  
-* `useIdentity` hook (library helper)  
+* Contember authentication guide
+* `useIdentity` hook (library helper)
 * Layout and slots pattern in Contember
 
 <!-- End of Generated Documentation -->

@@ -1,6 +1,5 @@
 ---
 title: SortableBlock
-sidebar_label: SortableBlock
 ---
 <!-- Examples count: 1 -->
 
@@ -13,13 +12,13 @@ SortableBlock wraps a Slate editor block and makes it draggable. You add it to a
 The component shows visual feedback with an overlay while you drag. It never mutates Slate state; it only forwards events to the `withSortable` plugin.
 
 ## Styling Guidelines
-* All examples use Tailwind CSS.  
+* All examples use Tailwind CSS.
 * SortableBlock adds no Contember‑specific theme classes, so you style it freely.
 
 ## Core Concepts
-* Slate renders each editor block through a React component.  
-* `SortableBlock` must receive the exact Slate `element` instance.  
-* Drag handles, outlines, and cursor styles are up to you; SortableBlock only manages DOM events.  
+* Slate renders each editor block through a React component.
+* `SortableBlock` must receive the exact Slate `element` instance.
+* Drag handles, outlines, and cursor styles are up to you; SortableBlock only manages DOM events.
 * The `withSortable` plugin updates Slate when the drag ends.
 
 ## Quick Start
@@ -102,15 +101,15 @@ const sortable = withSortable({
 You pass a `canDrop` function to the plugin, not to `SortableBlock`. The block now drags only inside its original section.
 
 ## Best Practices & Gotchas
-* Always pass the same `element` instance you received in `renderElement`.  
-* Memoize heavy child components; dragging triggers re‑renders.  
-* Add a visible drag handle to improve usability on touch devices.  
-* Avoid absolute positioning inside the block; the overlay copies computed styles.  
+* Always pass the same `element` instance you received in `renderElement`.
+* Memoize heavy child components; dragging triggers re‑renders.
+* Add a visible drag handle to improve usability on touch devices.
+* Avoid absolute positioning inside the block; the overlay copies computed styles.
 * Do not mutate the Slate element inside SortableBlock.
 
 ## Further Reading
-* withSortable plugin documentation  
-* BlockEditor component  
+* withSortable plugin documentation
+* BlockEditor component
 * Slate `renderElement` pattern
 
 <!-- End of Generated Documentation -->

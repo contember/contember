@@ -12,7 +12,7 @@ title: RepeaterDropIndicator
 # RepeaterDropIndicator
 
 ## Overview
-`RepeaterDropIndicator` shows users where a dragged repeater item will land.  
+`RepeaterDropIndicator` shows users where a dragged repeater item will land.
 It positions itself **before** or **after** the current item based on the `position` prop.
 
 ## Styling Guidelines
@@ -39,7 +39,7 @@ export const SimpleDropZone = () => (
 ```
 
 ## Detailed Guide
-Place the indicator at both ends of every sortable item.  
+Place the indicator at both ends of every sortable item.
 Wrap the whole row in `relative` so the absolutely positioned line anchors correctly.
 
 ```tsx
@@ -226,7 +226,7 @@ Explanation:
 Explanation:
 * Hides the activator when the list is `readonly` but still renders both indicators.
 
-### 108 Agency – Block Repeater With Add-Item Button
+### Block Repeater With Add-Item Button
 ```tsx
 <RepeaterSortableEachItem>
 	<div className="relative">
@@ -247,7 +247,7 @@ Explanation:
 Explanation:
 * Same pattern as the Learning Platform; proves consistency across projects.
 
-### 108 Agency – Basic Repeater Wrapper
+### Basic Repeater Wrapper
 ```tsx
 <RepeaterSortable>
 	<BlockRepeaterItemsWrapperUI>
@@ -261,7 +261,7 @@ Explanation:
 Explanation:
 * Simplest scaffold showing where items live.
 
-### 108 Agency – Item With Actions And Handle
+### Item With Actions And Handle
 ```tsx
 <div className="relative">
 	<RepeaterDropIndicator position="before" />
@@ -284,7 +284,7 @@ Explanation:
 Explanation:
 * Conditional remove button illustrates flexible layouts.
 
-### 108 Agency – Readonly Repeater Wrapper
+### Readonly Repeater Wrapper
 ```tsx
 <Repeater {...props}>
 	<RepeaterSortable>

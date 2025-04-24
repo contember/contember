@@ -3,11 +3,11 @@ title: UploadedImageView
 ---
 
 <!-- Edited by human: false -->
-<!-- Examples count: 13 -->
+<!-- Examples count: 5 -->
 <!-- Source examples: 0 -->
 <!-- Playground examples: 3 -->
-<!-- External examples: 10 -->
-<!-- Import examples: 7 -->
+<!-- External examples: 2 -->
+<!-- Import examples: 4 -->
 
 ## Overview
 _None_
@@ -38,31 +38,31 @@ _None_
 ## Props Reference
 | Name | Type | Required | Default | Description |
 | --- | --- | --- | --- | --- |
-| urlField | string &#124; { field: string; hasOneRelationPath?: SugarableHasOneRelation &#124; SugarableHasOneRelation[] } | Yes | - | Field holding the image URL. |
-| fileNameField | string &#124; { field: string; hasOneRelationPath?: SugarableHasOneRelation &#124; SugarableHasOneRelation[] } | No | - | Field with the original filename. |
-| lastModifiedField | string &#124; { field: string; hasOneRelationPath?: SugarableHasOneRelation &#124; SugarableHasOneRelation[] } | No | - | Field with last modified timestamp. |
-| fileSizeField | string &#124; { field: string; hasOneRelationPath?: SugarableHasOneRelation &#124; SugarableHasOneRelation[] } | No | - | Field containing file size in bytes. |
-| fileTypeField | string &#124; { field: string; hasOneRelationPath?: SugarableHasOneRelation &#124; SugarableHasOneRelation[] } | No | - | Field holding MIME type. |
-| widthField | string &#124; { field: string; hasOneRelationPath?: SugarableHasOneRelation &#124; SugarableHasOneRelation[] } | No | - | Image width in pixels. |
-| heightField | string &#124; { field: string; hasOneRelationPath?: SugarableHasOneRelation &#124; SugarableHasOneRelation[] } | No | - | Image height in pixels. |
-| baseField | string &#124; SugarableHasOneRelation &#124; SugarableHasOneRelation[] | No | - | Relation path shared by all file sub-fields. |
-| actions | React.ReactNode | No | - | Extra action buttons rendered over the image. |
-| edit | React.ReactNode | No | - | Custom edit UI shown with the image. |
-| noDestroy | boolean | No | - | Disable default destroy action when `DestroyAction` is not provided. |
-| DestroyAction | React.ComponentType&lt;{ children: React.ReactElement }&gt; | No | - | Custom component wrapping a destroy trigger. |
+| urlField | `string \| { field: string; hasOneRelationPath?: SugarableHasOneRelation \| SugarableHasOneRelation[] }` | Yes | - | Field holding the image URL. |
+| fileNameField | `string \| { field: string; hasOneRelationPath?: SugarableHasOneRelation \| SugarableHasOneRelation[] }` | No | - | Field with the original filename. |
+| lastModifiedField | `string \| { field: string; hasOneRelationPath?: SugarableHasOneRelation \| SugarableHasOneRelation[] }` | No | - | Field with last modified timestamp. |
+| fileSizeField | `string \| { field: string; hasOneRelationPath?: SugarableHasOneRelation \| SugarableHasOneRelation[] }` | No | - | Field containing file size in bytes. |
+| fileTypeField | `string \| { field: string; hasOneRelationPath?: SugarableHasOneRelation \| SugarableHasOneRelation[] }` | No | - | Field holding MIME type. |
+| widthField | `string \| { field: string; hasOneRelationPath?: SugarableHasOneRelation \| SugarableHasOneRelation[] }` | No | - | Image width in pixels. |
+| heightField | `string \| { field: string; hasOneRelationPath?: SugarableHasOneRelation \| SugarableHasOneRelation[] }` | No | - | Image height in pixels. |
+| baseField | `string \| SugarableHasOneRelation \| SugarableHasOneRelation[]` | No | - | Relation path shared by all file sub-fields. |
+| actions | `React.ReactNode` | No | - | Extra action buttons rendered over the image. |
+| edit | `React.ReactNode` | No | - | Custom edit UI shown with the image. |
+| noDestroy | `boolean` | No | - | Disable default destroy action when `DestroyAction` is not provided. |
+| DestroyAction | `React.ComponentType<{ children: React.ReactElement }>` | No | - | Custom component wrapping a destroy trigger. |
 
 ## Sub-Components / Building Blocks
 _None_
 
 ## Examples
 
-### Image preview inside a content card
+### Basic preview in a relation
 ```tsx
 <HasOne field="image">
   <UploadedImageView urlField="url" className="w-48 h-48 object-cover rounded" />
 </HasOne>
 ```
-This renders a 48 × 48 preview inside your card layout.
+Displays a square thumbnail pulled from the related `image` entity.
 
 ### Conditional layout based on an entity field
 ```tsx
@@ -88,9 +88,9 @@ This renders a 48 × 48 preview inside your card layout.
   </div>
 </div>
 ```
-You flip image order when the `imagePosition` field equals `"right"`.
+Switch the image column when the `imagePosition` field equals `"right"`.
 
-### Grid selection with custom click behavior
+### Selectable grid item
 ```tsx
 it => (
   <div
@@ -104,41 +104,9 @@ it => (
   </div>
 )
 ```
-Use the component inside a selectable grid. The outer div adds visual feedback and custom click logic.
+Use the component inside a selectable grid. The outer element handles selection logic and hover styling.
 
-### Repeater item with a remove trigger
-```tsx
-props => (
-  <FileRepeaterFieldInner {...props} fileType={createImageFileType(props)}>
-    {props.children ?? (
-      <UploadedImageView
-        {...props}
-        DestroyAction={RepeaterRemoveItemTrigger}
-        className="w-32 h-32 object-cover"
-      />
-    )}
-  </FileRepeaterFieldInner>
-)
-```
-Wrap the image inside a repeater field. The custom `DestroyAction` removes the item without touching related entities.
-
-### Single file field with a disconnect trigger
-```tsx
-props => (
-  <UploadFieldInner {...props} fileType={createImageFileType(props)}>
-    {props.children ?? (
-      <UploadedImageView
-        {...props}
-        DestroyAction={DisconnectEntityTrigger}
-        className="w-full max-w-xs rounded"
-      />
-    )}
-  </UploadFieldInner>
-)
-```
-Use the image inside a standard upload field. The `DisconnectEntityTrigger` breaks the relation while keeping the file entity intact.
-
-### Repeater field with overlay checkbox and hidden danger buttons
+### Repeater item with overlay checkbox and remove trigger
 ```tsx
 () => (
   <div className="[&_.cui-button.theme-danger-controls]:hidden [&_.cui-button.scheme-light]:bg-white">
@@ -160,25 +128,31 @@ Use the image inside a standard upload field. The `DisconnectEntityTrigger` brea
   </div>
 )
 ```
-Overlay a checkbox in the corner and visually hide danger buttons. This pattern works well in image galleries where editors mark photos as “used”.
+Overlay a checkbox in the corner and hide default danger buttons. Editors can mark photos as “used” while still removing them.
 
-### Upload field with conditional destroy logic
+### Same pattern reused in another project
 ```tsx
-props => (
-  <UploadFieldInner {...props} fileType={createImageFileType(props)}>
-    <UploaderItemUI>
-      {props.children ?? (
-        <UploadedImageView
-          {...props}
-          DestroyAction={props.noDestroy ? undefined : DisconnectEntityTrigger}
-          className="w-40 h-40 object-cover"
-        />
-      )}
-    </UploaderItemUI>
-  </UploadFieldInner>
+() => (
+  <div className="[&_.cui-button.theme-danger-controls]:hidden [&_.cui-button.scheme-light]:bg-white">
+    <ImageRepeaterField
+      field="photos"
+      urlField="image.url"
+      sortableBy="order"
+      label={undefined}
+      withoutUploader
+    >
+      <div className="relative">
+        <div className="absolute top-1 right-1 z-10 bg-white/80 py-0.5 px-1 rounded">
+          <CheckboxField field="isUsed" label="Use image" />
+        </div>
+
+        <UploadedImageView urlField="image.url" DestroyAction={RepeaterRemoveItemTrigger} />
+      </div>
+    </ImageRepeaterField>
+  </div>
 )
 ```
-Toggle destroy capability via the `noDestroy` prop. This lets you reuse one field component in editable and read-only contexts.
+A CMS project reuses the exact setup, proving the pattern scales across codebases.
 
 ## Best Practices & Gotchas
 * Supply only fields you actually store; missing props do not break rendering.  

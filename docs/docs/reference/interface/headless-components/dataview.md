@@ -4,12 +4,12 @@ title: DataView
 
 This guide introduces the **headless DataView** API from `@contember/react-dataview`. It is intended for React developers who want full control over the UI of their data listings (tables, grids, tile views, etc.) while benefiting from robust built-in logic for filtering, sorting, pagination, highlighting rows, exporting, and more.
 
-Unlike a “batteries-included” component, the headless DataView **does not impose any specific UI**. Instead, it provides reusable primitives (components, hooks, utilities) that you can assemble into **any** design—table, list, tiles, or a custom layout. If you prefer a ready-to-use, styled grid component, see the [**UI DataGrid**](../ui-components/datagrid.md) documentation instead.
+Unlike a “batteries-included” component, the headless DataView **does not impose any specific UI**. Instead, it provides reusable primitives (components, hooks, utilities) that you can assemble into **any** design—table, list, tiles, or a custom layout. If you prefer a ready-to-use, styled grid component, see the [**UI DataGrid**](../ui-components/datagrid.mdx) documentation instead.
 
 
 ## Core Concepts
 
-1. **DataView State**  
+1. **DataView State**
    Each “data view” consists of:
 
 - **Filtering** state (which conditions are applied to the data)
@@ -17,10 +17,10 @@ Unlike a “batteries-included” component, the headless DataView **does not im
 - **Paging** state (current page, items per page)
 - **Selection & Layout** state (e.g., which layout to show or which columns to hide)
 
-2. **Decoupled Logic & UI**  
+2. **Decoupled Logic & UI**
    DataView handles data querying, filter condition creation, and pagination. **You** supply the markup (tables, inputs, buttons, etc.). The library’s components and hooks help you connect these UI elements to the underlying state.
 
-3. **Storage & Persistence**  
+3. **Storage & Persistence**
    You can store DataView state in the URL, session storage, local storage, or a custom storage. This makes it easy to preserve user settings across page refreshes or navigations.
 
 
@@ -45,11 +45,11 @@ export default () => <>
     <DataViewLoaderState initial refreshing>
       <p>Loading...</p>
     </DataViewLoaderState>
-      
+
     <DataViewLoaderState failed>
       <p>Failed to load data</p>
     </DataViewLoaderState>
-      
+
     <DataViewLoaderState loaded>
       <table>
         <tr>
@@ -147,7 +147,7 @@ const { state, methods, info } = useControlledDataView({
   // same props as in DataView
 })
 
-// here you can access or intercept state / methods of the dataview 
+// here you can access or intercept state / methods of the dataview
 
 const dataview = <ControlledDataView state={state} methods={methods} info={info} />
 ```

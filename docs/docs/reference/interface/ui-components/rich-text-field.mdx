@@ -12,7 +12,7 @@ title: RichTextField
 # RichTextField
 
 ## Overview
-RichTextField embeds a rich-text editor into a Contember form.  
+RichTextField embeds a rich-text editor into a Contember form.
 It integrates with Contember’s field management and offers basic formatting like bold, italic, and code.
 
 The editor relies on a plugin architecture, supports custom placeholders, and becomes read-only during ongoing mutations.
@@ -72,10 +72,10 @@ import {
 ## Props Reference
 | Name | Type | Required | Default | Description |
 |------|------|----------|---------|-------------|
-| field | string &#124; { field: string; hasOneRelationPath?: SugarableHasOneRelation &#124; SugarableHasOneRelation[] } | Yes | — | Form field name for storing content |
+| field | `string \| { field: string; hasOneRelationPath?: SugarableHasOneRelation \| SugarableHasOneRelation[] }` | Yes | — | Form field name for storing content |
 | label | React.ReactNode | Yes | — | Visible label shown above the editor |
 | description | React.ReactNode | Yes | — | Helper text rendered below the editor |
-| errors | React.ReactNode &#124; ErrorAccessor.Error[] | Yes | — | Validation errors for the field |
+| errors | `React.ReactNode | ErrorAccessor.Error[]` | Yes | — | Validation errors for the field |
 | required | boolean | Yes | — | Marks the input as mandatory |
 | children | React.ReactNode | Yes | — | Toolbar, triggers, or other custom nodes (inherited) |
 

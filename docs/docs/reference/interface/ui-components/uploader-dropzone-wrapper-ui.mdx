@@ -3,11 +3,11 @@ title: UploaderDropzoneWrapperUI
 ---
 
 <!-- Edited by human: false -->
-<!-- Examples count: 4 -->
+<!-- Examples count: 0 -->
 <!-- Source examples: 0 -->
 <!-- Playground examples: 0 -->
-<!-- External examples: 4 -->
-<!-- Import examples: 4 -->
+<!-- External examples: 0 -->
+<!-- Import examples: 0 -->
 
 # UploaderDropzoneWrapperUI
 
@@ -22,7 +22,7 @@ Use it with UploaderDropzoneArea, UploaderDropzoneAreaUI, and UploaderInactiveDr
 
 ## Core Concepts
 * Wrapper only – it adds no logic; you control which child gets rendered.
-* Render prop pattern – place UploaderDropzoneArea or UploaderInactiveDropzoneUI as children.
+* Render-prop pattern – place UploaderDropzoneArea or UploaderInactiveDropzoneUI as children.
 * Composability – nest it inside UploaderDropzoneRoot to gain full uploader context.
 
 ## Quick Start
@@ -58,33 +58,7 @@ _None_
 _None_
 
 ## Examples
-
-### Switching to inactive UI while uploading
-```tsx
-({ inactiveOnUpload }: { inactiveOnUpload?: boolean }) => {
-	const filesInProgress = useUploaderStateFiles({ state: ['uploading', 'initial', 'finalizing'] })
-	const showLoader = inactiveOnUpload && filesInProgress.length > 0
-
-	return (
-		<UploaderDropzoneRoot>
-			<UploaderDropzoneWrapperUI>
-				{showLoader ? (
-					<UploaderInactiveDropzoneUI />
-				) : (
-					<UploaderDropzoneArea>
-						<UploaderDropzoneAreaUI className="flex flex-col items-center gap-2 p-6 border-2 border-dashed rounded-md">
-							<span className="text-sm font-semibold">Drop files here</span>
-							<span className="text-xs">or</span>
-							<button className="px-3 py-1 text-xs border rounded">Browse</button>
-						</UploaderDropzoneAreaUI>
-					</UploaderDropzoneArea>
-				)}
-			</UploaderDropzoneWrapperUI>
-		</UploaderDropzoneRoot>
-	)
-}
-```
-The component stays agnostic of upload state. You decide when to render UploaderInactiveDropzoneUI.
+_None_
 
 ## Best Practices & Gotchas
 * Always wrap the component inside UploaderDropzoneRoot to get proper context.

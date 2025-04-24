@@ -3,11 +3,11 @@ title: UploaderProgress
 ---
 
 <!-- Edited by human: false -->
-<!-- Examples count: 10 -->
+<!-- Examples count: 2 -->
 <!-- Source examples: 0 -->
 <!-- Playground examples: 0 -->
-<!-- External examples: 10 -->
-<!-- Import examples: 5 -->
+<!-- External examples: 2 -->
+<!-- Import examples: 2 -->
 
 # UploaderProgress
 
@@ -49,6 +49,7 @@ export const ImageUploadField = () => (
 ```  
 
 ## Detailed Guide  
+
 ### Conditional Rendering  
 UploaderProgress appears only when a file is queued or uploading. Wrap it with `<UploaderHasFile>` to avoid empty UI:  
 ```tsx
@@ -78,6 +79,14 @@ _None_
 
 ## Examples  
 
+### Minimal Progress Indicator  
+```tsx
+<UploaderHasFile>
+  <UploaderProgress />
+</UploaderHasFile>
+```  
+This snippet shows the smallest possible integration. The progress bar appears whenever a file exists in the current uploader context.  
+
 ### Single File Upload With Preview  
 ```tsx
 <Uploader baseField="avatar">
@@ -95,7 +104,7 @@ _None_
 
   <UploaderDropzone dropzonePlaceholder="Select avatar" />
 </Uploader>
-```
+```  
 The progress bar appears while the avatar uploads, then the preview replaces it.  
 
 ### Multi-File Reordering With Drag & Drop  
@@ -119,7 +128,7 @@ The progress bar appears while the avatar uploads, then the preview replaces it.
     </RepeaterSortableEachItem>
   </RepeaterSortable>
 </Repeater>
-```
+```  
 Each image shows its own progress bar. You can reorder images even while uploads are in progress.  
 
 ## Best Practices & Gotchas  

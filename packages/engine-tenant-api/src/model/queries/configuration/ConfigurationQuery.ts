@@ -1,6 +1,5 @@
 import { DatabaseQuery, DatabaseQueryable, Literal, SelectBuilder } from '@contember/database'
-import { Config, ConfigPolicy } from '../../../schema'
-import { ConfigRow } from '../../type/Config'
+import { Config, ConfigRow } from '../../type/Config'
 
 export class ConfigurationQuery extends DatabaseQuery<Config> {
 
@@ -18,7 +17,7 @@ export class ConfigurationQuery extends DatabaseQuery<Config> {
 			passwordless: {
 				enabled: result.passwordless_enabled,
 				url: result.passwordless_url,
-				expirationMinutes: result.passwordless_expiration_minutes,
+				expiration: result.passwordless_expiration,
 			},
 			password: {
 				minLength: result.password_min_length,
@@ -30,12 +29,12 @@ export class ConfigurationQuery extends DatabaseQuery<Config> {
 				checkBlacklist: result.password_check_blacklist,
 			},
 			login: {
-				baseBackoffMs: result.login_base_backoff_ms,
-				maxBackoffMs: result.login_max_backoff_ms,
-				attemptWindowMs: result.login_attempt_window_ms,
+				baseBackoff: result.login_base_backoff,
+				maxBackoff: result.login_max_backoff,
+				attemptWindow: result.login_attempt_window,
 				revealUserExists: result.login_reveal_user_exits,
-				defaultTokenExpirationMinutes: result.login_default_token_expiration_minutes,
-				maxTokenExpirationMinutes: result.login_max_token_expiration_minutes,
+				defaultTokenExpiration: result.login_default_token_expiration,
+				maxTokenExpiration: result.login_max_token_expiration,
 			},
 		}
 	}

@@ -1,3 +1,5 @@
+import { Interval } from './types'
+import { OutputInterval } from './types'
 import { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql'
 export type Maybe<T> = T | null
 export type InputMaybe<T> = Maybe<T>
@@ -15,8 +17,9 @@ export type Scalars = {
 	Boolean: { input: boolean; output: boolean }
 	Int: { input: number; output: number }
 	Float: { input: number; output: number }
-	DateTime: { input: any; output: any }
-	Json: { input: any; output: any }
+	DateTime: { input: Date; output: Date }
+	Interval: { input: Interval; output: OutputInterval }
+	Json: { input: unknown; output: unknown }
 }
 
 export type ActivatePasswordlessOtpError = {
@@ -241,20 +244,20 @@ export type ConfigInput = {
 
 export type ConfigLogin = {
 	readonly __typename?: 'ConfigLogin'
-	readonly attemptWindowMs: Scalars['Int']['output']
-	readonly baseBackoffMs: Scalars['Int']['output']
-	readonly defaultTokenExpirationMinutes: Scalars['Int']['output']
-	readonly maxBackoffMs: Scalars['Int']['output']
-	readonly maxTokenExpirationMinutes?: Maybe<Scalars['Int']['output']>
+	readonly attemptWindow: Scalars['Interval']['output']
+	readonly baseBackoff: Scalars['Interval']['output']
+	readonly defaultTokenExpiration: Scalars['Interval']['output']
+	readonly maxBackoff: Scalars['Interval']['output']
+	readonly maxTokenExpiration?: Maybe<Scalars['Interval']['output']>
 	readonly revealUserExists: Scalars['Boolean']['output']
 }
 
 export type ConfigLoginInput = {
-	readonly attemptWindowMs?: InputMaybe<Scalars['Int']['input']>
-	readonly baseBackoffMs?: InputMaybe<Scalars['Int']['input']>
-	readonly defaultTokenExpirationMinutes?: InputMaybe<Scalars['Int']['input']>
-	readonly maxBackoffMs?: InputMaybe<Scalars['Int']['input']>
-	readonly maxTokenExpirationMinutes?: InputMaybe<Scalars['Int']['input']>
+	readonly attemptWindow?: InputMaybe<Scalars['Interval']['input']>
+	readonly baseBackoff?: InputMaybe<Scalars['Interval']['input']>
+	readonly defaultTokenExpiration?: InputMaybe<Scalars['Interval']['input']>
+	readonly maxBackoff?: InputMaybe<Scalars['Interval']['input']>
+	readonly maxTokenExpiration?: InputMaybe<Scalars['Interval']['input']>
 	readonly revealUserExists?: InputMaybe<Scalars['Boolean']['input']>
 }
 
@@ -282,13 +285,13 @@ export type ConfigPasswordInput = {
 export type ConfigPasswordless = {
 	readonly __typename?: 'ConfigPasswordless'
 	readonly enabled: ConfigPolicy
-	readonly expirationMinutes: Scalars['Int']['output']
+	readonly expiration: Scalars['Interval']['output']
 	readonly url?: Maybe<Scalars['String']['output']>
 }
 
 export type ConfigPasswordlessInput = {
 	readonly enabled?: InputMaybe<ConfigPolicy>
-	readonly expirationMinutes?: InputMaybe<Scalars['Int']['input']>
+	readonly expiration?: InputMaybe<Scalars['Interval']['input']>
 	readonly url?: InputMaybe<Scalars['String']['input']>
 }
 
@@ -1686,6 +1689,7 @@ export type ResolversTypes = {
 	InitSignInPasswordlessResponse: ResolverTypeWrapper<InitSignInPasswordlessResponse>
 	InitSignInPasswordlessResult: ResolverTypeWrapper<InitSignInPasswordlessResult>
 	Int: ResolverTypeWrapper<Scalars['Int']['output']>
+	Interval: ResolverTypeWrapper<Scalars['Interval']['output']>
 	InviteError: ResolverTypeWrapper<InviteError>
 	InviteErrorCode: InviteErrorCode
 	InviteMethod: InviteMethod
@@ -1849,6 +1853,7 @@ export type ResolversParentTypes = {
 	InitSignInPasswordlessResponse: InitSignInPasswordlessResponse
 	InitSignInPasswordlessResult: InitSignInPasswordlessResult
 	Int: Scalars['Int']['output']
+	Interval: Scalars['Interval']['output']
 	InviteError: InviteError
 	InviteOptions: InviteOptions
 	InviteResponse: InviteResponse
@@ -2069,11 +2074,11 @@ export type ConfigResolvers<ContextType = any, ParentType extends ResolversParen
 }
 
 export type ConfigLoginResolvers<ContextType = any, ParentType extends ResolversParentTypes['ConfigLogin'] = ResolversParentTypes['ConfigLogin']> = {
-	attemptWindowMs?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
-	baseBackoffMs?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
-	defaultTokenExpirationMinutes?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
-	maxBackoffMs?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
-	maxTokenExpirationMinutes?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>
+	attemptWindow?: Resolver<ResolversTypes['Interval'], ParentType, ContextType>
+	baseBackoff?: Resolver<ResolversTypes['Interval'], ParentType, ContextType>
+	defaultTokenExpiration?: Resolver<ResolversTypes['Interval'], ParentType, ContextType>
+	maxBackoff?: Resolver<ResolversTypes['Interval'], ParentType, ContextType>
+	maxTokenExpiration?: Resolver<Maybe<ResolversTypes['Interval']>, ParentType, ContextType>
 	revealUserExists?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
@@ -2091,7 +2096,7 @@ export type ConfigPasswordResolvers<ContextType = any, ParentType extends Resolv
 
 export type ConfigPasswordlessResolvers<ContextType = any, ParentType extends ResolversParentTypes['ConfigPasswordless'] = ResolversParentTypes['ConfigPasswordless']> = {
 	enabled?: Resolver<ResolversTypes['ConfigPolicy'], ParentType, ContextType>
-	expirationMinutes?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
+	expiration?: Resolver<ResolversTypes['Interval'], ParentType, ContextType>
 	url?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
@@ -2340,6 +2345,10 @@ export type InitSignInPasswordlessResultResolvers<ContextType = any, ParentType 
 	expiresAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
 	requestId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export interface IntervalScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Interval'], any> {
+	name: 'Interval'
 }
 
 export type InviteErrorResolvers<ContextType = any, ParentType extends ResolversParentTypes['InviteError'] = ResolversParentTypes['InviteError']> = {
@@ -2808,6 +2817,7 @@ export type Resolvers<ContextType = any> = {
 	InitSignInPasswordlessError?: InitSignInPasswordlessErrorResolvers<ContextType>
 	InitSignInPasswordlessResponse?: InitSignInPasswordlessResponseResolvers<ContextType>
 	InitSignInPasswordlessResult?: InitSignInPasswordlessResultResolvers<ContextType>
+	Interval?: GraphQLScalarType
 	InviteError?: InviteErrorResolvers<ContextType>
 	InviteResponse?: InviteResponseResolvers<ContextType>
 	InviteResult?: InviteResultResolvers<ContextType>

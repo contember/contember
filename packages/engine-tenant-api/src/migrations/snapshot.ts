@@ -72,7 +72,7 @@ CREATE TABLE "config" (
     "id" "config_singleton" DEFAULT 'singleton'::"config_singleton" NOT NULL,
     "passwordless_enabled" "config_policy" DEFAULT 'never'::"config_policy" NOT NULL,
     "passwordless_url" "text",
-    "passwordless_expiration_minutes" integer DEFAULT 5 NOT NULL,
+    "passwordless_expiration" interval DEFAULT '00:05:00'::interval NOT NULL,
     "password_min_length" integer DEFAULT 8 NOT NULL,
     "password_require_uppercase" integer DEFAULT 1 NOT NULL,
     "password_require_lowercase" integer DEFAULT 1 NOT NULL,
@@ -80,12 +80,12 @@ CREATE TABLE "config" (
     "password_require_special" integer DEFAULT 0 NOT NULL,
     "password_pattern" "text",
     "password_check_blacklist" boolean DEFAULT true NOT NULL,
-    "login_base_backoff_ms" integer DEFAULT 1000 NOT NULL,
-    "login_max_backoff_ms" integer DEFAULT (1000 * 60) NOT NULL,
-    "login_attempt_window_ms" integer DEFAULT ((1000 * 60) * 5) NOT NULL,
+    "login_base_backoff" interval DEFAULT '00:00:01'::interval NOT NULL,
+    "login_max_backoff" interval DEFAULT '00:01:00'::interval NOT NULL,
+    "login_attempt_window" interval DEFAULT '00:05:00'::interval NOT NULL,
     "login_reveal_user_exits" boolean DEFAULT true NOT NULL,
-    "login_default_token_expiration_minutes" integer DEFAULT 30 NOT NULL,
-    "login_max_token_expiration_minutes" integer DEFAULT ((60 * 24) * 180)
+    "login_default_token_expiration" interval DEFAULT '00:30:00'::interval NOT NULL,
+    "login_max_token_expiration" interval DEFAULT '6 mons'::interval
 );
 CREATE TABLE "identity" (
     "id" "uuid" NOT NULL,

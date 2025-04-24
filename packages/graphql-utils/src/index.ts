@@ -1,4 +1,5 @@
 export * from './DateTimeType'
+export * from './IntervalType'
 export * from './json'
 export * from './JsonType'
 export * from './errors'

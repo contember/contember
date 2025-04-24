@@ -1,11 +1,15 @@
 schema:
   - "./src/schema/tenant.graphql.ts"
 documents: []
-config:
-  immutableTypes: "1"
 generates:
   ./src/schema/index.ts:
     config:
+      scalars:
+        DateTime: Date
+        Json: unknown
+        Interval:
+          input: './types#Interval'
+          output: './types#OutputInterval'
       immutableTypes: true
       enumsAsTypes: true
     plugins:

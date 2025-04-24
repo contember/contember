@@ -23,7 +23,7 @@ export class UpdateProjectMutationResolver implements MutationResolvers {
 		}
 		await this.projectManager.updateProject(context.db, project.id, {
 			name: args.name || undefined,
-			config: args.config !== undefined ? Merger.merge(args.mergeConfig ? project.config : {}, args.config) : undefined,
+			config: args.config !== undefined ? Merger.merge(args.mergeConfig ? project.config : {}, args.config as any) : undefined,
 		})
 		return { ok: true }
 	}

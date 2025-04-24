@@ -26,7 +26,7 @@ import {
 import { Resolvers } from '../schema'
 import { MeQueryResolver, PersonQueryResolver, ProjectMembersQueryResolver, ProjectQueryResolver } from './query'
 import { IdentityTypeResolver, ProjectTypeResolver } from './types'
-import { DateTimeType, JSONType } from '@contember/graphql-utils'
+import { DateTimeType, IntervalType, JSONType } from '@contember/graphql-utils'
 import { IDPQueryResolver } from './query/IDPQueryResolver'
 import { UpdateIDPMutationResolver } from './mutation/idp/UpdateIDPMutationResolver'
 import { DisablePersonMutationResolver } from './mutation/person/DisablePersonMutationResolver'
@@ -94,6 +94,7 @@ class ResolverFactory {
 		return {
 			Json: JSONType,
 			DateTime: DateTimeType,
+			Interval: IntervalType,
 			Identity: {
 				projects: this.resolvers.identityTypeResolver.projects.bind(this.resolvers.identityTypeResolver),
 				person: this.resolvers.identityTypeResolver.person.bind(this.resolvers.identityTypeResolver),

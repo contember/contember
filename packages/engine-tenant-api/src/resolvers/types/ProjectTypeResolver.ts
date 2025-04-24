@@ -12,7 +12,7 @@ export class ProjectTypeResolver implements ProjectResolvers {
 	) {}
 
 	async members(
-		parent: Project,
+		parent: Omit<Project, 'config'>,
 		args: ProjectMembersArgs,
 		context: TenantResolverContext,
 	): Promise<readonly ProjectIdentityRelation[]> {
@@ -38,7 +38,7 @@ export class ProjectTypeResolver implements ProjectResolvers {
 		}))
 	}
 
-	async roles(parent: Project, args: unknown, context: TenantResolverContext) {
+	async roles(parent: Omit<Project, 'config'>, args: unknown, context: TenantResolverContext) {
 		const schema = await this.projectSchemaResolver.getSchema(parent.slug)
 		if (!schema) {
 			return []

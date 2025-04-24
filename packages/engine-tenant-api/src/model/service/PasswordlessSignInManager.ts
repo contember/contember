@@ -13,6 +13,7 @@ import { ImplementationException } from '../../exceptions'
 import { OtpAuthenticator } from './OtpAuthenticator'
 import { PersonToken } from '../type'
 import { AuthLogService } from './AuthLogService'
+import { intervalToSeconds } from '../utils/interval'
 
 class PasswordlessSignInManager {
 	constructor(
@@ -55,7 +56,7 @@ class PasswordlessSignInManager {
 				})
 			}
 
-			const createTokenCommand = CreatePersonTokenCommand.createPasswordlessRequest(person.id, configuration.passwordless.expirationMinutes)
+			const createTokenCommand = CreatePersonTokenCommand.createPasswordlessRequest(person.id, intervalToSeconds(configuration.passwordless.expiration) / 60)
 			const result = await db.commandBus.execute(createTokenCommand)
 
 

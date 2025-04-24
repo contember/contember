@@ -4,6 +4,9 @@ import { DocumentNode } from 'graphql'
 const schema: DocumentNode = gql`
 	scalar Json
 	scalar DateTime
+	
+	""" Interval is a string in the format ISO 8601, e.g. "PT1H" for 1 hour """
+	scalar Interval
 
 	schema {
 		query: Query
@@ -127,7 +130,7 @@ const schema: DocumentNode = gql`
 	type ConfigPasswordless {
 		enabled: ConfigPolicy!
 		url: String
-		expirationMinutes: Int!
+		expiration: Interval!
 	}
 	
 	type ConfigPassword {
@@ -141,12 +144,12 @@ const schema: DocumentNode = gql`
     }
 	
 	type ConfigLogin {
-		baseBackoffMs: Int!
-		maxBackoffMs: Int!
-		attemptWindowMs: Int!
+		baseBackoff: Interval!
+		maxBackoff: Interval!
+		attemptWindow: Interval!
 		revealUserExists: Boolean!
-		defaultTokenExpirationMinutes: Int!
-		maxTokenExpirationMinutes: Int
+		defaultTokenExpiration: Interval!
+		maxTokenExpiration: Interval
     }
 	
 	input ConfigInput {
@@ -165,7 +168,7 @@ const schema: DocumentNode = gql`
 	input ConfigPasswordlessInput {
 		enabled: ConfigPolicy
 		url: String
-		expirationMinutes: Int
+		expiration: Interval
 	}
 	
 	input ConfigPasswordInput {
@@ -179,12 +182,12 @@ const schema: DocumentNode = gql`
     }
 	
 	input ConfigLoginInput {
-		baseBackoffMs: Int
-		maxBackoffMs: Int
-		attemptWindowMs: Int
+		baseBackoff: Interval
+		maxBackoff: Interval
+		attemptWindow: Interval
 		revealUserExists: Boolean
-		defaultTokenExpirationMinutes: Int
-		maxTokenExpirationMinutes: Int
+		defaultTokenExpiration: Interval
+		maxTokenExpiration: Interval
     }
 	
 	type ConfigureResponse {

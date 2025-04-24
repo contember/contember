@@ -14,7 +14,7 @@ export class UpdateIDPMutationResolver implements MutationResolvers {
 			message: 'You are not allowed to update IDP',
 		})
 		const result = await this.idpManager.updateIDP(context.db, args.identityProvider, {
-			configuration: args.configuration,
+			configuration: args.configuration as any,
 			type: args.type ?? undefined,
 			options: {
 				autoSignUp: args.options?.autoSignUp ?? undefined,

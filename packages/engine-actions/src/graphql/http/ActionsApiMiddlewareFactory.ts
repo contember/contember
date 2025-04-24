@@ -25,6 +25,7 @@ export class ActionsApiMiddlewareFactory {
 			const graphqlContext: ActionsContext = {
 				db: systemDatabase,
 				logger,
+				project: projectContainer.project,
 				contentSchemaResolver: projectContainer.contentSchemaResolver,
 				requireAccess: async (action, message) => {
 					if (!(await this.authorizator.isAllowed(identity, new AuthorizationScope.Global(), action))) {

@@ -11,4 +11,6 @@ export namespace ActionsAuthorizationActions {
 
 	export const EVENTS_VIEW = Authorizator.createAction(Resources.events, 'view')
 	export const EVENTS_PROCESS = Authorizator.createAction(Resources.events, 'process')
+	export const EVENTS_RETRY = Authorizator.createAction(Resources.events, 'retry')
+	export const EVENTS_STOP = Authorizator.createAction(Resources.events, 'stop')
 }

@@ -15,11 +15,14 @@ export const schema: DocumentNode = gql`
         failedEvents(args: EventArgs): [Event!]!
         eventsToProcess(args: EventArgs): [Event!]!
         eventsInProcessing(args: EventArgs): [Event!]!
+        event(id: Uuid!): Event
         variables: [Variable!]!
     }
 
     type Mutation {
         processBatch: ProcessBatchResponse!
+        retryEvent(id: Uuid!): RetryEventResponse!
+        stopEvent(id: Uuid!): StopEventResponse!
         setVariables(args: SetVariablesArgs!): SetVariablesResponse!
     }
 
@@ -54,6 +57,14 @@ export const schema: DocumentNode = gql`
     }
 
     type ProcessBatchResponse {
+        ok: Boolean!
+    }
+    
+    type RetryEventResponse {
+        ok: Boolean!
+    }
+    
+    type StopEventResponse {
         ok: Boolean!
     }
 

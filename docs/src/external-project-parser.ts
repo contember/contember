@@ -14,14 +14,23 @@ export class ExternalProjectExampleFinder extends PlaygroundExampleFinder {
 				// eslint-disable-next-line no-console
 				console.log(`Searching for ${componentName} usage in external project: ${project.name} (${project.path})...`)
 
-				const projectExamples = await super.findComponentExamples(componentName, project.path)
+				const projectExamples = await super.findComponentExamples(
+					componentName,
+					project.path,
+					project.excludeFolders,
+				)
+
 				if (projectExamples.length > 0) {
 					// eslint-disable-next-line no-console
 					console.log(` -> Found ${projectExamples.length} usage examples in ${project.name}`)
 					examplesByProject.set(project.name, projectExamples)
 				}
 
-				const projectImports = await super.findComponentImports(componentName, project.path)
+				const projectImports = await super.findComponentImports(
+					componentName,
+					project.path,
+					project.excludeFolders,
+				)
 				if (projectImports.length > 0) {
 					// eslint-disable-next-line no-console
 					console.log(` -> Found ${projectImports.length} import examples in ${project.name}`)

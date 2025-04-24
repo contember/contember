@@ -75,6 +75,7 @@ export interface ExternalProject {
 	path: string
 	name: string
 	description?: string
+	excludeFolders?: string[]  // List of folder names or patterns to exclude from search
 }
 
 export interface DocsConfig {

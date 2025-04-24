@@ -13,6 +13,11 @@ const config: DocsConfig = {
 	//     path: 'path/to/external/admin/dir',
 	//     name: 'Name of the project',
 	//     description: 'Description of the project. This can help AI to understand the context and provide more accurate suggestions.',
+	//     excludeFolders: [
+	//          'lib',
+	//          'dist',
+	//          'build',
+	// 	   ],
 	//   },
 	// ],
 

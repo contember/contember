@@ -2,13 +2,13 @@
 title: User Sessions
 ---
 
-User session management is a crucial aspect of maintaining secure and efficient interactions within your application. This guide elaborates on how to manage user sessions through sign-ins and sign-outs using Contember's Tenant API.
+User session management is a key part of secure and seamless access to your application. This guide explains how session tokens work in Contember and how you can sign in, sign out, and manage session-related behavior using the Tenant API.
 
-## Sign In to Your Account
+## Signing In
 
-To sign in, you need a [login token](overview.md#authorization-tokens). Once you've successfully signed in, a session token will be issued, which is necessary for making subsequent authenticated requests.
+To begin a session, the user must call the `signIn` mutation using their credentials. Upon successful login, the server issues a session token, which must be included in subsequent requests.
 
-#### Example: How to Sign In
+### Example: Sign In with Credentials
 
 ```graphql
 mutation {
@@ -19,20 +19,38 @@ mutation {
     }
     error {
       code
+      retryAfter
     }
   }
 }
 ```
 
-:::note
-The session token's expiration time will be automatically extended with each subsequent request you make, so you don't need to worry about frequent re-logins.
-:::
+- The `expiration` value defines the token's validity in **minutes**. If not set, a default value will be applied from the server config.
+- The `retryAfter` field (returned when sign-in is rate-limited) indicates how many **seconds** you should wait before retrying.
+- The token is extended automatically with every request — users typically don’t need to re-authenticate unless inactive for a long time.
 
-## Sign Out of Your Account
+### Login Rate Limiting
 
-Signing out is straightforward: all you need to do is call the `signOut` mutation. This invalidates the session token associated with the current request, effectively logging you out.
+To protect against brute-force attacks, Contember implements adaptive rate limiting:
 
-#### Example: How to Sign Out from the Current Session
+- If too many failed attempts are made from the same source, the server will respond with a `RATE_LIMIT_EXCEEDED` error and include `retryAfter` in seconds.
+- The server uses a backoff algorithm with configuration options:
+  - **Base delay** between attempts
+  - **Maximum delay** cap
+  - **Attempt window** length (time frame for tracking failed attempts)
+
+### Hiding User Existence
+
+By default, the API **does reveal** whether the email or password is incorrect. For example, if a user attempts to sign in with an unknown email, the error will be `UNKNOWN_EMAIL`, whereas an incorrect password returns `INVALID_PASSWORD`.
+
+To prevent revealing whether an email exists, you can disable this behavior by setting `revealUserExists` to `false` in your configuration. When disabled, all login failures return a generic `INVALID_CREDENTIALS` error.
+---
+
+## Signing Out
+
+You can end a session at any time using the `signOut` mutation. This invalidates the current token.
+
+### Example: Sign Out
 
 ```graphql
 mutation {
@@ -42,11 +60,9 @@ mutation {
 }
 ```
 
-### Signing Out of All Sessions
+To invalidate all tokens associated with your account (e.g. if you're logged in on multiple devices), set `all` to `true`.
 
-If you want to take an extra step in security or think your credentials have been compromised, you can invalidate all session tokens associated with your current identity by setting the `all` parameter to `true`.
-
-#### Example: How to Sign Out from All Sessions
+### Example: Sign Out of All Sessions
 
 ```graphql
 mutation {
@@ -54,21 +70,21 @@ mutation {
     ok
   }
 }
-``` 
+```
 
-:::note
-Keep in mind that the `signOut` mutation is only applicable for persons (users with a set of credentials). It cannot be called using a permanent API key. This design choice ensures that application-level permissions remain secure.
-:::
+> ⚠️ Note: You must be authenticated as a user to call `signOut`. It does not work with permanent API keys.
 
-## Advanced: Create session token manually
+---
 
-For users with `super_admin` or `project_admin` roles, the `createSessionToken` mutation provides a way to generate session tokens for other users. This functionality enables administrators to act as a specific user.
+## Creating a Session Token as an Admin
 
-### Example: Create session token for given user
+Administrators with appropriate roles can generate a session token for any user using the `createSessionToken` mutation. This is useful for impersonation or debugging.
+
+### Example: Create Session Token
 
 ```graphql
 mutation {
-  createSessionToken(email: "example@email.com", expiration: 60) {
+  createSessionToken(email: "user@example.com", expiration: 120) {
     ok
     result {
       token
@@ -80,4 +96,36 @@ mutation {
 }
 ```
 
-You must supply either an `email` or a `personId`, along with an optional expiration time for the token.
+- You must provide either an `email` or a `personId`.
+- The `expiration` is specified in **minutes**.
+
+---
+
+## Login Configuration Options
+
+Login behavior can be configured using the `configure` mutation and adjusted per environment or security requirement. You can inspect current login settings using the `configuration` query.
+
+### Example: Fetching Login Configuration
+
+```graphql
+query {
+  configuration {
+    login {
+      revealUserExists
+      baseBackoff
+      maxBackoff
+      attemptWindow
+      defaultTokenExpiration
+      maxTokenExpiration
+    }
+  }
+}
+```
+
+### Available Settings
+
+- **`revealUserExists`**: Whether login errors should reveal whether a user exists.
+- **`defaultTokenExpiration`**: Default lifetime of session tokens (used when `expiration` is omitted). Uses ISO 8601 intervals like `"PT30M"` for 30 minutes.
+- **`maxTokenExpiration`**: Maximum allowed token lifetime.
+- **`baseBackoff`**, **`maxBackoff`**: Controls exponential delay between attempts.
+- **`attemptWindow`**: Defines how long failed login attempts are remembered.

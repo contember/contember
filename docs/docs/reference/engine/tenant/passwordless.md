@@ -54,7 +54,7 @@ mutation {
     passwordless: {
       enabled: always,
       url: "https://example.com/auth",
-      expirationMinutes: 5
+      expiration: "PT5M"
     }
   }) {
     ok

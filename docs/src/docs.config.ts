@@ -8,7 +8,15 @@ const config: DocsConfig = {
 	ai: {
 		model: 'o3',
 	},
+	// externalProjects: [
+	//   {
+	//     path: 'path/to/external/admin/dir',
+	//     name: 'Name of the project',
+	//     description: 'Description of the project. This can help AI to understand the context and provide more accurate suggestions.',
+	//   },
+	// ],
 
+	// Component-specific overrides
 	// overrides: {
 	// 	SelectField: {
 	// 		title: 'SelectField (Entity Picker)',

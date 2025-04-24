@@ -9,12 +9,14 @@ export async function writeMarkdownFile(filePath: string, content: string): Prom
 		const hasExamplesCount = content.includes('<!-- Examples count:')
 		const hasSourceExamples = content.includes('<!-- Source examples:')
 		const hasPlaygroundExamples = content.includes('<!-- Playground examples:')
+		const hasExternalExamples = content.includes('<!-- External examples:')
 		
-		if (!hasExamplesCount || !hasSourceExamples || !hasPlaygroundExamples) {
+		if (!hasExamplesCount || !hasSourceExamples || !hasPlaygroundExamples || !hasExternalExamples) {
 			console.warn(`Warning: Some metadata markers are missing in ${filePath}:` + 
 				`${!hasExamplesCount ? ' total_count' : ''}` +
 				`${!hasSourceExamples ? ' source_examples' : ''}` +
-				`${!hasPlaygroundExamples ? ' playground_examples' : ''}`)
+				`${!hasPlaygroundExamples ? ' playground_examples' : ''}` +
+				`${!hasExternalExamples ? ' external_examples' : ''}`)
 		}
 
 		await fs.mkdir(dirPath, { recursive: true })

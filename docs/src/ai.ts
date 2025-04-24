@@ -3,10 +3,7 @@ import type { AIPromptData, ComponentOverride, DocsConfig } from './types'
 
 const openai = new OpenAI()
 
-export const buildPrompt = (
-	data: AIPromptData,
-	override?: ComponentOverride,
-): string => {
+export const buildPrompt = (data: AIPromptData, override?: ComponentOverride): string => {
 	const lines: string[] = []
 
 	lines.push(`You are an **expert technical writer** creating Docusaurus pages for Contember React components.
@@ -73,27 +70,46 @@ export const buildPrompt = (
 
 	const sourceExamples: string[] = []
 	const playgroundExamples: string[] = []
+	const externalExamples: { example: string; projectName?: string }[] = []
 
-	if (data.examples?.length) {
+	if (data.exampleSources && data.exampleSources.length) {
+		data.exampleSources.forEach((sourceInfo, index) => {
+			const example = data.examples?.[index]
+
+			if (!example) return
+
+			if (!sourceInfo) {
+				// If no source info, default to JSDoc example
+				sourceExamples.push(example)
+			} else if (sourceInfo.source === 'jsdoc') {
+				sourceExamples.push(example)
+			} else if (sourceInfo.source === 'playground') {
+				playgroundExamples.push(example)
+			} else if (sourceInfo.source === 'external') {
+				externalExamples.push({
+					example,
+					projectName: sourceInfo.projectName,
+				})
+			}
+		})
+	} else if (data.examples?.length) {
 		const originalCount = data.originalExamplesCount || 0
+		const playgroundCount = data.playgroundExamplesCount || 0
 
-		if (originalCount > 0) {
-			data.examples.forEach((example, index) => {
-				if (index < originalCount) {
-					sourceExamples.push(example)
-				} else {
-					playgroundExamples.push(example)
-				}
-			})
-		} else {
-			sourceExamples.push(...data.examples)
-		}
+		data.examples.forEach((example, index) => {
+			if (index < originalCount) {
+				sourceExamples.push(example)
+			} else if (index < originalCount + playgroundCount) {
+				playgroundExamples.push(example)
+			} else {
+				externalExamples.push({ example })
+			}
+		})
 	}
 
 	lines.push(`## Examples (from source code)`)
 	if (sourceExamples.length > 0) {
 		sourceExamples.forEach(example => {
-			// Ensure each stored example is trimmed
 			lines.push('```tsx')
 			lines.push(example.trim())
 			lines.push('```')
@@ -104,14 +120,45 @@ export const buildPrompt = (
 	lines.push('')
 
 	if (playgroundExamples.length > 0) {
-		lines.push(`## Real-World Examples (from playground)`)
+		lines.push(`## Real-World Examples (from Contember playground)`)
 		playgroundExamples.forEach((example, index) => {
-			lines.push(`### Example ${index + 1}`)
+			lines.push(`### Playground Example ${index + 1}`)
 			lines.push('```tsx')
 			lines.push(example.trim())
 			lines.push('```')
 		})
-		lines.push('_These examples show how the component is used in real Contember applications. Use them for reference on component integration patterns._')
+		lines.push('_These examples show how the component is used in the Contember playground. Use them for reference on component integration patterns._')
+		lines.push('')
+	}
+
+	// Add external project examples section to prompt
+	if (externalExamples.length > 0) {
+		lines.push(`## Real-World Examples (from external Contember projects)`)
+
+		// Group examples by project name
+		const projectGroups = new Map<string, string[]>()
+
+		externalExamples.forEach(({ example, projectName }) => {
+			const key = projectName || 'Unnamed Project'
+			if (!projectGroups.has(key)) {
+				projectGroups.set(key, [])
+			}
+			projectGroups.get(key)?.push(example)
+		})
+
+		// Add each project's examples
+		Array.from(projectGroups.entries()).forEach(([projectName, examples], projectIndex) => {
+			lines.push(`### ${projectName}`)
+
+			examples.forEach((example, index) => {
+				lines.push(`#### Example ${index + 1}`)
+				lines.push('```tsx')
+				lines.push(example.trim())
+				lines.push('```')
+			})
+		})
+
+		lines.push('_These examples from real-world Contember projects show how the component is used in production applications. They provide valuable context for integration patterns and best practices._')
 		lines.push('')
 	}
 
@@ -141,6 +188,14 @@ export const buildPrompt = (
 				}
 			}
 
+			if (reason.externalExamplesChanged) {
+				if (reason.externalExamplesCount > reason.previousExternalCount) {
+					changeReason += `\n- ${reason.externalExamplesCount - reason.previousExternalCount} new external project example(s) have been added.`
+				} else if (reason.externalExamplesCount < reason.previousExternalCount) {
+					changeReason += `\n- ${reason.previousExternalCount - reason.externalExamplesCount} external project example(s) have been removed.`
+				}
+			}
+
 			if (reason.importsChanged) {
 				if (reason.importsCount > reason.previousImportsCount) {
 					changeReason += `\n- ${reason.importsCount - reason.previousImportsCount} new import example(s) are now available.`
@@ -152,6 +207,9 @@ export const buildPrompt = (
 			// Fallback if no detailed reason
 			if (reason.playgroundExamplesCount > 0) {
 				changeReason += `\n- ${reason.playgroundExamplesCount} playground example(s) have been added.`
+			}
+			if (reason.externalExamplesCount > 0) {
+				changeReason += `\n- ${reason.externalExamplesCount} external project example(s) have been added.`
 			}
 			if (reason.importsCount > 0) {
 				changeReason += '\n- Import examples are now available.'
@@ -192,13 +250,15 @@ export async function generateMarkdownWithAI(
 	if (sourceData.previousDocContent) {
 		// Calculate what changed to provide context to the AI
 		const sourceExamplesCount = sourceData.originalExamplesCount || 0
+		const playgroundExamplesCount = sourceData.playgroundExamplesCount || 0
+		const externalExamplesCount = sourceData.externalProjectExamplesCount || 0
 		const totalExamplesCount = sourceData.examples?.length || 0
-		const playgroundExamplesCount = totalExamplesCount - sourceExamplesCount
 		const importsCount = sourceData.imports?.length || 0
 
 		// Extract previous counts from the document if possible
 		const sourceRegex = /<!-- Source examples: (\d+) -->/
 		const playgroundRegex = /<!-- Playground examples: (\d+) -->/
+		const externalRegex = /<!-- External examples: (\d+) -->/
 		const importsRegex = /<!-- Import examples: (\d+) -->/
 
 		const previousSourceMatch = sourceData.previousDocContent.match(sourceRegex)
@@ -207,31 +267,36 @@ export async function generateMarkdownWithAI(
 		const previousPlaygroundMatch = sourceData.previousDocContent.match(playgroundRegex)
 		const previousPlaygroundCount = previousPlaygroundMatch ? parseInt(previousPlaygroundMatch[1], 10) : 0
 
+		const previousExternalMatch = sourceData.previousDocContent.match(externalRegex)
+		const previousExternalCount = previousExternalMatch ? parseInt(previousExternalMatch[1], 10) : 0
+
 		const previousImportsMatch = sourceData.previousDocContent.match(importsRegex)
 		const previousImportsCount = previousImportsMatch ? parseInt(previousImportsMatch[1], 10) : 0
 
 		// Create a detailed reason object
 		sourceData.regenerationReason = {
 			isUpdate: true,
-			// Source examples info
+
 			sourceExamplesCount,
 			previousSourceCount,
 			sourceExamplesChanged: sourceExamplesCount !== previousSourceCount,
 
-			// Playground examples info
 			playgroundExamplesCount,
 			previousPlaygroundCount,
 			playgroundExamplesChanged: playgroundExamplesCount !== previousPlaygroundCount,
 
-			// Import examples info
+			externalExamplesCount,
+			previousExternalCount,
+			externalExamplesChanged: externalExamplesCount !== previousExternalCount,
+
 			importsCount,
 			previousImportsCount,
 			importsChanged: importsCount !== previousImportsCount,
 
-			// Total count info
 			totalExamplesCount,
-			previousTotalCount: previousSourceCount + previousPlaygroundCount,
+			previousTotalCount: previousSourceCount + previousPlaygroundCount + previousExternalCount,
 			hasNewImports: importsCount > previousImportsCount,
+			hasNewExternalExamples: externalExamplesCount > previousExternalCount,
 		}
 	}
 
@@ -246,10 +311,8 @@ export async function generateMarkdownWithAI(
 	// ---
 
 	try {
-		// Create system prompt with specific instructions for updating docs
 		let systemPrompt = 'You are an expert technical writer generating Markdown documentation for React components for a Docusaurus site.'
 
-		// Add specific instructions if we're updating existing documentation
 		if ((sourceData as any).previousDocContent) {
 			systemPrompt += `
 
@@ -315,13 +378,15 @@ title: ${title}
 
 		// Track source and playground examples separately
 		const sourceExamplesCount = sourceData.originalExamplesCount || 0
-		const playgroundExamplesCount = (sourceData.examples?.length || 0) - sourceExamplesCount
+		const playgroundExamplesCount = sourceData.playgroundExamplesCount || 0
+		const externalExamplesCount = sourceData.externalProjectExamplesCount || 0
 		const importsCount = sourceData.imports?.length || 0
 
 		// Create metadata tags with detailed example counts
 		const examplesCountTag = `<!-- Examples count: ${examplesCount} -->`
 		const sourceExamplesTag = `<!-- Source examples: ${sourceExamplesCount} -->`
 		const playgroundExamplesTag = `<!-- Playground examples: ${playgroundExamplesCount} -->`
+		const externalExamplesTag = `<!-- External examples: ${externalExamplesCount} -->`
 		const importsTag = `<!-- Import examples: ${importsCount} -->`
 
 		// Define regexes to match and replace existing tags
@@ -329,6 +394,7 @@ title: ${title}
 		const examplesCountRegex = /<!--\s*Examples count:\s*\d+\s*-->\n*/
 		const sourceExamplesRegex = /<!--\s*Source examples:\s*\d+\s*-->\n*/
 		const playgroundExamplesRegex = /<!--\s*Playground examples:\s*\d+\s*-->\n*/
+		const externalExamplesRegex = /<!--\s*External examples:\s*\d+\s*-->\n*/
 		const importsRegex = /<!--\s*Import examples:\s*\d+\s*-->\n*/
 
 		const frontmatterEndIndex = finalContent.indexOf('---', 3)
@@ -353,6 +419,7 @@ title: ${title}
 		contentAfterInsert = contentAfterInsert.replace(examplesCountRegex, '')
 		contentAfterInsert = contentAfterInsert.replace(sourceExamplesRegex, '')
 		contentAfterInsert = contentAfterInsert.replace(playgroundExamplesRegex, '')
+		contentAfterInsert = contentAfterInsert.replace(externalExamplesRegex, '')
 		contentAfterInsert = contentAfterInsert.replace(importsRegex, '')
 
 		// Insert all metadata tags after frontmatter
@@ -362,6 +429,7 @@ title: ${title}
 			examplesCountTag + '\n' +
 			sourceExamplesTag + '\n' +
 			playgroundExamplesTag + '\n' +
+			externalExamplesTag + '\n' +
 			importsTag + '\n\n' +
 			contentAfterInsert.trimStart()
 

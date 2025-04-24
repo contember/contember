@@ -48,7 +48,6 @@ async function main() {
 			// eslint-disable-next-line no-console
 			console.log(` -> Found ${componentsData.length} component(s) in file. [${componentsData.map(c => c.componentName).join(', ')}]`)
 
-			// Process each component in the file
 			for (const sourceData of componentsData) {
 				// eslint-disable-next-line no-console
 				console.log(`\n -> Processing component: ${sourceData.componentName}`)
@@ -96,48 +95,81 @@ async function main() {
 					}
 				}
 
-				// Now that we have all examples, check if regeneration is needed
 				let regenerate = !outputFileExists
 				let existingContent: string | null = null
 
 				if (outputFileExists && sourceData.examples) {
-					// Read the existing file to check if examples count has changed
 					try {
 						existingContent = await Bun.file(outputFilePath).text()
 
-						// Look for any examples count marker in the file
-						const examplesMarker = existingContent.match(/<!-- Examples count: (\d+) -->/)
 						// eslint-disable-next-line no-console
-						console.log(` -> Checking examples count marker in existing file...`)
+						console.log(` -> Checking examples count markers in existing file...`)
 
-						if (examplesMarker && examplesMarker[1]) {
-							const existingExamplesCount = parseInt(examplesMarker[1], 10)
-							const currentExamplesCount = sourceData.examples.length
+						const totalMarker = existingContent.match(/<!-- Examples count: (\d+) -->/)
+						const sourceMarker = existingContent.match(/<!-- Source examples: (\d+) -->/)
+						const playgroundMarker = existingContent.match(/<!-- Playground examples: (\d+) -->/)
+						const importsMarker = existingContent.match(/<!-- Import examples: (\d+) -->/)
 
-							// eslint-disable-next-line no-console
-							console.log(` -> Found examples count marker: ${existingExamplesCount}, current count: ${currentExamplesCount}`)
+						const currentSourceCount = sourceData.originalExamplesCount || 0
+						const currentPlaygroundCount = (sourceData.examples?.length || 0) - currentSourceCount
+						const currentImportsCount = sourceData.imports?.length || 0
+						const currentTotalCount = sourceData.examples?.length || 0
 
-							// Regenerate if examples count has changed
-							if (existingExamplesCount !== currentExamplesCount) {
-								// eslint-disable-next-line no-console
-								console.log(` -> Examples count changed from ${existingExamplesCount} to ${currentExamplesCount}. Regenerating documentation.`)
-								regenerate = true
+						let hasChanges = false
+						let changeReason = ''
 
-								// Store the previous content for reference
-								sourceData.previousDocContent = existingContent
+						// eslint-disable-next-line no-console
+						console.log(` -> Current counts - Total: ${currentTotalCount}, Source: ${currentSourceCount}, Playground: ${currentPlaygroundCount}, Imports: ${currentImportsCount}`)
+
+						if (sourceMarker && sourceMarker[1]) {
+							const existingSourceCount = parseInt(sourceMarker[1], 10)
+							if (existingSourceCount !== currentSourceCount) {
+								hasChanges = true
+								changeReason += `source examples (${existingSourceCount}->${currentSourceCount}) `
 							}
 						} else {
-							// If no marker found, regenerate to include the marker
-							// eslint-disable-next-line no-console
-							console.log(` -> No examples count marker found in existing file. File will be regenerated.`)
-							regenerate = true
+							hasChanges = true
+							changeReason += 'missing source examples marker '
+						}
 
-							// Store the previous content for reference
+						if (playgroundMarker && playgroundMarker[1]) {
+							const existingPlaygroundCount = parseInt(playgroundMarker[1], 10)
+							if (existingPlaygroundCount !== currentPlaygroundCount) {
+								hasChanges = true
+								changeReason += `playground examples (${existingPlaygroundCount}->${currentPlaygroundCount}) `
+							}
+						} else {
+							hasChanges = true
+							changeReason += 'missing playground examples marker '
+						}
+
+						if (importsMarker && importsMarker[1]) {
+							const existingImportsCount = parseInt(importsMarker[1], 10)
+							if (existingImportsCount !== currentImportsCount) {
+								hasChanges = true
+								changeReason += `imports (${existingImportsCount}->${currentImportsCount}) `
+							}
+						} else if (currentImportsCount > 0) {
+							hasChanges = true
+							changeReason += 'missing imports marker '
+						}
+
+						if (hasChanges) {
+							// eslint-disable-next-line no-console
+							console.log(` -> Examples counts changed: ${changeReason}. Regenerating documentation.`)
+							regenerate = true
 							sourceData.previousDocContent = existingContent
+						} else if (!totalMarker || !sourceMarker || !playgroundMarker) {
+							// eslint-disable-next-line no-console
+							console.log(` -> Missing some example count markers in existing file. File will be regenerated.`)
+							regenerate = true
+							sourceData.previousDocContent = existingContent
+						} else {
+							// eslint-disable-next-line no-console
+							console.log(` -> All example counts match. No changes needed.`)
 						}
 					} catch (error) {
 						console.warn(`Error reading existing file ${outputFilePath}:`, error)
-						// If we can't read the file, assume we need to regenerate
 						regenerate = true
 					}
 				}
@@ -170,7 +202,6 @@ async function main() {
 
 		} catch (error) {
 			console.error(`Error processing file ${filePath}:`, error)
-			// Continue with next file
 		}
 	}
 

@@ -1,6 +1,6 @@
 import { executeTenantTest } from '../../../src/testTenant'
 import { testUuid } from '../../../src/testUuid'
-import { test } from 'bun:test'
+import { expect, test } from 'bun:test'
 import { signInIDP } from './gql/signInIdp'
 import { sqlTransaction } from './sql/sqlTransaction'
 import { getIdpBySlugSql } from './sql/getIdpBySlugSql'
@@ -10,6 +10,7 @@ import { getIdentityProjectsSql } from './sql/getIdentityProjectsSql'
 import { selectMembershipsSql } from './sql/selectMembershipsSql'
 import { createIdentitySql } from './sql/createIdentitySql'
 import { createPersonSql } from './sql/createPersonSql'
+import { getConfigSql } from './sql/getConfigSql'
 
 test('signs in idp with existing identity', async () => {
 	const externalIdentifier = 'abcd'
@@ -57,6 +58,7 @@ test('signs in idp with existing identity', async () => {
 						roles: [],
 					},
 				}),
+				getConfigSql(),
 				createSessionKeySql({
 					apiKeyId,
 					identityId,
@@ -79,6 +81,12 @@ test('signs in idp with existing identity', async () => {
 					},
 				},
 			},
+		},
+		expectedAuthLog: {
+			type: 'idp_login',
+			response: expect.objectContaining({
+				ok: true,
+			}),
 		},
 	})
 })
@@ -131,6 +139,7 @@ test('signs in exclusive idp', async () => {
 					parameters: [testUuid(3), idpId, personId, externalIdentifier],
 					response: { rowCount: 1 },
 				},
+				getConfigSql(),
 				createSessionKeySql({
 					apiKeyId,
 					identityId,
@@ -153,6 +162,12 @@ test('signs in exclusive idp', async () => {
 					},
 				},
 			},
+		},
+		expectedAuthLog: {
+			type: 'idp_login',
+			response: expect.objectContaining({
+				ok: true,
+			}),
 		},
 	})
 })

@@ -31,7 +31,7 @@ test('does not send an email and sets given password', async () => {
 	const tester = await createTester(schema)
 	const email = `john-${rand()}@doe.com`
 	const languageId = 'c43e7c51-e138-4e52-95d5-7a41d5c026ee'
-	const password = 'abcdefg'
+	const password = 'HWGA51KKpJ4lSW'
 	await tester(gql`
         mutation($email: String!, $projectSlug: String!, $password: String! $memberships: [MembershipInput!]!) {
             unmanagedInvite(email: $email, projectSlug: $projectSlug, memberships: $memberships, password: $password) {

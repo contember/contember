@@ -12,7 +12,7 @@ export const createSessionKeySql = function ({ apiKeyId, identityId }: { apiKeyI
 			identityId,
 			null,
 			new Date('2019-09-04 12:30'),
-			null,
+			30,
 			new Date('2019-09-04 12:00'),
 		],
 		response: { rowCount: 1 },

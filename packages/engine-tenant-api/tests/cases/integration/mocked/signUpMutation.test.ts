@@ -8,10 +8,11 @@ import { getPersonByEmailSql } from './sql/getPersonByEmailSql'
 import { sqlTransaction } from './sql/sqlTransaction'
 import { disableOneOffKeySql } from './sql/disableOneOffKeySql'
 import { test } from 'bun:test'
+import { getConfigSql } from './sql/getConfigSql'
 
 test('signs up a new user', async () => {
 	const email = 'john@doe.com'
-	const password = '123456'
+	const password = 'Ab1Cd23456'
 	const identityId = testUuid(1)
 	const personId = testUuid(2)
 	const projectId = testUuid(3)
@@ -19,6 +20,7 @@ test('signs up a new user', async () => {
 		query: signUpMutation({ email, password }),
 		executes: [
 			getPersonByEmailSql({ email, response: null }),
+			getConfigSql(),
 			...sqlTransaction(
 				createIdentitySql({ identityId, roles: ['person'] }),
 				createPersonSql({ personId, email, password, identityId }),
@@ -28,17 +30,6 @@ test('signs up a new user', async () => {
 				sql: SQL`select "id", "description", "roles"  from "tenant"."identity"  where "id" in (?)`,
 				parameters: [testUuid(1)],
 				response: { rows: [{ id: testUuid(1), description: '', roles: ['person'] }] },
-			},
-			{
-				sql: SQL`select
-                       "project"."id",
-                       "project"."name",
-                       "project"."slug"
-                     from "tenant"."project"
-                       inner join "tenant"."project_member" as "project_member" on "project_member"."project_id" = "project"."id"
-                     where "project_member"."identity_id" = ?`,
-				parameters: [identityId],
-				response: { rows: [{ id: projectId, name: 'foo', slug: 'foo' }] },
 			},
 		],
 		return: {

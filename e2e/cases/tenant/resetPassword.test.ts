@@ -6,7 +6,7 @@ import { signIn, signUp } from '../../src/requests'
 test('execute password reset', async () => {
 	const tester = await createTester(emptySchema)
 	const email = `john-${rand()}@doe.com`
-	const password = 'foobar'
+	const password = 'HWGA51KKpJ4lSW'
 	await signUp(email, password)
 
 	await tester(gql`

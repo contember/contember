@@ -28,7 +28,7 @@ test('manage global roles', async () => {
 			path: '/tenant',
 			variables: {
 				email: `foo+${rand()}@example.com`,
-				password: 'abcdxy',
+				password: 'AbCdEf1234',
 			},
 		},
 	)

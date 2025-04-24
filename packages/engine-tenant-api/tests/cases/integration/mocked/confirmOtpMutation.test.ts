@@ -3,7 +3,7 @@ import { testUuid } from '../../../src/testUuid'
 import { getPersonByIdentity } from './sql/getPersonByIdentity'
 import { confirmOtpMutation } from './gql/confirmOtp'
 import { ConfirmOtpErrorCode } from '../../../../src/schema'
-import { test } from 'bun:test'
+import { expect, test } from 'bun:test'
 import { OtpAuthenticator } from '../../../../src'
 import { Buffer } from 'buffer'
 
@@ -43,6 +43,12 @@ test('confirm otp mutation with valid code', async () => {
 				},
 			},
 		},
+		expectedAuthLog: expect.objectContaining({
+			type: '2fa_enable',
+			response: expect.objectContaining({
+				ok: true,
+			}),
+		}),
 	})
 })
 
@@ -61,13 +67,6 @@ test('confirm otp mutation with invalid code', async () => {
 					email: 'john@doe.com',
 				},
 			}),
-			{
-				sql: `update "tenant"."person" set "otp_activated_at" = ? where "id" = ?`,
-				parameters: [now, personId],
-				response: {
-					rowCount: 1,
-				},
-			},
 		],
 		return: {
 			data: {
@@ -77,6 +76,12 @@ test('confirm otp mutation with invalid code', async () => {
 				},
 			},
 		},
+		expectedAuthLog: expect.objectContaining({
+			type: '2fa_enable',
+			response: expect.objectContaining({
+				ok: false,
+			}),
+		}),
 	})
 })
 

@@ -6,7 +6,7 @@ import { signUp } from '../../src/requests'
 test('sign in using magic link', async () => {
 	const tester = await createTester(emptySchema)
 	const email = `john-${rand()}@doe.com`
-	const password = 'foobar'
+	const password = 'HWGA51KKpJ4lSW'
 	await signUp(email, password)
 	await tester(`mutation {
 	configure(config: { passwordless: {enabled: always, url: "https://example.com" }}) {

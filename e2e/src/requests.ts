@@ -2,13 +2,16 @@ import { executeGraphql, gql, loginToken } from './tester'
 import { Acl } from '@contember/schema'
 import { MembershipInput } from '../../packages/engine-tenant-api/src/schema'
 import { expect } from 'bun:test'
-export const signIn = async (email: string, password = '123456'): Promise<string> => {
+export const signIn = async (email: string, password = 'HWGA51KKpJ4lSW'): Promise<string> => {
 	const response = await executeGraphql(
 		'/tenant',
 		gql`
 			mutation ($email: String!, $password: String!) {
 				signIn(email: $email, password: $password) {
 					ok
+					error {
+						code
+					}
 					result {
 						token
 					}
@@ -25,7 +28,7 @@ export const signIn = async (email: string, password = '123456'): Promise<string
 }
 
 
-export const signUp = async (email: string, password = '123456') => {
+export const signUp = async (email: string, password = 'HWGA51KKpJ4lSW') => {
 	const signUpResponse = await executeGraphql(
 		'/tenant',
 		gql`

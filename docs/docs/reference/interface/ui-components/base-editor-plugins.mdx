@@ -1,16 +1,21 @@
 ---
 title: baseEditorPlugins
 ---
-<!-- Examples count: 1 -->
 
+<!-- Edited by human: false -->
+<!-- Examples count: 1 -->
+<!-- Source examples: 1 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 0 -->
+<!-- Import examples: 6 -->
 
 # baseEditorPlugins
 
 ## Overview
-`baseEditorPlugins` bundles the default plugin set for Contember’s Slate‑powered rich‑text editors.
+`baseEditorPlugins` bundles the default plugin set for Contember’s Slate-powered rich-text editors.  
 The collection covers structural elements (paragraphs, headings, tables) and common inline formatting (bold, code, underline).
 
-You import it once and cherry‑pick only the plugins you need. This keeps every editor lean and predictable.
+You import it once and cherry-pick only the plugins you need. This keeps every editor lean and predictable.
 
 ## Styling Guidelines
 * All code samples use Tailwind CSS utility classes.
@@ -25,7 +30,7 @@ You import it once and cherry‑pick only the plugins you need. This keeps every
 
 ## Quick Start
 ```tsx
-import { baseEditorPlugins } from '~/lib/editor'
+import { baseEditorPlugins } from '@app/lib/editor'
 import { RichTextEditor } from '@contember/react-slate'
 
 export default function Demo() {
@@ -44,9 +49,13 @@ export default function Demo() {
 
 ## Detailed Guide
 ```tsx
-import { baseEditorPlugins, EditorBlockToolbar, EditorInlineToolbar } from '~/lib/editor'
+import {
+  baseEditorPlugins,
+  EditorBlockToolbar,
+  EditorInlineToolbar,
+} from '~/lib/editor'
 
-/* Full‑featured editor with toolbars */
+/* Full-featured editor with toolbars */
 export function ArticleEditor() {
   const plugins = [
     baseEditorPlugins.paragraph,
@@ -88,14 +97,14 @@ Default text block. Uses `ParagraphRenderer`.
 Renders `h1`–`h6` via `HeadingRenderer`.
 
 ### list
-Renders ordered and unordered lists.
+Renders ordered and unordered lists.  
 Includes `ListItemRenderer`, `OrderedListRenderer`, `UnorderedListRenderer`.
 
 ### horizontalRule
 Inserts `<hr>` through `HorizontalRuleRenderer`.
 
 ### scrollTarget
-Adds in‑page anchor targets with `ScrollTargetRenderer`.
+Adds in-page anchor targets with `ScrollTargetRenderer`.
 
 ### table
 Full table support with:
@@ -149,7 +158,7 @@ Add scroll targets to headings:
   ]}
 />
 ```
-The `scrollTarget` plugin injects an `id` into each heading, making in‑page navigation trivial.
+The `scrollTarget` plugin injects an `id` into each heading, making in-page navigation trivial.
 
 Enable code snippets inside list items:
 ```tsx

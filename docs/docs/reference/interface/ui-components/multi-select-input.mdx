@@ -3,22 +3,26 @@ title: MultiSelectInput
 ---
 
 <!-- Edited by human: false -->
-<!-- Examples count: 1 -->
+<!-- Examples count: 5 -->
+<!-- Source examples: 1 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 4 -->
+<!-- Import examples: 4 -->
 
 # MultiSelectInput
 
 ## Overview
-`MultiSelectInput` lets you pick several related entities from a list.
+`MultiSelectInput` lets you pick several related entities from a list.  
 You can filter, sort, and even create new entities without leaving the form.
 
 ## Styling Guidelines
-* All examples use Tailwind for spacing and width.
+* All examples use Tailwind for spacing and width.  
 * No special Contember theme classes are required.
 
 ## Core Concepts
-* Select multiple entities in one field.
-* Filter the option list with Contember query operators.
-* Sort options ascending or descending.
+* Select multiple entities in one field.  
+* Filter the option list with Contember query operators.  
+* Sort options ascending or descending.  
 * Render an inline form to create a missing entity.
 
 ## Quick Start
@@ -29,8 +33,8 @@ import { MultiSelectInput, Field } from '@contember/admin'
   field="tags"
   placeholder="Select tags"
   options={[
-    { field: 'id', operator: 'eq', value: '1', label: 'Tag 1' },
-    { field: 'id', operator: 'eq', value: '2', label: 'Tag 2' },
+    { field: 'id', operator: 'eq', value: '1', label: 'Tag 1' },
+    { field: 'id', operator: 'eq', value: '2', label: 'Tag 2' },
   ]}
   className="w-full"
 >
@@ -39,11 +43,11 @@ import { MultiSelectInput, Field } from '@contember/admin'
 ```
 
 ## Detailed Guide
-1. Pass `field` with the relation name (e.g., `"tags"`).
-2. Provide `options` as an array of filter objects with `label`.
-3. Add a `<Field>` child to decide what the dropdown shows.
-4. Set `initialSorting="ASC"` or `"DESC"` when order matters.
-5. Supply `createNewForm` to enable inline creation.
+1. Pass `field` with the relation name (e.g., `"tags"`).  
+2. Provide `options` as an array of filter objects with `label`.  
+3. Add a `<Field>` child to decide what the dropdown shows.  
+4. Set `initialSorting="ASC"` or `"DESC"` when order matters.  
+5. Supply `createNewForm` to enable inline creation.  
 
 ```tsx
 <MultiSelectInput
@@ -70,11 +74,12 @@ import { MultiSelectInput, Field } from '@contember/admin'
 | options | Array&lt;FilterWithLabel&gt; | Yes | — | Filters that build the selectable list. |
 | createNewForm | ReactNode | No | — | Component rendered for inline entity creation. |
 | initialSorting | `'ASC' \| 'DESC'` | No | — | Direction for initial option sorting. |
+| queryField | string | No | — | Alternative entity field used for search queries. |
 | *Inherited props* | _None_ |  |  |  |
 
 ## Sub-Components / Building Blocks
 ### Field
-Use any `<Field>` from `@contember/admin` as a child.
+Use any `<Field>` from `@contember/admin` as a child.  
 It controls which column appears in the dropdown.
 
 ## Examples
@@ -108,7 +113,7 @@ Users pick existing tags or add a new one without leaving the dropdown.
 ```
 The custom form appears inside the dropdown when users need a new tag.
 
-### Server‑side filtered list
+### Server-side filtered list
 ```tsx
 <MultiSelectInput
   field="products"
@@ -120,17 +125,60 @@ The custom form appears inside the dropdown when users need a new tag.
   <Field field="title" />
 </MultiSelectInput>
 ```
-The component offers only in‑stock products, improving selection speed.
+The component offers only in-stock products, improving selection speed.
+
+### Real-world: Learning Platform
+```tsx
+<FormHasManyRelationScope field="tags">
+  <FormContainer label="Tags">
+    <MultiSelectInput
+      field="tags"
+      queryField="name"
+      options={[
+        { field: 'id', operator: 'eq', value: '1', label: 'Popular' },
+      ]}
+      placeholder="Add tag"
+      createNewForm={<TagCreateForm />}
+      initialSorting="ASC"
+      className="w-full"
+    >
+      <Field field="name" />
+    </MultiSelectInput>
+  </FormContainer>
+</FormHasManyRelationScope>
+```
+This pattern wraps `MultiSelectInput` with scope and container blocks for form structure.
+
+### Real-world: CRM category selector
+```tsx
+<RecursionTerminator field={{ field: 'categories', kind: 'hasMany' }}>
+  <FormHasManyRelationScope field="categories">
+    <FormContainer label="Categories">
+      <MultiSelectInput
+        field="categories"
+        queryField="title"
+        placeholder="Select categories"
+        initialSorting="DESC"
+        className="w-full"
+      >
+        <Field field="title" />
+      </MultiSelectInput>
+    </FormContainer>
+  </FormHasManyRelationScope>
+</RecursionTerminator>
+```
+`RecursionTerminator` prevents infinite nesting when categories reference themselves.
 
 ## Best Practices & Gotchas
-* Keep `options` small to avoid long requests.
-* Always add a `<Field>` child or the dropdown shows raw IDs.
-* Use `createNewForm` sparingly; too many forms overwhelm users.
-* Apply Tailwind `truncate` to wrap long labels.
+* Keep `options` small to avoid long requests.  
+* Always add a `<Field>` child or the dropdown shows raw IDs.  
+* Use `createNewForm` sparingly; too many forms overwhelm users.  
+* Apply Tailwind `truncate` to wrap long labels.  
+* Wrap the component in `FormHasManyRelationScope` for relation fields.
 
 ## Further Reading
-* `SelectInput` – single‑value variant.
-* Contember Filters – build complex option queries.
+* `SelectInput` – single-value variant.  
+* Contember Filters – build complex option queries.  
 * Form Blocks – compose reusable inline creation forms.
 
 <!-- End of Generated Documentation -->

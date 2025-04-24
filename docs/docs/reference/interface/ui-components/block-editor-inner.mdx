@@ -1,0 +1,71 @@
+---
+title: BlockEditorInner
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 2 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 2 -->
+<!-- Import examples: 0 -->
+
+# BlockEditorInner
+
+## Overview
+_None_
+
+## Styling Guidelines
+* All examples use Tailwind CSS utility classes.  
+* No Contember-specific theme classes are required.
+
+## Core Concepts
+* Acts as the inner surface of a `BlockEditor`.  
+* Expects to live inside both `BlockEditor` and `SortableBlockEditor`.  
+* Shows an optional placeholder when empty.  
+
+## Quick Start
+```tsx
+import { BlockEditor, SortableBlockEditor, BlockEditorInner } from '@contember/react-editors'
+
+export const PageEditor = () => (
+	<BlockEditor plugins={[]}>
+		<SortableBlockEditor>
+			<BlockEditorInner placeholder="Start writing here…" className="prose max-w-none" />
+		</SortableBlockEditor>
+	</BlockEditor>
+)
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| _None_ | — | — | — | The component exposes no custom props. |
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+
+```tsx
+<BlockEditor plugins={customPlugins}>
+	<SortableBlockEditor className="space-y-4">
+		<BlockEditorInner placeholder="Describe your lesson…" />
+	</SortableBlockEditor>
+</BlockEditor>
+```
+
+This snippet, used in a learning platform, wraps `BlockEditorInner` with sortable behavior. The `placeholder` guides users while keeping the UI clean.
+
+## Best Practices & Gotchas
+* Always nest `BlockEditorInner` inside `BlockEditor` and `SortableBlockEditor`.  
+* Pass a short, helpful `placeholder` to improve user onboarding.  
+* Combine with Tailwind’s typography utilities (`prose`) for readable output.  
+
+## Further Reading
+* `BlockEditor` – top-level rich text context.  
+* `SortableBlockEditor` – drag-and-drop ordering of blocks.  
+
+<!-- End of Generated Documentation -->

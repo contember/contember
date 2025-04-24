@@ -1,21 +1,26 @@
 ---
 title: RichTextView
 ---
-<!-- Examples count: 3 -->
 
+<!-- Edited by human: false -->
+<!-- Examples count: 3 -->
+<!-- Source examples: 2 -->
+<!-- Playground examples: 1 -->
+<!-- External examples: 0 -->
+<!-- Import examples: 1 -->
 
 # RichTextView
 
 ## Overview
-RichTextView displays formatted rich‑text stored in a Contember field.
-It safely parses JSON and renders semantic React elements through Contember’s rich‑text engine.
+RichTextView displays formatted rich-text stored in a Contember field.  
+It safely parses JSON and renders semantic React elements through Contember’s rich-text engine.
 
 ## Styling Guidelines
 * All examples use Tailwind CSS.
-* No Contember‑specific theme classes are required, but you can wrap the output in `prose` or similar typography utilities.
+* No Contember-specific theme classes are required, but you can wrap the output in `prose` or similar typography utilities.
 
 ## Core Concepts
-* Rich‑text data is stored as JSON in a field.
+* Rich-text data is stored as JSON in a field.
 * RichTextView converts that JSON to React elements.
 * You can supply `renderLeaf`, `renderElement`, or `referenceRenderers` to change output.
 * The component renders nothing when the field is empty.
@@ -71,11 +76,10 @@ const renderElement = (
 ## Props Reference
 | Name | Type | Required | Default | Description |
 |------|------|----------|---------|-------------|
-| field | `string` | Yes | – | Contember field path containing the rich‑text JSON. |
+| field | `string` | Yes | – | Contember field path containing the rich-text JSON. |
 | renderLeaf | `(leaf) => ReactNode` | No | – | Custom renderer for leaf nodes (text runs). |
-| renderElement | `(element, leafRenderer) => ReactNode` | No | – | Custom renderer for non‑leaf nodes. |
+| renderElement | `(element, leafRenderer) => ReactNode` | No | – | Custom renderer for non-leaf nodes. |
 | referenceRenderers | `Record<string, (props) => ReactNode>` | No | – | Functions that render entity references (e.g., images). |
-| **Inherited HTML attributes** | _varies_ | No | – | Props accepted by the underlying HTML element. |
 
 ## Sub-Components / Building Blocks
 _None_
@@ -158,13 +162,13 @@ You build an inline toolbar for formatting and show a live preview rendered by R
 ## Best Practices & Gotchas
 * Wrap the component in `prose` for instant typography.
 * Provide only the renderers you need; missing ones fall back to defaults.
-* Memoize heavy render functions to avoid unnecessary re‑renders.
+* Memoize heavy render functions to avoid unnecessary re-renders.
 * Handle the empty state because the component renders nothing when the field is empty.
-* Store valid rich‑text JSON; malformed data causes runtime errors.
+* Store valid rich-text JSON; malformed data causes runtime errors.
 
 ## Further Reading
 * `RichTextField` – editable counterpart of this component.
-* `EditorInlineToolbar`, `EditorMarkTrigger` – tools to build rich‑text editors.
-* Contember rich‑text schema documentation.
+* `EditorInlineToolbar`, `EditorMarkTrigger` – tools to build rich-text editors.
+* Contember rich-text schema documentation.
 
 <!-- End of Generated Documentation -->

@@ -1,22 +1,27 @@
 ---
 title: DefaultRepeater
 ---
-<!-- Examples count: 6 -->
 
+<!-- Edited by human: false -->
+<!-- Examples count: 16 -->
+<!-- Source examples: 1 -->
+<!-- Playground examples: 5 -->
+<!-- External examples: 10 -->
+<!-- Import examples: 8 -->
 
 ## Overview
-DefaultRepeater wraps `Repeater` and renders a ready‑made UI for managing a list of entities.
+DefaultRepeater wraps `Repeater` and renders a ready-made UI for managing a list of entities.  
 It handles ordering, add/remove buttons, and item actions so you can focus on form fields.
 
 ## Styling Guidelines
 * All snippets use TailwindCSS utility classes.
-* No Contember‑specific theme classes are required; integrate with your existing Tailwind setup.
+* No Contember-specific theme classes are required; integrate with your existing Tailwind setup.
 
 ## Core Concepts
 * DefaultRepeater manages an entity collection for you.
 * You can make the list sortable by passing `sortableBy`.
 * Place form fields inside DefaultRepeater to edit each item.
-* Use `RepeaterItemActions` to place per‑item controls (e.g., delete).
+* Use `RepeaterItemActions` to place per-item controls (e.g., delete).
 * The component forwards every prop of the underlying `Repeater`.
 
 ## Quick Start
@@ -41,22 +46,31 @@ _None_
 |------|------|----------|---------|-------------|
 | entities | string | No | – | Entity name for a standalone collection. |
 | field | string | No | – | Relation field when nested in `EntitySubTree`. |
-| orderBy | string | No | – | Static ordering for non‑sortable lists. |
-| sortableBy | string | No | – | Column used when drag‑and‑drop sorting is enabled. |
+| orderBy | string | No | – | Static ordering for non-sortable lists. |
+| sortableBy | string | No | – | Column used when drag-and-drop sorting is enabled. |
 | title | string | No | – | Heading displayed above the list. |
-| addButtonPosition | string | No | `around` | Where the “Add” button appears (`start`, `end`, `around`). |
+| addButtonPosition | string | No | `around` | Where the “Add” button appears (`start`, `end`, `around`, `none`). |
 | initialEntityCount | number | No | 0 | Entities created on first render. |
+| noRemove | boolean | No | false | Hides the default remove button. |
 | ...RepeaterProps (inherited) | RepeaterProps | No | – | All props from the base `Repeater` component. |
 
 ## Sub-Components / Building Blocks
 ### RepeaterItemActions
-Wrap per‑item buttons (e.g., delete or custom menus).
+Wrap per-item buttons (e.g., delete or custom menus).
 
 ### RepeaterRemoveItemButton
 Renders a delete button inside `RepeaterItemActions`.
 
 ## Examples
-### Sortable list with relation field
+### 1. Minimal setup
+```tsx
+<DefaultRepeater entities="RepeaterItem" title="Foo items">
+	<InputField field="title" />
+</DefaultRepeater>
+```
+A single field per item—no ordering, no custom actions.
+
+### 2. Sortable list with relation field
 ```tsx
 <DefaultRepeater field="items" sortableBy="order" title="Products">
 	<InputField field="name" className="w-full" />
@@ -70,7 +84,7 @@ Renders a delete button inside `RepeaterItemActions`.
 ```
 The list is sortable by the `order` column. Each item edits its `name` and related `category`.
 
-### Pre‑filled list with initial entity
+### 3. Pre-filled list with initial entity
 ```tsx
 <DefaultRepeater field="notes" initialEntityCount={1}>
 	<TextAreaField field="content" className="w-full" />
@@ -78,7 +92,7 @@ The list is sortable by the `order` column. Each item edits its `name` and relat
 ```
 A single blank entity is inserted automatically, saving one click for users.
 
-### Non‑sortable static order
+### 4. Non-sortable static order
 ```tsx
 <DefaultRepeater entities="TodoItem" orderBy="createdAt DESC">
 	<InputField field="task" />
@@ -89,7 +103,7 @@ A single blank entity is inserted automatically, saving one click for users.
 ```
 Items follow the `createdAt` order delegated to the backend; users cannot reorder them.
 
-### Internationalized notes form
+### 5. Internationalized notes form
 ```tsx
 <>
 	<EnvironmentMiddleware create={it => it.withDimensions({ locale: ['cs', 'en'] })}>
@@ -106,7 +120,7 @@ Items follow the `createdAt` order delegated to the backend; users cannot reorde
 ```
 The form duplicates note editing for each locale and starts with one blank note per locale.
 
-### Admin form with server rules
+### 6. Admin form with server rules
 ```tsx
 <Binding>
 	<Slots.Title>
@@ -126,9 +140,9 @@ The form duplicates note editing for each locale and starts with one blank note 
 	</DefaultRepeater>
 </Binding>
 ```
-An admin page collects validation rules; items are ordered by `id` without drag‑and‑drop.
+An admin page collects validation rules; items are ordered by `id` without drag-and-drop.
 
-### Sortable repeater with custom actions
+### 7. Sortable repeater with custom actions
 ```tsx
 <Binding>
 	<Slots.Title>
@@ -156,7 +170,7 @@ An admin page collects validation rules; items are ordered by `id` without drag�
 ```
 Users can drag items by the grip icon while dropdown and delete buttons live inside `RepeaterItemActions`.
 
-### Repeater on nested relation
+### 8. Repeater on nested relation
 ```tsx
 <Binding>
 	<Slots.Title>
@@ -186,7 +200,7 @@ Users can drag items by the grip icon while dropdown and delete buttons live ins
 ```
 The repeater edits a relation inside `EntitySubTree`; new items inherit the `unique` column from the parent entity.
 
-### Non‑sortable repeater with dropdown actions
+### 9. Non-sortable repeater with dropdown actions
 ```tsx
 <Binding>
 	<Slots.Title>
@@ -209,15 +223,65 @@ The repeater edits a relation inside `EntitySubTree`; new items inherit the `uni
 ```
 Items follow the backend order and still expose dropdown and delete actions.
 
+### 10. Dialog-based sorting without remove
+```tsx
+<DialogContent>
+	<DefaultRepeater entities="RiskFactor" sortableBy="order" addButtonPosition="none" noRemove>
+		<Field field="name" />
+	</DefaultRepeater>
+
+	<DialogFooter>
+		<SaveButton />
+	</DialogFooter>
+</DialogContent>
+```
+A modal dialog allows reordering `RiskFactor` rows. Users cannot add or remove rows—only drag to sort.
+
+### 11. Wrapper with redirect on persist
+```tsx
+<DefaultRepeater entities={entity} sortableBy="displayOrder" addButtonPosition="none">
+	<RedirectOnPersist to={redirectPath} />
+	{children}
+</DefaultRepeater>
+```
+A higher-order component wraps DefaultRepeater and redirects after a successful save.
+
+### 12. Contacts form inside layout
+```tsx
+<FormLayout>
+	<DefaultRepeater field="contacts" title={false} orderBy="createdAt">
+		<ContactForm />
+	</DefaultRepeater>
+</FormLayout>
+```
+Contacts are appended chronologically; the surrounding layout handles spacing.
+
+### 13. Sequential course steps
+```tsx
+<DefaultRepeater field="sequentialSteps" sortableBy="displayOrder" orderBy="displayOrder">
+	<CourseDistributionSequentialStepForm />
+</DefaultRepeater>
+```
+Users drag and drop sequential steps; backend stores the `displayOrder` field.
+
+### 14. Simple terms list
+```tsx
+<DefaultRepeater field="terms">
+	<CourseTermForm context="courseModule" />
+</DefaultRepeater>
+```
+No sorting or title—just a basic list of term forms.
+
 ## Best Practices & Gotchas
 * Always choose either `sortableBy` or `orderBy`, not both.
 * Nest DefaultRepeater under `EntitySubTree` when editing relations.
 * Wrap destructive buttons in `RepeaterItemActions` for consistent spacing.
-* Remember to persist the form with `PersistButton` to save ordering changes.
+* Use `addButtonPosition="none"` and `noRemove` for read-only ordering dialogs.
+* Remember to persist the form with `PersistButton` or save inside `DialogFooter` to store ordering changes.
 * Large lists may benefit from virtual scrolling; DefaultRepeater does not handle this.
 
 ## Further Reading
-* Repeater – the lower‑level component that DefaultRepeater wraps.
+* Repeater – the lower-level component that DefaultRepeater wraps.
 * EntitySubTree – editing nested relations in Contember forms.
 * PersistButton – saving mutations triggered by Repeaters.
 

@@ -1,0 +1,117 @@
+---
+title: SelectPopoverContent
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 10 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 10 -->
+<!-- Import examples: 5 -->
+
+## Overview
+`SelectPopoverContent` wraps the dropdown area of Contember select inputs.  
+It renders the list of options inside a Radix Popover and handles scrolling and positioning.
+
+## Styling Guidelines
+* All snippets use Tailwind classes.  
+* The component itself adds Contember UI theme classes; you usually style only its children (`SelectListItemUI`, etc.).
+
+## Core Concepts
+* Radix Popover drives accessibility and positioning.  
+* `SelectPopoverContent` displays the options list.  
+* It is always paired with `PopoverTrigger` and `SelectInputUI`.  
+* You control selection in the parent (`Select`, `MultiSelect`, or custom logic).
+
+## Quick Start
+```tsx
+import {
+	Popover,
+	PopoverTrigger,
+	SelectInputUI,
+	SelectInputActionsUI,
+	SelectInputWrapperUI,
+	SelectListItemUI,
+	SelectPopoverContent,
+} from '@contember/ui'
+
+export const SimpleSelect = () => (
+	<Popover>
+		<SelectInputWrapperUI>
+			<PopoverTrigger asChild>
+				<SelectInputUI className="w-48 px-3 py-2 border rounded">
+					<span className="text-gray-400">Choose…</span>
+					<SelectInputActionsUI>
+						<ChevronDownIcon className="w-4 h-4" />
+					</SelectInputActionsUI>
+				</SelectInputUI>
+			</PopoverTrigger>
+		</SelectInputWrapperUI>
+
+		<SelectPopoverContent className="max-h-60 overflow-auto">
+			{['A', 'B', 'C'].map(value => (
+				<SelectListItemUI key={value} onClick={() => console.log(value)}>
+					{value}
+				</SelectListItemUI>
+			))}
+		</SelectPopoverContent>
+	</Popover>
+)
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| children | React.ReactNode | No | — | Elements shown in the dropdown. |
+| …rest (inherited) | Radix `Popover.ContentProps` | No | — | Any prop supported by Radix Popover.Content. |
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+
+### Enum field select
+```tsx
+<SelectPopoverContent>
+	{normalizedOptions.map(({ value, label }) => (
+		<SelectListItemUI
+			key={value}
+			onClick={() => {
+				fieldAccessor.updateValue(value)
+				setOpen(false)
+			}}
+		>
+			{label}
+		</SelectListItemUI>
+	))}
+</SelectPopoverContent>
+```
+This pattern shows how you update the form state and close the popover from inside a list item.
+
+### Data-view backed select
+```tsx
+<SelectPopoverContent>
+	<DefaultSelectDataView initialSorting={initialSorting} queryField={queryField}>
+		{children}
+	</DefaultSelectDataView>
+</SelectPopoverContent>
+```
+Here the content renders a data view that handles pagination and filtering automatically.
+
+## Best Practices & Gotchas
+* Always place `SelectPopoverContent` inside the same `Popover` that holds the trigger.  
+* Keep the content width similar to the trigger for visual consistency.  
+* Limit height with `max-h-* overflow-auto` to maintain usability.  
+* Close the popover after a successful selection to prevent duplicate clicks.  
+* Forward unknown props to benefit from Radix features like `side` or `align`.
+
+## Further Reading
+* `SelectInputUI` – visual trigger of the select.  
+* `SelectListItemUI` – individual option item.  
+* Radix Popover documentation for advanced positioning.  
+* `DefaultSelectDataView` for server-driven option lists.
+
+<!-- End of Generated Documentation -->

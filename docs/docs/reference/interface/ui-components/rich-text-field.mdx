@@ -3,15 +3,19 @@ title: RichTextField
 ---
 
 <!-- Edited by human: false -->
-<!-- Examples count: 3 -->
+<!-- Examples count: 13 -->
+<!-- Source examples: 2 -->
+<!-- Playground examples: 1 -->
+<!-- External examples: 10 -->
+<!-- Import examples: 6 -->
 
 # RichTextField
 
 ## Overview
-RichTextField embeds a rich‑text editor into a Contember form.
+RichTextField embeds a rich-text editor into a Contember form.  
 It integrates with Contember’s field management and offers basic formatting like bold, italic, and code.
 
-The editor relies on a plugin architecture, supports custom placeholders, and becomes read‑only during ongoing mutations.
+The editor relies on a plugin architecture, supports custom placeholders, and becomes read-only during ongoing mutations.
 
 ## Styling Guidelines
 * All code samples use Tailwind CSS.
@@ -20,7 +24,7 @@ The editor relies on a plugin architecture, supports custom placeholders, and be
 ## Core Concepts
 * Form binding via the `field` prop.
 * Plugin architecture for marks, elements, and toolbars.
-* Read‑only lock while the form mutates.
+* Read-only lock while the form mutates.
 * Optional custom placeholder text.
 * Toolbar triggers must sit inside the editor to get context.
 
@@ -83,13 +87,13 @@ Interactive area that hosts formatting triggers.
 Button that toggles a mark (e.g., bold, italic).
 
 ### EditorElementTrigger
-Switches block‑level elements like links or headings.
+Switches block-level elements like links or headings.
 
 ### EditorGenericTrigger
 Runs custom editor commands such as alignment changes.
 
 ### RichTextView
-Read‑only renderer for stored rich text.
+Read-only renderer for stored rich text.
 
 ## Examples
 ### Full Form With Preview
@@ -112,7 +116,7 @@ Read‑only renderer for stored rich text.
 ```
 Stores rich text in the `body` field and instantly renders a preview.
 
-### Rich Text With Alignment and Link
+### Playground – Alignment, Link, and Mark Controls
 ```tsx
 <Binding>
 	<Slots.Title>
@@ -147,17 +151,73 @@ Stores rich text in the `body` field and instantly renders a preview.
 	</EntitySubTree>
 </Binding>
 ```
-Adds alignment controls and a link trigger. The preview below shows the stored content in real time.
+Shows a fully-featured inline toolbar with alignment buttons and a link trigger.
+
+### Lesson Description – Learning Platform
+```tsx
+<FormLayout className="mx-0">
+	<InputField field="name" />
+	<RichTextField
+		field="description"
+		label={entityLabels.CourseLessonLocale.fields.description}
+	/>
+</FormLayout>
+```
+A simple form section binding the `description` field of a lesson locale.
+
+### Conditional Minimal Variant
+```tsx
+<FormLayout>
+	{variant === 'minimal' ? (
+		<>
+			<InputField field="name" required />
+			<RichTextField
+				field="description"
+				label={entityLabels.CourseModuleLocale.fields.description}
+			/>
+		</>
+	) : null}
+</FormLayout>
+```
+Shows how you can render the editor only when a certain variant is active.
+
+### Notification Email Body
+```tsx
+<FormLayout>
+	<EmailInputField field="emailSubject" />
+	<RichTextField
+		field="emailBodyPart"
+		label={entityLabels.NotificationLocale.fields.emailBodyPart}
+	/>
+</FormLayout>
+```
+Uses RichTextField for composing notification emails.
+
+### Global Email Body Part with Locales
+```tsx
+<FormLocales>
+	<FormLayout>
+		<RichTextField
+			field="globalEmailBodyPart"
+			label={entityLabels.NotificationRulesetLocale.fields.globalEmailBodyPart}
+			description={
+				entityLabels.NotificationRulesetLocale.form.description.globalEmailBodyPart
+			}
+		/>
+	</FormLayout>
+</FormLocales>
+```
+Demonstrates locale-aware editing of a global email template.
 
 ## Best Practices & Gotchas
 * Place toolbars inside `RichTextField` to gain editor context.
 * Keep the editor in a `max-w-*` container to control layout.
 * Avoid heavy plugins that bloat bundle size.
 * Use `RichTextView` for display—never reuse the editing component.
-* Wrap rich‑text editing inside a `Binding` context so mutations propagate.
+* Wrap rich-text editing inside a `Binding` context so mutations propagate.
 
 ## Further Reading
-* BlockEditorField – block‑based editing.
+* BlockEditorField – block-based editing.
 * PersistButton – saving entity data.
 * ErrorAccessor – advanced error handling.
 

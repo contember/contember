@@ -1,0 +1,79 @@
+---
+title: MultiSelectItemRemoveButtonUI
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 8 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 8 -->
+<!-- Import examples: 5 -->
+
+# MultiSelectItemRemoveButtonUI
+
+## Overview
+MultiSelectItemRemoveButtonUI shows a small button inside each selected item. Users click it to remove that value without reopening the dropdown. The component is usually wrapped by `SelectItemTrigger` so it inherits the correct focus and keyboard handling.
+
+## Styling Guidelines
+* All examples use Tailwind CSS for speed and clarity.  
+* The button has no mandatory Contember theme classes; you can style it freely.
+
+## Core Concepts
+* A Multi-Select input can list many chosen values.  
+* Each value is rendered by `MultiSelectItemUI`.  
+* `MultiSelectItemRemoveButtonUI` lives inside the item and sends a remove command.  
+* You must cancel event propagation (`e.stopPropagation()`) to avoid unwanted dropdown toggling.  
+* Wrap the button with `SelectItemTrigger` to ensure accessibility.
+
+## Quick Start
+```tsx
+<SelectItemTrigger>
+	<MultiSelectItemRemoveButtonUI
+		onClick={e => e.stopPropagation()}
+		className="text-red-500 hover:text-red-700"
+	/>
+</SelectItemTrigger>
+```
+The snippet removes the clicked value and keeps the popover closed.
+
+## Detailed Guide
+_None_
+
+## Props Reference
+_None_
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+
+### Remove buttons in a custom Multi-Select
+```tsx
+<MultiSelect field={field} options={options}>
+	<SelectEachValue>
+		<MultiSelectItemUI>
+			<MultiSelectItemContentUI>{children}</MultiSelectItemContentUI>
+
+			<SelectItemTrigger>
+				<MultiSelectItemRemoveButtonUI onClick={e => e.stopPropagation()} />
+			</SelectItemTrigger>
+		</MultiSelectItemUI>
+	</SelectEachValue>
+</MultiSelect>
+```
+The button appears next to every selected value. The `stopPropagation` call prevents the parent `SelectItemTrigger` from opening the dropdown.
+
+## Best Practices & Gotchas
+* Always call `e.stopPropagation()` in `onClick`.  
+* Use descriptive `aria-label` for accessibility, e.g. `"Remove item"`.  
+* Keep the button visually small (`w-4 h-4`) to avoid crowding.  
+* Wrap inside `SelectItemTrigger` to inherit correct focus styles.  
+* Test keyboard removal flows to maintain accessibility.
+
+## Further Reading
+* MultiSelect  
+* MultiSelectItemUI  
+* SelectItemTrigger  
+* Contember Form Kit  
+
+<!-- End of Generated Documentation -->

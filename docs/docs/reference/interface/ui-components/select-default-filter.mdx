@@ -3,13 +3,17 @@ title: SelectDefaultFilter
 ---
 
 <!-- Edited by human: false -->
-<!-- Examples count: 0 -->
+<!-- Examples count: 10 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 10 -->
+<!-- Import examples: 5 -->
 
 # SelectDefaultFilter
 
 ## Overview
-`SelectDefaultFilter` filters data in a `SelectDataView`.
-It checks whether a default filter type exists and, when it does, renders a text input for user‑driven filtering.
+`SelectDefaultFilter` filters data in a `SelectDataView`.  
+It checks whether a default filter type exists and, when it does, renders a text input for user-driven filtering.
 
 ## Styling Guidelines
 * All examples use Tailwind CSS.
@@ -22,7 +26,8 @@ It checks whether a default filter type exists and, when it does, renders a text
 
 ## Quick Start
 ```tsx
-import { SelectDataView, SelectDefaultFilter } from '@contember/react-components'
+import { SelectDataView } from '@contember/react-components'
+import { SelectDefaultFilter } from './filter'
 
 export const UserSelect = () => (
 	<SelectDataView className="flex flex-col gap-4">
@@ -38,17 +43,132 @@ _None_
 ## Props Reference
 _None_
 
-## Sub‑Components / Building Blocks
+## Sub-Components / Building Blocks
 _None_
 
 ## Examples
-_None_
+
+### Example 1 – Basic List Filtering
+```tsx
+({ children }) => (
+	<>
+		<SelectListInner filterToolbar={<SelectDefaultFilter />}>
+			<div className="border-b py-1">
+				<SelectOption>
+					<SelectItemTrigger>
+						<SelectListItemUI>{children}</SelectListItemUI>
+					</SelectItemTrigger>
+				</SelectOption>
+			</div>
+		</SelectListInner>
+	</>
+)
+```
+The filter appears above the list and lets users narrow results with free-text input.
+
+### Example 2 – Multi-Select Picker With Filter
+```tsx
+({ field, queryField, options, children, placeholder, createNewForm, initialSorting }) => {
+	const [open, setOpen] = React.useState(false)
+	const id = useFormFieldId()
+
+	return (
+		<MultiSelect field={field} options={options}>
+			<div className="flex gap-1 items-center">
+				<Popover open={open} onOpenChange={setOpen}>
+					<SelectInputWrapperUI>
+						<PopoverTrigger asChild>
+							<SelectInputUI id={id ? `${id}-input` : undefined}>
+								<SelectPlaceholder>
+									{placeholder ?? <SelectDefaultPlaceholderUI />}
+								</SelectPlaceholder>
+
+								<MultiSelectItemsUI>
+									<SelectEachValue>
+										<MultiSelectItemUI>
+											<MultiSelectItemContentUI>{children}</MultiSelectItemContentUI>
+											<SelectItemTrigger>
+												<MultiSelectItemRemoveButtonUI onClick={e => e.stopPropagation()} />
+											</SelectItemTrigger>
+										</MultiSelectItemUI>
+									</SelectEachValue>
+								</MultiSelectItemsUI>
+
+								<SelectInputActionsUI>
+									{open ? <ChevronUpIcon className="w-4 h-4" /> : <ChevronDownIcon className="w-4 h-4" />}
+								</SelectInputActionsUI>
+							</SelectInputUI>
+						</PopoverTrigger>
+					</SelectInputWrapperUI>
+
+					<SelectPopoverContent>
+						<SelectDataView initialSorting={initialSorting} queryField={queryField}>
+							<SelectListInner filterToolbar={<SelectDefaultFilter />}>
+								<SelectOption>
+									<SelectItemTrigger>
+										<SelectListItemUI>{children}</SelectListItemUI>
+									</SelectItemTrigger>
+								</SelectOption>
+							</SelectListInner>
+						</SelectDataView>
+					</SelectPopoverContent>
+				</Popover>
+				{createNewForm && (
+					<CreateEntityDialog trigger={<SelectCreateNewTrigger />}>
+						{createNewForm}
+					</CreateEntityDialog>
+				)}
+			</div>
+		</MultiSelect>
+	)
+}
+```
+You embed the filter inside a popover so users can search large datasets without leaving the form.
+
+### Example 3 – Inline Usage
+```tsx
+{<SelectDefaultFilter />}
+```
+Use the component without extra wrappers when you only need a quick filter bar.
+
+### Example 4 – Relation Filter Integration
+```tsx
+({ children }) => (
+	<>
+		<SelectListInner filterToolbar={<SelectDefaultFilter />}>
+			<DataGridRelationFilterSelectItem>{children}</DataGridRelationFilterSelectItem>
+		</SelectListInner>
+	</>
+)
+```
+Combine `SelectDefaultFilter` with relation filters to let users search referenced entities.
+
+### Example 5 – Duplicate Patterns in Another Project
+The 108 Agency CRM reuses the exact patterns shown above, confirming that these integrations work in production-grade apps.
+
+```tsx
+({ children }) => (
+	<>
+		<SelectListInner filterToolbar={<SelectDefaultFilter />}>
+			<div className="border-b py-1">
+				<SelectOption>
+					<SelectItemTrigger>
+						<SelectListItemUI>{children}</SelectListItemUI>
+					</SelectItemTrigger>
+				</SelectOption>
+			</div>
+		</SelectListInner>
+	</>
+)
+```
+This snippet mirrors Example 1 but comes from a different codebase, showing consistent best practices across teams.
 
 ## Best Practices & Gotchas
 * Place `SelectDefaultFilter` at the top of the view for better UX.
 * Combine it with other filters for complex queries.
 * Avoid wrapping it in additional forms; it manages its own input state.
 * Verify the target `SelectDataView` supports the expected filter type.
+* Keep the filter visible; hidden filters reduce discoverability.
 
 ## Further Reading
 * `SelectDataView`

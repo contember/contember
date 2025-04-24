@@ -1,0 +1,91 @@
+---
+title: ParagraphRenderer
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 0 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 0 -->
+<!-- Import examples: 4 -->
+
+# ParagraphRenderer
+
+## Overview
+_None_
+
+## Styling Guidelines
+All examples use Tailwind for utility-first styling.  
+ParagraphRenderer adds no Contember theme classes, so feel free to wrap it with your own utility classes.
+
+## Core Concepts
+- ParagraphRenderer expects a Slate `ParagraphElement` object.
+- It outputs a read-only HTML `<p>` tag with the element’s children.
+- Use the component inside a Contember Slate editor or as a standalone viewer.
+- You must supply the complete `ParagraphElement` (including its children).
+
+## Quick Start
+```tsx
+import { ParagraphRenderer } from './elements/ParagraphRenderer'
+import type { ParagraphElement } from '@contember/react-slate-editor-base'
+
+const paragraphElement: ParagraphElement = {
+  type: 'paragraph',
+  children: [{ text: 'Hello, world!' }],
+}
+
+export default function Demo() {
+  return (
+    <div className="prose">
+      <ParagraphRenderer element={paragraphElement} />
+    </div>
+  )
+}
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+| Name    | Type              | Required | Default | Description                              |
+|---------|-------------------|----------|---------|------------------------------------------|
+| element | ParagraphElement  | Yes      | —       | Slate paragraph element to render.       |
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+
+### Read-only rich-text viewer
+```tsx
+import { ParagraphRenderer } from './elements/ParagraphRenderer'
+import type { ParagraphElement } from '@contember/react-slate-editor-base'
+
+const doc: ParagraphElement[] = [
+  { type: 'paragraph', children: [{ text: 'First paragraph.' }] },
+  { type: 'paragraph', children: [{ text: 'Second paragraph.' }] },
+]
+
+export default function Viewer() {
+  return (
+    <article className="space-y-4">
+      {doc.map((el, i) => (
+        <ParagraphRenderer key={i} element={el} />
+      ))}
+    </article>
+  )
+}
+```
+The example maps an array of paragraph elements to individual `ParagraphRenderer` instances, producing two styled paragraphs.
+
+## Best Practices & Gotchas
+- Validate that every `element` matches the `ParagraphElement` schema.
+- Wrap the renderer with semantic containers (`article`, `section`) for accessibility.
+- Pair with Tailwind’s `prose` class for effortless typography.
+
+## Further Reading
+- `RichTextRenderer`
+- Contember Slate Editor documentation
+- Tailwind Typography plugin
+
+<!-- End of Generated Documentation -->

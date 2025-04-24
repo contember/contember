@@ -1,20 +1,25 @@
 ---
 title: BlockEditorHandle
 ---
-<!-- Examples count: 1 -->
 
+<!-- Edited by human: false -->
+<!-- Examples count: 3 -->
+<!-- Source examples: 1 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 2 -->
+<!-- Import examples: 0 -->
 
 ## Overview
-BlockEditorHandle renders a small drag handle inside a block‑editor layout.
-You use it to reorder blocks via drag‑and‑drop in Contember’s sortable block editor.
+BlockEditorHandle renders a small drag handle inside a block-editor layout.  
+You use it to reorder blocks via drag-and-drop in Contember’s sortable block editor.
 
 ## Styling Guidelines
-* All snippets use Tailwind classes.
+* All snippets use Tailwind classes.  
 * The component itself has no required Contember theme classes, but you should add cursor and spacing utilities for better UX.
 
 ## Core Concepts
 * Each block inside BlockEditor should contain exactly one `<BlockEditorHandle />`.
-* Contember’s drag‑and‑drop context recognizes the handle automatically.
+* Contember’s drag-and-drop context recognizes the handle automatically.
 * The component renders a `div`—style it as you would any other element.
 
 ## Quick Start
@@ -32,9 +37,9 @@ export const MyBlock = () => (
 ```
 
 ## Detailed Guide
-1. Place `<BlockEditorHandle />` as the first child of your block container.
-2. Apply `cursor-move` so users know they can drag.
-3. Use padding to enlarge the hit‑area for accessibility.
+1. Place `<BlockEditorHandle />` as the first child of your block container.  
+2. Apply `cursor-move` so users know they can drag.  
+3. Use padding to enlarge the hit-area for accessibility.
 
 ```tsx
 <BlockEditorHandle className="cursor-move p-2 rounded hover:bg-gray-100" />
@@ -81,17 +86,68 @@ const PageForm = () => (
 	</SortableBlocksField>
 )
 ```
-The handle enables drag‑and‑drop ordering without extra configuration.
+The handle enables drag-and-drop ordering without extra configuration.
+
+### Advanced drag overlay with `@dnd-kit`
+```tsx
+({ children, element }: { children: ReactNode; element: Element }) => {
+	const sortable = useSortable({ id: element.key as string })
+	const isOver = sortable.isOver
+	const activeSortable = sortable.active?.data.current?.sortable
+	const isAfter = (sortable.data?.sortable.index ?? 0) > activeSortable?.index
+	const isActive = sortable.active?.id === element.key
+	const contentRef = React.useRef<HTMLDivElement>(null)
+
+	return (
+		<>
+			<div className="relative">
+				<div className="relative">
+					{isOver && !isAfter ? <DropIndicator placement="top" /> : null}
+				</div>
+
+				<div className={'p-4 ' + (isActive ? 'opacity-60' : '')} ref={sortable.setNodeRef}>
+					<BlockEditorHandle
+						ref={sortable.setActivatorNodeRef}
+						{...sortable.listeners}
+						className="cursor-grab p-2 text-gray-500"
+					/>
+					<div ref={contentRef}>{children}</div>
+				</div>
+
+				<div className="relative">
+					{isOver && isAfter ? <DropIndicator placement="bottom" /> : null}
+				</div>
+			</div>
+
+			{isActive && contentRef.current && (
+				<Portal>
+					<DragOverlay>
+						<div className="opacity-80 flex">
+							<div
+								className="p-4 bg-white bg-opacity-80 backdrop-blur-sm"
+								dangerouslySetInnerHTML={{ __html: contentRef.current.innerHTML }}
+							/>
+						</div>
+					</DragOverlay>
+				</Portal>
+			)}
+		</>
+	)
+}
+```
+This pattern mirrors production use.  
+You connect the handle to `useSortable`, render drop indicators, and show an overlay during drag.
 
 ## Best Practices & Gotchas
-* Always wrap the handle in a `flex` container so it keeps its size.
-* Add `cursor-grab` or `cursor-move` to signal interactivity.
-* Increase padding for touch devices.
-* Do not nest multiple handles inside one block.
+* Always wrap the handle in a `flex` container so it keeps its size.  
+* Add `cursor-grab` or `cursor-move` to signal interactivity.  
+* Increase padding for touch devices.  
+* Do not nest multiple handles inside one block.  
+* When integrating with `@dnd-kit`, forward `sortable.listeners` directly to `<BlockEditorHandle />`.
 
 ## Further Reading
-* `SortableBlocksField` – container that makes blocks sortable.
-* `BlockEditor` – high‑level editor for rich content.
+* `SortableBlocksField` – container that makes blocks sortable.  
+* `BlockEditor` – high-level editor for rich content.  
 * Tailwind utility documentation.
 
 <!-- End of Generated Documentation -->

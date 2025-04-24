@@ -1,0 +1,101 @@
+---
+title: SelectInputUI
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 10 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 10 -->
+<!-- Import examples: 5 -->
+
+## Overview
+SelectInputUI renders the visible control of a Contember select component.  
+It acts as the clickable surface that opens the dropdown and shows selected values or a placeholder.
+
+## Styling Guidelines
+* All code examples use Tailwind classes.  
+* No special Contember theme class is required; inherit styles from parent components.
+
+## Core Concepts
+* SelectInputUI is presentational only—it has no own state.  
+* It should live inside `SelectInputWrapperUI` and usually wrap a `PopoverTrigger`.  
+* Place custom content (placeholder, selected items, icons) as children.
+
+## Quick Start
+```tsx
+import { SelectInputUI } from '@contember/react-components'
+
+export const SimpleSelectInput = () => (
+	<SelectInputUI className="flex items-center gap-2 px-3 py-2 border rounded">
+		<span className="text-gray-500">Select a value…</span>
+	</SelectInputUI>
+)
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+_None_
+
+## Sub-Components / Building Blocks
+### SelectInputWrapperUI
+Wraps SelectInputUI and provides layout constraints.
+
+### SelectInputActionsUI
+Holds icons like `ChevronDownIcon` that signal dropdown state.
+
+### SelectDefaultPlaceholderUI
+Default placeholder rendered when no value is selected.
+
+### SelectListItemUI
+Optional item used inside `SelectPopoverContent`.
+
+## Examples
+
+### Single-select enumeration
+```tsx
+const EnumSelectInput = () => {
+	const [open, setOpen] = React.useState(false)
+	const id = 'status'
+
+	return (
+		<Popover open={open} onOpenChange={setOpen}>
+			<SelectInputWrapperUI>
+				<PopoverTrigger asChild>
+					<SelectInputUI id={`${id}-input`} className="w-48 justify-between">
+						Pick status
+						<SelectInputActionsUI>
+							<ChevronDownIcon className="w-4 h-4" />
+						</SelectInputActionsUI>
+					</SelectInputUI>
+				</PopoverTrigger>
+			</SelectInputWrapperUI>
+
+			<SelectPopoverContent>
+				{['Draft', 'Published', 'Archived'].map(status => (
+					<SelectListItemUI key={status} onClick={() => setOpen(false)}>
+						{status}
+					</SelectListItemUI>
+				))}
+			</SelectPopoverContent>
+		</Popover>
+	)
+}
+```
+The `SelectInputUI` shows a placeholder.  
+`SelectInputActionsUI` holds the chevron icon.  
+Clicking the input opens the popover with list items.
+
+## Best Practices & Gotchas
+* Always place `SelectInputUI` inside a `PopoverTrigger` to handle clicks.  
+* Keep interactive elements (remove buttons) inside `SelectInputActionsUI` to maintain layout.  
+* Do not manage selection state in `SelectInputUI`; use higher-level select components.
+
+## Further Reading
+* `MultiSelectInput` – multiple value selection.  
+* `SelectPopoverContent` – dropdown body.  
+* `SelectCreateNewTrigger` – inline entity creation.
+
+<!-- End of Generated Documentation -->

@@ -1,0 +1,66 @@
+---
+title: TableRowElementRenderer
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 0 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 0 -->
+<!-- Import examples: 4 -->
+
+# TableRowElementRenderer
+
+## Overview
+TableRowElementRenderer renders a single table row (`<tr>`) inside the Contember Slate editor.  
+You pass it a `TableRowElement` object and it handles outputting the correct DOM structure for the editor.
+
+## Styling Guidelines
+* All code examples use Tailwind CSS utility classes.  
+* No additional Contember theme classes are required for this component.
+
+## Core Concepts
+* Table rows in Slate are represented by `TableRowElement` objects.
+* TableRowElementRenderer is a low-level renderer—supply the element, it returns the row.
+* You usually use it inside a custom table renderer or editor plugin.
+
+## Quick Start
+```tsx
+import { TableRowElementRenderer } from './elements/TableRowElementRenderer'
+
+/* “element” comes from your Slate table logic */
+const MyTableRow = () => (
+  <div className="prose">
+    <TableRowElementRenderer element={element} />
+  </div>
+)
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+| Name    | Type | Required | Default | Description |
+|---------|------|----------|---------|-------------|
+| element | TableRowElement | Yes | — | Slate representation of the row to render |
+
+### Inherited Props
+_None_
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+_None_
+
+## Best Practices & Gotchas
+* Always pass a valid `TableRowElement`; other objects cause render errors.
+* Wrap the renderer in a styled container instead of passing style props—TableRowElementRenderer does not forward `className`.
+* Use memoization if you render many rows to avoid unnecessary re-renders.
+
+## Further Reading
+* Contember Slate Table guide  
+* `TableCellElementRenderer` for individual cells  
+* `TableElementRenderer` for complete tables
+
+<!-- End of Generated Documentation -->

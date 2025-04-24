@@ -1,0 +1,102 @@
+---
+title: SortableMultiSelectInput
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 4 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 4 -->
+<!-- Import examples: 4 -->
+
+# SortableMultiSelectInput
+
+## Overview
+_None_
+
+## Styling Guidelines
+* All examples use Tailwind utility classes.  
+* No Contember theme-specific classes are required.
+
+## Core Concepts
+* Manage a has-many relation through a multi-select UI.
+* Drag items to reorder them (`sortableBy`).
+* Fetch available options via `queryField` or local `options`.
+* Optionally create new related entities with `createNewForm`.
+* Persist initial order with `initialSorting`.
+
+## Quick Start
+```tsx
+import { SortableMultiSelectInput } from '@contember/react-controls'
+
+<FormHasManyRelationScope field="articles">
+	<SortableMultiSelectInput
+		field="articles"
+		placeholder="Select articles"
+		className="w-full max-w-md"
+	/>
+</FormHasManyRelationScope>
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| field | unknown | Yes | – | Target relation field. |
+| queryField | unknown | No | – | Query field used to load selectable entities. |
+| options | unknown | No | – | Array of fixed options (bypasses datasource). |
+| placeholder | unknown | No | – | Placeholder shown when nothing is selected. |
+| sortableBy | unknown | No | – | Entity column used to store sort order. |
+| connectAt | unknown | No | – | Name of relation to connect new entity at. |
+| createNewForm | unknown | No | – | React node used to add new items. |
+| initialSorting | unknown | No | – | GraphQL order applied on mount. |
+| children | ReactNode | No | – | Custom item renderer. |
+| **Inherited props** | – | – | – | _None_ |
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+
+### Sortable tag selector inside a blog post form
+```tsx
+<FormHasManyRelationScope field="tags">
+	<FormContainer label="Tags">
+		<SortableMultiSelectInput
+			field="tags"
+			queryField="TagList"
+			placeholder="Choose tags…"
+			sortableBy="order"
+			className="w-full"
+		/>
+	</FormContainer>
+</FormHasManyRelationScope>
+```
+Reorder tags by dragging. The order persists in the `order` column.
+
+### Allow users to add new categories on the fly
+```tsx
+<SortableMultiSelectInput
+	field="categories"
+	queryField="CategoryList"
+	createNewForm={<CategoryCreateForm />}
+	placeholder="Add or create categories"
+	className="w-full"
+/>
+```
+When the user cannot find a category, they press the “+” button rendered by `CategoryCreateForm`.
+
+## Best Practices & Gotchas
+* Always pass `sortableBy` to persist ordering in the database.
+* Provide `options` only for small, static lists; otherwise use `queryField`.
+* Wrap the input in `FormHasManyRelationScope` to avoid unexpected query nesting.
+* Keep `placeholder` short; long text harms accessibility.
+
+## Further Reading
+* `MultiSelectInput`
+* `SelectInput`
+* `FormHasManyRelationScope`
+
+<!-- End of Generated Documentation -->

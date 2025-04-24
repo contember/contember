@@ -1,13 +1,18 @@
 ---
 title: EditorBlockContent
 ---
-<!-- Examples count: 2 -->
 
+<!-- Edited by human: false -->
+<!-- Examples count: 2 -->
+<!-- Source examples: 1 -->
+<!-- Playground examples: 1 -->
+<!-- External examples: 0 -->
+<!-- Import examples: 1 -->
 
 # EditorBlockContent
 
 ## Overview
-`EditorBlockContent` renders the editable region inside a block.
+`EditorBlockContent` renders the editable region inside a block.  
 It manages `contentEditable`, placeholder text, and padding so you can focus on authoring.
 
 ## Styling Guidelines
@@ -17,8 +22,8 @@ It manages `contentEditable`, placeholder text, and padding so you can focus on 
 ## Core Concepts
 * Editable region lives inside each `EditorBlock`.
 * Placeholder appears when the block is empty.
-* Component handles focus and text‑presence detection.
-* You may style the area with standard Tailwind utilities.
+* Component handles focus and text-presence detection.
+* Style the area with standard Tailwind utilities.
 
 ## Quick Start
 ```tsx
@@ -44,7 +49,15 @@ _None_
 
 ## Examples
 
-### Minimal quoted block
+### Standalone content area
+```tsx
+import { EditorBlockContent } from '~/lib/editor'
+
+export const PlainContent = () => <EditorBlockContent />
+```
+Use this only inside a parent `EditorBlock`. It shows the simplest possible usage.
+
+### Minimal quoted block (matches playground)
 ```tsx
 import { EditorBlock, EditorBlockContent } from '~/lib/editor'
 
@@ -54,7 +67,7 @@ export const MinimalQuoteBlock = () => (
 	</EditorBlock>
 )
 ```
-This mirrors playground usage. You get inline editing without extra styling complexity.
+The block gains a left border. `EditorBlockContent` takes care of editing and placeholder logic.
 
 ### Quoted block with custom background
 ```tsx
@@ -73,17 +86,18 @@ export const QuoteBlock = () => (
 	</EditorBlock>
 )
 ```
-The block gets left‑border styling, while `EditorBlockContent` handles inline editing and placeholder logic.
+The block gets background and border styling, while `EditorBlockContent` handles inline editing.
 
 ## Best Practices & Gotchas
 * Wrap `EditorBlockContent` only inside `EditorBlock`.
-* Add padding on the parent block, not on the content, to keep placeholder aligned.
+* Add padding on the parent block, not on the content, to keep the placeholder aligned.
 * Use `prose` or similar Tailwind typography classes for rich text.
-* Do not set `contentEditable` manually; the component does that for you.
+* Do not set `contentEditable` manually; the component already does that.
 
 ## Further Reading
 * `EditorBlock`
 * `EditorBlockToolbar`
+* `EditorInlineToolbar`
 * `RichTextField`
 
 <!-- End of Generated Documentation -->

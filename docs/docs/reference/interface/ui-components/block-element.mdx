@@ -1,0 +1,104 @@
+---
+title: BlockElement
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 11 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 1 -->
+<!-- External examples: 10 -->
+<!-- Import examples: 6 -->
+
+# BlockElement
+
+## Overview
+`BlockElement` wraps content in a chosen HTML block element and optionally draws visual boundaries around it.  
+You typically use it inside a Slate editor to isolate complex blocks like images, lists, or custom components.
+
+## Styling Guidelines
+* All examples use Tailwind CSS.  
+* No Contember-specific theme classes are required.
+
+## Core Concepts
+* `domElement` lets you switch the rendered HTML tag.
+* `withBoundaries` adds a subtle outline to highlight the block in edit mode.
+* You can forward `className` to style the wrapper with Tailwind utilities.
+
+## Quick Start
+```tsx
+import { BlockElement } from '@app/lib/editor'
+
+export const SimpleBlock = () => (
+  <BlockElement withBoundaries className="p-4 border rounded-md">
+    <p className="text-sm">
+      Your rich text or nested editor nodes live here.
+    </p>
+  </BlockElement>
+)
+```
+
+## Detailed Guide
+```tsx
+// Render as <li> inside a custom list renderer
+<BlockElement domElement="li" className="list-disc ml-6">
+  {children}
+</BlockElement>
+```
+
+```tsx
+// Visual cue for selected horizontal rule
+<BlockElement withBoundaries>
+  <span contentEditable={false}>
+    <hr className="border-t border-gray-300" />
+  </span>
+</BlockElement>
+```
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| domElement | keyof JSX.IntrinsicElements | No | `"div"` | HTML tag used for the wrapper. |
+| withBoundaries | boolean | No | `false` | When `true`, shows an outline to distinguish the block. |
+| className | string | No | `""` | Additional Tailwind classes applied to the wrapper. |
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+### Custom List Renderer
+```tsx
+props => (
+  <BlockElement {...props} domElement="ol" className="list-decimal ml-4">
+    {props.children}
+  </BlockElement>
+)
+```
+The component renders as an ordered list (`<ol>`) and inherits Tailwind list styles.
+
+### Removable Rich-Text Block
+```tsx
+<BlockElement withBoundaries>
+  <div className="group -ml-3 p-3 hover:shadow-md transition-all">
+    <div contentEditable={false} className="flex">
+      <span className="text-gray-400 text-xs font-semibold">Caption</span>
+      <button className="ml-auto opacity-0 group-hover:opacity-100">
+        Remove
+      </button>
+    </div>
+    <div>{children}</div>
+  </div>
+</BlockElement>
+```
+This pattern adds a hoverable toolbar inside the block while keeping boundaries visible.
+
+## Best Practices & Gotchas
+* Always wrap non-editable UI (buttons, icons) with `contentEditable={false}`.
+* Use `withBoundaries` only in edit mode to avoid visual noise in read-only views.
+* Prefer semantic tags via `domElement` for accessibility (`<ol>`, `<li>`, `<section>`).
+
+## Further Reading
+* Slate `useSelected` hook for selection state.
+* Contember `InlineElement` for inline rich-text constructs.
+* Tailwind spacing and border utilities for consistent visuals.
+
+<!-- End of Generated Documentation -->

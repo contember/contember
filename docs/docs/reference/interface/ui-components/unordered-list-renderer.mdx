@@ -1,0 +1,75 @@
+---
+title: UnorderedListRenderer
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 0 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 0 -->
+<!-- Import examples: 4 -->
+
+# UnorderedListRenderer
+
+## Overview
+`UnorderedListRenderer` outputs an unordered list (<ul>) inside Contember’s Slate-based editor.  
+Use it whenever you need to display list data that lives in a `UnorderedListElement` node.
+
+## Styling Guidelines
+* All code examples rely on Tailwind CSS.  
+* No Contember-specific theme classes are required.
+
+## Core Concepts
+* `UnorderedListElement` – the Slate node the renderer expects.  
+* Render-only component – it **does not** handle editing logic.  
+* Works inside any Slate context provided by Contember.
+
+## Quick Start
+```tsx
+import { UnorderedListRenderer } from './elements/UnorderedListRenderer'
+
+const element /* : UnorderedListElement */ = /* obtain from Slate editor state */
+
+export const BasicList = () => (
+  <div className="prose">
+    <UnorderedListRenderer element={element} />
+  </div>
+)
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+| Name    | Type | Required | Default | Description |
+|---------|------|----------|---------|-------------|
+| element | UnorderedListElement | Yes | – | Slate node to be rendered. |
+
+### Inherited Props
+_None_
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+
+### Custom Padding
+Wrap the renderer in a Tailwind-powered container to tweak spacing.
+
+```tsx
+<div className="pl-6">
+  <UnorderedListRenderer element={element} />
+</div>
+```
+This adds `1.5rem` left padding while keeping bullet styling intact.
+
+## Best Practices & Gotchas
+* Always memoize `element` when passing props in React to avoid needless re-renders.  
+* Place the renderer inside a Slate provider; it will not work standalone.  
+* Do not attempt to pass additional props—only `element` is supported.
+
+## Further Reading
+* `OrderedListRenderer` – for numbered lists.  
+* Contember Slate Editor documentation.  
+
+<!-- End of Generated Documentation -->

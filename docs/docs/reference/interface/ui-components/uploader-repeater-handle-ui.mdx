@@ -1,0 +1,90 @@
+---
+title: UploaderRepeaterHandleUI
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 4 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 4 -->
+<!-- Import examples: 4 -->
+
+# UploaderRepeaterHandleUI
+
+## Overview
+`UploaderRepeaterHandleUI` renders the visual drag-handle used when you sort uploaded files inside a repeater.  
+You place it inside `RepeaterSortableItemActivator` so users can grab and move items with their mouse or keyboard.
+
+## Styling Guidelines
+* All examples use Tailwind classes.  
+* No special Contember theme classes are required.
+
+## Core Concepts
+* Drag handle must be wrapped by `RepeaterSortableItemActivator`.
+* Users reorder uploaded items by dragging the handle.
+* The handle is presentation only; sorting logic lives in `RepeaterSortable`.
+
+## Quick Start
+```tsx
+import {
+	UploaderRepeaterHandleUI,
+	RepeaterSortable,
+	RepeaterSortableEachItem,
+	RepeaterSortableItemActivator,
+	RepeaterSortableItemNode,
+} from '@contember/react-components'
+
+export const FilesField = () => (
+	<RepeaterSortable>
+		<RepeaterSortableEachItem>
+			<RepeaterSortableItemNode>
+				<div className="flex items-center gap-2">
+					<RepeaterSortableItemActivator>
+						<UploaderRepeaterHandleUI />
+					</RepeaterSortableItemActivator>
+
+					{/* Your file preview goes here */}
+				</div>
+			</RepeaterSortableItemNode>
+		</RepeaterSortableEachItem>
+	</RepeaterSortable>
+)
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+_None_
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+
+### Reordering files in a multi-upload field
+```tsx
+<RepeaterSortableEachItem>
+	<div className="flex">
+		<RepeaterSortableItemActivator>
+			<UploaderRepeaterHandleUI />
+		</RepeaterSortableItemActivator>
+
+		<UploadedImageView className="w-24 h-24 object-cover" />
+	</div>
+</RepeaterSortableEachItem>
+```
+The user drags the handle to reorder images. The layout stays flexible thanks to Tailwind utility classes.
+
+## Best Practices & Gotchas
+* Always nest the handle inside `RepeaterSortableItemActivator`.
+* Add `cursor-move` or similar Tailwind class to provide a visual cue.
+* Keep the handle large enough for touch targets (≥ 44 px).
+
+## Further Reading
+* `UploaderRepeaterItemUI`
+* `UploaderRepeaterDragOverlayUI`
+* `RepeaterSortable` and friends  
+* Contember Upload guide
+
+<!-- End of Generated Documentation -->

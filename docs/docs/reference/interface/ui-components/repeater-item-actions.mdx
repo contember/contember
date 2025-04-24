@@ -1,14 +1,19 @@
 ---
 title: RepeaterItemActions
 ---
-<!-- Examples count: 3 -->
 
+<!-- Edited by human: false -->
+<!-- Examples count: 13 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 3 -->
+<!-- External examples: 10 -->
+<!-- Import examples: 6 -->
 
 # RepeaterItemActions
 
 ## Overview
-`RepeaterItemActions` wraps buttons or menus that act on a single repeater item.
-Place it in the upper‑right corner of each item to keep actions consistent and discoverable.
+`RepeaterItemActions` wraps buttons or menus that act on a single repeater item.  
+Place it in the upper-right corner of each item to keep actions consistent and discoverable.
 
 ## Styling Guidelines
 * All snippets use Tailwind CSS.
@@ -40,17 +45,17 @@ _None_
 |------|------|----------|---------|-------------|
 | _None_ | | | | |
 
-_Inherited props_
+_Inherited props_  
 _None_
 
 ## Sub-Components / Building Blocks
 
 ### RepeaterRemoveItemButton
-Built‑in button that deletes the current repeater item. Place it inside `RepeaterItemActions`.
+Built-in button that deletes the current repeater item. Place it inside `RepeaterItemActions`.
 
 ## Examples
 
-### 1 — Sortable repeater on a collection
+### 1 — Sortable repeater on a collection
 ```tsx
 <DefaultRepeater entities="RepeaterItem" sortableBy="order" title="Foo items" addButtonPosition="around">
   <InputField field="title" />
@@ -68,7 +73,7 @@ Built‑in button that deletes the current repeater item. Place it inside `Repea
 ```
 `sortableBy="order"` adds drag handles. The action area stays fixed, so users always know where to click.
 
-### 2 — Repeater on a relation subtree
+### 2 — Repeater on a relation subtree
 ```tsx
 <EntitySubTree entity="RepeaterRoot(unique = unique)" setOnCreate="(unique = unique)">
   <DefaultRepeater field="items" sortableBy="order" title="Foo items" addButtonPosition="around">
@@ -88,7 +93,7 @@ Built‑in button that deletes the current repeater item. Place it inside `Repea
 ```
 `RepeaterItemActions` works the same inside an `EntitySubTree`; no extra wiring is necessary.
 
-### 3 — Non‑sortable repeater
+### 3 — Non-sortable repeater
 ```tsx
 <DefaultRepeater entities="RepeaterItem" orderBy="order" title="Foo items">
   <Field field="title" />
@@ -100,6 +105,33 @@ Built‑in button that deletes the current repeater item. Place it inside `Repea
 </DefaultRepeater>
 ```
 When the list is static (`orderBy` only), the action area remains the interaction hub for each row.
+
+### 4 — Minimal removal-only actions
+```tsx
+<RepeaterItemActions>
+  <RepeaterRemoveItemButton />
+</RepeaterItemActions>
+```
+A single destructive action is common for simple lists. The default spacing is sufficient, so `className` is optional.
+
+### 5 — Pipeline management repeater
+```tsx
+<Binding>
+  <Slots.Title>Pipeline</Slots.Title>
+  <Slots.Actions>
+    <PersistButton />
+  </Slots.Actions>
+
+  <DefaultRepeater entities="Pipeline" orderBy="branch.name">
+    <PipelineForm />
+
+    <RepeaterItemActions className="flex gap-2">
+      <RepeaterRemoveItemButton />
+    </RepeaterItemActions>
+  </DefaultRepeater>
+</Binding>
+```
+This production example shows `RepeaterItemActions` inside a complex form. The action area stays lightweight, keeping the form focused.
 
 ## Best Practices & Gotchas
 * Keep only essential controls in the action area to avoid clutter.

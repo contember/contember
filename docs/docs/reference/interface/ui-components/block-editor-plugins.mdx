@@ -1,30 +1,35 @@
 ---
 title: blockEditorPlugins
 ---
-<!-- Examples count: 1 -->
 
+<!-- Edited by human: false -->
+<!-- Examples count: 1 -->
+<!-- Source examples: 1 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 0 -->
+<!-- Import examples: 2 -->
 
 # blockEditorPlugins
 
 ## Overview
-`blockEditorPlugins` bundles advanced Slate plugins that bring structural editing to Contember’s `BlockEditor`. You gain block‑level formatting, lists, tables, scroll targets, and drag‑and‑drop sorting without extra wiring.
+`blockEditorPlugins` bundles advanced Slate plugins that bring structural editing to Contember’s `BlockEditor`. You gain block-level formatting, lists, tables, scroll targets, and drag-and-drop sorting without extra wiring.
 
-Use the preset when you need rich, section‑based documents rather than plain text fields.
+Use the preset when you need rich, section-based documents rather than plain text fields.
 
 ## Styling Guidelines
 * All snippets apply Tailwind CSS directly in JSX.
-* No Contember‑specific theme classes are required, but keep your editor container flexible with `prose` or `flex` utilities.
+* No Contember-specific theme classes are required, but keep your editor container flexible with `prose` or `flex` utilities.
 
 ## Core Concepts
-* Plugin preset — a ready‑made array passed to `BlockEditor`.
+* Plugin preset — a ready-made array passed to `BlockEditor`.
 * Structural blocks — headings, paragraphs, lists, rules, tables, and scroll targets.
-* Drag‑and‑drop — powered by `withSortable` and rendered by `SortableBlock`.
+* Drag-and-drop — powered by `withSortable` and rendered by `SortableBlock`.
 * Declarative sections — each sortable block receives a unique `name` to map data.
 
 ## Quick Start
 ```tsx
-import { BlockEditor, SortableBlock } from '@contember/react-admin';
-import { blockEditorPlugins } from './blockEditorPlugins';
+import { BlockEditor, SortableBlock } from '@contember/react-admin'
+import { blockEditorPlugins } from './plugins'
 
 export const ArticleEditor = () => (
   <div className="prose max-w-none">
@@ -32,7 +37,7 @@ export const ArticleEditor = () => (
       <SortableBlock name="section" className="border-l-4 pl-4" />
     </BlockEditor>
   </div>
-);
+)
 ```
 
 ## Detailed Guide
@@ -47,7 +52,7 @@ _None_
 Renders the draggable handle and wraps each block so you can reorder them.
 
 ### withSortable
-Higher‑order plugin that injects sortability into editor nodes. It is already included inside `blockEditorPlugins`.
+Higher-order plugin that injects sortability into editor nodes. It is already included inside `blockEditorPlugins`.
 
 ## Examples
 
@@ -78,7 +83,7 @@ A horizontal rule appears as a draggable block, separating content logically.
 
 ## Best Practices & Gotchas
 * Keep each `SortableBlock`’s `name` unique within the parent editor.
-* Wrap the editor in a scrollable container to improve drag‑and‑drop UX.
+* Wrap the editor in a scrollable container to improve drag-and-drop UX.
 * Disable Tailwind’s `prose` default margins if your layout already has spacing.
 * Do not mix `richTextFieldPlugins` with `blockEditorPlugins` in the same editor.
 

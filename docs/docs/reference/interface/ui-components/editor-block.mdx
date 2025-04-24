@@ -1,16 +1,21 @@
 ---
 title: EditorBlock
 ---
-<!-- Examples count: 3 -->
 
+<!-- Edited by human: false -->
+<!-- Examples count: 3 -->
+<!-- Source examples: 1 -->
+<!-- Playground examples: 2 -->
+<!-- External examples: 0 -->
+<!-- Import examples: 1 -->
 
 # EditorBlock
 
 ## Overview
-EditorBlock registers reusable content blocks inside a Slate‑powered rich‑text editor.
-You pass a unique `name`, a human‑readable `label`, and JSX defining the block body.
+EditorBlock registers reusable content blocks inside a Slate-powered rich-text editor.  
+You pass a unique `name`, a human-readable `label`, and JSX defining the block body.
 
-The component supports an optional alternate pop‑over for configuration. Drag‑and‑drop works out of the box, so authors reorder blocks effortlessly.
+The component supports an optional alternate pop-over for configuration. Drag-and-drop works out of the box, so authors reorder blocks effortlessly.
 
 ## Styling Guidelines
 * All examples use Tailwind CSS.
@@ -18,7 +23,7 @@ The component supports an optional alternate pop‑over for configuration. Drag�
 
 ## Core Concepts
 * Give every block a stable, unique `name`.
-* `label` appears in toolbars and pop‑overs.
+* `label` appears in toolbars and pop-overs.
 * Render block internals through the `children` prop.
 * Provide `alternate` to show a secondary settings UI.
 * Wrap blocks with `<BlockEditorField>` for persistence and references.
@@ -30,7 +35,7 @@ import {
   EditorBlock,
   EditorBlockToolbar,
   EditorReferenceTrigger,
-  EditorBlockContent,
+  BlockButton,
 } from '~/lib/editor'
 import { ImageIcon } from 'lucide-react'
 
@@ -43,9 +48,9 @@ const PostEditor = () => (
   >
     <EditorBlockToolbar className="flex gap-2">
       <EditorReferenceTrigger referenceType="image">
-        <button className="btn btn-primary flex items-center gap-1">
+        <BlockButton className="inline-flex items-center gap-1">
           <ImageIcon size={16} /> Image
-        </button>
+        </BlockButton>
       </EditorReferenceTrigger>
     </EditorBlockToolbar>
 
@@ -67,9 +72,9 @@ _None_
 | children | React.ReactNode | Yes | — | Primary block content |
 | alternate | React.ReactNode | No | — | Alternate configuration UI (optional) |
 
-## Sub‑Components / Building Blocks
+## Sub-Components / Building Blocks
 ### EditorBlockContent
-Renders a default rich‑text area inside a block.
+Renders a default rich-text area inside a block.
 
 ### EditorBlockToolbar
 Horizontal toolbar displayed above the editor.
@@ -80,14 +85,37 @@ Contextual toolbar appearing near selected text.
 ### EditorReferenceTrigger
 Element that inserts a reference block, such as an image.
 
+### BlockButton
+Styled button used inside toolbars for inserting blocks or references.
+
 ## Examples
+### Full Editor With Image Block
+```tsx
+<BlockEditorField
+  field="data"
+  referencesField="references"
+  referenceDiscriminationField="type"
+>
+  <EditorBlockToolbar>
+    <EditorReferenceTrigger referenceType="image">
+      <BlockButton><ImageIcon /> Image</BlockButton>
+    </EditorReferenceTrigger>
+  </EditorBlockToolbar>
+
+  <EditorBlock name="image" label="Image">
+    <ImageField baseField="image" urlField="url" />
+  </EditorBlock>
+</BlockEditorField>
+```
+This pattern shows a complete editor setup that lets authors insert an image block through a toolbar trigger.
+
 ### Quote Block
 ```tsx
 <EditorBlock name="quote" label="Quote">
   <EditorBlockContent />
 </EditorBlock>
 ```
-This block gives authors a rich‑text area styled as a quote.
+Use this block to let authors write rich-text quotes.
 
 ### Image Block
 ```tsx
@@ -95,7 +123,7 @@ This block gives authors a rich‑text area styled as a quote.
   <ImageField baseField="image" urlField="url" />
 </EditorBlock>
 ```
-Authors upload or select an image. The block stores the file and URL.
+This standalone image block stores both the file and its URL.
 
 ## Best Practices & Gotchas
 * Keep `name` constant; changing it breaks stored content.

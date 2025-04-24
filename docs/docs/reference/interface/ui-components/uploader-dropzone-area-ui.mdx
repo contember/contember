@@ -1,0 +1,95 @@
+---
+title: UploaderDropzoneAreaUI
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 6 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 2 -->
+<!-- External examples: 4 -->
+<!-- Import examples: 5 -->
+
+## Overview
+UploaderDropzoneAreaUI renders the visible “drop files here” zone inside a Contember uploader.  
+It only controls layout and styling; logic lives in surrounding uploader components.
+
+## Styling Guidelines
+* All examples use Tailwind CSS.  
+* The component adds no Contember-specific theme classes—style it freely with Tailwind utilities.
+
+## Core Concepts
+* The component is **presentational**—place your own icons, text, or buttons inside.  
+* It forwards click and drop events to the surrounding uploader context.  
+* Combine it with `UploaderDropzoneWrapperUI` and `UploaderInactiveDropzoneUI` for full UX.
+
+## Quick Start
+```tsx
+import { UploaderDropzoneAreaUI } from '~/lib/upload'
+import { UploadIcon } from '@radix-ui/react-icons'
+
+export default function ImageUploaderPlaceholder() {
+	return (
+		<UploaderDropzoneAreaUI className="flex flex-col items-center gap-2 p-6 border-2 border-dashed rounded-lg">
+			<UploadIcon className="w-12 h-12 text-gray-400" />
+			<span className="text-sm font-semibold">Drop images here</span>
+			<span className="text-xs text-gray-500">or click to browse</span>
+		</UploaderDropzoneAreaUI>
+	)
+}
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+_None_
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+
+### Playground – Single Image Field
+```tsx
+<UploaderDropzoneAreaUI className="w-60">
+	<UploadIcon className="w-12 h-12 text-gray-400" />
+	<div className="font-semibold text-sm">{dict.uploader.dropFiles}</div>
+	<div className="text-xs">{dict.uploader.or}</div>
+	<div className="flex gap-2 items-center text-xs">
+		<Button size="sm" variant="outline">{dict.uploader.browseFiles}</Button>
+		<div onClick={e => e.stopPropagation()}>
+			<SelectImage />
+		</div>
+	</div>
+</UploaderDropzoneAreaUI>
+```
+The wrapper provides a drop target and click area.  
+It keeps nested controls like `SelectImage` interactive by stopping propagation.
+
+### Production – Conditional Inactive State
+```tsx
+{showLoader ? (
+	<UploaderInactiveDropzoneUI />
+) : (
+	<UploaderDropzoneArea>
+		<UploaderDropzoneAreaUI>
+			<UploadIcon className="w-12 h-12 text-gray-400" />
+			{/* … */}
+		</UploaderDropzoneAreaUI>
+	</UploaderDropzoneArea>
+)}
+```
+You can swap the active area for `UploaderInactiveDropzoneUI` during file uploads to prevent additional drops.
+
+## Best Practices & Gotchas
+* Always render at least one child so the dropzone has a visible height.  
+* Stop event propagation on nested file inputs to keep them clickable.  
+* Use conditional rendering to disable the zone while uploads are in progress.  
+* Wrap the component in `UploaderDropzoneRoot` and `UploaderDropzoneWrapperUI` for keyboard focus outlines.
+
+## Further Reading
+* `UploaderDropzoneWrapperUI` – outer container with focus ring.  
+* `UploaderInactiveDropzoneUI` – read-only overlay during uploads.  
+* Contember Uploader guide in the official docs.
+
+<!-- End of Generated Documentation -->

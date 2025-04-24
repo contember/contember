@@ -1,2 +1,2 @@
 export * from './DatabaseContext'
-export * from './tokenUtils'
+export * from './token'

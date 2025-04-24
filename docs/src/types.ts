@@ -1,27 +1,39 @@
 export type RegenerationReason = {
 	isUpdate: boolean
-	
+
 	// Source examples
 	sourceExamplesCount: number
 	previousSourceCount: number
 	sourceExamplesChanged: boolean
-	
+
 	// Playground examples
 	playgroundExamplesCount: number
 	previousPlaygroundCount: number
 	playgroundExamplesChanged: boolean
-	
+
+	// External project examples
+	externalExamplesCount: number
+	previousExternalCount: number
+	externalExamplesChanged: boolean
+
 	// Import examples
 	importsCount: number
 	previousImportsCount: number
 	importsChanged: boolean
-	
+
 	// Totals
 	totalExamplesCount: number
 	previousTotalCount: number
-	
+
 	// Flags
 	hasNewImports: boolean
+	hasNewExternalExamples: boolean
+}
+
+export interface ExampleSourceInfo {
+	source: 'jsdoc' | 'playground' | 'external'
+	projectName?: string
+	filePath?: string
 }
 
 export interface ComponentSourceData {
@@ -30,10 +42,14 @@ export interface ComponentSourceData {
 	jsdoc?: string
 	props?: Record<string, PropData>
 	examples?: string[]
+	exampleSources?: ExampleSourceInfo[]
 	originalExamplesCount?: number
+	playgroundExamplesCount?: number
+	externalProjectExamplesCount?: number
 	previousDocContent?: string
 	links?: string[]
 	imports?: string[]
+	importSources?: { source: string; path?: string }[]
 	regenerationReason?: RegenerationReason
 }
 
@@ -55,12 +71,19 @@ export interface ComponentOverride {
 	notes?: string
 }
 
+export interface ExternalProject {
+	path: string
+	name: string
+	description?: string
+}
+
 export interface DocsConfig {
 	sourceDir: string
 	contextDir: string
 	outputDir: string
 	overrides?: Record<string, ComponentOverride>
 	componentFilePattern?: string
+	externalProjects?: ExternalProject[]
 	ai?: {
 		model?: string
 	}

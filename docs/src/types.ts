@@ -1,8 +1,26 @@
 export type RegenerationReason = {
 	isUpdate: boolean
-	originalExamplesCount: number
-	newExamplesCount: number
-	playgroundExamplesAdded: number
+	
+	// Source examples
+	sourceExamplesCount: number
+	previousSourceCount: number
+	sourceExamplesChanged: boolean
+	
+	// Playground examples
+	playgroundExamplesCount: number
+	previousPlaygroundCount: number
+	playgroundExamplesChanged: boolean
+	
+	// Import examples
+	importsCount: number
+	previousImportsCount: number
+	importsChanged: boolean
+	
+	// Totals
+	totalExamplesCount: number
+	previousTotalCount: number
+	
+	// Flags
 	hasNewImports: boolean
 }
 

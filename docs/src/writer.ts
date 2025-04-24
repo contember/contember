@@ -5,10 +5,16 @@ export async function writeMarkdownFile(filePath: string, content: string): Prom
 	try {
 		const dirPath = path.dirname(filePath)
 
-		// Check if examples count marker is in the content
+		// Check if all example count markers are in the content
 		const hasExamplesCount = content.includes('<!-- Examples count:')
-		if (!hasExamplesCount) {
-			console.warn(`Warning: Examples count marker is missing in ${filePath}`)
+		const hasSourceExamples = content.includes('<!-- Source examples:')
+		const hasPlaygroundExamples = content.includes('<!-- Playground examples:')
+		
+		if (!hasExamplesCount || !hasSourceExamples || !hasPlaygroundExamples) {
+			console.warn(`Warning: Some metadata markers are missing in ${filePath}:` + 
+				`${!hasExamplesCount ? ' total_count' : ''}` +
+				`${!hasSourceExamples ? ' source_examples' : ''}` +
+				`${!hasPlaygroundExamples ? ' playground_examples' : ''}`)
 		}
 
 		await fs.mkdir(dirPath, { recursive: true })

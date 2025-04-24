@@ -120,23 +120,42 @@ export const buildPrompt = (
 	}
 
 	if (data.previousDocContent) {
-		const regenerationReason = data.regenerationReason || {
-			isUpdate: true,
-			originalExamplesCount: 0,
-			newExamplesCount: data.examples?.length || 0,
-			playgroundExamplesAdded: 0,
-			hasNewImports: false,
-		}
-		const playgroundExamplesAdded = regenerationReason.playgroundExamplesAdded || 0
-		const hasNewImports = regenerationReason.hasNewImports || false
-
-		// Create a specific reason message based on what changed
 		let changeReason = 'Documentation is being regenerated because:'
-		if (playgroundExamplesAdded > 0) {
-			changeReason += `\n- ${playgroundExamplesAdded} new playground example(s) have been added.`
-		}
-		if (hasNewImports) {
-			changeReason += '\n- New import examples are now available.'
+
+		const reason = data.regenerationReason
+
+		if (reason) {
+			if (reason.sourceExamplesChanged) {
+				if (reason.sourceExamplesCount > reason.previousSourceCount) {
+					changeReason += `\n- Source examples increased from ${reason.previousSourceCount} to ${reason.sourceExamplesCount}.`
+				} else if (reason.sourceExamplesCount < reason.previousSourceCount) {
+					changeReason += `\n- Source examples decreased from ${reason.previousSourceCount} to ${reason.sourceExamplesCount}.`
+				}
+			}
+
+			if (reason.playgroundExamplesChanged) {
+				if (reason.playgroundExamplesCount > reason.previousPlaygroundCount) {
+					changeReason += `\n- ${reason.playgroundExamplesCount - reason.previousPlaygroundCount} new playground example(s) have been added.`
+				} else if (reason.playgroundExamplesCount < reason.previousPlaygroundCount) {
+					changeReason += `\n- ${reason.previousPlaygroundCount - reason.playgroundExamplesCount} playground example(s) have been removed.`
+				}
+			}
+
+			if (reason.importsChanged) {
+				if (reason.importsCount > reason.previousImportsCount) {
+					changeReason += `\n- ${reason.importsCount - reason.previousImportsCount} new import example(s) are now available.`
+				} else if (reason.importsCount < reason.previousImportsCount) {
+					changeReason += `\n- ${reason.previousImportsCount - reason.importsCount} import example(s) have been removed.`
+				}
+			}
+		} else {
+			// Fallback if no detailed reason
+			if (reason.playgroundExamplesCount > 0) {
+				changeReason += `\n- ${reason.playgroundExamplesCount} playground example(s) have been added.`
+			}
+			if (reason.importsCount > 0) {
+				changeReason += '\n- Import examples are now available.'
+			}
 		}
 
 		lines.push(`## Previous Documentation Version
@@ -172,16 +191,47 @@ export async function generateMarkdownWithAI(
 	// Add regeneration reason if updating existing doc
 	if (sourceData.previousDocContent) {
 		// Calculate what changed to provide context to the AI
-		const originalExamplesCount = sourceData.originalExamplesCount || 0
+		const sourceExamplesCount = sourceData.originalExamplesCount || 0
 		const totalExamplesCount = sourceData.examples?.length || 0
-		const playgroundExamplesCount = totalExamplesCount - originalExamplesCount
+		const playgroundExamplesCount = totalExamplesCount - sourceExamplesCount
+		const importsCount = sourceData.imports?.length || 0
 
+		// Extract previous counts from the document if possible
+		const sourceRegex = /<!-- Source examples: (\d+) -->/
+		const playgroundRegex = /<!-- Playground examples: (\d+) -->/
+		const importsRegex = /<!-- Import examples: (\d+) -->/
+
+		const previousSourceMatch = sourceData.previousDocContent.match(sourceRegex)
+		const previousSourceCount = previousSourceMatch ? parseInt(previousSourceMatch[1], 10) : 0
+
+		const previousPlaygroundMatch = sourceData.previousDocContent.match(playgroundRegex)
+		const previousPlaygroundCount = previousPlaygroundMatch ? parseInt(previousPlaygroundMatch[1], 10) : 0
+
+		const previousImportsMatch = sourceData.previousDocContent.match(importsRegex)
+		const previousImportsCount = previousImportsMatch ? parseInt(previousImportsMatch[1], 10) : 0
+
+		// Create a detailed reason object
 		sourceData.regenerationReason = {
 			isUpdate: true,
-			originalExamplesCount,
-			newExamplesCount: totalExamplesCount,
-			playgroundExamplesAdded: playgroundExamplesCount,
-			hasNewImports: !!sourceData.imports && sourceData.imports.length > 0,
+			// Source examples info
+			sourceExamplesCount,
+			previousSourceCount,
+			sourceExamplesChanged: sourceExamplesCount !== previousSourceCount,
+
+			// Playground examples info
+			playgroundExamplesCount,
+			previousPlaygroundCount,
+			playgroundExamplesChanged: playgroundExamplesCount !== previousPlaygroundCount,
+
+			// Import examples info
+			importsCount,
+			previousImportsCount,
+			importsChanged: importsCount !== previousImportsCount,
+
+			// Total count info
+			totalExamplesCount,
+			previousTotalCount: previousSourceCount + previousPlaygroundCount,
+			hasNewImports: importsCount > previousImportsCount,
 		}
 	}
 
@@ -262,9 +312,24 @@ title: ${title}
 		}
 
 		const editedByHumanTag = `<!-- Edited by human: false -->`
+
+		// Track source and playground examples separately
+		const sourceExamplesCount = sourceData.originalExamplesCount || 0
+		const playgroundExamplesCount = (sourceData.examples?.length || 0) - sourceExamplesCount
+		const importsCount = sourceData.imports?.length || 0
+
+		// Create metadata tags with detailed example counts
 		const examplesCountTag = `<!-- Examples count: ${examplesCount} -->`
+		const sourceExamplesTag = `<!-- Source examples: ${sourceExamplesCount} -->`
+		const playgroundExamplesTag = `<!-- Playground examples: ${playgroundExamplesCount} -->`
+		const importsTag = `<!-- Import examples: ${importsCount} -->`
+
+		// Define regexes to match and replace existing tags
 		const editedByHumanRegex = /<!--\s*Edited by human:\s*(true|false)\s*-->\n*/
 		const examplesCountRegex = /<!--\s*Examples count:\s*\d+\s*-->\n*/
+		const sourceExamplesRegex = /<!--\s*Source examples:\s*\d+\s*-->\n*/
+		const playgroundExamplesRegex = /<!--\s*Playground examples:\s*\d+\s*-->\n*/
+		const importsRegex = /<!--\s*Import examples:\s*\d+\s*-->\n*/
 
 		const frontmatterEndIndex = finalContent.indexOf('---', 3)
 		let insertPosition = 0
@@ -283,13 +348,21 @@ title: ${title}
 		let contentBeforeInsert = finalContent.substring(0, insertPosition)
 		let contentAfterInsert = finalContent.substring(insertPosition)
 
+		// Remove any existing metadata tags
 		contentAfterInsert = contentAfterInsert.replace(editedByHumanRegex, '')
 		contentAfterInsert = contentAfterInsert.replace(examplesCountRegex, '')
+		contentAfterInsert = contentAfterInsert.replace(sourceExamplesRegex, '')
+		contentAfterInsert = contentAfterInsert.replace(playgroundExamplesRegex, '')
+		contentAfterInsert = contentAfterInsert.replace(importsRegex, '')
 
+		// Insert all metadata tags after frontmatter
 		finalContent =
 			contentBeforeInsert.trimEnd() + '\n\n' +
 			editedByHumanTag + '\n' +
-			examplesCountTag + '\n\n' +
+			examplesCountTag + '\n' +
+			sourceExamplesTag + '\n' +
+			playgroundExamplesTag + '\n' +
+			importsTag + '\n\n' +
 			contentAfterInsert.trimStart()
 
 		return finalContent

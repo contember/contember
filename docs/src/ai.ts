@@ -375,21 +375,17 @@ title: ${title}
 		}
 
 		const editedByHumanTag = `<!-- Edited by human: false -->`
-
-		// Track source and playground examples separately
 		const sourceExamplesCount = sourceData.originalExamplesCount || 0
 		const playgroundExamplesCount = sourceData.playgroundExamplesCount || 0
 		const externalExamplesCount = sourceData.externalProjectExamplesCount || 0
 		const importsCount = sourceData.imports?.length || 0
 
-		// Create metadata tags with detailed example counts
 		const examplesCountTag = `<!-- Examples count: ${examplesCount} -->`
 		const sourceExamplesTag = `<!-- Source examples: ${sourceExamplesCount} -->`
 		const playgroundExamplesTag = `<!-- Playground examples: ${playgroundExamplesCount} -->`
 		const externalExamplesTag = `<!-- External examples: ${externalExamplesCount} -->`
 		const importsTag = `<!-- Import examples: ${importsCount} -->`
 
-		// Define regexes to match and replace existing tags
 		const editedByHumanRegex = /<!--\s*Edited by human:\s*(true|false)\s*-->\n*/
 		const examplesCountRegex = /<!--\s*Examples count:\s*\d+\s*-->\n*/
 		const sourceExamplesRegex = /<!--\s*Source examples:\s*\d+\s*-->\n*/
@@ -414,7 +410,6 @@ title: ${title}
 		let contentBeforeInsert = finalContent.substring(0, insertPosition)
 		let contentAfterInsert = finalContent.substring(insertPosition)
 
-		// Remove any existing metadata tags
 		contentAfterInsert = contentAfterInsert.replace(editedByHumanRegex, '')
 		contentAfterInsert = contentAfterInsert.replace(examplesCountRegex, '')
 		contentAfterInsert = contentAfterInsert.replace(sourceExamplesRegex, '')
@@ -422,7 +417,56 @@ title: ${title}
 		contentAfterInsert = contentAfterInsert.replace(externalExamplesRegex, '')
 		contentAfterInsert = contentAfterInsert.replace(importsRegex, '')
 
-		// Insert all metadata tags after frontmatter
+		const escapePipesInCell = (text: string): string => {
+			let result = ''
+			let inCode = false
+			for (let i = 0; i < text.length; i++) {
+				const char = text[i]
+				if (char === '`' && (i === 0 || text[i - 1] !== '\\')) {
+					inCode = !inCode
+				}
+				if (char === '|' && !inCode) {
+					result += '\\|'
+				} else {
+					result += char
+				}
+			}
+			return result
+		}
+
+		const propsTableRegex = /(### Props Reference\s*\n\s*\|.*?\|\s*\n\|.*?---\|.*?\n)([\s\S]*?)(\n\n\s*[^|]|\n\s*###|$)/
+		const tableMatch = contentAfterInsert.match(propsTableRegex)
+
+		if (tableMatch) {
+			const tableHeaderAndSeparator = tableMatch[1]
+			const tableBodyOriginal = tableMatch[2].trimEnd()
+			const afterTableMarker = tableMatch[3]
+			const tableRows = tableBodyOriginal.split('\n').filter(line => {
+				const trimmedLine = line.trim()
+				return trimmedLine.startsWith('|') && trimmedLine.endsWith('|') && trimmedLine.length > 2
+			})
+
+			const processedRows = tableRows.map(row => {
+				const cells = row.split('|').slice(1, -1)
+				const processedCells = cells.map(cellContent => {
+					const trimmedContent = cellContent.trim()
+					const escapedContent = escapePipesInCell(trimmedContent)
+
+					return escapedContent ? `\`${escapedContent}\`` : ''
+				})
+
+				return `| ${processedCells.join(' | ')} |`
+			})
+
+			const processedTableBody = processedRows.join('\n')
+			const processedTableSection = tableHeaderAndSeparator + processedTableBody
+
+			contentAfterInsert = contentAfterInsert.replace(
+				tableHeaderAndSeparator + tableBodyOriginal,
+				processedTableSection
+			)
+		}
+
 		finalContent =
 			contentBeforeInsert.trimEnd() + '\n\n' +
 			editedByHumanTag + '\n' +

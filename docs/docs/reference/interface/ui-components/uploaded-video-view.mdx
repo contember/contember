@@ -3,27 +3,27 @@ title: UploadedVideoView
 ---
 
 <!-- Edited by human: false -->
-<!-- Examples count: 8 -->
+<!-- Examples count: 0 -->
 <!-- Source examples: 0 -->
 <!-- Playground examples: 0 -->
-<!-- External examples: 8 -->
-<!-- Import examples: 5 -->
+<!-- External examples: 0 -->
+<!-- Import examples: 0 -->
 
 # UploadedVideoView
 
 ## Overview
-`UploadedVideoView` renders a preview of a video already stored in Contember Storage.  
+`UploadedVideoView` renders a preview of a video already stored in Contember Storage.
 You point the component to entity fields such as the file URL, file name, or dimensions and it outputs a ready-to-use video player plus optional metadata and action buttons.
 
 ## Styling Guidelines
-* All snippets use Tailwind CSS.  
-* The component itself ships **unstyled**. Add your own Tailwind classes on wrappers or via `actions` / `edit` render props.  
+* All snippets use Tailwind CSS.
+* The component itself ships **unstyled**. Add your own Tailwind classes on wrappers or via `actions` / `edit` render props.
 * No Contember theme classes are required.
 
 ## Core Concepts
-* Map entity fields to props (e.g. `urlField`, `fileNameField`).  
-* Combine with form helpers like `FileRepeaterFieldInner` for multiple uploads.  
-* Supply custom UI through `actions`, `edit`, or a custom `DestroyAction`.  
+* Map entity fields to props (e.g. `urlField`, `fileNameField`).
+* Combine with form helpers like `FileRepeaterFieldInner` for multiple uploads.
+* Supply custom UI through `actions`, `edit`, or a custom `DestroyAction`.
 * Use `noDestroy` to hide the default “delete” action when provided by the parent.
 
 ## Quick Start
@@ -48,15 +48,15 @@ _None_
 ## Props Reference
 | Name | Type | Required | Default | Description |
 |------|------|----------|---------|-------------|
-| urlField | `string` &#124; `{ field: string; hasOneRelationPath?: SugarableHasOneRelation &#124; SugarableHasOneRelation[] }` | Yes | — | Entity field that holds the public video URL. |
-| fileNameField | `string` &#124; `{ field: string; hasOneRelationPath?: SugarableHasOneRelation &#124; SugarableHasOneRelation[] }` | No | — | Field containing the original file name. |
-| lastModifiedField | `string` &#124; `{ field: string; hasOneRelationPath?: SugarableHasOneRelation &#124; SugarableHasOneRelation[] }` | No | — | Field with the last modified timestamp. |
-| fileSizeField | `string` &#124; `{ field: string; hasOneRelationPath?: SugarableHasOneRelation &#124; SugarableHasOneRelation[] }` | No | — | Field with file size in bytes. |
-| fileTypeField | `string` &#124; `{ field: string; hasOneRelationPath?: SugarableHasOneRelation &#124; SugarableHasOneRelation[] }` | No | — | Field describing the MIME type. |
-| widthField | `string` &#124; `{ field: string; hasOneRelationPath?: SugarableHasOneRelation &#124; SugarableHasOneRelation[] }` | No | — | Field with video width in pixels. |
-| heightField | `string` &#124; `{ field: string; hasOneRelationPath?: SugarableHasOneRelation &#124; SugarableHasOneRelation[] }` | No | — | Field with video height in pixels. |
-| durationField | `string` &#124; `{ field: string; hasOneRelationPath?: SugarableHasOneRelation &#124; SugarableHasOneRelation[] }` | No | — | Field with video duration in seconds. |
-| baseField | `string` &#124; SugarableHasOneRelation &#124; SugarableHasOneRelation[] | No | — | Reference to a base entity when metadata fields live on a nested relation. |
+| urlField | `string` \| `{ field: string; hasOneRelationPath?: SugarableHasOneRelation \| SugarableHasOneRelation[] }` | Yes | — | Entity field that holds the public video URL. |
+| fileNameField | `string` \| `{ field: string; hasOneRelationPath?: SugarableHasOneRelation \| SugarableHasOneRelation[] }` | No | — | Field containing the original file name. |
+| lastModifiedField | `string` \| `{ field: string; hasOneRelationPath?: SugarableHasOneRelation \| SugarableHasOneRelation[] }` | No | — | Field with the last modified timestamp. |
+| fileSizeField | `string` \| `{ field: string; hasOneRelationPath?: SugarableHasOneRelation \| SugarableHasOneRelation[] }` | No | — | Field with file size in bytes. |
+| fileTypeField | `string` \| `{ field: string; hasOneRelationPath?: SugarableHasOneRelation \| SugarableHasOneRelation[] }` | No | — | Field describing the MIME type. |
+| widthField | `string` \| `{ field: string; hasOneRelationPath?: SugarableHasOneRelation \| SugarableHasOneRelation[] }` | No | — | Field with video width in pixels. |
+| heightField | `string` \| `{ field: string; hasOneRelationPath?: SugarableHasOneRelation \| SugarableHasOneRelation[] }` | No | — | Field with video height in pixels. |
+| durationField | `string` \| `{ field: string; hasOneRelationPath?: SugarableHasOneRelation \| SugarableHasOneRelation[] }` | No | — | Field with video duration in seconds. |
+| baseField | `string` \| SugarableHasOneRelation \| SugarableHasOneRelation[] | No | — | Reference to a base entity when metadata fields live on a nested relation. |
 | actions | `React.ReactNode` | No | — | Extra action elements displayed next to the preview. |
 | edit | `React.ReactNode` | No | — | Custom edit UI (e.g. replace video button). |
 | noDestroy | `boolean` | No | `false` | When `true`, suppress the default destroy button. |
@@ -67,124 +67,19 @@ _None_
 Optional override that wraps the default “delete” icon or button. Provide a component that receives the preview element as `children` and handles the removal logic.
 
 ## Examples
-
-### 1. File Repeater with Remove Trigger
-```tsx
-import {
-  FileRepeaterFieldInner,
-  UploadedVideoView,
-  RepeaterRemoveItemTrigger,
-} from '@contember/react-admin'
-
-export const VideoRepeaterField = props => (
-  <FileRepeaterFieldInner {...props} fileType="video/*">
-    {props.children ?? (
-      <UploadedVideoView
-        {...props}
-        DestroyAction={RepeaterRemoveItemTrigger}
-        urlField="url"
-        fileNameField="fileName"
-      />
-    )}
-  </FileRepeaterFieldInner>
-)
-```
-This pattern creates a repeater for many videos and uses `RepeaterRemoveItemTrigger` to remove an item from the list.
-
-### 2. Upload Field with Disconnect Trigger
-```tsx
-import {
-  UploadFieldInner,
-  UploadedVideoView,
-  DisconnectEntityTrigger,
-} from '@contember/react-admin'
-
-export const SingleVideoField = props => (
-  <UploadFieldInner {...props} fileType="video/*">
-    {props.children ?? (
-      <UploadedVideoView
-        {...props}
-        DestroyAction={DisconnectEntityTrigger}
-        urlField="url"
-        fileNameField="fileName"
-      />
-    )}
-  </UploadFieldInner>
-)
-```
-`DisconnectEntityTrigger` detaches the file entity rather than deleting it. Use this when you only want to break the relation.
-
-### 3. Custom Item UI in Upload Field
-```tsx
-import {
-  UploadFieldInner,
-  UploaderItemUI,
-  UploadedVideoView,
-  DisconnectEntityTrigger,
-} from '@contember/react-admin'
-
-export const CustomItemVideoField = props => (
-  <UploadFieldInner {...props} fileType="video/*">
-    <UploaderItemUI className="border rounded p-4 flex gap-4">
-      {props.children ?? (
-        <UploadedVideoView
-          {...props}
-          DestroyAction={DisconnectEntityTrigger}
-          urlField="url"
-          fileNameField="fileName"
-        />
-      )}
-    </UploaderItemUI>
-  </UploadFieldInner>
-)
-```
-`UploaderItemUI` lets you inject your own layout around the preview while still leveraging built-in upload logic.
-
-### 4. Video Repeater with Drag & Drop
-```tsx
-import {
-  UploaderDropzone,
-  UploaderRepeaterItemsWrapperUI,
-  UploaderRepeaterItemUI,
-  UploadedVideoView,
-  UploaderRepeaterHandleUI,
-  UploaderRepeaterDragOverlayUI,
-} from '@contember/react-admin'
-
-export const VideoRepeater = () => (
-  <UploaderDropzone
-    fileType="video/*"
-    className="border-dashed border-2 rounded p-6 text-center"
-  >
-    <UploaderRepeaterItemsWrapperUI className="space-y-4">
-      <UploaderRepeaterItemUI className="relative">
-        <UploaderRepeaterHandleUI className="absolute -left-6 top-1/2 -translate-y-1/2 cursor-move" />
-        <UploadedVideoView
-          urlField="url"
-          fileNameField="fileName"
-          DestroyAction={UploaderRepeaterDragOverlayUI}
-        />
-      </UploaderRepeaterItemUI>
-    </UploaderRepeaterItemsWrapperUI>
-  </UploaderDropzone>
-)
-```
-The snippet shows how to:
-* Allow multi-file uploads.  
-* Reorder items with drag handles.  
-* Use a custom `DestroyAction` that integrates with the Repeater overlay.
+_None_
 
 ## Best Practices & Gotchas
-* Always supply `urlField`; without it the component renders nothing.  
-* Wrap the view in a container that sets width; the video element uses 100 % width by default.  
-* When you pass relation objects instead of strings, keep the `field` property short and precise.  
-* Use `noDestroy` if the parent already provides a delete UI to avoid duplicated buttons.  
-* Restrict uploads by MIME type on the server; `UploadedVideoView` only displays the file.  
+* Always supply `urlField`; without it the component renders nothing.
+* Wrap the view in a container that sets width; the video element uses 100 % width by default.
+* When you pass relation objects instead of strings, keep the `field` property short and precise.
+* Use `noDestroy` if the parent already provides a delete UI to avoid duplicated buttons.
+* Restrict uploads by MIME type on the server; `UploadedVideoView` only displays the file.
 * Prefer `DisconnectEntityTrigger` over deletion when you must keep the file entity around.
 
 ## Further Reading
-* `UploaderDropzone` – drag-and-drop area for new uploads.  
-* `FileRepeaterFieldInner` – helper for one-to-many file relations.  
+* `UploaderDropzone` – drag-and-drop area for new uploads.
+* `FileRepeaterFieldInner` – helper for one-to-many file relations.
 * `UploadedImageView`, `UploadedAudioView`, `UploadedAnyView` – sister components for other media types.
 
 <!-- End of Generated Documentation -->

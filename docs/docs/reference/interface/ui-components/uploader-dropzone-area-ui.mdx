@@ -3,15 +3,15 @@ title: UploaderDropzoneAreaUI
 ---
 
 <!-- Edited by human: false -->
-<!-- Examples count: 6 -->
+<!-- Examples count: 2 -->
 <!-- Source examples: 0 -->
 <!-- Playground examples: 2 -->
-<!-- External examples: 4 -->
-<!-- Import examples: 5 -->
+<!-- External examples: 0 -->
+<!-- Import examples: 1 -->
 
 ## Overview
 UploaderDropzoneAreaUI renders the visible “drop files here” zone inside a Contember uploader.  
-It only controls layout and styling; logic lives in surrounding uploader components.
+It only controls layout and styling; upload logic lives in surrounding uploader components.
 
 ## Styling Guidelines
 * All examples use Tailwind CSS.  
@@ -51,24 +51,83 @@ _None_
 
 ### Playground – Single Image Field
 ```tsx
-<UploaderDropzoneAreaUI className="w-60">
-	<UploadIcon className="w-12 h-12 text-gray-400" />
-	<div className="font-semibold text-sm">{dict.uploader.dropFiles}</div>
-	<div className="text-xs">{dict.uploader.or}</div>
-	<div className="flex gap-2 items-center text-xs">
-		<Button size="sm" variant="outline">{dict.uploader.browseFiles}</Button>
-		<div onClick={e => e.stopPropagation()}>
-			<SelectImage />
-		</div>
-	</div>
-</UploaderDropzoneAreaUI>
+<Binding>
+	<Slots.Title>
+		<Title icon={<UploadIcon />}>Image upload</Title>
+	</Slots.Title>
+
+	<Slots.Actions>
+		<PersistButton />
+	</Slots.Actions>
+
+	<EntitySubTree entity="UploadRoot(unique = unique)" setOnCreate="(unique = unique)">
+		<ImageField
+			baseField="image"
+			{...imageFields}
+			label="Image file"
+			description="Some description of the image file."
+			dropzonePlaceholder={(
+				<UploaderDropzoneAreaUI className="w-60">
+					<UploadIcon className="w-12 h-12 text-gray-400" />
+					<div className="font-semibold text-sm">{dict.uploader.dropFiles}</div>
+					<div className="text-xs">{dict.uploader.or}</div>
+					<div className="flex gap-2 items-center text-xs">
+						<Button size="sm" variant="outline">{dict.uploader.browseFiles}</Button>
+						<div onClick={e => e.stopPropagation()}>
+							<SelectImage />
+						</div>
+					</div>
+				</UploaderDropzoneAreaUI>
+			)}
+		/>
+	</EntitySubTree>
+</Binding>
 ```
-The wrapper provides a drop target and click area.  
-It keeps nested controls like `SelectImage` interactive by stopping propagation.
+The placeholder appears only when no image is selected.  
+Nested inputs like `SelectImage` stay interactive because their click events are stopped.
+
+### Playground – Image Repeater Field
+```tsx
+<Binding>
+	<Slots.Title>
+		<Title icon={<UploadIcon />}>Image repeater upload</Title>
+	</Slots.Title>
+
+	<Slots.Actions>
+		<PersistButton />
+	</Slots.Actions>
+
+	<EntitySubTree entity="UploadRoot(unique = unique)" setOnCreate="(unique = unique)">
+		<ImageRepeaterField
+			field="imageList.items"
+			baseField="image"
+			sortableBy="order"
+			{...imageFields}
+			label="Image file"
+			description="Some description of the image file."
+			dropzonePlaceholder={(
+				<UploaderDropzoneAreaUI className="w-60">
+					<UploadIcon className="w-12 h-12 text-gray-400" />
+					<div className="font-semibold text-sm">{dict.uploader.dropFiles}</div>
+					<div className="text-xs">{dict.uploader.or}</div>
+					<div className="flex gap-2 items-center text-xs">
+						<Button size="sm" variant="outline">{dict.uploader.browseFiles}</Button>
+						<div onClick={e => e.stopPropagation()}>
+							<SelectImageRepeater />
+						</div>
+					</div>
+				</UploaderDropzoneAreaUI>
+			)}
+		/>
+	</EntitySubTree>
+</Binding>
+```
+Each repeater item uses its own dropzone, letting users add many images quickly.  
+Sorting and other list controls remain functional.
 
 ### Production – Conditional Inactive State
 ```tsx
-{showLoader ? (
+{isUploading ? (
 	<UploaderInactiveDropzoneUI />
 ) : (
 	<UploaderDropzoneArea>
@@ -79,13 +138,13 @@ It keeps nested controls like `SelectImage` interactive by stopping propagation.
 	</UploaderDropzoneArea>
 )}
 ```
-You can swap the active area for `UploaderInactiveDropzoneUI` during file uploads to prevent additional drops.
+Swap the active area for `UploaderInactiveDropzoneUI` during file uploads to prevent additional drops.
 
 ## Best Practices & Gotchas
 * Always render at least one child so the dropzone has a visible height.  
 * Stop event propagation on nested file inputs to keep them clickable.  
-* Use conditional rendering to disable the zone while uploads are in progress.  
-* Wrap the component in `UploaderDropzoneRoot` and `UploaderDropzoneWrapperUI` for keyboard focus outlines.
+* Disable the zone while uploads are in progress to avoid duplicate files.  
+* Wrap the component in `UploaderDropzoneWrapperUI` for keyboard focus outlines.
 
 ## Further Reading
 * `UploaderDropzoneWrapperUI` – outer container with focus ring.  

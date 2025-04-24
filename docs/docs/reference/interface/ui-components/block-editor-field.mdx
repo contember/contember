@@ -12,7 +12,7 @@ title: BlockEditorField
 ## BlockEditorField
 
 ### Overview
-BlockEditorField is a rich-text editor that lets you create structured content with drag-and-drop blocks.  
+BlockEditorField is a rich-text editor that lets you create structured content with drag-and-drop blocks.
 It integrates Slate.js, supports entity references, and exposes an extensible plugin system.
 
 The component stores your content in one field, references in another, and discriminates reference types through a third field. It handles collision detection and measurements for smooth block reordering.
@@ -103,9 +103,9 @@ Mix and match triggers for the UX you need.
 ### Props Reference
 | Name | Type | Required | Default | Description |
 | --- | --- | --- | --- | --- |
-| field | string &#124; object | Yes | — | Field that stores the serialized editor content. |
-| referencesField | string &#124; object | Yes | — | Field that stores related entity references. |
-| referenceDiscriminationField | string &#124; object | Yes | — | Field that discriminates reference entity types. |
+| field | string \| object | Yes | — | Field that stores the serialized editor content. |
+| referencesField | string \| object | Yes | — | Field that stores related entity references. |
+| referenceDiscriminationField | string \| object | Yes | — | Field that discriminates reference entity types. |
 | plugins | EditorPlugin[] | No | `[]` | Array of plugin factory functions. |
 | placeholder | string | No | `""` | Placeholder text for an empty editor. |
 | children | React.ReactNode | No | — | Toolbar and block definitions rendered inside the editor. |

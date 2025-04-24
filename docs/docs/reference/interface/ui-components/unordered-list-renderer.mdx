@@ -12,16 +12,16 @@ title: UnorderedListRenderer
 # UnorderedListRenderer
 
 ## Overview
-`UnorderedListRenderer` outputs an unordered list (<ul>) inside Contember’s Slate-based editor.  
+`UnorderedListRenderer` outputs an unordered list (`<ul>`) inside Contember’s Slate-based editor.
 Use it whenever you need to display list data that lives in a `UnorderedListElement` node.
 
 ## Styling Guidelines
-* All code examples rely on Tailwind CSS.  
+* All code examples rely on Tailwind CSS.
 * No Contember-specific theme classes are required.
 
 ## Core Concepts
-* `UnorderedListElement` – the Slate node the renderer expects.  
-* Render-only component – it **does not** handle editing logic.  
+* `UnorderedListElement` – the Slate node the renderer expects.
+* Render-only component – it **does not** handle editing logic.
 * Works inside any Slate context provided by Contember.
 
 ## Quick Start
@@ -64,12 +64,12 @@ Wrap the renderer in a Tailwind-powered container to tweak spacing.
 This adds `1.5rem` left padding while keeping bullet styling intact.
 
 ## Best Practices & Gotchas
-* Always memoize `element` when passing props in React to avoid needless re-renders.  
-* Place the renderer inside a Slate provider; it will not work standalone.  
+* Always memoize `element` when passing props in React to avoid needless re-renders.
+* Place the renderer inside a Slate provider; it will not work standalone.
 * Do not attempt to pass additional props—only `element` is supported.
 
 ## Further Reading
-* `OrderedListRenderer` – for numbered lists.  
-* Contember Slate Editor documentation.  
+* `OrderedListRenderer` – for numbered lists.
+* Contember Slate Editor documentation.
 
 <!-- End of Generated Documentation -->

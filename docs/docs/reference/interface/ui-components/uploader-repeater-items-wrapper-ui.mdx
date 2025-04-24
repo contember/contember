@@ -3,17 +3,17 @@ title: UploaderRepeaterItemsWrapperUI
 ---
 
 <!-- Edited by human: false -->
-<!-- Examples count: 4 -->
+<!-- Examples count: 0 -->
 <!-- Source examples: 0 -->
 <!-- Playground examples: 0 -->
-<!-- External examples: 4 -->
-<!-- Import examples: 4 -->
+<!-- External examples: 0 -->
+<!-- Import examples: 0 -->
 
 # UploaderRepeaterItemsWrapperUI
 
 ## Overview
 `UploaderRepeaterItemsWrapperUI` groups uploader controls and repeater items into a single visual block.  
-You typically wrap a `MultiUploader` and a `RepeaterSortable` tree inside it so the uploader and each uploaded file share one layout context.
+Wrap `MultiUploader` and a `RepeaterSortable` tree inside it so the uploader and each uploaded file share one layout context.
 
 ## Styling Guidelines
 * All examples use Tailwind CSS classes.  
@@ -22,8 +22,8 @@ You typically wrap a `MultiUploader` and a `RepeaterSortable` tree inside it so 
 ## Core Concepts
 * Wrap uploader controls and sortable items in one container.  
 * Maintain consistent spacing and borders around the uploader area.  
-* Delegate all drag-and-drop logic to nested components (`RepeaterSortable*`, `UploaderRepeater*`).  
-* The wrapper itself holds **no props**; its purpose is layout only.
+* Delegate drag-and-drop logic to nested components (`RepeaterSortable*`, `UploaderRepeater*`).  
+* The wrapper holds **no props**; it only manages layout.
 
 ## Quick Start
 ```tsx
@@ -58,67 +58,25 @@ export const ImagesField = () => (
 _None_
 
 ## Props Reference
-_None_
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| _None_ | | | | |
 
 ## Sub-Components / Building Blocks
 _None_
 
 ## Examples
-
-### 1. Uploader with Drag Handle and Drop Indicators
-```tsx
-<UploaderRepeaterItemsWrapperUI>
-	<MultiUploader baseField={baseField} fileType={fileTypeWithUploader}>
-		<UploaderDropzone dropzonePlaceholder="Upload files" />
-	</MultiUploader>
-
-	<RepeaterSortable>
-		<RepeaterSortableEachItem>
-			<div className="flex">
-				<UploaderRepeaterDropIndicator position="before" />
-				<RepeaterSortableItemNode>
-					<UploaderRepeaterItemUI className="flex items-center gap-2 p-2 border">
-						<RepeaterSortableItemActivator>
-							<UploaderRepeaterHandleUI />
-						</RepeaterSortableItemActivator>
-						{children}
-					</UploaderRepeaterItemUI>
-				</RepeaterSortableItemNode>
-				<UploaderRepeaterDropIndicator position="after" />
-			</div>
-		</RepeaterSortableEachItem>
-
-		<RepeaterSortableDragOverlay>
-			<UploaderRepeaterDragOverlayUI>{children}</UploaderRepeaterDragOverlayUI>
-		</RepeaterSortableDragOverlay>
-	</RepeaterSortable>
-</UploaderRepeaterItemsWrapperUI>
-```
-Use this pattern when you need sortable uploaded files with visual drop indicators.
-
-### 2. Conditional Uploader Rendering
-```tsx
-<UploaderRepeaterItemsWrapperUI>
-	{withoutUploader !== true ? (
-		<MultiUploader baseField={baseField} fileType={fileTypeWithUploader}>
-			<UploaderDropzone dropzonePlaceholder="Add files" />
-		</MultiUploader>
-	) : null}
-
-	{/* RepeaterSortable tree identical to example above */}
-</UploaderRepeaterItemsWrapperUI>
-```
-Render the wrapper even when the uploader is hidden. The layout of existing items stays stable.
+_None_
 
 ## Best Practices & Gotchas
-* Always place `MultiUploader` first so users drop files at the top.  
-* Keep nested elements inside one flex container for predictable spacing.  
-* The wrapper itself renders a plain `div`; add Tailwind classes on children, not the wrapper.  
-* Do not attach event handlers directly to `UploaderRepeaterItemsWrapperUI`. Use nested components instead.  
-* Remember to wrap the whole block in a `Repeater` when working inside Contember forms.
+* Place `MultiUploader` first so users drop files at the top.  
+* Keep nested elements inside one `flex` container for predictable spacing.  
+* The wrapper renders a plain `div`; add Tailwind classes to children, not the wrapper.  
+* Avoid attaching event handlers directly to `UploaderRepeaterItemsWrapperUI`.  
+* Wrap the whole block in a `Repeater` when working inside Contember forms.
 
 ## Further Reading
-* `MultiUploader` – handles file selection and S3 upload.  
+* `MultiUploader` – file selection and S3 upload.  
 * `RepeaterSortable` – drag-and-drop ordering.  
 * `UploaderRepeaterItemUI`, `UploaderRepeaterHandleUI` – individual item UI parts.  
 * Contember docs: Form Repeater and Uploader patterns.

@@ -3,20 +3,20 @@ title: UploadedAudioView
 ---
 
 <!-- Edited by human: false -->
-<!-- Examples count: 8 -->
+<!-- Examples count: 0 -->
 <!-- Source examples: 0 -->
 <!-- Playground examples: 0 -->
-<!-- External examples: 8 -->
-<!-- Import examples: 5 -->
+<!-- External examples: 0 -->
+<!-- Import examples: 0 -->
 
 # UploadedAudioView
 
 ## Overview
-UploadedAudioView renders a single audio file stored in Contember.  
+UploadedAudioView renders a single audio file stored in Contember.
 You can preview the track, display metadata, and plug in custom edit or destroy actions.
 
 ## Styling Guidelines
-* All examples use Tailwind CSS.  
+* All examples use Tailwind CSS.
 * The component adds no classes. Wrap it with your own Tailwind containers or Contember theme utilities as needed.
 
 ## Core Concepts
@@ -42,17 +42,17 @@ _None_
 ## Props Reference
 | Name | Type | Required | Default | Description |
 |------|------|----------|---------|-------------|
-| urlField | string &#124; SugarFieldConfig | Yes | — | Entity field with the public URL of the audio file. |
-| fileNameField | string &#124; SugarFieldConfig | No | — | Entity field holding the original file name. |
-| lastModifiedField | string &#124; SugarFieldConfig | No | — | Entity field with the last modified timestamp. |
-| fileSizeField | string &#124; SugarFieldConfig | No | — | Entity field containing file size (bytes). |
-| fileTypeField | string &#124; SugarFieldConfig | No | — | Entity field with MIME type. |
-| durationField | string &#124; SugarFieldConfig | No | — | Entity field with audio length in seconds. |
-| baseField | string &#124; SugarRelationConfig | No | — | Optional relation path to the base file entity. |
-| actions | React.ReactNode | No | — | Extra buttons or links shown next to default actions. |
-| edit | React.ReactNode | No | — | Custom edit UI rendered in place of the component when triggered. |
-| noDestroy | boolean | No | false | Prevents rendering the default destroy button. |
-| DestroyAction | React.ComponentType&lt;{ children: React.ReactElement }&gt; | No | — | Custom component wrapping the destroy button. |
+| urlField | `string \| SugarFieldConfig` | Yes | — | Entity field with the public URL of the audio file. |
+| fileNameField | `string \| SugarFieldConfig` | No | — | Entity field holding the original file name. |
+| lastModifiedField | `string \| SugarFieldConfig` | No | — | Entity field with the last modified timestamp. |
+| fileSizeField | `string \| SugarFieldConfig` | No | — | Entity field containing file size (bytes). |
+| fileTypeField | `string \| SugarFieldConfig` | No | — | Entity field with MIME type. |
+| durationField | `string \| SugarFieldConfig` | No | — | Entity field with audio length in seconds. |
+| baseField | `string \| SugarRelationConfig` | No | — | Optional relation path to the base file entity. |
+| actions | `React.ReactNode` | No | — | Extra buttons or links shown next to default actions. |
+| edit | `React.ReactNode` | No | — | Custom edit UI rendered in place of the component when triggered. |
+| noDestroy | `boolean` | No | false | Prevents rendering the default destroy button. |
+| DestroyAction | `React.ComponentType<{ children: React.ReactElement }>` | No | — | Custom component wrapping the destroy button. |
 
 ## Sub-Components / Building Blocks
 _None_
@@ -95,85 +95,15 @@ const DangerButton = ({ children }: { children: React.ReactElement }) => (
 
 You changed only the visuals; Contember still handles deletion logic.
 
-### 3. Repeater With Remove Trigger (Real-World)
-```tsx
-<FileRepeaterFieldInner
-  {...props}
-  fileType={createAudioFileType(props)}
->
-  {props.children ?? (
-    <UploadedAudioView
-      {...props}
-      DestroyAction={RepeaterRemoveItemTrigger}
-    />
-  )}
-</FileRepeaterFieldInner>
-```
-
-Files live inside a repeater.  
-`RepeaterRemoveItemTrigger` integrates with Contember form state, so removing an item updates both UI and data.
-
-### 4. Single Upload Field With Disconnect Trigger (Real-World)
-```tsx
-<UploadFieldInner
-  {...props}
-  fileType={createAudioFileType(props)}
->
-  {props.children ?? (
-    <UploadedAudioView
-      {...props}
-      DestroyAction={DisconnectEntityTrigger}
-    />
-  )}
-</UploadFieldInner>
-```
-
-Use this layout for one-off uploads.  
-`DisconnectEntityTrigger` keeps the record but unlinks the audio file.
-
-### 5. Repeater Item Wrapped in UploaderItemUI (Real-World)
-```tsx
-<UploadFieldInner {...props} fileType={createAudioFileType(props)}>
-  <UploaderItemUI>
-    {props.children ?? (
-      <UploadedAudioView
-        {...props}
-        DestroyAction={DisconnectEntityTrigger}
-      />
-    )}
-  </UploaderItemUI>
-</UploadFieldInner>
-```
-
-`UploaderItemUI` supplies drag handles and consistent padding.  
-The view stays unchanged; the wrapper handles layout concerns.
-
-### 6. Inline Repeater Variation (Real-World)
-```tsx
-<>
-  <FileRepeaterFieldInner {...props} fileType={createAudioFileType(props)}>
-    {props.children ?? (
-      <UploadedAudioView
-        {...props}
-        DestroyAction={RepeaterRemoveItemTrigger}
-      />
-    )}
-  </FileRepeaterFieldInner>
-</>
-```
-
-This minimal variation shows how teams embed the component directly in fragments for terser JSX.
-
 ## Best Practices & Gotchas
-* Always pass `urlField`; the component throws if missing.  
-* Wrap the player in a fixed-width container to prevent stretching.  
-* Use `noDestroy` when the user lacks delete permission.  
-* Keep custom actions small; they share horizontal space.  
-* In repeaters, prefer a `DestroyAction` wired to form helpers (see real-world examples).
+* Always pass `urlField`; the component throws if missing.
+* Wrap the player in a fixed-width container to prevent stretching.
+* Use `noDestroy` when the user lacks delete permission.
+* Keep custom actions small; they share horizontal space.
 
 ## Further Reading
-* Contember File Upload pipeline  
-* `<UploadField>` – component used to upload audio files  
-* Contember access control  
+* Contember File Upload pipeline
+* `<UploadField>` – component used to upload audio files
+* Contember access control
 
 <!-- End of Generated Documentation -->

@@ -10,7 +10,7 @@ title: SelectInput
 <!-- Import examples: 5 -->
 
 ## Overview
-SelectInput renders a selectable input field with rich Contember features.  
+SelectInput renders a selectable input field with rich Contember features.
 It can create new entities, validate the selection, and support in-list sorting.
 
 ## Styling Guidelines
@@ -54,7 +54,7 @@ _None_
 |------|------|----------|---------|-------------|
 | field | string | Yes | — | Entity field that stores the relation. |
 | placeholder | string | No | — | Text shown when no value is selected. |
-| options | Array&lt;{ field: string; operator: string; value: string; label: string }&gt; | No | `[]` | Static list of selectable filters. |
+| options | `Array<{ field: string; operator: string; value: string; label: string }>` | No | `[]` | Static list of selectable filters. |
 | createNewForm | ReactNode | No | — | JSX rendered when the user chooses “create new”. |
 | required | boolean | No | `false` | Forces at least one selection. |
 | initialSorting | unknown | No | — | Contember sorting applied when the dropdown opens. |

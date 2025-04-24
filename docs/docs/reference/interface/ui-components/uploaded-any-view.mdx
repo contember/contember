@@ -3,11 +3,11 @@ title: UploadedAnyView
 ---
 
 <!-- Edited by human: false -->
-<!-- Examples count: 8 -->
+<!-- Examples count: 0 -->
 <!-- Source examples: 0 -->
 <!-- Playground examples: 0 -->
-<!-- External examples: 8 -->
-<!-- Import examples: 5 -->
+<!-- External examples: 0 -->
+<!-- Import examples: 0 -->
 
 ## Overview
 _None_
@@ -59,50 +59,7 @@ _None_
 _None_
 
 ## Examples
-
-### Example 1 – Remove file from repeater
-```tsx
-<FileRepeaterFieldInner {...props} fileType={createAnyFileType(props)}>
-	{props.children ?? (
-		<UploadedAnyView
-			{...props}
-			DestroyAction={RepeaterRemoveItemTrigger}
-			className="w-full"
-		/>
-	)}
-</FileRepeaterFieldInner>
-```
-The preview is wrapped in a repeater field. `RepeaterRemoveItemTrigger` replaces the default delete button, so the file disappears from the list instantly.
-
-### Example 2 – Disconnect file from single relation
-```tsx
-<UploadFieldInner {...props} fileType={createAnyFileType(props)}>
-	{props.children ?? (
-		<UploadedAnyView
-			{...props}
-			DestroyAction={DisconnectEntityTrigger}
-			className="w-full"
-		/>
-	)}
-</UploadFieldInner>
-```
-Here the file is stored through a `hasOne` relation. `DisconnectEntityTrigger` only unlinks the entity rather than deleting it from the database.
-
-### Example 3 – Custom item UI
-```tsx
-<UploadFieldInner {...props} fileType={createAnyFileType(props)}>
-	<UploaderItemUI>
-		{props.children ?? (
-			<UploadedAnyView
-				{...props}
-				DestroyAction={DisconnectEntityTrigger}
-				className="w-full"
-			/>
-		)}
-	</UploaderItemUI>
-</UploadFieldInner>
-```
-`UploaderItemUI` provides a custom container (e.g. with hover effects or status indicators). Inside, `UploadedAnyView` renders the file preview, while `DisconnectEntityTrigger` unlinks the file when clicked.
+_None_
 
 ## Best Practices & Gotchas
 * Always supply `urlField`; nothing renders without it.

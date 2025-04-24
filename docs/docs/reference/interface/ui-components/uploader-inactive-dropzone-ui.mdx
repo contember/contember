@@ -3,17 +3,17 @@ title: UploaderInactiveDropzoneUI
 ---
 
 <!-- Edited by human: false -->
-<!-- Examples count: 4 -->
+<!-- Examples count: 0 -->
 <!-- Source examples: 0 -->
 <!-- Playground examples: 0 -->
-<!-- External examples: 4 -->
-<!-- Import examples: 4 -->
+<!-- External examples: 0 -->
+<!-- Import examples: 0 -->
 
 # UploaderInactiveDropzoneUI
 
 ## Overview
-UploaderInactiveDropzoneUI shows a non-interactive dropzone while files upload.  
-You use it to block new drops and display a loader or placeholder.
+UploaderInactiveDropzoneUI renders a non-interactive dropzone while files upload.  
+Use it to block additional drops and display a loader or placeholder.
 
 ## Styling Guidelines
 All examples use Tailwind classes.  
@@ -21,7 +21,7 @@ The component adds no Contember theme classes by itself.
 
 ## Core Concepts
 - Inactive state replaces the regular dropzone during uploads.  
-- You render it inside `UploaderDropzoneWrapperUI` or `UploaderDropzoneArea`.  
+- Render it inside `UploaderDropzoneWrapperUI` or `UploaderDropzoneArea`.  
 - It has no props; appearance comes from surrounding CSS or Tailwind.
 
 ## Quick Start
@@ -51,32 +51,7 @@ _None_
 _None_
 
 ## Examples
-
-### Show inactive dropzone while files upload
-```tsx
-({ inactiveOnUpload }: { inactiveOnUpload?: boolean }) => {
-	const filesInProgress = useUploaderStateFiles({ state: ['uploading', 'initial', 'finalizing'] })
-	const showLoader = inactiveOnUpload && filesInProgress.length > 0
-
-	return (
-		<UploaderDropzoneRoot>
-			<UploaderDropzoneWrapperUI className="border rounded p-4">
-				{showLoader ? (
-					<UploaderInactiveDropzoneUI />
-				) : (
-					<UploaderDropzoneArea>
-						<UploaderDropzoneAreaUI>
-							<UploadIcon className="w-12 h-12 text-gray-400" />
-							<div className="font-semibold text-sm">Drop files here</div>
-						</UploaderDropzoneAreaUI>
-					</UploaderDropzoneArea>
-				)}
-			</UploaderDropzoneWrapperUI>
-		</UploaderDropzoneRoot>
-	)
-}
-```
-This pattern prevents users from dropping new files during an ongoing upload and provides immediate visual feedback.
+_None_
 
 ## Best Practices & Gotchas
 - Render inside the same wrapper that normally hosts your active dropzone.  

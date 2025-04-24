@@ -3,19 +3,23 @@ title: DimensionsSwitcher
 ---
 
 <!-- Edited by human: false -->
-<!-- Examples count: 3 -->
+<!-- Examples count: 13 -->
+<!-- Source examples: 2 -->
+<!-- Playground examples: 1 -->
+<!-- External examples: 10 -->
+<!-- Import examples: 6 -->
 
 # DimensionsSwitcher
 
 ## Overview
-`DimensionsSwitcher` lets you switch between multiple data dimensions such as languages or markets.
-You provide an entity list, a slug field, and child fields; the component renders selectable options.
+`DimensionsSwitcher` lets you switch between multiple data dimensions such as languages or markets.  
+You provide an entity list, a slug field, and child fields. The component renders selectable options.
 
-It supports optional initial sorting and multi‑selection, so you can handle both simple and complex editing screens.
+It supports optional initial sorting and multi-selection, so you can handle both simple and complex editing screens.
 
 ## Styling Guidelines
 * All examples use Tailwind CSS utility classes.
-* The component itself adds no styles; wrap it in Tailwind‑styled containers as needed.
+* The component itself adds no styles; wrap it in Tailwind-styled containers as needed.
 * No special Contember theme classes are required.
 
 ## Core Concepts
@@ -24,7 +28,7 @@ It supports optional initial sorting and multi‑selection, so you can handle bo
 * `slugField` – unique identifier field of each option.
 * Child fields – what renders inside each option (commonly a `Field` component).
 * `orderBy` – optional initial sorting of options.
-* Multi‑selection – enabled with `isMulti`.
+* Multi-selection – enabled with `isMulti`.
 
 ## Quick Start
 ```tsx
@@ -52,9 +56,9 @@ _None_
 | dimension | `string` | Yes | – | Name of the dimension to switch |
 | children | `React.ReactNode` | Yes | – | Components rendered inside each option |
 | slugField | `string \| { field: string; hasOneRelationPath?: SugarableHasOneRelation \| SugarableHasOneRelation[]; }` | Yes | – | Field containing unique dimension identifiers |
-| isMulti | `boolean` | No | `false` | Enables multi‑selection mode |
+| isMulti | `boolean` | No | `false` | Enables multi-selection mode |
 
-## Sub‑Components / Building Blocks
+## Sub-Components / Building Blocks
 _None_
 
 ## Examples
@@ -71,7 +75,7 @@ _None_
 ```
 You render a simple list of locales. The user can switch the current locale with one click.
 
-### 2. Sorted, Multi‑Select Locale Switcher
+### 2. Sorted, Multi-Select Locale Switcher
 ```tsx
 <DimensionsSwitcher
   dimension="locale"
@@ -85,7 +89,20 @@ You render a simple list of locales. The user can switch the current locale with
 ```
 You allow selecting several locales. Options are sorted alphabetically descending by label.
 
-### 3. Full Page Integration with SideDimensions
+### 3. Branch Selector With Permissions
+```tsx
+<DimensionsSwitcher
+  options="Branch[canEdit = yes]"
+  orderBy={{ code: 'asc' }}
+  dimension="branch"
+  slugField="code"
+>
+  <Field field="name" />
+</DimensionsSwitcher>
+```
+You restrict selectable branches to those the user can edit. Sorting is ascending by branch code.
+
+### 4. Integration With SideDimensions
 ```tsx
 <>
   <Slots.Title>
@@ -106,21 +123,13 @@ You allow selecting several locales. Options are sorted alphabetically descendin
   </Binding>
 
   <Binding>
-    <Slots.Actions>
-      <PersistButton />
-    </Slots.Actions>
-
+    <Slots.Actions><PersistButton /></Slots.Actions>
     <EntitySubTree entity="DimensionsItem(unique = unique)">
-      <SideDimensions
-        dimension="locale"
-        as="currentLocale"
-        field="locales(locale.code = $currentLocale)"
-      >
+      <SideDimensions dimension="locale" as="currentLocale" field="locales(locale.code = $currentLocale)">
         <Card>
           <CardHeader>
             <CardTitle><Variable name="currentLocale" /></CardTitle>
           </CardHeader>
-
           <CardContent>
             <InputField field="title" />
             <TextareaField field="content" />
@@ -131,8 +140,41 @@ You allow selecting several locales. Options are sorted alphabetically descendin
   </Binding>
 </>
 ```
-You combine `DimensionsSwitcher` with `SideDimensions`, `PersistButton`, and header slots.
-Users pick one or more locales, edit locale‑specific fields, and persist changes.
+You combine `DimensionsSwitcher` with `SideDimensions`, allowing users to edit locale-specific fields and persist changes.
+
+### 5. User Profile Locale Selector With Preview
+```tsx
+<DimensionsSwitcher
+  dimension="locale"
+  options="Locale"
+  slugField="code"
+  isMulti
+  optionsField={<LocalePreview />}
+>
+  <LocalePreview showCode={false} />
+</DimensionsSwitcher>
+```
+You embed the switcher in a user profile sidebar. The custom `LocalePreview` component shows both flag and language name.
+
+### 6. Form Field Wrapper
+```tsx
+<FormContainerUI>
+  <FormLabelWrapperUI>
+    <FormLabelUI>Select locales</FormLabelUI>
+  </FormLabelWrapperUI>
+
+  <DimensionsSwitcher
+    options="Locale"
+    slugField="code"
+    dimension="locale"
+    orderBy={{ code: 'asc' }}
+    isMulti
+  >
+    <LocalePreview />
+  </DimensionsSwitcher>
+</FormContainerUI>
+```
+You wrap the switcher in form-related components. The user can choose multiple locales inside a standard Contember form.
 
 ## Best Practices & Gotchas
 * Always pass a stable `slugField`; unreliable slugs break selection tracking.

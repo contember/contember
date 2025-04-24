@@ -1,0 +1,124 @@
+---
+title: SelectInputWrapperUI
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 10 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 10 -->
+<!-- Import examples: 5 -->
+
+# SelectInputWrapperUI
+
+## Overview
+SelectInputWrapperUI is a lightweight wrapper used around SelectInputUI (and its multi-select variations).  
+It adds the correct layout and positioning so the input works nicely with PopoverTrigger and other Contember select parts.
+
+## Styling Guidelines
+* All code samples use Tailwind classes out of the box.  
+* No additional Contember theme classes are required for this wrapper.
+
+## Core Concepts
+* Wrap every SelectInputUI with this component.
+* Keep PopoverTrigger inside the wrapper.
+* The wrapper has zero visual impact; it only handles layout.
+
+## Quick Start
+```tsx
+import { SelectInputWrapperUI, SelectInputUI } from '@contember/ui'
+
+<Popover>
+  <SelectInputWrapperUI>
+    <PopoverTrigger asChild>
+      <SelectInputUI className="w-full">
+        Choose…
+      </SelectInputUI>
+    </PopoverTrigger>
+  </SelectInputWrapperUI>
+  {/* Popover content here */}
+</Popover>
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| _None_ | | | | |
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+
+### Single-value enum select
+```tsx
+<Popover open={open} onOpenChange={setOpen}>
+  <SelectInputWrapperUI>
+    <PopoverTrigger asChild>
+      <SelectInputUI id={`${id}-input`}>
+        {selectedValue?.label ?? <SelectDefaultPlaceholderUI />}
+        <SelectInputActionsUI>
+          {open
+            ? <ChevronUpIcon className="w-4 h-4" />
+            : <ChevronDownIcon className="w-4 h-4" />}
+        </SelectInputActionsUI>
+      </SelectInputUI>
+    </PopoverTrigger>
+  </SelectInputWrapperUI>
+
+  <SelectPopoverContent>
+    {options.map(({ value, label }) => (
+      <SelectListItemUI key={value} onClick={() => select(value)}>
+        {label}
+      </SelectListItemUI>
+    ))}
+  </SelectPopoverContent>
+</Popover>
+```
+The wrapper keeps the trigger and the popover aligned while staying visually neutral.
+
+### Multi-select with create-new trigger
+```tsx
+<MultiSelect field={field} options={options}>
+  <div className="flex gap-1 items-center">
+    <Popover>
+      <SelectInputWrapperUI>
+        <PopoverTrigger asChild>
+          <SelectInputUI id={`${id}-input`}>
+            <SelectPlaceholder>
+              {placeholder ?? <SelectDefaultPlaceholderUI />}
+            </SelectPlaceholder>
+            <SelectInputActionsUI>
+              <ChevronDownIcon className="w-4 h-4" />
+            </SelectInputActionsUI>
+          </SelectInputUI>
+        </PopoverTrigger>
+      </SelectInputWrapperUI>
+      <SelectPopoverContent>
+        {/* Data view goes here */}
+      </SelectPopoverContent>
+    </Popover>
+
+    <CreateEntityDialog trigger={<SelectCreateNewTrigger />}>
+      {createNewForm}
+    </CreateEntityDialog>
+  </div>
+</MultiSelect>
+```
+The wrapper ensures the popover trigger remains clickable even when extra buttons are rendered next to the input.
+
+## Best Practices & Gotchas
+* Always place PopoverTrigger **inside** SelectInputWrapperUI.  
+* Do not add margins to the wrapper; style the surrounding container instead.  
+* The wrapper should wrap only one child.
+
+## Further Reading
+* SelectInputUI  
+* MultiSelectInput  
+* SelectPopoverContent  
+* PopoverTrigger  
+
+<!-- End of Generated Documentation -->

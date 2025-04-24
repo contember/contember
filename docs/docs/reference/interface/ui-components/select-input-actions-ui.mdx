@@ -1,0 +1,81 @@
+---
+title: SelectInputActionsUI
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 10 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 10 -->
+<!-- Import examples: 5 -->
+
+## Overview  
+_None_
+
+## Styling Guidelines  
+* All examples use Tailwind utility classes.  
+* No special Contember theme classes are required for `SelectInputActionsUI`.
+
+## Core Concepts  
+* `SelectInputActionsUI` renders the action slot on the right side of `SelectInputUI`.  
+* You typically place icons, buttons, or triggers inside this slot.  
+* The component has no own state; it only arranges its children.  
+* It inherits layout from the surrounding `SelectInputUI`.
+
+## Quick Start  
+```tsx
+import { SelectInputUI, SelectInputActionsUI } from '@contember/ui'
+import { ChevronDownIcon } from '@radix-ui/react-icons'
+
+export const SimpleSelectInput = () => (
+  <SelectInputUI className="flex items-center gap-2 px-3 py-2 border rounded">
+    Label or selected value
+    <SelectInputActionsUI>
+      <ChevronDownIcon className="w-4 h-4" />
+    </SelectInputActionsUI>
+  </SelectInputUI>
+)
+```
+
+## Detailed Guide  
+_None_
+
+## Props Reference  
+_None_
+
+## Sub-Components / Building Blocks  
+_None_
+
+## Examples  
+
+### Display a collapse / expand icon  
+```tsx
+<SelectInputActionsUI>
+  <ChevronDownIcon className="w-4 h-4" />
+</SelectInputActionsUI>
+```
+Use this when the select is closed. Swap it with `ChevronUpIcon` when open.
+
+### Action group with remove button and dropdown icon  
+```tsx
+<SelectInputActionsUI className="flex items-center gap-1">
+  <Button size="xs" variant="ghost">
+    <XIcon className="w-4 h-4" />
+  </Button>
+  <ChevronDownIcon className="w-4 h-4 pointer-events-none" />
+</SelectInputActionsUI>
+```
+Combine multiple interactive elements. Ensure you stop propagation on buttons if you do not want to toggle the popover.
+
+## Best Practices & Gotchas  
+* Keep the slot small; oversized elements break alignment.  
+* Place only interactive elements that belong to the input (e.g., clear, open).  
+* Stop event propagation inside nested buttons to avoid unwanted popover toggling.  
+* Use `pointer-events-none` on decorative icons to allow clicks to reach the input.  
+
+## Further Reading  
+* `SelectInputUI` – parent container.  
+* `SelectPopoverContent` – the popup list.  
+* `MultiSelectItemRemoveButtonUI` – common action inside multi-select inputs.
+
+<!-- End of Generated Documentation -->

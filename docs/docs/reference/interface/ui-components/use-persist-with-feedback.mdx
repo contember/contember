@@ -2,26 +2,28 @@
 title: usePersistWithFeedback
 ---
 
+<!-- Edited by human: false -->
+<!-- Examples count: 1 -->
+
 # usePersistWithFeedback
 
 ## Overview
-`usePersistWithFeedback` lets you persist Contember data and show automatic toast notifications.
+`usePersistWithFeedback` persists Contember data and shows toast notifications.  
 The hook returns a callback that saves pending mutations, then shows a success or error message.
 
 ## Styling Guidelines
-* All examples use Tailwind.
+* All examples use Tailwind.  
 * The hook itself needs no Contember‑specific theme classes.
 
 ## Core Concepts
-* Trigger persistence from any UI element.
-* Await the mutation queue managed by Contember.
-* Show toast feedback without extra code.
+* Trigger persistence from any UI element.  
+* Await the mutation queue managed by Contember.  
+* Show toast feedback without extra code.  
 * Keep components stateless by delegating save logic to the hook.
 
 ## Quick Start
 ```tsx
 import { usePersistWithFeedback } from '@contember/react'
-import { Button } from '@contember/ui' // optional
 
 export const SaveButton = () => {
   const persistWithFeedback = usePersistWithFeedback()
@@ -48,6 +50,25 @@ _None_
 
 ## Examples
 
+### Simple save button
+```tsx
+import { usePersistWithFeedback } from '@contember/react'
+
+export const SimpleSave = () => {
+  const persistWithFeedback = usePersistWithFeedback()
+
+  return (
+    <button
+      className="px-4 py-2 bg-blue-600 text-white rounded"
+      onClick={persistWithFeedback}
+    >
+      Save changes
+    </button>
+  )
+}
+```
+This is the smallest viable setup. The button calls `persistWithFeedback` on click.
+
 ### Form footer with autosave prompt
 ```tsx
 import { usePersistWithFeedback } from '@contember/react'
@@ -68,7 +89,7 @@ export const FormFooter = () => {
   )
 }
 ```
-The footer warns users that data lives only in the browser.
+The footer warns users that data lives only in the browser.  
 `persistWithFeedback` flushes changes and shows a toast.
 
 ### Toolbar shortcut
@@ -90,14 +111,14 @@ export const SaveHotkey = () => {
 You wire the hook to a keyboard shortcut, improving editor ergonomics.
 
 ## Best Practices & Gotchas
-* Call the returned function inside UI events, not during render.
-* Await the promise if you need post‑save logic.
-* Combine with optimistic UI only when network latency is low.
+* Call the returned function inside UI events, not during render.  
+* Await the promise if you need post‑save logic.  
+* Combine with optimistic UI only when network latency is low.  
 * Do not wrap the hook in conditionals; follow React Rules of Hooks.
 
 ## Further Reading
-* `usePersist` – low‑level variant without toasts.
-* Contember Toast API.
+* `usePersist` – low‑level variant without toasts.  
+* Contember Toast API.  
 * Data mutations and transaction queue.
 
 <!-- End of Generated Documentation -->

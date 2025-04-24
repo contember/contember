@@ -1,0 +1,138 @@
+---
+title: UploaderProgress
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 10 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 10 -->
+<!-- Import examples: 5 -->
+
+# UploaderProgress
+
+## Overview  
+_None_
+
+## Styling Guidelines  
+* All code samples use Tailwind CSS utility classes.  
+* UploaderProgress relies on Contember UI theme classes injected by surrounding uploader components.  
+
+## Core Concepts  
+* UploaderProgress renders **only** when a file is present (`<UploaderHasFile>`).  
+* The component subscribes to the uploader context to display real-time progress.  
+* It has **no props** – styling and behaviour come entirely from context providers.  
+
+## Quick Start  
+```tsx
+import {
+  Uploader,
+  UploaderBase,
+  UploaderHasFile,
+  UploaderProgress,
+  UploaderDropzone,
+} from '@contember/admin'
+
+export const ImageUploadField = () => (
+  <div className="flex gap-4">
+    <Uploader baseField="image">
+      <UploaderBase baseField="image">
+        <UploaderHasFile>
+          <UploaderProgress />
+        </UploaderHasFile>
+      </UploaderBase>
+
+      <UploaderDropzone dropzonePlaceholder="Drag & drop image here" />
+    </Uploader>
+  </div>
+)
+```  
+
+## Detailed Guide  
+### Conditional Rendering  
+UploaderProgress appears only when a file is queued or uploading. Wrap it with `<UploaderHasFile>` to avoid empty UI:  
+```tsx
+<UploaderHasFile>
+  <UploaderProgress />
+</UploaderHasFile>
+```  
+
+### Combining With Repeater  
+Use UploaderProgress inside repeaters to handle multiple file uploads:  
+```tsx
+<Repeater initialEntityCount={0}>
+  <MultiUploader baseField="files">
+    <UploaderHasFile>
+      <UploaderProgress />
+    </UploaderHasFile>
+    <UploaderDropzone dropzonePlaceholder="Upload more files" />
+  </MultiUploader>
+</Repeater>
+```  
+
+## Props Reference  
+_None_
+
+## Sub-Components / Building Blocks  
+_None_
+
+## Examples  
+
+### Single File Upload With Preview  
+```tsx
+<Uploader baseField="avatar">
+  <UploaderBase baseField="avatar">
+    <UploaderHasFile>
+      <div className="flex items-center gap-2">
+        <UploaderProgress />
+        <img
+          src={entity.getField('url').value}
+          className="h-10 w-10 rounded-full object-cover"
+        />
+      </div>
+    </UploaderHasFile>
+  </UploaderBase>
+
+  <UploaderDropzone dropzonePlaceholder="Select avatar" />
+</Uploader>
+```
+The progress bar appears while the avatar uploads, then the preview replaces it.  
+
+### Multi-File Reordering With Drag & Drop  
+```tsx
+<Repeater initialEntityCount={0}>
+  <MultiUploader baseField="gallery">
+    <UploaderHasFile>
+      <UploaderProgress />
+    </UploaderHasFile>
+    <UploaderDropzone dropzonePlaceholder="Add images" />
+  </MultiUploader>
+
+  <RepeaterSortable>
+    <RepeaterSortableEachItem>
+      <div className="flex">
+        <RepeaterSortableItemActivator>
+          <UploaderRepeaterHandleUI />
+        </RepeaterSortableItemActivator>
+        {children /* your image thumb */}
+      </div>
+    </RepeaterSortableEachItem>
+  </RepeaterSortable>
+</Repeater>
+```
+Each image shows its own progress bar. You can reorder images even while uploads are in progress.  
+
+## Best Practices & Gotchas  
+* Wrap UploaderProgress in `<UploaderHasFile>` to avoid rendering when no file is selected.  
+* Place it **inside** the uploader that owns the file to ensure correct context.  
+* Do not give it additional props; it ignores unknown props.  
+* Use Tailwind spacing utilities (`gap-*`, `mb-*`) for layout instead of custom CSS.  
+
+## Further Reading  
+* Uploader  
+* UploaderHasFile  
+* UploaderDropzone  
+* Repeater & RepeaterSortable  
+* MultiUploader  
+
+<!-- End of Generated Documentation -->

@@ -1,0 +1,87 @@
+---
+title: MultiSelectItemContentUI
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 4 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 4 -->
+<!-- Import examples: 4 -->
+
+## Overview
+`MultiSelectItemContentUI` displays the visual content of a selected value inside a `MultiSelect` field.  
+You wrap arbitrary JSX (usually a text label) with it to keep spacing and consistent styling among selected chips.
+
+## Styling Guidelines
+All examples use Tailwind CSS.  
+The component itself adds no extra Contember theme classes; feel free to extend it with custom classes.
+
+## Core Concepts
+- Every selected value renders inside `MultiSelectItemUI`, which nests `MultiSelectItemContentUI`.
+- You control what appears in the chip by passing children.
+- Pair it with `MultiSelectItemRemoveButtonUI` to offer a delete action.
+
+## Quick Start
+```tsx
+import {
+  MultiSelect,
+  MultiSelectItemUI,
+  MultiSelectItemContentUI,
+  MultiSelectItemRemoveButtonUI,
+} from '@contember/react-select' // adjust path
+
+<MultiSelect field="tags">
+  <MultiSelectItemUI className="flex items-center gap-1 bg-gray-200 px-2 py-1 rounded">
+    <MultiSelectItemContentUI>Tag label</MultiSelectItemContentUI>
+    <MultiSelectItemRemoveButtonUI />
+  </MultiSelectItemUI>
+</MultiSelect>
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| _None_ |  |  |  |  |
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+
+### Chip with icon
+```tsx
+<MultiSelectItemUI className="flex items-center gap-2 bg-blue-50 px-2 py-1 rounded">
+  <span className="text-blue-500">
+    <TagIcon className="w-4 h-4" />
+  </span>
+  <MultiSelectItemContentUI>
+    {option.label}
+  </MultiSelectItemContentUI>
+  <MultiSelectItemRemoveButtonUI />
+</MultiSelectItemUI>
+```
+The icon appears before the text because you decide the layout inside the chip.
+
+### Read-only badge
+```tsx
+<MultiSelectItemUI className="bg-gray-100 px-2 py-1 rounded cursor-default">
+  <MultiSelectItemContentUI>{option.label}</MultiSelectItemContentUI>
+</MultiSelectItemUI>
+```
+Do not include `MultiSelectItemRemoveButtonUI`. Users cannot remove this value.
+
+## Best Practices & Gotchas
+- Keep the chip width minimal. Long texts break layouts.
+- Stop event propagation inside custom buttons to avoid opening the dropdown.
+- Style all items consistently for better UX.
+
+## Further Reading
+- `MultiSelectItemRemoveButtonUI`
+- `MultiSelectItemUI`
+- `SelectInputUI`
+
+<!-- End of Generated Documentation -->

@@ -1,0 +1,138 @@
+---
+title: EditorCanvas
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 9 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 1 -->
+<!-- External examples: 8 -->
+<!-- Import examples: 6 -->
+
+## Overview
+`EditorCanvas` renders an arbitrary React component—often Slate’s `Editable`—and forwards any props you supply.  
+It lets you decorate the wrapped component with Contember-specific logic, focus handling, and optional visual focus rings.
+
+You pass the target component through `underlyingComponent` and its props through `componentProps`; `EditorCanvas` takes care of the rest.
+
+## Styling Guidelines
+* All examples below use Tailwind CSS.  
+* No special Contember theme classes are required, but you can add any Tailwind utilities to `className`.
+
+## Core Concepts
+* Canvas acts as a bridge between your editor logic and the UI.  
+* All rendering responsibility stays inside the `underlyingComponent`.  
+* You keep full control of props by passing them through `componentProps`.  
+* `focusRing` toggles an optional visual outline.  
+* Children render inside the same tree, so portals are unnecessary.
+
+## Quick Start
+```tsx
+import { EditorCanvas, EditorEditableCanvas } from '~/lib/editor'
+import { useSlateStatic } from 'slate-react'
+
+const SimpleEditor = () => {
+  const editor = useSlateStatic()
+
+  return (
+    <EditorCanvas
+      underlyingComponent={EditorEditableCanvas}
+      componentProps={{
+        renderElement: editor.renderElement,
+        renderLeaf: editor.renderLeaf,
+        onKeyDown: editor.onKeyDown,
+      }}
+      className="border rounded p-4 focus:outline-none"
+    >
+      {/* Your Slate nodes go here */}
+    </EditorCanvas>
+  )
+}
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| underlyingComponent | `React.ComponentType<P>` | Yes | — | Component that actually renders the editor. |
+| componentProps | `P` | Yes | — | Props forwarded to `underlyingComponent`. |
+| focusRing | `boolean` | No | `false` | Shows a focus outline when `true`. |
+| children | `React.ReactNode` | No | — | Nodes rendered inside the canvas. |
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+### Sortable Slate Blocks
+```tsx
+const SortableEditor = ({ children }: { children: ReactNode }) => {
+  const editor = useSlateStatic()
+  const entities = useRepeaterSortedEntities()
+
+  const onDragEnd = ({ active, over }: DragEndEvent) => {
+    if (!over) return
+    const from = entities.findIndex(e => e.id === active.id)
+    const to = entities.findIndex(e => e.id === over.id)
+    if (from === to || from < 0 || to < 0) return
+    Transforms.moveNodes(editor, { at: [from], to: [to] })
+  }
+
+  return (
+    <RepeaterSortable onDragEnd={onDragEnd}>
+      <EditorCanvas
+        underlyingComponent={EditorEditableCanvas}
+        componentProps={{
+          renderElement: editor.renderElement,
+          renderLeaf: editor.renderLeaf,
+          onKeyDown: editor.onKeyDown,
+        }}
+        className="border rounded p-4 bg-white"
+      >
+        {children}
+      </EditorCanvas>
+    </RepeaterSortable>
+  )
+}
+```
+This pattern lets users reorder blocks while preserving full Slate editing features.
+
+### Read-Only While Mutating
+```tsx
+const MutatingEditor = ({ children }: { children: ReactNode }) => {
+  const editor = useSlateStatic()
+  const isMutating = useMutationState()
+
+  return (
+    <EditorCanvas
+      underlyingComponent={Editable}
+      componentProps={{
+        readOnly: isMutating,
+        renderElement: editor.renderElement,
+        renderLeaf: editor.renderLeaf,
+        onKeyDown: editor.onKeyDown,
+      }}
+      className="border p-4"
+    >
+      {children}
+    </EditorCanvas>
+  )
+}
+```
+When a mutation runs, the editor becomes read-only to prevent conflicting edits.
+
+## Best Practices & Gotchas
+* Keep `componentProps` memoized to avoid unnecessary rerenders.  
+* Pass every editor callback (`renderElement`, `onKeyDown`, etc.) through `componentProps`; do not attach them directly to `EditorCanvas`.  
+* Use `focusRing` only for visual cues; it does not manage focus state.  
+* Avoid heavy logic in children; place it in the wrapped component instead.  
+* Wrap sortable or draggable canvases with layout containers to keep DOM structure predictable.
+
+## Further Reading
+* `EditorEditableCanvas` – default Slate wrapper used in Contember playground.  
+* Slate’s `Editable` component.  
+* `RepeaterSortable` for drag-and-drop integration.  
+* Contember design system components like `BlockToolbar`.
+
+<!-- End of Generated Documentation -->

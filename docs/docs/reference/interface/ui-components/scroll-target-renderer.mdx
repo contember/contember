@@ -1,0 +1,57 @@
+---
+title: ScrollTargetRenderer
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 0 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 0 -->
+<!-- Import examples: 4 -->
+
+# ScrollTargetRenderer
+
+## Overview
+ScrollTargetRenderer renders a single `ScrollTargetElement` inside a Contember Slate editor.  
+Use it when you need to output a scroll anchor that other components (e.g. a table of contents) can reference.
+
+## Styling Guidelines
+* All code samples use Tailwind CSS.  
+* ScrollTargetRenderer adds no visual styles by default, so wrap it in your own Tailwind classes if needed.
+
+## Core Concepts
+* Slate editors render their content through element renderers.
+* ScrollTargetRenderer expects a `ScrollTargetElement` instance from Slate.
+* The component itself produces an invisible anchor; styling and positioning are up to you.
+
+## Quick Start
+```tsx
+import { ScrollTargetRenderer } from '@contember/react-slate-editor'
+
+// `element` is supplied by Slate's renderElement callback
+<ScrollTargetRenderer element={element} />
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+| Name    | Type | Required | Default | Description |
+|---------|------|----------|---------|-------------|
+| element | ScrollTargetElement | Yes | – | The Slate element instance to render. |
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+_None_
+
+## Best Practices & Gotchas
+* Pass the exact `element` object provided by Slate; do not clone or modify it.
+* Wrap the component in a block-level element if you need custom spacing or layout.
+
+## Further Reading
+* Slate `renderElement` documentation  
+* Contember React Slate utilities  
+
+<!-- End of Generated Documentation -->

@@ -1,13 +1,18 @@
 ---
 title: RepeaterDropIndicator
 ---
-<!-- Examples count: 2 -->
 
+<!-- Edited by human: false -->
+<!-- Examples count: 12 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 2 -->
+<!-- External examples: 10 -->
+<!-- Import examples: 6 -->
 
 # RepeaterDropIndicator
 
 ## Overview
-`RepeaterDropIndicator` shows users where a dragged repeater item will land.
+`RepeaterDropIndicator` shows users where a dragged repeater item will land.  
 It positions itself **before** or **after** the current item based on the `position` prop.
 
 ## Styling Guidelines
@@ -15,10 +20,10 @@ It positions itself **before** or **after** the current item based on the `posit
 * The component needs no special Contember theme classes.
 
 ## Core Concepts
-* Drop indicators improve drag‑and‑drop clarity.
+* Drop indicators increase drag-and-drop clarity.
 * `position` decides if the line renders above or below the item.
-* You use the indicator inside sortable repeater items.
-* The component itself is visual only; it holds no logic.
+* You render the indicator inside every sortable repeater item.
+* The component is visual only; it contains no drag logic.
 
 ## Quick Start
 ```tsx
@@ -34,7 +39,7 @@ export const SimpleDropZone = () => (
 ```
 
 ## Detailed Guide
-Place the indicator at both ends of every sortable item.
+Place the indicator at both ends of every sortable item.  
 Wrap the whole row in `relative` so the absolutely positioned line anchors correctly.
 
 ```tsx
@@ -56,8 +61,8 @@ const { attributes, listeners, setNodeRef, transform, transition } = useSortable
 Apply the returned attributes to your item, while the indicator handles only the visual focus state.
 
 ## Props Reference
-| Name     | Type                   | Required | Default | Description                          |
-|----------|------------------------|----------|---------|--------------------------------------|
+| Name     | Type                    | Required | Default | Description                          |
+|----------|-------------------------|----------|---------|--------------------------------------|
 | position | `"before" \| "after"` | Yes      | —       | Where to render the drop indicator. |
 
 _Inherited props: None_
@@ -67,7 +72,7 @@ _None_
 
 ## Examples
 
-### Drag‑and‑Drop Block Editor
+### Playground – Drag-and-Drop Block Editor
 ```tsx
 <Entity key={entity.key} accessor={entity}>
 	<RepeaterCurrentEntityContext.Provider value={entity}>
@@ -93,36 +98,224 @@ Explanation:
 * Two instances cover both insertion points.
 * Context providers keep the item reactive to order changes.
 
-### Same Editor Pattern With Explicit Path Lookup
+### Playground – Explicit Path Lookup
 ```tsx
-<Entity key={entity.key} accessor={entity}>
-	<RepeaterCurrentEntityContext.Provider value={entity}>
-		<RepeaterSortableItemContext.Provider value={sortable}>
+{({ children, element }: { children: ReactNode; element: Element }) => {
+	const editor = useSlateStatic()
+	const sortedBlocks = useContext(SortedBlocksContext)
+	const [index] = ReactEditor.findPath(editor, element)
+	const entity = sortedBlocks[index]
+	const sortable = useSortable({ id: entity?.id })
+
+	return entity ? (
+		<Entity key={entity.key} accessor={entity}>
+			<RepeaterCurrentEntityContext.Provider value={entity}>
+				<RepeaterSortableItemContext.Provider value={sortable}>
+					<div className="relative">
+						<RepeaterDropIndicator position="before" />
+						<RepeaterSortableItemNode>
+							<div className="p-4">
+								<RepeaterSortableItemActivator>
+									<BlockEditorHandle />
+								</RepeaterSortableItemActivator>
+								{children}
+							</div>
+						</RepeaterSortableItemNode>
+						<RepeaterDropIndicator position="after" />
+					</div>
+				</RepeaterSortableItemContext.Provider>
+			</RepeaterCurrentEntityContext.Provider>
+		</Entity>
+	) : (
+		<div className="p-4">
+			<BlockEditorHandle />
+			{children}
+		</div>
+	)
+}}
+```
+Explanation:
+* Re-calculates the Slate path each render.
+* The indicator usage stays identical; only surrounding lookup logic differs.
+
+### Learning Platform – Block Repeater With Add-Item Button
+```tsx
+<RepeaterSortableEachItem>
+	<div className="relative">
+		<RepeaterDropIndicator position="before" />
+		<RepeaterSortableItemNode>
+			<BlockRepeaterItemUI>
+				<RepeaterSortableItemActivator>
+					<BlockRepeaterHandleUI />
+				</RepeaterSortableItemActivator>
+				<BlockRepeaterContent />
+			</BlockRepeaterItemUI>
+		</RepeaterSortableItemNode>
+		<RepeaterDropIndicator position="after" />
+		<BlockRepeaterAddItemBefore sortableBy={sortableBy} />
+	</div>
+</RepeaterSortableEachItem>
+```
+Explanation:
+* Adds an “insert before” button right after the bottom indicator.
+* Keeps the drag handle inside the activator.
+
+### Learning Platform – Basic Repeater Wrapper
+```tsx
+<RepeaterSortable>
+	<BlockRepeaterItemsWrapperUI>
+		<RepeaterEmpty>
+			<div className="italic text-sm text-gray-600">{dict.repeater.empty}</div>
+		</RepeaterEmpty>
+		{/* items rendered here */}
+		<RepeaterSortableDragOverlay>
+			<BlockRepeaterDragOverlayUI>
+				<BlockRepeaterContent />
+			</BlockRepeaterDragOverlayUI>
+		</RepeaterSortableDragOverlay>
+	</BlockRepeaterItemsWrapperUI>
+</RepeaterSortable>
+```
+Explanation:
+* Context wrapper around items; every item still contains two indicators.
+
+### Learning Platform – Item With Actions And Handle
+```tsx
+<div className="relative">
+	<RepeaterDropIndicator position="before" />
+	<RepeaterSortableItemNode>
+		<RepeaterItemUI>
+			<RepeaterSortableItemActivator>
+				<RepeaterHandleUI />
+			</RepeaterSortableItemActivator>
+			<RepeaterItemActions>
+				<RepeaterRemoveItemButton />
+			</RepeaterItemActions>
+			{children}
+		</RepeaterItemUI>
+	</RepeaterSortableItemNode>
+	<RepeaterDropIndicator position="after" />
+</div>
+```
+Explanation:
+* Shows how to mix drag handle and remove button within the item UI.
+
+### Learning Platform – Readonly Repeater Wrapper
+```tsx
+<Repeater {...props}>
+	<RepeaterSortable>
+		<RepeaterSortableEachItem>
 			<div className="relative">
 				<RepeaterDropIndicator position="before" />
 				<RepeaterSortableItemNode>
-					<div className="p-4">
-						<RepeaterSortableItemActivator>
-							<BlockEditorHandle />
-						</RepeaterSortableItemActivator>
+					<div>
+						{!readonly && (
+							<RepeaterSortableItemActivator>
+								<RepeaterHandleUI />
+							</RepeaterSortableItemActivator>
+						)}
 						{children}
 					</div>
 				</RepeaterSortableItemNode>
 				<RepeaterDropIndicator position="after" />
 			</div>
-		</RepeaterSortableItemContext.Provider>
-	</RepeaterCurrentEntityContext.Provider>
-</Entity>
+		</RepeaterSortableEachItem>
+	</RepeaterSortable>
+</Repeater>
 ```
 Explanation:
-* Demonstrates recalculating the Slate path before rendering.
-* The indicator usage stays identical; only surrounding logic differs.
+* Hides the activator when the list is `readonly` but still renders both indicators.
+
+### 108 Agency – Block Repeater With Add-Item Button
+```tsx
+<RepeaterSortableEachItem>
+	<div className="relative">
+		<RepeaterDropIndicator position="before" />
+		<RepeaterSortableItemNode>
+			<BlockRepeaterItemUI>
+				<RepeaterSortableItemActivator>
+					<BlockRepeaterHandleUI />
+				</RepeaterSortableItemActivator>
+				<BlockRepeaterContent />
+			</BlockRepeaterItemUI>
+		</RepeaterSortableItemNode>
+		<RepeaterDropIndicator position="after" />
+		<BlockRepeaterAddItemBefore sortableBy={sortableBy} />
+	</div>
+</RepeaterSortableEachItem>
+```
+Explanation:
+* Same pattern as the Learning Platform; proves consistency across projects.
+
+### 108 Agency – Basic Repeater Wrapper
+```tsx
+<RepeaterSortable>
+	<BlockRepeaterItemsWrapperUI>
+		<RepeaterEmpty>
+			<div className="italic text-sm text-gray-600">{dict.repeater.empty}</div>
+		</RepeaterEmpty>
+		{/* items */}
+	</BlockRepeaterItemsWrapperUI>
+</RepeaterSortable>
+```
+Explanation:
+* Simplest scaffold showing where items live.
+
+### 108 Agency – Item With Actions And Handle
+```tsx
+<div className="relative">
+	<RepeaterDropIndicator position="before" />
+	<RepeaterSortableItemNode>
+		<RepeaterItemUI>
+			<RepeaterSortableItemActivator>
+				<RepeaterHandleUI />
+			</RepeaterSortableItemActivator>
+			{noRemove !== true && (
+				<RepeaterItemActions>
+					<RepeaterRemoveItemButton />
+				</RepeaterItemActions>
+			)}
+			{children}
+		</RepeaterItemUI>
+	</RepeaterSortableItemNode>
+	<RepeaterDropIndicator position="after" />
+</div>
+```
+Explanation:
+* Conditional remove button illustrates flexible layouts.
+
+### 108 Agency – Readonly Repeater Wrapper
+```tsx
+<Repeater {...props}>
+	<RepeaterSortable>
+		<RepeaterSortableEachItem>
+			<div className="relative">
+				<RepeaterDropIndicator position="before" />
+				<RepeaterSortableItemNode>
+					<div>
+						{!readonly && (
+							<RepeaterSortableItemActivator>
+								<RepeaterHandleUI />
+							</RepeaterSortableItemActivator>
+						)}
+						{children}
+					</div>
+				</RepeaterSortableItemNode>
+				<RepeaterDropIndicator position="after" />
+			</div>
+		</RepeaterSortableEachItem>
+	</RepeaterSortable>
+</Repeater>
+```
+Explanation:
+* Mirrors the Learning Platform version; confirms identical API usage.
 
 ## Best Practices & Gotchas
 * Render both **before** and **after** indicators for consistent UX.
 * Wrap the parent with `relative` positioning.
-* Keep the indicator thin and contrasting.
-* Do not attach drag logic to the indicator itself.
+* Keep the indicator thin and high-contrast.
+* Never attach drag logic to the indicator itself.
+* Show indicators only during drag if visual noise becomes an issue.
 
 ## Further Reading
 * `RepeaterSortableItemActivator` – handle for dragging.

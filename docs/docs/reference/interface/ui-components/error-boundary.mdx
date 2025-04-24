@@ -1,0 +1,78 @@
+---
+title: ErrorBoundary
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 0 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 0 -->
+<!-- Import examples: 0 -->
+
+# ErrorBoundary
+
+## Overview
+ErrorBoundary traps runtime errors inside its React subtree.  
+When a child throws, the component swaps in a fallback UI and prevents the whole app from crashing.
+
+## Styling Guidelines
+* All snippets use Tailwind classes.  
+* ErrorBoundary itself renders no DOM. No Contember theme classes are required.
+
+## Core Concepts
+* React error boundaries catch render-time exceptions.
+* You supply a `fallback` node shown when an error occurs.
+* Children continue rendering as usual when no error is thrown.
+* State resets once the component unmounts or you re-mount children.
+
+## Quick Start
+```tsx
+import { ErrorBoundary } from '@contember/react-components'
+
+export const Page = () => (
+	<ErrorBoundary fallback={<p className="text-red-600">Something went wrong.</p>}>
+		<MyRiskyWidget className="border p-4" />
+	</ErrorBoundary>
+)
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| fallback | React.ReactNode | No | `null` | UI rendered when a child throws. |
+| children | React.ReactNode | Yes | — | Components protected by the boundary. |
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+
+### Wrap a data-heavy panel
+```tsx
+<ErrorBoundary fallback={<Alert className="alert-error">Failed to load panel.</Alert>}>
+	<ProjectDashboard className="grid gap-4" />
+</ErrorBoundary>
+```
+Use this pattern when loading complex dashboards that may fail due to network issues.
+
+### Protect an async form
+```tsx
+<ErrorBoundary fallback={<p className="text-red-500">Form crashed. Please refresh.</p>}>
+	<UserSettingsForm className="space-y-6" />
+</ErrorBoundary>
+```
+Isolate forms so validation bugs do not break surrounding pages.
+
+## Best Practices & Gotchas
+* Keep fallback UI lightweight; complex fallbacks may throw again.
+* Place boundaries high enough to cover related widgets, but low enough to keep the rest of the page live.
+* Reset state by unmounting the boundary—for example, using a key prop.
+
+## Further Reading
+* React official docs: “Error Boundaries”.
+* Contember component library overview.
+
+<!-- End of Generated Documentation -->

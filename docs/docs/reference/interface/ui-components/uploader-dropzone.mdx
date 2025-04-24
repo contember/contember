@@ -1,0 +1,152 @@
+---
+title: UploaderDropzone
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 8 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 8 -->
+<!-- Import examples: 5 -->
+
+## Overview
+UploaderDropzone renders an area where users can drag-and-drop files.  
+It usually lives inside `MultiUploader` or similar upload wrappers and reacts to upload state.
+
+## Styling Guidelines
+* All examples in this documentation use Tailwind CSS utility classes.  
+* No Contember-specific theme classes are required for this component.
+
+## Core Concepts
+* UploaderDropzone shows a visual target for dropping files.  
+* It works best inside `MultiUploader`, which provides the actual upload logic.  
+* `inactiveOnUpload` hides or disables the dropzone while a file is being uploaded.  
+* `dropzonePlaceholder` lets you replace the default text with any React node.
+
+## Quick Start
+```tsx
+import { UploaderDropzone } from '~/lib/upload'
+
+export const AvatarUploader = () => (
+	<div className="max-w-sm border border-dashed border-gray-300 p-4">
+		<UploaderDropzone dropzonePlaceholder="Drop your avatar here" />
+	</div>
+)
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+Name | Type | Required | Default | Description
+---- | ---- | -------- | ------- | -----------
+dropzonePlaceholder | ReactNode | No | `"Drop files here"` | Custom content rendered inside the dropzone.
+inactiveOnUpload | boolean | No | `false` | When **true**, the dropzone is hidden or disabled during an active upload.
+…inherited props | … | … | … | All standard HTML `div` attributes are forwarded.
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+
+### Example&nbsp;1 – Basic dropzone inside a complex form
+```tsx
+<FormFieldStateProvider>
+	<FormContainer description={description} label={label}>
+		<Repeater initialEntityCount={0}>
+			<UploaderRepeaterItemsWrapperUI>
+				<MultiUploader baseField={baseField} fileType={fileTypeWithUploader}>
+					<UploaderHasFile>
+						<UploaderProgress />
+					</UploaderHasFile>
+					<UploaderDropzone dropzonePlaceholder={dropzonePlaceholder} />
+				</MultiUploader>
+				{/* …sortable repeater items… */}
+			</UploaderRepeaterItemsWrapperUI>
+		</Repeater>
+	</FormContainer>
+</FormFieldStateProvider>
+```
+The dropzone appears only when `MultiUploader` reports no file. It inherits sizing from its wrapper, so Tailwind borders from the parent remain visible.
+
+### Example&nbsp;2 – Display dropzone only when no file URL exists
+```tsx
+entity => {
+	entity = baseField ? entity.getEntity({ field: baseField }) : entity
+	if (entity.getField(urlField).value === null) {
+		return <UploaderDropzone inactiveOnUpload dropzonePlaceholder={dropzonePlaceholder} />
+	}
+	return children
+}
+```
+You conditionally render the dropzone by inspecting the entity. `inactiveOnUpload` prevents duplicate uploads while the first file is on its way.
+
+### Example&nbsp;3 – Custom button as placeholder
+```tsx
+entity => {
+	entity = baseField ? entity.getEntity({ field: baseField }) : entity
+	if (entity.getField('file.url').value === null) {
+		return (
+			<UploaderDropzone
+				inactiveOnUpload
+				dropzonePlaceholder={
+					<Button variant="secondary" size="sm" className="w-full min-h-10">
+						{dict.uploader.dropFiles}
+					</Button>
+				}
+			/>
+		)
+	}
+	/* …render URL input… */
+}
+```
+You pass a fully styled Contember `Button` as `dropzonePlaceholder`. This keeps UX consistent with the rest of the form.
+
+### Example&nbsp;4 – Slim integration inside `MultiUploader`
+```tsx
+<MultiUploader baseField={baseField} fileType={fileTypeWithUploader}>
+	<UploaderHasFile>
+		<UploaderProgress />
+	</UploaderHasFile>
+
+	{/* This is the only visible element until a file exists */}
+	<UploaderDropzone dropzonePlaceholder={dropzonePlaceholder} />
+</MultiUploader>
+```
+You sometimes need nothing more than a progress bar and a dropzone.  
+This snippet shows the minimal structure required for a functional uploader.
+
+### Example&nbsp;5 – Conditional rendering with secondary button placeholder
+```tsx
+entity => {
+	entity = baseField ? entity.getEntity({ field: baseField }) : entity
+	if (entity.getField(urlField).value === null) {
+		return (
+			<UploaderDropzone
+				inactiveOnUpload
+				dropzonePlaceholder={
+					<Button variant="secondary" size="sm" className="w-full min-h-10">
+						{dict.uploader.dropFiles}
+					</Button>
+				}
+			/>
+		)
+	}
+	return children
+}
+```
+This variant mirrors Example 3 but uses a different `urlField` and lives in another project.  
+It reinforces the pattern of swapping out default text for a fully styled button.
+
+## Best Practices & Gotchas
+* Place the dropzone inside `MultiUploader` for automatic state handling.  
+* Always size the parent container; the dropzone stretches to 100 %.  
+* Use `inactiveOnUpload` to avoid user confusion during long uploads.  
+* Replace placeholder text with a button or illustration to match your design.
+
+## Further Reading
+* `MultiUploader` – Orchestrates uploads and exposes state.  
+* `UploaderHasFile` – Conditionally renders content once a file exists.  
+* `UploaderProgress` – Shows real-time upload progress.
+
+<!-- End of Generated Documentation -->

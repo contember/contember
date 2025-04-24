@@ -1,0 +1,92 @@
+---
+title: UploaderInactiveDropzoneUI
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 4 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 4 -->
+<!-- Import examples: 4 -->
+
+# UploaderInactiveDropzoneUI
+
+## Overview
+UploaderInactiveDropzoneUI shows a non-interactive dropzone while files upload.  
+You use it to block new drops and display a loader or placeholder.
+
+## Styling Guidelines
+All examples use Tailwind classes.  
+The component adds no Contember theme classes by itself.
+
+## Core Concepts
+- Inactive state replaces the regular dropzone during uploads.  
+- You render it inside `UploaderDropzoneWrapperUI` or `UploaderDropzoneArea`.  
+- It has no props; appearance comes from surrounding CSS or Tailwind.
+
+## Quick Start
+```tsx
+import {
+	UploaderDropzoneRoot,
+	UploaderDropzoneWrapperUI,
+	UploaderInactiveDropzoneUI,
+} from '@contember/react-uploader'
+
+export const MyUploader = () => (
+	<UploaderDropzoneRoot>
+		<UploaderDropzoneWrapperUI className="flex items-center justify-center p-6 border rounded">
+			<UploaderInactiveDropzoneUI />
+		</UploaderDropzoneWrapperUI>
+	</UploaderDropzoneRoot>
+)
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+_None_
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+
+### Show inactive dropzone while files upload
+```tsx
+({ inactiveOnUpload }: { inactiveOnUpload?: boolean }) => {
+	const filesInProgress = useUploaderStateFiles({ state: ['uploading', 'initial', 'finalizing'] })
+	const showLoader = inactiveOnUpload && filesInProgress.length > 0
+
+	return (
+		<UploaderDropzoneRoot>
+			<UploaderDropzoneWrapperUI className="border rounded p-4">
+				{showLoader ? (
+					<UploaderInactiveDropzoneUI />
+				) : (
+					<UploaderDropzoneArea>
+						<UploaderDropzoneAreaUI>
+							<UploadIcon className="w-12 h-12 text-gray-400" />
+							<div className="font-semibold text-sm">Drop files here</div>
+						</UploaderDropzoneAreaUI>
+					</UploaderDropzoneArea>
+				)}
+			</UploaderDropzoneWrapperUI>
+		</UploaderDropzoneRoot>
+	)
+}
+```
+This pattern prevents users from dropping new files during an ongoing upload and provides immediate visual feedback.
+
+## Best Practices & Gotchas
+- Render inside the same wrapper that normally hosts your active dropzone.  
+- Toggle it based on uploader state, not timers.  
+- Combine with a spinner or progress bar for better UX.  
+- Do not attach click handlers; keep it passive.
+
+## Further Reading
+- UploaderDropzoneAreaUI  
+- UploaderDropzoneWrapperUI  
+- useUploaderStateFiles
+
+<!-- End of Generated Documentation -->

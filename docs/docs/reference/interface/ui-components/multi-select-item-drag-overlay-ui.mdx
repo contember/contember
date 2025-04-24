@@ -1,0 +1,76 @@
+---
+title: MultiSelectItemDragOverlayUI
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 4 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 4 -->
+<!-- Import examples: 4 -->
+
+# MultiSelectItemDragOverlayUI
+
+## Overview
+MultiSelectItemDragOverlayUI renders the draggable “ghost” that follows your cursor while you sort items inside a multi-select field.  
+Use it inside Contember forms to give users clear visual feedback during drag-and-drop reordering.
+
+## Styling Guidelines
+* All code samples use Tailwind for styling.  
+* The component does not require special Contember theme classes.
+
+## Core Concepts
+* Drag overlay mirrors the dragged item’s content.
+* It should wrap exactly what you want to preview while dragging.
+* Works together with MultiSelectItemUI and Contember DnD helpers.
+
+## Quick Start
+```tsx
+import { MultiSelectItemDragOverlayUI } from './ui'
+
+export const TagsField = () => (
+	<MultiSelectItemDragOverlayUI className="pointer-events-none opacity-80">
+		{/* Replace with your field */}
+		<span className="px-2 py-1 bg-white rounded shadow">Tag name</span>
+	</MultiSelectItemDragOverlayUI>
+)
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| _No props_ | | | | |
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+
+### Reordering related entities
+```tsx
+import { MultiSelectItemDragOverlayUI } from './ui'
+import { HasOne } from '@contember/react-binding'
+
+<MultiSelectItemDragOverlayUI className="bg-gray-50 border border-dashed rounded p-2">
+	<HasOne field="lesson">
+		{/* children is rendered inside the overlay while dragging */}
+		{children}
+	</HasOne>
+</MultiSelectItemDragOverlayUI>
+```
+When you start dragging, the overlay shows the lesson content with a subtle dashed border.
+
+## Best Practices & Gotchas
+* Keep the overlay lightweight; large DOM trees hurt performance.
+* Add `pointer-events-none` to avoid accidental mouse interactions.
+* Apply `opacity` instead of `transform` for smoother animations.
+
+## Further Reading
+* MultiSelectItemUI
+* MultiSelectSortableItemContentUI
+* Contember drag-and-drop utilities
+
+<!-- End of Generated Documentation -->

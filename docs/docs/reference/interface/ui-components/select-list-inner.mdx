@@ -1,0 +1,127 @@
+---
+title: SelectListInner
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 10 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 10 -->
+<!-- Import examples: 5 -->
+
+## Overview
+SelectListInner renders a scrollable list used by Contember select components.  
+It composes smaller building blocks such as `SelectOption` and can display an optional filter toolbar.
+
+## Styling Guidelines
+All examples use Tailwind.  
+If you follow the default Contember theme, no extra utility classes are required.
+
+## Core Concepts
+- Composition with `SelectOption`, `SelectItemTrigger`, and UI wrappers.  
+- Optional `filterToolbar` prop injects custom filtering UI above the list.  
+- Designed to sit inside popovers or dropdowns.  
+- Renders children without additional layout constraints, so you control item structure.
+
+## Quick Start
+```tsx
+import { SelectListInner, SelectOption, SelectItemTrigger } from '@contember/react-select'
+
+<SelectListInner filterToolbar={<SelectDefaultFilter />}>
+	<SelectOption>
+		<SelectItemTrigger>
+			<div className="px-3 py-2 hover:bg-gray-100">Item 1</div>
+		</SelectItemTrigger>
+	</SelectOption>
+
+	<SelectOption>
+		<SelectItemTrigger>
+			<div className="px-3 py-2 hover:bg-gray-100">Item 2</div>
+		</SelectItemTrigger>
+	</SelectOption>
+</SelectListInner>
+```
+
+## Detailed Guide
+You can wrap items in your own container to add separators or custom padding.
+
+```tsx
+<SelectListInner filterToolbar={<SelectDefaultFilter />}>
+	<div className="border-b py-1">
+		<SelectOption>
+			<SelectItemTrigger>
+				<SelectListItemUI>First</SelectListItemUI>
+			</SelectItemTrigger>
+		</SelectOption>
+	</div>
+
+	<SelectOption>
+		<SelectItemTrigger>
+			<SelectListItemUI>Second</SelectListItemUI>
+		</SelectItemTrigger>
+	</SelectOption>
+</SelectListInner>
+```
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| filterToolbar | ReactNode | No | `undefined` | Element shown above the list, typically `<SelectDefaultFilter />`. |
+
+<!-- inherited props -->
+| **Inherited props** | | | | |
+| _None_ | | | | |
+
+## Sub-Components / Building Blocks
+### SelectOption
+Wraps a single selectable entity.  
+Pass it as a direct child of `SelectListInner`.
+
+### SelectItemTrigger
+Handles keyboard and pointer interaction for its parent `SelectOption`.
+
+### SelectListItemUI
+Themeable UI wrapper for every item.  
+Use it to keep visual consistency with Contember design system.
+
+## Examples
+### Multi-select with inline create dialog
+```tsx
+<MultiSelect field="tags">
+	<SelectListInner filterToolbar={<SelectDefaultFilter />}>
+		<SelectOption>
+			<SelectItemTrigger>
+				<SelectListItemUI>Tag name</SelectListItemUI>
+			</SelectItemTrigger>
+		</SelectOption>
+	</SelectListInner>
+</MultiSelect>
+```
+The list lives inside a `MultiSelect` component.  
+`filterToolbar` lets users narrow down large datasets before choosing.
+
+### Data-grid relation filter
+```tsx
+<SelectListInner filterToolbar={<SelectDefaultFilter />}>
+	<DataGridRelationFilterSelectItem>
+		{children}
+	</DataGridRelationFilterSelectItem>
+</SelectListInner>
+```
+Here `SelectListInner` powers a data-grid filter.  
+Wrapping items in `DataGridRelationFilterSelectItem` keeps the filter UI consistent.
+
+## Best Practices & Gotchas
+- Always place `SelectOption` directly under `SelectListInner`.  
+- Stop event propagation inside removal buttons to keep focus intact.  
+- Render lightweight items; virtualisation is not built-in.  
+- Provide unique keys on custom list containers to avoid React warnings.
+
+## Further Reading
+- MultiSelect  
+- SelectOption  
+- SelectItemTrigger  
+- SelectDefaultFilter  
+- CreateEntityDialog  
+
+<!-- End of Generated Documentation -->

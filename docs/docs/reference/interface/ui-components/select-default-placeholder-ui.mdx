@@ -1,0 +1,97 @@
+---
+title: SelectDefaultPlaceholderUI
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 10 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 10 -->
+<!-- Import examples: 5 -->
+
+## SelectDefaultPlaceholderUI
+
+### Overview
+SelectDefaultPlaceholderUI shows a muted “Select…” text when no option is chosen inside Contember select inputs.  
+You drop it wherever a placeholder should appear; it needs no props or configuration.
+
+### Styling Guidelines
+* All examples use Tailwind CSS utility classes.  
+* The component itself applies Contember’s `text-gray-500 italic` theme classes internally, so you rarely need extra styling.
+
+### Core Concepts
+* Placeholder appears only when the field has no value.  
+* You can replace or localize the placeholder by passing any React node instead of this component.  
+* Works with both single and multi-select inputs.  
+* It renders plain text, so it never triggers a popover or select action.
+
+### Quick Start
+```tsx
+import { SelectInputUI, SelectDefaultPlaceholderUI } from '@contember/react-select'
+
+export const StatusSelect = () => (
+	<SelectInputUI className="w-full">
+		{/* Placeholder shown until user chooses a value */}
+		<SelectDefaultPlaceholderUI />
+	</SelectInputUI>
+)
+```
+
+### Detailed Guide
+_None_
+
+### Props Reference
+Name | Type | Required | Default | Description
+--- | --- | --- | --- | ---
+_None_
+
+
+
+### Sub-Components / Building Blocks
+_None_
+
+### Examples
+
+#### In a single-value select
+```tsx
+<SelectInputUI id="priority">
+	{selectedLabel ?? <SelectDefaultPlaceholderUI />}
+	<SelectInputActionsUI>
+		<ChevronDownIcon className="w-4 h-4" />
+	</SelectInputActionsUI>
+</SelectInputUI>
+```
+`selectedLabel` is rendered if a value exists; otherwise the default placeholder appears.
+
+#### In a multi-select with custom items
+```tsx
+<SelectInputUI>
+	<SelectPlaceholder>
+		<SelectDefaultPlaceholderUI />
+	</SelectPlaceholder>
+
+	<SelectEachValue>
+		<MultiSelectItemUI>
+			<MultiSelectItemContentUI>{children}</MultiSelectItemContentUI>
+			<SelectItemTrigger>
+				<MultiSelectItemRemoveButtonUI />
+			</SelectItemTrigger>
+		</MultiSelectItemUI>
+	</SelectEachValue>
+</SelectInputUI>
+```
+The placeholder disappears once at least one item is selected.
+
+### Best Practices & Gotchas
+* Keep the placeholder short; long texts push icons outside the input.  
+* When you translate the UI, swap the component for localized text instead of mutating it.  
+* Do not attach event handlers; the component is purely visual.  
+* Avoid extra wrapping elements—use it directly inside select input bodies.
+
+### Further Reading
+* SelectInputUI  
+* MultiSelectInput  
+* SelectPopoverContent  
+* Contember Form Fields documentation  
+
+<!-- End of Generated Documentation -->

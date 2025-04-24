@@ -1,0 +1,112 @@
+---
+title: UploaderItemUI
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 10 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 10 -->
+<!-- Import examples: 5 -->
+
+## UploaderItemUI
+
+### Overview
+`UploaderItemUI` acts as a visual wrapper around a single upload item.  
+It slots into the broader Contember upload pipeline and decides whether to render a drop-zone or the uploaded file preview.
+
+### Styling Guidelines
+* All examples below use Tailwind CSS utility classes.  
+* `UploaderItemUI` adds no extra Contember theme classes, so you style it freely.
+
+### Core Concepts
+* `UploaderItemUI` wraps one logical file slot.
+* You can render either a `UploaderDropzone` or a preview component (`UploadedImageView`, `UploadedVideoView`, etc.).
+* The component receives no dedicated props; it only renders its children.
+* Place it inside `Uploader` or higher-level abstractions such as `UploadFieldInner`.
+
+### Quick Start
+```tsx
+import { Uploader, UploaderItemUI, UploaderDropzone, UploadedImageView } from '~/lib/upload'
+
+export const ImageUploadField = () => (
+  <Uploader>
+    <UploaderItemUI>
+      {/* Show a drop-zone until a file exists, then swap in the preview */}
+      <UploaderDropzone className="w-full h-32 flex items-center justify-center border-2 border-dashed rounded text-gray-500" />
+      <UploadedImageView className="mt-4" />
+    </UploaderItemUI>
+  </Uploader>
+)
+```
+
+### Detailed Guide
+_None_
+
+### Props Reference
+_None_
+
+### Sub-Components / Building Blocks
+#### UploaderRepeaterItemUI
+Wraps each item inside a multi-file repeater.
+
+#### UploaderRepeaterHandleUI
+Renders a drag handle when you need manual sorting.
+
+#### UploaderRepeaterDragOverlayUI
+Shows a translucent overlay while the user drags an item.
+
+#### UploaderRepeaterItemsWrapperUI
+Provides a flex or grid wrapper around multiple `UploaderRepeaterItemUI` instances.
+
+### Examples
+#### 1. Custom image field with destroy action
+```tsx
+props => (
+  <UploadFieldInner {...props} fileType={createImageFileType(props)}>
+    <UploaderItemUI>
+      {props.children ?? (
+        <UploadedImageView
+          {...props}
+          DestroyAction={props.noDestroy ? undefined : DisconnectEntityTrigger}
+        />
+      )}
+    </UploaderItemUI>
+  </UploadFieldInner>
+)
+```
+The wrapper chooses between a user-supplied child or the default `UploadedImageView`.  
+`DestroyAction` lets users remove the file.
+
+#### 2. Conditional drop-zone vs. preview
+```tsx
+<FormContainer label="Profile picture">
+  <Uploader baseField="image">
+    <UploaderItemUI>
+      <EntityView
+        render={entity =>
+          entity.getField('url').value === null
+            ? <UploaderDropzone inactiveOnUpload dropzonePlaceholder="Drag image…" />
+            : <UploadedImageView />
+        }
+      />
+    </UploaderItemUI>
+  </Uploader>
+</FormContainer>
+```
+The `EntityView` decides which child to show based on the `url` field’s value.
+
+### Best Practices & Gotchas
+* Keep exactly one logical file inside each `UploaderItemUI`.
+* Wrap the component in a Flex or Grid container to align previews consistently.
+* Always render *something* (drop-zone or preview) to avoid empty UI gaps.
+* Combine with `UploaderHasFile` if you need fine-grained “has / has not” logic.
+* Forward ref only through children, not through `UploaderItemUI` itself.
+
+### Further Reading
+* `UploaderDropzone`
+* `UploadedImageView`, `UploadedAudioView`, `UploadedVideoView`, `UploadedAnyView`
+* `UploaderRepeaterItemUI`  
+* Contember docs: “Uploading files”
+
+<!-- End of Generated Documentation -->

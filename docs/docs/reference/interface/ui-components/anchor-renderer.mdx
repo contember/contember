@@ -1,0 +1,70 @@
+---
+title: AnchorRenderer
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 0 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 0 -->
+<!-- Import examples: 4 -->
+
+## Overview
+_None_
+
+## Styling Guidelines
+* All examples use Tailwind CSS classes.  
+* AnchorRenderer does not require any Contember theme-specific classes.
+
+## Core Concepts
+* AnchorRenderer renders a Slate `AnchorElement`.
+* You must pass the `element` prop obtained from the Slate editor.
+* The component is presentation-only; editing logic lives elsewhere.
+
+## Quick Start
+```tsx
+import { AnchorRenderer } from './elements/AnchorRenderer'
+
+/**
+ * `anchorElement` comes from your Slate editor's element tree.
+ */
+const Example = ({ anchorElement }: { anchorElement: AnchorElement }) => (
+	<AnchorRenderer element={anchorElement} />
+)
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+| Name    | Type | Required | Default | Description |
+|---------|------|----------|---------|-------------|
+| element | AnchorElement | Yes | — | Slate element to render. |
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+### Rendering inside a Slate element loop
+```tsx
+import { AnchorRenderer } from './elements/AnchorRenderer'
+
+const RenderElement = ({ element, attributes, children }: RenderElementProps) => {
+	switch (element.type) {
+		case 'anchor':
+			return <AnchorRenderer element={element} {...attributes}>{children}</AnchorRenderer>
+		default:
+			return <p {...attributes}>{children}</p>
+	}
+}
+```
+The example shows how you can delegate rendering of anchor elements while keeping other elements generic.
+
+## Best Practices & Gotchas
+* Always pass the exact `AnchorElement` instance you receive from Slate.
+* Do not wrap AnchorRenderer with additional DOM nodes; it already outputs an anchor.
+
+## Further Reading
+* Slate custom element rendering
+* Contember Slate editor integration guide  
+<!-- End of Generated Documentation -->

@@ -1,0 +1,103 @@
+---
+title: UploaderRepeaterItemUI
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 4 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 4 -->
+<!-- Import examples: 4 -->
+
+## Overview
+`UploaderRepeaterItemUI` visually wraps a single item inside a file-upload repeater.  
+It provides consistent spacing and borders, making each file preview look like a draggable card.
+
+## Styling Guidelines
+* All examples use Tailwind classes.  
+* The component assumes Contember’s default theme but adds no theme-specific classes on its own.
+
+## Core Concepts
+* You wrap every uploaded file preview in `UploaderRepeaterItemUI`.
+* The component works best with `RepeaterSortableItemActivator` for drag-and-drop.
+* Pair it with `UploaderRepeaterHandleUI` to show a handle icon users can grab.
+* Surround multiple items with `UploaderRepeaterItemsWrapperUI` for proper grid or flex layout.
+
+## Quick Start
+```tsx
+import {
+	UploaderRepeaterItemUI,
+	UploaderRepeaterHandleUI,
+} from '../upload'
+
+export const FileItem = ({ children }) => (
+	<UploaderRepeaterItemUI className="flex items-center gap-3 p-2 border rounded-md bg-white">
+		<RepeaterSortableItemActivator>
+			<UploaderRepeaterHandleUI />
+		</RepeaterSortableItemActivator>
+
+		{/* Put your <UploadedImageView /> or other preview here */}
+		{children}
+	</UploaderRepeaterItemUI>
+)
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+_None_
+
+## Sub-Components / Building Blocks
+### UploaderRepeaterHandleUI
+Draggable handle you place inside each `UploaderRepeaterItemUI`.
+
+### RepeaterSortableItemActivator
+Wrapper that enables drag-and-drop for the current item.
+
+### UploaderRepeaterDragOverlayUI
+Custom overlay shown while the item is being dragged.
+
+### UploaderRepeaterItemsWrapperUI
+Flex or grid container that holds a list of `UploaderRepeaterItemUI` components.
+
+## Examples
+### Reorderable Image Gallery
+```tsx
+<Repeater initialEntityCount={0}>
+	<UploaderRepeaterItemsWrapperUI className="grid grid-cols-2 gap-4">
+		<RepeaterSortableEachItem>
+			<div className="flex">
+				<UploaderRepeaterDropIndicator position="before" />
+
+				<RepeaterSortableItemNode>
+					<UploaderRepeaterItemUI className="flex items-center gap-2 p-2 border rounded">
+						<RepeaterSortableItemActivator>
+							<UploaderRepeaterHandleUI />
+						</RepeaterSortableItemActivator>
+
+						<UploadedImageView />
+					</UploaderRepeaterItemUI>
+				</RepeaterSortableItemNode>
+
+				<UploaderRepeaterDropIndicator position="after" />
+			</div>
+		</RepeaterSortableEachItem>
+	</UploaderRepeaterItemsWrapperUI>
+</Repeater>
+```
+The gallery lets users drag images to reorder them. Each item is draggable because `UploaderRepeaterItemUI` wraps the preview and contains the handle.
+
+## Best Practices & Gotchas
+* Always place the drag handle inside `RepeaterSortableItemActivator`.
+* Keep padding consistent; otherwise drag overlay sizes may jump.
+* Do not nest interactive elements with their own drag logic inside the item—it interferes with sorting.
+* Combine with `UploaderHasFile` and `UploaderProgress` to show upload state beside the preview.
+
+## Further Reading
+* `UploaderDropzone`
+* `UploadedImageView`
+* `RepeaterSortable`
+* Contember “File Upload” guide in the docs
+
+<!-- End of Generated Documentation -->

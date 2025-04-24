@@ -1,16 +1,21 @@
 ---
 title: richTextFieldPlugins
 ---
-<!-- Examples count: 1 -->
 
+<!-- Edited by human: false -->
+<!-- Examples count: 1 -->
+<!-- Source examples: 1 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 0 -->
+<!-- Import examples: 4 -->
 
 ## Overview
-`richTextFieldPlugins` is a predefined array of Slate plugins that adds essential inline formatting to Contember’s `RichTextEditor`.
-Use it when you need links, emphasis, code blocks, highlights, and other common text styles without hand‑crafting every Slate plugin yourself.
+`richTextFieldPlugins` is a predefined array of Slate plugins that adds essential inline formatting to Contember’s `RichTextEditor`.  
+Use it when you need links, emphasis, code blocks, highlights, and other common text styles without hand-crafting every Slate plugin yourself.
 
 ## Styling Guidelines
 * All code examples use Tailwind CSS.
-* No Contember‑specific theme classes are required for the plugins to work.
+* No Contember-specific theme classes are required for the plugins to work.
 
 ## Core Concepts
 * Slate plugins extend editor behavior.
@@ -21,7 +26,7 @@ Use it when you need links, emphasis, code blocks, highlights, and other common 
 ## Quick Start
 ```tsx
 import { RichTextEditor } from '@contember/react';
-import { richTextFieldPlugins } from '@contember/react'; // adjust import path if needed
+import { richTextFieldPlugins } from './plugins'; // adjust path to your project layout
 
 export default function ArticleEditor() {
 	return (
@@ -46,9 +51,16 @@ _None_
 
 ## Examples
 
+### Bare-bones usage
+```tsx
+<RichTextEditor plugins={richTextFieldPlugins} />
+```
+Use this when you only need basic formatting features and no extra UI or styling.
+
 ### Playground snippet
 ```tsx
-import { RichTextEditor, richTextFieldPlugins } from '@contember/react';
+import { RichTextEditor } from '@contember/react';
+import { richTextFieldPlugins } from './plugins';
 
 export default function Playground() {
 	return <RichTextEditor plugins={richTextFieldPlugins} />;
@@ -58,7 +70,8 @@ The editor renders with all basic inline tools and no extra styling. Ideal for q
 
 ### Minimal usage with styling
 ```tsx
-import { RichTextEditor, richTextFieldPlugins } from '@contember/react';
+import { RichTextEditor } from '@contember/react';
+import { richTextFieldPlugins } from './plugins';
 
 export default function MinimalEditor() {
 	return (
@@ -75,7 +88,7 @@ This example adds minimal borders and padding for better visual clarity.
 ```tsx
 import { useCallback } from 'react';
 import { RichTextEditor } from '@contember/react';
-import { richTextFieldPlugins } from '@contember/react';
+import { richTextFieldPlugins } from './plugins';
 
 export default function BlogPostBody({ onSave }: { onSave: (value: unknown) => void }) {
 	const handleSave = useCallback((value: unknown) => {
@@ -102,9 +115,9 @@ export default function BlogPostBody({ onSave }: { onSave: (value: unknown) => v
 `onBlur` triggers automatic saving; the button provides a manual fallback.
 
 ## Best Practices & Gotchas
-* Always memoize plugin arrays when you create custom ones to avoid re‑mounting the editor.
+* Always memoize plugin arrays when you create custom ones to avoid re-mounting the editor.
 * Keep the array stable: pass the literal `richTextFieldPlugins` variable instead of recreating it on every render.
-* Wrap the editor in a container with a defined width to prevent unexpected line‑wrap behavior.
+* Wrap the editor in a container with a defined width to prevent unexpected line-wrap behavior.
 * Use Tailwind’s focus utilities (`focus:outline-none`) so keyboard users get proper feedback.
 
 ## Further Reading

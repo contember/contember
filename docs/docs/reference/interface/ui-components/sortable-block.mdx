@@ -1,8 +1,13 @@
 ---
 title: SortableBlock
 ---
-<!-- Examples count: 1 -->
 
+<!-- Edited by human: false -->
+<!-- Examples count: 1 -->
+<!-- Source examples: 1 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 0 -->
+<!-- Import examples: 5 -->
 
 # SortableBlock
 
@@ -13,7 +18,7 @@ The component shows visual feedback with an overlay while you drag. It never mut
 
 ## Styling Guidelines
 * All examples use Tailwind CSS.
-* SortableBlock adds no Contember‑specific theme classes, so you style it freely.
+* SortableBlock adds no Contember-specific theme classes, so you style it freely.
 
 ## Core Concepts
 * Slate renders each editor block through a React component.
@@ -77,6 +82,18 @@ _None_
 ```
 Use the bare component when you want default drag behavior and handle styling elsewhere.
 
+### Within a BlockEditor
+```tsx
+<BlockEditor
+  plugins={[
+    withSortable({
+      render: SortableBlock,
+    }),
+  ]}
+/>
+```
+Embed the component through `withSortable`. Slate now renders each block as a draggable element.
+
 ### Custom Drag Handle
 ```tsx
 <SortableBlock element={element} className="relative pl-8">
@@ -102,7 +119,7 @@ You pass a `canDrop` function to the plugin, not to `SortableBlock`. The block n
 
 ## Best Practices & Gotchas
 * Always pass the same `element` instance you received in `renderElement`.
-* Memoize heavy child components; dragging triggers re‑renders.
+* Memoize heavy child components; dragging triggers re-renders.
 * Add a visible drag handle to improve usability on touch devices.
 * Avoid absolute positioning inside the block; the overlay copies computed styles.
 * Do not mutate the Slate element inside SortableBlock.

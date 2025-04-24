@@ -3,11 +3,15 @@ title: SelectInput
 ---
 
 <!-- Edited by human: false -->
-<!-- Examples count: 1 -->
+<!-- Examples count: 9 -->
+<!-- Source examples: 1 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 8 -->
+<!-- Import examples: 5 -->
 
 ## Overview
-SelectInput renders a selectable input field with rich Contember features.
-It can create new entities, validate selection, and support in‑list sorting.
+SelectInput renders a selectable input field with rich Contember features.  
+It can create new entities, validate the selection, and support in-list sorting.
 
 ## Styling Guidelines
 * All code samples use Tailwind CSS.
@@ -15,9 +19,10 @@ It can create new entities, validate selection, and support in‑list sorting.
 
 ## Core Concepts
 * Field mapping ties the selection to a specific entity column.
-* `options` define pre‑filtered choices using Contember filter objects.
+* `options` define pre-filtered choices using Contember filter objects.
 * `createNewForm` lets users add missing records inline.
 * Validation occurs when `required` is true.
+* `initialSorting` controls ordering of options when the list loads.
 * Children decide which entity fields show inside the dropdown.
 
 ## Quick Start
@@ -52,6 +57,12 @@ _None_
 | options | Array&lt;{ field: string; operator: string; value: string; label: string }&gt; | No | `[]` | Static list of selectable filters. |
 | createNewForm | ReactNode | No | — | JSX rendered when the user chooses “create new”. |
 | required | boolean | No | `false` | Forces at least one selection. |
+| initialSorting | unknown | No | — | Contember sorting applied when the dropdown opens. |
+| queryField | string | No | — | Alternative field used for server-side searching. |
+| isNonbearing | boolean | No | `false` | Marks relation as non-bearing for validation. |
+| errorMessage | string | No | — | Custom validation message. |
+| useLabelElement | boolean | No | `false` | Renders a `<label>` around the input in container components. |
+| onChange | (event) ⇒ void | No | — | Standard change handler for uncontrolled HTML `<select>` usage. |
 | children | ReactNode | Yes | — | Components that display option content. |
 
 ## Sub-Components / Building Blocks
@@ -78,36 +89,90 @@ export const CategorySelectBasic = () => (
   </SelectInput>
 )
 ```
-This minimal example shows you how to let users pick or create a category in one place.
+This minimal example lets users pick or create a category in one place.
 
-### Entity Creation Workflow
+### Form Scope Integration
 ```tsx
-import { SelectInput, Field } from '@contember/admin'
+import {
+  FormHasOneRelationScope,
+  FormContainer,
+  SelectInput,
+  Field,
+} from '@contember/admin'
 
-const CategoryCreateForm = () => <div className="p-4">Form for creating a new category</div>
-
-export const CategorySelectWithCreate = () => (
-  <SelectInput
-    field="category"
-    placeholder="Pick or create a category"
-    options={[
-      { field: 'id', operator: 'eq', value: '1', label: 'Books' },
-      { field: 'id', operator: 'eq', value: '2', label: 'Music' },
-    ]}
-    createNewForm={<CategoryCreateForm />}
-    required
-  >
-    <Field field="label" />
-  </SelectInput>
+export const CategorySelectInsideForm = () => (
+  <FormHasOneRelationScope field="category">
+    <FormContainer label="Category" required>
+      <SelectInput
+        field="category"
+        queryField="label"
+        placeholder="Choose category"
+        options={[
+          { field: 'id', operator: 'eq', value: '1', label: 'Books' },
+          { field: 'id', operator: 'eq', value: '2', label: 'Music' },
+        ]}
+        createNewForm={<div className="p-4">Form for creating a new category</div>}
+        initialSorting={{ label: 'asc' }}
+        required
+      >
+        <Field field="label" />
+      </SelectInput>
+    </FormContainer>
+  </FormHasOneRelationScope>
 )
 ```
-The example lets users add a category when the desired option is missing. The inline form appears without leaving the page.
+The component inherits validation from `FormContainer` and uses `initialSorting` for alphabetical order.
+
+### Locale Picker Without Entity Relation
+```tsx
+import { SelectInput } from '@contember/admin'
+import { useState } from 'react'
+
+export const LocaleSelect = ({ locales }: { locales: string[] }) => {
+  const [sourceLocale, setSourceLocale] = useState<string | null>(null)
+
+  return (
+    <SelectInput onChange={e => setSourceLocale(e.target.value || null)}>
+      <option value="">Select language</option>
+      {locales.map(it => (
+        <option key={it} value={it}>
+          {it}
+        </option>
+      ))}
+    </SelectInput>
+  )
+}
+```
+This uncontrolled version works like a native `<select>` while still giving you consistent styling.
+
+### Filtered Target Locale Picker
+```tsx
+import { SelectInput } from '@contember/admin'
+import { useState } from 'react'
+
+export const TargetLocaleSelect = ({ locales }: { locales: string[] }) => {
+  const [targetLocale, setTargetLocale] = useState('All')
+
+  return (
+    <SelectInput onChange={e => setTargetLocale(e.target.value)}>
+      {['All', ...locales].map(it => (
+        <option key={it} value={it}>
+          {it}
+        </option>
+      ))}
+    </SelectInput>
+  )
+}
+```
+The example shows how to prepend a static “All” option and store the choice in component state.
 
 ## Best Practices & Gotchas
 * Wrap the component in a sized container to control width.
 * Keep `options` small; large static arrays slow rendering.
 * Provide `placeholder` to improve accessibility.
 * Always include a child `<Field>` so users see meaningful labels.
+* Use `initialSorting` for predictable option orders.
+* When using uncontrolled HTML mode, remember to supply an `onChange` handler.
 
 ## Further Reading
 * Field component

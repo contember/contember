@@ -1,11 +1,16 @@
 ---
 title: RepeaterRemoveItemButton
 ---
-<!-- Examples count: 3 -->
 
+<!-- Edited by human: false -->
+<!-- Examples count: 13 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 3 -->
+<!-- External examples: 10 -->
+<!-- Import examples: 6 -->
 
 ## Overview
-`RepeaterRemoveItemButton` renders a button that removes the current repeater item.
+`RepeaterRemoveItemButton` renders a button that removes the current repeater item.  
 It wraps `RepeaterRemoveItemTrigger`, so you can replace the default trash icon (which turns red on hover) with any child element.
 
 ## Styling Guidelines
@@ -58,12 +63,12 @@ export const Page = () => (
 | --- | --- | --- | --- | --- |
 | children | React.ReactNode | No | Trash icon | Element to display inside the button |
 
-_Inherited props_
+_Inherited props_  
 _None_
 
 ## Sub-Components / Building Blocks
 ### RepeaterRemoveItemTrigger
-Low‑level trigger used by the button. Import from `~/lib/repeater` if you need custom rendering.
+Low-level trigger used by the button. Import from `~/lib/repeater` if you need custom rendering.
 
 ## Examples
 ### Sortable repeater with relations
@@ -103,7 +108,7 @@ The button removes the current row while the repeater remains sortable.
 ```
 Use the same button pattern even when the repeater points to a relation.
 
-### Non‑sortable repeater
+### Non-sortable repeater
 ```tsx
 <DefaultRepeater entities="RepeaterItem" orderBy="order" title="Foo items">
 	<Field field="title" />
@@ -115,6 +120,184 @@ Use the same button pattern even when the repeater points to a relation.
 </DefaultRepeater>
 ```
 Even without sorting, the button cleanly removes the selected item.
+
+### Editable block repeater (Learning Platform)
+```tsx
+() => {
+	const entity = useEntity()
+	const block = useBlockRepeaterCurrentBlock()
+	const children = block?.children
+	const editMode = useBlockRepeaterEditMode()
+	const editForm = block?.form ?? block?.children
+	const [editEntity, setEditEntity] = useState(!entity.existsOnServer)
+
+	if (!block?.form || editMode) {
+		return (
+			<div className="p-4">
+				<BlockRepeaterItemActions>
+					<RepeaterRemoveItemButton />
+				</BlockRepeaterItemActions>
+				{editForm}
+			</div>
+		)
+	}
+	return (
+		<>
+			<div className="p-4 cursor-pointer hover:bg-gray-50" onClick={() => setEditEntity(true)}>
+				{children}
+			</div>
+			<BlockRepeaterEditSheetInner open={editEntity} setOpen={setEditEntity} />
+		</>
+	)
+}
+```
+The button sits inside block actions, letting authors delete the whole block while editing.
+
+### Simple remove button in block repeater (Learning Platform)
+```tsx
+<RepeaterItemActions>
+	<RepeaterRemoveItemButton />
+</RepeaterItemActions>
+```
+A minimal usage keeps the markup clean.
+
+### Alternate simple variant (Learning Platform)
+```tsx
+<RepeaterItemActions>
+		<RepeaterRemoveItemButton />
+</RepeaterItemActions>
+```
+Spacing or indent does not affect behavior.
+
+### Block repeater with heading (Learning Platform)
+```tsx
+() => {
+	const entity = useEntity()
+	const block = useBlockRepeaterCurrentBlock()
+	const children = block?.children
+	const editMode = useBlockRepeaterEditMode()
+	const editForm = block?.form ?? block?.children
+	const [editEntity, setEditEntity] = useState(!entity.existsOnServer)
+
+	if (!block?.form || editMode) {
+		return (
+			<div className="px-4 pt-4 pb-8 hover:bg-gray-50">
+				<BlockRepeaterItemActions>
+					<RepeaterRemoveItemButton />
+				</BlockRepeaterItemActions>
+				<h2 className="text-lg font-medium mb-4 -ml-3">{block?.label}</h2>
+				<div className="space-y-2">
+					{editForm}
+				</div>
+			</div>
+		)
+	}
+	return (
+		<>
+			<div className="p-4 cursor-pointer hover:bg-gray-50" onClick={() => setEditEntity(true)}>
+				{children}
+			</div>
+			<BlockRepeaterEditSheetInner open={editEntity} setOpen={setEditEntity} />
+		</>
+	)
+}
+```
+Deleting entire blocks becomes intuitive with the button placed consistently at the top.
+
+### One-liner usage (Learning Platform)
+```tsx
+<RepeaterItemActions><RepeaterRemoveItemButton/></RepeaterItemActions>
+```
+You can inline the component when no extra styling is needed.
+
+### Editable block repeater (108 Agency CMS)
+```tsx
+() => {
+	const entity = useEntity()
+	const block = useBlockRepeaterCurrentBlock()
+	const children = block?.children
+	const editMode = useBlockRepeaterEditMode()
+	const editForm = block?.form ?? block?.children
+	const [editEntity, setEditEntity] = useState(!entity.existsOnServer)
+
+	if (!block?.form || editMode) {
+		return (
+			<div className="p-4">
+				<BlockRepeaterItemActions>
+					<RepeaterRemoveItemButton />
+				</BlockRepeaterItemActions>
+				{editForm}
+			</div>
+		)
+	}
+	return (
+		<>
+			<div className="p-4 cursor-pointer hover:bg-gray-50" onClick={() => setEditEntity(true)}>
+				{children}
+			</div>
+			<BlockRepeaterEditSheetInner open={editEntity} setOpen={setEditEntity} />
+		</>
+	)
+}
+```
+Pattern identical to the learning platform, showing reuse across projects.
+
+### Simple remove button in CMS
+```tsx
+<RepeaterItemActions>
+	<RepeaterRemoveItemButton />
+</RepeaterItemActions>
+```
+Consistency across codebases reduces cognitive load.
+
+### Alternate simple variant in CMS
+```tsx
+<RepeaterItemActions>
+		<RepeaterRemoveItemButton />
+</RepeaterItemActions>
+```
+Indentation styles differ, usage stays the same.
+
+### Block repeater with heading (CMS)
+```tsx
+() => {
+	const entity = useEntity()
+	const block = useBlockRepeaterCurrentBlock()
+	const children = block?.children
+	const editMode = useBlockRepeaterEditMode()
+	const editForm = block?.form ?? block?.children
+	const [editEntity, setEditEntity] = useState(!entity.existsOnServer)
+
+	if (!block?.form || editMode) {
+		return (
+			<div className="px-4 pt-4 pb-8 hover:bg-gray-50">
+				<BlockRepeaterItemActions>
+					<RepeaterRemoveItemButton />
+				</BlockRepeaterItemActions>
+				<h2 className="text-lg font-medium mb-4 -ml-3">{block?.label}</h2>
+				<div className="space-y-2">
+					{editForm}
+				</div>
+			</div>
+		)
+	}
+	return (
+		<>
+			<div className="p-4 cursor-pointer hover:bg-gray-50" onClick={() => setEditEntity(true)}>
+				{children}
+			</div>
+			<BlockRepeaterEditSheetInner open={editEntity} setOpen={setEditEntity} />
+		</>
+	)
+}
+```
+Again, the remove button stays visible even when blocks render additional UI.
+
+### One-liner usage in CMS
+```tsx
+<RepeaterItemActions><RepeaterRemoveItemButton/></RepeaterItemActions>
+```
+Short syntax remains valid.
 
 ## Best Practices & Gotchas
 * Keep destructive actions visually distinct (e.g., red icon).

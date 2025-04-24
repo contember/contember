@@ -169,8 +169,8 @@ export const createContainer = ({ env, version, runtime, workspace }: {
 			new MigrationExecutor())
 		.addService('migrationsStatusResolver', () =>
 			new MigrationsStatusResolver())
-		.addService('migrationsStatusFacade', ({ systemClientProvider, migrationsResolver, migrationsStatusResolver }) =>
-			new MigrationsStatusFacade(systemClientProvider, migrationsResolver, migrationsStatusResolver))
+		.addService('migrationsStatusFacade', ({ systemClientProvider, migrationsResolver, migrationsStatusResolver, migrationPrinter }) =>
+			new MigrationsStatusFacade(systemClientProvider, migrationsResolver, migrationsStatusResolver, migrationPrinter))
 		.addService('migrationExecutionFacade', ({ systemClientProvider, tenantClientProvider, remoteProjectProvider, schemaVersionBuilder, migrationPrinter, migrationsExecutor, migrationsStatusFacade }) =>
 			new MigrationExecutionFacade(systemClientProvider, tenantClientProvider, remoteProjectProvider, schemaVersionBuilder, migrationPrinter, migrationsExecutor, migrationsStatusFacade))
 		.addService('migrationsValidator', ({ migrationDescriber, schemaMigrator }) =>

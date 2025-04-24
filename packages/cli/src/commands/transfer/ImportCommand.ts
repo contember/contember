@@ -52,6 +52,10 @@ export class ImportCommand extends Command<Args, Options> {
 		const file = input.getArgument('file')
 		const baseInputStream = createReadStream(file)
 		const stream = (file.endsWith('.gz') ? baseInputStream.pipe(createGunzip()) : baseInputStream)
+		stream.on('error', (err: any) => {
+			console.error('Error in import stream:', err)
+		})
+
 		const gzipTransfer = !input.getOption('no-gzip-transfer')
 		const response = await this.dataTransferClient.dataImport({
 			stream: stream,
@@ -60,12 +64,13 @@ export class ImportCommand extends Command<Args, Options> {
 			gzip: gzipTransfer,
 		})
 		console.log('')
-		const responseData = JSON.parse((await readStream(response)).toString())
+		const responseData = await response.json()
 		if (responseData.ok) {
 			console.log('Import done.')
 		} else {
 			console.error('Import failed:')
 			console.log(responseData)
+			return 1
 		}
 	}
 }

@@ -1,7 +1,5 @@
-import http from 'node:http'
-import https from 'node:https'
-import { LineTransform, readStream } from '../stream'
-import { Readable, Stream } from 'node:stream'
+import { LineTransform } from '../stream'
+import { Readable } from 'node:stream'
 import { createGzip } from 'node:zlib'
 import { RemoteProject } from '../project/RemoteProject'
 
@@ -47,16 +45,26 @@ export class DataTransferClient {
 			}
 			return line
 		}))
+		inputStream.on('error', err => {
+			throw new Error(`Input stream error: ${err}`)
+		})
 
-		return await this.executeRequest({
-			url: `${project.endpoint}/import`,
-			token: project.token,
+		const bodyStream = Readable.toWeb((gzip ? inputStream.pipe(createGzip()) : inputStream)) as unknown as BodyInit
+
+		const response = await fetch(`${project.endpoint}/import`, {
 			headers: {
+				'Authorization': `Bearer ${project.token}`,
 				'Content-type': 'application/x-ndjson',
 				...(gzip ? { 'Content-Encoding': 'gzip' } : {}),
 			},
-			body: gzip ? inputStream.pipe(createGzip()) : inputStream,
+			method: 'POST',
+			body: bodyStream,
 		})
+		if (!response.ok) {
+			const responseBody = await response.text()
+			throw new Error(`Invalid response: ${response.statusText}\n${responseBody}`)
+		}
+		return response
 	}
 
 
@@ -66,48 +74,21 @@ export class DataTransferClient {
 		includeSystem: boolean
 		gzip: boolean
 	}) => {
-		return await this.executeRequest({
-			url: `${baseUrl}/export`,
-			token,
+		const response = await fetch(`${baseUrl}/export`, {
 			headers: {
+				'Authorization': `Bearer ${token}`,
 				'Accept-Encoding': gzip ? 'gzip' : 'identity',
 				'Content-type': 'application/json',
 			},
+			method: 'POST',
 			body: JSON.stringify({
 				projects: [{ slug: project, system: includeSystem, excludeTables }],
 			}),
 		})
-	}
-
-
-	private executeRequest = async ({ url, token, headers, body }: {
-		url: string
-		token: string
-		headers: Record<string, string>
-		body: any
-	}) => {
-		return await new Promise<http.IncomingMessage>((resolve, reject) => {
-			const req = (url.startsWith('https://') ? https : http).request(url, {
-				method: 'POST',
-				headers: {
-					Authorization: `Bearer ${token}`,
-					...headers,
-				},
-			}, async res => {
-				if (res.statusCode !== 200) {
-					const responseBody = (await readStream(res)).toString()
-					reject(new Error(`Invalid response: ${res.statusMessage}\n${responseBody}`))
-				} else {
-					resolve(res)
-				}
-			})
-
-			if (body instanceof Stream) {
-				body.pipe(req)
-			} else {
-				req.write(body)
-				req.end()
-			}
-		})
+		if (!response.ok) {
+			const responseBody = await response.text()
+			throw new Error(`Invalid response: ${response.statusText}\n${responseBody}`)
+		}
+		return response
 	}
 }

@@ -13,7 +13,7 @@ import { PropsWithoutRef } from 'react';
 import { ReactNode } from 'react';
 import { RefAttributes } from 'react';
 
-// @public (undocumented)
+// @public
 export const cn: (...inputs: ClassValue[]) => string;
 
 // Warning: (ae-forgotten-export) The symbol "ConfigSchema" needs to be exported by the entry point index.d.ts
@@ -32,7 +32,7 @@ export { NoInfer_2 as NoInfer }
 
 // Warning: (ae-forgotten-export) The symbol "Config" needs to be exported by the entry point index.d.ts
 //
-// @public (undocumented)
+// @public
 export const uic: <El extends React.ElementType, Variants extends ConfigSchema | undefined = undefined>(Component: El, config: Config<Variants, NoInfer_2<El>>) => ForwardRefExoticComponent<PropsWithoutRef<ComponentProps<El> & {
 asChild?: boolean;
 children?: ReactNode;

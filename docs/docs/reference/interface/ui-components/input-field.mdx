@@ -12,18 +12,18 @@ title: InputField
 # InputField
 
 ## Overview
-`InputField` renders a text input that talks to Contember’s form engine.  
+`InputField` renders a text input that talks to Contember’s form engine.
 It connects to `FormFieldScope`, `FormContainer`, and `FormInput`, so you can map an entity field to a browser `<input>` with almost no boilerplate.
 
 ## Styling Guidelines
-* All snippets use Tailwind CSS.  
+* All snippets use Tailwind CSS.
 * `InputField` itself adds no classes. Style via surrounding containers or the `inputProps.className` value.
 
 ## Core Concepts
-* Bind an entity column through the `field` prop.  
-* Use `inputProps` to pass native input attributes (`placeholder`, `type`, etc.).  
-* Provide `formatValue` / `parseValue` when you need custom serialization.  
-* The component reports validation problems via the `errors` prop.  
+* Bind an entity column through the `field` prop.
+* Use `inputProps` to pass native input attributes (`placeholder`, `type`, etc.).
+* Provide `formatValue` / `parseValue` when you need custom serialization.
+* The component reports validation problems via the `errors` prop.
 * Place `InputField` inside a `FormContainer` or `FormFieldScope` for correct context.
 
 ## Quick Start
@@ -44,15 +44,15 @@ _None_
 | Name | Type | Required | Default | Description |
 | ---- | ---- | -------- | ------- | ----------- |
 | isNonbearing | boolean | Yes | – | Mark field as read-only in change sets. |
-| field | string &#124; { field: string; hasOneRelationPath?: … } | Yes | – | Entity column or a relation path object. |
+| field | `string \| { field: string; hasOneRelationPath?: … }` | Yes | – | Entity column or a relation path object. |
 | defaultValue | OptionallyVariableFieldValue | Yes | – | Initial value when the entity is new. |
-| formatValue | (value: any, ctx) => string | Yes | – | Convert stored value to string for the input. |
-| parseValue | (value: string, ctx) => any | Yes | – | Convert input text back to the stored value. |
+| formatValue | `(value: any, ctx) => string` | Yes | – | Convert stored value to string for the input. |
+| parseValue | `(value: string, ctx) => any` | Yes | – | Convert input text back to the stored value. |
 | label | React.ReactNode | Yes | – | Input caption rendered by `FormInput`. |
 | description | React.ReactNode | Yes | – | Help text shown under the input. |
-| errors | React.ReactNode &#124; Error[] | Yes | – | Validation messages from Contember. |
+| errors | `React.ReactNode \| Error[]` | Yes | – | Validation messages from Contember. |
 | required | boolean | Yes | – | Adds the HTML `required` attribute and triggers validation. |
-| inputProps | Omit<InputHTMLAttributes<HTMLInputElement>, 'ref'> & RefAttributes<HTMLInputElement> | No | `{}` | Props forwarded to the native `<input>`. |
+| inputProps | `Omit<InputHTMLAttributes<HTMLInputElement>, 'ref'> & RefAttributes<HTMLInputElement>` | No | `{}` | Props forwarded to the native `<input>`. |
 | *Inherited props* | _None_ | – | – | – |
 
 ## Sub-Components / Building Blocks
@@ -94,15 +94,15 @@ Query the entity and lock the field when it cannot be updated.
 Useful for percentage or ratio values.
 
 ## Best Practices & Gotchas
-* Always wrap `InputField` in `FormContainer` or `FormFieldScope`.  
-* Use `inputProps.className` instead of attempting to style `InputField` directly.  
-* Provide both `formatValue` and `parseValue` when storing non-string values.  
-* Keep validation synchronous; async logic should live in server rules.  
+* Always wrap `InputField` in `FormContainer` or `FormFieldScope`.
+* Use `inputProps.className` instead of attempting to style `InputField` directly.
+* Provide both `formatValue` and `parseValue` when storing non-string values.
+* Keep validation synchronous; async logic should live in server rules.
 * Avoid uncontrolled usage—`InputField` expects Contember form context.
 
 ## Further Reading
-* `FormContainer` – parent component providing form context.  
-* `FormFieldScope` – for scoping complex nested fields.  
+* `FormContainer` – parent component providing form context.
+* `FormFieldScope` – for scoping complex nested fields.
 * `SelectField`, `TextareaField` – input siblings with similar API.
 
 <!-- End of Generated Documentation -->

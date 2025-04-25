@@ -12,18 +12,18 @@ title: FileField
 # FileField
 
 ## Overview
-`FileField` lets you upload any file type and persist its URL and optional metadata.  
+`FileField` lets you upload any file type and persist its URL and optional metadata.
 It wraps Contember’s upload client and renders a drag-and-drop zone with progress, validation and removal controls.
 
 ## Styling Guidelines
-* All examples below use Tailwind utility classes.  
+* All examples below use Tailwind utility classes.
 * `FileField` does not require special Contember theme classes, but you may add custom styles as needed.
 
 ## Core Concepts
-* Map each file attribute (URL, name, size, type, etc.) to a Contember field.  
-* Use `baseField` when the file lives in a related entity.  
-* Pass an `accept` object or `acceptFile` function to restrict uploads.  
-* Disable deletion with `noDestroy` when the file must remain permanent.  
+* Map each file attribute (URL, name, size, type, etc.) to a Contember field.
+* Use `baseField` when the file lives in a related entity.
+* Pass an `accept` object or `acceptFile` function to restrict uploads.
+* Disable deletion with `noDestroy` when the file must remain permanent.
 * Provide optional `dropzonePlaceholder` to guide users.
 
 ## Quick Start
@@ -52,32 +52,32 @@ It wraps Contember’s upload client and renders a drag-and-drop zone with progr
 />
 ```
 The snippet:
-* Stores the actual file in the related `document` entity (`baseField`).  
-* Saves additional metadata into dedicated fields.  
-* Limits uploads to any PDF MIME type.  
+* Stores the actual file in the related `document` entity (`baseField`).
+* Saves additional metadata into dedicated fields.
+* Limits uploads to any PDF MIME type.
 * Shows a branded dropzone with Tailwind classes.
 
 ## Props Reference
 
 | Name | Type | Required | Default | Description |
 |------|------|----------|---------|-------------|
-| baseField | string \| SugarableHasOneRelation \| SugarableHasOneRelation[] | No | — | Relation in which the file is stored |
+| baseField | `string \| SugarableHasOneRelation \| SugarableHasOneRelation[]` | No | — | Relation in which the file is stored |
 | dropzonePlaceholder | React.ReactNode | No | — | Content shown inside an empty dropzone |
 | actions | React.ReactNode | No | — | Actions displayed next to the picker |
 | edit | React.ReactNode | No | — | Custom edit controls |
 | noDestroy | boolean | No | — | Disables file removal capability |
-| accept | Record&lt;string, string[]&gt; | No | — | Allowed MIME types / extensions |
-| acceptFile | (file) => boolean \| Promise<void> | No | — | Imperative validator, may throw `RejectFileError` |
+| accept | `Record<string, string[]>` | No | — | Allowed MIME types / extensions |
+| acceptFile | `(file) => boolean \| Promise<void>` | No | — | Imperative validator, may throw `RejectFileError` |
 | extractors | FileDataExtractor[] | No | — | Custom metadata extractors |
 | uploader | UploadClient | No | — | Custom uploader instance |
-| urlField | string \| { field: string; hasOneRelationPath?: ... } | Yes | — | Field that stores the public file URL |
-| fileNameField | string \| { field: string; hasOneRelationPath?: ... } | No | — | Field that stores original file name |
-| lastModifiedField | string \| { field: string; hasOneRelationPath?: ... } | No | — | Last modification timestamp |
-| fileSizeField | string \| { field: string; hasOneRelationPath?: ... } | No | — | Field that stores file size |
-| fileTypeField | string \| { field: string; hasOneRelationPath?: ... } | No | — | Field that stores MIME type |
+| urlField | `string \| { field: string; hasOneRelationPath?: ... }` | Yes | — | Field that stores the public file URL |
+| fileNameField | `string \| { field: string; hasOneRelationPath?: ... }` | No | — | Field that stores original file name |
+| lastModifiedField | `string \| { field: string; hasOneRelationPath?: ... }` | No | — | Last modification timestamp |
+| fileSizeField | `string \| { field: string; hasOneRelationPath?: ... }` | No | — | Field that stores file size |
+| fileTypeField | `string \| { field: string; hasOneRelationPath?: ... }` | No | — | Field that stores MIME type |
 | **label** | React.ReactNode | Yes | — | Field label *(inherited)* |
 | **description** | React.ReactNode | Yes | — | Helper text *(inherited)* |
-| **errors** | React.ReactNode \| Error[] | Yes | — | Validation errors *(inherited)* |
+| **errors** | `React.ReactNode \| Error[]` | Yes | — | Validation errors *(inherited)* |
 | **required** | boolean | Yes | — | Marks the field as mandatory *(inherited)* |
 
 ## Sub-Components / Building Blocks
@@ -119,17 +119,17 @@ Use this pattern when an entity can contain multiple files.
 The `noDestroy` flag prevents accidental deletion of legally binding documents.
 
 ## Best Practices & Gotchas
-* Always set `urlField`—nothing uploads without it.  
-* Reserve `baseField` for relations; omit it for scalar fields.  
-* Validate file types with both `accept` and server-side rules.  
-* Do not store large blobs inside Contember, only URLs and metadata.  
-* Pass a stable `uploader` instance to reuse connections.  
+* Always set `urlField`—nothing uploads without it.
+* Reserve `baseField` for relations; omit it for scalar fields.
+* Validate file types with both `accept` and server-side rules.
+* Do not store large blobs inside Contember, only URLs and metadata.
+* Pass a stable `uploader` instance to reuse connections.
 * Remember to handle `errors` in parent forms.
 
 ## Further Reading
-* `ImageField` – optimized for images.  
-* `AudioField` – audio-specific metadata.  
-* `VideoField` – video thumbnails and duration.  
+* `ImageField` – optimized for images.
+* `AudioField` – audio-specific metadata.
+* `VideoField` – video thumbnails and duration.
 * `BaseUploadFieldProps` – shared upload API.
 
 <!-- End of Generated Documentation -->

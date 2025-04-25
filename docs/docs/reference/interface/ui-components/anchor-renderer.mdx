@@ -7,7 +7,7 @@ title: AnchorRenderer
 <!-- Source examples: 0 -->
 <!-- Playground examples: 0 -->
 <!-- External examples: 0 -->
-<!-- Import examples: 4 -->
+<!-- Import examples: 0 -->
 
 ## Overview
 _None_
@@ -52,13 +52,17 @@ import { AnchorRenderer } from './elements/AnchorRenderer'
 const RenderElement = ({ element, attributes, children }: RenderElementProps) => {
 	switch (element.type) {
 		case 'anchor':
-			return <AnchorRenderer element={element} {...attributes}>{children}</AnchorRenderer>
+			return (
+				<AnchorRenderer element={element} {...attributes}>
+					{children}
+				</AnchorRenderer>
+			)
 		default:
 			return <p {...attributes}>{children}</p>
 	}
 }
 ```
-The example shows how you can delegate rendering of anchor elements while keeping other elements generic.
+This example shows how you can delegate rendering of anchor elements while keeping other elements generic.
 
 ## Best Practices & Gotchas
 * Always pass the exact `AnchorElement` instance you receive from Slate.
@@ -67,4 +71,5 @@ The example shows how you can delegate rendering of anchor elements while keepin
 ## Further Reading
 * Slate custom element rendering
 * Contember Slate editor integration guide  
+
 <!-- End of Generated Documentation -->

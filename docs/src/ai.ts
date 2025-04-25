@@ -30,6 +30,7 @@ export const buildPrompt = (data: AIPromptData, override?: ComponentOverride): s
 * Prefer bullet lists over long paragraphs.
 * Code fences: \` \`\`\`tsx \`\`\` for TS/JSX, \` \`\`\`bash \`\`\` for CLI.
 * Insert Tailwind classes directly in JSX (e.g. \`className="flex gap-2"\`).
+* Don't name examples after projects. It should be project agnostic.
 
 ### 3. Output Rules
 * **Do not** invent props or examples that are not present in the source data.
@@ -463,7 +464,7 @@ title: ${title}
 
 			contentAfterInsert = contentAfterInsert.replace(
 				tableHeaderAndSeparator + tableBodyOriginal,
-				processedTableSection
+				processedTableSection,
 			)
 		}
 

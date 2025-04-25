@@ -3,14 +3,14 @@ title: SelectInput
 ---
 
 <!-- Edited by human: false -->
-<!-- Examples count: 9 -->
+<!-- Examples count: 5 -->
 <!-- Source examples: 1 -->
 <!-- Playground examples: 0 -->
-<!-- External examples: 8 -->
-<!-- Import examples: 5 -->
+<!-- External examples: 4 -->
+<!-- Import examples: 2 -->
 
 ## Overview
-SelectInput renders a selectable input field with rich Contember features.
+SelectInput renders a selectable input field with rich Contember features.  
 It can create new entities, validate the selection, and support in-list sorting.
 
 ## Styling Guidelines
@@ -19,10 +19,9 @@ It can create new entities, validate the selection, and support in-list sorting.
 
 ## Core Concepts
 * Field mapping ties the selection to a specific entity column.
-* `options` define pre-filtered choices using Contember filter objects.
+* `options` define static choices using Contember filter objects.
 * `createNewForm` lets users add missing records inline.
 * Validation occurs when `required` is true.
-* `initialSorting` controls ordering of options when the list loads.
 * Children decide which entity fields show inside the dropdown.
 
 ## Quick Start
@@ -57,11 +56,6 @@ _None_
 | options | `Array<{ field: string; operator: string; value: string; label: string }>` | No | `[]` | Static list of selectable filters. |
 | createNewForm | ReactNode | No | — | JSX rendered when the user chooses “create new”. |
 | required | boolean | No | `false` | Forces at least one selection. |
-| initialSorting | unknown | No | — | Contember sorting applied when the dropdown opens. |
-| queryField | string | No | — | Alternative field used for server-side searching. |
-| isNonbearing | boolean | No | `false` | Marks relation as non-bearing for validation. |
-| errorMessage | string | No | — | Custom validation message. |
-| useLabelElement | boolean | No | `false` | Renders a `<label>` around the input in container components. |
 | onChange | (event) ⇒ void | No | — | Standard change handler for uncontrolled HTML `<select>` usage. |
 | children | ReactNode | Yes | — | Components that display option content. |
 
@@ -105,14 +99,12 @@ export const CategorySelectInsideForm = () => (
     <FormContainer label="Category" required>
       <SelectInput
         field="category"
-        queryField="label"
         placeholder="Choose category"
         options={[
           { field: 'id', operator: 'eq', value: '1', label: 'Books' },
           { field: 'id', operator: 'eq', value: '2', label: 'Music' },
         ]}
         createNewForm={<div className="p-4">Form for creating a new category</div>}
-        initialSorting={{ label: 'asc' }}
         required
       >
         <Field field="label" />
@@ -121,7 +113,7 @@ export const CategorySelectInsideForm = () => (
   </FormHasOneRelationScope>
 )
 ```
-The component inherits validation from `FormContainer` and uses `initialSorting` for alphabetical order.
+The component inherits validation from `FormContainer`.
 
 ### Locale Picker Without Entity Relation
 ```tsx
@@ -171,7 +163,6 @@ The example shows how to prepend a static “All” option and store the choice 
 * Keep `options` small; large static arrays slow rendering.
 * Provide `placeholder` to improve accessibility.
 * Always include a child `<Field>` so users see meaningful labels.
-* Use `initialSorting` for predictable option orders.
 * When using uncontrolled HTML mode, remember to supply an `onChange` handler.
 
 ## Further Reading

@@ -1,0 +1,88 @@
+---
+title: BackButtonLabel
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 2 -->
+<!-- Source examples: 2 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 0 -->
+<!-- Import examples: 0 -->
+
+# BackButtonLabel
+
+## Overview
+`BackButtonLabel` renders a back arrow icon with a text label.  
+You place it inside `BackButton` to keep navigation styling consistent.
+
+## Styling Guidelines
+All examples use Tailwind utility classes.  
+`BackButtonLabel` follows the Contember theme; you do not need extra theme classes.
+
+## Core Concepts
+- Back navigation should look identical across pages.  
+- The component is presentational; logic lives in `BackButton`.  
+- You may override the label with a custom string.
+
+## Quick Start
+```tsx
+import { BackButtonLabel } from '@contember/react-components'
+
+export const PageHeader = () => (
+	<button className="flex items-center gap-2 text-sm text-gray-700">
+		<BackButtonLabel />
+	</button>
+)
+```
+
+## Detailed Guide
+### Customizing the label
+You might need a different language or phrasing.
+
+```tsx
+<button className="flex items-center gap-2 text-sm text-gray-700">
+	<BackButtonLabel label="Go Back" />
+</button>
+```
+
+### Composing with BackButton
+`BackButton` adds click handling and ARIA roles.
+
+```tsx
+import { BackButton, BackButtonLabel } from '@contember/react-components'
+
+<BackButton className="inline-flex items-center gap-2 text-sm text-blue-600">
+	<BackButtonLabel />
+</BackButton>
+```
+
+## Props Reference
+| Name  | Type   | Required | Default | Description                                                       |
+|-------|--------|----------|---------|-------------------------------------------------------------------|
+| label | string | No       | dictionary.backButton.back | Optional custom button text. |
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+```tsx
+<BackButtonLabel />
+```
+Renders the default dictionary label with the arrow icon.
+
+```tsx
+<BackButtonLabel label="Go Back" />
+```
+Shows custom text while keeping the same icon and spacing.
+
+## Best Practices & Gotchas
+- Keep the label short; it sits beside a small icon.  
+- Wrap the component in a button for proper semantics.  
+- Avoid adding extra padding; the component already includes spacing.  
+- Pass plain text only; rich content breaks alignment.
+
+## Further Reading
+- `BackButton` – wrapper adding navigation logic.  
+- Contember Design System – typography and iconography guidelines.
+
+<!-- End of Generated Documentation -->

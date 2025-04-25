@@ -1,0 +1,128 @@
+---
+title: DefaultBoard
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 8 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 2 -->
+<!-- External examples: 6 -->
+<!-- Import examples: 6 -->
+
+# DefaultBoard
+
+## Overview
+_None_
+
+## Styling Guidelines
+* All examples below use Tailwind CSS utility classes.  
+* No specific Contember theme classes are required, but you can combine Tailwind with your own design system.
+
+## Core Concepts
+* Boards display entities grouped into columns.
+* You choose the entity set shown in each column via `columns` and `discriminationField`.
+* Sorting works in two layers: items inside a column (`sortableBy`) and the column order itself (`columnsSortableBy`).
+* You can render custom headers for both regular and “null” columns.
+
+## Quick Start
+```tsx
+import { Binding, Field } from '@contember/admin'
+import { DefaultBoard } from '@app/lib/board'
+
+export default () => (
+	<Binding>
+		<DefaultBoard
+			entities="BoardTask"
+			columns="BoardUser"
+			discriminationField="assignee"
+			sortableBy="order"
+			columnHeader={<div className="text-sm font-semibold"><Field field="name" /></div>}
+		>
+			<Field field="title" />
+		</DefaultBoard>
+	</Binding>
+)
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+| ---- | ---- | -------- | ------- | ----------- |
+| entities | string &#124; EntityBindingProps | Yes | — | Entity collection shown as board cards. |
+| columns | string &#124; EntityBindingProps &#124; OptionGenerator | Yes | — | Set of columns. Can be an entity name or a generated option list. |
+| discriminationField | string | Yes | — | Field used to decide which column a record belongs to. |
+| sortableBy | string | No | — | Field used for item ordering inside each column. |
+| sortScope | string | No | — | Scope name shared by multiple sortable components. |
+| columnsSortableBy | string | No | — | Field used to sort entire columns. |
+| columnHeader | ReactNode | No | — | Component rendered at the top of every non-null column. |
+| nullColumnHeader | ReactNode | No | — | Header shown for records with no column value. |
+| children | ReactNode | Yes | — | Content rendered inside each card. |
+| ...rest | any | No | — | Additional props are spread to the underlying container element. |
+
+## Sub-Components / Building Blocks
+### PersistOnFieldChange
+Triggers a persist mutation when the given field changes.
+
+### PersistOnHasOneChange
+Triggers a persist mutation when a `HasOne` relation changes.
+
+### BoardColumnLabel
+Utility component for displaying column names. Often combined with color indicators.
+
+### ConvertedPricePreview
+Shows a monetary value converted to the active currency.
+
+## Examples
+### Dynamic user columns
+```tsx
+<DefaultBoard
+	entities="BoardTask"
+	columns="BoardUser"
+	columnsSortableBy="order"
+	discriminationField="assignee"
+	sortableBy="order"
+	sortScope="board"
+	columnHeader={<div className="text-lg font-semibold"><Field field="name" /></div>}
+	nullColumnHeader={<div className="text-lg font-semibold italic">Without assignee</div>}
+>
+	<PersistOnHasOneChange field="assignee" />
+	<PersistOnFieldChange field="order" />
+	<Field field="title" />
+</DefaultBoard>
+```
+The board shows tasks per assignee. Dragging a task to a new column updates the `assignee` and persists automatically.
+
+### Static status columns
+```tsx
+<DefaultBoard
+	entities="BoardTask"
+	columns={statusList}
+	discriminationField="status"
+	sortableBy="order"
+	sortScope="board"
+	columnHeader={<div className="text-lg font-semibold"><BoardColumnLabel /></div>}
+	nullColumnHeader={<div className="text-lg font-semibold italic">Without status</div>}
+>
+	<PersistOnFieldChange field="status" />
+	<PersistOnFieldChange field="order" />
+	<Field field="title" />
+</DefaultBoard>
+```
+You supply a prepared `statusList` so the board never adds or removes columns at runtime.
+
+## Best Practices & Gotchas
+* Always provide `discriminationField`; otherwise cards cannot map to columns.
+* Wrap the board in `<Binding>` so data loading and mutations work.
+* Use `sortableBy` and `columnsSortableBy` together to avoid conflicting orders.
+* Render lightweight card bodies—heavy components slow drag-and-drop.
+* Persist triggers (`PersistOnFieldChange`, `PersistOnHasOneChange`) must be inside the board to catch mutations.
+
+## Further Reading
+* PersistButton  
+* Binding & EntityList  
+* Drag-and-drop sorting guide  
+* Option generator utilities (`createOptionLabel`)
+
+<!-- End of Generated Documentation -->

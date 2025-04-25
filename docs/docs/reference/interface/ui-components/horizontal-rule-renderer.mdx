@@ -7,12 +7,12 @@ title: HorizontalRuleRenderer
 <!-- Source examples: 0 -->
 <!-- Playground examples: 0 -->
 <!-- External examples: 0 -->
-<!-- Import examples: 4 -->
+<!-- Import examples: 0 -->
 
 # HorizontalRuleRenderer
 
 ## Overview
-`HorizontalRuleRenderer` visualizes a horizontal rule (`<hr />`) element within the Contember Slate editor. It turns the internal `HorizontalRuleElement` node into a styled divider that separates content blocks.
+`HorizontalRuleRenderer` visualizes a horizontal rule (`<hr />`) element within the Contember Slate editor. It converts the internal `HorizontalRuleElement` node into a styled divider that separates content blocks.
 
 The component is presentation-only. It receives the Slate element object and renders a semantic `<hr>` with Tailwind utility classes.
 
@@ -21,9 +21,9 @@ The component is presentation-only. It receives the Slate element object and ren
 * No mandatory Contember theme classes exist for this component, but you can layer your own design-system styles on top.
 
 ## Core Concepts
-* The component must be used inside a Contember Slate editor context.
-* It expects the exact Slate element object (`HorizontalRuleElement`) via the `element` prop.
-* Styling is handled through Tailwind classes applied directly to the rendered `<hr>`.
+* Use the renderer inside a Contember Slate editor context.
+* Pass the exact Slate element object (`HorizontalRuleElement`) via the `element` prop.
+* Apply Tailwind classes directly to the rendered `<hr>` for styling.
 
 ## Quick Start
 ```tsx
@@ -51,45 +51,13 @@ _None_
 _None_
 
 ## Examples
-
-### Custom Color Divider
-Render a separator matching your brand color.
-
-```tsx
-<HorizontalRuleRenderer
-	element={{ type: 'horizontalRule', children: [] }}
-/>
-<style jsx>{`
-	hr {
-		@apply border-t-2 border-primary-500;
-	}
-`}</style>
-```
-
-The `@apply` directive combines Tailwind classes in a global style so every horizontal rule adopts the primary brand color.
-
-### Spaced Section Break
-Add vertical spacing before and after the rule.
-
-```tsx
-<HorizontalRuleRenderer
-	element={{ type: 'horizontalRule', children: [] }}
-/>
-
-<style jsx>{`
-	hr {
-		@apply my-8 border-gray-300;
-	}
-`}</style>
-```
-
-`my-8` inserts equal margin above and below the divider, creating clear separation between sections.
+_None_
 
 ## Best Practices & Gotchas
 * Always supply the real Slate `HorizontalRuleElement`; passing an empty object causes runtime errors.
 * Keep rules visually subtle to avoid overwhelming the document.
 * Combine Tailwind classes instead of inline styles for easier theming.
-* Wrap the renderer in memoization (`React.memo`) if you render many rules for performance gains.
+* Wrap the renderer in `React.memo` if you render many rules for performance gains.
 
 ## Further Reading
 * Slate Editor Integration Guide

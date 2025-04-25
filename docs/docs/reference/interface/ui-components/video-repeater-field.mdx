@@ -1,0 +1,107 @@
+---
+title: VideoRepeaterField
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 2 -->
+<!-- Source examples: 2 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 0 -->
+<!-- Import examples: 0 -->
+
+# VideoRepeaterField
+
+## Overview
+VideoRepeaterField lets you manage an ordered collection of videos inside an Entity context.  
+It handles uploads, previews, drag-and-drop sorting, and progress tracking for each video file.
+
+## Styling Guidelines
+* All code samples use Tailwind classes.  
+* No special Contember theme classes are required; the component inherits your form styles.
+
+## Core Concepts
+* Runs only inside `<EntitySubTree />` or `<EntityListSubTree />`.
+* Treats each item as a nested entity for metadata fields.
+* Saves the video URL (or path) into the `urlField`.
+* Maintains the item order via `orderBy` or `sortableBy`.
+* Supports optional metadata fields (duration, size, type, etc.).
+
+## Quick Start
+```tsx
+// tailwind: simple vertical stack
+<div className="space-y-4">
+  <VideoRepeaterField
+    label="Course Videos"
+    field="courses"
+    urlField="video.url"
+    orderBy="createdAt"
+  />
+</div>
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| label | Not specified | No | — | Field label shown above the list |
+| field | Not specified | Yes | — | Relation path to the repeated entity |
+| urlField | Not specified | Yes | — | Field that stores the uploaded file URL |
+| orderBy | Not specified | No | — | Column used to fetch items in order |
+| baseField | Not specified | No | — | Root field when nested metadata live under a separate object |
+| sortableBy | Not specified | No | — | Field updated during drag-and-drop reordering |
+| durationField | Not specified | No | — | Field storing video length in seconds |
+| fileNameField | Not specified | No | — | Field storing the original file name |
+| fileSizeField | Not specified | No | — | Field storing file size in bytes |
+| fileTypeField | Not specified | No | — | Field storing MIME type |
+| lastModifiedField | Not specified | No | — | Field storing file last-modified timestamp |
+| *Inherited props* | — | — | — | _None documented_ |
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+
+### Basic list ordered by creation time
+```tsx
+<VideoRepeaterField
+  label="Course Videos"
+  field="courses"
+  urlField="video.url"
+  orderBy="createdAt"
+/>
+```
+The component lists existing videos by `createdAt` and lets users add more. Drag-and-drop is disabled because no `sortableBy` field is set.
+
+### Sortable list with rich metadata
+```tsx
+<VideoRepeaterField
+  field="courses"
+  baseField="video"
+  urlField="url"
+  sortableBy="order"
+  durationField="duration"
+  fileNameField="fileName"
+  fileSizeField="fileSize"
+  fileTypeField="fileType"
+  lastModifiedField="lastModified"
+  label="Course Videos"
+/>
+```
+This setup saves all video metadata under the nested `video` object and allows reordering by the integer `order` field.
+
+## Best Practices & Gotchas
+* Always place the component inside an Entity context; otherwise it throws runtime errors.
+* Use `sortableBy` only on integer fields that default to sequential numbers.
+* Keep `urlField`, `durationField`, and other metadata in the same entity to avoid query complexity.
+* Limit max file size on the server; the component does not validate size.
+* Provide a fallback poster image for videos if the backend cannot generate thumbnails.
+
+## Further Reading
+* FileRepeaterField – similar API for generic files.  
+* ImageRepeaterField – image-specific variant with cropping support.  
+* EntitySubTree – wraps a single entity context.  
+* EntityListSubTree – handles lists of entities.
+
+<!-- End of Generated Documentation -->

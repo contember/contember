@@ -1,0 +1,142 @@
+---
+title: createComponentOpenHooks
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 1 -->
+<!-- Source examples: 1 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 0 -->
+<!-- Import examples: 0 -->
+
+# createComponentOpenHooks
+
+## Overview
+`createComponentOpenHooks` wraps a React component that already supports the trio of props `open`, `defaultOpen`, and `onOpenChange`.  
+The wrapper injects a context provider plus a `useOpen` hook, so you can read or change the open state from anywhere within the component tree.
+
+This pattern works well for modals, drawers, popovers, and any other UI element that toggles between visible and hidden states.
+
+## Styling Guidelines
+All examples use Tailwind CSS classes. No additional Contember theme classes are required.
+
+## Core Concepts
+- Wrapper adds a React context to hold the open state.
+- `useOpen` returns `[open, setOpen]`, mirroring `useState`.
+- The original component keeps its own props; no API surface is lost.
+- You can call `useOpen` in any child of the wrapped component.
+
+## Quick Start
+```tsx
+import { createComponentOpenHooks } from '@contember/react-utils'
+
+const BaseModal: React.FC<{
+  open?: boolean
+  defaultOpen?: boolean
+  onOpenChange?: (open: boolean) => void
+}> = ({ open, onOpenChange }) => (
+  <div className={open ? 'block bg-white p-4 shadow-lg' : 'hidden'}>
+    <button
+      className="mb-2 rounded bg-red-500 px-3 py-1 text-white"
+      onClick={() => onOpenChange?.(false)}
+    >
+      Close
+    </button>
+    <p>Modal Content</p>
+  </div>
+)
+
+const { Component: Modal, useOpen } = createComponentOpenHooks(BaseModal)
+
+export const App = () => {
+  const [, setOpen] = useOpen()
+
+  return (
+    <>
+      <button
+        className="rounded bg-blue-600 px-4 py-2 text-white"
+        onClick={() => setOpen(true)}
+      >
+        Open Modal
+      </button>
+      <Modal />
+    </>
+  )
+}
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| open | boolean | No | `undefined` | Controls the current open state. |
+| defaultOpen | boolean | No | `false` | Sets the initial open state when `open` is uncontrolled. |
+| onOpenChange | (open: boolean) => void | No | `undefined` | Callback fired when the open state changes. |
+| **Inherited props from the wrapped component** | — | — | — | All other props defined on your base component remain available. |
+
+## Sub-Components / Building Blocks
+### Component
+The wrapped React component with context already wired in. Use it exactly like the original.
+
+### useOpen
+React hook that returns `[open, setOpen]`. Call it inside any descendant to inspect or control the open state.
+
+## Examples
+```tsx
+const BaseDrawer: React.FC<{
+  open?: boolean
+  defaultOpen?: boolean
+  onOpenChange?: (open: boolean) => void
+}> = ({ open, children, onOpenChange }) => (
+  <aside
+    className={`fixed right-0 top-0 h-full w-64 transform bg-gray-100 p-6 transition-transform ${
+      open ? 'translate-x-0' : 'translate-x-full'
+    }`}
+  >
+    <button
+      className="mb-4 rounded bg-gray-800 px-2 py-1 text-sm text-white"
+      onClick={() => onOpenChange?.(false)}
+    >
+      Close
+    </button>
+    {children}
+  </aside>
+)
+
+const { Component: Drawer, useOpen } = createComponentOpenHooks(BaseDrawer)
+
+export const DrawerExample = () => {
+  const [open, setOpen] = useOpen()
+
+  return (
+    <>
+      <button
+        className="rounded bg-green-600 px-4 py-2 text-white"
+        onClick={() => setOpen(!open)}
+      >
+        {open ? 'Hide' : 'Show'} Drawer
+      </button>
+      <Drawer>
+        <p>Toggleable side drawer content.</p>
+      </Drawer>
+    </>
+  )
+}
+```
+The drawer slide-in demo reuses the same pattern as the modal.  
+You can toggle from any nested component because `useOpen` lives in context.
+
+## Best Practices & Gotchas
+- Keep all stateful logic inside the wrapper; avoid mixing external and internal state controls.
+- Always supply `onOpenChange` when you fully control the `open` prop.
+- Call `useOpen` only within components rendered under the wrapped component; context will be `undefined` elsewhere.
+- Use Tailwind’s `hidden` and `block` or transform utilities to animate visibility.
+
+## Further Reading
+- `createControlledContext`
+- React Context API basics
+- Contember UI toggleable components
+
+<!-- End of Generated Documentation -->

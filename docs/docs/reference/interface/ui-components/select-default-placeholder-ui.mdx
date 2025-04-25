@@ -3,10 +3,10 @@ title: SelectDefaultPlaceholderUI
 ---
 
 <!-- Edited by human: false -->
-<!-- Examples count: 10 -->
+<!-- Examples count: 6 -->
 <!-- Source examples: 0 -->
 <!-- Playground examples: 0 -->
-<!-- External examples: 10 -->
+<!-- External examples: 6 -->
 <!-- Import examples: 5 -->
 
 ## SelectDefaultPlaceholderUI
@@ -31,7 +31,7 @@ import { SelectInputUI, SelectDefaultPlaceholderUI } from '@contember/react-sele
 
 export const StatusSelect = () => (
 	<SelectInputUI className="w-full">
-		{/* Placeholder shown until user chooses a value */}
+		{/* Placeholder shown until the user chooses a value */}
 		<SelectDefaultPlaceholderUI />
 	</SelectInputUI>
 )
@@ -45,52 +45,86 @@ Name | Type | Required | Default | Description
 --- | --- | --- | --- | ---
 _None_
 
-
-
 ### Sub-Components / Building Blocks
 _None_
 
 ### Examples
 
-#### In a single-value select
+#### Single-value select with icon
 ```tsx
-<SelectInputUI id="priority">
+<SelectInputUI id="priority" className="w-56">
 	{selectedLabel ?? <SelectDefaultPlaceholderUI />}
 	<SelectInputActionsUI>
 		<ChevronDownIcon className="w-4 h-4" />
 	</SelectInputActionsUI>
 </SelectInputUI>
 ```
-`selectedLabel` is rendered if a value exists; otherwise the default placeholder appears.
+`selectedLabel` is rendered if a value exists; otherwise the placeholder appears.
 
-#### In a multi-select with custom items
+#### Wrapped in SelectPlaceholder
 ```tsx
-<SelectInputUI>
+<SelectInputUI className="w-48">
 	<SelectPlaceholder>
 		<SelectDefaultPlaceholderUI />
 	</SelectPlaceholder>
-
-	<SelectEachValue>
-		<MultiSelectItemUI>
-			<MultiSelectItemContentUI>{children}</MultiSelectItemContentUI>
-			<SelectItemTrigger>
-				<MultiSelectItemRemoveButtonUI />
-			</SelectItemTrigger>
-		</MultiSelectItemUI>
-	</SelectEachValue>
+	{/* other select elements go here */}
 </SelectInputUI>
 ```
-The placeholder disappears once at least one item is selected.
+Using `SelectPlaceholder` lets you keep layout consistent while conditionally hiding the placeholder.
+
+#### Custom form field with Popover
+```tsx
+({ field, label, description, options, placeholder }) => {
+	const [open, setOpen] = useState(false)
+	const fieldAccessor = useField<string>(field)
+
+	return (
+		<FormFieldScope field={field}>
+			<FormContainer description={description} label={label}>
+				<Popover open={open} onOpenChange={setOpen}>
+					<PopoverTrigger asChild>
+						<SelectInputUI className="w-full">
+							{fieldAccessor.value
+								? options[fieldAccessor.value]
+								: (placeholder ?? <SelectDefaultPlaceholderUI />)}
+							<SelectInputActionsUI>
+								{open
+									? <ChevronUpIcon className="w-4 h-4" />
+									: <ChevronDownIcon className="w-4 h-4" />}
+							</SelectInputActionsUI>
+						</SelectInputUI>
+					</PopoverTrigger>
+
+					<SelectPopoverContent>
+						{Object.entries(options).map(([value, label]) => (
+							<SelectListItemUI
+								key={value}
+								onClick={() => {
+									fieldAccessor.updateValue(value)
+									setOpen(false)
+								}}
+							>
+								{label}
+							</SelectListItemUI>
+						))}
+					</SelectPopoverContent>
+				</Popover>
+			</FormContainer>
+		</FormFieldScope>
+	)
+}
+```
+The component acts as a fallback when no `placeholder` prop is supplied, keeping the field usable without extra work.
 
 ### Best Practices & Gotchas
 * Keep the placeholder short; long texts push icons outside the input.  
-* When you translate the UI, swap the component for localized text instead of mutating it.  
+* Swap the component for localized text instead of mutating it.  
 * Do not attach event handlers; the component is purely visual.  
-* Avoid extra wrapping elements—use it directly inside select input bodies.
+* Avoid extra wrapping elements—use it directly inside select input bodies where possible.  
 
 ### Further Reading
 * SelectInputUI  
-* MultiSelectInput  
+* SelectPlaceholder  
 * SelectPopoverContent  
 * Contember Form Fields documentation  
 

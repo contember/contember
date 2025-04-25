@@ -1,0 +1,99 @@
+---
+title: BackButton
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 16 -->
+<!-- Source examples: 3 -->
+<!-- Playground examples: 3 -->
+<!-- External examples: 10 -->
+<!-- Import examples: 6 -->
+
+## Overview
+`BackButton` navigates the browser one step back with `history.back()`.  
+You can keep the default text label or replace it with the `label` prop or any custom `children`.
+
+## Styling Guidelines
+All examples use Tailwind utility classes.  
+No extra Contember theme classes are required for `BackButton`.
+
+## Core Concepts
+* Uses the browser history API.
+* Accepts either `label` or `children` for content.
+* Fits naturally into `Slots.Back` in Contember layouts.
+* Acts as a simple `<button>` styled by Tailwind.
+
+## Quick Start
+```tsx
+import { BackButton } from '@app/lib/buttons'
+
+export default () => (
+  <BackButton className="text-sm font-medium text-blue-600 hover:underline" />
+)
+```
+
+## Detailed Guide
+### Custom text label
+```tsx
+<BackButton
+  label="Return to list"
+  className="inline-flex items-center gap-2 text-blue-500"
+/>
+```
+
+### Fully custom content
+```tsx
+<BackButton className="flex items-center gap-1 text-gray-700">
+  <ArrowLeftIcon className="w-4 h-4" />
+  <span>Go Back</span>
+</BackButton>
+```
+
+## Props Reference
+| Name     | Type              | Required | Default                         | Description                                                       |
+|----------|-------------------|----------|---------------------------------|-------------------------------------------------------------------|
+| label    | string            | No       | `dictionary.backButton.back`    | Custom button text. Ignored when `children` is provided.          |
+| children | React.ReactNode   | No       | –                               | Custom button content. Replaces the label entirely.               |
+
+_Inherited props_: _None_
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+### Inside a layout slot
+Used in the Contember playground for consistent navigation.
+```tsx
+<Slots.Back>
+  <BackButton className="text-gray-600 hover:text-black" />
+</Slots.Back>
+```
+`Slots.Back` ensures the button appears in the expected position of every page.
+
+### Create–edit workflow
+```tsx
+<Binding>
+  <Slots.Back>
+    <BackButton />
+  </Slots.Back>
+
+  <EntitySubTree entity="Company" isCreating>
+    <RedirectOnPersist to="crm/companyList" />
+    <CompanyForm />
+  </EntitySubTree>
+</Binding>
+```
+`BackButton` lets users leave the form without saving, complementing the explicit persist action.
+
+## Best Practices & Gotchas
+* Prefer `label` for simple text changes; reserve `children` for icons or complex markup.
+* Do not attach `onClick`; the component already handles navigation.
+* Pair with `Slots.Back` to keep your layout consistent.
+* Remember that `history.back()` can fail if there is no previous entry.
+
+## Further Reading
+* `Link` – for forward navigation.
+* `AnchorButton` – styled links acting as buttons.
+* `Slots` – Contember layout composition.
+
+<!-- End of Generated Documentation -->

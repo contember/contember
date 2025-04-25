@@ -1,0 +1,108 @@
+---
+title: Title
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 11 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 5 -->
+<!-- External examples: 6 -->
+<!-- Import examples: 8 -->
+
+## Overview
+_None_
+
+## Styling Guidelines
+* All code examples use Tailwind CSS classes.  
+* The `Title` component itself does not require Contember theme classes, but wrap it in Tailwind utility classes as needed.
+
+## Core Concepts
+* `Title` renders the primary heading for the current view.
+* It’s usually placed in `Slots.Title` so layout templates can position it.
+* Pass any React node as children—text or rich JSX.
+* Combine `Title` with navigation and action slots for cohesive pages.
+
+## Quick Start
+```tsx
+import { Title } from '@app/lib/layout'
+
+export default function ExamplePage() {
+	return (
+		<div className="p-6">
+			<Title>Dashboard</Title>
+		</div>
+	)
+}
+```
+
+## Detailed Guide
+```tsx
+import { Slots, Title } from '@app/lib/layout'
+
+export default function ListPage() {
+	return (
+		<Slots.Title>
+			<Title>Users</Title>
+		</Slots.Title>
+	)
+}
+```
+* Place `Title` inside `Slots.Title` so your layout decides where to render it.
+* You can add icons or inline fields:
+
+```tsx
+<Slots.Title>
+	<Title icon={<UserIcon className="text-primary-500" />}>
+		Users <Field field="name" />
+	</Title>
+</Slots.Title>
+```
+
+## Props Reference
+_None_
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+```tsx
+() => (
+	<Binding>
+		<Slots.Title>
+			<Title icon={<DatabaseIcon />}>Auto CRUD</Title>
+		</Slots.Title>
+
+		<EntityList />
+	</Binding>
+)
+```
+Auto-generated CRUD screen with a database icon.
+
+```tsx
+() => {
+	const entityName = useEnvironment().getParameter('entity')
+	if (!entityName || typeof entityName === 'number') return null
+
+	return (
+		<Binding>
+			<Slots.Title>
+				<Title>Edit {entityName}</Title>
+			</Slots.Title>
+			{/* form content */}
+		</Binding>
+	)
+}
+```
+Dynamic titles based on URL parameters.
+
+## Best Practices & Gotchas
+* Always place `Title` in `Slots.Title` for layouts that expect it.
+* Keep titles short; overflow breaks breadcrumbs.
+* Avoid heavy markup—icons and inline fields are fine, but complex layouts belong elsewhere.
+
+## Further Reading
+* `Slots` layout system  
+* `Binding` data context  
+* `BackButton` and other navigation helpers  
+
+<!-- End of Generated Documentation -->

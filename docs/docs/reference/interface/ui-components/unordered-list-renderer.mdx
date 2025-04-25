@@ -7,12 +7,12 @@ title: UnorderedListRenderer
 <!-- Source examples: 0 -->
 <!-- Playground examples: 0 -->
 <!-- External examples: 0 -->
-<!-- Import examples: 4 -->
+<!-- Import examples: 0 -->
 
 # UnorderedListRenderer
 
 ## Overview
-`UnorderedListRenderer` outputs an unordered list (`<ul>`) inside Contember’s Slate-based editor.
+`UnorderedListRenderer` outputs an unordered list (`<ul>`) inside Contember’s Slate-based editor.  
 Use it whenever you need to display list data that lives in a `UnorderedListElement` node.
 
 ## Styling Guidelines
@@ -21,7 +21,7 @@ Use it whenever you need to display list data that lives in a `UnorderedListElem
 
 ## Core Concepts
 * `UnorderedListElement` – the Slate node the renderer expects.
-* Render-only component – it **does not** handle editing logic.
+* Render-only component – it does not handle editing logic.
 * Works inside any Slate context provided by Contember.
 
 ## Quick Start
@@ -41,8 +41,8 @@ export const BasicList = () => (
 _None_
 
 ## Props Reference
-| Name    | Type | Required | Default | Description |
-|---------|------|----------|---------|-------------|
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
 | element | UnorderedListElement | Yes | – | Slate node to be rendered. |
 
 ### Inherited Props
@@ -64,7 +64,7 @@ Wrap the renderer in a Tailwind-powered container to tweak spacing.
 This adds `1.5rem` left padding while keeping bullet styling intact.
 
 ## Best Practices & Gotchas
-* Always memoize `element` when passing props in React to avoid needless re-renders.
+* Always memoize `element` when passing props to avoid needless re-renders.
 * Place the renderer inside a Slate provider; it will not work standalone.
 * Do not attempt to pass additional props—only `element` is supported.
 

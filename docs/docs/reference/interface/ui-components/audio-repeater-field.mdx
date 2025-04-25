@@ -1,0 +1,96 @@
+---
+title: AudioRepeaterField
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 2 -->
+<!-- Source examples: 2 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 0 -->
+<!-- Import examples: 0 -->
+
+## Overview
+`AudioRepeaterField` lets you upload, preview, and order multiple audio files inside an Entity context.  
+It supports common audio formats, validates size, and renders an inline audio player for each file.
+
+## Styling Guidelines
+* All examples use Tailwind CSS utility classes.  
+* No Contember-specific theme classes are required by default.
+
+## Core Concepts
+* You work inside `<EntitySubTree>` or `<EntityListSubTree>`.
+* The component manages an ordered relation of audio files.
+* Each audio item can expose additional metadata fields (duration, fileSize, etc.).
+* Sorting happens through `orderBy` or `sortableBy`.
+
+## Quick Start
+```tsx
+<EntitySubTree entity="podcast">
+	<AudioRepeaterField
+		className="w-full"
+		label="Podcast Episodes"
+		field="episodes"
+		urlField="audio.url"
+		orderBy="createdAt"
+	/>
+</EntitySubTree>
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+| ---- | ---- | -------- | ------- | ----------- |
+| label | string | No | — | Text shown above the repeater. |
+| field | string | No | — | Relation field holding the audio records. |
+| urlField | string | No | — | Field containing the audio file URL. |
+| orderBy | string | No | — | Orders items when `sortableBy` is not used. |
+| baseField | string | No | — | Root field when your audio data is nested. |
+| sortableBy | string | No | — | Field used for manual drag-and-drop sorting. |
+| durationField | string | No | — | Stores audio duration in seconds. |
+| fileNameField | string | No | — | Stores original file name. |
+| fileSizeField | string | No | — | Stores file size in bytes. |
+| fileTypeField | string | No | — | Stores MIME type. |
+| lastModifiedField | string | No | — | Stores last modified timestamp. |
+| **…inherited props** | — | — | — | Standard input props from Contember Field components. |
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+
+### Drag-and-Drop Sorting with Metadata
+```tsx
+<EntityListSubTree entities="episodes">
+	<AudioRepeaterField
+		className="w-full border rounded p-4"
+		field="episodes"
+		baseField="audio"
+		urlField="url"
+		sortableBy="order"
+		durationField="duration"
+		fileNameField="fileName"
+		fileSizeField="fileSize"
+		fileTypeField="fileType"
+		lastModifiedField="lastModified"
+		label="Audio files"
+	/>
+</EntityListSubTree>
+```
+The list becomes draggable thanks to `sortableBy="order"`.  
+Contember stores duration, size, and other metadata into dedicated columns.
+
+## Best Practices & Gotchas
+* Always wrap the component in an Entity context; otherwise it throws an error.
+* Keep `fileSizeField` indexed if you plan to filter by size.
+* Use `orderBy` only when you do not need manual reordering.
+* Validate accepted MIME types server-side too; the client check is not foolproof.
+
+## Further Reading
+* File upload patterns in Contember
+* `FileRepeaterField`
+* `ImageRepeaterField`
+* Sorting with `sortableBy`
+
+<!-- End of Generated Documentation -->

@@ -3,24 +3,25 @@ title: SelectInputActionsUI
 ---
 
 <!-- Edited by human: false -->
-<!-- Examples count: 10 -->
+<!-- Examples count: 6 -->
 <!-- Source examples: 0 -->
 <!-- Playground examples: 0 -->
-<!-- External examples: 10 -->
+<!-- External examples: 6 -->
 <!-- Import examples: 5 -->
 
 ## Overview  
-_None_
+`SelectInputActionsUI` renders the right-hand action slot inside `SelectInputUI`.  
+Place icons, buttons, or triggers here. The component holds no state; it only positions its children.
 
 ## Styling Guidelines  
 * All examples use Tailwind utility classes.  
 * No special Contember theme classes are required for `SelectInputActionsUI`.
 
 ## Core Concepts  
-* `SelectInputActionsUI` renders the action slot on the right side of `SelectInputUI`.  
-* You typically place icons, buttons, or triggers inside this slot.  
-* The component has no own state; it only arranges its children.  
-* It inherits layout from the surrounding `SelectInputUI`.
+* Sits inside `SelectInputUI` next to the selected label.  
+* Accepts arbitrary React children (icons, buttons, loaders, etc.).  
+* Relies on `flex` alignment from the parent.  
+* Does **not** manage click handling; handle events inside the children.  
 
 ## Quick Start  
 ```tsx
@@ -65,17 +66,30 @@ Use this when the select is closed. Swap it with `ChevronUpIcon` when open.
   <ChevronDownIcon className="w-4 h-4 pointer-events-none" />
 </SelectInputActionsUI>
 ```
-Combine multiple interactive elements. Ensure you stop propagation on buttons if you do not want to toggle the popover.
+Combine interactive and decorative elements. Apply `pointer-events-none` to non-interactive icons to let clicks reach the input.
+
+### Loader with dynamic open/close icons  
+```tsx
+<SelectInputActionsUI className="flex items-center gap-1">
+  {isLoading && <Loader size="sm" />}
+  {open ? (
+    <ChevronUpIcon className="w-4 h-4" />
+  ) : (
+    <ChevronDownIcon className="w-4 h-4" />
+  )}
+</SelectInputActionsUI>
+```
+Show a spinner while fetching options, then toggle the chevron based on the `open` state.
 
 ## Best Practices & Gotchas  
-* Keep the slot small; oversized elements break alignment.  
-* Place only interactive elements that belong to the input (e.g., clear, open).  
-* Stop event propagation inside nested buttons to avoid unwanted popover toggling.  
-* Use `pointer-events-none` on decorative icons to allow clicks to reach the input.  
+* Keep the slot compact; large children break vertical alignment.  
+* Stop event propagation inside buttons to avoid closing the popover unintentionally.  
+* Decorate only; never place heavy logic inside this presentational component.  
+* Hide loaders when not needed to avoid layout shifts.  
 
 ## Further Reading  
 * `SelectInputUI` – parent container.  
-* `SelectPopoverContent` – the popup list.  
-* `MultiSelectItemRemoveButtonUI` – common action inside multi-select inputs.
+* `SelectPopoverContent` – dropdown list.  
+* `SelectEachValue` – iterate over selected items.  
 
 <!-- End of Generated Documentation -->

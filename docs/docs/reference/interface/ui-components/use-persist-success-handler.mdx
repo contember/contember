@@ -2,18 +2,25 @@
 title: usePersistSuccessHandler
 ---
 
+<!-- Edited by human: false -->
+<!-- Examples count: 1 -->
+<!-- Source examples: 1 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 0 -->
+<!-- Import examples: 0 -->
+
 ## Overview
-`usePersistSuccessHandler` is a small React hook that displays a toast after data is successfully persisted.
+`usePersistSuccessHandler` is a small React hook that displays a toast after data is successfully persisted.  
 The hook returns a callback you call with the persistence result; it then shows the correct success message.
 
 ## Styling Guidelines
 * All code samples use Tailwind CSS utility classes.
-* The hook itself has no visual output and requires no Contember‑specific theme classes.
+* The hook itself has no visual output and requires no Contember-specific theme classes.
 
 ## Core Concepts
 * Treat persistence as an asynchronous side effect.
 * Decouple UI feedback (toast) from the code that performs the request.
-* Keep success handling logic reusable across multiple save operations.
+* Keep success-handling logic reusable across multiple save operations.
 
 ## Quick Start
 ```tsx
@@ -46,6 +53,14 @@ _None_
 
 ## Examples
 
+### Basic usage with a promise chain
+```tsx
+const handleSuccess = usePersistSuccessHandler()
+
+persistData().then(result => handleSuccess(result))
+```
+Call the handler in the `then` callback to show a toast once the request resolves.
+
 ### Updating a user profile
 ```tsx
 import { usePersistSuccessHandler } from '@contember/react'
@@ -68,7 +83,7 @@ export const ProfileForm = () => {
 	)
 }
 ```
-`handleSuccess` shows a toast (e.g. “Profile updated”) when the API responds successfully.
+`handleSuccess` shows a toast (for example “Profile updated”) when the API responds successfully.
 
 ## Best Practices & Gotchas
 * Always call the returned callback inside your `then`/`catch` chain or `try`/`await` block after a successful request.

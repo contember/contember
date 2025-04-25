@@ -1,0 +1,80 @@
+---
+title: Toaster
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 10 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 2 -->
+<!-- External examples: 8 -->
+<!-- Import examples: 7 -->
+
+## Overview
+`Toaster` mounts a global toast notification system.  
+Place it high in your component tree so every page can dispatch messages.
+
+## Styling Guidelines
+* All examples use Tailwind CSS.  
+* `Toaster` itself adds no Contember-specific theme classes.
+
+## Core Concepts
+* Global provider – one `Toaster` per application.
+* Must wrap all routes so every page can trigger toasts.
+* Requires no props; configuration is internal to the toast library.
+
+## Quick Start
+```tsx
+import { Toaster } from '~/lib/toast'
+
+export default function App() {
+	return (
+		<div className="min-h-screen bg-gray-50">
+			<Toaster />
+			{/* your app routes here */}
+		</div>
+	)
+}
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| _None_ | – | – | – | – |
+
+## Sub-Components / Building Blocks
+### ToastContent
+A utility component for custom toast bodies. _See its dedicated docs._
+
+### useShowToast
+React hook that triggers a toast. _See its dedicated docs._
+
+## Examples
+### Wrapping a multi-page application
+```tsx
+import { Toaster } from '~/lib/toast'
+import { Pages } from './Pages'
+import { Layout } from './Layout'
+
+export const Entrypoint = () => (
+	<Toaster>
+		<Pages layout={Layout} children={import.meta.glob('./pages/**/*.tsx', { eager: true })} />
+	</Toaster>
+)
+```
+`Toaster` wraps `Pages`, ensuring every route can show notifications.
+
+## Best Practices & Gotchas
+* Mount exactly one `Toaster`. Multiple instances duplicate toasts.
+* Place it as high as possible, ideally above routing providers.
+* Keep toast messages short; avoid multi-line paragraphs.
+* Test announcement timing for accessibility.
+
+## Further Reading
+* `useShowToast` hook  
+* `ToastContent` component  
+* Contember Routing Provider  
+
+<!-- End of Generated Documentation -->

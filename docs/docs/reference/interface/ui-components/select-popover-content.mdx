@@ -3,10 +3,10 @@ title: SelectPopoverContent
 ---
 
 <!-- Edited by human: false -->
-<!-- Examples count: 10 -->
+<!-- Examples count: 8 -->
 <!-- Source examples: 0 -->
 <!-- Playground examples: 0 -->
-<!-- External examples: 10 -->
+<!-- External examples: 8 -->
 <!-- Import examples: 5 -->
 
 ## Overview
@@ -89,17 +89,84 @@ _None_
 	))}
 </SelectPopoverContent>
 ```
-This pattern shows how you update the form state and close the popover from inside a list item.
+You update the form state and close the popover from inside a list item.
 
 ### Data-view backed select
 ```tsx
 <SelectPopoverContent>
-	<DefaultSelectDataView initialSorting={initialSorting} queryField={queryField}>
-		{children}
-	</DefaultSelectDataView>
+	<SelectEntityDataView {...rest}>
+		<DefaultSelectDataViewRenderer>{children}</DefaultSelectDataViewRenderer>
+	</SelectEntityDataView>
 </SelectPopoverContent>
 ```
-Here the content renders a data view that handles pagination and filtering automatically.
+`SelectEntityDataView` handles server paging, filtering, and sorting.  
+`SelectPopoverContent` only provides the scrollable container.
+
+### Searchable select with loading indicator
+```tsx
+<SelectPopoverContent>
+	{searchable && (
+		<div className="px-2 py-1.5 pb-4">
+			<div className="relative">
+				<Search className="absolute left-2.5 top-2 h-4 w-4 text-gray-500" />
+				<Input
+					placeholder="Search..."
+					className="pl-8"
+					value={searchQuery}
+					onChange={e => setSearchQuery(e.target.value)}
+					inputSize="sm"
+					autoFocus
+				/>
+			</div>
+		</div>
+	)}
+	<ScrollArea className="max-h-80">
+		{isLoading && (
+			<SelectListItemUI>
+				<Loader size="md" />
+			</SelectListItemUI>
+		)}
+		{error && <SelectListItemUI>{error}</SelectListItemUI>}
+		{!isLoading && filteredItems?.length === 0 && (
+			<SelectListItemUI className="hover:cursor-default hover:bg-transparent">
+				{componentLabels.simpleSelect.noData}
+			</SelectListItemUI>
+		)}
+		{filteredItems?.map((item, index) => (
+			<SelectListItemUI
+				key={getItemValue ? String(getItemValue(item)) : `item-${index}`}
+				onClick={() => handleItemClick(item)}
+			>
+				{getItemLabel(item)}
+			</SelectListItemUI>
+		))}
+	</ScrollArea>
+</SelectPopoverContent>
+```
+The search input sits above a scrollable list.  
+Loading, empty, and error states reuse `SelectListItemUI` for visual consistency.
+
+### Data-grid filter select
+```tsx
+<Popover>
+	<PopoverTrigger asChild>
+		<DataGridFilterSelectTriggerUI>{label}</DataGridFilterSelectTriggerUI>
+	</PopoverTrigger>
+	<SelectPopoverContent>
+		<DataViewQueryFilter
+			toggleInclude={toggleInclude}
+			toggleExclude={toggleExclude}
+			included={included}
+			excluded={excluded}
+			entityName={entityName}
+			initialSorting={initialSorting}
+		>
+			{children}
+		</DataViewQueryFilter>
+	</SelectPopoverContent>
+</Popover>
+```
+You wrap `DataViewQueryFilter` to offer include/exclude toggles inside the popover.
 
 ## Best Practices & Gotchas
 * Always place `SelectPopoverContent` inside the same `Popover` that holds the trigger.  

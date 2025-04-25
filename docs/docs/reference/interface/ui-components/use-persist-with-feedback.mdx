@@ -4,6 +4,10 @@ title: usePersistWithFeedback
 
 <!-- Edited by human: false -->
 <!-- Examples count: 1 -->
+<!-- Source examples: 1 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 0 -->
+<!-- Import examples: 5 -->
 
 # usePersistWithFeedback
 
@@ -13,7 +17,7 @@ The hook returns a callback that saves pending mutations, then shows a success o
 
 ## Styling Guidelines
 * All examples use Tailwind.  
-* The hook itself needs no Contember‑specific theme classes.
+* The hook itself needs no Contember-specific theme classes.
 
 ## Core Concepts
 * Trigger persistence from any UI element.  
@@ -23,7 +27,7 @@ The hook returns a callback that saves pending mutations, then shows a success o
 
 ## Quick Start
 ```tsx
-import { usePersistWithFeedback } from '@contember/react'
+import { usePersistWithFeedback } from '~/lib/binding'
 
 export const SaveButton = () => {
   const persistWithFeedback = usePersistWithFeedback()
@@ -45,14 +49,14 @@ _None_
 ## Props Reference
 _None_
 
-## Sub‑Components / Building Blocks
+## Sub-Components / Building Blocks
 _None_
 
 ## Examples
 
 ### Simple save button
 ```tsx
-import { usePersistWithFeedback } from '@contember/react'
+import { usePersistWithFeedback } from '~/lib/binding'
 
 export const SimpleSave = () => {
   const persistWithFeedback = usePersistWithFeedback()
@@ -71,7 +75,7 @@ This is the smallest viable setup. The button calls `persistWithFeedback` on cli
 
 ### Form footer with autosave prompt
 ```tsx
-import { usePersistWithFeedback } from '@contember/react'
+import { usePersistWithFeedback } from '~/lib/binding'
 
 export const FormFooter = () => {
   const persistWithFeedback = usePersistWithFeedback()
@@ -94,7 +98,7 @@ The footer warns users that data lives only in the browser.
 
 ### Toolbar shortcut
 ```tsx
-import { usePersistWithFeedback } from '@contember/react'
+import { usePersistWithFeedback } from '~/lib/binding'
 import { useHotkeys } from 'react-hotkeys-hook'
 
 export const SaveHotkey = () => {
@@ -112,12 +116,12 @@ You wire the hook to a keyboard shortcut, improving editor ergonomics.
 
 ## Best Practices & Gotchas
 * Call the returned function inside UI events, not during render.  
-* Await the promise if you need post‑save logic.  
+* Await the promise if you need post-save logic.  
 * Combine with optimistic UI only when network latency is low.  
 * Do not wrap the hook in conditionals; follow React Rules of Hooks.
 
 ## Further Reading
-* `usePersist` – low‑level variant without toasts.  
+* `usePersist` – low-level variant without toasts.  
 * Contember Toast API.  
 * Data mutations and transaction queue.
 

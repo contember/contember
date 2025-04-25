@@ -4,11 +4,15 @@ title: usePersistFeedbackHandlers
 
 <!-- Edited by human: false -->
 <!-- Examples count: 1 -->
+<!-- Source examples: 1 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 0 -->
+<!-- Import examples: 0 -->
 
 # usePersistFeedbackHandlers
 
 ## Overview
-`usePersistFeedbackHandlers` is a React hook that centralizes persistence‑related feedback.  
+`usePersistFeedbackHandlers` is a React hook that centralizes persistence-related feedback.  
 You receive handlers—currently only a success handler—to plug into any async workflow.
 
 ## Styling Guidelines
@@ -18,7 +22,7 @@ You receive handlers—currently only a success handler—to plug into any async
 ## Core Concepts
 * Keep feedback logic outside UI components.  
 * Reuse a single success handler across mutations.  
-* Compose the handler with any `Promise`‑returning function.
+* Compose the handler with any `Promise`-returning function.
 
 ## Quick Start
 ```tsx
@@ -61,32 +65,11 @@ const { onPersistSuccess } = usePersistFeedbackHandlers()
 
 persistData().then(onPersistSuccess)
 ```
-Pass the handler directly to the promise for a one‑liner feedback solution.
-
-### Integrating with a form submit
-```tsx
-const { onPersistSuccess } = usePersistFeedbackHandlers()
-
-const handleSubmit = async (values: FormValues) => {
-	await saveForm(values).then(onPersistSuccess)
-}
-```
-Your form stays slim while feedback remains consistent across pages.
-
-### Chaining multiple async calls
-```tsx
-const { onPersistSuccess } = usePersistFeedbackHandlers()
-
-const handleComplexSave = async () => {
-	await uploadAssets()
-	await saveMetadata().then(onPersistSuccess)
-}
-```
-You can call the handler in any branch, avoiding duplicated toast logic.
+Pass the handler directly to the promise for a one-liner feedback solution.
 
 ## Best Practices & Gotchas
 * Call the handler only after the promise resolves.  
-* Keep the handler side‑effect focused; do not mutate unrelated state.  
+* Keep the handler side-effect focused; do not mutate unrelated state.  
 * Memoize long callbacks with `useCallback` when passing them to children.  
 * Plan for future error or loading handlers; the hook may expand.
 

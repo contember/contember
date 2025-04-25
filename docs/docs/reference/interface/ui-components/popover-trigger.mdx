@@ -1,0 +1,85 @@
+---
+title: PopoverTrigger
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 15 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 5 -->
+<!-- External examples: 10 -->
+<!-- Import examples: 8 -->
+
+## Overview
+_None_
+
+## Styling Guidelines
+* All examples use Tailwind CSS utility classes.  
+* Ensure Contember’s base theme classes are loaded before using the component.
+
+## Core Concepts
+* PopoverTrigger links a user-visible element to its parent `Popover`.  
+* You usually pass `asChild` to render your own element as the trigger.  
+* Popover state (open / close) is controlled by the surrounding `Popover`.
+
+## Quick Start
+```tsx
+import { Popover, PopoverContent, PopoverTrigger } from '~/lib/ui/popover'
+
+export default () => (
+	<Popover>
+		<PopoverTrigger asChild>
+			<button className="px-2 py-1 border rounded">Open popover</button>
+		</PopoverTrigger>
+
+		<PopoverContent className="p-4 bg-white shadow">
+			Hello, world!
+		</PopoverContent>
+	</Popover>
+)
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+_None_
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+
+### Icon button trigger
+```tsx
+<PopoverTrigger asChild>
+	<Button variant="outline" size="xs">
+		<SendIcon className="w-4" />
+	</Button>
+</PopoverTrigger>
+```
+The trigger reuses your `Button` component. Passing `asChild` ensures `PopoverTrigger` does not add extra DOM nodes, keeping styles intact.
+
+### Absolute-positioned hotspot
+```tsx
+<PopoverTrigger asChild>
+	<button
+		type="button"
+		className="absolute ring-[5px] ring-blue-500 rounded-full"
+		style={{ left: '45%', top: '30%', width: '10%' }}
+	>
+		<span className="block w-full h-0 pb-[100%]" />
+	</button>
+</PopoverTrigger>
+```
+You can attach a popover to any positioned element. The trigger can be disabled or styled freely.
+
+## Best Practices & Gotchas
+* Always add `asChild` when you want to style the trigger yourself.  
+* Keep the trigger focusable for keyboard users.  
+* Group trigger and content within the same `Popover` component.
+
+## Further Reading
+* `Popover` – the container that manages open / close state.  
+* `PopoverContent` – the fly-out panel that holds your UI.
+
+<!-- End of Generated Documentation -->

@@ -1,0 +1,140 @@
+---
+title: ToggleGroup
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 6 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 6 -->
+<!-- Import examples: 5 -->
+
+# ToggleGroup
+
+## Overview
+ToggleGroup renders a set of mutually related buttons. You use it to switch between predefined values, most often years, ratings, or categories.  
+The component is fully controlled—pass the current value and handle `onValueChange` to update your state.
+
+## Styling Guidelines
+* All examples use Tailwind CSS classes.  
+* Contember’s default theme adds utility classes such as `bg-muted`, `text-primary`, and `data-[state=on]:*` for on-state styling.
+
+## Core Concepts
+* Controlled component – always supply `value` and `onValueChange`.
+* `type="single"` lets users pick exactly one option.
+* Wrap each option in `ToggleGroupItem`.
+* Apply Tailwind state selectors (`data-[state=on]:*`) for active styles.
+* Use `unselectable="off"` to forbid unselecting the last active item.
+
+## Quick Start
+```tsx
+import { ToggleGroup, ToggleGroupItem } from '~/lib/ui/toggle-group'
+
+export const YearSwitcher = () => {
+  const [year, setYear] = React.useState('2024')
+
+  return (
+    <ToggleGroup
+      type="single"
+      value={year}
+      onValueChange={setYear}
+      className="bg-muted rounded-md flex gap-2 p-1"
+      unselectable="off"
+    >
+      <ToggleGroupItem value="2023" className="px-3 py-1 data-[state=on]:text-primary">
+        2023
+      </ToggleGroupItem>
+      <ToggleGroupItem value="2024" className="px-3 py-1 data-[state=on]:text-primary">
+        2024
+      </ToggleGroupItem>
+    </ToggleGroup>
+  )
+}
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| type | `"single"` | No | `"single"` | Selection mode. Only the `"single"` variant is shown in examples. |
+| value | `string` | Yes | – | Currently selected value. |
+| onValueChange | `(value: string \| undefined) => void` | Yes | – | Handler called when the user picks a different item. |
+| className | `string` | No | – | Tailwind classes applied to the root element. |
+| unselectable | `"off"` \| `"on"` | No | `"on"` | When `"off"`, the last selected item cannot be unselected. |
+| …rest | *Inherited div props* | No | – | Any additional props supported by a standard `div`. |
+
+## Sub-Components / Building Blocks
+### ToggleGroupItem
+Single option inside a ToggleGroup. It receives the following props:
+
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| value | `string` | Yes | – | Value emitted when this item is selected. |
+| className | `string` | No | – | Tailwind classes applied to the button element. |
+| …rest | *Inherited button props* | No | – | Standard button attributes (disabled, title, etc.). |
+
+## Examples
+### Emoji Rating Selector
+```tsx
+const ratings = [1, 2, 3, 4, 5]
+
+<ToggleGroup
+  type="single"
+  value={rating?.toString()}
+  onValueChange={v => v && setRating(Number(v))}
+  className="flex justify-between w-full"
+>
+  {ratings.map(r => (
+    <ToggleGroupItem
+      key={r}
+      value={r.toString()}
+      className="data-[state=on]:bg-gray-200 p-2 rounded"
+    >
+      {r === 1 && <AngryIcon className="text-red-600" />}
+      {r === 2 && <FrownIcon className="text-orange-600" />}
+      {r === 3 && <MehIcon className="text-yellow-600" />}
+      {r === 4 && <SmileIcon className="text-green-600" />}
+      {r === 5 && <LaughIcon className="text-green-600" />}
+    </ToggleGroupItem>
+  ))}
+</ToggleGroup>
+```
+Use visual cues (icons, colors) to communicate meaning while the core logic stays unchanged.
+
+### Year Filter
+```tsx
+<ToggleGroup
+  type="single"
+  value={year}
+  onValueChange={setYear}
+  className="bg-muted w-fit rounded-md"
+  unselectable="off"
+>
+  {[2023, 2024].map(y => (
+    <ToggleGroupItem
+      key={y}
+      value={y.toString()}
+      className="text-xs data-[state=on]:text-primary data-[state=on]:pointer-events-none"
+    >
+      {y}
+    </ToggleGroupItem>
+  ))}
+</ToggleGroup>
+```
+Prevent users from clearing the filter by keeping `unselectable="off"`.
+
+## Best Practices & Gotchas
+* Keep `value` in sync with your state; uncontrolled usage leads to UI desync.
+* Always wrap items in `ToggleGroupItem`; plain children will not register clicks.
+* Use `data-[state=on]:pointer-events-none` to disable clicks on the active item.
+* Limit the number of items to avoid horizontal overflow on small screens.
+* Provide accessible labels when items contain only icons.
+
+## Further Reading
+* ToggleGroupItem (sub-component)
+* Radix UI Toggle Group for behavioural inspiration
+* Contember Form fields for controlled value patterns
+
+<!-- End of Generated Documentation -->

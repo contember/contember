@@ -1,0 +1,100 @@
+---
+title: DataGridDateColumn
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 13 -->
+<!-- Source examples: 1 -->
+<!-- Playground examples: 2 -->
+<!-- External examples: 10 -->
+<!-- Import examples: 7 -->
+
+# DataGridDateColumn
+
+## Overview
+`DataGridDateColumn` renders a table column with date values inside a `DataGridTable`.
+You pass a field name and the component shows the formatted date, optional header and filter components.
+
+## Styling Guidelines
+* All examples use Tailwind CSS classes out-of-the-box.
+* No additional Contember theme classes are required for this component.
+
+## Core Concepts
+* Column definition inside a `DataGridTable`.
+* Automatic label formatting when `header` is not supplied.
+* Built-in date formatting with the option to override via `format`.
+* Optional inline filter rendered via the `filter` prop.
+
+## Quick Start
+```tsx
+import { DataGridTable, DataGridDateColumn } from '~/lib/datagrid'
+
+export const Page = () => (
+	<DataGridTable className="min-w-full divide-y divide-gray-200">
+		<DataGridDateColumn field="createdAt" />
+	</DataGridTable>
+)
+```
+
+## Detailed Guide
+```tsx
+<DataGridDateColumn
+	field="publishedAt"
+	header="Published at"
+	format={value => new Date(value).toLocaleDateString()}
+filter={<MyCustomDateRangeFilter />}
+/>
+```
+* `header` overrides the auto-generated label.
+* `format` lets you display relative dates, locale specific strings, or custom JSX.
+* `filter` replaces the default date filter with your own component.
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| field | string | Yes | — | Displayed field. |
+| header | React.ReactNode | No | — | Custom header. When omitted, the label formatter is used. |
+| children | React.ReactNode | No | — | Custom cell content. When omitted, the field value is displayed. |
+| format | (value: string) => React.ReactNode | No | default date formatter | Custom value formatter. |
+| filter | React.ReactNode | No | default date filter | Custom filter component. |
+
+## Sub-Components / Building Blocks
+### Default Date Filter
+Rendered automatically when no `filter` prop is provided. It lets users filter by exact date or range.
+
+### createDataGridDateRange
+Utility factory (import from `~/lib/datagrid`) to build range filters compatible with `DataGridDateColumn`.
+
+## Examples
+### Inline Click-to-Edit
+```tsx
+<DataGridDateColumn
+	field="createdAt"
+	format={date => (
+		<ClickToEdit
+			view={new Date(date).toLocaleDateString()}
+			edit={<InputField field="createdAt" label={undefined} />}
+		/>
+	)}
+/>
+```
+This pattern shows the raw date, then swaps to an `InputField` when the user clicks.
+
+### Production Listing
+```tsx
+<DataGridDateColumn header="Published at" field="publishedAt" />
+```
+Used alongside text, enum and relation columns to display publication dates in a blog, CMS, or admin portal.
+
+## Best Practices & Gotchas
+* Keep dates in ISO-8601 strings on the server; the default formatter expects that format.
+* Provide a `format` function for locale sensitive output.
+* Use `createDataGridDateRange` when you need complex range filters.
+* Avoid heavy JSX inside `format`; delegate complex rendering to `children`.
+
+## Further Reading
+* `DataGridDateTimeColumn` – display date & time together.
+* `DataGridTextColumn` – render plain strings next to your dates.
+* `DataGridNumberColumn` – numeric counterpart for amounts and counts.
+
+<!-- End of Generated Documentation -->

@@ -1,0 +1,121 @@
+---
+title: SidebarMenuButton
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 9 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 1 -->
+<!-- External examples: 8 -->
+<!-- Import examples: 5 -->
+
+# SidebarMenuButton
+
+## Overview
+`SidebarMenuButton` renders a clickable item inside a Contember sidebar.  
+You use it to wrap links, avatars, and icons that live in `SidebarMenuItem` or `SidebarMenuSubItem`.
+
+## Styling Guidelines
+* All snippets use Tailwind CSS.
+* The Contember sidebar theme relies on the CSS variables prefixed with `--sidebar-*` and utility classes like `bg-sidebar-accent`. No extra theme setup is required for the button itself.
+
+## Core Concepts
+* The component visually highlights the current route when `isActive` is true.  
+* `asChild` lets you pass any element (usually `<a>` or `<Link>`) while preserving styles.  
+* The optional `size` prop changes padding and text size.
+
+## Quick Start
+```tsx
+import { SidebarMenuItem, SidebarMenuButton } from '~/lib/ui/sidebar'
+
+<SidebarMenuItem>
+  <SidebarMenuButton isActive>
+    <span className="flex items-center gap-2">
+      <HomeIcon className="h-4 w-4" />
+      Dashboard
+    </span>
+  </SidebarMenuButton>
+</SidebarMenuItem>
+```
+
+## Detailed Guide
+### Passing a React Router link with `asChild`
+```tsx
+<SidebarMenuItem>
+  <SidebarMenuButton asChild isActive={pathname === '/settings'}>
+    <Link to="/settings" className="flex items-center gap-2">
+      <CogIcon className="h-4 w-4" />
+      Settings
+    </Link>
+  </SidebarMenuButton>
+</SidebarMenuItem>
+```
+`asChild` prevents nested buttons and keeps your link accessible.
+
+### Enlarged user menu entry
+```tsx
+<SidebarMenuButton
+  size="lg"
+  className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+>
+  <Avatar className="icon h-6 w-6 rounded-lg">
+    <AvatarFallback className="rounded-lg">JD</AvatarFallback>
+  </Avatar>
+  <span className="truncate font-semibold">john.doe@example.com</span>
+  <ChevronsUpDown className="ml-auto size-4" />
+</SidebarMenuButton>
+```
+The `size="lg"` prop increases the touch-target and text size, suitable for user profiles or important actions.
+
+## Props Reference
+| Name      | Type           | Required | Default | Description                                           |
+|-----------|----------------|----------|---------|-------------------------------------------------------|
+| className | string         | No       | —       | Additional Tailwind classes.                          |
+| asChild   | boolean        | No       | false   | Renders the passed child element instead of a button. |
+| isActive  | boolean        | No       | false   | Applies active styles (usually current route).        |
+| size      | `'sm' \| 'md' \| 'lg'` | No | `'md'` | Changes padding and font size.                        |
+| **…Button HTML props** | React.ButtonHTMLAttributes<HTMLButtonElement> | No | — | All standard button attributes are forwarded. |
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+### Collapsible sidebar section trigger
+```tsx
+<CollapsibleTrigger asChild>
+  <SidebarMenuButton>
+    {icon}
+    <span>{label}</span>
+    <ChevronDown className="ml-auto h-4 w-4" />
+  </SidebarMenuButton>
+</CollapsibleTrigger>
+```
+Use the button as a trigger inside `@radix-ui/react-collapsible` to create expandable menu groups.
+
+### Action menu with permission guard
+```tsx
+{hasPermission && (
+  <SidebarMenuItem>
+    <SidebarMenuButton asChild>
+      <Link to="/admin">
+        <ShieldIcon />
+        Admin Panel
+      </Link>
+    </SidebarMenuButton>
+  </SidebarMenuItem>
+)}
+```
+Wrap the button in conditional logic to show items only to authorized users.
+
+## Best Practices & Gotchas
+* Always pair `SidebarMenuButton` with `SidebarMenuItem` for proper spacing.  
+* Use `isActive` instead of custom class overrides – it keeps theme consistency.  
+* Prefer `asChild` when integrating with routing libraries to avoid nested interactive elements.  
+* Do not rely on `size` for all spacing; nest content in flex layouts when necessary.
+
+## Further Reading
+* `SidebarMenuItem` – parent container for the button.  
+* `SidebarMenuSubButton` – equivalent inside nested sub-menus.  
+* `useSidebar` – hook for opening or collapsing the mobile sidebar.  
+
+<!-- End of Generated Documentation -->

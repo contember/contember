@@ -1,0 +1,108 @@
+---
+title: DataGridRelationFilteredItemsList
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 10 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 10 -->
+<!-- Import examples: 5 -->
+
+# DataGridRelationFilteredItemsList
+
+## Overview
+DataGridRelationFilteredItemsList renders the list of records currently matched by a relation filter inside a DataGrid.
+You usually place it inside a filter pop-over so users see which entities the filter targets.
+
+## Styling Guidelines
+* All examples use Tailwind classes.
+* No special Contember theme classes are required—standard Tailwind utilities are enough.
+
+## Core Concepts
+* Works only inside a relation filter context.
+* Renders its children for every filtered entity.
+* Keeps the list visually aligned by exposing no extra wrapper markup.
+* Does not fetch data—children handle their own queries.
+
+## Quick Start
+```tsx
+import {
+	DataViewHasManyFilter,
+	DataGridRelationFilteredItemsList,
+	DataGridRelationFilterControls,
+} from '~/lib/datagrid'
+import { CompanyWorkplacePreview } from './CompanyWorkplacePreview'
+
+<DataViewHasManyFilter field="workplaces">
+	<div className="border rounded p-2 max-w-60 flex flex-col gap-2">
+		<div className="flex flex-wrap gap-2">
+			<DataGridRelationFilteredItemsList>
+				<CompanyWorkplacePreview />
+			</DataGridRelationFilteredItemsList>
+		</div>
+
+		<DataGridRelationFilterControls>
+			<CompanyWorkplacePreview />
+		</DataGridRelationFilterControls>
+	</div>
+</DataViewHasManyFilter>
+```
+
+## Examples
+
+### Showing selected medical providers
+```tsx
+<DataViewHasManyFilter field="medicalProviders">
+	<div className="border rounded p-2 max-w-60 flex flex-col gap-2">
+		<div className="flex flex-wrap gap-2">
+			<DataGridRelationFilteredItemsList>
+				<MedicalProviderLocalityPreview />
+			</DataGridRelationFilteredItemsList>
+		</div>
+
+		<DataGridRelationFilterControls>
+			<MedicalProviderLocalityPreview />
+		</DataGridRelationFilterControls>
+	</div>
+</DataViewHasManyFilter>
+```
+When the user picks medical providers, each provider preview appears in the list immediately, confirming the filter content.
+
+### Nested usage inside a custom column filter
+```tsx
+<DataGridColumn
+	header={<DataViewHasManyLabel field="costCenters" />}
+	name="costCenters"
+	filterName="costCenters"
+	filter={
+		<DataViewHasManyFilter field="costCenters">
+			<div className="border rounded p-2 max-w-60 flex flex-col gap-2">
+				<div className="flex flex-wrap gap-2">
+					<DataGridRelationFilteredItemsList>
+						<CompanyCostCenterPreview />
+					</DataGridRelationFilteredItemsList>
+				</div>
+
+				<DataGridRelationFilterControls>
+					<CompanyCostCenterPreview />
+				</DataGridRelationFilterControls>
+			</div>
+		</DataViewHasManyFilter>
+	}
+/>
+```
+The column offers an inline filter. The component shows the filtered cost centers directly within the pop-over.
+
+## Best Practices & Gotchas
+* Wrap it in a flex container with `flex-wrap` for nice chip layout.
+* Keep child previews small to avoid oversized filter pop-overs.
+* Use together with DataGridRelationFilterControls to provide add/remove actions.
+* Avoid placing heavy queries in children; use lightweight preview fragments.
+
+## Further Reading
+* DataGridRelationFilterControls
+* DataViewHasManyFilter
+* DataGridHasManyColumn
+
+<!-- End of Generated Documentation -->

@@ -1,0 +1,77 @@
+---
+title: DataGridToolbarVisibleElements
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 0 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 0 -->
+<!-- Import examples: 0 -->
+
+# DataGridToolbarVisibleElements
+
+## Overview
+`DataGridToolbarVisibleElements` lets users toggle which columns appear in a data grid.
+Place it inside a grid toolbar to give readers a quick “show / hide column” menu.
+
+## Styling Guidelines
+* All examples use Tailwind CSS.
+* The component relies only on Contember’s default theme—no extra classes required.
+
+## Core Concepts
+* Column visibility belongs to the data-view layer, not the grid itself.
+* The component reads and writes column preferences via Contember’s data-view context.
+* You can supply a custom `elements` array to limit available columns.
+
+## Quick Start
+```tsx
+import { DataGridToolbarVisibleElements } from '@contember/react-dataview'
+
+export const OrdersGridToolbar = () => (
+	<div className="flex items-center gap-2">
+		<DataGridToolbarVisibleElements />
+	</div>
+)
+```
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| elements | DataViewElementData[] | No | – | Custom list of columns that the user can toggle. |
+| *Inherited props* | – | – | – | – |
+
+## Examples
+
+### Limit toggleable columns
+```tsx
+import { DataGridToolbarVisibleElements, useDataViewElements } from '@contember/react-dataview'
+
+export const ProductsGridToolbar = () => {
+	const allElements = useDataViewElements()
+
+	const visibleElements = allElements.filter(element =>
+		['name', 'price', 'stock'].includes(element.name),
+	)
+
+	return (
+		<div className="flex items-center gap-2">
+			<DataGridToolbarVisibleElements elements={visibleElements} />
+		</div>
+	)
+}
+```
+This snippet restricts the menu to `name`, `price`, and `stock` columns while hiding advanced fields.
+
+## Best Practices & Gotchas
+* Place the control inside the grid’s toolbar so users find it quickly.
+* Keep the list short—over 10 columns can overwhelm the dropdown.
+* Avoid computing `elements` on every render; memoize or derive them once.
+* Pair with a persistence layer to remember user choices across sessions.
+
+## Further Reading
+* DataGridToolbar
+* useDataViewElements hook
+* DataGrid column configuration
+
+<!-- End of Generated Documentation -->

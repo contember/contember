@@ -1,0 +1,95 @@
+---
+title: DataViewHasManyLabel
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 11 -->
+<!-- Source examples: 1 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 10 -->
+<!-- Import examples: 5 -->
+
+# DataViewHasManyLabel
+
+## Overview
+`DataViewHasManyLabel` displays a human-friendly label for a has-many relation field of the current entity.  
+It discovers the correct label at runtime from the Contember schema, so you avoid hard-coding field names.
+
+## Styling Guidelines
+* All examples use Tailwind CSS classes.  
+* No special Contember theme classes are required for this component.
+
+## Core Concepts
+* The component works only inside an active Contember `Entity` context.  
+* You pass a `field` prop containing the relation path (e.g. `"comments"`).  
+* The label resolves using the project schema’s `label` metadata.  
+* It is presentation-only; no data is fetched.  
+* Ideal for table headers, list headers, or filter panels.
+
+## Quick Start
+```tsx
+import { DataViewHasManyLabel } from '~/lib/datagrid/labels'
+
+export const PostListHeader = () => (
+	<h2 className="text-lg font-semibold">
+		<DataViewHasManyLabel field="comments" />
+	</h2>
+)
+```
+
+## Detailed Guide
+### Using in a DataGrid column
+```tsx
+import { DataGridColumn } from '@contember/react-datagrid'
+import { DataViewHasManyLabel } from '~/lib/datagrid/labels'
+
+<DataGridColumn
+	header={<DataViewHasManyLabel field="tags" />}
+	name="tags"
+/>
+```
+* The column header now shows the localized “Tags” label.  
+* You avoid keeping the column label in sync with the schema.
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+| ---- | ---- | -------- | ------- | ----------- |
+| field | string | Yes | — | Relation path to the has-many field. |
+| *...rest* | *Inherited* | No | — | Standard React props such as `className`. |
+
+## Sub-Components / Building Blocks
+### DataViewHasManyFilter
+Combines perfectly with `DataViewHasManyLabel` to filter by related entities while reusing the same label logic.
+
+## Examples
+### Show label inside a custom header
+```tsx
+<WorkforceJobHeader>
+	<DataViewHasManyLabel field="workplaces" />
+</WorkforceJobHeader>
+```
+You keep header text synchronized with the project schema.
+
+### Pair with a filter panel
+```tsx
+<DataViewHasManyFilter field="localities">
+	<div className="border p-2 rounded flex flex-col gap-2">
+		<DataViewHasManyLabel field="localities" />
+		{/* filter controls */}
+	</div>
+</DataViewHasManyFilter>
+```
+Users see the same label in both the grid header and filter panel.
+
+## Best Practices & Gotchas
+* Always pass a valid relation path; otherwise nothing renders.  
+* Prefer using it everywhere you show the field name to avoid drift.  
+* Wrap the component in a heading tag or Tailwind utility for proper semantics.  
+* Do not use it for scalar fields—use `DataViewFieldLabel` instead.
+
+## Further Reading
+* `DataViewFieldLabel` – labels for scalar fields.  
+* `DataViewHasManyFilter` – filtering UI for has-many relations.  
+* Contember schema `@label` doc.
+
+<!-- End of Generated Documentation -->

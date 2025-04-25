@@ -1,0 +1,123 @@
+---
+title: DataGridDateTimeColumn
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 12 -->
+<!-- Source examples: 1 -->
+<!-- Playground examples: 1 -->
+<!-- External examples: 10 -->
+<!-- Import examples: 6 -->
+
+# DataGridDateTimeColumn
+
+## Overview
+`DataGridDateTimeColumn` renders a date-time cell inside a `DataGridTable`.
+Use it when you need sortable, filterable date-time information without writing custom render logic.
+
+It accepts a field path, optional header, custom formatter, filter, or even full cell content through `children`.
+
+## Styling Guidelines
+* All examples use Tailwind CSS utility classes.
+* The component itself does not impose additional Contember theme classes.
+
+## Core Concepts
+* Map an entity field of type `DateTime` to a grid column.
+* Let Contember format, sort, and filter the field automatically.
+* Override header, cell, or filter rendering when you need bespoke UI.
+* Combine with other `DataGrid*Column` components to build feature-rich tables.
+
+## Quick Start
+```tsx
+// inside your page component
+import { DataGridTable, DataGridDateTimeColumn } from '~/lib/datagrid'
+
+export default () => (
+	<DataGridTable className="w-full">
+		<DataGridDateTimeColumn field="createdAt" />
+	</DataGridTable>
+)
+```
+
+## Detailed Guide
+### Custom header
+```tsx
+<DataGridDateTimeColumn field="createdAt" header="Created at" />
+```
+
+### Custom formatter
+Highlight past vs. future values:
+
+```tsx
+<DataGridDateTimeColumn
+	field="activeFrom"
+	format={value =>
+		!value || new Date().toISOString() < value ? (
+			<span className="text-destructive">Inactive</span>
+		) : (
+			<span className="text-success">Active</span>
+		)
+	}
+/>
+```
+
+### Inline editing
+```tsx
+<DataGridDateTimeColumn
+	field="updatedAt"
+	format={value => (
+		<ClickToEdit
+			view={new Date(value).toLocaleString()}
+			edit={<InputField field="updatedAt" label={undefined} />}
+		/>
+	)}
+/>
+```
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| field | `string` | Yes | — | Displayed field. |
+| header | `React.ReactNode` | No | auto-generated label | Custom column header. |
+| children | `React.ReactNode` | No | field value | Custom cell content. |
+| format | `(value: string) => React.ReactNode` | No | built-in date-time formatter | Custom value formatter. |
+| filter | `React.ReactNode` | No | default date filter | Custom filter element. |
+
+## Examples
+### Audit log table
+```tsx
+<DataGridTable className="min-w-full">
+	<DataGridTextColumn field="user.email" header="User" />
+	<DataGridTextColumn field="action" />
+	<DataGridDateTimeColumn field="executedAt" header="Executed" />
+</DataGridTable>
+```
+This grid lists user actions together with the exact execution timestamp.
+
+### Conditional styling
+```tsx
+<DataGridDateTimeColumn
+	field="expiresAt"
+	format={value => (
+		<span className={new Date(value) < new Date() ? 'text-red-600' : ''}>
+			{new Date(value).toLocaleString()}
+		</span>
+	)}
+/>
+```
+Expired dates appear in red, drawing immediate attention.
+
+## Best Practices & Gotchas
+* Store values in ISO 8601 format—Contember expects that.
+* Keep formatting functions pure; avoid network calls.
+* Use `header` only for simple text or icons; complex headers belong in `DataGridColumn`.
+* Remember timezone differences when comparing date strings.
+* Place filters consistently so users understand grid behavior.
+
+## Further Reading
+* `DataGridTable`
+* `DataGridDateColumn`
+* `DataGridTextColumn`
+* Contember documentation: DataGrid basics
+
+<!-- End of Generated Documentation -->

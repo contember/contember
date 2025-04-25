@@ -1,0 +1,106 @@
+---
+title: ToggleGroupItem
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 10 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 10 -->
+<!-- Import examples: 5 -->
+
+# ToggleGroupItem
+
+## Overview
+ToggleGroupItem renders a single selectable option inside a ToggleGroup.  
+It forwards events and accessibility props to the underlying element so the parent group can manage selection state.
+
+## Styling Guidelines
+* All examples use Tailwind CSS.  
+* You can target the `data-[state=on]` attribute to style the selected item.  
+* No additional Contember theme classes are required.
+
+## Core Concepts
+* A ToggleGroup controls which ToggleGroupItem is “on”.  
+* Each item needs a unique `value` string.  
+* Apply Tailwind utilities directly to the component.  
+* Use the `data-[state=on]` selector for active-state styling.  
+* The component passes through standard HTML attributes.
+
+## Quick Start
+```tsx
+import { ToggleGroup, ToggleGroupItem } from '~/lib/ui/toggle-group'
+
+export const YearSwitcher = () => (
+	<ToggleGroup className="inline-flex gap-2">
+		<ToggleGroupItem
+			value="2023"
+			className="px-3 py-1 rounded data-[state=on]:bg-primary data-[state=on]:text-white"
+		>
+			2023
+		</ToggleGroupItem>
+		<ToggleGroupItem
+			value="2024"
+			className="px-3 py-1 rounded data-[state=on]:bg-primary data-[state=on]:text-white"
+		>
+			2024
+		</ToggleGroupItem>
+	</ToggleGroup>
+)
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| value | string | Yes | — | Unique identifier passed to the parent ToggleGroup. |
+| className | string | No | — | Additional Tailwind classes. |
+| **Inherited HTML attributes** | — | No | — | All standard HTML attributes supported by the rendered element. |
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+
+### Emoji Rating Toggle
+Renders five icons that change color when selected.
+
+```tsx
+import { ToggleGroup, ToggleGroupItem } from '~/lib/ui/toggle-group'
+import { AngryIcon, FrownIcon, MehIcon, SmileIcon, LaughIcon } from './icons'
+
+export const RatingToggle = () => (
+	<ToggleGroup className="flex gap-2">
+		{[1, 2, 3, 4, 5].map(rating => (
+			<ToggleGroupItem
+				key={rating}
+				value={rating.toString()}
+				className="p-2 rounded data-[state=on]:bg-gray-200"
+			>
+				{rating === 1 && <AngryIcon className="text-red-600" />}
+				{rating === 2 && <FrownIcon className="text-orange-600" />}
+				{rating === 3 && <MehIcon className="text-yellow-600" />}
+				{rating === 4 && <SmileIcon className="text-green-600" />}
+				{rating === 5 && <LaughIcon className="text-green-600" />}
+			</ToggleGroupItem>
+		))}
+	</ToggleGroup>
+)
+```
+
+The `data-[state=on]:bg-gray-200` class highlights the selected rating while keeping unselected items transparent.
+
+## Best Practices & Gotchas
+* Always provide a `value`; without it the ToggleGroup cannot track selection.  
+* Use semantic elements (`button`, `div`, etc.) that match your accessibility needs.  
+* Avoid pointer-event blocking styles unless you intentionally want to disable re-selection.  
+* Prefer conditional classes (`data-[state=on]`) instead of manual class toggling.
+
+## Further Reading
+* ToggleGroup – parent component managing selection.  
+* Tailwind `data-` attribute selectors.  
+* Accessibility patterns for toggle buttons.
+
+<!-- End of Generated Documentation -->

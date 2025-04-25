@@ -1,0 +1,71 @@
+---
+title: DropdownMenuSubTrigger
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 0 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 0 -->
+<!-- Import examples: 0 -->
+
+## Overview
+_None_
+
+## Styling Guidelines
+All examples use Tailwind for utility-first styling.  
+This component requires no special Contember theme classes.
+
+## Core Concepts
+- Acts as a trigger that opens a nested dropdown menu.  
+- Must be placed inside `DropdownMenuSub`.  
+- Receives focus and hover states from Tailwind utility classes.
+
+## Quick Start
+```tsx
+import {
+  DropdownMenu,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuContent,
+} from '@contember/ui'
+
+export const BasicSubTrigger = () => (
+  <DropdownMenu>
+    <DropdownMenuSub>
+      <DropdownMenuSubTrigger className="flex items-center gap-2 px-2 py-1 hover:bg-gray-100">
+        More options
+      </DropdownMenuSubTrigger>
+
+      <DropdownMenuContent className="bg-white shadow-lg rounded">
+        {/* Sub-menu items go here */}
+      </DropdownMenuContent>
+    </DropdownMenuSub>
+  </DropdownMenu>
+)
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+_None_
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+_None_
+
+## Best Practices & Gotchas
+- Place `DropdownMenuSubTrigger` directly inside `DropdownMenuSub`.  
+- Use clear, concise text so users know a submenu exists.  
+- Add focus and hover Tailwind classes for keyboard accessibility.  
+- Keep submenu content concise to avoid deep nesting.
+
+## Further Reading
+- `DropdownMenu`  
+- `DropdownMenuSub`  
+- `DropdownMenuContent`  
+
+<!-- End of Generated Documentation -->

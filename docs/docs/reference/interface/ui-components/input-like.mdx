@@ -1,0 +1,95 @@
+---
+title: InputLike
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 3 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 1 -->
+<!-- External examples: 2 -->
+<!-- Import examples: 3 -->
+
+# InputLike
+
+## Overview
+InputLike is a lightweight wrapper that groups an input, prefixes, and suffixes into a single flex container.  
+Use it when you need consistent spacing, borders, or relative positioning around an input element.
+
+## Styling Guidelines
+* All code examples rely on Tailwind CSS classes.  
+* InputLike does not require any Contember-specific theme class; add your own Tailwind utilities as needed.
+
+## Core Concepts
+* Acts as a `<div>` container with forwarded `className`.
+* Lets you compose `InputBare`, icons, buttons, or links inside.
+* Leaves all actual input logic to its children.
+
+## Quick Start
+```tsx
+import { InputBare, InputLike } from '@app/lib/ui/input'
+
+export const UsernameField = () => (
+	<InputLike className="relative flex items-center rounded-md border">
+		<span className="px-2 text-gray-400">/</span>
+		<InputBare
+			placeholder="username"
+			className="flex-1 bg-transparent p-2 focus:outline-none"
+		/>
+	</InputLike>
+)
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| children | ReactNode | Yes | — | Elements rendered inside the wrapper. |
+| className | string | No | — | Additional Tailwind classes applied to the wrapper. |
+| ...divProps | `ComponentProps<'div'>` | No | — | Any native `<div>` attribute is forwarded. |
+
+### Inherited Props
+Listed above as `...divProps`.
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+
+### Prefix and External Link
+```tsx
+import { InputBare, InputLike } from '@app/lib/ui/input'
+import { ExternalLinkIcon } from '@heroicons/react/outline'
+
+export const RepoField = () => (
+	<InputLike className="relative">
+		<span className="-my-2 -ml-2 flex items-center py-1 pl-2 text-gray-400">github.com/</span>
+		<InputBare
+			placeholder="owner/repository"
+			className="pr-1 flex-1"
+		/>
+		<a
+			href="https://github.com"
+			target="_blank"
+			rel="noreferrer"
+			className="ml-auto -my-2 -mr-2 flex items-center rounded-r-md border-l bg-gray-50 px-2 text-gray-600 hover:bg-gray-100"
+		>
+			<ExternalLinkIcon className="h-4 w-4" />
+		</a>
+	</InputLike>
+)
+```
+Use a prefix to hint the constant part of the URL and a suffix link to open the final address.
+
+## Best Practices & Gotchas
+* Keep `InputLike` as thin as possible; avoid business logic inside it.  
+* Apply spacing classes (`p-*`, `gap-*`) to `InputLike`; avoid padding on `InputBare`.  
+* Use `flex` utilities to align icons and inputs consistently.  
+* When adding borders, round only the wrapper, not individual children, to avoid visual gaps.
+
+## Further Reading
+* Input  
+* InputBare  
+
+<!-- End of Generated Documentation -->

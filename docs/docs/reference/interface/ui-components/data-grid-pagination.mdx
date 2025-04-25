@@ -1,0 +1,96 @@
+---
+title: DataGridPagination
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 15 -->
+<!-- Source examples: 1 -->
+<!-- Playground examples: 4 -->
+<!-- External examples: 10 -->
+<!-- Import examples: 8 -->
+
+## Overview
+`DataGridPagination` renders navigation controls for moving across pages in a `DataView`.
+It shows first, previous, next, and last buttons and syncs with `DataGridLoader`.
+
+## Styling Guidelines
+* All examples use Tailwind classes.
+* No special Contember theme classes are required.
+
+## Core Concepts
+* Pagination is optional but recommended for large datasets.
+* The component must live inside a `DataView` (`DataGrid`, `DataView`, etc.).
+* It reacts to the current `DataView` paging state.
+* `sticky` keeps the bar visible while scrolling.
+
+## Quick Start
+```tsx
+<DataGrid entities="Article">
+	<DataGridLoader>
+		<DataGridTable />
+	</DataGridLoader>
+
+	<DataGridPagination />
+</DataGrid>
+```
+
+## Detailed Guide
+Making the bar sticky to the bottom edge:
+
+```tsx
+<DataGrid className="relative">
+	{/* …columns… */}
+	<DataGridPagination sticky className="border-t bg-white sticky bottom-0" />
+</DataGrid>
+```
+
+## Props Reference
+| Name   | Type    | Required | Default | Description                                    |
+|--------|---------|----------|---------|------------------------------------------------|
+| sticky | boolean | No       | false   | Keeps pagination bar fixed at the bottom edge. |
+
+_Inherited props: None_
+## Examples
+
+### Sticky pagination with custom layout
+```tsx
+<DataGrid
+	entities="GridArticle"
+	initialSorting={{ publishedAt: 'asc' }}
+>
+	<DataGridToolbar sticky />
+	<DataGridLoader>
+		<DataGridTable />
+	</DataGridLoader>
+
+	<DataGridPagination sticky className="border-t bg-gray-50" />
+</DataGrid>
+```
+The toolbar and pagination both stay visible. Users can filter and page without scrolling.
+
+### Pagination inside a dialog
+```tsx
+<DialogContent className="max-w-[90vw]">
+	<DataGrid entities="UploadImage">
+		<DataGridLoader>
+			<DataGridTiles className="grid-cols-3" />
+		</DataGridLoader>
+		<DataGridPagination />
+	</DataGrid>
+</DialogContent>
+```
+A modal picker uses pagination to load more images without closing the dialog.
+
+## Best Practices & Gotchas
+* Place pagination directly under the loader for clarity.
+* Combine with `initialItemsPerPage` for predictable UX.
+* Use `sticky` only when the grid has its own scroll container.
+* Avoid hiding pagination with overflow styles.
+
+## Further Reading
+* DataGridLoader
+* DataGridToolbar
+* DataGridTable
+* DataViewInfiniteLoadTrigger
+
+<!-- End of Generated Documentation -->

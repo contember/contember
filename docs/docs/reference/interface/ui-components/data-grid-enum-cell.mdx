@@ -1,0 +1,113 @@
+---
+title: DataGridEnumCell
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 8 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 8 -->
+<!-- Import examples: 2 -->
+
+# DataGridEnumCell
+
+## Overview
+`DataGridEnumCell` renders an enum value inside a data-grid table cell.
+It adds a tooltip that offers quick filtering actions for that enum.
+
+## Styling Guidelines
+* All snippets use Tailwind classes.
+* The component relies only on Contember default theme; no extra classes are required.
+
+## Core Concepts
+* Cell component, not a full column.
+* Expects an enum field on the entity.
+* Tooltip appears on hover or focus.
+* Tooltip can show custom actions or default quick filters.
+* Works inside a `<DataGridTable>`.
+
+## Quick Start
+```tsx
+import { DataGrid, DataGridTable, DataGridEnumCell } from '~/lib/datagrid'
+
+<DataGrid entities="Article">
+	<DataGridTable className="w-full text-sm">
+		<DataGridEnumCell field="status" className="px-4 py-2" />
+	</DataGridTable>
+</DataGrid>
+```
+
+## Detailed Guide
+### Custom tooltip actions
+You can inject buttons or links into the tooltip.
+
+```tsx
+<DataGridEnumCell
+	field="status"
+	tooltipActions={
+		<button
+			className="text-xs text-blue-600 hover:underline"
+			onClick={() => alert('Custom action')}
+		>
+			View history
+		</button>
+	}
+/>
+```
+
+### Overriding enum labels
+Pass an `options` map for friendly labels.
+
+```tsx
+<DataGridEnumCell
+	field="status"
+	options={{
+		draft: 'Draft 📝',
+		published: 'Published ✅',
+		archived: 'Archived 🗄️',
+	}}
+/>
+```
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| field | string &#124; { field: string; hasOneRelationPath?: SugarableHasOneRelation &#124; SugarableHasOneRelation[] } | Yes | — | Field to be displayed. |
+| filterName | string | No | — | Filter identifier. If missing, taken from `field`. |
+| options | Record<string, React.ReactNode> | No | — | Custom enum label map. |
+| tooltipActions | React.ReactNode | No | — | Extra elements rendered in the tooltip. |
+
+## Examples
+### Display course type with quick filter
+```tsx
+<DataGridTable>
+	{/* Other columns */}
+	<DataGridEnumCell field="course.type" className="px-4 py-2" />
+</DataGridTable>
+```
+The cell shows the current course type.
+Users can hover and filter the grid to that type instantly.
+
+### Enum with friendly labels and action
+```tsx
+<DataGridEnumCell
+	field="priority"
+	options={{ 1: 'Low', 2: 'Medium', 3: 'High' }}
+	tooltipActions={<TaskCreateDialog />}
+	className="px-4 py-2"
+/>
+```
+The tooltip shows “Low”, “Medium”, or “High” instead of raw numbers and adds a create-task dialog shortcut.
+
+## Best Practices & Gotchas
+* Use `DataGridEnumColumn` when you need sorting and filtering in the header.
+* Keep enum option labels short; long text breaks table layout.
+* Provide `options` when server enum values are cryptic.
+* Do not wrap the cell with additional `<td>`; include it directly in `<DataGridTable>`.
+
+## Further Reading
+* `DataGridEnumColumn` – full column version with header.
+* `DataGridTable` – renders grid body.
+* Filtering guide – learn how `filterName` integrates with filter forms.
+
+<!-- End of Generated Documentation -->

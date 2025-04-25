@@ -10,11 +10,11 @@ title: AudioRepeaterField
 <!-- Import examples: 0 -->
 
 ## Overview
-`AudioRepeaterField` lets you upload, preview, and order multiple audio files inside an Entity context.  
+`AudioRepeaterField` lets you upload, preview, and order multiple audio files inside an Entity context.
 It supports common audio formats, validates size, and renders an inline audio player for each file.
 
 ## Styling Guidelines
-* All examples use Tailwind CSS utility classes.  
+* All examples use Tailwind CSS utility classes.
 * No Contember-specific theme classes are required by default.
 
 ## Core Concepts
@@ -36,9 +36,6 @@ It supports common audio formats, validates size, and renders an inline audio pl
 </EntitySubTree>
 ```
 
-## Detailed Guide
-_None_
-
 ## Props Reference
 | Name | Type | Required | Default | Description |
 | ---- | ---- | -------- | ------- | ----------- |
@@ -54,9 +51,6 @@ _None_
 | fileTypeField | string | No | — | Stores MIME type. |
 | lastModifiedField | string | No | — | Stores last modified timestamp. |
 | **…inherited props** | — | — | — | Standard input props from Contember Field components. |
-
-## Sub-Components / Building Blocks
-_None_
 
 ## Examples
 
@@ -78,7 +72,7 @@ _None_
 	/>
 </EntityListSubTree>
 ```
-The list becomes draggable thanks to `sortableBy="order"`.  
+The list becomes draggable thanks to `sortableBy="order"`.
 Contember stores duration, size, and other metadata into dedicated columns.
 
 ## Best Practices & Gotchas

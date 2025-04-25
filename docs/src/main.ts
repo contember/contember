@@ -53,6 +53,11 @@ async function main() {
 				// eslint-disable-next-line no-console
 				console.log(`\n -> Processing component: ${sourceData.componentName}`)
 
+				if (config.excludeComponents?.includes(sourceData.componentName)) {
+					console.warn(`Component ${sourceData.componentName} is excluded from documentation.`)
+					continue
+				}
+
 				processedComponents.add(sourceData.componentName)
 
 				const outputFilePath = path.join(config.outputDir, `${kebabCase(sourceData.componentName)}.mdx`)

@@ -1,0 +1,121 @@
+---
+title: DataGridPerPageSelector
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 1 -->
+<!-- Source examples: 1 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 0 -->
+<!-- Import examples: 0 -->
+
+# DataGridPerPageSelector
+
+## Overview
+`DataGridPerPageSelector` lets users choose how many items appear on each page of a `DataView`.
+It renders a dropdown with several preset page-size options.
+
+## Styling Guidelines
+* All snippets use Tailwind CSS.
+* No Contember-specific theme classes are required.
+
+## Core Concepts
+* Pagination size controls live outside of the `DataGrid` itself.
+* `DataGridPerPageSelector` updates the surrounding `DataView` context.
+* You usually place the selector in a toolbar or header area.
+* It has no public props; behaviour comes from context.
+
+## Quick Start
+```tsx
+import { DataGrid, DataView, DataGridPerPageSelector } from '@contember/react-dataview'
+
+export const UsersPage = () => (
+	<DataView entities="User">
+		<div className="flex items-center justify-end">
+			<DataGridPerPageSelector />
+		</div>
+
+		<DataGrid
+			className="mt-4 border border-gray-200 rounded"
+			columns={[
+				{ header: 'Name', field: 'name' },
+				{ header: 'Email', field: 'email' },
+			]}
+		/>
+	</DataView>
+)
+```
+
+## Detailed Guide
+### 1. Place the selector near pagination controls
+Users expect the page-size selector next to page navigation buttons.
+
+```tsx
+<DataView entities="Article">
+	<header className="flex items-center justify-between mb-2">
+		<h1 className="text-lg font-semibold">Articles</h1>
+		<div className="flex gap-3">
+			<DataGridPerPageSelector />
+			<DataGridPaginator /> {/* Provided by Contember */}
+		</div>
+	</header>
+
+	<DataGrid columns={[{ header: 'Title', field: 'title' }]} />
+</DataView>
+```
+
+### 2. Use utility classes for spacing
+Tailwind makes alignment easy.
+
+```tsx
+<div className="flex gap-2 items-center">
+	<label className="text-sm text-gray-600">Rows per page:</label>
+	<DataGridPerPageSelector />
+</div>
+```
+
+## Examples
+
+### Example 1 – Admin list with compact toolbar
+```tsx
+<DataView entities="Product">
+	<div className="flex flex-wrap items-center gap-4 mb-3">
+		<SearchInput className="flex-1" placeholder="Search products…" />
+		<DataGridPerPageSelector />
+	</div>
+
+	<DataGrid columns={[
+		{ header: 'SKU', field: 'sku' },
+		{ header: 'Name', field: 'name' },
+		{ header: 'Price', field: 'price' },
+	]} />
+</DataView>
+```
+This layout reserves most space for search, while the selector stays visible on all screen sizes.
+
+### Example 2 – Centered selector below the table
+```tsx
+<DataView entities="Order">
+	<DataGrid columns={[{ header: 'Order #', field: 'number' }]} />
+
+	<footer className="mt-4 flex justify-center">
+		<DataGridPerPageSelector />
+	</footer>
+</DataView>
+```
+Placing the selector below the grid helps when vertical reading flow is preferred.
+
+## Best Practices & Gotchas
+* Pair the selector with a paginator for a complete pagination UX.
+* Avoid hiding it behind dropdowns; it needs one click.
+* Keep option lists short (5–4 values).
+* Do not wrap it with `Suspense`; it reads context synchronously.
+* Remember: the component accepts no props—configuration happens at `DataView` level.
+
+## Further Reading
+* DataGrid
+* DataGridPaginator
+* DataView
+* SearchInput
+
+<!-- End of Generated Documentation -->

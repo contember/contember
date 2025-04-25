@@ -1,0 +1,98 @@
+---
+title: DialogTitle
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 10 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 10 -->
+<!-- Import examples: 5 -->
+
+## Overview
+_None_
+
+## Styling Guidelines
+* All examples use Tailwind CSS utility classes.  
+* No additional Contember theme classes are required for `DialogTitle`.
+
+## Core Concepts
+* `DialogTitle` renders the heading inside a Contember `Dialog`.
+* It does not manage state; it only displays content.
+* You should place it inside `DialogHeader` or directly as the first child of `DialogContent`.
+
+## Quick Start
+```tsx
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '~/lib/ui/dialog'
+
+export const BasicDialog = () => (
+	<Dialog open>
+		<DialogContent className="max-w-sm">
+			<DialogHeader>
+				<DialogTitle className="text-lg font-semibold">Modal title</DialogTitle>
+			</DialogHeader>
+			<p className="mt-4 text-sm">Hello from Contember Dialog!</p>
+		</DialogContent>
+	</Dialog>
+)
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+_None_
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+
+### Dynamic title based on props
+```tsx
+({ isOpen, onClose, title, content }) => (
+	<Dialog open={isOpen} onOpenChange={onClose}>
+		<DialogContent className="max-w-2xl bg-amber-50 p-4">
+			<DialogHeader>
+				<DialogTitle>{title}</DialogTitle>
+			</DialogHeader>
+			<div className="mt-4 text-base leading-7 text-zinc-900">
+				<p>{content}</p>
+			</div>
+		</DialogContent>
+	</Dialog>
+)
+```
+You control the headline by passing a `title` prop to your own wrapper component. `DialogTitle` simply renders the value.
+
+### Hidden title for screen readers
+```tsx
+({ open, setOpen, block }) => (
+	<Dialog open={open} onOpenChange={setOpen}>
+		<DialogTrigger asChild>
+			<Button variant="link" size="sm" className="gap-1 px-0">
+				Edit
+			</Button>
+		</DialogTrigger>
+
+		<DialogContent className="max-w-4xl max-h-screen overflow-auto">
+			<DialogTitle className="hidden">{block.label}</DialogTitle>
+			<div className="my-4">{block.form}</div>
+		</DialogContent>
+	</Dialog>
+)
+```
+Add `className="hidden"` to keep the title accessible for assistive technologies while removing it visually.
+
+## Best Practices & Gotchas
+* Always include `DialogTitle` for accessibility, even if you hide it visually.
+* Wrap the component in a `DialogHeader` to inherit consistent spacing.
+* Keep text short; long titles wrap and may push content down.
+
+## Further Reading
+* `Dialog`
+* `DialogContent`
+* `DialogHeader`
+* `DialogDescription`
+
+<!-- End of Generated Documentation -->

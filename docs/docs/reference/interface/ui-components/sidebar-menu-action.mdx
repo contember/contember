@@ -1,0 +1,103 @@
+---
+title: SidebarMenuAction
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 4 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 4 -->
+<!-- Import examples: 2 -->
+
+# SidebarMenuAction
+
+## Overview
+SidebarMenuAction renders auxiliary controls beside a menu item.  
+Use it to place buttons, badges, or any React node aligned with SidebarMenuButton or SidebarMenuSubButton.
+
+## Styling Guidelines
+* All examples use Tailwind CSS.  
+* No mandatory Contember theme classes are required; the component inherits layout from its parent menu element.
+
+## Core Concepts
+* SidebarMenuAction slots any React node on the right side of a menu row.  
+* It must be a direct child of SidebarMenuItem or SidebarMenuSubItem.  
+* Use it for contextual actions like “Add”, “Settings”, or status indicators.
+
+## Quick Start
+```tsx
+import { SidebarMenuItem, SidebarMenuButton, SidebarMenuAction } from '~/lib/ui/sidebar'
+
+export const SimpleMenu = () => (
+	<SidebarMenuItem>
+		<SidebarMenuButton className="flex items-center gap-2">
+			<span>Projects</span>
+		</SidebarMenuButton>
+
+		<SidebarMenuAction>
+			<button className="text-sm text-blue-600 hover:underline">+ New</button>
+		</SidebarMenuAction>
+	</SidebarMenuItem>
+)
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+_None_
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+
+### Add-New Button Next to Menu Item
+```tsx
+<SidebarMenuItem>
+	<SidebarMenuButton className="flex items-center gap-2">
+		<span>Articles</span>
+	</SidebarMenuButton>
+
+	<SidebarMenuAction>
+		<Link to="/articles/new">
+			<button className="rounded bg-green-600 px-2 py-1 text-xs text-white hover:bg-green-700">
+				New
+			</button>
+		</Link>
+	</SidebarMenuAction>
+</SidebarMenuItem>
+```
+The `SidebarMenuAction` holds a green “New” button.  
+The button stays visually aligned because SidebarMenuAction follows the menu’s flex layout.
+
+### Permission-Aware Actions
+```tsx
+<SidebarMenuSubItem>
+	<SidebarMenuSubButton isActive={isActive} className="flex items-center gap-2">
+		<span>{label}</span>
+	</SidebarMenuSubButton>
+
+	{canInvite && (
+		<SidebarMenuAction>
+			<InviteUserIcon className="h-4 w-4 text-gray-400 hover:text-gray-600" />
+		</SidebarMenuAction>
+	)}
+</SidebarMenuSubItem>
+```
+Display an invite icon only when `canInvite` is true.  
+SidebarMenuAction keeps action icons consistently placed in nested menu levels.
+
+## Best Practices & Gotchas
+* Wrap only interaction elements inside SidebarMenuAction.  
+* Keep content small; large nodes break row alignment.  
+* Do not place stateful logic in SidebarMenuAction. Pass pre-computed props instead.  
+* Always pair SidebarMenuAction with a menu button component. Alone, it renders nothing useful.
+
+## Further Reading
+* SidebarMenu  
+* SidebarMenuItem  
+* SidebarMenuSubItem  
+* SidebarMenuButton  
+
+<!-- End of Generated Documentation -->

@@ -10,11 +10,11 @@ title: BlockEditorHandle
 <!-- Import examples: 0 -->
 
 ## Overview
-BlockEditorHandle renders a small drag handle inside a block-editor layout.  
+BlockEditorHandle renders a small drag handle inside a block-editor layout.
 You use it to reorder blocks via drag-and-drop in Contember’s sortable block editor.
 
 ## Styling Guidelines
-* All snippets use Tailwind classes.  
+* All snippets use Tailwind classes.
 * The component itself has no required Contember theme classes, but you should add cursor and spacing utilities for better UX.
 
 ## Core Concepts
@@ -37,8 +37,8 @@ export const MyBlock = () => (
 ```
 
 ## Detailed Guide
-1. Place `<BlockEditorHandle />` as the first child of your block container.  
-2. Apply `cursor-move` so users know they can drag.  
+1. Place `<BlockEditorHandle />` as the first child of your block container.
+2. Apply `cursor-move` so users know they can drag.
 3. Use padding to enlarge the hit-area for accessibility.
 
 ```tsx
@@ -58,12 +58,6 @@ You can combine with icons:
 </BlockEditorHandle>
 ```
 
-## Props Reference
-_None_
-
-## Sub-Components / Building Blocks
-_None_
-
 ## Examples
 ### Basic handle
 ```tsx
@@ -72,15 +66,15 @@ _None_
 A plain handle renders as a simple `div`. Add Tailwind utilities for better visuals and UX.
 
 ## Best Practices & Gotchas
-* Always wrap the handle in a `flex` container so it keeps its size.  
-* Add `cursor-grab` or `cursor-move` to signal interactivity.  
-* Increase padding for touch devices.  
-* Do not nest multiple handles inside one block.  
+* Always wrap the handle in a `flex` container so it keeps its size.
+* Add `cursor-grab` or `cursor-move` to signal interactivity.
+* Increase padding for touch devices.
+* Do not nest multiple handles inside one block.
 * When integrating with `@dnd-kit`, forward `sortable.listeners` directly to `<BlockEditorHandle />`.
 
 ## Further Reading
-* `SortableBlocksField` – container that makes blocks sortable.  
-* `BlockEditor` – high-level editor for rich content.  
+* `SortableBlocksField` – container that makes blocks sortable.
+* `BlockEditor` – high-level editor for rich content.
 * Tailwind utility documentation.
 
 <!-- End of Generated Documentation -->

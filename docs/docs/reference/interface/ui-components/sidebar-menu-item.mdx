@@ -1,0 +1,118 @@
+---
+title: SidebarMenuItem
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 8 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 8 -->
+<!-- Import examples: 4 -->
+
+## Overview
+_None_
+
+## Styling Guidelines
+* All examples use Tailwind CSS classes.
+* SidebarMenuItem relies on Contember sidebar theme tokens such as `text-sidebar-accent-corporate` found in parent elements.
+
+## Core Concepts
+* SidebarMenuItem acts as a list item inside `SidebarMenu` or `SidebarMenuSub`.
+* You wrap interactive content with `SidebarMenuButton`.
+* Combine multiple items to build hierarchical, collapsible sidebars.
+* The component itself is presentational; it forwards props to the underlying `<li>` element.
+
+## Quick Start
+```tsx
+import {
+	Sidebar,
+	SidebarContent,
+	SidebarMenu,
+	SidebarMenuItem,
+	SidebarMenuButton,
+} from '~/lib/ui/sidebar'
+
+export default function BasicSidebar() {
+	return (
+		<Sidebar className="w-64">
+			<SidebarContent>
+				<SidebarMenu>
+					<SidebarMenuItem>
+						<SidebarMenuButton asChild>
+							<a className="flex items-center gap-2 p-2 hover:bg-gray-100">
+								<span>🏠</span>
+								<span>Dashboard</span>
+							</a>
+						</SidebarMenuButton>
+					</SidebarMenuItem>
+				</SidebarMenu>
+			</SidebarContent>
+		</Sidebar>
+	)
+}
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+_None_
+
+## Sub-Components / Building Blocks
+### SidebarMenuButton
+Wrap links or buttons. Use the `asChild` prop to pass your own anchor or link element.
+
+### SidebarMenuAction
+Render an optional action (e.g., badge or shortcut) next to the main button.
+
+### SidebarMenuSub / SidebarMenuSubItem
+Create a nested menu level when you need indented items.
+
+## Examples
+### Collapsible menu with nested items
+```tsx
+function SettingsMenu() {
+	return (
+		<SidebarMenu>
+			{/* Root item */}
+			<SidebarMenuItem>
+				<SidebarMenuButton asChild>
+					<a className="flex items-center gap-2 p-2">
+						⚙️
+						<span>Settings</span>
+					</a>
+				</SidebarMenuButton>
+			</SidebarMenuItem>
+
+			{/* Nested group */}
+			<SidebarMenuItem>
+				<SidebarMenuSub>
+					<SidebarMenuSubItem>
+						<SidebarMenuButton asChild>
+							<a className="flex items-center gap-2 pl-8 p-2">
+								🔒
+								<span>Security</span>
+							</a>
+						</SidebarMenuButton>
+					</SidebarMenuSubItem>
+				</SidebarMenuSub>
+			</SidebarMenuItem>
+		</SidebarMenu>
+	)
+}
+```
+You nest `SidebarMenuSub` and `SidebarMenuSubItem` to achieve multi-level navigation while keeping each clickable element inside a `SidebarMenuButton`.
+
+## Best Practices & Gotchas
+* Always place content inside `SidebarMenuButton`; otherwise focus and hover styles might break.
+* Use `asChild` when integrating with `react-router`’s `<Link>` to avoid extra DOM wrappers.
+* Keep SVG icons at a fixed size (e.g., `className="h-5 w-5"`) for visual alignment.
+* Avoid mixing arbitrary `<li>` elements with `SidebarMenuItem`; it breaks keyboard navigation.
+
+## Further Reading
+* Sidebar, SidebarContent, SidebarFooter
+* SidebarMenuButton
+* SidebarMenuSub and SidebarMenuSubItem
+* Collapsible component for advanced menus
+
+<!-- End of Generated Documentation -->

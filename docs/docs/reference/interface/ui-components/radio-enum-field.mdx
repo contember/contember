@@ -2,7 +2,7 @@
 title: RadioEnumField
 ---
 
-<!-- Edited by human: false -->
+<!-- Edited by human: true -->
 <!-- Examples count: 16 -->
 <!-- Source examples: 2 -->
 <!-- Playground examples: 4 -->
@@ -71,18 +71,15 @@ Use `orientation="horizontal"` for a compact inline layout. The default orientat
 | orientation | `"horizontal" \| "vertical"` | No | "vertical" | Layout direction of radio buttons. |
 | inputProps | `Omit&lt;React.InputHTMLAttributes&lt;HTMLInputElement&gt;, "defaultValue" | "value"&gt;` | No | - | Extra attributes passed to every radio input. |
 
-## Sub-Components / Building Blocks
-_None_
-
 ## Examples
 ### Conditional rendering with `If`
 ```tsx
 <RadioEnumField field="loginBackgroundType" orientation="horizontal" />
 <If condition="[loginBackgroundType = image]">
-	<ImageField baseField="loginBackgroundImage" label=" " />
+	<ImageField baseField="loginBackgroundImage" />
 </If>
 <If condition="[loginBackgroundType = color]">
-	<InputField field="loginBackgroundColor" inputProps={{ type: 'color' }} label=" " />
+	<InputField field="loginBackgroundColor" inputProps={{ type: 'color' }} />
 </If>
 ```
 This pattern shows how you can branch the form based on the selected radio value.

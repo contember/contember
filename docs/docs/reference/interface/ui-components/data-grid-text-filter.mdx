@@ -1,0 +1,111 @@
+---
+title: DataGridTextFilter
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 5 -->
+<!-- Source examples: 1 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 4 -->
+<!-- Import examples: 2 -->
+
+# DataGridTextFilter
+
+## Overview
+DataGridTextFilter renders a text input that filters rows in a DataGrid.
+You bind it to a field and optionally pass a label for the UI.
+
+## Styling Guidelines
+* All examples use Tailwind CSS classes.
+* No special Contember theme classes are required.
+
+## Core Concepts
+* The filter works only within a `<DataGrid>` context.
+* `field` determines which column receives the filter.
+* `name` must be unique inside one DataGrid instance.
+* Non-string fields must first be converted to text in the query layer.
+
+## Quick Start
+```tsx
+<DataGridTextFilter
+	field="name"
+	name="nameFilter"
+	label="Name"
+	className="w-full max-w-xs"
+/>
+```
+
+## Detailed Guide
+```tsx
+// 1. Define columns
+<DataGridTextColumn header="Name" field="name" />
+
+// 2. Place filters above the grid
+<div className="flex gap-4">
+	<DataGridTextFilter
+		field="name"
+		name="nameFilter"
+		label="Search by name"
+		className="input input-bordered w-64"
+	/>
+</div>
+
+// 3. The DataGrid now re-renders when the text changes
+```
+
+## Props Reference
+| Name   | Type | Required | Default | Description |
+| ------ | ---- | -------- | ------- | ----------- |
+| field  | string &#124; { field: string; hasOneRelationPath?: SugarableHasOneRelation &#124; SugarableHasOneRelation[] } | Yes | – | Path to the column being filtered. |
+| name   | string | Yes | – | Unique identifier used in the filter state. |
+| label  | React.ReactNode | No | – | Optional visible label. |
+
+_Inherited props: None_
+
+## Examples
+
+### Filter jobs by name
+```tsx
+<Label className="block mb-1">Job name</Label>
+<DataGridTextFilter
+	field="jobs.job.name"
+	name="jobNameFilter"
+	label=""
+	className="input input-bordered w-60"
+/>
+```
+Above, the filter affects the nested `jobs.job.name` field using a dotted path.
+
+### Combine with multiple filters
+```tsx
+<div className="flex gap-2">
+	<DataGridTextFilter
+		field="name"
+		name="nameFilter"
+		label="Name"
+		className="input input-bordered"
+	/>
+	<DataGridTextFilter
+		field="code"
+		name="codeFilter"
+		label="Code"
+		className="input input-bordered"
+	/>
+</div>
+```
+You can use several `DataGridTextFilter` instances as long as each `name` differs.
+
+## Best Practices & Gotchas
+* Keep each `name` unique to avoid state collisions.
+* Place filters outside the DataGrid body for better UX.
+* Use Tailwind utility classes to align filter inputs.
+* Avoid heavy debounce logic; DataGrid handles performance well.
+* If the field is nullable, ensure backend filtering logic matches expectations.
+
+## Further Reading
+* DataGridTextColumn
+* DataGridBooleanFilter
+* DataGridEnumFilter
+* DataGridRelationFilterControls
+
+<!-- End of Generated Documentation -->

@@ -1,0 +1,114 @@
+---
+title: AlertDialogTrigger
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 8 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 8 -->
+<!-- Import examples: 5 -->
+
+## Styling Guidelines
+* All snippets use TailwindCSS utility classes.
+* No special Contember theme classes are required by `AlertDialogTrigger`.
+
+## Core Concepts
+* `AlertDialogTrigger` must be rendered inside an `AlertDialog` component.
+* It toggles the visibility of the surrounding `AlertDialogContent`.
+* The `asChild` prop lets you turn any element (e.g. `<Button>`) into the trigger without adding an extra wrapper.
+
+## Quick Start
+```tsx
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from '~/lib/ui/alert-dialog'
+
+export default function QuickStart() {
+  return (
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <button className="px-3 py-2 bg-blue-600 text-white rounded">
+          Delete record
+        </button>
+      </AlertDialogTrigger>
+
+      <AlertDialogContent className="max-w-sm rounded-lg bg-white p-6 shadow">
+        <p className="mb-4 text-gray-800">Are you sure you want to delete this record?</p>
+
+        <AlertDialogFooter className="flex justify-end gap-2">
+          <AlertDialogCancel className="px-3 py-2 rounded border">Cancel</AlertDialogCancel>
+          <AlertDialogAction className="px-3 py-2 rounded bg-red-600 text-white">
+            Confirm
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  )
+}
+```
+
+## Props Reference
+| Name    | Type    | Required | Default | Description                                                     |
+|---------|---------|----------|---------|-----------------------------------------------------------------|
+| asChild | boolean | No       | -       | Forwards trigger behaviour to the child element instead of rendering a wrapper button. |
+
+## Examples
+
+### Icon Button Trigger
+```tsx
+<AlertDialog>
+  <AlertDialogTrigger asChild>
+    <button className="p-2 rounded hover:bg-gray-100">
+      <svg className="h-4 w-4" /* ...icon props */ />
+    </button>
+  </AlertDialogTrigger>
+  <AlertDialogContent>
+    <p className="mb-4">This action cannot be undone.</p>
+    <AlertDialogFooter>
+      <AlertDialogCancel className="btn btn-secondary">Cancel</AlertDialogCancel>
+      <AlertDialogAction className="btn btn-destructive">Delete</AlertDialogAction>
+    </AlertDialogFooter>
+  </AlertDialogContent>
+</AlertDialog>
+```
+The trigger is an icon-only button thanks to `asChild`, so no extra DOM nodes are introduced.
+
+### Inline “Add Comment” Button
+```tsx
+<AlertDialog>
+  <AlertDialogTrigger asChild>
+    <button className="flex items-center gap-2 text-sm text-blue-600">
+      <svg className="h-4 w-4" /* ...icon props */ />
+      Add comment
+    </button>
+  </AlertDialogTrigger>
+
+  <AlertDialogContent className="max-h-full overflow-y-auto">
+    {/* application-specific form fields */}
+    <AlertDialogFooter>
+      <AlertDialogCancel className="btn btn-secondary">Cancel</AlertDialogCancel>
+      <AlertDialogAction className="btn btn-primary">Save</AlertDialogAction>
+    </AlertDialogFooter>
+  </AlertDialogContent>
+</AlertDialog>
+```
+`asChild` keeps the original semantics of the inline button while still controlling the dialog.
+
+## Best Practices & Gotchas
+* Always wrap `AlertDialogTrigger` inside the matching `AlertDialog`; otherwise nothing happens on click.
+* Prefer `asChild` to avoid unnecessary wrapper elements that could break layouts or styles.
+* Only one `AlertDialogTrigger` should be used per dialog to prevent race conditions.
+* Place the trigger close to the content it affects for better accessibility.
+
+## Further Reading
+* `AlertDialogContent` – container for the dialog body.
+* `AlertDialogAction` & `AlertDialogCancel` – standardized footer buttons.
+* Contember design system documentation on modal dialogs.
+
+<!-- End of Generated Documentation -->

@@ -1,0 +1,89 @@
+---
+title: DataGridEnumFieldTooltip
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 2 -->
+<!-- Source examples: 2 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 0 -->
+<!-- Import examples: 0 -->
+
+# DataGridEnumFieldTooltip
+
+## Overview
+`DataGridEnumFieldTooltip` wraps any React node and augments it with a tooltip where users can include or exclude the enum value from a data-grid filter. You typically use it inside `DataGridEnumColumn`, but you can drop it into custom columns whenever you need in-place filter controls.
+
+The component stays presentation-agnostic; you decide how the value looks. It just wires the tooltip and filter logic for you.
+
+## Styling Guidelines
+* All examples use Tailwind utility classes.
+* The component itself adds no styles; you may apply any Contember theme classes you use elsewhere.
+
+## Core Concepts
+* Rendering enum values in a grid.
+* Showing a tooltip on hover or focus.
+* Letting users include/exclude a value in a filter directly from the UI.
+* Passing extra action buttons through the `actions` prop.
+
+## Quick Start
+```tsx
+import { DataGridEnumFieldTooltip } from '@contember/react-components'
+
+<DataGridEnumFieldTooltip value="active">
+  <span className="text-green-600">Active</span>
+</DataGridEnumFieldTooltip>
+```
+
+## Detailed Guide
+### Adding custom actions
+```tsx
+const DeleteButton = () => (
+  <button className="text-red-500 hover:text-red-700">Delete</button>
+)
+
+<DataGridEnumFieldTooltip
+  value="inactive"
+  actions={<DeleteButton />}
+>
+  <span className="text-gray-500">Inactive</span>
+</DataGridEnumFieldTooltip>
+```
+The `DeleteButton` appears inside the tooltip, giving users extra control without leaving the grid.
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| value | string | Yes | – | Enum value used for filtering. |
+| actions | ReactNode | No | `undefined` | Extra elements rendered inside the tooltip. |
+| children | ReactNode | Yes | – | Visual representation of the value. |
+
+## Examples
+### Basic usage
+```tsx
+<DataGridEnumFieldTooltip value="active">
+  <span>Active</span>
+</DataGridEnumFieldTooltip>
+```
+The tooltip offers “Include” and “Exclude” options for the `active` value.
+
+### With an additional action
+```tsx
+<DataGridEnumFieldTooltip value="inactive" actions={<CustomActionButton />}>
+  <span>Inactive</span>
+</DataGridEnumFieldTooltip>
+```
+The custom button appears next to the default filter controls inside the tooltip.
+
+## Best Practices & Gotchas
+* Always pass a stable `value`; changing it on every render resets tooltip state.
+* Keep `children` simple—complex elements may confuse users inside small grid cells.
+* Use concise action labels; tooltips should stay lightweight.
+* Remember accessibility: ensure focusable elements inside `actions` have clear labels.
+
+## Further Reading
+* `DataGridEnumColumn`
+* `DataGridFilter`
+* `Tooltip`
+* `DataGrid`
+<!-- End of Generated Documentation -->

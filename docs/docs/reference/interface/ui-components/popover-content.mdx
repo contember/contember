@@ -1,0 +1,122 @@
+---
+title: PopoverContent
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 15 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 5 -->
+<!-- External examples: 10 -->
+<!-- Import examples: 8 -->
+
+# PopoverContent
+
+## Overview
+`PopoverContent` renders the floating panel of a `Popover`.  
+It receives focus automatically and handles positioning next to the trigger element.
+
+## Styling Guidelines
+* All examples use Tailwind classes.  
+* Add extra styles with the `className` prop; no Contember-specific theme classes are required.
+
+## Core Concepts
+* `PopoverContent` appears when its `PopoverTrigger` is active.  
+* Position is configurable with `side`, `align`, and `sideOffset`.  
+* Content is rendered in a React portal, so z-index and stacking contexts matter.  
+* You may pass any Radix `PopoverContentProps`.
+
+## Quick Start
+```tsx
+import { Popover, PopoverTrigger, PopoverContent } from '~/lib/ui/popover'
+
+<Popover>
+  <PopoverTrigger asChild>
+    <button className="px-3 py-1.5 rounded bg-blue-600 text-white">Open</button>
+  </PopoverTrigger>
+
+  <PopoverContent className="p-4 bg-white border rounded shadow">
+    Hello from the popover!
+  </PopoverContent>
+</Popover>
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| className | string | No | "" | Additional Tailwind classes. |
+| side | `"top" \| "right" \| "bottom" \| "left"` | No | `"bottom"` | Side of the trigger where the panel appears. |
+| align | `"start" \| "center" \| "end"` | No | `"center"` | Horizontal / vertical alignment relative to the trigger. |
+| sideOffset | number | No | `0` | Distance (in px) from the trigger. |
+| — inherited Radix props | `PopoverContentProps` | No | — | All other props from `@radix-ui/react-popover`. |
+| children | ReactNode | Yes | — | Content displayed inside the popover. |
+
+## Sub-Components / Building Blocks
+### Popover
+Container that ties trigger and content together.
+
+### PopoverTrigger
+Element that toggles the popover visibility.
+
+### PopoverClose
+Optional button that closes the popover from inside the content.
+
+## Examples
+
+### Inline link editor
+```tsx
+<Popover>
+  <PopoverTrigger asChild>
+    <button className="p-1.5 border rounded hover:bg-gray-200">
+      <LinkIcon className="w-4 h-4" />
+    </button>
+  </PopoverTrigger>
+
+  <PopoverContent className="flex gap-2 items-center p-2 bg-white border rounded shadow">
+    <LinkField field="link" />
+    <Button
+      variant="destructive"
+      size="sm"
+      onClick={() => EditorTransforms.unwrapNodes(editor, { at: [], match: node => node === element })}
+    >
+      <TrashIcon className="w-3 h-3" />
+    </Button>
+  </PopoverContent>
+</Popover>
+```
+This pattern lets users edit a hyperlink inline without leaving the editor.
+
+### “More filters” panel in a data grid
+```tsx
+<Popover>
+  <PopoverTrigger asChild>
+    <Button className="h-auto" variant="outline">More filters</Button>
+  </PopoverTrigger>
+
+  <PopoverContent className="flex flex-col gap-2 p-4 bg-white border rounded shadow-md">
+    <DataGridHasManyFilter field="tags" label="Tags">
+      <Field field="name" />
+    </DataGridHasManyFilter>
+    <DataGridBooleanFilter field="locked" label="Locked" />
+    <DataGridNumberFilter field="views" label="Views" />
+  </PopoverContent>
+</Popover>
+```
+The popover groups rarely used filters while keeping the main UI clean.
+
+## Best Practices & Gotchas
+* Always add `className="bg-white"` when the surrounding page uses transparent backgrounds.  
+* Pass a stable `sideOffset` (e.g. `2`) to avoid the panel sticking to the trigger.  
+* Wrap buttons in `PopoverTrigger asChild` to keep semantic HTML.  
+* Place `PopoverContent` as a direct child of `Popover`; nested popovers can break focus management.  
+* Remember to handle z-index if the popover is hidden behind modals.
+
+## Further Reading
+* PopoverTrigger  
+* PopoverClose  
+* Radix Popover docs  
+* DataGrid filters components  
+
+<!-- End of Generated Documentation -->

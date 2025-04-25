@@ -1,0 +1,85 @@
+---
+title: Progress
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 4 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 4 -->
+<!-- Import examples: 4 -->
+
+## Overview
+The `Progress` component renders a horizontal bar that visualizes completion percentage.  
+You pass a numeric value (0 – 100) and optionally adjust styling with Tailwind classes or a custom indicator color.
+
+## Styling Guidelines
+* All snippets use TailwindCSS.  
+* No special Contember theme classes are required.
+
+## Core Concepts
+* The `value` prop controls the filled percentage.
+* Tailwind classes let you size or position the bar.
+* `indicatorHexColor` overrides the default bar color.
+
+## Quick Start
+```tsx
+import { Progress } from '@app/lib/ui/progress'
+
+export const Demo = () => (
+  <Progress value={72} className="w-64" indicatorHexColor="#10b981" />
+)
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| value | number | Yes | – | Completion percentage (0 – 100). |
+| indicatorHexColor | string | No | – | Hex color of the filled section. |
+| className | string | No | – | Tailwind classes forwarded to the root element. |
+| …HTMLDivElement props | – | No | – | All standard `<div>` attributes are forwarded. |
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+
+### Conditional Progress Display
+```tsx
+{isProgress && (
+  <Progress
+    value={(normalizedDisplayOrder ?? 0) / (progressStatusCount ?? 1) * 100}
+    className="w-[150px]"
+    indicatorHexColor={colorHex ?? '#000000'}
+  />
+)}
+```
+When `isProgress` is false, the bar is hidden, preventing confusion on incomplete data.
+
+### Category List with Progress
+```tsx
+<div className="flex flex-col">
+  <Progress
+    value={(normalizedDisplayOrder ?? 0) / (totalCount ?? 1) * 100}
+    className="w-[150px]"
+    indicatorHexColor={colorHex ?? '#000000'}
+  />
+  <span className="text-xs">{name}</span>
+</div>
+```
+This pattern pairs each category label with a sized progress bar, ideal for dashboards.
+
+## Best Practices & Gotchas
+* Always clamp `value` between 0 and 100 to avoid overflow.
+* Use descriptive hex colors for accessibility; ensure a 3:1 contrast ratio against the background.
+* Keep widths explicit (`w-64`, `w-[150px]`) to prevent layout shifts.
+
+## Further Reading
+* `<Badge>` for status indicators.
+* Contember “Dashboard Patterns” guide.
+* Tailwind width utilities.
+
+<!-- End of Generated Documentation -->

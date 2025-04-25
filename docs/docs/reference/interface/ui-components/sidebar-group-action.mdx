@@ -1,0 +1,72 @@
+---
+title: SidebarGroupAction
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 0 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 0 -->
+<!-- Import examples: 0 -->
+
+## Overview
+_None_
+
+## Styling Guidelines
+* All code examples use Tailwind CSS utility classes.  
+* SidebarGroupAction does not require Contember theme classes by default.
+
+## Core Concepts
+* SidebarGroupAction renders an action inside a sidebar group.  
+* You can place it among other sidebar items to trigger custom logic.
+
+## Quick Start
+```tsx
+import { SidebarGroupAction } from "@contember/react-components"
+
+export const Demo = () => (
+	<SidebarGroupAction className="block px-4 py-2 hover:bg-gray-100">
+		Profile
+	</SidebarGroupAction>
+)
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| *No props available* | | | | |
+| **Inherited props** | | | | |
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+```tsx
+import { SidebarGroupAction } from "@contember/react-components"
+
+export const LogoutButton = () => (
+	<SidebarGroupAction
+		className="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50"
+		onClick={() => console.log("Logging out")}
+	>
+		<span className="material-icons">logout</span>
+		Log out
+	</SidebarGroupAction>
+)
+```
+The component renders a red “Log out” action. Clicking logs the user out.
+
+## Best Practices & Gotchas
+* Keep the action label short.  
+* Apply hover states to improve accessibility.  
+* Wrap long lists of actions inside a scrollable container.
+
+## Further Reading
+* SidebarGroup  
+* Sidebar  
+* Navigation patterns in Contember React
+
+<!-- End of Generated Documentation -->

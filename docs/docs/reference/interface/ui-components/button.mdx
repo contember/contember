@@ -1,0 +1,124 @@
+---
+title: Button
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 15 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 5 -->
+<!-- External examples: 10 -->
+<!-- Import examples: 8 -->
+
+# Button
+
+## Styling Guidelines
+* All snippets use Tailwind utility classes.
+* No special Contember theme classes are required.
+
+## Core Concepts
+* `variant` switches the visual style (`solid`, `outline`, `ghost`, `destructive`, `link`).
+* `size` changes padding and font size (`xs`, `sm`, `md`, `lg`).
+* You can pass any standard HTML `<button>` props (`disabled`, `type`, etc.).
+* Combine icons and text within the button for richer UIs.
+* Use `AnchorButton` for link–like buttons that need an `href`.
+
+## Quick Start
+```tsx
+import { Button } from '~/lib/ui/button'
+
+export default () => (
+	<Button variant="solid" size="md" className="flex items-center gap-2">
+		Submit
+	</Button>
+)
+```
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| children | ReactNode | Yes | — | Content rendered inside the button. |
+| variant | string | No | `"solid"` | Visual style of the button (`solid`, `outline`, `ghost`, `destructive`, `link`). |
+| size | string | No | `"md"` | Pre-defined size (`xs`, `sm`, `md`, `lg`). |
+| onClick | (event) => void | No | — | Click handler. |
+| className | string | No | — | Additional Tailwind classes. |
+| **…HTMLButtonProps** | — | No | — | All other HTML `<button>` attributes are forwarded. |
+
+## Sub-Components / Building Blocks
+### AnchorButton
+Button-styled link that accepts all props of `<a>` plus the same `variant` and `size` options.
+
+## Examples
+
+### Icon with label
+```tsx
+<Button variant="ghost" size="xs" className="flex gap-2">
+	<LogOutIcon size={16} />
+	Logout
+</Button>
+```
+Use `flex gap-2` to align the icon and text.
+
+### Data-grid actions
+```tsx
+<DataGridActionColumn>
+	<Button size="sm" variant="destructive">
+		<TrashIcon size={16} />
+	</Button>
+</DataGridActionColumn>
+```
+Place destructive actions at the end of grids for easy access.
+
+### Dialog + Tooltip combo
+```tsx
+<TooltipProvider>
+	<Dialog>
+		<Tooltip>
+			<TooltipTrigger asChild>
+				<DialogTrigger asChild>
+					<Button size="sm" variant="ghost">
+						<PencilIcon size={16} />
+					</Button>
+				</DialogTrigger>
+			</TooltipTrigger>
+			<TooltipContent>
+				<AnchorButton size="sm" variant="ghost" href="/edit">
+					Open
+				</AnchorButton>
+			</TooltipContent>
+		</Tooltip>
+		<DialogContent>…</DialogContent>
+	</Dialog>
+</TooltipProvider>
+```
+Wrap the button in `TooltipTrigger` and `DialogTrigger` to reuse it for multiple interactions.
+
+### Increment / Decrement field value
+```tsx
+const CounterInput = ({ field }: { field: string }) => {
+	const counter = useField<number>(field)
+	return (
+		<div className="flex gap-4 items-center">
+			<Button onClick={() => counter.updateValue((counter.value ?? 0) - 1)}>Decrement</Button>
+			<div className="w-8 h-8 border flex items-center justify-center">
+				{counter.value}
+			</div>
+			<Button onClick={() => counter.updateValue((counter.value ?? 0) + 1)}>Increment</Button>
+		</div>
+	)
+}
+```
+Demonstrates how to pair Buttons with Contember `useField` data binding.
+
+## Best Practices & Gotchas
+* Keep button text short—ideally one or two words.
+* Use `variant="destructive"` only for irreversible actions.
+* Provide an `aria-label` when the button contains only an icon.
+* Combine `className` with the default styling; do not overwrite core utility classes.
+* Prefer `AnchorButton` over plain `<a>` to maintain consistent styling.
+
+## Further Reading
+* AnchorButton – Link-styled button component.
+* Tooltip – Add hover information to buttons.
+* Dialog – Wrap complex flows triggered by buttons.
+
+<!-- End of Generated Documentation -->

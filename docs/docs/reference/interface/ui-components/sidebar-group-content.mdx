@@ -1,0 +1,94 @@
+---
+title: SidebarGroupContent
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 1 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 1 -->
+<!-- External examples: 0 -->
+<!-- Import examples: 1 -->
+
+## Overview
+_None_
+
+## Styling Guidelines
+* All snippets use Tailwind classes.  
+* SidebarGroupContent does not require any special Contember theme classes.
+
+## Core Concepts
+* SidebarGroupContent renders the body of a sidebar group.  
+* You place it inside `SidebarGroup`, which itself sits inside `SidebarContent`.  
+* It accepts any React children.
+
+## Quick Start
+```tsx
+import { SidebarContent, SidebarGroup, SidebarGroupContent } from '~/lib/ui/sidebar'
+
+export const SimpleSidebar = () => (
+	<SidebarContent>
+		<SidebarGroup>
+			<SidebarGroupContent className="p-4">
+				{/* Your links or widgets go here */}
+				<p className="text-sm">Sidebar group content</p>
+			</SidebarGroupContent>
+		</SidebarGroup>
+	</SidebarContent>
+)
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+_None_
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+
+### Collapsible Sidebar Group
+```tsx
+import { SidebarContent, SidebarGroup, SidebarGroupContent } from '~/lib/ui/sidebar'
+import { useState } from 'react'
+
+export const CollapsibleGroup = () => {
+	const [open, setOpen] = useState(true)
+
+	return (
+		<SidebarContent>
+			<SidebarGroup>
+				<button
+					onClick={() => setOpen(!open)}
+					className="w-full text-left px-4 py-2 font-semibold hover:bg-gray-100"
+				>
+					Toggle Group
+				</button>
+				{open && (
+					<SidebarGroupContent className="pl-6 pb-2">
+						<ul className="space-y-1 text-sm">
+							<li><a className="content-link" href="#item1">Item 1</a></li>
+							<li><a className="content-link" href="#item2">Item 2</a></li>
+						</ul>
+					</SidebarGroupContent>
+				)}
+			</SidebarGroup>
+		</SidebarContent>
+	)
+}
+```
+You toggle the content’s visibility yet keep markup flat and readable.
+
+## Best Practices & Gotchas
+* Wrap SidebarGroupContent only in `SidebarGroup`.  
+* Avoid extra padding on the group and the content; pick one.  
+* Keep interactive controls (links, buttons) inside the content, not on the group container.
+
+## Further Reading
+* `SidebarGroup`  
+* `SidebarContent`  
+* `SidebarHeader`  
+* `SidebarFooter`  
+
+<!-- End of Generated Documentation -->

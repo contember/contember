@@ -1,0 +1,139 @@
+---
+title: DataGridLoader
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 16 -->
+<!-- Source examples: 1 -->
+<!-- Playground examples: 5 -->
+<!-- External examples: 10 -->
+<!-- Import examples: 8 -->
+
+## Overview
+`DataGridLoader` manages loading states inside a data grid.
+It shows loaders for initial fetch, refresh, or failure and then renders its children when data is ready.
+
+## Styling Guidelines
+* All examples use Tailwind CSS.
+* `DataGridLoader` adds no visual styles itself, so no extra Contember theme classes are required.
+
+## Core Concepts
+* Wrap any grid-view (`DataGridTable`, `DataGridTiles`, custom layouts) with `DataGridLoader`.
+* The component decides when to show loading, empty, or error states.
+* You can nest multiple children; only one shows at a time based on active layout.
+* `DataGridLoader` must live inside a `DataGrid` or `DataView` provider.
+
+## Quick Start
+```tsx
+import { DataGrid, DataGridLoader, DataGridTable, DataGridTextColumn } from '~/lib/datagrid'
+
+export default () => (
+	<DataGrid entities="Article">
+		<DataGridLoader>
+			<DataGridTable className="w-full border border-gray-200 rounded">
+				<DataGridTextColumn header="Title" field="title" />
+			</DataGridTable>
+		</DataGridLoader>
+	</DataGrid>
+)
+```
+
+## Detailed Guide
+_DataGridLoader_ switches views automatically.
+You only declare layouts; it handles the rest.
+
+```tsx
+<DataGrid entities="Folder">
+	<DataGridLoader>
+		{/* Table view */}
+		<DataGridTable className="min-w-full">
+			<DataGridTextColumn header="Name" field="name" />
+		</DataGridTable>
+
+		{/* Custom rows view */}
+		<DataViewLayout name="rows" label="Rows">
+			<div className="grid gap-2">
+				<DataViewEachRow>
+					<div className="flex gap-2 border p-2 rounded">
+						<Field field="name" />
+					</div>
+				</DataViewEachRow>
+			</div>
+		</DataViewLayout>
+	</DataGridLoader>
+</DataGrid>
+```
+
+## Props Reference
+| Name     | Type             | Required | Default | Description                                  |
+|----------|------------------|----------|---------|----------------------------------------------|
+| children | React.ReactNode  | Yes      | —       | Grid layouts shown after data loads.         |
+
+## Examples
+
+### Infinite Scroll Grid
+```tsx
+<DataView entities="GridArticle" initialItemsPerPage={6}>
+	<DataGridToolbar />
+	<DataViewInfiniteLoadProvider>
+		<DataGridLoader>
+			<div className="grid grid-cols-3 gap-4">
+				<DataViewInfiniteLoadEachRow>
+					<Card className="h-72">
+						<CardHeader>
+							<CardTitle>
+								<Field field="title" />
+							</CardTitle>
+						</CardHeader>
+					</Card>
+				</DataViewInfiniteLoadEachRow>
+			</div>
+
+			<DataViewInfiniteLoadScrollObserver />
+
+			<div className="flex justify-center mt-8">
+				<DataViewInfiniteLoadTrigger>
+					<Button size="lg">Load more</Button>
+				</DataViewInfiniteLoadTrigger>
+			</div>
+		</DataGridLoader>
+	</DataViewInfiniteLoadProvider>
+</DataView>
+```
+`DataGridLoader` wraps all infinite-scroll helpers so the loader shows while more data arrives.
+
+### Multi-Layout Grid
+```tsx
+<DataGrid entities="GridArticle">
+	<DataGridToolbar sticky />
+
+	<DataGridLoader>
+		<DataGridTable>
+			<DataGridTextColumn header="Title" field="title" />
+		</DataGridTable>
+
+		<DataGridTiles>
+			<CustomGridTile />
+		</DataGridTiles>
+	</DataGridLoader>
+
+	<DataGridPagination sticky />
+</DataGrid>
+```
+Here the loader handles both table and tile layouts without extra code.
+
+## Best Practices & Gotchas
+* Always wrap exactly the parts that depend on the dataset.
+* Do not place toolbar or pagination inside `DataGridLoader`; they have their own states.
+* Combine with `DataViewEmpty` to customise empty results.
+* Include only one instance of `DataGridLoader` per grid.
+* Keep heavy child components inside `DataGridLoader` to avoid unnecessary renders.
+
+## Further Reading
+* `DataGrid` – parent provider.
+* `DataGridToolbar` – filtering and actions.
+* `DataGridPagination` – paging controls.
+* `DataViewLayout` – define alternative layouts.
+* `DataViewInfiniteLoadProvider` – infinite scrolling.
+
+<!-- End of Generated Documentation -->

@@ -1,0 +1,105 @@
+---
+title: DataGridHasManyCell
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 0 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 0 -->
+<!-- Import examples: 0 -->
+
+# DataGridHasManyCell
+
+## Overview
+`DataGridHasManyCell` renders a single data-grid cell that shows a has-many relation.
+The cell opens a tooltip that lets you trigger predefined filter actions.
+
+## Styling Guidelines
+* All snippets use Tailwind for layout and spacing.
+* The component adds no Contember theme classes by itself.
+
+## Core Concepts
+* Display the size or preview of a has-many relation inside a data grid.
+* Provide contextual filter actions through a tooltip.
+* Resolve the filter automatically from the `field` name when `filterName` is omitted.
+* Pass custom actions via `tooltipActions`.
+
+## Quick Start
+```tsx
+import { DataGrid, DataGridHasManyCell } from '@contember/admin'
+
+<DataGrid className="w-full">
+	<DataGrid.Column header="Tags">
+		<DataGridHasManyCell field="tags">
+			{({ count }) => <span className="text-sm text-gray-700">{count} tags</span>}
+		</DataGridHasManyCell>
+	</DataGrid.Column>
+</DataGrid>
+```
+
+## Detailed Guide
+```tsx
+import { DataGridHasManyCell, Filter } from '@contember/admin'
+
+<DataGridHasManyCell
+	field={{ hasManyRelation: 'orders.items', hasOneRelationPath: 'customer' }}
+	tooltipActions={
+		<>
+			<Filter.Toggle name="orders" className="btn btn-sm">
+				Filter orders
+			</Filter.Toggle>
+		</>
+	}
+>
+	{({ count }) => (
+		<div className="flex items-center gap-2">
+			<span className="font-medium">{count}</span>
+			<span className="text-xs text-gray-500">items</span>
+		</div>
+	)}
+</DataGridHasManyCell>
+```
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| field | string &#124; { hasOneRelationPath?: SugarableHasOneRelation &#124; SugarableHasOneRelation[]; hasManyRelation: SugarableHasManyRelation } | Yes | — | Has-many field to display. |
+| filterName | string | No | — | Filter identifier. Resolved from `field` when omitted. |
+| children | React.ReactNode | Yes | — | Render prop in the context of the has-many relation. |
+| tooltipActions | React.ReactNode | No | — | Custom content rendered inside the tooltip. |
+
+## Examples
+### Show comment count with filter toggle
+```tsx
+<DataGridHasManyCell field="comments" filterName="commentsFilter">
+	{({ count }) => (
+		<button className="text-blue-600 underline">
+			{count} comments
+		</button>
+	)}
+</DataGridHasManyCell>
+```
+Pressing the cell opens the tooltip. You can then activate the `commentsFilter`.
+
+### Custom tooltip actions
+```tsx
+<DataGridHasManyCell field="orders" tooltipActions={<button className="btn btn-sm">New order</button>}>
+	{({ count }) => <span>{count} orders</span>}
+</DataGridHasManyCell>
+```
+The tooltip now contains a “New order” button, enhancing quick workflows.
+
+## Best Practices & Gotchas
+* Use concise cell content; heavy UI belongs in the tooltip.
+* Provide `filterName` only when auto-resolution would collide with another filter.
+* Keep tooltip actions idempotent; avoid destructive operations without confirmation.
+* The `children` render prop receives relation context, not plain props—plan for async data.
+
+## Further Reading
+* `DataGrid`
+* `Filter.Toggle`
+* `HasManyField`
+* Contember filtering overview
+
+<!-- End of Generated Documentation -->

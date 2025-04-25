@@ -1,0 +1,136 @@
+---
+title: DataGridEnumColumn
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 14 -->
+<!-- Source examples: 1 -->
+<!-- Playground examples: 3 -->
+<!-- External examples: 10 -->
+<!-- Import examples: 7 -->
+
+# DataGridEnumColumn
+
+## Overview
+`DataGridEnumColumn` renders an enum field inside a `DataGridTable`.  
+The column automatically formats values, offers enum-aware filtering, and shows a tooltip with optional actions.
+
+Use it when your entity field is an enum and you need readable labels, filters, and minimal boilerplate.
+
+## Styling Guidelines
+All examples use Tailwind for layout and spacing.  
+`DataGridEnumColumn` itself adds no extra theme classes, so you can style headers and cells with standard Tailwind utilities.
+
+## Core Concepts
+- Enum mapping: `options` translates raw enum values to human-friendly labels.  
+- Automatic filter: If you omit `filter`, the column provides an enum selector.  
+- Tooltip: By default, the cell shows the value and reveals a tooltip on hover.  
+- Composition: You can replace the cell, header, or filter with custom React nodes.  
+- Context: Always place the column inside `DataGridTable` (or `DefaultDataGrid`).
+
+## Quick Start
+```tsx
+import { DataGridTable, DataGridEnumColumn } from '~/lib/datagrid'
+
+export default () => (
+	<DataGridTable className="w-full">
+		<DataGridEnumColumn field="status" options={{ active: 'Active', inactive: 'Inactive' }} />
+	</DataGridTable>
+)
+```
+
+## Detailed Guide
+### Custom header
+```tsx
+<DataGridEnumColumn
+	field="state"
+	header={<span className="font-bold text-primary-600">State</span>}
+/>
+```
+
+### Derive labels from the enum itself
+```tsx
+// If StatusEnum has labels via Contember schema, you can skip options.
+<DataGridEnumColumn field="status" />
+```
+
+### Provide custom cell content
+```tsx
+<DataGridEnumColumn field="visibility">
+	{value => (
+		<span className={value === 'public' ? 'text-success' : 'text-muted'}>
+			{value}
+		</span>
+	)}
+</DataGridEnumColumn>
+```
+
+### Replace the default filter
+```tsx
+import { DataGridEnumFilter } from '~/lib/datagrid'
+
+<DataGridEnumColumn
+	field="type"
+	filter={<DataGridEnumFilter field="type" placeholder="All types" />}
+/>
+```
+
+### Add tooltip actions
+```tsx
+<DataGridEnumColumn
+	field="status"
+	tooltipActions={<button className="text-sm text-blue-600">Copy</button>}
+/>
+```
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| field | string | Yes | — | Displayed field. |
+| header | React.ReactNode | No | — | Custom header. Uses label formatter when omitted. |
+| options | Record&lt;string, React.ReactNode&gt; | No | resolved from enum | Mapping for value formatting and filter choices. |
+| children | React.ReactNode | No | default renderer | Custom cell content. Receives the field value. |
+| filter | React.ReactNode | No | default enum filter | Custom filter element. |
+| tooltipActions | React.ReactNode | No | — | Extra actions shown inside the tooltip. |
+| children (inherited) | React.ReactNode | No | — | React `children` prop inherited from `React.Component`. |
+
+## Sub-Components / Building Blocks
+### DataGridEnumFilter
+Default filter used by `DataGridEnumColumn`.  
+You can import and reuse it when replacing the column filter manually.
+
+## Examples
+### 1. Enum column inside a full grid
+```tsx
+<DefaultDataGrid entities="Article">
+	<DataGridTextColumn header="Title" field="title" />
+	<DataGridEnumColumn header="State" field="state" options={ArticleStateLabels} />
+	<DataGridActionColumn>
+		<Button>Detail</Button>
+	</DataGridActionColumn>
+</DefaultDataGrid>
+```
+The column shows readable state labels and a dropdown filter.
+
+### 2. Mapping labels on the fly
+```tsx
+const statusLabels = { draft: 'Draft', published: 'Published' }
+
+<DataGridEnumColumn field="status" options={statusLabels} />
+```
+You create a local label map and pass it through `options`.
+
+## Best Practices & Gotchas
+- Keep `options` object stable to avoid unnecessary re-renders.  
+- Use concise labels; long text widens the column.  
+- When overriding `children`, remember to handle `null` values.  
+- Combine `tooltipActions` with Tailwind for a lightweight UI.  
+- Always verify enum values match your Contember schema; mismatches render empty cells.
+
+## Further Reading
+- `DataGridEnumFilter` – standalone filter component.  
+- `DataGridEnumListColumn` – displays multiple enum values.  
+- `DataGridTextColumn` – for non-enum text fields.  
+- `DefaultDataGrid` – opinionated wrapper around `DataGridTable`.
+
+<!-- End of Generated Documentation -->

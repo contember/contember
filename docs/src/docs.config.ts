@@ -8,28 +8,18 @@ const config: DocsConfig = {
 	ai: {
 		model: 'o3',
 	},
-	externalProjects: [
-		{
-			path: '../../../contember-external/fabis/admin',
-			name: 'Learning Platform',
-			description: 'A learning platform built with Contember with a lot of features, including user management, course creation, and content organization.',
-			excludeFolders: [
-				'lib',
-				'dist',
-				'build',
-			],
-		},
-		{
-			path: '../../../108agency/mapeditor/admin',
-			name: '108 Agency CRM and CMS',
-			description: 'Content management system for a websites and a CRM',
-			excludeFolders: [
-				'lib',
-				'dist',
-				'build',
-			],
-		},
-	],
+	// externalProjects: [
+	// 	{
+	// 		path: 'path/to/project/admin',
+	// 		name: 'Project name',
+	// 		description: 'Project description to help AI understand the project',
+	// 		excludeFolders: [
+	// 			'lib', // You don't want to include the lib folder in the documentation
+	// 			'dist',
+	// 			'build',
+	// 		],
+	// 	},
+	// ],
 
 	// Component-specific overrides
 	// overrides: {
@@ -38,6 +28,27 @@ const config: DocsConfig = {
 	// 		notes: 'This component is optimized for selecting single related entities (hasOne). Avoid using it for complex data fetching scenarios directly.',
 	// 	},
 	// },
+	excludeComponents: [
+		'AlertDialogOverlay',
+		'AlertDialogPortal',
+		'AvatarImage',
+		'BoardCardUI',
+		'BoardColumnHandleUI',
+		'BoardColumnHeaderUI',
+		'BoardColumnUI',
+		'BoardDragOverlayUI',
+		'BoardItemHandleUI',
+		'BoardItemsWrapperUI',
+		'BoardNonSortableColumn',
+		'BoardNonSortableItems',
+		'BoardSortableColumn',
+		'BoardSortableItems',
+		'BoardWrapperUI',
+		'buttonConfig',
+		'ColumnDropIndicator',
+		'DialogOverlay',
+		'DropdownMenuShortcut',
+	],
 }
 
 export default config

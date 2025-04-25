@@ -1,0 +1,158 @@
+---
+title: TooltipContent
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 11 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 1 -->
+<!-- External examples: 10 -->
+<!-- Import examples: 6 -->
+
+# TooltipContent
+
+## Overview
+TooltipContent renders the floating panel that appears when the user focuses or hovers over a TooltipTrigger. You place any JSX inside TooltipContent to show rich, contextual information without cluttering the UI.
+
+TooltipContent works together with Tooltip, TooltipTrigger, and (optionally) TooltipProvider to provide a fully-featured, accessible tooltip experience.
+
+## Styling Guidelines
+* All examples use Tailwind CSS utility classes.  
+* TooltipContent accepts any Tailwind class via `className`.  
+* No special Contember theme classes are required.
+
+## Core Concepts
+* TooltipContent must be a direct child of Tooltip.  
+* TooltipProvider lets you configure delay and other global options once.  
+* Use `asChild` on TooltipTrigger to pass the tooltip behavior to arbitrary elements.  
+* Combine Tailwind classes with component props (e.g., `sideOffset`) for positioning.
+
+## Quick Start
+```tsx
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipTrigger,
+	TooltipProvider,
+} from '~/lib/ui/tooltip'
+
+export const Example = () => (
+	<TooltipProvider>
+		<Tooltip>
+			<TooltipTrigger asChild>
+				<button className="px-2 py-1 text-sm border rounded">
+					Hover me
+				</button>
+			</TooltipTrigger>
+
+			<TooltipContent className="bg-zinc-800 text-white p-2 rounded shadow">
+				Tooltip text
+			</TooltipContent>
+		</Tooltip>
+	</TooltipProvider>
+)
+```
+
+## Detailed Guide
+1. Wrap your tooltip group in `TooltipProvider` (optional but recommended for shared delay).  
+2. Create a `Tooltip` wrapper.  
+3. Inside, add `TooltipTrigger`—either a native element or pass `asChild` to reuse an existing one.  
+4. Add `TooltipContent` right after the trigger.  
+5. Style `TooltipContent` with Tailwind (`p-4`, `rounded`, etc.) and, if needed, positioning props such as `sideOffset` (seen in production examples).
+
+```tsx
+<Tooltip>
+	<TooltipTrigger>
+		<InfoIcon className="w-4 h-4 text-blue-500" />
+	</TooltipTrigger>
+
+	<TooltipContent
+		side="top"
+		sideOffset={8}
+		className="flex gap-2 items-center bg-blue-600 text-white text-xs px-3 py-1 rounded"
+	>
+		<span>Additional details</span>
+	</TooltipContent>
+</Tooltip>
+```
+
+## Props Reference
+_None_
+
+## Sub-Components / Building Blocks
+### Tooltip
+Wrapper that groups trigger and content. It controls open state when used without TooltipProvider.
+
+### TooltipTrigger
+Element that the user interacts with to open the tooltip. Accepts `asChild` for composition.
+
+### TooltipProvider
+Optional context provider that sets delay, skipDelay, and disables all tooltips when needed.
+
+## Examples
+```tsx
+// Editing dialog shortcut
+<TooltipProvider>
+	<Dialog>
+		<Tooltip>
+			<TooltipTrigger asChild>
+				<DialogTrigger asChild>
+					<Button size="sm" variant="ghost">
+						<PencilIcon size={16} />
+					</Button>
+				</DialogTrigger>
+			</TooltipTrigger>
+
+			<TooltipContent className="p-2">
+				<AnchorButton size="sm" variant="ghost">
+					Open
+				</AnchorButton>
+			</TooltipContent>
+		</Tooltip>
+
+		<DialogContent>
+			<EntityEditContent entityName="Article" close={() => {}} />
+		</DialogContent>
+	</Dialog>
+</TooltipProvider>
+```
+Above, TooltipContent wraps a navigation link, giving users a clear “Open” hint before launching a dialog.
+
+```tsx
+// Formatted monetary value with a note
+<Tooltip>
+	<TooltipTrigger className="border-b border-dashed">
+		{formatFractionalAmount(price, 2, 'Kč')}
+	</TooltipTrigger>
+
+	<TooltipContent className="max-w-xs p-4">
+		{nl2brJsx(priceNote)}
+	</TooltipContent>
+</Tooltip>
+```
+Use TooltipContent to show multiline notes while keeping the table cell compact.
+
+```tsx
+// Certificate metadata in a list
+<TooltipContent>
+	{entityLabels.CourseCertificate.fields.signedAt}:{' '}
+	<FormattedField field="certificate.certificateFiles(type=signed).signedAt" />
+</TooltipContent>
+```
+TooltipContent can be placed directly inside lists or grids to reveal secondary metadata on hover.
+
+## Best Practices & Gotchas
+* Always pair TooltipContent with TooltipTrigger inside the same Tooltip component.  
+* Keep TooltipContent short; long text increases cognitive load.  
+* Use `sideOffset` (seen in examples) to avoid overlapping UI elements.  
+* Wrap the whole page (or section) in TooltipProvider to avoid repeating delay props.  
+* Avoid tooltips on elements that already have native browser tooltips (e.g., `<abbr>` with title).
+
+## Further Reading
+* Tooltip  
+* TooltipTrigger  
+* TooltipProvider  
+* Dialog & DialogContent (often combined with tooltips)  
+* Tailwind spacing and positioning utilities  
+
+<!-- End of Generated Documentation -->

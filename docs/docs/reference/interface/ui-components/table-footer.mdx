@@ -1,0 +1,66 @@
+---
+title: TableFooter
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 0 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 0 -->
+<!-- Import examples: 0 -->
+
+## Overview
+`TableFooter` renders a semantic HTML `<tfoot>` element.  
+Use it to group summary rows or aggregated data at the bottom of a table.
+
+## Styling Guidelines
+* All examples use Tailwind CSS.  
+* No Contember-specific theme classes are required.
+
+## Core Concepts
+* Semantic HTML improves accessibility.
+* Footers usually contain totals or actions aligned with table columns.
+* `TableFooter` does not add styles; Tailwind handles presentation.
+
+## Quick Start
+```tsx
+import { TableFooter } from "@contember/react-components"
+
+export const OrdersTable = () => (
+	<table className="min-w-full divide-y divide-gray-200">
+		{/* …head and body rows… */}
+		<TableFooter>
+			<tr className="bg-gray-50">
+				<td className="px-4 py-2 font-semibold">Total</td>
+				<td className="px-4 py-2 text-right">$1 234.00</td>
+			</tr>
+		</TableFooter>
+	</table>
+)
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| *(inherits)* `React.ComponentPropsWithoutRef<'tfoot'>` | – | No | – | All standard `<tfoot>` props are forwarded.|
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+_None_
+
+## Best Practices & Gotchas
+* Keep footer row counts small; too many rows reduce readability.
+* Align footer cell count with body rows to avoid layout shifts.
+* Apply contrast-friendly background colors for quick visual separation.
+
+## Further Reading
+* TableHead  
+* TableBody  
+* TableRow  
+
+<!-- End of Generated Documentation -->

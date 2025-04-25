@@ -1,0 +1,63 @@
+---
+title: DropIndicator
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 0 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 0 -->
+<!-- Import examples: 0 -->
+
+## Styling Guidelines
+* All examples use Tailwind CSS.
+* No Contember-specific theme classes are required for `DropIndicator`.
+
+## Core Concepts
+* A drop indicator shows where a dragged item will be placed.
+* It reacts to drag-and-drop events from parent components.
+* Render it inside sortable or droppable lists to improve UX.
+
+## Quick Start
+```tsx
+import { DropIndicator } from '@contember/react-dnd';
+
+export const BasicList = () => (
+	<ul className="divide-y divide-gray-200">
+		<li className="p-2">Item A</li>
+		<DropIndicator />
+		<li className="p-2">Item B</li>
+	</ul>
+);
+```
+
+## Examples
+
+### Visual cue between list items
+```tsx
+import { DropIndicator } from '@contember/react-dnd';
+
+export const TaskList = () => (
+	<div className="w-64 bg-white shadow rounded">
+		{['Inbox', 'Today', 'Upcoming'].map(task => (
+			<div key={task} className="p-3">
+				{task}
+				<DropIndicator />
+			</div>
+		))}
+	</div>
+);
+```
+The indicator appears between tasks as you drag another task over the list, clarifying the drop position.
+
+## Best Practices & Gotchas
+* Render only one indicator between any two items.
+* Hide the indicator with `display: none` when nothing is being dragged to avoid layout shifts.
+* Wrap it with a focusable element if you need keyboard reordering support.
+
+## Further Reading
+* Drag & Drop overview in Contember docs
+* `Draggable` and `Droppable` components
+* Accessibility guidelines for drag-and-drop
+
+<!-- End of Generated Documentation -->

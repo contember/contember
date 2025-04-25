@@ -1,0 +1,109 @@
+---
+title: DataGridFilterActionButtonUI
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 0 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 0 -->
+<!-- Import examples: 0 -->
+
+# DataGridFilterActionButtonUI
+
+## Overview
+DataGridFilterActionButtonUI renders a button inside a tooltip.
+You use it to execute the active DataGrid filter and refresh the displayed results.
+
+## Styling Guidelines
+All examples use Tailwind CSS utility classes.
+The component does not require Contember-specific theme classes, but you can add them as needed.
+
+## Core Concepts
+- The button lives inside a tooltip near the filter inputs.
+- Clicking the button applies the current filter state.
+- You usually place the component next to DataGrid filter controls.
+- The component receives no dedicated props—behavior comes from its context.
+
+## Quick Start
+```tsx
+import { DataGridFilterActionButtonUI } from '@contember/react-datagrid'
+
+export const OrdersPage = () => (
+	<div className="p-6">
+		{/* ... your DataGrid here ... */}
+		<Tooltip content="Apply filter">
+			<DataGridFilterActionButtonUI />
+		</Tooltip>
+	</div>
+)
+```
+
+## Detailed Guide
+You rarely use the button alone.
+The snippet below shows it alongside a simple filter form.
+
+```tsx
+import { DataGrid, DataGridFilterActionButtonUI } from '@contember/react-datagrid'
+
+const ProductsGrid = () => (
+	<DataGrid
+		resource="Product"
+		className="border rounded-md"
+	>
+		<DataGrid.Filter>
+			<input
+				type="text"
+				placeholder="Search name"
+				className="input input-bordered w-full max-w-xs"
+			/>
+			<Tooltip content="Filter products">
+				<DataGridFilterActionButtonUI />
+			</Tooltip>
+		</DataGrid.Filter>
+
+		<DataGrid.Columns>
+			<DataGrid.Column field="name" header="Name" />
+			<DataGrid.Column field="price" header="Price" />
+		</DataGrid.Columns>
+	</DataGrid>
+)
+```
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+
+## Examples
+### Combine with custom icon
+```tsx
+<Tooltip content="Apply filter" className="bg-neutral-800 text-white">
+	<DataGridFilterActionButtonUI>
+		<span className="material-icons">filter_alt</span>
+	</DataGridFilterActionButtonUI>
+</Tooltip>
+```
+You wrap the icon in the component to keep the click handler intact.
+
+### Place inside a toolbar
+```tsx
+<div className="flex items-center gap-2">
+	<label className="text-sm">Filters</label>
+	<DataGridFilterActionButtonUI className="btn btn-primary" />
+</div>
+```
+You can pass Tailwind or custom classes to match surrounding controls.
+
+## Best Practices & Gotchas
+- Keep the button close to filter inputs to improve UX.
+- Wrap the component in a tooltip for clarity.
+- Do not add business logic inside the button; place it in filter handlers.
+- Style using external `className`; the component has no style props.
+- Remember the button does nothing without an active DataGrid context.
+
+## Further Reading
+- DataGrid
+- DataGrid.Filter
+- Tooltip integration patterns
+
+<!-- End of Generated Documentation -->

@@ -1,0 +1,112 @@
+---
+title: DataGridTable
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 14 -->
+<!-- Source examples: 1 -->
+<!-- Playground examples: 3 -->
+<!-- External examples: 10 -->
+<!-- Import examples: 8 -->
+
+# DataGridTable
+
+## Overview
+`DataGridTable` renders a classic table layout inside a `DataView`.
+Use it to display tabular data when the user selects the *table* view in a `DataGrid`.
+
+## Styling Guidelines
+* All examples use Tailwind CSS utility classes.
+* No Contember-specific theme classes are required.
+
+## Core Concepts
+* `DataGridTable` works **only** inside `DataView` – usually provided by `DataGridLoader`.
+* You build table columns with column components (`DataGridTextColumn`, `DataGridNumberColumn`, …).
+* The component changes automatically when users switch between rows, tiles, or other `DataView` layouts.
+
+## Quick Start
+```tsx
+<DataGrid entities="Article">
+  <DataGridLoader>
+    <DataGridTable>
+      <DataGridTextColumn header="Title" field="title" />
+      <DataGridTextColumn header="Author" field="author" />
+    </DataGridTable>
+  </DataGridLoader>
+</DataGrid>
+```
+
+## Sub-Components / Building Blocks
+### DataGridTextColumn
+Text cell renderer for string fields.
+
+### DataGridNumberColumn
+Numeric cell renderer with optional formatting.
+
+### DataGridActionColumn
+Renders buttons or links for each row.
+
+### DataGridHasOneColumn
+Displays related entity fields (one-to-one / many-to-one).
+
+## Examples
+
+### Toggleable layout with toolbar
+```tsx
+<DataGrid entities="GridArticle" initialSorting={{ publishedAt: 'asc' }}>
+  <DataGridToolbar sticky />
+  <DataGridLoader>
+    <DataGridTable>
+      <DataGridTextColumn header="Title" field="title" />
+      <DataGridTextColumn header="Author" field="author" />
+    </DataGridTable>
+
+    <DataGridTiles>
+      <CustomGridTile />
+    </DataGridTiles>
+  </DataGridLoader>
+  <DataGridPagination sticky />
+</DataGrid>
+```
+The table layout and tile layout coexist. Users switch views without remounting the grid.
+
+### Select row from dialog
+```tsx
+<Dialog open={open} onOpenChange={setOpen}>
+  <DialogTrigger asChild>
+    <Button size="sm" variant="outline">Select image</Button>
+  </DialogTrigger>
+  <DialogContent className="max-w-[90vw]">
+    <DataGrid entities="UploadImage">
+      <DataGridLoader>
+        <DataGridTable>
+          <DataGridActionColumn>
+            <UseEntity render={it => (
+              <Button onClick={() => { connect(it); closeOnSelect && setOpen(false) }}>
+                Select
+              </Button>
+            )} />
+          </DataGridActionColumn>
+          <DataGridTextColumn field="url" header="URL" />
+        </DataGridTable>
+      </DataGridLoader>
+      <DataGridPagination />
+    </DataGrid>
+  </DialogContent>
+</Dialog>
+```
+Inside a modal, the table lets users pick an entity and close the dialog in one click.
+
+## Best Practices & Gotchas
+* Always wrap `DataGridTable` in `DataGridLoader`; otherwise, it renders nothing.
+* Combine with `DataGridToolbar` so users can change views or apply filters.
+* Keep columns lean—avoid heavy render functions that slow every cell.
+* Use `className` on individual columns, **not** on `DataGridTable`, for per-column styling.
+
+## Further Reading
+* DataGrid
+* DataGridTiles
+* DataGridLoader
+* DataGridToolbar
+
+<!-- End of Generated Documentation -->

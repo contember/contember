@@ -10,18 +10,18 @@ title: DefaultSelectDataView
 <!-- Import examples: 0 -->
 
 ## Overview
-`DefaultSelectDataView` renders a ready-made `DataView` optimised for select and multiselect pop-overs.  
+`DefaultSelectDataView` renders a ready-made `DataView` optimised for select and multiselect pop-overs.
 You provide an optional search field, an initial sort order, and a child renderer for list items.
 
 ## Styling Guidelines
-* All examples use Tailwind CSS utility classes.  
+* All examples use Tailwind CSS utility classes.
 * The component adds no Contember theme classes, so you rely on your project’s defaults.
 
 ## Core Concepts
-* Integrates `DataView` into a select pop-over.  
-* `queryField` enables full-text search.  
-* `initialSorting` sets first ordering.  
-* `children` renders each entity row.  
+* Integrates `DataView` into a select pop-over.
+* `queryField` enables full-text search.
+* `initialSorting` sets first ordering.
+* `children` renders each entity row.
 * The component is headless—style it in parent UI.
 
 ## Quick Start
@@ -47,8 +47,8 @@ import { DefaultSelectDataView } from './list'
   )}
 </DefaultSelectDataView>
 ```
-* `queryField` links search input to `fullName`.  
-* `initialSorting` keeps list alphabetical.  
+* `queryField` links search input to `fullName`.
+* `initialSorting` keeps list alphabetical.
 * The child function renders each row with an avatar and name.
 
 ## Props Reference
@@ -59,21 +59,15 @@ import { DefaultSelectDataView } from './list'
 | children | React.ReactNode | Yes | — | Renderer for each entity. |
 | *…DataView props* | *Inherited* | No | — | All other `DataView` props are forwarded. |
 
-## Sub-Components / Building Blocks
-_None_
-
-## Examples
-_None_
-
 ## Best Practices & Gotchas
-* Wrap the component in `SelectPopoverContent` or similar pop-over.  
-* Index `queryField` in your database for fast search.  
-* Keep row markup light to ensure smooth scrolling.  
+* Wrap the component in `SelectPopoverContent` or similar pop-over.
+* Index `queryField` in your database for fast search.
+* Keep row markup light to ensure smooth scrolling.
 * Pass a stable object to `initialSorting` to avoid unnecessary re-renders.
 
 ## Further Reading
-* `DataView` – underlying list component.  
-* `Select` and `MultiSelect` – Contember form field components.  
+* `DataView` – underlying list component.
+* `Select` and `MultiSelect` – Contember form field components.
 * `useDataView` hook for advanced filtering logic.
 
 <!-- End of Generated Documentation -->

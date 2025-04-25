@@ -1,0 +1,78 @@
+---
+title: TextareaAutosize
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 2 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 2 -->
+<!-- Import examples: 2 -->
+
+# TextareaAutosize
+
+## Overview
+_None_
+
+## Styling Guidelines
+* All examples use Tailwind utility classes.  
+* The component does not require any Contember-specific theme classes, but it works well with common classes such as `border`, `rounded`, and `w-full`.
+
+## Core Concepts
+* The textarea grows vertically to fit its content.
+* You can control the value with React state or let the browser manage it.
+* The component forwards all native `<textarea>` attributes and events.
+
+## Quick Start
+```tsx
+import { useState } from 'react'
+import { TextareaAutosize } from '@app/lib/ui/textarea'
+
+export const BasicDemo = () => {
+  const [note, setNote] = useState('')
+
+  return (
+    <TextareaAutosize
+      value={note}
+      onChange={e => setNote(e.target.value)}
+      placeholder="Type your notes…"
+      className="w-full border rounded p-2"
+    />
+  )
+}
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| *All native textarea attributes* | `HTMLTextAreaAttributes` | No | — | Inherited from the standard `<textarea>` element. |
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+
+```tsx
+<StandaloneFormContainer label="Gradient" labelPosition="left">
+  <TextareaAutosize
+    value={options.gradient}
+    onChange={e => setOptions({ ...options, gradient: e.target.value })}
+    className="w-96 border rounded"
+  />
+</StandaloneFormContainer>
+```
+The component integrates seamlessly with Contember forms. It receives `value` and `onChange` like a regular textarea, while Tailwind classes handle the visual styling.
+
+## Best Practices & Gotchas
+* Keep the component controlled to avoid cursor jumps when syncing external state.
+* Limit `maxRows` (if supported) to prevent the textarea from overtaking the page.
+* Combine with `resize-none` Tailwind class if you want to disable manual resizing.
+
+## Further Reading
+* Contember Form components
+* Tailwind `resize` utilities
+
+<!-- End of Generated Documentation -->

@@ -1,0 +1,98 @@
+---
+title: AnchorButton
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 15 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 5 -->
+<!-- External examples: 10 -->
+<!-- Import examples: 8 -->
+
+# AnchorButton
+
+## Overview
+AnchorButton renders an anchor (`<a>`) element styled like a button.
+Use it when you need button-level styling while preserving link semantics.
+
+## Styling Guidelines
+* All examples use Tailwind classes.
+* No Contember theme classes are required; style freely with Tailwind utilities.
+
+## Core Concepts
+* Combines anchor navigation with button appearance.
+* Accepts the same `variant` and `size` props as the standard `Button` component.
+* Pass any valid anchor attributes (`href`, `target`, etc.).
+* Composes well with Contember’s `<Link>` for client-side routing.
+
+## Quick Start
+```tsx
+import { AnchorButton } from '~/lib/ui/button'
+
+export const BasicLink = () => (
+	<AnchorButton href="https://contember.com" variant="outline" size="sm" className="mx-auto">
+		Docs
+	</AnchorButton>
+)
+```
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| children | `ReactNode` | Yes | — | Button label or elements. |
+| variant | `'ghost' \| 'outline' \| 'link' \| 'destructive'` | No | `'outline'` | Visual style matching Contember buttons. |
+| size | `'xs' \| 'sm' \| 'md' \| 'lg'` | No | `'md'` | Predefined sizing token. |
+| href | `string` | No | — | Destination URL. Leave empty when used inside a `<Link>`. |
+| className | `string` | No | — | Additional Tailwind classes. |
+| *All other anchor props* | `React.AnchorHTMLAttributes<HTMLAnchorElement>` | No | — | Props inherited from native `<a>`. |
+
+## Examples
+
+### 1. Icon button inside a toolbar
+```tsx
+import { BadgeCheckIcon } from 'lucide-react'
+
+<AnchorButton variant="ghost" size="xs" className="flex gap-2">
+	<BadgeCheckIcon size={16} />
+	Security
+</AnchorButton>
+```
+A small, low-prominence action used inside a complex toolbar.
+
+### 2. Toggling a query parameter
+```tsx
+() => {
+	const required = !!useEnvironment().getParameterOrElse('required', false)
+
+	return (
+		<Link to={it => it ? ({ pageName: it.pageName, parameters: { required: !required ? '1' : '' } }) : it}>
+			<AnchorButton variant="outline">
+				{required ? 'Turn off required' : 'Turn on required'}
+			</AnchorButton>
+		</Link>
+	)
+}
+```
+The button updates URL state without full reload thanks to `<Link>`.
+
+### 3. Destructive external link
+```tsx
+<AnchorButton href={appUrl} size="lg" className="w-full" variant="destructive">
+	Continue as default user
+</AnchorButton>
+```
+Use the `destructive` variant to warn users before critical actions.
+
+## Best Practices & Gotchas
+* Prefer `<Link>` wrapped AnchorButtons for internal navigation.
+* Do not mix `href` and `<Link>`—pick one approach.
+* Keep anchor semantics for accessibility; screen readers expect it.
+* Use succinct labels; long text breaks layout in small sizes.
+* Ensure `variant="link"` still looks interactive on hover/focus.
+
+## Further Reading
+* Button – shares `variant` and `size` APIs.
+* Link – Contember routing component used with AnchorButton.
+* Tailwind documentation – for custom styling.
+
+<!-- End of Generated Documentation -->

@@ -1,0 +1,127 @@
+---
+title: TooltipTrigger
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 11 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 1 -->
+<!-- External examples: 10 -->
+<!-- Import examples: 6 -->
+
+## TooltipTrigger
+
+### Overview
+`TooltipTrigger` defines the element that opens and closes a tooltip.  
+It forwards events to the tooltip context and can wrap an existing child via the `asChild` prop.
+
+### Styling Guidelines
+* All examples use Tailwind CSS.  
+* No additional Contember theme classes are required.
+
+### Core Concepts
+* The component only controls tooltip visibility.
+* Wrap any interactive element with `TooltipTrigger` to enable tooltips.
+* Use `asChild` to avoid extra DOM nodes.
+* Place `TooltipTrigger` inside `Tooltip` and `TooltipProvider`.
+
+### Quick Start
+```tsx
+import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '~/lib/ui/tooltip'
+
+export const Example = () => (
+  <TooltipProvider>
+    <Tooltip>
+      <TooltipTrigger className="underline decoration-dotted">
+        Hover me
+      </TooltipTrigger>
+      <TooltipContent className="bg-zinc-800 text-white px-2 py-1 rounded">
+        Helpful info
+      </TooltipContent>
+    </Tooltip>
+  </TooltipProvider>
+)
+```
+
+### Detailed Guide
+```tsx
+import {
+  TooltipProvider,
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from '~/lib/ui/tooltip'
+
+export const WrappedButton = () => (
+  <TooltipProvider>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <button className="px-3 py-1 border rounded">Edit</button>
+      </TooltipTrigger>
+      <TooltipContent className="bg-zinc-900 text-white rounded px-2 py-1">
+        Open the edit dialog
+      </TooltipContent>
+    </Tooltip>
+  </TooltipProvider>
+)
+```
+* `asChild` prevents an extra `<span>` wrapper.
+* Events propagate to the tooltip even when you pass a custom component.
+
+### Props Reference
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| `asChild` | `boolean` | `No` | ``false`` | `Renders only its child without adding a wrapper element.` |
+| `className` | `string` | `No` | `–` | `Tailwind or custom class names applied to the wrapper.` |
+| `...HTMLAttributes` | `inherited` | `No` | `–` | `All standard HTML props.` |
+
+### Sub-Components / Building Blocks
+#### Tooltip
+The parent component that manages state.
+
+#### TooltipContent
+The floating panel that shows the tooltip body.
+
+#### TooltipProvider
+Context provider; place it once near the root.
+
+### Examples
+Progress bar trigger:  
+```tsx
+<Tooltip>
+  <TooltipTrigger asChild>
+    <button className="w-full max-w-[200px] h-2 relative">
+      <span className="block w-full h-2 bg-progress rounded-full absolute left-0 top-0" />
+      <span
+        style={{ width: `${percent}%` }}
+        className="block h-2 bg-success rounded-full absolute left-0 top-0 z-10"
+      />
+    </button>
+  </TooltipTrigger>
+  <TooltipContent>{percent}% completed</TooltipContent>
+</Tooltip>
+```
+Inline price note:  
+```tsx
+<Tooltip>
+  <TooltipTrigger className="border-b border-zinc-700 border-dashed">
+    {formatPrice(price)}
+  </TooltipTrigger>
+  <TooltipContent>{nl2brJsx(note)}</TooltipContent>
+</Tooltip>
+```
+
+### Best Practices & Gotchas
+* Always wrap the whole tooltip tree with `TooltipProvider`.
+* Use `asChild` when you need semantic HTML, e.g., wrapping a `<button>`.
+* Avoid placing focusable elements inside both `TooltipTrigger` and `TooltipContent`.
+* Keep tooltip content short to prevent overflow on small screens.
+
+### Further Reading
+* Tooltip  
+* TooltipContent  
+* TooltipProvider  
+* React Portals for floating UI  
+* Tailwind pseudo-class utilities  
+
+<!-- End of Generated Documentation -->

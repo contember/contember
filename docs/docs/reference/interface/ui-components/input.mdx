@@ -1,0 +1,142 @@
+---
+title: Input
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 15 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 5 -->
+<!-- External examples: 10 -->
+<!-- Import examples: 8 -->
+
+# Input
+
+## Overview
+Input is a lightweight wrapper around the native `<input>` element.  
+It ships with Contember-approved Tailwind classes and forwards every React `<input>` prop and ref.
+
+## Styling Guidelines
+* All examples use Tailwind CSS.  
+* The component adds Contember theme classes automatically—no extra work is needed.
+
+## Core Concepts
+* Input behaves like a normal `<input>` while providing consistent design.
+* You can pass any standard `<input>` attribute (value, onChange, type, etc.).
+* The component forwards `ref` so you can control focus or selection.
+* Combine it with Contember form helpers (`FormInput`, `FormContainer`) for validation and data binding.
+
+## Quick Start
+```tsx
+import { Input } from '~/lib/ui/input'
+import { useState } from 'react'
+
+export default function QuickStart() {
+  const [email, setEmail] = useState('')
+
+  return (
+    <Input
+      type="email"
+      value={email}
+      onChange={e => setEmail(e.target.value)}
+      placeholder="your@email.com"
+      className="max-w-md"
+    />
+  )
+}
+```
+
+## Detailed Guide
+### Using Input with FormInput
+```tsx
+import { Input } from '~/lib/ui/input'
+import { FormInput, useField } from '@contember/react'
+import { useRef, useCallback } from 'react'
+
+export default function PriceField() {
+  const fractionDigits = 2
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  const parse = useCallback(
+    (raw: string) => {
+      const val = parseFloat(raw)
+      return Number.isNaN(val) ? null : Math.round(val * 10 ** fractionDigits)
+    },
+    [fractionDigits],
+  )
+
+  const format = useCallback(
+    (stored: number | null) =>
+      stored === null ? '' : (stored / 10 ** fractionDigits).toFixed(fractionDigits),
+    [fractionDigits],
+  )
+
+  return (
+    <FormInput field="price" parseValue={parse} formatValue={format}>
+      <Input ref={inputRef} className="max-w-md" />
+    </FormInput>
+  )
+}
+```
+The snippet demonstrates how to:
+* Parse and format user input.
+* Keep cursor position via `ref`.
+* Let Contember handle validation while you handle display.
+
+## Props Reference
+_None_
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+### Toggle between select and free text
+```tsx
+const options = { apple: 'Apple', banana: 'Banana' }
+
+export function SelectOrType({ field }) {
+  const [showSelect, setShowSelect] = useState(true)
+  const access = useField<string>({ field })
+
+  return showSelect ? (
+    <Select value={access.value ?? undefined} onValueChange={v => {
+        if (v === '___other') {
+          setShowSelect(false)
+          access.updateValue('')
+        } else {
+          access.updateValue(v)
+        }
+      }}>
+      {/* …items… */}
+    </Select>
+  ) : (
+    <FormInput field={field}>
+      <Input className="max-w-md" />
+    </FormInput>
+  )
+}
+```
+This real-world pattern lets users pick a predefined value or type their own.
+
+### Read-only display inside DataView
+```tsx
+<Field<string>
+  field="value"
+  format={val => <Input value={val ?? ''} readOnly className="max-w-md" />}
+/>
+```
+Use Input for consistent read-only rendering inside a data view.
+
+## Best Practices & Gotchas
+* Always forward `className` to keep the default styling intact.
+* Use `max-w-md` or similar Tailwind utilities to constrain width.
+* Forward `ref` when you need cursor control or focus management.
+* Do not wrap Input in extra divs unless you need custom layout—its own styles are already scoped.
+* Combine Input with Contember `FormInput` for schema-aware validation.
+
+## Further Reading
+* FormInput – parsing, formatting, and validation.
+* FormContainer – labels and descriptions.
+* Select – alternative to free-text input.
+* DataView components – displaying read-only data.
+
+<!-- End of Generated Documentation -->

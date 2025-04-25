@@ -1,0 +1,74 @@
+---
+title: DataGridColumnLeaf
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 0 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 0 -->
+<!-- Import examples: 0 -->
+
+# DataGridColumnLeaf
+
+## Overview
+DataGridColumnLeaf is an *internal* Contember component marked `@internal`.
+It represents a leaf-level column definition inside a DataGrid layout.
+
+## Styling Guidelines
+* All examples below use Tailwind CSS utility classes.
+* The component itself adds no Contember-specific theme classes.
+
+## Core Concepts
+* A “leaf” column contains the actual cell renderer—no nested columns.
+* You pass React nodes for both the header and individual cells.
+* Use the optional `name` prop to identify the column for debugging or tests.
+
+## Quick Start
+```tsx
+import { DataGridColumnLeaf } from '@contember/react-datagrid';
+
+export const BasicColumn = () => (
+  <DataGridColumnLeaf
+    header={<span className="font-semibold">Status</span>}
+    cell={<span className="text-sm text-green-600">Active</span>}
+    name="status"
+  />
+);
+```
+
+## Props Reference
+| Name   | Type             | Required | Default | Description      |
+|--------|------------------|----------|---------|------------------|
+| header | React.ReactNode  | No       | —       | _Undocumented_   |
+| cell   | React.ReactNode  | Yes      | —       | _Undocumented_   |
+| name   | string           | No       | —       | _Undocumented_   |
+
+## Examples
+
+### Conditional Cell Rendering
+```tsx
+<DataGridColumnLeaf
+  header={<span className="font-semibold">Status</span>}
+  name="status"
+  cell={({ value }) => (
+    <span
+      className={value === 'active' ? 'text-green-600' : 'text-red-600'}
+    >
+      {value === 'active' ? 'Active' : 'Inactive'}
+    </span>
+  )}
+/>
+```
+This example changes text color based on the `value` supplied by the DataGrid’s row renderer.
+
+## Best Practices & Gotchas
+* Always provide a `cell` prop; the component renders nothing without it.
+* Keep complex logic inside the `cell` renderer rather than the parent component for clarity.
+* Use the `name` prop to simplify automated testing selectors.
+
+## Further Reading
+* DataGrid – parent component that consumes DataGridColumnLeaf.
+* DataGridColumnGroup – for nested column structures.
+
+<!-- End of Generated Documentation -->

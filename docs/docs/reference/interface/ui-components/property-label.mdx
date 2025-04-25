@@ -1,0 +1,86 @@
+---
+title: PropertyLabel
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 4 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 4 -->
+<!-- Import examples: 4 -->
+
+# PropertyLabel
+
+## Overview
+_None_
+
+## Styling Guidelines
+* All examples use Tailwind CSS utility classes.  
+* PropertyLabel works with any Contember theme. No special theme classes are required.
+
+## Core Concepts
+* PropertyLabel renders a text label inside a PropertyList.  
+* It pairs with PropertyValue and PropertyItem to build read-only detail views.  
+* You can pass Tailwind classes through `className` for quick styling.  
+* PropertyLabel never fetches data; you decide what text it displays.
+
+## Quick Start
+```tsx
+import { PropertyLabel } from '~/lib/ui/property-list'
+
+export const EmailSubject = () => (
+	<PropertyLabel className="text-sm font-medium text-gray-600">
+		Subject
+	</PropertyLabel>
+)
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+_None_
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+
+```tsx
+<PropertyRow>
+	<PropertyLabel className="font-semibold">
+		{entityLabels.Email.fields.content}
+	</PropertyLabel>
+
+	<PropertyValue className="font-normal">
+		<FormattedField field="content" formatter={formatStringToHtmlDoc} />
+	</PropertyValue>
+</PropertyRow>
+```
+You render a bold label next to rich HTML content. PropertyRow keeps the label and value aligned.
+
+---
+
+```tsx
+{!readonly && (
+	<PropertyLabel className="text-lg font-semibold border-0">
+		{componentLabels.hotspotsEditor.title}
+	</PropertyLabel>
+)}
+```
+You conditionally show the label only in edit mode. Tailwind classes adjust size and remove default border.
+
+## Best Practices & Gotchas
+* Keep label text short; long labels break layout.  
+* Use semantic Tailwind classes (`font-semibold`, `text-sm`) for consistent typography.  
+* Wrap the component in PropertyRow or PropertyItem for correct spacing.  
+* Do not place interactive elements inside PropertyLabel; it is presentational only.
+
+## Further Reading
+* PropertyList – container for labels and values  
+* PropertyItem – combined label + value helper  
+* PropertyValue – companion component for displaying data
+
+<!-- End of Generated Documentation -->

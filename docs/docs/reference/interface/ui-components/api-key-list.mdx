@@ -1,0 +1,87 @@
+---
+title: ApiKeyList
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 1 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 1 -->
+<!-- External examples: 0 -->
+<!-- Import examples: 1 -->
+
+# ApiKeyList
+
+## Styling Guidelines
+* All snippets use Tailwind CSS utility classes.
+* ApiKeyList has no mandatory Contember theme classes.
+
+## Core Concepts
+* ApiKeyList displays all API keys belonging to the current project.
+* You can pass a `MemberListController` via the `controller` prop to trigger programmatic refreshes.
+* Combine ApiKeyList with `CreateApiKeyForm` for a full CRUD workflow.
+
+## Quick Start
+```tsx
+import { ApiKeyList } from '~/lib/tenant'
+
+export default function ApiKeyPage() {
+	return (
+		<div className="p-6">
+			<ApiKeyList />
+		</div>
+	)
+}
+```
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| controller | `MemberListController` | No | `undefined` | Optional controller instance that lets you call `refresh()` on the list. |
+
+## Examples
+
+### 1. Refresh the list after creating a new key
+```tsx
+() => {
+	const controllerRef = useRef<MemberListController>()
+	const showToast = useShowToast()
+	const projectSlug = useProjectSlug()!
+
+	return (
+		<div className="flex flex-col gap-4">
+			<CreateApiKeyForm
+				projectSlug={projectSlug}
+				initialMemberships={[{ role: 'admin', variables: [] }]}
+				onSuccess={args => {
+					showToast(
+						<ToastContent title="API key created">
+							<Input value={args.result.apiKey.token} type="text" />
+						</ToastContent>,
+						{ type: 'success' },
+					)
+					controllerRef.current?.refresh()
+				}}
+			>
+				<form className="grid gap-4">
+					<CreateApiKeyFormFields projectSlug={projectSlug} />
+				</form>
+			</CreateApiKeyForm>
+
+			<ApiKeyList controller={controllerRef} />
+		</div>
+	)
+}
+```
+Explanation: You store the controller in a ref. After the form succeeds, call `controllerRef.current?.refresh()` to reload the list instantly.
+
+## Best Practices & Gotchas
+* Keep the controller in a `useRef` to avoid unnecessary re-renders.
+* Always call `refresh()` after mutating API keys to keep the list in sync.
+* Wrap the list in responsive containers (`className="w-full overflow-auto"`) for small screens.
+
+## Further Reading
+* `CreateApiKeyForm` – create new keys.
+* `MemberListController` – imperative API for lists.
+* Contember project roles and permissions.
+
+<!-- End of Generated Documentation -->

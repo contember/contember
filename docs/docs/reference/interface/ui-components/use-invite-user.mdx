@@ -1,0 +1,135 @@
+---
+title: useInviteUser
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 1 -->
+<!-- Source examples: 1 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 0 -->
+<!-- Import examples: 2 -->
+
+# useInviteUser
+
+## Overview
+`useInviteUser` lets you invite users to your Contember project from React code.  
+The hook talks to the tenant API and uses project-level settings to create invitations based on entity accessor fields.
+
+## Styling Guidelines
+* All code samples use Tailwind CSS for basic styling.  
+* The hook itself adds no DOM, so no Contember theme classes are required.
+
+## Core Concepts
+* Invitation happens on demand through an async function returned by the hook.  
+* You map entity fields (`emailField`, `personIdField`) to invitation data.  
+* Memberships define the roles and variables granted to the invited user.  
+* Errors are thrown, so wrap the call in `try / catch`.  
+* The hook depends on a valid `EntityAccessor` created by Contember forms or queries.
+
+## Quick Start
+```tsx
+import { useInviteUser } from '@app/hooks/useInviteUser'
+
+const InviteUserButton = ({ entityAccessor }: { entityAccessor: EntityAccessor }) => {
+  const inviteUser = useInviteUser({
+    emailField: 'email',
+    personIdField: 'personId',
+    memberships: [{ role: 'admin', variables: {} }],
+  })
+
+  return (
+    <button
+      onClick={() => inviteUser(() => entityAccessor)}
+      className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+    >
+      Invite user
+    </button>
+  )
+}
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+_None_
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+
+### Invite on Form Submit
+You can trigger an invitation after a form saves an entity.
+
+```tsx
+import { Form, PersistButton, useFormPersist } from '@contember/react-form'
+import { useInviteUser } from '@app/hooks/useInviteUser'
+
+const UserForm = () => {
+  const inviteUser = useInviteUser({
+    emailField: 'email',
+    personIdField: 'personId',
+    memberships: [{ role: 'editor', variables: {} }],
+  })
+
+  useFormPersist(async accessor => {
+    await inviteUser(() => accessor)
+  })
+
+  return (
+    <Form className="space-y-4">
+      {/* ... form fields bound to email & personId ... */}
+      <PersistButton className="rounded bg-green-600 px-4 py-2 text-white hover:bg-green-700">
+        Save & Invite
+      </PersistButton>
+    </Form>
+  )
+}
+```
+
+Explanation  
+The `useFormPersist` callback runs after the entity is persisted. You pass the accessor straight to `inviteUser`, ensuring the invitation uses the latest data.
+
+### Bulk Invitations in a Table
+Invite several users from a list.
+
+```tsx
+const BulkInvite = ({ rows }: { rows: EntityAccessor[] }) => {
+  const inviteUser = useInviteUser({
+    emailField: 'email',
+    personIdField: 'personId',
+    memberships: [{ role: 'member', variables: {} }],
+  })
+
+  const handleBulk = async () => {
+    await Promise.all(rows.map(row => inviteUser(() => row)))
+  }
+
+  return (
+    <button
+      onClick={handleBulk}
+      className="mt-4 rounded bg-indigo-600 px-6 py-2 text-white hover:bg-indigo-700"
+    >
+      Invite selected users
+    </button>
+  )
+}
+```
+
+Explanation  
+`Promise.all` runs every invitation in parallel. Wrap in `try / catch` if you need per-invite error handling.
+
+## Best Practices & Gotchas
+* Always wrap the invitation call in `try / catch` to surface API errors.  
+* Pass a function that returns the accessor—not the accessor itself—to delay evaluation.  
+* Do not hard-code memberships; read them from project config when possible.  
+* Ensure the entity really contains `email` and `personId`; validation happens on the API side, not in the hook.  
+* Avoid calling the hook inside loops; call it once and reuse the returned function.
+
+## Further Reading
+* Contember documentation – Tenant API  
+* `EntityAccessor` guide  
+* `@contember/react-form` for building forms that provide accessors
+
+<!-- End of Generated Documentation -->

@@ -99,6 +99,8 @@ export const changeMyPasswordMutation: TenantApi.MutationFetcher<{
         readonly error?: ({
             readonly code: TenantApi.ChangeMyPasswordErrorCode;
         } & {
+            readonly weakPasswordReasons?: ReadonlyArray<TenantApi.WeakPasswordReason>;
+        } & {
             readonly developerMessage: string;
         }) | undefined;
     }) | undefined;
@@ -1092,6 +1094,8 @@ export const resetPasswordMutation: TenantApi.MutationFetcher<{
         readonly error?: ({
             readonly code: TenantApi.ResetPasswordErrorCode;
         } & {
+            readonly weakPasswordReasons?: ReadonlyArray<TenantApi.WeakPasswordReason>;
+        } & {
             readonly developerMessage: string;
         } & {
             readonly endUserMessage?: string;
@@ -1170,6 +1174,8 @@ export const signInMutation: TenantApi.MutationFetcher<{
             readonly developerMessage: string;
         } & {
             readonly endUserMessage?: string;
+        } & {
+            readonly retryAfter?: number;
         }) | undefined;
     } & {
         readonly result?: ({

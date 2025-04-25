@@ -329,10 +329,13 @@ export type DataGridNumberFilterProps = Omit<DataViewNumberFilterProps, 'childre
     label: ReactNode;
 };
 
-// Warning: (ae-forgotten-export) The symbol "DataGridPaginationProps" needs to be exported by the entry point index.d.ts
-//
 // @public
 export const DataGridPagination: ({ sticky }: DataGridPaginationProps) => JSX_2.Element;
+
+// @public
+export type DataGridPaginationProps = {
+    sticky?: boolean;
+};
 
 // @public
 export const DataGridPerPageSelector: () => JSX_2.Element;

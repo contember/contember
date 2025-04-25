@@ -1,0 +1,151 @@
+---
+title: DropdownMenuSeparator
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 6 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 4 -->
+<!-- External examples: 2 -->
+<!-- Import examples: 5 -->
+
+# DropdownMenuSeparator
+
+## Overview
+DropdownMenuSeparator renders a thin horizontal line that groups related items inside a dropdown menu.
+It improves visual clarity by separating logical sections of `<DropdownMenuContent>` without adding extra spacing or padding.
+
+## Styling Guidelines
+* All examples use Tailwind CSS utility classes.
+* DropdownMenuSeparator inherits colors from the Contember theme via Radix primitives—no additional theme classes are required.
+
+## Core Concepts
+* Separates menu items into logical groups.
+* Renders only inside `<DropdownMenuContent>`.
+* Uses Radix UI defaults; you usually add only `className` for width or color tweaks.
+* Accepts no custom props—behaves as a purely presentational component.
+
+## Quick Start
+```tsx
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from '~/lib/ui/dropdown'
+
+export const BasicDropdown = () => (
+  <DropdownMenu>
+    <DropdownMenuTrigger asChild>
+      <button className="px-3 py-2 rounded-md bg-primary-600 text-white">
+        Actions
+      </button>
+    </DropdownMenuTrigger>
+
+    <DropdownMenuContent className="w-48 rounded-lg shadow-lg bg-white">
+      <DropdownMenuItem className="px-3 py-2">Edit</DropdownMenuItem>
+      <DropdownMenuItem className="px-3 py-2">Duplicate</DropdownMenuItem>
+
+      <DropdownMenuSeparator />
+
+      <DropdownMenuItem className="px-3 py-2 text-destructive">Delete</DropdownMenuItem>
+    </DropdownMenuContent>
+  </DropdownMenu>
+)
+```
+
+## Examples
+
+### User Profile Menu
+```tsx
+<DropdownMenuContent
+  className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
+  side={isMobile ? 'bottom' : 'right'}
+  align="end"
+  sideOffset={4}
+>
+  <DropdownMenuLabel className="p-0 font-normal">
+    <div className="flex items-center gap-2 pl-3 pr-1 py-1.5 text-left text-sm">
+      <Avatar className="h-8 w-8 rounded-lg">
+        <AvatarFallback avatarFallbackColorString={userEmail} className="rounded-lg">
+          {userInitial}
+        </AvatarFallback>
+      </Avatar>
+      <div className="grid flex-1 text-left text-sm leading-tight">
+        <span className="truncate font-semibold">{userEmail}</span>
+      </div>
+    </div>
+  </DropdownMenuLabel>
+
+  <DropdownMenuSeparator />
+
+  <DropdownMenuGroup>
+    <DropdownMenuItem>
+      <Link to="tenant/security">
+        <AnchorButton variant="ghost" size="xs" className="flex gap-2">
+          <BadgeCheckIcon size={16} />
+          Security
+        </AnchorButton>
+      </Link>
+    </DropdownMenuItem>
+    <DropdownMenuItem>
+      <Link to="tenant/apiKeys">
+        <AnchorButton variant="ghost" size="xs" className="flex gap-2">
+          <BellIcon size={16} />
+          API keys
+        </AnchorButton>
+      </Link>
+    </DropdownMenuItem>
+  </DropdownMenuGroup>
+
+  <DropdownMenuSeparator />
+
+  <DropdownMenuItem>
+    <LogoutTrigger>
+      <Button variant="ghost" size="xs" className="flex gap-2">
+        <LogOutIcon size={16} /> {dict.logout}
+      </Button>
+    </LogoutTrigger>
+  </DropdownMenuItem>
+</DropdownMenuContent>
+```
+Explanation: Two separators divide the label, grouped items, and logout action, creating clear visual sections.
+
+### Repeater Item Actions
+```tsx
+<DropdownMenu>
+  <DropdownMenuTrigger asChild>
+    <DropDownTriggerButton />
+  </DropdownMenuTrigger>
+
+  <DropdownMenuContent className="w-[160px]">
+    <DropdownMenuItem>Edit</DropdownMenuItem>
+    <DropdownMenuItem>Make a copy</DropdownMenuItem>
+
+    <DropdownMenuSeparator />
+
+    <DeleteEntityDialog trigger={
+      <DropdownMenuItem onSelect={e => e.preventDefault()}>
+        Delete
+      </DropdownMenuItem>
+    } />
+  </DropdownMenuContent>
+</DropdownMenu>
+```
+Explanation: The separator isolates destructive `Delete` from routine actions, reducing accidental clicks.
+
+## Best Practices & Gotchas
+* Place separators only between items—not at the start or end of the menu.
+* Combine destructive actions after a separator for safer UX.
+* Avoid over-using separators; too many lines reduce readability.
+* Do not pass onClick or other props—DropdownMenuSeparator ignores them.
+
+## Further Reading
+* DropdownMenu
+* DropdownMenuContent
+* DropdownMenuItem
+* DropdownMenuGroup
+* DropdownMenuLabel
+
+<!-- End of Generated Documentation -->

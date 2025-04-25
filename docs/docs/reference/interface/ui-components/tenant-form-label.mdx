@@ -1,0 +1,93 @@
+---
+title: TenantFormLabel
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 0 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 0 -->
+<!-- Import examples: 0 -->
+
+## Overview  
+_None_
+
+## Styling Guidelines  
+* All examples use Tailwind CSS.  
+* The component renders a plain `<label>` element, so you can add any Tailwind utilities.  
+* No special Contember theme classes are required.
+
+## Core Concepts  
+* The component must receive a `form` object from Contember Form context.  
+* `field` must match a key in `form.values`.  
+* Children define the visible text inside the label.  
+* All regular HTML `<label>` attributes are supported.
+
+## Quick Start  
+```tsx
+import { TenantFormLabel } from "@contember/react"
+
+export const EmailField = ({ form }: { form: any }) => (
+	<div className="flex flex-col gap-2">
+		<TenantFormLabel
+			form={form}
+			field="email"
+			className="block text-sm font-medium text-gray-700"
+		>
+			Email address
+		</TenantFormLabel>
+
+		<input
+			name="email"
+			className="border rounded p-2"
+			onChange={form.handleInputChange}
+		/>
+	</div>
+)
+```
+
+## Detailed Guide  
+_None_
+
+## Props Reference  
+
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| form | CtxValue | Yes | – | Contember form instance. |
+| field | keyof CtxValue["values"] & string | Yes | – | Name of the form field this label describes. |
+| children | React.ReactNode | Yes | – | Visible label content. |
+| className | string | Yes | – | Tailwind / custom classes. |
+| id | string | Yes | – | HTML id. |
+| htmlFor | string | No | – | You can also set `field` instead. |
+| ...all other HTMLLabelElement props | – | No | – | Standard React props forwarded to `<label>`. |
+
+### Inherited props  
+The component passes every prop listed in `React.LabelHTMLAttributes<HTMLLabelElement>` through to the DOM. See React documentation for the full list.
+
+## Sub-Components / Building Blocks  
+_None_
+
+## Examples  
+
+#### Accessible label with custom color  
+```tsx
+<TenantFormLabel
+	form={form}
+	field="password"
+	className="block text-sm font-semibold text-pink-600"
+>
+	Password
+</TenantFormLabel>
+```
+The example shows how you add Tailwind color utilities without extra configuration.
+
+## Best Practices & Gotchas  
+* Always supply the same `field` string to both `TenantFormLabel` and the matching input’s `name` or `id`.  
+* Avoid placing interactive elements (links, buttons) inside the label.  
+* Combine with Tailwind focus styles for clear accessibility feedback.
+
+## Further Reading  
+* Contember `useFormContext` hook  
+* Tailwind Typography plugin for advanced styling  
+
+<!-- End of Generated Documentation -->

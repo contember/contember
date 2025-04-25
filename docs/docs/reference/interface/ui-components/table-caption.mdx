@@ -1,0 +1,73 @@
+---
+title: TableCaption
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 0 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 0 -->
+<!-- Import examples: 0 -->
+
+## Overview
+_None_
+
+## Styling Guidelines
+All examples use Tailwind CSS classes.  
+TableCaption renders a native HTML `<caption>` element, so no extra Contember theme classes are required.
+
+## Core Concepts
+- You place TableCaption as the first child inside a `<table>`.
+- Screen readers announce the caption before table content, improving accessibility.
+- You style the caption with Tailwind classes through the `className` prop inherited from React.
+
+## Quick Start
+```tsx
+import { TableCaption } from '@contember/react-components'
+
+export const PriceTable = () => (
+  <table className="w-full text-sm text-gray-700">
+    <TableCaption className="caption-top font-semibold">
+      Product price list
+    </TableCaption>
+    {/* …table head and body… */}
+  </table>
+)
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+_None_
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+
+### Accessible financial report caption
+```tsx
+<table className="w-full border border-gray-300">
+  <TableCaption className="caption-bottom italic text-gray-500">
+    Financial report for fiscal year 2023
+  </TableCaption>
+  {/* …thead & tbody… */}
+</table>
+```
+The caption appears below the table (`caption-bottom`).  
+Screen readers announce it before users interact with the data grid.
+
+## Best Practices & Gotchas
+- Always keep TableCaption inside the `<table>` tag.  
+- Use concise, descriptive text; avoid repeating surrounding headings.  
+- Place TableCaption as the first child to meet HTML specifications.  
+- Apply Tailwind utilities directly through `className`.  
+- Do not wrap large blocks or interactive elements inside the caption.
+
+## Further Reading
+- Table  
+- TableHead  
+- TableRow  
+- WAI-ARIA Authoring Practices: Tables  
+<!-- End of Generated Documentation -->

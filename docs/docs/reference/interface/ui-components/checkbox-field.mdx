@@ -12,14 +12,14 @@ title: CheckboxField
 # CheckboxField
 
 ## Overview
-CheckboxField renders a boolean field as a native `<input type="checkbox" />`.  
+CheckboxField renders a boolean field as a native `<input type="checkbox" />`.
 You must place it inside an `EntitySubTree` or `EntityListSubTree` so the value binds to the current entity.
 
 The component automatically marks the checkbox as required when the underlying field is non-nullable. You can override this behaviour with the `required` prop.
 
 ## Styling Guidelines
-* All snippets use Tailwind classes.  
-* CheckboxField itself has no visual styles; add Tailwind utilities to surrounding elements as needed.  
+* All snippets use Tailwind classes.
+* CheckboxField itself has no visual styles; add Tailwind utilities to surrounding elements as needed.
 * No Contember-specific theme classes are required.
 
 ## Core Concepts
@@ -44,9 +44,6 @@ export const PublishToggle = () => (
 )
 ```
 
-## Detailed Guide
-_None_
-
 ## Props Reference
 | Name | Type | Required | Default | Description |
 |------|------|----------|---------|-------------|
@@ -58,9 +55,6 @@ _None_
 | errors | React.ReactNode &#124; ErrorAccessor.Error[] | Yes | – | Custom error messages or Contember error objects. |
 | required | boolean | Yes | – | Forces HTML `required` attribute regardless of schema nullability. |
 | inputProps | Omit&lt;React.InputHTMLAttributes&lt;HTMLInputElement&gt;, "defaultValue"&gt; | No | – | Native input props (e.g. `disabled`, `autoFocus`). |
-
-## Sub-Components / Building Blocks
-_None_
 
 ## Examples
 

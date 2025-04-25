@@ -1,0 +1,89 @@
+---
+title: InviteFormFields
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 7 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 1 -->
+<!-- External examples: 6 -->
+<!-- Import examples: 5 -->
+
+## Overview  
+_None_
+
+## Styling Guidelines
+* All examples use Tailwind utility classes.  
+* Contember UI elements like `Card`, `Tabs`, and `ToastContent` rely on Contember’s default theme classes.
+
+## Core Concepts
+* `InviteFormFields` fills the form rendered by `InviteForm`.  
+* You must pass the current `projectSlug`.  
+* Optionally supply a `roles` map so users can choose a role.  
+* Combine with `MemberListController` to update member lists after inviting.
+
+## Quick Start
+```tsx
+import { InviteForm, InviteFormFields } from '~/lib/tenant'
+import { useProjectSlug } from '@contember/react'
+
+export const InvitePage = () => {
+  const projectSlug = useProjectSlug()!
+
+  return (
+    <InviteForm projectSlug={projectSlug}>
+      <form className="grid gap-4">
+        <InviteFormFields projectSlug={projectSlug} />
+      </form>
+    </InviteForm>
+  )
+}
+```
+
+## Detailed Guide  
+_None_
+
+## Props Reference
+| Name         | Type                 | Required | Default | Description                                                         |
+|--------------|----------------------|----------|---------|---------------------------------------------------------------------|
+| projectSlug  | `string`             | Yes      | —       | Slug of the Contember project for which you invite members.         |
+| roles        | `RolesConfig` object | No       | —       | Map of role identifiers shown in the role selector (if provided).   |
+| *Inherited*  | —                    | —        | —       | _None_                                                              |
+
+## Sub-Components / Building Blocks  
+_None_
+
+## Examples
+
+### Invite & Refresh Member List
+```tsx
+const memberListController = useRef<MemberListController>()
+const projectSlug = useProjectSlug()!
+
+<InviteForm
+  projectSlug={projectSlug}
+  initialMemberships={[{ role: 'admin', variables: [] }]}
+  onSuccess={args => {
+    showToast(<ToastContent>Invitation sent to {args.result.person?.email}</ToastContent>, { type: 'success' })
+    memberListController.current?.refresh()
+  }}
+>
+  <form className="grid gap-4">
+    <InviteFormFields projectSlug={projectSlug} roles={rolesConfig} />
+  </form>
+</InviteForm>
+```
+Use `onSuccess` to notify users and refresh lists. Tailwind’s `grid gap-4` keeps spacing consistent.
+
+## Best Practices & Gotchas
+* Always provide `projectSlug`; the component fails silently without it.  
+* Wrap fields in a `<form>` element so browser validation works.  
+* Refresh member lists after a successful invite to show changes immediately.  
+* Pass only allowed roles to avoid exposing admin-only roles.
+
+## Further Reading
+* `InviteForm` – parent component that sends the invitation.  
+* `MemberListController` – refresh member list after inviting.  
+* `PersonList` – display existing project members.
+
+<!-- End of Generated Documentation -->

@@ -1,0 +1,103 @@
+---
+title: Separator
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 10 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 10 -->
+<!-- Import examples: 0 -->
+
+# `<Separator />`
+
+## Overview
+`Separator` renders a thin dividing line between UI sections.  
+Developers use it to visually group forms, buttons, and other controls without writing custom CSS.
+
+## Styling Guidelines
+* All snippets below use Tailwind CSS utility classes.  
+* The component itself adds no Contember-specific theme classes—feel free to style via `className`.
+
+## Core Concepts
+* Separators improve visual hierarchy.
+* They should not add extra spacing—handle margins with Tailwind utilities.
+* Combine with conditional rendering (`<If />`) to show the divider only when needed.
+
+## Quick Start
+```tsx
+import { Separator } from '@contember/react-components'
+
+export const SimpleForm = () => (
+	<div className="flex flex-col gap-4">
+		<InputField field="title" label="Title" />
+
+		{/* Divider */}
+		<Separator variant="horizontal" className="border-gray-300" />
+
+		<TextareaField field="description" label="Description" />
+	</div>
+)
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| variant | string | No | `"horizontal"` | Visual orientation. Real-world code shows `"horizontal"`. |
+| ...HTMLDivElement props | — | No | — | Any prop valid for a `<div>` is forwarded. |
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+
+### Conditional separator between edit sections
+```tsx
+const EditPage = () => (
+	<div className="flex flex-col gap-4">
+		<DataEditLink page="item/edit" />
+
+		<If condition="[id != null]">
+			<Separator variant="horizontal" />
+		</If>
+
+		<LastUpdatedAtField />
+	</div>
+)
+```
+The divider appears only when an entity already exists, keeping create pages uncluttered.
+
+### Grouping destructive actions
+```tsx
+const DangerZone = () => (
+	<div className="flex flex-col gap-4">
+		{/* Regular edit form ... */}
+
+		<Separator variant="horizontal" className="border-red-400" />
+
+		<IntentButton
+			useExecute={useRemoveItem}
+			successMessage="Item deleted"
+			confirmation="Are you sure?"
+		>
+			Delete item
+		</IntentButton>
+	</div>
+)
+```
+Adding a red-tinted separator draws attention to risky operations without extra layout changes.
+
+## Best Practices & Gotchas
+* Apply margin utilities (`my-4`, `mb-2`, etc.) to control spacing.
+* Use conditional rendering to avoid double dividers.
+* Keep the component lightweight—avoid wrapping it in additional layout elements.
+
+## Further Reading
+* `<If />` for conditional UI
+* `<IntentButton />` for actions
+* Tailwind spacing utilities
+
+<!-- End of Generated Documentation -->

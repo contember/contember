@@ -1,0 +1,114 @@
+---
+title: DataGridHasManyColumn
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 13 -->
+<!-- Source examples: 1 -->
+<!-- Playground examples: 2 -->
+<!-- External examples: 10 -->
+<!-- Import examples: 7 -->
+
+# DataGridHasManyColumn
+
+## Overview
+`DataGridHasManyColumn` renders the content of a has-many relation inside a `DataGridTable` column.  
+You place any field or component inside the column body to define how each related entity is shown.
+
+## Styling Guidelines
+* All examples use Tailwind CSS.  
+* No Contember theme classes are required, but feel free to add your design tokens.
+
+## Core Concepts
+* The `field` prop points to the has-many relation.  
+* Children render **inside** the relation context, so you can use `<Field />`, custom components, or plain JSX.  
+* `header`, `filter`, and `tooltipActions` let you override default UI pieces.  
+* Use `DataGridHasManyFilter` or `DataGridRelationFilterControls` for advanced filtering.
+
+## Quick Start
+```tsx
+<DataGridTable className="w-full">
+	<DataGridHasManyColumn field="tags">
+		<Field field="name" />
+	</DataGridHasManyColumn>
+</DataGridTable>
+```
+
+## Detailed Guide
+```tsx
+<DataGridHasManyColumn
+	field={{ hasManyRelation: 'employees', hasOneRelationPath: 'department' }}
+	header="Employees"
+/>
+```
+* The object syntax lets you traverse additional relations.  
+* Omit `header` and the label formatter names the column automatically.
+
+### Custom filter
+```tsx
+<DataGridHasManyColumn
+	field="companies"
+	filterName="activeCompanies"
+	filter={
+		<DataGridHasManyFilter field="companies" name="activeCompanies" />
+	}
+>
+	<CompanyPreview />
+</DataGridHasManyColumn>
+```
+
+### Tooltip actions
+```tsx
+<DataGridHasManyColumn
+	field="costCenters"
+	tooltipActions={<Button className="text-xs">Manage</Button>}
+>
+	<CostCenterPreview />
+</DataGridHasManyColumn>
+```
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| field | string &#124; { hasOneRelationPath?: SugarableHasOneRelation &#124; SugarableHasOneRelation[]; hasManyRelation: SugarableHasManyRelation } | Yes | undefined | Has-many relation field. |
+| filterName | string | No | undefined | Custom filter identifier. Defaults to the field name. |
+| children | React.ReactNode | Yes | undefined | Cell content rendered in relation context. |
+| header | React.ReactNode | No | undefined | Column header. Uses label formatter when omitted. |
+| filter | React.ReactNode | No | undefined | Custom filter element. Defaults to `DataGridHasManyFilter`. |
+| tooltipActions | React.ReactNode | No | undefined | Elements displayed in the tooltip footer. |
+
+## Sub-Components / Building Blocks
+### DataGridHasManyFilter
+Use this component to filter rows by the related entities.
+
+### DataGridHasManyTooltip
+Wrap any clickable element and show related record details in a tooltip.
+
+## Examples
+```tsx
+<DataGridHasManyColumn field="categories">
+	<CourseCategoryPreview />
+</DataGridHasManyColumn>
+```
+Displays course categories.  
+`<CourseCategoryPreview />` handles its own styling.
+
+```tsx
+<DataGridHasManyColumn field="companyCostCenters" header="Cost Centers" maxItems={5}>
+	<CompanyCostCenterPreview />
+</DataGridHasManyColumn>
+```
+Limits the displayed items to five and sets a custom header.
+
+## Best Practices & Gotchas
+* Keep children simple; complex layouts slow down large grids.  
+* Always provide `filterName` when you reuse the same field twice.  
+* Use Tailwind utility classes inside children for consistent spacing.  
+* Avoid expensive computations in `format` functions; memoize when possible.
+
+## Further Reading
+* `DataGridHasOneColumn` – for one-to-one relations.  
+* `DataGridRelationFilterControls` – build custom relation filters.  
+* `DataGridHasManyTooltip` – enrich cells with tooltips.
+
+<!-- End of Generated Documentation -->

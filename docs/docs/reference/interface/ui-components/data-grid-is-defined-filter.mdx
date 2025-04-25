@@ -1,0 +1,86 @@
+---
+title: DataGridIsDefinedFilter
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 2 -->
+<!-- Source examples: 1 -->
+<!-- Playground examples: 1 -->
+<!-- External examples: 0 -->
+<!-- Import examples: 1 -->
+
+## Overview
+`DataGridIsDefinedFilter` lets you filter a Contember `DataGrid` by checking if a field has any value.
+It renders a simple checkbox-style UI, so users can toggle “defined / not defined” without writing conditions.
+
+## Styling Guidelines
+All examples use Tailwind for layout and spacing.
+The component itself relies on Contember’s default theme classes—no additional theme setup is required.
+
+## Core Concepts
+- A “defined” value means the database column is not `null`.
+- The filter outputs a boolean query (`is null` vs `is not null`).
+- You must pass the `field`, `label`, and `name` props.
+- Combine this filter with other `DataGrid*Filter` components for advanced searches.
+
+## Quick Start
+```tsx
+import { DataGrid, DataGridIsDefinedFilter } from '~/lib/datagrid'
+
+export default () => (
+	<DataGrid entities="Post">
+		<DataGridIsDefinedFilter
+			field="deletedAt"
+			label="Is deleted?"
+			name="deletedAt_defined"
+			className="flex items-center gap-2"
+		/>
+	</DataGrid>
+)
+```
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| field | string &#124; { field: string; hasOneRelationPath?: SugarableHasOneRelation &#124; SugarableHasOneRelation[] } | Yes | — | Field to test for `null` vs `not null`. |
+| name | string | Yes | — | Unique filter identifier used in URL and state. |
+| label | React.ReactNode | Yes | — | Visible label shown next to the checkbox. |
+
+
+## Examples
+```tsx
+// Multiple filters in one toolbar
+<DataGrid>
+	<div className="flex flex-col gap-3">
+		<DataGridIsDefinedFilter
+			field="publishedAt"
+			label="Is published"
+			name="publishedAt_defined"
+			className="flex items-center gap-1"
+		/>
+
+		<DataGridIsDefinedFilter
+			field={{ field: 'author.photo', hasOneRelationPath: ['author'] }}
+			label="Has author photo"
+			name="authorPhoto_defined"
+			className="flex items-center gap-1"
+		/>
+	</div>
+</DataGrid>
+```
+The first filter shows whether a post is published.
+The second checks a nested relation: it verifies the author’s photo exists.
+
+## Best Practices & Gotchas
+- Always provide a unique `name`; collisions break URL state.
+- Group related filters with `flex gap-2` for consistent spacing.
+- Remember `undefined` JavaScript values are irrelevant—the filter works on SQL `NULL`.
+- Use concise labels like “Is published” instead of “Published at is defined”.
+
+## Further Reading
+- `DataGridBooleanFilter` – filter by boolean column.
+- `DataGridDateFilter` – range filter for dates.
+- `DataGridHasOneFilter` – filter by linked entity.
+- Contember documentation: Filtering patterns.
+
+<!-- End of Generated Documentation -->

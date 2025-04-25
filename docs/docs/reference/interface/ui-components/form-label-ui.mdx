@@ -1,0 +1,84 @@
+---
+title: FormLabelUI
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 13 -->
+<!-- Source examples: 2 -->
+<!-- Playground examples: 1 -->
+<!-- External examples: 10 -->
+<!-- Import examples: 6 -->
+
+# FormLabelUI
+
+## Overview
+`FormLabelUI` renders accessible labels for form fields.  
+It aligns text to the left and optionally appends a red asterisk when the field is required.
+
+## Styling Guidelines
+* All snippets use Tailwind utility classes.  
+* `FormLabelUI` adds its own Contember theme classes; you can safely combine them with any Tailwind classes shown below.
+
+## Core Concepts
+* Labels improve accessibility and click-target size.
+* The `required` prop controls display of the red asterisk.
+* You can pass any native `<label>` attributes directly.
+
+## Quick Start
+```tsx
+import { FormLabelUI } from '~/lib/form'
+
+export default function Example() {
+	return (
+		<FormLabelUI className="block text-sm font-medium text-gray-700">
+			Email
+		</FormLabelUI>
+	)
+}
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| required | boolean | No | false | When **true**, shows a red asterisk after the label text. |
+| children | React.ReactNode | Yes | — | Content of the label. |
+| …HTMLLabelProps | HTMLAttributes\<HTMLLabelElement\> | No | — | Any prop accepted by a native `<label>` element. |
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+
+### Required indicator
+```tsx
+<FormLabelUI required className="text-red-800">
+	Password
+</FormLabelUI>
+```
+Shows the default asterisk after the word “Password”.
+
+### Label with checkbox
+```tsx
+<FormLabelUI className="flex gap-2 items-center">
+	<CheckboxInput checked={agreed} onChange={e => setAgreed(e.target.checked)} />
+	I agree to terms
+</FormLabelUI>
+```
+Wrapping a checkbox inside the label increases the clickable area.
+
+## Best Practices & Gotchas
+* Always pass meaningful text or elements as `children`; empty labels harm accessibility.
+* Combine `FormLabelUI` with `FormLabelWrapperUI` when you need extra spacing or layout control.
+* Use the `required` prop instead of adding your own asterisk to keep visuals consistent.
+* Avoid placing focusable elements other than inputs or checkboxes inside the label to prevent unexpected focus behavior.
+
+## Further Reading
+* `FormLabelWrapperUI`
+* `FormContainerUI`
+* `CheckboxInput`
+* Contember design system typography guidelines
+
+<!-- End of Generated Documentation -->

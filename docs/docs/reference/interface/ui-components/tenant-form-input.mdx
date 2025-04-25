@@ -1,0 +1,104 @@
+---
+title: TenantFormInput
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 0 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 0 -->
+<!-- Import examples: 0 -->
+
+## TenantFormInput
+
+### Overview
+_None_
+
+### Styling Guidelines
+* All examples use Tailwind CSS utility classes.  
+* The component does **not** add any Contember-specific theme classes automatically; you can style it freely.
+
+### Core Concepts
+* Bind an HTML `<input>` element to a Contember form context.
+* Keep form state in sync through the required `form` prop.
+* Select a specific field from `form.values` via the `field` prop.
+* Forward every standard HTML input attribute to the underlying element.
+
+### Quick Start
+```tsx
+import { TenantFormInput } from "@contember/react";
+
+const Example = ({ form }: { form: CtxValue }) => (
+	<TenantFormInput
+		form={form}
+		field="title"
+		type="text"
+		className="w-full rounded border border-gray-300 p-2"
+		placeholder="Tenant title"
+	/>
+);
+```
+
+### Detailed Guide
+_None_
+
+### Props Reference
+
+| Name | Type | Required | Default | Description |
+| ---- | ---- | -------- | ------- | ----------- |
+| form | CtxValue | Yes | — | Form instance providing `values` and mutators. |
+| field | keyof form.values & string | Yes | — | Name of the field in `form.values` this input controls. |
+| type | React.HTMLInputTypeAttribute | Yes | `"text"` | Standard HTML input `type`. |
+| …HTMLInputElement props | See MDN | No | — | All other props are forwarded to the underlying `<input>` element. |
+
+### Sub-Components / Building Blocks
+_None_
+
+### Examples
+
+#### File upload with preview
+```tsx
+const FileInput = ({ form }: { form: CtxValue }) => (
+	<div className="flex flex-col gap-2">
+		<TenantFormInput
+			form={form}
+			field="logo"
+			type="file"
+			accept="image/*"
+			className="file:mr-4 file:rounded file:border-0 file:bg-blue-600 file:px-4 file:py-2 file:text-white"
+		/>
+		{form.values.logo && (
+			<img
+				src={URL.createObjectURL(form.values.logo as File)}
+				alt="Preview"
+				className="h-24 w-auto rounded border"
+			/>
+		)}
+	</div>
+);
+```
+Use `accept="image/*"` to limit file types. Generate a preview from `form.values`.
+
+#### Checkbox bound to Boolean field
+```tsx
+<TenantFormInput
+	form={form}
+	field="isActive"
+	type="checkbox"
+	className="h-5 w-5 accent-green-600"
+/>
+```
+The component synchronizes the checked state with `form.values.isActive`.
+
+### Best Practices & Gotchas
+* Always pass the same `form` object to every input inside a form.
+* Use stable field names; renaming breaks state persistence.
+* Forward `className` instead of styling via global CSS for better maintainability.
+* Avoid mixing uncontrolled and controlled props like `defaultValue` and `value`.
+
+### Further Reading
+* `useTenantForm()` hook  
+* `TenantFormSelect`  
+* Contember → Forms documentation
+
+<!-- End of Generated Documentation -->

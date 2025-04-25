@@ -1,0 +1,124 @@
+---
+title: SelectItem
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 12 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 2 -->
+<!-- External examples: 10 -->
+<!-- Import examples: 6 -->
+
+## Overview
+`SelectItem` renders a single option inside a Contember `Select`.  
+You pass a `value` and any JSX as its label. When the user picks the item, the `Select` returns the given `value`.
+
+## Styling Guidelines
+* All examples use Tailwind classes.  
+* `SelectItem` inherits Contember theme classes (e.g. `text-muted-foreground`) automatically; you rarely need extra styling.
+
+## Core Concepts
+* Each item must have a unique `value` string.
+* The item's children become the visible label.
+* `Select` shows one item at a time but keeps all `SelectItem` components mounted.
+* You map over data arrays to generate multiple `SelectItem` elements.
+
+## Quick Start
+```tsx
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/lib/ui/select'
+
+export const LanguageSelect = () => (
+  <Select>
+    <SelectTrigger className="w-44">
+      <SelectValue placeholder="Choose language" />
+    </SelectTrigger>
+
+    <SelectContent>
+      <SelectItem value="en">English</SelectItem>
+      <SelectItem value="es">Español</SelectItem>
+    </SelectContent>
+  </Select>
+)
+```
+
+## Detailed Guide
+### Rendering options from an object
+```tsx
+const options = { en: 'English', es: 'Español', fr: 'Français' }
+
+<Select>
+  <SelectTrigger className="w-48"><SelectValue placeholder="Language" /></SelectTrigger>
+  <SelectContent>
+    {Object.entries(options).map(([value, label]) => (
+      <SelectItem key={value} value={value}>
+        {label}
+      </SelectItem>
+    ))}
+  </SelectContent>
+</Select>
+```
+* Iterate with `Object.entries` to keep code concise.
+* Always pass `key` and `value` to avoid React warnings.
+
+## Props Reference
+| Name      | Type       | Required | Default | Description                                               |
+|-----------|------------|----------|---------|-----------------------------------------------------------|
+| value     | string     | Yes      | —       | Returned by the parent `Select` when this item is chosen. |
+| children* | ReactNode  | Yes      | —       | Label displayed to the user.                              |
+| *inherited from React `HTMLAttributes` | | | | |
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+### Toggle between select and free-text input
+```tsx
+{showSelect ? (
+  <Select value={fieldValue ?? undefined} onValueChange={handleChange}>
+    <SelectTrigger className="max-w-md">
+      <SelectValue placeholder="Choose or type" />
+    </SelectTrigger>
+    <SelectContent>
+      {Object.entries(options).map(([value, label]) => (
+        <SelectItem key={value} value={value}>
+          {label}
+        </SelectItem>
+      ))}
+      <SelectItem value="___other">Other</SelectItem>
+    </SelectContent>
+  </Select>
+) : (
+  /* fallback Input */
+)}
+```
+The snippet demonstrates:
+* Passing dynamic `value` to `SelectItem`.
+* Adding a special item (`___other`) that switches to a text field.
+
+### Rich visual option
+```tsx
+country => (
+  <SelectItem key={country.code} value={country.code}>
+    <span className="flex items-center gap-2">
+      <span className="text-base">{country.flag}</span>
+      <span>{country.dialCode}</span>
+      <span className="text-muted-foreground text-xs">{country.name}</span>
+    </span>
+  </SelectItem>
+)
+```
+Use arbitrary JSX inside `SelectItem` for advanced layouts.
+
+## Best Practices & Gotchas
+* Keep `value` stable; changing it breaks the selected state.
+* Use short string `value`s to reduce payload size in forms.
+* Pass a `key` identical to `value` when mapping to silence React warnings.
+* Avoid heavy components inside a `SelectItem`; complex trees slow down scrolling.
+
+## Further Reading
+* `Select`
+* `SelectContent`
+* `SelectTrigger`
+* `SelectValue`
+
+<!-- End of Generated Documentation -->

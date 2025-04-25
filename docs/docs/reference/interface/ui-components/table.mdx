@@ -1,0 +1,170 @@
+---
+title: Table
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 12 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 2 -->
+<!-- External examples: 10 -->
+<!-- Import examples: 7 -->
+
+# Table
+
+## Overview
+_None_
+
+## Styling Guidelines
+* All snippets use Tailwind CSS utility classes.  
+* The component adds no styles on its own. You may want to apply your Contember theme classes to `Table`, `TableHeader`, and `TableCell` to keep visual consistency.
+
+## Core Concepts
+* `Table` wraps semantic `<table>` markup.
+* Use `TableHeader` + `TableRow` + `TableHead` for the header section.
+* Use `TableBody` + `TableRow` + `TableCell` for data rows.
+* Combine with Contember data helpers (`Binding`, `EntityListSubTree`, `HasMany`) to render database rows.
+* The component is unstyled; Tailwind classes control spacing, borders, and typography.
+
+## Quick Start
+```tsx
+import { Table, TableHeader, TableHead, TableBody, TableRow, TableCell } from '~/lib/ui/table'
+
+export default () => (
+	<Table className="w-full text-sm">
+		<TableHeader>
+			<TableRow className="bg-gray-100">
+				<TableHead className="w-1/3 px-4 py-2">Name</TableHead>
+				<TableHead className="w-1/3 px-4 py-2">Email</TableHead>
+				<TableHead className="w-1/3 px-4 py-2">Role</TableHead>
+			</TableRow>
+		</TableHeader>
+
+		<TableBody>
+			<TableRow className="even:bg-gray-50">
+				<TableCell className="px-4 py-2">Jane Doe</TableCell>
+				<TableCell className="px-4 py-2">jane@example.com</TableCell>
+				<TableCell className="px-4 py-2">Admin</TableCell>
+			</TableRow>
+		</TableBody>
+	</Table>
+)
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+_None_
+
+## Sub-Components / Building Blocks
+### TableHeader
+Semantic wrapper for `<thead>`.
+
+### TableBody
+Semantic wrapper for `<tbody>`.
+
+### TableRow
+Semantic wrapper for `<tr>`.
+
+### TableHead
+Semantic wrapper for `<th>`.
+
+### TableCell
+Semantic wrapper for `<td>`.
+
+## Examples
+
+### Entity list with ACL-aware input
+```tsx
+<Binding>
+	<Table className="w-full">
+		<TableHeader>
+			<TableRow>
+				<TableHead className="px-3 py-2">Readable</TableHead>
+				<TableHead className="px-3 py-2">Editable</TableHead>
+				<TableHead className="px-3 py-2">Value</TableHead>
+			</TableRow>
+		</TableHeader>
+
+		<TableBody>
+			<EntityListSubTree entities="AclRestrictedValue">
+				<TableRow className="even:bg-gray-50">
+					<TableCell><Field field="canRead" format={formatBoolean} /></TableCell>
+					<TableCell><Field field="canEdit" format={formatBoolean} /></TableCell>
+					<TableCell><AclAwareInputField field="primaryValue" /></TableCell>
+				</TableRow>
+			</EntityListSubTree>
+		</TableBody>
+	</Table>
+</Binding>
+```
+This pattern shows how you can mix `Field` formatters with editable inputs while keeping rows aligned.
+
+### Blog posts with `DataViewEachRow`
+```tsx
+<Table className="w-full">
+	<TableHeader>
+		<TableRow>
+			<TableHead className="px-2 py-1">Title</TableHead>
+			<TableHead className="px-2 py-1">Category</TableHead>
+			<TableHead className="px-2 py-1">Tags</TableHead>
+			<TableHead className="px-2 py-1">Published</TableHead>
+		</TableRow>
+	</TableHeader>
+
+	<TableBody>
+		<DataViewEachRow>
+			<TableRow className="odd:bg-gray-50">
+				<TableCell><Field field="title" /></TableCell>
+				<TableCell><Field field="category.name" /></TableCell>
+				<TableCell>
+					<HasMany field="tags">
+						<Field field="name" />{', '}
+					</HasMany>
+				</TableCell>
+				<TableCell><Field field="publishedAt" format={formatDate} /></TableCell>
+			</TableRow>
+		</DataViewEachRow>
+	</TableBody>
+</Table>
+```
+`DataViewEachRow` loops through the result set and renders each record inside its own `TableRow`.
+
+### Summary table with bold total
+```tsx
+<Table className="min-w-[20rem]">
+	<TableRow>
+		<TableCell>Included</TableCell>
+		<TableCell>{included.length}</TableCell>
+	</TableRow>
+	<TableRow>
+		<TableCell>Already assigned</TableCell>
+		<TableCell>{alreadyAssigned.length}</TableCell>
+	</TableRow>
+	<TableRow>
+		<TableCell>Ignored</TableCell>
+		<TableCell>{ignored.length}</TableCell>
+	</TableRow>
+	<TableRow className="font-bold">
+		<TableCell>Ready for assignment</TableCell>
+		<TableCell>{ready.length}</TableCell>
+	</TableRow>
+</Table>
+```
+You can skip `TableHeader` when the table is purely presentational, like a summary grid.
+
+## Best Practices & Gotchas
+* Apply `className` to child components, not to HTML tags inside them.
+* Keep header cell counts equal to body cell counts to avoid misalignment.
+* Wrap long content with `break-all` or `truncate` Tailwind utilities to prevent overflow.
+* Use `even:` or `odd:` pseudo classes (`even:bg-gray-50`) for zebra striping.
+* Remember to provide keys when mapping rows to avoid React warnings.
+
+## Further Reading
+* `EntityListSubTree`
+* `DataViewEachRow`
+* `HasMany`
+* Contember ACL helpers
+* Tailwind table utilities
+
+<!-- End of Generated Documentation -->

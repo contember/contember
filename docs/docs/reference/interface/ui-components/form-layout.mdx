@@ -1,0 +1,104 @@
+---
+title: FormLayout
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 11 -->
+<!-- Source examples: 1 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 10 -->
+<!-- Import examples: 5 -->
+
+# FormLayout
+
+## Overview
+FormLayout provides a consistent vertical layout for form elements.  
+It wraps children in a flex column with uniform gap and side margins.
+
+## Styling Guidelines
+* All examples use Tailwind CSS.  
+* The component itself applies `flex flex-col gap-2 mx-4`.  
+* No additional Contember theme classes are required.
+
+## Core Concepts
+* Vertical flex layout keeps fields aligned.  
+* `gap-2` maintains equal vertical spacing.  
+* `mx-4` adds horizontal breathing space.  
+* Nest additional Tailwind classes through `className` when needed.
+
+## Quick Start
+```tsx
+import { FormLayout, InputField } from '~/lib/form'
+
+export const BasicForm = () => (
+  <FormLayout>
+    <InputField field="username" />
+  </FormLayout>
+)
+```
+
+## Detailed Guide
+### Adding Custom Width
+Wrap the component and extend it with width classes.
+
+```tsx
+<FormLayout className="max-w-md">
+  <InputField field="email" />
+  <InputField field="password" />
+</FormLayout>
+```
+
+### Combining Grids Inside
+Mix grid utilities for complex layouts.
+
+```tsx
+<FormLayout>
+  <div className="grid grid-cols-2 gap-4">
+    <InputField field="firstName" />
+    <InputField field="lastName" />
+  </div>
+  <EmailInputField field="email" />
+</FormLayout>
+```
+
+## Props Reference
+_None_
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+### Embedded in a Modal
+```tsx
+<ModalEntityEdit buttonLabel="Add Rating">
+  <FormLayout>
+    <SelectEnumField field="rating" />
+    <TextareaField field="ratingText" />
+  </FormLayout>
+</ModalEntityEdit>
+```
+Use FormLayout inside a modal to keep fields aligned and readable.
+
+### Nested Entity Editing
+```tsx
+<FormLayout>
+  <HasOne field="billingInfo">
+    <AccountBillingInfoForm />
+  </HasOne>
+</FormLayout>
+```
+Combine with relational helpers to group related entities under one layout.
+
+## Best Practices & Gotchas
+* Place all immediate form fields directly under FormLayout.  
+* Add extra wrappers only when you need grids or flex tweaks.  
+* Avoid margin utilities on children; FormLayout already spaces them.  
+* Supply `className` for width or responsive changes instead of wrapping divs.
+
+## Further Reading
+* InputField  
+* SelectEnumField  
+* Contember Entity SubTree  
+* ModalEntityEdit  
+
+<!-- End of Generated Documentation -->

@@ -12,7 +12,7 @@ title: DefaultBlockRepeater
 # DefaultBlockRepeater
 
 ## Overview
-`DefaultBlockRepeater` lets you create and manage repeatable content blocks inside a Contember form.  
+`DefaultBlockRepeater` lets you create and manage repeatable content blocks inside a Contember form.
 It supports inline editing or a dual-mode that opens a dedicated form for each block while still shipping a ready-to-use UI.
 
 ## Styling Guidelines
@@ -42,8 +42,6 @@ import { DefaultBlockRepeater, Block } from '~/lib/block-repeater'
 </DefaultBlockRepeater>
 ```
 
-## Detailed Guide
-_None_
 
 ## Props Reference
 | Name | Type | Required | Default | Description |
@@ -53,11 +51,10 @@ _None_
 | sortableBy | Unknown | No | — | Field used for drag-and-drop ordering. |
 | discriminationField | Unknown | Yes | — | Field storing the block type discriminator. |
 | children | ReactNode | Yes | — | One or more `<Block>` elements. |
-| *Inherited props* | — | — | — | _None_ |
 
 ## Sub-Components / Building Blocks
 ### Block
-Defines a single block type.  
+Defines a single block type.
 Props include `name`, `label`, plus optional `form` and `children` for dual-mode editing.
 
 ### EntityView
@@ -237,7 +234,7 @@ import { DefaultBlockRepeater, Block } from '@app/lib/block-repeater'
 Embed the repeater in any Contember binding context for instant persistence.
 
 ### 3. Large-scale block library for a marketing site
-This snippet (shortened for brevity) shows how teams compose 30+ block types in one repeater.  
+This snippet (shortened for brevity) shows how teams compose 30+ block types in one repeater.
 Use it as inspiration for structuring big content libraries.
 
 ```tsx

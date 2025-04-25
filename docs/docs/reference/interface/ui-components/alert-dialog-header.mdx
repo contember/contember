@@ -1,0 +1,112 @@
+---
+title: AlertDialogHeader
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 4 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 4 -->
+<!-- Import examples: 4 -->
+
+## Overview
+`AlertDialogHeader` wraps `AlertDialogTitle` and `AlertDialogDescription`.
+You place it inside `AlertDialogContent` to display a concise heading and explanatory text.
+
+The component adds vertical spacing and aligns header elements. You rarely customize it beyond Tailwind utility classes.
+
+## Styling Guidelines
+* All examples use Tailwind CSS.
+* No special Contember theme classes are required; utilities cover spacing and typography.
+
+## Core Concepts
+* Composition: combine `AlertDialogHeader`, `Title`, and `Description`.
+* Slot order: header appears first inside `AlertDialogContent`.
+* Stateless: you pass no props; styling is done via `className`.
+* Accessibility: screen readers reach the title before action buttons.
+
+## Quick Start
+```tsx
+import {
+	AlertDialog,
+	AlertDialogTrigger,
+	AlertDialogContent,
+	AlertDialogHeader,
+	AlertDialogTitle,
+	AlertDialogDescription,
+} from '~/lib/ui/alert-dialog'
+
+export const DeleteButton = () => (
+	<AlertDialog>
+		<AlertDialogTrigger asChild>
+			<button className="btn btn-danger">Delete</button>
+		</AlertDialogTrigger>
+
+		<AlertDialogContent className="w-96">
+			<AlertDialogHeader className="space-y-1">
+				<AlertDialogTitle className="text-lg font-medium">
+					Delete item?
+				</AlertDialogTitle>
+				<AlertDialogDescription className="text-sm text-gray-500">
+					This action is permanent.
+				</AlertDialogDescription>
+			</AlertDialogHeader>
+			{/* footer actions here */}
+		</AlertDialogContent>
+	</AlertDialog>
+)
+```
+
+## Detailed Guide
+### 1. Place the Header Correctly
+```tsx
+<AlertDialogContent>
+	{/* Header first */}
+	<AlertDialogHeader>...</AlertDialogHeader>
+
+	{/* Optional body or footer */}
+</AlertDialogContent>
+```
+### 2. Add Extra Spacing
+```tsx
+<AlertDialogHeader className="mb-4">
+	...
+</AlertDialogHeader>
+```
+The header remains stateless; extra utilities only adjust layout.
+
+## Examples
+### Confirmation Dialog with Destructive Action
+```tsx
+<AlertDialog>
+	<AlertDialogTrigger asChild>
+		<button className="text-red-600 underline">Remove attendee</button>
+	</AlertDialogTrigger>
+	<AlertDialogContent>
+		<AlertDialogHeader>
+			<AlertDialogTitle>Remove attendee?</AlertDialogTitle>
+			<AlertDialogDescription>
+				The attendee and related data will be deleted.
+			</AlertDialogDescription>
+		</AlertDialogHeader>
+		{/* footer with actions */}
+	</AlertDialogContent>
+</AlertDialog>
+```
+The header communicates the consequence clearly before users interact with buttons.
+
+## Best Practices & Gotchas
+* Keep titles concise; reserve details for the description line.
+* Use Tailwind spacing utilities instead of margins on child elements.
+* Do not wrap interactive elements inside the header.
+* Memoization is unnecessary; the component is lightweight.
+* Pass `className` rather than inline styles to stay consistent with themes.
+
+## Further Reading
+* `AlertDialogContent` – container for the header, body, and footer.
+* `AlertDialogTitle` – headline text element.
+* `AlertDialogDescription` – sub-text displaying additional info.
+* Modal accessibility in React.
+* Tailwind typography utilities.
+
+<!-- End of Generated Documentation -->

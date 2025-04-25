@@ -1,0 +1,89 @@
+---
+title: Toggle
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 15 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 5 -->
+<!-- External examples: 10 -->
+<!-- Import examples: 7 -->
+
+# Toggle
+
+## Overview
+Toggle renders a single interactive button that can switch between pressed and un-pressed states.  
+Contember wraps Radix UI’s `Toggle` primitive to keep the API thin and predictable.
+
+## Styling Guidelines
+* All examples use Tailwind classes.  
+* Toggle adds no Contember theme classes—style it with plain Tailwind or your design tokens.
+
+## Core Concepts
+* Toggle holds internal pressed state (`pressed` / `not pressed`).  
+* You can place any icon, text, or element inside the button.  
+* Combine Toggle with editor triggers (e.g. `EditorMarkTrigger`) for rich-text controls.  
+* The component is uncontrolled by default—manage state at a higher level if needed.
+
+## Quick Start
+```tsx
+import { Toggle } from '~/lib/ui/toggle'
+import { BoldIcon } from '@radix-ui/react-icons'
+
+export default function Example() {
+	return (
+		<Toggle className="rounded p-2 hover:bg-gray-100 data-[state=on]:bg-gray-200">
+			<BoldIcon className="h-4 w-4" />
+		</Toggle>
+	)
+}
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+_None_
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+
+### Rich-text toolbar button
+```tsx
+<EditorMarkTrigger mark={boldMark}>
+	<Toggle className="p-2 data-[state=on]:bg-primary-500">
+		<BoldIcon className="h-3 w-3" />
+	</Toggle>
+</EditorMarkTrigger>
+```
+Pressing the button toggles the **bold** mark in the editor.  
+`data-[state=on]` comes from Radix and lets you style the pressed state.
+
+### Stand-alone boolean flag
+```tsx
+const [active, setActive] = useState(false)
+
+<Toggle
+	pressed={active}
+	onPressedChange={setActive}
+	className="px-3 py-1 border rounded data-[state=on]:bg-green-50"
+>
+	{active ? 'Enabled' : 'Disabled'}
+</Toggle>
+```
+Here you control the state explicitly with `pressed` and `onPressedChange`.
+
+## Best Practices & Gotchas
+* Add `aria-label` or visible text for accessibility when using only icons.  
+* Style the `data-[state=on]` attribute instead of relying on custom classes.  
+* Keep Toggle’s job small—delegate complex logic to parent components.  
+* Do not put focusable children inside; Radix handles focus for the root element.
+
+## Further Reading
+* Radix UI Toggle documentation  
+* Editor triggers: `EditorMarkTrigger`, `EditorElementTrigger`  
+* Button vs. Toggle comparison in Contember design system  
+
+<!-- End of Generated Documentation -->

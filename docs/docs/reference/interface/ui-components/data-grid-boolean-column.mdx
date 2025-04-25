@@ -1,0 +1,124 @@
+---
+title: DataGridBooleanColumn
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 13 -->
+<!-- Source examples: 1 -->
+<!-- Playground examples: 2 -->
+<!-- External examples: 10 -->
+<!-- Import examples: 7 -->
+
+# DataGridBooleanColumn
+
+## Overview
+`DataGridBooleanColumn` renders a boolean field inside a `DataGridTable`.  
+You pass the entity field and optionally format, filter, or override the header and cell content.
+
+## Styling Guidelines
+* All examples use Tailwind CSS utility classes.  
+* The component itself adds no styles. You do not need Contember theme classes unless you customize cell content.
+
+## Core Concepts
+* Column lives inside `DataGridTable`.
+* `field` identifies the entity boolean you display.
+* You may format the value with the `format` prop.
+* You can supply a custom filter via `filter`.
+* Passing `children` replaces the default cell renderer.
+
+## Quick Start
+```tsx
+import { DataGridTable, DataGridBooleanColumn } from '~/lib/datagrid'
+
+<DataGridTable className="w-full border">
+	<DataGridBooleanColumn field="isPublished" />
+</DataGridTable>
+```
+
+## Detailed Guide
+### Custom header and label
+```tsx
+<DataGridBooleanColumn
+	field="isActive"
+	header="Active?"
+/>
+```
+
+### Formatting the value
+```tsx
+import { CheckIcon, XIcon } from '@heroicons/react/20/solid'
+
+<DataGridBooleanColumn
+	field="hasImage"
+	format={value => value ? <CheckIcon className="h-4 text-success" /> : <XIcon className="h-4 text-destructive" />}
+/>
+```
+
+### Replacing the default filter
+```tsx
+import { DataGridBooleanFilter } from '~/lib/datagrid'
+
+<DataGridBooleanColumn
+	field="locked"
+	filter={<DataGridBooleanFilter field="locked" />}
+/>
+```
+
+## Props Reference
+| Name     | Type                                       | Required | Default | Description                                                         |
+|----------|--------------------------------------------|----------|---------|---------------------------------------------------------------------|
+| field    | `string`                                   | Yes      | —       | Displayed field.                                                    |
+| header   | `React.ReactNode`                          | No       | —       | Custom header. Uses label formatter when omitted.                   |
+| children | `React.ReactNode`                          | No       | —       | Custom cell content. When set, the field value is not rendered.     |
+| format   | `(value: boolean) => React.ReactNode`      | No       | —       | Function to transform the boolean value before rendering.           |
+| filter   | `React.ReactNode`                          | No       | —       | Custom filter component. Falls back to default boolean filter.      |
+
+## Sub-Components / Building Blocks
+### DataGridBooleanFilter
+A standalone filter component for boolean fields.  
+Use it inside `filter` or elsewhere to keep a consistent UI.
+
+```tsx
+<DataGridBooleanFilter field="isPublished" />
+```
+
+## Examples
+### Show “Yes/No” text
+```tsx
+<DataGridBooleanColumn
+	field="isActive"
+	format={value => value ? 'Yes' : 'No'}
+/>
+```
+The formatter converts the boolean into human-friendly text.
+
+### Inline edit with `ClickToEdit`
+```tsx
+<DataGridBooleanColumn
+	field="isPublished"
+	header="Published?"
+	format={value => (
+		<ClickToEdit
+			view={value ? '✅' : '❌'}
+			edit={<CheckboxField field="isPublished" label={undefined} />}
+		/>
+	)}
+/>
+```
+You render a small editor directly in the cell for quick updates.
+
+## Best Practices & Gotchas
+* Always pass `field`; the column will not render without it.
+* Keep `format` functions pure. Avoid side effects like API calls.
+* Provide a concise header to prevent crowded table layouts.
+* When you override `children`, you should handle null values yourself.
+* Use icons or colored labels for faster visual scanning.
+
+## Further Reading
+* `DataGridTextColumn` – for string fields.  
+* `DataGridEnumColumn` – for enumerations.  
+* `DataGridIsDefinedColumn` – check value existence.  
+* `DataGridBooleanFilter` – reusable boolean filter.  
+* `DataGridActionColumn` – place row actions next to your boolean column.
+
+<!-- End of Generated Documentation -->

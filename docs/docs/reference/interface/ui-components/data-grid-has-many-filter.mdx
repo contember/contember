@@ -1,0 +1,94 @@
+---
+title: DataGridHasManyFilter
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 13 -->
+<!-- Source examples: 1 -->
+<!-- Playground examples: 2 -->
+<!-- External examples: 10 -->
+<!-- Import examples: 6 -->
+
+# DataGridHasManyFilter
+
+## Overview
+DataGridHasManyFilter adds a *has-many* relation filter to a Contember DataGrid.
+It renders a default UI so users can pick multiple related entities when filtering grid results.
+
+## Styling Guidelines
+* All snippets use Tailwind classes.
+* The component has no mandatory Contember theme classes.
+
+## Core Concepts
+* Filters a collection by a **has-many relation**.
+* Uses the **field** prop to identify the relation path.
+* Renders its **children** (usually `<Field>` components) as the selection UI.
+* Accepts optional **name** and **options** to fine-tune the filter query.
+
+## Quick Start
+```tsx
+<DataGridToolbar className="flex flex-wrap gap-2">
+  <DataGridHasManyFilter field="tags" label="Tags">
+    <Field field="name" />
+  </DataGridHasManyFilter>
+</DataGridToolbar>
+```
+
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| field | string &#124; object | Yes | — | The relation path to filter by. |
+| label | React.ReactNode | Yes | — | Visible label above the filter UI. |
+| children | React.ReactNode | Yes | — | Elements rendered inside the filter (e.g., `<Field>`). |
+| name | string | No | Field value | Custom filter name. |
+| options | string &#124; object | No | — | Pre-filtered entity list or filter definition. |
+
+## Examples
+
+### Multiple relation filters in a popover
+```tsx
+<Popover>
+  <PopoverTrigger asChild>
+    <Button className="h-auto" variant="outline">More filters</Button>
+  </PopoverTrigger>
+
+  <PopoverContent>
+    <div className="flex flex-col gap-2">
+      <DataGridHasManyFilter field="tags" label="Tags">
+        <Field field="name" />
+      </DataGridHasManyFilter>
+
+      <DataGridHasManyFilter field="comments.author" label="Comment authors">
+        <Field field="name" />
+      </DataGridHasManyFilter>
+    </div>
+  </PopoverContent>
+</Popover>
+```
+The popover keeps the main toolbar compact while still exposing advanced relation filters.
+
+### Using `options` to limit choices
+```tsx
+<DataGridHasManyFilter
+  field="categories"
+  options="CourseCategory[courseModules.publishOnMarketPlaceAt!=null]"
+  label="Category"
+>
+  <CourseCategoryPreview />
+</DataGridHasManyFilter>
+```
+`options` narrows the list to marketplace categories only.
+
+## Best Practices & Gotchas
+* Place the filter inside **DataGridToolbar** to ensure correct layout.
+* Always supply at least one **<Field>** so users see meaningful data.
+* Use **name** when you reuse the same relation path with different criteria.
+* Remember that **options** can be either a Contember query string or an object; pick the simpler form.
+
+## Further Reading
+* DataGridHasManyColumn – display many-to-many fields.
+* DataGridHasOneFilter – similar filter for one-to-one relations.
+* DataGridQueryFilter – free-text search across the grid.
+
+<!-- End of Generated Documentation -->

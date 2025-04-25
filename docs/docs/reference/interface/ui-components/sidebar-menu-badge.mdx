@@ -1,0 +1,57 @@
+---
+title: SidebarMenuBadge
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 0 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 0 -->
+<!-- Import examples: 0 -->
+
+## Overview
+SidebarMenuBadge adds a small badge element to your Contember sidebar.  
+The source provides no further JSDoc, so behaviour details are minimal.
+
+## Styling Guidelines
+All examples rely on Tailwind CSS for styling.  
+No Contember-specific theme classes are required by default.
+
+## Core Concepts
+- Badge components enhance navigation elements with counts or status.
+- Tailwind utility classes let you style size, color, and spacing quickly.
+- Composition keeps SidebarMenuBadge independent of menu item logic.
+
+## Quick Start
+```tsx
+import { SidebarMenuBadge } from '@contember/ui'
+
+export const NotificationsBadge = () => (
+	<SidebarMenuBadge className="bg-blue-600 text-white rounded-full px-2 text-xs">
+		3
+	</SidebarMenuBadge>
+)
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+_None_
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+_None_
+
+## Best Practices & Gotchas
+- Use concise text (numbers or short words) inside the badge.
+- Combine with flex utilities (`flex gap-2`) to align with icons or labels.
+- Avoid complex children; render plain text for accessibility.
+
+## Further Reading
+- SidebarMenu  
+- Contember UI documentation on navigation components
+
+<!-- End of Generated Documentation -->

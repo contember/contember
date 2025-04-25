@@ -85,6 +85,7 @@ export interface DocsConfig {
 	overrides?: Record<string, ComponentOverride>
 	componentFilePattern?: string
 	externalProjects?: ExternalProject[]
+	excludeComponents?: string[]
 	ai?: {
 		model?: string
 	}

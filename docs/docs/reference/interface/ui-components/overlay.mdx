@@ -1,0 +1,102 @@
+---
+title: Overlay
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 5 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 1 -->
+<!-- External examples: 4 -->
+<!-- Import examples: 5 -->
+
+# Overlay
+
+## Overview
+Overlay renders its children in a new stacking context above the main UI.  
+Use it for modals, error banners, and any full-screen feedback that blocks user interaction until dismissed.
+
+## Styling Guidelines
+* All examples use Tailwind CSS.
+* Overlay itself adds no Contember theme classes; style the children directly.
+
+## Core Concepts
+* Children appear on top of all other content.
+* `position` prop controls the CSS positioning strategy.
+* You can show the overlay instantly with `showImmediately`.
+
+## Quick Start
+```tsx
+import { Overlay } from '~/lib/ui/overlay'
+
+export const ErrorOverlay = () => (
+	<Overlay>
+		<div className="flex flex-col items-center gap-4 bg-white p-8 rounded shadow-lg">
+			<p className="text-xl font-semibold text-red-600">Something went wrong</p>
+			<button className="btn btn-primary">Retry</button>
+		</div>
+	</Overlay>
+)
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+| ---- | ---- | -------- | ------- | ----------- |
+| position | "fixed" &#124; "absolute" &#124; "static" | No | - | CSS positioning of the overlay container. |
+| className | string | No | - | Additional Tailwind or custom classes applied to the overlay element. |
+| children | React.ReactNode | No | - | Elements rendered inside the overlay. |
+| showImmediately | boolean | No | - | If true, renders without transition delays. |
+| **Inherited props** | | | | |
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+
+### Identity failure screen
+```tsx
+import { Overlay } from '~/lib/ui/overlay'
+
+const IdentityFailed = () => (
+	<Overlay>
+		<div className="bg-gray-100 flex flex-col gap-4 items-center justify-center p-16 rounded-lg shadow-lg border">
+			<p className="text-lg">Failed to load identity.</p>
+			<LogoutTrigger>
+				<Button className="w-full" variant="outline">Logout</Button>
+			</LogoutTrigger>
+		</div>
+	</Overlay>
+)
+```
+This pattern shows a full-screen error message while preventing interaction with the rest of the app.
+
+### Overlay with card component
+```tsx
+<Overlay>
+	<Card className="w-72">
+		<CardContent className="flex flex-col items-center gap-2">
+			<CircleAlert className="h-12 w-12 text-destructive" />
+			<p className="text-center text-lg text-gray-600">Unable to authenticate.</p>
+			<LogoutTrigger>
+				<Button>Login again</Button>
+			</LogoutTrigger>
+		</CardContent>
+	</Card>
+</Overlay>
+```
+Cards help you constrain content width while keeping the backdrop clickable.
+
+## Best Practices & Gotchas
+* Wrap only one visual block inside Overlay to keep focus clear.
+* Add `fixed` position when you need the overlay to ignore parent overflow.
+* Combine with Tailwind `backdrop-blur` or `bg-opacity` classes for dimmed backgrounds.
+* Remember to manage focus for accessibility; move focus into the overlay when it opens.
+
+## Further Reading
+* Modal
+* Dialog
+* useBodyScrollLock hook
+
+<!-- End of Generated Documentation -->

@@ -1,0 +1,75 @@
+---
+title: DataViewHasOneLabel
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 5 -->
+<!-- Source examples: 1 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 4 -->
+<!-- Import examples: 2 -->
+
+## Overview
+`DataViewHasOneLabel` renders the label of a has-one relation field inside a Contember entity.
+It reads the label from the entity schema at runtime, so you avoid hard-coding field names.
+
+## Styling Guidelines
+* All examples use Tailwind CSS.
+* No extra Contember theme classes are required; you can extend your own if needed.
+
+## Core Concepts
+* Dynamic label resolution from entity schema.
+* Works only with has-one relations.
+* Integrates seamlessly with other `DataView` label components.
+* Pure presentational component—no data fetching logic.
+
+## Quick Start
+```tsx
+import { DataViewHasOneLabel } from '~/lib/datagrid/labels'
+
+export const AuthorLabel = () => (
+	<DataViewHasOneLabel field="author" className="text-sm font-medium text-gray-700" />
+)
+```
+
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| field | string | Yes | – | Name of the has-one relation field in the current entity. |
+
+## Examples
+
+### Show a shift type label in a job header
+```tsx
+import { DataViewHasOneLabel } from '~/lib/datagrid/labels'
+
+const JobHeader = () => (
+	<header className="flex items-center gap-2">
+		<span className="text-gray-500">Shift type:</span>
+		<DataViewHasOneLabel field="shiftType" className="font-semibold" />
+	</header>
+)
+```
+The component pulls the `shiftType` label from the schema, so translators manage wording in one place.
+
+### Combine with multiple labels
+```tsx
+<header className="flex gap-4">
+	<DataViewHasOneLabel field="shiftType" className="text-xs uppercase text-blue-600" />
+	<DataViewHasOneLabel field="shiftRotation" className="text-xs uppercase text-green-600" />
+</header>
+```
+You can render several relation labels side by side to build compact headers.
+
+## Best Practices & Gotchas
+* Pass only has-one fields; has-many will render nothing.
+* Keep labels short; the component is not responsive by itself.
+* Use Tailwind utility classes for spacing and typography.
+* Do not fetch data in this component; handle data in parent views.
+
+## Further Reading
+* `DataViewFieldLabel` – Generic label for scalar fields.
+* `DataViewHasManyLabel` – Label for has-many relations.
+
+<!-- End of Generated Documentation -->

@@ -1,0 +1,81 @@
+---
+title: PropertyItem
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 13 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 3 -->
+<!-- External examples: 10 -->
+<!-- Import examples: 6 -->
+
+## Overview
+`PropertyItem` renders a single row inside a `PropertyList`.  
+It shows a label followed by any React children, letting you highlight entity attributes quickly.
+
+## Styling Guidelines
+* All examples use Tailwind classes.  
+* `PropertyItem` itself adds no required Contember theme classes.
+
+## Core Concepts
+* Property lists show read-only data as “label – value” pairs.  
+* `PropertyItem` accepts a `label` prop and any children.  
+* You nest `PropertyItem` inside `PropertyList` for consistent spacing.  
+* Children can be plain text or other Contember components.
+
+## Quick Start
+```tsx
+import { PropertyItem, PropertyList } from '~/lib/ui/property-list'
+
+export const BasicList = () => (
+	<PropertyList className="divide-y divide-gray-200">
+		<PropertyItem label="Name">John Doe</PropertyItem>
+		<PropertyItem label="Job type">Full-time</PropertyItem>
+		<PropertyItem label="Workplace">Office</PropertyItem>
+	</PropertyList>
+)
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+| Name     | Type   | Required | Default | Description                              |
+|----------|--------|----------|---------|------------------------------------------|
+| label    | string | Yes      | —       | Text shown before the value.             |
+| children | ReactNode | Yes | — | Value content rendered after the label. |
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+### Formatting entity fields
+```tsx
+<PropertyItem label="Created at">
+	<FormattedField field="createdAt" />
+</PropertyItem>
+```
+This pattern keeps your pages declarative. You pass Contember field components as children.
+
+### Listing relations
+```tsx
+<PropertyItem label="Workplaces">
+	<HasManyList field="workplaces">
+		<CompanyWorkplaceLink />
+	</HasManyList>
+</PropertyItem>
+```
+Use complex children such as `HasManyList` to summarise relations in a single row.
+
+## Best Practices & Gotchas
+* Keep labels short; long text breaks layout on small screens.  
+* Wrap date and number values in formatter components for locale safety.  
+* Do not place interactive elements inside `PropertyItem`; the row is meant for display.  
+* Always group multiple items in `PropertyList` to preserve spacing.  
+
+## Further Reading
+* `PropertyList` – parent container.  
+* `FormattedField` – Contember field formatting helper.  
+* `HasManyList`, `HasOne` – relation helpers.
+
+<!-- End of Generated Documentation -->

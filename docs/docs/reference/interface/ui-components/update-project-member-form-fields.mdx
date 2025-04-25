@@ -1,0 +1,118 @@
+---
+title: UpdateProjectMemberFormFields
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 1 -->
+<!-- Source examples: 1 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 0 -->
+<!-- Import examples: 0 -->
+
+# UpdateProjectMemberFormFields
+
+## Overview
+`UpdateProjectMemberFormFields` lets you edit a project member’s roles and memberships.  
+The component integrates with `useUpdateProjectMemberForm`, which introspects roles when not explicitly provided.
+
+## Styling Guidelines
+* All examples use Tailwind CSS utility classes.  
+* No additional Contember theme classes are required.
+
+## Core Concepts
+* Role introspection based on `projectSlug`.
+* Controlled form fields driven by `useUpdateProjectMemberForm`.
+* Optional `roles` override for custom role definitions.
+* Works inside any form created with Contember React hooks.
+
+## Quick Start
+```tsx
+import { UpdateProjectMemberFormFields } from '@contember/react-ui'
+
+export const QuickExample = () => (
+	<form className="space-y-6">
+		<UpdateProjectMemberFormFields projectSlug="my-project" />
+		<button type="submit" className="btn btn-primary">Save</button>
+	</form>
+)
+```
+
+## Detailed Guide
+```tsx
+import {
+	UpdateProjectMemberFormFields,
+	useUpdateProjectMemberForm,
+} from '@contember/react-ui'
+
+// 1. Create the form state with the helper hook.
+const { form, submit } = useUpdateProjectMemberForm({
+	projectSlug: 'my-project',
+})
+
+// 2. Render the form fields and handle submit.
+export const MemberEditor = () => (
+	<form onSubmit={submit} className="max-w-lg p-6 bg-white shadow rounded">
+		<UpdateProjectMemberFormFields projectSlug="my-project" />
+		<button type="submit" className="mt-4 btn btn-primary">Update member</button>
+	</form>
+)
+```
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| projectSlug | string | Yes | — | The slug of the project to which the member belongs. |
+| roles | RolesConfig | No | Introspected | Predefined roles configuration. If not provided, roles are introspected based on the `projectSlug`. |
+
+_Inherited props: None_
+
+## Sub-Components / Building Blocks
+### useUpdateProjectMemberForm
+Hook that handles form state, validation, and submission for `UpdateProjectMemberFormFields`.
+
+## Examples
+### Custom Role Configuration
+Override the introspected roles with your own configuration:
+```tsx
+const roles = {
+	admin: { label: 'Admin', memberships: ['*'] },
+	developer: { label: 'Developer', memberships: ['content', 'media'] },
+}
+
+<form className="space-y-4">
+	<UpdateProjectMemberFormFields
+		projectSlug="my-project"
+		roles={roles}
+	/>
+	<button type="submit" className="btn btn-primary">Save</button>
+</form>
+```
+The component now shows only “Admin” and “Developer” options.
+
+### Embedding in a Modal
+```tsx
+import { Dialog } from '@headlessui/react'
+
+<Dialog open={open} onClose={setOpen}>
+	<Dialog.Panel className="p-6 bg-white rounded shadow">
+		<h2 className="text-lg font-medium mb-4">Edit member</h2>
+		<UpdateProjectMemberFormFields projectSlug="my-project" />
+		<button className="mt-4 btn btn-primary" onClick={submit}>Save</button>
+	</Dialog.Panel>
+</Dialog>
+```
+The form fields behave the same, now inside a modal.
+
+## Best Practices & Gotchas
+* Always wrap the component in a `<form>` element to enable browser validation.  
+* Use `useUpdateProjectMemberForm` to get submit handlers and error states.  
+* Provide a `roles` prop for predictable ordering or labeling.  
+* The component does not fetch member data; populate initial values separately.  
+* Avoid hard-coding role slugs; use the introspection feature when possible.
+
+## Further Reading
+* `useUpdateProjectMemberForm` hook documentation  
+* Contember Tenant API concepts  
+* Role management patterns in multi-tenant apps  
+
+<!-- End of Generated Documentation -->

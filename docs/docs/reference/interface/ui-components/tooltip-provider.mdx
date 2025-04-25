@@ -1,0 +1,126 @@
+---
+title: TooltipProvider
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 7 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 1 -->
+<!-- External examples: 6 -->
+<!-- Import examples: 5 -->
+
+# TooltipProvider
+
+## Overview
+`TooltipProvider` sets up a React context that coordinates all nested `Tooltip` components.  
+Wrap any part of your UI that needs tooltips with this provider once.
+
+## Styling Guidelines
+* All examples use Tailwind CSS utility classes.  
+* No extra Contember theme classes are required.
+
+## Core Concepts
+* You must wrap every `Tooltip` with a single `TooltipProvider`.
+* `TooltipProvider` has no props—configuration happens on individual tooltips.
+* Nest `TooltipTrigger` and `TooltipContent` inside each `Tooltip`.
+* Tailwind handles visual appearance; tooltip logic stays in React.
+
+## Quick Start
+```tsx
+import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '~/lib/ui/tooltip'
+
+export default function Page() {
+	return (
+		<TooltipProvider>
+			<Tooltip>
+				<TooltipTrigger asChild>
+					<button className="px-2 py-1 text-sm border rounded">Hover me</button>
+				</TooltipTrigger>
+				<TooltipContent className="bg-zinc-900 text-white px-2 py-1 rounded">
+					Helpful text
+				</TooltipContent>
+			</Tooltip>
+		</TooltipProvider>
+	)
+}
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+_None_
+
+## Sub-Components / Building Blocks
+
+### Tooltip
+Wraps a single trigger/content pair and handles open state.
+
+### TooltipTrigger
+The interactive element that users hover or focus.  
+Use `asChild` when you want to pass any JSX element as the trigger.
+
+### TooltipContent
+The panel that displays the tooltip message.  
+Style it with Tailwind classes for background, text, and shadow.
+
+## Examples
+
+### Dialog action tooltip
+```tsx
+const [open, setOpen] = useState(false)
+
+<TooltipProvider>
+	<Dialog open={open} onOpenChange={setOpen}>
+		<Tooltip>
+			<TooltipTrigger asChild>
+				<DialogTrigger asChild>
+					<Button size="sm" variant="ghost">
+						<PencilIcon size={16} />
+					</Button>
+				</DialogTrigger>
+			</TooltipTrigger>
+
+			<TooltipContent className="bg-zinc-800 text-white px-2 py-1 rounded">
+				Open editor
+			</TooltipContent>
+		</Tooltip>
+
+		<DialogContent>
+			{/* dialog body */}
+		</DialogContent>
+	</Dialog>
+</TooltipProvider>
+```
+This pattern shows tooltips inside interactive dialogs. `TooltipProvider` wraps both dialog and tooltip trees.
+
+### Conditional status icons
+```tsx
+<TooltipProvider>
+	<div className="flex items-center gap-1.5">
+		<Tooltip>
+			<TooltipTrigger>
+				<ShieldCheckIcon className="w-5 text-green-600" />
+			</TooltipTrigger>
+			<TooltipContent className="bg-black text-white px-2 py-1 rounded">
+				Certificate signed at <FormattedField field="certificate.signedAt" />
+			</TooltipContent>
+		</Tooltip>
+	</div>
+</TooltipProvider>
+```
+Render tooltip content dynamically with Contember’s `FormattedField`. The icon always remains interactive.
+
+## Best Practices & Gotchas
+* Place only one `TooltipProvider` per React tree—usually near the root.
+* Keep tooltip text short; longer content reduces usability.
+* Combine `asChild` with Tailwind button classes for seamless styling.
+* Avoid heavy components inside `TooltipContent`; keep it lightweight.
+* Tooltips work on hover and focus; ensure triggers are keyboard-accessible.
+
+## Further Reading
+* Tooltip, TooltipTrigger and TooltipContent components  
+* Dialog and Popover integration patterns  
+* Tailwind CSS documentation for spacing, color, and shadow utilities  
+
+<!-- End of Generated Documentation -->

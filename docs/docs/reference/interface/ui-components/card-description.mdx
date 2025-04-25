@@ -1,0 +1,77 @@
+---
+title: CardDescription
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 15 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 5 -->
+<!-- External examples: 10 -->
+<!-- Import examples: 8 -->
+
+## Styling Guidelines
+* All examples use Tailwind CSS utility classes.
+* CardDescription relies on Contember’s default theme; no extra theme classes are required.
+
+## Core Concepts
+* CardDescription displays low-priority text under a CardTitle.
+* It belongs inside a CardHeader alongside CardTitle.
+* It inherits typography styles from the surrounding Contember theme.
+
+## Quick Start
+```tsx
+import { Card, CardHeader, CardTitle, CardDescription } from '~/lib/ui/card'
+
+export const SimpleCard = () => (
+	<Card className="w-80">
+		<CardHeader>
+			<CardTitle className="text-xl">Sign in</CardTitle>
+			<CardDescription>Enter your credentials to continue</CardDescription>
+		</CardHeader>
+	</Card>
+)
+```
+
+## Examples
+
+### Password Reset Request
+```tsx
+<Card className="w-96">
+	<CardHeader>
+		<CardTitle className="text-2xl">Forgot password?</CardTitle>
+		<CardDescription>We will email you a reset link.</CardDescription>
+	</CardHeader>
+
+	{/* Remaining form omitted for brevity */}
+</Card>
+```
+CardDescription explains the form purpose in a calm tone, improving UX without distracting users.
+
+### Logged-in Notification
+```tsx
+<Card className="w-96">
+	<CardHeader>
+		<CardTitle className="text-2xl">Logged in</CardTitle>
+		<CardDescription>
+			as {identity?.person?.email ?? 'unknown'}
+		</CardDescription>
+	</CardHeader>
+	<Loader position="static" />
+</Card>
+```
+Here CardDescription dynamically shows the current user email.
+
+## Best Practices & Gotchas
+* Keep CardDescription concise—one or two short sentences.
+* Place it directly after CardTitle for consistent spacing.
+* Avoid critical information; users may skip low-contrast text.
+* Do not wrap interactive elements inside CardDescription.
+
+## Further Reading
+* Card
+* CardHeader
+* CardTitle
+* CardContent
+* Contember UI design system
+
+<!-- End of Generated Documentation -->

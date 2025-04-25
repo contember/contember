@@ -12,16 +12,16 @@ title: BackButtonLabel
 # BackButtonLabel
 
 ## Overview
-`BackButtonLabel` renders a back arrow icon with a text label.  
+`BackButtonLabel` renders a back arrow icon with a text label.
 You place it inside `BackButton` to keep navigation styling consistent.
 
 ## Styling Guidelines
-All examples use Tailwind utility classes.  
+All examples use Tailwind utility classes.
 `BackButtonLabel` follows the Contember theme; you do not need extra theme classes.
 
 ## Core Concepts
-- Back navigation should look identical across pages.  
-- The component is presentational; logic lives in `BackButton`.  
+- Back navigation should look identical across pages.
+- The component is presentational; logic lives in `BackButton`.
 - You may override the label with a custom string.
 
 ## Quick Start
@@ -61,9 +61,6 @@ import { BackButton, BackButtonLabel } from '@contember/react-components'
 |-------|--------|----------|---------|-------------------------------------------------------------------|
 | label | string | No       | dictionary.backButton.back | Optional custom button text. |
 
-## Sub-Components / Building Blocks
-_None_
-
 ## Examples
 ```tsx
 <BackButtonLabel />
@@ -76,13 +73,13 @@ Renders the default dictionary label with the arrow icon.
 Shows custom text while keeping the same icon and spacing.
 
 ## Best Practices & Gotchas
-- Keep the label short; it sits beside a small icon.  
-- Wrap the component in a button for proper semantics.  
-- Avoid adding extra padding; the component already includes spacing.  
+- Keep the label short; it sits beside a small icon.
+- Wrap the component in a button for proper semantics.
+- Avoid adding extra padding; the component already includes spacing.
 - Pass plain text only; rich content breaks alignment.
 
 ## Further Reading
-- `BackButton` – wrapper adding navigation logic.  
+- `BackButton` – wrapper adding navigation logic.
 - Contember Design System – typography and iconography guidelines.
 
 <!-- End of Generated Documentation -->

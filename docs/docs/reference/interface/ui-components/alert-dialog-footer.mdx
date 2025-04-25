@@ -1,0 +1,148 @@
+---
+title: AlertDialogFooter
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 8 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 8 -->
+<!-- Import examples: 5 -->
+
+# AlertDialogFooter
+
+## Overview
+`AlertDialogFooter` groups the **primary** and **secondary** actions at the bottom of an `AlertDialogContent`.
+Use it to keep buttons like `AlertDialogCancel` and `AlertDialogAction` in a predictable place.
+
+## Styling Guidelines
+* All snippets below use Tailwind CSS.
+* `AlertDialogFooter` itself adds no styles—you apply Tailwind classes directly to the buttons inside it.
+
+## Core Concepts
+* Place `AlertDialogFooter` as the last child inside `AlertDialogContent`.
+* Keep only action-oriented children (`AlertDialogCancel`, `AlertDialogAction`, or custom buttons wrapped with `asChild`).
+* `AlertDialogFooter` helps users scan for decisions: **Cancel** on the left, **Confirm** on the right.
+
+## Quick Start
+```tsx
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from '~/lib/ui/alert-dialog'
+import { Button } from '~/lib/ui/button'
+
+export const DeleteButton = () => (
+  <AlertDialog>
+    <AlertDialogTrigger asChild>
+      <Button className="bg-red-600 text-white hover:bg-red-700">Delete item</Button>
+    </AlertDialogTrigger>
+
+    <AlertDialogContent>
+      {/* ...header & description here... */}
+      <AlertDialogFooter className="flex gap-2 justify-end">
+        <AlertDialogCancel className="px-3 py-1.5 border">Cancel</AlertDialogCancel>
+        <AlertDialogAction className="px-3 py-1.5 bg-red-600 text-white">
+          Confirm
+        </AlertDialogAction>
+      </AlertDialogFooter>
+    </AlertDialogContent>
+  </AlertDialog>
+)
+```
+
+## Sub-Components / Building Blocks
+
+### AlertDialogCancel
+Cancels the dialog without performing any action.
+Typically placed as the first child inside `AlertDialogFooter`.
+
+### AlertDialogAction
+Confirms the dialog.
+Wrap it with `asChild` when you need full control over the underlying element (e.g. a `Button` from your design system).
+
+## Examples
+
+### 1. Confirmation before deleting an entity
+```tsx
+<AlertDialog>
+  <AlertDialogTrigger asChild>
+    <Button size="icon" variant="ghost">
+      <Trash2Icon size={16} />
+    </Button>
+  </AlertDialogTrigger>
+
+  <AlertDialogContent>
+    <AlertDialogHeader>
+      <AlertDialogTitle>Delete course module?</AlertDialogTitle>
+      <AlertDialogDescription>
+        This action cannot be undone.
+      </AlertDialogDescription>
+    </AlertDialogHeader>
+
+    <AlertDialogFooter>
+      <AlertDialogCancel className="border px-3 py-1.5">Cancel</AlertDialogCancel>
+      <AlertDialogAction asChild>
+        <Button
+          variant="destructive"
+          onClick={handleDeleteEntity}
+        >
+          Delete
+        </Button>
+      </AlertDialogAction>
+    </AlertDialogFooter>
+  </AlertDialogContent>
+</AlertDialog>
+```
+Handle your deletion logic in `handleDeleteEntity`. Wrap the destructive button with `AlertDialogAction asChild` to keep button styles consistent.
+
+### 2. Bulk delete with access checks
+```tsx
+<IsAllowed entity="CourseTermAttendee" action="delete">
+  <IfHasManyItems entityList="attendees">
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <Button variant="destructive" size="xs">Delete all attendees</Button>
+      </AlertDialogTrigger>
+
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Remove all attendees?</AlertDialogTitle>
+          <AlertDialogDescription>
+            You will delete every attendee linked to this term.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+
+        <AlertDialogFooter>
+          <AlertDialogCancel className="border px-2 py-1">Cancel</AlertDialogCancel>
+          <AlertDialogAction asChild>
+            <Button variant="destructive" onClick={handleDelete}>
+              Confirm
+            </Button>
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  </IfHasManyItems>
+</IsAllowed>
+```
+The footer sits at the bottom, keeping the dialog purpose clear and preventing accidental confirmation.
+
+## Best Practices & Gotchas
+* Keep exactly two buttons whenever possible—users expect a binary choice.
+* Always label actions clearly (“Delete”, “Save”) to reduce hesitation.
+* Use `asChild` on `AlertDialogAction` when you need your design-system `Button`.
+* Do not place form fields inside `AlertDialogFooter`; keep it for actions only.
+
+## Further Reading
+* `AlertDialogContent`
+* `AlertDialogTrigger`
+* `AlertDialogAction`
+* `AlertDialogCancel`
+* Contember design system guidelines for modals and dialogs.
+
+<!-- End of Generated Documentation -->

@@ -1,0 +1,101 @@
+---
+title: Textarea
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 10 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 10 -->
+<!-- Import examples: 5 -->
+
+## Overview
+_None_
+
+## Styling Guidelines
+* All examples use Tailwind utility classes.  
+* The component works without extra Contember theme classes.
+
+## Core Concepts
+* Treat `Textarea` as a controlled component—pass `value` and `onChange`.
+* Use Tailwind classes (`resize-none`, `min-h-*`, `font-mono`, etc.) for sizing and appearance.
+* Toggle `readOnly` or `disabled` to lock user input.
+* Forward additional props (e.g., `rows`, `placeholder`) to the underlying `<textarea>` element.
+
+## Quick Start
+```tsx
+import { Textarea } from '@app/lib/ui/textarea'
+
+export const Demo = () => {
+  const [text, setText] = useState('')
+
+  return (
+    <Textarea
+      className="w-full p-2 border rounded resize-none"
+      rows={4}
+      value={text}
+      onChange={e => setText(e.target.value)}
+      placeholder="Type here…"
+    />
+  )
+}
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+_None_
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+
+### Read-only log output
+```tsx
+<Textarea
+  value={errors.join('\n')}
+  readOnly
+  className="w-full bg-gray-50 font-mono text-sm"
+/>
+```
+Displays logs in a fixed, monospaced box without allowing edits.
+
+### Multiline survey answer
+```tsx
+<Textarea
+  rows={3}
+  value={answer}
+  readOnly={surveyState?.readOnly}
+  onChange={e => setAnswer(e.currentTarget.value)}
+  onBlur={e => saveAnswer(e.currentTarget.value)}
+  className="bg-white w-full"
+/>
+```
+Lets users submit long answers while respecting a global read-only state.
+
+### GeoJSON editor
+```tsx
+<Textarea
+  value={geoJson}
+  onChange={e => setGeoJson(e.target.value)}
+  className="mt-3 w-[24rem] min-h-[150px] font-mono text-sm resize-none"
+  placeholder="Paste GeoJSON here…"
+/>
+```
+Uses Tailwind to lock resizing, fix width, and apply a monospaced font for JSON-like data.
+
+## Best Practices & Gotchas
+* Always control the component to keep React state source-of-truth.
+* Combine `resize-none` with fixed `min-h-*` classes to avoid layout jumps.
+* Use `rows` instead of CSS height for simpler accessibility.
+* Pass `readOnly` rather than `disabled` if you still need the content selectable.
+* Keep multiline placeholders short—many screen readers read the full placeholder.
+
+## Further Reading
+* `TextInput` – single-line alternative.
+* Contember form components (`FormLayout`, `StandaloneFormContainer`).
+* Tailwind resizing utilities.  
+
+<!-- End of Generated Documentation -->

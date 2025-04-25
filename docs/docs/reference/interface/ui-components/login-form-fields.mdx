@@ -1,0 +1,111 @@
+---
+title: LoginFormFields
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 5 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 1 -->
+<!-- External examples: 4 -->
+<!-- Import examples: 5 -->
+
+# `LoginFormFields`
+
+## Overview  
+_None_
+
+## Styling Guidelines  
+* All examples use Tailwind CSS.  
+* No additional Contember theme classes are required.
+
+## Core Concepts  
+* Render `LoginFormFields` inside a `<form>` element.  
+* Wrap the form with `LoginForm` to connect to Contember auth logic.  
+* The component manages its own state; it exposes no props.  
+
+## Quick Start
+```tsx
+import { LoginForm, LoginFormFields } from '@app/lib/tenant'
+
+export default function LoginPage() {
+  return (
+    <LoginForm>
+      <form className="grid gap-4">
+        <LoginFormFields />
+      </form>
+    </LoginForm>
+  )
+}
+```
+
+## Detailed Guide  
+_None_
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| N/A  | —    | No       | —       | This component does not accept any props. |
+
+## Sub-Components / Building Blocks  
+_None_
+
+## Examples
+
+### 1. Login card with OAuth buttons
+```tsx
+import {
+  LoginForm,
+  LoginFormFields,
+  IDP,
+  IDPInitTrigger,
+  IDPState,
+} from '@app/lib/tenant'
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui'
+import { Loader, Button } from '@/components/ui'
+
+export default function LoginCard({ idps }: { idps: Record<string, string> }) {
+  return (
+    <IDP>
+      <Card className="w-96 relative">
+        <CardHeader>
+          <CardTitle className="text-2xl">Sign in</CardTitle>
+        </CardHeader>
+
+        <CardContent className="grid gap-4">
+          <LoginForm>
+            <form className="grid gap-4">
+              <LoginFormFields />
+            </form>
+          </LoginForm>
+
+          {Object.entries(idps).map(([idp, label]) => (
+            <IDPInitTrigger key={idp} identityProvider={idp}>
+              <Button variant="outline" className="w-full">
+                {label}
+              </Button>
+            </IDPInitTrigger>
+          ))}
+        </CardContent>
+
+        <IDPState state={['processing_init', 'processing_response', 'success']}>
+          <Loader />
+        </IDPState>
+      </Card>
+    </IDP>
+  )
+}
+```
+The snippet shows a complete login card that combines `LoginFormFields` with identity-provider (OAuth) buttons and a loading overlay.
+
+## Best Practices & Gotchas  
+* Always wrap the fields with `LoginForm`; otherwise, submission will fail.  
+* Place the fields inside a `<form>` to enable browser validation and keyboard submission.  
+* Keep layout simple—let `grid gap-4` handle vertical rhythm.  
+* Do not apply `disabled` manually; `LoginForm` controls field states.  
+
+## Further Reading  
+* `LoginForm` – container that handles submission logic.  
+* `IDP`, `IDPInitTrigger`, `IDPState` – identity provider integration.  
+* `PasswordResetFormFields`, `PasswordlessSignInInitFormFields` – related auth forms.
+
+<!-- End of Generated Documentation -->

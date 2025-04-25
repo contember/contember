@@ -1,0 +1,121 @@
+---
+title: DataGridHasOneTooltip
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 4 -->
+<!-- Source examples: 1 -->
+<!-- Playground examples: 3 -->
+<!-- External examples: 0 -->
+<!-- Import examples: 1 -->
+
+## Overview
+DataGridHasOneTooltip renders a related entity value wrapped in a tooltip.
+The tooltip lets users quickly include or exclude that relation in an active DataGrid filter.
+
+You typically use the component inside `DataGridHasOneColumn`, yet you can place it in any custom column or standalone view.
+
+## Styling Guidelines
+* All examples rely on Tailwind CSS utility classes.
+* No additional Contember-specific theme classes are required.
+
+## Core Concepts
+* Relation filtering: include/exclude a single related entity (`hasOne`) from the grid filter.
+* Tooltip trigger and content separation via `children` and optional `actions`.
+* Reusable outside the built-in `DataGridHasOneColumn`.
+* Custom filter name through the `name` prop.
+* Advanced filtering paths with the `options` prop.
+
+## Quick Start
+```tsx
+import { HasOne, DataGridHasOneTooltip } from '~/lib/datagrid'
+import { Field } from '@contember/react-binding'
+
+<HasOne field="category">
+	<DataGridHasOneTooltip field="category">
+		<button className="text-lg font-semibold text-gray-600">
+			<Field field="category.name" />
+		</button>
+	</DataGridHasOneTooltip>
+</HasOne>
+```
+
+## Detailed Guide
+### Custom tooltip actions
+```tsx
+<DataGridHasOneTooltip
+	field="author"
+	actions={
+		<button className="text-xs text-red-600" onClick={resetFilter}>
+			Reset
+		</button>
+	}
+>
+	<span className="underline">
+		<Field field="author.name" />
+	</span>
+</DataGridHasOneTooltip>
+```
+* `actions` renders inside the tooltip next to the include/exclude buttons.
+* You control styling and behavior of these extra actions.
+
+### Overriding the filter name
+```tsx
+<DataGridHasOneTooltip field="category" name="postCategory">
+	<Field field="category.name" />
+</DataGridHasOneTooltip>
+```
+* The active filter appears under `postCategory` instead of `category`.
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| field | string &#124; SugarableHasOneRelation &#124; SugarableHasOneRelation[] | Yes | — | The relation you filter by. |
+| children | React.ReactNode | Yes | — | UI shown as the tooltip trigger. |
+| name | string | No | field name | Custom filter name. |
+| options | string &#124; { filter?: SugaredFilter; hasOneRelationPath?: SugarableHasOneRelation &#124; SugarableHasOneRelation[]; entityName: string } | No | — | Advanced filter definition or pre-defined entity list. |
+| actions | React.ReactNode | No | — | Extra elements rendered inside the tooltip. |
+
+## Examples
+### Display category with quick filter
+```tsx
+<HasOne field="category">
+	<DataGridHasOneTooltip field="category">
+		<button className="text-sm text-blue-600 hover:underline">
+			<Field field="category.name" />
+		</button>
+	</DataGridHasOneTooltip>
+</HasOne>
+```
+This snippet places the category name in a list or card view. Clicking opens a tooltip to filter the grid by the selected category.
+
+### Dual relations in a detail panel
+```tsx
+<HasOne field="author">
+	<DataGridHasOneTooltip field="author">
+		<Field field="author.name" />
+	</DataGridHasOneTooltip>
+</HasOne>
+
+<HasOne field="category">
+	<DataGridHasOneTooltip field="category">
+		<Field field="category.name" />
+	</DataGridHasOneTooltip>
+</HasOne>
+```
+Both author and category can be toggled independently, improving exploration of related content.
+
+## Best Practices & Gotchas
+* Wrap the component in a `HasOne` binding context to avoid runtime errors.
+* Keep the trigger small; large blocks make tooltips feel clunky.
+* Use unique `name` props when multiple filters target the same field path.
+* Avoid placing the tooltip inside a disabled or non-interactive parent element.
+* Remember to reset filters when navigating between unrelated DataGrids.
+
+## Further Reading
+* `DataGridHasOneColumn`
+* `DataGridHasOneFilter`
+* `DataGridHasManyTooltip`
+* Contember DataGrid filtering guide
+
+<!-- End of Generated Documentation -->

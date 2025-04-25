@@ -1,0 +1,96 @@
+---
+title: PropertyList
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 11 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 1 -->
+<!-- External examples: 10 -->
+<!-- Import examples: 6 -->
+
+# `PropertyList`
+
+## Overview
+`PropertyList` renders a vertical list of label–value pairs.  
+Use it inside detail screens or read-only views to present entity attributes in a clean, aligned layout.
+
+## Styling Guidelines
+* All examples use Tailwind CSS.  
+* No special Contember theme classes are required; extend with your own Tailwind utilities if desired.
+
+## Core Concepts
+* Pair `PropertyList` with one or more `PropertyItem` elements.  
+* Each `PropertyItem` receives a `label` prop and arbitrary children as the value.  
+* Nest other Contember components (e.g. `FormattedField`, `HasManyList`) inside a `PropertyItem` to compose complex views.  
+* Place the list inside any container (`SectionBody`, `Card`, etc.)—`PropertyList` only handles internal spacing.
+
+## Quick Start
+```tsx
+import { PropertyList, PropertyItem } from '~/lib/ui/property-list'
+
+export const UserPreview = () => (
+	<div className="max-w-md rounded border p-6 shadow">
+		<PropertyList>
+			<PropertyItem label="Name">John Doe</PropertyItem>
+			<PropertyItem label="Role">Admin</PropertyItem>
+			<PropertyItem label="Joined">2023-01-15</PropertyItem>
+		</PropertyList>
+	</div>
+)
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+_None_
+
+## Sub-Components / Building Blocks
+### PropertyItem
+Renders an individual row inside `PropertyList`.
+
+```tsx
+<PropertyItem label="Email">
+	user@example.com
+</PropertyItem>
+```
+
+## Examples
+### Combining with Contember field formatters
+```tsx
+<PropertyList>
+	<PropertyItem label="Created at">
+		<FormattedField field="createdAt" />
+	</PropertyItem>
+
+	<PropertyItem label="Active">
+		<FormattedField field="active" />
+	</PropertyItem>
+</PropertyList>
+```
+`FormattedField` handles date and boolean formatting, while `PropertyList` keeps the layout tidy.
+
+### Displaying relations
+```tsx
+<PropertyList>
+	<PropertyItem label="Workplaces">
+		<HasManyList field="workplaces">
+			<CompanyWorkplaceLink />
+		</HasManyList>
+	</PropertyItem>
+</PropertyList>
+```
+You can nest relation helpers such as `HasManyList` or `HasOne` to show linked entities.
+
+## Best Practices & Gotchas
+* Keep labels short to avoid wrapping; use Tailwind `w-40` on the label slot if needed.  
+* Wrap long values (e.g. notes) in a `<p className="whitespace-pre-line">` to preserve formatting.  
+* Do not place interactive elements (buttons, links) directly in labels—put them inside the value cell.
+
+## Further Reading
+* `PropertyItem` – the companion component for individual rows.  
+* `HasManyList`, `HasOne` – relation helpers commonly nested inside `PropertyItem`.  
+* `FormattedField` – value formatter used in read-only UIs.
+
+<!-- End of Generated Documentation -->

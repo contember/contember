@@ -1,0 +1,114 @@
+---
+title: SortableMultiSelectField
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 13 -->
+<!-- Source examples: 1 -->
+<!-- Playground examples: 2 -->
+<!-- External examples: 10 -->
+<!-- Import examples: 7 -->
+
+## Overview
+SortableMultiSelectField lets you pick multiple related entities and define their order with drag-and-drop.  
+You must place the component inside an entity context and define a sort field via `sortableBy`.
+
+## Styling Guidelines
+All examples use Tailwind classes.  
+The component itself adds no styles, so you can rely on your Contember theme utility classes.
+
+## Core Concepts
+- Entity context (`<EntitySubTree />` or `<EntityListSubTree />`) is mandatory.  
+- `sortableBy` tells Contember where to store the sort index.  
+- `connectAt` defines the relation through which selected items connect.  
+- Drag-and-drop reorders items and updates the sort field automatically.  
+- SortableMultiSelectField inherits every feature of MultiSelectField.
+
+## Quick Start
+```tsx
+import { Binding, EntitySubTree, Field, PersistButton, SortableMultiSelectField } from '@app/lib/form'
+
+export default () => (
+	<Binding>
+		<EntitySubTree entity="Book(id = 1)">
+			<SortableMultiSelectField
+				className="w-full"
+				field="chapterPages"
+				label="Page order"
+				sortableBy="pageNumber"
+				connectAt="bookChapter"
+			>
+				<Field field="content" />
+			</SortableMultiSelectField>
+
+			<PersistButton className="mt-4" />
+		</EntitySubTree>
+	</Binding>
+)
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| field | string &#124; Relation object | Yes | — | Target relation holding selected items |
+| sortableBy | string &#124; Sort config object | Yes | — | Field used to store sort order |
+| connectAt | string &#124; Relation object | Yes | — | Relation through which the item is connected |
+| children | React.ReactNode | Yes | — | JSX rendered inside each option |
+| options | string &#124; Entity options object | No | — | Entity options or filter |
+| placeholder | React.ReactNode | No | — | Placeholder text when nothing is selected |
+| createNewForm | React.ReactNode | No | — | Form shown when creating a new entity |
+| queryField | DataViewUnionFilterFields | No | — | Field used for server-side search |
+| initialSorting | DataViewSortingDirections | No | — | Initial list ordering |
+| label | React.ReactNode | Yes | — | Field label |
+| description | React.ReactNode | Yes | — | Helper description |
+| errors | React.ReactNode &#124; Error[] | Yes | — | Validation errors |
+| _All MultiSelectField props_ | — | — | — | Inherited; see MultiSelectField docs |
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+
+### Sortable tags on a location
+```tsx
+<SortableMultiSelectField
+	options="Tag"
+	label="Tags"
+	field="location.tags"
+	connectAt="tag"
+	sortableBy="order"
+>
+	<Field field="internalName" />
+</SortableMultiSelectField>
+```
+This example lets you pick Tag entities, connect them through `tag`, and reorder them by updating the `order` field.
+
+### Has-many sortable select in a playground form
+```tsx
+<SortableMultiSelectField
+	field="hasManySorted"
+	label="Sorted values"
+	connectAt="value"
+	sortableBy="order"
+>
+	<Field field="name" />
+</SortableMultiSelectField>
+```
+Inside an `<EntitySubTree>`, users can drag items to change `order`. Persist the entity to save the new sequence.
+
+## Best Practices & Gotchas
+- Always include `sortableBy`; without it reordering fails silently.  
+- Keep the list narrow enough so users do not need to scroll while dragging.  
+- Display a visual handle or use `cursor-move` Tailwind class to hint drag ability.  
+- Avoid complex filters in `options` when you only need a simple entity name string.  
+- Remember to wrap the component in a `<Binding>` and `<PersistButton>` so changes are saved.
+
+## Further Reading
+- MultiSelectField – underlying selection logic  
+- EntitySubTree – creates an entity context  
+- Drag-and-drop handling in Contember UI
+
+<!-- End of Generated Documentation -->

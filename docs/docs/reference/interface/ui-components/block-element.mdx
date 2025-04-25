@@ -12,11 +12,11 @@ title: BlockElement
 # BlockElement
 
 ## Overview
-`BlockElement` wraps its children in a chosen HTML block element.  
+`BlockElement` wraps its children in a chosen HTML block element.
 Use it inside a Slate editor to isolate complex blocks like images or custom widgets while optionally drawing edit-mode boundaries.
 
 ## Styling Guidelines
-* All examples use Tailwind CSS.  
+* All examples use Tailwind CSS.
 * No Contember-specific theme classes are required.
 
 ## Core Concepts
@@ -58,9 +58,6 @@ export const SimpleBlock = () => (
 | domElement | keyof JSX.IntrinsicElements | No | `"div"` | HTML tag used for the wrapper. |
 | withBoundaries | boolean | No | `false` | Shows an outline when `true`. |
 | className | string | No | `""` | Tailwind classes applied to the wrapper. |
-
-## Sub-Components / Building Blocks
-_None_
 
 ## Examples
 ### Editable vs Read-Only Rendering

@@ -1,0 +1,115 @@
+---
+title: SidebarFooter
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 3 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 1 -->
+<!-- External examples: 2 -->
+<!-- Import examples: 3 -->
+
+# SidebarFooter
+
+## Overview
+`SidebarFooter` renders the bottom section of a Contember sidebar.  
+Use it to display auxiliary navigation, user controls, or legal information.
+
+`SidebarFooter` accepts any React children. It does not add padding by default, so control the spacing with Tailwind classes.
+
+## Styling Guidelines
+* All snippets below rely on Tailwind CSS.  
+* No Contember-specific theme class is required, but you often combine `SidebarFooter` with classes like `py-4` or `border-t`.
+
+## Core Concepts
+* `SidebarFooter` is only a container; you supply structure and spacing.
+* It must be placed inside a `Sidebar` tree.
+* Its contents typically stay visible while the sidebar scrolls.
+
+## Quick Start
+```tsx
+import { Sidebar, SidebarFooter } from '~/lib/ui/sidebar'
+
+export default function Example() {
+	return (
+		<Sidebar className="w-64 bg-gray-900 text-white">
+			{/* ...other sidebar parts... */}
+			<SidebarFooter className="border-t border-gray-700 p-4">
+				<p className="text-sm">&copy; 2024 Acme Inc.</p>
+			</SidebarFooter>
+		</Sidebar>
+	)
+}
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+_None_
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+
+### Support & Account Links
+Displays a help link and user account slots.
+
+```tsx
+<SidebarFooter className="space-y-4 p-4">
+	<SidebarMenu>
+		<SidebarMenuItem>
+			<SidebarMenuButton asChild>
+				<a href="#" className="flex items-center gap-2">
+					<LifeBuoyIcon className="h-5 w-5" />
+					Support
+				</a>
+			</SidebarMenuButton>
+		</SidebarMenuItem>
+	</SidebarMenu>
+
+	<div>
+		<SlotTargets.Account />
+	</div>
+</SidebarFooter>
+```
+
+Explanation:  
+* `space-y-4` separates the menu from the account block.  
+* Icons inherit color from surrounding text.
+
+### Multiple Information Blocks
+```tsx
+<SidebarFooter className="p-4 text-xs">
+	<div className="mb-2">
+		<small className="block">Version 2.0.1</small>
+		<small className="block">Build 7c9a3f4</small>
+	</div>
+	<div>
+		<small>
+			Created with&nbsp;
+			<a href="https://www.contember.com/" className="underline">
+				Contember Studio
+			</a>
+		</small>
+	</div>
+</SidebarFooter>
+```
+
+Explanation:  
+Small blocks keep technical info at the bottom without crowding the main navigation.
+
+## Best Practices & Gotchas
+* Always wrap `SidebarFooter` in the `Sidebar` component; stand-alone use breaks layout.
+* Add a top border to visually separate it from scrolling content.
+* Keep content concise; long lists push important items off screen.
+* Combine with `SidebarMenu` when you need button-like links.
+
+## Further Reading
+* `Sidebar`
+* `SidebarHeader`
+* `SidebarContent`
+* `SidebarMenu`, `SidebarMenuItem`, `SidebarMenuButton`
+
+<!-- End of Generated Documentation -->

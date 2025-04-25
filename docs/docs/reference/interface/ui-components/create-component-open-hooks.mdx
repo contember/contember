@@ -12,7 +12,7 @@ title: createComponentOpenHooks
 # createComponentOpenHooks
 
 ## Overview
-`createComponentOpenHooks` wraps a React component that already supports the trio of props `open`, `defaultOpen`, and `onOpenChange`.  
+`createComponentOpenHooks` wraps a React component that already supports the trio of props `open`, `defaultOpen`, and `onOpenChange`.
 The wrapper injects a context provider plus a `useOpen` hook, so you can read or change the open state from anywhere within the component tree.
 
 This pattern works well for modals, drawers, popovers, and any other UI element that toggles between visible and hidden states.
@@ -64,9 +64,6 @@ export const App = () => {
   )
 }
 ```
-
-## Detailed Guide
-_None_
 
 ## Props Reference
 | Name | Type | Required | Default | Description |
@@ -125,7 +122,7 @@ export const DrawerExample = () => {
   )
 }
 ```
-The drawer slide-in demo reuses the same pattern as the modal.  
+The drawer slide-in demo reuses the same pattern as the modal.
 You can toggle from any nested component because `useOpen` lives in context.
 
 ## Best Practices & Gotchas

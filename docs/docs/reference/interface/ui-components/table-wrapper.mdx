@@ -1,0 +1,126 @@
+---
+title: TableWrapper
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 10 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 10 -->
+<!-- Import examples: 5 -->
+
+# TableWrapper
+
+## Overview
+TableWrapper groups a `<Table>` with optional headings or other inline elements.  
+Use it to keep table content visually separated and to apply shared padding, borders, or background styles.
+
+## Styling Guidelines
+All examples use Tailwind utility classes.  
+TableWrapper itself adds no Contember-specific theme classes, so you style it freely with `className`.
+
+## Core Concepts
+- Wrap every `<Table>` in a TableWrapper for consistent spacing.  
+- Add headings or toolbars inside TableWrapper before the table.  
+- Pass Tailwind classes via `className` to control background, borders, or spacing.
+
+## Quick Start
+```tsx
+import {
+	TableWrapper,
+	Table,
+	TableBody,
+	TableRow,
+	TableCell,
+} from '@app/lib/ui/custom-table'
+
+export const MinimalTable = () => (
+	<TableWrapper className="border rounded-md">
+		<Table>
+			<TableBody>
+				<TableRow>
+					<TableCell className="font-medium">Label</TableCell>
+					<TableCell>Value</TableCell>
+				</TableRow>
+			</TableBody>
+		</Table>
+	</TableWrapper>
+)
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+_None_
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+
+### Adding a Section Heading
+```tsx
+<TableWrapper className="bg-gray-50/50 border rounded-md">
+	<h3 className="px-4 py-2 font-bold">Contact</h3>
+
+	<Table>
+		<TableBody>
+			<TableRow>
+				<TableCell>Name</TableCell>
+				<TableCell className="font-semibold">
+					<Field field="contactName" />
+				</TableCell>
+			</TableRow>
+			<TableRow>
+				<TableCell>Email</TableCell>
+				<TableCell className="font-semibold">
+					<Field field="contactEmail" />
+				</TableCell>
+			</TableRow>
+		</TableBody>
+	</Table>
+</TableWrapper>
+```
+You place any React nodes—like headings—above the table but still inside the wrapper. This keeps related content visually grouped.
+
+### Displaying Entity Details
+```tsx
+<TableWrapper>
+	<Table>
+		<TableBody>
+			<TableRow>
+				<TableCell>Type</TableCell>
+				<TableCell className="font-bold text-lg">
+					<HasOne field="type">
+						<Field field="name" />
+					</HasOne>
+				</TableCell>
+			</TableRow>
+
+			<TableRow>
+				<TableCell>Responsible Employee</TableCell>
+				<TableCell className="font-bold text-lg">
+					<HasOne field="responsibleEmployee">
+						<EmployeePreview link />
+					</HasOne>
+				</TableCell>
+			</TableRow>
+		</TableBody>
+	</Table>
+</TableWrapper>
+```
+The wrapper keeps the table compact while entity preview components render inside cells.
+
+## Best Practices & Gotchas
+- Always close TableWrapper around exactly one `<Table>`.  
+- Place toolbars or headings before the table, not inside `<Table>`.  
+- Add outer margin on TableWrapper, not the table, to avoid double spacing.  
+- Supply Tailwind classes through `className` instead of nesting extra divs.
+
+## Further Reading
+- Table  
+- TableRow and TableCell  
+- Contember `Field`, `HasOne`, and `HasMany` components for rendering data.
+
+<!-- End of Generated Documentation -->

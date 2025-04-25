@@ -1,16 +1,10 @@
 import nodeAssert from 'node:assert'
 import supertest from 'supertest'
 import { Schema } from '@contember/schema'
-import {
-	Migration,
-	MigrationVersionHelper,
-	ModificationHandlerFactory,
-	SchemaDiffer,
-	SchemaMigrator, VERSION_LATEST,
-} from '@contember/schema-migrations'
+import { Migration, MigrationVersionHelper, ModificationHandlerFactory, SchemaDiffer, SchemaMigrator, VERSION_LATEST } from '@contember/schema-migrations'
 import { emptySchema } from '@contember/schema-utils'
-import { afterEach, describe, beforeEach, expect } from 'bun:test'
-
+import { afterEach, beforeEach, expect } from 'bun:test'
+import { TenantClient } from './TenantClient'
 
 export const rootToken = String(process.env.CONTEMBER_ROOT_TOKEN)
 export const loginToken = String(process.env.CONTEMBER_LOGIN_TOKEN)
@@ -67,31 +61,6 @@ const createMigrations = (schema: Schema) => {
 	return differ.diffSchemas(emptySchema, schema)
 }
 
-const createProject = async (slug: string) => {
-	await executeGraphql(
-		'/tenant',
-		gql`
-		mutation($projectSlug: String!, $config: Json!) {
-			createProject(projectSlug: $projectSlug, config: $config) {
-				ok
-				error { code }
-			}
-		}
-	`,
-		{
-			variables: {
-				projectSlug: slug,
-				config: {},
-			},
-		})
-		.expect(response => {
-			expect(response.body).toBeTruthy()
-			expect(response.body.data).toBeTruthy()
-			expect(response.body.data.createProject).toBeTruthy()
-			expect(response.body.data.createProject.ok).toBeTruthy()
-		})
-		.expect(200)
-}
 
 const executeMigrations = async (projectSlug: string, modifications: Migration.Modification[], fullName: string = '2024-07-01-120000-init') => {
 	const version = MigrationVersionHelper.extractVersion(fullName)
@@ -130,7 +99,10 @@ export const rand = () => Math.random().toString(36).slice(2)
 export const createTester = async (schema: Schema) => {
 	const projectSlug = 'test_' + rand()
 	// console.log(`Creating project ${projectSlug}`)
-	await createProject(projectSlug)
+
+	const tenantClient = new TenantClient(apiUrl, rootToken)
+	await tenantClient.createProject(projectSlug)
+
 	const migrations = createMigrations(schema)
 	await executeMigrations(projectSlug, migrations)
 
@@ -143,6 +115,9 @@ export const createTester = async (schema: Schema) => {
 	queryCb.migrate = async (modifications: Migration.Modification[], fullName: string) => {
 		await executeMigrations(projectSlug, modifications, fullName)
 	}
+
+	queryCb.tenant = tenantClient
+
 	return queryCb
 }
 

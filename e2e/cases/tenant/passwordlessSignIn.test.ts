@@ -1,37 +1,36 @@
 import { expect, test } from 'bun:test'
-import { consumeMails, createTester, gql, loginToken, rand } from '../../src/tester'
+import { consumeMails, createTester, loginToken, rand } from '../../src/tester'
 import { emptySchema } from '@contember/schema-utils'
-import { signUp } from '../../src/requests'
+import * as TenantApi from '@contember/graphql-client-tenant'
 
 test('sign in using magic link', async () => {
 	const tester = await createTester(emptySchema)
 	const email = `john-${rand()}@doe.com`
 	const password = 'HWGA51KKpJ4lSW'
-	await signUp(email, password)
-	await tester(`mutation {
-	configure(config: { passwordless: {enabled: always, url: "https://example.com" }}) {
-		ok
-	}
-}`, {
-		path: '/tenant',
-	}).expect(200).expect({ data: { configure: { ok: true } } })
+	await tester.tenant.signUp(email, password)
 
-	const initResult = await tester(gql`
-		mutation($email: String!) {
-            initSignInPasswordless(email: $email) {
-				ok
-				result {
-					requestId
-				}
-            }
-        }
-	`, {
-		path: '/tenant',
-		variables: { email },
-		authorizationToken: loginToken,
-	})
-		.expect(200)
+	const configResult = await tester.tenant.send(
+		TenantApi.mutation$.configure(TenantApi.configureResponse$$),
+		{
+			config: { passwordless: { enabled: 'always', url: 'https://example.com' } },
+		},
+	)
+	expect(configResult.status).toBe(200)
+	expect(configResult.body).toEqual({ data: { configure: { ok: true } } })
 
+	const initResult = await tester.tenant.send(
+		TenantApi.mutation$
+			.initSignInPasswordless(
+				TenantApi.initSignInPasswordlessResponse$$
+					.result(TenantApi.initSignInPasswordlessResult$$),
+			),
+		{
+			email: email,
+		},
+		{ authorizationToken: loginToken },
+	)
+
+	expect(initResult.status).toBe(200)
 	const requestId = initResult.body.data.initSignInPasswordless.result.requestId
 
 	const mails = await consumeMails()
@@ -42,55 +41,54 @@ test('sign in using magic link', async () => {
 	expect(token).toHaveLength(40)
 
 	// invalid token
-	await tester(gql`
-        mutation($token: String!, $request: String!) {
-            signInPasswordless(requestId: $request, token: $token, validationType: token) {
-                ok
-                error {
-                    code
-                }
-            }
-        }
-	`, {
-		path: '/tenant',
-		variables: { token: 'ABCD', request: requestId },
-		authorizationToken: loginToken,
-	})
-		.expect(200)
-		.expect({
-			data: {
-				signInPasswordless: {
-					ok: false,
-					error: {
-						code: 'TOKEN_INVALID',
-					},
+	const invalidTokenResult = await tester.tenant.send(
+		TenantApi.mutation$
+			.signInPasswordless(
+				TenantApi.signInPasswordlessResponse$$
+					.error(TenantApi.signInPasswordlessError$$),
+			),
+		{
+			requestId: requestId,
+			token: 'ABCD',
+			validationType: 'token',
+		},
+		{ authorizationToken: loginToken },
+	)
+
+	expect(invalidTokenResult.status).toBe(200)
+	expect(invalidTokenResult.body).toMatchObject({
+		data: {
+			signInPasswordless: {
+				ok: false,
+				error: {
+					code: 'TOKEN_INVALID',
 				},
 			},
-		})
-
+		},
+	})
 
 	// valid
-	await tester(gql`
-		mutation($token: String!, $request: String!) {
-            signInPasswordless(requestId: $request, token: $token, validationType: token) {
-				ok
-				error {
-					code
-				}
-			}
-		}
-	`, {
-		path: '/tenant',
-		variables: { token, request: requestId },
-		authorizationToken: loginToken,
-	})
-		.expect(200)
-		.expect({
-			data: {
-				signInPasswordless: {
-					ok: true,
-					error: null,
-				},
+	const validTokenResult = await tester.tenant.send(
+		TenantApi.mutation$
+			.signInPasswordless(
+				TenantApi.signInPasswordlessResponse$$
+					.error(TenantApi.signInPasswordlessError$$),
+			),
+		{
+			requestId: requestId,
+			token: token,
+			validationType: 'token',
+		},
+		{ authorizationToken: loginToken },
+	)
+
+	expect(validTokenResult.status).toBe(200)
+	expect(validTokenResult.body).toMatchObject({
+		data: {
+			signInPasswordless: {
+				ok: true,
+				error: null,
 			},
-		})
+		},
+	})
 })

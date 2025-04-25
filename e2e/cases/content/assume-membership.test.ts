@@ -1,6 +1,5 @@
 import { test } from 'bun:test'
 import { createTester, gql } from '../../src/tester'
-import { addProjectMember, signIn, signUp } from '../../src/requests'
 import { createSchema, SchemaDefinition as def } from '@contember/schema-definition'
 
 namespace TagModel {
@@ -31,9 +30,9 @@ test('Content API: assume membership', async () => {
 	}))
 
 	const email = `john+${Date.now()}@doe.com`
-	const identityId = await signUp(email)
-	const authKey = await signIn(email)
-	await addProjectMember(identityId, tester.projectSlug, { role: 'test', variables: [] })
+	const identityId = await tester.tenant.signUp(email)
+	const authKey = await tester.tenant.signIn(email)
+	await tester.tenant.addProjectMember(identityId, tester.projectSlug, { role: 'test', variables: [] })
 
 	await tester(
 		gql`

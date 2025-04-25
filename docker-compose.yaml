@@ -162,6 +162,8 @@ services:
 
   mailhog:
     image: mailhog/mailhog
+    environment:
+      MH_CORS_ORIGIN: '*'
 volumes:
   pgsql-data: ~
   minio-data: ~

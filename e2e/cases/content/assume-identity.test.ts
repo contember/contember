@@ -1,6 +1,5 @@
 import { test } from 'bun:test'
 import { createTester, gql } from '../../src/tester'
-import { addProjectMember, signIn, signUp } from '../../src/requests'
 import { createSchema, SchemaDefinition as def } from '@contember/schema-definition'
 import { AllowAllPermissionFactory } from '@contember/schema-utils'
 
@@ -30,9 +29,9 @@ test('Content API: assume identity', async () => {
 	}))
 
 	const email = `john+${Date.now()}@doe.com`
-	const identityId = await signUp(email)
-	const authKey = await signIn(email)
-	await addProjectMember(identityId, tester.projectSlug, { role: 'test', variables: [] })
+	const identityId = await tester.tenant.signUp(email)
+	const authKey = await tester.tenant.signIn(email)
+	await tester.tenant.addProjectMember(identityId, tester.projectSlug, { role: 'test', variables: [] })
 
 	const assumedIdentityId = '65e049e7-4b22-487a-a93b-528b3127d967'
 	await tester(
@@ -91,9 +90,9 @@ test('Content API: assume identity is declined', async () => {
 	}))
 
 	const email = `john+${Date.now()}@doe.com`
-	const identityId = await signUp(email)
-	const authKey = await signIn(email)
-	await addProjectMember(identityId, tester.projectSlug, { role: 'test', variables: [] })
+	const identityId = await tester.tenant.signUp(email)
+	const authKey = await tester.tenant.signIn(email)
+	await tester.tenant.addProjectMember(identityId, tester.projectSlug, { role: 'test', variables: [] })
 
 	const assumedIdentityId = '65e049e7-4b22-487a-a93b-528b3127d967'
 	await tester(

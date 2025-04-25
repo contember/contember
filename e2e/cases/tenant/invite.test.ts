@@ -1,8 +1,8 @@
 import { test, expect } from 'bun:test'
 import { Acl } from '@contember/schema'
-import { consumeMails, createTester, gql, rand } from '../../src/tester'
-import { addProjectMember, invite, signIn, signUp } from '../../src/requests'
+import { consumeMails, createTester, rand } from '../../src/tester'
 import { c, createSchema } from '@contember/schema-definition'
+import * as TenantApi from '@contember/graphql-client-tenant'
 
 namespace Model {
 	export class Language {
@@ -53,7 +53,7 @@ test('admin can invite a user with a membership', async () => {
 	const tester = await createTester(schema)
 	const email = `john-${rand()}@doe.com`
 	const languageId = 'c43e7c51-e138-4e52-95d5-7a41d5c026ee'
-	const result = await invite({
+	const result = await tester.tenant.invite({
 		email: email,
 		projectSlug: tester.projectSlug,
 		memberships: [
@@ -69,65 +69,61 @@ test('admin can invite a user with a membership', async () => {
 	expect(mail[0].Content.Headers.Subject[0]).toBe('You have been invited to ' + tester.projectSlug)
 	const identity = result.body.data.invite.result.person.identity.id
 
-	await tester(gql`
-			query($slug: String!, $email: String!) {
-				projectBySlug(slug: $slug) {
-					members(input: {filter: {email: [$email]}}) {
-						identity {
-							id
-						}
-						memberships {
-							role
-							variables {
-								name
-								values
-							}
-						}
-					}
-				}
-			}
-		`, { variables: { slug: tester.projectSlug, email }, path: '/tenant' })
-		.expect(200)
-		.expect({
-			data: {
-				projectBySlug: {
-					members: [
-						{
-							identity: {
-								id: identity,
-							},
-							memberships: [
-								{
-									role: 'editor',
-									variables: [
-										{
-											name: 'language',
-											values: [languageId],
-										},
-									],
-								},
-							],
+	const projectMembersResult = await tester.tenant.send(
+		TenantApi.query$
+			.projectBySlug(
+				TenantApi.project$$.members(
+					TenantApi.projectIdentityRelation$
+						.identity(TenantApi.identity$$)
+						.memberships(TenantApi.membership$$.variables(TenantApi.variableEntry$$)),
+				),
+			),
+		{
+			slug: tester.projectSlug,
+			input: { filter: { email: [email] } },
+		},
+	)
+	expect(projectMembersResult.status).toBe(200)
+	expect(projectMembersResult.body).toMatchObject({
+		data: {
+			projectBySlug: {
+				members: [
+					{
+						identity: {
+							id: identity,
 						},
-					],
-				},
+						memberships: [
+							{
+								role: 'editor',
+								variables: [
+									{
+										name: 'language',
+										values: [languageId],
+									},
+								],
+							},
+						],
+					},
+				],
 			},
-		})
+		},
+	})
 })
 
 test('superEditor can invite a user with a membership', async () => {
 	const tester = await createTester(schema)
 	const email = `john-${rand()}@doe.com`
 	const languageId = 'c43e7c51-e138-4e52-95d5-7a41d5c026ee'
-	const identityId = await signUp(email)
-	const authKey = await signIn(email)
-	await addProjectMember(identityId, tester.projectSlug, {
+	const identityId = await tester.tenant.signUp(email)
+	const authKey = await tester.tenant.signIn(email)
+	await tester.tenant.addProjectMember(identityId, tester.projectSlug, {
 		role: 'superEditor',
 		variables: [{ name: 'language', values: [languageId] }],
 	})
 
 
 	const email2 = `john-${rand()}@doe.com`
-	const result = await invite({
+	const result = await tester.tenant.invite({
 		email: email2,
 		projectSlug: tester.projectSlug,
 		memberships: [
@@ -150,16 +146,16 @@ test('superEditor cannot invite a user with different variables', async () => {
 	const email = `john-${rand()}@doe.com`
 	const languageId = 'c43e7c51-e138-4e52-95d5-7a41d5c026ee'
 	const languageId2 = '75da639f-78c0-4f0f-8c9c-05e7fc5385cf'
-	const identityId = await signUp(email)
-	const authKey = await signIn(email)
-	await addProjectMember(identityId, tester.projectSlug, {
+	const identityId = await tester.tenant.signUp(email)
+	const authKey = await tester.tenant.signIn(email)
+	await tester.tenant.addProjectMember(identityId, tester.projectSlug, {
 		role: 'superEditor',
 		variables: [{ name: 'language', values: [languageId] }],
 	})
 
 
 	const email2 = `john-${rand()}@doe.com`
-	const result = await invite({
+	const result = await tester.tenant.invite({
 		email: email2,
 		projectSlug: tester.projectSlug,
 		memberships: [
@@ -168,25 +164,37 @@ test('superEditor cannot invite a user with different variables', async () => {
 				variables: [{ name: 'language', values: [languageId2] }],
 			},
 		],
-	}, { authorizationToken: authKey })
-	expect(result.body.data.invite).toBeNull()
-	expect(result.body.errors[0].message).toBe('You are not allowed to invite a person')
+	}, {
+		authorizationToken: authKey,
+		expected: {
+			body: {
+				errors: [
+					{
+						message: 'You are not allowed to invite a person',
+					},
+				],
+				data: {
+					invite: null,
+				},
+			},
+		},
+	})
 })
 
 test('editor cannot invite a user with a membership', async () => {
 	const tester = await createTester(schema)
 	const email = `john-${rand()}@doe.com`
 	const languageId = 'c43e7c51-e138-4e52-95d5-7a41d5c026ee'
-	const identityId = await signUp(email)
-	const authKey = await signIn(email)
-	await addProjectMember(identityId, tester.projectSlug, {
+	const identityId = await tester.tenant.signUp(email)
+	const authKey = await tester.tenant.signIn(email)
+	await tester.tenant.addProjectMember(identityId, tester.projectSlug, {
 		role: 'editor',
 		variables: [{ name: 'language', values: [languageId] }],
 	})
 
 
 	const email2 = `john-${rand()}@doe.com`
-	const result = await invite({
+	await tester.tenant.invite({
 		email: email2,
 		projectSlug: tester.projectSlug,
 		memberships: [
@@ -195,7 +203,20 @@ test('editor cannot invite a user with a membership', async () => {
 				variables: [{ name: 'language', values: [languageId] }],
 			},
 		],
-	}, { authorizationToken: authKey })
-	expect(result.body.data.invite).toBeNull()
-	expect(result.body.errors[0].message).toBe('You are not allowed to invite a person')
+	}, {
+		authorizationToken: authKey,
+		expected: {
+			body: {
+				errors: [
+					{
+						message: 'You are not allowed to invite a person',
+					},
+				],
+				data: {
+					invite: null,
+				},
+			},
+		},
+	})
 })
+

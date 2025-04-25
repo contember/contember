@@ -1,7 +1,6 @@
 import { expect, test } from 'bun:test'
 import { createSchema, SchemaDefinition as def } from '@contember/schema-definition'
 import { createTester, gql } from '../../src/tester'
-import { addProjectMember, signIn, signUp } from '../../src/requests'
 
 
 namespace TagModel {
@@ -15,8 +14,8 @@ test('Tenant API: sign up, add to a project and check project access', async () 
 	const tester = await createTester(createSchema(TagModel))
 
 	const email = `john+${Date.now()}@doe.com`
-	const identityId = await signUp(email)
-	const authKey = await signIn(email)
+	const identityId = await tester.tenant.signUp(email)
+	const authKey = await tester.tenant.signIn(email)
 
 	await tester(
 		gql`
@@ -39,7 +38,7 @@ test('Tenant API: sign up, add to a project and check project access', async () 
 		})
 
 
-	await addProjectMember(identityId, tester.projectSlug)
+	await tester.tenant.addProjectMember(identityId, tester.projectSlug)
 
 	await tester(
 		gql`

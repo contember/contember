@@ -1,0 +1,141 @@
+---
+title: FileRepeaterField
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 8 -->
+<!-- Source examples: 2 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 6 -->
+<!-- Import examples: 5 -->
+
+# FileRepeaterField
+
+## Overview
+`FileRepeaterField` lets you add, preview, sort, and remove multiple files inside an Entity context (`<EntitySubTree />` or `<EntityListSubTree />`).  
+It supports every file type, shows a type-specific icon, and allows custom preview components.
+
+## Styling Guidelines
+* All examples use Tailwind CSS classes out of the box.  
+* No extra Contember theme classes are required—override Tailwind classes as needed.
+
+## Core Concepts
+* Works only inside an Entity context.
+* Treats each file as a nested entity; you can edit extra fields per file.
+* Supports drag-and-drop sorting when you supply `sortableBy`.
+* Uses Contember file columns (`urlField`, `fileNameField`, …) for metadata.
+* Accepts a `ReactNode` in `edit` to render per-file form fields.
+
+## Quick Start
+```tsx
+// Inside an <EntitySubTree> or <EntityListSubTree>
+<FileRepeaterField
+  className="mt-4"
+  label="Attachments"
+  field="attachments"
+  urlField="file.url"
+  orderBy="createdAt"
+/>
+```
+
+## Detailed Guide
+```tsx
+<FileRepeaterField
+  className="mt-6"
+  field="documents"
+  label="Course documents"
+  baseField="document"       // nested entity you relate to
+  urlField="file.url"        // column with the file URL
+  sortableBy="order"         // enables drag-and-drop
+  fileNameField="file.fileName"
+  fileSizeField="file.fileSize"
+  fileTypeField="file.fileType"
+  lastModifiedField="file.lastModified"
+  edit={
+    <>
+      <SelectField field="locale" className="w-32" />
+      <InputField field="printName" className="flex-1" />
+      <SelectEnumField
+        field="document.kind"
+        options={{ external: 'External', internal: 'Internal' }}
+        className="w-40"
+      />
+    </>
+  }
+/>
+```
+
+## Props Reference
+Name | Type | Required | Default | Description
+--- | --- | --- | --- | ---
+field | string | Yes | — | Name of the one-to-many relation storing files.
+label | ReactNode | No | — | Field label rendered above the list.
+urlField | string | No | `file.url` | Column containing the file URL.
+orderBy | string | No | — | Initial ordering of the list.
+baseField | string | No | — | Name of the nested entity when file columns live deeper.
+sortableBy | string | No | — | Column used to persist drag-and-drop order.
+fileNameField | string | No | — | Column with the original file name.
+fileSizeField | string | No | — | Column with file size in bytes.
+fileTypeField | string | No | — | Column with MIME type.
+lastModifiedField | string | No | — | Column with the file’s last-modified timestamp.
+edit | ReactNode | No | — | Custom form elements rendered per list item.
+className | string | No | — | Extra Tailwind classes.
+_inherited props_ | — | — | — | _None_
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+
+### Read-only list inside a disabled container
+```tsx
+<div className="pointer-events-none cursor-not-allowed">
+  <FileRepeaterField
+    label="Task files"
+    field="files"
+    sortableBy="order"
+  />
+</div>
+```
+The wrapper disables all pointer events, turning the list into a passive preview.
+
+### Multi-locale document management
+```tsx
+<FileRepeaterField
+  field="documents"
+  label="Course documents"
+  sortableBy="order"
+  baseField="document"
+  urlField="file.url"
+  fileNameField="file.fileName"
+  fileSizeField="file.fileSize"
+  fileTypeField="file.fileType"
+  lastModifiedField="file.lastModified"
+  edit={
+    <>
+      <SelectField field="locale" />
+      <InputField field="printName" />
+      <SelectEnumField
+        field="document.kind"
+        options={{ external: 'External', internal: 'Internal' }}
+      />
+    </>
+  }
+/>
+```
+You can mix Contember form fields inside `edit` to capture extra metadata per file.
+
+## Best Practices & Gotchas
+* Always wrap the component in an Entity context, otherwise nothing will render.
+* Supply `sortableBy` only when the related column exists; missing columns break the list.
+* Keep file metadata columns (`fileNameField`, `fileSizeField`, …) inside the same entity level.
+* Use concise labels—long labels push the toolbar down.
+* Defer expensive previews (e.g., image thumbnails) to a custom component for performance.
+
+## Further Reading
+* `ImageField` – single-file image upload  
+* `RepeaterField` – generic list handling without file specifics  
+* Contember docs: “EntitySubTree” and “EntityListSubTree” for context usage  
+* Tailwind CSS utility classes
+
+<!-- End of Generated Documentation -->

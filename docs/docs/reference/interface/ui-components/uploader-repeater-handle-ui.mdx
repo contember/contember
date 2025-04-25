@@ -3,17 +3,17 @@ title: UploaderRepeaterHandleUI
 ---
 
 <!-- Edited by human: false -->
-<!-- Examples count: 4 -->
+<!-- Examples count: 0 -->
 <!-- Source examples: 0 -->
 <!-- Playground examples: 0 -->
-<!-- External examples: 4 -->
-<!-- Import examples: 4 -->
+<!-- External examples: 0 -->
+<!-- Import examples: 0 -->
 
 # UploaderRepeaterHandleUI
 
 ## Overview
 `UploaderRepeaterHandleUI` renders the visual drag-handle used when you sort uploaded files inside a repeater.  
-You place it inside `RepeaterSortableItemActivator` so users can grab and move items with their mouse or keyboard.
+You place it inside `RepeaterSortableItemActivator` so users can grab and move items with a mouse or keyboard.
 
 ## Styling Guidelines
 * All examples use Tailwind classes.  
@@ -39,7 +39,7 @@ export const FilesField = () => (
 		<RepeaterSortableEachItem>
 			<RepeaterSortableItemNode>
 				<div className="flex items-center gap-2">
-					<RepeaterSortableItemActivator>
+					<RepeaterSortableItemActivator className="cursor-move">
 						<UploaderRepeaterHandleUI />
 					</RepeaterSortableItemActivator>
 
@@ -61,20 +61,7 @@ _None_
 _None_
 
 ## Examples
-
-### Reordering files in a multi-upload field
-```tsx
-<RepeaterSortableEachItem>
-	<div className="flex">
-		<RepeaterSortableItemActivator>
-			<UploaderRepeaterHandleUI />
-		</RepeaterSortableItemActivator>
-
-		<UploadedImageView className="w-24 h-24 object-cover" />
-	</div>
-</RepeaterSortableEachItem>
-```
-The user drags the handle to reorder images. The layout stays flexible thanks to Tailwind utility classes.
+_None_
 
 ## Best Practices & Gotchas
 * Always nest the handle inside `RepeaterSortableItemActivator`.

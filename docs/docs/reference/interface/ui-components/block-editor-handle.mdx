@@ -3,10 +3,10 @@ title: BlockEditorHandle
 ---
 
 <!-- Edited by human: false -->
-<!-- Examples count: 3 -->
+<!-- Examples count: 1 -->
 <!-- Source examples: 1 -->
 <!-- Playground examples: 0 -->
-<!-- External examples: 2 -->
+<!-- External examples: 0 -->
 <!-- Import examples: 0 -->
 
 ## Overview
@@ -70,73 +70,6 @@ _None_
 <BlockEditorHandle />
 ```
 A plain handle renders as a simple `div`. Add Tailwind utilities for better visuals and UX.
-
-### Reordering within a `SortableBlocksField`
-```tsx
-import { SortableBlocksField } from '@contember/react-blocks'
-
-const PageForm = () => (
-	<SortableBlocksField field="content">
-		{({ blocks }) => blocks.map(block => (
-			<div key={block.id} className="flex gap-4 items-start border p-4 rounded mb-2">
-				<BlockEditorHandle className="cursor-grab p-2 text-gray-500" />
-				{/* other block fields */}
-			</div>
-		))}
-	</SortableBlocksField>
-)
-```
-The handle enables drag-and-drop ordering without extra configuration.
-
-### Advanced drag overlay with `@dnd-kit`
-```tsx
-({ children, element }: { children: ReactNode; element: Element }) => {
-	const sortable = useSortable({ id: element.key as string })
-	const isOver = sortable.isOver
-	const activeSortable = sortable.active?.data.current?.sortable
-	const isAfter = (sortable.data?.sortable.index ?? 0) > activeSortable?.index
-	const isActive = sortable.active?.id === element.key
-	const contentRef = React.useRef<HTMLDivElement>(null)
-
-	return (
-		<>
-			<div className="relative">
-				<div className="relative">
-					{isOver && !isAfter ? <DropIndicator placement="top" /> : null}
-				</div>
-
-				<div className={'p-4 ' + (isActive ? 'opacity-60' : '')} ref={sortable.setNodeRef}>
-					<BlockEditorHandle
-						ref={sortable.setActivatorNodeRef}
-						{...sortable.listeners}
-						className="cursor-grab p-2 text-gray-500"
-					/>
-					<div ref={contentRef}>{children}</div>
-				</div>
-
-				<div className="relative">
-					{isOver && isAfter ? <DropIndicator placement="bottom" /> : null}
-				</div>
-			</div>
-
-			{isActive && contentRef.current && (
-				<Portal>
-					<DragOverlay>
-						<div className="opacity-80 flex">
-							<div
-								className="p-4 bg-white bg-opacity-80 backdrop-blur-sm"
-								dangerouslySetInnerHTML={{ __html: contentRef.current.innerHTML }}
-							/>
-						</div>
-					</DragOverlay>
-				</Portal>
-			)}
-		</>
-	)
-}
-```
-This pattern mirrors production use.  
-You connect the handle to `useSortable`, render drop indicators, and show an overlay during drag.
 
 ## Best Practices & Gotchas
 * Always wrap the handle in a `flex` container so it keeps its size.  

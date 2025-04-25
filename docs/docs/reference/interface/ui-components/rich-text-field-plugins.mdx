@@ -7,26 +7,26 @@ title: richTextFieldPlugins
 <!-- Source examples: 1 -->
 <!-- Playground examples: 0 -->
 <!-- External examples: 0 -->
-<!-- Import examples: 4 -->
+<!-- Import examples: 0 -->
 
 ## Overview
 `richTextFieldPlugins` is a predefined array of Slate plugins that adds essential inline formatting to Contember’s `RichTextEditor`.  
 Use it when you need links, emphasis, code blocks, highlights, and other common text styles without hand-crafting every Slate plugin yourself.
 
 ## Styling Guidelines
-* All code examples use Tailwind CSS.
-* No Contember-specific theme classes are required for the plugins to work.
+* All code examples use Tailwind CSS.  
+* No Contember-specific theme classes are required.
 
 ## Core Concepts
-* Slate plugins extend editor behavior.
-* `richTextFieldPlugins` is an array; pass it to `RichTextEditor` via the `plugins` prop.
-* The plugins cover links, bold/italic/underline, strikethrough, code blocks, highlights, and manual line breaks.
+* Slate plugins extend editor behavior.  
+* `richTextFieldPlugins` is an array; pass it to `RichTextEditor` via the `plugins` prop.  
+* The plugins cover links, bold/italic/underline, strikethrough, code blocks, highlights, and manual line breaks.  
 * Order matters: Contember already arranges the plugins in a safe sequence.
 
 ## Quick Start
 ```tsx
 import { RichTextEditor } from '@contember/react';
-import { richTextFieldPlugins } from './plugins'; // adjust path to your project layout
+import { richTextFieldPlugins } from './plugins'; // adjust path as needed
 
 export default function ArticleEditor() {
 	return (
@@ -57,72 +57,15 @@ _None_
 ```
 Use this when you only need basic formatting features and no extra UI or styling.
 
-### Playground snippet
-```tsx
-import { RichTextEditor } from '@contember/react';
-import { richTextFieldPlugins } from './plugins';
-
-export default function Playground() {
-	return <RichTextEditor plugins={richTextFieldPlugins} />;
-}
-```
-The editor renders with all basic inline tools and no extra styling. Ideal for quick prototyping.
-
-### Minimal usage with styling
-```tsx
-import { RichTextEditor } from '@contember/react';
-import { richTextFieldPlugins } from './plugins';
-
-export default function MinimalEditor() {
-	return (
-		<RichTextEditor
-			plugins={richTextFieldPlugins}
-			className="border rounded p-2"
-		/>
-	);
-}
-```
-This example adds minimal borders and padding for better visual clarity.
-
-### Blog post body with save button
-```tsx
-import { useCallback } from 'react';
-import { RichTextEditor } from '@contember/react';
-import { richTextFieldPlugins } from './plugins';
-
-export default function BlogPostBody({ onSave }: { onSave: (value: unknown) => void }) {
-	const handleSave = useCallback((value: unknown) => {
-		onSave(value);
-	}, [onSave]);
-
-	return (
-		<div className="flex flex-col gap-4">
-			<RichTextEditor
-				plugins={richTextFieldPlugins}
-				className="border rounded p-4 min-h-[300px]"
-				onBlur={handleSave}
-			/>
-			<button
-				onClick={() => handleSave(/* you could read editor state here */)}
-				className="self-end px-4 py-2 bg-blue-600 text-white rounded"
-			>
-				Save
-			</button>
-		</div>
-	);
-}
-```
-`onBlur` triggers automatic saving; the button provides a manual fallback.
-
 ## Best Practices & Gotchas
-* Always memoize plugin arrays when you create custom ones to avoid re-mounting the editor.
-* Keep the array stable: pass the literal `richTextFieldPlugins` variable instead of recreating it on every render.
-* Wrap the editor in a container with a defined width to prevent unexpected line-wrap behavior.
+* Always memoize plugin arrays when you create custom ones to avoid re-mounting the editor.  
+* Keep the array stable: pass the literal `richTextFieldPlugins` variable instead of recreating it on every render.  
+* Wrap the editor in a container with a defined width to prevent unexpected line-wrap behavior.  
 * Use Tailwind’s focus utilities (`focus:outline-none`) so keyboard users get proper feedback.
 
 ## Further Reading
-* `RichTextEditor` component
-* Slate documentation – plugin architecture
-* Contember UI theme guidelines
+* `RichTextEditor` component  
+* Slate documentation – plugin architecture  
+* Contember UI theme guidelines  
 
 <!-- End of Generated Documentation -->

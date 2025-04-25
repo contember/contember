@@ -1,0 +1,129 @@
+---
+title: MultiSelectField
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 17 -->
+<!-- Source examples: 2 -->
+<!-- Playground examples: 5 -->
+<!-- External examples: 10 -->
+<!-- Import examples: 8 -->
+
+## Overview
+`MultiSelectField` lets you manage `hasMany` relations inside Contember forms.  
+You select multiple entities, display them as chips, and even create new ones on the fly.
+
+The component must live inside an `EntitySubTree` or `EntityListSubTree` so it can read and write entity data.
+
+## Styling Guidelines
+* All examples use Tailwind CSS utility classes.  
+* Chips and dropdowns receive basic Contember theme styles automatically; you do not need manual theme classes.
+
+## Core Concepts
+* Entity context – the component must be inside `EntitySubTree`.
+* Data binding – the `field` prop connects the selected entities.
+* Option source – pass `options` or rely on relation introspection.
+* Querying – `queryField` filters options while you type.
+* Sorting – `initialSorting` sets default option order.
+* Creation – `createNewForm` lets users add new entities without leaving the form.
+
+## Quick Start
+```tsx
+import { EntitySubTree, Field, MultiSelectField } from '~/lib/form'
+
+<EntitySubTree entity="Article(unique = someId)">
+  <MultiSelectField
+    field="categories"
+    label="Article Categories"
+    className="w-full"
+  >
+    <Field field="name" />
+  </MultiSelectField>
+</EntitySubTree>
+```
+
+## Detailed Guide
+```tsx
+// 1️⃣ Allow users to search by name and create new tags
+<MultiSelectField
+  field="tags"
+  label="Tags"
+  queryField={['name']}
+  initialSorting={{ name: 'asc' }}
+  createNewForm={<TagCreateForm />}
+  className="w-full"
+>
+  <Field field="name" />
+</MultiSelectField>
+
+// 2️⃣ Limit options via filter
+<MultiSelectField
+  field="companies"
+  options="Company[account.id = null]"
+  label="Available Companies"
+  className="w-full"
+>
+  <CompanyPreview />
+</MultiSelectField>
+```
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| field | string &#124; object | Yes | - | Specifies the field to bind the selection to. |
+| options | string &#124; object | No | - | Entities used to populate options. |
+| children | React.ReactNode | Yes | - | Template for each option chip / row. |
+| placeholder | React.ReactNode | No | - | Text shown when no items are selected. |
+| createNewForm | React.ReactNode | No | - | Component that creates a new entity. |
+| queryField | DataViewUnionFilterFields | No | - | Field used when querying options. |
+| initialSorting | DataViewSortingDirections | No | - | Initial sort order for options. |
+| label | React.ReactNode | Yes | - | Field label shown above the select. |
+| description | React.ReactNode | Yes | - | Helper text under the field. |
+| errors | React.ReactNode &#124; ErrorAccessor.Error[] | Yes | - | Custom error renderer or array. |
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+```tsx
+// Add articles to an author and allow creation in place
+<MultiSelectField
+  field="articles"
+  label="Articles"
+  createNewForm={<ArticleForm />}
+  className="w-full"
+>
+  <Field field="internalName" />
+</MultiSelectField>
+```
+Use this when editors should attach existing articles or create new ones without leaving the author form.
+
+```tsx
+// Select active company cost centers filtered by owner
+<MultiSelectField
+  field={field}
+  options="CompanyCostCenter[owner.slug=$company && active = true]"
+  label="Active Cost Centers"
+  createNewForm={<CompanyCostCenterForm />}
+  className="w-full"
+>
+  <CompanyCostCenterPreview />
+</MultiSelectField>
+```
+The `options` expression filters entities server-side, ensuring only active cost centers show up.
+
+## Best Practices & Gotchas
+* Always wrap the field in `EntitySubTree`; otherwise data binding fails.
+* Provide a narrow `options` filter to avoid large queries.
+* Keep `queryField` indexed in your schema for fast search.
+* Use `createNewForm` to maintain editor flow without page reloads.
+* Chips reflect selection order; users expect last clicked last in list.
+* Do not forget to handle validation; errors bubble from parent form.
+
+## Further Reading
+* `SelectField` – single entity selection.
+* `SortableMultiSelectField` – reorderable alternative.
+* Contember data binding basics.
+* Contember Tailwind theme guide.
+
+<!-- End of Generated Documentation -->

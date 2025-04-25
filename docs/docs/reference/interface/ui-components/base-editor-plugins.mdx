@@ -7,15 +7,14 @@ title: baseEditorPlugins
 <!-- Source examples: 1 -->
 <!-- Playground examples: 0 -->
 <!-- External examples: 0 -->
-<!-- Import examples: 6 -->
+<!-- Import examples: 3 -->
 
 # baseEditorPlugins
 
 ## Overview
-`baseEditorPlugins` bundles the default plugin set for Contember’s Slate-powered rich-text editors.  
-The collection covers structural elements (paragraphs, headings, tables) and common inline formatting (bold, code, underline).
+`baseEditorPlugins` bundles the default plugin set for Contember’s Slate-powered rich-text editors.
 
-You import it once and cherry-pick only the plugins you need. This keeps every editor lean and predictable.
+The collection covers structural elements (paragraphs, headings, tables) and common inline formatting (bold, code, underline).
 
 ## Styling Guidelines
 * All code samples use Tailwind CSS utility classes.
@@ -53,7 +52,7 @@ import {
   baseEditorPlugins,
   EditorBlockToolbar,
   EditorInlineToolbar,
-} from '~/lib/editor'
+} from '@app/lib/editor'
 
 /* Full-featured editor with toolbars */
 export function ArticleEditor() {
@@ -146,31 +145,7 @@ Create an editor with the most common plugins:
   ]}
 />
 ```
-Use this as a starting point. Add more plugins as your content grows.
-
-Add scroll targets to headings:
-```tsx
-<RichTextEditor
-  className="prose max-w-none"
-  plugins={[
-    baseEditorPlugins.heading,
-    baseEditorPlugins.scrollTarget,
-  ]}
-/>
-```
-The `scrollTarget` plugin injects an `id` into each heading, making in-page navigation trivial.
-
-Enable code snippets inside list items:
-```tsx
-<RichTextEditor
-  className="prose max-w-none"
-  plugins={[
-    baseEditorPlugins.list,
-    baseEditorPlugins.code,
-  ]}
-/>
-```
-You can now paste code inside bullet points without breaking formatting.
+This configuration delivers headings, paragraphs and the two most used inline styles.
 
 ## Best Practices & Gotchas
 * Include only the plugins you need to avoid bloat.

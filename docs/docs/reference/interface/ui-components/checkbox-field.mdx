@@ -1,0 +1,109 @@
+---
+title: CheckboxField
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 16 -->
+<!-- Source examples: 1 -->
+<!-- Playground examples: 5 -->
+<!-- External examples: 10 -->
+<!-- Import examples: 8 -->
+
+# CheckboxField
+
+## Overview
+CheckboxField renders a boolean field as a native `<input type="checkbox" />`.  
+You must place it inside an `EntitySubTree` or `EntityListSubTree` so the value binds to the current entity.
+
+The component automatically marks the checkbox as required when the underlying field is non-nullable. You can override this behaviour with the `required` prop.
+
+## Styling Guidelines
+* All snippets use Tailwind classes.  
+* CheckboxField itself has no visual styles; add Tailwind utilities to surrounding elements as needed.  
+* No Contember-specific theme classes are required.
+
+## Core Concepts
+* Checkbox represents a boolean field stored in Contember.
+* Must run inside an Entity context to read/write data.
+* `field` accepts a plain column name or a sugar relation path.
+* `required` overrides automatic nullability detection.
+* Pass native `<input>` attributes through `inputProps`.
+
+## Quick Start
+```tsx
+import { Binding, EntitySubTree, CheckboxField } from '~/lib/form'
+
+export const PublishToggle = () => (
+	<Binding>
+		<EntitySubTree entity="Article(id = $id)">
+			<div className="flex items-center gap-2">
+				<CheckboxField field="isPublished" label="Publish immediately" />
+			</div>
+		</EntitySubTree>
+	</Binding>
+)
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| isNonbearing | boolean | Yes | – | Internal binding flag. Always pass the provided value. |
+| field | string &#124; SugarableHasOneRelation &#124; SugarableHasOneRelation[] | Yes | – | Field name or relation path pointing to a boolean column. |
+| defaultValue | OptionallyVariableFieldValue | Yes | – | Value applied when the entity is created. |
+| label | React.ReactNode | Yes | – | Element displayed next to the checkbox. |
+| description | React.ReactNode | Yes | – | Helper text rendered below the field. |
+| errors | React.ReactNode &#124; ErrorAccessor.Error[] | Yes | – | Custom error messages or Contember error objects. |
+| required | boolean | Yes | – | Forces HTML `required` attribute regardless of schema nullability. |
+| inputProps | Omit&lt;React.InputHTMLAttributes&lt;HTMLInputElement&gt;, "defaultValue"&gt; | No | – | Native input props (e.g. `disabled`, `autoFocus`). |
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+
+### Sidebar toggle
+```tsx
+// Inside a form sidebar
+<div className="flex flex-col gap-4">
+	<InputField field="internalName" required />
+	<CheckboxField field="locked" label="Lock article" />
+</div>
+```
+You add a simple lock toggle next to other fields. Tailwind spacing keeps the layout consistent.
+
+### Client-side validation
+```tsx
+<CheckboxField
+	field="termsAccepted"
+	label="I agree to the terms"
+	description="You must accept before continuing."
+	inputProps={{ required: true }}
+/>
+```
+The `inputProps` object passes `required` to the underlying input, enabling browser validation without changing server schema.
+
+### Repeater items
+```tsx
+<DefaultRepeater field="notes" orderBy="createdAt">
+	<CheckboxField field="highlight" label="Pin note" className="ml-2" />
+</DefaultRepeater>
+```
+Each repeater row includes a checkbox. The `ml-2` Tailwind class indents the field for readability.
+
+## Best Practices & Gotchas
+* Always wrap CheckboxField in an Entity context; otherwise it throws an error.
+* Use `inputProps={{ disabled: true }}` instead of conditional rendering when you only need to lock editing.
+* Keep labels short; long labels break horizontal alignment.
+* Do not style the checkbox directly—wrap it and apply Tailwind utilities.
+* Remember that `defaultValue` only applies on entity creation.
+
+## Further Reading
+* InputField – single-line text input.
+* SwitchField – alternative boolean UI using a toggle switch.
+* MultiSelectField – for many-to-many relations.
+* Contember Binding Guide – deeper dive into Entity contexts.
+
+<!-- End of Generated Documentation -->

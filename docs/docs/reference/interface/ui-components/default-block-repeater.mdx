@@ -3,24 +3,28 @@ title: DefaultBlockRepeater
 ---
 
 <!-- Edited by human: false -->
-<!-- Examples count: 3 -->
+<!-- Examples count: 7 -->
+<!-- Source examples: 1 -->
+<!-- Playground examples: 2 -->
+<!-- External examples: 4 -->
+<!-- Import examples: 5 -->
 
 # DefaultBlockRepeater
 
 ## Overview
-`DefaultBlockRepeater` lets you create and manage repeatable content blocks inside a Contember form.
-You can edit blocks inline or switch to a dual‑mode that opens a dedicated form for each block.
+`DefaultBlockRepeater` lets you create and manage repeatable content blocks inside a Contember form.  
+It supports inline editing or a dual-mode that opens a dedicated form for each block while still shipping a ready-to-use UI.
 
 ## Styling Guidelines
 * All examples use Tailwind for layout and spacing.
-* No special Contember theme classes are required—apply your own Tailwind utilities.
+* No Contember-specific theme classes are required—apply your own Tailwind utilities.
 
 ## Core Concepts
 * Define a collection of blocks with the `field` (or `entities`) prop.
 * Provide a `discriminationField` so Contember knows which block type is stored.
-* Use `sortableBy` to enable drag‑and‑drop reordering.
+* Use `sortableBy` to enable drag-and-drop reordering.
 * Wrap each block definition in a `<Block>` element.
-* Inline edit = only `children`. Dual‑mode = both `form` and `children`.
+* Inline edit = only `children`. Dual-mode = both `form` and `children`.
 
 ## Quick Start
 ```tsx
@@ -46,28 +50,29 @@ _None_
 |------|------|----------|---------|-------------|
 | field | Unknown | No | — | Relation field holding the block list. |
 | entities | Unknown | No | — | Alternative to `field` when working with queried entities. |
-| sortableBy | Unknown | No | — | Field used for drag‑and‑drop ordering. |
+| sortableBy | Unknown | No | — | Field used for drag-and-drop ordering. |
 | discriminationField | Unknown | Yes | — | Field storing the block type discriminator. |
 | children | ReactNode | Yes | — | One or more `<Block>` elements. |
 | *Inherited props* | — | — | — | _None_ |
 
 ## Sub-Components / Building Blocks
 ### Block
-Defines a single block type.
-Props include `name`, `label`, plus optional `form` and `children` for dual‑mode editing.
+Defines a single block type.  
+Props include `name`, `label`, plus optional `form` and `children` for dual-mode editing.
 
 ### EntityView
 Renders entities using a render prop. Commonly used for complex visualisation inside a block.
 
 ### StaticRender
-Outputs static content (e.g., a colour field) without entering edit mode.
+Outputs static content (e.g. a colour field) without entering edit mode.
 
 ## Examples
-### Dual‑mode repeater with four block types
+### 1. Dual-mode repeater with four block types
 ```tsx
 import { DefaultBlockRepeater, Block } from '~/lib/block-repeater'
 
 <DefaultBlockRepeater field="blocks" sortableBy="order" discriminationField="type">
+  {/* Text block */}
   <Block
     name="text"
     label={<><TextIcon /> Text</>}
@@ -77,22 +82,20 @@ import { DefaultBlockRepeater, Block } from '~/lib/block-repeater'
         <TextareaField field="content" label="Content" />
       </>
     }
-    children={
-      <>
-        <div className="flex">
-          <div className="w-64 space-y-2">
-            <h2 className="text-xl font-bold">
-              <Field field="title" />
-            </h2>
-            <p>
-              <Field field="content" />
-            </p>
-          </div>
-        </div>
-      </>
-    }
-  />
+  >
+    <div className="flex">
+      <div className="w-64 space-y-2">
+        <h2 className="text-xl font-bold">
+          <Field field="title" />
+        </h2>
+        <p>
+          <Field field="content" />
+        </p>
+      </div>
+    </div>
+  </Block>
 
+  {/* Image block */}
   <Block
     name="image"
     label={<><ImageIcon /> Image</>}
@@ -102,26 +105,20 @@ import { DefaultBlockRepeater, Block } from '~/lib/block-repeater'
         <ImageField baseField="image" urlField="url" label="Image" />
       </>
     }
-    children={
-      <>
-        <div className="flex">
-          <div className="flex flex-col gap-2">
-            <div className="space-y-2">
-              <h2 className="text-xl font-bold">
-                <Field field="title" />
-              </h2>
-              <div className="border">
-                <HasOne field="image">
-                  <UploadedImageView urlField="url" />
-                </HasOne>
-              </div>
-            </div>
-          </div>
-        </div>
-      </>
-    }
-  />
+  >
+    <div className="flex flex-col gap-2">
+      <h2 className="text-xl font-bold">
+        <Field field="title" />
+      </h2>
+      <div className="border">
+        <HasOne field="image">
+          <UploadedImageView urlField="url" />
+        </HasOne>
+      </div>
+    </div>
+  </Block>
 
+  {/* Text with image block */}
   <Block
     name="textWithImage"
     label={<><ColumnsIcon /> Image with text</>}
@@ -160,6 +157,7 @@ import { DefaultBlockRepeater, Block } from '~/lib/block-repeater'
     />
   </Block>
 
+  {/* Hero block */}
   <Block
     name="hero"
     label={<><AlertOctagonIcon /> Hero</>}
@@ -199,18 +197,12 @@ import { DefaultBlockRepeater, Block } from '~/lib/block-repeater'
 ```
 Use this pattern when authors need a focused form for each block.
 
-### Inline‑only repeater in a persisted entity tree
+### 2. Inline-only repeater in a persisted entity tree
 ```tsx
-import { DefaultBlockRepeater, Block } from '~/lib/block-repeater'
+import { DefaultBlockRepeater, Block } from '@app/lib/block-repeater'
 
 <Binding>
-  <Slots.Title>
-    <Title>Repeater: Block repeater w/o dual render</Title>
-  </Slots.Title>
-
-  <Slots.Actions>
-    <PersistButton />
-  </Slots.Actions>
+  <Slots.Actions><PersistButton /></Slots.Actions>
 
   <EntitySubTree entity="BlockList(unique = unique)" setOnCreate="(unique = unique)">
     <DefaultBlockRepeater field="blocks" sortableBy="order" discriminationField="type">
@@ -228,9 +220,7 @@ import { DefaultBlockRepeater, Block } from '~/lib/block-repeater'
         name="textWithImage"
         label={
           <>
-            <span className="inline-flex gap-1">
-              <ImageIcon /> <TextIcon />
-            </span>
+            <span className="inline-flex gap-1"><ImageIcon /><TextIcon /></span>
             Image with text
           </>
         }
@@ -240,17 +230,62 @@ import { DefaultBlockRepeater, Block } from '~/lib/block-repeater'
         <ImageField baseField="image" urlField="url" label="Image" />
         <RadioEnumField field="imagePosition" options={{ left: 'Left', right: 'Right' }} />
       </Block>
-
-      <Block name="hero" label={<><AlertOctagonIcon /> Hero</>}>
-        <InputField field="title" label="Title" />
-        <TextareaField field="content" label="Content" />
-        <InputField field="color" label="Color" inputProps={{ type: 'color' }} />
-      </Block>
     </DefaultBlockRepeater>
   </EntitySubTree>
 </Binding>
 ```
 Embed the repeater in any Contember binding context for instant persistence.
+
+### 3. Large-scale block library for a marketing site
+This snippet (shortened for brevity) shows how teams compose 30+ block types in one repeater.  
+Use it as inspiration for structuring big content libraries.
+
+```tsx
+<DefaultBlockRepeater
+  field="blocks"
+  sortableBy="order"
+  discriminationField="type"
+>
+  <Block name="heroWithGallery" label="Hero with gallery">
+    <InputField field="primaryText" label="Title" />
+    <RadioEnumField field="imagePosition" options={{ left: 'Left', right: 'Right' }} />
+    <ContentField />
+    <Buttons />
+    <Gallery />
+  </Block>
+
+  {/* dozens of additional Block definitions… */}
+  <Block name="services" label="Services">
+    <InputField field="primaryText" label="Title" />
+    <SingleButton />
+    <Services />
+  </Block>
+</DefaultBlockRepeater>
+```
+Pattern highlights:
+* Keep each block self-contained.
+* Group related inputs together for readability.
+* Split very complex blocks into their own components.
+
+### 4. Minimal content + image set for landing pages
+```tsx
+<DefaultBlockRepeater field="blocks" discriminationField="type" sortableBy="order">
+  <Block name="content" label="Content">
+    <ContentField />
+  </Block>
+
+  <Block name="image" label="Image">
+    <InputField field="primaryText" label="Title" />
+    <Image />
+  </Block>
+
+  <Block name="imageWithText" label="Image with text">
+    <ContentField />
+    <Image imagePosition />
+  </Block>
+</DefaultBlockRepeater>
+```
+Great starting point for simple landing pages with text, images and combined sections.
 
 ## Best Practices & Gotchas
 * Always set `discriminationField`; omission breaks block recognition.
@@ -258,6 +293,7 @@ Embed the repeater in any Contember binding context for instant persistence.
 * Use Tailwind `space-y-*` utilities for vertical rhythm between blocks.
 * When many block types share fields, extract common forms into separate components.
 * Sorting relies on `sortableBy`; ensure the underlying column exists in the schema.
+* For very large block libraries, split blocks across multiple files to guard against merge conflicts.
 
 ## Further Reading
 * Block component

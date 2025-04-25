@@ -7,7 +7,7 @@ title: ParagraphRenderer
 <!-- Source examples: 0 -->
 <!-- Playground examples: 0 -->
 <!-- External examples: 0 -->
-<!-- Import examples: 4 -->
+<!-- Import examples: 0 -->
 
 # ParagraphRenderer
 
@@ -20,7 +20,7 @@ ParagraphRenderer adds no Contember theme classes, so feel free to wrap it with 
 
 ## Core Concepts
 - ParagraphRenderer expects a Slate `ParagraphElement` object.
-- It outputs a read-only HTML `<p>` tag with the element’s children.
+- It outputs a read-only HTML `<p>` element with the element’s children.
 - Use the component inside a Contember Slate editor or as a standalone viewer.
 - You must supply the complete `ParagraphElement` (including its children).
 
@@ -47,9 +47,9 @@ export default function Demo() {
 _None_
 
 ## Props Reference
-| Name    | Type              | Required | Default | Description                              |
-|---------|-------------------|----------|---------|------------------------------------------|
-| element | ParagraphElement  | Yes      | —       | Slate paragraph element to render.       |
+| Name    | Type             | Required | Default | Description                            |
+|---------|------------------|----------|---------|----------------------------------------|
+| element | ParagraphElement | Yes      | —       | Slate paragraph element to render.     |
 
 ## Sub-Components / Building Blocks
 _None_

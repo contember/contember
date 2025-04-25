@@ -3,10 +3,10 @@ title: EditorInlineToolbar
 ---
 
 <!-- Edited by human: false -->
-<!-- Examples count: 11 -->
+<!-- Examples count: 9 -->
 <!-- Source examples: 0 -->
 <!-- Playground examples: 3 -->
-<!-- External examples: 8 -->
+<!-- External examples: 6 -->
 <!-- Import examples: 7 -->
 
 # EditorInlineToolbar
@@ -83,9 +83,9 @@ import { BoldIcon, ItalicIcon, AlignLeftIcon, Toggle } from '~/components/ui'
 ```
 
 ## Props Reference
-| Name     | Type              | Required | Default | Description                 |
-|----------|-------------------|----------|---------|-----------------------------|
-| children | React.ReactNode   | Yes      | –       | Toolbar content: usually trigger components and groups. |
+| Name     | Type            | Required | Default | Description                                                         |
+|----------|-----------------|----------|---------|---------------------------------------------------------------------|
+| children | React.ReactNode | Yes      | –       | Toolbar content: usually trigger components and groups.             |
 
 **Inherited props:** _None_
 
@@ -106,7 +106,7 @@ Reusable button that reflects active editor state through its `data-[state]` att
 Used inside popovers to edit object references (e.g., link target).
 
 ## Examples
-### Toolbar inside RichTextField
+### Minimal toolbar inside RichTextField
 ```tsx
 <RichTextField field="body">
   <EditorInlineToolbar className="flex gap-2">
@@ -115,7 +115,7 @@ Used inside popovers to edit object references (e.g., link target).
   </EditorInlineToolbar>
 </RichTextField>
 ```
-This shows the minimal integration: the toolbar sits directly inside the field component.
+This shows the smallest integration. The toolbar sits directly inside the field component.
 
 ### Two-row toolbar with grouped sections
 ```tsx
@@ -131,6 +131,146 @@ This shows the minimal integration: the toolbar sits directly inside the field c
 </EditorInlineToolbar>
 ```
 Splitting buttons into rows lets you build complex toolbars without horizontal overflow.
+
+### Playground – RichTextField with inline toolbar
+```tsx
+<RichTextField field="data" label="Rich text field">
+  <EditorInlineToolbar>
+    <EditorMarkTrigger mark={boldMark}><Toggle><BoldIcon className="h-3 w-3" /></Toggle></EditorMarkTrigger>
+    <EditorMarkTrigger mark={italicMark}><Toggle><ItalicIcon className="h-3 w-3" /></Toggle></EditorMarkTrigger>
+    <EditorMarkTrigger mark={underlineMark}><Toggle><UnderlineIcon className="h-3 w-3" /></Toggle></EditorMarkTrigger>
+
+    <EditorElementTrigger elementType={anchorElementType}>
+      <Toggle><LinkIcon className="h-3 w-3" /></Toggle>
+    </EditorElementTrigger>
+
+    <EditorGenericTrigger {...createAlignHandler('start')}>
+      <Toggle><AlignLeftIcon className="h-3 w-3" /></Toggle>
+    </EditorGenericTrigger>
+    <EditorGenericTrigger {...createAlignHandler('end')}>
+      <Toggle><AlignRightIcon className="h-3 w-3" /></Toggle>
+    </EditorGenericTrigger>
+    <EditorGenericTrigger {...createAlignHandler('center')}>
+      <Toggle><AlignCenterIcon className="h-3 w-3" /></Toggle>
+    </EditorGenericTrigger>
+  </EditorInlineToolbar>
+</RichTextField>
+```
+The playground pairs the toolbar with a preview component so you can see changes live.
+
+### Playground – full featured two-section toolbar
+```tsx
+<EditorInlineToolbar>
+  <div>
+    <EditorMarkTrigger mark={boldMark}><Toggle><BoldIcon className="h-3 w-3" /></Toggle></EditorMarkTrigger>
+    <EditorMarkTrigger mark={italicMark}><Toggle><ItalicIcon className="h-3 w-3" /></Toggle></EditorMarkTrigger>
+    <EditorMarkTrigger mark={underlineMark}><Toggle><UnderlineIcon className="h-3 w-3" /></Toggle></EditorMarkTrigger>
+    <EditorElementTrigger elementType={anchorElementType}><Toggle><Link2Icon className="h-3 w-3" /></Toggle></EditorElementTrigger>
+    <Popover>
+      <PopoverTrigger asChild>
+        <Toggle><LinkIcon className="h-3 w-3" /></Toggle>
+      </PopoverTrigger>
+      <PopoverContent>
+        <EditorInlineReferencePortal referenceType="link">
+          <LinkField field="link" />
+          <ConfirmReferenceButton />
+        </EditorInlineReferencePortal>
+      </PopoverContent>
+    </Popover>
+  </div>
+  <div>
+    <EditorElementTrigger elementType={headingElementType} suchThat={{ level: 1, isNumbered: false }}>
+      <Toggle><Heading1Icon className="h-3 w-3" /></Toggle>
+    </EditorElementTrigger>
+    <EditorElementTrigger elementType={unorderedListElementType}><Toggle><ListIcon className="h-3 w-3" /></Toggle></EditorElementTrigger>
+    <EditorGenericTrigger {...createAlignHandler('justify')}><Toggle><AlignJustifyIcon className="h-3 w-3" /></Toggle></EditorGenericTrigger>
+  </div>
+</EditorInlineToolbar>
+```
+Two `div` containers let you style left and right button groups independently.
+
+### Playground – toolbar with numbered headings
+```tsx
+<EditorInlineToolbar>
+  <div>
+    <EditorMarkTrigger mark={codeMark}><Toggle><CodeIcon className="h-3 w-3" /></Toggle></EditorMarkTrigger>
+    <EditorMarkTrigger mark={strikeThroughMark}><Toggle><StrikethroughIcon className="h-3 w-3" /></Toggle></EditorMarkTrigger>
+  </div>
+  <div>
+    <EditorElementTrigger elementType={headingElementType} suchThat={{ level: 2, isNumbered: false }}>
+      <Toggle><Heading2Icon className="h-3 w-3" /></Toggle>
+    </EditorElementTrigger>
+    <EditorGenericTrigger {...createAlignHandler('center')}><Toggle><AlignCenterIcon className="h-3 w-3" /></Toggle></EditorGenericTrigger>
+  </div>
+</EditorInlineToolbar>
+```
+Use `suchThat` to target specific heading levels or numbered variants.
+
+### Learning Platform – basic rich-text toolbar
+```tsx
+<BaseRichTextField field={field} label={label}>
+  <EditorInlineToolbar>
+    <EditorMarkTrigger mark={boldMark}><Toggle><BoldIcon className="h-3 w-3" /></Toggle></EditorMarkTrigger>
+    <EditorMarkTrigger mark={italicMark}><Toggle><ItalicIcon className="h-3 w-3" /></Toggle></EditorMarkTrigger>
+    <EditorElementTrigger elementType={anchorElementType}><Toggle><LinkIcon className="h-3 w-3" /></Toggle></EditorElementTrigger>
+  </EditorInlineToolbar>
+</BaseRichTextField>
+```
+Production apps often keep the toolbar minimal to reduce visual clutter.
+
+### Learning Platform – extended toolbar with superscript
+```tsx
+<EditorInlineToolbar>
+  <div>
+    <EditorMarkTrigger mark={supMark}><Toggle><SuperscriptIcon className="h-3 w-3" /></Toggle></EditorMarkTrigger>
+    <Popover>
+      <PopoverTrigger asChild>
+        <Toggle><LinkIcon className="h-3 w-3" /></Toggle>
+      </PopoverTrigger>
+      <PopoverContent>
+        <EditorInlineReferencePortal referenceType="link">
+          <LinkField field="target" />
+          <ConfirmReferenceButton />
+        </EditorInlineReferencePortal>
+      </PopoverContent>
+    </Popover>
+  </div>
+  <div>
+    <EditorElementTrigger elementType={orderedListElementType}><Toggle><ListOrderedIcon className="h-3 w-3" /></Toggle></EditorElementTrigger>
+  </div>
+</EditorInlineToolbar>
+```
+The split layout keeps text-style buttons left and structural buttons right.
+
+### 108 Agency – rich-text with highlight and code marks
+```tsx
+<EditorInlineToolbar>
+  <div>
+    <EditorMarkTrigger mark={highlightMark}><Toggle><HighlighterIcon className="h-3 w-3" /></Toggle></EditorMarkTrigger>
+    <EditorMarkTrigger mark={codeMark}><Toggle><CodeIcon className="h-3 w-3" /></Toggle></EditorMarkTrigger>
+  </div>
+  <div>
+    <EditorElementTrigger elementType={unorderedListElementType}><Toggle><ListIcon className="h-3 w-3" /></Toggle></EditorElementTrigger>
+    <EditorGenericTrigger {...createAlignHandler('start')}><Toggle><AlignLeftIcon className="h-3 w-3" /></Toggle></EditorGenericTrigger>
+  </div>
+</EditorInlineToolbar>
+```
+Highlight and code are less common marks; showcase how easily you can add them.
+
+### 108 Agency – full toolbar with justify alignment
+```tsx
+<EditorInlineToolbar>
+  <div>
+    <EditorMarkTrigger mark={boldMark}><Toggle><BoldIcon className="h-3 w-3" /></Toggle></EditorMarkTrigger>
+    <EditorMarkTrigger mark={underlineMark}><Toggle><UnderlineIcon className="h-3 w-3" /></Toggle></EditorMarkTrigger>
+    <EditorElementTrigger elementType={anchorElementType}><Toggle><Link2Icon className="h-3 w-3" /></Toggle></EditorElementTrigger>
+  </div>
+  <div>
+    <EditorGenericTrigger {...createAlignHandler('justify')}><Toggle><AlignJustifyIcon className="h-3 w-3" /></Toggle></EditorGenericTrigger>
+  </div>
+</EditorInlineToolbar>
+```
+The justify icon works thanks to `EditorGenericTrigger` receiving the handler from `createAlignHandler`.
 
 ## Best Practices & Gotchas
 * Keep groups small; overflowing buttons wrap or scroll depending on the container’s CSS.

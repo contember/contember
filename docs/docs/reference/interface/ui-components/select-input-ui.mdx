@@ -3,24 +3,26 @@ title: SelectInputUI
 ---
 
 <!-- Edited by human: false -->
-<!-- Examples count: 10 -->
+<!-- Examples count: 6 -->
 <!-- Source examples: 0 -->
 <!-- Playground examples: 0 -->
-<!-- External examples: 10 -->
+<!-- External examples: 6 -->
 <!-- Import examples: 5 -->
 
 ## Overview
 SelectInputUI renders the visible control of a Contember select component.  
-It acts as the clickable surface that opens the dropdown and shows selected values or a placeholder.
+You use it as the clickable surface that opens the dropdown and shows selected values or a placeholder.
 
 ## Styling Guidelines
-* All code examples use Tailwind classes.  
-* No special Contember theme class is required; inherit styles from parent components.
+* All code examples use Tailwind utility classes.  
+* No special Contember theme class is required—the component inherits styles from its container.
 
 ## Core Concepts
-* SelectInputUI is presentational only—it has no own state.  
-* It should live inside `SelectInputWrapperUI` and usually wrap a `PopoverTrigger`.  
-* Place custom content (placeholder, selected items, icons) as children.
+* SelectInputUI is presentational only—it keeps no internal state.  
+* It typically lives inside `SelectInputWrapperUI` and acts as a `PopoverTrigger`.  
+* You pass placeholder text, selected items, and icons as children.  
+* Pair it with `SelectInputActionsUI` to align icons on the right.  
+* Combine with `SelectDefaultPlaceholderUI` for consistent empty-state visuals.
 
 ## Quick Start
 ```tsx
@@ -41,16 +43,16 @@ _None_
 
 ## Sub-Components / Building Blocks
 ### SelectInputWrapperUI
-Wraps SelectInputUI and provides layout constraints.
+Provides layout constraints and spacing around the input.
 
 ### SelectInputActionsUI
-Holds icons like `ChevronDownIcon` that signal dropdown state.
+Holds action icons (chevron, loader, clear buttons) aligned to the right.
 
 ### SelectDefaultPlaceholderUI
-Default placeholder rendered when no value is selected.
+Default placeholder displayed when no value is selected.
 
 ### SelectListItemUI
-Optional item used inside `SelectPopoverContent`.
+Represents a selectable option inside `SelectPopoverContent`.
 
 ## Examples
 
@@ -58,20 +60,17 @@ Optional item used inside `SelectPopoverContent`.
 ```tsx
 const EnumSelectInput = () => {
 	const [open, setOpen] = React.useState(false)
-	const id = 'status'
 
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
-			<SelectInputWrapperUI>
-				<PopoverTrigger asChild>
-					<SelectInputUI id={`${id}-input`} className="w-48 justify-between">
-						Pick status
-						<SelectInputActionsUI>
-							<ChevronDownIcon className="w-4 h-4" />
-						</SelectInputActionsUI>
-					</SelectInputUI>
-				</PopoverTrigger>
-			</SelectInputWrapperUI>
+			<PopoverTrigger asChild>
+				<SelectInputUI className="w-48 justify-between">
+					Pick status
+					<SelectInputActionsUI>
+						<ChevronDownIcon className="w-4 h-4" />
+					</SelectInputActionsUI>
+				</SelectInputUI>
+			</PopoverTrigger>
 
 			<SelectPopoverContent>
 				{['Draft', 'Published', 'Archived'].map(status => (
@@ -84,18 +83,105 @@ const EnumSelectInput = () => {
 	)
 }
 ```
-The `SelectInputUI` shows a placeholder.  
-`SelectInputActionsUI` holds the chevron icon.  
-Clicking the input opens the popover with list items.
+The input shows a placeholder.  
+`SelectInputActionsUI` keeps the chevron aligned to the right.
+
+### Multi-value with inline remove buttons
+```tsx
+<SelectInputUI id={id ? `${id}-input` : undefined}>
+	<SelectPlaceholder>
+		<SelectDefaultPlaceholderUI />
+	</SelectPlaceholder>
+
+	<SelectEachValue>{children}</SelectEachValue>
+
+	<SelectInputActionsUI className="gap-1">
+		<SelectEachValue>
+			<SelectItemTrigger>
+				<Button size="xs" variant="ghost">
+					<XIcon className="w-4 h-4" />
+				</Button>
+			</SelectItemTrigger>
+		</SelectEachValue>
+		<ChevronDownIcon className="w-4 h-4 pointer-events-none" />
+	</SelectInputActionsUI>
+</SelectInputUI>
+```
+Each selected value renders a small **x** button you can click to remove that item.  
+`pointer-events-none` on the chevron makes sure only the input handles clicks.
+
+### Loading indicator and disabled state
+```tsx
+<SelectInputUI disabled={disabled} className="w-60">
+	{selectedItem ? (
+		getItemLabel(selectedItem)
+	) : placeholder ? (
+		<span className="text-gray-400">{placeholder}</span>
+	) : (
+		<SelectDefaultPlaceholderUI />
+	)}
+	<SelectInputActionsUI>
+		{isLoading && <Loader size="sm" />}
+		{open ? <ChevronUpIcon className="w-4 h-4" /> : <ChevronDownIcon className="w-4 h-4" />}
+	</SelectInputActionsUI>
+</SelectInputUI>
+```
+You can mix a loader with chevron icons.  
+Setting the `disabled` prop stops user interaction and applies the browser-default disabled style.
+
+### Form-controlled select with Popover
+```tsx
+({ field, label, description, options, placeholder }) => {
+	const [open, setOpen] = useState(false)
+	const fieldAccessor = useField<string>(field)
+
+	return (
+		<FormFieldScope field={field}>
+			<FormContainer description={description} label={label}>
+				<Popover open={open} onOpenChange={setOpen}>
+					<PopoverTrigger asChild>
+						<SelectInputUI>
+							{fieldAccessor.value
+								? options[fieldAccessor.value]
+								: placeholder ?? <SelectDefaultPlaceholderUI />}
+							<SelectInputActionsUI>
+								{open ? <ChevronUpIcon className="w-4 h-4" /> : <ChevronDownIcon className="w-4 h-4" />}
+							</SelectInputActionsUI>
+						</SelectInputUI>
+					</PopoverTrigger>
+
+					<SelectPopoverContent>
+						{Object.entries(options).map(([value, label]) => (
+							<SelectListItemUI
+								key={value}
+								onClick={() => {
+									fieldAccessor.updateValue(value)
+									setOpen(false)
+								}}
+							>
+								{label}
+							</SelectListItemUI>
+						))}
+					</SelectPopoverContent>
+				</Popover>
+			</FormContainer>
+		</FormFieldScope>
+	)
+}
+```
+The input binds to a form field via `useField`.  
+Updating a list item closes the popover and pushes the value into form state.
 
 ## Best Practices & Gotchas
-* Always place `SelectInputUI` inside a `PopoverTrigger` to handle clicks.  
-* Keep interactive elements (remove buttons) inside `SelectInputActionsUI` to maintain layout.  
-* Do not manage selection state in `SelectInputUI`; use higher-level select components.
+* Always wrap `SelectInputUI` in `PopoverTrigger` so clicks toggle the dropdown.  
+* Place icons, loaders, and remove buttons inside `SelectInputActionsUI` to keep spacing predictable.  
+* Never manage selection state inside `SelectInputUI`; lift it to the select controller.  
+* Add `pointer-events-none` to decorative icons so they do not steal focus.  
+* Use `SelectDefaultPlaceholderUI` instead of plain text for consistent theme styling.
 
 ## Further Reading
-* `MultiSelectInput` – multiple value selection.  
-* `SelectPopoverContent` – dropdown body.  
-* `SelectCreateNewTrigger` – inline entity creation.
+* `MultiSelectInputUI` – handles multiple selections out of the box.  
+* `SelectPopoverContent` – dropdown body with keyboard navigation.  
+* `SelectCreateNewTrigger` – button for on-the-fly entity creation.
 
 <!-- End of Generated Documentation -->

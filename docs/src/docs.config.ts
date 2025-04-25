@@ -8,18 +8,28 @@ const config: DocsConfig = {
 	ai: {
 		model: 'o3',
 	},
-	// externalProjects: [
-	//   {
-	//     path: 'path/to/external/admin/dir',
-	//     name: 'Name of the project',
-	//     description: 'Description of the project. This can help AI to understand the context and provide more accurate suggestions.',
-	//     excludeFolders: [
-	//          'lib',
-	//          'dist',
-	//          'build',
-	// 	   ],
-	//   },
-	// ],
+	externalProjects: [
+		{
+			path: '../../../contember-external/fabis/admin',
+			name: 'Learning Platform',
+			description: 'A learning platform built with Contember with a lot of features, including user management, course creation, and content organization.',
+			excludeFolders: [
+				'lib',
+				'dist',
+				'build',
+			],
+		},
+		{
+			path: '../../../108agency/mapeditor/admin',
+			name: '108 Agency CRM and CMS',
+			description: 'Content management system for a websites and a CRM',
+			excludeFolders: [
+				'lib',
+				'dist',
+				'build',
+			],
+		},
+	],
 
 	// Component-specific overrides
 	// overrides: {

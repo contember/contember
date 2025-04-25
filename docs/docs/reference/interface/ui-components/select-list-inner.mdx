@@ -3,11 +3,11 @@ title: SelectListInner
 ---
 
 <!-- Edited by human: false -->
-<!-- Examples count: 10 -->
+<!-- Examples count: 2 -->
 <!-- Source examples: 0 -->
 <!-- Playground examples: 0 -->
-<!-- External examples: 10 -->
-<!-- Import examples: 5 -->
+<!-- External examples: 2 -->
+<!-- Import examples: 2 -->
 
 ## Overview
 SelectListInner renders a scrollable list used by Contember select components.  
@@ -25,18 +25,18 @@ If you follow the default Contember theme, no extra utility classes are required
 
 ## Quick Start
 ```tsx
-import { SelectListInner, SelectOption, SelectItemTrigger } from '@contember/react-select'
+import { SelectListInner, SelectOption, SelectItemTrigger, SelectDefaultFilter } from '@app/lib/select'
 
 <SelectListInner filterToolbar={<SelectDefaultFilter />}>
 	<SelectOption>
 		<SelectItemTrigger>
-			<div className="px-3 py-2 hover:bg-gray-100">Item 1</div>
+			<div className="px-3 py-2 hover:bg-gray-100">Item&nbsp;1</div>
 		</SelectItemTrigger>
 	</SelectOption>
 
 	<SelectOption>
 		<SelectItemTrigger>
-			<div className="px-3 py-2 hover:bg-gray-100">Item 2</div>
+			<div className="px-3 py-2 hover:bg-gray-100">Item&nbsp;2</div>
 		</SelectItemTrigger>
 	</SelectOption>
 </SelectListInner>
@@ -108,8 +108,36 @@ The list lives inside a `MultiSelect` component.
 	</DataGridRelationFilterSelectItem>
 </SelectListInner>
 ```
-Here `SelectListInner` powers a data-grid filter.  
+`SelectListInner` powers a data-grid filter.  
 Wrapping items in `DataGridRelationFilterSelectItem` keeps the filter UI consistent.
+
+### Data-view relation filter with include / exclude logic
+```tsx
+({ children, toggleExclude, toggleInclude, included, excluded, entityName, initialSorting }: {
+	children: ReactNode
+	toggleInclude: (entityId: EntityId) => void
+	toggleExclude: (entityId: EntityId) => void
+	included: string[]
+	excluded: string[]
+	entityName: string
+	initialSorting?: DataViewSortingDirections
+}) => (
+	<DataViewRelationFilterOptions entities={entityName} initialSorting={initialSorting}>
+		<SelectListInner filterToolbar={<SelectDefaultFilter />}>
+			<DataGridRelationFilterSelectItem
+				toggleInclude={toggleInclude}
+				toggleExclude={toggleExclude}
+				included={included}
+				excluded={excluded}
+			>
+				{children}
+			</DataGridRelationFilterSelectItem>
+		</SelectListInner>
+	</DataViewRelationFilterOptions>
+)
+```
+The component glues together `DataViewRelationFilterOptions` and `DataGridRelationFilterSelectItem`.  
+`SelectListInner` stays responsible for scrolling, focus handling, and optional filtering UI.
 
 ## Best Practices & Gotchas
 - Always place `SelectOption` directly under `SelectListInner`.  

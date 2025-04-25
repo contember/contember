@@ -1,0 +1,58 @@
+---
+title: BoardColumnHeaderUI
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 0 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 0 -->
+<!-- Import examples: 0 -->
+
+## Overview
+BoardColumnHeaderUI renders the visual header section of a board column.  
+Use it to display a column title, status indicators, or aggregate actions.
+
+## Styling Guidelines
+* All examples use Tailwind CSS utility classes.  
+* The component does not require any special Contember theme class names.
+
+## Core Concepts
+* Compose BoardColumnHeaderUI with your own layout wrappers.  
+* Style through surrounding elements or global CSS since the component exposes minimal surface.  
+* Keep header content concise for readability.
+
+## Quick Start
+```tsx
+import { BoardColumnHeaderUI } from '@contember/react-components'
+
+export const ColumnHeader = () => (
+  <div className="bg-gray-100 px-4 py-2 flex items-center">
+    <BoardColumnHeaderUI />
+  </div>
+)
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+_None_
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+_None_
+
+## Best Practices & Gotchas
+* Wrap the component in a flex container to align items horizontally.  
+* Use semantic HTML (e.g., `<header>`) around the component for accessibility.  
+* Keep spacing consistent with Tailwind padding utilities.
+
+## Further Reading
+* Board UI pattern in Contember  
+* Tailwind utility-first styling  
+* Composition over inheritance in React
+
+<!-- End of Generated Documentation -->

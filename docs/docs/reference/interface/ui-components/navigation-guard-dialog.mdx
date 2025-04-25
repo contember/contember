@@ -2,20 +2,27 @@
 title: NavigationGuardDialog
 ---
 
+<!-- Edited by human: false -->
+<!-- Examples count: 1 -->
+<!-- Source examples: 1 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 0 -->
+<!-- Import examples: 0 -->
+
 # NavigationGuardDialog
 
 ## Overview
-`NavigationGuardDialog` prompts users before they leave a page with unsaved changes.
-It works with `useBlockNavigationOnDirtyState` to avoid accidental data loss.
+`NavigationGuardDialog` prompts users with a confirmation dialog when they attempt to leave a page that has unsaved changes.  
+It integrates with `useBlockNavigationOnDirtyState` to prevent accidental data loss.
 
 ## Styling Guidelines
 * All examples use Tailwind CSS.
 * No special Contember theme classes are required.
 
 ## Core Concepts
-* Detect unsaved (“dirty”) state with `useBlockNavigationOnDirtyState`.
-* Show a modal dialog when navigation is blocked.
-* Offer save, discard, or cancel actions.
+* Detect a “dirty” state with `useBlockNavigationOnDirtyState`.
+* Block navigation and show a confirmation dialog.
+* Provide save, discard, or cancel actions.
 
 ## Quick Start
 ```tsx
@@ -41,6 +48,12 @@ Hook that marks the page as “dirty” and blocks navigation until changes are 
 
 ## Examples
 ```tsx
+// Basic usage — mount once at page level
+<NavigationGuardDialog />
+```
+The component renders a modal dialog when navigation is blocked.
+
+```tsx
 import { useState } from 'react'
 import { useBlockNavigationOnDirtyState, NavigationGuardDialog } from '@contember/react-components'
 
@@ -63,14 +76,14 @@ export const ArticleEditor = () => {
 	)
 }
 ```
-The textarea sets the page to a “dirty” state.
-Trying to navigate away triggers `NavigationGuardDialog`.
+The textarea sets the page to a “dirty” state.  
+Attempting to navigate away shows `NavigationGuardDialog`, letting users save, discard, or cancel.
 
 ## Best Practices & Gotchas
-* Mount `NavigationGuardDialog` once, near the end of the component tree.
-* Keep dialog content short and action‑oriented.
+* Mount `NavigationGuardDialog` only once, near the root of your page.
+* Keep dialog text short and action-oriented.
 * Always pair the dialog with `useBlockNavigationOnDirtyState`.
-* Do not rely on browser “beforeunload” alone; users may have it disabled.
+* Don’t rely solely on the browser’s `beforeunload`; some users disable it.
 
 ## Further Reading
 * `useBlockNavigationOnDirtyState` hook

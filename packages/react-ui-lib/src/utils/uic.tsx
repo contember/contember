@@ -42,6 +42,37 @@ export const uiconfig = <T extends ConfigSchema | undefined>(config: Config<T, C
 
 export type NoInfer<T> = T & { [K in keyof T]: T[K] }
 
+/**
+ * `uic` is a utility function that enhances a React component with a set of configurable
+ * styling and behavior options using a utility-based class variance system (e.g., `cva`).
+ *
+ * It wraps a base component and adds support for:
+ * - Variant-based styling using `cva` configuration
+ * - Optional variant-to-data-attribute mapping
+ * - Component composition with `asChild`, `wrapInner`, and `wrapOuter` props
+ * - Automatic removal of variant props if not specified in `passVariantProps`
+ *
+ * Must be used with a `Config` object that defines styling and behavior options.
+ *
+ * #### Example: Basic usage with variant styling
+ * ```tsx
+ * const Button = uic('button', {
+ *   baseClass: 'px-4 py-2 font-bold',
+ *   variants: {
+ *     intent: {
+ *       primary: 'bg-blue-500 text-white',
+ *       secondary: 'bg-gray-500 text-white',
+ *     },
+ *   },
+ *   defaultVariants: {
+ *     intent: 'primary',
+ *   },
+ *   displayName: 'Button',
+ * })
+ *
+ * <Button intent="secondary">Click me</Button>
+ * ```
+ */
 export const uic = <El extends React.ElementType, Variants extends ConfigSchema | undefined = undefined>(Component: El, config: Config<Variants, NoInfer<El>>) => {
 	const cls = cva<any>(config?.baseClass as any, {
 		variants: config?.variants,

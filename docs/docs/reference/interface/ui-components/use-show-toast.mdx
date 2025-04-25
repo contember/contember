@@ -1,0 +1,119 @@
+---
+title: useShowToast
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 0 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 0 -->
+<!-- Import examples: 8 -->
+
+## Overview
+`useShowToast` is a React hook that lets you trigger toast notifications from anywhere in your component tree.  
+It integrates with Contember’s toast system and pairs with `<ToastContent>` and `<Toaster>` for rendering.
+
+## Styling Guidelines
+* All examples use TailwindCSS utility classes.  
+* No special Contember theme classes are required by default.
+
+## Core Concepts
+* The hook returns an imperative function you call to display a toast.
+* Toast rendering happens through a single `<Toaster>` mounted once in your app.
+* You can supply custom React nodes (e.g., `<ToastContent>`) as toast bodies.
+
+## Quick Start
+```tsx
+import { Toaster, ToastContent, useShowToast } from '@app/lib/toast'
+
+export default function Demo() {
+  const showToast = useShowToast()
+
+  return (
+    <div className="p-6 space-y-4">
+      <button
+        onClick={() => showToast(<ToastContent>Saved successfully</ToastContent>)}
+        className="px-4 py-2 bg-blue-600 text-white rounded"
+      >
+        Show toast
+      </button>
+
+      <Toaster />
+    </div>
+  )
+}
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| _None_ | — | No | — | This hook does not accept props. |
+
+## Sub-Components / Building Blocks
+### ToastContent
+Wrapper component used as the visible body of a toast.
+
+### Toaster
+Portal-like component that renders all active toasts. Place it once near the root of your app.
+
+## Examples
+### Form submit confirmation
+```tsx
+function SaveButton() {
+  const showToast = useShowToast()
+
+  const handleSave = () => {
+    // ...save logic
+    showToast(<ToastContent>Your data is saved.</ToastContent>)
+  }
+
+  return (
+    <button
+      onClick={handleSave}
+      className="rounded bg-green-600 px-4 py-2 text-white"
+    >
+      Save
+    </button>
+  )
+}
+```
+The handler saves data, then triggers a toast to confirm success.
+
+### Error handling in async calls
+```tsx
+function FetchUser() {
+  const showToast = useShowToast()
+
+  const loadUser = async () => {
+    try {
+      await api.fetchUser()
+    } catch {
+      showToast(<ToastContent className="text-red-500">Failed to load user</ToastContent>)
+    }
+  }
+
+  return (
+    <button onClick={loadUser} className="underline text-blue-600">
+      Reload user
+    </button>
+  )
+}
+```
+The toast appears only when the async call fails, improving UX with instant feedback.
+
+## Best Practices & Gotchas
+* Mount exactly one `<Toaster>` in your app.
+* Memoize heavy toast bodies to avoid unnecessary re-renders.
+* Keep toast messages short; long text hurts readability.
+* Avoid triggering multiple toasts at once—queue them instead.
+
+## Further Reading
+* `<ToastContent>` component documentation  
+* `<Toaster>` component guide  
+* Contember UI patterns – Feedback & Notifications  
+* React Hooks basics
+
+<!-- End of Generated Documentation -->

@@ -3,16 +3,16 @@ title: CreateEntityDialog
 ---
 
 <!-- Edited by human: false -->
-<!-- Examples count: 11 -->
+<!-- Examples count: 1 -->
 <!-- Source examples: 1 -->
 <!-- Playground examples: 0 -->
-<!-- External examples: 10 -->
-<!-- Import examples: 5 -->
+<!-- External examples: 0 -->
+<!-- Import examples: 0 -->
 
 # CreateEntityDialog
 
 ## Overview
-`CreateEntityDialog` is a modal component that lets you create a new entity without leaving the current screen.
+`CreateEntityDialog` is a modal component that lets you create a new entity without leaving the current screen.  
 You pass a trigger element (for example, a button) and any form or content you want inside the dialog.
 
 ## Styling Guidelines
@@ -42,7 +42,7 @@ _None_
 ## Props Reference
 | Name | Type | Required | Default | Description |
 |------|------|----------|---------|-------------|
-| trigger | React.ReactElement\<any, string \| React.JSXElementConstructor\<any\>\> | Yes | — | Element that opens the dialog. |
+| trigger | React.ReactElement\<any, string \| React.JSXElementConstructor\<any\> | Yes | — | Element that opens the dialog. |
 | children | React.ReactNode | Yes | — | Content rendered inside the dialog. |
 | *Inherited props* | — | — | — | _None_ |
 
@@ -51,7 +51,7 @@ _None_
 
 ## Examples
 
-### 1. Basic Dialog
+### Basic Dialog
 ```tsx
 import { CreateEntityDialog } from '@contember/react'
 import { Button } from './ui'
@@ -62,112 +62,14 @@ import { Button } from './ui'
   <EntityForm />
 </CreateEntityDialog>
 ```
-Use this as the minimal setup when you only need a modal wrapper around an existing form.
-
-### 2. Dialog with Confirmation Toast
-```tsx
-import { CreateEntityDialog } from '@contember/react'
-import { Button } from './ui'
-import { toast } from 'react-hot-toast'
-
-<CreateEntityDialog
-  trigger={<Button className="bg-green-600 text-white px-4 py-2 rounded">Add Company</Button>}
->
-  <CompanyForm
-    onSuccess={() => toast.success('Company created')}
-    className="p-6 grid gap-4"
-  />
-</CreateEntityDialog>
-```
-Show a toast from the nested form’s `onSuccess` handler to confirm the action.
-
-### 3. Inline List Refresh
-```tsx
-const CompaniesPage = () => {
-  const [reloadKey, setReloadKey] = useState(0)
-
-  return (
-    <div className="space-y-6">
-      <CreateEntityDialog
-        trigger={<button className="btn-primary">New Company</button>}
-      >
-        <CompanyForm onSuccess={() => setReloadKey(Date.now())} />
-      </CreateEntityDialog>
-
-      <CompanyList key={reloadKey} />
-    </div>
-  )
-}
-```
-Update the surrounding list by bumping a `key` once the dialog form succeeds.
-
-### 4. “Create New” Inside Select
-```tsx
-import {
-  Select,
-  SelectInputUI,
-  SelectPlaceholder,
-  SelectPopoverContent,
-  SelectDefaultPlaceholderUI,
-  SelectCreateNewTrigger,
-} from '@contember/react-select'
-import { CreateEntityDialog } from '@contember/react'
-
-<Select field="category">
-  <SelectInputUI className="w-full">
-    <SelectPlaceholder>
-      <SelectDefaultPlaceholderUI />
-    </SelectPlaceholder>
-  </SelectInputUI>
-
-  <SelectPopoverContent>
-    {/* …existing list of options… */}
-  </SelectPopoverContent>
-</Select>
-
-<CreateEntityDialog
-  trigger={<SelectCreateNewTrigger />}
->
-  <CategoryForm />
-</CreateEntityDialog>
-```
-Embed `CreateEntityDialog` next to a `<Select>` so users can add a missing option without leaving the flow.
-
-### 5. Multi-Select Variation
-```tsx
-import {
-  MultiSelect,
-  SelectEachValue,
-  SelectItemTrigger,
-  SelectCreateNewTrigger,
-} from '@contember/react-select'
-import { ChevronDownIcon } from 'lucide-react'
-import { CreateEntityDialog } from '@contember/react'
-
-<MultiSelect field="tags">
-  <div className="flex gap-1 items-center">
-    <SelectEachValue>
-      {/* …render selected tags… */}
-    </SelectEachValue>
-
-    <ChevronDownIcon className="w-4 h-4" />
-
-    <CreateEntityDialog
-      trigger={<SelectCreateNewTrigger />}
-    >
-      <TagForm />
-    </CreateEntityDialog>
-  </div>
-</MultiSelect>
-```
-Pairing `MultiSelect` with `CreateEntityDialog` lets users add new tags on the fly while keeping the interface compact.
+Use this minimal setup when you only need a modal wrapper around an existing form.
 
 ## Best Practices & Gotchas
 * Keep the dialog form concise; long forms feel cramped in modals.
-* Pass a visually distinct trigger button; otherwise users miss the action.
+* Pass a visually distinct trigger button; otherwise users might miss the action.
 * Handle success inside the child form, not in `CreateEntityDialog`.
 * Avoid nesting multiple dialogs—they confuse focus and accessibility.
-* When integrating with `<Select>` or `<MultiSelect>`, place the trigger **next to** the input to preserve keyboard navigation.
+* When integrating with selection components, place the trigger next to the input to preserve keyboard navigation.
 
 ## Further Reading
 * `EntityForm`

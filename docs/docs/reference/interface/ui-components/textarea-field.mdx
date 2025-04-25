@@ -1,0 +1,98 @@
+---
+title: TextareaField
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 16 -->
+<!-- Source examples: 1 -->
+<!-- Playground examples: 5 -->
+<!-- External examples: 10 -->
+<!-- Import examples: 8 -->
+
+## Overview
+`TextareaField` renders a multi-line text input that integrates with Contember form scopes.  
+You use it inside `FormContainer`, `FormFieldScope`, or any compatible form context.
+
+It provides labels, descriptions, required validation, auto-resize via `TextareaAutosize`, and forwards additional DOM props through `inputProps`.
+
+## Styling Guidelines
+* All code samples use Tailwind utility classes.  
+* `TextareaField` itself adds no visual styles; rely on your Tailwind setup or Contember theme classes like `con-input`, `con-label`, and `con-error`.
+
+## Core Concepts
+* Form context is mandatory—wrap the field in `FormContainer` or equivalent.
+* The `field` prop binds the component to an entity attribute.
+* Accessibility comes from `label` and `description`.
+* Auto-resize works out-of-the-box; override with `inputProps={{ minRows: n }}`.
+* Validation respects the `required` prop and server errors.
+
+## Quick Start
+```tsx
+import { FormContainer, TextareaField } from '~/lib/form'
+
+export default () => (
+  <FormContainer>
+    <TextareaField
+      field="bio"
+      label="Biography"
+      description="Tell us about yourself"
+      required
+      inputProps={{ placeholder: 'Write something...', className: 'con-input w-full min-h-[120px]' }}
+    />
+  </FormContainer>
+)
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| field | string &#124; { field: string; hasOneRelationPath?: SugarableHasOneRelation &#124; SugarableHasOneRelation[] } | Yes | – | Entity field path. |
+| label | React.ReactNode | Yes | – | Field label, rendered by Contember form. |
+| description | React.ReactNode | Yes | – | Additional helper text under the input. |
+| required | boolean | Yes | – | Marks the field as mandatory; handled by form validation. |
+| inputProps | undefined | No | – | Props passed directly to the underlying `textarea`. |
+| defaultValue | OptionallyVariableFieldValue | Yes | – | Initial value if entity field is empty. |
+| formatValue | (value: any, ctx) => string | Yes | – | Formats stored value for display. |
+| parseValue | (value: string, ctx) => any | Yes | – | Converts user input back to entity value. |
+| errors | React.ReactNode &#124; Error[] | Yes | – | Custom error output or error list. |
+| isNonbearing | boolean | Yes | – | Marks field as non-bearing for optimistic updates. |
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+### Auto-resized comment box
+```tsx
+<TextareaField
+  field="comment"
+  label="Comment"
+  inputProps={{ minRows: 2, placeholder: 'Leave your feedback...', className: 'w-full con-input' }}
+/>
+```
+This creates a comment box that grows with content thanks to `TextareaAutosize`.
+
+### Edit-in-place pattern
+```tsx
+<ClickToEdit
+  view={entity => entity.getField('bio').value}
+  edit={<TextareaField field="bio" label={undefined} />}
+/>
+```
+`ClickToEdit` toggles between read and edit modes. Passing `label={undefined}` hides the label in compact UIs.
+
+## Best Practices & Gotchas
+* Always provide `label` for accessibility unless the design omits it intentionally.  
+* Combine `minRows` and `maxRows` in `inputProps` to control resize limits.  
+* Wrap the field in `FormLocales` to localize rich text.  
+* Server validation errors flow automatically; you rarely need custom error handling.  
+* Avoid heavy CSS on `textarea`; let Tailwind or Contember theme styles handle appearance.
+
+## Further Reading
+* `InputField` – single-line counterpart.  
+* `FormContainer` – root context for all form fields.  
+* `ClickToEdit` – toggles between read and write states.  
+
+<!-- End of Generated Documentation -->

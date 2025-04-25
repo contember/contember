@@ -3,11 +3,11 @@ title: EditorCanvas
 ---
 
 <!-- Edited by human: false -->
-<!-- Examples count: 9 -->
+<!-- Examples count: 1 -->
 <!-- Source examples: 0 -->
 <!-- Playground examples: 1 -->
-<!-- External examples: 8 -->
-<!-- Import examples: 6 -->
+<!-- External examples: 0 -->
+<!-- Import examples: 1 -->
 
 ## Overview
 `EditorCanvas` renders an arbitrary React component—often Slate’s `Editable`—and forwards any props you supply.  
@@ -67,7 +67,7 @@ _None_
 ## Examples
 ### Sortable Slate Blocks
 ```tsx
-const SortableEditor = ({ children }: { children: ReactNode }) => {
+({ children, placeholder }: { children: ReactNode; placeholder?: string }) => {
   const editor = useSlateStatic()
   const entities = useRepeaterSortedEntities()
 
@@ -75,18 +75,23 @@ const SortableEditor = ({ children }: { children: ReactNode }) => {
     if (!over) return
     const from = entities.findIndex(e => e.id === active.id)
     const to = entities.findIndex(e => e.id === over.id)
-    if (from === to || from < 0 || to < 0) return
+    if (from === undefined || to === undefined || from === to) return
     Transforms.moveNodes(editor, { at: [from], to: [to] })
   }
 
   return (
-    <RepeaterSortable onDragEnd={onDragEnd}>
+    <RepeaterSortable onDragEnd={onDragEnd} autoScroll={{ layoutShiftCompensation: false }}>
       <EditorCanvas
         underlyingComponent={EditorEditableCanvas}
         componentProps={{
           renderElement: editor.renderElement,
           renderLeaf: editor.renderLeaf,
           onKeyDown: editor.onKeyDown,
+          onFocusCapture: editor.onFocus,
+          onBlurCapture: editor.onBlur,
+          onDOMBeforeInput: editor.onDOMBeforeInput,
+          onDrop: e => e.preventDefault(),
+          placeholder,
         }}
         className="border rounded p-4 bg-white"
       >
@@ -96,31 +101,7 @@ const SortableEditor = ({ children }: { children: ReactNode }) => {
   )
 }
 ```
-This pattern lets users reorder blocks while preserving full Slate editing features.
-
-### Read-Only While Mutating
-```tsx
-const MutatingEditor = ({ children }: { children: ReactNode }) => {
-  const editor = useSlateStatic()
-  const isMutating = useMutationState()
-
-  return (
-    <EditorCanvas
-      underlyingComponent={Editable}
-      componentProps={{
-        readOnly: isMutating,
-        renderElement: editor.renderElement,
-        renderLeaf: editor.renderLeaf,
-        onKeyDown: editor.onKeyDown,
-      }}
-      className="border p-4"
-    >
-      {children}
-    </EditorCanvas>
-  )
-}
-```
-When a mutation runs, the editor becomes read-only to prevent conflicting edits.
+This pattern lets users reorder blocks while preserving full Slate editing capabilities.
 
 ## Best Practices & Gotchas
 * Keep `componentProps` memoized to avoid unnecessary rerenders.  

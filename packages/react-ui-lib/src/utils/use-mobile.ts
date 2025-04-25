@@ -2,6 +2,25 @@ import { useEffect, useState } from 'react'
 
 const MOBILE_BREAKPOINT = 768
 
+/**
+ * `useIsMobile` is a responsive utility hook that returns a boolean indicating
+ * whether the current viewport width is below the mobile breakpoint (768px).
+ *
+ * Useful for conditional rendering or styling based on mobile layout needs.
+ *
+ * #### Example: Conditional rendering for mobile
+ * ```tsx
+ * const MyComponent = () => {
+ *   const isMobile = useIsMobile()
+ *
+ *   return (
+ *     <div>
+ *       {isMobile ? <MobileMenu /> : <DesktopMenu />}
+ *     </div>
+ *   )
+ * }
+ * ```
+ */
 export const useIsMobile = () => {
 	const [isMobile, setIsMobile] = useState(() =>
 		typeof window !== 'undefined' ? window.innerWidth < MOBILE_BREAKPOINT : false,

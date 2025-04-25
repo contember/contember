@@ -7,23 +7,23 @@ title: SelectListItemUI
 <!-- Source examples: 0 -->
 <!-- Playground examples: 0 -->
 <!-- External examples: 10 -->
-<!-- Import examples: 5 -->
+<!-- Import examples: 4 -->
 
 # SelectListItemUI
 
 ## Overview
 SelectListItemUI renders one option inside a Contember `Select` or `MultiSelect` list.  
-You wrap it in `SelectItemTrigger` to commit the value when users click the row.
+Wrap the item in `SelectItemTrigger` to commit the value when users click the row.
 
 ## Styling Guidelines
 * All examples use Tailwind CSS classes.  
 * The component adds no styles by itself; apply Tailwind or your Contember theme classes (e.g. `contember-select-item`) as needed.
 
 ## Core Concepts
-* SelectListItemUI is only visual; behaviour comes from its surrounding triggers.
-* You place any custom content (text, icons) between its tags.
+* SelectListItemUI is purely visual; behaviour comes from surrounding triggers.
+* Place any content (text, icons, loaders) between its tags.
 * Combine it with `SelectItemTrigger` to handle clicks without manual event wiring.
-* It works in both single- and multi-select inputs.
+* Works in both single- and multi-select inputs.
 
 ## Quick Start
 ```tsx
@@ -77,7 +77,7 @@ import {
 	</SelectPopoverContent>
 </Popover>
 ```
-The trigger closes the popover and writes the chosen value. You handle no state yourself.
+`SelectItemTrigger` closes the popover and writes the chosen value. You handle no state yourself.
 
 ## Props Reference
 _None_
@@ -86,11 +86,46 @@ _None_
 _None_
 
 ## Examples
-### Update form field and close popover
+### 1. Show loading spinner inside item
 ```tsx
-({ value, label, fieldAccessor, setOpen }: Props) => (
+<SelectListItemUI>
+	<Loader size="md" />
+</SelectListItemUI>
+```
+You can display a loader while the list data downloads.
+
+### 2. Render error message
+```tsx
+<SelectListItemUI>{error}</SelectListItemUI>
+```
+Show a full-width error placeholder instead of selectable options.
+
+### 3. Non-interactive “no data” note
+```tsx
+<SelectListItemUI className="hover:cursor-default hover:bg-transparent">
+	{componentLabels.simpleSelect.noData}
+</SelectListItemUI>
+```
+Remove pointer cursor and hover background to signal that the row is not clickable.
+
+### 4. Map dynamic list with custom click handler
+```tsx
+(item, index) => (
 	<SelectListItemUI
-		className="px-3 py-2 hover:bg-primary-50"
+		key={getItemValue ? String(getItemValue(item)) : `item-${index}`}
+		onClick={() => handleItemClick(item)}
+	>
+		{getItemLabel(item)}
+	</SelectListItemUI>
+)
+```
+When mapping over data, forward the item to an external handler that writes the value and closes the popover.
+
+### 5. Update form field and close popover
+```tsx
+([value, label]) => (
+	<SelectListItemUI
+		key={value}
 		onClick={() => {
 			fieldAccessor.updateValue(value)
 			setOpen(false)
@@ -100,9 +135,9 @@ _None_
 	</SelectListItemUI>
 )
 ```
-Clicking the item writes the `value` to the form field and closes the dropdown.
+Clicking the item writes `value` to the form field and closes the dropdown.
 
-### Nest inside SelectListInner with filter toolbar
+### 6. Nest inside SelectListInner with filter toolbar
 ```tsx
 <SelectListInner filterToolbar={<SelectDefaultFilter />}>
 	<div className="border-b py-1">
@@ -116,13 +151,14 @@ Clicking the item writes the `value` to the form field and closes the dropdown.
 	</div>
 </SelectListInner>
 ```
-You can insert filtering components and dividers between list items.
+Combine list items with custom toolbars, dividers, or other UI elements.
 
 ## Best Practices & Gotchas
 * Always wrap SelectListItemUI in `SelectItemTrigger`; otherwise clicks do nothing.  
 * Keep item padding consistent with `SelectInputUI` for visual alignment.  
 * Use descriptive keys when mapping over dynamic lists to avoid React warnings.  
-* Prevent event bubbling if you also render interactive children inside the item.
+* Prevent event bubbling if you render interactive children inside the item.  
+* Remove pointer cursor for informational rows so users know they cannot select them.
 
 ## Further Reading
 * SelectItemTrigger – commits the value.  

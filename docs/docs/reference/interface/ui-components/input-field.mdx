@@ -1,0 +1,108 @@
+---
+title: InputField
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 16 -->
+<!-- Source examples: 1 -->
+<!-- Playground examples: 5 -->
+<!-- External examples: 10 -->
+<!-- Import examples: 8 -->
+
+# InputField
+
+## Overview
+`InputField` renders a text input that talks to Contember’s form engine.  
+It connects to `FormFieldScope`, `FormContainer`, and `FormInput`, so you can map an entity field to a browser `<input>` with almost no boilerplate.
+
+## Styling Guidelines
+* All snippets use Tailwind CSS.  
+* `InputField` itself adds no classes. Style via surrounding containers or the `inputProps.className` value.
+
+## Core Concepts
+* Bind an entity column through the `field` prop.  
+* Use `inputProps` to pass native input attributes (`placeholder`, `type`, etc.).  
+* Provide `formatValue` / `parseValue` when you need custom serialization.  
+* The component reports validation problems via the `errors` prop.  
+* Place `InputField` inside a `FormContainer` or `FormFieldScope` for correct context.
+
+## Quick Start
+```tsx
+import { FormContainer, InputField } from '~/lib/form'
+
+export default () => (
+  <FormContainer className="space-y-4">
+    <InputField field="title" label="Article title" />
+  </FormContainer>
+)
+```
+
+## Detailed Guide
+_None_
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+| ---- | ---- | -------- | ------- | ----------- |
+| isNonbearing | boolean | Yes | – | Mark field as read-only in change sets. |
+| field | string &#124; { field: string; hasOneRelationPath?: … } | Yes | – | Entity column or a relation path object. |
+| defaultValue | OptionallyVariableFieldValue | Yes | – | Initial value when the entity is new. |
+| formatValue | (value: any, ctx) => string | Yes | – | Convert stored value to string for the input. |
+| parseValue | (value: string, ctx) => any | Yes | – | Convert input text back to the stored value. |
+| label | React.ReactNode | Yes | – | Input caption rendered by `FormInput`. |
+| description | React.ReactNode | Yes | – | Help text shown under the input. |
+| errors | React.ReactNode &#124; Error[] | Yes | – | Validation messages from Contember. |
+| required | boolean | Yes | – | Adds the HTML `required` attribute and triggers validation. |
+| inputProps | Omit<InputHTMLAttributes<HTMLInputElement>, 'ref'> & RefAttributes<HTMLInputElement> | No | `{}` | Props forwarded to the native `<input>`. |
+| *Inherited props* | _None_ | – | – | – |
+
+## Sub-Components / Building Blocks
+_None_
+
+## Examples
+
+### Custom placeholder
+```tsx
+<InputField
+  field="title"
+  label="Article title"
+  inputProps={{ placeholder: 'Enter a title', className: 'w-full' }}
+/>
+```
+The `inputProps` object passes `placeholder` and Tailwind classes directly to the rendered `<input>`.
+
+### Read-only based on entity metadata
+```tsx
+const entity = useEntity()
+const readOnly = entity.getFieldMeta(field).updatable === false
+
+<InputField
+  field={field}
+  label="Article title"
+  inputProps={{ readOnly }}
+/>
+```
+Query the entity and lock the field when it cannot be updated.
+
+### Numeric input with min / max / step
+```tsx
+<InputField
+  field="tolerance"
+  label="Tolerance"
+  inputProps={{ type: 'number', min: 0, max: 1, step: 0.01 }}
+/>
+```
+Useful for percentage or ratio values.
+
+## Best Practices & Gotchas
+* Always wrap `InputField` in `FormContainer` or `FormFieldScope`.  
+* Use `inputProps.className` instead of attempting to style `InputField` directly.  
+* Provide both `formatValue` and `parseValue` when storing non-string values.  
+* Keep validation synchronous; async logic should live in server rules.  
+* Avoid uncontrolled usage—`InputField` expects Contember form context.
+
+## Further Reading
+* `FormContainer` – parent component providing form context.  
+* `FormFieldScope` – for scoping complex nested fields.  
+* `SelectField`, `TextareaField` – input siblings with similar API.
+
+<!-- End of Generated Documentation -->

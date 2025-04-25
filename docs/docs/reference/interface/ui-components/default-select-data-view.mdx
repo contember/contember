@@ -3,26 +3,26 @@ title: DefaultSelectDataView
 ---
 
 <!-- Edited by human: false -->
-<!-- Examples count: 6 -->
+<!-- Examples count: 0 -->
 <!-- Source examples: 0 -->
 <!-- Playground examples: 0 -->
-<!-- External examples: 6 -->
-<!-- Import examples: 5 -->
+<!-- External examples: 0 -->
+<!-- Import examples: 0 -->
 
 ## Overview
-`DefaultSelectDataView` renders a standard `DataView` optimised for select and multiselect pop-overs.  
-It accepts a search field, an initial sort order, and children that define individual list items.
+`DefaultSelectDataView` renders a ready-made `DataView` optimised for select and multiselect pop-overs.  
+You provide an optional search field, an initial sort order, and a child renderer for list items.
 
 ## Styling Guidelines
 * All examples use Tailwind CSS utility classes.  
-* The component itself adds no Contember theme classes, so you only need your project’s defaults.
+* The component adds no Contember theme classes, so you rely on your project’s defaults.
 
 ## Core Concepts
-* It plugs a ready-made `DataView` into a select pop-over.  
-* `queryField` enables text search in the list.  
-* `initialSorting` decides the first ordering of items.  
-* You pass `children` to describe how every entity renders.  
-* The component is headless—styling happens in surrounding UI elements.
+* Integrates `DataView` into a select pop-over.  
+* `queryField` enables full-text search.  
+* `initialSorting` sets first ordering.  
+* `children` renders each entity row.  
+* The component is headless—style it in parent UI.
 
 ## Quick Start
 ```tsx
@@ -47,8 +47,8 @@ import { DefaultSelectDataView } from './list'
   )}
 </DefaultSelectDataView>
 ```
-* `queryField` links the search input to the `fullName` column.  
-* `initialSorting` keeps the list alphabetical.  
+* `queryField` links search input to `fullName`.  
+* `initialSorting` keeps list alphabetical.  
 * The child function renders each row with an avatar and name.
 
 ## Props Reference
@@ -56,53 +56,20 @@ import { DefaultSelectDataView } from './list'
 | --- | --- | --- | --- | --- |
 | queryField | DataViewUnionFilterFields | No | — | Field used for full-text filtering. |
 | initialSorting | DataViewSortingDirections | No | — | Sorting applied on first render. |
-| children | React.ReactNode | Yes | — | Row renderer for each entity. |
+| children | React.ReactNode | Yes | — | Renderer for each entity. |
+| *…DataView props* | *Inherited* | No | — | All other `DataView` props are forwarded. |
 
 ## Sub-Components / Building Blocks
 _None_
 
 ## Examples
-
-### Inside `MultiSelect`
-```tsx
-<Popover>
-  {/* trigger omitted for brevity */}
-  <SelectPopoverContent>
-    <DefaultSelectDataView
-      queryField="title"
-      initialSorting={{ title: 'asc' }}
-    >
-      {entity => <span>{entity.title}</span>}
-    </DefaultSelectDataView>
-  </SelectPopoverContent>
-</Popover>
-```
-The pop-over now shows an alphabetically sorted, searchable list of titles.
-
-### Required value with validation
-```tsx
-<Select
-  field="author"
-  options="authors"
-  onSelect={() => setOpen(false)}
->
-  <Popover open={open} onOpenChange={setOpen}>
-    {/* trigger omitted */}
-    <SelectPopoverContent>
-      <DefaultSelectDataView queryField="name">
-        {entity => <span>{entity.name}</span>}
-      </DefaultSelectDataView>
-    </SelectPopoverContent>
-  </Popover>
-</Select>
-```
-The example uses `DefaultSelectDataView` to choose an author while keeping validation logic separate.
+_None_
 
 ## Best Practices & Gotchas
-* Always wrap the component in a `SelectPopoverContent` or similar pop-over.  
-* Keep `queryField` indexed in the database for fast search.  
-* Avoid heavy layouts inside children; simpler markup keeps scrolling smooth.  
-* Pass a stable object to `initialSorting` to prevent unnecessary re-renders.
+* Wrap the component in `SelectPopoverContent` or similar pop-over.  
+* Index `queryField` in your database for fast search.  
+* Keep row markup light to ensure smooth scrolling.  
+* Pass a stable object to `initialSorting` to avoid unnecessary re-renders.
 
 ## Further Reading
 * `DataView` – underlying list component.  

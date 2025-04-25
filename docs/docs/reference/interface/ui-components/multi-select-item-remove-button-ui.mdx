@@ -3,27 +3,27 @@ title: MultiSelectItemRemoveButtonUI
 ---
 
 <!-- Edited by human: false -->
-<!-- Examples count: 8 -->
+<!-- Examples count: 0 -->
 <!-- Source examples: 0 -->
 <!-- Playground examples: 0 -->
-<!-- External examples: 8 -->
-<!-- Import examples: 5 -->
+<!-- External examples: 0 -->
+<!-- Import examples: 0 -->
 
 # MultiSelectItemRemoveButtonUI
 
 ## Overview
-MultiSelectItemRemoveButtonUI shows a small button inside each selected item. Users click it to remove that value without reopening the dropdown. The component is usually wrapped by `SelectItemTrigger` so it inherits the correct focus and keyboard handling.
+MultiSelectItemRemoveButtonUI renders a small button inside each selected item. You let users remove a chosen value without reopening the dropdown. The component usually sits inside `SelectItemTrigger`, inheriting focus and keyboard handling.
 
 ## Styling Guidelines
-* All examples use Tailwind CSS for speed and clarity.  
-* The button has no mandatory Contember theme classes; you can style it freely.
+* All examples use Tailwind CSS.  
+* The button has no required Contember theme classes; style it as you prefer.
 
 ## Core Concepts
-* A Multi-Select input can list many chosen values.  
+* A multi-select input can hold many chosen values.  
 * Each value is rendered by `MultiSelectItemUI`.  
-* `MultiSelectItemRemoveButtonUI` lives inside the item and sends a remove command.  
-* You must cancel event propagation (`e.stopPropagation()`) to avoid unwanted dropdown toggling.  
-* Wrap the button with `SelectItemTrigger` to ensure accessibility.
+* `MultiSelectItemRemoveButtonUI` lives inside the item and fires a remove command.  
+* Call `e.stopPropagation()` to stop unwanted dropdown toggling.  
+* Wrap the button with `SelectItemTrigger` for accessibility.
 
 ## Quick Start
 ```tsx
@@ -34,7 +34,7 @@ MultiSelectItemRemoveButtonUI shows a small button inside each selected item. Us
 	/>
 </SelectItemTrigger>
 ```
-The snippet removes the clicked value and keeps the popover closed.
+The snippet removes the clicked value while keeping the popover closed.
 
 ## Detailed Guide
 _None_
@@ -46,29 +46,14 @@ _None_
 _None_
 
 ## Examples
-
-### Remove buttons in a custom Multi-Select
-```tsx
-<MultiSelect field={field} options={options}>
-	<SelectEachValue>
-		<MultiSelectItemUI>
-			<MultiSelectItemContentUI>{children}</MultiSelectItemContentUI>
-
-			<SelectItemTrigger>
-				<MultiSelectItemRemoveButtonUI onClick={e => e.stopPropagation()} />
-			</SelectItemTrigger>
-		</MultiSelectItemUI>
-	</SelectEachValue>
-</MultiSelect>
-```
-The button appears next to every selected value. The `stopPropagation` call prevents the parent `SelectItemTrigger` from opening the dropdown.
+_None_
 
 ## Best Practices & Gotchas
 * Always call `e.stopPropagation()` in `onClick`.  
-* Use descriptive `aria-label` for accessibility, e.g. `"Remove item"`.  
-* Keep the button visually small (`w-4 h-4`) to avoid crowding.  
-* Wrap inside `SelectItemTrigger` to inherit correct focus styles.  
-* Test keyboard removal flows to maintain accessibility.
+* Add a descriptive `aria-label`, for example `"Remove item"`.  
+* Keep the button small (`w-4 h-4`) to reduce visual clutter.  
+* Wrap the button in `SelectItemTrigger` to inherit focus styles.  
+* Test keyboard removal flows to ensure accessibility.
 
 ## Further Reading
 * MultiSelect  

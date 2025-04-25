@@ -10,18 +10,18 @@ title: RadioEnumField
 <!-- Import examples: 7 -->
 
 ## Overview
-RadioEnumField renders enum values as a group of radio buttons inside an Entity context.  
+RadioEnumField renders enum values as a group of radio buttons inside an Entity context.
 You can let the component discover enum values automatically or pass your own `options` array.
 
 ## Styling Guidelines
-All examples use Tailwind utility classes.  
+All examples use Tailwind utility classes.
 RadioEnumField works with any Contember theme; no special theme classes are required.
 
 ## Core Concepts
 - Entity context is mandatory (`<EntitySubTree />` or `<EntityListSubTree />`).
-- Each option needs a `value` and a `label`.  
-- The `orientation` prop controls horizontal or vertical layout.  
-- Omit the `options` prop to auto-generate choices from the schema enum.  
+- Each option needs a `value` and a `label`.
+- The `orientation` prop controls horizontal or vertical layout.
+- Omit the `options` prop to auto-generate choices from the schema enum.
 - You can forward standard `<input>` attributes through `inputProps`.
 
 ## Quick Start
@@ -61,15 +61,15 @@ Use `orientation="horizontal"` for a compact inline layout. The default orientat
 | Name | Type | Required | Default | Description |
 |------|------|----------|---------|-------------|
 | isNonbearing | boolean | Yes | - | Excludes the field from dirty-state calculation. |
-| field | string &#124; SugarableFieldObject | Yes | - | Target enum field within the current entity. |
+| field | `string \| SugarableFieldObject` | Yes | - | Target enum field within the current entity. |
 | defaultValue | OptionallyVariableFieldValue | Yes | - | Initial value used on entity creation. |
 | label | React.ReactNode | Yes | - | Visible field label. |
 | description | React.ReactNode | Yes | - | Helper text displayed below the radios. |
-| errors | React.ReactNode &#124; ErrorAccessor.Error[] | Yes | - | Custom validation errors. |
+| errors | `React.ReactNode \| ErrorAccessor.Error[]` | Yes | - | Custom validation errors. |
 | required | boolean | Yes | - | Marks the field as mandatory. |
-| options | Record&lt;string, React.ReactNode&gt; &#124; { value: string&#124;number&#124;boolean; label: React.ReactNode; }[] | No | - | Explicit option list. |
-| orientation | "horizontal" &#124; "vertical" | No | "vertical" | Layout direction of radio buttons. |
-| inputProps | Omit&lt;React.InputHTMLAttributes&lt;HTMLInputElement&gt;, "defaultValue"&gt; | No | - | Extra attributes passed to every radio input. |
+| options | `Record<string, React.ReactNode> \| { value: string \| number \| boolean; label: React.ReactNode; }[]` | No | - | Explicit option list. |
+| orientation | `"horizontal" \| "vertical"` | No | "vertical" | Layout direction of radio buttons. |
+| inputProps | `Omit&lt;React.InputHTMLAttributes&lt;HTMLInputElement&gt;, "defaultValue" | "value"&gt;` | No | - | Extra attributes passed to every radio input. |
 
 ## Sub-Components / Building Blocks
 _None_
@@ -103,16 +103,16 @@ This pattern shows how you can branch the form based on the selected radio value
 RadioEnumField handles strings, numbers, booleans, and `null` without extra code.
 
 ## Best Practices & Gotchas
-- Always nest the component in an Entity context; otherwise, it cannot bind to data.  
-- Provide `inputProps={{ disabled: true }}` instead of wrapping the whole field in `fieldset disabled`.  
-- Keep option values immutable to avoid React key warnings.  
-- Use the schema enum labels to localize automatically; avoid hard-coding strings when possible.  
+- Always nest the component in an Entity context; otherwise, it cannot bind to data.
+- Provide `inputProps={{ disabled: true }}` instead of wrapping the whole field in `fieldset disabled`.
+- Keep option values immutable to avoid React key warnings.
+- Use the schema enum labels to localize automatically; avoid hard-coding strings when possible.
 - Combine `required` with server-side validation rules for full safety.
 
 ## Further Reading
-- InputField – single line text input  
-- SelectField – dropdown alternative for large enums  
-- CheckboxField – boolean input  
-- EntitySubTree – creates the required data context  
+- InputField – single line text input
+- SelectField – dropdown alternative for large enums
+- CheckboxField – boolean input
+- EntitySubTree – creates the required data context
 
 <!-- End of Generated Documentation -->

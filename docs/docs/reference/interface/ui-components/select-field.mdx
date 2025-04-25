@@ -10,18 +10,18 @@ title: SelectField
 <!-- Import examples: 8 -->
 
 ## Overview
-SelectField lets you pick a single related entity (hasOne) through a dropdown.  
+SelectField lets you pick a single related entity (hasOne) through a dropdown.
 You must use it inside an Entity or EntityList context.
 
 ## Styling Guidelines
-* All examples use Tailwind classes.  
+* All examples use Tailwind classes.
 * The rendered `<select>` element already carries Contember’s form theme classes (`ct-select`).
 
 ## Core Concepts
-* Works only inside `<EntitySubTree />` or `<EntityListSubTree />`.  
-* Binds the chosen option to a hasOne relation.  
-* Accepts children that define how each option renders.  
-* Can sort, filter, or query options.  
+* Works only inside `<EntitySubTree />` or `<EntityListSubTree />`.
+* Binds the chosen option to a hasOne relation.
+* Accepts children that define how each option renders.
+* Can sort, filter, or query options.
 * Can embed a form for creating a new related entity.
 
 ## Quick Start
@@ -57,8 +57,8 @@ import { CountryForm } from './CountryForm'
 	</SelectField>
 </EntitySubTree>
 ```
-* `initialSorting` orders the dropdown alphabetically.  
-* `createNewForm` opens `CountryForm` in a dialog when the user wants to add a missing country.  
+* `initialSorting` orders the dropdown alphabetically.
+* `createNewForm` opens `CountryForm` in a dialog when the user wants to add a missing country.
 * `placeholder` shows until a value is selected.
 
 ## Props Reference
@@ -66,7 +66,7 @@ import { CountryForm } from './CountryForm'
 | ---- | ---- | -------- | ------- | ----------- |
 | field | string &#124; SugarableHasOneRelation &#124; SugarableHasOneRelation[] | Yes | – | The relation field to bind. |
 | children | React.ReactNode | Yes | – | Option label renderer or extra content. |
-| options | string &#124; { filter?: SugaredFilter; hasOneRelationPath?: SugarableHasOneRelation &#124; SugarableHasOneRelation[]; entityName: string } | No | – | Entity list definition or shorthand filter. |
+| options | `string \| { filter?: SugaredFilter; hasOneRelationPath?: SugarableHasOneRelation \| SugarableHasOneRelation[]; entityName: string }` | No | – | Entity list definition or shorthand filter. |
 | placeholder | React.ReactNode | No | – | Custom placeholder when no value is chosen. |
 | createNewForm | React.ReactNode | No | – | Dialog content for creating a new entity. |
 | queryField | DataViewUnionFilterFields | No | – | Field used for full-text querying. |
@@ -75,7 +75,7 @@ import { CountryForm } from './CountryForm'
 | **Inherited props** | | | | |
 | label | React.ReactNode | Yes | – | Field label. |
 | description | React.ReactNode | Yes | – | Help text shown under the field. |
-| errors | React.ReactNode &#124; ErrorAccessor.Error[] | Yes | – | Validation errors list. |
+| errors | `React.ReactNode \| ErrorAccessor.Error[]` | Yes | – | Validation errors list. |
 
 ## Sub-Components / Building Blocks
 _None_
@@ -108,15 +108,15 @@ This query hides archived authors.
 `ArticleForm` appears in a modal when the user clicks “Create new”.
 
 ## Best Practices & Gotchas
-* Always wrap SelectField in an Entity context; otherwise it throws.  
-* Provide a child `<Field>` for readable option labels.  
-* Prefer `initialSorting` to keep large lists predictable.  
-* Avoid heavy `createNewForm` components; keep the dialog lightweight.  
+* Always wrap SelectField in an Entity context; otherwise it throws.
+* Provide a child `<Field>` for readable option labels.
+* Prefer `initialSorting` to keep large lists predictable.
+* Avoid heavy `createNewForm` components; keep the dialog lightweight.
 * Combine `queryField` with options filtering for fast search.
 
 ## Further Reading
-* MultiSelectField – pick multiple related entities.  
-* SelectEnumField – dropdown for enum values.  
-* CreateEntityDialog – wraps `createNewForm`.  
+* MultiSelectField – pick multiple related entities.
+* SelectEnumField – dropdown for enum values.
+* CreateEntityDialog – wraps `createNewForm`.
 
 <!-- End of Generated Documentation -->

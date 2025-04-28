@@ -12,17 +12,17 @@ title: UploaderFileProgressUI
 # UploaderFileProgressUI
 
 ## Overview
-UploaderFileProgressUI shows a single file’s upload status.  
+UploaderFileProgressUI shows a single file’s upload status.
 You pass the `File` object, optional progress percentage, and any extra UI like buttons or info.
 
 ## Styling Guidelines
-* All examples use TailwindCSS.  
+* All examples use TailwindCSS.
 * The component itself adds no styles—you supply classes via `actions` or `info` nodes.
 
 ## Core Concepts
-* Track upload progress per file rather than globally.  
-* Compose extra actions (abort, dismiss) as children via the `actions` prop.  
-* Keep additional details (bytes, icons) in the `info` prop for total layout control.  
+* Track upload progress per file rather than globally.
+* Compose extra actions (abort, dismiss) as children via the `actions` prop.
+* Keep additional details (bytes, icons) in the `info` prop for total layout control.
 * Progress is a plain number `0–100`; calculation happens in your code.
 
 ## Quick Start
@@ -41,9 +41,6 @@ function Example({ file }: { file: File }) {
 }
 ```
 
-## Detailed Guide
-_None_
-
 ## Props Reference
 | Name    | Type              | Required | Default | Description                                                |
 |---------|-------------------|----------|---------|------------------------------------------------------------|
@@ -52,23 +49,17 @@ _None_
 | actions | React.ReactNode   | No       | undefined | Extra UI (e.g., Abort / Dismiss buttons).                  |
 | info    | React.ReactNode   | No       | undefined | Supplementary info (bytes, icons, messages).               |
 
-## Sub-Components / Building Blocks
-_None_
-
-## Examples
-_None_
-
 ## Best Practices & Gotchas
-* Always supply the raw `File` so the component can render file name and type.  
-* Compute progress (`0–100`) yourself; the component stays presentation-only.  
-* Debounce progress updates for smoother UI.  
-* Keep `actions` compact; crowded layouts break on small screens.  
+* Always supply the raw `File` so the component can render file name and type.
+* Compute progress (`0–100`) yourself; the component stays presentation-only.
+* Debounce progress updates for smoother UI.
+* Keep `actions` compact; crowded layouts break on small screens.
 * Remember to unmount the component after success to free memory.
 
 ## Further Reading
-* UploaderEachFile – iterate over multiple files.  
-* UploaderFileStateSwitch – declarative state-based rendering.  
-* AbortButton / DismissButton helpers.  
+* UploaderEachFile – iterate over multiple files.
+* UploaderFileStateSwitch – declarative state-based rendering.
+* AbortButton / DismissButton helpers.
 * Toast component for transient feedback.
 
 <!-- End of Generated Documentation -->

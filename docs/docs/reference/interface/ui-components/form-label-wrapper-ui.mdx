@@ -12,17 +12,17 @@ title: FormLabelWrapperUI
 # FormLabelWrapperUI
 
 ## Overview
-FormLabelWrapperUI wraps one or more `FormLabelUI` elements to keep them aligned and evenly spaced.  
+FormLabelWrapperUI wraps one or more `FormLabelUI` elements to keep them aligned and evenly spaced.
 Internally it renders a flex container, so labels line up neatly in complex forms.
 
 ## Styling Guidelines
-* All snippets use Tailwind CSS.  
+* All snippets use Tailwind CSS.
 * The component already applies the base `flex` class; you rarely need extra layout utilities.
 
 ## Core Concepts
-* The wrapper is purely presentational—no state or logic.  
-* Children render exactly as passed; they are not modified.  
-* Use it inside `FormContainerUI` for consistent padding and margins.  
+* The wrapper is purely presentational—no state or logic.
+* Children render exactly as passed; they are not modified.
+* Use it inside `FormContainerUI` for consistent padding and margins.
 * Combine it with other Contember form primitives like `FormDescriptionUI`.
 
 ## Quick Start
@@ -35,15 +35,6 @@ export const EmailFieldLabel = () => (
   </FormLabelWrapperUI>
 )
 ```
-
-## Detailed Guide
-_None_
-
-## Props Reference
-_None_
-
-## Sub-Components / Building Blocks
-_None_
 
 ## Examples
 
@@ -92,14 +83,14 @@ The wrapper isolates the label, so relation previews below it do not affect alig
 Here the wrapper keeps the optional `label` element centered even when the locale picker renders dynamic content beneath it.
 
 ## Best Practices & Gotchas
-* Place only label elements inside; avoid form controls.  
-* Add margin or padding on the wrapper, not individual labels, to keep spacing consistent.  
-* Do not nest multiple wrappers unnecessarily—it increases DOM depth without benefit.  
+* Place only label elements inside; avoid form controls.
+* Add margin or padding on the wrapper, not individual labels, to keep spacing consistent.
+* Do not nest multiple wrappers unnecessarily—it increases DOM depth without benefit.
 * Remember that `FormLabelUI` can accept `required` to show an asterisk; the wrapper does not forward props.
 
 ## Further Reading
-* `FormLabelUI` – the actual label component you wrap.  
-* `FormContainerUI` – higher-level container that groups labels, inputs, and descriptions.  
+* `FormLabelUI` – the actual label component you wrap.
+* `FormContainerUI` – higher-level container that groups labels, inputs, and descriptions.
 * Contember form guide – overview of form building blocks.
 
 <!-- End of Generated Documentation -->

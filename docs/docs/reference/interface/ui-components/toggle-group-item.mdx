@@ -12,19 +12,19 @@ title: ToggleGroupItem
 # ToggleGroupItem
 
 ## Overview
-ToggleGroupItem renders a single selectable option inside a ToggleGroup.  
+ToggleGroupItem renders a single selectable option inside a ToggleGroup.
 It forwards events and accessibility props to the underlying element so the parent group can manage selection state.
 
 ## Styling Guidelines
-* All examples use Tailwind CSS.  
-* You can target the `data-[state=on]` attribute to style the selected item.  
+* All examples use Tailwind CSS.
+* You can target the `data-[state=on]` attribute to style the selected item.
 * No additional Contember theme classes are required.
 
 ## Core Concepts
-* A ToggleGroup controls which ToggleGroupItem is “on”.  
-* Each item needs a unique `value` string.  
-* Apply Tailwind utilities directly to the component.  
-* Use the `data-[state=on]` selector for active-state styling.  
+* A ToggleGroup controls which ToggleGroupItem is “on”.
+* Each item needs a unique `value` string.
+* Apply Tailwind utilities directly to the component.
+* Use the `data-[state=on]` selector for active-state styling.
 * The component passes through standard HTML attributes.
 
 ## Quick Start
@@ -49,18 +49,12 @@ export const YearSwitcher = () => (
 )
 ```
 
-## Detailed Guide
-_None_
-
 ## Props Reference
 | Name | Type | Required | Default | Description |
 |------|------|----------|---------|-------------|
 | value | string | Yes | — | Unique identifier passed to the parent ToggleGroup. |
 | className | string | No | — | Additional Tailwind classes. |
 | **Inherited HTML attributes** | — | No | — | All standard HTML attributes supported by the rendered element. |
-
-## Sub-Components / Building Blocks
-_None_
 
 ## Examples
 
@@ -93,14 +87,14 @@ export const RatingToggle = () => (
 The `data-[state=on]:bg-gray-200` class highlights the selected rating while keeping unselected items transparent.
 
 ## Best Practices & Gotchas
-* Always provide a `value`; without it the ToggleGroup cannot track selection.  
-* Use semantic elements (`button`, `div`, etc.) that match your accessibility needs.  
-* Avoid pointer-event blocking styles unless you intentionally want to disable re-selection.  
+* Always provide a `value`; without it the ToggleGroup cannot track selection.
+* Use semantic elements (`button`, `div`, etc.) that match your accessibility needs.
+* Avoid pointer-event blocking styles unless you intentionally want to disable re-selection.
 * Prefer conditional classes (`data-[state=on]`) instead of manual class toggling.
 
 ## Further Reading
-* ToggleGroup – parent component managing selection.  
-* Tailwind `data-` attribute selectors.  
+* ToggleGroup – parent component managing selection.
+* Tailwind `data-` attribute selectors.
 * Accessibility patterns for toggle buttons.
 
 <!-- End of Generated Documentation -->

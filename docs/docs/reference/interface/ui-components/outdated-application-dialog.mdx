@@ -11,16 +11,13 @@ title: OutdatedApplicationDialog
 
 # OutdatedApplicationDialog
 
-## Overview
-_None_
-
 ## Styling Guidelines
-* All snippets use TailwindCSS utility classes.  
+* All snippets use TailwindCSS utility classes.
 * No Contember-specific theme classes are required.
 
 ## Core Concepts
-* Place the dialog inside the `ApplicationEntrypoint` tree so it can subscribe to application lifecycle events.  
-* The component renders nothing until the application becomes outdated, then displays a modal asking users to refresh.  
+* Place the dialog inside the `ApplicationEntrypoint` tree so it can subscribe to application lifecycle events.
+* The component renders nothing until the application becomes outdated, then displays a modal asking users to refresh.
 * Mount exactly one instance per page to avoid multiple dialogs.
 
 ## Quick Start
@@ -34,17 +31,6 @@ export const App = () => (
 	</>
 )
 ```
-
-## Detailed Guide
-_None_
-
-## Props Reference
-| Name | Type | Required | Default | Description |
-|------|------|----------|---------|-------------|
-| _None_ | | | | |
-
-## Sub-Components / Building Blocks
-_None_
 
 ## Examples
 
@@ -73,13 +59,13 @@ The dialog lives alongside other global UI elements (`Toaster`, `DevBar`) so use
 Conditionally mounting prevents the dialog from interrupting local development while still safeguarding production users.
 
 ## Best Practices & Gotchas
-* Mount the component once, preferably close to the root.  
-* Wrap it with the same providers that wrap your pages to avoid context mismatches.  
-* Do not hide the dialog—users need to reload to get the latest code.  
+* Mount the component once, preferably close to the root.
+* Wrap it with the same providers that wrap your pages to avoid context mismatches.
+* Do not hide the dialog—users need to reload to get the latest code.
 * Test in production-like builds; dev servers often auto-refresh and bypass the dialog.
 
 ## Further Reading
-* `ApplicationEntrypoint` – bootstraps Contember admin apps.  
+* `ApplicationEntrypoint` – bootstraps Contember admin apps.
 * `Toaster` – displays global notifications that pair well with update dialogs.
 
 <!-- End of Generated Documentation -->

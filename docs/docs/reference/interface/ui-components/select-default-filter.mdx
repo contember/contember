@@ -12,7 +12,7 @@ title: SelectDefaultFilter
 # SelectDefaultFilter
 
 ## Overview
-`SelectDefaultFilter` filters data inside a `SelectDataView`.  
+`SelectDefaultFilter` filters data inside a `SelectDataView`.
 The component renders a text input only when a matching default filter exists, letting users refine the list quickly.
 
 ## Styling Guidelines
@@ -27,7 +27,7 @@ The component renders a text input only when a matching default filter exists, l
 ## Quick Start
 ```tsx
 import { SelectDataView } from '@contember/react-components'
-import { SelectDefaultFilter } from '@app/lib/select'
+import { SelectDefaultFilter } from '~/lib/select'
 
 export const UserSelect = () => (
 	<SelectDataView className="flex flex-col gap-4">
@@ -36,16 +36,6 @@ export const UserSelect = () => (
 	</SelectDataView>
 )
 ```
-
-## Detailed Guide
-_None_
-
-## Props Reference
-_Name | Type | Required | Default | Description_
-_None_
-
-## Sub-Components / Building Blocks
-_None_
 
 ## Examples
 
@@ -73,7 +63,7 @@ _None_
 	)
 }
 ```
-The filter sits in the `filterToolbar` position of `SelectListInner`.  
+The filter sits in the `filterToolbar` position of `SelectListInner`.
 Users type text to narrow entities before including or excluding them in the relation filter.
 
 ### Example 2 – Same Pattern in CRM/CMS

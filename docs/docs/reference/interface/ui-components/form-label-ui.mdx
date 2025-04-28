@@ -12,11 +12,11 @@ title: FormLabelUI
 # FormLabelUI
 
 ## Overview
-`FormLabelUI` renders accessible labels for form fields.  
+`FormLabelUI` renders accessible labels for form fields.
 It aligns text to the left and optionally appends a red asterisk when the field is required.
 
 ## Styling Guidelines
-* All snippets use Tailwind utility classes.  
+* All snippets use Tailwind utility classes.
 * `FormLabelUI` adds its own Contember theme classes; you can safely combine them with any Tailwind classes shown below.
 
 ## Core Concepts
@@ -37,18 +37,12 @@ export default function Example() {
 }
 ```
 
-## Detailed Guide
-_None_
-
 ## Props Reference
 | Name | Type | Required | Default | Description |
 |------|------|----------|---------|-------------|
 | required | boolean | No | false | When **true**, shows a red asterisk after the label text. |
 | children | React.ReactNode | Yes | — | Content of the label. |
 | …HTMLLabelProps | HTMLAttributes\<HTMLLabelElement\> | No | — | Any prop accepted by a native `<label>` element. |
-
-## Sub-Components / Building Blocks
-_None_
 
 ## Examples
 

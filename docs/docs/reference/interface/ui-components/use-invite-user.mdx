@@ -12,18 +12,18 @@ title: useInviteUser
 # useInviteUser
 
 ## Overview
-`useInviteUser` lets you invite users to your Contember project from React code.  
+`useInviteUser` lets you invite users to your Contember project from React code.
 The hook talks to the tenant API and uses project-level settings to create invitations based on entity accessor fields.
 
 ## Styling Guidelines
-* All code samples use Tailwind CSS for basic styling.  
+* All code samples use Tailwind CSS for basic styling.
 * The hook itself adds no DOM, so no Contember theme classes are required.
 
 ## Core Concepts
-* Invitation happens on demand through an async function returned by the hook.  
-* You map entity fields (`emailField`, `personIdField`) to invitation data.  
-* Memberships define the roles and variables granted to the invited user.  
-* Errors are thrown, so wrap the call in `try / catch`.  
+* Invitation happens on demand through an async function returned by the hook.
+* You map entity fields (`emailField`, `personIdField`) to invitation data.
+* Memberships define the roles and variables granted to the invited user.
+* Errors are thrown, so wrap the call in `try / catch`.
 * The hook depends on a valid `EntityAccessor` created by Contember forms or queries.
 
 ## Quick Start
@@ -47,15 +47,6 @@ const InviteUserButton = ({ entityAccessor }: { entityAccessor: EntityAccessor }
   )
 }
 ```
-
-## Detailed Guide
-_None_
-
-## Props Reference
-_None_
-
-## Sub-Components / Building Blocks
-_None_
 
 ## Examples
 
@@ -88,7 +79,7 @@ const UserForm = () => {
 }
 ```
 
-Explanation  
+Explanation
 The `useFormPersist` callback runs after the entity is persisted. You pass the accessor straight to `inviteUser`, ensuring the invitation uses the latest data.
 
 ### Bulk Invitations in a Table
@@ -117,19 +108,19 @@ const BulkInvite = ({ rows }: { rows: EntityAccessor[] }) => {
 }
 ```
 
-Explanation  
+Explanation
 `Promise.all` runs every invitation in parallel. Wrap in `try / catch` if you need per-invite error handling.
 
 ## Best Practices & Gotchas
-* Always wrap the invitation call in `try / catch` to surface API errors.  
-* Pass a function that returns the accessor—not the accessor itself—to delay evaluation.  
-* Do not hard-code memberships; read them from project config when possible.  
-* Ensure the entity really contains `email` and `personId`; validation happens on the API side, not in the hook.  
+* Always wrap the invitation call in `try / catch` to surface API errors.
+* Pass a function that returns the accessor—not the accessor itself—to delay evaluation.
+* Do not hard-code memberships; read them from project config when possible.
+* Ensure the entity really contains `email` and `personId`; validation happens on the API side, not in the hook.
 * Avoid calling the hook inside loops; call it once and reuse the returned function.
 
 ## Further Reading
-* Contember documentation – Tenant API  
-* `EntityAccessor` guide  
+* Contember documentation – Tenant API
+* `EntityAccessor` guide
 * `@contember/react-form` for building forms that provide accessors
 
 <!-- End of Generated Documentation -->

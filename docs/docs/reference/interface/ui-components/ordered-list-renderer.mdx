@@ -12,16 +12,16 @@ title: OrderedListRenderer
 # OrderedListRenderer
 
 ## Overview
-OrderedListRenderer outputs an ordered list element coming from the Contember Slate editor.  
+OrderedListRenderer outputs an ordered list element coming from the Contember Slate editor.
 Use it in your `renderElement` callback to keep list rendering consistent across your app.
 
 ## Styling Guidelines
-* All code examples use Tailwind CSS.  
+* All code examples use Tailwind CSS.
 * OrderedListRenderer adds no CSS classes of its own. Add any needed theme classes on a wrapping element.
 
 ## Core Concepts
-* You receive the `element` prop from Slate during rendering.  
-* OrderedListRenderer only renders; it does not handle editing logic.  
+* You receive the `element` prop from Slate during rendering.
+* OrderedListRenderer only renders; it does not handle editing logic.
 * Style through external classes instead of modifying the component.
 
 ## Quick Start
@@ -41,16 +41,10 @@ const renderElement = ({ element, children, attributes }: RenderElementProps) =>
 }
 ```
 
-## Detailed Guide
-_None_
-
 ## Props Reference
 | Name    | Type                | Required | Default | Description                                      |
 |---------|---------------------|----------|---------|--------------------------------------------------|
 | element | OrderedListElement  | Yes      | –       | Slate element representing the ordered list node |
-
-## Sub-Components / Building Blocks
-_None_
 
 ## Examples
 
@@ -75,13 +69,13 @@ The `list-[upper-roman]` utility shows Roman numerals instead of decimal numbers
 `space-y-1` keeps the vertical rhythm when list items contain block elements.
 
 ## Best Practices & Gotchas
-* Pass the exact `element` object from Slate; do not clone or mutate it.  
-* Wrap the renderer in an `<ol>` and apply list-related classes there.  
+* Pass the exact `element` object from Slate; do not clone or mutate it.
+* Wrap the renderer in an `<ol>` and apply list-related classes there.
 * Keep formatting concerns outside the renderer to simplify maintenance.
 
 ## Further Reading
-* Contember Slate Editor documentation  
-* `BulletedListRenderer` for unordered lists  
-* Tailwind list-style utilities  
+* Contember Slate Editor documentation
+* `BulletedListRenderer` for unordered lists
+* Tailwind list-style utilities
 
 <!-- End of Generated Documentation -->

@@ -11,17 +11,15 @@ title: LoginFormFields
 
 # `LoginFormFields`
 
-## Overview  
-_None_
 
-## Styling Guidelines  
-* All examples use Tailwind CSS.  
+## Styling Guidelines
+* All examples use Tailwind CSS.
 * No additional Contember theme classes are required.
 
-## Core Concepts  
-* Render `LoginFormFields` inside a `<form>` element.  
-* Wrap the form with `LoginForm` to connect to Contember auth logic.  
-* The component manages its own state; it exposes no props.  
+## Core Concepts
+* Render `LoginFormFields` inside a `<form>` element.
+* Wrap the form with `LoginForm` to connect to Contember auth logic.
+* The component manages its own state; it exposes no props.
 
 ## Quick Start
 ```tsx
@@ -38,16 +36,12 @@ export default function LoginPage() {
 }
 ```
 
-## Detailed Guide  
-_None_
 
 ## Props Reference
 | Name | Type | Required | Default | Description |
 |------|------|----------|---------|-------------|
 | N/A  | —    | No       | —       | This component does not accept any props. |
 
-## Sub-Components / Building Blocks  
-_None_
 
 ## Examples
 
@@ -97,15 +91,15 @@ export default function LoginCard({ idps }: { idps: Record<string, string> }) {
 ```
 The snippet shows a complete login card that combines `LoginFormFields` with identity-provider (OAuth) buttons and a loading overlay.
 
-## Best Practices & Gotchas  
-* Always wrap the fields with `LoginForm`; otherwise, submission will fail.  
-* Place the fields inside a `<form>` to enable browser validation and keyboard submission.  
-* Keep layout simple—let `grid gap-4` handle vertical rhythm.  
-* Do not apply `disabled` manually; `LoginForm` controls field states.  
+## Best Practices & Gotchas
+* Always wrap the fields with `LoginForm`; otherwise, submission will fail.
+* Place the fields inside a `<form>` to enable browser validation and keyboard submission.
+* Keep layout simple—let `grid gap-4` handle vertical rhythm.
+* Do not apply `disabled` manually; `LoginForm` controls field states.
 
-## Further Reading  
-* `LoginForm` – container that handles submission logic.  
-* `IDP`, `IDPInitTrigger`, `IDPState` – identity provider integration.  
+## Further Reading
+* `LoginForm` – container that handles submission logic.
+* `IDP`, `IDPInitTrigger`, `IDPState` – identity provider integration.
 * `PasswordResetFormFields`, `PasswordlessSignInInitFormFields` – related auth forms.
 
 <!-- End of Generated Documentation -->

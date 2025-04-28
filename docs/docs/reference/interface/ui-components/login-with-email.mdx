@@ -12,7 +12,7 @@ title: LoginWithEmail
 # LoginWithEmail
 
 ## Overview
-`LoginWithEmail` authenticates users by email.  
+`LoginWithEmail` authenticates users by email.
 It works with session tokens to establish a signed-in state.
 
 ## Styling Guidelines
@@ -38,8 +38,6 @@ export default function Page() {
 }
 ```
 
-## Detailed Guide
-_None_
 
 ## Props Reference
 
@@ -47,8 +45,6 @@ _None_
 |------|------|----------|---------|-------------|
 | _No props available_ | | | | |
 
-## Sub-Components / Building Blocks
-_None_
 
 ## Examples
 
@@ -60,7 +56,7 @@ export function Login() {
 	return <LoginWithEmail />
 }
 ```
-Render the component wherever you need a simple login form.  
+Render the component wherever you need a simple login form.
 It handles validation and submission internally.
 
 ### 2. Embedded in a DevBar
@@ -79,7 +75,7 @@ export function DevTools() {
 	)
 }
 ```
-Place the login form in a development toolbar.  
+Place the login form in a development toolbar.
 You can switch accounts without leaving the current page.
 
 ### 3. Playground-Style Entrypoint
@@ -131,7 +127,7 @@ export function App() {
 	)
 }
 ```
-This real-world setup conditionally shows the login panel only during development.  
+This real-world setup conditionally shows the login panel only during development.
 Production builds omit the DevBar to keep the UI clean.
 
 ### 4. Production Variant with Providers

@@ -12,21 +12,21 @@ title: StandaloneFormContainer
 # StandaloneFormContainer
 
 ## Overview
-StandaloneFormContainer wraps one or more form fields and renders an optional label.  
+StandaloneFormContainer wraps one or more form fields and renders an optional label.
 The component is **deprecated**; switch to `FormContainer` to receive updates and bug fixes.
 
 ## Styling Guidelines
-* All examples use Tailwind utility classes.  
+* All examples use Tailwind utility classes.
 * No Contember–specific theme classes are required.
 
 ## Core Concepts
-* Container groups a label and its children in a consistent layout.  
-* Accepts any React nodes as children, not only Contember fields.  
+* Container groups a label and its children in a consistent layout.
+* Accepts any React nodes as children, not only Contember fields.
 * Supports an optional `labelPosition` to align the label.
 
 ## Quick Start
 ```tsx
-import { InputField, StandaloneFormContainer } from '@app/lib/form'
+import { InputField, StandaloneFormContainer } from '~/lib/form'
 
 export const NameField = () => (
   <StandaloneFormContainer label="Name">
@@ -35,18 +35,12 @@ export const NameField = () => (
 )
 ```
 
-## Detailed Guide
-_None_
-
 ## Props Reference
 | Name | Type | Required | Default | Description |
 |------|------|----------|---------|-------------|
 | label | React.ReactNode | No | — | Content shown as the container label. |
 | labelPosition | `'left' \| 'right'` | No | `'left'` | Places the label left of or above the children. |
 | children | React.ReactNode | Yes | — | Form field(s) or any React nodes rendered inside the container. |
-
-## Sub-Components / Building Blocks
-_None_
 
 ## Examples
 
@@ -87,12 +81,12 @@ const UpdatedAtToggle = ({ label, field }: { label: string; field: string }) => 
 The label dynamically displays the current date, and the checkbox updates the ISO timestamp.
 
 ## Best Practices & Gotchas
-* Migrate to `FormContainer`; future releases will drop this component.  
-* Keep labels concise to maintain alignment when `labelPosition="left"`.  
+* Migrate to `FormContainer`; future releases will drop this component.
+* Keep labels concise to maintain alignment when `labelPosition="left"`.
 * Wrap complex child layouts in a `div` with `flex flex-col gap-1` to avoid cramped spacing.
 
 ## Further Reading
-* `FormContainer` – modern replacement with identical API.  
+* `FormContainer` – modern replacement with identical API.
 * `Field`, `InputField`, `CheckboxInput` – commonly nested components.
 
 <!-- End of Generated Documentation -->

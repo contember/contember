@@ -12,7 +12,7 @@ title: NavigationGuardDialog
 # NavigationGuardDialog
 
 ## Overview
-`NavigationGuardDialog` prompts users with a confirmation dialog when they attempt to leave a page that has unsaved changes.  
+`NavigationGuardDialog` prompts users with a confirmation dialog when they attempt to leave a page that has unsaved changes.
 It integrates with `useBlockNavigationOnDirtyState` to prevent accidental data loss.
 
 ## Styling Guidelines
@@ -35,12 +35,6 @@ export const Page = () => (
 	</>
 )
 ```
-
-## Detailed Guide
-_None_
-
-## Props Reference
-_None_
 
 ## Sub-Components / Building Blocks
 ### useBlockNavigationOnDirtyState
@@ -76,7 +70,7 @@ export const ArticleEditor = () => {
 	)
 }
 ```
-The textarea sets the page to a “dirty” state.  
+The textarea sets the page to a “dirty” state.
 Attempting to navigate away shows `NavigationGuardDialog`, letting users save, discard, or cancel.
 
 ## Best Practices & Gotchas

@@ -12,16 +12,16 @@ title: SidebarMenuAction
 # SidebarMenuAction
 
 ## Overview
-SidebarMenuAction renders auxiliary controls beside a menu item.  
+SidebarMenuAction renders auxiliary controls beside a menu item.
 Use it to place buttons, badges, or any React node aligned with SidebarMenuButton or SidebarMenuSubButton.
 
 ## Styling Guidelines
-* All examples use Tailwind CSS.  
+* All examples use Tailwind CSS.
 * No mandatory Contember theme classes are required; the component inherits layout from its parent menu element.
 
 ## Core Concepts
-* SidebarMenuAction slots any React node on the right side of a menu row.  
-* It must be a direct child of SidebarMenuItem or SidebarMenuSubItem.  
+* SidebarMenuAction slots any React node on the right side of a menu row.
+* It must be a direct child of SidebarMenuItem or SidebarMenuSubItem.
 * Use it for contextual actions like “Add”, “Settings”, or status indicators.
 
 ## Quick Start
@@ -41,15 +41,6 @@ export const SimpleMenu = () => (
 )
 ```
 
-## Detailed Guide
-_None_
-
-## Props Reference
-_None_
-
-## Sub-Components / Building Blocks
-_None_
-
 ## Examples
 
 ### Add-New Button Next to Menu Item
@@ -68,7 +59,7 @@ _None_
 	</SidebarMenuAction>
 </SidebarMenuItem>
 ```
-The `SidebarMenuAction` holds a green “New” button.  
+The `SidebarMenuAction` holds a green “New” button.
 The button stays visually aligned because SidebarMenuAction follows the menu’s flex layout.
 
 ### Permission-Aware Actions
@@ -85,19 +76,19 @@ The button stays visually aligned because SidebarMenuAction follows the menu’s
 	)}
 </SidebarMenuSubItem>
 ```
-Display an invite icon only when `canInvite` is true.  
+Display an invite icon only when `canInvite` is true.
 SidebarMenuAction keeps action icons consistently placed in nested menu levels.
 
 ## Best Practices & Gotchas
-* Wrap only interaction elements inside SidebarMenuAction.  
-* Keep content small; large nodes break row alignment.  
-* Do not place stateful logic in SidebarMenuAction. Pass pre-computed props instead.  
+* Wrap only interaction elements inside SidebarMenuAction.
+* Keep content small; large nodes break row alignment.
+* Do not place stateful logic in SidebarMenuAction. Pass pre-computed props instead.
 * Always pair SidebarMenuAction with a menu button component. Alone, it renders nothing useful.
 
 ## Further Reading
-* SidebarMenu  
-* SidebarMenuItem  
-* SidebarMenuSubItem  
-* SidebarMenuButton  
+* SidebarMenu
+* SidebarMenuItem
+* SidebarMenuSubItem
+* SidebarMenuButton
 
 <!-- End of Generated Documentation -->

@@ -12,17 +12,17 @@ title: usePersistWithFeedback
 # usePersistWithFeedback
 
 ## Overview
-`usePersistWithFeedback` persists Contember data and shows toast notifications.  
+`usePersistWithFeedback` persists Contember data and shows toast notifications.
 The hook returns a callback that saves pending mutations, then shows a success or error message.
 
 ## Styling Guidelines
-* All examples use Tailwind.  
+* All examples use Tailwind.
 * The hook itself needs no Contember-specific theme classes.
 
 ## Core Concepts
-* Trigger persistence from any UI element.  
-* Await the mutation queue managed by Contember.  
-* Show toast feedback without extra code.  
+* Trigger persistence from any UI element.
+* Await the mutation queue managed by Contember.
+* Show toast feedback without extra code.
 * Keep components stateless by delegating save logic to the hook.
 
 ## Quick Start
@@ -42,15 +42,6 @@ export const SaveButton = () => {
   )
 }
 ```
-
-## Detailed Guide
-_None_
-
-## Props Reference
-_None_
-
-## Sub-Components / Building Blocks
-_None_
 
 ## Examples
 
@@ -93,7 +84,7 @@ export const FormFooter = () => {
   )
 }
 ```
-The footer warns users that data lives only in the browser.  
+The footer warns users that data lives only in the browser.
 `persistWithFeedback` flushes changes and shows a toast.
 
 ### Toolbar shortcut
@@ -115,14 +106,14 @@ export const SaveHotkey = () => {
 You wire the hook to a keyboard shortcut, improving editor ergonomics.
 
 ## Best Practices & Gotchas
-* Call the returned function inside UI events, not during render.  
-* Await the promise if you need post-save logic.  
-* Combine with optimistic UI only when network latency is low.  
+* Call the returned function inside UI events, not during render.
+* Await the promise if you need post-save logic.
+* Combine with optimistic UI only when network latency is low.
 * Do not wrap the hook in conditionals; follow React Rules of Hooks.
 
 ## Further Reading
-* `usePersist` – low-level variant without toasts.  
-* Contember Toast API.  
+* `usePersist` – low-level variant without toasts.
+* Contember Toast API.
 * Data mutations and transaction queue.
 
 <!-- End of Generated Documentation -->

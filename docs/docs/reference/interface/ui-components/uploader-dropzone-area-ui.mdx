@@ -10,16 +10,16 @@ title: UploaderDropzoneAreaUI
 <!-- Import examples: 1 -->
 
 ## Overview
-UploaderDropzoneAreaUI renders the visible “drop files here” zone inside a Contember uploader.  
+UploaderDropzoneAreaUI renders the visible “drop files here” zone inside a Contember uploader.
 It only controls layout and styling; upload logic lives in surrounding uploader components.
 
 ## Styling Guidelines
-* All examples use Tailwind CSS.  
+* All examples use Tailwind CSS.
 * The component adds no Contember-specific theme classes—style it freely with Tailwind utilities.
 
 ## Core Concepts
-* The component is **presentational**—place your own icons, text, or buttons inside.  
-* It forwards click and drop events to the surrounding uploader context.  
+* The component is **presentational**—place your own icons, text, or buttons inside.
+* It forwards click and drop events to the surrounding uploader context.
 * Combine it with `UploaderDropzoneWrapperUI` and `UploaderInactiveDropzoneUI` for full UX.
 
 ## Quick Start
@@ -37,15 +37,6 @@ export default function ImageUploaderPlaceholder() {
 	)
 }
 ```
-
-## Detailed Guide
-_None_
-
-## Props Reference
-_None_
-
-## Sub-Components / Building Blocks
-_None_
 
 ## Examples
 
@@ -83,7 +74,7 @@ _None_
 	</EntitySubTree>
 </Binding>
 ```
-The placeholder appears only when no image is selected.  
+The placeholder appears only when no image is selected.
 Nested inputs like `SelectImage` stay interactive because their click events are stopped.
 
 ### Playground – Image Repeater Field
@@ -122,7 +113,7 @@ Nested inputs like `SelectImage` stay interactive because their click events are
 	</EntitySubTree>
 </Binding>
 ```
-Each repeater item uses its own dropzone, letting users add many images quickly.  
+Each repeater item uses its own dropzone, letting users add many images quickly.
 Sorting and other list controls remain functional.
 
 ### Production – Conditional Inactive State
@@ -141,14 +132,14 @@ Sorting and other list controls remain functional.
 Swap the active area for `UploaderInactiveDropzoneUI` during file uploads to prevent additional drops.
 
 ## Best Practices & Gotchas
-* Always render at least one child so the dropzone has a visible height.  
-* Stop event propagation on nested file inputs to keep them clickable.  
-* Disable the zone while uploads are in progress to avoid duplicate files.  
+* Always render at least one child so the dropzone has a visible height.
+* Stop event propagation on nested file inputs to keep them clickable.
+* Disable the zone while uploads are in progress to avoid duplicate files.
 * Wrap the component in `UploaderDropzoneWrapperUI` for keyboard focus outlines.
 
 ## Further Reading
-* `UploaderDropzoneWrapperUI` – outer container with focus ring.  
-* `UploaderInactiveDropzoneUI` – read-only overlay during uploads.  
+* `UploaderDropzoneWrapperUI` – outer container with focus ring.
+* `UploaderInactiveDropzoneUI` – read-only overlay during uploads.
 * Contember Uploader guide in the official docs.
 
 <!-- End of Generated Documentation -->

@@ -12,11 +12,11 @@ title: UpdateProjectMemberFormFields
 # UpdateProjectMemberFormFields
 
 ## Overview
-`UpdateProjectMemberFormFields` lets you edit a project member’s roles and memberships.  
+`UpdateProjectMemberFormFields` lets you edit a project member’s roles and memberships.
 The component integrates with `useUpdateProjectMemberForm`, which introspects roles when not explicitly provided.
 
 ## Styling Guidelines
-* All examples use Tailwind CSS utility classes.  
+* All examples use Tailwind CSS utility classes.
 * No additional Contember theme classes are required.
 
 ## Core Concepts
@@ -64,8 +64,6 @@ export const MemberEditor = () => (
 | projectSlug | string | Yes | — | The slug of the project to which the member belongs. |
 | roles | RolesConfig | No | Introspected | Predefined roles configuration. If not provided, roles are introspected based on the `projectSlug`. |
 
-_Inherited props: None_
-
 ## Sub-Components / Building Blocks
 ### useUpdateProjectMemberForm
 Hook that handles form state, validation, and submission for `UpdateProjectMemberFormFields`.
@@ -104,15 +102,15 @@ import { Dialog } from '@headlessui/react'
 The form fields behave the same, now inside a modal.
 
 ## Best Practices & Gotchas
-* Always wrap the component in a `<form>` element to enable browser validation.  
-* Use `useUpdateProjectMemberForm` to get submit handlers and error states.  
-* Provide a `roles` prop for predictable ordering or labeling.  
-* The component does not fetch member data; populate initial values separately.  
+* Always wrap the component in a `<form>` element to enable browser validation.
+* Use `useUpdateProjectMemberForm` to get submit handlers and error states.
+* Provide a `roles` prop for predictable ordering or labeling.
+* The component does not fetch member data; populate initial values separately.
 * Avoid hard-coding role slugs; use the introspection feature when possible.
 
 ## Further Reading
-* `useUpdateProjectMemberForm` hook documentation  
-* Contember Tenant API concepts  
-* Role management patterns in multi-tenant apps  
+* `useUpdateProjectMemberForm` hook documentation
+* Contember Tenant API concepts
+* Role management patterns in multi-tenant apps
 
 <!-- End of Generated Documentation -->

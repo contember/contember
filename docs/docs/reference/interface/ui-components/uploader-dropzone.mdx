@@ -10,19 +10,19 @@ title: UploaderDropzone
 <!-- Import examples: 2 -->
 
 ## Overview
-UploaderDropzone renders a drag-and-drop area for file uploads.  
+UploaderDropzone renders a drag-and-drop area for file uploads.
 Use it inside an uploader context so it can react to upload state.
 
 It can show custom placeholder content and auto-hide while files upload.
 
 ## Styling Guidelines
-* All examples use Tailwind CSS utility classes.  
+* All examples use Tailwind CSS utility classes.
 * No Contember-specific theme classes are required.
 
 ## Core Concepts
-* The dropzone only displays when its uploader context is active.  
-* `inactiveOnUpload` disables the zone during active uploads.  
-* `dropzonePlaceholder` replaces default placeholder content.  
+* The dropzone only displays when its uploader context is active.
+* `inactiveOnUpload` disables the zone during active uploads.
+* `dropzonePlaceholder` replaces default placeholder content.
 * You decide size through the parent container’s styles.
 
 ## Quick Start
@@ -36,18 +36,12 @@ export const AvatarUploader = () => (
 )
 ```
 
-## Detailed Guide
-_None_
-
 ## Props Reference
 Name | Type | Required | Default | Description
 ---- | ---- | -------- | ------- | -----------
 dropzonePlaceholder | React.ReactNode | No | `undefined` | Custom content rendered inside the dropzone.
 inactiveOnUpload | boolean | No | `false` | When **true**, the dropzone hides or disables during an active upload.
 …inherited props | … | … | … | All standard HTML `div` attributes are forwarded to the root element.
-
-## Sub-Components / Building Blocks
-_None_
 
 ## Examples
 
@@ -115,14 +109,14 @@ The dropzone appears only when `MultiUploader` reports no files. The parent cont
 Use this pattern when you need only a progress bar and a dropzone.
 
 ## Best Practices & Gotchas
-* Place the dropzone inside `MultiUploader` for automatic state handling.  
-* Size the parent container; the dropzone stretches to 100 % width and height.  
-* Use `inactiveOnUpload` to prevent double uploads.  
+* Place the dropzone inside `MultiUploader` for automatic state handling.
+* Size the parent container; the dropzone stretches to 100 % width and height.
+* Use `inactiveOnUpload` to prevent double uploads.
 * Replace placeholder text with visuals that match your design system.
 
 ## Further Reading
-* `MultiUploader` – Orchestrates uploads and exposes state.  
-* `UploaderHasFile` – Shows or hides children based on file presence.  
+* `MultiUploader` – Orchestrates uploads and exposes state.
+* `UploaderHasFile` – Shows or hides children based on file presence.
 * `UploaderProgress` – Displays real-time upload progress.
 
 <!-- End of Generated Documentation -->

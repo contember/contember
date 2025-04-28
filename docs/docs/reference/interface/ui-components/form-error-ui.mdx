@@ -10,16 +10,16 @@ title: FormErrorUI
 <!-- Import examples: 2 -->
 
 ## Overview
-FormErrorUI displays form validation errors in a unified destructive style.  
+FormErrorUI displays form validation errors in a unified destructive style.
 It renders its children as red, bold, small text, making issues easy to spot.
 
 ## Styling Guidelines
-* All examples use Tailwind CSS.  
+* All examples use Tailwind CSS.
 * The component already applies `text-[0.8rem] font-medium text-destructive`. No additional Contember theme classes are required.
 
 ## Core Concepts
-* Error messages must stand out yet stay compact.  
-* Consistent styling improves accessibility and user trust.  
+* Error messages must stand out yet stay compact.
+* Consistent styling improves accessibility and user trust.
 * You usually combine FormErrorUI with higher-level `FormError` logic.
 
 ## Quick Start
@@ -51,12 +51,6 @@ export default function EmailField() {
 
 `FormError` injects the current error text as children. FormErrorUI then handles the visual presentation.
 
-## Props Reference
-_None_
-
-## Sub-Components / Building Blocks
-_None_
-
 ## Examples
 ### With custom formatter
 ```tsx
@@ -76,14 +70,14 @@ export default function PasswordField() {
 The `formatter` converts error codes to readable messages. FormErrorUI keeps styling consistent.
 
 ## Best Practices & Gotchas
-* Show only one error message per field to avoid clutter.  
-* Keep the message short; the component uses small font size.  
-* Do not add extra margins; let the parent control layout spacing.  
+* Show only one error message per field to avoid clutter.
+* Keep the message short; the component uses small font size.
+* Do not add extra margins; let the parent control layout spacing.
 * Combine with ARIA attributes on the related form field for accessibility.
 
 ## Further Reading
-* `FormError` – conditional rendering logic.  
-* `useErrorFormatter` – translates validation codes.  
+* `FormError` – conditional rendering logic.
+* `useErrorFormatter` – translates validation codes.
 * Contember React Form documentation.
 
 <!-- End of Generated Documentation -->

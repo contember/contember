@@ -9,18 +9,15 @@ title: LoaderIcon
 <!-- External examples: 0 -->
 <!-- Import examples: 3 -->
 
-## Overview  
-_None_
-
-## Styling Guidelines  
+## Styling Guidelines
 All examples use Tailwind CSS utility classes. The component does not rely on any Contember-specific theme classes.
 
-## Core Concepts  
-- Lucide icons are React components that render SVGs.  
-- You can scale icons by passing the `size` prop or via Tailwind classes.  
+## Core Concepts
+- Lucide icons are React components that render SVGs.
+- You can scale icons by passing the `size` prop or via Tailwind classes.
 - Icons behave like inline SVGs, so you can style them with `stroke`, `fill`, and CSS utilities.
 
-## Quick Start  
+## Quick Start
 ```tsx
 import { LoaderIcon } from 'lucide-react'
 
@@ -29,22 +26,11 @@ export const Example = () => (
 )
 ```
 
-## Detailed Guide  
-_None_
 
-## Props Reference  
+## Examples
 
-| Name | Type | Required | Default | Description |
-|------|------|----------|---------|-------------|
-_None_
-
-## Sub-Components / Building Blocks  
-_None_
-
-## Examples  
-
-### Inline Button Spinner  
-Show a spinner while an async action runs.  
+### Inline Button Spinner
+Show a spinner while an async action runs.
 ```tsx
 import { useState } from 'react'
 import { LoaderIcon } from 'lucide-react'
@@ -74,7 +60,7 @@ const fakeRequest = () => new Promise(res => setTimeout(res, 1500))
 ```
 The icon appears only while the promise resolves, giving clear feedback to the user.
 
-### Centered Page Loader  
+### Centered Page Loader
 ```tsx
 import { LoaderIcon } from 'lucide-react'
 
@@ -86,15 +72,15 @@ export const PageLoader = () => (
 ```
 Use this pattern when fetching data for an entire page.
 
-## Best Practices & Gotchas  
-- Combine `animate-spin` with Tailwind color utilities for instant theming.  
-- Keep spinner sizes consistent across the app to avoid visual noise.  
-- Hide spinners quickly once loading completes; lingering spinners confuse users.  
+## Best Practices & Gotchas
+- Combine `animate-spin` with Tailwind color utilities for instant theming.
+- Keep spinner sizes consistent across the app to avoid visual noise.
+- Hide spinners quickly once loading completes; lingering spinners confuse users.
 - Use descriptive labels or aria attributes for accessibility when the spinner is the only visible element.
 
-## Further Reading  
-- Lucide React documentation  
-- Contember UI guidelines for asynchronous states  
-- Tailwind CSS animation utilities  
+## Further Reading
+- Lucide React documentation
+- Contember UI guidelines for asynchronous states
+- Tailwind CSS animation utilities
 
 <!-- End of Generated Documentation -->

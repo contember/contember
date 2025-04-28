@@ -10,17 +10,17 @@ title: SelectPopoverContent
 <!-- Import examples: 5 -->
 
 ## Overview
-`SelectPopoverContent` wraps the dropdown area of Contember select inputs.  
+`SelectPopoverContent` wraps the dropdown area of Contember select inputs.
 It renders the list of options inside a Radix Popover and handles scrolling and positioning.
 
 ## Styling Guidelines
-* All snippets use Tailwind classes.  
+* All snippets use Tailwind classes.
 * The component itself adds Contember UI theme classes; you usually style only its children (`SelectListItemUI`, etc.).
 
 ## Core Concepts
-* Radix Popover drives accessibility and positioning.  
-* `SelectPopoverContent` displays the options list.  
-* It is always paired with `PopoverTrigger` and `SelectInputUI`.  
+* Radix Popover drives accessibility and positioning.
+* `SelectPopoverContent` displays the options list.
+* It is always paired with `PopoverTrigger` and `SelectInputUI`.
 * You control selection in the parent (`Select`, `MultiSelect`, or custom logic).
 
 ## Quick Start
@@ -59,17 +59,11 @@ export const SimpleSelect = () => (
 )
 ```
 
-## Detailed Guide
-_None_
-
 ## Props Reference
 | Name | Type | Required | Default | Description |
 |------|------|----------|---------|-------------|
 | children | React.ReactNode | No | — | Elements shown in the dropdown. |
 | …rest (inherited) | Radix `Popover.ContentProps` | No | — | Any prop supported by Radix Popover.Content. |
-
-## Sub-Components / Building Blocks
-_None_
 
 ## Examples
 
@@ -99,7 +93,7 @@ You update the form state and close the popover from inside a list item.
 	</SelectEntityDataView>
 </SelectPopoverContent>
 ```
-`SelectEntityDataView` handles server paging, filtering, and sorting.  
+`SelectEntityDataView` handles server paging, filtering, and sorting.
 `SelectPopoverContent` only provides the scrollable container.
 
 ### Searchable select with loading indicator
@@ -143,7 +137,7 @@ You update the form state and close the popover from inside a list item.
 	</ScrollArea>
 </SelectPopoverContent>
 ```
-The search input sits above a scrollable list.  
+The search input sits above a scrollable list.
 Loading, empty, and error states reuse `SelectListItemUI` for visual consistency.
 
 ### Data-grid filter select
@@ -169,16 +163,16 @@ Loading, empty, and error states reuse `SelectListItemUI` for visual consistency
 You wrap `DataViewQueryFilter` to offer include/exclude toggles inside the popover.
 
 ## Best Practices & Gotchas
-* Always place `SelectPopoverContent` inside the same `Popover` that holds the trigger.  
-* Keep the content width similar to the trigger for visual consistency.  
-* Limit height with `max-h-* overflow-auto` to maintain usability.  
-* Close the popover after a successful selection to prevent duplicate clicks.  
+* Always place `SelectPopoverContent` inside the same `Popover` that holds the trigger.
+* Keep the content width similar to the trigger for visual consistency.
+* Limit height with `max-h-* overflow-auto` to maintain usability.
+* Close the popover after a successful selection to prevent duplicate clicks.
 * Forward unknown props to benefit from Radix features like `side` or `align`.
 
 ## Further Reading
-* `SelectInputUI` – visual trigger of the select.  
-* `SelectListItemUI` – individual option item.  
-* Radix Popover documentation for advanced positioning.  
+* `SelectInputUI` – visual trigger of the select.
+* `SelectListItemUI` – individual option item.
+* Radix Popover documentation for advanced positioning.
 * `DefaultSelectDataView` for server-driven option lists.
 
 <!-- End of Generated Documentation -->

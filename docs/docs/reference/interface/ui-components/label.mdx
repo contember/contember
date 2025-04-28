@@ -9,16 +9,13 @@ title: Label
 <!-- External examples: 10 -->
 <!-- Import examples: 5 -->
 
-## Overview
-_None_
-
 ## Styling Guidelines
-* All examples use Tailwind CSS utility classes.  
+* All examples use Tailwind CSS utility classes.
 * The real-world snippets rely on Contember theme tokens such as `fill-foreground` and `fill-muted-foreground`.
 
 ## Core Concepts
-* `Label` renders SVG or text inside Recharts primitives.  
-* You can pass either plain children or a `content` render function to gain full control.  
+* `Label` renders SVG or text inside Recharts primitives.
+* You can pass either plain children or a `content` render function to gain full control.
 * Tailwind classes let you style fills, typography, and spacing without extra CSS.
 
 ## Quick Start
@@ -29,15 +26,6 @@ export const Example = () => (
 	<Label className="fill-foreground text-sm">Total</Label>
 )
 ```
-
-## Detailed Guide
-_None_
-
-## Props Reference
-_None_
-
-## Sub-Components / Building Blocks
-_None_
 
 ## Examples
 
@@ -69,13 +57,13 @@ This pattern places dynamic numbers inside a donut chart. The first `tspan` show
 Use `Label` outside charts when you only need styled text pulled from localization files.
 
 ## Best Practices & Gotchas
-* Always check `viewBox` keys (`cx`, `cy`) before accessing them.  
-* Keep `tspan` offsets relative, not absolute, for responsive layouts.  
-* Prefer Tailwind color tokens (`fill-foreground`) so themes remain swappable.  
-* Wrap long strings in `tspan` elements to avoid SVG text clipping.  
+* Always check `viewBox` keys (`cx`, `cy`) before accessing them.
+* Keep `tspan` offsets relative, not absolute, for responsive layouts.
+* Prefer Tailwind color tokens (`fill-foreground`) so themes remain swappable.
+* Wrap long strings in `tspan` elements to avoid SVG text clipping.
 
 ## Further Reading
-* Recharts `Pie` and `PieChart` documentation  
-* Contember design system guidelines for SVG fills and text tokens  
+* Recharts `Pie` and `PieChart` documentation
+* Contember design system guidelines for SVG fills and text tokens
 
 <!-- End of Generated Documentation -->

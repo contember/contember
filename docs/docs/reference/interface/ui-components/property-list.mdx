@@ -12,17 +12,17 @@ title: PropertyList
 # `PropertyList`
 
 ## Overview
-`PropertyList` renders a vertical list of label–value pairs.  
+`PropertyList` renders a vertical list of label–value pairs.
 Use it inside detail screens or read-only views to present entity attributes in a clean, aligned layout.
 
 ## Styling Guidelines
-* All examples use Tailwind CSS.  
+* All examples use Tailwind CSS.
 * No special Contember theme classes are required; extend with your own Tailwind utilities if desired.
 
 ## Core Concepts
-* Pair `PropertyList` with one or more `PropertyItem` elements.  
-* Each `PropertyItem` receives a `label` prop and arbitrary children as the value.  
-* Nest other Contember components (e.g. `FormattedField`, `HasManyList`) inside a `PropertyItem` to compose complex views.  
+* Pair `PropertyList` with one or more `PropertyItem` elements.
+* Each `PropertyItem` receives a `label` prop and arbitrary children as the value.
+* Nest other Contember components (e.g. `FormattedField`, `HasManyList`) inside a `PropertyItem` to compose complex views.
 * Place the list inside any container (`SectionBody`, `Card`, etc.)—`PropertyList` only handles internal spacing.
 
 ## Quick Start
@@ -39,12 +39,6 @@ export const UserPreview = () => (
 	</div>
 )
 ```
-
-## Detailed Guide
-_None_
-
-## Props Reference
-_None_
 
 ## Sub-Components / Building Blocks
 ### PropertyItem
@@ -84,13 +78,13 @@ Renders an individual row inside `PropertyList`.
 You can nest relation helpers such as `HasManyList` or `HasOne` to show linked entities.
 
 ## Best Practices & Gotchas
-* Keep labels short to avoid wrapping; use Tailwind `w-40` on the label slot if needed.  
-* Wrap long values (e.g. notes) in a `<p className="whitespace-pre-line">` to preserve formatting.  
+* Keep labels short to avoid wrapping; use Tailwind `w-40` on the label slot if needed.
+* Wrap long values (e.g. notes) in a `<p className="whitespace-pre-line">` to preserve formatting.
 * Do not place interactive elements (buttons, links) directly in labels—put them inside the value cell.
 
 ## Further Reading
-* `PropertyItem` – the companion component for individual rows.  
-* `HasManyList`, `HasOne` – relation helpers commonly nested inside `PropertyItem`.  
+* `PropertyItem` – the companion component for individual rows.
+* `HasManyList`, `HasOne` – relation helpers commonly nested inside `PropertyItem`.
 * `FormattedField` – value formatter used in read-only UIs.
 
 <!-- End of Generated Documentation -->

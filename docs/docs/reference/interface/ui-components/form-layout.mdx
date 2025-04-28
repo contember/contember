@@ -12,18 +12,18 @@ title: FormLayout
 # FormLayout
 
 ## Overview
-FormLayout provides a consistent vertical layout for form elements.  
+FormLayout provides a consistent vertical layout for form elements.
 It wraps children in a flex column with uniform gap and side margins.
 
 ## Styling Guidelines
-* All examples use Tailwind CSS.  
-* The component itself applies `flex flex-col gap-2 mx-4`.  
+* All examples use Tailwind CSS.
+* The component itself applies `flex flex-col gap-2 mx-4`.
 * No additional Contember theme classes are required.
 
 ## Core Concepts
-* Vertical flex layout keeps fields aligned.  
-* `gap-2` maintains equal vertical spacing.  
-* `mx-4` adds horizontal breathing space.  
+* Vertical flex layout keeps fields aligned.
+* `gap-2` maintains equal vertical spacing.
+* `mx-4` adds horizontal breathing space.
 * Nest additional Tailwind classes through `className` when needed.
 
 ## Quick Start
@@ -60,13 +60,6 @@ Mix grid utilities for complex layouts.
   <EmailInputField field="email" />
 </FormLayout>
 ```
-
-## Props Reference
-_None_
-
-## Sub-Components / Building Blocks
-_None_
-
 ## Examples
 ### Embedded in a Modal
 ```tsx
@@ -90,15 +83,15 @@ Use FormLayout inside a modal to keep fields aligned and readable.
 Combine with relational helpers to group related entities under one layout.
 
 ## Best Practices & Gotchas
-* Place all immediate form fields directly under FormLayout.  
-* Add extra wrappers only when you need grids or flex tweaks.  
-* Avoid margin utilities on children; FormLayout already spaces them.  
+* Place all immediate form fields directly under FormLayout.
+* Add extra wrappers only when you need grids or flex tweaks.
+* Avoid margin utilities on children; FormLayout already spaces them.
 * Supply `className` for width or responsive changes instead of wrapping divs.
 
 ## Further Reading
-* InputField  
-* SelectEnumField  
-* Contember Entity SubTree  
-* ModalEntityEdit  
+* InputField
+* SelectEnumField
+* Contember Entity SubTree
+* ModalEntityEdit
 
 <!-- End of Generated Documentation -->

@@ -11,16 +11,13 @@ title: SelectGroup
 
 # SelectGroup
 
-## Overview
-_None_
-
 ## Styling Guidelines
-* All examples use Tailwind CSS utility classes.  
+* All examples use Tailwind CSS utility classes.
 * No special Contember theme classes are required for `SelectGroup`.
 
 ## Core Concepts
-* `SelectGroup` groups related `SelectItem` elements inside a `Select` dropdown.  
-* It does not render visible UI by itself; it wraps children in a semantic `<div>`.  
+* `SelectGroup` groups related `SelectItem` elements inside a `Select` dropdown.
+* It does not render visible UI by itself; it wraps children in a semantic `<div>`.
 * Use groups to improve keyboard navigation and screen-reader structure.
 
 ## Quick Start
@@ -50,12 +47,6 @@ export const CountryPicker = () => (
   </Select>
 )
 ```
-
-## Detailed Guide
-_None_
-
-## Props Reference
-_None_
 
 ## Sub-Components / Building Blocks
 ### SelectItem
@@ -102,15 +93,15 @@ This example shows how you can render emojis, phone codes, and muted helper text
 The action appears as the last item. Handle the `"add-custom"` value in your `onValueChange` callback.
 
 ## Best Practices & Gotchas
-* Keep each group focused on one category.  
-* Avoid mixing action items and data items in the same group.  
-* Wrap heavy item content (icons, flags) in `flex` containers for alignment.  
+* Keep each group focused on one category.
+* Avoid mixing action items and data items in the same group.
+* Wrap heavy item content (icons, flags) in `flex` containers for alignment.
 * Do not apply margins to `SelectGroup`; style `SelectContent` instead.
 
 ## Further Reading
-* `Select` – container component.  
-* `SelectContent` – popup panel.  
-* `SelectItem` – individual option.  
+* `Select` – container component.
+* `SelectContent` – popup panel.
+* `SelectItem` – individual option.
 * Accessibility guidelines for custom selects.
 
 <!-- End of Generated Documentation -->

@@ -10,7 +10,7 @@ title: IdentityLoader
 <!-- Import examples: 5 -->
 
 ## Overview
-`IdentityLoader` manages user-identity loading inside your React app.  
+`IdentityLoader` manages user-identity loading inside your React app.
 It shows nothing until the identity is fetched, then renders children or a fallback UI on failure.
 
 The component centralises authentication state so you avoid manual loading checks in every view.
@@ -61,8 +61,6 @@ export default function App() {
 
 _Inherited props: none_
 
-## Sub-Components / Building Blocks
-_None_
 
 ## Examples
 ### Minimal wrapper
@@ -197,7 +195,7 @@ The platform hosts both portal and main dashboards. `IdentityLoader` wraps `AppI
 ```
 Here `IdentityLoader` covers a smaller slot set. The pattern is identical—load identity first, then mount the UI tree.
 
-### 108 Agency CRM – portal aware sidebar
+### Portal aware sidebar
 ```tsx
 ({ children }: PropsWithChildren) => {
 	const env = useEnvironment()
@@ -245,7 +243,7 @@ Here `IdentityLoader` covers a smaller slot set. The pattern is identical—load
 ```
 This CRM shares logic with the learning platform. It shows how teams reuse the `IdentityLoader` pattern across products.
 
-### 108 Agency CMS – concise wrapper
+### Concise wrapper
 ```tsx
 ({ children }: PropsWithChildren<{}>) => (
 	<IdentityLoader>

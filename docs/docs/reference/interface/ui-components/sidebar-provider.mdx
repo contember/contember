@@ -12,16 +12,16 @@ title: SidebarProvider
 # SidebarProvider
 
 ## Overview
-SidebarProvider wraps your layout and shares sidebar state through React context.  
+SidebarProvider wraps your layout and shares sidebar state through React context.
 Place it high in the tree to let child components open, close, or read the sidebar status.
 
 ## Styling Guidelines
-* All snippets use Tailwind utility classes.  
+* All snippets use Tailwind utility classes.
 * The provider itself adds no DOM, so you only style the visible sidebar components.
 
 ## Core Concepts
-* Context Provider – exposes sidebar visibility to descendants.  
-* Composition – you decide which Sidebar, triggers, or slots to render.  
+* Context Provider – exposes sidebar visibility to descendants.
+* Composition – you decide which Sidebar, triggers, or slots to render.
 * Mobile support – combine with SidebarMobileTrigger for responsive layouts.
 
 ## Quick Start
@@ -35,15 +35,6 @@ export const AppLayout = () => (
 	</SidebarProvider>
 )
 ```
-
-## Detailed Guide
-_None_
-
-## Props Reference
-_None_
-
-## Sub-Components / Building Blocks
-_None_
 
 ## Examples
 
@@ -76,14 +67,14 @@ export const ResponsiveLayout = ({ children }: { children: React.ReactNode }) =>
 The provider holds the context; the trigger toggles `open`. On large screens, the sidebar stays visible. On small screens, users touch the burger icon.
 
 ## Best Practices & Gotchas
-* Wrap the whole page, not just the sidebar, so any descendant can toggle visibility.  
-* Keep SidebarProvider singular—nesting providers may cause inconsistent state.  
+* Wrap the whole page, not just the sidebar, so any descendant can toggle visibility.
+* Keep SidebarProvider singular—nesting providers may cause inconsistent state.
 * Manage mobile and desktop visibility in one place to avoid duplication.
 
 ## Further Reading
-* SidebarMobileTrigger  
-* RightSidebar  
-* SlotTargets and Layout components in Contember UI  
+* SidebarMobileTrigger
+* RightSidebar
+* SlotTargets and Layout components in Contember UI
 * React Context API
 
 <!-- End of Generated Documentation -->

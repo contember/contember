@@ -10,17 +10,17 @@ title: SelectListInner
 <!-- Import examples: 2 -->
 
 ## Overview
-SelectListInner renders a scrollable list used by Contember select components.  
+SelectListInner renders a scrollable list used by Contember select components.
 It composes smaller building blocks such as `SelectOption` and can display an optional filter toolbar.
 
 ## Styling Guidelines
-All examples use Tailwind.  
+All examples use Tailwind.
 If you follow the default Contember theme, no extra utility classes are required.
 
 ## Core Concepts
-- Composition with `SelectOption`, `SelectItemTrigger`, and UI wrappers.  
-- Optional `filterToolbar` prop injects custom filtering UI above the list.  
-- Designed to sit inside popovers or dropdowns.  
+- Composition with `SelectOption`, `SelectItemTrigger`, and UI wrappers.
+- Optional `filterToolbar` prop injects custom filtering UI above the list.
+- Designed to sit inside popovers or dropdowns.
 - Renders children without additional layout constraints, so you control item structure.
 
 ## Quick Start
@@ -68,20 +68,17 @@ You can wrap items in your own container to add separators or custom padding.
 |------|------|----------|---------|-------------|
 | filterToolbar | ReactNode | No | `undefined` | Element shown above the list, typically `<SelectDefaultFilter />`. |
 
-<!-- inherited props -->
-| **Inherited props** | | | | |
-| _None_ | | | | |
 
 ## Sub-Components / Building Blocks
 ### SelectOption
-Wraps a single selectable entity.  
+Wraps a single selectable entity.
 Pass it as a direct child of `SelectListInner`.
 
 ### SelectItemTrigger
 Handles keyboard and pointer interaction for its parent `SelectOption`.
 
 ### SelectListItemUI
-Themeable UI wrapper for every item.  
+Themeable UI wrapper for every item.
 Use it to keep visual consistency with Contember design system.
 
 ## Examples
@@ -97,7 +94,7 @@ Use it to keep visual consistency with Contember design system.
 	</SelectListInner>
 </MultiSelect>
 ```
-The list lives inside a `MultiSelect` component.  
+The list lives inside a `MultiSelect` component.
 `filterToolbar` lets users narrow down large datasets before choosing.
 
 ### Data-grid relation filter
@@ -108,7 +105,7 @@ The list lives inside a `MultiSelect` component.
 	</DataGridRelationFilterSelectItem>
 </SelectListInner>
 ```
-`SelectListInner` powers a data-grid filter.  
+`SelectListInner` powers a data-grid filter.
 Wrapping items in `DataGridRelationFilterSelectItem` keeps the filter UI consistent.
 
 ### Data-view relation filter with include / exclude logic
@@ -136,20 +133,20 @@ Wrapping items in `DataGridRelationFilterSelectItem` keeps the filter UI consist
 	</DataViewRelationFilterOptions>
 )
 ```
-The component glues together `DataViewRelationFilterOptions` and `DataGridRelationFilterSelectItem`.  
+The component glues together `DataViewRelationFilterOptions` and `DataGridRelationFilterSelectItem`.
 `SelectListInner` stays responsible for scrolling, focus handling, and optional filtering UI.
 
 ## Best Practices & Gotchas
-- Always place `SelectOption` directly under `SelectListInner`.  
-- Stop event propagation inside removal buttons to keep focus intact.  
-- Render lightweight items; virtualisation is not built-in.  
+- Always place `SelectOption` directly under `SelectListInner`.
+- Stop event propagation inside removal buttons to keep focus intact.
+- Render lightweight items; virtualisation is not built-in.
 - Provide unique keys on custom list containers to avoid React warnings.
 
 ## Further Reading
-- MultiSelect  
-- SelectOption  
-- SelectItemTrigger  
-- SelectDefaultFilter  
-- CreateEntityDialog  
+- MultiSelect
+- SelectOption
+- SelectItemTrigger
+- SelectDefaultFilter
+- CreateEntityDialog
 
 <!-- End of Generated Documentation -->

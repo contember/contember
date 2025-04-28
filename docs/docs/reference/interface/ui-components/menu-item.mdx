@@ -11,8 +11,6 @@ title: MenuItem
 
 # MenuItem
 
-## Overview
-_None_
 
 ## Styling Guidelines
 * All examples use Tailwind utility classes.
@@ -37,24 +35,18 @@ export const Navigation = () => (
 )
 ```
 
-## Detailed Guide
-_None_
-
 ## Props Reference
 
 | Name | Type | Required | Default | Description |
 |------|------|----------|---------|-------------|
 | label | React.ReactNode | Yes | - | Visible title or JSX node. |
-| variant | { default: string; outline: string; } | Yes | - | Tailwind class map for visual variants. |
-| size | { default: string; sm: string; lg: string; } | Yes | - | Tailwind class map for paddings and font sizes. |
+| variant | `{ default: string; outline: string; }` | Yes | - | Tailwind class map for visual variants. |
+| size | `{ default: string; sm: string; lg: string; }` | Yes | - | Tailwind class map for paddings and font sizes. |
 | icon | React.ReactNode | No | - | Element shown before the label. |
 | to | RoutingLinkTarget | No | - | Destination for Contember router. |
 | children | React.ReactNode | No | - | Nested `MenuItem` elements. |
 | role | RoleCondition | No | - | Render condition based on user roles. |
 | expandedByDefault | boolean | No | false | Opens nested items initially. |
-
-## Sub-Components / Building Blocks
-_None_
 
 ## Examples
 

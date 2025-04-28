@@ -10,11 +10,11 @@ title: MemberList
 <!-- Import examples: 0 -->
 
 ## Overview
-MemberList renders a table of project members.  
+MemberList renders a table of project members.
 You configure the table headers, columns, labels, and an optional controller.
 
 ## Styling Guidelines
-* All examples use Tailwind CSS.  
+* All examples use Tailwind CSS.
 * No extra Contember theme classes are required.
 
 ## Core Concepts
@@ -50,9 +50,6 @@ export const Page = () => {
 }
 ```
 
-## Detailed Guide
-_None_
-
 ## Props Reference
 | Name | Type | Required | Default | Description |
 |------|------|----------|---------|-------------|
@@ -62,9 +59,6 @@ _None_
 | tableHeaders | `string[]` | Yes | — | Titles shown above columns. |
 | controller | `{ current?: MemberListController }` | No | — | Ref object exposing list controls. |
 | roles | `RolesConfig` | No | — | Config that enriches role rendering. |
-
-## Sub-Components / Building Blocks
-_None_
 
 ## Examples
 ### Custom Role Badges
@@ -97,14 +91,14 @@ _None_
 The example shows how to decorate each role with a badge.
 
 ## Best Practices & Gotchas
-* Keep `tableHeaders` length equal to `tableColumns` output cells.  
-* Memoize `tableColumns` to avoid re-render loops.  
-* Provide clear delete labels to prevent accidents.  
+* Keep `tableHeaders` length equal to `tableColumns` output cells.
+* Memoize `tableColumns` to avoid re-render loops.
+* Provide clear delete labels to prevent accidents.
 * Use the `controller` ref for refreshes instead of remounting.
 
 ## Further Reading
-* RolesConfig reference  
-* GraphQL `ProjectMembersFilter` input type  
+* RolesConfig reference
+* GraphQL `ProjectMembersFilter` input type
 * Building bounded contexts in Contember
 
 <!-- End of Generated Documentation -->

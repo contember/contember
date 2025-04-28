@@ -12,11 +12,11 @@ title: ToastContent
 # ToastContent
 
 ## Overview
-ToastContent wraps any React nodes you want to show inside a toast notification.  
+ToastContent wraps any React nodes you want to show inside a toast notification.
 Use it with `useShowToast` and `Toaster` to display success, error, or info messages across your app.
 
 ## Styling Guidelines
-* All examples use Tailwind CSS classes.  
+* All examples use Tailwind CSS classes.
 * ToastContent renders plain HTML. You do not need Contember-specific theme classes.
 
 ## Core Concepts
@@ -49,9 +49,6 @@ export default function App() {
   )
 }
 ```
-
-## Detailed Guide
-_None_
 
 ## Props Reference
 | Name | Type | Required | Default | Description |
@@ -99,15 +96,15 @@ showToast(
 Titles improve scanability. Embed form elements for copy-to-clipboard workflows.
 
 ## Best Practices & Gotchas
-* Mount one `<Toaster />` at the app root.  
-* Keep toast messages short; aim for two lines max.  
-* Pass stable keys to dynamic lists inside ToastContent.  
-* Avoid long-running JSX logic inside the toast callback. Compute data beforehand.  
+* Mount one `<Toaster />` at the app root.
+* Keep toast messages short; aim for two lines max.
+* Pass stable keys to dynamic lists inside ToastContent.
+* Avoid long-running JSX logic inside the toast callback. Compute data beforehand.
 * Do not style ToastContent directly; style the surrounding toast container if needed.
 
 ## Further Reading
-* Toaster – renders and positions toasts.  
-* useShowToast – imperative API for firing toasts.  
+* Toaster – renders and positions toasts.
+* useShowToast – imperative API for firing toasts.
 * Tailwind documentation – customize utility classes.
 
 <!-- End of Generated Documentation -->

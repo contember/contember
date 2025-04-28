@@ -12,7 +12,7 @@ title: RichTextView
 # RichTextView
 
 ## Overview
-RichTextView displays formatted rich-text stored in a Contember field.  
+RichTextView displays formatted rich-text stored in a Contember field.
 It safely parses JSON and renders semantic React elements through Contember’s rich-text engine.
 
 ## Styling Guidelines
@@ -80,10 +80,6 @@ const renderElement = (
 | renderLeaf | `(leaf) => ReactNode` | No | – | Custom renderer for leaf nodes (text runs). |
 | renderElement | `(element, leafRenderer) => ReactNode` | No | – | Custom renderer for non-leaf nodes. |
 | referenceRenderers | `Record<string, (props) => ReactNode>` | No | – | Functions that render entity references (e.g., images). |
-
-## Sub-Components / Building Blocks
-_None_
-
 ## Examples
 
 ### Preview next to an editor

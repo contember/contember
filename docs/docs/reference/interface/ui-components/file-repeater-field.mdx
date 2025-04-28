@@ -12,11 +12,11 @@ title: FileRepeaterField
 # FileRepeaterField
 
 ## Overview
-`FileRepeaterField` lets you add, preview, sort, and remove multiple files inside an Entity context (`<EntitySubTree />` or `<EntityListSubTree />`).  
+`FileRepeaterField` lets you add, preview, sort, and remove multiple files inside an Entity context (`<EntitySubTree />` or `<EntityListSubTree />`).
 It supports every file type, shows a type-specific icon, and allows custom preview components.
 
 ## Styling Guidelines
-* All examples use Tailwind CSS classes out of the box.  
+* All examples use Tailwind CSS classes out of the box.
 * No extra Contember theme classes are required—override Tailwind classes as needed.
 
 ## Core Concepts
@@ -80,10 +80,6 @@ fileTypeField | string | No | — | Column with MIME type.
 lastModifiedField | string | No | — | Column with the file’s last-modified timestamp.
 edit | ReactNode | No | — | Custom form elements rendered per list item.
 className | string | No | — | Extra Tailwind classes.
-_inherited props_ | — | — | — | _None_
-
-## Sub-Components / Building Blocks
-_None_
 
 ## Examples
 
@@ -133,9 +129,9 @@ You can mix Contember form fields inside `edit` to capture extra metadata per fi
 * Defer expensive previews (e.g., image thumbnails) to a custom component for performance.
 
 ## Further Reading
-* `ImageField` – single-file image upload  
-* `RepeaterField` – generic list handling without file specifics  
-* Contember docs: “EntitySubTree” and “EntityListSubTree” for context usage  
+* `ImageField` – single-file image upload
+* `RepeaterField` – generic list handling without file specifics
+* Contember docs: “EntitySubTree” and “EntityListSubTree” for context usage
 * Tailwind CSS utility classes
 
 <!-- End of Generated Documentation -->

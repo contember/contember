@@ -12,18 +12,18 @@ title: SidebarMenu
 # SidebarMenu
 
 ## Overview
-SidebarMenu renders a vertical list of navigation or action items inside a `Sidebar`.  
+SidebarMenu renders a vertical list of navigation or action items inside a `Sidebar`.
 It works together with `SidebarMenuItem`, `SidebarMenuButton`, and optional sub-menus to build hierarchical sidebars.
 
 ## Styling Guidelines
-* All examples use Tailwind CSS utility classes.  
+* All examples use Tailwind CSS utility classes.
 * You can freely apply Contember theme classes such as `text-sidebar-accent-corporate` to harmonize with the default design system.
 
 ## Core Concepts
-* SidebarMenu is just a container; it delegates interaction to its children.  
-* Combine `SidebarMenuItem` and `SidebarMenuButton` to create clickable rows.  
-* Place SidebarMenu inside `SidebarFooter`, `SidebarContent`, or any other sidebar section.  
-* Icons are commonly rendered before text and inherit color from the parent item.  
+* SidebarMenu is just a container; it delegates interaction to its children.
+* Combine `SidebarMenuItem` and `SidebarMenuButton` to create clickable rows.
+* Place SidebarMenu inside `SidebarFooter`, `SidebarContent`, or any other sidebar section.
+* Icons are commonly rendered before text and inherit color from the parent item.
 * You can nest `SidebarMenuSub` inside an item for collapsible sub-navigation.
 
 ## Quick Start
@@ -62,12 +62,6 @@ export default function BasicSidebar() {
   )
 }
 ```
-
-## Detailed Guide
-_None_
-
-## Props Reference
-_None_
 
 ## Sub-Components / Building Blocks
 
@@ -140,17 +134,17 @@ const [state, setState] = useStoredState<{ openedItems: string[] }>(
 The app stores the list of opened sub-menus in `sessionStorage` to restore them after reload.
 
 ## Best Practices & Gotchas
-* Keep text labels short; long strings break the fixed sidebar width.  
-* Always wrap anchors with `SidebarMenuButton asChild` to preserve focus styling.  
-* Use Tailwind’s `hover:` and `aria-expanded` selectors to customize interactive states.  
-* Avoid putting heavy business logic in menu components; compute permissions outside and render conditionally.  
-* When nesting sub-menus, increment padding to show hierarchy clearly.  
+* Keep text labels short; long strings break the fixed sidebar width.
+* Always wrap anchors with `SidebarMenuButton asChild` to preserve focus styling.
+* Use Tailwind’s `hover:` and `aria-expanded` selectors to customize interactive states.
+* Avoid putting heavy business logic in menu components; compute permissions outside and render conditionally.
+* When nesting sub-menus, increment padding to show hierarchy clearly.
 * Remember that icons inherit text color; apply only theme text classes, not background classes, to them.
 
 ## Further Reading
-* Sidebar  
-* SidebarGroup & SidebarGroupLabel  
-* useStoredState utility  
-* Role-based access (`HasCompanyRole`)  
+* Sidebar
+* SidebarGroup & SidebarGroupLabel
+* useStoredState utility
+* Role-based access (`HasCompanyRole`)
 
 <!-- End of Generated Documentation -->

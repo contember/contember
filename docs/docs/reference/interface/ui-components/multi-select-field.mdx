@@ -10,13 +10,13 @@ title: MultiSelectField
 <!-- Import examples: 8 -->
 
 ## Overview
-`MultiSelectField` lets you manage `hasMany` relations inside Contember forms.  
+`MultiSelectField` lets you manage `hasMany` relations inside Contember forms.
 You select multiple entities, display them as chips, and even create new ones on the fly.
 
 The component must live inside an `EntitySubTree` or `EntityListSubTree` so it can read and write entity data.
 
 ## Styling Guidelines
-* All examples use Tailwind CSS utility classes.  
+* All examples use Tailwind CSS utility classes.
 * Chips and dropdowns receive basic Contember theme styles automatically; you do not need manual theme classes.
 
 ## Core Concepts
@@ -80,9 +80,6 @@ import { EntitySubTree, Field, MultiSelectField } from '~/lib/form'
 | label | React.ReactNode | Yes | - | Field label shown above the select. |
 | description | React.ReactNode | Yes | - | Helper text under the field. |
 | errors | React.ReactNode &#124; ErrorAccessor.Error[] | Yes | - | Custom error renderer or array. |
-
-## Sub-Components / Building Blocks
-_None_
 
 ## Examples
 ```tsx

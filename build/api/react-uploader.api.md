@@ -6,7 +6,7 @@
 
 import { ComponentType } from 'react';
 import { Context } from 'react';
-import type { EntityAccessor } from '@contember/react-binding';
+import { EntityAccessor } from '@contember/react-binding';
 import type { Environment } from '@contember/react-binding';
 import { ErrorAccessor } from '@contember/react-binding';
 import type { ErrorAccessorHolder } from '@contember/react-binding';
@@ -331,12 +331,12 @@ export type UploaderErrorType = 'fileRejected' | 'networkError' | 'httpError' | 
 
 // @public (undocumented)
 export type UploaderEvents = {
-    onBeforeUpload?: (event: BeforeUploadEvent) => Promise<FileType | undefined>;
-    onStartUpload?: (event: StartUploadEvent) => void;
-    onProgress?: (event: ProgressEvent_2) => void;
-    onAfterUpload?: (event: AfterUploadEvent) => Promise<void> | void;
-    onSuccess?: (event: SuccessEvent) => void;
-    onError?: (event: ErrorEvent_2) => void;
+    onBeforeUpload: (event: BeforeUploadEvent) => Promise<FileType | undefined>;
+    onStartUpload: (event: StartUploadEvent) => void;
+    onProgress: (event: ProgressEvent_2) => void;
+    onAfterUpload: (event: AfterUploadEvent) => Promise<void> | void;
+    onSuccess: (event: SuccessEvent) => void;
+    onError: (event: ErrorEvent_2) => void;
 };
 
 // @public (undocumented)
@@ -432,6 +432,9 @@ export const UploaderStateContext: Context<UploaderState>;
 
 // @public (undocumented)
 export const UploaderUploadFilesContext: Context<(files: File[]) => void>;
+
+// @public (undocumented)
+export const useMultiUploaderFileState: (entity: EntityAccessor) => UploaderFileState | undefined;
 
 // @public (undocumented)
 export const useS3Client: (options?: Partial<S3UploadClientOptions>) => S3UploadClient;

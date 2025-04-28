@@ -32,9 +32,7 @@ export const MultiUploader = Component<MultiUploaderProps>(({ baseField, fileTyp
 		<UploaderStateContext.Provider value={files}>
 			<UploaderUploadFilesContext.Provider value={onDrop}>
 				<UploaderOptionsContext.Provider value={options}>
-					<UploaderStateContext.Provider value={files}>
-						{children}
-					</UploaderStateContext.Provider>
+					{children}
 				</UploaderOptionsContext.Provider>
 			</UploaderUploadFilesContext.Provider>
 		</UploaderStateContext.Provider>

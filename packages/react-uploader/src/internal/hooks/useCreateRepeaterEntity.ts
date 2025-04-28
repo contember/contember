@@ -4,7 +4,7 @@ import { resolveAcceptingSingleType } from '../utils/resolveAccept'
 import { executeExtractors } from '../utils/fillEntityFields'
 import { UploaderBaseFieldProps } from '../../types/base'
 import { useRepeaterMethods } from '@contember/react-repeater'
-import { useMemo, useRef } from 'react'
+import { useState } from 'react'
 import { EntityAccessor } from '@contember/react-binding'
 
 export type UseFillEntityArgs =
@@ -14,18 +14,23 @@ export type UseFillEntityArgs =
 		fileType: FileType
 	}
 
-export const useCreateRepeaterEntity = ({ baseField, fileType, ...events }: UseFillEntityArgs): UploaderEvents => {
+export const useCreateRepeaterEntity = ({ baseField, fileType, ...events }: UseFillEntityArgs): UploaderEvents & {
+	entityToFileId: Map<EntityAccessor.GetEntityAccessor, string>
+} => {
 	const { addItem } = useRepeaterMethods()
-	const entityMap = useRef(useMemo(() => new WeakMap<File, () => EntityAccessor>(), []))
+	const [entityMap] = useState(() => new WeakMap<File, EntityAccessor.GetEntityAccessor>())
+	const [entityToFileId] = useState(() => new Map<EntityAccessor.GetEntityAccessor, string>())
 
 	return {
 		...events,
+		entityToFileId,
 		onBeforeUpload: useReferentiallyStableCallback(async event => {
 			if (!(await resolveAcceptingSingleType(event.file, fileType))) {
 				return undefined
 			}
 			addItem(undefined, getEntity => {
-				entityMap.current.set(event.file.file, getEntity)
+				entityMap.set(event.file.file, getEntity)
+				entityToFileId.set(getEntity, event.file.id)
 			})
 
 			return (await events.onBeforeUpload?.(event)) ?? fileType
@@ -38,7 +43,7 @@ export const useCreateRepeaterEntity = ({ baseField, fileType, ...events }: UseF
 						result: event.result,
 						file: event.file,
 					})
-					const entity = entityMap.current.get(event.file.file)?.()
+					const entity = entityMap.get(event.file.file)?.()
 					if (!entity) {
 						throw new Error('Entity not found')
 					}
@@ -49,10 +54,10 @@ export const useCreateRepeaterEntity = ({ baseField, fileType, ...events }: UseF
 			])
 		}),
 		onError: useReferentiallyStableCallback(event => {
-			const entity = entityMap.current.get(event.file.file)?.()
+			const entity = entityMap.get(event.file.file)?.()
 			if (entity) {
 				entity.deleteEntity()
-				entityMap.current.delete(event.file.file)
+				entityMap.delete(event.file.file)
 			}
 			events.onError?.(event)
 		}),

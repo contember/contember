@@ -7,6 +7,7 @@ import { FileType, UploaderBaseFieldProps } from '../types'
 import { UploaderBase } from './UploaderBase'
 import { uploaderErrorHandler } from '../internal/utils/uploaderErrorHandler'
 import { useCreateRepeaterEntity } from '../internal/hooks/useCreateRepeaterEntity'
+import { MultiUploaderEntityToFileStateMapContext } from '../internal/contexts'
 
 export type MultiUploaderProps =
 	& UploaderBaseFieldProps
@@ -18,7 +19,7 @@ export type MultiUploaderProps =
 const noop = () => Promise.resolve(undefined)
 
 export const MultiUploader = Component<MultiUploaderProps>(({ baseField, fileType, children }) => {
-	const fillEntityEvents = useCreateRepeaterEntity({
+	const { entityToFileId, ...fillEntityEvents } = useCreateRepeaterEntity({
 		baseField,
 		fileType,
 		onError: uploaderErrorHandler,
@@ -39,7 +40,9 @@ export const MultiUploader = Component<MultiUploaderProps>(({ baseField, fileTyp
 		<UploaderStateContext.Provider value={files}>
 			<UploaderUploadFilesContext.Provider value={onDrop}>
 				<UploaderOptionsContext.Provider value={options}>
-					{children}
+					<MultiUploaderEntityToFileStateMapContext.Provider value={entityToFileId}>
+						{children}
+					</MultiUploaderEntityToFileStateMapContext.Provider>
 				</UploaderOptionsContext.Provider>
 			</UploaderUploadFilesContext.Provider>
 		</UploaderStateContext.Provider>

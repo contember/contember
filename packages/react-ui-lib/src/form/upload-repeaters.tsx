@@ -6,18 +6,20 @@ import {
 	createImageFileType,
 	createVideoFileType,
 	FileType,
+	FileWithMeta,
 	ImageFileTypeProps,
 	MultiUploader,
 	UploaderBaseFieldProps,
 	UploaderHasFile,
+	useMultiUploaderFileState,
 	useS3Client,
 	VideoFileTypeProps,
 } from '@contember/react-uploader'
 import * as React from 'react'
-import { ReactNode, useId, useMemo, useState } from 'react'
+import { ReactNode, useMemo, useState } from 'react'
 import { FormContainer, FormContainerProps } from './container'
-import { Component } from '@contember/interface'
-import { FormErrorContext, FormFieldIdContext, FormFieldStateProvider } from '@contember/react-form'
+import { Component, useEntity } from '@contember/interface'
+import { FormFieldStateProvider } from '@contember/react-form'
 import {
 	UploadedAnyView,
 	UploadedAudioView,
@@ -39,6 +41,7 @@ import {
 	RepeaterSortableItemNode,
 } from '@contember/react-repeater-dnd-kit'
 import { UploaderRepeaterDropIndicator } from '../upload/repeater'
+import { Loader } from '../ui/loader'
 
 
 export type BaseFileRepeaterFieldProps =
@@ -57,7 +60,11 @@ export type ImageRepeaterFieldProps =
 	& ImageFileTypeProps
 
 export const ImageRepeaterField = Component<ImageRepeaterFieldProps>(props => <>
-	<FileRepeaterFieldInner {...props} fileType={createImageFileType(props)}>
+	<FileRepeaterFieldInner {...props} fileType={createImageFileType(props)} renderPreview={file => {
+		return <div className="flex items-center justify-center h-40 rounded-md group relative">
+			<img src={file.file.previewUrl} className="max-w-full max-h-full" />
+		</div>
+	}}>
 		{props.children ?? (
 			<UploadedImageView {...props} DestroyAction={RepeaterRemoveItemTrigger} />
 		)}
@@ -104,11 +111,16 @@ export const FileRepeaterField = Component<FileRepeaterFieldProps>(props => <>
 </>)
 
 
+type PreviewRenderer = (props: {
+	file: FileWithMeta
+}) => ReactNode
+
 type FileRepeaterFieldInnerProps =
 	& BaseFileRepeaterFieldProps
 	& {
 		fileType: FileType
 		children: ReactNode
+		renderPreview?: PreviewRenderer
 	}
 
 const FileRepeaterFieldInner = Component<FileRepeaterFieldInnerProps>(({
@@ -118,6 +130,7 @@ const FileRepeaterFieldInner = Component<FileRepeaterFieldInnerProps>(({
 	children,
 	fileType,
 	dropzonePlaceholder,
+	renderPreview,
 	...props
 }) => {
 
@@ -145,34 +158,37 @@ const FileRepeaterFieldInner = Component<FileRepeaterFieldInnerProps>(({
 								<UploaderProgress />
 							</UploaderHasFile>
 							<UploaderDropzone dropzonePlaceholder={dropzonePlaceholder} />
+
+							<RepeaterSortable>
+
+								<RepeaterSortableEachItem>
+									<div className="flex">
+										<UploaderRepeaterDropIndicator position={'before'} />
+										<RepeaterSortableItemNode>
+											<UploaderRepeaterItemUI>
+												<RepeaterSortableItemActivator>
+													<UploaderRepeaterHandleUI />
+												</RepeaterSortableItemActivator>
+
+												<FileRepeaterItemPreview renderPreview={renderPreview} >
+													{children}
+												</FileRepeaterItemPreview>
+											</UploaderRepeaterItemUI>
+										</RepeaterSortableItemNode>
+										<UploaderRepeaterDropIndicator position={'after'} />
+									</div>
+
+
+								</RepeaterSortableEachItem>
+
+								<RepeaterSortableDragOverlay>
+									<UploaderRepeaterDragOverlayUI>
+										{children}
+									</UploaderRepeaterDragOverlayUI>
+								</RepeaterSortableDragOverlay>
+
+							</RepeaterSortable>
 						</MultiUploader>
-
-						<RepeaterSortable>
-
-							<RepeaterSortableEachItem>
-								<div className="flex">
-									<UploaderRepeaterDropIndicator position={'before'} />
-									<RepeaterSortableItemNode>
-										<UploaderRepeaterItemUI>
-											<RepeaterSortableItemActivator>
-												<UploaderRepeaterHandleUI />
-											</RepeaterSortableItemActivator>
-											{children}
-										</UploaderRepeaterItemUI>
-									</RepeaterSortableItemNode>
-									<UploaderRepeaterDropIndicator position={'after'} />
-								</div>
-
-
-							</RepeaterSortableEachItem>
-
-							<RepeaterSortableDragOverlay>
-								<UploaderRepeaterDragOverlayUI>
-									{children}
-								</UploaderRepeaterDragOverlayUI>
-							</RepeaterSortableDragOverlay>
-
-						</RepeaterSortable>
 					</UploaderRepeaterItemsWrapperUI>
 				</Repeater>
 			</FormContainer>
@@ -186,3 +202,16 @@ const FileRepeaterFieldInner = Component<FileRepeaterFieldInnerProps>(({
 		</Repeater>
 	</>
 }, 'FileRepeaterFieldInner')
+
+const FileRepeaterItemPreview = ({ renderPreview, children }: { renderPreview?: PreviewRenderer; children: ReactNode }) => {
+	const entity = useEntity()
+	const fileState = useMultiUploaderFileState(entity)
+	if (!fileState || fileState.state === 'success' || fileState.state === 'error') {
+		return <>{children}</>
+	}
+
+	return <>
+		{renderPreview?.({ file: fileState.file })}
+		<Loader position="absolute" className="bg-transparent" />
+	</>
+}

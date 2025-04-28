@@ -4,6 +4,8 @@ import { resolveAcceptingSingleType } from '../utils/resolveAccept'
 import { executeExtractors } from '../utils/fillEntityFields'
 import { UploaderBaseFieldProps } from '../../types/base'
 import { useRepeaterMethods } from '@contember/react-repeater'
+import { useMemo, useRef } from 'react'
+import { EntityAccessor } from '@contember/react-binding'
 
 export type UseFillEntityArgs =
 	& UploaderEvents
@@ -14,12 +16,17 @@ export type UseFillEntityArgs =
 
 export const useCreateRepeaterEntity = ({ baseField, fileType, ...events }: UseFillEntityArgs): UploaderEvents => {
 	const { addItem } = useRepeaterMethods()
+	const entityMap = useRef(useMemo(() => new WeakMap<File, () => EntityAccessor>(), []))
+
 	return {
 		...events,
 		onBeforeUpload: useReferentiallyStableCallback(async event => {
 			if (!(await resolveAcceptingSingleType(event.file, fileType))) {
 				return undefined
 			}
+			addItem(undefined, getEntity => {
+				entityMap.current.set(event.file.file, getEntity)
+			})
 
 			return events.onBeforeUpload?.(event) ?? fileType
 		}),
@@ -31,13 +38,23 @@ export const useCreateRepeaterEntity = ({ baseField, fileType, ...events }: UseF
 						result: event.result,
 						file: event.file,
 					})
-					addItem(undefined, getEntity => {
-						const entity = baseField ? getEntity().getEntity({ field: baseField }) : getEntity()
-						extractionResult?.({ entity })
-					})
+					const entity = entityMap.current.get(event.file.file)?.()
+					if (!entity) {
+						throw new Error('Entity not found')
+					}
+					const baseEntity = baseField ? entity.getEntity({ field: baseField }) : entity
+					extractionResult?.({ entity: baseEntity })
 				})(),
 				events.onAfterUpload?.(event),
 			])
+		}),
+		onError: useReferentiallyStableCallback(event => {
+			const entity = entityMap.current.get(event.file.file)?.()
+			if (entity) {
+				entity.deleteEntity()
+				entityMap.current.delete(event.file.file)
+			}
+			events.onError?.(event)
 		}),
 	}
 }

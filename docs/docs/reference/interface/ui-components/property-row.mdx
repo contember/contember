@@ -11,17 +11,14 @@ title: PropertyRow
 
 # PropertyRow
 
-## Overview
-_None_
-
 ## Styling Guidelines
-* All examples use Tailwind CSS utility classes.  
+* All examples use Tailwind CSS utility classes.
 * Contember’s default theme adds typography helpers such as `font-normal`. Keep them if you rely on consistent weight across the list.
 
 ## Core Concepts
-* PropertyRow groups one label with one value inside a PropertyList.  
-* Combine it with PropertyLabel and PropertyValue for clear two-column layout.  
-* Use composition instead of props to control spacing and order.  
+* PropertyRow groups one label with one value inside a PropertyList.
+* Combine it with PropertyLabel and PropertyValue for clear two-column layout.
+* Use composition instead of props to control spacing and order.
 * Nest any React elements inside PropertyValue, including rich text or formatted fields.
 
 ## Quick Start
@@ -65,21 +62,18 @@ export const EmailDetail = () => (
   </PropertyList>
 )
 ```
-* Place PropertyRow among PropertyItem components for mixed layouts.  
-* Add `divide-y` to the parent list for subtle separators.  
+* Place PropertyRow among PropertyItem components for mixed layouts.
+* Add `divide-y` to the parent list for subtle separators.
 * Override spacing with Tailwind’s padding utilities on each row.
-
-## Props Reference
-_None_
 
 ## Sub-Components / Building Blocks
 ### PropertyLabel
-* Renders the descriptive text.  
+* Renders the descriptive text.
 * Accepts standard `className` and children.
 
 ### PropertyValue
-* Holds the actual value.  
-* Accepts any React nodes.  
+* Holds the actual value.
+* Accepts any React nodes.
 * Use typography classes like `font-normal` for consistency.
 
 ## Examples
@@ -104,14 +98,14 @@ _None_
 This pattern mixes PropertyItem (label prop) and PropertyRow (explicit label component) in one list. Use it when the value needs custom styling or multiple elements.
 
 ## Best Practices & Gotchas
-* Keep label width consistent with the Tailwind `w-*` utilities.  
-* Avoid wrapping PropertyRow inside another flex container; it already exposes a flex layout.  
-* Do not pass props that belong to PropertyItem; PropertyRow ignores them.  
+* Keep label width consistent with the Tailwind `w-*` utilities.
+* Avoid wrapping PropertyRow inside another flex container; it already exposes a flex layout.
+* Do not pass props that belong to PropertyItem; PropertyRow ignores them.
 * Always pair PropertyLabel and PropertyValue to preserve accessibility.
 
 ## Further Reading
-* PropertyList – parent container.  
-* PropertyItem – simpler label/value variant.  
-* Contember Field – data binding helper.  
+* PropertyList – parent container.
+* PropertyItem – simpler label/value variant.
+* Contember Field – data binding helper.
 
 <!-- End of Generated Documentation -->

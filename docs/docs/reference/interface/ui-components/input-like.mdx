@@ -12,11 +12,11 @@ title: InputLike
 # InputLike
 
 ## Overview
-InputLike is a lightweight wrapper that groups an input, prefixes, and suffixes into a single flex container.  
+InputLike is a lightweight wrapper that groups an input, prefixes, and suffixes into a single flex container.
 Use it when you need consistent spacing, borders, or relative positioning around an input element.
 
 ## Styling Guidelines
-* All code examples rely on Tailwind CSS classes.  
+* All code examples rely on Tailwind CSS classes.
 * InputLike does not require any Contember-specific theme class; add your own Tailwind utilities as needed.
 
 ## Core Concepts
@@ -39,9 +39,6 @@ export const UsernameField = () => (
 )
 ```
 
-## Detailed Guide
-_None_
-
 ## Props Reference
 | Name | Type | Required | Default | Description |
 |------|------|----------|---------|-------------|
@@ -51,9 +48,6 @@ _None_
 
 ### Inherited Props
 Listed above as `...divProps`.
-
-## Sub-Components / Building Blocks
-_None_
 
 ## Examples
 
@@ -83,13 +77,13 @@ export const RepoField = () => (
 Use a prefix to hint the constant part of the URL and a suffix link to open the final address.
 
 ## Best Practices & Gotchas
-* Keep `InputLike` as thin as possible; avoid business logic inside it.  
-* Apply spacing classes (`p-*`, `gap-*`) to `InputLike`; avoid padding on `InputBare`.  
-* Use `flex` utilities to align icons and inputs consistently.  
+* Keep `InputLike` as thin as possible; avoid business logic inside it.
+* Apply spacing classes (`p-*`, `gap-*`) to `InputLike`; avoid padding on `InputBare`.
+* Use `flex` utilities to align icons and inputs consistently.
 * When adding borders, round only the wrapper, not individual children, to avoid visual gaps.
 
 ## Further Reading
-* Input  
-* InputBare  
+* Input
+* InputBare
 
 <!-- End of Generated Documentation -->

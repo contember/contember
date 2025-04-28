@@ -12,17 +12,17 @@ title: PopoverContent
 # PopoverContent
 
 ## Overview
-`PopoverContent` renders the floating panel of a `Popover`.  
+`PopoverContent` renders the floating panel of a `Popover`.
 It receives focus automatically and handles positioning next to the trigger element.
 
 ## Styling Guidelines
-* All examples use Tailwind classes.  
+* All examples use Tailwind classes.
 * Add extra styles with the `className` prop; no Contember-specific theme classes are required.
 
 ## Core Concepts
-* `PopoverContent` appears when its `PopoverTrigger` is active.  
-* Position is configurable with `side`, `align`, and `sideOffset`.  
-* Content is rendered in a React portal, so z-index and stacking contexts matter.  
+* `PopoverContent` appears when its `PopoverTrigger` is active.
+* Position is configurable with `side`, `align`, and `sideOffset`.
+* Content is rendered in a React portal, so z-index and stacking contexts matter.
 * You may pass any Radix `PopoverContentProps`.
 
 ## Quick Start
@@ -39,9 +39,6 @@ import { Popover, PopoverTrigger, PopoverContent } from '~/lib/ui/popover'
   </PopoverContent>
 </Popover>
 ```
-
-## Detailed Guide
-_None_
 
 ## Props Reference
 | Name | Type | Required | Default | Description |
@@ -107,16 +104,16 @@ This pattern lets users edit a hyperlink inline without leaving the editor.
 The popover groups rarely used filters while keeping the main UI clean.
 
 ## Best Practices & Gotchas
-* Always add `className="bg-white"` when the surrounding page uses transparent backgrounds.  
-* Pass a stable `sideOffset` (e.g. `2`) to avoid the panel sticking to the trigger.  
-* Wrap buttons in `PopoverTrigger asChild` to keep semantic HTML.  
-* Place `PopoverContent` as a direct child of `Popover`; nested popovers can break focus management.  
+* Always add `className="bg-white"` when the surrounding page uses transparent backgrounds.
+* Pass a stable `sideOffset` (e.g. `2`) to avoid the panel sticking to the trigger.
+* Wrap buttons in `PopoverTrigger asChild` to keep semantic HTML.
+* Place `PopoverContent` as a direct child of `Popover`; nested popovers can break focus management.
 * Remember to handle z-index if the popover is hidden behind modals.
 
 ## Further Reading
-* PopoverTrigger  
-* PopoverClose  
-* Radix Popover docs  
-* DataGrid filters components  
+* PopoverTrigger
+* PopoverClose
+* Radix Popover docs
+* DataGrid filters components
 
 <!-- End of Generated Documentation -->

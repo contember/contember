@@ -12,19 +12,19 @@ title: FormattedField
 # FormattedField
 
 ## Overview
-`FormattedField` displays a field value formatted according to the schema definition.  
+`FormattedField` displays a field value formatted according to the schema definition.
 You use it when you only need to show data, not edit it.
 
 The component wraps `FieldView`, so it inherits all formatting rules (dates, numbers, enums) defined on the server.
 
 ## Styling Guidelines
-* Every snippet below uses Tailwind CSS.  
+* Every snippet below uses Tailwind CSS.
 * The component itself requires no special Contember theme classes.
 
 ## Core Concepts
-* Schema-driven formatting—values look exactly like in the administration UI.  
-* Accepts either a simple field name or an object with a relation path.  
-* Read-only by design; pair it with input components when you need editing.  
+* Schema-driven formatting—values look exactly like in the administration UI.
+* Accepts either a simple field name or an object with a relation path.
+* Read-only by design; pair it with input components when you need editing.
 * Works inside an `Entity` or `HasOne` context provided by Contember binding.
 
 ## Quick Start
@@ -44,7 +44,7 @@ export const UserName = () => (
 // Displays `city` of the related `address`
 <FormattedField field={{ field: 'city', hasOneRelationPath: ['address'] }} />
 ```
-You can pass an object to travel through `hasOne` relations.  
+You can pass an object to travel through `hasOne` relations.
 The example above calls `address.city` behind the scenes.
 
 ## Props Reference
@@ -53,10 +53,6 @@ The example above calls `address.city` behind the scenes.
 | field | `string` &#124; `{ field: string; hasOneRelationPath?: SugarableHasOneRelation &#124; SugarableHasOneRelation[] }` | Yes | – | The field to render. |
 
 _Inherited props_ – None
-
-## Sub-Components / Building Blocks
-_None_
-
 ## Examples
 ### Address overview
 ```tsx
@@ -86,14 +82,14 @@ This snippet shows how you can combine multiple `FormattedField` components to r
 Use formatted fields directly inside headings or labels to keep typography consistent.
 
 ## Best Practices & Gotchas
-* Place the component inside an `Entity` provider; otherwise, it cannot resolve the field.  
-* Do not use it for editing—pair it with input components instead.  
-* Keep relation paths short; deeply nested relations may impact query performance.  
+* Place the component inside an `Entity` provider; otherwise, it cannot resolve the field.
+* Do not use it for editing—pair it with input components instead.
+* Keep relation paths short; deeply nested relations may impact query performance.
 * Combine with Tailwind utility classes for tight control of spacing and colors.
 
 ## Further Reading
-* `FieldView` – the lower-level display component.  
-* `EmailField` – specialized formatter for e-mail addresses.  
+* `FieldView` – the lower-level display component.
+* `EmailField` – specialized formatter for e-mail addresses.
 * `HasOne` – provides relation context for nested fields.
 
 <!-- End of Generated Documentation -->

@@ -15,14 +15,14 @@ title: MultiSelectItemRemoveButtonUI
 MultiSelectItemRemoveButtonUI renders a small button inside each selected item. You let users remove a chosen value without reopening the dropdown. The component usually sits inside `SelectItemTrigger`, inheriting focus and keyboard handling.
 
 ## Styling Guidelines
-* All examples use Tailwind CSS.  
+* All examples use Tailwind CSS.
 * The button has no required Contember theme classes; style it as you prefer.
 
 ## Core Concepts
-* A multi-select input can hold many chosen values.  
-* Each value is rendered by `MultiSelectItemUI`.  
-* `MultiSelectItemRemoveButtonUI` lives inside the item and fires a remove command.  
-* Call `e.stopPropagation()` to stop unwanted dropdown toggling.  
+* A multi-select input can hold many chosen values.
+* Each value is rendered by `MultiSelectItemUI`.
+* `MultiSelectItemRemoveButtonUI` lives inside the item and fires a remove command.
+* Call `e.stopPropagation()` to stop unwanted dropdown toggling.
 * Wrap the button with `SelectItemTrigger` for accessibility.
 
 ## Quick Start
@@ -36,29 +36,17 @@ MultiSelectItemRemoveButtonUI renders a small button inside each selected item. 
 ```
 The snippet removes the clicked value while keeping the popover closed.
 
-## Detailed Guide
-_None_
-
-## Props Reference
-_None_
-
-## Sub-Components / Building Blocks
-_None_
-
-## Examples
-_None_
-
 ## Best Practices & Gotchas
-* Always call `e.stopPropagation()` in `onClick`.  
-* Add a descriptive `aria-label`, for example `"Remove item"`.  
-* Keep the button small (`w-4 h-4`) to reduce visual clutter.  
-* Wrap the button in `SelectItemTrigger` to inherit focus styles.  
+* Always call `e.stopPropagation()` in `onClick`.
+* Add a descriptive `aria-label`, for example `"Remove item"`.
+* Keep the button small (`w-4 h-4`) to reduce visual clutter.
+* Wrap the button in `SelectItemTrigger` to inherit focus styles.
 * Test keyboard removal flows to ensure accessibility.
 
 ## Further Reading
-* MultiSelect  
-* MultiSelectItemUI  
-* SelectItemTrigger  
-* Contember Form Kit  
+* MultiSelect
+* MultiSelectItemUI
+* SelectItemTrigger
+* Contember Form Kit
 
 <!-- End of Generated Documentation -->

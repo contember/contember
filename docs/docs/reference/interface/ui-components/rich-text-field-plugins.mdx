@@ -10,17 +10,17 @@ title: richTextFieldPlugins
 <!-- Import examples: 0 -->
 
 ## Overview
-`richTextFieldPlugins` is a predefined array of Slate plugins that adds essential inline formatting to Contember’s `RichTextEditor`.  
+`richTextFieldPlugins` is a predefined array of Slate plugins that adds essential inline formatting to Contember’s `RichTextEditor`.
 Use it when you need links, emphasis, code blocks, highlights, and other common text styles without hand-crafting every Slate plugin yourself.
 
 ## Styling Guidelines
-* All code examples use Tailwind CSS.  
+* All code examples use Tailwind CSS.
 * No Contember-specific theme classes are required.
 
 ## Core Concepts
-* Slate plugins extend editor behavior.  
-* `richTextFieldPlugins` is an array; pass it to `RichTextEditor` via the `plugins` prop.  
-* The plugins cover links, bold/italic/underline, strikethrough, code blocks, highlights, and manual line breaks.  
+* Slate plugins extend editor behavior.
+* `richTextFieldPlugins` is an array; pass it to `RichTextEditor` via the `plugins` prop.
+* The plugins cover links, bold/italic/underline, strikethrough, code blocks, highlights, and manual line breaks.
 * Order matters: Contember already arranges the plugins in a safe sequence.
 
 ## Quick Start
@@ -39,16 +39,6 @@ export default function ArticleEditor() {
 	);
 }
 ```
-
-## Detailed Guide
-_None_
-
-## Props Reference
-_None_
-
-## Sub-Components / Building Blocks
-_None_
-
 ## Examples
 
 ### Bare-bones usage
@@ -58,14 +48,14 @@ _None_
 Use this when you only need basic formatting features and no extra UI or styling.
 
 ## Best Practices & Gotchas
-* Always memoize plugin arrays when you create custom ones to avoid re-mounting the editor.  
-* Keep the array stable: pass the literal `richTextFieldPlugins` variable instead of recreating it on every render.  
-* Wrap the editor in a container with a defined width to prevent unexpected line-wrap behavior.  
+* Always memoize plugin arrays when you create custom ones to avoid re-mounting the editor.
+* Keep the array stable: pass the literal `richTextFieldPlugins` variable instead of recreating it on every render.
+* Wrap the editor in a container with a defined width to prevent unexpected line-wrap behavior.
 * Use Tailwind’s focus utilities (`focus:outline-none`) so keyboard users get proper feedback.
 
 ## Further Reading
-* `RichTextEditor` component  
-* Slate documentation – plugin architecture  
-* Contember UI theme guidelines  
+* `RichTextEditor` component
+* Slate documentation – plugin architecture
+* Contember UI theme guidelines
 
 <!-- End of Generated Documentation -->

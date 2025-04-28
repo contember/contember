@@ -72,9 +72,9 @@ Pass an `options` map for friendly labels.
 ## Props Reference
 | Name | Type | Required | Default | Description |
 |------|------|----------|---------|-------------|
-| field | string &#124; { field: string; hasOneRelationPath?: SugarableHasOneRelation &#124; SugarableHasOneRelation[] } | Yes | — | Field to be displayed. |
+| field | `string \| { field: string; hasOneRelationPath?: SugarableHasOneRelation \| SugarableHasOneRelation[] }` | Yes | — | Field to be displayed. |
 | filterName | string | No | — | Filter identifier. If missing, taken from `field`. |
-| options | Record<string, React.ReactNode> | No | — | Custom enum label map. |
+| options | `Record<string, React.ReactNode>` | No | — | Custom enum label map. |
 | tooltipActions | React.ReactNode | No | — | Extra elements rendered in the tooltip. |
 
 ## Examples

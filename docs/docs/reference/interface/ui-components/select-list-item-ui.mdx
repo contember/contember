@@ -12,11 +12,11 @@ title: SelectListItemUI
 # SelectListItemUI
 
 ## Overview
-SelectListItemUI renders one option inside a Contember `Select` or `MultiSelect` list.  
+SelectListItemUI renders one option inside a Contember `Select` or `MultiSelect` list.
 Wrap the item in `SelectItemTrigger` to commit the value when users click the row.
 
 ## Styling Guidelines
-* All examples use Tailwind CSS classes.  
+* All examples use Tailwind CSS classes.
 * The component adds no styles by itself; apply Tailwind or your Contember theme classes (e.g. `contember-select-item`) as needed.
 
 ## Core Concepts
@@ -78,12 +78,6 @@ import {
 </Popover>
 ```
 `SelectItemTrigger` closes the popover and writes the chosen value. You handle no state yourself.
-
-## Props Reference
-_None_
-
-## Sub-Components / Building Blocks
-_None_
 
 ## Examples
 ### 1. Show loading spinner inside item
@@ -154,15 +148,15 @@ Clicking the item writes `value` to the form field and closes the dropdown.
 Combine list items with custom toolbars, dividers, or other UI elements.
 
 ## Best Practices & Gotchas
-* Always wrap SelectListItemUI in `SelectItemTrigger`; otherwise clicks do nothing.  
-* Keep item padding consistent with `SelectInputUI` for visual alignment.  
-* Use descriptive keys when mapping over dynamic lists to avoid React warnings.  
-* Prevent event bubbling if you render interactive children inside the item.  
+* Always wrap SelectListItemUI in `SelectItemTrigger`; otherwise clicks do nothing.
+* Keep item padding consistent with `SelectInputUI` for visual alignment.
+* Use descriptive keys when mapping over dynamic lists to avoid React warnings.
+* Prevent event bubbling if you render interactive children inside the item.
 * Remove pointer cursor for informational rows so users know they cannot select them.
 
 ## Further Reading
-* SelectItemTrigger – commits the value.  
-* SelectOption – passes context to triggers and list items.  
-* SelectInputUI – renders the input box.  
+* SelectItemTrigger – commits the value.
+* SelectOption – passes context to triggers and list items.
+* SelectInputUI – renders the input box.
 
 <!-- End of Generated Documentation -->

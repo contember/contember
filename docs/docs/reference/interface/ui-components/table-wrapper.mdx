@@ -12,16 +12,16 @@ title: TableWrapper
 # TableWrapper
 
 ## Overview
-TableWrapper groups a `<Table>` with optional headings or other inline elements.  
+TableWrapper groups a `<Table>` with optional headings or other inline elements.
 Use it to keep table content visually separated and to apply shared padding, borders, or background styles.
 
 ## Styling Guidelines
-All examples use Tailwind utility classes.  
+All examples use Tailwind utility classes.
 TableWrapper itself adds no Contember-specific theme classes, so you style it freely with `className`.
 
 ## Core Concepts
-- Wrap every `<Table>` in a TableWrapper for consistent spacing.  
-- Add headings or toolbars inside TableWrapper before the table.  
+- Wrap every `<Table>` in a TableWrapper for consistent spacing.
+- Add headings or toolbars inside TableWrapper before the table.
 - Pass Tailwind classes via `className` to control background, borders, or spacing.
 
 ## Quick Start
@@ -47,15 +47,6 @@ export const MinimalTable = () => (
 	</TableWrapper>
 )
 ```
-
-## Detailed Guide
-_None_
-
-## Props Reference
-_None_
-
-## Sub-Components / Building Blocks
-_None_
 
 ## Examples
 
@@ -113,14 +104,14 @@ You place any React nodes—like headings—above the table but still inside the
 The wrapper keeps the table compact while entity preview components render inside cells.
 
 ## Best Practices & Gotchas
-- Always close TableWrapper around exactly one `<Table>`.  
-- Place toolbars or headings before the table, not inside `<Table>`.  
-- Add outer margin on TableWrapper, not the table, to avoid double spacing.  
+- Always close TableWrapper around exactly one `<Table>`.
+- Place toolbars or headings before the table, not inside `<Table>`.
+- Add outer margin on TableWrapper, not the table, to avoid double spacing.
 - Supply Tailwind classes through `className` instead of nesting extra divs.
 
 ## Further Reading
-- Table  
-- TableRow and TableCell  
+- Table
+- TableRow and TableCell
 - Contember `Field`, `HasOne`, and `HasMany` components for rendering data.
 
 <!-- End of Generated Documentation -->

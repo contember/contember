@@ -10,11 +10,11 @@ title: Progress
 <!-- Import examples: 4 -->
 
 ## Overview
-The `Progress` component renders a horizontal bar that visualizes completion percentage.  
+The `Progress` component renders a horizontal bar that visualizes completion percentage.
 You pass a numeric value (0 – 100) and optionally adjust styling with Tailwind classes or a custom indicator color.
 
 ## Styling Guidelines
-* All snippets use TailwindCSS.  
+* All snippets use TailwindCSS.
 * No special Contember theme classes are required.
 
 ## Core Concepts
@@ -24,15 +24,12 @@ You pass a numeric value (0 – 100) and optionally adjust styling with Tailwind
 
 ## Quick Start
 ```tsx
-import { Progress } from '@app/lib/ui/progress'
+import { Progress } from '~/lib/ui/progress'
 
 export const Demo = () => (
   <Progress value={72} className="w-64" indicatorHexColor="#10b981" />
 )
 ```
-
-## Detailed Guide
-_None_
 
 ## Props Reference
 | Name | Type | Required | Default | Description |
@@ -41,9 +38,6 @@ _None_
 | indicatorHexColor | string | No | – | Hex color of the filled section. |
 | className | string | No | – | Tailwind classes forwarded to the root element. |
 | …HTMLDivElement props | – | No | – | All standard `<div>` attributes are forwarded. |
-
-## Sub-Components / Building Blocks
-_None_
 
 ## Examples
 

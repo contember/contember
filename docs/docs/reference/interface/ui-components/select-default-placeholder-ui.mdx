@@ -12,17 +12,17 @@ title: SelectDefaultPlaceholderUI
 ## SelectDefaultPlaceholderUI
 
 ### Overview
-SelectDefaultPlaceholderUI shows a muted “Select…” text when no option is chosen inside Contember select inputs.  
+SelectDefaultPlaceholderUI shows a muted “Select…” text when no option is chosen inside Contember select inputs.
 You drop it wherever a placeholder should appear; it needs no props or configuration.
 
 ### Styling Guidelines
-* All examples use Tailwind CSS utility classes.  
+* All examples use Tailwind CSS utility classes.
 * The component itself applies Contember’s `text-gray-500 italic` theme classes internally, so you rarely need extra styling.
 
 ### Core Concepts
-* Placeholder appears only when the field has no value.  
-* You can replace or localize the placeholder by passing any React node instead of this component.  
-* Works with both single and multi-select inputs.  
+* Placeholder appears only when the field has no value.
+* You can replace or localize the placeholder by passing any React node instead of this component.
+* Works with both single and multi-select inputs.
 * It renders plain text, so it never triggers a popover or select action.
 
 ### Quick Start
@@ -36,17 +36,6 @@ export const StatusSelect = () => (
 	</SelectInputUI>
 )
 ```
-
-### Detailed Guide
-_None_
-
-### Props Reference
-Name | Type | Required | Default | Description
---- | --- | --- | --- | ---
-_None_
-
-### Sub-Components / Building Blocks
-_None_
 
 ### Examples
 
@@ -117,15 +106,15 @@ Using `SelectPlaceholder` lets you keep layout consistent while conditionally hi
 The component acts as a fallback when no `placeholder` prop is supplied, keeping the field usable without extra work.
 
 ### Best Practices & Gotchas
-* Keep the placeholder short; long texts push icons outside the input.  
-* Swap the component for localized text instead of mutating it.  
-* Do not attach event handlers; the component is purely visual.  
-* Avoid extra wrapping elements—use it directly inside select input bodies where possible.  
+* Keep the placeholder short; long texts push icons outside the input.
+* Swap the component for localized text instead of mutating it.
+* Do not attach event handlers; the component is purely visual.
+* Avoid extra wrapping elements—use it directly inside select input bodies where possible.
 
 ### Further Reading
-* SelectInputUI  
-* SelectPlaceholder  
-* SelectPopoverContent  
-* Contember Form Fields documentation  
+* SelectInputUI
+* SelectPlaceholder
+* SelectPopoverContent
+* Contember Form Fields documentation
 
 <!-- End of Generated Documentation -->

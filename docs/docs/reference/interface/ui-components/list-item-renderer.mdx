@@ -9,18 +9,15 @@ title: ListItemRenderer
 <!-- External examples: 0 -->
 <!-- Import examples: 0 -->
 
-## Overview  
-_None_
+## Styling Guidelines
+* All examples use Tailwind CSS classes.
+* This component does not rely on any Contember-specific theme classes.
 
-## Styling Guidelines  
-* All examples use Tailwind CSS classes.  
-* This component does not rely on any Contember-specific theme classes.  
+## Core Concepts
+* `ListItemRenderer` renders a Slate `ListItemElement`.
+* You must pass the `element` prop obtained from your Slate editor.
 
-## Core Concepts  
-* `ListItemRenderer` renders a Slate `ListItemElement`.  
-* You must pass the `element` prop obtained from your Slate editor.  
-
-## Quick Start  
+## Quick Start
 ```tsx
 import { ListItemRenderer } from './elements/ListItemRenderer'
 
@@ -29,31 +26,16 @@ export const Example = ({ element }: { element: ListItemElement }) => (
     <ListItemRenderer element={element} />
   </div>
 )
-```  
+```
 
-## Detailed Guide  
-_None_
-
-## Props Reference  
+## Props Reference
 
 | Name    | Type | Required | Default | Description |
 |---------|------|----------|---------|-------------|
 | element | ListItemElement | Yes | — | Slate element representing the list item. |
 
-### Inherited Props  
-_None_
-
-## Sub-Components / Building Blocks  
-_None_
-
-## Examples  
-_None_
-
-## Best Practices & Gotchas  
-* Pass the exact `element` object received from Slate.  
-* Do not wrap the component in an `<li>` unless you know the renderer output.  
-
-## Further Reading  
-_None_
+## Best Practices & Gotchas
+* Pass the exact `element` object received from Slate.
+* Do not wrap the component in an `<li>` unless you know the renderer output.
 
 <!-- End of Generated Documentation -->

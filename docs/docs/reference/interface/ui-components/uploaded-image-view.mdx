@@ -13,13 +13,13 @@ title: UploadedImageView
 _None_
 
 ## Styling Guidelines
-* All examples use Tailwind CSS utility classes.  
+* All examples use Tailwind CSS utility classes.
 * The component adds no built-in styles, so you may combine it with your Contember theme classes if needed.
 
 ## Core Concepts
-* Map CMS file fields to visual output with `urlField` and optional metadata fields.  
-* Wrap the component in `<HasOne>` (or another binding component) so field values come from the current entity.  
-* Optional action elements (`actions`, `edit`, `DestroyAction`) let you build inline editing UIs.  
+* Map CMS file fields to visual output with `urlField` and optional metadata fields.
+* Wrap the component in `<HasOne>` (or another binding component) so field values come from the current entity.
+* Optional action elements (`actions`, `edit`, `DestroyAction`) let you build inline editing UIs.
 * The component only renders; it never mutates data unless you supply custom actions.
 
 ## Quick Start
@@ -31,9 +31,6 @@ import { UploadedImageView } from '~/lib/upload'
   <UploadedImageView urlField="url" className="max-w-full rounded shadow" />
 </HasOne>
 ```
-
-## Detailed Guide
-_None_
 
 ## Props Reference
 | Name | Type | Required | Default | Description |
@@ -50,9 +47,6 @@ _None_
 | edit | `React.ReactNode` | No | - | Custom edit UI shown with the image. |
 | noDestroy | `boolean` | No | - | Disable default destroy action when `DestroyAction` is not provided. |
 | DestroyAction | `React.ComponentType<{ children: React.ReactElement }>` | No | - | Custom component wrapping a destroy trigger. |
-
-## Sub-Components / Building Blocks
-_None_
 
 ## Examples
 
@@ -155,17 +149,17 @@ Overlay a checkbox in the corner and hide default danger buttons. Editors can ma
 A CMS project reuses the exact setup, proving the pattern scales across codebases.
 
 ## Best Practices & Gotchas
-* Supply only fields you actually store; missing props do not break rendering.  
-* Always wrap the component in a binding context (`HasOne`, `FieldView`) so data loads.  
-* Use `noDestroy` when the file should survive record deletion in the UI.  
-* Tailwind’s `object-cover` class yields consistent thumbnails.  
-* Pass a custom `DestroyAction` if you need confirmation dialogs or a disconnect action.  
-* Overlay elements (checkboxes, buttons) should share a `relative` parent to avoid stacking issues.  
+* Supply only fields you actually store; missing props do not break rendering.
+* Always wrap the component in a binding context (`HasOne`, `FieldView`) so data loads.
+* Use `noDestroy` when the file should survive record deletion in the UI.
+* Tailwind’s `object-cover` class yields consistent thumbnails.
+* Pass a custom `DestroyAction` if you need confirmation dialogs or a disconnect action.
+* Overlay elements (checkboxes, buttons) should share a `relative` parent to avoid stacking issues.
 * Hide default danger controls with scoped selectors when you provide your own UI.
 
 ## Further Reading
-* `HasOne` relation component  
-* `UploaderDropzoneAreaUI` – for file uploads  
-* Contember guide “Working with images”  
+* `HasOne` relation component
+* `UploaderDropzoneAreaUI` – for file uploads
+* Contember guide “Working with images”
 
 <!-- End of Generated Documentation -->

@@ -9,11 +9,8 @@ title: Title
 <!-- External examples: 6 -->
 <!-- Import examples: 8 -->
 
-## Overview
-_None_
-
 ## Styling Guidelines
-* All code examples use Tailwind CSS classes.  
+* All code examples use Tailwind CSS classes.
 * The `Title` component itself does not require Contember theme classes, but wrap it in Tailwind utility classes as needed.
 
 ## Core Concepts
@@ -24,7 +21,7 @@ _None_
 
 ## Quick Start
 ```tsx
-import { Title } from '@app/lib/layout'
+import { Title } from '~/lib/layout'
 
 export default function ExamplePage() {
 	return (
@@ -37,7 +34,7 @@ export default function ExamplePage() {
 
 ## Detailed Guide
 ```tsx
-import { Slots, Title } from '@app/lib/layout'
+import { Slots, Title } from '~/lib/layout'
 
 export default function ListPage() {
 	return (
@@ -57,12 +54,6 @@ export default function ListPage() {
 	</Title>
 </Slots.Title>
 ```
-
-## Props Reference
-_None_
-
-## Sub-Components / Building Blocks
-_None_
 
 ## Examples
 ```tsx
@@ -101,8 +92,8 @@ Dynamic titles based on URL parameters.
 * Avoid heavy markup—icons and inline fields are fine, but complex layouts belong elsewhere.
 
 ## Further Reading
-* `Slots` layout system  
-* `Binding` data context  
-* `BackButton` and other navigation helpers  
+* `Slots` layout system
+* `Binding` data context
+* `BackButton` and other navigation helpers
 
 <!-- End of Generated Documentation -->

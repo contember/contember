@@ -12,13 +12,13 @@ title: FormContainer
 # FormContainer
 
 ## Overview
-`FormContainer` wraps form inputs with consistent markup and accessibility helpers.  
+`FormContainer` wraps form inputs with consistent markup and accessibility helpers.
 It renders an optional label, description, and error list while managing the required state inside Contember forms.
 
 The component accepts any React children. You embed inputs, editors, or even nested form scopes to keep your UI coherent.
 
 ## Styling Guidelines
-* All snippets use Tailwind CSS.  
+* All snippets use Tailwind CSS.
 * No Contember-specific theme class is required; style with regular Tailwind utilities or your own classes.
 
 ## Core Concepts
@@ -52,10 +52,6 @@ _Optional section omitted._
 | children | React.ReactNode | Yes | — | Elements rendered inside the container. |
 | errors | React.ReactNode &#124; ErrorAccessor.Error[] | No | — | Error message(s) displayed below the field. |
 | required | boolean | No | — | Marks the field as mandatory. |
-
-## Sub-Components / Building Blocks
-_None_
-
 ## Examples
 
 ### Checkbox list with field scope
@@ -91,9 +87,9 @@ The scope binds nested inputs to the `roles` field. `FormContainer` adds a label
 The component hosts either a select or an input based on state, yet keeps consistent labeling and error handling.
 
 ## Best Practices & Gotchas
-* Always pass `errors` from your form validation logic.  
-* Keep one `FormContainer` per logical field.  
-* Avoid wrapping multiple unrelated fields; it harms accessibility.  
+* Always pass `errors` from your form validation logic.
+* Keep one `FormContainer` per logical field.
+* Avoid wrapping multiple unrelated fields; it harms accessibility.
 * Put layout classes such as `flex gap-2` on the child elements, not on `FormContainer`.
 
 ## Further Reading

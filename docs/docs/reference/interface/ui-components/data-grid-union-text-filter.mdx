@@ -44,7 +44,7 @@ import { DataGrid, DataGridUnionTextFilter } from '@contember/react-datagrid'
 | Name  | Type | Required | Default | Description |
 |-------|------|----------|---------|-------------|
 | name  | `string` | Yes | – | Identifier for the filter inside the DataGrid filter form. |
-| fields | `string \| FieldConfig \| Array<string \| FieldConfig>` | Yes | – | Fields that participate in the union search. `FieldConfig` is `{ field: string; hasOneRelationPath?: SugarableHasOneRelation | SugarableHasOneRelation[] }`. |
+| fields | `string \| FieldConfig \| Array<string \| FieldConfig>` | Yes | – | Fields that participate in the union search. `FieldConfig` is `{ field: string; hasOneRelationPath?: SugarableHasOneRelation \| SugarableHasOneRelation[] }`. |
 | label | `React.ReactNode` | No | `undefined` | Optional label shown next to the input. |
 
 

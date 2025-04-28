@@ -12,11 +12,11 @@ title: TooltipProvider
 # TooltipProvider
 
 ## Overview
-`TooltipProvider` sets up a React context that coordinates all nested `Tooltip` components.  
+`TooltipProvider` sets up a React context that coordinates all nested `Tooltip` components.
 Wrap any part of your UI that needs tooltips with this provider once.
 
 ## Styling Guidelines
-* All examples use Tailwind CSS utility classes.  
+* All examples use Tailwind CSS utility classes.
 * No extra Contember theme classes are required.
 
 ## Core Concepts
@@ -45,23 +45,17 @@ export default function Page() {
 }
 ```
 
-## Detailed Guide
-_None_
-
-## Props Reference
-_None_
-
 ## Sub-Components / Building Blocks
 
 ### Tooltip
 Wraps a single trigger/content pair and handles open state.
 
 ### TooltipTrigger
-The interactive element that users hover or focus.  
+The interactive element that users hover or focus.
 Use `asChild` when you want to pass any JSX element as the trigger.
 
 ### TooltipContent
-The panel that displays the tooltip message.  
+The panel that displays the tooltip message.
 Style it with Tailwind classes for background, text, and shadow.
 
 ## Examples
@@ -119,8 +113,8 @@ Render tooltip content dynamically with Contember’s `FormattedField`. The icon
 * Tooltips work on hover and focus; ensure triggers are keyboard-accessible.
 
 ## Further Reading
-* Tooltip, TooltipTrigger and TooltipContent components  
-* Dialog and Popover integration patterns  
-* Tailwind CSS documentation for spacing, color, and shadow utilities  
+* Tooltip, TooltipTrigger and TooltipContent components
+* Dialog and Popover integration patterns
+* Tailwind CSS documentation for spacing, color, and shadow utilities
 
 <!-- End of Generated Documentation -->

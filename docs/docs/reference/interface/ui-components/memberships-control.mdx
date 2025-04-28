@@ -12,11 +12,11 @@ title: MembershipsControl
 # MembershipsControl
 
 ## Overview
-MembershipsControl renders a controlled input that lets you view and update a list of tenant memberships.  
+MembershipsControl renders a controlled input that lets you view and update a list of tenant memberships.
 You pass the current `memberships` array and a `setMemberships` callback; the component notifies you whenever the list changes.
 
 ## Styling Guidelines
-* All examples use Tailwind CSS utility classes.  
+* All examples use Tailwind CSS utility classes.
 * No Contember-specific theme classes are required out of the box.
 
 ## Core Concepts
@@ -44,9 +44,6 @@ export default function MembershipEditor() {
 }
 ```
 
-## Detailed Guide
-_None_
-
 ## Props Reference
 | Name | Type | Required | Default | Description |
 |------|------|----------|---------|-------------|
@@ -54,8 +51,6 @@ _None_
 | setMemberships | (memberships: MembershipInput[]) => void | Yes | — | Callback invoked with the updated memberships array. |
 | roles | RolesConfig | No | — | Optional role configuration. |
 
-## Sub-Components / Building Blocks
-_None_
 
 ## Examples
 
@@ -75,7 +70,7 @@ function SettingsPage() {
   )
 }
 ```
-The component shows the existing memberships and lets you add, remove, or edit them.  
+The component shows the existing memberships and lets you add, remove, or edit them.
 When the user modifies the list, `setMemberships` updates the parent state.
 
 ## Best Practices & Gotchas

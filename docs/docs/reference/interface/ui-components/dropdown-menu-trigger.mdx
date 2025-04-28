@@ -12,17 +12,17 @@ title: DropdownMenuTrigger
 # DropdownMenuTrigger
 
 ## Overview
-`DropdownMenuTrigger` toggles a `DropdownMenu` when the user interacts with its child element.  
+`DropdownMenuTrigger` toggles a `DropdownMenu` when the user interacts with its child element.
 It forwards events and refs to the wrapped element, letting you style or replace the trigger freely.
 
 ## Styling Guidelines
-* All examples use Tailwind CSS.  
+* All examples use Tailwind CSS.
 * No Contember-specific theme classes are required, but you can add project styles through the wrapped element.
 
 ## Core Concepts
-* The trigger is **only a wrapper**—it renders nothing when `asChild` is true.  
-* Interaction state is exposed through `data-[state=open|closed]` attributes for styling.  
-* You must place `DropdownMenuTrigger` **inside** a `DropdownMenu` provider.  
+* The trigger is **only a wrapper**—it renders nothing when `asChild` is true.
+* Interaction state is exposed through `data-[state=open|closed]` attributes for styling.
+* You must place `DropdownMenuTrigger` **inside** a `DropdownMenu` provider.
 * Any element (button, div, icon) can become a trigger via `asChild`.
 
 ## Quick Start
@@ -46,17 +46,11 @@ export const SimpleDropdown = () => (
 )
 ```
 
-## Detailed Guide
-_None_
-
 ## Props Reference
 | Name | Type | Required | Default | Description |
 |------|------|----------|---------|-------------|
 | asChild | boolean | No | `false` | When true, renders only the child element and attaches menu logic to it. |
 | ...HTMLAttributes\<HTMLElement\> | — | No | — | All standard props of the underlying element are forwarded. |
-
-## Sub-Components / Building Blocks
-_None_
 
 ## Examples
 
@@ -95,15 +89,15 @@ Use `asChild` so the button remains untouched and accessible.
 Mix Contember UI buttons with Tailwind utilities to keep design consistent.
 
 ## Best Practices & Gotchas
-* Always wrap the trigger in a `DropdownMenu`; otherwise, it does nothing.  
-* When the child already handles `onClick`, **call `event.preventDefault()`** inside menu items, not on the trigger.  
-* Use the `data-[state=open]` attribute for styling active state instead of manual state tracking.  
-* Set `asChild` for custom elements to avoid extra DOM nodes that could break flex layouts.  
+* Always wrap the trigger in a `DropdownMenu`; otherwise, it does nothing.
+* When the child already handles `onClick`, **call `event.preventDefault()`** inside menu items, not on the trigger.
+* Use the `data-[state=open]` attribute for styling active state instead of manual state tracking.
+* Set `asChild` for custom elements to avoid extra DOM nodes that could break flex layouts.
 * Ensure the trigger is **focusable** for keyboard users (e.g., `button` or `tabIndex={0}`).
 
 ## Further Reading
-* `DropdownMenuContent` – renders the popup.  
-* `DropdownMenuItem` – clickable menu option.  
+* `DropdownMenuContent` – renders the popup.
+* `DropdownMenuItem` – clickable menu option.
 * [Radix UI Dropdown Menu docs](https://www.radix-ui.com/primitives/docs/components/dropdown-menu) – underlying primitive.
 
 <!-- End of Generated Documentation -->

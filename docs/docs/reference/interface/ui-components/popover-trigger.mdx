@@ -9,16 +9,13 @@ title: PopoverTrigger
 <!-- External examples: 10 -->
 <!-- Import examples: 8 -->
 
-## Overview
-_None_
-
 ## Styling Guidelines
-* All examples use Tailwind CSS utility classes.  
+* All examples use Tailwind CSS utility classes.
 * Ensure Contember’s base theme classes are loaded before using the component.
 
 ## Core Concepts
-* PopoverTrigger links a user-visible element to its parent `Popover`.  
-* You usually pass `asChild` to render your own element as the trigger.  
+* PopoverTrigger links a user-visible element to its parent `Popover`.
+* You usually pass `asChild` to render your own element as the trigger.
 * Popover state (open / close) is controlled by the surrounding `Popover`.
 
 ## Quick Start
@@ -37,15 +34,6 @@ export default () => (
 	</Popover>
 )
 ```
-
-## Detailed Guide
-_None_
-
-## Props Reference
-_None_
-
-## Sub-Components / Building Blocks
-_None_
 
 ## Examples
 
@@ -74,12 +62,12 @@ The trigger reuses your `Button` component. Passing `asChild` ensures `PopoverTr
 You can attach a popover to any positioned element. The trigger can be disabled or styled freely.
 
 ## Best Practices & Gotchas
-* Always add `asChild` when you want to style the trigger yourself.  
-* Keep the trigger focusable for keyboard users.  
+* Always add `asChild` when you want to style the trigger yourself.
+* Keep the trigger focusable for keyboard users.
 * Group trigger and content within the same `Popover` component.
 
 ## Further Reading
-* `Popover` – the container that manages open / close state.  
+* `Popover` – the container that manages open / close state.
 * `PopoverContent` – the fly-out panel that holds your UI.
 
 <!-- End of Generated Documentation -->

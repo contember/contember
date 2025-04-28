@@ -12,11 +12,11 @@ title: MultiSelectItemUI
 # MultiSelectItemUI
 
 ## Overview
-MultiSelectItemUI wraps one selected value inside a MultiSelect input.  
+MultiSelectItemUI wraps one selected value inside a MultiSelect input.
 It groups the item content and related triggers (remove, drag-handle) so you can style or reorder the selection consistently.
 
 ## Styling Guidelines
-* All snippets below use Tailwind CSS.  
+* All snippets below use Tailwind CSS.
 * No mandatory Contember theme classes exist for this component. Adjust Tailwind classes to match your design system.
 
 ## Core Concepts
@@ -42,13 +42,8 @@ import {
 </MultiSelectItemUI>
 ```
 
-## Detailed Guide
-_None_
 
-## Props Reference
-| Name | Type | Required | Default | Description |
-|------|------|----------|---------|-------------|
-| _None_ | | | | |
+
 
 ## Sub-Components / Building Blocks
 
@@ -56,7 +51,7 @@ _None_
 Wraps the human-readable label of the selected entity.
 
 ### MultiSelectItemRemoveButtonUI
-Clickable icon/button that removes the item from the selection.  
+Clickable icon/button that removes the item from the selection.
 Call `stopPropagation()` in its `onClick` to avoid toggling the parent popover.
 
 ### MultiSelectItemDragOverlayUI
@@ -65,9 +60,6 @@ Overlay rendered while the item is dragged. Combine with `dnd-kit` or Contember 
 ### MultiSelectSortableItemContentUI
 Drop-in replacement for `MultiSelectItemContentUI` when items are sortable.
 
-## Examples
-_None_
-
 ## Best Practices & Gotchas
 * Always call `e.stopPropagation()` in the remove button’s `onClick` to prevent opening/closing the select popover.
 * Keep the entire item clickable only if you want to toggle the option; wrap internal buttons to isolate events.
@@ -75,9 +67,9 @@ _None_
 * Use the sortable variants only when the parent repeater or list supports drag-and-drop.
 
 ## Further Reading
-* SelectInputUI  
-* SelectEachValue  
-* RepeaterSortableItemActivator  
-* MultiSelect overview page  
+* SelectInputUI
+* SelectEachValue
+* RepeaterSortableItemActivator
+* MultiSelect overview page
 
 <!-- End of Generated Documentation -->

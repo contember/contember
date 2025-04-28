@@ -12,17 +12,17 @@ title: SidebarGroup
 # SidebarGroup
 
 ## Overview
-SidebarGroup wraps a set of sidebar elements and keeps them visually together.  
+SidebarGroup wraps a set of sidebar elements and keeps them visually together.
 Use it to separate logical blocks inside `SidebarContent` and `SidebarFooter`.
 
 ## Styling Guidelines
-* All examples use Tailwind CSS.  
+* All examples use Tailwind CSS.
 * SidebarGroup relies on Contember’s sidebar theme classes (`text-sidebar-…`, `bg-sidebar-…`) applied globally by the layout.
 
 ## Core Concepts
-* Group related links, actions, or slots in one container.  
-* Place SidebarGroup only inside `SidebarContent` or `SidebarFooter`.  
-* Nest `SidebarGroupContent` for extra padding or borders.  
+* Group related links, actions, or slots in one container.
+* Place SidebarGroup only inside `SidebarContent` or `SidebarFooter`.
+* Nest `SidebarGroupContent` for extra padding or borders.
 * Combine multiple groups to create clear visual sections.
 
 ## Quick Start
@@ -42,12 +42,6 @@ export function SimpleSidebar() {
 	)
 }
 ```
-
-## Detailed Guide
-_None_
-
-## Props Reference
-_None_
 
 ## Sub-Components / Building Blocks
 ### SidebarGroupContent
@@ -93,15 +87,15 @@ This pattern keeps main navigation and quick actions visually separated while in
 Placing groups in the footer lets you cluster user-specific widgets away from global navigation.
 
 ## Best Practices & Gotchas
-* Use one group per logical section; avoid over-nesting.  
-* Apply spacing on the group, not individual items, for consistent layout.  
-* Inherit icon colors with `[&_svg]:text-sidebar-accent-…` rather than styling each icon.  
+* Use one group per logical section; avoid over-nesting.
+* Apply spacing on the group, not individual items, for consistent layout.
+* Inherit icon colors with `[&_svg]:text-sidebar-accent-…` rather than styling each icon.
 * Keep groups empty only temporarily; remove them in production builds.
 
 ## Further Reading
-* Sidebar  
-* SidebarContent  
-* SidebarMenu and SidebarMenuItem  
+* Sidebar
+* SidebarContent
+* SidebarMenu and SidebarMenuItem
 * Contember Slot system
 
 <!-- End of Generated Documentation -->

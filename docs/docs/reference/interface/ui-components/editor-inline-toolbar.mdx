@@ -12,11 +12,11 @@ title: EditorInlineToolbar
 # EditorInlineToolbar
 
 ## Overview
-EditorInlineToolbar groups inline formatting controls for Contember’s rich-text editor.  
+EditorInlineToolbar groups inline formatting controls for Contember’s rich-text editor.
 You wrap buttons like `EditorMarkTrigger` or `EditorElementTrigger` inside it, and the toolbar handles focus management and keyboard navigation.
 
 ## Styling Guidelines
-* All examples use Tailwind CSS.  
+* All examples use Tailwind CSS.
 * EditorInlineToolbar renders no default styles—add Tailwind utility classes to the toolbar itself or to its children as needed.
 
 ## Core Concepts
@@ -87,7 +87,6 @@ import { BoldIcon, ItalicIcon, AlignLeftIcon, Toggle } from '~/components/ui'
 |----------|-----------------|----------|---------|---------------------------------------------------------------------|
 | children | React.ReactNode | Yes      | –       | Toolbar content: usually trigger components and groups.             |
 
-**Inherited props:** _None_
 
 ## Sub-Components / Building Blocks
 ### EditorMarkTrigger
@@ -242,7 +241,7 @@ Production apps often keep the toolbar minimal to reduce visual clutter.
 ```
 The split layout keeps text-style buttons left and structural buttons right.
 
-### 108 Agency – rich-text with highlight and code marks
+### Rich-text with highlight and code marks
 ```tsx
 <EditorInlineToolbar>
   <div>
@@ -257,7 +256,7 @@ The split layout keeps text-style buttons left and structural buttons right.
 ```
 Highlight and code are less common marks; showcase how easily you can add them.
 
-### 108 Agency – full toolbar with justify alignment
+### Full toolbar with justify alignment
 ```tsx
 <EditorInlineToolbar>
   <div>

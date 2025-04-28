@@ -11,18 +11,15 @@ title: Menu
 
 # Menu
 
-## Overview
-_None_
-
 ## Styling Guidelines
-* All examples use Tailwind CSS utility classes.  
+* All examples use Tailwind CSS utility classes.
 * The component follows Contember theme tokens where relevant. No additional theme classes are required.
 
 ## Core Concepts
-* Menus group navigation links into vertical trees.  
-* Each `MenuItem` can act as a link or expandable node.  
-* You can nest `MenuItem` components to any depth.  
-* Icons are optional React nodes placed before the label.  
+* Menus group navigation links into vertical trees.
+* Each `MenuItem` can act as a link or expandable node.
+* You can nest `MenuItem` components to any depth.
+* Icons are optional React nodes placed before the label.
 * Role-based wrappers (`HasRole`, `HasCompanyRole`) can wrap `MenuItem` or whole `Menu`.
 
 ## Quick Start
@@ -60,11 +57,6 @@ export const NestedMenu = () => (
 )
 ```
 
-## Props Reference
-| Name | Type | Required | Default | Description |
-|------|------|----------|---------|-------------|
-_None_
-
 ## Sub-Components / Building Blocks
 ### MenuItem
 Reusable item that represents a link or expandable branch inside a `Menu`. See examples above for typical props like `label`, `to`, `icon`, and `expandedByDefault`.
@@ -100,16 +92,16 @@ export const ShortcutsMenu = () => (
 This example mirrors the “Shortcuts” pattern from production apps where a secondary menu accelerates frequent actions.
 
 ## Best Practices & Gotchas
-* Wrap the menu in a fixed-width container to avoid layout shift.  
-* Keep nesting depth shallow; deep trees confuse users.  
-* Use meaningful icons; avoid decorative clutter.  
-* Combine `Menu` with role guards (`HasRole`, `HasCompanyRole`) for secure navigation.  
-* Use consistent `size` values for sibling `MenuItem` elements.  
+* Wrap the menu in a fixed-width container to avoid layout shift.
+* Keep nesting depth shallow; deep trees confuse users.
+* Use meaningful icons; avoid decorative clutter.
+* Combine `Menu` with role guards (`HasRole`, `HasCompanyRole`) for secure navigation.
+* Use consistent `size` values for sibling `MenuItem` elements.
 * Do not mix interactive and disabled states in one group without clear styling.
 
 ## Further Reading
-* `MenuItem` component documentation.  
-* Contember access control wrappers (`HasRole`, `HasCompanyRole`).  
+* `MenuItem` component documentation.
+* Contember access control wrappers (`HasRole`, `HasCompanyRole`).
 * Tailwind layout utilities for sidebars.
 
 <!-- End of Generated Documentation -->

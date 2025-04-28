@@ -12,11 +12,11 @@ title: UploaderItemUI
 ## UploaderItemUI
 
 ### Overview
-`UploaderItemUI` wraps one logical upload slot and decides what to render inside.  
+`UploaderItemUI` wraps one logical upload slot and decides what to render inside.
 It commonly toggles between a `UploaderDropzone` and a preview or input tied to the uploaded file.
 
 ### Styling Guidelines
-* All examples use Tailwind CSS utility classes.  
+* All examples use Tailwind CSS utility classes.
 * `UploaderItemUI` injects no Contember-specific theme classes, so you style it freely.
 
 ### Core Concepts
@@ -38,12 +38,6 @@ export const ImageUploadField = () => (
   </Uploader>
 )
 ```
-
-### Detailed Guide
-_None_
-
-### Props Reference
-_None_
 
 ### Sub-Components / Building Blocks
 #### UploaderRepeaterItemUI
@@ -74,7 +68,7 @@ props => (
   </UploadFieldInner>
 )
 ```
-This wrapper chooses between a user-supplied child or the default preview.  
+This wrapper chooses between a user-supplied child or the default preview.
 `DestroyAction` lets users remove the file.
 
 #### 2. Conditional drop-zone vs. preview
@@ -145,8 +139,8 @@ This wrapper chooses between a user-supplied child or the default preview.
   />
 </UploaderItemUI>
 ```
-The company’s design system demands a transparent background and zero shadow.  
-Utility selectors like `&[_.rounded]` reset nested component styling.  
+The company’s design system demands a transparent background and zero shadow.
+Utility selectors like `&[_.rounded]` reset nested component styling.
 A `DisconnectEntityTrigger` provides a red “delete” button next to the URL input.
 
 ### Best Practices & Gotchas

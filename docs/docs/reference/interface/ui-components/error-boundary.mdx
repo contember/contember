@@ -12,11 +12,11 @@ title: ErrorBoundary
 # ErrorBoundary
 
 ## Overview
-ErrorBoundary traps runtime errors inside its React subtree.  
+ErrorBoundary traps runtime errors inside its React subtree.
 When a child throws, the component swaps in a fallback UI and prevents the whole app from crashing.
 
 ## Styling Guidelines
-* All snippets use Tailwind classes.  
+* All snippets use Tailwind classes.
 * ErrorBoundary itself renders no DOM. No Contember theme classes are required.
 
 ## Core Concepts
@@ -36,17 +36,11 @@ export const Page = () => (
 )
 ```
 
-## Detailed Guide
-_None_
-
 ## Props Reference
 | Name | Type | Required | Default | Description |
 |------|------|----------|---------|-------------|
 | fallback | React.ReactNode | No | `null` | UI rendered when a child throws. |
 | children | React.ReactNode | Yes | — | Components protected by the boundary. |
-
-## Sub-Components / Building Blocks
-_None_
 
 ## Examples
 

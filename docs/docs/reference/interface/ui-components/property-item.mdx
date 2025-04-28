@@ -10,17 +10,17 @@ title: PropertyItem
 <!-- Import examples: 6 -->
 
 ## Overview
-`PropertyItem` renders a single row inside a `PropertyList`.  
+`PropertyItem` renders a single row inside a `PropertyList`.
 It shows a label followed by any React children, letting you highlight entity attributes quickly.
 
 ## Styling Guidelines
-* All examples use Tailwind classes.  
+* All examples use Tailwind classes.
 * `PropertyItem` itself adds no required Contember theme classes.
 
 ## Core Concepts
-* Property lists show read-only data as “label – value” pairs.  
-* `PropertyItem` accepts a `label` prop and any children.  
-* You nest `PropertyItem` inside `PropertyList` for consistent spacing.  
+* Property lists show read-only data as “label – value” pairs.
+* `PropertyItem` accepts a `label` prop and any children.
+* You nest `PropertyItem` inside `PropertyList` for consistent spacing.
 * Children can be plain text or other Contember components.
 
 ## Quick Start
@@ -36,17 +36,11 @@ export const BasicList = () => (
 )
 ```
 
-## Detailed Guide
-_None_
-
 ## Props Reference
 | Name     | Type   | Required | Default | Description                              |
 |----------|--------|----------|---------|------------------------------------------|
 | label    | string | Yes      | —       | Text shown before the value.             |
 | children | ReactNode | Yes | — | Value content rendered after the label. |
-
-## Sub-Components / Building Blocks
-_None_
 
 ## Examples
 ### Formatting entity fields
@@ -68,14 +62,14 @@ This pattern keeps your pages declarative. You pass Contember field components a
 Use complex children such as `HasManyList` to summarise relations in a single row.
 
 ## Best Practices & Gotchas
-* Keep labels short; long text breaks layout on small screens.  
-* Wrap date and number values in formatter components for locale safety.  
-* Do not place interactive elements inside `PropertyItem`; the row is meant for display.  
-* Always group multiple items in `PropertyList` to preserve spacing.  
+* Keep labels short; long text breaks layout on small screens.
+* Wrap date and number values in formatter components for locale safety.
+* Do not place interactive elements inside `PropertyItem`; the row is meant for display.
+* Always group multiple items in `PropertyList` to preserve spacing.
 
 ## Further Reading
-* `PropertyList` – parent container.  
-* `FormattedField` – Contember field formatting helper.  
+* `PropertyList` – parent container.
+* `FormattedField` – Contember field formatting helper.
 * `HasManyList`, `HasOne` – relation helpers.
 
 <!-- End of Generated Documentation -->

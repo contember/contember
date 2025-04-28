@@ -12,17 +12,17 @@ title: SelectInputWrapperUI
 # SelectInputWrapperUI
 
 ## Overview
-SelectInputWrapperUI is a lightweight wrapper placed around SelectInputUI (and its multi-select variations).  
+SelectInputWrapperUI is a lightweight wrapper placed around SelectInputUI (and its multi-select variations).
 It provides the proper positioning so the input cooperates with PopoverTrigger and other Contember select parts.
 
 ## Styling Guidelines
-* All examples use Tailwind utility classes.  
+* All examples use Tailwind utility classes.
 * The wrapper itself needs no extra Contember theme class.
 
 ## Core Concepts
-* Always wrap SelectInputUI with this component.  
-* Keep PopoverTrigger inside the wrapper.  
-* The wrapper adds no visual styling—only layout logic.  
+* Always wrap SelectInputUI with this component.
+* Keep PopoverTrigger inside the wrapper.
+* The wrapper adds no visual styling—only layout logic.
 
 ## Quick Start
 ```tsx
@@ -39,17 +39,6 @@ import { SelectInputWrapperUI, SelectInputUI } from '@contember/ui'
   {/* Popover content here */}
 </Popover>
 ```
-
-## Detailed Guide
-_None_
-
-## Props Reference
-| Name | Type | Required | Default | Description |
-|------|------|----------|---------|-------------|
-| _None_ | | | | |
-
-## Sub-Components / Building Blocks
-_None_
 
 ## Examples
 
@@ -119,17 +108,17 @@ The wrapper keeps the trigger aligned while allowing each selected item to rende
   </FormContainerUI>
 </SelectInputWrapperUI>
 ```
-This pattern shows the wrapper used together with Contember form elements.  
+This pattern shows the wrapper used together with Contember form elements.
 Labels, descriptions, and loaders sit outside the wrapper; the wrapper focuses on aligning the select input with the popover.
 
 ## Best Practices & Gotchas
-* Place PopoverTrigger **inside** SelectInputWrapperUI.  
-* Do not add margins to the wrapper—style surrounding containers instead.  
-* Keep exactly one child inside the wrapper.  
+* Place PopoverTrigger **inside** SelectInputWrapperUI.
+* Do not add margins to the wrapper—style surrounding containers instead.
+* Keep exactly one child inside the wrapper.
 
 ## Further Reading
-* SelectInputUI  
-* SelectPopoverContent  
-* PopoverTrigger  
+* SelectInputUI
+* SelectPopoverContent
+* PopoverTrigger
 
 <!-- End of Generated Documentation -->

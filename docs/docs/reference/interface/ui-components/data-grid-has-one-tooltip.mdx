@@ -70,10 +70,10 @@ import { Field } from '@contember/react-binding'
 ## Props Reference
 | Name | Type | Required | Default | Description |
 |------|------|----------|---------|-------------|
-| field | string &#124; SugarableHasOneRelation &#124; SugarableHasOneRelation[] | Yes | — | The relation you filter by. |
+| field | `string \| { field: string; hasOneRelationPath?: SugarableHasOneRelation \| SugarableHasOneRelation[] }` | Yes | — | The relation you filter by. |
 | children | React.ReactNode | Yes | — | UI shown as the tooltip trigger. |
 | name | string | No | field name | Custom filter name. |
-| options | string &#124; { filter?: SugaredFilter; hasOneRelationPath?: SugarableHasOneRelation &#124; SugarableHasOneRelation[]; entityName: string } | No | — | Advanced filter definition or pre-defined entity list. |
+| options | `string \| { filter?: SugaredFilter; hasOneRelationPath?: SugarableHasOneRelation \| SugarableHasOneRelation[]; entityName: string }` | No | — | Advanced filter definition or pre-defined entity list. |
 | actions | React.ReactNode | No | — | Extra elements rendered inside the tooltip. |
 
 ## Examples

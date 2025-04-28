@@ -11,17 +11,14 @@ title: PropertyLabel
 
 # PropertyLabel
 
-## Overview
-_None_
-
 ## Styling Guidelines
-* All examples use Tailwind CSS utility classes.  
+* All examples use Tailwind CSS utility classes.
 * PropertyLabel works with any Contember theme. No special theme classes are required.
 
 ## Core Concepts
-* PropertyLabel renders a text label inside a PropertyList.  
-* It pairs with PropertyValue and PropertyItem to build read-only detail views.  
-* You can pass Tailwind classes through `className` for quick styling.  
+* PropertyLabel renders a text label inside a PropertyList.
+* It pairs with PropertyValue and PropertyItem to build read-only detail views.
+* You can pass Tailwind classes through `className` for quick styling.
 * PropertyLabel never fetches data; you decide what text it displays.
 
 ## Quick Start
@@ -34,17 +31,6 @@ export const EmailSubject = () => (
 	</PropertyLabel>
 )
 ```
-
-## Detailed Guide
-_None_
-
-## Props Reference
-| Name | Type | Required | Default | Description |
-|------|------|----------|---------|-------------|
-_None_
-
-## Sub-Components / Building Blocks
-_None_
 
 ## Examples
 
@@ -73,14 +59,14 @@ You render a bold label next to rich HTML content. PropertyRow keeps the label a
 You conditionally show the label only in edit mode. Tailwind classes adjust size and remove default border.
 
 ## Best Practices & Gotchas
-* Keep label text short; long labels break layout.  
-* Use semantic Tailwind classes (`font-semibold`, `text-sm`) for consistent typography.  
-* Wrap the component in PropertyRow or PropertyItem for correct spacing.  
+* Keep label text short; long labels break layout.
+* Use semantic Tailwind classes (`font-semibold`, `text-sm`) for consistent typography.
+* Wrap the component in PropertyRow or PropertyItem for correct spacing.
 * Do not place interactive elements inside PropertyLabel; it is presentational only.
 
 ## Further Reading
-* PropertyList – container for labels and values  
-* PropertyItem – combined label + value helper  
+* PropertyList – container for labels and values
+* PropertyItem – combined label + value helper
 * PropertyValue – companion component for displaying data
 
 <!-- End of Generated Documentation -->

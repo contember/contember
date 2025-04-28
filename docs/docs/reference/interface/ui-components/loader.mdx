@@ -9,16 +9,14 @@ title: Loader
 <!-- External examples: 10 -->
 <!-- Import examples: 8 -->
 
-## Overview
-_None_
 
 ## Styling Guidelines
-* All code samples use Tailwind classes.  
+* All code samples use Tailwind classes.
 * `Loader` has no mandatory Contember theme classes.
 
 ## Core Concepts
-* Show a visual indicator while data loads.  
-* Render conditionally based on fetch or mutation state.  
+* Show a visual indicator while data loads.
+* Render conditionally based on fetch or mutation state.
 * Keep the spinner lightweight to avoid blocking the main thread.
 
 ## Quick Start
@@ -32,16 +30,12 @@ export const Page = () => (
 )
 ```
 
-## Detailed Guide
-_None_
 
 ## Props Reference
 | Name | Type | Required | Default | Description |
 |------|------|----------|---------|-------------|
 | size | "sm" &#124; "md" &#124; "lg" | No | "md" | Controls the spinner diameter. |
 
-## Sub-Components / Building Blocks
-_None_
 
 ## Examples
 
@@ -94,14 +88,14 @@ const SaveButton = ({ onSave }: { onSave: () => Promise<void> }) => {
 `Loader` augments the button label without disrupting layout.
 
 ## Best Practices & Gotchas
-* Place the spinner close to the data it represents.  
-* Memoize expensive child elements to prevent unnecessary re-renders.  
-* Prefer the `sm` size inside buttons to keep alignment tidy.  
+* Place the spinner close to the data it represents.
+* Memoize expensive child elements to prevent unnecessary re-renders.
+* Prefer the `sm` size inside buttons to keep alignment tidy.
 * Do not rely on undocumented props; stick to `size`.
 
 ## Further Reading
-* `useEntitySubTreeLoader` – async entity fetching helper.  
-* `IDPState` – identity-provider state machine that often pairs with `Loader`.  
+* `useEntitySubTreeLoader` – async entity fetching helper.
+* `IDPState` – identity-provider state machine that often pairs with `Loader`.
 * Contember UI guidelines on feedback patterns.
 
 <!-- End of Generated Documentation -->

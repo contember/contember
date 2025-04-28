@@ -12,16 +12,16 @@ title: PersonList
 # PersonList
 
 ## Overview
-PersonList renders a paginated table of project members.  
+PersonList renders a paginated table of project members.
 You use it to view, filter, and refresh user memberships inside a Contember project.
 
 ## Styling Guidelines
-* All code samples use Tailwind classes.  
+* All code samples use Tailwind classes.
 * PersonList itself adds no visual styles; wrap it in your theme’s `Card`, `div`, or layout utilities.
 
 ## Core Concepts
-* MemberListController lets you refresh the list programmatically.  
-* RolesConfig supplies human-friendly labels for each role.  
+* MemberListController lets you refresh the list programmatically.
+* RolesConfig supplies human-friendly labels for each role.
 * PersonList reads project context from `ProjectSlugProvider` higher in the tree.
 
 ## Quick Start
@@ -40,18 +40,11 @@ export default () => {
 }
 ```
 
-## Detailed Guide
-_None_
-
 ## Props Reference
 | Name | Type | Required | Default | Description |
 |------|------|----------|---------|-------------|
-| controller | React.RefObject<MemberListController> | No | `undefined` | Controls refresh and other imperative actions. |
+| controller | `React.RefObject<MemberListController>` | No | `undefined` | Controls refresh and other imperative actions. |
 | roles | RolesConfig | No | `undefined` | Role descriptors shown beside each member. |
-| _Inherited props_ | — | — | — | _None_ |
-
-## Sub-Components / Building Blocks
-_None_
 
 ## Examples
 
@@ -95,14 +88,14 @@ The invite form triggers `controller.current?.refresh()` which reloads the list 
 Pass `roles` to display labels and colors specific to your application’s role scheme.
 
 ## Best Practices & Gotchas
-* Always wrap PersonList in a container with overflow handling.  
-* Reuse one MemberListController per page; avoid new refs on each render.  
-* Call `refresh` after any mutation to keep the list in sync.  
+* Always wrap PersonList in a container with overflow handling.
+* Reuse one MemberListController per page; avoid new refs on each render.
+* Call `refresh` after any mutation to keep the list in sync.
 * Provide `roles` so users understand each member’s permissions.
 
 ## Further Reading
-* InviteForm – create new members.  
-* MemberListController – imperative API for PersonList.  
+* InviteForm – create new members.
+* MemberListController – imperative API for PersonList.
 * RolesConfig – structure for role definitions.
 
 <!-- End of Generated Documentation -->

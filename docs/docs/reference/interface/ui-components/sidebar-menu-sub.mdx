@@ -12,17 +12,17 @@ title: SidebarMenuSub
 # SidebarMenuSub
 
 ## Overview
-SidebarMenuSub renders a nested group of sidebar menu items.  
+SidebarMenuSub renders a nested group of sidebar menu items.
 You use it inside a collapsible menu to display second-level navigation.
 
 ## Styling Guidelines
-* All examples use Tailwind CSS.  
+* All examples use Tailwind CSS.
 * No special Contember theme classes are required; inherit styles from parent `SidebarMenu`.
 
 ## Core Concepts
-* SidebarMenuSub groups child items and adds proper indentation.  
-* It relies on the surrounding `SidebarMenu` context.  
-* Use it only inside a collapsible area or another menu item.  
+* SidebarMenuSub groups child items and adds proper indentation.
+* It relies on the surrounding `SidebarMenu` context.
+* Use it only inside a collapsible area or another menu item.
 * Combine with `SidebarMenuSubItem` and `SidebarMenuSubButton` for consistent UX.
 
 ## Quick Start
@@ -66,12 +66,6 @@ export const AppSidebar = () => (
 	</SidebarMenu>
 )
 ```
-
-## Detailed Guide
-_None_
-
-## Props Reference
-_None_
 
 ## Sub-Components / Building Blocks
 ### SidebarMenuSubItem
@@ -133,20 +127,20 @@ Clickable element placed inside `SidebarMenuSubItem`.
 	)
 }
 ```
-This pattern shows how you keep a sub-menu open when one of its descendants is active.  
+This pattern shows how you keep a sub-menu open when one of its descendants is active.
 `SidebarMenuSub` hosts the nested items inside `CollapsibleContent`.
 
 ## Best Practices & Gotchas
-* Render `SidebarMenuSub` only when you actually have nested items.  
-* Add left margin (`ml-*`) so nested items align visually.  
-* Combine with `Collapsible` to toggle visibility instead of conditionally rendering.  
-* Avoid deep nesting beyond two levels; usability suffers.  
+* Render `SidebarMenuSub` only when you actually have nested items.
+* Add left margin (`ml-*`) so nested items align visually.
+* Combine with `Collapsible` to toggle visibility instead of conditionally rendering.
+* Avoid deep nesting beyond two levels; usability suffers.
 * Keep button widths consistent (`w-full`) to keep click targets predictable.
 
 ## Further Reading
-* SidebarMenu  
-* SidebarMenuItem  
-* SidebarMenuButton  
-* Collapsible (from Radix)  
+* SidebarMenu
+* SidebarMenuItem
+* SidebarMenuButton
+* Collapsible (from Radix)
 
 <!-- End of Generated Documentation -->

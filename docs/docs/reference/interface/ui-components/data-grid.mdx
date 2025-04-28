@@ -60,11 +60,11 @@ export const ProjectsGrid = () => (
 | Name | Type | Required | Default | Description |
 |------|------|----------|---------|-------------|
 | children | React.ReactNode | Yes | - | Nested grid parts such as toolbar, loader, and pagination. |
-| entities | string &#124; { … } | Yes | - | Entity name or advanced descriptor. |
+| entities | `string \| { … }` | Yes | - | Entity name or advanced descriptor. |
 | queryField | DataViewUnionFilterFields | Yes | - | Field used by `DataGridQueryFilter`. |
 | filterTypes | DataViewFilterHandlerRegistry | Yes | - | Registry mapping filter components to handlers. |
 | dataViewKey | string | Yes | - | Unique key for storing grid state. |
-| onSelectHighlighted | (entity: EntityAccessor) => void | Yes | - | Called when the user selects the highlighted row. |
+| onSelectHighlighted | `(entity: EntityAccessor) => void` | Yes | - | Called when the user selects the highlighted row. |
 | initialFilters | DataViewFilteringArtifacts &#124; (stored) => … | Yes | - | Initial filter set. |
 | filteringStateStorage | StateStorageOrName | Yes | - | Storage backend for filters. |
 | initialSorting | DataViewSortingDirections | Yes | - | Initial sort directions. |

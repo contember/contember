@@ -10,13 +10,13 @@ title: DataGridHasOneFilter
 <!-- Import examples: 6 -->
 
 ## Overview
-`DataGridHasOneFilter` renders a complete “has-one” filter for a Contember `DataGrid`.  
+`DataGridHasOneFilter` renders a complete “has-one” filter for a Contember `DataGrid`.
 It connects a single entity relation (e.g. `author`, `category`) to user-friendly UI generated from the `children` you pass in.
 
 The component ships with sensible defaults, so you only specify the relation field, a label, and a preview of the related entity.
 
 ## Styling Guidelines
-* All snippets use Tailwind CSS classes.  
+* All snippets use Tailwind CSS classes.
 * The component itself adds no visual style; wrap it in your own Tailwind utility classes or rely on your global Contember theme.
 
 ## Core Concepts
@@ -70,11 +70,11 @@ Setting `name` avoids collisions when multiple filters reference the same relati
 ## Props Reference
 Name | Type | Required | Default | Description
 -----|------|----------|---------|------------
-field | string &#124; SugarableHasOneRelation &#124; SugarableHasOneRelation[] | Yes | — | Relation field to filter by.
+field | `string \| SugarableHasOneRelation \| SugarableHasOneRelation[]` | Yes | — | Relation field to filter by.
 label | React.ReactNode | Yes | — | UI label shown to the user.
 children | React.ReactNode | Yes | — | Rendered inside each option (usually a `Field`).
 name | string | No | field value | Custom filter name (helps with duplicates).
-options | string &#124; { filter?: SugaredFilter; hasOneRelationPath?: SugarableHasOneRelation &#124; SugarableHasOneRelation[]; entityName: string } | No | — | Constrain or remap selectable entities.
+options | `string \| { filter?: SugaredFilter; hasOneRelationPath?: SugarableHasOneRelation \| SugarableHasOneRelation[]; entityName: string }` | No | — | Constrain or remap selectable entities.
 
 ## Sub-Components / Building Blocks
 ### Field
@@ -124,9 +124,9 @@ Combine a text query filter with a relation filter for quick searches.
 * Large datasets need pagination or server-side filtering in `options.filter`.
 
 ## Further Reading
-* `DataGridHasManyFilter` – filter by many-to-many relations.  
-* `DataGridEnumFilter` – filter by enums.  
-* `DataGridBooleanFilter` – simple true/false filtering.  
+* `DataGridHasManyFilter` – filter by many-to-many relations.
+* `DataGridEnumFilter` – filter by enums.
+* `DataGridBooleanFilter` – simple true/false filtering.
 * Contember documentation on “Sugared filters”.
 
 <!-- End of Generated Documentation -->

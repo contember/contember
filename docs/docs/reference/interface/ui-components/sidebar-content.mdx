@@ -9,17 +9,15 @@ title: SidebarContent
 <!-- External examples: 2 -->
 <!-- Import examples: 3 -->
 
-## Overview
-_None_
 
 ## Styling Guidelines
-* All examples in this page use Tailwind CSS utility classes.  
+* All examples in this page use Tailwind CSS utility classes.
 * The component sits inside a `<Sidebar>` that applies Contember theme classes such as `bg-sidebar`, `text-sidebar`, and `text-sidebar-accent`.
 
 ## Core Concepts
-* SidebarContent wraps the scrollable middle section of a Contember sidebar.  
-* It holds one or more `<SidebarGroup>` elements that organize navigation or actions.  
-* You usually pair it with `<SidebarHeader>` and `<SidebarFooter>` for a complete sidebar layout.  
+* SidebarContent wraps the scrollable middle section of a Contember sidebar.
+* It holds one or more `<SidebarGroup>` elements that organize navigation or actions.
+* You usually pair it with `<SidebarHeader>` and `<SidebarFooter>` for a complete sidebar layout.
 * The component accepts standard `div` props (className, style, …) through React’s prop spreading.
 
 ## Quick Start
@@ -45,15 +43,6 @@ export default function BasicSidebar() {
   )
 }
 ```
-
-## Detailed Guide
-_None_
-
-## Props Reference
-_None_
-
-## Sub-Components / Building Blocks
-_None_
 
 ## Examples
 
@@ -139,16 +128,16 @@ export function SupportSidebar() {
 SidebarContent holds both navigation items and quick-action buttons, showing its flexibility.
 
 ## Best Practices & Gotchas
-* Always place SidebarContent between SidebarHeader and SidebarFooter for predictable layout.  
-* Apply `overflow-y-auto` on SidebarContent when the sidebar can grow taller than the viewport.  
-* Keep padding consistent (`px-4 py-6`) so content aligns with header and footer.  
-* Do not nest multiple SidebarContent components inside one Sidebar; use SidebarGroup for sectioning.  
+* Always place SidebarContent between SidebarHeader and SidebarFooter for predictable layout.
+* Apply `overflow-y-auto` on SidebarContent when the sidebar can grow taller than the viewport.
+* Keep padding consistent (`px-4 py-6`) so content aligns with header and footer.
+* Do not nest multiple SidebarContent components inside one Sidebar; use SidebarGroup for sectioning.
 
 ## Further Reading
-* Sidebar  
-* SidebarHeader  
-* SidebarFooter  
-* SidebarGroup  
-* SidebarMenu, SidebarMenuItem, SidebarMenuButton  
+* Sidebar
+* SidebarHeader
+* SidebarFooter
+* SidebarGroup
+* SidebarMenu, SidebarMenuItem, SidebarMenuButton
 
 <!-- End of Generated Documentation -->

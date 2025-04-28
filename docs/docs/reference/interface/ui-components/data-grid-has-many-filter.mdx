@@ -38,11 +38,11 @@ It renders a default UI so users can pick multiple related entities when filteri
 ## Props Reference
 | Name | Type | Required | Default | Description |
 | --- | --- | --- | --- | --- |
-| field | string &#124; object | Yes | — | The relation path to filter by. |
+| field | `string \| object` | Yes | — | The relation path to filter by. |
 | label | React.ReactNode | Yes | — | Visible label above the filter UI. |
 | children | React.ReactNode | Yes | — | Elements rendered inside the filter (e.g., `<Field>`). |
 | name | string | No | Field value | Custom filter name. |
-| options | string &#124; object | No | — | Pre-filtered entity list or filter definition. |
+| options | `string \| object` | No | — | Pre-filtered entity list or filter definition. |
 
 ## Examples
 
@@ -82,7 +82,7 @@ The popover keeps the main toolbar compact while still exposing advanced relatio
 
 ## Best Practices & Gotchas
 * Place the filter inside **DataGridToolbar** to ensure correct layout.
-* Always supply at least one **<Field>** so users see meaningful data.
+* Always supply at least one **`<Field>`** so users see meaningful data.
 * Use **name** when you reuse the same relation path with different criteria.
 * Remember that **options** can be either a Contember query string or an object; pick the simpler form.
 

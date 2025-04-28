@@ -9,17 +9,14 @@ title: TableHeader
 <!-- External examples: 10 -->
 <!-- Import examples: 7 -->
 
-## Overview  
-_None_
-
-## Styling Guidelines  
-* All snippets use Tailwind CSS.  
+## Styling Guidelines
+* All snippets use Tailwind CSS.
 * No additional Contember theme classes are required for `TableHeader`.
 
-## Core Concepts  
-* `TableHeader` wraps one or more `TableRow` elements.  
-* Place it directly inside `Table` before `TableBody`.  
-* Combine with `TableHead` for individual header cells.  
+## Core Concepts
+* `TableHeader` wraps one or more `TableRow` elements.
+* Place it directly inside `Table` before `TableBody`.
+* Combine with `TableHead` for individual header cells.
 * Keep the component purely structural—put styles on `TableHead` or `TableRow`.
 
 ## Quick Start
@@ -40,18 +37,9 @@ export const BasicTable = () => (
 )
 ```
 
-## Detailed Guide  
-_None_
+## Examples
 
-## Props Reference  
-_None_
-
-## Sub-Components / Building Blocks  
-_None_
-
-## Examples  
-
-### ACL-Aware Table  
+### ACL-Aware Table
 The header defines two permission columns and an input column. The body is driven by Contember data bindings.
 ```tsx
 <Table>
@@ -75,7 +63,7 @@ The header defines two permission columns and an input column. The body is drive
 ```
 **Why it matters:** You keep permission-related columns grouped and readable while Contember handles data security.
 
-### Editable Factors List  
+### Editable Factors List
 You can mix static widths with flexible columns.
 ```tsx
 <Table>
@@ -96,16 +84,16 @@ You can mix static widths with flexible columns.
 ```
 **Why it matters:** Fixed widths keep key columns aligned across pages.
 
-## Best Practices & Gotchas  
-* Keep exactly one `TableHeader` per table for valid semantics.  
-* Avoid putting interactive elements (buttons, inputs) inside `TableHeader`; reserve them for `TableBody`.  
-* Style the background at the `TableRow` level to affect all header cells consistently.  
+## Best Practices & Gotchas
+* Keep exactly one `TableHeader` per table for valid semantics.
+* Avoid putting interactive elements (buttons, inputs) inside `TableHeader`; reserve them for `TableBody`.
+* Style the background at the `TableRow` level to affect all header cells consistently.
 * Apply responsive classes (`hidden md:table-cell`) directly on `TableHead` when you need column hiding.
 
-## Further Reading  
-* `Table` – container component.  
-* `TableBody` – body section for data rows.  
-* `TableRow` – structural row element.  
+## Further Reading
+* `Table` – container component.
+* `TableBody` – body section for data rows.
+* `TableRow` – structural row element.
 * `TableHead` – header cell element.
 
 <!-- End of Generated Documentation -->

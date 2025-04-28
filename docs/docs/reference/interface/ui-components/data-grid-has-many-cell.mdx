@@ -64,7 +64,7 @@ import { DataGridHasManyCell, Filter } from '@contember/admin'
 ## Props Reference
 | Name | Type | Required | Default | Description |
 |------|------|----------|---------|-------------|
-| field | string &#124; { hasOneRelationPath?: SugarableHasOneRelation &#124; SugarableHasOneRelation[]; hasManyRelation: SugarableHasManyRelation } | Yes | — | Has-many field to display. |
+| field | `string \| { hasOneRelationPath?: SugarableHasOneRelation \| SugarableHasOneRelation[]; hasManyRelation: SugarableHasManyRelation }` | Yes | — | Has-many field to display. |
 | filterName | string | No | — | Filter identifier. Resolved from `field` when omitted. |
 | children | React.ReactNode | Yes | — | Render prop in the context of the has-many relation. |
 | tooltipActions | React.ReactNode | No | — | Custom content rendered inside the tooltip. |

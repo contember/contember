@@ -12,11 +12,11 @@ title: VideoRepeaterField
 # VideoRepeaterField
 
 ## Overview
-VideoRepeaterField lets you manage an ordered collection of videos inside an Entity context.  
+VideoRepeaterField lets you manage an ordered collection of videos inside an Entity context.
 It handles uploads, previews, drag-and-drop sorting, and progress tracking for each video file.
 
 ## Styling Guidelines
-* All code samples use Tailwind classes.  
+* All code samples use Tailwind classes.
 * No special Contember theme classes are required; the component inherits your form styles.
 
 ## Core Concepts
@@ -39,9 +39,6 @@ It handles uploads, previews, drag-and-drop sorting, and progress tracking for e
 </div>
 ```
 
-## Detailed Guide
-_None_
-
 ## Props Reference
 | Name | Type | Required | Default | Description |
 |------|------|----------|---------|-------------|
@@ -57,9 +54,6 @@ _None_
 | fileTypeField | Not specified | No | — | Field storing MIME type |
 | lastModifiedField | Not specified | No | — | Field storing file last-modified timestamp |
 | *Inherited props* | — | — | — | _None documented_ |
-
-## Sub-Components / Building Blocks
-_None_
 
 ## Examples
 
@@ -99,9 +93,9 @@ This setup saves all video metadata under the nested `video` object and allows r
 * Provide a fallback poster image for videos if the backend cannot generate thumbnails.
 
 ## Further Reading
-* FileRepeaterField – similar API for generic files.  
-* ImageRepeaterField – image-specific variant with cropping support.  
-* EntitySubTree – wraps a single entity context.  
+* FileRepeaterField – similar API for generic files.
+* ImageRepeaterField – image-specific variant with cropping support.
+* EntitySubTree – wraps a single entity context.
 * EntityListSubTree – handles lists of entities.
 
 <!-- End of Generated Documentation -->

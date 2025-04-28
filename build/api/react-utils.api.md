@@ -66,6 +66,9 @@ export const localStateStorage: StateStorage;
 export type MaybeRef<T> = ((instance: T | null) => void) | MutableRefObject<T | null> | null | undefined;
 
 // @public (undocumented)
+export type NoConstructor<T extends Function> = T extends new (...args: unknown[]) => unknown ? never : T;
+
+// @public (undocumented)
 export const noop: () => undefined;
 
 // @public (undocumented)
@@ -209,7 +212,7 @@ export function useOnWindowResize(callback: (event: Event) => void, interval?: n
 export const usePreviousValue: <Value>(value: Value) => Value;
 
 // @public (undocumented)
-export const useReferentiallyStableCallback: <T extends (...args: any[]) => any>(callback: T) => T;
+export const useReferentiallyStableCallback: <T extends Function>(callback: NoConstructor<T>) => T;
 
 // @public (undocumented)
 export const useScopedConsoleRef: (prefix: string, override?: boolean) => MutableRefObject<ScopedConsoleContextType>;

@@ -8,7 +8,7 @@ export const useDataBindingEvent = <Type extends keyof DataBindingEventListenerM
 	listener: DataBindingEventListenerMap[Type],
 ): void => {
 	const { addEventListener } = useBindingOperations()
-	const listenerStable = useReferentiallyStableCallback(listener)
+	const listenerStable = useReferentiallyStableCallback(listener as any)
 	useEffect(() => {
 		const unsubscribe = addEventListener(event, listenerStable)
 		return () => unsubscribe()

@@ -14,12 +14,17 @@ export type UploaderProps =
 		fileType: FileType
 		children?: ReactNode
 	}
-
+const noop = () => Promise.resolve(undefined)
 export const Uploader = Component<UploaderProps>(({ baseField, fileType, children }) => {
 	const fillEntityEvents = useFillEntity({
 		baseField,
 		fileType,
 		onError: uploaderErrorHandler,
+		onStartUpload: noop,
+		onBeforeUpload: noop,
+		onProgress: noop,
+		onAfterUpload: noop,
+		onSuccess: noop,
 	})
 	const { files, ...stateEvents } = useUploadState(fillEntityEvents)
 	const onDrop = useUploaderDoUpload(stateEvents)

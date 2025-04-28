@@ -33,7 +33,7 @@ export const useFillDiscriminatedEntity = ({ baseField, types, discriminatorFiel
 		...events,
 		onBeforeUpload: useReferentiallyStableCallback(async event => {
 			const type = await getResolvedFileType(event.file)
-			return events.onBeforeUpload?.(event) ?? type[1]
+			return (await events.onBeforeUpload?.(event)) ?? type[1]
 		}),
 		onStartUpload: useReferentiallyStableCallback((event: StartUploadEvent) => {
 			if (baseField) {

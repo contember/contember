@@ -15,11 +15,18 @@ export type MultiUploaderProps =
 		children?: ReactNode
 	}
 
+const noop = () => Promise.resolve(undefined)
+
 export const MultiUploader = Component<MultiUploaderProps>(({ baseField, fileType, children }) => {
 	const fillEntityEvents = useCreateRepeaterEntity({
 		baseField,
 		fileType,
 		onError: uploaderErrorHandler,
+		onStartUpload: noop,
+		onBeforeUpload: noop,
+		onProgress: noop,
+		onAfterUpload: noop,
+		onSuccess: noop,
 	})
 	const { files, ...stateEvents } = useUploadState(fillEntityEvents)
 	const onDrop = useUploaderDoUpload(stateEvents)

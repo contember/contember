@@ -28,7 +28,7 @@ export const useCreateRepeaterEntity = ({ baseField, fileType, ...events }: UseF
 				entityMap.current.set(event.file.file, getEntity)
 			})
 
-			return events.onBeforeUpload?.(event) ?? fileType
+			return (await events.onBeforeUpload?.(event)) ?? fileType
 		}),
 		onAfterUpload: useReferentiallyStableCallback(async event => {
 			await Promise.all([

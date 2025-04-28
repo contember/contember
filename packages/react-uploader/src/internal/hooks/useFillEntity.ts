@@ -22,7 +22,7 @@ export const useFillEntity = ({ baseField, fileType, ...events }: UseFillEntityA
 				return undefined
 			}
 
-			return events.onBeforeUpload?.(event) ?? fileType
+			return (await events.onBeforeUpload?.(event)) ?? fileType
 		}),
 		onStartUpload: useReferentiallyStableCallback((event: StartUploadEvent) => {
 			if (baseField) {

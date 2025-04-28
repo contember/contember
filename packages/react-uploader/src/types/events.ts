@@ -37,10 +37,10 @@ export type ErrorEvent = {
 }
 
 export type UploaderEvents = {
-	onBeforeUpload?: (event: BeforeUploadEvent) => Promise<FileType | undefined>
-	onStartUpload?: (event: StartUploadEvent) => void
-	onProgress?: (event: ProgressEvent) => void
-	onAfterUpload?: (event: AfterUploadEvent) => Promise<void> | void
-	onSuccess?: (event: SuccessEvent) => void
-	onError?: (event: ErrorEvent) => void
+	onBeforeUpload: (event: BeforeUploadEvent) => Promise<FileType | undefined>
+	onStartUpload: (event: StartUploadEvent) => void
+	onProgress: (event: ProgressEvent) => void
+	onAfterUpload: (event: AfterUploadEvent) => Promise<void> | void
+	onSuccess: (event: SuccessEvent) => void
+	onError: (event: ErrorEvent) => void
 }

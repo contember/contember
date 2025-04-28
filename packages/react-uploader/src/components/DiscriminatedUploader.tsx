@@ -17,12 +17,19 @@ export type DiscriminatedUploaderProps = {
 	types: DiscriminatedFileTypeMap
 }
 
+const noop = () => Promise.resolve(undefined)
+
 export const DiscriminatedUploader = Component<DiscriminatedUploaderProps>(({ baseField, types, children, discriminatorField }) => {
 	const fillEntityEvents = useFillDiscriminatedEntity({
 		baseField,
 		onError: uploaderErrorHandler,
 		discriminatorField,
 		types,
+		onStartUpload: noop,
+		onBeforeUpload: noop,
+		onProgress: noop,
+		onAfterUpload: noop,
+		onSuccess: noop,
 	})
 	const { files, ...stateEvents } = useUploadState(fillEntityEvents)
 

@@ -41,7 +41,7 @@ export type DataGridTextFilterProps =
  * ## Props {@link DataGridTextFilterProps}
  * field, label, ?name
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <DataGridTextFilter field={'name'} label="Name" />
  * ```
@@ -69,7 +69,7 @@ export type DataGridUnionTextFilterProps =
  * ## Props {@link DataGridUnionTextFilterProps}
  * fields, label, ?name
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <DataGridUnionTextFilter fields={['name', 'description']} label="Name or description" />
  * ```
@@ -91,7 +91,7 @@ export type DataGridQueryFilterProps = {
 /**
  * Universal text filter for DataGrid with default UI. By default, it filters all text fields.
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <DataGridQueryFilter label="Search" />
  * ```

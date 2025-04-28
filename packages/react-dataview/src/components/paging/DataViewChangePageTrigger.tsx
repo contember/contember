@@ -39,7 +39,7 @@ export interface DataViewChangePageTriggerProps {
  * ## Data Attributes (applied to `Slot`)
  * - **`data-active`**: Present if the trigger corresponds to the current page.
  * - **`data-current`**: Reflects the current page index (0-based).
- * ## Example
+ * #### Example
  * ```tsx
  * <DataViewChangePageTrigger page="next">
  *     <button>Next</button>

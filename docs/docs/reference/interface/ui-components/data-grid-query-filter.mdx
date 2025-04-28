@@ -1,0 +1,107 @@
+---
+title: DataGridQueryFilter
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 12 -->
+<!-- Source examples: 1 -->
+<!-- Playground examples: 1 -->
+<!-- External examples: 10 -->
+<!-- Import examples: 6 -->
+
+## Overview
+DataGridQueryFilter adds a universal text search box to any `DataGrid`.
+It searches across every text column automatically, using Contember’s default UI.
+
+## Styling Guidelines
+* All code samples use Tailwind CSS utility classes.
+* No extra Contember theme classes are required for this component.
+
+## Core Concepts
+* The filter targets **all** text columns unless narrowed by other filters.
+* It works only inside a `DataGrid` or its toolbar.
+* You can localize the UI via the optional `label` prop.
+* The filter updates the underlying query instantly on change.
+
+## Quick Start
+```tsx
+import { DataGrid, DataGridQueryFilter, DataGridToolbar } from '~/lib/datagrid'
+
+export const UsersList = () => (
+	<DataGrid entities="User">
+		<DataGridToolbar className="flex gap-2">
+			<DataGridQueryFilter label="Search users" />
+		</DataGridToolbar>
+	</DataGrid>
+)
+```
+
+## Detailed Guide
+### Customizing the label
+Change the placeholder text with the `label` prop.
+```tsx
+<DataGridQueryFilter label="Search products…" />
+```
+
+### Grouping filters in a popover
+```tsx
+import { Popover, PopoverTrigger, PopoverContent } from '~/lib/ui'
+
+<DataGridToolbar className="flex gap-2">
+	<DataGridQueryFilter />
+	<Popover>
+		<PopoverTrigger asChild>
+			<button className="btn-outline h-auto">More filters</button>
+		</PopoverTrigger>
+		<PopoverContent className="p-4">
+			<div className="flex flex-col gap-2">
+				<DataGridBooleanFilter field="active" label="Active" />
+				<DataGridDateFilter field="createdAt" label="Created at" />
+			</div>
+		</PopoverContent>
+	</Popover>
+</DataGridToolbar>
+```
+
+## Props Reference
+| Name  | Type | Required | Default | Description |
+|-------|------|----------|---------|-------------|
+| label | React.ReactNode | No | – | Text shown as the input’s label or placeholder |
+## Examples
+### Marketplace search
+```tsx
+<DataGridToolbarUI>
+	<div className="flex flex-1 flex-wrap gap-2">
+		<DataGridQueryFilter />
+		<DataGridHasManyFilter field="categories" label="Category">
+			<Field field="name" />
+		</DataGridHasManyFilter>
+	</div>
+</DataGridToolbarUI>
+```
+The universal filter lets users search courses by title, description, and other text fields while category filtering remains separate.
+
+### Mixed filter set inside listings
+```tsx
+<>
+	<DataGridQueryFilter />
+	<DataGridBooleanFilter field="info.active" label="Active" />
+	<DataGridEnumFilter field="status" label="Status" />
+</>
+```
+This pattern mixes text search with boolean and enum filters, offering rich query options without extra code.
+
+## Best Practices & Gotchas
+* Place the filter in a toolbar or above the grid for visibility.
+* Combine with `DataGridBooleanFilter` or others for advanced searches.
+* Avoid duplicating text filters; one universal query is enough.
+* Remember to pass a clear `label` for accessibility.
+
+## Further Reading
+* DataGridBooleanFilter
+* DataGridEnumFilter
+* DataGridDateFilter
+* DataGridHasOneFilter
+* DataGridHasManyFilter
+
+<!-- End of Generated Documentation -->

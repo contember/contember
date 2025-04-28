@@ -33,7 +33,7 @@ export interface DataViewTextFilterMatchModeTriggerProps {
  * ## Data Attributes (applied to `Slot`)
  * - **`data-active`**: Present if the trigger's match mode is currently active.
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <DataViewTextFilterMatchModeTrigger mode="contains">
  *     <button>Contains</button>

@@ -1,0 +1,98 @@
+---
+title: MultiSelectInput
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 1 -->
+<!-- Source examples: 1 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 0 -->
+<!-- Import examples: 0 -->
+
+# MultiSelectInput
+
+## Overview
+MultiSelectInput lets you select multiple values from a list of options.
+You can filter, sort, and create new entities without leaving the form.
+
+## Styling Guidelines
+* All examples use Tailwind for layout.
+* No Contember-specific theme classes are required.
+
+## Core Concepts
+* Select several related entities in one input.
+* Filter the option list using Contember operators.
+* Sort options ascending or descending.
+* Render an inline form for missing entities.
+
+## Quick Start
+```tsx
+import { MultiSelectInput, Field } from '@contember/admin'
+
+<MultiSelectInput
+  field="tags"
+  placeholder="Select tags"
+  options={[
+    { field: 'id', operator: 'eq', value: '1', label: 'Tag 1' },
+    { field: 'id', operator: 'eq', value: '2', label: 'Tag 2' },
+  ]}
+  createNewForm={<div>Form to create a new tag</div>}
+  initialSorting="ASC"
+  className="w-full"
+>
+  <Field field="name" />
+</MultiSelectInput>
+```
+
+## Detailed Guide
+1. Pass `field` with the relation name (for example, `"tags"`).
+2. Supply `options` as an array of filter objects containing a visible `label`.
+3. Add a `<Field>` child to decide what the dropdown shows.
+4. Control option order with `initialSorting="ASC"` or `"DESC"`.
+5. Provide `createNewForm` to let users add entities inline.
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+| ---- | ---- | -------- | ------- | ----------- |
+| field | string | Yes | — | Relation path in the current entity. |
+| placeholder | string | No | — | Text shown when nothing is selected. |
+| options | Array\<FilterWithLabel\> | Yes | — | Filters that build the selectable list. |
+| createNewForm | ReactNode | No | — | Component rendered inside the dropdown for inline creation. |
+| initialSorting | `'ASC' \| 'DESC'` | No | — | Initial sort direction of the options. |
+
+## Sub-Components / Building Blocks
+### Field
+Place any `<Field>` from `@contember/admin` as a child.
+It defines which column appears in the option list.
+
+## Examples
+### Basic usage with inline entity creation
+```tsx
+<MultiSelectInput
+  field="tags"
+  placeholder="Select tags"
+  options={[
+    { field: 'id', operator: 'eq', value: '1', label: 'Tag 1' },
+    { field: 'id', operator: 'eq', value: '2', label: 'Tag 2' },
+  ]}
+  createNewForm={<div>Form to create a new tag</div>}
+  initialSorting="ASC"
+  className="w-full"
+>
+  <Field field="name" />
+</MultiSelectInput>
+```
+Users pick existing tags or add a new one without leaving the dropdown.
+
+## Best Practices & Gotchas
+* Keep `options` small to avoid long queries.
+* Always include a `<Field>` child; otherwise the dropdown shows raw IDs.
+* Use `createNewForm` sparingly so the UI stays focused.
+* Apply Tailwind `truncate` to handle long option labels.
+
+## Further Reading
+* SelectInput – single-value variant.
+* Contember Filters – build complex option queries.
+* Form Blocks – create reusable inline forms.
+
+<!-- End of Generated Documentation -->

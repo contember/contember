@@ -5,7 +5,7 @@ import { Entity } from '@contember/react-binding'
 /**
  * Iterates over all entities in the repeater and renders the children for each entity.
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <RepeaterEachItem>
  *     <div>

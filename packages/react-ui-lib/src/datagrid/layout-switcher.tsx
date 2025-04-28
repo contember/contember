@@ -1,8 +1,7 @@
 import { DataViewLayoutTrigger, useDataViewSelectionState } from '@contember/react-dataview'
 import { Button } from '../ui/button'
-import * as React from 'react'
 import { dict } from '../dict'
-import { uic } from '../utils/uic'
+import { uic } from '../utils'
 
 const LayoutSwitchButton = uic(Button, {
 	baseClass: 'data-[active]:text-blue-600 data-[active]:bg-gray-50 data-[active]:shadow-inner gap-2 flex-1',
@@ -13,7 +12,13 @@ const LayoutSwitchButton = uic(Button, {
 })
 
 /**
- * Layout switcher UI for data grid. Displays buttons for each layout.
+ * `DataGridLayoutSwitcher` is a UI component for switching between different data grid layouts.
+ * It renders a set of buttons, allowing users to select and apply a layout dynamically.
+ *
+ * #### Example: Basic Usage
+ * ```tsx
+ * <DataGridLayoutSwitcher />
+ * ```
  */
 export const DataGridLayoutSwitcher = () => {
 	const layouts = useDataViewSelectionState().layouts

@@ -21,7 +21,7 @@ export interface DataViewHasFilterTypeProps {
  *
  * See {@link DataViewHasFilterTypeProps} for details.
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <DataViewHasFilterType name="text">
  *     //  Filter controls here 

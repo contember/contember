@@ -38,7 +38,7 @@ export interface DataViewExportTriggerProps {
  * - Automatically fetches all data before generating the export file.
  * - Downloads the exported file with the specified `baseName` and file extension.
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <DataViewExportTrigger baseName="my-export">
  *     <button>Export Data</button>

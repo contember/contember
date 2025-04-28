@@ -1,0 +1,71 @@
+---
+title: DataGridExcludeActionButtonUI
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 0 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 0 -->
+<!-- Import examples: 0 -->
+
+# DataGridExcludeActionButtonUI
+
+## Overview
+DataGridExcludeActionButtonUI renders a button wrapped in a tooltip.
+Clicking the button triggers the DataGrid “exclude” action, letting users hide unwanted rows.
+
+## Styling Guidelines
+* All code samples use Tailwind CSS classes.
+* The component does not require special Contember theme classes, but it inherits your global button styles.
+
+## Core Concepts
+* Exclude action hides selected items within a DataGrid.
+* Tooltip conveys the button’s intent without cluttering the UI.
+* Place the button inside a toolbar or action area for intuitive access.
+
+## Quick Start
+```tsx
+import { DataGridExcludeActionButtonUI } from '@contember/react-datagrid'
+
+export const Toolbar = () => (
+	<div className="flex gap-2">
+		<DataGridExcludeActionButtonUI />
+	</div>
+)
+```
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+
+## Examples
+
+### Exclude rows from a DataGrid
+```tsx
+import { DataGrid, DataGridExcludeActionButtonUI } from '@contember/react-datagrid'
+
+export const UsersGrid = () => (
+	<DataGrid className="border rounded">
+		<header className="flex items-center gap-2 p-2 border-b">
+			<DataGridExcludeActionButtonUI />
+		</header>
+
+		{/* ...your columns and rows here... */}
+	</DataGrid>
+)
+```
+This pattern places the button in the grid header so users can quickly exclude selected rows.
+
+## Best Practices & Gotchas
+* Pair the button with selection checkboxes so users understand which rows will be excluded.
+* Keep the tooltip text short—single-word verbs work best.
+* Disable the button when no rows are selected to prevent confusion.
+* Test keyboard navigation; focus should move into the tooltip affordance smoothly.
+
+## Further Reading
+* DataGrid
+* DataGridDeleteActionButtonUI
+* Contember Action System
+
+<!-- End of Generated Documentation -->

@@ -14,7 +14,7 @@ export class AddIDPMutationResolver implements MutationResolvers {
 			message: 'You are not allowed to add IDP',
 		})
 		const result = await this.idpManager.addIDP(context.db, {
-			configuration: args.configuration,
+			configuration: args.configuration as any,
 			slug: args.identityProvider,
 			type: args.type,
 			options: {

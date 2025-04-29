@@ -86,6 +86,8 @@ jobs:
         run: |
           bun --version
           bun install --frozen-lockfile
+      - name: build
+        run: bun run pre-build
       - name: "Build server"
         run: ./scripts/server-build/run.sh
 

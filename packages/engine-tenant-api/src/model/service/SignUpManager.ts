@@ -1,12 +1,12 @@
 import { CreateIdentityCommand, CreatePersonCommand } from '../commands'
-import { PersonQuery, PersonRow } from '../queries'
-import { SignUpErrorCode } from '../../schema'
+import { ConfigurationQuery, PersonRow } from '../queries'
+import { SignUpErrorCode, WeakPasswordReason } from '../../schema'
 import { TenantRole } from '../authorization'
-import { getPasswordWeaknessMessage } from '../utils/password'
-import { Response, ResponseError, ResponseOk } from '../utils/Response'
+import { Response, ResponseOk } from '../utils/Response'
 import { DatabaseContext } from '../utils'
 import { MaybePassword } from '../dtos'
 import { EmailValidator } from './EmailValidator'
+import { PasswordStrengthValidator } from './PasswordStrengthValidator'
 
 type SignUpUser = {
 	email: string
@@ -18,6 +18,7 @@ type SignUpUser = {
 export class SignUpManager {
 	constructor(
 		private readonly emailValidator: EmailValidator,
+		private readonly passwordStrengthValidator: PasswordStrengthValidator,
 	) {
 	}
 
@@ -27,10 +28,15 @@ export class SignUpManager {
 			return validationError
 		}
 		const plainPassword = password.getPlain()
-		const weakPassword = plainPassword ? getPasswordWeaknessMessage(plainPassword) : null
-		if (weakPassword) {
-			return new ResponseError('TOO_WEAK', weakPassword)
+
+		if (plainPassword) {
+			const config = await dbContext.queryHandler.fetch(new ConfigurationQuery())
+			const passwordVerifyResult = await this.passwordStrengthValidator.verify(plainPassword, config.password, 'TOO_WEAK')
+			if (!passwordVerifyResult.ok) {
+				return passwordVerifyResult
+			}
 		}
+
 		const person = await dbContext.transaction(async db => {
 			const identityId = await db.commandBus.execute(new CreateIdentityCommand([...roles, TenantRole.PERSON]))
 			return await db.commandBus.execute(new CreatePersonCommand({ identityId, email, password }))
@@ -42,4 +48,6 @@ export class SignUpManager {
 export class SignUpResult {
 	constructor(public readonly person: Omit<PersonRow, 'roles'>) {}
 }
-export type SignUpResponse = Response<SignUpResult, SignUpErrorCode>
+export type SignUpResponse = Response<SignUpResult, SignUpErrorCode, {
+	weakPasswordReasons?: WeakPasswordReason[]
+}>

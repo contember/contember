@@ -184,6 +184,7 @@ const sidebars: SidebarsConfig = {
 						'reference/engine/tenant/idp',
 						'reference/engine/tenant/passwordless',
 						'reference/engine/tenant/mail-templates',
+						'reference/engine/tenant/password-policy',
 					],
 				},
 				{

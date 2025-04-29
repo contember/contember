@@ -3,7 +3,7 @@ import { InviteErrorCodes } from './tenant/hooks/useInvite'
 import { UploaderErrorType } from '@contember/react-uploader'
 import { ChangeMyPasswordFormErrorCode, CreateApiKeyFormErrorCode } from '@contember/interface'
 import { InviteFormErrorCode, LoginFormErrorCode, OtpPrepareFormErrorCode, OtpConfirmFormErrorCode, PasswordResetFormErrorCode, PasswordResetRequestFormErrorCode, UpdateProjectMemberFormErrorCode, PasswordlessSignInInitFormErrorCode, PasswordlessSignInFormErrorCode } from '@contember/react-identity'
-import { ActivatePasswordlessOtpErrorCode } from '@contember/graphql-client-tenant'
+import { ActivatePasswordlessOtpErrorCode, WeakPasswordReason } from '@contember/graphql-client-tenant'
 
 export const dict = {
 	deleteEntityDialog: {
@@ -209,6 +209,8 @@ export const dict = {
 				'NO_PASSWORD_SET': 'No password set',
 				'PERSON_DISABLED': 'Person disabled',
 				'UNKNOWN_EMAIL': 'Unknown email',
+				'INVALID_CREDENTIALS': 'Invalid credentials',
+				'RATE_LIMIT_EXCEEDED': 'Too many failed attempts, please try again later',
 				'OTP_REQUIRED': undefined,
 			} satisfies Record<LoginFormErrorCode, string | undefined>,
 			idpInitError: 'Failed to initialize IdP login:',

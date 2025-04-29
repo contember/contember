@@ -8,6 +8,7 @@ import { CreateIdentityCommand, CreatePersonCommand, CreatePersonIdentityProvide
 import { TenantRole } from '../authorization'
 import { NoPassword } from '../dtos'
 import { IdentityProviderRow } from '../queries/idp/types'
+import { AuthLogService } from './AuthLogService'
 
 class IDPSignInManager {
 	constructor(
@@ -36,25 +37,56 @@ class IDPSignInManager {
 				)
 			} catch (e) {
 				if (e instanceof IDPResponseError) {
-					return new ResponseError('INVALID_IDP_RESPONSE', e.message)
+					return new ResponseError('INVALID_IDP_RESPONSE', e.message, {
+						[AuthLogService.Key]: new AuthLogService.Bag({
+							personId: undefined,
+							identityProviderId: provider.id,
+						}),
+					})
 				}
 				if (e instanceof IDPValidationError) {
-					return new ResponseError('IDP_VALIDATION_FAILED', e.message)
+					return new ResponseError('IDP_VALIDATION_FAILED', e.message, {
+						[AuthLogService.Key]: new AuthLogService.Bag({
+							personId: undefined,
+							identityProviderId: provider.id,
+						}),
+					})
 				}
 				throw e
 			}
 			const personRow = await this.resolvePerson(db, claim, provider)
 
 			if (!personRow) {
-				return new ResponseError('PERSON_NOT_FOUND', `Person ${claim.email} not found`)
+				return new ResponseError('PERSON_NOT_FOUND', `Person ${claim.email} not found`, {
+					[AuthLogService.Key]: new AuthLogService.Bag({
+						identityProviderId: provider.id,
+						personInput: claim.email,
+						personId: undefined,
+					}),
+				})
 			}
 
 			if (personRow.disabled_at !== null) {
-				return new ResponseError('PERSON_DISABLED', `Person with e-mail ${claim.email} is disabled`)
+				return new ResponseError('PERSON_DISABLED', `Person with e-mail ${claim.email} is disabled`, {
+					[AuthLogService.Key]: new AuthLogService.Bag({
+						identityProviderId: provider.id,
+						personInput: claim.email,
+						personId: personRow.id,
+					}),
+				})
 			}
 
 			const sessionToken = await this.apiKeyManager.createSessionApiKey(db, personRow.identity_id, expiration)
-			return new ResponseOk({ person: personRow, token: sessionToken, idpResponse: claim })
+			return new ResponseOk({
+				person: personRow,
+				token: sessionToken,
+				idpResponse: claim,
+				[AuthLogService.Key]: new AuthLogService.Bag({
+					personId: personRow.id,
+					identityProviderId: provider.id,
+					personInput: claim.email,
+				}),
+			})
 		})
 	}
 
@@ -137,9 +169,12 @@ namespace IDPSignInManager {
 		readonly person: PersonRow
 		readonly token: string
 		readonly idpResponse?: Record<string, unknown>
+		[AuthLogService.Key]: AuthLogService.Bag
 	}
 
-	export type SignInIDPResponse = Response<SignInIDPResult, SignInIdpErrorCode>
+	export type SignInIDPResponse = Response<SignInIDPResult, SignInIdpErrorCode, {
+		[AuthLogService.Key]: AuthLogService.Bag
+	}>
 }
 
 export { IDPSignInManager }

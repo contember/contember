@@ -3,12 +3,13 @@ import { testUuid } from '../../../src/testUuid'
 import { changePasswordMutation } from './gql/changePassword'
 import { getPersonByIdSql } from './sql/getPersonByIdSql'
 import { updatePersonPasswordSql } from './sql/updatePesonPasswordSql'
-import { test } from 'bun:test'
+import { expect, test } from 'bun:test'
+import { getConfigSql } from './sql/getConfigSql'
 
 test('changes a password', async () => {
 	const personId = testUuid(1)
 	const identityId = testUuid(2)
-	const password = '123456'
+	const password = 'AbcDeg123'
 	await executeTenantTest({
 		query: changePasswordMutation({ personId, password }),
 		executes: [
@@ -16,6 +17,7 @@ test('changes a password', async () => {
 				personId,
 				response: { personId, email: 'john@doe.com', roles: [], password: '123', identityId },
 			}),
+			getConfigSql(),
 			updatePersonPasswordSql({ personId, password }),
 		],
 		return: {
@@ -25,6 +27,12 @@ test('changes a password', async () => {
 				},
 			},
 		},
+		expectedAuthLog: expect.objectContaining({
+			type: 'password_change',
+			response: expect.objectContaining({
+				ok: true,
+			}),
+		}),
 	})
 })
 

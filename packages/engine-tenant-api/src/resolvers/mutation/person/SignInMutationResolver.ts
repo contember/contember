@@ -1,15 +1,11 @@
-import {
-	CreateSessionTokenResponse,
-	MutationCreateSessionTokenArgs,
-	MutationResolvers,
-	MutationSignInArgs,
-	SignInResponse,
-} from '../../../schema'
+import { CreateSessionTokenResponse, MutationCreateSessionTokenArgs, MutationResolvers, MutationSignInArgs, SignInResponse } from '../../../schema'
 import { TenantResolverContext } from '../../TenantResolverContext'
-import { PermissionActions, PersonUniqueIdentifier, SignInManager } from '../../../model'
+import { ConfigurationQuery, PermissionActions, PersonUniqueIdentifier, SignInManager } from '../../../model'
 import { createErrorResponse } from '../../errorUtils'
 import { SignInResponseFactory } from '../../responseHelpers/SignInResponseFactory'
 import { UserInputError } from '@contember/graphql-utils'
+import { NextLoginAttemptQuery } from '../../../model/queries/authLog/NextLoginAttemptQuery'
+import { ResponseError } from '../../../model/utils/Response'
 
 export class SignInMutationResolver implements MutationResolvers {
 	constructor(
@@ -23,6 +19,13 @@ export class SignInMutationResolver implements MutationResolvers {
 			message: 'You are not allowed to sign in',
 		})
 
+		const nextAllowedSignIn = await context.db.queryHandler.fetch(new NextLoginAttemptQuery(args.email))
+		if (nextAllowedSignIn > new Date()) {
+			return createErrorResponse(new ResponseError('RATE_LIMIT_EXCEEDED', `Too many attempts, please try again later.`, {
+				retryAfter: Math.ceil((nextAllowedSignIn.getTime() - Date.now()) / 1000),
+			}))
+		}
+
 		const response = await this.signInManager.signIn(
 			context.db,
 			args.email,
@@ -30,8 +33,18 @@ export class SignInMutationResolver implements MutationResolvers {
 			args.expiration || undefined,
 			args.otpToken || undefined,
 		)
+		await context.logAuthAction({
+			type: 'login',
+			response,
+		})
+
 
 		if (!response.ok) {
+			const configuration = await context.db.queryHandler.fetch(new ConfigurationQuery())
+			if (!configuration.login.revealUserExists && ['NO_PASSWORD_SET', 'NO_PASSWORD_SET', 'PERSON_DISABLED', 'INVALID_PASSWORD'].includes(response.error)) {
+				// if the user does not exist, we don't want to reveal that, so we return a generic error
+				return createErrorResponse('INVALID_CREDENTIALS', 'Invalid credentials')
+			}
 			return createErrorResponse(response.error, response.errorMessage)
 		}
 
@@ -65,10 +78,15 @@ export class SignInMutationResolver implements MutationResolvers {
 				message: 'You are not allowed to create a session key for this person.',
 			}),
 		)
+		await context.logAuthAction({
+			type: 'create_session_token',
+			response: response,
+		})
 
 		if (!response.ok) {
 			return createErrorResponse(response.error, response.errorMessage)
 		}
+
 		return {
 			ok: true,
 			result: await this.signInResponseFactory.createResponse(response.result, context),

@@ -1,3 +1,5 @@
+import { Interval } from './types'
+import { OutputInterval } from './types'
 import { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql'
 export type Maybe<T> = T | null
 export type InputMaybe<T> = Maybe<T>
@@ -15,8 +17,9 @@ export type Scalars = {
 	Boolean: { input: boolean; output: boolean }
 	Int: { input: number; output: number }
 	Float: { input: number; output: number }
-	DateTime: { input: any; output: any }
-	Json: { input: any; output: any }
+	DateTime: { input: Date; output: Date }
+	Interval: { input: Interval; output: OutputInterval }
+	Json: { input: unknown; output: unknown }
 }
 
 export type ActivatePasswordlessOtpError = {
@@ -139,6 +142,7 @@ export type ChangeMyPasswordError = {
 	readonly __typename?: 'ChangeMyPasswordError'
 	readonly code: ChangeMyPasswordErrorCode
 	readonly developerMessage: Scalars['String']['output']
+	readonly weakPasswordReasons?: Maybe<ReadonlyArray<WeakPasswordReason>>
 }
 
 export type ChangeMyPasswordErrorCode =
@@ -176,6 +180,7 @@ export type ChangePasswordError = {
 	readonly developerMessage: Scalars['String']['output']
 	/** @deprecated Field no longer supported */
 	readonly endUserMessage?: Maybe<Scalars['String']['output']>
+	readonly weakPasswordReasons?: Maybe<ReadonlyArray<WeakPasswordReason>>
 }
 
 export type ChangePasswordErrorCode =
@@ -226,23 +231,67 @@ export type CommonSignInResult = {
 
 export type Config = {
 	readonly __typename?: 'Config'
+	readonly login: ConfigLogin
+	readonly password: ConfigPassword
 	readonly passwordless: ConfigPasswordless
 }
 
 export type ConfigInput = {
+	readonly login?: InputMaybe<ConfigLoginInput>
+	readonly password?: InputMaybe<ConfigPasswordInput>
 	readonly passwordless?: InputMaybe<ConfigPasswordlessInput>
+}
+
+export type ConfigLogin = {
+	readonly __typename?: 'ConfigLogin'
+	readonly attemptWindow: Scalars['Interval']['output']
+	readonly baseBackoff: Scalars['Interval']['output']
+	readonly defaultTokenExpiration: Scalars['Interval']['output']
+	readonly maxBackoff: Scalars['Interval']['output']
+	readonly maxTokenExpiration?: Maybe<Scalars['Interval']['output']>
+	readonly revealUserExists: Scalars['Boolean']['output']
+}
+
+export type ConfigLoginInput = {
+	readonly attemptWindow?: InputMaybe<Scalars['Interval']['input']>
+	readonly baseBackoff?: InputMaybe<Scalars['Interval']['input']>
+	readonly defaultTokenExpiration?: InputMaybe<Scalars['Interval']['input']>
+	readonly maxBackoff?: InputMaybe<Scalars['Interval']['input']>
+	readonly maxTokenExpiration?: InputMaybe<Scalars['Interval']['input']>
+	readonly revealUserExists?: InputMaybe<Scalars['Boolean']['input']>
+}
+
+export type ConfigPassword = {
+	readonly __typename?: 'ConfigPassword'
+	readonly checkBlacklist: Scalars['Boolean']['output']
+	readonly minLength: Scalars['Int']['output']
+	readonly pattern?: Maybe<Scalars['String']['output']>
+	readonly requireDigit: Scalars['Int']['output']
+	readonly requireLowercase: Scalars['Int']['output']
+	readonly requireSpecial: Scalars['Int']['output']
+	readonly requireUppercase: Scalars['Int']['output']
+}
+
+export type ConfigPasswordInput = {
+	readonly checkBlacklist?: InputMaybe<Scalars['Boolean']['input']>
+	readonly minLength?: InputMaybe<Scalars['Int']['input']>
+	readonly pattern?: InputMaybe<Scalars['String']['input']>
+	readonly requireDigit?: InputMaybe<Scalars['Int']['input']>
+	readonly requireLowercase?: InputMaybe<Scalars['Int']['input']>
+	readonly requireSpecial?: InputMaybe<Scalars['Int']['input']>
+	readonly requireUppercase?: InputMaybe<Scalars['Int']['input']>
 }
 
 export type ConfigPasswordless = {
 	readonly __typename?: 'ConfigPasswordless'
 	readonly enabled: ConfigPolicy
-	readonly expirationMinutes: Scalars['Int']['output']
+	readonly expiration: Scalars['Interval']['output']
 	readonly url?: Maybe<Scalars['String']['output']>
 }
 
 export type ConfigPasswordlessInput = {
 	readonly enabled?: InputMaybe<ConfigPolicy>
-	readonly expirationMinutes?: InputMaybe<Scalars['Int']['input']>
+	readonly expiration?: InputMaybe<Scalars['Interval']['input']>
 	readonly url?: InputMaybe<Scalars['String']['input']>
 }
 
@@ -1169,6 +1218,7 @@ export type ResetPasswordError = {
 	readonly developerMessage: Scalars['String']['output']
 	/** @deprecated Field no longer supported */
 	readonly endUserMessage?: Maybe<Scalars['String']['output']>
+	readonly weakPasswordReasons?: Maybe<ReadonlyArray<WeakPasswordReason>>
 }
 
 export type ResetPasswordErrorCode =
@@ -1234,14 +1284,17 @@ export type SignInError = {
 	readonly developerMessage: Scalars['String']['output']
 	/** @deprecated Field no longer supported */
 	readonly endUserMessage?: Maybe<Scalars['String']['output']>
+	readonly retryAfter?: Maybe<Scalars['Int']['output']>
 }
 
 export type SignInErrorCode =
+  | 'INVALID_CREDENTIALS'
   | 'INVALID_OTP_TOKEN'
   | 'INVALID_PASSWORD'
   | 'NO_PASSWORD_SET'
   | 'OTP_REQUIRED'
   | 'PERSON_DISABLED'
+  | 'RATE_LIMIT_EXCEEDED'
   | 'UNKNOWN_EMAIL'
 
 export type SignInIdpError = {
@@ -1344,6 +1397,7 @@ export type SignUpError = {
 	readonly developerMessage: Scalars['String']['output']
 	/** @deprecated Field no longer supported */
 	readonly endPersonMessage?: Maybe<Scalars['String']['output']>
+	readonly weakPasswordReasons?: Maybe<ReadonlyArray<WeakPasswordReason>>
 }
 
 export type SignUpErrorCode =
@@ -1452,6 +1506,15 @@ export type VariableEntryInput = {
 	readonly name: Scalars['String']['input']
 	readonly values: ReadonlyArray<Scalars['String']['input']>
 }
+
+export type WeakPasswordReason =
+  | 'BLACKLISTED'
+  | 'INVALID_PATTERN'
+  | 'MISSING_DIGIT'
+  | 'MISSING_LOWERCASE'
+  | 'MISSING_SPECIAL'
+  | 'MISSING_UPPERCASE'
+  | 'TOO_SHORT'
 
 
 
@@ -1565,6 +1628,10 @@ export type ResolversTypes = {
 	CommonSignInResult: ResolverTypeWrapper<ResolversInterfaceTypes<ResolversTypes>['CommonSignInResult']>
 	Config: ResolverTypeWrapper<Config>
 	ConfigInput: ConfigInput
+	ConfigLogin: ResolverTypeWrapper<ConfigLogin>
+	ConfigLoginInput: ConfigLoginInput
+	ConfigPassword: ResolverTypeWrapper<ConfigPassword>
+	ConfigPasswordInput: ConfigPasswordInput
 	ConfigPasswordless: ResolverTypeWrapper<ConfigPasswordless>
 	ConfigPasswordlessInput: ConfigPasswordlessInput
 	ConfigPolicy: ConfigPolicy
@@ -1624,6 +1691,7 @@ export type ResolversTypes = {
 	InitSignInPasswordlessResponse: ResolverTypeWrapper<InitSignInPasswordlessResponse>
 	InitSignInPasswordlessResult: ResolverTypeWrapper<InitSignInPasswordlessResult>
 	Int: ResolverTypeWrapper<Scalars['Int']['output']>
+	Interval: ResolverTypeWrapper<Scalars['Interval']['output']>
 	InviteError: ResolverTypeWrapper<InviteError>
 	InviteErrorCode: InviteErrorCode
 	InviteMethod: InviteMethod
@@ -1707,6 +1775,7 @@ export type ResolversTypes = {
 	UpdateProjectResponse: ResolverTypeWrapper<UpdateProjectResponse>
 	VariableEntry: ResolverTypeWrapper<VariableEntry>
 	VariableEntryInput: VariableEntryInput
+	WeakPasswordReason: WeakPasswordReason
 }
 
 /** Mapping between all available schema types and the resolvers parents */
@@ -1737,6 +1806,10 @@ export type ResolversParentTypes = {
 	CommonSignInResult: ResolversInterfaceTypes<ResolversParentTypes>['CommonSignInResult']
 	Config: Config
 	ConfigInput: ConfigInput
+	ConfigLogin: ConfigLogin
+	ConfigLoginInput: ConfigLoginInput
+	ConfigPassword: ConfigPassword
+	ConfigPasswordInput: ConfigPasswordInput
 	ConfigPasswordless: ConfigPasswordless
 	ConfigPasswordlessInput: ConfigPasswordlessInput
 	ConfigureError: ConfigureError
@@ -1782,6 +1855,7 @@ export type ResolversParentTypes = {
 	InitSignInPasswordlessResponse: InitSignInPasswordlessResponse
 	InitSignInPasswordlessResult: InitSignInPasswordlessResult
 	Int: Scalars['Int']['output']
+	Interval: Scalars['Interval']['output']
 	InviteError: InviteError
 	InviteOptions: InviteOptions
 	InviteResponse: InviteResponse
@@ -1934,6 +2008,7 @@ export type ApiKeyWithTokenResolvers<ContextType = any, ParentType extends Resol
 export type ChangeMyPasswordErrorResolvers<ContextType = any, ParentType extends ResolversParentTypes['ChangeMyPasswordError'] = ResolversParentTypes['ChangeMyPasswordError']> = {
 	code?: Resolver<ResolversTypes['ChangeMyPasswordErrorCode'], ParentType, ContextType>
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	weakPasswordReasons?: Resolver<Maybe<ReadonlyArray<ResolversTypes['WeakPasswordReason']>>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
@@ -1959,6 +2034,7 @@ export type ChangePasswordErrorResolvers<ContextType = any, ParentType extends R
 	code?: Resolver<ResolversTypes['ChangePasswordErrorCode'], ParentType, ContextType>
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	endUserMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	weakPasswordReasons?: Resolver<Maybe<ReadonlyArray<ResolversTypes['WeakPasswordReason']>>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
@@ -1993,13 +2069,36 @@ export type CommonSignInResultResolvers<ContextType = any, ParentType extends Re
 }
 
 export type ConfigResolvers<ContextType = any, ParentType extends ResolversParentTypes['Config'] = ResolversParentTypes['Config']> = {
+	login?: Resolver<ResolversTypes['ConfigLogin'], ParentType, ContextType>
+	password?: Resolver<ResolversTypes['ConfigPassword'], ParentType, ContextType>
 	passwordless?: Resolver<ResolversTypes['ConfigPasswordless'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type ConfigLoginResolvers<ContextType = any, ParentType extends ResolversParentTypes['ConfigLogin'] = ResolversParentTypes['ConfigLogin']> = {
+	attemptWindow?: Resolver<ResolversTypes['Interval'], ParentType, ContextType>
+	baseBackoff?: Resolver<ResolversTypes['Interval'], ParentType, ContextType>
+	defaultTokenExpiration?: Resolver<ResolversTypes['Interval'], ParentType, ContextType>
+	maxBackoff?: Resolver<ResolversTypes['Interval'], ParentType, ContextType>
+	maxTokenExpiration?: Resolver<Maybe<ResolversTypes['Interval']>, ParentType, ContextType>
+	revealUserExists?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type ConfigPasswordResolvers<ContextType = any, ParentType extends ResolversParentTypes['ConfigPassword'] = ResolversParentTypes['ConfigPassword']> = {
+	checkBlacklist?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	minLength?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
+	pattern?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	requireDigit?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
+	requireLowercase?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
+	requireSpecial?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
+	requireUppercase?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type ConfigPasswordlessResolvers<ContextType = any, ParentType extends ResolversParentTypes['ConfigPasswordless'] = ResolversParentTypes['ConfigPasswordless']> = {
 	enabled?: Resolver<ResolversTypes['ConfigPolicy'], ParentType, ContextType>
-	expirationMinutes?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
+	expiration?: Resolver<ResolversTypes['Interval'], ParentType, ContextType>
 	url?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
@@ -2250,6 +2349,10 @@ export type InitSignInPasswordlessResultResolvers<ContextType = any, ParentType 
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
+export interface IntervalScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Interval'], any> {
+	name: 'Interval'
+}
+
 export type InviteErrorResolvers<ContextType = any, ParentType extends ResolversParentTypes['InviteError'] = ResolversParentTypes['InviteError']> = {
 	code?: Resolver<ResolversTypes['InviteErrorCode'], ParentType, ContextType>
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
@@ -2446,6 +2549,7 @@ export type ResetPasswordErrorResolvers<ContextType = any, ParentType extends Re
 	code?: Resolver<ResolversTypes['ResetPasswordErrorCode'], ParentType, ContextType>
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	endUserMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	weakPasswordReasons?: Resolver<Maybe<ReadonlyArray<ResolversTypes['WeakPasswordReason']>>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
@@ -2500,6 +2604,7 @@ export type SignInErrorResolvers<ContextType = any, ParentType extends Resolvers
 	code?: Resolver<ResolversTypes['SignInErrorCode'], ParentType, ContextType>
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	endUserMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	retryAfter?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
@@ -2576,6 +2681,7 @@ export type SignUpErrorResolvers<ContextType = any, ParentType extends Resolvers
 	code?: Resolver<ResolversTypes['SignUpErrorCode'], ParentType, ContextType>
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	endPersonMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	weakPasswordReasons?: Resolver<Maybe<ReadonlyArray<ResolversTypes['WeakPasswordReason']>>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
@@ -2674,6 +2780,8 @@ export type Resolvers<ContextType = any> = {
 	CheckResetPasswordTokenResult?: CheckResetPasswordTokenResultResolvers<ContextType>
 	CommonSignInResult?: CommonSignInResultResolvers<ContextType>
 	Config?: ConfigResolvers<ContextType>
+	ConfigLogin?: ConfigLoginResolvers<ContextType>
+	ConfigPassword?: ConfigPasswordResolvers<ContextType>
 	ConfigPasswordless?: ConfigPasswordlessResolvers<ContextType>
 	ConfigureError?: ConfigureErrorResolvers<ContextType>
 	ConfigureResponse?: ConfigureResponseResolvers<ContextType>
@@ -2712,6 +2820,7 @@ export type Resolvers<ContextType = any> = {
 	InitSignInPasswordlessError?: InitSignInPasswordlessErrorResolvers<ContextType>
 	InitSignInPasswordlessResponse?: InitSignInPasswordlessResponseResolvers<ContextType>
 	InitSignInPasswordlessResult?: InitSignInPasswordlessResultResolvers<ContextType>
+	Interval?: GraphQLScalarType
 	InviteError?: InviteErrorResolvers<ContextType>
 	InviteResponse?: InviteResponseResolvers<ContextType>
 	InviteResult?: InviteResultResolvers<ContextType>

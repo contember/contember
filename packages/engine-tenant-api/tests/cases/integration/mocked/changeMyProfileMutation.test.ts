@@ -1,7 +1,7 @@
 import { executeTenantTest } from '../../../src/testTenant'
 import { testUuid } from '../../../src/testUuid'
 import { updatePersonProfileNameSql, updatePersonProfileEmailSql, updatePersonProfileNameAndEmailSql } from './sql/updatePesonNameSql'
-import { test } from 'bun:test'
+import { expect, test } from 'bun:test'
 import { changeMyProfileMutation } from './gql/changeMyProfile'
 import { getPersonByIdentity } from './sql/getPersonByIdentity'
 import { authenticatedIdentityId } from '../../../src/testTenant'
@@ -78,6 +78,12 @@ test('changes my email', async () => {
 				},
 			},
 		},
+		expectedAuthLog: expect.objectContaining({
+			type: 'email_change',
+			response: expect.objectContaining({
+				ok: true,
+			}),
+		}),
 	})
 })
 
@@ -92,7 +98,6 @@ test('changes my email - invalid', async () => {
 				identityId,
 				response: { personId, email: 'john.doe@example.com', name: 'John Doe', roles: [], password: '123456' },
 			}),
-			updatePersonProfileEmailSql({ personId, email }),
 		],
 		return: {
 			data: {
@@ -118,7 +123,6 @@ test('changes my email - invalid #2', async () => {
 				identityId,
 				response: { personId, email: 'john.doe@example.com', name: 'John Doe', roles: [], password: '123456' },
 			}),
-			updatePersonProfileEmailSql({ personId, email }),
 		],
 		return: {
 			data: {
@@ -130,6 +134,12 @@ test('changes my email - invalid #2', async () => {
 				},
 			},
 		},
+		expectedAuthLog: expect.objectContaining({
+			type: 'email_change',
+			response: expect.objectContaining({
+				ok: false,
+			}),
+		}),
 	})
 })
 
@@ -145,7 +155,6 @@ test('changes my email - exists', async () => {
 				response: { personId, email: 'john.doe@example.com', name: 'John Doe', roles: [], password: '123456' },
 			}),
 			getPersonByEmailSql({ email, response: { personId: testUuid(4), identityId: testUuid(5), roles: [], password: '' } }),
-			updatePersonProfileEmailSql({ personId, email }),
 		],
 		return: {
 			data: {
@@ -157,6 +166,12 @@ test('changes my email - exists', async () => {
 				},
 			},
 		},
+		expectedAuthLog: expect.objectContaining({
+			type: 'email_change',
+			response: expect.objectContaining({
+				ok: false,
+			}),
+		}),
 	})
 })
 
@@ -183,5 +198,11 @@ test('changes my name and email', async () => {
 				},
 			},
 		},
+		expectedAuthLog: expect.objectContaining({
+			type: 'email_change',
+			response: expect.objectContaining({
+				ok: true,
+			}),
+		}),
 	})
 })

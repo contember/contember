@@ -1,33 +1,31 @@
 import { expect, test } from 'bun:test'
-import { consumeMails, createTester, gql, loginToken, rand } from '../../src/tester'
+import { consumeMails, createTester, loginToken, rand } from '../../src/tester'
 import { emptySchema } from '@contember/schema-utils'
-import { signIn, signUp } from '../../src/requests'
+import * as TenantApi from '@contember/graphql-client-tenant'
 
 test('execute password reset', async () => {
 	const tester = await createTester(emptySchema)
 	const email = `john-${rand()}@doe.com`
-	const password = 'foobar'
-	await signUp(email, password)
+	const password = 'HWGA51KKpJ4lSW'
+	await tester.tenant.signUp(email, password)
 
-	await tester(gql`
-		mutation($email: String!) {
-			createResetPasswordRequest(email: $email) {
-				ok
-            }
-        }
-	`, {
-		path: '/tenant',
-		variables: { email },
-		authorizationToken: loginToken,
-	})
-		.expect(200)
-		.expect({
-			data: {
-				createResetPasswordRequest: {
-					ok: true,
-				},
+	const createResetResult = await tester.tenant.send(
+		TenantApi.mutation$.createResetPasswordRequest(
+			TenantApi.createPasswordResetRequestResponse$$,
+		),
+		{ email },
+		{ authorizationToken: loginToken },
+	)
+
+	expect(createResetResult.status).toBe(200)
+	expect(createResetResult.body).toEqual({
+		data: {
+			createResetPasswordRequest: {
+				ok: true,
 			},
-		})
+		},
+	})
+
 	const mails = await consumeMails()
 	expect(mails).toHaveLength(1)
 
@@ -35,48 +33,41 @@ test('execute password reset', async () => {
 	const token = matches?.[1] as string
 	expect(token).toHaveLength(40)
 
-	await tester(gql`
-		mutation($token: String!, $password: String!) {
-			resetPassword(token: $token, password: $password) {
-				ok
-			}
-		}
-	`, {
-		path: '/tenant',
-		variables: { token, password },
-		authorizationToken: loginToken,
-	})
-		.expect(200)
-		.expect({
-			data: {
-				resetPassword: {
-					ok: true,
-				},
+	const resetResult = await tester.tenant.send(
+		TenantApi.mutation$.resetPassword(
+			TenantApi.resetPasswordResponse$$,
+		),
+		{ token, password },
+		{ authorizationToken: loginToken },
+	)
+
+	expect(resetResult.status).toBe(200)
+	expect(resetResult.body).toEqual({
+		data: {
+			resetPassword: {
+				ok: true,
 			},
-		})
+		},
+	})
+
 	// used token
+	const usedTokenResult = await tester.tenant.send(
+		TenantApi.mutation$.resetPassword(
+			TenantApi.resetPasswordResponse$$,
+		),
+		{ token, password },
+		{ authorizationToken: loginToken },
+	)
 
-	await tester(gql`
-		mutation($token: String!, $password: String!) {
-			resetPassword(token: $token, password: $password) {
-				ok
-			}
-		}
-	`, {
-		path: '/tenant',
-		variables: { token, password },
-		authorizationToken: loginToken,
-	})
-		.expect(200)
-		.expect({
-			data: {
-				resetPassword: {
-					ok: false,
-				},
+	expect(usedTokenResult.status).toBe(200)
+	expect(usedTokenResult.body).toEqual({
+		data: {
+			resetPassword: {
+				ok: false,
 			},
-		})
+		},
+	})
 
-	const authToken = await signIn(email, password)
+	const authToken = await tester.tenant.signIn(email, password)
 	expect(authToken).toHaveLength(40)
-
 })

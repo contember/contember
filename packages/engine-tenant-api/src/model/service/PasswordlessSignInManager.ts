@@ -1,30 +1,23 @@
 import { ApiKeyManager } from './apiKey'
-import { PersonQuery, PersonRow } from '../queries'
+import { ConfigurationQuery, PersonQuery, PersonRow } from '../queries'
 import { Response, ResponseError, ResponseOk } from '../utils/Response'
-import {
-	ActivatePasswordlessOtpErrorCode,
-	ConfigPolicy,
-	InitSignInPasswordlessErrorCode,
-	InitSignInPasswordlessResult,
-	SignInPasswordlessErrorCode,
-} from '../../schema'
+import { ActivatePasswordlessOtpErrorCode, ConfigPolicy, InitSignInPasswordlessErrorCode, InitSignInPasswordlessResult, SignInPasswordlessErrorCode } from '../../schema'
 import { DatabaseContext, validateToken } from '../utils'
-import { ConfigurationManager } from './ConfigurationManager'
 import { UserMailer } from '../mailing'
-import { ActivateOtpCommand, CreatePersonTokenCommand, IncreaseOtpAttemptCommand } from '../commands'
+import { ActivateOtpCommand, CreatePersonTokenCommand, IncreaseOtpAttemptCommand, InvalidateTokenCommand } from '../commands'
 import { getPreferredProject } from './helpers/getPreferredProject'
 import { ProjectManager } from './ProjectManager'
 import { PermissionContext } from '../authorization'
 import { PersonTokenQuery } from '../queries/personToken/PersonTokenQuery'
 import { ImplementationException } from '../../exceptions'
 import { OtpAuthenticator } from './OtpAuthenticator'
-import { InvalidateTokenCommand } from '../commands/personToken/InvalidateTokenCommand'
 import { PersonToken } from '../type'
+import { AuthLogService } from './AuthLogService'
+import { intervalToSeconds } from '../utils/interval'
 
 class PasswordlessSignInManager {
 	constructor(
 		private readonly apiKeyManager: ApiKeyManager,
-		private readonly configurationManager: ConfigurationManager,
 		private readonly mailer: UserMailer,
 		private readonly projectManager: ProjectManager,
 		private readonly otpAuthenticator: OtpAuthenticator,
@@ -39,20 +32,31 @@ class PasswordlessSignInManager {
 		mailProject?: string
 	}): Promise<PasswordlessSignInManager.InitSignInPasswordlessResponse> {
 		return db.transaction(async (db): Promise<PasswordlessSignInManager.InitSignInPasswordlessResponse> => {
-			const configuration = await this.configurationManager.fetchConfiguration(db)
+			const configuration = await db.queryHandler.fetch(new ConfigurationQuery())
 			if (configuration.passwordless.enabled === 'never') {
-				return new ResponseError('PASSWORDLESS_DISABLED', 'Passwordless sign-in is disabled')
+				return new ResponseError('PASSWORDLESS_DISABLED', 'Passwordless sign-in is disabled', {
+					[AuthLogService.Key]: new AuthLogService.Bag({}),
+				})
 			}
 
 			const person = await db.queryHandler.fetch(PersonQuery.byEmail(email))
 			if (!person) {
-				return new ResponseError('PERSON_NOT_FOUND', `Person ${email} not found`)
+				return new ResponseError('PERSON_NOT_FOUND', `Person ${email} not found`, {
+					[AuthLogService.Key]: new AuthLogService.Bag({
+						personInput: email,
+					}),
+				})
 			}
 			if (!this.isEnabled(configuration.passwordless.enabled, person.passwordless_enabled)) {
-				return new ResponseError('PASSWORDLESS_DISABLED', 'Passwordless sign-in is disabled for this person')
+				return new ResponseError('PASSWORDLESS_DISABLED', 'Passwordless sign-in is disabled for this person', {
+					[AuthLogService.Key]: new AuthLogService.Bag({
+						personInput: email,
+						personId: person.id,
+					}),
+				})
 			}
 
-			const createTokenCommand = CreatePersonTokenCommand.createPasswordlessRequest(person.id, configuration.passwordless.expirationMinutes)
+			const createTokenCommand = CreatePersonTokenCommand.createPasswordlessRequest(person.id, intervalToSeconds(configuration.passwordless.expiration) / 60)
 			const result = await db.commandBus.execute(createTokenCommand)
 
 
@@ -72,7 +76,16 @@ class PasswordlessSignInManager {
 				projectId: project?.id ?? null,
 			})
 
-			return new ResponseOk({ requestId: result.id, expiresAt: result.expiresAt })
+			return new ResponseOk({
+				requestId: result.id,
+				expiresAt: result.expiresAt,
+				person,
+				[AuthLogService.Key]: new AuthLogService.Bag({
+					personInput: email,
+					personId: person.id,
+					tokenId: result.id,
+				}),
+			})
 		})
 	}
 
@@ -108,30 +121,61 @@ class PasswordlessSignInManager {
 				if (tokenValidationResult.error === 'TOKEN_INVALID' && validationType === 'otp') {
 					await db.commandBus.execute(new IncreaseOtpAttemptCommand(tokenResult!.id))
 				}
-				return tokenValidationResult
+				return new ResponseError(tokenValidationResult.error, tokenValidationResult.errorMessage, {
+					...tokenValidationResult.metadata ?? {},
+					[AuthLogService.Key]: new AuthLogService.Bag({
+						personId: tokenResult?.person_id,
+						tokenId: tokenResult?.id,
+					}),
+				})
+			}
+			if (!tokenResult) {
+				throw new ImplementationException()
 			}
 			const personRow = await db.queryHandler.fetch(PersonQuery.byId(tokenValidationResult.result.person_id))
 			if (!personRow) {
 				throw new ImplementationException()
 			}
 			if (personRow.disabled_at !== null) {
-				return new ResponseError('PERSON_DISABLED', `Person is disabled`)
+				return new ResponseError('PERSON_DISABLED', `Person is disabled`, {
+					[AuthLogService.Key]: new AuthLogService.Bag({
+						personId: personRow.id,
+						tokenId: tokenResult?.id,
+					}),
+				})
 			}
 
 			if (personRow.otp_uri && personRow.otp_activated_at) {
 				if (!mfaOtp) {
-					return new ResponseError('OTP_REQUIRED', `2FA is enabled. OTP token is required`)
+					return new ResponseError('OTP_REQUIRED', `2FA is enabled. OTP token is required`, {
+						[AuthLogService.Key]: new AuthLogService.Bag({
+							personId: personRow.id,
+							tokenId: tokenResult?.id,
+						}),
+					})
 				}
 
 				if (!this.otpAuthenticator.validate({ uri: personRow.otp_uri }, mfaOtp)) {
-					return new ResponseError('INVALID_OTP_TOKEN', 'OTP token validation has failed')
+					return new ResponseError('INVALID_OTP_TOKEN', 'OTP token validation has failed', {
+						[AuthLogService.Key]: new AuthLogService.Bag({
+							personId: personRow.id,
+							tokenId: tokenResult?.id,
+						}),
+					})
 				}
 			}
 
 			await db.commandBus.execute(new InvalidateTokenCommand(tokenValidationResult.result.id))
 			const sessionToken = await this.apiKeyManager.createSessionApiKey(db, personRow.identity_id, expiration)
 
-			return new ResponseOk({ person: personRow, token: sessionToken })
+			return new ResponseOk({
+				person: personRow,
+				token: sessionToken,
+				[AuthLogService.Key]: new AuthLogService.Bag({
+					personId: personRow.id,
+					tokenId: tokenResult?.id,
+				}),
+			})
 		})
 	}
 
@@ -151,12 +195,24 @@ class PasswordlessSignInManager {
 				validationType: 'token',
 			})
 			if (!tokenValidationResult.ok) {
-				return tokenValidationResult
+				return new ResponseError(tokenValidationResult.error, tokenValidationResult.errorMessage, {
+					...tokenValidationResult.metadata ?? {},
+					[AuthLogService.Key]: new AuthLogService.Bag({
+						personId: tokenResult?.person_id,
+						tokenId: tokenResult?.id,
+					}),
+				})
 			}
 
 			await db.commandBus.execute(new ActivateOtpCommand(tokenValidationResult.result.id, otpHash))
 
-			return new ResponseOk(null)
+			return new ResponseOk({
+				person: tokenResult?.person_id,
+				[AuthLogService.Key]: new AuthLogService.Bag({
+					personId: tokenResult?.person_id,
+					tokenId: tokenResult?.id,
+				}),
+			})
 		})
 	}
 
@@ -175,16 +231,27 @@ class PasswordlessSignInManager {
 }
 
 namespace PasswordlessSignInManager {
-	export type InitSignInPasswordlessResponse = Response<InitSignInPasswordlessResult, InitSignInPasswordlessErrorCode>
+	export type InitSignInPasswordlessResponse = Response<InitSignInPasswordlessResult & {
+		[AuthLogService.Key]: AuthLogService.Bag
+	}, InitSignInPasswordlessErrorCode, {
+		[AuthLogService.Key]: AuthLogService.Bag
+	}>
 
 
 	interface SignInPasswordlessResult {
 		readonly person: PersonRow
 		readonly token: string
+		[AuthLogService.Key]: AuthLogService.Bag
 	}
-	export type SignInPasswordlessResponse = Response<SignInPasswordlessResult, SignInPasswordlessErrorCode>
+	export type SignInPasswordlessResponse = Response<SignInPasswordlessResult, SignInPasswordlessErrorCode, {
+		[AuthLogService.Key]: AuthLogService.Bag
+	}>
 
-	export type ActivatePasswordlessOtpResponse = Response<null, ActivatePasswordlessOtpErrorCode>
+	export type ActivatePasswordlessOtpResponse = Response<{
+		[AuthLogService.Key]: AuthLogService.Bag
+	}, ActivatePasswordlessOtpErrorCode, {
+		[AuthLogService.Key]: AuthLogService.Bag
+	}>
 }
 
 export { PasswordlessSignInManager }

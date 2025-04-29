@@ -1,6 +1,6 @@
 import { executeTenantTest } from '../../../src/testTenant'
 import { testUuid } from '../../../src/testUuid'
-import { test } from 'bun:test'
+import { expect, test } from 'bun:test'
 import { changeProfileMutation } from './gql/changeProfile'
 import { updatePersonProfileNameAndEmailSql } from './sql/updatePesonNameSql'
 import { authenticatedIdentityId } from '../../../src/testTenant'
@@ -32,6 +32,12 @@ test('changes my name and email', async () => {
 				},
 			},
 		},
+		expectedAuthLog: expect.objectContaining({
+			type: 'email_change',
+			response: expect.objectContaining({
+				ok: true,
+			}),
+		}),
 	})
 })
 

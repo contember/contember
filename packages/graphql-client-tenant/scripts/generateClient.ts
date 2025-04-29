@@ -14,6 +14,7 @@ const generator = new AsyncGenerator({
 	targetDir: path.join(dirname(fileURLToPath(import.meta.url)), '../src/generated'),
 	scalarTypeMap: {
 		Json: 'unknown',
+		Interval: 'string',
 	},
 })
 generator.generate()

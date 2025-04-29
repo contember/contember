@@ -109,11 +109,6 @@ test('sign out - permanent api key', async () => {
 				apiKeyId: authenticatedApiKeyId,
 				response: { personId: personId, identityId: authenticatedIdentityId, apiKeyType: ApiKey.Type.PERMANENT },
 			}),
-			{
-				sql: SQL`update "tenant"."api_key" set "disabled_at" = ? where "identity_id" = ?`,
-				parameters: [(val: any) => val instanceof Date, identityId],
-				response: { rowCount: 1 },
-			},
 		],
 		return: {
 			data: {

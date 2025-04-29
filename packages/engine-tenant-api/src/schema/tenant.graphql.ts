@@ -4,6 +4,9 @@ import { DocumentNode } from 'graphql'
 const schema: DocumentNode = gql`
 	scalar Json
 	scalar DateTime
+	
+	""" Interval is a string in the format ISO 8601, e.g. "PT1H" for 1 hour """
+	scalar Interval
 
 	schema {
 		query: Query
@@ -120,16 +123,39 @@ const schema: DocumentNode = gql`
 	
 	type Config {
 		passwordless: ConfigPasswordless!
+		password: ConfigPassword!
+		login: ConfigLogin!
 	}
 	
 	type ConfigPasswordless {
 		enabled: ConfigPolicy!
 		url: String
-		expirationMinutes: Int!
+		expiration: Interval!
 	}
+	
+	type ConfigPassword {
+		minLength: Int!
+		requireUppercase: Int!
+		requireLowercase: Int!
+		requireDigit: Int!
+		requireSpecial: Int!
+		pattern: String
+		checkBlacklist: Boolean!
+    }
+	
+	type ConfigLogin {
+		baseBackoff: Interval!
+		maxBackoff: Interval!
+		attemptWindow: Interval!
+		revealUserExists: Boolean!
+		defaultTokenExpiration: Interval!
+		maxTokenExpiration: Interval
+    }
 	
 	input ConfigInput {
 		passwordless: ConfigPasswordlessInput
+		password: ConfigPasswordInput
+		login: ConfigLoginInput
 	}
 	
 	enum ConfigPolicy {
@@ -142,8 +168,27 @@ const schema: DocumentNode = gql`
 	input ConfigPasswordlessInput {
 		enabled: ConfigPolicy
 		url: String
-		expirationMinutes: Int
+		expiration: Interval
 	}
+	
+	input ConfigPasswordInput {
+		minLength: Int
+		requireUppercase: Int
+		requireLowercase: Int
+		requireDigit: Int
+		requireSpecial: Int
+		pattern: String
+		checkBlacklist: Boolean
+    }
+	
+	input ConfigLoginInput {
+		baseBackoff: Interval
+		maxBackoff: Interval
+		attemptWindow: Interval
+		revealUserExists: Boolean
+		defaultTokenExpiration: Interval
+		maxTokenExpiration: Interval
+    }
 	
 	type ConfigureResponse {
 		ok: Boolean!
@@ -169,6 +214,7 @@ const schema: DocumentNode = gql`
 
 	type SignUpError {
 		code: SignUpErrorCode!
+        weakPasswordReasons: [WeakPasswordReason!]
 		developerMessage: String!
 		endPersonMessage: String @deprecated
 	}
@@ -202,15 +248,18 @@ const schema: DocumentNode = gql`
 		code: SignInErrorCode!
 		developerMessage: String!
 		endUserMessage: String @deprecated
+		retryAfter: Int
 	}
 
 	enum SignInErrorCode {
+		INVALID_CREDENTIALS
 		UNKNOWN_EMAIL
 		INVALID_PASSWORD
 		PERSON_DISABLED
 		NO_PASSWORD_SET
 		OTP_REQUIRED
 		INVALID_OTP_TOKEN
+		RATE_LIMIT_EXCEEDED
 	}
 
 	type SignInResult implements CommonSignInResult {
@@ -307,6 +356,7 @@ const schema: DocumentNode = gql`
 
 	type ChangePasswordError {
 		code: ChangePasswordErrorCode!
+		weakPasswordReasons: [WeakPasswordReason!]
 		developerMessage: String!
 		endUserMessage: String @deprecated
 	}
@@ -315,6 +365,16 @@ const schema: DocumentNode = gql`
 		PERSON_NOT_FOUND
 		TOO_WEAK
 	}
+	
+	enum WeakPasswordReason {
+		TOO_SHORT
+		MISSING_UPPERCASE
+		MISSING_LOWERCASE
+		MISSING_DIGIT
+		MISSING_SPECIAL
+		INVALID_PATTERN
+		BLACKLISTED
+    }
 
 
 	# === changeMyPassword ===
@@ -326,6 +386,7 @@ const schema: DocumentNode = gql`
 
 	type ChangeMyPasswordError {
 		code: ChangeMyPasswordErrorCode!
+        weakPasswordReasons: [WeakPasswordReason!]
 		developerMessage: String!
 	}
 
@@ -1086,6 +1147,7 @@ const schema: DocumentNode = gql`
 	}
 	type ResetPasswordError {
 		code: ResetPasswordErrorCode!
+        weakPasswordReasons: [WeakPasswordReason!]
 		developerMessage: String!
 		endUserMessage: String @deprecated
 	}

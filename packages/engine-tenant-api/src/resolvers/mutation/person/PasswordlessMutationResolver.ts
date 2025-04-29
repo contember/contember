@@ -7,7 +7,7 @@ import {
 	SignInPasswordlessResponse,
 } from '../../../schema'
 import { TenantResolverContext } from '../../TenantResolverContext'
-import { PermissionActions } from '../../../model'
+import { ConfigurationQuery, PermissionActions } from '../../../model'
 import { createErrorResponse } from '../../errorUtils'
 import { SignInResponseFactory } from '../../responseHelpers/SignInResponseFactory'
 import { PasswordlessSignInManager } from '../../../model/service/PasswordlessSignInManager'
@@ -34,7 +34,19 @@ export class PasswordlessMutationResolver implements Pick<MutationResolvers, 'in
 			mailVariant: args.options?.mailVariant ?? undefined,
 			mailProject: args.options?.mailProject ?? undefined,
 		})
+		await context.logAuthAction({
+			type: 'passwordless_login_init',
+			response: result,
+		})
 		if (!result.ok) {
+			if (result.error === 'PERSON_NOT_FOUND') {
+				const configuration = await context.db.queryHandler.fetch(new ConfigurationQuery())
+				if (!configuration.login.revealUserExists) {
+					// If the user does not exist, we don't want to reveal that
+					return createErrorResponse('PASSWORDLESS_DISABLED', 'Passwordless sign-in is disabled for this person')
+				}
+			}
+
 			return createErrorResponse(result.error, result.errorMessage)
 		}
 		return { ok: true, result: result.result }
@@ -52,6 +64,10 @@ export class PasswordlessMutationResolver implements Pick<MutationResolvers, 'in
 			mfaOtp: args.mfaOtp ?? undefined,
 			validationType: args.validationType,
 			expiration: args.expiration ?? undefined,
+		})
+		await context.logAuthAction({
+			type: 'passwordless_login',
+			response: signIn,
 		})
 		if (!signIn.ok) {
 			return createErrorResponse(signIn.error, signIn.errorMessage)
@@ -72,6 +88,10 @@ export class PasswordlessMutationResolver implements Pick<MutationResolvers, 'in
 			requestId: args.requestId,
 			token: args.token,
 			otpHash: args.otpHash,
+		})
+		await context.logAuthAction({
+			type: 'passwordless_login_exchange',
+			response: result,
 		})
 		if (!result.ok) {
 			return createErrorResponse(result.error, result.errorMessage)

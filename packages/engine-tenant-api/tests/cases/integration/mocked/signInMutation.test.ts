@@ -5,11 +5,13 @@ import { selectMembershipsSql } from './sql/selectMembershipsSql'
 import { signInMutation } from './gql/signIn'
 import { getPersonByEmailSql } from './sql/getPersonByEmailSql'
 import { SignInErrorCode } from '../../../../src/schema'
-import { test } from 'bun:test'
+import { test, expect } from 'bun:test'
 import { OtpAuthenticator } from '../../../../src'
 import { Buffer } from 'buffer'
 import { createSessionKeySql } from './sql/createSessionKeySql'
 import { getIdentityProjectsSql } from './sql/getIdentityProjectsSql'
+import { getNextLoginAttemptSql } from './sql/getNextLoginAttemptSql'
+import { getConfigSql } from './sql/getConfigSql'
 
 test('signs in', async () => {
 	const email = 'john@doe.com'
@@ -21,7 +23,9 @@ test('signs in', async () => {
 	await executeTenantTest({
 		query: signInMutation({ email, password }, { withData: true }),
 		executes: [
+			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [] } }),
+			getConfigSql(),
 			createSessionKeySql({ apiKeyId: apiKeyId, identityId: identityId }),
 			getIdentityProjectsSql({ identityId: identityId, projectId: projectId }),
 			selectMembershipsSql({
@@ -29,26 +33,6 @@ test('signs in', async () => {
 				projectId,
 				membershipsResponse: [{ role: 'editor', variables: [{ name: 'locale', values: ['cs'] }] }],
 			}),
-			{
-				sql: SQL`SELECT "id",
-						         "email",
-						         "identity_id"
-					         FROM "tenant"."person"
-					         WHERE "id" = ?`,
-				parameters: [personId],
-				response: { rows: [{ id: personId, email: email }] },
-			},
-			{
-				sql: SQL`SELECT "project"."id",
-						         "project"."name",
-						         "project"."slug",
-						         "project"."config"
-					         FROM "tenant"."project"
-						              INNER JOIN "tenant"."project_member" AS "project_member" ON "project_member"."project_id" = "project"."id"
-					         WHERE "project_member"."identity_id" = ?`,
-				parameters: [identityId],
-				response: { rows: [{ id: projectId, name: 'foo' }] },
-			},
 		],
 		return: {
 			data: {
@@ -78,6 +62,12 @@ test('signs in', async () => {
 				},
 			},
 		},
+		expectedAuthLog: {
+			type: 'login',
+			response: expect.objectContaining({
+				ok: true,
+			}),
+		},
 	})
 })
 
@@ -91,8 +81,10 @@ test('signs in - normalize email', async () => {
 	await executeTenantTest({
 		query: signInMutation({ email, password }),
 		executes: [
+			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({ email, response: null }),
 			getPersonByEmailSql({ email: 'john@doe.com', response: { personId, identityId, password, roles: [] } }),
+			getConfigSql(),
 			createSessionKeySql({ apiKeyId: apiKeyId, identityId: identityId }),
 			getIdentityProjectsSql({ identityId: identityId, projectId: projectId }),
 			selectMembershipsSql({
@@ -112,6 +104,12 @@ test('signs in - normalize email', async () => {
 				},
 			},
 		},
+		expectedAuthLog: {
+			type: 'login',
+			response: expect.objectContaining({
+				ok: true,
+			}),
+		},
 	})
 })
 
@@ -122,7 +120,11 @@ test('sign in - invalid password', async () => {
 	const personId = testUuid(7)
 	await executeTenantTest({
 		query: signInMutation({ email, password: 'abcd' }),
-		executes: [getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [] } })],
+		executes: [
+			getNextLoginAttemptSql(email),
+			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [] } }),
+			getConfigSql(),
+		],
 		return: {
 			data: {
 				signIn: {
@@ -131,6 +133,12 @@ test('sign in - invalid password', async () => {
 					result: null,
 				},
 			},
+		},
+		expectedAuthLog: {
+			type: 'login',
+			response: expect.objectContaining({
+				ok: false,
+			}),
 		},
 	})
 })
@@ -143,7 +151,9 @@ test('otp token not provided', async () => {
 	await executeTenantTest({
 		query: signInMutation({ email, password }),
 		executes: [
+			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [], otpUri: 'otpauth://totp/contember:john?secret=ABCDEFG&period=30&digits=6&algorithm=SHA1&issuer=contember' } }),
+			getConfigSql(),
 		],
 		return: {
 			data: {
@@ -153,6 +163,12 @@ test('otp token not provided', async () => {
 					result: null,
 				},
 			},
+		},
+		expectedAuthLog: {
+			type: 'login',
+			response: expect.objectContaining({
+				ok: false,
+			}),
 		},
 	})
 })
@@ -172,7 +188,9 @@ test('sign in - invalid otp token', async () => {
 	await executeTenantTest({
 		query: signInMutation({ email, password, otpToken: '123456' }),
 		executes: [
+			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [], otpUri: otp.uri } }),
+			getConfigSql(),
 		],
 		return: {
 			data: {
@@ -182,6 +200,12 @@ test('sign in - invalid otp token', async () => {
 					result: null,
 				},
 			},
+		},
+		expectedAuthLog: {
+			type: 'login',
+			response: expect.objectContaining({
+				ok: false,
+			}),
 		},
 	})
 })
@@ -201,7 +225,9 @@ test('sign in - valid otp token', async () => {
 	await executeTenantTest({
 		query: signInMutation({ email, password, otpToken: otpAuth.generate(otp) }),
 		executes: [
+			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [], otpUri: otp.uri } }),
+			getConfigSql(),
 			createSessionKeySql({ apiKeyId, identityId }),
 			getIdentityProjectsSql({ identityId, projectId }),
 			selectMembershipsSql({
@@ -220,6 +246,12 @@ test('sign in - valid otp token', async () => {
 					},
 				},
 			},
+		},
+		expectedAuthLog: {
+			type: 'login',
+			response: expect.objectContaining({
+				ok: true,
+			}),
 		},
 	})
 })

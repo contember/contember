@@ -1,20 +1,13 @@
 import { HttpController } from '../application'
 import { HttpErrorResponse } from '../common'
-import { TenantGraphQLContextFactory } from './TenantGraphQLContextFactory'
-import { ProjectGroupResolver } from '../projectGroup/ProjectGroupResolver'
 import { GraphQLKoaState } from '../graphql'
 
 export class TenantApiMiddlewareFactory {
-	constructor(
-		private readonly debug: boolean,
-		private readonly projectGroupResolver: ProjectGroupResolver,
-		private readonly tenantGraphQLContextFactory: TenantGraphQLContextFactory,
-	) {
-	}
+
 
 	create(): HttpController {
 		return async ctx => {
-			const { timer, projectGroup, authResult, logger, koa } = ctx
+			const { timer, projectGroup, authResult, logger, koa, clientIp } = ctx
 			if (!authResult) {
 				return new HttpErrorResponse(401, 'Authentication required')
 			}
@@ -28,8 +21,20 @@ export class TenantApiMiddlewareFactory {
 						(koa.state as GraphQLKoaState).graphql = {
 							operationName: operation,
 						}
+						const resolverContextFactory = tenantContainer.resolverContextFactory
+						const db = tenantContainer.databaseContext
+						const context = resolverContextFactory.create(
+							authResult,
+							{ ip: clientIp, userAgent: koa.request.headers['user-agent'] },
+							db,
+							logger,
+						)
 
-						return this.tenantGraphQLContextFactory.create({ authResult, tenantContainer, logger })
+						return {
+							...context,
+							identityId: authResult.identityId,
+						}
+
 					},
 				}))
 				logger.debug('Tenant query finished')

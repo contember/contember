@@ -36,7 +36,7 @@ export class CreateProjectMutationResolver implements MutationResolvers {
 			{
 				slug: projectSlug,
 				name: name || projectSlug,
-				config: config || {},
+				config: (config as any) || {},
 				secrets: Object.fromEntries((secrets || []).map(it => [it.key, it.value])),
 			},
 			{

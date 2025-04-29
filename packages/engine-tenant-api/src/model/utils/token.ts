@@ -1,5 +1,5 @@
 import crypto from 'node:crypto'
-import { FixedLengthHexString, isFixedLengthHexString } from './typeUtils'
+import { FixedLengthHexString, isFixedLengthHexString } from './hex'
 import { PersonToken } from '../type'
 import { ImplementationException } from '../../exceptions'
 import { Response, ResponseError, ResponseOk } from './Response'

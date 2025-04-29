@@ -1,8 +1,4 @@
-import {
-	DisablePersonResponse,
-	MutationDisablePersonArgs,
-	MutationResolvers,
-} from '../../../schema'
+import { DisablePersonResponse, MutationDisablePersonArgs, MutationResolvers } from '../../../schema'
 import { TenantResolverContext } from '../../TenantResolverContext'
 import { PermissionActions, PersonAccessManager } from '../../../model'
 import { PersonManager } from '../../../model/service/PersonManager'
@@ -35,8 +31,12 @@ export class DisablePersonMutationResolver implements MutationResolvers {
 			message: 'You are not allowed to disable person account',
 		})
 
-		const result = await this.personAccessManager.disablePerson(context.db, args.personId)
-
+		const result = await this.personAccessManager.disablePerson(context.db, targetPerson)
+		await context.logAuthAction({
+			type: 'person_disable',
+			response: result,
+			personId: targetPerson.id,
+		})
 		if (!result.ok) {
 			return createErrorResponse(result.error, result.errorMessage)
 		}

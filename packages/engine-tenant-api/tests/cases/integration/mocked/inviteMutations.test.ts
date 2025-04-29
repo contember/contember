@@ -54,18 +54,6 @@ test('invite a new person', async () => {
 				getMailTemplateSql({ projectId, type: 'newUserInvited' }),
 				getMailTemplateSql({ projectId: null, type: 'newUserInvited' }),
 			),
-			disableOneOffKeySql({ id: authenticatedApiKeyId }),
-			{
-				sql: SQL`SELECT "project"."id",
-						         "project"."name",
-						         "project"."slug",
-						         "project"."config"
-					         FROM "tenant"."project"
-						              INNER JOIN "tenant"."project_member" AS "project_member" ON "project_member"."project_id" = "project"."id"
-					         WHERE "project_member"."identity_id" = ?`,
-				parameters: [identityId],
-				response: { rows: [{ id: membershipId, name: 'foo', slug: 'foo' }] },
-			},
 		],
 		sentMails: [
 			{
@@ -136,18 +124,6 @@ test('invite a new person with password reset', async () => {
 				getMailTemplateSql({ projectId, type: 'newUserInvited' }),
 				getMailTemplateSql({ projectId: null, type: 'newUserInvited' }),
 			),
-			disableOneOffKeySql({ id: authenticatedApiKeyId }),
-			{
-				sql: SQL`SELECT "project"."id",
-						         "project"."name",
-						         "project"."slug",
-						         "project"."config"
-					         FROM "tenant"."project"
-						              INNER JOIN "tenant"."project_member" AS "project_member" ON "project_member"."project_id" = "project"."id"
-					         WHERE "project_member"."identity_id" = ?`,
-				parameters: [identityId],
-				response: { rows: [{ id: membershipId, name: 'foo', slug: 'foo' }] },
-			},
 		],
 		sentMails: [
 			{

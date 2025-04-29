@@ -42,7 +42,7 @@ export class SignUpMutationResolver implements MutationResolvers {
 		})
 
 		if (!response.ok) {
-			return createErrorResponse(response.error, response.errorMessage)
+			return createErrorResponse(response)
 		}
 		const result = response.result
 		await this.apiKeyManager.disableOneOffApiKey(context.db, context.apiKeyId)

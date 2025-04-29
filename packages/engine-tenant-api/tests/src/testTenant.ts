@@ -22,12 +22,15 @@ import { dbCredentials } from './dbUtils'
 import { IdPMock } from './IdPMock'
 import { createLogger, JsonStreamLoggerHandler } from '@contember/logger'
 import { emptySchema } from '@contember/schema-utils'
+import { expect } from 'bun:test'
+import { AuthLogService } from '../../src/model/service/AuthLogService'
 
 export interface Test {
 	query: GraphQLTestQuery
 	executes: ExpectedQuery[]
 	return: object
 	sentMails?: ExpectedMessage[]
+	expectedAuthLog?: AuthLogService.LogArgs
 }
 
 export const createUuidGenerator = () => {
@@ -114,6 +117,14 @@ export const executeTenantTest = async (test: Test) => {
 			authenticatedApiKeyId,
 		),
 		logger: createLogger(new JsonStreamLoggerHandler(process.stderr)),
+		logAuthAction: async args => {
+			if (!test.expectedAuthLog) {
+				console.log(JSON.stringify(args))
+				throw new Error('No expected auth log')
+			}
+			expect(args).toEqual(test.expectedAuthLog)
+			test.expectedAuthLog = undefined
+		},
 		db: databaseContext,
 	}
 
@@ -135,4 +146,6 @@ export const executeTenantTest = async (test: Test) => {
 		mailer.expectMessage(email)
 	}
 	mailer.expectEmpty()
+	expect(test.executes).toHaveLength(0)
+	expect(test.expectedAuthLog).toBeUndefined()
 }

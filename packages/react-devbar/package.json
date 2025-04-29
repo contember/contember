@@ -1,7 +1,7 @@
 {
   "name": "@contember/react-devbar",
   "license": "Apache-2.0",
-  "version": "2.1.0-alpha.16",
+  "version": "2.1.0-alpha.17",
   "type": "module",
   "sideEffects": false,
   "main": "./dist/production/index.js",

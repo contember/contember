@@ -85,6 +85,7 @@ const config: DocsConfig = {
 		'SidebarTrigger',
 		'TableElementRenderer',
 		'TableFooter',
+		'TableCellElementRenderer',
 		'TableRowElementRenderer',
 		'TenantFormError',
 		'TenantFormField',
@@ -109,6 +110,7 @@ const config: DocsConfig = {
 		'useOnHighlight',
 		'usePersistErrorHandler',
 		'usePersistSuccessHandler',
+		'usePersistFeedbackHandlers',
 		'useToasts',
 	],
 }

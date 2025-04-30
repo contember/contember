@@ -59,6 +59,7 @@ export class DataTransferClient {
 			},
 			method: 'POST',
 			body: bodyStream,
+			...{ duplex: 'half' },
 		})
 		if (!response.ok) {
 			const responseBody = await response.text()

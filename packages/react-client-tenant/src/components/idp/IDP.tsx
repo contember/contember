@@ -10,9 +10,10 @@ export interface IDPProps {
 	onLogin?: () => void
 	onInitError?: (error: IDPInitError) => void
 	onResponseError?: (error: IDPResponseError) => void
+	expiration?: number
 }
 
-export const IDP = ({ children, onResponseError, onInitError, onLogin }: IDPProps) => {
+export const IDP = ({ children, onResponseError, onInitError, onLogin, expiration }: IDPProps) => {
 	const hasOauthResponse = useMemo(() => {
 		const params = new URLSearchParams(window.location.search)
 		return params.has('state') && (params.has('code') || params.has('id_token'))
@@ -28,7 +29,7 @@ export const IDP = ({ children, onResponseError, onInitError, onLogin }: IDPProp
 		}
 		return { type: 'nothing' }
 	})
-	useHandleIDPResponse({ hasOauthResponse, setState, onLogin })
+	useHandleIDPResponse({ hasOauthResponse, setState, onLogin, expiration: expiration })
 
 	const initRedirect = useInitIDPRedirect({ setState })
 

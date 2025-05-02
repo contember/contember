@@ -41,7 +41,7 @@ export class SignInMutationResolver implements MutationResolvers {
 
 		if (!response.ok) {
 			const configuration = await context.db.queryHandler.fetch(new ConfigurationQuery())
-			if (!configuration.login.revealUserExists && ['NO_PASSWORD_SET', 'NO_PASSWORD_SET', 'PERSON_DISABLED', 'INVALID_PASSWORD'].includes(response.error)) {
+			if (!configuration.login.revealUserExists && ['NO_PASSWORD_SET', 'NO_PASSWORD_SET', 'PERSON_DISABLED', 'INVALID_PASSWORD', 'UNKNOWN_EMAIL'].includes(response.error)) {
 				// if the user does not exist, we don't want to reveal that, so we return a generic error
 				return createErrorResponse('INVALID_CREDENTIALS', 'Invalid credentials')
 			}

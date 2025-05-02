@@ -546,7 +546,7 @@ export interface IdentityStateProps {
 export type IdentityStateValue = 'none' | 'loading' | 'failed' | 'cleared' | 'success';
 
 // @public (undocumented)
-export const IDP: ({ children, onResponseError, onInitError, onLogin }: IDPProps) => JSX_2.Element;
+export const IDP: ({ children, onResponseError, onInitError, onLogin, expiration }: IDPProps) => JSX_2.Element;
 
 // @public (undocumented)
 export type IDPInitError = InitSignInIDPErrorCode | 'UNKNOWN_ERROR';
@@ -581,6 +581,8 @@ export const IDPMethodsContextProvider: Context<IDPMethods>;
 export interface IDPProps {
     // (undocumented)
     children: ReactNode;
+    // (undocumented)
+    expiration?: number;
     // (undocumented)
     onInitError?: (error: IDPInitError) => void;
     // (undocumented)

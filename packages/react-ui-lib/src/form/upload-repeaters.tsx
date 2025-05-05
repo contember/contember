@@ -8,7 +8,7 @@ import {
 	FileType,
 	FileWithMeta,
 	ImageFileTypeProps,
-	MultiUploader,
+	MultiUploader, S3FileOptions,
 	UploaderBaseFieldProps,
 	UploaderHasFile,
 	useMultiUploaderFileState,
@@ -53,6 +53,7 @@ export type BaseFileRepeaterFieldProps =
 		actions?: ReactNode
 		edit?: ReactNode
 		noDestroy?: boolean
+		getUploadOptions?: (file: File) => S3FileOptions
 	}
 
 export type ImageRepeaterFieldProps =
@@ -131,10 +132,13 @@ const FileRepeaterFieldInner = Component<FileRepeaterFieldInnerProps>(({
 	fileType,
 	dropzonePlaceholder,
 	renderPreview,
+	getUploadOptions,
 	...props
 }) => {
 
-	const defaultUploader = useS3Client()
+	const defaultUploader = useS3Client({
+		getUploadOptions,
+	})
 	const [fileTypeStable] = useState(fileType)
 	const fileTypeWithUploader = useMemo(
 		() => ({ ...fileTypeStable, uploader: fileTypeStable?.uploader ?? defaultUploader }),

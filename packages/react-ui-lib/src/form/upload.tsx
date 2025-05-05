@@ -7,7 +7,7 @@ import {
 	createVideoFileType,
 	FileType,
 	FileUrlDataExtractorProps,
-	ImageFileTypeProps,
+	ImageFileTypeProps, S3FileOptions,
 	Uploader,
 	UploaderBase,
 	UploaderBaseFieldProps,
@@ -31,6 +31,7 @@ export type BaseUploadFieldProps =
 		actions?: ReactNode
 		edit?: ReactNode
 		noDestroy?: boolean
+		getUploadOptions?: (file: File) => S3FileOptions
 	}
 
 
@@ -92,9 +93,11 @@ type UploadFieldInnerProps =
 		children: ReactNode
 	}
 
-const UploadFieldInner = Component((({ baseField, label, description, children, fileType, urlField, dropzonePlaceholder }: UploadFieldInnerProps) => {
+const UploadFieldInner = Component((({ baseField, label, description, children, fileType, urlField, dropzonePlaceholder, getUploadOptions }: UploadFieldInnerProps) => {
 	const entity = useEntity()
-	const defaultUploader = useS3Client()
+	const defaultUploader = useS3Client({
+		getUploadOptions,
+	})
 	const [fileTypeStable] = useState(fileType)
 	const fileTypeWithUploader = useMemo(
 		() => ({ ...fileTypeStable, uploader: fileTypeStable?.uploader ?? defaultUploader }),

@@ -23,6 +23,7 @@ import * as React_2 from 'react';
 import { ReactNode } from 'react';
 import { RefAttributes } from 'react';
 import { RepeaterProps } from '@contember/react-repeater';
+import { S3FileOptions } from '@contember/react-uploader';
 import { SugaredQualifiedEntityList } from '@contember/interface';
 import { SugaredRelativeEntityList } from '@contember/interface';
 import { SugaredRelativeSingleEntity } from '@contember/interface';
@@ -49,6 +50,7 @@ export type BaseFileRepeaterFieldProps = Omit<FormContainerProps, 'children'> & 
     actions?: ReactNode;
     edit?: ReactNode;
     noDestroy?: boolean;
+    getUploadOptions?: (file: File) => S3FileOptions;
 };
 
 // @public (undocumented)
@@ -57,6 +59,7 @@ export type BaseUploadFieldProps = Omit<FormContainerProps, 'children'> & Upload
     actions?: ReactNode;
     edit?: ReactNode;
     noDestroy?: boolean;
+    getUploadOptions?: (file: File) => S3FileOptions;
 };
 
 // @public (undocumented)

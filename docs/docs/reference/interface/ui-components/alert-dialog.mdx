@@ -1,0 +1,211 @@
+# AlertDialog Component Family
+
+## Overview
+`AlertDialog` renders an interruptive modal that blocks the UI until the user responds.  
+You use it to confirm actions or show urgent information.
+
+## Core Concepts
+- Uses a **Trigger → Content → Footer** pattern.  
+- Portal and overlay move the dialog outside the normal DOM flow.  
+- Cancel and Action buttons close the dialog with different intents.  
+- `useAlertDialogOpenState` gives programmatic control.  
+- All sub-components must live inside the main `AlertDialog` provider.
+
+## Installation
+```tsx
+import {
+	AlertDialog,
+	AlertDialogTrigger,
+	AlertDialogContent,
+	AlertDialogHeader,
+	AlertDialogTitle,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogCancel,
+	AlertDialogAction,
+} from '~/lib/ui/alert-dialog'
+```
+
+## Quick Start
+```tsx
+<AlertDialog>
+	<AlertDialogTrigger>Delete file</AlertDialogTrigger>
+
+	<AlertDialogContent>
+		<AlertDialogHeader>
+			<AlertDialogTitle>Are you sure?</AlertDialogTitle>
+			<AlertDialogDescription>
+				This action cannot be undone.
+			</AlertDialogDescription>
+		</AlertDialogHeader>
+
+		<AlertDialogFooter>
+			<AlertDialogCancel>Cancel</AlertDialogCancel>
+			<AlertDialogAction>Delete</AlertDialogAction>
+		</AlertDialogFooter>
+	</AlertDialogContent>
+</AlertDialog>
+```
+
+## Detailed Guide
+1. Wrap all dialog parts in `<AlertDialog>`.  
+2. Add one `<AlertDialogTrigger>` to open the modal.  
+3. Place `<AlertDialogContent>` for the visible panel.  
+4. Combine `<AlertDialogHeader>`, `<AlertDialogTitle>`, and `<AlertDialogDescription>` for text.  
+5. Put buttons inside `<AlertDialogFooter>` using `<AlertDialogCancel>` and `<AlertDialogAction>`.  
+6. Style or replace buttons with `asChild`, letting you pass your own button components.  
+7. Control visibility from code with `open` / `onOpenChange` or the `useAlertDialogOpenState` hook.
+
+## Component API Reference
+
+### AlertDialog
+Main context and state provider.
+
+#### Props
+<!-- props -->
+
+---
+
+### Sub-Components
+
+#### AlertDialogTrigger
+Opens the dialog.
+
+##### Props
+<!-- props:AlertDialogTrigger -->
+
+#### AlertDialogPortal
+Creates a React portal for the dialog.
+
+##### Props
+<!-- props:AlertDialogPortal -->
+
+#### AlertDialogOverlay
+Semi-transparent backdrop placed under the content.
+
+##### Props
+<!-- props:AlertDialogOverlay -->
+
+#### AlertDialogContent
+Holds the modal panel and handles focus trapping.
+
+##### Props
+<!-- props:AlertDialogContent -->
+
+#### AlertDialogHeader
+Wrapper for title and description.
+
+##### Props
+<!-- props:AlertDialogHeader -->
+
+#### AlertDialogFooter
+Container for action buttons.
+
+##### Props
+<!-- props:AlertDialogFooter -->
+
+#### AlertDialogTitle
+Dialog heading.
+
+##### Props
+<!-- props:AlertDialogTitle -->
+
+#### AlertDialogDescription
+Additional explanatory text.
+
+##### Props
+<!-- props:AlertDialogDescription -->
+
+#### AlertDialogAction
+Primary confirmation button.
+
+##### Props
+<!-- props:AlertDialogAction -->
+
+#### AlertDialogCancel
+Secondary cancel button.
+
+##### Props
+<!-- props:AlertDialogCancel -->
+
+## Hooks
+
+### useAlertDialogOpenState
+Custom hook that returns `[isOpen, setIsOpen]`.
+
+```tsx
+const SaveButton = () => {
+	const [, setOpen] = useAlertDialogOpenState()
+
+	return (
+		<PersistTrigger onPersistSuccess={() => setOpen(false)}>
+			<Button>Save</Button>
+		</PersistTrigger>
+	)
+}
+```
+
+## Examples
+
+### Validate before persisting
+```tsx
+const [open, setOpen] = useAlertDialogOpenState()
+
+<EntityBeforePersist
+	listener={() => {
+		if (!formIsValid()) {
+			setOpen(true)
+		}
+	}}
+/>
+
+<AlertDialog open={open} onOpenChange={setOpen}>
+	<AlertDialogContent>
+		<AlertDialogTitle>Translations missing</AlertDialogTitle>
+		<AlertDialogDescription>Some locales are incomplete. Continue anyway?</AlertDialogDescription>
+		<AlertDialogFooter>
+			<AlertDialogCancel>Cancel</AlertDialogCancel>
+			<AlertDialogAction>Save anyway</AlertDialogAction>
+		</AlertDialogFooter>
+	</AlertDialogContent>
+</AlertDialog>
+```
+
+### Destructive list action
+```tsx
+<AlertDialog>
+	<AlertDialogTrigger asChild>
+		<Button variant="destructive" size="xs">Bulk delete</Button>
+	</AlertDialogTrigger>
+
+	<AlertDialogContent>
+		<AlertDialogHeader>
+			<AlertDialogTitle>Delete selected items?</AlertDialogTitle>
+			<AlertDialogDescription>You cannot undo this operation.</AlertDialogDescription>
+		</AlertDialogHeader>
+
+		<AlertDialogFooter>
+			<AlertDialogCancel>Cancel</AlertDialogCancel>
+			<AlertDialogAction asChild>
+				<Button variant="destructive" onClick={handleBulkDelete}>Delete</Button>
+			</AlertDialogAction>
+		</AlertDialogFooter>
+	</AlertDialogContent>
+</AlertDialog>
+```
+
+## Best Practices & Gotchas
+- Always include a **Cancel** action for accessibility.  
+- Keep dialog content short; long text lowers conversion.  
+- Use `asChild` to reuse existing button components.  
+- Do not nest dialogs; stacking modals confuses focus management.  
+- Control focus with `initialFocus` if your design needs it.  
+
+## Further Reading
+- `Dialog` component for non-blocking modals.  
+- `useOpen` hook – underlying state helper.  
+- Tailwind modal sizing utilities.
+
+<!-- End of Generated Documentation -->
+
+> **Note:** Props reference has been automatically enhanced with precise API types from API Extractor.

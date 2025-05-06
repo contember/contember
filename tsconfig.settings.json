@@ -25,6 +25,8 @@
 		"strict": true,
 		"target": "ES2020",
 		"useDefineForClassFields": true,
+		"stripInternal": false,
+		"removeComments": false
 //		"types": [
 //			"vite/client",
 //			"node",

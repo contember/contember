@@ -3,7 +3,53 @@ import { Check, ChevronDown, ChevronUp } from 'lucide-react'
 import { uic } from '../utils'
 import { createComponentOpenHooks } from '../utils/createComponentOpenHooks'
 
-export const { Component: Select, useOpen: useSelectOpenState } = createComponentOpenHooks(SelectPrimitive.Root)
+const { Component, useOpen } = createComponentOpenHooks(SelectPrimitive.Root)
+
+/**
+ * Select Component
+ *
+ * ### Example: Basic
+ * ```tsx
+ *  <Select>
+ *    <SelectTrigger>Choose</SelectTrigger>
+ *    <SelectContent>
+ *      <SelectItem value="apple">Apple</SelectItem>
+ *      <SelectItem value="banana">Banana</SelectItem>
+ *    </SelectContent>
+ *  </Select>
+ * ```
+ *
+ * ### Example: With Group
+ * ```tsx
+ * <Select>
+ *    <SelectTrigger>Choose country</SelectTrigger>
+ *    <SelectContent>
+ *      <SelectGroup>
+ *        <SelectItem value="apple">Apple</SelectItem>
+ *        <SelectItem value="banana">Banana</SelectItem>
+ *      </SelectGroup>
+ *      <SelectGroup>
+ *        <SelectItem value="cucumber">Cucumber</SelectItem>
+ *        <SelectItem value="paprika">Paprika</SelectItem>
+ *      </SelectGroup>
+ *    </SelectContent>
+ * </Select>
+ * ```
+ *
+ * ### Sub-components
+ * - {@link SelectTrigger}
+ * - {@link SelectContent}
+ * - {@link SelectItem}
+ * - {@link SelectGroup}
+ * - {@link SelectValue}
+ * - {@link SelectLabel}
+ *
+ * #### Hooks
+ * - {@link useSelectOpenState}
+ */
+export const Select = Component
+
+export const useSelectOpenState = useOpen
 
 export const SelectGroup = SelectPrimitive.Group
 

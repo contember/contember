@@ -32,6 +32,9 @@ export type CreateEntityDialogProps = {
  *   <EntityForm />
  * </CreateEntityDialog>
  * ```
+ *
+ * @group SelectInput
+ * @group MultiSelectInput
  */
 export const CreateEntityDialog = ({ trigger, children }: CreateEntityDialogProps) => (
 	<Dialog>

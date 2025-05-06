@@ -39,7 +39,7 @@ export type SelectFieldProps =
 	& Omit<FormContainerProps, 'children'>
 
 /**
- * SelectField is a component for single-entity relationship selection (hasOne). Must be used within an Entity context.
+ * `SelectField` is a component for single-entity relationship selection (hasOne). Must be used within an Entity context.
  *
  * #### Requirements
  * - Must be used within an Entity context (`<EntitySubTree />` or `<EntityListSubTree />`).

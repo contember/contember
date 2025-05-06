@@ -61,6 +61,13 @@ export type SortableMultiSelectInputProps =
 		initialSorting?: DataViewSortingDirections
 	}
 
+/**
+* `SortableMultiSelectInput` is the UI for the sortable multi select input.
+*
+* See more {@link MultiSelectInput}
+*
+* @group SortableMultiSelectField
+*/
 export const SortableMultiSelectInput = Component<SortableMultiSelectInputProps>(({ field, queryField, options, children, sortableBy, connectAt, placeholder, createNewForm, initialSorting }) => {
 	const id = useFormFieldId()
 	return (

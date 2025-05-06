@@ -51,6 +51,12 @@ export interface ComponentSourceData {
 	imports?: string[]
 	importSources?: { source: string; path?: string }[]
 	regenerationReason?: RegenerationReason
+	// Group-related fields
+	groupName?: string            // The group this component belongs to
+	isMainComponent?: boolean     // Whether this is the main component of a group
+	subComponents?: string[]      // Names of sub-components linked to this component
+	hooks?: string[]              // Names of hooks linked to this component
+	isInternal?: boolean          // Whether this is an internal component that shouldn't have its own page
 }
 
 export interface PropData {
@@ -62,8 +68,17 @@ export interface PropData {
 }
 
 export interface AIPromptData extends Omit<ComponentSourceData, 'filePath'> {
-	// Potentially add more structured fields here if needed
-	// e.g., separate description, params from JSDoc
+	// Component group related fields
+	isComponentGroup?: boolean
+	groupComponents?: Array<{
+		componentName: string
+		jsdoc?: string
+		props?: Record<string, PropData>
+		examples?: string[]
+		exampleSources?: ExampleSourceInfo[]
+		isMainComponent?: boolean
+		isInternal?: boolean
+	}>
 }
 
 export interface ComponentOverride {

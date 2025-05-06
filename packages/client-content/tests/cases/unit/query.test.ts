@@ -255,6 +255,7 @@ describe('queries', () => {
 			],
 		})
 		expect(calls).toHaveLength(1)
+		expect(calls).toMatchSnapshot()
 	})
 
 	test('top level get transform', async () => {
@@ -281,6 +282,7 @@ describe('queries', () => {
 			},
 		})
 		expect(calls).toHaveLength(1)
+		expect(calls).toMatchSnapshot()
 	})
 
 
@@ -325,6 +327,7 @@ describe('queries', () => {
 			},
 		})
 		expect(calls).toHaveLength(1)
+		expect(calls).toMatchSnapshot()
 	})
 
 
@@ -362,6 +365,7 @@ describe('queries', () => {
 				},
 			},
 		})
+		expect(calls).toMatchSnapshot()
 	})
 
 
@@ -392,6 +396,7 @@ describe('queries', () => {
 				},
 			},
 		})
+		expect(calls).toMatchSnapshot()
 	})
 
 	test('multiple transforms', async () => {

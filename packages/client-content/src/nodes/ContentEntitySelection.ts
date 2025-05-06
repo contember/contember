@@ -177,7 +177,7 @@ export class ContentEntitySelection {
 		if (!nestedTransform) {
 			return selectionWithField
 		}
-		return this.withFieldTransform(alias, it => it.map(nestedTransform))
+		return selectionWithField.withFieldTransform(alias, it => it.map(nestedTransform))
 	}
 
 
@@ -229,7 +229,7 @@ export class ContentEntitySelection {
 		if (!nestedTransform) {
 			return selectionWithField
 		}
-		return this.withFieldTransform(alias, (it, ctx) => it !== null ? nestedTransform(it, ctx) : null)
+		return selectionWithField.withFieldTransform(alias, (it, ctx) => it !== null ? nestedTransform(it, ctx) : null)
 	}
 
 	private _one(
@@ -273,7 +273,7 @@ export class ContentEntitySelection {
 		if (!nestedTransform) {
 			return selectionWithField
 		}
-		return this.withFieldTransform(alias, (it, ctx) => it !== null ? nestedTransform(it, ctx) : null)
+		return selectionWithField.withFieldTransform(alias, (it, ctx) => it !== null ? nestedTransform(it, ctx) : null)
 	}
 
 

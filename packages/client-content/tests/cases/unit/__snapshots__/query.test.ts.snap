@@ -100,3 +100,126 @@ exports[`queries get by id 1`] = `
 }
 "
 `;
+
+exports[`queries nested has-many transform 1`] = `
+[
+  {
+    "query": 
+"query($AuthorUniqueWhere_0: AuthorUniqueWhere!) {
+	author: getAuthor(by: $AuthorUniqueWhere_0) {
+		id
+		name
+		email
+		posts {
+			id
+			publishedAt
+		}
+	}
+}
+"
+,
+    "variables": {
+      "AuthorUniqueWhere_0": {
+        "id": "123",
+      },
+    },
+  },
+]
+`;
+
+exports[`queries top level list transform 1`] = `
+[
+  {
+    "query": 
+"query {
+	authors: listAuthor {
+		id
+		name
+		email
+	}
+}
+"
+,
+    "variables": {},
+  },
+]
+`;
+
+exports[`queries top level get transform 1`] = `
+[
+  {
+    "query": 
+"query($AuthorUniqueWhere_0: AuthorUniqueWhere!) {
+	author: getAuthor(by: $AuthorUniqueWhere_0) {
+		id
+		name
+		email
+	}
+}
+"
+,
+    "variables": {
+      "AuthorUniqueWhere_0": {
+        "id": "123",
+      },
+    },
+  },
+]
+`;
+
+exports[`queries nested has-one transform 1`] = `
+[
+  {
+    "query": 
+"query($PostUniqueWhere_0: PostUniqueWhere!) {
+	post: getPost(by: $PostUniqueWhere_0) {
+		id
+		publishedAt
+		author {
+			id
+			name
+			email
+		}
+	}
+}
+"
+,
+    "variables": {
+      "PostUniqueWhere_0": {
+        "id": "123",
+      },
+    },
+  },
+]
+`;
+
+exports[`queries nested has-many-by transform 1`] = `
+[
+  {
+    "query": 
+"query($PostUniqueWhere_0: PostUniqueWhere!, $PostLocalesByLocaleUniqueWhere_1: PostLocalesByLocaleUniqueWhere!) {
+	post: getPost(by: $PostUniqueWhere_0) {
+		id
+		publishedAt
+		localesByLocale(by: $PostLocalesByLocaleUniqueWhere_1) {
+			id
+			title
+			content
+		}
+	}
+}
+"
+,
+    "variables": {
+      "PostLocalesByLocaleUniqueWhere_1": {
+        "locale": {
+          "code": "en",
+        },
+      },
+      "PostUniqueWhere_0": {
+        "id": "123",
+      },
+    },
+  },
+]
+`;

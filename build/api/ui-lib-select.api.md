@@ -17,16 +17,13 @@ import { SugaredRelativeEntityList } from '@contember/interface';
 import { SugaredRelativeSingleEntity } from '@contember/interface';
 import { SugaredRelativeSingleField } from '@contember/interface';
 
-// @public (undocumented)
+// @public
 export const DefaultSelectDataView: NamedExoticComponent<DefaultSelectDataViewProps>;
 
-// @public (undocumented)
+// @public
 export interface DefaultSelectDataViewProps {
-    // (undocumented)
     children: ReactNode;
-    // (undocumented)
     initialSorting?: DataViewSortingDirections;
-    // (undocumented)
     queryField?: DataViewUnionFilterFields;
 }
 

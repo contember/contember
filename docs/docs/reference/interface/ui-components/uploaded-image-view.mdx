@@ -1,26 +1,21 @@
----
-title: UploadedImageView
----
-
-<!-- Edited by human: false -->
-<!-- Examples count: 5 -->
-<!-- Source examples: 0 -->
-<!-- Playground examples: 3 -->
-<!-- External examples: 2 -->
-<!-- Import examples: 4 -->
-
 ## Overview
-_None_
-
-## Styling Guidelines
-* All examples use Tailwind CSS utility classes.
-* The component adds no built-in styles, so you may combine it with your Contember theme classes if needed.
+`UploadedImageView` shows an already–uploaded image that lives inside a Contember entity.  
+You give it the field holding the file URL and it renders an `<img>` with optional action buttons.
 
 ## Core Concepts
-* Map CMS file fields to visual output with `urlField` and optional metadata fields.
-* Wrap the component in `<HasOne>` (or another binding component) so field values come from the current entity.
-* Optional action elements (`actions`, `edit`, `DestroyAction`) let you build inline editing UIs.
-* The component only renders; it never mutates data unless you supply custom actions.
+* Contember stores each file attribute (URL, width, …) in a separate field.
+* You usually place the component inside `<HasOne>` or `<RepeaterField>` so it gets entity context.
+* The component is read-only by default.  
+  Supply `actions`, `edit`, or `DestroyAction` if you need inline editing.
+* It never uploads or deletes files on its own. You wire those behaviours in higher-level components.
+
+## Installation
+```tsx
+// any React file
+import { UploadedImageView } from '~/lib/upload'
+// or
+import { UploadedImageView } from '@app/lib/upload'
+```
 
 ## Quick Start
 ```tsx
@@ -28,61 +23,83 @@ import { HasOne } from '@contember/admin'
 import { UploadedImageView } from '~/lib/upload'
 
 <HasOne field="image">
-  <UploadedImageView urlField="url" className="max-w-full rounded shadow" />
-</HasOne>
-```
-
-## Props Reference
-| Name | Type | Required | Default | Description |
-| --- | --- | --- | --- | --- |
-| urlField | `string \| { field: string; hasOneRelationPath?: SugarableHasOneRelation \| SugarableHasOneRelation[] }` | Yes | - | Field holding the image URL. |
-| fileNameField | `string \| { field: string; hasOneRelationPath?: SugarableHasOneRelation \| SugarableHasOneRelation[] }` | No | - | Field with the original filename. |
-| lastModifiedField | `string \| { field: string; hasOneRelationPath?: SugarableHasOneRelation \| SugarableHasOneRelation[] }` | No | - | Field with last modified timestamp. |
-| fileSizeField | `string \| { field: string; hasOneRelationPath?: SugarableHasOneRelation \| SugarableHasOneRelation[] }` | No | - | Field containing file size in bytes. |
-| fileTypeField | `string \| { field: string; hasOneRelationPath?: SugarableHasOneRelation \| SugarableHasOneRelation[] }` | No | - | Field holding MIME type. |
-| widthField | `string \| { field: string; hasOneRelationPath?: SugarableHasOneRelation \| SugarableHasOneRelation[] }` | No | - | Image width in pixels. |
-| heightField | `string \| { field: string; hasOneRelationPath?: SugarableHasOneRelation \| SugarableHasOneRelation[] }` | No | - | Image height in pixels. |
-| baseField | `string \| SugarableHasOneRelation \| SugarableHasOneRelation[]` | No | - | Relation path shared by all file sub-fields. |
-| actions | `React.ReactNode` | No | - | Extra action buttons rendered over the image. |
-| edit | `React.ReactNode` | No | - | Custom edit UI shown with the image. |
-| noDestroy | `boolean` | No | - | Disable default destroy action when `DestroyAction` is not provided. |
-| DestroyAction | `React.ComponentType<{ children: React.ReactElement }>` | No | - | Custom component wrapping a destroy trigger. |
-
-## Examples
-
-### Basic preview in a relation
-```tsx
-<HasOne field="image">
   <UploadedImageView urlField="url" className="w-48 h-48 object-cover rounded" />
 </HasOne>
 ```
-Displays a square thumbnail pulled from the related `image` entity.
 
-### Conditional layout based on an entity field
+## Detailed Guide
+1. Wrap the component in a binding component that provides entity context:
+   ```tsx
+   <HasOne field="image">
+     <UploadedImageView urlField="url" />
+   </HasOne>
+   ```
+2. Add more metadata fields when you need them for captions or tooltips:
+   ```tsx
+   <UploadedImageView
+     urlField="url"
+     fileNameField="fileName"
+     widthField="width"
+     heightField="height"
+   />
+   ```
+3. Inject custom actions:
+   ```tsx
+   <UploadedImageView
+     urlField="url"
+     actions={<MyReplaceButton />}
+     DestroyAction={RepeaterRemoveItemTrigger}
+   />
+   ```
+
+## Component API Reference
+
+### Main Component – `UploadedImageView`
+Shows an image referenced by the given field.  
+You may also read other metadata fields or render custom action buttons.
+
+#### Props
+<!-- props -->
+
+<!-- No sub-components in this group -->
+
+## Hooks
+*(none)*
+
+## Examples
+
+### Basic preview
 ```tsx
-<div className="flex">
-  <div
-    className={cn(
-      'border border-gray-200',
-      it.getField('imagePosition').value === 'right' ? 'order-2' : ''
-    )}
-  >
-    <HasOne field="image">
-      <UploadedImageView urlField="url" />
-    </HasOne>
-  </div>
-
-  <div className="w-64 px-4 space-y-2">
-    <h2 className="text-xl font-bold">
-      <Field field="title" />
-    </h2>
-    <p>
-      <Field field="content" />
-    </p>
-  </div>
-</div>
+<HasOne field="image">
+  <UploadedImageView urlField="url" />
+</HasOne>
 ```
-Switch the image column when the `imagePosition` field equals `"right"`.
+
+### Conditional column order
+```tsx
+it => (
+  <div className="flex">
+    <div
+      className={cn(
+        'border border-gray-200',
+        it.getField('imagePosition').value === 'right' ? 'order-2' : ''
+      )}
+    >
+      <HasOne field="image">
+        <UploadedImageView urlField="url" />
+      </HasOne>
+    </div>
+    <div className="w-64 px-4 space-y-2">
+      <h2 className="text-xl font-bold">
+        <Field field="title" />
+      </h2>
+      <p>
+        <Field field="content" />
+      </p>
+    </div>
+  </div>
+)
+```
 
 ### Selectable grid item
 ```tsx
@@ -98,68 +115,40 @@ it => (
   </div>
 )
 ```
-Use the component inside a selectable grid. The outer element handles selection logic and hover styling.
 
-### Repeater item with overlay checkbox and remove trigger
+### Repeater with checkbox and custom destroy
 ```tsx
-() => (
-  <div className="[&_.cui-button.theme-danger-controls]:hidden [&_.cui-button.scheme-light]:bg-white">
-    <ImageRepeaterField
-      field="photos"
+<ImageRepeaterField
+  field="photos"
+  urlField="image.url"
+  sortableBy="order"
+  withoutUploader
+>
+  <div className="relative">
+    <div className="absolute top-1 right-1 z-10 bg-white/80 py-0.5 px-1 rounded">
+      <CheckboxField field="isUsed" label="Use image" />
+    </div>
+
+    <UploadedImageView
       urlField="image.url"
-      sortableBy="order"
-      label={undefined}
-      withoutUploader
-    >
-      <div className="relative">
-        <div className="absolute top-1 right-1 z-10 bg-white/80 py-0.5 px-1 rounded">
-          <CheckboxField field="isUsed" label="Use image" />
-        </div>
-
-        <UploadedImageView urlField="image.url" DestroyAction={RepeaterRemoveItemTrigger} />
-      </div>
-    </ImageRepeaterField>
+      DestroyAction={RepeaterRemoveItemTrigger}
+    />
   </div>
-)
+</ImageRepeaterField>
 ```
-Overlay a checkbox in the corner and hide default danger buttons. Editors can mark photos as “used” while still removing them.
-
-### Same pattern reused in another project
-```tsx
-() => (
-  <div className="[&_.cui-button.theme-danger-controls]:hidden [&_.cui-button.scheme-light]:bg-white">
-    <ImageRepeaterField
-      field="photos"
-      urlField="image.url"
-      sortableBy="order"
-      label={undefined}
-      withoutUploader
-    >
-      <div className="relative">
-        <div className="absolute top-1 right-1 z-10 bg-white/80 py-0.5 px-1 rounded">
-          <CheckboxField field="isUsed" label="Use image" />
-        </div>
-
-        <UploadedImageView urlField="image.url" DestroyAction={RepeaterRemoveItemTrigger} />
-      </div>
-    </ImageRepeaterField>
-  </div>
-)
-```
-A CMS project reuses the exact setup, proving the pattern scales across codebases.
 
 ## Best Practices & Gotchas
-* Supply only fields you actually store; missing props do not break rendering.
-* Always wrap the component in a binding context (`HasOne`, `FieldView`) so data loads.
-* Use `noDestroy` when the file should survive record deletion in the UI.
-* Tailwind’s `object-cover` class yields consistent thumbnails.
-* Pass a custom `DestroyAction` if you need confirmation dialogs or a disconnect action.
-* Overlay elements (checkboxes, buttons) should share a `relative` parent to avoid stacking issues.
-* Hide default danger controls with scoped selectors when you provide your own UI.
+* Always wrap the component in an entity provider like `<HasOne>` or `<RepeaterField>`.
+* Store all image metadata in the same entity to avoid deep relation paths.
+* Use `DestroyAction` to prevent accidental deletes when multiple editors work together.
+* Disable the default destroy icon with `noDestroy` if you rely on your own control.
+* Combine Tailwind classes to keep images responsive (`className="max-w-full h-auto"`).
 
 ## Further Reading
-* `HasOne` relation component
-* `UploaderDropzoneAreaUI` – for file uploads
-* Contember guide “Working with images”
+* `HasOne` and `RepeaterField` – provide entity context.
+* `UploaderDropzoneAreaUI` – handle the upload flow.
+* Contember Admin binding documentation.
 
 <!-- End of Generated Documentation -->
+
+> **Note:** Props reference has been automatically enhanced with precise API types from API Extractor.

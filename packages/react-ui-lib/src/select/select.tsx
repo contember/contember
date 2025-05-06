@@ -1,5 +1,4 @@
-import * as React from 'react'
-import { ReactNode, useCallback } from 'react'
+import { ReactNode, useCallback, useState } from 'react'
 import { Popover, PopoverTrigger } from '../ui/popover'
 import {
 	Component,
@@ -47,7 +46,7 @@ export type SelectInputProps =
 	}
 
 /**
- * SelectInput is a versatile component for rendering a selectable input field with advanced functionality.
+ * `SelectInput` is a versatile component for rendering a selectable input field with advanced functionality.
  * It supports optional entity creation, validation, and sorting within the context of Contember's interface.
  *
  * #### Example: Basic usage with entity creation
@@ -65,9 +64,23 @@ export type SelectInputProps =
  *   <Field field="label" />
  * </SelectInput>
  * ```
+ *
+ * #### Sub-components
+ * - {@link SelectInputWrapperUI}
+ * - {@link SelectInputUI}
+ * - {@link SelectDefaultPlaceholderUI}
+ * - {@link SelectPlaceholder}
+ * - {@link SelectInputActionsUI}
+ * - {@link SelectListItemUI}
+ * - {@link SelectEachValue}
+ * - {@link SelectItemTrigger}
+ * - {@link SelectPopoverContent}
+ * - {@link DefaultSelectDataView}
+ * - {@link Popover}
+ * - {@link PopoverTrigger}
  */
 export const SelectInput = Component<SelectInputProps>(({ field, queryField, options, children, placeholder, createNewForm, initialSorting, required }) => {
-	const [open, setOpen] = React.useState(false)
+	const [open, setOpen] = useState(false)
 	const id = useFormFieldId()
 	const getEntity = useEntity().getAccessor
 	useEntityBeforePersist(useCallback(() => {

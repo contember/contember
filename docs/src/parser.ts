@@ -88,6 +88,16 @@ export class ComponentParser {
 					}
 				}
 
+				// Extract group information and metadata
+				const groupName = this.getGroupName(jsDocNode)
+				const isInternal = this.isInternalComponent(jsDocNode)
+
+				// Parse sub-components and hooks
+				const { subComponents, hooks } = this.parseSubComponentsAndHooks(jsdoc)
+
+				// A component is a main component if it has sub-components or hooks defined
+				const isMainComponent = subComponents.length > 0 || hooks.length > 0
+
 				results.push({
 					componentName: name,
 					filePath,
@@ -95,6 +105,11 @@ export class ComponentParser {
 					props,
 					links,
 					examples,
+					groupName,
+					isMainComponent,
+					isInternal,
+					subComponents: subComponents.length > 0 ? subComponents : undefined,
+					hooks: hooks.length > 0 ? hooks : undefined,
 				})
 			}
 		} catch (error) {
@@ -126,6 +141,22 @@ export class ComponentParser {
 		return undefined
 	}
 
+	private getGroupName(jsDocNode: JSDoc | undefined): string | undefined {
+		if (!jsDocNode) return undefined
+
+		const groupTag = jsDocNode.getTags()
+			.find(tag => tag.getTagName() === 'group')
+
+		return groupTag?.getCommentText()?.trim()
+	}
+
+	private isInternalComponent(jsDocNode: JSDoc | undefined): boolean {
+		if (!jsDocNode) return false
+
+		return jsDocNode.getTags()
+			.some(tag => tag.getTagName() === 'internal')
+	}
+
 	private getJSDocLinks(jsDocNode: JSDoc | undefined): string[] {
 		if (!jsDocNode) return []
 
@@ -147,6 +178,45 @@ export class ComponentParser {
 			})
 
 		return links
+	}
+
+	private parseSubComponentsAndHooks(jsdoc: string | undefined): { subComponents: string[]; hooks: string[] } {
+		const result = {
+			subComponents: [] as string[],
+			hooks: [] as string[],
+		}
+
+		if (!jsdoc) return result
+
+		// Find Sub-components section
+		const subComponentsSectionRegex = /#+\s*Sub-components\s*([\s\S]*?)(?=#+|$)/
+		const subComponentsMatch = jsdoc.match(subComponentsSectionRegex)
+
+		if (subComponentsMatch && subComponentsMatch[1]) {
+			const subComponentsSection = subComponentsMatch[1]
+			const linkRegex = /{@link\s+([^}]+)}/g
+			let match
+
+			while ((match = linkRegex.exec(subComponentsSection)) !== null) {
+				result.subComponents.push(match[1].trim())
+			}
+		}
+
+		// Find Hooks section
+		const hooksSectionRegex = /#+\s*Hooks\s*([\s\S]*?)(?=#+|$)/
+		const hooksMatch = jsdoc.match(hooksSectionRegex)
+
+		if (hooksMatch && hooksMatch[1]) {
+			const hooksSection = hooksMatch[1]
+			const linkRegex = /{@link\s+([^}]+)}/g
+			let match
+
+			while ((match = linkRegex.exec(hooksSection)) !== null) {
+				result.hooks.push(match[1].trim())
+			}
+		}
+
+		return result
 	}
 
 	private findLinkedPropsType(jsDocNode: JSDoc | undefined): string | undefined {

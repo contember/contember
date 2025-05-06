@@ -2,33 +2,28 @@
 title: UploadedAudioView
 ---
 
-<!-- Edited by human: false -->
-<!-- Examples count: 0 -->
-<!-- Source examples: 0 -->
-<!-- Playground examples: 0 -->
-<!-- External examples: 0 -->
-<!-- Import examples: 0 -->
-
-# UploadedAudioView
-
 ## Overview
-UploadedAudioView renders a single audio file stored in Contember.
-You can preview the track, display metadata, and plug in custom edit or destroy actions.
-
-## Styling Guidelines
-* All examples use Tailwind CSS.
-* The component adds no classes. Wrap it with your own Tailwind containers or Contember theme utilities as needed.
+UploadedAudioView renders a single audio file stored in Contember.  
+You can preview the track, read metadata, and plug in custom edit or destroy actions.
 
 ## Core Concepts
-* Audio metadata lives in Contember entity fields.
-* Map entity fields to props like `urlField="url"`.
-* Use `actions`, `edit`, or `DestroyAction` to extend the default UI.
-* Toggle the built-in destroy button with `noDestroy`.
+* Map Contember entity fields to component props (e.g. `urlField="url"`).
+* The component shows an HTML `<audio>` element with built-in controls.
+* Optional fields enrich the UI with file name, size, and duration.
+* `actions`, `edit`, and `DestroyAction` let you extend or replace parts of the UI.
+* Set `noDestroy` to hide the default destroy button.
+
+## Installation
+```bash
+npm i @contember/react-components
+```
+
+```tsx
+import { UploadedAudioView } from '@contember/react-components'
+```
 
 ## Quick Start
 ```tsx
-import { UploadedAudioView } from '@contember/react-components'
-
 export const SongPreview = () => (
   <div className="p-4 bg-white rounded shadow">
     <UploadedAudioView urlField="url" />
@@ -36,68 +31,81 @@ export const SongPreview = () => (
 )
 ```
 
-## Props Reference
-| Name | Type | Required | Default | Description |
-|------|------|----------|---------|-------------|
-| urlField | `string \| SugarFieldConfig` | Yes | — | Entity field with the public URL of the audio file. |
-| fileNameField | `string \| SugarFieldConfig` | No | — | Entity field holding the original file name. |
-| lastModifiedField | `string \| SugarFieldConfig` | No | — | Entity field with the last modified timestamp. |
-| fileSizeField | `string \| SugarFieldConfig` | No | — | Entity field containing file size (bytes). |
-| fileTypeField | `string \| SugarFieldConfig` | No | — | Entity field with MIME type. |
-| durationField | `string \| SugarFieldConfig` | No | — | Entity field with audio length in seconds. |
-| baseField | `string \| SugarRelationConfig` | No | — | Optional relation path to the base file entity. |
-| actions | `React.ReactNode` | No | — | Extra buttons or links shown next to default actions. |
-| edit | `React.ReactNode` | No | — | Custom edit UI rendered in place of the component when triggered. |
-| noDestroy | `boolean` | No | false | Prevents rendering the default destroy button. |
-| DestroyAction | `React.ComponentType<{ children: React.ReactElement }>` | No | — | Custom component wrapping the destroy button. |
+## Detailed Guide
+1. Provide the public URL field.  
+   ```tsx
+   <UploadedAudioView urlField="url" />
+   ```
+2. Add extra metadata fields if you store them.  
+   ```tsx
+   <UploadedAudioView
+     urlField="url"
+     fileNameField="fileName"
+     durationField="duration"
+   />
+   ```
+3. Inject custom actions.  
+   ```tsx
+   <UploadedAudioView
+     urlField="url"
+     actions={<DownloadButton />}
+   />
+   ```
+4. Hide or replace the destroy action.  
+   ```tsx
+   <UploadedAudioView urlField="url" noDestroy />
+   ```
+
+## Component API Reference
+
+### UploadedAudioView
+Renders an audio player with optional metadata and actions.
+
+#### Props
+<!-- props -->
 
 ## Examples
 
-### 1. Custom Actions
-Add a download button while keeping the default destroy action.
-
+### Custom Download Action
 ```tsx
-<UploadedAudioView
-  urlField="url"
-  actions={
-    <a
-      href={record.url}
-      download
-      className="text-blue-600 hover:underline"
-    >
-      Download
-    </a>
-  }
-/>
-```
-
-The link appears next to the built-in controls. Tailwind styles keep visual consistency.
-
-### 2. Replace Destroy Action
-Wrap the destroy trigger with your own component.
-
-```tsx
-const DangerButton = ({ children }: { children: React.ReactElement }) => (
-  <span className="text-red-600 hover:text-red-800">{children}</span>
+const DownloadButton = ({ url }: { url: string }) => (
+  <a href={url} download className="text-blue-600 hover:underline">
+    Download
+  </a>
 )
 
 <UploadedAudioView
   urlField="url"
-  DestroyAction={DangerButton}
+  actions={<DownloadButton />}
+  fileNameField="fileName"
 />
 ```
 
-You changed only the visuals; Contember still handles deletion logic.
+### Styled Destroy Action
+```tsx
+const DangerWrapper = ({
+  children,
+}: {
+  children: React.ReactElement
+}) => <span className="text-red-600 hover:text-red-800">{children}</span>
+
+<UploadedAudioView
+  urlField="url"
+  DestroyAction={DangerWrapper}
+/>
+```
 
 ## Best Practices & Gotchas
-* Always pass `urlField`; the component throws if missing.
+* Always pass `urlField`; the component throws otherwise.
+* Use `noDestroy` when users lack delete permission.
+* Keep custom actions compact; they share horizontal space.
 * Wrap the player in a fixed-width container to prevent stretching.
-* Use `noDestroy` when the user lacks delete permission.
-* Keep custom actions small; they share horizontal space.
 
 ## Further Reading
-* Contember File Upload pipeline
-* `<UploadField>` – component used to upload audio files
-* Contember access control
+* Contember file upload pipeline
+* `<UploadField>` – uploading audio files
+* Contember access control docs
 
 <!-- End of Generated Documentation -->
+
+> **Note:** Props reference has been automatically enhanced with precise API types from API Extractor.

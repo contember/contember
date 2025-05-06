@@ -1,4 +1,4 @@
-import {CompilerState, Extractor, ExtractorConfig} from '@microsoft/api-extractor'
+import { CompilerState, Extractor, ExtractorConfig } from '@microsoft/api-extractor'
 import * as path from 'path'
 import * as fs from 'fs'
 

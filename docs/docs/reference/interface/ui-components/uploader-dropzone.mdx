@@ -2,62 +2,76 @@
 title: UploaderDropzone
 ---
 
-<!-- Edited by human: false -->
-<!-- Examples count: 3 -->
-<!-- Source examples: 1 -->
-<!-- Playground examples: 0 -->
-<!-- External examples: 2 -->
-<!-- Import examples: 2 -->
-
 ## Overview
-UploaderDropzone renders a drag-and-drop area for file uploads.
-Use it inside an uploader context so it can react to upload state.
+`UploaderDropzone` renders a drag-and-drop area for uploading files.  
+Use it inside an uploader context so it can react to active uploads.
 
-It can show custom placeholder content and auto-hide while files upload.
-
-## Styling Guidelines
-* All examples use Tailwind CSS utility classes.
-* No Contember-specific theme classes are required.
+The component can show custom placeholder content and automatically disable itself while files upload.
 
 ## Core Concepts
-* The dropzone only displays when its uploader context is active.
-* `inactiveOnUpload` disables the zone during active uploads.
-* `dropzonePlaceholder` replaces default placeholder content.
-* You decide size through the parent container’s styles.
+* Renders nothing when its uploader context reports active uploads and `inactiveOnUpload` is `true`.
+* Accepts any JSX as `dropzonePlaceholder`.
+* Requires a surrounding uploader provider that handles file state.
+
+## Installation
+```tsx
+// Contember project import
+import { UploaderDropzone } from '~/lib/upload'
+```
 
 ## Quick Start
 ```tsx
-import { UploaderDropzone } from '~/lib/upload'
-
 export const AvatarUploader = () => (
 	<div className="max-w-sm border border-dashed border-gray-300 p-4">
-		<UploaderDropzone dropzonePlaceholder="Drop your avatar here" />
+		<UploaderDropzone
+			inactiveOnUpload
+			dropzonePlaceholder={<div>Drop files here or click to upload</div>}
+		/>
 	</div>
 )
 ```
 
-## Props Reference
-Name | Type | Required | Default | Description
----- | ---- | -------- | ------- | -----------
-dropzonePlaceholder | React.ReactNode | No | `undefined` | Custom content rendered inside the dropzone.
-inactiveOnUpload | boolean | No | `false` | When **true**, the dropzone hides or disables during an active upload.
-…inherited props | … | … | … | All standard HTML `div` attributes are forwarded to the root element.
+## Detailed Guide
+1. Wrap the dropzone with a component that creates an uploader context (e.g. `MultiUploader`).  
+2. Pass `inactiveOnUpload` to hide the zone while a file is uploading.  
+3. Provide `dropzonePlaceholder` to match your design.
+
+```tsx
+<MultiUploader baseField="avatar">
+	{/* Hidden while a file uploads */}
+	<UploaderDropzone
+		inactiveOnUpload
+		dropzonePlaceholder={
+			<button className="w-full py-2 text-center text-sm text-gray-600">
+				Select or drop an image
+			</button>
+		}
+	/>
+	<UploaderProgress />
+</MultiUploader>
+```
+
+## Component API Reference
+
+### UploaderDropzone
+Renders the interactive file drop area.
+
+#### Props
+<!-- props -->
 
 ## Examples
 
-### Example&nbsp;1 – Basic usage with custom placeholder
+### Example 1 – Basic usage
 ```tsx
 <UploaderDropzone
 	inactiveOnUpload
 	dropzonePlaceholder={<div>Drop files here or click to upload</div>}
 />
 ```
-The dropzone displays a simple text placeholder. It hides while uploads are active.
 
-### Example&nbsp;2 – Conditional rendering with button placeholder
+### Example 2 – Conditional rendering inside an entity form
 ```tsx
 entity => {
-	entity = baseField ? entity.getEntity({ field: baseField }) : entity
 	if (entity.getField('file.url').value === null) {
 		return (
 			<UploaderDropzone
@@ -70,53 +84,35 @@ entity => {
 			/>
 		)
 	}
-	return <div className="w-full">{/* Alternative UI once file URL exists */}</div>
+	return <div className="w-full">{/* alternative UI */}</div>
 }
 ```
-You render the dropzone only when no file URL exists. A styled button invites users to add files.
 
-### Example&nbsp;3 – Dropzone inside a complex form
+### Example 3 – Dropzone in a complex form
 ```tsx
 <FormFieldStateProvider>
-	<FormContainer description={description} label={label}>
+	<FormContainer label="Gallery">
 		<Repeater initialEntityCount={0}>
-			<UploaderRepeaterItemsWrapperUI>
-				<MultiUploader baseField={baseField} fileType={fileTypeWithUploader}>
-					<UploaderHasFile>
-						<UploaderProgress />
-					</UploaderHasFile>
-					<UploaderDropzone dropzonePlaceholder={dropzonePlaceholder} />
-				</MultiUploader>
-				{/* …sortable repeater items… */}
-			</UploaderRepeaterItemsWrapperUI>
+			<MultiUploader baseField="images">
+				<UploaderDropzone dropzonePlaceholder="Drop images here" />
+				<UploaderProgress />
+			</MultiUploader>
 		</Repeater>
 	</FormContainer>
 </FormFieldStateProvider>
 ```
-The dropzone appears only when `MultiUploader` reports no files. The parent container provides borders and spacing.
-
-### Example&nbsp;4 – Slim integration inside `MultiUploader`
-```tsx
-<MultiUploader baseField={baseField} fileType={fileTypeWithUploader}>
-	<UploaderHasFile>
-		<UploaderProgress />
-	</UploaderHasFile>
-
-	{/* Visible element until a file exists */}
-	<UploaderDropzone dropzonePlaceholder={dropzonePlaceholder} />
-</MultiUploader>
-```
-Use this pattern when you need only a progress bar and a dropzone.
 
 ## Best Practices & Gotchas
-* Place the dropzone inside `MultiUploader` for automatic state handling.
-* Size the parent container; the dropzone stretches to 100 % width and height.
-* Use `inactiveOnUpload` to prevent double uploads.
-* Replace placeholder text with visuals that match your design system.
+* Always place the dropzone inside the uploader context so it can receive upload state.
+* Size the parent container; the dropzone fills 100 % width and height.
+* Disable the zone with `inactiveOnUpload` to prevent duplicate uploads.
+* Replace the placeholder with visuals or buttons that match your brand.
 
 ## Further Reading
-* `MultiUploader` – Orchestrates uploads and exposes state.
-* `UploaderHasFile` – Shows or hides children based on file presence.
-* `UploaderProgress` – Displays real-time upload progress.
+* MultiUploader – Provides an uploader context and state.
+* UploaderProgress – Shows current upload progress.
+* UploaderHasFile – Conditionally renders content based on file presence.
 
 <!-- End of Generated Documentation -->
+
+> **Note:** Props reference has been automatically enhanced with precise API types from API Extractor.

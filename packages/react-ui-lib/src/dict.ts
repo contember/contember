@@ -10,7 +10,7 @@ import {
 	PasswordResetRequestFormErrorCode,
 	PasswordlessSignInFormErrorCode,
 	PasswordlessSignInInitFormErrorCode,
-	UpdateProjectMemberFormErrorCode
+	UpdateProjectMemberFormErrorCode,
 } from '@contember/react-client-tenant'
 import { TextFilterArtifactsMatchMode } from '@contember/react-dataview'
 import { UploaderErrorType } from '@contember/react-uploader'

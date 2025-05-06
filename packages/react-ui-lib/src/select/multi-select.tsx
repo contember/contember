@@ -8,7 +8,6 @@ import { DataViewSortingDirections, DataViewUnionFilterFields } from '@contember
 import { useFormFieldId } from '@contember/react-form'
 import { MultiSelect, SelectEachValue, SelectItemTrigger, SelectPlaceholder } from '@contember/react-select'
 import { ChevronDownIcon } from 'lucide-react'
-import * as React from 'react'
 import { ReactNode } from 'react'
 import { Popover, PopoverTrigger } from '../ui/popover'
 import { CreateEntityDialog } from './create-new'
@@ -63,6 +62,22 @@ export type MultiSelectInputProps =
  *   <Field field="name" />
  * </MultiSelectInput>
  * ```
+ *
+ * #### Sub-components
+ * - {@link SelectInputWrapperUI}
+ * - {@link SelectInputUI}
+ * - {@link SelectDefaultPlaceholderUI}
+ * - {@link MultiSelectItemWrapperUI}
+ * - {@link SelectEachValue}
+ * - {@link MultiSelectItemUI}
+ * - {@link MultiSelectItemContentUI}
+ * - {@link SelectItemTrigger}
+ * - {@link MultiSelectItemRemoveButtonUI}
+ * - {@link SelectInputActionsUI}
+ * - {@link SelectPopoverContent}
+ * - {@link Popover}
+ * - {@link PopoverTrigger}
+ *
  */
 export const MultiSelectInput = Component<MultiSelectInputProps>(({ field, queryField, options, children, placeholder, createNewForm, initialSorting }) => {
 	const id = useFormFieldId()

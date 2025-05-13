@@ -26,6 +26,10 @@ export interface TypedEntitySelection<TSchema extends SchemaTypeLike, TEntityNam
 		[key in TAlias extends null ? TKey : TAlias]: TypedEntitySelectionResult<TEntity, TKey, TNestedValue>
 	}>
 
+	omit<TField extends keyof TValue>(
+		...fields: TField[]
+	): TypedEntitySelection<TSchema, TEntityName, TEntity, Omit<TValue, TField>>
+
 
 	meta<
 		TField extends (keyof TEntity['columns'] | keyof TEntity['hasMany'] | keyof TEntity['hasOne'])

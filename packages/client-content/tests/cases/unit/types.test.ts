@@ -142,4 +142,10 @@ describe('ts types', () => {
 			)
 		}).toThrow('Field Post.lorem does not exist.')
 	})
+
+	test('omit', async () => {
+		const fragment = qb.fragment('Post', it => it.$$().omit('publishedAt'))
+		type fragmentType = FragmentType<typeof fragment>
+		expectTypeOf<fragmentType>().toEqualTypeOf<{ id: string }>()
+	})
 })

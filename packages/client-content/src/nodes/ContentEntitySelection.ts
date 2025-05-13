@@ -99,6 +99,19 @@ export class ContentEntitySelection {
 		return new ContentEntitySelection(this.context, nodes)
 	}
 
+	omit(...fields: string[]): ContentEntitySelection {
+		return new ContentEntitySelection(
+			this.context,
+			this.selectionSet.filter(it => {
+				if (!(it instanceof GraphQlField)) {
+					return true
+				}
+				const alias = it.alias ?? it.name
+				return !fields.includes(alias)
+			}),
+		)
+	}
+
 	meta(field: string, flags: ('readable' | 'updatable')[]): ContentEntitySelection {
 		const metaField = this.selectionSet.find((it): it is GraphQlField => it instanceof GraphQlField && it.name === '_meta')
 		const selectionWithoutMeta = metaField ? this.selectionSet.filter(it => it !== metaField) : this.selectionSet

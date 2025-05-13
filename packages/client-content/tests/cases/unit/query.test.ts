@@ -452,4 +452,29 @@ describe('queries', () => {
 		expect(calls).toHaveLength(1)
 	})
 
+	test('omit', async () => {
+		const [client, calls] = createClient({
+			authors: [
+				{
+					id: '1',
+					name: 'John',
+				},
+			],
+		})
+		const result = await client.query({
+			authors: qb.list('Author', {}, it => it.$$().omit('email').$('posts', {}, it => it.$$()).omit('posts')),
+		})
+		expect(result).toStrictEqual({
+			authors: [
+				{
+					id: '1',
+					name: 'John',
+				},
+			],
+		})
+		expect(calls).toHaveLength(1)
+		expect(calls[0].query).toMatchSnapshot()
+		expect(calls[0].variables).toStrictEqual({})
+	})
+
 })

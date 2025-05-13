@@ -260,6 +260,8 @@ export class ContentEntitySelection {
     readonly context: ContentEntitySelectionContext<string>;
     // (undocumented)
     meta(field: string, flags: ('readable' | 'updatable')[]): ContentEntitySelection;
+    // (undocumented)
+    omit(...fields: string[]): ContentEntitySelection;
     // @internal (undocumented)
     readonly selectionSet: GraphQlSelectionSet;
     // (undocumented)
@@ -523,6 +525,8 @@ export interface TypedEntitySelection<TSchema extends SchemaTypeLike, TEntityNam
     readonly context: ContentEntitySelectionContext<TEntityName>;
     // (undocumented)
     meta<TField extends (keyof TEntity['columns'] | keyof TEntity['hasMany'] | keyof TEntity['hasOne'])>(field: TField, flags: ('readable' | 'updatable')[]): TypedEntitySelection<TSchema, TEntityName, TEntity, TValue>;
+    // (undocumented)
+    omit<TField extends keyof TValue>(...fields: TField[]): TypedEntitySelection<TSchema, TEntityName, TEntity, Omit<TValue, TField>>;
     // (undocumented)
     transform<T>(cb: (value: TValue) => T): TypedEntitySelection<TSchema, TEntityName, TEntity, T>;
 }

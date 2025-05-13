@@ -223,3 +223,13 @@ exports[`queries nested has-many-by transform 1`] = `
   },
 ]
 `;
+
+exports[`queries omit 1`] = `
+"query {
+	authors: listAuthor {
+		id
+		name
+	}
+}
+"
+`;

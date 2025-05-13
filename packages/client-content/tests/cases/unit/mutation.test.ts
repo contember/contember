@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 import { createClient } from '../../lib'
 import { queryBuilder } from '../../client'
+import { expectTypeOf } from 'expect-type'
 
 const qb = queryBuilder
 describe('mutations in trx', () => {
@@ -518,4 +519,52 @@ describe('mutations without trx', () => {
 		expect(calls[0].variables).toMatchSnapshot()
 	})
 
+	test('mutate or fail - fail', async () => {
+		const [client, calls] = createClient({
+			mut: {
+				ok: false,
+				errorMessage: 'some error',
+				mut: {
+					ok: false,
+				},
+			},
+		})
+		const createAuthor = qb.transaction(qb.create('Author', {
+			data: {
+				name: 'John',
+				email: 'xx@localhost',
+			},
+		}))
+		expect(() => client.mutateOrThrow(createAuthor)).toThrow('some error')
+		expect(calls).toHaveLength(1)
+		expect(calls[0].query).toMatchSnapshot()
+		expect(calls[0].variables).toMatchSnapshot()
+	})
+
+
+	test('mutate or fail - ok', async () => {
+		const [client, calls] = createClient({
+			mut: {
+				ok: true,
+				errorMessage: null,
+				mut: {
+					ok: true,
+				},
+			},
+		})
+		const createAuthor = qb.transaction(qb.create('Author', {
+			data: {
+				name: 'John',
+				email: 'xx@localhost',
+			},
+		}))
+		const result = await client.mutateOrThrow(createAuthor)
+		expect(result.ok).toBe(true)
+		const ok = result.ok
+		expectTypeOf(ok).toEqualTypeOf<true>()
+
+		expect(calls).toHaveLength(1)
+		expect(calls[0].query).toMatchSnapshot()
+		expect(calls[0].variables).toMatchSnapshot()
+	})
 })

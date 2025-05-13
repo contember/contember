@@ -4,6 +4,8 @@ import { GraphQlQueryPrinter } from '@contember/graphql-builder'
 import { ContentMutation, ContentQuery } from './nodes'
 import { createMutationOperationSet } from './utils/createMutationOperationSet'
 import { createQueryOperationSet } from './utils/createQueryOperationSet'
+import { MutationError, ValidationResult } from './types'
+import { MutationFailedError } from './MutationFailedError'
 
 
 export type QueryExecutorOptions =
@@ -37,5 +39,23 @@ export class ContentClient {
 		const result = await this.client.execute(query, { variables, ...options })
 
 		return operationSet.parse(result)
+	}
+
+
+	public async mutateOrThrow<Value extends {
+		readonly ok: boolean
+		readonly errorMessage: string | null
+		readonly errors: MutationError[]
+		readonly validation: ValidationResult
+	}>(mutation: ContentMutation<Value>, options?: QueryExecutorOptions): Promise<Value & { readonly ok: true; readonly errorMessage: null }> {
+		const result = await this.mutate(mutation, options)
+		if (!result.ok) {
+			throw new MutationFailedError(
+				result.errorMessage ?? 'Unknown error',
+				mutation as ContentMutation<Value & { readonly ok: false; readonly errorMessage: string }>,
+				result as Value & { readonly ok: false; readonly errorMessage: string },
+			)
+		}
+		return result as Value & { readonly ok: true; readonly errorMessage: null }
 	}
 }

@@ -1196,3 +1196,201 @@ exports[`mutations in trx create trx 2`] = `
   "MutationTransactionOptions_0": {},
 }
 `;
+
+exports[`mutations without trx mutate or fail 1`] = `
+"mutation($MutationTransactionOptions_0: MutationTransactionOptions, $AuthorCreateInput_1: AuthorCreateInput!) {
+	mut: transaction(options: $MutationTransactionOptions_0) {
+		ok
+		errorMessage
+		errors {
+			... MutationError
+		}
+		validation {
+			... ValidationResult
+		}
+		mut: createAuthor(data: $AuthorCreateInput_1) {
+			ok
+			errorMessage
+			errors {
+				... MutationError
+			}
+			validation {
+				... ValidationResult
+			}
+		}
+	}
+}
+fragment MutationError on _MutationError {
+	paths {
+		... on _FieldPathFragment {
+			field
+		}
+		... on _IndexPathFragment {
+			index
+			alias
+		}
+	}
+	message
+	type
+}
+fragment ValidationResult on _ValidationResult {
+	valid
+	errors {
+		path {
+			... on _FieldPathFragment {
+				field
+			}
+			... on _IndexPathFragment {
+				index
+				alias
+			}
+		}
+		message {
+			text
+		}
+	}
+}
+"
+`;
+
+exports[`mutations without trx mutate or fail 2`] = `
+{
+  "AuthorCreateInput_1": {
+    "email": "xx@localhost",
+    "name": "John",
+  },
+  "MutationTransactionOptions_0": {},
+}
+`;
+
+exports[`mutations without trx mutate or fail - fail 1`] = `
+"mutation($MutationTransactionOptions_0: MutationTransactionOptions, $AuthorCreateInput_1: AuthorCreateInput!) {
+	mut: transaction(options: $MutationTransactionOptions_0) {
+		ok
+		errorMessage
+		errors {
+			... MutationError
+		}
+		validation {
+			... ValidationResult
+		}
+		mut: createAuthor(data: $AuthorCreateInput_1) {
+			ok
+			errorMessage
+			errors {
+				... MutationError
+			}
+			validation {
+				... ValidationResult
+			}
+		}
+	}
+}
+fragment MutationError on _MutationError {
+	paths {
+		... on _FieldPathFragment {
+			field
+		}
+		... on _IndexPathFragment {
+			index
+			alias
+		}
+	}
+	message
+	type
+}
+fragment ValidationResult on _ValidationResult {
+	valid
+	errors {
+		path {
+			... on _FieldPathFragment {
+				field
+			}
+			... on _IndexPathFragment {
+				index
+				alias
+			}
+		}
+		message {
+			text
+		}
+	}
+}
+"
+`;
+
+exports[`mutations without trx mutate or fail - fail 2`] = `
+{
+  "AuthorCreateInput_1": {
+    "email": "xx@localhost",
+    "name": "John",
+  },
+  "MutationTransactionOptions_0": {},
+}
+`;
+
+exports[`mutations without trx mutate or fail - ok 1`] = `
+"mutation($MutationTransactionOptions_0: MutationTransactionOptions, $AuthorCreateInput_1: AuthorCreateInput!) {
+	mut: transaction(options: $MutationTransactionOptions_0) {
+		ok
+		errorMessage
+		errors {
+			... MutationError
+		}
+		validation {
+			... ValidationResult
+		}
+		mut: createAuthor(data: $AuthorCreateInput_1) {
+			ok
+			errorMessage
+			errors {
+				... MutationError
+			}
+			validation {
+				... ValidationResult
+			}
+		}
+	}
+}
+fragment MutationError on _MutationError {
+	paths {
+		... on _FieldPathFragment {
+			field
+		}
+		... on _IndexPathFragment {
+			index
+			alias
+		}
+	}
+	message
+	type
+}
+fragment ValidationResult on _ValidationResult {
+	valid
+	errors {
+		path {
+			... on _FieldPathFragment {
+				field
+			}
+			... on _IndexPathFragment {
+				index
+				alias
+			}
+		}
+		message {
+			text
+		}
+	}
+}
+"
+`;
+
+exports[`mutations without trx mutate or fail - ok 2`] = `
+{
+  "AuthorCreateInput_1": {
+    "email": "xx@localhost",
+    "name": "John",
+  },
+  "MutationTransactionOptions_0": {},
+}
+`;

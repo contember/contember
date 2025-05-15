@@ -25,6 +25,16 @@ export class ContentClient {
         [K in keyof Values]: ContentMutation<Values[K]> | ContentQuery<Values[K]>;
     }, options?: QueryExecutorOptions): Promise<Values>;
     // (undocumented)
+    mutateOrThrow<Value extends {
+        readonly ok: boolean;
+        readonly errorMessage: string | null;
+        readonly errors: MutationError[];
+        readonly validation: ValidationResult;
+    }>(mutation: ContentMutation<Value>, options?: QueryExecutorOptions): Promise<Value & {
+        readonly ok: true;
+        readonly errorMessage: null;
+    }>;
+    // (undocumented)
     query<Value>(query: ContentQuery<Value>, options?: QueryExecutorOptions): Promise<Value>;
     // (undocumented)
     query<Values extends Record<string, any>>(queries: {
@@ -405,16 +415,28 @@ export type MutationError = {
 };
 
 // @public (undocumented)
+export type MutationFailResult = {
+    readonly ok: boolean;
+    readonly errorMessage: string;
+    readonly errors: MutationError[];
+    readonly node: null;
+    readonly validation: ValidationResult;
+};
+
+// @public (undocumented)
 export const mutationFragments: Record<string, GraphQlFragment>;
 
 // @public (undocumented)
-export type MutationResult<Value = unknown> = {
-    readonly ok: boolean;
-    readonly errorMessage: string | null;
-    readonly errors: MutationError[];
+export type MutationOkResult<Value = unknown> = {
+    readonly ok: true;
+    readonly errorMessage: null;
+    readonly errors: [];
     readonly node: Value | null;
-    readonly validation?: ValidationResult;
+    readonly validation: ValidationOkResult;
 };
+
+// @public (undocumented)
+export type MutationResult<Value = unknown> = MutationOkResult<Value> | MutationFailResult;
 
 // @public (undocumented)
 export type MutationTransactionOptions = {
@@ -460,13 +482,25 @@ export type SchemaTypeLike = {
 };
 
 // @public (undocumented)
-export type TransactionResult<V> = {
-    readonly ok: boolean;
-    readonly errorMessage: string | null;
+export type TransactionFailResult<V> = {
+    readonly ok: false;
+    readonly errorMessage: string;
     readonly errors: MutationError[];
     readonly validation: ValidationResult;
     readonly data: V;
 };
+
+// @public (undocumented)
+export type TransactionOkResult<V> = {
+    readonly ok: true;
+    readonly errorMessage: null;
+    readonly errors: [];
+    readonly validation: ValidationOkResult;
+    readonly data: V;
+};
+
+// @public (undocumented)
+export type TransactionResult<V> = TransactionOkResult<V> | TransactionFailResult<V>;
 
 // @public (undocumented)
 export type TypedColumnArgs<TAlias extends string | null = null> = {
@@ -595,10 +629,19 @@ export type ValidationError = {
 };
 
 // @public (undocumented)
-export type ValidationResult = {
-    readonly valid: boolean;
+export type ValidationFailResult = {
+    readonly valid: false;
     readonly errors: ValidationError[];
 };
+
+// @public (undocumented)
+export type ValidationOkResult = {
+    readonly valid: true;
+    readonly errors: [];
+};
+
+// @public (undocumented)
+export type ValidationResult = ValidationOkResult | ValidationFailResult;
 
 // (No @packageDocumentation comment for this package)
 

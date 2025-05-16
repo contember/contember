@@ -28,7 +28,7 @@ export type BlockRepeaterProps =
  * ## Props {@link BlockRepeaterProps}
  * - field or entities, sortableBy, discriminationField, children
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <BlockRepeater field="blocks" discriminationField="type" sortableBy="order">
  *     <Block name="text" label="Text">

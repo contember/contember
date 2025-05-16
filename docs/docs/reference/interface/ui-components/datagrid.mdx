@@ -5,9 +5,9 @@ title: Datagrid
 
 This covers the **UI Data Grid**—a higher-level library built on top of the headless Data View system. It provides **pre-built**, **Tailwind + Shadcn**-based components (columns, filters, layouts, pagination, etc.) so you can **quickly spin up** a feature-rich data listing interface without having to build all the UI manually.
 
-> **Note**  
+> **Note**
 > If you want full control over styling, layout, or filter logic, check out our [Headless Data View documentation](#) to build a custom UI. Otherwise, this UI Data Grid is a great out-of-the-box solution.
-  
+
 
 ## **1. Introduction**
 
@@ -27,7 +27,7 @@ Internally, it **re-uses** the logic from `@contember/react-dataview` (filters, 
 - **Choose the UI Data Grid** if you want **fast, conventional** table-based UIs with minimal custom code.
 - **Choose Headless** if you have **unconventional layouts** (like highly custom UIs, advanced card/tile patterns, or a unique design system not easily adapted from the shipped components).
 
-  
+
 
 ## **2. Quick Start**
 
@@ -62,7 +62,7 @@ By default, `<DefaultDataGrid>` includes:
 
 You get **sorting** by clicking the column headers, basic searching, and the rest of the standard features with minimal setup.
 
-  
+
 
 ## **3. Core Components**
 
@@ -83,7 +83,7 @@ Depending on how much customization you need, you can either keep `<DefaultDataG
 - Lower-level version. You manually place the `<DataGridToolbar>`, `<DataGridLoader>`, `<DataGridTable>`, `<DataGridPagination>`, etc. in whichever arrangement you desire.
 - Great for **partial** or **more custom** UIs.
 
-  
+
 
 ### **3.2 DataGridToolbar**
 
@@ -118,7 +118,7 @@ Example with `<DataGrid>`:
 </DataGrid>
 ```
 
-  
+
 
 ### **3.3 DataGridLoader**
 
@@ -126,14 +126,14 @@ Example with `<DataGrid>`:
 - Typically wraps `<DataGridTable>` or `<DataGridTiles>`.
 - If you prefer custom loading messages or no-results messages, you can override `<DataGridNoResults>` or integrate your own.
 
-  
+
 
 ### **3.4 DataGridPagination**
 
 - `<DataGridPagination>` is a ready-made component for page navigation. It includes previous/next buttons, optional page number links, and so forth.
 - `<DataGridPerPageSelector>` can also appear to let users pick a page size (like 10, 20, 50).
 
-  
+
 
 ### **3.5 DataGridTable vs. DataGridTiles**
 
@@ -141,7 +141,7 @@ Example with `<DataGrid>`:
 - `<DataGridTiles>`: A simple “tiling” layout, more like cards or grid items, for an alternative to the classic table.
 - You can also define custom `<DataViewLayout>` blocks inside `<DataGridLoader>` if you want multiple layout styles that the user can toggle.
 
-  
+
 
 ## **4. Columns and Filters**
 
@@ -200,7 +200,7 @@ These are for **related entities**. For example:
 </DataGridHasOneColumn>
 ```
 
-Inside, you can place standard binding components.  
+Inside, you can place standard binding components.
 They also provide tooltips for including/excluding specific related entity IDs in the filter.
 
 #### **4.1.7 `<DataGridIsDefinedColumn>`**
@@ -228,7 +228,7 @@ Props:
 - `filter?: ReactNode` if you want to attach a filter
 - `cellClassName?`, `headerClassName?` for styling
 
-  
+
 
 ### **4.2 Built-in Filter Components**
 
@@ -246,7 +246,7 @@ When you specify a `field` on these columns, the grid automatically wires in the
 
 By default, columns **already** provide a filter if applicable. If you prefer **not** to have a filter in the header or you want a more advanced filter in the toolbar, you can supply `filter={null}` or define your own.
 
-  
+
 
 ### **4.3 Custom or Manual Columns**
 
@@ -270,7 +270,7 @@ Example:
 </DataGridTable>
 ```
 
-  
+
 
 ## **5. Other Customization Points**
 
@@ -287,7 +287,7 @@ As mentioned, `<DataGridActionColumn>` is a specialized variant of `<DataGridCol
 
 No sorting or filtering is typically tied to an action column, but you can do so if needed.
 
-  
+
 
 ### **5.2 Layout Switching**
 
@@ -301,7 +301,7 @@ For instance:
 ```tsx
 <DataGrid entities="GridArticle">
   <DataGridToolbar>
-    <DataGridLayoutSwitcher /> 
+    <DataGridLayoutSwitcher />
   </DataGridToolbar>
 
   <DataGridLoader>
@@ -314,7 +314,7 @@ For instance:
 </DataGrid>
 ```
 
-  
+
 
 ### **5.3 Visibility Toggle (Column Hiding)**
 
@@ -325,7 +325,7 @@ Internally, DataGrid uses **DataView’s selection** to store which columns are 
 
 If you don’t want this feature, you can remove or override it in the toolbar.
 
-  
+
 
 ### **5.4 Row-Level Expansions**
 
@@ -336,7 +336,7 @@ For advanced layouts, you might want an “expandable row.” The DataGrid doesn
 
 This is more of a **custom** approach, but DataGrid columns are flexible enough to allow it.
 
-  
+
 
 ## **6. Putting It All Together**
 
@@ -389,7 +389,7 @@ A more advanced example might add:
 
 See the example in your snippet where you created a **`CustomGridColumn`** with many columns including relationships, tooltips, and an action dropdown. That example demonstrates how you can mix and match these provided components in a single `<DataGrid>`.
 
-  
+
 
 ## **7. Detailed Reference**
 
@@ -431,7 +431,7 @@ See the example in your snippet where you created a **`CustomGridColumn`** with 
 
 - A small dropdown or buttons to change items-per-page.
 
-  
+
 
 ### **7.2 Column Components**
 
@@ -487,7 +487,7 @@ See the example in your snippet where you created a **`CustomGridColumn`** with 
 
 - Low-level. You can specify `header`, `sortingField`, `filter`, etc., and render **any** cell content you want.
 
-  
+
 
 ### **7.3 Additional Filter Components**
 
@@ -501,7 +501,7 @@ See the example in your snippet where you created a **`CustomGridColumn`** with 
 - **`<DataGridNumberFilter>`**: For numeric ranges.
 - **`<DataGridUnionTextFilter>`**: For searching multiple fields with one input.
 
-  
+
 
 ### **7.4 Other Utility Components**
 
@@ -517,7 +517,7 @@ See the example in your snippet where you created a **`CustomGridColumn`** with 
 - **`DataGridNoResults`**
   - A small component for rendering a “No results found” message.
 
-  
+
 
 ## **8. Conclusion**
 
@@ -525,4 +525,3 @@ The **UI Data Grid** library streamlines the creation of typical data listings�
 
 - **If you need** total flexibility or a highly custom layout, revisit the [Headless Data View docs](../headless-components/dataview.md).
 - **Otherwise**, the UI Data Grid is your fastest path to a fully featured data experience that’s easy to theme or extend.
-

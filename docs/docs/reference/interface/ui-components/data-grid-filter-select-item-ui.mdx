@@ -1,0 +1,89 @@
+---
+title: DataGridFilterSelectItemUI
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 2 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 2 -->
+<!-- Import examples: 2 -->
+
+# DataGridFilterSelectItemUI
+
+## Overview
+DataGridFilterSelectItemUI renders one selectable item within a DataGrid filter dropdown.
+You can mark the item as included or excluded and react to user clicks with callbacks.
+
+## Styling Guidelines
+All examples use Tailwind CSS.
+No additional Contember theme classes are required.
+
+## Core Concepts
+* Each item represents one entity record inside a filter.
+* You can include or exclude the entity independently.
+* Callbacks update the surrounding filter state.
+* The component is visually independent; styling happens via Tailwind.
+
+## Quick Start
+```tsx
+import { DataGridFilterSelectItemUI } from '@app/lib/datagrid/ui'
+
+const UserFilterItem = ({ id, name, includedIds, excludedIds, toggleInclude, toggleExclude }) => (
+	<DataGridFilterSelectItemUI
+		className="flex items-center gap-2 px-3 py-1 hover:bg-gray-100"
+		onInclude={() => toggleInclude(id)}
+		onExclude={() => toggleExclude(id)}
+		isIncluded={includedIds.includes(id)}
+		isExcluded={excludedIds.includes(id)}
+	>
+		<span>{name}</span>
+	</DataGridFilterSelectItemUI>
+)
+```
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| children | ReactNode | Yes | – | Content shown inside the item. |
+| onInclude | () => void | No | – | Called when the user marks the item as included. |
+| onExclude | () => void | No | – | Called when the user marks the item as excluded. |
+| isIncluded | boolean | No | `false` | Visual state: item is currently included. |
+| isExcluded | boolean | No | `false` | Visual state: item is currently excluded. |
+| *Inherited props* | – | – | – | All standard props accepted by the underlying HTML element. |
+
+## Sub-Components / Building Blocks
+### DataGridFilterSelectTriggerUI
+Works with DataGridFilterSelectItemUI to open and close the dropdown.
+You usually pair TriggerUI and ItemUI inside DataGridSingleFilterUI.
+
+## Examples
+
+### Include / Exclude toggling inside a list
+```tsx
+const EntityItem = ({ entity, toggleInclude, toggleExclude, included, excluded }) => (
+	<DataGridFilterSelectItemUI
+		className="flex items-center justify-between w-full px-4 py-2 hover:bg-slate-50"
+		onInclude={() => toggleInclude(entity.id)}
+		onExclude={() => toggleExclude(entity.id)}
+		isIncluded={included.includes(entity.id.toString())}
+		isExcluded={excluded.includes(entity.id.toString())}
+	>
+		<span className="truncate">{entity.label}</span>
+	</DataGridFilterSelectItemUI>
+)
+```
+The component receives callbacks and state arrays from a parent.
+It updates the filter state without internal storage.
+
+## Best Practices & Gotchas
+* Keep callbacks stable with `useCallback` to avoid re-renders.
+* Only one of `isIncluded` or `isExcluded` should be true at the same time.
+* Pass explicit `className` values; the component does not provide spacing.
+
+## Further Reading
+* DataGridSingleFilterUI
+* DataGridFilterSelectTriggerUI
+* Contember DataGrid filtering patterns
+
+<!-- End of Generated Documentation -->

@@ -7,6 +7,7 @@
 import { DataViewSortingDirections } from '@contember/react-dataview';
 import { DataViewUnionFilterFields } from '@contember/react-dataview';
 import { JSX as JSX_2 } from 'react/jsx-runtime';
+import { MemoExoticComponent } from 'react';
 import { NamedExoticComponent } from 'react';
 import { PopoverContentProps } from '@radix-ui/react-popover';
 import * as React_2 from 'react';
@@ -16,20 +17,17 @@ import { SugaredRelativeEntityList } from '@contember/interface';
 import { SugaredRelativeSingleEntity } from '@contember/interface';
 import { SugaredRelativeSingleField } from '@contember/interface';
 
-// @public (undocumented)
-export const DefaultSelectDataView: React_2.NamedExoticComponent<DefaultSelectDataViewProps>;
+// @public
+export const DefaultSelectDataView: NamedExoticComponent<DefaultSelectDataViewProps>;
 
-// @public (undocumented)
+// @public
 export interface DefaultSelectDataViewProps {
-    // (undocumented)
     children: ReactNode;
-    // (undocumented)
     initialSorting?: DataViewSortingDirections;
-    // (undocumented)
     queryField?: DataViewUnionFilterFields;
 }
 
-// @public (undocumented)
+// @public
 export const MultiSelectInput: React_2.NamedExoticComponent<{
     field: SugaredRelativeEntityList["field"];
     options?: SugaredQualifiedEntityList["entities"];
@@ -96,13 +94,13 @@ export const MultiSelectSortableItemContentUI: React_2.ForwardRefExoticComponent
 // @public (undocumented)
 export const SelectCreateNewTrigger: React_2.ForwardRefExoticComponent<React_2.RefAttributes<HTMLButtonElement>>;
 
-// @public (undocumented)
-export const SelectDefaultFilter: React_2.MemoExoticComponent<() => JSX_2.Element>;
+// @public
+export const SelectDefaultFilter: MemoExoticComponent<() => JSX_2.Element>;
 
 // @public (undocumented)
 export const SelectDefaultPlaceholderUI: () => JSX_2.Element;
 
-// @public (undocumented)
+// @public
 export const SelectInput: React_2.NamedExoticComponent<{
     field: SugaredRelativeSingleEntity["field"];
     children: ReactNode;
@@ -148,9 +146,9 @@ export const SelectInputWrapperUI: React_2.ForwardRefExoticComponent<Omit<React_
 }, "ref"> & React_2.RefAttributes<HTMLDivElement>>;
 
 // @public (undocumented)
-export const SelectListInner: React_2.NamedExoticComponent<{
-    children: ReactNode;
-    filterToolbar?: ReactNode;
+export const SelectListInner: NamedExoticComponent<    {
+children: ReactNode;
+filterToolbar?: ReactNode;
 }>;
 
 // @public (undocumented)

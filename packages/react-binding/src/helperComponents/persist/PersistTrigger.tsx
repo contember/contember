@@ -31,7 +31,7 @@ export interface PersistTriggerProps {
  * ## Props {@link PersistTriggerProps}
  * - children, ?onPersistError, ?onPersistSuccess
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <PersistTrigger>
  *     <button>Save</button>

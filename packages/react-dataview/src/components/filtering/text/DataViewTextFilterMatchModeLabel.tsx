@@ -26,7 +26,7 @@ export interface DataViewTextFilterMatchModeLabelProps {
  *
  * See {@link DataViewTextFilterMatchModeLabelProps} for details.
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <DataViewTextFilterMatchModeLabel render={mode => <span>{mode}</span>} />
  * ```

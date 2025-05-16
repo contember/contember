@@ -4,7 +4,7 @@ import { useDataViewEntityListAccessor } from '../contexts'
 /**
  * Renders children when the DataView is empty.
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <DataViewEmpty>
  *     <p>No items found</p>

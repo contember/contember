@@ -38,7 +38,7 @@ export interface DataViewDateFilterResetTriggerProps {
  *
  * See {@link DataViewDateFilterResetTriggerProps} for details.
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <DataViewDateFilterResetTrigger type="start">
  *     <button>Reset Start Date</button>

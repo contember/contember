@@ -1,4 +1,4 @@
-import {CompilerState, Extractor, ExtractorConfig} from '@microsoft/api-extractor'
+import { CompilerState, Extractor, ExtractorConfig } from '@microsoft/api-extractor'
 import * as path from 'path'
 import * as fs from 'fs'
 
@@ -36,6 +36,10 @@ const configs = [
 			apiReport: {
 				...config.apiReport,
 				reportFileName: `ui-lib-${pckg}`,
+			},
+			docModel: {
+				...config.docModel,
+				apiJsonFilePath: path.resolve(`build/api/ui-lib-${pckg}.api.json`),
 			},
 			dtsRollup: {
 				...config.dtsRollup,

@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { ComponentType, ReactElement, ReactNode } from 'react'
 import { Component, Field, FieldView, StaticRender, SugaredRelativeSingleEntity, SugaredRelativeSingleField } from '@contember/interface'
 import {

@@ -1,0 +1,81 @@
+---
+title: DataGridNoResults
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 6 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 6 -->
+<!-- Import examples: 5 -->
+
+# DataGridNoResults
+
+## Styling Guidelines
+* All examples use Tailwind CSS utility classes.
+* DataGridNoResults itself adds no styles.
+* Ensure your global Contember theme loads the default Tailwind reset.
+
+## Core Concepts
+* DataGridNoResults renders when a DataGrid query returns zero entities.
+* You typically nest it inside a DataViewEmpty wrapper.
+* It displays a user-friendly “no data” message without extra configuration.
+
+## Quick Start
+```tsx
+import { DataGrid, DataGridLoader, DataGridNoResults } from '~/lib/datagrid'
+
+export const Demo = () => (
+	<DataGrid entities="Article">
+		<DataGridLoader>
+			{/* Shown only when the query has no results */}
+			<DataViewEmpty>
+				<DataGridNoResults />
+			</DataViewEmpty>
+		</DataGridLoader>
+	</DataGrid>
+)
+```
+
+## Examples
+
+### Marketplace Courses – Empty State
+```tsx
+<DataGridLoader>
+	<DataViewEmpty>
+		<DataGridNoResults />
+	</DataViewEmpty>
+	<CourseProgressTileWrapper>
+		<CourseModuleTile />
+	</CourseProgressTileWrapper>
+</DataGridLoader>
+```
+When no marketplace courses match current filters, users see the fallback message instead of an empty grid.
+
+### Completed Courses Certificate List
+```tsx
+<DataGridLoader>
+	<DataViewEmpty>
+		<DataGridNoResults />
+	</DataViewEmpty>
+	<CourseProgressTileWrapper>
+		<CourseCertificateTile />
+	</CourseProgressTileWrapper>
+</DataGridLoader>
+```
+You keep the UI clean and predictable across different entity sets by reusing the same empty-state component.
+
+## Best Practices & Gotchas
+* Always place DataGridNoResults inside DataViewEmpty to ensure correct rendering logic.
+* Combine with query filters so users understand why no items appear.
+* Keep surrounding layouts consistent; only the fallback message should change.
+* Avoid adding heavy content inside the component; wrap it instead.
+
+## Further Reading
+* DataGrid
+* DataGridLoader
+* DataViewEmpty
+* DataGridQueryFilter
+* DataGridHasManyFilter
+
+<!-- End of Generated Documentation -->

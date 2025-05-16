@@ -36,7 +36,7 @@ export interface DataViewNumberFilterInputProps {
  *
  * See {@link DataViewNumberFilterInputProps} for details.
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <DataViewNumberFilterInput type="from" allowFloat>
  *     <input placeholder="Minimum Value" />

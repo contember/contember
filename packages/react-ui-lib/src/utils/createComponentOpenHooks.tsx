@@ -1,6 +1,39 @@
 import { ComponentType, memo, SetStateAction, useCallback, useState } from 'react'
 import { createRequiredContext } from '@contember/react-utils'
 
+/**
+ * `createComponentOpenHooks` wraps a component that supports open state management
+ * (`open`, `defaultOpen`, `onOpenChange`) and injects context-based control and access hooks.
+ *
+ * It returns:
+ * - A `Component` wrapped with open state context
+ * - A `useOpen` hook to access and control the open state
+ *
+ * This is especially useful for modals, drawers, popovers, and similar toggleable UI components.
+ *
+ * #### Example: Creating a toggleable modal with context access
+ * ```tsx
+ * const BaseModal: React.FC<{ open?: boolean; defaultOpen?: boolean; onOpenChange?: (open: boolean) => void }> = ({ open, onOpenChange }) => (
+ *   <div style={{ display: open ? 'block' : 'none' }}>
+ *     <button onClick={() => onOpenChange?.(false)}>Close</button>
+ *     <p>Modal Content</p>
+ *   </div>
+ * )
+ *
+ * const { Component: ModalWithHooks, useOpen } = createComponentOpenHooks(BaseModal)
+ *
+ * const App = () => {
+ *   const [open, setOpen] = useOpen()
+ *
+ *   return (
+ *     <>
+ *       <button onClick={() => setOpen(true)}>Open Modal</button>
+ *       <ModalWithHooks />
+ *     </>
+ *   )
+ * }
+ * ```
+ */
 export const createComponentOpenHooks = <P extends {
 	open?: boolean
 	defaultOpen?: boolean

@@ -1,0 +1,93 @@
+---
+title: DialogContent
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 14 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 4 -->
+<!-- External examples: 10 -->
+<!-- Import examples: 8 -->
+
+# `DialogContent`
+
+## Overview
+`DialogContent` renders the body of a Contember dialog.
+It wraps any JSX you pass in and positions it according to the dialog overlay.
+
+## Styling Guidelines
+* All examples use Tailwind classes.
+* No additional Contember theme classes are required.
+
+## Core Concepts
+* `DialogContent` always lives inside a `Dialog` component.
+* Pair it with `DialogTrigger`, `DialogHeader`, and `DialogFooter` for full layouts.
+* Pass Tailwind utility classes through the `className` prop for sizing and spacing.
+
+## Quick Start
+```tsx
+import { Dialog, DialogTrigger, DialogContent } from '~/lib/ui/dialog'
+import { Button } from '~/lib/ui/button'
+
+export default () => (
+	<Dialog>
+		<DialogTrigger asChild>
+			<Button className="px-4 py-2">Open dialog</Button>
+		</DialogTrigger>
+
+		<DialogContent className="max-w-md p-6 bg-white rounded shadow">
+			<p className="text-gray-700">Hello from DialogContent!</p>
+		</DialogContent>
+	</Dialog>
+)
+```
+
+
+## Examples
+
+### Search dialog with scrollable content
+```tsx
+<Dialog>
+	<DialogTrigger asChild>
+		<Button className="gap-2">
+			<SearchIcon /> Search
+		</Button>
+	</DialogTrigger>
+
+	<DialogContent className="h-[60vh] overflow-auto">
+		<DialogDataGrid />
+	</DialogContent>
+</Dialog>
+```
+`DialogContent` stretches to 60 vh and enables scrolling with `overflow-auto`.
+You can now load large grids without growing beyond the viewport.
+
+### Image picker with responsive width
+```tsx
+<Dialog open={open} onOpenChange={setOpen}>
+	<DialogTrigger asChild>
+		<Button size="sm" variant="outline">Select image</Button>
+	</DialogTrigger>
+
+	<DialogContent className="max-w-[90vw]">
+		<DataGrid entities="UploadImage">
+			{/* grid columns here */}
+		</DataGrid>
+	</DialogContent>
+</Dialog>
+```
+The `max-w-[90vw]` class keeps the dialog within the viewport while allowing wide content.
+
+## Best Practices & Gotchas
+* Keep `DialogContent` close to related `DialogTrigger` and `Dialog` for readability.
+* Add `overflow-auto` or `overflow-scroll` when content can exceed the viewport height.
+* Always control width with Tailwind classes like `max-w-md` or `max-w-[90vw]`.
+* Wrap actions inside `DialogFooter` to keep layout consistent.
+
+## Further Reading
+* `Dialog` – root container that controls visibility.
+* `DialogTrigger` – element that toggles the dialog.
+* `DialogHeader`, `DialogFooter` – optional layout helpers.
+* Radix UI Dialog primitives (underlying implementation).
+
+<!-- End of Generated Documentation -->

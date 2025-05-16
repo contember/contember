@@ -1,0 +1,87 @@
+---
+title: DialogFooter
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 11 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 1 -->
+<!-- External examples: 10 -->
+<!-- Import examples: 6 -->
+
+## Overview
+`DialogFooter` groups action buttons at the bottom of a dialog.
+It keeps primary and secondary actions visually separated from dialog content and header.
+
+## Styling Guidelines
+* All examples use Tailwind CSS.
+* No Contember-specific theme classes are required; use your project’s standard button styles.
+
+## Core Concepts
+* `DialogFooter` should be the last child inside `DialogContent`.
+* Place buttons or other actionable elements inside it.
+* Combine with `DialogClose` when you need a cancel button.
+* Tailwind’s flex utilities help you align buttons (e.g. `justify-end`).
+
+## Quick Start
+```tsx
+import { Dialog, DialogContent, DialogFooter, DialogTrigger, DialogClose } from '~/lib/ui/dialog'
+
+export const SimpleDialog = () => (
+	<Dialog>
+		<DialogTrigger asChild>
+			<button className="btn-primary">Open dialog</button>
+		</DialogTrigger>
+
+		<DialogContent className="max-w-md">
+			<p className="text-gray-700">
+				Your unsaved changes will be lost. Continue?
+			</p>
+
+			<DialogFooter className="flex justify-end gap-2">
+				<DialogClose asChild>
+					<button className="btn-secondary">Cancel</button>
+				</DialogClose>
+				<button className="btn-primary">Confirm</button>
+			</DialogFooter>
+		</DialogContent>
+	</Dialog>
+)
+```
+
+## Examples
+
+### Sticky footer with backdrop blur
+This pattern keeps actions visible when dialog content scrolls.
+```tsx
+<DialogFooter className="sticky bottom-0 backdrop-blur py-4 px-6 flex justify-end gap-3">
+	<PersistButton />
+</DialogFooter>
+```
+`sticky` and `backdrop-blur` Tailwind classes pin the footer and add translucency.
+
+### Using `DialogClose` to wrap a cancel button
+```tsx
+<DialogFooter className="flex justify-end gap-2">
+	<DialogClose asChild>
+		<Button variant="secondary" size="sm">Cancel</Button>
+	</DialogClose>
+	<Button variant="primary" size="sm">Save</Button>
+</DialogFooter>
+```
+`asChild` lets the cancel button inherit `DialogClose` behavior.
+
+## Best Practices & Gotchas
+* Always place `DialogFooter` inside `DialogContent`.
+* Use `flex row-reverse` when you need primary action on the right for LTR layouts.
+* Combine with `sticky` if the dialog can scroll.
+* Avoid heavy padding inside the footer; let buttons define vertical rhythm.
+* Do not nest `DialogFooter` inside other containers—it should be a direct child.
+
+## Further Reading
+* `DialogContent`
+* `DialogHeader`
+* `DialogClose`
+* `useDialogOpenState` hook
+
+<!-- End of Generated Documentation -->

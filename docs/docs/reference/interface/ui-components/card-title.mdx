@@ -1,0 +1,88 @@
+---
+title: CardTitle
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 15 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 5 -->
+<!-- External examples: 10 -->
+<!-- Import examples: 8 -->
+
+## Styling Guidelines
+* All code examples use Tailwind utility classes.
+* CardTitle requires no special Contember theme classes.
+
+## Core Concepts
+* CardTitle represents the heading text of a Card.
+* Use CardTitle only inside a CardHeader component.
+* Combine CardTitle with Card, CardHeader and CardContent to create consistent panels.
+
+## Quick Start
+```tsx
+import { Card, CardHeader, CardTitle } from '~/lib/ui/card'
+
+export const Demo = () => (
+  <Card className="w-80">
+    <CardHeader>
+      <CardTitle className="text-xl">Welcome</CardTitle>
+    </CardHeader>
+  </Card>
+)
+```
+
+## Examples
+
+### Form Panel Title
+```tsx
+<Card className="w-[40rem] max-w-full">
+  <CardHeader>
+    <CardTitle className="text-2xl">Change Password</CardTitle>
+  </CardHeader>
+  <CardContent>
+    {/* form fields */}
+  </CardContent>
+</Card>
+```
+This pattern adds a large, prominent title to a form-centred Card.
+
+### Infinite Scroll Item Title
+```tsx
+<div className="grid grid-cols-3 gap-4">
+  <Card className="h-72">
+    <CardHeader>
+      <CardTitle>
+        <Field field="title" />
+      </CardTitle>
+    </CardHeader>
+  </Card>
+</div>
+```
+Use CardTitle with dynamic content (`<Field />`) when listing many items.
+
+### Multi-Language Content Editor
+```tsx
+<Card>
+  <CardHeader>
+    <CardTitle>
+      <Variable name="currentLocale" />
+    </CardTitle>
+  </CardHeader>
+  <CardContent>
+    {/* locale-specific inputs */}
+  </CardContent>
+</Card>
+```
+Here CardTitle displays the current locale while editing localized fields.
+
+## Best Practices & Gotchas
+* Keep CardTitle inside CardHeader; placing it elsewhere breaks semantics.
+* Use semantic heading classes (e.g. `text-2xl`) instead of hard-coded font sizes.
+* When the Card acts as a dialog, set appropriate ARIA roles on the surrounding component, not on CardTitle.
+
+## Further Reading
+* Card
+* CardHeader
+* CardContent
+* Design System – Panel patterns
+<!-- End of Generated Documentation -->

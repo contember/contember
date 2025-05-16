@@ -1,0 +1,223 @@
+# SelectInput & Family
+
+## Overview
+`SelectInput` renders a powerful dropdown field that plugs straight into Contember forms.  
+It supports validation, custom options, on-the-fly entity creation, and full keyboard / mouse control.
+
+Use it when you need a tiny input with big features—search, sorting, and the ability to add new entities without leaving the form.
+
+## Core Concepts
+- SelectInput drives the data flow; UI subcomponents only style and compose it.
+- The popover is controlled with Radix UI’s `<Popover>` and the `SelectPopoverContent` wrapper.
+- Composition > configuration: you pass children (`<Field>` or plain text) to build each option.
+- Optional *create new* flow uses `createNewForm` prop and `SelectCreateNewTrigger`.
+- Subcomponents are pure presentational helpers—feel free to swap them.
+- All components respect Contember form scopes (`FormFieldScope`, `useField`, etc.).
+
+## Installation
+```tsx
+import {
+  SelectInput,
+  SelectInputWrapperUI,
+  SelectInputUI,
+  SelectInputActionsUI,
+  SelectListItemUI,
+  SelectDefaultPlaceholderUI,
+  SelectPopoverContent,
+  SelectCreateNewTrigger,
+  DefaultSelectDataView,
+} from '@app/lib/ui/input'
+```
+
+## Quick Start
+```tsx
+<SelectInput
+  field="category"
+  placeholder="Select a category"
+  options={[
+    { field: 'id', operator: 'eq', value: '1', label: 'Option 1' },
+    { field: 'id', operator: 'eq', value: '2', label: 'Option 2' },
+  ]}
+  required
+>
+  <Field field="label" />
+</SelectInput>
+```
+
+## Detailed Guide
+1. Wrap the trigger with `SelectInputWrapperUI` to get proper spacing and label support.
+2. Use `SelectInputUI` inside a Radix `PopoverTrigger` to render the clickable field.
+3. Place `SelectDefaultPlaceholderUI` inside `SelectPlaceholder` for empty state.
+4. Append `SelectInputActionsUI` for icons, loaders, or *clear* buttons.
+5. Render list items inside `SelectPopoverContent` with `SelectListItemUI`.
+
+```tsx
+<Popover>
+  <SelectInputWrapperUI>
+    <PopoverTrigger asChild>
+      <SelectInputUI>
+        <SelectPlaceholder>
+          <SelectDefaultPlaceholderUI />
+        </SelectPlaceholder>
+
+        <SelectInputActionsUI>
+          <ChevronDownIcon className="w-4 h-4 pointer-events-none" />
+        </SelectInputActionsUI>
+      </SelectInputUI>
+    </PopoverTrigger>
+
+    <SelectPopoverContent>
+      {items.map(item => (
+        <SelectListItemUI key={item.id} onClick={() => handleSelect(item.id)}>
+          {item.label}
+        </SelectListItemUI>
+      ))}
+      <SelectCreateNewTrigger>
+        <div className="text-primary">+ Create new</div>
+      </SelectCreateNewTrigger>
+    </SelectPopoverContent>
+  </SelectInputWrapperUI>
+</Popover>
+```
+
+## Component API Reference
+
+### Main Component (SelectInput)
+
+#### Description
+Versatile dropdown input with optional entity creation, validation, and sorting.
+
+#### Props
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| field | SugaredRelativeSingleEntity['field'] | Yes | – |  |
+| children | ReactNode | Yes | – |  |
+| options | SugaredQualifiedEntityList['entities'] | No | – |  |
+| placeholder | ReactNode | No | – |  |
+| createNewForm | ReactNode | No | – |  |
+| queryField | DataViewUnionFilterFields | No | – |  |
+| initialSorting | DataViewSortingDirections | No | – |  |
+| required | boolean | No | – |  |
+
+
+---
+
+### Sub-Components
+
+#### SelectInputWrapperUI
+UI wrapper that adds form label, description, and spacing around the input.
+
+##### Props
+<!-- props:SelectInputWrapperUI -->
+
+---
+
+#### SelectInputUI
+Clickable input element shown inside the form.
+
+##### Props
+<!-- props:SelectInputUI -->
+
+---
+
+#### SelectInputActionsUI
+Right-hand adornments such as chevrons, loaders, or clear buttons.
+
+##### Props
+<!-- props:SelectInputActionsUI -->
+
+---
+
+#### SelectListItemUI
+Renders a single option inside the dropdown list.
+
+##### Props
+<!-- props:SelectListItemUI -->
+
+---
+
+#### SelectDefaultPlaceholderUI
+Default “nothing selected” placeholder text.
+
+##### Props
+<!-- props:SelectDefaultPlaceholderUI -->
+
+---
+
+#### SelectPopoverContent
+Scrollable panel that displays search, loader, and list items.
+
+##### Props
+<!-- props:SelectPopoverContent -->
+
+---
+
+#### SelectCreateNewTrigger
+Small button rendered inside the list that opens the `createNewForm`.
+
+##### Props
+<!-- props:SelectCreateNewTrigger -->
+
+---
+
+#### DefaultSelectDataView
+Convenient wrapper around `SelectDataView` with a default renderer.
+
+##### Props
+<!-- props:DefaultSelectDataView -->
+
+## Examples
+
+### Language Switcher
+```tsx
+<SelectInput onChange={e => setSourceLocale(e.target.value || null)}>
+  <option value="">Select language</option>
+  {locales.map(l => (
+    <option key={l} value={l}>{l}</option>
+  ))}
+</SelectInput>
+```
+
+### Searchable List With Loader
+```tsx
+<SelectPopoverContent>
+  {isLoading && (
+    <SelectListItemUI>
+      <Loader size="md" />
+    </SelectListItemUI>
+  )}
+  {items.map(item => (
+    <SelectListItemUI key={item.id} onClick={() => pick(item.id)}>
+      {item.label}
+    </SelectListItemUI>
+  ))}
+</SelectPopoverContent>
+```
+
+### DataGrid Filter
+```tsx
+<Popover>
+  <PopoverTrigger asChild>
+    <DataGridFilterSelectTriggerUI>{label}</DataGridFilterSelectTriggerUI>
+  </PopoverTrigger>
+  <SelectPopoverContent>
+    <DataViewQueryFilter {...props}>{children}</DataViewQueryFilter>
+  </SelectPopoverContent>
+</Popover>
+```
+
+## Best Practices & Gotchas
+- Always wrap `SelectInputUI` in `PopoverTrigger asChild` to keep focus handling intact.
+- Provide a stable `key` for each `SelectListItemUI`; use the entity id, not the index.
+- Use `SelectInputActionsUI` for **all** interactive icons; avoid placing icons directly.
+- When using `createNewForm`, also include `SelectCreateNewTrigger` inside the list.
+- Keep async loaders inside `SelectPopoverContent` to prevent layout jumps.
+
+## Further Reading
+- `MultiSelectInput` – same principles for multiple values.
+- Contember `useField` hook – low-level field accessor used in examples.
+- Radix UI Popover – underlying primitive used by `SelectPopoverContent`.
+
+<!-- End of Generated Documentation -->
+
+> **Note:** Props reference has been automatically enhanced with precise API types from API Extractor.

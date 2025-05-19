@@ -1,21 +1,17 @@
 import { SqlUpdateInputProcessor, SqlUpdateInputProcessorResult } from './SqlUpdateInputProcessor'
 import { UpdateInputVisitor } from '../../inputProcessing'
 import { Input, Model } from '@contember/schema'
-import { PredicateFactory } from '../../acl'
 import { UpdateBuilderFactory } from './UpdateBuilderFactory'
 import { Mapper } from '../Mapper'
 import { acceptFieldVisitor } from '@contember/schema-utils'
-import { MutationNoResultError, MutationNothingToDo, MutationResultList, MutationUpdateOk, NothingToDoReason } from '../Result'
+import { MutationEntryNotFoundError, MutationNoResultError, MutationNothingToDo, MutationResultList, MutationUpdateOk, NothingToDoReason } from '../Result'
 import { UpdateBuilder } from './UpdateBuilder'
 import { rowDataToFieldValues } from '../ColumnValue'
-import { DatabaseMetadata } from '@contember/database'
 import { MapperInput } from '../types'
 
 export class Updater {
 	constructor(
 		private readonly schema: Model.Schema,
-		private readonly schemaDatabaseMetadata: DatabaseMetadata,
-		private readonly predicateFactory: PredicateFactory,
 		private readonly updateBuilderFactory: UpdateBuilderFactory,
 	) {}
 
@@ -66,6 +62,21 @@ export class Updater {
 		const result = await updateBuilder.execute(mapper)
 
 		if (!result.executed) {
+			if (filter && Object.keys(filter).length > 0) {
+				// direct update was not invoked, but we still need to check if the row matches the filter
+				const where: Input.OptionalWhere = {
+					and: [
+						filter,
+						{
+							[entity.primary]: { eq: primaryValue },
+						},
+					],
+				}
+				const count = await mapper.count(entity, where)
+				if (!count) {
+					return [new MutationEntryNotFoundError([], where)]
+				}
+			}
 			resultList.unshift(new MutationNothingToDo([], NothingToDoReason.noData))
 		} else if (result.affectedRows !== 1) {
 			return [new MutationNoResultError([])]

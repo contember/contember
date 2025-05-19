@@ -1,6 +1,6 @@
 import { test } from 'bun:test'
-import { execute, sqlTransaction } from '../../../../src/test'
-import { SchemaBuilder } from '@contember/schema-definition'
+import { execute, failedTransaction, sqlTransaction } from '../../../../src/test'
+import { c, createSchema, SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
 import { GQL, SQL } from '../../../../src/tags'
 import { testUuid } from '../../../../src/testUuid'
@@ -59,3 +59,52 @@ test('applies a filter', async () => {
 	})
 })
 
+
+namespace FilterModel {
+	export class Article {
+		publishedAt = c.dateTimeColumn()
+		tags = c.manyHasMany(Tag)
+	}
+
+	export class Tag {
+		name = c.stringColumn()
+	}
+}
+
+test('applies a filter with only relation update', async () => {
+	await execute({
+		schema: createSchema(FilterModel).model,
+		query: GQL`mutation {
+        updateArticle(
+            by: {id: "${testUuid(1)}"},
+            filter: {publishedAt: {isNull: false}},
+            data: {tags: {connect: {id: "${testUuid(2)}"}}}
+          ) {
+          ok
+          errorMessage
+        }
+      }`,
+		executes: [
+			...failedTransaction([
+				{
+					sql: SQL`select "root_"."id" from "public"."article" as "root_" where "root_"."id" = ?`,
+					parameters: [testUuid(1)],
+					response: { rows: [{ id: testUuid(1) }] },
+				},
+				{
+					sql: SQL`select count(*) as "row_count"  from "public"."article" as "root_"  where not("root_"."published_at" is null) and "root_"."id" = ?`,
+					parameters: [testUuid(1)],
+					response: { rows: [{ row_count: 0 }] },
+				},
+			]),
+		],
+		return: {
+			data: {
+				updateArticle: {
+					ok: false,
+					errorMessage: `Execution has failed:\nunknown field: NotFoundOrDenied (for input {\"and\":[{\"publishedAt\":{\"isNull\":false}},{\"id\":{\"eq\":\"123e4567-e89b-12d3-a456-000000000001\"}}]})`,
+				},
+			},
+		},
+	})
+})

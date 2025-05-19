@@ -166,8 +166,8 @@ export class ExecutionContainerFactory {
 				new JunctionTableManager(schema.model, predicateFactory, whereBuilder, connectJunctionHandler, disconnectJunctionHandler, pathFactory))
 			.addService('deleteExecutor', ({ predicateFactory, updateBuilderFactory, whereBuilder, pathFactory, schema }) =>
 				new DeleteExecutor(schema.model, predicateFactory, whereBuilder, updateBuilderFactory, pathFactory))
-			.addService('updater', ({ predicateFactory, updateBuilderFactory, schema, schemaDatabaseMetadata }) =>
-				new Updater(schema.model, schemaDatabaseMetadata, predicateFactory, updateBuilderFactory))
+			.addService('updater', ({ updateBuilderFactory, schema }) =>
+				new Updater(schema.model, updateBuilderFactory))
 			.addService('inserter', ({  insertBuilderFactory, providers, schema, schemaDatabaseMetadata }) =>
 				new Inserter(schema.model, schemaDatabaseMetadata, insertBuilderFactory, providers))
 			.addService('mapperFactory', ({ predicatesInjector, selectBuilderFactory, uniqueWhereExpander, whereBuilder, junctionTableManager, deleteExecutor, updater, inserter, pathFactory, providers, schema, schemaDatabaseMetadata }) => {

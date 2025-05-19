@@ -3,7 +3,7 @@ import { forwardRef, ReactElement, ReactNode, useCallback } from 'react'
 import { Slot } from '@radix-ui/react-slot'
 import { useDataViewFetchAllData } from '../hooks'
 import { CsvExportFactory, ExportFactory } from '../export'
-import { useDataViewChildren, useDataViewEntityListProps } from '../contexts'
+import { useDataViewChildren, useDataViewEntityListProps, useDataViewSelectionState } from '../contexts'
 import { composeEventHandlers } from '@radix-ui/primitive'
 
 export interface DataViewExportTriggerProps {
@@ -23,6 +23,11 @@ export interface DataViewExportTriggerProps {
 	 * A factory for generating the exported data. Defaults to a CSV export factory.
 	 */
 	exportFactory?: ExportFactory
+
+	/**
+	 * Only export visible columns.
+	 */
+	onlyVisible?: boolean
 }
 
 /**
@@ -46,10 +51,12 @@ export interface DataViewExportTriggerProps {
  * ```
  */
 export const DataViewExportTrigger = forwardRef<HTMLButtonElement, DataViewExportTriggerProps>(
-	({ fields, children, baseName, exportFactory, ...props }: DataViewExportTriggerProps, ref) => {
+	({ fields, children, baseName, onlyVisible, exportFactory, ...props }: DataViewExportTriggerProps, ref) => {
 		const entityName = useDataViewEntityListProps().entityName
 		const globalChildren = useDataViewChildren()
-		const fetchData = useDataViewFetchAllData({ children: fields ?? globalChildren })
+		const selection = useDataViewSelectionState()?.values
+
+		const fetchData = useDataViewFetchAllData({ children: fields ?? globalChildren, selection })
 		const download = useTriggerDownload()
 
 		const doExport = useCallback(async () => {

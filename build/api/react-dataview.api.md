@@ -332,6 +332,7 @@ export interface DataViewExportTriggerProps {
     children: ReactElement;
     exportFactory?: ExportFactory;
     fields?: ReactNode;
+    onlyVisible?: boolean;
 }
 
 // @public
@@ -1146,8 +1147,9 @@ export const useDataViewEnumFilterArgs: () => {
 export const useDataViewEnumFilterFactory: (name: string) => (value: string) => UseDataViewEnumFilter;
 
 // @public
-export const useDataViewFetchAllData: ({ children }: {
+export const useDataViewFetchAllData: ({ children, selection }: {
     children: ReactNode;
+    selection?: DataViewSelectionValues;
 }) => () => Promise<{
     marker: EntityListSubTreeMarker;
     data: ReceivedEntityData[];

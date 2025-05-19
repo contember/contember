@@ -12,11 +12,12 @@ import {
 	useEnvironment,
 } from '@contember/react-binding'
 import { dataViewSelectionEnvironmentExtension } from '../env/dataViewSelectionEnvironmentExtension'
+import { DataViewSelectionValues } from '../types'
 
 /**
  * Hook for fetching all data matching the current filter. Used for exporting data.
  */
-export const useDataViewFetchAllData = ({ children }: { children: ReactNode }) => {
+export const useDataViewFetchAllData = ({ children, selection }: { children: ReactNode; selection?: DataViewSelectionValues }) => {
 	const entityName = useDataViewEntityListProps().entityName
 	const filter = useDataViewFilteringState().filter
 	const env = useEnvironment()
@@ -39,7 +40,7 @@ export const useDataViewFetchAllData = ({ children }: { children: ReactNode }) =
 		)
 
 		const { data, markerTreeRoot } = await bindingOperations.fetchData(node, {
-			environment: env.withExtension(dataViewSelectionEnvironmentExtension, {}),
+			environment: env.withExtension(dataViewSelectionEnvironmentExtension, selection ?? {}),
 		})
 		const marker = Array.from(markerTreeRoot.subTrees.values())[0]
 		const fieldData = data[marker.placeholderName]
@@ -52,7 +53,7 @@ export const useDataViewFetchAllData = ({ children }: { children: ReactNode }) =
 			marker,
 		}
 
-	}, [entityName, filter, children, bindingOperations, env])
+	}, [entityName, filter, children, bindingOperations, env, selection])
 }
 
 const OmitSubTrees = Component<{ children: ReactNode }>(

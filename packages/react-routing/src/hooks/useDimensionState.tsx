@@ -21,11 +21,15 @@ export const useDimensionState = ({ dimension, defaultValue, storage = 'null' }:
 	const redirect = useRedirect()
 
 	useEffect(() => {
-		setStoredState(currentDimensionValue)
+		if (currentDimensionValue.length > 0 && !(currentDimensionValue.length === 1 && currentDimensionValue[0] === '')) {
+			setStoredState(currentDimensionValue)
+		}
 	}, [currentDimensionValue, setStoredState])
 
 	useEffect(() => {
-		if (currentDimensionValue.length === 0 && initialStoredState.length > 0) {
+		const isDimensionEmpty = currentDimensionValue.length === 0 || (currentDimensionValue.length === 1 && currentDimensionValue[0] === '')
+
+		if (isDimensionEmpty && initialStoredState.length > 0 && initialStoredState[0] !== '') {
 			redirect(it => it ? {
 				...it,
 				dimensions: {
@@ -34,7 +38,7 @@ export const useDimensionState = ({ dimension, defaultValue, storage = 'null' }:
 				},
 			} : null)
 		}
-	}, [currentDimensionValue.length, dimension, initialStoredState, redirect])
+	}, [currentDimensionValue, dimension, initialStoredState, redirect])
 
 	return currentDimensionValue
 }

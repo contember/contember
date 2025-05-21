@@ -178,7 +178,7 @@ export class MutationEntryNotFoundError implements MutationResultInterface {
 	hints: MutationResultHint[] = []
 	message: string
 
-	constructor(public readonly paths: Path[], public readonly where: Input.UniqueWhere | Input.Where) {
+	constructor(public readonly paths: Path[], public readonly where: Input.UniqueWhere | Input.OptionalWhere) {
 		this.message = 'for input ' + JSON.stringify(where)
 	}
 }

@@ -43,7 +43,9 @@ export const pathToRequestState = (routing: RoutingContextValue, path: string, q
 		return null
 	}
 
-	const dimensionsSegment = path.slice(routing.basePath.length, path.indexOf('/', routing.basePath.length))
+	const pathAfterBase = path.slice(routing.basePath.length)
+	const dimensionsMatch = pathAfterBase.match(/^([^\/]*)/)
+	const dimensionsSegment = dimensionsMatch?.[1] || ''
 	const hasDimensions = dimensionsSegment.includes('=')
 
 	const dimensions = hasDimensions ? dimensionsIn(dimensionsSegment) : routing.defaultDimensions
@@ -120,4 +122,3 @@ export const requestStateToPath = (routing: RoutingContextValue, request: Reques
 
 	return (prefix + pathSegment + querySegment) || '/'
 }
-

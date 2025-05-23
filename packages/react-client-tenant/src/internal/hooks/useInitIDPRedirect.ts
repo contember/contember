@@ -8,9 +8,10 @@ import { useSaveBacklink } from './useRedirectToBacklink'
 export interface UseInitIDPRedirectProps {
 	onRedirect?: (url: string) => void
 	setState: (state: SetStateAction<IDPStateValue>) => void
+	redirectUrl?: string
 }
 
-export const useInitIDPRedirect = ({ onRedirect, setState }: UseInitIDPRedirectProps) => {
+export const useInitIDPRedirect = ({ onRedirect, setState, redirectUrl }: UseInitIDPRedirectProps) => {
 	const initRequest = useInitSignInIDPMutation()
 	const saveBacklink = useSaveBacklink()
 	const { set: saveIdpState } = useIDPStateStore()
@@ -24,7 +25,7 @@ export const useInitIDPRedirect = ({ onRedirect, setState }: UseInitIDPRedirectP
 			setState({ type: 'processing_init' })
 			const response = await initRequest({
 				data: {
-					redirectUrl: getBaseHref(),
+					redirectUrl: redirectUrl || getBaseHref(),
 				},
 				identityProvider: provider,
 			})
@@ -44,5 +45,5 @@ export const useInitIDPRedirect = ({ onRedirect, setState }: UseInitIDPRedirectP
 			console.error(e)
 			return fail('UNKNOWN_ERROR')
 		}
-	}, [initRequest, onRedirect, saveBacklink, saveIdpState, setState])
+	}, [initRequest, onRedirect, saveBacklink, saveIdpState, setState, redirectUrl])
 }

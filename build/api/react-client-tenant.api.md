@@ -546,7 +546,7 @@ export interface IdentityStateProps {
 export type IdentityStateValue = 'none' | 'loading' | 'failed' | 'cleared' | 'success';
 
 // @public (undocumented)
-export const IDP: ({ children, onResponseError, onInitError, onLogin, expiration }: IDPProps) => JSX_2.Element;
+export const IDP: ({ children, onResponseError, onInitError, onLogin, expiration, redirectUrl }: IDPProps) => JSX_2.Element;
 
 // @public (undocumented)
 export type IDPInitError = InitSignInIDPErrorCode | 'UNKNOWN_ERROR';
@@ -589,6 +589,8 @@ export interface IDPProps {
     onLogin?: () => void;
     // (undocumented)
     onResponseError?: (error: IDPResponseError) => void;
+    // (undocumented)
+    redirectUrl?: string;
 }
 
 // @public (undocumented)

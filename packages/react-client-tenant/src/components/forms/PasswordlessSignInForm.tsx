@@ -1,11 +1,11 @@
-import { ReactElement, useCallback, useMemo } from 'react'
 import * as TenantApi from '@contember/graphql-client-tenant'
-import { TenantForm } from './TenantForm'
-import { FormContextValue, FormError, FormState } from '../../types/forms'
+import { useSetSessionToken } from '@contember/react-client'
+import { ReactElement, useCallback, useMemo } from 'react'
 import { useForm } from '../../contexts'
 import { SignInPasswordlessMutationResult, useSignInPasswordlessMutation } from '../../hooks'
 import { useRedirectToBacklinkCallback } from '../../internal/hooks/useRedirectToBacklink'
-import { useSetSessionToken } from '@contember/react-client'
+import { FormContextValue, FormError, FormState } from '../../types/forms'
+import { TenantForm } from './TenantForm'
 
 export type PasswordlessSignInFormValues = {
 	token: string

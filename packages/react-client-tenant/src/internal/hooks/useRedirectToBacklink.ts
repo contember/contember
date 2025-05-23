@@ -5,23 +5,30 @@ const getBacklinkFromUrl = () => {
 	return new URLSearchParams(window.location.search).get('backlink')
 }
 
-export const useSaveBacklink = () => {
+export const useSaveBacklink = ({ storage = 'session' }: {
+	storage?: 'session' | 'local'
+} = {}) => {
 	return useCallback(() => {
 		const backlink = getBacklinkFromUrl()
 		if (!backlink) {
 			return
 		}
-		sessionStorage.setItem('backlink', backlink)
-	}, [])
+		if (storage === 'local') {
+			localStorage.setItem('backlink', backlink)
+		} else {
+			sessionStorage.setItem('backlink', backlink)
+		}
+	}, [storage])
 }
 
 export const useRedirectToBacklinkCallback = () => {
 	return useCallback(() => {
-		const backlink = getBacklinkFromUrl() ?? sessionStorage.getItem('backlink')
+		const backlink = getBacklinkFromUrl() ?? sessionStorage.getItem('backlink') ?? localStorage.getItem('backlink')
 		if (!backlink) {
 			return
 		}
 		sessionStorage.removeItem('backlink')
+		localStorage.removeItem('backlink')
 		const resolvedBacklink = new URL(backlink, window.location.href)
 		if (resolvedBacklink.origin === window.location.origin) {
 			window.location.href = resolvedBacklink.toString()

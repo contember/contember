@@ -5,6 +5,7 @@ import { FormContextValue, FormError, FormState } from '../../types/forms'
 import { useForm } from '../../contexts'
 import { InitSignInPasswordlessMutationResult, useInitSignInPasswordlessMutation } from '../../hooks'
 import { PASSWORDLESS_REQUEST_STORAGE_KEY } from '../../consts'
+import { useSaveBacklink } from '../../internal/hooks/useRedirectToBacklink'
 
 export type PasswordlessSignInInitFormValues = {
 	email: string
@@ -33,10 +34,15 @@ export const usePasswordlessSignInInitForm = useForm as () => PasswordlessSignIn
 export const PasswordlessSignInInitForm = ({ children, onSuccess }: PasswordlessSignInInitFormProps) => {
 
 	const initSignIn = useInitSignInPasswordlessMutation()
+	const saveBacklink = useSaveBacklink({
+		storage: 'local',
+	})
+
 	return (
 		<TenantForm<PasswordlessSignInInitFormContextValue, InitSignInPasswordlessMutationResult>
 			onSuccess={res => {
 				localStorage.setItem(PASSWORDLESS_REQUEST_STORAGE_KEY, res.result.requestId)
+				saveBacklink()
 				onSuccess?.(res)
 			}}
 			errorMapping={errorToField}

@@ -1,7 +1,7 @@
 {
   "name": "@contember/oss",
   "type": "module",
-  "version": "2.1.0-alpha.21",
+  "version": "2.1.0-alpha.22",
   "private": true,
   "scripts": {
     "pre-build": "bun run --filter=\"*\" pre-build",

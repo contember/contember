@@ -41,15 +41,14 @@ ${query}`
 
 		try {
 			response = await this.doExecute(query, options)
+			this.options?.onResponse?.(response)
+			options?.onResponse?.(response)
+
+			body = await response.text()
 		} catch (e) {
 			const aborted = typeof e === 'object' && e !== null && (e as { name?: unknown }).name === 'AbortError'
 			throw createError(aborted ? 'aborted' : 'network error', undefined, e)
 		}
-
-		this.options?.onResponse?.(response)
-		options?.onResponse?.(response)
-
-		body = await response.text()
 
 		let data: any
 		try {

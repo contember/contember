@@ -59,7 +59,7 @@ export class UserMailer {
 
 	async sendPasswordlessEmail(
 		dbContext: DatabaseContext,
-		mailArguments: { email: string; token: string; project?: string; projectSlug?: string; url?: string },
+		mailArguments: { email: string; token: string; project?: string; projectSlug?: string; url?: string; requestId: string },
 		customMailOptions: { projectId: string | null; variant: string },
 	): Promise<void> {
 		const templateId = { type: MailType.passwordlessSignIn, ...customMailOptions }

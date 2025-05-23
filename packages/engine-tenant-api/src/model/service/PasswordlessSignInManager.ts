@@ -71,6 +71,7 @@ class PasswordlessSignInManager {
 				url,
 				project: project?.name,
 				projectSlug: project?.slug,
+				requestId: result.id,
 			}, {
 				variant: mailVariant || '',
 				projectId: project?.id ?? null,

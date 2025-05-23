@@ -1,6 +1,6 @@
 {
   "name": "@contember/schema-definition",
-  "version": "2.1.0-alpha.23",
+  "version": "2.1.0-alpha.24",
   "license": "Apache-2.0",
   "main": "./dist/production/index.js",
   "typings": "./dist/types/index.d.ts",

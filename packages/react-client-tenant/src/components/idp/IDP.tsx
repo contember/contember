@@ -30,7 +30,7 @@ export const IDP = ({ children, onResponseError, onInitError, onLogin, expiratio
 		}
 		return { type: 'nothing' }
 	})
-	useHandleIDPResponse({ hasOauthResponse, setState, onLogin, expiration: expiration })
+	useHandleIDPResponse({ hasOauthResponse, setState, onLogin, expiration: expiration, redirectUrl })
 
 	const initRedirect = useInitIDPRedirect({ setState, redirectUrl })
 

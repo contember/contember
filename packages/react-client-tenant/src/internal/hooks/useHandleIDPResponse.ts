@@ -12,6 +12,7 @@ export interface UseHandleIDPResponseProps {
 
 	setState: (state: SetStateAction<IDPStateValue>) => void
 	hasOauthResponse: boolean
+	redirectUrl?: string
 }
 
 const headers = {
@@ -20,7 +21,7 @@ const headers = {
 
 const DEFAULT_LOGIN_EXPIRATION = 14 * 24 * 60 // 14 days
 
-export const useHandleIDPResponse = ({ onLogin, expiration = DEFAULT_LOGIN_EXPIRATION, setState, hasOauthResponse }: UseHandleIDPResponseProps): void => {
+export const useHandleIDPResponse = ({ onLogin, expiration = DEFAULT_LOGIN_EXPIRATION, setState, hasOauthResponse, redirectUrl }: UseHandleIDPResponseProps): void => {
 	const idpSignIn = useSignInIDPMutation({ headers })
 	const setSessionToken = useSetSessionToken()
 
@@ -44,7 +45,7 @@ export const useHandleIDPResponse = ({ onLogin, expiration = DEFAULT_LOGIN_EXPIR
 			const response = await idpSignIn({
 				data: {
 					url: window.location.href,
-					redirectUrl: getBaseHref(),
+					redirectUrl: redirectUrl || getBaseHref(),
 					sessionData: idpState.sessionData,
 				},
 				identityProvider: idpState.provider,

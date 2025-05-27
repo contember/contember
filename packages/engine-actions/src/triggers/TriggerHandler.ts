@@ -71,28 +71,28 @@ export class TriggerHandler {
 
 	private async directUpdateHandler(event: AfterUpdateEvent) {
 		const updateListeners = this.listenersStore.getUpdateListeners(event.entity.name)
-		updateListeners.map(listener => {
+		await Promise.all(updateListeners.map(listener => {
 			if (event.data.some(it => listener.fields.has(it.fieldName) && it.value !== it.old)) {
-				this.payloadManager.add({
+				return this.payloadManager.add({
 					listener,
 					entity: event.entity,
 					primary: event.id,
 					cause: event,
 				})
 			}
-		})
+		}))
 	}
 
 	private async directCreateHandler(event: AfterInsertEvent) {
 		const createListeners = this.listenersStore.getCreateListener(event.entity.name)
-		createListeners.map(listener => {
-			this.payloadManager.add({
+		await Promise.all(createListeners.map(listener => {
+			return this.payloadManager.add({
 				listener,
 				entity: event.entity,
 				primary: event.id,
 				cause: event,
 			})
-		})
+		}))
 	}
 
 
@@ -103,7 +103,7 @@ export class TriggerHandler {
 	private async indirectChangesEntityHandler(event: BeforeDeleteEvent | AfterInsertEvent) {
 		//
 		const indirectEntityListeners = this.listenersStore.getIndirectListeners(event.entity.name)
-		const promises =  indirectEntityListeners.map(listener => this.collectDeepChanges(event, listener, {
+		const promises = indirectEntityListeners.map(listener => this.collectDeepChanges(event, listener, {
 			[event.entity.primary]: { eq: event.id },
 		}))
 		await Promise.all(promises)
@@ -149,13 +149,13 @@ export class TriggerHandler {
 		where: Input.Where,
 	) {
 		const result = await this.changesFetcher.fetch(listener, where)
-		for (const row of result) {
-			this.payloadManager.add({
+		await Promise.all(result.map(row => {
+			return this.payloadManager.add({
 				listener,
 				entity: listener.rootEntity,
 				primary: row,
 				cause,
 			})
-		}
+		}))
 	}
 }

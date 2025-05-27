@@ -61,5 +61,5 @@ export const useHandleIDPResponse = ({ onLogin, expiration = DEFAULT_LOGIN_EXPIR
 				redirectToBackLink()
 			}
 		})()
-	}, [idpSignIn, onLogin, setSessionToken, hasOauthResponse, loadIdpState, expiration, setState, redirectToBackLink])
+	}, [idpSignIn, onLogin, setSessionToken, hasOauthResponse, loadIdpState, expiration, setState, redirectToBackLink, redirectUrl])
 }

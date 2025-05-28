@@ -1,5 +1,4 @@
 export * from './ContentApiControllerFactory'
-export * from './ContentGraphQLContextFactory'
 export * from './ContentQueryHandlerFactory'
 export * from './GraphQLSchemaContributor'
 export * from './ContentSchemaResolver'

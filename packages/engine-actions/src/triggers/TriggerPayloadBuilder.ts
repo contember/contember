@@ -51,6 +51,19 @@ export class TriggerPayloadBuilder {
 		}
 		const payloads: ActionsPayload.WatchEventPayload[] = []
 		for (const eventsByPrimary of Object.values(byPrimary)) {
+			const baseEvents: ActionsPayload.BaseEventPayload[] = []
+
+			const existingEvents = new Set<string>()
+			for (const event of eventsByPrimary.events) {
+				const baseEvent = this.buildBaseEventPayloads(event)
+				const stringRepresentation = JSON.stringify(baseEvent)
+				if (existingEvents.has(stringRepresentation)) {
+					continue
+				}
+				existingEvents.add(stringRepresentation)
+				baseEvents.push(baseEvent)
+			}
+
 			payloads.push({
 				operation: 'watch',
 				trigger: events[0].listener.trigger.name,
@@ -58,7 +71,7 @@ export class TriggerPayloadBuilder {
 				id: eventsByPrimary.primary,
 				selection: eventsByPrimary.events.find(it => it.selection)?.selection
 					?? selections[eventsByPrimary.primary],
-				events: eventsByPrimary.events.map(it => this.buildBaseEventPayloads(it)),
+				events: baseEvents,
 			})
 		}
 		return payloads
@@ -74,6 +87,7 @@ export class TriggerPayloadBuilder {
 					selection,
 					values: Object.fromEntries(event.cause.data.map(it => [it.fieldName, it.value])),
 					path: 'path' in event.listener ? event.listener.path : undefined,
+					nodes: event.nodes,
 				}
 			case 'AfterUpdateEvent':
 			case 'BeforeUpdateEvent':
@@ -89,6 +103,7 @@ export class TriggerPayloadBuilder {
 					values: Object.fromEntries(event.cause.data.map(it => [it.fieldName, it.value])),
 					path: 'path' in event.listener ? event.listener.path : undefined,
 					old: Object.fromEntries(afterEvent.data.map(it => [it.fieldName, it.old])),
+					nodes: event.nodes,
 				}
 			case 'BeforeDeleteEvent':
 				return {
@@ -97,6 +112,7 @@ export class TriggerPayloadBuilder {
 					id: event.cause.id,
 					selection,
 					path: 'path' in event.listener ? event.listener.path : undefined,
+					nodes: event.nodes,
 				}
 			case 'AfterJunctionUpdateEvent':
 				if (event.listener.type !== 'junction') {
@@ -112,6 +128,7 @@ export class TriggerPayloadBuilder {
 					id,
 					inverseId,
 					path: 'path' in event.listener ? event.listener.path : undefined,
+					nodes: event.nodes,
 				}
 			default:
 				assertNever(event.cause, it => it.type)

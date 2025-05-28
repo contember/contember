@@ -1,4 +1,4 @@
-import { Actions, Input, Model } from '@contember/schema'
+import { Actions, ActionsPayload, Input, Model } from '@contember/schema'
 import { AnyListener } from './TriggerListenersStore'
 import { EventCause } from './TriggerHandler'
 import { TriggerPayloadBuilder } from './TriggerPayloadBuilder'
@@ -11,6 +11,7 @@ export interface FiredEvent {
 	entity: Model.Entity
 	primary: Input.PrimaryValue
 	selection?: any
+	nodes?: ActionsPayload.EntityEventPathNode[]
 }
 
 export class TriggerPayloadManager {

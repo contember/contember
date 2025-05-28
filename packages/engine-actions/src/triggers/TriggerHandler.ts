@@ -153,8 +153,9 @@ export class TriggerHandler {
 			return this.payloadManager.add({
 				listener,
 				entity: listener.rootEntity,
-				primary: row,
+				primary: row.id,
 				cause,
+				nodes: row.nodes,
 			})
 		}))
 	}

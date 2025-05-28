@@ -49,6 +49,7 @@ export namespace Actions {
 			readonly type: 'watch'
 			readonly entity: string
 			readonly watch: SelectionNode
+			readonly withNodes?: boolean
 		}
 
 	export type Schema = {

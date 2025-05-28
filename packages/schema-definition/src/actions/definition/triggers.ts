@@ -35,6 +35,7 @@ export type BasicTriggerDefinition =
 export type WatchTriggerDefinition =
 	& {
 		readonly watch: Actions.SelectionNode | string
+		readonly withNodes?: boolean
 	}
 	& CommonTriggerDefinition
 	& TargetDefinition

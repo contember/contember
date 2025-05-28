@@ -3,7 +3,7 @@ import { TriggerListeners } from './TriggerListeners'
 
 export interface IndirectListener {
 	type: 'indirect'
-	trigger: Actions.AnyTrigger
+	trigger: Actions.WatchTrigger
 	rootEntity: Model.Entity
 	fields: Set<string>
 	relations: Set<string>
@@ -12,7 +12,7 @@ export interface IndirectListener {
 
 export interface JunctionListener {
 	type: 'junction'
-	trigger: Actions.AnyTrigger
+	trigger: Actions.WatchTrigger
 	rootEntity: Model.Entity
 	path: string[]
 	context: {

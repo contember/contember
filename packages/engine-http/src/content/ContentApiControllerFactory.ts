@@ -24,7 +24,7 @@ export class ContentApiControllerFactory {
 	create(): HttpController {
 		const handlerCache = new WeakMap<GraphQLSchema, ContentQueryHandler>()
 		return async context => {
-			const { params, timer, projectGroup, authResult, request, koa } = context
+			const { params, timer, projectGroup, authResult, request, koa, clientIp } = context
 			if (!authResult) {
 				return new HttpErrorResponse(401, 'Authentication required')
 			}
@@ -134,6 +134,10 @@ export class ContentApiControllerFactory {
 							systemSchema: projectContainer.systemDatabaseContextFactory.schemaName,
 							stage,
 							project,
+							userInfo: {
+								ipAddress: clientIp,
+								userAgent: koa.request.headers['user-agent'] ?? null,
+							},
 						})
 
 						return {

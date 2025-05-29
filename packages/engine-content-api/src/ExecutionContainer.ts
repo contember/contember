@@ -54,6 +54,7 @@ export type ExecutionContainerArgs = {
 	systemSchema: string
 	project: { slug: string }
 	stage: { id: string; slug: string }
+	userInfo: { ipAddress: string | null; userAgent: string | null }
 }
 
 export interface ExecutionContainer {
@@ -79,7 +80,7 @@ export class ExecutionContainerFactory {
 		return this.hooks.reduce((acc, cb) => cb(acc), builder)
 	}
 
-	createBuilderInternal({ permissions, identityVariables, identityId, db, schema, schemaMeta, systemSchema, stage, project, schemaDatabaseMetadata }: ExecutionContainerArgs) {
+	createBuilderInternal({ permissions, identityVariables, identityId, db, schema, schemaMeta, systemSchema, stage, project, schemaDatabaseMetadata, userInfo }: ExecutionContainerArgs) {
 		return new Builder({})
 			.addService('systemSchema', () =>
 				systemSchema)
@@ -95,6 +96,8 @@ export class ExecutionContainerFactory {
 				schemaMeta)
 			.addService('schemaDatabaseMetadata', () =>
 				schemaDatabaseMetadata)
+			.addService('userInfo', () =>
+				userInfo)
 			.addService('providers', () =>
 				this.providers)
 			.addService('variableInjector', ({ schema }) =>

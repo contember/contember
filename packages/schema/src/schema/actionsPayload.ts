@@ -90,6 +90,9 @@ export namespace ActionsPayload {
 	export type WebhookMeta = {
 		readonly eventId: string
 		readonly transactionId: string
+		readonly identityId: string | null
+		readonly ipAddress: string | null
+		readonly userAgent: string | null
 		readonly createdAt: string
 		readonly lastStateChange: string
 		readonly numRetries: number

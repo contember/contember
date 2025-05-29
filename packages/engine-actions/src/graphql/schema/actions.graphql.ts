@@ -35,6 +35,9 @@ export const schema: DocumentNode = gql`
     type Event {
         id: Uuid!
         transactionId: Uuid!
+        identityId: Uuid
+        ipAddress: String
+        userAgent: String
         createdAt: DateTime!
         lastStateChange: DateTime!
         resolvedAt: DateTime
@@ -59,11 +62,11 @@ export const schema: DocumentNode = gql`
     type ProcessBatchResponse {
         ok: Boolean!
     }
-    
+
     type RetryEventResponse {
         ok: Boolean!
     }
-    
+
     type StopEventResponse {
         ok: Boolean!
     }
@@ -72,12 +75,12 @@ export const schema: DocumentNode = gql`
         variables: [VariableInput!]!
         mode: SetVariablesMode
     }
-	
+
 	"""
-	Defines how it handles original variables. 
+	Defines how it handles original variables.
 	- MERGE merges with new values (default behaviour)
 	- SET replaces all variables
-	- APPEND_ONLY_MISSING appends values if not already exist 
+	- APPEND_ONLY_MISSING appends values if not already exist
 	"""
 	enum SetVariablesMode {
 		MERGE
@@ -89,7 +92,7 @@ export const schema: DocumentNode = gql`
         name: String!
         value: String!
     }
-	
+
 	type SetVariablesResponse {
 		ok: Boolean!
 	}

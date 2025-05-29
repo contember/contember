@@ -37,6 +37,10 @@ export class ContentQueryExecutorImpl implements ContentQueryExecutor {
 			systemSchema: project.systemSchema,
 			stage,
 			project: project,
+			userInfo: {
+				ipAddress: null,
+				userAgent: null,
+			},
 		})
 
 		const ctx: ContentGraphqlContext = {

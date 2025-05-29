@@ -23,6 +23,8 @@ export type Event = {
 	readonly __typename?: 'Event'
 	readonly createdAt: Scalars['DateTime']['output']
 	readonly id: Scalars['Uuid']['output']
+	readonly identityId?: Maybe<Scalars['Uuid']['output']>
+	readonly ipAddress?: Maybe<Scalars['String']['output']>
 	readonly lastStateChange: Scalars['DateTime']['output']
 	readonly log: Scalars['Json']['output']
 	readonly numRetries: Scalars['Int']['output']
@@ -32,6 +34,7 @@ export type Event = {
 	readonly state: EventState
 	readonly target: Scalars['String']['output']
 	readonly transactionId: Scalars['Uuid']['output']
+	readonly userAgent?: Maybe<Scalars['String']['output']>
 	readonly visibleAt?: Maybe<Scalars['DateTime']['output']>
 }
 
@@ -268,6 +271,8 @@ export interface DateTimeScalarConfig extends GraphQLScalarTypeConfig<ResolversT
 export type EventResolvers<ContextType = any, ParentType extends ResolversParentTypes['Event'] = ResolversParentTypes['Event']> = {
 	createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
 	id?: Resolver<ResolversTypes['Uuid'], ParentType, ContextType>
+	identityId?: Resolver<Maybe<ResolversTypes['Uuid']>, ParentType, ContextType>
+	ipAddress?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
 	lastStateChange?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
 	log?: Resolver<ResolversTypes['Json'], ParentType, ContextType>
 	numRetries?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
@@ -277,6 +282,7 @@ export type EventResolvers<ContextType = any, ParentType extends ResolversParent
 	state?: Resolver<ResolversTypes['EventState'], ParentType, ContextType>
 	target?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	transactionId?: Resolver<ResolversTypes['Uuid'], ParentType, ContextType>
+	userAgent?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
 	visibleAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }

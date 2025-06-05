@@ -174,6 +174,9 @@ export class WebhookTargetHandler implements InvokeHandler<Actions.WebhookTarget
 			meta: {
 				eventId: it.id,
 				transactionId: it.transaction_id,
+				identityId: it.identity_id ?? null,
+				ipAddress: it.ip_address ?? null,
+				userAgent: it.user_agent ?? null,
 				createdAt: it.created_at.toISOString(),
 				lastStateChange: it.last_state_change.toISOString(),
 				numRetries: it.num_retries,

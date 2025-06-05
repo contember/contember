@@ -45,6 +45,7 @@ const watchTriggerSchema = Typesafe.intersection(
 	Typesafe.partial({
 		selection: selectionNodeSchemaFactory(),
 		priority: Typesafe.integer,
+		withNodes: Typesafe.boolean,
 	}),
 )
 

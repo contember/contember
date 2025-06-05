@@ -68,6 +68,9 @@ export class EventsQueryResolver implements QueryResolvers<ActionsContext> {
 			state: row.state,
 			target: row.target,
 			transactionId: row.transaction_id,
+			identityId: row.identity_id ?? undefined,
+			ipAddress: row.ip_address ?? undefined,
+			userAgent: row.user_agent ?? undefined,
 		}))
 	}
 }

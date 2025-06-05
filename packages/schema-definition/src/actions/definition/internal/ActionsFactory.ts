@@ -101,6 +101,7 @@ export class ActionsFactory {
 			watch: this.parseSelection(trigger.watch),
 			selection: trigger.selection ? this.parseSelection(trigger.selection) : undefined,
 			priority: trigger.priority,
+			...('withNodes' in trigger ? { withNodes: trigger.withNodes } : {}),
 		}
 	}
 

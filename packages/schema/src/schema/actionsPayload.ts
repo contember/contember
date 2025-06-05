@@ -2,6 +2,12 @@ import { Input } from './input'
 import { JSONObject } from './json'
 
 export namespace ActionsPayload {
+	export type EntityEventPathNode = {
+		readonly relation: string
+		readonly entity: string
+		readonly id: Input.PrimaryValue
+	}
+
 	export type UpdateEvent = {
 		readonly operation: 'update'
 		readonly entity: string
@@ -10,6 +16,7 @@ export namespace ActionsPayload {
 		readonly old?: JSONObject
 		readonly selection?: JSONObject
 		readonly path?: readonly string[]
+		readonly nodes?: readonly EntityEventPathNode[]
 	}
 
 	export type CreateEvent = {
@@ -19,6 +26,7 @@ export namespace ActionsPayload {
 		readonly values: JSONObject
 		readonly selection?: JSONObject
 		readonly path?: readonly string[]
+		readonly nodes?: readonly EntityEventPathNode[]
 	}
 
 	export type DeleteEvent = {
@@ -27,6 +35,7 @@ export namespace ActionsPayload {
 		readonly id: Input.PrimaryValue
 		readonly selection?: JSONObject
 		readonly path?: readonly string[]
+		readonly nodes?: readonly EntityEventPathNode[]
 	}
 
 	export type JunctionConnectEvent = {
@@ -37,6 +46,7 @@ export namespace ActionsPayload {
 		readonly inverseId: Input.PrimaryValue
 		readonly selection?: JSONObject
 		readonly path?: readonly string[]
+		readonly nodes?: readonly EntityEventPathNode[]
 	}
 
 	export type JunctionDisconnectEvent = {
@@ -47,6 +57,7 @@ export namespace ActionsPayload {
 		readonly inverseId: Input.PrimaryValue
 		readonly selection?: JSONObject
 		readonly path?: readonly string[]
+		readonly nodes?: readonly EntityEventPathNode[]
 	}
 
 	export type WatchEventPayload = {
@@ -79,6 +90,9 @@ export namespace ActionsPayload {
 	export type WebhookMeta = {
 		readonly eventId: string
 		readonly transactionId: string
+		readonly identityId: string | null
+		readonly ipAddress: string | null
+		readonly userAgent: string | null
 		readonly createdAt: string
 		readonly lastStateChange: string
 		readonly numRetries: number

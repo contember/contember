@@ -30,11 +30,14 @@ export default async function (builder: MigrationBuilder) {
 			trigger         TEXT                NOT NULL,
 			priority        INT                 NOT NULL DEFAULT 0,
 			payload         JSONB               NOT NULL,
-			log             JSONB               NOT NULL DEFAULT '[]'
+			log             JSONB               NOT NULL DEFAULT '[]',
+			identity_id     UUID                DEFAULT NULL,
+			ip_address      INET                DEFAULT NULL,
+			user_agent      TEXT                DEFAULT NULL
 		);
 
 		CREATE INDEX ON actions_event (priority DESC, visible_at) WHERE state IN ('created', 'retrying', 'processing');
-		
+
 		CREATE TABLE actions_variable
     	(
         	id              UUID PRIMARY KEY NOT NULL,

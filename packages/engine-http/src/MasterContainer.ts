@@ -1,25 +1,40 @@
+import { Builder } from '@contember/dic'
 import { SystemContainerFactory } from '@contember/engine-system-api'
 import { TenantContainerFactory } from '@contember/engine-tenant-api'
-import { Builder } from '@contember/dic'
-import { ServerConfig } from './config/config'
 import { ModificationHandlerFactory } from '@contember/schema-migrations'
 import { Initializer } from './bootstrap'
+import { ServerConfig } from './config/config'
 
-import { ProjectContainerFactoryFactory } from './project'
+import { DatabaseMetadataResolver } from '@contember/database'
+import { ExecutionContainerFactory, GraphQlSchemaBuilderFactory, PermissionFactory } from '@contember/engine-content-api'
+import { Logger } from '@contember/logger'
+import { Schema } from '@contember/schema'
+import Koa from 'koa'
+import { createSecretKey } from 'node:crypto'
+import { Application } from './application'
+import { HttpResponse } from './common'
 import { ProjectConfigResolver } from './config/projectConfigResolver'
 import { TenantConfigResolver } from './config/tenantConfigResolver'
-import { ProjectGroupContainerFactory } from './projectGroup/ProjectGroupContainer'
-import { ProjectGroupResolver } from './projectGroup/ProjectGroupResolver'
-import { Logger } from '@contember/logger'
-import { ExecutionContainerFactory, GraphQlSchemaBuilderFactory, PermissionFactory } from '@contember/engine-content-api'
-import { createProviders, Providers } from './providers'
-import { TenantApiMiddlewareFactory, TenantGraphQLHandlerFactory } from './tenant'
-import { SystemApiMiddlewareFactory, SystemGraphQLContextFactory, SystemGraphQLHandlerFactory } from './system'
 import {
-	ContentApiControllerFactory, ContentGraphQLContextFactory, ContentQueryHandlerFactory, GraphQLSchemaContributor, GraphQlSchemaFactory,
+	ContentApiControllerFactory,
+	ContentQueryHandlerFactory, GraphQLSchemaContributor, GraphQlSchemaFactory,
 	GraphQLSchemaFactoryResult, NotModifiedChecker,
 } from './content'
+import { ContentApiSpecificCache } from './content/ContentApiSpecificCache'
+import { homepageController } from './misc'
+import { Plugin } from './plugin/Plugin'
+import { ProjectContainerFactoryFactory } from './project'
 import { ProjectContextResolver } from './project-common'
+import { ProjectGroupContainerFactory } from './projectGroup/ProjectGroupContainer'
+import { ProjectGroupContainerResolver } from './projectGroup/ProjectGroupContainerResolver'
+import { ProjectGroupResolver } from './projectGroup/ProjectGroupResolver'
+import { createColllectHttpMetricsMiddleware, createShowMetricsMiddleware } from './prometheus'
+import { ProjectGroupContainerMetricsHook } from './prometheus/ProjectGroupContainerMetricsHook'
+import { PrometheusRegistryFactory } from './prometheus/PrometheusRegistryFactory'
+import { createProviders, Providers } from './providers'
+import { SystemApiMiddlewareFactory, SystemGraphQLContextFactory, SystemGraphQLHandlerFactory } from './system'
+import { ContentQueryExecutorImpl } from './system/ContentQueryExecutor'
+import { TenantApiMiddlewareFactory, TenantGraphQLHandlerFactory } from './tenant'
 import {
 	ContentSchemaTransferMappingFactory,
 	ExportApiControllerFactory,
@@ -28,22 +43,8 @@ import {
 	ImportExecutor,
 	SystemSchemaTransferMappingFactory,
 } from './transfer'
-import { homepageController } from './misc'
-import { Plugin } from './plugin/Plugin'
-import { Application } from './application'
-import { ApplicationWorkerManager } from './workers'
-import { HttpResponse } from './common'
-import { ContentQueryExecutorImpl } from './system/ContentQueryExecutor'
-import { DatabaseMetadataResolver } from '@contember/database'
-import Koa from 'koa'
-import { ProjectGroupContainerResolver } from './projectGroup/ProjectGroupContainerResolver'
-import { PrometheusRegistryFactory } from './prometheus/PrometheusRegistryFactory'
-import { ProjectGroupContainerMetricsHook } from './prometheus/ProjectGroupContainerMetricsHook'
-import { createColllectHttpMetricsMiddleware, createShowMetricsMiddleware } from './prometheus'
-import { createSecretKey } from 'node:crypto'
 import { CryptoWrapper } from './utils/CryptoWrapper'
-import { ContentApiSpecificCache } from './content/ContentApiSpecificCache'
-import { Schema } from '@contember/schema'
+import { ApplicationWorkerManager } from './workers'
 
 export type ProcessType =
 	| 'singleNode'
@@ -178,14 +179,12 @@ export class MasterContainerFactory {
 			})
 			.addService('notModifiedChecker', () =>
 				new NotModifiedChecker())
-			.addService('contentGraphqlContextFactory', ({ providers, executionContainerFactory }) =>
-				new ContentGraphQLContextFactory(providers, executionContainerFactory))
 			.addService('contentQueryHandlerFactory', ({ debugMode }) =>
 				new ContentQueryHandlerFactory(debugMode))
 			.addService('projectContextResolver', () =>
 				new ProjectContextResolver())
-			.addService('contentApiMiddlewareFactory', ({ projectContextResolver, notModifiedChecker, contentGraphqlContextFactory, contentQueryHandlerFactory, graphQlSchemaFactory }) =>
-				new ContentApiControllerFactory(notModifiedChecker, contentGraphqlContextFactory, contentQueryHandlerFactory, projectContextResolver, graphQlSchemaFactory))
+			.addService('contentApiMiddlewareFactory', ({ projectContextResolver, notModifiedChecker, executionContainerFactory, contentQueryHandlerFactory, graphQlSchemaFactory }) =>
+				new ContentApiControllerFactory(notModifiedChecker, executionContainerFactory, contentQueryHandlerFactory, projectContextResolver, graphQlSchemaFactory))
 			.addService('tenantApiMiddlewareFactory', () =>
 				new TenantApiMiddlewareFactory())
 			.addService('systemGraphQLContextFactory', () =>

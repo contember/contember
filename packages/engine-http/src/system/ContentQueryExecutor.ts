@@ -1,15 +1,15 @@
+import { Authorizator, ExecutionContainerFactory, GraphQlSchemaBuilderFactory } from '@contember/engine-content-api'
 import {
 	ContentQueryExecutor,
 	ContentQueryExecutorContext,
 	ContentQueryExecutorQuery,
 	ContentQueryExecutorResult,
 } from '@contember/engine-system-api'
-import { Authorizator, ExecutionContainerFactory, GraphQlSchemaBuilderFactory } from '@contember/engine-content-api'
+import { logger } from '@contember/logger'
 import { AllowAllPermissionFactory } from '@contember/schema-utils'
 import { graphql, GraphQLError } from 'graphql'
-import { ExtendedGraphqlContext } from '../content'
+import { ContentGraphqlContext } from '../content/ContentGraphqlContext'
 import { extractOriginalError } from '../graphql'
-import { logger } from '@contember/logger'
 
 export class ContentQueryExecutorImpl implements ContentQueryExecutor {
 	constructor(
@@ -37,9 +37,13 @@ export class ContentQueryExecutorImpl implements ContentQueryExecutor {
 			systemSchema: project.systemSchema,
 			stage,
 			project: project,
+			userInfo: {
+				ipAddress: null,
+				userAgent: null,
+			},
 		})
 
-		const ctx: ExtendedGraphqlContext = {
+		const ctx: ContentGraphqlContext = {
 			project,
 			db: db.client.forSchema(stage.schema),
 			identityVariables: {},

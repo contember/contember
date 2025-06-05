@@ -14,6 +14,9 @@ export type EventRow = {
 	target: string
 	priority: number
 	trigger: string
+	identity_id: string | null
+	ip_address: string | null
+	user_agent: string | null
 	payload: ActionsPayload.AnyEventPayload
 	log: any[]
 }

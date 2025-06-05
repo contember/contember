@@ -18,7 +18,9 @@ export class TriggerPayloadPersister {
 		private readonly providers: { uuid: () => string },
 		private readonly projectSlug: string,
 		private readonly stageId: string,
-		private readonly schemaId?: number,
+		private readonly schemaId: number | undefined,
+		private readonly identityId: string,
+		private readonly userInfo: { ipAddress: string | null; userAgent: string | null },
 	) {
 	}
 
@@ -46,6 +48,9 @@ export class TriggerPayloadPersister {
 					payload: it,
 					resolved_at: null,
 					last_state_change: 'now',
+					identity_id: this.identityId,
+					ip_address: this.userInfo.ipAddress,
+					user_agent: this.userInfo.userAgent,
 				})))
 				.execute(this.client)
 		}

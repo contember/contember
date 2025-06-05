@@ -1,20 +1,20 @@
-import { HttpController } from '../application'
-import { ProjectContextResolver } from '../project-common'
-import { HttpErrorResponse, HttpResponse } from '../common'
+import { createAclVariables, ExecutionContainerFactory } from '@contember/engine-content-api'
 import { StageBySlugQuery } from '@contember/engine-system-api'
-import { NotModifiedChecker } from './NotModifiedChecker'
-import { ContentGraphQLContextFactory } from './ContentGraphQLContextFactory'
-import { ContentQueryHandler, ContentQueryHandlerFactory } from './ContentQueryHandlerFactory'
 import { GraphQLSchema } from 'graphql'
+import { HttpController } from '../application'
+import { HttpErrorResponse, HttpResponse } from '../common'
 import { GraphQLKoaState } from '../graphql'
+import { ProjectContextResolver } from '../project-common'
+import { ContentQueryHandler, ContentQueryHandlerFactory } from './ContentQueryHandlerFactory'
 import { GraphQlSchemaFactory } from './GraphQlSchemaFactory'
+import { NotModifiedChecker } from './NotModifiedChecker'
 
 const debugHeader = 'x-contember-debug'
 
 export class ContentApiControllerFactory {
 	constructor(
 		private readonly notModifiedChecker: NotModifiedChecker,
-		private readonly contentGraphqlContextFactory: ContentGraphQLContextFactory,
+		private readonly executionContainerFactory: ExecutionContainerFactory,
 		private readonly handlerFactory: ContentQueryHandlerFactory,
 		private readonly projectContextResolver: ProjectContextResolver,
 		private readonly graphQlSchemaFactory: GraphQlSchemaFactory,
@@ -24,7 +24,7 @@ export class ContentApiControllerFactory {
 	create(): HttpController {
 		const handlerCache = new WeakMap<GraphQLSchema, ContentQueryHandler>()
 		return async context => {
-			const { params, timer, projectGroup, authResult, request, koa } = context
+			const { params, timer, projectGroup, authResult, request, koa, clientIp } = context
 			if (!authResult) {
 				return new HttpErrorResponse(401, 'Authentication required')
 			}
@@ -113,20 +113,42 @@ export class ContentApiControllerFactory {
 						const connection = operation === 'query' ? projectContainer.readConnection : projectContainer.connection
 						const contentDatabase = connection.createClient(stage.schema, { module: 'content' })
 
-						return this.contentGraphqlContextFactory.create({
+
+						const identityVariables = createAclVariables(schema.acl, memberships)
+						let identityId = authResult.identityId
+						if (
+							authResult.assumedIdentityId &&
+							memberships.some(it => schema.acl.roles[it.role].system?.assumeIdentity)
+						) {
+							identityId = authResult.assumedIdentityId
+						}
+
+						const executionContainer = this.executionContainerFactory.create({
 							db: contentDatabase,
-							authResult,
-							memberships,
-							permissions,
-							schemaDatabaseMetadata,
+							identityVariables,
+							identityId,
 							schema,
 							schemaMeta: { id: schemaWithMeta.meta.id },
-							timer,
-							requestDebug,
+							schemaDatabaseMetadata,
+							permissions,
 							systemSchema: projectContainer.systemDatabaseContextFactory.schemaName,
 							stage,
 							project,
+							userInfo: {
+								ipAddress: clientIp,
+								userAgent: koa.request.headers['user-agent'] ?? null,
+							},
 						})
+
+						return {
+							db: contentDatabase,
+							identityVariables,
+							identityId,
+							executionContainer,
+							timer,
+							requestDebug,
+							project,
+						}
 					},
 				}))
 				logger.debug('Content query finished')

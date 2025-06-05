@@ -113,6 +113,7 @@ export const execute = async (test: Test) => {
 					stage: { id: '00000000-0000-0000-0000-000000000000', slug: 'live' },
 					project: { slug: 'test' },
 					schemaDatabaseMetadata: emptyDatabaseMetadata,
+					userInfo: { ipAddress: null, userAgent: null },
 				}),
 			timer: (label: any, cb: any) => cb(),
 		},

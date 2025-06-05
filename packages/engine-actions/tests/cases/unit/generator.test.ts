@@ -8,7 +8,7 @@ const assert = {
 	equal: (a: any, b: any) => expect(a).toEqual(b),
 	deepStrictEqual: (a: any, b: any) => expect(a).toStrictEqual(b),
 }
-const createTrigger = (watchNode: Actions.SelectionNode): Actions.AnyTrigger => ({
+const createTrigger = (watchNode: Actions.SelectionNode): Actions.WatchTrigger => ({
 	type: 'watch',
 	entity: 'Author',
 	name: 'author_trigger',

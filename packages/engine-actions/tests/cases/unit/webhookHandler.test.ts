@@ -29,6 +29,9 @@ const createTestEvent = (i = 0, row: Partial<EventRow> = {}): EventRow => ({
 	priority: 1,
 	schema_id: 1,
 	state: 'created',
+	identity_id: testUuid(i * 10 + 4),
+	ip_address: '127.0.0.1',
+	user_agent: 'test-agent',
 	...row,
 })
 
@@ -56,6 +59,9 @@ describe('webhook request', () => {
 						meta: {
 							eventId: testUuid(1),
 							transactionId: testUuid(2),
+							identityId: testUuid(4),
+							ipAddress: '127.0.0.1',
+							userAgent: 'test-agent',
 							createdAt: now.toISOString(),
 							lastStateChange: now.toISOString(),
 							numRetries: 0,
@@ -104,6 +110,9 @@ describe('webhook request', () => {
 								meta: {
 									eventId: testUuid(1),
 									transactionId: testUuid(2),
+									identityId: testUuid(4),
+									ipAddress: '127.0.0.1',
+									userAgent: 'test-agent',
 									createdAt: now.toISOString(),
 									lastStateChange: now.toISOString(),
 									numRetries: 0,

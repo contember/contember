@@ -344,6 +344,7 @@ class Pool {
 				e.code === ClientErrorCodes.TOO_MANY_CONNECTIONS
 				|| e.code === ClientErrorCodes.CANNOT_CONNECT_NOW // server starting
 				|| e.message === 'timeout expired' // https://github.com/brianc/node-postgres/blob/c7dc621d3fb52c158eb23aa31dea6bd440700a4a/packages/pg/lib/client.js#L105
+				|| e.code === 'ETIMEDOUT'
 			) {
 				this.lastRecoverableError = { error: e, time: Date.now() }
 				this.poolStats.connection_recoverable_error_count++

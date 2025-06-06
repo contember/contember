@@ -23,7 +23,7 @@ export type ClientErrorType =
 
 export class ClientError extends DatabaseError {
 	constructor(previous: Error | any, public readonly type: ClientErrorType) {
-		super(`Database client ${type}: ${'message' in previous ? previous.message : JSON.stringify(previous)}`, previous)
+		super(`Database client ${type}: ${'message' in previous && previous.message ? previous.message : JSON.stringify(previous)}`, previous)
 	}
 }
 
@@ -33,7 +33,7 @@ export class QueryError extends DatabaseError {
 
 	constructor(public readonly sql: string, public readonly parameters: any, public override readonly previous: Error | any) {
 		super(
-			`Database query error: ${'message' in previous ? previous.message : JSON.stringify(previous)}
+			`Database query error: ${'message' in previous && previous.message ? previous.message : JSON.stringify(previous)}
 SQL: ${sql}
 parameters: ${parameters}`,
 			previous,

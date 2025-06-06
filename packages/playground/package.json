@@ -1,6 +1,6 @@
 {
   "name": "@contember/playground",
-  "version": "2.1.0-alpha.24",
+  "version": "2.1.0-alpha.25",
   "type": "module",
   "private": true,
   "scripts": {

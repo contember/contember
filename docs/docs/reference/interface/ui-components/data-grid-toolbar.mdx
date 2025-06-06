@@ -1,0 +1,122 @@
+---
+title: DataGridToolbar
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 16 -->
+<!-- Source examples: 1 -->
+<!-- Playground examples: 5 -->
+<!-- External examples: 10 -->
+<!-- Import examples: 8 -->
+
+# DataGridToolbar
+
+## Overview
+`DataGridToolbar` adds a ready-to-use toolbar to `DataGrid`.  
+It renders default controls for filtering, layout selection, exporting, and reloading. You can also inject custom filters or actions via `children`.
+
+## Styling Guidelines
+* All snippets use Tailwind.
+* The toolbar itself needs no special Contember theme classes—you may wrap it in layout containers as needed.
+
+## Core Concepts
+* The toolbar is a child of `DataGrid`.
+* Built-in buttons (layout, export, reload) appear automatically.
+* You can place filter components (e.g., `DataGridQueryFilter`) inside.
+* Use the `sticky` prop to fix the toolbar to the top of its scroll container.
+* The order of `children` determines button layout.
+
+## Quick Start
+```tsx
+import { DataGrid, DataGridLoader, DataGridToolbar, DataGridQueryFilter } from '~/lib/datagrid'
+
+export const SimpleGrid = () => (
+	<DataGrid entities="Article">
+		<DataGridToolbar className="border-b" >
+			<DataGridQueryFilter />
+		</DataGridToolbar>
+
+		<DataGridLoader>
+			{/* columns here */}
+		</DataGridLoader>
+	</DataGrid>
+)
+```
+
+## Detailed Guide
+```tsx
+// 1️⃣ Make the toolbar sticky inside a scrolling panel
+<div className="sticky top-0 z-10">
+	<DataGridToolbar sticky />
+</div>
+
+// 2️⃣ Add custom text filter
+<DataGridToolbar>
+	<DataGridTextFilter field="title" label="Title" />
+</DataGridToolbar>
+
+// 3️⃣ Combine multiple filters and extra buttons
+<DataGridToolbar className="flex gap-4 items-center">
+	<DataGridQueryFilter />
+	<DataGridBooleanFilter field="published" label="Published" />
+	<Button size="sm">Custom action</Button>
+</DataGridToolbar>
+```
+
+## Props Reference
+| Name     | Type               | Required | Default | Description                                       |
+|----------|--------------------|----------|---------|---------------------------------------------------|
+| children | React.ReactNode    | No       | –       | Components rendered inside the toolbar.           |
+| sticky   | boolean            | No       | false   | Adds `position:sticky` styles to keep the toolbar visible. |
+
+_Inherited props: None_
+
+## Sub-Components / Building Blocks
+### DataGridQueryFilter
+Adds a search box that filters across multiple fields.
+
+### DataGridTextFilter
+Adds a text input bound to a single text field.
+
+## Examples
+### Sticky toolbar in a card layout
+```tsx
+<Card className="p-4">
+	<div className="overflow-auto max-h-96">
+		<DataGrid entities="Folder">
+			<div className="sticky top-0 bg-white">
+				<DataGridToolbar sticky />
+			</div>
+			<DataGridLoader>
+				{/* table or tiles */}
+			</DataGridLoader>
+		</DataGrid>
+	</div>
+</Card>
+```
+With `sticky` the toolbar remains visible while you scroll the data rows.
+
+### Custom filters only
+```tsx
+<DataGridToolbar>
+	<DataGridTextFilter field="name" label="Name" />
+	<DataGridEnumFilter field="status" label="Status" options={statusLabels} />
+</DataGridToolbar>
+```
+You replaced the default query filter with two specific filters.
+
+## Best Practices & Gotchas
+* Always place `DataGridToolbar` as the first child of `DataGrid`.
+* Use `sticky` only inside a container that has a defined height and `overflow-auto`.
+* Wrap custom buttons with Tailwind spacing (`className="flex gap-2"`).
+* Keep filter components lightweight; heavy logic belongs in query builders.
+* Do not abuse `children` for heavy content—toolbar should stay concise.
+
+## Further Reading
+* DataGrid
+* DataGridQueryFilter
+* DataGridTextFilter
+* DataGridPagination
+* DataViewLayout
+
+<!-- End of Generated Documentation -->

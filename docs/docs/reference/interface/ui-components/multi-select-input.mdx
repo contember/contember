@@ -1,0 +1,125 @@
+---
+title: MultiSelectInput
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 1 -->
+<!-- Source examples: 1 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 0 -->
+<!-- Import examples: 0 -->
+
+# MultiSelectInput Component Group
+
+## Overview
+MultiSelectInput lets you pick multiple related entities from a dropdown list.  
+You can filter, sort, and even create new entities without leaving the input.
+
+## Core Concepts
+- Multi-value selection bound to a relation field.
+- Filtered option list supplied by Contember query objects.
+- Initial ascending or descending sorting.
+- Inline entity creation through an embedded form.
+
+## Installation
+```bash
+npm install @contember/admin
+```
+
+```tsx
+import { MultiSelectInput, Field } from '@contember/admin'
+```
+
+## Quick Start
+```tsx
+import { MultiSelectInput, Field } from '@contember/admin'
+
+<MultiSelectInput
+  field="tags"
+  placeholder="Select tags"
+  options={[
+    { field: 'id', operator: 'eq', value: '1', label: 'Tag 1' },
+    { field: 'id', operator: 'eq', value: '2', label: 'Tag 2' },
+  ]}
+  createNewForm={<div className="p-4">Form to create a new tag</div>}
+  initialSorting="ASC"
+  className="w-full"
+/>
+```
+
+## Detailed Guide
+1. Pass `field` with the relation name, e.g. `"tags"`.  
+2. Build `options` with filter objects containing a `label`.  
+3. Add a `<Field>` child when you need custom rendering inside each option.  
+4. Control list order with `initialSorting="ASC"` or `"DESC"`.  
+5. Supply `createNewForm` to open an inline form at the bottom of the menu.  
+
+```tsx
+<MultiSelectInput
+  field="tags"
+  placeholder="Select tags"
+  options={[
+    { field: 'id', operator: 'eq', value: '1', label: 'Tag 1' },
+    { field: 'id', operator: 'eq', value: '2', label: 'Tag 2' },
+  ]}
+  createNewForm={<div>New tag form</div>}
+  initialSorting="DESC"
+  className="w-full"
+>
+  <Field field="name" />
+</MultiSelectInput>
+```
+
+## Component API Reference
+
+### MultiSelectInput
+Multi-select dropdown tied to a relation field.
+
+#### Props
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| field | SugaredRelativeEntityList['field'] | Yes | – |  |
+| options | SugaredQualifiedEntityList['entities'] | No | – |  |
+| children | ReactNode | Yes | – |  |
+| placeholder | ReactNode | No | – |  |
+| createNewForm | ReactNode | No | – |  |
+| queryField | DataViewUnionFilterFields | No | – |  |
+| initialSorting | DataViewSortingDirections | No | – |  |
+
+
+## Hooks
+*No hooks exported by this component group.*
+
+## Examples
+### Basic usage with inline entity creation
+```tsx
+<MultiSelectInput
+  field="tags"
+  placeholder="Select tags"
+  options={[
+    { field: 'id', operator: 'eq', value: '1', label: 'Tag 1' },
+    { field: 'id', operator: 'eq', value: '2', label: 'Tag 2' },
+  ]}
+  createNewForm={<div>Form to create a new tag</div>}
+  initialSorting="ASC"
+  className="w-full"
+>
+  <Field field="name" />
+</MultiSelectInput>
+```
+
+## Best Practices & Gotchas
+- Keep the `options` array short to reduce query cost.
+- Provide a `<Field>` child to avoid showing raw IDs.
+- Use Tailwind `truncate` on option labels for long names.
+- Embed `createNewForm` sparingly to keep focus on selection.
+
+## Further Reading
+- SelectInput – single-value variant.
+- Contember Filters – build powerful option queries.
+- Form Blocks – compose reusable inline forms.
+
+<!-- End of Generated Documentation -->
+
+
+> **Note:** Props reference has been automatically enhanced with precise API types from API Extractor.

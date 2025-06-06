@@ -42,7 +42,7 @@ export interface DeleteEntityTriggerProps {
  * ## Props {@link DeleteEntityTriggerProps}
  * - children, ?immediatePersist, ?onPersistError, ?onPersistSuccess
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <DeleteEntityTrigger immediatePersist>
  *     <button>Delete</button>

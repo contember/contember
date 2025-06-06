@@ -1,0 +1,108 @@
+---
+title: DefaultDropdown
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 5 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 1 -->
+<!-- External examples: 4 -->
+<!-- Import examples: 5 -->
+
+
+## Styling Guidelines
+* All code examples use Tailwind CSS utility classes.
+* Dropdown items inherit Contember theme classes like `text-link`, `hover:bg-accent`, and `focus:text-red-600`.
+
+## Core Concepts
+* DefaultDropdown renders a trigger button and a dropdown menu.
+* You compose its content with `DropdownMenuItem`, `DropdownMenuSeparator`, or custom elements.
+* Prevent default selection when you wrap destructive actions in dialogs.
+* The component works without extra props—everything is passed through its children.
+
+## Quick Start
+```tsx
+import { DefaultDropdown, DropdownMenuItem } from '~/lib/ui/dropdown'
+
+export const SimpleDropdown = () => (
+	<DefaultDropdown>
+		<DropdownMenuItem>First action</DropdownMenuItem>
+		<DropdownMenuItem>Second action</DropdownMenuItem>
+	</DefaultDropdown>
+)
+```
+
+## Sub-Components / Building Blocks
+### DropdownMenuItem
+Interactive menu option. Accepts all button HTML attributes and forwards them.
+
+### DropdownMenuSeparator
+Thin horizontal line for visual grouping.
+
+### DeleteEntityDialog
+Modal dialog used for destructive actions. It often wraps a `DropdownMenuItem` trigger.
+
+### RepeaterRemoveItemTrigger / RepeaterRemoveItemButton
+Helpers from Contember repeater UI that tie into dropdown flows.
+
+### ModalEntityEdit
+Opens an entity edit form in a modal. The trigger can be a dropdown item.
+
+## Examples
+### Playground Menu with Delete Dialog
+```tsx
+<DefaultDropdown>
+	<DropdownMenuItem>Edit</DropdownMenuItem>
+	<DropdownMenuItem>Make a copy</DropdownMenuItem>
+	<DropdownMenuSeparator />
+	<DeleteEntityDialog trigger={
+		<DropdownMenuItem onSelect={e => e.preventDefault()}>
+			Delete
+		</DropdownMenuItem>
+	} />
+</DefaultDropdown>
+```
+Use `onSelect={e => e.preventDefault()}` to keep the dropdown open while the dialog opens.
+
+### Grid Row Actions
+```tsx
+<DefaultDropdown>
+	{children /* other grid actions */}
+	<IsAllowed entity={entityName as any} action="update">
+		<ModalEntityEdit
+			button={
+				<DropdownMenuItem className="hover:bg-accent" onSelect={e => e.preventDefault()}>
+					<EditIcon className="w-4 mr-2" />
+					<span>Edit</span>
+				</DropdownMenuItem>
+			}
+		>
+			{editForm}
+		</ModalEntityEdit>
+	</IsAllowed>
+
+	<IsAllowed entity={entityName as any} action="delete">
+		<DeleteEntityDialog immediatePersist trigger={
+			<DropdownMenuItem onSelect={e => e.preventDefault()}>
+				<TrashIcon className="text-red-500 w-4 mr-2" />
+				<span>Delete</span>
+			</DropdownMenuItem>
+		} />
+	</IsAllowed>
+</DefaultDropdown>
+```
+Combine authorization checks with modal dialogs to secure update and delete actions.
+
+## Best Practices & Gotchas
+* Always call `e.preventDefault()` in `onSelect` when a dialog follows the click.
+* Wrap destructive actions in confirmation dialogs.
+* Keep dropdown menus short; avoid deep nesting.
+* Use Tailwind focus classes to provide clear keyboard navigation feedback.
+
+## Further Reading
+* DropdownMenuItem
+* DropdownMenuSeparator
+* DeleteEntityDialog
+* ModalEntityEdit
+
+<!-- End of Generated Documentation -->

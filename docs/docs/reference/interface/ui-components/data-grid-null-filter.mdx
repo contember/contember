@@ -1,0 +1,84 @@
+---
+title: DataGridNullFilter
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 2 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 2 -->
+<!-- Import examples: 4 -->
+
+# DataGridNullFilter
+
+## Overview
+`DataGridNullFilter` lets you filter a Contember `DataGrid` or `DataView` column for entities where a field is either null or empty.
+It renders a single clickable option, usually inside a custom filter panel.
+
+## Styling Guidelines
+* All examples use Tailwind CSS.
+* The component itself adds no visual classes; you style the wrapper.
+
+## Core Concepts
+* Works only inside a `DataGridColumn` or `DataView…Filter` wrapper.
+* Matches rows where the target field has no value.
+* Accepts an optional `label` prop for custom button text.
+* Triggered by the surrounding filter context; it does not fetch data on its own.
+
+## Quick Start
+```tsx
+import { DataGridNullFilter } from '@app/lib/datagrid/filters/common'
+
+<DataGridColumn
+  header="Company Logo"
+  name="logo"
+  filter={<DataGridNullFilter label="Without Logo" />}
+>
+  {/* …cell renderer… */}
+</DataGridColumn>
+```
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| label | string | No | `"Is empty"` | Text shown inside the filter button. |
+
+## Examples
+
+### Filter Has-Many Relation for “empty”
+```tsx
+<DataGridColumn
+  header="Adverts"
+  name="realManAdvertGroups"
+  filterName="realManAdvertGroups"
+  filter={
+    <DataViewHasManyFilter
+      field="realManAdvertGroups"
+      name="realManAdvertGroups"
+    >
+      <div className="border rounded p-2 max-w-60 flex flex-col gap-2">
+        <DataGridNullFilter label="Without Adverts" />
+      </div>
+    </DataViewHasManyFilter>
+  }
+>
+  {/* column body */}
+</DataGridColumn>
+```
+The `DataGridNullFilter` appears inside a `DataViewHasManyFilter`.
+When clicked, it shows only entities without related `realManAdvertGroups`.
+
+## Best Practices & Gotchas
+* Place the filter inside a visibly styled container; the component renders no border.
+* Combine with other filters to offer “is empty” alongside value filters.
+* Do not use outside Contember filter context; it will not work.
+* Provide a clear `label`; users must understand the action.
+* Remember that “null” also matches empty relation arrays.
+
+## Further Reading
+* `DataGridColumn` – wraps your filter.
+* `DataViewHasManyFilter` – relation filter container.
+* `DataGridBooleanFilter` – yes/no filter alternative.
+* Contember Tailwind theme guide.
+
+<!-- End of Generated Documentation -->

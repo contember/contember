@@ -31,7 +31,7 @@ export interface DataViewBooleanFilterProps {
  *
  * See {@link DataViewBooleanFilterProps} for details.
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <DataViewBooleanFilter field="published">
  *   //  Filter controls here 

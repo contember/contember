@@ -1,0 +1,126 @@
+---
+title: ImageField
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 17 -->
+<!-- Source examples: 2 -->
+<!-- Playground examples: 5 -->
+<!-- External examples: 10 -->
+<!-- Import examples: 8 -->
+
+# ImageField
+
+## Overview
+`ImageField` lets you upload and preview images inside a Contember form. It wraps the generic file upload with image–specific conveniences such as drag-and-drop and an automatic thumbnail preview.
+
+Use it only inside an entity context (`<EntitySubTree />` or `<EntityListSubTree />`). The component stores the upload metadata (url, dimensions, etc.) into the current entity fields.
+
+## Styling Guidelines
+* All examples use Tailwind CSS utility classes.  
+* Contember’s default theme already styles form labels, inputs, and error messages—no extra classes are required unless you want custom layouts.
+
+## Core Concepts
+* Works **only** inside an entity subtree.
+* Persists the uploaded file’s URL (and optional metadata) to designated fields.
+* Shows a live preview via `UploadedImageView`.
+* Accepts custom drag-and-drop UI through `dropzonePlaceholder`.
+* You can disable the “remove” button with `noDestroy`.
+
+## Quick Start
+```tsx
+import { Binding, EntitySubTree, PersistButton } from '@contember/react-binding'
+import { ImageField } from '~/lib/form'
+
+const UserForm = () => (
+  <Binding>
+    <EntitySubTree entity="User(id = $id)">
+      <ImageField
+        label="Profile picture"
+        urlField="avatar.url"
+        dropzonePlaceholder="Drag image here"
+      />
+      <PersistButton className="mt-4" />
+    </EntitySubTree>
+  </Binding>
+)
+```
+
+## Detailed Guide
+_Optional walkthrough has been omitted for brevity._
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| label | React.ReactNode | Yes | – | Field label shown above the uploader. |
+| description | React.ReactNode | Yes | – | Helper text displayed below the label. |
+| errors | React.ReactNode &#124; ErrorAccessor.Error[] | Yes | – | Injected by Contember to render validation errors. |
+| required | boolean | Yes | – | Marks the field as mandatory; handled by Contember validators. |
+| urlField | string &#124; `{ field: string; hasOneRelationPath?: … }` | Yes | – | Entity field that stores the uploaded file URL. |
+| baseField | string &#124; SugarableHasOneRelation &#124; SugarableHasOneRelation[] | No | – | Relation used when the image is stored in a separate entity. |
+| dropzonePlaceholder | React.ReactNode | No | – | Custom element rendered inside the drop zone before a file is chosen. |
+| actions | React.ReactNode | No | – | Extra UI (e.g., buttons) shown next to the preview. |
+| edit | React.ReactNode | No | – | Custom edit overlay rendered over the preview. |
+| noDestroy | boolean | No | – | When `true`, hides the “Remove” button. |
+| accept | Record&lt;string, string[]&gt; | No | – | MIME types passed to the underlying `<input type="file" />`. |
+| acceptFile | `(file) => boolean &#124; Promise<void>` | No | – | Programmatically accept/reject a file. Throw/return `false` to reject. |
+| extractors | FileDataExtractor[] | No | – | Custom metadata extractors executed after upload. |
+| uploader | UploadClient | No | – | Supply your own upload client instead of the default one. |
+| fileNameField | string &#124; object | No | – | Entity field for the original file name. |
+| lastModifiedField | string &#124; object | No | – | Stores the file’s last modified timestamp. |
+| fileSizeField | string &#124; object | No | – | Stores file size in bytes. |
+| fileTypeField | string &#124; object | No | – | Stores the MIME type. |
+| widthField | string &#124; object | No | – | Stores image width in pixels. |
+| heightField | string &#124; object | No | – | Stores image height in pixels. |
+<!-- Inherited props (none) -->
+
+## Sub-Components / Building Blocks
+### UploadedImageView
+Renders the thumbnail preview once the upload is complete. You rarely use it directly—it is integrated into `ImageField`.
+
+### UploaderDropzoneAreaUI
+Reusable drop-area wrapper. Pass it to `dropzonePlaceholder` to replace the default minimal placeholder.
+
+## Examples
+
+### Custom drop-zone with browse button
+```tsx
+<ImageField
+  baseField="image"
+  urlField="url"
+  fileNameField="fileName"
+  dropzonePlaceholder={(
+    <UploaderDropzoneAreaUI className="w-60 p-4 border rounded-md text-center">
+      <UploadIcon className="w-12 h-12 text-gray-400 mx-auto" />
+      <div className="font-semibold text-sm">Drop image here</div>
+      <div className="text-xs">or</div>
+      <Button size="sm" variant="outline" className="mt-1">Browse</Button>
+    </UploaderDropzoneAreaUI>
+  )}
+/>
+```
+The custom placeholder keeps the default uploader logic while giving you full control over the visuals.
+
+### Disabling file removal
+```tsx
+<ImageField
+  label="Company logo"
+  urlField="logo.url"
+  noDestroy
+/>
+```
+Set `noDestroy` to prevent accidental deletion of mandatory files.
+
+## Best Practices & Gotchas
+* Always wrap the component inside an entity subtree; otherwise it has nowhere to save data.
+* Prefer dedicated image entities (`baseField`) when you need extra metadata (width/height).
+* Supply `accept` to limit formats, e.g. `{ 'image/*': [] }`.
+* Stop event propagation in custom placeholders if you embed interactive elements (buttons, selects).
+* When using `acceptFile`, throw `RejectFileError` to display a human-friendly error.
+
+## Further Reading
+* FileField – generic version for any file type.
+* Contember Uploader – low-level upload API.
+* Form Layout components (`FormLayout`, `PersistButton`) for consistent styling.
+
+<!-- End of Generated Documentation -->

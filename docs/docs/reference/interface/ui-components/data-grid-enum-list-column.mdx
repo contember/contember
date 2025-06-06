@@ -1,0 +1,85 @@
+---
+title: DataGridEnumListColumn
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 6 -->
+<!-- Source examples: 1 -->
+<!-- Playground examples: 1 -->
+<!-- External examples: 4 -->
+<!-- Import examples: 3 -->
+
+# DataGridEnumListColumn
+
+## Overview
+`DataGridEnumListColumn` renders a table column that displays a list of enum values.
+Use it inside a `DataGridTable` to show multiple enum items per record with optional custom header, filter, and tooltip actions.
+
+## Styling Guidelines
+* All examples below use Tailwind CSS utility classes.
+* The component does not require additional Contember-specific theme classes.
+
+## Core Concepts
+* The `field` prop selects the entity column you want to render.
+* You can override the automatically generated header with the `header` prop.
+* `options` lets you map raw enum keys to human-friendly labels.
+* Without `children`, the column shows each enum value and a tooltip.
+* Provide `filter` to replace the default enum filter UI.
+
+## Quick Start
+```tsx
+import { DataGridTable, DataGridEnumListColumn } from '~/lib/datagrid'
+
+<DataGridTable className="w-full">
+  <DataGridEnumListColumn field="target" />
+</DataGridTable>
+```
+
+## Props Reference
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| field | string | Yes | — | Displayed field. |
+| header | React.ReactNode | No | — | Custom header. When omitted, the label formatter provides one. |
+| options | Record&lt;string, React.ReactNode&gt; | No | — | Enum options for value and filter formatting. Falls back to enum metadata. |
+| children | React.ReactNode | No | — | Custom cell content. Replaces the default tooltip list. |
+| filter | React.ReactNode | No | — | Custom filter component for this column. |
+| tooltipActions | React.ReactNode | No | — | Extra actions rendered inside the tooltip. |
+
+## Examples
+
+### Custom Labels and Header
+```tsx
+const targetLabels = { a: 'Admin', b: 'Basic', c: 'Contributor' }
+
+<DataGridTable className="min-w-full">
+  <DataGridEnumListColumn
+    field="target"
+    header="Target audience"
+    options={targetLabels}
+  />
+</DataGridTable>
+```
+The `options` map converts raw enum keys (`a`, `b`, `c`) into readable labels.
+
+### Replacing the Default Filter
+```tsx
+<DataGridEnumListColumn
+  field="classes"
+  filter={<MyCustomEnumFilter className="mt-2" />}
+/>
+```
+You can supply any React node as `filter`. The grid will render it in place of the built-in enum filter.
+
+## Best Practices & Gotchas
+* Always pass `options` when enum metadata is not available at runtime.
+* Keep the list of enum labels short to avoid tooltip overflow.
+* Provide a unique `header` string to improve column readability.
+* When adding large custom content through `children`, ensure the cell height remains consistent.
+
+## Further Reading
+* `DataGridEnumColumn` – single-value enum column.
+* `DataGridEnumFilter` – default filter component for enum fields.
+* `DataGridTable` – parent container that renders columns.
+* Contember Data Grid overview.
+
+<!-- End of Generated Documentation -->

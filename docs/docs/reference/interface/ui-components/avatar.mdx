@@ -1,0 +1,91 @@
+---
+title: Avatar
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 2 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 2 -->
+<!-- External examples: 0 -->
+<!-- Import examples: 1 -->
+
+# Avatar
+
+## Overview
+The `Avatar` component renders a user avatar image or a text fallback.
+It pairs with `AvatarFallback` to ensure graceful display when no image exists.
+
+## Styling Guidelines
+All examples use Tailwind CSS.
+`Avatar` has no mandatory Contember theme classes; you add any Tailwind utilities you need.
+
+## Core Concepts
+* Render an avatar container with `Avatar`.
+* Nest `AvatarFallback` for text initials or icons.
+* Pass `className` props to size and shape the avatar.
+* Provide `avatarFallbackColorString` to generate a consistent fallback color.
+
+## Quick Start
+```tsx
+import { Avatar, AvatarFallback } from '~/lib/ui/avatar'
+
+<Avatar className="h-8 w-8 rounded-full">
+  <AvatarFallback avatarFallbackColorString={userEmail}>
+    {userInitial}
+  </AvatarFallback>
+</Avatar>
+```
+
+## Props Reference
+
+### Avatar
+| Name | Type | Required | Default | Description |
+| ---- | ---- | -------- | ------- | ----------- |
+| *Inherited HTMLDivElement props* | HTMLDivElement | No | – | Any valid HTML `<div>` attribute. |
+
+### AvatarFallback
+| Name | Type | Required | Default | Description |
+| ---- | ---- | -------- | ------- | ----------- |
+| avatarFallbackColorString | string | No | – | Seed string used to derive the background color. |
+| *Inherited HTMLSpanElement props* | HTMLSpanElement | No | – | Any valid HTML `<span>` attribute. |
+
+## Sub-Components / Building Blocks
+
+### AvatarFallback
+Displays fallback content (usually initials).
+You pass `avatarFallbackColorString` for deterministic colors and any Tailwind classes via `className`.
+
+## Examples
+
+### Small icon-sized avatar
+```tsx
+<Avatar className="icon h-6 w-6 rounded-lg">
+  <AvatarFallback avatarFallbackColorString={userEmail} className="rounded-lg">
+    {userInitial}
+  </AvatarFallback>
+</Avatar>
+```
+A 24×24 px avatar that fits compact UIs like toolbars.
+
+### Medium avatar in a list
+```tsx
+<Avatar className="h-8 w-8 rounded-lg">
+  <AvatarFallback avatarFallbackColorString={userEmail} className="rounded-lg">
+    {userInitial}
+  </AvatarFallback>
+</Avatar>
+```
+Use in tables or card headers for clear visual identity.
+
+## Best Practices & Gotchas
+* Keep the avatar square; rounded borders create circles or pills.
+* Supply meaningful `avatarFallbackColorString` such as email for stable colors.
+* Always include `AvatarFallback`; images can fail to load.
+* Avoid adding interactive handlers to `Avatar`; wrap it in a button instead.
+
+## Further Reading
+* Skeleton – show loading placeholders.
+* Tooltip – pair with avatars for user names.
+* Button – wrap avatars to create profile menu triggers.
+
+<!-- End of Generated Documentation -->

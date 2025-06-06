@@ -49,7 +49,9 @@ const MultiSortableSelectDropIndicator = ({ position }: { position: 'before' | '
 export type SortableMultiSelectInputProps =
 	& {
 		field: SugaredRelativeEntityList['field']
+		/** Field name used to store sort order */
 		sortableBy: SugaredRelativeSingleField['field']
+		/** Field name used to connect the selected entity */
 		connectAt: SugaredRelativeSingleEntity['field']
 		children: ReactNode
 		options?: SugaredQualifiedEntityList['entities']
@@ -59,6 +61,13 @@ export type SortableMultiSelectInputProps =
 		initialSorting?: DataViewSortingDirections
 	}
 
+/**
+* `SortableMultiSelectInput` is the UI for the sortable multi select input.
+*
+* See more {@link MultiSelectInput}
+*
+* @group SortableMultiSelectField
+*/
 export const SortableMultiSelectInput = Component<SortableMultiSelectInputProps>(({ field, queryField, options, children, sortableBy, connectAt, placeholder, createNewForm, initialSorting }) => {
 	const id = useFormFieldId()
 	return (

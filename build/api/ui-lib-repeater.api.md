@@ -17,23 +17,29 @@ import { RepeaterProps } from '@contember/react-repeater';
 // @public
 export const DefaultRepeater: NamedExoticComponent<DefaultRepeaterProps>;
 
-// @public (undocumented)
+// @public
 export type DefaultRepeaterProps = {
     title?: ReactNode;
     addButtonPosition?: 'none' | 'after' | 'before' | 'around';
     addButtonLabel?: ReactNode;
 } & RepeaterProps;
 
-// @public (undocumented)
-export const RepeaterAddItemButton: ({ children, index }: {
+// @public
+export const RepeaterAddItemButton: ({ children, index }: RepeaterAddItemButtonProps) => JSX_2.Element;
+
+// @public
+export type RepeaterAddItemButtonProps = {
     children?: React.ReactNode;
     index?: RepeaterAddItemIndex;
-}) => JSX_2.Element;
+};
 
-// @public (undocumented)
-export const RepeaterDropIndicator: ({ position }: {
-    position: "before" | "after";
-}) => JSX_2.Element;
+// @public
+export const RepeaterDropIndicator: ({ position }: RepeaterDropIndicatorProps) => JSX_2.Element;
+
+// @public
+export type RepeaterDropIndicatorProps = {
+    position: 'before' | 'after';
+};
 
 // @public
 export const RepeaterItemActions: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLDivElement> & HTMLAttributes<HTMLDivElement> & {
@@ -42,10 +48,15 @@ children?: ReactNode;
 className?: string;
 }, "ref"> & RefAttributes<HTMLDivElement>>;
 
+// Warning: (ae-unresolved-link) The @link reference could not be resolved: The package "@contember/react-ui-lib" does not have an export "RepeaterRemoveItemTrigger"
+//
 // @public
-export const RepeaterRemoveItemButton: ({ children }: {
-    children?: React.ReactNode;
-}) => JSX_2.Element;
+export const RepeaterRemoveItemButton: ({ children }: RepeaterRemoveItemButtonProps) => JSX_2.Element;
+
+// @public
+export type RepeaterRemoveItemButtonProps = {
+    children?: ReactNode;
+};
 
 // (No @packageDocumentation comment for this package)
 

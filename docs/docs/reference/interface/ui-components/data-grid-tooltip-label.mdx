@@ -1,0 +1,77 @@
+---
+title: DataGridTooltipLabel
+---
+
+<!-- Edited by human: false -->
+<!-- Examples count: 4 -->
+<!-- Source examples: 0 -->
+<!-- Playground examples: 0 -->
+<!-- External examples: 4 -->
+<!-- Import examples: 4 -->
+
+# DataGridTooltipLabel
+
+## Overview
+DataGridTooltipLabel wraps any JSX you place inside a `DataGridHasManyTooltip`.
+It applies consistent spacing and typography so the content looks like a clickable label inside the tooltip.
+
+## Styling Guidelines
+* All examples use Tailwind classes.
+* DataGridTooltipLabel adds its own minimal styling; you do not need extra Contember theme classes.
+
+## Core Concepts
+* Tooltip labels should be visually distinct yet lightweight.
+* DataGridTooltipLabel is presentation-only; it accepts no props.
+* Use it as a direct child of `DataGridHasManyTooltip` for consistent spacing.
+* Nest any React nodes inside—text, icons, or custom preview components.
+
+## Quick Start
+```tsx
+import { DataGridHasManyTooltip, DataGridTooltipLabel } from '~/lib/datagrid'
+
+<DataGridHasManyTooltip field="orders">
+  <DataGridTooltipLabel className="text-sm text-blue-600 hover:underline">
+    View orders
+  </DataGridTooltipLabel>
+</DataGridHasManyTooltip>
+```
+
+
+## Examples
+
+### Showing related entities inside a cell
+```tsx
+<HasMany field="employees">
+  <HasOne field="profile">
+    <DataGridHasManyTooltip field="employees.profile" name="employeeProfile">
+      <DataGridTooltipLabel className="inline-flex items-center gap-1">
+        <Avatar size="2xs" />
+        <span>Profile</span>
+      </DataGridTooltipLabel>
+    </DataGridHasManyTooltip>
+  </HasOne>
+</HasMany>
+```
+The label combines an avatar and text. When clicked, the tooltip reveals filtered employee profiles.
+
+### Custom action inside tooltip
+```tsx
+<DataGridHasManyTooltip field="tasks" actions={<Button size="xs">Assign</Button>}>
+  <DataGridTooltipLabel className="text-xs font-medium text-gray-700">
+    {taskCount} tasks
+  </DataGridTooltipLabel>
+</DataGridHasManyTooltip>
+```
+The label displays a dynamic task count. The optional `actions` prop on the tooltip renders an extra button.
+
+## Best Practices & Gotchas
+* Keep the label concise; tooltips should open quickly.
+* Do not attach click handlers to the label itself—let the surrounding tooltip handle events.
+* Avoid heavy DOM inside the label; large trees slow hover performance.
+
+## Further Reading
+* DataGridHasManyTooltip
+* DataGridColumn
+* DataViewHasManyFilter
+
+<!-- End of Generated Documentation -->

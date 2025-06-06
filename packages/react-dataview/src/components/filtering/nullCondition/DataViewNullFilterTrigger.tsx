@@ -49,7 +49,7 @@ export interface DataViewNullFilterTriggerProps {
  *   - `'exclude'`: Null values are excluded from the filter.
  *   - `'none'`: The filter is not active.
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <DataViewNullFilterTrigger action="toggleInclude">
  *     <button>Include Nulls</button>

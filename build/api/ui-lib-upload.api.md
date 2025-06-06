@@ -5,14 +5,19 @@
 ```ts
 
 import { AudioFileDataExtractorProps } from '@contember/react-uploader';
+import { ButtonHTMLAttributes } from 'react';
+import { ClassAttributes } from 'react';
 import { ComponentType } from 'react';
 import { FileUrlDataExtractorProps } from '@contember/react-uploader';
+import { ForwardRefExoticComponent } from 'react';
 import { GenericFileMetadataExtractorProps } from '@contember/react-uploader';
+import { HTMLAttributes } from 'react';
 import { ImageFileDataExtractorProps } from '@contember/react-uploader';
 import { JSX as JSX_2 } from 'react/jsx-runtime';
-import * as React_2 from 'react';
+import { NamedExoticComponent } from 'react';
 import { ReactElement } from 'react';
 import { ReactNode } from 'react';
+import { RefAttributes } from 'react';
 import { SugaredRelativeSingleEntity } from '@contember/interface';
 import { VideoFileDataExtractorProps } from '@contember/react-uploader';
 
@@ -28,92 +33,95 @@ export type BaseFileViewProps = {
 };
 
 // @public (undocumented)
-export const UploadedAnyView: React_2.NamedExoticComponent<UploadedAnyViewProps>;
+export const UploadedAnyView: NamedExoticComponent<UploadedAnyViewProps>;
 
 // @public (undocumented)
 export type UploadedAnyViewProps = FileUrlDataExtractorProps & GenericFileMetadataExtractorProps & BaseFileViewProps;
 
 // @public (undocumented)
-export const UploadedAudioView: React_2.NamedExoticComponent<UploadedAudioViewProps>;
+export const UploadedAudioView: NamedExoticComponent<UploadedAudioViewProps>;
 
 // @public (undocumented)
 export type UploadedAudioViewProps = FileUrlDataExtractorProps & GenericFileMetadataExtractorProps & AudioFileDataExtractorProps & BaseFileViewProps;
 
 // @public (undocumented)
-export const UploadedImageView: React_2.NamedExoticComponent<UploadedImageViewProps>;
+export const UploadedImageView: NamedExoticComponent<UploadedImageViewProps>;
 
 // @public (undocumented)
 export type UploadedImageViewProps = FileUrlDataExtractorProps & GenericFileMetadataExtractorProps & ImageFileDataExtractorProps & BaseFileViewProps;
 
 // @public (undocumented)
-export const UploadedVideoView: React_2.NamedExoticComponent<UploadedVideoViewProps>;
+export const UploadedVideoView: NamedExoticComponent<UploadedVideoViewProps>;
 
 // @public (undocumented)
 export type UploadedVideoViewProps = FileUrlDataExtractorProps & GenericFileMetadataExtractorProps & VideoFileDataExtractorProps & BaseFileViewProps;
 
-// @public (undocumented)
-export const UploaderDropzone: ({ inactiveOnUpload, dropzonePlaceholder }: {
-    inactiveOnUpload?: boolean;
-    dropzonePlaceholder?: ReactNode;
-}) => JSX_2.Element;
+// @public
+export const UploaderDropzone: ({ inactiveOnUpload, dropzonePlaceholder }: UploaderDropzoneProps) => JSX_2.Element;
 
 // @public (undocumented)
-export const UploaderDropzoneAreaUI: React_2.ForwardRefExoticComponent<Omit<React_2.ClassAttributes<HTMLDivElement> & React_2.HTMLAttributes<HTMLDivElement> & {
-    asChild?: boolean;
-    children?: React_2.ReactNode;
-    className?: string;
+export const UploaderDropzoneAreaUI: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLDivElement> & HTMLAttributes<HTMLDivElement> & {
+asChild?: boolean;
+children?: ReactNode;
+className?: string;
 } & {
-    size?: "square" | null | undefined;
-}, "ref"> & React_2.RefAttributes<HTMLDivElement>>;
+size?: "square" | null | undefined;
+}, "ref"> & RefAttributes<HTMLDivElement>>;
+
+// @public
+export type UploaderDropzoneProps = {
+    dropzonePlaceholder?: ReactNode;
+    inactiveOnUpload?: boolean;
+};
 
 // @public (undocumented)
-export const UploaderDropzoneWrapperUI: React_2.ForwardRefExoticComponent<Omit<React_2.ClassAttributes<HTMLDivElement> & React_2.HTMLAttributes<HTMLDivElement> & {
-    asChild?: boolean;
-    children?: React_2.ReactNode;
-    className?: string;
-}, "ref"> & React_2.RefAttributes<HTMLDivElement>>;
+export const UploaderDropzoneWrapperUI: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLDivElement> & HTMLAttributes<HTMLDivElement> & {
+asChild?: boolean;
+children?: ReactNode;
+className?: string;
+}, "ref"> & RefAttributes<HTMLDivElement>>;
 
 // @public (undocumented)
-export const UploaderInactiveDropzoneUI: React_2.ForwardRefExoticComponent<Omit<React_2.ClassAttributes<HTMLDivElement> & React_2.HTMLAttributes<HTMLDivElement> & {
-    asChild?: boolean;
-    children?: React_2.ReactNode;
-    className?: string;
-}, "ref"> & React_2.RefAttributes<HTMLDivElement>>;
+export const UploaderInactiveDropzoneUI: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLDivElement> & HTMLAttributes<HTMLDivElement> & {
+asChild?: boolean;
+children?: ReactNode;
+className?: string;
+}, "ref"> & RefAttributes<HTMLDivElement>>;
 
 // @public (undocumented)
-export const UploaderItemUI: React_2.ForwardRefExoticComponent<Omit<React_2.ClassAttributes<HTMLDivElement> & React_2.HTMLAttributes<HTMLDivElement> & {
-    asChild?: boolean;
-    children?: React_2.ReactNode;
-    className?: string;
-}, "ref"> & React_2.RefAttributes<HTMLDivElement>>;
+export const UploaderItemUI: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLDivElement> & HTMLAttributes<HTMLDivElement> & {
+asChild?: boolean;
+children?: ReactNode;
+className?: string;
+}, "ref"> & RefAttributes<HTMLDivElement>>;
 
 // @public (undocumented)
-export const UploaderRepeaterDragOverlayUI: React_2.ForwardRefExoticComponent<Omit<React_2.ClassAttributes<HTMLDivElement> & React_2.HTMLAttributes<HTMLDivElement> & {
-    asChild?: boolean;
-    children?: React_2.ReactNode;
-    className?: string;
-}, "ref"> & React_2.RefAttributes<HTMLDivElement>>;
+export const UploaderRepeaterDragOverlayUI: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLDivElement> & HTMLAttributes<HTMLDivElement> & {
+asChild?: boolean;
+children?: ReactNode;
+className?: string;
+}, "ref"> & RefAttributes<HTMLDivElement>>;
 
 // @public (undocumented)
-export const UploaderRepeaterHandleUI: React_2.ForwardRefExoticComponent<Omit<React_2.ClassAttributes<HTMLButtonElement> & React_2.ButtonHTMLAttributes<HTMLButtonElement> & {
-    asChild?: boolean;
-    children?: React_2.ReactNode;
-    className?: string;
-}, "ref"> & React_2.RefAttributes<HTMLButtonElement>>;
+export const UploaderRepeaterHandleUI: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLButtonElement> & ButtonHTMLAttributes<HTMLButtonElement> & {
+asChild?: boolean;
+children?: ReactNode;
+className?: string;
+}, "ref"> & RefAttributes<HTMLButtonElement>>;
 
 // @public (undocumented)
-export const UploaderRepeaterItemsWrapperUI: React_2.ForwardRefExoticComponent<Omit<React_2.ClassAttributes<HTMLDivElement> & React_2.HTMLAttributes<HTMLDivElement> & {
-    asChild?: boolean;
-    children?: React_2.ReactNode;
-    className?: string;
-}, "ref"> & React_2.RefAttributes<HTMLDivElement>>;
+export const UploaderRepeaterItemsWrapperUI: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLDivElement> & HTMLAttributes<HTMLDivElement> & {
+asChild?: boolean;
+children?: ReactNode;
+className?: string;
+}, "ref"> & RefAttributes<HTMLDivElement>>;
 
 // @public (undocumented)
-export const UploaderRepeaterItemUI: React_2.ForwardRefExoticComponent<Omit<React_2.ClassAttributes<HTMLDivElement> & React_2.HTMLAttributes<HTMLDivElement> & {
-    asChild?: boolean;
-    children?: React_2.ReactNode;
-    className?: string;
-}, "ref"> & React_2.RefAttributes<HTMLDivElement>>;
+export const UploaderRepeaterItemUI: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLDivElement> & HTMLAttributes<HTMLDivElement> & {
+asChild?: boolean;
+children?: ReactNode;
+className?: string;
+}, "ref"> & RefAttributes<HTMLDivElement>>;
 
 // (No @packageDocumentation comment for this package)
 

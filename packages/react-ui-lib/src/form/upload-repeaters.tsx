@@ -60,6 +60,60 @@ export type ImageRepeaterFieldProps =
 	& BaseFileRepeaterFieldProps
 	& ImageFileTypeProps
 
+/**
+ * ImageRepeaterField component - Multiple image upload with sorting capabilities
+ *
+ * #### Requirements
+ * - Must be used within an Entity context (`<EntitySubTree />` or `<EntityListSubTree />`).
+ *
+ * #### Features
+ * - Handles multiple image uploads in a list format
+ * - Drag-and-drop reordering of images
+ * - Auto-generated image previews
+ * - Progress indicators during upload
+ * - Integrated removal controls
+ *
+ * #### Example: Basic usage
+ * ```tsx
+ * <ImageRepeaterField
+ *   label="Gallery Images"
+ *   field="images"
+ *   urlField="image.url"
+ *   orderBy="createdAt"
+ * />
+ * ```
+ *
+ * #### Example: With custom dropzone and actions
+ * ```tsx
+ * <ImageRepeaterField
+ *   field="imageList.items"
+ *   baseField="image"
+ *   sortableBy="order"
+ *   urlField="url"
+ *   widthField="width"
+ *   heightField="height"
+ *   fileNameField="fileName"
+ *   fileSizeField="fileSize"
+ *   fileTypeField="fileType"
+ *   lastModifiedField="lastModified"
+ *   label="Image file"
+ *   description="Some description of the image file."
+ *   dropzonePlaceholder={(
+ *     <UploaderDropzoneAreaUI className="w-60">
+ *       <UploadIcon className="w-12 h-12 text-gray-400" />
+ *       <div className="font-semibold text-sm">Drop files here</div>
+ *       <div className="text-xs">or</div>
+ *       <div className="flex gap-2 items-center text-xs">
+ *         <Button size="sm" variant="outline">Browse</Button>
+ *         <div onClick={e => e.stopPropagation()}>
+ *           <SelectImageRepeater />
+ *         </div>
+ *       </div>
+ *     </UploaderDropzoneAreaUI>
+ *   )}
+ * />
+ * ```
+ */
 export const ImageRepeaterField = Component<ImageRepeaterFieldProps>(props => <>
 	<FileRepeaterFieldInner {...props} fileType={createImageFileType(props)} renderPreview={file => {
 		return <div className="flex items-center justify-center h-40 rounded-md group relative">
@@ -77,6 +131,44 @@ export type AudioRepeaterFieldProps =
 	& BaseFileRepeaterFieldProps
 	& AudioFileTypeProps
 
+/**
+ * AudioRepeaterField component - Multiple audio file upload manager
+ *
+ * #### Requirements
+ * - Must be used within an Entity context (`<EntitySubTree />` or `<EntityListSubTree />`).
+ *
+ * #### Features
+ * - Handles ordered lists of audio files
+ * - Audio player preview for uploaded files
+ * - Supports common audio formats
+ * - File size validation
+ *
+ * #### Example: Basic usage
+ * ```tsx
+ * <AudioRepeaterField
+ *   label="Podcast Episodes"
+ *   field="episodes"
+ *   urlField="audio.url"
+ *   orderBy="createdAt"
+ * />
+ * ```
+ *
+ * #### Example: Sortable with baseField and some optional props
+ * ```tsx
+ * <AudioRepeaterField
+ *   field="episodes"
+ *   baseField="audio"
+ *   urlField="url"
+ *   sortableBy="order"
+ *   durationField="duration"
+ *   fileNameField="fileName"
+ *   fileSizeField="fileSize"
+ *   fileTypeField="fileType"
+ *   lastModifiedField="lastModified"
+ *   label="Audio file"
+ * />
+ * ```
+ */
 export const AudioRepeaterField = Component<AudioRepeaterFieldProps>(props => <>
 	<FileRepeaterFieldInner {...props} fileType={createAudioFileType(props)}>
 		{props.children ?? (
@@ -85,11 +177,48 @@ export const AudioRepeaterField = Component<AudioRepeaterFieldProps>(props => <>
 	</FileRepeaterFieldInner>
 </>)
 
-
 export type VideoRepeaterFieldProps =
 	& BaseFileRepeaterFieldProps
 	& VideoFileTypeProps
 
+/**
+ * VideoRepeaterField component - Ordered video upload collection
+ *
+ * #### Requirements
+ * - Must be used within an Entity context (`<EntitySubTree />` or `<EntityListSubTree />`).
+ *
+ * #### Features
+ * - Manages multiple video uploads
+ * - Video preview thumbnails
+ * - Drag-and-drop sequence control
+ * - Upload progress tracking
+ *
+ * #### Example: Basic usage
+ * ```tsx
+ * <VideoRepeaterField
+ *   label="Course Videos"
+ *   field="courses"
+ *   urlField="video.url"
+ *   orderBy="createdAt"
+ * />
+ * ```
+ *
+ * #### Example: Sortable with baseField and some optional props
+ * ```tsx
+ * <VideoRepeaterField
+ *   field="courses"
+ *   baseField="video"
+ *   urlField="url"
+ *   sortableBy="order"
+ *   durationField="duration"
+ *   fileNameField="fileName"
+ *   fileSizeField="fileSize"
+ *   fileTypeField="fileType"
+ *   lastModifiedField="lastModified"
+ *   label="Course Videos"
+ * />
+ * ```
+ */
 export const VideoRepeaterField = Component<VideoRepeaterFieldProps>(props => <>
 	<FileRepeaterFieldInner {...props} fileType={createVideoFileType(props)}>
 		{props.children ?? (
@@ -98,11 +227,47 @@ export const VideoRepeaterField = Component<VideoRepeaterFieldProps>(props => <>
 	</FileRepeaterFieldInner>
 </>)
 
-
 export type FileRepeaterFieldProps =
 	& BaseFileRepeaterFieldProps
 	& AnyFileTypeProps
 
+/**
+ * FileRepeaterField component - Generic multi-file upload repeater
+ *
+ * #### Requirements
+ * - Must be used within an Entity context (`<EntitySubTree />` or `<EntityListSubTree />`).
+ *
+ * #### Features
+ * - Handles any file type in a list format
+ * - File type icon display
+ * - Customizable preview components
+ * - Sortable document lists
+ *
+ * #### Example: Basic usage
+ * ```tsx
+ * <FileRepeaterField
+ *   label="Attachments"
+ *   field="attachments"
+ *   urlField="file.url"
+ *   orderBy="createdAt"
+ * />
+ * ```
+ *
+ * #### Example: Sortable with baseField and some optional props
+ * ```tsx
+ * <FileRepeaterField
+ *  field="attachments"
+ *  baseField="file"
+ *  urlField="url"
+ *  sortableBy="order"
+ *  fileNameField="fileName"
+ *  fileSizeField="fileSize"
+ *  fileTypeField="fileType"
+ *  lastModifiedField="lastModified"
+ *  label="File"
+ * />
+ * ```
+ */
 export const FileRepeaterField = Component<FileRepeaterFieldProps>(props => <>
 	<FileRepeaterFieldInner {...props} fileType={createAnyFileType(props)}>
 		{props.children ?? (

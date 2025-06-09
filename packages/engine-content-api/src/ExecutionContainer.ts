@@ -31,7 +31,7 @@ import { Client, DatabaseMetadata, SelectBuilder as DbSelectBuilder } from '@con
 import { ParsedMembership, Providers } from '@contember/schema-utils'
 import { PaginatedHasManyExecutionHandler } from './extensions/paginatedHasMany/PaginatedHasManyExecutionHandler'
 import { PaginatedHasManyFieldProvider } from './extensions/paginatedHasMany/PaginatedHasManyFieldProvider'
-import { WhereOptimizer } from './mapper/select/optimizer/WhereOptimizer'
+import { WhereOptimizer, WhereOptimizerOptions } from './mapper/select/optimizer/WhereOptimizer'
 import { ConditionOptimizer } from './mapper/select/optimizer/ConditionOptimizer'
 import { GraphQlQueryAstFactory, MutationResolver, ReadResolver, ValidationResolver } from './resolvers'
 import {
@@ -72,6 +72,7 @@ export class ExecutionContainerFactory {
 
 	constructor(
 		private readonly providers: Providers,
+		private readonly whereOptimizerOptions?: WhereOptimizerOptions,
 	) {
 	}
 
@@ -113,7 +114,7 @@ export class ExecutionContainerFactory {
 			.addService('pathFactory', () =>
 				new PathFactory())
 			.addService('whereOptimized', ({ schema }) =>
-				new WhereOptimizer(schema.model, new ConditionOptimizer()))
+				new WhereOptimizer(schema.model, new ConditionOptimizer(), this.whereOptimizerOptions))
 			.addService('whereBuilder', ({ joinBuilder, conditionBuilder, pathFactory, whereOptimized, schema }) =>
 				new WhereBuilder(
 					schema.model,

@@ -85,6 +85,10 @@ export const configTemplate: any = {
 		},
 		contentApi: {
 			schemaCacheTtlSeconds: '%?env.CONTEMBER_CONTENT_API_SCHEMA_CACHE_TTL_SECONDS::number%',
+			whereOptimizer: {
+				disable: '%?env.CONTEMBER_CONTENT_API_WHERE_OPTIMIZER_DISABLE::bool%',
+				maxCrossOptimizationInput: '%?env.CONTEMBER_CONTENT_API_MAX_CROSS_OPTIMIZATION_INPUT::number%',
+			},
 		},
 		projectGroup: {
 			domainMapping: '%?env.CONTEMBER_PROJECT_GROUP_DOMAIN_MAPPING%',

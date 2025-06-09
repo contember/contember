@@ -105,6 +105,10 @@ export const serverConfigSchema = Typesafe.partial({
 	}),
 	contentApi: Typesafe.partial({
 		schemaCacheTtlSeconds: Typesafe.integer,
+		whereOptimizer: Typesafe.partial({
+			disable: Typesafe.boolean,
+			maxCrossOptimizationInput: Typesafe.number,
+		}),
 	}),
 	logging: Typesafe.union(
 		(val): { sentry?: { dsn: string } } => Typesafe.valueAt(val, ['sentry', 'dsn']) === undefined ? {} : Typesafe.fail([]),

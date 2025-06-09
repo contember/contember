@@ -114,8 +114,8 @@ export class MasterContainerFactory {
 				new TenantContainerFactory(providers))
 			.addService('modificationHandlerFactory', () =>
 				new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap))
-			.addService('executionContainerFactory', ({ providers }) =>
-				new ExecutionContainerFactory(providers))
+			.addService('executionContainerFactory', ({ providers, serverConfig }) =>
+				new ExecutionContainerFactory(providers, serverConfig.contentApi?.whereOptimizer))
 			.addService('graphQlSchemaBuilderFactory', () =>
 				new GraphQlSchemaBuilderFactory())
 			.addService('contentQueryExecutor', ({ executionContainerFactory, graphQlSchemaBuilderFactory }) =>

@@ -18,16 +18,25 @@ export interface WhereOptimizationHints {
 
 type OptimizedOperand = Input.OptionalWhere | undefined | boolean
 
+export type WhereOptimizerOptions = {
+	disable?: boolean
+	maxCrossOptimizationInput?: number
+}
+
 export class WhereOptimizer {
 	private static eliminableRelations = new Set<Model.AnyRelationContext['type']>(['oneHasMany', 'oneHasOneInverse', 'oneHasOneOwning'])
 
 	constructor(
 		private readonly model: Model.Schema,
 		private readonly conditionOptimizer: ConditionOptimizer,
+		private readonly options?: WhereOptimizerOptions,
 	) {
 	}
 
 	public optimize(where: Input.OptionalWhere, entity: Model.Entity, { relationPath = [], evaluatedPredicates = [] }: WhereOptimizationHints = {}): Input.OptionalWhere {
+		if (this.options?.disable) {
+			return where
+		}
 		let processedRelationPath: ExtendedRelationContext[] = []
 		for (const i in relationPath) {
 			const el = relationPath[i]
@@ -134,7 +143,7 @@ export class WhereOptimizer {
 	private crossOptimize(operands: Input.OptionalWhere[], entity: Model.Entity, replacement: Input.Condition, relationPath: ExtendedRelationContext[]): (Input.OptionalWhere | boolean)[] {
 		let result: (Input.OptionalWhere | boolean)[] = operands
 		let copied = false
-		const count = result.length
+		const count = Math.min(result.length, this.options?.maxCrossOptimizationInput ?? 50)
 		for (let i = 0; i < count; i++) {
 			for (let j = 0; j < count; j++) {
 				const a = result[j]

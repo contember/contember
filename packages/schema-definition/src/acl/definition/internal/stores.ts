@@ -1,10 +1,10 @@
 import { createMetadataStore } from '../../../utils/MetadataStore'
+import { AllowDefinitionFactory } from '../permissions'
 import { Role } from '../roles'
-import { AllowDefinition } from '../permissions'
 
 export type EntityPermissionsDefinition =
-	& AllowDefinition<any>
 	& {
+		factory: AllowDefinitionFactory<any>
 		role: Role<string>
 	}
 export const allowDefinitionsStore = createMetadataStore<EntityPermissionsDefinition[]>([])

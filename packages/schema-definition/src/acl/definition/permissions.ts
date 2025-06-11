@@ -1,4 +1,4 @@
-import { Acl } from '@contember/schema'
+import { Acl, Model } from '@contember/schema'
 import { Role } from './roles'
 import { VariableDefinition } from './variables'
 import { PredicateEvaluationReference } from './references'
@@ -18,10 +18,19 @@ export interface AllowDefinition<E> {
 	delete?: true
 }
 
-export const allow = <E, R extends Role<string>>(role: R | R[], args: AllowDefinition<E>): DecoratorFunction<E> => {
+export type AllowDefinitionFactory<E> = (args: {
+	model: Model.Schema
+	entity: Model.Entity<(keyof E) & string>
+	except: (...fields: (keyof E)[]) => (keyof E)[]
+}) => AllowDefinition<E>
+
+export const allow = <E, R extends Role<string>>(role: R | R[], args: AllowDefinition<E> | AllowDefinitionFactory<E>): DecoratorFunction<E> => {
 	return (entity: EntityConstructor<E>) => {
 		(Array.isArray(role) ? role : [role]).forEach(role => {
-			allowDefinitionsStore.update(entity, val => [...val, { ...args, role }])
+			allowDefinitionsStore.update(entity, val => [...val, {
+				factory: typeof args === 'function' ? args : () => args,
+				role,
+			}])
 		})
 	}
 }

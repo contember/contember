@@ -3,12 +3,12 @@ import { JSONValue } from './json'
 
 export namespace Model {
 
-	export type Entity = {
+	export type Entity<Fields extends string = string> = {
 		readonly name: string
 		readonly primary: string
 		readonly primaryColumn: string
 		readonly tableName: string
-		readonly fields: { readonly [name: string]: AnyField }
+		readonly fields: { readonly [name in Fields]: AnyField }
 		readonly unique: Uniques
 		readonly indexes: Indexes
 		readonly view?: View

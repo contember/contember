@@ -2,6 +2,8 @@ import { Actions, Schema } from '@contember/schema'
 import { SchemaUpdater } from '../utils/schemaUpdateUtils'
 import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler'
 import deepEqual from 'fast-deep-equal'
+import { createPatch } from 'rfc6902'
+import { patchTriggerModification } from './PatchTriggerModification'
 
 export class UpdateTriggerModificationHandler implements ModificationHandler<UpdateTriggerModificationData> {
 	constructor(private readonly data: UpdateTriggerModificationData) {
@@ -40,9 +42,28 @@ export const updateTriggerModification = createModificationType({
 })
 
 export class UpdateTriggerDiffer implements Differ {
+	constructor(
+		private readonly options?: {
+			maxPatchSize?: number
+		},
+	) {
+	}
+
 	createDiff(originalSchema: Schema, updatedSchema: Schema) {
 		return Object.entries(updatedSchema.actions.triggers)
 			.filter(([name, trigger]) => originalSchema.actions.triggers[name] && !deepEqual(trigger, originalSchema.actions.triggers[name]))
-			.map(([, trigger]) => updateTriggerModification.createModification({ trigger }))
+			.map(([name, trigger]) => {
+				const originalTrigger = originalSchema.actions.triggers[name]
+
+				const patch = createPatch(originalTrigger, trigger)
+				if (patch.length <= (this.options?.maxPatchSize ?? 100)) {
+					return patchTriggerModification.createModification({
+						triggerName: name,
+						patch,
+					})
+				}
+
+				return updateTriggerModification.createModification({ trigger })
+			})
 	}
 }

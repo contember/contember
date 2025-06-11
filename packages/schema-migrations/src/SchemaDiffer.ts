@@ -109,7 +109,7 @@ export class SchemaDiffer {
 			new UpdateEntityOrderByDiffer(),
 			new UpdateTargetDiffer(),
 			new CreateTargetDiffer(),
-			new UpdateTriggerDiffer(),
+			new UpdateTriggerDiffer(this.options),
 			new CreateTriggerDiffer(),
 			new RemoveTriggerDiffer(),
 			new RemoveTargetDiffer(),

@@ -25,7 +25,7 @@ export class AclFactory {
 		const roles: Role[] = Object.values(exportedDefinitions).filter(it => it instanceof Role)
 		const variables: VariableDefinition[] = Object.values(exportedDefinitions).filter(it => it instanceof VariableDefinition)
 
-		const groupedPermissions = AclFactory.groupPermissions(entityLikeDefinition, roles)
+		const groupedPermissions = this.groupPermissions(entityLikeDefinition, roles)
 
 		return {
 			roles: Object.fromEntries(roles.map((role): [string, Acl.RolePermissions] => {
@@ -118,7 +118,7 @@ export class AclFactory {
 		}))
 	}
 
-	private static groupPermissions(entityLikeDefinition: [string, { new(): any }][], roles: Role[]): PermissionsByRoleAndEntity {
+	private groupPermissions(entityLikeDefinition: [string, { new(): any }][], roles: Role[]): PermissionsByRoleAndEntity {
 		const groupedPermissions: PermissionsByRoleAndEntity = new Map()
 		for (const [name, entity] of entityLikeDefinition) {
 			const initEntityPermissions = (role: Role): EntityPermissions => {
@@ -131,12 +131,17 @@ export class AclFactory {
 				return entityPermissions
 			}
 			const metadata: EntityPermissionsDefinition[] = allowDefinitionsStore.get(entity)
-			for (const { role, ...definition } of metadata) {
+			for (const { role, factory } of metadata) {
 				if (!roles.includes(role)) {
 					throw `Role ${role.name} used on entity ${name} is not registered. Have you exported it?`
 				}
 				const entityPermissions = initEntityPermissions(role)
-				entityPermissions.definitions.push(definition)
+				const entity = getEntity(this.model, name)
+				entityPermissions.definitions.push(factory({
+					model: this.model,
+					entity: getEntity(this.model, name),
+					except: (...fields) => (Object.keys(entity.fields)).filter(it => !fields.includes(it)),
+				}))
 			}
 		}
 

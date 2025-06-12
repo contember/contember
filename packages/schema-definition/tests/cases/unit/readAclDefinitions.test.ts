@@ -1,6 +1,6 @@
 import { expect, test } from 'bun:test'
 import { c, createSchema } from '../../../src'
-import { Acl } from '@contember/schema'
+import { Acl, Model } from '@contember/schema'
 
 namespace SimpleModel {
 	export const publicRole = c.createRole('public')
@@ -130,24 +130,24 @@ test('definition with update, create, delete predicates', () => {
 	const schema = createSchema(ModelWithModificationAcl)
 	expect(schema.acl.roles.public.entities.Book).toStrictEqual(
 		{
-		  'operations': {
-		    'create': {
-		      'isPublished': 'isPublished_eq_true',
-		      'title': 'isPublished_eq_true',
-		    },
-		    'delete': 'isPublished_eq_true',
-		    'update': {
-		      'isPublished': 'isPublished_eq_true',
-		      'title': 'isPublished_eq_true',
-		    },
-		  },
-		  'predicates': {
-		    'isPublished_eq_true': {
-		      'isPublished': {
-		        'eq': true,
-		      },
-		    },
-		  },
+			'operations': {
+				'create': {
+					'isPublished': 'isPublished_eq_true',
+					'title': 'isPublished_eq_true',
+				},
+				'delete': 'isPublished_eq_true',
+				'update': {
+					'isPublished': 'isPublished_eq_true',
+					'title': 'isPublished_eq_true',
+				},
+			},
+			'predicates': {
+				'isPublished_eq_true': {
+					'isPublished': {
+						'eq': true,
+					},
+				},
+			},
 		},
 	)
 })
@@ -174,27 +174,27 @@ test('definition with multiple predicates on a single field', () => {
 	const schema = createSchema(ModelWithMultiplePredicates)
 	expect(schema.acl.roles.public.entities.Book).toStrictEqual(
 		{
-		  'operations': {
-		    'read': {
-		      'title': 'or_isPublished_eq_false_isPub',
-		    },
-		  },
-		  'predicates': {
-		    'or_isPublished_eq_false_isPub': {
-		      'or': [
-		        {
-		          'isPublished': {
-		            'eq': false,
-		          },
-		        },
-		        {
-		          'isPublished': {
-		            'eq': true,
-		          },
-		        },
-		      ],
-		    },
-		  },
+			'operations': {
+				'read': {
+					'title': 'or_isPublished_eq_false_isPub',
+				},
+			},
+			'predicates': {
+				'or_isPublished_eq_false_isPub': {
+					'or': [
+						{
+							'isPublished': {
+								'eq': false,
+							},
+						},
+						{
+							'isPublished': {
+								'eq': true,
+							},
+						},
+					],
+				},
+			},
 		},
 	)
 })
@@ -225,42 +225,42 @@ test('definition with collision', () => {
 	const schema = createSchema(ModelWithJoinedPredicateCollision)
 	expect(schema.acl.roles.public.entities.Book).toStrictEqual(
 		{
-		  'operations': {
-		    'read': {
-		      'isPublishedLoremIpsumDolorSitAmet': 'or_isPublishedLoremIpsumDolor_1',
-		      'title': 'or_isPublishedLoremIpsumDolor',
-		    },
-		  },
-		  'predicates': {
-		    'or_isPublishedLoremIpsumDolor': {
-		      'or': [
-		        {
-		          'isPublishedLoremIpsumDolorSitAmet': {
-		            'eq': false,
-		          },
-		        },
-		        {
-		          'isPublishedLoremIpsumDolorSitAmet': {
-		            'eq': true,
-		          },
-		        },
-		      ],
-		    },
-		    'or_isPublishedLoremIpsumDolor_1': {
-		      'or': [
-		        {
-		          'isPublishedLoremIpsumDolorSitAmet': {
-		            'eq': false,
-		          },
-		        },
-		        {
-		          'isPublishedLoremIpsumDolorSitAmet': {
-		            'eq': false,
-		          },
-		        },
-		      ],
-		    },
-		  },
+			'operations': {
+				'read': {
+					'isPublishedLoremIpsumDolorSitAmet': 'or_isPublishedLoremIpsumDolor_1',
+					'title': 'or_isPublishedLoremIpsumDolor',
+				},
+			},
+			'predicates': {
+				'or_isPublishedLoremIpsumDolor': {
+					'or': [
+						{
+							'isPublishedLoremIpsumDolorSitAmet': {
+								'eq': false,
+							},
+						},
+						{
+							'isPublishedLoremIpsumDolorSitAmet': {
+								'eq': true,
+							},
+						},
+					],
+				},
+				'or_isPublishedLoremIpsumDolor_1': {
+					'or': [
+						{
+							'isPublishedLoremIpsumDolorSitAmet': {
+								'eq': false,
+							},
+						},
+						{
+							'isPublishedLoremIpsumDolorSitAmet': {
+								'eq': false,
+							},
+						},
+					],
+				},
+			},
 		},
 	)
 })
@@ -283,34 +283,34 @@ test('definition with multiple roles in single predicate', () => {
 	const schema = createSchema(ModelWithMultipleRolesForSinglePredicate)
 	expect(schema.acl.roles).toStrictEqual(
 		{
-		  'admin': {
-		    'entities': {
-		      'Book': {
-		        'operations': {
-		          'read': {
-		            'title': true,
-		          },
-		        },
-		        'predicates': {},
-		      },
-		    },
-		    'stages': '*',
-		    'variables': {},
-		  },
-		  'public': {
-		    'entities': {
-		      'Book': {
-		        'operations': {
-		          'read': {
-		            'title': true,
-		          },
-		        },
-		        'predicates': {},
-		      },
-		    },
-		    'stages': '*',
-		    'variables': {},
-		  },
+			'admin': {
+				'entities': {
+					'Book': {
+						'operations': {
+							'read': {
+								'title': true,
+							},
+						},
+						'predicates': {},
+					},
+				},
+				'stages': '*',
+				'variables': {},
+			},
+			'public': {
+				'entities': {
+					'Book': {
+						'operations': {
+							'read': {
+								'title': true,
+							},
+						},
+						'predicates': {},
+					},
+				},
+				'stages': '*',
+				'variables': {},
+			},
 		},
 	)
 })
@@ -340,36 +340,36 @@ test('definition with predicate references', () => {
 	const schema = createSchema(ModelWithAclPredicateReferences)
 	expect(schema.acl.roles.public.entities).toStrictEqual(
 		{
-		  'Book': {
-		    'operations': {
-		      'read': {
-		        'title': 'isPublished_eq_true',
-		      },
-		    },
-		    'predicates': {
-		      'isPublished_eq_true': {
-		        'isPublished': {
-		          'eq': true,
-		        },
-		      },
-		    },
-		  },
-		  'BookReview': {
-		    'operations': {
-		      'read': {
-		        'content': 'book_isPublished_eq_true',
-		      },
-		    },
-		    'predicates': {
-		      'book_isPublished_eq_true': {
-		        'book': {
-		          'isPublished': {
-		            'eq': true,
-		          },
-		        },
-		      },
-		    },
-		  },
+			'Book': {
+				'operations': {
+					'read': {
+						'title': 'isPublished_eq_true',
+					},
+				},
+				'predicates': {
+					'isPublished_eq_true': {
+						'isPublished': {
+							'eq': true,
+						},
+					},
+				},
+			},
+			'BookReview': {
+				'operations': {
+					'read': {
+						'content': 'book_isPublished_eq_true',
+					},
+				},
+				'predicates': {
+					'book_isPublished_eq_true': {
+						'book': {
+							'isPublished': {
+								'eq': true,
+							},
+						},
+					},
+				},
+			},
 		},
 	)
 })
@@ -392,27 +392,27 @@ test('definition with variables', () => {
 	const schema = createSchema(ModelWithVariables)
 	expect(schema.acl.roles.manager).toStrictEqual(
 		{
-		  'entities': {
-		    'Book': {
-		      'operations': {
-		        'read': {
-		          'title': 'id_bookId',
-		        },
-		      },
-		      'predicates': {
-		        'id_bookId': {
-		          'id': 'bookId',
-		        },
-		      },
-		    },
-		  },
-		  'stages': '*',
-		  'variables': {
-		    'bookId': {
-		      'entityName': 'Book',
-		      'type': Acl.VariableType.entity,
-		    },
-		  },
+			'entities': {
+				'Book': {
+					'operations': {
+						'read': {
+							'title': 'id_bookId',
+						},
+					},
+					'predicates': {
+						'id_bookId': {
+							'id': 'bookId',
+						},
+					},
+				},
+			},
+			'stages': '*',
+			'variables': {
+				'bookId': {
+					'entityName': 'Book',
+					'type': Acl.VariableType.entity,
+				},
+			},
 		},
 	)
 })
@@ -430,10 +430,10 @@ test('allow custom primary', () => {
 	const schema = createSchema(ModelWithAllowCustomPrimary)
 	expect(schema.acl.roles.public.entities.Book).toStrictEqual(
 		{
-		  'operations': {
-		    'customPrimary': true,
-		  },
-		  'predicates': {},
+			'operations': {
+				'customPrimary': true,
+			},
+			'predicates': {},
 		},
 	)
 })
@@ -451,10 +451,10 @@ test('allow custom primary', () => {
 	const schema = createSchema(ModelWithAllowCustomPrimaryAllRoles)
 	expect(schema.acl.roles.public.entities.Book).toStrictEqual(
 		{
-		  'operations': {
-		    'customPrimary': true,
-		  },
-		  'predicates': {},
+			'operations': {
+				'customPrimary': true,
+			},
+			'predicates': {},
 		},
 	)
 })
@@ -641,4 +641,30 @@ namespace NoRootInvalid {
 
 test('no root - invalid combo', () => {
 	expect(() => createSchema(NoRootInvalid)).toThrow('Operation update cannot be both allowed and disallowed on root on entity Book')
+})
+
+
+namespace AllowFactoryModel {
+	export const publicRole = c.createRole('public')
+
+	@c.Allow(publicRole, ({ except }) => ({
+		read: except('confidential'),
+	}))
+	export class Book {
+		title = c.stringColumn()
+		confidential = c.stringColumn()
+	}
+}
+
+test('allow with factory', () => {
+	const schema = createSchema(AllowFactoryModel)
+	expect(schema.acl.roles.public.entities.Book).toStrictEqual({
+		'operations': {
+			'read': {
+				'id': true,
+				'title': true,
+			},
+		},
+		'predicates': {},
+	})
 })

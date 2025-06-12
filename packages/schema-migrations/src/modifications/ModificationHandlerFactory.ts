@@ -30,7 +30,7 @@ import {
 import { patchValidationSchemaModification, updateValidationSchemaModification } from './validation'
 import { createIndexModification, removeIndexModification } from './indexes'
 import { updateSettingsModification } from './settings'
-import { createTriggerModification, removeTriggerModification, updateTriggerModification } from './actions'
+import { createTriggerModification, patchTriggerModification, removeTriggerModification, updateTriggerModification } from './actions'
 import { createTargetModification } from './actions/CreateTargetModification'
 import { removeTargetModification } from './actions/RemoveTargetModification'
 import { updateTargetModification } from './actions/UpdateTargetModification'
@@ -94,6 +94,7 @@ namespace ModificationHandlerFactory {
 		updateEntityOrderByModification,
 		createTriggerModification,
 		updateTriggerModification,
+		patchTriggerModification,
 		removeTriggerModification,
 		createTargetModification,
 		updateTargetModification,

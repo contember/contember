@@ -13,6 +13,7 @@ export type UniqueOptions<T> = {
 	| {
 		index: true
 		nulls?: Model.NullsDistinctBehaviour
+		method?: Model.IndexMethod
 	}
 )
 export function Unique<T>(options: UniqueOptions<T>): DecoratorFunction<T>

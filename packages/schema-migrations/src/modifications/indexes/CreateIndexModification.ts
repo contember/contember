@@ -28,8 +28,9 @@ export class CreateIndexModificationHandler implements ModificationHandler<Creat
 
 		const tableNameId = wrapIdentifier(entity.tableName)
 		const columnNameIds = columns.map(wrapIdentifier)
+		const methodClause = this.data.index.method ? ` USING ${this.data.index.method}` : ''
 
-		builder.sql(`CREATE INDEX ON ${tableNameId} (${columnNameIds.join(', ')})`)
+		builder.sql(`CREATE INDEX ON ${tableNameId}${methodClause} (${columnNameIds.join(', ')})`)
 
 		invalidateDatabaseMetadata()
 	}
@@ -47,8 +48,9 @@ export class CreateIndexModificationHandler implements ModificationHandler<Creat
 	}
 
 	describe() {
+		const methodText = this.data.index.method ? ` using ${this.data.index.method}` : ''
 		return {
-			message: `Create index(${this.data.index.fields.join(', ')}) on entity ${this.data.entityName}`,
+			message: `Create index(${this.data.index.fields.join(', ')})${methodText} on entity ${this.data.entityName}`,
 		}
 	}
 }

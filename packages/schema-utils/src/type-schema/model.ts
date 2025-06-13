@@ -169,6 +169,7 @@ const indexSchemaBase = Typesafe.intersection(
 	}),
 	Typesafe.partial({
 		name: Typesafe.string,
+		method: Typesafe.enumeration('btree', 'gin', 'gist', 'hash', 'brin', 'spgist'),
 	}),
 )
 const indexCheck: Typesafe.Equals<Model.Index, ReturnType<typeof indexSchemaBase>> = true
@@ -198,6 +199,7 @@ const uniqueIndex = Typesafe.intersection(
 	}),
 	Typesafe.partial({
 		nulls: Typesafe.enumeration('distinct', 'not distinct'),
+		method: Typesafe.enumeration('btree', 'gin', 'gist', 'hash', 'brin', 'spgist'),
 	}),
 )
 const uniqueConstraintCheck: Typesafe.Equals<Model.UniqueConstraint, ReturnType<typeof uniqueConstraint>> = true

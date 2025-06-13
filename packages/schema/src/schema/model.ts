@@ -230,13 +230,17 @@ export namespace Model {
 		readonly fields: readonly string[]
 		readonly index: true
 		readonly nulls?: NullsDistinctBehaviour // empty means distinct
+		readonly method?: IndexMethod
 	}
 
 	export type Indexes = readonly Index[]
 
+	export type IndexMethod = 'btree' | 'gin' | 'gist' | 'hash' | 'brin' | 'spgist'
+
 	export type Index = {
 		readonly fields: readonly string[]
 		readonly name?: string
+		readonly method?: IndexMethod
 	}
 
 

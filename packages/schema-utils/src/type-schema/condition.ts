@@ -34,7 +34,10 @@ const conditionSchemaInner = <T extends Json>(metadata: ResolvedColumnMetadata<T
 				lte: inner,
 				gt: inner,
 				gte: inner,
-			} : {}),
+			} : {
+				// For JSON columns, allow includes operator
+				includes: inner,
+			}),
 			...(metadata.isString !== false ? {
 				contains: Typesafe.string,
 				startsWith: Typesafe.string,

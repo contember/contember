@@ -50,11 +50,17 @@ export class ConditionBuilder {
 			gte: (builder, value) => builder.compare(columnIdentifier, Operator.gte, value),
 
 			includes: (builder, value) => {
-				const cast = columnType.type === Model.ColumnType.Enum
-					? `${Compiler.SCHEMA_PLACEHOLDER}."${columnType.columnType}"`
-					: columnType.columnType
+				if (columnType.type === Model.ColumnType.Json) {
+					// For JSON columns, use @> operator to check if JSON contains the value
+					return builder.raw(`${formatColumnIdentifier(columnIdentifier)} @> ?::jsonb`, JSON.stringify(value))
+				} else {
+					// For array columns, use @> operator with array casting
+					const cast = columnType.type === Model.ColumnType.Enum
+						? `${Compiler.SCHEMA_PLACEHOLDER}."${columnType.columnType}"`
+						: columnType.columnType
 
-				return builder.raw(`${formatColumnIdentifier(columnIdentifier)} @> ARRAY[?]::${cast}[]`, value)
+					return builder.raw(`${formatColumnIdentifier(columnIdentifier)} @> ARRAY[?]::${cast}[]`, value)
+				}
 			},
 			maxLength: (builder, value) => builder.raw(`array_length(${formatColumnIdentifier(columnIdentifier)}, 1) <= ?`, value),
 			minLength: (builder, value) => builder.raw(`array_length(${formatColumnIdentifier(columnIdentifier)}, 1) >= ?`, value),

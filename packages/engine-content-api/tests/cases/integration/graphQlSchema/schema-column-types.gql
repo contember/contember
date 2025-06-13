@@ -204,6 +204,7 @@ input JsonCondition {
   not: JsonCondition
   null: Boolean
   isNull: Boolean
+  includes: Json
 }
 
 input TimeCondition {

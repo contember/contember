@@ -77,6 +77,48 @@ export class Post {
 }
 ```
 
+#### Unique constraints with options
+
+You can specify additional options for unique constraints:
+
+```typescript
+// Basic unique constraint with timing options
+@c.Unique({
+	fields: ["locale", "slug"],
+	timing: "deferrable"
+})
+export class Post {
+	slug = c.stringColumn().notNull()
+	locale = c.stringColumn().notNull()
+}
+
+// Unique index with custom options
+@c.Unique({
+	fields: ["email"],
+	index: true,
+	nulls: "not distinct",
+	method: "btree"
+})
+export class User {
+	email = c.stringColumn()
+}
+```
+
+:::note
+PostgreSQL distinguishes between unique constraints and unique indexes, which have different properties that cannot be combined:
+
+- **Unique constraints** support timing options (`timing: "deferrable"` or `"deferred"`) but don't support nulls behavior or index method configuration
+- **Unique indexes** (when `index: true`) support nulls behavior (`"distinct"` or `"not distinct"`) and index methods, but don't support timing options
+
+Choose the appropriate type based on your needs.
+:::
+
+Available options for unique constraints:
+- `timing`: Constraint timing (`"deferrable"` or `"deferred"`) - only for constraints, not indexes
+- `index`: Set to `true` to create a unique index instead of a constraint
+- `nulls`: For unique indexes only, specify null handling (`"distinct"` or `"not distinct"`)
+- `method`: For unique indexes only, specify index method (`"btree"`, `"gin"`, `"gist"`, `"hash"`, `"brin"`, `"spgist"`)
+
 :::tip
 You can also reference relationships in `Unique`.
 :::
@@ -104,6 +146,46 @@ export class Article {
 	description = c.stringColumn()
 }
 ```
+
+#### Indexes with options
+
+You can specify additional options for indexes:
+
+```typescript
+// Index with custom method
+@c.Index({
+	fields: ['title'],
+	method: 'btree'
+})
+export class Article {
+	title = c.stringColumn()
+}
+
+// Multi-column index with options
+@c.Index({
+	fields: ['category', 'publishedAt'],
+	method: 'btree'
+})
+export class Article {
+	category = c.stringColumn()
+	publishedAt = c.dateTimeColumn()
+}
+```
+
+Available options for indexes:
+- `fields`: Array of field names to include in the index
+- `method`: Index method (`"btree"`, `"gin"`, `"gist"`, `"hash"`, `"brin"`, `"spgist"`)
+
+:::tip
+Use `gin` method for JSON columns and array/list columns as it provides efficient indexing for these data types:
+
+```typescript
+@c.Index({ fields: ['metadata'], method: 'gin' })
+export class Article {
+	metadata = c.jsonColumn()
+}
+```
+:::
 
 ### Changing column name
 

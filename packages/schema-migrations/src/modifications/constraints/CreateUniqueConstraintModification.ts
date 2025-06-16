@@ -35,7 +35,8 @@ export class CreateUniqueConstraintModificationHandler implements ModificationHa
 
 		if ('index' in this.data.unique && this.data.unique.index) {
 			const nulls = this.data.unique.nulls === 'not distinct' ? ' NULLS NOT DISTINCT' : ''
-			builder.sql(`CREATE UNIQUE INDEX ON ${tableNameId} (${columnNameIds.join(', ')})${nulls}`)
+			const methodClause = this.data.unique.method ? ` USING ${this.data.unique.method}` : ''
+			builder.sql(`CREATE UNIQUE INDEX ON ${tableNameId}${methodClause} (${columnNameIds.join(', ')})${nulls}`)
 		} else {
 			let checkModifier = ''
 			if (this.data.unique.timing === 'deferred') {

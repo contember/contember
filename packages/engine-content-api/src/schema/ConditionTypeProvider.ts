@@ -60,6 +60,9 @@ export class ConditionTypeProvider {
 						conditions.lte = { type: type }
 						conditions.gt = { type: type }
 						conditions.gte = { type: type }
+					} else {
+						// For JSON columns, add the includes operator
+						conditions.includes = { type: type }
 					}
 					if (column.type === Model.ColumnType.String) {
 						conditions.contains = { type: GraphQLString }

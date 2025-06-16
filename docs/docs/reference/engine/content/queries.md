@@ -179,23 +179,26 @@ To filter the results of a query in Contember's GraphQL API, you can use the fil
 
 ### Comparison operators
 
-| GraphQL name | Description     | Example                                                        | Supported columns
-| ------------ | --------------  | ----------------                                               | ------------
-| isNull       |  is (not) null                           | `{isNull: true}` or `{isNull: false}` | Everywhere
-| eq           |  equal to                                | `{eq: "value"}`                       | Everywhere but JSON
-| notEq        |  not equals to                           | `{notEq: "value"}`                    | Everywhere but JSON
-| in           |  is in list                              | `{in: ["A", "B"]}`                    | Everywhere but JSON
-| notIn        |  is not in list                          | `{in: ["A", "B"]}`                    | Everywhere but JSON
-| lt           |  less than                               | `{lt: 100}`                           | Everywhere but JSON
-| lte          |  less than or equals to                  | `{lte: 100}`                          | Everywhere but JSON
-| gt           |  greater than                            | `{gt: 100}`                           | Everywhere but JSON
-| gte          |  greater than or equals to               | `{gte: 100}`                          | Everywhere but JSON
-| contains     |  contains a string (case sensitive)      | `{contains: "contember"}`             | String only
-| containsCI   |  contains a string (case insensitive)    | `{containsCI: "contember"}`           | String only
-| startsWith   |  starts with a string (case sensitive)   | `{startsWith: "contember"}`           | String only
-| startsWithCI |  starts with a string (case insensitive) | `{startsWithCI: "contember"}`         | String only
-| endsWith     |  ends with a string (case sensitive)     | `{endsWith: "contember"}`             | String only
-| endsWithCI   |  ends with a string (case insensitive)   | `{endsWithCI: "contember"}`           | String only
+| GraphQL name | Description                              | Example                                | Supported columns
+| ------------ | ---------------------------------------- | -------------------------------------- | ------------
+| isNull       | is (not) null                            | `{isNull: true}` or `{isNull: false}` | All column types
+| eq           | equal to                                 | `{eq: "value"}`                       | All column types except JSON
+| notEq        | not equals to                            | `{notEq: "value"}`                    | All column types except JSON
+| in           | is in list                               | `{in: ["A", "B"]}`                    | All column types except JSON
+| notIn        | is not in list                           | `{notIn: ["A", "B"]}`                 | All column types except JSON
+| lt           | less than                                | `{lt: 100}`                           | All column types except JSON
+| lte          | less than or equals to                   | `{lte: 100}`                          | All column types except JSON
+| gt           | greater than                             | `{gt: 100}`                           | All column types except JSON
+| gte          | greater than or equals to                | `{gte: 100}`                          | All column types except JSON
+| contains     | contains a string (case sensitive)       | `{contains: "contember"}`             | String only
+| containsCI   | contains a string (case insensitive)     | `{containsCI: "contember"}`           | String only
+| startsWith   | starts with a string (case sensitive)    | `{startsWith: "contember"}`           | String only
+| startsWithCI | starts with a string (case insensitive)  | `{startsWithCI: "contember"}`         | String only
+| endsWith     | ends with a string (case sensitive)      | `{endsWith: "contember"}`             | String only
+| endsWithCI   | ends with a string (case insensitive)    | `{endsWithCI: "contember"}`           | String only
+| includes     | checks if array includes value or JSON contains value | `{includes: "value"}`     | Array/List columns and JSON columns
+| minLength    | minimum array length                     | `{minLength: 1}`                      | Array/List columns
+| maxLength    | maximum array length                     | `{maxLength: 5}`                      | Array/List columns
 
 #### Example: GraphQL type for String condition
 
@@ -220,6 +223,8 @@ input StringCondition {
   containsCI: String
   startsWithCI: String
   endsWithCI: String
+  always: Boolean
+  never: Boolean
 }
 ```
 

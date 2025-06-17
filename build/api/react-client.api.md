@@ -5,55 +5,12 @@
 ```ts
 
 import { Context } from 'react';
-import { GraphQlClient } from '@contember/client';
-import { GraphQlClient as GraphQlClient_2 } from '@contember/graphql-client';
-import type { GraphQlClientError } from '@contember/client';
-import type { GraphQlClientRequestOptions } from '@contember/client';
-import type { GraphQlClientVariables } from '@contember/client';
+import { GraphQlClient } from '@contember/graphql-client';
+import { GraphQlClientOptions } from '@contember/graphql-client';
 import { NamedExoticComponent } from 'react';
 
 // @public (undocumented)
 export const ApiBaseUrlContext: Context<string>;
-
-// @public (undocumented)
-export type ApiRequestAction<SuccessData> = {
-    type: 'uninitialize';
-} | {
-    type: 'initialize';
-} | {
-    type: 'resolveSuccessfully';
-    data: SuccessData;
-} | {
-    type: 'resolveWithError';
-    error: GraphQlClientError;
-};
-
-// @public (undocumented)
-export type ApiRequestReducer<SuccessData> = (previousState: ApiRequestState<SuccessData>, action: ApiRequestAction<SuccessData>) => ApiRequestState<SuccessData>;
-
-// @public (undocumented)
-export const apiRequestReducer: <SuccessData>(previousState: ApiRequestState<SuccessData>, action: ApiRequestAction<SuccessData>) => ApiRequestState<SuccessData>;
-
-// @public (undocumented)
-export type ApiRequestState<SuccessData> = {
-    isLoading: false;
-    isFinished: false;
-    readyState: 'uninitialized';
-} | {
-    isLoading: true;
-    isFinished: false;
-    readyState: 'pending';
-} | {
-    isLoading: false;
-    isFinished: true;
-    readyState: 'networkSuccess';
-    data: SuccessData;
-} | {
-    isLoading: false;
-    isFinished: true;
-    readyState: 'networkError';
-    data: GraphQlClientError;
-};
 
 // @public (undocumented)
 export class ClientError extends Error {
@@ -69,6 +26,8 @@ export interface ContemberClientProps {
     // (undocumented)
     apiBaseUrl: string;
     // (undocumented)
+    graphqlClientFactory?: GraphQlClientFactory;
+    // (undocumented)
     loginToken?: string;
     // (undocumented)
     project?: string;
@@ -77,6 +36,12 @@ export interface ContemberClientProps {
     // (undocumented)
     stage?: string;
 }
+
+// @public (undocumented)
+export type GraphQlClientFactory = (options: GraphQlClientOptions) => GraphQlClient;
+
+// @public (undocumented)
+export const GraphQlClientFactoryContext: Context<GraphQlClientFactory | undefined>;
 
 // @public (undocumented)
 export const LoginTokenContext: Context<string | undefined>;
@@ -107,18 +72,6 @@ export const StageSlugContext: Context<string | undefined>;
 export const useApiBaseUrl: () => string;
 
 // @public (undocumented)
-export const useApiRequest: <SuccessData>(client: GraphQlClient) => UseApiRequestResult<SuccessData>;
-
-// @public (undocumented)
-export type UseApiRequestResult<SuccessData> = [
-ApiRequestState<SuccessData>,
-(query: string, variables?: GraphQlClientVariables, options?: Omit<GraphQlClientRequestOptions, 'variables'>) => Promise<SuccessData>
-];
-
-// @public (undocumented)
-export const useContentApiRequest: <SuccessData>() => UseApiRequestResult<SuccessData>;
-
-// @public (undocumented)
 export const useContentGraphQlClient: (projectSlug: string, stageSlug: string) => GraphQlClient;
 
 // @public (undocumented)
@@ -129,6 +82,9 @@ export const useCurrentSystemGraphQlClient: () => GraphQlClient;
 
 // @public (undocumented)
 export const useGraphQlClient: (path: string) => GraphQlClient;
+
+// @public (undocumented)
+export const useGraphQlClientFactory: () => GraphQlClientFactory | undefined;
 
 // @public (undocumented)
 export const useLoginToken: () => string | undefined;
@@ -149,16 +105,10 @@ export const useSetSessionToken: () => (token: string | undefined) => void;
 export const useStageSlug: () => string | undefined;
 
 // @public (undocumented)
-export const useSystemApiRequest: <SuccessData>() => UseApiRequestResult<SuccessData>;
+export const useSystemGraphQlClient: (projectSlug: string) => GraphQlClient;
 
 // @public (undocumented)
-export const useSystemGraphQlClient: (projectSlug: string) => GraphQlClient_2;
-
-// @public (undocumented)
-export const useTenantApiRequest: <SuccessData>() => UseApiRequestResult<SuccessData>;
-
-// @public (undocumented)
-export const useTenantGraphQlClient: () => GraphQlClient_2;
+export const useTenantGraphQlClient: () => GraphQlClient;
 
 
 export * from "@contember/client";

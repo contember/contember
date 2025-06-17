@@ -30,6 +30,7 @@
   },
   "dependencies": {
     "@contember/client": "workspace:*",
+    "@contember/graphql-client": "workspace:*",
     "@contember/react-utils": "workspace:*",
     "@contember/react-richtext-renderer": "workspace:*"
   },

@@ -1,5 +1,5 @@
 import { createContext, createRequiredContext } from '@contember/react-utils'
-import { SessionTokenContextValue } from './types'
+import { GraphQlClientFactory, SessionTokenContextValue } from './types'
 
 const SessionTokenContext_ = createContext<SessionTokenContextValue>('SessionTokenContext', {
 	propsToken: undefined,
@@ -39,3 +39,9 @@ const StageSlugContext_ = createContext<string | undefined>('StageSlugContext', 
 
 export const StageSlugContext = StageSlugContext_[0]
 export const useStageSlug = StageSlugContext_[1]
+
+
+const GraphQlClientFactoryContext_ = createContext<GraphQlClientFactory | undefined>('GraphQlClientFactoryContext', undefined)
+
+export const GraphQlClientFactoryContext = GraphQlClientFactoryContext_[0]
+export const useGraphQlClientFactory = GraphQlClientFactoryContext_[1]

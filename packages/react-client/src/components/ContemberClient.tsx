@@ -1,6 +1,6 @@
 import { memo, useCallback, useMemo, useState } from 'react'
-import { ApiBaseUrlContext, LoginTokenContext, ProjectSlugContext, SessionTokenContext, SetSessionTokenContext, StageSlugContext } from '../contexts'
-import { SessionTokenContextValue } from '../types'
+import { ApiBaseUrlContext, GraphQlClientFactoryContext, LoginTokenContext, ProjectSlugContext, SessionTokenContext, SetSessionTokenContext, StageSlugContext } from '../contexts'
+import { GraphQlClientFactory, SessionTokenContextValue } from '../types'
 
 export interface ContemberClientProps {
 	apiBaseUrl: string
@@ -8,6 +8,7 @@ export interface ContemberClientProps {
 	loginToken?: string
 	project?: string
 	stage?: string
+	graphqlClientFactory?: GraphQlClientFactory
 }
 
 const sessionTokenKey = 'contember_session_token'
@@ -22,6 +23,7 @@ export const ContemberClient = memo<ContemberClientProps & { children: React.Rea
 	project,
 	sessionToken,
 	stage,
+	graphqlClientFactory,
 }) {
 	const [localStorageSessionToken, setLocalStorageSessionToken] = useLocalStorageSessionToken()
 
@@ -37,7 +39,11 @@ export const ContemberClient = memo<ContemberClientProps & { children: React.Rea
 				<SetSessionTokenContext.Provider value={setLocalStorageSessionToken}>
 					<SessionTokenContext.Provider value={sessionTokenContextValue}>
 						<ProjectSlugContext.Provider value={project}>
-							<StageSlugContext.Provider value={stage}>{children}</StageSlugContext.Provider>
+							<StageSlugContext.Provider value={stage}>
+								<GraphQlClientFactoryContext.Provider value={graphqlClientFactory}>
+									{children}
+								</GraphQlClientFactoryContext.Provider>
+							</StageSlugContext.Provider>
 						</ProjectSlugContext.Provider>
 					</SessionTokenContext.Provider>
 				</SetSessionTokenContext.Provider>

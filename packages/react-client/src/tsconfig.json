@@ -5,6 +5,8 @@
 	},
 	"references": [
 		{ "path": "../../client/src" },
+		{ "path": "../../graphql-client/src" },
+		{ "path": "../../react-utils/src" },
 		{ "path": "../../react-richtext-renderer/src" }
 	]
 }

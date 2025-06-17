@@ -56,7 +56,7 @@ export class UpdateTriggerDiffer implements Differ {
 				const originalTrigger = originalSchema.actions.triggers[name]
 
 				const patch = createPatch(originalTrigger, trigger)
-				if (patch.length <= (this.options?.maxPatchSize ?? 100)) {
+				if (patch.length <= (this.options?.maxPatchSize ?? 1000)) {
 					return patchTriggerModification.createModification({
 						triggerName: name,
 						patch,

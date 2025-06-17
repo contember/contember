@@ -44,7 +44,7 @@ export class UpdateAclSchemaDiffer implements Differ {
 			return []
 		}
 		const patch = createPatch(originalSchema.acl, updatedSchema.acl)
-		if (patch.length <= (this.options?.maxPatchSize ?? 100)) {
+		if (patch.length <= (this.options?.maxPatchSize ?? 1000)) {
 			return [patchAclSchemaModification.createModification({ patch })]
 		}
 		return [updateAclSchemaModification.createModification({ schema: updatedSchema.acl })]

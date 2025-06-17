@@ -13,7 +13,7 @@ import type { GraphQlClientVariables } from '@contember/client';
 import { NamedExoticComponent } from 'react';
 
 // @public (undocumented)
-export const ApiBaseUrlContext: Context<string | undefined>;
+export const ApiBaseUrlContext: Context<string>;
 
 // @public (undocumented)
 export type ApiRequestAction<SuccessData> = {
@@ -104,7 +104,7 @@ export const SetSessionTokenContext: Context<(token: string | undefined) => void
 export const StageSlugContext: Context<string | undefined>;
 
 // @public (undocumented)
-export const useApiBaseUrl: () => string | undefined;
+export const useApiBaseUrl: () => string;
 
 // @public (undocumented)
 export const useApiRequest: <SuccessData>(client: GraphQlClient) => UseApiRequestResult<SuccessData>;

@@ -1,7 +1,6 @@
 import { memo, useCallback, useMemo, useState } from 'react'
-import { SessionTokenContext, SessionTokenContextValue, SetSessionTokenContext } from './auth'
-import { ApiBaseUrlContext, LoginTokenContext } from './config'
-import { ProjectSlugContext, StageSlugContext } from './project'
+import { ApiBaseUrlContext, LoginTokenContext, ProjectSlugContext, SessionTokenContext, SetSessionTokenContext, StageSlugContext } from '../contexts'
+import { SessionTokenContextValue } from '../types'
 
 export interface ContemberClientProps {
 	apiBaseUrl: string

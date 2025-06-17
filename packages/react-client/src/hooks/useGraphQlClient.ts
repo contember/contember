@@ -1,7 +1,7 @@
 import { GraphQlClient } from '@contember/client'
 import { useMemo } from 'react'
-import { useSessionToken } from './auth'
-import { useApiBaseUrl } from './config'
+import { useSessionToken } from '../contexts'
+import { useApiBaseUrl } from '../contexts'
 
 export const useGraphQlClient = (path: string): GraphQlClient => {
 	const apiBaseUrl = useApiBaseUrl()

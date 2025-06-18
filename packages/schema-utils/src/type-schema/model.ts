@@ -24,6 +24,8 @@ const oneHasManyRelationSchema = Typesafe.intersection(
 	}),
 	Typesafe.partial({
 		orderBy: orderBySchema,
+		deprecationReason: Typesafe.string,
+		aliases: Typesafe.array(Typesafe.string),
 	}),
 )
 const oneHasManyRelationSchemaCheck: Typesafe.Equals<Model.OneHasManyRelation, ReturnType<typeof oneHasManyRelationSchema>> = true
@@ -38,18 +40,25 @@ const manyHasOneRelationSchema = Typesafe.intersection(
 	}),
 	Typesafe.partial({
 		inversedBy: Typesafe.string,
+		deprecationReason: Typesafe.string,
+		aliases: Typesafe.array(Typesafe.string),
 	}),
 )
 
 const manyHasOneRelationSchemaCheck: Typesafe.Equals<Model.ManyHasOneRelation, ReturnType<typeof manyHasOneRelationSchema>> = true
 
-const oneHasOneInverseRelationSchema = Typesafe.object({
-	type: Typesafe.literal(Model.RelationType.OneHasOne),
-	name: Typesafe.string,
-	target: Typesafe.string,
-	ownedBy: Typesafe.string,
-	nullable: Typesafe.boolean,
-})
+const oneHasOneInverseRelationSchema = Typesafe.intersection(
+	Typesafe.object({
+		type: Typesafe.literal(Model.RelationType.OneHasOne),
+		name: Typesafe.string,
+		target: Typesafe.string,
+		ownedBy: Typesafe.string,
+		nullable: Typesafe.boolean,
+	}), Typesafe.partial({
+		deprecationReason: Typesafe.string,
+		aliases: Typesafe.array(Typesafe.string),
+	}),
+)
 const oneHasOneInverseRelationSchemaCheck: Typesafe.Equals<Model.OneHasOneInverseRelation, ReturnType<typeof oneHasOneInverseRelationSchema>> = true
 
 
@@ -64,6 +73,8 @@ const oneHasOneOwningRelationSchema = Typesafe.intersection(
 	Typesafe.partial({
 		inversedBy: Typesafe.string,
 		orphanRemoval: Typesafe.literal(true),
+		deprecationReason: Typesafe.string,
+		aliases: Typesafe.array(Typesafe.string),
 	}),
 )
 
@@ -101,6 +112,8 @@ const manyHasManyInverseRelationSchema = Typesafe.intersection(
 	}),
 	Typesafe.partial({
 		orderBy: orderBySchema,
+		deprecationReason: Typesafe.string,
+		aliases: Typesafe.array(Typesafe.string),
 	}),
 )
 const manyHasManyInverseRelationSchemaCheck: Typesafe.Equals<Model.ManyHasManyInverseRelation, ReturnType<typeof manyHasManyInverseRelationSchema>> = true
@@ -134,6 +147,8 @@ const columnSchema = Typesafe.intersection(
 		default: Typesafe.anyJson,
 		sequence: intersectionSchema as Typesafe.Type<Model.AnyColumn['sequence']>,
 		collation: Typesafe.string as Typesafe.Type<Model.AnyColumn['collation']>,
+		deprecationReason: Typesafe.string,
+		aliases: Typesafe.array(Typesafe.string),
 	}),
 )
 const columnSchemaCheck: Typesafe.Equals<Model.AnyColumn, ReturnType<typeof columnSchema>> = true

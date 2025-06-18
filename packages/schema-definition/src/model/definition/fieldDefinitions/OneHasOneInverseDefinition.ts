@@ -10,7 +10,15 @@ export class OneHasOneInverseDefinition extends FieldDefinition<OneHasOneInverse
 		return this.withOption('nullable', false)
 	}
 
-	createField({ name, conventions, entityRegistry }: CreateFieldContext): Model.AnyField {
+	public deprecated(deprecationReason?: string): OneHasOneInverseDefinition {
+		return this.withOption('deprecationReason', deprecationReason || 'This field is deprecated')
+	}
+
+	public alias(...aliases: string[]): OneHasOneInverseDefinition {
+		return this.withOption('aliases', aliases)
+	}
+
+	public createField({ name, conventions, entityRegistry }: CreateFieldContext): Model.AnyField {
 		const options = this.options
 		return {
 			name: name,
@@ -18,6 +26,8 @@ export class OneHasOneInverseDefinition extends FieldDefinition<OneHasOneInverse
 			target: entityRegistry.getName(options.target),
 			type: Model.RelationType.OneHasOne,
 			nullable: options.nullable === undefined ? true : options.nullable,
+			...(options.aliases !== undefined ? { aliases: options.aliases } : {}),
+			...(options.deprecationReason !== undefined ? { deprecationReason: options.deprecationReason } : {}),
 		}
 	}
 
@@ -36,4 +46,6 @@ export type OneHasOneInverseDefinitionOptions = {
 	target: RelationTarget
 	ownedBy: string
 	nullable?: boolean
+	aliases?: string[]
+	deprecationReason?: string
 }

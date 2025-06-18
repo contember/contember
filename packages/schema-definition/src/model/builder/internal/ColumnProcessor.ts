@@ -25,6 +25,8 @@ export default class ColumnProcessor implements FieldProcessor<ColumnBuilder.Opt
 			name: fieldName,
 			columnName: options.columnName || this.conventions.getColumnName(fieldName),
 			nullable: options.nullable === undefined ? true : options.nullable,
+			...(options.aliases !== undefined ? { aliases: options.aliases } : {}),
+			...(options.deprecationReason !== undefined ? { deprecationReason: options.deprecationReason } : {}),
 		}
 		if (type === Model.ColumnType.Enum) {
 			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion

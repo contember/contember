@@ -41,7 +41,15 @@ class OneHasManyBuilder<O extends PartialOptions<never> = PartialOptions<never>>
 		return this.withOption('orderBy', [...(this.options.orderBy || []), { path, direction }])
 	}
 
-	getOption(): O {
+	public alias(...aliases: string[]): OneHasManyBuilder<O> {
+		return this.withOption('aliases', aliases)
+	}
+
+	public deprecated(deprecationReason: string): OneHasManyBuilder<O> {
+		return this.withOption('deprecationReason', deprecationReason)
+	}
+
+	public getOption(): O {
 		return this.options
 	}
 
@@ -60,6 +68,8 @@ namespace OneHasManyBuilder {
 		ownerJoiningColumn?: Partial<Model.JoiningColumn>
 		ownerNullable?: boolean
 		orderBy?: Model.OrderBy[]
+		aliases?: string[]
+		deprecationReason?: string
 	}
 }
 

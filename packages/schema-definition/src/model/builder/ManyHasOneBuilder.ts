@@ -32,7 +32,15 @@ class ManyHasOneBuilder<O extends PartialOptions<never> = PartialOptions<never>>
 		return this.withOption('nullable', false)
 	}
 
-	getOption(): O {
+	public alias(...aliases: string[]): ManyHasOneBuilder<O> {
+		return this.withOption('aliases', aliases)
+	}
+
+	public deprecated(deprecationReason: string): ManyHasOneBuilder<O> {
+		return this.withOption('deprecationReason', deprecationReason)
+	}
+
+	public getOption(): O {
 		return this.options
 	}
 
@@ -50,6 +58,8 @@ namespace ManyHasOneBuilder {
 		inversedBy?: string
 		joiningColumn?: Partial<Model.JoiningColumn>
 		nullable?: boolean
+		aliases?: string[]
+		deprecationReason?: string
 	}
 }
 

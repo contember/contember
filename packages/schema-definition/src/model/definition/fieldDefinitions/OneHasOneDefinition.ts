@@ -34,7 +34,15 @@ export class OneHasOneDefinition extends FieldDefinition<OneHasOneDefinitionOpti
 		return this.withOption('nullable', false)
 	}
 
-	removeOrphan(): OneHasOneDefinition {
+	public deprecated(deprecationReason?: string): OneHasOneDefinition {
+		return this.withOption('deprecationReason', deprecationReason || 'This field is deprecated')
+	}
+
+	public alias(...aliases: string[]): OneHasOneDefinition {
+		return this.withOption('aliases', aliases)
+	}
+
+	public removeOrphan(): OneHasOneDefinition {
 		return this.withOption('orphanRemoval', true)
 	}
 
@@ -56,6 +64,8 @@ export class OneHasOneDefinition extends FieldDefinition<OneHasOneDefinitionOpti
 				onDelete: joiningColumn.onDelete || Model.OnDelete.restrict,
 			},
 			...(options.orphanRemoval ? { orphanRemoval: true } : {}),
+			...(options.aliases !== undefined ? { aliases: options.aliases } : {}),
+			...(options.deprecationReason !== undefined ? { deprecationReason: options.deprecationReason } : {}),
 		}
 	}
 
@@ -75,4 +85,6 @@ export type OneHasOneDefinitionOptions = {
 	joiningColumn?: Partial<Model.JoiningColumn>
 	nullable?: boolean
 	orphanRemoval?: true
+	aliases?: string[]
+	deprecationReason?: string
 }

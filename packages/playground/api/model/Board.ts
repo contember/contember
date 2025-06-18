@@ -3,11 +3,11 @@ import { c } from '@contember/schema-definition'
 export const BoardTaskStatus = c.createEnum('backlog', 'todo', 'inProgress', 'done')
 
 export class BoardTask {
-	title = c.stringColumn().notNull()
+	title = c.stringColumn().notNull().alias('name')
 	description = c.stringColumn()
 	status = c.enumColumn(BoardTaskStatus)
 	assignee = c.manyHasOne(BoardUser).setNullOnDelete()
-	tags = c.manyHasMany(BoardTag)
+	tags = c.manyHasMany(BoardTag).alias('labels')
 	order = c.intColumn()
 }
 

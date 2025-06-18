@@ -21,7 +21,15 @@ export class ManyHasManyDefinition extends FieldDefinition<ManyHasManyDefinition
 		return this.withOption('orderBy', [...(this.options.orderBy || []), { path, direction: direction as Model.OrderDirection }])
 	}
 
-	createField({ name, conventions, entityName, entityRegistry, strictDefinitionValidator }: CreateFieldContext): Model.AnyField {
+	public deprecated(deprecationReason?: string): ManyHasManyDefinition {
+		return this.withOption('deprecationReason', deprecationReason || 'This field is deprecated')
+	}
+
+	public alias(...aliases: string[]): ManyHasManyDefinition {
+		return this.withOption('aliases', aliases)
+	}
+
+	public createField({ name, conventions, entityName, entityRegistry, strictDefinitionValidator }: CreateFieldContext): Model.AnyField {
 		const options = this.options
 		const columnNames = conventions.getJoiningTableColumnNames(
 			entityName,
@@ -46,6 +54,8 @@ export class ManyHasManyDefinition extends FieldDefinition<ManyHasManyDefinition
 			target: entityRegistry.getName(options.target),
 			joiningTable: joiningTable,
 			...(options.orderBy ? { orderBy: options.orderBy } : {}),
+			...(options.aliases !== undefined ? { aliases: options.aliases } : {}),
+			...(options.deprecationReason !== undefined ? { deprecationReason: options.deprecationReason } : {}),
 		}
 	}
 
@@ -65,4 +75,6 @@ export type ManyHasManyDefinitionOptions = {
 	inversedBy?: string
 	joiningTable?: Partial<Model.JoiningTable>
 	orderBy?: Model.OrderBy[]
+	aliases?: string[]
+	deprecationReason?: string
 }

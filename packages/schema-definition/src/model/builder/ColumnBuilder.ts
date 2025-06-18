@@ -43,7 +43,15 @@ class ColumnBuilder<O extends PartialColumnOptions<never> = PartialColumnOptions
 		return new ColumnBuilder<O>({ ...(this.options as object), typeAlias } as O)
 	}
 
-	getOption(): O {
+	public alias(...aliases: string[]): ColumnBuilder<O> {
+		return new ColumnBuilder<O>({ ...this.options, aliases } as O)
+	}
+
+	public deprecated(deprecationReason: string): ColumnBuilder<O> {
+		return new ColumnBuilder<O>({ ...this.options, deprecationReason } as O)
+	}
+
+	public getOption(): O {
 		return this.options
 	}
 }
@@ -61,6 +69,8 @@ namespace ColumnBuilder {
 		nullable?: boolean
 		primary?: boolean
 		typeAlias?: string
+		aliases?: string[]
+		deprecationReason?: string
 	}
 }
 

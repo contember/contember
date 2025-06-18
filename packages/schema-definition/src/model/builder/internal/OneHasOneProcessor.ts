@@ -40,6 +40,8 @@ export default class OneHasOneProcessor implements FieldProcessor<OneHasOneBuild
 			target: entityName,
 			type: Model.RelationType.OneHasOne,
 			nullable: options.inverseNullable === undefined ? true : options.inverseNullable,
+			...(options.aliases !== undefined ? { aliases: options.aliases } : {}),
+			...(options.deprecationReason !== undefined ? { deprecationReason: options.deprecationReason } : {}),
 		}
 	}
 
@@ -57,6 +59,8 @@ export default class OneHasOneProcessor implements FieldProcessor<OneHasOneBuild
 				onDelete: joiningColumn.onDelete || Model.OnDelete.restrict,
 			},
 			...(options.orphanRemoval ? { orphanRemoval: true } : {}),
+			...(options.aliases !== undefined ? { aliases: options.aliases } : {}),
+			...(options.deprecationReason !== undefined ? { deprecationReason: options.deprecationReason } : {}),
 		}
 	}
 }

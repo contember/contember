@@ -26,7 +26,7 @@ describe('printJsValue', () => {
 		expect(printJsValue([1, 2, 3])).toEqual(`[1, 2, 3]`)
 	})
 	test('block array', () => {
-		expect(printJsValue([1, 2, 3], () => true)).toEqual(
+		expect(printJsValue([1, 2, 3], { indentDecider: () => true })).toEqual(
 			`[
 	1,
 	2,
@@ -39,7 +39,7 @@ describe('printJsValue', () => {
 	})
 
 	test('block object', () => {
-		expect(printJsValue({ a: 1, b: 2 }, () => true)).toEqual(
+		expect(printJsValue({ a: 1, b: 2 }, { indentDecider: () => true })).toEqual(
 			`{
 	a: 1,
 	b: 2,
@@ -47,7 +47,7 @@ describe('printJsValue', () => {
 	})
 
 	test('nested block object', () => {
-		expect(printJsValue({ a: 1, b: { c: { d: { e: 1 } } } }, () => true)).toEqual(
+		expect(printJsValue({ a: 1, b: { c: { d: { e: 1 } } } }, { indentDecider: () => true })).toEqual(
 			`{
 	a: 1,
 	b: {
@@ -62,7 +62,7 @@ describe('printJsValue', () => {
 
 
 	test('one level nested block object', () => {
-		expect(printJsValue({ a: 1, b: { c: { d: { e: 1 } } } }, (_, path) => path.length === 0)).toEqual(
+		expect(printJsValue({ a: 1, b: { c: { d: { e: 1 } } } }, { indentDecider: (_, path) => path.length === 0 })).toEqual(
 			`{
 	a: 1,
 	b: { c: { d: { e: 1 } } },
@@ -70,7 +70,7 @@ describe('printJsValue', () => {
 	})
 
 	test('nested block object and arr', () => {
-		expect(printJsValue({ a: 1, b: [2, { c: 4 }, [5, 6]] }, () => true)).toEqual(
+		expect(printJsValue({ a: 1, b: [2, { c: 4 }, [5, 6]] }, { indentDecider: () => true })).toEqual(
 			`{
 	a: 1,
 	b: [

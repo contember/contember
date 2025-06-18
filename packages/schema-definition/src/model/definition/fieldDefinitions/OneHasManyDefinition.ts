@@ -12,7 +12,16 @@ export class OneHasManyDefinition extends FieldDefinition<OneHasManyDefinitionOp
 		const path = typeof field === 'string' ? [field] : field
 		return this.withOption('orderBy', [...(this.options.orderBy || []), { path, direction: direction as Model.OrderDirection }])
 	}
-	createField({ name, entityRegistry }: CreateFieldContext): Model.AnyField {
+
+	public deprecated(deprecationReason?: string): OneHasManyDefinition {
+		return this.withOption('deprecationReason', deprecationReason || 'This field is deprecated')
+	}
+
+	public alias(...aliases: string[]): OneHasManyDefinition {
+		return this.withOption('aliases', aliases)
+	}
+
+	public createField({ name, entityRegistry }: CreateFieldContext): Model.AnyField {
 		const options = this.options
 		return {
 			name: name,
@@ -20,6 +29,8 @@ export class OneHasManyDefinition extends FieldDefinition<OneHasManyDefinitionOp
 			type: Model.RelationType.OneHasMany,
 			target: entityRegistry.getName(options.target),
 			...(options.orderBy ? { orderBy: options.orderBy } : {}),
+			...(options.aliases !== undefined ? { aliases: options.aliases } : {}),
+			...(options.deprecationReason !== undefined ? { deprecationReason: options.deprecationReason } : {}),
 		}
 	}
 
@@ -37,4 +48,6 @@ export type OneHasManyDefinitionOptions = {
 	target: RelationTarget
 	ownedBy: string
 	orderBy?: Model.OrderBy[]
+	aliases?: string[]
+	deprecationReason?: string
 }

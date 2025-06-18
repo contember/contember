@@ -45,7 +45,16 @@ class OneHasOneBuilder<O extends PartialOptions<never> = PartialOptions<never>> 
 		return this.withOption('orphanRemoval', true)
 	}
 
-	getOption(): O {
+	public alias(...aliases: string[]): OneHasOneBuilder<O> {
+		return this.withOption('aliases', aliases)
+	}
+
+	public deprecated(deprecationReason: string): OneHasOneBuilder<O> {
+		return this.withOption('deprecationReason', deprecationReason)
+	}
+
+
+	public getOption(): O {
 		return this.options
 	}
 
@@ -65,6 +74,8 @@ namespace OneHasOneBuilder {
 		nullable?: boolean
 		inverseNullable?: boolean
 		orphanRemoval?: true
+		aliases?: string[]
+		deprecationReason?: string
 	}
 }
 

@@ -65,6 +65,8 @@ export default class ManyHasManyProcessor implements FieldProcessor<ManyHasManyB
 			target: options.target,
 			joiningTable: joiningTable,
 			...(options.orderBy ? { orderBy: options.orderBy } : {}),
+			...(options.aliases !== undefined ? { aliases: options.aliases } : {}),
+			...(options.deprecationReason !== undefined ? { deprecationReason: options.deprecationReason } : {}),
 		}
 	}
 }

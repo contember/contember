@@ -51,9 +51,7 @@ interface SidebarProviderProps extends PropsWithChildren {
 
 const [ctx, useSidebar] = createRequiredContext<SidebarContext>('SidebarContext')
 
-export const SidebarProvider = ({
-	defaultOpen = true, open: openProp, onOpenChange, children,
-}: SidebarProviderProps) => {
+export const SidebarProvider = ({ defaultOpen = true, open: openProp, onOpenChange, children }: SidebarProviderProps) => {
 	const isMobile = useIsMobile()
 	const [openMobile, setOpenMobile] = useState(false)
 	const [_open, _setOpen] = useState(defaultOpen)

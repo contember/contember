@@ -1,0 +1,636 @@
+{
+  "metadata": {
+    "toolPackage": "@microsoft/api-extractor",
+    "toolVersion": "7.52.8",
+    "schemaVersion": 1011,
+    "oldestForwardsCompatibleVersion": 1001,
+    "tsdocConfig": {
+      "$schema": "https://developer.microsoft.com/json-schemas/tsdoc/v0/tsdoc.schema.json",
+      "noStandardTags": true,
+      "tagDefinitions": [
+        {
+          "tagName": "@alpha",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@beta",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@defaultValue",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@decorator",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@deprecated",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@eventProperty",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@example",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@experimental",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@inheritDoc",
+          "syntaxKind": "inline"
+        },
+        {
+          "tagName": "@internal",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@label",
+          "syntaxKind": "inline"
+        },
+        {
+          "tagName": "@link",
+          "syntaxKind": "inline",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@override",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@packageDocumentation",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@param",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@privateRemarks",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@public",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@readonly",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@remarks",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@returns",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@sealed",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@see",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@throws",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@typeParam",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@virtual",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@group",
+          "syntaxKind": "block"
+        }
+      ],
+      "reportUnsupportedHtmlElements": false
+    }
+  },
+  "kind": "Package",
+  "canonicalReference": "@contember/react-ui-lib!",
+  "docComment": "",
+  "name": "@contember/react-ui-lib",
+  "preserveMemberOrder": false,
+  "members": [
+    {
+      "kind": "EntryPoint",
+      "canonicalReference": "@contember/react-ui-lib!",
+      "name": "",
+      "preserveMemberOrder": false,
+      "members": [
+        {
+          "kind": "Function",
+          "canonicalReference": "@contember/react-ui-lib!Binding:function(1)",
+          "docComment": "/**\n * Props {@link BindingProps}.\n *\n * `Binding` component - Core data management wrapper for Contember applications\n *\n * #### Subcomponents - {@link NavigationGuardDialog}: Prevents accidental navigation with unsaved changes\n *\n * #### Example\n * ```tsx\n * <Binding>\n *   <EntitySubTree entity=\"Project(id: $id)\">\n *     <ArticleForm />\n *   </EntitySubTree>\n * </Binding>\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "Binding: ({ children }: "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    children: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react/jsx-runtime\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "JSX.Element",
+              "canonicalReference": "@types/react!JSX.Element:interface"
+            }
+          ],
+          "fileUrlPath": "src/binding/binding.tsx",
+          "returnTypeTokenRange": {
+            "startIndex": 5,
+            "endIndex": 7
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "{ children }",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 4
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "Binding"
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!BindingProps:type",
+          "docComment": "/**\n * Props for the {@link Binding} component.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type BindingProps = "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    children: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/binding/binding.tsx",
+          "releaseTag": "Public",
+          "name": "BindingProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 4
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!DeleteEntityDialog:var",
+          "docComment": "/**\n * Props {@link DeleteEntityDialogProps}.\n *\n * `DeleteEntityDialog` component - Confirmation dialog for entity deletion\n *\n * Provides a user-friendly confirmation flow before deleting entities while handling persistence and redirects\n *\n * #### Example: Basic usage\n * ```tsx\n * <DeleteEntityDialog\n *   trigger={<Button>Delete User</Button>}\n * />\n * ```\n *\n * #### Example: With delayed persistence\n * ```tsx\n * <DeleteEntityDialog\n *   immediatePersist={false}\n *   trigger={<Button>Mark for Deletion</Button>}\n * />\n * ```\n *\n * #### Example: With redirect\n * ```tsx\n * <DeleteEntityDialog\n *   onSuccessRedirectTo=\"users\"\n *   trigger={<Button variant=\"destructive\">Delete</Button>}\n * />\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "DeleteEntityDialog: "
+            },
+            {
+              "kind": "Reference",
+              "text": "FC",
+              "canonicalReference": "@types/react!React.FC:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "DeleteEntityDialogProps",
+              "canonicalReference": "@contember/react-ui-lib!DeleteEntityDialogProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            }
+          ],
+          "fileUrlPath": "src/binding/delete.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "DeleteEntityDialog",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 5
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!DeleteEntityDialogProps:type",
+          "docComment": "/**\n * Props for {@link DeleteEntityDialog} component.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type DeleteEntityDialogProps = "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    trigger: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactElement",
+              "canonicalReference": "@types/react!React.ReactElement:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    immediatePersist?: boolean;\n    onSuccessRedirectTo?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "RoutingLinkTarget",
+              "canonicalReference": "@contember/react-ui-lib!~RoutingLinkTarget:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/binding/delete.tsx",
+          "releaseTag": "Public",
+          "name": "DeleteEntityDialogProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 6
+          }
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@contember/react-ui-lib!IdentityLoader:function(1)",
+          "docComment": "/**\n * Props {@link IdentityLoaderProps}.\n *\n * `IdentityLoader` component manages the loading state of user identity and renders appropriate UI based on state.\n *\n * This component handles different identity states, such as loading, failure, and successful authentication, ensuring a smooth user experience.\n *\n * #### Example: Wrapping an authenticated component\n * ```tsx\n * <IdentityLoader>\n *   <Dashboard />\n * </IdentityLoader>\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "IdentityLoader: ({ children }: "
+            },
+            {
+              "kind": "Reference",
+              "text": "IdentityLoaderProps",
+              "canonicalReference": "@contember/react-ui-lib!IdentityLoaderProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react/jsx-runtime\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "JSX.Element",
+              "canonicalReference": "@types/react!JSX.Element:interface"
+            }
+          ],
+          "fileUrlPath": "src/binding/identity.tsx",
+          "returnTypeTokenRange": {
+            "startIndex": 3,
+            "endIndex": 5
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "{ children }",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "IdentityLoader"
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!IdentityLoaderProps:type",
+          "docComment": "/**\n * Props for {@link IdentityLoader} component.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type IdentityLoaderProps = "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    children: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/binding/identity.tsx",
+          "releaseTag": "Public",
+          "name": "IdentityLoaderProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 4
+          }
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@contember/react-ui-lib!NavigationGuardDialog:function(1)",
+          "docComment": "/**\n * `NavigationGuardDialog` component prompts users with a confirmation dialog when attempting to navigate away from a page with unsaved changes.\n *\n * This component integrates with {@link useBlockNavigationOnDirtyState} to prevent accidental data loss. The user can choose to save, discard, or cancel the navigation attempt.\n *\n * #### Example: Basic Usage\n * ```tsx\n * <NavigationGuardDialog />\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "NavigationGuardDialog: () => "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react/jsx-runtime\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "JSX.Element",
+              "canonicalReference": "@types/react!JSX.Element:interface"
+            }
+          ],
+          "fileUrlPath": "src/binding/navigation-guard-dialog.tsx",
+          "returnTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 3
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [],
+          "name": "NavigationGuardDialog"
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@contember/react-ui-lib!PersistButton:function(1)",
+          "docComment": "/**\n * `PersistButton` is a button component that triggers a persistence action (saves unsaved data).\n *\n * #### Used hooks - {@link usePersistSuccessHandler}: Handles success feedback after persistence\n *\n * #### Example: Basic usage\n * ```tsx\n * <PersistButton />\n * ```\n *\n * #### Example: Custom label\n * ```tsx\n * <PersistButton label=\"Save Article\" />\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "PersistButton: ({ label }: "
+            },
+            {
+              "kind": "Reference",
+              "text": "PersistButtonProps",
+              "canonicalReference": "@contember/react-ui-lib!PersistButtonProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react/jsx-runtime\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "JSX.Element",
+              "canonicalReference": "@types/react!JSX.Element:interface"
+            }
+          ],
+          "fileUrlPath": "src/binding/persist.tsx",
+          "returnTypeTokenRange": {
+            "startIndex": 3,
+            "endIndex": 5
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "{ label }",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "PersistButton"
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!PersistButtonProps:type",
+          "docComment": "/**\n * Props for the {@link PersistButton} component.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type PersistButtonProps = "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    label?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/binding/persist.tsx",
+          "releaseTag": "Public",
+          "name": "PersistButtonProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 4
+          }
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@contember/react-ui-lib!usePersistErrorHandler:function(1)",
+          "docComment": "/**\n * A hook `usePersistErrorHandler` that handles persistence errors by showing appropriate toast notifications.\n *\n * #### Returns Callback function to handle persistence errors\n *\n * #### Example\n * ```tsx\n * const handleError = usePersistErrorHandler()\n *\n * try {\n *   await persist()\n * } catch (error) {\n *   handleError(error)\n * }\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "usePersistErrorHandler: () => "
+            },
+            {
+              "kind": "Content",
+              "text": "(result: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ErrorPersistResult",
+              "canonicalReference": "@contember/react-ui-lib!~ErrorPersistResult:type"
+            },
+            {
+              "kind": "Content",
+              "text": ") => void"
+            }
+          ],
+          "fileUrlPath": "src/binding/hooks.tsx",
+          "returnTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 4
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [],
+          "name": "usePersistErrorHandler"
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@contember/react-ui-lib!usePersistFeedbackHandlers:function(1)",
+          "docComment": "/**\n * A hook `usePersistFeedbackHandlers` that provides handlers for persistence feedback. Currently returns success handler. Used in {@link usePersistWithFeedback}.\n *\n * #### Returns Object containing persistence feedback handlers\n *\n * #### Example\n * ```tsx\n * const { onPersistSuccess } = usePersistFeedbackHandlers()\n *\n * persistData().then(onPersistSuccess)\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "usePersistFeedbackHandlers: () => "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    onPersistSuccess: (result: "
+            },
+            {
+              "kind": "Reference",
+              "text": "SuccessfulPersistResult",
+              "canonicalReference": "@contember/react-ui-lib!~SuccessfulPersistResult:type"
+            },
+            {
+              "kind": "Content",
+              "text": ") => void;\n}"
+            }
+          ],
+          "fileUrlPath": "src/binding/hooks.tsx",
+          "returnTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 4
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [],
+          "name": "usePersistFeedbackHandlers"
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@contember/react-ui-lib!usePersistSuccessHandler:function(1)",
+          "docComment": "/**\n * A hook `usePersistSuccessHandler` that handles successful persistence by showing appropriate toast notifications.\n *\n * ### Returns Callback function to handle successful persistence\n *\n * #### Example\n * ```tsx\n * const handleSuccess = usePersistSuccessHandler()\n *\n * persistData().then(result => handleSuccess(result))\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "usePersistSuccessHandler: () => "
+            },
+            {
+              "kind": "Content",
+              "text": "(result: "
+            },
+            {
+              "kind": "Reference",
+              "text": "SuccessfulPersistResult",
+              "canonicalReference": "@contember/react-ui-lib!~SuccessfulPersistResult:type"
+            },
+            {
+              "kind": "Content",
+              "text": ") => void"
+            }
+          ],
+          "fileUrlPath": "src/binding/hooks.tsx",
+          "returnTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 4
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [],
+          "name": "usePersistSuccessHandler"
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@contember/react-ui-lib!usePersistWithFeedback:function(1)",
+          "docComment": "/**\n * A hook `usePersistWithFeedback` that combines persistence with automatic feedback notifications. Triggers data persistence and shows success/error toasts.\n *\n * #### Returns A callback function that triggers persistence with feedback\n *\n * #### Example\n * ```tsx\n * const SaveButton = () => {\n *   const persistWithFeedback = usePersistWithFeedback()\n *\n *   return (\n *     <button onClick={() => persistWithFeedback()}>\n *       Save changes\n *     </button>\n *   )\n * }\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "usePersistWithFeedback: () => "
+            },
+            {
+              "kind": "Content",
+              "text": "() => "
+            },
+            {
+              "kind": "Reference",
+              "text": "Promise",
+              "canonicalReference": "!Promise:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<void | null>"
+            }
+          ],
+          "fileUrlPath": "src/binding/hooks.tsx",
+          "returnTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 4
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [],
+          "name": "usePersistWithFeedback"
+        }
+      ]
+    }
+  ]
+}

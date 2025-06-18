@@ -44,7 +44,7 @@ export interface BlockRepeaterAddItemTriggerProps {
  * ## Props {@link BlockRepeaterAddItemTriggerProps}
  * - type, ?index, ?preprocess, children
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <BlockRepeaterAddItemTrigger type="image" index="first">
  *     <button>Add Image</button>

@@ -1,9 +1,21 @@
+import {
+	ChangeMyPasswordFormErrorCode,
+	CreateApiKeyFormErrorCode,
+	CreateSessionTokenFormErrorCode,
+	InviteFormErrorCode,
+	LoginFormErrorCode,
+	OtpConfirmFormErrorCode,
+	OtpPrepareFormErrorCode,
+	PasswordResetFormErrorCode,
+	PasswordResetRequestFormErrorCode,
+	PasswordlessSignInFormErrorCode,
+	PasswordlessSignInInitFormErrorCode,
+	UpdateProjectMemberFormErrorCode,
+} from '@contember/react-client-tenant'
 import { TextFilterArtifactsMatchMode } from '@contember/react-dataview'
-import { InviteErrorCodes } from './tenant/hooks/useInvite'
 import { UploaderErrorType } from '@contember/react-uploader'
-import { ChangeMyPasswordFormErrorCode, CreateApiKeyFormErrorCode } from '@contember/interface'
-import { InviteFormErrorCode, LoginFormErrorCode, OtpPrepareFormErrorCode, OtpConfirmFormErrorCode, PasswordResetFormErrorCode, PasswordResetRequestFormErrorCode, UpdateProjectMemberFormErrorCode, PasswordlessSignInInitFormErrorCode, PasswordlessSignInFormErrorCode } from '@contember/react-identity'
-import { ActivatePasswordlessOtpErrorCode, WeakPasswordReason } from '@contember/graphql-client-tenant'
+import { InviteErrorCodes } from './tenant/hooks/useInvite'
+import { ActivatePasswordlessOtpErrorCode } from '@contember/graphql-client-tenant'
 
 export const dict = {
 	deleteEntityDialog: {
@@ -14,6 +26,15 @@ export const dict = {
 	},
 	identityLoader: {
 		fail: 'Failed to load identity',
+		tryReload: 'Try reload',
+		loginAgain: 'Login again',
+	},
+	navigationGuardDialog: {
+		title: 'Unsaved changes',
+		description: 'Do you want to save your changes before leaving?',
+		confirmButton: 'Leave',
+		discardButton: 'Don\'t save',
+		cancelButton: 'Cancel',
 	},
 	persist: {
 		persistButton: 'Save data',
@@ -99,7 +120,7 @@ export const dict = {
 		VARIABLE_EMPTY: 'Variable is empty',
 		VARIABLE_NOT_FOUND: 'Variable not found',
 		fallback: 'Failed to invite user',
-	} satisfies Record<InviteErrorCodes | 'fallback',  string>,
+	} satisfies Record<InviteErrorCodes | 'fallback', string>,
 	uploader: {
 		uploadErrors: {
 			httpError: 'HTTP error',
@@ -159,6 +180,17 @@ export const dict = {
 				'VARIABLE_EMPTY': 'Variable empty',
 				'VARIABLE_NOT_FOUND': 'Variable not found',
 			} satisfies Record<CreateApiKeyFormErrorCode, string>,
+		},
+		createSessionToken: {
+			email: 'Email',
+			login: 'Login',
+			errorMessages: {
+				'FIELD_REQUIRED': 'This field is required',
+				'UNKNOWN_ERROR': 'An unknown error occurred',
+				'PERSON_DISABLED': 'Person is disabled',
+				'UNKNOWN_EMAIL': 'Person with given email not found',
+				'UNKNOWN_PERSON_ID': 'Person with given ID not found',
+			} satisfies Record<CreateSessionTokenFormErrorCode, string>,
 		},
 		invite: {
 			email: 'Email',

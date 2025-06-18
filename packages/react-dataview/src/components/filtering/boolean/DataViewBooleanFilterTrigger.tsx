@@ -54,7 +54,7 @@ export interface DataViewBooleanFilterTriggerProps {
  *   - `'include'`: The filter is active for the specified `value`.
  *   - `'none'`: The filter is not active.
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <DataViewBooleanFilterTrigger value={true} action="toggle">
  *     <button>Include True</button>

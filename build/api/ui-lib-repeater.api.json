@@ -1,0 +1,580 @@
+{
+  "metadata": {
+    "toolPackage": "@microsoft/api-extractor",
+    "toolVersion": "7.52.8",
+    "schemaVersion": 1011,
+    "oldestForwardsCompatibleVersion": 1001,
+    "tsdocConfig": {
+      "$schema": "https://developer.microsoft.com/json-schemas/tsdoc/v0/tsdoc.schema.json",
+      "noStandardTags": true,
+      "tagDefinitions": [
+        {
+          "tagName": "@alpha",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@beta",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@defaultValue",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@decorator",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@deprecated",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@eventProperty",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@example",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@experimental",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@inheritDoc",
+          "syntaxKind": "inline"
+        },
+        {
+          "tagName": "@internal",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@label",
+          "syntaxKind": "inline"
+        },
+        {
+          "tagName": "@link",
+          "syntaxKind": "inline",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@override",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@packageDocumentation",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@param",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@privateRemarks",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@public",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@readonly",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@remarks",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@returns",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@sealed",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@see",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@throws",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@typeParam",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@virtual",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@group",
+          "syntaxKind": "block"
+        }
+      ],
+      "reportUnsupportedHtmlElements": false
+    }
+  },
+  "kind": "Package",
+  "canonicalReference": "@contember/react-ui-lib!",
+  "docComment": "",
+  "name": "@contember/react-ui-lib",
+  "preserveMemberOrder": false,
+  "members": [
+    {
+      "kind": "EntryPoint",
+      "canonicalReference": "@contember/react-ui-lib!",
+      "name": "",
+      "preserveMemberOrder": false,
+      "members": [
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!DefaultRepeater:var",
+          "docComment": "/**\n * Props {@link DefaultRepeaterProps}.\n *\n * DefaultRepeater is a wrapper around Repeater that provides a default UI for a list of items.\n *\n * #### Example\n * ```tsx\n * <DefaultRepeater entities=\"RepeaterItem\" sortableBy=\"order\" title=\"Foo items\" addButtonPosition=\"around\">\n * \t<InputField field=\"title\" />\n * \t<RepeaterItemActions>\n * \t\t<RepeaterRemoveItemButton />\n * \t</RepeaterItemActions>\n * </DefaultRepeater>\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "DefaultRepeater: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "DefaultRepeaterProps",
+              "canonicalReference": "@contember/react-ui-lib!DefaultRepeaterProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            }
+          ],
+          "fileUrlPath": "src/repeater/repeater.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "DefaultRepeater",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 6
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!DefaultRepeaterProps:type",
+          "docComment": "/**\n * Props for the {@link DefaultRepeater} component.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type DefaultRepeaterProps = "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    title?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    addButtonPosition?: 'none' | 'after' | 'before' | 'around';\n    addButtonLabel?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n} & "
+            },
+            {
+              "kind": "Reference",
+              "text": "RepeaterProps",
+              "canonicalReference": "@contember/react-ui-lib!~RepeaterProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/repeater/repeater.tsx",
+          "releaseTag": "Public",
+          "name": "DefaultRepeaterProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 7
+          }
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@contember/react-ui-lib!RepeaterAddItemButton:function(1)",
+          "docComment": "/**\n * Props {@link RepeaterAddItemButtonProps}\n *\n * `RepeaterAddItemButton` is a button that adds a new item to a repeater at a specified index. It wraps the `RepeaterAddItemTrigger` and displays customizable content. By default, it shows a plus icon alongside a localized label.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "RepeaterAddItemButton: ({ children, index }: "
+            },
+            {
+              "kind": "Reference",
+              "text": "RepeaterAddItemButtonProps",
+              "canonicalReference": "@contember/react-ui-lib!RepeaterAddItemButtonProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react/jsx-runtime\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "JSX.Element",
+              "canonicalReference": "@types/react!JSX.Element:interface"
+            }
+          ],
+          "fileUrlPath": "src/repeater/repeater.tsx",
+          "returnTypeTokenRange": {
+            "startIndex": 3,
+            "endIndex": 5
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "{ children, index }",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "RepeaterAddItemButton"
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!RepeaterAddItemButtonProps:type",
+          "docComment": "/**\n * Props for the {@link RepeaterAddItemButton} component.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type RepeaterAddItemButtonProps = "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    children?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "React.ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    index?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "RepeaterAddItemIndex",
+              "canonicalReference": "@contember/react-ui-lib!~RepeaterAddItemIndex:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/repeater/repeater.tsx",
+          "releaseTag": "Public",
+          "name": "RepeaterAddItemButtonProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 6
+          }
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@contember/react-ui-lib!RepeaterDropIndicator:function(1)",
+          "docComment": "/**\n * Props {@link RepeaterDropIndicatorProps}\n *\n * `RepeaterDropIndicator` is a visual indicator for sortable repeater items, showing where an item will be dropped. It adapts its placement based on the `position` prop.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "RepeaterDropIndicator: ({ position }: "
+            },
+            {
+              "kind": "Reference",
+              "text": "RepeaterDropIndicatorProps",
+              "canonicalReference": "@contember/react-ui-lib!RepeaterDropIndicatorProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react/jsx-runtime\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "JSX.Element",
+              "canonicalReference": "@types/react!JSX.Element:interface"
+            }
+          ],
+          "fileUrlPath": "src/repeater/repeater.tsx",
+          "returnTypeTokenRange": {
+            "startIndex": 3,
+            "endIndex": 5
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "{ position }",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "RepeaterDropIndicator"
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!RepeaterDropIndicatorProps:type",
+          "docComment": "/**\n * Props for the {@link RepeaterDropIndicator} component.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type RepeaterDropIndicatorProps = "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    position: 'before' | 'after';\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/repeater/repeater.tsx",
+          "releaseTag": "Public",
+          "name": "RepeaterDropIndicatorProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!RepeaterItemActions:var",
+          "docComment": "/**\n * A container for actions that can be performed on a repeater item. Placed in the top right corner of the item.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "RepeaterItemActions: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "ForwardRefExoticComponent",
+              "canonicalReference": "@types/react!React.ForwardRefExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "Omit",
+              "canonicalReference": "!Omit:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "ClassAttributes",
+              "canonicalReference": "@types/react!React.ClassAttributes:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLDivElement",
+              "canonicalReference": "!HTMLDivElement:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "> & import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLAttributes",
+              "canonicalReference": "@types/react!React.HTMLAttributes:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLDivElement",
+              "canonicalReference": "!HTMLDivElement:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "> & {\n    asChild?: boolean;\n    children?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    className?: string;\n}, \"ref\"> & import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "RefAttributes",
+              "canonicalReference": "@types/react!React.RefAttributes:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLDivElement",
+              "canonicalReference": "!HTMLDivElement:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">>"
+            }
+          ],
+          "fileUrlPath": "src/repeater/repeater.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "RepeaterItemActions",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 20
+          }
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@contember/react-ui-lib!RepeaterRemoveItemButton:function(1)",
+          "docComment": "/**\n * Props see {@link RepeaterRemoveItemButtonProps}\n *\n * `RepeaterRemoveItemButton` is a button that removes an item from a repeater. It wraps the {@link RepeaterRemoveItemTrigger} and displays a customizable child element. By default, it shows a trash icon that turns red on hover.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "RepeaterRemoveItemButton: ({ children }: "
+            },
+            {
+              "kind": "Reference",
+              "text": "RepeaterRemoveItemButtonProps",
+              "canonicalReference": "@contember/react-ui-lib!RepeaterRemoveItemButtonProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react/jsx-runtime\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "JSX.Element",
+              "canonicalReference": "@types/react!JSX.Element:interface"
+            }
+          ],
+          "fileUrlPath": "src/repeater/repeater.tsx",
+          "returnTypeTokenRange": {
+            "startIndex": 3,
+            "endIndex": 5
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "{ children }",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "RepeaterRemoveItemButton"
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!RepeaterRemoveItemButtonProps:type",
+          "docComment": "/**\n * `RepeaterRemoveItemButtonProps` is a type that defines the props for the `RepeaterRemoveItemButton` component. It includes an optional `children` prop that can be used to customize the content of the button.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type RepeaterRemoveItemButtonProps = "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    children?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/repeater/repeater.tsx",
+          "releaseTag": "Public",
+          "name": "RepeaterRemoveItemButtonProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 4
+          }
+        }
+      ]
+    }
+  ]
+}

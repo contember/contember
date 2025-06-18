@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { Loader } from '../ui/loader'
 import { GripIcon } from 'lucide-react'
 import { uic } from '../utils/uic'
@@ -43,5 +42,3 @@ export const UploaderRepeaterHandleUI = uic('button', {
 	baseClass: 'absolute top-0 left-0 h-6 w-6 inline-flex justify-center align-center opacity-10 hover:opacity-100 transition-opacity z-10',
 	beforeChildren: <GripIcon size={16} />,
 })
-
-

@@ -1,0 +1,1574 @@
+{
+  "metadata": {
+    "toolPackage": "@microsoft/api-extractor",
+    "toolVersion": "7.52.8",
+    "schemaVersion": 1011,
+    "oldestForwardsCompatibleVersion": 1001,
+    "tsdocConfig": {
+      "$schema": "https://developer.microsoft.com/json-schemas/tsdoc/v0/tsdoc.schema.json",
+      "noStandardTags": true,
+      "tagDefinitions": [
+        {
+          "tagName": "@alpha",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@beta",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@defaultValue",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@decorator",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@deprecated",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@eventProperty",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@example",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@experimental",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@inheritDoc",
+          "syntaxKind": "inline"
+        },
+        {
+          "tagName": "@internal",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@label",
+          "syntaxKind": "inline"
+        },
+        {
+          "tagName": "@link",
+          "syntaxKind": "inline",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@override",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@packageDocumentation",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@param",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@privateRemarks",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@public",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@readonly",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@remarks",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@returns",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@sealed",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@see",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@throws",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@typeParam",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@virtual",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@group",
+          "syntaxKind": "block"
+        }
+      ],
+      "reportUnsupportedHtmlElements": false
+    }
+  },
+  "kind": "Package",
+  "canonicalReference": "@contember/react-ui-lib!",
+  "docComment": "",
+  "name": "@contember/react-ui-lib",
+  "preserveMemberOrder": false,
+  "members": [
+    {
+      "kind": "EntryPoint",
+      "canonicalReference": "@contember/react-ui-lib!",
+      "name": "",
+      "preserveMemberOrder": false,
+      "members": [
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!baseEditorPlugins:var",
+          "docComment": "/**\n * baseEditorPlugins - Core plugin configuration for Slate.js editor components\n *\n * ### Plugin Structure Contains renderer configurations and basic formatting capabilities for:\n *\n * #### Structural Elements - **anchor**: Link handling with `AnchorRenderer` - **paragraph**: Text blocks with `ParagraphRenderer` - **heading**: Headings with `HeadingRenderer` - **list**: List structures with: - `ListItemRenderer` - `OrderedListRenderer` - `UnorderedListRenderer` - **horizontalRule**: Dividers with `HorizontalRuleRenderer` - **scrollTarget**: Navigation anchors with `ScrollTargetRenderer` - **table**: Tabular data with: - `TableElementRenderer` - `TableCellElementRenderer` - `TableRowElementRenderer`\n *\n * #### Text Formatting - **bold**: Bold text formatting - **code**: Inline code styling - **highlight**: Text highlighting - **italic**: Italic text - **newline**: Manual line breaks - **strikeThrough**: Strikethrough text - **underline**: Underlined text\n *\n * ### Usage\n * ```tsx\n * // Create editor with base configuration\n * <RichTextEditor\n *   plugins={[\n *     baseEditorPlugins.paragraph,\n *     baseEditorPlugins.heading,\n *     baseEditorPlugins.bold,\n *     baseEditorPlugins.italic\n *   ]}\n * />\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "baseEditorPlugins: "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    anchor: <E extends import(\"slate\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "Editor",
+              "canonicalReference": "slate!Editor:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">(editor: E) => E;\n    paragraph: <E extends import(\"slate\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "Editor",
+              "canonicalReference": "slate!Editor:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">(editor: E) => E;\n    heading: <E extends import(\"slate\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "Editor",
+              "canonicalReference": "slate!Editor:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">(editor: E) => E;\n    list: <E extends import(\"slate\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "Editor",
+              "canonicalReference": "slate!Editor:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">(editor: E) => E;\n    horizontalRule: <E extends import(\"slate\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "Editor",
+              "canonicalReference": "slate!Editor:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">(editor: E) => E;\n    scrollTarget: <E extends import(\"slate\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "Editor",
+              "canonicalReference": "slate!Editor:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">(editor: E) => E;\n    table: <E extends import(\"slate\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "Editor",
+              "canonicalReference": "slate!Editor:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">(editor: E) => E;\n    bold: "
+            },
+            {
+              "kind": "Reference",
+              "text": "EditorPlugin",
+              "canonicalReference": "@contember/react-ui-lib!~EditorPlugin:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    code: "
+            },
+            {
+              "kind": "Reference",
+              "text": "EditorPlugin",
+              "canonicalReference": "@contember/react-ui-lib!~EditorPlugin:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    highlight: "
+            },
+            {
+              "kind": "Reference",
+              "text": "EditorPlugin",
+              "canonicalReference": "@contember/react-ui-lib!~EditorPlugin:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    italic: "
+            },
+            {
+              "kind": "Reference",
+              "text": "EditorPlugin",
+              "canonicalReference": "@contember/react-ui-lib!~EditorPlugin:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    newline: "
+            },
+            {
+              "kind": "Reference",
+              "text": "EditorPlugin",
+              "canonicalReference": "@contember/react-ui-lib!~EditorPlugin:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    strikeThrough: "
+            },
+            {
+              "kind": "Reference",
+              "text": "EditorPlugin",
+              "canonicalReference": "@contember/react-ui-lib!~EditorPlugin:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    underline: "
+            },
+            {
+              "kind": "Reference",
+              "text": "EditorPlugin",
+              "canonicalReference": "@contember/react-ui-lib!~EditorPlugin:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}"
+            }
+          ],
+          "fileUrlPath": "src/editor/common/baseEditorPlugins.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "baseEditorPlugins",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 30
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!BlockEditorField:var",
+          "docComment": "/**\n * BlockEditorField component - Rich text editor with drag-and-drop block management\n *\n * #### Purpose Provides a structured content editing experience with sortable blocks and reference management\n *\n * #### Features - Drag-and-drop block reordering - Reference entity integration - Slate.js editor core - Plugin system extensibility - Collision detection and measuring strategies\n *\n * #### Example: Basic usage\n * ```tsx\n * <BlockEditorField\n *   field=\"data\"\n *   referencesField=\"references\"\n *   referenceDiscriminationField=\"type\"\n * >\n *   <EditorBlockToolbar>\n *     <EditorReferenceTrigger referenceType=\"image\">\n *       <BlockButton><ImageIcon /> Image</BlockButton>\n *     </EditorReferenceTrigger>\n *   </EditorBlockToolbar>\n *\n *   <EditorBlock name=\"image\" label=\"Image\">\n *     <ImageField baseField=\"image\" urlField=\"url\" />\n *   </EditorBlock>\n * </BlockEditorField>\n * ```\n *\n * #### Example with custom plugins and toolbars (inline and block)\n * ```tsx\n * <BlockEditorField\n *   field=\"data\"\n *   referencesField=\"references\"\n *   referenceDiscriminationField=\"type\"\n *   plugins={[\n *     editor => {\n *       editor.registerElement({\n *         type: 'link',\n *         isInline: true,\n *         render: LinkElement,\n *       })\n *     },\n *   ]}\n * >\n *   <EditorBlockToolbar>\n *     <EditorReferenceTrigger referenceType=\"image\">\n *       <BlockButton>\n *         <ImageIcon /> Image\n *       </BlockButton>\n *     </EditorReferenceTrigger>\n *\n *     <EditorElementTrigger elementType={tableElementType}>\n *       <BlockButton>\n *         <TableIcon /> Table\n *       </BlockButton>\n *     </EditorElementTrigger>\n *\n *     <EditorElementTrigger elementType={scrollTargetElementType}>\n *       <BlockButton>\n *         <LocateIcon /> Scroll target\n *       </BlockButton>\n *     </EditorElementTrigger>\n *\n *     <EditorElementTrigger elementType={horizontalRuleElementType}>\n *       <BlockButton>\n *         <MinusIcon  /> Horizontal rule\n *       </BlockButton>\n *     </EditorElementTrigger>\n *   </EditorBlockToolbar>\n *\n *   <EditorInlineToolbar>\n *     <div>\n *       <EditorMarkTrigger mark={boldMark}>\n *           <Toggle><BoldIcon className=\"h-3 w-3\" /></Toggle>\n *       </EditorMarkTrigger>\n *\n *       <EditorMarkTrigger mark={italicMark}>\n *         <Toggle><ItalicIcon className=\"h-3 w-3\" /></Toggle>\n *       </EditorMarkTrigger>\n *\n *       <EditorMarkTrigger mark={underlineMark}>\n *         <Toggle><UnderlineIcon className=\"h-3 w-3\" /></Toggle>\n *       </EditorMarkTrigger>\n *\n *       <EditorMarkTrigger mark={strikeThroughMark}>\n *         <Toggle><StrikethroughIcon className=\"h-3 w-3\" /></Toggle>\n *       </EditorMarkTrigger>\n *\n *       <EditorMarkTrigger mark={highlightMark}>\n *         <Toggle><HighlighterIcon className=\"h-3 w-3\" /></Toggle>\n *       </EditorMarkTrigger>\n *\n *       <EditorMarkTrigger mark={codeMark}>\n *         <Toggle><CodeIcon className=\"h-3 w-3\" /></Toggle>\n *       </EditorMarkTrigger>\n *\n *       <EditorElementTrigger elementType={anchorElementType}>\n *         <Toggle><Link2Icon className=\"h-3 w-3\" /></Toggle>\n *       </EditorElementTrigger>\n *\n *       <Popover>\n *         <PopoverTrigger asChild>\n *           <Toggle><LinkIcon className=\"h-3 w-3\" /></Toggle>\n *         </PopoverTrigger>\n *         <PopoverContent>\n *           <EditorInlineReferencePortal referenceType=\"link\">\n *             <LinkField field=\"link\" />\n *             <ConfirmReferenceButton />\n *           </EditorInlineReferencePortal>\n *         </PopoverContent>\n *       </Popover>\n *     </div>\n *\n *     <div>\n *       <EditorElementTrigger elementType={paragraphElementType} suchThat={{ isNumbered: false }}>\n *         <Toggle><PilcrowIcon className=\"h-3 w-3\" /></Toggle>\n *       </EditorElementTrigger>\n *\n *       <EditorElementTrigger elementType={headingElementType} suchThat={{ level: 1, isNumbered: false }}>\n *         <Toggle><Heading1Icon className=\"h-3 w-3\" /></Toggle>\n *       </EditorElementTrigger>\n *\n *       <EditorElementTrigger elementType={headingElementType} suchThat={{ level: 2, isNumbered: false }}>\n *         <Toggle><Heading2Icon className=\"h-3 w-3\" /></Toggle>\n *       </EditorElementTrigger>\n *\n *       <EditorElementTrigger elementType={headingElementType} suchThat={{ level: 3, isNumbered: false }}>\n *         <Toggle><Heading3Icon className=\"h-3 w-3\" /></Toggle>\n *       </EditorElementTrigger>\n *\n *       <EditorElementTrigger elementType={unorderedListElementType}>\n *           <Toggle><ListIcon className=\"h-3 w-3\" /></Toggle>\n *       </EditorElementTrigger>\n *\n *       <EditorElementTrigger elementType={orderedListElementType}>\n *         <Toggle><ListOrderedIcon className=\"h-3 w-3\" /></Toggle>\n *       </EditorElementTrigger>\n *\n *       <EditorGenericTrigger {...createAlignHandler('start')}>\n *         <Toggle className=\"ml-4\"><AlignLeftIcon className=\"h-3 w-3\" /></Toggle>\n *       </EditorGenericTrigger>\n *\n *       <EditorGenericTrigger {...createAlignHandler('end')}>\n *         <Toggle><AlignRightIcon className=\"h-3 w-3\" /></Toggle>\n *       </EditorGenericTrigger>\n *\n *       <EditorGenericTrigger {...createAlignHandler('center')}>\n *         <Toggle><AlignCenterIcon className=\"h-3 w-3\" /></Toggle>\n *       </EditorGenericTrigger>\n *\n *       <EditorGenericTrigger {...createAlignHandler('justify')}>\n *         <Toggle><AlignJustifyIcon className=\"h-3 w-3\" /></Toggle>\n *       </EditorGenericTrigger>\n *     </div>\n *   </EditorInlineToolbar>\n *\n *   <EditorBlock name=\"quote\" label=\"Quote\">\n *     <EditorBlockContent />\n *   </EditorBlock>\n *\n *   <EditorBlock name=\"image\" label=\"Image\">\n *     <ImageField baseField=\"image\" urlField=\"url\" />\n *   </EditorBlock>\n * </BlockEditorField>\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "BlockEditorField: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "BlockEditorFieldProps",
+              "canonicalReference": "@contember/react-ui-lib!BlockEditorFieldProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            }
+          ],
+          "fileUrlPath": "src/editor/block-editor.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "BlockEditorField",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 6
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!BlockEditorFieldProps:type",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type BlockEditorFieldProps = "
+            },
+            {
+              "kind": "Reference",
+              "text": "BlockEditorProps",
+              "canonicalReference": "@contember/react-ui-lib!~BlockEditorProps:interface"
+            },
+            {
+              "kind": "Content",
+              "text": " & {\n    referencesField: "
+            },
+            {
+              "kind": "Reference",
+              "text": "SugaredRelativeEntityList",
+              "canonicalReference": "@contember/react-ui-lib!~SugaredRelativeEntityList:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "['field'];\n    referenceDiscriminationField: "
+            },
+            {
+              "kind": "Reference",
+              "text": "SugaredRelativeSingleField",
+              "canonicalReference": "@contember/react-ui-lib!~SugaredRelativeSingleField:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "['field'];\n    placeholder?: string;\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/editor/block-editor.tsx",
+          "releaseTag": "Public",
+          "name": "BlockEditorFieldProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 7
+          }
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@contember/react-ui-lib!BlockEditorInner:function(1)",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "BlockEditorInner: ({ children, placeholder }: "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    placeholder?: string;\n    children: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react/jsx-runtime\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "JSX.Element",
+              "canonicalReference": "@types/react!JSX.Element:interface"
+            }
+          ],
+          "fileUrlPath": "src/editor/block-editor.tsx",
+          "returnTypeTokenRange": {
+            "startIndex": 5,
+            "endIndex": 7
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "{ children, placeholder }",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 4
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "BlockEditorInner"
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!blockEditorPlugins:var",
+          "docComment": "/**\n * blockEditorPlugins - Advanced content editing plugins with structural elements\n *\n * #### Purpose Enables complex document structures and block management in Slate editor\n *\n * #### Additional Features beyond richTextFieldPlugins: - Paragraph/heading formatting - Lists (ordered/unordered) - Horizontal rules - Tables - Scroll targets - Drag-and-drop block sorting\n *\n * #### Key Integration - `withSortable` enables block reordering - Requires `SortableBlock` component for drag handles\n *\n * #### Example Usage\n * ```tsx\n * <BlockEditor plugins={blockEditorPlugins}>\n *   <SortableBlock name=\"section\" />\n * </BlockEditor>\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "blockEditorPlugins: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"@contember/react-slate-editor\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "EditorPlugin",
+              "canonicalReference": "@contember/react-ui-lib!~EditorPlugin:type"
+            },
+            {
+              "kind": "Content",
+              "text": "[]"
+            }
+          ],
+          "fileUrlPath": "src/editor/plugins.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "blockEditorPlugins",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 4
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!BlockElement:var",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "BlockElement: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "BlockElementProps",
+              "canonicalReference": "@contember/react-ui-lib!BlockElementProps:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            }
+          ],
+          "fileUrlPath": "src/editor/common/elements/BlockElement.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "BlockElement",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 6
+          }
+        },
+        {
+          "kind": "Interface",
+          "canonicalReference": "@contember/react-ui-lib!BlockElementProps:interface",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export interface BlockElementProps extends "
+            },
+            {
+              "kind": "Reference",
+              "text": "RenderElementProps",
+              "canonicalReference": "slate-react!RenderElementProps:interface"
+            },
+            {
+              "kind": "Content",
+              "text": " "
+            }
+          ],
+          "fileUrlPath": "src/editor/common/elements/BlockElement.tsx",
+          "releaseTag": "Public",
+          "name": "BlockElementProps",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@contember/react-ui-lib!BlockElementProps#className:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "className?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": true,
+              "releaseTag": "Public",
+              "name": "className",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@contember/react-ui-lib!BlockElementProps#domElement:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "domElement?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "keyof "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "JSX.IntrinsicElements",
+                  "canonicalReference": "@types/react!__global.JSX.IntrinsicElements:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": true,
+              "releaseTag": "Public",
+              "name": "domElement",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 3
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@contember/react-ui-lib!BlockElementProps#withBoundaries:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "withBoundaries?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "boolean"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": true,
+              "releaseTag": "Public",
+              "name": "withBoundaries",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            }
+          ],
+          "extendsTokenRanges": [
+            {
+              "startIndex": 1,
+              "endIndex": 2
+            }
+          ]
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!EditorBlock:var",
+          "docComment": "/**\n * EditorBlock component - Configurable content block for rich text editor\n *\n * #### Purpose Creates reusable, customizable content blocks within a Slate.js editor instance\n *\n * #### Features - Drag-and-drop enabled block structure - Alternate configuration UI via popover - Block type labeling and identification\n *\n * #### Example: Basic usage\n * ```tsx\n * <BlockEditorField\n *   field=\"data\"\n *   referencesField=\"references\"\n *   referenceDiscriminationField=\"type\"\n * >\n *   <EditorBlockToolbar>\n *     <EditorReferenceTrigger referenceType=\"image\">\n *       <BlockButton><ImageIcon /> Image</BlockButton>\n *     </EditorReferenceTrigger>\n *   </EditorBlockToolbar>\n *\n *   <EditorBlock name=\"image\" label=\"Image\">\n *     <ImageField baseField=\"image\" urlField=\"url\" />\n *   </EditorBlock>\n * </BlockEditorField>\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "EditorBlock: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "EditorBlockProps",
+              "canonicalReference": "@contember/react-ui-lib!EditorBlockProps:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            }
+          ],
+          "fileUrlPath": "src/editor/editor-block.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "EditorBlock",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 6
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!EditorBlockContent:var",
+          "docComment": "/**\n * EditorBlockContent component - Editable content area for blocks\n *\n * #### Purpose Provides the main editable region within a content block\n *\n * #### Features - Automatic placeholder text when empty - ContentEditable management - Text presence detection - Proper padding and positioning\n *\n * #### Example\n * ```tsx\n * <EditorBlockContent />\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "EditorBlockContent: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<{}>"
+            }
+          ],
+          "fileUrlPath": "src/editor/editor-block.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "EditorBlockContent",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 4
+          }
+        },
+        {
+          "kind": "Interface",
+          "canonicalReference": "@contember/react-ui-lib!EditorBlockProps:interface",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export interface EditorBlockProps "
+            }
+          ],
+          "fileUrlPath": "src/editor/editor-block.tsx",
+          "releaseTag": "Public",
+          "name": "EditorBlockProps",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@contember/react-ui-lib!EditorBlockProps#alternate:member",
+              "docComment": "/**\n * Alternate configuration UI (optional)\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "alternate?: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ReactNode",
+                  "canonicalReference": "@types/react!React.ReactNode:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": true,
+              "releaseTag": "Public",
+              "name": "alternate",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@contember/react-ui-lib!EditorBlockProps#children:member",
+              "docComment": "/**\n * Primary block content\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "children: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ReactNode",
+                  "canonicalReference": "@types/react!React.ReactNode:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "children",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@contember/react-ui-lib!EditorBlockProps#label:member",
+              "docComment": "/**\n * Display name for block type\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "label: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ReactNode",
+                  "canonicalReference": "@types/react!React.ReactNode:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "label",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@contember/react-ui-lib!EditorBlockProps#name:member",
+              "docComment": "/**\n * Unique block type identifier\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "name: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "name",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            }
+          ],
+          "extendsTokenRanges": []
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!EditorBlockToolbar:var",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "EditorBlockToolbar: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "MemoExoticComponent",
+              "canonicalReference": "@types/react!React.MemoExoticComponent:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<({ children }: "
+            },
+            {
+              "kind": "Reference",
+              "text": "EditorBlockToolbarProps",
+              "canonicalReference": "@contember/react-ui-lib!EditorBlockToolbarProps:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ") => import(\"react/jsx-runtime\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "JSX.Element",
+              "canonicalReference": "@types/react!JSX.Element:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            }
+          ],
+          "fileUrlPath": "src/editor/common/editor-block-toolbar.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "EditorBlockToolbar",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 8
+          }
+        },
+        {
+          "kind": "Interface",
+          "canonicalReference": "@contember/react-ui-lib!EditorBlockToolbarProps:interface",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export interface EditorBlockToolbarProps "
+            }
+          ],
+          "fileUrlPath": "src/editor/common/editor-block-toolbar.tsx",
+          "releaseTag": "Public",
+          "name": "EditorBlockToolbarProps",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@contember/react-ui-lib!EditorBlockToolbarProps#children:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "children: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ReactNode",
+                  "canonicalReference": "@types/react!React.ReactNode:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "children",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            }
+          ],
+          "extendsTokenRanges": []
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!EditorCanvas:var",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "EditorCanvas: "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    <P extends "
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLTextAreaDivTargetProps",
+              "canonicalReference": "@contember/react-ui-lib!HTMLTextAreaDivTargetProps:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">(props: "
+            },
+            {
+              "kind": "Reference",
+              "text": "EditorCanvasProps",
+              "canonicalReference": "@contember/react-ui-lib!EditorCanvasProps:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<P>): "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactElement",
+              "canonicalReference": "@types/react!React.ReactElement:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    displayName?: string;\n}"
+            }
+          ],
+          "fileUrlPath": "src/editor/common/editor-canvas.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "EditorCanvas",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 8
+          }
+        },
+        {
+          "kind": "Interface",
+          "canonicalReference": "@contember/react-ui-lib!EditorCanvasProps:interface",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export interface EditorCanvasProps<P extends "
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLTextAreaDivTargetProps",
+              "canonicalReference": "@contember/react-ui-lib!HTMLTextAreaDivTargetProps:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "> "
+            }
+          ],
+          "fileUrlPath": "src/editor/common/editor-canvas.tsx",
+          "releaseTag": "Public",
+          "typeParameters": [
+            {
+              "typeParameterName": "P",
+              "constraintTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "defaultTypeTokenRange": {
+                "startIndex": 0,
+                "endIndex": 0
+              }
+            }
+          ],
+          "name": "EditorCanvasProps",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@contember/react-ui-lib!EditorCanvasProps#children:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "children?: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ReactNode",
+                  "canonicalReference": "@types/react!React.ReactNode:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": true,
+              "releaseTag": "Public",
+              "name": "children",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@contember/react-ui-lib!EditorCanvasProps#componentProps:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "componentProps: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "P"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "componentProps",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@contember/react-ui-lib!EditorCanvasProps#focusRing:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "focusRing?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "boolean"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": true,
+              "releaseTag": "Public",
+              "name": "focusRing",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@contember/react-ui-lib!EditorCanvasProps#underlyingComponent:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "underlyingComponent: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ComponentType",
+                  "canonicalReference": "@types/react!React.ComponentType:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<P>"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "underlyingComponent",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 3
+              }
+            }
+          ],
+          "extendsTokenRanges": []
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@contember/react-ui-lib!EditorEditableCanvas:function(1)",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "EditorEditableCanvas: (editableProps: "
+            },
+            {
+              "kind": "Reference",
+              "text": "EditorEditableCanvasProps",
+              "canonicalReference": "@contember/react-ui-lib!EditorEditableCanvasProps:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react/jsx-runtime\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "JSX.Element",
+              "canonicalReference": "@types/react!JSX.Element:interface"
+            }
+          ],
+          "fileUrlPath": "src/editor/common/editor-editable-canvas.tsx",
+          "returnTypeTokenRange": {
+            "startIndex": 3,
+            "endIndex": 5
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "editableProps",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "EditorEditableCanvas"
+        },
+        {
+          "kind": "Interface",
+          "canonicalReference": "@contember/react-ui-lib!EditorEditableCanvasProps:interface",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export interface EditorEditableCanvasProps extends "
+            },
+            {
+              "kind": "Reference",
+              "text": "EditableProps",
+              "canonicalReference": "@contember/react-ui-lib!~EditableProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": " "
+            }
+          ],
+          "fileUrlPath": "src/editor/common/editor-editable-canvas.tsx",
+          "releaseTag": "Public",
+          "name": "EditorEditableCanvasProps",
+          "preserveMemberOrder": false,
+          "members": [],
+          "extendsTokenRanges": [
+            {
+              "startIndex": 1,
+              "endIndex": 2
+            }
+          ]
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!EditorInlineToolbar:var",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "EditorInlineToolbar: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "MemoExoticComponent",
+              "canonicalReference": "@types/react!React.MemoExoticComponent:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<({ children }: "
+            },
+            {
+              "kind": "Reference",
+              "text": "EditorInlineToolbarProps",
+              "canonicalReference": "@contember/react-ui-lib!EditorInlineToolbarProps:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ") => import(\"react/jsx-runtime\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "JSX.Element",
+              "canonicalReference": "@types/react!JSX.Element:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            }
+          ],
+          "fileUrlPath": "src/editor/common/editor-inline-toolbar.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "EditorInlineToolbar",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 8
+          }
+        },
+        {
+          "kind": "Interface",
+          "canonicalReference": "@contember/react-ui-lib!EditorInlineToolbarProps:interface",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export interface EditorInlineToolbarProps "
+            }
+          ],
+          "fileUrlPath": "src/editor/common/editor-inline-toolbar.tsx",
+          "releaseTag": "Public",
+          "name": "EditorInlineToolbarProps",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@contember/react-ui-lib!EditorInlineToolbarProps#children:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "children: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ReactNode",
+                  "canonicalReference": "@types/react!React.ReactNode:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "children",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            }
+          ],
+          "extendsTokenRanges": []
+        },
+        {
+          "kind": "Interface",
+          "canonicalReference": "@contember/react-ui-lib!HTMLTextAreaDivTargetProps:interface",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export interface HTMLTextAreaDivTargetProps extends "
+            },
+            {
+              "kind": "Reference",
+              "text": "TextareaHTMLAttributes",
+              "canonicalReference": "@types/react!React.TextareaHTMLAttributes:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLDivElement",
+              "canonicalReference": "!HTMLDivElement:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            },
+            {
+              "kind": "Content",
+              "text": " "
+            }
+          ],
+          "fileUrlPath": "src/editor/common/editor-canvas.tsx",
+          "releaseTag": "Public",
+          "name": "HTMLTextAreaDivTargetProps",
+          "preserveMemberOrder": false,
+          "members": [],
+          "extendsTokenRanges": [
+            {
+              "startIndex": 1,
+              "endIndex": 5
+            }
+          ]
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!RichTextField:var",
+          "docComment": "/**\n * RichTextField component - Form-integrated rich text editor with basic formatting\n *\n * #### Purpose Provides a rich text editing experience within Contember forms with common formatting tools\n *\n * #### Features - Integrated with Contember form field management - Basic text formatting (bold, italic, code, etc.) - Read-only state during mutations - Custom placeholder support - Plugin-based architecture\n *\n * #### Example: Basic usage\n * ```tsx\n * <RichTextField field=\"content\" />\n * ```\n *\n * #### Example: With custom placeholder\n * ```tsx\n * <RichTextField\n *   field=\"content\"\n *   label=\"Article body\"\n *   placeholder=\"Enter your text here\"\n * />\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "RichTextField: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "RichTextFieldProps",
+              "canonicalReference": "@contember/react-ui-lib!RichTextFieldProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            }
+          ],
+          "fileUrlPath": "src/editor/rich-text.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "RichTextField",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 6
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!richTextFieldPlugins:var",
+          "docComment": "/**\n * richTextFieldPlugins - Basic text formatting plugins for Slate editor\n *\n * #### Purpose Provides essential inline formatting tools for rich text fields\n *\n * #### Included Features: - Anchor/links - Bold/italic/underline - Code blocks - Text highlighting - Strikethrough - Manual newlines\n *\n * #### Example Usage\n * ```tsx\n * <RichTextEditor plugins={richTextFieldPlugins} />\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "richTextFieldPlugins: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"@contember/react-slate-editor\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "EditorPlugin",
+              "canonicalReference": "@contember/react-ui-lib!~EditorPlugin:type"
+            },
+            {
+              "kind": "Content",
+              "text": "[]"
+            }
+          ],
+          "fileUrlPath": "src/editor/plugins.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "richTextFieldPlugins",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 4
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!RichTextFieldProps:type",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type RichTextFieldProps = "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    field: "
+            },
+            {
+              "kind": "Reference",
+              "text": "SugaredRelativeSingleField",
+              "canonicalReference": "@contember/react-ui-lib!~SugaredRelativeSingleField:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "['field'];\n    children: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n} & "
+            },
+            {
+              "kind": "Reference",
+              "text": "Omit",
+              "canonicalReference": "!Omit:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "FormContainerProps",
+              "canonicalReference": "@contember/react-ui-lib!~FormContainerProps:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", 'children'>"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/editor/rich-text.tsx",
+          "releaseTag": "Public",
+          "name": "RichTextFieldProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 10
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!RichTextRendererProps:type",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type RichTextRendererProps = "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    field: "
+            },
+            {
+              "kind": "Reference",
+              "text": "SugaredRelativeSingleField",
+              "canonicalReference": "@contember/react-ui-lib!~SugaredRelativeSingleField:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "['field'];\n} & "
+            },
+            {
+              "kind": "Reference",
+              "text": "Omit",
+              "canonicalReference": "!Omit:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "RichTextFieldRendererProps",
+              "canonicalReference": "@contember/react-ui-lib!~RichTextFieldRendererProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ", 'source'>"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/editor/rich-text-view.tsx",
+          "releaseTag": "Public",
+          "name": "RichTextRendererProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 8
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!RichTextView:var",
+          "docComment": "/**\n * RichTextView component - Displays formatted rich text content from a Contember field\n *\n * #### Purpose Renders stored rich text content with proper formatting and structure\n *\n * #### Features - Safe JSON parsing of stored rich text data - Conditional rendering when content is empty - Integration with Contember's rich text rendering system - Customizable through RichTextFieldRenderer props\n *\n * #### Example\n * ```tsx\n * <RichTextView field=\"content\" />\n * ```\n *\n * #### Example with renderers\n * ```tsx\n * const renderLeaf = (leaf: Leaf) => {\n * \tlet content = <>{leaf.text}</>\n *\n *  if (leaf.isBold) {\n *    content = <strong>{content}</strong>\n * \t}\n *\n * \tif (leaf.isItalic) {\n *    content = <em>{content}</em>\n * \t}\n *\n * \tif (leaf.isUnderlined) {\n *    content = <u>{content}</u>\n * \t}\n *\n * \treturn content\n * }\n *\n * const renderElement = (element: RichTextElement, leafRenderer: LeafRenderer) => {\n *   if (isLeaf(element)) {\n *     return leafRenderer(element)\n *   }\n *\n *   if (element.type === 'anchor') {\n *     const children = element.children.map((child, index) => (\n *       <Fragment key={index}>\n *         {isLeaf(child) && leafRenderer(child)}\n *       </Fragment>\n *     ))\n *\n *     return (\n *       <a href={element.href}>\n *         {children}\n *       </a>\n *     )\n *   }\n *\n *   return null\n * }\n *\n * <RichTextView\n *   field=\"content\"\n *   renderLeaf={renderLeaf}\n *   renderElement={renderElement}\n *   referenceRenderers={{\n *      image: ({ reference }) => <img src={reference.url} />\n *   }}\n * />\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "RichTextView: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "RichTextRendererProps",
+              "canonicalReference": "@contember/react-ui-lib!RichTextRendererProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            }
+          ],
+          "fileUrlPath": "src/editor/rich-text-view.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "RichTextView",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 6
+          }
+        }
+      ]
+    }
+  ]
+}

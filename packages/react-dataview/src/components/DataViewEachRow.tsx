@@ -5,7 +5,7 @@ import { useDataViewEntityListAccessor } from '../contexts'
 /**
  * Renders children for each row in the DataView.
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <DataViewEachRow>
  *     <Field field="name" />

@@ -1,0 +1,208 @@
+{
+  "metadata": {
+    "toolPackage": "@microsoft/api-extractor",
+    "toolVersion": "7.52.8",
+    "schemaVersion": 1011,
+    "oldestForwardsCompatibleVersion": 1001,
+    "tsdocConfig": {
+      "$schema": "https://developer.microsoft.com/json-schemas/tsdoc/v0/tsdoc.schema.json",
+      "noStandardTags": true,
+      "tagDefinitions": [
+        {
+          "tagName": "@alpha",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@beta",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@defaultValue",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@decorator",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@deprecated",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@eventProperty",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@example",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@experimental",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@inheritDoc",
+          "syntaxKind": "inline"
+        },
+        {
+          "tagName": "@internal",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@label",
+          "syntaxKind": "inline"
+        },
+        {
+          "tagName": "@link",
+          "syntaxKind": "inline",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@override",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@packageDocumentation",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@param",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@privateRemarks",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@public",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@readonly",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@remarks",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@returns",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@sealed",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@see",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@throws",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@typeParam",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@virtual",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@group",
+          "syntaxKind": "block"
+        }
+      ],
+      "reportUnsupportedHtmlElements": false
+    }
+  },
+  "kind": "Package",
+  "canonicalReference": "@contember/react-ui-lib!",
+  "docComment": "",
+  "name": "@contember/react-ui-lib",
+  "preserveMemberOrder": false,
+  "members": [
+    {
+      "kind": "EntryPoint",
+      "canonicalReference": "@contember/react-ui-lib!",
+      "name": "",
+      "preserveMemberOrder": false,
+      "members": [
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!DefaultBlockRepeater:var",
+          "docComment": "/**\n * `DefaultBlockRepeater` component is a versatile and customizable block repeater shipped with a UI. It allows for the creation and management of repeatable content blocks within a form.\n *\n * Supports two modes of operation: - **Inline Edit Mode**: By providing only `children`, the blocks can be edited inline. - **Dual-Mode**: By providing both `form` and `children`, the component supports a dual-mode where blocks can be edited in a separate form view.\n *\n * #### Props {@link DefaultBlockRepeaterProps} - field or entities, sortableBy, discriminationField, children\n *\n * #### Example\n * ```tsx\n * <DefaultBlockRepeater field=\"blocks\" sortableBy=\"order\" discriminationField=\"type\">\n *   <Block\n *     name=\"text\"\n *     label={<><TextIcon /> Text</>}\n *     form={<>\n *       <InputField field=\"title\" label=\"Title\" />\n *       <TextareaField field=\"content\" label=\"Content\" />\n *     </>}\n *     children={<>\n *       <div className=\"flex\">\n *         <div className=\"w-64 space-y-2\">\n *           <h2 className=\"text-xl font-bold\">\n *             <Field field=\"title\" />\n *           </h2>\n *           <p>\n *             <Field field=\"content\" />\n *           </p>\n *         </div>\n *       </div>\n *     </>\n *     }\n *   />\n * </DefaultBlockRepeater>\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "DefaultBlockRepeater: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "BlockRepeaterProps",
+              "canonicalReference": "@contember/react-ui-lib!~BlockRepeaterProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            }
+          ],
+          "fileUrlPath": "src/block-repeater/block-repeater.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "DefaultBlockRepeater",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 6
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!DefaultBlockRepeaterProps:type",
+          "docComment": "/**\n * Props for {@link DefaultBlockRepeater} component.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type DefaultBlockRepeaterProps = "
+            },
+            {
+              "kind": "Reference",
+              "text": "BlockRepeaterProps",
+              "canonicalReference": "@contember/react-ui-lib!~BlockRepeaterProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/block-repeater/block-repeater.tsx",
+          "releaseTag": "Public",
+          "name": "DefaultBlockRepeaterProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,400 @@
+{
+  "metadata": {
+    "toolPackage": "@microsoft/api-extractor",
+    "toolVersion": "7.52.8",
+    "schemaVersion": 1011,
+    "oldestForwardsCompatibleVersion": 1001,
+    "tsdocConfig": {
+      "$schema": "https://developer.microsoft.com/json-schemas/tsdoc/v0/tsdoc.schema.json",
+      "noStandardTags": true,
+      "tagDefinitions": [
+        {
+          "tagName": "@alpha",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@beta",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@defaultValue",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@decorator",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@deprecated",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@eventProperty",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@example",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@experimental",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@inheritDoc",
+          "syntaxKind": "inline"
+        },
+        {
+          "tagName": "@internal",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@label",
+          "syntaxKind": "inline"
+        },
+        {
+          "tagName": "@link",
+          "syntaxKind": "inline",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@override",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@packageDocumentation",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@param",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@privateRemarks",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@public",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@readonly",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@remarks",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@returns",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@sealed",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@see",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@throws",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@typeParam",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@virtual",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@group",
+          "syntaxKind": "block"
+        }
+      ],
+      "reportUnsupportedHtmlElements": false
+    }
+  },
+  "kind": "Package",
+  "canonicalReference": "@contember/react-ui-lib!",
+  "docComment": "",
+  "name": "@contember/react-ui-lib",
+  "preserveMemberOrder": false,
+  "members": [
+    {
+      "kind": "EntryPoint",
+      "canonicalReference": "@contember/react-ui-lib!",
+      "name": "",
+      "preserveMemberOrder": false,
+      "members": [
+        {
+          "kind": "Function",
+          "canonicalReference": "@contember/react-ui-lib!BackButton:function(1)",
+          "docComment": "/**\n * Props {@link BackButtonProps}.\n *\n * `BackButton` is a navigation button that returns the user to the previous page using the browser's history API. It provides a default label but allows customization via the `label` prop or `children`.\n *\n * #### Example: Basic usage\n * ```tsx\n * <BackButton />\n * ```\n *\n * #### Example: Custom label\n * ```tsx\n * <BackButton label=\"Return to list\" />\n * ```\n *\n * #### Example: Custom content\n * ```tsx\n * <BackButton>\n *   <CustomIcon />\n *   <span>Go Back</span>\n * </BackButton>\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "BackButton: ({ label, children }: "
+            },
+            {
+              "kind": "Reference",
+              "text": "BackButtonProps",
+              "canonicalReference": "@contember/react-ui-lib!BackButtonProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react/jsx-runtime\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "JSX.Element",
+              "canonicalReference": "@types/react!JSX.Element:interface"
+            }
+          ],
+          "fileUrlPath": "src/buttons/back-button.tsx",
+          "returnTypeTokenRange": {
+            "startIndex": 3,
+            "endIndex": 5
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "{ label, children }",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "BackButton"
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@contember/react-ui-lib!BackButtonLabel:function(1)",
+          "docComment": "/**\n * Props {@link BackButtonLabelProps}.\n *\n * `BackButtonLabel` is a presentational component that renders a back arrow icon alongside a label. Typically used inside `BackButton` for consistent styling.\n *\n * #### Example: Basic usage\n * ```tsx\n * <BackButtonLabel />\n * ```\n *\n * #### Example: Custom label\n * ```tsx\n * <BackButtonLabel label=\"Go Back\" />\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "BackButtonLabel: ({ label }: "
+            },
+            {
+              "kind": "Reference",
+              "text": "BackButtonLabelProps",
+              "canonicalReference": "@contember/react-ui-lib!BackButtonLabelProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react/jsx-runtime\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "JSX.Element",
+              "canonicalReference": "@types/react!JSX.Element:interface"
+            }
+          ],
+          "fileUrlPath": "src/buttons/back-button.tsx",
+          "returnTypeTokenRange": {
+            "startIndex": 3,
+            "endIndex": 5
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "{ label }",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "BackButtonLabel"
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!BackButtonLabelProps:type",
+          "docComment": "/**\n * Props for {@link BackButtonLabel} component.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type BackButtonLabelProps = "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    label?: string;\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/buttons/back-button.tsx",
+          "releaseTag": "Public",
+          "name": "BackButtonLabelProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!BackButtonProps:type",
+          "docComment": "/**\n * Props for {@link BackButton} component.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type BackButtonProps = "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    children?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n} & "
+            },
+            {
+              "kind": "Reference",
+              "text": "BackButtonLabelProps",
+              "canonicalReference": "@contember/react-ui-lib!BackButtonLabelProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/buttons/back-button.tsx",
+          "releaseTag": "Public",
+          "name": "BackButtonProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 5
+          }
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@contember/react-ui-lib!LinkBackButton:function(1)",
+          "docComment": "/**\n * `LinkBackButton` is a navigational button that provides a back navigation link. It wraps the link inside a `Slots.Back` container and renders an `AnchorButton`.\n *\n * #### Comparison - **{@link BackButton}**: Uses browser history.back()\n *\n * #### Example: Basic usage (keeps default icon)\n * ```tsx\n * <LinkBackButton to=\"articles\" label=\"Back to Articles\" />\n * ```\n *\n * #### Example: With icon only\n * ```tsx\n * <LinkBackButton to=\"dashboard\">\n *   <ArrowLeftIcon />\n * </LinkBackButton>\n * ```\n *\n * #### Example: With custom icon and label\n * ```tsx\n * <LinkBackButton to=\"dashboard\">\n *   <ArrowLeftIcon /> Dashboard\n * </LinkBackButton>\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "LinkBackButton: ({ children, label, to }: "
+            },
+            {
+              "kind": "Reference",
+              "text": "LinkBackButtonProps",
+              "canonicalReference": "@contember/react-ui-lib!LinkBackButtonProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react/jsx-runtime\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "JSX.Element",
+              "canonicalReference": "@types/react!JSX.Element:interface"
+            }
+          ],
+          "fileUrlPath": "src/buttons/link-back-button.tsx",
+          "returnTypeTokenRange": {
+            "startIndex": 3,
+            "endIndex": 5
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "{ children, label, to }",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "LinkBackButton"
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!LinkBackButtonProps:type",
+          "docComment": "/**\n * Props for the {@link LinkBackButton} component.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type LinkBackButtonProps = "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    children?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    label: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    to: "
+            },
+            {
+              "kind": "Reference",
+              "text": "RoutingLinkTarget",
+              "canonicalReference": "@contember/react-ui-lib!~RoutingLinkTarget:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/buttons/link-back-button.tsx",
+          "releaseTag": "Public",
+          "name": "LinkBackButtonProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 8
+          }
+        }
+      ]
+    }
+  ]
+}

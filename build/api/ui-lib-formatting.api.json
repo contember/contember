@@ -1,0 +1,601 @@
+{
+  "metadata": {
+    "toolPackage": "@microsoft/api-extractor",
+    "toolVersion": "7.52.8",
+    "schemaVersion": 1011,
+    "oldestForwardsCompatibleVersion": 1001,
+    "tsdocConfig": {
+      "$schema": "https://developer.microsoft.com/json-schemas/tsdoc/v0/tsdoc.schema.json",
+      "noStandardTags": true,
+      "tagDefinitions": [
+        {
+          "tagName": "@alpha",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@beta",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@defaultValue",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@decorator",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@deprecated",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@eventProperty",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@example",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@experimental",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@inheritDoc",
+          "syntaxKind": "inline"
+        },
+        {
+          "tagName": "@internal",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@label",
+          "syntaxKind": "inline"
+        },
+        {
+          "tagName": "@link",
+          "syntaxKind": "inline",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@override",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@packageDocumentation",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@param",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@privateRemarks",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@public",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@readonly",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@remarks",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@returns",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@sealed",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@see",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@throws",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@typeParam",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@virtual",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@group",
+          "syntaxKind": "block"
+        }
+      ],
+      "reportUnsupportedHtmlElements": false
+    }
+  },
+  "kind": "Package",
+  "canonicalReference": "@contember/react-ui-lib!",
+  "docComment": "",
+  "name": "@contember/react-ui-lib",
+  "preserveMemberOrder": false,
+  "members": [
+    {
+      "kind": "EntryPoint",
+      "canonicalReference": "@contember/react-ui-lib!",
+      "name": "",
+      "preserveMemberOrder": false,
+      "members": [
+        {
+          "kind": "Function",
+          "canonicalReference": "@contember/react-ui-lib!createEnumFormatter:function(1)",
+          "docComment": "/**\n * createEnumFormatter - Creates enum value to label converter\n *\n * #### Purpose Maps enum keys to human-readable labels\n *\n * #### Features - Factory function returns formatter - Handles null values - Case-sensitive key matching\n *\n * #### Example\n * ```ts\n * const formatStatus = createEnumFormatter({ DRAFT: 'Draft', PUBLISHED: 'Published' })\n * formatStatus('DRAFT') // 'Draft'\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "createEnumFormatter: (enumValues: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Record",
+              "canonicalReference": "!Record:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<string, string>"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Content",
+              "text": "(value: string | null) => string | null"
+            }
+          ],
+          "fileUrlPath": "src/formatting/formatting.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 4,
+            "endIndex": 5
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "enumValues",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 3
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "createEnumFormatter"
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@contember/react-ui-lib!formatBoolean:function(1)",
+          "docComment": "/**\n * formatBoolean - Converts boolean values to localized strings\n *\n * #### Purpose Displays boolean values using application dictionary\n *\n * #### Features - Uses `dict.boolean.true` and `dict.boolean.false` - Returns null for null input\n *\n * #### Example\n * ```ts\n * formatBoolean(true) // 'Yes' (depending on dict)\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "formatBoolean: (value: "
+            },
+            {
+              "kind": "Content",
+              "text": "boolean | null"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Content",
+              "text": "string | null"
+            }
+          ],
+          "fileUrlPath": "src/formatting/formatting.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 3,
+            "endIndex": 4
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "value",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "formatBoolean"
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@contember/react-ui-lib!formatBytes:function(1)",
+          "docComment": "/**\n * formatBytes - Converts bytes to human-readable file sizes\n *\n * #### Purpose Formats raw byte counts to friendly units\n *\n * #### Features - Automatic unit selection (KB, MB, etc) - Configurable decimal precision - Handles zero values\n *\n * #### Example\n * ```ts\n * formatBytes(2048) // '2.0 KB'\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "formatBytes: (bytes: "
+            },
+            {
+              "kind": "Content",
+              "text": "number"
+            },
+            {
+              "kind": "Content",
+              "text": ", decimals?: "
+            },
+            {
+              "kind": "Content",
+              "text": "number"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Content",
+              "text": "string"
+            }
+          ],
+          "fileUrlPath": "src/formatting/formatting.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 5,
+            "endIndex": 6
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "bytes",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            },
+            {
+              "parameterName": "decimals",
+              "parameterTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 4
+              },
+              "isOptional": true
+            }
+          ],
+          "name": "formatBytes"
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@contember/react-ui-lib!formatDate:function(1)",
+          "docComment": "/**\n * formatDate - Formats a date string into localized date format\n *\n * #### Purpose Converts ISO date strings to human-readable date format\n *\n * #### Features - Handles null values gracefully - Uses browser locale settings - Returns only date portion\n *\n * #### Example\n * ```ts\n * formatDate('2023-10-05') // '10/5/2023' (en-US locale)\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "formatDate: (date: "
+            },
+            {
+              "kind": "Content",
+              "text": "string | null"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Content",
+              "text": "string | null"
+            }
+          ],
+          "fileUrlPath": "src/formatting/formatting.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 3,
+            "endIndex": 4
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "date",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "formatDate"
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@contember/react-ui-lib!formatDateTime:function(1)",
+          "docComment": "/**\n * formatDateTime - Formats date with time component\n *\n * #### Purpose Shows both date and time in localized format\n *\n * #### Features - Includes hours:minutes:seconds - Respects system timezone\n *\n * #### Example\n * ```ts\n * formatDateTime('2023-10-05T14:30:00') // '10/5/2023, 2:30:00 PM'\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "formatDateTime: (date: "
+            },
+            {
+              "kind": "Content",
+              "text": "string | null"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Content",
+              "text": "string | null"
+            }
+          ],
+          "fileUrlPath": "src/formatting/formatting.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 3,
+            "endIndex": 4
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "date",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "formatDateTime"
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@contember/react-ui-lib!formatDuration:function(1)",
+          "docComment": "/**\n * formatDuration - Converts seconds to mm:ss format\n *\n * #### Purpose Displays time durations in minutes:seconds\n *\n * #### Features - Pads seconds with leading zero - Handles over 60 minutes correctly\n *\n * #### Example\n * ```ts\n * formatDuration(125) // '2:05'\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "formatDuration: (duration: "
+            },
+            {
+              "kind": "Content",
+              "text": "number"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Content",
+              "text": "string"
+            }
+          ],
+          "fileUrlPath": "src/formatting/formatting.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 3,
+            "endIndex": 4
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "duration",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "formatDuration"
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@contember/react-ui-lib!formatJson:function(1)",
+          "docComment": "/**\n * formatJson - Pretty-prints JSON data\n *\n * #### Purpose Formats JSON objects for human readability\n *\n * #### Features - 2-space indentation - Syntax highlighting support - Handles circular references safely\n *\n * #### Example\n * ```ts\n * formatJson({ key: 'value' }) // '{\\n  \"key\": \"value\"\\n}'\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "formatJson: (value: "
+            },
+            {
+              "kind": "Content",
+              "text": "any"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Content",
+              "text": "string"
+            }
+          ],
+          "fileUrlPath": "src/formatting/formatting.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 3,
+            "endIndex": 4
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "value",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "formatJson"
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@contember/react-ui-lib!formatNumber:function(1)",
+          "docComment": "/**\n * formatNumber - Formats numbers with locale-aware separators\n *\n * #### Purpose Displays numbers with proper thousand separators\n *\n * #### Features - Handles integers and floats - Respects browser locale\n *\n * #### Example\n * ```ts\n * formatNumber(1234.5) // '1,234.5' (en-US)\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "formatNumber: (value: "
+            },
+            {
+              "kind": "Content",
+              "text": "number | null"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Content",
+              "text": "string | null"
+            }
+          ],
+          "fileUrlPath": "src/formatting/formatting.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 3,
+            "endIndex": 4
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "value",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "formatNumber"
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@contember/react-ui-lib!getFormatter:function(1)",
+          "docComment": "/**\n * getFormatter - Selects appropriate formatter based on schema type\n *\n * #### Purpose Automatically choose formatter for data types\n *\n * #### Mapping - Date → formatDate - DateTime → formatDateTime - Bool → formatBoolean - Integer/Float → formatNumber - Json → formatJson - Other → Identity formatter\n *\n * #### Example\n * ```ts\n * getFormatter({ type: 'Date' })('2023-10-05') // formatted date\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "getFormatter: (schema: "
+            },
+            {
+              "kind": "Reference",
+              "text": "SchemaColumn",
+              "canonicalReference": "@contember/react-ui-lib!~SchemaColumn:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Content",
+              "text": "((date: string | null) => string | null) | ((value: boolean | null) => string | null) | ((value: number | null) => string | null) | ((value: any) => any)"
+            }
+          ],
+          "fileUrlPath": "src/formatting/formatting.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 3,
+            "endIndex": 4
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "schema",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "getFormatter"
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@contember/react-ui-lib!withFallback:function(1)",
+          "docComment": "/**\n * withFallback - Creates fallback for null values\n *\n * #### Purpose Wraps formatters to handle null cases\n *\n * #### Features - Provides default value for null - Maintains original formatter behavior\n *\n * #### Example\n * ```ts\n * const safeFormat = withFallback(formatDate, 'Unknown date')\n * safeFormat(null) // 'Unknown date'\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "withFallback: <T>(formatter: "
+            },
+            {
+              "kind": "Content",
+              "text": "(value: T) => string"
+            },
+            {
+              "kind": "Content",
+              "text": ", fallback: "
+            },
+            {
+              "kind": "Content",
+              "text": "string"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Content",
+              "text": "(value: T | null) => string"
+            }
+          ],
+          "fileUrlPath": "src/formatting/formatting.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 5,
+            "endIndex": 6
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "formatter",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            },
+            {
+              "parameterName": "fallback",
+              "parameterTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 4
+              },
+              "isOptional": false
+            }
+          ],
+          "typeParameters": [
+            {
+              "typeParameterName": "T",
+              "constraintTokenRange": {
+                "startIndex": 0,
+                "endIndex": 0
+              },
+              "defaultTypeTokenRange": {
+                "startIndex": 0,
+                "endIndex": 0
+              }
+            }
+          ],
+          "name": "withFallback"
+        }
+      ]
+    }
+  ]
+}

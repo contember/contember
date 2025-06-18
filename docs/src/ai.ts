@@ -1,7 +1,194 @@
+import * as fs from 'fs'
 import OpenAI from 'openai'
-import type { AIPromptData, ComponentOverride, DocsConfig } from './types'
+import * as path from 'path'
+import type { AIPromptData, ComponentOverride, DocsConfig, PropData } from './types'
 
 const openai = new OpenAI()
+
+/**
+ * Reads and parses API extractor data for a component
+ */
+function getApiExtractorData(componentName: string): Record<string, PropData> | null {
+	try {
+		// Find the matching .api.json file
+		const apiDir = path.join(process.cwd(), '..', 'build', 'api')
+		const files = fs.readdirSync(apiDir)
+
+		// Look for ui-lib files first, then fall back to others
+		const apiFiles = files.filter(f => f.endsWith('.api.json'))
+
+		// Try to find the component in all API files
+		for (const apiFile of apiFiles) {
+			const apiData = JSON.parse(fs.readFileSync(path.join(apiDir, apiFile), 'utf-8'))
+
+			// First, look for the Props interface
+			const propsInterface = apiData.members?.[0]?.members?.find((m: any) =>
+				m.kind === 'Interface' && m.name === `${componentName}Props`,
+			)
+
+			if (propsInterface) {
+				const props: Record<string, PropData> = {}
+
+				// Extract props from the interface
+				propsInterface.members?.forEach((member: any) => {
+					if (member.kind === 'PropertySignature') {
+						const name = member.name
+						const type = member.excerptTokens
+							.slice(member.propertyTypeTokenRange.startIndex, member.propertyTypeTokenRange.endIndex)
+							.map((t: any) => t.text)
+							.join('')
+							.trim()
+
+						props[name] = {
+							name,
+							type,
+							description: member.docComment || '',
+							required: !member.excerptTokens.some((t: any) => t.text.includes('?')),
+						}
+					}
+				})
+
+				return props
+			}
+
+			// If no Props interface, look for the component itself
+			const component = apiData.members?.[0]?.members?.find((m: any) => m.name === componentName)
+
+			if (component) {
+				// For components defined as variables with inline types
+				if (component.kind === 'Variable' && component.variableTypeTokenRange) {
+					const typeTokens = component.excerptTokens.slice(
+						component.variableTypeTokenRange.startIndex,
+						component.variableTypeTokenRange.endIndex,
+					)
+
+					// Extract props from the inline type
+					const props: Record<string, PropData> = {}
+					let objectTypeLevel = 0
+					let objectTypeBuffer = ''
+					let inObjectType = false
+
+					typeTokens.forEach((token: any) => {
+						if (token.kind === 'Content' || token.kind === 'Reference') {
+							const text = token.text
+							if (text === '{') {
+								objectTypeLevel++
+								inObjectType = true
+							}
+							if (inObjectType) {
+								objectTypeBuffer += text
+							}
+							if (text === '}') {
+								objectTypeLevel--
+								if (objectTypeLevel === 0) {
+									inObjectType = false
+									// Now parse the objectTypeBuffer for props
+									const propLines = objectTypeBuffer
+										.replace(/^{|}$/g, '')
+										.split(/;|\n/)
+										.map(l => l.trim())
+										.filter(Boolean)
+									for (const line of propLines) {
+										// Match: name?: type or name: type
+										const match = line.match(/^(\w+)(\?)?:\s*(.+)$/)
+										if (match) {
+											const [, name, optional, type] = match
+											props[name] = {
+												name,
+												type: type.trim(),
+												description: '',
+												required: !optional,
+											}
+										}
+									}
+									objectTypeBuffer = ''
+								}
+							}
+						}
+					})
+
+					// Add common HTML attributes if no props were found
+					if (Object.keys(props).length === 0) {
+						props.asChild = {
+							name: 'asChild',
+							type: 'boolean',
+							description: 'Whether to render as a child component',
+							required: false,
+						}
+						props.children = {
+							name: 'children',
+							type: 'ReactNode',
+							description: 'The content to render',
+							required: false,
+						}
+						props.className = {
+							name: 'className',
+							type: 'string',
+							description: 'Additional CSS class name',
+							required: false,
+						}
+						props.style = {
+							name: 'style',
+							type: 'CSSProperties',
+							description: 'Inline styles',
+							required: false,
+						}
+						props.id = {
+							name: 'id',
+							type: 'string',
+							description: 'HTML id attribute',
+							required: false,
+						}
+						props['aria-label'] = {
+							name: 'aria-label',
+							type: 'string',
+							description: 'ARIA label for accessibility',
+							required: false,
+						}
+					}
+
+					return props
+				}
+			}
+		}
+
+		console.warn(`Component ${componentName} not found in API data`)
+		return null
+	} catch (error) {
+		console.error(`Error reading API extractor data for ${componentName}:`, error)
+		return null
+	}
+}
+
+/**
+ * Extracts props from a type definition
+ */
+function extractPropsFromTypeDef(typeDef: any): Record<string, PropData> {
+	const props: Record<string, PropData> = {}
+
+	typeDef.members?.forEach((prop: any) => {
+		if (prop.kind === 'PropertySignature' || prop.kind === 'Property') {
+			const description = prop.docComment?.split('\n')
+				.filter((line: string) => !line.startsWith('@'))
+				.join('\n')
+				.trim()
+
+			props[prop.name] = {
+				name: prop.name,
+				type: prop.excerptTokens
+					?.filter((t: any) => t.kind === 'Content')
+					.map((t: any) => t.text)
+					.join('')
+					.trim(),
+				description,
+				required: !prop.isOptional,
+				defaultValue: prop.docComment?.match(/@defaultValue\s+(.+)/)?.[1]?.trim(),
+			}
+		}
+	})
+
+	return props
+}
 
 export const buildPrompt = (data: AIPromptData, override?: ComponentOverride): string => {
 	const lines: string[] = []
@@ -65,8 +252,7 @@ export const buildPrompt = (data: AIPromptData, override?: ComponentOverride): s
 	// Main component info
 	lines.push(`## Component\n${data.componentName}\n`)
 	lines.push(
-		`## Description (from JSDoc)\n${
-			data.jsdoc ?? '_No JSDoc description provided._'
+		`## Description (from JSDoc)\n${data.jsdoc ?? '_No JSDoc description provided._'
 		}\n`,
 	)
 
@@ -381,14 +567,86 @@ export async function generateMarkdownWithAI(
 
 		// eslint-disable-next-line no-console
 		console.log(
-			`AI response received (${Math.round(result.length / 1024)}KB). Token usage: ${
-				response.usage?.total_tokens || 'unknown'
+			`AI response received (${Math.round(result.length / 1024)}KB). Token usage: ${response.usage?.total_tokens || 'unknown'
 			}`,
 		)
 
-		return result
+		// Process the generated documentation to add props tables
+		const processedContent = processPropsDocumentation(result, sourceData)
+
+		return processedContent
 	} catch (error) {
 		console.error('Error generating component documentation with AI:', error)
 		return null
 	}
+}
+
+/**
+ * Processes the generated documentation to add props tables
+ */
+export function processPropsDocumentation(content: string, data: AIPromptData): string {
+	let processedContent = content
+
+	// For component groups, we need to handle multiple components
+	if (data.isComponentGroup && data.groupComponents) {
+		// Process each component's props
+		data.groupComponents.forEach(comp => {
+			// Try to get props from API extractor
+			const apiProps = getApiExtractorData(comp.componentName)
+			if (apiProps) {
+				const propsTable = generatePropsTable(apiProps, comp.componentName)
+
+				// Replace the placeholder for this component
+				const placeholder = comp.isMainComponent ? '<!-- props -->' : `<!-- props:${comp.componentName} -->`
+				processedContent = processedContent.replace(placeholder, propsTable)
+			} else {
+				console.warn(`No props found for component ${comp.componentName}`)
+			}
+		})
+	} else {
+		// For single components, try to get props from API extractor
+		const apiProps = getApiExtractorData(data.componentName)
+		if (apiProps) {
+			const propsTable = generatePropsTable(apiProps, data.componentName)
+			processedContent = processedContent.replace('<!-- props -->', propsTable)
+		} else {
+			console.warn(`No props found for component ${data.componentName}`)
+		}
+	}
+
+	return processedContent
+}
+
+/**
+ * Generates a props table in markdown format using API extractor data
+ */
+function generatePropsTable(props: Record<string, PropData>, componentName: string): string {
+	const lines: string[] = []
+
+	// Add table header
+	lines.push('| Name | Type | Required | Description |')
+	lines.push('|------|------|----------|-------------|')
+
+	// Add each prop as a row
+	Object.entries(props).forEach(([propName, propData]) => {
+		const type = propData.type || 'any'
+		const description = propData.description || ''
+		const required = propData.required ? 'Yes' : 'No'
+		const defaultValue = propData.defaultValue ? `Default: \`${propData.defaultValue}\`` : ''
+
+		// Clean up the type string
+		const cleanType = type
+			.replace(/\s+/g, ' ')
+			.replace(/\["([^"]+)"\]/g, '["$1"]')
+			.trim()
+
+		// Combine all descriptions
+		const fullDescription = [description, defaultValue]
+			.filter(Boolean)
+			.join(' ')
+
+		lines.push(`| ${propName} | \`${cleanType}\` | ${required} | ${fullDescription} |`)
+	})
+
+	return lines.join('\n')
 }

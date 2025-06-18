@@ -1,0 +1,505 @@
+{
+  "metadata": {
+    "toolPackage": "@microsoft/api-extractor",
+    "toolVersion": "7.52.8",
+    "schemaVersion": 1011,
+    "oldestForwardsCompatibleVersion": 1001,
+    "tsdocConfig": {
+      "$schema": "https://developer.microsoft.com/json-schemas/tsdoc/v0/tsdoc.schema.json",
+      "noStandardTags": true,
+      "tagDefinitions": [
+        {
+          "tagName": "@alpha",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@beta",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@defaultValue",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@decorator",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@deprecated",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@eventProperty",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@example",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@experimental",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@inheritDoc",
+          "syntaxKind": "inline"
+        },
+        {
+          "tagName": "@internal",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@label",
+          "syntaxKind": "inline"
+        },
+        {
+          "tagName": "@link",
+          "syntaxKind": "inline",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@override",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@packageDocumentation",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@param",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@privateRemarks",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@public",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@readonly",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@remarks",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@returns",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@sealed",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@see",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@throws",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@typeParam",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@virtual",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@group",
+          "syntaxKind": "block"
+        }
+      ],
+      "reportUnsupportedHtmlElements": false
+    }
+  },
+  "kind": "Package",
+  "canonicalReference": "@contember/react-ui-lib!",
+  "docComment": "",
+  "name": "@contember/react-ui-lib",
+  "preserveMemberOrder": false,
+  "members": [
+    {
+      "kind": "EntryPoint",
+      "canonicalReference": "@contember/react-ui-lib!",
+      "name": "",
+      "preserveMemberOrder": false,
+      "members": [
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!LayoutBoxedComponent:var",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "LayoutBoxedComponent: "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    ({ children, ...rest }: "
+            },
+            {
+              "kind": "Reference",
+              "text": "PropsWithChildren",
+              "canonicalReference": "@types/react!React.PropsWithChildren:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<{}>): import(\"react/jsx-runtime\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "JSX.Element",
+              "canonicalReference": "@types/react!JSX.Element:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    displayName: string;\n}"
+            }
+          ],
+          "fileUrlPath": "src/layout/layout-boxed.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "LayoutBoxedComponent",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 6
+          }
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@contember/react-ui-lib!LayoutComponent:function(1)",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "LayoutComponent: ({ children }: "
+            },
+            {
+              "kind": "Reference",
+              "text": "PropsWithChildren",
+              "canonicalReference": "@types/react!React.PropsWithChildren:type"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react/jsx-runtime\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "JSX.Element",
+              "canonicalReference": "@types/react!JSX.Element:interface"
+            }
+          ],
+          "fileUrlPath": "src/layout/layout.tsx",
+          "returnTypeTokenRange": {
+            "startIndex": 3,
+            "endIndex": 5
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "{ children }",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "LayoutComponent"
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!Slots:var",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "Slots: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Readonly",
+              "canonicalReference": "!Readonly:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<{\n    readonly Back: import(\"@contember/react-slots\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "SlotSourceComponent",
+              "canonicalReference": "@contember/react-ui-lib!~SlotSourceComponent:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<\"Back\">;\n    readonly Sidebar: import(\"@contember/react-slots\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "SlotSourceComponent",
+              "canonicalReference": "@contember/react-ui-lib!~SlotSourceComponent:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<\"Sidebar\">;\n    readonly Title: import(\"@contember/react-slots\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "SlotSourceComponent",
+              "canonicalReference": "@contember/react-ui-lib!~SlotSourceComponent:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<\"Title\">;\n    readonly Logo: import(\"@contember/react-slots\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "SlotSourceComponent",
+              "canonicalReference": "@contember/react-ui-lib!~SlotSourceComponent:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<\"Logo\">;\n    readonly Navigation: import(\"@contember/react-slots\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "SlotSourceComponent",
+              "canonicalReference": "@contember/react-ui-lib!~SlotSourceComponent:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<\"Navigation\">;\n    readonly Footer: import(\"@contember/react-slots\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "SlotSourceComponent",
+              "canonicalReference": "@contember/react-ui-lib!~SlotSourceComponent:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<\"Footer\">;\n    readonly Content: import(\"@contember/react-slots\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "SlotSourceComponent",
+              "canonicalReference": "@contember/react-ui-lib!~SlotSourceComponent:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<\"Content\">;\n    readonly ContentHeader: import(\"@contember/react-slots\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "SlotSourceComponent",
+              "canonicalReference": "@contember/react-ui-lib!~SlotSourceComponent:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<\"ContentHeader\">;\n    readonly Actions: import(\"@contember/react-slots\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "SlotSourceComponent",
+              "canonicalReference": "@contember/react-ui-lib!~SlotSourceComponent:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<\"Actions\">;\n    readonly UserNavigation: import(\"@contember/react-slots\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "SlotSourceComponent",
+              "canonicalReference": "@contember/react-ui-lib!~SlotSourceComponent:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<\"UserNavigation\">;\n}>"
+            }
+          ],
+          "fileUrlPath": "src/layout/slots.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "Slots",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 23
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!SlotTargets:var",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "SlotTargets: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Readonly",
+              "canonicalReference": "!Readonly:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<{\n    readonly Back: import(\"@contember/react-slots\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "SlotTargetComponent",
+              "canonicalReference": "@contember/react-ui-lib!~SlotTargetComponent:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<\"Back\">;\n    readonly Sidebar: import(\"@contember/react-slots\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "SlotTargetComponent",
+              "canonicalReference": "@contember/react-ui-lib!~SlotTargetComponent:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<\"Sidebar\">;\n    readonly Title: import(\"@contember/react-slots\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "SlotTargetComponent",
+              "canonicalReference": "@contember/react-ui-lib!~SlotTargetComponent:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<\"Title\">;\n    readonly Logo: import(\"@contember/react-slots\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "SlotTargetComponent",
+              "canonicalReference": "@contember/react-ui-lib!~SlotTargetComponent:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<\"Logo\">;\n    readonly Navigation: import(\"@contember/react-slots\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "SlotTargetComponent",
+              "canonicalReference": "@contember/react-ui-lib!~SlotTargetComponent:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<\"Navigation\">;\n    readonly Footer: import(\"@contember/react-slots\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "SlotTargetComponent",
+              "canonicalReference": "@contember/react-ui-lib!~SlotTargetComponent:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<\"Footer\">;\n    readonly Content: import(\"@contember/react-slots\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "SlotTargetComponent",
+              "canonicalReference": "@contember/react-ui-lib!~SlotTargetComponent:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<\"Content\">;\n    readonly ContentHeader: import(\"@contember/react-slots\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "SlotTargetComponent",
+              "canonicalReference": "@contember/react-ui-lib!~SlotTargetComponent:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<\"ContentHeader\">;\n    readonly Actions: import(\"@contember/react-slots\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "SlotTargetComponent",
+              "canonicalReference": "@contember/react-ui-lib!~SlotTargetComponent:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<\"Actions\">;\n    readonly UserNavigation: import(\"@contember/react-slots\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "SlotTargetComponent",
+              "canonicalReference": "@contember/react-ui-lib!~SlotTargetComponent:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<\"UserNavigation\">;\n}>"
+            }
+          ],
+          "fileUrlPath": "src/layout/slots.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "SlotTargets",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 23
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!Title:var",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "Title: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<{\n    children: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}>"
+            }
+          ],
+          "fileUrlPath": "src/layout/slots.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "Title",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 6
+          }
+        }
+      ]
+    }
+  ]
+}

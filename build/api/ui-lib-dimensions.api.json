@@ -1,0 +1,546 @@
+{
+  "metadata": {
+    "toolPackage": "@microsoft/api-extractor",
+    "toolVersion": "7.52.8",
+    "schemaVersion": 1011,
+    "oldestForwardsCompatibleVersion": 1001,
+    "tsdocConfig": {
+      "$schema": "https://developer.microsoft.com/json-schemas/tsdoc/v0/tsdoc.schema.json",
+      "noStandardTags": true,
+      "tagDefinitions": [
+        {
+          "tagName": "@alpha",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@beta",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@defaultValue",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@decorator",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@deprecated",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@eventProperty",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@example",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@experimental",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@inheritDoc",
+          "syntaxKind": "inline"
+        },
+        {
+          "tagName": "@internal",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@label",
+          "syntaxKind": "inline"
+        },
+        {
+          "tagName": "@link",
+          "syntaxKind": "inline",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@override",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@packageDocumentation",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@param",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@privateRemarks",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@public",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@readonly",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@remarks",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@returns",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@sealed",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@see",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@throws",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@typeParam",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@virtual",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@group",
+          "syntaxKind": "block"
+        }
+      ],
+      "reportUnsupportedHtmlElements": false
+    }
+  },
+  "kind": "Package",
+  "canonicalReference": "@contember/react-ui-lib!",
+  "docComment": "",
+  "name": "@contember/react-ui-lib",
+  "preserveMemberOrder": false,
+  "members": [
+    {
+      "kind": "EntryPoint",
+      "canonicalReference": "@contember/react-ui-lib!",
+      "name": "",
+      "preserveMemberOrder": false,
+      "members": [
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!DimensionsSwitcher:var",
+          "docComment": "/**\n * Props {@link DimensionsSwitcherProps}.\n *\n * `DimensionsSwitcher` is a UI component for switching between different dimensions of data.\n *\n * #### Example: Basic usage\n * ```tsx\n * <DimensionsSwitcher\n *   dimension=\"locale\"\n *   slugField=\"code\"\n *   options=\"DimensionsLocale\"\n * >\n *   <Field field=\"label\" />\n * </DimensionsSwitcher>\n * ```\n *\n * #### Example: With initial sorting and multi-selection\n * ```tsx\n * <DimensionsSwitcher\n *   dimension=\"locale\"\n *   slugField=\"code\"\n *   options=\"DimensionsLocale\"\n *   orderBy={{ label: 'desc' }}\n *   isMulti\n * >\n *   <Field field=\"label\" />\n * </DimensionsSwitcher>\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "DimensionsSwitcher: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "DimensionsSwitcherProps",
+              "canonicalReference": "@contember/react-ui-lib!DimensionsSwitcherProps:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            }
+          ],
+          "fileUrlPath": "src/dimensions/dimensions.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "DimensionsSwitcher",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 6
+          }
+        },
+        {
+          "kind": "Interface",
+          "canonicalReference": "@contember/react-ui-lib!DimensionsSwitcherProps:interface",
+          "docComment": "/**\n * Props for the {@link DimensionsSwitcher} component.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export interface DimensionsSwitcherProps "
+            }
+          ],
+          "fileUrlPath": "src/dimensions/dimensions.tsx",
+          "releaseTag": "Public",
+          "name": "DimensionsSwitcherProps",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@contember/react-ui-lib!DimensionsSwitcherProps#children:member",
+              "docComment": "/**\n * Child components or fields to render within the dimension selector.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "children: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ReactNode",
+                  "canonicalReference": "@types/react!React.ReactNode:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "children",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@contember/react-ui-lib!DimensionsSwitcherProps#dimension:member",
+              "docComment": "/**\n * The name of the dimension to switch.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "dimension: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "dimension",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@contember/react-ui-lib!DimensionsSwitcherProps#isMulti:member",
+              "docComment": "/**\n * Enables multi-selection mode.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "isMulti?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "boolean"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": true,
+              "releaseTag": "Public",
+              "name": "isMulti",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@contember/react-ui-lib!DimensionsSwitcherProps#options:member",
+              "docComment": "/**\n * Entity list for dimension options\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "options: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "SugaredQualifiedEntityList",
+                  "canonicalReference": "@contember/react-ui-lib!~SugaredQualifiedEntityList:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "['entities']"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "options",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 3
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@contember/react-ui-lib!DimensionsSwitcherProps#orderBy:member",
+              "docComment": "/**\n * Specifies initial sorting of the options (e.g., `{ label: 'desc' }`).\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "orderBy?: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "DataViewSortingDirections",
+                  "canonicalReference": "@contember/react-ui-lib!~DataViewSortingDirections:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": true,
+              "releaseTag": "Public",
+              "name": "orderBy",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@contember/react-ui-lib!DimensionsSwitcherProps#slugField:member",
+              "docComment": "/**\n * Field containing unique dimension identifiers\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "slugField: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "SugaredRelativeSingleField",
+                  "canonicalReference": "@contember/react-ui-lib!~SugaredRelativeSingleField:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "['field']"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "slugField",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 3
+              }
+            }
+          ],
+          "extendsTokenRanges": []
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!SideDimensions:var",
+          "docComment": "/**\n * Props {@link SideDimensionsProps}.\n *\n * `SideDimensions` is a layout component that renders a dimension within a flexible side panel. It wraps its content inside a `DimensionRenderer` and `HasOne` field relationship.\n *\n * #### Example: Basic Usage\n * ```tsx\n * <SideDimensions\n *   dimension=\"locale\"\n *   as=\"currentLocale\"\n *   field=\"locales(locale.code = $currentLocale)\"\n * >\n *   <InputField field=\"title\" />\n * </SideDimensions>\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "SideDimensions: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "SideDimensionsProps",
+              "canonicalReference": "@contember/react-ui-lib!SideDimensionsProps:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            }
+          ],
+          "fileUrlPath": "src/dimensions/dimensions.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "SideDimensions",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 6
+          }
+        },
+        {
+          "kind": "Interface",
+          "canonicalReference": "@contember/react-ui-lib!SideDimensionsProps:interface",
+          "docComment": "/**\n * Props for the {@link SideDimensions} component.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export interface SideDimensionsProps "
+            }
+          ],
+          "fileUrlPath": "src/dimensions/dimensions.tsx",
+          "releaseTag": "Public",
+          "name": "SideDimensionsProps",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@contember/react-ui-lib!SideDimensionsProps#as:member",
+              "docComment": "/**\n * The name of the dimension to use in the context.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "as: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "as",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@contember/react-ui-lib!SideDimensionsProps#children:member",
+              "docComment": "/**\n * Child components or fields to render within the dimension selector.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "children: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ReactNode",
+                  "canonicalReference": "@types/react!React.ReactNode:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "children",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@contember/react-ui-lib!SideDimensionsProps#dimension:member",
+              "docComment": "/**\n * The name of the dimension to render.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "dimension: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "dimension",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@contember/react-ui-lib!SideDimensionsProps#field:member",
+              "docComment": "/**\n * The field to filter by.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "field: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "SugaredRelativeSingleEntity",
+                  "canonicalReference": "@contember/react-ui-lib!~SugaredRelativeSingleEntity:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "['field']"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "field",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 3
+              }
+            }
+          ],
+          "extendsTokenRanges": []
+        }
+      ]
+    }
+  ]
+}

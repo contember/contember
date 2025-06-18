@@ -1,98 +1,94 @@
----
-title: SortableMultiSelectField
----
+# SortableMultiSelectField
 
 ## Overview
-SortableMultiSelectField lets you pick many related entities and sort them with drag-and-drop.  
-Use it inside an entity context and tell it which field stores the order with `sortableBy`.
+SortableMultiSelectField lets you pick multiple related entities and order them with drag-and-drop.  
+It extends MultiSelectField, adds sortable handling, and stores the explicit order in a chosen field.
 
 ## Core Concepts
-- Entity context (`<EntitySubTree />` or `<EntityListSubTree />`) is mandatory.  
-- `sortableBy` defines where Contember saves the numeric order.  
-- `connectAt` chooses the relation used to link the selected entity.  
-- The component inherits every feature of MultiSelectField.  
-- Dragging an item updates its sort index immediately.
+* Works only inside an entity context (`<EntitySubTree />` or `<EntityListSubTree />`).
+* Needs a numeric sort column supplied through `sortableBy`.
+* `connectAt` tells Contember which relation to use for connecting items.
+* Dragging items updates their order instantly in the form state.
+* All visual, validation, and option features of MultiSelectField stay available.
 
 ## Installation
 ```tsx
-// Any file where you build forms
-import {
-  Binding,
-  EntitySubTree,
-  Field,
-  PersistButton,
-  SortableMultiSelectField,
-} from '@app/lib/form'
+// pick the import path you already use for Contember form components
+import { SortableMultiSelectField } from '@app/lib/form'
 ```
 
 ## Quick Start
 ```tsx
-import {
-  Binding,
-  EntitySubTree,
-  Field,
-  PersistButton,
-  SortableMultiSelectField,
-} from '@app/lib/form'
-
-export default () => (
-  <Binding>
-    <EntitySubTree entity="Book(id = 1)">
-      <SortableMultiSelectField
-        className="w-full"
-        field="chapterPages"
-        label="Page order"
-        sortableBy="pageNumber"
-        connectAt="bookChapter"
-      >
-        <Field field="content" />
-      </SortableMultiSelectField>
-
-      <PersistButton className="mt-4" />
-    </EntitySubTree>
-  </Binding>
-)
-```
-
-## Detailed Guide
-1. Wrap your form with `<Binding>` so Contember tracks changes.  
-2. Open an entity scope with `<EntitySubTree entity="Book(id = 1)" />`.  
-3. Add `<SortableMultiSelectField>` and pass:  
-   - `field="chapterPages"` – relation holding pages.  
-   - `sortableBy="pageNumber"` – integer field on the relation.  
-   - `connectAt="bookChapter"` – relation through which a page connects.  
-4. Place one or more `<Field>` components inside to decide what users see for each item.  
-5. Add a `<PersistButton>` to save the order.
-
-While users drag, Contember updates `pageNumber` immediately. Persisting flushes the new order to the API.
-
-## Component API Reference
-
-### Main Component (SortableMultiSelectField)
-
-#### Props
-<!-- props -->
-
-## Examples
-
-### Tags sorted on a location
-```tsx
 <SortableMultiSelectField
-  options="Tag"
-  label="Tags"
-  field="location.tags"
-  connectAt="tag"
-  sortableBy="order"
+  field="chapterPages"
+  label="Page order"
+  sortableBy="pageNumber"
+  connectAt="bookChapter"
 >
-  <Field field="internalName" />
+  <Field field="content" />
 </SortableMultiSelectField>
 ```
 
-### Playground: has-many sortable select
+## Detailed Guide
+1. Wrap your edit page in Binding and an entity subtree.
+2. Add SortableMultiSelectField.
+3. Pass  
+   * `field` – the has-many relation you are editing.  
+   * `sortableBy` – the column used to store order.  
+   * `connectAt` – the has-one relation path that links the item.
+4. Provide children that render each option’s preview (most often `<Field field="name" />`).
+5. Items appear with drag handles. Drag to reorder.  
+6. PersistButton saves both connections and order.
+
+```tsx
+<Binding>
+  <Slots.Actions><PersistButton /></Slots.Actions>
+
+  <EntitySubTree entity="Article(unique = $id)">
+    <SortableMultiSelectField
+      field="articleTags"
+      label="Tags"
+      options="Tag"
+      connectAt="tag"
+      sortableBy="order"
+    >
+      <Field field="internalName" />
+    </SortableMultiSelectField>
+  </EntitySubTree>
+</Binding>
+```
+
+## Component API Reference
+
+### SortableMultiSelectField
+#### Props
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| asChild | `boolean` | No | Whether to render as a child component |
+| children | `ReactNode` | No | The content to render |
+| className | `string` | No | Additional CSS class name |
+| style | `CSSProperties` | No | Inline styles |
+| id | `string` | No | HTML id attribute |
+| aria-label | `string` | No | ARIA label for accessibility |
+
+| prop | type | required | description |
+| ---- | ---- | -------- | ----------- |
+| `field` | string &#124; object | ✔️ | Has-many relation you are editing. |
+| `sortableBy` | string &#124; object | ✔️ | Field that stores the order (integer). |
+| `connectAt` | string &#124; relation | ✔️ | Path to the has-one relation for connection. |
+| `label` | ReactNode | ✔️ | Field label. |
+| `children` | ReactNode | ✔️ | Option renderer, usually one or more `<Field>` nodes. |
+| … | _see MultiSelectField_ | | All other props of MultiSelectField are supported. |
+
+## Hooks
+_No dedicated hooks._
+
+## Examples
+### Has-many ordered values
 ```tsx
 <SortableMultiSelectField
   field="hasManySorted"
-  label="Sorted values"
+  label="Values"
   connectAt="value"
   sortableBy="order"
 >
@@ -100,17 +96,30 @@ While users drag, Contember updates `pageNumber` immediately. Persisting flushes
 </SortableMultiSelectField>
 ```
 
+### Tag picker inside a complex form
+```tsx
+<SortableMultiSelectField
+  options="Tag"
+  field="location.tags"
+  connectAt="tag"
+  sortableBy="order"
+  label="Tags"
+>
+  <Field field="internalName" />
+</SortableMultiSelectField>
+```
+
 ## Best Practices & Gotchas
-- Always set `sortableBy`; without it the order cannot persist.  
-- Keep the list height small so users do not scroll while dragging.  
-- Show a drag handle or add `cursor-move` via Tailwind to hint interactivity.  
-- Avoid heavy filters in `options` when you only need the entity name.  
-- Remember to wrap the form in `<Binding>` and include `<PersistButton>`.
+* Always create an integer column (`order` or similar) and make it required; null breaks ordering.
+* Place PersistButton somewhere in the page; drag changes live only in form state.
+* Do not sort on the server side too—let the component manage order.
+* Children should be lightweight; heavy render slows drag performance.
+* Use `initialSorting` only for virtual ordering of unselected options, not for selected items.
 
 ## Further Reading
-- MultiSelectField – base selection component.  
-- EntitySubTree – creates the entity context.  
-- Drag-and-drop in Contember UI.
+* MultiSelectField – parent component with filtering and option handling.
+* Field – renders individual fields inside options.
+* EntitySubTree – scoping entity contexts.
 
 <!-- End of Generated Documentation -->
 

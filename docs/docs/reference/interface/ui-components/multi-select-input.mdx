@@ -1,125 +1,221 @@
----
-title: MultiSelectInput
----
-
-<!-- Edited by human: false -->
-<!-- Examples count: 1 -->
-<!-- Source examples: 1 -->
-<!-- Playground examples: 0 -->
-<!-- External examples: 0 -->
-<!-- Import examples: 0 -->
-
-# MultiSelectInput Component Group
+# MultiSelectInput & Friends
 
 ## Overview
-MultiSelectInput lets you pick multiple related entities from a dropdown list.  
-You can filter, sort, and even create new entities without leaving the input.
+`MultiSelectInput` lets you pick many entities from a list.  
+You can filter, sort, and even create missing entities without leaving the input.
+
+The component bundles several UI helpers (wrappers, items, popovers) so you can compose a rich select field while keeping full control over styling.
 
 ## Core Concepts
-- Multi-value selection bound to a relation field.
-- Filtered option list supplied by Contember query objects.
-- Initial ascending or descending sorting.
-- Inline entity creation through an embedded form.
+* Multi-selection of entities stored in Contember.
+* Inline entity creation inside the dropdown.
+* Filtering and sorting options client side or server side.
+* Composable UI – wrap, list, drag, remove, and pop over items.
+* Works with regular Contember `<Field>` components.
 
 ## Installation
 ```bash
-npm install @contember/admin
+npm install @contember/react-components
 ```
 
 ```tsx
-import { MultiSelectInput, Field } from '@contember/admin'
+import {
+	MultiSelectInput,
+	MultiSelectItemUI,
+	MultiSelectItemRemoveButtonUI,
+	Popover,
+	PopoverTrigger,
+} from '@contember/react-components'
 ```
 
 ## Quick Start
 ```tsx
-import { MultiSelectInput, Field } from '@contember/admin'
-
 <MultiSelectInput
-  field="tags"
-  placeholder="Select tags"
-  options={[
-    { field: 'id', operator: 'eq', value: '1', label: 'Tag 1' },
-    { field: 'id', operator: 'eq', value: '2', label: 'Tag 2' },
-  ]}
-  createNewForm={<div className="p-4">Form to create a new tag</div>}
-  initialSorting="ASC"
-  className="w-full"
-/>
+	field="tags"
+	placeholder="Select tags"
+	options={[
+		{ field: 'id', operator: 'eq', value: '1', label: 'Tag 1' },
+		{ field: 'id', operator: 'eq', value: '2', label: 'Tag 2' },
+	]}
+	createNewForm={<div>Form to create a new tag</div>}
+	initialSorting="ASC"
+>
+	<Field field="name" />
+</MultiSelectInput>
 ```
 
 ## Detailed Guide
-1. Pass `field` with the relation name, e.g. `"tags"`.  
-2. Build `options` with filter objects containing a `label`.  
-3. Add a `<Field>` child when you need custom rendering inside each option.  
-4. Control list order with `initialSorting="ASC"` or `"DESC"`.  
-5. Supply `createNewForm` to open an inline form at the bottom of the menu.  
+1. Wrap the component in a Contember form or entity context.  
+2. Pass the entity relation in `field`.  
+3. Provide `options` for initial search results.  
+4. Optionally render `createNewForm` so users add new entities inline.  
+5. Use subcomponents to customize the UI:
 
 ```tsx
-<MultiSelectInput
-  field="tags"
-  placeholder="Select tags"
-  options={[
-    { field: 'id', operator: 'eq', value: '1', label: 'Tag 1' },
-    { field: 'id', operator: 'eq', value: '2', label: 'Tag 2' },
-  ]}
-  createNewForm={<div>New tag form</div>}
-  initialSorting="DESC"
-  className="w-full"
->
-  <Field field="name" />
+<MultiSelectInput field="authors" placeholder="Pick authors">
+	{/* Shows each chosen value */}
+	<MultiSelectItemWrapperUI className="flex items-center gap-1">
+		<MultiSelectItemContentUI className="px-2" />
+		<MultiSelectItemRemoveButtonUI className="text-red-500" />
+	</MultiSelectItemWrapperUI>
 </MultiSelectInput>
 ```
+
+The input is rendered inside a `Popover`.  
+`PopoverTrigger` toggles the dropdown, while `PopoverContent` holds the list.
 
 ## Component API Reference
 
 ### MultiSelectInput
-Multi-select dropdown tied to a relation field.
+Select multiple related entities with optional inline creation.
 
 #### Props
-| Name | Type | Required | Default | Description |
-|------|------|----------|---------|-------------|
-| field | SugaredRelativeEntityList['field'] | Yes | – |  |
-| options | SugaredQualifiedEntityList['entities'] | No | – |  |
-| children | ReactNode | Yes | – |  |
-| placeholder | ReactNode | No | – |  |
-| createNewForm | ReactNode | No | – |  |
-| queryField | DataViewUnionFilterFields | No | – |  |
-| initialSorting | DataViewSortingDirections | No | – |  |
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| asChild | `boolean` | No | Whether to render as a child component |
+| children | `ReactNode` | No | The content to render |
+| className | `string` | No | Additional CSS class name |
+| style | `CSSProperties` | No | Inline styles |
+| id | `string` | No | HTML id attribute |
+| aria-label | `string` | No | ARIA label for accessibility |
 
+---
 
-## Hooks
-*No hooks exported by this component group.*
+### MultiSelectItemWrapperUI
+Visual wrapper around each chosen item.
+
+#### Props
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| asChild | `boolean` | No | Whether to render as a child component |
+| children | `ReactNode` | No | The content to render |
+| className | `string` | No | Additional CSS class name |
+| style | `CSSProperties` | No | Inline styles |
+| id | `string` | No | HTML id attribute |
+| aria-label | `string` | No | ARIA label for accessibility |
+
+### MultiSelectItemUI
+Base component for a single selected item.
+
+#### Props
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| asChild | `boolean` | No | Whether to render as a child component |
+| children | `ReactNode` | No | The content to render |
+| className | `string` | No | Additional CSS class name |
+| style | `CSSProperties` | No | Inline styles |
+| id | `string` | No | HTML id attribute |
+| aria-label | `string` | No | ARIA label for accessibility |
+
+### MultiSelectItemContentUI
+Renders the textual/content part of a selected item.
+
+#### Props
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| asChild | `boolean` | No | Whether to render as a child component |
+| children | `ReactNode` | No | The content to render |
+| className | `string` | No | Additional CSS class name |
+| style | `CSSProperties` | No | Inline styles |
+| id | `string` | No | HTML id attribute |
+| aria-label | `string` | No | ARIA label for accessibility |
+
+### MultiSelectSortableItemContentUI
+Wraps item content and integrates drag-and-drop sorting.
+
+#### Props
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| asChild | `boolean` | No | Whether to render as a child component |
+| children | `ReactNode` | No | The content to render |
+| className | `string` | No | Additional CSS class name |
+| style | `CSSProperties` | No | Inline styles |
+| id | `string` | No | HTML id attribute |
+| aria-label | `string` | No | ARIA label for accessibility |
+
+### MultiSelectItemDragOverlayUI
+Drag overlay shown while sorting items.
+
+#### Props
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| asChild | `boolean` | No | Whether to render as a child component |
+| children | `ReactNode` | No | The content to render |
+| className | `string` | No | Additional CSS class name |
+| style | `CSSProperties` | No | Inline styles |
+| id | `string` | No | HTML id attribute |
+| aria-label | `string` | No | ARIA label for accessibility |
+
+### MultiSelectItemRemoveButtonUI
+Small button that removes the current item.
+
+#### Props
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| asChild | `boolean` | No | Whether to render as a child component |
+| children | `ReactNode` | No | The content to render |
+| className | `string` | No | Additional CSS class name |
+| style | `CSSProperties` | No | Inline styles |
+| id | `string` | No | HTML id attribute |
+| aria-label | `string` | No | ARIA label for accessibility |
+
+### Popover
+Generic floating panel used internally by the input.
+
+#### Props
+<!-- props:Popover -->
+
+### PopoverTrigger
+Element that toggles the `Popover`.
+
+#### Props
+<!-- props:PopoverTrigger -->
 
 ## Examples
-### Basic usage with inline entity creation
+### Inline Entity Creation
 ```tsx
 <MultiSelectInput
-  field="tags"
-  placeholder="Select tags"
-  options={[
-    { field: 'id', operator: 'eq', value: '1', label: 'Tag 1' },
-    { field: 'id', operator: 'eq', value: '2', label: 'Tag 2' },
-  ]}
-  createNewForm={<div>Form to create a new tag</div>}
-  initialSorting="ASC"
-  className="w-full"
+	field="categories"
+	createNewForm={<CategoryForm />}
 >
-  <Field field="name" />
+	<Field field="name" />
 </MultiSelectInput>
 ```
 
+### Custom Item Layout with Remove Button
+```tsx
+<MultiSelectInput field="tags">
+	<MultiSelectItemWrapperUI className="flex gap-2 items-center bg-gray-100 px-2 py-1 rounded">
+		<MultiSelectItemContentUI />
+		<MultiSelectItemRemoveButtonUI />
+	</MultiSelectItemWrapperUI>
+</MultiSelectInput>
+```
+
+### Using Popover Directly
+```tsx
+<Popover>
+	<PopoverTrigger asChild>
+		<button className="px-2 py-1 border rounded">Filters</button>
+	</PopoverTrigger>
+	<PopoverContent className="p-4 bg-white shadow-lg">
+		<DataGridEnumFilter field="state" />
+	</PopoverContent>
+</Popover>
+```
+
 ## Best Practices & Gotchas
-- Keep the `options` array short to reduce query cost.
-- Provide a `<Field>` child to avoid showing raw IDs.
-- Use Tailwind `truncate` on option labels for long names.
-- Embed `createNewForm` sparingly to keep focus on selection.
+* Always place `MultiSelectInput` inside a Contember `Form` or `Entity`.
+* Provide meaningful `placeholder` to guide users.
+* Keep `options` small; rely on server search for large data sets.
+* Show a clear remove icon on each item to avoid user confusion.
+* Wrap long item labels to prevent layout breaks.
 
 ## Further Reading
-- SelectInput – single-value variant.
-- Contember Filters – build powerful option queries.
-- Form Blocks – compose reusable inline forms.
+* `SingleSelectInput` – when you need just one value.
+* `DataGrid` filters – often used inside `Popover`.
+* Drag-and-drop helpers for sortable lists.
 
 <!-- End of Generated Documentation -->
-
 
 > **Note:** Props reference has been automatically enhanced with precise API types from API Extractor.

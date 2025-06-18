@@ -9,6 +9,7 @@ export interface SchemaColumn {
 	nullable: boolean
 	type: SchemaColumnType
 	enumName: SchemaEnumName | null
+	deprecationReason?: string
 
 	// rules
 	// validators

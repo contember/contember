@@ -100,24 +100,34 @@ export class EntityTypeProvider {
 			_meta: metaField,
 		}
 
-		for (const field of accessibleFields) {
+		const fieldConfigs = accessibleFields.map(field => {
 			const fieldTypeVisitor = new FieldTypeVisitor(this.columnTypeResolver, this, this.authorizator)
 			const type: GraphQLOutputType = acceptFieldVisitor(this.schema, entity, field.name, fieldTypeVisitor)
-
 			const fieldArgsVisitor = new FieldArgsVisitor(this.whereTypeProvider, this.orderByTypeProvider)
-			fields[field.name] = {
-				type,
-				args: acceptFieldVisitor(this.schema, entity, field.name, fieldArgsVisitor),
-				resolve: aliasAwareResolver,
+
+			return {
+				key: field.name,
+				config: {
+					type,
+					args: acceptFieldVisitor(this.schema, entity, field.name, fieldArgsVisitor),
+					resolve: aliasAwareResolver,
+					deprecationReason: field.deprecationReason,
+				},
 			}
+		})
+
+		fields = {
+			...fields,
+			...Object.fromEntries(fieldConfigs.map(({ key, config }) => [key, config])),
 		}
 
-		for (const [key, provider] of Object.entries(this.entityFieldProviders)) {
+		for (const [_key, provider] of Object.entries(this.entityFieldProviders)) {
 			fields = {
 				...fields,
 				...provider.getFields(entity, accessibleFields),
 			}
 		}
+
 		return fields
 	}
 

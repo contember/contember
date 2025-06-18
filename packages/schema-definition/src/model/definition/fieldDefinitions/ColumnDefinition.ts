@@ -6,7 +6,6 @@ import { resolveDefaultColumnType } from '@contember/schema-utils'
 export class ColumnDefinition extends FieldDefinition<ColumnDefinitionOptions> {
 	type = 'ColumnDefinition' as const
 
-
 	public static create(
 		type: Model.ColumnType,
 		typeOptions: ColumnTypeOptions = {},
@@ -16,7 +15,6 @@ export class ColumnDefinition extends FieldDefinition<ColumnDefinitionOptions> {
 			...typeOptions,
 		})
 	}
-
 
 	public columnName(columnName: string): ColumnDefinition {
 		return this.withOption('columnName', columnName)
@@ -61,8 +59,12 @@ export class ColumnDefinition extends FieldDefinition<ColumnDefinitionOptions> {
 		return this.withOption('collation', collation)
 	}
 
-	createField({ name, conventions, enumRegistry, entityName, options }: CreateFieldContext): Model.AnyField {
-		const { type, nullable, columnName, enumDefinition, default: defaultValue, columnType, typeAlias, sequence, list, collation = options.defaultCollation } = this.options
+	public deprecated(deprecationReason?: string): ColumnDefinition {
+		return this.withOption('deprecationReason', deprecationReason || 'This field is deprecated')
+	}
+
+	public createField({ name, conventions, enumRegistry, entityName, options }: CreateFieldContext): Model.AnyField {
+		const { type, nullable, columnName, enumDefinition, default: defaultValue, columnType, typeAlias, sequence, list, collation = options.defaultCollation, deprecationReason, aliases } = this.options
 		const common = {
 			name: name,
 			columnName: columnName || conventions.getColumnName(name),
@@ -71,6 +73,7 @@ export class ColumnDefinition extends FieldDefinition<ColumnDefinitionOptions> {
 			...(defaultValue !== undefined ? { default: defaultValue } : {}),
 			...(sequence !== undefined ? { sequence } : {}),
 			...(type === Model.ColumnType.String && collation !== undefined ? { collation } : {}),
+			...(deprecationReason !== undefined ? { deprecationReason } : {}),
 		}
 		if (type === Model.ColumnType.Enum) {
 			if (typeAlias) {
@@ -153,6 +156,7 @@ export function uuidColumn(): ColumnDefinition {
 export type ColumnTypeOptions = {
 	enumDefinition?: EnumDefinition
 }
+
 export type ColumnDefinitionOptions = {
 	type: Model.ColumnType
 	columnType?: string
@@ -164,5 +168,5 @@ export type ColumnDefinitionOptions = {
 	default?: Model.ColumnTypeDefinition['default']
 	sequence?: Model.ColumnTypeDefinition['sequence']
 	collation?: Model.Collation
+	deprecationReason?: string
 } & ColumnTypeOptions
-

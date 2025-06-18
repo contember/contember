@@ -76,6 +76,7 @@ export class HasManyToHasOneRelationReducerFieldVisitor implements
 			graphQlName,
 			{
 				type: entityType,
+				deprecationReason: relation.deprecationReason,
 				extensions: {
 					relationName: relation.name,
 					extensionKey: HasManyToHasOneReducer.extensionName,
@@ -127,6 +128,7 @@ export class HasManyToHasOneRelationReducerFieldVisitor implements
 					graphQlName,
 					{
 						type: entityType,
+						deprecationReason: relation.deprecationReason,
 						extensions: {
 							relationName: relation.name,
 							extensionKey: HasManyToHasOneReducer.extensionName,

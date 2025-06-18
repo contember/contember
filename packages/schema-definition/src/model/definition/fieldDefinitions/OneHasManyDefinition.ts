@@ -5,14 +5,19 @@ import { EntityConstructor, RelationTarget } from '../types'
 export class OneHasManyDefinition extends FieldDefinition<OneHasManyDefinitionOptions> {
 	type = 'OneHasManyDefinition' as const
 
-	orderBy(
+	public orderBy(
 		field: string | string[],
 		direction: Model.OrderDirection | `${Model.OrderDirection}` = Model.OrderDirection.asc,
 	): OneHasManyDefinition {
 		const path = typeof field === 'string' ? [field] : field
 		return this.withOption('orderBy', [...(this.options.orderBy || []), { path, direction: direction as Model.OrderDirection }])
 	}
-	createField({ name, entityRegistry }: CreateFieldContext): Model.AnyField {
+
+	public deprecated(deprecationReason?: string): OneHasManyDefinition {
+		return this.withOption('deprecationReason', deprecationReason || 'This field is deprecated')
+	}
+
+	public createField({ name, entityRegistry }: CreateFieldContext): Model.AnyField {
 		const options = this.options
 		return {
 			name: name,
@@ -20,6 +25,7 @@ export class OneHasManyDefinition extends FieldDefinition<OneHasManyDefinitionOp
 			type: Model.RelationType.OneHasMany,
 			target: entityRegistry.getName(options.target),
 			...(options.orderBy ? { orderBy: options.orderBy } : {}),
+			...(options.deprecationReason !== undefined ? { deprecationReason: options.deprecationReason } : {}),
 		}
 	}
 
@@ -37,4 +43,5 @@ export type OneHasManyDefinitionOptions = {
 	target: RelationTarget
 	ownedBy: string
 	orderBy?: Model.OrderBy[]
+	deprecationReason?: string
 }

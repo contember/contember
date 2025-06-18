@@ -63,6 +63,10 @@ export class ColumnDefinition extends FieldDefinition<ColumnDefinitionOptions> {
 		return this.withOption('deprecationReason', deprecationReason || 'This field is deprecated')
 	}
 
+	public alias(...aliases: string[]): ColumnDefinition {
+		return this.withOption('aliases', aliases)
+	}
+
 	public createField({ name, conventions, enumRegistry, entityName, options }: CreateFieldContext): Model.AnyField {
 		const { type, nullable, columnName, enumDefinition, default: defaultValue, columnType, typeAlias, sequence, list, collation = options.defaultCollation, deprecationReason, aliases } = this.options
 		const common = {
@@ -73,6 +77,7 @@ export class ColumnDefinition extends FieldDefinition<ColumnDefinitionOptions> {
 			...(defaultValue !== undefined ? { default: defaultValue } : {}),
 			...(sequence !== undefined ? { sequence } : {}),
 			...(type === Model.ColumnType.String && collation !== undefined ? { collation } : {}),
+			...(aliases !== undefined ? { aliases } : {}),
 			...(deprecationReason !== undefined ? { deprecationReason } : {}),
 		}
 		if (type === Model.ColumnType.Enum) {
@@ -168,5 +173,6 @@ export type ColumnDefinitionOptions = {
 	default?: Model.ColumnTypeDefinition['default']
 	sequence?: Model.ColumnTypeDefinition['sequence']
 	collation?: Model.Collation
+	aliases?: string[]
 	deprecationReason?: string
 } & ColumnTypeOptions

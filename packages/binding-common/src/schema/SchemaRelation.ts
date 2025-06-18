@@ -13,6 +13,7 @@ export interface BaseRelation {
 	targetEntity: EntityName
 	type: 'OneHasOne' | 'OneHasMany' | 'ManyHasOne' | 'ManyHasMany'
 	deprecationReason?: string
+	aliases?: string[]
 }
 
 export interface OwningRelation extends BaseRelation {

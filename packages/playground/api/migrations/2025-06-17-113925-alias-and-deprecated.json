@@ -1,0 +1,26 @@
+{
+	"formatVersion": 6,
+	"modifications": [
+		{
+			"modification": "updateColumnDefinition",
+			"entityName": "BoardTask",
+			"fieldName": "title",
+			"definition": {
+				"columnType": "text",
+				"nullable": false,
+				"type": "String",
+				"aliases": [
+					"name"
+				]
+			}
+		},
+		{
+			"modification": "createRelationAliases",
+			"entityName": "BoardTask",
+			"fieldName": "tags",
+			"aliases": [
+				"labels"
+			]
+		}
+	]
+}

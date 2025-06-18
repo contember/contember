@@ -17,6 +17,10 @@ export class ManyHasManyInverseDefinition extends FieldDefinition<ManyHasManyInv
 		return this.withOption('deprecationReason', deprecationReason || 'This field is deprecated')
 	}
 
+	public alias(...aliases: string[]): ManyHasManyInverseDefinition {
+		return this.withOption('aliases', aliases)
+	}
+
 	public createField({ name, conventions, entityName, entityRegistry }: CreateFieldContext): Model.AnyField {
 		const options = this.options
 		return {
@@ -25,6 +29,7 @@ export class ManyHasManyInverseDefinition extends FieldDefinition<ManyHasManyInv
 			target: entityRegistry.getName(options.target),
 			type: Model.RelationType.ManyHasMany,
 			...(options.orderBy ? { orderBy: options.orderBy } : {}),
+			...(options.aliases !== undefined ? { aliases: options.aliases } : {}),
 			...(options.deprecationReason !== undefined ? { deprecationReason: options.deprecationReason } : {}),
 		}
 	}
@@ -43,5 +48,6 @@ export type ManyHasManyInverseDefinitionOptions = {
 	target: RelationTarget
 	ownedBy: string
 	orderBy?: Model.OrderBy[]
+	aliases?: string[]
 	deprecationReason?: string
 }

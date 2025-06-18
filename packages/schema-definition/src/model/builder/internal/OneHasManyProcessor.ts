@@ -34,6 +34,7 @@ export default class OneHasManyProcessor implements FieldProcessor<OneHasManyBui
 			type: Model.RelationType.OneHasMany,
 			target: options.target,
 			...(options.orderBy ? { orderBy: options.orderBy } : {}),
+			...(options.aliases !== undefined ? { aliases: options.aliases } : {}),
 			...(options.deprecationReason !== undefined ? { deprecationReason: options.deprecationReason } : {}),
 		}
 	}

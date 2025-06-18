@@ -17,6 +17,7 @@ import { removeFieldModification, updateFieldNameModification } from './fields'
 import {
 	convertOneHasManyToManyHasManyRelationModification,
 	convertOneToManyRelationModification,
+	createRelationAliasesModification,
 	createRelationInverseSideModification,
 	createRelationModification,
 	disableOrphanRemovalModification,
@@ -25,7 +26,9 @@ import {
 	makeRelationNotDeprecatedModification,
 	makeRelationNotNullModification,
 	makeRelationNullableModification,
+	removeRelationAliasesModification,
 	toggleJunctionEventLogModification,
+	updateRelationAliasesModification,
 	updateRelationOnDeleteModification,
 	updateRelationOrderByModification,
 } from './relations'
@@ -80,6 +83,9 @@ namespace ModificationHandlerFactory {
 		updateFieldNameModification,
 		createRelationInverseSideModification,
 		createRelationModification,
+		createRelationAliasesModification,
+		updateRelationAliasesModification,
+		removeRelationAliasesModification,
 		updateRelationOnDeleteModification,
 		updateRelationOrderByModification,
 		makeRelationDeprecatedModification,

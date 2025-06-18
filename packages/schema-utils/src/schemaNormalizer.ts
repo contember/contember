@@ -68,12 +68,14 @@ export const normalizeSchema = <S extends Schema>(schema: S): S => {
 						...adminRoleDefinition.system,
 					},
 					debug: true,
-					...adminRoleDefinition,
+					...adminRoleDefinitionWithoutEntities,
 				},
 				[ProjectRole.CONTENT_ADMIN]: {
 					stages: '*',
 					variables: {},
-					entities: new AllowAllPermissionFactory().create(schema.model),
+					entities: contentAdminRoleDefinition.entities
+						? processedAcl[ProjectRole.CONTENT_ADMIN]!.entities
+						: new AllowAllPermissionFactory().create(processedModel),
 					s3: {
 						'**': {
 							upload: true,
@@ -92,7 +94,7 @@ export const normalizeSchema = <S extends Schema>(schema: S): S => {
 						import: true,
 						...contentAdminRoleDefinition.system,
 					},
-					...contentAdminRoleDefinition,
+					...contentAdminRoleDefinitionWithoutEntities,
 				},
 				[ProjectRole.DEPLOYER]: {
 					stages: '*',

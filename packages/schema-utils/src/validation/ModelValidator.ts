@@ -56,6 +56,7 @@ export class ModelValidator {
 			errors.for('unique'),
 		)
 		this.validateColumnNamesCollision(entity, errors)
+		this.validateAliasesCollision(entity, errors)
 	}
 
 	private validateUniqueConstraints(entity: Model.Entity, errors: ErrorBuilder): void {
@@ -95,10 +96,91 @@ export class ModelValidator {
 			visitManyHasOne: ({ relation }) => {
 				addColumnName(relation.name, relation.joiningColumn.columnName)
 			},
-			visitOneHasOneInverse: () => {},
-			visitOneHasMany: () => {},
-			visitManyHasManyInverse: () => {},
-			visitManyHasManyOwning: () => {},
+			visitOneHasOneInverse: () => { },
+			visitOneHasMany: () => { },
+			visitManyHasManyInverse: () => { },
+			visitManyHasManyOwning: () => { },
+		})
+	}
+
+	private validateAliasesCollision(entity: Model.Entity, errors: ErrorBuilder): void {
+		const fieldNames = new Set<string>()
+		const allAliases = new Map<string, { fieldName: string; fieldType: string }>()
+
+		const collectFieldData = (fieldName: string, aliases: readonly string[] | undefined, fieldType: string) => {
+			fieldNames.add(fieldName)
+			if (aliases) {
+				for (const alias of aliases) {
+					allAliases.set(alias, { fieldName, fieldType })
+				}
+			}
+		}
+
+		const checkAliasCollisions = (fieldName: string, aliases: readonly string[] | undefined, fieldType: string) => {
+			if (!aliases) return
+
+			for (const alias of aliases) {
+				if (fieldNames.has(alias)) {
+					errors
+						.for(fieldName)
+						.add('MODEL_NAME_COLLISION', `Alias "${alias}" on ${fieldType} "${fieldName}" collides with a field name.`)
+				}
+
+				const existingAlias = allAliases.get(alias)
+				if (existingAlias && existingAlias.fieldName !== fieldName) {
+					errors
+						.for(fieldName)
+						.add('MODEL_NAME_COLLISION', `Alias "${alias}" on ${fieldType} "${fieldName}" collides with an alias on ${existingAlias.fieldType} "${existingAlias.fieldName}".`)
+				}
+			}
+		}
+
+		acceptEveryFieldVisitor(this.model, entity, {
+			visitColumn: ({ column }) => {
+				collectFieldData(column.name, column.aliases, 'field')
+			},
+			visitOneHasOneOwning: ({ relation }) => {
+				collectFieldData(relation.name, relation.aliases, 'relation')
+			},
+			visitManyHasOne: ({ relation }) => {
+				collectFieldData(relation.name, relation.aliases, 'relation')
+			},
+			visitOneHasOneInverse: ({ relation }) => {
+				collectFieldData(relation.name, relation.aliases, 'relation')
+			},
+			visitOneHasMany: ({ relation }) => {
+				collectFieldData(relation.name, relation.aliases, 'relation')
+			},
+			visitManyHasManyInverse: ({ relation }) => {
+				collectFieldData(relation.name, relation.aliases, 'relation')
+			},
+			visitManyHasManyOwning: ({ relation }) => {
+				collectFieldData(relation.name, relation.aliases, 'relation')
+			},
+		})
+
+		acceptEveryFieldVisitor(this.model, entity, {
+			visitColumn: ({ column }) => {
+				checkAliasCollisions(column.name, column.aliases, 'field')
+			},
+			visitOneHasOneOwning: ({ relation }) => {
+				checkAliasCollisions(relation.name, relation.aliases, 'relation')
+			},
+			visitManyHasOne: ({ relation }) => {
+				checkAliasCollisions(relation.name, relation.aliases, 'relation')
+			},
+			visitOneHasOneInverse: ({ relation }) => {
+				checkAliasCollisions(relation.name, relation.aliases, 'relation')
+			},
+			visitOneHasMany: ({ relation }) => {
+				checkAliasCollisions(relation.name, relation.aliases, 'relation')
+			},
+			visitManyHasManyInverse: ({ relation }) => {
+				checkAliasCollisions(relation.name, relation.aliases, 'relation')
+			},
+			visitManyHasManyOwning: ({ relation }) => {
+				checkAliasCollisions(relation.name, relation.aliases, 'relation')
+			},
 		})
 	}
 

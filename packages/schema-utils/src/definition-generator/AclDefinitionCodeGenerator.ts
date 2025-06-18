@@ -80,7 +80,7 @@ export class AclDefinitionCodeGenerator {
 							return ctx.value
 						},
 					})
-					const aclDefinition = printJsValue({ when, ...operations }, indentFirstLevel)
+					const aclDefinition = printJsValue({ when, ...operations }, { indentDecider: indentFirstLevel })
 					aclOutput.push(`@c.Allow(${roleVarName}, ${aclDefinition})\n`)
 				}
 			}
@@ -90,7 +90,7 @@ export class AclDefinitionCodeGenerator {
 				numberOfEntityFieldsWithoutId,
 			})
 			if (Object.keys(trueOperations).length > 0) {
-				const aclDefinition = printJsValue({ ...trueOperations }, indentFirstLevel)
+				const aclDefinition = printJsValue({ ...trueOperations }, { indentDecider: indentFirstLevel })
 				aclOutput.push(`@c.Allow(${roleVarName}, ${aclDefinition})\n`)
 			}
 		}

@@ -29,6 +29,10 @@ class ManyHasManyBuilder<O extends PartialOptions<never> = PartialOptions<never>
 		return this.withOption('orderBy', [...(this.options.orderBy || []), { path, direction }])
 	}
 
+	public alias(...aliases: string[]): ManyHasManyBuilder<O> {
+		return this.withOption('aliases', aliases)
+	}
+
 	public deprecated(deprecationReason: string): ManyHasManyBuilder<O> {
 		return this.withOption('deprecationReason', deprecationReason)
 	}
@@ -51,6 +55,7 @@ namespace ManyHasManyBuilder {
 		inversedBy?: string
 		joiningTable?: Model.JoiningTable
 		orderBy?: Model.OrderBy[]
+		aliases?: string[]
 		deprecationReason?: string
 	}
 }

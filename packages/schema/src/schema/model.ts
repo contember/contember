@@ -66,6 +66,7 @@ export namespace Model {
 				readonly start?: number
 			}
 			readonly collation?: Collation
+			readonly aliases?: readonly string[]
 			readonly deprecationReason?: string
 		}
 
@@ -106,6 +107,7 @@ export namespace Model {
 			readonly name: string
 			readonly type: T
 			readonly target: string
+			readonly aliases?: readonly string[]
 		}
 
 	export type InverseRelation =

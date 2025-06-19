@@ -52,6 +52,7 @@ export default class ManyHasOneProcessor implements FieldProcessor<ManyHasOneBui
 				columnName: joiningColumn.columnName || this.conventions.getJoiningColumnName(fieldName),
 				onDelete: joiningColumn.onDelete || Model.OnDelete.restrict,
 			},
+			...(options.deprecationReason !== undefined ? { deprecationReason: options.deprecationReason } : {}),
 		}
 	}
 }

@@ -109,6 +109,12 @@ ${Object.values(entity.fields).map(field => this.generateField({ field, entity, 
 			}
 			return `joiningColumn(${printJsValue(joiningColumnName)})`
 		}
+		const formatDeprecationReason = (deprecationReason?: string): string | undefined => {
+			if (!deprecationReason) {
+				return undefined
+			}
+			return `deprecated(${printJsValue(deprecationReason)})`
+		}
 		const definition = acceptFieldVisitor<(string | undefined)[]>(schema.model, entity, field, {
 			visitColumn: ctx => {
 				return this.generateColumn(ctx)
@@ -125,12 +131,14 @@ ${Object.values(entity.fields).map(field => this.generateField({ field, entity, 
 					!relation.nullable ? 'notNull()' : undefined,
 					formatOnDelete(relation.joiningColumn.onDelete),
 					formatJoiningColumn(relation.joiningColumn.columnName, relation.name),
+					formatDeprecationReason(relation.deprecationReason),
 				]
 			},
 			visitOneHasOneInverse: ({ relation }) => {
 				return [
 					formatRelationFactory('oneHasOneInverse', relation),
 					!relation.nullable ? 'notNull()' : undefined,
+					formatDeprecationReason(relation.deprecationReason),
 				]
 			},
 			visitOneHasOneOwning: ({ relation }) => {
@@ -140,6 +148,7 @@ ${Object.values(entity.fields).map(field => this.generateField({ field, entity, 
 					formatOnDelete(relation.joiningColumn.onDelete),
 					formatJoiningColumn(relation.joiningColumn.columnName, relation.name),
 					relation.orphanRemoval ? 'removeOrphan()' : undefined,
+					formatDeprecationReason(relation.deprecationReason),
 				]
 			},
 			visitManyHasManyOwning: ({ entity, relation }) => {
@@ -174,12 +183,14 @@ ${Object.values(entity.fields).map(field => this.generateField({ field, entity, 
 					formatRelationFactory('manyHasMany', relation),
 					...formatOrderBy(relation.orderBy),
 					Object.keys(joiningTable).length > 0 ? `joiningTable(${printJsValue(joiningTable)})` : undefined,
+					formatDeprecationReason(relation.deprecationReason),
 				]
 			},
 			visitManyHasManyInverse: ({ relation }) => {
 				return [
 					formatRelationFactory('manyHasManyInverse', relation),
 					...formatOrderBy(relation.orderBy),
+					formatDeprecationReason(relation.deprecationReason),
 				]
 			},
 		})
@@ -213,6 +224,9 @@ ${Object.values(entity.fields).map(field => this.generateField({ field, entity, 
 		}
 		if (column.typeAlias) {
 			parts.push(`typeAlias(${printJsValue(column.typeAlias)})`)
+		}
+		if (column.deprecationReason) {
+			parts.push(`deprecated(${printJsValue(column.deprecationReason)})`)
 		}
 
 

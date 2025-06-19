@@ -9,39 +9,43 @@ type PartialOptions<K extends keyof OneHasManyBuilder.Options> =
 class OneHasManyBuilder<O extends PartialOptions<never> = PartialOptions<never>> implements FieldBuilder<O> {
 	constructor(private readonly options: O, private readonly addEntity: AddEntityCallback) {}
 
-	target(target: string, configurator?: EntityConfigurator): OneHasManyBuilder<O & PartialOptions<'target'>> {
+	public target(target: string, configurator?: EntityConfigurator): OneHasManyBuilder<O & PartialOptions<'target'>> {
 		if (configurator) {
 			this.addEntity(target, configurator)
 		}
 		return this.withOption('target', target)
 	}
 
-	ownedBy(ownedBy: string): OneHasManyBuilder<O> {
+	public ownedBy(ownedBy: string): OneHasManyBuilder<O> {
 		return this.withOption('ownedBy', ownedBy)
 	}
 
-	ownerJoiningColumn(columnName: string): OneHasManyBuilder<O> {
+	public ownerJoiningColumn(columnName: string): OneHasManyBuilder<O> {
 		return this.withOption('ownerJoiningColumn', { ...this.options.ownerJoiningColumn, columnName })
 	}
 
-	onDelete(onDelete: Model.OnDelete): OneHasManyBuilder<O> {
+	public onDelete(onDelete: Model.OnDelete): OneHasManyBuilder<O> {
 		return this.withOption('ownerJoiningColumn', { ...this.options.ownerJoiningColumn, onDelete })
 	}
 
-	ownerNotNull(): OneHasManyBuilder<O> {
+	public ownerNotNull(): OneHasManyBuilder<O> {
 		return this.withOption('ownerNullable', false)
 	}
 
-	ownerNullable(): OneHasManyBuilder<O> {
+	public ownerNullable(): OneHasManyBuilder<O> {
 		return this.withOption('ownerNullable', true)
 	}
 
-	orderBy(field: string | string[], direction: Model.OrderDirection = Model.OrderDirection.asc): OneHasManyBuilder<O> {
+	public orderBy(field: string | string[], direction: Model.OrderDirection = Model.OrderDirection.asc): OneHasManyBuilder<O> {
 		const path = typeof field === 'string' ? [field] : field
 		return this.withOption('orderBy', [...(this.options.orderBy || []), { path, direction }])
 	}
 
-	getOption(): O {
+	public deprecated(deprecationReason: string): OneHasManyBuilder<O> {
+		return this.withOption('deprecationReason', deprecationReason)
+	}
+
+	public getOption(): O {
 		return this.options
 	}
 
@@ -60,6 +64,7 @@ namespace OneHasManyBuilder {
 		ownerJoiningColumn?: Partial<Model.JoiningColumn>
 		ownerNullable?: boolean
 		orderBy?: Model.OrderBy[]
+		deprecationReason?: string
 	}
 }
 

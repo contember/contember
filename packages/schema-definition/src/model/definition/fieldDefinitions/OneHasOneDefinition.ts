@@ -6,39 +6,43 @@ export class OneHasOneDefinition extends FieldDefinition<OneHasOneDefinitionOpti
 	type = 'OneHasOneDefinition' as const
 
 
-	inversedBy(inversedBy: string): OneHasOneDefinition {
+	public inversedBy(inversedBy: string): OneHasOneDefinition {
 		return this.withOption('inversedBy', inversedBy)
 	}
 
-	joiningColumn(columnName: string): OneHasOneDefinition {
+	public joiningColumn(columnName: string): OneHasOneDefinition {
 		return this.withOption('joiningColumn', { ...this.joiningColumn, columnName })
 	}
 
-	onDelete(onDelete: Model.OnDelete | `${Model.OnDelete}`): OneHasOneDefinition {
+	public onDelete(onDelete: Model.OnDelete | `${Model.OnDelete}`): OneHasOneDefinition {
 		return this.withOption('joiningColumn', { ...this.joiningColumn, onDelete: onDelete as Model.OnDelete })
 	}
 
-	cascadeOnDelete(): OneHasOneDefinition {
+	public cascadeOnDelete(): OneHasOneDefinition {
 		return this.withOption('joiningColumn', { ...this.options.joiningColumn, onDelete: Model.OnDelete.cascade })
 	}
 
-	setNullOnDelete(): OneHasOneDefinition {
+	public setNullOnDelete(): OneHasOneDefinition {
 		return this.withOption('joiningColumn', { ...this.options.joiningColumn, onDelete: Model.OnDelete.setNull })
 	}
 
-	restrictOnDelete(): OneHasOneDefinition {
+	public restrictOnDelete(): OneHasOneDefinition {
 		return this.withOption('joiningColumn', { ...this.options.joiningColumn, onDelete: Model.OnDelete.restrict })
 	}
 
-	notNull(): OneHasOneDefinition {
+	public notNull(): OneHasOneDefinition {
 		return this.withOption('nullable', false)
 	}
 
-	removeOrphan(): OneHasOneDefinition {
+	public deprecated(deprecationReason?: string): OneHasOneDefinition {
+		return this.withOption('deprecationReason', deprecationReason || 'This field is deprecated')
+	}
+
+	public removeOrphan(): OneHasOneDefinition {
 		return this.withOption('orphanRemoval', true)
 	}
 
-	createField({ name, conventions, entityRegistry, strictDefinitionValidator, entityName }: CreateFieldContext): Model.AnyField {
+	public createField({ name, conventions, entityRegistry, strictDefinitionValidator, entityName }: CreateFieldContext): Model.AnyField {
 		const options = this.options
 		const joiningColumn: Partial<Model.JoiningColumn> = options.joiningColumn || {}
 
@@ -56,6 +60,7 @@ export class OneHasOneDefinition extends FieldDefinition<OneHasOneDefinitionOpti
 				onDelete: joiningColumn.onDelete || Model.OnDelete.restrict,
 			},
 			...(options.orphanRemoval ? { orphanRemoval: true } : {}),
+			...(options.deprecationReason !== undefined ? { deprecationReason: options.deprecationReason } : {}),
 		}
 	}
 
@@ -75,4 +80,5 @@ export type OneHasOneDefinitionOptions = {
 	joiningColumn?: Partial<Model.JoiningColumn>
 	nullable?: boolean
 	orphanRemoval?: true
+	deprecationReason?: string
 }

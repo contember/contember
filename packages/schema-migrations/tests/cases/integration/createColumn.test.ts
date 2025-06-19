@@ -37,6 +37,39 @@ SET CONSTRAINTS ALL IMMEDIATE; SET CONSTRAINTS ALL DEFERRED;
 ALTER TABLE "author" ALTER "name" SET NOT NULL;`,
 }))
 
+describe('create a column with deprecation flag', () => testMigrations({
+	original: createSchema({
+		Author: class Author {
+			email = def.stringColumn().unique()
+		},
+	}),
+	updated: createSchema({
+		Author: class Author {
+			deprecated = def.stringColumn().deprecated('deprecated')
+			email = def.stringColumn().unique()
+		},
+	}),
+	noDiff: true,
+	diff: [
+		{
+			modification: 'createColumn',
+			entityName: 'Author',
+			field: {
+				columnName: 'deprecated',
+				name: 'deprecated',
+				nullable: true,
+				type: Model.ColumnType.String,
+				columnType: 'text',
+				deprecationReason: 'deprecated',
+			},
+			fillValue: 'unnamed author',
+		},
+	],
+	sql: SQL`ALTER TABLE "author" ADD "deprecated" text;
+UPDATE "author" SET "deprecated" = $pga$unnamed author$pga$;
+SET CONSTRAINTS ALL IMMEDIATE; SET CONSTRAINTS ALL DEFERRED;`,
+}))
+
 describe('create a column with copy value', () => testMigrations({
 	original: createSchema({
 		Author: class Author {
@@ -166,9 +199,9 @@ ALTER TABLE "author" ADD "order" integer;
 ALTER TABLE "author" ALTER "order" SET DATA TYPE integer USING 0, ALTER "order" SET NOT NULL;
 ALTER TABLE "author" ADD "score" double precision;
 ALTER TABLE "author" ALTER "score" SET DATA TYPE double precision USING 0.3333333333333333, ALTER "score" SET NOT NULL;
-ALTER TABLE "author" ADD "active" boolean; 
-ALTER TABLE "author" ALTER "active" SET DATA TYPE boolean USING false, 
-ALTER "active" SET NOT NULL; ALTER TABLE "author" ADD "created_at" timestamptz; 
+ALTER TABLE "author" ADD "active" boolean;
+ALTER TABLE "author" ALTER "active" SET DATA TYPE boolean USING false,
+ALTER "active" SET NOT NULL; ALTER TABLE "author" ADD "created_at" timestamptz;
 ALTER TABLE "author" ALTER "created_at" SET DATA TYPE timestamptz USING $pga$2024-01-01 10:00$pga$, ALTER "created_at" SET NOT NULL;
 `,
 }))

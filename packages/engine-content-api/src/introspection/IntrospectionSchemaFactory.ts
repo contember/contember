@@ -47,6 +47,7 @@ export class IntrospectionSchemaFactory {
 					side: ContentSchema._RelationSide.Inverse,
 					ownedBy: relation.ownedBy,
 					orderBy: relation.orderBy?.map(convertOrderBy),
+					deprecationReason: relation.deprecationReason,
 				}
 			},
 			visitManyHasManyOwning({ relation }) {
@@ -56,6 +57,7 @@ export class IntrospectionSchemaFactory {
 					side: ContentSchema._RelationSide.Owning,
 					inversedBy: relation.inversedBy,
 					orderBy: relation.orderBy?.map(convertOrderBy),
+					deprecationReason: relation.deprecationReason,
 				}
 			},
 			visitManyHasOne({ relation }) {
@@ -66,6 +68,7 @@ export class IntrospectionSchemaFactory {
 					inversedBy: relation.inversedBy,
 					onDelete: convertOnDelete(relation.joiningColumn.onDelete),
 					nullable: relation.nullable,
+					deprecationReason: relation.deprecationReason,
 				}
 			},
 			visitOneHasMany({ relation }) {
@@ -75,6 +78,7 @@ export class IntrospectionSchemaFactory {
 					side: ContentSchema._RelationSide.Inverse,
 					ownedBy: relation.ownedBy,
 					orderBy: relation.orderBy?.map(convertOrderBy),
+					deprecationReason: relation.deprecationReason,
 				}
 			},
 			visitOneHasOneInverse({ relation }) {
@@ -84,6 +88,7 @@ export class IntrospectionSchemaFactory {
 					side: ContentSchema._RelationSide.Inverse,
 					ownedBy: relation.ownedBy,
 					nullable: relation.nullable,
+					deprecationReason: relation.deprecationReason,
 				}
 			},
 			visitOneHasOneOwning({ relation }) {
@@ -95,6 +100,7 @@ export class IntrospectionSchemaFactory {
 					onDelete: convertOnDelete(relation.joiningColumn.onDelete),
 					nullable: relation.nullable,
 					orphanRemoval: relation.orphanRemoval === true,
+					deprecationReason: relation.deprecationReason,
 				}
 			},
 			visitColumn({ column }) {
@@ -103,6 +109,7 @@ export class IntrospectionSchemaFactory {
 					defaultValue: column.default ?? undefined,
 					enumName: column.type === Model.ColumnType.Enum ? column.columnType : null,
 					nullable: column.nullable,
+					deprecationReason: column.deprecationReason,
 				}
 			},
 		})

@@ -5,15 +5,15 @@ import { CreateFieldContext, FieldDefinition } from './FieldDefinition'
 export class ManyHasManyDefinition extends FieldDefinition<ManyHasManyDefinitionOptions> {
 	type = 'ManyHasManyDefinition' as const
 
-	inversedBy(inversedBy: string): ManyHasManyDefinition {
+	public inversedBy(inversedBy: string): ManyHasManyDefinition {
 		return this.withOption('inversedBy', inversedBy)
 	}
 
-	joiningTable(joiningTable: Partial<Model.JoiningTable>): ManyHasManyDefinition {
+	public joiningTable(joiningTable: Partial<Model.JoiningTable>): ManyHasManyDefinition {
 		return this.withOption('joiningTable', joiningTable)
 	}
 
-	orderBy(
+	public orderBy(
 		field: string | string[],
 		direction: Model.OrderDirection | `${Model.OrderDirection}` = Model.OrderDirection.asc,
 	): ManyHasManyDefinition {
@@ -21,7 +21,11 @@ export class ManyHasManyDefinition extends FieldDefinition<ManyHasManyDefinition
 		return this.withOption('orderBy', [...(this.options.orderBy || []), { path, direction: direction as Model.OrderDirection }])
 	}
 
-	createField({ name, conventions, entityName, entityRegistry, strictDefinitionValidator }: CreateFieldContext): Model.AnyField {
+	public deprecated(deprecationReason?: string): ManyHasManyDefinition {
+		return this.withOption('deprecationReason', deprecationReason || 'This field is deprecated')
+	}
+
+	public createField({ name, conventions, entityName, entityRegistry, strictDefinitionValidator }: CreateFieldContext): Model.AnyField {
 		const options = this.options
 		const columnNames = conventions.getJoiningTableColumnNames(
 			entityName,
@@ -46,6 +50,7 @@ export class ManyHasManyDefinition extends FieldDefinition<ManyHasManyDefinition
 			target: entityRegistry.getName(options.target),
 			joiningTable: joiningTable,
 			...(options.orderBy ? { orderBy: options.orderBy } : {}),
+			...(options.deprecationReason !== undefined ? { deprecationReason: options.deprecationReason } : {}),
 		}
 	}
 
@@ -65,4 +70,5 @@ export type ManyHasManyDefinitionOptions = {
 	inversedBy?: string
 	joiningTable?: Partial<Model.JoiningTable>
 	orderBy?: Model.OrderBy[]
+	deprecationReason?: string
 }

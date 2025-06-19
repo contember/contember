@@ -52,7 +52,7 @@ export class AclDefinitionCodeGenerator {
 		return variablesOutput.join('')
 	}
 
-	public generateEntityAcl({ entity, schema }: { entity: Model.Entity; schema: Schema  }): string {
+	public generateEntityAcl({ entity, schema }: { entity: Model.Entity; schema: Schema }): string {
 		const aclOutput: string[] = []
 		const numberOfEntityFieldsWithoutId = Object.keys(entity.fields).length - 1
 		for (const [roleName, roleDefinition] of Object.entries(schema.acl.roles)) {

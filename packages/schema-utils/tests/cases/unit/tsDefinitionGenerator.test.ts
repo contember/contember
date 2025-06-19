@@ -6,6 +6,7 @@ import * as relations from './schemas/relations'
 import * as unique from './schemas/unique'
 import * as enum_ from './schemas/enum'
 import * as acl from './schemas/acl'
+import * as deprecated from './schemas/deprecated'
 import * as view from './schemas/view'
 import { readFile, writeFile } from 'fs/promises'
 import { join } from 'path'
@@ -20,6 +21,7 @@ const tests = [
 	['unique', unique],
 	['enum', enum_],
 	['acl', acl],
+	['deprecated', deprecated],
 	['view', view],
 ] as const
 for (const [name, def] of tests) {

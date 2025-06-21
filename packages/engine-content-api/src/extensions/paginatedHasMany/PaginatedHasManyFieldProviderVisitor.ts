@@ -1,6 +1,6 @@
 import { Model } from '@contember/schema'
 import { PaginatedHasManyFieldProvider, PaginatedHasManyFieldProviderExtension } from './PaginatedHasManyFieldProvider'
-import { capitalizeFirstLetter, isIt } from '../../utils'
+import { capitalizeFirstLetter } from '../../utils'
 import { PaginatedFieldConfigFactory } from '../../schema/PaginatedFieldConfigFactory'
 import { aliasAwareResolver } from '../../schema'
 import { GraphQLFieldConfig } from 'graphql'
@@ -36,7 +36,7 @@ export class PaginatedHasManyFieldProviderVisitor implements
 				`paginate${capitalizeFirstLetter(relation.name)}`,
 				{
 					...this.paginatedFieldFactory.createFieldConfig(entity),
-					...(isIt<Model.DeprecatedRelation>(relation, 'deprecationReason') ? { deprecationReason: relation.deprecationReason } : {}),
+					deprecationReason: relation.deprecationReason,
 					description: relation.description,
 					extensions: {
 						relationName: relation.name,

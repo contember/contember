@@ -400,7 +400,6 @@ describe('GraphQL schema builder', () => {
 		})
 	})
 
-
 	it('view entity', async () => {
 		await testSchema({
 			schema: () => SchemaDefinition.createModel(ViewEntity),
@@ -421,7 +420,6 @@ describe('GraphQL schema builder', () => {
 			graphQlSchemaFile: 'schema-no-root-ops.gql',
 		})
 	})
-
 
 	it('array', async () => {
 		const schema = createSchema({
@@ -444,6 +442,14 @@ describe('GraphQL schema builder', () => {
 			schema: () => SchemaDefinition.createModel(ModelWithDescriptions),
 			permissions: schema => new AllowAllPermissionFactory().create(schema),
 			graphQlSchemaFile: 'schema-description.gql',
+		})
+	})
+
+	it('deprecation', async () => {
+		await testSchema({
+			schema: () => SchemaDefinition.createModel(ModelWithDeprecation),
+			permissions: schema => new AllowAllPermissionFactory().create(schema),
+			graphQlSchemaFile: 'schema-deprecation.gql',
 		})
 	})
 })
@@ -482,28 +488,55 @@ namespace NoRootOperation {
 }
 
 namespace ModelWithDescriptions {
-	@def.Description('description of entity Article')
+	@c.Description('description of entity Article')
 	export class Article {
-		title = def.stringColumn().description('description of Article.title')
-		category = def.manyHasOne(Category, 'articles').description('description of Article.category')
-		tags = def.manyHasMany(Tag, 'articles').description('description of Article.tags')
-		stats = def.oneHasOne(ArticleStats, 'article').description('description of Article.stats')
+		title = c.stringColumn().description('description of Article.title')
+		category = c.manyHasOne(Category, 'articles').description('description of Article.category')
+		tags = c.manyHasMany(Tag, 'articles').description('description of Article.tags')
+		stats = c.oneHasOne(ArticleStats, 'article').description('description of Article.stats')
 	}
 
-	@def.Description('description of entity ArticleStats')
+	@c.Description('description of entity ArticleStats')
 	export class ArticleStats {
-		article = def.manyHasManyInverse(Article, 'stats').description('description of ArticleStats.article')
+		article = c.manyHasManyInverse(Article, 'stats').description('description of ArticleStats.article')
 	}
 
-	@def.Description('description of entity Category')
+	@c.Description('description of entity Category')
 	export class Category {
-		name = def.stringColumn().description('description of Category.name')
-		articles = def.oneHasMany(Article, 'category').description('description of Category.articles')
+		name = c.stringColumn().description('description of Category.name')
+		articles = c.oneHasMany(Article, 'category').description('description of Category.articles')
 	}
 
-	@def.Description('description of entity Tag')
+	@c.Description('description of entity Tag')
 	export class Tag {
-		name = def.stringColumn().description('description of Tag.name')
-		articles = def.manyHasManyInverse(Article, 'tags').description('description of Tag.articles')
+		name = c.stringColumn().description('description of Tag.name')
+		articles = c.manyHasManyInverse(Article, 'tags').description('description of Tag.articles')
+	}
+}
+
+namespace ModelWithDeprecation {
+	@c.Deprecated('deprecated entity Article')
+	export class Article {
+		title = c.stringColumn().deprecated('deprecated Article.title')
+		category = c.manyHasOne(Category, 'articles').deprecated('deprecated Article.category')
+		tags = c.manyHasMany(Tag, 'articles').deprecated('deprecated Article.tags')
+		stats = c.oneHasOne(ArticleStats, 'article').deprecated('deprecated Article.stats')
+	}
+
+	@c.Deprecated('deprecated entity ArticleStats')
+	export class ArticleStats {
+		article = c.manyHasManyInverse(Article, 'stats').deprecated('deprecated ArticleStats.article')
+	}
+
+	@c.Deprecated('deprecated entity Category')
+	export class Category {
+		name = c.stringColumn().deprecated('deprecated Category.name')
+		articles = c.oneHasMany(Article, 'category').deprecated('deprecated Category.articles')
+	}
+
+	@c.Deprecated()
+	export class Tag {
+		name = c.stringColumn().deprecated()
+		articles = c.manyHasManyInverse(Article, 'tags').deprecated()
 	}
 }

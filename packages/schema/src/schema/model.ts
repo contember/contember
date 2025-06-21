@@ -15,6 +15,7 @@ export namespace Model {
 		readonly eventLog: EventLogConfig
 		readonly orderBy?: readonly OrderBy[]
 		readonly description?: string
+		readonly deprecationReason?: string
 	}
 
 	export type View = {
@@ -32,6 +33,7 @@ export namespace Model {
 	export type Field<T extends FieldType> = {
 		readonly type: T
 		readonly description?: string
+		readonly deprecationReason?: string
 	}
 
 	export type AnyField = AnyColumn | AnyRelation
@@ -68,7 +70,6 @@ export namespace Model {
 				readonly start?: number
 			}
 			readonly collation?: Collation
-			readonly deprecationReason?: string
 		}
 
 	export type Collation =
@@ -147,10 +148,6 @@ export namespace Model {
 		readonly nullable: boolean
 	}
 
-	export type DeprecatedRelation = {
-		readonly deprecationReason?: string
-	}
-
 	export type JoiningTable = {
 		readonly tableName: string
 		readonly joiningColumn: JoiningColumn
@@ -176,20 +173,17 @@ export namespace Model {
 		& Relation<RelationType.OneHasMany>
 		& InverseRelation
 		& OrderableRelation
-		& DeprecatedRelation
 
 	export type ManyHasOneRelation =
 		& Relation<RelationType.ManyHasOne>
 		& OwningRelation
 		& JoiningColumnRelation
 		& NullableRelation
-		& DeprecatedRelation
 
 	export type OneHasOneInverseRelation =
 		& Relation<RelationType.OneHasOne>
 		& InverseRelation
 		& NullableRelation
-		& DeprecatedRelation
 	/** @deprecated */
 	export type OneHasOneInversedRelation = OneHasOneInverseRelation
 
@@ -198,7 +192,6 @@ export namespace Model {
 		& OwningRelation
 		& JoiningColumnRelation
 		& NullableRelation
-		& DeprecatedRelation
 		& {
 			readonly orphanRemoval?: true
 		}
@@ -209,7 +202,6 @@ export namespace Model {
 		& Relation<RelationType.ManyHasMany>
 		& InverseRelation
 		& OrderableRelation
-		& DeprecatedRelation
 	/** @deprecated */
 	export type ManyHasManyInversedRelation = ManyHasManyInverseRelation
 
@@ -218,7 +210,6 @@ export namespace Model {
 		& OwningRelation
 		& JoiningTableRelation
 		& OrderableRelation
-		& DeprecatedRelation
 	/** @deprecated */
 	export type ManyHasManyOwnerRelation = ManyHasManyOwningRelation
 

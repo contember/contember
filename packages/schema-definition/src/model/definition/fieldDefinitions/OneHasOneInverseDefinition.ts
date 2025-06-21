@@ -1,6 +1,7 @@
 import { Model } from '@contember/schema'
-import { EntityConstructor } from '../types'
+import { EntityConstructor, RelationTarget } from '../types'
 import { CreateFieldContext, FieldDefinition } from './FieldDefinition'
+import { DEFAULT_FIELD_DEPRECATION_REASON } from '@contember/schema-utils'
 
 export class OneHasOneInverseDefinition extends FieldDefinition<OneHasOneInverseDefinitionOptions> {
 	type = 'OneHasOneInverseDefinition' as const
@@ -10,7 +11,7 @@ export class OneHasOneInverseDefinition extends FieldDefinition<OneHasOneInverse
 	}
 
 	public deprecated(deprecationReason?: string): OneHasOneInverseDefinition {
-		return this.withOption('deprecationReason', deprecationReason || 'This field is deprecated')
+		return this.withOption('deprecationReason', deprecationReason || DEFAULT_FIELD_DEPRECATION_REASON)
 	}
 
 
@@ -27,7 +28,7 @@ export class OneHasOneInverseDefinition extends FieldDefinition<OneHasOneInverse
 			type: Model.RelationType.OneHasOne,
 			nullable: options.nullable === undefined ? true : options.nullable,
 			...(options.deprecationReason !== undefined ? { deprecationReason: options.deprecationReason } : {}),
-			...(options.description ? { description: options.description } : {}),
+			...(options.description !== undefined ? { description: options.description } : {}),
 		}
 	}
 

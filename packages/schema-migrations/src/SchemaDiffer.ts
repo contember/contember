@@ -18,6 +18,8 @@ import {
 	EnableOrphanRemovalDiffer,
 	MakeRelationNotNullDiffer,
 	MakeRelationNullableDiffer,
+	SetDeprecatedDiffer,
+	SetDescriptionDiffer,
 	RemoveEntityDiffer,
 	RemoveEnumDiffer,
 	RemoveFieldDiffer,
@@ -82,6 +84,8 @@ export class SchemaDiffer {
 			new RemoveEntityDiffer(),
 			new RemoveFieldDiffer(),
 			new CreateEnumDiffer(),
+			new SetDescriptionDiffer(),
+			new SetDeprecatedDiffer(),
 			new UpdateEntityTableNameDiffer(),
 			new ToggleEventLogDiffer(),
 			new ToggleJunctionEventLogDiffer(),
@@ -113,6 +117,7 @@ export class SchemaDiffer {
 			new CreateTriggerDiffer(),
 			new RemoveTriggerDiffer(),
 			new RemoveTargetDiffer(),
+			new UpdateAclSchemaDiffer(),
 		]
 
 		const diffs: Migration.Modification[] = []

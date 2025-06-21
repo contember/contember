@@ -14,6 +14,8 @@ import {
 import { updateViewModification } from './entities/UpdateViewModification'
 import { createEnumModification, removeEnumModification, updateEnumModification } from './enums'
 import { removeFieldModification, updateFieldNameModification } from './fields'
+import { setDescriptionModification } from './description'
+import { setDeprecatedModification } from './deprecated'
 import {
 	convertOneHasManyToManyHasManyRelationModification,
 	convertOneToManyRelationModification,
@@ -37,7 +39,6 @@ import { updateTargetModification } from './actions/UpdateTargetModification'
 import { updateEntityOrderByModification } from './entities/UpdateEntityOrderByModification'
 import { removeIndexNamesModification } from './upgrade/RemoveIndexNamesModification'
 import { convertOneHasManyToOneHasOneRelationModification } from './relations/ConvertOneHasManyToOneHasOneRelationModification'
-
 
 class ModificationHandlerFactory {
 	constructor(private readonly map: Record<string, ModificationType<string, any>>) {}
@@ -76,6 +77,8 @@ namespace ModificationHandlerFactory {
 		updateEnumModification,
 		removeFieldModification,
 		updateFieldNameModification,
+		setDescriptionModification,
+		setDeprecatedModification,
 		createRelationInverseSideModification,
 		createRelationModification,
 		updateRelationOnDeleteModification,

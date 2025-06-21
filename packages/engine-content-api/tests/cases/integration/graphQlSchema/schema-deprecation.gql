@@ -1,0 +1,826 @@
+type Query {
+  getArticle(by: ArticleUniqueWhere!, filter: ArticleWhere): Article @deprecated(reason: "deprecated entity Article")
+  listArticle(filter: ArticleWhere, orderBy: [ArticleOrderBy!], offset: Int, limit: Int): [Article!]! @deprecated(reason: "deprecated entity Article")
+  paginateArticle(filter: ArticleWhere, orderBy: [ArticleOrderBy!], skip: Int, first: Int): ArticleConnection! @deprecated(reason: "deprecated entity Article")
+  validateCreateArticle(data: ArticleCreateInput!): _ValidationResult! @deprecated(reason: "deprecated entity Article")
+  validateUpdateArticle(by: ArticleUniqueWhere!, data: ArticleUpdateInput!): _ValidationResult! @deprecated(reason: "deprecated entity Article")
+  getArticleStats(by: ArticleStatsUniqueWhere!, filter: ArticleStatsWhere): ArticleStats @deprecated(reason: "deprecated entity ArticleStats")
+  listArticleStats(filter: ArticleStatsWhere, orderBy: [ArticleStatsOrderBy!], offset: Int, limit: Int): [ArticleStats!]! @deprecated(reason: "deprecated entity ArticleStats")
+  paginateArticleStats(filter: ArticleStatsWhere, orderBy: [ArticleStatsOrderBy!], skip: Int, first: Int): ArticleStatsConnection! @deprecated(reason: "deprecated entity ArticleStats")
+  validateCreateArticleStats(data: ArticleStatsCreateInput!): _ValidationResult! @deprecated(reason: "deprecated entity ArticleStats")
+  validateUpdateArticleStats(by: ArticleStatsUniqueWhere!, data: ArticleStatsUpdateInput!): _ValidationResult! @deprecated(reason: "deprecated entity ArticleStats")
+  getCategory(by: CategoryUniqueWhere!, filter: CategoryWhere): Category @deprecated(reason: "deprecated entity Category")
+  listCategory(filter: CategoryWhere, orderBy: [CategoryOrderBy!], offset: Int, limit: Int): [Category!]! @deprecated(reason: "deprecated entity Category")
+  paginateCategory(filter: CategoryWhere, orderBy: [CategoryOrderBy!], skip: Int, first: Int): CategoryConnection! @deprecated(reason: "deprecated entity Category")
+  validateCreateCategory(data: CategoryCreateInput!): _ValidationResult! @deprecated(reason: "deprecated entity Category")
+  validateUpdateCategory(by: CategoryUniqueWhere!, data: CategoryUpdateInput!): _ValidationResult! @deprecated(reason: "deprecated entity Category")
+  getTag(by: TagUniqueWhere!, filter: TagWhere): Tag @deprecated(reason: "Entity is deprecated")
+  listTag(filter: TagWhere, orderBy: [TagOrderBy!], offset: Int, limit: Int): [Tag!]! @deprecated(reason: "Entity is deprecated")
+  paginateTag(filter: TagWhere, orderBy: [TagOrderBy!], skip: Int, first: Int): TagConnection! @deprecated(reason: "Entity is deprecated")
+  validateCreateTag(data: TagCreateInput!): _ValidationResult! @deprecated(reason: "Entity is deprecated")
+  validateUpdateTag(by: TagUniqueWhere!, data: TagUpdateInput!): _ValidationResult! @deprecated(reason: "Entity is deprecated")
+  transaction: QueryTransaction
+  _info: Info
+}
+
+type Article {
+  _meta: ArticleMeta
+  id: UUID!
+  title: String @deprecated(reason: "deprecated Article.title")
+  category(filter: CategoryWhere): Category @deprecated(reason: "deprecated Article.category")
+  tags(filter: TagWhere, orderBy: [TagOrderBy!], offset: Int, limit: Int): [Tag!]! @deprecated(reason: "deprecated Article.tags")
+  stats(filter: ArticleStatsWhere): ArticleStats @deprecated(reason: "deprecated Article.stats")
+  paginateTags(filter: TagWhere, orderBy: [TagOrderBy!], skip: Int, first: Int): TagConnection! @deprecated(reason: "deprecated Article.tags")
+}
+
+type ArticleMeta {
+  id: FieldMeta
+  title: FieldMeta
+  category: FieldMeta
+  tags: FieldMeta
+  stats: FieldMeta
+}
+
+type FieldMeta {
+  readable: Boolean
+  updatable: Boolean
+}
+
+scalar UUID
+
+type Category {
+  _meta: CategoryMeta
+  id: UUID!
+  name: String @deprecated(reason: "deprecated Category.name")
+  articles(filter: ArticleWhere, orderBy: [ArticleOrderBy!], offset: Int, limit: Int): [Article!]! @deprecated(reason: "deprecated Category.articles")
+  articlesByStats(by: CategoryArticlesByStatsUniqueWhere!, filter: ArticleWhere): Article @deprecated(reason: "deprecated Category.articles")
+  articlesBy(by: ArticlesOfCategoryByUniqueWhere!, filter: ArticleWhere): Article @deprecated(reason: "deprecated Category.articles")
+  paginateArticles(filter: ArticleWhere, orderBy: [ArticleOrderBy!], skip: Int, first: Int): ArticleConnection! @deprecated(reason: "deprecated Category.articles")
+}
+
+type CategoryMeta {
+  id: FieldMeta
+  name: FieldMeta
+  articles: FieldMeta
+}
+
+input ArticleWhere {
+  id: UUIDCondition
+  title: StringCondition @deprecated(reason: "deprecated Article.title")
+  category: CategoryWhere @deprecated(reason: "deprecated Article.category")
+  tags: TagWhere @deprecated(reason: "deprecated Article.tags")
+  stats: ArticleStatsWhere @deprecated(reason: "deprecated Article.stats")
+  and: [ArticleWhere]
+  or: [ArticleWhere]
+  not: ArticleWhere
+}
+
+input UUIDCondition {
+  and: [UUIDCondition!]
+  or: [UUIDCondition!]
+  not: UUIDCondition
+  null: Boolean
+  isNull: Boolean
+  eq: UUID
+  notEq: UUID
+  in: [UUID!]
+  notIn: [UUID!]
+  lt: UUID
+  lte: UUID
+  gt: UUID
+  gte: UUID
+}
+
+input StringCondition {
+  and: [StringCondition!]
+  or: [StringCondition!]
+  not: StringCondition
+  null: Boolean
+  isNull: Boolean
+  eq: String
+  notEq: String
+  in: [String!]
+  notIn: [String!]
+  lt: String
+  lte: String
+  gt: String
+  gte: String
+  contains: String
+  startsWith: String
+  endsWith: String
+  containsCI: String
+  startsWithCI: String
+  endsWithCI: String
+}
+
+input CategoryWhere {
+  id: UUIDCondition
+  name: StringCondition @deprecated(reason: "deprecated Category.name")
+  articles: ArticleWhere @deprecated(reason: "deprecated Category.articles")
+  and: [CategoryWhere]
+  or: [CategoryWhere]
+  not: CategoryWhere
+}
+
+input TagWhere {
+  id: UUIDCondition
+  name: StringCondition @deprecated(reason: "Field is deprecated")
+  articles: ArticleWhere @deprecated(reason: "Field is deprecated")
+  and: [TagWhere]
+  or: [TagWhere]
+  not: TagWhere
+}
+
+input ArticleStatsWhere {
+  id: UUIDCondition
+  article: ArticleWhere @deprecated(reason: "deprecated ArticleStats.article")
+  and: [ArticleStatsWhere]
+  or: [ArticleStatsWhere]
+  not: ArticleStatsWhere
+}
+
+input ArticleOrderBy {
+  _random: Boolean
+  _randomSeeded: Int
+  id: OrderDirection
+  title: OrderDirection @deprecated(reason: "deprecated Article.title")
+  category: CategoryOrderBy @deprecated(reason: "deprecated Article.category")
+  stats: ArticleStatsOrderBy @deprecated(reason: "deprecated Article.stats")
+}
+
+enum OrderDirection {
+  asc
+  desc
+  ascNullsFirst
+  descNullsLast
+}
+
+input CategoryOrderBy {
+  _random: Boolean
+  _randomSeeded: Int
+  id: OrderDirection
+  name: OrderDirection @deprecated(reason: "deprecated Category.name")
+}
+
+input ArticleStatsOrderBy {
+  _random: Boolean
+  _randomSeeded: Int
+  id: OrderDirection
+}
+
+input CategoryArticlesByStatsUniqueWhere {
+  stats: ArticleStatsUniqueWhere @deprecated(reason: "deprecated Article.stats")
+}
+
+input ArticleStatsUniqueWhere {
+  id: UUID
+}
+
+input ArticlesOfCategoryByUniqueWhere {
+  id: UUID
+  stats: ArticleStatsUniqueWhere @deprecated(reason: "deprecated Article.stats")
+}
+
+type ArticleConnection {
+  pageInfo: PageInfo!
+  edges: [ArticleEdge!]!
+}
+
+type PageInfo {
+  totalCount: Int!
+}
+
+type ArticleEdge {
+  node: Article!
+
+
+type Tag {
+  _meta: TagMeta
+  id: UUID!
+  name: String @deprecated(reason: "Field is deprecated")
+  articles(filter: ArticleWhere, orderBy: [ArticleOrderBy!], offset: Int, limit: Int): [Article!]! @deprecated(reason: "Field is deprecated")
+  paginateArticles(filter: ArticleWhere, orderBy: [ArticleOrderBy!], skip: Int, first: Int): ArticleConnection! @deprecated(reason: "Field is deprecated")
+}
+
+type TagMeta {
+  id: FieldMeta
+  name: FieldMeta
+  articles: FieldMeta
+}
+
+input TagOrderBy {
+  _random: Boolean
+  _randomSeeded: Int
+  id: OrderDirection
+  name: OrderDirection @deprecated(reason: "Field is deprecated")
+}
+
+type ArticleStats {
+  _meta: ArticleStatsMeta
+  id: UUID!
+  article(filter: ArticleWhere, orderBy: [ArticleOrderBy!], offset: Int, limit: Int): [Article!]! @deprecated(reason: "deprecated ArticleStats.article")
+  paginateArticle(filter: ArticleWhere, orderBy: [ArticleOrderBy!], skip: Int, first: Int): ArticleConnection! @deprecated(reason: "deprecated ArticleStats.article")
+}
+
+type ArticleStatsMeta {
+  id: FieldMeta
+  article: FieldMeta
+}
+
+type TagConnection {
+  pageInfo: PageInfo!
+  edges: [TagEdge!]!
+}
+
+type TagEdge {
+  node: Tag!
+}
+
+input ArticleUniqueWhere {
+  id: UUID
+  stats: ArticleStatsUniqueWhere @deprecated(reason: "deprecated Article.stats")
+}
+
+type _ValidationResult {
+  valid: Boolean!
+  errors: [_ValidationError!]!
+}
+
+type _ValidationError {
+  path: [_PathFragment!]!
+  message: _ValidationMessage!
+}
+
+union _PathFragment = _FieldPathFragment | _IndexPathFragment
+
+type _FieldPathFragment {
+  field: String!
+}
+
+type _IndexPathFragment {
+  index: Int!
+  alias: String
+}
+
+type _ValidationMessage {
+  text: String!
+}
+
+input ArticleCreateInput {
+  title: String @deprecated(reason: "deprecated Article.title")
+  category: ArticleCreateCategoryEntityRelationInput @deprecated(reason: "deprecated Article.category")
+  tags: [ArticleCreateTagsEntityRelationInput!] @deprecated(reason: "deprecated Article.tags")
+  stats: ArticleCreateStatsEntityRelationInput @deprecated(reason: "deprecated Article.stats")
+  _dummy_field_: Boolean
+}
+
+input ArticleCreateCategoryEntityRelationInput {
+  connect: CategoryUniqueWhere
+  create: CategoryWithoutArticlesCreateInput
+  connectOrCreate: ArticleConnectOrCreateCategoryRelationInput
+}
+
+input CategoryUniqueWhere {
+  id: UUID
+  articles: ArticleUniqueWhere @deprecated(reason: "deprecated Category.articles")
+}
+
+input CategoryWithoutArticlesCreateInput {
+  name: String @deprecated(reason: "deprecated Category.name")
+  _dummy_field_: Boolean
+}
+
+input ArticleConnectOrCreateCategoryRelationInput {
+  connect: CategoryUniqueWhere!
+  create: CategoryWithoutArticlesCreateInput!
+}
+
+input ArticleCreateTagsEntityRelationInput {
+  connect: TagUniqueWhere
+  create: TagWithoutArticlesCreateInput
+  connectOrCreate: ArticleConnectOrCreateTagsRelationInput
+  alias: String
+}
+
+input TagUniqueWhere {
+  id: UUID
+}
+
+input TagWithoutArticlesCreateInput {
+  name: String @deprecated(reason: "Field is deprecated")
+  _dummy_field_: Boolean
+}
+
+input ArticleConnectOrCreateTagsRelationInput {
+  connect: TagUniqueWhere!
+  create: TagWithoutArticlesCreateInput!
+}
+
+input ArticleCreateStatsEntityRelationInput {
+  connect: ArticleStatsUniqueWhere
+  create: ArticleStatsWithoutArticleCreateInput
+  connectOrCreate: ArticleConnectOrCreateStatsRelationInput
+}
+
+input ArticleStatsWithoutArticleCreateInput {
+  _dummy_field_: Boolean
+}
+
+input ArticleConnectOrCreateStatsRelationInput {
+  connect: ArticleStatsUniqueWhere!
+  create: ArticleStatsWithoutArticleCreateInput!
+}
+
+input ArticleUpdateInput {
+  title: String @deprecated(reason: "deprecated Article.title")
+  category: ArticleUpdateCategoryEntityRelationInput @deprecated(reason: "deprecated Article.category")
+  tags: [ArticleUpdateTagsEntityRelationInput!] @deprecated(reason: "deprecated Article.tags")
+  stats: ArticleUpdateStatsEntityRelationInput @deprecated(reason: "deprecated Article.stats")
+  _dummy_field_: Boolean
+}
+
+input ArticleUpdateCategoryEntityRelationInput {
+  connect: CategoryUniqueWhere
+  create: CategoryWithoutArticlesCreateInput
+  connectOrCreate: ArticleConnectOrCreateCategoryRelationInput
+  update: CategoryWithoutArticlesUpdateInput
+  upsert: ArticleUpsertCategoryRelationInput
+  disconnect: Boolean
+  delete: Boolean
+}
+
+input CategoryWithoutArticlesUpdateInput {
+  name: String @deprecated(reason: "deprecated Category.name")
+  _dummy_field_: Boolean
+}
+
+input ArticleUpsertCategoryRelationInput {
+  update: CategoryWithoutArticlesUpdateInput!
+  create: CategoryWithoutArticlesCreateInput!
+}
+
+input ArticleUpdateTagsEntityRelationInput {
+  create: TagWithoutArticlesCreateInput
+  update: ArticleUpdateTagsRelationInput
+  upsert: ArticleUpsertTagsRelationInput
+  connect: TagUniqueWhere
+  connectOrCreate: ArticleConnectOrCreateTagsRelationInput
+  disconnect: TagUniqueWhere
+  delete: TagUniqueWhere
+  alias: String
+}
+
+input ArticleUpdateTagsRelationInput {
+  by: TagUniqueWhere!
+  data: TagWithoutArticlesUpdateInput!
+}
+
+input TagWithoutArticlesUpdateInput {
+  name: String @deprecated(reason: "Field is deprecated")
+  _dummy_field_: Boolean
+}
+
+input ArticleUpsertTagsRelationInput {
+  by: TagUniqueWhere!
+  update: TagWithoutArticlesUpdateInput!
+  create: TagWithoutArticlesCreateInput!
+}
+
+input ArticleUpdateStatsEntityRelationInput {
+  connect: ArticleStatsUniqueWhere
+  create: ArticleStatsWithoutArticleCreateInput
+  connectOrCreate: ArticleConnectOrCreateStatsRelationInput
+  update: ArticleStatsWithoutArticleUpdateInput
+  upsert: ArticleUpsertStatsRelationInput
+  disconnect: Boolean
+  delete: Boolean
+}
+
+input ArticleStatsWithoutArticleUpdateInput {
+  _dummy_field_: Boolean
+}
+
+input ArticleUpsertStatsRelationInput {
+  update: ArticleStatsWithoutArticleUpdateInput!
+  create: ArticleStatsWithoutArticleCreateInput!
+}
+
+type ArticleStatsConnection {
+  pageInfo: PageInfo!
+  edges: [ArticleStatsEdge!]!
+}
+
+type ArticleStatsEdge {
+  node: ArticleStats!
+}
+
+input ArticleStatsCreateInput {
+  article: [ArticleStatsCreateArticleEntityRelationInput!] @deprecated(reason: "deprecated ArticleStats.article")
+  _dummy_field_: Boolean
+}
+
+input ArticleStatsCreateArticleEntityRelationInput {
+  connect: ArticleUniqueWhere
+  create: ArticleWithoutStatsCreateInput
+  connectOrCreate: ArticleStatsConnectOrCreateArticleRelationInput
+  alias: String
+}
+
+input ArticleWithoutStatsCreateInput {
+  title: String @deprecated(reason: "deprecated Article.title")
+  category: ArticleCreateCategoryEntityRelationInput @deprecated(reason: "deprecated Article.category")
+  tags: [ArticleCreateTagsEntityRelationInput!] @deprecated(reason: "deprecated Article.tags")
+  _dummy_field_: Boolean
+}
+
+input ArticleStatsConnectOrCreateArticleRelationInput {
+  connect: ArticleUniqueWhere!
+  create: ArticleWithoutStatsCreateInput!
+}
+
+input ArticleStatsUpdateInput {
+  article: [ArticleStatsUpdateArticleEntityRelationInput!] @deprecated(reason: "deprecated ArticleStats.article")
+  _dummy_field_: Boolean
+}
+
+input ArticleStatsUpdateArticleEntityRelationInput {
+  create: ArticleWithoutStatsCreateInput
+  update: ArticleStatsUpdateArticleRelationInput
+  upsert: ArticleStatsUpsertArticleRelationInput
+  connect: ArticleUniqueWhere
+  connectOrCreate: ArticleStatsConnectOrCreateArticleRelationInput
+  disconnect: ArticleUniqueWhere
+  delete: ArticleUniqueWhere
+  alias: String
+}
+
+input ArticleStatsUpdateArticleRelationInput {
+  by: ArticleUniqueWhere!
+  data: ArticleWithoutStatsUpdateInput!
+}
+
+input ArticleWithoutStatsUpdateInput {
+  title: String @deprecated(reason: "deprecated Article.title")
+  category: ArticleUpdateCategoryEntityRelationInput @deprecated(reason: "deprecated Article.category")
+  tags: [ArticleUpdateTagsEntityRelationInput!] @deprecated(reason: "deprecated Article.tags")
+  _dummy_field_: Boolean
+}
+
+input ArticleStatsUpsertArticleRelationInput {
+  by: ArticleUniqueWhere!
+  update: ArticleWithoutStatsUpdateInput!
+  create: ArticleWithoutStatsCreateInput!
+}
+
+type CategoryConnection {
+  pageInfo: PageInfo!
+  edges: [CategoryEdge!]!
+}
+
+type CategoryEdge {
+  node: Category!
+}
+
+input CategoryCreateInput {
+  name: String @deprecated(reason: "deprecated Category.name")
+  articles: [CategoryCreateArticlesEntityRelationInput!] @deprecated(reason: "deprecated Category.articles")
+  _dummy_field_: Boolean
+}
+
+input CategoryCreateArticlesEntityRelationInput {
+  connect: ArticleUniqueWhere
+  create: ArticleWithoutCategoryCreateInput
+  connectOrCreate: CategoryConnectOrCreateArticlesRelationInput
+  alias: String
+}
+
+input ArticleWithoutCategoryCreateInput {
+  title: String @deprecated(reason: "deprecated Article.title")
+  tags: [ArticleCreateTagsEntityRelationInput!] @deprecated(reason: "deprecated Article.tags")
+  stats: ArticleCreateStatsEntityRelationInput @deprecated(reason: "deprecated Article.stats")
+  _dummy_field_: Boolean
+}
+
+input CategoryConnectOrCreateArticlesRelationInput {
+  connect: ArticleUniqueWhere!
+  create: ArticleWithoutCategoryCreateInput!
+}
+
+input CategoryUpdateInput {
+  name: String @deprecated(reason: "deprecated Category.name")
+  articles: [CategoryUpdateArticlesEntityRelationInput!] @deprecated(reason: "deprecated Category.articles")
+  _dummy_field_: Boolean
+}
+
+input CategoryUpdateArticlesEntityRelationInput {
+  create: ArticleWithoutCategoryCreateInput
+  update: CategoryUpdateArticlesRelationInput
+  upsert: CategoryUpsertArticlesRelationInput
+  connect: ArticleUniqueWhere
+  connectOrCreate: CategoryConnectOrCreateArticlesRelationInput
+  disconnect: ArticleUniqueWhere
+  delete: ArticleUniqueWhere
+  alias: String
+}
+
+input CategoryUpdateArticlesRelationInput {
+  by: ArticleUniqueWhere!
+  data: ArticleWithoutCategoryUpdateInput!
+}
+
+input ArticleWithoutCategoryUpdateInput {
+  title: String @deprecated(reason: "deprecated Article.title")
+  tags: [ArticleUpdateTagsEntityRelationInput!] @deprecated(reason: "deprecated Article.tags")
+  stats: ArticleUpdateStatsEntityRelationInput @deprecated(reason: "deprecated Article.stats")
+  _dummy_field_: Boolean
+}
+
+input CategoryUpsertArticlesRelationInput {
+  by: ArticleUniqueWhere!
+  update: ArticleWithoutCategoryUpdateInput!
+  create: ArticleWithoutCategoryCreateInput!
+}
+
+input TagCreateInput {
+  name: String @deprecated(reason: "Field is deprecated")
+  articles: [TagCreateArticlesEntityRelationInput!] @deprecated(reason: "Field is deprecated")
+  _dummy_field_: Boolean
+}
+
+input TagCreateArticlesEntityRelationInput {
+  connect: ArticleUniqueWhere
+  create: ArticleWithoutTagsCreateInput
+  connectOrCreate: TagConnectOrCreateArticlesRelationInput
+  alias: String
+}
+
+input ArticleWithoutTagsCreateInput {
+  title: String @deprecated(reason: "deprecated Article.title")
+  category: ArticleCreateCategoryEntityRelationInput @deprecated(reason: "deprecated Article.category")
+  stats: ArticleCreateStatsEntityRelationInput @deprecated(reason: "deprecated Article.stats")
+  _dummy_field_: Boolean
+}
+
+input TagConnectOrCreateArticlesRelationInput {
+  connect: ArticleUniqueWhere!
+  create: ArticleWithoutTagsCreateInput!
+}
+
+input TagUpdateInput {
+  name: String @deprecated(reason: "Field is deprecated")
+  articles: [TagUpdateArticlesEntityRelationInput!] @deprecated(reason: "Field is deprecated")
+  _dummy_field_: Boolean
+}
+
+input TagUpdateArticlesEntityRelationInput {
+  create: ArticleWithoutTagsCreateInput
+  update: TagUpdateArticlesRelationInput
+  upsert: TagUpsertArticlesRelationInput
+  connect: ArticleUniqueWhere
+  connectOrCreate: TagConnectOrCreateArticlesRelationInput
+  disconnect: ArticleUniqueWhere
+  delete: ArticleUniqueWhere
+  alias: String
+}
+
+input TagUpdateArticlesRelationInput {
+  by: ArticleUniqueWhere!
+  data: ArticleWithoutTagsUpdateInput!
+}
+
+input ArticleWithoutTagsUpdateInput {
+  title: String @deprecated(reason: "deprecated Article.title")
+  category: ArticleUpdateCategoryEntityRelationInput @deprecated(reason: "deprecated Article.category")
+  stats: ArticleUpdateStatsEntityRelationInput @deprecated(reason: "deprecated Article.stats")
+  _dummy_field_: Boolean
+}
+
+input TagUpsertArticlesRelationInput {
+  by: ArticleUniqueWhere!
+  update: ArticleWithoutTagsUpdateInput!
+  create: ArticleWithoutTagsCreateInput!
+}
+
+type QueryTransaction {
+  getArticle(by: ArticleUniqueWhere!, filter: ArticleWhere): Article @deprecated(reason: "deprecated entity Article")
+  listArticle(filter: ArticleWhere, orderBy: [ArticleOrderBy!], offset: Int, limit: Int): [Article!]! @deprecated(reason: "deprecated entity Article")
+  paginateArticle(filter: ArticleWhere, orderBy: [ArticleOrderBy!], skip: Int, first: Int): ArticleConnection! @deprecated(reason: "deprecated entity Article")
+  validateCreateArticle(data: ArticleCreateInput!): _ValidationResult! @deprecated(reason: "deprecated entity Article")
+  validateUpdateArticle(by: ArticleUniqueWhere!, data: ArticleUpdateInput!): _ValidationResult! @deprecated(reason: "deprecated entity Article")
+  getArticleStats(by: ArticleStatsUniqueWhere!, filter: ArticleStatsWhere): ArticleStats @deprecated(reason: "deprecated entity ArticleStats")
+  listArticleStats(filter: ArticleStatsWhere, orderBy: [ArticleStatsOrderBy!], offset: Int, limit: Int): [ArticleStats!]! @deprecated(reason: "deprecated entity ArticleStats")
+  paginateArticleStats(filter: ArticleStatsWhere, orderBy: [ArticleStatsOrderBy!], skip: Int, first: Int): ArticleStatsConnection! @deprecated(reason: "deprecated entity ArticleStats")
+  validateCreateArticleStats(data: ArticleStatsCreateInput!): _ValidationResult! @deprecated(reason: "deprecated entity ArticleStats")
+  validateUpdateArticleStats(by: ArticleStatsUniqueWhere!, data: ArticleStatsUpdateInput!): _ValidationResult! @deprecated(reason: "deprecated entity ArticleStats")
+  getCategory(by: CategoryUniqueWhere!, filter: CategoryWhere): Category @deprecated(reason: "deprecated entity Category")
+  listCategory(filter: CategoryWhere, orderBy: [CategoryOrderBy!], offset: Int, limit: Int): [Category!]! @deprecated(reason: "deprecated entity Category")
+  paginateCategory(filter: CategoryWhere, orderBy: [CategoryOrderBy!], skip: Int, first: Int): CategoryConnection! @deprecated(reason: "deprecated entity Category")
+  validateCreateCategory(data: CategoryCreateInput!): _ValidationResult! @deprecated(reason: "deprecated entity Category")
+  validateUpdateCategory(by: CategoryUniqueWhere!, data: CategoryUpdateInput!): _ValidationResult! @deprecated(reason: "deprecated entity Category")
+  getTag(by: TagUniqueWhere!, filter: TagWhere): Tag @deprecated(reason: "Entity is deprecated")
+  listTag(filter: TagWhere, orderBy: [TagOrderBy!], offset: Int, limit: Int): [Tag!]! @deprecated(reason: "Entity is deprecated")
+  paginateTag(filter: TagWhere, orderBy: [TagOrderBy!], skip: Int, first: Int): TagConnection! @deprecated(reason: "Entity is deprecated")
+  validateCreateTag(data: TagCreateInput!): _ValidationResult! @deprecated(reason: "Entity is deprecated")
+  validateUpdateTag(by: TagUniqueWhere!, data: TagUpdateInput!): _ValidationResult! @deprecated(reason: "Entity is deprecated")
+}
+
+type Info {
+  description: String
+}
+
+type Mutation {
+  createArticle(data: ArticleCreateInput!): ArticleCreateResult! @deprecated(reason: "deprecated entity Article")
+  deleteArticle(by: ArticleUniqueWhere!, filter: ArticleWhere): ArticleDeleteResult! @deprecated(reason: "deprecated entity Article")
+  updateArticle(by: ArticleUniqueWhere!, filter: ArticleWhere, data: ArticleUpdateInput!): ArticleUpdateResult! @deprecated(reason: "deprecated entity Article")
+  upsertArticle(by: ArticleUniqueWhere!, filter: ArticleWhere, update: ArticleUpdateInput!, create: ArticleCreateInput!): ArticleUpsertResult! @deprecated(reason: "deprecated entity Article")
+  createArticleStats(data: ArticleStatsCreateInput!): ArticleStatsCreateResult! @deprecated(reason: "deprecated entity ArticleStats")
+  deleteArticleStats(by: ArticleStatsUniqueWhere!, filter: ArticleStatsWhere): ArticleStatsDeleteResult! @deprecated(reason: "deprecated entity ArticleStats")
+  updateArticleStats(by: ArticleStatsUniqueWhere!, filter: ArticleStatsWhere, data: ArticleStatsUpdateInput!): ArticleStatsUpdateResult! @deprecated(reason: "deprecated entity ArticleStats")
+  upsertArticleStats(by: ArticleStatsUniqueWhere!, filter: ArticleStatsWhere, update: ArticleStatsUpdateInput!, create: ArticleStatsCreateInput!): ArticleStatsUpsertResult! @deprecated(reason: "deprecated entity ArticleStats")
+  createCategory(data: CategoryCreateInput!): CategoryCreateResult! @deprecated(reason: "deprecated entity Category")
+  deleteCategory(by: CategoryUniqueWhere!, filter: CategoryWhere): CategoryDeleteResult! @deprecated(reason: "deprecated entity Category")
+  updateCategory(by: CategoryUniqueWhere!, filter: CategoryWhere, data: CategoryUpdateInput!): CategoryUpdateResult! @deprecated(reason: "deprecated entity Category")
+  upsertCategory(by: CategoryUniqueWhere!, filter: CategoryWhere, update: CategoryUpdateInput!, create: CategoryCreateInput!): CategoryUpsertResult! @deprecated(reason: "deprecated entity Category")
+  createTag(data: TagCreateInput!): TagCreateResult! @deprecated(reason: "Entity is deprecated")
+  deleteTag(by: TagUniqueWhere!, filter: TagWhere): TagDeleteResult! @deprecated(reason: "Entity is deprecated")
+  updateTag(by: TagUniqueWhere!, filter: TagWhere, data: TagUpdateInput!): TagUpdateResult! @deprecated(reason: "Entity is deprecated")
+  upsertTag(by: TagUniqueWhere!, filter: TagWhere, update: TagUpdateInput!, create: TagCreateInput!): TagUpsertResult! @deprecated(reason: "Entity is deprecated")
+  transaction(options: MutationTransactionOptions): MutationTransaction!
+  query: Query!
+}
+
+type ArticleCreateResult implements MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: Article
+  validation: _ValidationResult!
+}
+
+interface MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+}
+
+type _MutationError {
+  path: [_PathFragment!]! @deprecated(reason: "Use `paths`.")
+  paths: [[_PathFragment!]!]!
+  type: _MutationErrorType!
+  message: String
+}
+
+enum _MutationErrorType {
+  NotNullConstraintViolation
+  UniqueConstraintViolation
+  ForeignKeyConstraintViolation
+  NotFoundOrDenied
+  NonUniqueWhereInput
+  InvalidDataInput
+  SqlError
+}
+
+type ArticleDeleteResult implements MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: Article
+}
+
+type ArticleUpdateResult implements MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: Article
+  validation: _ValidationResult!
+}
+
+type ArticleUpsertResult implements MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: Article
+  validation: _ValidationResult!
+}
+
+type ArticleStatsCreateResult implements MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: ArticleStats
+  validation: _ValidationResult!
+}
+
+type ArticleStatsDeleteResult implements MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: ArticleStats
+}
+
+type ArticleStatsUpdateResult implements MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: ArticleStats
+  validation: _ValidationResult!
+}
+
+type ArticleStatsUpsertResult implements MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: ArticleStats
+  validation: _ValidationResult!
+}
+
+type CategoryCreateResult implements MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: Category
+  validation: _ValidationResult!
+}
+
+type CategoryDeleteResult implements MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: Category
+}
+
+type CategoryUpdateResult implements MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: Category
+  validation: _ValidationResult!
+}
+
+type CategoryUpsertResult implements MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: Category
+  validation: _ValidationResult!
+}
+
+type TagCreateResult implements MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: Tag
+  validation: _ValidationResult!
+}
+
+type TagDeleteResult implements MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: Tag
+}
+
+type TagUpdateResult implements MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: Tag
+  validation: _ValidationResult!
+}
+
+type TagUpsertResult implements MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: Tag
+  validation: _ValidationResult!
+}
+
+type MutationTransaction {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  validation: _ValidationResult!
+  createArticle(data: ArticleCreateInput!): ArticleCreateResult! @deprecated(reason: "deprecated entity Article")
+  deleteArticle(by: ArticleUniqueWhere!, filter: ArticleWhere): ArticleDeleteResult! @deprecated(reason: "deprecated entity Article")
+  updateArticle(by: ArticleUniqueWhere!, filter: ArticleWhere, data: ArticleUpdateInput!): ArticleUpdateResult! @deprecated(reason: "deprecated entity Article")
+  upsertArticle(by: ArticleUniqueWhere!, filter: ArticleWhere, update: ArticleUpdateInput!, create: ArticleCreateInput!): ArticleUpsertResult! @deprecated(reason: "deprecated entity Article")
+  createArticleStats(data: ArticleStatsCreateInput!): ArticleStatsCreateResult! @deprecated(reason: "deprecated entity ArticleStats")
+  deleteArticleStats(by: ArticleStatsUniqueWhere!, filter: ArticleStatsWhere): ArticleStatsDeleteResult! @deprecated(reason: "deprecated entity ArticleStats")
+  updateArticleStats(by: ArticleStatsUniqueWhere!, filter: ArticleStatsWhere, data: ArticleStatsUpdateInput!): ArticleStatsUpdateResult! @deprecated(reason: "deprecated entity ArticleStats")
+  upsertArticleStats(by: ArticleStatsUniqueWhere!, filter: ArticleStatsWhere, update: ArticleStatsUpdateInput!, create: ArticleStatsCreateInput!): ArticleStatsUpsertResult! @deprecated(reason: "deprecated entity ArticleStats")
+  createCategory(data: CategoryCreateInput!): CategoryCreateResult! @deprecated(reason: "deprecated entity Category")
+  deleteCategory(by: CategoryUniqueWhere!, filter: CategoryWhere): CategoryDeleteResult! @deprecated(reason: "deprecated entity Category")
+  updateCategory(by: CategoryUniqueWhere!, filter: CategoryWhere, data: CategoryUpdateInput!): CategoryUpdateResult! @deprecated(reason: "deprecated entity Category")
+  upsertCategory(by: CategoryUniqueWhere!, filter: CategoryWhere, update: CategoryUpdateInput!, create: CategoryCreateInput!): CategoryUpsertResult! @deprecated(reason: "deprecated entity Category")
+  createTag(data: TagCreateInput!): TagCreateResult! @deprecated(reason: "Entity is deprecated")
+  deleteTag(by: TagUniqueWhere!, filter: TagWhere): TagDeleteResult! @deprecated(reason: "Entity is deprecated")
+  updateTag(by: TagUniqueWhere!, filter: TagWhere, data: TagUpdateInput!): TagUpdateResult! @deprecated(reason: "Entity is deprecated")
+  upsertTag(by: TagUniqueWhere!, filter: TagWhere, update: TagUpdateInput!, create: TagCreateInput!): TagUpsertResult! @deprecated(reason: "Entity is deprecated")
+  query: Query
+}
+
+input MutationTransactionOptions {
+  deferForeignKeyConstraints: Boolean
+  deferUniqueConstraints: Boolean
+}

@@ -2,6 +2,7 @@ import { Model } from '@contember/schema'
 import { CreateFieldContext, FieldDefinition } from './FieldDefinition'
 import { EnumDefinition } from '../EnumDefinition'
 import { resolveDefaultColumnType } from '@contember/schema-utils'
+import { DEFAULT_FIELD_DEPRECATION_REASON } from '@contember/schema-utils'
 
 export class ColumnDefinition extends FieldDefinition<ColumnDefinitionOptions> {
 	type = 'ColumnDefinition' as const
@@ -60,7 +61,7 @@ export class ColumnDefinition extends FieldDefinition<ColumnDefinitionOptions> {
 	}
 
 	public deprecated(deprecationReason?: string): ColumnDefinition {
-		return this.withOption('deprecationReason', deprecationReason || 'This field is deprecated')
+		return this.withOption('deprecationReason', deprecationReason || DEFAULT_FIELD_DEPRECATION_REASON)
 	}
 
 	public description(description: string): ColumnDefinition {
@@ -77,6 +78,7 @@ export class ColumnDefinition extends FieldDefinition<ColumnDefinitionOptions> {
 			...(defaultValue !== undefined ? { default: defaultValue } : {}),
 			...(sequence !== undefined ? { sequence } : {}),
 			...(type === Model.ColumnType.String && collation !== undefined ? { collation } : {}),
+			...(description !== undefined ? { description } : {}),
 			...(deprecationReason !== undefined ? { deprecationReason } : {}),
 		}
 		if (type === Model.ColumnType.Enum) {
@@ -101,8 +103,6 @@ export class ColumnDefinition extends FieldDefinition<ColumnDefinitionOptions> {
 			type: type,
 			columnType: columnType || resolveDefaultColumnType(type),
 			...(typeAlias !== undefined ? { typeAlias } : {}),
-			...(description ? { description } : {}),
-			...(deprecationReason ? { deprecationReason } : {})
 		}
 	}
 

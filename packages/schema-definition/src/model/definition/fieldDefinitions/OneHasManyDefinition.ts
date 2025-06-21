@@ -1,6 +1,7 @@
 import { Model } from '@contember/schema'
 import { CreateFieldContext, FieldDefinition } from './FieldDefinition'
 import { EntityConstructor, RelationTarget } from '../types'
+import { DEFAULT_FIELD_DEPRECATION_REASON } from '@contember/schema-utils'
 
 export class OneHasManyDefinition extends FieldDefinition<OneHasManyDefinitionOptions> {
 	type = 'OneHasManyDefinition' as const
@@ -14,7 +15,7 @@ export class OneHasManyDefinition extends FieldDefinition<OneHasManyDefinitionOp
 	}
 
 	public deprecated(deprecationReason?: string): OneHasManyDefinition {
-		return this.withOption('deprecationReason', deprecationReason || 'This field is deprecated')
+		return this.withOption('deprecationReason', deprecationReason || DEFAULT_FIELD_DEPRECATION_REASON)
 	}
 
 	public description(description: string): OneHasManyDefinition {
@@ -30,7 +31,7 @@ export class OneHasManyDefinition extends FieldDefinition<OneHasManyDefinitionOp
 			target: entityRegistry.getName(options.target),
 			...(options.orderBy ? { orderBy: options.orderBy } : {}),
 			...(options.deprecationReason !== undefined ? { deprecationReason: options.deprecationReason } : {}),
-			...(options.description ? { description: options.description } : {}),
+			...(options.description !== undefined ? { description: options.description } : {}),
 		}
 	}
 

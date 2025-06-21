@@ -24,15 +24,15 @@ class ColumnBuilder<O extends PartialColumnOptions<never> = PartialColumnOptions
 	}
 
 	public nullable(): ColumnBuilder<O> {
-		return new ColumnBuilder<O>({ ...(this.options as object), nullable: true } as O)
+		return new ColumnBuilder<O>({ ...this.options, nullable: true } as O)
 	}
 
 	public notNull(): ColumnBuilder<O> {
-		return new ColumnBuilder<O>({ ...(this.options as object), nullable: false } as O)
+		return new ColumnBuilder<O>({ ...this.options, nullable: false } as O)
 	}
 
 	public unique(): ColumnBuilder<O> {
-		return new ColumnBuilder<O>({ ...(this.options as object), unique: true } as O)
+		return new ColumnBuilder<O>({ ...this.options, unique: true } as O)
 	}
 
 	public primary(): ColumnBuilder<O> {
@@ -40,7 +40,11 @@ class ColumnBuilder<O extends PartialColumnOptions<never> = PartialColumnOptions
 	}
 
 	public typeAlias(typeAlias: string): ColumnBuilder<O> {
-		return new ColumnBuilder<O>({ ...(this.options as object), typeAlias } as O)
+		return new ColumnBuilder<O>({ ...this.options, typeAlias } as O)
+	}
+
+	public description(description: string): ColumnBuilder<O> {
+		return new ColumnBuilder<O>({ ...this.options, description } as O)
 	}
 
 	public deprecated(deprecationReason: string): ColumnBuilder<O> {
@@ -65,6 +69,7 @@ namespace ColumnBuilder {
 		nullable?: boolean
 		primary?: boolean
 		typeAlias?: string
+		description?: string
 		deprecationReason?: string
 	}
 }

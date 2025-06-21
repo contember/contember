@@ -13,6 +13,7 @@ export * from './validation'
 export * from './schemaNormalizer'
 export * from './schemaFilter'
 export * from './schemaChecksum'
+export * from './constants'
 export { deepCompare, compareArraysIgnoreOrder } from './utils'
 
 export const emptySchema: Schema = {

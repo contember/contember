@@ -1,6 +1,7 @@
 import { Model } from '@contember/schema'
 import { EntityConstructor, RelationTarget } from '../types'
 import { CreateFieldContext, FieldDefinition } from './FieldDefinition'
+import { DEFAULT_FIELD_DEPRECATION_REASON } from '@contember/schema-utils'
 
 export class OneHasOneDefinition extends FieldDefinition<OneHasOneDefinitionOptions> {
 	type = 'OneHasOneDefinition' as const
@@ -35,7 +36,7 @@ export class OneHasOneDefinition extends FieldDefinition<OneHasOneDefinitionOpti
 	}
 
 	public deprecated(deprecationReason?: string): OneHasOneDefinition {
-		return this.withOption('deprecationReason', deprecationReason || 'This field is deprecated')
+		return this.withOption('deprecationReason', deprecationReason || DEFAULT_FIELD_DEPRECATION_REASON)
 	}
 
 	public removeOrphan(): OneHasOneDefinition {
@@ -43,7 +44,7 @@ export class OneHasOneDefinition extends FieldDefinition<OneHasOneDefinitionOpti
 	}
 
 
-	public description(description: string): Interface<OneHasOneDefinition> {
+	public description(description: string): OneHasOneDefinition {
 		return this.withOption('description', description)
 	}
 
@@ -66,7 +67,7 @@ export class OneHasOneDefinition extends FieldDefinition<OneHasOneDefinitionOpti
 			},
 			...(options.orphanRemoval ? { orphanRemoval: true } : {}),
 			...(options.deprecationReason !== undefined ? { deprecationReason: options.deprecationReason } : {}),
-			...(options.description ? { description: options.description } : {}),
+			...(options.description !== undefined ? { description: options.description } : {}),
 		}
 	}
 

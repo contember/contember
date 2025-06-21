@@ -1,6 +1,7 @@
 import { EntityConstructor,  RelationTarget } from '../types'
 import { Model } from '@contember/schema'
 import { CreateFieldContext, FieldDefinition } from './FieldDefinition'
+import { DEFAULT_FIELD_DEPRECATION_REASON } from '@contember/schema-utils'
 
 export class ManyHasOneDefinition extends FieldDefinition<ManyHasOneDefinitionOptions> {
 	type = 'ManyHasOneDefinition' as const
@@ -34,11 +35,11 @@ export class ManyHasOneDefinition extends FieldDefinition<ManyHasOneDefinitionOp
 	}
 
 	public deprecated(deprecationReason?: string): ManyHasOneDefinition {
-		return this.withOption('deprecationReason', deprecationReason || 'This field is deprecated')
+		return this.withOption('deprecationReason', deprecationReason || DEFAULT_FIELD_DEPRECATION_REASON)
 	}
 
 
-	public description(description: string): Interface<ManyHasOneDefinition> {
+	public description(description: string): ManyHasOneDefinition {
 		return this.withOption('description', description)
 	}
 

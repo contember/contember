@@ -44,6 +44,8 @@ export default class SchemaBuilderInternal {
 				enabled: true,
 			},
 			...(options.orderBy !== undefined ? { orderBy: options.orderBy } : {}),
+			...(options.deprecationReason !== undefined ? { deprecationReason: options.deprecationReason } : {}),
+			...(options.description !== undefined ? { description: options.description } : {}),
 		}
 	}
 

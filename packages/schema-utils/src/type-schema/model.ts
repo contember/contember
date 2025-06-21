@@ -240,6 +240,7 @@ const entitySchema = Typesafe.intersection(
 		view: viewSchema,
 		orderBy: orderBySchema,
 		description: Typesafe.string,
+		deprecationReason: Typesafe.string,
 	}),
 )
 

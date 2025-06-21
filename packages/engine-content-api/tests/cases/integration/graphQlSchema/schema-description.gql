@@ -111,6 +111,7 @@ type Category {
 
   """description of Category.articles"""
   articlesByStats(by: CategoryArticlesByStatsUniqueWhere!, filter: ArticleWhere): Article
+  articlesBy(by: ArticlesOfCategoryByUniqueWhere!, filter: ArticleWhere): Article
 
   """description of Category.articles"""
   paginateArticles(filter: ArticleWhere, orderBy: [ArticleOrderBy!], skip: Int, first: Int): ArticleConnection!
@@ -265,6 +266,13 @@ input CategoryArticlesByStatsUniqueWhere {
 """description of entity ArticleStats"""
 input ArticleStatsUniqueWhere {
   id: UUID
+}
+
+input ArticlesOfCategoryByUniqueWhere {
+  id: UUID
+
+  """description of Article.stats"""
+  stats: ArticleStatsUniqueWhere
 }
 
 type ArticleConnection {
@@ -503,6 +511,7 @@ input ArticleUpdateTagsEntityRelationInput {
   update: ArticleUpdateTagsRelationInput
   upsert: ArticleUpsertTagsRelationInput
   connect: TagUniqueWhere
+  connectOrCreate: ArticleConnectOrCreateTagsRelationInput
   disconnect: TagUniqueWhere
   delete: TagUniqueWhere
   alias: String
@@ -606,6 +615,7 @@ input ArticleStatsUpdateArticleEntityRelationInput {
   update: ArticleStatsUpdateArticleRelationInput
   upsert: ArticleStatsUpsertArticleRelationInput
   connect: ArticleUniqueWhere
+  connectOrCreate: ArticleStatsConnectOrCreateArticleRelationInput
   disconnect: ArticleUniqueWhere
   delete: ArticleUniqueWhere
   alias: String
@@ -699,6 +709,7 @@ input CategoryUpdateArticlesEntityRelationInput {
   update: CategoryUpdateArticlesRelationInput
   upsert: CategoryUpsertArticlesRelationInput
   connect: ArticleUniqueWhere
+  connectOrCreate: CategoryConnectOrCreateArticlesRelationInput
   disconnect: ArticleUniqueWhere
   delete: ArticleUniqueWhere
   alias: String
@@ -783,6 +794,7 @@ input TagUpdateArticlesEntityRelationInput {
   update: TagUpdateArticlesRelationInput
   upsert: TagUpsertArticlesRelationInput
   connect: ArticleUniqueWhere
+  connectOrCreate: TagConnectOrCreateArticlesRelationInput
   disconnect: ArticleUniqueWhere
   delete: ArticleUniqueWhere
   alias: String

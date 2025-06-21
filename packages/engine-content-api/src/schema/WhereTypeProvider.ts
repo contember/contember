@@ -61,7 +61,7 @@ export class WhereTypeProvider {
 		}
 
 		return new GraphQLInputObjectType({
-			name: capitalizeFirstLetter(entityName) + 'UniqueWhere',
+			name: `${capitalizeFirstLetter(entityName)}UniqueWhere`,
 			description: entity.description,
 			// description: `Valid combinations are: (${combinations.join('), (')})`, generates invalid schema file
 			fields: () => this.getUniqueWhereFields(entity, uniqueKeys),
@@ -86,17 +86,15 @@ export class WhereTypeProvider {
 						}
 						return {
 							type: uniqueWhere,
+							deprecationReason: relation.deprecationReason,
 							description: relation.description,
 						}
 					},
-<<<<<<< HEAD
-					visitColumn: ({ column }) => ({ type: this.columnTypeResolver.getType(column)[0] }),
-=======
 					visitColumn: ({ column }) => ({
-						type: this.columnTypeResolver.getType(column),
+						type: this.columnTypeResolver.getType(column)[0],
+						deprecationReason: column.deprecationReason,
 						description: column.description,
 					}),
->>>>>>> 39501e918 (feat(schema): custom descriptions (comments) of entities / fields)
 				})
 			}
 		}
@@ -118,10 +116,12 @@ export class WhereTypeProvider {
 			fields[fieldName] = acceptFieldVisitor(this.schema, name, fieldName, {
 				visitColumn: ({ column }) => ({
 					type: this.conditionTypeProvider.getCondition(column),
+					deprecationReason: column.deprecationReason,
 					description: column.description,
 				}),
 				visitRelation: ({ relation }) => ({
 					type: this.getEntityWhereType(relation.target),
+					deprecationReason: relation.deprecationReason,
 					description: relation.description,
 				}),
 			} as Model.FieldVisitor<GraphQLInputFieldConfig>)

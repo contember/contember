@@ -103,6 +103,9 @@ input FooOrderBy {
   _random: Boolean
   _randomSeeded: Int
   id: OrderDirection
+  stringArrayValue: OrderDirection
+  enumArrayValue: OrderDirection
+  intArrayValue: OrderDirection
 }
 
 enum OrderDirection {

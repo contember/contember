@@ -21,7 +21,7 @@ The assume membership feature is enabled by sending a special request header cal
 
 #### Example of the x-contember-assume-membership header in use:
 ```
-x-contember-assign-membership: {"memberships": [{"role": "editor", "variables": [{"name": "lang", "values": ["en"]}]}]}
+x-contember-assume-membership: {"memberships": [{"role": "editor", "variables": [{"name": "lang", "values": ["en"]}]}]}
 ```
 This header would allow the identity to temporarily assume the editor role with a `lang` variable set to `en`.
 

@@ -267,6 +267,65 @@ export class Task {
 
 In this example, the counter column in the Task entity is defined as an integer column with a generated sequence. The sequence will start at value 1000, and the generated value will always be used, regardless of whether a value has been specified for the column.
 
+### Deprecation
+
+You can mark a column as deprecated by calling the `.deprecated()` method on the column definition. This adds a deprecation notice to the GraphQL schema without affecting the database structure.
+
+#### Example how to deprecate a column:
+
+```typescript
+oldName = c.stringColumn().deprecated('Use fullName field instead')
+```
+
+In this example, the `oldName` column is marked as deprecated with a message explaining what to use instead. The deprecation message will be visible in the GraphQL schema documentation and tools.
+
+#### Example how to deprecate relations:
+
+```typescript
+export class Author {
+	name = c.stringColumn()
+	posts = c.oneHasMany(Post, 'author').deprecated('Use articles relation instead')
+}
+
+export class Post {
+	title = c.stringColumn()
+	author = c.manyHasOne(Author, 'posts').deprecated('Use writer relation instead')
+}
+```
+
+You can deprecate all types of relations, such as one-to-many, many-to-one, and one-to-one.
+
+Entire entities can also be marked as deprecated using the `@c.Deprecated` decorator:
+
+```typescript
+@c.Deprecated('This entity is deprecated, use User instead')
+export class Author {
+	name = c.stringColumn()
+}
+```
+
+### Description
+
+Descriptions can be added to columns, entities, and relations to enhance the documentation in the GraphQL schema. Use the `.description()` method for columns and relations, and the `@c.Description` decorator for entities.
+
+#### Example of adding descriptions:
+The following example demonstrates how to add descriptions to entities, columns, and relations:
+
+```typescript
+@c.Description('Represents content authors')
+export class Author {
+	name = c.stringColumn().description('Full name of the author')
+	email = c.stringColumn().description('Contact email address')
+	posts = c.oneHasMany(Post, 'author').description('All posts written by this author')
+}
+
+export class Post {
+	title = c.stringColumn().description('Post title')
+	author = c.manyHasOne(Author, 'posts').description('The author who wrote this post')
+}
+```
+
+In this example, entities, columns, and relations all have descriptive documentation that will appear in the GraphQL schema. This helps developers understand the purpose and usage of fields, entities, and relationships more effectively.
 
 ## Enums
 

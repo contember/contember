@@ -203,6 +203,8 @@ export const updateField =
 			}
 		}
 
+export const updateEntityDeprecation = (entityUpdater: EntityUpdater): EntityUpdater => args => ({ ...entityUpdater({ ...args }) })
+
 export const updateEveryField =
 	(fieldUpdater: FieldUpdater<Model.AnyField, Model.AnyField>): EntityUpdater =>
 		args => ({

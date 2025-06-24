@@ -35,8 +35,10 @@ export class WhereTypeProvider {
 	}
 
 	private createEntityWhereType(entityName: string) {
+		const entity = getEntity(this.schema, entityName)
 		const where: GraphQLInputObjectType = new GraphQLInputObjectType({
 			name: GqlTypeName`${entityName}Where`,
+			description: entity.description,
 			fields: () => this.getEntityWhereFields(entityName, where),
 		})
 
@@ -59,7 +61,8 @@ export class WhereTypeProvider {
 		}
 
 		return new GraphQLInputObjectType({
-			name: capitalizeFirstLetter(entityName) + 'UniqueWhere',
+			name: `${capitalizeFirstLetter(entityName)}UniqueWhere`,
+			description: entity.description,
 			// description: `Valid combinations are: (${combinations.join('), (')})`, generates invalid schema file
 			fields: () => this.getUniqueWhereFields(entity, uniqueKeys),
 		})
@@ -73,7 +76,7 @@ export class WhereTypeProvider {
 					continue
 				}
 				fields[field] = acceptFieldVisitor<GraphQLInputFieldConfig>(this.schema, entity, field, {
-					visitRelation: ({ targetEntity }) => {
+					visitRelation: ({ relation, targetEntity }) => {
 						// if (!isIt<Model.JoiningColumnRelation>(relation, 'joiningColumn')) {
 						// 	throw new Error('Only column or owning relation can be a part of unique key')
 						// }
@@ -81,9 +84,17 @@ export class WhereTypeProvider {
 						if (!uniqueWhere) {
 							throw new ImplementationException()
 						}
-						return { type: uniqueWhere }
+						return {
+							type: uniqueWhere,
+							deprecationReason: relation.deprecationReason,
+							description: relation.description,
+						}
 					},
-					visitColumn: ({ column }) => ({ type: this.columnTypeResolver.getType(column)[0] }),
+					visitColumn: ({ column }) => ({
+						type: this.columnTypeResolver.getType(column)[0],
+						deprecationReason: column.deprecationReason,
+						description: column.description,
+					}),
 				})
 			}
 		}
@@ -103,8 +114,16 @@ export class WhereTypeProvider {
 				continue
 			}
 			fields[fieldName] = acceptFieldVisitor(this.schema, name, fieldName, {
-				visitColumn: ({ column }) => ({ type: this.conditionTypeProvider.getCondition(column) }),
-				visitRelation: ({ relation }) => ({ type: this.getEntityWhereType(relation.target) }),
+				visitColumn: ({ column }) => ({
+					type: this.conditionTypeProvider.getCondition(column),
+					deprecationReason: column.deprecationReason,
+					description: column.description,
+				}),
+				visitRelation: ({ relation }) => ({
+					type: this.getEntityWhereType(relation.target),
+					deprecationReason: relation.deprecationReason,
+					description: relation.description,
+				}),
 			} as Model.FieldVisitor<GraphQLInputFieldConfig>)
 		}
 

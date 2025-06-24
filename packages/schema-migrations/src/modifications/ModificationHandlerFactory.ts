@@ -14,8 +14,7 @@ import {
 import { updateViewModification } from './entities/UpdateViewModification'
 import { createEnumModification, removeEnumModification, updateEnumModification } from './enums'
 import { removeFieldModification, updateFieldNameModification } from './fields'
-import { setDescriptionModification } from './description'
-import { setDeprecatedModification } from './deprecated'
+import { setDescriptionModification, setDeprecatedModification } from './annotations'
 import {
 	convertOneHasManyToManyHasManyRelationModification,
 	convertOneToManyRelationModification,

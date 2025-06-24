@@ -192,7 +192,7 @@ type PageInfo {
 
 type ArticleEdge {
   node: Article!
-
+}
 
 type Tag {
   _meta: TagMeta

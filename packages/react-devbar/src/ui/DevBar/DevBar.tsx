@@ -5,7 +5,7 @@ import {
 	useWindowSize,
 } from '@contember/react-utils'
 import { dataAttribute } from '@contember/utilities'
-import { PropsWithChildren, ReactNode, useCallback, useEffect, useRef, useState } from 'react'
+import { type PropsWithChildren, type ReactNode, useCallback, useEffect, useRef, useState } from 'react'
 
 const className = (cls: string | null) => cls ? `cui-devBar-${cls}` : 'cui-devBar'
 
@@ -126,6 +126,7 @@ export const DevPanel = ({ heading, icon, children, preview }: DevPanelProps) =>
 	return (
 		<div className={className('trigger')}>
 			<button
+				type="button"
 				ref={triggerRef}
 				tabIndex={0}
 				aria-haspopup="dialog"
@@ -144,6 +145,7 @@ export const DevPanel = ({ heading, icon, children, preview }: DevPanelProps) =>
 					<div className={className('panel-header')}>
 						<h2 className="h4">{heading}</h2>
 						<button
+							type="button"
 							onClick={handleClose}
 							className={className('close-button')}
 							aria-label="Close"

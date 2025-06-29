@@ -1,6 +1,7 @@
+import { useEffect, useMemo } from 'react'
+import { useCopyErrorMarkdown } from '../../hooks/useCopyErrorMarkdown'
 import { DevErrorInner } from './DevErrorInner'
-import { ProcessedError } from './types'
-import { useEffect } from 'react'
+import type { ProcessedError } from './types'
 
 export interface DevErrorListProps {
 	currentError: ProcessedError
@@ -25,6 +26,17 @@ export function DevErrorList({
 	onPrevious,
 	onClear,
 }: DevErrorListProps) {
+	const { copyStatus, handleCopyMarkdown, isClipboardSupported } = useCopyErrorMarkdown({ currentError, currentErrorSource })
+
+	const buttonText = useMemo(() => {
+		switch (copyStatus) {
+			case 'copying': return 'Copying...'
+			case 'success': return 'Copied!'
+			case 'error': return '❌ Copy Failed'
+			default: return 'Copy Error to Markdown'
+		}
+	}, [copyStatus])
+
 	useEffect(() => {
 		document.body.classList.add('cui-devError-body')
 		return () => {
@@ -36,7 +48,20 @@ export function DevErrorList({
 		<div className={className()}>
 			<div className={className('in')}>
 				<div className={className('bar')}>
-					<div className={className('errorSource')}>{currentErrorSource}</div>
+					<div className={className('errorSource')}>
+						{currentErrorSource}
+						{isClipboardSupported && (
+							<button
+								type="button"
+								className={className('copyButton')}
+								onClick={handleCopyMarkdown}
+								disabled={copyStatus === 'copying'}
+								title="Copy current error as Markdown"
+							>
+								{buttonText}
+							</button>
+						)}
+					</div>
 					<div className={className('actions')}>
 						{errorCount > 1 ? (
 							<div className={className('switcher')}>
@@ -44,23 +69,23 @@ export function DevErrorList({
 									Error {currentErrorIndex + 1} of {errorCount}
 								</p>
 								<div className={className('switcherButtons')}>
-									<button className={className('switcherButton')} onClick={onPrevious}>
+									<button type="button" className={className('switcherButton')} onClick={onPrevious}>
 										←
 									</button>
-									<button className={className('switcherButton')} onClick={onNext}>
+									<button type="button" className={className('switcherButton')} onClick={onNext}>
 										→
 									</button>
 								</div>
 							</div>
 						) : null}
 						<div className={className('close')}>
-							<button className={className('closeButton')} onClick={onClose}>
+							<button type="button" className={className('closeButton')} onClick={onClose}>
 								✕
 							</button>
 						</div>
 					</div>
 					<div className={className('close')}>
-						<button className={className('closeButton')} onClick={onClear}>
+						<button type="button" className={className('closeButton')} onClick={onClear}>
 							Clear errors
 						</button>
 					</div>

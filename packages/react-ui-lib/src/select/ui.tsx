@@ -57,7 +57,7 @@ export const MultiSelectItemDragOverlayUI = uic('span', {
 })
 
 export const MultiSelectItemRemoveButtonUI = uic('span', {
-	baseClass: 'bg-gray-100 border-l py-1 px-2 rounded-r text-black inline-flex items-center justify-center hover:bg-gray-300',
+	baseClass: 'bg-gray-100 border-l border-gray-200 py-1 px-2 rounded-r text-black inline-flex items-center justify-center hover:bg-gray-300',
 	afterChildren: <XIcon className={'w-3 h-3'}/>,
 	defaultProps: {
 		tabIndex: 0,

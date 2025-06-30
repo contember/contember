@@ -1,16 +1,12 @@
 import { BrushIcon } from 'lucide-react'
 import { Title } from '~/app/components/title'
-import { Slots } from '~/lib/layout'
+import { GenericPage } from '~/lib/pages'
 import { Button } from '~/lib/ui/button'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, useDialogOpenState } from '~/lib/ui/dialog'
 import { uic } from '~/lib/utils'
 
 export default () => (
-	<>
-		<Slots.Title>
-			<Title icon={<BrushIcon />}>Dialog</Title>
-		</Slots.Title>
-
+	<GenericPage title={<Title icon={<BrushIcon />}>Dialog</Title>}>
 		<div>
 			<p className="max-w-md">
 				The dialog component based on Radix UI primitives. It provides a simple way to create a dialog with a header, content, and footer.
@@ -36,7 +32,7 @@ export default () => (
 				</DialogContent>
 			</Dialog>
 		</div>
-	</>
+	</GenericPage>
 )
 
 const DialogStatusLabel = uic('div', {

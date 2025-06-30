@@ -31,7 +31,6 @@ import {
 	DataGridToolbar,
 	DefaultDataGrid,
 } from '~/lib/datagrid'
-import * as React from 'react'
 import { DefaultDropdown, DropdownMenuItem, DropdownMenuSeparator } from '~/lib/ui/dropdown'
 import { Binding, DeleteEntityDialog } from '~/lib/binding'
 import { GridArticleStateLabels } from '../labels'
@@ -39,94 +38,71 @@ import { formatDate } from '~/lib/formatting'
 import { Button } from '~/lib/ui/button'
 import { EyeIcon, LockIcon, MessageSquareIcon, RowsIcon } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from '~/lib/ui/popover'
+import { GenericPage } from '~/lib/pages'
 
-export const SimpleGrid = () => {
-	return (
-		<>
-			<Slots.Title>
-				<h1 className="text-3xl font-semibold">Articles</h1>
-			</Slots.Title>
-
-			<Binding>
-
-				<DefaultDataGrid
-					entities="GridArticle"
-					initialSelection={{
-						visibility: {
-							state: false,
-						},
-					}}
-				>
-					<DataGridActionColumn><Button>Show detail</Button></DataGridActionColumn>
-					<DataGridTextColumn header="Title" field="title" />
-					<DataGridEnumColumn header="State" field="state" options={GridArticleStateLabels} />
-					<DataGridColumn header="test" hidingName="test">
-						<DataViewElement label="Foo" name="foo">
-							<Field field="title" />
-						</DataViewElement>
-						<DataViewElement label="Bar" name="bar">
-							bar
-						</DataViewElement>
-					</DataGridColumn>
-				</DefaultDataGrid>
-			</Binding>
-		</>
-	)
-}
+export const SimpleGrid = () => (
+	<GenericPage title={<h1 className="text-3xl font-semibold">Articles</h1>}>
+		<DefaultDataGrid
+			entities="GridArticle"
+			initialSelection={{
+				visibility: {
+					state: false,
+				},
+			}}
+		>
+			<DataGridActionColumn><Button>Show detail</Button></DataGridActionColumn>
+			<DataGridTextColumn header="Title" field="title" />
+			<DataGridEnumColumn header="State" field="state" options={GridArticleStateLabels} />
+			<DataGridColumn header="test" hidingName="test">
+				<DataViewElement label="Foo" name="foo">
+					<Field field="title" />
+				</DataViewElement>
+				<DataViewElement label="Bar" name="bar">
+					bar
+				</DataViewElement>
+			</DataGridColumn>
+		</DefaultDataGrid>
+	</GenericPage>
+)
 
 export default () => {
-	return (
-		<>
-			<Slots.Title>
-				<h1 className="text-3xl font-semibold">
-					Articles
-				</h1>
-			</Slots.Title>
+	<GenericPage title={<h1 className="text-3xl font-semibold">Articles</h1>} actions={<Button>Add article</Button>}>
+		<DataGrid
+			entities="GridArticle"
+			initialSorting={{
+				publishedAt: 'asc',
+			}}
+		>
+			<DataGridToolbar sticky>
+				<CustomGridFilters />
+			</DataGridToolbar>
 
-			<Binding>
+			<DataGridLoader>
 
-				<Slots.Actions>
-					<Button>Add article</Button>
-				</Slots.Actions>
+				<DataGridTable>
+					<CustomGridColumn />
+				</DataGridTable>
 
-				<DataGrid
-					entities="GridArticle"
-					initialSorting={{
-						publishedAt: 'asc',
-					}}
-				>
-					<DataGridToolbar sticky>
-						<CustomGridFilters />
-					</DataGridToolbar>
+				<DataGridTiles>
+					<CustomGridTile />
+				</DataGridTiles>
 
-					<DataGridLoader>
+				<DataViewLayout name="rows" label={(
+					<>
+						<RowsIcon className="w-3 h-3" />
+						<span>Rows</span>
+					</>
+				)}>
+					<DataViewEachRow>
+						<CustomGridRow />
+					</DataViewEachRow>
+				</DataViewLayout>
 
-						<DataGridTable>
-							<CustomGridColumn />
-						</DataGridTable>
+			</DataGridLoader>
 
-						<DataGridTiles>
-							<CustomGridTile />
-						</DataGridTiles>
-
-						<DataViewLayout name="rows" label={(
-							<>
-								<RowsIcon className="w-3 h-3" />
-								<span>Rows</span>
-							</>
-						)}>
-							<DataViewEachRow>
-								<CustomGridRow />
-							</DataViewEachRow>
-						</DataViewLayout>
-
-					</DataGridLoader>
-
-					<DataGridPagination sticky />
-				</DataGrid>
-			</Binding>
-		</>
-	)
+			<DataGridPagination sticky />
+		</DataGrid>
+	</GenericPage>
 }
 
 const CustomGridColumn = Component(() => {

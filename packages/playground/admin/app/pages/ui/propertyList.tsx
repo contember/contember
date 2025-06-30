@@ -1,14 +1,10 @@
 import { BrushIcon } from 'lucide-react'
 import { Title } from '~/app/components/title'
-import { Slots } from '~/lib/layout'
+import { GenericPage } from '~/lib/pages'
 import { PropertyItem, PropertyList } from '~/lib/ui/property-list'
 
 export default () => (
-	<>
-		<Slots.Title>
-			<Title icon={<BrushIcon />}>Property list</Title>
-		</Slots.Title>
-
+	<GenericPage title={<Title icon={<BrushIcon />}>Property list</Title>}>
 		<PropertyList>
 			<PropertyItem label="Name">
 				John Doe
@@ -20,5 +16,5 @@ export default () => (
 				Office
 			</PropertyItem>
 		</PropertyList>
-	</>
+	</GenericPage>
 )

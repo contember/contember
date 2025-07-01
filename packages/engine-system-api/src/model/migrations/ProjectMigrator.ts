@@ -15,6 +15,11 @@ import { SchemaProvider } from './SchemaProvider'
 import { SaveSchemaCommand } from '../commands/schema/SaveSchemaCommand'
 import { ImplementationException } from '../../utils'
 
+type MigrationVariables = {
+	system_schema: string
+	project_slug: string
+}
+
 export class ProjectMigrator {
 	constructor(
 		private readonly migrationDescriber: MigrationDescriber,
@@ -64,7 +69,7 @@ export class ProjectMigrator {
 						modification,
 						formatVersion,
 						migration.version,
-						db.client.schema,
+						project,
 						metadataStore,
 					)
 				}
@@ -200,6 +205,13 @@ export class ProjectMigrator {
 		return toExecute
 	}
 
+	private sqlPreprocessor(text: string, variables: MigrationVariables): string {
+		return Object.entries(variables).reduce(
+			(content, [key, value]) => content.replace(new RegExp(`\\{\\{${key}\\}\\}`, 'g'), value),
+			text,
+		)
+	}
+
 	private async applyModification(
 		db: Client,
 		stages: Stage[],
@@ -207,7 +219,7 @@ export class ProjectMigrator {
 		modification: Migration.Modification,
 		formatVersion: number,
 		migrationVersion: string,
-		systemSchema: string,
+		project: { slug: string; systemSchema: string },
 		metadataStore: SchemaDatabaseMetadataResolverStore,
 	): Promise<[Schema]> {
 		const {
@@ -217,11 +229,15 @@ export class ProjectMigrator {
 		for (const stage of stages) {
 			const databaseMetadata = await metadataStore.getMetadata(stage.schema)
 			const sql = getSql({
-				systemSchema,
+				systemSchema: project.systemSchema,
 				databaseMetadata,
 				invalidateDatabaseMetadata: () => metadataStore.invalidate(stage.schema),
 			})
-			await this.executeOnStage(db, stage, sql, migrationVersion)
+			const processedSql = this.sqlPreprocessor(sql, {
+				project_slug: project.slug,
+				system_schema: project.systemSchema,
+			})
+			await this.executeOnStage(db, stage, processedSql, migrationVersion)
 		}
 		return [newSchema]
 	}

@@ -1,10 +1,13 @@
 import { Model } from '@contember/schema'
 import { acceptEveryFieldVisitor, acceptFieldVisitor } from '@contember/schema-utils'
-
 import { getEnumTypeName } from './utils'
 
+export type GenerateOptions = {
+	includeDeprecated?: boolean
+}
+
 export class EntityTypeSchemaGenerator {
-	generate(model: Model.Schema): string {
+	generate(model: Model.Schema, options?: GenerateOptions): string {
 		let code = ''
 		for (const enumName of Object.keys(model.enums)) {
 			code += `import type { ${getEnumTypeName(enumName)} } from './enums'\n`
@@ -18,12 +21,13 @@ export type JSONArray = readonly JSONValue[]
 
 `
 
-		for (const entity of Object.values(model.entities)) {
-			code += this.generateTypeEntityCode(model, entity)
+		const entities = options?.includeDeprecated ? Object.values(model.entities) : Object.values(model.entities).filter(entity => !entity.deprecationReason)
+		for (const entity of entities) {
+			code += this.generateTypeEntityCode(model, entity, options)
 		}
 		code += '\n'
 		code += `export type ContemberClientEntities = {\n`
-		for (const entity of Object.values(model.entities)) {
+		for (const entity of entities) {
 			code += `\t${entity.name}: ${entity.name}\n`
 		}
 		code += '}\n\n'
@@ -33,7 +37,7 @@ export type JSONArray = readonly JSONValue[]
 		return code
 	}
 
-	private generateTypeEntityCode(model: Model.Schema, entity: Model.Entity): string {
+	private generateTypeEntityCode(model: Model.Schema, entity: Model.Entity, options?: { includeDeprecated?: boolean }): string {
 		let code = `export type ${entity.name} <OverRelation extends string | never = never> = {\n`
 		code += '\tname: \'' + entity.name + '\'\n'
 		code += '\tunique:\n'
@@ -43,12 +47,21 @@ export type JSONArray = readonly JSONValue[]
 		let hasManyCode = ''
 		acceptEveryFieldVisitor(model, entity, {
 			visitHasMany: ctx => {
+				if (!options?.includeDeprecated && ctx.relation.deprecationReason) {
+					return
+				}
 				hasManyCode += `\t\t${ctx.relation.name}: ${ctx.targetEntity.name}${ctx.targetRelation?.type === Model.RelationType.ManyHasOne ? `<'${ctx.targetRelation.name}'>` : ''}\n`
 			},
 			visitHasOne: ctx => {
+				if (!options?.includeDeprecated && ctx.relation.deprecationReason) {
+					return
+				}
 				hasOneCode += `\t\t${ctx.relation.name}: ${ctx.targetEntity.name}\n`
 			},
 			visitColumn: ctx => {
+				if (!options?.includeDeprecated && ctx.column.deprecationReason) {
+					return
+				}
 				columnsCode += `\t\t${ctx.column.name}: ${columnToTsType(ctx.column)}${ctx.column.nullable ? ` | null` : ''}\n`
 			},
 		})
@@ -69,11 +82,17 @@ export type JSONArray = readonly JSONValue[]
 		return code
 	}
 
-	private formatReducedFields(model: Model.Schema, entity: Model.Entity): string {
+	private formatReducedFields(model: Model.Schema, entity: Model.Entity, options?: { includeDeprecated?: boolean }): string {
 		let code = ''
 		acceptEveryFieldVisitor(model, entity, {
 			visitOneHasMany: ({ entity, relation, targetEntity, targetRelation }) => {
+				if (!options?.includeDeprecated && relation.deprecationReason) {
+					return
+				}
 				if (!targetRelation) {
+					return
+				}
+				if (!options?.includeDeprecated && targetRelation.deprecationReason) {
 					return
 				}
 				const uniqueConstraints = getFieldsForUniqueWhere(model, targetEntity)
@@ -120,7 +139,7 @@ export type JSONArray = readonly JSONValue[]
 		let code = ''
 		for (const field of fields) {
 			code += '\t\t| Omit<{ '
-			code += field.map(it => `${it}: ${uniqueType(model, entity, entity.fields[it])}`).join(', ')
+			code += field.map(it => `${it}: ${uniqueType(model, entity, entity.fields[it])}`).join('; ')
 			code += '}, OverRelation>\n'
 		}
 		return code

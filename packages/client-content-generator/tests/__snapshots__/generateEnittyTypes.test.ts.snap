@@ -276,3 +276,444 @@ export type ContemberClientSchema = {
 }
 "
 `;
+
+exports[`generate entities generate for scalars with deprecated 1`] = `
+"
+export type JSONPrimitive = string | number | boolean | null
+export type JSONValue = JSONPrimitive | JSONObject | JSONArray
+export type JSONObject = { readonly [K in string]?: JSONValue }
+export type JSONArray = readonly JSONValue[]
+
+export type Foo <OverRelation extends string | never = never> = {
+	name: 'Foo'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+	columns: {
+		id: string
+		stringCol: string | null
+		intCol: number | null
+		doubleCol: number | null
+		dateCol: string | null
+		datetimeCol: string | null
+		booleanCol: boolean | null
+		jsonCol: JSONValue | null
+		uuidCol: string | null
+		deprecatedStringCol: string | null
+		deprecatedIntCol: number | null
+		deprecatedDoubleCol: number | null
+		deprecatedDateCol: string | null
+		deprecatedDatetimeCol: string | null
+		deprecatedBooleanCol: boolean | null
+		deprecatedJsonCol: JSONValue | null
+		deprecatedUuidCol: string | null
+	}
+	hasOne: {
+	}
+	hasMany: {
+	}
+	hasManyBy: {
+	}
+}
+
+export type ContemberClientEntities = {
+	Foo: Foo
+}
+
+export type ContemberClientSchema = {
+	entities: ContemberClientEntities
+}
+"
+`;
+
+exports[`generate entities generate for has enum deprecated 1`] = `
+"import type { FooEnumCol } from './enums'
+import type { FooDeprecatedEnumCol } from './enums'
+import type { DeprecatedFooEnumCol } from './enums'
+import type { DeprecatedFooDeprecatedEnumCol } from './enums'
+
+export type JSONPrimitive = string | number | boolean | null
+export type JSONValue = JSONPrimitive | JSONObject | JSONArray
+export type JSONObject = { readonly [K in string]?: JSONValue }
+export type JSONArray = readonly JSONValue[]
+
+export type Foo <OverRelation extends string | never = never> = {
+	name: 'Foo'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+	columns: {
+		id: string
+		enumCol: FooEnumCol | null
+		deprecatedEnumCol: FooDeprecatedEnumCol | null
+	}
+	hasOne: {
+	}
+	hasMany: {
+	}
+	hasManyBy: {
+	}
+}
+export type DeprecatedFoo <OverRelation extends string | never = never> = {
+	name: 'DeprecatedFoo'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+	columns: {
+		id: string
+		enumCol: DeprecatedFooEnumCol | null
+		deprecatedEnumCol: DeprecatedFooDeprecatedEnumCol | null
+	}
+	hasOne: {
+	}
+	hasMany: {
+	}
+	hasManyBy: {
+	}
+}
+
+export type ContemberClientEntities = {
+	Foo: Foo
+	DeprecatedFoo: DeprecatedFoo
+}
+
+export type ContemberClientSchema = {
+	entities: ContemberClientEntities
+}
+"
+`;
+
+exports[`generate entities generate one has one deprecated 1`] = `
+"
+export type JSONPrimitive = string | number | boolean | null
+export type JSONValue = JSONPrimitive | JSONObject | JSONArray
+export type JSONObject = { readonly [K in string]?: JSONValue }
+export type JSONArray = readonly JSONValue[]
+
+export type Foo <OverRelation extends string | never = never> = {
+	name: 'Foo'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+		| Omit<{ oneHasOneInverseRel: Bar['unique']}, OverRelation>
+	columns: {
+		id: string
+	}
+	hasOne: {
+		oneHasOneInverseRel: Bar
+	}
+	hasMany: {
+	}
+	hasManyBy: {
+	}
+}
+export type Bar <OverRelation extends string | never = never> = {
+	name: 'Bar'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+		| Omit<{ oneHasOneOwningRel: Foo['unique']}, OverRelation>
+	columns: {
+		id: string
+	}
+	hasOne: {
+		oneHasOneOwningRel: Foo
+	}
+	hasMany: {
+	}
+	hasManyBy: {
+	}
+}
+export type DeprecatedFoo <OverRelation extends string | never = never> = {
+	name: 'DeprecatedFoo'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+		| Omit<{ oneHasOneInverseRel: Bar['unique']}, OverRelation>
+	columns: {
+		id: string
+	}
+	hasOne: {
+		oneHasOneInverseRel: Bar
+	}
+	hasMany: {
+	}
+	hasManyBy: {
+	}
+}
+export type DeprecatedBar <OverRelation extends string | never = never> = {
+	name: 'DeprecatedBar'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+		| Omit<{ oneHasOneOwningRel: Foo['unique']}, OverRelation>
+	columns: {
+		id: string
+	}
+	hasOne: {
+		oneHasOneOwningRel: Foo
+	}
+	hasMany: {
+	}
+	hasManyBy: {
+	}
+}
+
+export type ContemberClientEntities = {
+	Foo: Foo
+	Bar: Bar
+	DeprecatedFoo: DeprecatedFoo
+	DeprecatedBar: DeprecatedBar
+}
+
+export type ContemberClientSchema = {
+	entities: ContemberClientEntities
+}
+"
+`;
+
+exports[`generate entities generate one has many deprecated 1`] = `
+"
+export type JSONPrimitive = string | number | boolean | null
+export type JSONValue = JSONPrimitive | JSONObject | JSONArray
+export type JSONObject = { readonly [K in string]?: JSONValue }
+export type JSONArray = readonly JSONValue[]
+
+export type Foo <OverRelation extends string | never = never> = {
+	name: 'Foo'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+		| Omit<{ oneHasManyRel: Bar['unique']}, OverRelation>
+	columns: {
+		id: string
+	}
+	hasOne: {
+	}
+	hasMany: {
+		oneHasManyRel: Bar<'manyHasOneRel'>
+	}
+	hasManyBy: {
+	}
+}
+export type Bar <OverRelation extends string | never = never> = {
+	name: 'Bar'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+	columns: {
+		id: string
+	}
+	hasOne: {
+		manyHasOneRel: Foo
+	}
+	hasMany: {
+	}
+	hasManyBy: {
+	}
+}
+export type DeprecatedFoo <OverRelation extends string | never = never> = {
+	name: 'DeprecatedFoo'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+		| Omit<{ oneHasManyRel: Bar['unique']}, OverRelation>
+	columns: {
+		id: string
+	}
+	hasOne: {
+	}
+	hasMany: {
+		oneHasManyRel: Bar<'manyHasOneRel'>
+	}
+	hasManyBy: {
+	}
+}
+export type DeprecatedBar <OverRelation extends string | never = never> = {
+	name: 'DeprecatedBar'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+	columns: {
+		id: string
+	}
+	hasOne: {
+		manyHasOneRel: Foo
+	}
+	hasMany: {
+	}
+	hasManyBy: {
+	}
+}
+
+export type ContemberClientEntities = {
+	Foo: Foo
+	Bar: Bar
+	DeprecatedFoo: DeprecatedFoo
+	DeprecatedBar: DeprecatedBar
+}
+
+export type ContemberClientSchema = {
+	entities: ContemberClientEntities
+}
+"
+`;
+
+exports[`generate entities generate many has many deprecated 1`] = `
+"
+export type JSONPrimitive = string | number | boolean | null
+export type JSONValue = JSONPrimitive | JSONObject | JSONArray
+export type JSONObject = { readonly [K in string]?: JSONValue }
+export type JSONArray = readonly JSONValue[]
+
+export type Foo <OverRelation extends string | never = never> = {
+	name: 'Foo'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+	columns: {
+		id: string
+	}
+	hasOne: {
+	}
+	hasMany: {
+		manyHasManyRel: Bar
+	}
+	hasManyBy: {
+	}
+}
+export type Bar <OverRelation extends string | never = never> = {
+	name: 'Bar'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+	columns: {
+		id: string
+	}
+	hasOne: {
+	}
+	hasMany: {
+		manyHasManyInverseRel: Foo
+	}
+	hasManyBy: {
+	}
+}
+export type DeprecatedFoo <OverRelation extends string | never = never> = {
+	name: 'DeprecatedFoo'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+	columns: {
+		id: string
+	}
+	hasOne: {
+	}
+	hasMany: {
+		manyHasManyRel: Bar
+	}
+	hasManyBy: {
+	}
+}
+export type DeprecatedBar <OverRelation extends string | never = never> = {
+	name: 'DeprecatedBar'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+	columns: {
+		id: string
+	}
+	hasOne: {
+	}
+	hasMany: {
+		manyHasManyInverseRel: Foo
+	}
+	hasManyBy: {
+	}
+}
+
+export type ContemberClientEntities = {
+	Foo: Foo
+	Bar: Bar
+	DeprecatedFoo: DeprecatedFoo
+	DeprecatedBar: DeprecatedBar
+}
+
+export type ContemberClientSchema = {
+	entities: ContemberClientEntities
+}
+"
+`;
+
+exports[`generate entities generate reduced has by deprecated 1`] = `
+"
+export type JSONPrimitive = string | number | boolean | null
+export type JSONValue = JSONPrimitive | JSONObject | JSONArray
+export type JSONObject = { readonly [K in string]?: JSONValue }
+export type JSONArray = readonly JSONValue[]
+
+export type Foo <OverRelation extends string | never = never> = {
+	name: 'Foo'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+		| Omit<{ locales: FooLocale['unique']}, OverRelation>
+	columns: {
+		id: string
+	}
+	hasOne: {
+	}
+	hasMany: {
+		locales: FooLocale<'foo'>
+	}
+	hasManyBy: {
+		localesByLocale: { entity: FooLocale; by: {locale: string}  }
+	}
+}
+export type FooLocale <OverRelation extends string | never = never> = {
+	name: 'FooLocale'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+		| Omit<{ locale: string; foo: Foo['unique']}, OverRelation>
+	columns: {
+		id: string
+		locale: string
+	}
+	hasOne: {
+		foo: Foo
+	}
+	hasMany: {
+	}
+	hasManyBy: {
+	}
+}
+export type DeprecatedFoo <OverRelation extends string | never = never> = {
+	name: 'DeprecatedFoo'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+		| Omit<{ locales: FooLocale['unique']}, OverRelation>
+	columns: {
+		id: string
+	}
+	hasOne: {
+	}
+	hasMany: {
+		locales: FooLocale<'foo'>
+	}
+	hasManyBy: {
+		localesByLocale: { entity: FooLocale; by: {locale: string}  }
+	}
+}
+export type DeprecatedFooLocale <OverRelation extends string | never = never> = {
+	name: 'DeprecatedFooLocale'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+		| Omit<{ locale: string; foo: Foo['unique']}, OverRelation>
+	columns: {
+		id: string
+		locale: string
+	}
+	hasOne: {
+		foo: Foo
+	}
+	hasMany: {
+	}
+	hasManyBy: {
+	}
+}
+
+export type ContemberClientEntities = {
+	Foo: Foo
+	FooLocale: FooLocale
+	DeprecatedFoo: DeprecatedFoo
+	DeprecatedFooLocale: DeprecatedFooLocale
+}
+
+export type ContemberClientSchema = {
+	entities: ContemberClientEntities
+}
+"
+`;

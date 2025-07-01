@@ -5,16 +5,26 @@ import { ContemberClientGenerator } from './ContemberClientGenerator';
 
 (async () => {
 	const schemaPath = process.argv[2]
-	const outDir = process.argv[3]
+	let outDir = process.argv[3]
+	let includeDeprecated = false
+
+	const deprecatedFlagIndex = process.argv.indexOf('--include-deprecated')
+	if (deprecatedFlagIndex !== -1) {
+		includeDeprecated = true
+		if (deprecatedFlagIndex === 3) {
+			process.argv.splice(deprecatedFlagIndex, 1)
+			outDir = process.argv[3]
+		}
+	}
 
 	if (!schemaPath || !outDir) {
 		console.error(`Usage:
 
 From file:
-yarn contember-client-generator <schema.json> <out-dir>
+yarn contember-client-generator <schema.json> <out-dir> [--include-deprecated]
 
 From stdin:
-yarn run --silent contember project:print-schema --format=schema | yarn contember-client-generator - <out-dir>
+yarn run --silent contember project:print-schema --format=schema | yarn contember-client-generator - <out-dir> [--include-deprecated]
 `)
 		process.exit(1)
 	}
@@ -37,7 +47,7 @@ yarn run --silent contember project:print-schema --format=schema | yarn contembe
 
 	const dir = resolve(process.cwd(), process.argv[3])
 	const generator = new ContemberClientGenerator()
-	const result = generator.generate(source.model)
+	const result = generator.generate(source.model, { includeDeprecated })
 	await fs.mkdir(dir, { recursive: true })
 	for (const [name, content] of Object.entries(result)) {
 		await fs.writeFile(join(dir, name), content, 'utf8')
@@ -46,4 +56,3 @@ yarn run --silent contember project:print-schema --format=schema | yarn contembe
 	console.error(e)
 	process.exit(1)
 })
-

@@ -1,6 +1,6 @@
 import { Model } from '@contember/schema'
 import { EnumTypeSchemaGenerator } from './EnumTypeSchemaGenerator'
-import { EntityTypeSchemaGenerator } from './EntityTypeSchemaGenerator'
+import { EntityTypeSchemaGenerator, GenerateOptions } from './EntityTypeSchemaGenerator'
 import { NameSchemaGenerator } from './NameSchemaGenerator'
 
 
@@ -12,16 +12,15 @@ export class ContemberClientGenerator {
 	) {
 	}
 
-	generate(model: Model.Schema): Record<string, string> {
+	generate(model: Model.Schema, options?: GenerateOptions): Record<string, string> {
 		const nameSchema = this.nameSchemaGenerator.generate(model)
 		const enumTypeSchema = this.enumTypeSchemaGenerator.generate(model)
-		const entityTypeSchema = this.entityTypeSchemaGenerator.generate(model)
+		const entityTypeSchema = this.entityTypeSchemaGenerator.generate(model, options)
 
 		const namesCode = `import { SchemaNames } from '@contember/client-content'
 export const ContemberClientNames: SchemaNames = ` + JSON.stringify(nameSchema, null, 2)
 
-		const indexCode = `
-import { ContemberClientNames } from './names'
+		const indexCode = `import { ContemberClientNames } from './names'
 import type { ContemberClientSchema } from './entities'
 import { ContentQueryBuilder, TypedContentQueryBuilder, TypedEntitySelection } from '@contember/client-content'
 export * from './names'

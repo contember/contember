@@ -17,21 +17,24 @@ export default class ManyHasManyProcessor implements FieldProcessor<ManyHasManyB
 		registerField: FieldProcessor.FieldRegistrar,
 	): void {
 		registerField(entityName, this.createManyHasManyOwning(options, entityName, fieldName))
+
 		if (options.inversedBy) {
-			registerField(options.target, this.createManyHasManyInverse(options.inversedBy, entityName, fieldName))
+			registerField(options.target, this.createManyHasManyInverse(options, entityName, fieldName))
 		}
 	}
 
 	private createManyHasManyInverse(
-		inversedBy: string,
+		options: ManyHasManyBuilder.Options,
 		entityName: string,
 		fieldName: string,
 	): Model.ManyHasManyInverseRelation {
 		return {
-			name: inversedBy,
+			name: options.inversedBy!,
 			ownedBy: fieldName,
 			target: entityName,
 			type: Model.RelationType.ManyHasMany,
+			...(options.description !== undefined ? { description: options.description } : {}),
+			...(options.deprecationReason !== undefined ? { deprecationReason: options.deprecationReason } : {}),
 		}
 	}
 
@@ -65,6 +68,8 @@ export default class ManyHasManyProcessor implements FieldProcessor<ManyHasManyB
 			target: options.target,
 			joiningTable: joiningTable,
 			...(options.orderBy ? { orderBy: options.orderBy } : {}),
+			...(options.description !== undefined ? { description: options.description } : {}),
+			...(options.deprecationReason !== undefined ? { deprecationReason: options.deprecationReason } : {}),
 		}
 	}
 }

@@ -2,15 +2,15 @@
 
 exports[`generate enums 1`] = `
 "export type OrderStatus = 
-\t | "new"
-\t | "paid"
-\t | "cancelled"
+	 | "new"
+	 | "paid"
+	 | "cancelled"
 export type OrderType = 
-\t | "normal"
-\t | "express"
+	 | "normal"
+	 | "express"
 export type ContemberClientEnums = {
-\tOrderStatus: OrderStatus
-\torderType: OrderType
+	OrderStatus: OrderStatus
+	orderType: OrderType
 }
 
 "

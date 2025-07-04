@@ -3,7 +3,9 @@ import { ChangeMyPasswordForm, CreateApiKeyForm, InviteForm } from '@contember/r
 import { KeyRoundIcon, LockKeyholeIcon, UsersIcon } from 'lucide-react'
 import { useRef } from 'react'
 import { Title } from '~/app/components/title'
+import { FormLayout } from '~/lib/form'
 import { Slots } from '~/lib/layout'
+import { GenericPage } from '~/lib/pages'
 import {
 	ApiKeyList,
 	ChangeMyPasswordFormFields,
@@ -21,12 +23,8 @@ export const Security = () => {
 	const showToast = useShowToast()
 
 	return (
-		<>
-			<Slots.Title>
-				<Title icon={<LockKeyholeIcon />}>Security</Title>
-			</Slots.Title>
-
-			<div className="flex flex-col gap-4">
+		<GenericPage title={<Title icon={<LockKeyholeIcon />}>Security</Title>}>
+			<FormLayout>
 				<Card className="w-[40rem] max-w-full">
 					<CardHeader>
 						<CardTitle className="text-2xl">Change Password</CardTitle>
@@ -48,8 +46,8 @@ export const Security = () => {
 						<OtpSetup />
 					</CardContent>
 				</Card>
-			</div>
-		</>
+			</FormLayout>
+		</GenericPage>
 	)
 }
 
@@ -60,12 +58,8 @@ export const Members = () => {
 	const memberListController = useRef<MemberListController>()
 
 	return (
-		<>
-			<Slots.Title>
-				<Title icon={<UsersIcon />}>Members</Title>
-			</Slots.Title>
-
-			<div className="flex flex-col gap-4">
+		<GenericPage title={<Title icon={<UsersIcon />}>Members</Title>}>
+			<FormLayout>
 				<Card className="w-[40rem] max-w-full">
 					<CardHeader>
 						<CardTitle className="text-2xl">Invite</CardTitle>
@@ -94,9 +88,8 @@ export const Members = () => {
 						<PersonList controller={memberListController} />
 					</CardContent>
 				</Card>
-
-			</div>
-		</>
+			</FormLayout>
+		</GenericPage>
 	)
 }
 
@@ -106,12 +99,8 @@ export const ApiKeys = () => {
 	const memberListController = useRef<MemberListController>()
 
 	return (
-		<>
-			<Slots.Title>
-				<Title icon={<KeyRoundIcon />}>API keys</Title>
-			</Slots.Title>
-
-			<div className="flex flex-col gap-4">
+		<GenericPage title={<Title icon={<KeyRoundIcon />}>API keys</Title>}>
+			<FormLayout>
 				<div>
 					<Card className="w-[40rem] max-w-full">
 						<CardHeader>
@@ -147,7 +136,7 @@ export const ApiKeys = () => {
 						</CardContent>
 					</Card>
 				</div>
-			</div>
-		</>
+			</FormLayout>
+		</GenericPage>
 	)
 }

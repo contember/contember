@@ -50,7 +50,7 @@ export const MembershipsControl = ({ setMemberships, memberships, roles }: Membe
 			{memberships.map(membership => {
 				const role = roles?.[membership.role]
 				return (
-					<div key={membership.role} className="border border-gray-200 rounded-sm px-4 py-2">
+					<div key={membership.role} className="bg-background border border-gray-200 rounded-sm px-4 py-2">
 						<div className="flex justify-between items-center">
 							<h2 className="font-semibold">{role?.label ?? membership.role}</h2>
 							<Button

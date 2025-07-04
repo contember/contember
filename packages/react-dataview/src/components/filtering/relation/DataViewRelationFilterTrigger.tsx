@@ -49,7 +49,7 @@ export interface DataViewRelationFilterTriggerProps {
  *   - `'exclude'`: The relation is excluded from the filter.
  *   - `'none'`: The relation is not active in the filter.
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <DataViewRelationFilterTrigger action="toggleInclude">
  *     <button>Include Relation</button>

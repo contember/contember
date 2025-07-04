@@ -29,10 +29,11 @@
 		}
 	},
 	"dtsRollup": {
-		"enabled": false
+		"enabled": true
 	},
 	"docModel": {
-		"enabled": false
+		"enabled": true,
+		"apiJsonFilePath": "./api/api.json"
 	},
 	"apiReport": {
 		"enabled": true,

@@ -32,7 +32,7 @@ export const DataViewQueryFilterName = '_query'
 /**
  * The root component for DataView. It initializes the DataView state and provides the DataView context.
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <DataView entities={'Post'}>
  *     // DataView content here

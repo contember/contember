@@ -50,7 +50,7 @@ export const emptyObject: Readonly<{}>;
 // @public
 export function getChildrenAsLabel(node: ReactNode): string | undefined;
 
-// @public (undocumented)
+// @public
 export const getStateStorage: (storageOrName: StateStorageOrName | StateStorageOrName[]) => StateStorage;
 
 // @public (undocumented)
@@ -59,7 +59,7 @@ export const identityFunction: <Value>(value: Value) => Value;
 // @public (undocumented)
 export function isNoopScopedConsole(value: unknown): boolean;
 
-// @public (undocumented)
+// @public
 export const localStateStorage: StateStorage;
 
 // @public (undocumented)
@@ -120,7 +120,7 @@ export type Serializable = string | number | boolean | null | readonly Serializa
     readonly [K in string]?: Serializable;
 };
 
-// @public (undocumented)
+// @public
 export const sessionStateStorage: StateStorage;
 
 // @public (undocumented)
@@ -143,7 +143,7 @@ export type StateStorageOrName = StateStorage | 'url' | 'session' | 'local' | 'n
 // @public
 export function unwrapRefValue<T>(value: RefObjectOrElement<T>): T | null;
 
-// @public (undocumented)
+// @public
 export const urlStateStorage: StateStorage;
 
 // @public (undocumented)
@@ -190,7 +190,7 @@ export function useId(): string;
 // @public (undocumented)
 export const useIsMounted: () => MutableRefObject<boolean>;
 
-// @public (undocumented)
+// @public
 export const useLocalStorageState: <V extends Serializable>(key: StateStorageKey, initializeValue: ValueInitializer<V>) => [V, SetState<V>];
 
 // @public (undocumented)
@@ -217,10 +217,10 @@ export const useReferentiallyStableCallback: <T extends Function>(callback: NoCo
 // @public (undocumented)
 export const useScopedConsoleRef: (prefix: string, override?: boolean) => MutableRefObject<ScopedConsoleContextType>;
 
-// @public (undocumented)
+// @public
 export const useSessionStorageState: <V extends Serializable>(key: StateStorageKey, initializeValue: ValueInitializer<V>) => [V, SetState<V>];
 
-// @public (undocumented)
+// @public
 export const useStoredState: <V extends Serializable>(storageOrName: StateStorageOrName | StateStorageOrName[], key: StateStorageKey, initializeValue: ValueInitializer<V>) => [V, SetState<V>];
 
 // @public

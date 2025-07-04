@@ -4,17 +4,51 @@ import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
 import { Component } from '@contember/interface'
 import { ReactNode, useCallback } from 'react'
 import { Block, BlockContent, BlockRendererProps, useEditorBlockElement } from '@contember/react-slate-editor'
-import { BlockElement } from './common/elements/BlockElement'
+import { BlockElement } from './common'
 import { ReactEditor, useSlateStatic } from 'slate-react'
 import { Node, Transforms } from 'slate'
 
 export interface EditorBlockProps {
+	/** Unique block type identifier */
 	name: string
+	/** Display name for block type */
 	label: ReactNode
+	/** Primary block content */
 	children: ReactNode
+	/** Alternate configuration UI (optional) */
 	alternate?: ReactNode
 }
 
+/**
+ * EditorBlock component - Configurable content block for rich text editor
+ *
+ * #### Purpose
+ * Creates reusable, customizable content blocks within a Slate.js editor instance
+ *
+ * #### Features
+ * - Drag-and-drop enabled block structure
+ * - Alternate configuration UI via popover
+ * - Block type labeling and identification
+ *
+ * #### Example: Basic usage
+ * ```tsx
+ * <BlockEditorField
+ *   field="data"
+ *   referencesField="references"
+ *   referenceDiscriminationField="type"
+ * >
+ *   <EditorBlockToolbar>
+ *     <EditorReferenceTrigger referenceType="image">
+ *       <BlockButton><ImageIcon /> Image</BlockButton>
+ *     </EditorReferenceTrigger>
+ *   </EditorBlockToolbar>
+ *
+ *   <EditorBlock name="image" label="Image">
+ *     <ImageField baseField="image" urlField="url" />
+ *   </EditorBlock>
+ * </BlockEditorField>
+ * ```
+ */
 export const EditorBlock = Component<EditorBlockProps>(() => {
 	return null
 }, blockProps => {
@@ -31,6 +65,23 @@ export const EditorBlock = Component<EditorBlockProps>(() => {
 	)
 })
 
+/**
+ * EditorBlockContent component - Editable content area for blocks
+ *
+ * #### Purpose
+ * Provides the main editable region within a content block
+ *
+ * #### Features
+ * - Automatic placeholder text when empty
+ * - ContentEditable management
+ * - Text presence detection
+ * - Proper padding and positioning
+ *
+ * #### Example
+ * ```tsx
+ * <EditorBlockContent />
+ * ```
+ */
 export const EditorBlockContent = Component(() => {
 	const el = useEditorBlockElement().element
 	const hasText = Node.string(el).length > 0

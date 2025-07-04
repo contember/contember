@@ -31,7 +31,7 @@ export interface DataViewVisibilityTriggerProps {
  * - **`data-active`**: Present if the visibility state matches the trigger's `value`.
  * - **`data-current`**: Present if visible.
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <DataViewVisibilityTrigger name="column1" value={true}>
  *     <button>Show Column 1</button>

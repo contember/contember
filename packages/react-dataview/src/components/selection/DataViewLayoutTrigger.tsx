@@ -34,7 +34,7 @@ export interface DataViewLayoutTriggerProps {
  * - **`data-active`**: Present if the current layout matches the trigger's layout name.
  * - **`data-current`**: Reflects the name of the currently active layout.
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <DataViewLayoutTrigger name="table">
  *     <button>Table View</button>

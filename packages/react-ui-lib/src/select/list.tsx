@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { ReactNode } from 'react'
 import { ScrollArea } from '../ui/scroll-area'
 import { Loader } from '../ui/loader'
@@ -21,12 +20,38 @@ import { SelectDefaultFilter } from './filter'
 import { SelectListItemUI } from './ui'
 import { SelectDataView, SelectItemTrigger, SelectOption } from '@contember/react-select'
 
+/**
+ * Props for {@link DefaultSelectDataView}.
+ */
 export interface DefaultSelectDataViewProps {
+	/**
+	* Optional field used for querying the data view.
+	*/
 	queryField?: DataViewUnionFilterFields
+	/**
+	* Optional initial sorting direction for the data view.
+	*/
 	initialSorting?: DataViewSortingDirections
+	/**
+	* Children elements to be rendered inside the default data view renderer.
+	*/
 	children: ReactNode
 }
 
+/**
+ * Props {@link DefaultSelectDataViewProps}
+ *
+ * `DefaultSelectDataView` provides a wrapper around `SelectDataView` with a default renderer. It simplifies setting up a data view selection with initial sorting and query field options.
+ *
+ * Must be used inside a context where `SelectDataView` is valid.
+ *
+ * #### Example: Basic usage
+ * ```tsx
+ * <DefaultSelectDataView queryField="status" initialSorting="asc">
+ *   <ItemRenderer />
+ * </DefaultSelectDataView>
+ * ```
+ */
 export const DefaultSelectDataView = Component< DefaultSelectDataViewProps>(({ children, initialSorting, queryField }) => {
 	return <>
 		<SelectDataView initialSorting={initialSorting} queryField={queryField}>

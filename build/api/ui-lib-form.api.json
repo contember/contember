@@ -1,0 +1,2792 @@
+{
+  "metadata": {
+    "toolPackage": "@microsoft/api-extractor",
+    "toolVersion": "7.52.8",
+    "schemaVersion": 1011,
+    "oldestForwardsCompatibleVersion": 1001,
+    "tsdocConfig": {
+      "$schema": "https://developer.microsoft.com/json-schemas/tsdoc/v0/tsdoc.schema.json",
+      "noStandardTags": true,
+      "tagDefinitions": [
+        {
+          "tagName": "@alpha",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@beta",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@defaultValue",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@decorator",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@deprecated",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@eventProperty",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@example",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@experimental",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@inheritDoc",
+          "syntaxKind": "inline"
+        },
+        {
+          "tagName": "@internal",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@label",
+          "syntaxKind": "inline"
+        },
+        {
+          "tagName": "@link",
+          "syntaxKind": "inline",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@override",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@packageDocumentation",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@param",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@privateRemarks",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@public",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@readonly",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@remarks",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@returns",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@sealed",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@see",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@throws",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@typeParam",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@virtual",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@group",
+          "syntaxKind": "block"
+        }
+      ],
+      "reportUnsupportedHtmlElements": false
+    }
+  },
+  "kind": "Package",
+  "canonicalReference": "@contember/react-ui-lib!",
+  "docComment": "",
+  "name": "@contember/react-ui-lib",
+  "preserveMemberOrder": false,
+  "members": [
+    {
+      "kind": "EntryPoint",
+      "canonicalReference": "@contember/react-ui-lib!",
+      "name": "",
+      "preserveMemberOrder": false,
+      "members": [
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!AudioField:var",
+          "docComment": "/**\n * `AudioField` is a specialized upload component for handling audio files. It provides built-in file validation, an audio preview, and metadata tracking.\n *\n * #### Example: Basic usage\n * ```tsx\n * <AudioField\n *   label=\"Podcast File\"\n *   urlField=\"audio.url\"\n * />\n * ```\n *\n * #### Example: With metadata fields\n * ```tsx\n * <AudioField\n *   label=\"Podcast File\"\n *   baseField=\"audio\"\n *   urlField=\"url\"\n *   durationField=\"duration\"\n *   fileNameField=\"fileName\"\n *   fileSizeField=\"fileSize\"\n *   fileTypeField=\"fileType\"\n *   lastModifiedField=\"lastModified\"\n *   accept={{ 'audio/*': ['.mp3', '.wav', '.ogg'] }}\n * />\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "AudioField: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "AudioFieldProps",
+              "canonicalReference": "@contember/react-ui-lib!AudioFieldProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            }
+          ],
+          "fileUrlPath": "src/form/upload.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "AudioField",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 6
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!AudioFieldProps:type",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type AudioFieldProps = "
+            },
+            {
+              "kind": "Reference",
+              "text": "BaseUploadFieldProps",
+              "canonicalReference": "@contember/react-ui-lib!BaseUploadFieldProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": " & "
+            },
+            {
+              "kind": "Reference",
+              "text": "AudioFileTypeProps",
+              "canonicalReference": "@contember/react-ui-lib!~AudioFileTypeProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/form/upload.tsx",
+          "releaseTag": "Public",
+          "name": "AudioFieldProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 4
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!AudioRepeaterField:var",
+          "docComment": "/**\n * AudioRepeaterField component - Multiple audio file upload manager\n *\n * #### Requirements - Must be used within an Entity context (`<EntitySubTree />` or `<EntityListSubTree />`).\n *\n * #### Features - Handles ordered lists of audio files - Audio player preview for uploaded files - Supports common audio formats - File size validation\n *\n * #### Example: Basic usage\n * ```tsx\n * <AudioRepeaterField\n *   label=\"Podcast Episodes\"\n *   field=\"episodes\"\n *   urlField=\"audio.url\"\n *   orderBy=\"createdAt\"\n * />\n * ```\n *\n * #### Example: Sortable with baseField and some optional props\n * ```tsx\n * <AudioRepeaterField\n *   field=\"episodes\"\n *   baseField=\"audio\"\n *   urlField=\"url\"\n *   sortableBy=\"order\"\n *   durationField=\"duration\"\n *   fileNameField=\"fileName\"\n *   fileSizeField=\"fileSize\"\n *   fileTypeField=\"fileType\"\n *   lastModifiedField=\"lastModified\"\n *   label=\"Audio file\"\n * />\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "AudioRepeaterField: "
+            },
+            {
+              "kind": "Reference",
+              "text": "React.NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "AudioRepeaterFieldProps",
+              "canonicalReference": "@contember/react-ui-lib!AudioRepeaterFieldProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            }
+          ],
+          "fileUrlPath": "src/form/upload-repeaters.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "AudioRepeaterField",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 5
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!AudioRepeaterFieldProps:type",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type AudioRepeaterFieldProps = "
+            },
+            {
+              "kind": "Reference",
+              "text": "BaseFileRepeaterFieldProps",
+              "canonicalReference": "@contember/react-ui-lib!BaseFileRepeaterFieldProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": " & "
+            },
+            {
+              "kind": "Reference",
+              "text": "AudioFileTypeProps",
+              "canonicalReference": "@contember/react-ui-lib!~AudioFileTypeProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/form/upload-repeaters.tsx",
+          "releaseTag": "Public",
+          "name": "AudioRepeaterFieldProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 4
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!BaseFileRepeaterFieldProps:type",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type BaseFileRepeaterFieldProps = "
+            },
+            {
+              "kind": "Reference",
+              "text": "Omit",
+              "canonicalReference": "!Omit:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "FormContainerProps",
+              "canonicalReference": "@contember/react-ui-lib!FormContainerProps:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", 'children'> & "
+            },
+            {
+              "kind": "Reference",
+              "text": "RepeaterProps",
+              "canonicalReference": "@contember/react-ui-lib!~RepeaterProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": " & "
+            },
+            {
+              "kind": "Reference",
+              "text": "UploaderBaseFieldProps",
+              "canonicalReference": "@contember/react-ui-lib!~UploaderBaseFieldProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": " & {\n    dropzonePlaceholder?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    actions?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    edit?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    noDestroy?: boolean;\n    getUploadOptions?: (file: "
+            },
+            {
+              "kind": "Reference",
+              "text": "File",
+              "canonicalReference": "!File:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Reference",
+              "text": "S3FileOptions",
+              "canonicalReference": "@contember/react-ui-lib!~S3FileOptions:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/form/upload-repeaters.tsx",
+          "releaseTag": "Public",
+          "name": "BaseFileRepeaterFieldProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 19
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!BaseUploadFieldProps:type",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type BaseUploadFieldProps = "
+            },
+            {
+              "kind": "Reference",
+              "text": "Omit",
+              "canonicalReference": "!Omit:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "FormContainerProps",
+              "canonicalReference": "@contember/react-ui-lib!FormContainerProps:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", 'children'> & "
+            },
+            {
+              "kind": "Reference",
+              "text": "UploaderBaseFieldProps",
+              "canonicalReference": "@contember/react-ui-lib!~UploaderBaseFieldProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": " & {\n    dropzonePlaceholder?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    actions?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    edit?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    noDestroy?: boolean;\n    getUploadOptions?: (file: "
+            },
+            {
+              "kind": "Reference",
+              "text": "File",
+              "canonicalReference": "!File:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Reference",
+              "text": "S3FileOptions",
+              "canonicalReference": "@contember/react-ui-lib!~S3FileOptions:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/form/upload.tsx",
+          "releaseTag": "Public",
+          "name": "BaseUploadFieldProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 17
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!CheckboxField:var",
+          "docComment": "/**\n * CheckboxField is a component for boolean fields. Must be used within an Entity context.\n *\n * #### Requirements - Must be used within an Entity context (`<EntitySubTree />` or `<EntityListSubTree />`).\n *\n * #### Features: - Renders as a standard checkbox input - Label appears adjacent to the checkbox - Required state reflects field nullability (can be overridden)\n *\n * #### Example: Basic usage\n * ```tsx\n * <CheckboxField\n *   field=\"isPublished\"\n *   label=\"Publish immediately\"\n * />\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "CheckboxField: "
+            },
+            {
+              "kind": "Reference",
+              "text": "React.NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "Omit",
+              "canonicalReference": "!Omit:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "FormCheckboxProps",
+              "canonicalReference": "@contember/react-ui-lib!~FormCheckboxProps:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", \"children\"> & "
+            },
+            {
+              "kind": "Reference",
+              "text": "Omit",
+              "canonicalReference": "!Omit:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "FormContainerProps",
+              "canonicalReference": "@contember/react-ui-lib!FormContainerProps:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", \"children\"> & {\n    required?: boolean;\n    inputProps?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Omit",
+              "canonicalReference": "!Omit:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "React.InputHTMLAttributes",
+              "canonicalReference": "@types/react!React.InputHTMLAttributes:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLInputElement",
+              "canonicalReference": "!HTMLInputElement:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">, \"defaultValue\">;\n}>"
+            }
+          ],
+          "fileUrlPath": "src/form/inputs.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "CheckboxField",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 17
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!CheckboxFieldProps:type",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type CheckboxFieldProps = "
+            },
+            {
+              "kind": "Reference",
+              "text": "Omit",
+              "canonicalReference": "!Omit:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "FormCheckboxProps",
+              "canonicalReference": "@contember/react-ui-lib!~FormCheckboxProps:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", 'children'> & "
+            },
+            {
+              "kind": "Reference",
+              "text": "Omit",
+              "canonicalReference": "!Omit:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "FormContainerProps",
+              "canonicalReference": "@contember/react-ui-lib!FormContainerProps:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", 'children'> & {\n    required?: boolean;\n    inputProps?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Omit",
+              "canonicalReference": "!Omit:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "React.InputHTMLAttributes",
+              "canonicalReference": "@types/react!React.InputHTMLAttributes:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLInputElement",
+              "canonicalReference": "!HTMLInputElement:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">, 'defaultValue'>;\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/form/inputs.tsx",
+          "releaseTag": "Public",
+          "name": "CheckboxFieldProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 15
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!FileField:var",
+          "docComment": "/**\n * `FileField` is a generic file upload component that supports any file type.\n *\n * #### Example: Basic usage\n * ```tsx\n * <FileField label=\"Document\" urlField=\"file.url\" />\n * ```\n *\n * #### Example: With metadata fields and custom dropzone placeholder\n * ```tsx\n * <FileField\n *   label=\"Document\"\n *   baseField=\"document\"\n *   urlField=\"file.url\"\n *   fileNameField=\"fileName\"\n *   fileSizeField=\"fileSize\"\n *   fileTypeField=\"fileType\"\n *   lastModifiedField=\"lastModified\"\n *   dropzonePlaceholder=\"Drag PDF here\"\n *   accept={{ 'application/*': ['.pdf'] }}\n * />\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "FileField: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "FileFieldProps",
+              "canonicalReference": "@contember/react-ui-lib!FileFieldProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            }
+          ],
+          "fileUrlPath": "src/form/upload.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "FileField",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 6
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!FileFieldProps:type",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type FileFieldProps = "
+            },
+            {
+              "kind": "Reference",
+              "text": "BaseUploadFieldProps",
+              "canonicalReference": "@contember/react-ui-lib!BaseUploadFieldProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": " & "
+            },
+            {
+              "kind": "Reference",
+              "text": "AnyFileTypeProps",
+              "canonicalReference": "@contember/react-ui-lib!~AnyFileTypeProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/form/upload.tsx",
+          "releaseTag": "Public",
+          "name": "FileFieldProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 4
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!FileRepeaterField:var",
+          "docComment": "/**\n * FileRepeaterField component - Generic multi-file upload repeater\n *\n * #### Requirements - Must be used within an Entity context (`<EntitySubTree />` or `<EntityListSubTree />`).\n *\n * #### Features - Handles any file type in a list format - File type icon display - Customizable preview components - Sortable document lists\n *\n * #### Example: Basic usage\n * ```tsx\n * <FileRepeaterField\n *   label=\"Attachments\"\n *   field=\"attachments\"\n *   urlField=\"file.url\"\n *   orderBy=\"createdAt\"\n * />\n * ```\n *\n * #### Example: Sortable with baseField and some optional props\n * ```tsx\n * <FileRepeaterField\n *  field=\"attachments\"\n *  baseField=\"file\"\n *  urlField=\"url\"\n *  sortableBy=\"order\"\n *  fileNameField=\"fileName\"\n *  fileSizeField=\"fileSize\"\n *  fileTypeField=\"fileType\"\n *  lastModifiedField=\"lastModified\"\n *  label=\"File\"\n * />\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "FileRepeaterField: "
+            },
+            {
+              "kind": "Reference",
+              "text": "React.NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "FileRepeaterFieldProps",
+              "canonicalReference": "@contember/react-ui-lib!FileRepeaterFieldProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            }
+          ],
+          "fileUrlPath": "src/form/upload-repeaters.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "FileRepeaterField",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 5
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!FileRepeaterFieldProps:type",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type FileRepeaterFieldProps = "
+            },
+            {
+              "kind": "Reference",
+              "text": "BaseFileRepeaterFieldProps",
+              "canonicalReference": "@contember/react-ui-lib!BaseFileRepeaterFieldProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": " & "
+            },
+            {
+              "kind": "Reference",
+              "text": "AnyFileTypeProps",
+              "canonicalReference": "@contember/react-ui-lib!~AnyFileTypeProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/form/upload-repeaters.tsx",
+          "releaseTag": "Public",
+          "name": "FileRepeaterFieldProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 4
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!FormContainer:var",
+          "docComment": "/**\n * Props {@link FormContainerProps}.\n *\n * `FormContainer` is a layout component for form fields, providing consistent styling and handling of labels, descriptions, and error messages. It ensures accessibility and state management within form contexts.\n *\n * #### Example: Basic usage\n * ```tsx\n * <FormContainer label=\"Email\" description=\"Enter a valid email address\" required errors={errors}>\n *   <FormInput field=\"email\" />\n * </FormContainer>\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "FormContainer: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "FormContainerProps",
+              "canonicalReference": "@contember/react-ui-lib!FormContainerProps:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            }
+          ],
+          "fileUrlPath": "src/form/container.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "FormContainer",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 6
+          }
+        },
+        {
+          "kind": "Interface",
+          "canonicalReference": "@contember/react-ui-lib!FormContainerProps:interface",
+          "docComment": "/**\n * Props for the {@link FormContainer} component.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export interface FormContainerProps "
+            }
+          ],
+          "fileUrlPath": "src/form/container.tsx",
+          "releaseTag": "Public",
+          "name": "FormContainerProps",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@contember/react-ui-lib!FormContainerProps#children:member",
+              "docComment": "/**\n * The child components or form elements to render within the container.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "children: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ReactNode",
+                  "canonicalReference": "@types/react!React.ReactNode:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "children",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@contember/react-ui-lib!FormContainerProps#description:member",
+              "docComment": "/**\n * The description text for the form element.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "description?: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ReactNode",
+                  "canonicalReference": "@types/react!React.ReactNode:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": true,
+              "releaseTag": "Public",
+              "name": "description",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@contember/react-ui-lib!FormContainerProps#errors:member",
+              "docComment": "/**\n * The error message to display.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "errors?: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ErrorAccessor.Error",
+                  "canonicalReference": "@contember/react-ui-lib!~ErrorAccessor.Error:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "[] | "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ReactNode",
+                  "canonicalReference": "@types/react!React.ReactNode:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": true,
+              "releaseTag": "Public",
+              "name": "errors",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 4
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@contember/react-ui-lib!FormContainerProps#label:member",
+              "docComment": "/**\n * The label for the form element.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "label?: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ReactNode",
+                  "canonicalReference": "@types/react!React.ReactNode:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": true,
+              "releaseTag": "Public",
+              "name": "label",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@contember/react-ui-lib!FormContainerProps#required:member",
+              "docComment": "/**\n * Indicates whether the form element\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "required?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "boolean"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": true,
+              "releaseTag": "Public",
+              "name": "required",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            }
+          ],
+          "extendsTokenRanges": []
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!FormContainerUI:var",
+          "docComment": "/**\n * FormContainerUI component - Wrapper for individual form fields\n *\n * #### Purpose Creates consistent spacing and layout for form field groups\n *\n * #### Features - Vertical flex layout - Full width container - Uses Tailwind classes: `flex flex-col gap-2 w-full`\n *\n * #### Example\n * ```tsx\n * <FormContainerUI>\n *   <FormLabelUI>Email</FormLabelUI>\n *   <InputField field=\"email\" />\n * </FormContainerUI>\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "FormContainerUI: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "ForwardRefExoticComponent",
+              "canonicalReference": "@types/react!React.ForwardRefExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "Omit",
+              "canonicalReference": "!Omit:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "ClassAttributes",
+              "canonicalReference": "@types/react!React.ClassAttributes:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLDivElement",
+              "canonicalReference": "!HTMLDivElement:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "> & import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLAttributes",
+              "canonicalReference": "@types/react!React.HTMLAttributes:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLDivElement",
+              "canonicalReference": "!HTMLDivElement:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "> & {\n    asChild?: boolean;\n    children?: import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    className?: string;\n}, \"ref\"> & import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "RefAttributes",
+              "canonicalReference": "@types/react!React.RefAttributes:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLDivElement",
+              "canonicalReference": "!HTMLDivElement:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">>"
+            }
+          ],
+          "fileUrlPath": "src/form/ui.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "FormContainerUI",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 20
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!FormDescriptionUI:var",
+          "docComment": "/**\n * FormDescriptionUI component - Styled text for form field descriptions\n *\n * #### Purpose Displays secondary help text below form fields\n *\n * #### Features - Small muted text style - Uses Tailwind classes: `text-[0.8rem] text-muted-foreground`\n *\n * #### Example\n * ```tsx\n * <FormDescriptionUI>\n *   Must be at least 8 characters\n * </FormDescriptionUI>\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "FormDescriptionUI: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "ForwardRefExoticComponent",
+              "canonicalReference": "@types/react!React.ForwardRefExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "Omit",
+              "canonicalReference": "!Omit:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "ClassAttributes",
+              "canonicalReference": "@types/react!React.ClassAttributes:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLParagraphElement",
+              "canonicalReference": "!HTMLParagraphElement:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "> & import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLAttributes",
+              "canonicalReference": "@types/react!React.HTMLAttributes:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLParagraphElement",
+              "canonicalReference": "!HTMLParagraphElement:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "> & {\n    asChild?: boolean;\n    children?: import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    className?: string;\n}, \"ref\"> & import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "RefAttributes",
+              "canonicalReference": "@types/react!React.RefAttributes:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLParagraphElement",
+              "canonicalReference": "!HTMLParagraphElement:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">>"
+            }
+          ],
+          "fileUrlPath": "src/form/ui.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "FormDescriptionUI",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 20
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!FormErrorUI:var",
+          "docComment": "/**\n * FormErrorUI component - Error message display for form validation\n *\n * #### Purpose Shows validation error messages in consistent destructive style\n *\n * #### Features - Red destructive color scheme - Small bold text - Uses Tailwind classes: `text-[0.8rem] font-medium text-destructive`\n *\n * #### Example\n * ```tsx\n * <FormErrorUI>Invalid email format</FormErrorUI>\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "FormErrorUI: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "ForwardRefExoticComponent",
+              "canonicalReference": "@types/react!React.ForwardRefExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "Omit",
+              "canonicalReference": "!Omit:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "ClassAttributes",
+              "canonicalReference": "@types/react!React.ClassAttributes:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLParagraphElement",
+              "canonicalReference": "!HTMLParagraphElement:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "> & import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLAttributes",
+              "canonicalReference": "@types/react!React.HTMLAttributes:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLParagraphElement",
+              "canonicalReference": "!HTMLParagraphElement:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "> & {\n    asChild?: boolean;\n    children?: import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    className?: string;\n}, \"ref\"> & import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "RefAttributes",
+              "canonicalReference": "@types/react!React.RefAttributes:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLParagraphElement",
+              "canonicalReference": "!HTMLParagraphElement:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">>"
+            }
+          ],
+          "fileUrlPath": "src/form/ui.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "FormErrorUI",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 20
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!FormLabelUI:var",
+          "docComment": "/**\n * FormLabelUI component - Styled label for form fields\n *\n * #### Purpose Displays accessible labels with required state indicators\n *\n * #### Features - Left-aligned text - Dynamic required indicator (red asterisk) - Variant support for required state - Default required marker: '*'\n *\n * #### Variants - `required`: Controls display of required indicator (true/false)\n *\n * #### Example: Basic usage\n * ```tsx\n * <FormLabelUI>Password</FormLabelUI>\n * ```\n *\n * #### Example: With required indicator\n * ```tsx\n * <FormLabelUI required>Username</FormLabelUI>\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "FormLabelUI: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "ForwardRefExoticComponent",
+              "canonicalReference": "@types/react!React.ForwardRefExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "Omit",
+              "canonicalReference": "!Omit:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "Omit",
+              "canonicalReference": "!Omit:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<import(\"@radix-ui/react-label\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "LabelProps",
+              "canonicalReference": "@radix-ui/react-label!LabelProps:interface"
+            },
+            {
+              "kind": "Content",
+              "text": " & import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "RefAttributes",
+              "canonicalReference": "@types/react!React.RefAttributes:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLLabelElement",
+              "canonicalReference": "!HTMLLabelElement:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "> & {\n    asChild?: boolean;\n    children?: import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    className?: string;\n}, \"ref\"> & import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "RefAttributes",
+              "canonicalReference": "@types/react!React.RefAttributes:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLLabelElement",
+              "canonicalReference": "!HTMLLabelElement:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "> & {\n    asChild?: boolean;\n    children?: import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    className?: string;\n} & {\n    required?: boolean | null | undefined;\n}, \"ref\"> & import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "RefAttributes",
+              "canonicalReference": "@types/react!React.RefAttributes:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLLabelElement",
+              "canonicalReference": "!HTMLLabelElement:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">>"
+            }
+          ],
+          "fileUrlPath": "src/form/ui.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "FormLabelUI",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 26
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!FormLabelWrapperUI:var",
+          "docComment": "/**\n * FormLabelWrapperUI component - Container for form labels\n *\n * #### Purpose Wraps label elements for proper alignment and spacing\n *\n * #### Features - Flex container layout - Base Tailwind class: `flex`\n *\n * #### Example\n * ```tsx\n * <FormLabelWrapperUI>\n *   <FormLabelUI>Email Address</FormLabelUI>\n * </FormLabelWrapperUI>\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "FormLabelWrapperUI: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "ForwardRefExoticComponent",
+              "canonicalReference": "@types/react!React.ForwardRefExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "Omit",
+              "canonicalReference": "!Omit:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "ClassAttributes",
+              "canonicalReference": "@types/react!React.ClassAttributes:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLDivElement",
+              "canonicalReference": "!HTMLDivElement:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "> & import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLAttributes",
+              "canonicalReference": "@types/react!React.HTMLAttributes:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLDivElement",
+              "canonicalReference": "!HTMLDivElement:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "> & {\n    asChild?: boolean;\n    children?: import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    className?: string;\n}, \"ref\"> & import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "RefAttributes",
+              "canonicalReference": "@types/react!React.RefAttributes:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLDivElement",
+              "canonicalReference": "!HTMLDivElement:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">>"
+            }
+          ],
+          "fileUrlPath": "src/form/ui.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "FormLabelWrapperUI",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 20
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!FormLayout:var",
+          "docComment": "/**\n * FormLayout component - Core layout container for form elements\n *\n * #### Purpose Provides consistent spacing and layout structure for form components\n *\n * #### Features - Vertical flex layout with gap spacing - Side margins for visual balance - Uses Tailwind classes: `flex flex-col gap-2 mx-4`\n *\n * #### Example\n * ```tsx\n * <FormLayout>\n *   <InputField field=\"username\" />\n * </FormLayout>\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "FormLayout: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "ForwardRefExoticComponent",
+              "canonicalReference": "@types/react!React.ForwardRefExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "Omit",
+              "canonicalReference": "!Omit:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "ClassAttributes",
+              "canonicalReference": "@types/react!React.ClassAttributes:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLDivElement",
+              "canonicalReference": "!HTMLDivElement:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "> & import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLAttributes",
+              "canonicalReference": "@types/react!React.HTMLAttributes:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLDivElement",
+              "canonicalReference": "!HTMLDivElement:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "> & {\n    asChild?: boolean;\n    children?: import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    className?: string;\n}, \"ref\"> & import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "RefAttributes",
+              "canonicalReference": "@types/react!React.RefAttributes:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLDivElement",
+              "canonicalReference": "!HTMLDivElement:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">>"
+            }
+          ],
+          "fileUrlPath": "src/form/ui.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "FormLayout",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 20
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!ImageField:var",
+          "docComment": "/**\n * ImageField component - Specialized file upload for images\n *\n * #### Requirements - Must be used within an Entity context (`<EntitySubTree />` or `<EntityListSubTree />`).\n *\n * #### Features - Handles image file uploads with preview - Supports common image formats (from ImageFileTypeProps) - Integrated drag-and-drop zone - Auto-generated preview using UploadedImageView - Optional custom destruction control\n *\n * #### Example: Basic usage\n * ```tsx\n * <ImageField\n *   label=\"Profile Picture\"\n *   urlField=\"avatar.url\"\n *   dropzonePlaceholder=\"Drag image here\"\n * />\n * ```\n *\n * #### Example: With baseField and custom dropzone\n * ```tsx\n * <ImageField\n *   baseField=\"image\"\n *   urlField=\"url\"\n *   widthField=\"width\"\n *   heightField=\"height\"\n *   fileNameField=\"fileName\"\n *   fileSizeField=\"fileSize\"\n *   fileTypeField=\"fileType\"\n *   lastModifiedField=\"lastModified\"\n *   label=\"Image file\"\n *   description=\"Some description of the image file.\"\n *   dropzonePlaceholder={(\n *     <UploaderDropzoneAreaUI className=\"w-60\">\n *       <UploadIcon className=\"w-12 h-12 text-gray-400\" />\n *       <div className=\"font-semibold text-sm\">Drop files here</div>\n *       <div className=\"text-xs\">or</div>\n *       <div className=\"flex gap-2 items-center text-xs\">\n *         <Button size=\"sm\" variant=\"outline\">Browse</Button>\n *         <div onClick={e => e.stopPropagation()}>\n *           <SelectImage />\n *         </div>\n *       </div>\n *     </UploaderDropzoneAreaUI>\n *   )}\n * />\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "ImageField: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "ImageFieldProps",
+              "canonicalReference": "@contember/react-ui-lib!ImageFieldProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            }
+          ],
+          "fileUrlPath": "src/form/upload.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "ImageField",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 6
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!ImageFieldProps:type",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type ImageFieldProps = "
+            },
+            {
+              "kind": "Reference",
+              "text": "BaseUploadFieldProps",
+              "canonicalReference": "@contember/react-ui-lib!BaseUploadFieldProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": " & "
+            },
+            {
+              "kind": "Reference",
+              "text": "ImageFileTypeProps",
+              "canonicalReference": "@contember/react-ui-lib!~ImageFileTypeProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/form/upload.tsx",
+          "releaseTag": "Public",
+          "name": "ImageFieldProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 4
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!ImageRepeaterField:var",
+          "docComment": "/**\n * ImageRepeaterField component - Multiple image upload with sorting capabilities\n *\n * #### Requirements - Must be used within an Entity context (`<EntitySubTree />` or `<EntityListSubTree />`).\n *\n * #### Features - Handles multiple image uploads in a list format - Drag-and-drop reordering of images - Auto-generated image previews - Progress indicators during upload - Integrated removal controls\n *\n * #### Example: Basic usage\n * ```tsx\n * <ImageRepeaterField\n *   label=\"Gallery Images\"\n *   field=\"images\"\n *   urlField=\"image.url\"\n *   orderBy=\"createdAt\"\n * />\n * ```\n *\n * #### Example: With custom dropzone and actions\n * ```tsx\n * <ImageRepeaterField\n *   field=\"imageList.items\"\n *   baseField=\"image\"\n *   sortableBy=\"order\"\n *   urlField=\"url\"\n *   widthField=\"width\"\n *   heightField=\"height\"\n *   fileNameField=\"fileName\"\n *   fileSizeField=\"fileSize\"\n *   fileTypeField=\"fileType\"\n *   lastModifiedField=\"lastModified\"\n *   label=\"Image file\"\n *   description=\"Some description of the image file.\"\n *   dropzonePlaceholder={(\n *     <UploaderDropzoneAreaUI className=\"w-60\">\n *       <UploadIcon className=\"w-12 h-12 text-gray-400\" />\n *       <div className=\"font-semibold text-sm\">Drop files here</div>\n *       <div className=\"text-xs\">or</div>\n *       <div className=\"flex gap-2 items-center text-xs\">\n *         <Button size=\"sm\" variant=\"outline\">Browse</Button>\n *         <div onClick={e => e.stopPropagation()}>\n *           <SelectImageRepeater />\n *         </div>\n *       </div>\n *     </UploaderDropzoneAreaUI>\n *   )}\n * />\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "ImageRepeaterField: "
+            },
+            {
+              "kind": "Reference",
+              "text": "React.NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "ImageRepeaterFieldProps",
+              "canonicalReference": "@contember/react-ui-lib!ImageRepeaterFieldProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            }
+          ],
+          "fileUrlPath": "src/form/upload-repeaters.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "ImageRepeaterField",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 5
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!ImageRepeaterFieldProps:type",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type ImageRepeaterFieldProps = "
+            },
+            {
+              "kind": "Reference",
+              "text": "BaseFileRepeaterFieldProps",
+              "canonicalReference": "@contember/react-ui-lib!BaseFileRepeaterFieldProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": " & "
+            },
+            {
+              "kind": "Reference",
+              "text": "ImageFileTypeProps",
+              "canonicalReference": "@contember/react-ui-lib!~ImageFileTypeProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/form/upload-repeaters.tsx",
+          "releaseTag": "Public",
+          "name": "ImageRepeaterFieldProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 4
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!InputField:var",
+          "docComment": "/**\n * Props {@link InputFieldProps}.\n *\n * `InputField` is a form input component that integrates with {@link FormFieldScope}, {@link FormContainer}, and {@link FormInput} to provide a structured and configurable input field.\n *\n * #### Example: Basic usage\n * ```tsx\n * <InputField field=\"title\" label=\"Article title\" />\n * ```\n *\n * #### Example: With additional input properties ```tsx <InputField field=\"title\" label=\"Article title\" inputProps={{ placeholder: 'Enter a title' }} />\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "InputField: "
+            },
+            {
+              "kind": "Reference",
+              "text": "React.NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "InputFieldProps",
+              "canonicalReference": "@contember/react-ui-lib!InputFieldProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            }
+          ],
+          "fileUrlPath": "src/form/inputs.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "InputField",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 5
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!InputFieldProps:type",
+          "docComment": "/**\n * Props for the {@link InputField} component.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type InputFieldProps = "
+            },
+            {
+              "kind": "Reference",
+              "text": "Omit",
+              "canonicalReference": "!Omit:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "FormInputProps",
+              "canonicalReference": "@contember/react-ui-lib!~FormInputProps:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", 'children'> & "
+            },
+            {
+              "kind": "Reference",
+              "text": "Omit",
+              "canonicalReference": "!Omit:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "FormContainerProps",
+              "canonicalReference": "@contember/react-ui-lib!FormContainerProps:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", 'children'> & {\n    required?: boolean;\n    inputProps?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ComponentProps",
+              "canonicalReference": "@types/react!React.ComponentProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "Input",
+              "canonicalReference": "@contember/react-ui-lib!~Input:var"
+            },
+            {
+              "kind": "Content",
+              "text": ">;\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/form/inputs.tsx",
+          "releaseTag": "Public",
+          "name": "InputFieldProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 13
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!MultiSelectField:var",
+          "docComment": "/**\n * MultiSelectField component for managing multiple-entity (hasMany) relationships.\n *\n * #### Requirements - Must be used within an Entity context (`<EntitySubTree />` or `<EntityListSubTree />`)\n *\n * #### Features - Multiple entity selection with chip display - Supports custom option rendering and creation of new entities - Maintains selection order based on user interaction - Query-based option filtering with initial sorting - Integrated error state handling from parent form\n *\n * #### Example: Basic usage\n * ```tsx\n * <MultiSelectField\n *   field=\"categories\"\n *   label=\"Article Categories\"\n * >\n *   <Field field=\"name\" />\n * </MultiSelectField>\n * ```\n *\n * #### Example: With creation form and sorting\n * ```tsx\n * <MultiSelectField\n *   field=\"tags\"\n *   label=\"Article Tags\"\n *   initialSorting={{ name: 'asc' }}\n *   createNewForm={<TagCreateForm />}\n * >\n *   <Field field=\"name\" />\n * </MultiSelectField>\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "MultiSelectField: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "MultiSelectFieldProps",
+              "canonicalReference": "@contember/react-ui-lib!MultiSelectFieldProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            }
+          ],
+          "fileUrlPath": "src/form/select.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "MultiSelectField",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 6
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!MultiSelectFieldProps:type",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type MultiSelectFieldProps = "
+            },
+            {
+              "kind": "Reference",
+              "text": "MultiSelectInputProps",
+              "canonicalReference": "@contember/react-ui-lib!~MultiSelectInputProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": " & "
+            },
+            {
+              "kind": "Reference",
+              "text": "Omit",
+              "canonicalReference": "!Omit:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "FormContainerProps",
+              "canonicalReference": "@contember/react-ui-lib!FormContainerProps:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", 'children' | 'required'>"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/form/select.tsx",
+          "releaseTag": "Public",
+          "name": "MultiSelectFieldProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 7
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!RadioEnumField:var",
+          "docComment": "/**\n * RadioEnumField is a component for enum fields with radio button selection. Must be used within an Entity context.\n *\n * #### Requirements - Must be used within an Entity context (`<EntitySubTree />` or `<EntityListSubTree />`).\n *\n * Features: - Can auto-generate options from enum definitions - Supports horizontal or vertical layout - Options can be provided explicitly or derived from enum labels\n *\n * #### Example: Basic usage\n * ```tsx\n * <RadioEnumField\n *   field=\"status\"\n *   label=\"Article Status\"\n *   orientation=\"horizontal\"\n *   options={[\n *     { value: 'draft', label: 'Draft' },\n *     { value: 'published', label: 'Published' }\n *   ]}\n * />\n * ```\n *\n * #### Example: Using enum auto-detection\n * ```tsx\n * // Using enum auto-detection\n * <RadioEnumField\n *   field=\"category\"\n *   label=\"Article Category\"\n * />\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "RadioEnumField: "
+            },
+            {
+              "kind": "Reference",
+              "text": "React.NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "RadioEnumFieldProps",
+              "canonicalReference": "@contember/react-ui-lib!RadioEnumFieldProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            }
+          ],
+          "fileUrlPath": "src/form/inputs.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "RadioEnumField",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 5
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!RadioEnumFieldProps:type",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type RadioEnumFieldProps = "
+            },
+            {
+              "kind": "Reference",
+              "text": "Omit",
+              "canonicalReference": "!Omit:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "FormRadioItemProps",
+              "canonicalReference": "@contember/react-ui-lib!~FormRadioItemProps:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", 'children' | 'value'> & "
+            },
+            {
+              "kind": "Reference",
+              "text": "Omit",
+              "canonicalReference": "!Omit:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "FormContainerProps",
+              "canonicalReference": "@contember/react-ui-lib!FormContainerProps:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", 'children'> & {\n    required?: boolean;\n    options?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Record",
+              "canonicalReference": "!Record:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<string, "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": "> | "
+            },
+            {
+              "kind": "Reference",
+              "text": "Array",
+              "canonicalReference": "!Array:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<{\n        value: null | string | number | boolean;\n        label: "
+            },
+            {
+              "kind": "Reference",
+              "text": "React.ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    }>;\n    orientation?: 'horizontal' | 'vertical';\n    inputProps?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Omit",
+              "canonicalReference": "!Omit:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "React.InputHTMLAttributes",
+              "canonicalReference": "@types/react!React.InputHTMLAttributes:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLInputElement",
+              "canonicalReference": "!HTMLInputElement:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">, 'defaultValue'>;\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/form/inputs.tsx",
+          "releaseTag": "Public",
+          "name": "RadioEnumFieldProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 23
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!SelectEnumField:var",
+          "docComment": "/**\n * SelectEnumField component for enum value selection with auto-option detection.\n *\n * #### Requirements - Field must be an enum type when using auto-detection - Manual options must be provided if enum not detected\n *\n * #### Features - Auto-detects enum options from schema definition - Supports mixed value types (string, number, boolean, null) - Two option formats: object map or array of {value/label} - Required field validation with error feedback - Custom placeholder support - Pre-persist validation for required fields\n *\n * #### Example: Auto-detected enum usage\n * ```tsx\n * <SelectEnumField\n *   field=\"articleStatus\"\n *   label=\"Publication Status\"\n *   required\n * />\n * ```\n *\n * #### Example: Manual options with mixed types\n * ```tsx\n * <SelectEnumField\n *   field=\"notificationSettings\"\n *   label=\"Alert Preferences\"\n *   options={[\n *     { value: 'email', label: 'Email Notifications' },\n *     { value: 1, label: 'SMS Alerts' },\n *     { value: null, label: 'No Notifications' }\n *   ]}\n *   placeholder=\"Select preference...\"\n * />\n * ```\n *\n * #### Example: Object-based options\n * ```tsx\n * <SelectEnumField\n *   field=\"userRole\"\n *   label=\"Account Type\"\n *   options={{\n *     admin: 'Administrator',\n *     user: 'Standard User',\n *     guest: 'Temporary Access'\n *   }}\n * />\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "SelectEnumField: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "SelectEnumFieldProps",
+              "canonicalReference": "@contember/react-ui-lib!SelectEnumFieldProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            }
+          ],
+          "fileUrlPath": "src/form/select.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "SelectEnumField",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 6
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!SelectEnumFieldProps:type",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type SelectEnumFieldProps = "
+            },
+            {
+              "kind": "Reference",
+              "text": "Omit",
+              "canonicalReference": "!Omit:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "FormContainerProps",
+              "canonicalReference": "@contember/react-ui-lib!FormContainerProps:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", 'children'> & {\n    field: "
+            },
+            {
+              "kind": "Reference",
+              "text": "SugaredRelativeSingleField",
+              "canonicalReference": "@contember/react-ui-lib!~SugaredRelativeSingleField:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "['field'];\n    options?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Record",
+              "canonicalReference": "!Record:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<string, "
+            },
+            {
+              "kind": "Reference",
+              "text": "React.ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": "> | {\n        value: null | string | number | boolean;\n        label: "
+            },
+            {
+              "kind": "Reference",
+              "text": "React.ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    }[];\n    placeholder?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "React.ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    defaultValue?: string;\n    required?: boolean;\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/form/select.tsx",
+          "releaseTag": "Public",
+          "name": "SelectEnumFieldProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 15
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!SelectField:var",
+          "docComment": "/**\n * `SelectField` is a component for single-entity relationship selection (hasOne). Must be used within an Entity context.\n *\n * #### Requirements - Must be used within an Entity context (`<EntitySubTree />` or `<EntityListSubTree />`).\n *\n * #### Features - Manages hasOne relationships through a dropdown interface. - Supports custom option rendering and creation of new entities. - Sorts options by a specified field. - Query-based option filtering.\n *\n * #### Example: Basic usage\n * ```tsx\n * <SelectField\n *   field=\"country\"\n *   label=\"Home Country\"\n * >\n *   <Field field=\"name\" />\n * </SelectField>\n * ```\n *\n * #### Example: With sorting and form allowing creation of new entities\n * ```tsx\n * <SelectField\n *   field=\"author\"\n *   label=\"Author\"\n *   initialSorting={{ name: 'asc' }}\n *   createNewForm={<CountryForm />}\n * >\n *   <Field field=\"name\" />\n * </SelectField>\n * ```\n *\n * #### Example: With query-based filtering\n * ```tsx\n * <SelectField\n *   field=\"author\"\n *   label=\"Author\"\n *   options=\"Author[archived != false]\"\n * >\n *   <Field field=\"name\" />\n * </SelectField>\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "SelectField: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "SelectFieldProps",
+              "canonicalReference": "@contember/react-ui-lib!SelectFieldProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            }
+          ],
+          "fileUrlPath": "src/form/select.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "SelectField",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 6
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!SelectFieldProps:type",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type SelectFieldProps = "
+            },
+            {
+              "kind": "Reference",
+              "text": "SelectInputProps",
+              "canonicalReference": "@contember/react-ui-lib!~SelectInputProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": " & "
+            },
+            {
+              "kind": "Reference",
+              "text": "Omit",
+              "canonicalReference": "!Omit:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "FormContainerProps",
+              "canonicalReference": "@contember/react-ui-lib!FormContainerProps:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", 'children'>"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/form/select.tsx",
+          "releaseTag": "Public",
+          "name": "SelectFieldProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 7
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!SortableMultiSelectField:var",
+          "docComment": "/**\n * SortableMultiSelectField component for ordered multi-entity relationships with drag-and-drop.\n *\n * #### Requirements - Must be used within an Entity context (`<EntitySubTree />` or `<EntityListSubTree />`) - Requires sort field configuration via `sortableBy` prop\n *\n * #### Features - Drag-and-drop reordering of selected items - Visual sorting indicators during drag operations - Customizable sort field storage - Connection point management for complex relationships - Inherits all MultiSelectField features\n *\n * #### Example: Basic usage\n * ```tsx\n * <SortableMultiSelectField\n *   field=\"chapterPages\"\n *   label=\"Page Order\"\n *   sortableBy=\"pageNumber\"\n *   connectAt=\"bookChapter\"\n * >\n *   <Field field=\"content\" />\n * </SortableMultiSelectField>\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "SortableMultiSelectField: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "SortableMultiSelectFieldProps",
+              "canonicalReference": "@contember/react-ui-lib!SortableMultiSelectFieldProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            }
+          ],
+          "fileUrlPath": "src/form/select.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "SortableMultiSelectField",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 6
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!SortableMultiSelectFieldProps:type",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type SortableMultiSelectFieldProps = "
+            },
+            {
+              "kind": "Reference",
+              "text": "SortableMultiSelectInputProps",
+              "canonicalReference": "@contember/react-ui-lib!~SortableMultiSelectInputProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": " & "
+            },
+            {
+              "kind": "Reference",
+              "text": "Omit",
+              "canonicalReference": "!Omit:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "FormContainerProps",
+              "canonicalReference": "@contember/react-ui-lib!FormContainerProps:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", 'children' | 'required'>"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/form/select.tsx",
+          "releaseTag": "Public",
+          "name": "SortableMultiSelectFieldProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 7
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!StandaloneFormContainer:var",
+          "docComment": "/**\n * @deprecated\n *\n * use `FormContainer` instead\n *\n * StandaloneFormContainer component.\n *\n * #### Deprecation Notice This component is deprecated and will be removed in future versions. Use `FormContainer` instead.\n *\n * #### Migration Example\n * ```tsx\n * // Old:\n * <StandaloneFormContainer label=\"Name\">\n *   <FormInput field=\"name\" />\n * </StandaloneFormContainer>\n *\n * // New:\n * <FormContainer label=\"Name\">\n *   <FormInput field=\"name\" />\n * </FormContainer>\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "StandaloneFormContainer: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "FormContainerProps",
+              "canonicalReference": "@contember/react-ui-lib!FormContainerProps:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            }
+          ],
+          "fileUrlPath": "src/form/container.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "StandaloneFormContainer",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 6
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!TextareaField:var",
+          "docComment": "/**\n * `TextareaField` is a form textarea component that integrates with `FormFieldScope`, `FormContainer`, and `FormInput` to provide a structured and configurable multi-line input field.\n *\n * Must be used within a form context.\n *\n * #### Features - Supports field scoping for form state management - Includes a label and description for accessibility - Handles required validation - Supports automatic resizing with `TextareaAutosize` - Allows custom input properties via `inputProps`\n *\n * #### Example: Basic usage\n * ```tsx\n * <TextareaField\n *   field=\"bio\"\n *   label=\"Biography\"\n *   description=\"Tell us about yourself\"\n *   required\n *   inputProps={{ placeholder: \"Write something...\" }}\n * />\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "TextareaField: "
+            },
+            {
+              "kind": "Reference",
+              "text": "React.NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "TextareaFieldProps",
+              "canonicalReference": "@contember/react-ui-lib!TextareaFieldProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            }
+          ],
+          "fileUrlPath": "src/form/inputs.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "TextareaField",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 5
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!TextareaFieldProps:type",
+          "docComment": "/**\n * Props for the {@link TextareaField} component.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type TextareaFieldProps = "
+            },
+            {
+              "kind": "Reference",
+              "text": "Omit",
+              "canonicalReference": "!Omit:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "FormInputProps",
+              "canonicalReference": "@contember/react-ui-lib!~FormInputProps:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", 'children'> & "
+            },
+            {
+              "kind": "Reference",
+              "text": "Omit",
+              "canonicalReference": "!Omit:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "FormContainerProps",
+              "canonicalReference": "@contember/react-ui-lib!FormContainerProps:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", 'children'> & {\n    required?: boolean;\n    inputProps?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ComponentProps",
+              "canonicalReference": "@types/react!React.ComponentProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "TextareaAutosize",
+              "canonicalReference": "@contember/react-ui-lib!~TextareaAutosize:var"
+            },
+            {
+              "kind": "Content",
+              "text": ">;\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/form/inputs.tsx",
+          "releaseTag": "Public",
+          "name": "TextareaFieldProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 13
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!VideoField:var",
+          "docComment": "/**\n * `VideoField` is a specialized upload component for handling video files with built-in preview capabilities.\n *\n * #### Example: Basic usage\n * ```tsx\n * <VideoField\n *   label=\"Demo Video\"\n *   urlField=\"video.url\"\n * />\n * ```\n *\n * #### Example: With metadata fields\n * ```tsx\n * <VideoField\n *   label=\"Demo Video\"\n *   baseField=\"video\"\n *   urlField=\"url\"\n *   durationField=\"duration\"\n *   fileNameField=\"fileName\"\n *   fileSizeField=\"fileSize\"\n *   fileTypeField=\"fileType\"\n *   lastModifiedField=\"lastModified\"\n *   accept={{ 'video/*': ['.mp4', '.webm', '.ogg'] }}\n * />\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "VideoField: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "VideoFieldProps",
+              "canonicalReference": "@contember/react-ui-lib!VideoFieldProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            }
+          ],
+          "fileUrlPath": "src/form/upload.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "VideoField",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 6
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!VideoFieldProps:type",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type VideoFieldProps = "
+            },
+            {
+              "kind": "Reference",
+              "text": "BaseUploadFieldProps",
+              "canonicalReference": "@contember/react-ui-lib!BaseUploadFieldProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": " & "
+            },
+            {
+              "kind": "Reference",
+              "text": "VideoFileTypeProps",
+              "canonicalReference": "@contember/react-ui-lib!~VideoFileTypeProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/form/upload.tsx",
+          "releaseTag": "Public",
+          "name": "VideoFieldProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 4
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!VideoRepeaterField:var",
+          "docComment": "/**\n * VideoRepeaterField component - Ordered video upload collection\n *\n * #### Requirements - Must be used within an Entity context (`<EntitySubTree />` or `<EntityListSubTree />`).\n *\n * #### Features - Manages multiple video uploads - Video preview thumbnails - Drag-and-drop sequence control - Upload progress tracking\n *\n * #### Example: Basic usage\n * ```tsx\n * <VideoRepeaterField\n *   label=\"Course Videos\"\n *   field=\"courses\"\n *   urlField=\"video.url\"\n *   orderBy=\"createdAt\"\n * />\n * ```\n *\n * #### Example: Sortable with baseField and some optional props\n * ```tsx\n * <VideoRepeaterField\n *   field=\"courses\"\n *   baseField=\"video\"\n *   urlField=\"url\"\n *   sortableBy=\"order\"\n *   durationField=\"duration\"\n *   fileNameField=\"fileName\"\n *   fileSizeField=\"fileSize\"\n *   fileTypeField=\"fileType\"\n *   lastModifiedField=\"lastModified\"\n *   label=\"Course Videos\"\n * />\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "VideoRepeaterField: "
+            },
+            {
+              "kind": "Reference",
+              "text": "React.NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "VideoRepeaterFieldProps",
+              "canonicalReference": "@contember/react-ui-lib!VideoRepeaterFieldProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            }
+          ],
+          "fileUrlPath": "src/form/upload-repeaters.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "VideoRepeaterField",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 5
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!VideoRepeaterFieldProps:type",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type VideoRepeaterFieldProps = "
+            },
+            {
+              "kind": "Reference",
+              "text": "BaseFileRepeaterFieldProps",
+              "canonicalReference": "@contember/react-ui-lib!BaseFileRepeaterFieldProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": " & "
+            },
+            {
+              "kind": "Reference",
+              "text": "VideoFileTypeProps",
+              "canonicalReference": "@contember/react-ui-lib!~VideoFileTypeProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/form/upload-repeaters.tsx",
+          "releaseTag": "Public",
+          "name": "VideoRepeaterFieldProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 4
+          }
+        }
+      ]
+    }
+  ]
+}

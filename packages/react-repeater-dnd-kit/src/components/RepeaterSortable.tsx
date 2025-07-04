@@ -9,7 +9,7 @@ import { useRepeaterMethods, useRepeaterSortedEntities } from '@contember/react-
  * Initializes dnd-kit based sorting for the repeater.
  * Using the props, you can customize the behavior of the sorting and hook into the drag events.
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <Repeater {...}>
  *   <RepeaterSortable>

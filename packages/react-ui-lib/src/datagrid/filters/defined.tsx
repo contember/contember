@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { ReactNode } from 'react'
 import { DataViewBooleanFilterProps, DataViewIsDefinedFilter, DataViewNullFilterTrigger } from '@contember/react-dataview'
 import { Popover, PopoverContent, PopoverTrigger } from '../../ui/popover'
@@ -16,18 +15,21 @@ import { DataViewFieldLabel } from '../labels'
 export type DataGridIsDefinedFilterProps =
 	& Omit<DataViewBooleanFilterProps, 'children'>
 	& {
+		/**
+		 * Label for the filter.
+		 */
 		label: ReactNode
 	}
 
 /**
- * Is defined filter for DataGrid with default UI.
+ * Props {@link DataGridIsDefinedFilterProps}
  *
- * ## Props {@link DataGridIsDefinedFilterProps}
- * field, label, ?name
+ * `DataGridIsDefinedFilter` is a filter component for `DataGrid` that checks whether a field is defined or not.
+ * It provides a default UI for filtering records based on the presence of a value.
  *
- * ## Example
+ * #### Example: Basic usage
  * ```tsx
- * <DataGridIsDefinedFilter field={'deletedAt'} label="Is Deleted?" />
+ * <DataGridIsDefinedFilter field="deletedAt" label="Is Deleted?" />
  * ```
  */
 export const DataGridIsDefinedFilter = Component(({ label, ...props }: DataGridIsDefinedFilterProps) => (
@@ -65,9 +67,7 @@ const DataGridIsDefinedFilterList = () => (
 )
 
 
-const DataGridIsDefinedFilterSelect = ({ label }: {
-	label?: ReactNode
-}) => (
+const DataGridIsDefinedFilterSelect = ({ label }: { label?: ReactNode }) => (
 	<Popover>
 		<PopoverTrigger asChild>
 			<DataGridFilterSelectTriggerUI>{label}</DataGridFilterSelectTriggerUI>

@@ -9,7 +9,7 @@ import { dict } from '../dict'
  * Button for exporting data grid to CSV.
  * If no fields are provided, all fields will be exported.
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <DataGridExport />
  * ```

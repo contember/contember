@@ -27,7 +27,7 @@ export interface DataViewNumberFilterResetTriggerProps {
  *
  * See {@link DataViewNumberFilterResetTriggerProps} for details.
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <DataViewNumberFilterResetTrigger>
  *     <button>Reset Filter</button>

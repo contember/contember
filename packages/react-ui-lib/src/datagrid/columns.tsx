@@ -32,17 +32,19 @@ import { DataViewFieldLabel, DataViewHasManyLabel, DataViewHasOneLabel } from '.
 import { DataGridColumnLeaf } from './column-leaf'
 
 /**
- * Renders a column with action buttons. Should be used in a {@link DataGridTable}.
+ * `DataGridActionColumn` renders a column with action buttons in a `DataGridTable`.
+ * It is typically used to provide interactive controls such as edit, delete, or custom actions.
  *
- * ## Example
+ * #### Example: Basic usage with a button
  * ```tsx
  * <DataGridTable>
- *     <DataGridActionColumn>
- *         <Button>Click me</Button>
- *     </DataGridActionColumn>
+ *   <DataGridActionColumn>
+ *     <Button variant="outline">Click me</Button>
+ *   </DataGridActionColumn>
  * </DataGridTable>
  * ```
  */
+
 export const DataGridActionColumn = Component<{ children: ReactNode }>(({ children }) => (
 	<DataGridColumnLeaf
 		header={<TableHead className="w-0"></TableHead>}
@@ -81,12 +83,22 @@ export type DataGridTextColumnProps = {
 }
 
 /**
+ * Props {@link DataGridTextColumnProps}.
+ *
  * Renders a column with text content and column controls in a header. Should be used in a {@link DataGridTable}.
  *
- * ## Example
+ * #### Example: Basic Usage
  * ```tsx
  * <DataGridTable>
  *     <DataGridTextColumn field="title" />
+ *     <DataGridTextColumn
+ *         field="subtitle"
+ *         format={it => (
+ *             <span className="text-blue-500 flex items-center gap-2">
+ *                 <Heading2Icon /> {it}
+ *             </span>
+ *         )}
+ *     />
  *     <DataGridTextColumn field="description" format={it => it.slice(0, 100)} />
  * </DataGridTable>
  * ```
@@ -131,12 +143,16 @@ export type DataGridBooleanColumnProps = {
 }
 
 /**
+ * Props {@link DataGridBooleanColumnProps}.
+ *
  * Renders a column with boolean content. Should be used in a {@link DataGridTable}.
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <DataGridTable>
  *     <DataGridBooleanColumn field="isPublished" />
+ *     <DataGridBooleanColumn field="isActive" format={it => it ? 'Hooray' : 'Oh noooo!'} />
+ *     <DataGridBooleanColumn field="hasImage" format={it => it ? <CheckIcon /> : <XIcon />} />
  * </DataGridTable>
  * ```
  */
@@ -182,12 +198,17 @@ export type DataGridNumberColumnProps = {
 }
 
 /**
+ * Props {@link DataGridNumberColumnProps}.
+ *
  * Renders a column with number content. Should be used in a {@link DataGridTable}.
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <DataGridTable>
  *     <DataGridNumberColumn field="price" format={it => it.toFixed(2)} />
+ *     <DataGridNumberColumn field="price" header="Price with currency">
+ *         <Field field="price" /> <Field field="currency" />
+ *     </DataGridNumberColumn>
  * </DataGridTable>
  * ```
  */
@@ -232,9 +253,11 @@ export type DataGridDateColumnProps = {
 }
 
 /**
+ * Props {@link DataGridDateColumnProps}.
+ *
  * Renders a column with date content. Should be used in a {@link DataGridTable}.
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <DataGridTable>
  *     <DataGridDateColumn field="createdAt" />
@@ -283,9 +306,11 @@ export type DataGridDateTimeColumnProps = {
 }
 
 /**
+ * Props {@link DataGridDateTimeColumnProps}.
+ *
  * Renders a column with date-time content. Should be used in a {@link DataGridTable}.
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <DataGridTable>
  *     <DataGridDateTimeColumn field="createdAt" />
@@ -345,9 +370,11 @@ export type DataGridEnumColumnProps = {
 }
 
 /**
+ * Props {@link DataGridEnumColumnProps}.
+ *
  * Renders a column with enum content. Should be used in a {@link DataGridTable}.
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <DataGridTable>
  *     <DataGridEnumColumn field="status" />
@@ -409,9 +436,11 @@ export type DataGridEnumListColumnProps = {
 }
 
 /**
+ * Props {@link DataGridEnumListColumnProps}.
+ *
  * Renders a column with enum list content. Should be used in a {@link DataGridTable}.
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <DataGridTable>
  *     <DataGridEnumListColumn field="target" />
@@ -464,9 +493,11 @@ export type DataGridIsDefinedColumnProps = {
 }
 
 /**
+ * Props {@link DataGridIsDefinedColumnProps}.
+ *
  * Renders a column with is-defined content. Should be used in a {@link DataGridTable}.
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <DataGridTable>
  *     <DataGridIsDefinedColumn field="coverImage.url" />
@@ -514,6 +545,8 @@ export type DataGridUuidColumnProps = {
 
 
 /**
+ * Props {@link DataGridUuidColumnProps}.
+ *
  * Renders a column with UUID content. Should be used in a {@link DataGridTable}.
  */
 export const DataGridUuidColumn = Component<DataGridUuidColumnProps>(({ field, header, children, format }) => (
@@ -556,9 +589,11 @@ export type DataGridHasOneColumnProps = {
 }
 
 /**
+ * Props {@link DataGridHasOneColumnProps}.
+ *
  * Renders a column with has-one relation content. Should be used in a {@link DataGridTable}.
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <DataGridTable>
  *     <DataGridHasOneColumn field="author">
@@ -619,9 +654,11 @@ export type DataGridHasManyColumnProps = {
 }
 
 /**
+ * Props {@link DataGridHasManyColumnProps}
+ *
  * Renders a column with has-many relation content. Should be used in a {@link DataGridTable}.
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <DataGridTable>
  *     <DataGridHasManyColumn field="tags">
@@ -667,6 +704,8 @@ export type DataGridColumnProps = {
 }
 
 /**
+ * Props {@link DataGridColumnProps}
+ *
  * Low-level component for rendering a column in a data grid.
  */
 export const DataGridColumn = Component<DataGridColumnProps>(({ children, header, name, hidingName, sortingField, cellClassName, headerClassName, filter, filterName }) => {

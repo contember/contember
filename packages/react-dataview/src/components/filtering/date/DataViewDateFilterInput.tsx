@@ -33,7 +33,7 @@ export interface DataViewDateFilterInputProps {
  *
  * See {@link DataViewDateFilterInputProps} for details.
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <DataViewDateFilterInput type="start">
  *     <input placeholder="Start Date" />

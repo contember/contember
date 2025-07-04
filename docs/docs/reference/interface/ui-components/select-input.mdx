@@ -1,0 +1,295 @@
+# SelectInput & Friends
+
+## Overview
+`SelectInput` lets you render a selectable field that feels native yet powerful.  
+You can list options, allow inline entity creation, validate selections, and sort results—all within Contember.
+
+The component ships with small UI helpers (wrappers, list items, popover, etc.).  
+You combine them for a polished select or autocomplete experience.
+
+## Core Concepts
+- SelectInput wraps native selection behaviour into Contember forms.  
+- Popover-driven dropdown keeps the markup accessible and keyboard friendly.  
+- Sub-components separate concerns: wrapper, input, actions, list item, placeholder, and popover content.  
+- You may embed a “create new” form so users can add missing entities on the fly.  
+- Everything is composable—swap, style, or extend any UI part.
+
+## Installation
+```bash
+npm i @contember/react
+```
+
+```tsx
+import {
+	SelectInput,
+	SelectInputWrapperUI,
+	SelectInputUI,
+	SelectInputActionsUI,
+	SelectListItemUI,
+	SelectDefaultPlaceholderUI,
+	SelectPopoverContent,
+	SelectCreateNewTrigger,
+	DefaultSelectDataView,
+} from '@contember/react'
+```
+
+## Quick Start
+Smallest usable select with two static options.
+
+```tsx
+<SelectInput
+	field="category"
+	placeholder="Select a category"
+	options={[
+		{ field: 'id', operator: 'eq', value: '1', label: 'Option 1' },
+		{ field: 'id', operator: 'eq', value: '2', label: 'Option 2' },
+	]}
+	required
+>
+	<Field field="label" />
+</SelectInput>
+```
+
+## Detailed Guide
+1. Wrap your form or data grid with Contember providers.  
+2. Use `SelectInput` where you would normally render an `<input>` or `<select>`.  
+3. Supply `field`, `options`, and an optional `createNewForm`.  
+4. Inside the component tree you can refine the UI:
+
+```tsx
+<SelectInputWrapperUI>
+	<PopoverTrigger asChild>
+		<SelectInputUI className="w-full">
+			<SelectPlaceholder>
+				<SelectDefaultPlaceholderUI />
+			</SelectPlaceholder>
+
+			<SelectEachValue>
+				<Field field="label" />
+			</SelectEachValue>
+
+			<SelectInputActionsUI>
+				<ChevronDownIcon className="w-4 h-4 pointer-events-none" />
+			</SelectInputActionsUI>
+		</SelectInputUI>
+	</PopoverTrigger>
+
+	<SelectPopoverContent>
+		{({ items, handleItemClick, getItemLabel, getItemValue }) => (
+			items.map((item, index) => (
+				<SelectListItemUI
+					key={getItemValue(item) ?? index}
+					onClick={() => handleItemClick(item)}
+				>
+					{getItemLabel(item)}
+				</SelectListItemUI>
+			))
+		)}
+	</SelectPopoverContent>
+</SelectInputWrapperUI>
+```
+
+## Component API Reference
+
+### SelectInput
+Top-level component that wires Contember form state with the select UI.
+
+#### Props
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| asChild | `boolean` | No | Whether to render as a child component |
+| children | `ReactNode` | No | The content to render |
+| className | `string` | No | Additional CSS class name |
+| style | `CSSProperties` | No | Inline styles |
+| id | `string` | No | HTML id attribute |
+| aria-label | `string` | No | ARIA label for accessibility |
+
+#### Example
+```tsx
+<SelectInput
+	field="category"
+	placeholder="Select a category"
+	createNewForm={<div>New category form…</div>}
+	options={[
+		{ field: 'id', operator: 'eq', value: '1', label: 'Option 1' },
+		{ field: 'id', operator: 'eq', value: '2', label: 'Option 2' },
+	]}
+/>
+```
+
+### Sub-Components
+
+#### SelectInputWrapperUI
+Container that groups label, input, description, and popover trigger.
+
+##### Props
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| asChild | `boolean` | No | Whether to render as a child component |
+| children | `ReactNode` | No | The content to render |
+| className | `string` | No | Additional CSS class name |
+| style | `CSSProperties` | No | Inline styles |
+| id | `string` | No | HTML id attribute |
+| aria-label | `string` | No | ARIA label for accessibility |
+
+##### Example
+```tsx
+<SelectInputWrapperUI className="space-y-1">
+	<PopoverTrigger asChild>
+		<SelectInputUI>
+			<SelectDefaultPlaceholderUI />
+			<SelectInputActionsUI>
+				<ChevronDownIcon className="w-4 h-4" />
+			</SelectInputActionsUI>
+		</SelectInputUI>
+	</PopoverTrigger>
+</SelectInputWrapperUI>
+```
+
+#### SelectInputUI
+Clickable area that shows the current value and holds action icons.
+
+##### Props
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| asChild | `boolean` | No | Whether to render as a child component |
+| children | `ReactNode` | No | The content to render |
+| className | `string` | No | Additional CSS class name |
+| style | `CSSProperties` | No | Inline styles |
+| id | `string` | No | HTML id attribute |
+| aria-label | `string` | No | ARIA label for accessibility |
+
+```tsx
+<SelectInputUI disabled className="w-48">
+	<SelectDefaultPlaceholderUI />
+	<SelectInputActionsUI>
+		<ChevronDownIcon className="w-4 h-4" />
+	</SelectInputActionsUI>
+</SelectInputUI>
+```
+
+#### SelectInputActionsUI
+Right-aligned action slot (clear button, chevron, loader, …).
+
+##### Props
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| asChild | `boolean` | No | Whether to render as a child component |
+| children | `ReactNode` | No | The content to render |
+| className | `string` | No | Additional CSS class name |
+| style | `CSSProperties` | No | Inline styles |
+| id | `string` | No | HTML id attribute |
+| aria-label | `string` | No | ARIA label for accessibility |
+
+```tsx
+<SelectInputActionsUI>
+	<Loader size="sm" />
+</SelectInputActionsUI>
+```
+
+#### SelectListItemUI
+Single row inside the dropdown list.
+
+##### Props
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| asChild | `boolean` | No | Whether to render as a child component |
+| children | `ReactNode` | No | The content to render |
+| className | `string` | No | Additional CSS class name |
+| style | `CSSProperties` | No | Inline styles |
+| id | `string` | No | HTML id attribute |
+| aria-label | `string` | No | ARIA label for accessibility |
+
+```tsx
+<SelectListItemUI onClick={() => alert('clicked')}>
+	Option title
+</SelectListItemUI>
+```
+
+#### SelectDefaultPlaceholderUI
+Gray placeholder rendered when nothing is selected.
+
+##### Props
+<!-- props:SelectDefaultPlaceholderUI -->
+
+```tsx
+<SelectDefaultPlaceholderUI />
+```
+
+#### SelectPopoverContent
+Scrollable dropdown body that hosts list items or search input.
+
+##### Props
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| asChild | `boolean` | No | Whether to render as a child component |
+| children | `ReactNode` | No | The content to render |
+| className | `string` | No | Additional CSS class name |
+| style | `CSSProperties` | No | Inline styles |
+| id | `string` | No | HTML id attribute |
+| aria-label | `string` | No | ARIA label for accessibility |
+
+```tsx
+<SelectPopoverContent>
+	<SelectListItemUI>Loading…</SelectListItemUI>
+</SelectPopoverContent>
+```
+
+#### SelectCreateNewTrigger
+Button or element that lets users add a new entity directly from the dropdown.
+
+##### Props
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| asChild | `boolean` | No | Whether to render as a child component |
+| children | `ReactNode` | No | The content to render |
+| className | `string` | No | Additional CSS class name |
+| style | `CSSProperties` | No | Inline styles |
+| id | `string` | No | HTML id attribute |
+| aria-label | `string` | No | ARIA label for accessibility |
+
+#### DefaultSelectDataView
+Helper that connects a data view with a default renderer for selects.
+
+##### Props
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| children | `ReactNode` | Yes | /**
+ * Children elements to be rendered inside the default data view renderer.
+ */
+ |
+| initialSorting | `DataViewSortingDirections` | No | /**
+ * Optional initial sorting direction for the data view.
+ */
+ |
+| queryField | `DataViewUnionFilterFields` | No | /**
+ * Optional field used for querying the data view.
+ */
+ |
+
+```tsx
+<DefaultSelectDataView queryField="status" initialSorting="asc">
+	{/* ItemRenderer goes here */}
+</DefaultSelectDataView>
+```
+
+## Examples
+- Language picker that toggles source and target locales.  
+- Autocomplete with search box inside `SelectPopoverContent`.  
+- Data grid filter using `SelectPopoverContent` and `DefaultSelectDataView`.
+
+## Best Practices & Gotchas
+- Always pass a stable `field` prop so Contember can track value correctly.  
+- Wrap input and popover trigger in `PopoverTrigger asChild` to forward events.  
+- Provide clear, unique `label`s for list items. Avoid duplicates.  
+- Use `SelectDefaultPlaceholderUI` for consistent empty state visuals.  
+- Keep list items keyboard reachable; rely on native focus order.
+
+## Further Reading
+- Contember Form components  
+- Popover primitives  
+- DataView and DataGrid filtering
+
+<!-- End of Generated Documentation -->
+
+> **Note:** Props reference has been automatically enhanced with precise API types from API Extractor.

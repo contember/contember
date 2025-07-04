@@ -39,7 +39,7 @@ export interface RepeaterAddItemTriggerProps {
  * ## Props {@link RepeaterAddItemTriggerProps}
  * - children, ?index, ?preprocess
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <RepeaterAddItemTrigger index="first">
  *   <button>Add Item</button>

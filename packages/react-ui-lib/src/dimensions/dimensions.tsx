@@ -13,63 +13,122 @@ import {
 	useDimensionState,
 	useEntity,
 } from '@contember/interface'
-import { DataView, DataViewEachRow, DataViewLoaderState, DataViewSortingDirections, useDataViewEntityListAccessor } from '@contember/react-dataview'
-import * as React from 'react'
-import { ReactNode, useMemo } from 'react'
+import {
+	DataView,
+	DataViewEachRow,
+	DataViewLoaderState,
+	DataViewSortingDirections,
+	useDataViewEntityListAccessor,
+} from '@contember/react-dataview'
 import { CheckIcon } from 'lucide-react'
+import { ReactNode, useMemo } from 'react'
+import { Button } from '../ui/button'
 import { Loader } from '../ui/loader'
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
-import { Button } from '../ui/button'
 
+/**
+ * Props for the {@link DimensionsSwitcher} component.
+ */
 export interface DimensionsSwitcherProps {
+	/**
+	 * Entity list for dimension options
+	 * */
 	options: SugaredQualifiedEntityList['entities']
+	/**
+	 * Specifies initial sorting of the options (e.g., `{ label: 'desc' }`).
+	 * */
 	orderBy?: DataViewSortingDirections
+	/**
+	 * The name of the dimension to switch.
+	 * */
 	dimension: string
+	/**
+	 * Child components or fields to render within the dimension selector.
+	 * */
 	children: ReactNode
+	/**
+	 * Field containing unique dimension identifiers
+	 * */
 	slugField: SugaredRelativeSingleField['field']
+	/**
+	 * Enables multi-selection mode.
+	 * */
 	isMulti?: boolean
 }
 
-export const DimensionsSwitcher = Component(({ options, dimension, children, slugField, orderBy, isMulti }: DimensionsSwitcherProps) => {
-	return (
-		<DataView entities={options} initialSorting={orderBy}>
-			<DataViewLoaderState initial refreshing>
-				<Loader position={'static'} />
-			</DataViewLoaderState>
-			<DataViewLoaderState loaded>
+/**
+ * Props {@link DimensionsSwitcherProps}.
+ *
+ * `DimensionsSwitcher` is a UI component for switching between different dimensions of data.
+ *
+ * #### Example: Basic usage
+ * ```tsx
+ * <DimensionsSwitcher
+ *   dimension="locale"
+ *   slugField="code"
+ *   options="DimensionsLocale"
+ * >
+ *   <Field field="label" />
+ * </DimensionsSwitcher>
+ * ```
+ *
+ * #### Example: With initial sorting and multi-selection
+ * ```tsx
+ * <DimensionsSwitcher
+ *   dimension="locale"
+ *   slugField="code"
+ *   options="DimensionsLocale"
+ *   orderBy={{ label: 'desc' }}
+ *   isMulti
+ * >
+ *   <Field field="label" />
+ * </DimensionsSwitcher>
+ * ```
+ */
+export const DimensionsSwitcher = Component<DimensionsSwitcherProps>(props => (
+	<DataView entities={props.options} initialSorting={props.orderBy}>
+		<DataViewLoaderState initial refreshing>
+			<Loader position="static" />
+		</DataViewLoaderState>
 
-				<Popover>
-					<PopoverTrigger asChild>
-						<Button variant={'outline'} size="sm">
-							<DimensionSwitcherCurrentValues dimension={dimension} slugField={slugField}>
-								{children}
-							</DimensionSwitcherCurrentValues>
-						</Button>
-					</PopoverTrigger>
-					<PopoverContent className="p-2" align="start">
-						<div className="flex flex-col gap-1">
-							<DataViewEachRow>
-								<DimensionSwitcherItem dimension={dimension} slugField={slugField} isMulti={isMulti}>
-									{children}
-									<StaticRender>
-										<Field field={slugField} />
-									</StaticRender>
-								</DimensionSwitcherItem>
-							</DataViewEachRow>
-						</div>
-					</PopoverContent>
-				</Popover>
-			</DataViewLoaderState>
-		</DataView>
-	)
-})
+		<DataViewLoaderState loaded>
+			<Popover>
+				<PopoverTrigger asChild>
+					<Button variant="outline" size="sm">
+						<DimensionSwitcherCurrentValues dimension={props.dimension} slugField={props.slugField}>
+							{props.children}
+						</DimensionSwitcherCurrentValues>
+					</Button>
+				</PopoverTrigger>
+				<PopoverContent className="p-2" align="start">
+					<div className="flex flex-col gap-1">
+						<DataViewEachRow>
+							<DimensionSwitcherItem dimension={props.dimension} slugField={props.slugField} isMulti={props.isMulti}>
+								{props.children}
+								<StaticRender>
+									<Field field={props.slugField} />
+								</StaticRender>
+							</DimensionSwitcherItem>
+						</DataViewEachRow>
+					</div>
+				</PopoverContent>
+			</Popover>
+		</DataViewLoaderState>
+	</DataView>
+))
 
-const DimensionSwitcherCurrentValues = ({ children, dimension, slugField }: { children: ReactNode; dimension: string; slugField: SugaredRelativeSingleField['field'] }) => {
+interface DimensionSwitcherCurrentValuesProps {
+	children: ReactNode
+	dimension: string
+	slugField: SugaredRelativeSingleField['field']
+}
+
+const DimensionSwitcherCurrentValues = ({ children, dimension, slugField }: DimensionSwitcherCurrentValuesProps) => {
 	const entitiesBySlug = useDimensionEntitiesBySlug(slugField)
-
+	const [defaultValue] = Object.keys(entitiesBySlug)
 	const currentDimensionValue = useDimensionState({
 		dimension,
-		defaultValue: Object.keys(entitiesBySlug)[0],
+		defaultValue,
 		storage: 'local',
 	})
 
@@ -88,10 +147,17 @@ const DimensionSwitcherCurrentValues = ({ children, dimension, slugField }: { ch
 	)
 }
 
+interface DimensionSwitcherItemProps {
+	children: ReactNode
+	dimension: string
+	slugField: SugaredRelativeSingleField['field']
+	isMulti?: boolean
+}
 
-const DimensionSwitcherItem = ({ children, dimension, slugField, isMulti }: { children: ReactNode; dimension: string; slugField: SugaredRelativeSingleField['field']; isMulti?: boolean }) => {
+const DimensionSwitcherItem = ({ children, dimension, slugField, isMulti }: DimensionSwitcherItemProps) => {
 	const entity = useEntity()
 	const slugValue = entity.getField<string>(slugField).value
+
 	if (!slugValue) {
 		return null
 	}
@@ -107,13 +173,46 @@ const DimensionSwitcherItem = ({ children, dimension, slugField, isMulti }: { ch
 	)
 }
 
+
+/**
+ * Props for the {@link SideDimensions} component.
+ */
 export interface SideDimensionsProps {
+	/**
+	 * The name of the dimension to render.
+	 */
 	dimension: string
+	/**
+	 * The name of the dimension to use in the context.
+	 */
 	as: string
+	/**
+	 * The field to filter by.
+	 */
 	field: SugaredRelativeSingleEntity['field']
+	/**
+	 * Child components or fields to render within the dimension selector.
+	 */
 	children: ReactNode
 }
 
+/**
+ * Props {@link SideDimensionsProps}.
+ *
+ * `SideDimensions` is a layout component that renders a dimension within a flexible side panel.
+ * It wraps its content inside a `DimensionRenderer` and `HasOne` field relationship.
+ *
+ * #### Example: Basic Usage
+ * ```tsx
+ * <SideDimensions
+ *   dimension="locale"
+ *   as="currentLocale"
+ *   field="locales(locale.code = $currentLocale)"
+ * >
+ *   <InputField field="title" />
+ * </SideDimensions>
+ * ```
+ */
 export const SideDimensions = Component<SideDimensionsProps>(({ dimension, children, as, field }) => {
 	return (
 		<div className="flex mt-4 gap-4">

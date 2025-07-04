@@ -1,0 +1,126 @@
+# SortableMultiSelectField
+
+## Overview
+SortableMultiSelectField lets you pick multiple related entities and order them with drag-and-drop.  
+It extends MultiSelectField, adds sortable handling, and stores the explicit order in a chosen field.
+
+## Core Concepts
+* Works only inside an entity context (`<EntitySubTree />` or `<EntityListSubTree />`).
+* Needs a numeric sort column supplied through `sortableBy`.
+* `connectAt` tells Contember which relation to use for connecting items.
+* Dragging items updates their order instantly in the form state.
+* All visual, validation, and option features of MultiSelectField stay available.
+
+## Installation
+```tsx
+// pick the import path you already use for Contember form components
+import { SortableMultiSelectField } from '@app/lib/form'
+```
+
+## Quick Start
+```tsx
+<SortableMultiSelectField
+  field="chapterPages"
+  label="Page order"
+  sortableBy="pageNumber"
+  connectAt="bookChapter"
+>
+  <Field field="content" />
+</SortableMultiSelectField>
+```
+
+## Detailed Guide
+1. Wrap your edit page in Binding and an entity subtree.
+2. Add SortableMultiSelectField.
+3. Pass  
+   * `field` – the has-many relation you are editing.  
+   * `sortableBy` – the column used to store order.  
+   * `connectAt` – the has-one relation path that links the item.
+4. Provide children that render each option’s preview (most often `<Field field="name" />`).
+5. Items appear with drag handles. Drag to reorder.  
+6. PersistButton saves both connections and order.
+
+```tsx
+<Binding>
+  <Slots.Actions><PersistButton /></Slots.Actions>
+
+  <EntitySubTree entity="Article(unique = $id)">
+    <SortableMultiSelectField
+      field="articleTags"
+      label="Tags"
+      options="Tag"
+      connectAt="tag"
+      sortableBy="order"
+    >
+      <Field field="internalName" />
+    </SortableMultiSelectField>
+  </EntitySubTree>
+</Binding>
+```
+
+## Component API Reference
+
+### SortableMultiSelectField
+#### Props
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| asChild | `boolean` | No | Whether to render as a child component |
+| children | `ReactNode` | No | The content to render |
+| className | `string` | No | Additional CSS class name |
+| style | `CSSProperties` | No | Inline styles |
+| id | `string` | No | HTML id attribute |
+| aria-label | `string` | No | ARIA label for accessibility |
+
+| prop | type | required | description |
+| ---- | ---- | -------- | ----------- |
+| `field` | string &#124; object | ✔️ | Has-many relation you are editing. |
+| `sortableBy` | string &#124; object | ✔️ | Field that stores the order (integer). |
+| `connectAt` | string &#124; relation | ✔️ | Path to the has-one relation for connection. |
+| `label` | ReactNode | ✔️ | Field label. |
+| `children` | ReactNode | ✔️ | Option renderer, usually one or more `<Field>` nodes. |
+| … | _see MultiSelectField_ | | All other props of MultiSelectField are supported. |
+
+## Hooks
+_No dedicated hooks._
+
+## Examples
+### Has-many ordered values
+```tsx
+<SortableMultiSelectField
+  field="hasManySorted"
+  label="Values"
+  connectAt="value"
+  sortableBy="order"
+>
+  <Field field="name" />
+</SortableMultiSelectField>
+```
+
+### Tag picker inside a complex form
+```tsx
+<SortableMultiSelectField
+  options="Tag"
+  field="location.tags"
+  connectAt="tag"
+  sortableBy="order"
+  label="Tags"
+>
+  <Field field="internalName" />
+</SortableMultiSelectField>
+```
+
+## Best Practices & Gotchas
+* Always create an integer column (`order` or similar) and make it required; null breaks ordering.
+* Place PersistButton somewhere in the page; drag changes live only in form state.
+* Do not sort on the server side too—let the component manage order.
+* Children should be lightweight; heavy render slows drag performance.
+* Use `initialSorting` only for virtual ordering of unselected options, not for selected items.
+
+## Further Reading
+* MultiSelectField – parent component with filtering and option handling.
+* Field – renders individual fields inside options.
+* EntitySubTree – scoping entity contexts.
+
+<!-- End of Generated Documentation -->
+
+> **Note:** Props reference has been automatically enhanced with precise API types from API Extractor.

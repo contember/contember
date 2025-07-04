@@ -1,0 +1,578 @@
+{
+  "metadata": {
+    "toolPackage": "@microsoft/api-extractor",
+    "toolVersion": "7.52.8",
+    "schemaVersion": 1011,
+    "oldestForwardsCompatibleVersion": 1001,
+    "tsdocConfig": {
+      "$schema": "https://developer.microsoft.com/json-schemas/tsdoc/v0/tsdoc.schema.json",
+      "noStandardTags": true,
+      "tagDefinitions": [
+        {
+          "tagName": "@alpha",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@beta",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@defaultValue",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@decorator",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@deprecated",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@eventProperty",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@example",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@experimental",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@inheritDoc",
+          "syntaxKind": "inline"
+        },
+        {
+          "tagName": "@internal",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@label",
+          "syntaxKind": "inline"
+        },
+        {
+          "tagName": "@link",
+          "syntaxKind": "inline",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@override",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@packageDocumentation",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@param",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@privateRemarks",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@public",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@readonly",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@remarks",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@returns",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@sealed",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@see",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@throws",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@typeParam",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@virtual",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@group",
+          "syntaxKind": "block"
+        }
+      ],
+      "reportUnsupportedHtmlElements": false
+    }
+  },
+  "kind": "Package",
+  "canonicalReference": "@contember/react-ui-lib!",
+  "docComment": "",
+  "name": "@contember/react-ui-lib",
+  "preserveMemberOrder": false,
+  "members": [
+    {
+      "kind": "EntryPoint",
+      "canonicalReference": "@contember/react-ui-lib!",
+      "name": "",
+      "preserveMemberOrder": false,
+      "members": [
+        {
+          "kind": "Function",
+          "canonicalReference": "@contember/react-ui-lib!cn:function(1)",
+          "docComment": "/**\n * `cn` is a utility function that combines Tailwind CSS class names using `clsx` and merges conflicting classes with `twMerge`.\n *\n * Useful for composing conditional and dynamic className values in React components with Tailwind, ensuring the final output avoids duplicates or conflicts.\n *\n * #### Example: Conditional class merging\n * ```tsx\n * const Button = ({ isPrimary }: { isPrimary?: boolean }) => {\n *   return (\n *     <button className={cn('px-4 py-2', isPrimary && 'bg-blue-500', 'text-white')}>\n *       Click me\n *     </button>\n *   )\n * }\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "cn: (...inputs: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ClassValue",
+              "canonicalReference": "clsx!clsx.ClassValue:type"
+            },
+            {
+              "kind": "Content",
+              "text": "[]"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Content",
+              "text": "string"
+            }
+          ],
+          "fileUrlPath": "src/utils/cn.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 4,
+            "endIndex": 5
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "inputs",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 3
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "cn"
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!ConfigVariants:type",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type ConfigVariants<T extends "
+            },
+            {
+              "kind": "Reference",
+              "text": "ConfigSchema",
+              "canonicalReference": "@contember/react-ui-lib!~ConfigSchema:type"
+            },
+            {
+              "kind": "Content",
+              "text": " | undefined"
+            },
+            {
+              "kind": "Content",
+              "text": "> = "
+            },
+            {
+              "kind": "Content",
+              "text": "T extends "
+            },
+            {
+              "kind": "Reference",
+              "text": "ConfigSchema",
+              "canonicalReference": "@contember/react-ui-lib!~ConfigSchema:type"
+            },
+            {
+              "kind": "Content",
+              "text": " ? {\n    [Variant in keyof T]?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "StringToBoolean",
+              "canonicalReference": "@contember/react-ui-lib!~StringToBoolean:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<keyof T[Variant]> | null | undefined;\n} : {}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/utils/uic.tsx",
+          "releaseTag": "Public",
+          "name": "ConfigVariants",
+          "typeParameters": [
+            {
+              "typeParameterName": "T",
+              "constraintTokenRange": {
+                "startIndex": 1,
+                "endIndex": 3
+              },
+              "defaultTypeTokenRange": {
+                "startIndex": 0,
+                "endIndex": 0
+              }
+            }
+          ],
+          "typeTokenRange": {
+            "startIndex": 4,
+            "endIndex": 9
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!NoInfer_2:type",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type NoInfer<T> = "
+            },
+            {
+              "kind": "Content",
+              "text": "T & {\n    [K in keyof T]: T[K];\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/utils/uic.tsx",
+          "releaseTag": "Public",
+          "name": "NoInfer_2",
+          "typeParameters": [
+            {
+              "typeParameterName": "T",
+              "constraintTokenRange": {
+                "startIndex": 0,
+                "endIndex": 0
+              },
+              "defaultTypeTokenRange": {
+                "startIndex": 0,
+                "endIndex": 0
+              }
+            }
+          ],
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          }
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@contember/react-ui-lib!uic:function(1)",
+          "docComment": "/**\n * Props are inferred from the base element and the provided config.\n *\n * `uic` is a utility function that enhances a base React component with configurable styling and structural behaviors using a utility-based class variance system (e.g., `cva`).\n *\n * It wraps the base component and provides features including: - Variant-based styling using `cva` configuration - Optional mapping of variant values to `data-*` attributes - Conditional rendering via `asChild` to support component composition - Structural wrapping of children (`wrapInner`) and of the whole component (`wrapOuter`) - Automatic filtering of unused variant props unless passed in `passVariantProps`\n *\n * The `wrapInner` and `wrapOuter` props in the config allow injecting extra layout structure: - `wrapInner`: Wraps the component's children in a custom element (e.g., for padding or effects) - `wrapOuter`: Wraps the entire rendered component (e.g., for layout constraints or portals)\n *\n * Must be used with a `Config` object that defines styling, variant options, and optional wrappers.\n *\n * #### Example: Basic usage with variant styling\n * ```tsx\n * const Button = uic('button', {\n *   baseClass: 'px-4 py-2 font-bold',\n *   variants: {\n *     intent: {\n *       primary: 'bg-blue-500 text-white',\n *       secondary: 'bg-gray-500 text-white',\n *     },\n *   },\n *   defaultVariants: { intent: 'primary' },\n *   displayName: 'Button',\n * })\n *\n * <Button intent=\"secondary\">Click me</Button>\n * ```\n *\n * #### Example: Using `wrapInner` and `wrapOuter`\n * ```tsx\n * const Card = uic('div', {\n *   baseClass: 'bg-white shadow-md rounded',\n *   wrapInner: 'section',\n *   wrapOuter: ({ children }) => <div className=\"p-4 border\">{children}</div>,\n *   displayName: 'Card',\n * })\n *\n * <Card>\n *   <p>Hello world</p>\n * </Card>\n *\n * // Results in:\n * // <div class=\"p-4 border\">\n * //   <div class=\"bg-white shadow-md rounded\">\n * //     <section>\n * //       <p>Hello world</p>\n * //     </section>\n * //   </div>\n * // </div>\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "uic: <El extends "
+            },
+            {
+              "kind": "Reference",
+              "text": "React.ElementType",
+              "canonicalReference": "@types/react!React.ElementType:type"
+            },
+            {
+              "kind": "Content",
+              "text": ", Variants extends "
+            },
+            {
+              "kind": "Reference",
+              "text": "ConfigSchema",
+              "canonicalReference": "@contember/react-ui-lib!~ConfigSchema:type"
+            },
+            {
+              "kind": "Content",
+              "text": " | undefined"
+            },
+            {
+              "kind": "Content",
+              "text": " = "
+            },
+            {
+              "kind": "Content",
+              "text": "undefined"
+            },
+            {
+              "kind": "Content",
+              "text": ">(Component: "
+            },
+            {
+              "kind": "Content",
+              "text": "El"
+            },
+            {
+              "kind": "Content",
+              "text": ", config: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Config",
+              "canonicalReference": "@contember/react-ui-lib!~Config:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<Variants, "
+            },
+            {
+              "kind": "Reference",
+              "text": "NoInfer",
+              "canonicalReference": "@contember/react-ui-lib!NoInfer_2:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<El>>"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "ForwardRefExoticComponent",
+              "canonicalReference": "@types/react!React.ForwardRefExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "PropsWithoutRef",
+              "canonicalReference": "@types/react!React.PropsWithoutRef:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "ComponentProps",
+              "canonicalReference": "@types/react!React.ComponentProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<El> & {\n    asChild?: boolean;\n    children?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    className?: string;\n} & "
+            },
+            {
+              "kind": "Reference",
+              "text": "ConfigVariants",
+              "canonicalReference": "@contember/react-ui-lib!ConfigVariants:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<Variants>> & import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "RefAttributes",
+              "canonicalReference": "@types/react!React.RefAttributes:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "ElementRef",
+              "canonicalReference": "@types/react!React.ElementRef:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<El>>>"
+            }
+          ],
+          "fileUrlPath": "src/utils/uic.tsx",
+          "returnTypeTokenRange": {
+            "startIndex": 15,
+            "endIndex": 30
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "Component",
+              "parameterTypeTokenRange": {
+                "startIndex": 8,
+                "endIndex": 9
+              },
+              "isOptional": false
+            },
+            {
+              "parameterName": "config",
+              "parameterTypeTokenRange": {
+                "startIndex": 10,
+                "endIndex": 14
+              },
+              "isOptional": false
+            }
+          ],
+          "typeParameters": [
+            {
+              "typeParameterName": "El",
+              "constraintTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "defaultTypeTokenRange": {
+                "startIndex": 0,
+                "endIndex": 0
+              }
+            },
+            {
+              "typeParameterName": "Variants",
+              "constraintTokenRange": {
+                "startIndex": 3,
+                "endIndex": 5
+              },
+              "defaultTypeTokenRange": {
+                "startIndex": 6,
+                "endIndex": 7
+              }
+            }
+          ],
+          "name": "uic"
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@contember/react-ui-lib!uiconfig:function(1)",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "uiconfig: <T extends "
+            },
+            {
+              "kind": "Reference",
+              "text": "ConfigSchema",
+              "canonicalReference": "@contember/react-ui-lib!~ConfigSchema:type"
+            },
+            {
+              "kind": "Content",
+              "text": " | undefined"
+            },
+            {
+              "kind": "Content",
+              "text": ">(config: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Config",
+              "canonicalReference": "@contember/react-ui-lib!~Config:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<T, "
+            },
+            {
+              "kind": "Reference",
+              "text": "ComponentType",
+              "canonicalReference": "@types/react!React.ComponentType:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<{}>>"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Reference",
+              "text": "Config",
+              "canonicalReference": "@contember/react-ui-lib!~Config:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<T, "
+            },
+            {
+              "kind": "Reference",
+              "text": "ComponentType",
+              "canonicalReference": "@types/react!React.ComponentType:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<{}>>"
+            }
+          ],
+          "fileUrlPath": "src/utils/uic.tsx",
+          "returnTypeTokenRange": {
+            "startIndex": 9,
+            "endIndex": 13
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "config",
+              "parameterTypeTokenRange": {
+                "startIndex": 4,
+                "endIndex": 8
+              },
+              "isOptional": false
+            }
+          ],
+          "typeParameters": [
+            {
+              "typeParameterName": "T",
+              "constraintTokenRange": {
+                "startIndex": 1,
+                "endIndex": 3
+              },
+              "defaultTypeTokenRange": {
+                "startIndex": 0,
+                "endIndex": 0
+              }
+            }
+          ],
+          "name": "uiconfig"
+        }
+      ]
+    }
+  ]
+}

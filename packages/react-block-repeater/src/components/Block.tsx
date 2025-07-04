@@ -29,7 +29,7 @@ export interface BlockProps {
  * ## Props {@link BlockProps}
  * - name, children, ?label, ?form
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <Block name="text" label="Text">
  *     <Field field="content" />

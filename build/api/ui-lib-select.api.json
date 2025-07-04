@@ -1,0 +1,2292 @@
+{
+  "metadata": {
+    "toolPackage": "@microsoft/api-extractor",
+    "toolVersion": "7.52.8",
+    "schemaVersion": 1011,
+    "oldestForwardsCompatibleVersion": 1001,
+    "tsdocConfig": {
+      "$schema": "https://developer.microsoft.com/json-schemas/tsdoc/v0/tsdoc.schema.json",
+      "noStandardTags": true,
+      "tagDefinitions": [
+        {
+          "tagName": "@alpha",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@beta",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@defaultValue",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@decorator",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@deprecated",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@eventProperty",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@example",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@experimental",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@inheritDoc",
+          "syntaxKind": "inline"
+        },
+        {
+          "tagName": "@internal",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@label",
+          "syntaxKind": "inline"
+        },
+        {
+          "tagName": "@link",
+          "syntaxKind": "inline",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@override",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@packageDocumentation",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@param",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@privateRemarks",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@public",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@readonly",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@remarks",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@returns",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@sealed",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@see",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@throws",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@typeParam",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@virtual",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@group",
+          "syntaxKind": "block"
+        }
+      ],
+      "reportUnsupportedHtmlElements": false
+    }
+  },
+  "kind": "Package",
+  "canonicalReference": "@contember/react-ui-lib!",
+  "docComment": "",
+  "name": "@contember/react-ui-lib",
+  "preserveMemberOrder": false,
+  "members": [
+    {
+      "kind": "EntryPoint",
+      "canonicalReference": "@contember/react-ui-lib!",
+      "name": "",
+      "preserveMemberOrder": false,
+      "members": [
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!DefaultSelectDataView:var",
+          "docComment": "/**\n * Props {@link DefaultSelectDataViewProps}\n *\n * `DefaultSelectDataView` provides a wrapper around `SelectDataView` with a default renderer. It simplifies setting up a data view selection with initial sorting and query field options.\n *\n * Must be used inside a context where `SelectDataView` is valid.\n *\n * #### Example: Basic usage\n * ```tsx\n * <DefaultSelectDataView queryField=\"status\" initialSorting=\"asc\">\n *   <ItemRenderer />\n * </DefaultSelectDataView>\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "DefaultSelectDataView: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "DefaultSelectDataViewProps",
+              "canonicalReference": "@contember/react-ui-lib!DefaultSelectDataViewProps:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            }
+          ],
+          "fileUrlPath": "src/select/list.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "DefaultSelectDataView",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 6
+          }
+        },
+        {
+          "kind": "Interface",
+          "canonicalReference": "@contember/react-ui-lib!DefaultSelectDataViewProps:interface",
+          "docComment": "/**\n * Props for {@link DefaultSelectDataView}.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export interface DefaultSelectDataViewProps "
+            }
+          ],
+          "fileUrlPath": "src/select/list.tsx",
+          "releaseTag": "Public",
+          "name": "DefaultSelectDataViewProps",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@contember/react-ui-lib!DefaultSelectDataViewProps#children:member",
+              "docComment": "/**\n * Children elements to be rendered inside the default data view renderer.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "children: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ReactNode",
+                  "canonicalReference": "@types/react!React.ReactNode:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "children",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@contember/react-ui-lib!DefaultSelectDataViewProps#initialSorting:member",
+              "docComment": "/**\n * Optional initial sorting direction for the data view.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "initialSorting?: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "DataViewSortingDirections",
+                  "canonicalReference": "@contember/react-ui-lib!~DataViewSortingDirections:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": true,
+              "releaseTag": "Public",
+              "name": "initialSorting",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@contember/react-ui-lib!DefaultSelectDataViewProps#queryField:member",
+              "docComment": "/**\n * Optional field used for querying the data view.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "queryField?: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "DataViewUnionFilterFields",
+                  "canonicalReference": "@contember/react-ui-lib!~DataViewUnionFilterFields:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": true,
+              "releaseTag": "Public",
+              "name": "queryField",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            }
+          ],
+          "extendsTokenRanges": []
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!MultiSelectInput:var",
+          "docComment": "/**\n * MultiSelectInput is a component for selecting multiple values from a list of options, with support for inline entity creation, filtering, and sorting.\n *\n * #### Example: Basic usage with inline entity creation\n * ```tsx\n * <MultiSelectInput\n *   field=\"tags\"\n *   placeholder=\"Select tags\"\n *   options={[\n *     { field: 'id', operator: 'eq', value: '1', label: 'Tag 1' },\n *     { field: 'id', operator: 'eq', value: '2', label: 'Tag 2' },\n *   ]}\n *   createNewForm={<div>Form to create a new tag</div>}\n *   initialSorting=\"ASC\"\n * >\n *   <Field field=\"name\" />\n * </MultiSelectInput>\n * ```\n *\n * #### Sub-components - {@link SelectInputWrapperUI} - {@link SelectInputUI} - {@link SelectDefaultPlaceholderUI} - {@link MultiSelectItemWrapperUI} - {@link SelectEachValue} - {@link MultiSelectItemUI} - {@link MultiSelectItemContentUI} - {@link SelectItemTrigger} - {@link MultiSelectItemRemoveButtonUI} - {@link SelectInputActionsUI} - {@link SelectPopoverContent} - {@link Popover} - {@link PopoverTrigger}\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "MultiSelectInput: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<{\n    field: "
+            },
+            {
+              "kind": "Reference",
+              "text": "SugaredRelativeEntityList",
+              "canonicalReference": "@contember/react-ui-lib!~SugaredRelativeEntityList:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "[\"field\"];\n    options?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "SugaredQualifiedEntityList",
+              "canonicalReference": "@contember/react-ui-lib!~SugaredQualifiedEntityList:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "[\"entities\"];\n    children: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    placeholder?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    createNewForm?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    queryField?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "DataViewUnionFilterFields",
+              "canonicalReference": "@contember/react-ui-lib!~DataViewUnionFilterFields:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    initialSorting?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "DataViewSortingDirections",
+              "canonicalReference": "@contember/react-ui-lib!~DataViewSortingDirections:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}>"
+            }
+          ],
+          "fileUrlPath": "src/select/multi-select.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "MultiSelectInput",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 18
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!MultiSelectInputProps:type",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type MultiSelectInputProps = "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    field: "
+            },
+            {
+              "kind": "Reference",
+              "text": "SugaredRelativeEntityList",
+              "canonicalReference": "@contember/react-ui-lib!~SugaredRelativeEntityList:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "['field'];\n    options?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "SugaredQualifiedEntityList",
+              "canonicalReference": "@contember/react-ui-lib!~SugaredQualifiedEntityList:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "['entities'];\n    children: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    placeholder?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    createNewForm?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    queryField?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "DataViewUnionFilterFields",
+              "canonicalReference": "@contember/react-ui-lib!~DataViewUnionFilterFields:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    initialSorting?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "DataViewSortingDirections",
+              "canonicalReference": "@contember/react-ui-lib!~DataViewSortingDirections:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/select/multi-select.tsx",
+          "releaseTag": "Public",
+          "name": "MultiSelectInputProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 16
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!MultiSelectItemContentUI:var",
+          "docComment": "/**\n * `MultiSelectItemContentUI` is the UI for the multi-select item content.\n *\n * See more {@link MultiSelectInput}\n *\n * @group\n *\n * MultiSelectInput\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "MultiSelectItemContentUI: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "ForwardRefExoticComponent",
+              "canonicalReference": "@types/react!React.ForwardRefExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "Omit",
+              "canonicalReference": "!Omit:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "ClassAttributes",
+              "canonicalReference": "@types/react!React.ClassAttributes:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLSpanElement",
+              "canonicalReference": "!HTMLSpanElement:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "> & import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLAttributes",
+              "canonicalReference": "@types/react!React.HTMLAttributes:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLSpanElement",
+              "canonicalReference": "!HTMLSpanElement:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "> & {\n    asChild?: boolean;\n    children?: import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    className?: string;\n}, \"ref\"> & import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "RefAttributes",
+              "canonicalReference": "@types/react!React.RefAttributes:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLSpanElement",
+              "canonicalReference": "!HTMLSpanElement:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">>"
+            }
+          ],
+          "fileUrlPath": "src/select/ui.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "MultiSelectItemContentUI",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 20
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!MultiSelectItemDragOverlayUI:var",
+          "docComment": "/**\n * `MultiSelectItemDragOverlayUI` is the UI for the multi-select item drag overlay.\n *\n * See more {@link MultiSelectInput}\n *\n * @group\n *\n * MultiSelectInput\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "MultiSelectItemDragOverlayUI: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "ForwardRefExoticComponent",
+              "canonicalReference": "@types/react!React.ForwardRefExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "Omit",
+              "canonicalReference": "!Omit:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "ClassAttributes",
+              "canonicalReference": "@types/react!React.ClassAttributes:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLSpanElement",
+              "canonicalReference": "!HTMLSpanElement:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "> & import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLAttributes",
+              "canonicalReference": "@types/react!React.HTMLAttributes:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLSpanElement",
+              "canonicalReference": "!HTMLSpanElement:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "> & {\n    asChild?: boolean;\n    children?: import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    className?: string;\n}, \"ref\"> & import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "RefAttributes",
+              "canonicalReference": "@types/react!React.RefAttributes:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLSpanElement",
+              "canonicalReference": "!HTMLSpanElement:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">>"
+            }
+          ],
+          "fileUrlPath": "src/select/ui.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "MultiSelectItemDragOverlayUI",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 20
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!MultiSelectItemRemoveButtonUI:var",
+          "docComment": "/**\n * `MultiSelectItemRemoveButtonUI` is the UI for the multi-select item remove button.\n *\n * See more {@link MultiSelectInput}\n *\n * @group\n *\n * MultiSelectInput\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "MultiSelectItemRemoveButtonUI: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "ForwardRefExoticComponent",
+              "canonicalReference": "@types/react!React.ForwardRefExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "Omit",
+              "canonicalReference": "!Omit:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "ClassAttributes",
+              "canonicalReference": "@types/react!React.ClassAttributes:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLSpanElement",
+              "canonicalReference": "!HTMLSpanElement:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "> & import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLAttributes",
+              "canonicalReference": "@types/react!React.HTMLAttributes:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLSpanElement",
+              "canonicalReference": "!HTMLSpanElement:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "> & {\n    asChild?: boolean;\n    children?: import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    className?: string;\n}, \"ref\"> & import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "RefAttributes",
+              "canonicalReference": "@types/react!React.RefAttributes:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLSpanElement",
+              "canonicalReference": "!HTMLSpanElement:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">>"
+            }
+          ],
+          "fileUrlPath": "src/select/ui.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "MultiSelectItemRemoveButtonUI",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 20
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!MultiSelectItemUI:var",
+          "docComment": "/**\n * `MultiSelectItemUI` is the UI for the multi-select item.\n *\n * See more {@link MultiSelectInput}\n *\n * @group\n *\n * MultiSelectInput\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "MultiSelectItemUI: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "ForwardRefExoticComponent",
+              "canonicalReference": "@types/react!React.ForwardRefExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "Omit",
+              "canonicalReference": "!Omit:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "ClassAttributes",
+              "canonicalReference": "@types/react!React.ClassAttributes:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLSpanElement",
+              "canonicalReference": "!HTMLSpanElement:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "> & import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLAttributes",
+              "canonicalReference": "@types/react!React.HTMLAttributes:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLSpanElement",
+              "canonicalReference": "!HTMLSpanElement:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "> & {\n    asChild?: boolean;\n    children?: import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    className?: string;\n}, \"ref\"> & import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "RefAttributes",
+              "canonicalReference": "@types/react!React.RefAttributes:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLSpanElement",
+              "canonicalReference": "!HTMLSpanElement:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">>"
+            }
+          ],
+          "fileUrlPath": "src/select/ui.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "MultiSelectItemUI",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 20
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!MultiSelectItemWrapperUI:var",
+          "docComment": "/**\n * `MultiSelectItemWrapperUI` is the UI for the multi-select item wrapper.\n *\n * See more {@link MultiSelectInput}\n *\n * @group\n *\n * MultiSelectInput\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "MultiSelectItemWrapperUI: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "ForwardRefExoticComponent",
+              "canonicalReference": "@types/react!React.ForwardRefExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "Omit",
+              "canonicalReference": "!Omit:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "ClassAttributes",
+              "canonicalReference": "@types/react!React.ClassAttributes:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLDivElement",
+              "canonicalReference": "!HTMLDivElement:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "> & import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLAttributes",
+              "canonicalReference": "@types/react!React.HTMLAttributes:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLDivElement",
+              "canonicalReference": "!HTMLDivElement:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "> & {\n    asChild?: boolean;\n    children?: import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    className?: string;\n}, \"ref\"> & import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "RefAttributes",
+              "canonicalReference": "@types/react!React.RefAttributes:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLDivElement",
+              "canonicalReference": "!HTMLDivElement:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">>"
+            }
+          ],
+          "fileUrlPath": "src/select/ui.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "MultiSelectItemWrapperUI",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 20
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!MultiSelectSortableItemContentUI:var",
+          "docComment": "/**\n * `MultiSelectSortableItemContentUI` is the UI for the multi-select sortable item content.\n *\n * See more {@link MultiSelectInput}\n *\n * @group\n *\n * MultiSelectInput\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "MultiSelectSortableItemContentUI: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "ForwardRefExoticComponent",
+              "canonicalReference": "@types/react!React.ForwardRefExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "Omit",
+              "canonicalReference": "!Omit:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "ClassAttributes",
+              "canonicalReference": "@types/react!React.ClassAttributes:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLSpanElement",
+              "canonicalReference": "!HTMLSpanElement:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "> & import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLAttributes",
+              "canonicalReference": "@types/react!React.HTMLAttributes:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLSpanElement",
+              "canonicalReference": "!HTMLSpanElement:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "> & {\n    asChild?: boolean;\n    children?: import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    className?: string;\n}, \"ref\"> & import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "RefAttributes",
+              "canonicalReference": "@types/react!React.RefAttributes:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLSpanElement",
+              "canonicalReference": "!HTMLSpanElement:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">>"
+            }
+          ],
+          "fileUrlPath": "src/select/ui.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "MultiSelectSortableItemContentUI",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 20
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!SelectCreateNewTrigger:var",
+          "docComment": "/**\n * `SelectCreateNewTrigger` is the UI for the select create new trigger.\n *\n * See more {@link SelectInput}\n *\n * @group\n *\n * SelectInput\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "SelectCreateNewTrigger: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "ForwardRefExoticComponent",
+              "canonicalReference": "@types/react!React.ForwardRefExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "RefAttributes",
+              "canonicalReference": "@types/react!React.RefAttributes:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLButtonElement",
+              "canonicalReference": "!HTMLButtonElement:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">>"
+            }
+          ],
+          "fileUrlPath": "src/select/ui.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "SelectCreateNewTrigger",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 8
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!SelectDefaultFilter:var",
+          "docComment": "/**\n * `SelectDefaultFilter` is component for filtering data in a `SelectDataView`. It checks if a specific filter type exists and, if so, renders a text input for filtering.\n *\n * @group\n *\n * SelectInput\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "SelectDefaultFilter: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "MemoExoticComponent",
+              "canonicalReference": "@types/react!React.MemoExoticComponent:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<() => import(\"react/jsx-runtime\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "JSX.Element",
+              "canonicalReference": "@types/react!JSX.Element:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            }
+          ],
+          "fileUrlPath": "src/select/filter.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "SelectDefaultFilter",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 6
+          }
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@contember/react-ui-lib!SelectDefaultPlaceholderUI:function(1)",
+          "docComment": "/**\n * `SelectDefaultPlaceholderUI` is the UI for the select default placeholder.\n *\n * See more {@link SelectInput}\n *\n * @group\n *\n * SelectInput\n *\n * @group\n *\n * MultiSelectInput\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "SelectDefaultPlaceholderUI: () => "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react/jsx-runtime\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "JSX.Element",
+              "canonicalReference": "@types/react!JSX.Element:interface"
+            }
+          ],
+          "fileUrlPath": "src/select/ui.tsx",
+          "returnTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 3
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [],
+          "name": "SelectDefaultPlaceholderUI"
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!SelectInput:var",
+          "docComment": "/**\n * `SelectInput` is a versatile component for rendering a selectable input field with advanced functionality. It supports optional entity creation, validation, and sorting within the context of Contember's interface.\n *\n * #### Example: Basic usage with entity creation\n * ```tsx\n * <SelectInput\n *   field=\"category\"\n *   placeholder=\"Select a category\"\n *   options={[\n *     { field: 'id', operator: 'eq', value: '1', label: 'Option 1' },\n *     { field: 'id', operator: 'eq', value: '2', label: 'Option 2' }\n *   ]}\n *   createNewForm={<div>Form for creating a new category</div>}\n *   required\n * >\n *   <Field field=\"label\" />\n * </SelectInput>\n * ```\n *\n * #### Sub-components - {@link SelectInputWrapperUI} - {@link SelectInputUI} - {@link SelectDefaultPlaceholderUI} - {@link SelectPlaceholder} - {@link SelectInputActionsUI} - {@link SelectListItemUI} - {@link SelectEachValue} - {@link SelectItemTrigger} - {@link SelectPopoverContent} - {@link DefaultSelectDataView} - {@link Popover} - {@link PopoverTrigger}\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "SelectInput: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<{\n    field: "
+            },
+            {
+              "kind": "Reference",
+              "text": "SugaredRelativeSingleEntity",
+              "canonicalReference": "@contember/react-ui-lib!~SugaredRelativeSingleEntity:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "[\"field\"];\n    children: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    options?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "SugaredQualifiedEntityList",
+              "canonicalReference": "@contember/react-ui-lib!~SugaredQualifiedEntityList:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "[\"entities\"];\n    placeholder?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    createNewForm?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    queryField?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "DataViewUnionFilterFields",
+              "canonicalReference": "@contember/react-ui-lib!~DataViewUnionFilterFields:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    initialSorting?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "DataViewSortingDirections",
+              "canonicalReference": "@contember/react-ui-lib!~DataViewSortingDirections:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    required?: boolean;\n}>"
+            }
+          ],
+          "fileUrlPath": "src/select/select.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "SelectInput",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 18
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!SelectInputActionsUI:var",
+          "docComment": "/**\n * `SelectInputActionsUI` is the UI for the select action.\n *\n * See more {@link SelectInput}\n *\n * @group\n *\n * SelectInput\n *\n * @group\n *\n * MultiSelectInput\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "SelectInputActionsUI: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "ForwardRefExoticComponent",
+              "canonicalReference": "@types/react!React.ForwardRefExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "Omit",
+              "canonicalReference": "!Omit:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "ClassAttributes",
+              "canonicalReference": "@types/react!React.ClassAttributes:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLSpanElement",
+              "canonicalReference": "!HTMLSpanElement:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "> & import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLAttributes",
+              "canonicalReference": "@types/react!React.HTMLAttributes:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLSpanElement",
+              "canonicalReference": "!HTMLSpanElement:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "> & {\n    asChild?: boolean;\n    children?: import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    className?: string;\n}, \"ref\"> & import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "RefAttributes",
+              "canonicalReference": "@types/react!React.RefAttributes:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLSpanElement",
+              "canonicalReference": "!HTMLSpanElement:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">>"
+            }
+          ],
+          "fileUrlPath": "src/select/ui.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "SelectInputActionsUI",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 20
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!SelectInputProps:type",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type SelectInputProps = "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    field: "
+            },
+            {
+              "kind": "Reference",
+              "text": "SugaredRelativeSingleEntity",
+              "canonicalReference": "@contember/react-ui-lib!~SugaredRelativeSingleEntity:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "['field'];\n    children: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    options?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "SugaredQualifiedEntityList",
+              "canonicalReference": "@contember/react-ui-lib!~SugaredQualifiedEntityList:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "['entities'];\n    placeholder?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    createNewForm?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    queryField?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "DataViewUnionFilterFields",
+              "canonicalReference": "@contember/react-ui-lib!~DataViewUnionFilterFields:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    initialSorting?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "DataViewSortingDirections",
+              "canonicalReference": "@contember/react-ui-lib!~DataViewSortingDirections:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    required?: boolean;\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/select/select.tsx",
+          "releaseTag": "Public",
+          "name": "SelectInputProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 16
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!SelectInputUI:var",
+          "docComment": "/**\n * `SelectInputUI` is the UI input wrapper for the select component.\n *\n * See more {@link SelectInput}\n *\n * @group\n *\n * SelectInput\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "SelectInputUI: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "ForwardRefExoticComponent",
+              "canonicalReference": "@types/react!React.ForwardRefExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "Omit",
+              "canonicalReference": "!Omit:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "ClassAttributes",
+              "canonicalReference": "@types/react!React.ClassAttributes:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLButtonElement",
+              "canonicalReference": "!HTMLButtonElement:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "> & import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "ButtonHTMLAttributes",
+              "canonicalReference": "@types/react!React.ButtonHTMLAttributes:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLButtonElement",
+              "canonicalReference": "!HTMLButtonElement:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "> & {\n    asChild?: boolean;\n    children?: import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    className?: string;\n}, \"ref\"> & import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "RefAttributes",
+              "canonicalReference": "@types/react!React.RefAttributes:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLButtonElement",
+              "canonicalReference": "!HTMLButtonElement:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">>"
+            }
+          ],
+          "fileUrlPath": "src/select/ui.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "SelectInputUI",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 20
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!SelectInputWrapperUI:var",
+          "docComment": "/**\n * `SelectInputWrapperUI` is the UI input wrapper for the select component.\n *\n * See more {@link SelectInput}\n *\n * @group\n *\n * SelectInput\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "SelectInputWrapperUI: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "ForwardRefExoticComponent",
+              "canonicalReference": "@types/react!React.ForwardRefExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "Omit",
+              "canonicalReference": "!Omit:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "ClassAttributes",
+              "canonicalReference": "@types/react!React.ClassAttributes:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLDivElement",
+              "canonicalReference": "!HTMLDivElement:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "> & import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLAttributes",
+              "canonicalReference": "@types/react!React.HTMLAttributes:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLDivElement",
+              "canonicalReference": "!HTMLDivElement:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "> & {\n    asChild?: boolean;\n    children?: import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    className?: string;\n}, \"ref\"> & import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "RefAttributes",
+              "canonicalReference": "@types/react!React.RefAttributes:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLDivElement",
+              "canonicalReference": "!HTMLDivElement:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">>"
+            }
+          ],
+          "fileUrlPath": "src/select/ui.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "SelectInputWrapperUI",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 20
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!SelectListInner:var",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "SelectListInner: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<{\n    children: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    filterToolbar?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}>"
+            }
+          ],
+          "fileUrlPath": "src/select/list.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "SelectListInner",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 8
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!SelectListItemUI:var",
+          "docComment": "/**\n * `SelectListItemUI` is the UI for the select items list.\n *\n * See more {@link SelectInput}\n *\n * @group\n *\n * SelectInput\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "SelectListItemUI: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "ForwardRefExoticComponent",
+              "canonicalReference": "@types/react!React.ForwardRefExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "Omit",
+              "canonicalReference": "!Omit:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "Omit",
+              "canonicalReference": "!Omit:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "ClassAttributes",
+              "canonicalReference": "@types/react!React.ClassAttributes:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLButtonElement",
+              "canonicalReference": "!HTMLButtonElement:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "> & import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "ButtonHTMLAttributes",
+              "canonicalReference": "@types/react!React.ButtonHTMLAttributes:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLButtonElement",
+              "canonicalReference": "!HTMLButtonElement:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "> & {\n    asChild?: boolean;\n    children?: import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    className?: string;\n} & {\n    variant?: \"link\" | \"default\" | \"destructive\" | \"outline\" | \"secondary\" | \"ghost\" | null | undefined;\n    size?: \"default\" | \"icon\" | \"sm\" | \"lg\" | \"xs\" | null | undefined;\n}, \"ref\"> & import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "RefAttributes",
+              "canonicalReference": "@types/react!React.RefAttributes:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLButtonElement",
+              "canonicalReference": "!HTMLButtonElement:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "> & {\n    asChild?: boolean;\n    children?: import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    className?: string;\n}, \"ref\"> & import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "RefAttributes",
+              "canonicalReference": "@types/react!React.RefAttributes:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLButtonElement",
+              "canonicalReference": "!HTMLButtonElement:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">>"
+            }
+          ],
+          "fileUrlPath": "src/select/ui.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "SelectListItemUI",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 28
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!SelectListProps:type",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type SelectListProps = "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    children: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    filterToolbar?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/select/list.tsx",
+          "releaseTag": "Public",
+          "name": "SelectListProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 6
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!SelectPopoverContent:var",
+          "docComment": "/**\n * `SelectPopoverContent` is the UI for the select popover content.\n *\n * See more {@link SelectInput}\n *\n * @group\n *\n * SelectInput\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "SelectPopoverContent: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "ForwardRefExoticComponent",
+              "canonicalReference": "@types/react!React.ForwardRefExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "Omit",
+              "canonicalReference": "!Omit:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "Omit",
+              "canonicalReference": "!Omit:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<import(\"@radix-ui/react-popover\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "PopoverContentProps",
+              "canonicalReference": "@radix-ui/react-popover!PopoverContentProps:interface"
+            },
+            {
+              "kind": "Content",
+              "text": " & import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "RefAttributes",
+              "canonicalReference": "@types/react!React.RefAttributes:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLDivElement",
+              "canonicalReference": "!HTMLDivElement:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "> & {\n    asChild?: boolean;\n    children?: import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    className?: string;\n}, \"ref\"> & import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "RefAttributes",
+              "canonicalReference": "@types/react!React.RefAttributes:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLDivElement",
+              "canonicalReference": "!HTMLDivElement:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "> & {\n    asChild?: boolean;\n    children?: import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    className?: string;\n}, \"ref\"> & import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "RefAttributes",
+              "canonicalReference": "@types/react!React.RefAttributes:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HTMLDivElement",
+              "canonicalReference": "!HTMLDivElement:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">>"
+            }
+          ],
+          "fileUrlPath": "src/select/ui.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "SelectPopoverContent",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 26
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!SortableMultiSelectInput:var",
+          "docComment": "/**\n * `SortableMultiSelectInput` is the UI for the sortable multi select input.\n *\n * See more {@link MultiSelectInput}\n *\n * @group\n *\n * SortableMultiSelectField\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "SortableMultiSelectInput: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<{\n    field: "
+            },
+            {
+              "kind": "Reference",
+              "text": "SugaredRelativeEntityList",
+              "canonicalReference": "@contember/react-ui-lib!~SugaredRelativeEntityList:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "[\"field\"];\n    sortableBy: "
+            },
+            {
+              "kind": "Reference",
+              "text": "SugaredRelativeSingleField",
+              "canonicalReference": "@contember/react-ui-lib!~SugaredRelativeSingleField:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "[\"field\"];\n    connectAt: "
+            },
+            {
+              "kind": "Reference",
+              "text": "SugaredRelativeSingleEntity",
+              "canonicalReference": "@contember/react-ui-lib!~SugaredRelativeSingleEntity:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "[\"field\"];\n    children: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    options?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "SugaredQualifiedEntityList",
+              "canonicalReference": "@contember/react-ui-lib!~SugaredQualifiedEntityList:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "[\"entities\"];\n    placeholder?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    createNewForm?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    queryField?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "DataViewUnionFilterFields",
+              "canonicalReference": "@contember/react-ui-lib!~DataViewUnionFilterFields:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    initialSorting?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "DataViewSortingDirections",
+              "canonicalReference": "@contember/react-ui-lib!~DataViewSortingDirections:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}>"
+            }
+          ],
+          "fileUrlPath": "src/select/sortable-select.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "SortableMultiSelectInput",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 22
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!SortableMultiSelectInputProps:type",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type SortableMultiSelectInputProps = "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    field: "
+            },
+            {
+              "kind": "Reference",
+              "text": "SugaredRelativeEntityList",
+              "canonicalReference": "@contember/react-ui-lib!~SugaredRelativeEntityList:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "['field'];\n    sortableBy: "
+            },
+            {
+              "kind": "Reference",
+              "text": "SugaredRelativeSingleField",
+              "canonicalReference": "@contember/react-ui-lib!~SugaredRelativeSingleField:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "['field'];\n    connectAt: "
+            },
+            {
+              "kind": "Reference",
+              "text": "SugaredRelativeSingleEntity",
+              "canonicalReference": "@contember/react-ui-lib!~SugaredRelativeSingleEntity:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "['field'];\n    children: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    options?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "SugaredQualifiedEntityList",
+              "canonicalReference": "@contember/react-ui-lib!~SugaredQualifiedEntityList:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "['entities'];\n    placeholder?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    createNewForm?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    queryField?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "DataViewUnionFilterFields",
+              "canonicalReference": "@contember/react-ui-lib!~DataViewUnionFilterFields:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    initialSorting?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "DataViewSortingDirections",
+              "canonicalReference": "@contember/react-ui-lib!~DataViewSortingDirections:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/select/sortable-select.tsx",
+          "releaseTag": "Public",
+          "name": "SortableMultiSelectInputProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 20
+          }
+        }
+      ]
+    }
+  ]
+}

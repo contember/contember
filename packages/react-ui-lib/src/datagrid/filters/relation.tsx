@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { forwardRef, ReactNode, useCallback, useMemo } from 'react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../../ui/tooltip'
 import {
@@ -47,7 +46,7 @@ export type DataGridHasOneFilterProps =
  * ## Props {@link DataGridHasOneFilterProps}
  * field, label, children, ?name, ?options
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <DataGridHasOneFilter field={'author'} label="Author">
  *     <Field field="name" />
@@ -79,7 +78,7 @@ export type DataGridHasManyFilterProps =
  * ## Props {@link DataGridHasManyFilterProps}
  * field, label, children, ?name, ?options
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <DataGridHasManyFilter field={'tags'} label="Tags">
  *     <Field field="name" />
@@ -132,7 +131,7 @@ export type DataGridHasOneTooltipProps =
  * ## Props {@link DataGridHasOneTooltipProps}
  * field, children, ?name, ?options, ?actions
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <HasOne field="category">
  * <DataGridHasOneTooltip field={'category'}>
@@ -175,7 +174,7 @@ export type DataGridHasManyTooltipProps =
  * ## Props {@link DataGridHasManyTooltipProps}
  * field, children, ?name, ?options, ?actions
  *
- * ## Example
+ * #### Example
  * ```tsx
  * <HasMany field="tags">
  *     <DataGridHasManyTooltip field={'tags'}>

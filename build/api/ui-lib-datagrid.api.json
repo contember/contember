@@ -1,0 +1,4071 @@
+{
+  "metadata": {
+    "toolPackage": "@microsoft/api-extractor",
+    "toolVersion": "7.52.8",
+    "schemaVersion": 1011,
+    "oldestForwardsCompatibleVersion": 1001,
+    "tsdocConfig": {
+      "$schema": "https://developer.microsoft.com/json-schemas/tsdoc/v0/tsdoc.schema.json",
+      "noStandardTags": true,
+      "tagDefinitions": [
+        {
+          "tagName": "@alpha",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@beta",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@defaultValue",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@decorator",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@deprecated",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@eventProperty",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@example",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@experimental",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@inheritDoc",
+          "syntaxKind": "inline"
+        },
+        {
+          "tagName": "@internal",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@label",
+          "syntaxKind": "inline"
+        },
+        {
+          "tagName": "@link",
+          "syntaxKind": "inline",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@override",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@packageDocumentation",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@param",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@privateRemarks",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@public",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@readonly",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@remarks",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@returns",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@sealed",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@see",
+          "syntaxKind": "block"
+        },
+        {
+          "tagName": "@throws",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@typeParam",
+          "syntaxKind": "block",
+          "allowMultiple": true
+        },
+        {
+          "tagName": "@virtual",
+          "syntaxKind": "modifier"
+        },
+        {
+          "tagName": "@group",
+          "syntaxKind": "block"
+        }
+      ],
+      "reportUnsupportedHtmlElements": false
+    }
+  },
+  "kind": "Package",
+  "canonicalReference": "@contember/react-ui-lib!",
+  "docComment": "",
+  "name": "@contember/react-ui-lib",
+  "preserveMemberOrder": false,
+  "members": [
+    {
+      "kind": "EntryPoint",
+      "canonicalReference": "@contember/react-ui-lib!",
+      "name": "",
+      "preserveMemberOrder": false,
+      "members": [
+        {
+          "kind": "Function",
+          "canonicalReference": "@contember/react-ui-lib!createDataGridDateRange:function(1)",
+          "docComment": "/**\n * Creates a predefined date range object for use in a `DataGrid` filter.\n *\n * - Computes start and end dates based on the given day offsets. - Returns the range in `YYYY-MM-DD` format.\n *\n * @param label - The displaydd label for the predefined range.\n *\n * @param dayDeltaStart - The number of days from today for the start date (negative for past dates).\n *\n * @param dayDeltaEnd - The number of days from today for the end date.\n *\n * @returns A `DataGridPredefinedDateRange` object with formatted start and end dates.\n *\n * #### Example: Last 7 days\n * ```tsx\n * const lastWeek = createDataGridDateRange('Last 7 days', -7, 0)\n * console.log(lastWeek)\n * // { label: 'Last 7 days', start: '2025-01-01', end: '2025-01-07' }\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "createDataGridDateRange: (label: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ", dayDeltaStart: "
+            },
+            {
+              "kind": "Content",
+              "text": "number"
+            },
+            {
+              "kind": "Content",
+              "text": ", dayDeltaEnd: "
+            },
+            {
+              "kind": "Content",
+              "text": "number"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Reference",
+              "text": "DataGridPredefinedDateRange",
+              "canonicalReference": "@contember/react-ui-lib!DataGridPredefinedDateRange:type"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/filters/date.tsx",
+          "returnTypeTokenRange": {
+            "startIndex": 7,
+            "endIndex": 8
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "label",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            },
+            {
+              "parameterName": "dayDeltaStart",
+              "parameterTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 4
+              },
+              "isOptional": false
+            },
+            {
+              "parameterName": "dayDeltaEnd",
+              "parameterTypeTokenRange": {
+                "startIndex": 5,
+                "endIndex": 6
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "createDataGridDateRange"
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!DataGrid:var",
+          "docComment": "/**\n * `DataGrid` is a flexible data display component that provides sorting, filtering, selection, and pagination capabilities. The UI is customizable, allowing you to define how data is presented.\n *\n * #### Props {@link DataGridProps} - **Primary:** `children`, `entities` - **Optional:** `queryField`, `filterTypes`, `dataViewKey`, `onSelectHighlighted` - **Initial values:** `initialFilters`, `initialSorting`, `initialSelection`, `initialItemsPerPage` - **Storage settings:** `filteringStateStorage`, `sortingStateStorage`, `currentPageStateStorage`, `selectionStateStorage`, `pagingSettingsStorage`\n *\n * #### Example: Basic Usage\n * ```tsx\n * <DataGrid\n *     entities=\"Project\"\n *     initialSorting={{\n *         createdAt: 'asc',\n *     }}\n * >\n *     <DataGridToolbar>\n *         <DataGridQueryFilter />\n *         <DataGridEnumFilter field=\"state\" />\n *         <DataGridHasOneFilter field=\"author\" label=\"Author\">\n *             <Field field=\"name\" />\n *         </DataGridHasOneFilter>\n *     </DataGridToolbar>\n *     <DataGridLoader>\n *         <DataGridTable>\n *             <DataGridActionColumn>\n *                 <Button>Show detail</Button>\n *             </DataGridActionColumn>\n *             <DataGridTextColumn header=\"Title\" field=\"title\" />\n *             <DataGridEnumColumn field=\"state\" />\n *             <DataGridDateColumn header=\"Created at\" field=\"createdAt\" />\n *             <DataGridHasOneColumn header=\"Company\" field=\"company\">\n *                 <Field field=\"name\" />\n *             </DataGridHasOneColumn>\n *         </DataGridTable>\n *\n *         <DataGridTiles>\n *             <MyCustomTile />\n *         </DataGridTiles>\n *\n *         <DataViewLayout name=\"rows\" label=\"Rows\">\n *             <DataViewEachRow>\n *                 <MyCustomRow />\n *             </DataViewEachRow>\n *         </DataViewLayout>\n *     </DataGridLoader>\n *     <DataGridPagination />\n * </DataGrid>\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "DataGrid: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "Omit",
+              "canonicalReference": "!Omit:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "DataViewProps",
+              "canonicalReference": "@contember/react-ui-lib!~DataViewProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ", \"children\"> & {\n    children: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}>"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/grid.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "DataGrid",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 10
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!DataGridActionColumn:var",
+          "docComment": "/**\n * `DataGridActionColumn` renders a column with action buttons in a `DataGridTable`. It is typically used to provide interactive controls such as edit, delete, or custom actions.\n *\n * #### Example: Basic usage with a button\n * ```tsx\n * <DataGridTable>\n *   <DataGridActionColumn>\n *     <Button variant=\"outline\">Click me</Button>\n *   </DataGridActionColumn>\n * </DataGridTable>\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "DataGridActionColumn: "
+            },
+            {
+              "kind": "Reference",
+              "text": "React.NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<{\n    children: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}>"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/columns.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "DataGridActionColumn",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 5
+          }
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@contember/react-ui-lib!DataGridAutoExport:function(1)",
+          "docComment": "/**\n * Button for exporting data grid to CSV. If no fields are provided, all fields will be exported.\n *\n * #### Example\n * ```tsx\n * <DataGridExport />\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "DataGridAutoExport: ({ fields }: "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    fields?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react/jsx-runtime\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "JSX.Element",
+              "canonicalReference": "@types/react!JSX.Element:interface"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/export.tsx",
+          "returnTypeTokenRange": {
+            "startIndex": 5,
+            "endIndex": 7
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "{ fields }",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 4
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "DataGridAutoExport"
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!DataGridBooleanColumn:var",
+          "docComment": "/**\n * Props {@link DataGridBooleanColumnProps}.\n *\n * Renders a column with boolean content. Should be used in a {@link DataGridTable}.\n *\n * #### Example\n * ```tsx\n * <DataGridTable>\n *     <DataGridBooleanColumn field=\"isPublished\" />\n *     <DataGridBooleanColumn field=\"isActive\" format={it => it ? 'Hooray' : 'Oh noooo!'} />\n *     <DataGridBooleanColumn field=\"hasImage\" format={it => it ? <CheckIcon /> : <XIcon />} />\n * </DataGridTable>\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "DataGridBooleanColumn: "
+            },
+            {
+              "kind": "Reference",
+              "text": "React.NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "DataGridBooleanColumnProps",
+              "canonicalReference": "@contember/react-ui-lib!DataGridBooleanColumnProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/columns.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "DataGridBooleanColumn",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 5
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!DataGridBooleanColumnProps:type",
+          "docComment": "/**\n * Props for {@link DataGridBooleanColumn}.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type DataGridBooleanColumnProps = "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    field: string;\n    header?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    children?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    format?: (value: boolean | null) => "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    filter?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/columns.tsx",
+          "releaseTag": "Public",
+          "name": "DataGridBooleanColumnProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 10
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!DataGridBooleanFilter:var",
+          "docComment": "/**\n * Props {@link DataGridBooleanFilterProps}\n *\n * `DataGridBooleanFilter` provides a boolean filter for `DataGrid` with a default UI.\n *\n * #### Example\n * ```tsx\n * <DefaultDataGrid entities=\"Project\">\n *   <DataGridBooleanFilter field=\"locked\" label=\"Locked\" />\n * </DefaultDataGrid>\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "DataGridBooleanFilter: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "DataGridBooleanFilterProps",
+              "canonicalReference": "@contember/react-ui-lib!DataGridBooleanFilterProps:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/filters/boolean.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "DataGridBooleanFilter",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 6
+          }
+        },
+        {
+          "kind": "Interface",
+          "canonicalReference": "@contember/react-ui-lib!DataGridBooleanFilterProps:interface",
+          "docComment": "/**\n * Props for {@link DataGridBooleanFilter}.\n *\n * Extends {@link DataViewBooleanFilterProps}, excluding the `children` prop.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export interface DataGridBooleanFilterProps extends "
+            },
+            {
+              "kind": "Reference",
+              "text": "Omit",
+              "canonicalReference": "!Omit:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "DataViewBooleanFilterProps",
+              "canonicalReference": "@contember/react-ui-lib!~DataViewBooleanFilterProps:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", 'children'>"
+            },
+            {
+              "kind": "Content",
+              "text": " "
+            }
+          ],
+          "fileUrlPath": "src/datagrid/filters/boolean.tsx",
+          "releaseTag": "Public",
+          "name": "DataGridBooleanFilterProps",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@contember/react-ui-lib!DataGridBooleanFilterProps#label:member",
+              "docComment": "/**\n * Label for the filter UI\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "label: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ReactNode",
+                  "canonicalReference": "@types/react!React.ReactNode:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "label",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            }
+          ],
+          "extendsTokenRanges": [
+            {
+              "startIndex": 1,
+              "endIndex": 5
+            }
+          ]
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!DataGridColumn:var",
+          "docComment": "/**\n * Props {@link DataGridColumnProps}\n *\n * Low-level component for rendering a column in a data grid.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "DataGridColumn: "
+            },
+            {
+              "kind": "Reference",
+              "text": "React.NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "DataGridColumnProps",
+              "canonicalReference": "@contember/react-ui-lib!DataGridColumnProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/columns.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "DataGridColumn",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 5
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!DataGridColumnProps:type",
+          "docComment": "/**\n * Props for {@link DataGridColumn}.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type DataGridColumnProps = "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    children: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    header?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    name?: string;\n    hidingName?: string;\n    sortingField?: string;\n    cellClassName?: string;\n    headerClassName?: string;\n    filter?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    filterName?: string;\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/columns.tsx",
+          "releaseTag": "Public",
+          "name": "DataGridColumnProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 8
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!DataGridDateColumn:var",
+          "docComment": "/**\n * Props {@link DataGridDateColumnProps}.\n *\n * Renders a column with date content. Should be used in a {@link DataGridTable}.\n *\n * #### Example\n * ```tsx\n * <DataGridTable>\n *     <DataGridDateColumn field=\"createdAt\" />\n * </DataGridTable>\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "DataGridDateColumn: "
+            },
+            {
+              "kind": "Reference",
+              "text": "React.NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "DataGridDateColumnProps",
+              "canonicalReference": "@contember/react-ui-lib!DataGridDateColumnProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/columns.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "DataGridDateColumn",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 5
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!DataGridDateColumnProps:type",
+          "docComment": "/**\n * Props for {@link DataGridDateColumn}.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type DataGridDateColumnProps = "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    field: string;\n    header?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    children?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    format?: (value: string | null) => "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    filter?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/columns.tsx",
+          "releaseTag": "Public",
+          "name": "DataGridDateColumnProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 10
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!DataGridDateFilter:var",
+          "docComment": "/**\n * Props {@link DataGridDateFilterProps}\n *\n * `DataGridDateFilter` is a date filter component designed for use within a `DataGrid`. It provides a default UI for selecting date ranges and filtering data accordingly.\n *\n * #### Example: Basic usage\n * ```tsx\n * <DataGridDateFilter field=\"createdAt\" label=\"Created at\" />\n * ```\n *\n * #### Example: With predefined date ranges\n * ```tsx\n * <DataGridDateFilter field=\"updatedAt\" ranges={[{ label: 'Last 7 days', value: '7d' }]} />\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "DataGridDateFilter: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "DataGridDateFilterProps",
+              "canonicalReference": "@contember/react-ui-lib!DataGridDateFilterProps:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/filters/date.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "DataGridDateFilter",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 6
+          }
+        },
+        {
+          "kind": "Interface",
+          "canonicalReference": "@contember/react-ui-lib!DataGridDateFilterProps:interface",
+          "docComment": "/**\n * Props for {@link DataGridDateFilter}.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export interface DataGridDateFilterProps extends "
+            },
+            {
+              "kind": "Reference",
+              "text": "Omit",
+              "canonicalReference": "!Omit:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "DataViewDateFilterProps",
+              "canonicalReference": "@contember/react-ui-lib!~DataViewDateFilterProps:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", 'children'>"
+            },
+            {
+              "kind": "Content",
+              "text": " "
+            }
+          ],
+          "fileUrlPath": "src/datagrid/filters/date.tsx",
+          "releaseTag": "Public",
+          "name": "DataGridDateFilterProps",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@contember/react-ui-lib!DataGridDateFilterProps#label:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "label: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ReactNode",
+                  "canonicalReference": "@types/react!React.ReactNode:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "label",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@contember/react-ui-lib!DataGridDateFilterProps#ranges:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "ranges?: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "DataGridPredefinedDateRange",
+                  "canonicalReference": "@contember/react-ui-lib!DataGridPredefinedDateRange:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "[]"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": true,
+              "releaseTag": "Public",
+              "name": "ranges",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 3
+              }
+            }
+          ],
+          "extendsTokenRanges": [
+            {
+              "startIndex": 1,
+              "endIndex": 5
+            }
+          ]
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!DataGridDateTimeColumn:var",
+          "docComment": "/**\n * Props {@link DataGridDateTimeColumnProps}.\n *\n * Renders a column with date-time content. Should be used in a {@link DataGridTable}.\n *\n * #### Example\n * ```tsx\n * <DataGridTable>\n *     <DataGridDateTimeColumn field=\"createdAt\" />\n * </DataGridTable>\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "DataGridDateTimeColumn: "
+            },
+            {
+              "kind": "Reference",
+              "text": "React.NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "DataGridDateTimeColumnProps",
+              "canonicalReference": "@contember/react-ui-lib!DataGridDateTimeColumnProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/columns.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "DataGridDateTimeColumn",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 5
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!DataGridDateTimeColumnProps:type",
+          "docComment": "/**\n * Props for {@link DataGridDateTimeColumn}.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type DataGridDateTimeColumnProps = "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    field: string;\n    header?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    children?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    format?: (value: string | null) => "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    filter?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/columns.tsx",
+          "releaseTag": "Public",
+          "name": "DataGridDateTimeColumnProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 10
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!DataGridEnumCell:var",
+          "docComment": "/**\n * Renders a cell with an enum value. Contains a tooltip with filter actions.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "DataGridEnumCell: "
+            },
+            {
+              "kind": "Reference",
+              "text": "React.NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "DataGridEnumCellProps",
+              "canonicalReference": "@contember/react-ui-lib!DataGridEnumCellProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/cells.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "DataGridEnumCell",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 5
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!DataGridEnumCellProps:type",
+          "docComment": "/**\n * Props for {@link DataGridEnumCell}.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type DataGridEnumCellProps = "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    field: "
+            },
+            {
+              "kind": "Reference",
+              "text": "SugaredRelativeSingleField",
+              "canonicalReference": "@contember/react-ui-lib!~SugaredRelativeSingleField:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "['field'];\n    filterName?: string;\n    options?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Record",
+              "canonicalReference": "!Record:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<string, "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">;\n    tooltipActions?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/cells.tsx",
+          "releaseTag": "Public",
+          "name": "DataGridEnumCellProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 10
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!DataGridEnumColumn:var",
+          "docComment": "/**\n * Props {@link DataGridEnumColumnProps}.\n *\n * Renders a column with enum content. Should be used in a {@link DataGridTable}.\n *\n * #### Example\n * ```tsx\n * <DataGridTable>\n *     <DataGridEnumColumn field=\"status\" />\n *     <DataGridEnumColumn field=\"status\" options={{ active: 'Active', inactive: 'Inactive' }} />\n * </DataGridTable>\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "DataGridEnumColumn: "
+            },
+            {
+              "kind": "Reference",
+              "text": "React.NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "DataGridEnumColumnProps",
+              "canonicalReference": "@contember/react-ui-lib!DataGridEnumColumnProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/columns.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "DataGridEnumColumn",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 5
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!DataGridEnumColumnProps:type",
+          "docComment": "/**\n * Props for {@link DataGridEnumColumn}.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type DataGridEnumColumnProps = "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    field: string;\n    header?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    options?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Record",
+              "canonicalReference": "!Record:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<string, "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">;\n    children?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    filter?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    tooltipActions?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/columns.tsx",
+          "releaseTag": "Public",
+          "name": "DataGridEnumColumnProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 14
+          }
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@contember/react-ui-lib!DataGridEnumFieldTooltip:function(1)",
+          "docComment": "/**\n * Props {@link DataGridEnumFieldTooltipProps}\n *\n * `DataGridEnumFieldTooltip` renders a value with a tooltip that allows users to include or exclude the value from the filter. It is primarily used in {@link DataGridEnumColumn}, but can be utilized in custom columns as well.\n *\n * #### Example: Basic usage inside a custom column\n * ```tsx\n * <DataGridEnumFieldTooltip value=\"active\">\n *   <span>Active</span>\n * </DataGridEnumFieldTooltip>\n * ```\n *\n * #### Example: With additional actions\n * ```tsx\n * <DataGridEnumFieldTooltip value=\"inactive\" actions={<CustomActionButton />}>\n *   <span>Inactive</span>\n * </DataGridEnumFieldTooltip>\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "DataGridEnumFieldTooltip: ({ children, actions, value, ...props }: "
+            },
+            {
+              "kind": "Reference",
+              "text": "DataGridEnumFieldTooltipProps",
+              "canonicalReference": "@contember/react-ui-lib!DataGridEnumFieldTooltipProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": " & {\n    children: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    value: string;\n    actions?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react/jsx-runtime\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "JSX.Element",
+              "canonicalReference": "@types/react!JSX.Element:interface"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/filters/enum.tsx",
+          "returnTypeTokenRange": {
+            "startIndex": 8,
+            "endIndex": 10
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "{ children, actions, value, ...props }",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 7
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "DataGridEnumFieldTooltip"
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!DataGridEnumFieldTooltipProps:type",
+          "docComment": "/**\n * Props for {@link DataGridEnumFieldTooltip}.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type DataGridEnumFieldTooltipProps = "
+            },
+            {
+              "kind": "Reference",
+              "text": "Omit",
+              "canonicalReference": "!Omit:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "DataViewEnumFilterProps",
+              "canonicalReference": "@contember/react-ui-lib!~DataViewEnumFilterProps:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", 'children'>"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/filters/enum.tsx",
+          "releaseTag": "Public",
+          "name": "DataGridEnumFieldTooltipProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 5
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!DataGridEnumFilter:var",
+          "docComment": "/**\n * Props {@link DataGridEnumFilterProps}\n *\n * `DataGridEnumFilter` is an enum-based filter component for `DataGrid` with a default UI. It allows filtering records based on predefined enum values.\n *\n * #### Example: Basic usage\n * ```tsx\n * <DataGridEnumFilter field=\"status\" />\n * ```\n *\n * #### Example: With custom enum options\n * ```tsx\n * <DataGridEnumFilter\n *   field=\"status\"\n *   options={[\n *     { value: 'active', label: 'Active' },\n *     { value: 'inactive', label: 'Inactive' }\n *   ]}\n * />\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "DataGridEnumFilter: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "DataGridEnumFilterProps",
+              "canonicalReference": "@contember/react-ui-lib!DataGridEnumFilterProps:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/filters/enum.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "DataGridEnumFilter",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 6
+          }
+        },
+        {
+          "kind": "Interface",
+          "canonicalReference": "@contember/react-ui-lib!DataGridEnumFilterProps:interface",
+          "docComment": "/**\n * Props for {@link DataGridEnumFilter}.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export interface DataGridEnumFilterProps extends "
+            },
+            {
+              "kind": "Reference",
+              "text": "Omit",
+              "canonicalReference": "!Omit:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "DataViewEnumFilterProps",
+              "canonicalReference": "@contember/react-ui-lib!~DataViewEnumFilterProps:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", 'children'>"
+            },
+            {
+              "kind": "Content",
+              "text": " "
+            }
+          ],
+          "fileUrlPath": "src/datagrid/filters/enum.tsx",
+          "releaseTag": "Public",
+          "name": "DataGridEnumFilterProps",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@contember/react-ui-lib!DataGridEnumFilterProps#label:member",
+              "docComment": "/**\n * Label for the filter.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "label?: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ReactNode",
+                  "canonicalReference": "@types/react!React.ReactNode:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": true,
+              "releaseTag": "Public",
+              "name": "label",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@contember/react-ui-lib!DataGridEnumFilterProps#options:member",
+              "docComment": "/**\n * Options for the filter.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "options?: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Record",
+                  "canonicalReference": "!Record:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<string, "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ReactNode",
+                  "canonicalReference": "@types/react!React.ReactNode:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ">"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": true,
+              "releaseTag": "Public",
+              "name": "options",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 5
+              }
+            }
+          ],
+          "extendsTokenRanges": [
+            {
+              "startIndex": 1,
+              "endIndex": 5
+            }
+          ]
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!DataGridEnumListCell:var",
+          "docComment": "/**\n * Renders a cell with an enum list. Contains a tooltip with filter actions.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "DataGridEnumListCell: "
+            },
+            {
+              "kind": "Reference",
+              "text": "React.NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "DataGridEnumListCellProps",
+              "canonicalReference": "@contember/react-ui-lib!DataGridEnumListCellProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/cells.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "DataGridEnumListCell",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 5
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!DataGridEnumListCellProps:type",
+          "docComment": "/**\n * Props for {@link DataGridEnumListCell}.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type DataGridEnumListCellProps = "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    field: "
+            },
+            {
+              "kind": "Reference",
+              "text": "SugaredRelativeSingleField",
+              "canonicalReference": "@contember/react-ui-lib!~SugaredRelativeSingleField:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "['field'];\n    filterName?: string;\n    options?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Record",
+              "canonicalReference": "!Record:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<string, "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">;\n    tooltipActions?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/cells.tsx",
+          "releaseTag": "Public",
+          "name": "DataGridEnumListCellProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 10
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!DataGridEnumListColumn:var",
+          "docComment": "/**\n * Props {@link DataGridEnumListColumnProps}.\n *\n * Renders a column with enum list content. Should be used in a {@link DataGridTable}.\n *\n * #### Example\n * ```tsx\n * <DataGridTable>\n *     <DataGridEnumListColumn field=\"target\" />\n * </DataGridTable>\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "DataGridEnumListColumn: "
+            },
+            {
+              "kind": "Reference",
+              "text": "React.NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "DataGridEnumListColumnProps",
+              "canonicalReference": "@contember/react-ui-lib!DataGridEnumListColumnProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/columns.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "DataGridEnumListColumn",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 5
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!DataGridEnumListColumnProps:type",
+          "docComment": "/**\n * Props for {@link DataGridEnumListColumn}.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type DataGridEnumListColumnProps = "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    field: string;\n    header?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    options?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Record",
+              "canonicalReference": "!Record:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<string, "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">;\n    children?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    filter?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    tooltipActions?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/columns.tsx",
+          "releaseTag": "Public",
+          "name": "DataGridEnumListColumnProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 14
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!DataGridHasManyCell:var",
+          "docComment": "/**\n * Renders a cell with a has-many relation. Contains a tooltip with filter actions.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "DataGridHasManyCell: "
+            },
+            {
+              "kind": "Reference",
+              "text": "React.NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "DataGridHasManyCellProps",
+              "canonicalReference": "@contember/react-ui-lib!DataGridHasManyCellProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/cells.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "DataGridHasManyCell",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 5
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!DataGridHasManyCellProps:type",
+          "docComment": "/**\n * Props for {@link DataGridHasManyCell}.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type DataGridHasManyCellProps = "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    field: "
+            },
+            {
+              "kind": "Reference",
+              "text": "SugaredRelativeEntityList",
+              "canonicalReference": "@contember/react-ui-lib!~SugaredRelativeEntityList:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "['field'];\n    filterName?: string;\n    children: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    tooltipActions?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/cells.tsx",
+          "releaseTag": "Public",
+          "name": "DataGridHasManyCellProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 8
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!DataGridHasManyColumn:var",
+          "docComment": "/**\n * Props {@link DataGridHasManyColumnProps}\n *\n * Renders a column with has-many relation content. Should be used in a {@link DataGridTable}.\n *\n * #### Example\n * ```tsx\n * <DataGridTable>\n *     <DataGridHasManyColumn field=\"tags\">\n *         <Field field=\"name\" />\n *     </DataGridHasManyColumn>\n * </DataGridTable>\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "DataGridHasManyColumn: "
+            },
+            {
+              "kind": "Reference",
+              "text": "React.NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "DataGridHasManyColumnProps",
+              "canonicalReference": "@contember/react-ui-lib!DataGridHasManyColumnProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/columns.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "DataGridHasManyColumn",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 5
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!DataGridHasManyColumnProps:type",
+          "docComment": "/**\n * Props for {@link DataGridHasManyColumn}.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type DataGridHasManyColumnProps = "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    field: "
+            },
+            {
+              "kind": "Reference",
+              "text": "SugaredRelativeEntityList",
+              "canonicalReference": "@contember/react-ui-lib!~SugaredRelativeEntityList:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "['field'];\n    filterName?: string;\n    children: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    header?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    filter?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    tooltipActions?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/columns.tsx",
+          "releaseTag": "Public",
+          "name": "DataGridHasManyColumnProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 12
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!DataGridHasManyFilter:var",
+          "docComment": "/**\n * Has many filter for DataGrid with default UI.\n *\n * ## Props {@link DataGridHasManyFilterProps} field, label, children, ?name, ?options\n *\n * #### Example\n * ```tsx\n * <DataGridHasManyFilter field={'tags'} label=\"Tags\">\n *     <Field field=\"name\" />\n * </DataGridHasManyFilter>\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "DataGridHasManyFilter: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "DataViewHasManyFilterProps",
+              "canonicalReference": "@contember/react-ui-lib!~DataViewHasManyFilterProps:interface"
+            },
+            {
+              "kind": "Content",
+              "text": " & {\n    children: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    label: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}>"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/filters/relation.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "DataGridHasManyFilter",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 10
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!DataGridHasManyFilterProps:type",
+          "docComment": "/**\n * Props for {@link DataGridHasManyFilter}.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type DataGridHasManyFilterProps = "
+            },
+            {
+              "kind": "Reference",
+              "text": "DataViewHasManyFilterProps",
+              "canonicalReference": "@contember/react-ui-lib!~DataViewHasManyFilterProps:interface"
+            },
+            {
+              "kind": "Content",
+              "text": " & {\n    children: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    label: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/filters/relation.tsx",
+          "releaseTag": "Public",
+          "name": "DataGridHasManyFilterProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 7
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!DataGridHasManyTooltip:var",
+          "docComment": "/**\n * Component for rendering a value with a tooltip that allows to include/exclude the value from the filter. Used in DataGridHasManyColumn, but can be used in custom columns as well.\n *\n * ## Props {@link DataGridHasManyTooltipProps} field, children, ?name, ?options, ?actions\n *\n * #### Example\n * ```tsx\n * <HasMany field=\"tags\">\n *     <DataGridHasManyTooltip field={'tags'}>\n *         <button className=\"text-sm border border-gray-200 rounded-sm px-2 py-1\">\n *             <Field field=\"name\" />\n *         </button>\n *     </DataGridHasManyTooltip>\n * </HasMany>\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "DataGridHasManyTooltip: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "DataGridHasManyTooltipProps",
+              "canonicalReference": "@contember/react-ui-lib!DataGridHasManyTooltipProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/filters/relation.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "DataGridHasManyTooltip",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 6
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!DataGridHasManyTooltipProps:type",
+          "docComment": "/**\n * Props for {@link DataGridHasManyTooltip}.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type DataGridHasManyTooltipProps = "
+            },
+            {
+              "kind": "Reference",
+              "text": "DataViewHasManyFilterProps",
+              "canonicalReference": "@contember/react-ui-lib!~DataViewHasManyFilterProps:interface"
+            },
+            {
+              "kind": "Content",
+              "text": " & {\n    children: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    actions?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/filters/relation.tsx",
+          "releaseTag": "Public",
+          "name": "DataGridHasManyTooltipProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 7
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!DataGridHasOneCell:var",
+          "docComment": "/**\n * Renders a cell with a has-one relation. Contains a tooltip with filter actions.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "DataGridHasOneCell: "
+            },
+            {
+              "kind": "Reference",
+              "text": "React.NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "DataGridHasOneCellProps",
+              "canonicalReference": "@contember/react-ui-lib!DataGridHasOneCellProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/cells.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "DataGridHasOneCell",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 5
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!DataGridHasOneCellProps:type",
+          "docComment": "/**\n * Props for {@link DataGridHasOneCell}.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type DataGridHasOneCellProps = "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    field: "
+            },
+            {
+              "kind": "Reference",
+              "text": "SugaredRelativeSingleEntity",
+              "canonicalReference": "@contember/react-ui-lib!~SugaredRelativeSingleEntity:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "['field'];\n    filterName?: string;\n    children: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    tooltipActions?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/cells.tsx",
+          "releaseTag": "Public",
+          "name": "DataGridHasOneCellProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 8
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!DataGridHasOneColumn:var",
+          "docComment": "/**\n * Props {@link DataGridHasOneColumnProps}.\n *\n * Renders a column with has-one relation content. Should be used in a {@link DataGridTable}.\n *\n * #### Example\n * ```tsx\n * <DataGridTable>\n *     <DataGridHasOneColumn field=\"author\">\n *         <Field field=\"name\" />\n *     </DataGridHasOneColumn>\n * </DataGridTable>\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "DataGridHasOneColumn: "
+            },
+            {
+              "kind": "Reference",
+              "text": "React.NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "DataGridHasOneColumnProps",
+              "canonicalReference": "@contember/react-ui-lib!DataGridHasOneColumnProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/columns.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "DataGridHasOneColumn",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 5
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!DataGridHasOneColumnProps:type",
+          "docComment": "/**\n * Props for {@link DataGridHasOneColumn}.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type DataGridHasOneColumnProps = "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    field: "
+            },
+            {
+              "kind": "Reference",
+              "text": "SugaredRelativeSingleEntity",
+              "canonicalReference": "@contember/react-ui-lib!~SugaredRelativeSingleEntity:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "['field'];\n    filterName?: string;\n    children: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    header?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    filter?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    tooltipActions?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/columns.tsx",
+          "releaseTag": "Public",
+          "name": "DataGridHasOneColumnProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 12
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!DataGridHasOneFilter:var",
+          "docComment": "/**\n * Has one filter for DataGrid with default UI.\n *\n * ## Props {@link DataGridHasOneFilterProps} field, label, children, ?name, ?options\n *\n * #### Example\n * ```tsx\n * <DataGridHasOneFilter field={'author'} label=\"Author\">\n *     <Field field=\"name\" />\n * </DataGridHasOneFilter>\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "DataGridHasOneFilter: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "DataViewHasOneFilterProps",
+              "canonicalReference": "@contember/react-ui-lib!~DataViewHasOneFilterProps:interface"
+            },
+            {
+              "kind": "Content",
+              "text": " & {\n    children: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    label: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}>"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/filters/relation.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "DataGridHasOneFilter",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 10
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!DataGridHasOneFilterProps:type",
+          "docComment": "/**\n * Props for {@link DataGridHasOneFilter}.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type DataGridHasOneFilterProps = "
+            },
+            {
+              "kind": "Reference",
+              "text": "DataViewHasOneFilterProps",
+              "canonicalReference": "@contember/react-ui-lib!~DataViewHasOneFilterProps:interface"
+            },
+            {
+              "kind": "Content",
+              "text": " & {\n    children: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    label: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/filters/relation.tsx",
+          "releaseTag": "Public",
+          "name": "DataGridHasOneFilterProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 7
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!DataGridHasOneTooltip:var",
+          "docComment": "/**\n * Component for rendering a value with a tooltip that allows to include/exclude the value from the filter. Used in DataGridHasOneColumn, but can be used in custom columns as well.\n *\n * ## Props {@link DataGridHasOneTooltipProps} field, children, ?name, ?options, ?actions\n *\n * #### Example\n * ```tsx\n * <HasOne field=\"category\">\n * <DataGridHasOneTooltip field={'category'}>\n *     <button className=\"text-lg font-semibold text-gray-600\">\n *        <Field field=\"category.name\" />\n *     </button>\n *  </button>\n * </DataGridHasOneTooltip>\n * </HasOne>\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "DataGridHasOneTooltip: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "DataGridHasOneTooltipProps",
+              "canonicalReference": "@contember/react-ui-lib!DataGridHasOneTooltipProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/filters/relation.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "DataGridHasOneTooltip",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 6
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!DataGridHasOneTooltipProps:type",
+          "docComment": "/**\n * Props for {@link DataGridHasOneTooltip}.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type DataGridHasOneTooltipProps = "
+            },
+            {
+              "kind": "Reference",
+              "text": "DataViewHasOneFilterProps",
+              "canonicalReference": "@contember/react-ui-lib!~DataViewHasOneFilterProps:interface"
+            },
+            {
+              "kind": "Content",
+              "text": " & {\n    children: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    actions?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/filters/relation.tsx",
+          "releaseTag": "Public",
+          "name": "DataGridHasOneTooltipProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 7
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!DataGridIsDefinedColumn:var",
+          "docComment": "/**\n * Props {@link DataGridIsDefinedColumnProps}.\n *\n * Renders a column with is-defined content. Should be used in a {@link DataGridTable}.\n *\n * #### Example\n * ```tsx\n * <DataGridTable>\n *     <DataGridIsDefinedColumn field=\"coverImage.url\" />\n * </DataGridTable>\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "DataGridIsDefinedColumn: "
+            },
+            {
+              "kind": "Reference",
+              "text": "React.NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "DataGridIsDefinedColumnProps",
+              "canonicalReference": "@contember/react-ui-lib!DataGridIsDefinedColumnProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/columns.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "DataGridIsDefinedColumn",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 5
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!DataGridIsDefinedColumnProps:type",
+          "docComment": "/**\n * Props for {@link DataGridIsDefinedColumn}.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type DataGridIsDefinedColumnProps = "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    field: string;\n    header?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    children?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    format?: (value: boolean) => "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    filter?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    filterName?: string;\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/columns.tsx",
+          "releaseTag": "Public",
+          "name": "DataGridIsDefinedColumnProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 10
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!DataGridIsDefinedFilter:var",
+          "docComment": "/**\n * Props {@link DataGridIsDefinedFilterProps}\n *\n * `DataGridIsDefinedFilter` is a filter component for `DataGrid` that checks whether a field is defined or not. It provides a default UI for filtering records based on the presence of a value.\n *\n * #### Example: Basic usage\n * ```tsx\n * <DataGridIsDefinedFilter field=\"deletedAt\" label=\"Is Deleted?\" />\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "DataGridIsDefinedFilter: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "Omit",
+              "canonicalReference": "!Omit:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "DataViewBooleanFilterProps",
+              "canonicalReference": "@contember/react-ui-lib!~DataViewBooleanFilterProps:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", \"children\"> & {\n    label: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}>"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/filters/defined.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "DataGridIsDefinedFilter",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 10
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!DataGridIsDefinedFilterProps:type",
+          "docComment": "/**\n * Props for {@link DataGridIsDefinedFilter}.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type DataGridIsDefinedFilterProps = "
+            },
+            {
+              "kind": "Reference",
+              "text": "Omit",
+              "canonicalReference": "!Omit:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "DataViewBooleanFilterProps",
+              "canonicalReference": "@contember/react-ui-lib!~DataViewBooleanFilterProps:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", 'children'> & {\n    label: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/filters/defined.tsx",
+          "releaseTag": "Public",
+          "name": "DataGridIsDefinedFilterProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 7
+          }
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@contember/react-ui-lib!DataGridLayoutSwitcher:function(1)",
+          "docComment": "/**\n * `DataGridLayoutSwitcher` is a UI component for switching between different data grid layouts. It renders a set of buttons, allowing users to select and apply a layout dynamically.\n *\n * #### Example: Basic Usage\n * ```tsx\n * <DataGridLayoutSwitcher />\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "DataGridLayoutSwitcher: () => "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react/jsx-runtime\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "JSX.Element",
+              "canonicalReference": "@types/react!JSX.Element:interface"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/layout-switcher.tsx",
+          "returnTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 3
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [],
+          "name": "DataGridLayoutSwitcher"
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@contember/react-ui-lib!DataGridLoader:function(1)",
+          "docComment": "/**\n * `DataGridLoader` manages the loading state for a data grid, displaying appropriate loaders based on the current state (refreshing, initial load, or failure).\n *\n * #### Example: Basic Usage\n * ```tsx\n * <DataGridLoader>\n *     <DataGridTable>\n *         <DataGridTextColumn header=\"Title\" field=\"title\" />\n *     </DataGridTable>\n * </DataGridLoader>\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "DataGridLoader: ({ children }: "
+            },
+            {
+              "kind": "Reference",
+              "text": "DataGridLoaderProps",
+              "canonicalReference": "@contember/react-ui-lib!DataGridLoaderProps:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react/jsx-runtime\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "JSX.Element",
+              "canonicalReference": "@types/react!JSX.Element:interface"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/loader.tsx",
+          "returnTypeTokenRange": {
+            "startIndex": 3,
+            "endIndex": 5
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "{ children }",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "DataGridLoader"
+        },
+        {
+          "kind": "Interface",
+          "canonicalReference": "@contember/react-ui-lib!DataGridLoaderProps:interface",
+          "docComment": "/**\n * Props for the {@link DataGridLoader} component.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export interface DataGridLoaderProps "
+            }
+          ],
+          "fileUrlPath": "src/datagrid/loader.tsx",
+          "releaseTag": "Public",
+          "name": "DataGridLoaderProps",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@contember/react-ui-lib!DataGridLoaderProps#children:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "children: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ReactNode",
+                  "canonicalReference": "@types/react!React.ReactNode:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "children",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            }
+          ],
+          "extendsTokenRanges": []
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@contember/react-ui-lib!DataGridNoResults:function(1)",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "DataGridNoResults: () => "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react/jsx-runtime\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "JSX.Element",
+              "canonicalReference": "@types/react!JSX.Element:interface"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/empty.tsx",
+          "returnTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 3
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [],
+          "name": "DataGridNoResults"
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!DataGridNumberColumn:var",
+          "docComment": "/**\n * Props {@link DataGridNumberColumnProps}.\n *\n * Renders a column with number content. Should be used in a {@link DataGridTable}.\n *\n * #### Example\n * ```tsx\n * <DataGridTable>\n *     <DataGridNumberColumn field=\"price\" format={it => it.toFixed(2)} />\n *     <DataGridNumberColumn field=\"price\" header=\"Price with currency\">\n *         <Field field=\"price\" /> <Field field=\"currency\" />\n *     </DataGridNumberColumn>\n * </DataGridTable>\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "DataGridNumberColumn: "
+            },
+            {
+              "kind": "Reference",
+              "text": "React.NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "DataGridNumberColumnProps",
+              "canonicalReference": "@contember/react-ui-lib!DataGridNumberColumnProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/columns.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "DataGridNumberColumn",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 5
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!DataGridNumberColumnProps:type",
+          "docComment": "/**\n * Props for {@link DataGridNumberColumn}.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type DataGridNumberColumnProps = "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    field: string;\n    header?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    children?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    format?: (value: number | null) => "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    filter?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/columns.tsx",
+          "releaseTag": "Public",
+          "name": "DataGridNumberColumnProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 10
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!DataGridNumberFilter:var",
+          "docComment": "/**\n * Props {@link DataGridNumberFilterProps}\n *\n * `DataGridNumberFilter` provides a number filter UI for `DataGrid`, allowing users to filter numerical values efficiently.\n *\n * #### Example\n * ```tsx\n * <DataGridNumberFilter field=\"views\" label=\"Views\" />\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "DataGridNumberFilter: "
+            },
+            {
+              "kind": "Reference",
+              "text": "React.NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "Omit",
+              "canonicalReference": "!Omit:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "DataViewNumberFilterProps",
+              "canonicalReference": "@contember/react-ui-lib!~DataViewNumberFilterProps:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", \"children\"> & {\n    label: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}>"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/filters/number.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "DataGridNumberFilter",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 9
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!DataGridNumberFilterProps:type",
+          "docComment": "/**\n * Props for {@link DataGridNumberFilter}.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type DataGridNumberFilterProps = "
+            },
+            {
+              "kind": "Reference",
+              "text": "Omit",
+              "canonicalReference": "!Omit:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "DataViewNumberFilterProps",
+              "canonicalReference": "@contember/react-ui-lib!~DataViewNumberFilterProps:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", 'children'> & {\n    label: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/filters/number.tsx",
+          "releaseTag": "Public",
+          "name": "DataGridNumberFilterProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 7
+          }
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@contember/react-ui-lib!DataGridPagination:function(1)",
+          "docComment": "/**\n * Props {@link DataGridPaginationProps}\n *\n * `DataGridPagination` provides pagination controls for navigating through pages in a `DataView`. It includes buttons for navigating to the first, previous, next, and last pages.\n *\n * #### Example: Basic Usage\n * ```tsx\n * <DataGridPagination />\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "DataGridPagination: ({ sticky }: "
+            },
+            {
+              "kind": "Reference",
+              "text": "DataGridPaginationProps",
+              "canonicalReference": "@contember/react-ui-lib!DataGridPaginationProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react/jsx-runtime\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "JSX.Element",
+              "canonicalReference": "@types/react!JSX.Element:interface"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/pagination.tsx",
+          "returnTypeTokenRange": {
+            "startIndex": 3,
+            "endIndex": 5
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "{ sticky }",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "DataGridPagination"
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!DataGridPaginationProps:type",
+          "docComment": "/**\n * Props for {@link DataGridPagination} component.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type DataGridPaginationProps = "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    sticky?: boolean;\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/pagination.tsx",
+          "releaseTag": "Public",
+          "name": "DataGridPaginationProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          }
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@contember/react-ui-lib!DataGridPerPageSelector:function(1)",
+          "docComment": "/**\n * `DataGridPerPageSelector` allows users to set the number of items displayed per page in a `DataView`. It provides a dropdown menu with preset options.\n *\n * #### Example: Basic Usage\n * ```tsx\n * <DataGridPerPageSelector />\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "DataGridPerPageSelector: () => "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react/jsx-runtime\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "JSX.Element",
+              "canonicalReference": "@types/react!JSX.Element:interface"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/pagination.tsx",
+          "returnTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 3
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [],
+          "name": "DataGridPerPageSelector"
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!DataGridPredefinedDateRange:type",
+          "docComment": "/**\n * Props for {@link DataGridDateFilter}.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type DataGridPredefinedDateRange = "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    start: string;\n    end: string;\n    label: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/filters/date.tsx",
+          "releaseTag": "Public",
+          "name": "DataGridPredefinedDateRange",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 4
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!DataGridProps:type",
+          "docComment": "/**\n * Props for {@link DataGrid}.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type DataGridProps = "
+            },
+            {
+              "kind": "Reference",
+              "text": "Omit",
+              "canonicalReference": "!Omit:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "DataViewProps",
+              "canonicalReference": "@contember/react-ui-lib!~DataViewProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ", 'children'> & {\n    children: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/grid.tsx",
+          "releaseTag": "Public",
+          "name": "DataGridProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 7
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!DataGridQueryFilter:var",
+          "docComment": "/**\n * Universal text filter for DataGrid with default UI. By default, it filters all text fields.\n *\n * #### Example\n * ```tsx\n * <DataGridQueryFilter label=\"Search\" />\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "DataGridQueryFilter: "
+            },
+            {
+              "kind": "Reference",
+              "text": "React.NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "DataGridQueryFilterProps",
+              "canonicalReference": "@contember/react-ui-lib!DataGridQueryFilterProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/filters/text.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "DataGridQueryFilter",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 5
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!DataGridQueryFilterProps:type",
+          "docComment": "/**\n * Props for {@link DataGridQueryFilter}.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type DataGridQueryFilterProps = "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    label?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "React.ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/filters/text.tsx",
+          "releaseTag": "Public",
+          "name": "DataGridQueryFilterProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 4
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!DataGridTable:var",
+          "docComment": "/**\n * `DataGridTable` provides a table layout for `DataView`, allowing structured data representation. It must be used within a `DataView` context to function correctly.\n *\n * #### Example: Basic usage\n * ```tsx\n * <DataGridTable>\n *   <DataGridTextColumn header=\"Title\" field=\"title\" />\n *   <DataGridTextColumn header=\"Author\" field=\"author\" />\n * </DataGridTable>\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "DataGridTable: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "DataViewTableProps",
+              "canonicalReference": "@contember/react-ui-lib!DataViewTableProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/table.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "DataGridTable",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 6
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!DataGridTextColumn:var",
+          "docComment": "/**\n * Props {@link DataGridTextColumnProps}.\n *\n * Renders a column with text content and column controls in a header. Should be used in a {@link DataGridTable}.\n *\n * #### Example: Basic Usage\n * ```tsx\n * <DataGridTable>\n *     <DataGridTextColumn field=\"title\" />\n *     <DataGridTextColumn\n *         field=\"subtitle\"\n *         format={it => (\n *             <span className=\"text-blue-500 flex items-center gap-2\">\n *                 <Heading2Icon /> {it}\n *             </span>\n *         )}\n *     />\n *     <DataGridTextColumn field=\"description\" format={it => it.slice(0, 100)} />\n * </DataGridTable>\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "DataGridTextColumn: "
+            },
+            {
+              "kind": "Reference",
+              "text": "React.NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "DataGridTextColumnProps",
+              "canonicalReference": "@contember/react-ui-lib!DataGridTextColumnProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/columns.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "DataGridTextColumn",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 5
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!DataGridTextColumnProps:type",
+          "docComment": "/**\n * Props for {@link DataGridTextColumn}.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type DataGridTextColumnProps = "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    field: string;\n    header?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    children?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    format?: (value: string | null) => "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    filter?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/columns.tsx",
+          "releaseTag": "Public",
+          "name": "DataGridTextColumnProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 10
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!DataGridTextFilter:var",
+          "docComment": "/**\n * Text filter for DataGrid with default UI.\n *\n * ## Props {@link DataGridTextFilterProps} field, label, ?name\n *\n * #### Example\n * ```tsx\n * <DataGridTextFilter field={'name'} label=\"Name\" />\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "DataGridTextFilter: "
+            },
+            {
+              "kind": "Reference",
+              "text": "React.NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "Omit",
+              "canonicalReference": "!Omit:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "DataViewTextFilterProps",
+              "canonicalReference": "@contember/react-ui-lib!~DataViewTextFilterProps:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", \"children\"> & {\n    label?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "React.ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}>"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/filters/text.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "DataGridTextFilter",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 9
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!DataGridTextFilterProps:type",
+          "docComment": "/**\n * Props for {@link DataGridTextFilter}.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type DataGridTextFilterProps = "
+            },
+            {
+              "kind": "Reference",
+              "text": "Omit",
+              "canonicalReference": "!Omit:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "DataViewTextFilterProps",
+              "canonicalReference": "@contember/react-ui-lib!~DataViewTextFilterProps:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", 'children'> & {\n    label?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "React.ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/filters/text.tsx",
+          "releaseTag": "Public",
+          "name": "DataGridTextFilterProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 7
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!DataGridTiles:var",
+          "docComment": "/**\n * `DataGridTiles` provides a simple grid layout for `DataView`, enabling a tile-based display. It must be used within a `DataView` context.\n *\n * #### Example: Basic usage\n * ```tsx\n * <DataGridTiles>\n *   <MyCustomTile />\n * </DataGridTiles>\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "DataGridTiles: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "DataGridTilesProps",
+              "canonicalReference": "@contember/react-ui-lib!DataGridTilesProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/tiles.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "DataGridTiles",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 6
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!DataGridTilesProps:type",
+          "docComment": "/**\n * Props for the {@link DataGridTiles} component.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type DataGridTilesProps = "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    children: "
+            },
+            {
+              "kind": "Reference",
+              "text": "React.ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    className?: string;\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/tiles.tsx",
+          "releaseTag": "Public",
+          "name": "DataGridTilesProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 4
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!DataGridToolbar:var",
+          "docComment": "/**\n * `DataGridToolbar` provides a toolbar for `DataGrid` with default UI components. It includes filtering, layout settings, export functionality, and a reload button.\n *\n * #### Example: Basic usage with custom filters\n * ```tsx\n * <DataGridToolbar>\n *   <DataGridQueryFilter />\n *   <DataGridTextFilter field=\"name\" label=\"Name\" />\n * </DataGridToolbar>\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "DataGridToolbar: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "DataGridToolbarProps",
+              "canonicalReference": "@contember/react-ui-lib!DataGridToolbarProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/toolbar.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "DataGridToolbar",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 6
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!DataGridToolbarProps:type",
+          "docComment": "/**\n * Props for the {@link DataGridToolbar} component.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type DataGridToolbarProps = "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    children?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    sticky?: boolean;\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/toolbar.tsx",
+          "releaseTag": "Public",
+          "name": "DataGridToolbarProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 4
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!DataGridUnionTextFilter:var",
+          "docComment": "/**\n * Text filter which filters multiple fields at once for DataGrid with default UI.\n *\n * ## Props {@link DataGridUnionTextFilterProps} fields, label, ?name\n *\n * #### Example\n * ```tsx\n * <DataGridUnionTextFilter fields={['name', 'description']} label=\"Name or description\" />\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "DataGridUnionTextFilter: "
+            },
+            {
+              "kind": "Reference",
+              "text": "React.NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "Omit",
+              "canonicalReference": "!Omit:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "DataViewUnionTextFilterProps",
+              "canonicalReference": "@contember/react-ui-lib!~DataViewUnionTextFilterProps:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", \"children\"> & {\n    label?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "React.ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}>"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/filters/text.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "DataGridUnionTextFilter",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 9
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!DataGridUnionTextFilterProps:type",
+          "docComment": "/**\n * Props for {@link DataGridUnionTextFilter}.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type DataGridUnionTextFilterProps = "
+            },
+            {
+              "kind": "Reference",
+              "text": "Omit",
+              "canonicalReference": "!Omit:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "DataViewUnionTextFilterProps",
+              "canonicalReference": "@contember/react-ui-lib!~DataViewUnionTextFilterProps:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", 'children'> & {\n    label?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "React.ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/filters/text.tsx",
+          "releaseTag": "Public",
+          "name": "DataGridUnionTextFilterProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 7
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!DataGridUuidColumn:var",
+          "docComment": "/**\n * Props {@link DataGridUuidColumnProps}.\n *\n * Renders a column with UUID content. Should be used in a {@link DataGridTable}.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "DataGridUuidColumn: "
+            },
+            {
+              "kind": "Reference",
+              "text": "React.NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "DataGridUuidColumnProps",
+              "canonicalReference": "@contember/react-ui-lib!DataGridUuidColumnProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/columns.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "DataGridUuidColumn",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 5
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!DataGridUuidColumnProps:type",
+          "docComment": "/**\n * Props for {@link DataGridUuidColumn}.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type DataGridUuidColumnProps = "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    field: string;\n    header?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    children?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    format?: (value: string | null) => "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/columns.tsx",
+          "releaseTag": "Public",
+          "name": "DataGridUuidColumnProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 8
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!DataViewTableProps:type",
+          "docComment": "/**\n * Props for the {@link DataGridTable} component.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type DataViewTableProps = "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    children: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/table.tsx",
+          "releaseTag": "Public",
+          "name": "DataViewTableProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 4
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@contember/react-ui-lib!DefaultDataGrid:var",
+          "docComment": "/**\n * `DefaultDataGrid` is a pre-configured `DataGrid` component that includes a toolbar, loader, table, and pagination. It provides a structured layout for displaying data with minimal configuration.\n *\n * #### Example: Basic Usage\n * ```tsx\n * <DefaultDataGrid entities=\"Project\">\n *     <DataGridActionColumn>\n *         <Button>Show detail</Button>\n *     </DataGridActionColumn>\n *     <DataGridTextColumn header=\"Title\" field=\"title\" />\n *     <DataGridEnumColumn header=\"State\" field=\"state\" />\n * </DefaultDataGrid>\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "DefaultDataGrid: "
+            },
+            {
+              "kind": "Content",
+              "text": "import(\"react\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "NamedExoticComponent",
+              "canonicalReference": "@types/react!React.NamedExoticComponent:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "Omit",
+              "canonicalReference": "!Omit:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "DataViewProps",
+              "canonicalReference": "@contember/react-ui-lib!~DataViewProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ", \"children\"> & {\n    children: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    toolbar?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}>"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/grid.tsx",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "DefaultDataGrid",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 12
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@contember/react-ui-lib!DefaultDataGridProps:type",
+          "docComment": "/**\n * Props for {@link DefaultDataGrid}.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type DefaultDataGridProps = "
+            },
+            {
+              "kind": "Reference",
+              "text": "Omit",
+              "canonicalReference": "!Omit:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "DataViewProps",
+              "canonicalReference": "@contember/react-ui-lib!~DataViewProps:type"
+            },
+            {
+              "kind": "Content",
+              "text": ", 'children'> & {\n    children: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    toolbar?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ReactNode",
+              "canonicalReference": "@types/react!React.ReactNode:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "src/datagrid/grid.tsx",
+          "releaseTag": "Public",
+          "name": "DefaultDataGridProps",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 9
+          }
+        }
+      ]
+    }
+  ]
+}

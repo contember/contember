@@ -1,6 +1,6 @@
-import type { GraphQlClient } from '@contember/client'
+import type { GraphQlClient } from '@contember/graphql-client'
 import { ClientError } from '../ClientError'
-import { useProjectSlug, useStageSlug } from '../project'
+import { useProjectSlug, useStageSlug } from '../contexts'
 import { useContentGraphQlClient } from './useContentGraphQlClient'
 
 export const useCurrentContentGraphQlClient = (): GraphQlClient => {

@@ -34,11 +34,10 @@ export class SchemaProvider {
 
 		const partialResult = newMigrations.reduce<SchemaWithMeta>(
 			(schema, migration) => {
-				if (migration.type !== 'schema') {
-					return schema
-				}
 				return {
-					schema: this.schemaMigrator.applyModifications(schema.schema, migration.modifications, migration.formatVersion),
+					schema: migration.type !== 'schema'
+						? schema.schema
+						: this.schemaMigrator.applyModifications(schema.schema, migration.modifications, migration.formatVersion),
 					meta: {
 						version: migration.version,
 						id: migration.id,
@@ -63,7 +62,7 @@ export class SchemaProvider {
 		}
 	}
 
-	public async fetch({ db, currentSchema  }: {
+	public async fetch({ db, currentSchema }: {
 		db: DatabaseContext
 		currentSchema?: SchemaWithMeta | null
 	}): Promise<SchemaWithMeta> {

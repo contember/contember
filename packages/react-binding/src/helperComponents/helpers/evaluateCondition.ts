@@ -20,7 +20,7 @@ export const evaluateCondition = (value: FieldValue | null, condition: Input.Con
 		lte: expr => value !== null && value <= expr,
 		gt: expr => value !== null && value > expr,
 		gte: expr => value !== null && value >= expr,
-		includes: expr => Array.isArray(value) && value.includes(expr),
+		includes: (expr: any) => Array.isArray(value) && value.includes(expr),
 		maxLength: expr => Array.isArray(value) && value.length <= expr,
 		minLength: expr => Array.isArray(value) && value.length >= expr,
 		contains: expr => typeof value === 'string' && value.includes(expr),

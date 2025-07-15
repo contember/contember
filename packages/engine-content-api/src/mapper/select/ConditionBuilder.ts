@@ -49,7 +49,7 @@ export class ConditionBuilder {
 			gt: (builder, value) => builder.compare(columnIdentifier, Operator.gt, value),
 			gte: (builder, value) => builder.compare(columnIdentifier, Operator.gte, value),
 
-			includes: (builder, value) => {
+			includes: (builder, value: any) => {
 				if (columnType.type === Model.ColumnType.Json) {
 					// For JSON columns, use @> operator to check if JSON contains the value
 					return builder.raw(`${formatColumnIdentifier(columnIdentifier)} @> ?::jsonb`, JSON.stringify(value))

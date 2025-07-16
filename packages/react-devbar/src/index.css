@@ -235,6 +235,12 @@
 	overflow: auto;
 }
 
+.cui-devError-errorSource {
+	display: flex;
+	gap: 20px;
+	align-items: center;
+}
+
 .cui-devError-errorMessage,
 .cui-devError-errorName,
 .cui-devError-errorDetails {
@@ -284,6 +290,7 @@
 	color: #eeeeee;
 	display: flex;
 	align-items: center;
+	justify-content: space-between;
 }
 
 .cui-devError-causedBy {
@@ -292,6 +299,26 @@
 	color: #000000;
 	display: flex;
 	align-items: center;
+}
+
+.cui-devError-copyButton {
+	background: transparent;
+	border: 1px solid #cbcbcb;
+	border-radius: 0.375rem;
+	color: #ffffff;
+	cursor: pointer;
+	font-size: 0.875rem;
+	font-weight: 500;
+	padding: 0.375rem 0.75rem;
+	transition: all 200ms;
+	display: flex;
+	align-items: center;
+	gap: 0.25rem;
+}
+
+.cui-devError-copyButton:hover:not(:disabled) {
+	background: #910f0f;
+	border-color: #910f0f;
 }
 
 .cui-devError-actions {

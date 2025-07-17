@@ -1,11 +1,13 @@
 import { Model } from '@contember/schema'
 import { CreateFieldContext, FieldDefinition } from './FieldDefinition'
 import { EntityConstructor, RelationTarget } from '../types'
+import { ManyHasManyDefinition } from './ManyHasManyDefinition'
+import { DEFAULT_FIELD_DEPRECATION_REASON } from '@contember/schema-utils'
 
 export class ManyHasManyInverseDefinition extends FieldDefinition<ManyHasManyInverseDefinitionOptions> {
 	type = 'ManyHasManyInverseDefinition' as const
 
-	orderBy(
+	public orderBy(
 		field: string | string[],
 		direction: Model.OrderDirection | `${Model.OrderDirection}` = Model.OrderDirection.asc,
 	): ManyHasManyInverseDefinition {
@@ -13,7 +15,15 @@ export class ManyHasManyInverseDefinition extends FieldDefinition<ManyHasManyInv
 		return this.withOption('orderBy', [...(this.options.orderBy || []), { path, direction: direction as Model.OrderDirection }])
 	}
 
-	createField({ name, conventions, entityName, entityRegistry }: CreateFieldContext): Model.AnyField {
+	public deprecated(deprecationReason?: string): ManyHasManyInverseDefinition {
+		return this.withOption('deprecationReason', deprecationReason || DEFAULT_FIELD_DEPRECATION_REASON)
+	}
+
+	public description(description: string): ManyHasManyInverseDefinition {
+		return this.withOption('description', description)
+	}
+
+	public createField({ name, conventions, entityName, entityRegistry }: CreateFieldContext): Model.AnyField {
 		const options = this.options
 		return {
 			name: name,
@@ -21,6 +31,8 @@ export class ManyHasManyInverseDefinition extends FieldDefinition<ManyHasManyInv
 			target: entityRegistry.getName(options.target),
 			type: Model.RelationType.ManyHasMany,
 			...(options.orderBy ? { orderBy: options.orderBy } : {}),
+			...(options.deprecationReason !== undefined ? { deprecationReason: options.deprecationReason } : {}),
+			...(options.description !== undefined ? { description: options.description } : {}),
 		}
 	}
 
@@ -38,4 +50,6 @@ export type ManyHasManyInverseDefinitionOptions = {
 	target: RelationTarget
 	ownedBy: string
 	orderBy?: Model.OrderBy[]
+	deprecationReason?: string
+	description?: string
 }

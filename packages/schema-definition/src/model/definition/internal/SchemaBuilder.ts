@@ -65,7 +65,6 @@ export class SchemaBuilder {
 					return { ...acc, [field.name]: field }
 				}, {})
 
-
 			const entity: Model.Entity = {
 				name: entityName,
 				primary: primaryName,

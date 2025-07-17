@@ -15,7 +15,7 @@ import {
 import * as React from 'react'
 import { useCallback, useMemo } from 'react'
 import { FormContainer, FormContainerProps } from './container'
-import { FormFieldScope, FormHasManyRelationScope, FormHasOneRelationScope, useFormFieldId, useFormFieldState } from '@contember/react-form'
+import { FormFieldScope, FormHasManyRelationScope, FormHasOneRelationScope, useFormFieldState } from '@contember/react-form'
 import { Component, Field, RecursionTerminator, SugaredRelativeSingleField, useEntityBeforePersist, useField } from '@contember/interface'
 import { Popover, PopoverTrigger } from '../ui/popover'
 import { ChevronDownIcon, ChevronUpIcon } from 'lucide-react'
@@ -98,33 +98,43 @@ export const SelectEnumField = Component<SelectEnumFieldProps>(
 	'SelectEnumField',
 )
 
+const useNormalizedOptions = (options: SelectEnumFieldProps['options']) => {
+	return useMemo(() => {
+		if (!options) return []
+		return Array.isArray(options)
+			? options
+			: Object.entries(options).map(([value, label]) => ({ value, label }))
+	}, [options])
+}
+
 const SelectEnumFieldInner = ({ field, options, placeholder, required }: SelectEnumFieldProps) => {
 	const [open, setOpen] = React.useState(false)
 	const fieldAccessor = useField(field)
 	const fieldAccessorGetter = fieldAccessor.getAccessor
+
 	useEntityBeforePersist(useCallback(() => {
 		if (!required) {
 			return
 		}
+
 		const field = fieldAccessorGetter()
 		if (!field.value) {
 			field.addError(dict.errors.required)
 		}
 	}, [fieldAccessorGetter, required]))
-	const id = useFormFieldId()
+
+	const fieldState = useFormFieldState()
 	const enumLabelsFormatter = useEnumOptionsFormatter()
-	const enumName = useFormFieldState()?.field?.enumName
+	const id = fieldState?.htmlId
+	const enumName = fieldState?.field?.enumName
+
 	options ??= enumName ? enumLabelsFormatter(enumName) : undefined
 	if (!options) {
 		throw new Error('SelectEnumFields: options are required')
 	}
-	const normalizedOptions = useMemo(() => {
-		return Array.isArray(options) ? options : Object.entries(options).map(([value, label]) => ({ value, label }))
-	}, [options])
-	const selectedValue = useMemo(() => {
-		return normalizedOptions.find(it => it.value === fieldAccessor.value)
-	}, [fieldAccessor.value, normalizedOptions])
 
+	const normalizedOptions = useNormalizedOptions(options)
+	const selectedValue = useMemo(() => normalizedOptions.find(it => it.value === fieldAccessor.value), [fieldAccessor.value, normalizedOptions])
 
 	return (
 		<Popover open={open} onOpenChange={setOpen}>

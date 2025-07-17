@@ -19,6 +19,7 @@ import { HTMLAttributes } from 'react';
 import { ImageFileTypeProps } from '@contember/react-uploader';
 import { InputHTMLAttributes } from 'react';
 import { LabelProps } from '@radix-ui/react-label';
+import { NamedExoticComponent } from 'react';
 import * as React_2 from 'react';
 import { ReactNode } from 'react';
 import { RefAttributes } from 'react';
@@ -63,15 +64,15 @@ export type BaseUploadFieldProps = Omit<FormContainerProps, 'children'> & Upload
 };
 
 // @public (undocumented)
-export const CheckboxField: React_2.NamedExoticComponent<Omit<FormCheckboxProps, "children"> & Omit<FormContainerProps, "children"> & {
-    required?: boolean;
-    inputProps?: Omit<React_2.InputHTMLAttributes<HTMLInputElement>, "defaultValue">;
+export const CheckboxField: NamedExoticComponent<Omit<FormCheckboxProps, "children"> & Omit<FormContainerProps, "children"> & {
+required?: boolean;
+inputProps?: Omit<React.InputHTMLAttributes<HTMLInputElement>, "defaultValue">;
 }>;
 
 // @public (undocumented)
 export type CheckboxFieldProps = Omit<FormCheckboxProps, 'children'> & Omit<FormContainerProps, 'children'> & {
     required?: boolean;
-    inputProps?: Omit<React_2.InputHTMLAttributes<HTMLInputElement>, 'defaultValue'>;
+    inputProps?: Omit<React.InputHTMLAttributes<HTMLInputElement>, 'defaultValue'>;
 };
 
 // @public (undocumented)
@@ -87,21 +88,16 @@ export const FileRepeaterField: React_2.NamedExoticComponent<FileRepeaterFieldPr
 export type FileRepeaterFieldProps = BaseFileRepeaterFieldProps & AnyFileTypeProps;
 
 // @public (undocumented)
-export const FormContainer: React_2.NamedExoticComponent<FormContainerProps>;
+export const FormContainer: NamedExoticComponent<FormContainerProps>;
 
 // @public (undocumented)
-export interface FormContainerProps {
-    // (undocumented)
-    children: ReactNode;
-    // (undocumented)
-    description?: ReactNode;
-    // (undocumented)
-    errors?: ErrorAccessor.Error[] | ReactNode;
-    // (undocumented)
+export type FormContainerProps = {
     label?: ReactNode;
-    // (undocumented)
+    description?: ReactNode;
+    children: ReactNode;
+    errors?: ErrorAccessor.Error[] | ReactNode;
     required?: boolean;
-}
+};
 
 // @public (undocumented)
 export const FormContainerUI: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLDivElement> & HTMLAttributes<HTMLDivElement> & {
@@ -164,9 +160,9 @@ export const ImageRepeaterField: React_2.NamedExoticComponent<ImageRepeaterField
 export type ImageRepeaterFieldProps = BaseFileRepeaterFieldProps & ImageFileTypeProps;
 
 // @public (undocumented)
-export const InputField: React_2.NamedExoticComponent<Omit<FormInputProps, "children"> & Omit<FormContainerProps, "children"> & {
-    required?: boolean;
-    inputProps?: ComponentProps<typeof Input>;
+export const InputField: NamedExoticComponent<Omit<FormInputProps, "children"> & Omit<FormContainerProps, "children"> & {
+required?: boolean;
+inputProps?: ComponentProps<typeof Input>;
 }>;
 
 // @public (undocumented)
@@ -184,17 +180,17 @@ export const MultiSelectField: React_2.NamedExoticComponent<MultiSelectFieldProp
 export type MultiSelectFieldProps = MultiSelectInputProps & Omit<FormContainerProps, 'children' | 'required'>;
 
 // @public (undocumented)
-export const RadioEnumField: React_2.NamedExoticComponent<RadioEnumFieldProps>;
+export const RadioEnumField: NamedExoticComponent<RadioEnumFieldProps>;
 
 // @public (undocumented)
 export type RadioEnumFieldProps = Omit<FormRadioItemProps, 'children' | 'value'> & Omit<FormContainerProps, 'children'> & {
     required?: boolean;
     options?: Record<string, ReactNode> | Array<{
         value: null | string | number | boolean;
-        label: React_2.ReactNode;
+        label: React.ReactNode;
     }>;
     orientation?: 'horizontal' | 'vertical';
-    inputProps?: Omit<React_2.InputHTMLAttributes<HTMLInputElement>, 'defaultValue'>;
+    inputProps?: Omit<React.InputHTMLAttributes<HTMLInputElement>, 'defaultValue'>;
 };
 
 // @public (undocumented)
@@ -229,12 +225,12 @@ export const SortableMultiSelectField: React_2.NamedExoticComponent<SortableMult
 export type SortableMultiSelectFieldProps = SortableMultiSelectInputProps & Omit<FormContainerProps, 'children' | 'required'>;
 
 // @public @deprecated (undocumented)
-export const StandaloneFormContainer: React_2.NamedExoticComponent<FormContainerProps>;
+export const StandaloneFormContainer: NamedExoticComponent<FormContainerProps>;
 
 // @public (undocumented)
-export const TextareaField: React_2.NamedExoticComponent<Omit<FormInputProps, "children"> & Omit<FormContainerProps, "children"> & {
-    required?: boolean;
-    inputProps?: ComponentProps<typeof TextareaAutosize>;
+export const TextareaField: NamedExoticComponent<Omit<FormInputProps, "children"> & Omit<FormContainerProps, "children"> & {
+required?: boolean;
+inputProps?: ComponentProps<typeof TextareaAutosize>;
 }>;
 
 // @public (undocumented)
@@ -257,8 +253,8 @@ export type VideoRepeaterFieldProps = BaseFileRepeaterFieldProps & VideoFileType
 
 // Warnings were encountered during analysis:
 //
-// src/form/inputs.tsx:29:3 - (ae-forgotten-export) The symbol "Input" needs to be exported by the entry point index.d.ts
-// src/form/inputs.tsx:47:3 - (ae-forgotten-export) The symbol "TextareaAutosize" needs to be exported by the entry point index.d.ts
+// src/form/inputs.tsx:27:3 - (ae-forgotten-export) The symbol "Input" needs to be exported by the entry point index.d.ts
+// src/form/inputs.tsx:45:3 - (ae-forgotten-export) The symbol "TextareaAutosize" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

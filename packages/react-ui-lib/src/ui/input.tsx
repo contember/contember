@@ -1,16 +1,17 @@
 import { uic, uiconfig } from '../utils'
 
 export const inputConfig = uiconfig({
-	baseClass: `
-		flex w-full bg-background-input
-		file:border-0 file:bg-transparent file:text-sm file:font-medium
-		placeholder:text-muted-foreground
-		focus-visible:outline-hidden
-		disabled:cursor-not-allowed disabled:opacity-50
-		read-only:bg-gray-100
-		` /*data-[dirty]:border-yellow-500 focus-visible:data-[dirty]:border-input*/ + `
-		data-[invalid]:border-destructive data-[invalid]:ring-destructive
-	`,
+	baseClass: [
+		'flex w-full bg-background',
+		'file:border-0 file:bg-transparent file:text-sm file:font-medium',
+		'placeholder:text-muted-foreground',
+		'focus-visible:outline-none',
+		'disabled:cursor-not-allowed disabled:opacity-50',
+		'read-only:bg-gray-100',
+		// Uncomment this if you want to see inputs in dirty state
+		// 'data-[dirty]:border-yellow-500 focus-visible:data-[dirty]:border-input',
+		'data-[invalid]:border-destructive data-[invalid]:ring-destructive',
+	],
 	variants: {
 		inputSize: {
 			default: 'h-10 rounded-md p-2 text-sm',
@@ -34,14 +35,13 @@ export const Input = uic('input', {
 })
 
 export const InputLike = uic('div', {
-	baseClass: `
-		flex items-center min-h-10 w-full rounded-md border border-input bg-background p-2 text-sm ring-offset-background max-w-md
-		file:border-0 file:bg-transparent file:text-sm file:font-medium
-		placeholder:text-muted-foreground
-		focus-within:outline-hidden focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2
-		disabled:cursor-not-allowed
-		disabled:opacity-50
-		`,
+	baseClass: [
+		'flex items-center min-h-10 w-full rounded-md border border-input bg-background p-2 text-sm ring-offset-background',
+		'file:border-0 file:bg-transparent file:text-sm file:font-medium',
+		'placeholder:text-muted-foreground',
+		'focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2',
+		'disabled:cursor-not-allowed disabled:opacity-50',
+	],
 	displayName: 'InputLike',
 })
 
@@ -52,7 +52,6 @@ export const InputBare = uic('input', {
 	baseClass: 'w-full h-full focus-visible:outline-hidden',
 	displayName: 'InputBare',
 })
-
 
 export const CheckboxInput = uic('input', {
 	baseClass: 'w-4 h-4',

@@ -37,7 +37,7 @@ export type JSONArray = readonly JSONValue[]
 		return code
 	}
 
-	private generateTypeEntityCode(model: Model.Schema, entity: Model.Entity, options?: { includeDeprecated?: boolean }): string {
+	private generateTypeEntityCode(model: Model.Schema, entity: Model.Entity, options?: GenerateOptions): string {
 		let code = `export type ${entity.name} <OverRelation extends string | never = never> = {\n`
 		code += '\tname: \'' + entity.name + '\'\n'
 		code += '\tunique:\n'
@@ -82,7 +82,7 @@ export type JSONArray = readonly JSONValue[]
 		return code
 	}
 
-	private formatReducedFields(model: Model.Schema, entity: Model.Entity, options?: { includeDeprecated?: boolean }): string {
+	private formatReducedFields(model: Model.Schema, entity: Model.Entity, options?: GenerateOptions): string {
 		let code = ''
 		acceptEveryFieldVisitor(model, entity, {
 			visitOneHasMany: ({ entity, relation, targetEntity, targetRelation }) => {

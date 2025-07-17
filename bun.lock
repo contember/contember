@@ -164,6 +164,7 @@
         "contember-client-generator": "./dist/production/generate.cjs",
       },
       "dependencies": {
+        "@contember/cli-common": "workspace:*",
         "@contember/client-content": "workspace:*",
         "@contember/schema": "workspace:*",
         "@contember/schema-utils": "workspace:*",
@@ -1202,10 +1203,10 @@
     },
   },
   "overrides": {
-    "typescript": "5.8.2",
-    "rollup": "npm:@rollup/wasm-node@*",
     "@types/node": "20.17.22",
     "graphql": "16.9.0",
+    "rollup": "npm:@rollup/wasm-node@*",
+    "typescript": "5.8.2",
   },
   "packages": {
     "@actions/core": ["@actions/core@1.11.1", "", { "dependencies": { "@actions/exec": "^1.1.1", "@actions/http-client": "^2.0.1" } }, "sha512-hXJCSrkwfA46Vd9Z3q4cpEpHB1rL5NG04+/rbqW9d3+CSvtB1tYe8UTpAlixa1vj0m/ULglfEK2UKxMGxCxv5A=="],

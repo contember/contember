@@ -36,9 +36,9 @@ export interface BaseRelation {
     // (undocumented)
     __typename: '_Relation';
     // (undocumented)
-    deprecationReason?: string;
+    deprecationReason: string | null;
     // (undocumented)
-    description?: string;
+    description: string | null;
     // (undocumented)
     name: FieldName;
     // (undocumented)
@@ -1453,9 +1453,9 @@ export interface SchemaColumn {
     // (undocumented)
     defaultValue: any;
     // (undocumented)
-    deprecationReason?: string;
+    deprecationReason: string | null;
     // (undocumented)
-    description?: string;
+    description: string | null;
     // (undocumented)
     enumName: SchemaEnumName | null;
     // (undocumented)

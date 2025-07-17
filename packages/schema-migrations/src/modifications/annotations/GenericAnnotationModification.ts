@@ -1,5 +1,5 @@
 import { MigrationBuilder } from '@contember/database-migrations'
-import { Schema } from '@contember/schema'
+import { Model, Schema } from '@contember/schema'
 import { SchemaUpdater, updateModel, updateEntity, updateField } from '../utils/schemaUpdateUtils'
 import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler'
 import { Migration } from '../../Migration'
@@ -9,17 +9,19 @@ export interface BaseAnnotationModificationData {
 	fieldName?: string
 }
 
-export type AnnotationModificationData<T extends string> = BaseAnnotationModificationData & {
+export type AnnotationField = keyof Model.AnyField & keyof Model.Entity
+
+export type AnnotationModificationData<T extends AnnotationField> = BaseAnnotationModificationData & {
 	[K in T]?: string
 }
 
-export interface AnnotationConfig<T extends string> {
+export interface AnnotationConfig<T extends AnnotationField> {
 	id: string
 	annotationField: T
 	displayName: string
 }
 
-export function createAnnotationModification<T extends string>(config: AnnotationConfig<T>) {
+export function createAnnotationModification<T extends AnnotationField>(config: AnnotationConfig<T>) {
 	const { id, annotationField, displayName } = config
 
 	class AnnotationModificationHandler implements ModificationHandler<AnnotationModificationData<T>> {

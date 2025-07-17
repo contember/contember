@@ -11,8 +11,8 @@ export interface BaseRelation {
 	orphanRemoval: boolean | null
 	targetEntity: EntityName
 	type: 'OneHasOne' | 'OneHasMany' | 'ManyHasOne' | 'ManyHasMany'
-	deprecationReason?: string
-	description?: string
+	deprecationReason: string | null
+	description: string | null
 }
 
 export interface OwningRelation extends BaseRelation {

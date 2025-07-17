@@ -70,6 +70,8 @@ describe('Marker tree generator', () => {
 							defaultValue: null,
 							type: 'Uuid',
 							enumName: null,
+							deprecationReason: null,
+							description: null,
 						},
 						{
 							__typename: '_Relation',
@@ -82,6 +84,8 @@ describe('Marker tree generator', () => {
 							orderBy: null,
 							onDelete: null,
 							orphanRemoval: null,
+							deprecationReason: null,
+							description: null,
 						},
 						{
 							__typename: '_Relation',
@@ -94,6 +98,8 @@ describe('Marker tree generator', () => {
 							orderBy: null,
 							onDelete: null,
 							orphanRemoval: null,
+							deprecationReason: null,
+							description: null,
 						},
 
 						{
@@ -103,6 +109,8 @@ describe('Marker tree generator', () => {
 							defaultValue: null,
 							type: 'String',
 							enumName: null,
+							deprecationReason: null,
+							description: null,
 						},
 						{
 							__typename: '_Column',
@@ -111,6 +119,8 @@ describe('Marker tree generator', () => {
 							defaultValue: null,
 							type: 'String',
 							enumName: null,
+							deprecationReason: null,
+							description: null,
 						},
 					],
 				},
@@ -126,6 +136,8 @@ describe('Marker tree generator', () => {
 							defaultValue: null,
 							type: 'Uuid',
 							enumName: null,
+							deprecationReason: null,
+							description: null,
 						},
 						{
 							__typename: '_Relation',
@@ -138,6 +150,8 @@ describe('Marker tree generator', () => {
 							orderBy: null,
 							onDelete: null,
 							orphanRemoval: null,
+							deprecationReason: null,
+							description: null,
 						},
 
 						{
@@ -147,6 +161,8 @@ describe('Marker tree generator', () => {
 							defaultValue: null,
 							type: 'String',
 							enumName: null,
+							deprecationReason: null,
+							description: null,
 						},
 						{
 							__typename: '_Column',
@@ -155,6 +171,8 @@ describe('Marker tree generator', () => {
 							defaultValue: null,
 							type: 'String',
 							enumName: null,
+							deprecationReason: null,
+							description: null,
 						},
 						{
 							__typename: '_Column',
@@ -163,6 +181,8 @@ describe('Marker tree generator', () => {
 							defaultValue: null,
 							type: 'String',
 							enumName: null,
+							deprecationReason: null,
+							description: null,
 						},
 						{
 							__typename: '_Column',
@@ -171,6 +191,8 @@ describe('Marker tree generator', () => {
 							defaultValue: null,
 							type: 'String',
 							enumName: null,
+							deprecationReason: null,
+							description: null,
 						},
 						{
 							__typename: '_Column',
@@ -179,6 +201,8 @@ describe('Marker tree generator', () => {
 							defaultValue: null,
 							type: 'String',
 							enumName: null,
+							deprecationReason: null,
+							description: null,
 						},
 					],
 				},
@@ -535,6 +559,8 @@ describe('Marker tree generator', () => {
 							defaultValue: null,
 							type: 'Uuid',
 							enumName: null,
+							deprecationReason: null,
+							description: null,
 						},
 					],
 				},

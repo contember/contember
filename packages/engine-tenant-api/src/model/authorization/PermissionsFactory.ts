@@ -4,7 +4,7 @@ import { TenantRole } from './Roles'
 
 const allowedRoles = new Set<string>([TenantRole.LOGIN, TenantRole.PROJECT_ADMIN, TenantRole.ENTRYPOINT_DEPLOYER])
 
-const projectAdminAllowedInputRoles = ({ roles }: {roles?: readonly string[]}) => {
+const projectAdminAllowedInputRoles = ({ roles }: { roles?: readonly string[] }) => {
 	return roles === undefined || roles.every(it => allowedRoles.has(it))
 }
 
@@ -37,6 +37,8 @@ class PermissionsFactory {
 		permissions.allow(TenantRole.PROJECT_MEMBER, PermissionActions.PROJECT_VIEW)
 
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PROJECT_VIEW)
+		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.IDENTITY_VIEW_PERMISSIONS)
+		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PERSON_VIEW)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.API_KEY_CREATE)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.API_KEY_DISABLE)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.API_KEY_CREATE_GLOBAL(), projectAdminAllowedInputRoles)

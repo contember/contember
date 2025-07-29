@@ -9,7 +9,10 @@ import { Identity } from '@contember/react-client-tenant';
 import { NamedExoticComponent } from 'react';
 import { ReactNode } from 'react';
 
-// @public (undocumented)
+// @public
+export const evaluateRoleCondition: (condition: RoleCondition, roles: Set<string>) => boolean;
+
+// @public
 export const HasRole: NamedExoticComponent<HasRoleProps>;
 
 // @public (undocumented)
@@ -42,8 +45,14 @@ export const projectEnvironmentExtension: Environment.Extension<string | null, {
 // @public (undocumented)
 export type ProjectUserRoles = Set<string>;
 
-// @public (undocumented)
-export type RoleCondition = string | ((roles: Set<string>) => boolean);
+// @public
+export type RoleCondition = string | string[] | {
+    any: string[];
+} | {
+    all: string[];
+} | {
+    not: string | string[];
+} | ((roles: Set<string>) => boolean);
 
 // @public (undocumented)
 export const useProjectUserRoles: () => ProjectUserRoles;

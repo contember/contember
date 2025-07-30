@@ -49,15 +49,15 @@ export class UpdateEntityRelationInputFieldVisitor implements Model.ColumnVisito
 		const upsertInput = updateInputType && createInputType
 			? {
 				type: new GraphQLInputObjectType({
+					description: relation.description,
 					name: GqlTypeName`${entity.name}Upsert${relation.name}RelationInput`,
 					fields: () => ({
 						update: { type: new GraphQLNonNull(updateInputType) },
 						create: { type: new GraphQLNonNull(createInputType) },
 					}),
 				}),
-			}
+				  }
 			: undefined
-
 		const booleanInput = {
 			type: GraphQLBoolean,
 		}
@@ -83,6 +83,7 @@ export class UpdateEntityRelationInputFieldVisitor implements Model.ColumnVisito
 
 		return new GraphQLInputObjectType({
 			name: GqlTypeName`${entity.name}Update${relation.name}EntityRelationInput`,
+			description: relation.description,
 			fields: () => filteredFields,
 		})
 	}
@@ -102,25 +103,27 @@ export class UpdateEntityRelationInputFieldVisitor implements Model.ColumnVisito
 			? {
 				type: new GraphQLInputObjectType({
 					name: GqlTypeName`${entity.name}Update${relation.name}RelationInput`,
+					description: relation.description,
 					fields: () => ({
 						by: { type: new GraphQLNonNull(whereInputType) },
 						data: { type: new GraphQLNonNull(updateInputType) },
 					}),
 				}),
-			}
+				  }
 			: undefined
 
 		const upsertInput = updateInputType && createInputType && whereInputType
 			? {
 				type: new GraphQLInputObjectType({
 					name: GqlTypeName`${entity.name}Upsert${relation.name}RelationInput`,
+					description: relation.description,
 					fields: () => ({
 						by: { type: new GraphQLNonNull(whereInputType) },
 						update: { type: new GraphQLNonNull(updateInputType) },
 						create: { type: new GraphQLNonNull(createInputType) },
 					}),
 				}),
-			}
+				  }
 			: undefined
 
 		const connectOrCreateInput = createInput && whereInputType
@@ -144,6 +147,7 @@ export class UpdateEntityRelationInputFieldVisitor implements Model.ColumnVisito
 
 		return new GraphQLInputObjectType({
 			name: GqlTypeName`${entity.name}Update${relation.name}EntityRelationInput`,
+			description: relation.description,
 			fields: () => ({
 				...filteredFields,
 				alias: { type: GraphQLString },

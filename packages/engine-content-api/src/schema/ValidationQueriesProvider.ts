@@ -33,6 +33,8 @@ export class ValidationQueriesProvider {
 		}
 		return {
 			type: new GraphQLNonNull(this.resultSchemaTypeProvider.validationResultType),
+			description: entity.description,
+			deprecationReason: entity.deprecationReason,
 			args: {
 				data: { type: new GraphQLNonNull(dataType) },
 			},
@@ -55,6 +57,8 @@ export class ValidationQueriesProvider {
 		}
 		return {
 			type: new GraphQLNonNull(this.resultSchemaTypeProvider.validationResultType),
+			description: entity.description,
+			deprecationReason: entity.deprecationReason,
 			args: {
 				by: {
 					type: new GraphQLNonNull(uniqueWhere),

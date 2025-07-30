@@ -68,14 +68,16 @@ export class EntityTypeProvider {
 	}
 
 	private createEntity(entityName: string) {
+		const entity = getEntityFromSchema(this.schema, entityName)
 		return new GraphQLObjectType({
 			name: GqlTypeName`${entityName}`,
-			fields: () => this.getEntityFields(entityName),
+			deprecationReason: entity.deprecationReason,
+			description: entity.description,
+			fields: () => this.getEntityFields(entity),
 		} as GraphQLObjectTypeConfig<any, any>)
 	}
 
-	private getEntityFields(entityName: string) {
-		const entity = getEntityFromSchema(this.schema, entityName)
+	private getEntityFields(entity: Model.Entity) {
 		const accessVisitor = new FieldAccessVisitor(Acl.Operation.read, this.authorizator)
 		const accessibleFields = Object.values(entity.fields).filter(field =>
 			acceptFieldVisitor(this.schema, entity, field.name, accessVisitor),
@@ -90,7 +92,7 @@ export class EntityTypeProvider {
 
 		const metaField = {
 			type: new GraphQLObjectType({
-				name: GqlTypeName`${entityName}Meta`,
+				name: GqlTypeName`${entity.name}Meta`,
 				fields: metaFields,
 			}),
 			resolve: aliasAwareResolver,
@@ -100,24 +102,35 @@ export class EntityTypeProvider {
 			_meta: metaField,
 		}
 
-		for (const field of accessibleFields) {
+		const fieldConfigs = accessibleFields.map(field => {
 			const fieldTypeVisitor = new FieldTypeVisitor(this.columnTypeResolver, this, this.authorizator)
 			const type: GraphQLOutputType = acceptFieldVisitor(this.schema, entity, field.name, fieldTypeVisitor)
-
 			const fieldArgsVisitor = new FieldArgsVisitor(this.whereTypeProvider, this.orderByTypeProvider)
-			fields[field.name] = {
-				type,
-				args: acceptFieldVisitor(this.schema, entity, field.name, fieldArgsVisitor),
-				resolve: aliasAwareResolver,
+
+			return {
+				key: field.name,
+				config: {
+					type,
+					args: acceptFieldVisitor(this.schema, entity, field.name, fieldArgsVisitor),
+					resolve: aliasAwareResolver,
+					deprecationReason: field.deprecationReason,
+					description: field.description,
+				},
 			}
+		})
+
+		fields = {
+			...fields,
+			...Object.fromEntries(fieldConfigs.map(({ key, config }) => [key, config])),
 		}
 
-		for (const [key, provider] of Object.entries(this.entityFieldProviders)) {
+		for (const [_key, provider] of Object.entries(this.entityFieldProviders)) {
 			fields = {
 				...fields,
 				...provider.getFields(entity, accessibleFields),
 			}
 		}
+
 		return fields
 	}
 

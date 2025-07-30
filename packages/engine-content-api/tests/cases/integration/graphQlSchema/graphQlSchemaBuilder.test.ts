@@ -1,4 +1,4 @@
-import { graphql, printSchema } from 'graphql'
+import { graphql, printIntrospectionSchema, printSchema } from 'graphql'
 import { Acl, Model } from '@contember/schema'
 import * as fs from 'node:fs/promises'
 import * as path from 'node:path'
@@ -400,7 +400,6 @@ describe('GraphQL schema builder', () => {
 		})
 	})
 
-
 	it('view entity', async () => {
 		await testSchema({
 			schema: () => SchemaDefinition.createModel(ViewEntity),
@@ -422,7 +421,6 @@ describe('GraphQL schema builder', () => {
 		})
 	})
 
-
 	it('array', async () => {
 		const schema = createSchema({
 			Foo: class Foo {
@@ -436,6 +434,22 @@ describe('GraphQL schema builder', () => {
 			schema: () => schema.model,
 			permissions: schema => new AllowAllPermissionFactory().create(schema),
 			graphQlSchemaFile: 'schema-array.gql',
+		})
+	})
+
+	it('descriptions', async () => {
+		await testSchema({
+			schema: () => SchemaDefinition.createModel(ModelWithDescriptions),
+			permissions: schema => new AllowAllPermissionFactory().create(schema),
+			graphQlSchemaFile: 'schema-description.gql',
+		})
+	})
+
+	it('deprecation', async () => {
+		await testSchema({
+			schema: () => SchemaDefinition.createModel(ModelWithDeprecation),
+			permissions: schema => new AllowAllPermissionFactory().create(schema),
+			graphQlSchemaFile: 'schema-deprecation.gql',
 		})
 	})
 })
@@ -470,5 +484,59 @@ namespace NoRootOperation {
 	})
 	export class Image {
 		url = c.stringColumn()
+	}
+}
+
+namespace ModelWithDescriptions {
+	@c.Description('description of entity Article')
+	export class Article {
+		title = c.stringColumn().description('description of Article.title')
+		category = c.manyHasOne(Category, 'articles').description('description of Article.category')
+		tags = c.manyHasMany(Tag, 'articles').description('description of Article.tags')
+		stats = c.oneHasOne(ArticleStats, 'article').description('description of Article.stats')
+	}
+
+	@c.Description('description of entity ArticleStats')
+	export class ArticleStats {
+		article = c.manyHasManyInverse(Article, 'stats').description('description of ArticleStats.article')
+	}
+
+	@c.Description('description of entity Category')
+	export class Category {
+		name = c.stringColumn().description('description of Category.name')
+		articles = c.oneHasMany(Article, 'category').description('description of Category.articles')
+	}
+
+	@c.Description('description of entity Tag')
+	export class Tag {
+		name = c.stringColumn().description('description of Tag.name')
+		articles = c.manyHasManyInverse(Article, 'tags').description('description of Tag.articles')
+	}
+}
+
+namespace ModelWithDeprecation {
+	@c.Deprecated('deprecated entity Article')
+	export class Article {
+		title = c.stringColumn().deprecated('deprecated Article.title')
+		category = c.manyHasOne(Category, 'articles').deprecated('deprecated Article.category')
+		tags = c.manyHasMany(Tag, 'articles').deprecated('deprecated Article.tags')
+		stats = c.oneHasOne(ArticleStats, 'article').deprecated('deprecated Article.stats')
+	}
+
+	@c.Deprecated('deprecated entity ArticleStats')
+	export class ArticleStats {
+		article = c.manyHasManyInverse(Article, 'stats').deprecated('deprecated ArticleStats.article')
+	}
+
+	@c.Deprecated('deprecated entity Category')
+	export class Category {
+		name = c.stringColumn().deprecated('deprecated Category.name')
+		articles = c.oneHasMany(Article, 'category').deprecated('deprecated Category.articles')
+	}
+
+	@c.Deprecated()
+	export class Tag {
+		name = c.stringColumn().deprecated()
+		articles = c.manyHasManyInverse(Article, 'tags').deprecated()
 	}
 }

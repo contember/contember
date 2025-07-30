@@ -1,39 +1,49 @@
 import { EntityConstructor,  RelationTarget } from '../types'
 import { Model } from '@contember/schema'
 import { CreateFieldContext, FieldDefinition } from './FieldDefinition'
+import { DEFAULT_FIELD_DEPRECATION_REASON } from '@contember/schema-utils'
 
 export class ManyHasOneDefinition extends FieldDefinition<ManyHasOneDefinitionOptions> {
 	type = 'ManyHasOneDefinition' as const
 
-	inversedBy(inversedBy: string): ManyHasOneDefinition {
+	public inversedBy(inversedBy: string): ManyHasOneDefinition {
 		return this.withOption('inversedBy', inversedBy)
 	}
 
-	joiningColumn(columnName: string): ManyHasOneDefinition {
+	public joiningColumn(columnName: string): ManyHasOneDefinition {
 		return this.withOption('joiningColumn', { ...this.options.joiningColumn, columnName })
 	}
 
-	onDelete(onDelete: Model.OnDelete | `${Model.OnDelete}`): ManyHasOneDefinition {
+	public onDelete(onDelete: Model.OnDelete | `${Model.OnDelete}`): ManyHasOneDefinition {
 		return this.withOption('joiningColumn', { ...this.options.joiningColumn, onDelete: onDelete as Model.OnDelete })
 	}
 
-	cascadeOnDelete(): ManyHasOneDefinition {
+	public cascadeOnDelete(): ManyHasOneDefinition {
 		return this.withOption('joiningColumn', { ...this.options.joiningColumn, onDelete: Model.OnDelete.cascade })
 	}
 
-	setNullOnDelete(): ManyHasOneDefinition {
+	public setNullOnDelete(): ManyHasOneDefinition {
 		return this.withOption('joiningColumn', { ...this.options.joiningColumn, onDelete: Model.OnDelete.setNull })
 	}
 
-	restrictOnDelete(): ManyHasOneDefinition {
+	public restrictOnDelete(): ManyHasOneDefinition {
 		return this.withOption('joiningColumn', { ...this.options.joiningColumn, onDelete: Model.OnDelete.restrict })
 	}
 
-	notNull(): ManyHasOneDefinition {
+	public notNull(): ManyHasOneDefinition {
 		return this.withOption('nullable', false)
 	}
 
-	createField({ name, conventions, entityName, entityRegistry, strictDefinitionValidator }: CreateFieldContext): Model.AnyField {
+	public deprecated(deprecationReason?: string): ManyHasOneDefinition {
+		return this.withOption('deprecationReason', deprecationReason || DEFAULT_FIELD_DEPRECATION_REASON)
+	}
+
+
+	public description(description: string): ManyHasOneDefinition {
+		return this.withOption('description', description)
+	}
+
+	public createField({ name, conventions, entityName, entityRegistry, strictDefinitionValidator }: CreateFieldContext): Model.AnyField {
 		const options = this.options
 		const joiningColumn = options.joiningColumn || {}
 		strictDefinitionValidator.validateInverseSide(entityName, name, options)
@@ -49,6 +59,8 @@ export class ManyHasOneDefinition extends FieldDefinition<ManyHasOneDefinitionOp
 				columnName: joiningColumn.columnName || conventions.getJoiningColumnName(name),
 				onDelete: joiningColumn.onDelete || Model.OnDelete.restrict,
 			},
+			...(options.deprecationReason !== undefined ? { deprecationReason: options.deprecationReason } : {}),
+			...(options.description ? { description: options.description } : {}),
 		}
 	}
 
@@ -66,4 +78,6 @@ export type ManyHasOneDefinitionOptions = {
 	inversedBy?: string
 	joiningColumn?: Partial<Model.JoiningColumn>
 	nullable?: boolean
+	deprecationReason?: string
+	description?: string
 }

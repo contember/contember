@@ -3,7 +3,6 @@ import type { SchemaRelationOrderBy } from './SchemaRelationOrderBy'
 
 export interface BaseRelation {
 	__typename: '_Relation'
-
 	name: FieldName
 	// This *CAN* be null because the whole notion of nullability doesn't make sense for ManyHasMany
 	nullable: boolean | null
@@ -12,6 +11,8 @@ export interface BaseRelation {
 	orphanRemoval: boolean | null
 	targetEntity: EntityName
 	type: 'OneHasOne' | 'OneHasMany' | 'ManyHasOne' | 'ManyHasMany'
+	deprecationReason: string | null
+	description: string | null
 }
 
 export interface OwningRelation extends BaseRelation {

@@ -1,19 +1,20 @@
 import { Model } from '@contember/schema'
 import { EntityConstructor, RelationTarget } from '../types'
 import { CreateFieldContext, FieldDefinition } from './FieldDefinition'
+import { DEFAULT_FIELD_DEPRECATION_REASON } from '@contember/schema-utils'
 
 export class ManyHasManyDefinition extends FieldDefinition<ManyHasManyDefinitionOptions> {
 	type = 'ManyHasManyDefinition' as const
 
-	inversedBy(inversedBy: string): ManyHasManyDefinition {
+	public inversedBy(inversedBy: string): ManyHasManyDefinition {
 		return this.withOption('inversedBy', inversedBy)
 	}
 
-	joiningTable(joiningTable: Partial<Model.JoiningTable>): ManyHasManyDefinition {
+	public joiningTable(joiningTable: Partial<Model.JoiningTable>): ManyHasManyDefinition {
 		return this.withOption('joiningTable', joiningTable)
 	}
 
-	orderBy(
+	public orderBy(
 		field: string | string[],
 		direction: Model.OrderDirection | `${Model.OrderDirection}` = Model.OrderDirection.asc,
 	): ManyHasManyDefinition {
@@ -21,7 +22,15 @@ export class ManyHasManyDefinition extends FieldDefinition<ManyHasManyDefinition
 		return this.withOption('orderBy', [...(this.options.orderBy || []), { path, direction: direction as Model.OrderDirection }])
 	}
 
-	createField({ name, conventions, entityName, entityRegistry, strictDefinitionValidator }: CreateFieldContext): Model.AnyField {
+	public deprecated(deprecationReason?: string): ManyHasManyDefinition {
+		return this.withOption('deprecationReason', deprecationReason || DEFAULT_FIELD_DEPRECATION_REASON)
+	}
+
+	public description(description: string): ManyHasManyDefinition {
+		return this.withOption('description', description)
+	}
+
+	public createField({ name, conventions, entityName, entityRegistry, strictDefinitionValidator }: CreateFieldContext): Model.AnyField {
 		const options = this.options
 		const columnNames = conventions.getJoiningTableColumnNames(
 			entityName,
@@ -46,6 +55,8 @@ export class ManyHasManyDefinition extends FieldDefinition<ManyHasManyDefinition
 			target: entityRegistry.getName(options.target),
 			joiningTable: joiningTable,
 			...(options.orderBy ? { orderBy: options.orderBy } : {}),
+			...(options.deprecationReason !== undefined ? { deprecationReason: options.deprecationReason } : {}),
+			...(options.description !== undefined ? { description: options.description } : {}),
 		}
 	}
 
@@ -65,4 +76,6 @@ export type ManyHasManyDefinitionOptions = {
 	inversedBy?: string
 	joiningTable?: Partial<Model.JoiningTable>
 	orderBy?: Model.OrderBy[]
+	deprecationReason?: string
+	description?: string
 }

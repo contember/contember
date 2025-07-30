@@ -52,6 +52,8 @@ export class MutationProvider {
 		const resultType = this.createResultType(entityName, 'create')
 		return {
 			type: new GraphQLNonNull(resultType),
+			description: entity.description,
+			deprecationReason: entity.deprecationReason,
 			args: {
 				data: { type: new GraphQLNonNull(dataType) },
 			},
@@ -84,6 +86,8 @@ export class MutationProvider {
 		}
 		return {
 			type: new GraphQLNonNull(this.createResultType(entityName, 'delete')),
+			description: entity.description,
+			deprecationReason: entity.deprecationReason,
 			args: {
 				by: {
 					type: new GraphQLNonNull(uniqueWhere),
@@ -120,6 +124,8 @@ export class MutationProvider {
 		}
 		return {
 			type: new GraphQLNonNull(resultType),
+			description: entity.description,
+			deprecationReason: entity.deprecationReason,
 			args: {
 				by: {
 					type: new GraphQLNonNull(uniqueWhere),
@@ -162,6 +168,8 @@ export class MutationProvider {
 		}
 		return {
 			type: new GraphQLNonNull(resultType),
+			description: entity.description,
+			deprecationReason: entity.deprecationReason,
 			args: {
 				by: {
 					type: new GraphQLNonNull(uniqueWhere),

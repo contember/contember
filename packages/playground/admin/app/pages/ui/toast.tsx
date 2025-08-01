@@ -3,6 +3,7 @@ import { BrushIcon } from 'lucide-react'
 import { ReactNode } from 'react'
 import { Title } from '~/app/components/title'
 import { Slots } from '~/lib/layout'
+import { GenericPage } from '~/lib/pages'
 import { ToastContent, ToastType, useShowToast } from '~/lib/toast'
 import { Button } from '~/lib/ui/button'
 
@@ -27,10 +28,7 @@ const ToastTrigger = ({ type, description, title, ...props }: {
 }
 
 export default () => (
-	<>
-		<Slots.Title>
-			<Title icon={<BrushIcon />}>Toasts</Title>
-		</Slots.Title>
+	<GenericPage title={<Title icon={<BrushIcon />}>Toasts</Title>}>
 		<div className="flex gap-4 items-start">
 			<ToastTrigger title="Info toast" description="This is description for info toast">
 				<Button>Show info toast</Button>
@@ -45,5 +43,5 @@ export default () => (
 				<Button>Show error toast</Button>
 			</ToastTrigger>
 		</div>
-	</>
+	</GenericPage>
 )

@@ -1,150 +1,88 @@
 import { SlugField } from '~/lib-extra/slug-field/field'
-import { Binding, PersistButton } from '~/lib/binding'
 import { DataGridTextColumn, DefaultDataGrid } from '~/lib/datagrid'
 import { SideDimensions } from '~/lib/dimensions'
-import { CheckboxField, InputField, MultiSelectField, SelectField, TextareaField } from '~/lib/form'
-import { Slots } from '~/lib/layout'
-import { DefaultRepeater } from '~/lib/repeater'
-import { AnchorButton } from '~/lib/ui/button'
-import { Component, EntitySubTree, EnvironmentMiddleware, Field, Link, Variable } from '@contember/interface'
+import { CheckboxField, FormLayout, InputField, MultiSelectField, SelectField, TextareaField } from '~/lib/form'
+import { DefaultRepeater, RepeaterItemActions, RepeaterRemoveItemButton } from '~/lib/repeater'
+import { LinkAnchor, LinkAnchorButton } from '~/lib/links'
+import { Component, EnvironmentMiddleware, Field, Link, Variable } from '@contember/interface'
 import slugify from '@sindresorhus/slugify'
+import { CreatePage, EditPage, GenericPage } from '~/lib/pages'
 
 export default () => (
-	<Binding>
-		<Slots.Title>Articles</Slots.Title>
-		<Slots.Actions>
-			<Link to="form/articleCreate">
-				<AnchorButton>Create article</AnchorButton>
-			</Link>
-			<Link to="form/tagCreate">
-				<AnchorButton>Create tag</AnchorButton>
-			</Link>
-			<Link to="form/authorCreate">
-				<AnchorButton>Create author</AnchorButton>
-			</Link>
-
-		</Slots.Actions>
-
+	<GenericPage
+		title="Articles"
+		actions={<>
+			<LinkAnchorButton to="form/articleCreate">Create article</LinkAnchorButton>
+			<LinkAnchorButton to="form/tagCreate">Create tag</LinkAnchorButton>
+			<LinkAnchorButton to="form/authorCreate">Create author</LinkAnchorButton>
+		</>}
+	>
 		<DefaultDataGrid entities="FormArticle">
 			<DataGridTextColumn header="Internal name" field="internalName">
-				<Link to="form/articleEdit(id: $entity.id)">
-					<AnchorButton variant="link"><Field field="internalName" /></AnchorButton>
-				</Link>
+				<LinkAnchor to="form/articleEdit(id: $entity.id)">
+					<Field field="internalName" />
+				</LinkAnchor>
 			</DataGridTextColumn>
 		</DefaultDataGrid>
 
 		<h2 className="text-2xl">Tags</h2>
 		<DefaultDataGrid entities="FormTag">
 			<DataGridTextColumn header="Name" field="name">
-				<Link to="form/tagEdit(id: $entity.id)">
-					<AnchorButton variant="link"><Field field="name" /></AnchorButton>
-				</Link>
+				<LinkAnchor to="form/tagEdit(id: $entity.id)">
+					<Field field="name" />
+				</LinkAnchor>
 			</DataGridTextColumn>
 		</DefaultDataGrid>
 
 		<h2 className="text-2xl">Authors</h2>
 		<DefaultDataGrid entities="FormAuthor">
 			<DataGridTextColumn header="Name" field="name">
-				<Link to="form/authorEdit(id: $entity.id)">
-					<AnchorButton variant="link"><Field field="name" /></AnchorButton>
-				</Link>
+				<LinkAnchor to="form/authorEdit(id: $entity.id)">
+					<Field field="name" />
+				</LinkAnchor>
 			</DataGridTextColumn>
 		</DefaultDataGrid>
-	</Binding>
+	</GenericPage>
 )
 
 export const ArticleCreate = () => (
-	<Binding>
-		<Slots.Title>Create article</Slots.Title>
-		<Slots.Actions>
-			<PersistButton />
-			<Link to="form">
-				<AnchorButton>Back to list</AnchorButton>
-			</Link>
-		</Slots.Actions>
-		<EntitySubTree entity="FormArticle" isCreating>
-			<ArticleForm />
-		</EntitySubTree>
-	</Binding>
+	<CreatePage entity="FormArticle" title="Create article" sidebar={<ArticleSidebarForm />}>
+		<ArticleForm />
+	</CreatePage>
 )
 
 export const ArticleEdit = () => (
-	<Binding>
-		<Slots.Title>Edit article</Slots.Title>
-		<Slots.Actions>
-			<PersistButton />
-			<Link to="form">
-				<AnchorButton>Back to list</AnchorButton>
-			</Link>
-		</Slots.Actions>
-		<EntitySubTree entity="FormArticle(id = $id)">
-			<ArticleForm />
-		</EntitySubTree>
-	</Binding>
+	<EditPage entity="FormArticle(id = $id)" title="Edit article">
+		<ArticleForm />
+	</EditPage>
 )
 
 export const TagCreate = () => (
-	<Binding>
-		<Slots.Title>Create tag</Slots.Title>
-		<Slots.Actions>
-			<PersistButton />
-			<Link to="form">
-				<AnchorButton>Back to list</AnchorButton>
-			</Link>
-		</Slots.Actions>
-		<EntitySubTree entity="FormTag" isCreating>
-			<ArticleTagForm />
-		</EntitySubTree>
-	</Binding>
+	<CreatePage entity="FormTag" title="Create tag">
+		<ArticleTagForm />
+	</CreatePage>
 )
 
 export const TagEdit = () => (
-	<Binding>
-		<Slots.Title>Edit tag</Slots.Title>
-		<Slots.Actions>
-			<PersistButton />
-			<Link to="form">
-				<AnchorButton>Back to list</AnchorButton>
-			</Link>
-		</Slots.Actions>
-		<EntitySubTree entity="FormTag(id = $id)">
-			<ArticleTagForm />
-		</EntitySubTree>
-	</Binding>
+	<EditPage entity="FormTag(id = $id)" title="Edit tag">
+		<ArticleTagForm />
+	</EditPage>
 )
 
 export const AuthorCreate = () => (
-	<Binding>
-		<Slots.Title>Create author</Slots.Title>
-		<Slots.Actions>
-			<PersistButton />
-			<Link to="form">
-				<AnchorButton>Back to list</AnchorButton>
-			</Link>
-		</Slots.Actions>
-		<EntitySubTree entity="FormAuthor" isCreating>
-			<ArticleAuthorForm />
-		</EntitySubTree>
-	</Binding>
+	<CreatePage entity="FormAuthor" title="Create author">
+		<ArticleAuthorForm />
+	</CreatePage>
 )
 
 export const AuthorEdit = () => (
-	<Binding>
-		<Slots.Title>Edit author</Slots.Title>
-		<Slots.Actions>
-			<PersistButton />
-			<Link to="form">
-				<AnchorButton>Back to list</AnchorButton>
-			</Link>
-		</Slots.Actions>
-		<EntitySubTree entity="FormAuthor(id = $id)">
-			<ArticleAuthorForm />
-		</EntitySubTree>
-	</Binding>
+	<EditPage entity="FormAuthor(id = $id)" title="Edit author">
+		<ArticleAuthorForm />
+	</EditPage>
 )
 
 export const ArticleForm = Component(() => (
-	<>
+	<FormLayout>
 		<EnvironmentMiddleware create={it => it.withDimensions({ locale: ['cs', 'en'] })}>
 			<SideDimensions dimension="locale" field="locales(locale = $currentLocale)" as="currentLocale">
 				<h2 className="text-2xl"><Variable name="currentLocale" /></h2>
@@ -152,59 +90,64 @@ export const ArticleForm = Component(() => (
 			</SideDimensions>
 		</EnvironmentMiddleware>
 		<DefaultRepeater field="notes" orderBy="createdAt" initialEntityCount={1}>
+			<RepeaterItemActions>
+				<RepeaterRemoveItemButton />
+			</RepeaterItemActions>
 			<ArticleNoteForm />
 		</DefaultRepeater>
-		<Slots.Sidebar>
-			<InputField field="internalName" required />
-			<CheckboxField field="locked" />
-			<InputField field="publishedAt" />
-			<MultiSelectField field="tags" createNewForm={<ArticleTagForm />}>
-				<Field field="name" />
-			</MultiSelectField>
-			<SelectField field="author" createNewForm={<ArticleAuthorForm />}>
-				<Field field="name" />
-			</SelectField>
+	</FormLayout>
+))
 
-		</Slots.Sidebar>
-	</>
+export const ArticleSidebarForm = Component(() => (
+	<FormLayout>
+		<InputField field="internalName" required />
+		<CheckboxField field="locked" />
+		<InputField field="publishedAt" />
+		<MultiSelectField field="tags" createNewForm={<ArticleTagForm />}>
+			<Field field="name" />
+		</MultiSelectField>
+		<SelectField field="author" createNewForm={<ArticleAuthorForm />}>
+			<Field field="name" />
+		</SelectField>
+	</FormLayout>
 ))
 
 export const ArticleLocaleForm = Component(() => (
-	<>
+	<FormLayout>
 		<SelectField field="article" createNewForm={<ArticleForm />}>
 			<Field field="internalName" />
 		</SelectField>
 		<InputField field="title" required />
 		<SlugField field="slug" derivedFrom="title" slugify={slugify} />
 		<TextareaField field="content" />
-	</>
+	</FormLayout>
 ))
 
 export const ArticleNoteForm = Component(() => (
-	<>
+	<FormLayout>
 		<SelectField field="article" createNewForm={<ArticleForm />}>
 			<Field field="internalName" />
 		</SelectField>
 		<TextareaField field="text" />
-	</>
+	</FormLayout>
 ))
 
 export const ArticleTagForm = Component(() => (
-	<>
+	<FormLayout>
 		<MultiSelectField field="articles" createNewForm={<ArticleForm />}>
 			<Field field="internalName" />
 		</MultiSelectField>
 		<InputField field="name" required />
 		<SlugField field="slug" derivedFrom="name" slugify={slugify} />
-	</>
+	</FormLayout>
 ))
 
 export const ArticleAuthorForm = Component(() => (
-	<>
+	<FormLayout>
 		<MultiSelectField field="articles" createNewForm={<ArticleForm />}>
 			<Field field="internalName" />
 		</MultiSelectField>
 		<InputField field="name" required />
 		<SlugField field="slug" derivedFrom="name" slugify={slugify} />
-	</>
+	</FormLayout>
 ))

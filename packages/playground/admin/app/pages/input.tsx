@@ -10,8 +10,9 @@ import { FieldExists } from '~/lib-extra/has-field'
 import { SelectOrTypeField } from '~/lib-extra/select-or-type-field'
 import { SlugField } from '~/lib-extra/slug-field/field'
 import { Binding, PersistButton } from '~/lib/binding'
-import { CheckboxField, InputField, InputFieldProps, RadioEnumField, TextareaField } from '~/lib/form'
+import { CheckboxField, FormLayout, InputField, InputFieldProps, RadioEnumField, TextareaField } from '~/lib/form'
 import { Slots } from '~/lib/layout'
+import { EditPage, MultiEditPage } from '~/lib/pages'
 import { DefaultRepeater } from '~/lib/repeater'
 import { Button } from '~/lib/ui/button'
 import { Divider } from '~/lib/ui/divider'
@@ -21,107 +22,87 @@ export const Basic = () => {
 	const required = !!useEnvironment().getParameterOrElse('required', false)
 
 	return (
-		<Binding>
-			<Slots.Title>
-				<Title icon={<FormInputIcon />}>Basic inputs</Title>
-			</Slots.Title>
-
-			<Slots.Actions>
+		<EditPage
+			entity="InputRoot(unique = unique)"
+			setOnCreate="(unique = unique)"
+			title={<Title icon={<FormInputIcon />}>Basic inputs</Title>}
+			actions={<>
 				<ToggleRequired />
 				<PersistButton />
-			</Slots.Actions>
+			</>}
+		>
+			<FormLayout>
+				<InputField field="textValue" label="Text" description="Hello world" required={required} />
+				<InputField field="intValue" label="Number" required={required} />
+				<InputField field="floatValue" label="Float" required={required} />
+				<InputField field="dateValue" label="Date" required={required} />
+				<InputField field="timeValue" label="Time" required={required} />
+				<InputField field="datetimeValue" label="Date time" required={required} />
 
-			<EntitySubTree entity="InputRoot(unique = unique)" setOnCreate="(unique = unique)">
-				<div className="space-y-4">
-					<InputField field="textValue" label="Text" description="Hello world" required={required} />
-					<InputField field="intValue" label="Number" required={required} />
-					<InputField field="floatValue" label="Float" required={required} />
-					<InputField field="dateValue" label="Date" required={required} />
-					<InputField field="timeValue" label="Time" required={required} />
-					<InputField field="datetimeValue" label="Date time" required={required} />
-
-					<FieldExists field="nonExistingField">
-						<InputField field="nonExistingField" label="Date time" />
-					</FieldExists>
-					<Divider />
-					<InputField field="dummy" label="Dummy to trigger dirty state" />
-				</div>
-			</EntitySubTree>
-		</Binding>
+				<FieldExists field="nonExistingField">
+					<InputField field="nonExistingField" label="Date time" />
+				</FieldExists>
+				<Divider />
+				<InputField field="dummy" label="Dummy to trigger dirty state" />
+			</FormLayout>
+		</EditPage>
 	)
 }
 export const Cents = () => {
 	const required = !!useEnvironment().getParameterOrElse('required', false)
 
 	return (
-		<Binding>
-			<Slots.Title>
-				<Title icon={<FormInputIcon />}>Cents field</Title>
-			</Slots.Title>
-
-			<Slots.Actions>
+		<EditPage
+			entity="InputRoot(unique = unique)"
+			setOnCreate="(unique = unique)"
+			title={<Title icon={<FormInputIcon />}>Cents field</Title>}
+			actions={<>
 				<ToggleRequired />
 				<PersistButton />
-			</Slots.Actions>
-
-			<EntitySubTree entity="InputRoot(unique = unique)" setOnCreate="(unique = unique)">
-				<div className="space-y-4">
-					<InputField field="dummy" label="Dummy to trigger dirty state" />
-					<FractionalAmountField field="intValue" label="Cents" required={required} fractionDigits={2} />
-					<Divider />
-					<InputField field="dummy" label="Dummy to trigger dirty state" />
-				</div>
-			</EntitySubTree>
-		</Binding>
+			</>}
+		>
+			<FormLayout>
+				<InputField field="dummy" label="Dummy to trigger dirty state" />
+				<FractionalAmountField field="intValue" label="Cents" required={required} fractionDigits={2} />
+				<Divider />
+				<InputField field="dummy" label="Dummy to trigger dirty state" />
+			</FormLayout>
+		</EditPage>
 	)
 }
 
-
 export const SelectOrType = () => (
-	<Binding>
-		<Slots.Title>
-			<Title icon={<FormInputIcon />}>Select or type</Title>
-		</Slots.Title>
-
-		<Slots.Actions>
-			<PersistButton />
-		</Slots.Actions>
-
-		<EntitySubTree entity="InputRoot(unique = unique)" setOnCreate="(unique = unique)">
-			<div className="space-y-4">
-				<SelectOrTypeField field="textValue" label="Text" options={{
-					a: 'Option A',
-					b: 'Option B',
-				}} />
-				<Divider />
-				<InputField field="dummy" label="Dummy to trigger dirty state" />
-			</div>
-		</EntitySubTree>
-	</Binding>
+	<EditPage entity="InputRoot(unique = unique)" setOnCreate="(unique = unique)" title={<Title icon={<FormInputIcon />}>Select or type</Title>}>
+		<FormLayout>
+			<SelectOrTypeField field="textValue" label="Text" options={{
+				a: 'Option A',
+				b: 'Option B',
+			}} />
+			<Divider />
+			<InputField field="dummy" label="Dummy to trigger dirty state" />
+		</FormLayout>
+	</EditPage>
 )
 
 export const Textarea = () => {
 	const required = !!useEnvironment().getParameterOrElse('required', false)
 
 	return (
-		<Binding>
-			<Slots.Title>
-				<Title icon={<FormInputIcon />}>Textarea</Title>
-			</Slots.Title>
-
-			<Slots.Actions>
+		<EditPage
+			entity="InputRoot(unique = unique)"
+			setOnCreate="(unique = unique)"
+			title={<Title icon={<FormInputIcon />}>Textarea</Title>}
+			actions={<>
 				<ToggleRequired />
 				<PersistButton />
-			</Slots.Actions>
-
-			<EntitySubTree entity="InputRoot(unique = unique)" setOnCreate="(unique = unique)">
-				<div className="space-y-4">
-					<TextareaField field="textValue" label="Text" description="Hello world" required={required} />
-					<Divider />
-					<InputField field="dummy" label="Dummy to trigger dirty state" />
-				</div>
-			</EntitySubTree>
-		</Binding>
+			</>}
+		>
+			<FormLayout>
+				<TextareaField field="textValue" label="Text" description="Hello world" required={required} />
+				<Divider />
+				<InputField field="dummy" label="Dummy to trigger dirty state" />
+			</FormLayout>
+		</EditPage>
 	)
 }
 
@@ -129,24 +110,21 @@ export const Checkbox = () => {
 	const required = !!useEnvironment().getParameterOrElse('required', false)
 
 	return (
-		<Binding>
-			<Slots.Title>
-				<Title icon={<FormInputIcon />}>Checkbox</Title>
-			</Slots.Title>
-
-			<Slots.Actions>
+		<EditPage
+			entity="InputRoot(unique = unique)"
+			setOnCreate="(unique = unique)"
+			title={<Title icon={<FormInputIcon />}>Checkbox</Title>}
+			actions={<>
 				<ToggleRequired />
 				<PersistButton />
-			</Slots.Actions>
-
-			<EntitySubTree entity="InputRoot(unique = unique)" setOnCreate="(unique = unique)">
-				<div className="space-y-4">
-					<CheckboxField field="boolValue" label="Some boolean" description="Hello world" required={required} />
-					<Divider />
-					<InputField field="dummy" label="Dummy to trigger dirty state" />
-				</div>
-			</EntitySubTree>
-		</Binding>
+			</>}
+		>
+			<FormLayout>
+				<CheckboxField field="boolValue" label="Some boolean" description="Hello world" required={required} />
+				<Divider />
+				<InputField field="dummy" label="Dummy to trigger dirty state" />
+			</FormLayout>
+		</EditPage>
 	)
 }
 
@@ -154,57 +132,44 @@ export const EnumRadio = () => {
 	const required = !!useEnvironment().getParameterOrElse('required', false)
 
 	return (
-		<Binding>
-			<Slots.Title>
-				<Title icon={<FormInputIcon />}>Radio</Title>
-			</Slots.Title>
-
-			<Slots.Actions>
+		<EditPage
+			entity="InputRoot(unique = unique)"
+			setOnCreate="(unique = unique)"
+			title={<Title icon={<FormInputIcon />}>Radio</Title>}
+			actions={<>
 				<ToggleRequired />
 				<PersistButton />
-			</Slots.Actions>
-
-			<EntitySubTree entity="InputRoot(unique = unique)" setOnCreate="(unique = unique)">
-				<div className="space-y-4">
-					<RadioEnumField field="enumValue" label="Some enum" required={required} />
-					<RadioEnumField field="enumValue" label="Enum with boolean, numbers and null" options={[
-						{ value: 'a', label: 'Option A' },
-						{ value: 'b', label: 'Option B' },
-						{ value: 'c', label: 'Option C' },
-						{ value: true, label: 'True' },
-						{ value: false, label: 'False' },
-						{ value: 1, label: 'One' },
-						{ value: 2, label: 'Two' },
-						{ value: null, label: 'No value' },
-					]} required={required} />
-					<Divider />
-					<InputField field="dummy" label="Dummy to trigger dirty state" />
-				</div>
-			</EntitySubTree>
-		</Binding>
+			</>}
+		>
+			<FormLayout>
+				<RadioEnumField field="enumValue" label="Some enum" required={required} />
+				<RadioEnumField field="enumValue" label="Enum with boolean, numbers and null" options={[
+					{ value: 'a', label: 'Option A' },
+					{ value: 'b', label: 'Option B' },
+					{ value: 'c', label: 'Option C' },
+					{ value: true, label: 'True' },
+					{ value: false, label: 'False' },
+					{ value: 1, label: 'One' },
+					{ value: 2, label: 'Two' },
+					{ value: null, label: 'No value' },
+				]} required={required} />
+				<Divider />
+				<InputField field="dummy" label="Dummy to trigger dirty state" />
+			</FormLayout>
+		</EditPage>
 	)
 }
 
 
 export const CheckboxList = () => {
 	return (
-		<Binding>
-			<Slots.Title>
-				<Title icon={<FormInputIcon />}>Checkbox list</Title>
-			</Slots.Title>
-
-			<Slots.Actions>
-				<PersistButton />
-			</Slots.Actions>
-
-			<EntitySubTree entity="InputRoot(unique = unique)" setOnCreate="(unique = unique)">
-				<div className="space-y-4">
-					<CheckboxListEnumField field="enumArrayValue" label="Some enum" />
-					<Divider />
-					<InputField field="dummy" label="Dummy to trigger dirty state" />
-				</div>
-			</EntitySubTree>
-		</Binding>
+		<EditPage entity="InputRoot(unique = unique)" setOnCreate="(unique = unique)" title={<Title icon={<FormInputIcon />}>Checkbox list</Title>}>
+			<FormLayout>
+				<CheckboxListEnumField field="enumArrayValue" label="Some enum" />
+				<Divider />
+				<InputField field="dummy" label="Dummy to trigger dirty state" />
+			</FormLayout>
+		</EditPage>
 	)
 }
 
@@ -235,32 +200,22 @@ const FillValue = () => {
 }
 
 export const ClientValidation = () => (
-	<Binding>
-		<Slots.Title>
-			<Title icon={<FormInputIcon />}>Client validation</Title>
-		</Slots.Title>
-
-		<Slots.Actions>
-			<PersistButton />
-		</Slots.Actions>
-
-		<EntitySubTree entity="InputRoot(unique = unique)" setOnCreate="(unique = unique)">
-			<div className="space-y-4">
-				<div className="space-x-4">
-					<FillValue />
-				</div>
-
-				<InputField field="textValue" label="Name" description="3-16 characters" required inputProps={{ pattern: '\\w{3,16}' }} />
-				<InputField field="intValue" label="Number" description="max 100" inputProps={{
-					required: true,
-					max: 100,
-				}} />
-				<CheckboxField field="boolValue" label="Required" description="Required" inputProps={{ required: true }} />
-				<Divider />
-				<InputField field="dummy" label="Dummy to trigger dirty state" />
+	<EditPage entity="InputRoot(unique = unique)" setOnCreate="(unique = unique)" title={<Title icon={<FormInputIcon />}>Client validation</Title>}>
+		<FormLayout>
+			<div className="space-x-4">
+				<FillValue />
 			</div>
-		</EntitySubTree>
-	</Binding>
+
+			<InputField field="textValue" label="Name" description="3-16 characters" required inputProps={{ pattern: '\\w{3,16}' }} />
+			<InputField field="intValue" label="Number" description="max 100" inputProps={{
+				required: true,
+				max: 100,
+			}} />
+			<CheckboxField field="boolValue" label="Required" description="Required" inputProps={{ required: true }} />
+			<Divider />
+			<InputField field="dummy" label="Dummy to trigger dirty state" />
+		</FormLayout>
+	</EditPage>
 )
 
 const Code = uic('code', { baseClass: 'bg-gray-100 p-1 rounded' })
@@ -285,65 +240,40 @@ const SlugDescription = () => (
 )
 
 export const Slug = () => (
-	<Binding>
-		<Slots.Title>
-			<Title icon={<FormInputIcon />}>Slug</Title>
-		</Slots.Title>
-
-		<Slots.Actions>
-			<PersistButton />
-		</Slots.Actions>
-
-		<EntitySubTree entity="Slug(unique = unique)" setOnCreate="(unique = unique)">
-			<div className="space-y-4">
-				<InputField field="title" label="Title" />
-				<SlugField
-					description={<SlugDescription />}
-					slugify={slugify}
-					field="slug"
-					label="Slug"
-					derivedFrom="title"
-					unpersistedHardPrefix="http://google.com"
-					persistedHardPrefix="/article/"
-					persistedSoftPrefix="foo/"
-				/>
-			</div>
-		</EntitySubTree>
-	</Binding>
+	<EditPage entity="Slug(unique = unique)" setOnCreate="(unique = unique)" title={<Title icon={<FormInputIcon />}>Slug</Title>}>
+		<FormLayout>
+			<InputField field="title" label="Title" />
+			<SlugField
+				description={<SlugDescription />}
+				slugify={slugify}
+				field="slug"
+				label="Slug"
+				derivedFrom="title"
+				unpersistedHardPrefix="http://google.com"
+				persistedHardPrefix="/article/"
+				persistedSoftPrefix="foo/"
+			/>
+		</FormLayout>
+	</EditPage>
 )
 
 
 export const ServerRules = () => (
-	<Binding>
-		<Slots.Title>
-			<Title icon={<FormInputIcon />}>Server rules</Title>
-		</Slots.Title>
-
-		<Slots.Actions>
-			<PersistButton />
-		</Slots.Actions>
-
-		<DefaultRepeater entities="InputRules" orderBy="id">
-			<div className="space-y-4">
-				<InputField field="notNullValue" label="Not null" />
-				<InputField field="uniqueValue" label="Unique value" />
-				<InputField field="validationValue" label="Validation value" />
-			</div>
-		</DefaultRepeater>
-	</Binding>
+	<MultiEditPage entities="InputRules" orderBy="id" title={<Title icon={<FormInputIcon />}>Server rules</Title>}>
+		<FormLayout>
+			<InputField field="notNullValue" label="Not null" />
+			<InputField field="uniqueValue" label="Unique value" />
+			<InputField field="validationValue" label="Validation value" />
+		</FormLayout>
+	</MultiEditPage>
 )
 
 export const CustomError = () => <>
-	<Binding>
-		<Slots.Actions>
-			<PersistButton />
-		</Slots.Actions>
-		<EntitySubTree entity={'InputRoot(unique=unique)'} setOnCreate={'(unique=unique)'}>
-			<div className={'space-y-4'}>
-				<InputFieldWithCustomError field={'textValue'} label={'Text'} description={'Hello world'} />
-			</div>
-		</EntitySubTree>
-	</Binding>
+	<EditPage entity="InputRoot(unique=unique)" setOnCreate="(unique=unique)">
+		<FormLayout>
+			<InputFieldWithCustomError field="textValue" label="Text" description="Hello world" />
+		</FormLayout>
+	</EditPage>
 </>
 
 const InputFieldWithCustomError = Component<InputFieldProps>(
@@ -356,7 +286,7 @@ const InputFieldWithCustomError = Component<InputFieldProps>(
 			}
 		})
 
-		return <InputField field={'textValue'} label={'Text'} description={'Try to write anything but "Hello world"'} />
+		return <InputField field="textValue" label="Text" description="Try to write anything but 'Hello world'" />
 	},
 	() => <Field field={'textValue'} />,
 )

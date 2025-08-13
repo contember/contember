@@ -1,13 +1,10 @@
 import { BrushIcon, HomeIcon } from 'lucide-react'
 import { Title } from '~/app/components/title'
-import { Slots } from '~/lib/layout'
 import { Button } from '~/lib/ui/button'
+import { GenericPage } from '~/lib/pages'
 
 export default () => (
-	<>
-		<Slots.Title>
-			<Title icon={<BrushIcon />}>Buttons</Title>
-		</Slots.Title>
+	<GenericPage title={<Title icon={<BrushIcon />}>Buttons</Title>}>
 		<div className={'flex flex-col gap-2 items-start h-screen'}>
 			<h2 className={'text-2xl'}>Button variants</h2>
 			<Button>Default button</Button>
@@ -23,5 +20,5 @@ export default () => (
 			<Button size="lg">Large size</Button>
 			<Button size="icon"><HomeIcon /></Button>
 		</div>
-	</>
+	</GenericPage>
 )

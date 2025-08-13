@@ -11,13 +11,10 @@ import { Field } from '@contember/interface'
 import { Button } from '~/lib/ui/button'
 import { DataGridLoader, DataGridPagination, DataGridToolbar } from '~/lib/datagrid'
 import { Card, CardHeader, CardTitle } from '~/lib/ui/card'
+import { GenericPage } from '~/lib/pages'
 
 export default () => (
-	<Binding>
-		<Slots.Title>
-			<h1 className="text-3xl font-semibold">Articles infinite scroll</h1>
-		</Slots.Title>
-
+	<GenericPage title={<h1 className="text-3xl font-semibold">Articles infinite scroll</h1>}>
 		<DataView
 			entities="GridArticle"
 			initialItemsPerPage={6}
@@ -48,9 +45,8 @@ export default () => (
 			{/*<DataGridLoader>*/}
 			{/*</DataGridLoader>*/}
 
-
 			<DataGridPagination />
 
 		</DataView>
-	</Binding>
+	</GenericPage>
 )

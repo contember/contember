@@ -1,5 +1,5 @@
 import { Workspace } from './Workspace'
-import { join } from 'node:path'
+import { join, resolve } from 'node:path'
 import { YamlHandler } from '../fs/YamlHandler'
 
 export interface LocalProjectConfig {
@@ -17,10 +17,10 @@ export class WorkspaceResolver {
 
 	resolve = async (baseDir: string): Promise<Workspace> => {
 		const config = await this.readConfig(baseDir)
-		const apiDir = config.apiDir ?? join(baseDir, 'api')
-		const migrationsDir = config.migrationsDir ?? join(apiDir, 'migrations')
-		const adminDir = config.adminDir === false ? undefined : (config.adminDir ?? join(baseDir, 'admin'))
-		const adminDistDir = adminDir === undefined ? undefined : (config.adminDistDir ?? join(adminDir, 'dist'))
+		const apiDir = config.apiDir ? resolve(baseDir, config.apiDir) : join(baseDir, 'api')
+		const migrationsDir = config.migrationsDir ? resolve(baseDir, config.migrationsDir) : join(apiDir, 'migrations')
+		const adminDir = config.adminDir === false ? undefined : (config.adminDir ? resolve(baseDir, config.adminDir) : join(baseDir, 'admin'))
+		const adminDistDir = adminDir === undefined ? undefined : (config.adminDistDir ? resolve(baseDir, config.adminDistDir) : join(adminDir, 'dist'))
 
 		return {
 			baseDir,

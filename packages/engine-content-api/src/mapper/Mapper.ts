@@ -139,7 +139,12 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		const augmentedBuilder = qb.from(entity.tableName, path.alias).meta('path', [...input.path, input.alias])
 
 		const selector = this.selectBuilderFactory.create(augmentedBuilder, hydrator, relationPath)
-		const filterWithPredicates = this.predicatesInjector.inject(entity, inputWithOrder.args.filter || {}, relationPath[relationPath.length - 1])
+		const filterWithPredicates = this.predicatesInjector.inject(
+			entity,
+			inputWithOrder.args.filter || {},
+			relationPath[relationPath.length - 1],
+			relationPath,
+		)
 		const inputWithPredicates = inputWithOrder.withArg('filter', filterWithPredicates)
 		selector.select(this, entity, inputWithPredicates, path, groupBy)
 		return await selector.execute(this.db)
@@ -168,7 +173,7 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 			.select(expr => expr.raw('count(*)'), 'row_count')
 			.select([path.alias, relation.joiningColumn.columnName])
 			.groupBy([path.alias, relation.joiningColumn.columnName])
-		const withPredicates = this.predicatesInjector.inject(entity, filter, relationPath[relationPath.length - 1])
+		const withPredicates = this.predicatesInjector.inject(entity, filter, relationPath[relationPath.length - 1], relationPath)
 		const qbWithWhere = this.whereBuilder.build(qb, entity, path, withPredicates, { relationPath })
 		const rows = await qbWithWhere.getResult(this.db)
 		const result = new Map<string, number>()

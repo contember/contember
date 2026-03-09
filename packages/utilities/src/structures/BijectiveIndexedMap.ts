@@ -69,6 +69,25 @@ export class BijectiveIndexedMap<K, V> implements Map<K, V> {
 	public has(key: K): boolean {
 		return this.index.has(key)
 	}
+	public getOrInsert(key: K, defaultValue: V): V {
+		const existing = this.get(key)
+		if (existing !== undefined) {
+			return existing
+		}
+		this.set(key, defaultValue)
+		return defaultValue
+	}
+
+	public getOrInsertComputed(key: K, callback: (key: K) => V): V {
+		const existing = this.get(key)
+		if (existing !== undefined) {
+			return existing
+		}
+		const value = callback(key)
+		this.set(key, value)
+		return value
+	}
+
 	public set(key: K, value: V): this {
 		const existingIndex = this.index.get(key)
 

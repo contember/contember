@@ -15,7 +15,7 @@
 			"dom.iterable"
 		],
 		"module": "esnext",
-		"moduleResolution": "node",
+		"moduleResolution": "bundler",
 		"esModuleInterop": true,
 		"noEmitOnError": true,
 		"noImplicitOverride": true,
@@ -25,9 +25,9 @@
 		"strict": true,
 		"target": "ES2020",
 		"useDefineForClassFields": true,
-//		"types": [
-//			"vite/client",
-//			"node",
-//		]
+		"types": [
+			"node",
+			"bun"
+		]
 	}
 }

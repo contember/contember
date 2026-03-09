@@ -175,7 +175,7 @@
       "vite-tsconfig-paths": "^5.0.1",
       "ws": "^8.19.0",
       "yawn-yaml": "^2.3.0"
-    },
+    }
   },
   "resolutions": {
     "typescript": "6.0.1-rc",

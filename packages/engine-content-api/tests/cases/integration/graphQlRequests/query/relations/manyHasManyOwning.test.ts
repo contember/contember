@@ -194,7 +194,7 @@ test('Posts with paginated tags (many has many owning)', async () => {
 })
 
 
-test.only('large number of posts - use array', async () => {
+test('large number of posts - use array', async () => {
 	const ids = Array.from({ length: 1000 }).map((it, index) => testUuid(index + 1))
 	await execute({
 		schema: new SchemaBuilder()

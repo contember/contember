@@ -26,6 +26,6 @@
   },
   "typings": "./dist/types/index.d.ts",
   "peerDependencies": {
-    "vite": "^6.4.1"
+    "vite": "^7"
   }
 }

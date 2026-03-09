@@ -9,14 +9,13 @@
   },
   "devDependencies": {
     "@contember/vite-plugin": "{version}",
-    "@tailwindcss/postcss": "^4",
+    "@tailwindcss/vite": "^4",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "@vitejs/plugin-react": "^4.2.1",
-    "postcss": "^8",
     "tailwindcss": "^4",
     "tailwindcss-animate": "^1.0.7",
-    "vite": "^6"
+    "vite": "^7"
   },
   "dependencies": {
     "@contember/client-content": "{version}",

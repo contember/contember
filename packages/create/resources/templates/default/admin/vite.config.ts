@@ -6,6 +6,6 @@ import tsconfigPaths from 'vite-tsconfig-paths'
 
 export default defineConfig(() => {
 	return {
-		plugins: [tsconfigPaths(), react(), contember()],
+		plugins: [tsconfigPaths(), tailwindcss(), react(), contember()],
 	}
 })

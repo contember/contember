@@ -1,4 +1,5 @@
 import contember from '@contember/vite-plugin/src'
+import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 import tsconfigPaths from 'vite-tsconfig-paths'
@@ -8,7 +9,7 @@ import { resolveConfig } from '../../../scripts/vite/resolveConfig'
 
 export default defineConfig(() => {
 	return ({
-		plugins: [tsconfigPaths({ root: './' }), react(), contember()],
+		plugins: [tsconfigPaths({ root: './' }), tailwindcss(), react(), contember()],
 		resolve: resolveConfig,
 		build: {
 			rollupOptions: {

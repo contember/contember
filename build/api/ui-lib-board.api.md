@@ -9,7 +9,7 @@ import { ButtonHTMLAttributes } from 'react';
 import { ClassAttributes } from 'react';
 import { ForwardRefExoticComponent } from 'react';
 import { HTMLAttributes } from 'react';
-import { JSX as JSX_2 } from 'react/jsx-runtime';
+import { JSX } from 'react/jsx-runtime';
 import { NamedExoticComponent } from 'react';
 import { ReactNode } from 'react';
 import { RefAttributes } from 'react';
@@ -98,9 +98,9 @@ className?: string;
 }, "ref"> & RefAttributes<HTMLDivElement>>;
 
 // @public (undocumented)
-export const ColumnDropIndicator: ({ position }: {
+export const ColumnDropIndicator: (input: {
     position: "before" | "after";
-}) => JSX_2.Element;
+}) => JSX.Element;
 
 // @public (undocumented)
 export const DefaultBoard: NamedExoticComponent<DefaultBoardProps>;
@@ -114,9 +114,9 @@ export type DefaultBoardProps = {
 } & BoardProps;
 
 // @public (undocumented)
-export const ItemDropIndicator: ({ position }: {
+export const ItemDropIndicator: (input: {
     position: "before" | "after";
-}) => JSX_2.Element;
+}) => JSX.Element;
 
 // (No @packageDocumentation comment for this package)
 

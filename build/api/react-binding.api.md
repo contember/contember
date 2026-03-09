@@ -7,6 +7,7 @@
 import type { Alias } from '@contember/binding';
 import type { BindingOperations } from '@contember/binding';
 import { ComponentType } from 'react';
+import { Context } from 'react';
 import { DataBinding } from '@contember/binding';
 import { DataBindingEventListenerMap } from '@contember/binding';
 import { EntityAccessor } from '@contember/binding';
@@ -25,8 +26,9 @@ import type { GetEntityByKey } from '@contember/binding';
 import { GraphQlClientError } from '@contember/react-client';
 import type { HasManyRelationMarker } from '@contember/binding';
 import type { HasOneRelationMarker } from '@contember/binding';
-import { JSX as JSX_2 } from 'react/jsx-runtime';
+import { JSX } from 'react/jsx-runtime';
 import { MarkerTreeRoot } from '@contember/binding';
+import { MemoExoticComponent } from 'react';
 import { NamedExoticComponent } from 'react';
 import type { Persist } from '@contember/binding';
 import { PropsWithChildren } from 'react';
@@ -49,11 +51,11 @@ import type { TreeRootAccessor } from '@contember/binding';
 import { TreeRootId } from '@contember/binding';
 
 // @public (undocumented)
-export function AccessorProvider(props: EntityProviderProps): JSX_2.Element;
+export function AccessorProvider(props: EntityProviderProps): JSX.Element;
 
 // @public (undocumented)
 export const AccessorTree: {
-    ({ state, children }: AccessorTreeProps): JSX_2.Element;
+    (input: AccessorTreeProps): JSX.Element;
     displayName: string;
 };
 
@@ -99,7 +101,7 @@ export interface AccessorTreeStateOptions {
 export const addEntityAtIndex: (entityList: EntityListAccessor, sortableByField: RelativeSingleField, index: number, preprocess?: EntityAccessor.BatchUpdatesHandler) => void;
 
 // @public (undocumented)
-export function BindingOperationsProvider(props: BindingOperationsProviderProps): JSX_2.Element;
+export function BindingOperationsProvider(props: BindingOperationsProviderProps): JSX.Element;
 
 // @public (undocumented)
 export interface BindingOperationsProviderProps {
@@ -152,7 +154,7 @@ export interface DataBindingStateComponentProps {
 }
 
 // @public (undocumented)
-export const DeferredSubTrees: React.NamedExoticComponent<DeferredSubTreesProps>;
+export const DeferredSubTrees: NamedExoticComponent<DeferredSubTreesProps>;
 
 // @public (undocumented)
 export interface DeferredSubTreesProps {
@@ -163,7 +165,7 @@ export interface DeferredSubTreesProps {
 }
 
 // @public
-export const DeleteEntityTrigger: ({ immediatePersist, onPersistError, onPersistSuccess, ...props }: DeleteEntityTriggerProps) => JSX_2.Element;
+export const DeleteEntityTrigger: (input: DeleteEntityTriggerProps) => JSX.Element;
 
 // @public (undocumented)
 export interface DeleteEntityTriggerProps {
@@ -184,10 +186,10 @@ export type DimensionRendererProps = {
 };
 
 // @public (undocumented)
-export const DirtinessContext: React.Context<boolean>;
+export const DirtinessContext: Context<boolean>;
 
 // @public (undocumented)
-export const Entity: React.NamedExoticComponent<EntityBaseProps>;
+export const Entity: NamedExoticComponent<EntityBaseProps>;
 
 // @public (undocumented)
 export interface EntityBaseProps {
@@ -198,7 +200,7 @@ export interface EntityBaseProps {
 }
 
 // @public (undocumented)
-export function EntityKeyProvider(props: EntityKeyProviderProps): JSX_2.Element;
+export function EntityKeyProvider(props: EntityKeyProviderProps): JSX.Element;
 
 // @public (undocumented)
 export interface EntityKeyProviderProps {
@@ -276,7 +278,7 @@ export type EntitySubTreeProps<EntityProps> = {
 } & EntitySubTreeAdditionalProps & (SugaredQualifiedSingleEntity | (SugaredUnconstrainedQualifiedSingleEntity & EntitySubTreeAdditionalCreationProps));
 
 // @public (undocumented)
-export function EntityView(props: EntityViewProps): JSX_2.Element;
+export function EntityView(props: EntityViewProps): JSX.Element;
 
 // @public (undocumented)
 export interface EntityViewProps {
@@ -295,7 +297,7 @@ export interface EnvironmentAwareFunctionComponent<P> {
 }
 
 // @public (undocumented)
-export const EnvironmentContext: React.Context<Environment<Environment.AnyNode | undefined>>;
+export const EnvironmentContext: Context<Environment<Environment.AnyNode | undefined>>;
 
 // @public (undocumented)
 export interface EnvironmentDeltaProvider<Props extends {} = any> {
@@ -425,7 +427,7 @@ export type HasOneProps<EntityProps = never> = SugaredRelativeSingleEntity & {
 };
 
 // @public (undocumented)
-export const If: React.NamedExoticComponent<IfProps>;
+export const If: NamedExoticComponent<IfProps>;
 
 // @public (undocumented)
 export interface IfCallbackProps {
@@ -476,13 +478,13 @@ export interface InitializingAccessorTreeState {
 export type LabelMiddleware = (label: ReactNode, environment: Environment) => ReactNode;
 
 // @public (undocumented)
-export const LabelMiddlewareContext: React.Context<LabelMiddleware>;
+export const LabelMiddlewareContext: Context<LabelMiddleware>;
 
 // @public (undocumented)
-export const LabelMiddlewareProvider: ({ value, children }: {
+export const LabelMiddlewareProvider: (input: {
     value: LabelMiddleware;
     children: ReactNode;
-}) => JSX_2.Element;
+}) => JSX.Element;
 
 // @public (undocumented)
 export interface LeafMarkerProvider<Props extends {} = any> {
@@ -501,10 +503,10 @@ export class MarkerTreeGenerator {
 }
 
 // @public (undocumented)
-export const MutationStateContext: React.Context<boolean>;
+export const MutationStateContext: Context<boolean>;
 
 // @public (undocumented)
-export const ParentEntity: React.NamedExoticComponent<ParentEntityProps>;
+export const ParentEntity: NamedExoticComponent<ParentEntityProps>;
 
 // @public (undocumented)
 export interface ParentEntityProps extends SugaredParentEntityParameters {
@@ -513,7 +515,7 @@ export interface ParentEntityProps extends SugaredParentEntityParameters {
 }
 
 // @public
-export const PersistOnFieldChange: React.NamedExoticComponent<PersistOnFieldChangeProps>;
+export const PersistOnFieldChange: NamedExoticComponent<PersistOnFieldChangeProps>;
 
 // @public (undocumented)
 export type PersistOnFieldChangeProps = {
@@ -523,7 +525,7 @@ export type PersistOnFieldChangeProps = {
 };
 
 // @public
-export const PersistOnHasOneChange: React.NamedExoticComponent<PersistOnHasOneChangeProps>;
+export const PersistOnHasOneChange: NamedExoticComponent<PersistOnHasOneChangeProps>;
 
 // @public (undocumented)
 export type PersistOnHasOneChangeProps = {
@@ -533,7 +535,7 @@ export type PersistOnHasOneChangeProps = {
 };
 
 // @public
-export const PersistOnKey: ({ onPersistSuccess, onPersistError, isHotkey, }: PersistOnKeyProps) => null;
+export const PersistOnKey: (input: PersistOnKeyProps) => null;
 
 // @public (undocumented)
 export type PersistOnKeyProps = {
@@ -543,7 +545,7 @@ export type PersistOnKeyProps = {
 };
 
 // @public
-export const PersistTrigger: ({ onPersistError, onPersistSuccess, ...props }: PersistTriggerProps) => JSX_2.Element;
+export const PersistTrigger: (input: PersistTriggerProps) => JSX.Element;
 
 // @public (undocumented)
 export interface PersistTriggerAttributes {
@@ -562,7 +564,7 @@ export interface PersistTriggerProps {
 }
 
 // @public (undocumented)
-export const RecursionTerminator: React.NamedExoticComponent<RecursionTerminatorProps>;
+export const RecursionTerminator: NamedExoticComponent<RecursionTerminatorProps>;
 
 // @public (undocumented)
 export const recursionTerminatorEnvironmentExtension: Environment.Extension<RecursionTerminatorOptions, RecursionTerminatorOptions | undefined>;
@@ -578,7 +580,7 @@ export interface RecursionTerminatorOptions {
 }
 
 // @public (undocumented)
-export const RecursionTerminatorPortal: React.NamedExoticComponent<RecursionTerminatorProps>;
+export const RecursionTerminatorPortal: NamedExoticComponent<RecursionTerminatorProps>;
 
 // @public (undocumented)
 export interface RecursionTerminatorProps {
@@ -598,7 +600,7 @@ export interface RecursionTerminatorProps {
 export const repairEntitiesOrder: (sortableByField: RelativeSingleField, sortedEntities: EntityAccessor[]) => void;
 
 // @public (undocumented)
-export const SetOrderFieldOnCreate: React.NamedExoticComponent<SetOrderFieldOnCreateProps>;
+export const SetOrderFieldOnCreate: NamedExoticComponent<SetOrderFieldOnCreateProps>;
 
 // @public (undocumented)
 export interface SetOrderFieldOnCreateOwnProps {
@@ -630,7 +632,7 @@ export interface SortedEntities {
 export const sortEntities: (entities: EntityAccessor[], sortByField: RelativeSingleField | undefined) => EntityAccessor[];
 
 // @public (undocumented)
-export const StaticRender: React.NamedExoticComponent<StaticRenderProps>;
+export const StaticRender: NamedExoticComponent<StaticRenderProps>;
 
 // @public (undocumented)
 export interface StaticRenderProps {
@@ -659,7 +661,7 @@ export interface SugaredFieldProps<Persisted extends FieldValue = FieldValue> ex
 }
 
 // @public (undocumented)
-export function TreeRootIdProvider(props: TreeRootIdProviderProps): JSX_2.Element;
+export function TreeRootIdProvider(props: TreeRootIdProviderProps): JSX.Element;
 
 // @public (undocumented)
 export interface TreeRootIdProviderProps {
@@ -685,7 +687,7 @@ export const useAccessorUpdateSubscription: <Accessor extends {
 export const useBindingOperations: () => BindingOperations<ReactNode>;
 
 // @public (undocumented)
-export const useDataBinding: ({ children, refreshOnPersist, skipStateUpdateAfterPersist, }: {
+export const useDataBinding: (input: {
     children?: ReactNode;
     refreshOnPersist?: boolean;
     skipStateUpdateAfterPersist?: boolean;
@@ -944,7 +946,7 @@ export const usePersist: () => Persist;
 export const useTreeRootId: () => TreeRootId | undefined;
 
 // @public (undocumented)
-export const Variable: React.MemoExoticComponent<({ name, format }: VariableProps) => ReactElement>;
+export const Variable: MemoExoticComponent<(input: VariableProps) => ReactElement>;
 
 // @public (undocumented)
 export interface VariableProps {

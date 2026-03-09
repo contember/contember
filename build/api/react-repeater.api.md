@@ -7,7 +7,7 @@
 import { Context } from 'react';
 import { EntityAccessor } from '@contember/react-binding';
 import { EntityListAccessor } from '@contember/react-binding';
-import { JSX as JSX_2 } from 'react/jsx-runtime';
+import { JSX } from 'react/jsx-runtime';
 import { NamedExoticComponent } from 'react';
 import { ReactElement } from 'react';
 import { ReactNode } from 'react';
@@ -25,7 +25,7 @@ export type RepeaterAddItemIndex = number | 'first' | 'last' | undefined;
 export type RepeaterAddItemMethod = (index: RepeaterAddItemIndex, preprocess?: EntityAccessor.BatchUpdatesHandler) => void;
 
 // @public
-export const RepeaterAddItemTrigger: ({ children, index, preprocess, ...props }: RepeaterAddItemTriggerProps) => JSX_2.Element;
+export const RepeaterAddItemTrigger: (input: RepeaterAddItemTriggerProps) => JSX.Element;
 
 // @public
 export interface RepeaterAddItemTriggerProps {
@@ -38,14 +38,14 @@ export interface RepeaterAddItemTriggerProps {
 export const RepeaterCurrentEntityContext: Context<EntityAccessor>;
 
 // @public
-export const RepeaterEachItem: ({ children }: {
+export const RepeaterEachItem: (input: {
     children: ReactNode;
-}) => JSX_2.Element;
+}) => JSX.Element;
 
 // @public
-export const RepeaterEmpty: ({ children }: {
+export const RepeaterEmpty: (input: {
     children: ReactNode;
-}) => JSX_2.Element | null;
+}) => JSX.Element | null;
 
 // @internal (undocumented)
 export const RepeaterEntityListAccessorContext: Context<EntityListAccessor>;
@@ -67,7 +67,7 @@ export type RepeaterMoveItemIndex = number | 'first' | 'last' | 'previous' | 'ne
 export type RepeaterMoveItemMethod = (entity: EntityAccessor, index: RepeaterMoveItemIndex) => void;
 
 // @public
-export const RepeaterMoveItemTrigger: ({ children, index, ...props }: RepeaterMoveItemTriggerProps) => JSX_2.Element;
+export const RepeaterMoveItemTrigger: (input: RepeaterMoveItemTriggerProps) => JSX.Element;
 
 // @public
 export interface RepeaterMoveItemTriggerProps {
@@ -78,9 +78,9 @@ export interface RepeaterMoveItemTriggerProps {
 // Warning: (tsdoc-code-fence-missing-delimiter) Error parsing code fence: Missing closing delimiter
 //
 // @public
-export const RepeaterNotEmpty: ({ children }: {
+export const RepeaterNotEmpty: (input: {
     children: ReactNode;
-}) => JSX_2.Element | null;
+}) => JSX.Element | null;
 
 // @public (undocumented)
 export type RepeaterProps = RepeaterQualifiedProps | RepeaterRelativeProps;
@@ -101,7 +101,7 @@ export type RepeaterRelativeProps = SugaredRelativeEntityList & {
 export type RepeaterRemoveItemMethod = (entity: EntityAccessor) => void;
 
 // @public
-export const RepeaterRemoveItemTrigger: ({ children, ...props }: RepeaterRemoveItemTriggerProps) => JSX_2.Element;
+export const RepeaterRemoveItemTrigger: (input: RepeaterRemoveItemTriggerProps) => JSX.Element;
 
 // @public
 export interface RepeaterRemoveItemTriggerProps {

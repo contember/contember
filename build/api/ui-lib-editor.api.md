@@ -9,12 +9,12 @@ import { ComponentType } from 'react';
 import { Editable } from 'slate-react';
 import { Editor } from 'slate';
 import { EditorPlugin } from '@contember/react-slate-editor-base';
-import { EditorPlugin as EditorPlugin_2 } from '@contember/react-slate-editor';
 import { ErrorAccessor } from '@contember/interface';
-import { JSX as JSX_2 } from 'react/jsx-runtime';
+import { JSX } from 'react/jsx-runtime';
 import { MemoExoticComponent } from 'react';
 import { NamedExoticComponent } from 'react';
-import * as React_2 from 'react';
+import { default as React_2 } from 'react';
+import * as React_3 from 'react';
 import { ReactElement } from 'react';
 import { ReactNode } from 'react';
 import { RenderElementProps } from 'slate-react';
@@ -52,23 +52,23 @@ export type BlockEditorFieldProps = BlockEditorProps & {
 };
 
 // @public (undocumented)
-export const BlockEditorInner: ({ children, placeholder }: {
+export const BlockEditorInner: (input: {
     placeholder?: string;
     children: ReactNode;
-}) => JSX_2.Element;
+}) => JSX.Element;
 
 // @public (undocumented)
-export const blockEditorPlugins: EditorPlugin_2[];
+export const blockEditorPlugins: EditorPlugin[];
 
 // @public (undocumented)
-export const BlockElement: NamedExoticComponent<BlockElementProps>;
+export const BlockElement: React_2.MemoExoticComponent<(input: BlockElementProps) => JSX.Element>;
 
 // @public (undocumented)
 export interface BlockElementProps extends RenderElementProps {
     // (undocumented)
     className?: string;
     // (undocumented)
-    domElement?: keyof JSX.IntrinsicElements;
+    domElement?: keyof React_2.JSX.IntrinsicElements;
     // (undocumented)
     withBoundaries?: boolean;
 }
@@ -92,7 +92,7 @@ export interface EditorBlockProps {
 }
 
 // @public (undocumented)
-export const EditorBlockToolbar: MemoExoticComponent<({ children }: EditorBlockToolbarProps) => JSX_2.Element>;
+export const EditorBlockToolbar: MemoExoticComponent<(input: EditorBlockToolbarProps) => JSX.Element>;
 
 // @public (undocumented)
 export interface EditorBlockToolbarProps {
@@ -119,7 +119,7 @@ export interface EditorCanvasProps<P extends HTMLTextAreaDivTargetProps> {
 }
 
 // @public (undocumented)
-export const EditorEditableCanvas: (editableProps: EditorEditableCanvasProps) => JSX_2.Element;
+export const EditorEditableCanvas: (editableProps: EditorEditableCanvasProps) => JSX.Element;
 
 // Warning: (ae-forgotten-export) The symbol "EditableProps" needs to be exported by the entry point index.d.ts
 //
@@ -128,7 +128,7 @@ export interface EditorEditableCanvasProps extends EditableProps {
 }
 
 // @public (undocumented)
-export const EditorInlineToolbar: MemoExoticComponent<({ children }: EditorInlineToolbarProps) => JSX_2.Element>;
+export const EditorInlineToolbar: MemoExoticComponent<(input: EditorInlineToolbarProps) => JSX.Element>;
 
 // @public (undocumented)
 export interface EditorInlineToolbarProps {
@@ -141,10 +141,10 @@ export interface HTMLTextAreaDivTargetProps extends TextareaHTMLAttributes<HTMLD
 }
 
 // @public (undocumented)
-export const RichTextField: React_2.NamedExoticComponent<RichTextFieldProps>;
+export const RichTextField: React_3.NamedExoticComponent<RichTextFieldProps>;
 
 // @public (undocumented)
-export const richTextFieldPlugins: EditorPlugin_2[];
+export const richTextFieldPlugins: EditorPlugin[];
 
 // Warning: (ae-forgotten-export) The symbol "FormContainerProps" needs to be exported by the entry point index.d.ts
 //

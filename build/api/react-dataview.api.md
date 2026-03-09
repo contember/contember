@@ -17,7 +17,7 @@ import { ForwardRefExoticComponent } from 'react';
 import { HasManyRelationMarker } from '@contember/react-binding';
 import { HasOneRelationMarker } from '@contember/react-binding';
 import { Input } from '@contember/client';
-import { JSX as JSX_2 } from 'react/jsx-runtime';
+import { JSX } from 'react/jsx-runtime';
 import { JSXElementConstructor } from 'react';
 import { NamedExoticComponent } from 'react';
 import { OrderBy } from '@contember/react-binding';
@@ -25,11 +25,12 @@ import { QualifiedEntityList } from '@contember/react-binding';
 import * as React_2 from 'react';
 import { ReactElement } from 'react';
 import { ReactNode } from 'react';
+import { ReactPortal } from 'react';
 import { ReceivedEntityData } from '@contember/react-binding';
 import { RefAttributes } from 'react';
-import { SchemaColumn } from '@contember/react-binding';
-import { SchemaEntity } from '@contember/react-binding';
-import { SchemaRelation } from '@contember/react-binding';
+import { SchemaColumn } from '@contember/binding-common';
+import { SchemaEntity } from '@contember/binding-common';
+import { SchemaRelation } from '@contember/binding-common';
 import { Serializable } from '@contember/react-utils';
 import { SetStateAction } from 'react';
 import { StateStorageOrName } from '@contember/react-utils';
@@ -78,13 +79,13 @@ export const createEnumFilter: (field: SugaredRelativeSingleField_2["field"]) =>
 export const createEnumListFilter: (field: SugaredRelativeSingleField_2["field"]) => DataViewFilterHandler<EnumListFilterArtifacts>;
 
 // @public
-export const createFieldFilterHandler: <FA extends DataViewFilterArtifact = DataViewFilterArtifact>({ createCondition, isEmpty }: {
+export const createFieldFilterHandler: <FA extends DataViewFilterArtifact = DataViewFilterArtifact>(input: {
     createCondition: ((filterArtifact: FA, options: DataViewFilterHandlerOptions) => Input.Condition | undefined);
     isEmpty?: (filterArtifact: FA) => boolean;
 }) => (field: SugaredRelativeSingleField["field"]) => DataViewFilterHandler<FA>;
 
 // @public (undocumented)
-export const createFilterHandler: <FA extends DataViewFilterArtifact = DataViewFilterArtifact>({ createFilter, isEmpty, identifier }: {
+export const createFilterHandler: <FA extends DataViewFilterArtifact = DataViewFilterArtifact>(input: {
     createFilter: ((filterArtifact: FA, options: DataViewFilterHandlerOptions) => Filter | undefined);
     isEmpty?: (filterArtifact: FA) => boolean;
     identifier?: {
@@ -234,9 +235,9 @@ export interface DataViewDateFilterResetTriggerProps {
 export const DataViewDisplayedStateContext: React_2.Context<DataViewState | undefined>;
 
 // @public
-export const DataViewEachRow: ({ children }: {
+export const DataViewEachRow: (input: {
     children: ReactNode;
-}) => JSX_2.Element | null;
+}) => JSX.Element | null;
 
 // @public
 export const DataViewElement: NamedExoticComponent<DataViewElementProps>;
@@ -258,9 +259,9 @@ export interface DataViewElementProps {
 }
 
 // @public
-export const DataViewEmpty: ({ children }: {
+export const DataViewEmpty: (input: {
     children: ReactNode;
-}) => JSX_2.Element | null;
+}) => JSX.Element | null;
 
 // @internal (undocumented)
 export const DataViewEntityListAccessorContext: React_2.Context<EntityListAccessor | undefined>;
@@ -287,12 +288,12 @@ export interface DataViewEnumFilterProps {
 }
 
 // @public (undocumented)
-export const DataViewEnumFilterState: ({ name, children, state, value }: {
+export const DataViewEnumFilterState: (input: {
     name?: string;
     value: string;
     children: ReactNode;
     state?: DataViewEnumFilterCurrent | DataViewEnumFilterCurrent[];
-}) => JSX_2.Element | null;
+}) => JSX.Element | null;
 
 // @public
 export const DataViewEnumFilterTrigger: React_2.ForwardRefExoticComponent<DataViewEnumFilterTriggerProps & React_2.RefAttributes<HTMLButtonElement>>;
@@ -404,7 +405,7 @@ export interface DataViewFilterProps {
 }
 
 // @public
-export const DataViewFilterScope: ({ name, children }: DataViewFilterScopeProps) => JSX_2.Element;
+export const DataViewFilterScope: (input: DataViewFilterScopeProps) => JSX.Element;
 
 // @public (undocumented)
 export interface DataViewFilterScopeProps {
@@ -417,7 +418,7 @@ export interface DataViewFilterScopeProps {
 export const DataViewGlobalKeyContext: React_2.Context<string>;
 
 // @public
-export const DataViewHasFilterType: ({ name, children }: DataViewHasFilterTypeProps) => JSX_2.Element | null;
+export const DataViewHasFilterType: (input: DataViewHasFilterTypeProps) => JSX.Element | null;
 
 // @public (undocumented)
 export interface DataViewHasFilterTypeProps {
@@ -483,7 +484,7 @@ export const DataViewInfiniteLoadProvider: React_2.NamedExoticComponent<{
 }>;
 
 // @public (undocumented)
-export const DataViewInfiniteLoadScrollObserver: () => JSX_2.Element;
+export const DataViewInfiniteLoadScrollObserver: () => JSX.Element;
 
 // @public
 export const DataViewInfiniteLoadTrigger: React_2.ForwardRefExoticComponent<{
@@ -517,10 +518,10 @@ export const DataViewKeyboardEventHandler: React_2.ForwardRefExoticComponent<{
 export const DataViewKeyboardEventHandlerContext: React_2.Context<React_2.KeyboardEventHandler<Element>>;
 
 // @public
-export const DataViewKeyProvider: ({ children, value }: {
+export const DataViewKeyProvider: (input: {
     children: React.ReactNode;
     value: string;
-}) => JSX_2.Element;
+}) => JSX.Element;
 
 // @public
 export const DataViewLayout: NamedExoticComponent<DataViewLayoutProps>;
@@ -550,7 +551,7 @@ export interface DataViewLayoutTriggerProps {
 }
 
 // @public
-export const DataViewLoaderState: ({ children, ...props }: DataViewLoaderStateProps) => JSX_2.Element | null;
+export const DataViewLoaderState: (input: DataViewLoaderStateProps) => JSX.Element | null;
 
 // @internal (undocumented)
 export const DataViewLoaderStateContext: React_2.Context<"initial" | "failed" | "refreshing" | "loaded">;
@@ -574,9 +575,9 @@ export type DataViewMethods = {
 };
 
 // @public
-export const DataViewNonEmpty: ({ children }: {
+export const DataViewNonEmpty: (input: {
     children: ReactNode;
-}) => JSX_2.Element | null;
+}) => JSX.Element | null;
 
 // @public (undocumented)
 export type DataViewNullFilterState = 'include' | 'exclude' | 'none';
@@ -665,7 +666,7 @@ export type DataViewPagingState = {
 export const DataViewPagingStateContext: React_2.Context<DataViewPagingState>;
 
 // @public
-export const DataViewPagingStateView: ({ render }: DataViewPagingStateViewProps) => JSX_2.Element;
+export const DataViewPagingStateView: (input: DataViewPagingStateViewProps) => JSX.Element;
 
 // @public (undocumented)
 export interface DataViewPagingStateViewProps {
@@ -700,17 +701,17 @@ export interface DataViewRelationFilterListProps {
 }
 
 // @public
-export const DataViewRelationFilterOptions: ({ children, name, ...props }: {
+export const DataViewRelationFilterOptions: (input: {
     name?: string;
     children: React_2.ReactNode;
-} & Omit<DataViewProps, "entities">) => JSX_2.Element;
+} & Omit<DataViewProps, "entities">) => JSX.Element;
 
 // @public
-export const DataViewRelationFilterState: ({ name, children, state }: {
+export const DataViewRelationFilterState: (input: {
     name?: string;
     children: ReactNode;
     state?: DataViewRelationFilterCurrent | DataViewRelationFilterCurrent[];
-}) => JSX_2.Element | null;
+}) => JSX.Element | null;
 
 // @public
 export const DataViewRelationFilterTrigger: React_2.ForwardRefExoticComponent<DataViewRelationFilterTriggerProps & React_2.RefAttributes<HTMLButtonElement>>;
@@ -857,7 +858,7 @@ export type DataViewSortingState = {
 export const DataViewSortingStateContext: React_2.Context<DataViewSortingState>;
 
 // @public (undocumented)
-export const DataViewSortingSwitch: ({ field, ...props }: DataViewSortingSwitchProps) => string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null;
+export const DataViewSortingSwitch: (input: DataViewSortingSwitchProps) => string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | null;
 
 // @public (undocumented)
 export interface DataViewSortingSwitchProps {
@@ -916,7 +917,7 @@ export interface DataViewTextFilterInputProps {
 }
 
 // @public
-export const DataViewTextFilterMatchModeLabel: ({ name, render }: DataViewTextFilterMatchModeLabelProps) => JSX_2.Element;
+export const DataViewTextFilterMatchModeLabel: (input: DataViewTextFilterMatchModeLabelProps) => JSX.Element;
 
 // @public (undocumented)
 export interface DataViewTextFilterMatchModeLabelProps {
@@ -1099,7 +1100,7 @@ export const useDataViewChildren: () => React_2.ReactNode;
 export const useDataViewCurrentKey: () => string;
 
 // @public (undocumented)
-export const useDataViewDateFilterInput: ({ name, type }: UseDataViewDateFilterInputProps) => UseDataViewDateFilterInputResult;
+export const useDataViewDateFilterInput: (input: UseDataViewDateFilterInputProps) => UseDataViewDateFilterInputResult;
 
 // @public (undocumented)
 export type UseDataViewDateFilterInputProps = {
@@ -1119,7 +1120,7 @@ export interface UseDataViewDateFilterInputResult {
 export const useDataViewDisplayedState: <T extends DataViewState>() => T | undefined;
 
 // @public
-export const useDataViewElements: ({ selection }?: {
+export const useDataViewElements: (input?: {
     selection?: DataViewSelectionValues;
 }) => DataViewElementData[];
 
@@ -1147,7 +1148,7 @@ export const useDataViewEnumFilterArgs: () => {
 export const useDataViewEnumFilterFactory: (name: string) => (value: string) => UseDataViewEnumFilter;
 
 // @public
-export const useDataViewFetchAllData: ({ children, selection }: {
+export const useDataViewFetchAllData: (input: {
     children: ReactNode;
     selection?: DataViewSelectionValues;
 }) => () => Promise<{
@@ -1207,7 +1208,7 @@ set: (action: DataViewSetNullFilterAction) => void
 ];
 
 // @public (undocumented)
-export const useDataViewNumberFilterInput: ({ name, type, allowFloat }: UseDataViewNumberFilterInputProps) => UseDataViewNumberFilterInputResult;
+export const useDataViewNumberFilterInput: (input: UseDataViewNumberFilterInputProps) => UseDataViewNumberFilterInputResult;
 
 // @public (undocumented)
 export type UseDataViewNumberFilterInputProps = {
@@ -1242,7 +1243,7 @@ export const useDataViewRelationFilterArgs: () => {
 };
 
 // @public (undocumented)
-export const useDataViewRelationFilterData: ({ name, children, options }: {
+export const useDataViewRelationFilterData: (input: {
     name: string;
     options: SugaredQualifiedEntityList["entities"];
     children: ReactNode;
@@ -1298,7 +1299,7 @@ export const useDataViewTargetHasOneSchema: (field: SugaredRelativeSingleEntity[
 };
 
 // @public (undocumented)
-export const useDataViewTextFilterInput: ({ name, debounceMs }: {
+export const useDataViewTextFilterInput: (input: {
     name: string;
     debounceMs?: number;
 }) => UseDataViewTextFilterInputResult;

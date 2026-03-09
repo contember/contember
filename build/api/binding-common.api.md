@@ -1295,11 +1295,11 @@ export class QueryLanguage {
     // (undocumented)
     static desugarParentEntityParameters(parentEntity: SugaredParentEntityParameters, environment: Environment): ParentEntityParameters;
     // (undocumented)
-    static desugarQualifiedEntityList({ entities, ...unsugarableEntityList }: SugaredQualifiedEntityList, environment: Environment): QualifiedEntityList;
+    static desugarQualifiedEntityList(input: SugaredQualifiedEntityList, environment: Environment): QualifiedEntityList;
     // (undocumented)
-    static desugarQualifiedFieldList({ fields, ...unsugarableFieldList }: SugaredQualifiedFieldList, environment: Environment): QualifiedFieldList;
+    static desugarQualifiedFieldList(input: SugaredQualifiedFieldList, environment: Environment): QualifiedFieldList;
     // (undocumented)
-    static desugarQualifiedSingleEntity({ entity, ...unsugarableSingleEntity }: SugaredQualifiedSingleEntity, environment: Environment): QualifiedSingleEntity;
+    static desugarQualifiedSingleEntity(input: SugaredQualifiedSingleEntity, environment: Environment): QualifiedSingleEntity;
     // (undocumented)
     static desugarRelativeEntityList(sugaredRelativeEntityList: string | SugaredRelativeEntityList, environment: Environment): RelativeEntityList;
     // (undocumented)
@@ -1311,9 +1311,9 @@ export class QueryLanguage {
     // (undocumented)
     static desugarTaggedMap: (input: string | ParsedTaggedMap, environment: Environment) => ParsedTaggedMap;
     // (undocumented)
-    static desugarUnconstrainedQualifiedEntityList({ entities, ...unsugarableEntityList }: SugaredUnconstrainedQualifiedEntityList, environment: Environment): UnconstrainedQualifiedEntityList;
+    static desugarUnconstrainedQualifiedEntityList(input: SugaredUnconstrainedQualifiedEntityList, environment: Environment): UnconstrainedQualifiedEntityList;
     // (undocumented)
-    static desugarUnconstrainedQualifiedSingleEntity({ entity, ...unsugarableSingleEntity }: SugaredUnconstrainedQualifiedSingleEntity, environment: Environment): UnconstrainedQualifiedSingleEntity;
+    static desugarUnconstrainedQualifiedSingleEntity(input: SugaredUnconstrainedQualifiedSingleEntity, environment: Environment): UnconstrainedQualifiedSingleEntity;
     // (undocumented)
     static desugarUniqueWhere: (input: string | UniqueWhere, environment: Environment) => UniqueWhere;
 }

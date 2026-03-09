@@ -18,8 +18,9 @@ import { Environment } from '@contember/react-binding';
 import { FieldAccessor } from '@contember/react-binding';
 import { FieldValue } from '@contember/react-binding';
 import { FunctionComponent } from 'react';
-import { JSX as JSX_2 } from 'react/jsx-runtime';
-import { NamedExoticComponent } from 'react';
+import { JSX } from 'react/jsx-runtime';
+import { JSXElementConstructor } from 'react';
+import { MemoExoticComponent } from 'react';
 import { Node as Node_2 } from 'slate';
 import { OptionallyVariableFieldValue } from '@contember/react-binding';
 import { Path } from 'slate';
@@ -27,6 +28,7 @@ import { PathRef } from 'slate';
 import { Range as Range_2 } from 'slate';
 import { ReactElement } from 'react';
 import { ReactNode } from 'react';
+import { ReactPortal } from 'react';
 import { RelativeSingleField } from '@contember/react-binding';
 import { RenderElementProps } from 'slate-react';
 import * as Slate from 'slate';
@@ -108,7 +110,7 @@ export interface DiscriminatedDatum {
 }
 
 // @public (undocumented)
-export const EditorInlineReferencePortal: (props: EditorInlineReferenceTriggerProps) => JSX_2.Element | null;
+export const EditorInlineReferencePortal: (props: EditorInlineReferenceTriggerProps) => JSX.Element | null;
 
 // @public (undocumented)
 export interface EditorInlineReferenceTriggerProps {
@@ -133,7 +135,7 @@ export type EditorReferenceBlocks = NormalizedDiscriminatedData<EditorReferenceB
 export const EditorReferenceBlocksContext: Context<EditorReferenceBlocks>;
 
 // @public (undocumented)
-export const EditorReferenceTrigger: ({ referenceType, ...props }: EditorReferenceTriggerProps) => JSX_2.Element;
+export const EditorReferenceTrigger: (input: EditorReferenceTriggerProps) => JSX.Element;
 
 // @public (undocumented)
 export interface EditorReferenceTriggerProps {
@@ -189,7 +191,7 @@ export const getDiscriminatedBlock: (blocks: NormalizedBlocks, field: FieldAcces
 export const getDiscriminatedDatum: <Datum>(data: NormalizedDiscriminatedData<Datum>, discriminant: FieldAccessor | FieldValue) => ResolvedDiscriminatedDatum<Datum> | undefined;
 
 // @public (undocumented)
-export const initBlockEditor: ({ editor, ...options }: InitEditorOptions & {
+export const initBlockEditor: (input: InitEditorOptions & {
     editor: Editor;
 }) => void;
 
@@ -318,7 +320,7 @@ export const SortedBlocksContext: Context<EntityAccessor[]>;
 export type SugaredDiscriminateBy = OptionallyVariableFieldValue;
 
 // @public (undocumented)
-export const useBlockEditorSlateNodes: ({ editor, blockElementCache, blockElementPathRefs, blockContentField, topLevelBlocks, }: UseBlockEditorSlateNodesOptions) => Descendant[];
+export const useBlockEditorSlateNodes: (input: UseBlockEditorSlateNodesOptions) => Descendant[];
 
 // @public (undocumented)
 export interface UseBlockEditorSlateNodesOptions {

@@ -9,7 +9,7 @@ import { ComponentType } from 'react';
 import { FileUrlDataExtractorProps } from '@contember/react-uploader';
 import { GenericFileMetadataExtractorProps } from '@contember/react-uploader';
 import { ImageFileDataExtractorProps } from '@contember/react-uploader';
-import { JSX as JSX_2 } from 'react/jsx-runtime';
+import { JSX } from 'react/jsx-runtime';
 import * as React_2 from 'react';
 import { ReactElement } from 'react';
 import { ReactNode } from 'react';
@@ -52,10 +52,10 @@ export const UploadedVideoView: React_2.NamedExoticComponent<UploadedVideoViewPr
 export type UploadedVideoViewProps = FileUrlDataExtractorProps & GenericFileMetadataExtractorProps & VideoFileDataExtractorProps & BaseFileViewProps;
 
 // @public (undocumented)
-export const UploaderDropzone: ({ inactiveOnUpload, dropzonePlaceholder }: {
+export const UploaderDropzone: (input: {
     inactiveOnUpload?: boolean;
     dropzonePlaceholder?: ReactNode;
-}) => JSX_2.Element;
+}) => JSX.Element;
 
 // @public (undocumented)
 export const UploaderDropzoneAreaUI: React_2.ForwardRefExoticComponent<Omit<React_2.ClassAttributes<HTMLDivElement> & React_2.HTMLAttributes<HTMLDivElement> & {

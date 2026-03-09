@@ -6,7 +6,7 @@
 
 import { DataViewSortingDirections } from '@contember/react-dataview';
 import { DataViewUnionFilterFields } from '@contember/react-dataview';
-import { JSX as JSX_2 } from 'react/jsx-runtime';
+import { JSX } from 'react/jsx-runtime';
 import { NamedExoticComponent } from 'react';
 import { PopoverContentProps } from '@radix-ui/react-popover';
 import * as React_2 from 'react';
@@ -97,10 +97,10 @@ export const MultiSelectSortableItemContentUI: React_2.ForwardRefExoticComponent
 export const SelectCreateNewTrigger: React_2.ForwardRefExoticComponent<React_2.RefAttributes<HTMLButtonElement>>;
 
 // @public (undocumented)
-export const SelectDefaultFilter: React_2.MemoExoticComponent<() => JSX_2.Element>;
+export const SelectDefaultFilter: React_2.MemoExoticComponent<() => JSX.Element>;
 
 // @public (undocumented)
-export const SelectDefaultPlaceholderUI: () => JSX_2.Element;
+export const SelectDefaultPlaceholderUI: () => JSX.Element;
 
 // @public (undocumented)
 export const SelectInput: React_2.NamedExoticComponent<{

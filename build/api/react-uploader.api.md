@@ -12,7 +12,7 @@ import { ErrorAccessor } from '@contember/react-binding';
 import type { ErrorAccessorHolder } from '@contember/react-binding';
 import { GenerateUploadUrlMutationBuilder } from '@contember/client';
 import { GraphQlClient } from '@contember/graphql-client';
-import { JSX as JSX_2 } from 'react/jsx-runtime';
+import { JSX } from 'react/jsx-runtime';
 import { JSXElementConstructor } from 'react';
 import { NamedExoticComponent } from 'react';
 import { ReactElement } from 'react';
@@ -46,19 +46,19 @@ export type BeforeUploadEvent = {
 };
 
 // @public (undocumented)
-export const createAnyFileType: ({ fileSizeField, fileTypeField, lastModifiedField, fileNameField, urlField, uploader, extractors, acceptFile, accept, }: AnyFileTypeProps) => FileType;
+export const createAnyFileType: (input: AnyFileTypeProps) => FileType;
 
 // @public (undocumented)
-export const createAudioFileType: ({ durationField, fileSizeField, fileTypeField, lastModifiedField, fileNameField, urlField, uploader, extractors, acceptFile, accept, }: AudioFileTypeProps) => FileType;
+export const createAudioFileType: (input: AudioFileTypeProps) => FileType;
 
 // @public (undocumented)
 export const createContentApiS3Signer: (client: GraphQlClient) => (parameters: GenerateUploadUrlMutationBuilder.FileParameters) => Promise<GenerateUploadUrlMutationBuilder.ResponseBody>;
 
 // @public (undocumented)
-export const createImageFileType: ({ uploader, urlField, fileSizeField, fileTypeField, lastModifiedField, fileNameField, heightField, widthField, accept, acceptFile, extractors, }: ImageFileTypeProps) => FileType;
+export const createImageFileType: (input: ImageFileTypeProps) => FileType;
 
 // @public (undocumented)
-export const createVideoFileType: ({ urlField, durationField, fileSizeField, fileTypeField, lastModifiedField, fileNameField, heightField, widthField, extractors, acceptFile, accept, uploader, }: VideoFileTypeProps) => FileType;
+export const createVideoFileType: (input: VideoFileTypeProps) => FileType;
 
 // @public (undocumented)
 export type DiscriminatedFileType = FileType & {
@@ -228,7 +228,7 @@ export class S3UploadClient implements UploadClient<S3FileOptions> {
     // (undocumented)
     readonly options: S3UploadClientOptions;
     // (undocumented)
-    upload({ file, signal, onProgress, ...options }: UploadClientUploadArgs & S3FileOptions): Promise<{
+    upload(input: UploadClientUploadArgs & S3FileOptions): Promise<{
         publicUrl: string;
     }>;
 }
@@ -298,11 +298,11 @@ export type UploaderBaseProps = UploaderBaseFieldProps & {
 export const UploaderClientContext: Context<UploadClient<any, FileUploadResult> | null>;
 
 // @public (undocumented)
-export const UploaderEachFile: ({ children, state, fallback }: {
+export const UploaderEachFile: (input: {
     children: ReactNode;
     state?: UploaderFileState["state"] | UploaderFileState["state"][];
     fallback?: ReactNode;
-}) => JSX_2.Element;
+}) => JSX.Element;
 
 // @public (undocumented)
 export class UploaderError extends Error {
@@ -399,11 +399,11 @@ export type UploaderFileStateUploading = {
 };
 
 // @public (undocumented)
-export const UploaderHasFile: ({ children, state, fallback }: {
+export const UploaderHasFile: (input: {
     children: ReactNode;
     fallback?: ReactNode;
     state?: UploaderFileState["state"] | UploaderFileState["state"][];
-}) => JSX_2.Element;
+}) => JSX.Element;
 
 // @public (undocumented)
 export interface UploaderOptions {
@@ -455,7 +455,7 @@ export const useUploaderOptions: () => UploaderOptions;
 export const useUploaderState: () => UploaderState;
 
 // @public (undocumented)
-export const useUploaderStateFiles: ({ state }?: UseUploaderStateFilesArgs) => UploaderState;
+export const useUploaderStateFiles: (input?: UseUploaderStateFilesArgs) => UploaderState;
 
 // @public (undocumented)
 export type UseUploaderStateFilesArgs = {

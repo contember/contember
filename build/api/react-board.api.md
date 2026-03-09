@@ -6,7 +6,7 @@
 
 import { Context } from 'react';
 import { EntityAccessor } from '@contember/react-binding';
-import { JSX as JSX_2 } from 'react/jsx-runtime';
+import { JSX } from 'react/jsx-runtime';
 import { NamedExoticComponent } from 'react';
 import { ReactNode } from 'react';
 import { SugaredQualifiedEntityList } from '@contember/react-binding';
@@ -24,12 +24,12 @@ export type BoardAddColumnMethod = (index: number | undefined, preprocess?: Enti
 export type BoardAddItemMethod<ColumnValue extends BoardColumnValue> = (column: ColumnValue | null, index: number | undefined, preprocess?: EntityAccessor.BatchUpdatesHandler) => void;
 
 // @public (undocumented)
-export const BoardColumn: ({}: {
+export const BoardColumn: (input: {
     children: ReactNode;
 }) => null;
 
 // @public (undocumented)
-export const BoardColumnLabel: () => JSX_2.Element | null;
+export const BoardColumnLabel: () => JSX.Element | null;
 
 // @public (undocumented)
 export type BoardColumnNode<ColumnValue extends BoardColumnValue = BoardColumnValue> = {
@@ -69,27 +69,27 @@ export type BoardDynamicColumnsBindingProps = {
 
 // @public (undocumented)
 export const BoardEachColumn: {
-    ({ children }: {
+    (input: {
         children: ReactNode;
-    }): JSX_2.Element;
-    staticRender({ children }: {
+    }): JSX.Element;
+    staticRender(input: {
         children: ReactNode;
-    }): JSX_2.Element;
+    }): JSX.Element;
 };
 
 // @public (undocumented)
 export const BoardEachItem: {
-    ({ children }: {
+    (input: {
         children: ReactNode;
-    }): JSX_2.Element;
-    staticRender({ children }: {
+    }): JSX.Element;
+    staticRender(input: {
         children: ReactNode;
-    }): JSX_2.Element;
+    }): JSX.Element;
 };
 
 // @public (undocumented)
 export const BoardItem: {
-    ({}: {
+    (input: {
         children: ReactNode;
     }): null;
     staticRender(): null;
@@ -122,7 +122,7 @@ export type BoardMoveColumnMethod = (entity: EntityAccessor, index: number) => v
 export type BoardMoveItemMethod<ColumnValue extends BoardColumnValue> = (entity: EntityAccessor, column: ColumnValue | null, index: number) => void;
 
 // @public (undocumented)
-export const BoardNullColumn: ({ children, hideEmpty }: BoardNullColumnProps) => JSX_2.Element | null;
+export const BoardNullColumn: (input: BoardNullColumnProps) => JSX.Element | null;
 
 // @public (undocumented)
 export const BoardNullColumnPlaceholder = "__null_column";

@@ -4,7 +4,7 @@
 
 ```ts
 
-import { JSX as JSX_2 } from 'react/jsx-runtime';
+import { JSX } from 'react/jsx-runtime';
 import { PropsWithChildren } from 'react';
 
 // @public (undocumented)
@@ -12,10 +12,10 @@ export interface CommentProps extends PropsWithChildren {
 }
 
 // @public (undocumented)
-export const LoginWithEmail: () => JSX_2.Element;
+export const LoginWithEmail: () => JSX.Element;
 
 // @public (undocumented)
-export const Todo: ({ children }: CommentProps) => JSX_2.Element | null;
+export const Todo: (input: CommentProps) => JSX.Element | null;
 
 // (No @packageDocumentation comment for this package)
 

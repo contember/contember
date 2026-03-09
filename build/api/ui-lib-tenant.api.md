@@ -4,7 +4,7 @@
 
 ```ts
 
-import { JSX as JSX_2 } from 'react/jsx-runtime';
+import { JSX } from 'react/jsx-runtime';
 import { MembershipInput } from '@contember/graphql-client-tenant';
 import { ProjectMembersFilter } from '@contember/graphql-client-tenant';
 import { ProjectMembersQueryResult } from '@contember/react-client-tenant';
@@ -15,27 +15,27 @@ export const ApiKeyList: (props: {
     controller?: {
         current?: MemberListController;
     };
-}) => JSX_2.Element;
+}) => JSX.Element;
 
 // @public (undocumented)
-export const ChangeMyPasswordFormFields: () => JSX_2.Element;
+export const ChangeMyPasswordFormFields: () => JSX.Element;
 
 // @public (undocumented)
-export const CreateApiKeyFormFields: ({ projectSlug }: {
+export const CreateApiKeyFormFields: (input: {
     projectSlug: string;
-}) => JSX_2.Element;
+}) => JSX.Element;
 
 // @public (undocumented)
-export const InviteFormFields: ({ projectSlug, roles }: {
+export const InviteFormFields: (input: {
     projectSlug: string;
     roles?: RolesConfig;
-}) => JSX_2.Element;
+}) => JSX.Element;
 
 // @public (undocumented)
-export const LoginFormFields: () => JSX_2.Element;
+export const LoginFormFields: () => JSX.Element;
 
 // @public (undocumented)
-export const MemberDeleteDialog: ({ onError, title, identityId, onSuccess, projectSlug }: MemberDeleteProps) => JSX_2.Element;
+export const MemberDeleteDialog: (input: MemberDeleteProps) => JSX.Element;
 
 // @public (undocumented)
 export interface MemberDeleteProps {
@@ -52,7 +52,7 @@ export interface MemberDeleteProps {
 }
 
 // @public (undocumented)
-export const MemberList: ({ filter, labels, tableColumns, controller, tableHeaders, roles }: MemberListProps) => JSX_2.Element;
+export const MemberList: (input: MemberListProps) => JSX.Element;
 
 // @public (undocumented)
 export interface MemberListController {
@@ -83,7 +83,7 @@ export interface MemberListProps {
 }
 
 // @public (undocumented)
-export const MembershipsControl: ({ setMemberships, memberships, roles }: MembershipsControlProps) => JSX_2.Element;
+export const MembershipsControl: (input: MembershipsControlProps) => JSX.Element;
 
 // @public (undocumented)
 export interface MembershipsControlProps {
@@ -96,21 +96,21 @@ export interface MembershipsControlProps {
 }
 
 // @public (undocumented)
-export const OtpConfirmFormFields: () => JSX_2.Element;
+export const OtpConfirmFormFields: () => JSX.Element;
 
 // @public (undocumented)
-export const OtpPrepareFormFields: () => JSX_2.Element;
+export const OtpPrepareFormFields: () => JSX.Element;
 
 // @public (undocumented)
-export const OtpSetup: () => JSX_2.Element | null;
+export const OtpSetup: () => JSX.Element | null;
 
 // @public (undocumented)
-export const PasswordResetFormFields: ({ hasToken }: {
+export const PasswordResetFormFields: (input: {
     hasToken?: boolean;
-}) => JSX_2.Element;
+}) => JSX.Element;
 
 // @public (undocumented)
-export const PasswordResetRequestFormFields: () => JSX_2.Element;
+export const PasswordResetRequestFormFields: () => JSX.Element;
 
 // @public (undocumented)
 export const PersonList: (props: {
@@ -118,7 +118,7 @@ export const PersonList: (props: {
         current?: MemberListController;
     };
     roles?: RolesConfig;
-}) => JSX_2.Element;
+}) => JSX.Element;
 
 // @public (undocumented)
 export type RolesConfig = {
@@ -134,10 +134,10 @@ export type RolesConfig = {
 };
 
 // @public (undocumented)
-export const UpdateProjectMemberFormFields: ({ projectSlug, roles }: {
+export const UpdateProjectMemberFormFields: (input: {
     projectSlug: string;
     roles?: RolesConfig;
-}) => JSX_2.Element;
+}) => JSX.Element;
 
 // @public (undocumented)
 export const useIntrospectionRolesConfig: (projectSlug: string) => RolesConfig | undefined;

@@ -8,7 +8,7 @@ import { Context } from 'react';
 import { ErrorAccessor } from '@contember/react-binding';
 import { ErrorAccessor as ErrorAccessor_2 } from '@contember/binding-common';
 import { FieldAccessor } from '@contember/react-binding';
-import { JSX as JSX_2 } from 'react/jsx-runtime';
+import { JSX } from 'react/jsx-runtime';
 import { JSXElementConstructor } from 'react';
 import { OptionallyVariableFieldValue } from '@contember/react-binding';
 import * as React_2 from 'react';
@@ -34,29 +34,29 @@ export interface FormCheckboxProps {
 }
 
 // @public (undocumented)
-export const FormError: ({ children, formatter }: {
+export const FormError: (input: {
     formatter: (errors: ErrorAccessor.Error[]) => ReactNode[];
-    children: ReactElement;
+    children: ReactElement<any>;
 }) => ReactElement<any, string | JSXElementConstructor<any>>[];
 
 // @public @deprecated (undocumented)
 export const FormErrorContext: {
-    Provider: ({ children, value }: {
+    Provider: (input: {
         children: React.ReactNode;
         value: ErrorAccessor.Error[];
-    }) => JSX_2.Element;
+    }) => JSX.Element;
 };
 
 // @public @deprecated (undocumented)
 export const FormFieldIdContext: {
-    Provider: ({ children, value }: {
+    Provider: (input: {
         children: React.ReactNode;
         value: string;
-    }) => JSX_2.Element;
+    }) => JSX.Element;
 };
 
 // @public (undocumented)
-export const FormFieldScope: ({ field, children, required }: FormFieldScopeProps) => JSX_2.Element;
+export const FormFieldScope: (input: FormFieldScopeProps) => JSX.Element;
 
 // @public (undocumented)
 export type FormFieldScopeProps = {
@@ -87,10 +87,10 @@ export type FormFieldStateProvider = Partial<FormFieldState> & {
 };
 
 // @public (undocumented)
-export const FormFieldStateProvider: ({ children, required, errors, dirty, htmlId, field }: FormFieldStateProvider) => JSX_2.Element;
+export const FormFieldStateProvider: (input: FormFieldStateProvider) => JSX.Element;
 
 // @public (undocumented)
-export const FormHasManyRelationScope: ({ children, required, ...props }: FormHasManyRelationScopeProps) => JSX_2.Element;
+export const FormHasManyRelationScope: (input: FormHasManyRelationScopeProps) => JSX.Element;
 
 // @public (undocumented)
 export type FormHasManyRelationScopeProps = {
@@ -103,7 +103,7 @@ export type FormHasManyRelationScopeProps = {
 };
 
 // @public (undocumented)
-export const FormHasOneRelationScope: ({ field, children, required }: FormHasOneRelationScopeProps) => JSX_2.Element;
+export const FormHasOneRelationScope: (input: FormHasOneRelationScopeProps) => JSX.Element;
 
 // @public (undocumented)
 export type FormHasOneRelationScopeProps = {
@@ -147,7 +147,7 @@ export interface FormInputProps {
 // @public (undocumented)
 export const FormLabel: (props: {
     children: React_2.ReactElement;
-}) => JSX_2.Element;
+}) => JSX.Element;
 
 // @public (undocumented)
 export const FormRadioInput: React_2.NamedExoticComponent<FormRadioItemProps>;
@@ -177,7 +177,7 @@ export const useFormFieldState: () => FormFieldState | undefined;
 
 // @public (undocumented)
 export const useFormInputValidationHandler: (field: FieldAccessor<any>) => {
-    ref: React_2.RefObject<HTMLInputElement>;
+    ref: React_2.RefObject<HTMLInputElement | null>;
     onFocus: () => void;
     onBlur: () => void;
 };

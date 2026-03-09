@@ -4,12 +4,12 @@
 
 ```ts
 
-import { JSX as JSX_2 } from 'react/jsx-runtime';
+import { JSX } from 'react/jsx-runtime';
 import { ReactNode } from 'react';
 import { RoutingLinkTarget } from '@contember/interface';
 
 // @public (undocumented)
-export const BackButton: ({ label }: BackButtonProps) => JSX_2.Element;
+export const BackButton: (input: BackButtonProps) => JSX.Element;
 
 // @public (undocumented)
 export type BackButtonProps = {
@@ -17,10 +17,10 @@ export type BackButtonProps = {
 };
 
 // @public (undocumented)
-export const LinkBackButton: ({ children, to }: {
+export const LinkBackButton: (input: {
     children: ReactNode;
     to: RoutingLinkTarget;
-}) => JSX_2.Element;
+}) => JSX.Element;
 
 // (No @packageDocumentation comment for this package)
 

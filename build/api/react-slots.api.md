@@ -6,6 +6,7 @@
 
 import { ComponentType } from 'react';
 import { ElementType } from 'react';
+import { FragmentProps } from 'react';
 import { FunctionComponentElement } from 'react';
 import { NamedExoticComponent } from 'react';
 import { ReactNode } from 'react';
@@ -98,9 +99,7 @@ export function useHasActiveSlotsFactory<T extends SlotTargetComponentsRecord<st
 export const useSlotTargetElement: (name: string) => HTMLElement | null | undefined;
 
 // @public
-export function useSlotTargetsFactory<R extends SlotTargetComponentsRecord<string>>(SlotTargets: R): <T>(slots: ReadonlyArray<keyof R & string>, override?: T) => NonNullable<T> | FunctionComponentElement<    {
-children?: ReactNode | undefined;
-}> | null;
+export function useSlotTargetsFactory<R extends SlotTargetComponentsRecord<string>>(SlotTargets: R): <T>(slots: ReadonlyArray<keyof R & string>, override?: T) => NonNullable<T> | FunctionComponentElement<FragmentProps> | null;
 
 // @public
 export const useTargetElementRegistrar: (name: string, aliases?: string[]) => ((element: HTMLElement | null) => void);

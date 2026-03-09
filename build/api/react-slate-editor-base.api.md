@@ -17,7 +17,7 @@ import { FieldBasicProps } from '@contember/react-binding';
 import type { FocusEvent as FocusEvent_2 } from 'react';
 import { FunctionComponent } from 'react';
 import { HistoryEditor } from 'slate-history';
-import { JSX as JSX_2 } from 'react/jsx-runtime';
+import { JSX } from 'react/jsx-runtime';
 import type { KeyboardEvent as KeyboardEvent_2 } from 'react';
 import { Location as Location_2 } from 'slate';
 import { MouseEventHandler } from 'react';
@@ -50,7 +50,7 @@ export interface AnchorElement extends Element_2 {
 }
 
 // @public (undocumented)
-export const anchorElementPlugin: ({ render }: {
+export const anchorElementPlugin: (input: {
     render: ElementRenderer<AnchorElement>;
 }) => EditorElementPlugin<AnchorElement>;
 
@@ -120,7 +120,7 @@ export const createAlignHandler: (direction: AlignDirection) => {
 };
 
 // @public (undocumented)
-export const createEditor: ({ plugins, defaultElementType, entity, environment, children, }: CreateEditorOptions) => {
+export const createEditor: (input: CreateEditorOptions) => {
     editor: Editor_2;
     OuterWrapper: FunctionComponent<{
         children: ReactNode;
@@ -244,7 +244,7 @@ export interface EditorElementPlugin<T extends Element_2> {
 }
 
 // @public (undocumented)
-export const EditorElementTrigger: ({ elementType, suchThat, ...props }: EditorElementTriggerProps) => JSX_2.Element;
+export const EditorElementTrigger: (input: EditorElementTriggerProps) => JSX.Element;
 
 // @public (undocumented)
 export interface EditorElementTriggerProps {
@@ -257,7 +257,7 @@ export interface EditorElementTriggerProps {
 }
 
 // @public (undocumented)
-export const EditorGenericTrigger: ({ toggle, isActive, shouldDisplay, ...props }: EditorGenericTriggerProps) => JSX_2.Element | null;
+export const EditorGenericTrigger: (input: EditorGenericTriggerProps) => JSX.Element | null;
 
 // @public (undocumented)
 export interface EditorGenericTriggerProps {
@@ -288,7 +288,7 @@ export interface EditorMarkPlugin {
 }
 
 // @public (undocumented)
-export const EditorMarkTrigger: ({ mark, ...props }: EditorMarkTriggerProps) => JSX_2.Element;
+export const EditorMarkTrigger: (input: EditorMarkTriggerProps) => JSX.Element;
 
 // @public (undocumented)
 export interface EditorMarkTriggerProps {
@@ -350,7 +350,7 @@ export const EditorUtils: EditorInterface;
 export type EditorWithEssentials<E extends BaseEditor> = WithEssentials & E;
 
 // @public (undocumented)
-export const EditorWrapNodeTrigger: ({ elementType, suchThat, selection, ...props }: EditorWrapNodeTriggerProps) => JSX_2.Element;
+export const EditorWrapNodeTrigger: (input: EditorWrapNodeTriggerProps) => JSX.Element;
 
 // @public (undocumented)
 export interface EditorWrapNodeTriggerProps {
@@ -401,7 +401,7 @@ export interface HeadingElement extends Element_2 {
 }
 
 // @public (undocumented)
-export const headingElementPlugin: ({ render }: {
+export const headingElementPlugin: (input: {
     render: ElementRenderer<HeadingElement>;
 }) => EditorElementPlugin<HeadingElement>;
 
@@ -426,7 +426,7 @@ export interface HorizontalRuleElement extends Element_2 {
 }
 
 // @public (undocumented)
-export const horizontalRuleElementPlugin: ({ render }: {
+export const horizontalRuleElementPlugin: (input: {
     render: ElementRenderer<HorizontalRuleElement>;
 }) => EditorElementPlugin<HorizontalRuleElement>;
 
@@ -538,7 +538,7 @@ export interface ListElementProperties {
 }
 
 // @public (undocumented)
-export const listHtmlDeserializerFactory: ({ getListElementProperties }?: ListHtmlDeserializerOptions) => HtmlDeserializerPlugin;
+export const listHtmlDeserializerFactory: (input?: ListHtmlDeserializerOptions) => HtmlDeserializerPlugin;
 
 // @public (undocumented)
 export interface ListHtmlDeserializerOptions {
@@ -555,7 +555,7 @@ export interface ListItemElement extends Element_2 {
 }
 
 // @public (undocumented)
-export const listItemElementPlugin: ({ render }: {
+export const listItemElementPlugin: (input: {
     render: ElementRenderer<ListItemElement>;
 }) => EditorElementPlugin<ListItemElement>;
 
@@ -571,7 +571,7 @@ export interface OrderedListElement extends Element_2 {
 }
 
 // @public (undocumented)
-export const orderedListElementPlugin: ({ render }: {
+export const orderedListElementPlugin: (input: {
     render: ElementRenderer<OrderedListElement>;
 }) => EditorElementPlugin<OrderedListElement>;
 
@@ -591,7 +591,7 @@ export interface ParagraphElement extends Element_2 {
 }
 
 // @public (undocumented)
-export const paragraphElementPlugin: ({ render }: {
+export const paragraphElementPlugin: (input: {
     render: ElementRenderer<ParagraphElement>;
 }) => EditorElementPlugin<ParagraphElement>;
 
@@ -620,7 +620,7 @@ export interface ScrollTargetElement extends Element_2 {
 }
 
 // @public (undocumented)
-export const scrollTargetElementPlugin: ({ render }: {
+export const scrollTargetElementPlugin: (input: {
     render: ElementRenderer<ScrollTargetElement>;
 }) => EditorElementPlugin<ScrollTargetElement>;
 
@@ -654,7 +654,7 @@ export interface TableCellElement extends Element_2 {
 }
 
 // @public (undocumented)
-export const tableCellElementPlugin: ({ render }: {
+export const tableCellElementPlugin: (input: {
     render: ElementRenderer<TableCellElement>;
 }) => EditorElementPlugin<TableCellElement>;
 
@@ -670,7 +670,7 @@ export interface TableElement extends Element_2 {
 }
 
 // @public (undocumented)
-export const tableElementPlugin: ({ render }: {
+export const tableElementPlugin: (input: {
     render: ElementRenderer<TableElement>;
 }) => EditorElementPlugin<TableElement>;
 
@@ -706,7 +706,7 @@ export interface TableRowElement extends Element_2 {
 }
 
 // @public (undocumented)
-export const tableRowElementPlugin: ({ render }: {
+export const tableRowElementPlugin: (input: {
     render: ElementRenderer<TableRowElement>;
 }) => EditorElementPlugin<TableRowElement>;
 
@@ -731,7 +731,7 @@ export interface UnorderedListElement extends Element_2 {
 }
 
 // @public (undocumented)
-export const unorderedListElementPlugin: ({ render }: {
+export const unorderedListElementPlugin: (input: {
     render: ElementRenderer<UnorderedListElement>;
 }) => EditorElementPlugin<UnorderedListElement>;
 
@@ -739,7 +739,7 @@ export const unorderedListElementPlugin: ({ render }: {
 export const unorderedListElementType: "unorderedList";
 
 // @public (undocumented)
-export const withAnchors: ({ render }: {
+export const withAnchors: (input: {
     render: ElementRenderer<AnchorElement>;
 }) => <E extends Editor_2>(editor: E) => E;
 
@@ -808,7 +808,7 @@ export interface WithEssentials {
 }
 
 // @public (undocumented)
-export const withHeadings: ({ render }: {
+export const withHeadings: (input: {
     render: ElementRenderer<HeadingElement>;
 }) => <E extends Editor_2>(editor: E) => E;
 
@@ -816,7 +816,7 @@ export const withHeadings: ({ render }: {
 export const withHighlight: () => EditorPlugin;
 
 // @public (undocumented)
-export const withHorizontalRules: ({ render }: {
+export const withHorizontalRules: (input: {
     render: ElementRenderer<HorizontalRuleElement>;
 }) => <E extends Editor_2>(editor: E) => E;
 
@@ -824,7 +824,7 @@ export const withHorizontalRules: ({ render }: {
 export const withItalic: () => EditorPlugin;
 
 // @public (undocumented)
-export const withLists: ({ renderListItem, renderUnorderedList, renderOrderedList }: {
+export const withLists: (input: {
     renderListItem: ElementRenderer<ListItemElement>;
     renderOrderedList: ElementRenderer<OrderedListElement>;
     renderUnorderedList: ElementRenderer<UnorderedListElement>;
@@ -834,7 +834,7 @@ export const withLists: ({ renderListItem, renderUnorderedList, renderOrderedLis
 export const withNewline: () => EditorPlugin;
 
 // @public (undocumented)
-export const withParagraphs: ({ render }: {
+export const withParagraphs: (input: {
     render: ElementRenderer<ParagraphElement>;
 }) => <E extends Editor_2>(editor: E) => E;
 
@@ -842,7 +842,7 @@ export const withParagraphs: ({ render }: {
 export const withPaste: (editor: Editor_2) => void;
 
 // @public (undocumented)
-export const withScrollTargets: ({ render }: {
+export const withScrollTargets: (input: {
     render: ElementRenderer<ScrollTargetElement>;
 }) => <E extends Editor_2>(editor: E) => E;
 
@@ -850,7 +850,7 @@ export const withScrollTargets: ({ render }: {
 export const withStrikeThrough: () => EditorPlugin;
 
 // @public (undocumented)
-export const withTables: ({ renderTable, renderTableCell, renderTableRow }: {
+export const withTables: (input: {
     renderTable: ElementRenderer<TableElement>;
     renderTableCell: ElementRenderer<TableCellElement>;
     renderTableRow: ElementRenderer<TableRowElement>;

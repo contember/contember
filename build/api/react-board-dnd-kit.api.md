@@ -11,7 +11,7 @@ import { BoardNullColumnProps } from '@contember/react-board';
 import { ClientRect as ClientRect_2 } from '@dnd-kit/core';
 import { Context } from 'react';
 import { DraggableAttributes } from '@dnd-kit/core';
-import { JSX as JSX_2 } from 'react/jsx-runtime';
+import { JSX } from 'react/jsx-runtime';
 import { MutableRefObject } from 'react';
 import { Over } from '@dnd-kit/core';
 import { ReactNode } from 'react';
@@ -29,61 +29,61 @@ column: BoardColumnNode;
 }) | undefined>;
 
 // @public (undocumented)
-export const BoardSortable: ({ children }: {
+export const BoardSortable: (input: {
     children: ReactNode;
-}) => JSX_2.Element;
+}) => JSX.Element;
 
 // @public (undocumented)
-export const BoardSortableActivator: ({ children }: {
+export const BoardSortableActivator: (input: {
     children: ReactNode;
-}) => JSX_2.Element;
+}) => JSX.Element;
 
 // @public (undocumented)
-export const BoardSortableColumnDragOverlay: ({ children }: {
+export const BoardSortableColumnDragOverlay: (input: {
     children: ReactNode;
-}) => JSX_2.Element | null;
+}) => JSX.Element | null;
 
 // @public (undocumented)
-export const BoardSortableColumnDropIndicator: ({ children, position }: {
+export const BoardSortableColumnDropIndicator: (input: {
     children: ReactNode;
     position: "before" | "after";
-}) => JSX_2.Element | null;
+}) => JSX.Element | null;
 
 // @public (undocumented)
 export const BoardSortableEachColumn: {
-    ({ children }: {
+    (input: {
         children: ReactNode;
-    }): JSX_2.Element;
-    staticRender({ children }: {
+    }): JSX.Element;
+    staticRender(input: {
         children: ReactNode;
-    }): JSX_2.Element;
+    }): JSX.Element;
 };
 
 // @public (undocumented)
 export const BoardSortableEachItem: {
-    ({ children }: {
+    (input: {
         children: ReactNode;
-    }): JSX_2.Element;
-    staticRender({ children }: {
+    }): JSX.Element;
+    staticRender(input: {
         children: ReactNode;
-    }): JSX_2.Element;
+    }): JSX.Element;
 };
 
 // @public (undocumented)
-export const BoardSortableItemDragOverlay: ({ children }: {
+export const BoardSortableItemDragOverlay: (input: {
     children: ReactNode;
-}) => JSX_2.Element | null;
+}) => JSX.Element | null;
 
 // @public (undocumented)
-export const BoardSortableItemDropIndicator: ({ children, position }: {
+export const BoardSortableItemDropIndicator: (input: {
     children: ReactNode;
     position: "before" | "after";
-}) => JSX_2.Element | null;
+}) => JSX.Element | null;
 
 // @public (undocumented)
-export const BoardSortableNode: ({ children }: {
+export const BoardSortableNode: (input: {
     children: ReactNode;
-}) => JSX_2.Element;
+}) => JSX.Element;
 
 // @internal (undocumented)
 export const BoardSortableNodeContext: Context<    {
@@ -113,7 +113,7 @@ transition: string | undefined;
 }>;
 
 // @public (undocumented)
-export const BoardSortableNullColumn: ({ children }: BoardNullColumnProps) => JSX_2.Element;
+export const BoardSortableNullColumn: (input: BoardNullColumnProps) => JSX.Element;
 
 // @public (undocumented)
 export const useBoardActiveColumn: () => BoardColumnNode | undefined;

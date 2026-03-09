@@ -10,7 +10,7 @@ import { Context } from 'react';
 import { DndContextProps } from '@dnd-kit/core';
 import { DraggableAttributes } from '@dnd-kit/core';
 import { EntityAccessor } from '@contember/react-binding';
-import { JSX as JSX_2 } from 'react/jsx-runtime';
+import { JSX } from 'react/jsx-runtime';
 import { MutableRefObject } from 'react';
 import { Over } from '@dnd-kit/core';
 import { default as React_2 } from 'react';
@@ -25,25 +25,25 @@ import { UniqueIdentifier } from '@dnd-kit/core';
 export const RepeaterActiveEntityContext: Context<EntityAccessor | undefined>;
 
 // @public
-export const RepeaterSortable: ({ children, onDragStart, onDragEnd: onDragEndIn, onDragCancel: onDragCancelIn, ...props }: {
+export const RepeaterSortable: (input: {
     children: ReactNode;
-} & DndContextProps) => JSX_2.Element;
+} & DndContextProps) => JSX.Element;
 
 // @public
-export const RepeaterSortableDragOverlay: ({ children }: {
+export const RepeaterSortableDragOverlay: (input: {
     children: ReactNode;
-}) => JSX_2.Element | null;
+}) => JSX.Element | null;
 
 // @public
-export const RepeaterSortableDropIndicator: ({ children, position }: {
+export const RepeaterSortableDropIndicator: (input: {
     children: ReactNode;
     position: "before" | "after";
-}) => JSX_2.Element | null;
+}) => JSX.Element | null;
 
 // @public
-export const RepeaterSortableEachItem: ({ children }: {
+export const RepeaterSortableEachItem: (input: {
     children: ReactNode;
-}) => JSX_2.Element;
+}) => JSX.Element;
 
 // @public
 export const RepeaterSortableItemActivator: React_2.ForwardRefExoticComponent<{
@@ -78,9 +78,9 @@ transition: string | undefined;
 }>;
 
 // @public
-export const RepeaterSortableItemNode: ({ children }: {
+export const RepeaterSortableItemNode: (input: {
     children: ReactElement;
-}) => JSX_2.Element;
+}) => JSX.Element;
 
 // @public
 export const useRepeaterActiveEntity: () => EntityAccessor | undefined;

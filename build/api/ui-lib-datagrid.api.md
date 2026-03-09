@@ -14,7 +14,7 @@ import { DataViewProps } from '@contember/react-dataview';
 import { DataViewTextFilterProps } from '@contember/react-dataview';
 import { DataViewUnionTextFilterProps } from '@contember/react-dataview';
 import { FC } from 'react';
-import { JSX as JSX_2 } from 'react/jsx-runtime';
+import { JSX } from 'react/jsx-runtime';
 import { NamedExoticComponent } from 'react';
 import * as React_2 from 'react';
 import { ReactNode } from 'react';
@@ -36,9 +36,9 @@ export const DataGridActionColumn: React_2.NamedExoticComponent<{
 }>;
 
 // @public
-export const DataGridAutoExport: ({ fields }: {
+export const DataGridAutoExport: (input: {
     fields?: ReactNode;
-}) => JSX_2.Element;
+}) => JSX.Element;
 
 // @public
 export const DataGridBooleanColumn: React_2.NamedExoticComponent<DataGridBooleanColumnProps>;
@@ -139,11 +139,11 @@ export type DataGridEnumColumnProps = {
 };
 
 // @public
-export const DataGridEnumFieldTooltip: ({ children, actions, value, ...props }: DataGridEnumFieldTooltipProps & {
+export const DataGridEnumFieldTooltip: (input: DataGridEnumFieldTooltipProps & {
     children: ReactNode;
     value: string;
     actions?: ReactNode;
-}) => JSX_2.Element;
+}) => JSX.Element;
 
 // @public
 export type DataGridEnumFieldTooltipProps = Omit<DataViewEnumFilterProps, 'children'>;
@@ -298,12 +298,12 @@ export type DataGridIsDefinedFilterProps = Omit<DataViewBooleanFilterProps, 'chi
 };
 
 // @public
-export const DataGridLayoutSwitcher: () => JSX_2.Element;
+export const DataGridLayoutSwitcher: () => JSX.Element;
 
 // @public
-export const DataGridLoader: ({ children }: {
+export const DataGridLoader: (input: {
     children: ReactNode;
-}) => JSX_2.Element;
+}) => JSX.Element;
 
 // @public
 export interface DataGridLoaderProps {
@@ -312,7 +312,7 @@ export interface DataGridLoaderProps {
 }
 
 // @public (undocumented)
-export const DataGridNoResults: () => JSX_2.Element;
+export const DataGridNoResults: () => JSX.Element;
 
 // @public
 export const DataGridNumberColumn: React_2.NamedExoticComponent<DataGridNumberColumnProps>;
@@ -342,7 +342,7 @@ export type DataGridNumberFilterProps = Omit<DataViewNumberFilterProps, 'childre
 export const DataGridPagination: FC<DataGridPaginationProps>;
 
 // @public (undocumented)
-export const DataGridPerPageSelector: () => JSX_2.Element;
+export const DataGridPerPageSelector: () => JSX.Element;
 
 // @public (undocumented)
 export type DataGridPredefinedDateRange = {

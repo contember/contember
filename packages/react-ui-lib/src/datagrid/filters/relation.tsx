@@ -145,7 +145,7 @@ export type DataGridHasOneTooltipProps =
  * ```
  */
 export const DataGridHasOneTooltip = Component<DataGridHasOneTooltipProps>(({ children, actions, ...props }) => (<>
-	<DataViewHasOneFilter {...props}>
+	<DataViewHasOneFilter {...props as DataViewHasOneFilterProps}>
 		<DataGridRelationFieldTooltipInner actions={actions}>
 			{children}
 		</DataGridRelationFieldTooltipInner>
@@ -188,7 +188,7 @@ export type DataGridHasManyTooltipProps =
  */
 export const DataGridHasManyTooltip = Component<DataGridHasManyTooltipProps>(({ children, actions, ...props }) => {
 	return (<>
-		<DataViewHasManyFilter {...props}>
+		<DataViewHasManyFilter {...props as DataViewHasManyFilterProps}>
 			<DataGridRelationFieldTooltipInner actions={actions}>
 				{children}
 			</DataGridRelationFieldTooltipInner>

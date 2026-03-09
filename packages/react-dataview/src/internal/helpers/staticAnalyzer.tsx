@@ -1,7 +1,7 @@
 import { dataViewSelectionEnvironmentExtension } from '../../env/dataViewSelectionEnvironmentExtension'
 import { createUnionTextFilter } from '../../filterTypes'
 import { DataViewFilter, DataViewFilterProps, DataViewLayout, DataViewLayoutProps, DataViewProps, DataViewQueryFilterName } from '../../components'
-import { EntityListSubTreeMarker, Environment, FieldMarker, HasOneRelationMarker, MeaningfulMarker } from '@contember/react-binding'
+import { EntityFieldMarkersContainer, EntityListSubTreeMarker, Environment, FieldMarker, HasOneRelationMarker } from '@contember/react-binding'
 import { EntityListSubTree, MarkerTreeGenerator } from '@contember/react-binding'
 import { ChildrenAnalyzer, Leaf } from '@contember/react-multipass-rendering'
 import { DataViewFilterHandler, DataViewSelectionLayout } from '../../types'
@@ -111,7 +111,7 @@ const dataViewLayoutAnalyzer = new ChildrenAnalyzer<
 })
 
 
-const extractStringFields = (marker: Exclude<MeaningfulMarker, FieldMarker>): string[] => {
+const extractStringFields = (marker: { environment: Environment; fields: EntityFieldMarkersContainer }): string[] => {
 	const node = marker.environment.getSubTreeNode()
 	const textFields = []
 	for (const field of marker.fields.markers.values()) {

@@ -94,7 +94,7 @@ const [BlockRepeaterEditModeContext, useBlockRepeaterEditMode] = createRequiredC
 export const DefaultBlockRepeater = Component<DefaultBlockRepeaterProps>(({ children, ...props }) => {
 	const [editMode, setEditMode] = useState(false)
 	return (
-		<BlockRepeater {...props}>
+		<BlockRepeater {...props as BlockRepeaterProps}>
 			<StaticRender>
 				{children}
 			</StaticRender>

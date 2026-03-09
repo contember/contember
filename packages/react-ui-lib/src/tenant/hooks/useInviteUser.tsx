@@ -34,7 +34,7 @@ export const useInviteUser = ({ emailField, personIdField, memberships }: {
 
 		return () => {
 			if (!result?.ok || !result?.result) {
-				return toast(<ToastContent title={dict.inviteErrors[result?.error?.code ?? 'fallback']} />, {
+				return toast(<ToastContent title={(dict.inviteErrors as Record<string, string>)[result?.error?.code ?? 'fallback']} />, {
 					type: 'error',
 				})
 			}

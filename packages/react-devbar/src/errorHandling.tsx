@@ -1,4 +1,3 @@
-import * as ReactDOM from 'react-dom'
 import { Buffer } from 'buffer'
 import { DevErrorManager, ErrorBus } from './DevErrorManager'
 import { ReactElement } from 'react'
@@ -9,11 +8,7 @@ const getErrorContainer = () => {
 	const errorElementId = '__contember__dev__error__container__element'
 	let errorContainer = document.getElementById(errorElementId)
 
-	if (errorContainer) {
-		// eslint-disable-next-line react/no-deprecated
-		ReactDOM.unmountComponentAtNode(errorContainer)
-
-	} else {
+	if (!errorContainer) {
 		errorContainer = document.createElement('div')
 		errorContainer.id = errorElementId
 		document.body.appendChild(errorContainer)

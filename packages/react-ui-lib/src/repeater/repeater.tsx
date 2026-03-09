@@ -124,7 +124,7 @@ const DefaultRepeaterInner = Component<DefaultRepeaterProps>(({ title, children,
 
 	if (!isSortable) {
 		return (
-			<Repeater {...props}>
+			<Repeater {...props as RepeaterProps}>
 				<RepeaterWrapperUI>
 					{title && <h3 className={'font-medium'}>{title}</h3>}
 					{(addButtonPosition === 'before' || addButtonPosition === 'around') && <RepeaterAddItemButton index="first">{addButtonLabel}</RepeaterAddItemButton>}
@@ -144,7 +144,7 @@ const DefaultRepeaterInner = Component<DefaultRepeaterProps>(({ title, children,
 		)
 	}
 	return (
-		<Repeater {...props}>
+		<Repeater {...props as RepeaterProps}>
 			<RepeaterWrapperUI>
 				{title && <h3 className={'font-medium'}>{title}</h3>}
 				{(addButtonPosition === 'before' || addButtonPosition === 'around') && <RepeaterAddItemButton index="first">{addButtonLabel}</RepeaterAddItemButton>}

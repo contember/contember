@@ -55,7 +55,7 @@ const useHasActiveChild = (children: ReactNode) => {
 		const checkChild = (child: ReactNode): boolean => {
 			if (!isValidElement(child)) return false
 
-			const { to, children: grandChildren } = child.props
+			const { to, children: grandChildren } = child.props as Record<string, any>
 
 			if (to && isMatchingPage(to)) return true
 

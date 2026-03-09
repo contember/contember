@@ -25,7 +25,7 @@ export const useBlockEditorState = ({ editor, blockList, sortableBy, contentFiel
 }): useBlockEditorStateResult => {
 	const entityList = useEntityList(blockList)
 	const desugaredSortableByField = useDesugaredRelativeSingleField(sortableBy)
-	const trashFakeBlockId = useRef<EntityId>()
+	const trashFakeBlockId = useRef<EntityId>(undefined)
 	const sortedBlocks = useMemo(() => {
 		return sortEntities(
 			Array.from(entityList).filter(it => it.id !== trashFakeBlockId.current),

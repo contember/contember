@@ -17,7 +17,7 @@ export const dimensionsIn = (dimensions: string): Environment.SelectedDimensions
 
 export const dimensionsOut = (dimensions: Environment.SelectedDimensions): string => {
 	return Object.entries(dimensions)
-		.map(([key, value]) => `${key}=${value.join(',')}`)
+		.map(([key, value]) => `${key}=${(value as string[]).join(',')}`)
 		.join('+')
 }
 

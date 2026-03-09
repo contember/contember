@@ -5,10 +5,13 @@ import { HTMLInputTypeAttribute, useState } from 'react'
 import { dataAttribute } from '@contember/utilities'
 import { Label } from '../../ui/label'
 
+type FormErrorMessages<CtxValue extends FormContextValue<any, any, any>> =
+	Record<(CtxValue extends FormContextValue<any, infer E> ? E : never) & string, string | undefined>
+
 export interface TenantFormErrorsProps<CtxValue extends FormContextValue<any, any, any>> {
 	form: CtxValue
 	field?: keyof CtxValue['values']
-	messages: Record<CtxValue extends FormContextValue<any, infer E> ? E : never, string>
+	messages: FormErrorMessages<CtxValue>
 }
 
 export const TenantFormError = <CtxValue extends FormContextValue<any, any, any>>({ form, field, messages }: TenantFormErrorsProps<CtxValue>) => {
@@ -79,7 +82,7 @@ export type TenantFormFieldProps<CtxValue extends FormContextValue<any, any, any
 		form: CtxValue
 		field: keyof CtxValue['values'] & string
 		type: HTMLInputTypeAttribute
-		messages: Record<CtxValue extends FormContextValue<any, infer E> ? E : never, string>
+		messages: FormErrorMessages<CtxValue>
 	}
 	& Omit<Partial<React.InputHTMLAttributes<HTMLInputElement>>, 'form' | 'field'>
 

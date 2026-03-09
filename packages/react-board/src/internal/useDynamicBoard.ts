@@ -54,7 +54,7 @@ export const useDynamicBoard = ({
 	const columnEntitiesGetter = columnEntities.getAccessor
 
 
-	const exitingColumnIds = useMemo(() => new Set(Array.from(columnEntities).map(it => it.id)), [columnEntities])
+	const exitingColumnIds = useMemo(() => new Set(Array.from(columnEntities).map((it: EntityAccessor) => it.id)), [columnEntities])
 
 	const getDiscriminatorValue = useCallback((entity: EntityAccessor) => {
 		const entityId = entity.getEntity(desugaredDiscriminationField).id

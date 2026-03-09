@@ -16,7 +16,7 @@ export const MultiSelect = Component(({ field, children, options, onSelect, onUn
 	const entities = useEntityList({ field })
 	options ??= entities.name
 	const entitiesArr = useMemo(() => Array.from(entities), [entities])
-	const selectedEntities = useMemo(() => Array.from(entities).map(it => it.id), [entities])
+	const selectedEntities = useMemo(() => Array.from(entities).map((it: EntityAccessor) => it.id), [entities])
 
 	const handler = useReferentiallyStableCallback<SelectHandler>((entity, action = 'toggle') => {
 		const isSelected = selectedEntities.includes(entity.id)

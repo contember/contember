@@ -81,7 +81,7 @@ const DataGridTableRenderer = Component<DataViewTableProps>(({ children }, env) 
 	return <>{children}</>
 })
 
-const columnLeaf = new Leaf(node => node.props, DataGridColumnLeaf)
+const columnLeaf = new Leaf(node => node.props as DataGridColumnLeafProps, DataGridColumnLeaf)
 
 const datagridColumnsAnalyzer = new ChildrenAnalyzer<
 	DataGridColumnLeafProps,

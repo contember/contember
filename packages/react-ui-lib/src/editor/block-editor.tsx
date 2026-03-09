@@ -19,7 +19,7 @@ export type BlockEditorFieldProps =
 
 export const BlockEditorField = Component<BlockEditorFieldProps>(({ placeholder, children, ...props }) => {
 	return (
-		<BlockEditor {...props} plugins={[
+		<BlockEditor {...props as BlockEditorProps} plugins={[
 			...blockEditorPlugins,
 			...props.plugins ?? [],
 			withReferences({

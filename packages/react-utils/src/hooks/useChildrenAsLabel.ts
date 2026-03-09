@@ -27,18 +27,19 @@ export function getChildrenAsLabel(node: ReactNode): string | undefined {
 			if (child === null || child === undefined || typeof child === 'boolean') {
 			} else if (typeof child === 'string') {
 				label.push(child)
-			} else if (typeof child === 'number') {
-				label.push(child)
+			} else if (typeof child === 'number' || typeof child === 'bigint') {
+				label.push(String(child))
 			} else if (Array.isArray(child)) {
 				const childLabel = getChildrenAsLabel(child)
 
 				if (childLabel) {
 					label.push(childLabel)
 				}
-			} else {
-				// ReactElement | JSXElementConstructor | ReactPortal
-				if ('props' in child && 'children' in child.props) {
-					const childLabel = getChildrenAsLabel(child.props.children)
+			} else if (typeof child === 'object') {
+				// ReactElement | ReactPortal | Iterable
+				const props = 'props' in child ? child.props as Record<string, unknown> : null
+				if (props && 'children' in props) {
+					const childLabel = getChildrenAsLabel(props.children as ReactNode)
 
 					if (childLabel) {
 						label.push(childLabel)

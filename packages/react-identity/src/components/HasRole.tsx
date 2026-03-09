@@ -20,7 +20,7 @@ export const HasRole = Component<HasRoleProps>(({ children, role }) => {
 }, ({ children, role }, env) => {
 	const identity = env.getExtension(identityEnvironmentExtension).identity
 	const project = env.getExtension(projectEnvironmentExtension).slug
-	const projectRoles = new Set(identity?.projects.find(it => it.slug === project)?.roles ?? [])
+	const projectRoles = new Set<string>(identity?.projects.find(it => it.slug === project)?.roles ?? [])
 
 	return evaluateCondition(role, projectRoles) ? <>{children}</> : null
 })

@@ -7,7 +7,7 @@ export const wrapError = (e: unknown, currentComponentName: string, methodName: 
 	}
 
 	const componentPath = path.map((it, index) => {
-		const { children, ...props } = it.props
+		const { children, ...props } = it.props as Record<string, any>
 		const printProps = (props: any) => {
 			let result = ''
 			for (const [key, value] of Object.entries(props)) {

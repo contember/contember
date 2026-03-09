@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Fragment, ReactNode } from 'react'
-import { Component, Entity } from '@contember/react-binding'
+import { Component, Entity, EntityAccessor } from '@contember/react-binding'
 import { useDataViewInfiniteLoadAccessors } from '../../contexts'
 
 export const DataViewInfiniteLoadEachRow = Component(({ children }: {
@@ -11,7 +11,7 @@ export const DataViewInfiniteLoadEachRow = Component(({ children }: {
 		{accessors.map((accessor, index) => {
 			return (
 				<Fragment key={Array.from(accessor.ids()).join('__')}>
-					{Array.from(accessor, entity => {
+					{Array.from(accessor, (entity: EntityAccessor) => {
 						return (
 							<Entity key={entity.key} accessor={entity}>
 								{children}

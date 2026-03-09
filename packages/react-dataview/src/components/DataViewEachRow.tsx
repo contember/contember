@@ -1,5 +1,5 @@
 import { ReactNode } from 'react'
-import { Entity } from '@contember/react-binding'
+import { Entity, EntityAccessor } from '@contember/react-binding'
 import { useDataViewEntityListAccessor } from '../contexts'
 
 /**
@@ -18,7 +18,7 @@ export const DataViewEachRow = ({ children }: { children: ReactNode }) => {
 		return null
 	}
 	return <>
-		{Array.from(accessor, entity => {
+		{Array.from(accessor, (entity: EntityAccessor) => {
 			return (
 				<Entity key={entity.key} accessor={entity}>
 					{children}

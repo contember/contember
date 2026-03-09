@@ -72,7 +72,7 @@ export const useEntityListSubTreeLoader = <State>(entities: SugaredQualifiedEnti
 	const currentlyLoading = useRef<{
 		entities: SugaredQualifiedEntityList
 		state?: State
-	}>()
+	} | undefined>(undefined)
 
 	const extendTree = useExtendTree()
 	const [reloadTrigger, setReloadTrigger] = useState<object | null>(null)

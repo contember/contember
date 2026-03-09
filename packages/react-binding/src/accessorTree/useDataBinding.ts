@@ -30,7 +30,7 @@ export const useDataBinding = ({
 	const environment = useEnvironment()
 	const environmentWithSchema = useEnvironmentWithSchema(environment)
 
-	const currentTreeStore = useRef<TreeStore>()
+	const currentTreeStore = useRef<TreeStore>(undefined)
 	const isMountedRef = useIsMounted()
 
 	const [state, setState] = useState<AccessorTreeState & { binding?: DataBinding<ReactNode> }>({

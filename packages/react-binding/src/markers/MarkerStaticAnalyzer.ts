@@ -42,13 +42,15 @@ export class MarkerStaticAnalyzer {
 			return node.flatMap(subNode => this.processNode(subNode, env, componentPath))
 		}
 
-		if (!('type' in node)) {
+		if (typeof node !== 'object' || !('type' in node)) {
 			return []
 		}
 
+		const props = node.props as Record<string, any>
+
 		if (typeof node.type === 'symbol' || typeof node.type === 'string') {
 			// Fragment, Portal or other non-component
-			return this.processNode(node.props.children, env, componentPath)
+			return this.processNode(props.children, env, componentPath)
 		}
 
 		const nodeDisplayName = 'displayName' in node.type ? (node.type.displayName as string) : '???'
@@ -61,18 +63,18 @@ export class MarkerStaticAnalyzer {
 
 		try {
 			if ('generateEnvironment' in node.type) {
-				env = (node.type as EnvironmentDeltaProvider).generateEnvironment(node.props, env)
+				env = (node.type as EnvironmentDeltaProvider).generateEnvironment(props, env)
 			}
 		} catch (e) {
 			wrapError(e, nodeDisplayName, 'static context factory', componentPath)
 		}
 		if ('generateLeafMarker' in node.type) {
-			return [(node.type as LeafMarkerProvider).generateLeafMarker(node.props, env)]
+			return [(node.type as LeafMarkerProvider).generateLeafMarker(props, env)]
 		}
-		let children: ReactNode = node.props.children
+		let children: ReactNode = props.children
 		try {
 			if ('staticRender' in node.type) {
-				children = (node.type as StaticRenderProvider).staticRender(node.props, env)
+				children = (node.type as StaticRenderProvider).staticRender(props, env)
 			}
 		} catch (e) {
 			wrapError(e, nodeDisplayName, 'static render', componentPath)
@@ -80,7 +82,7 @@ export class MarkerStaticAnalyzer {
 		const processedChildren = this.processNode(children, env, componentPath)
 		if ('generateBranchMarker' in node.type) {
 			const marker = IncrementalMarkerBuilder.build(processedChildren)
-			return [(node.type as BranchMarkerProvider).generateBranchMarker(node.props, marker, env)]
+			return [(node.type as BranchMarkerProvider).generateBranchMarker(props, marker, env)]
 		}
 		return processedChildren
 	}
@@ -101,7 +103,7 @@ const wrapError = (e: unknown, currentComponentName: string, methodName: string,
 	}
 
 	const componentPath = path.map((it, index) => {
-		const { children, ...props } = it.props
+		const { children, ...props } = it.props as Record<string, any>
 		const printProps = (props: any) => {
 			let result = ''
 			for (const [key, value] of Object.entries(props)) {

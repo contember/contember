@@ -1,6 +1,6 @@
 import { RefObject } from 'react'
 
-export type RefObjectOrElement<T> = T | RefObject<T>
+export type RefObjectOrElement<T> = T | RefObject<T | null>
 
 /**
  * Unwraps a ref object or returns the value if it is not a ref object.

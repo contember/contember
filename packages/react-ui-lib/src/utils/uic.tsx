@@ -50,7 +50,7 @@ export const uic = <El extends React.ElementType, Variants extends ConfigSchema 
 	})
 	const passVariantProps = config?.passVariantProps ? new Set(config.passVariantProps) : undefined
 
-	const component = forwardRef<React.ElementRef<El>, React.ComponentProps<El> & {
+	const component = forwardRef<React.ComponentRef<El>, React.ComponentProps<El> & {
 		asChild?: boolean
 		children?: ReactNode
 		className?: string

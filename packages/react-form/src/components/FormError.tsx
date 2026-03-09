@@ -4,7 +4,7 @@ import { BindingError, ErrorAccessor } from '@contember/react-binding'
 
 export const FormError = ({ children, formatter }: {
 	formatter: (errors: ErrorAccessor.Error[]) => ReactNode[]
-	children: ReactElement
+	children: ReactElement<any>
 }) => {
 	const formState = useFormFieldState()
 	if (!formState) {

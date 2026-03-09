@@ -26,7 +26,7 @@ export const useDataViewTotalCount = ({ entities: { entityName }, filter }: UseD
 			filter,
 		})
 		try {
-			const result = await contentClient.query(query, {
+			const result: number = await contentClient.query(query, {
 				signal: abortController(),
 			})
 			setCount(result)

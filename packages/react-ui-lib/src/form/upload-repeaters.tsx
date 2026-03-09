@@ -154,7 +154,7 @@ const FileRepeaterFieldInner = Component<FileRepeaterFieldInnerProps>(({
 	return (
 		<FormFieldStateProvider>
 			<FormContainer description={description} label={label}>
-				<Repeater {...props} initialEntityCount={0}>
+				<Repeater {...props as RepeaterProps} initialEntityCount={0}>
 					<UploaderRepeaterItemsWrapperUI>
 
 						<MultiUploader baseField={baseField} fileType={fileTypeWithUploader}>
@@ -200,7 +200,7 @@ const FileRepeaterFieldInner = Component<FileRepeaterFieldInnerProps>(({
 	)
 }, ({ baseField, label, description, children, fileType, ...props }) => {
 	return <>
-		<Repeater {...props} initialEntityCount={0}>
+		<Repeater {...props as RepeaterProps} initialEntityCount={0}>
 			<MultiUploader baseField={baseField} fileType={fileType} />
 			{children}
 		</Repeater>

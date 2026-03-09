@@ -3,9 +3,12 @@ import { SelectCurrentEntitiesContext, SelectHandler, SelectHandleSelectContext,
 import {
 	Component,
 	EntityAccessor,
+	EntityListSubTreeMarker,
+	EntitySubTreeMarker,
 	FieldMarker,
+	HasManyRelationMarker,
 	HasOne,
-	MeaningfulMarker,
+	HasOneRelationMarker,
 	PlaceholderGenerator,
 	QueryLanguage,
 	SugaredQualifiedEntityList,
@@ -34,7 +37,7 @@ export const SortableMultiSelect = Component(({ field, children, sortableBy, con
 
 	const optionsMarker = useMemo(() => {
 		const desugared = QueryLanguage.desugarRelativeSingleEntity({ field: connectAt }, list.environment)
-		let marker: Exclude<MeaningfulMarker, FieldMarker> = list.getMarker()
+		let marker: HasOneRelationMarker | HasManyRelationMarker | EntitySubTreeMarker | EntityListSubTreeMarker = list.getMarker()
 		for (let relation of desugared.hasOneRelationPath) {
 			const placeholder = PlaceholderGenerator.getHasOneRelationPlaceholder(relation)
 			const relationMarker = marker.fields.markers.get(placeholder)
@@ -49,7 +52,7 @@ export const SortableMultiSelect = Component(({ field, children, sortableBy, con
 	options ??= optionsMarker.environment.getSubTreeNode().entity.name
 
 
-	const selectedEntities = useMemo(() => Array.from(list).map(it => it.getEntity({ field: connectAt }).id), [connectAt, list])
+	const selectedEntities = useMemo(() => Array.from(list).map((it: EntityAccessor) => it.getEntity({ field: connectAt }).id), [connectAt, list])
 
 	const handler = useReferentiallyStableCallback<SelectHandler>((entity, action = 'toggle') => {
 		const isSelected = selectedEntities.includes(entity.id)
@@ -57,7 +60,7 @@ export const SortableMultiSelect = Component(({ field, children, sortableBy, con
 			action = isSelected ? 'unselect' : 'select'
 		}
 		if (action === 'unselect' && isSelected) {
-			Array.from(list).find(it => it.getEntity({ field: connectAt }).id === entity.id)?.deleteEntity()
+			Array.from(list).find((it: EntityAccessor) => it.getEntity({ field: connectAt }).id === entity.id)?.deleteEntity()
 			onUnselect?.(entity)
 		} else if (action === 'select' && !isSelected) {
 			list.createNewEntity(getEntity => {

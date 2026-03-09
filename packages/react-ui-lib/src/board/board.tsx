@@ -179,7 +179,7 @@ export const DefaultBoard = Component<DefaultBoardProps>(({ columnHeader, nullCo
 	const anySortable = itemsSortable || columnsSortable
 	if (!anySortable) {
 		return (
-			<Board {...props}>
+			<Board {...props as BoardProps}>
 				<BoardWrapperUI>
 					<BoardNonSortableColumn
 						columnHeader={columnHeader}
@@ -197,7 +197,7 @@ export const DefaultBoard = Component<DefaultBoardProps>(({ columnHeader, nullCo
 	const ItemsComponent = itemsSortable ? BoardSortableItems : BoardNonSortableItems
 
 	return (
-		<Board {...props}>
+		<Board {...props as BoardProps}>
 			<BoardSortable>
 				<BoardWrapperUI>
 					<BoardSortableColumn
@@ -228,7 +228,7 @@ export const DefaultBoard = Component<DefaultBoardProps>(({ columnHeader, nullCo
 	)
 }, ({ children, columnHeader, nullColumnHeader, ...props }) => {
 	return <>
-		<Board {...props}>
+		<Board {...props as BoardProps}>
 			<BoardItem>
 				{children}
 			</BoardItem>

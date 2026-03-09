@@ -1,10 +1,10 @@
 import { ContemberEditor } from '@contember/react-slate-editor-base'
-import { memo } from 'react'
+import React, { memo } from 'react'
 import { ReactEditor, RenderElementProps, useSlateStatic } from 'slate-react'
 import { PlusCircleIcon } from 'lucide-react'
 
 export interface BlockElementProps extends RenderElementProps {
-	domElement?: keyof JSX.IntrinsicElements
+	domElement?: keyof React.JSX.IntrinsicElements
 	withBoundaries?: boolean
 	className?: string
 }

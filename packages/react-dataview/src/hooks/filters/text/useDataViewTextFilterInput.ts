@@ -10,7 +10,7 @@ export interface UseDataViewTextFilterInputResult {
 export const useDataViewTextFilterInput = ({ name, debounceMs = 500 }: { name: string; debounceMs?: number }): UseDataViewTextFilterInputResult => {
 	const [state, setFilter] = useDataViewFilter<TextFilterArtifacts>(name)
 	const [value, setValue] = useState(state?.query ?? '')
-	const timerRef = useRef<ReturnType<typeof setTimeout>>()
+	const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 	useEffect(() => {
 		if (!timerRef.current) {
 			setValue(state?.query ?? '')

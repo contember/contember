@@ -52,6 +52,7 @@
   ],
   "resolutions": {
     "typescript": "6.0.1-rc",
+    "graphql": "16.13.1",
     "@types/node": "20.19.37",
     "rollup": "npm:@rollup/wasm-node@*"
   }

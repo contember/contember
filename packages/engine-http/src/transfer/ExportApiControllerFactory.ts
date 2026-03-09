@@ -71,7 +71,8 @@ export class ExportApiControllerFactory {
 				projectContainers[project.slug] = projectContainer
 			}
 
-			;(koa as any).compress = true
+			const koaCtx = koa as any
+			koaCtx.compress = true
 			response.status = 200
 			response.res.setHeader('Content-Type', 'application/x-ndjson') // https://github.com/ndjson/ndjson-spec
 			response.body = Readable.from(toBuffer(this.exportExecutor.export(exportRequest, projectContainers)))

@@ -40,17 +40,17 @@
     "@contember/react-slate-editor-base": "workspace:*",
     "@contember/react-utils": "workspace:*",
     "@contember/utilities": "workspace:*",
-    "@radix-ui/react-slot": "^1.2.4",
-    "react-error-boundary": "^4.0.13",
-    "slate": "^0.103.0",
-    "slate-react": "^0.110.1"
+    "@radix-ui/react-slot": "catalog:",
+    "react-error-boundary": "catalog:",
+    "slate": "catalog:",
+    "slate-react": "catalog:"
   },
   "peerDependencies": {
-    "react": "^18 || ^19",
-    "react-dom": "^18 || ^19"
+    "react": "catalog:",
+    "react-dom": "catalog:"
   },
   "devDependencies": {
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4"
+    "react": "catalog:",
+    "react-dom": "catalog:"
   }
 }

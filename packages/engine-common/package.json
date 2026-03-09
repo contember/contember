@@ -23,7 +23,7 @@
     }
   },
   "devDependencies": {
-    "@types/node": "^20.17.22"
+    "@types/node": "catalog:"
   },
   "dependencies": {
     "@contember/logger": "workspace:*"

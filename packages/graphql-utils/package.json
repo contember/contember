@@ -23,11 +23,11 @@
     }
   },
   "devDependencies": {
-    "@types/node": "^20.17.22",
-    "graphql": "^16.13.1"
+    "@types/node": "catalog:",
+    "graphql": "catalog:"
   },
   "peerDependencies": {
-    "graphql": ">=16.13.1"
+    "graphql": "catalog:"
   },
   "type": "module"
 }

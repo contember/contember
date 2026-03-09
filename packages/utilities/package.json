@@ -34,6 +34,6 @@
     "directory": "packages/utilities"
   },
   "peerDependencies": {
-    "react": "^18 || ^19"
+    "react": "catalog:"
   }
 }

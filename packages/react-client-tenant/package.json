@@ -37,16 +37,16 @@
     "@contember/graphql-client-tenant": "workspace:*",
     "@contember/react-client": "workspace:*",
     "@contember/react-utils": "workspace:*",
-    "@radix-ui/primitive": "^1.1.3",
-    "@radix-ui/react-slot": "^1.2.4",
-    "graphql-ts-client-api": "^3.1.17"
+    "@radix-ui/primitive": "catalog:",
+    "@radix-ui/react-slot": "catalog:",
+    "graphql-ts-client-api": "catalog:"
   },
   "peerDependencies": {
-    "react": "^18 || ^19",
-    "react-dom": "^18 || ^19"
+    "react": "catalog:",
+    "react-dom": "catalog:"
   },
   "devDependencies": {
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react": "catalog:",
+    "react-dom": "catalog:"
   }
 }

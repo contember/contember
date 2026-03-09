@@ -39,14 +39,14 @@
     "@contember/react-repeater": "workspace:*",
     "@contember/react-utils": "workspace:*",
     "@contember/utilities": "workspace:*",
-    "@radix-ui/react-slot": "^1.2.4"
+    "@radix-ui/react-slot": "catalog:"
   },
   "peerDependencies": {
-    "react": "^18 || ^19",
-    "react-dom": "^18 || ^19"
+    "react": "catalog:",
+    "react-dom": "catalog:"
   },
   "devDependencies": {
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4"
+    "react": "catalog:",
+    "react-dom": "catalog:"
   }
 }

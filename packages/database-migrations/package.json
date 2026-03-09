@@ -24,13 +24,13 @@
   },
   "dependencies": {
     "@contember/database": "workspace:*",
-    "node-pg-migrate": "^5.10.0"
+    "node-pg-migrate": "catalog:"
   },
   "devDependencies": {
-    "pg": "^8.20.0"
+    "pg": "catalog:"
   },
   "peerDependencies": {
-    "pg": "^8.20.0"
+    "pg": "catalog:"
   },
   "type": "module"
 }

@@ -34,10 +34,10 @@
     "directory": "packages/react-richtext-renderer"
   },
   "devDependencies": {
-    "@testing-library/dom": "^10.4.1",
-    "@testing-library/react": "^16.3.2"
+    "@testing-library/dom": "catalog:",
+    "@testing-library/react": "catalog:"
   },
   "peerDependencies": {
-    "react": "^18 || ^19"
+    "react": "catalog:"
   }
 }

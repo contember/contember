@@ -36,26 +36,26 @@
     "@contember/schema": "workspace:*",
     "@contember/schema-utils": "workspace:*",
     "@contember/typesafe": "workspace:*",
-    "@graphql-tools/utils": "^10.11.0",
-    "graphql-tag": "^2.12.6",
-    "jose": "^5.10.0",
-    "mustache": "^4.2.0",
-    "nodemailer": "^6.10.1",
-    "postgres-interval": "^2.1.0",
-    "openid-client": "^5.7.0",
-    "otpauth": "^9.5.0"
+    "@graphql-tools/utils": "catalog:",
+    "graphql-tag": "catalog:",
+    "jose": "catalog:",
+    "mustache": "catalog:",
+    "nodemailer": "catalog:",
+    "postgres-interval": "catalog:",
+    "openid-client": "catalog:",
+    "otpauth": "catalog:"
   },
   "devDependencies": {
     "@contember/database-tester": "workspace:*",
-    "@graphql-tools/schema": "^10.0.31",
-    "@types/mustache": "^4.2.6",
-    "@types/node": "^20.17.22",
-    "@types/nodemailer": "^6.4.23",
-    "graphql": "^16.13.1"
+    "@graphql-tools/schema": "catalog:",
+    "@types/mustache": "catalog:",
+    "@types/node": "catalog:",
+    "@types/nodemailer": "catalog:",
+    "graphql": "catalog:"
   },
   "peerDependencies": {
-    "graphql": ">=16.13.1",
-    "pg": "^8.20.0"
+    "graphql": "catalog:",
+    "pg": "catalog:"
   },
   "type": "module"
 }

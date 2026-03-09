@@ -27,11 +27,11 @@
     "@contember/engine-http": "workspace:*"
   },
   "peerDependencies": {
-    "graphql": ">=16.13.1",
-    "pg": "^8.20.0"
+    "graphql": "catalog:",
+    "pg": "catalog:"
   },
   "devDependencies": {
-    "graphql": "^16.13.1"
+    "graphql": "catalog:"
   },
   "type": "module"
 }

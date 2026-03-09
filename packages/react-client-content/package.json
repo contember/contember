@@ -34,11 +34,11 @@
     "@contember/react-utils": "workspace:*"
   },
   "peerDependencies": {
-    "react": "^18 || ^19",
-    "react-dom": "^18 || ^19"
+    "react": "catalog:",
+    "react-dom": "catalog:"
   },
   "devDependencies": {
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4"
+    "react": "catalog:",
+    "react-dom": "catalog:"
   }
 }

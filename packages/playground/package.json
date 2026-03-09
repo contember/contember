@@ -21,25 +21,25 @@
     "@contember/schema-utils": "workspace:*",
     "@contember/utilities": "workspace:*",
     "@contember/vite-plugin": "workspace:*",
-    "@tailwindcss/vite": "^4.2.1",
-    "@faker-js/faker": "^9.9.0",
-    "@radix-ui/react-separator": "^1.1.8",
-    "@radix-ui/react-toolbar": "^1.1.11",
-    "graphql": "^16.13.1",
-    "lucide-react": "^0.453.0",
-    "qrcode-generator": "^1.5.2",
-    "react": "^19.2.4",
-    "react-dnd": "^16.0.1",
-    "react-dnd-html5-backend": "^16.0.1",
-    "react-dom": "^19.2.4",
-    "slate-hyperscript": "^0.100.0",
-    "tailwindcss": "^4.2.1",
-    "tailwindcss-animate": "^1.0.7",
-    "vite": "^7",
-    "vite-tsconfig-paths": "^5.0.1"
+    "@tailwindcss/vite": "catalog:",
+    "@faker-js/faker": "catalog:",
+    "@radix-ui/react-separator": "catalog:",
+    "@radix-ui/react-toolbar": "catalog:",
+    "graphql": "catalog:",
+    "lucide-react": "catalog:",
+    "qrcode-generator": "catalog:",
+    "react": "catalog:",
+    "react-dnd": "catalog:",
+    "react-dnd-html5-backend": "catalog:",
+    "react-dom": "catalog:",
+    "slate-hyperscript": "catalog:",
+    "tailwindcss": "catalog:",
+    "tailwindcss-animate": "catalog:",
+    "vite": "catalog:",
+    "vite-tsconfig-paths": "catalog:"
   },
   "dependencies": {
-    "@sindresorhus/slugify": "^2.2.1"
+    "@sindresorhus/slugify": "catalog:"
   },
   "exports": {
     ".": {

@@ -40,34 +40,34 @@
     "@contember/schema-migrations": "workspace:*",
     "@contember/schema-utils": "workspace:*",
     "@contember/typesafe": "workspace:*",
-    "@graphql-tools/merge": "^9.1.7",
-    "@graphql-tools/schema": "^10.0.31",
-    "@koa/cors": "^5.0.0",
-    "@sentry/node": "^7.120.4",
-    "bcryptjs": "^2.4.3",
-    "ipaddr.js": "^2.3.0",
-    "koa": "^2.16.4",
-    "koa-bodyparser": "^4.4.1",
-    "koa-compress": "^5.2.0",
-    "lru-cache": "^11.2.6",
-    "path-to-regexp": "^6.2.2",
-    "prom-client": "^12.0.0",
-    "uuid": "^11.1.0",
-    "ws": "^8.19.0"
+    "@graphql-tools/merge": "catalog:",
+    "@graphql-tools/schema": "catalog:",
+    "@koa/cors": "catalog:",
+    "@sentry/node": "catalog:",
+    "bcryptjs": "catalog:",
+    "ipaddr.js": "catalog:",
+    "koa": "catalog:",
+    "koa-bodyparser": "catalog:",
+    "koa-compress": "catalog:",
+    "lru-cache": "catalog:",
+    "path-to-regexp": "catalog:",
+    "prom-client": "catalog:",
+    "uuid": "catalog:",
+    "ws": "catalog:"
   },
   "devDependencies": {
-    "@types/bcryptjs": "^2.4.6",
-    "@types/koa": "^2.15.0",
-    "@types/koa-bodyparser": "^4.3.13",
-    "@types/koa__cors": "^5.0.1",
-    "@types/lru-cache": "^7.10.10",
-    "@types/node": "^20.17.22",
-    "@types/ws": "^8.18.1",
-    "graphql": "^16.13.1"
+    "@types/bcryptjs": "catalog:",
+    "@types/koa": "catalog:",
+    "@types/koa-bodyparser": "catalog:",
+    "@types/koa__cors": "catalog:",
+    "@types/lru-cache": "catalog:",
+    "@types/node": "catalog:",
+    "@types/ws": "catalog:",
+    "graphql": "catalog:"
   },
   "peerDependencies": {
-    "graphql": ">=16.13.1",
-    "pg": "^8.20.0"
+    "graphql": "catalog:",
+    "pg": "catalog:"
   },
   "type": "module"
 }

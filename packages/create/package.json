@@ -5,16 +5,16 @@
   "bin": "dist/production/run.js",
   "dependencies": {
     "@contember/cli-common": "workspace:*",
-    "chalk": "^5.6.2",
-    "degit": "^2.8.4",
-    "fs-extra": "^11.3.4",
-    "js-yaml": "^4.1.1"
+    "chalk": "catalog:",
+    "degit": "catalog:",
+    "fs-extra": "catalog:",
+    "js-yaml": "catalog:"
   },
   "type": "module",
   "scripts": {
     "pre-build": "rm -rf rm ./resources/templates/default/admin/lib && cp -r ../react-ui-lib/src ./resources/templates/default/admin/lib && rm ./resources/templates/default/admin/lib/index.ts ./resources/templates/default/admin/lib/tsconfig.json"
   },
   "devDependencies": {
-    "@types/degit": "^2.8.6"
+    "@types/degit": "catalog:"
   }
 }

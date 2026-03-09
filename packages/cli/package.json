@@ -10,14 +10,12 @@
     "build": "tailwindcss -i src/lib/project/docs/resources/style.css -o ./dist/resources/out.css"
   },
   "devDependencies": {
-    "@types/fs-extra": "^11.0.4",
-    "@types/js-yaml": "^4.0.9",
-    "@types/node": "^20.17.22",
-    "@types/prompts": "^2.4.9",
-    "@types/semver": "^7.7.1",
-    "autoprefixer": "^10.4.27",
-    "postcss": "^8.5.8",
-    "tailwindcss": "^3.4.19"
+    "@types/fs-extra": "catalog:",
+    "@types/js-yaml": "catalog:",
+    "@types/node": "catalog:",
+    "@types/prompts": "catalog:",
+    "@types/semver": "catalog:",
+    "tailwindcss": "catalog:"
   },
   "dependencies": {
     "@contember/cli-common": "workspace:*",
@@ -32,21 +30,21 @@
     "@contember/schema-migrations": "workspace:*",
     "@contember/schema-utils": "workspace:*",
     "@contember/typesafe": "workspace:*",
-    "@graphql-tools/schema": "^10.0.31",
-    "chalk": "^5.6.2",
-    "chalk-table": "^1.0.2",
-    "fast-glob": "^3.3.3",
-    "graphql": "^16.13.1",
-    "js-yaml": "^4.1.1",
-    "lodash-es": "^4.17.23",
-    "pg": "^8.20.0",
-    "preact": "^10.28.4",
-    "preact-render-to-string": "^6.6.6",
-    "prompts": "^2.4.2",
-    "semver": "^7.7.4",
-    "yawn-yaml": "^2.3.0"
+    "@graphql-tools/schema": "catalog:",
+    "chalk": "catalog:",
+    "chalk-table": "catalog:",
+    "fast-glob": "catalog:",
+    "graphql": "catalog:",
+    "js-yaml": "catalog:",
+    "lodash-es": "catalog:",
+    "pg": "catalog:",
+    "preact": "catalog:",
+    "preact-render-to-string": "catalog:",
+    "prompts": "catalog:",
+    "semver": "catalog:",
+    "yawn-yaml": "catalog:"
   },
   "peerDependencies": {
-    "esbuild": "*"
+    "esbuild": "catalog:"
   }
 }

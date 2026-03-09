@@ -26,19 +26,19 @@
     "@contember/engine-plugins": "workspace:*",
     "@contember/graphql-utils": "workspace:*",
     "@contember/typesafe": "workspace:*",
-    "mime-types": "^2.1.35",
-    "picomatch": "^4.0.3",
-    "qs": "^6.15.0",
-    "uuid": "^11.1.0"
+    "mime-types": "catalog:",
+    "picomatch": "catalog:",
+    "qs": "catalog:",
+    "uuid": "catalog:"
   },
   "devDependencies": {
-    "@types/mime-types": "^2.1.4",
-    "@types/qs": "^6.15.0",
-    "graphql": "^16.13.1"
+    "@types/mime-types": "catalog:",
+    "@types/qs": "catalog:",
+    "graphql": "catalog:"
   },
   "peerDependencies": {
-    "graphql": ">=16.13.1",
-    "pg": "^8.20.0"
+    "graphql": "catalog:",
+    "pg": "catalog:"
   },
   "type": "module"
 }

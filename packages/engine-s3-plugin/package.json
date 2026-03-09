@@ -27,18 +27,18 @@
     "@contember/graphql-utils": "workspace:*",
     "@contember/typesafe": "workspace:*",
     "mime-types": "^2.1.35",
-    "picomatch": "^4.0.2",
-    "qs": "^6.13.0",
-    "uuid": "^11.0.5"
+    "picomatch": "^4.0.3",
+    "qs": "^6.15.0",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@types/mime-types": "^2.1.4",
-    "@types/qs": "^6.9.16",
-    "graphql": "^16.9.0"
+    "@types/qs": "^6.15.0",
+    "graphql": "^16.13.1"
   },
   "peerDependencies": {
-    "graphql": ">= 14.6.0",
-    "pg": "^8.9.0"
+    "graphql": ">=16.13.1",
+    "pg": "^8.20.0"
   },
   "type": "module"
 }

@@ -36,17 +36,17 @@
     "@contember/schema": "workspace:*",
     "@contember/schema-utils": "workspace:*",
     "@contember/typesafe": "workspace:*",
-    "@graphql-tools/schema": "^10.0.7",
+    "@graphql-tools/schema": "^10.0.31",
     "graphql-tag": "^2.12.6"
   },
   "devDependencies": {
     "@types/bun": "^1.1.10",
-    "@types/ws": "^8.5.12",
-    "graphql": "^16.9.0"
+    "@types/ws": "^8.18.1",
+    "graphql": "^16.13.1"
   },
   "peerDependencies": {
-    "graphql": ">= 14.6.0",
-    "pg": "^8.5.0"
+    "graphql": ">=16.13.1",
+    "pg": "^8.20.0"
   },
   "type": "module",
   "version": "2.1.0-alpha.30"

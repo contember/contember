@@ -28,12 +28,12 @@
     "@contember/engine-plugins": "workspace:*",
     "@contember/engine-s3-plugin": "workspace:*",
     "@contember/engine-vimeo-plugin": "workspace:*",
-    "graphql": "^16.9.0",
-    "pg": "^8.12.0",
-    "uuid": "^11.0.5"
+    "graphql": "^16.13.1",
+    "pg": "^8.20.0",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
-    "@types/koa-compress": "^4.0.6",
+    "@types/koa-compress": "^4.0.7",
     "@types/node": "^20.17.22"
   },
   "type": "module"

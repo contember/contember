@@ -24,10 +24,10 @@
   },
   "devDependencies": {
     "@types/node": "^20.17.22",
-    "graphql": "^16.9.0"
+    "graphql": "^16.13.1"
   },
   "peerDependencies": {
-    "graphql": ">= 14.6.0"
+    "graphql": ">=16.13.1"
   },
   "type": "module"
 }

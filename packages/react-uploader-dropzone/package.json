@@ -33,8 +33,8 @@
     "@contember/react-uploader": "workspace:*",
     "@contember/react-utils": "workspace:*",
     "@contember/utilities": "workspace:*",
-    "@radix-ui/react-slot": "^1.1.0",
-    "react-dropzone": "^14.2.9"
+    "@radix-ui/react-slot": "^1.2.4",
+    "react-dropzone": "^14.4.1"
   },
   "peerDependencies": {
     "react": "^18 || ^19",

@@ -27,7 +27,7 @@
     "@types/node": "^20.17.22"
   },
   "dependencies": {
-    "js-yaml": "^4.1.0"
+    "js-yaml": "^4.1.1"
   },
   "type": "module"
 }

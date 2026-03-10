@@ -7,7 +7,8 @@ export class Author {
 
 	emailValidated = d.boolColumn().notNull()
 
-	@v.when(v.rules.on('emailValidated', v.rules.equals(true))).assertPattern(/.+@.+/, 'E-mail is not valid')
+	// dprint-ignore
+	@(v.when(v.rules.on('emailValidated', v.rules.equals(true))).assertPattern(/.+@.+/, 'E-mail is not valid'))
 	email = d.stringColumn().notNull()
 }
 

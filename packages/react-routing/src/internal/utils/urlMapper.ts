@@ -1,11 +1,11 @@
 import * as pathToRegexp from 'path-to-regexp'
-import { MatchFunction, PathFunction } from 'path-to-regexp'
+import { MatchFunction, PathFunction, TokenData, Key } from 'path-to-regexp'
 import { Environment } from '@contember/react-binding'
 import { RequestState, RoutingContextValue } from '../../types'
 import { PageNotFound } from '../../PageNotFound'
 
-const matchFunctionsCache: Record<string, MatchFunction> = {}
-const pathFunctionsCache: Record<string, PathFunction> = {}
+const matchFunctionsCache: Record<string, MatchFunction<Record<string, string>>> = {}
+const pathFunctionsCache: Record<string, PathFunction<Record<string, string>>> = {}
 const pathKeysCache: Record<string, string[]> = {}
 
 export const dimensionsIn = (dimensions: string): Environment.SelectedDimensions => {
@@ -113,7 +113,7 @@ export const requestStateToPath = (routing: RoutingContextValue, request: Reques
 		pathFunctionsCache[route.path] ??= pathToRegexp.compile(route.path, { encode: encodeURIComponent })
 		pathSegment = pathFunctionsCache[route.path](pathParameters)
 
-		pathKeysCache[route.path] ??= pathToRegexp.parse(route.path).flatMap(it => typeof it !== 'string' && typeof it.name === 'string' ? [it.name] : [])
+		pathKeysCache[route.path] ??= pathToRegexp.parse(route.path).tokens.flatMap(it => it.type === 'param' ? [it.name] : [])
 		pathKeysCache[route.path].forEach(key => query.delete(key))
 	}
 

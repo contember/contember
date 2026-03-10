@@ -1,4 +1,4 @@
-import { Key, pathToRegexp } from 'path-to-regexp'
+import { pathToRegexp } from 'path-to-regexp'
 import { KoaContext, KoaMiddleware } from './types'
 import { AuthResult, HttpErrorResponse, HttpResponse } from '../common'
 import Koa from 'koa'
@@ -478,8 +478,7 @@ type RequestMatcher = (args: { url: URL }) => Params | null
 const createRequestMatcher = (
 	mask: string,
 ): RequestMatcher => {
-	const keys: Key[] = []
-	const regexp: RegExp = pathToRegexp(mask, keys)
+	const { regexp, keys } = pathToRegexp(mask)
 
 	const match = function (url: string): Params | null {
 		const match = regexp.exec(url)

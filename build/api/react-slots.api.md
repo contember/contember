@@ -60,14 +60,7 @@ children: ReactNode;
 }>;
 
 // @public (undocumented)
-export const SlotTarget: NamedExoticComponent<    {
-as?: ElementType;
-fallback?: ReactNode;
-name: string;
-aliases?: [string, ...string[]];
-display?: boolean | "contents" | "block" | "flex" | "grid" | "inline" | "inline-flex" | "inline-grid" | "inline-block" | "inherit" | "initial" | "none" | "unset";
-className?: string;
-}>;
+export const SlotTarget: NamedExoticComponent<SlotTargetProps>;
 
 // @public (undocumented)
 export type SlotTargetComponent<T extends string> = ComponentType<SlotTargetComponentProps> & {
@@ -102,7 +95,7 @@ export const useSlotTargetElement: (name: string) => HTMLElement | null | undefi
 export function useSlotTargetsFactory<R extends SlotTargetComponentsRecord<string>>(SlotTargets: R): <T>(slots: ReadonlyArray<keyof R & string>, override?: T) => NonNullable<T> | FunctionComponentElement<FragmentProps> | null;
 
 // @public
-export const useTargetElementRegistrar: (name: string, aliases?: string[]) => ((element: HTMLElement | null) => void);
+export const useTargetElementRegistrar: (name: string, aliases?: string[]) => (element: HTMLElement | null) => void;
 
 // (No @packageDocumentation comment for this package)
 

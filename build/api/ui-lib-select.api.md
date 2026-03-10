@@ -30,15 +30,7 @@ export interface DefaultSelectDataViewProps {
 }
 
 // @public (undocumented)
-export const MultiSelectInput: React_2.NamedExoticComponent<{
-    field: SugaredRelativeEntityList["field"];
-    options?: SugaredQualifiedEntityList["entities"];
-    children: ReactNode;
-    placeholder?: ReactNode;
-    createNewForm?: ReactNode;
-    queryField?: DataViewUnionFilterFields;
-    initialSorting?: DataViewSortingDirections;
-}>;
+export const MultiSelectInput: React_2.NamedExoticComponent<MultiSelectInputProps>;
 
 // @public (undocumented)
 export type MultiSelectInputProps = {
@@ -103,16 +95,7 @@ export const SelectDefaultFilter: React_2.MemoExoticComponent<() => JSX.Element>
 export const SelectDefaultPlaceholderUI: () => JSX.Element;
 
 // @public (undocumented)
-export const SelectInput: React_2.NamedExoticComponent<{
-    field: SugaredRelativeSingleEntity["field"];
-    children: ReactNode;
-    options?: SugaredQualifiedEntityList["entities"];
-    placeholder?: ReactNode;
-    createNewForm?: ReactNode;
-    queryField?: DataViewUnionFilterFields;
-    initialSorting?: DataViewSortingDirections;
-    required?: boolean;
-}>;
+export const SelectInput: React_2.NamedExoticComponent<SelectInputProps>;
 
 // @public (undocumented)
 export const SelectInputActionsUI: React_2.ForwardRefExoticComponent<Omit<React_2.ClassAttributes<HTMLSpanElement> & React_2.HTMLAttributes<HTMLSpanElement> & {
@@ -148,10 +131,7 @@ export const SelectInputWrapperUI: React_2.ForwardRefExoticComponent<Omit<React_
 }, "ref"> & React_2.RefAttributes<HTMLDivElement>>;
 
 // @public (undocumented)
-export const SelectListInner: React_2.NamedExoticComponent<{
-    children: ReactNode;
-    filterToolbar?: ReactNode;
-}>;
+export const SelectListInner: React_2.NamedExoticComponent<SelectListProps>;
 
 // @public (undocumented)
 export const SelectListItemUI: React_2.ForwardRefExoticComponent<Omit<Omit<React_2.ClassAttributes<HTMLButtonElement> & React_2.ButtonHTMLAttributes<HTMLButtonElement> & {
@@ -181,17 +161,7 @@ export const SelectPopoverContent: React_2.ForwardRefExoticComponent<Omit<Omit<P
 }, "ref"> & React_2.RefAttributes<HTMLDivElement>>;
 
 // @public (undocumented)
-export const SortableMultiSelectInput: NamedExoticComponent<    {
-field: SugaredRelativeEntityList["field"];
-sortableBy: SugaredRelativeSingleField["field"];
-connectAt: SugaredRelativeSingleEntity["field"];
-children: ReactNode;
-options?: SugaredQualifiedEntityList["entities"];
-placeholder?: ReactNode;
-createNewForm?: ReactNode;
-queryField?: DataViewUnionFilterFields;
-initialSorting?: DataViewSortingDirections;
-}>;
+export const SortableMultiSelectInput: NamedExoticComponent<SortableMultiSelectInputProps>;
 
 // @public (undocumented)
 export type SortableMultiSelectInputProps = {

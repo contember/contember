@@ -386,11 +386,22 @@ export type FieldViewComponentSignature = {
         render: (field1: FieldAccessor<FV1>, field2: FieldAccessor<FV2>, field3: FieldAccessor<FV3>) => ReactNode;
     }): ReactElement | null;
     <FV1 extends FieldValue, FV2 extends FieldValue, FV3 extends FieldValue, FV4 extends FieldValue>(props: FieldViewCommonProps & {
-        fields: [string | SugaredRelativeSingleField, string | SugaredRelativeSingleField, string | SugaredRelativeSingleField, string | SugaredRelativeSingleField];
+        fields: [
+        string | SugaredRelativeSingleField,
+        string | SugaredRelativeSingleField,
+        string | SugaredRelativeSingleField,
+        string | SugaredRelativeSingleField
+        ];
         render: (field1: FieldAccessor<FV1>, field2: FieldAccessor<FV2>, field3: FieldAccessor<FV3>, field4: FieldAccessor<FV4>) => ReactNode;
     }): ReactElement | null;
     <FV1 extends FieldValue, FV2 extends FieldValue, FV3 extends FieldValue, FV4 extends FieldValue, FV5 extends FieldValue>(props: FieldViewCommonProps & {
-        fields: [string | SugaredRelativeSingleField, string | SugaredRelativeSingleField, string | SugaredRelativeSingleField, string | SugaredRelativeSingleField, string | SugaredRelativeSingleField];
+        fields: [
+        string | SugaredRelativeSingleField,
+        string | SugaredRelativeSingleField,
+        string | SugaredRelativeSingleField,
+        string | SugaredRelativeSingleField,
+        string | SugaredRelativeSingleField
+        ];
         render: (field1: FieldAccessor<FV1>, field2: FieldAccessor<FV2>, field3: FieldAccessor<FV3>, field4: FieldAccessor<FV4>, field5: FieldAccessor<FV5>) => ReactNode;
     }): ReactElement | null;
     (props: FieldViewProps): ReactElement | null;
@@ -922,10 +933,10 @@ export function useField<Value extends FieldValue = FieldValue>(sugaredRelativeS
 export const useGetEntityByKey: () => GetEntityByKey;
 
 // @public (undocumented)
-export const useGetEntityListSubTree: () => ((parametersOrAlias: Alias | SugaredQualifiedEntityList | SugaredUnconstrainedQualifiedEntityList, ...treeId: [TreeRootId | undefined] | []) => EntityListAccessor);
+export const useGetEntityListSubTree: () => (parametersOrAlias: Alias | SugaredQualifiedEntityList | SugaredUnconstrainedQualifiedEntityList, ...treeId: [TreeRootId | undefined] | []) => EntityListAccessor;
 
 // @public (undocumented)
-export const useGetEntitySubTree: () => ((parametersOrAlias: Alias | SugaredQualifiedSingleEntity | SugaredUnconstrainedQualifiedSingleEntity, ...treeId: [TreeRootId | undefined] | []) => EntityAccessor);
+export const useGetEntitySubTree: () => (parametersOrAlias: Alias | SugaredQualifiedSingleEntity | SugaredUnconstrainedQualifiedSingleEntity, ...treeId: [TreeRootId | undefined] | []) => EntityAccessor;
 
 // @public (undocumented)
 export const useHasEntity: () => boolean;

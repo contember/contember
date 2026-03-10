@@ -80,13 +80,13 @@ export const createEnumListFilter: (field: SugaredRelativeSingleField_2["field"]
 
 // @public
 export const createFieldFilterHandler: <FA extends DataViewFilterArtifact = DataViewFilterArtifact>(input: {
-    createCondition: ((filterArtifact: FA, options: DataViewFilterHandlerOptions) => Input.Condition | undefined);
+    createCondition: (filterArtifact: FA, options: DataViewFilterHandlerOptions) => Input.Condition | undefined;
     isEmpty?: (filterArtifact: FA) => boolean;
 }) => (field: SugaredRelativeSingleField["field"]) => DataViewFilterHandler<FA>;
 
 // @public (undocumented)
 export const createFilterHandler: <FA extends DataViewFilterArtifact = DataViewFilterArtifact>(input: {
-    createFilter: ((filterArtifact: FA, options: DataViewFilterHandlerOptions) => Filter | undefined);
+    createFilter: (filterArtifact: FA, options: DataViewFilterHandlerOptions) => Filter | undefined;
     isEmpty?: (filterArtifact: FA) => boolean;
     identifier?: {
         id: Symbol;

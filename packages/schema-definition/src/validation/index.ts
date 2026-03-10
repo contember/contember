@@ -1,6 +1,5 @@
 import { tuple } from '../utils'
 import { SchemaDefinition } from '../model'
-import 'reflect-metadata'
 import { Validation } from '@contember/schema'
 import { filterEntityDefinition } from '../utils'
 
@@ -31,21 +30,32 @@ const ArgumentFactory = {
 
 const RuleMetaKey = Symbol('Rule')
 
-function updateMetadata<T>(
-	{ key, target, propertyKey }: { key: symbol; target: any; propertyKey: string | symbol },
-	generator: (previous: T) => T,
-	initialValue: T,
-) {
-	const metadata = Reflect.hasMetadata(key, target, propertyKey)
-		? Reflect.getMetadata(key, target, propertyKey)
-		: initialValue
+const isLegacyDecorator = (target: any): boolean =>
+	typeof target === 'object' && target !== null || typeof target === 'function'
 
-	const newMetadata = generator(metadata)
-	Reflect.defineMetadata(key, newMetadata, target, propertyKey)
+function addRuleToMetadata(target: any, propertyKeyOrContext: any, ...rule: Validation.ValidationRule[]) {
+	if (isLegacyDecorator(target)) {
+		// Legacy TypeScript decorators: target is prototype, propertyKeyOrContext is property name
+		const propertyKey: string | symbol = propertyKeyOrContext
+		const hasExisting = Reflect.hasMetadata(RuleMetaKey, target, propertyKey)
+		const existing: Validation.ValidationRule[] = hasExisting ? Reflect.getMetadata(RuleMetaKey, target, propertyKey) : []
+		Reflect.defineMetadata(RuleMetaKey, [...rule, ...existing], target, propertyKey)
+	} else {
+		// TC39 stage 3 decorators: target is undefined, propertyKeyOrContext is context
+		const context = propertyKeyOrContext as ClassFieldDecoratorContext
+		const name = String(context.name)
+		const allRules = (context.metadata[RuleMetaKey] as Record<string, Validation.ValidationRule[]>) ?? {}
+		allRules[name] = [...rule, ...(allRules[name] ?? [])]
+		context.metadata[RuleMetaKey] = allRules
+	}
 }
 
-function addRuleToMetadata(target: any, propertyKey: string | symbol, ...rule: Validation.ValidationRule[]) {
-	updateMetadata<Validation.ValidationRule[]>({ key: RuleMetaKey, target, propertyKey }, prev => [...rule, ...prev], [])
+function getTC39Metadata(cls: Function): Record<string, Validation.ValidationRule[]> | undefined {
+	const metaSymbol = Symbol.metadata
+		?? Reflect.ownKeys(cls).find((k): k is symbol => typeof k === 'symbol' && String(k) === 'Symbol(Symbol.metadata)')
+	if (!metaSymbol) return undefined
+	const meta = (cls as any)[metaSymbol]
+	return meta?.[RuleMetaKey] as Record<string, Validation.ValidationRule[]> | undefined
 }
 
 export function fluent() {
@@ -72,8 +82,8 @@ export class RuleBranch {
 		const messageParsed: Validation.Message = typeof message === 'string' ? { text: message } : message
 		const newRules = [...this.branchRules, { validator, message: messageParsed }]
 		const branch = new RuleBranch(this.conditions, newRules)
-		const propertyDecorator: PropertyDecorator = (target: any, propertykey: string | symbol) => {
-			addRuleToMetadata(target, propertykey, ...branch.buildRules())
+		const propertyDecorator = (target: any, propertyKeyOrContext: any) => {
+			addRuleToMetadata(target, propertyKeyOrContext, ...branch.buildRules())
 		}
 		return Object.assign(propertyDecorator, branch)
 	}
@@ -193,8 +203,8 @@ export const assertMaxLength = (min: number, message: MessageOrString) => fluent
 
 export const combine =
 	(...decorators: PropertyDecorator[]): PropertyDecorator =>
-		(target, propertyKey) =>
-			decorators.forEach(it => it(target, propertyKey))
+		(target: any, propertyKeyOrContext: any) =>
+			decorators.forEach(it => (it as any)(target, propertyKeyOrContext))
 
 export function parseDefinition(
 	definitions: Record<string, any>,
@@ -204,11 +214,14 @@ export function parseDefinition(
 			const target = definition.prototype
 			const defInstance = new definition()
 			const fields = Object.keys(defInstance)
+			const tc39Rules = getTC39Metadata(definition)
 			return tuple(
 				name,
 				fields
 					.map(field => {
-						const fieldRules: Validation.ValidationRule[] | undefined = Reflect.getMetadata(RuleMetaKey, target, field)
+						const fieldRules: Validation.ValidationRule[] | undefined =
+							tc39Rules?.[field]
+							?? (typeof Reflect.getMetadata === 'function' ? Reflect.getMetadata(RuleMetaKey, target, field) : undefined)
 						if (fieldRules === undefined) {
 							return tuple(field, [])
 						}

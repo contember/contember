@@ -1,6 +1,8 @@
+// dprint-ignore-file
 import { createPortal } from 'react-dom'
 import { describe, expect, it } from 'bun:test'
 import { getChildrenAsLabel } from '../../src'
+
 
 describe('@contember/utilities.getChildrenAsLabel', () => {
 	it('should return undefined for null or undefined children', () => {
@@ -30,8 +32,8 @@ describe('@contember/utilities.getChildrenAsLabel', () => {
 	it('should concatenate the labels of nested children', () => {
 		const nested = (
 			<div>
-				<span>Hello</span>
-				<span>world</span>
+				<span>Hello </span>
+				<span> world </span>
 			</div>
 		)
 
@@ -55,8 +57,8 @@ describe('@contember/utilities.getChildrenAsLabel', () => {
 
 	it('should concatenate the labels of nested arrays of children', () => {
 		const nested = [
-			<span key="0.1">Hello</span>,
-			[<span key="1.1">world</span>, '!', null],
+			<span key="0.1">Hello </span>,
+			[<span key="1.1">world </span>, '!', null],
 			<span key="1.2">How are you?</span>,
 		]
 
@@ -77,11 +79,11 @@ describe('@contember/utilities.getChildrenAsLabel', () => {
 	it('should ignore unsupported child types', () => {
 		const unsupported = (
 			<div>
-				<span>Hello</span>
+				<span>Hello </span>
 				{42}
-				{(() => {}) as any}
+				{(() => { }) as any}
 				<>
-					<span>world</span>
+					<span>world </span>
 				</>
 			</div>
 		)

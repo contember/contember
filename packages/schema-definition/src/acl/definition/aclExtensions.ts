@@ -12,8 +12,8 @@ const entityAclExtensionsStore = createMetadataStore<EntityAclExtension[]>([])
 
 export type EntityAclExtension = (args: EntityAclExtensionArgs) => Acl.EntityPermissions
 export const extendEntityAcl = <T>(extension: EntityAclExtension): DecoratorFunction<T> => {
-	return function(cls: EntityConstructor) {
-		entityAclExtensionsStore.update(cls, current => [...current, extension])
+	return function(cls: EntityConstructor, context?: ClassDecoratorContext) {
+		entityAclExtensionsStore.update(cls, current => [...current, extension], context)
 	}
 }
 

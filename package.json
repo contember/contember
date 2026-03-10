@@ -17,6 +17,7 @@
     "lint:fix": "biome lint . --write",
     "start": "docker compose up --detach && bun run contember migrations:execute . --yes",
     "test": "bun test --conditions=typescript packages",
+    "test:legacy-decorators": "bun --cwd=packages/schema-definition/tests test --conditions=typescript cases/unit",
     "test:e2e": "bun test --conditions=typescript e2e",
     "ts:build": "tsc --build",
     "ts:watch": "tsc --build --watch",

@@ -40,6 +40,7 @@ jobs:
           - job_name: test
             run_script: |
                 bun run test
+                bun run test:legacy-decorators
 
     steps:
       - name: Checkout code

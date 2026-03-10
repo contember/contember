@@ -40,10 +40,10 @@ export type WatchTriggerDefinition =
 	& CommonTriggerDefinition
 	& TargetDefinition
 
-export const trigger = <T>(definition: BasicTriggerDefinition): DecoratorFunction<T> => (entity: EntityConstructor<T>) => {
-	triggersStore.update(entity, it => [...it, { type: 'basic', definition }])
+export const trigger = <T>(definition: BasicTriggerDefinition): DecoratorFunction<T> => (entity: EntityConstructor<T>, context?: ClassDecoratorContext) => {
+	triggersStore.update(entity, it => [...it, { type: 'basic', definition }], context)
 }
 
-export const watch = <T>(definition: WatchTriggerDefinition): DecoratorFunction<T> => (entity: EntityConstructor<T>) => {
-	triggersStore.update(entity, it => [...it, { type: 'watch', definition }])
+export const watch = <T>(definition: WatchTriggerDefinition): DecoratorFunction<T> => (entity: EntityConstructor<T>, context?: ClassDecoratorContext) => {
+	triggersStore.update(entity, it => [...it, { type: 'watch', definition }], context)
 }

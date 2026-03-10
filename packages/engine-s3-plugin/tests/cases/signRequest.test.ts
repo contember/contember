@@ -36,7 +36,7 @@ test('sign s3 request - prefix', () => {
 test('sign upload', () => {
 	const service = createS3Service('test')
 	const signed = service.getSignedUploadUrl({ contentType: 'image/jpeg', acl: 'PUBLIC_READ', expiration: 1800, contentDisposition: null, extension: null, fileName: null, prefix: null, suffix: null, size: null })
-	expect(signed.url).toEqual('https://test.s3.eu-central-1.amazonaws.com/9fce3907-ff2b-45bb-b4ce-eff5527dd315.jpeg?Cache-Control=immutable&Content-Type=image%2Fjpeg&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=test%2F20210702%2Feu-central-1%2Fs3%2Faws4_request&X-Amz-Date=20210702T172200Z&X-Amz-Expires=1800&X-Amz-Signature=fcd00b967054c19a2ee64b59e31d61e032ea086dcf2f0d8c36a883971c469c99&X-Amz-SignedHeaders=cache-control%3Bhost%3Bx-amz-acl&x-amz-acl=public-read')
+	expect(signed.url).toEqual('https://test.s3.eu-central-1.amazonaws.com/9fce3907-ff2b-45bb-b4ce-eff5527dd315.jpg?Cache-Control=immutable&Content-Type=image%2Fjpeg&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=test%2F20210702%2Feu-central-1%2Fs3%2Faws4_request&X-Amz-Date=20210702T172200Z&X-Amz-Expires=1800&X-Amz-Signature=b4d5ce6a36e7684f1367addb3259e8361a0ef1972986c05ce01536f2fd955a32&X-Amz-SignedHeaders=cache-control%3Bhost%3Bx-amz-acl&x-amz-acl=public-read')
 })
 
 test('sign upload #2', () => {

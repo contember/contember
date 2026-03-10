@@ -19,6 +19,9 @@ jobs:
           - job_name: lint
             run_script: bun run lint
 
+          - job_name: format
+            run_script: bun run format:check
+
           - job_name: build
             run_script: |
               bun run pre-build

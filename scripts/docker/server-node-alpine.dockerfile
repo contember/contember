@@ -6,7 +6,7 @@ RUN apk add --no-cache bash
 RUN bun install
 RUN /src/scripts/server-build/run.sh
 
-FROM node:22-alpine
+FROM node:24-alpine
 
 WORKDIR /src
 RUN apk --no-cache add curl ca-certificates \

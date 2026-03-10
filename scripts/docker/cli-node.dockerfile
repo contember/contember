@@ -6,7 +6,7 @@ RUN apk add --no-cache bash
 RUN bun install
 RUN /src/scripts/cli-build/run.sh --esbuild
 
-FROM node:22-alpine
+FROM node:24-alpine
 
 WORKDIR /src
 ENV NODE_ENV "production"

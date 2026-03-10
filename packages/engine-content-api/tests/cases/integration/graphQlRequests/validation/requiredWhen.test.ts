@@ -8,14 +8,12 @@ export class Author {
 
 	authorWithContact = d.boolColumn().notNull()
 
-	@(v.when(v.rules.on('authorWithContact', v.rules.equals(true))).assertNotEmpty('E-mail is required'))
+	@v.when(v.rules.on('authorWithContact', v.rules.equals(true))).assertNotEmpty('E-mail is required')
 	email = d.stringColumn()
 }
 
 const schema = createSchema({ Author })
 describe('Required when condition', () => {
-
-
 	it('create succeeds when rule condition is not true', async () => {
 		await testCreate({
 			schema,

@@ -29,7 +29,6 @@ export const useDataViewTextFilterInput = ({ name, debounceMs = 500 }: { name: s
 					query: e.target.value,
 				}))
 			}, debounceMs)
-
 		} else {
 			setFilter(it => ({
 				...it,
@@ -37,7 +36,6 @@ export const useDataViewTextFilterInput = ({ name, debounceMs = 500 }: { name: s
 			}))
 		}
 		setValue(e.target.value)
-
 	}, [debounceMs, setFilter])
 
 	return {

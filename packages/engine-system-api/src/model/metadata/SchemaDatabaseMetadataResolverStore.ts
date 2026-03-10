@@ -2,7 +2,6 @@ import { DatabaseContext } from '../database'
 import { DatabaseMetadata, DatabaseMetadataResolver } from '@contember/database'
 
 export class SchemaDatabaseMetadataResolverStore {
-
 	private cache: Map<string, DatabaseMetadata> = new Map()
 
 	constructor(
@@ -26,7 +25,6 @@ export class SchemaDatabaseMetadataResolverStore {
 		this.cache.delete(schema)
 	}
 }
-
 
 export class MigrationsDatabaseMetadataResolverStoreFactory {
 	constructor(

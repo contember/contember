@@ -13,14 +13,14 @@ export * from './queryable'
 export * from './Literal'
 export * from './types'
 export {
+	AcquiringListener,
 	asyncIterableTransaction,
-	wrapIdentifier,
-	formatColumnIdentifier,
-	retryTransaction,
 	ConstraintHelper,
-	withDatabaseAdvisoryLock,
 	createDatabaseIfNotExists,
 	createPgClientFactory,
+	formatColumnIdentifier,
 	Listener,
-	AcquiringListener,
+	retryTransaction,
+	withDatabaseAdvisoryLock,
+	wrapIdentifier,
 } from './utils'

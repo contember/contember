@@ -79,8 +79,6 @@ test('invite a new person', async () => {
 	})
 })
 
-
-
 test('invite a new person with password reset', async () => {
 	const languageId = testUuid(555)
 	const email = 'john@doe.com'
@@ -113,7 +111,12 @@ test('invite a new person with password reset', async () => {
 				getPersonByEmailSql({ email, response: null }),
 				createIdentitySql({ roles: ['person'], identityId }),
 				createPersonSql({ identityId, personId, email }),
-				createPersonTokenSql({ personId, tokenHash: '9692e67b8378a6f6753f97782d458aa757e947eab2fbdf6b5c187b74561eb78f', resetId: passwordTokenId, type: 'password_reset' }),
+				createPersonTokenSql({
+					personId,
+					tokenHash: '9692e67b8378a6f6753f97782d458aa757e947eab2fbdf6b5c187b74561eb78f',
+					resetId: passwordTokenId,
+					type: 'password_reset',
+				}),
 				createMembershipSql({ membershipId, projectId, identityId, role: 'editor' }),
 				patchVariablesSql({
 					id: variableId,
@@ -148,4 +151,3 @@ test('invite a new person with password reset', async () => {
 		},
 	})
 })
-

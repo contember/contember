@@ -21,7 +21,6 @@ type NodeFilter = (node: GraphQlFieldNode, path: string[]) => boolean
 type AnyNode = ObjectNode | FieldNode
 
 export class GraphQlQueryAstFactory {
-
 	public create<Args = any>(info: GraphQLResolveInfo, filter?: NodeFilter): ObjectNode<Args> {
 		const node = ResolveInfoUtils.extractFieldNode(info)
 		const parentType = info.parentType

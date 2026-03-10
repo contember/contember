@@ -1,6 +1,6 @@
 import type { ScopedConsoleContextType } from './Types'
 
-export function noopLog(...parameters: any[]) { }
+export function noopLog(...parameters: any[]) {}
 
 export function noopLogged<T>(message: string, value: T): T {
 	return value

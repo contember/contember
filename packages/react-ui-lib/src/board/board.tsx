@@ -30,7 +30,8 @@ export const BoardCardUI = uic('div', {
 	baseClass: 'rounded-sm border border-gray-200 bg-card text-card-foreground shadow-xs p-4 relative hover:shadow-md transition-all duration-200',
 })
 export const BoardColumnUI = uic('div', {
-	baseClass: 'rounded-lg border border-gray-200 bg-card text-card-foreground shadow-md relative min-w-48 data-[sortable-over="item"]:bg-yellow-100 hover:shadow-lg transition-all duration-200',
+	baseClass:
+		'rounded-lg border border-gray-200 bg-card text-card-foreground shadow-md relative min-w-48 data-[sortable-over="item"]:bg-yellow-100 hover:shadow-lg transition-all duration-200',
 })
 export const BoardDragOverlayUI = uic('div', {
 	baseClass: 'rounded-sm border border-gray-200 border-gray-300 p-4 relative bg-gray-100/60 backdrop-blur-xs',
@@ -121,17 +122,19 @@ export const BoardSortableColumn = Component<{
 			</div>
 		</BoardSortableEachColumn>
 
-		{nullColumnHeader && <BoardSortableNullColumn>
-			<BoardSortableNode>
-				<BoardColumnUI>
-					<BoardColumnHeaderUI>
-						{nullColumnHeader}
-					</BoardColumnHeaderUI>
-					{children}
-					{columnFooter}
-				</BoardColumnUI>
-			</BoardSortableNode>
-		</BoardSortableNullColumn>}
+		{nullColumnHeader && (
+			<BoardSortableNullColumn>
+				<BoardSortableNode>
+					<BoardColumnUI>
+						<BoardColumnHeaderUI>
+							{nullColumnHeader}
+						</BoardColumnHeaderUI>
+						{children}
+						{columnFooter}
+					</BoardColumnUI>
+				</BoardSortableNode>
+			</BoardSortableNullColumn>
+		)}
 	</>
 ))
 export const BoardNonSortableColumn = Component<{
@@ -151,18 +154,19 @@ export const BoardNonSortableColumn = Component<{
 			</BoardColumnUI>
 		</BoardEachColumn>
 
-		{nullColumnHeader && <BoardNullColumn>
-			<BoardColumnUI>
-				<BoardColumnHeaderUI>
-					{nullColumnHeader}
-				</BoardColumnHeaderUI>
-				{children}
-				{columnFooter}
-			</BoardColumnUI>
-		</BoardNullColumn>}
+		{nullColumnHeader && (
+			<BoardNullColumn>
+				<BoardColumnUI>
+					<BoardColumnHeaderUI>
+						{nullColumnHeader}
+					</BoardColumnHeaderUI>
+					{children}
+					{columnFooter}
+				</BoardColumnUI>
+			</BoardNullColumn>
+		)}
 	</>
 ))
-
 
 export type DefaultBoardProps =
 	& {
@@ -212,29 +216,39 @@ export const DefaultBoard = Component<DefaultBoardProps>(({ columnHeader, nullCo
 					</BoardSortableColumn>
 				</BoardWrapperUI>
 
-				{columnsSortable ? <BoardSortableColumnDragOverlay>
-					<BoardDragOverlayUI>
-						{columnHeader}
-					</BoardDragOverlayUI>
-				</BoardSortableColumnDragOverlay> : null}
+				{columnsSortable
+					? (
+						<BoardSortableColumnDragOverlay>
+							<BoardDragOverlayUI>
+								{columnHeader}
+							</BoardDragOverlayUI>
+						</BoardSortableColumnDragOverlay>
+					)
+					: null}
 
-				{itemsSortable ? <BoardSortableItemDragOverlay>
-					<BoardDragOverlayUI>
-						{children}
-					</BoardDragOverlayUI>
-				</BoardSortableItemDragOverlay> : null}
+				{itemsSortable
+					? (
+						<BoardSortableItemDragOverlay>
+							<BoardDragOverlayUI>
+								{children}
+							</BoardDragOverlayUI>
+						</BoardSortableItemDragOverlay>
+					)
+					: null}
 			</BoardSortable>
 		</Board>
 	)
 }, ({ children, columnHeader, nullColumnHeader, ...props }) => {
-	return <>
-		<Board {...props as BoardProps}>
-			<BoardItem>
-				{children}
-			</BoardItem>
-			<BoardColumn>
-				{columnHeader}
-			</BoardColumn>
-		</Board>
-	</>
+	return (
+		<>
+			<Board {...props as BoardProps}>
+				<BoardItem>
+					{children}
+				</BoardItem>
+				<BoardColumn>
+					{columnHeader}
+				</BoardColumn>
+			</Board>
+		</>
+	)
 })

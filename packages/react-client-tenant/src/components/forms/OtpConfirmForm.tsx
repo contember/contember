@@ -46,7 +46,7 @@ export const OtpConfirmForm = ({ children, onSuccess }: OtpConfirmFormProps) => 
 			}}
 			execute={async ({ values }) => {
 				return await confirmOtp({
-					 otpToken: values.otpToken,
+					otpToken: values.otpToken,
 				})
 			}}
 			errorMapping={{
@@ -58,4 +58,3 @@ export const OtpConfirmForm = ({ children, onSuccess }: OtpConfirmFormProps) => 
 		</TenantForm>
 	)
 }
-

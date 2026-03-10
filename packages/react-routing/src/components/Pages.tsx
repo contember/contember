@@ -52,70 +52,69 @@ export const Pages = ({ children, layout, ErrorBoundary = Fragment, suspenseFall
 			if (Array.isArray(children)) {
 				if (children.every(child => isPageProviderElement(child))) {
 					return new Map(children.map(child => [child.type.getPageName(child.props), disallowAction(() => child)]))
-
 				} else {
 					throw new Error('Pages has a child which is not a Page')
 				}
-
 			} else if (isPageProviderElement(children)) {
 				return new Map([[children.type.getPageName(children.props), disallowAction(() => children)]])
-
 			} else {
 				const modules = Object.entries(children).filter(([k, v]) => isLazyPageModule(k, v) || isEagerPageModule(k, v))
 				const modulesPrefix = findPrefix(modules.map(it => it[0]))
 				const getPageNameFromFile = (name: string) => pageNameIn(name.slice(modulesPrefix.length, -4))
 
-				return new Map(Object.entries(children).flatMap(([k, v]): [string, PageActionHandler][] => {
-					if (isLazyPageModule(k, v)) { // children={import.meta.glob('./pages/**/*.tsx')}
-						const pageName = getPageNameFromFile(k)
+				return new Map(
+					Object.entries(children).flatMap(([k, v]): [string, PageActionHandler][] => {
+						if (isLazyPageModule(k, v)) { // children={import.meta.glob('./pages/**/*.tsx')}
+							const pageName = getPageNameFromFile(k)
 
-						const PageActionHandler = (props: { action?: string }) => {
-							const Lazy = lazy(async () => {
-								const module = normalizeModule(await v())
-								const page = module[props.action ?? 'default']
+							const PageActionHandler = (props: { action?: string }) => {
+								const Lazy = lazy(async () => {
+									const module = normalizeModule(await v())
+									const page = module[props.action ?? 'default']
 
-								if (page === undefined) {
+									if (page === undefined) {
+										throw new Error(`No such page as ${pageName}${props.action ? '/' + props.action : ''}.`)
+									}
+
+									return { default: isValidElement<any>(page) ? () => page : page }
+								})
+
+								return (
+									<Suspense fallback={suspenseFallback}>
+										<Lazy />
+									</Suspense>
+								)
+							}
+
+							return [[pageName, PageActionHandler]]
+						} else if (isEagerPageModule(k, v)) { // children={import.meta.glob('./pages/**/*.tsx', { eager: false })}
+							const pageName = getPageNameFromFile(k)
+							const module = normalizeModule(v)
+
+							const PageActionHandler = (props: { action?: string }) => {
+								const Page = module[props.action ?? 'default']
+
+								if (Page === undefined) {
 									throw new Error(`No such page as ${pageName}${props.action ? '/' + props.action : ''}.`)
 								}
 
-								return { default: isValidElement<any>(page) ? () => page : page }
-							})
-
-							return <Suspense fallback={suspenseFallback}><Lazy /></Suspense>
-						}
-
-						return [[pageName, PageActionHandler]]
-
-					} else if (isEagerPageModule(k, v)) { // children={import.meta.glob('./pages/**/*.tsx', { eager: false })}
-						const pageName = getPageNameFromFile(k)
-						const module = normalizeModule(v)
-
-						const PageActionHandler = (props: { action?: string }) => {
-							const Page = module[props.action ?? 'default']
-
-							if (Page === undefined) {
-								throw new Error(`No such page as ${pageName}${props.action ? '/' + props.action : ''}.`)
+								return isValidElement<any>(Page) ? Page : <Page />
 							}
 
-							return isValidElement<any>(Page) ? Page : <Page />
-						}
-
-						return [[pageName, PageActionHandler]]
-
-					} else {
-						const pageName = lowerFirst(k)
-
-						if (isPageProviderElement(v)) {
-							return [[v.type.getPageName(v.props, pageName), disallowAction(() => v)]]
-
-						} else if (isValidElement<any>(v)) {
-							return [[pageName, disallowAction(() => v)]]
-
+							return [[pageName, PageActionHandler]]
 						} else {
-							return [[pageName, disallowAction(v)]]
+							const pageName = lowerFirst(k)
+
+							if (isPageProviderElement(v)) {
+								return [[v.type.getPageName(v.props, pageName), disallowAction(() => v)]]
+							} else if (isValidElement<any>(v)) {
+								return [[pageName, disallowAction(() => v)]]
+							} else {
+								return [[pageName, disallowAction(v)]]
+							}
 						}
-					}
-				}))
+					}),
+				)
 			}
 		},
 		[children, suspenseFallback],
@@ -126,7 +125,7 @@ export const Pages = ({ children, layout, ErrorBoundary = Fragment, suspenseFall
 	}
 
 	let pageKey = request.pageName
-	let pageAction 
+	let pageAction
 	let Page = pageMap.get(pageKey)
 
 	if (Page === undefined) {
@@ -191,7 +190,6 @@ function disallowAction(Component: ComponentType): PageActionHandler {
 		return <Component />
 	}
 }
-
 
 function isPageProvider(it: any): it is PageProvider<any> {
 	return typeof it.getPageName === 'function'

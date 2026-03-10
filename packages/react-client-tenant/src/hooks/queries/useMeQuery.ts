@@ -6,10 +6,11 @@ import { useCallback } from 'react'
 const identityFragment = TenantApi
 	.identity$$
 	.person(TenantApi.person$.id.email.name.otpEnabled)
-	.projects(TenantApi
-		.identityProjectRelation$
-		.project(TenantApi.project$$)
-		.memberships(TenantApi.membership$$.variables(TenantApi.variableEntry$$)),
+	.projects(
+		TenantApi
+			.identityProjectRelation$
+			.project(TenantApi.project$$)
+			.memberships(TenantApi.membership$$.variables(TenantApi.variableEntry$$)),
 	)
 	.permissions(TenantApi.identityGlobalPermissions$$)
 

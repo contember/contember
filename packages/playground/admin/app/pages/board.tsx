@@ -38,13 +38,13 @@ export const Assignee = () => (
 			nullColumnHeader={
 				<div className="text-lg font-semibold italic">
 					Without assignee
-				</div>}
+				</div>
+			}
 		>
 			<PersistOnHasOneChange field="assignee" />
 			<PersistOnFieldChange field="order" />
 			<Field field={'title'} />
 		</DefaultBoard>
-
 	</Binding>
 )
 
@@ -68,7 +68,8 @@ export const Status = () => (
 			nullColumnHeader={
 				<div className="text-lg font-semibold italic">
 					Without status
-				</div>}
+				</div>
+			}
 		>
 			<PersistOnFieldChange field="status" />
 			<PersistOnFieldChange field="order" />

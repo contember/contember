@@ -47,44 +47,45 @@ export class InsertBuilder {
 	}
 
 	public async execute(mapper: Mapper): Promise<InsertResult> {
-			const resolvedData = [...this.rowData.values()]
+		const resolvedData = [...this.rowData.values()]
 
-			const insertData = resolvedData.reduce<QueryBuilder.ColumnExpressionMap>(
-				(result, item) => ({ ...result, [item.columnName]: expr => expr.select(['root_', item.columnName]) }),
-				{},
-			)
-			const qb = DbInsertBuilder.create()
-				.with('root_', qb => {
-					return resolvedData.reduce(
-						(qb, value) =>
-							qb.select(
-								expr => expr.selectValue(
+		const insertData = resolvedData.reduce<QueryBuilder.ColumnExpressionMap>(
+			(result, item) => ({ ...result, [item.columnName]: expr => expr.select(['root_', item.columnName]) }),
+			{},
+		)
+		const qb = DbInsertBuilder.create()
+			.with('root_', qb => {
+				return resolvedData.reduce(
+					(qb, value) =>
+						qb.select(
+							expr =>
+								expr.selectValue(
 									normalizeDbValue(value.value, value.columnType),
 									value.columnType,
 								),
-								value.columnName,
-							),
-						qb,
-					)
-				})
-				.into(this.entity.tableName)
-				.values(insertData)
-				.from(qb => {
-					qb = qb.from('root_')
-					return this.whereBuilder.build(qb, this.entity, this.pathFactory.create([]), this.where)
-				})
-				.returning(this.entity.primaryColumn)
+							value.columnName,
+						),
+					qb,
+				)
+			})
+			.into(this.entity.tableName)
+			.values(insertData)
+			.from(qb => {
+				qb = qb.from('root_')
+				return this.whereBuilder.build(qb, this.entity, this.pathFactory.create([]), this.where)
+			})
+			.returning(this.entity.primaryColumn)
 
-			const beforeInsertEvent = new BeforeInsertEvent(this.entity, resolvedData)
-			await mapper.eventManager.fire(beforeInsertEvent)
+		const beforeInsertEvent = new BeforeInsertEvent(this.entity, resolvedData)
+		await mapper.eventManager.fire(beforeInsertEvent)
 
-			const returning = (await qb.execute(mapper.db)).map(it => it[this.entity.primaryColumn])
-			const result = returning.length === 1 ? returning[0] : null
+		const returning = (await qb.execute(mapper.db)).map(it => it[this.entity.primaryColumn])
+		const result = returning.length === 1 ? returning[0] : null
 
-			const afterInsertEvent = new AfterInsertEvent(this.entity, resolvedData, result)
-			beforeInsertEvent.afterEvent = afterInsertEvent
-			await mapper.eventManager.fire(afterInsertEvent)
+		const afterInsertEvent = new AfterInsertEvent(this.entity, resolvedData, result)
+		beforeInsertEvent.afterEvent = afterInsertEvent
+		await mapper.eventManager.fire(afterInsertEvent)
 
-			return { values: resolvedData, executed: true, primaryValue: result }
+		return { values: resolvedData, executed: true, primaryValue: result }
 	}
 }

@@ -4,7 +4,6 @@ import { EventCause } from './TriggerHandler'
 import { TriggerPayloadBuilder } from './TriggerPayloadBuilder'
 import { TriggerPayloadPersister } from './TriggerPayloadPersister'
 
-
 export interface FiredEvent {
 	listener: AnyListener
 	cause: EventCause
@@ -29,7 +28,6 @@ export class TriggerPayloadManager {
 		this.eventsByTrigger[firedEvent.listener.trigger.name].push(event)
 	}
 
-
 	public async persist(): Promise<void> {
 		for (const events of Object.values(this.eventsByTrigger)) {
 			const payloads = await this.triggerPayloadBuilder.build(events)
@@ -38,4 +36,3 @@ export class TriggerPayloadManager {
 		}
 	}
 }
-

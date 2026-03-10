@@ -35,7 +35,7 @@ test('delete', async () => {
 				{
 					sql: SQL`delete from "public"."site" where "id" in (?)`,
 					parameters: [testUuid(1)],
-					response: {  },
+					response: {},
 				},
 			]),
 		],
@@ -48,7 +48,6 @@ test('delete', async () => {
 		},
 	})
 })
-
 
 test('delete', async () => {
 	await execute({
@@ -103,7 +102,6 @@ test('delete', async () => {
 	})
 })
 
-
 test('delete - denied', async () => {
 	await execute({
 		schema: siteSettingSchema,
@@ -143,4 +141,3 @@ test('delete - denied', async () => {
 		},
 	})
 })
-

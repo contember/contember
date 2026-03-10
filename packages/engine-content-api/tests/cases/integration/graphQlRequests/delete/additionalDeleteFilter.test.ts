@@ -31,7 +31,7 @@ test('delete post with additional filter', async () => {
 				{
 					sql: SQL`delete from "public"."post" where "id" in (?)`,
 					parameters: [testUuid(1)],
-					response: {  },
+					response: {},
 				},
 			]),
 		],
@@ -44,4 +44,3 @@ test('delete post with additional filter', async () => {
 		},
 	})
 })
-

@@ -10,4 +10,3 @@ export const SinglePermission = ({ predicate, value }: { predicate?: Acl.Predica
 	}
 	return <span class={'bg-yellow-400 text-black font-semibold px-0.5'} title={predicate}>{value}</span>
 }
-

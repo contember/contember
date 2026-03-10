@@ -45,5 +45,4 @@ export const useRedirectToBacklink = () => {
 		}
 		redirect()
 	}, [identity, redirect])
-
 }

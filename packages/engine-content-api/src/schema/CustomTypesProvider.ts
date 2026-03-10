@@ -20,11 +20,10 @@ function validateTime(value: unknown): string {
 	return `${hours}:${minutes}:${seconds}${fraction}`
 }
 
-
 export class CustomTypesProvider {
 	public readonly uuidType: GraphQLScalarType = UuidType
 
-	//todo: implement serialize, parseValue and parseLiteral properly
+	// todo: implement serialize, parseValue and parseLiteral properly
 
 	public readonly dateType: GraphQLScalarType = new GraphQLScalarType({
 		name: 'Date',

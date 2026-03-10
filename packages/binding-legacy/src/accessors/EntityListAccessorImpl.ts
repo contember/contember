@@ -1,11 +1,20 @@
 import type { EntityListState } from '../core/state'
 import type { ListOperations } from '../core/operations'
-import { EntityAccessor, EntityId, EntityListSubTreeMarker, EntityName, EntityRealmKey, Environment, ErrorAccessor,
-	HasManyRelationMarker, RuntimeId } from '@contember/binding-common'
+import {
+	EntityAccessor,
+	EntityId,
+	EntityListSubTreeMarker,
+	EntityName,
+	EntityRealmKey,
+	Environment,
+	ErrorAccessor,
+	HasManyRelationMarker,
+	RuntimeId,
+} from '@contember/binding-common'
 import { EntityListAccessor } from '@contember/binding-common'
 
 export class EntityListAccessorImpl implements EntityListAccessor {
-	public readonly  __type = 'EntityListAccessor' as const
+	public readonly __type = 'EntityListAccessor' as const
 
 	public constructor(
 		private readonly state: EntityListState,
@@ -25,13 +34,13 @@ export class EntityListAccessorImpl implements EntityListAccessor {
 	 * **KEYS ARE NOT IDS!**
 	 * @see EntityAccessor.key
 	 */
-	public* keys(): IterableIterator<EntityRealmKey> {
+	public *keys(): IterableIterator<EntityRealmKey> {
 		for (const accessor of this) {
 			yield accessor.key!
 		}
 	}
 
-	public* ids(): IterableIterator<EntityId> {
+	public *ids(): IterableIterator<EntityId> {
 		yield* this._children.keys()
 	}
 
@@ -43,7 +52,7 @@ export class EntityListAccessorImpl implements EntityListAccessor {
 		return new Set(this._idsPersistedOnServer)
 	}
 
-	public* [Symbol.iterator](): IterableIterator<EntityAccessor> {
+	public *[Symbol.iterator](): IterableIterator<EntityAccessor> {
 		for (const { getAccessor } of this._children.values()) {
 			yield getAccessor()
 		}

@@ -11,7 +11,6 @@ const exists = async (path: string) => {
 		return false
 	}
 }
-
 ;(async () => {
 	const [{}, {}, aName, bName] = process.argv
 	const resultsPath = path.join(__dirname, '/../../results/')

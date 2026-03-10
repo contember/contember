@@ -5,7 +5,6 @@ import deepEqual from 'fast-deep-equal'
 import { updateRelations } from '../utils/diffUtils'
 
 export class UpdateRelationOrderByModificationHandler implements ModificationHandler<UpdateRelationOrderByModificationData> {
-
 	constructor(private readonly data: UpdateRelationOrderByModificationData, private readonly schema: Schema) {}
 
 	public createSql(): void {}
@@ -45,10 +44,10 @@ export class UpdateRelationOrderByDiffer implements Differ {
 			const isItOrderable = (relation: Model.AnyRelation): relation is Model.OrderableRelation & Model.AnyRelation =>
 				relation.type === Model.RelationType.ManyHasMany || relation.type === Model.RelationType.OneHasMany
 			if (
-				updatedRelation.type === originalRelation.type &&
-				isItOrderable(updatedRelation) &&
-				isItOrderable(originalRelation) &&
-				!deepEqual(updatedRelation.orderBy || [], originalRelation.orderBy || [])
+				updatedRelation.type === originalRelation.type
+				&& isItOrderable(updatedRelation)
+				&& isItOrderable(originalRelation)
+				&& !deepEqual(updatedRelation.orderBy || [], originalRelation.orderBy || [])
 			) {
 				return updateRelationOrderByModification.createModification({
 					entityName: updatedEntity.name,

@@ -7,7 +7,8 @@ import {
 	DataViewBooleanFilter,
 	DataViewDateFilter,
 	DataViewElement,
-	DataViewEnumFilter, DataViewEnumListFilter,
+	DataViewEnumFilter,
+	DataViewEnumListFilter,
 	DataViewHasManyFilter,
 	DataViewHasOneFilter,
 	DataViewIsDefinedFilter,
@@ -93,14 +94,16 @@ export type DataGridTextColumnProps = {
  */
 export const DataGridTextColumn = Component<DataGridTextColumnProps>(({ field, header, children, format, filter }) => (
 	<DataGridColumn
-		header={header ?? <DataViewFieldLabel field={field}/>}
+		header={header ?? <DataViewFieldLabel field={field} />}
 		sortingField={field}
 		name={field}
 		children={children ?? <Field field={field} format={format} />}
 		filterName={field}
-		filter={filter ?? <DataViewTextFilter field={field}>
-			<DataGridTextFilterInner />
-		</DataViewTextFilter>}
+		filter={filter ?? (
+			<DataViewTextFilter field={field}>
+				<DataGridTextFilterInner />
+			</DataViewTextFilter>
+		)}
 	/>
 ))
 
@@ -147,11 +150,13 @@ export const DataGridBooleanColumn = Component<DataGridBooleanColumnProps>(({ fi
 		name={field}
 		children={children ?? <Field field={field} format={format ?? formatBoolean} />}
 		filterName={field}
-		filter={filter ?? <DataViewBooleanFilter field={field}>
-			<div className="border border-gray-200 rounded-sm p-2">
-				<DataGridBooleanFilterControls />
-			</div>
-		</DataViewBooleanFilter>}
+		filter={filter ?? (
+			<DataViewBooleanFilter field={field}>
+				<div className="border border-gray-200 rounded-sm p-2">
+					<DataGridBooleanFilterControls />
+				</div>
+			</DataViewBooleanFilter>
+		)}
 	/>
 ))
 
@@ -198,11 +203,13 @@ export const DataGridNumberColumn = Component<DataGridNumberColumnProps>(({ fiel
 		name={field}
 		children={children ?? <Field field={field} format={format ?? formatNumber} />}
 		filterName={field}
-		filter={filter ?? <DataViewNumberFilter field={field}>
-			<div className="border border-gray-200 rounded-sm max-w-60 p-2">
-				<DataGridNumberFilterControls/>
-			</div>
-		</DataViewNumberFilter>}
+		filter={filter ?? (
+			<DataViewNumberFilter field={field}>
+				<div className="border border-gray-200 rounded-sm max-w-60 p-2">
+					<DataGridNumberFilterControls />
+				</div>
+			</DataViewNumberFilter>
+		)}
 	/>
 ))
 /**
@@ -248,11 +255,13 @@ export const DataGridDateColumn = Component<DataGridDateColumnProps>(({ field, h
 		name={field}
 		children={children ?? <Field field={field} format={format ?? formatDate} />}
 		filterName={field}
-		filter={filter ?? <DataViewDateFilter field={field}>
-			<div className="border border-gray-200 rounded-sm">
-				<DataGridDateFilterControls layout="row"/>
-			</div>
-		</DataViewDateFilter>}
+		filter={filter ?? (
+			<DataViewDateFilter field={field}>
+				<div className="border border-gray-200 rounded-sm">
+					<DataGridDateFilterControls layout="row" />
+				</div>
+			</DataViewDateFilter>
+		)}
 	/>
 ))
 
@@ -299,12 +308,13 @@ export const DataGridDateTimeColumn = Component<DataGridDateTimeColumnProps>(({ 
 		name={field}
 		children={children ?? <Field field={field} format={format ?? formatDateTime} />}
 		filterName={field}
-		filter={filter ?? <DataViewDateFilter field={field}>
-			<div className="border border-gray-200 rounded-sm">
-				<DataGridDateFilterControls layout="row" />
-			</div>
-		</DataViewDateFilter>}
-
+		filter={filter ?? (
+			<DataViewDateFilter field={field}>
+				<div className="border border-gray-200 rounded-sm">
+					<DataGridDateFilterControls layout="row" />
+				</div>
+			</DataViewDateFilter>
+		)}
 	/>
 ))
 
@@ -312,7 +322,6 @@ export const DataGridDateTimeColumn = Component<DataGridDateTimeColumnProps>(({ 
  * Props for {@link DataGridEnumColumn}.
  */
 export type DataGridEnumColumnProps = {
-
 	/**
 	 * Displayed field.
 	 */
@@ -355,28 +364,29 @@ export type DataGridEnumColumnProps = {
  * </DataGridTable>
  * ```
  */
-export const DataGridEnumColumn = Component<DataGridEnumColumnProps>(({ field, header, options, children, tooltipActions, filter }) => (<>
-	<DataGridColumn
-		header={header ?? <DataViewFieldLabel field={field} />}
-		sortingField={field}
-		name={field}
-		children={children ?? <DataGridEnumCell field={field} options={options} tooltipActions={tooltipActions} />}
-		filterName={field}
-		filter={filter ?? <DataViewEnumFilter field={field}>
-			<div className="max-w-60 border border-gray-200 rounded-sm p-2">
-				<DataGridEnumFilterControls options={options} />
-			</div>
-		</DataViewEnumFilter>}
-	/>
-</>))
-
-
+export const DataGridEnumColumn = Component<DataGridEnumColumnProps>(({ field, header, options, children, tooltipActions, filter }) => (
+	<>
+		<DataGridColumn
+			header={header ?? <DataViewFieldLabel field={field} />}
+			sortingField={field}
+			name={field}
+			children={children ?? <DataGridEnumCell field={field} options={options} tooltipActions={tooltipActions} />}
+			filterName={field}
+			filter={filter ?? (
+				<DataViewEnumFilter field={field}>
+					<div className="max-w-60 border border-gray-200 rounded-sm p-2">
+						<DataGridEnumFilterControls options={options} />
+					</div>
+				</DataViewEnumFilter>
+			)}
+		/>
+	</>
+))
 
 /**
  * Props for {@link DataGridEnumListColumn}.
  */
 export type DataGridEnumListColumnProps = {
-
 	/**
 	 * Displayed field.
 	 */
@@ -418,20 +428,23 @@ export type DataGridEnumListColumnProps = {
  * </DataGridTable>
  * ```
  */
-export const DataGridEnumListColumn = Component<DataGridEnumListColumnProps>(({ field, header, options, children, tooltipActions, filter }) => (<>
-	<DataGridColumn
-		header={header ?? <DataViewFieldLabel field={field} />}
-		name={field}
-		children={children ?? <DataGridEnumListCell field={field} options={options} tooltipActions={tooltipActions} />}
-		filterName={field}
-		filter={filter ?? <DataViewEnumListFilter field={field}>
-			<div className="max-w-60 border border-gray-200 rounded-sm p-2">
-				<DataGridEnumFilterControls options={options} />
-			</div>
-		</DataViewEnumListFilter>}
-	/>
-</>))
-
+export const DataGridEnumListColumn = Component<DataGridEnumListColumnProps>(({ field, header, options, children, tooltipActions, filter }) => (
+	<>
+		<DataGridColumn
+			header={header ?? <DataViewFieldLabel field={field} />}
+			name={field}
+			children={children ?? <DataGridEnumListCell field={field} options={options} tooltipActions={tooltipActions} />}
+			filterName={field}
+			filter={filter ?? (
+				<DataViewEnumListFilter field={field}>
+					<div className="max-w-60 border border-gray-200 rounded-sm p-2">
+						<DataGridEnumFilterControls options={options} />
+					</div>
+				</DataViewEnumListFilter>
+			)}
+		/>
+	</>
+))
 
 /**
  * Props for {@link DataGridIsDefinedColumn}.
@@ -477,16 +490,23 @@ export const DataGridIsDefinedColumn = Component<DataGridIsDefinedColumnProps>((
 	<DataGridColumn
 		header={header ?? <DataViewFieldLabel field={field} />}
 		name={field}
-		children={children ?? <Field field={field} format={it => {
-			if (format) {
-				return format(it !== null)
-			}
-			return it !== null ? <CheckIcon size={16} /> : <XIcon size={16} />
-		}} />}
+		children={children ?? (
+			<Field
+				field={field}
+				format={it => {
+					if (format) {
+						return format(it !== null)
+					}
+					return it !== null ? <CheckIcon size={16} /> : <XIcon size={16} />
+				}}
+			/>
+		)}
 		filterName={filterName ?? field}
-		filter={filter ?? <DataViewIsDefinedFilter field={field} name={filterName}>
-			<DataGridIsDefinedFilterControls />
-		</DataViewIsDefinedFilter>}
+		filter={filter ?? (
+			<DataViewIsDefinedFilter field={field} name={filterName}>
+				<DataGridIsDefinedFilterControls />
+			</DataViewIsDefinedFilter>
+		)}
 	/>
 ))
 
@@ -511,7 +531,6 @@ export type DataGridUuidColumnProps = {
 	 */
 	format?: (value: string | null) => ReactNode
 }
-
 
 /**
  * Renders a column with UUID content. Should be used in a {@link DataGridTable}.
@@ -573,18 +592,20 @@ export const DataGridHasOneColumn = Component<DataGridHasOneColumnProps>(({ fiel
 		name={typeof field === 'string' ? field : undefined}
 		children={<DataGridHasOneCell field={field} filterName={filterName} tooltipActions={tooltipActions}>{children}</DataGridHasOneCell>}
 		filterName={filterName ?? (typeof field === 'string' ? field : undefined)}
-		filter={filter ?? <DataViewHasOneFilter field={field} name={filterName}>
-			<div className="border border-gray-200 rounded-sm p-2 max-w-60 flex flex-col gap-2">
-				<div className="flex flex-wrap gap-2">
-					<DataGridRelationFilteredItemsList>
+		filter={filter ?? (
+			<DataViewHasOneFilter field={field} name={filterName}>
+				<div className="border border-gray-200 rounded-sm p-2 max-w-60 flex flex-col gap-2">
+					<div className="flex flex-wrap gap-2">
+						<DataGridRelationFilteredItemsList>
+							{children}
+						</DataGridRelationFilteredItemsList>
+					</div>
+					<DataGridRelationFilterControls>
 						{children}
-					</DataGridRelationFilteredItemsList>
+					</DataGridRelationFilterControls>
 				</div>
-				<DataGridRelationFilterControls>
-					{children}
-				</DataGridRelationFilterControls>
-			</div>
-		</DataViewHasOneFilter>}
+			</DataViewHasOneFilter>
+		)}
 	/>
 ))
 
@@ -636,18 +657,20 @@ export const DataGridHasManyColumn = Component<DataGridHasManyColumnProps>(({ fi
 		name={typeof field === 'string' ? field : undefined}
 		children={<DataGridHasManyCell field={field} filterName={filterName} tooltipActions={tooltipActions}>{children}</DataGridHasManyCell>}
 		filterName={filterName ?? (typeof field === 'string' ? field : undefined)}
-		filter={filter ?? <DataViewHasManyFilter field={field} name={filterName}>
-			<div className="border border-gray-200 rounded-sm p-2 max-w-60 flex flex-col gap-2">
-				<div className="flex flex-wrap gap-2">
-					<DataGridRelationFilteredItemsList>
+		filter={filter ?? (
+			<DataViewHasManyFilter field={field} name={filterName}>
+				<div className="border border-gray-200 rounded-sm p-2 max-w-60 flex flex-col gap-2">
+					<div className="flex flex-wrap gap-2">
+						<DataGridRelationFilteredItemsList>
+							{children}
+						</DataGridRelationFilteredItemsList>
+					</div>
+					<DataGridRelationFilterControls>
 						{children}
-					</DataGridRelationFilteredItemsList>
+					</DataGridRelationFilterControls>
 				</div>
-				<DataGridRelationFilterControls>
-					{children}
-				</DataGridRelationFilterControls>
-			</div>
-		</DataViewHasManyFilter>}
+			</DataViewHasManyFilter>
+		)}
 	/>
 ))
 
@@ -669,25 +692,25 @@ export type DataGridColumnProps = {
 /**
  * Low-level component for rendering a column in a data grid.
  */
-export const DataGridColumn = Component<DataGridColumnProps>(({ children, header, name, hidingName, sortingField, cellClassName, headerClassName, filter, filterName }) => {
-	const wrapIsVisible = (child: ReactNode) => {
-		const resolvedName = hidingName ?? name
-		return resolvedName ? <DataViewElement name={resolvedName} label={header}>{child}</DataViewElement> : child
-	}
+export const DataGridColumn = Component<DataGridColumnProps>(
+	({ children, header, name, hidingName, sortingField, cellClassName, headerClassName, filter, filterName }) => {
+		const wrapIsVisible = (child: ReactNode) => {
+			const resolvedName = hidingName ?? name
+			return resolvedName ? <DataViewElement name={resolvedName} label={header}>{child}</DataViewElement> : child
+		}
 
-	return (
-		<DataGridColumnLeaf
-			name={name}
-			header={
-				wrapIsVisible(
+		return (
+			<DataGridColumnLeaf
+				name={name}
+				header={wrapIsVisible(
 					<TableHead className={cn('text-center', headerClassName)}>
 						<DataGridColumnHeader hidingName={hidingName ?? name} sortingField={sortingField} filter={filter} filterName={filterName}>
 							{header}
 						</DataGridColumnHeader>
 					</TableHead>,
-				)
-			}
-			cell={wrapIsVisible(<TableCell className={cellClassName}>{children}</TableCell>)}
-		/>
-	)
-})
+				)}
+				cell={wrapIsVisible(<TableCell className={cellClassName}>{children}</TableCell>)}
+			/>
+		)
+	},
+)

@@ -9,7 +9,6 @@ import { getPersonByEmailSql } from './sql/getPersonByEmailSql'
 import { getPersonByIdSql } from './sql/getPersonByIdSql'
 
 test('changes my name and email', async () => {
-
 	const personId = testUuid(1)
 	const identityId = authenticatedIdentityId
 	const email = 'jane@doe.com'
@@ -40,4 +39,3 @@ test('changes my name and email', async () => {
 		}),
 	})
 })
-

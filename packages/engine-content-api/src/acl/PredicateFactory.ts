@@ -106,7 +106,6 @@ export class PredicateFactory {
 		}
 		const where: Input.Where = predicatesWhere.length === 1 ? predicatesWhere[0] : { and: predicatesWhere }
 		return this.optimizePredicates(where, relationContext)
-
 	}
 
 	private getRequiredPredicates(

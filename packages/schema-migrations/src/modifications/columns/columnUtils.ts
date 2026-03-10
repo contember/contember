@@ -11,7 +11,6 @@ export const fillSeed = ({ builder, entity, columnName, nullable, type, seedExpr
 	type: 'creating' | 'updating'
 	seedExpression: string
 }) => {
-
 	const where = type === 'updating' ? ` WHERE ${wrapIdentifier(columnName)} IS NULL` : ''
 	builder.sql(`UPDATE ${wrapIdentifier(entity.tableName)}
 				 SET ${wrapIdentifier(columnName)} = ${seedExpression}${where}`)
@@ -26,7 +25,6 @@ export const fillSeed = ({ builder, entity, columnName, nullable, type, seedExpr
 		})
 	}
 }
-
 
 export const formatSeedExpression = ({ model, entity, columnType, fillValue, copyValue }: {
 	model: Model.Schema

@@ -11,8 +11,6 @@ const schema = createSchema({
 })
 
 describe('Not empty rule', () => {
-
-
 	it('fails when value not valid #1', async () => {
 		await testCreate({
 			schema,
@@ -47,5 +45,3 @@ describe('Not empty rule', () => {
 		})
 	})
 })
-
-

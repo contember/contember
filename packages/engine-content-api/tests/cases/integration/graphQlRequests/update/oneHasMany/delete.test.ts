@@ -49,7 +49,6 @@ test('delete', async () => {
 	})
 })
 
-
 test('delete - denied', async () => {
 	await execute({
 		schema: postWithLocale,

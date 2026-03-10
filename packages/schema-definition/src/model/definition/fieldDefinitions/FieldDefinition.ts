@@ -8,7 +8,7 @@ export abstract class FieldDefinition<O> {
 }
 
 export type CreateFieldContext =
-	&  {
+	& {
 		name: string
 		entityName: string
 	}

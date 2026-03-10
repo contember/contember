@@ -134,10 +134,11 @@ export class EntityAccessorImpl implements EntityAccessor {
 
 		TreeNodeUtils.resolveColumn(entity.environment, field.field)
 
-		throw new BindingError(''
-			+ 'EntityAccessor: cannot access field '
-			+ `'${field.field}' on ${TreeNodeUtils.describeLocation(entity.environment)}.\n`
-			+ 'The cause of the error is that this relation has not been registered during the static rendering process. As a result, it lacks a required marker and accessor.',
+		throw new BindingError(
+			''
+				+ 'EntityAccessor: cannot access field '
+				+ `'${field.field}' on ${TreeNodeUtils.describeLocation(entity.environment)}.\n`
+				+ 'The cause of the error is that this relation has not been registered during the static rendering process. As a result, it lacks a required marker and accessor.',
 		)
 	}
 
@@ -201,13 +202,14 @@ export class EntityAccessorImpl implements EntityAccessor {
 
 	private raiseUndefinedRelationError(field: string, environment: Environment, relationParams: any, otherMarkersParams: any[]): never {
 		const hint = this.createHintMessage(otherMarkersParams)
-		throw new BindingError(''
-			+ `EntityAccessor: cannot access relation `
-			+ `'${field}' on ${TreeNodeUtils.describeLocation(environment)}.\n`
-			+ 'The cause of the error is that this relation has not been registered during the static rendering process. As a result, it lacks a required marker and accessor.\n\n'
-			+ 'Provided parameters:\n'
-			+ JSON.stringify(relationParams)
-			+ hint,
+		throw new BindingError(
+			''
+				+ `EntityAccessor: cannot access relation `
+				+ `'${field}' on ${TreeNodeUtils.describeLocation(environment)}.\n`
+				+ 'The cause of the error is that this relation has not been registered during the static rendering process. As a result, it lacks a required marker and accessor.\n\n'
+				+ 'Provided parameters:\n'
+				+ JSON.stringify(relationParams)
+				+ hint,
 		)
 	}
 

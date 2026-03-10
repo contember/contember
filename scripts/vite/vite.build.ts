@@ -13,13 +13,17 @@ const extraEntrypoints = {
 }
 
 export default defineConfig(({ command, mode }) => {
-
-	const inputs = Object.fromEntries(Array.from(packages.entries()).flatMap(([packageName, packagePath]) => {
-		if (extraEntrypoints[packageName]) {
-			return extraEntrypoints[packageName].map((entrypoint, i) => [packageName + '/' + entrypoint, resolve(rootDirectory, `${packagePath}/src/${entrypoint}.ts`)])
-		}
-		return [[packageName + '/' + 'index', resolve(rootDirectory, `${packagePath}/src/index.ts`)]]
-	}))
+	const inputs = Object.fromEntries(
+		Array.from(packages.entries()).flatMap(([packageName, packagePath]) => {
+			if (extraEntrypoints[packageName]) {
+				return extraEntrypoints[packageName].map((
+					entrypoint,
+					i,
+				) => [packageName + '/' + entrypoint, resolve(rootDirectory, `${packagePath}/src/${entrypoint}.ts`)])
+			}
+			return [[packageName + '/' + 'index', resolve(rootDirectory, `${packagePath}/src/index.ts`)]]
+		}),
+	)
 
 	const inputPaths = new Set(Object.values(inputs))
 
@@ -63,4 +67,3 @@ export default defineConfig(({ command, mode }) => {
 		resolve: resolveConfig,
 	})
 })
-

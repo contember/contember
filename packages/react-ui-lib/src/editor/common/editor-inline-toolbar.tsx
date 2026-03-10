@@ -36,7 +36,10 @@ export const EditorInlineToolbar = memo(({ children }: EditorInlineToolbarProps)
 				Math.max(0, document.documentElement.clientWidth - toolbar.offsetWidth),
 				Math.max(
 					0,
-					Math.min(parentRect.width - toolbar.offsetWidth - borderWidth * 2, rangeRect.left - parentRect.left - toolbar.offsetWidth / 2 + rangeRect.width / 2),
+					Math.min(
+						parentRect.width - toolbar.offsetWidth - borderWidth * 2,
+						rangeRect.left - parentRect.left - toolbar.offsetWidth / 2 + rangeRect.width / 2,
+					),
 				),
 			)
 			toolbar.style.top = `${top}px`

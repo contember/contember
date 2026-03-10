@@ -5,8 +5,7 @@ import { MigrationsStatusFacade } from '../../lib/migrations/MigrationsStatusFac
 import { MigrationPrinter } from '../../lib/migrations/MigrationPrinter'
 import { SystemClientProvider } from '../../lib/SystemClientProvider'
 
-type Args = {
-}
+type Args = {}
 
 type Options = {
 	['only-to-execute']?: true
@@ -41,7 +40,6 @@ export class MigrationStatusCommand extends Command<Args, Options> {
 	}
 
 	protected async execute(input: Input<Args, Options>): Promise<number> {
-
 		const onlyErrors = input.getOption('only-errors')
 		const onlyToExecute = input.getOption('only-to-execute')
 		const restoreMissing = input.getOption('restore-missing')
@@ -68,15 +66,12 @@ export class MigrationStatusCommand extends Command<Args, Options> {
 			status = await this.migrationsStatusFacade.resolveMigrationsStatus({})
 		}
 
-
-
-		const filtered =
-			onlyErrors || onlyToExecute
-				? sortMigrations([
-					...(onlyErrors ? status.errorMigrations : []),
-					...(onlyToExecute ? status.migrationsToExecute : []),
-				  ])
-				: status.allMigrations
+		const filtered = onlyErrors || onlyToExecute
+			? sortMigrations([
+				...(onlyErrors ? status.errorMigrations : []),
+				...(onlyToExecute ? status.migrationsToExecute : []),
+			])
+			: status.allMigrations
 
 		console.log(this.migrationPrinter.printStatusTable(filtered))
 

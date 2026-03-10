@@ -10,12 +10,7 @@ import {
 	updateModel,
 	updateSchema,
 } from '../utils/schemaUpdateUtils'
-import {
-	createModificationType,
-	ModificationHandler,
-	ModificationHandlerCreateSqlOptions,
-	ModificationHandlerOptions,
-} from '../ModificationHandler'
+import { createModificationType, ModificationHandler, ModificationHandlerCreateSqlOptions, ModificationHandlerOptions } from '../ModificationHandler'
 import { isIt } from '../../utils/isIt'
 import { VERSION_ACL_PATCH } from '../ModificationVersions'
 import { NoopModification } from '../NoopModification'
@@ -35,7 +30,7 @@ export class UpdateEntityNameModificationHandler implements ModificationHandler<
 				{ entityName: data.entityName, tableName: data.tableName },
 				schema,
 				this.options,
-			  )
+			)
 			: new NoopModification()
 	}
 
@@ -101,7 +96,7 @@ export class UpdateEntityNameModificationHandler implements ModificationHandler<
 							}
 						}),
 					),
-				  )
+				)
 				: undefined,
 		)
 	}

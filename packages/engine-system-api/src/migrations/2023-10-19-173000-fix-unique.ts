@@ -3,9 +3,9 @@ import { DatabaseMetadata, wrapIdentifier } from '@contember/database'
 import { SystemMigrationArgs } from './types'
 import { getUniqueConstraintColumns } from '@contember/schema-migrations'
 
-export default async function (builder: MigrationBuilder, args: MigrationArgs<SystemMigrationArgs>) {
+export default async function(builder: MigrationBuilder, args: MigrationArgs<SystemMigrationArgs>) {
 	const schema = (await args.schemaResolver(args.connection)).schema
-	const stages = (await args.connection.query<{schema: string}>('SELECT schema FROM stage')).rows
+	const stages = (await args.connection.query<{ schema: string }>('SELECT schema FROM stage')).rows
 	const metadataByStage: Record<string, DatabaseMetadata> = {}
 
 	for (const entity of Object.values(schema.model.entities)) {
@@ -24,7 +24,6 @@ export default async function (builder: MigrationBuilder, args: MigrationArgs<Sy
 			expectedUnique.push(columns)
 		}
 
-
 		for (const stage of stages) {
 			const databaseMetadata = metadataByStage[stage.schema] ??= await args.databaseMetadataResolver(args.connection, stage.schema)
 
@@ -33,7 +32,9 @@ export default async function (builder: MigrationBuilder, args: MigrationArgs<Sy
 				if (constraint.columnNames.length === 1 || expectedUnique.some(it => stringArrayEquals(it, constraint.columnNames))) {
 					continue
 				}
-				builder.sql(`ALTER TABLE ${wrapIdentifier(stage.schema)}.${wrapIdentifier(entity.tableName)} DROP CONSTRAINT ${wrapIdentifier(constraint.constraintName)}`)
+				builder.sql(
+					`ALTER TABLE ${wrapIdentifier(stage.schema)}.${wrapIdentifier(entity.tableName)} DROP CONSTRAINT ${wrapIdentifier(constraint.constraintName)}`,
+				)
 			}
 		}
 	}

@@ -23,7 +23,9 @@ const defaultGetListElementProperties = (text: string): ListElementProperties =>
 	}
 }
 
-export const listHtmlDeserializerFactory = ({ getListElementProperties = defaultGetListElementProperties }: ListHtmlDeserializerOptions = {}): HtmlDeserializerPlugin => ({
+export const listHtmlDeserializerFactory = (
+	{ getListElementProperties = defaultGetListElementProperties }: ListHtmlDeserializerOptions = {},
+): HtmlDeserializerPlugin => ({
 	processBlockPaste: ({ element, next, cumulativeTextAttrs }) => {
 		if (element.tagName === 'UL') {
 			return [{ type: unorderedListElementType, children: next(element.childNodes, cumulativeTextAttrs) }]

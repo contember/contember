@@ -61,7 +61,6 @@ export class CommandRunner {
 	}
 }
 
-
 export class ChildProcessError extends Error {
 	constructor(public readonly exitCode: number | null, public readonly stderr: string) {
 		super(`Command has failed(${exitCode}): ${stderr} `)

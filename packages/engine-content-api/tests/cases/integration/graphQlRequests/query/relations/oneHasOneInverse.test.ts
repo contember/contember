@@ -11,8 +11,7 @@ test('Settings with sites (one-has-one inverse)', async () => {
 			.entity('Site', entity =>
 				entity
 					.column('name', column => column.type(Model.ColumnType.String))
-					.oneHasOne('setting', relation => relation.target('SiteSetting').inversedBy('site')),
-			)
+					.oneHasOne('setting', relation => relation.target('SiteSetting').inversedBy('site')))
 			.entity('SiteSetting', entity => entity.column('url', column => column.type(Model.ColumnType.String)))
 			.buildSchema(),
 		query: GQL`query {
@@ -93,4 +92,3 @@ test('Settings with sites (one-has-one inverse)', async () => {
 		},
 	})
 })
-

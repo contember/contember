@@ -24,4 +24,3 @@ export interface StageConfig {
 }
 
 export type ProjectSecrets = Record<string, string>
-

@@ -4,7 +4,6 @@ import { VariablesManager } from '../../../model/VariablesManager'
 import { ActionsAuthorizationActions } from '../../../authorization'
 
 export class VariablesQueryResolver implements QueryResolvers<ActionsContext> {
-
 	constructor(
 		private readonly variablesManager: VariablesManager,
 	) {

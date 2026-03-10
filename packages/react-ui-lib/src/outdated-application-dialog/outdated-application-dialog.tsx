@@ -1,5 +1,13 @@
 import { ComponentType, useCallback, useState } from 'react'
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader } from '../ui/alert-dialog'
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+} from '../ui/alert-dialog'
 import { useIsApplicationOutdated } from '@contember/interface'
 import { ClockIcon, RefreshCwIcon } from 'lucide-react'
 import { dict } from '../dict'
@@ -25,7 +33,7 @@ export const OutdatedApplicationDialog: ComponentType = () => {
 				<div className="text-sm text-destructive">{dict.outdatedApplication.warning}</div>
 				<AlertDialogFooter>
 					<AlertDialogCancel onClick={postpone} className="gap-1">
-						<ClockIcon className="w-3 h-4"/>
+						<ClockIcon className="w-3 h-4" />
 						{dict.outdatedApplication.snooze}
 					</AlertDialogCancel>
 					<AlertDialogAction onClick={() => window.location.reload()} className="gap-1">
@@ -37,5 +45,3 @@ export const OutdatedApplicationDialog: ComponentType = () => {
 		</AlertDialog>
 	)
 }
-
-

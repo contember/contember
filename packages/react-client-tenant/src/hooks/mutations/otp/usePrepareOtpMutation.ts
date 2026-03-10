@@ -11,6 +11,5 @@ export const prepareOtpMutation = TenantApi.mutation$.prepareOtp(
 	options => options.alias('mutation'),
 )
 
-
 export const usePrepareOtpMutation = createTenantMutation(prepareOtpMutation)
 export type PrepareOtpMutationVariables = Parameters<ReturnType<typeof usePrepareOtpMutation>>[0]

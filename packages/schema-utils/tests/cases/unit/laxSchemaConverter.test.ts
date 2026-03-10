@@ -18,7 +18,6 @@ test('lax schema converter basic', () => {
 	expect(converter.convert()).toMatchSnapshot()
 })
 
-
 test('lax schema converter one-has-many', () => {
 	const converter = new LaxSchemaConverter(
 		{
@@ -56,7 +55,6 @@ test('lax schema converter one-has-many', () => {
 	)
 	expect(converter2.convert()).toStrictEqual(schema1)
 })
-
 
 test('lax schema converter many-has-many', () => {
 	const converter = new LaxSchemaConverter(
@@ -96,7 +94,6 @@ test('lax schema converter many-has-many', () => {
 	expect(converter2.convert()).toStrictEqual(schema1)
 })
 
-
 test('lax schema converter one-has-one', () => {
 	const converter = new LaxSchemaConverter(
 		{
@@ -134,4 +131,3 @@ test('lax schema converter one-has-one', () => {
 	)
 	expect(converter2.convert()).toStrictEqual(schema1)
 })
-

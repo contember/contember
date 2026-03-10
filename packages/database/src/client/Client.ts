@@ -21,36 +21,36 @@ class Client<ConnectionType extends Connection.ConnectionLike = Connection.Conne
 
 	async scope<T>(callback: (wrapper: Client<ConnectionType & Connection.AcquiredConnectionLike>) => Promise<T> | T): Promise<T> {
 		return await this.connection.scope(
-			connection => callback(
-				new Client(
-					connection as ConnectionType & Connection.AcquiredConnectionLike,
-					this.schema,
-					this.queryMeta,
-					new EventManager(connection.eventManager),
+			connection =>
+				callback(
+					new Client(
+						connection as ConnectionType & Connection.AcquiredConnectionLike,
+						this.schema,
+						this.queryMeta,
+						new EventManager(connection.eventManager),
+					),
 				),
-			),
 			{ eventManager: this.eventManager },
 		)
 	}
 
 	async transaction<T>(transactionScope: (wrapper: Client<Connection.TransactionLike>) => Promise<T> | T): Promise<T> {
 		return await this.connection.transaction(
-			transaction => transactionScope(
-				new Client<Connection.TransactionLike>(
-					transaction,
-					this.schema,
-					this.queryMeta,
-					new EventManager(transaction.eventManager),
+			transaction =>
+				transactionScope(
+					new Client<Connection.TransactionLike>(
+						transaction,
+						this.schema,
+						this.queryMeta,
+						new EventManager(transaction.eventManager),
+					),
 				),
-			),
 			{ eventManager: this.eventManager },
 		)
 	}
 
 	async locked<T>(lock: number, callback: (wrapper: Client<Connection.ConnectionLike>) => Promise<T> | T): Promise<T> {
-		return await this.scope(client =>
-			withDatabaseAdvisoryLock(client.connection, lock, () => callback(client)),
-		)
+		return await this.scope(client => withDatabaseAdvisoryLock(client.connection, lock, () => callback(client)))
 	}
 
 	selectBuilder<Result = SelectBuilder.Result>(): SelectBuilder<Result> {

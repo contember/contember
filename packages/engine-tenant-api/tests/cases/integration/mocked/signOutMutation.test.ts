@@ -153,4 +153,3 @@ test('sign out - not a person', async () => {
 		},
 	})
 })
-

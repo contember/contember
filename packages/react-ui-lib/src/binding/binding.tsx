@@ -29,7 +29,6 @@ export interface BindingStateRendererProps {
 	children?: ReactNode
 }
 
-
 function BindingStateRenderer({ accessorTreeState, children }: BindingStateRendererProps) {
 	useEffect(() => {
 		if (accessorTreeState.name === 'error' && accessorTreeState.error.type === 'unauthorized') {
@@ -55,4 +54,3 @@ function BindingStateRenderer({ accessorTreeState, children }: BindingStateRende
 
 	return <>{children}</>
 }
-

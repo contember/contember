@@ -13,7 +13,6 @@ import { Providers } from '@contember/schema-utils'
 export type MapperFactoryHook = (mapper: Mapper) => void
 
 export class MapperFactory {
-
 	public readonly hooks: MapperFactoryHook[] = []
 
 	constructor(

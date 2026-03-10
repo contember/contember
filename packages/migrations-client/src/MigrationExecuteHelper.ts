@@ -3,9 +3,7 @@ import { ContentMigrationFactoryArgs, ResolvedMigrationContent } from './Migrati
 import { assertNever } from './utils/assertNever'
 import { SystemClient } from './SystemClient'
 
-
 export class MigrationExecutor {
-
 	async executeMigrations({
 		client,
 		migrations,

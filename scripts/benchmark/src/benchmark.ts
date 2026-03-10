@@ -11,11 +11,11 @@ const readStdin = (): Promise<string> => {
 		process.stdin.resume()
 		process.stdin.setEncoding('utf8')
 
-		process.stdin.on('data', function (chunk) {
+		process.stdin.on('data', function(chunk) {
 			data += chunk
 		})
 
-		process.stdin.on('end', function () {
+		process.stdin.on('end', function() {
 			resolve(data)
 		})
 	})
@@ -44,7 +44,7 @@ const sleep = (delay: number) => new Promise(resolve => setTimeout(resolve, dela
 					query: queryGql,
 					authorizationToken: accessToken,
 					variables,
-				}),
+				})
 			),
 		)
 	}

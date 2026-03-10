@@ -7,7 +7,6 @@ export type MembershipErrorCode =
 	| 'VARIABLE_EMPTY'
 	| 'VARIABLE_NOT_FOUND'
 
-
 export interface MembershipErrorVariable {
 	code: MembershipErrorCode
 	membershipValidation?: MembershipValidationErrorSchema[]
@@ -57,10 +56,9 @@ export const createMembershipValidationErrorResult = (
 	return [
 		{
 			code: 'INVALID_MEMBERSHIP',
-			developerMessage:
-				'Provided membership is invalid: ' +
-				result.map(it => formatDeveloperError(it)).join('. ') +
-				'. You can also check membershipValidation field for structured details.',
+			developerMessage: 'Provided membership is invalid: '
+				+ result.map(it => formatDeveloperError(it)).join('. ')
+				+ '. You can also check membershipValidation field for structured details.',
 			membershipValidation: result.map((it): MembershipValidationErrorSchema => {
 				switch (it.error) {
 					case MembershipValidationErrorType.ROLE_NOT_FOUND:

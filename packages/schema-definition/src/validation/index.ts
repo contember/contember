@@ -30,8 +30,7 @@ const ArgumentFactory = {
 
 const RuleMetaKey = Symbol('Rule')
 
-const isLegacyDecorator = (target: any): boolean =>
-	typeof target === 'object' && target !== null || typeof target === 'function'
+const isLegacyDecorator = (target: any): boolean => typeof target === 'object' && target !== null || typeof target === 'function'
 
 function addRuleToMetadata(target: any, propertyKeyOrContext: any, ...rule: Validation.ValidationRule[]) {
 	if (isLegacyDecorator(target)) {
@@ -201,10 +200,8 @@ export const assertPattern = (pattern: RegExp, message: MessageOrString) => flue
 export const assertMinLength = (min: number, message: MessageOrString) => fluent().assertMinLength(min, message)
 export const assertMaxLength = (min: number, message: MessageOrString) => fluent().assertMaxLength(min, message)
 
-export const combine =
-	(...decorators: PropertyDecorator[]): PropertyDecorator =>
-		(target: any, propertyKeyOrContext: any) =>
-			decorators.forEach(it => (it as any)(target, propertyKeyOrContext))
+export const combine = (...decorators: PropertyDecorator[]): PropertyDecorator => (target: any, propertyKeyOrContext: any) =>
+	decorators.forEach(it => (it as any)(target, propertyKeyOrContext))
 
 export function parseDefinition(
 	definitions: Record<string, any>,
@@ -219,8 +216,7 @@ export function parseDefinition(
 				name,
 				fields
 					.map(field => {
-						const fieldRules: Validation.ValidationRule[] | undefined =
-							tc39Rules?.[field]
+						const fieldRules: Validation.ValidationRule[] | undefined = tc39Rules?.[field]
 							?? (typeof Reflect.getMetadata === 'function' ? Reflect.getMetadata(RuleMetaKey, target, field) : undefined)
 						if (fieldRules === undefined) {
 							return tuple(field, [])

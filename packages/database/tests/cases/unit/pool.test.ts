@@ -1,10 +1,10 @@
-import { expect, it, beforeAll } from 'bun:test'
+import { beforeAll, expect, it } from 'bun:test'
 import { ClientErrorCodes, Pool, PoolLogger } from '../../../src'
 import { Client as PgClient } from 'pg'
 import EventEmitter from 'node:events'
 
 const createPoolLogger = () => {
-	const logger: PoolLogger & {messages: string; clear: () => void} = (message, pool) => {
+	const logger: PoolLogger & { messages: string; clear: () => void } = (message, pool) => {
 		logger.messages += `\t\t${pool.connecting}${pool.active}${pool.idle} ${pool.pending}: ${message}\n`
 	}
 	logger.messages = '\n\t\tCAI P\n'
@@ -13,7 +13,6 @@ const createPoolLogger = () => {
 }
 
 const timeout = async (ms = 1) => await new Promise(resolve => setTimeout(resolve, ms))
-
 
 it('acquires and releases new connection from pool', async () => {
 	const logger = createPoolLogger()
@@ -35,7 +34,6 @@ it('acquires and releases new connection from pool', async () => {
 		001 0: Connection is idle and available.
 `)
 })
-
 
 it('disposes connection when maxIdle is reached', async () => {
 	const logger = createPoolLogger()
@@ -105,7 +103,6 @@ it('disposes errored connection', async () => {
 `)
 })
 
-
 it('time outs when waiting for a connection', async () => {
 	const logger = createPoolLogger()
 	const clientMock = new PgClientMock()
@@ -128,7 +125,6 @@ it('time outs when waiting for a connection', async () => {
 		001 0: Not connecting, queue is empty.
 `)
 })
-
 
 it('acquires idle connection from pool', async () => {
 	const logger = createPoolLogger()
@@ -180,7 +176,6 @@ it('acquires multiple new connections from pool', async () => {
 `)
 })
 
-
 it('releases idle connection', async () => {
 	const logger = createPoolLogger()
 	const pool = new Pool(() => new PgClientMock() as unknown as PgClient, {
@@ -203,7 +198,6 @@ it('releases idle connection', async () => {
 		000 0: Idle connection disposed after timeout.
 `)
 })
-
 
 it('waits for idle connection when pool is full', async () => {
 	const logger = createPoolLogger()
@@ -235,12 +229,10 @@ it('waits for idle connection when pool is full', async () => {
 `)
 })
 
-
 it('tries to reconnect on recoverable error', async () => {
 	const logger = createPoolLogger()
 	const pgClientMock = new PgClientMock()
 	pgClientMock.on('error', () => {
-
 	})
 	const pool = new Pool(() => pgClientMock as unknown as PgClient, {
 		log: logger,
@@ -267,12 +259,10 @@ it('tries to reconnect on recoverable error', async () => {
 `)
 })
 
-
 it('fails to reconnect on recoverable error', async () => {
 	const logger = createPoolLogger()
 	const pgClientMock = new PgClientMock()
 	pgClientMock.on('error', () => {
-
 	})
 	const pool = new Pool(() => pgClientMock as unknown as PgClient, {
 		log: logger,
@@ -320,23 +310,24 @@ it('fails to reconnect on unrecoverable error', async () => {
 `)
 })
 
+const createSuccessfulPromise = (timeout = 1) => () =>
+	new Promise<void>(resolve => {
+		setTimeout(resolve, timeout)
+	})
 
+const createRecoverableErrorPromise = () => () =>
+	new Promise<void>((resolve, reject) => {
+		setTimeout(() => {
+			const err: Error & { code?: string } = new Error('too many connection')
+			err.code = ClientErrorCodes.TOO_MANY_CONNECTIONS
+			reject(err)
+		}, 1)
+	})
 
-const createSuccessfulPromise = (timeout = 1) => () => new Promise<void>(resolve => {
-	setTimeout(resolve, timeout)
-})
-
-const createRecoverableErrorPromise = () => () => new Promise<void>((resolve, reject) => {
-	setTimeout(() => {
-		const err: Error & {code?: string} = new Error('too many connection')
-		err.code = ClientErrorCodes.TOO_MANY_CONNECTIONS
-		reject(err)
-	}, 1)
-})
-
-const createErrorPromise = () => () => new Promise<void>((resolve, reject) => {
-	setTimeout(() => reject(new Error('my err')), 1)
-})
+const createErrorPromise = () => () =>
+	new Promise<void>((resolve, reject) => {
+		setTimeout(() => reject(new Error('my err')), 1)
+	})
 
 const PgClientMock = class extends EventEmitter {
 	public connections: (() => Promise<void>)[] = []
@@ -350,7 +341,6 @@ const PgClientMock = class extends EventEmitter {
 		return createSuccessfulPromise()
 	}
 }
-
 
 it('rate limit', async () => {
 	const logger = createPoolLogger()

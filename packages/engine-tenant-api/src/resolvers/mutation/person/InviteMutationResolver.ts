@@ -1,14 +1,6 @@
 import { InviteErrorCode, InviteResponse, MutationInviteArgs, MutationResolvers, MutationUnmanagedInviteArgs } from '../../../schema'
 import { TenantResolverContext } from '../../TenantResolverContext'
-import {
-	DatabaseContext,
-	InviteData,
-	InviteManager,
-	isTokenHash,
-	MembershipValidator,
-	PermissionActions,
-	ProjectManager,
-} from '../../../model'
+import { DatabaseContext, InviteData, InviteManager, isTokenHash, MembershipValidator, PermissionActions, ProjectManager } from '../../../model'
 import { createMembershipValidationErrorResult } from '../../membershipUtils'
 import { createErrorResponse, createProjectNotFoundResponse } from '../../errorUtils'
 import { UserInputError } from '@contember/graphql-utils'

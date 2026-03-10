@@ -2,7 +2,6 @@ import * as Typesafe from '@contember/typesafe'
 import { MailerOptions } from '@contember/engine-tenant-api'
 import { upperCaseFirst } from '../utils/strings'
 
-
 const dbConfigRequired = {
 	host: Typesafe.string,
 	port: Typesafe.number,
@@ -55,31 +54,34 @@ export const dbConfigSchema = Typesafe.intersection(
 export const tenantConfigSchema = Typesafe.intersection(
 	Typesafe.object({
 		db: dbConfigSchema,
-		mailer: Typesafe.transform(Typesafe.partial({
-			from: Typesafe.string,
-			host: Typesafe.string,
-			port: Typesafe.number,
-			user: Typesafe.string,
-			password: Typesafe.string,
+		mailer: Typesafe.transform(
+			Typesafe.partial({
+				from: Typesafe.string,
+				host: Typesafe.string,
+				port: Typesafe.number,
+				user: Typesafe.string,
+				password: Typesafe.string,
 
-			webhook: Typesafe.union(
-				Typesafe.string,
-				Typesafe.intersection(
-					Typesafe.object({
-						url: Typesafe.string,
-					}),
-					Typesafe.partial({
-						headers: Typesafe.record(Typesafe.string, Typesafe.string),
-					}),
+				webhook: Typesafe.union(
+					Typesafe.string,
+					Typesafe.intersection(
+						Typesafe.object({
+							url: Typesafe.string,
+						}),
+						Typesafe.partial({
+							headers: Typesafe.record(Typesafe.string, Typesafe.string),
+						}),
+					),
 				),
-			),
-		}), (value, input): MailerOptions & Typesafe.JsonObject => {
-			return {
-				...(input as any),
-				...value,
-				...(value.user ? { auth: { user: value.user, pass: value.password } } : {}),
-			}
-		}),
+			}),
+			(value, input): MailerOptions & Typesafe.JsonObject => {
+				return {
+					...(input as any),
+					...value,
+					...(value.user ? { auth: { user: value.user, pass: value.password } } : {}),
+				}
+			},
+		),
 		credentials: Typesafe.partial({
 			rootToken: Typesafe.string,
 			rootTokenHash: Typesafe.string,
@@ -130,17 +132,18 @@ export const serverConfigSchema = Typesafe.partial({
 			}),
 		}),
 	),
-	projectGroup: (val: unknown, path: PropertyKey[] = []) => Typesafe.valueAt(val, ['domainMapping']) === undefined
-		? undefined
-		: Typesafe.intersection(
-			Typesafe.object({
-				domainMapping: Typesafe.string,
-			}),
-			Typesafe.partial({
-				configHeader: Typesafe.string,
-				configEncryptionKey: Typesafe.string,
-			}),
-		)(val, path),
+	projectGroup: (val: unknown, path: PropertyKey[] = []) =>
+		Typesafe.valueAt(val, ['domainMapping']) === undefined
+			? undefined
+			: Typesafe.intersection(
+				Typesafe.object({
+					domainMapping: Typesafe.string,
+				}),
+				Typesafe.partial({
+					configHeader: Typesafe.string,
+					configEncryptionKey: Typesafe.string,
+				}),
+			)(val, path),
 	monitoringPort: Typesafe.number,
 	workerCount: Typesafe.union(Typesafe.number, Typesafe.string),
 	applicationWorker: Typesafe.string,

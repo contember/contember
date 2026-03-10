@@ -39,11 +39,10 @@ export class ApiKeyService {
 	}
 }
 
-
 export type CreateApiKeyResponse = Response<CreateApiKeyResult, never>
 
 export class CreateApiKeyResult {
-	constructor(public readonly identity: {id: string; description?: string}, public readonly apiKey: { id: string; token?: string }) {
+	constructor(public readonly identity: { id: string; description?: string }, public readonly apiKey: { id: string; token?: string }) {
 	}
 
 	toApiKeyWithToken(): ApiKeyWithToken {

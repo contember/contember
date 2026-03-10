@@ -38,8 +38,7 @@ export const SelectContent = uic(SelectPrimitive.Content, {
 	displayName: SelectPrimitive.Content.displayName,
 	variants: {
 		position: {
-			popper:
-				'data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1',
+			popper: 'data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1',
 		},
 	},
 	defaultVariants: {

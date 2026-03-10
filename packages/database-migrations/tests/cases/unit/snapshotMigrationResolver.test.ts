@@ -1,5 +1,5 @@
-import { expect, describe, test } from 'bun:test'
-import { SnapshotMigrationResolver, Migration } from '../../../src'
+import { describe, expect, test } from 'bun:test'
+import { Migration, SnapshotMigrationResolver } from '../../../src'
 
 describe('snapshot migration resolver', () => {
 	test('use snapshot with latest migration timestamp', () => {
@@ -16,13 +16,18 @@ describe('snapshot migration resolver', () => {
 
 	test('use snapshot with latest base migration timestamp', () => {
 		const snapshotRunner = () => null
-		const resolver = new SnapshotMigrationResolver(snapshotRunner, {
-			'2023-07-26-105000-xx': () => null,
-			'2023-07-26-105500-yy': () => null,
-		}, 'snapshot', {
-			'2023-07-26-105000-xx': () => null,
-			'2023-07-26-105700-yy': () => null,
-		})
+		const resolver = new SnapshotMigrationResolver(
+			snapshotRunner,
+			{
+				'2023-07-26-105000-xx': () => null,
+				'2023-07-26-105500-yy': () => null,
+			},
+			'snapshot',
+			{
+				'2023-07-26-105000-xx': () => null,
+				'2023-07-26-105700-yy': () => null,
+			},
+		)
 
 		expect(resolver.resolveMigrations({ runMigrations: [] })).toStrictEqual([
 			new Migration('2023-07-26-105700-snapshot', snapshotRunner),
@@ -43,7 +48,6 @@ describe('snapshot migration resolver', () => {
 			new Migration('2023-07-26-105500-yy', yyRunner),
 		])
 	})
-
 
 	test('merge snapshot with new migrations', () => {
 		const snapshotRunner = () => null

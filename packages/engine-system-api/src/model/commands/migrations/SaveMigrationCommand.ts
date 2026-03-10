@@ -25,8 +25,7 @@ export class SaveMigrationCommand implements Command<number> {
 		const latestId = (await SelectBuilder.create<{ id: number }>()
 			.from('schema_migration')
 			.select(new Literal('max(id)'), 'id')
-			.getResult(db)
-		)[0]?.id ?? 0
+			.getResult(db))[0]?.id ?? 0
 
 		const newId = latestId + 1
 		const result = await InsertBuilder.create()

@@ -4,73 +4,73 @@ import { SQL } from '../../src/tags'
 import { describe } from 'bun:test'
 import { testMigrations } from '../../src/tests'
 
-describe('create many has one relation (post with author)', () => testMigrations({
-	original: {
-		model: new SchemaBuilder()
-			.entity('Author', e => e.column('name', c => c.type(Model.ColumnType.String)))
-			.buildSchema(),
-	},
-	updated: {
-		model: new SchemaBuilder()
-			.entity('Author', e => e.column('name', c => c.type(Model.ColumnType.String)))
-			.entity('Post', e =>
-				e
-					.column('title', c => c.type(Model.ColumnType.String))
-					.manyHasOne('author', r => r.target('Author').onDelete(Model.OnDelete.cascade)),
-			)
-			.buildSchema(),
-	},
-	diff: [
-		{
-			modification: 'createEntity',
-			entity: {
-				fields: {
-					id: {
-						columnName: 'id',
-						name: 'id',
-						nullable: false,
-						type: Model.ColumnType.Uuid,
-						columnType: 'uuid',
+describe('create many has one relation (post with author)', () =>
+	testMigrations({
+		original: {
+			model: new SchemaBuilder()
+				.entity('Author', e => e.column('name', c => c.type(Model.ColumnType.String)))
+				.buildSchema(),
+		},
+		updated: {
+			model: new SchemaBuilder()
+				.entity('Author', e => e.column('name', c => c.type(Model.ColumnType.String)))
+				.entity('Post', e =>
+					e
+						.column('title', c => c.type(Model.ColumnType.String))
+						.manyHasOne('author', r => r.target('Author').onDelete(Model.OnDelete.cascade)))
+				.buildSchema(),
+		},
+		diff: [
+			{
+				modification: 'createEntity',
+				entity: {
+					fields: {
+						id: {
+							columnName: 'id',
+							name: 'id',
+							nullable: false,
+							type: Model.ColumnType.Uuid,
+							columnType: 'uuid',
+						},
 					},
+					name: 'Post',
+					primary: 'id',
+					primaryColumn: 'id',
+					tableName: 'post',
+					unique: [],
+					eventLog: {
+						enabled: true,
+					},
+					indexes: [],
 				},
-				name: 'Post',
-				primary: 'id',
-				primaryColumn: 'id',
-				tableName: 'post',
-				unique: [],
-				eventLog: {
-					enabled: true,
+			},
+			{
+				modification: 'createColumn',
+				entityName: 'Post',
+				field: {
+					columnName: 'title',
+					name: 'title',
+					nullable: true,
+					type: Model.ColumnType.String,
+					columnType: 'text',
 				},
-				indexes: [],
 			},
-		},
-		{
-			modification: 'createColumn',
-			entityName: 'Post',
-			field: {
-				columnName: 'title',
-				name: 'title',
-				nullable: true,
-				type: Model.ColumnType.String,
-				columnType: 'text',
-			},
-		},
-		{
-			modification: 'createRelation',
-			entityName: 'Post',
-			owningSide: {
-				name: 'author',
-				type: Model.RelationType.ManyHasOne,
-				target: 'Author',
-				joiningColumn: {
-					columnName: 'author_id',
-					onDelete: Model.OnDelete.cascade,
+			{
+				modification: 'createRelation',
+				entityName: 'Post',
+				owningSide: {
+					name: 'author',
+					type: Model.RelationType.ManyHasOne,
+					target: 'Author',
+					joiningColumn: {
+						columnName: 'author_id',
+						onDelete: Model.OnDelete.cascade,
+					},
+					nullable: true,
 				},
-				nullable: true,
 			},
-		},
-	],
-	sql: SQL`CREATE TABLE "post" (
+		],
+		sql: SQL`CREATE TABLE "post" (
 		"id" uuid PRIMARY KEY NOT NULL
 	);
 	CREATE TRIGGER "log_event"
@@ -91,4 +91,4 @@ describe('create many has one relation (post with author)', () => testMigrations
 	ALTER TABLE "post"
 		ADD FOREIGN KEY ("author_id") REFERENCES "author"("id") ON DELETE CASCADE DEFERRABLE INITIALLY IMMEDIATE;
 	CREATE INDEX ON "post" ("author_id");`,
-}))
+	}))

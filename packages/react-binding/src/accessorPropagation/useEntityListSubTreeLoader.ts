@@ -29,7 +29,6 @@ export type UseEntityListSubTreeLoaderStateRefreshing<State> = {
 	isLoading: true
 }
 
-
 export type UseEntityListSubTreeLoaderStateLoaded<State> = {
 	state: 'loaded'
 	entities: SugaredQualifiedEntityList
@@ -47,7 +46,6 @@ export type UseEntityListSubTreeLoaderStateFailed = {
 	isLoading: false
 }
 
-
 export type UseEntityListSubTreeLoaderState<State> =
 	| UseEntityListSubTreeLoaderStateInitial
 	| UseEntityListSubTreeLoaderStateLoading
@@ -61,7 +59,11 @@ export type UseEntityListSubTreeLoaderStateMethods = {
 
 const emptyObject = {} as SugaredQualifiedEntityList
 
-export const useEntityListSubTreeLoader = <State>(entities: SugaredQualifiedEntityList | undefined, children: ReactNode, state?: State): [UseEntityListSubTreeLoaderState<State>, UseEntityListSubTreeLoaderStateMethods] => {
+export const useEntityListSubTreeLoader = <State>(
+	entities: SugaredQualifiedEntityList | undefined,
+	children: ReactNode,
+	state?: State,
+): [UseEntityListSubTreeLoaderState<State>, UseEntityListSubTreeLoaderStateMethods] => {
 	const [displayedState, setDisplayedState] = useState<UseEntityListSubTreeLoaderState<State>>({
 		state: 'initial',
 		isLoading: false,
@@ -69,10 +71,12 @@ export const useEntityListSubTreeLoader = <State>(entities: SugaredQualifiedEnti
 		treeRootId: undefined,
 		customState: undefined,
 	})
-	const currentlyLoading = useRef<{
-		entities: SugaredQualifiedEntityList
-		state?: State
-	} | undefined>(undefined)
+	const currentlyLoading = useRef<
+		{
+			entities: SugaredQualifiedEntityList
+			state?: State
+		} | undefined
+	>(undefined)
 
 	const extendTree = useExtendTree()
 	const [reloadTrigger, setReloadTrigger] = useState<object | null>(null)
@@ -80,7 +84,7 @@ export const useEntityListSubTreeLoader = <State>(entities: SugaredQualifiedEnti
 	const resolvedEntities = entities ? memoizedEntities : undefined
 
 	useEffect(() => {
-		(async () => {
+		;(async () => {
 			if (!resolvedEntities) {
 				return
 			}

@@ -22,12 +22,14 @@ export class CreatePersonTokenCommand implements Command<CreatePersonTokenComman
 	async execute({ db, providers, bus }: Command.Args): Promise<CreatePersonTokenCommand.Result> {
 		const token = await generateToken(providers)
 		const tokenHash = computeTokenHash(token)
-		const result = await bus.execute(new SavePersonTokenCommand(
-			this.personId,
-			tokenHash,
-			this.type,
-			this.expirationMinutes,
-		))
+		const result = await bus.execute(
+			new SavePersonTokenCommand(
+				this.personId,
+				tokenHash,
+				this.type,
+				this.expirationMinutes,
+			),
+		)
 
 		return { ...result, token }
 	}

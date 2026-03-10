@@ -8,7 +8,6 @@ import { UpdateColumnDefinitionDiffer } from '../columns'
  * Remove changed or removed view.
  */
 export class RemoveViewDiffer implements Differ {
-
 	createDiff(originalSchema: Schema, updatedSchema: Schema) {
 		const changedOrRemovedViews = Object.values(originalSchema.model.entities)
 			.filter(it => {

@@ -5,7 +5,6 @@ import { TenantFormError, TenantFormField } from './common'
 import { dict } from '../../dict'
 import { useEffect, useRef, useState } from 'react'
 
-
 export const PasswordlessSignInFormFields = ({ type, email }: { type: 'token' | 'otp'; email?: string }) => {
 	const form = usePasswordlessSignInForm()
 	const fieldErrors = form.errors.map(it => it.field)
@@ -31,21 +30,35 @@ export const PasswordlessSignInFormFields = ({ type, email }: { type: 'token' | 
 			{form.state === 'success' || form.state === 'submitting' ? <Loader position="absolute" /> : null}
 
 			<TenantFormError
-				form={form} messages={dict.tenant.passwordlessSignIn.errorMessages}
+				form={form}
+				messages={dict.tenant.passwordlessSignIn.errorMessages}
 			/>
 
-			{(!hasToken || fieldErrors.includes('token')) && <TenantFormField
-				form={form} messages={dict.tenant.passwordlessSignIn.errorMessages} field="token"
-				type="text" required autoComplete="off" autoFocus
-				className={type === 'otp' ? 'text-2xl font-bold font-mono' : ''}
-			>
-				{dict.tenant.passwordlessSignIn.token}
-			</TenantFormField>}
+			{(!hasToken || fieldErrors.includes('token')) && (
+				<TenantFormField
+					form={form}
+					messages={dict.tenant.passwordlessSignIn.errorMessages}
+					field="token"
+					type="text"
+					required
+					autoComplete="off"
+					autoFocus
+					className={type === 'otp' ? 'text-2xl font-bold font-mono' : ''}
+				>
+					{dict.tenant.passwordlessSignIn.token}
+				</TenantFormField>
+			)}
 
 			{(form.state === 'otp-required' || fieldErrors.includes('otpToken')) && (
 				<TenantFormField
-					form={form} messages={dict.tenant.passwordlessSignIn.errorMessages} field="otpToken" autoComplete="one-time-code"
-					type="text" required autoFocus maxLength={6}
+					form={form}
+					messages={dict.tenant.passwordlessSignIn.errorMessages}
+					field="otpToken"
+					autoComplete="one-time-code"
+					type="text"
+					required
+					autoFocus
+					maxLength={6}
 				>
 					{dict.tenant.passwordlessSignIn.otpToken}
 				</TenantFormField>
@@ -57,4 +70,3 @@ export const PasswordlessSignInFormFields = ({ type, email }: { type: 'token' | 
 		</div>
 	)
 }
-

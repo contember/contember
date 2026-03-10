@@ -21,8 +21,8 @@ export default class EntitySelector {
 	public havingRelation(name: string, targetEntityName?: string) {
 		return this.matching(
 			(schema, entity) =>
-				entity.fields[name] &&
-				acceptFieldVisitor(schema, entity, name, {
+				entity.fields[name]
+				&& acceptFieldVisitor(schema, entity, name, {
 					visitColumn: () => false,
 					visitRelation: ({ targetEntity }) => !targetEntityName || targetEntity.name === targetEntityName,
 				}),

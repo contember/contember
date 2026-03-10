@@ -64,4 +64,3 @@ test('create session key', async () => {
 		}),
 	})
 })
-

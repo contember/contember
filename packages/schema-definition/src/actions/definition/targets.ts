@@ -1,6 +1,5 @@
 import { Actions } from '@contember/schema'
 
-
 export class ActionsTarget {
 	constructor(
 		public readonly name: string | undefined,

@@ -83,7 +83,7 @@ export class MigrationFilesManager {
 		const files = await this.tryReadDir()
 
 		const extensions = Object.keys(this.loaders).join('|')
-		const regex = new RegExp('^\\d{4}-\\d{2}-\\d{2}-\\d{6}-[\\w-]+\\.(' + extensions  + ')$')
+		const regex = new RegExp('^\\d{4}-\\d{2}-\\d{2}-\\d{6}-[\\w-]+\\.(' + extensions + ')$')
 		const filteredFiles = await Promise.all(
 			files
 				.filter(it => it.isFile())

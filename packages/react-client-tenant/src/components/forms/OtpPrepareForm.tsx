@@ -8,8 +8,7 @@ export type OtpPrepareFormValues = {
 	label: string
 }
 
-export type OtpPrepareFormErrorCode =
-	| 'UNKNOWN_ERROR'
+export type OtpPrepareFormErrorCode = 'UNKNOWN_ERROR'
 
 export type OtpPrepareFormState = FormState
 
@@ -42,4 +41,3 @@ export const OtpPrepareForm = ({ children, onSuccess }: OtpPrepareFormProps) => 
 		</TenantForm>
 	)
 }
-

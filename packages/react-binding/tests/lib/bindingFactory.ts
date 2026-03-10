@@ -1,5 +1,15 @@
 import { ReactNode } from 'react'
-import { Config, DirtinessTracker, Environment, EventManager, Schema, SchemaStore, StateInitializer, TreeAugmenter, TreeStore } from '@contember/binding-legacy'
+import {
+	Config,
+	DirtinessTracker,
+	Environment,
+	EventManager,
+	Schema,
+	SchemaStore,
+	StateInitializer,
+	TreeAugmenter,
+	TreeStore,
+} from '@contember/binding-legacy'
 import { MarkerTreeGenerator } from '../../src'
 
 export const createBinding = ({ node, schema }: { node: ReactNode; schema: SchemaStore }) => {

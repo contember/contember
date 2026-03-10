@@ -12,7 +12,11 @@ class PasswordChangeManager {
 		private readonly passwordStrengthVerifier: PasswordStrengthValidator,
 	) {}
 
-	async changePassword(dbContext: DatabaseContext, person: PersonRow, password: string): Promise<PasswordChangeManager.PasswordChangeResponse<ChangePasswordErrorCode>> {
+	async changePassword(
+		dbContext: DatabaseContext,
+		person: PersonRow,
+		password: string,
+	): Promise<PasswordChangeManager.PasswordChangeResponse<ChangePasswordErrorCode>> {
 		const config = await dbContext.queryHandler.fetch(new ConfigurationQuery())
 		const passwordVerifyResult = await this.passwordStrengthVerifier.verify(password, config.password, 'TOO_WEAK')
 		if (!passwordVerifyResult.ok) {
@@ -22,7 +26,12 @@ class PasswordChangeManager {
 		return new ResponseOk(null)
 	}
 
-	async changeMyPassword(dbContext: DatabaseContext, person: PersonRow, currentPassword: string, password: string): Promise<PasswordChangeManager.PasswordChangeResponse<ChangeMyPasswordErrorCode>> {
+	async changeMyPassword(
+		dbContext: DatabaseContext,
+		person: PersonRow,
+		currentPassword: string,
+		password: string,
+	): Promise<PasswordChangeManager.PasswordChangeResponse<ChangeMyPasswordErrorCode>> {
 		const config = await dbContext.queryHandler.fetch(new ConfigurationQuery())
 		const passwordVerifyResult = await this.passwordStrengthVerifier.verify(password, config.password, 'TOO_WEAK')
 		if (!passwordVerifyResult.ok) {

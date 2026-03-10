@@ -89,7 +89,6 @@ export class ImportExecutor {
 
 			if (processor) {
 				next = await processor(next as any)
-
 			} else {
 				break
 			}
@@ -98,7 +97,11 @@ export class ImportExecutor {
 		return next
 	}
 
-	private async importContentSchemaBegin(groupContainer: ProjectGroupContainer, authResult: AuthResult, it: CommandIterator<'importContentSchemaBegin'>) {
+	private async importContentSchemaBegin(
+		groupContainer: ProjectGroupContainer,
+		authResult: AuthResult,
+		it: CommandIterator<'importContentSchemaBegin'>,
+	) {
 		const [options] = it.commandArgs
 		const projectContainer = await this.createProjectContainer(groupContainer, options.project)
 		const systemDatabaseContext = projectContainer.systemDatabaseContext
@@ -107,7 +110,9 @@ export class ImportExecutor {
 		const contentSchema = await projectContainer.contentSchemaResolver.getSchema({ db: systemDatabaseContext, stage: stage.slug, normalize: true })
 
 		if (contentSchema.meta.version !== options.schemaVersion) {
-			throw new ImportError(`Incompatible schema version (import version ${options.schemaVersion} does not match server version ${contentSchema.meta.version})`)
+			throw new ImportError(
+				`Incompatible schema version (import version ${options.schemaVersion} does not match server version ${contentSchema.meta.version})`,
+			)
 		}
 
 		await this.requireImportAccess(groupContainer, contentSchema.schema, authResult, options.project, 'content')
@@ -136,7 +141,11 @@ export class ImportExecutor {
 		})
 	}
 
-	private async importSystemSchemaBegin(groupContainer: ProjectGroupContainer, authResult: AuthResult, it: CommandIterator<'importSystemSchemaBegin'>) {
+	private async importSystemSchemaBegin(
+		groupContainer: ProjectGroupContainer,
+		authResult: AuthResult,
+		it: CommandIterator<'importSystemSchemaBegin'>,
+	) {
 		const [options] = it.commandArgs
 		const projectContainer = await this.createProjectContainer(groupContainer, options.project)
 		const schema = await groupContainer.projectSchemaResolver.getSchema(options.project)
@@ -163,7 +172,11 @@ export class ImportExecutor {
 		})
 	}
 
-	private async importSequence(db: Client<Connection.TransactionLike>, mapping: TransferMapping, it: CommandIterator<'importSequence'>): Promise<CommandIterator | null> {
+	private async importSequence(
+		db: Client<Connection.TransactionLike>,
+		mapping: TransferMapping,
+		it: CommandIterator<'importSequence'>,
+	): Promise<CommandIterator | null> {
 		const [options] = it.commandArgs
 
 		await db.query(
@@ -174,7 +187,11 @@ export class ImportExecutor {
 		return it.next()
 	}
 
-	private async insertBegin(db: Client<Connection.TransactionLike>, mapping: TransferMapping, it: CommandIterator<'insertBegin'>): Promise<CommandIterator | null> {
+	private async insertBegin(
+		db: Client<Connection.TransactionLike>,
+		mapping: TransferMapping,
+		it: CommandIterator<'insertBegin'>,
+	): Promise<CommandIterator | null> {
 		const [options] = it.commandArgs
 		const insertContext = await this.buildInsertContext(db, mapping, db.schema, options.table, options.columns)
 		let insertRowsPromise: Promise<Connection.Result> | null = null
@@ -188,11 +205,9 @@ export class ImportExecutor {
 
 				try {
 					insertContext.rows.push(insertContext.rowParser(values))
-
 				} catch (e) {
 					if (e instanceof ParseError) {
 						throw new ImportError(`Invalid row ${JSON.stringify(values)} for table ${options.table}: ${e.message}`)
-
 					} else {
 						throw e
 					}
@@ -234,7 +249,13 @@ export class ImportExecutor {
 		return projectContainer
 	}
 
-	private async requireImportAccess(groupContainer: ProjectGroupContainer, schema: Schema, authResult: AuthResult, projectSlug: string, kind: 'content' | 'system') {
+	private async requireImportAccess(
+		groupContainer: ProjectGroupContainer,
+		schema: Schema,
+		authResult: AuthResult,
+		projectSlug: string,
+		kind: 'content' | 'system',
+	) {
 		const { effective: memberships } = await groupContainer.projectMembershipResolver.resolveMemberships({
 			request: { get: () => '' },
 			acl: schema.acl,
@@ -286,7 +307,6 @@ export class ImportExecutor {
 		await db.query(`TRUNCATE ${tableNamesQuoted.join(', ')}`)
 	}
 
-
 	private async disableStatementTimeout(db: Client) {
 		await db.query('SET LOCAL statement_timeout = 0')
 	}
@@ -305,7 +325,13 @@ export class ImportExecutor {
 		return await db.query(sql, parameters)
 	}
 
-	private async buildInsertContext(db: Client, mapping: TransferMapping, schema: string, tableName: string, columnNames: readonly string[]): Promise<InsertContext> {
+	private async buildInsertContext(
+		db: Client,
+		mapping: TransferMapping,
+		schema: string,
+		tableName: string,
+		columnNames: readonly string[],
+	): Promise<InsertContext> {
 		const tableMapping = mapping.tables[tableName]
 		const columns = []
 
@@ -358,16 +384,26 @@ export class ImportExecutor {
 
 	private buildColumnRuntimeType(columnType: Model.ColumnType): Typesafe.Type<Exclude<Cell, null>> {
 		switch (columnType) {
-			case Model.ColumnType.Uuid: return Typesafe.string // TODO
-			case Model.ColumnType.String: return Typesafe.string
-			case Model.ColumnType.Int: return Typesafe.number // TODO
-			case Model.ColumnType.Double: return Typesafe.number
-			case Model.ColumnType.Bool: return Typesafe.boolean
-			case Model.ColumnType.Enum: return Typesafe.string // TODO
-			case Model.ColumnType.DateTime: return Typesafe.string // TODO
-			case Model.ColumnType.Time: return Typesafe.string // TODO
-			case Model.ColumnType.Date: return Typesafe.string // TODO
-			case Model.ColumnType.Json: return Typesafe.string
+			case Model.ColumnType.Uuid:
+				return Typesafe.string // TODO
+			case Model.ColumnType.String:
+				return Typesafe.string
+			case Model.ColumnType.Int:
+				return Typesafe.number // TODO
+			case Model.ColumnType.Double:
+				return Typesafe.number
+			case Model.ColumnType.Bool:
+				return Typesafe.boolean
+			case Model.ColumnType.Enum:
+				return Typesafe.string // TODO
+			case Model.ColumnType.DateTime:
+				return Typesafe.string // TODO
+			case Model.ColumnType.Time:
+				return Typesafe.string // TODO
+			case Model.ColumnType.Date:
+				return Typesafe.string // TODO
+			case Model.ColumnType.Json:
+				return Typesafe.string
 		}
 	}
 }

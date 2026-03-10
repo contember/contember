@@ -4,7 +4,8 @@ import { addField, SchemaUpdater, updateEntity, updateModel, updateSchema } from
 import {
 	createModificationType,
 	Differ,
-	ModificationHandler, ModificationHandlerCreateSqlOptions,
+	ModificationHandler,
+	ModificationHandlerCreateSqlOptions,
 	ModificationHandlerOptions,
 } from '../ModificationHandler'
 import { isInverseRelation, isOwningRelation } from '@contember/schema-utils'
@@ -14,7 +15,9 @@ import { wrapIdentifier } from '../../utils/dbHelpers'
 import { normalizeManyHasManyRelation, PartialManyHasManyRelation } from './normalization'
 import { updateFieldNameModification } from '../fields'
 
-export class ConvertOneHasManyToManyHasManyRelationModificationHandler implements ModificationHandler<ConvertOneHasManyToManyHasManyRelationModificationData> {
+export class ConvertOneHasManyToManyHasManyRelationModificationHandler
+	implements ModificationHandler<ConvertOneHasManyToManyHasManyRelationModificationData>
+{
 	private subModification: ModificationHandler<any>
 
 	constructor(
@@ -93,10 +96,10 @@ export class ConvertOneHasManyToManyHasManyRelationDiffer implements Differ {
 	createDiff(originalSchema: Schema, updatedSchema: Schema) {
 		return updateRelations(originalSchema, updatedSchema, ({ originalRelation, updatedRelation, updatedEntity }) => {
 			if (
-				isInverseRelation(originalRelation) &&
-				isInverseRelation(updatedRelation) &&
-				originalRelation.type === Model.RelationType.OneHasMany &&
-				updatedRelation.type === Model.RelationType.ManyHasMany
+				isInverseRelation(originalRelation)
+				&& isInverseRelation(updatedRelation)
+				&& originalRelation.type === Model.RelationType.OneHasMany
+				&& updatedRelation.type === Model.RelationType.ManyHasMany
 			) {
 				const owningOldName = originalRelation.ownedBy
 				const owningNewName = updatedRelation.ownedBy

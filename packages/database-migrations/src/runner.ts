@@ -26,9 +26,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
 
-import {
-	createMigrationBuilder,
-} from './helpers'
+import { createMigrationBuilder } from './helpers'
 import { Connection, withDatabaseAdvisoryLock, wrapIdentifier } from '@contember/database'
 import { Migration, RunMigration } from './Migration'
 import { MigrationsResolver } from './MigrationsResolver'
@@ -39,7 +37,6 @@ export type RunnerOption<Args = unknown> = {
 	log: (msg: string) => void
 	migrationArgs: Args
 }
-
 
 // Random but well-known identifier shared by all instances of node-pg-migrate
 const PG_MIGRATE_LOCK_ID = 7241865325823964
@@ -55,12 +52,11 @@ const ensureMigrationsTable = async (db: Connection.ConnectionLike, options: Run
 				id INT PRIMARY KEY,
 				name varchar(255) NOT NULL,
 				run_on timestamp NOT NULL
-			)`,
-		)
+			)`)
 		await db.query(`ALTER TABLE ${fullTableName} ADD COLUMN IF NOT EXISTS "group" TEXT DEFAULT NULL`)
 
 		await db.query(`ALTER TABLE ${fullTableName} ALTER id DROP DEFAULT`)
-		const seqName = (await db.query<{seq_name: string}>(`
+		const seqName = (await db.query<{ seq_name: string }>(`
 			SELECT pg_get_serial_sequence('${fullTableName}', 'id') as seq_name
 		`)).rows[0].seq_name
 		if (seqName) {
@@ -76,7 +72,7 @@ const ensureMigrationsTable = async (db: Connection.ConnectionLike, options: Run
 
 const getRunMigrations = async (db: Connection.ConnectionLike, options: RunnerOption<unknown>) => {
 	const fullTableName = getMigrationsTableName(options)
-	return (await db.query<{name: string; group: string | null}>(`SELECT name, "group" FROM ${fullTableName} ORDER BY run_on, id`)).rows
+	return (await db.query<{ name: string; group: string | null }>(`SELECT name, "group" FROM ${fullTableName} ORDER BY run_on, id`)).rows
 }
 
 const getMigrationsToRun = <Args>(options: RunnerOption, runNames: string[], migrations: Migration<Args>[]): Migration<Args>[] => {
@@ -94,7 +90,6 @@ export default async <Args>(
 			await db.query(`CREATE SCHEMA IF NOT EXISTS ${wrapIdentifier(options.schema)}`)
 			await db.query(`SET search_path TO ${wrapIdentifier(options.schema)}`)
 			await ensureMigrationsTable(db, options)
-
 
 			const runMigrations = await getRunMigrations(db, options)
 			const migrations = await migrationsResolver.resolveMigrations({
@@ -120,7 +115,7 @@ export default async <Args>(
 							for (const sql of steps) {
 								await trx.query(sql)
 							}
-							const maxId = await trx.query<{id: number}>(`SELECT MAX(id) as id FROM ${getMigrationsTableName(options)}`)
+							const maxId = await trx.query<{ id: number }>(`SELECT MAX(id) as id FROM ${getMigrationsTableName(options)}`)
 							const nextId = (maxId.rows[0]?.id ?? 0) + 1
 							await trx.query(
 								`INSERT INTO ${getMigrationsTableName(options)} (id, name, run_on, "group") VALUES (?, ?, NOW(), ?);`,
@@ -140,9 +135,7 @@ export default async <Args>(
 				return toRun.map(m => ({
 					name: m.name,
 				}))
-
 			})
-		}),
+		})
 	)
-
 }

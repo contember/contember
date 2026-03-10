@@ -8,20 +8,22 @@ export const LoginWithEmail = () => {
 	const sessionToken = useSessionTokenWithMeta()
 	const setSessionToken = useSetSessionToken()
 
-	return <>
-		<CreateSessionTokenForm
-			expiration={3600 * 24 * 7}
-			apiToken={sessionToken.propsToken}
-			onSuccess={it => {
-				setSessionToken(it.result.token)
-			}}>
-			<form>
-				<CreateSessionTokenFormFields />
-			</form>
-		</CreateSessionTokenForm>
-	</>
+	return (
+		<>
+			<CreateSessionTokenForm
+				expiration={3600 * 24 * 7}
+				apiToken={sessionToken.propsToken}
+				onSuccess={it => {
+					setSessionToken(it.result.token)
+				}}
+			>
+				<form>
+					<CreateSessionTokenFormFields />
+				</form>
+			</CreateSessionTokenForm>
+		</>
+	)
 }
-
 
 const CreateSessionTokenFormFields = () => {
 	const form = useCreateSessionTokenForm()
@@ -38,12 +40,17 @@ const CreateSessionTokenFormFields = () => {
 			{form.state === 'submitting' ? <Loader position="absolute" /> : null}
 
 			<TenantFormError
-				form={form} messages={messages}
+				form={form}
+				messages={messages}
 			/>
 
 			<TenantFormField
-				form={form} messages={messages} field="email"
-				type="text" required autoFocus
+				form={form}
+				messages={messages}
+				field="email"
+				type="text"
+				required
+				autoFocus
 			>
 				E-mail
 			</TenantFormField>

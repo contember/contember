@@ -11,8 +11,7 @@ test('paginate posts', async () => {
 			.entity('Post', entity =>
 				entity
 					.column('title', column => column.type(Model.ColumnType.String))
-					.manyHasOne('author', relation => relation.target('Author')),
-			)
+					.manyHasOne('author', relation => relation.target('Author')))
 			.entity('Author', entity => entity.column('name', column => column.type(Model.ColumnType.String)))
 			.buildSchema(),
 		query: GQL`
@@ -112,4 +111,3 @@ where "root_author"."name" = ? order by "root_"."id" asc limit 2 offset 1`,
 		},
 	})
 })
-

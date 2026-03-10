@@ -6,7 +6,6 @@ import { useReferentiallyStableCallback } from '@contember/react-utils'
 
 const SlotForm = Slot as ComponentType<React.FormHTMLAttributes<HTMLFormElement>>
 
-
 type ExecuteResult<T extends FormContextValue<any, any, any>, OkResult = undefined> =
 	| ({ ok: true } & (OkResult extends undefined ? {} : { result: OkResult }))
 	| { ok: false; error?: T['errors'][number]['code']; developerMessage?: string; state?: T['state'] }
@@ -87,11 +86,14 @@ export const TenantForm = <T extends FormContextValue<any, any, any>, OkResult =
 			setState('error')
 			setErrors([{
 				code: 'UNKNOWN_ERROR',
-				developerMessage: typeof e === 'string' ? e : (e && typeof e === 'object' && 'message' in e && typeof e.message === 'string') ? e.message : undefined,
+				developerMessage: typeof e === 'string'
+					? e
+					: (e && typeof e === 'object' && 'message' in e && typeof e.message === 'string')
+					? e.message
+					: undefined,
 			}])
 		}
 	})
-
 
 	const onChange = useReferentiallyStableCallback(onChangeIn || (() => undefined))
 	useEffect(() => {
@@ -101,13 +103,15 @@ export const TenantForm = <T extends FormContextValue<any, any, any>, OkResult =
 	const setValue = useCallback((field: string, value: string) => setValues(values => ({ ...values, [field]: value })), [])
 
 	return (
-		<FormContext.Provider value={{
-			values,
-			setValues,
-			state,
-			errors,
-			setValue: setValue,
-		} as unknown as T}>
+		<FormContext.Provider
+			value={{
+				values,
+				setValues,
+				state,
+				errors,
+				setValue: setValue,
+			} as unknown as T}
+		>
 			<SlotForm onSubmit={submit}>
 				{children}
 			</SlotForm>

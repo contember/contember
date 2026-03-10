@@ -21,11 +21,9 @@ export const useBlockEditorOnChange = ({ refreshBlocks, editor, sortedBlocksRef,
 	blockElementCache: BlockElementCache
 	refreshBlocks: () => void
 }) => {
-
 	const getParentEntityRef = useGetParentEntityRef()
 	const desugaredBlockList = useDesugaredRelativeEntityList(blockList)
 	const desugaredBlockContentField = useDesugaredRelativeSingleField(contentField)
-
 
 	return useCallback(() => {
 		const { children, operations } = editor
@@ -65,7 +63,6 @@ export const useBlockEditorOnChange = ({ refreshBlocks, editor, sortedBlocksRef,
 		} else {
 			refreshBlocks()
 		}
-
 	}, [blockElementCache, desugaredBlockContentField, desugaredBlockList, editor, getParentEntityRef, refreshBlocks, sortedBlocksRef])
 }
 

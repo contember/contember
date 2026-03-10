@@ -1,5 +1,13 @@
 import { Schema } from '@contember/schema'
-import { compareArraysIgnoreOrder, deepCompare, isInverseRelation, isOwningRelation, isRelation, SchemaValidator, ValidationError } from '@contember/schema-utils'
+import {
+	compareArraysIgnoreOrder,
+	deepCompare,
+	isInverseRelation,
+	isOwningRelation,
+	isRelation,
+	SchemaValidator,
+	ValidationError,
+} from '@contember/schema-utils'
 import { SchemaMigrator } from './SchemaMigrator'
 import { Migration } from './Migration'
 import { ImplementationException } from './exceptions'

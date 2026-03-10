@@ -17,31 +17,33 @@ export type DataCallback = (ids: Input.PrimaryValue[]) => Promise<SelectNestedDa
 export type SelectExecutionHandlerContext<
 	FieldArgs = any,
 	FieldExtensions extends Record<string, any> = Record<string, any>,
-> = {
-	mapper: Mapper
-	path: Path
-	entity: Model.Entity
-	relationPath: Model.AnyRelationContext[]
-	addPredicate: (predicate: Acl.Predicate) => (row: SelectRow) => boolean
-	addColumn: (args: {
-		predicate?: Acl.Predicate
-		query?: (qb: SelectBuilder<SelectBuilder.Result>) => SelectBuilder<SelectBuilder.Result>
-		path?: Path
-		valueGetter?: ColumnValueGetter
-	}) => void
-	addData: (args: {
-		field: string
-		dataProvider: DataCallback
-		predicate?: Acl.Predicate
-		defaultValue?: SelectNestedDefaultValue
-	}) => void
-} & (
-	| {
-		fieldNode: FieldNode<FieldExtensions>
-		objectNode?: never
-	  }
-	| {
-		fieldNode?: never
-		objectNode: ObjectNode<FieldArgs, FieldExtensions>
-	  }
-)
+> =
+	& {
+		mapper: Mapper
+		path: Path
+		entity: Model.Entity
+		relationPath: Model.AnyRelationContext[]
+		addPredicate: (predicate: Acl.Predicate) => (row: SelectRow) => boolean
+		addColumn: (args: {
+			predicate?: Acl.Predicate
+			query?: (qb: SelectBuilder<SelectBuilder.Result>) => SelectBuilder<SelectBuilder.Result>
+			path?: Path
+			valueGetter?: ColumnValueGetter
+		}) => void
+		addData: (args: {
+			field: string
+			dataProvider: DataCallback
+			predicate?: Acl.Predicate
+			defaultValue?: SelectNestedDefaultValue
+		}) => void
+	}
+	& (
+		| {
+			fieldNode: FieldNode<FieldExtensions>
+			objectNode?: never
+		}
+		| {
+			fieldNode?: never
+			objectNode: ObjectNode<FieldArgs, FieldExtensions>
+		}
+	)

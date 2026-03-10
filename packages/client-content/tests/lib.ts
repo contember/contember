@@ -13,4 +13,3 @@ export const createClient = (result?: any) => {
 	})
 	return [client, calls] as const
 }
-

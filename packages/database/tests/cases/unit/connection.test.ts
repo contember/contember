@@ -7,16 +7,18 @@ it('support nested scope', async () => {
 		[{ sql: 'SELECT 1' }],
 	)
 
-	await connection.scope(async c1 => await c1.scope(async c2 => {
-		await c2.query('SELECT 1')
-		return 'foo'
-	}))
+	await connection.scope(async c1 =>
+		await c1.scope(async c2 => {
+			await c2.query('SELECT 1')
+			return 'foo'
+		})
+	)
 	end()
 })
 
 it('another scope acquires new connection', async () => {
 	const [connection, end] = createConnectionMockAlt(
-		[{ sql: 'SELECT 1', timeout: 5  }, { sql: 'SELECT 2', timeout: 5 }],
+		[{ sql: 'SELECT 1', timeout: 5 }, { sql: 'SELECT 2', timeout: 5 }],
 		[{ sql: 'SELECT 3', timeout: 5 }],
 	)
 
@@ -29,7 +31,6 @@ it('another scope acquires new connection', async () => {
 	])
 	end()
 })
-
 
 it('another nested scope waits for connection', async () => {
 	const [connection, end] = createConnectionMockAlt(
@@ -46,7 +47,6 @@ it('another nested scope waits for connection', async () => {
 	})
 	end()
 })
-
 
 it('another nested scope waits for connection in a transaction', async () => {
 	const [connection, end] = createConnectionMockAlt(
@@ -70,7 +70,6 @@ it('another nested scope waits for connection in a transaction', async () => {
 	end()
 })
 
-
 it('unscoped queries can pe out of order', async () => {
 	const [connection, end] = createConnectionMockAlt(
 		[
@@ -84,14 +83,12 @@ it('unscoped queries can pe out of order', async () => {
 			(async () => {
 				await c1.query('SELECT 1')
 				await c1.query('SELECT 2')
-
 			})(),
 			c1.query('SELECT 3'),
 		])
 	})
 	end()
 })
-
 
 it('support nested transaction / savepoints', async () => {
 	const [connection, end] = createConnectionMockAlt([
@@ -112,8 +109,7 @@ it('support nested transaction / savepoints', async () => {
 		{ sql: 'RELEASE SAVEPOINT "savepoint_3"' },
 		{ sql: 'SELECT 9' },
 		{ sql: 'COMMIT', result: { command: 'COMMIT' } },
-	],
-	)
+	])
 
 	await connection.transaction(async trx => {
 		await Promise.all([
@@ -151,4 +147,3 @@ it('detects deadlock', async () => {
 	await expect(connection.scope(async c1 => c1.scope(async () => await c1.query('SELECT 1')))).rejects.toThrow(MutexDeadlockError)
 	end()
 })
-

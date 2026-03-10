@@ -35,4 +35,3 @@ test('Composed filter with nulls', async () => {
 		},
 	})
 })
-

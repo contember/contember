@@ -4,7 +4,14 @@ import { Input, Model } from '@contember/schema'
 import { UpdateBuilderFactory } from './UpdateBuilderFactory'
 import { Mapper } from '../Mapper'
 import { acceptFieldVisitor } from '@contember/schema-utils'
-import { MutationEntryNotFoundError, MutationNoResultError, MutationNothingToDo, MutationResultList, MutationUpdateOk, NothingToDoReason } from '../Result'
+import {
+	MutationEntryNotFoundError,
+	MutationNoResultError,
+	MutationNothingToDo,
+	MutationResultList,
+	MutationUpdateOk,
+	NothingToDoReason,
+} from '../Result'
 import { UpdateBuilder } from './UpdateBuilder'
 import { rowDataToFieldValues } from '../ColumnValue'
 import { MapperInput } from '../types'

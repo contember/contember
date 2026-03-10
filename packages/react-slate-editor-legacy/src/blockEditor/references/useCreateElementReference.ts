@@ -17,16 +17,18 @@ export type CreateElementReferences = (
 	editor: Editor,
 	targetPath: Slate.Path,
 	referenceDiscriminant: FieldValue,
-	initialize?: EntityAccessor.BatchUpdatesHandler
+	initialize?: EntityAccessor.BatchUpdatesHandler,
 ) => EntityAccessor
 
-export const useCreateElementReference = ({ monolithicReferencesMode, sortedBlocksRef, referenceDiscriminationField, referencesField, refreshBlocks }: {
-	referencesField?: SugaredRelativeEntityList | string
-	monolithicReferencesMode?: boolean
-	sortedBlocksRef: MutableRefObject<EntityAccessor[]>
-	referenceDiscriminationField?: SugaredFieldProps['field']
-	refreshBlocks: RefreshBlocks
-}): CreateElementReferences => {
+export const useCreateElementReference = (
+	{ monolithicReferencesMode, sortedBlocksRef, referenceDiscriminationField, referencesField, refreshBlocks }: {
+		referencesField?: SugaredRelativeEntityList | string
+		monolithicReferencesMode?: boolean
+		sortedBlocksRef: MutableRefObject<EntityAccessor[]>
+		referenceDiscriminationField?: SugaredFieldProps['field']
+		refreshBlocks: RefreshBlocks
+	},
+): CreateElementReferences => {
 	const getReferenceList = useGetReferenceEntityList({ monolithicReferencesMode, sortedBlocksRef, referencesField })
 
 	return useCreateElementReferenceInternal({

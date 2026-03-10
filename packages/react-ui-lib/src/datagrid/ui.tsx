@@ -67,11 +67,8 @@ export const DataGridActiveFilterUI = forwardRef<HTMLButtonElement, {
 	)
 })
 
-
 export const DataGridSingleFilterUI = forwardRef<HTMLDivElement, { children: ReactNode }>((props, ref) => {
-	return (
-		<div className="flex flex-wrap gap-2 rounded-sm bg-gray-50 items-center text-sm px-2 py-1.5 border border-gray-200" ref={ref} {...props} />
-	)
+	return <div className="flex flex-wrap gap-2 rounded-sm bg-gray-50 items-center text-sm px-2 py-1.5 border border-gray-200" ref={ref} {...props} />
 })
 
 export const DataGridFilterSelectTriggerUI = forwardRef<HTMLButtonElement, { children: ReactNode }>(({
@@ -80,12 +77,12 @@ export const DataGridFilterSelectTriggerUI = forwardRef<HTMLButtonElement, { chi
 }, ref) => {
 	return (
 		<button className="hover:underline inline-flex items-center gap-2 group px-1" ref={ref} {...props}>
-			{children && <span className="text-xs font-medium">
-				{children}
-			</span>}
-			<span
-				className="bg-gray-100 rounded-full border border-gray-200 group-data-[state=open]:bg-background group-data-[state=open]:shadow-inner h-5 w-5 inline-flex items-center justify-center"
-			>
+			{children && (
+				<span className="text-xs font-medium">
+					{children}
+				</span>
+			)}
+			<span className="bg-gray-100 rounded-full border border-gray-200 group-data-[state=open]:bg-background group-data-[state=open]:shadow-inner h-5 w-5 inline-flex items-center justify-center">
 				<PlusIcon className="w-3 h-3" />
 			</span>
 		</button>
@@ -125,7 +122,9 @@ export const DataGridFilterSelectItemUI = forwardRef<HTMLButtonElement, DataGrid
 				onClick={include}
 				size="sm"
 				className="pl-1 w-full text-left justify-start gap-1 data-[highlighted]:bg-gray-200"
-				variant="ghost" {...props}>
+				variant="ghost"
+				{...props}
+			>
 				{isIncluded ? <CheckSquareIcon className="w-3 h-3" /> : <SquareIcon className="w-3 h-3" />}
 				<span className={cn('font-normal', isIncluded && 'text-blue-700')}>
 					{children}
@@ -141,10 +140,8 @@ export const DataGridFilterSelectItemUI = forwardRef<HTMLButtonElement, DataGrid
 				<FilterXIcon className="h-3 w-3" />
 			</button>
 		</div>
-
 	)
 })
-
 
 export const DataGridToolbarUI = uic('div', {
 	baseClass: 'flex flex-col md:flex-row gap-2 md:items-end mb-4 items-stretch',

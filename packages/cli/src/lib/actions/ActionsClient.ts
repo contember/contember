@@ -79,7 +79,6 @@ export class ActionsClient {
 		return result.stopEvent.ok
 	}
 
-
 	public async getEvent(id: string): Promise<Event | null> {
 		const query = `query($id: UUID!) {
   event(id: $id) {

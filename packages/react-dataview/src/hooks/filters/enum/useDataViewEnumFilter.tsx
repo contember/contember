@@ -6,7 +6,7 @@ export type DataViewSetEnumFilterAction = 'include' | 'exclude' | 'unset' | 'tog
 export type DataViewEnumFilterCurrent = 'include' | 'exclude' | 'none'
 export type UseDataViewEnumFilter = [
 	current: DataViewEnumFilterCurrent,
-	set: (value: DataViewSetEnumFilterAction) => void
+	set: (value: DataViewSetEnumFilterAction) => void,
 ]
 
 export const useDataViewEnumFilter = (name: string, value: string): UseDataViewEnumFilter => {
@@ -18,7 +18,6 @@ export const useDataViewEnumFilterFactory = (name: string) => {
 	const [filter, setFilter] = useDataViewFilter<EnumFilterArtifacts>(name)
 
 	return useCallback((value: string): UseDataViewEnumFilter => {
-
 		const current = (() => {
 			if (filter?.values?.includes(value)) {
 				return 'include'
@@ -29,7 +28,7 @@ export const useDataViewEnumFilterFactory = (name: string) => {
 			return 'none'
 		})()
 
-		const set = ((action: DataViewSetEnumFilterAction = 'include') => {
+		const set = (action: DataViewSetEnumFilterAction = 'include') => {
 			switch (action) {
 				case 'unset':
 					setFilter(it => ({
@@ -67,9 +66,8 @@ export const useDataViewEnumFilterFactory = (name: string) => {
 					}))
 					return
 			}
-		})
+		}
 
 		return [current, set]
-
 	}, [filter?.notValues, filter?.values, setFilter])
 }

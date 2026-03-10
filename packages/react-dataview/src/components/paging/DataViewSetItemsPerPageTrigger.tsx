@@ -8,7 +8,9 @@ export interface DataViewSetItemsPerPageTriggerAttributes {
 	['data-active']?: ''
 }
 
-const SlotType = Slot as React.ForwardRefExoticComponent<React.ButtonHTMLAttributes<HTMLButtonElement> & React.RefAttributes<HTMLButtonElement> & DataViewSetItemsPerPageTriggerAttributes>
+const SlotType = Slot as React.ForwardRefExoticComponent<
+	React.ButtonHTMLAttributes<HTMLButtonElement> & React.RefAttributes<HTMLButtonElement> & DataViewSetItemsPerPageTriggerAttributes
+>
 
 export interface DataViewSetItemsPerPageTriggerProps {
 	children: ReactNode

@@ -1,4 +1,11 @@
-import { FileUrlDataExtractorProps, GenericFileMetadataExtractorProps, getFileUrlDataExtractor, getGenericFileMetadataExtractor, getVideoFileDataExtractor, VideoFileDataExtractorProps } from '../extractors'
+import {
+	FileUrlDataExtractorProps,
+	GenericFileMetadataExtractorProps,
+	getFileUrlDataExtractor,
+	getGenericFileMetadataExtractor,
+	getVideoFileDataExtractor,
+	VideoFileDataExtractorProps,
+} from '../extractors'
 import { FileType } from '../types'
 
 export type VideoFileTypeProps =

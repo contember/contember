@@ -10,6 +10,6 @@ export type Schema = {
 	readonly settings: Settings.Schema
 }
 
-export type Writable<V> = {-readonly [K in keyof V]: V[K]}
+export type Writable<V> = { -readonly [K in keyof V]: V[K] }
 
 export * from './schema'

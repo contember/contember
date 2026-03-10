@@ -7,7 +7,6 @@ UPDATE person
 SET name = SPLIT_PART(email, '@', 1);
 `
 
-export default async function (builder: MigrationBuilder) {
+export default async function(builder: MigrationBuilder) {
 	builder.sql(sql)
 }
-

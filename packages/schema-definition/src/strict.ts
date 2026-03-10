@@ -10,7 +10,6 @@ export const allStrict: StrictOptions = {
 	requireInverseSide: true,
 }
 
-
 export type Warning = { message: string }
 
 export class StrictDefinitionValidator {
@@ -27,10 +26,11 @@ export class StrictDefinitionValidator {
 		}
 	}
 
-
-	public validateOnCascade(entityName: string, field: string, definition: { onDelete?: Model.OnDelete}): void {
+	public validateOnCascade(entityName: string, field: string, definition: { onDelete?: Model.OnDelete }): void {
 		if (!definition.onDelete && this.options.requireOnDelete) {
-			this.registerWarning(`${entityName}.${field}: onDelete behaviour is not set. Use one of cascadeOnDelete(), setNullOnDelete() or restrictOnDelete().`)
+			this.registerWarning(
+				`${entityName}.${field}: onDelete behaviour is not set. Use one of cascadeOnDelete(), setNullOnDelete() or restrictOnDelete().`,
+			)
 		}
 	}
 

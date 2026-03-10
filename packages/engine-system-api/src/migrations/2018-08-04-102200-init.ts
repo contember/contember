@@ -31,6 +31,6 @@ CREATE TABLE "stage" (
 CREATE INDEX "system_stage_event_id" ON "stage"("event_id");
 `
 
-export default async function (builder: MigrationBuilder) {
+export default async function(builder: MigrationBuilder) {
 	builder.sql(sql)
 }

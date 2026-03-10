@@ -1,12 +1,7 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
 import { SchemaUpdater, updateEntity, updateModel } from '../utils/schemaUpdateUtils'
-import {
-	createModificationType,
-	Differ,
-	ModificationHandler,
-	ModificationHandlerCreateSqlOptions,
-} from '../ModificationHandler'
+import { createModificationType, Differ, ModificationHandler, ModificationHandlerCreateSqlOptions } from '../ModificationHandler'
 import { wrapIdentifier } from '../../utils/dbHelpers'
 import { getIndexColumns } from './utils'
 import deepEqual from 'fast-deep-equal'
@@ -70,10 +65,12 @@ export class CreateIndexDiffer implements Differ {
 		return Object.values(updatedSchema.model.entities).flatMap(entity =>
 			entity.indexes
 				.filter(it => !originalSchema.model.entities[entity.name].indexes.find(idx => deepEqual(idx, it)))
-				.map(index => createIndexModification.createModification({
-					entityName: entity.name,
-					index,
-				})),
+				.map(index =>
+					createIndexModification.createModification({
+						entityName: entity.name,
+						index,
+					})
+				)
 		)
 	}
 }

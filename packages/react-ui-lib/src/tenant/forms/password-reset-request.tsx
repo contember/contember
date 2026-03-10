@@ -4,7 +4,6 @@ import { Loader } from '../../ui/loader'
 import { TenantFormError, TenantFormField } from './common'
 import { dict } from '../../dict'
 
-
 export const PasswordResetRequestFormFields = () => {
 	const form = usePasswordResetRequestForm()
 	return (
@@ -12,12 +11,18 @@ export const PasswordResetRequestFormFields = () => {
 			{form.state === 'success' || form.state === 'submitting' ? <Loader position="absolute" /> : null}
 
 			<TenantFormError
-				form={form} messages={dict.tenant.passwordResetRequest.errorMessages}
+				form={form}
+				messages={dict.tenant.passwordResetRequest.errorMessages}
 			/>
 
 			<TenantFormField
-				form={form} messages={dict.tenant.passwordResetRequest.errorMessages} field="email"
-				type="email" required autoFocus autoComplete="email"
+				form={form}
+				messages={dict.tenant.passwordResetRequest.errorMessages}
+				field="email"
+				type="email"
+				required
+				autoFocus
+				autoComplete="email"
 			>
 				{dict.tenant.passwordResetRequest.email}
 			</TenantFormField>
@@ -28,4 +33,3 @@ export const PasswordResetRequestFormFields = () => {
 		</div>
 	)
 }
-

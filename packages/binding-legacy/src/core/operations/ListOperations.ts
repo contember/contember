@@ -69,9 +69,9 @@ export class ListOperations {
 			for (const state of StateIterator.eachSiblingRealmChild(this.treeStore, outerState)) {
 				if (state.entityName !== stateToConnect.entity.entityName) {
 					throw new BindingError(
-						`EntityListAccessor.connectEntity: Attempting to connect at an entity of type ` +
-							`'${stateToConnect.entity.entityName}' but '${state.entityName}' is expected.\n\n` +
-							`Entity located at: ${ErrorLocator.locateInternalState(outerState)}.`,
+						`EntityListAccessor.connectEntity: Attempting to connect at an entity of type `
+							+ `'${stateToConnect.entity.entityName}' but '${state.entityName}' is expected.\n\n`
+							+ `Entity located at: ${ErrorLocator.locateInternalState(outerState)}.`,
 					)
 				}
 
@@ -83,13 +83,13 @@ export class ListOperations {
 				} catch (error) {
 					if (error instanceof LocalizedBindingError) {
 						throw new BindingError(
-							`Entity list: cannot connect entity with key '${entityToConnect.key}' because its fields are ` +
-								`incompatible with entities found on this list. Make sure both trees are equivalent.\n\n` +
-								`${error.message}\n\n` +
-								(error.markerPath.length > 1
+							`Entity list: cannot connect entity with key '${entityToConnect.key}' because its fields are `
+								+ `incompatible with entities found on this list. Make sure both trees are equivalent.\n\n`
+								+ `${error.message}\n\n`
+								+ (error.markerPath.length > 1
 									? `Incompatibility found at: ${ErrorLocator.locateMarkerPath(error.markerPath)}.\n\n`
-									: '') +
-								`Entity list located at: ${ErrorLocator.locateInternalState(state)}.`,
+									: '')
+								+ `Entity list located at: ${ErrorLocator.locateInternalState(state)}.`,
 						)
 					}
 					throw error
@@ -124,7 +124,7 @@ export class ListOperations {
 		})
 	}
 
-	public disconnectEntity(listState: EntityListState, childEntity: EntityAccessor, options: {noPersist?: boolean}) {
+	public disconnectEntity(listState: EntityListState, childEntity: EntityAccessor, options: { noPersist?: boolean }) {
 		this.eventManager.syncOperation(() => {
 			// TODO disable this at the top-level.
 			const persistedEntityIds = this.treeStore.getEntityListPersistedIds(listState)
@@ -205,11 +205,11 @@ export class ListOperations {
 			}
 			const looksLikeKey = typeof id === 'string' && (this.treeStore.entityRealmStore.has(id) || RealmKeyGenerator.vaguelyAppearsToBeAKey(id))
 			throw new BindingError(
-				`EntityList: cannot retrieve an entity with id '${id}' because it's not a valid id.` +
-					(looksLikeKey
-						? `\nThe supplied value appears to be an entity *key*, not an *id*. List accessors are indexed by ids ` +
-						  `and you can use \`EntityAccessor.id\` to obtain one. Keys, on the other hand, are globally unique and ` +
-						  `you can use \`getEntityByKey\` to get its EntityAccessor.`
+				`EntityList: cannot retrieve an entity with id '${id}' because it's not a valid id.`
+					+ (looksLikeKey
+						? `\nThe supplied value appears to be an entity *key*, not an *id*. List accessors are indexed by ids `
+							+ `and you can use \`EntityAccessor.id\` to obtain one. Keys, on the other hand, are globally unique and `
+							+ `you can use \`getEntityByKey\` to get its EntityAccessor.`
 						: ''),
 			)
 		}

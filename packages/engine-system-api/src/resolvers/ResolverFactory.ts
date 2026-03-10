@@ -2,7 +2,7 @@ import { EventsQueryResolver, ExecutedMigrationsQueryResolver, StagesQueryResolv
 import { Event, EventType, Resolvers } from '../schema'
 import { assertNever } from '../utils'
 import { MigrateMutationResolver, MigrationAlterMutationResolver, TruncateMutationResolver } from './mutation'
-import { DateTimeType, JSONType, createJsonLikeType } from '@contember/graphql-utils'
+import { createJsonLikeType, DateTimeType, JSONType } from '@contember/graphql-utils'
 import { EventOldValuesResolver } from './types'
 import { GraphQLError, GraphQLScalarType, Kind } from 'graphql'
 import { SchemaQueryResolver } from './query/SchemaQueryResolver'
@@ -68,7 +68,7 @@ export class ResolverFactory {
 	}
 }
 
-const parseValue = (value: any)  => {
+const parseValue = (value: any) => {
 	if ((typeof value === 'string' && value !== '') || typeof value === 'number' && Number.isFinite(value) && Math.floor(value) === value) {
 		return value
 	}
@@ -76,7 +76,6 @@ const parseValue = (value: any)  => {
 }
 
 const SchemaType = createJsonLikeType('Schema', 'Content schema custom scalar type')
-
 
 export const PrimaryKeyType = new GraphQLScalarType({
 	name: 'PrimaryKey',

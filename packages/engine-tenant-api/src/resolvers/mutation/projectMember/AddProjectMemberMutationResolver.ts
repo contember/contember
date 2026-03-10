@@ -1,9 +1,4 @@
-import {
-	AddProjectMemberErrorCode,
-	AddProjectMemberResponse,
-	MutationAddProjectMemberArgs,
-	MutationResolvers,
-} from '../../../schema'
+import { AddProjectMemberErrorCode, AddProjectMemberResponse, MutationAddProjectMemberArgs, MutationResolvers } from '../../../schema'
 import { TenantResolverContext } from '../../TenantResolverContext'
 import { MembershipValidator, PermissionActions, ProjectManager, ProjectMemberManager } from '../../../model'
 import { createMembershipValidationErrorResult } from '../../membershipUtils'

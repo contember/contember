@@ -21,7 +21,6 @@ export const computeTokenHash = (token: string): TokenHash => {
 
 export const isTokenHash = (token: string): token is TokenHash => isFixedLengthHexString(token, 64)
 
-
 const MAX_OTP_ATTEMPTS = 3
 
 export const validateToken = ({ entry, validationType, token, now }: {

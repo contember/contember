@@ -39,7 +39,6 @@ export const notifyWorkerStarted = () =>
 	})
 
 export class WorkerManager {
-
 	private isTerminating = false
 
 	private workers: Set<Worker> = new Set()
@@ -75,18 +74,20 @@ export class WorkerManager {
 			throw new Error(`Worker manager is terminating`)
 		}
 		this.isTerminating = true
-		await Promise.allSettled(Array.from(this.workers).map(async it => {
-			if (!it) {
-				return
-			}
-			console.log(`Terminating worker ${it.process.pid}`)
-			const disconnectPromise = new Promise(resolve => it.once('disconnect', resolve))
-			it.disconnect()
-			await disconnectPromise
-			const killPromise = new Promise(resolve => it.once('exit', resolve))
-			it.kill(signal)
-			await killPromise
-			console.log(`Worker ${it.process.pid} terminated`)
-		}))
+		await Promise.allSettled(
+			Array.from(this.workers).map(async it => {
+				if (!it) {
+					return
+				}
+				console.log(`Terminating worker ${it.process.pid}`)
+				const disconnectPromise = new Promise(resolve => it.once('disconnect', resolve))
+				it.disconnect()
+				await disconnectPromise
+				const killPromise = new Promise(resolve => it.once('exit', resolve))
+				it.kill(signal)
+				await killPromise
+				console.log(`Worker ${it.process.pid} terminated`)
+			}),
+		)
 	}
 }

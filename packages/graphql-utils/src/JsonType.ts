@@ -39,7 +39,6 @@ export const createJsonLikeType = (name: string, description: string) => {
 			return parseLiteral(ast, variables)
 		},
 	})
-
 }
 
 export const JSONType = createJsonLikeType('Json', 'JSON custom scalar type')

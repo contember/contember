@@ -1,4 +1,4 @@
-import { Editor as SlateEditor, Editor, Element, Location, NodeEntry, Text } from 'slate'
+import { Editor, Editor as SlateEditor, Element, Location, NodeEntry, Text } from 'slate'
 
 export const closest = <E extends SlateEditor>(
 	editor: E,

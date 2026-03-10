@@ -4,7 +4,6 @@ import { getEntity } from '../model'
 import { ErrorBuilder, ValidationError } from './errors'
 import { conditionSchema } from '../type-schema'
 
-
 export class AclValidator {
 	constructor(private readonly model: Model.Schema) {}
 
@@ -28,7 +27,6 @@ export class AclValidator {
 		roles: string[],
 		errorBuilder: ErrorBuilder,
 	): void {
-
 		this.validateInherits(permissions.inherits, roles, errorBuilder.for('inherits'))
 		this.validateVariables(permissions.variables, errorBuilder.for('variables'))
 		this.validatePermissions(permissions.entities, (permissions.variables as Acl.Variables) || {}, errorBuilder.for('entities'))

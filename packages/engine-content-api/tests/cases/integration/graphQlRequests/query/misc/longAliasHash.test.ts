@@ -12,8 +12,7 @@ test('hashes an alias when too long', async () => {
 				e
 					.column('title', c => c.type(Model.ColumnType.String))
 					.column('subtitle', c => c.type(Model.ColumnType.String))
-					.manyHasOne('parent', r => r.target('Category')),
-			)
+					.manyHasOne('parent', r => r.target('Category')))
 			.buildSchema(),
 		query: GQL`
         query {
@@ -60,4 +59,3 @@ test('hashes an alias when too long', async () => {
 		},
 	})
 })
-

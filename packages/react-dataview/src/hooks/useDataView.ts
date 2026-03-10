@@ -36,7 +36,6 @@ export type UseDataViewResult = {
  * Use with caution, prefer the {@link DataView} component for most use cases.
  */
 export const useDataView = (args: UseDataViewArgs): UseDataViewResult => {
-
 	const environment = useEnvironment()
 	const key = getDataViewKey(environment, args)
 

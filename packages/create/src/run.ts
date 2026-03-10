@@ -4,13 +4,15 @@ import { WorkspaceCreateCommand } from './commands'
 import { TemplateInstaller } from './lib/TemplateInstaller'
 import { resourcesDir } from './paths'
 import { FileSystem } from './lib/FileSystem'
-
-(async () => {
+;(async () => {
 	const commandManager = new CommandManager({
-		['workspace']: () => new WorkspaceCreateCommand(new TemplateInstaller(
-			resourcesDir,
-			new FileSystem(),
-		)),
+		['workspace']: () =>
+			new WorkspaceCreateCommand(
+				new TemplateInstaller(
+					resourcesDir,
+					new FileSystem(),
+				),
+			),
 	})
 
 	const nodeVersion = process.version.match(/^v?(\d+)\..+$/)

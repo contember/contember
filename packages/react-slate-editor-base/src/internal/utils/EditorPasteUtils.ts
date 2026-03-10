@@ -8,8 +8,8 @@ export class EditorPasteUtils {
 		let ignoring = false
 		let forProcessing = Array.from(allNodes)
 		if (
-			(forProcessing.length === 1 && forProcessing[0].nodeName === 'SPAN') ||
-				(forProcessing.length === 2 && forProcessing[0].nodeName === 'SPAN' && forProcessing[1].nodeName === 'O:P')
+			(forProcessing.length === 1 && forProcessing[0].nodeName === 'SPAN')
+			|| (forProcessing.length === 2 && forProcessing[0].nodeName === 'SPAN' && forProcessing[1].nodeName === 'O:P')
 		) {
 			forProcessing = Array.from(forProcessing[0].childNodes)
 		}
@@ -32,7 +32,7 @@ export class EditorPasteUtils {
 		return nodes
 	}
 
-	public static flattenNodesWithType(withType: NodesWithType[], defaultElementFactory: EditorDefaultElementFactory): NodesWithType  {
+	public static flattenNodesWithType(withType: NodesWithType[], defaultElementFactory: EditorDefaultElementFactory): NodesWithType {
 		const withTypeFiltered = withType.filter((item): item is Exclude<NodesWithType, null> => item !== null)
 		const containsBlock = withTypeFiltered.find(({ elements }) => elements !== undefined) !== undefined
 

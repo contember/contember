@@ -1,8 +1,24 @@
 import { ReactNode, useEffect, useMemo } from 'react'
 import { useCreateRepeaterMethods } from '../internal/useCreateRepeaterMethods'
 import { RepeaterEntityListAccessorContext, RepeaterMethodsContext, RepeaterSortedEntitiesContext } from '../contexts'
-import { Component, EntityListSubTree, HasMany, repairEntitiesOrder, sortEntities, SugaredField, useEntityList, useEntityListSubTree, useEnvironment } from '@contember/react-binding'
-import { EntityListAccessor, QueryLanguage, SugaredQualifiedEntityList, SugaredRelativeEntityList, SugaredRelativeSingleField } from '@contember/react-binding'
+import {
+	Component,
+	EntityListSubTree,
+	HasMany,
+	repairEntitiesOrder,
+	sortEntities,
+	SugaredField,
+	useEntityList,
+	useEntityListSubTree,
+	useEnvironment,
+} from '@contember/react-binding'
+import {
+	EntityListAccessor,
+	QueryLanguage,
+	SugaredQualifiedEntityList,
+	SugaredRelativeEntityList,
+	SugaredRelativeSingleField,
+} from '@contember/react-binding'
 
 export type RepeaterRelativeProps =
 	& SugaredRelativeEntityList
@@ -32,7 +48,6 @@ export const Repeater = Component<RepeaterProps>(props => {
 
 	return <RepeaterRelative {...props} />
 })
-
 
 const RepeaterRelative = Component(
 	(props: RepeaterRelativeProps) => {
@@ -71,7 +86,6 @@ const RepeaterQualified = Component(
 	'Repeater',
 )
 
-
 interface RepeaterInnerProps {
 	accessor: EntityListAccessor
 	children: React.ReactNode
@@ -80,7 +94,10 @@ interface RepeaterInnerProps {
 
 const RepeaterInner = ({ sortableBy, accessor, children }: RepeaterInnerProps) => {
 	const environment = useEnvironment()
-	const desugaredSortableByField = useMemo(() => sortableBy ? QueryLanguage.desugarRelativeSingleField(sortableBy, environment) : undefined, [environment, sortableBy])
+	const desugaredSortableByField = useMemo(() => sortableBy ? QueryLanguage.desugarRelativeSingleField(sortableBy, environment) : undefined, [
+		environment,
+		sortableBy,
+	])
 	const sortedEntities = useMemo(() => {
 		return sortEntities(Array.from(accessor), desugaredSortableByField)
 	}, [desugaredSortableByField, accessor])

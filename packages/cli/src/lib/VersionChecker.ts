@@ -63,9 +63,7 @@ export class VersionChecker {
 Please make sure all dependencies are up to date.\nIf you are really certain about the compatibility, you can disable this version check by running the CLI with the CONTEMBER_SKIP_VERSION_CHECK=1 environment variable`
 		}
 	}
-
 }
-
 
 const extractVersion = (tag: string) => {
 	// e.g.

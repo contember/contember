@@ -1,9 +1,8 @@
 #!/usr/bin/env node
 import * as fs from 'node:fs/promises'
-import { resolve, join } from 'node:path'
-import { ContemberClientGenerator } from './ContemberClientGenerator';
-
-(async () => {
+import { join, resolve } from 'node:path'
+import { ContemberClientGenerator } from './ContemberClientGenerator'
+;(async () => {
 	const schemaPath = process.argv[2]
 	const outDir = process.argv[3]
 
@@ -46,4 +45,3 @@ yarn run --silent contember project:print-schema --format=schema | yarn contembe
 	console.error(e)
 	process.exit(1)
 })
-

@@ -30,7 +30,8 @@ test('applies a filter', async () => {
 					response: { rows: [{ id: testUuid(1) }] },
 				},
 				{
-					sql: SQL`with "newData_" as (select ? :: text as "name", "root_"."name" as "name_old__", "root_"."id"  from "public"."author" as "root_"  where "root_"."id" = ? and "root_"."name" = ?) 
+					sql:
+						SQL`with "newData_" as (select ? :: text as "name", "root_"."name" as "name_old__", "root_"."id"  from "public"."author" as "root_"  where "root_"."id" = ? and "root_"."name" = ?) 
 							update  "public"."author" set  "name" =  "newData_"."name"   from "newData_"  where "author"."id" = "newData_"."id"  returning "name_old__"`,
 					parameters: ['John', testUuid(1), 'Jack'],
 					response: { rows: [{ name_old__: 'Jack' }] },
@@ -58,7 +59,6 @@ test('applies a filter', async () => {
 		},
 	})
 })
-
 
 namespace FilterModel {
 	export class Article {
@@ -102,7 +102,8 @@ test('applies a filter with only relation update', async () => {
 			data: {
 				updateArticle: {
 					ok: false,
-					errorMessage: `Execution has failed:\nunknown field: NotFoundOrDenied (for input {"and":[{"publishedAt":{"isNull":false}},{"id":{"eq":"123e4567-e89b-12d3-a456-000000000001"}}]})`,
+					errorMessage:
+						`Execution has failed:\nunknown field: NotFoundOrDenied (for input {"and":[{"publishedAt":{"isNull":false}},{"id":{"eq":"123e4567-e89b-12d3-a456-000000000001"}}]})`,
 				},
 			},
 		},

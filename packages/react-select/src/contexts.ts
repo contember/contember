@@ -7,8 +7,6 @@ const _SelectCurrentEntitiesContext = createRequiredContext<EntityAccessor[]>('S
 export const SelectCurrentEntitiesContext = _SelectCurrentEntitiesContext[0]
 export const useSelectCurrentEntities = _SelectCurrentEntitiesContext[1]
 
-
-
 const _SelectIsSelectedContext = createRequiredContext<(entity: EntityAccessor) => boolean>('SelectIsSelectedContext')
 /** @internal */
 export const SelectIsSelectedContext = _SelectIsSelectedContext[0]

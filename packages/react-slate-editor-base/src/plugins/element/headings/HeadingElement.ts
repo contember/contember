@@ -23,7 +23,6 @@ export const ejectHeadingElement = (editor: Editor, elementPath: SlatePath) => {
 	Transforms.setNodes(editor, { type: editor.defaultElementType }, { at: elementPath })
 }
 
-
 export const headingElementPlugin = ({ render }: { render: ElementRenderer<HeadingElement> }): EditorElementPlugin<HeadingElement> => ({
 	type: headingElementType,
 	render,

@@ -34,7 +34,6 @@ export const RichTextEditor: FunctionComponent<RichTextEditorProps> = Component(
 		// The cache is questionable, really.
 		const [contemberFieldElementCache] = useState(() => new WeakMap<FieldAccessor<string>, SlateElement[]>())
 
-
 		const [editor] = useState(() => {
 			const { editor } = createEditor({
 				plugins: props.plugins,
@@ -121,4 +120,3 @@ export const RichTextEditor: FunctionComponent<RichTextEditorProps> = Component(
 	),
 	'RichTextEditor',
 )
-

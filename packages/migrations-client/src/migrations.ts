@@ -55,7 +55,6 @@ export interface MigrationSkipStatus extends MigrationStatusBase<MigrationState.
 	localMigration: MigrationFile
 }
 
-
 export type ErrorMigrationStatus =
 	| MigrationToExecuteInvalidStatus
 	| MigrationExecutedMissingStatus
@@ -77,7 +76,6 @@ export const sortMigrations = <M extends { version: string }>(migrations: M[]): 
 }
 
 export class MigrationsStatusResolver {
-
 	async getMigrationsStatus(
 		executedMigrations: ExecutedMigrationInfo[],
 		localMigrations: MigrationFile[],
@@ -165,10 +163,8 @@ export class MigrationsStatusResolver {
 			allMigrations: allMigrationsSorted,
 			errorMigrations: allMigrationsSorted.filter(isErrorMigrationStatus),
 			migrationsToExecute: allMigrationsSorted.filter(
-				(it): it is MigrationToExecuteOkStatus =>
-					it.state === MigrationState.TO_EXECUTE_OK || (force && it.state === MigrationState.TO_EXECUTE_ERROR),
+				(it): it is MigrationToExecuteOkStatus => it.state === MigrationState.TO_EXECUTE_OK || (force && it.state === MigrationState.TO_EXECUTE_ERROR),
 			),
 		}
 	}
-
 }

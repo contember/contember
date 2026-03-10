@@ -6,7 +6,6 @@ import { mapGetOrPut } from '../utils/map'
 import { ImplementationException } from '../ImplementationException'
 
 export class TriggerListenerBuilder {
-
 	private readonly data: TriggerListeners = {
 		createListeners: new Map(),
 		updateListeners: new Map(),
@@ -26,7 +25,7 @@ export class TriggerListenerBuilder {
 		} else if (trigger.type === 'watch') {
 			this.processIndirectListeners(trigger)
 		} else {
-			((_: never) => {
+			;((_: never) => {
 				throw new ImplementationException(`Unhandled trigger ${(trigger as any).type}`)
 			})(trigger)
 		}
@@ -169,12 +168,10 @@ export class TriggerListenerBuilder {
 		return new TriggerListenersStore(this.data)
 	}
 
-
 	private addListener<
 		K extends Exclude<keyof TriggerListeners, 'junctionListeners'>,
-		V extends TriggerListeners[K] extends Map<string, infer V extends any[]> ? V[number] : never
-	>
-	(
+		V extends TriggerListeners[K] extends Map<string, infer V extends any[]> ? V[number] : never,
+	>(
 		type: K,
 		entityName: string,
 		value: V,

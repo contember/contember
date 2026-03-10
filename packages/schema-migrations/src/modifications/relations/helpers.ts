@@ -33,7 +33,9 @@ export const addForeignKeyConstraint = ({ builder, entity, relation, targetEntit
 	} as const)[relation.joiningColumn.onDelete]
 	builder.sql(`ALTER TABLE ${wrapIdentifier(entity.tableName)}
 		ADD FOREIGN KEY (${wrapIdentifier(relation.joiningColumn.columnName)}) 
-		REFERENCES ${wrapIdentifier(targetEntity.tableName)}(${wrapIdentifier(targetEntity.primaryColumn)}) ON DELETE ${onDelete} DEFERRABLE INITIALLY IMMEDIATE`)
+		REFERENCES ${wrapIdentifier(targetEntity.tableName)}(${
+		wrapIdentifier(targetEntity.primaryColumn)
+	}) ON DELETE ${onDelete} DEFERRABLE INITIALLY IMMEDIATE`)
 
 	invalidateDatabaseMetadata()
 }

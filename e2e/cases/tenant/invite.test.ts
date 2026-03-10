@@ -1,4 +1,4 @@
-import { test, expect } from 'bun:test'
+import { expect, test } from 'bun:test'
 import { Acl } from '@contember/schema'
 import { consumeMails, createTester, rand } from '../../src/tester'
 import { c, createSchema } from '@contember/schema-definition'
@@ -8,7 +8,6 @@ namespace Model {
 	export class Language {
 		code = c.stringColumn().unique()
 	}
-
 }
 
 const schema = createSchema(Model, schema => ({
@@ -121,7 +120,6 @@ test('superEditor can invite a user with a membership', async () => {
 		variables: [{ name: 'language', values: [languageId] }],
 	})
 
-
 	const email2 = `john-${rand()}@doe.com`
 	const result = await tester.tenant.invite({
 		email: email2,
@@ -140,8 +138,6 @@ test('superEditor can invite a user with a membership', async () => {
 })
 
 test('superEditor cannot invite a user with different variables', async () => {
-
-
 	const tester = await createTester(schema)
 	const email = `john-${rand()}@doe.com`
 	const languageId = 'c43e7c51-e138-4e52-95d5-7a41d5c026ee'
@@ -152,7 +148,6 @@ test('superEditor cannot invite a user with different variables', async () => {
 		role: 'superEditor',
 		variables: [{ name: 'language', values: [languageId] }],
 	})
-
 
 	const email2 = `john-${rand()}@doe.com`
 	const result = await tester.tenant.invite({
@@ -192,7 +187,6 @@ test('editor cannot invite a user with a membership', async () => {
 		variables: [{ name: 'language', values: [languageId] }],
 	})
 
-
 	const email2 = `john-${rand()}@doe.com`
 	await tester.tenant.invite({
 		email: email2,
@@ -219,4 +213,3 @@ test('editor cannot invite a user with a membership', async () => {
 		},
 	})
 })
-

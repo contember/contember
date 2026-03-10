@@ -6,7 +6,6 @@ import { ContentSchemaResolver } from '@contember/engine-http'
 import { DatabaseContext } from '@contember/engine-system-api'
 import { VariablesManager } from '../model/VariablesManager'
 
-
 type ProcessBatchArgs = {
 	db: DatabaseContext
 	contentSchemaResolver: ContentSchemaResolver
@@ -20,7 +19,6 @@ type ProcessBatchResult = {
 }
 
 export class EventDispatcher {
-
 	constructor(
 		private readonly eventsRepository: EventsRepository,
 		private readonly variablesManager: VariablesManager,

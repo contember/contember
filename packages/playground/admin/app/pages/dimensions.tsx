@@ -8,7 +8,8 @@ import { Slots } from '~/lib/layout'
 import { Card, CardContent, CardHeader, CardTitle } from '~/lib/ui/card'
 
 const DimensionLabel = ({ label, dimensionValue }: RenderLabelProps) => {
-	const getColor = (value: string | null) =>  value ? `hsl(${value.split('').reduce((acc, char) => char.charCodeAt(0) + ((acc << 5) - acc), 0) % 360}, 65%, 89%)` : '#000000'
+	const getColor = (value: string | null) =>
+		value ? `hsl(${value.split('').reduce((acc, char) => char.charCodeAt(0) + ((acc << 5) - acc), 0) % 360}, 65%, 89%)` : '#000000'
 	const color = getColor(dimensionValue)
 
 	return (
@@ -44,12 +45,16 @@ export default () => (
 		</Binding>
 
 		<Binding>
-			<Slots.Actions><PersistButton /></Slots.Actions>
+			<Slots.Actions>
+				<PersistButton />
+			</Slots.Actions>
 			<EntitySubTree entity="DimensionsItem(unique = unique)">
 				<SideDimensions dimension="locale" as="currentLocale" field="locales(locale.code = $currentLocale)">
 					<Card>
 						<CardHeader>
-							<CardTitle><Variable name="currentLocale" /></CardTitle>
+							<CardTitle>
+								<Variable name="currentLocale" />
+							</CardTitle>
 						</CardHeader>
 						<CardContent>
 							<InputField field="title" />
@@ -64,7 +69,9 @@ export default () => (
 				<SideDimensions dimension="locale" as="currentLocale" field="locales(locale.code = $currentLocale)" renderLabel={DimensionLabel}>
 					<Card>
 						<CardHeader>
-							<CardTitle><Variable name="currentLocale" /></CardTitle>
+							<CardTitle>
+								<Variable name="currentLocale" />
+							</CardTitle>
 						</CardHeader>
 						<CardContent>
 							<InputField field="title" />

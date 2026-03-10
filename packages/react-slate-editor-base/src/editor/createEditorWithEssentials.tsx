@@ -1,5 +1,15 @@
 import { createElement, isValidElement, ReactElement } from 'react'
-import { createEditor, Descendant, Editor, Element as SlateElement, Node as SlateNode, Path, Range as SlateRange, Text as SlateText, Transforms } from 'slate'
+import {
+	createEditor,
+	Descendant,
+	Editor,
+	Element as SlateElement,
+	Node as SlateNode,
+	Path,
+	Range as SlateRange,
+	Text as SlateText,
+	Transforms,
+} from 'slate'
 import * as Slate from 'slate'
 import { withHistory } from 'slate-history'
 import { ReactEditor, withReact } from 'slate-react'
@@ -46,10 +56,10 @@ export const createEditorWithEssentials = ({ defaultElementType }: { defaultElem
 		isElementActive: <E extends SlateElement>(elementType: E['type'], suchThat?: Partial<E>) => {
 			return (
 				elements.get(elementType)?.isActive?.({ editor, suchThat })
-				?? Array.from(Editor.nodes(editor, {
-					match: node => SlateElement.isElement(node) && ContemberEditor.isElementType(node, elementType, suchThat),
-					voids: false,
-				})).length > 0
+					?? Array.from(Editor.nodes(editor, {
+							match: node => SlateElement.isElement(node) && ContemberEditor.isElementType(node, elementType, suchThat),
+							voids: false,
+						})).length > 0
 			)
 		},
 
@@ -101,8 +111,7 @@ export const createEditorWithEssentials = ({ defaultElementType }: { defaultElem
 		},
 
 		serializeNodes: (nodes, errorMessage) => ContemberEditor.serializeNodes(editor, nodes, errorMessage),
-		deserializeNodes: (serializedNodes, errorMessage) =>
-			ContemberEditor.permissivelyDeserializeNodes(editor, serializedNodes, errorMessage),
+		deserializeNodes: (serializedNodes, errorMessage) => ContemberEditor.permissivelyDeserializeNodes(editor, serializedNodes, errorMessage),
 
 		upgradeFormatBySingleVersion: (node, oldVersion) => {
 			if (SlateElement.isElement(node)) {
@@ -148,7 +157,6 @@ export const createEditorWithEssentials = ({ defaultElementType }: { defaultElem
 				}
 			}
 
-
 			// Inline void nodes cannot be deleted by default: https://github.com/ianstormtaylor/slate/issues/3456
 			// This is a hack to get around this issue. The problem is that when an inline void node is selected, Slate's
 			// beforeInput handler doesn't get triggered. However, when we put the caret right after the inline void
@@ -172,14 +180,13 @@ export const createEditorWithEssentials = ({ defaultElementType }: { defaultElem
 				}
 				const [node, nodePath] = voidEntry
 				if (editor.isInline(node)) {
-					const adjacentPoint =
-						e.key === 'Backspace'
-							? Editor.point(editor, Path.next(nodePath), {
-								edge: 'start',
-							  })
-							: Editor.point(editor, Path.previous(nodePath), {
-								edge: 'end',
-							  })
+					const adjacentPoint = e.key === 'Backspace'
+						? Editor.point(editor, Path.next(nodePath), {
+							edge: 'start',
+						})
+						: Editor.point(editor, Path.previous(nodePath), {
+							edge: 'end',
+						})
 					Transforms.select(editor, adjacentPoint)
 				}
 			}

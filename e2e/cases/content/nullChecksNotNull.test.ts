@@ -31,7 +31,6 @@ test('update site & create contact page', async () => {
 			},
 		})
 
-
 	await tester(gql`mutation {
         updateSite(by: { slug: "en" }, data: { contactPage: { create: { title: "Test" } } }) {
             ok
@@ -66,7 +65,6 @@ test('update site & create contact page', async () => {
 				},
 			},
 		})
-
 })
 
 test('update site & try to create contact page which however exists', async () => {
@@ -128,4 +126,3 @@ test('update site & try to create contact page which however exists', async () =
 			},
 		})
 })
-

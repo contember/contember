@@ -1,10 +1,9 @@
 import { relative } from 'node:path'
-import { ModificationHandlerFactory, SchemaDiffer, SchemaMigrator, } from '../../packages/schema-migrations/src'
-import { emptySchema, schemaType } from '@contember/schema-utils';
-import { MigrationsResolver } from "../../packages/cli/src/lib/migrations/MigrationsResolver";
-import { MigrationFilesManager } from "../../packages/cli/src/lib/migrations/MigrationFilesManager";
-
-(async () => {
+import { ModificationHandlerFactory, SchemaDiffer, SchemaMigrator } from '../../packages/schema-migrations/src'
+import { emptySchema, schemaType } from '@contember/schema-utils'
+import { MigrationsResolver } from '../../packages/cli/src/lib/migrations/MigrationsResolver'
+import { MigrationFilesManager } from '../../packages/cli/src/lib/migrations/MigrationFilesManager'
+;(async () => {
 	console.log(relative(process.cwd(), process.argv[2]))
 	const migrationsResolver = new MigrationsResolver(new MigrationFilesManager(relative(process.cwd(), process.argv[2])))
 	const modificationHandlerFactory = new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap)

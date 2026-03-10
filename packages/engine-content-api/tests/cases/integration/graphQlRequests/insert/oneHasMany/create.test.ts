@@ -12,13 +12,11 @@ test('insert posts with locales (one has many)', async () => {
 			.entity('Post', e =>
 				e
 					.column('publishedAt', c => c.type(Model.ColumnType.DateTime))
-					.oneHasMany('locales', r => r.target('PostLocale')),
-			)
+					.oneHasMany('locales', r => r.target('PostLocale')))
 			.entity('PostLocale', e =>
 				e
 					.column('locale', c => c.type(Model.ColumnType.Enum, { enumName: 'locale' }))
-					.column('title', c => c.type(Model.ColumnType.String)),
-			)
+					.column('title', c => c.type(Model.ColumnType.String)))
 			.buildSchema(),
 		query: GQL`
         mutation {
@@ -89,4 +87,3 @@ test('insert posts with locales (one has many)', async () => {
 		},
 	})
 })
-

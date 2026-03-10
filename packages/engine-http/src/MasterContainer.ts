@@ -17,8 +17,11 @@ import { ProjectConfigResolver } from './config/projectConfigResolver'
 import { TenantConfigResolver } from './config/tenantConfigResolver'
 import {
 	ContentApiControllerFactory,
-	ContentQueryHandlerFactory, GraphQLSchemaContributor, GraphQlSchemaFactory,
-	GraphQLSchemaFactoryResult, NotModifiedChecker,
+	ContentQueryHandlerFactory,
+	GraphQLSchemaContributor,
+	GraphQlSchemaFactory,
+	GraphQLSchemaFactoryResult,
+	NotModifiedChecker,
 } from './content'
 import { ContentApiSpecificCache } from './content/ContentApiSpecificCache'
 import { homepageController } from './misc'
@@ -74,7 +77,6 @@ export type MasterContainerBuilder = ReturnType<MasterContainerFactory['createBu
 export type MasterContainerHook = (builder: MasterContainerBuilder) => MasterContainerBuilder
 
 export class MasterContainerFactory {
-
 	createBuilder(args: MasterContainerArgs): MasterContainerBuilder {
 		const builder = this.createBuilderInternal(args)
 		const hooks = args.plugins
@@ -94,38 +96,33 @@ export class MasterContainerFactory {
 		processType,
 	}: MasterContainerArgs) {
 		return new Builder({})
-			.addService('serverConfig', () =>
-				serverConfig)
-			.addService('debugMode', () =>
-				debugMode)
-			.addService('version', () =>
-				version)
-			.addService('processType', () =>
-				processType)
-			.addService('projectConfigResolver', () =>
-				projectConfigResolver)
-			.addService('tenantConfigResolver', () =>
-				tenantConfigResolver)
-			.addService('plugins', () =>
-				plugins)
-			.addService('providers', () =>
-				createProviders())
-			.addService('tenantContainerFactory', ({ providers }) =>
-				new TenantContainerFactory(providers))
-			.addService('modificationHandlerFactory', () =>
-				new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap))
-			.addService('executionContainerFactory', ({ providers, serverConfig }) =>
-				new ExecutionContainerFactory(providers, serverConfig.contentApi?.whereOptimizer))
-			.addService('graphQlSchemaBuilderFactory', () =>
-				new GraphQlSchemaBuilderFactory())
-			.addService('contentQueryExecutor', ({ executionContainerFactory, graphQlSchemaBuilderFactory }) =>
-				new ContentQueryExecutorImpl(executionContainerFactory, graphQlSchemaBuilderFactory))
-			.addService('systemContainerFactory', ({ providers, modificationHandlerFactory, contentQueryExecutor }) =>
-				new SystemContainerFactory(providers, modificationHandlerFactory, contentQueryExecutor))
-			.addService('contentPermissionFactory', ({}) =>
-				new PermissionFactory())
-			.addService('databaseMetadataResolver', () =>
-				new DatabaseMetadataResolver())
+			.addService('serverConfig', () => serverConfig)
+			.addService('debugMode', () => debugMode)
+			.addService('version', () => version)
+			.addService('processType', () => processType)
+			.addService('projectConfigResolver', () => projectConfigResolver)
+			.addService('tenantConfigResolver', () => tenantConfigResolver)
+			.addService('plugins', () => plugins)
+			.addService('providers', () => createProviders())
+			.addService('tenantContainerFactory', ({ providers }) => new TenantContainerFactory(providers))
+			.addService('modificationHandlerFactory', () => new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap))
+			.addService(
+				'executionContainerFactory',
+				({ providers, serverConfig }) => new ExecutionContainerFactory(providers, serverConfig.contentApi?.whereOptimizer),
+			)
+			.addService('graphQlSchemaBuilderFactory', () => new GraphQlSchemaBuilderFactory())
+			.addService(
+				'contentQueryExecutor',
+				({ executionContainerFactory, graphQlSchemaBuilderFactory }) =>
+					new ContentQueryExecutorImpl(executionContainerFactory, graphQlSchemaBuilderFactory),
+			)
+			.addService(
+				'systemContainerFactory',
+				({ providers, modificationHandlerFactory, contentQueryExecutor }) =>
+					new SystemContainerFactory(providers, modificationHandlerFactory, contentQueryExecutor),
+			)
+			.addService('contentPermissionFactory', ({}) => new PermissionFactory())
+			.addService('databaseMetadataResolver', () => new DatabaseMetadataResolver())
 			.addService('graphqlSchemaCache', ({ serverConfig }) =>
 				new ContentApiSpecificCache<Schema, GraphQLSchemaFactoryResult>({
 					ttlSeconds: serverConfig.contentApi?.schemaCacheTtlSeconds,
@@ -142,29 +139,57 @@ export class MasterContainerFactory {
 					contributors,
 				)
 			})
-			.addService('projectContainerFactoryFactory', ({ plugins, providers, databaseMetadataResolver }) =>
-				new ProjectContainerFactoryFactory(plugins, providers, databaseMetadataResolver))
-			.addService('tenantGraphQLHandlerFactory', () =>
-				new TenantGraphQLHandlerFactory())
-			.addService('systemGraphQLHandlerFactory', ({ debugMode }) =>
-				new SystemGraphQLHandlerFactory(debugMode))
-			.addService('logger', () =>
-				logger)
-			.addService('projectGroupContainerFactory', ({ debugMode, providers, systemContainerFactory, tenantContainerFactory, projectContainerFactoryFactory, projectConfigResolver, tenantGraphQLHandlerFactory, systemGraphQLHandlerFactory, logger }) =>
-				new ProjectGroupContainerFactory(debugMode, providers, systemContainerFactory, tenantContainerFactory, projectContainerFactoryFactory, projectConfigResolver, tenantGraphQLHandlerFactory, systemGraphQLHandlerFactory, logger))
-			.addService('projectGroupContainerResolver', ({ tenantConfigResolver, projectGroupContainerFactory }) =>
-				new ProjectGroupContainerResolver(tenantConfigResolver, projectGroupContainerFactory))
-			.addService('promRegistryFactory', ({ processType, version }) =>
-				new PrometheusRegistryFactory(processType, { version }))
-			.addService('projectGroupContainerMetricsHook', ({ projectGroupContainerResolver }) =>
-				new ProjectGroupContainerMetricsHook(projectGroupContainerResolver))
+			.addService(
+				'projectContainerFactoryFactory',
+				({ plugins, providers, databaseMetadataResolver }) => new ProjectContainerFactoryFactory(plugins, providers, databaseMetadataResolver),
+			)
+			.addService('tenantGraphQLHandlerFactory', () => new TenantGraphQLHandlerFactory())
+			.addService('systemGraphQLHandlerFactory', ({ debugMode }) => new SystemGraphQLHandlerFactory(debugMode))
+			.addService('logger', () => logger)
+			.addService(
+				'projectGroupContainerFactory',
+				({
+					debugMode,
+					providers,
+					systemContainerFactory,
+					tenantContainerFactory,
+					projectContainerFactoryFactory,
+					projectConfigResolver,
+					tenantGraphQLHandlerFactory,
+					systemGraphQLHandlerFactory,
+					logger,
+				}) =>
+					new ProjectGroupContainerFactory(
+						debugMode,
+						providers,
+						systemContainerFactory,
+						tenantContainerFactory,
+						projectContainerFactoryFactory,
+						projectConfigResolver,
+						tenantGraphQLHandlerFactory,
+						systemGraphQLHandlerFactory,
+						logger,
+					),
+			)
+			.addService(
+				'projectGroupContainerResolver',
+				({ tenantConfigResolver, projectGroupContainerFactory }) => new ProjectGroupContainerResolver(tenantConfigResolver, projectGroupContainerFactory),
+			)
+			.addService('promRegistryFactory', ({ processType, version }) => new PrometheusRegistryFactory(processType, { version }))
+			.addService(
+				'projectGroupContainerMetricsHook',
+				({ projectGroupContainerResolver }) => new ProjectGroupContainerMetricsHook(projectGroupContainerResolver),
+			)
 			.addService('promRegistry', ({ promRegistryFactory, projectGroupContainerMetricsHook }) => {
 				const registry = promRegistryFactory.create()
 				projectGroupContainerMetricsHook.register(registry)
 				return registry
 			})
-			.addService('projectGroupContainer', ({ tenantConfigResolver, projectGroupContainerFactory }) =>
-				projectGroupContainerFactory.create({ slug: undefined, config: tenantConfigResolver(undefined, {}) }))
+			.addService(
+				'projectGroupContainer',
+				({ tenantConfigResolver, projectGroupContainerFactory }) =>
+					projectGroupContainerFactory.create({ slug: undefined, config: tenantConfigResolver(undefined, {}) }),
+			)
 			.addService('projectGroupResolver', ({ serverConfig, projectGroupContainerResolver }): ProjectGroupResolver => {
 				const encryptionKey = serverConfig.projectGroup?.configEncryptionKey
 					? createSecretKey(Buffer.from(serverConfig.projectGroup?.configEncryptionKey, 'hex'))
@@ -175,34 +200,48 @@ export class MasterContainerFactory {
 					serverConfig.projectGroup?.configEncryptionKey ? new CryptoWrapper(encryptionKey) : undefined,
 					projectGroupContainerResolver,
 				)
-
 			})
-			.addService('notModifiedChecker', () =>
-				new NotModifiedChecker())
-			.addService('contentQueryHandlerFactory', ({ debugMode }) =>
-				new ContentQueryHandlerFactory(debugMode))
-			.addService('projectContextResolver', () =>
-				new ProjectContextResolver())
-			.addService('contentApiMiddlewareFactory', ({ projectContextResolver, notModifiedChecker, executionContainerFactory, contentQueryHandlerFactory, graphQlSchemaFactory }) =>
-				new ContentApiControllerFactory(notModifiedChecker, executionContainerFactory, contentQueryHandlerFactory, projectContextResolver, graphQlSchemaFactory))
-			.addService('tenantApiMiddlewareFactory', () =>
-				new TenantApiMiddlewareFactory())
-			.addService('systemGraphQLContextFactory', () =>
-				new SystemGraphQLContextFactory())
-			.addService('systemApiMiddlewareFactory', ({ debugMode, systemGraphQLContextFactory, projectContextResolver }) =>
-				new SystemApiMiddlewareFactory(debugMode, systemGraphQLContextFactory, projectContextResolver))
-			.addService('contentSchemaTransferMappingFactory', () =>
-				new ContentSchemaTransferMappingFactory())
-			.addService('systemSchemaTransferMappingFactory', () =>
-				new SystemSchemaTransferMappingFactory())
-			.addService('importExecutor', ({ contentSchemaTransferMappingFactory, systemSchemaTransferMappingFactory, databaseMetadataResolver }) =>
-				new ImportExecutor(contentSchemaTransferMappingFactory, systemSchemaTransferMappingFactory, databaseMetadataResolver))
-			.addService('exportExecutor', ({ contentSchemaTransferMappingFactory, systemSchemaTransferMappingFactory }) =>
-				new ExportExecutor(contentSchemaTransferMappingFactory, systemSchemaTransferMappingFactory))
-			.addService('importApiMiddlewareFactory', ({ projectGroupResolver, importExecutor }) =>
-				new ImportApiMiddlewareFactory(projectGroupResolver, importExecutor))
-			.addService('exportApiMiddlewareFactory', ({ projectGroupResolver, exportExecutor }) =>
-				new ExportApiControllerFactory(projectGroupResolver, exportExecutor))
+			.addService('notModifiedChecker', () => new NotModifiedChecker())
+			.addService('contentQueryHandlerFactory', ({ debugMode }) => new ContentQueryHandlerFactory(debugMode))
+			.addService('projectContextResolver', () => new ProjectContextResolver())
+			.addService(
+				'contentApiMiddlewareFactory',
+				({ projectContextResolver, notModifiedChecker, executionContainerFactory, contentQueryHandlerFactory, graphQlSchemaFactory }) =>
+					new ContentApiControllerFactory(
+						notModifiedChecker,
+						executionContainerFactory,
+						contentQueryHandlerFactory,
+						projectContextResolver,
+						graphQlSchemaFactory,
+					),
+			)
+			.addService('tenantApiMiddlewareFactory', () => new TenantApiMiddlewareFactory())
+			.addService('systemGraphQLContextFactory', () => new SystemGraphQLContextFactory())
+			.addService(
+				'systemApiMiddlewareFactory',
+				({ debugMode, systemGraphQLContextFactory, projectContextResolver }) =>
+					new SystemApiMiddlewareFactory(debugMode, systemGraphQLContextFactory, projectContextResolver),
+			)
+			.addService('contentSchemaTransferMappingFactory', () => new ContentSchemaTransferMappingFactory())
+			.addService('systemSchemaTransferMappingFactory', () => new SystemSchemaTransferMappingFactory())
+			.addService(
+				'importExecutor',
+				({ contentSchemaTransferMappingFactory, systemSchemaTransferMappingFactory, databaseMetadataResolver }) =>
+					new ImportExecutor(contentSchemaTransferMappingFactory, systemSchemaTransferMappingFactory, databaseMetadataResolver),
+			)
+			.addService(
+				'exportExecutor',
+				({ contentSchemaTransferMappingFactory, systemSchemaTransferMappingFactory }) =>
+					new ExportExecutor(contentSchemaTransferMappingFactory, systemSchemaTransferMappingFactory),
+			)
+			.addService(
+				'importApiMiddlewareFactory',
+				({ projectGroupResolver, importExecutor }) => new ImportApiMiddlewareFactory(projectGroupResolver, importExecutor),
+			)
+			.addService(
+				'exportApiMiddlewareFactory',
+				({ projectGroupResolver, exportExecutor }) => new ExportApiControllerFactory(projectGroupResolver, exportExecutor),
+			)
 			.addService('application', ({ projectGroupResolver, serverConfig, logger, debugMode, version, promRegistry }) => {
 				const app = new Application(
 					projectGroupResolver,
@@ -215,22 +254,26 @@ export class MasterContainerFactory {
 
 				return app
 			})
-			.setupService('application', (it, { contentApiMiddlewareFactory, tenantApiMiddlewareFactory, systemApiMiddlewareFactory, importApiMiddlewareFactory, exportApiMiddlewareFactory }) => {
-				it.addRoute('content', '/content/:projectSlug/:stageSlug', contentApiMiddlewareFactory.create())
-				it.addRoute('tenant', '/tenant', tenantApiMiddlewareFactory.create())
-				it.addRoute('system', '/system/:projectSlug', systemApiMiddlewareFactory.create())
-				it.addRoute('transfer', '/import', importApiMiddlewareFactory.create())
-				it.addRoute('transfer', '/export', exportApiMiddlewareFactory.create())
-				it.addRoute('misc', '/', homepageController)
+			.setupService(
+				'application',
+				(
+					it,
+					{ contentApiMiddlewareFactory, tenantApiMiddlewareFactory, systemApiMiddlewareFactory, importApiMiddlewareFactory, exportApiMiddlewareFactory },
+				) => {
+					it.addRoute('content', '/content/:projectSlug/:stageSlug', contentApiMiddlewareFactory.create())
+					it.addRoute('tenant', '/tenant', tenantApiMiddlewareFactory.create())
+					it.addRoute('system', '/system/:projectSlug', systemApiMiddlewareFactory.create())
+					it.addRoute('transfer', '/import', importApiMiddlewareFactory.create())
+					it.addRoute('transfer', '/export', exportApiMiddlewareFactory.create())
+					it.addRoute('misc', '/', homepageController)
 
-				it.addInternalRoute('internal', '/health', () => {
-					return new HttpResponse(200, 'OK')
-				})
-			})
-			.addService('initializer', ({ projectGroupContainer }) =>
-				new Initializer(projectGroupContainer))
-			.addService('applicationWorkers', () =>
-				new ApplicationWorkerManager())
+					it.addInternalRoute('internal', '/health', () => {
+						return new HttpResponse(200, 'OK')
+					})
+				},
+			)
+			.addService('initializer', ({ projectGroupContainer }) => new Initializer(projectGroupContainer))
+			.addService('applicationWorkers', () => new ApplicationWorkerManager())
 			.setupService('executionContainerFactory', (it, { plugins }) => {
 				for (const plugin of plugins) {
 					if (plugin.getExecutionContainerHook) {
@@ -244,7 +287,6 @@ export class MasterContainerFactory {
 
 				return app
 			})
-
 	}
 
 	create(args: MasterContainerArgs): MasterContainer {

@@ -1,7 +1,7 @@
 import { Schema } from '@contember/schema'
 import { emptyModelSchema } from './model'
 import * as Typesafe from '@contember/typesafe'
-import { aclSchema, modelSchema, validationSchema, settingsSchema } from './type-schema'
+import { aclSchema, modelSchema, settingsSchema, validationSchema } from './type-schema'
 import { actionsSchema } from './type-schema/actions'
 
 export * from './definition-generator'
@@ -13,7 +13,7 @@ export * from './validation'
 export * from './schemaNormalizer'
 export * from './schemaFilter'
 export * from './schemaChecksum'
-export { deepCompare, compareArraysIgnoreOrder } from './utils'
+export { compareArraysIgnoreOrder, deepCompare } from './utils'
 
 export const emptySchema: Schema = {
 	model: emptyModelSchema,

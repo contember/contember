@@ -6,7 +6,6 @@ import { resolveParameters } from '../internal/utils/resolveParameters'
 import { requestStateToPath } from '../internal/utils/urlMapper'
 import { PageNotFound } from '../PageNotFound'
 
-
 export interface RoutingLinkParams {
 	href: string
 	navigate: (e?: BaseSyntheticEvent) => void
@@ -35,7 +34,7 @@ export const useRoutingLinkFactory = () => {
 					throw new PageNotFound(`Routing parameter ${param} not found`)
 				}
 
-				return (parametersResolver)?.(param)
+				return parametersResolver?.(param)
 			}),
 		}
 		let href: string

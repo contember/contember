@@ -16,21 +16,23 @@ const style = {
 	cursor: 'pointer',
 } as const
 
-export const AnchorRenderer: FunctionComponent<AnchorRendererProps> = (props: AnchorRendererProps) => (<span className="inline-flex gap-1 items-center">
-	<span className="bg-gray-50 border-b border-b-blue-300">
-		{props.children}
+export const AnchorRenderer: FunctionComponent<AnchorRendererProps> = (props: AnchorRendererProps) => (
+	<span className="inline-flex gap-1 items-center">
+		<span className="bg-gray-50 border-b border-b-blue-300">
+			{props.children}
+		</span>
+		<a
+			{...props.attributes}
+			href={props.element.href}
+			title={props.element.href}
+			target="_blank"
+			rel="noopener noreferrer"
+			onClickCapture={onClick}
+			style={style}
+			contentEditable={false}
+		>
+			<LinkIcon className="w-3 h-3" />
+		</a>
 	</span>
-	<a
-		{...props.attributes}
-		href={props.element.href}
-		title={props.element.href}
-		target="_blank"
-		rel="noopener noreferrer"
-		onClickCapture={onClick}
-		style={style}
-		contentEditable={false}
-	>
-		<LinkIcon className="w-3 h-3" />
-	</a>
-</span>)
+)
 AnchorRenderer.displayName = 'AnchorRenderer'

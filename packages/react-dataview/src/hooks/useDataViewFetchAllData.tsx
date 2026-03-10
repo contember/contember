@@ -53,7 +53,6 @@ export const useDataViewFetchAllData = ({ children, selection }: { children: Rea
 			data: fieldData,
 			marker,
 		}
-
 	}, [entityName, filter, children, bindingOperations, env, selection])
 }
 

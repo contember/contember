@@ -1,4 +1,4 @@
-import { Editor as SlateEditor, Editor, Location, Element } from 'slate'
+import { Editor, Editor as SlateEditor, Element, Location } from 'slate'
 import { closest } from './closest'
 
 export const closestBlockEntry = <E extends SlateEditor>(

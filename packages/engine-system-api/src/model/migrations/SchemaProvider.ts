@@ -30,7 +30,7 @@ export class SchemaProvider {
 	}
 
 	async buildSchemaFromMigrations(db: DatabaseContext): Promise<SchemaWithMeta> {
-		const newMigrations = (await this.executedMigrationsResolver.getMigrations(db))
+		const newMigrations = await this.executedMigrationsResolver.getMigrations(db)
 
 		const partialResult = newMigrations.reduce<SchemaWithMeta>(
 			(schema, migration) => {

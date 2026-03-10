@@ -5,7 +5,6 @@ import { SelectItemTrigger, SelectNewItem } from '@contember/react-select'
 import { dict } from '../dict'
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogTrigger } from '../ui/dialog'
 
-
 export const CreateEntityDialog = ({ trigger, children }: { trigger: ReactElement; children: ReactNode }) => {
 	return (
 		<Dialog>
@@ -25,10 +24,8 @@ export const CreateEntityDialog = ({ trigger, children }: { trigger: ReactElemen
 							</SelectItemTrigger>
 						</DialogClose>
 					</DialogFooter>
-
 				</SelectNewItem>
 			</DialogContent>
 		</Dialog>
 	)
 }
-

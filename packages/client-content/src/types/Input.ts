@@ -1,7 +1,6 @@
 import { Input, JSONObject } from '@contember/schema'
 import { EntityTypeLike } from './Schema'
 
-
 export namespace ContentClientInput {
 	export type ConnectRelationInput<TEntity extends EntityTypeLike> = {
 		/** @internal */
@@ -55,7 +54,7 @@ export namespace ContentClientInput {
 		readonly upsert: {
 			readonly by: UniqueWhere<TEntity>
 			readonly update: UpdateDataInput<TEntity>
-			readonly  create: CreateDataInput<TEntity>
+			readonly create: CreateDataInput<TEntity>
 		}
 	}
 
@@ -107,7 +106,6 @@ export namespace ContentClientInput {
 		| ConnectOrCreateRelationInput<TEntity>
 
 	export type CreateManyRelationInput<TEntity extends EntityTypeLike> = readonly CreateOneRelationInput<TEntity>[]
-
 
 	export type UpdateDataInput<TEntity extends EntityTypeLike> =
 		& {
@@ -197,7 +195,6 @@ export namespace ContentClientInput {
 	export type HasManyRelationInput<TEntity extends EntityTypeLike> = ListQueryInput<TEntity>
 	export type HasManyRelationPaginateInput<TEntity extends EntityTypeLike> = PaginationQueryInput<TEntity>
 
-
 	export type UpdateOneRelationInput<TEntity extends EntityTypeLike> =
 		| CreateRelationInput<TEntity>
 		| ConnectRelationInput<TEntity>
@@ -216,9 +213,7 @@ export namespace ContentClientInput {
 		| UpdateSpecifiedRelationInput<TEntity>
 		| UpsertSpecifiedRelationInput<TEntity>
 
-
 	export type UpdateManyRelationInput<TEntity extends EntityTypeLike> = Array<UpdateManyRelationInputItem<TEntity>>
-
 
 	export type FieldOrderBy<TEntity extends EntityTypeLike> =
 		& {
@@ -241,7 +236,6 @@ export namespace ContentClientInput {
 		}
 		& FieldOrderBy<TEntity>
 
-
 	export type UniqueWhere<TEntity extends EntityTypeLike> =
 		& {
 			/**
@@ -250,7 +244,6 @@ export namespace ContentClientInput {
 			readonly __typeGuard?: TEntity['name']
 		}
 		& TEntity['unique']
-
 
 	export type Where<TEntity extends EntityTypeLike> =
 		& {
@@ -269,7 +262,6 @@ export namespace ContentClientInput {
 		& {
 			readonly [key in keyof TEntity['hasOne']]?: Where<TEntity['hasOne'][key]> | null
 		}
-
 
 	export type AnyOrderBy = Input.OrderBy<`${Input.OrderDirection}`>[]
 	export type AnyListQueryInput =

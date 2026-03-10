@@ -118,4 +118,3 @@ test('aliases', async () => {
 		},
 	})
 })
-

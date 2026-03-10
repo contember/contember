@@ -9,7 +9,6 @@ import { useComposeRef } from '@contember/react-utils'
 export interface DataViewHighlightEvent {
 	entity: EntityAccessor
 	element: HTMLElement
-
 }
 
 export interface DataViewHighlightRowProps {

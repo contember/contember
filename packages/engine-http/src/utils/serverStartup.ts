@@ -23,7 +23,9 @@ export const printStartInfo = ({ version, isDebug }: { version: string; isDebug:
 	}
 }
 
-export const resolveServerConfig = async <T extends ServerConfig>({ plugins, serverConfigSchema }: { plugins: Plugin[]; serverConfigSchema: Type<T> }) => {
+export const resolveServerConfig = async <T extends ServerConfig>(
+	{ plugins, serverConfigSchema }: { plugins: Plugin[]; serverConfigSchema: Type<T> },
+) => {
 	const configProcessors = plugins
 		.map(it => (it.getConfigProcessor ? it.getConfigProcessor() : null))
 		.filter((it): it is ConfigProcessor<any> => it !== null)
@@ -52,8 +54,8 @@ export const createDefaultLogger = (): Logger => {
 					const color = attributes.status === undefined
 						? chalk.cyan
 						: attributes.status < 300
-							? chalk.green
-							: chalk.yellowBright
+						? chalk.green
+						: chalk.yellowBright
 					const timeInfo = attributes.totalTimeMs !== undefined ? ` ${attributes.totalTimeMs}ms` : ''
 					const statusInfo = attributes.status !== undefined ? ` [${attributes.status}]` : ''
 					return { line: color(`${attributes.method}${statusInfo} ${attributes.uri}${timeInfo} ${chalk.white.dim('#' + attributes.requestId)}`) }

@@ -29,12 +29,14 @@ export class EventsQueryResolver implements QueryResolver<'events'> {
 				'You are not allowed to view a history.',
 			)
 
-			const history = await db.queryHandler.fetch(new EventsQuery(
-				args?.filter ?? {},
-				args?.order ?? EventsOrder.AppliedAtDesc,
-				args?.offset ?? 0,
-				Math.min(args?.limit ?? 1000, 10000),
-			))
+			const history = await db.queryHandler.fetch(
+				new EventsQuery(
+					args?.filter ?? {},
+					args?.order ?? EventsOrder.AppliedAtDesc,
+					args?.offset ?? 0,
+					Math.min(args?.limit ?? 1000, 10000),
+				),
+			)
 
 			return await this.eventResponseBuilder.buildResponse(history)
 		})

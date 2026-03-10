@@ -5,12 +5,13 @@ import { assertNever } from '../utils'
 import * as Typesafe from '@contember/typesafe'
 import { whereSchema } from '../type-schema/where'
 
-const manyArgsSchema = (args: {schema: Model.Schema; entity: Model.Entity}) => Typesafe.partial({
-	limit: Typesafe.integer,
-	offset: Typesafe.integer,
-	orderBy: Typesafe.array(Typesafe.anyJsonObject),
-	filter: whereSchema(args),
-})
+const manyArgsSchema = (args: { schema: Model.Schema; entity: Model.Entity }) =>
+	Typesafe.partial({
+		limit: Typesafe.integer,
+		offset: Typesafe.integer,
+		orderBy: Typesafe.array(Typesafe.anyJsonObject),
+		filter: whereSchema(args),
+	})
 
 export class ActionsValidator {
 	constructor(private readonly model: Model.Schema) {}
@@ -33,7 +34,6 @@ export class ActionsValidator {
 			this.validateTrigger(def, triggerErrorBuilder)
 		}
 	}
-
 
 	private validateTrigger(trigger: Actions.AnyTrigger, errorBuilder: ErrorBuilder): void {
 		const entity = this.model.entities[trigger.entity]

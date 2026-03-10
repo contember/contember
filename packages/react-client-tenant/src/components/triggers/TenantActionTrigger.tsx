@@ -8,12 +8,14 @@ const SlotButton = Slot as ComponentType<React.ButtonHTMLAttributes<HTMLButtonEl
 export interface TenantActionTriggerProps<OkResult, Error extends string> {
 	children: ReactElement
 	onClick?: MouseEventHandler<HTMLButtonElement>
-	onSuccess?: (args: {result: OkResult}) => void
+	onSuccess?: (args: { result: OkResult }) => void
 	onError?: (args: { code: Error | 'UNKNOWN_ERROR'; error: unknown }) => void
 	execute: () => Promise<({ ok: true } & (OkResult extends undefined ? {} : { result: OkResult })) | { ok: false; error?: Error }>
 }
 
-export const TenantActionTrigger = <OkResult, Error extends string>({ onError: onErrorIn, onSuccess: onSuccessIn, onClick: onClickProp, execute: executeIn, ...props }: TenantActionTriggerProps<OkResult, Error>) => {
+export const TenantActionTrigger = <OkResult, Error extends string>(
+	{ onError: onErrorIn, onSuccess: onSuccessIn, onClick: onClickProp, execute: executeIn, ...props }: TenantActionTriggerProps<OkResult, Error>,
+) => {
 	const [submitting, setSubmitting] = useState(false)
 
 	const onSuccess = useReferentiallyStableCallback(onSuccessIn || (() => undefined))

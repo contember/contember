@@ -25,7 +25,6 @@ export class AfterInsertEvent {
 	}
 }
 
-
 export class BeforeUpdateEvent {
 	public type = 'BeforeUpdateEvent' as const
 
@@ -80,7 +79,6 @@ export class BeforeJunctionUpdateEvent {
 	) {
 	}
 }
-
 
 export class AfterJunctionUpdateEvent {
 	public type = 'AfterJunctionUpdateEvent' as const

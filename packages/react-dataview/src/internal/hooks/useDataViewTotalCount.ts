@@ -4,13 +4,14 @@ import { useCurrentContentGraphQlClient } from '@contember/react-client'
 import { useCallback, useEffect, useState } from 'react'
 import { useAbortController } from '@contember/react-utils'
 
-export type UseDataViewTotalCountArgs =
-	& {
-		entities: QualifiedEntityList
-		filter: Filter<never>
-	}
+export type UseDataViewTotalCountArgs = {
+	entities: QualifiedEntityList
+	filter: Filter<never>
+}
 
-export const useDataViewTotalCount = ({ entities: { entityName }, filter }: UseDataViewTotalCountArgs): [number | undefined, { refresh: () => void }] => {
+export const useDataViewTotalCount = (
+	{ entities: { entityName }, filter }: UseDataViewTotalCountArgs,
+): [number | undefined, { refresh: () => void }] => {
 	const client = useCurrentContentGraphQlClient()
 	const env = useEnvironment()
 
@@ -37,7 +38,6 @@ export const useDataViewTotalCount = ({ entities: { entityName }, filter }: UseD
 			}
 			console.error(e)
 		}
-
 	}, [abortController, client, entityName, filter, schema])
 
 	useEffect(() => {

@@ -33,7 +33,7 @@ export const HeadingRenderer: FunctionComponent<HeadingRendererProps> = ({
 	const el = lvlToHtmlEl[element.level]
 
 	// todo numbered element.isNumbered
-	return  React.createElement(
+	return React.createElement(
 		el,
 		{
 			...attributes,

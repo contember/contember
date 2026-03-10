@@ -1,7 +1,8 @@
 import { ExpectedQuery } from '@contember/database-tester'
 
 export const getNextLoginAttemptSql = (email: string): ExpectedQuery => ({
-	sql: `with "cfg" as (select *  from "tenant"."config"), "last_successful_reset" as (select MAX(person_auth_log.created_at) as "created_at"  from "tenant"."person_auth_log" inner join  "tenant"."person" as "person" on  "person"."id" = "person_auth_log"."person_id"  where "type" = ? and "success" = ? and "email" = ?), "window_start" as (select
+	sql:
+		`with "cfg" as (select *  from "tenant"."config"), "last_successful_reset" as (select MAX(person_auth_log.created_at) as "created_at"  from "tenant"."person_auth_log" inner join  "tenant"."person" as "person" on  "person"."id" = "person_auth_log"."person_id"  where "type" = ? and "success" = ? and "email" = ?), "window_start" as (select
                                         GREATEST(
                                                 COALESCE(last_successful_reset.created_at, NOW() - cfg.login_attempt_window),
                                                 NOW() - cfg.login_attempt_window
@@ -14,7 +15,6 @@ export const getNextLoginAttemptSql = (email: string): ExpectedQuery => ({
                                 ) END as "next_allowed_login"  from "failed_logins", "cfg"`,
 	parameters: ['password_reset', true, email, email, 'login', false],
 	response: {
-		rows: [
-		],
+		rows: [],
 	},
 })

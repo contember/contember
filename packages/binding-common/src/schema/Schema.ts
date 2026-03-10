@@ -10,7 +10,6 @@ import { throwBindingError } from '../BindingError'
 export class Schema {
 	public constructor(private readonly store: SchemaStore) {}
 
-
 	public getEnumNames(): string[] {
 		return Array.from(this.store.enums.keys())
 	}

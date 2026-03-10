@@ -6,8 +6,7 @@ export const useConstantLengthInvariant = <Item>(items: Item[], message?: string
 		const previous = usePreviousValue(items)
 		if (previous.length !== items.length) {
 			throw new Error(
-				`Invariant violation: ${message || 'Changing the length of an array whose length must remain constant between renders.'
-				}`,
+				`Invariant violation: ${message || 'Changing the length of an array whose length must remain constant between renders.'}`,
 			)
 		}
 	}

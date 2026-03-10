@@ -1,4 +1,15 @@
-import { Editor as SlateEditor, Editor, Element as SlateElement, Element, Node as SlateNode, Node, NodeEntry, Path as SlatePath, Range as SlateRange, Transforms } from 'slate'
+import {
+	Editor,
+	Editor as SlateEditor,
+	Element,
+	Element as SlateElement,
+	Node,
+	Node as SlateNode,
+	NodeEntry,
+	Path as SlatePath,
+	Range as SlateRange,
+	Transforms,
+} from 'slate'
 import { createEmptyTableRowElement, isTableRowElement, TableRowElement, tableRowElementType } from './TableRowElement'
 import { ContemberEditor } from '../../../editor'
 import { gaugeTableColumnCount } from './gaugeTableColumnCount'
@@ -28,7 +39,7 @@ export const getTableElementColumnCount = (element: TableElement): number => {
 	return firstRow?.children.length ?? 0
 }
 
-export const tableElementPlugin = ({ render }: {render: ElementRenderer<TableElement>}): EditorElementPlugin<TableElement> => ({
+export const tableElementPlugin = ({ render }: { render: ElementRenderer<TableElement> }): EditorElementPlugin<TableElement> => ({
 	type: tableElementType,
 	render,
 	normalizeNode: ({ editor, element, path, preventDefault }) => {

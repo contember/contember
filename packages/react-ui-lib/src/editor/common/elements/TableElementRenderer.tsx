@@ -5,7 +5,6 @@ import { Transforms } from 'slate'
 import { ReactEditor, RenderElementProps, useSelected, useSlateStatic } from 'slate-react'
 import { BlockElement } from './BlockElement'
 
-
 export interface TableElementRendererProps extends Omit<RenderElementProps, 'element'> {
 	element: TableElement
 }
@@ -53,8 +52,7 @@ export const TableElementRenderer = memo(function TableElementRenderer(props: Ta
 	)
 
 	const justifyColumn = useCallback(
-		(index: number, direction: TableCellElement['justify']) =>
-			TableModifications.justifyTableColumn(editor, props.element, index, direction),
+		(index: number, direction: TableCellElement['justify']) => TableModifications.justifyTableColumn(editor, props.element, index, direction),
 		[editor, props.element],
 	)
 
@@ -73,10 +71,7 @@ export const TableElementRenderer = memo(function TableElementRenderer(props: Ta
 	return (
 		<BlockElement element={props.element} attributes={props.attributes} withBoundaries>
 			<div className="py-4">
-
-				<table
-					className=""
-					// rowCount={props.element.children.length}
+				<table className="" // rowCount={props.element.children.length}
 					// columnCount={(props.element.children[0] as TableRowElement | undefined)?.children.length ?? 0}
 					// extendTable={extendTable}
 					// shrinkTable={shrinkTable}

@@ -1,7 +1,6 @@
 import * as TenantApi from '@contember/graphql-client-tenant'
 import { createTenantMutation } from '../../useTenantMutation'
 
-
 export const disableApiKeyMutation = TenantApi.mutation$
 	.disableApiKey(
 		TenantApi

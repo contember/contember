@@ -2,7 +2,7 @@ import { Connection } from './Connection'
 import { EventManager } from './EventManager'
 import { wrapIdentifier } from '../utils'
 import { Notification } from 'pg'
-import { DatabaseError, CannotCommitError } from './errors'
+import { CannotCommitError, DatabaseError } from './errors'
 
 export class Transaction implements Connection.TransactionLike {
 	public get isClosed(): boolean {
@@ -73,7 +73,6 @@ export class Transaction implements Connection.TransactionLike {
 }
 
 class SavePoint implements Connection.TransactionLike {
-
 	public on
 
 	constructor(
@@ -101,7 +100,6 @@ class SavePoint implements Connection.TransactionLike {
 			return await callback(new SavePoint(this.savepointName, this.savepointManager, connection, this.state))
 		}, { eventManager })
 	}
-
 
 	async transaction<Result>(
 		callback: (connection: Connection.TransactionLike) => Promise<Result> | Result,
@@ -166,10 +164,10 @@ class SavepointState {
 	}
 }
 
-export const executeTransaction =  async <Result>(
+export const executeTransaction = async <Result>(
 	transaction: Connection.TransactionLike,
 	callback: (connection: Connection.TransactionLike) => Promise<Result> | Result,
-)  => {
+) => {
 	try {
 		const result = await callback(transaction)
 		if (!transaction.isClosed) {

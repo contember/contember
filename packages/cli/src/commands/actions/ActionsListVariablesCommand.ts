@@ -3,8 +3,7 @@ import { RemoteProjectResolver } from '../../lib/project/RemoteProjectResolver'
 import { ActionsClient } from '../../lib/actions/ActionsClient'
 import chalkTable from 'chalk-table'
 
-type Args = {
-}
+type Args = {}
 
 type Options = {
 	project?: string

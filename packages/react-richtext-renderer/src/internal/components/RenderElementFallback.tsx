@@ -127,9 +127,9 @@ function ReferenceElementFallback<
 	const elementMetadata = useReferenceMetadata<CustomElements, CustomLeaves>(element, options, block, true)
 
 	if (
-		elementMetadata.referenceRenderer === undefined ||
-		elementMetadata.referenceType === undefined ||
-		elementMetadata.reference === undefined
+		elementMetadata.referenceRenderer === undefined
+		|| elementMetadata.referenceType === undefined
+		|| elementMetadata.reference === undefined
 	) {
 		return children // At least render the text contents
 	}

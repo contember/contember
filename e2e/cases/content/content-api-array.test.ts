@@ -1,6 +1,6 @@
 import { expect, test } from 'bun:test'
 import { createTester, gql } from '../../src/tester'
-import { createSchema, c } from '@contember/schema-definition'
+import { c, createSchema } from '@contember/schema-definition'
 
 namespace ArrayModel {
 	export class Foo {
@@ -31,7 +31,6 @@ test('Content API: create & read array', async () => {
 			expect(response.body.data.createFoo.ok).toBe(true)
 		})
 		.expect(200)
-
 
 	await tester(
 		gql`
@@ -142,5 +141,4 @@ test('Content API: create & read array', async () => {
 			expect(response.body.data.maxLengthNotMatch).toHaveLength(0)
 		})
 		.expect(200)
-
 })

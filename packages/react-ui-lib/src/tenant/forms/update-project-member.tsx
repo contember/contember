@@ -5,8 +5,7 @@ import { TenantFormError, TenantFormLabel } from './common'
 import { MembershipsControl, RolesConfig, useIntrospectionRolesConfig } from './memberships-control'
 import { dict } from '../../dict'
 
-
-export const UpdateProjectMemberFormFields = ({ projectSlug, roles }: {projectSlug: string; roles?: RolesConfig}) => {
+export const UpdateProjectMemberFormFields = ({ projectSlug, roles }: { projectSlug: string; roles?: RolesConfig }) => {
 	const form = useUpdateProjectMemberForm()
 	const rolesResolved = roles ?? useIntrospectionRolesConfig(projectSlug)
 	return (
@@ -14,7 +13,8 @@ export const UpdateProjectMemberFormFields = ({ projectSlug, roles }: {projectSl
 			{form.state === 'submitting' || form.state === 'loading' ? <Loader position="absolute" /> : null}
 
 			<TenantFormError
-				form={form} messages={dict.tenant.updateProjectMember.errorMessages}
+				form={form}
+				messages={dict.tenant.updateProjectMember.errorMessages}
 			/>
 
 			<TenantFormLabel form={form} field="memberships">{dict.tenant.updateProjectMember.roles}</TenantFormLabel>

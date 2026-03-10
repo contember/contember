@@ -118,12 +118,13 @@ export class PermissionFactory {
 		}
 		const noRoot: `${Acl.Operation}`[] = []
 
-		for (let operation of [
-			'create',
-			'read',
-			'update',
-		] as const) {
-
+		for (
+			let operation of [
+				'create',
+				'read',
+				'update',
+			] as const
+		) {
 			const { predicates: opPredicates, permissions: fieldPermissions, noRoot: opNoRoot } = this.mergeOperationPermissions(left, right, operation)
 
 			if (opNoRoot) {
@@ -147,7 +148,6 @@ export class PermissionFactory {
 			operations.delete = predicate
 		}
 
-
 		if (noRoot.length > 0) {
 			operations.noRoot = noRoot
 		}
@@ -157,7 +157,6 @@ export class PermissionFactory {
 			operations: operations,
 		}
 	}
-
 
 	private mergeOperationPermissions(left: Acl.EntityPermissions, right: Acl.EntityPermissions, operation: 'create' | 'read' | 'update'): {
 		noRoot: boolean
@@ -194,7 +193,7 @@ export class PermissionFactory {
 		}
 	}
 
-	private resolveNoRoot<const Op extends`${Acl.Operation}`>(left: Acl.EntityPermissions, right: Acl.EntityPermissions, operation: Op): {
+	private resolveNoRoot<const Op extends `${Acl.Operation}`>(left: Acl.EntityPermissions, right: Acl.EntityPermissions, operation: Op): {
 		noRoot: boolean
 		leftPermissions: Acl.EntityPermissions['operations'][Op] | undefined
 		rightPermissions: Acl.EntityPermissions['operations'][Op] | undefined
@@ -223,7 +222,7 @@ export class PermissionFactory {
 		leftFieldPermissions: Acl.FieldPermissions | undefined = {},
 		rightPredicates: Acl.PredicateMap,
 		rightFieldPermissions: Acl.FieldPermissions | undefined = {},
-	): {predicates: Acl.PredicateMap; permissions: Acl.FieldPermissions} {
+	): { predicates: Acl.PredicateMap; permissions: Acl.FieldPermissions } {
 		const permissions: Writable<Acl.FieldPermissions> = {}
 		const predicates: Writable<Acl.PredicateMap> = {}
 

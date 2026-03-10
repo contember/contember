@@ -7,7 +7,6 @@ export type TenantGraphQLContext = TenantResolverContext & { identityId: string 
 export type TenantGraphQLHandler = GraphQLQueryHandler<TenantGraphQLContext>
 
 export class TenantGraphQLHandlerFactory {
-
 	create(resolvers: Schema.Resolvers): TenantGraphQLHandler {
 		const schema = makeExecutableSchema({
 			typeDefs,

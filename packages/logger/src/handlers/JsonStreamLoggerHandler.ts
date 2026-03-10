@@ -23,7 +23,8 @@ export class JsonStreamLoggerHandler implements LoggerHandler {
 			return
 		}
 		const formatted = entry.format()
-		const line = `{"time": "${entry.isoTime}", "level": "${entry.level.name}", "message": ${formatted.message}${formatted.error}${formatted.attributes}}\n`
+		const line =
+			`{"time": "${entry.isoTime}", "level": "${entry.level.name}", "message": ${formatted.message}${formatted.error}${formatted.attributes}}\n`
 		this.stream.write(line)
 	}
 

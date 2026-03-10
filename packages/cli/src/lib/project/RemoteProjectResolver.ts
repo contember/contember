@@ -13,9 +13,9 @@ export class RemoteProjectResolver {
 		let token: string | undefined
 		let project: string | undefined
 		if (identifier?.includes('://')) {
-			({ endpoint, project, token } = parseDsn(identifier))
+			;({ endpoint, project, token } = parseDsn(identifier))
 		} else if (this.cliEnv.dsn) {
-			({ endpoint, project, token } = parseDsn(this.cliEnv.dsn))
+			;({ endpoint, project, token } = parseDsn(this.cliEnv.dsn))
 		} else {
 			endpoint = this.cliEnv.apiUrl
 			token = this.cliEnv.apiToken

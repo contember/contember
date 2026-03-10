@@ -84,4 +84,3 @@ test('confirm otp mutation with invalid code', async () => {
 		}),
 	})
 })
-

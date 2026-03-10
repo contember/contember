@@ -60,7 +60,6 @@ const BlockEditorSortable = ({ children, placeholder }: { children: ReactNode; p
 					}),
 					placeholder: placeholder,
 				}}
-
 			>
 				{children}
 			</EditorCanvas>

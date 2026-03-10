@@ -45,4 +45,3 @@ test('removes a project member', async () => {
 		},
 	})
 })
-

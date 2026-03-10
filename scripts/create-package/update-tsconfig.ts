@@ -9,7 +9,6 @@ const tsconfigJson = JSON.parse(fs.readFileSync(tsconfig, 'utf-8'))
 
 const packages = fs.readdirSync(join(root, 'packages')).map(it => `packages/${it}`)
 
-
 const references = packages.filter(p => fs.existsSync(join(root, p, 'package.json'))).map(p => ({ path: './' + p }))
 tsconfigJson.references = references
 

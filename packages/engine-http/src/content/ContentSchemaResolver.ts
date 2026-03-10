@@ -49,4 +49,3 @@ const getSchema = (schema: Schema, options: { stage?: string; normalize?: boolea
 		return result
 	})
 }
-

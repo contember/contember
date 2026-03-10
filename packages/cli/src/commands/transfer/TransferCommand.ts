@@ -50,7 +50,6 @@ export class TransferCommand extends Command<Args, Options> {
 			throw `Target project not defined`
 		}
 
-
 		console.log('')
 		console.log('Transferring data between projects:')
 		console.log('')
@@ -68,12 +67,12 @@ export class TransferCommand extends Command<Args, Options> {
 
 		const includeSystem = input.getOption('include-system') === true
 		const gzipTransfer = !input.getOption('no-gzip-transfer')
-		const exportResponse = (await this.dataTransferClient.dataExport({
+		const exportResponse = await this.dataTransferClient.dataExport({
 			project: sourceProject,
 			includeSystem,
 			excludeTables: input.getOption('exclude-table') ?? [],
 			gzip: gzipTransfer,
-		}))
+		})
 		const stream = Readable.fromWeb(exportResponse.body! as any)
 		const importResponse = await this.dataTransferClient.dataImport({
 			stream: stream,

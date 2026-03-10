@@ -11,18 +11,20 @@ export interface EntityListSubTreeAdditionalProps {
 	variables?: Environment.ValuesMapWithFactory
 }
 
-export type EntityListSubTreeProps<ListProps, EntityProps> = {
-	treeRootId?: TreeRootId
-	children?: ReactNode
-} & EntityListSubTreeAdditionalProps &
-(SugaredQualifiedEntityList | SugaredUnconstrainedQualifiedEntityList) &
-(
-	| {}
-	| {
-		listComponent: ComponentType<ListProps & EntityListBaseProps>
-		listProps?: ListProps
-		  }
-)
+export type EntityListSubTreeProps<ListProps, EntityProps> =
+	& {
+		treeRootId?: TreeRootId
+		children?: ReactNode
+	}
+	& EntityListSubTreeAdditionalProps
+	& (SugaredQualifiedEntityList | SugaredUnconstrainedQualifiedEntityList)
+	& (
+		| {}
+		| {
+			listComponent: ComponentType<ListProps & EntityListBaseProps>
+			listProps?: ListProps
+		}
+	)
 
 /**
  * Creates a subtree with list of entities in current data binding context.

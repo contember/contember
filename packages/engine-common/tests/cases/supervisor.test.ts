@@ -1,5 +1,5 @@
 import { createLogger, TestLoggerHandler } from '@contember/logger'
-import { test, expect } from 'bun:test'
+import { expect, test } from 'bun:test'
 import { Runnable, RunnableArgs, Running, Supervisor } from '../../src'
 
 const shouldNotHappenCallback = () => {
@@ -25,7 +25,7 @@ test('supervisor: start - end', async () => {
 				},
 			}
 		}
-	}
+	}()
 	const supervisor = new Supervisor(okRunnable)
 	const running = await supervisor.run({
 		logger,
@@ -38,7 +38,6 @@ test('supervisor: start - end', async () => {
 		'Runnable terminated',
 	])
 })
-
 
 test('supervisor: retry start', async () => {
 	const { logger, testLogger } = createTestLogger()
@@ -59,7 +58,7 @@ test('supervisor: retry start', async () => {
 				},
 			}
 		}
-	}
+	}()
 
 	const supervisor = new Supervisor(okRunnable, { minBackoff: 1 })
 	const running = await supervisor.run({
@@ -79,10 +78,8 @@ test('supervisor: retry start', async () => {
 		'Starting runnable #3',
 		'Runnable #3 started',
 		'Runnable #3 terminated',
-
 	])
 })
-
 
 test('supervisor: failed to start', async () => {
 	const { logger, testLogger } = createTestLogger()
@@ -92,7 +89,7 @@ test('supervisor: failed to start', async () => {
 			await new Promise(resolve => setTimeout(resolve, 1))
 			throw new Error('failed to start')
 		}
-	}
+	}()
 
 	const supervisor = new Supervisor(okRunnable, { startupMax: 0 })
 	const runningPromise = supervisor.run({
@@ -105,7 +102,6 @@ test('supervisor: failed to start', async () => {
 		'Runnable crashed, stopping: failed to start',
 	])
 })
-
 
 test('supervisor: crash after start, restarts', async () => {
 	const { logger, testLogger } = createTestLogger()
@@ -127,7 +123,7 @@ test('supervisor: crash after start, restarts', async () => {
 				},
 			}
 		}
-	}
+	}()
 
 	const supervisor = new Supervisor(okRunnable, { minBackoff: 1 })
 	const running = await supervisor.run({
@@ -142,10 +138,8 @@ test('supervisor: crash after start, restarts', async () => {
 		'Restarting runnable now',
 		'Starting runnable #2',
 		'Runnable #2 terminated',
-
 	])
 })
-
 
 test('supervisor: failed to restart', async () => {
 	const { logger, testLogger } = createTestLogger()
@@ -169,7 +163,7 @@ test('supervisor: failed to restart', async () => {
 				},
 			}
 		}
-	}
+	}()
 
 	const supervisor = new Supervisor(okRunnable, { minBackoff: 1, max: 5 })
 	const errorPromise = new Promise(async (resolve, reject) => {
@@ -201,4 +195,3 @@ test('supervisor: failed to restart', async () => {
 		'Runnable crashed, stopping: failed to restart',
 	])
 })
-

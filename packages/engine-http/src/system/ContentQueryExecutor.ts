@@ -18,7 +18,10 @@ export class ContentQueryExecutorImpl implements ContentQueryExecutor {
 	) {
 	}
 
-	public async execute({ db, schema, schemaMeta, databaseMetadata, stage, project, identity }: ContentQueryExecutorContext, { query, variables }: ContentQueryExecutorQuery): Promise<ContentQueryExecutorResult> {
+	public async execute(
+		{ db, schema, schemaMeta, databaseMetadata, stage, project, identity }: ContentQueryExecutorContext,
+		{ query, variables }: ContentQueryExecutorQuery,
+	): Promise<ContentQueryExecutorResult> {
 		const permissions = new AllowAllPermissionFactory().create(schema.model, true)
 		const authorizator = new Authorizator(permissions, true, false)
 		const dataSchemaBuilder = this.graphqlSchemaBuilderFactory.create(schema.model, authorizator)
@@ -76,8 +79,10 @@ const formatErrorMessage = (e: any): string => {
 		return originalError.message
 	}
 	const errorDetails = typeof originalError === 'object'
-		&& originalError !== null
-		&& 'message' in originalError ? `: ${originalError.message}` : ''
+			&& originalError !== null
+			&& 'message' in originalError
+		? `: ${originalError.message}`
+		: ''
 
 	logger.error(e)
 

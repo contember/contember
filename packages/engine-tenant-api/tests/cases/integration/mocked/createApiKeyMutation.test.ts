@@ -73,4 +73,3 @@ test('create api key', async () => {
 		},
 	})
 })
-

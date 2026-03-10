@@ -3,12 +3,9 @@ import { getEntity } from '@contember/schema-utils'
 
 import { EntityPredicatesResolver } from './EntityPredicateResolver'
 import { AllowDefinition } from '../permissions'
-import {
-	allowDefinitionsStore,
-	EntityPermissionsDefinition,
-} from './stores'
+import { allowDefinitionsStore, EntityPermissionsDefinition } from './stores'
 import { Role } from '../roles'
-import {  VariableDefinition } from '../variables'
+import { VariableDefinition } from '../variables'
 import { filterEntityDefinition } from '../../../utils'
 import { applyEntityAclExtensions } from '../aclExtensions'
 
@@ -43,19 +40,25 @@ export class AclFactory {
 		}
 	}
 
-	private createPermissions(rolePermissions: PermissionsByEntity | undefined, entityLikeDefinition: Record<string, { new(): any }>, role: Role): Acl.Permissions {
-		return Object.fromEntries(Object.values(this.model.entities).map((entity): [string, Acl.EntityPermissions] | undefined => {
-			const permissions = rolePermissions ? this.createPermissionsFromAllow(rolePermissions, entity) : { predicates: {}, operations: {} }
-			const isEmpty = !rolePermissions?.has(entity.name)
-			const withExtensions = applyEntityAclExtensions(entityLikeDefinition[entity.name], { entity, permissions, role })
-			if (isEmpty && withExtensions === permissions) {
-				return undefined
-			}
-			return [
-				entity.name,
-				withExtensions,
-			]
-		}).filter(<T>(it: T | undefined): it is T => it !== undefined))
+	private createPermissions(
+		rolePermissions: PermissionsByEntity | undefined,
+		entityLikeDefinition: Record<string, { new(): any }>,
+		role: Role,
+	): Acl.Permissions {
+		return Object.fromEntries(
+			Object.values(this.model.entities).map((entity): [string, Acl.EntityPermissions] | undefined => {
+				const permissions = rolePermissions ? this.createPermissionsFromAllow(rolePermissions, entity) : { predicates: {}, operations: {} }
+				const isEmpty = !rolePermissions?.has(entity.name)
+				const withExtensions = applyEntityAclExtensions(entityLikeDefinition[entity.name], { entity, permissions, role })
+				if (isEmpty && withExtensions === permissions) {
+					return undefined
+				}
+				return [
+					entity.name,
+					withExtensions,
+				]
+			}).filter(<T>(it: T | undefined): it is T => it !== undefined),
+		)
 	}
 
 	private createPermissionsFromAllow(rolePermissions: PermissionsByEntity, entity: Model.Entity): Acl.EntityPermissions {
@@ -88,7 +91,6 @@ export class AclFactory {
 		}
 	}
 
-
 	getNoRootOptions(entity: Model.Entity, permissions?: EntityPermissions): Acl.EntityOperations['noRoot'] {
 		const allowedRoot = new Set<Acl.Operation>()
 		const disallowedRoot = new Set<Acl.Operation>()
@@ -106,7 +108,6 @@ export class AclFactory {
 					}
 				}
 			}
-
 		}
 		return [...disallowedRoot.values()]
 	}
@@ -148,7 +149,6 @@ export class AclFactory {
 		return groupedPermissions
 	}
 }
-
 
 export type EntityPermissions = { definitions: AllowDefinition<any>[] }
 export type PermissionsByEntity = Map<string, EntityPermissions>

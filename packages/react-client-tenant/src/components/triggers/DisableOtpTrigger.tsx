@@ -19,7 +19,8 @@ export const DisableOtpTrigger = ({ onSuccess, ...props }: DisableOtpTriggerProp
 			onSuccess={() => {
 				refreshIdentity()
 				onSuccess?.()
-			}} {...props}
+			}}
+			{...props}
 		/>
 	)
 }

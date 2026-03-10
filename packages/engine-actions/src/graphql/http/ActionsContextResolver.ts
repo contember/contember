@@ -29,8 +29,7 @@ export class ActionsContextResolver {
 					id: authResult.identityId,
 					roles: authResult.roles,
 				},
-			),
-		)
+			))
 		logger.debug('Memberships fetched', { memberships })
 
 		if (memberships.length === 0) {

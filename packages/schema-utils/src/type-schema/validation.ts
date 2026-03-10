@@ -9,10 +9,11 @@ const messageSchema = Typesafe.intersection(
 		parameters: Typesafe.array(Typesafe.union(Typesafe.string, Typesafe.number)),
 	}),
 )
-const literalArgumentFactory = <T extends Typesafe.Json>(inner: Typesafe.Type<T>) => Typesafe.object({
-	type: Typesafe.literal(Validation.ArgumentType.literal),
-	value: inner,
-})
+const literalArgumentFactory = <T extends Typesafe.Json>(inner: Typesafe.Type<T>) =>
+	Typesafe.object({
+		type: Typesafe.literal(Validation.ArgumentType.literal),
+		value: inner,
+	})
 
 const validatorArgumentSchema = Typesafe.object({
 	type: Typesafe.literal(Validation.ArgumentType.validator),

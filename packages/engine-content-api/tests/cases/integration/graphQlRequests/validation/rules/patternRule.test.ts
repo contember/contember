@@ -30,4 +30,3 @@ describe('Pattern rule', () => {
 		})
 	})
 })
-

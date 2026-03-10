@@ -1,11 +1,4 @@
-import {
-	ClientGeneratedUuid,
-	HasOneRelationMarker,
-	ReceivedDataTree,
-	RuntimeId,
-	ServerId,
-	UnpersistedEntityDummyId,
-} from '@contember/binding-common'
+import { ClientGeneratedUuid, HasOneRelationMarker, ReceivedDataTree, RuntimeId, ServerId, UnpersistedEntityDummyId } from '@contember/binding-common'
 import { BindingError } from '@contember/binding-common'
 import type { MarkerTreeRoot } from '@contember/binding-common'
 import type { EntityId, PlaceholderName, TreeRootId } from '@contember/binding-common'
@@ -142,7 +135,7 @@ export class TreeAugmenter {
 		newId: ServerId | undefined | null,
 	) {
 		const currentId = realm.entity.id
-		let idToChangeTo: RuntimeId | undefined 
+		let idToChangeTo: RuntimeId | undefined
 
 		if (currentId instanceof ServerId) {
 			if (newId === undefined || newId === null) {
@@ -227,14 +220,14 @@ export class TreeAugmenter {
 				if (
 					// It's a uuid but it's not among the persisted so either it got deleted/disconnected or the client-side
 					// id generation didn't quite pan out.
-					childRuntimeId instanceof ServerId ||
-					childRuntimeId instanceof ClientGeneratedUuid ||
+					childRuntimeId instanceof ServerId
+					|| childRuntimeId instanceof ClientGeneratedUuid
 					// No persisted entity id to allocate to this so that's a goodbye.
-					persistedWithoutState.size === 0 ||
+					|| persistedWithoutState.size === 0
 					// not a persisted entity
-					child.type === 'entityRealmStub' ||
+					|| child.type === 'entityRealmStub'
 					// We couldn't find a matching persisted entity
-					!this.tryAssignIdToMatching(child, persistedWithoutState)
+					|| !this.tryAssignIdToMatching(child, persistedWithoutState)
 				) {
 					state.getAccessor().disconnectEntity(child.getAccessor())
 					continue
@@ -330,7 +323,7 @@ export class TreeAugmenter {
 					if (childData !== undefined && !(childData instanceof Set)) {
 						throw new BindingError()
 					}
-					if (!childData){
+					if (!childData) {
 						break
 					}
 					if (childData?.size !== child.children.size) {

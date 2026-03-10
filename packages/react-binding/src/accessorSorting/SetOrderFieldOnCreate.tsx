@@ -15,9 +15,7 @@ export interface SetOrderFieldOnCreateOwnProps {
 	newOrderFieldValue?: number
 }
 
-export interface SetOrderFieldOnCreateProps
-	extends SetOrderFieldOnCreateOwnProps,
-	Pick<SugaredUnconstrainedQualifiedSingleEntity, 'entity'> {}
+export interface SetOrderFieldOnCreateProps extends SetOrderFieldOnCreateOwnProps, Pick<SugaredUnconstrainedQualifiedSingleEntity, 'entity'> {}
 
 export const SetOrderFieldOnCreate = Component<SetOrderFieldOnCreateProps>(
 	() => null,
@@ -75,7 +73,7 @@ export const SetOrderFieldOnCreate = Component<SetOrderFieldOnCreateProps>(
 					onBeforePersist={(getAccessor, bindingOperations) => {
 						// We're creating a new entity which adjusts the numbering of the other ones if applicable
 						// and then deleting it again which leaves a hole for newOrderFieldValue that is set above.
-						let newEntityKey: string | undefined 
+						let newEntityKey: string | undefined
 						addEntityAtIndex(getAccessor(), desugaredOrderField, newOrderFieldValue, getNewEntity => {
 							newEntityKey = getNewEntity().key
 						})

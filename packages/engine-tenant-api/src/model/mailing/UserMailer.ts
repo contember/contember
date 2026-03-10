@@ -13,11 +13,18 @@ export class UserMailer {
 	constructor(
 		private readonly mailer: Mailer,
 		private readonly templateRenderer: TemplateRenderer,
-	) { }
+	) {}
 
 	async sendNewUserInvitedMail(
 		dbContext: DatabaseContext,
-		mailArguments: { email: string; password: string | null; token: string | null; project: string; projectSlug: string; memberships: readonly Acl.Membership[]},
+		mailArguments: {
+			email: string
+			password: string | null
+			token: string | null
+			project: string
+			projectSlug: string
+			memberships: readonly Acl.Membership[]
+		},
 		customMailOptions: { projectId: string; variant: string },
 	): Promise<void> {
 		const templateId = { type: MailType.newUserInvited, ...customMailOptions }
@@ -83,9 +90,11 @@ export class UserMailer {
 			html,
 			variables,
 			template: templateId,
-			...(template.replyTo ? {
-				replyTo: template.replyTo,
-			} : {}),
+			...(template.replyTo
+				? {
+					replyTo: template.replyTo,
+				}
+				: {}),
 		})
 	}
 
@@ -93,8 +102,7 @@ export class UserMailer {
 		dbContext: DatabaseContext,
 		identifier: MailTemplateIdentifier,
 	): Promise<Pick<MailTemplateData, 'subject' | 'content' | 'replyTo'> | null> {
-		const customTemplate =
-			(await dbContext.queryHandler.fetch(new MailTemplateQuery(identifier)))
+		const customTemplate = (await dbContext.queryHandler.fetch(new MailTemplateQuery(identifier)))
 			?? (await dbContext.queryHandler.fetch(new MailTemplateQuery({ ...identifier, projectId: null })))
 
 		if (!customTemplate) {

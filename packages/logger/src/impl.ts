@@ -6,7 +6,8 @@ import {
 	LoggerChildOptions,
 	LoggerHandler,
 	LoggerOptions,
-	LogLevel, LogLevelName,
+	LogLevel,
+	LogLevelName,
 } from './types'
 import { LogLevels } from './levels'
 import { formatLogEntryAttributes, formatLoggerAttributes, FormattedAttributes, stringify } from './formatting'
@@ -21,9 +22,7 @@ export const createLogger = (
 	return LoggerImpl.create(handler, attributes, options)
 }
 
-
 export class LoggerImpl implements Logger {
-
 	public readonly attributes: LoggerAttributes
 	private formattedAttributes: FormattedAttributes | undefined
 	private minLevelValue: number
@@ -78,7 +77,11 @@ export class LoggerImpl implements Logger {
 		return new LoggerImpl(newHandler, attributes, this.depth + 1, this, { ...this.options, ...options })
 	}
 
-	public async scope<T>(cb: (logger: Logger) => Promise<T> | T, attributes: LoggerAttributes = {}, options: Partial<LoggerChildOptions> = {}): Promise<T> {
+	public async scope<T>(
+		cb: (logger: Logger) => Promise<T> | T,
+		attributes: LoggerAttributes = {},
+		options: Partial<LoggerChildOptions> = {},
+	): Promise<T> {
 		const logger = this.child(attributes, options)
 		try {
 			return await withLogger(logger, () => cb(logger))
@@ -90,13 +93,14 @@ export class LoggerImpl implements Logger {
 	private doLog(level: LogLevel, errorOrMessage: unknown, { error: errorAttr, message: messageAttr, ...attributes }: LoggerAttributes = {}) {
 		const error: unknown | undefined = typeof errorOrMessage !== 'string' ? errorOrMessage : errorAttr
 		const errorMessage = typeof error === 'object' && error !== null && typeof (error as any).message === 'string'
-			? (error as any).message : undefined
+			? (error as any).message
+			: undefined
 
 		const passedMessage = typeof errorOrMessage === 'string'
 			? errorOrMessage
 			: (typeof messageAttr === 'string')
-				? messageAttr
-				: undefined
+			? messageAttr
+			: undefined
 
 		const message = errorMessage && passedMessage ? `${passedMessage}: ${errorMessage}` : (passedMessage ?? errorMessage ?? 'undefined message')
 
@@ -144,6 +148,3 @@ export class LoggerImpl implements Logger {
 		return this.formattedAttributes
 	}
 }
-
-
-

@@ -22,7 +22,6 @@ describe('mutations in trx', () => {
 		}))
 		const result = await client.mutate(createAuthor)
 
-
 		expect(result.data.ok).toBe(true)
 		expect(calls).toHaveLength(1)
 		expect(calls[0].query).toMatchSnapshot()
@@ -303,7 +302,6 @@ describe('mutations in trx', () => {
 		expect(calls[0].query).toMatchSnapshot()
 		expect(calls[0].variables).toMatchSnapshot()
 	})
-
 })
 describe('mutations without trx', () => {
 	test('create', async () => {
@@ -319,7 +317,6 @@ describe('mutations without trx', () => {
 			},
 		})
 		const result = await client.mutate(createAuthor)
-
 
 		expect(result.ok).toBe(true)
 		expect(calls).toHaveLength(1)
@@ -540,7 +537,6 @@ describe('mutations without trx', () => {
 		expect(calls[0].query).toMatchSnapshot()
 		expect(calls[0].variables).toMatchSnapshot()
 	})
-
 
 	test('mutate or fail - ok', async () => {
 		const [client, calls] = createClient({

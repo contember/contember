@@ -17,5 +17,5 @@ export const SelectItemTrigger = forwardRef<HTMLElement, SelectItemTriggerProps>
 		handleSelect?.(entity, action)
 		onClickProp?.(e)
 	}, [action, entity, handleSelect, onClickProp])
-	return <Slot {...props} onClick={onClick}  ref={ref} />
+	return <Slot {...props} onClick={onClick} ref={ref} />
 })

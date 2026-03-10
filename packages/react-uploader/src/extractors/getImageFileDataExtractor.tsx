@@ -22,7 +22,7 @@ export const getImageFileDataExtractor: (props: ImageFileDataExtractorProps) => 
 			if (!heightField && !widthField) {
 				return undefined
 			}
-			const result = await new Promise< {
+			const result = await new Promise<{
 				width: number
 				height: number
 			}>((resolve, reject) => {
@@ -39,7 +39,6 @@ export const getImageFileDataExtractor: (props: ImageFileDataExtractorProps) => 
 				image.src = previewUrl
 			})
 			return ({ entity }) => {
-
 				widthField && entity.getField(widthField).updateValue(result.width ?? null)
 				heightField && entity.getField(heightField).updateValue(result.height ?? null)
 			}

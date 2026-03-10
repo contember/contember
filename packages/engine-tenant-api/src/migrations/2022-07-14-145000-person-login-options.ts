@@ -9,7 +9,6 @@ ALTER TABLE identity_provider
 	ADD exclusive BOOLEAN DEFAULT FALSE;
 `
 
-export default async function (builder: MigrationBuilder) {
+export default async function(builder: MigrationBuilder) {
 	builder.sql(sql)
 }
-

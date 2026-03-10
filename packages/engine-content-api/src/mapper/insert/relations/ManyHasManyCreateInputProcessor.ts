@@ -9,7 +9,6 @@ import { MapperInput } from '../../types'
 type Context = Model.ManyHasManyOwningContext | Model.ManyHasManyInverseContext
 
 export class ManyHasManyCreateInputProcessor implements CreateInputProcessor.HasManyRelationProcessor<Context, SqlCreateInputProcessorResult> {
-
 	constructor(
 		private readonly mapper: Mapper,
 	) {

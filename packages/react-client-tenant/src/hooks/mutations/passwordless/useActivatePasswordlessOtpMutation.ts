@@ -2,7 +2,6 @@ import * as TenantApi from '@contember/graphql-client-tenant'
 import { LoginToken } from '../../useTenantApi'
 import { createTenantMutation } from '../../useTenantMutation'
 
-
 const ActivatePasswordlessOtpMutation = TenantApi
 	.mutation$
 	.activatePasswordlessOtp(

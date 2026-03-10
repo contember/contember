@@ -6,7 +6,6 @@ ALTER TABLE project
     add column updated_at timestamptz not null DEFAULT now();
 `
 
-export default async function (builder: MigrationBuilder) {
+export default async function(builder: MigrationBuilder) {
 	builder.sql(sql)
 }
-

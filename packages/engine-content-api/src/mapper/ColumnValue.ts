@@ -7,7 +7,6 @@ export type ColumnValue = {
 	columnType: string
 }
 
-
 export const rowDataToFieldValues = (values: ColumnValue[]): Record<string, Value.FieldValue> =>
 	Object.fromEntries(values.map(it => [it.fieldName, it.value]))
 

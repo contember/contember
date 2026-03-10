@@ -7,7 +7,13 @@ import { MasterContainerBuilder, MasterContainerHook } from '@contember/engine-h
 import { ActionsApiMiddlewareFactory } from './graphql/http/ActionsApiMiddlewareFactory'
 import { ActionsGraphQLHandlerFactory } from './graphql/http/ActionsGraphQLHandlerFactory'
 import { ResolversFactory } from './graphql/resolvers/ResolversFactory'
-import { EventsQueryResolver, ProcessBatchMutationResolver, RetryEventMutationResolver, SetVariablesMutationResolver, StopEventMutationResolver } from './graphql/resolvers'
+import {
+	EventsQueryResolver,
+	ProcessBatchMutationResolver,
+	RetryEventMutationResolver,
+	SetVariablesMutationResolver,
+	StopEventMutationResolver,
+} from './graphql/resolvers'
 import { EventDispatcher } from './dispatch/EventDispatcher'
 import { EventsRepository } from './dispatch/EventsRepository'
 import { TargetHandlerResolver } from './dispatch/TargetHandlerResolver'
@@ -22,13 +28,7 @@ import { AccessEvaluator, Authorizator } from '@contember/authorization'
 import { ActionsPermissionsFactory } from './authorization'
 import { WebhookFetcherNative } from './dispatch/WebhookFetcher'
 
-export {
-	TriggerListenersFactory,
-	TriggerListenersStore,
-	TriggerHandler,
-	TriggerPayloadManager,
-	TriggerIndirectChangesFetcher,
-} from './triggers'
+export { TriggerHandler, TriggerIndirectChangesFetcher, TriggerListenersFactory, TriggerListenersStore, TriggerPayloadManager } from './triggers'
 export { ActionsExecutionContainerHookFactory } from './ActionsExecutionContainerHookFactory'
 export { ListenerStoreProvider } from './ListenerStoreProvider'
 
@@ -65,33 +65,54 @@ export default class ActionsPlugin implements Plugin {
 				.addService('actions_authorizator', () => {
 					return new Authorizator.Default(new AccessEvaluator.PermissionEvaluator(new ActionsPermissionsFactory().create()))
 				})
-				.setupService('application', (it, { projectContextResolver, debugMode, actions_eventRepository, actions_eventDispatcher, actions_dispatchWorkerSupervisorFactory, actions_variableManager, actions_authorizator }) => {
-					const handlerFactory = new ActionsGraphQLHandlerFactory()
-					const eventsQueryResolver = new EventsQueryResolver()
-					const processBatchMutationResolver = new ProcessBatchMutationResolver(actions_eventDispatcher)
-					const variablesQueryResolver = new VariablesQueryResolver(actions_variableManager)
-					const setVariablesMutationResolver = new SetVariablesMutationResolver(actions_variableManager)
-					const resolversFactory = new ResolversFactory(
-						eventsQueryResolver,
-						processBatchMutationResolver,
-						variablesQueryResolver,
-						setVariablesMutationResolver,
-						new RetryEventMutationResolver(actions_eventRepository),
-						new StopEventMutationResolver(actions_eventRepository),
-					)
+				.setupService(
+					'application',
+					(
+						it,
+						{
+							projectContextResolver,
+							debugMode,
+							actions_eventRepository,
+							actions_eventDispatcher,
+							actions_dispatchWorkerSupervisorFactory,
+							actions_variableManager,
+							actions_authorizator,
+						},
+					) => {
+						const handlerFactory = new ActionsGraphQLHandlerFactory()
+						const eventsQueryResolver = new EventsQueryResolver()
+						const processBatchMutationResolver = new ProcessBatchMutationResolver(actions_eventDispatcher)
+						const variablesQueryResolver = new VariablesQueryResolver(actions_variableManager)
+						const setVariablesMutationResolver = new SetVariablesMutationResolver(actions_variableManager)
+						const resolversFactory = new ResolversFactory(
+							eventsQueryResolver,
+							processBatchMutationResolver,
+							variablesQueryResolver,
+							setVariablesMutationResolver,
+							new RetryEventMutationResolver(actions_eventRepository),
+							new StopEventMutationResolver(actions_eventRepository),
+						)
 
-					const actionsContextResolver = new ActionsContextResolver(debugMode, projectContextResolver)
-					const actionsMiddlewareFactory = new ActionsApiMiddlewareFactory(actionsContextResolver, handlerFactory.create(resolversFactory), actions_authorizator)
-					const actionsWebsocketMiddlewareFactory = new ActionsWebsocketControllerFactory(debugMode, actionsContextResolver, actions_dispatchWorkerSupervisorFactory)
-					it.addRoute('actions', '/actions/:projectSlug', actionsMiddlewareFactory.create())
-					it.addWebsocketRoute('actions', '/actions/_worker', actionsWebsocketMiddlewareFactory.create())
-				})
+						const actionsContextResolver = new ActionsContextResolver(debugMode, projectContextResolver)
+						const actionsMiddlewareFactory = new ActionsApiMiddlewareFactory(
+							actionsContextResolver,
+							handlerFactory.create(resolversFactory),
+							actions_authorizator,
+						)
+						const actionsWebsocketMiddlewareFactory = new ActionsWebsocketControllerFactory(
+							debugMode,
+							actionsContextResolver,
+							actions_dispatchWorkerSupervisorFactory,
+						)
+						it.addRoute('actions', '/actions/:projectSlug', actionsMiddlewareFactory.create())
+						it.addWebsocketRoute('actions', '/actions/_worker', actionsWebsocketMiddlewareFactory.create())
+					},
+				)
 				.setupService('applicationWorkers', (it, { actions_dispatchWorkerSupervisorFactory, projectGroupContainer, serverConfig }) => {
 					if (!(serverConfig as any).projectGroup) {
 						it.registerWorker(this.name, actions_dispatchWorkerSupervisorFactory.create(projectGroupContainer))
 					}
 				}) as unknown as MasterContainerBuilder
-
 		}
 		return hook
 	}

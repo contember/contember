@@ -1,6 +1,6 @@
 import { executeTenantTest } from '../../../src/testTenant'
 import { testUuid } from '../../../src/testUuid'
-import { updatePersonProfileNameSql, updatePersonProfileEmailSql, updatePersonProfileNameAndEmailSql } from './sql/updatePesonNameSql'
+import { updatePersonProfileEmailSql, updatePersonProfileNameAndEmailSql, updatePersonProfileNameSql } from './sql/updatePesonNameSql'
 import { expect, test } from 'bun:test'
 import { changeMyProfileMutation } from './gql/changeMyProfile'
 import { getPersonByIdentity } from './sql/getPersonByIdentity'
@@ -30,7 +30,6 @@ test('changes my name', async () => {
 		},
 	})
 })
-
 
 test('unset my name', async () => {
 	const personId = testUuid(1)

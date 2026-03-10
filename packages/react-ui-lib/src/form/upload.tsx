@@ -7,7 +7,8 @@ import {
 	createVideoFileType,
 	FileType,
 	FileUrlDataExtractorProps,
-	ImageFileTypeProps, S3FileOptions,
+	ImageFileTypeProps,
+	S3FileOptions,
 	Uploader,
 	UploaderBase,
 	UploaderBaseFieldProps,
@@ -34,16 +35,13 @@ export type BaseUploadFieldProps =
 		getUploadOptions?: (file: File) => S3FileOptions
 	}
 
-
 export type ImageFieldProps =
 	& BaseUploadFieldProps
 	& ImageFileTypeProps
 
 export const ImageField = Component<ImageFieldProps>(props => (
 	<UploadFieldInner {...props} fileType={createImageFileType(props)}>
-		{props.children ?? (
-			<UploadedImageView {...props} DestroyAction={DisconnectEntityTrigger} />
-		)}
+		{props.children ?? <UploadedImageView {...props} DestroyAction={DisconnectEntityTrigger} />}
 	</UploadFieldInner>
 ))
 
@@ -53,12 +51,9 @@ export type AudioFieldProps =
 
 export const AudioField = Component<AudioFieldProps>(props => (
 	<UploadFieldInner {...props} fileType={createAudioFileType(props)}>
-		{props.children ?? (
-			<UploadedAudioView {...props} DestroyAction={DisconnectEntityTrigger} />
-		)}
+		{props.children ?? <UploadedAudioView {...props} DestroyAction={DisconnectEntityTrigger} />}
 	</UploadFieldInner>
 ))
-
 
 export type VideoFieldProps =
 	& BaseUploadFieldProps
@@ -66,9 +61,7 @@ export type VideoFieldProps =
 
 export const VideoField = Component<VideoFieldProps>(props => (
 	<UploadFieldInner {...props} fileType={createVideoFileType(props)}>
-		{props.children ?? (
-			<UploadedVideoView {...props} DestroyAction={DisconnectEntityTrigger} />
-		)}
+		{props.children ?? <UploadedVideoView {...props} DestroyAction={DisconnectEntityTrigger} />}
 	</UploadFieldInner>
 ))
 
@@ -78,12 +71,9 @@ export type FileFieldProps =
 
 export const FileField = Component<FileFieldProps>(props => (
 	<UploadFieldInner {...props} fileType={createAnyFileType(props)}>
-		{props.children ?? (
-			<UploadedAnyView {...props} DestroyAction={DisconnectEntityTrigger} />
-		)}
+		{props.children ?? <UploadedAnyView {...props} DestroyAction={DisconnectEntityTrigger} />}
 	</UploadFieldInner>
 ))
-
 
 type UploadFieldInnerProps =
 	& BaseUploadFieldProps
@@ -93,52 +83,58 @@ type UploadFieldInnerProps =
 		children: ReactNode
 	}
 
-const UploadFieldInner = Component((({ baseField, label, description, children, fileType, urlField, dropzonePlaceholder, getUploadOptions }: UploadFieldInnerProps) => {
-	const entity = useEntity()
-	const defaultUploader = useS3Client({
-		getUploadOptions,
-	})
-	const [fileTypeStable] = useState(fileType)
-	const fileTypeWithUploader = useMemo(
-		() => ({ ...fileTypeStable, uploader: fileTypeStable?.uploader ?? defaultUploader }),
-		[defaultUploader, fileTypeStable],
-	)
+const UploadFieldInner = Component(
+	({ baseField, label, description, children, fileType, urlField, dropzonePlaceholder, getUploadOptions }: UploadFieldInnerProps) => {
+		const entity = useEntity()
+		const defaultUploader = useS3Client({
+			getUploadOptions,
+		})
+		const [fileTypeStable] = useState(fileType)
+		const fileTypeWithUploader = useMemo(
+			() => ({ ...fileTypeStable, uploader: fileTypeStable?.uploader ?? defaultUploader }),
+			[defaultUploader, fileTypeStable],
+		)
 
-	// const errors = type.extractors?.flatMap(it => it.getErrorsHolders?.({
-	// 	environment,
-	// 	entity,
-	// }) ?? []).flatMap(it => it.errors?.errors ?? [])
+		// const errors = type.extractors?.flatMap(it => it.getErrorsHolders?.({
+		// 	environment,
+		// 	entity,
+		// }) ?? []).flatMap(it => it.errors?.errors ?? [])
 
-	return (
-		<FormFieldStateProvider>
-			<FormContainer description={description} label={label}>
-				<div className="flex">
+		return (
+			<FormFieldStateProvider>
+				<FormContainer description={description} label={label}>
+					<div className="flex">
+						<Uploader baseField={baseField} fileType={fileTypeWithUploader}>
+							<UploaderBase baseField={baseField}>
+								<UploaderHasFile>
+									<UploaderProgress />
+								</UploaderHasFile>
+							</UploaderBase>
 
-					<Uploader baseField={baseField} fileType={fileTypeWithUploader}>
-						<UploaderBase baseField={baseField}>
-							<UploaderHasFile>
-								<UploaderProgress />
-							</UploaderHasFile>
-						</UploaderBase>
-
-						<UploaderItemUI>
-							<EntityView render={entity => {
-								entity = baseField ? entity.getEntity({ field: baseField }) : entity
-								if (entity.getField(urlField).value === null) {
-									return <UploaderDropzone inactiveOnUpload dropzonePlaceholder={dropzonePlaceholder} />
-								} else {
-									return children
-								}
-							}} />
-						</UploaderItemUI>
-					</Uploader>
-				</div>
-			</FormContainer>
-		</FormFieldStateProvider>
-	)
-}), ({ fileType, children, baseField }) => {
-	return <>
-		{children}
-		<Uploader baseField={baseField} fileType={fileType}></Uploader>
-	</>
-})
+							<UploaderItemUI>
+								<EntityView
+									render={entity => {
+										entity = baseField ? entity.getEntity({ field: baseField }) : entity
+										if (entity.getField(urlField).value === null) {
+											return <UploaderDropzone inactiveOnUpload dropzonePlaceholder={dropzonePlaceholder} />
+										} else {
+											return children
+										}
+									}}
+								/>
+							</UploaderItemUI>
+						</Uploader>
+					</div>
+				</FormContainer>
+			</FormFieldStateProvider>
+		)
+	},
+	({ fileType, children, baseField }) => {
+		return (
+			<>
+				{children}
+				<Uploader baseField={baseField} fileType={fileType}></Uploader>
+			</>
+		)
+	},
+)

@@ -1,10 +1,4 @@
-import {
-	Component,
-	EntityListSubTree,
-	Field,
-	TreeRootIdProvider,
-	useEntityListSubTreeLoader,
-} from '@contember/interface'
+import { Component, EntityListSubTree, Field, TreeRootIdProvider, useEntityListSubTreeLoader } from '@contember/interface'
 import { LoaderIcon } from 'lucide-react'
 import { useMemo } from 'react'
 import { Title } from '~/app/components/title'
@@ -26,7 +20,8 @@ export default () => (
 		<div className="max-w-2xl">
 			<div className="space-y-6 text-gray-700">
 				<p>
-					The Entity List Subtree feature enables dynamic loading and refreshing of entity data. This example shows how data can be updated and reloaded independently:
+					The Entity List Subtree feature enables dynamic loading and refreshing of entity data. This example shows how data can be updated and reloaded
+					independently:
 				</p>
 
 				<ol className="list-decimal list-inside">
@@ -85,12 +80,11 @@ export default () => (
 	</div>
 )
 
-
 const LoadMany = () => {
 	const entities = 'ExtendTreeMany'
 	const [state, { reload }] = useEntityListSubTreeLoader(
-		{ entities, orderBy: 'value' },  // you may also pass "undefined" to load nothing
-		useMemo(() => (<Value />), []), // make sure the children is memoized
+		{ entities, orderBy: 'value' }, // you may also pass "undefined" to load nothing
+		useMemo(() => <Value />, []), // make sure the children is memoized
 	)
 
 	const isContentReady = state.state === 'loaded' || state.state === 'refreshing'

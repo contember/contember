@@ -9,8 +9,6 @@ import { handleOIDCResponse, initOIDCAuth } from './OIDCHelpers'
 import { createHmac } from 'node:crypto'
 import { IDPResponseError } from '../IDPResponseError'
 
-
-
 const FacebookConfiguration = BaseOIDCConfiguration
 type FacebookConfiguration = ReturnType<typeof FacebookConfiguration>
 
@@ -29,7 +27,6 @@ const FacebookResponsePayload = Typesafe.object({
 })
 
 type FacebookResponseData = ReturnType<typeof FacebookResponseData>
-
 
 export class FacebookProvider implements IdentityProviderHandler<FacebookConfiguration> {
 	// based on https://www.facebook.com/.well-known/openid-configuration/

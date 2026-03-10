@@ -7,9 +7,5 @@ export interface TableRowElementRendererProps extends Omit<RenderElementProps, '
 }
 
 export const TableRowElementRenderer = memo(function TableRowElementRenderer(props: TableRowElementRendererProps) {
-	return (
-		<tr {...props.attributes} /* headerScope={props.element.headerScope}*/>
-			{props.children}
-		</tr>
-	)
+	return <tr {...props.attributes}>/* headerScope={props.element.headerScope}*/{props.children}</tr>
 })

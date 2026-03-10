@@ -1,4 +1,4 @@
-import { h, Fragment } from 'preact'
+import { Fragment, h } from 'preact'
 import { Model } from '@contember/schema'
 import { ReferenceMapEntry, ReferencesMap } from '../../../schema/collectReferences'
 import { FieldLink } from './FieldLink'
@@ -36,37 +36,39 @@ export const OnDelete = ({ references, entity, visited = [] }: { references: Ref
 				.sort(sortReferences)
 				.map(it => {
 					const inverseDescr = it.targetRelation
-						? <>see <FieldLink entity={entity.name} field={it.targetRelation.name} /></>
+						? (
+							<>
+								see <FieldLink entity={entity.name} field={it.targetRelation.name} />
+							</>
+						)
 						: 'no inverse side'
 					if (it.owningRelation.joiningColumn.onDelete === 'restrict') {
 						return (
 							<li key={it.owningEntity.name + '_' + it.owningRelation.name}>
-								<span class={'bg-black text-white px-1'}>Fails</span> when referenced from
-								{' '}<FieldLink entity={it.owningEntity.name} field={it.owningRelation.name} />
-								{' '}({inverseDescr})
+								<span class={'bg-black text-white px-1'}>Fails</span> when referenced from{' '}
+								<FieldLink entity={it.owningEntity.name} field={it.owningRelation.name} /> ({inverseDescr})
 							</li>
 						)
 					}
 					if (it.owningRelation.joiningColumn.onDelete === 'set null') {
 						return (
 							<li key={it.owningEntity.name + '_' + it.owningRelation.name}>
-								<span class={'bg-blue-400 text-white px-1'}>Sets null</span> at
-								{' '}<FieldLink entity={it.owningEntity.name} field={it.owningRelation.name} />
-								{' '}({inverseDescr})
+								<span class={'bg-blue-400 text-white px-1'}>Sets null</span> at <FieldLink entity={it.owningEntity.name} field={it.owningRelation.name} />
+								{' '}
+								({inverseDescr})
 							</li>
 						)
 					}
 					if (it.owningRelation.joiningColumn.onDelete === 'cascade') {
 						return (
 							<li key={it.owningEntity.name + '_' + it.owningRelation.name}>
-								<span class={'bg-red-400 text-white px-1'}>Deletes</span> <EntityLink entity={it.owningEntity.name} />
-								{' '}connected using
-								{' '}<FieldLink entity={it.owningEntity.name} field={it.owningRelation.name} noEntityLabel />
-								{' '}({inverseDescr})
+								<span class={'bg-red-400 text-white px-1'}>Deletes</span> <EntityLink entity={it.owningEntity.name} /> connected using{' '}
+								<FieldLink entity={it.owningEntity.name} field={it.owningRelation.name} noEntityLabel /> ({inverseDescr})
 								<OnDelete entity={it.owningEntity} visited={[...visited, entity]} references={references} />
 							</li>
 						)
 					}
 				})}
-		</ul>)
+		</ul>
+	)
 }

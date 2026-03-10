@@ -11,7 +11,6 @@ const schema = createSchema({
 	Item,
 })
 describe('Length range rule', () => {
-
 	it('fails when value not valid #1', async () => {
 		await testCreate({
 			schema,

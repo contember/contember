@@ -20,7 +20,7 @@ const execute = (test: Test) => {
 	const initialAcl = JSON.parse(JSON.stringify(test.acl))
 	const result = merger.create({
 		...emptySchema,
-		 model,
+		model,
 		acl: test.acl,
 	}, test.roles)
 	assert.deepStrictEqual(result, test.result)
@@ -28,7 +28,6 @@ const execute = (test: Test) => {
 }
 
 describe('Permission merger', () => {
-
 	it('merge inheritance', () => {
 		execute({
 			acl: {
@@ -549,7 +548,6 @@ describe('Permission merger', () => {
 		})
 	})
 
-
 	it('merge noRootOperations', () => {
 		execute({
 			acl: {
@@ -607,7 +605,6 @@ describe('Permission merger', () => {
 		})
 	})
 
-
 	it('merge delete #1', () => {
 		execute({
 			acl: {
@@ -648,7 +645,6 @@ describe('Permission merger', () => {
 		})
 	})
 
-
 	it('merge delete #2', () => {
 		execute({
 			acl: {
@@ -729,7 +725,6 @@ describe('Permission merger', () => {
 			},
 		})
 	})
-
 
 	it('prefer permissions with root allowed', () => {
 		execute({
@@ -788,7 +783,6 @@ describe('Permission merger', () => {
 			},
 		})
 	})
-
 
 	it('merge permissions with no root', () => {
 		execute({

@@ -40,5 +40,4 @@ export class S3ConfigProcessor implements ConfigProcessor<Project3Config> {
 			}),
 		)
 	}
-
 }

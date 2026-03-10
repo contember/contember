@@ -6,11 +6,9 @@ import { useEntity } from '../accessorPropagation'
 import { useMutationState } from '../accessorTree'
 import { composeEventHandlers } from '@radix-ui/primitive'
 
-
 const SlotType = Slot as React.ForwardRefExoticComponent<React.ButtonHTMLAttributes<HTMLButtonElement> & React.RefAttributes<HTMLButtonElement>>
 
 export interface DeleteEntityTriggerProps {
-
 	/**
 	 * If true, binding will trigger persist immediately after the entity is deleted.
 	 */

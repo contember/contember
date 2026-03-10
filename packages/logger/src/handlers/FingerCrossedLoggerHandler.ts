@@ -38,7 +38,6 @@ export class FingerCrossedLoggerHandler implements LoggerHandler {
 		return this.options.logWhenActivatedLevel.value
 	}
 
-
 	handle(logEntry: LogEntry): void {
 		const logEntryLevel = logEntry.level.value
 		if (logEntryLevel < this.options.logWhenActivatedLevel.value) {
@@ -47,15 +46,12 @@ export class FingerCrossedLoggerHandler implements LoggerHandler {
 
 		if (this.active) {
 			this.inner.handle(logEntry)
-
 		} else if (logEntryLevel >= this.options.activationLevel.value) {
 			this.active = true
 			this.doFlush(this.options.logWhenActivatedLevel)
 			this.inner.handle(logEntry)
-
 		} else if (this.buffer.length === 0 && logEntryLevel >= this.options.logAlwaysLevel.value) {
 			this.inner.handle(logEntry)
-
 		} else {
 			this.buffer.push(logEntry)
 

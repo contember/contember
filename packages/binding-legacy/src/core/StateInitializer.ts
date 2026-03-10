@@ -1,13 +1,7 @@
 import { BatchUpdatesOptions, EntityAccessor, FieldAccessor } from '@contember/binding-common'
-import {  RuntimeId, ServerId, UnpersistedEntityDummyId } from '@contember/binding-common'
+import { RuntimeId, ServerId, UnpersistedEntityDummyId } from '@contember/binding-common'
 import { BindingError } from '@contember/binding-common'
-import {
-	EntityListSubTreeMarker,
-	EntitySubTreeMarker,
-	FieldMarker,
-	HasManyRelationMarker,
-	HasOneRelationMarker,
-} from '@contember/binding-common'
+import { EntityListSubTreeMarker, EntitySubTreeMarker, FieldMarker, HasManyRelationMarker, HasOneRelationMarker } from '@contember/binding-common'
 import { BijectiveIndexedMap } from '@contember/utilities'
 import type {
 	EntityEventListenerStore,
@@ -137,7 +131,7 @@ export class StateInitializer {
 				this.initializeFromHasManyRelationMarker(realm, field, new Set(value.children.keys()))
 			} else if (field instanceof HasOneRelationMarker) {
 				let runtimeId: RuntimeId
-				let subCopyFrom: EntityRealmState | undefined 
+				let subCopyFrom: EntityRealmState | undefined
 				if (pathBack?.fieldBackToParent === field.parameters.field && !field.parameters.reducedBy) {
 					runtimeId = pathBack.parent.entity.id
 				} else {
@@ -190,7 +184,6 @@ export class StateInitializer {
 						entity.id,
 						entityRealm.realmKey,
 						entity.entityName,
-
 						// We're technically exposing more info in runtime than we'd like but that way we don't have to allocate and
 						// keep in sync two copies of the same data. TS hides the extra info anyway.
 						entityRealm.children,
@@ -332,10 +325,9 @@ export class StateInitializer {
 			},
 		}
 
-		const initialData: Iterable<EntityId | undefined> =
-			initialEntityIds.size === 0
-				? Array.from({ length: blueprint.marker.parameters.initialEntityCount })
-				: initialEntityIds
+		const initialData: Iterable<EntityId | undefined> = initialEntityIds.size === 0
+			? Array.from({ length: blueprint.marker.parameters.initialEntityCount })
+			: initialEntityIds
 		for (const entityId of initialData) {
 			this.initializeEntityRealm(
 				entityId ? new ServerId(entityId, entityName) : new UnpersistedEntityDummyId(),
@@ -408,14 +400,14 @@ export class StateInitializer {
 	) {
 		if (persistedValue instanceof Set) {
 			throw new BindingError(
-				`Received a collection of referenced entities where a single '${field.fieldName}' field was expected. ` +
-					`Perhaps you wanted to use a <Repeater />?`,
+				`Received a collection of referenced entities where a single '${field.fieldName}' field was expected. `
+					+ `Perhaps you wanted to use a <Repeater />?`,
 			)
 		}
 		if (persistedValue instanceof ServerId) {
 			throw new BindingError(
-				`Received a referenced entity where a single '${field.fieldName}' field was expected. ` +
-					`Perhaps you wanted to use <HasOne />?`,
+				`Received a referenced entity where a single '${field.fieldName}' field was expected. `
+					+ `Perhaps you wanted to use <HasOne />?`,
 			)
 		}
 		parent.children.set(

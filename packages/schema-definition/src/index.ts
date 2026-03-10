@@ -14,20 +14,19 @@ export type { Role }
 export type { VariableDefinition } from './acl/definition'
 export type {
 	ColumnDefinition,
+	EnumDefinition,
 	FieldDefinition,
-	OneHasOneDefinition,
-	OneHasOneInverseDefinition,
-	OneHasManyDefinition,
-	ManyHasOneDefinition,
 	ManyHasManyDefinition,
 	ManyHasManyInverseDefinition,
-	EnumDefinition,
+	ManyHasOneDefinition,
+	OneHasManyDefinition,
+	OneHasOneDefinition,
+	OneHasOneInverseDefinition,
 } from './model/definition'
 
-export { AclDefinition, ActionsDefinition, SchemaDefinition, InputValidation, createSchema }
+export { AclDefinition, ActionsDefinition, createSchema, InputValidation, SchemaDefinition }
 
 export const c = {
-
 	// ACL
 	// ACL entity decorators
 	AllowCustomPrimary: AclDefinition.allowCustomPrimary,
@@ -43,14 +42,12 @@ export const c = {
 	canUpdate: AclDefinition.canUpdate,
 	canDelete: AclDefinition.canDelete,
 
-
 	// Actions
 	// Actions entity decorators
 	Watch: ActionsDefinition.watch,
 	Trigger: ActionsDefinition.trigger,
 	// Actions factories
 	createActionsTarget: ActionsDefinition.createTarget,
-
 
 	// Model
 	// Model entity decorators
@@ -81,7 +78,6 @@ export const c = {
 	// Model factories
 	createEnum: SchemaDefinition.createEnum,
 
-
 	// Validation
 	// Validation field decorators
 	Assert: InputValidation.assert,
@@ -94,5 +90,4 @@ export const c = {
 	ValidateWhen: InputValidation.when,
 	// Validation utilities
 	rules: InputValidation.rules,
-
 }

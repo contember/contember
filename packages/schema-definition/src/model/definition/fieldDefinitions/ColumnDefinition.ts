@@ -6,7 +6,6 @@ import { resolveDefaultColumnType } from '@contember/schema-utils'
 export class ColumnDefinition extends FieldDefinition<ColumnDefinitionOptions> {
 	type = 'ColumnDefinition' as const
 
-
 	public static create(
 		type: Model.ColumnType,
 		typeOptions: ColumnTypeOptions = {},
@@ -16,7 +15,6 @@ export class ColumnDefinition extends FieldDefinition<ColumnDefinitionOptions> {
 			...typeOptions,
 		})
 	}
-
 
 	public columnName(columnName: string): ColumnDefinition {
 		return this.withOption('columnName', columnName)
@@ -62,7 +60,18 @@ export class ColumnDefinition extends FieldDefinition<ColumnDefinitionOptions> {
 	}
 
 	createField({ name, conventions, enumRegistry, entityName, options }: CreateFieldContext): Model.AnyField {
-		const { type, nullable, columnName, enumDefinition, default: defaultValue, columnType, typeAlias, sequence, list, collation = options.defaultCollation } = this.options
+		const {
+			type,
+			nullable,
+			columnName,
+			enumDefinition,
+			default: defaultValue,
+			columnType,
+			typeAlias,
+			sequence,
+			list,
+			collation = options.defaultCollation,
+		} = this.options
 		const common = {
 			name: name,
 			columnName: columnName || conventions.getColumnName(name),
@@ -165,4 +174,3 @@ export type ColumnDefinitionOptions = {
 	sequence?: Model.ColumnTypeDefinition['sequence']
 	collation?: Model.Collation
 } & ColumnTypeOptions
-

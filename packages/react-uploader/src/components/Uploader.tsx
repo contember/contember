@@ -44,7 +44,6 @@ export const Uploader = Component<UploaderProps>(({ baseField, fileType, childre
 		</UploaderStateContext.Provider>
 	)
 }, ({ baseField, fileType, children }, environment) => {
-
 	return (
 		<UploaderBase baseField={baseField}>
 			{fileType.extractors?.map((extractor, i) => <Fragment key={i}>{extractor.staticRender({ environment })}</Fragment>)}

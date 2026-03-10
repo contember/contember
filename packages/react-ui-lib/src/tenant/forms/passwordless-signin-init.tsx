@@ -4,7 +4,6 @@ import { Loader } from '../../ui/loader'
 import { TenantFormError, TenantFormField } from './common'
 import { dict } from '../../dict'
 
-
 export const PasswordlessSignInInitFormFields = () => {
 	const form = usePasswordlessSignInInitForm()
 	return (
@@ -12,12 +11,18 @@ export const PasswordlessSignInInitFormFields = () => {
 			{form.state === 'success' || form.state === 'submitting' ? <Loader position="absolute" /> : null}
 
 			<TenantFormError
-				form={form} messages={dict.tenant.passwordlessSignInInit.errorMessages}
+				form={form}
+				messages={dict.tenant.passwordlessSignInInit.errorMessages}
 			/>
 
 			<TenantFormField
-				form={form} messages={dict.tenant.passwordlessSignInInit.errorMessages} field="email"
-				type="email" required autoFocus autoComplete="email"
+				form={form}
+				messages={dict.tenant.passwordlessSignInInit.errorMessages}
+				field="email"
+				type="email"
+				required
+				autoFocus
+				autoComplete="email"
 			>
 				{dict.tenant.passwordlessSignInInit.email}
 			</TenantFormField>
@@ -28,4 +33,3 @@ export const PasswordlessSignInInitFormFields = () => {
 		</div>
 	)
 }
-

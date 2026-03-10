@@ -5,6 +5,6 @@ DROP FUNCTION rebase_events_unsafe(head UUID, oldbase UUID, newbase UUID, applie
 DROP FUNCTION statement_trigger_event();
 `
 
-export default async function (builder: MigrationBuilder) {
+export default async function(builder: MigrationBuilder) {
 	builder.sql(sql)
 }

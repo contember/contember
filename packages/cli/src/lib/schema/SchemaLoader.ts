@@ -28,7 +28,7 @@ export class TranspilingSchemaLoader {
 	loadSchema = async (): Promise<Schema> => {
 		const path = join(this.workspace.apiDir, 'index.ts')
 
-		const result = (await this.jsCodeRunner.run(path))
+		const result = await this.jsCodeRunner.run(path)
 		return Typesafe.object({ default: schemaType })(result).default
 	}
 }

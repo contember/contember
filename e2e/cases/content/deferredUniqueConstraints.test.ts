@@ -46,7 +46,6 @@ test('update without deferring unique constraints', async () => {
 		.expect(200)
 		.expect({
 			data: {
-
 				transaction: {
 					ok: false,
 					errorMessage: 'Execution has failed:\nupA.order: UniqueConstraintViolation (Value (2) already exists in unique columns (order) on entity Post)',
@@ -64,7 +63,6 @@ test('update without deferring unique constraints', async () => {
 })
 
 test('update with deferring unique constraints', async () => {
-
 	const tester = await createTester(createSchema(DeferredUniqueModel))
 
 	await tester(gql`mutation {
@@ -113,15 +111,11 @@ test('update with deferring unique constraints', async () => {
 						errorMessage: null,
 					},
 				},
-
 			},
 		})
-
 })
 
-
 test('update with failed deferred unique constraints', async () => {
-
 	const tester = await createTester(createSchema(DeferredUniqueModel))
 
 	await tester(gql`mutation {
@@ -154,7 +148,6 @@ test('update with failed deferred unique constraints', async () => {
 		.expect(200)
 		.expect({
 			data: {
-
 				transaction: {
 					ok: false,
 					errorMessage: 'Execution has failed:\norder: UniqueConstraintViolation (Value (2) already exists in unique columns (order) on entity Post)',
@@ -165,5 +158,4 @@ test('update with failed deferred unique constraints', async () => {
 				},
 			},
 		})
-
 })

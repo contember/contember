@@ -35,11 +35,12 @@ export class ActionsApiMiddlewareFactory {
 			}
 			const handler = this.actionsGraphQLHandler
 
-			await timer('GraphQL', () => handler({
-				request: koa.request,
-				response: koa.response,
-				createContext: () => graphqlContext,
-			}))
+			await timer('GraphQL', () =>
+				handler({
+					request: koa.request,
+					response: koa.response,
+					createContext: () => graphqlContext,
+				}))
 			logger.debug('Actions query finished')
 		}
 	}

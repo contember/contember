@@ -1,6 +1,6 @@
 import React, { ReactNode, useMemo } from 'react'
 import { useSelectHandleSelect, useSelectOptions } from '../contexts'
-import { DataViewProps, DataView, DataViewFilterHandlerRegistry } from '@contember/react-dataview'
+import { DataView, DataViewFilterHandlerRegistry, DataViewProps } from '@contember/react-dataview'
 
 export type SelectDataViewProps =
 	& Omit<DataViewProps, 'entities'>

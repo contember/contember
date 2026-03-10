@@ -8,7 +8,10 @@ export const useFetchIdentity = (): [{ state: IdentityStateValue; identity: Iden
 	const sessionToken = useSessionToken()
 	const fetchMe = useMeQuery()
 
-	const [identityState, setIdentityState] = useState<ReturnType<typeof useFetchIdentity>[0]>({ state: sessionToken ? 'loading' : 'none', identity: undefined })
+	const [identityState, setIdentityState] = useState<ReturnType<typeof useFetchIdentity>[0]>({
+		state: sessionToken ? 'loading' : 'none',
+		identity: undefined,
+	})
 
 	const clearIdentity = useCallback(() => setIdentityState({ state: 'cleared', identity: undefined }), [])
 	const logout = useLogoutInternal(clearIdentity)

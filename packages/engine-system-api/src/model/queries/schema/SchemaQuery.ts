@@ -3,13 +3,11 @@ import { Schema } from '@contember/schema'
 import { SchemaWithMeta } from '../../migrations'
 
 export class SchemaQuery extends DatabaseQuery<SchemaWithMeta | null> {
-
 	constructor(
 		private readonly currentHash?: string,
 	) {
 		super()
 	}
-
 
 	async fetch(queryable: DatabaseQueryable): Promise<SchemaWithMeta | null> {
 		const query = SelectBuilder.create<{
@@ -31,7 +29,7 @@ export class SchemaQuery extends DatabaseQuery<SchemaWithMeta | null> {
 				return it.where(it => it.raw('checksum != ?', this.currentHash))
 			})
 
-		const row =  this.fetchOneOrNull(await query.getResult(queryable.db))
+		const row = this.fetchOneOrNull(await query.getResult(queryable.db))
 		if (!row) {
 			return null
 		}

@@ -1,7 +1,7 @@
 import { Environment } from '@contember/react-binding'
 import { ReactNode } from 'react'
 import { blockAnalyzer } from './blockAnalyzer'
-import { BlockProps, BlockContent, ContentOutletProps } from '../../components'
+import { BlockContent, BlockProps, ContentOutletProps } from '../../components'
 import { ChildrenAnalyzer, Leaf } from '@contember/react-multipass-rendering'
 
 export interface EditorReferenceBlock extends BlockProps {
@@ -24,10 +24,12 @@ export const getEditorReferenceBlocks = (children: ReactNode, env: Environment):
 		staticContextFactoryName: 'generateEnvironment',
 	})
 
-	return Object.fromEntries(blocks.map(
-		(props): EditorReferenceBlock => ({
-			...props,
-			isVoid: editorTemplateAnalyzer.processChildren(props.children, env).length === 0,
-		}),
-	).map(it => [it.name, it]))
+	return Object.fromEntries(
+		blocks.map(
+			(props): EditorReferenceBlock => ({
+				...props,
+				isVoid: editorTemplateAnalyzer.processChildren(props.children, env).length === 0,
+			}),
+		).map(it => [it.name, it]),
+	)
 }

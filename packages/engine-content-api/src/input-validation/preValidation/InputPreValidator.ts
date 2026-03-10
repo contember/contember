@@ -48,7 +48,7 @@ export class InputPreValidator {
 			? {
 				...data,
 				[overRelation.name]: { create: {} },
-			  }
+			}
 			: data
 		const context = this.createContextForCreate(entity, dataWithRelation)
 
@@ -114,8 +114,8 @@ export class InputPreValidator {
 				}
 				if ('delete' in value) {
 					if (
-						isIt<Model.JoiningColumnRelation>(relation, 'joiningColumn') &&
-						relation.joiningColumn.onDelete === Model.OnDelete.cascade
+						isIt<Model.JoiningColumnRelation>(relation, 'joiningColumn')
+						&& relation.joiningColumn.onDelete === Model.OnDelete.cascade
 					) {
 						return true
 					}
@@ -150,7 +150,7 @@ export class InputPreValidator {
 				tuple(
 					field,
 					fieldRules.find(it => evaluateValidation(context, InputValidation.rules.on(field, it.validator)) === false),
-				),
+				)
 			)
 			.filter((arg): arg is [string, Validation.ValidationRule] => !!arg[1])
 			.map(([field, { message }]) => ({ path: [...path, { field }], message }))
@@ -174,9 +174,7 @@ export class InputPreValidator {
 						field,
 						changedFields.includes(field)
 							? fieldRules
-							: fieldRules.filter(rule =>
-								Object.keys(DependencyCollector.collect(rule.validator)).find(it => changedFields.includes(it)),
-							  ),
+							: fieldRules.filter(rule => Object.keys(DependencyCollector.collect(rule.validator)).find(it => changedFields.includes(it))),
 					)
 				})
 				.filter(([, it]) => it.length > 0),

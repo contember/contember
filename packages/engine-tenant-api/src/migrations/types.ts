@@ -1,7 +1,7 @@
 import { Providers } from '../model'
 
 export interface TenantMigrationArgs {
-	getCredentials: () =>  Promise<{
+	getCredentials: () => Promise<{
 		loginTokenHash?: string
 		rootEmail?: string
 		rootTokenHash?: string

@@ -11,10 +11,9 @@ export const useEnvironmentWithSchema = (env: Environment): Environment | undefi
 			return
 		}
 
-		(async () => {
+		;(async () => {
 			try {
 				setSchema(await SchemaLoader.loadSchema(contentClient))
-
 			} catch (e) {
 				if (e instanceof GraphQlClientError) {
 					if (e.type === 'aborted') {

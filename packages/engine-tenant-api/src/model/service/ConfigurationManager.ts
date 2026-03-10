@@ -4,7 +4,6 @@ import { DatabaseContext } from '../utils'
 import { UpdateConfigurationCommand } from '../commands'
 
 export class ConfigurationManager {
-
 	public async updateConfiguration(db: DatabaseContext, configuration: ConfigInput): Promise<Response<null, ConfigureErrorCode>> {
 		// todo: validate configuration
 

@@ -8,13 +8,7 @@
  * see https://github.com/clauderic/dnd-kit/blob/master/LICENSE
  */
 
-import {
-	closestCorners,
-	getFirstCollision,
-	KeyboardCode,
-	DroppableContainer,
-	KeyboardCoordinateGetter,
-} from '@dnd-kit/core'
+import { closestCorners, DroppableContainer, getFirstCollision, KeyboardCode, KeyboardCoordinateGetter } from '@dnd-kit/core'
 
 const directions: string[] = [
 	KeyboardCode.Down,

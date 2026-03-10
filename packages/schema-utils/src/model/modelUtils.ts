@@ -14,8 +14,7 @@ export class ModelError extends Error {
 	}
 }
 
-const createEntityNotFoundError = (entityName: string) =>
-	new ModelError(ModelErrorCode.ENTITY_NOT_FOUND, `Entity ${entityName} not found`)
+const createEntityNotFoundError = (entityName: string) => new ModelError(ModelErrorCode.ENTITY_NOT_FOUND, `Entity ${entityName} not found`)
 
 const createFieldNotFoundError = (entityName: string, fieldName: string) =>
 	new ModelError(ModelErrorCode.FIELD_NOT_FOUND, `Field ${fieldName} of entity ${entityName} not found`)
@@ -184,8 +183,7 @@ export const acceptRelationTypeVisitor = <T>(
 					relation: relationObj,
 					targetEntity: targetEntity,
 					targetRelation: targetRelation as Model.ManyHasManyOwningRelation,
-				},
-				)
+				})
 			case Model.RelationType.OneHasOne:
 				return visitor.visitOneHasOneInverse({
 					type: 'oneHasOneInverse',

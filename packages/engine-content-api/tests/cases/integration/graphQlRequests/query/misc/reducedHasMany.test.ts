@@ -16,10 +16,7 @@ test('reduced has many', async () => {
 							e
 								.unique(['locale', 'post'])
 								.column('locale', c => c.type(Model.ColumnType.String))
-								.column('title', c => c.type(Model.ColumnType.String)),
-						),
-					),
-			)
+								.column('title', c => c.type(Model.ColumnType.String)))))
 			.buildSchema(),
 		query: GQL`
         query {
@@ -73,7 +70,6 @@ test('reduced has many', async () => {
 	})
 })
 
-
 test('universal reduced has many', async () => {
 	await execute({
 		schema: new SchemaBuilder()
@@ -85,10 +81,7 @@ test('universal reduced has many', async () => {
 							e
 								.unique(['locale', 'post'])
 								.column('locale', c => c.type(Model.ColumnType.String))
-								.column('title', c => c.type(Model.ColumnType.String)),
-						),
-					),
-			)
+								.column('title', c => c.type(Model.ColumnType.String)))))
 			.buildSchema(),
 		query: GQL`
         query {
@@ -141,4 +134,3 @@ test('universal reduced has many', async () => {
 		},
 	})
 })
-

@@ -12,6 +12,6 @@ ALTER TABLE "api_key"
     DROP COLUMN "enabled";
 `
 
-export default async function (builder: MigrationBuilder) {
+export default async function(builder: MigrationBuilder) {
 	builder.sql(sql)
 }

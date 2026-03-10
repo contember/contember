@@ -33,7 +33,6 @@ export type S3SchemaAcl = Record<
 	}
 >
 
-
 export class S3SchemaContributor implements GraphQLSchemaContributor {
 	constructor(
 		private readonly s3Factory: S3ServiceFactory,
@@ -48,10 +47,7 @@ export class S3SchemaContributor implements GraphQLSchemaContributor {
 		if (!context.project.s3) {
 			return undefined
 		}
-		const rules = context.identity.projectRoles.flatMap(it =>
-			Object.entries((context.schema.acl.roles[it]?.s3 as S3SchemaAcl) || {}),
-		)
-
+		const rules = context.identity.projectRoles.flatMap(it => Object.entries((context.schema.acl.roles[it]?.s3 as S3SchemaAcl) || {}))
 
 		const uploadRules = rules.filter(([, it]) => it.upload).map(([it, val]) => ({
 			pattern: it,
@@ -89,7 +85,6 @@ export class S3SchemaContributor implements GraphQLSchemaContributor {
 	}
 
 	private createReadMutation(authorizator: S3ObjectAuthorizator): GraphQLFieldConfig<any, { project: Project3Config }, any> {
-
 		return {
 			type: new GraphQLNonNull(S3SignedRead),
 			args: {

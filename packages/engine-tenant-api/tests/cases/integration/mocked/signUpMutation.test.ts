@@ -76,4 +76,3 @@ test('not sign up user with existing email', async () => {
 		},
 	})
 })
-

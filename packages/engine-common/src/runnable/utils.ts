@@ -18,4 +18,3 @@ export const abortableTimeout = async (timeoutMs: number, abortSignal: AbortSign
 	await Promise.race([abortPromise, timeoutPromise])
 	cleanup.forEach(it => it())
 }
-

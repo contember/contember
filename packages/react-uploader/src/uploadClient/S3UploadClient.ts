@@ -10,10 +10,11 @@ export interface S3UploadClientOptions {
 
 export type S3FileOptions = Partial<GenerateUploadUrlMutationBuilder.FileParameters>
 
-export type S3UrlSigner = (args: GenerateUploadUrlMutationBuilder.FileParameters & { file: File }) => Promise<GenerateUploadUrlMutationBuilder.ResponseBody>
+export type S3UrlSigner = (
+	args: GenerateUploadUrlMutationBuilder.FileParameters & { file: File },
+) => Promise<GenerateUploadUrlMutationBuilder.ResponseBody>
 
 export class S3UploadClient implements UploadClient<S3FileOptions> {
-
 	private activeCount = 0
 	private resolverQueue: Array<() => void> = []
 
@@ -22,9 +23,7 @@ export class S3UploadClient implements UploadClient<S3FileOptions> {
 	) {
 	}
 
-
 	public async upload({ file, signal, onProgress, ...options }: UploadClientUploadArgs & S3FileOptions) {
-
 		const parameters: GenerateUploadUrlMutationBuilder.FileParameters = {
 			contentType: file.type,
 			...this.options.getUploadOptions?.(file),
@@ -43,7 +42,6 @@ export class S3UploadClient implements UploadClient<S3FileOptions> {
 		signedUrl: GenerateUploadUrlMutationBuilder.ResponseBody,
 		options: UploadClientUploadArgs,
 	) {
-
 		try {
 			if (this.activeCount >= (this.options.concurrency ?? 5)) {
 				await new Promise<void>(resolve => this.resolverQueue.push(resolve))
@@ -51,7 +49,6 @@ export class S3UploadClient implements UploadClient<S3FileOptions> {
 			this.activeCount++
 
 			await xhrAdapter(signedUrl, options)
-
 		} finally {
 			this.activeCount--
 			this.resolverQueue.shift()?.()
@@ -63,14 +60,12 @@ const xhrAdapter = async (
 	signedUrl: GenerateUploadUrlMutationBuilder.ResponseBody,
 	{ file, signal, onProgress }: UploadClientUploadArgs,
 ) => {
-
 	return await new Promise<void>((resolve, reject) => {
 		const xhr = new XMLHttpRequest()
 
 		signal.addEventListener('abort', () => {
 			xhr.abort()
 		})
-
 
 		xhr.open(signedUrl.method, signedUrl.url)
 
@@ -82,27 +77,35 @@ const xhrAdapter = async (
 			if (xhr.status >= 200 && xhr.status < 300) {
 				resolve()
 			} else {
-				reject(new UploaderError({
-					type: 'httpError',
-					developerMessage: `HTTP error: ${xhr.status}`,
-				}))
+				reject(
+					new UploaderError({
+						type: 'httpError',
+						developerMessage: `HTTP error: ${xhr.status}`,
+					}),
+				)
 			}
 		})
 
 		xhr.addEventListener('error', () => {
-			reject(new UploaderError({
-				type: 'networkError',
-			}))
+			reject(
+				new UploaderError({
+					type: 'networkError',
+				}),
+			)
 		})
 		xhr.addEventListener('abort', () => {
-			reject(new UploaderError({
-				type: 'aborted',
-			}))
+			reject(
+				new UploaderError({
+					type: 'aborted',
+				}),
+			)
 		})
 		xhr.addEventListener('timeout', () => {
-			reject(new UploaderError({
-				type: 'timeout',
-			}))
+			reject(
+				new UploaderError({
+					type: 'timeout',
+				}),
+			)
 		})
 
 		xhr.upload?.addEventListener('progress', e => {
@@ -116,5 +119,3 @@ const xhrAdapter = async (
 		xhr.send(file)
 	})
 }
-
-

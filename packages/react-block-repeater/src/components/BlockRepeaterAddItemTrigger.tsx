@@ -5,14 +5,12 @@ import { EntityAccessor } from '@contember/react-binding'
 import { RepeaterAddItemIndex, useRepeaterMethods } from '@contember/react-repeater'
 import { composeEventHandlers } from '@radix-ui/primitive'
 
-
 const SlotType = Slot as React.ForwardRefExoticComponent<React.ButtonHTMLAttributes<HTMLButtonElement> & React.RefAttributes<HTMLButtonElement>>
 
 /**
  * Props for the {@link BlockRepeaterAddItemTrigger} component.
  */
 export interface BlockRepeaterAddItemTriggerProps {
-
 	/**
 	 * The type of the item to add.
 	 */
@@ -55,10 +53,11 @@ export const BlockRepeaterAddItemTrigger = ({ preprocess, index, type, ...props 
 	const { discriminatedBy } = useBlockRepeaterConfig()
 
 	const { addItem } = useRepeaterMethods()
-	const doAddItem = useCallback(() => addItem(index, (it, options) => {
-		it().getField(discriminatedBy).updateValue(type)
-		preprocess?.(it, options)
-	}), [addItem, discriminatedBy, index, preprocess, type])
+	const doAddItem = useCallback(() =>
+		addItem(index, (it, options) => {
+			it().getField(discriminatedBy).updateValue(type)
+			preprocess?.(it, options)
+		}), [addItem, discriminatedBy, index, preprocess, type])
 
 	const { onClick, ...otherProps } = props as React.ButtonHTMLAttributes<HTMLButtonElement>
 

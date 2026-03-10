@@ -1,9 +1,5 @@
 import type { ElementType } from 'react'
-import type {
-	ConstrainedLeafRepresentationFactory,
-	UnconstrainedLeafRepresentationFactory,
-	ValidFactoryName,
-} from './types'
+import type { ConstrainedLeafRepresentationFactory, UnconstrainedLeafRepresentationFactory, ValidFactoryName } from './types'
 
 class Leaf<
 	Props extends {} = {},
@@ -48,12 +44,12 @@ namespace Leaf {
 		| {
 			type: 'declarationSite'
 			factoryMethodName: FactoryMethodName
-		  }
+		}
 		| {
 			type: 'useSite'
 			factory: UnconstrainedLeafRepresentationFactory<Props, Representation, StaticContext>
 			ComponentType?: ElementType<Props>
-		  }
+		}
 }
 
 export { Leaf }

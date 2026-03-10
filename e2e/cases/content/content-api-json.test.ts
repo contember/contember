@@ -28,7 +28,6 @@ test('Content API: create & read json', async () => {
 		})
 		.expect(200)
 
-
 	await tester(
 		gql`
 			query {

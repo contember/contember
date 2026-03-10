@@ -6,7 +6,7 @@ export const optimizeOr = <P extends Record<string, unknown>>(operands: readonly
 			return true
 		} else if (operand === false) {
 			hasNever = true
-		} else if (operand !== undefined)  {
+		} else if (operand !== undefined) {
 			normalized.push(...Array.isArray(operand.or) ? operand.or : [operand])
 		}
 	}

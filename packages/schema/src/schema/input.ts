@@ -73,11 +73,13 @@ export namespace Input {
 		[column: string]: Value.FieldValue<E> | CreateOneRelationInput<E> | CreateManyRelationInput<E>
 	}
 
-	export type CreateOneRelationInput<E = never> = { alias?: string } & (
-		| ConnectRelationInput<E>
-		| CreateRelationInput<E>
-		| ConnectOrCreateRelationInput<E>
-	)
+	export type CreateOneRelationInput<E = never> =
+		& { alias?: string }
+		& (
+			| ConnectRelationInput<E>
+			| CreateRelationInput<E>
+			| ConnectOrCreateRelationInput<E>
+		)
 
 	export type CreateManyRelationInput<E = never> = Array<CreateOneRelationInput<E>>
 
@@ -138,15 +140,17 @@ export namespace Input {
 		| UpdateRelationInput<E>
 		| UpsertRelationInput<E>
 
-	export type UpdateManyRelationInputItem<E = never> = { alias?: string } & (
-		| CreateRelationInput<E>
-		| ConnectRelationInput<E>
-		| ConnectOrCreateRelationInput<E>
-		| DeleteSpecifiedRelationInput<E>
-		| DisconnectSpecifiedRelationInput<E>
-		| UpdateSpecifiedRelationInput<E>
-		| UpsertSpecifiedRelationInput<E>
-	)
+	export type UpdateManyRelationInputItem<E = never> =
+		& { alias?: string }
+		& (
+			| CreateRelationInput<E>
+			| ConnectRelationInput<E>
+			| ConnectOrCreateRelationInput<E>
+			| DeleteSpecifiedRelationInput<E>
+			| DisconnectSpecifiedRelationInput<E>
+			| UpdateSpecifiedRelationInput<E>
+			| UpsertSpecifiedRelationInput<E>
+		)
 
 	export type UpdateManyRelationInput<E = never> = Array<UpdateManyRelationInputItem<E>>
 
@@ -220,7 +224,7 @@ export namespace Input {
 	}
 
 	export interface FieldWhere<C = Condition, Opt = never> {
-		readonly [name: string]: Opt | C | Where<C, Opt> |  readonly (Where<C, Opt> | Opt)[] //last one if for ComposedWhere
+		readonly [name: string]: Opt | C | Where<C, Opt> | readonly (Where<C, Opt> | Opt)[] // last one if for ComposedWhere
 	}
 
 	export type Where<C = Condition, Opt = never> = ComposedWhere<C, Opt> & FieldWhere<C, Opt>

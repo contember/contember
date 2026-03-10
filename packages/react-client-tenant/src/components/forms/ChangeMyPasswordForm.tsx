@@ -65,7 +65,6 @@ export const ChangeMyPasswordForm = ({ children, onSuccess }: ChangeMyPasswordFo
 			{children}
 		</TenantForm>
 	)
-
 }
 const errorToField: Partial<Record<ChangeMyPasswordFormErrorCode, keyof ChangeMyPasswordFormValues | undefined>> = {
 	PASSWORD_MISMATCH: 'passwordConfirmation',

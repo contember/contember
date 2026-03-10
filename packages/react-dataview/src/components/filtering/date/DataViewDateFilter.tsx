@@ -34,7 +34,7 @@ export interface DataViewDateFilterProps {
  * ## Example
  * ```tsx
  * <DataViewDateFilter field="createdAt">
- *   //  Filter controls here 
+ *   //  Filter controls here
  * </DataViewDateFilter>
  * ```
  */

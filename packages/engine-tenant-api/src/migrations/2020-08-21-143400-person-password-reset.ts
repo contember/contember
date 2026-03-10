@@ -17,7 +17,6 @@ CREATE UNIQUE INDEX person_password_reset_token
 	ON person_password_reset(token_hash);
 `
 
-
-export default async function (builder: MigrationBuilder) {
+export default async function(builder: MigrationBuilder) {
 	builder.sql(sql)
 }

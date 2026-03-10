@@ -8,7 +8,6 @@ namespace TagModel {
 	}
 }
 
-
 test('Content API: assume membership', async () => {
 	const tester = await createTester(createSchema(TagModel, schema => {
 		return {
@@ -45,7 +44,6 @@ test('Content API: assume membership', async () => {
 		{ authorizationToken: authKey },
 	)
 		.expect(400)
-
 
 	await tester(
 		gql`

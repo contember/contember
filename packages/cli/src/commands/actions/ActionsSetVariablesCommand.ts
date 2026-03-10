@@ -37,15 +37,21 @@ export class ActionsSetVariablesCommand extends Command<Args, Options> {
 		}
 		const api = ActionsClient.create(project.endpoint, project.name, project.token)
 		const mode = input.getOption('merge')
-			? 'MERGE' as const : input.getOption('set')
-				? 'SET' as const : input.getOption('append-only-missing')
-					? 'APPEND_ONLY_MISSING' as const : 'MERGE' as const
+			? 'MERGE' as const
+			: input.getOption('set')
+			? 'SET' as const
+			: input.getOption('append-only-missing')
+			? 'APPEND_ONLY_MISSING' as const
+			: 'MERGE' as const
 
 		const variables = input.getArgument('variables').flatMap(it => it.split('\n')).filter(it => it.trim().length > 0)
-		const result = await api.setVariables(variables.map(it => {
-			const [name, value] = it.split('=')
-			return { name, value }
-		}), mode)
+		const result = await api.setVariables(
+			variables.map(it => {
+				const [name, value] = it.split('=')
+				return { name, value }
+			}),
+			mode,
+		)
 		if (result) {
 			console.log('Success')
 		} else {

@@ -1,6 +1,6 @@
 import { ApiKeyManager } from './apiKey'
 import { IdentityProviderBySlugQuery, PersonByIdPQuery, PersonQuery, PersonRow } from '../queries'
-import { IDPResponse, IDPHandlerRegistry, IDPResponseError, IDPValidationError } from './idp'
+import { IDPHandlerRegistry, IDPResponse, IDPResponseError, IDPValidationError } from './idp'
 import { Response, ResponseError, ResponseOk } from '../utils/Response'
 import { InitSignInIdpErrorCode, InitSignInIdpResult, SignInIdpErrorCode } from '../../schema'
 import { DatabaseContext } from '../utils'
@@ -143,13 +143,15 @@ class IDPSignInManager {
 	private async signUp(db: DatabaseContext, { email, name, externalIdentifier }: IDPResponse, provider: IdentityProviderRow): Promise<PersonRow> {
 		const roles = [TenantRole.PERSON]
 		const identityId = await db.commandBus.execute(new CreateIdentityCommand(roles))
-		const newPerson = await db.commandBus.execute(new CreatePersonCommand({
-			identityId,
-			email: provider.exclusive ? undefined : email,
-			password: NoPassword,
-			name: name ?? email?.split('@')[0] ?? externalIdentifier,
-			idpOnly: provider.exclusive,
-		}))
+		const newPerson = await db.commandBus.execute(
+			new CreatePersonCommand({
+				identityId,
+				email: provider.exclusive ? undefined : email,
+				password: NoPassword,
+				name: name ?? email?.split('@')[0] ?? externalIdentifier,
+				idpOnly: provider.exclusive,
+			}),
+		)
 
 		return {
 			...newPerson,

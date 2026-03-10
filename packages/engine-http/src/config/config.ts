@@ -51,7 +51,3 @@ export async function readConfig<T extends ServerConfig>(
 		tenantConfigResolver: createTenantConfigResolver(env, rawConfig.tenant),
 	}
 }
-
-
-
-

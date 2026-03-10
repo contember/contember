@@ -1,4 +1,4 @@
-import { EntityConstructor,  RelationTarget } from '../types'
+import { EntityConstructor, RelationTarget } from '../types'
 import { Model } from '@contember/schema'
 import { CreateFieldContext, FieldDefinition } from './FieldDefinition'
 

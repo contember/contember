@@ -1,4 +1,12 @@
-import { DataViewFilteringArtifacts, DataViewFilteringProps, DataViewPagingProps, DataViewPagingState, DataViewSelectionValues, DataViewSelectionProps, DataViewSortingState } from '../types'
+import {
+	DataViewFilteringArtifacts,
+	DataViewFilteringProps,
+	DataViewPagingProps,
+	DataViewPagingState,
+	DataViewSelectionProps,
+	DataViewSelectionValues,
+	DataViewSortingState,
+} from '../types'
 
 export const dataViewKeyFallback = 'dataview'
 
@@ -12,9 +20,10 @@ export const getDataViewPagingSettingStorageArgs = ({ dataViewKey, initialItemsP
 }): DataViewStoredStateArgs<DataViewPagingSettingStoredState> => {
 	return [
 		[dataViewKey ?? dataViewKeyFallback, 'itemsPerPage'],
-		val => val ?? {
-			itemsPerPage: initialItemsPerPage ?? DATA_VIEW_DEFAULT_ITEMS_PER_PAGE,
-		},
+		val =>
+			val ?? {
+				itemsPerPage: initialItemsPerPage ?? DATA_VIEW_DEFAULT_ITEMS_PER_PAGE,
+			},
 	]
 }
 
@@ -24,9 +33,10 @@ export const getDataViewCurrentPageStorageArgs = ({ dataViewKey }: {
 }): DataViewStoredStateArgs<DataViewCurrentPageStoredState> => {
 	return [
 		[dataViewKey ?? dataViewKeyFallback, 'pageIndex'],
-		val => val ?? {
-			pageIndex: 0,
-		},
+		val =>
+			val ?? {
+				pageIndex: 0,
+			},
 	]
 }
 

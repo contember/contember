@@ -3,52 +3,50 @@ import { testMigrations } from '../../src/tests'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
 import { SQL } from '../../src/tags'
-import { ForeignKeyDeleteAction, createDatabaseMetadata } from '@contember/database'
-import { } from 'bun:test'
+import { createDatabaseMetadata, ForeignKeyDeleteAction } from '@contember/database'
+import {} from 'bun:test'
 
-describe('update relation ondelete to cascade', () => testMigrations({
-	original: {
-		model: new SchemaBuilder()
-			.entity('Post', entity =>
-				entity.column('name', c => c.type(Model.ColumnType.String)).manyHasOne('category', r => r.target('Category')),
-			)
-			.entity('Category', e => e.column('name', c => c.type(Model.ColumnType.String)))
-			.buildSchema(),
-	},
-	updated: {
-		model: new SchemaBuilder()
-			.entity('Post', entity =>
-				entity
-					.column('name', c => c.type(Model.ColumnType.String))
-					.manyHasOne('category', r => r.target('Category').onDelete(Model.OnDelete.cascade)),
-			)
-			.entity('Category', e => e.column('name', c => c.type(Model.ColumnType.String)))
-			.buildSchema(),
-	},
-	diff: [
-		{
-			modification: 'updateRelationOnDelete',
-			entityName: 'Post',
-			fieldName: 'category',
-			onDelete: Model.OnDelete.cascade,
+describe('update relation ondelete to cascade', () =>
+	testMigrations({
+		original: {
+			model: new SchemaBuilder()
+				.entity('Post', entity => entity.column('name', c => c.type(Model.ColumnType.String)).manyHasOne('category', r => r.target('Category')))
+				.entity('Category', e => e.column('name', c => c.type(Model.ColumnType.String)))
+				.buildSchema(),
 		},
-	],
-	sql: SQL`ALTER TABLE "post" DROP CONSTRAINT "fk_post_category_id_category_id"; 
-ALTER TABLE "post" ADD FOREIGN KEY ("category_id") REFERENCES "category"("id") ON DELETE CASCADE DEFERRABLE INITIALLY IMMEDIATE;`,
-	databaseMetadata: createDatabaseMetadata({
-		foreignKeys: [
+		updated: {
+			model: new SchemaBuilder()
+				.entity('Post', entity =>
+					entity
+						.column('name', c => c.type(Model.ColumnType.String))
+						.manyHasOne('category', r => r.target('Category').onDelete(Model.OnDelete.cascade)))
+				.entity('Category', e => e.column('name', c => c.type(Model.ColumnType.String)))
+				.buildSchema(),
+		},
+		diff: [
 			{
-				constraintName: 'fk_post_category_id_category_id',
-				deleteAction: ForeignKeyDeleteAction.cascade,
-				fromColumn: 'category_id',
-				fromTable: 'post',
-				toColumn: 'id',
-				toTable: 'category',
-				deferred: false,
-				deferrable: false,
+				modification: 'updateRelationOnDelete',
+				entityName: 'Post',
+				fieldName: 'category',
+				onDelete: Model.OnDelete.cascade,
 			},
 		],
-		indexes: [],
-		uniqueConstraints: [],
-	}),
-}))
+		sql: SQL`ALTER TABLE "post" DROP CONSTRAINT "fk_post_category_id_category_id"; 
+ALTER TABLE "post" ADD FOREIGN KEY ("category_id") REFERENCES "category"("id") ON DELETE CASCADE DEFERRABLE INITIALLY IMMEDIATE;`,
+		databaseMetadata: createDatabaseMetadata({
+			foreignKeys: [
+				{
+					constraintName: 'fk_post_category_id_category_id',
+					deleteAction: ForeignKeyDeleteAction.cascade,
+					fromColumn: 'category_id',
+					fromTable: 'post',
+					toColumn: 'id',
+					toTable: 'category',
+					deferred: false,
+					deferrable: false,
+				},
+			],
+			indexes: [],
+			uniqueConstraints: [],
+		}),
+	}))

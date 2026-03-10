@@ -14,7 +14,9 @@ import { NoopModification } from '../NoopModification'
 import { updateFieldNameModification } from '../fields'
 import { wrapIdentifier } from '../../utils/dbHelpers'
 
-export class ConvertOneHasManyToOneHasOneRelationModificationHandler implements ModificationHandler<ConvertOneHasManyToOneHasOneRelationModificationData> {
+export class ConvertOneHasManyToOneHasOneRelationModificationHandler
+	implements ModificationHandler<ConvertOneHasManyToOneHasOneRelationModificationData>
+{
 	private subModification: ModificationHandler<any>
 
 	constructor(
@@ -23,8 +25,8 @@ export class ConvertOneHasManyToOneHasOneRelationModificationHandler implements 
 		private readonly options: ModificationHandlerOptions,
 	) {
 		const { relation } = this.getRelation()
-		this.subModification = data.newInverseSideFieldName && relation.inversedBy ?
-			updateFieldNameModification.createHandler(
+		this.subModification = data.newInverseSideFieldName && relation.inversedBy
+			? updateFieldNameModification.createHandler(
 				{
 					entityName: relation.target,
 					fieldName: relation.inversedBy,
@@ -76,8 +78,8 @@ export class ConvertOneHasManyToOneHasOneRelationModificationHandler implements 
 				),
 			),
 			this.subModification.getSchemaUpdater(),
-			inverseFieldName ?
-				updateModel(
+			inverseFieldName
+				? updateModel(
 					updateEntity(
 						relation.target,
 						updateField<Model.OneHasManyRelation, Model.OneHasOneInverseRelation>(
@@ -89,7 +91,8 @@ export class ConvertOneHasManyToOneHasOneRelationModificationHandler implements 
 							}),
 						),
 					),
-				) : undefined,
+				)
+				: undefined,
 		)
 	}
 
@@ -125,18 +128,21 @@ export class ConvertOneHasManyToOneHasOneRelationDiffer implements Differ {
 	createDiff(originalSchema: Schema, updatedSchema: Schema) {
 		return updateRelations(originalSchema, updatedSchema, ({ originalRelation, updatedRelation, updatedEntity }) => {
 			if (
-				isOwningRelation(originalRelation) &&
-				isOwningRelation(updatedRelation) &&
-				originalRelation.type === Model.RelationType.ManyHasOne &&
-				updatedRelation.type === Model.RelationType.OneHasOne
+				isOwningRelation(originalRelation)
+				&& isOwningRelation(updatedRelation)
+				&& originalRelation.type === Model.RelationType.ManyHasOne
+				&& updatedRelation.type === Model.RelationType.OneHasOne
 			) {
-				const isInverseSideRenamed = originalRelation.inversedBy && updatedRelation.inversedBy && originalRelation.inversedBy !== updatedRelation.inversedBy
+				const isInverseSideRenamed = originalRelation.inversedBy && updatedRelation.inversedBy
+					&& originalRelation.inversedBy !== updatedRelation.inversedBy
 				return convertOneHasManyToOneHasOneRelationModification.createModification({
 					entityName: updatedEntity.name,
 					fieldName: updatedRelation.name,
-					...(isInverseSideRenamed ? {
-						newInverseSideFieldName: updatedRelation.inversedBy,
-					} : {}),
+					...(isInverseSideRenamed
+						? {
+							newInverseSideFieldName: updatedRelation.inversedBy,
+						}
+						: {}),
 				})
 			}
 			return undefined

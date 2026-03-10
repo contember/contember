@@ -7,7 +7,7 @@ export type ContentQueryOptions = QueryExecutorOptions
 
 export type ContentQueryResult<T> = readonly [
 	state: ContentQueryState<T>,
-	meta: () => void
+	meta: () => void,
 ]
 
 export type ContentQueryState<Result> =
@@ -58,7 +58,6 @@ export function useContentQuery<T>(
 			}
 			setState({ state: 'error', error: e })
 		}
-
 	}, [client, queryMemo, optionsMemo])
 
 	useEffect(() => {

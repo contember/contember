@@ -44,9 +44,7 @@ export interface ProjectGroupContainer {
 	systemGraphQLHandler: SystemGraphQLHandler
 }
 
-
-interface ProjectGroupContainerFactoryArgs
-{
+interface ProjectGroupContainerFactoryArgs {
 	config: TenantConfig
 	slug: string | undefined
 }
@@ -66,16 +64,14 @@ export class ProjectGroupContainerFactory {
 
 	public create({ config, slug }: ProjectGroupContainerFactoryArgs): ProjectGroupContainer {
 		return new Builder({})
-			.addService('slug', () =>
-				slug)
-			.addService('logger', ({ slug }) =>
-				this.logger.child({ projectGroup: slug }))
-			.addService('providers', () =>
-				this.providers)
-			.addService('tenantDbCredentials', () =>
-				config.db)
-			.addService('tenantConnection', ({ tenantDbCredentials, logger }): Connection.ConnectionType =>
-				Connection.create(tenantDbCredentials, err => logger.error(err)))
+			.addService('slug', () => slug)
+			.addService('logger', ({ slug }) => this.logger.child({ projectGroup: slug }))
+			.addService('providers', () => this.providers)
+			.addService('tenantDbCredentials', () => config.db)
+			.addService(
+				'tenantConnection',
+				({ tenantDbCredentials, logger }): Connection.ConnectionType => Connection.create(tenantDbCredentials, err => logger.error(err)),
+			)
 			.addService('tenantReadConnection', ({ tenantDbCredentials, logger, tenantConnection }) => {
 				if (!tenantDbCredentials.read) {
 					return tenantConnection
@@ -89,10 +85,8 @@ export class ProjectGroupContainerFactory {
 					},
 				}, err => logger.error(err))
 			})
-			.addService('projectSchemaResolver', () =>
-				new ProjectSchemaResolverProxy())
-			.addService('projectInitializer', () =>
-				new ProjectInitializerProxy())
+			.addService('projectSchemaResolver', () => new ProjectSchemaResolverProxy())
+			.addService('projectInitializer', () => new ProjectInitializerProxy())
 			.addService('tenantContainer', ({ tenantConnection, tenantReadConnection, tenantDbCredentials, projectSchemaResolver, projectInitializer }) => {
 				const encryptionKey = config.secrets.encryptionKey
 					? createSecretKey(Buffer.from(config.secrets.encryptionKey, 'hex'))
@@ -113,22 +107,14 @@ export class ProjectGroupContainerFactory {
 					},
 				})
 			})
-			.addService('tenantDatabase', ({ tenantContainer }) =>
-				tenantContainer.databaseContext)
-			.addService('tenantReadDatabase', ({ tenantContainer }) =>
-				tenantContainer.readDatabaseContext)
-			.addService('identityFetcher', ({ tenantContainer: { identityFetcher } }) =>
-				identityFetcher)
-			.addService('systemContainer', ({ identityFetcher }) =>
-				this.systemContainerFactory.create({ identityFetcher }))
-			.addService('schemaProvider', ({ systemContainer }) =>
-				systemContainer.schemaProvider)
-			.addService('projectContainerFactory', ({ schemaProvider, logger }) =>
-				this.projectContainerFactoryFactory.create(schemaProvider, logger))
-			.addService('tenantProjectManager', ({ tenantContainer }) =>
-				tenantContainer.projectManager)
-			.addService('tenantProjectMemberManager', ({ tenantContainer }) =>
-				tenantContainer.projectMemberManager)
+			.addService('tenantDatabase', ({ tenantContainer }) => tenantContainer.databaseContext)
+			.addService('tenantReadDatabase', ({ tenantContainer }) => tenantContainer.readDatabaseContext)
+			.addService('identityFetcher', ({ tenantContainer: { identityFetcher } }) => identityFetcher)
+			.addService('systemContainer', ({ identityFetcher }) => this.systemContainerFactory.create({ identityFetcher }))
+			.addService('schemaProvider', ({ systemContainer }) => systemContainer.schemaProvider)
+			.addService('projectContainerFactory', ({ schemaProvider, logger }) => this.projectContainerFactoryFactory.create(schemaProvider, logger))
+			.addService('tenantProjectManager', ({ tenantContainer }) => tenantContainer.projectManager)
+			.addService('tenantProjectMemberManager', ({ tenantContainer }) => tenantContainer.projectMemberManager)
 			.addService('projectContainerResolver', ({ projectContainerFactory, tenantProjectManager, tenantReadDatabase }) =>
 				new ProjectContainerResolver(
 					projectContainerFactory,
@@ -137,21 +123,23 @@ export class ProjectGroupContainerFactory {
 					tenantReadDatabase,
 					config,
 				))
-
 			.setupService('projectSchemaResolver', (it, { projectContainerResolver }) => {
 				it.setResolver(new ProjectSchemaResolver(projectContainerResolver))
 			})
 			.setupService('projectInitializer', (it, { projectContainerResolver }) => {
 				it.setInitializer(new ProjectInitializer(projectContainerResolver))
 			})
-			.addService('tenantGraphQLHandler', ({ tenantContainer }) =>
-				this.tenantGraphQLHandlerFactory.create(tenantContainer.resolvers))
-			.addService('systemGraphQLHandler', ({ systemContainer }) =>
-				this.systemGraphQLHandlerFactory.create(systemContainer.systemResolversFactory))
-			.addService('authenticator', ({ tenantDatabase, tenantReadDatabase, tenantContainer }) =>
-				new Authenticator(tenantDatabase, tenantReadDatabase, tenantContainer.apiKeyManager))
-			.addService('projectMembershipResolver', ({ tenantProjectMemberManager, tenantReadDatabase }) =>
-				new ProjectMembershipResolver(this.debug, new ProjectMembershipFetcher(tenantProjectMemberManager, tenantReadDatabase)))
+			.addService('tenantGraphQLHandler', ({ tenantContainer }) => this.tenantGraphQLHandlerFactory.create(tenantContainer.resolvers))
+			.addService('systemGraphQLHandler', ({ systemContainer }) => this.systemGraphQLHandlerFactory.create(systemContainer.systemResolversFactory))
+			.addService(
+				'authenticator',
+				({ tenantDatabase, tenantReadDatabase, tenantContainer }) => new Authenticator(tenantDatabase, tenantReadDatabase, tenantContainer.apiKeyManager),
+			)
+			.addService(
+				'projectMembershipResolver',
+				({ tenantProjectMemberManager, tenantReadDatabase }) =>
+					new ProjectMembershipResolver(this.debug, new ProjectMembershipFetcher(tenantProjectMemberManager, tenantReadDatabase)),
+			)
 			.build()
 			.pick(
 				'projectContainerResolver',

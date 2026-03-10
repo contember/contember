@@ -2,7 +2,6 @@ import { c, createSchema } from '@contember/schema-definition'
 import { test } from 'bun:test'
 import { createTester, gql } from '../../src/tester'
 
-
 namespace Model {
 	export class Post {
 		slug = c.stringColumn().unique()
@@ -21,7 +20,6 @@ namespace Model {
 		post = c.manyHasOne(Post, 'references').notNull()
 		attachment = c.manyHasOne(Attachment, 'references')
 	}
-
 }
 
 test('delete without deferring constraints', async () => {
@@ -86,7 +84,6 @@ attachments.0: ForeignKeyConstraintViolation (Cannot delete ${attachmentId} row(
 		})
 })
 
-
 test('delete with successfully deferring constraints', async () => {
 	const tester = await createTester(createSchema(Model))
 
@@ -146,7 +143,6 @@ test('delete with successfully deferring constraints', async () => {
 			},
 		})
 })
-
 
 test('delete with unsuccessfully deferring constraints', async () => {
 	const tester = await createTester(createSchema(Model))
@@ -208,6 +204,3 @@ unknown field: ForeignKeyConstraintViolation (Cannot delete row ${attachmentId} 
 			},
 		})
 })
-
-
-

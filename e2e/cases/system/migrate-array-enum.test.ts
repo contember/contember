@@ -26,7 +26,6 @@ test('update enum used in array', async () => {
 
 	const updatedSchema = createSchema(ArticleModelUpdate)
 
-
 	const migration = differ.diffSchemas(origSchema, updatedSchema)
 
 	await tester(`mutation {
@@ -34,11 +33,13 @@ test('update enum used in array', async () => {
 			ok
 		}
 	}`)
-		.expect({ data: {
-			createArticle: {
-				ok: true,
+		.expect({
+			data: {
+				createArticle: {
+					ok: true,
+				},
 			},
-		} })
+		})
 		.expect(200)
 
 	await tester.migrate(migration, '2024-08-01-120000-update-array')

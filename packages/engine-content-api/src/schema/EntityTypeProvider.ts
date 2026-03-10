@@ -77,9 +77,7 @@ export class EntityTypeProvider {
 	private getEntityFields(entityName: string) {
 		const entity = getEntityFromSchema(this.schema, entityName)
 		const accessVisitor = new FieldAccessVisitor(Acl.Operation.read, this.authorizator)
-		const accessibleFields = Object.values(entity.fields).filter(field =>
-			acceptFieldVisitor(this.schema, entity, field.name, accessVisitor),
-		)
+		const accessibleFields = Object.values(entity.fields).filter(field => acceptFieldVisitor(this.schema, entity, field.name, accessVisitor))
 		const metaFields: { [field: string]: GraphQLFieldConfig<any, any> } = {}
 		for (const field of accessibleFields) {
 			metaFields[field.name] = {

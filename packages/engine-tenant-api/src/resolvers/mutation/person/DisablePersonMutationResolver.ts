@@ -5,14 +5,15 @@ import { PersonManager } from '../../../model/service/PersonManager'
 import { createErrorResponse } from '../../errorUtils'
 
 export class DisablePersonMutationResolver implements MutationResolvers {
-
 	constructor(
 		private readonly personAccessManager: PersonAccessManager,
 		private readonly personManager: PersonManager,
 	) {}
 
 	async disablePerson(
-		parent: any, args: MutationDisablePersonArgs, context: TenantResolverContext,
+		parent: any,
+		args: MutationDisablePersonArgs,
+		context: TenantResolverContext,
 	): Promise<DisablePersonResponse> {
 		const targetPerson = await this.personManager.findPersonById(context.db, args.personId)
 

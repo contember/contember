@@ -12,7 +12,6 @@ export interface StateStorage {
 	setItem(key: StateStorageKey, value: Serializable): void
 }
 
-
 export const urlStateStorage: StateStorage = {
 	getItem(key) {
 		const searchParams = new URLSearchParams(window.location.search)
@@ -58,7 +57,11 @@ const builtInStorages = {
 
 export type StateStorageOrName = StateStorage | 'url' | 'session' | 'local' | 'null'
 
-export const useStoredState = <V extends Serializable>(storageOrName: StateStorageOrName | StateStorageOrName[], key: StateStorageKey, initializeValue: ValueInitializer<V>): [V, SetState<V>] => {
+export const useStoredState = <V extends Serializable>(
+	storageOrName: StateStorageOrName | StateStorageOrName[],
+	key: StateStorageKey,
+	initializeValue: ValueInitializer<V>,
+): [V, SetState<V>] => {
 	const storage = useMemo(() => {
 		return getStateStorage(storageOrName)
 	}, [storageOrName])
@@ -93,7 +96,6 @@ export const getStateStorage = (storageOrName: StateStorageOrName | StateStorage
 	}
 	return typeof storageOrName === 'string' ? builtInStorages[storageOrName] : storageOrName
 }
-
 
 const createFallbackStorage = (storageTypes: StateStorage[]): StateStorage => {
 	return {

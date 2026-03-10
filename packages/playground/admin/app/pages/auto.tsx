@@ -89,33 +89,35 @@ export const List = () => {
 		return <div>Entity not found</div>
 	}
 
-	return <>
-		<Binding>
-			<Slots.Back>
-				<BackButton />
-			</Slots.Back>
+	return (
+		<>
+			<Binding>
+				<Slots.Back>
+					<BackButton />
+				</Slots.Back>
 
-			<Slots.Title>
-				<Title>{entityName}</Title>
-			</Slots.Title>
+				<Slots.Title>
+					<Title>{entityName}</Title>
+				</Slots.Title>
 
-			<Slots.Actions>
-				<Link to="auto/create(entity: $entityName)" parameters={{ entityName }}>
-					<AnchorButton>New {entityName}</AnchorButton>
-				</Link>
-			</Slots.Actions>
+				<Slots.Actions>
+					<Link to="auto/create(entity: $entityName)" parameters={{ entityName }}>
+						<AnchorButton>New {entityName}</AnchorButton>
+					</Link>
+				</Slots.Actions>
 
-			<DataGrid entities={entityName}>
-				<DataGridToolbar />
-				<DataGridLoader>
-					<DataGridTable>
-						<EntityColumns entityName={entityName} />
-					</DataGridTable>
-				</DataGridLoader>
-				<DataGridPagination />
-			</DataGrid>
-		</Binding>
-	</>
+				<DataGrid entities={entityName}>
+					<DataGridToolbar />
+					<DataGridLoader>
+						<DataGridTable>
+							<EntityColumns entityName={entityName} />
+						</DataGridTable>
+					</DataGridLoader>
+					<DataGridPagination />
+				</DataGrid>
+			</Binding>
+		</>
+	)
 }
 
 export const Create = () => {
@@ -175,19 +177,24 @@ export const Edit = () => {
 const EntityColumns = Component<{ entityName: string }>(({ entityName }, env) => {
 	const entitySchema = env.getSchema().getEntity(entityName)
 
-	return (<>
-		<DataGridActionColumn>
-			<EntityEditDialog entityName={entityName} />
-		</DataGridActionColumn>
-		{Array.from(entitySchema.fields).map(([fieldName, fieldSchema]) => (
-			<EntityColumn key={fieldName} entityName={entityName} fieldName={fieldName} />
-		))}
-		<DataGridActionColumn>
-			<DeleteEntityDialog trigger={<Button size="sm" variant="destructive"><TrashIcon size={16} /></Button>} />
-		</DataGridActionColumn>
-	</>)
+	return (
+		<>
+			<DataGridActionColumn>
+				<EntityEditDialog entityName={entityName} />
+			</DataGridActionColumn>
+			{Array.from(entitySchema.fields).map(([fieldName, fieldSchema]) => <EntityColumn key={fieldName} entityName={entityName} fieldName={fieldName} />)}
+			<DataGridActionColumn>
+				<DeleteEntityDialog
+					trigger={
+						<Button size="sm" variant="destructive">
+							<TrashIcon size={16} />
+						</Button>
+					}
+				/>
+			</DataGridActionColumn>
+		</>
+	)
 })
-
 
 const EntityEditDialog = ({ entityName }: { entityName: string }) => {
 	const [open, setOpen] = useState(false)
@@ -332,7 +339,6 @@ const EntityColumn = Component<{ entityName: string; fieldName: string }>(({ ent
 			default:
 				return null
 		}
-
 	} else {
 		const sortableBy = resolveSortableBy(schema, fieldSchema)
 		const connectingEntity = resolveConnectingEntity(schema, fieldSchema, sortableBy)
@@ -341,8 +347,9 @@ const EntityColumn = Component<{ entityName: string; fieldName: string }>(({ ent
 		const targetEntity = schema.getEntity(targetField.targetEntity)
 		const humanFieldName = getHumanFriendlyField(targetEntity)
 		let optionLabel = <EntityFieldLabel field={humanFieldName} />
-		optionLabel = connectingEntity ?
-			<HasOne field={connectingEntity.field.name}>{optionLabel}</HasOne> : optionLabel
+		optionLabel = connectingEntity
+			? <HasOne field={connectingEntity.field.name}>{optionLabel}</HasOne>
+			: optionLabel
 
 		if (fieldSchema.type === 'OneHasOne' || fieldSchema.type === 'ManyHasOne') {
 			return (
@@ -354,7 +361,6 @@ const EntityColumn = Component<{ entityName: string; fieldName: string }>(({ ent
 					{optionLabel}
 				</DataGridHasOneColumn>
 			)
-
 		} else {
 			return (
 				<DataGridHasManyColumn
@@ -483,18 +489,14 @@ const EntityField = Component<AutoFieldProps>(
 const formatString = (type: SchemaColumnType, value: any) => {
 	if (typeof value !== 'string') {
 		return value
-
 	} else if (type === 'Uuid') {
 		return <span title={value}>{value.slice(0, 8)}</span>
-
 	} else if (type === 'String') {
 		return value.length > 100 ? <span title={value}>{value.slice(0, 100) + '...'}</span> : value
-
 	} else {
 		return value
 	}
 }
-
 
 const ClickToEdit = Component<{ view: ReactNode; edit: ReactNode }>(
 	props => {

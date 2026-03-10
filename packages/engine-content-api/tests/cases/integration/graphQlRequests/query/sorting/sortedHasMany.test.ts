@@ -76,4 +76,3 @@ test('Post with ordered locales', async () => {
 		},
 	})
 })
-

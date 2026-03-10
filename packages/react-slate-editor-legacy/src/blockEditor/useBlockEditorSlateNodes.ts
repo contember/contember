@@ -1,10 +1,4 @@
-import {
-	BindingError,
-	EntityAccessor,
-	EntityId,
-	SugaredFieldProps,
-	useDesugaredRelativeSingleField,
-} from '@contember/react-binding'
+import { BindingError, EntityAccessor, EntityId, SugaredFieldProps, useDesugaredRelativeSingleField } from '@contember/react-binding'
 import { Descendant, Editor, Element as SlateElement, PathRef } from 'slate'
 
 export interface UseBlockEditorSlateNodesOptions {
@@ -25,13 +19,13 @@ export const useBlockEditorSlateNodes = ({
 	const desugaredContentField = useDesugaredRelativeSingleField(blockContentField)
 	if (editor.operations.length) {
 		// This is *ABSOLUTELY CRUCIAL*!
-		//	Slate invokes the onChange callback asynchronously, and so it could happen that this hook is invoked whilst
-		//	there are pending changes that the onChange routines haven't had a chance to let binding know about yet.
-		//	In those situations, if this hook were to generate elements based on accessors, it would effectively
-		//	prevent the pending changes from ever happening because Slate updates editor.children based on the value
-		//	this hook generates and onChange in turn uses editor.children to update accessors.
-		//	Consequently, whenever there are pending changes, we just return whatever children the editor already has
-		//	because we know that an onChange is already scheduled.
+		// 	Slate invokes the onChange callback asynchronously, and so it could happen that this hook is invoked whilst
+		// 	there are pending changes that the onChange routines haven't had a chance to let binding know about yet.
+		// 	In those situations, if this hook were to generate elements based on accessors, it would effectively
+		// 	prevent the pending changes from ever happening because Slate updates editor.children based on the value
+		// 	this hook generates and onChange in turn uses editor.children to update accessors.
+		// 	Consequently, whenever there are pending changes, we just return whatever children the editor already has
+		// 	because we know that an onChange is already scheduled.
 		return editor.children
 	}
 
@@ -69,9 +63,9 @@ export const useBlockEditorSlateNodes = ({
 			}
 			blockElementCache.set(entity, blockElement)
 			return blockElement
-		  })
+		})
 		: [
 			editor.createDefaultElement([{ text: '' }]),
-		  ]
+		]
 	return topLevelBlockElements
 }

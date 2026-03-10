@@ -69,5 +69,3 @@ test('predicate with OR', async () => {
 		},
 	})
 })
-
-

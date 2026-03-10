@@ -21,9 +21,7 @@ export const EditorBlock = Component<EditorBlockProps>(() => {
 	return (
 		<Block
 			name={blockProps.name}
-			render={renderBlockProps => (
-				<EditorBlockUi blockProps={blockProps} renderBlockProps={renderBlockProps} />
-			)}
+			render={renderBlockProps => <EditorBlockUi blockProps={blockProps} renderBlockProps={renderBlockProps} />}
 		>
 			{blockProps.children}
 			{blockProps.alternate}
@@ -48,7 +46,8 @@ export const EditorBlockContent = Component(() => {
 
 const EditorBlockUi = ({ blockProps, renderBlockProps }: {
 	blockProps: EditorBlockProps
-	renderBlockProps: BlockRendererProps }) => {
+	renderBlockProps: BlockRendererProps
+}) => {
 	const {
 		children,
 		alternate,
@@ -78,11 +77,19 @@ const EditorBlockUi = ({ blockProps, renderBlockProps }: {
 							{label}
 						</div>
 						<div className="ml-auto opacity-0 group-hover:opacity-20 hover:!opacity-100 transition-opacity">
-							<Button variant="destructive" onClick={onRemove} size="sm"><TrashIcon className="w-3 h-3" /></Button>
-							{alternate && (<Popover>
-								<PopoverTrigger asChild><Button size="sm"><PencilIcon className="w-3 h-3" /></Button></PopoverTrigger>
-								<PopoverContent>{alternate}</PopoverContent>
-							</Popover>)}
+							<Button variant="destructive" onClick={onRemove} size="sm">
+								<TrashIcon className="w-3 h-3" />
+							</Button>
+							{alternate && (
+								<Popover>
+									<PopoverTrigger asChild>
+										<Button size="sm">
+											<PencilIcon className="w-3 h-3" />
+										</Button>
+									</PopoverTrigger>
+									<PopoverContent>{alternate}</PopoverContent>
+								</Popover>
+							)}
 						</div>
 					</div>
 				</div>

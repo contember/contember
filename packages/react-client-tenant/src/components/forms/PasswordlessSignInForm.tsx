@@ -24,8 +24,11 @@ export type PasswordlessSignInFormState =
 
 export type PasswordlessSignInFormError = FormError<PasswordlessSignInFormValues, PasswordlessSignInFormErrorCode>
 
-export type PasswordlessSignInFormContextValue = FormContextValue<PasswordlessSignInFormValues, PasswordlessSignInFormErrorCode, PasswordlessSignInFormState>
-
+export type PasswordlessSignInFormContextValue = FormContextValue<
+	PasswordlessSignInFormValues,
+	PasswordlessSignInFormErrorCode,
+	PasswordlessSignInFormState
+>
 
 export interface PasswordlessSignInFormProps {
 	requestId: string
@@ -43,8 +46,9 @@ const headers = {
 }
 const DEFAULT_LOGIN_EXPIRATION = 14 * 24 * 60 // 14 days
 
-export const PasswordlessSignInForm = ({ children, onSuccess, requestId, validationType, token, expiration = DEFAULT_LOGIN_EXPIRATION }: PasswordlessSignInFormProps) => {
-
+export const PasswordlessSignInForm = (
+	{ children, onSuccess, requestId, validationType, token, expiration = DEFAULT_LOGIN_EXPIRATION }: PasswordlessSignInFormProps,
+) => {
 	const signIn = useSignInPasswordlessMutation({ headers })
 	const redirectToBacklink = useRedirectToBacklinkCallback()
 	const setSessionToken = useSetSessionToken()
@@ -89,7 +93,6 @@ export const PasswordlessSignInForm = ({ children, onSuccess, requestId, validat
 			{children}
 		</TenantForm>
 	)
-
 }
 const errorToField: Record<TenantApi.SignInPasswordlessErrorCode, keyof PasswordlessSignInFormValues | undefined> = {
 	PERSON_DISABLED: undefined,

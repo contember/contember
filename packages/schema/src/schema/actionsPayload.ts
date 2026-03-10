@@ -86,7 +86,6 @@ export namespace ActionsPayload {
 		| BasicEventPayload
 		| WatchEventPayload
 
-
 	export type WebhookMeta = {
 		readonly eventId: string
 		readonly transactionId: string

@@ -3,7 +3,6 @@ import { expect, test } from 'bun:test'
 import { createActions } from '../../../src/actions/definition'
 
 namespace SimpleActions {
-
 	@c.Watch({
 		name: 'book_watch',
 		watch: `
@@ -31,7 +30,6 @@ namespace SimpleActions {
 		name = c.stringColumn()
 		locale = c.manyHasOne(Locale)
 	}
-
 
 	export class Category {
 		locales = c.oneHasMany(CategoryLocale, 'category')

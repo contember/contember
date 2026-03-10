@@ -1,12 +1,7 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
 import { SchemaUpdater, updateEntity, updateModel } from '../utils/schemaUpdateUtils'
-import {
-	createModificationType,
-	Differ,
-	ModificationHandler,
-	ModificationHandlerCreateSqlOptions,
-} from '../ModificationHandler'
+import { createModificationType, Differ, ModificationHandler, ModificationHandlerCreateSqlOptions } from '../ModificationHandler'
 import deepEqual from 'fast-deep-equal'
 import { getUniqueConstraintColumns } from './utils'
 import { wrapIdentifier } from '../../utils/dbHelpers'
@@ -19,14 +14,12 @@ export class RemoveUniqueConstraintModificationHandler implements ModificationHa
 		const entity = this.schema.model.entities[this.data.entityName]
 		const unique = this.getUnique()
 
-		const shouldExecuteSql =
-			!entity.view
+		const shouldExecuteSql = !entity.view
 			|| (unique.index && entity.view.materialized)
 
 		if (!shouldExecuteSql) {
 			return
 		}
-
 
 		const columns = getUniqueConstraintColumns({
 			entity,
@@ -44,9 +37,7 @@ export class RemoveUniqueConstraintModificationHandler implements ModificationHa
 			for (const name of indexNames) {
 				builder.sql(`DROP INDEX ${wrapIdentifier(name)}`)
 			}
-
 		} else {
-
 			const constraintNames = databaseMetadata.uniqueConstraints.filter({
 				tableName: entity.tableName,
 				columnNames: columns,
@@ -56,7 +47,6 @@ export class RemoveUniqueConstraintModificationHandler implements ModificationHa
 				builder.sql(`ALTER TABLE ${wrapIdentifier(entity.tableName)} DROP CONSTRAINT ${wrapIdentifier(name)}`)
 			}
 		}
-
 
 		invalidateDatabaseMetadata()
 	}
@@ -119,7 +109,6 @@ export type RemoveUniqueConstraintModificationData =
 		constraintName?: never
 	}
 
-
 export class RemoveUniqueConstraintDiffer implements Differ {
 	createDiff(originalSchema: Schema, updatedSchema: Schema) {
 		return Object.values(originalSchema.model.entities).flatMap(entity =>
@@ -135,8 +124,8 @@ export class RemoveUniqueConstraintDiffer implements Differ {
 					removeUniqueConstraintModification.createModification({
 						entityName: entity.name,
 						unique: unique,
-					}),
-				),
+					})
+				)
 		)
 	}
 }

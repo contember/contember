@@ -5,7 +5,6 @@ import { ErrorAccessor } from './ErrorAccessor'
 import type { SchemaColumn } from '../schema'
 import { EntityAccessor } from './EntityAccessor'
 
-
 export const isFieldAccessor = (accessor: unknown): accessor is FieldAccessor =>
 	accessor !== null && typeof accessor === 'object' && '__type' in accessor && accessor.__type === 'FieldAccessor'
 

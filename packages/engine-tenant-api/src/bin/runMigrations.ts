@@ -3,7 +3,6 @@ import { createLogger, PrettyPrintLoggerHandler } from '@contember/logger'
 
 let uuidNum = 0
 const dummyUuid = () => '123e4567-e89b-12d3-a456-' + (uuidNum++).toString().padStart(12, '0')
-
 ;(async () => {
 	const migrationsRunner = new TenantMigrationsRunner(
 		{

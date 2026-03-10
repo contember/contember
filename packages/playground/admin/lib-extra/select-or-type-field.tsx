@@ -19,46 +19,57 @@ export type SelectOrTypeFieldProps =
 		options: Record<string, string>
 	}
 
-export const SelectOrTypeField = Component(({ field, label, description, selectProps, inputProps, isNonbearing, defaultValue, required, options }: SelectOrTypeFieldProps) => {
-	const fieldAccessor = useField<string>({ field })
-	const fieldValue = fieldAccessor.value
-	const [showSelect, setShowSelect] = useState(!fieldValue || Object.keys(options).includes(fieldValue))
-	return (
-		<FormFieldScope field={field}>
-			<FormContainer description={description} label={label}>
-				{showSelect ? <Select value={fieldValue ?? undefined} onValueChange={value => {
-					if (value === '___other') {
-						setShowSelect(false)
-						fieldAccessor.updateValue('')
-					} else {
-						fieldAccessor.updateValue(value)
-
-					}
-				}} {...selectProps}>
-					<SelectTrigger className={cn('max-w-md')}>
-						<SelectValue placeholder={dict.select.placeholder}>{fieldValue}</SelectValue>
-					</SelectTrigger>
-					<SelectContent>
-						{Object.entries(options ?? {}).map(([value, label]) => (
-							<SelectItem key={value} value={value}>
-								{label}
-							</SelectItem>
-						))}
-						<SelectItem value="___other">Other</SelectItem>
-					</SelectContent>
-				</Select>
-					: <FormInput field={field} isNonbearing={isNonbearing} defaultValue={defaultValue}>
-						<Input required={required} {...(inputProps ?? {})} className={cn('max-w-md', inputProps?.className)} />
-					</FormInput>}
-			</FormContainer>
-		</FormFieldScope>
-	)
-}, ({ field, label, description, isNonbearing, defaultValue }) => {
-	return (
-		<>
-			{label}
-			{description}
-			<Field field={field} isNonbearing={isNonbearing} defaultValue={defaultValue} />
-		</>
-	)
-})
+export const SelectOrTypeField = Component(
+	({ field, label, description, selectProps, inputProps, isNonbearing, defaultValue, required, options }: SelectOrTypeFieldProps) => {
+		const fieldAccessor = useField<string>({ field })
+		const fieldValue = fieldAccessor.value
+		const [showSelect, setShowSelect] = useState(!fieldValue || Object.keys(options).includes(fieldValue))
+		return (
+			<FormFieldScope field={field}>
+				<FormContainer description={description} label={label}>
+					{showSelect
+						? (
+							<Select
+								value={fieldValue ?? undefined}
+								onValueChange={value => {
+									if (value === '___other') {
+										setShowSelect(false)
+										fieldAccessor.updateValue('')
+									} else {
+										fieldAccessor.updateValue(value)
+									}
+								}}
+								{...selectProps}
+							>
+								<SelectTrigger className={cn('max-w-md')}>
+									<SelectValue placeholder={dict.select.placeholder}>{fieldValue}</SelectValue>
+								</SelectTrigger>
+								<SelectContent>
+									{Object.entries(options ?? {}).map(([value, label]) => (
+										<SelectItem key={value} value={value}>
+											{label}
+										</SelectItem>
+									))}
+									<SelectItem value="___other">Other</SelectItem>
+								</SelectContent>
+							</Select>
+						)
+						: (
+							<FormInput field={field} isNonbearing={isNonbearing} defaultValue={defaultValue}>
+								<Input required={required} {...(inputProps ?? {})} className={cn('max-w-md', inputProps?.className)} />
+							</FormInput>
+						)}
+				</FormContainer>
+			</FormFieldScope>
+		)
+	},
+	({ field, label, description, isNonbearing, defaultValue }) => {
+		return (
+			<>
+				{label}
+				{description}
+				<Field field={field} isNonbearing={isNonbearing} defaultValue={defaultValue} />
+			</>
+		)
+	},
+)

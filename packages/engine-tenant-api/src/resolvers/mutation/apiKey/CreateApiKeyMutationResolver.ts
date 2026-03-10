@@ -1,7 +1,8 @@
 import {
 	CreateApiKeyErrorCode,
 	CreateApiKeyResponse,
-	MutationCreateApiKeyArgs, MutationCreateGlobalApiKeyArgs,
+	MutationCreateApiKeyArgs,
+	MutationCreateGlobalApiKeyArgs,
 	MutationResolvers,
 } from '../../../schema'
 import { GraphQLResolveInfo } from 'graphql'

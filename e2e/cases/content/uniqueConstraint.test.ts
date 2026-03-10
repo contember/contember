@@ -34,5 +34,3 @@ test('fail when creating a non-unique site', async () => {
 			},
 		})
 })
-
-

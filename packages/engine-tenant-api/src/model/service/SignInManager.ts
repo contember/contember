@@ -75,7 +75,6 @@ class SignInManager {
 						personInput: personIdentifier.email,
 					}),
 				})
-
 			} else if (personIdentifier.type === 'id') {
 				return new ResponseError('UNKNOWN_PERSON_ID', `Person with id ${personIdentifier.id} not found`, {
 					[AuthLogService.Key]: new AuthLogService.Bag({

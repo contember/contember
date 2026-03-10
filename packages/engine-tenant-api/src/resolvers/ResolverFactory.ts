@@ -86,9 +86,8 @@ class ResolverFactory {
 			configurationQueryResolver: ConfigurationQueryResolver
 
 			togglePasswordlessMutationResolver: TogglePasswordlessMutationResolver
-
 		},
-	) { }
+	) {}
 
 	create(): Resolvers & { Mutation: Required<Resolvers['Mutation']> } & { Query: Required<Resolvers['Query']> } {
 		return {
@@ -128,7 +127,9 @@ class ResolverFactory {
 				changeMyProfile: this.resolvers.changeProfileMutationResolver.changeMyProfile.bind(this.resolvers.changeProfileMutationResolver),
 				changePassword: this.resolvers.changePasswordMutationResolver.changePassword.bind(this.resolvers.changePasswordMutationResolver),
 				changeMyPassword: this.resolvers.changePasswordMutationResolver.changeMyPassword.bind(this.resolvers.changePasswordMutationResolver),
-				createResetPasswordRequest: this.resolvers.resetPasswordMutationResolver.createResetPasswordRequest.bind(this.resolvers.resetPasswordMutationResolver),
+				createResetPasswordRequest: this.resolvers.resetPasswordMutationResolver.createResetPasswordRequest.bind(
+					this.resolvers.resetPasswordMutationResolver,
+				),
 				resetPassword: this.resolvers.resetPasswordMutationResolver.resetPassword.bind(this.resolvers.resetPasswordMutationResolver),
 
 				initSignInIDP: this.resolvers.idpMutationResolver.initSignInIDP.bind(this.resolvers.idpMutationResolver),
@@ -142,15 +143,23 @@ class ResolverFactory {
 				signInPasswordless: this.resolvers.passwordlessMutationResolver.signInPasswordless.bind(this.resolvers.passwordlessMutationResolver),
 				initSignInPasswordless: this.resolvers.passwordlessMutationResolver.initSignInPasswordless.bind(this.resolvers.passwordlessMutationResolver),
 				activatePasswordlessOtp: this.resolvers.passwordlessMutationResolver.activatePasswordlessOtp.bind(this.resolvers.passwordlessMutationResolver),
-				disableMyPasswordless: this.resolvers.togglePasswordlessMutationResolver.disableMyPasswordless.bind(this.resolvers.togglePasswordlessMutationResolver),
-				enableMyPasswordless: this.resolvers.togglePasswordlessMutationResolver.enableMyPasswordless.bind(this.resolvers.togglePasswordlessMutationResolver),
+				disableMyPasswordless: this.resolvers.togglePasswordlessMutationResolver.disableMyPasswordless.bind(
+					this.resolvers.togglePasswordlessMutationResolver,
+				),
+				enableMyPasswordless: this.resolvers.togglePasswordlessMutationResolver.enableMyPasswordless.bind(
+					this.resolvers.togglePasswordlessMutationResolver,
+				),
 
 				invite: this.resolvers.inviteMutationResolver.invite.bind(this.resolvers.inviteMutationResolver),
 				unmanagedInvite: this.resolvers.inviteMutationResolver.unmanagedInvite.bind(this.resolvers.inviteMutationResolver),
 
 				addProjectMember: this.resolvers.addProjectMemberMutationResolver.addProjectMember.bind(this.resolvers.addProjectMemberMutationResolver),
-				updateProjectMember: this.resolvers.updateProjectMemberMutationResolver.updateProjectMember.bind(this.resolvers.updateProjectMemberMutationResolver),
-				removeProjectMember: this.resolvers.removeProjectMemberMutationResolver.removeProjectMember.bind(this.resolvers.updateProjectMemberMutationResolver),
+				updateProjectMember: this.resolvers.updateProjectMemberMutationResolver.updateProjectMember.bind(
+					this.resolvers.updateProjectMemberMutationResolver,
+				),
+				removeProjectMember: this.resolvers.removeProjectMemberMutationResolver.removeProjectMember.bind(
+					this.resolvers.updateProjectMemberMutationResolver,
+				),
 
 				createApiKey: this.resolvers.createApiKeyMutationResolver.createApiKey.bind(this.resolvers.createApiKeyMutationResolver),
 				createGlobalApiKey: this.resolvers.createApiKeyMutationResolver.createGlobalApiKey.bind(this.resolvers.createApiKeyMutationResolver),
@@ -170,8 +179,12 @@ class ResolverFactory {
 				updateProject: this.resolvers.updateProjectMutationResolver.updateProject.bind(this.resolvers.updateProjectMutationResolver),
 				setProjectSecret: this.resolvers.setProjectSecretMutationResolver.setProjectSecret.bind(this.resolvers.setProjectSecretMutationResolver),
 
-				addGlobalIdentityRoles: this.resolvers.identityGlobalRolesMutationResolver.addGlobalIdentityRoles.bind(this.resolvers.identityGlobalRolesMutationResolver),
-				removeGlobalIdentityRoles: this.resolvers.identityGlobalRolesMutationResolver.removeGlobalIdentityRoles.bind(this.resolvers.identityGlobalRolesMutationResolver),
+				addGlobalIdentityRoles: this.resolvers.identityGlobalRolesMutationResolver.addGlobalIdentityRoles.bind(
+					this.resolvers.identityGlobalRolesMutationResolver,
+				),
+				removeGlobalIdentityRoles: this.resolvers.identityGlobalRolesMutationResolver.removeGlobalIdentityRoles.bind(
+					this.resolvers.identityGlobalRolesMutationResolver,
+				),
 
 				configure: this.resolvers.configurationMutationResolver.configure.bind(this.resolvers.configurationMutationResolver),
 			},

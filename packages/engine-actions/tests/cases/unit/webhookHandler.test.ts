@@ -7,7 +7,6 @@ import { Actions, ActionsPayload } from '@contember/schema'
 import { HandledEvent } from '../../../src/dispatch/types'
 import { testUuid } from '../../src/uuid'
 
-
 const assert = {
 	equal: (a: any, b: any) => expect(a).toEqual(b),
 	deepStrictEqual: (a: any, b: any) => expect(a).toStrictEqual(b),
@@ -54,23 +53,26 @@ describe('webhook request', () => {
 			fetch(url: string, init: RequestInit): Promise<FetcherResponse> {
 				fetchCalled = true
 				assert.equal(url, 'http://localhost')
-				assert.equal(init.body, JSON.stringify({
-					events: [{
-						meta: {
-							eventId: testUuid(1),
-							transactionId: testUuid(2),
-							identityId: testUuid(4),
-							ipAddress: '127.0.0.1',
-							userAgent: 'test-agent',
-							createdAt: now.toISOString(),
-							lastStateChange: now.toISOString(),
-							numRetries: 0,
-							trigger: 'test',
-							target: 'test_target',
-						},
-						foo: 'bar',
-					}],
-				}))
+				assert.equal(
+					init.body,
+					JSON.stringify({
+						events: [{
+							meta: {
+								eventId: testUuid(1),
+								transactionId: testUuid(2),
+								identityId: testUuid(4),
+								ipAddress: '127.0.0.1',
+								userAgent: 'test-agent',
+								createdAt: now.toISOString(),
+								lastStateChange: now.toISOString(),
+								numRetries: 0,
+								trigger: 'test',
+								target: 'test_target',
+							},
+							foo: 'bar',
+						}],
+					}),
+				)
 
 				return okResponse
 			},
@@ -102,28 +104,31 @@ describe('webhook request', () => {
 			fetch(url: string, init: RequestInit): Promise<FetcherResponse> {
 				fetchCalled = true
 				assert.equal(url, 'http://localhost')
-				assert.equal(init.body, JSON.stringify({
-					options: 'value',
-					payload: {
-						json: {
-							events: [{
-								meta: {
-									eventId: testUuid(1),
-									transactionId: testUuid(2),
-									identityId: testUuid(4),
-									ipAddress: '127.0.0.1',
-									userAgent: 'test-agent',
-									createdAt: now.toISOString(),
-									lastStateChange: now.toISOString(),
-									numRetries: 0,
-									trigger: 'test',
-									target: 'test_target',
-								},
-								foo: 'bar',
-							}],
+				assert.equal(
+					init.body,
+					JSON.stringify({
+						options: 'value',
+						payload: {
+							json: {
+								events: [{
+									meta: {
+										eventId: testUuid(1),
+										transactionId: testUuid(2),
+										identityId: testUuid(4),
+										ipAddress: '127.0.0.1',
+										userAgent: 'test-agent',
+										createdAt: now.toISOString(),
+										lastStateChange: now.toISOString(),
+										numRetries: 0,
+										trigger: 'test',
+										target: 'test_target',
+									},
+									foo: 'bar',
+								}],
+							},
 						},
-					},
-				}))
+					}),
+				)
 
 				return okResponse
 			},
@@ -266,7 +271,6 @@ describe('webhook response', () => {
 		])
 	})
 
-
 	test('invalid partial response', async () => {
 		const testLoggerHandler = new TestLoggerHandler()
 		const logger = createLogger(testLoggerHandler)
@@ -327,7 +331,6 @@ describe('webhook response', () => {
 			},
 		])
 	})
-
 
 	test('ignored invalid response', async () => {
 		const testLoggerHandler = new TestLoggerHandler()

@@ -2,12 +2,11 @@ import { describe, expect, test } from 'bun:test'
 import { GraphQlField, GraphQlQueryPrinter } from '../../../src'
 
 describe('builder', () => {
-
 	test('fetch field', async () => {
 		const printer = new GraphQlQueryPrinter()
 		const result = printer.printDocument('query', [
 			new GraphQlField(null, 'test', {}),
-		],  {})
+		], {})
 		expect(result).toMatchSnapshot()
 	})
 
@@ -21,8 +20,7 @@ describe('builder', () => {
 			new GraphQlField('a', 'test', {
 				variable: { graphQlType: 'Json', value: someValue },
 			}),
-		],  {})
+		], {})
 		expect(result).toMatchSnapshot()
-
 	})
 })

@@ -9,8 +9,7 @@ export type ContentMutationState<Result> =
 	| { state: 'error'; error: unknown }
 	| { state: 'success'; data: Result }
 
-export type ContentMutationOptions<T> =
-	& QueryExecutorOptions
+export type ContentMutationOptions<T> = QueryExecutorOptions
 
 export type ContentMutationResult<Result, Variables extends Record<string, any>> = readonly [
 	state: ContentMutationState<Result>,
@@ -19,15 +18,15 @@ export type ContentMutationResult<Result, Variables extends Record<string, any>>
 
 export function useContentMutation<Value, Variables extends Record<string, any>>(
 	mutationFn: (variables: Variables) => ContentMutation<Value>,
-	options?: ContentMutationOptions<Value>
+	options?: ContentMutationOptions<Value>,
 ): ContentMutationResult<Value, Variables>
 export function useContentMutation<Value, Variables extends Record<string, any>>(
 	mutationFn: (variables: Variables) => ContentMutation<Value>[],
-	options?: ContentMutationOptions<Value[]>
+	options?: ContentMutationOptions<Value[]>,
 ): ContentMutationResult<Value[], Variables>
 export function useContentMutation<Values extends Record<string, any>, Variables extends Record<string, any>>(
 	mutationFn: (variables: Variables) => { [K in keyof Values]: ContentMutation<Values[K]> | ContentQuery<Values[K]> },
-	options?: ContentMutationOptions<Values>
+	options?: ContentMutationOptions<Values>,
 ): ContentMutationResult<Values, Variables>
 export function useContentMutation<Result, Variables extends Record<string, any>>(
 	mutationFn: (variables: Variables) => ContentMutation<Result> | ContentMutation<Result>[] | Record<string, ContentMutation<any> | ContentQuery<any>>,

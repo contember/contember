@@ -26,27 +26,37 @@ export default () => {
 				<CardTitle className="text-2xl">{dict.tenant.passwordlessSignIn.title}</CardTitle>
 			</CardHeader>
 			<CardContent>
-				{showOtp ? (<>
-					<p className="text-gray-600">Have a verification code? Enter it here:</p>
-					<PasswordlessSignInForm onSuccess={() => {
-						redirect('index')
-					}} requestId={requestId} validationType="otp">
-						<form>
-							<PasswordlessSignInFormFields type="otp" />
-						</form>
-					</PasswordlessSignInForm>
-				</>) : <div className="flex flex-col items-center justify-center gap-4">
-					<MailIcon className="text-gray-300 w-16 h-16" />
-					<div className="text-center">
-						An email with password reset instructions has been sent to your email address.
-					</div>
-					<div className="text-xs text-gray-600">
-						Do you have a verification code?{' '}
-						<span onClick={() => setShowOtp(true)} className="underline cursor-pointer">
-							Enter manually
-						</span>
-					</div>
-				</div>}
+				{showOtp
+					? (
+						<>
+							<p className="text-gray-600">Have a verification code? Enter it here:</p>
+							<PasswordlessSignInForm
+								onSuccess={() => {
+									redirect('index')
+								}}
+								requestId={requestId}
+								validationType="otp"
+							>
+								<form>
+									<PasswordlessSignInFormFields type="otp" />
+								</form>
+							</PasswordlessSignInForm>
+						</>
+					)
+					: (
+						<div className="flex flex-col items-center justify-center gap-4">
+							<MailIcon className="text-gray-300 w-16 h-16" />
+							<div className="text-center">
+								An email with password reset instructions has been sent to your email address.
+							</div>
+							<div className="text-xs text-gray-600">
+								Do you have a verification code?{' '}
+								<span onClick={() => setShowOtp(true)} className="underline cursor-pointer">
+									Enter manually
+								</span>
+							</div>
+						</div>
+					)}
 			</CardContent>
 			<CardFooter>
 				<Link to="index">

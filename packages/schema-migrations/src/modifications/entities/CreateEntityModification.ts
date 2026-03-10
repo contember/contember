@@ -4,7 +4,8 @@ import { SchemaUpdater, updateModel } from '../utils/schemaUpdateUtils'
 import {
 	createModificationType,
 	Differ,
-	ModificationHandler, ModificationHandlerCreateSqlOptions,
+	ModificationHandler,
+	ModificationHandlerCreateSqlOptions,
 	ModificationHandlerOptions,
 } from '../ModificationHandler'
 import { createEventTrigger, createEventTrxTrigger } from '../utils/sqlUpdateUtils'
@@ -40,7 +41,7 @@ export class CreateEntityModificationHandler implements ModificationHandler<Crea
 			},
 		})
 
-		if  (entity.eventLog?.enabled !== false) {
+		if (entity.eventLog?.enabled !== false) {
 			createEventTrigger(builder, systemSchema, entity.tableName, [entity.primaryColumn])
 			createEventTrxTrigger(builder, systemSchema, entity.tableName)
 		}
@@ -61,11 +62,9 @@ export class CreateEntityModificationHandler implements ModificationHandler<Crea
 		}))
 	}
 
-
 	describe() {
 		return { message: `Add entity ${this.data.entity.name}` }
 	}
-
 }
 
 export const createEntityModification = createModificationType({
@@ -88,7 +87,7 @@ export class CreateEntityDiffer implements Differ {
 						unique: [],
 						indexes: [],
 					},
-				}),
+				})
 			)
 	}
 }

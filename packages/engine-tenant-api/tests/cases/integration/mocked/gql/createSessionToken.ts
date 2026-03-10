@@ -13,7 +13,9 @@ export const createSessionTokenMutation = (
 			error {code}
 			result {
 				token
-				${options.withData ? `person {
+				${
+		options.withData
+			? `person {
 					id
 					identity {
 						projects {
@@ -27,7 +29,8 @@ export const createSessionTokenMutation = (
 					}
 				}
 				`
-		: ''}
+			: ''
+	}
 			}
 		}
 	}`,

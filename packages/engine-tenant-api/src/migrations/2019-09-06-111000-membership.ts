@@ -45,6 +45,6 @@ INTO project_membership_variable(id, membership_id, variable, value)
     FROM data;
 `
 
-export default async function (builder: MigrationBuilder) {
+export default async function(builder: MigrationBuilder) {
 	builder.sql(sql)
 }

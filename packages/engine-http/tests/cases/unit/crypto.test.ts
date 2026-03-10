@@ -1,4 +1,4 @@
-import { test, expect } from 'bun:test'
+import { expect, test } from 'bun:test'
 import { CryptoWrapper } from '../../../src'
 import * as crypto from 'node:crypto'
 
@@ -6,7 +6,7 @@ const encryptionKey = crypto.createSecretKey(Buffer.from('0000000000000000000000
 const iv = Buffer.alloc(16).fill('a')
 const algorithm = CryptoWrapper.cryptoAlgo
 
-const assert  = {
+const assert = {
 	strictEqual: (a: any, b: any) => expect(a).toBe(b),
 }
 
@@ -37,7 +37,6 @@ test('encryption v1 17 chars string', async () => {
 	assert.strictEqual(decrypted.value.toString(), input)
 })
 
-
 test('encryption v2 16 chars string (block size)', async () => {
 	const cryptoWrapper = new CryptoWrapper(encryptionKey)
 	const input = 'a'.repeat(16)
@@ -49,7 +48,6 @@ test('encryption v2 16 chars string (block size)', async () => {
 	assert.strictEqual(decrypted.needsReEncrypt, false)
 	assert.strictEqual(decrypted.value.toString(), input)
 })
-
 
 test('encryption v2 17 chars string', async () => {
 	const cryptoWrapper = new CryptoWrapper(encryptionKey)
@@ -76,4 +74,3 @@ test('encryption v2: corrupted auth key', async () => {
 	}
 	assert.strictEqual('Unsupported state or unable to authenticate data', err.message)
 })
-

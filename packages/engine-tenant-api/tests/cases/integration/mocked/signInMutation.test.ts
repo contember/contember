@@ -5,7 +5,7 @@ import { selectMembershipsSql } from './sql/selectMembershipsSql'
 import { signInMutation } from './gql/signIn'
 import { getPersonByEmailSql } from './sql/getPersonByEmailSql'
 import { SignInErrorCode } from '../../../../src/schema'
-import { test, expect } from 'bun:test'
+import { expect, test } from 'bun:test'
 import { OtpAuthenticator } from '../../../../src'
 import { Buffer } from 'buffer'
 import { createSessionKeySql } from './sql/createSessionKeySql'
@@ -152,7 +152,16 @@ test('otp token not provided', async () => {
 		query: signInMutation({ email, password }),
 		executes: [
 			getNextLoginAttemptSql(email),
-			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [], otpUri: 'otpauth://totp/contember:john?secret=ABCDEFG&period=30&digits=6&algorithm=SHA1&issuer=contember' } }),
+			getPersonByEmailSql({
+				email,
+				response: {
+					personId,
+					identityId,
+					password,
+					roles: [],
+					otpUri: 'otpauth://totp/contember:john?secret=ABCDEFG&period=30&digits=6&algorithm=SHA1&issuer=contember',
+				},
+			}),
 			getConfigSql(),
 		],
 		return: {
@@ -255,4 +264,3 @@ test('sign in - valid otp token', async () => {
 		},
 	})
 })
-

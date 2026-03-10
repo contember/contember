@@ -30,14 +30,14 @@ const allowedDirectoryImports = new Set([
 	'crypto-js/sha256',
 	'crypto-js/enc-hex',
 	'node-pg-migrate/dist/utils.js',
-	'node-pg-migrate/dist/migration-builder.js'
+	'node-pg-migrate/dist/migration-builder.js',
 ])
 
 const processPackage = async (dir: string, projectList: ProjectList) => {
 	const files = await glob([`${dir}/src/**/*.{ts,tsx}`, `!${dir}/src/generated/**`], { onlyFiles: true })
 	const contents = await Promise.all(files.map(async (it): Promise<[file: string, content: string]> => [it, await fs.readFile(it, 'utf-8')]))
 	const imports = new Set<string>()
-	const errors: { file: string; message: string, type: string }[] = []
+	const errors: { file: string; message: string; type: string }[] = []
 	for (const [file, content] of contents) {
 		const sourceFile = ts.createSourceFile(file, content, ts.ScriptTarget.ESNext)
 		sourceFile.forEachChild(node => {
@@ -83,7 +83,7 @@ const processPackage = async (dir: string, projectList: ProjectList) => {
 	}
 	for (const key in thisProject.packageJson.dependencies ?? {}) {
 		if (!imports.has(key) && !allowedUnused.has(key)) {
-			errors.push({file: dir,  message: `Module ${key} from package.json dependencies is unused`, type: 'package_unused' })
+			errors.push({ file: dir, message: `Module ${key} from package.json dependencies is unused`, type: 'package_unused' })
 		}
 	}
 
@@ -132,7 +132,7 @@ interface Project {
 		devDependencies?: Record<string, string>
 	}
 }
-(async () => {
+;(async () => {
 	const dirs = (await glob(process.cwd() + '/packages/*', { onlyDirectories: true }))
 		.filter(dir => !dir.endsWith('packages/playground'))
 		.filter(it => existsSync(`${it}/package.json`))
@@ -153,7 +153,8 @@ interface Project {
 		}
 	}))
 	const projectList = new ProjectList(projects)
-	const failed = (await Promise.all(dirs.filter(it => !process.argv[2] || it.endsWith(process.argv[2])).map(it => processPackage(it, projectList)))).some(it => !it)
+	const failed = (await Promise.all(dirs.filter(it => !process.argv[2] || it.endsWith(process.argv[2])).map(it => processPackage(it, projectList))))
+		.some(it => !it)
 	if (failed) {
 		process.exit(1)
 	}

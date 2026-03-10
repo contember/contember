@@ -15,8 +15,7 @@ export const createNumberRangeFilter = createFieldFilterHandler<NumberRangeFilte
 			inclusion.push({
 				gte: filter.from,
 				lte: filter.to,
-			},
-			)
+			})
 		}
 		if (filter.nullCondition === true) {
 			inclusion.push({ isNull: true })

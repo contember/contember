@@ -39,7 +39,6 @@ export class ProjectGroupContainerMetricsHook {
 				return () => unregister.forEach(it => it())
 			})
 
-
 			const primaryConnection = groupContainer.tenantContainer.connection
 			const readConnection = groupContainer.tenantContainer.readConnection
 			const hasDifferentReadConnection = primaryConnection !== readConnection

@@ -81,12 +81,9 @@ export class ProjectContainerFactory {
 
 	protected createBuilder({ project }: ProjectContainerFactoryArgs) {
 		return new Builder({})
-			.addService('logger', () =>
-				this.logger.child({ project: project.slug }))
-			.addService('project', () =>
-				project)
-			.addService('connection', ({ project, logger }) =>
-				Connection.create(project.db, err => logger.error(err)))
+			.addService('logger', () => this.logger.child({ project: project.slug }))
+			.addService('project', () => project)
+			.addService('connection', ({ project, logger }) => Connection.create(project.db, err => logger.error(err)))
 			.addService('readConnection', ({ project, logger, connection }) => {
 				if (!project.db.read) {
 					return connection
@@ -100,25 +97,31 @@ export class ProjectContainerFactory {
 					},
 				}, err => logger.error(err))
 			})
-
-
-			.addService('contentSchemaResolver', () =>
-				new ContentSchemaResolver(this.schemaProvider))
-			.addService('systemSchemaName', ({ project }) =>
-				project.db.systemSchema ?? 'system')
-			.addService('systemDatabaseContextFactory', ({ systemSchemaName }) =>
-				new DatabaseContextFactory(systemSchemaName, this.providers))
-			.addService('systemDatabaseContext', ({ connection, systemDatabaseContextFactory }) =>
-				systemDatabaseContextFactory.create(connection))
-			.addService('systemReadDatabaseContext', ({ readConnection, systemDatabaseContextFactory }) =>
-				systemDatabaseContextFactory.create(readConnection))
-			.addService('systemMigrationGroups', () =>
-				Object.fromEntries(this.plugins.flatMap(it => it.getSystemMigrations ? [[it.name, it.getSystemMigrations()]] : [])))
-			.addService('systemMigrationsRunner', ({ systemDatabaseContextFactory, project, systemSchemaName, systemMigrationGroups }) =>
-				new SystemMigrationsRunner(systemDatabaseContextFactory, { ...project, systemSchema: systemSchemaName }, this.schemaProvider, systemMigrationGroups, this.databaseMetadataResolver))
-			.addService('projectInitializer', ({ systemMigrationsRunner, systemDatabaseContext, project, systemSchemaName }) =>
-				new ProjectInitializer(new StageCreator(), systemMigrationsRunner, systemDatabaseContext, { ...project, systemSchema: systemSchemaName }))
-			.addService('projectDatabaseMetadataResolver', () =>
-				new ProjectDatabaseMetadataResolver(this.databaseMetadataResolver))
+			.addService('contentSchemaResolver', () => new ContentSchemaResolver(this.schemaProvider))
+			.addService('systemSchemaName', ({ project }) => project.db.systemSchema ?? 'system')
+			.addService('systemDatabaseContextFactory', ({ systemSchemaName }) => new DatabaseContextFactory(systemSchemaName, this.providers))
+			.addService('systemDatabaseContext', ({ connection, systemDatabaseContextFactory }) => systemDatabaseContextFactory.create(connection))
+			.addService('systemReadDatabaseContext', ({ readConnection, systemDatabaseContextFactory }) => systemDatabaseContextFactory.create(readConnection))
+			.addService(
+				'systemMigrationGroups',
+				() => Object.fromEntries(this.plugins.flatMap(it => it.getSystemMigrations ? [[it.name, it.getSystemMigrations()]] : [])),
+			)
+			.addService(
+				'systemMigrationsRunner',
+				({ systemDatabaseContextFactory, project, systemSchemaName, systemMigrationGroups }) =>
+					new SystemMigrationsRunner(
+						systemDatabaseContextFactory,
+						{ ...project, systemSchema: systemSchemaName },
+						this.schemaProvider,
+						systemMigrationGroups,
+						this.databaseMetadataResolver,
+					),
+			)
+			.addService(
+				'projectInitializer',
+				({ systemMigrationsRunner, systemDatabaseContext, project, systemSchemaName }) =>
+					new ProjectInitializer(new StageCreator(), systemMigrationsRunner, systemDatabaseContext, { ...project, systemSchema: systemSchemaName }),
+			)
+			.addService('projectDatabaseMetadataResolver', () => new ProjectDatabaseMetadataResolver(this.databaseMetadataResolver))
 	}
 }

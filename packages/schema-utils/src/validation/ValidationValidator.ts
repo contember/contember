@@ -65,7 +65,6 @@ export class ValidationValidator {
 		this.validateValidator(errorBuilder.for('validator'), rule.validator, entity, field)
 	}
 
-
 	private validateValidator(
 		errorBuilder: ErrorBuilder,
 		validator: Validation.Validator,
@@ -120,7 +119,7 @@ export class ValidationValidator {
 				)
 				return
 			default:
-				((_: never) => {
+				;((_: never) => {
 					errorBuilder.for('operation', `Operation ${(validatorCast as any).operation} is not an valid option`)
 				})(validatorCast)
 		}
@@ -134,7 +133,6 @@ export class ValidationValidator {
 	): void {
 		this.validateValidator(errorBuilder.for('validator'), argument.validator, entity, field)
 	}
-
 
 	private validatePathArgument(
 		errorBuilder: ErrorBuilder,

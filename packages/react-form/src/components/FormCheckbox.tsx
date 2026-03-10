@@ -45,7 +45,7 @@ export const FormCheckbox = Component<FormCheckboxProps>(({ field, isNonbearing,
 	return (
 		<SlotInput
 			ref={it => {
-				(ref as any).current = checkboxRef
+				;(ref as any).current = checkboxRef
 				setCheckboxRef(it)
 			}}
 			type="checkbox"

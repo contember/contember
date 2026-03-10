@@ -1,7 +1,13 @@
 import { ApiKeyManager } from './apiKey'
 import { ConfigurationQuery, PersonQuery, PersonRow } from '../queries'
 import { Response, ResponseError, ResponseOk } from '../utils/Response'
-import { ActivatePasswordlessOtpErrorCode, ConfigPolicy, InitSignInPasswordlessErrorCode, InitSignInPasswordlessResult, SignInPasswordlessErrorCode } from '../../schema'
+import {
+	ActivatePasswordlessOtpErrorCode,
+	ConfigPolicy,
+	InitSignInPasswordlessErrorCode,
+	InitSignInPasswordlessResult,
+	SignInPasswordlessErrorCode,
+} from '../../schema'
 import { DatabaseContext, validateToken } from '../utils'
 import { UserMailer } from '../mailing'
 import { ActivateOtpCommand, CreatePersonTokenCommand, IncreaseOtpAttemptCommand, InvalidateTokenCommand } from '../commands'
@@ -21,7 +27,6 @@ class PasswordlessSignInManager {
 		private readonly mailer: UserMailer,
 		private readonly projectManager: ProjectManager,
 		private readonly otpAuthenticator: OtpAuthenticator,
-
 	) {}
 
 	async initSignInPasswordless({ db, permissionContext, mailVariant, mailProject, email }: {
@@ -56,9 +61,11 @@ class PasswordlessSignInManager {
 				})
 			}
 
-			const createTokenCommand = CreatePersonTokenCommand.createPasswordlessRequest(person.id, intervalToSeconds(configuration.passwordless.expiration) / 60)
+			const createTokenCommand = CreatePersonTokenCommand.createPasswordlessRequest(
+				person.id,
+				intervalToSeconds(configuration.passwordless.expiration) / 60,
+			)
 			const result = await db.commandBus.execute(createTokenCommand)
-
 
 			const url = this.formatUrl(configuration.passwordless.url ?? null, result.token, result.id, email) ?? undefined
 
@@ -110,7 +117,6 @@ class PasswordlessSignInManager {
 		expiration?: number
 	}): Promise<PasswordlessSignInManager.SignInPasswordlessResponse> {
 		return db.transaction(async (db): Promise<PasswordlessSignInManager.SignInPasswordlessResponse> => {
-
 			const tokenResult = await db.queryHandler.fetch(PersonTokenQuery.byId(requestId, 'passwordless'))
 			const tokenValidationResult = validateToken({
 				entry: tokenResult,
@@ -187,7 +193,6 @@ class PasswordlessSignInManager {
 		otpHash: string
 	}): Promise<PasswordlessSignInManager.ActivatePasswordlessOtpResponse> {
 		return db.transaction(async (db): Promise<PasswordlessSignInManager.ActivatePasswordlessOtpResponse> => {
-
 			const tokenResult = await db.queryHandler.fetch(PersonTokenQuery.byId(requestId, 'passwordless'))
 			const tokenValidationResult = validateToken({
 				entry: tokenResult,
@@ -232,12 +237,15 @@ class PasswordlessSignInManager {
 }
 
 namespace PasswordlessSignInManager {
-	export type InitSignInPasswordlessResponse = Response<InitSignInPasswordlessResult & {
-		[AuthLogService.Key]: AuthLogService.Bag
-	}, InitSignInPasswordlessErrorCode, {
-		[AuthLogService.Key]: AuthLogService.Bag
-	}>
-
+	export type InitSignInPasswordlessResponse = Response<
+		InitSignInPasswordlessResult & {
+			[AuthLogService.Key]: AuthLogService.Bag
+		},
+		InitSignInPasswordlessErrorCode,
+		{
+			[AuthLogService.Key]: AuthLogService.Bag
+		}
+	>
 
 	interface SignInPasswordlessResult {
 		readonly person: PersonRow
@@ -248,11 +256,15 @@ namespace PasswordlessSignInManager {
 		[AuthLogService.Key]: AuthLogService.Bag
 	}>
 
-	export type ActivatePasswordlessOtpResponse = Response<{
-		[AuthLogService.Key]: AuthLogService.Bag
-	}, ActivatePasswordlessOtpErrorCode, {
-		[AuthLogService.Key]: AuthLogService.Bag
-	}>
+	export type ActivatePasswordlessOtpResponse = Response<
+		{
+			[AuthLogService.Key]: AuthLogService.Bag
+		},
+		ActivatePasswordlessOtpErrorCode,
+		{
+			[AuthLogService.Key]: AuthLogService.Bag
+		}
+	>
 }
 
 export { PasswordlessSignInManager }

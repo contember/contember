@@ -1,4 +1,4 @@
-import { Editor as SlateEditor, Editor, Element as SlateElement, Node as SlateNode, Transforms } from 'slate'
+import { Editor, Editor as SlateEditor, Element as SlateElement, Node as SlateNode, Transforms } from 'slate'
 import { ContemberEditor } from '../../../editor'
 import { AlignDirection } from '../../attributes'
 import { EditorElementPlugin, ElementRenderer } from '../../../types'
@@ -17,7 +17,7 @@ export const isParagraphElement = (
 	suchThat?: Partial<ParagraphElement>,
 ): element is ParagraphElement => ContemberEditor.isElementType(element, paragraphElementType, suchThat)
 
-export const paragraphElementPlugin = ({ render }: {render: ElementRenderer<ParagraphElement>}): EditorElementPlugin<ParagraphElement> => ({
+export const paragraphElementPlugin = ({ render }: { render: ElementRenderer<ParagraphElement> }): EditorElementPlugin<ParagraphElement> => ({
 	type: paragraphElementType,
 	render,
 	canContainAnyBlocks: false,

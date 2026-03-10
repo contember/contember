@@ -254,11 +254,13 @@ class Compiler {
 
 	private createValues(values: QueryBuilder.ResolvedValues[]): Literal {
 		return Literal.empty.appendAll(
-			values.map(it => Literal.empty.appendAll(
-				it.map(({ value }) => value),
-				', ',
-				['(', ')'],
-			)),
+			values.map(it =>
+				Literal.empty.appendAll(
+					it.map(({ value }) => value),
+					', ',
+					['(', ')'],
+				)
+			),
 			', ',
 		)
 	}

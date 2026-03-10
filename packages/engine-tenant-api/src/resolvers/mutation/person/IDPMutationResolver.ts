@@ -1,10 +1,4 @@
-import {
-	InitSignInIdpResponse,
-	MutationInitSignInIdpArgs,
-	MutationResolvers,
-	MutationSignInIdpArgs,
-	SignInIdpResponse,
-} from '../../../schema'
+import { InitSignInIdpResponse, MutationInitSignInIdpArgs, MutationResolvers, MutationSignInIdpArgs, SignInIdpResponse } from '../../../schema'
 import { TenantResolverContext } from '../../TenantResolverContext'
 import { IDPSignInManager, PermissionActions } from '../../../model'
 import { createErrorResponse } from '../../errorUtils'
@@ -25,9 +19,13 @@ export class IDPMutationResolver implements MutationResolvers {
 			action: PermissionActions.PERSON_CREATE_IDP_URL,
 			message: 'You are not allowed to create a redirect URL for IDP',
 		})
-		const result = await this.idpSignInManager.initSignInIDP(context.db, args.identityProvider, args.data ?? {
-			redirectUrl: args.redirectUrl,
-		})
+		const result = await this.idpSignInManager.initSignInIDP(
+			context.db,
+			args.identityProvider,
+			args.data ?? {
+				redirectUrl: args.redirectUrl,
+			},
+		)
 		if (!result.ok) {
 			return createErrorResponse(result.error, result.errorMessage)
 		}

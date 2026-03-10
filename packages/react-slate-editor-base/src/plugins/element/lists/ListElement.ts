@@ -7,7 +7,8 @@ import { isListItemElement } from './ListItemElement'
 export const isListElement = <T extends UnorderedListElement | OrderedListElement>(
 	element: Node,
 	suchThat?: Partial<T>,
-): element is T => isOrderedListElement(element, suchThat as Partial<OrderedListElement>) || isUnorderedListElement(element, suchThat as Partial<UnorderedListElement>)
+): element is T =>
+	isOrderedListElement(element, suchThat as Partial<OrderedListElement>) || isUnorderedListElement(element, suchThat as Partial<UnorderedListElement>)
 
 export const getParentListElement = (editor: Editor): Element | undefined => {
 	const closestNonDefaultEntry = ContemberEditor.closest(editor, {

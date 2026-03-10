@@ -2,20 +2,21 @@ import { extendEntity } from './extensions'
 import { DecoratorFunction } from '../../utils'
 import { Model } from '@contember/schema'
 
-export type UniqueOptions<T> = {
-	fields: (keyof T & string)[]
-
-} & (
-	| {
-		index?: false
-		timing?: Model.ConstraintTiming
+export type UniqueOptions<T> =
+	& {
+		fields: (keyof T & string)[]
 	}
-	| {
-		index: true
-		nulls?: Model.NullsDistinctBehaviour
-		method?: Model.IndexMethod
-	}
-)
+	& (
+		| {
+			index?: false
+			timing?: Model.ConstraintTiming
+		}
+		| {
+			index: true
+			nulls?: Model.NullsDistinctBehaviour
+			method?: Model.IndexMethod
+		}
+	)
 export function Unique<T>(options: UniqueOptions<T>): DecoratorFunction<T>
 export function Unique<T>(...fields: (keyof T & string)[]): DecoratorFunction<T>
 export function Unique<T>(options: UniqueOptions<T> | keyof T & string, ...args: (keyof T & string)[]): DecoratorFunction<T> {

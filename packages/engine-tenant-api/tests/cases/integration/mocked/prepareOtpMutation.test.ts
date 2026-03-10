@@ -2,7 +2,7 @@ import { authenticatedIdentityId, executeTenantTest } from '../../../src/testTen
 import { testUuid } from '../../../src/testUuid'
 import { prepareOtpMutation } from './gql/prepareOtp'
 import { getPersonByIdentity } from './sql/getPersonByIdentity'
-import { test, expect } from 'bun:test'
+import { expect, test } from 'bun:test'
 
 test('prepare otp', async () => {
 	const personId = testUuid(1)
@@ -32,4 +32,3 @@ test('prepare otp', async () => {
 		},
 	})
 })
-

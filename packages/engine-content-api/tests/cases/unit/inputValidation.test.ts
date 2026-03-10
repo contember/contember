@@ -14,8 +14,6 @@ import { describe, expect, it } from 'bun:test'
 import { assert } from '../../src/assert'
 
 describe('input validation tests', () => {
-
-
 	it('evaluates rule', () => {
 		const r = validation.rules
 		const rule = r.conditional(
@@ -106,14 +104,12 @@ describe('input validation tests', () => {
 				e
 					.column('deleted', c => c.type(Model.ColumnType.Bool))
 					.column('published', c => c.type(Model.ColumnType.Bool))
-					.manyHasOne('category', r => r.target('Category')),
-			)
+					.manyHasOne('category', r => r.target('Category')))
 			.entity('Category', e => e.column('name'))
 			.entity('Author', e =>
 				e
 					.oneHasMany('books', r => r.target('Book').ownedBy('author'))
-					.column('published', c => c.type(Model.ColumnType.Bool)),
-			)
+					.column('published', c => c.type(Model.ColumnType.Bool)))
 			.buildSchema()
 		const dependencies: Dependencies = {
 			books: {
@@ -165,7 +161,6 @@ describe('input validation tests', () => {
 	})
 
 	describe('validation - trinary logic', () => {
-
 		it('trinary "and" results in a null', () => {
 			const rule = validation.rules.and(
 				validation.rules.on('email', validation.rules.pattern(/.+@.+/)),

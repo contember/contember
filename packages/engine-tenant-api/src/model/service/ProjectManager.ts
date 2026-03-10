@@ -1,9 +1,4 @@
-import {
-	AddProjectMemberCommand,
-	CreateProjectCommand,
-	SetProjectSecretCommand,
-	UpdateProjectCommand,
-} from '../commands'
+import { AddProjectMemberCommand, CreateProjectCommand, SetProjectSecretCommand, UpdateProjectCommand } from '../commands'
 import { PermissionContext } from '../authorization'
 import { Project, ProjectInitializer, ProjectWithSecrets } from '../type'
 import { ProjectBySlugQuery, ProjectsByIdentityQuery, ProjectsQuery, ProjectUpdateTimestampQuery } from '../queries'
@@ -114,7 +109,6 @@ export class ProjectManager {
 }
 
 export class ProjectInitError extends Error {}
-
 
 export type CreateProjectResponse = Response<CreateProjectResult, CreateProjectResponseErrorCode>
 

@@ -1,4 +1,3 @@
-
 import { describe, expect, it } from 'bun:test'
 import { ProjectMembershipFetcher, ProjectMembershipResolver } from '../../../src'
 import { createMock } from '../../utils'
@@ -6,11 +5,14 @@ import { Acl } from '@contember/schema'
 
 describe('membership resolver', () => {
 	it('should return implicit role', async () => {
-		const membershipResolver = new ProjectMembershipResolver(false, createMock<ProjectMembershipFetcher>({
-			fetchMemberships(): Promise<readonly Acl.Membership[]> {
-				return Promise.resolve([])
-			},
-		}))
+		const membershipResolver = new ProjectMembershipResolver(
+			false,
+			createMock<ProjectMembershipFetcher>({
+				fetchMemberships(): Promise<readonly Acl.Membership[]> {
+					return Promise.resolve([])
+				},
+			}),
+		)
 		const resolvedMembership = await membershipResolver.resolveMemberships({
 			request: {
 				body: {},
@@ -34,13 +36,15 @@ describe('membership resolver', () => {
 		expect(resolvedMembership.effective).toStrictEqual([{ role: 'test', variables: [] }])
 	})
 
-
 	it('should return fetched memberships', async () => {
-		const membershipResolver = new ProjectMembershipResolver(false, createMock<ProjectMembershipFetcher>({
-			fetchMemberships(): Promise<readonly Acl.Membership[]> {
-				return Promise.resolve([{ role: 'test', variables: [] }])
-			},
-		}))
+		const membershipResolver = new ProjectMembershipResolver(
+			false,
+			createMock<ProjectMembershipFetcher>({
+				fetchMemberships(): Promise<readonly Acl.Membership[]> {
+					return Promise.resolve([{ role: 'test', variables: [] }])
+				},
+			}),
+		)
 		const resolvedMembership = await membershipResolver.resolveMemberships({
 			request: {
 				body: {},
@@ -64,17 +68,21 @@ describe('membership resolver', () => {
 	})
 
 	it('should return assumed membership', async () => {
-		const membershipResolver = new ProjectMembershipResolver(false, createMock<ProjectMembershipFetcher>({
-			fetchMemberships(): Promise<readonly Acl.Membership[]> {
-				return Promise.resolve([{ role: 'admin', variables: [] }])
-			},
-		}))
+		const membershipResolver = new ProjectMembershipResolver(
+			false,
+			createMock<ProjectMembershipFetcher>({
+				fetchMemberships(): Promise<readonly Acl.Membership[]> {
+					return Promise.resolve([{ role: 'admin', variables: [] }])
+				},
+			}),
+		)
 		const resolvedMembership = await membershipResolver.resolveMemberships({
 			request: {
 				body: {},
-				get: () => JSON.stringify({
-					memberships: [{ role: 'test', variables: [{ name: 'lang', values: [JSON.stringify({ eq: 'cs' })] }] }],
-				}),
+				get: () =>
+					JSON.stringify({
+						memberships: [{ role: 'test', variables: [{ name: 'lang', values: [JSON.stringify({ eq: 'cs' })] }] }],
+					}),
 			},
 			projectSlug: 'test',
 			identity: {
@@ -109,11 +117,14 @@ describe('membership resolver', () => {
 	})
 
 	it('should return assumed membership from a body', async () => {
-		const membershipResolver = new ProjectMembershipResolver(false, createMock<ProjectMembershipFetcher>({
-			fetchMemberships(): Promise<readonly Acl.Membership[]> {
-				return Promise.resolve([{ role: 'admin', variables: [] }])
-			},
-		}))
+		const membershipResolver = new ProjectMembershipResolver(
+			false,
+			createMock<ProjectMembershipFetcher>({
+				fetchMemberships(): Promise<readonly Acl.Membership[]> {
+					return Promise.resolve([{ role: 'admin', variables: [] }])
+				},
+			}),
+		)
 		const resolvedMembership = await membershipResolver.resolveMemberships({
 			request: {
 				body: {

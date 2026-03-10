@@ -66,7 +66,7 @@ export class AccessorErrorManager {
 
 			let errorsById: ErrorAccessor.ErrorsById | undefined = this.errorsByState.get(state)
 			if (errorsById === undefined) {
-				this.errorsByState.set(state, (errorsById = new Map()))
+				this.errorsByState.set(state, errorsById = new Map())
 			}
 			errorsById.set(errorId, error)
 			state.errors = { errors: Array.from(errorsById.values()) }

@@ -13,7 +13,7 @@ import { createErrorResponse } from '../../errorUtils'
 export class ChangeProfileMutationResolver implements Pick<MutationResolvers, 'changeMyProfile' | 'changeProfile'> {
 	constructor(
 		private readonly personManager: PersonManager,
-	) { }
+	) {}
 
 	async changeProfile(
 		parent: unknown,
@@ -51,7 +51,6 @@ export class ChangeProfileMutationResolver implements Pick<MutationResolvers, 'c
 
 		return { ok: true }
 	}
-
 
 	async changeMyProfile(
 		parent: unknown,

@@ -1,5 +1,4 @@
 export const resolveAllAcceptedMimes = (inputMimes: (Record<string, string[]> | undefined)[]): Record<string, string[]> | undefined => {
-
 	// new implementation
 	const result: Record<string, string[]> = {}
 	for (const mimes of inputMimes) {

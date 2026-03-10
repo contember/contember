@@ -17,16 +17,20 @@ export const useDataViewElements = ({ selection }: {
 	const env = useEnvironment()
 
 	const [analyzer] = useState(() => {
-		const elementNode = new BranchNode((node, child: undefined | DataViewElementData | DataViewElementData[], env: Environment): DataViewElementData => {
-			return {
-				name: node.props.name,
-				label: node.props.label,
-				fallback: node.props.fallback,
-				children: Array.isArray(child) ? child : child ? [child] : [],
-			}
-		}, DataViewElement, {
-			childrenAreOptional: true,
-		})
+		const elementNode = new BranchNode(
+			(node, child: undefined | DataViewElementData | DataViewElementData[], env: Environment): DataViewElementData => {
+				return {
+					name: node.props.name,
+					label: node.props.label,
+					fallback: node.props.fallback,
+					children: Array.isArray(child) ? child : child ? [child] : [],
+				}
+			},
+			DataViewElement,
+			{
+				childrenAreOptional: true,
+			},
+		)
 
 		return new ChildrenAnalyzer<
 			never,

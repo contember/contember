@@ -18,8 +18,8 @@ export class ProjectQueryResolver implements QueryResolvers {
 	): Promise<Maybe<Project>> {
 		const project = await this.projectManager.getProjectBySlug(context.db, args.slug)
 		if (
-			!project ||
-			!(await context.isAllowed({
+			!project
+			|| !(await context.isAllowed({
 				scope: await context.permissionContext.createProjectScope(project),
 				action: PermissionActions.PROJECT_VIEW,
 			}))

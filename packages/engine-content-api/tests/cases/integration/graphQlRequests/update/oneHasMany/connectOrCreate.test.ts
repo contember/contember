@@ -28,7 +28,8 @@ test('connectOrCreate - exists', async () => {
 					response: { rows: [{ id: testUuid(10) }] },
 				},
 				{
-					sql: SQL`with "newData_" as (select ? :: uuid as "post_id", "root_"."post_id" as "post_id_old__", "root_"."id", "root_"."title", "root_"."locale"  from "public"."post_locale" as "root_"  where "root_"."id" = ?) update  "public"."post_locale" set  "post_id" =  "newData_"."post_id"   from "newData_"  where "post_locale"."id" = "newData_"."id"  returning "post_id_old__"`,
+					sql:
+						SQL`with "newData_" as (select ? :: uuid as "post_id", "root_"."post_id" as "post_id_old__", "root_"."id", "root_"."title", "root_"."locale"  from "public"."post_locale" as "root_"  where "root_"."id" = ?) update  "public"."post_locale" set  "post_id" =  "newData_"."post_id"   from "newData_"  where "post_locale"."id" = "newData_"."id"  returning "post_id_old__"`,
 					parameters: [testUuid(2), testUuid(10)],
 					response: { rows: [{ post_id_old__: testUuid(1) }] },
 				},
@@ -87,4 +88,3 @@ test('upsert - not exists (composed unique)', async () => {
 		},
 	})
 })
-

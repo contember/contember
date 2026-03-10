@@ -39,7 +39,8 @@ test('delete post and orphaned content', async () => {
 					response: { rows: [{ id: testUuid(1) }] },
 				},
 				{
-					sql: SQL`select "root_"."id" as "id", "root_"."content_id" as "_content_id", true as "allowed" from "public"."post" as "root_" where "root_"."id" = ?`,
+					sql:
+						SQL`select "root_"."id" as "id", "root_"."content_id" as "_content_id", true as "allowed" from "public"."post" as "root_" where "root_"."id" = ?`,
 					parameters: [testUuid(1)],
 					response: {
 						rows: [{ id: testUuid(1), _content_id: testUuid(2), allowed: true }],
@@ -62,12 +63,12 @@ test('delete post and orphaned content', async () => {
 				{
 					sql: SQL`delete from "public"."post" where "id" in (?)`,
 					parameters: [testUuid(1)],
-					response: { },
+					response: {},
 				},
 				{
 					sql: SQL`delete from "public"."content" where "id" in (?)`,
 					parameters: [testUuid(2)],
-					response: { },
+					response: {},
 				},
 			]),
 		],
@@ -82,5 +83,3 @@ test('delete post and orphaned content', async () => {
 		},
 	})
 })
-
-

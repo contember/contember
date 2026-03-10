@@ -1,8 +1,16 @@
 import { ComponentType, ReactNode, useCallback } from 'react'
 import { Slot } from '@radix-ui/react-slot'
-import { BindingError, EntityListAccessor, ErrorPersistResult,
-	isEntityListAccessor, SuccessfulPersistResult, SugaredRelativeSingleEntity, useEntity, useMutationState, usePersist } from '@contember/react-binding'
-
+import {
+	BindingError,
+	EntityListAccessor,
+	ErrorPersistResult,
+	isEntityListAccessor,
+	SuccessfulPersistResult,
+	SugaredRelativeSingleEntity,
+	useEntity,
+	useMutationState,
+	usePersist,
+} from '@contember/react-binding'
 
 const SlotButton = Slot as ComponentType<React.ButtonHTMLAttributes<HTMLButtonElement>>
 

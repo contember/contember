@@ -34,7 +34,7 @@ export interface DataViewNumberFilterProps {
  * ## Example
  * ```tsx
  * <DataViewNumberFilter field="price">
- *   //  Filter controls here 
+ *   //  Filter controls here
  * </DataViewNumberFilter>
  * ```
  */

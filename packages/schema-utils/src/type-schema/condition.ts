@@ -25,27 +25,31 @@ const conditionSchemaInner = <T extends Json>(metadata: ResolvedColumnMetadata<T
 			isNull: Typesafe.boolean,
 			never: Typesafe.true_,
 			always: Typesafe.true_,
-			...(metadata.isJson !== true ? {
-				eq: inner,
-				notEq: inner,
-				in: Typesafe.array(inner),
-				notIn: Typesafe.array(inner),
-				lt: inner,
-				lte: inner,
-				gt: inner,
-				gte: inner,
-			} : {
-				// For JSON columns, allow includes operator
-				includes: inner,
-			}),
-			...(metadata.isString !== false ? {
-				contains: Typesafe.string,
-				startsWith: Typesafe.string,
-				endsWith: Typesafe.string,
-				containsCI: Typesafe.string,
-				startsWithCI: Typesafe.string,
-				endsWithCI: Typesafe.string,
-			} : {}),
+			...(metadata.isJson !== true
+				? {
+					eq: inner,
+					notEq: inner,
+					in: Typesafe.array(inner),
+					notIn: Typesafe.array(inner),
+					lt: inner,
+					lte: inner,
+					gt: inner,
+					gte: inner,
+				}
+				: {
+					// For JSON columns, allow includes operator
+					includes: inner,
+				}),
+			...(metadata.isString !== false
+				? {
+					contains: Typesafe.string,
+					startsWith: Typesafe.string,
+					endsWith: Typesafe.string,
+					containsCI: Typesafe.string,
+					startsWithCI: Typesafe.string,
+					endsWithCI: Typesafe.string,
+				}
+				: {}),
 		}))
 		return objectSchema(input, path) as Input.Condition<T>
 	}
@@ -57,10 +61,8 @@ const resolveColumnMetadata = (type: Model.ColumnType): ResolvedColumnMetadata<a
 		type: resolvedType,
 		isJson: type === Model.ColumnType.Json,
 		isString: type === Model.ColumnType.String,
-
 	}
 }
-
 
 const resolveColumnTypeSchema = (type: Model.ColumnType) => {
 	switch (type) {

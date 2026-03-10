@@ -92,7 +92,6 @@ test('column name collision', () => {
 	])
 })
 
-
 namespace ViewRelations {
 	@c.View('SELECT 1')
 	export class Foo {

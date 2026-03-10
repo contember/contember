@@ -10,9 +10,8 @@ export default () => (
 		<div className="prose prose-lg max-w-2xl">
 			<div className="space-y-6">
 				<p className="text-gray-700">
-					This is a place where you can find examples of how to use the Contember framework.
-					Explore examples of various components, page creation, data views, forms, blocks,
-					layout components, and much more.
+					This is a place where you can find examples of how to use the Contember framework. Explore examples of various components, page creation, data
+					views, forms, blocks, layout components, and much more.
 				</p>
 
 				<p className="text-gray-700">

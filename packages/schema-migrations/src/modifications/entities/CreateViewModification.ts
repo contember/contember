@@ -37,7 +37,6 @@ export class CreateViewModificationHandler implements ModificationHandler<Create
 		}))
 	}
 
-
 	describe() {
 		return { message: `Add view ${this.data.entity.name}` }
 	}

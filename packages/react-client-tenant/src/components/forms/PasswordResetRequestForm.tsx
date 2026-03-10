@@ -22,7 +22,6 @@ export type PasswordResetRequestFormError = FormError<PasswordResetRequestFormVa
 
 export type PasswordResetRequestFormContextValue = FormContextValue<PasswordResetRequestFormValues, PasswordResetRequestFormErrorCode>
 
-
 export interface PasswordResetRequestFormProps {
 	children: ReactElement
 	onSuccess?: () => void
@@ -31,7 +30,6 @@ export interface PasswordResetRequestFormProps {
 export const usePasswordResetRequestForm = useForm as () => PasswordResetRequestFormContextValue
 
 export const PasswordResetRequestForm = ({ children, onSuccess }: PasswordResetRequestFormProps) => {
-
 	const createResetRequest = useCreateResetPasswordRequestMutation()
 	return (
 		<TenantForm<PasswordResetRequestFormContextValue>
@@ -57,7 +55,6 @@ export const PasswordResetRequestForm = ({ children, onSuccess }: PasswordResetR
 			{children}
 		</TenantForm>
 	)
-
 }
 const errorToField: Record<TenantApi.CreatePasswordResetRequestErrorCode, keyof PasswordResetRequestFormValues | undefined> = {
 	PERSON_NOT_FOUND: 'email',

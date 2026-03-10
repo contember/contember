@@ -7,21 +7,25 @@ export const DataViewInfiniteLoadEachRow = Component(({ children }: {
 	children: ReactNode
 }) => {
 	const accessors = useDataViewInfiniteLoadAccessors()
-	return <>
-		{accessors.map((accessor, index) => {
-			return (
-				<Fragment key={Array.from(accessor.ids()).join('__')}>
-					{Array.from(accessor, (entity: EntityAccessor) => {
-						return (
-							<Entity key={entity.key} accessor={entity}>
-								{children}
-							</Entity>
-						)
-					})}
-				</Fragment>
-			)
-		})}
+	return (
+		<>
+			{accessors.map((accessor, index) => {
+				return (
+					<Fragment key={Array.from(accessor.ids()).join('__')}>
+						{Array.from(accessor, (entity: EntityAccessor) => {
+							return (
+								<Entity key={entity.key} accessor={entity}>
+									{children}
+								</Entity>
+							)
+						})}
+					</Fragment>
+				)
+			})}
+		</>
+	)
+}, ({ children }) => (
+	<>
+		{children}
 	</>
-}, ({ children }) => <>
-	{children}
-</>)
+))

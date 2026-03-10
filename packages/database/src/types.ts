@@ -9,7 +9,6 @@ export type Value =
 	| readonly Date[]
 	| Buffer
 
-
 export interface Raw {
 	sql: string
 	bindings: Value[]

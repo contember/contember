@@ -1,4 +1,4 @@
-import { NullLoggerHandler, withLogger, createLogger } from '@contember/logger'
+import { createLogger, NullLoggerHandler, withLogger } from '@contember/logger'
 import { graphql, GraphQLSchema } from 'graphql'
 import { expect } from 'bun:test'
 

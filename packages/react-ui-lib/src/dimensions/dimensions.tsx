@@ -62,7 +62,9 @@ export const DimensionsSwitcher = Component(({ options, dimension, children, slu
 	</DataView>
 ))
 
-const DimensionSwitcherCurrentValues = ({ children, dimension, slugField }: { children: ReactNode; dimension: string; slugField: SugaredRelativeSingleField['field'] }) => {
+const DimensionSwitcherCurrentValues = (
+	{ children, dimension, slugField }: { children: ReactNode; dimension: string; slugField: SugaredRelativeSingleField['field'] },
+) => {
 	const entitiesBySlug = useDimensionEntitiesBySlug(slugField)
 	const currentDimensionValue = useDimensionState({
 		dimension,
@@ -84,7 +86,14 @@ const DimensionSwitcherCurrentValues = ({ children, dimension, slugField }: { ch
 	)
 }
 
-const DimensionSwitcherItem = ({ children, dimension, slugField, isMulti }: { children: ReactNode; dimension: string; slugField: SugaredRelativeSingleField['field']; isMulti?: boolean }) => {
+const DimensionSwitcherItem = (
+	{ children, dimension, slugField, isMulti }: {
+		children: ReactNode
+		dimension: string
+		slugField: SugaredRelativeSingleField['field']
+		isMulti?: boolean
+	},
+) => {
 	const entity = useEntity()
 	const slugValue = entity.getField<string>(slugField).value
 
@@ -103,7 +112,8 @@ const DimensionSwitcherItem = ({ children, dimension, slugField, isMulti }: { ch
 
 export const DimensionLabel = ({ label, dimensionValue }: { label: ReactNode; dimensionValue: ReactNode }) => (
 	<DimensionLabelWrapperUI>
-		{label}<DimensionLabelUI>{dimensionValue}</DimensionLabelUI>
+		{label}
+		<DimensionLabelUI>{dimensionValue}</DimensionLabelUI>
 	</DimensionLabelWrapperUI>
 )
 
@@ -123,12 +133,14 @@ export type SideDimensionsProps = {
 export const SideDimensions = Component<SideDimensionsProps>(({ dimension, children, as, field, renderLabel }) => (
 	<div className="flex mt-4 gap-4">
 		<DimensionRenderer dimension={dimension} as={as}>
-			<LabelMiddlewareProvider value={(label, environment) => {
-				const dimensionValue = environment.getVariableOrElse(as, null) as string | null
-				const Component = renderLabel || DimensionLabel
+			<LabelMiddlewareProvider
+				value={(label, environment) => {
+					const dimensionValue = environment.getVariableOrElse(as, null) as string | null
+					const Component = renderLabel || DimensionLabel
 
-				return <Component label={label} dimensionValue={dimensionValue} />
-			}}>
+					return <Component label={label} dimensionValue={dimensionValue} />
+				}}
+			>
 				<HasOne field={field}>
 					<div className="flex-1">{children}</div>
 				</HasOne>

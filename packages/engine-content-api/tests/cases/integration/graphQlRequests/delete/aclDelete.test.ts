@@ -53,11 +53,10 @@ test('delete post with acl (denied)', async () => {
 			data: {
 				deletePost: {
 					ok: false,
-					errorMessage: 'Execution has failed:\n' +
-						'unknown field: NotFoundOrDenied (for input {"id":{"in":["123e4567-e89b-12d3-a456-000000000001"]}})',
+					errorMessage: 'Execution has failed:\n'
+						+ 'unknown field: NotFoundOrDenied (for input {"id":{"in":["123e4567-e89b-12d3-a456-000000000001"]}})',
 				},
 			},
 		},
 	})
 })
-

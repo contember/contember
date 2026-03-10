@@ -28,4 +28,3 @@ export const DataViewHasManyLabel = ({ field }: { field: SugaredRelativeEntityLi
 	const formatter = useFieldLabelFormatter()
 	return <>{formatter(entity.name, targetField.name)}</>
 }
-

@@ -11,7 +11,9 @@ export interface DataViewNullFilterTriggerAttributes {
 	['data-current']: DataViewNullFilterState
 }
 
-const SlotType = Slot as React.ForwardRefExoticComponent<React.ButtonHTMLAttributes<HTMLButtonElement> & React.RefAttributes<HTMLButtonElement> & DataViewNullFilterTriggerAttributes>
+const SlotType = Slot as React.ForwardRefExoticComponent<
+	React.ButtonHTMLAttributes<HTMLButtonElement> & React.RefAttributes<HTMLButtonElement> & DataViewNullFilterTriggerAttributes
+>
 
 export interface DataViewNullFilterTriggerProps {
 	/**
@@ -34,7 +36,6 @@ export interface DataViewNullFilterTriggerProps {
 }
 
 /**
- *
  * A trigger component for managing null filters in a data view.
  *
  * ## Props

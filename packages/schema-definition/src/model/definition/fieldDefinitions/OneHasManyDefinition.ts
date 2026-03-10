@@ -28,7 +28,6 @@ export class OneHasManyDefinition extends FieldDefinition<OneHasManyDefinitionOp
 	}
 }
 
-
 export function oneHasMany(target: EntityConstructor, ownedBy: string): OneHasManyDefinition {
 	return new OneHasManyDefinition({ target, ownedBy })
 }

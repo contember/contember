@@ -3,7 +3,6 @@ import { LogEntry, LoggerHandler } from '../types'
 export class TestLoggerHandler implements LoggerHandler {
 	public readonly messages: LogEntry[] = []
 
-
 	constructor(
 		private print = false,
 	) {

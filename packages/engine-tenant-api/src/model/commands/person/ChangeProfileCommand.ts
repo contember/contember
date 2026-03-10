@@ -7,7 +7,7 @@ export type ChangeProfileData = {
 }
 
 export class ChangeProfileCommand implements Command<void> {
-	constructor(private readonly personId: string, private readonly data: ChangeProfileData) { }
+	constructor(private readonly personId: string, private readonly data: ChangeProfileData) {}
 
 	async execute({ db }: Command.Args): Promise<void> {
 		await UpdateBuilder.create()

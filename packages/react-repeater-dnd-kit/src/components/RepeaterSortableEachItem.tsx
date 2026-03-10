@@ -19,7 +19,6 @@ export const RepeaterSortableEachItem = ({ children }: {
 				<RepeaterSortableEachItemInner>
 					{children}
 				</RepeaterSortableEachItemInner>
-
 			</RepeaterEachItem>
 		</SortableContext>
 	)

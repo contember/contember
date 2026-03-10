@@ -16,8 +16,8 @@ export class ProjectMembersQueryResolver implements QueryResolvers {
 		const project = await this.projectManager.getProjectBySlug(context.db, args.projectSlug)
 		const projectScope = await context.permissionContext.createProjectScope(project)
 		if (
-			!project ||
-			!(await context.isAllowed({
+			!project
+			|| !(await context.isAllowed({
 				scope: projectScope,
 				action: PermissionActions.PROJECT_VIEW_MEMBER([]),
 			}))

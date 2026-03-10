@@ -5,9 +5,13 @@ import { prepareElementForInsertion } from '../utils'
 import { ElementWithReference } from '../elements'
 import { CreateElementReferences } from './useCreateElementReference'
 
-export type InsertElementWithReference = (element: Omit<SlateElement, 'referenceId'>, referenceDiscriminant: FieldValue, initialize?: EntityAccessor.BatchUpdatesHandler) => void
+export type InsertElementWithReference = (
+	element: Omit<SlateElement, 'referenceId'>,
+	referenceDiscriminant: FieldValue,
+	initialize?: EntityAccessor.BatchUpdatesHandler,
+) => void
 
-export const useInsertElementWithReference = ({ editor,  createElementReference }: {
+export const useInsertElementWithReference = ({ editor, createElementReference }: {
 	editor: Editor
 	createElementReference: CreateElementReferences
 }): InsertElementWithReference => {

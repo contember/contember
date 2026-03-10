@@ -8,10 +8,7 @@ export const postWithNullableLocale = new SchemaBuilder()
 				e
 					.unique(['locale', 'post'])
 					.column('title', c => c.type(Model.ColumnType.String))
-					.column('locale', c => c.type(Model.ColumnType.String)),
-			),
-		),
-	)
+					.column('locale', c => c.type(Model.ColumnType.String)))))
 	.buildSchema()
 
 export const postWithLocale = new SchemaBuilder()
@@ -24,8 +21,5 @@ export const postWithLocale = new SchemaBuilder()
 					e
 						.unique(['locale', 'post'])
 						.column('title', c => c.type(Model.ColumnType.String))
-						.column('locale', c => c.type(Model.ColumnType.String)),
-				),
-		),
-	)
+						.column('locale', c => c.type(Model.ColumnType.String)))))
 	.buildSchema()

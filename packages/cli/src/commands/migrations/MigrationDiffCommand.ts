@@ -58,7 +58,6 @@ export class MigrationDiffCommand extends Command<Args, Options> {
 			}
 			this.migrationPrinter.printMigrationDescription(result.initialSchema, result.migration, { noSql: true })
 
-
 			if (!yes) {
 				const { action } = await prompts({
 					type: 'select',
@@ -82,7 +81,6 @@ export class MigrationDiffCommand extends Command<Args, Options> {
 			const filename = await this.migrationCreator.saveMigration(result.migration)
 
 			console.log(`${filename} created`)
-
 		} catch (e) {
 			if (e instanceof InvalidSchemaException) {
 				printValidationErrors(e.validationErrors, e.message)

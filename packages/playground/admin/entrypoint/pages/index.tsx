@@ -56,7 +56,7 @@ const LoggedIn = () => {
 	return (
 		<Card className="w-96 relative">
 			<CardHeader>
-				<CardTitle className="text-2xl">Logged in </CardTitle>
+				<CardTitle className="text-2xl">Logged in</CardTitle>
 				<CardDescription>
 					as {identity?.person?.email ?? 'unknown'}
 				</CardDescription>
@@ -64,7 +64,4 @@ const LoggedIn = () => {
 			<Loader position="static" />
 		</Card>
 	)
-
 }
-
-

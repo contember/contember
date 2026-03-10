@@ -1,4 +1,4 @@
-import { Editor as SlateEditor, Editor, Element as SlateElement, Node as SlateNode, Range as SlateRange, Transforms } from 'slate'
+import { Editor, Editor as SlateEditor, Element as SlateElement, Node as SlateNode, Range as SlateRange, Transforms } from 'slate'
 import { EditorElementPlugin, ElementRenderer } from '../../../types'
 
 export const scrollTargetElementType = 'scrollTarget' as const
@@ -17,7 +17,9 @@ export const isScrollTargetElementActive = (editor: Editor) => {
 	return !!link
 }
 
-export const scrollTargetElementPlugin = ({ render }: { render: ElementRenderer<ScrollTargetElement> }): EditorElementPlugin<ScrollTargetElement> => ({
+export const scrollTargetElementPlugin = (
+	{ render }: { render: ElementRenderer<ScrollTargetElement> },
+): EditorElementPlugin<ScrollTargetElement> => ({
 	type: scrollTargetElementType,
 	render,
 	isActive: ({ editor }) => isScrollTargetElementActive(editor),
@@ -27,9 +29,8 @@ export const scrollTargetElementPlugin = ({ render }: { render: ElementRenderer<
 		if (isScrollTargetElementActive(editor)) {
 			unwrapScrollTarget(editor)
 		} else {
-			let identifier =
-				suchThat?.identifier ??
-				prompt('Insert the identifier:')
+			let identifier = suchThat?.identifier
+				?? prompt('Insert the identifier:')
 
 			if (!identifier) {
 				return

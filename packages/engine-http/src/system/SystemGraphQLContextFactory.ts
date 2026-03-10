@@ -5,7 +5,7 @@ import { Acl } from '@contember/schema'
 import { ProjectContainer } from '../project'
 
 export class SystemGraphQLContextFactory {
-	public async create({ authResult, memberships,  projectContainer, systemContainer, onClearCache }: {
+	public async create({ authResult, memberships, projectContainer, systemContainer, onClearCache }: {
 		authResult: AuthResult
 		memberships: readonly Acl.Membership[]
 		projectContainer: ProjectContainer
@@ -23,7 +23,7 @@ export class SystemGraphQLContextFactory {
 			identity,
 			project: { ...projectContainer.project, systemSchema: db.client.schema },
 			getSchema: async options => {
-				 return (await projectContainer.contentSchemaResolver.getSchema({ db, ...options })).schema
+				return (await projectContainer.contentSchemaResolver.getSchema({ db, ...options })).schema
 			},
 		})
 		return {

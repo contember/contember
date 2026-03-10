@@ -16,12 +16,10 @@ const IdentityStateContext_ = createRequiredContext<IdentityStateValue>('Identit
 export const IdentityStateContext = IdentityStateContext_[0]
 export const useIdentityState = IdentityStateContext_[1]
 
-
 const FormContext_ = createRequiredContext<FormContextValue<any, any, any>>('FormContext')
 /** @internal */
 export const FormContext = FormContext_[0]
 export const useForm = FormContext_[1]
-
 
 const IDPStateContext = createRequiredContext<IDPStateValue>('IDPStateContext')
 /** @internal */

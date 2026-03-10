@@ -1,9 +1,4 @@
-import {
-	Maybe,
-	Person,
-	QueryPersonByIdArgs,
-	QueryResolvers,
-} from '../../schema'
+import { Maybe, Person, QueryPersonByIdArgs, QueryResolvers } from '../../schema'
 import { TenantResolverContext } from '../TenantResolverContext'
 import { PermissionActions, PersonManager } from '../../model'
 import { PersonResponseFactory } from '../responseHelpers/PersonResponseFactory'

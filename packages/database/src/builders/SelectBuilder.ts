@@ -182,10 +182,18 @@ namespace SelectBuilder {
 	export type Result = Record<string, any>
 
 	export type OrderByDirection = 'asc' | 'desc' | 'asc nulls last' | 'asc nulls first' | 'desc nulls first' | 'desc nulls last'
-	export const orderByDirection = new Set<OrderByDirection>(['asc', 'desc', 'asc nulls last', 'asc nulls first', 'desc nulls first', 'desc nulls last'])
+	export const orderByDirection = new Set<OrderByDirection>([
+		'asc',
+		'desc',
+		'asc nulls last',
+		'asc nulls first',
+		'desc nulls first',
+		'desc nulls last',
+	])
 	export type Options = Readonly<
-		With.Options &
-		Where.Options & {
+		& With.Options
+		& Where.Options
+		& {
 			distinct?: Literal[]
 			select: Literal[]
 			limit: [number | undefined, number | undefined]

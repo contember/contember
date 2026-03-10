@@ -4,7 +4,6 @@ import { ActionsFactory } from './internal/ActionsFactory'
 export * from './triggers'
 export * from './targets'
 
-
 export const createActions = (
 	exportedDefinitions: Record<string, any>,
 ): Actions.Schema => {

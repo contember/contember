@@ -51,7 +51,6 @@ const watchTriggerSchema = Typesafe.intersection(
 
 const watchTriggerSchemaCheck: Typesafe.Equals<Actions.WatchTrigger, ReturnType<typeof watchTriggerSchema>> = true
 
-
 const basicTriggerSchema = Typesafe.intersection(
 	Typesafe.object({
 		type: Typesafe.literal('basic'),
@@ -69,7 +68,6 @@ const basicTriggerSchema = Typesafe.intersection(
 )
 
 const basicTriggerSchemaCheck: Typesafe.Equals<Actions.BasicTrigger, ReturnType<typeof basicTriggerSchema>> = true
-
 
 const anyTriggerSchema = Typesafe.union(
 	watchTriggerSchema,

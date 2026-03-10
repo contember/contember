@@ -49,7 +49,7 @@ test('query builder: constructs condition', async () => {
 						.in('m', wrapper.selectBuilder().select(expr => expr.selectValue(1)))
 						.exists(it => it)
 						.isNull('n')
-						.raw('false'),
+						.raw('false')
 				)
 
 			await qb.getResult(wrapper)
@@ -77,16 +77,15 @@ test('query builder: construct "on"', async () => {
 							clause
 								.compare(['bar', 'a'], Operator.eq, 1)
 								.compare(['bar', 'a'], Operator.eq, 2)
-								.not(clause => clause.compare(['bar', 'b'], Operator.eq, 1)),
+								.not(clause => clause.compare(['bar', 'b'], Operator.eq, 1))
 						)
 						.and(clause =>
 							clause
 								.in(['bar', 'c'], [1, 2, 3])
 								.isNull(['bar', 'd'])
 								.not(clause => clause.isNull(['bar', 'd']))
-								.compareColumns(['bar', 'e'], Operator.lte, ['bar', 'f']),
-						),
-				)
+								.compareColumns(['bar', 'e'], Operator.lte, ['bar', 'f'])
+						))
 			await qb.getResult(wrapper)
 		},
 		sql: SQL`select "foo"."id"
@@ -289,10 +288,7 @@ test('query builder: constructs select with condition', async () => {
 			const qb = wrapper
 				.selectBuilder()
 				.select(
-					expr =>
-						expr.selectCondition(condition =>
-							condition.or(condition => condition.compare('foo', Operator.gte, 1).compare('foo', Operator.lte, 0)),
-						),
+					expr => expr.selectCondition(condition => condition.or(condition => condition.compare('foo', Operator.gte, 1).compare('foo', Operator.lte, 0))),
 					'bar',
 				)
 			await qb.getResult(wrapper)
@@ -328,9 +324,7 @@ test('query builder: constructs window function', async () => {
 		query: async wrapper => {
 			const qb = wrapper
 				.selectBuilder()
-				.select(expr =>
-					expr.window(window => window.orderBy(['foo', 'bar'], 'desc').rowNumber().partitionBy(['lorem', 'ipsum'])),
-				)
+				.select(expr => expr.window(window => window.orderBy(['foo', 'bar'], 'desc').rowNumber().partitionBy(['lorem', 'ipsum'])))
 
 			await qb.getResult(wrapper)
 		},
@@ -410,9 +404,8 @@ test('query builder: select with recursive', async () => {
 								.select('id')
 								.from('events')
 								.from('recent_events')
-								.where(expr => expr.columnsEq(['events', 'id'], ['recent_events', 'previous_id'])),
-						),
-				)
+								.where(expr => expr.columnsEq(['events', 'id'], ['recent_events', 'previous_id']))
+						))
 				.select('id')
 				.from('recent_events')
 
@@ -426,4 +419,3 @@ test('query builder: select with recursive', async () => {
 		parameters: ['123'],
 	})
 })
-

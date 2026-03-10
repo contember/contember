@@ -8,10 +8,9 @@ import { testUuid } from '../../../../../src/testUuid'
 test('Post by category name (where many has many owning)', async () => {
 	await execute({
 		schema: new SchemaBuilder()
-			.entity('Post', entity =>
-				entity.manyHasMany('categories', relation =>
-					relation.target('Category', e => e.column('name', c => c.type(Model.ColumnType.String))),
-				),
+			.entity(
+				'Post',
+				entity => entity.manyHasMany('categories', relation => relation.target('Category', e => e.column('name', c => c.type(Model.ColumnType.String)))),
 			)
 			.buildSchema(),
 		query: GQL`
@@ -60,10 +59,9 @@ test('Post by category name (where many has many owning)', async () => {
 test('Post by category ids (where many has many owning)', async () => {
 	await execute({
 		schema: new SchemaBuilder()
-			.entity('Post', entity =>
-				entity.manyHasMany('categories', relation =>
-					relation.target('Category', e => e.column('name', c => c.type(Model.ColumnType.String))),
-				),
+			.entity(
+				'Post',
+				entity => entity.manyHasMany('categories', relation => relation.target('Category', e => e.column('name', c => c.type(Model.ColumnType.String)))),
 			)
 			.buildSchema(),
 		query: GQL`
@@ -108,20 +106,20 @@ test('Post by category ids (where many has many owning)', async () => {
 	})
 })
 
-
 test('Post by category tag name (where multiple many has many owning)', async () => {
 	await execute({
 		schema: new SchemaBuilder()
-			.entity('Post', entity =>
-				entity.manyHasMany('categories', relation =>
-					relation.target('Category', e =>
-						e.manyHasMany('tagsButWithVeryVeryVeryLongNameSoItReachesPostgresqlAliasLengthLimit', relation =>
-							relation.target('Tag', e =>
-								e.column('name', c => c.type(Model.ColumnType.String)),
-							),
-						),
+			.entity(
+				'Post',
+				entity =>
+					entity.manyHasMany(
+						'categories',
+						relation =>
+							relation.target('Category', e =>
+								e.manyHasMany('tagsButWithVeryVeryVeryLongNameSoItReachesPostgresqlAliasLengthLimit', relation =>
+									relation.target('Tag', e =>
+										e.column('name', c => c.type(Model.ColumnType.String))))),
 					),
-				),
 			)
 			.buildSchema(),
 		query: GQL`

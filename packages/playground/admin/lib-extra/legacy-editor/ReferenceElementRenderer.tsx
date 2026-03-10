@@ -1,5 +1,13 @@
 import { BindingError, Entity, RelativeSingleField, useEntity } from '@contember/react-binding'
-import { BlockProps, EditorWithBlocks, EmbedHandler, getDiscriminatedBlock, getDiscriminatedDatum, ReferenceElement, ReferenceElementOptions } from '@contember/react-slate-editor-legacy'
+import {
+	BlockProps,
+	EditorWithBlocks,
+	EmbedHandler,
+	getDiscriminatedBlock,
+	getDiscriminatedDatum,
+	ReferenceElement,
+	ReferenceElementOptions,
+} from '@contember/react-slate-editor-legacy'
 import { memo, MouseEvent as ReactMouseEvent, ReactNode, useCallback } from 'react'
 import { Transforms } from 'slate'
 import { ReactEditor, RenderElementProps, useSelected, useSlateStatic } from 'slate-react'
@@ -58,9 +66,9 @@ export const ReferenceElementRenderer = memo((props: ReferenceElementRendererPro
 		const contentTemplate = elementTemplate.blockContent
 		if (contentTemplate === undefined) {
 			throw new BindingError(
-				`BlockEditor: All block reference elements must at least use the BlockEditor.ContentOutlet component!\n\n` +
-				`It appears that other BlockEditor._____ components have been used but the BlockEditor.ContentOutlet is ` +
-				`missing or isn't at the very top level.`,
+				`BlockEditor: All block reference elements must at least use the BlockEditor.ContentOutlet component!\n\n`
+					+ `It appears that other BlockEditor._____ components have been used but the BlockEditor.ContentOutlet is `
+					+ `missing or isn't at the very top level.`,
 			)
 		}
 		const placeholder = contentTemplate.value.placeholder
@@ -76,25 +84,23 @@ export const ReferenceElementRenderer = memo((props: ReferenceElementRendererPro
 							</div>
 							<div>{props.children}</div>
 						</div>
-					) : (
-						<div>{props.children}</div>
 					)
-				}
+					: <div>{props.children}</div>}
 				{!!contentTemplate.nodeAfter && <div contentEditable={false}>{contentTemplate.nodeAfter}</div>}
 			</>
 		)
 	} else if (
-		props.embedReferenceDiscriminateBy !== undefined &&
-		discriminationField.value === props.embedReferenceDiscriminateBy
+		props.embedReferenceDiscriminateBy !== undefined
+		&& discriminationField.value === props.embedReferenceDiscriminateBy
 	) {
 		if (
-			props.embedContentDiscriminationField === undefined ||
-			props.embedHandlers === undefined ||
-			props.embedSubBlocks === undefined
+			props.embedContentDiscriminationField === undefined
+			|| props.embedHandlers === undefined
+			|| props.embedSubBlocks === undefined
 		) {
 			throw new BindingError(
-				`BlockEditor: Trying to render an embed element without all the correct settings. ` +
-				`Check the related BlockEditor props.`,
+				`BlockEditor: Trying to render an embed element without all the correct settings. `
+					+ `Check the related BlockEditor props.`,
 			)
 		}
 		const embedTypeDiscriminant = referencedEntity.getField(props.embedContentDiscriminationField)
@@ -127,15 +133,23 @@ export const ReferenceElementRenderer = memo((props: ReferenceElementRendererPro
 			<Card className="group">
 				<CardHeader contentEditable={false}>
 					<div className="flex">
-						<CardTitle >
+						<CardTitle>
 							{renderedBlock.label}
 						</CardTitle>
 						<div className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity">
-							<Button variant="destructive" onClick={onRemove} size="sm"><TrashIcon className="w-3 h-3"/></Button>
-							{renderedBlock.alternate && (<Popover>
-								<PopoverTrigger asChild><Button size="sm"><PencilIcon className="w-3 h-3" /></Button></PopoverTrigger>
-								<PopoverContent>{renderedBlock.alternate}</PopoverContent>
-							</Popover>)}
+							<Button variant="destructive" onClick={onRemove} size="sm">
+								<TrashIcon className="w-3 h-3" />
+							</Button>
+							{renderedBlock.alternate && (
+								<Popover>
+									<PopoverTrigger asChild>
+										<Button size="sm">
+											<PencilIcon className="w-3 h-3" />
+										</Button>
+									</PopoverTrigger>
+									<PopoverContent>{renderedBlock.alternate}</PopoverContent>
+								</Popover>
+							)}
 						</div>
 					</div>
 				</CardHeader>
@@ -148,9 +162,7 @@ export const ReferenceElementRenderer = memo((props: ReferenceElementRendererPro
 
 	return (
 		<BlockElement element={props.element} attributes={props.attributes} withBoundaries>
-			{isEditable ? (
-				wrappedReference
-			) : (
+			{isEditable ? wrappedReference : (
 				// https://github.com/ianstormtaylor/slate/issues/3426#issuecomment-573939245
 				<>
 					<div

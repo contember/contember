@@ -11,7 +11,6 @@ type Options = {
 	['no-sql']: boolean
 }
 
-
 export class MigrationDescribeCommand extends Command<Args, Options> {
 	constructor(
 		private readonly migrationPrinter: MigrationPrinter,

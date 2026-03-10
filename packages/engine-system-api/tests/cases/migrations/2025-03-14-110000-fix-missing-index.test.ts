@@ -6,7 +6,6 @@ import { createConnectionMock } from '@contember/database-tester'
 import { createDatabaseMetadata } from '@contember/database'
 
 namespace IndexModel {
-
 	@c.Index('colA', 'colB')
 	@c.Index('colB', 'colC')
 	export class Foo {
@@ -14,7 +13,6 @@ namespace IndexModel {
 		colB = c.stringColumn()
 		colC = c.stringColumn()
 	}
-
 }
 
 test('unique fix test', async () => {
@@ -25,22 +23,24 @@ test('unique fix test', async () => {
 	}])
 	await migration(builder, {
 		connection: connection,
-		databaseMetadataResolver: () => Promise.resolve(createDatabaseMetadata({
-			foreignKeys: [],
-			indexes: [
-				{ indexName: 'valid1', tableName: 'foo', columnNames: ['col_a', 'col_b'], unique: false },
-			],
-			uniqueConstraints: [],
-		})),
-		schemaResolver: () => Promise.resolve({
-			schema: createSchema(IndexModel),
-			meta: {
-				id: 1,
-				version: '2024-06-28-153001',
-				checksum: '_checksum_',
-				updatedAt: new Date(),
-			},
-		}),
+		databaseMetadataResolver: () =>
+			Promise.resolve(createDatabaseMetadata({
+				foreignKeys: [],
+				indexes: [
+					{ indexName: 'valid1', tableName: 'foo', columnNames: ['col_a', 'col_b'], unique: false },
+				],
+				uniqueConstraints: [],
+			})),
+		schemaResolver: () =>
+			Promise.resolve({
+				schema: createSchema(IndexModel),
+				meta: {
+					id: 1,
+					version: '2024-06-28-153001',
+					checksum: '_checksum_',
+					updatedAt: new Date(),
+				},
+			}),
 		project: {
 			slug: 'test',
 			stages: [
@@ -59,4 +59,3 @@ test('unique fix test', async () => {
 `,
 	)
 })
-

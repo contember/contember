@@ -11,11 +11,13 @@ import { overrideInsertNode } from './overrideInsertNode'
 import { overrideRenderElement, OverrideRenderElementOptions } from './overrideRenderElement'
 
 export interface InitEditorOptions
-	extends OverrideCreateElementReferenceOptions,
-	ReferenceElementOptions,
-	OverrideInsertDataOptions,
-	OverrideRenderElementOptions,
-	OverrideInsertElementWithReferenceOptions {}
+	extends
+		OverrideCreateElementReferenceOptions,
+		ReferenceElementOptions,
+		OverrideInsertDataOptions,
+		OverrideRenderElementOptions,
+		OverrideInsertElementWithReferenceOptions
+{}
 
 export const initBlockEditor = ({ editor, ...options }: InitEditorOptions & { editor: Editor }) => {
 	const e = editor as EditorWithBlocks
@@ -23,14 +25,14 @@ export const initBlockEditor = ({ editor, ...options }: InitEditorOptions & { ed
 
 	e.insertElementWithReference = () => {
 		throw new BindingError(
-			`BlockEditor: trying to insert a referenced element but referencing has not been correctly set up. ` +
-			`Check the BlockEditor props.`,
+			`BlockEditor: trying to insert a referenced element but referencing has not been correctly set up. `
+				+ `Check the BlockEditor props.`,
 		)
 	}
 	e.getReferencedEntity = () => {
 		throw new BindingError(
-			`BlockEditor: trying to access a referenced entity but referencing has not been correctly set up. ` +
-			`Check the BlockEditor props.`,
+			`BlockEditor: trying to access a referenced entity but referencing has not been correctly set up. `
+				+ `Check the BlockEditor props.`,
 		)
 	}
 

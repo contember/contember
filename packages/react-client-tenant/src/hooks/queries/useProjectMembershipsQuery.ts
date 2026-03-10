@@ -12,7 +12,6 @@ export type ProjectMembershipsQueryVariables = {
 	identityId: string
 }
 
-
 export const useProjectMembershipsQuery = (options: TenantApiOptions = {}) => {
 	const executor = useTenantApi(options)
 	return useCallback(async (input: ProjectMembershipsQueryVariables): Promise<ProjectMembershipsQueryResult> => {

@@ -16,8 +16,7 @@ import { MapperInput } from '../../types'
 
 type Context = Model.ManyHasOneContext
 
-export class ManyHasOneUpdateInputProcessor implements UpdateInputProcessor.HasOneRelationInputProcessor<Context, SqlUpdateInputProcessorResult>{
-
+export class ManyHasOneUpdateInputProcessor implements UpdateInputProcessor.HasOneRelationInputProcessor<Context, SqlUpdateInputProcessorResult> {
 	constructor(
 		private readonly mapper: Mapper,
 		private readonly builder: UpdateBuilder,
@@ -93,8 +92,7 @@ export class ManyHasOneUpdateInputProcessor implements UpdateInputProcessor.HasO
 			return insertResult
 		}
 
-		return async () =>
-			await this.mapper.update(targetEntity, new CheckedPrimary(inversePrimary), update)
+		return async () => await this.mapper.update(targetEntity, new CheckedPrimary(inversePrimary), update)
 	}
 
 	public async disconnect(

@@ -19,7 +19,6 @@ const getErrorContainer = () => {
 
 const devErrorHandler = (renderer: ErrorReactRenderer): TryRun => {
 	const errorBus = new ErrorBus()
-
 	;(window as any).Buffer = Buffer
 	window.addEventListener('error', e => {
 		if (e.message.startsWith('ResizeObserver')) {
@@ -71,7 +70,6 @@ const prodErrorHandler = (renderer: ErrorReactRenderer): TryRun => {
 		}
 	}
 }
-
 
 export const createErrorHandler = (renderer: ErrorReactRenderer) => {
 	if (import.meta.env.DEV) {

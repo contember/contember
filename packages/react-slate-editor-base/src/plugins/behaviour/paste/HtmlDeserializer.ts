@@ -42,13 +42,12 @@ export class HtmlDeserializer {
 
 			// Block
 			const attrs = this.processWithAttributeProcessor(childNode, cumulativeTextAttrs)
-			const result =
-				childNode instanceof HTMLElement
-					? this.processBlockPaste(
-						childNode,
-						cumulativeTextAttrs,
-					)
-					: null
+			const result = childNode instanceof HTMLElement
+				? this.processBlockPaste(
+					childNode,
+					cumulativeTextAttrs,
+				)
+				: null
 			if (result !== null) {
 				processed.push(...(Array.isArray(result) ? result : [result]).map(element => ({ element })))
 			} else {
@@ -66,8 +65,8 @@ export class HtmlDeserializer {
 						...(deserializedChildren === null
 							? []
 							: deserializedChildren.texts !== undefined
-								? deserializedChildren.texts.map(text => ({ text, isWhiteSpace }))
-								: deserializedChildren.elements.map(element => ({ element }))),
+							? deserializedChildren.texts.map(text => ({ text, isWhiteSpace }))
+							: deserializedChildren.elements.map(element => ({ element }))),
 					)
 				}
 			}
@@ -87,7 +86,7 @@ export class HtmlDeserializer {
 					} else if (item.element !== undefined) {
 						return [item.element]
 					}
-						return []
+					return []
 				}),
 			}
 		} else {
@@ -111,7 +110,6 @@ export class HtmlDeserializer {
 		const result = this.processNodeListPaste(list, cumulativeTextAttrs)
 		return result?.texts ?? result?.elements ?? []
 	}
-
 
 	private deserializeTextNode(node: Node, cumulativeTextAttrs: TextAttrs): Descendant[] | null {
 		if (node.nodeType === Node.TEXT_NODE) {
@@ -155,7 +153,7 @@ export class HtmlDeserializer {
 			return {}
 		}
 		return this.plugins.reduce(
-			(cta, plugin) => plugin.processAttributesPaste?.({ element, cumulativeTextAttrs, deserializer: this  }) ?? cta,
+			(cta, plugin) => plugin.processAttributesPaste?.({ element, cumulativeTextAttrs, deserializer: this }) ?? cta,
 			cumulativeTextAttrs,
 		)
 	}
@@ -164,8 +162,7 @@ export class HtmlDeserializer {
 		if (ignoredElements.includes(element.tagName)) {
 			return []
 		}
-		const next: HtmlDeserializerNextCallback = (list, cta) =>
-			this.deserializeBlocks(Array.from(list), { ...cumulativeTextAttrs, ...cta })
+		const next: HtmlDeserializerNextCallback = (list, cta) => this.deserializeBlocks(Array.from(list), { ...cumulativeTextAttrs, ...cta })
 
 		for (const plugin of this.plugins) {
 			const result = plugin.processBlockPaste?.({ element, next, cumulativeTextAttrs, deserializer: this }) ?? null

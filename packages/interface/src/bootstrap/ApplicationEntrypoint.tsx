@@ -33,7 +33,6 @@ export const ApplicationEntrypoint = (props: ApplicationEntrypointProps) => {
 		defaultDimensions: rootEnv.getAllDimensions(),
 	}
 
-
 	return (
 		<EnvironmentContext.Provider value={rootEnv}>
 			<RoutingProvider {...routing}>

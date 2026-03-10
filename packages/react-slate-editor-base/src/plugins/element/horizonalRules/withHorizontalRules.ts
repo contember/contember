@@ -34,8 +34,7 @@ export const withHorizontalRules = ({ render }: { render: ElementRenderer<Horizo
 			let closestBlockEntry: NodeEntry | undefined = Editor.above(editor, {
 				at: focusPoint,
 				mode: 'lowest',
-				match: matchedNode =>
-					SlateElement.isElement(matchedNode) && !editor.isInline(matchedNode) && editor.isDefaultElement(matchedNode),
+				match: matchedNode => SlateElement.isElement(matchedNode) && !editor.isInline(matchedNode) && editor.isDefaultElement(matchedNode),
 			})
 			if (!closestBlockEntry) {
 				return

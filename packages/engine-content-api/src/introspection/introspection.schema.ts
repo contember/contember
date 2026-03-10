@@ -174,7 +174,6 @@ const _Schema = new GraphQLObjectType({
 	},
 })
 
-
 export const createSchemaConfig = (resolver?: GraphQLFieldResolver<any, any>): GraphQLSchemaConfig => {
 	return {
 		query: new GraphQLObjectType({
@@ -189,6 +188,5 @@ export const createSchemaConfig = (resolver?: GraphQLFieldResolver<any, any>): G
 		types: [_Column, _Relation],
 	}
 }
-
 
 export default new GraphQLSchema(createSchemaConfig())

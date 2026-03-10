@@ -3,7 +3,6 @@ import { ExportFactory, ExportFormatterCreateOutputArgs, ExportResult } from './
 import { DataViewDataForExport } from '../types'
 
 export class CsvExportFactory implements ExportFactory {
-
 	create(args: ExportFormatterCreateOutputArgs): ExportResult {
 		const data = this.flattenData(args.data, args.marker)
 		const filteredData = this.filterData(data)
@@ -29,7 +28,7 @@ export class CsvExportFactory implements ExportFactory {
 				const values = data.map((it: any) =>
 					Array.isArray(it)
 						? it.flatMap(it => it?.[subMarker.placeholderName])
-						: it?.[subMarker.placeholderName],
+						: it?.[subMarker.placeholderName]
 				)
 
 				if (subMarker instanceof FieldMarker) {
@@ -44,12 +43,15 @@ export class CsvExportFactory implements ExportFactory {
 		}
 		traverseMarkers(data, [marker])
 
-
 		return columns
 	}
 
 	protected formatValue(value: any) {
-		const stringValue = Array.isArray(value) ? value.join(';') : (value !== null && typeof value === 'object') ? JSON.stringify(value) : String((value ?? ''))
+		const stringValue = Array.isArray(value)
+			? value.join(';')
+			: (value !== null && typeof value === 'object')
+			? JSON.stringify(value)
+			: String(value ?? '')
 		if (stringValue.includes(',') || stringValue.includes('\n')) {
 			return '"' + stringValue.replace(/"/g, '""') + '"'
 		}

@@ -66,7 +66,7 @@ export class SelectBuilder {
 				[path.alias, groupByColumn],
 				(orderable, qb) => {
 					if (orderBy.length > 0) {
-						[qb, orderable] = this.orderByBuilder.build(qb, orderable, entity, this.pathFactory.create([]), orderBy)
+						;[qb, orderable] = this.orderByBuilder.build(qb, orderable, entity, this.pathFactory.create([]), orderBy)
 					}
 					return [orderable, qb]
 				},
@@ -75,7 +75,7 @@ export class SelectBuilder {
 			)
 		} else {
 			if (orderBy.length > 0) {
-				[this.qb] = this.orderByBuilder.build(this.qb, null, entity, path, orderBy)
+				;[this.qb] = this.orderByBuilder.build(this.qb, null, entity, path, orderBy)
 			}
 			this.qb = this.qb.limit(input.args.limit, input.args.offset)
 		}
@@ -103,16 +103,15 @@ export class SelectBuilder {
 					entity,
 					path.back(),
 					fieldPredicate,
-					apply => this.qb.select(expr =>
-						expr.selectCondition(condition => {
-							condition = apply(condition)
-							if (condition.isEmpty()) {
-								return condition.raw('true')
-							}
-							return condition
-						}),
-					predicatePath.alias,
-					),
+					apply =>
+						this.qb.select(expr =>
+							expr.selectCondition(condition => {
+								condition = apply(condition)
+								if (condition.isEmpty()) {
+									return condition.raw('true')
+								}
+								return condition
+							}), predicatePath.alias),
 					{ relationPath: this.relationPath, evaluatedPredicates: [primaryPredicate] },
 				)
 				fetchedPredicates.add(predicate)
@@ -131,7 +130,6 @@ export class SelectBuilder {
 				}
 				return assertNever(field)
 			})()
-
 
 			const executionContext: SelectExecutionHandlerContext = {
 				mapper,
@@ -198,7 +196,11 @@ export class SelectBuilder {
 		}
 	}
 
-	private async getColumnValues(columnPath: Path, columnName: string, predicateGetter: null | ColumnValueGetter<boolean>): Promise<Input.PrimaryValue[]> {
+	private async getColumnValues(
+		columnPath: Path,
+		columnName: string,
+		predicateGetter: null | ColumnValueGetter<boolean>,
+	): Promise<Input.PrimaryValue[]> {
 		this.qb = this.qb.select([columnPath.back().alias, columnName], columnPath.alias)
 		const rows = await this.rows
 		const filteredRows = predicateGetter === null ? rows : rows.filter(predicateGetter)

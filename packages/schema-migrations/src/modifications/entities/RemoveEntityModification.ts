@@ -14,7 +14,8 @@ import {
 import {
 	createModificationType,
 	Differ,
-	ModificationHandler, ModificationHandlerCreateSqlOptions,
+	ModificationHandler,
+	ModificationHandlerCreateSqlOptions,
 	ModificationHandlerOptions,
 } from '../ModificationHandler'
 import { VERSION_ACL_PATCH, VERSION_REMOVE_REFERENCING_RELATIONS } from '../ModificationVersions'
@@ -67,7 +68,7 @@ export class RemoveEntityModificationHandler implements ModificationHandler<Remo
 							...role,
 							variables: Object.fromEntries(
 								Object.entries(role.variables).filter(([, variable]) =>
-									variable.type !== Acl.VariableType.entity || variable.entityName !== this.data.entityName,
+									variable.type !== Acl.VariableType.entity || variable.entityName !== this.data.entityName
 								),
 							),
 						}),
@@ -90,7 +91,7 @@ export class RemoveEntityModificationHandler implements ModificationHandler<Remo
 							}),
 						),
 					),
-				  )
+				)
 				: undefined,
 			this.options.formatVersion >= VERSION_REMOVE_REFERENCING_RELATIONS
 				? ({ schema }) => {
@@ -99,7 +100,7 @@ export class RemoveEntityModificationHandler implements ModificationHandler<Remo
 						(schema, [entity, field]) => removeField(entity, field, this.options.formatVersion)({ schema }),
 						schema,
 					)
-				  }
+				}
 				: undefined,
 			updateModel(({ model }) => {
 				const { [this.data.entityName]: removed, ...entities } = model.entities
@@ -116,14 +117,13 @@ export class RemoveEntityModificationHandler implements ModificationHandler<Remo
 			Object.values(entity.fields)
 				.filter((field): field is Model.AnyRelation => isRelation(field) && field.target === this.data.entityName)
 				.filter(field => !isInverseRelation(field) || entity.name !== this.data.entityName) // skip self-referencing inverse relations
-				.map((field): [string, string] => [entity.name, field.name]),
+				.map((field): [string, string] => [entity.name, field.name])
 		)
 	}
 
 	describe() {
 		return { message: `Remove entity ${this.data.entityName}`, isDestructive: true }
 	}
-
 }
 
 export interface RemoveEntityModificationData {

@@ -46,7 +46,8 @@ export class DatabaseMetadataResolver {
 	}
 
 	private async fetchConstraints(connection: Connection.Queryable, schema: string): Promise<ConstraintsRow[]> {
-		return (await connection.query<ConstraintsRow>(`
+		return (await connection.query<ConstraintsRow>(
+			`
             SELECT
                 MAX(pg_constraint.conname) AS constraint_name,
                 MAX(pg_class.relname) AS table_name,
@@ -73,12 +74,15 @@ export class DatabaseMetadataResolver {
             WHERE pg_namespace.nspname = ?
               AND pg_constraint.contype = ANY (ARRAY ['f', 'u'])
             GROUP BY pg_constraint.oid
-		`, [schema]))
+		`,
+			[schema],
+		))
 			.rows
 	}
 
 	private async fetchIndexes(connection: Connection.Queryable, schema: string): Promise<IndexRow[]> {
-		return (await connection.query<IndexRow>(`
+		return (await connection.query<IndexRow>(
+			`
             SELECT
                 MAX(idx_class.relname) AS index_name,
                 MAX(table_class.relname) AS table_name,
@@ -96,7 +100,9 @@ export class DatabaseMetadataResolver {
             WHERE pg_namespace.nspname = ?
               AND indisprimary = FALSE
             GROUP BY pg_index.indexrelid
-		`, [schema]))
+		`,
+			[schema],
+		))
 			.rows
 	}
 }
@@ -138,4 +144,3 @@ type IndexRow = {
 	columns: string[]
 	is_unique: boolean
 }
-

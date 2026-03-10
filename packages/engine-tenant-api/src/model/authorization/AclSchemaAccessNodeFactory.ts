@@ -6,7 +6,6 @@ import { DirectPermissionsAccessNode } from './DirectPermissionsAccessNode'
 
 export class AclSchemaAccessNodeFactory {
 	create(schema: Acl.Schema, memberships: readonly Acl.Membership[]): AccessNode {
-
 		const createVerifier = (getRule: (permissions: Acl.TenantPermissions) => Acl.MembershipMatchRule) => {
 			const membershipMatcher = new MembershipMatcher(memberships.map(it => ({
 				...it,

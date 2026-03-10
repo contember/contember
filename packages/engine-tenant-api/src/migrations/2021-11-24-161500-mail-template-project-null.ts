@@ -12,6 +12,6 @@ CREATE UNIQUE INDEX mail_template_identifier_global
 	ON mail_template (mail_type, variant) WHERE project_id IS NULL;
 `
 
-export default async function (builder: MigrationBuilder) {
+export default async function(builder: MigrationBuilder) {
 	builder.sql(sql)
 }

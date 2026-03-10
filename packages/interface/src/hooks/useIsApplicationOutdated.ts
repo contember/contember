@@ -2,7 +2,6 @@ import { useCallback, useEffect, useState } from 'react'
 
 const defaultCheckIntervalMs = 30_000
 
-
 export const useIsApplicationOutdated = ({ checkIntervalMs = defaultCheckIntervalMs }: {
 	checkIntervalMs?: number
 } = {}) => {

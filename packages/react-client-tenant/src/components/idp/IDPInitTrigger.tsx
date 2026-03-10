@@ -11,7 +11,5 @@ export interface IDPInitTriggerProps {
 
 export const IDPInitTrigger = ({ identityProvider, ...props }: IDPInitTriggerProps) => {
 	const initIdp = useIDPMethods().initRedirect
-	return (
-		<SlotButton onClick={() => initIdp({ provider: identityProvider })}  {...props} />
-	)
+	return <SlotButton onClick={() => initIdp({ provider: identityProvider })} {...props} />
 }

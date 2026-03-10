@@ -4,7 +4,6 @@ import { Actions, ActionsPayload } from '@contember/schema'
 import { EventRow } from '../model/types'
 import { notify } from '../utils/notifyChannel'
 
-
 type EventRowToInsert = Omit<EventRow, 'created_at' | 'visible_at' | 'last_state_change' | 'log'> & {
 	created_at: string | Date
 	visible_at: string | Date

@@ -1,15 +1,7 @@
 import { getEntity } from '@contember/schema-utils'
 import { PathFactory, WhereBuilder } from './select'
 import { PredicateFactory } from '../acl'
-import {
-	Client,
-	ConflictActionType,
-	DeleteBuilder,
-	InsertBuilder,
-	Literal,
-	Operator,
-	SelectBuilder,
-} from '@contember/database'
+import { Client, ConflictActionType, DeleteBuilder, InsertBuilder, Literal, Operator, SelectBuilder } from '@contember/database'
 import { Acl, Input, Model } from '@contember/schema'
 import {
 	MutationJunctionUpdateOk,
@@ -58,7 +50,14 @@ export class JunctionTableManager {
 			this.connectJunctionHandler,
 		)
 		if (result.result !== MutationResultType.noResultError) {
-			const afterEvent = new AfterJunctionUpdateEvent(owningEntity, relation, owningUnique, inverseUnique, 'connect', result.result === MutationResultType.ok)
+			const afterEvent = new AfterJunctionUpdateEvent(
+				owningEntity,
+				relation,
+				owningUnique,
+				inverseUnique,
+				'connect',
+				result.result === MutationResultType.ok,
+			)
 			await mapper.eventManager.fire(afterEvent)
 		}
 		return [result]
@@ -82,13 +81,19 @@ export class JunctionTableManager {
 			this.disconnectJunctionHandler,
 		)
 		if (result.result !== MutationResultType.noResultError) {
-			const afterEvent = new AfterJunctionUpdateEvent(owningEntity, relation, owningUnique, inverseUnique, 'disconnect', result.result === MutationResultType.ok)
+			const afterEvent = new AfterJunctionUpdateEvent(
+				owningEntity,
+				relation,
+				owningUnique,
+				inverseUnique,
+				'disconnect',
+				result.result === MutationResultType.ok,
+			)
 			beforeEvent.afterEvent = afterEvent
 			await mapper.eventManager.fire(afterEvent)
 		}
 		return [result]
 	}
-
 
 	private async executeJunctionModification(
 		db: Client,
@@ -112,8 +117,7 @@ export class JunctionTableManager {
 
 		const hasNoPredicates = Object.keys(owningPredicate).length === 0 && Object.keys(inversePredicate).length === 0
 
-		const okResultFactory = () =>
-			new MutationJunctionUpdateOk([], owningEntity, relation, owningPrimary, inversePrimary)
+		const okResultFactory = () => new MutationJunctionUpdateOk([], owningEntity, relation, owningPrimary, inversePrimary)
 		if (hasNoPredicates) {
 			return await handler.executeSimple({ db, joiningTable, owningPrimary, inversePrimary, okResultFactory })
 		} else {
@@ -134,7 +138,6 @@ export class JunctionTableManager {
 					)
 					.select(expr => expr.raw('true'), 'selected')
 					.from(new Literal('(values (null))'), 't')
-
 					.join(owningEntity.tableName, 'owning', condition => condition.raw('true'))
 					.join(inverseEntity.tableName, 'inverse', condition => condition.raw('true'))
 				qb = this.whereBuilder.build(qb, owningEntity, this.pathFactory.create([], 'owning'), owningWhere)
@@ -200,8 +203,7 @@ export class JunctionConnectHandler implements JunctionHandler {
 			.into(joiningTable.tableName)
 			.values({
 				[joiningTable.joiningColumn.columnName]: expr => expr.select(['data', joiningTable.joiningColumn.columnName]),
-				[joiningTable.inverseJoiningColumn.columnName]: expr =>
-					expr.select(['data', joiningTable.inverseJoiningColumn.columnName]),
+				[joiningTable.inverseJoiningColumn.columnName]: expr => expr.select(['data', joiningTable.inverseJoiningColumn.columnName]),
 			})
 			.returning(new Literal('true as inserted'))
 			.from(qb => qb.from('data'))

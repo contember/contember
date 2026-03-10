@@ -45,9 +45,7 @@ class Parser extends EmbeddedActionsParser {
 			this.CONSUME(tokens.Dot)
 			return this.SUBRULE(this.relativeSingleEntity)
 		})
-		const hasOneRelationPath = this.ACTION(() =>
-			relativeSingleEntity === undefined ? [] : relativeSingleEntity.hasOneRelationPath,
-		)
+		const hasOneRelationPath = this.ACTION(() => relativeSingleEntity === undefined ? [] : relativeSingleEntity.hasOneRelationPath)
 
 		return {
 			entityName,
@@ -83,9 +81,7 @@ class Parser extends EmbeddedActionsParser {
 			return this.SUBRULE(this.relativeSingleEntity)
 		})
 
-		const hasOneRelationPath = this.ACTION(() =>
-			relativeSingleEntity === undefined ? [] : relativeSingleEntity.hasOneRelationPath,
-		)
+		const hasOneRelationPath = this.ACTION(() => relativeSingleEntity === undefined ? [] : relativeSingleEntity.hasOneRelationPath)
 
 		return {
 			entityName,
@@ -104,9 +100,7 @@ class Parser extends EmbeddedActionsParser {
 				return this.SUBRULE(this.relativeSingleEntity)
 			})
 
-			const hasOneRelationPath = this.ACTION(() =>
-				relativeSingleEntity === undefined ? [] : relativeSingleEntity.hasOneRelationPath,
-			)
+			const hasOneRelationPath = this.ACTION(() => relativeSingleEntity === undefined ? [] : relativeSingleEntity.hasOneRelationPath)
 
 			return {
 				entityName,
@@ -124,9 +118,7 @@ class Parser extends EmbeddedActionsParser {
 				return this.SUBRULE(this.relativeSingleEntity)
 			})
 
-			const hasOneRelationPath = this.ACTION(() =>
-				relativeSingleEntity === undefined ? [] : relativeSingleEntity.hasOneRelationPath,
-			)
+			const hasOneRelationPath = this.ACTION(() => relativeSingleEntity === undefined ? [] : relativeSingleEntity.hasOneRelationPath)
 
 			return {
 				entityName,
@@ -355,7 +347,6 @@ class Parser extends EmbeddedActionsParser {
 			})
 		}
 
-
 		return this.OR([
 			{
 				ALT: () => {
@@ -502,9 +493,11 @@ class Parser extends EmbeddedActionsParser {
 									nestedWhere = existingWhere
 								} else {
 									throw new QueryLanguageError(
-										`Malformed expression: cannot simultaneously treat the '${nestedFields
-											.slice(0, i + 1)
-											.join('.')}' ` + `field as a scalar as well as a relation.`,
+										`Malformed expression: cannot simultaneously treat the '${
+											nestedFields
+												.slice(0, i + 1)
+												.join('.')
+										}' ` + `field as a scalar as well as a relation.`,
 									)
 								}
 							} else {
@@ -628,7 +621,6 @@ class Parser extends EmbeddedActionsParser {
 		}
 	})
 
-
 	private fieldName: () => FieldName = this.RULE<FieldName>('fieldName', () => {
 		return this.OR([
 			{
@@ -653,8 +645,8 @@ class Parser extends EmbeddedActionsParser {
 					const variableValue = this.SUBRULE(this.variable)
 					return this.ACTION(() => {
 						if (
-							typeof variableValue === 'string' ||
-							typeof variableValue === 'number'
+							typeof variableValue === 'string'
+							|| typeof variableValue === 'number'
 						) {
 							return variableValue
 						}
@@ -780,8 +772,8 @@ class Parser extends EmbeddedActionsParser {
 				const dimensionValue = Parser.environment.getDimension(variableName)
 				if (dimensionValue.length > 1) {
 					throw new BindingError(
-						`The variable $${variableName} resolved to a dimension which exists but contains ${dimensionValue.length} values. It has to contain exactly one. ` +
-						`Perhaps you forgot to set the 'maxItems' prop of your DimensionsSwitcher?`,
+						`The variable $${variableName} resolved to a dimension which exists but contains ${dimensionValue.length} values. It has to contain exactly one. `
+							+ `Perhaps you forgot to set the 'maxItems' prop of your DimensionsSwitcher?`,
 					)
 				}
 				return dimensionValue[0]
@@ -807,7 +799,7 @@ class Parser extends EmbeddedActionsParser {
 			return cached
 		}
 
-		const lexingResult = Parser.lexer.tokenize((Parser.rawInput = input))
+		const lexingResult = Parser.lexer.tokenize(Parser.rawInput = input)
 
 		if (lexingResult.errors.length !== 0) {
 			throw new QueryLanguageError(

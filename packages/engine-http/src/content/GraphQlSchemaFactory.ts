@@ -20,7 +20,6 @@ export interface GraphQLSchemaFactoryResult {
 }
 
 export class GraphQlSchemaFactory {
-
 	constructor(
 		private readonly cache: ContentApiSpecificCache<Schema, GraphQLSchemaFactoryResult>,
 		private readonly graphqlSchemaBuilderFactory: GraphQlSchemaBuilderFactory,
@@ -86,6 +85,5 @@ export class GraphQlSchemaFactory {
 
 			return { schema: graphQlSchema, permissions }
 		})
-
 	}
 }

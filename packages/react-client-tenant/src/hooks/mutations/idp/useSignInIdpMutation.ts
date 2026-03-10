@@ -29,7 +29,9 @@ export type SignInIDPMutationVariables = {
 		& { [key: string]: any }
 }
 
-
-export const useSignInIDPMutation = createTenantMutation<SignInIDPMutationResult, TenantApi.SignInIDPErrorCode, SignInIDPMutationVariables>(signInIDPMutation, {
-	apiToken: LoginToken,
-})
+export const useSignInIDPMutation = createTenantMutation<SignInIDPMutationResult, TenantApi.SignInIDPErrorCode, SignInIDPMutationVariables>(
+	signInIDPMutation,
+	{
+		apiToken: LoginToken,
+	},
+)

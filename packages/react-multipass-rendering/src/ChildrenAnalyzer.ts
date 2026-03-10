@@ -69,8 +69,8 @@ export class ChildrenAnalyzer<
 		const processed = this.processNode(children, initialStaticContext, [])
 
 		const rawResult: Array<AllLeavesRepresentation | AllBranchNodesRepresentation | undefined> = Array.isArray(
-			processed,
-		)
+				processed,
+			)
 			? processed
 			: [processed]
 
@@ -129,7 +129,7 @@ export class ChildrenAnalyzer<
 			return mapped
 		}
 
-		let children: ReactNode 
+		let children: ReactNode
 
 		if (typeof node !== 'object' || !('type' in node)) {
 			return this.processNode(children, staticContext, componentPath)
@@ -151,14 +151,15 @@ export class ChildrenAnalyzer<
 
 		// Component, PureComponent, FunctionComponent
 
-		const treeNode = node.type as ElementType &
-		{
-			[staticMethod in ValidFactoryName]:
-			| StaticContextFactory<any, StaticContext>
-			| SyntheticChildrenFactory<any, StaticContext>
-			| UnconstrainedLeafRepresentationFactory<any, AllLeavesRepresentation, StaticContext>
-			| DeclarationSiteNodeRepresentationFactory<any, unknown, AllBranchNodesRepresentation, StaticContext>
-		}
+		const treeNode = node.type as
+			& ElementType
+			& {
+				[staticMethod in ValidFactoryName]:
+					| StaticContextFactory<any, StaticContext>
+					| SyntheticChildrenFactory<any, StaticContext>
+					| UnconstrainedLeafRepresentationFactory<any, AllLeavesRepresentation, StaticContext>
+					| DeclarationSiteNodeRepresentationFactory<any, unknown, AllBranchNodesRepresentation, StaticContext>
+			}
 
 		componentPath = [...componentPath, node]
 		if (typeof treeNode !== 'string') {
@@ -249,8 +250,8 @@ export class ChildrenAnalyzer<
 		}
 
 		if (
-			!this.options.ignoreUnhandledNodes &&
-			!(typeof treeNode !== 'string' && this.options.staticRenderFactoryName in treeNode)
+			!this.options.ignoreUnhandledNodes
+			&& !(typeof treeNode !== 'string' && this.options.staticRenderFactoryName in treeNode)
 		) {
 			throw new ChildrenAnalyzerError(getErrorMessage(this.options.unhandledNodeErrorMessage, node, staticContext))
 		}

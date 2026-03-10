@@ -23,7 +23,6 @@ test('simple definitions', () => {
 	})
 })
 
-
 namespace RoleOptions {
 	export const publicRole = c.createRole('public', {
 		debug: true,
@@ -45,7 +44,6 @@ test('role options', () => {
 		'variables': {},
 	})
 })
-
 
 namespace ModelWithPredicate {
 	export const publicRole = c.createRole('public')
@@ -110,7 +108,6 @@ test('definition with a predicate on field', () => {
 	})
 })
 
-
 namespace ModelWithModificationAcl {
 	export const publicRole = c.createRole('public')
 
@@ -151,7 +148,6 @@ test('definition with update, create, delete predicates', () => {
 		},
 	)
 })
-
 
 namespace ModelWithMultiplePredicates {
 	export const publicRole = c.createRole('public')
@@ -198,7 +194,6 @@ test('definition with multiple predicates on a single field', () => {
 		},
 	)
 })
-
 
 namespace ModelWithJoinedPredicateCollision {
 	export const publicRole = c.createRole('public')
@@ -265,7 +260,6 @@ test('definition with collision', () => {
 	)
 })
 
-
 namespace ModelWithMultipleRolesForSinglePredicate {
 	export const publicRole = c.createRole('public')
 	export const adminRole = c.createRole('admin')
@@ -326,6 +320,7 @@ namespace ModelWithAclPredicateReferences {
 		title = c.stringColumn()
 		isPublished = c.boolColumn()
 	}
+
 	@c.Allow(publicRole, {
 		when: { book: c.canRead('title') },
 		read: ['content'],
@@ -373,7 +368,6 @@ test('definition with predicate references', () => {
 		},
 	)
 })
-
 
 namespace ModelWithVariables {
 	export const managerRole = c.createRole('manager')
@@ -459,7 +453,6 @@ test('allow custom primary', () => {
 	)
 })
 
-
 namespace ModelWithInvalidAclPredicateReferences {
 	export const publicRole = c.createRole('public')
 
@@ -484,11 +477,10 @@ namespace ModelWithInvalidAclPredicateReferences {
 
 test('definition with invalid predicate references', () => {
 	expect(() => createSchema(ModelWithInvalidAclPredicateReferences)).toThrow(
-		'Predicate references are allowed only on relations. \n' +
-		'You cannot use "canRead("title")" on a column "content" of entity "BookReview".',
+		'Predicate references are allowed only on relations. \n'
+			+ 'You cannot use "canRead("title")" on a column "content" of entity "BookReview".',
 	)
 })
-
 
 namespace ModelWithPredefinedVariables {
 	export const customerRole = c.createRole('customer')
@@ -544,7 +536,6 @@ namespace InvalidModel {
 test('invalid column', () => {
 	expect(() => createSchema(InvalidModel)).toThrow('Field "bar" does not exist on entity "Book" in read ACL definition.')
 })
-
 
 namespace ExplicitIdPredicate {
 	export const publicRole = c.createRole('public')
@@ -620,7 +611,6 @@ test('no root - valid', () => {
 	})
 })
 
-
 namespace NoRootInvalid {
 	export const publicRole = c.createRole('public')
 
@@ -642,7 +632,6 @@ namespace NoRootInvalid {
 test('no root - invalid combo', () => {
 	expect(() => createSchema(NoRootInvalid)).toThrow('Operation update cannot be both allowed and disallowed on root on entity Book')
 })
-
 
 namespace AllowFactoryModel {
 	export const publicRole = c.createRole('public')

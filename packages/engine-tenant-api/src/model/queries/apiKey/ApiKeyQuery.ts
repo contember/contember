@@ -54,11 +54,14 @@ const apiKeyBaseQuery = SelectBuilder.create<null | ApiKeyRow>()
 	.select(['api_key', 'expiration'])
 	.select(['person', 'id'], 'person_id')
 	.from('api_key')
-	.join('identity', 'identity', joinClause =>
-		joinClause.compareColumns(['api_key', 'identity_id'], Operator.eq, ['identity', 'id']),
-	)
+	.join('identity', 'identity', joinClause => joinClause.compareColumns(['api_key', 'identity_id'], Operator.eq, ['identity', 'id']))
 	.leftJoin(
-		'person', 'person', on => on.compareColumns(
-			['person', 'identity_id'], Operator.eq, ['identity', 'id'],
-		),
+		'person',
+		'person',
+		on =>
+			on.compareColumns(
+				['person', 'identity_id'],
+				Operator.eq,
+				['identity', 'id'],
+			),
 	)

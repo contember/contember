@@ -1,4 +1,13 @@
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '../../ui/alert-dialog'
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+	AlertDialogTrigger,
+} from '../../ui/alert-dialog'
 import { Button } from '../../ui/button'
 import { TrashIcon } from 'lucide-react'
 import { dict } from '../../dict'
@@ -18,7 +27,9 @@ export const MemberDeleteDialog = ({ onError, title, identityId, onSuccess, proj
 	return (
 		<AlertDialog>
 			<AlertDialogTrigger asChild>
-				<Button variant="destructive"><TrashIcon className="w-3 h-3" /></Button>
+				<Button variant="destructive">
+					<TrashIcon className="w-3 h-3" />
+				</Button>
 			</AlertDialogTrigger>
 			<AlertDialogContent>
 				<AlertDialogHeader>

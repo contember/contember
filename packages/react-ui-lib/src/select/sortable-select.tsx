@@ -46,91 +46,93 @@ const MultiSortableSelectDropIndicator = ({ position }: { position: 'before' | '
 	</div>
 )
 
-export type SortableMultiSelectInputProps =
-	& {
-		field: SugaredRelativeEntityList['field']
-		sortableBy: SugaredRelativeSingleField['field']
-		connectAt: SugaredRelativeSingleEntity['field']
-		children: ReactNode
-		options?: SugaredQualifiedEntityList['entities']
-		placeholder?: ReactNode
-		createNewForm?: ReactNode
-		queryField?: DataViewUnionFilterFields
-		initialSorting?: DataViewSortingDirections
-	}
+export type SortableMultiSelectInputProps = {
+	field: SugaredRelativeEntityList['field']
+	sortableBy: SugaredRelativeSingleField['field']
+	connectAt: SugaredRelativeSingleEntity['field']
+	children: ReactNode
+	options?: SugaredQualifiedEntityList['entities']
+	placeholder?: ReactNode
+	createNewForm?: ReactNode
+	queryField?: DataViewUnionFilterFields
+	initialSorting?: DataViewSortingDirections
+}
 
-export const SortableMultiSelectInput = Component<SortableMultiSelectInputProps>(({ field, queryField, options, children, sortableBy, connectAt, placeholder, createNewForm, initialSorting }) => {
-	const id = useFormFieldId()
-	return (
-		<SortableMultiSelect field={field} sortableBy={sortableBy} connectAt={connectAt} options={options}>
-			<div className="flex gap-1 items-center">
-				<Popover>
-					<SelectInputWrapperUI>
-						<PopoverTrigger asChild>
-							<SelectInputUI id={id ? `${id}-input` : undefined}>
-								<SelectPlaceholder>
-									{placeholder ?? <SelectDefaultPlaceholderUI />}
-								</SelectPlaceholder>
+export const SortableMultiSelectInput = Component<SortableMultiSelectInputProps>(
+	({ field, queryField, options, children, sortableBy, connectAt, placeholder, createNewForm, initialSorting }) => {
+		const id = useFormFieldId()
+		return (
+			<SortableMultiSelect field={field} sortableBy={sortableBy} connectAt={connectAt} options={options}>
+				<div className="flex gap-1 items-center">
+					<Popover>
+						<SelectInputWrapperUI>
+							<PopoverTrigger asChild>
+								<SelectInputUI id={id ? `${id}-input` : undefined}>
+									<SelectPlaceholder>
+										{placeholder ?? <SelectDefaultPlaceholderUI />}
+									</SelectPlaceholder>
 
-								<MultiSelectItemWrapperUI>
-									<RepeaterSortable>
-										<RepeaterSortableEachItem>
-											<div className={'flex'}>
-												<MultiSortableSelectDropIndicator position={'before'} />
-												<RepeaterSortableItemNode>
-													<MultiSelectItemUI>
-														<HasOne field={connectAt}>
-															<RepeaterSortableItemActivator>
-																<MultiSelectSortableItemContentUI>
-																	{children}
-																</MultiSelectSortableItemContentUI>
-															</RepeaterSortableItemActivator>
+									<MultiSelectItemWrapperUI>
+										<RepeaterSortable>
+											<RepeaterSortableEachItem>
+												<div className={'flex'}>
+													<MultiSortableSelectDropIndicator position={'before'} />
+													<RepeaterSortableItemNode>
+														<MultiSelectItemUI>
+															<HasOne field={connectAt}>
+																<RepeaterSortableItemActivator>
+																	<MultiSelectSortableItemContentUI>
+																		{children}
+																	</MultiSelectSortableItemContentUI>
+																</RepeaterSortableItemActivator>
 
-															<SelectItemTrigger>
-																<MultiSelectItemRemoveButtonUI onClick={e => e.stopPropagation()} />
-															</SelectItemTrigger>
-														</HasOne>
-													</MultiSelectItemUI>
-												</RepeaterSortableItemNode>
-												<MultiSortableSelectDropIndicator position={'after'} />
-											</div>
-										</RepeaterSortableEachItem>
+																<SelectItemTrigger>
+																	<MultiSelectItemRemoveButtonUI onClick={e => e.stopPropagation()} />
+																</SelectItemTrigger>
+															</HasOne>
+														</MultiSelectItemUI>
+													</RepeaterSortableItemNode>
+													<MultiSortableSelectDropIndicator position={'after'} />
+												</div>
+											</RepeaterSortableEachItem>
 
-										<RepeaterSortableDragOverlay>
-											<MultiSelectItemDragOverlayUI>
-												<HasOne field={connectAt}>
-													{children}
-												</HasOne>
-											</MultiSelectItemDragOverlayUI>
-										</RepeaterSortableDragOverlay>
-									</RepeaterSortable>
-								</MultiSelectItemWrapperUI>
+											<RepeaterSortableDragOverlay>
+												<MultiSelectItemDragOverlayUI>
+													<HasOne field={connectAt}>
+														{children}
+													</HasOne>
+												</MultiSelectItemDragOverlayUI>
+											</RepeaterSortableDragOverlay>
+										</RepeaterSortable>
+									</MultiSelectItemWrapperUI>
 
-								<SelectInputActionsUI>
-									<ChevronDownIcon className={'w-4 h-4'} />
-								</SelectInputActionsUI>
-							</SelectInputUI>
-						</PopoverTrigger>
-					</SelectInputWrapperUI>
+									<SelectInputActionsUI>
+										<ChevronDownIcon className={'w-4 h-4'} />
+									</SelectInputActionsUI>
+								</SelectInputUI>
+							</PopoverTrigger>
+						</SelectInputWrapperUI>
 
-					<SelectPopoverContent>
-						<DefaultSelectDataView initialSorting={initialSorting} queryField={queryField}>
-							{children}
-						</DefaultSelectDataView>
-					</SelectPopoverContent>
-				</Popover>
-				{createNewForm && (
-					<CreateEntityDialog trigger={<SelectCreateNewTrigger />}>
-						{createNewForm}
-					</CreateEntityDialog>
-				)}
-			</div>
-		</SortableMultiSelect>
-	)
-}, ({ children, field, sortableBy, connectAt, options }) => {
-	return (
-		<SortableMultiSelect field={field} sortableBy={sortableBy} connectAt={connectAt} options={options}>
-			{children}
-		</SortableMultiSelect>
-	)
-})
+						<SelectPopoverContent>
+							<DefaultSelectDataView initialSorting={initialSorting} queryField={queryField}>
+								{children}
+							</DefaultSelectDataView>
+						</SelectPopoverContent>
+					</Popover>
+					{createNewForm && (
+						<CreateEntityDialog trigger={<SelectCreateNewTrigger />}>
+							{createNewForm}
+						</CreateEntityDialog>
+					)}
+				</div>
+			</SortableMultiSelect>
+		)
+	},
+	({ children, field, sortableBy, connectAt, options }) => {
+		return (
+			<SortableMultiSelect field={field} sortableBy={sortableBy} connectAt={connectAt} options={options}>
+				{children}
+			</SortableMultiSelect>
+		)
+	},
+)

@@ -5,13 +5,15 @@ import { MaybePassword } from '../../dtos/Password'
 import { normalizeEmail } from '../../utils/email'
 
 export class CreatePersonCommand implements Command<Omit<PersonRow, 'roles'>> {
-	constructor(private readonly data: {
-		identityId: string
-		email?: string
-		name?: string
-		password: MaybePassword
-		idpOnly?: boolean
-	}) {}
+	constructor(
+		private readonly data: {
+			identityId: string
+			email?: string
+			name?: string
+			password: MaybePassword
+			idpOnly?: boolean
+		},
+	) {}
 
 	async execute({ db, providers }: Command.Args): Promise<Omit<PersonRow, 'roles'>> {
 		const id = providers.uuid()
@@ -35,8 +37,8 @@ export class CreatePersonCommand implements Command<Omit<PersonRow, 'roles'>> {
 			id,
 			email,
 			name,
-			password_hash, identity_id:
-			this.data.identityId,
+			password_hash,
+			identity_id: this.data.identityId,
 			otp_uri: null,
 			otp_activated_at: null,
 			disabled_at: null,

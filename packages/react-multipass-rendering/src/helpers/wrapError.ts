@@ -23,8 +23,7 @@ export const wrapError = (e: unknown, currentComponentName: string, methodName: 
 							return '(react element)'
 						}
 						return value
-					},
-					)
+					})
 					result += ` ${key}=${valuePrinted}`
 				} catch {
 					result += ` ${key}=(failed to print a value)`

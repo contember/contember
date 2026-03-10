@@ -54,16 +54,17 @@ export class ContentApiControllerFactory {
 			const schema = schemaWithMeta.schema
 			const { effective: memberships, fetched: fetchedMemberships } = await timer(
 				'MembershipFetch',
-				() => projectGroup.projectMembershipResolver.resolveMemberships({
-					request: koa,
-					acl: schema.acl,
-					projectSlug: project.slug,
-					identity: {
-						identityId: authResult.identityId,
-						personId: authResult.personId ?? undefined,
-						roles: authResult.roles,
-					},
-				}),
+				() =>
+					projectGroup.projectMembershipResolver.resolveMemberships({
+						request: koa,
+						acl: schema.acl,
+						projectSlug: project.slug,
+						identity: {
+							identityId: authResult.identityId,
+							personId: authResult.personId ?? undefined,
+							roles: authResult.roles,
+						},
+					}),
 			)
 
 			logger.debug('Memberships fetched', { memberships })
@@ -81,11 +82,11 @@ export class ContentApiControllerFactory {
 
 			const { schema: graphQlSchema, permissions } = await timer(
 				'GraphQLSchemaCreate',
-				() => this.graphQlSchemaFactory.create(schema, {
-					projectRoles: projectRoles,
-				}, project),
+				() =>
+					this.graphQlSchemaFactory.create(schema, {
+						projectRoles: projectRoles,
+					}, project),
 			)
-
 
 			const schemaDatabaseMetadata = await projectContainer.projectDatabaseMetadataResolver.resolveDatabaseMetadata(systemDatabase, schema, stage.schema)
 
@@ -102,58 +103,57 @@ export class ContentApiControllerFactory {
 			await logger.scope(async logger => {
 				logger.debug('Content query processing started')
 
-				await timer('GraphQL', () => handler({
-					request: koa.request,
-					response: koa.response,
-					createContext: ({ operation }) => {
-						(koa.state as GraphQLKoaState).graphql = {
-							operationName: operation,
-						}
+				await timer('GraphQL', () =>
+					handler({
+						request: koa.request,
+						response: koa.response,
+						createContext: ({ operation }) => {
+							;(koa.state as GraphQLKoaState).graphql = {
+								operationName: operation,
+							}
 
-						const connection = operation === 'query' ? projectContainer.readConnection : projectContainer.connection
-						const contentDatabase = connection.createClient(stage.schema, { module: 'content' })
+							const connection = operation === 'query' ? projectContainer.readConnection : projectContainer.connection
+							const contentDatabase = connection.createClient(stage.schema, { module: 'content' })
 
+							const identityVariables = createAclVariables(schema.acl, memberships)
+							let identityId = authResult.identityId
+							if (
+								authResult.assumedIdentityId
+								&& memberships.some(it => schema.acl.roles[it.role].system?.assumeIdentity)
+							) {
+								identityId = authResult.assumedIdentityId
+							}
 
-						const identityVariables = createAclVariables(schema.acl, memberships)
-						let identityId = authResult.identityId
-						if (
-							authResult.assumedIdentityId &&
-							memberships.some(it => schema.acl.roles[it.role].system?.assumeIdentity)
-						) {
-							identityId = authResult.assumedIdentityId
-						}
+							const executionContainer = this.executionContainerFactory.create({
+								db: contentDatabase,
+								identityVariables,
+								identityId,
+								schema,
+								schemaMeta: { id: schemaWithMeta.meta.id },
+								schemaDatabaseMetadata,
+								permissions,
+								systemSchema: projectContainer.systemDatabaseContextFactory.schemaName,
+								stage,
+								project,
+								userInfo: {
+									ipAddress: clientIp,
+									userAgent: koa.request.headers['user-agent'] ?? null,
+								},
+							})
 
-						const executionContainer = this.executionContainerFactory.create({
-							db: contentDatabase,
-							identityVariables,
-							identityId,
-							schema,
-							schemaMeta: { id: schemaWithMeta.meta.id },
-							schemaDatabaseMetadata,
-							permissions,
-							systemSchema: projectContainer.systemDatabaseContextFactory.schemaName,
-							stage,
-							project,
-							userInfo: {
-								ipAddress: clientIp,
-								userAgent: koa.request.headers['user-agent'] ?? null,
-							},
-						})
-
-						return {
-							db: contentDatabase,
-							identityVariables,
-							identityId,
-							executionContainer,
-							timer,
-							requestDebug,
-							project,
-						}
-					},
-				}))
+							return {
+								db: contentDatabase,
+								identityVariables,
+								identityId,
+								executionContainer,
+								timer,
+								requestDebug,
+								project,
+							}
+						},
+					}))
 				logger.debug('Content query finished')
 			})
-
 
 			notModifiedRes?.setResponseHeader(context.response)
 		}

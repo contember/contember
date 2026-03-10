@@ -13,7 +13,6 @@ export class Author {
 const schema = createSchema({ Author })
 
 describe('Optional validation', () => {
-
 	it('create succeeds when null', async () => {
 		await testCreate({
 			schema,
@@ -63,5 +62,4 @@ describe('Optional validation', () => {
 			errors: [],
 		})
 	})
-
 })

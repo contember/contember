@@ -22,7 +22,6 @@ export class ResetPasswordCommand implements Command<ResetPasswordCommandRespons
 		return new ResponseOk(null)
 	}
 }
-export type ResetPasswordCommandErrorCode =
-	| PersonToken.TokenValidationError
+export type ResetPasswordCommandErrorCode = PersonToken.TokenValidationError
 
 export type ResetPasswordCommandResponse = Response<null, PersonToken.TokenValidationError>

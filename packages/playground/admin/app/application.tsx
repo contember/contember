@@ -10,7 +10,6 @@ import { DevBar, DevPanel } from '@contember/react-devbar'
 import { EnumOptionsFormatterProvider, FieldLabelFormatterProvider } from '~/lib/labels'
 import { enumOptionsFormatter, fieldLabelFormatter } from '~/app/labels'
 
-
 export const Application = () => {
 	return (
 		<FieldLabelFormatterProvider value={fieldLabelFormatter}>
@@ -28,9 +27,13 @@ export const Application = () => {
 											{ eager: true },
 										)}
 									/>
-									{import.meta.env.DEV && <DevBar>
-										<DevPanel heading="Login" icon={<LogInIcon />}><LoginWithEmail /></DevPanel>
-									</DevBar>}
+									{import.meta.env.DEV && (
+										<DevBar>
+											<DevPanel heading="Login" icon={<LogInIcon />}>
+												<LoginWithEmail />
+											</DevPanel>
+										</DevBar>
+									)}
 								</Toaster>
 								<OutdatedApplicationDialog />
 							</>

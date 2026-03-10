@@ -15,7 +15,9 @@ export type UseDataViewSelectionResult = {
 	methods: DataViewSelectionMethods
 }
 
-export const useDataViewSelection = ({ dataViewKey, initialSelection, selectionStateStorage, resetPage, layouts }: UseDataViewSelectionArgs): UseDataViewSelectionResult => {
+export const useDataViewSelection = (
+	{ dataViewKey, initialSelection, selectionStateStorage, resetPage, layouts }: UseDataViewSelectionArgs,
+): UseDataViewSelectionResult => {
 	const [values, setValues] = useStoredState<DataViewSelectionStoredState>(
 		selectionStateStorage ?? 'null',
 		...getDataViewSelectionStorageArgs({

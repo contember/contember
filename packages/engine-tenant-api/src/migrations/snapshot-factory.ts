@@ -4,7 +4,6 @@ import { createCredentials } from './tenantCredentials'
 
 export default async (sqlFactory: () => string) => {
 	return async (builder: MigrationBuilder, args: MigrationArgs<TenantMigrationArgs>) => {
-
 		const sql = sqlFactory()
 		builder.sql(sql)
 

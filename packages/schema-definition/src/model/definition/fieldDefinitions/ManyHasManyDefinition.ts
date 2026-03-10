@@ -49,12 +49,10 @@ export class ManyHasManyDefinition extends FieldDefinition<ManyHasManyDefinition
 		}
 	}
 
-
 	protected withOption<K extends keyof ManyHasManyDefinitionOptions>(key: K, value: ManyHasManyDefinitionOptions[K]): ManyHasManyDefinition {
 		return new ManyHasManyDefinition({ ...this.options, [key]: value })
 	}
 }
-
 
 export function manyHasMany(target: EntityConstructor, inversedBy?: string): ManyHasManyDefinition {
 	return new ManyHasManyDefinition({ target, inversedBy })

@@ -48,7 +48,6 @@ export class DeployCommand extends Command<Args, Options> {
 	}
 
 	protected async execute(input: Input<Args, Options>): Promise<void | number> {
-
 		const dsn = input.getArgument('dsn')
 		const adminEndpoint = input.getOption('admin')
 		const remoteProject = this.remoteProjectResolver.resolve(dsn, adminEndpoint)
@@ -63,7 +62,6 @@ export class DeployCommand extends Command<Args, Options> {
 
 		const deployAdmin = input.getOption('no-admin') !== true && !!remoteProject.adminEndpoint && !!projectAdminDistDir
 
-
 		console.log('')
 		console.log('Contember project deployment configuration:')
 		console.log(`Target project name: ${remoteProject.name}`)
@@ -71,7 +69,6 @@ export class DeployCommand extends Command<Args, Options> {
 		console.log(`Admin URL: ${remoteProject.adminEndpoint ?? 'none'}`)
 		console.log(`Deploy token: ${maskToken(remoteProject.token)}`)
 		console.log('')
-
 
 		if (deployAdmin && !(await this.fs.pathExists(`${projectAdminDistDir}/index.html`))) {
 			throw `Missing ${projectAdminDistDir}/index.html. Please build admin before deploying.`

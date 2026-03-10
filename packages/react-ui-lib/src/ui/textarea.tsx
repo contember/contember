@@ -15,10 +15,13 @@ export const Textarea = uic('textarea', {
 	displayName: 'Textarea',
 })
 
-export const TextareaAutosize = forwardRef<HTMLTextAreaElement, ComponentProps<typeof Textarea> & {
-	minRows?: number
-	maxRows?: number
-}>(({ minRows, maxRows, ...props }, ref) => {
+export const TextareaAutosize = forwardRef<
+	HTMLTextAreaElement,
+	ComponentProps<typeof Textarea> & {
+		minRows?: number
+		maxRows?: number
+	}
+>(({ minRows, maxRows, ...props }, ref) => {
 	const innerRef = useRef<HTMLTextAreaElement | null>(null)
 	useAutoHeightTextArea(innerRef, props.value?.toString() ?? '', minRows ?? 3, maxRows ?? 100)
 

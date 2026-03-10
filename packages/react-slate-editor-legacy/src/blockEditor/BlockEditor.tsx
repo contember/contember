@@ -6,7 +6,8 @@ import {
 	FieldValue,
 	HasMany,
 	SugaredField,
-	SugaredRelativeEntityList, SugaredRelativeSingleField,
+	SugaredRelativeEntityList,
+	SugaredRelativeSingleField,
 	TreeNodeEnvironmentFactory,
 	useDesugaredRelativeSingleField,
 	useEntity,
@@ -35,7 +36,6 @@ import { Descendant, insertNodes, Node, removeNodes, withoutNormalizing } from '
 import { createEditor, CreateEditorPublicOptions, paragraphElementType } from '@contember/react-slate-editor-base'
 
 export interface BlockEditorProps extends SugaredRelativeEntityList, CreateEditorPublicOptions {
-
 	contentField: SugaredRelativeSingleField['field']
 	sortableBy: SugaredRelativeSingleField['field']
 	children?: ReactNode
@@ -70,7 +70,6 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 			embedContentDiscriminationField,
 			embedHandlers = emptyArray,
 
-
 			plugins,
 			renderSortableBlock,
 			renderReference,
@@ -81,17 +80,22 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 		const desugaredReferenceDiscriminationField = useDesugaredRelativeSingleField(referenceDiscriminationField)
 		const desugaredEmbedContentDiscriminationField = useDesugaredRelativeSingleField(embedContentDiscriminationField)
 
-
-
 		let refEnv = environment
 		if (!props.monolithicReferencesMode) {
 			refEnv = TreeNodeEnvironmentFactory.createEnvironmentForEntityList(refEnv, {
 				field: props.field,
 			})
 		}
-		refEnv = referencesField ? TreeNodeEnvironmentFactory.createEnvironmentForEntityList(refEnv, typeof referencesField === 'string' ? {
-			field: referencesField,
-		} : referencesField) : refEnv
+		refEnv = referencesField
+			? TreeNodeEnvironmentFactory.createEnvironmentForEntityList(
+				refEnv,
+				typeof referencesField === 'string'
+					? {
+						field: referencesField,
+					}
+					: referencesField,
+			)
+			: refEnv
 		const editorReferenceBlocks = useEditorReferenceBlocks(children, refEnv)
 
 		//
@@ -158,7 +162,8 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 				insertElementWithReference,
 				renderSortableBlock,
 				renderReference,
-			}))
+			})
+		)
 
 		// biome-ignore lint/correctness/useExhaustiveDependencies: intentional
 		useEffect(() => {
@@ -168,12 +173,11 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 		return (
 			<OuterWrapper>
 				<Repeater {...blockListProps} sortableBy={sortableBy}>
-
 					<ReferencesProvider getReferencedEntity={getReferencedEntity}>
 						<SortedBlocksContext.Provider value={sortedBlocks}>
 							<EditorReferenceBlocksContext.Provider value={editorReferenceBlocks}>
 								<Slate editor={editor} initialValue={nodes} onChange={onChange}>
-									<SyncValue nodes={nodes}/>
+									<SyncValue nodes={nodes} />
 									<InnerWrapper>
 										{children}
 									</InnerWrapper>
@@ -182,7 +186,6 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 						</SortedBlocksContext.Provider>
 					</ReferencesProvider>
 				</Repeater>
-
 			</OuterWrapper>
 		)
 	},
@@ -201,9 +204,7 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 				{props.embedContentDiscriminationField && (
 					<>
 						<Field field={props.embedContentDiscriminationField} />
-						{embedHandlers.map((handler, i) => (
-							<Fragment key={i}>{handler.staticRender(environment)}</Fragment>
-						))}
+						{embedHandlers.map((handler, i) => <Fragment key={i}>{handler.staticRender(environment)}</Fragment>)}
 					</>
 				)}
 			</HasMany>
@@ -228,15 +229,16 @@ const SyncValue = ({ nodes }: { nodes: Descendant[] }) => {
 	useEffect(() => {
 		if (editor.children !== nodes && JSON.stringify(editor.children) !== JSON.stringify(nodes)) {
 			withoutNormalizing(editor, () => {
-				for (const [, childPath] of Node.children(editor, [], {
-					reverse: true,
-				})) {
+				for (
+					const [, childPath] of Node.children(editor, [], {
+						reverse: true,
+					})
+				) {
 					removeNodes(editor, { at: childPath })
 				}
 				insertNodes(editor, nodes)
 			})
 		}
-
 	}, [editor, nodes])
 	return null
 }
@@ -252,60 +254,60 @@ export const BlockEditor = Object.assign<
 		ContentOutlet: (props: ContentOutletProps) => ReactElement | null
 		// TextField: (props: TextFieldProps) => ReactElement | null
 	}
-			>(BlockEditorComponent, {
-				ContentOutlet,
-			})
+>(BlockEditorComponent, {
+	ContentOutlet,
+})
 
 const assertStaticBlockEditorInvariants = (props: BlockEditorProps, environment: Environment) => {
 	if (import.meta.env.DEV) {
-		//referencesField?: SugaredRelativeEntityList | string
-		//referenceDiscriminationField?: SugaredFieldProps['field']
+		// referencesField?: SugaredRelativeEntityList | string
+		// referenceDiscriminationField?: SugaredFieldProps['field']
 		//
-		//embedReferenceDiscriminateBy?: SugaredDiscriminateBy
-		//embedContentDiscriminationField?: SugaredFieldProps['field']
-		//embedHandlers?: Iterable<EmbedHandler>
+		// embedReferenceDiscriminateBy?: SugaredDiscriminateBy
+		// embedContentDiscriminationField?: SugaredFieldProps['field']
+		// embedHandlers?: Iterable<EmbedHandler>
 
 		if (props.referencesField !== undefined && props.referenceDiscriminationField === undefined) {
 			throw new BindingError(
-				`BlockEditor: missing the 'referenceDiscriminationField' prop. ` +
-				`Without it the editor cannot tell different kinds of references apart!`,
+				`BlockEditor: missing the 'referenceDiscriminationField' prop. `
+					+ `Without it the editor cannot tell different kinds of references apart!`,
 			)
 		}
 		if (props.referencesField === undefined && props.referenceDiscriminationField !== undefined) {
 			throw new BindingError(
-				`BlockEditor: supplied the 'referenceDiscriminationField' prop but missing 'referencesField'. ` +
-				`Either remove 'referenceDiscriminationField' to get rid of this error ` +
-				`or provide 'referencesField' to enable content references.`,
+				`BlockEditor: supplied the 'referenceDiscriminationField' prop but missing 'referencesField'. `
+					+ `Either remove 'referenceDiscriminationField' to get rid of this error `
+					+ `or provide 'referencesField' to enable content references.`,
 			)
 		}
 		if (
-			props.referencesField !== undefined &&
-			(props.embedReferenceDiscriminateBy === undefined ||
-				props.embedContentDiscriminationField === undefined ||
-				props.embedHandlers === undefined) &&
-			(props.embedReferenceDiscriminateBy !== undefined ||
-				props.embedContentDiscriminationField !== undefined ||
-				props.embedHandlers !== undefined)
+			props.referencesField !== undefined
+			&& (props.embedReferenceDiscriminateBy === undefined
+				|| props.embedContentDiscriminationField === undefined
+				|| props.embedHandlers === undefined)
+			&& (props.embedReferenceDiscriminateBy !== undefined
+				|| props.embedContentDiscriminationField !== undefined
+				|| props.embedHandlers !== undefined)
 		) {
 			throw new BindingError(
-				`BlockEditor: trying to enable embeds without content references being enabled. In order to use embeds, ` +
-				`provide both the 'referenceDiscriminationField' as well as the 'referencesField' prop`,
+				`BlockEditor: trying to enable embeds without content references being enabled. In order to use embeds, `
+					+ `provide both the 'referenceDiscriminationField' as well as the 'referencesField' prop`,
 			)
 		}
 
 		if (props.embedReferenceDiscriminateBy !== undefined) {
 			if (props.embedContentDiscriminationField === undefined) {
 				throw new BindingError(
-					`BlockEditor: You enabled embed blocks by supplying the 'embedReferenceDiscriminateBy' prop but then ` +
-					`failed to also supply the 'embedContentDiscriminationField'. Without it, the editor would not be ` +
-					`able to distinguish between the kinds of embedded content.`,
+					`BlockEditor: You enabled embed blocks by supplying the 'embedReferenceDiscriminateBy' prop but then `
+						+ `failed to also supply the 'embedContentDiscriminationField'. Without it, the editor would not be `
+						+ `able to distinguish between the kinds of embedded content.`,
 				)
 			}
 			if (!props.embedHandlers || Array.from(props.embedHandlers).length === 0) {
 				throw new BindingError(
-					`BlockEditor: You enabled embed blocks by supplying the 'embedReferenceDiscriminateBy' prop but then ` +
-					`failed to also supply any embed handlers. Without them, the editor would not be able to ` +
-					`recognize any embedded content.`,
+					`BlockEditor: You enabled embed blocks by supplying the 'embedReferenceDiscriminateBy' prop but then `
+						+ `failed to also supply any embed handlers. Without them, the editor would not be able to `
+						+ `recognize any embedded content.`,
 				)
 			}
 		}

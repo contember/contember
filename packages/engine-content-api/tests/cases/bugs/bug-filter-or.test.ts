@@ -9,10 +9,8 @@ const schema = new SchemaBuilder()
 	.entity('Location', entity =>
 		entity
 			.column('name', column => column.type(Model.ColumnType.String))
-			.manyHasOne('parent', c => c.target('Location')),
-	)
+			.manyHasOne('parent', c => c.target('Location')))
 	.entity('Pub', entity => entity.column('name').manyHasOne('location', relation => relation.target('Location')))
-
 	.buildSchema()
 
 const query = GQL`
@@ -87,5 +85,3 @@ test('Filter by "has one" multiple times with OR and with empty parameter', asyn
 		},
 	})
 })
-
-

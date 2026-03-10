@@ -5,7 +5,6 @@ import { Filter } from '@contember/binding'
 import { BindingError } from '@contember/binding'
 import { evaluateCondition } from './evaluateCondition'
 
-
 export class FilterEvaluator {
 	constructor(
 		private readonly schema: Schema,
@@ -24,10 +23,8 @@ export class FilterEvaluator {
 
 				const operation = key === 'and' ? 'every' : 'some' as const
 				acc &&= value[operation](it => this.evaluateFilter(entity, it))
-
 			} else if (key === 'not') {
 				acc &&= !this.evaluateFilter(entity, value as Filter)
-
 			} else {
 				const field = entitySchema.fields.get(key)
 				if (!field) {

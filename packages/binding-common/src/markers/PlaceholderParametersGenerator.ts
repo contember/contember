@@ -9,7 +9,6 @@ import {
 import { Environment } from '../environment'
 
 export class PlaceholderParametersGenerator {
-
 	public static createHasOneRelationParameters(relation: HasOneRelation): any {
 		return {
 			type: 'hasOne',
@@ -75,5 +74,4 @@ export class PlaceholderParametersGenerator {
 			variables: environment.getAllVariables(),
 		}
 	}
-
 }

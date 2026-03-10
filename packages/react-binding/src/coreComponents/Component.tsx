@@ -35,7 +35,9 @@ function Component<Props extends {}, NonStaticPropNames extends keyof Props = ne
 	displayName?: string,
 ) {
 	const RenderWithEnv = (props: Props) => render(props, useEnvironment())
-	const renderWithEnv: (props: Props) => ReactNode = (typeof render !== 'function' || render.length < 2 ? render : RenderWithEnv) as (props: Props) => ReactNode
+	const renderWithEnv: (props: Props) => ReactNode = (typeof render !== 'function' || render.length < 2 ? render : RenderWithEnv) as (
+		props: Props,
+	) => ReactNode
 
 	if (decider === undefined || typeof decider === 'string') {
 		render.displayName = decider
@@ -58,8 +60,7 @@ function Component<Props extends {}, NonStaticPropNames extends keyof Props = ne
 	if (typeof decider === 'object') {
 		for (const provisionName in decider) {
 			const methodName = provisionName as keyof MarkerProvider<Props, NonStaticPropNames>
-			;(augmentedRender[methodName] as MarkerProvider<Props, NonStaticPropNames>[typeof methodName]) =
-				decider[methodName]
+			;(augmentedRender[methodName] as MarkerProvider<Props, NonStaticPropNames>[typeof methodName]) = decider[methodName]
 		}
 
 		return augmentedRender

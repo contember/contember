@@ -18,9 +18,7 @@ export const toLatestFormat = <E extends SlateEditor>(
 		for (; formatNumber < editor.formatVersion; formatNumber++) {
 			potentiallyOldNode = {
 				formatVersion: formatNumber + 1,
-				children: potentiallyOldNode.children.map(oldChild =>
-					editor.upgradeFormatBySingleVersion(oldChild, formatNumber),
-				) as SlateElement[],
+				children: potentiallyOldNode.children.map(oldChild => editor.upgradeFormatBySingleVersion(oldChild, formatNumber)) as SlateElement[],
 			}
 		}
 		return potentiallyOldNode
@@ -28,8 +26,8 @@ export const toLatestFormat = <E extends SlateEditor>(
 		const genericMessage = `Failed to upgrade editor format from version ${formatNumber}.`
 		if (e instanceof RangeError) {
 			throw new BindingError(
-				`${genericMessage}\nDetected a stack overflow. ` +
-					`Perhaps you incorrectly implemented 'upgradeFormatBySingleVersion'?`,
+				`${genericMessage}\nDetected a stack overflow. `
+					+ `Perhaps you incorrectly implemented 'upgradeFormatBySingleVersion'?`,
 			)
 		}
 		throw new BindingError(genericMessage)

@@ -9,7 +9,9 @@ export interface DataViewLayoutTriggerAttributes {
 	['data-current']?: string
 }
 
-const SlotType = Slot as React.ForwardRefExoticComponent<React.ButtonHTMLAttributes<HTMLButtonElement> & React.RefAttributes<HTMLButtonElement> & DataViewLayoutTriggerAttributes>
+const SlotType = Slot as React.ForwardRefExoticComponent<
+	React.ButtonHTMLAttributes<HTMLButtonElement> & React.RefAttributes<HTMLButtonElement> & DataViewLayoutTriggerAttributes
+>
 
 export interface DataViewLayoutTriggerProps {
 	/**

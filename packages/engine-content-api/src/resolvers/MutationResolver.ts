@@ -44,11 +44,11 @@ export class MutationResolver {
 	public async resolveTransaction(info: GraphQLResolveInfo, options: TransactionOptions): Promise<Result.TransactionResult> {
 		const queryAst = this.graphqlQueryAstFactory.create(info, (node, path) => {
 			return (
-				(path.length === 1 && !['ok', 'validation', 'errorMessage', 'errors'].includes(node.name.value)) ||
-				(path.length === 2 && node.name.value === 'node') ||
-				path.length > 2 ||
-				path.length === 0 ||
-				(path.length > 1 && path[1] === 'query')
+				(path.length === 1 && !['ok', 'validation', 'errorMessage', 'errors'].includes(node.name.value))
+				|| (path.length === 2 && node.name.value === 'node')
+				|| path.length > 2
+				|| path.length === 0
+				|| (path.length > 1 && path[1] === 'query')
 			)
 		})
 		const fields = GraphQlQueryAstFactory.resolveObjectType(info.returnType).getFields()
@@ -189,7 +189,7 @@ export class MutationResolver {
 							? {
 								valid: result.validation.valid,
 								errors: validationErrors,
-							  }
+							}
 							: { valid: true, errors: [] },
 						errorMessage: [
 							this.stringifyValidationErrors(validationErrors),
@@ -429,8 +429,8 @@ export class MutationResolver {
 
 		const result = await mapper.delete(entity, queryAst.args.by, queryAst.args.filter)
 		if (
-			result.length >= 1 &&
-			(result[0].result === MutationResultType.ok || result[0].result === MutationResultType.nothingToDo)
+			result.length >= 1
+			&& (result[0].result === MutationResultType.ok || result[0].result === MutationResultType.nothingToDo)
 		) {
 			return { ok: true, errors: [], ...nodes }
 		} else {
@@ -492,7 +492,6 @@ export class MutationResolver {
 							}
 							return { ...result, ...errorResponse }
 						}
-
 					}
 					return result
 				})
@@ -504,7 +503,6 @@ export class MutationResolver {
 				maxTimeout: 1000,
 			},
 		)
-
 	}
 
 	private createErrorResponse(result: MutationResultList) {
@@ -545,7 +543,7 @@ export class MutationResolver {
 				path.map(it => ({
 					...it,
 					__typename: 'field' in it ? '_FieldPathFragment' : '_IndexPathFragment',
-				})),
+				}))
 			)
 			const path = paths[0] || []
 			switch (it.result) {
@@ -594,8 +592,8 @@ export class MutationResolver {
 			return undefined
 		}
 		return (
-			'Validation has failed:\n' +
-			validationErrors.map(it => `${this.stringifyPath(it.path)}: ${it.message.text}`).join('\n')
+			'Validation has failed:\n'
+			+ validationErrors.map(it => `${this.stringifyPath(it.path)}: ${it.message.text}`).join('\n')
 		)
 	}
 
@@ -604,8 +602,8 @@ export class MutationResolver {
 			return undefined
 		}
 		return (
-			'Execution has failed:\n' +
-			executionErrors.map(it => `${this.stringifyPath(it.paths[0] || [])}: ${it.type} (${it.message || ''})`)
+			'Execution has failed:\n'
+			+ executionErrors.map(it => `${this.stringifyPath(it.paths[0] || [])}: ${it.type} (${it.message || ''})`)
 		)
 	}
 

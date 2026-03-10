@@ -4,8 +4,6 @@ import { testUuid } from '../../../../src/testUuid'
 import { describe, it } from 'bun:test'
 
 describe('Nested validations', () => {
-
-
 	it('validates nested m:n create with an alias', async () => {
 		class Post {
 			title = d.stringColumn()

@@ -1,4 +1,4 @@
-import { test, expect } from 'bun:test'
+import { expect, test } from 'bun:test'
 import { testUuid } from '../../../src/testUuid'
 import { AclSchemaAccessNodeFactory, PermissionActions } from '../../../../src'
 import { Acl } from '@contember/schema'
@@ -49,7 +49,6 @@ test('admin can invite editor role with matching variable', async () => {
 	expect(await node.isAllowed(aclEvaluator, PermissionActions.PERSON_INVITE(editorOfSiteA))).toBeTrue()
 })
 
-
 const aclSchemaForInviteOnly: Acl.Schema = {
 	roles: {
 		admin: {
@@ -67,7 +66,6 @@ const aclSchemaForInviteOnly: Acl.Schema = {
 	},
 }
 
-
 test('admin can invite public. cannot manage public, cannot invite lorem', async () => {
 	const node = new AclSchemaAccessNodeFactory().create(aclSchemaForInviteOnly, [{ role: 'admin', variables: [] }])
 
@@ -77,7 +75,6 @@ test('admin can invite public. cannot manage public, cannot invite lorem', async
 
 	expect(await node.isAllowed(aclEvaluator, PermissionActions.PROJECT_REMOVE_MEMBER([{ role: 'public', variables: [] }]))).toBeFalse()
 })
-
 
 const aclSchemaForViewOnly: Acl.Schema = {
 	roles: {
@@ -92,7 +89,6 @@ const aclSchemaForViewOnly: Acl.Schema = {
 		},
 	},
 }
-
 
 test('admin can view lorem, but cannot manage it', async () => {
 	const node = new AclSchemaAccessNodeFactory().create(aclSchemaForViewOnly, [{ role: 'admin', variables: [] }])

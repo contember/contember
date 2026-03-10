@@ -1,8 +1,7 @@
 import { escapeValue, MigrationArgs, MigrationBuilder } from '@contember/database-migrations'
 import { SystemMigrationArgs } from './types'
 
-
-export default async function (builder: MigrationBuilder, args: MigrationArgs<SystemMigrationArgs>) {
+export default async function(builder: MigrationBuilder, args: MigrationArgs<SystemMigrationArgs>) {
 	const schema = await args.schemaResolver(args.connection)
 	if (!schema.meta.id) {
 		return

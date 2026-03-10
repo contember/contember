@@ -21,7 +21,9 @@ const headers = {
 
 const DEFAULT_LOGIN_EXPIRATION = 14 * 24 * 60 // 14 days
 
-export const useHandleIDPResponse = ({ onLogin, expiration = DEFAULT_LOGIN_EXPIRATION, setState, hasOauthResponse, redirectUrl }: UseHandleIDPResponseProps): void => {
+export const useHandleIDPResponse = (
+	{ onLogin, expiration = DEFAULT_LOGIN_EXPIRATION, setState, hasOauthResponse, redirectUrl }: UseHandleIDPResponseProps,
+): void => {
 	const idpSignIn = useSignInIDPMutation({ headers })
 	const setSessionToken = useSetSessionToken()
 

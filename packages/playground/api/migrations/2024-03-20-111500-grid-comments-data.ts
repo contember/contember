@@ -31,18 +31,22 @@ export default printMutation([
 				createdAt: faker.date.recent().toISOString(),
 				article: {
 					connect: {
-						slug: articles[faker.number.int({
-							min: 0,
-							max: articles.length - 1,
-						})],
+						slug: articles[
+							faker.number.int({
+								min: 0,
+								max: articles.length - 1,
+							})
+						],
 					},
 				},
 				author: {
 					connect: {
-						slug: authors[faker.number.int({
-							min: 0,
-							max: authors.length - 1,
-						})],
+						slug: authors[
+							faker.number.int({
+								min: 0,
+								max: authors.length - 1,
+							})
+						],
 					},
 				},
 			},

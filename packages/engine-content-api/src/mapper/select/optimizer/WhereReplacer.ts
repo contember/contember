@@ -1,7 +1,12 @@
 import { Input, Writable } from '@contember/schema'
 import deepEqual from 'fast-deep-equal'
 
-export const replaceWhere = (subject: Input.OptionalWhere, find: Input.OptionalWhere, replace: Input.OptionalWhere, opts: { replaceSubOperands?: boolean } = {}): Input.OptionalWhere => {
+export const replaceWhere = (
+	subject: Input.OptionalWhere,
+	find: Input.OptionalWhere,
+	replace: Input.OptionalWhere,
+	opts: { replaceSubOperands?: boolean } = {},
+): Input.OptionalWhere => {
 	if (deepEqual(subject, find)) {
 		return replace
 	}
@@ -42,12 +47,10 @@ export const replaceWhere = (subject: Input.OptionalWhere, find: Input.OptionalW
 					write(key, items)
 				}
 			}
-
 		}
 	}
 	return result
 }
-
 
 const containsAllOperands = (subjectOperands: Input.OptionalWhere[], findOperands: Input.OptionalWhere[]): boolean => {
 	for (const op1 of findOperands) {

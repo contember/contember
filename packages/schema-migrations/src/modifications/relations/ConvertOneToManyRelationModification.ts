@@ -23,8 +23,8 @@ export class ConvertOneToManyRelationModificationHandler implements Modification
 		private readonly options: ModificationHandlerOptions,
 	) {
 		const { relation } = this.getRelation()
-		this.subModification = data.newInverseSideFieldName && relation.inversedBy ?
-			updateFieldNameModification.createHandler(
+		this.subModification = data.newInverseSideFieldName && relation.inversedBy
+			? updateFieldNameModification.createHandler(
 				{
 					entityName: relation.target,
 					fieldName: relation.inversedBy,
@@ -76,19 +76,20 @@ export class ConvertOneToManyRelationModificationHandler implements Modification
 				),
 			),
 			this.subModification.getSchemaUpdater(),
-			inverseFieldName ?
-				updateModel(
+			inverseFieldName
+				? updateModel(
 					updateEntity(
 						relation.target,
 						updateField<Model.OneHasOneInverseRelation, Model.OneHasManyRelation>(
 							inverseFieldName,
-							({ field: { type,  nullable, ...field } }) => ({
+							({ field: { type, nullable, ...field } }) => ({
 								type: Model.RelationType.OneHasMany,
 								...field,
 							}),
 						),
 					),
-				) : undefined,
+				)
+				: undefined,
 		)
 	}
 
@@ -123,18 +124,21 @@ export class ConvertOneToManyRelationDiffer implements Differ {
 	createDiff(originalSchema: Schema, updatedSchema: Schema) {
 		return updateRelations(originalSchema, updatedSchema, ({ originalRelation, updatedRelation, updatedEntity }) => {
 			if (
-				isOwningRelation(originalRelation) &&
-				isOwningRelation(updatedRelation) &&
-				originalRelation.type === Model.RelationType.OneHasOne &&
-				updatedRelation.type === Model.RelationType.ManyHasOne
+				isOwningRelation(originalRelation)
+				&& isOwningRelation(updatedRelation)
+				&& originalRelation.type === Model.RelationType.OneHasOne
+				&& updatedRelation.type === Model.RelationType.ManyHasOne
 			) {
-				const isInverseSideRenamed = originalRelation.inversedBy && updatedRelation.inversedBy && originalRelation.inversedBy !== updatedRelation.inversedBy
+				const isInverseSideRenamed = originalRelation.inversedBy && updatedRelation.inversedBy
+					&& originalRelation.inversedBy !== updatedRelation.inversedBy
 				return convertOneToManyRelationModification.createModification({
 					entityName: updatedEntity.name,
 					fieldName: updatedRelation.name,
-					...(isInverseSideRenamed ? {
-						newInverseSideFieldName: updatedRelation.inversedBy,
-					} : {}),
+					...(isInverseSideRenamed
+						? {
+							newInverseSideFieldName: updatedRelation.inversedBy,
+						}
+						: {}),
 				})
 			}
 			return undefined

@@ -26,7 +26,9 @@ export const Layout = memo(({ children }: PropsWithChildren) => (
 
 			<Slots.Footer>
 				<p>
-					<small>Created with <a className="content-link" href="https://www.contember.com/">AI-assisted Contember Studio</a></small>
+					<small>
+						Created with <a className="content-link" href="https://www.contember.com/">AI-assisted Contember Studio</a>
+					</small>
 				</p>
 			</Slots.Footer>
 

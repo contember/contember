@@ -10,19 +10,13 @@ import {
 	useDesugaredRelativeSingleEntity,
 	useDesugaredRelativeSingleField,
 } from '@contember/react-binding'
-import {
-	BoardAddColumnMethod,
-	BoardMethods,
-	BoardMoveColumnMethod,
-	BoardRemoveColumnMethod,
-} from '../types'
+import { BoardAddColumnMethod, BoardMethods, BoardMoveColumnMethod, BoardRemoveColumnMethod } from '../types'
 import { useGroupItemsByColumn } from './useGroupItemsByColumn'
 import { useCreateBoardColumns } from './useCreateBoardColumns'
 import { arrayMove } from '../utils/arrayMove'
 import { useBoardItemsMethods } from './useBoardItemsMethods'
 import { BoardData } from '../types/BoardData'
 import { BoardCommonProps, BoardDynamicColumnsBindingProps } from '../components'
-
 
 export type UseDynamicBoardBindingProps =
 	& Omit<BoardCommonProps, 'children'>
@@ -46,13 +40,11 @@ export const useDynamicBoard = ({
 	columnEntities,
 	itemEntities,
 }: UseDynamicBoardBindingProps): [BoardData<EntityAccessor>, BoardMethods<EntityAccessor>] => {
-
 	const desugaredSortableByField = useDesugaredRelativeSingleField(sortableBy)
 	const desugaredColumnSortableByField = useDesugaredRelativeSingleField(columnsSortableBy)
 	const desugaredDiscriminationField = useDesugaredRelativeSingleEntity(discriminationField)
 
 	const columnEntitiesGetter = columnEntities.getAccessor
-
 
 	const exitingColumnIds = useMemo(() => new Set(Array.from(columnEntities).map((it: EntityAccessor) => it.id)), [columnEntities])
 
@@ -91,9 +83,7 @@ export const useDynamicBoard = ({
 		} else {
 			parentEntity.disconnectEntityAtField(hasOne[hasOne.length - 1].field)
 		}
-
 	}, [desugaredDiscriminationField.hasOneRelationPath])
-
 
 	const moveColumn = useMemo<BoardMoveColumnMethod | undefined>(() => {
 		if (!desugaredColumnSortableByField) {
@@ -106,7 +96,6 @@ export const useDynamicBoard = ({
 			repairEntitiesOrder(desugaredColumnSortableByField, resortedItems)
 		}
 	}, [columnEntitiesGetter, desugaredColumnSortableByField, getSortedColumns])
-
 
 	const removeColumn = useCallback<BoardRemoveColumnMethod>(entity => {
 		entity.deleteEntity()

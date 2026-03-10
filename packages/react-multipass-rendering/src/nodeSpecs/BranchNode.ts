@@ -89,15 +89,15 @@ namespace BranchNode {
 			type: 'declarationSite'
 			factoryMethodName: FactoryMethodName
 			childrenRepresentationReducer: ChildrenRepresentationReducer<
-					ChildrenRepresentation,
-					ReducedChildrenRepresentation
-				>
-		  }
+				ChildrenRepresentation,
+				ReducedChildrenRepresentation
+			>
+		}
 		| {
 			type: 'useSite'
 			factory: UseSiteBranchNodeRepresentationFactory<Props, ChildrenRepresentation, Representation, StaticContext>
 			ComponentType?: ElementType<Props>
-		  }
+		}
 }
 
 export { BranchNode }

@@ -7,4 +7,3 @@ export const useFieldEntityName = (fields: string[]) => {
 	}
 	return targetField.targetEntity
 }
-

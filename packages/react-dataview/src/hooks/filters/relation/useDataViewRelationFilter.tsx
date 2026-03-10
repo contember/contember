@@ -7,7 +7,7 @@ export type DataViewSetRelationFilterAction = 'include' | 'exclude' | 'unset' | 
 export type DataViewRelationFilterCurrent = 'include' | 'exclude' | 'none'
 export type UseDataViewRelationFilterResult = [
 	current: DataViewRelationFilterCurrent,
-	set: (value: DataViewSetRelationFilterAction) => void
+	set: (value: DataViewSetRelationFilterAction) => void,
 ]
 export const useDataViewRelationFilter = (name: string, entityId: EntityId): UseDataViewRelationFilterResult => {
 	const factory = useDataViewRelationFilterFactory(name)
@@ -17,7 +17,6 @@ export const useDataViewRelationFilter = (name: string, entityId: EntityId): Use
 export const useDataViewRelationFilterFactory = (name: string) => {
 	const [filter, setFilter] = useDataViewFilter<RelationFilterArtifacts>(name)
 	return useCallback((id: EntityId): UseDataViewRelationFilterResult => {
-
 		const current = (() => {
 			if (filter?.id?.includes(id)) {
 				return 'include'

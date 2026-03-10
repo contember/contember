@@ -77,7 +77,6 @@ export interface SugaredRelativeEntityList extends UnsugarableEntityListEventLis
 	withMeta?: FieldMeta
 }
 
-
 export interface SugaredRelativeSingleEntity extends UnsugarableSingleEntityEventListeners {
 	// E.g. localesByLocale(locale.slug = en)
 	field:
@@ -90,7 +89,6 @@ export interface SugaredRelativeSingleEntity extends UnsugarableSingleEntityEven
 	setOnCreate?: SugaredSetOnCreate
 	withMeta?: FieldMeta
 }
-
 
 export interface SugaredRelativeSingleField extends UnsugarableFieldEventListeners {
 	/** E.g. authors(id = 123).person.name */
@@ -127,7 +125,6 @@ export interface SugaredQualifiedFieldList extends UnsugarableFieldEventListener
 	isNonbearing?: boolean
 }
 
-
 export interface SugaredUnconstrainedQualifiedEntityList extends UnsugarableEntityListEventListeners {
 	entities:
 		| string
@@ -144,7 +141,6 @@ export interface SugaredUnconstrainedQualifiedEntityList extends UnsugarableEnti
 	isUnpersisted?: boolean
 	setOnCreate?: SugaredSetOnCreate
 }
-
 
 export interface SugaredUnconstrainedQualifiedSingleEntity extends UnsugarableSingleEntityEventListeners {
 	// E.g. Author.son.sisters(name = 'Jane')
@@ -163,12 +159,10 @@ export interface SugaredUnconstrainedQualifiedSingleEntity extends UnsugarableSi
 	setOnCreate?: SugaredSetOnCreate
 }
 
-
 export interface SugarableHasManyRelation {
 	filter?: SugaredFilter
 	field: FieldName
 }
-
 
 export interface SugarableHasOneRelation {
 	field: FieldName
@@ -190,8 +184,6 @@ export type UnsugarableEntityListEventListeners = {
 	onChildUpdate?: EntityAccessor.UpdateListener | Set<EntityAccessor.UpdateListener>
 }
 
-
-
 export type UnsugarableSingleEntityEventListeners = {
 	onBeforePersist?: EntityAccessor.BeforePersistHandler | Set<EntityAccessor.BeforePersistHandler>
 	onBeforeUpdate?: EntityAccessor.BatchUpdatesHandler | Set<EntityAccessor.BatchUpdatesHandler>
@@ -200,7 +192,7 @@ export type UnsugarableSingleEntityEventListeners = {
 	onUpdate?: EntityAccessor.UpdateListener | Set<EntityAccessor.UpdateListener>
 	onInitialize?: EntityAccessor.BatchUpdatesHandler | Set<EntityAccessor.BatchUpdatesHandler>
 	onConnectionUpdate?: {
-		[fieldName: string]: | EntityAccessor.UpdateListener | Set<EntityAccessor.UpdateListener>
+		[fieldName: string]: EntityAccessor.UpdateListener | Set<EntityAccessor.UpdateListener>
 	}
 }
 
@@ -212,21 +204,17 @@ export type UnsugarableFieldEventListeners<Persisted extends FieldValue = FieldV
 
 // --- type checks
 
-const checkEntityListEvents:
-	keyof UnsugarableEntityListEventListeners extends `on${Capitalize<keyof (EntityListAccessor.EntityListEventListenerMap & EntityListAccessor.ChildEventListenerMap)>}`
-		? `on${Capitalize<keyof (EntityListAccessor.EntityListEventListenerMap & EntityListAccessor.ChildEventListenerMap)>}` extends keyof UnsugarableEntityListEventListeners
-			? true
-			: false
-		: false = true
-const checkSingleEntityEvents:
-	keyof UnsugarableSingleEntityEventListeners extends `on${Capitalize<keyof EntityAccessor.EntityEventListenerMap>}`
-		? `on${Capitalize<keyof EntityAccessor.EntityEventListenerMap>}` extends keyof UnsugarableSingleEntityEventListeners
-			? true
-			: false
-		: false = true
-const checkFieldEvents:
-	keyof UnsugarableFieldEventListeners extends `on${Capitalize<keyof FieldAccessor.FieldEventListenerMap>}`
-		? `on${Capitalize<keyof FieldAccessor.FieldEventListenerMap>}` extends keyof UnsugarableFieldEventListeners
-			? true
-			: false
-		: false = true
+const checkEntityListEvents: keyof UnsugarableEntityListEventListeners extends
+	`on${Capitalize<keyof (EntityListAccessor.EntityListEventListenerMap & EntityListAccessor.ChildEventListenerMap)>}`
+	? `on${Capitalize<keyof (EntityListAccessor.EntityListEventListenerMap & EntityListAccessor.ChildEventListenerMap)>}` extends
+		keyof UnsugarableEntityListEventListeners ? true
+	: false
+	: false = true
+const checkSingleEntityEvents: keyof UnsugarableSingleEntityEventListeners extends `on${Capitalize<keyof EntityAccessor.EntityEventListenerMap>}`
+	? `on${Capitalize<keyof EntityAccessor.EntityEventListenerMap>}` extends keyof UnsugarableSingleEntityEventListeners ? true
+	: false
+	: false = true
+const checkFieldEvents: keyof UnsugarableFieldEventListeners extends `on${Capitalize<keyof FieldAccessor.FieldEventListenerMap>}`
+	? `on${Capitalize<keyof FieldAccessor.FieldEventListenerMap>}` extends keyof UnsugarableFieldEventListeners ? true
+	: false
+	: false = true

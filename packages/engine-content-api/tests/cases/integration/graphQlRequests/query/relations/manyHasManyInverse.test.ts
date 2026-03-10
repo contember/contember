@@ -7,9 +7,7 @@ import { testUuid } from '../../../../../src/testUuid'
 test('Tags with paginated posts (many has many inverse)', async () => {
 	await execute({
 		schema: new SchemaBuilder()
-			.entity('Post', entity =>
-				entity.manyHasMany('tags', relation => relation.target('Tag').inversedBy('posts')).column('name'),
-			)
+			.entity('Post', entity => entity.manyHasMany('tags', relation => relation.target('Tag').inversedBy('posts')).column('name'))
 			.entity('Tag', entity => entity.column('name'))
 			.buildSchema(),
 		query: GQL`
@@ -121,9 +119,7 @@ test('Tags with paginated posts (many has many inverse)', async () => {
 test('empty many-has-many inverse relation', async () => {
 	await execute({
 		schema: new SchemaBuilder()
-			.entity('Post', entity =>
-				entity.manyHasMany('tags', relation => relation.target('Tag').inversedBy('posts')).column('name'),
-			)
+			.entity('Post', entity => entity.manyHasMany('tags', relation => relation.target('Tag').inversedBy('posts')).column('name'))
 			.entity('Tag', entity => entity.column('name'))
 			.buildSchema(),
 		query: GQL`
@@ -170,7 +166,6 @@ test('empty many-has-many inverse relation', async () => {
 	})
 })
 
-
 test('Posts with filtered tags', async () => {
 	await execute({
 		schema: new SchemaBuilder()
@@ -197,7 +192,8 @@ test('Posts with filtered tags', async () => {
 				},
 			},
 			{
-				sql: SQL`select "junction_"."post_id", "junction_"."tag_id"  from "public"."tag_posts" as "junction_" inner join  "public"."tag" as "root_" on  "junction_"."tag_id" = "root_"."id"  where "junction_"."post_id" in (?, ?) and "root_"."name" = ?`,
+				sql:
+					SQL`select "junction_"."post_id", "junction_"."tag_id"  from "public"."tag_posts" as "junction_" inner join  "public"."tag" as "root_" on  "junction_"."tag_id" = "root_"."id"  where "junction_"."post_id" in (?, ?) and "root_"."name" = ?`,
 				parameters: [testUuid(1), testUuid(2), 'Foo'],
 				response: {
 					rows: [
@@ -244,4 +240,3 @@ test('Posts with filtered tags', async () => {
 		},
 	})
 })
-

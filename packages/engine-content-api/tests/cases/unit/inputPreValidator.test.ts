@@ -1,9 +1,4 @@
-import {
-	ColumnValueResolver,
-	Dependencies,
-	InputPreValidator,
-	ValidationDataSelector,
-} from '../../../src/input-validation'
+import { ColumnValueResolver, Dependencies, InputPreValidator, ValidationDataSelector } from '../../../src/input-validation'
 import { InputValidation as v, SchemaBuilder, SchemaDefinition } from '@contember/schema-definition'
 import { Input, Model, Validation, Value } from '@contember/schema'
 import { EntityRulesResolver } from '../../../src'
@@ -27,7 +22,7 @@ const createDataSelectorMock = (primaryValues: PrimaryValueExpectation[], select
 	return createMock<ValidationDataSelector>({
 		getPrimaryValue: async (mapper: Mapper, entity: Model.Entity, where: Input.UniqueWhere) => {
 			const entry = primaryValues.shift()
-			//console.log(JSON.stringify({ entity: entity.name, where, result: undefined }))
+			// console.log(JSON.stringify({ entity: entity.name, where, result: undefined }))
 			if (!entry) {
 				throw new Error(`Unexpected getPrimaryValue call`)
 			}
@@ -51,7 +46,7 @@ const createDataSelectorMock = (primaryValues: PrimaryValueExpectation[], select
 			}
 			assert.equal(entity.name, entry.entity)
 			assert.deepStrictEqual(where, entry.where)
-			//console.log(JSON.stringify(entry))
+			// console.log(JSON.stringify(entry))
 			assert.deepStrictEqual(dependencies, entry.dependencies)
 			return entry.result
 		},
@@ -80,7 +75,6 @@ const createValidator = ({
 	)
 const mapper = {} as Mapper
 
-
 namespace ViewModelDefinition {
 	export class Book {
 		title = def.stringColumn()
@@ -94,10 +88,7 @@ namespace ViewModelDefinition {
 	}
 }
 
-
 describe('Input pre-validator', () => {
-
-
 	it('validates implicit rules', async () => {
 		const model = new SchemaBuilder()
 			.entity('Book', e => e.column('title', c => c.notNull().type(Model.ColumnType.String)).column('description'))
@@ -244,8 +235,7 @@ describe('Input pre-validator', () => {
 			.entity('Book', e =>
 				e
 					.column('title', c => c.notNull().type(Model.ColumnType.String))
-					.manyHasOne('author', r => r.target('Author', e => e.column('name')).notNull()),
-			)
+					.manyHasOne('author', r => r.target('Author', e => e.column('name')).notNull()))
 			.buildSchema()
 
 		const validator = createValidator({ model, validation: {} })
@@ -392,8 +382,7 @@ describe('Input pre-validator', () => {
 			.entity('Article', e =>
 				e
 					.column('publishedAt', c => c.type(Model.ColumnType.DateTime))
-					.manyHasOne('image', image => image.target('Image', e => e.column('url'))),
-			)
+					.manyHasOne('image', image => image.target('Image', e => e.column('url'))))
 			.buildSchema()
 
 		const rule = v.rules.conditional(v.rules.on('publishedAt', v.rules.notNull()), v.rules.defined())
@@ -435,7 +424,6 @@ describe('Input pre-validator', () => {
 			},
 		])
 	})
-
 
 	it('ignore not null on view relation', async () => {
 		const model = SchemaDefinition.createModel(ViewModelDefinition)

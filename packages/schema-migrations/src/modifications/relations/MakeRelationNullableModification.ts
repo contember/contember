@@ -41,14 +41,12 @@ export class MakeRelationNullableModificationHandler implements ModificationHand
 			message: `Make relation ${this.data.entityName}.${this.data.fieldName} nullable`,
 		}
 	}
-
 }
 
 export interface MakeRelationNullableModificationData {
 	entityName: string
 	fieldName: string
 }
-
 
 export const makeRelationNullableModification = createModificationType({
 	id: 'makeRelationNullable',
@@ -59,11 +57,11 @@ export class MakeRelationNullableDiffer implements Differ {
 	createDiff(originalSchema: Schema, updatedSchema: Schema) {
 		return updateRelations(originalSchema, updatedSchema, ({ originalRelation, updatedRelation, updatedEntity }) => {
 			if (
-				originalRelation.type === updatedRelation.type &&
-				isIt<Model.NullableRelation>(updatedRelation, 'nullable') &&
-				isIt<Model.NullableRelation>(originalRelation, 'nullable') &&
-				updatedRelation.nullable &&
-				!originalRelation.nullable
+				originalRelation.type === updatedRelation.type
+				&& isIt<Model.NullableRelation>(updatedRelation, 'nullable')
+				&& isIt<Model.NullableRelation>(originalRelation, 'nullable')
+				&& updatedRelation.nullable
+				&& !originalRelation.nullable
 			) {
 				return makeRelationNullableModification.createModification({
 					entityName: updatedEntity.name,

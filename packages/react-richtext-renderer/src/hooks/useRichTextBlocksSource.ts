@@ -18,11 +18,11 @@ export const useRichTextBlocksSource = <CustomElements extends RichTextElement, 
 		return blocks.map(block => {
 			if (!(sourceFieldResolved in block)) {
 				throw new RichTextRendererError(
-					`Found a block without a '${sourceFieldResolved}' field. ` +
-					(sourceField === undefined
-						? `The 'sourceField' prop has not been supplied, and so '${sourceFieldResolved}' was used as a default.`
-						: `That is what the 'sourceField' prop has been set to, and so either this is a typo, ` +
-						`or the data supplied is invalid.`),
+					`Found a block without a '${sourceFieldResolved}' field. `
+						+ (sourceField === undefined
+							? `The 'sourceField' prop has not been supplied, and so '${sourceFieldResolved}' was used as a default.`
+							: `That is what the 'sourceField' prop has been set to, and so either this is a typo, `
+								+ `or the data supplied is invalid.`),
 				)
 			}
 			const source = block[sourceFieldResolved]
@@ -32,38 +32,40 @@ export const useRichTextBlocksSource = <CustomElements extends RichTextElement, 
 
 			if (referencesField !== undefined && !(referencesFieldResolved in block)) {
 				throw new RichTextRendererError(
-					`The 'referencesField' prop is set to '${referencesFieldResolved}' but a block without such field ` +
-					`has been encountered. Unless this is just a typo, ` +
-					`if you do not wish to use references, avoid supplying the 'referencesField' prop.`,
+					`The 'referencesField' prop is set to '${referencesFieldResolved}' but a block without such field `
+						+ `has been encountered. Unless this is just a typo, `
+						+ `if you do not wish to use references, avoid supplying the 'referencesField' prop.`,
 				)
 			}
 			const references = block[referencesFieldResolved]
 
-			let normalizedReferences: Record<string, RichTextReference> | undefined 
+			let normalizedReferences: Record<string, RichTextReference> | undefined
 			if (references) {
 				if (typeof Object(references)[Symbol.iterator] !== 'function') {
 					throw new RichTextRendererError(`The set of references must be an iterable!`)
 				}
 
-				normalizedReferences = Object.fromEntries(Array.from(references as Iterable<RichTextReference>).map(reference => {
-					if (!('id' in reference)) {
-						throw new RichTextRendererError(`Found a reference without an id field.`)
-					}
-					if (!(referenceDiscriminationFieldResolved in reference) || typeof reference[referenceDiscriminationFieldResolved] !== 'string') {
-						throw new RichTextRendererError(
-							`Found a reference without a '${referenceDiscriminationFieldResolved}' field. ` +
-							(referenceDiscriminationField === undefined
-								? `The 'referenceDiscriminationField' prop has not been supplied, ` +
-								`and so '${referenceDiscriminationFieldResolved}' was used as a default.`
-								: `That is what the 'referenceDiscriminationField' prop has been set to, ` +
-								`and so either this is a typo, or the data supplied is invalid.`),
-						)
-					}
-					return [reference.id, {
-						...reference,
-						type: reference[referenceDiscriminationFieldResolved] as string,
-					}]
-				}))
+				normalizedReferences = Object.fromEntries(
+					Array.from(references as Iterable<RichTextReference>).map(reference => {
+						if (!('id' in reference)) {
+							throw new RichTextRendererError(`Found a reference without an id field.`)
+						}
+						if (!(referenceDiscriminationFieldResolved in reference) || typeof reference[referenceDiscriminationFieldResolved] !== 'string') {
+							throw new RichTextRendererError(
+								`Found a reference without a '${referenceDiscriminationFieldResolved}' field. `
+									+ (referenceDiscriminationField === undefined
+										? `The 'referenceDiscriminationField' prop has not been supplied, `
+											+ `and so '${referenceDiscriminationFieldResolved}' was used as a default.`
+										: `That is what the 'referenceDiscriminationField' prop has been set to, `
+											+ `and so either this is a typo, or the data supplied is invalid.`),
+							)
+						}
+						return [reference.id, {
+							...reference,
+							type: reference[referenceDiscriminationFieldResolved] as string,
+						}]
+					}),
+				)
 			}
 			return {
 				id: typeof block.id === 'string' ? block.id : undefined,

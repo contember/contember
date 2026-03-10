@@ -43,9 +43,11 @@ export class CreateEnumDiffer implements Differ {
 	createDiff(originalSchema: Schema, updatedSchema: Schema) {
 		return Object.entries(updatedSchema.model.enums)
 			.filter(([name]) => !originalSchema.model.enums[name])
-			.map(([enumName, values]) => createEnumModification.createModification({
-				enumName,
-				values,
-			}))
+			.map(([enumName, values]) =>
+				createEnumModification.createModification({
+					enumName,
+					values,
+				})
+			)
 	}
 }

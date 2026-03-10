@@ -1,10 +1,4 @@
-import {
-	ConstraintType,
-	getInsertPrimary,
-	MutationConstraintViolationError,
-	MutationEntryNotFoundError,
-	MutationResultList,
-} from '../../Result'
+import { ConstraintType, getInsertPrimary, MutationConstraintViolationError, MutationEntryNotFoundError, MutationResultList } from '../../Result'
 import { InsertBuilder } from '../../insert'
 import { Mapper } from '../../Mapper'
 import { Input, Model } from '@contember/schema'
@@ -15,7 +9,7 @@ import { MapperInput } from '../../types'
 
 type Context = Model.OneHasOneOwningContext
 
-export class OneHasOneOwningCreateInputProcessor implements CreateInputProcessor.HasOneRelationProcessor<Context, SqlCreateInputProcessorResult>{
+export class OneHasOneOwningCreateInputProcessor implements CreateInputProcessor.HasOneRelationProcessor<Context, SqlCreateInputProcessorResult> {
 	constructor(
 		private readonly mapper: Mapper,
 		private readonly insertBuilder: InsertBuilder,
@@ -53,7 +47,6 @@ export class OneHasOneOwningCreateInputProcessor implements CreateInputProcessor
 				return disconnectResult
 			}
 			return []
-
 		} else {
 			const insertResult = await this.mapper.insert(context.targetEntity, input.create)
 			const primary = getInsertPrimary(insertResult)

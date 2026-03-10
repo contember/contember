@@ -40,6 +40,5 @@ export const useInviteUser = ({ emailField, personIdField, memberships }: {
 			}
 			personId.updateValue(result.result.person.id)
 		}
-	},
-	)
+	})
 }

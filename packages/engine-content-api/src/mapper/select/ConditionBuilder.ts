@@ -1,5 +1,5 @@
 import { Input, Model } from '@contember/schema'
-import { QueryBuilder, ConditionBuilder as SqlConditionBuilder, Operator, Literal, formatColumnIdentifier, Compiler } from '@contember/database'
+import { Compiler, ConditionBuilder as SqlConditionBuilder, formatColumnIdentifier, Literal, Operator, QueryBuilder } from '@contember/database'
 import { UserError } from '../../exception'
 
 export class ConditionBuilder {
@@ -14,16 +14,14 @@ export class ConditionBuilder {
 			return builder
 		}
 		const entries = Object.entries(condition)
-			.filter(<T extends keyof Input.Condition>(it: [string, any]): it is [T, Input.Condition[T]] =>
-				it[1] !== null,
-			)
+			.filter(<T extends keyof Input.Condition>(it: [string, any]): it is [T, Input.Condition[T]] => it[1] !== null)
 		if (entries.length === 0) {
 			return builder
 		}
 		if (entries.length > 1) {
 			throw new UserError(
-				'Only single field is allowed. If you want to combine multiple conditions, use "and" or "or". Got: ' +
-					JSON.stringify(condition),
+				'Only single field is allowed. If you want to combine multiple conditions, use "and" or "or". Got: '
+					+ JSON.stringify(condition),
 			)
 		}
 		const columnIdentifier: QueryBuilder.ColumnIdentifier = [tableName, columnName]
@@ -34,8 +32,10 @@ export class ConditionBuilder {
 				param: Exclude<Input.Condition<any>[K], undefined>,
 			) => SqlConditionBuilder
 		} = {
-			and: (builder, expressions) => builder.and(builder2 => expressions.reduce((builder3, expr) => this.build(builder3, tableName, columnName, columnType, expr), builder2)),
-			or: (builder, expressions) => builder.or(builder2 => expressions.reduce((builder3, expr) => this.build(builder3, tableName, columnName, columnType, expr), builder2)),
+			and: (builder, expressions) =>
+				builder.and(builder2 => expressions.reduce((builder3, expr) => this.build(builder3, tableName, columnName, columnType, expr), builder2)),
+			or: (builder, expressions) =>
+				builder.or(builder2 => expressions.reduce((builder3, expr) => this.build(builder3, tableName, columnName, columnType, expr), builder2)),
 			not: (builder, expression) => builder.not(builder2 => this.build(builder2, tableName, columnName, columnType, expression)),
 
 			isNull: (builder, value) => value ? builder.isNull(columnIdentifier) : builder.not(clause => clause.isNull(columnIdentifier)),

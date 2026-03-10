@@ -30,13 +30,11 @@ import { assertNever } from '../utils/assertNever'
 import { QueryLanguage } from './QueryLanguage'
 
 export class MarkerFactory {
-
 	public static createEntitySubTreeMarker(
 		entity: SugaredQualifiedSingleEntity,
 		fields: EntityFieldMarkersContainer | EntityFieldsWithHoistablesMarker,
 		environment: Environment,
 	): EntityFieldsWithHoistablesMarker {
-
 		const qualifiedSingleEntity: QualifiedSingleEntity = QueryLanguage.desugarQualifiedSingleEntity(entity, environment)
 
 		return this.createSubTreeMarker(qualifiedSingleEntity, 'eventListeners', EntitySubTreeMarker, fields, environment)
@@ -47,7 +45,6 @@ export class MarkerFactory {
 		fields: EntityFieldMarkersContainer | EntityFieldsWithHoistablesMarker,
 		environment: Environment,
 	): EntityFieldsWithHoistablesMarker {
-
 		return this.createSubTreeMarker(
 			QueryLanguage.desugarUnconstrainedQualifiedSingleEntity(entity, environment),
 			'eventListeners',
@@ -62,7 +59,6 @@ export class MarkerFactory {
 		fields: EntityFieldMarkersContainer | EntityFieldsWithHoistablesMarker,
 		environment: Environment,
 	): EntityFieldsWithHoistablesMarker {
-
 		return this.createSubTreeMarker(
 			QueryLanguage.desugarQualifiedEntityList(entityList, environment),
 			'childEventListeners',
@@ -77,7 +73,6 @@ export class MarkerFactory {
 		fields: EntityFieldMarkersContainer | EntityFieldsWithHoistablesMarker,
 		environment: Environment,
 	): EntityFieldsWithHoistablesMarker {
-
 		return this.createSubTreeMarker(
 			QueryLanguage.desugarUnconstrainedQualifiedEntityList(entityList, environment),
 			'childEventListeners',
@@ -92,7 +87,6 @@ export class MarkerFactory {
 		fields: EntityFieldMarkersContainer | EntityFieldsWithHoistablesMarker,
 		environment: Environment,
 	): EntityFieldsWithHoistablesMarker {
-
 		const desugared = QueryLanguage.desugarParentEntityParameters(parentEntity, environment)
 
 		if (fields instanceof EntityFieldMarkersContainer) {
@@ -110,7 +104,6 @@ export class MarkerFactory {
 		fields: EntityFieldMarkersContainer | EntityFieldsWithHoistablesMarker,
 		environment: Environment,
 	): EntityFieldsWithHoistablesMarker {
-
 		if (fields instanceof EntityFieldMarkersContainer) {
 			return new EntityFieldsWithHoistablesMarker(fields, undefined, undefined)
 		}
@@ -123,19 +116,17 @@ export class MarkerFactory {
 		environment: Environment,
 		fields: EntityFieldsWithHoistablesMarker | EntityFieldMarkersContainer,
 	): EntityFieldsWithHoistablesMarker | EntityFieldMarkersContainer {
-
 		const relativeSingleEntity = QueryLanguage.desugarRelativeSingleEntity(field, environment)
 
 		if (fields instanceof EntityFieldMarkersContainer) {
 			return this.wrapRelativeEntityFieldMarkers(relativeSingleEntity.hasOneRelationPath, environment, fields)
 		}
 
-		relativeSingleEntity.hasOneRelationPath[relativeSingleEntity.hasOneRelationPath.length - 1] =
-			TreeParameterMerger.mergeInParentEntity(
-				relativeSingleEntity.hasOneRelationPath[relativeSingleEntity.hasOneRelationPath.length - 1],
-				'eventListeners',
-				fields.parentReference,
-			)
+		relativeSingleEntity.hasOneRelationPath[relativeSingleEntity.hasOneRelationPath.length - 1] = TreeParameterMerger.mergeInParentEntity(
+			relativeSingleEntity.hasOneRelationPath[relativeSingleEntity.hasOneRelationPath.length - 1],
+			'eventListeners',
+			fields.parentReference,
+		)
 
 		return new EntityFieldsWithHoistablesMarker(
 			this.wrapRelativeEntityFieldMarkers(relativeSingleEntity.hasOneRelationPath, environment, fields.fields),
@@ -149,7 +140,6 @@ export class MarkerFactory {
 		environment: Environment,
 		fields: EntityFieldsWithHoistablesMarker | EntityFieldMarkersContainer,
 	): EntityFieldsWithHoistablesMarker | EntityFieldMarkersContainer {
-
 		const relativeEntityList = QueryLanguage.desugarRelativeEntityList(field, environment)
 
 		if (fields instanceof EntityFieldMarkersContainer) {
@@ -189,7 +179,6 @@ export class MarkerFactory {
 	}
 
 	public static createFieldMarker(field: SugaredRelativeSingleField, environment: Environment): EntityFieldMarkersContainer {
-
 		return this.wrapRelativeSingleField(
 			field,
 			environment,
@@ -202,7 +191,6 @@ export class MarkerFactory {
 		environment: Environment,
 		getMarker: (relativeSingleField: RelativeSingleField) => EntityFieldMarker,
 	): EntityFieldMarkersContainer {
-
 		const relativeSingleField = QueryLanguage.desugarRelativeSingleField(field, environment)
 
 		return this.wrapRelativeEntityFieldMarkers(
@@ -217,7 +205,6 @@ export class MarkerFactory {
 		environment: Environment,
 		fields: EntityFieldMarkersContainer,
 	): EntityFieldMarkersContainer {
-
 		for (let i = hasOneRelationPath.length - 1; i >= 0; i--) {
 			const marker = this.createHasOneRelationMarker(hasOneRelationPath[i], environment, fields)
 			environment = environment.getParent()
@@ -278,7 +265,7 @@ export class MarkerFactory {
 	>(
 		qualifiedParams: Params,
 		key: Key,
-		Marker: new (params: Params, fields: EntityFieldMarkersContainer, env: Environment) =>
+		Marker: new(params: Params, fields: EntityFieldMarkersContainer, env: Environment) =>
 			| EntitySubTreeMarker
 			| EntityListSubTreeMarker,
 		fields: EntityFieldMarkersContainer | EntityFieldsWithHoistablesMarker,

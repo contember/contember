@@ -8,14 +8,15 @@ export interface EntityListBaseProps {
 	children?: ReactNode
 }
 
-export type EntityListProps<ListProps> = EntityListBaseProps &
-(
-	| {}
-	| {
-		listComponent: ComponentType<ListProps & EntityListBaseProps>
-		listProps?: ListProps
-		  }
-)
+export type EntityListProps<ListProps> =
+	& EntityListBaseProps
+	& (
+		| {}
+		| {
+			listComponent: ComponentType<ListProps & EntityListBaseProps>
+			listProps?: ListProps
+		}
+	)
 
 /**
  * @group Data binding

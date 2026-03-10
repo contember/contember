@@ -21,11 +21,9 @@ export const UploaderDropzoneAreaUI = uic('div', {
 	},
 })
 
-
 export const UploaderItemUI = uic('div', {
 	baseClass: 'rounded-sm border border-gray-200 p-1 shadow-sm bg-gray-100  flex gap-2 relative',
 })
-
 
 export const UploaderInactiveDropzoneUI = uic('div', {
 	baseClass: 'h-40 w-40 flex flex-col pointer-events-none relative',
@@ -43,5 +41,3 @@ export const UploaderRepeaterHandleUI = uic('button', {
 	baseClass: 'absolute top-0 left-0 h-6 w-6 inline-flex justify-center align-center opacity-10 hover:opacity-100 transition-opacity z-10',
 	beforeChildren: <GripIcon size={16} />,
 })
-
-

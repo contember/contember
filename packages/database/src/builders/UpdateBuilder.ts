@@ -31,7 +31,9 @@ class UpdateBuilder<Result extends UpdateBuilder.UpdateResult> implements With.A
 		return this.withOption('table', name)
 	}
 
-	public values<Values extends QueryBuilder.Values>(columns: { [K in keyof Values]?: Values[K] | QueryBuilder.ColumnExpression }): UpdateBuilder<Result> {
+	public values<Values extends QueryBuilder.Values>(
+		columns: { [K in keyof Values]?: Values[K] | QueryBuilder.ColumnExpression },
+	): UpdateBuilder<Result> {
 		return this.withOption('values', resolveValues(columns))
 	}
 

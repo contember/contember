@@ -11,8 +11,7 @@ test('Author by post title (where one has many)', async () => {
 			.entity('Post', entity =>
 				entity
 					.manyHasOne('author', relation => relation.target('Author').inversedBy('posts'))
-					.column('title', column => column.type(Model.ColumnType.String)),
-			)
+					.column('title', column => column.type(Model.ColumnType.String)))
 			.entity('Author', entity => entity.column('name', column => column.type(Model.ColumnType.String)))
 			.buildSchema(),
 		query: GQL`
@@ -54,4 +53,3 @@ test('Author by post title (where one has many)', async () => {
 		},
 	})
 })
-

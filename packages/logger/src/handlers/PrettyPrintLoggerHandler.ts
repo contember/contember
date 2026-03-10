@@ -6,7 +6,9 @@ import { LogLevels } from '../levels'
 export interface PrettyPrintLoggerHandlerOptions {
 	logLevel: LogLevel
 	formatters: {
-		[key: string]: (args: { value: any; formattedValue: string; key: string; chalk: typeof chalk; attributes: LoggerAttributes }) => undefined | string | { line: string }
+		[key: string]: (
+			args: { value: any; formattedValue: string; key: string; chalk: typeof chalk; attributes: LoggerAttributes },
+		) => undefined | string | { line: string }
 	}
 }
 
@@ -63,7 +65,6 @@ export class PrettyPrintLoggerHandler implements LoggerHandler {
 			this.stream.write(inspect(entry.error).replaceAll(/^/gm, indent) + '\n')
 		}
 	}
-
 
 	private formatTime(date: string): string {
 		const result = date.match(/^([0-9-]+)T([0-9:]+)\.(\d+)Z$/)

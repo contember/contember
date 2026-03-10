@@ -1,10 +1,4 @@
-import {
-	Environment,
-	SugarableHasOneRelation,
-	SugaredRelativeEntityList,
-	SugaredRelativeSingleEntity,
-	TokenRegExps,
-} from '@contember/binding'
+import { Environment, SugarableHasOneRelation, SugaredRelativeEntityList, SugaredRelativeSingleEntity, TokenRegExps } from '@contember/binding'
 import { ReactNode, useMemo } from 'react'
 import { Component } from '../coreComponents'
 

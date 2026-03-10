@@ -70,7 +70,6 @@ export const DataGridToolbar = Component<DataGridToolbarProps>(({ children, stic
 								<DataGridToolbarVisibleElements />
 								<DataGridPerPageSelector />
 							</div>
-
 						</PopoverContent>
 					</Popover>
 
@@ -83,13 +82,17 @@ export const DataGridToolbar = Component<DataGridToolbarProps>(({ children, stic
 				</div>
 
 				<div className="flex flex-1 flex-wrap gap-2">
-					{children ?? <>
-						<DataGridQueryFilter />
-					</>}
+					{children ?? (
+						<>
+							<DataGridQueryFilter />
+						</>
+					)}
 				</div>
 			</DataGridToolbarUI>
 		</DataGridShowFiltersContext.Provider>
 	)
-}, ({ children }) => <>
-	{children}
-</>)
+}, ({ children }) => (
+	<>
+		{children}
+	</>
+))

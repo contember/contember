@@ -1,11 +1,5 @@
 import * as Slate from 'slate'
-import {
-	BindingError,
-	EntityAccessor,
-	EntityListAccessor,
-	SugaredRelativeEntityList,
-	useEntityList,
-} from '@contember/react-binding'
+import { BindingError, EntityAccessor, EntityListAccessor, SugaredRelativeEntityList, useEntityList } from '@contember/react-binding'
 import { MutableRefObject, useCallback } from 'react'
 import { useConstantValueInvariant } from '@contember/react-utils'
 
@@ -26,8 +20,8 @@ export const useGetReferenceEntityList = ({
 	if (!referencesField) {
 		return useCallback(() => {
 			throw new BindingError(
-				`BlockEditor: trying to get or insert a referenced element but referencing has not been correctly set up. ` +
-				`Check the BlockEditor props.`,
+				`BlockEditor: trying to get or insert a referenced element but referencing has not been correctly set up. `
+					+ `Check the BlockEditor props.`,
 			)
 		}, [])
 	}

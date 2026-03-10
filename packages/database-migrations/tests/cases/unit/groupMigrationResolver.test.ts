@@ -2,7 +2,6 @@ import { describe, expect, test } from 'bun:test'
 import { GroupMigrationsResolver, Migration } from '../../../src'
 
 describe('group migration resolver', () => {
-
 	test('merges migrations', () => {
 		const runner = () => null
 		const resolver = new GroupMigrationsResolver({

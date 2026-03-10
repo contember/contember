@@ -16,10 +16,12 @@ export const hasMarks = <T extends SlateText, E extends SlateEditor>(
 		return false
 	}
 
-	for (const [text] of SlateNode.texts(editor, {
-		from,
-		to,
-	})) {
+	for (
+		const [text] of SlateNode.texts(editor, {
+			from,
+			to,
+		})
+	) {
 		for (const markName in marks) {
 			if (!(markName in text) || text[markName] !== (marks as any)[markName]) {
 				return false

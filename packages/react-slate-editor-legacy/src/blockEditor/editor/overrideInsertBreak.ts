@@ -1,7 +1,7 @@
 import type { EditorWithBlocks } from './EditorWithBlocks'
 import { isInReferenceElement } from '../utils'
 import { isElementWithReference } from '../elements'
-import { Editor, Transforms, Text, Element, Path as SlatePath } from 'slate'
+import { Editor, Element, Path as SlatePath, Text, Transforms } from 'slate'
 import { ContemberEditor } from '@contember/react-slate-editor-base'
 
 export interface OverrideInsertBreakOptions {}

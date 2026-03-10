@@ -12,7 +12,6 @@ export type DataViewSortingMethods = {
 	setOrderBy: DataViewSetColumnSorting
 }
 
-
 export type DataViewSortingDirections = Record<string, Exclude<DataViewSortingDirection, null>>
 
 /**
@@ -31,7 +30,6 @@ export type DataViewSortingState = {
 }
 
 export type DataViewSortingProps = {
-
 	/**
 	 * Initial sorting state if not available in storage.
 	 */

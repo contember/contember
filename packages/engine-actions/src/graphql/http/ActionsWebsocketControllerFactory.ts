@@ -55,7 +55,7 @@ export class ActionsWebsocketControllerFactory {
 			if (!authResult) {
 				throw new HttpErrorResponse(401, 'Authentication required')
 			}
-			if (!authResult.roles.some(it => it === TenantRole.SUPER_ADMIN || it  === TenantRole.PROJECT_ADMIN)) {
+			if (!authResult.roles.some(it => it === TenantRole.SUPER_ADMIN || it === TenantRole.PROJECT_ADMIN)) {
 				throw new HttpErrorResponse(403, 'Not allowed to run actions worker')
 			}
 
@@ -113,9 +113,12 @@ export class ActionsWebsocketControllerFactory {
 						const workerId = Math.random().toString().substring(2)
 						const dispatchSupervisor = this.dispatchWorkerSupervisorFactory.create(projectGroup)
 						try {
-							const running  = dispatchSupervisor.run({ logger, onError: () => {
-								send({ type: 'workerCrashed', workerId })
-							} })
+							const running = dispatchSupervisor.run({
+								logger,
+								onError: () => {
+									send({ type: 'workerCrashed', workerId })
+								},
+							})
 							workers.push({ id: workerId, running })
 							await running
 							send({ type: 'workerStarted', workerId })
@@ -144,4 +147,3 @@ export class ActionsWebsocketControllerFactory {
 		}
 	}
 }
-

@@ -1,6 +1,6 @@
 import { expect, test } from 'bun:test'
 import { createTester, gql } from '../../src/tester'
-import { createSchema, c } from '@contember/schema-definition'
+import { c, createSchema } from '@contember/schema-definition'
 
 namespace TimeoutModel {
 	@c.View(`select 'a1767dd9-2e5c-44da-a6be-07bb46b8e275' as id, 'foo' as value from (values(PG_SLEEP(60))) t`)

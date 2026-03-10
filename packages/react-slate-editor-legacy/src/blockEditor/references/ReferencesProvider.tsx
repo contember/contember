@@ -12,7 +12,6 @@ export type ReferencesProviderProps = {
 }
 
 export const ReferencesProvider: FC<ReferencesProviderProps> = ({ children, getReferencedEntity }) => {
-
 	return (
 		<ReferencesContext.Provider value={getReferencedEntity}>
 			{children}

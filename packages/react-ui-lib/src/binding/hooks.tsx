@@ -14,7 +14,6 @@ export const usePersistWithFeedback = () => {
 	}, [onPersistSuccess, triggerPersist])
 }
 
-
 export const usePersistFeedbackHandlers = () => {
 	return {
 		onPersistSuccess: usePersistSuccessHandler(),
@@ -32,15 +31,18 @@ export const usePersistErrorHandler = () => {
 					title={dict.persist.invalidInputError}
 					children={<ul>{errorList.map((it, i) => <li key={i}>{it}</li>)}</ul>}
 					details={result.response?.errorMessage}
-				/>, {
+				/>,
+				{
 					type: 'error',
-				})
+				},
+			)
 		} else if (result.type === 'invalidResponse') {
 			showToast(
 				<ToastContent
 					title={dict.persist.invalidResponseError}
 					children={dict.persist.invalidResponseErrorDetails}
-				/>, {
+				/>,
+				{
 					type: 'error',
 				},
 			)
@@ -55,16 +57,20 @@ export const usePersistSuccessHandler = () => {
 		showToast(
 			<ToastContent
 				title={dict.persist.success}
-			/>, {
+			/>,
+			{
 				type: 'success',
-			})
+			},
+		)
 		if (result.type === 'justSuccess' && result.afterPersistError) {
 			showToast(
 				<ToastContent
 					title={dict.persist.afterPersistError}
-				/>, {
+				/>,
+				{
 					type: 'warning',
-				})
+				},
+			)
 		}
 	}, [showToast])
 }

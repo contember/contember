@@ -1,4 +1,4 @@
-import { Editor as SlateEditor, Element as SlateElement, Element, Node, Node as SlateNode, Transforms } from 'slate'
+import { Editor as SlateEditor, Element, Element as SlateElement, Node, Node as SlateNode, Transforms } from 'slate'
 import { createEmptyTableCellElement, isTableCellElement, tableCellElementType } from './TableCellElement'
 import { ContemberEditor } from '../../../editor'
 import { tableElementType } from './TableElement'
@@ -19,7 +19,7 @@ export const createEmptyTableRowElement = (columnCount = 2) => ({
 	children: Array.from({ length: columnCount }, () => createEmptyTableCellElement()),
 })
 
-export const tableRowElementPlugin = ({ render }: {render: ElementRenderer<TableRowElement>}): EditorElementPlugin<TableRowElement> => ({
+export const tableRowElementPlugin = ({ render }: { render: ElementRenderer<TableRowElement> }): EditorElementPlugin<TableRowElement> => ({
 	type: tableRowElementType,
 	render,
 	normalizeNode: ({ editor, path, element, preventDefault }) => {

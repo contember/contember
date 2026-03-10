@@ -56,14 +56,14 @@ export class EntityOperations {
 
 			if (fieldSchema === undefined) {
 				throw new BindingError(
-					`EntityAccessor.connectEntityAtField: Unknown field ${entityName}.${fieldName}.\n\n` +
-						`Entity located at: ${ErrorLocator.locateInternalState(outerState)}.`,
+					`EntityAccessor.connectEntityAtField: Unknown field ${entityName}.${fieldName}.\n\n`
+						+ `Entity located at: ${ErrorLocator.locateInternalState(outerState)}.`,
 				)
 			} else if (fieldSchema.__typename === '_Column') {
 				throw new BindingError(
-					`EntityAccessor.connectEntityAtField: Cannot connect at field ${entityName}.${fieldName} because ` +
-						`it's not a has-one relation.\n\n` +
-						`Entity located at: ${ErrorLocator.locateInternalState(outerState)}.`,
+					`EntityAccessor.connectEntityAtField: Cannot connect at field ${entityName}.${fieldName} because `
+						+ `it's not a has-one relation.\n\n`
+						+ `Entity located at: ${ErrorLocator.locateInternalState(outerState)}.`,
 				)
 			}
 
@@ -73,19 +73,19 @@ export class EntityOperations {
 					const previouslyConnectedState = state.children.get(targetHasOneMarker.placeholderName)
 
 					if (
-						previouslyConnectedState === undefined ||
-						previouslyConnectedState.type === 'field' ||
-						previouslyConnectedState.type === 'entityList'
+						previouslyConnectedState === undefined
+						|| previouslyConnectedState.type === 'field'
+						|| previouslyConnectedState.type === 'entityList'
 					) {
 						OperationsHelpers.rejectInvalidAccessorTree()
 					}
 
 					if (previouslyConnectedState.entity.entityName !== stateToConnect.entity.entityName) {
 						throw new BindingError(
-							`EntityAccessor.connectEntityAtField: Attempting to connect at field ${entityName}.${fieldName} ` +
-								`an entity of type '${stateToConnect.entity.entityName}' but ` +
-								`'${previouslyConnectedState.entity.entityName}' is expected.\n\n` +
-								`Entity located at: ${ErrorLocator.locateInternalState(outerState)}.`,
+							`EntityAccessor.connectEntityAtField: Attempting to connect at field ${entityName}.${fieldName} `
+								+ `an entity of type '${stateToConnect.entity.entityName}' but `
+								+ `'${previouslyConnectedState.entity.entityName}' is expected.\n\n`
+								+ `Entity located at: ${ErrorLocator.locateInternalState(outerState)}.`,
 						)
 					}
 
@@ -94,21 +94,21 @@ export class EntityOperations {
 					} catch (error) {
 						if (error instanceof LocalizedBindingError) {
 							throw new BindingError(
-								`EntityAccessor: cannot connect entity with key '${entityToConnect.key}' because its fields are` +
-									`incompatible with entities found at field '${fieldName}'. Make sure both trees are equivalent.\n\n` +
-									`${error.message}\n\n` +
-									(error.markerPath.length > 1
+								`EntityAccessor: cannot connect entity with key '${entityToConnect.key}' because its fields are`
+									+ `incompatible with entities found at field '${fieldName}'. Make sure both trees are equivalent.\n\n`
+									+ `${error.message}\n\n`
+									+ (error.markerPath.length > 1
 										? `Incompatibility found at: ${ErrorLocator.locateMarkerPath(error.markerPath)}.\n\n`
-										: '') +
-									`Entity located at: ${ErrorLocator.locateInternalState(state)}.`,
+										: '')
+									+ `Entity located at: ${ErrorLocator.locateInternalState(state)}.`,
 							)
 						}
 						throw error
 					}
 
 					if (
-						previouslyConnectedState === stateToConnect ||
-						previouslyConnectedState.entity.id.value === stateToConnect.entity.id.value
+						previouslyConnectedState === stateToConnect
+						|| previouslyConnectedState.entity.id.value === stateToConnect.entity.id.value
 					) {
 						continue // Do nothing.
 					}
@@ -130,9 +130,9 @@ export class EntityOperations {
 						changesDelta++ // We're changing it from the persisted id.
 					} else if (!previouslyConnectedState.entity.id.existsOnServer) {
 						if (
-							persistedId === null || // We're updating.
-							(persistedId === undefined && // We're creating.
-								(!fieldsToConnect.hasAtLeastOneBearingField || !targetHasOneMarker.parameters.isNonbearing))
+							persistedId === null // We're updating.
+							|| (persistedId === undefined // We're creating.
+								&& (!fieldsToConnect.hasAtLeastOneBearingField || !targetHasOneMarker.parameters.isNonbearing))
 						) {
 							changesDelta++
 						}
@@ -171,8 +171,8 @@ export class EntityOperations {
 					const stateToDisconnect = state.children.get(targetHasOneMarker.placeholderName)
 
 					if (
-						stateToDisconnect === undefined ||
-						(stateToDisconnect.type !== 'entityRealm' && stateToDisconnect.type !== 'entityRealmStub')
+						stateToDisconnect === undefined
+						|| (stateToDisconnect.type !== 'entityRealm' && stateToDisconnect.type !== 'entityRealmStub')
 					) {
 						OperationsHelpers.rejectInvalidAccessorTree()
 					}

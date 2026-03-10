@@ -11,8 +11,7 @@ test('Sites with settings (one-has-one owning)', async () => {
 			.entity('Site', entity =>
 				entity
 					.column('name', column => column.type(Model.ColumnType.String))
-					.oneHasOne('setting', relation => relation.target('SiteSetting')),
-			)
+					.oneHasOne('setting', relation => relation.target('SiteSetting')))
 			.entity('SiteSetting', entity => entity.column('url', column => column.type(Model.ColumnType.String)))
 			.buildSchema(),
 		query: GQL`query {
@@ -97,4 +96,3 @@ test('Sites with settings (one-has-one owning)', async () => {
 		},
 	})
 })
-

@@ -7,5 +7,4 @@ const errorHandler = createErrorHandler((dom, react, onRecoverableError) => crea
 
 const rootEl = document.body.appendChild(document.createElement('div'))
 
-errorHandler(onRecoverableError => createRoot(rootEl, { onRecoverableError }).render(<Entrypoint/>))
-
+errorHandler(onRecoverableError => createRoot(rootEl, { onRecoverableError }).render(<Entrypoint />))

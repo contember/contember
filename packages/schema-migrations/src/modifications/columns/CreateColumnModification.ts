@@ -27,7 +27,6 @@ export class CreateColumnModificationHandler implements ModificationHandler<Crea
 			copyValue: this.data.copyValue,
 		})
 
-
 		builder.addColumn(entity.tableName, {
 			[column.columnName]: {
 				type: columnType,
@@ -64,10 +63,9 @@ export class CreateColumnModificationHandler implements ModificationHandler<Crea
 	describe({ createdEntities }: { createdEntities: string[] }) {
 		const notNull = !this.data.field.nullable
 		const hasValue = this.data.fillValue !== undefined || this.data.copyValue !== undefined
-		const failureWarning =
-			notNull && !hasValue && !createdEntities.includes(this.data.entityName)
-				? 'May fail in runtime, because column is not-null. Consider setting fillValue or copyValue'
-				: undefined
+		const failureWarning = notNull && !hasValue && !createdEntities.includes(this.data.entityName)
+			? 'May fail in runtime, because column is not-null. Consider setting fillValue or copyValue'
+			: undefined
 		return { message: `Add field ${this.data.entityName}.${this.data.field.name}`, failureWarning }
 	}
 }
@@ -79,7 +77,6 @@ export interface CreateColumnModificationData {
 	copyValue?: string
 	valueMigrationStrategy?: 'using' | 'update'
 }
-
 
 export const createColumnModification = createModificationType({
 	id: 'createColumn',

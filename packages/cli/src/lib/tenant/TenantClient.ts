@@ -10,7 +10,6 @@ export const createTenantApiUrl = (url: string) => {
 	return url + '/tenant'
 }
 
-
 export class TenantClient {
 	constructor(private readonly apiClient: GraphQlClient) {}
 

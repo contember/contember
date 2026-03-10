@@ -2,9 +2,7 @@ import { SystemMigrationsRunner } from '../migrations'
 import { DatabaseContextFactory, emptyVersionedSchema, SchemaProvider } from '../model'
 import { DatabaseMetadataResolver, emptyDatabaseMetadata } from '@contember/database'
 import { createLogger, PrettyPrintLoggerHandler } from '@contember/logger'
-
-
-(async () => {
+;(async () => {
 	const dbConfig = {
 		database: process.env.PGDATABASE as string,
 		host: process.env.PGHOST as string,

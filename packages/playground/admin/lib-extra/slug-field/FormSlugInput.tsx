@@ -65,13 +65,15 @@ export const FormSlugInput = Component<FormSlugInputProps>(({
 	)
 }, ({ field, isNonbearing, defaultValue, derivedFrom }) => {
 	const derivedFromArray = Array.isArray(derivedFrom) ? derivedFrom : [derivedFrom]
-	return <>
-		<Field field={field} isNonbearing={isNonbearing} defaultValue={defaultValue} />
-		{derivedFromArray.map((it, index) => {
-			if (typeof it === 'function') {
-				return
-			}
-			return <Field field={it} key={index} />
-		})}
-	</>
+	return (
+		<>
+			<Field field={field} isNonbearing={isNonbearing} defaultValue={defaultValue} />
+			{derivedFromArray.map((it, index) => {
+				if (typeof it === 'function') {
+					return
+				}
+				return <Field field={it} key={index} />
+			})}
+		</>
+	)
 })

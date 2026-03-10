@@ -6,9 +6,9 @@ class TemporalFieldHelper extends FieldHelper<string> {
 		this.getAccessor().updateValue(new Date().toISOString(), options)
 	}
 
-	//public setToDate() TODO
-	//public setToTime() TODO
-	//public setToDateTime() TODO
+	// public setToDate() TODO
+	// public setToTime() TODO
+	// public setToDateTime() TODO
 }
 namespace TemporalFieldHelper {
 	export const setToNow = (

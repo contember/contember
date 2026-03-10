@@ -37,6 +37,5 @@ export class ActionsGetEventCommand extends Command<Args, Options> {
 			return 1
 		}
 		console.log(JSON.stringify(result, null, 2))
-
 	}
 }

@@ -3,7 +3,6 @@ import { useCurrentRequest } from '../contexts'
 import { useRedirect } from './useRedirect'
 import { StateStorageOrName, useStoredState } from '@contember/react-utils'
 
-
 const emptyDim = [] as string[]
 
 export const useDimensionState = ({ dimension, defaultValue, storage = 'null' }: {
@@ -30,13 +29,17 @@ export const useDimensionState = ({ dimension, defaultValue, storage = 'null' }:
 		const isDimensionEmpty = currentDimensionValue.length === 0 || (currentDimensionValue.length === 1 && currentDimensionValue[0] === '')
 
 		if (isDimensionEmpty && initialStoredState.length > 0 && initialStoredState[0] !== '') {
-			redirect(it => it ? {
-				...it,
-				dimensions: {
-					...it.dimensions,
-					[dimension]: initialStoredState,
-				},
-			} : null)
+			redirect(it =>
+				it
+					? {
+						...it,
+						dimensions: {
+							...it.dimensions,
+							[dimension]: initialStoredState,
+						},
+					}
+					: null
+			)
 		}
 	}, [currentDimensionValue, dimension, initialStoredState, redirect])
 

@@ -24,8 +24,7 @@ export class ProjectSecretsQuery extends DatabaseQuery<ProjectSecretsQueryResult
 					key: it.key,
 					...await this.providers.decrypt(it.value, it.version),
 				})
-			},
-			),
+			}),
 		)
 	}
 }

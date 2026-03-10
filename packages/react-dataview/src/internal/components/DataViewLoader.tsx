@@ -9,12 +9,7 @@ import {
 	useEntityListSubTree,
 	useEntityListSubTreeLoader,
 } from '@contember/react-binding'
-import {
-	DataViewDisplayedStateContext,
-	DataViewEntityListAccessorContext,
-	DataViewLoaderStateContext,
-	DataViewReloadContext,
-} from '../../contexts'
+import { DataViewDisplayedStateContext, DataViewEntityListAccessorContext, DataViewLoaderStateContext, DataViewReloadContext } from '../../contexts'
 import { DataViewState } from '../../types'
 import { dataViewSelectionEnvironmentExtension } from '../../env/dataViewSelectionEnvironmentExtension'
 import { DataViewInteractionProvider } from './DataViewInteractionProvider'
@@ -49,7 +44,6 @@ const NonExistingEntityListSubtree = memo(({ children }: {
 })
 
 export const DataViewLoader = Component(({ children, state, onSelectHighlighted }: DataViewLoaderProps) => {
-
 	const resolvedFilters = state.filtering.filter
 	const orderBy = state.sorting.orderBy
 	const paging = state.paging
@@ -76,8 +70,8 @@ export const DataViewLoader = Component(({ children, state, onSelectHighlighted 
 									entities={loaderState.entities}
 									children={innerChildren}
 								/>
-							)
-						}</TreeRootIdProvider>
+							)}
+					</TreeRootIdProvider>
 				</DataViewDisplayedStateContext.Provider>
 			</DataViewReloadContext.Provider>
 		</DataViewLoaderStateContext.Provider>

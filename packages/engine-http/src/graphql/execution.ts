@@ -38,7 +38,9 @@ interface FactoryArgs<Context> {
 	listeners: GraphQLListener<Context>[]
 }
 
-export type GraphQLQueryHandler<Context> = (args: { request: Request; response: Response; createContext: ({}: { operation: OperationTypeNode }) => Context }) => any
+export type GraphQLQueryHandler<Context> = (
+	args: { request: Request; response: Response; createContext: ({}: { operation: OperationTypeNode }) => Context },
+) => any
 
 const hitCacheMaxAgeSeconds = 10 * 60
 const documentCacheMaxAgeSeconds = hitCacheMaxAgeSeconds * 10
@@ -62,7 +64,6 @@ export const createGraphQLQueryHandler = <Context>({
 	let lastPrune = Date.now()
 
 	return async ({ request, response, createContext }) => {
-
 		const now = Date.now()
 		if ((now - lastPrune) > pruneIntervalSeconds * 1000) {
 			documentCache.purgeStale()
@@ -116,7 +117,6 @@ export const createGraphQLQueryHandler = <Context>({
 			const operationName = resolvedRequest.operationName ?? null
 			const operation = resolveOperationType(document, operationName)
 
-
 			const context = createContext({ operation })
 			listenersQueue.forEach(it => {
 				it.onExecute && listenersQueue.push(it.onExecute({ context, document, operation }) || {})
@@ -146,7 +146,6 @@ export const createGraphQLQueryHandler = <Context>({
 		}
 	}
 }
-
 
 export const extractOriginalError = (e: Error): Error => {
 	if (e instanceof GraphQLError && e.originalError) {
@@ -182,7 +181,6 @@ const processErrors = (errors: readonly any[]): [number | null, any[]] => {
 	}
 	return [has500 ? 500 : has400 ? 400 : has403 ? 403 : null, resultErrors]
 }
-
 
 const resolveOperationType = (document: DocumentNode, operationName: string | null): OperationTypeNode => {
 	for (const definition of document.definitions) {

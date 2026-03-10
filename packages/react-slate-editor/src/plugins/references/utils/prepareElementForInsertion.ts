@@ -1,4 +1,14 @@
-import { Editor, Element as SlateElement, Location, Node as SlateNode, NodeEntry, Path as SlatePath, Point, Range as SlateRange, Transforms } from 'slate'
+import {
+	Editor,
+	Element as SlateElement,
+	Location,
+	Node as SlateNode,
+	NodeEntry,
+	Path as SlatePath,
+	Point,
+	Range as SlateRange,
+	Transforms,
+} from 'slate'
 import { ContemberEditor } from '@contember/react-slate-editor-base'
 import { isElementWithReference } from '../elements'
 

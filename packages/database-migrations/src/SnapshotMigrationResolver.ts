@@ -14,7 +14,6 @@ export class SnapshotMigrationResolver<Args> implements MigrationsResolver<Args>
 	resolveMigrations(
 		{ runMigrations }: MigrationsResolverContext,
 	): Migration<Args>[] {
-
 		if (this.canUseSnapshot(runMigrations)) {
 			return this.getSnapshotMigration()
 		}

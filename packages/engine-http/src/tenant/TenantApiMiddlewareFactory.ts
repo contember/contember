@@ -3,8 +3,6 @@ import { HttpErrorResponse } from '../common'
 import { GraphQLKoaState } from '../graphql'
 
 export class TenantApiMiddlewareFactory {
-
-
 	create(): HttpController {
 		return async ctx => {
 			const { timer, projectGroup, authResult, logger, koa, clientIp } = ctx
@@ -14,29 +12,29 @@ export class TenantApiMiddlewareFactory {
 			const tenantContainer = projectGroup.tenantContainer
 			await logger.scope(async logger => {
 				logger.debug('Tenant query processing started')
-				await timer('GraphQL', () => projectGroup.tenantGraphQLHandler({
-					request: koa.request,
-					response: koa.response,
-					createContext: ({ operation }) => {
-						(koa.state as GraphQLKoaState).graphql = {
-							operationName: operation,
-						}
-						const resolverContextFactory = tenantContainer.resolverContextFactory
-						const db = tenantContainer.databaseContext
-						const context = resolverContextFactory.create(
-							authResult,
-							{ ip: clientIp, userAgent: koa.request.headers['user-agent'] },
-							db,
-							logger,
-						)
+				await timer('GraphQL', () =>
+					projectGroup.tenantGraphQLHandler({
+						request: koa.request,
+						response: koa.response,
+						createContext: ({ operation }) => {
+							;(koa.state as GraphQLKoaState).graphql = {
+								operationName: operation,
+							}
+							const resolverContextFactory = tenantContainer.resolverContextFactory
+							const db = tenantContainer.databaseContext
+							const context = resolverContextFactory.create(
+								authResult,
+								{ ip: clientIp, userAgent: koa.request.headers['user-agent'] },
+								db,
+								logger,
+							)
 
-						return {
-							...context,
-							identityId: authResult.identityId,
-						}
-
-					},
-				}))
+							return {
+								...context,
+								identityId: authResult.identityId,
+							}
+						},
+					}))
 				logger.debug('Tenant query finished')
 			})
 		}

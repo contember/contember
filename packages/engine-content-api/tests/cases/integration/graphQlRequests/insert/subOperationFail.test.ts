@@ -33,14 +33,16 @@ test('failed to insert in sub-operation', async () => {
 		executes: [
 			...failedTransaction([
 				{
-					sql: SQL`with "root_" as (select ? :: uuid as "id") insert into  "public"."article_content" ("id") select "root_"."id"  from "root_"  returning "id"`,
+					sql:
+						SQL`with "root_" as (select ? :: uuid as "id") insert into  "public"."article_content" ("id") select "root_"."id"  from "root_"  returning "id"`,
 					parameters: [testUuid(2)],
 					response: {
 						rows: [{ id: testUuid(2) }],
 					},
 				},
 				{
-					sql: SQL`with "root_" as (select ? :: uuid as "id", ? :: text as "title", ? :: text as "locale", ? :: uuid as "content_id") insert into  "public"."article_content_locale" ("id", "title", "locale", "content_id") select "root_"."id", "root_"."title", "root_"."locale", "root_"."content_id"  from "root_"  returning "id"`,
+					sql:
+						SQL`with "root_" as (select ? :: uuid as "id", ? :: text as "title", ? :: text as "locale", ? :: uuid as "content_id") insert into  "public"."article_content_locale" ("id", "title", "locale", "content_id") select "root_"."id", "root_"."title", "root_"."locale", "root_"."content_id"  from "root_"  returning "id"`,
 					parameters: [testUuid(3), 'Title', 'en', testUuid(2)],
 					response: {
 						rows: [],
@@ -57,7 +59,6 @@ test('failed to insert in sub-operation', async () => {
 		},
 	})
 })
-
 
 test('failed to insert in sub-operation in update', async () => {
 	await execute({
@@ -78,14 +79,16 @@ test('failed to insert in sub-operation in update', async () => {
 					},
 				},
 				{
-					sql: SQL`with "root_" as (select ? :: uuid as "id") insert into  "public"."article_content" ("id") select "root_"."id"  from "root_"  returning "id"`,
+					sql:
+						SQL`with "root_" as (select ? :: uuid as "id") insert into  "public"."article_content" ("id") select "root_"."id"  from "root_"  returning "id"`,
 					parameters: [testUuid(1)],
 					response: {
 						rows: [{ id: testUuid(1) }],
 					},
 				},
 				{
-					sql: SQL`with "root_" as (select ? :: uuid as "id", ? :: text as "title", ? :: text as "locale", ? :: uuid as "content_id") insert into  "public"."article_content_locale" ("id", "title", "locale", "content_id") select "root_"."id", "root_"."title", "root_"."locale", "root_"."content_id"  from "root_"  returning "id"`,
+					sql:
+						SQL`with "root_" as (select ? :: uuid as "id", ? :: text as "title", ? :: text as "locale", ? :: uuid as "content_id") insert into  "public"."article_content_locale" ("id", "title", "locale", "content_id") select "root_"."id", "root_"."title", "root_"."locale", "root_"."content_id"  from "root_"  returning "id"`,
 					parameters: [testUuid(2), 'Title', 'en', testUuid(1)],
 					response: {
 						rows: [],
@@ -102,4 +105,3 @@ test('failed to insert in sub-operation in update', async () => {
 		},
 	})
 })
-

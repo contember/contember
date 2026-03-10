@@ -16,8 +16,6 @@ const entity: Model.Entity = {
 }
 
 describe('order by helper', () => {
-
-
 	it('set default order by without defined order', () => {
 		const objectNode = new ObjectNode('test', 'test', [], {}, {}, [])
 
@@ -73,10 +71,14 @@ describe('order by helper', () => {
 	it('set default order by without defined order', () => {
 		const objectNode = new ObjectNode('test', 'test', [], {}, {}, [])
 
-		const newNode = OrderByHelper.appendDefaultOrderBy({
-			...entity,
-			orderBy: [{ path: ['lorem', 'ipsum'], direction: Input.OrderDirection.desc }],
-		}, objectNode, undefined)
+		const newNode = OrderByHelper.appendDefaultOrderBy(
+			{
+				...entity,
+				orderBy: [{ path: ['lorem', 'ipsum'], direction: Input.OrderDirection.desc }],
+			},
+			objectNode,
+			undefined,
+		)
 		assert.deepStrictEqual(newNode.args.orderBy, [
 			{ lorem: { ipsum: Input.OrderDirection.desc } },
 			{ id: Input.OrderDirection.asc },

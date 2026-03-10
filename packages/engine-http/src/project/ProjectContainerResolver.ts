@@ -7,8 +7,8 @@ import { Logger } from '@contember/logger'
 import { EventEmitter, EventManager } from '@contember/engine-common'
 
 export type ProjectContainerResolverEvents = {
-	create: (args: { container: ProjectContainer}) => (() => void) | void
-	destroy: (args: { container: ProjectContainer}) => void
+	create: (args: { container: ProjectContainer }) => (() => void) | void
+	destroy: (args: { container: ProjectContainer }) => void
 }
 
 export class ProjectContainerResolver implements EventEmitter<ProjectContainerResolverEvents> {
@@ -24,7 +24,6 @@ export class ProjectContainerResolver implements EventEmitter<ProjectContainerRe
 		private readonly tenantDatabase: DatabaseContext,
 		private readonly tenantConfig: TenantConfig,
 	) {}
-
 
 	public async getProjectContainer(slug: string, { alias = false }: { alias?: boolean } = {}): Promise<ProjectContainer | undefined> {
 		const realSlug = this.projectContainers.resolveAlias(slug)
@@ -76,7 +75,7 @@ export class ProjectContainerResolver implements EventEmitter<ProjectContainerRe
 		if (existing) {
 			const existingAwaited = await existing
 			existingAwaited.cleanups.forEach(it => it())
-			this.eventManager.fire('destroy', ({ container: existingAwaited.container }))
+			this.eventManager.fire('destroy', { container: existingAwaited.container })
 			existingAwaited.container.project.alias?.forEach(it => this.projectContainers.removeAlias(it))
 			this.projectContainers.removeContainer(slug)
 		}

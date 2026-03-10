@@ -5,7 +5,8 @@ import { addField, SchemaUpdater, updateEntity, updateModel, updateSchema } from
 import {
 	createModificationType,
 	Differ,
-	ModificationHandler, ModificationHandlerCreateSqlOptions,
+	ModificationHandler,
+	ModificationHandlerCreateSqlOptions,
 	ModificationHandlerOptions,
 } from '../ModificationHandler'
 import { isIt } from '../../utils/isIt'
@@ -16,9 +17,7 @@ import { normalizeManyHasManyRelation, PartialManyHasManyRelation } from './norm
 import { addForeignKeyConstraint } from './helpers'
 import { wrapIdentifier } from '../../utils/dbHelpers'
 
-
 export class CreateRelationModificationHandler implements ModificationHandler<CreateRelationModificationData> {
-
 	constructor(
 		private readonly data: CreateRelationModificationData,
 		private readonly schema: Schema,
@@ -82,13 +81,11 @@ export class CreateRelationModificationHandler implements ModificationHandler<Cr
 
 	describe({ createdEntities }: { createdEntities: string[] }) {
 		const notNull = isIt<Model.NullableRelation>(this.data.owningSide, 'nullable') && !this.data.owningSide.nullable
-		const failureWarning =
-			notNull && !createdEntities.includes(this.data.entityName)
-				? `May fail in runtime, because relation is not-null`
-				: undefined
+		const failureWarning = notNull && !createdEntities.includes(this.data.entityName)
+			? `May fail in runtime, because relation is not-null`
+			: undefined
 		return { message: `Add relation ${this.data.entityName}.${this.data.owningSide.name}`, failureWarning }
 	}
-
 
 	private getNormalizedOwningSide(): Model.AnyOwningRelation {
 		if (this.data.owningSide.type === Model.RelationType.ManyHasMany) {
@@ -97,7 +94,6 @@ export class CreateRelationModificationHandler implements ModificationHandler<Cr
 		return this.data.owningSide
 	}
 }
-
 
 export type CreateRelationModificationData = {
 	entityName: string

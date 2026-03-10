@@ -7,8 +7,8 @@ export const useEntityKey = (): string | (() => EntityAccessor) => {
 
 	if (entityKey === undefined) {
 		throw new BindingError(
-			`Trying to use a data bound component outside a correct parent. You likely forgot to use <DataBindingProvider /> ` +
-				`or a SubTree.`,
+			`Trying to use a data bound component outside a correct parent. You likely forgot to use <DataBindingProvider /> `
+				+ `or a SubTree.`,
 		)
 	}
 	return entityKey

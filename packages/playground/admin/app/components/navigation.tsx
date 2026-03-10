@@ -40,7 +40,6 @@ import { Menu, MenuItem } from '~/lib/ui/menu'
 import { SidebarMenuButton } from '~/lib/ui/sidebar'
 import { useIsMobile } from '~/lib/utils/use-mobile'
 
-
 const menuItemSize = 'lg'
 const menuSubItemSize = 'default'
 

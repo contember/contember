@@ -27,8 +27,7 @@ export interface SentInfo {
 
 export type MailerOptions =
 	& (
-		SMTPTransport.Options | SMTPPool.Options | SendmailTransport.Options | SESTransport.Options | TransportOptions
-		| {
+		SMTPTransport.Options | SMTPPool.Options | SendmailTransport.Options | SESTransport.Options | TransportOptions | {
 			webhook: string | {
 				url: string
 				headers?: Record<string, string>
@@ -38,7 +37,6 @@ export type MailerOptions =
 	& {
 		from?: string
 	}
-
 
 export interface Mailer {
 	send(message: MailMessage): Promise<SentInfo>
@@ -58,7 +56,6 @@ export class NodeMailer implements Mailer {
 }
 
 export class WebhookMailer implements Mailer {
-
 	constructor(
 		private readonly from: string | undefined,
 		private readonly url: string,
@@ -83,7 +80,6 @@ export class WebhookMailer implements Mailer {
 		return {}
 	}
 }
-
 
 export const createMailer = (options: MailerOptions): Mailer => {
 	const { from, ...transportOptions } = options

@@ -2,7 +2,7 @@ import { ReactElement, useEffect, useState } from 'react'
 import { TenantForm } from './TenantForm'
 import { FormContextValue, FormError, FormState } from '../../types'
 import { useForm } from '../../contexts'
-import { UpdateProjectMemberErrorCode, MembershipInput } from '@contember/graphql-client-tenant'
+import { MembershipInput, UpdateProjectMemberErrorCode } from '@contember/graphql-client-tenant'
 import { useProjectMembershipsQuery, useTenantQueryLoader, useUpdateProjectMemberMutation } from '../../hooks'
 
 export type UpdateProjectMemberFormValues = {
@@ -24,7 +24,7 @@ export interface UpdateProjectMemberFormProps {
 	children: ReactElement
 	identityId: string
 	projectSlug: string
-	onSuccess?: (args: { }) => void
+	onSuccess?: (args: {}) => void
 }
 
 export const useUpdateProjectMemberForm = useForm as () => UpdateProjectMemberFormContextValue

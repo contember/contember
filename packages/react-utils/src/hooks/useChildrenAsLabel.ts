@@ -11,7 +11,6 @@ function normalize(text: string): string {
  *
  * @param node - The children to walk through.
  * @returns String representation of the text content or undefined if there is no text content.
- *
  */
 export function getChildrenAsLabel(node: ReactNode): string | undefined {
 	if (typeof node === 'string' || typeof node === 'number') {
@@ -66,7 +65,6 @@ export function getChildrenAsLabel(node: ReactNode): string | undefined {
  *
  * @param node - The children to walk through.
  * @returns String representation of the text content or undefined if there is no text content.
- *
  */
 export function useChildrenAsLabel(node: ReactNode): string | undefined {
 	return useMemo(() => getChildrenAsLabel(node), [node])

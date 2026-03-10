@@ -6,8 +6,7 @@ type Args = {
 	format?: string
 }
 
-type Options = {
-}
+type Options = {}
 
 export class MigrationBlankCommand extends Command<Args, Options> {
 	constructor(
@@ -31,4 +30,3 @@ export class MigrationBlankCommand extends Command<Args, Options> {
 		return 0
 	}
 }
-

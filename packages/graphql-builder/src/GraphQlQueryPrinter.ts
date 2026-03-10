@@ -18,7 +18,6 @@ export class GraphQlQueryPrinter {
 
 	private body = ''
 
-
 	public printDocument(
 		operation: 'query' | 'mutation',
 		select: GraphQlSelectionSet,
@@ -37,7 +36,6 @@ export class GraphQlQueryPrinter {
 			variables: Object.fromEntries(Object.entries(this.variables).map(([key, value]) => [key, value.value])),
 		}
 	}
-
 
 	private processUsedFragments(fragments: Record<string, GraphQlFragment>): void {
 		const printed = new Set()

@@ -4,7 +4,6 @@ export type GenericEventsMap = {
 }
 
 export class EventListenersStore<Events extends GenericEventsMap> {
-
 	constructor(
 		private readonly parentStoreGetter?: () => EventListenersStore<Events> | undefined,
 		private listeners?: Map<string, Set<Events[any]>>,

@@ -11,11 +11,12 @@ import {
  * @group Layout
  */
 export const SlotsProvider = memo<{ children: ReactNode }>(({ children }) => {
-	const [slotsRefMap, setSlotsRefMap] = useState<Map<string, HTMLElement>>(new Map)
-	const [activeSlotsMap, setActiveSlotsMap] = useState<Map<string, string>>(new Map)
+	const [slotsRefMap, setSlotsRefMap] = useState<Map<string, HTMLElement>>(new Map())
+	const [activeSlotsMap, setActiveSlotsMap] = useState<Map<string, string>>(new Map())
 	const activeSlotPortals: Set<string> = useMemo(() => new Set(activeSlotsMap.values()), [activeSlotsMap])
 
-	const activeSlotsMapRef = useRef(activeSlotsMap); activeSlotsMapRef.current = activeSlotsMap
+	const activeSlotsMapRef = useRef(activeSlotsMap)
+	activeSlotsMapRef.current = activeSlotsMap
 
 	// TODO: refactor to use ID
 	const unregisterSlotTarget = useCallback((id: string, name: string) => {
@@ -33,7 +34,6 @@ export const SlotsProvider = memo<{ children: ReactNode }>(({ children }) => {
 			unregisterSlotTarget(id, name)
 		}
 	}, [unregisterSlotTarget])
-
 
 	const slotTargetsRegistry: SlotTargetsRegistryContextType = useMemo(() => {
 		return {

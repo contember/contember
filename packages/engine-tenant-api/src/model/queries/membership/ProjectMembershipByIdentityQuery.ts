@@ -21,20 +21,16 @@ class ProjectMembershipByIdentityQuery extends DatabaseQuery<ProjectMembershipBy
 						'id' in this.project
 							? qb.where({
 								project_id: this.project.id,
-							  })
-							: qb.match(byProjectSlug(this.project.slug)),
-					),
-			)
+							})
+							: qb.match(byProjectSlug(this.project.slug))
+					))
 			.with('variables', qb =>
 				qb
 					.select('membership_id')
 					.select(cb => cb.raw("json_agg(json_build_object('name', variable, 'values', value))"), 'variables')
 					.from('project_membership_variable')
-					.join('memberships', undefined, expr =>
-						expr.columnsEq(['project_membership_variable', 'membership_id'], ['memberships', 'id']),
-					)
-					.groupBy('membership_id'),
-			)
+					.join('memberships', undefined, expr => expr.columnsEq(['project_membership_variable', 'membership_id'], ['memberships', 'id']))
+					.groupBy('membership_id'))
 			.select('role')
 			.select(expr => expr.raw("coalesce(variables, '[]'::json)"), 'variables')
 			.select('identity_id', 'identityId')

@@ -5,8 +5,7 @@ import { SchemaBuilder } from '@contember/schema-definition'
 import { emptySchema } from '@contember/schema-utils'
 import { Model } from '@contember/schema'
 import { createConnectionMock } from '@contember/database-tester'
-import { ForeignKeyDeleteAction, createDatabaseMetadata, emptyDatabaseMetadata } from '@contember/database'
-
+import { createDatabaseMetadata, emptyDatabaseMetadata, ForeignKeyDeleteAction } from '@contember/database'
 
 test('table-on-delete test', async () => {
 	const builder = createMigrationBuilder()
@@ -16,37 +15,37 @@ test('table-on-delete test', async () => {
 	}])
 	await migration(builder, {
 		connection: connection,
-		databaseMetadataResolver: () => Promise.resolve(createDatabaseMetadata({
-			indexes: [],
-			uniqueConstraints: [],
-			foreignKeys: [{
-				constraintName: 'fk_post_author_id_author_id',
-				fromColumn: 'author_id',
-				fromTable: 'post',
-				toColumn: 'id',
-				toTable: 'author',
-				deleteAction: ForeignKeyDeleteAction.restrict,
-				deferrable: false,
-				deferred: false,
-			}],
-		})),
-		schemaResolver: () => Promise.resolve(({
-			schema: {
-				...emptySchema,
-				model: new SchemaBuilder()
-					.entity('Post', entity =>
-						entity.manyHasOne('author', relation => relation.target('Author').onDelete(Model.OnDelete.setNull)),
-					)
-					.entity('Author', entity => entity)
-					.buildSchema(),
-			},
-			meta: {
-				id: 1,
-				version: '2024-06-28-153001',
-				checksum: '_checksum_',
-				updatedAt: new Date(),
-			},
-		})),
+		databaseMetadataResolver: () =>
+			Promise.resolve(createDatabaseMetadata({
+				indexes: [],
+				uniqueConstraints: [],
+				foreignKeys: [{
+					constraintName: 'fk_post_author_id_author_id',
+					fromColumn: 'author_id',
+					fromTable: 'post',
+					toColumn: 'id',
+					toTable: 'author',
+					deleteAction: ForeignKeyDeleteAction.restrict,
+					deferrable: false,
+					deferred: false,
+				}],
+			})),
+		schemaResolver: () =>
+			Promise.resolve({
+				schema: {
+					...emptySchema,
+					model: new SchemaBuilder()
+						.entity('Post', entity => entity.manyHasOne('author', relation => relation.target('Author').onDelete(Model.OnDelete.setNull)))
+						.entity('Author', entity => entity)
+						.buildSchema(),
+				},
+				meta: {
+					id: 1,
+					version: '2024-06-28-153001',
+					checksum: '_checksum_',
+					updatedAt: new Date(),
+				},
+			}),
 		project: {
 			slug: 'test',
 			systemSchema: 'system',
@@ -69,4 +68,3 @@ ALTER TABLE "stage_live"."post"
 `,
 	)
 })
-

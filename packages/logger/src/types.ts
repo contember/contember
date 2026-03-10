@@ -1,6 +1,6 @@
 import { FingerCrossedLoggerHandlerOptions } from './handlers/FingerCrossedLoggerHandler'
 
-export type LogFn = ((errorOrMessage: unknown, attributes?: LoggerAttributes) => void)
+export type LogFn = (errorOrMessage: unknown, attributes?: LoggerAttributes) => void
 
 export interface Logger {
 	attributes: LoggerAttributes

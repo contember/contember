@@ -25,7 +25,6 @@ export class AdminDeployer {
 		console.log(`Admin deployed (${files.length} files)`)
 	}
 
-
 	private readAdminFiles = async (dir: string, prefix: string = ''): Promise<AdminFiles> => {
 		const files = []
 		for (const fileName of await this.fs.readDir(dir, { withFileTypes: true })) {

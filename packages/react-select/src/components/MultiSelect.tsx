@@ -53,4 +53,3 @@ export const MultiSelect = Component(({ field, children, options, onSelect, onUn
 		</HasMany>
 	)
 })
-

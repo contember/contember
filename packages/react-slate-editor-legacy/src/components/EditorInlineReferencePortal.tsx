@@ -18,7 +18,6 @@ export interface EditorInlineReferenceTriggerProps {
 	children: ReactNode
 }
 
-
 export const EditorInlineReferencePortal = (props: EditorInlineReferenceTriggerProps) => {
 	const editor = useSlate() as EditorWithBlocks
 	const environment = useEnvironment()

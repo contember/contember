@@ -9,9 +9,7 @@ export const siteSettingSchema = new SchemaBuilder()
 				r
 					.inversedBy('site')
 					.target('SiteSetting', e => e.column('url', c => c.type(Model.ColumnType.String)))
-					.onDelete(Model.OnDelete.setNull),
-			),
-	)
+					.onDelete(Model.OnDelete.setNull)))
 	.buildSchema()
 
 export const siteSettingSchemaWithOrphanRemoval = new SchemaBuilder()
@@ -22,7 +20,5 @@ export const siteSettingSchemaWithOrphanRemoval = new SchemaBuilder()
 				r
 					.inversedBy('site')
 					.target('SiteSetting', e => e.column('url', c => c.type(Model.ColumnType.String)))
-					.removeOrphan(),
-			),
-	)
+					.removeOrphan()))
 	.buildSchema()

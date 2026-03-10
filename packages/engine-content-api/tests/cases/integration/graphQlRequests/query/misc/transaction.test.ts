@@ -70,5 +70,3 @@ from "public"."post" as "root_"`,
 		},
 	})
 })
-
-

@@ -19,7 +19,6 @@ export type IDPResponseError =
 	| 'INVALID_LOCAL_STATE'
 	| 'UNKNOWN_ERROR'
 
-
 export type IDPMethods = {
 	initRedirect: (args: { provider: string }) => Promise<{ ok: true } | { ok: false; error: IDPInitError }>
 }

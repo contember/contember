@@ -5,10 +5,10 @@ import { useCallback } from 'react'
 
 const projectIdentityRelationFragment = TenantApi
 	.projectIdentityRelation$
-	.identity(TenantApi.identity$$
-		.person(TenantApi.person$.id.email.name.otpEnabled)
-		.apiKey(TenantApi.apiKey$$)
-		,
+	.identity(
+		TenantApi.identity$$
+			.person(TenantApi.person$.id.email.name.otpEnabled)
+			.apiKey(TenantApi.apiKey$$),
 	)
 	.memberships(TenantApi.membership$$.variables(TenantApi.variableEntry$$))
 
@@ -20,23 +20,28 @@ export type ProjectMembersQueryVariables =
 	}
 	& TenantApi.ProjectMembersInput
 
-
 export const useProjectMembersQuery = ({ headers, apiToken }: TenantApiOptions = {}) => {
 	const executor = useTenantApi({
 		headers,
 		apiToken,
 	})
 	return useCallback(async ({ projectSlug, ...membersInput }: ProjectMembersQueryVariables): Promise<ProjectMembersQueryResult> => {
-		const result = await executor(TenantApi.query$.projectBySlug({
-			slug: ParameterRef.of('projectSlug'),
-		}, TenantApi.project$.members({
-			input: ParameterRef.of('membersInput'),
-		}, projectIdentityRelationFragment)), {
-			variables: {
-				projectSlug,
-				membersInput,
+		const result = await executor(
+			TenantApi.query$.projectBySlug(
+				{
+					slug: ParameterRef.of('projectSlug'),
+				},
+				TenantApi.project$.members({
+					input: ParameterRef.of('membersInput'),
+				}, projectIdentityRelationFragment),
+			),
+			{
+				variables: {
+					projectSlug,
+					membersInput,
+				},
 			},
-		})
+		)
 
 		return result.projectBySlug?.members ?? []
 	}, [executor])

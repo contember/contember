@@ -4,7 +4,6 @@ import { TenantResolverContext } from '../TenantResolverContext'
 import { ConfigurationManager } from '../../model/service/ConfigurationManager'
 
 export class ConfigurationQueryResolver implements Pick<QueryResolvers, 'configuration'> {
-
 	constructor(
 		private readonly configurationManager: ConfigurationManager,
 	) {

@@ -1,4 +1,4 @@
-import { Editor as SlateEditor, Editor, Element as SlateElement, Node as SlateNode, Path, Range as SlateRange, Transforms } from 'slate'
+import { Editor, Editor as SlateEditor, Element as SlateElement, Node as SlateNode, Path, Range as SlateRange, Transforms } from 'slate'
 import { AnchorModifications } from './AnchorModifications'
 import { EditorElementPlugin, ElementRenderer } from '../../../types'
 
@@ -16,7 +16,6 @@ export const isAnchorElementActive = (editor: Editor) => {
 	const [link] = Editor.nodes(editor, { match: isAnchorElement })
 	return !!link
 }
-
 
 export const anchorElementPlugin = ({ render }: { render: ElementRenderer<AnchorElement> }): EditorElementPlugin<AnchorElement> => ({
 	type: anchorElementType,

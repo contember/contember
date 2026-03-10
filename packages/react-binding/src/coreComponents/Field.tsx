@@ -11,9 +11,7 @@ export interface FieldRuntimeProps<Persisted extends FieldValue = FieldValue> {
 	format?: (value: Persisted | null) => ReactNode
 }
 
-export interface FieldProps<Persisted extends FieldValue = FieldValue>
-	extends FieldBasicProps,
-	FieldRuntimeProps<Persisted> {}
+export interface FieldProps<Persisted extends FieldValue = FieldValue> extends FieldBasicProps, FieldRuntimeProps<Persisted> {}
 
 /**
  * @group Data binding
@@ -27,8 +25,8 @@ export const Field = Component(
 		}
 
 		if (
-			field.value === null ||
-			typeof field.value === 'boolean'
+			field.value === null
+			|| typeof field.value === 'boolean'
 		) {
 			return null
 		}

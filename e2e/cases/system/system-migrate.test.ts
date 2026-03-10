@@ -39,11 +39,14 @@ test('System API: migrate project', async () => {
 	}`)
 		.expect(200)
 
-	await tester(`query {
+	await tester(
+		`query {
 		schema
-	}`, {
-		path: `/system/${tester.projectSlug}`,
-	})
+	}`,
+		{
+			path: `/system/${tester.projectSlug}`,
+		},
+	)
 		.expect(response => {
 			expect(response.body.data).toStrictEqual({
 				schema,

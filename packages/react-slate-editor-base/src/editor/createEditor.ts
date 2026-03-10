@@ -5,7 +5,6 @@ import { createElement, FunctionComponent, ReactNode } from 'react'
 import { EntityAccessor } from '@contember/react-binding'
 import { Environment } from '@contember/react-binding'
 
-
 export interface CreateEditorPublicOptions {
 	plugins?: EditorPlugin[]
 }

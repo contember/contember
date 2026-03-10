@@ -12,10 +12,7 @@ const schema = new SchemaBuilder()
 			r.target('Author', e =>
 				e
 					.column('name', c => c.type(Model.ColumnType.String))
-					.manyHasOne('country', r => r.target('Country', e => e.column('name', c => c.type(Model.ColumnType.String)))),
-			),
-		),
-	)
+					.manyHasOne('country', r => r.target('Country', e => e.column('name', c => c.type(Model.ColumnType.String)))))))
 	.buildSchema()
 
 const permissions: Acl.Permissions = {
@@ -128,5 +125,3 @@ test('querying post + author name', async () => {
 		},
 	})
 })
-
-

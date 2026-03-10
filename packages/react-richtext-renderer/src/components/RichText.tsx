@@ -34,10 +34,12 @@ export const RichText = <
 		<>
 			{blocks.map((block, i) => (
 				createElement(
-					renderBlock, {
+					renderBlock,
+					{
 						block,
 						key: block.id ?? i,
-					}, renderChildren(block.content.children, {
+					},
+					renderChildren(block.content.children, {
 						referenceRenderers,
 						renderBlock,
 						renderLeaf,

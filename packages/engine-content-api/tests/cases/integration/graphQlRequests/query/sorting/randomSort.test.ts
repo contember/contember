@@ -96,10 +96,7 @@ test('sorts posts by random on has many relation', async () => {
 				e
 					.column('title', c => c.type(Model.ColumnType.String))
 					.column('locale', c => c.type(Model.ColumnType.String))
-					.manyHasMany('categories', r =>
-						r.target('Category', e => e.column('title', c => c.type(Model.ColumnType.String))).inversedBy('posts'),
-					),
-			)
+					.manyHasMany('categories', r => r.target('Category', e => e.column('title', c => c.type(Model.ColumnType.String))).inversedBy('posts')))
 			.buildSchema(),
 		query: GQL`
         query {
@@ -202,4 +199,3 @@ test('sorts posts by random on has many relation', async () => {
 		},
 	})
 })
-

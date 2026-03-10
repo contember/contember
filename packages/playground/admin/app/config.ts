@@ -1,5 +1,4 @@
 export const getConfig = () => {
-
 	let project = import.meta.env.VITE_CONTEMBER_ADMIN_PROJECT_NAME
 
 	if (project === '__PROJECT_SLUG__') {

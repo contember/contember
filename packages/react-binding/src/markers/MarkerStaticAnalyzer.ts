@@ -33,9 +33,11 @@ export class MarkerStaticAnalyzer {
 			return []
 		}
 		if (typeof node === 'function') {
-			throw new ChildrenAnalyzerError(`Render props (functions as React component children) are not supported within the schema. ` +
-				`You have likely used a bare custom component as opposed to wrapping in with \`Component\` ` +
-				`from the \`@contember/admin\` package. Please refer to the documentation.`)
+			throw new ChildrenAnalyzerError(
+				`Render props (functions as React component children) are not supported within the schema. `
+					+ `You have likely used a bare custom component as opposed to wrapping in with \`Component\` `
+					+ `from the \`@contember/admin\` package. Please refer to the documentation.`,
+			)
 		}
 
 		if (Array.isArray(node)) {
@@ -59,7 +61,6 @@ export class MarkerStaticAnalyzer {
 		if (componentPath.length > 1000) {
 			wrapError(new ChildrenAnalyzerError('Component path too long, likely a circular reference'), nodeDisplayName, '[NONE]', componentPath)
 		}
-
 
 		try {
 			if ('generateEnvironment' in node.type) {
@@ -119,8 +120,7 @@ const wrapError = (e: unknown, currentComponentName: string, methodName: string,
 							return '(react element)'
 						}
 						return value
-					},
-					)
+					})
 					result += ` ${key}=${valuePrinted}`
 				} catch {
 					result += ` ${key}=(failed to print a value)`

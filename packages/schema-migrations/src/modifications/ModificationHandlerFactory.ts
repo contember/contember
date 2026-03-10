@@ -38,7 +38,6 @@ import { updateEntityOrderByModification } from './entities/UpdateEntityOrderByM
 import { removeIndexNamesModification } from './upgrade/RemoveIndexNamesModification'
 import { convertOneHasManyToOneHasOneRelationModification } from './relations/ConvertOneHasManyToOneHasOneRelationModification'
 
-
 class ModificationHandlerFactory {
 	constructor(private readonly map: Record<string, ModificationType<string, any>>) {}
 

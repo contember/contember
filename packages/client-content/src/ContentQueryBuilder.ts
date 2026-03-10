@@ -1,5 +1,12 @@
 import { ContentClientInput, MutationResult, SchemaNames, TransactionResult } from './types'
-import { ContentEntitySelection, ContentEntitySelectionCallback, ContentEntitySelectionContext, ContentMutation, ContentOperation, ContentQuery } from './nodes'
+import {
+	ContentEntitySelection,
+	ContentEntitySelectionCallback,
+	ContentEntitySelectionContext,
+	ContentMutation,
+	ContentOperation,
+	ContentQuery,
+} from './nodes'
 import { createListArgs } from './utils/createListArgs'
 import { createTypedArgs } from './utils/createTypedArgs'
 import { Input } from '@contember/schema'
@@ -21,7 +28,6 @@ export class ContentQueryBuilder {
 	constructor(private readonly schema: SchemaNames) {
 	}
 
-
 	public fragment(name: string, fieldsCallback?: ContentEntitySelectionCallback): ContentEntitySelection {
 		const context = this.createContext(name)
 
@@ -31,8 +37,6 @@ export class ContentQueryBuilder {
 		}
 		return fieldsCallback(entitySelection)
 	}
-
-
 
 	public count(name: string, args: Pick<ContentClientInput.AnyListQueryInput, 'filter'>): ContentQuery<number> {
 		const context = this.createContext(name)
@@ -51,7 +55,6 @@ export class ContentQueryBuilder {
 		})
 	}
 
-
 	public list(name: string, args: ContentClientInput.AnyListQueryInput, fields: EntitySelectionOrCallback): ContentQuery<any[]> {
 		const context = this.createContext(name)
 		const fieldName = `list${name}`
@@ -61,14 +64,15 @@ export class ContentQueryBuilder {
 		return new ContentOperation('query', fieldName, typedArgs, selection.selectionSet, it => {
 			const transformFn = selection.transformFn
 			if (transformFn) {
-				return it.map((el: any) => transformFn(el, {
-					rootValue: it,
-				}))
+				return it.map((el: any) =>
+					transformFn(el, {
+						rootValue: it,
+					})
+				)
 			}
 			return it
 		})
 	}
-
 
 	public get(name: string, args: Input.UniqueQueryInput, fields: EntitySelectionOrCallback): ContentQuery<Record<string, unknown> | null> {
 		const context = this.createContext(name)
@@ -89,9 +93,7 @@ export class ContentQueryBuilder {
 		})
 	}
 
-
 	public create(name: string, args: Input.CreateInput, fields?: EntitySelectionOrCallback): ContentMutation<MutationResult> {
-
 		const entity = this.getEntity(name)
 		const typedArgs = createTypedArgs(args, {
 			data: `${entity.name}CreateInput!`,
@@ -101,7 +103,6 @@ export class ContentQueryBuilder {
 	}
 
 	public update(name: string, args: Input.UpdateInput, fields?: EntitySelectionOrCallback): ContentMutation<MutationResult> {
-
 		const entity = this.getEntity(name)
 		const typedArgs = createTypedArgs(args, {
 			data: `${entity.name}UpdateInput!`,
@@ -111,9 +112,7 @@ export class ContentQueryBuilder {
 		return this.createMutationOperation(name, 'update', typedArgs, fields)
 	}
 
-
 	public upsert(name: string, args: Input.UpsertInput, fields?: EntitySelectionOrCallback): ContentMutation<MutationResult> {
-
 		const entity = this.getEntity(name)
 		const typedArgs = createTypedArgs(args, {
 			update: `${entity.name}UpdateInput!`,
@@ -124,9 +123,7 @@ export class ContentQueryBuilder {
 		return this.createMutationOperation(name, 'upsert', typedArgs, fields)
 	}
 
-
 	public delete(name: string, args: Input.UniqueQueryInput, fields?: EntitySelectionOrCallback): ContentMutation<MutationResult> {
-
 		const entity = this.getEntity(name)
 		const typedArgs = createTypedArgs(args, {
 			by: `${entity.name}UniqueWhere!`,
@@ -135,9 +132,12 @@ export class ContentQueryBuilder {
 		return this.createMutationOperation(name, 'delete', typedArgs, fields)
 	}
 
-
-	private createMutationOperation(name: string, operation: MutationOperation, args: GraphQlFieldTypedArgs, fields?: EntitySelectionOrCallback): ContentMutation<MutationResult> {
-
+	private createMutationOperation(
+		name: string,
+		operation: MutationOperation,
+		args: GraphQlFieldTypedArgs,
+		fields?: EntitySelectionOrCallback,
+	): ContentMutation<MutationResult> {
 		const context = this.createContext(name)
 		const fieldName = `${operation}${name}`
 		const nodeSelection = fields ? this.resolveSelection(fields, context) : undefined
@@ -149,9 +149,11 @@ export class ContentQueryBuilder {
 			}
 			return {
 				...it,
-				node: it.node ? nodeSelection.transformFn(it.node, {
-					rootValue: it.node,
-				}) : null,
+				node: it.node
+					? nodeSelection.transformFn(it.node, {
+						rootValue: it.node,
+					})
+					: null,
 			}
 		})
 	}
@@ -169,15 +171,21 @@ export class ContentQueryBuilder {
 			...this.createMutationSelection('transaction'),
 			...combined.selection,
 		]
-		return new ContentOperation<TransactionResult<any>, 'mutation'>('mutation', 'transaction', transactionArgs, items, ({ ok, errorMessage, errors, validation, ...data }) => {
-			return {
-				ok,
-				errorMessage,
-				errors,
-				validation,
-				data: combined.parse(data),
-			}
-		})
+		return new ContentOperation<TransactionResult<any>, 'mutation'>(
+			'mutation',
+			'transaction',
+			transactionArgs,
+			items,
+			({ ok, errorMessage, errors, validation, ...data }) => {
+				return {
+					ok,
+					errorMessage,
+					errors,
+					validation,
+					data: combined.parse(data),
+				}
+			},
+		)
 	}
 
 	private createMutationSelection(operation: MutationOperation, selection?: GraphQlSelectionSet): GraphQlSelectionSet {
@@ -189,16 +197,17 @@ export class ContentQueryBuilder {
 			]),
 		]
 		if (operation !== 'delete') {
-			items.push(new GraphQlField(null, 'validation', {}, [
-				new GraphQlFragmentSpread('ValidationResult'),
-			]))
+			items.push(
+				new GraphQlField(null, 'validation', {}, [
+					new GraphQlFragmentSpread('ValidationResult'),
+				]),
+			)
 		}
 		if (selection) {
 			items.push(new GraphQlField(null, 'node', {}, selection))
 		}
 		return items
 	}
-
 
 	private resolveSelection(
 		fields: EntitySelectionOrCallback,

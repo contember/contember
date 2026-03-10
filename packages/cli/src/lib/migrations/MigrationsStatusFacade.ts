@@ -11,7 +11,6 @@ export class MigrationsStatusFacade {
 	) {
 	}
 
-
 	public resolveMigrationsStatus = async ({ force, allowError }: { force?: boolean; allowError?: boolean }) => {
 		const executedMigrations = await this.systemClientProvider.get().listExecutedMigrations()
 		const localMigrations = await this.migrationsResolver.getMigrationFiles()

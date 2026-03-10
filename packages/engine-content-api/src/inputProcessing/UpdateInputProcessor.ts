@@ -2,7 +2,6 @@ import { Input, Model } from '@contember/schema'
 import { CheckedPrimary } from '../mapper/CheckedPrimary'
 import { MapperInput } from '../mapper'
 
-
 interface UpdateInputProcessor<Result = void> {
 	column(context: Model.ColumnContext & { input: Input.ColumnValue | undefined }): Promise<Result>
 

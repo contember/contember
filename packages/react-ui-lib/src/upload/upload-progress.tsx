@@ -5,10 +5,17 @@ import * as React from 'react'
 import { ReactNode, useEffect } from 'react'
 import { Toast } from '../toast'
 import { dict } from '../dict'
-import { UploaderEachFile, UploaderError, UploaderFileStateError, UploaderFileStateFinalizing, UploaderFileStateSuccess, UploaderFileStateSwitch, UploaderFileStateUploading } from '@contember/react-uploader'
+import {
+	UploaderEachFile,
+	UploaderError,
+	UploaderFileStateError,
+	UploaderFileStateFinalizing,
+	UploaderFileStateSuccess,
+	UploaderFileStateSwitch,
+	UploaderFileStateUploading,
+} from '@contember/react-uploader'
 import { formatBytes } from '../formatting/formatting'
 import { Loader } from '../ui/loader'
-
 
 const formatError = (error: unknown) => {
 	if (error instanceof UploaderError) {
@@ -18,7 +25,11 @@ const formatError = (error: unknown) => {
 }
 
 const AbortButton = ({ state: { file: { abortController } } }: { state: UploaderFileStateFinalizing | UploaderFileStateUploading }) => {
-	return <Button className="p-1 h-5 text-red-500" variant="ghost" size={'sm'} onClick={() => abortController.abort()}><StopCircleIcon className="h-3 w-3" /></Button>
+	return (
+		<Button className="p-1 h-5 text-red-500" variant="ghost" size={'sm'} onClick={() => abortController.abort()}>
+			<StopCircleIcon className="h-3 w-3" />
+		</Button>
+	)
 }
 
 const DismissButton = ({ state }: { state: UploaderFileStateSuccess | UploaderFileStateError }) => {
@@ -29,7 +40,11 @@ const DismissButton = ({ state }: { state: UploaderFileStateSuccess | UploaderFi
 		return () => clearTimeout(timeout)
 	}, [state])
 
-	return <Button className="p-1 h-5" variant="ghost" size={'sm'} onClick={() => state.dismiss()}><XIcon className="h-3 w-3" /></Button>
+	return (
+		<Button className="p-1 h-5" variant="ghost" size={'sm'} onClick={() => state.dismiss()}>
+			<XIcon className="h-3 w-3" />
+		</Button>
+	)
 }
 
 const UploadError = ({ state: { error } }: { state: UploaderFileStateError }) => {
@@ -40,7 +55,9 @@ const UploadError = ({ state: { error } }: { state: UploaderFileStateError }) =>
 	return <div className="text-red-700 text-xs font-semibold">{formattedError}</div>
 }
 
-export const UploaderFileProgressUI = ({ file, progress, info, actions }: { file: File; progress?: number; actions?: ReactNode; info?: ReactNode }) => {
+export const UploaderFileProgressUI = (
+	{ file, progress, info, actions }: { file: File; progress?: number; actions?: ReactNode; info?: ReactNode },
+) => {
 	const fileName = file.name
 	const extension = file.name.split('.').pop()?.toUpperCase()
 
@@ -65,7 +82,6 @@ export const UploaderFileProgressUI = ({ file, progress, info, actions }: { file
 		</div>
 	)
 }
-
 
 export const UploaderProgress = () => {
 	const [open, setOpen] = React.useState(true)
@@ -94,12 +110,12 @@ export const UploaderProgress = () => {
 								file={it.file.file}
 								progress={100}
 								actions={<AbortButton state={it} />}
-								info={(
+								info={
 									<div className="text-gray-400 text-xs inline-flex gap-1 items-center">
 										<Loader2Icon className="animate-spin h-3 w-3 inline-block" />
 										{formatBytes(it.file.file.size)}
 									</div>
-								)}
+								}
 							/>
 						)}
 						error={it => (
@@ -114,12 +130,12 @@ export const UploaderProgress = () => {
 								file={it.file.file}
 								progress={100}
 								actions={<DismissButton state={it} />}
-								info={(
+								info={
 									<div className="flex gap-1 items-center text-green-600 ">
 										<CheckIcon className="w-3 h-3" />
-										<div className="text-green-600 text-xs "> Done ({formatBytes(it.file.file.size)})</div>
+										<div className="text-green-600 text-xs ">Done ({formatBytes(it.file.file.size)})</div>
 									</div>
-								)}
+								}
 							/>
 						)}
 					/>

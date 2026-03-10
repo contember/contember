@@ -13,7 +13,7 @@ export const BackButton = ({ label }: BackButtonProps) => {
 			className={'gap-1'}
 			onClick={() => history.back()}
 		>
-			<ArrowLeftIcon size={16}/>
+			<ArrowLeftIcon size={16} />
 			<span>{label ?? dict.backButton.back}</span>
 		</Button>
 	)

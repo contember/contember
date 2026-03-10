@@ -41,5 +41,3 @@ test('create redirect to non-existing target', async () => {
 			},
 		})
 })
-
-

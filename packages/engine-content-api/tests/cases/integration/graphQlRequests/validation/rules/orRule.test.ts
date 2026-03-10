@@ -10,7 +10,6 @@ const schema = createSchema({
 	Item,
 })
 describe('Logical OR rule', () => {
-
 	it('fails when value not valid', async () => {
 		await testCreate({
 			schema,
@@ -38,5 +37,3 @@ describe('Logical OR rule', () => {
 		})
 	})
 })
-
-

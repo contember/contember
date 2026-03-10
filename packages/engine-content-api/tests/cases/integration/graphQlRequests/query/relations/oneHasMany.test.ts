@@ -12,8 +12,7 @@ test('Posts with locales query (one has many)', async () => {
 			.entity('PostLocale', entity =>
 				entity
 					.column('locale', column => column.type(Model.ColumnType.String))
-					.column('title', column => column.type(Model.ColumnType.String)),
-			)
+					.column('title', column => column.type(Model.ColumnType.String)))
 			.buildSchema(),
 		query: GQL`
         query {
@@ -94,8 +93,7 @@ test('Posts with locales query with where (one has many)', async () => {
 			.entity('PostLocale', entity =>
 				entity
 					.column('locale', column => column.type(Model.ColumnType.String))
-					.column('title', column => column.type(Model.ColumnType.String)),
-			)
+					.column('title', column => column.type(Model.ColumnType.String)))
 			.buildSchema(),
 		query: GQL`
         query {
@@ -415,7 +413,6 @@ test('Posts with paginated comments without count (one has many)', async () => {
 		},
 	})
 })
-
 
 test('Posts with paginated comments (one has many)', async () => {
 	await execute({

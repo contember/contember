@@ -1,11 +1,4 @@
-import {
-	GraphQLBoolean,
-	GraphQLFieldConfig,
-	GraphQLNonNull,
-	GraphQLObjectType,
-	GraphQLObjectTypeConfig,
-	GraphQLString,
-} from 'graphql'
+import { GraphQLBoolean, GraphQLFieldConfig, GraphQLNonNull, GraphQLObjectType, GraphQLObjectTypeConfig, GraphQLString } from 'graphql'
 import { Acl, Input, Model } from '@contember/schema'
 import { Context } from '../types'
 import { EntityTypeProvider } from './EntityTypeProvider'
@@ -142,8 +135,10 @@ export class MutationProvider {
 	}
 
 	private getUpsertMutation(entity: Model.Entity): FieldConfig<Input.UpsertInput> | undefined {
-		if (this.authorizator.isRootOperationDisallowed(entity.name, Acl.Operation.update)
-			|| this.authorizator.isRootOperationDisallowed(entity.name, Acl.Operation.create)) {
+		if (
+			this.authorizator.isRootOperationDisallowed(entity.name, Acl.Operation.update)
+			|| this.authorizator.isRootOperationDisallowed(entity.name, Acl.Operation.create)
+		) {
 			return undefined
 		}
 		const entityName = entity.name

@@ -57,7 +57,6 @@ class Environment<Node extends Environment.AnyNode | undefined = Environment.Any
 		})
 	}
 
-
 	public hasVariable(key: string): boolean {
 		return key in this.options.variables
 	}
@@ -72,7 +71,6 @@ class Environment<Node extends Environment.AnyNode | undefined = Environment.Any
 	public getVariableOrElse<F, V extends Environment.Value = Environment.Value>(key: string, fallback: F): V | F {
 		return (this.options.variables[key] as V) ?? fallback
 	}
-
 
 	public withVariables(variables: Environment.ValuesMapWithFactory | undefined): Environment {
 		if (variables === undefined) {
@@ -208,9 +206,11 @@ class Environment<Node extends Environment.AnyNode | undefined = Environment.Any
 		}
 		for (const key in other.options.variables) {
 			if (key in this.options.variables && !equal(this.options.variables[key], other.options.variables[key])) {
-				throw new BindingError(`Cannot merge two environments with different value of variable ${key}:\n`
-					+ JSON.stringify(this.options.variables[key]) + '\n'
-					+ JSON.stringify(other.options.variables[key]))
+				throw new BindingError(
+					`Cannot merge two environments with different value of variable ${key}:\n`
+						+ JSON.stringify(this.options.variables[key]) + '\n'
+						+ JSON.stringify(other.options.variables[key]),
+				)
 			}
 		}
 

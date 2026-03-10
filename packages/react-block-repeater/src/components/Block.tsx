@@ -39,9 +39,11 @@ export interface BlockProps {
 export const Block = Component<BlockProps>(props => {
 	throw new BindingError('"Block" component is not supposed to be rendered.')
 }, ({ label, children, form }) => {
-	return <>
-		{label}
-		{children}
-		{form}
-	</>
+	return (
+		<>
+			{label}
+			{children}
+			{form}
+		</>
+	)
 })

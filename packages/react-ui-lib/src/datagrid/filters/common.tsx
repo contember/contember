@@ -15,17 +15,18 @@ export const DataGridNullFilter = ({ name }: {
 	const toggleExcludeNull = useCallback(() => setNullFilter('toggleExclude'), [setNullFilter])
 	const toggleIncludeNull = useCallback(() => setNullFilter('toggleInclude'), [setNullFilter])
 
-	return <>
-		<DataGridFilterSelectItemUI
-			onExclude={toggleExcludeNull}
-			onInclude={toggleIncludeNull}
-			isExcluded={nullFilter === 'exclude'}
-			isIncluded={nullFilter === 'include'}
-		>
-			<span className={'italic'}>
-				{dict.datagrid.na}
-			</span>
-		</DataGridFilterSelectItemUI>
-	</>
+	return (
+		<>
+			<DataGridFilterSelectItemUI
+				onExclude={toggleExcludeNull}
+				onInclude={toggleIncludeNull}
+				isExcluded={nullFilter === 'exclude'}
+				isIncluded={nullFilter === 'include'}
+			>
+				<span className={'italic'}>
+					{dict.datagrid.na}
+				</span>
+			</DataGridFilterSelectItemUI>
+		</>
+	)
 }
-

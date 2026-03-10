@@ -38,7 +38,7 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 			selectFrom += '::text[]'
 		}
 
-		let columnValueGetter: ColumnValueGetter | undefined 
+		let columnValueGetter: ColumnValueGetter | undefined
 		if (entity.view && column.name === entity.primary && column.type === Model.ColumnType.Uuid) {
 			if (entity.view.idSource) {
 				const aliases: string[] = []
@@ -58,7 +58,6 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 				columnValueGetter = row => {
 					return row[columnAlias] ?? (this.providers.uuid({ version: this.settings.uuidVersion }))
 				}
-
 			}
 		}
 

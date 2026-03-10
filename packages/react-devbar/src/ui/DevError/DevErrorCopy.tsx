@@ -19,13 +19,12 @@ export const DevErrorCopy = ({ currentError, currentErrorSource }: {
 			disabled={copyStatus === 'copying'}
 			title="Copy current error as Markdown"
 		>
-			{({
+			{{
 				success: 'Copied!',
 				copying: 'Copying...',
 				error: '❌ Copy Failed',
 				idle: 'Copy as Markdown',
-			}[copyStatus])}
+			}[copyStatus]}
 		</button>
 	)
-
 }

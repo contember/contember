@@ -47,9 +47,9 @@ export const overrideInsertData = <E extends EditorWithBlocks>(editor: E, option
 	const { embedReferenceDiscriminateBy, embedHandlers, embedContentDiscriminationField } = options
 
 	if (
-		embedReferenceDiscriminateBy === undefined ||
-		embedHandlers === undefined ||
-		embedContentDiscriminationField === undefined
+		embedReferenceDiscriminateBy === undefined
+		|| embedHandlers === undefined
+		|| embedContentDiscriminationField === undefined
 	) {
 		return
 	}
@@ -85,7 +85,6 @@ export const overrideInsertData = <E extends EditorWithBlocks>(editor: E, option
 		}
 
 		const url = parseUrl(text)
-
 		;(async () => {
 			for (const [, handler] of options.embedHandlers!) {
 				const result = await handler.datum.handleSource(text, url)

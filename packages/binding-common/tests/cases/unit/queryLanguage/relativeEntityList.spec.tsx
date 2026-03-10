@@ -1,4 +1,4 @@
-import { expect, it, describe } from 'bun:test'
+import { describe, expect, it } from 'bun:test'
 import { Environment } from '../../../../src/environment'
 import { Parser } from '../../../../src/queryLanguage'
 import type { ParsedRelativeEntityList } from '../../../../src/queryLanguage/ParserResults'

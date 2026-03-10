@@ -22,7 +22,6 @@ export class ConnectOrCreateRelationInputProvider {
 	) {
 	}
 
-
 	getInput(entityName: string, relationName: string) {
 		return this.inputs({ entityName, relationName })
 	}
@@ -49,6 +48,5 @@ export class ConnectOrCreateRelationInputProvider {
 				})
 			},
 		})
-
 	}
 }

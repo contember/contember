@@ -11,8 +11,7 @@ class CounterRef {
 	public value = 0
 }
 
-export class ConnectionMock implements Connection.ConnectionType, Connection.TransactionLike  {
-
+export class ConnectionMock implements Connection.ConnectionType, Connection.TransactionLike {
 	public config: DatabaseConfig = { database: '', host: '', password: '', user: '', port: 5432 }
 
 	constructor(

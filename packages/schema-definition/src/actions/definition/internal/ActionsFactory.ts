@@ -6,7 +6,6 @@ import { ActionsTarget } from '../targets'
 import { Kind, parse, SelectionNode, ValueNode } from 'graphql'
 
 export class ActionsFactory {
-
 	public create(
 		exportedDefinitions: Record<string, any>,
 	): Actions.Schema {
@@ -21,10 +20,12 @@ export class ActionsFactory {
 			targetsRegistry.register(name, def.definition)
 		}
 
-		const triggersDef = entityLikeDefinition.flatMap(([, entity]) => triggersStore.get(entity).map(it => ({
-			...it,
-			entity,
-		})))
+		const triggersDef = entityLikeDefinition.flatMap(([, entity]) =>
+			triggersStore.get(entity).map(it => ({
+				...it,
+				entity,
+			}))
+		)
 
 		const triggerNames = triggersDef.map(it => it.definition.name).filter((it): it is string => !!it)
 		triggerNames.forEach((it, index, arr) => {
@@ -53,7 +54,6 @@ export class ActionsFactory {
 			}
 			triggers[name] = trigger
 		}
-
 
 		return { triggers, targets: targetsRegistry.getTargets() }
 	}

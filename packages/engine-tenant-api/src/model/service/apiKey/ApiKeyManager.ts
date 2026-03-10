@@ -61,13 +61,14 @@ export class ApiKeyManager {
 	async createSessionApiKey(dbContext: DatabaseContext, identityId: string, expiration?: number): Promise<string> {
 		const config = await dbContext.queryHandler.fetch(new ConfigurationQuery())
 		const expirationResolved = expiration ?? (intervalToSeconds(config.login.defaultTokenExpiration) / 60)
-		const expirationCapped = config.login.maxTokenExpiration ? Math.min(expirationResolved, intervalToSeconds(config.login.maxTokenExpiration) / 60) : expirationResolved
+		const expirationCapped = config.login.maxTokenExpiration
+			? Math.min(expirationResolved, intervalToSeconds(config.login.maxTokenExpiration) / 60)
+			: expirationResolved
 		const command = new CreateApiKeyCommand({ type: ApiKey.Type.SESSION, identityId, expiration: expirationCapped })
 		const token = (await dbContext.commandBus.execute(command)).token
 		assert(token !== undefined)
 		return token
 	}
-
 
 	async findApiKey(dbContext: DatabaseContext, apiKeyId: string): Promise<ApiKeyRow | null> {
 		return await dbContext.queryHandler.fetch(
@@ -109,7 +110,6 @@ export class ApiKeyManager {
 			return await this.apiKeyService.createProjectPermanentApiKey(db, projectId, memberships, description, tokenHash)
 		})
 	}
-
 }
 
 export type VerifyResponse = Response<VerifyResult, VerifyErrorCode>

@@ -7,7 +7,6 @@ import { UploadIcon } from 'lucide-react'
 import { dict } from '../dict'
 import { Button } from '../ui/button'
 
-
 export const UploaderDropzone = ({ inactiveOnUpload, dropzonePlaceholder }: { inactiveOnUpload?: boolean; dropzonePlaceholder?: ReactNode }) => {
 	const filesInProgress = useUploaderStateFiles({ state: ['uploading', 'initial', 'finalizing'] })
 	const showLoader = inactiveOnUpload && filesInProgress.length > 0
@@ -17,15 +16,20 @@ export const UploaderDropzone = ({ inactiveOnUpload, dropzonePlaceholder }: { in
 			<UploaderDropzoneWrapperUI>
 				{showLoader
 					? <UploaderInactiveDropzoneUI />
-					: <UploaderDropzoneArea>{dropzonePlaceholder ?? <UploaderDropzoneAreaUI>
-						<UploadIcon className={'w-12 h-12 text-gray-400'} />
-						<div className={'font-semibold text-sm'}>{dict.uploader.dropFiles}</div>
-						<div className={'text-xs'}>{dict.uploader.or}</div>
-						<div className={'flex gap-2 items-center text-xs'}>
-							<Button size={'sm'} variant={'outline'}>{dict.uploader.browseFiles}</Button>
-						</div>
-					</UploaderDropzoneAreaUI>}</UploaderDropzoneArea>
-				}
+					: (
+						<UploaderDropzoneArea>
+							{dropzonePlaceholder ?? (
+								<UploaderDropzoneAreaUI>
+									<UploadIcon className={'w-12 h-12 text-gray-400'} />
+									<div className={'font-semibold text-sm'}>{dict.uploader.dropFiles}</div>
+									<div className={'text-xs'}>{dict.uploader.or}</div>
+									<div className={'flex gap-2 items-center text-xs'}>
+										<Button size={'sm'} variant={'outline'}>{dict.uploader.browseFiles}</Button>
+									</div>
+								</UploaderDropzoneAreaUI>
+							)}
+						</UploaderDropzoneArea>
+					)}
 			</UploaderDropzoneWrapperUI>
 		</UploaderDropzoneRoot>
 	)

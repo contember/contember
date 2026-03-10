@@ -30,10 +30,12 @@ export const DataGridTable = Component<DataViewTableProps>(({ children }) => {
 	return (
 		<DataViewLayout
 			name="table"
-			label={<>
-				<SheetIcon className="w-3 h-3" />
-				<span>{dict.datagrid.showTable}</span>
-			</>}
+			label={
+				<>
+					<SheetIcon className="w-3 h-3" />
+					<span>{dict.datagrid.showTable}</span>
+				</>
+			}
 		>
 			<div className="relative rounded-md border border-gray-200 overflow-y-auto">
 				<DataGridTableRenderer>

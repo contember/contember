@@ -1,15 +1,19 @@
 import { ComponentType, memo, SetStateAction, useCallback, useState } from 'react'
 import { createRequiredContext } from '@contember/react-utils'
 
-export const createComponentOpenHooks = <P extends {
-	open?: boolean
-	defaultOpen?: boolean
-	onOpenChange?(open: boolean): void
-}>(Component: ComponentType<P>): {
+export const createComponentOpenHooks = <
+	P extends {
+		open?: boolean
+		defaultOpen?: boolean
+		onOpenChange?(open: boolean): void
+	},
+>(Component: ComponentType<P>): {
 	Component: ComponentType<P>
 	useOpen: () => [boolean, (value: SetStateAction<boolean>) => void]
 } => {
-	const [ctx, useOpen] = createRequiredContext<[boolean, (value: SetStateAction<boolean>) => void]>(`${Component.displayName ?? 'UnnamedComponent'}OpenContext`)
+	const [ctx, useOpen] = createRequiredContext<[boolean, (value: SetStateAction<boolean>) => void]>(
+		`${Component.displayName ?? 'UnnamedComponent'}OpenContext`,
+	)
 	const WrappedComponent = memo<P>(({ open: openIn, defaultOpen, onOpenChange, ...props }) => {
 		const [open, setOpenInternal] = useState(openIn ?? defaultOpen ?? false)
 		if (openIn !== undefined && open !== openIn) {

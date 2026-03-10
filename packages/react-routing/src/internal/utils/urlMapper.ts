@@ -1,5 +1,5 @@
 import * as pathToRegexp from 'path-to-regexp'
-import { MatchFunction, PathFunction, TokenData, Key } from 'path-to-regexp'
+import { Key, MatchFunction, PathFunction, TokenData } from 'path-to-regexp'
 import { Environment } from '@contember/react-binding'
 import { RequestState, RoutingContextValue } from '../../types'
 import { PageNotFound } from '../../PageNotFound'
@@ -34,8 +34,8 @@ const parseQuery = (query: string): Record<string, string | number> => {
 
 	return Object.fromEntries(Array.from(
 		searchParams,
-		([key, val]) => [key, parseInt(val, 10).toString() === val ? parseInt(val, 10) : val]),
-	)
+		([key, val]) => [key, parseInt(val, 10).toString() === val ? parseInt(val, 10) : val],
+	))
 }
 
 export const pathToRequestState = (routing: RoutingContextValue, path: string, query: string): RequestState => {
@@ -75,7 +75,6 @@ export const pathToRequestState = (routing: RoutingContextValue, path: string, q
 	if (routing.pageInQuery) {
 		pageName = typeof parameters.page === 'string' ? parameters.page : 'index'
 		delete parameters.page
-
 	} else {
 		pageName = pageNameIn(pagePathNormalized.slice(1, -1))
 	}
@@ -105,7 +104,6 @@ export const requestStateToPath = (routing: RoutingContextValue, request: Reques
 		if (routing.pageInQuery && request.pageName !== 'index') {
 			query.append('page', request.pageName)
 		}
-
 	} else {
 		const route = routing.routes[request.pageName]
 		const pathParameters = route.objectToParams ? route.objectToParams(request.parameters) : request.parameters

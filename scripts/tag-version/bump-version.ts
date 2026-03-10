@@ -1,13 +1,12 @@
 import * as fs from 'node:fs/promises'
-import glob from "fast-glob";
-
+import glob from 'fast-glob'
 ;(async () => {
 	const cwd = process.cwd()
 	const version = process.argv[2]
 	const dirs = [cwd, ...await glob(process.cwd() + '/packages/*', { onlyDirectories: true })]
 
 	await Promise.all(dirs.map(async (dir): Promise<void> => {
-		const packageJsonPath = `${dir}/package.json`;
+		const packageJsonPath = `${dir}/package.json`
 		try {
 			await fs.access(packageJsonPath)
 		} catch (e) {
@@ -25,7 +24,6 @@ import glob from "fast-glob";
 			throw e
 		}
 	}))
-
 })().catch(e => {
 	console.error(e)
 	process.exit(1)

@@ -14,8 +14,12 @@ export type ContentEntitySelectionContext<Name extends string> = {
 export type ContentEntitySelectionCallback = (select: ContentEntitySelection) => ContentEntitySelection
 
 export type EntitySelectionCommonInput<Alias extends string | null = string | null> = { as?: Alias }
-export type EntitySelectionManyArgs<Alias extends string | null = string | null> = ContentClientInput.AnyListQueryInput & EntitySelectionCommonInput<Alias>
-export type EntitySelectionManyByArgs<Alias extends string | null = string | null> = { by: Input.UniqueWhere; filter?: Input.Where } & EntitySelectionCommonInput<Alias>
+export type EntitySelectionManyArgs<Alias extends string | null = string | null> =
+	& ContentClientInput.AnyListQueryInput
+	& EntitySelectionCommonInput<Alias>
+export type EntitySelectionManyByArgs<Alias extends string | null = string | null> =
+	& { by: Input.UniqueWhere; filter?: Input.Where }
+	& EntitySelectionCommonInput<Alias>
 export type EntitySelectionOneArgs<Alias extends string | null = string | null> = { filter?: Input.Where } & EntitySelectionCommonInput<Alias>
 export type EntitySelectionColumnArgs<Alias extends string | null = string | null> = EntitySelectionCommonInput<Alias>
 
@@ -27,13 +31,11 @@ export type EntitySelectionAnyArgs =
 
 export type ContentEntitySelectionOrCallback = ContentEntitySelectionCallback | ContentEntitySelection
 
-
 export type ContentTransformContext = {
 	rootValue: unknown
 }
 
 export class ContentEntitySelection {
-
 	/**
 	 * @internal
 	 */
@@ -47,14 +49,17 @@ export class ContentEntitySelection {
 	) {
 	}
 
-
 	$(field: string, args?: EntitySelectionColumnArgs): ContentEntitySelection
 	$(field: string, args: EntitySelectionManyArgs, selection: ContentEntitySelectionOrCallback): ContentEntitySelection
 	$(field: string, args: EntitySelectionManyByArgs, selection: ContentEntitySelectionOrCallback): ContentEntitySelection
 	$(field: string, args: EntitySelectionOneArgs, selection: ContentEntitySelectionOrCallback): ContentEntitySelection
 	$(field: string, selection: ContentEntitySelectionOrCallback): ContentEntitySelection
 
-	$(field: string, argsOrSelection?: EntitySelectionAnyArgs | ContentEntitySelectionOrCallback, selectionIn?: ContentEntitySelectionOrCallback): ContentEntitySelection {
+	$(
+		field: string,
+		argsOrSelection?: EntitySelectionAnyArgs | ContentEntitySelectionOrCallback,
+		selectionIn?: ContentEntitySelectionOrCallback,
+	): ContentEntitySelection {
 		const [args, selection] = typeof argsOrSelection === 'function' || argsOrSelection instanceof ContentEntitySelection
 			? [{}, argsOrSelection]
 			: [argsOrSelection ?? {}, selectionIn]
@@ -130,11 +135,14 @@ export class ContentEntitySelection {
 		])
 	}
 
-
 	transform(transform: (value: any, context: ContentTransformContext) => any): ContentEntitySelection {
-		return new ContentEntitySelection(this.context, this.selectionSet, !this.transformFn ? transform : (value, ctx) => {
-			return transform(this.transformFn!(value, ctx), ctx)
-		})
+		return new ContentEntitySelection(
+			this.context,
+			this.selectionSet,
+			!this.transformFn ? transform : (value, ctx) => {
+				return transform(this.transformFn!(value, ctx), ctx)
+			},
+		)
 	}
 
 	private _column(
@@ -155,14 +163,13 @@ export class ContentEntitySelection {
 		return this.withField(field)
 	}
 
-
 	private _many(
 		name: string,
 		args: EntitySelectionManyArgs,
 		fields:
 			| ContentEntitySelectionCallback
 			| ContentEntitySelection,
-	): ContentEntitySelection{
+	): ContentEntitySelection {
 		const alias = args.as ?? name
 		const fieldInfo = this.context.entity.fields[name]
 		if (!fieldInfo) {
@@ -192,7 +199,6 @@ export class ContentEntitySelection {
 		}
 		return selectionWithField.withFieldTransform(alias, it => it.map(nestedTransform))
 	}
-
 
 	private _manyBy(
 		name: string,
@@ -288,7 +294,6 @@ export class ContentEntitySelection {
 		}
 		return selectionWithField.withFieldTransform(alias, (it, ctx) => it !== null ? nestedTransform(it, ctx) : null)
 	}
-
 
 	private withField(field: GraphQlField) {
 		return new ContentEntitySelection(this.context, [

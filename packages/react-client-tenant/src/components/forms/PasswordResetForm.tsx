@@ -70,7 +70,6 @@ export const PasswordResetForm = ({ children, onSuccess, token }: PasswordResetF
 			{children}
 		</TenantForm>
 	)
-
 }
 const errorToField: Record<TenantApi.ResetPasswordErrorCode, keyof PasswordResetFormValues | undefined> = {
 	PASSWORD_TOO_WEAK: 'password',

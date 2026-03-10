@@ -1,5 +1,5 @@
 import { PermissionFactory, PredicateFactory, PredicatesInjector, VariableInjector } from '../../../src/acl'
-import { SchemaBuilder, SchemaDefinition as def, AclDefinition as acl, createSchema, PermissionsBuilder } from '@contember/schema-definition'
+import { AclDefinition as acl, createSchema, PermissionsBuilder, SchemaBuilder, SchemaDefinition as def } from '@contember/schema-definition'
 import { Acl, Model } from '@contember/schema'
 import { describe, it } from 'bun:test'
 import { WhereOptimizer } from '../../../src/mapper/select/optimizer/WhereOptimizer'
@@ -8,8 +8,6 @@ import { acceptFieldVisitor, AllowAllPermissionFactory } from '@contember/schema
 import { testUuid } from '../../src/testUuid'
 import { assert } from '../../src/assert'
 
-
-
 const schema = new SchemaBuilder()
 	.enum('locale', ['cs', 'en'])
 	.entity('Post', entityBuilder => entityBuilder.oneHasMany('locales', c => c.target('PostLocale')))
@@ -17,8 +15,7 @@ const schema = new SchemaBuilder()
 		entity
 			.column('title', column => column.type(Model.ColumnType.String))
 			.column('content', column => column.type(Model.ColumnType.String))
-			.column('locale', column => column.type(Model.ColumnType.Enum, { enumName: 'locale' })),
-	)
+			.column('locale', column => column.type(Model.ColumnType.Enum, { enumName: 'locale' })))
 	.buildSchema()
 
 const permissions: Acl.Permissions = {
@@ -50,9 +47,7 @@ const permissions: Acl.Permissions = {
 	},
 }
 
-
 describe('Predicates injector', () => {
-
 	const variables: Acl.VariablesMap = {
 		localeVariable: { in: ['cs'] },
 	}
@@ -113,8 +108,6 @@ describe('Predicates injector', () => {
 			],
 		})
 	})
-
-
 })
 
 namespace DeepFilterModel {
@@ -156,7 +149,6 @@ namespace DeepFilterModel {
 		label = def.stringColumn()
 	}
 }
-
 
 describe('predicates injector elimination', () => {
 	const schema = createSchema(DeepFilterModel)

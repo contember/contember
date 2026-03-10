@@ -46,7 +46,10 @@ const LaxSchemaField = Typesafe.discriminatedUnion('type', {
 export type LaxSchemaField = ReturnType<typeof LaxSchemaField>
 export type LaxSchemaEnum = Extract<LaxSchemaField, { type: 'enum' }>
 export type LaxSchemaColumn = Extract<LaxSchemaField, { type: 'int' | 'float' | 'boolean' | 'string' | 'json' | 'datetime' | 'date' | 'uuid' }>
-export type LaxSchemaRelation = Extract<LaxSchemaField, {type: 'oneHasOne' | 'oneHasOneInverse' | 'manyHasMany' | 'manyHasManyInverse' | 'oneHasMany' | 'manyHasOne' }>
+export type LaxSchemaRelation = Extract<
+	LaxSchemaField,
+	{ type: 'oneHasOne' | 'oneHasOneInverse' | 'manyHasMany' | 'manyHasManyInverse' | 'oneHasMany' | 'manyHasOne' }
+>
 
 const LaxSchemaEntity = Typesafe.object({
 	fields: Typesafe.record(Typesafe.string, LaxSchemaField),

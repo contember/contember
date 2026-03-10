@@ -1,13 +1,10 @@
 import { ParsedStackFrame, ParsedStackTrace } from './types'
 
-
 const className = (cls?: string | null) => cls ? `cui-devError-${cls}` : 'cui-devError'
 export const StackTrace = ({ stackTrace }: { stackTrace: ParsedStackTrace }) => {
 	return (
 		<div className={className('stack')}>
-			{stackTrace.map((it, index) => (
-				<StackFrame stackFrame={it} key={index} />
-			))}
+			{stackTrace.map((it, index) => <StackFrame stackFrame={it} key={index} />)}
 		</div>
 	)
 }

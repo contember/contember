@@ -1,17 +1,6 @@
-import {
-	MutationResolvers,
-	MutationUpdateProjectMemberArgs,
-	UpdateProjectMemberErrorCode,
-	UpdateProjectMemberResponse,
-} from '../../../schema'
+import { MutationResolvers, MutationUpdateProjectMemberArgs, UpdateProjectMemberErrorCode, UpdateProjectMemberResponse } from '../../../schema'
 import { TenantResolverContext } from '../../TenantResolverContext'
-import {
-	MembershipValidationErrorType,
-	MembershipValidator,
-	PermissionActions,
-	ProjectManager,
-	ProjectMemberManager,
-} from '../../../model'
+import { MembershipValidationErrorType, MembershipValidator, PermissionActions, ProjectManager, ProjectMemberManager } from '../../../model'
 import { createMembershipValidationErrorResult } from '../../membershipUtils'
 import { createMembershipModification } from '../../../model/service/membershipUtils'
 import { createErrorResponse, createProjectNotFoundResponse } from '../../errorUtils'

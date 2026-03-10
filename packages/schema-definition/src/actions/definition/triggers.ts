@@ -47,4 +47,3 @@ export const trigger = <T>(definition: BasicTriggerDefinition): DecoratorFunctio
 export const watch = <T>(definition: WatchTriggerDefinition): DecoratorFunction<T> => (entity: EntityConstructor<T>) => {
 	triggersStore.update(entity, it => [...it, { type: 'watch', definition }])
 }
-

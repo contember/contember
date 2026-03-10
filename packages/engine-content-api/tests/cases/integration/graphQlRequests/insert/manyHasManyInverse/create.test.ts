@@ -11,8 +11,7 @@ test('insert category with posts (many has many, inverse)', async () => {
 			.entity('Post', e =>
 				e
 					.column('name', c => c.type(Model.ColumnType.String))
-					.manyHasMany('categories', r => r.target('Category').inversedBy('posts')),
-			)
+					.manyHasMany('categories', r => r.target('Category').inversedBy('posts')))
 			.entity('Category', e => e.column('name', c => c.type(Model.ColumnType.String)))
 			.buildSchema(),
 		query: GQL`
@@ -92,4 +91,3 @@ test('insert category with posts (many has many, inverse)', async () => {
 		},
 	})
 })
-

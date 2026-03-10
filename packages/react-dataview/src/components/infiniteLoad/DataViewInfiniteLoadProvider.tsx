@@ -24,7 +24,6 @@ export const DataViewInfiniteLoadProvider = Component(({ children }: {
 	const expectedInfiniteScrollPage = useRef<number | null>(null)
 	const previousEntityListParams = useRef<QualifiedEntityList | null>(null)
 
-
 	useEffect(() => {
 		if (!entityList) {
 			return
@@ -44,7 +43,6 @@ export const DataViewInfiniteLoadProvider = Component(({ children }: {
 		previousEntityListParams.current = entityListParams
 	}, [entityList, displayedPage])
 
-
 	const nextPage = (displayedPage ?? -1) + 1
 
 	const loadMore = useCallback(() => {
@@ -52,14 +50,17 @@ export const DataViewInfiniteLoadProvider = Component(({ children }: {
 		goToPage(nextPage)
 	}, [goToPage, nextPage])
 
-	return <>
-		<DataViewInfiniteLoadAccessorsContext.Provider value={accessors}>
-			<DataViewInfiniteLoadTriggerContext.Provider value={pagesCount === undefined || nextPage >= pagesCount ? undefined : loadMore}>
-				{children}
-			</DataViewInfiniteLoadTriggerContext.Provider>
-		</DataViewInfiniteLoadAccessorsContext.Provider>
+	return (
+		<>
+			<DataViewInfiniteLoadAccessorsContext.Provider value={accessors}>
+				<DataViewInfiniteLoadTriggerContext.Provider value={pagesCount === undefined || nextPage >= pagesCount ? undefined : loadMore}>
+					{children}
+				</DataViewInfiniteLoadTriggerContext.Provider>
+			</DataViewInfiniteLoadAccessorsContext.Provider>
+		</>
+	)
+}, ({ children }) => (
+	<>
+		{children}
 	</>
-
-}, ({ children }) => <>
-	{children}
-</>)
+))

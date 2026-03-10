@@ -13,7 +13,6 @@ import { DeleteMigrationErrorCode, MigrationAlterer, UpdateMigrationErrorCode } 
 import { Migration } from '@contember/schema-migrations'
 
 export class MigrationAlterMutationResolver implements MutationResolver<'migrationModify'>, MutationResolver<'migrationDelete'> {
-
 	constructor(private readonly migrationAlterer: MigrationAlterer) {}
 
 	async migrationModify(

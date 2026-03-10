@@ -23,11 +23,11 @@ export const PropertyValue = uic('div', {
 /**
  * Shortcut for creating a property list item with a label and a value.
  */
-export const PropertyItem = (({ label, children }: { label: string; children: ReactNode }) => {
+export const PropertyItem = ({ label, children }: { label: string; children: ReactNode }) => {
 	return (
 		<PropertyRow>
 			<PropertyLabel>{label}</PropertyLabel>
 			<PropertyValue>{children}</PropertyValue>
 		</PropertyRow>
 	)
-})
+}

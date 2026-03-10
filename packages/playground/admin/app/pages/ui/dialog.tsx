@@ -15,7 +15,9 @@ export default () => (
 			<p className="max-w-md">
 				The dialog component based on Radix UI primitives. It provides a simple way to create a dialog with a header, content, and footer.
 			</p>
-			<p className="max-w-md">Additionally, it can be controlled by a <code>useDialogOpenState</code> hook.</p>
+			<p className="max-w-md">
+				Additionally, it can be controlled by a <code>useDialogOpenState</code> hook.
+			</p>
 		</div>
 		<div>
 			<Dialog>
@@ -64,17 +66,19 @@ const CustomDialogState = () => {
 
 	return (
 		<div className="fixed bottom-2 right-2 z-[60] flex items-center gap-2 px-3 py-1.5 rounded-lg font-medium text-sm pointer-events-none">
-			{open ? (
-				<DialogStatusLabel variant="open">
-					<DialogStatusIndicator variant="open" />
-					Dialog is opened
-				</DialogStatusLabel>
-			) : (
-				<DialogStatusLabel variant="closed">
-					<DialogStatusIndicator variant="closed" />
-					Dialog is closed
-				</DialogStatusLabel>
-			)}
+			{open
+				? (
+					<DialogStatusLabel variant="open">
+						<DialogStatusIndicator variant="open" />
+						Dialog is opened
+					</DialogStatusLabel>
+				)
+				: (
+					<DialogStatusLabel variant="closed">
+						<DialogStatusIndicator variant="closed" />
+						Dialog is closed
+					</DialogStatusLabel>
+				)}
 		</div>
 	)
 }

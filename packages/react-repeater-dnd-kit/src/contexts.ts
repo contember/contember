@@ -1,4 +1,4 @@
-import { createRequiredContext, createContext } from '@contember/react-utils'
+import { createContext, createRequiredContext } from '@contember/react-utils'
 import { EntityAccessor } from '@contember/react-binding'
 import { useSortable } from '@dnd-kit/sortable'
 

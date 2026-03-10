@@ -1,4 +1,4 @@
-import { expect, it, describe } from 'bun:test'
+import { describe, expect, it } from 'bun:test'
 import { Environment } from '../../../../src/environment'
 import { Parser } from '../../../../src/queryLanguage'
 
@@ -76,7 +76,6 @@ describe('filter QueryLanguage parser', () => {
 			},
 		})
 	})
-
 
 	it('should parse conditions with quantifiers', () => {
 		expect(parse(`[tags:all[isPublished = true]]`)).toEqual({

@@ -6,7 +6,9 @@ export type TenantMutationOkResponse<Result> = { ok: true; result: Result }
 export type TenantMutationErrorResponse<Error> = { ok: false; error: Error; developerMessage?: string }
 export type TenantMutationResponse<Result, Error> = TenantMutationOkResponse<Result> | TenantMutationErrorResponse<Error>
 
-export type TenantMutation<Result, Error> = { readonly mutation?: { readonly ok: boolean; readonly error?: { readonly code: Error; readonly developerMessage: string}; readonly result?: Result} }
+export type TenantMutation<Result, Error> = {
+	readonly mutation?: { readonly ok: boolean; readonly error?: { readonly code: Error; readonly developerMessage: string }; readonly result?: Result }
+}
 
 export const useTenantMutation = <TResult, TError extends string = never, TVariables extends object = {}>(
 	fetcher: MutationFetcher<TenantMutation<TResult, TError>, TVariables>,
@@ -33,13 +35,13 @@ export const useTenantMutation = <TResult, TError extends string = never, TVaria
 	}, [fetcher, tenantApi])
 }
 
-
 export const createTenantMutation = <TResult, TError extends string = never, TVariables extends object = {}>(
 	fetcher: MutationFetcher<TenantMutation<TResult, TError>, TVariables>,
 	defaultOptions?: TenantApiOptions,
 ) => {
-	return ({ headers, apiToken }: TenantApiOptions = {}) => useTenantMutation(fetcher, {
-		headers: useMemo(() => ({ ...defaultOptions?.headers, ...headers }), [headers]),
-		apiToken: apiToken ?? defaultOptions?.apiToken,
-	})
+	return ({ headers, apiToken }: TenantApiOptions = {}) =>
+		useTenantMutation(fetcher, {
+			headers: useMemo(() => ({ ...defaultOptions?.headers, ...headers }), [headers]),
+			apiToken: apiToken ?? defaultOptions?.apiToken,
+		})
 }

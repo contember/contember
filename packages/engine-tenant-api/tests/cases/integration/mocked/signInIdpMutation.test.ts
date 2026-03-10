@@ -91,7 +91,6 @@ test('signs in idp with existing identity', async () => {
 	})
 })
 
-
 test('signs in exclusive idp', async () => {
 	const externalIdentifier = 'abcd'
 	const email = 'john@doe.com'

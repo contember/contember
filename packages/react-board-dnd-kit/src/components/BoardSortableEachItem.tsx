@@ -18,9 +18,8 @@ export const BoardSortableEachItem = ({ children }: {
 					{children}
 				</BoardSortableEachItemInner>
 			</BoardEachItem>
-
-		</SortableContext>)
-
+		</SortableContext>
+	)
 }
 BoardSortableEachItem.staticRender = ({ children }: { children: ReactNode }) => {
 	return <BoardEachItem>{children}</BoardEachItem>

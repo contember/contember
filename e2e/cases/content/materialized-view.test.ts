@@ -23,7 +23,6 @@ namespace MaterializedViewTest {
 test('Content API: materialized view', async () => {
 	const tester = await createTester(createSchema(MaterializedViewTest))
 
-
 	await tester(
 		gql`
             mutation {

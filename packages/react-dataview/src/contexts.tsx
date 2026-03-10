@@ -17,7 +17,6 @@ import { EntityListSubTreeLoaderState, SugaredRelativeSingleField } from '@conte
 import * as React from 'react'
 import { ReactNode } from 'react'
 
-
 const _DataViewSortingStateContext = createRequiredContext<DataViewSortingState>('DataViewSortingStateContext')
 /** @internal */
 export const DataViewSortingStateContext = _DataViewSortingStateContext[0]
@@ -145,7 +144,6 @@ export const DataViewSelectionMethodsContext = _DataViewSelectionMethodsContext[
  */
 export const useDataViewSelectionMethods = _DataViewSelectionMethodsContext[1]
 
-
 const DataViewHighlightIndexContext_ = createRequiredContext<number | null>('DataViewHighlightIndex')
 /** @internal */
 export const DataViewHighlightIndexContext = DataViewHighlightIndexContext_[0]
@@ -158,7 +156,6 @@ const DataViewKeyboardEventHandlerContext_ = createRequiredContext<React.Keyboar
 /** @internal */
 export const DataViewKeyboardEventHandlerContext = DataViewKeyboardEventHandlerContext_[0]
 export const useDataViewKeyboardEventHandler = DataViewKeyboardEventHandlerContext_[1]
-
 
 const DataViewFilterNameContext_ = createRequiredContext<string>('DataViewFilterName')
 /** @internal */
@@ -174,7 +171,6 @@ const DataViewRelationFilterArgsContext_ = createRequiredContext<{
 /** @internal */
 export const DataViewRelationFilterArgsContext = DataViewRelationFilterArgsContext_[0]
 export const useDataViewRelationFilterArgs = DataViewRelationFilterArgsContext_[1]
-
 
 const DataViewChildrenContext_ = createRequiredContext<ReactNode>('DataViewChildren')
 /** @internal */
@@ -193,7 +189,6 @@ const DataViewInfiniteLoadTriggerContext_ = createRequiredContext<(() => void) |
 /** @internal */
 export const DataViewInfiniteLoadTriggerContext = DataViewInfiniteLoadTriggerContext_[0]
 export const useDataViewInfiniteLoadTrigger = DataViewInfiniteLoadTriggerContext_[1]
-
 
 const DataViewEnumFilterArgsContext_ = createRequiredContext<{
 	enumName: string

@@ -32,8 +32,13 @@ export const Security = () => {
 						<CardTitle className="text-2xl">Change Password</CardTitle>
 					</CardHeader>
 					<CardContent>
-						<ChangeMyPasswordForm onSuccess={() => showToast(
-							<ToastContent>Password changed</ToastContent>, { type: 'success' })}>
+						<ChangeMyPasswordForm
+							onSuccess={() =>
+								showToast(
+									<ToastContent>Password changed</ToastContent>,
+									{ type: 'success' },
+								)}
+						>
 							<form className="grid gap-4">
 								<ChangeMyPasswordFormFields />
 							</form>
@@ -52,7 +57,6 @@ export const Security = () => {
 		</>
 	)
 }
-
 
 export const Members = () => {
 	const projectSlug = useProjectSlug()!
@@ -76,7 +80,9 @@ export const Members = () => {
 							initialMemberships={[{ role: 'admin', variables: [] }]}
 							onSuccess={args => {
 								showToast(
-									<ToastContent>Invitation sent to {args.result.person?.email}</ToastContent>, { type: 'success' })
+									<ToastContent>Invitation sent to {args.result.person?.email}</ToastContent>,
+									{ type: 'success' },
+								)
 								memberListController.current?.refresh()
 							}}
 						>
@@ -94,7 +100,6 @@ export const Members = () => {
 						<PersonList controller={memberListController} />
 					</CardContent>
 				</Card>
-
 			</div>
 		</>
 	)
@@ -122,11 +127,14 @@ export const ApiKeys = () => {
 								projectSlug={projectSlug}
 								initialMemberships={[{ role: 'admin', variables: [] }]}
 								onSuccess={args => {
-									showToast((
-										<ToastContent title="API key created">
-											<Input value={args.result.apiKey.token} type="text" />
-										</ToastContent>
-									), { type: 'success' })
+									showToast(
+										(
+											<ToastContent title="API key created">
+												<Input value={args.result.apiKey.token} type="text" />
+											</ToastContent>
+										),
+										{ type: 'success' },
+									)
 									memberListController.current?.refresh()
 								}}
 							>

@@ -19,12 +19,18 @@ export default () => {
 				</CardDescription>
 			</CardHeader>
 			<CardContent>
-				<PasswordResetForm onSuccess={() => {
-					showToast(<ToastContent>
-						Password has been reset
-					</ToastContent>, { type: 'success' })
-					redirect('index')
-				}} token={token}>
+				<PasswordResetForm
+					onSuccess={() => {
+						showToast(
+							<ToastContent>
+								Password has been reset
+							</ToastContent>,
+							{ type: 'success' },
+						)
+						redirect('index')
+					}}
+					token={token}
+				>
 					<form>
 						<PasswordResetFormFields hasToken={!!token} />
 					</form>

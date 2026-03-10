@@ -3,7 +3,17 @@ import qrcode from 'qrcode-generator'
 import { DisableOtpTrigger, OtpConfirmForm, OtpPrepareForm, useIdentity, useOtpConfirmForm, useOtpPrepareForm } from '@contember/interface'
 import { Loader } from '../../ui/loader'
 import { Button } from '../../ui/button'
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '../../ui/alert-dialog'
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+	AlertDialogTrigger,
+} from '../../ui/alert-dialog'
 import { TenantFormError, TenantFormField } from '../forms/common'
 import { ToastContent, useShowToast } from '../../toast'
 import { dict } from '../../dict'
@@ -29,73 +39,85 @@ export const OtpSetup = () => {
 				}}
 			>
 				<form>
-					{person.otpEnabled && <>
-						<div className="border border-destructive p-4 mb-4 rounded-sm">
-							{dict.tenant.otpSetup.alreadyHaveOtp}
-						</div>
-					</>}
+					{person.otpEnabled && (
+						<>
+							<div className="border border-destructive p-4 mb-4 rounded-sm">
+								{dict.tenant.otpSetup.alreadyHaveOtp}
+							</div>
+						</>
+					)}
 					<OtpPrepareFormFields />
 				</form>
 			</OtpPrepareForm>
 		)
 	}
 	if (otpUri) {
-		return <>
-			<p>
-				{dict.tenant.otpSetup.nowScanQrCode}
-			</p>
-			<QrCode data={otpUri} />
-			<p>
-				{dict.tenant.otpSetup.writeDownCode}
-			</p>
-			<OtpConfirmForm onSuccess={() => {
-				showToast(<ToastContent>{dict.tenant.otpSetup.enabledSuccess}</ToastContent>, { type: 'success' })
-			}}>
-				<form>
-					<OtpConfirmFormFields />
-				</form>
-			</OtpConfirmForm>
-		</>
+		return (
+			<>
+				<p>
+					{dict.tenant.otpSetup.nowScanQrCode}
+				</p>
+				<QrCode data={otpUri} />
+				<p>
+					{dict.tenant.otpSetup.writeDownCode}
+				</p>
+				<OtpConfirmForm
+					onSuccess={() => {
+						showToast(<ToastContent>{dict.tenant.otpSetup.enabledSuccess}</ToastContent>, { type: 'success' })
+					}}
+				>
+					<form>
+						<OtpConfirmFormFields />
+					</form>
+				</OtpConfirmForm>
+			</>
+		)
 	}
 
 	if (person.otpEnabled) {
-		return <>
-			<p>
-				{dict.tenant.otpSetup.twoFactorEnabled}
-			</p>
-			<AlertDialog>
-				<AlertDialogTrigger asChild>
-					<Button variant="destructive">{dict.tenant.otpSetup.disableTwoFactor}</Button>
-				</AlertDialogTrigger>
-				<AlertDialogContent>
-					<AlertDialogHeader>
-						<AlertDialogTitle>{dict.tenant.otpSetup.disableTwoFactor}</AlertDialogTitle>
-						<AlertDialogDescription>{dict.tenant.otpSetup.disableTwoFactorConfirm}</AlertDialogDescription>
-					</AlertDialogHeader>
-					<AlertDialogFooter>
-						<AlertDialogCancel>
-							{dict.tenant.otpSetup.cancel}
-						</AlertDialogCancel>
-						<DisableOtpTrigger onSuccess={() => {
-							showToast(<ToastContent>{dict.tenant.otpSetup.disabledSuccess}</ToastContent>, { type: 'success' })
-						}}>
-							<AlertDialogAction variant="destructive">
-								{dict.tenant.otpSetup.disable}
-							</AlertDialogAction>
-						</DisableOtpTrigger>
-					</AlertDialogFooter>
-				</AlertDialogContent>
-			</AlertDialog>
-			<p>{dict.tenant.otpSetup.alreadyHaveOtp}</p>
-			<Button onClick={() => setInitializingOtp(true)}>{dict.tenant.otpSetup.setupAgain}</Button>
-		</>
+		return (
+			<>
+				<p>
+					{dict.tenant.otpSetup.twoFactorEnabled}
+				</p>
+				<AlertDialog>
+					<AlertDialogTrigger asChild>
+						<Button variant="destructive">{dict.tenant.otpSetup.disableTwoFactor}</Button>
+					</AlertDialogTrigger>
+					<AlertDialogContent>
+						<AlertDialogHeader>
+							<AlertDialogTitle>{dict.tenant.otpSetup.disableTwoFactor}</AlertDialogTitle>
+							<AlertDialogDescription>{dict.tenant.otpSetup.disableTwoFactorConfirm}</AlertDialogDescription>
+						</AlertDialogHeader>
+						<AlertDialogFooter>
+							<AlertDialogCancel>
+								{dict.tenant.otpSetup.cancel}
+							</AlertDialogCancel>
+							<DisableOtpTrigger
+								onSuccess={() => {
+									showToast(<ToastContent>{dict.tenant.otpSetup.disabledSuccess}</ToastContent>, { type: 'success' })
+								}}
+							>
+								<AlertDialogAction variant="destructive">
+									{dict.tenant.otpSetup.disable}
+								</AlertDialogAction>
+							</DisableOtpTrigger>
+						</AlertDialogFooter>
+					</AlertDialogContent>
+				</AlertDialog>
+				<p>{dict.tenant.otpSetup.alreadyHaveOtp}</p>
+				<Button onClick={() => setInitializingOtp(true)}>{dict.tenant.otpSetup.setupAgain}</Button>
+			</>
+		)
 	}
-	return <>
-		<p>
-			{dict.tenant.otpSetup.description}
-		</p>
-		<Button onClick={() => setInitializingOtp(true)}>{dict.tenant.otpSetup.setupTwoFactor}</Button>
-	</>
+	return (
+		<>
+			<p>
+				{dict.tenant.otpSetup.description}
+			</p>
+			<Button onClick={() => setInitializingOtp(true)}>{dict.tenant.otpSetup.setupTwoFactor}</Button>
+		</>
+	)
 }
 
 const QrCode = ({ data }: { data: string }) => {
@@ -115,8 +137,11 @@ export const OtpConfirmFormFields = () => {
 			{form.state === 'success' || form.state === 'submitting' ? <Loader position="absolute" /> : null}
 			<TenantFormError form={form} messages={dict.tenant.otpSetup.otpConfirmFormErrorMessages} />
 			<TenantFormField
-				form={form} messages={dict.tenant.otpSetup.otpConfirmFormErrorMessages} field="otpToken"
-				type="text" required
+				form={form}
+				messages={dict.tenant.otpSetup.otpConfirmFormErrorMessages}
+				field="otpToken"
+				type="text"
+				required
 			>
 				{dict.tenant.otpSetup.otpToken}
 			</TenantFormField>
@@ -133,7 +158,9 @@ export const OtpPrepareFormFields = () => {
 			{form.state === 'success' || form.state === 'submitting' ? <Loader position="absolute" /> : null}
 			<TenantFormError form={form} messages={dict.tenant.otpSetup.otpPrepareFormErrorMessages} />
 			<TenantFormField
-				form={form} messages={dict.tenant.otpSetup.otpPrepareFormErrorMessages} field="label"
+				form={form}
+				messages={dict.tenant.otpSetup.otpPrepareFormErrorMessages}
+				field="label"
 				type="text"
 			>
 				{dict.tenant.otpSetup.label}

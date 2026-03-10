@@ -9,7 +9,6 @@ import { useDataViewFilterName } from '../../../contexts'
 const SlotType = Slot as React.ForwardRefExoticComponent<React.ButtonHTMLAttributes<HTMLButtonElement> & React.RefAttributes<HTMLButtonElement>>
 
 export interface DataViewDateFilterResetTriggerProps {
-
 	/**
 	 * The name of the filter. If not provided, it will be inferred from the context
 	 */

@@ -1,10 +1,5 @@
 import type { Environment } from '../environment'
-import type {
-	Alias,
-	SugaredQualifiedEntityList,
-	SugaredUnconstrainedQualifiedEntityList,
-	TreeRootId,
-} from '../treeParameters'
+import type { Alias, SugaredQualifiedEntityList, SugaredUnconstrainedQualifiedEntityList, TreeRootId } from '../treeParameters'
 import type { EntityListAccessor } from './EntityListAccessor'
 
 export type GetEntityListSubTree = (

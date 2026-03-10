@@ -3,14 +3,14 @@ import {
 	EntityFieldMarkers,
 	EntityListSubTreeMarker,
 	EntitySubTreeMarker,
-	FieldMarker, FieldMeta,
+	FieldMarker,
+	FieldMeta,
 	HasManyRelationMarker,
 	HasOneRelationMarker,
 	MarkerTreeRoot,
 	PRIMARY_KEY_NAME,
 } from '@contember/binding-common'
 import { ContentEntitySelection, ContentQuery, ContentQueryBuilder } from '@contember/client'
-
 
 export class QueryGenerator {
 	constructor(
@@ -44,7 +44,7 @@ export class QueryGenerator {
 				by: subTree.parameters.where,
 				filter: subTree.parameters.filter,
 			},
-			it =>  QueryGenerator.registerQueryPart(subTree.fields.markers, it),
+			it => QueryGenerator.registerQueryPart(subTree.fields.markers, it),
 		)
 	}
 
@@ -60,7 +60,7 @@ export class QueryGenerator {
 				offset: subTree.parameters.offset,
 				limit: subTree.parameters.limit,
 			},
-			it =>  QueryGenerator.registerQueryPart(subTree.fields.markers, it),
+			it => QueryGenerator.registerQueryPart(subTree.fields.markers, it),
 		)
 	}
 
@@ -99,7 +99,6 @@ export class QueryGenerator {
 				}
 			} else if (fieldValue instanceof HasManyRelationMarker) {
 				const relation = fieldValue.parameters
-
 
 				selection = selection.$(
 					relation.field,

@@ -27,7 +27,6 @@ export class EnableOrphanRemovalModificationHandler implements ModificationHandl
 			message: `Enable orphan removal on ${this.data.entityName}.${this.data.fieldName}`,
 		}
 	}
-
 }
 
 export interface EnableOrphanRemovalModificationData {
@@ -41,15 +40,15 @@ export const enableOrphanRemovalModification = createModificationType({
 })
 
 export class EnableOrphanRemovalDiffer implements Differ {
-	 createDiff(originalSchema: Schema, updatedSchema: Schema) {
+	createDiff(originalSchema: Schema, updatedSchema: Schema) {
 		return updateRelations(originalSchema, updatedSchema, ({ originalRelation, updatedRelation, updatedEntity }) => {
 			if (
-				isOwningRelation(originalRelation) &&
-				isOwningRelation(updatedRelation) &&
-				originalRelation.type === Model.RelationType.OneHasOne &&
-				updatedRelation.type === Model.RelationType.OneHasOne &&
-				!originalRelation.orphanRemoval &&
-				updatedRelation.orphanRemoval
+				isOwningRelation(originalRelation)
+				&& isOwningRelation(updatedRelation)
+				&& originalRelation.type === Model.RelationType.OneHasOne
+				&& updatedRelation.type === Model.RelationType.OneHasOne
+				&& !originalRelation.orphanRemoval
+				&& updatedRelation.orphanRemoval
 			) {
 				return enableOrphanRemovalModification.createModification({
 					entityName: updatedEntity.name,

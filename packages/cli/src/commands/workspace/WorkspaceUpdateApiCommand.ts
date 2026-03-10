@@ -42,20 +42,22 @@ export class WorkspaceUpdateApiCommand extends Command<Args, Options> {
 		}
 		await this.dockerComposeManager.updateMainDockerComposeConfig(data => ({
 			...data,
-			services: Object.fromEntries(Object.entries(data?.services ?? {}).map(([name, service]: [string, any]) => {
-				const newImage = getNewImage(service.image)
-				if (newImage) {
-					console.log(`docker-compose service ${name} updated`)
-					return [
-						name,
-						{
-							...service,
-							image: newImage,
-						},
-					]
-				}
-				return [name, service]
-			})),
+			services: Object.fromEntries(
+				Object.entries(data?.services ?? {}).map(([name, service]: [string, any]) => {
+					const newImage = getNewImage(service.image)
+					if (newImage) {
+						console.log(`docker-compose service ${name} updated`)
+						return [
+							name,
+							{
+								...service,
+								image: newImage,
+							},
+						]
+					}
+					return [name, service]
+				}),
+			),
 		}))
 		console.log('API versions updated')
 		console.log('Restart server to apply changes')

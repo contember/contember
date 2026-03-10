@@ -5,7 +5,8 @@ import {
 	Literal,
 	Operator,
 	SelectBuilder,
-	SelectBuilderSpecification, Value,
+	SelectBuilderSpecification,
+	Value,
 } from '@contember/database'
 import { ContentEvent } from '../../events'
 import { EventsFilter, EventsFilterDate, EventsOrder } from '../../../schema'
@@ -52,11 +53,8 @@ export class EventsQuery extends DatabaseQuery<ContentEvent[]> {
 			.select('applied_at')
 			.select('identity_id')
 			.select(['event_data', 'transaction_id'])
-
 			.from('event_data')
-			.join('stage_transaction', undefined, on =>
-				on.columnsEq(['event_data', 'transaction_id'], ['stage_transaction', 'transaction_id']),
-			)
+			.join('stage_transaction', undefined, on => on.columnsEq(['event_data', 'transaction_id'], ['stage_transaction', 'transaction_id']))
 			.match(qb => {
 				switch (this.order) {
 					case EventsOrder.AppliedAtAsc:
@@ -94,10 +92,8 @@ export class EventsQuery extends DatabaseQuery<ContentEvent[]> {
 
 				return qb.where(ConditionBuilder.create().or(ConditionBuilder.create(ors)))
 			})
-
 			.limit(this.limit, this.offset)
 
 		return createEventsFromRows(await qb.getResult(db))
 	}
-
 }

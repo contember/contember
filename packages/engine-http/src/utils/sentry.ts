@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/node'
-import { LogEntry, LoggerHandler, LogLevel, LogLevels, LogLevelName } from '@contember/logger'
+import { LogEntry, LoggerHandler, LogLevel, LogLevelName, LogLevels } from '@contember/logger'
 import { LoggerRequestBody } from '../application'
 
 const logLevelMapping: Record<LogLevelName, Sentry.SeverityLevel> = {

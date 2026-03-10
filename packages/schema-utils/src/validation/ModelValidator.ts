@@ -5,9 +5,8 @@ import { acceptEveryFieldVisitor, getTargetEntity, isColumn, isInverseRelation, 
 const IDENTIFIER_PATTERN = /^[_a-zA-Z][_a-zA-Z0-9]*$/
 const RESERVED_WORDS = ['and', 'or', 'not']
 
-
 export class ModelValidator {
-	constructor(private readonly model: Model.Schema) { }
+	constructor(private readonly model: Model.Schema) {}
 
 	public validate(): ValidationError[] {
 		const errorBuilder = new ErrorBuilder([], [])
@@ -121,7 +120,7 @@ export class ModelValidator {
 			return errors.add('MODEL_UNDEFINED_ENTITY', `Target entity ${targetEntityName} not found`)
 		}
 		if (((it: Model.AnyRelation): it is Model.AnyRelation & Model.OrderableRelation => 'orderBy' in it)(field)) {
-			(field as Model.OrderableRelation).orderBy?.forEach(it => {
+			;(field as Model.OrderableRelation).orderBy?.forEach(it => {
 				let entity = targetEntity
 
 				for (let i = 0; i < it.path.length; i++) {
@@ -147,15 +146,15 @@ export class ModelValidator {
 				return errors.add('MODEL_INVALID_VIEW_USAGE', 'Many-has-many relation is not allowed on a view entity.')
 			}
 			if (
-				!targetEntity.view &&
-				field.type === Model.RelationType.OneHasMany
+				!targetEntity.view
+				&& field.type === Model.RelationType.OneHasMany
 			) {
 				return errors.add('MODEL_INVALID_VIEW_USAGE', 'One-has-many relation fields on views must point to a view entity.')
 			}
 			if (
-				!targetEntity.view &&
-				field.type === Model.RelationType.OneHasOne &&
-				!('joiningColumn' in field)
+				!targetEntity.view
+				&& field.type === Model.RelationType.OneHasOne
+				&& !('joiningColumn' in field)
 			) {
 				return errors.add('MODEL_INVALID_VIEW_USAGE', 'One-has-one relation fields on views must be owning or point to a view entity.')
 			}
@@ -172,7 +171,10 @@ export class ModelValidator {
 				return errors.add('MODEL_RELATION_REQUIRED', `${relationDescription} not a relation`)
 			}
 			if (targetField.target !== entityName) {
-				return errors.add('MODEL_INVALID_RELATION_DEFINITION', `${relationDescription} back reference to entity ${entityName} expected, but ${targetField.target} given`)
+				return errors.add(
+					'MODEL_INVALID_RELATION_DEFINITION',
+					`${relationDescription} back reference to entity ${entityName} expected, but ${targetField.target} given`,
+				)
 			}
 			if (!isOwningRelation(targetField)) {
 				errors.add('MODEL_INVALID_RELATION_DEFINITION', `${relationDescription} not an owning relation`)
@@ -182,7 +184,10 @@ export class ModelValidator {
 				return errors.add('MODEL_INVALID_RELATION_DEFINITION', `${relationDescription} inverse relation is not set`)
 			}
 			if (targetField.inversedBy !== field.name) {
-				return errors.add('MODEL_INVALID_RELATION_DEFINITION', `${relationDescription} back reference ${entityName}::${field.name} expected, ${targetField.target}::${targetField.inversedBy} given`)
+				return errors.add(
+					'MODEL_INVALID_RELATION_DEFINITION',
+					`${relationDescription} back reference ${entityName}::${field.name} expected, ${targetField.target}::${targetField.inversedBy} given`,
+				)
 			}
 			if (field.type === Model.RelationType.OneHasOne && targetField.type !== Model.RelationType.OneHasOne) {
 				return errors.add('MODEL_INVALID_RELATION_DEFINITION', `${relationDescription} "OneHasOne" type expected, "${targetField.type}" given`)
@@ -205,7 +210,10 @@ export class ModelValidator {
 					return errors.add('MODEL_RELATION_REQUIRED', `${relationDescription} not a relation`)
 				}
 				if (targetField.target !== entityName) {
-					return errors.add('MODEL_INVALID_RELATION_DEFINITION', `${relationDescription} back reference to entity ${entityName} expected, but ${targetField.target} given`)
+					return errors.add(
+						'MODEL_INVALID_RELATION_DEFINITION',
+						`${relationDescription} back reference to entity ${entityName} expected, but ${targetField.target} given`,
+					)
 				}
 				if (!isInverseRelation(targetField)) {
 					return errors.add('MODEL_INVALID_RELATION_DEFINITION', `${relationDescription} not an inverse relation`)
@@ -214,7 +222,10 @@ export class ModelValidator {
 					return errors.add('MODEL_INVALID_RELATION_DEFINITION', `${relationDescription} owning relation is not set`)
 				}
 				if (targetField.ownedBy !== field.name) {
-					return errors.add('MODEL_INVALID_RELATION_DEFINITION', `${relationDescription} back reference ${entityName}::${field.name} expected, ${targetField.target}::${targetField.ownedBy} given`)
+					return errors.add(
+						'MODEL_INVALID_RELATION_DEFINITION',
+						`${relationDescription} back reference ${entityName}::${field.name} expected, ${targetField.target}::${targetField.ownedBy} given`,
+					)
 				}
 				if (field.type === Model.RelationType.OneHasOne && targetField.type !== Model.RelationType.OneHasOne) {
 					return errors.add('MODEL_INVALID_RELATION_DEFINITION', `${relationDescription} "OneHasOne" type expected, "${targetField.type}" given`)
@@ -244,7 +255,6 @@ export class ModelValidator {
 		}
 	}
 
-
 	private validateMetaSuffixCollisions(entities: Model.Entity[], errorBuilder: ErrorBuilder) {
 		const entityNames = new Set(entities.map(it => it.name))
 		for (const entity of entities) {
@@ -252,12 +262,14 @@ export class ModelValidator {
 				const baseName = entity.name.substring(0, entity.name.length - 4)
 				if (entityNames.has(baseName)) {
 					errorBuilder.for(entity.name)
-						.add('MODEL_NAME_COLLISION', `entity ${entity.name} collides with entity ${baseName}, because a GraphQL type with "Meta" suffix is created for every entity`)
+						.add(
+							'MODEL_NAME_COLLISION',
+							`entity ${entity.name} collides with entity ${baseName}, because a GraphQL type with "Meta" suffix is created for every entity`,
+						)
 				}
 			}
 		}
 	}
-
 
 	private validateTableNameCollisions(entities: Model.Entity[], errorBuilder: ErrorBuilder) {
 		const relationNames: Record<string, string> = {}
@@ -280,24 +292,24 @@ export class ModelValidator {
 					if (relationNames[joiningTable.tableName]) {
 						entityErrorBuilder
 							.for(relation.name)
-							.add('MODEL_NAME_COLLISION',
-								`${description} collides with a ${relationNames[joiningTable.tableName]}.` +
-								'Consider using plural for a relation name or change the joining table name using .joiningTable(...) in schema definition.',
+							.add(
+								'MODEL_NAME_COLLISION',
+								`${description} collides with a ${relationNames[joiningTable.tableName]}.`
+									+ 'Consider using plural for a relation name or change the joining table name using .joiningTable(...) in schema definition.',
 							)
 					} else {
 						relationNames[joiningTable.tableName] = description
 					}
 				},
 				visitColumn: () => {},
-				visitManyHasManyInverse: () => { },
-				visitOneHasMany: () => { },
-				visitOneHasOneInverse: () => { },
-				visitOneHasOneOwning: () => { },
-				visitManyHasOne: () => { },
+				visitManyHasManyInverse: () => {},
+				visitOneHasMany: () => {},
+				visitOneHasOneInverse: () => {},
+				visitOneHasOneOwning: () => {},
+				visitManyHasOne: () => {},
 			})
 		}
 	}
-
 
 	private validateAliasedTypesCollision(entities: Model.Entity[], errorBuilder: ErrorBuilder) {
 		const aliasedTypes = new Map<string, Model.ColumnType>()
@@ -314,16 +326,15 @@ export class ModelValidator {
 					}
 					aliasedTypes.set(column.typeAlias, column.type)
 				},
-				visitManyHasManyOwning: () => { },
-				visitManyHasManyInverse: () => { },
-				visitOneHasMany: () => { },
-				visitOneHasOneInverse: () => { },
-				visitOneHasOneOwning: () => { },
-				visitManyHasOne: () => { },
+				visitManyHasManyOwning: () => {},
+				visitManyHasManyInverse: () => {},
+				visitOneHasMany: () => {},
+				visitOneHasOneInverse: () => {},
+				visitOneHasOneOwning: () => {},
+				visitManyHasOne: () => {},
 			})
 		}
 	}
 }
 
-const isRelation = (field: Model.AnyField): field is Model.AnyRelation =>
-	Object.values(Model.RelationType).includes(field.type as Model.RelationType)
+const isRelation = (field: Model.AnyField): field is Model.AnyRelation => Object.values(Model.RelationType).includes(field.type as Model.RelationType)

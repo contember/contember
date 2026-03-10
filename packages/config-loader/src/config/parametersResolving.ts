@@ -4,15 +4,13 @@ export type ParametersResolver = (parameterParts: string[], path: Path, dataReso
 
 export class UndefinedParameterError extends Error {}
 
-export const createObjectParametersResolver =
-	(parameters: any): ParametersResolver =>
-		parts =>
-			parts.reduce((current, part) => {
-				if (current === null || typeof current !== 'object' || typeof current[part] === 'undefined') {
-					throw new UndefinedParameterError(`Parameter "${parts.join('.')}" not found.`)
-				}
-				return current[part]
-			}, parameters)
+export const createObjectParametersResolver = (parameters: any): ParametersResolver => parts =>
+	parts.reduce((current, part) => {
+		if (current === null || typeof current !== 'object' || typeof current[part] === 'undefined') {
+			throw new UndefinedParameterError(`Parameter "${parts.join('.')}" not found.`)
+		}
+		return current[part]
+	}, parameters)
 
 export const resolveParameters = (data: any, parametersResolver: ParametersResolver): any => {
 	let recursionLevel = 0
@@ -32,9 +30,7 @@ export const resolveParameters = (data: any, parametersResolver: ParametersResol
 		if (recursionLevel++ > 20) {
 			throw new Error('Possible recursion in configuration')
 		}
-		const result = resolveParametersInternal(value, path, (parts, path) =>
-			parametersResolver(parts, path, dataResolver),
-		)
+		const result = resolveParametersInternal(value, path, (parts, path) => parametersResolver(parts, path, dataResolver))
 		recursionLevel--
 		return result
 	}

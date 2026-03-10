@@ -12,7 +12,6 @@ ALTER TABLE identity
 	ALTER created_at SET NOT NULL;
 `
 
-export default async function (builder: MigrationBuilder) {
+export default async function(builder: MigrationBuilder) {
 	builder.sql(sql)
 }
-

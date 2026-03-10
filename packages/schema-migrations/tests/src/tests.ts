@@ -1,7 +1,7 @@
 import { Migration, ModificationHandlerFactory, SchemaDiffer, SchemaMigrator, VERSION_LATEST } from '../../src'
 import { Schema } from '@contember/schema'
 import { createMigrationBuilder } from '@contember/database-migrations'
-import { expect, describe, it, test } from 'bun:test'
+import { describe, expect, it, test } from 'bun:test'
 import { emptySchema } from '@contember/schema-utils'
 import { DatabaseMetadata, emptyDatabaseMetadata } from '@contember/database'
 

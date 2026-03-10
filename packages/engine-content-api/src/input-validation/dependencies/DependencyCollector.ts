@@ -32,9 +32,9 @@ export class DependencyCollector {
 		const result: DependenciesList = []
 		for (const arg of validator.args) {
 			switch (arg.type) {
-				//case Validation.ArgumentType.path:
-				//	result.push([...prefix, ...arg.path])
-				//	break
+				// case Validation.ArgumentType.path:
+				// 	result.push([...prefix, ...arg.path])
+				// 	break
 				case Validation.ArgumentType.validator:
 					result.push(...DependencyCollector.doCollect(arg.validator, prefix))
 					break

@@ -11,10 +11,11 @@ export interface DataViewEnumFilterTriggerAttributes {
 	['data-current']: DataViewEnumFilterCurrent
 }
 
-const SlotType = Slot as React.ForwardRefExoticComponent<React.ButtonHTMLAttributes<HTMLButtonElement> & React.RefAttributes<HTMLButtonElement> & DataViewEnumFilterTriggerAttributes>
+const SlotType = Slot as React.ForwardRefExoticComponent<
+	React.ButtonHTMLAttributes<HTMLButtonElement> & React.RefAttributes<HTMLButtonElement> & DataViewEnumFilterTriggerAttributes
+>
 
 export interface DataViewEnumFilterTriggerProps {
-
 	/**
 	 * The name of the filter. If not provided, the component will attempt to infer it from the context.
 	 */

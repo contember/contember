@@ -42,14 +42,15 @@ test('delete', async () => {
 					response: { rows: [{ id: testUuid(1), allowed: true }] },
 				},
 				{
-					sql: SQL`select "root_"."id" as "id", "root_"."author_id" as "ref", true as "allowed" from "public"."post" as "root_" where "root_"."author_id" in (?)`,
+					sql:
+						SQL`select "root_"."id" as "id", "root_"."author_id" as "ref", true as "allowed" from "public"."post" as "root_" where "root_"."author_id" in (?)`,
 					parameters: [testUuid(1)],
 					response: { rows: [{ id: testUuid(2), ref: testUuid(1), allowed: true }] },
 				},
 				{
 					sql: SQL`delete from "public"."author" where "id" in (?)`,
 					parameters: [testUuid(1)],
-					response: {  },
+					response: {},
 				},
 			]),
 		],
@@ -101,14 +102,15 @@ test('delete with cascade', async () => {
 					response: { rows: [{ id: testUuid(1), allowed: true }] },
 				},
 				{
-					sql: SQL`select "root_"."id" as "id", "root_"."author_id" as "ref", true as "allowed" from "public"."post" as "root_" where "root_"."author_id" in (?)`,
+					sql:
+						SQL`select "root_"."id" as "id", "root_"."author_id" as "ref", true as "allowed" from "public"."post" as "root_" where "root_"."author_id" in (?)`,
 					parameters: [testUuid(1)],
 					response: { rows: [{ id: testUuid(2), ref: testUuid(1), allowed: true }] },
 				},
 				{
 					sql: SQL`delete from "public"."author" where "id" in (?)`,
 					parameters: [testUuid(1)],
-					response: {  },
+					response: {},
 				},
 			]),
 		],
@@ -160,7 +162,8 @@ test('delete with cascade - denied', async () => {
 					response: { rows: [{ id: testUuid(1), allowed: true }] },
 				},
 				{
-					sql: SQL`select "root_"."id" as "id", "root_"."author_id" as "ref", true as "allowed" from "public"."post" as "root_" where "root_"."author_id" in (?)`,
+					sql:
+						SQL`select "root_"."id" as "id", "root_"."author_id" as "ref", true as "allowed" from "public"."post" as "root_" where "root_"."author_id" in (?)`,
 					parameters: [testUuid(1)],
 					response: { rows: [{ id: testUuid(2), ref: testUuid(1), allowed: false }] },
 				},
@@ -175,4 +178,3 @@ test('delete with cascade - denied', async () => {
 		},
 	})
 })
-

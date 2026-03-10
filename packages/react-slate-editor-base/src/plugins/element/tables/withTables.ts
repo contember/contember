@@ -12,7 +12,8 @@ export const withTables = ({ renderTable, renderTableCell, renderTableRow }: {
 	renderTable: ElementRenderer<TableElement>
 	renderTableCell: ElementRenderer<TableCellElement>
 	renderTableRow: ElementRenderer<TableRowElement>
-}) => <E extends Editor>(editor: E): E => {
+}) =>
+<E extends Editor>(editor: E): E => {
 	const {
 		deleteForward,
 		deleteBackward,
@@ -66,9 +67,9 @@ export const withTables = ({ renderTable, renderTableCell, renderTableRow }: {
 			if (selection && SlateRange.isCollapsed(selection)) {
 				const closestBlockEntry = ContemberEditor.closestBlockEntry(editor)
 				if (
-					closestBlockEntry &&
-					isTableCellElement(closestBlockEntry[0]) &&
-					Point.equals(selection.focus, Editor.start(editor, closestBlockEntry[1]))
+					closestBlockEntry
+					&& isTableCellElement(closestBlockEntry[0])
+					&& Point.equals(selection.focus, Editor.start(editor, closestBlockEntry[1]))
 				) {
 					return
 				}
@@ -80,9 +81,9 @@ export const withTables = ({ renderTable, renderTableCell, renderTableRow }: {
 			if (selection && SlateRange.isCollapsed(selection)) {
 				const closestBlockEntry = ContemberEditor.closestBlockEntry(editor)
 				if (
-					closestBlockEntry &&
-					isTableCellElement(closestBlockEntry[0]) &&
-					Point.equals(selection.focus, Editor.end(editor, closestBlockEntry[1]))
+					closestBlockEntry
+					&& isTableCellElement(closestBlockEntry[0])
+					&& Point.equals(selection.focus, Editor.end(editor, closestBlockEntry[1]))
 				) {
 					return
 				}
@@ -105,15 +106,15 @@ export const withTables = ({ renderTable, renderTableCell, renderTableRow }: {
 		onKeyDown: event => {
 			const selection = editor.selection
 			if (
-				!selection ||
-				!(
-					event.key === 'Tab' ||
-					event.key === 'ArrowUp' ||
-					event.key === 'ArrowRight' ||
-					event.key === 'ArrowDown' ||
-					event.key === 'ArrowLeft' ||
-					event.key === 'Enter' ||
-					event.key === 'Backspace'
+				!selection
+				|| !(
+					event.key === 'Tab'
+					|| event.key === 'ArrowUp'
+					|| event.key === 'ArrowRight'
+					|| event.key === 'ArrowDown'
+					|| event.key === 'ArrowLeft'
+					|| event.key === 'Enter'
+					|| event.key === 'Backspace'
 				)
 			) {
 				return onKeyDown(event)
@@ -135,7 +136,7 @@ export const withTables = ({ renderTable, renderTableCell, renderTableRow }: {
 					return onKeyDown(event)
 				}
 			} else {
-				[cellElement, cellPath] = closestBlockEntry
+				;[cellElement, cellPath] = closestBlockEntry
 			}
 			if (cellPath.length < 3) {
 				return onKeyDown(event)
@@ -236,8 +237,8 @@ export const withTables = ({ renderTable, renderTableCell, renderTableRow }: {
 					const relative = SlatePath.relative(closestBlockEntry[1], cellPath)
 					const defaultIndex = relative[0]
 					if (
-						(event.key === 'ArrowUp' && defaultIndex !== 0) ||
-						(event.key === 'ArrowDown' && defaultIndex !== cellElement.children.length - 1)
+						(event.key === 'ArrowUp' && defaultIndex !== 0)
+						|| (event.key === 'ArrowDown' && defaultIndex !== cellElement.children.length - 1)
 					) {
 						return onKeyDown(event)
 					}
@@ -331,7 +332,6 @@ export const withTables = ({ renderTable, renderTableCell, renderTableRow }: {
 			}
 			onKeyDown(event)
 		},
-
 	})
 
 	return editor

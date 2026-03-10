@@ -12,7 +12,9 @@ export interface DataViewRelationFilterTriggerAttributes {
 	['data-current']: DataViewRelationFilterCurrent
 }
 
-const SlotType = Slot as React.ForwardRefExoticComponent<React.ButtonHTMLAttributes<HTMLButtonElement> & React.RefAttributes<HTMLButtonElement> & DataViewRelationFilterTriggerAttributes>
+const SlotType = Slot as React.ForwardRefExoticComponent<
+	React.ButtonHTMLAttributes<HTMLButtonElement> & React.RefAttributes<HTMLButtonElement> & DataViewRelationFilterTriggerAttributes
+>
 
 export interface DataViewRelationFilterTriggerProps {
 	/**

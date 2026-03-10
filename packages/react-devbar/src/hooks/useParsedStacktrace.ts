@@ -36,7 +36,7 @@ export const useProcessedError = (e: ErrorType): ProcessedError => {
 				cause: e instanceof Error && 'cause' in e && (e as any).cause !== undefined ? await createErrorWithStackTrace((e as any).cause) : undefined,
 			}
 		}
-		(async () => {
+		;(async () => {
 			setError(await createErrorWithStackTrace(e))
 		})()
 	}, [e])

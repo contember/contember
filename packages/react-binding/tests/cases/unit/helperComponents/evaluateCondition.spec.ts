@@ -28,7 +28,6 @@ describe('evaluate condition', () => {
 		})).toEqual(false)
 	})
 
-
 	it('empty and', () => {
 		expect(evaluateCondition(null, {
 			and: [],
@@ -54,7 +53,6 @@ describe('evaluate condition', () => {
 	it('eq OK', () => {
 		expect(evaluateCondition('a', { eq: 'a' })).toEqual(true)
 	})
-
 
 	it('eq NOK', () => {
 		expect(evaluateCondition('a', { eq: 'B' })).toEqual(false)

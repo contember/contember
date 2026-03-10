@@ -19,8 +19,7 @@ export const createEmptyTableCellElement = () => ({
 	children: [{ text: '' }],
 })
 
-
-export const tableCellElementPlugin = ({ render }: {render: ElementRenderer<TableCellElement>}): EditorElementPlugin<TableCellElement> => ({
+export const tableCellElementPlugin = ({ render }: { render: ElementRenderer<TableCellElement> }): EditorElementPlugin<TableCellElement> => ({
 	type: tableCellElementType,
 	render,
 	normalizeNode: ({ element, editor, path, preventDefault }) => {

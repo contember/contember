@@ -55,7 +55,6 @@ export const IDP = ({ children, onResponseError, onInitError, onLogin, expiratio
 		}
 	}, [onInitError, onResponseError, state])
 
-
 	return (
 		<IDPStateContextProvider.Provider value={state}>
 			<IDPMethodsContextProvider.Provider value={{ initRedirect }}>
@@ -63,5 +62,4 @@ export const IDP = ({ children, onResponseError, onInitError, onLogin, expiratio
 			</IDPMethodsContextProvider.Provider>
 		</IDPStateContextProvider.Provider>
 	)
-
 }

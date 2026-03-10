@@ -23,7 +23,6 @@ type SignedUploadUrl = {
 	method: string
 }
 
-
 export class S3Service {
 	private readonly publicBaseUrl: string
 
@@ -96,7 +95,7 @@ export class S3Service {
 		}
 	}
 
-	public getSignedReadUrl({ objectKey, expiration }: { objectKey: string; expiration: number | null}): SignedReadUrl {
+	public getSignedReadUrl({ objectKey, expiration }: { objectKey: string; expiration: number | null }): SignedReadUrl {
 		const bucket = this.config.bucket
 
 		const publicPrefix = this.formatPublicUrl('')

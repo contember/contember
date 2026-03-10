@@ -2,7 +2,6 @@ import { GenerateUploadUrlMutationBuilder } from '@contember/client'
 import { GraphQlClient } from '@contember/graphql-client'
 
 export const createContentApiS3Signer = (client: GraphQlClient) => {
-
 	let uploadUrlBatchParameters: GenerateUploadUrlMutationBuilder.FileParameters[] = []
 	let uploadUrlBatchResult: null | Promise<GenerateUploadUrlMutationBuilder.MutationResponse> = null
 

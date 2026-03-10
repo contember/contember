@@ -96,11 +96,9 @@ test('basic createSchema test', () => {
 	})
 })
 
-
 namespace StrictModel {
 	export class Genre {
 		name = c.stringColumn()
-
 	}
 	export class Book {
 		title = c.stringColumn()
@@ -109,10 +107,11 @@ namespace StrictModel {
 }
 
 test('strict test', () => {
-	const cb = () => createSchema(StrictModel, schema => ({
-		...schema,
-		settings: settingsPresets['v1.3'],
-	}), { strict: true })
+	const cb = () =>
+		createSchema(StrictModel, schema => ({
+			...schema,
+			settings: settingsPresets['v1.3'],
+		}), { strict: true })
 
 	expect(cb).toThrow(`Strict schema validation failed: 
 - Book.genre: inverse side of the relation is not defined.

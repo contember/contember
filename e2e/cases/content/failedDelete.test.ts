@@ -15,7 +15,6 @@ namespace CascadeFailModel {
 }
 
 test('fails when deleting entity without proper cascade', async () => {
-
 	const tester = await createTester(createSchema(CascadeFailModel))
 	const res = await tester(gql`mutation {
         createPost(data: {slug: "foo", locales: [{create: {title: "bar"}}]}) {
@@ -50,5 +49,3 @@ unknown field: ForeignKeyConstraintViolation (Cannot delete ${postId} row(s) of 
 			},
 		})
 })
-
-

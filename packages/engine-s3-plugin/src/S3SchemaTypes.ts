@@ -1,12 +1,4 @@
-import {
-	GraphQLEnumType,
-	GraphQLInputObjectType,
-	GraphQLInt,
-	GraphQLList,
-	GraphQLNonNull,
-	GraphQLObjectType,
-	GraphQLString,
-} from 'graphql'
+import { GraphQLEnumType, GraphQLInputObjectType, GraphQLInt, GraphQLList, GraphQLNonNull, GraphQLObjectType, GraphQLString } from 'graphql'
 
 export const S3Header = new GraphQLObjectType({
 	name: 'S3Header',
@@ -17,7 +9,8 @@ export const S3Header = new GraphQLObjectType({
 })
 
 export const S3ContentDisposition = new GraphQLEnumType({
-	name: 'S33ContentDisposition', values: {
+	name: 'S33ContentDisposition',
+	values: {
 		ATTACHMENT: {},
 		INLINE: {},
 	},

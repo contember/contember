@@ -92,8 +92,12 @@ export class ProjectMemberManager {
 		return []
 	}
 
-
-	async getProjectMembers(dbContext: DatabaseContext, projectId: string, accessVerifier: AccessVerifier, input: ProjectMembersInput): Promise<GetProjectMembersResponse> {
+	async getProjectMembers(
+		dbContext: DatabaseContext,
+		projectId: string,
+		accessVerifier: AccessVerifier,
+		input: ProjectMembersInput,
+	): Promise<GetProjectMembersResponse> {
 		return dbContext.transaction(async db => {
 			const members = await db.queryHandler.fetch(new ProjectMembersQuery(projectId, input))
 			const memberships = await db.queryHandler.fetch(

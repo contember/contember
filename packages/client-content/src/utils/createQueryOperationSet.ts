@@ -5,7 +5,6 @@ import { GraphQlField } from '@contember/graphql-builder'
 export const createQueryOperationSet = (
 	input: Record<string, ContentQuery<any>> | ContentQuery<any>,
 ): ContentOperationSet<any> => {
-
 	if (input instanceof ContentOperation) {
 		return new ContentOperationSet(
 			[new GraphQlField('value', input.fieldName, input.args, input.selection)],

@@ -81,10 +81,16 @@ export class ConditionBuilder {
 	}
 
 	compareColumns(columnName1: QueryBuilder.ColumnIdentifier, operator: Operator | `${Operator}`, columnName2: QueryBuilder.ColumnIdentifier) {
-		return this.with(new Literal(ConditionBuilder.createOperatorSql(formatColumnIdentifier(columnName1), formatColumnIdentifier(columnName2), operator)))
+		return this.with(
+			new Literal(ConditionBuilder.createOperatorSql(formatColumnIdentifier(columnName1), formatColumnIdentifier(columnName2), operator)),
+		)
 	}
 
-	in(columnName: QueryBuilder.ColumnIdentifier, values: ReadonlyArray<Value> | SelectBuilder<SelectBuilder.Result>, columnType?: string): ConditionBuilder {
+	in(
+		columnName: QueryBuilder.ColumnIdentifier,
+		values: ReadonlyArray<Value> | SelectBuilder<SelectBuilder.Result>,
+		columnType?: string,
+	): ConditionBuilder {
 		if (!isReadonlyArray(values)) {
 			// todo: replace placeholder with some kind of callback
 			const query = values.createQuery(new Compiler.Context(Compiler.SCHEMA_PLACEHOLDER, new Set()))

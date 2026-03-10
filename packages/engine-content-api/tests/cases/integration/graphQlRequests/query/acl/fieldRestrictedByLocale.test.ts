@@ -11,8 +11,7 @@ const schema = new SchemaBuilder()
 	.entity('PostLocale', entity =>
 		entity
 			.column('title', column => column.type(Model.ColumnType.String))
-			.column('locale', column => column.type(Model.ColumnType.Enum, { enumName: 'locale' })),
-	)
+			.column('locale', column => column.type(Model.ColumnType.Enum, { enumName: 'locale' })))
 	.buildSchema()
 
 const permissions: Acl.Permissions = {
@@ -318,5 +317,3 @@ test('querying on nested field', async () => {
 		},
 	})
 })
-
-

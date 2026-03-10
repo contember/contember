@@ -13,7 +13,6 @@ export interface EditorGenericTriggerProps {
 }
 
 export const EditorGenericTrigger = ({ toggle, isActive, shouldDisplay, ...props }: EditorGenericTriggerProps) => {
-
 	const editor = useSlate()
 	const onClick = () => {
 		toggle({ editor })

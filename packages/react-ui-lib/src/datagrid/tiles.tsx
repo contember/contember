@@ -23,12 +23,17 @@ export interface DataGridTilesProps {
  * </DataGridTiles>
  * ```
  */
-export const DataGridTiles = Component< DataGridTilesProps>(({ children, className }) => {
+export const DataGridTiles = Component<DataGridTilesProps>(({ children, className }) => {
 	return (
-		<DataViewLayout name={'grid'} label={<>
-			<LayoutGridIcon className={'w-3 h-3'} />
-			<span>{dict.datagrid.showGrid}</span>
-		</>}>
+		<DataViewLayout
+			name={'grid'}
+			label={
+				<>
+					<LayoutGridIcon className={'w-3 h-3'} />
+					<span>{dict.datagrid.showGrid}</span>
+				</>
+			}
+		>
 			<div className={cn('grid grid-cols-2 md:grid-cols-4 gap-4', className)}>
 				<DataViewEachRow>
 					{children}

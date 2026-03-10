@@ -1,8 +1,4 @@
-import {
-	ReceivedDataTree,
-	ReceivedEntityData,
-	ServerId,
-} from '@contember/binding-common'
+import { ReceivedDataTree, ReceivedEntityData, ServerId } from '@contember/binding-common'
 import { BindingError } from '@contember/binding-common'
 import { PRIMARY_KEY_NAME } from '@contember/binding-common'
 import { EntityId } from '@contember/binding-common'
@@ -60,7 +56,6 @@ export class RequestResponseNormalizer {
 		newPersistedData: ReceivedDataTree,
 		operations: SubMutationOperation[],
 	): void {
-
 		const { subTreeDataStore, persistedEntityDataStore } = original
 
 		for (const operation of operations) {
@@ -85,7 +80,7 @@ export class RequestResponseNormalizer {
 
 					if (list instanceof Set) {
 						// TODO this is somewhat dubious because we're essentially just guessing the order of the entities
-						//		and just carelessly put the new one at the end.
+						// 		and just carelessly put the new one at the end.
 						list.add(id.value)
 					} else if (list === undefined) {
 						// That's fine. This is probably just an isCreating sub-tree.
@@ -99,7 +94,7 @@ export class RequestResponseNormalizer {
 			} else if (operation.type === 'delete') {
 				const id = this.extractId(receivedData)
 				// TODO there are potentially some references to entityId that this whole process won't quite remove.
-				//		That's a memory leak. Probably not particularly severe in most cases but still.
+				// 		That's a memory leak. Probably not particularly severe in most cases but still.
 				persistedEntityDataStore.delete(id.uniqueValue)
 				if (subTreeType === 'single') {
 					subTreeDataStore.delete(subTreePlaceholder)

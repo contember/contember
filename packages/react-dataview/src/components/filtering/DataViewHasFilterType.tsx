@@ -1,7 +1,6 @@
 import { useDataViewFilterHandlerRegistry } from '../../contexts'
 
 export interface DataViewHasFilterTypeProps {
-
 	/**
 	 * The name of the filter type to check for.
 	 */
@@ -24,7 +23,7 @@ export interface DataViewHasFilterTypeProps {
  * ## Example
  * ```tsx
  * <DataViewHasFilterType name="text">
- *     //  Filter controls here 
+ *     //  Filter controls here
  * </DataViewHasFilterType>
  * ```
  */

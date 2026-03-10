@@ -35,7 +35,7 @@ export type JSONArray = readonly JSONValue[]
 
 	private generateTypeEntityCode(model: Model.Schema, entity: Model.Entity): string {
 		let code = `export type ${entity.name} <OverRelation extends string | never = never> = {\n`
-		code += '\tname: \'' + entity.name + '\'\n'
+		code += "\tname: '" + entity.name + "'\n"
 		code += '\tunique:\n'
 		code += this.formatUniqueFields(model, entity)
 		let columnsCode = ''
@@ -43,7 +43,9 @@ export type JSONArray = readonly JSONValue[]
 		let hasManyCode = ''
 		acceptEveryFieldVisitor(model, entity, {
 			visitHasMany: ctx => {
-				hasManyCode += `\t\t${ctx.relation.name}: ${ctx.targetEntity.name}${ctx.targetRelation?.type === Model.RelationType.ManyHasOne ? `<'${ctx.targetRelation.name}'>` : ''}\n`
+				hasManyCode += `\t\t${ctx.relation.name}: ${ctx.targetEntity.name}${
+					ctx.targetRelation?.type === Model.RelationType.ManyHasOne ? `<'${ctx.targetRelation.name}'>` : ''
+				}\n`
 			},
 			visitHasOne: ctx => {
 				hasOneCode += `\t\t${ctx.relation.name}: ${ctx.targetEntity.name}\n`
@@ -78,7 +80,7 @@ export type JSONArray = readonly JSONValue[]
 				}
 				const uniqueConstraints = getFieldsForUniqueWhere(model, targetEntity)
 				const composedUnique = uniqueConstraints
-					.filter(fields => fields.length === 2) //todo support all uniques
+					.filter(fields => fields.length === 2) // todo support all uniques
 					.filter(fields => fields.includes(targetRelation.name))
 					.map(fields => fields.filter(it => it !== targetRelation.name))
 					.map(fields => fields[0])
@@ -86,7 +88,6 @@ export type JSONArray = readonly JSONValue[]
 					.filter(fields => fields.length === 1 && fields[0] !== targetEntity.primary)
 					.map(fields => fields[0])
 					.filter(it => it !== targetRelation.name)
-
 				;[...composedUnique, ...singleUnique].forEach(fieldName => {
 					const capitalizeFirstLetter = (value: string) => {
 						return value.charAt(0).toUpperCase() + value.slice(1)
@@ -96,7 +97,6 @@ export type JSONArray = readonly JSONValue[]
 					const targetUnique = targetEntity.fields[fieldName]
 
 					code += `\t\t${name}: { entity: ${targetEntity.name}; by: {${fieldName}: ${uniqueType(model, targetEntity, targetUnique)}}  }\n`
-
 				})
 			},
 			visitColumn: () => {
@@ -127,7 +127,6 @@ export type JSONArray = readonly JSONValue[]
 	}
 }
 
-
 const uniqueType = (model: Model.Schema, entity: Model.Entity, field: Model.AnyField): string => {
 	return acceptFieldVisitor(model, entity, field, {
 		visitColumn: ctx => {
@@ -138,7 +137,6 @@ const uniqueType = (model: Model.Schema, entity: Model.Entity, field: Model.AnyF
 		},
 	})
 }
-
 
 const columnToTsType = (column: Model.AnyColumn): string => {
 	const baseType = (() => {
@@ -164,7 +162,7 @@ const columnToTsType = (column: Model.AnyColumn): string => {
 			case Model.ColumnType.Uuid:
 				return 'string'
 			default:
-				((_: never) => {
+				;((_: never) => {
 					throw new Error(`Unknown type ${_}`)
 				})(column.type)
 		}

@@ -1,4 +1,4 @@
-import {  it, expect } from 'bun:test'
+import { expect, it } from 'bun:test'
 import { createTenantConfigResolver } from '../../../src/config/tenantConfigResolver'
 import { configTemplate } from '../../../src/config/configTemplate'
 import { createProjectConfigResolver } from '../../../src/config/projectConfigResolver'
@@ -38,7 +38,10 @@ it('resolves tenant config', () => {
 				host: 'c0.cluster-ro-abc.eu-west-1.rds.amazonaws.com',
 				pool: {},
 			},
-		}, mailer: {}, credentials: {}, secrets: {},
+		},
+		mailer: {},
+		credentials: {},
+		secrets: {},
 	})
 })
 it('resolves project config', () => {
@@ -46,12 +49,19 @@ it('resolves project config', () => {
 	const resolvedTenantConfig = tenantResolver('test', tenantConfig)
 
 	const projectConfigResolver = createProjectConfigResolver(env, configTemplate, [])
-	const resolvedProjectConfig = projectConfigResolver('test-p', {
-		db: {
-			useTenantDb: true,
-			systemSchema: 'system_test_e',
-		}, s3: { prefix: 'test-e/test-e' }, stages: { live: { schema: 'content_test_e_live' } },
-	}, {}, resolvedTenantConfig)
+	const resolvedProjectConfig = projectConfigResolver(
+		'test-p',
+		{
+			db: {
+				useTenantDb: true,
+				systemSchema: 'system_test_e',
+			},
+			s3: { prefix: 'test-e/test-e' },
+			stages: { live: { schema: 'content_test_e_live' } },
+		},
+		{},
+		resolvedTenantConfig,
+	)
 
 	assert.deepEqual(resolvedProjectConfig as any, {
 		name: 'Test p',

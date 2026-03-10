@@ -28,8 +28,10 @@ export class JoinBuilder {
 			}
 			const sourceAlias = join.sourceAlias || path.back().alias
 
-			return qb.leftJoin(join.tableName, targetAlias, clause =>
-				clause.compareColumns([sourceAlias, join.sourceColumn], Operator.eq, [targetAlias, join.targetColumn]),
+			return qb.leftJoin(
+				join.tableName,
+				targetAlias,
+				clause => clause.compareColumns([sourceAlias, join.sourceColumn], Operator.eq, [targetAlias, join.targetColumn]),
 			)
 		}, qb)
 	}

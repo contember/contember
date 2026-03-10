@@ -2,7 +2,6 @@ import { DatabaseQuery, DatabaseQueryable, Literal, SelectBuilder } from '@conte
 import { Config, ConfigRow } from '../../type/Config'
 
 export class ConfigurationQuery extends DatabaseQuery<Config> {
-
 	async fetch({ db }: DatabaseQueryable): Promise<Config> {
 		const rows = await SelectBuilder.create<ConfigRow>()
 			.from('config')
@@ -39,4 +38,3 @@ export class ConfigurationQuery extends DatabaseQuery<Config> {
 		}
 	}
 }
-

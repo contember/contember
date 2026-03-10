@@ -55,10 +55,11 @@ export const useUploadState = ({ onBeforeUpload, onStartUpload, onSuccess, onErr
 					state: 'success',
 					file: event.file,
 					result: event.result,
-					dismiss: () => setFiles(files => {
-						const { [event.file.id]: _, ...rest } = files
-						return rest
-					}),
+					dismiss: () =>
+						setFiles(files => {
+							const { [event.file.id]: _, ...rest } = files
+							return rest
+						}),
 				},
 			}))
 			onSuccess?.(event)
@@ -70,10 +71,11 @@ export const useUploadState = ({ onBeforeUpload, onStartUpload, onSuccess, onErr
 					state: 'error',
 					file: event.file,
 					error: event.error,
-					dismiss: () => setFiles(files => {
-						const { [event.file.id]: _, ...rest } = files
-						return rest
-					}),
+					dismiss: () =>
+						setFiles(files => {
+							const { [event.file.id]: _, ...rest } = files
+							return rest
+						}),
 				},
 			}))
 			onError?.(event)

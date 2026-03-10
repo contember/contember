@@ -33,10 +33,9 @@ export class IntrospectionSchemaFactory {
 		const convertOrderBy = ({ path, direction }: Model.OrderBy): ContentSchema._OrderBy => {
 			return {
 				path,
-				direction:
-					direction === Model.OrderDirection.desc
-						? ContentSchema._OrderByDirection.Desc
-						: ContentSchema._OrderByDirection.Asc,
+				direction: direction === Model.OrderDirection.desc
+					? ContentSchema._OrderByDirection.Desc
+					: ContentSchema._OrderByDirection.Asc,
 			}
 		}
 		const additionalInfo = acceptEveryFieldVisitor<AdditionalFieldInfo>(this.model, entityName, {

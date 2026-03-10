@@ -39,7 +39,7 @@ export interface DataViewEnumFilterProps {
  * ## Example
  * ```tsx
  * <DataViewEnumFilter field="status">
- *   //  Filter controls here 
+ *   //  Filter controls here
  * </DataViewEnumFilter>
  * ```
  *

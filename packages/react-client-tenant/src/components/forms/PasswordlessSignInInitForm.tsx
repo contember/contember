@@ -23,7 +23,6 @@ export type PasswordlessSignInInitFormError = FormError<PasswordlessSignInInitFo
 
 export type PasswordlessSignInInitFormContextValue = FormContextValue<PasswordlessSignInInitFormValues, PasswordlessSignInInitFormErrorCode>
 
-
 export interface PasswordlessSignInInitFormProps {
 	children: ReactElement
 	onSuccess?: (args: { result: InitSignInPasswordlessMutationResult }) => void
@@ -32,7 +31,6 @@ export interface PasswordlessSignInInitFormProps {
 export const usePasswordlessSignInInitForm = useForm as () => PasswordlessSignInInitFormContextValue
 
 export const PasswordlessSignInInitForm = ({ children, onSuccess }: PasswordlessSignInInitFormProps) => {
-
 	const initSignIn = useInitSignInPasswordlessMutation()
 	const saveBacklink = useSaveBacklink({
 		storage: 'local',
@@ -66,7 +64,6 @@ export const PasswordlessSignInInitForm = ({ children, onSuccess }: Passwordless
 			{children}
 		</TenantForm>
 	)
-
 }
 const errorToField: Record<TenantApi.InitSignInPasswordlessErrorCode, keyof PasswordlessSignInInitFormValues | undefined> = {
 	PERSON_NOT_FOUND: 'email',

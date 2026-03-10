@@ -45,12 +45,12 @@ export type EventArgs = {
 }
 
 export type EventState =
-  | 'created'
-  | 'failed'
-  | 'processing'
-  | 'retrying'
-  | 'stopped'
-  | 'succeed'
+	| 'created'
+	| 'failed'
+	| 'processing'
+	| 'retrying'
+	| 'stopped'
+	| 'succeed'
 
 export type Mutation = {
 	readonly __typename?: 'Mutation'
@@ -60,16 +60,13 @@ export type Mutation = {
 	readonly stopEvent: StopEventResponse
 }
 
-
 export type MutationRetryEventArgs = {
 	id: Scalars['Uuid']['input']
 }
 
-
 export type MutationSetVariablesArgs = {
 	args: SetVariablesArgs
 }
-
 
 export type MutationStopEventArgs = {
 	id: Scalars['Uuid']['input']
@@ -89,21 +86,17 @@ export type Query = {
 	readonly variables: ReadonlyArray<Variable>
 }
 
-
 export type QueryEventArgs = {
 	id: Scalars['Uuid']['input']
 }
-
 
 export type QueryEventsInProcessingArgs = {
 	args?: InputMaybe<EventArgs>
 }
 
-
 export type QueryEventsToProcessArgs = {
 	args?: InputMaybe<EventArgs>
 }
-
 
 export type QueryFailedEventsArgs = {
 	args?: InputMaybe<EventArgs>
@@ -126,9 +119,9 @@ export type SetVariablesArgs = {
  * - APPEND_ONLY_MISSING appends values if not already exist
  */
 export type SetVariablesMode =
-  | 'APPEND_ONLY_MISSING'
-  | 'MERGE'
-  | 'SET'
+	| 'APPEND_ONLY_MISSING'
+	| 'MERGE'
+	| 'SET'
 
 export type SetVariablesResponse = {
 	readonly __typename?: 'SetVariablesResponse'
@@ -151,35 +144,34 @@ export type VariableInput = {
 	readonly value: Scalars['String']['input']
 }
 
-
-
 export type ResolverTypeWrapper<T> = Promise<T> | T
-
 
 export type ResolverWithResolve<TResult, TParent, TContext, TArgs> = {
 	resolve: ResolverFn<TResult, TParent, TContext, TArgs>
 }
-export type Resolver<TResult, TParent = {}, TContext = {}, TArgs = {}> = ResolverFn<TResult, TParent, TContext, TArgs> | ResolverWithResolve<TResult, TParent, TContext, TArgs>
+export type Resolver<TResult, TParent = {}, TContext = {}, TArgs = {}> =
+	| ResolverFn<TResult, TParent, TContext, TArgs>
+	| ResolverWithResolve<TResult, TParent, TContext, TArgs>
 
 export type ResolverFn<TResult, TParent, TContext, TArgs> = (
 	parent: TParent,
 	args: TArgs,
 	context: TContext,
-	info: GraphQLResolveInfo
+	info: GraphQLResolveInfo,
 ) => Promise<TResult> | TResult
 
 export type SubscriptionSubscribeFn<TResult, TParent, TContext, TArgs> = (
 	parent: TParent,
 	args: TArgs,
 	context: TContext,
-	info: GraphQLResolveInfo
+	info: GraphQLResolveInfo,
 ) => AsyncIterable<TResult> | Promise<AsyncIterable<TResult>>
 
 export type SubscriptionResolveFn<TResult, TParent, TContext, TArgs> = (
 	parent: TParent,
 	args: TArgs,
 	context: TContext,
-	info: GraphQLResolveInfo
+	info: GraphQLResolveInfo,
 ) => TResult | Promise<TResult>
 
 export interface SubscriptionSubscriberObject<TResult, TKey extends string, TParent, TContext, TArgs> {
@@ -193,17 +185,17 @@ export interface SubscriptionResolverObject<TResult, TParent, TContext, TArgs> {
 }
 
 export type SubscriptionObject<TResult, TKey extends string, TParent, TContext, TArgs> =
-  | SubscriptionSubscriberObject<TResult, TKey, TParent, TContext, TArgs>
-  | SubscriptionResolverObject<TResult, TParent, TContext, TArgs>
+	| SubscriptionSubscriberObject<TResult, TKey, TParent, TContext, TArgs>
+	| SubscriptionResolverObject<TResult, TParent, TContext, TArgs>
 
 export type SubscriptionResolver<TResult, TKey extends string, TParent = {}, TContext = {}, TArgs = {}> =
-  | ((...args: any[]) => SubscriptionObject<TResult, TKey, TParent, TContext, TArgs>)
-  | SubscriptionObject<TResult, TKey, TParent, TContext, TArgs>
+	| ((...args: any[]) => SubscriptionObject<TResult, TKey, TParent, TContext, TArgs>)
+	| SubscriptionObject<TResult, TKey, TParent, TContext, TArgs>
 
 export type TypeResolveFn<TTypes, TParent = {}, TContext = {}> = (
 	parent: TParent,
 	context: TContext,
-	info: GraphQLResolveInfo
+	info: GraphQLResolveInfo,
 ) => Maybe<TTypes> | Promise<Maybe<TTypes>>
 
 export type IsTypeOfResolverFn<T = {}, TContext = {}> = (obj: T, context: TContext, info: GraphQLResolveInfo) => boolean | Promise<boolean>
@@ -215,10 +207,8 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 	parent: TParent,
 	args: TArgs,
 	context: TContext,
-	info: GraphQLResolveInfo
+	info: GraphQLResolveInfo,
 ) => TResult | Promise<TResult>
-
-
 
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
@@ -298,7 +288,10 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 	stopEvent?: Resolver<ResolversTypes['StopEventResponse'], ParentType, ContextType, RequireFields<MutationStopEventArgs, 'id'>>
 }
 
-export type ProcessBatchResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['ProcessBatchResponse'] = ResolversParentTypes['ProcessBatchResponse']> = {
+export type ProcessBatchResponseResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['ProcessBatchResponse'] = ResolversParentTypes['ProcessBatchResponse'],
+> = {
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
@@ -311,17 +304,26 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
 	variables?: Resolver<ReadonlyArray<ResolversTypes['Variable']>, ParentType, ContextType>
 }
 
-export type RetryEventResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['RetryEventResponse'] = ResolversParentTypes['RetryEventResponse']> = {
+export type RetryEventResponseResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['RetryEventResponse'] = ResolversParentTypes['RetryEventResponse'],
+> = {
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
-export type SetVariablesResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['SetVariablesResponse'] = ResolversParentTypes['SetVariablesResponse']> = {
+export type SetVariablesResponseResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['SetVariablesResponse'] = ResolversParentTypes['SetVariablesResponse'],
+> = {
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
-export type StopEventResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['StopEventResponse'] = ResolversParentTypes['StopEventResponse']> = {
+export type StopEventResponseResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['StopEventResponse'] = ResolversParentTypes['StopEventResponse'],
+> = {
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
@@ -349,4 +351,3 @@ export type Resolvers<ContextType = any> = {
 	Uuid?: GraphQLScalarType
 	Variable?: VariableResolvers<ContextType>
 }
-

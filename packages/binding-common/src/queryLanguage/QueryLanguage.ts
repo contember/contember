@@ -51,10 +51,8 @@ import { VariableInputTransformer } from '../environment/VariableInputTransforme
 const emptyObject = Object.freeze({})
 
 export class QueryLanguage {
-
 	private static preparePrimitiveEntryPoint<Entry extends Parser.EntryPoint>(entryPoint: Entry) {
-		return (input: string, environment: Environment): Parser.ParserResult[Entry] =>
-			Parser.parseQueryLanguageExpression(input, entryPoint, environment)
+		return (input: string, environment: Environment): Parser.ParserResult[Entry] => Parser.parseQueryLanguageExpression(input, entryPoint, environment)
 	}
 
 	private static preparePrimitiveEntryPointWithFallback<Entry extends Parser.EntryPoint>(entryPoint: Entry) {
@@ -79,7 +77,6 @@ export class QueryLanguage {
 	public static desugarFilter = QueryLanguage.preparePrimitiveEntryPointWithFallback('filter')
 	public static desugarOrderBy = QueryLanguage.preparePrimitiveEntryPointWithFallback('orderBy')
 	public static desugarTaggedMap = QueryLanguage.preparePrimitiveEntryPointWithFallback('taggedMap')
-
 
 	public static desugarSetOnCreate(setOnCreate: SugaredSetOnCreate, environment: Environment): UniqueWhere {
 		if (Array.isArray(setOnCreate)) {
@@ -107,12 +104,12 @@ export class QueryLanguage {
 		unsugarable: UnsugarableSingleEntityEventListeners,
 	): EntityEventListenerStore | undefined {
 		if (
-			unsugarable.onBeforePersist === undefined &&
-			unsugarable.onBeforeUpdate === undefined &&
-			unsugarable.onInitialize === undefined &&
-			unsugarable.onPersistError === undefined &&
-			unsugarable.onPersistSuccess === undefined &&
-			unsugarable.onUpdate === undefined
+			unsugarable.onBeforePersist === undefined
+			&& unsugarable.onBeforeUpdate === undefined
+			&& unsugarable.onInitialize === undefined
+			&& unsugarable.onPersistError === undefined
+			&& unsugarable.onPersistSuccess === undefined
+			&& unsugarable.onUpdate === undefined
 		) {
 			return undefined
 		}
@@ -159,18 +156,19 @@ export class QueryLanguage {
 		| {
 			eventListeners: EntityListEventListenerStore | undefined
 			childEventListeners: EntityEventListenerStore | undefined
-		  }
-		| undefined {
+		}
+		| undefined
+	{
 		if (
-			unsugarable.onBeforePersist === undefined &&
-			unsugarable.onBeforeUpdate === undefined &&
-			unsugarable.onChildBeforeUpdate === undefined &&
-			unsugarable.onChildInitialize === undefined &&
-			unsugarable.onChildUpdate === undefined &&
-			unsugarable.onInitialize === undefined &&
-			unsugarable.onPersistError === undefined &&
-			unsugarable.onPersistSuccess === undefined &&
-			unsugarable.onUpdate === undefined
+			unsugarable.onBeforePersist === undefined
+			&& unsugarable.onBeforeUpdate === undefined
+			&& unsugarable.onChildBeforeUpdate === undefined
+			&& unsugarable.onChildInitialize === undefined
+			&& unsugarable.onChildUpdate === undefined
+			&& unsugarable.onInitialize === undefined
+			&& unsugarable.onPersistError === undefined
+			&& unsugarable.onPersistSuccess === undefined
+			&& unsugarable.onUpdate === undefined
 		) {
 			return undefined
 		}
@@ -286,7 +284,7 @@ export class QueryLanguage {
 				typeof desugaredHasOneRelation === 'string' ? { field: desugaredHasOneRelation } : desugaredHasOneRelation,
 				i === path.length - 1 ? unsugarable : {},
 				environment,
-			),
+			)
 		)
 	}
 
@@ -348,7 +346,6 @@ export class QueryLanguage {
 	): HasManyRelation {
 		const eventListeners = this.desugarEntityListEventListeners(unsugarablePart)
 		return {
-
 			filter: sugarablePart.filter ? this.desugarFilter(sugarablePart.filter, environment) : undefined,
 			limit: unsugarablePart.limit,
 			offset: unsugarablePart.offset,
@@ -529,10 +526,9 @@ export class QueryLanguage {
 			alias: this.desugarSubTreeAlias(unsugarableFieldList.alias),
 			isNonbearing: unsugarableFieldList.isNonbearing ?? EntityCreationParametersDefaults.isNonbearing,
 			// forceCreation: unsugarableFieldList.forceCreation ?? EntityCreationParametersDefaults.forceCreation,
-			defaultValue:
-				unsugarableFieldList.defaultValue !== undefined
-					? VariableInputTransformer.transformValue(unsugarableFieldList.defaultValue, environment)
-					: undefined,
+			defaultValue: unsugarableFieldList.defaultValue !== undefined
+				? VariableInputTransformer.transformValue(unsugarableFieldList.defaultValue, environment)
+				: undefined,
 			expectedMutation: unsugarableFieldList.expectedMutation ?? QualifiedEntityParametersDefaults.expectedMutation,
 			eventListeners: this.desugarFieldEventListeners(unsugarableFieldList),
 			filter: filter ? this.desugarFilter(filter, environment) : undefined,
@@ -578,19 +574,15 @@ export class QueryLanguage {
 		// 	unsugarableSingleEntity.forceCreation !== undefined
 		// 		? unsugarableSingleEntity.forceCreation !== undefined
 		// 		: EntityCreationParametersDefaults.forceCreation
-		let setOnCreate: UniqueWhere | undefined =
-			unsugarableSingleEntity.setOnCreate !== undefined
-				? this.desugarSetOnCreate(unsugarableSingleEntity.setOnCreate, environment)
-				: undefined
+		let setOnCreate: UniqueWhere | undefined = unsugarableSingleEntity.setOnCreate !== undefined
+			? this.desugarSetOnCreate(unsugarableSingleEntity.setOnCreate, environment)
+			: undefined
 
-
-		const isNonbearing: boolean =
-			unsugarableSingleEntity.isNonbearing !== undefined
-				? unsugarableSingleEntity.isNonbearing
-				: EntityCreationParametersDefaults.isNonbearing
+		const isNonbearing: boolean = unsugarableSingleEntity.isNonbearing !== undefined
+			? unsugarableSingleEntity.isNonbearing
+			: EntityCreationParametersDefaults.isNonbearing
 		const eventListeners = this.desugarSingleEntityEventListeners(unsugarableSingleEntity)
-		const expectedMutation =
-			unsugarableSingleEntity.expectedMutation ?? QualifiedEntityParametersDefaults.expectedMutation
+		const expectedMutation = unsugarableSingleEntity.expectedMutation ?? QualifiedEntityParametersDefaults.expectedMutation
 		const alias = this.desugarSubTreeAlias(unsugarableSingleEntity.alias)
 
 		return {
@@ -645,7 +637,6 @@ export class QueryLanguage {
 					environment,
 				)
 			}
-
 		} else {
 			hasOneRelationPath = this.desugarHasOneRelationPath(field, unsugarableEntity, environment)
 		}
@@ -682,7 +673,6 @@ export class QueryLanguage {
 				hasOneRelationPath = this.augmentDesugaredHasOneRelationPath(parsed.hasOneRelationPath, {}, environment)
 				fieldName = parsed.field
 			}
-
 		} else {
 			hasOneRelationPath = this.desugarHasOneRelationPath(field.hasOneRelationPath, {}, environment)
 			fieldName = field.field
@@ -694,10 +684,9 @@ export class QueryLanguage {
 			field: fieldName,
 			isNonbearing: unsugarableField.isNonbearing ?? LeafFieldDefaults.isNonbearing,
 			meta: unsugarableField.withMeta ?? [],
-			defaultValue:
-				unsugarableField.defaultValue !== undefined
-					? VariableInputTransformer.transformValue(unsugarableField.defaultValue, environment)
-					: undefined,
+			defaultValue: unsugarableField.defaultValue !== undefined
+				? VariableInputTransformer.transformValue(unsugarableField.defaultValue, environment)
+				: undefined,
 		}
 	}
 

@@ -13,6 +13,7 @@ export const conditionVar = c.createConditionVariable('conditionVar', conditionV
 export class AclBranch {
 	code = c.stringColumn().notNull().unique()
 }
+
 @c.Allow(adminRole, {
 	read: ['canRead', 'canEdit', 'canReadSecondary'],
 })

@@ -4,4 +4,3 @@ export type FileWithMeta = {
 	previewUrl: string
 	abortController: AbortController
 }
-

@@ -3,7 +3,6 @@ import { PersonToken } from '../../type'
 import { computeTokenHash } from '../../utils'
 
 export class PersonTokenQuery extends DatabaseQuery<PersonToken.Row | null> {
-
 	private constructor(
 		private readonly identifierType: 'id' | 'token_hash',
 		private readonly identifier: string,

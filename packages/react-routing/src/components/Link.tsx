@@ -21,11 +21,11 @@ export const Link = Component(({ to, ...props }: LinkProps) => {
 }, (props, env) => {
 	const to = parseLinkTarget(props.to, env)
 
-	return <>
-		{createFieldsFromTarget(to).map((it, index) => <Field key={`${index}-${it}`} field={it} />)}
-		{props.children}
-	</>
+	return (
+		<>
+			{createFieldsFromTarget(to).map((it, index) => <Field key={`${index}-${it}`} field={it} />)}
+			{props.children}
+		</>
+	)
 })
 Link.displayName = 'Link'
-
-

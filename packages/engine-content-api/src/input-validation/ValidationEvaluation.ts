@@ -83,8 +83,7 @@ const validatorEvaluators: {
 		return acceptContextVisitor(context, {
 			visitNodeContext: fixedResult(false),
 			visitNodeListContext: (context: ValidationContext.NodeListContext) => context.nodes.length === 0,
-			visitValueContext: (context: ValidationContext.ValueContext) =>
-				context.value === undefined || context.value === null || context.value === '',
+			visitValueContext: (context: ValidationContext.ValueContext) => context.value === undefined || context.value === null || context.value === '',
 			visitUndefinedContext: fixedResult(true),
 		})
 	},
@@ -92,8 +91,7 @@ const validatorEvaluators: {
 		return acceptContextVisitor(context, {
 			visitNodeContext: fixedResult(true),
 			visitNodeListContext: fixedResult(true),
-			visitValueContext: (context: ValidationContext.ValueContext) =>
-				context.value !== undefined && context.value !== null,
+			visitValueContext: (context: ValidationContext.ValueContext) => context.value !== undefined && context.value !== null,
 			visitUndefinedContext: fixedResult(false),
 		})
 	},
@@ -135,8 +133,7 @@ const validatorEvaluators: {
 		min: Validation.LiteralArgument<number | null>,
 		max: Validation.LiteralArgument<number | null>,
 	) => {
-		const doesMatchRange = (value: number) =>
-			(min.value === null || min.value <= value) && (max.value === null || max.value >= value)
+		const doesMatchRange = (value: number) => (min.value === null || min.value <= value) && (max.value === null || max.value >= value)
 		return acceptContextVisitor(context, {
 			visitNodeContext: cannotApplyOnNode('length range', 'node'),
 			visitNodeListContext: (context: ValidationContext.NodeListContext) => {

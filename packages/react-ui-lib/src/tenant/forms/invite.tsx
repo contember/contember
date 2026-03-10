@@ -5,8 +5,7 @@ import { TenantFormError, TenantFormField, TenantFormLabel } from './common'
 import { MembershipsControl, RolesConfig, useIntrospectionRolesConfig } from './memberships-control'
 import { dict } from '../../dict'
 
-
-export const InviteFormFields = ({ projectSlug, roles }: {projectSlug: string; roles?: RolesConfig}) => {
+export const InviteFormFields = ({ projectSlug, roles }: { projectSlug: string; roles?: RolesConfig }) => {
 	const form = useInviteForm()
 	const rolesResolved = roles ?? useIntrospectionRolesConfig(projectSlug)
 	return (
@@ -14,18 +13,25 @@ export const InviteFormFields = ({ projectSlug, roles }: {projectSlug: string; r
 			{form.state === 'submitting' ? <Loader position="absolute" /> : null}
 
 			<TenantFormError
-				form={form} messages={dict.tenant.invite.errorMessages}
+				form={form}
+				messages={dict.tenant.invite.errorMessages}
 			/>
 
 			<TenantFormField
-				form={form} messages={dict.tenant.invite.errorMessages} field="email"
-				type="email" required autoFocus
+				form={form}
+				messages={dict.tenant.invite.errorMessages}
+				field="email"
+				type="email"
+				required
+				autoFocus
 			>
 				{dict.tenant.invite.email}
 			</TenantFormField>
 
 			<TenantFormField
-				form={form} messages={dict.tenant.invite.errorMessages} field="name"
+				form={form}
+				messages={dict.tenant.invite.errorMessages}
+				field="name"
 				type="text"
 			>
 				{dict.tenant.invite.name}

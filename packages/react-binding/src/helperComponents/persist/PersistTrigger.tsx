@@ -11,7 +11,9 @@ export interface PersistTriggerAttributes {
 	['data-loading']?: ''
 }
 
-const SlotType = Slot as React.ForwardRefExoticComponent<React.ButtonHTMLAttributes<HTMLButtonElement> & React.RefAttributes<HTMLButtonElement> & PersistTriggerAttributes>
+const SlotType = Slot as React.ForwardRefExoticComponent<
+	React.ButtonHTMLAttributes<HTMLButtonElement> & React.RefAttributes<HTMLButtonElement> & PersistTriggerAttributes
+>
 
 export interface PersistTriggerProps {
 	/**

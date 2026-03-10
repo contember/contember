@@ -18,7 +18,6 @@ import { Component, Field } from '@contember/interface'
 import { useEnumOptionsFormatter } from '../labels'
 import { FormFieldLabel } from './labels'
 
-
 export type InputFieldProps =
 	& Omit<FormInputProps, 'children'>
 	& Omit<FormContainerProps, 'children'>
@@ -27,7 +26,9 @@ export type InputFieldProps =
 		inputProps?: ComponentProps<typeof Input>
 	}
 
-export const InputField = Component(({ field, label, description, inputProps, isNonbearing, defaultValue, required, parseValue, formatValue }: InputFieldProps) => (
+export const InputField = Component((
+	{ field, label, description, inputProps, isNonbearing, defaultValue, required, parseValue, formatValue }: InputFieldProps,
+) => (
 	<FormFieldScope field={field}>
 		<FormContainer description={description} label={label} required={required}>
 			<FormInput field={field} isNonbearing={isNonbearing} defaultValue={defaultValue} parseValue={parseValue} formatValue={formatValue}>
@@ -55,7 +56,6 @@ export const TextareaField = Component(({ field, label, description, inputProps,
 	</FormFieldScope>
 ))
 
-
 export type CheckboxFieldProps =
 	& Omit<FormCheckboxProps, 'children'>
 	& Omit<FormContainerProps, 'children'>
@@ -79,7 +79,6 @@ export const CheckboxField = Component(({ field, label, description, inputProps,
 	</FormFieldScope>
 ))
 
-
 export type RadioEnumFieldProps =
 	& Omit<FormRadioItemProps, 'children' | 'value'>
 	& Omit<FormContainerProps, 'children'>
@@ -100,9 +99,14 @@ export const RadioEnumField = Component<RadioEnumFieldProps>(({ field, label, de
 	)
 }, ({ field, isNonbearing, defaultValue }) => <Field field={field} isNonbearing={isNonbearing} defaultValue={defaultValue} />)
 
-type RadioEnumFieldInnerProps = Pick<RadioEnumFieldProps, 'field' | 'options' | 'orientation' | 'inputProps' | 'defaultValue' | 'isNonbearing' | 'required'>
+type RadioEnumFieldInnerProps = Pick<
+	RadioEnumFieldProps,
+	'field' | 'options' | 'orientation' | 'inputProps' | 'defaultValue' | 'isNonbearing' | 'required'
+>
 
-const RadioEnumFieldInner: React.FC<RadioEnumFieldInnerProps> = ({ field, inputProps, isNonbearing, required, options, orientation, defaultValue }) => {
+const RadioEnumFieldInner: React.FC<RadioEnumFieldInnerProps> = (
+	{ field, inputProps, isNonbearing, required, options, orientation, defaultValue },
+) => {
 	const enumLabelsFormatter = useEnumOptionsFormatter()
 	const enumName = useFormFieldState()?.field?.enumName
 	options ??= enumName ? enumLabelsFormatter(enumName) : undefined

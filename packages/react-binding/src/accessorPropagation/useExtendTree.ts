@@ -13,9 +13,7 @@ export const useExtendTree = () => {
 	const environment = useEnvironment()
 	return useCallback(async (newFragment: ReactNode, options?: Omit<ExtendTreeOptions, 'signal'>): Promise<TreeRootId | undefined> => {
 		try {
-			const newTreeRootId = await extendTree(newFragment,
-				{ environment, ...options, signal: abort() },
-			)
+			const newTreeRootId = await extendTree(newFragment, { environment, ...options, signal: abort() })
 			if (!isMountedRef.current) {
 				return
 			}

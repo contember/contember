@@ -5,20 +5,24 @@ import { TenantFormError, TenantFormField, TenantFormLabel } from './common'
 import { MembershipsControl, useIntrospectionRolesConfig } from './memberships-control'
 import { dict } from '../../dict'
 
-
-export const CreateApiKeyFormFields = ({ projectSlug }: {projectSlug: string}) => {
+export const CreateApiKeyFormFields = ({ projectSlug }: { projectSlug: string }) => {
 	const form = useCreateApiKeyForm()
 	return (
 		<div className="relative flex flex-col gap-2">
 			{form.state === 'submitting' ? <Loader position="absolute" /> : null}
 
 			<TenantFormError
-				form={form} messages={dict.tenant.createApiKey.errorMessages}
+				form={form}
+				messages={dict.tenant.createApiKey.errorMessages}
 			/>
 
 			<TenantFormField
-				form={form} messages={dict.tenant.createApiKey.errorMessages} field="description"
-				type="text" required autoFocus
+				form={form}
+				messages={dict.tenant.createApiKey.errorMessages}
+				field="description"
+				type="text"
+				required
+				autoFocus
 			>
 				{dict.tenant.createApiKey.description}
 			</TenantFormField>

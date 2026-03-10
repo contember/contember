@@ -4,7 +4,7 @@ import { GraphQlClientOptions, GraphQlClientRequestOptions } from './GraphQlClie
 export class GraphQlClient {
 	constructor(
 		private readonly options: GraphQlClientOptions,
-	) { }
+	) {}
 
 	get apiUrl(): string {
 		return this.options.url
@@ -83,7 +83,6 @@ ${query}`
 
 		return data.data
 	}
-
 
 	protected async doExecute(
 		query: string,

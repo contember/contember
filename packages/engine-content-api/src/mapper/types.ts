@@ -1,10 +1,9 @@
-import { Model, Input, Value } from '@contember/schema'
+import { Input, Model, Value } from '@contember/schema'
 import { CheckedPrimary } from './CheckedPrimary'
 
 export type JoiningColumns = { sourceColumn: Model.JoiningColumn; targetColumn: Model.JoiningColumn }
 
 export namespace MapperInput {
-
 	export interface ConnectRelationInput {
 		connect: Input.UniqueWhere | CheckedPrimary
 	}
@@ -58,11 +57,13 @@ export namespace MapperInput {
 		[column: string]: Value.FieldValue | CreateOneRelationInput | CreateManyRelationInput
 	}
 
-	export type CreateOneRelationInput = { alias?: string } & (
-		| ConnectRelationInput
-		| CreateRelationInput
-		| ConnectOrCreateRelationInput
-	)
+	export type CreateOneRelationInput =
+		& { alias?: string }
+		& (
+			| ConnectRelationInput
+			| CreateRelationInput
+			| ConnectOrCreateRelationInput
+		)
 
 	export type CreateManyRelationInput = Array<CreateOneRelationInput>
 
@@ -92,7 +93,6 @@ export namespace MapperInput {
 		filter?: Input.OptionalWhere
 	}
 
-
 	export type UpdateOneRelationInput =
 		| CreateRelationInput
 		| ConnectRelationInput
@@ -102,16 +102,17 @@ export namespace MapperInput {
 		| UpdateRelationInput
 		| UpsertRelationInput
 
-	export type UpdateManyRelationInputItem = { alias?: string } & (
-		| CreateRelationInput
-		| ConnectRelationInput
-		| ConnectOrCreateRelationInput
-		| DeleteSpecifiedRelationInput
-		| DisconnectSpecifiedRelationInput
-		| UpdateSpecifiedRelationInput
-		| UpsertSpecifiedRelationInput
-	)
+	export type UpdateManyRelationInputItem =
+		& { alias?: string }
+		& (
+			| CreateRelationInput
+			| ConnectRelationInput
+			| ConnectOrCreateRelationInput
+			| DeleteSpecifiedRelationInput
+			| DisconnectSpecifiedRelationInput
+			| UpdateSpecifiedRelationInput
+			| UpsertSpecifiedRelationInput
+		)
 
 	export type UpdateManyRelationInput = Array<UpdateManyRelationInputItem>
-
 }

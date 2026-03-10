@@ -23,7 +23,7 @@ function useDesugaredRelativeSingleField(
 ): RelativeSingleField | undefined {
 	const environment = useEnvironment()
 
-	let normalizedSugared: SugaredRelativeSingleField | undefined 
+	let normalizedSugared: SugaredRelativeSingleField | undefined
 	let hasField: boolean
 
 	if (sugaredRelativeSingleField === undefined) {
@@ -48,7 +48,7 @@ function useDesugaredRelativeSingleField(
 						isNonbearing: normalizedSugared?.isNonbearing,
 					},
 					environment,
-				  )
+				)
 				: undefined,
 		[normalizedSugared?.field, normalizedSugared?.defaultValue, normalizedSugared?.isNonbearing, environment, hasField],
 	)

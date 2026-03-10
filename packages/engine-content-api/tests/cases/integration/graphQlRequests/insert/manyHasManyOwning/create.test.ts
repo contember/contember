@@ -8,9 +8,7 @@ import { testUuid } from '../../../../../src/testUuid'
 test('insert post with categories (many has many, owning)', async () => {
 	await execute({
 		schema: new SchemaBuilder()
-			.entity('Post', e =>
-				e.column('name', c => c.type(Model.ColumnType.String)).manyHasMany('categories', r => r.target('Category')),
-			)
+			.entity('Post', e => e.column('name', c => c.type(Model.ColumnType.String)).manyHasMany('categories', r => r.target('Category')))
 			.entity('Category', e => e.column('name', c => c.type(Model.ColumnType.String)))
 			.buildSchema(),
 		query: GQL`
@@ -90,4 +88,3 @@ test('insert post with categories (many has many, owning)', async () => {
 		},
 	})
 })
-

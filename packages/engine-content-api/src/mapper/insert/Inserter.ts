@@ -90,4 +90,3 @@ export class Inserter {
 		return resultList
 	}
 }
-

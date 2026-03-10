@@ -3,11 +3,11 @@ export type VariableUpdateInput =
 	& (
 		| {
 			set: ReadonlyArray<string>
-	  }
+		}
 		| {
 			remove: ReadonlyArray<string>
 			append: ReadonlyArray<string>
-	  }
+		}
 	)
 
 export type MembershipInput = {

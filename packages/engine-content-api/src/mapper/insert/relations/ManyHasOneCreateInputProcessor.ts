@@ -9,8 +9,7 @@ import { MapperInput } from '../../types'
 
 type Context = Model.ManyHasOneContext
 
-export class ManyHasOneCreateInputProcessor implements CreateInputProcessor.HasManyRelationProcessor<Context, SqlCreateInputProcessorResult>  {
-
+export class ManyHasOneCreateInputProcessor implements CreateInputProcessor.HasManyRelationProcessor<Context, SqlCreateInputProcessorResult> {
 	constructor(
 		private readonly mapper: Mapper,
 		private readonly insertBuilder: InsertBuilder,

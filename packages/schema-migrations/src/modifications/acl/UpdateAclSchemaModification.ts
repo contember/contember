@@ -5,7 +5,7 @@ import deepEqual from 'fast-deep-equal'
 import { createPatch } from 'rfc6902'
 import { patchAclSchemaModification } from './PatchAclSchemaModification'
 
-export class UpdateAclSchemaModificationHandler implements ModificationHandler<UpdateAclSchemaModificationData>{
+export class UpdateAclSchemaModificationHandler implements ModificationHandler<UpdateAclSchemaModificationData> {
 	constructor(private readonly data: UpdateAclSchemaModificationData) {}
 
 	public createSql(): void {}

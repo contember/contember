@@ -359,10 +359,10 @@ export class WhereBuilder {
 		if (cond.isNull !== undefined) {
 			return true
 		}
-		if (cond.and && cond.and.some(it => this.conditionHasIsNull(it))) {
+		if (cond.and?.some(it => this.conditionHasIsNull(it))) {
 			return true
 		}
-		if (cond.or && cond.or.some(it => this.conditionHasIsNull(it))) {
+		if (cond.or?.some(it => this.conditionHasIsNull(it))) {
 			return true
 		}
 		if (cond.not && this.conditionHasIsNull(cond.not)) {

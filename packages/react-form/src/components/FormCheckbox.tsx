@@ -34,6 +34,7 @@ export const FormCheckbox = Component<FormCheckboxProps>(({ field, isNonbearing,
 	const { ref, onFocus, onBlur } = useFormInputValidationHandler(accessor)
 	const [checkboxRef, setCheckboxRef] = React.useState<HTMLInputElement | null>(null)
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: intentional
 	useEffect(() => {
 		if (!checkboxRef) {
 			return

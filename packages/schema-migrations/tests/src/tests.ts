@@ -31,7 +31,6 @@ export function testDiffSchemas(
 	try {
 		expect(actualDiff).toStrictEqual(expectedDiff)
 	} catch (e) {
-		// eslint-disable-next-line no-console
 		console.log(JSON.stringify(actualDiff))
 		throw e
 	}

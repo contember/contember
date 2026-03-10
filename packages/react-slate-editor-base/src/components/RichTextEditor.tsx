@@ -26,6 +26,7 @@ export const RichTextEditor: FunctionComponent<RichTextEditorProps> = Component(
 
 		const desugaredField = useMemo(
 			() => QueryLanguage.desugarRelativeSingleField(props, environment),
+			// biome-ignore lint/correctness/useExhaustiveDependencies: props is stable via Component HOC
 			[environment, props],
 		)
 		const fieldAccessor = useMemo(() => entity.getField<string>(desugaredField), [entity, desugaredField])

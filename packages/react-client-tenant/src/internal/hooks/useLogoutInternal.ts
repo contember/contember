@@ -8,7 +8,7 @@ export const useLogoutInternal = (clearIdentity?: () => void) => {
 
 	return useCallback(
 		async ({ noRedirect = false }: { noRedirect?: boolean } = {}) => {
-			if (navigator.credentials && navigator.credentials.preventSilentAccess) {
+			if (navigator.credentials?.preventSilentAccess) {
 				try {
 					await navigator.credentials.preventSilentAccess()
 				} catch {

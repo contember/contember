@@ -297,7 +297,6 @@ describe('Marker tree generator', () => {
 						field: 'name',
 						defaultValue: undefined,
 						eventListeners: undefined,
-						// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 						// @ts-ignore
 						hasOneRelationPath: [],
 						isNonbearing: false,
@@ -307,7 +306,6 @@ describe('Marker tree generator', () => {
 						field: 'surname',
 						defaultValue: undefined,
 						eventListeners: undefined,
-						// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 						// @ts-ignore
 						hasOneRelationPath: [],
 						isNonbearing: false,
@@ -348,7 +346,6 @@ describe('Marker tree generator', () => {
 						field: 'hasOneField',
 						defaultValue: undefined,
 						eventListeners: undefined,
-						// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 						// @ts-ignore
 						hasOneRelationPath: [],
 						isNonbearing: false,
@@ -390,7 +387,6 @@ describe('Marker tree generator', () => {
 						field: 'hasManyField',
 						defaultValue: undefined,
 						eventListeners: undefined,
-						// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 						// @ts-ignore
 						hasOneRelationPath: [],
 						isNonbearing: false,
@@ -432,7 +428,6 @@ describe('Marker tree generator', () => {
 						field: 'fooField',
 						defaultValue: undefined,
 						eventListeners: undefined,
-						// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 						// @ts-ignore
 						hasOneRelationPath: [],
 						isNonbearing: false,
@@ -471,7 +466,6 @@ describe('Marker tree generator', () => {
 					field: 'whatever',
 					defaultValue: undefined,
 					eventListeners: undefined,
-					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 					// @ts-ignore
 					hasOneRelationPath: [],
 					isNonbearing: false,

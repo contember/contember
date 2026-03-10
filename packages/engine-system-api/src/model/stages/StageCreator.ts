@@ -4,7 +4,6 @@ import { StageConfig } from '../../types'
 import { DatabaseContext } from '../database'
 
 class StageCreator {
-	constructor() {}
 
 	public async createStage(
 		db: DatabaseContext,

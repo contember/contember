@@ -102,7 +102,7 @@ test('applies a filter with only relation update', async () => {
 			data: {
 				updateArticle: {
 					ok: false,
-					errorMessage: `Execution has failed:\nunknown field: NotFoundOrDenied (for input {\"and\":[{\"publishedAt\":{\"isNull\":false}},{\"id\":{\"eq\":\"123e4567-e89b-12d3-a456-000000000001\"}}]})`,
+					errorMessage: `Execution has failed:\nunknown field: NotFoundOrDenied (for input {"and":[{"publishedAt":{"isNull":false}},{"id":{"eq":"123e4567-e89b-12d3-a456-000000000001"}}]})`,
 				},
 			},
 		},

@@ -11,7 +11,6 @@ export const DataViewEnumFilterState = ({ name, children, state, value }: {
 	children: ReactNode
 	state?: DataViewEnumFilterCurrent | DataViewEnumFilterCurrent[]
 }) => {
-	// eslint-disable-next-line react-hooks/rules-of-hooks
 	name ??= useDataViewFilterName()
 	const [current] = useDataViewEnumFilter(name, value)
 

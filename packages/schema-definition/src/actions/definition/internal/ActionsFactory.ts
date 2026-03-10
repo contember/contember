@@ -6,9 +6,6 @@ import { ActionsTarget } from '../targets'
 import { Kind, parse, SelectionNode, ValueNode } from 'graphql'
 
 export class ActionsFactory {
-	constructor(
-	) {
-	}
 
 	public create(
 		exportedDefinitions: Record<string, any>,

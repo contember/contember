@@ -50,16 +50,16 @@ export class ConditionBuilder {
 		return ConditionBuilder.create().not(condition)
 	}
 
+	not(condition: ConditionExpression): ConditionBuilder {
+		return this.processConditionExpression(ConditionBuilder.process(condition), ['and', true])
+	}
+
 	and(condition: ConditionExpression): ConditionBuilder {
 		return this.processConditionExpression(ConditionBuilder.process(condition), ['and', false])
 	}
 
 	or(condition: ConditionExpression): ConditionBuilder {
 		return this.processConditionExpression(ConditionBuilder.process(condition), ['or', false])
-	}
-
-	not(condition: ConditionExpression): ConditionBuilder {
-		return this.processConditionExpression(ConditionBuilder.process(condition), ['and', true])
 	}
 
 	compare(columnName: QueryBuilder.ColumnIdentifier, operator: Operator | `${Operator}`, value: Value | Literal): ConditionBuilder {

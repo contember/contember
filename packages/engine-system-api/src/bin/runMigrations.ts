@@ -27,10 +27,8 @@ import { createLogger, PrettyPrintLoggerHandler } from '@contember/logger'
 			resolveMetadata: () => Promise.resolve(emptyDatabaseMetadata),
 		} as unknown as DatabaseMetadataResolver,
 	)
-	// eslint-disable-next-line no-console
 	await migrationsRunner.run(createLogger(new PrettyPrintLoggerHandler(process.stderr)))
 })().catch(e => {
-	// eslint-disable-next-line no-console
 	console.error(e)
 	process.exit(1)
 })

@@ -16,6 +16,7 @@ class CaseStatement {
 				...this.options.whenClauses,
 				{
 					when: columnExpressionToLiteral(when) || new Literal('null'),
+					// biome-ignore lint/suspicious/noThenProperty: SQL CASE clause property
 					then: columnExpressionToLiteral(then) || new Literal('null'),
 				},
 			],

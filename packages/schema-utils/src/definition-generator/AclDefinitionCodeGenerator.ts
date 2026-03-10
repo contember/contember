@@ -110,7 +110,6 @@ export class AclDefinitionCodeGenerator {
 		for (const op of ['read', 'create', 'update'] as const) {
 			const fields = Object.entries(operations[op] ?? {}).filter(([, it]) => it === predicate).map(([it]) => it)
 			if (fields.length === 0) {
-				continue
 			} else if (fields.length === numberOfEntityFieldsWithoutId) {
 				result[op] = true
 			} else {

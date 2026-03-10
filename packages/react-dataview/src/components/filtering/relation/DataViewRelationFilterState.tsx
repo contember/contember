@@ -15,7 +15,6 @@ export const DataViewRelationFilterState = ({ name, children, state }: {
 	state?: DataViewRelationFilterCurrent | DataViewRelationFilterCurrent[]
 }) => {
 	const entity = useEntity()
-	// eslint-disable-next-line react-hooks/rules-of-hooks
 	name ??= useDataViewFilterName()
 	const [current] = useDataViewRelationFilter(name, entity.id)
 

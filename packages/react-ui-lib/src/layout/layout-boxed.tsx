@@ -81,10 +81,12 @@ export const LayoutBoxedComponent = ({ children, ...rest }: PropsWithChildren<{}
 	const [layout, setLayout] = useStoredState<'default' | 'stretch'>('local', ['', 'layout'], it => it ?? 'default')
 
 	const request = useCurrentRequest()
+	// biome-ignore lint/correctness/useExhaustiveDependencies: intentional
 	useEffect(() => {
 		setLeftSidebarVisibility(it => it === 'show' ? 'auto' : it)
 	}, [request])
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: intentional
 	useEffect(() => {
 		window.scrollTo({ top: 0 })
 	}, [request?.pageName])

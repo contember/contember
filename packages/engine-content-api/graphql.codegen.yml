@@ -12,4 +12,4 @@ generates:
       - "typescript-operations"
 hooks:
   afterAllFileWrite:
-    - bun run eslint --fix
+    - bunx biome lint --write

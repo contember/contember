@@ -41,7 +41,7 @@ export const SortableBlock = ({ children, element }: { children: ReactNode; elem
 			<DragOverlay>
 				<div className="opacity-80 flex">
 					<div className="p-4 bg-background/80 backdrop-blur-xs"
-						// deliberately using innerHTML to avoid firing React events
+						// biome-ignore lint/security/noDangerouslySetInnerHtml: deliberately using innerHTML to avoid firing React events
 						dangerouslySetInnerHTML={{ __html: contentRef.current.innerHTML }}/>
 				</div>
 			</DragOverlay>

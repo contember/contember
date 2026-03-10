@@ -38,7 +38,7 @@ export class ProjectDispatcher implements Runnable {
 			const resolvePendingRef = () => {
 				resolvePending()
 			}
-			let pendingError: any = undefined
+			let pendingError: any 
 			const rejectPendingRef = (e: any) => {
 				pendingError = e
 				rejectPending(e)

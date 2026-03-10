@@ -47,7 +47,6 @@ export class InsertBuilder {
 	}
 
 	public async execute(mapper: Mapper): Promise<InsertResult> {
-		try {
 			const resolvedData = [...this.rowData.values()]
 
 			const insertData = resolvedData.reduce<QueryBuilder.ColumnExpressionMap>(
@@ -87,8 +86,5 @@ export class InsertBuilder {
 			await mapper.eventManager.fire(afterInsertEvent)
 
 			return { values: resolvedData, executed: true, primaryValue: result }
-		} catch (e) {
-			throw e
-		}
 	}
 }

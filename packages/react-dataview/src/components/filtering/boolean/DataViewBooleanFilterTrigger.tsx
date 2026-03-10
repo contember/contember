@@ -62,7 +62,6 @@ export interface DataViewBooleanFilterTriggerProps {
  * ```
  */
 export const DataViewBooleanFilterTrigger = forwardRef<HTMLButtonElement, DataViewBooleanFilterTriggerProps>(({ name, action = 'include', value, ...props }: DataViewBooleanFilterTriggerProps, ref) => {
-	// eslint-disable-next-line react-hooks/rules-of-hooks
 	name ??= useDataViewFilterName()
 	const [current, setFilter] = useDataViewBooleanFilter(name, value)
 	const toggleFilter = useCallback(() => {

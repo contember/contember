@@ -36,6 +36,7 @@ const FractionalAmountInput = Component<FractionalAmountFieldProps>(({
 	const inputRef = useRef<HTMLInputElement>(null)
 	const fieldAccessor = useField(field)
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: intentional
 	useEffect(() => {
 		inputRef.current?.setSelectionRange(selection.current, selection.current)
 	}, [fieldAccessor.value])

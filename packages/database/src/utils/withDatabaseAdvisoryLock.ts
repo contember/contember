@@ -11,6 +11,7 @@ export const withDatabaseAdvisoryLock = async <Result>(
 	} finally {
 		const result = await connection.query<{lockReleased: boolean}>('select pg_advisory_unlock(?) as "lockReleased"', [lock])
 		if (!result.rows[0].lockReleased) {
+			// biome-ignore lint/correctness/noUnsafeFinally: lock release failure is critical
 			throw new Error('Failed to release migration lock')
 		}
 	}

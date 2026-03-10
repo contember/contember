@@ -47,7 +47,6 @@ export interface DataViewDateFilterResetTriggerProps {
  */
 export const DataViewDateFilterResetTrigger = forwardRef<HTMLButtonElement, DataViewDateFilterResetTriggerProps>(
 	({ name, type, ...props }, ref) => {
-		// eslint-disable-next-line react-hooks/rules-of-hooks
 		name ??= useDataViewFilterName()
 		const [state, setFilter] = useDataViewFilter<DateRangeFilterArtifacts>(name)
 

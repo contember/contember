@@ -98,7 +98,7 @@ export class TemplateInstaller {
 			}
 			await this.replaceFileContent(path, content =>
 				Object.entries(variables).reduce(
-					(content, [key, value]) => content.replace(new RegExp(`\{${key}\}`, 'g'), value),
+					(content, [key, value]) => content.replace(new RegExp(`{${key}}`, 'g'), value),
 					content,
 				),
 			)

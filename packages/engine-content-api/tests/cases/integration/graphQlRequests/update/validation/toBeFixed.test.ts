@@ -27,8 +27,6 @@ const bookValidation: Validation.Schema = {
 
 test.skip('update book with validation - failed', async () => {
 	//fixme
-	return
-
 	await execute({
 		schema: bookSchema,
 		validation: bookValidation,

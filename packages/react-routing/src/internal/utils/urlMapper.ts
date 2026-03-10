@@ -44,7 +44,7 @@ export const pathToRequestState = (routing: RoutingContextValue, path: string, q
 	}
 
 	const pathAfterBase = path.slice(routing.basePath.length)
-	const dimensionsMatch = pathAfterBase.match(/^([^\/]*)/)
+	const dimensionsMatch = pathAfterBase.match(/^([^/]*)/)
 	const dimensionsSegment = dimensionsMatch?.[1] || ''
 	const hasDimensions = dimensionsSegment.includes('=')
 

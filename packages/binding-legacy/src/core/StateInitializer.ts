@@ -137,7 +137,7 @@ export class StateInitializer {
 				this.initializeFromHasManyRelationMarker(realm, field, new Set(value.children.keys()))
 			} else if (field instanceof HasOneRelationMarker) {
 				let runtimeId: RuntimeId
-				let subCopyFrom: EntityRealmState | undefined = undefined
+				let subCopyFrom: EntityRealmState | undefined 
 				if (pathBack?.fieldBackToParent === field.parameters.field && !field.parameters.reducedBy) {
 					runtimeId = pathBack.parent.entity.id
 				} else {

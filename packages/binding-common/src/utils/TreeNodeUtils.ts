@@ -76,7 +76,7 @@ export class TreeNodeUtils {
 	}
 
 	public static recommendAlternative(original: string, possibleAlternatives: Iterable<string>): string | undefined {
-		let bestAlternative: string | undefined = undefined
+		let bestAlternative: string | undefined 
 		let bestAlternativeDistance = Number.MAX_SAFE_INTEGER
 
 		for (const alternative of possibleAlternatives) {

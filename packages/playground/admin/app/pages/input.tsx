@@ -351,7 +351,7 @@ const InputFieldWithCustomError = Component<InputFieldProps>(
 		useEntityBeforePersist(entityAccessor => {
 			const field = entityAccessor().getField('textValue')
 
-			if (field.value != 'Hello world') {
+			if (field.value !== 'Hello world') {
 				field.addError('You must enter "Hello world"')
 			}
 		})

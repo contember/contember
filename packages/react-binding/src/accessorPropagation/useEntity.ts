@@ -19,32 +19,25 @@ function useEntity(...entity: [] | [string | SugaredRelativeSingleEntity | undef
 	const getEntityByKey = useGetEntityByKey()
 
 	if (entity.length === 0) {
-		// eslint-disable-next-line react-hooks/rules-of-hooks
 		const getEntityAccessor = useCallback(() => getEntityByKey(entityKey), [entityKey, getEntityByKey])
-		// eslint-disable-next-line react-hooks/rules-of-hooks
 		return useAccessorUpdateSubscription(getEntityAccessor)[0]
 	}
 	const sugaredRelativeSingleEntity = entity[0]
 
-	// eslint-disable-next-line react-hooks/rules-of-hooks
 	const relativeSingleEntity = useDesugaredRelativeSingleEntity(sugaredRelativeSingleEntity)
-	// eslint-disable-next-line react-hooks/rules-of-hooks
 	const getEntity = useCallback(() => {
 		const parent = getEntityByKey(entityKey)
 		return parent.getEntity(relativeSingleEntity!)
 	}, [entityKey, getEntityByKey, relativeSingleEntity])
 
 	if (relativeSingleEntity) {
-		// eslint-disable-next-line react-hooks/rules-of-hooks
 		useConstantLengthInvariant(
 			relativeSingleEntity.hasOneRelationPath,
 			'Cannot change the length of the hasOneRelation path!',
 		)
-		// eslint-disable-next-line react-hooks/rules-of-hooks
 		const [entity, { update }] = useAccessorUpdateSubscription(getEntity)
 
 		if (relativeSingleEntity.hasOneRelationPath.length) {
-			// eslint-disable-next-line react-hooks/rules-of-hooks
 			useOnConnectionUpdate(relativeSingleEntity.hasOneRelationPath[0].field, update)
 		}
 

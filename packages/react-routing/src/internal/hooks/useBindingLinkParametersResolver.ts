@@ -20,7 +20,6 @@ export const createBindingLinkParametersResolver = (entity: EntityAccessor | und
 
 export const useBindingLinkParametersResolver = (): RoutingParameterResolver => {
 	const hasEntity = useHasEntity()
-	// eslint-disable-next-line react-hooks/rules-of-hooks
 	const entity = hasEntity ? useEntity() : undefined
 
 	return useMemo(

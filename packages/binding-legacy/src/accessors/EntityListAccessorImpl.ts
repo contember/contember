@@ -32,7 +32,7 @@ export class EntityListAccessorImpl implements EntityListAccessor {
 	}
 
 	public* ids(): IterableIterator<EntityId> {
-		return this._children.keys()
+		yield* this._children.keys()
 	}
 
 	/**

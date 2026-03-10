@@ -24,6 +24,7 @@ export const EditorInlineReferencePortal = (props: EditorInlineReferenceTriggerP
 	const environment = useEnvironment()
 	const [entity, setEntity] = useState<EntityAccessor>()
 	const { createElementReference } = useEditorReferenceMethods()
+	// biome-ignore lint/correctness/useExhaustiveDependencies: intentional
 	useEffect(() => {
 		if (entity) {
 			return

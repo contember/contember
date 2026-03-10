@@ -39,7 +39,7 @@ export const useRichTextBlocksSource = <CustomElements extends RichTextElement, 
 			}
 			const references = block[referencesFieldResolved]
 
-			let normalizedReferences: Record<string, RichTextReference> | undefined = undefined
+			let normalizedReferences: Record<string, RichTextReference> | undefined 
 			if (references) {
 				if (typeof Object(references)[Symbol.iterator] !== 'function') {
 					throw new RichTextRendererError(`The set of references must be an iterable!`)

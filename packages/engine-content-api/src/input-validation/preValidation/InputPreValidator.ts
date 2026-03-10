@@ -187,7 +187,7 @@ export class InputPreValidator {
 		const baseFieldsAsDeps = Object.keys(rules).reduce((acc, field) => ({ ...acc, [field]: {} }), {})
 
 		return Object.values(rules)
-			.flatMap(it => it)
+			.flat()
 			.map(it => DependencyCollector.collect(it.validator))
 			.concat(baseFieldsAsDeps)
 			.reduce((acc, dependecy) => DependencyMerger.merge(acc, dependecy), {})

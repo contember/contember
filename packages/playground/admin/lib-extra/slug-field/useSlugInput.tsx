@@ -90,6 +90,7 @@ export const useSlugInput = ({
 		})
 	}, [createSlug, desugaredField, getEntityAccessor])
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: intentional
 	useEffect(() => {
 		const targetField = getEntityAccessor().getField(desugaredField)
 		if (targetField.value !== null) {

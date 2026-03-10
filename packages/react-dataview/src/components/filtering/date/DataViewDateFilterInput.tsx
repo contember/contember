@@ -45,7 +45,6 @@ export interface DataViewDateFilterInputProps {
  */
 export const DataViewDateFilterInput = forwardRef<HTMLInputElement, DataViewDateFilterInputProps>(
 	({ name, type, ...props }: DataViewDateFilterInputProps, ref) => {
-		// eslint-disable-next-line react-hooks/rules-of-hooks
 		name ??= useDataViewFilterName()
 
 		return (

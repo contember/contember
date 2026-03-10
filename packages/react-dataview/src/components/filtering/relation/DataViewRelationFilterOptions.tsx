@@ -12,7 +12,6 @@ export const DataViewRelationFilterOptions = ({ children, name, ...props }: {
 	name?: string
 	children: React.ReactNode
 } & Omit<DataViewProps, 'entities'>) => {
-	// eslint-disable-next-line react-hooks/rules-of-hooks
 	name ??= useDataViewFilterName()
 	const filterFactory = useDataViewRelationFilterFactory(name)
 	const { options } = useDataViewRelationFilterArgs()

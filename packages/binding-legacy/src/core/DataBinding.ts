@@ -136,7 +136,6 @@ export class DataBinding<Node> {
 				}), {
 					signal,
 					onBeforeRequest: ({ query, variables }) => {
-						// eslint-disable-next-line no-console
 						console.debug(query, variables)
 					},
 				})
@@ -156,7 +155,6 @@ export class DataBinding<Node> {
 				return await this.processSuccessfulPersistResult(response, operations, onPersistSuccess)
 			} else {
 				if (response.errorMessage) {
-					// eslint-disable-next-line no-console
 					console.debug(response.errorMessage)
 				}
 
@@ -385,7 +383,6 @@ export class DataBinding<Node> {
 		return await this.contentClient.query(query, {
 			signal,
 			onBeforeRequest: ({ query, variables }) => {
-				// eslint-disable-next-line no-console
 				console.debug(query, variables)
 			},
 		})

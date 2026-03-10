@@ -32,7 +32,7 @@ export const createDbQueriesListener = <Context extends { requestDebug: boolean 
 				const extensions = response.extensions || (response.extensions = {})
 				extensions.dbQueries = queries.map(it => ({
 					...it,
-					path: (it.meta && it.meta.path) || [],
+					path: (it.meta?.path) || [],
 				}))
 			},
 		}

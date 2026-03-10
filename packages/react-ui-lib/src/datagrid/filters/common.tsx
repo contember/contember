@@ -10,7 +10,6 @@ import { dict } from '../../dict'
 export const DataGridNullFilter = ({ name }: {
 	name?: string
 }) => {
-	// eslint-disable-next-line react-hooks/rules-of-hooks
 	name ??= useDataViewFilterName()
 	const [nullFilter, setNullFilter] = useDataViewNullFilter(name)
 	const toggleExcludeNull = useCallback(() => setNullFilter('toggleExclude'), [setNullFilter])

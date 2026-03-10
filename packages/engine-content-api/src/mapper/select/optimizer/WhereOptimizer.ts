@@ -72,7 +72,7 @@ export class WhereOptimizer {
 
 		for (const key in where) {
 			const value = where[key]
-			let operand: OptimizedOperand = undefined
+			let operand: OptimizedOperand 
 			if (value === undefined || value === null) {
 				continue
 			} else if (key === 'and') {

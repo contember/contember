@@ -27,8 +27,6 @@ const bookValidation: Validation.Schema = {
 
 test.skip('insert book with validation - failed', async () => {
 	// fixme
-	return
-
 	await execute({
 		schema: bookSchema,
 		validation: bookValidation,
@@ -96,8 +94,6 @@ test.skip('insert book with validation - failed', async () => {
 
 test.skip('insert book with validation - ok', async () => {
 	// fixme
-	return
-
 	await execute({
 		schema: bookSchema,
 		validation: bookValidation,

@@ -17,7 +17,7 @@ export const useDataViewDateFilterInput = ({ name, type }: UseDataViewDateFilter
 	const onChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
 		setFilter(it => ({
 			...it,
-			[type]: e.target.value && e.target.value.match(/\d{4}-\d{2}-\d{2}/) ? e.target.value : undefined,
+			[type]: e.target.value?.match(/\d{4}-\d{2}-\d{2}/) ? e.target.value : undefined,
 		}))
 	}, [setFilter, type])
 

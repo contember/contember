@@ -65,7 +65,6 @@ export interface DataViewEnumFilterTriggerProps {
  */
 export const DataViewEnumFilterTrigger = forwardRef<HTMLButtonElement, DataViewEnumFilterTriggerProps>(
 	({ name, action = 'include', value, ...props }: DataViewEnumFilterTriggerProps, ref) => {
-		// eslint-disable-next-line react-hooks/rules-of-hooks
 		name ??= useDataViewFilterName()
 		const [current, setFilter] = useDataViewEnumFilter(name, value)
 		const toggleFilter = useCallback(() => {

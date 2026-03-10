@@ -32,7 +32,7 @@ class GoogleFormEmbedHandler implements EmbedHandler<string> {
 		if (!url.host.endsWith('docs.google.com')) {
 			return undefined
 		}
-		const matches = url.pathname.match(/^\/forms\/d(\/e)?\/([^\/]+).*$/)
+		const matches = url.pathname.match(/^\/forms\/d(\/e)?\/([^/]+).*$/)
 
 		if (!matches) {
 			return undefined

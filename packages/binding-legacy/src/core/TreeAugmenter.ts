@@ -142,7 +142,7 @@ export class TreeAugmenter {
 		newId: ServerId | undefined | null,
 	) {
 		const currentId = realm.entity.id
-		let idToChangeTo: RuntimeId | undefined = undefined
+		let idToChangeTo: RuntimeId | undefined 
 
 		if (currentId instanceof ServerId) {
 			if (newId === undefined || newId === null) {

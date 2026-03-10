@@ -120,4 +120,4 @@ namespace EntityListAccessor {
 	) => () => void
 }
 
-export { type EntityListAccessor }
+export type { EntityListAccessor }

@@ -27,7 +27,7 @@ export class ProjectGroupResolver {
 	}
 
 	async resolveContainer({ request }: { request: IncomingMessage }): Promise<ProjectGroupContainer> {
-		let group: string | undefined = undefined
+		let group: string | undefined 
 		let config = {}
 		if (this.groupRegex) {
 			const host = request.headers.host
@@ -43,7 +43,7 @@ export class ProjectGroupResolver {
 				}
 				const configValue = Buffer.from(configHeader, 'base64')
 				const decryptedValue = this.projectGroupConfigCrypto
-					? (await this.projectGroupConfigCrypto?.decrypt(configValue, CryptoWrapper.cryptoVersion)).value
+					? (await this.projectGroupConfigCrypto.decrypt(configValue, CryptoWrapper.cryptoVersion)).value
 					: configValue
 				try {
 					config = JSON.parse(decryptedValue.toString())

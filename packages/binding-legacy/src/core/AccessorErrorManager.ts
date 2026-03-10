@@ -232,7 +232,7 @@ export class AccessorErrorManager {
 				}
 			})
 			if (Object.keys(normalizedErrors).length) {
-				// eslint-disable-next-line no-console
+				// biome-ignore lint/suspicious/noConsole: debug output
 				console.table(normalizedErrors)
 			}
 		}

@@ -71,4 +71,4 @@ namespace FieldAccessor {
 	) => () => void
 }
 
-export { type FieldAccessor }
+export type { FieldAccessor }

@@ -22,6 +22,7 @@ export const DevBar = ({
 		setExpanded(expanded => !expanded)
 	})
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: intentional
 	useEffect(() => {
 		function handleKeyDown(event: KeyboardEvent) {
 			if (event.code === 'KeyJ' && (event.ctrlKey || event.metaKey)) {

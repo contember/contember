@@ -181,7 +181,7 @@ export const partial = <T extends Record<string, Type<Json | undefined>>>(inner:
 export const noExtraProps = <T extends JsonObject>(inner: Type<T>) => {
 	const type = (input: unknown, path: PropertyKey[] = []): T => {
 		const result = inner(input, path)
-		if (!(typeof input === 'object' && typeof input !== null && typeof result === 'object' && result !== null)) {
+		if (!(typeof input === 'object' && input !== null && typeof result === 'object' && result !== null)) {
 			return result
 		}
 		const resultProps = new Set(Object.keys(result))

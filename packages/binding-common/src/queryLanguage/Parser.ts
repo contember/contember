@@ -729,7 +729,7 @@ class Parser extends EmbeddedActionsParser {
 					const variable = this.SUBRULE(this.variable)
 					return this.ACTION(() => {
 						if (!(typeof variable === 'string') || !TokenRegExps.entityIdentifier.test(variable)) {
-							throw new QueryLanguageError(`The value of the variable \$${variable} is not a valid entity identifier.`)
+							throw new QueryLanguageError(`The value of the variable $${variable} is not a valid entity identifier.`)
 						}
 						return variable
 					})
@@ -780,14 +780,14 @@ class Parser extends EmbeddedActionsParser {
 				const dimensionValue = Parser.environment.getDimension(variableName)
 				if (dimensionValue.length > 1) {
 					throw new BindingError(
-						`The variable \$${variableName} resolved to a dimension which exists but contains ${dimensionValue.length} values. It has to contain exactly one. ` +
+						`The variable $${variableName} resolved to a dimension which exists but contains ${dimensionValue.length} values. It has to contain exactly one. ` +
 						`Perhaps you forgot to set the 'maxItems' prop of your DimensionsSwitcher?`,
 					)
 				}
 				return dimensionValue[0]
 			}
 
-			throw new QueryLanguageError(`Undefined variable \$${variableName}.`)
+			throw new QueryLanguageError(`Undefined variable $${variableName}.`)
 		})
 	})
 

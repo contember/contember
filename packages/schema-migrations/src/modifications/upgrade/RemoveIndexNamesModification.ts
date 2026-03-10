@@ -3,7 +3,6 @@ import { SchemaUpdater, updateEveryEntity, updateModel } from '../utils/schemaUp
 import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler'
 
 export class RemoveIndexNamesModificationHandler implements ModificationHandler<RemoveIndexNamesModificationData>  {
-	constructor() {}
 
 	public createSql(): void {
 	}

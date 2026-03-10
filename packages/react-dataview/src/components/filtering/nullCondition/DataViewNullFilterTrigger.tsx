@@ -58,7 +58,6 @@ export interface DataViewNullFilterTriggerProps {
  */
 export const DataViewNullFilterTrigger = forwardRef<HTMLButtonElement, DataViewNullFilterTriggerProps>(
 	({ name, action, ...props }: DataViewNullFilterTriggerProps, ref) => {
-		// eslint-disable-next-line react-hooks/rules-of-hooks
 		name ??= useDataViewFilterName()
 		const [current, setFilter] = useDataViewNullFilter(name)
 		const toggleFilter = useCallback(() => {

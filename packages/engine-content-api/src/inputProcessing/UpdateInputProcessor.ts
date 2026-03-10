@@ -61,4 +61,4 @@ namespace UpdateInputProcessor {
 	}
 }
 
-export { type UpdateInputProcessor }
+export type { UpdateInputProcessor }

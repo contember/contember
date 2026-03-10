@@ -32,7 +32,7 @@ export class S3Signer {
 		const nowFormatted = this.providers
 			.now()
 			.toISOString()
-			.replace(/[:\-]|\.\d{3}/g, '')
+			.replace(/[:-]|\.\d{3}/g, '')
 		const queryString = this.getQueryParams(request, nowFormatted)
 		const path = uris.basePath + '/' + request.key
 		const lines = [

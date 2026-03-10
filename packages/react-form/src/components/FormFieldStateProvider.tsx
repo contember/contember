@@ -34,7 +34,6 @@ export const FormFieldIdContext = {
 	Provider: ({ children, value }: { children: React.ReactNode; value: string }) => {
 		const state = useFormFieldState()
 		if (import.meta.env.DEV) {
-			// eslint-disable-next-line react-hooks/rules-of-hooks
 			useEffect(() => {
 				console.warn('FormFieldIdContext.Provider is deprecated, use FormFieldStateProvider instead')
 			}, [])
@@ -57,7 +56,6 @@ export const FormErrorContext = {
 	Provider: ({ children, value }: { children: React.ReactNode; value: ErrorAccessor.Error[] }) => {
 		const state = useFormFieldState()
 		if (import.meta.env.DEV) {
-			// eslint-disable-next-line react-hooks/rules-of-hooks
 			useEffect(() => {
 				console.warn('FormErrorContext.Provider is deprecated, use FormFieldStateProvider instead')
 			}, [])

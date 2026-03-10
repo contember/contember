@@ -156,10 +156,8 @@ export namespace Input {
 		desc = 'desc',
 		descNullsLast = 'descNullsLast',
 
-		/* eslint-disable @typescript-eslint/no-duplicate-enum-values */
 		/** @deprecated use ascNullsFirst*/
 		ascNullFirst = 'ascNullsFirst',
-		/* eslint-enable @typescript-eslint/no-duplicate-enum-values */
 	}
 
 	// generics required by admin

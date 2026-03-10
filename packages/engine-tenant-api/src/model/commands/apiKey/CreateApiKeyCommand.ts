@@ -27,7 +27,7 @@ export class CreateApiKeyCommand implements Command<CreateApiKeyCommandResult> {
 
 	async execute({ db, providers }: Command.Args): Promise<CreateApiKeyCommandResult> {
 		const apiKeyId = providers.uuid()
-		let token = undefined
+		let token 
 		let tokenHash = this.args.tokenHash
 		if (!tokenHash) {
 			token = await generateToken(providers)

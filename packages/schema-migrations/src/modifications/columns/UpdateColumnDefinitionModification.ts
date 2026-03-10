@@ -79,7 +79,7 @@ export class UpdateColumnDefinitionModificationHandler implements ModificationHa
 			if (oldColumn.sequence.precedence !== newColumn.sequence.precedence) {
 				seqAlter.push(`SET GENERATED ${newColumn.sequence.precedence}`)
 			}
-			if (oldColumn.sequence.start !== newColumn.sequence.start && typeof newColumn.sequence.start == 'number') {
+			if (oldColumn.sequence.start !== newColumn.sequence.start && typeof newColumn.sequence.start === 'number') {
 				seqAlter.push(`SET START WITH ${newColumn.sequence.start}`)
 			}
 			if (newColumn.sequence.restart) {

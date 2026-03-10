@@ -5,7 +5,6 @@ import { MigrationsResolver } from "../../packages/cli/src/lib/migrations/Migrat
 import { MigrationFilesManager } from "../../packages/cli/src/lib/migrations/MigrationFilesManager";
 
 (async () => {
-	// eslint-disable-next-line no-console
 	console.log(relative(process.cwd(), process.argv[2]))
 	const migrationsResolver = new MigrationsResolver(new MigrationFilesManager(relative(process.cwd(), process.argv[2])))
 	const modificationHandlerFactory = new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap)
@@ -20,10 +19,8 @@ import { MigrationFilesManager } from "../../packages/cli/src/lib/migrations/Mig
 
 		schema = nextSchema
 	}
-	// eslint-disable-next-line no-console
 	console.log('OK')
 })().catch(e => {
-	// eslint-disable-next-line no-console
 	console.error(e)
 	process.exit(1)
 })

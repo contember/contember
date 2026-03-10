@@ -42,7 +42,6 @@ export interface DataViewTextFilterMatchModeTriggerProps {
  */
 export const DataViewTextFilterMatchModeTrigger = forwardRef<HTMLButtonElement, DataViewTextFilterMatchModeTriggerProps>(
 	({ name, children, mode, ...props }: DataViewTextFilterMatchModeTriggerProps, ref) => {
-		// eslint-disable-next-line react-hooks/rules-of-hooks
 		name ??= useDataViewFilterName()
 		const [active, cb] = useDataViewTextFilterMatchMode(name, mode)
 		const { onClick, ...otherProps } = props as React.ButtonHTMLAttributes<HTMLButtonElement>

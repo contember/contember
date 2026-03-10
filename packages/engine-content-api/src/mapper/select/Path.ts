@@ -17,8 +17,6 @@ export class AliasContext {
 export class PathFactory {
 	private aliasContext = new AliasContext()
 
-	public constructor() {}
-
 	public create(path: string[], rootAlias = 'root_') {
 		return new Path(path, this.aliasContext, rootAlias)
 	}

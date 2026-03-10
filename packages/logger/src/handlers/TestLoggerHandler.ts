@@ -19,7 +19,6 @@ export class TestLoggerHandler implements LoggerHandler {
 	handle(logEntry: LogEntry): void {
 		this.messages.push(logEntry)
 		if (this.print) {
-			// eslint-disable-next-line no-console
 			console.error(logEntry.message)
 		}
 	}

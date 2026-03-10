@@ -20,7 +20,6 @@ import { FileSystem } from './lib/FileSystem'
 	const app = new Application(commandManager, `Contember installer`)
 	await app.runCommand('workspace', process.argv.slice(2))
 })().catch(e => {
-	// eslint-disable-next-line no-console
 	console.log(e)
 	process.exit(1)
 })

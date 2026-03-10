@@ -8,7 +8,6 @@ import { YamlHandler } from './lib/fs/YamlHandler'
 import { FileSystem } from './lib/fs/FileSystem';
 
 (async () => {
-	// eslint-disable-next-line @typescript-eslint/no-var-requires
 	const version = require(join(packageRoot, 'package.json')).version
 	const nodeVersion = process.version.match(/^v?(\d+)\..+$/)
 	if (nodeVersion && Number(nodeVersion[1]) < 18) {

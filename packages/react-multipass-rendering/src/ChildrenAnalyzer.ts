@@ -129,7 +129,7 @@ export class ChildrenAnalyzer<
 			return mapped
 		}
 
-		let children: ReactNode = undefined
+		let children: ReactNode 
 
 		if (typeof node !== 'object' || !('type' in node)) {
 			return this.processNode(children, staticContext, componentPath)

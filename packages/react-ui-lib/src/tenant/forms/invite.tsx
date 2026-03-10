@@ -8,7 +8,6 @@ import { dict } from '../../dict'
 
 export const InviteFormFields = ({ projectSlug, roles }: {projectSlug: string; roles?: RolesConfig}) => {
 	const form = useInviteForm()
-	// eslint-disable-next-line react-hooks/rules-of-hooks
 	const rolesResolved = roles ?? useIntrospectionRolesConfig(projectSlug)
 	return (
 		<div className="relative flex flex-col gap-2">

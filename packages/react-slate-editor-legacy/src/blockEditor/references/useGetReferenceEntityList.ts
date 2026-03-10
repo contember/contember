@@ -24,7 +24,6 @@ export const useGetReferenceEntityList = ({
 	useConstantValueInvariant(referencesField)
 	useConstantValueInvariant(monolithicReferencesMode)
 	if (!referencesField) {
-		// eslint-disable-next-line react-hooks/rules-of-hooks
 		return useCallback(() => {
 			throw new BindingError(
 				`BlockEditor: trying to get or insert a referenced element but referencing has not been correctly set up. ` +
@@ -33,9 +32,7 @@ export const useGetReferenceEntityList = ({
 		}, [])
 	}
 	return monolithicReferencesMode
-		// eslint-disable-next-line react-hooks/rules-of-hooks
 		? useGetMonolithicReferenceList({ referencesField })
-		// eslint-disable-next-line react-hooks/rules-of-hooks
 		: useGetPerBlockReferenceList({ referencesField, sortedBlocksRef: sortedBlocksRef })
 }
 

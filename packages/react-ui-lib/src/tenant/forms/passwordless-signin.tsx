@@ -19,6 +19,7 @@ export const PasswordlessSignInFormFields = ({ type, email }: { type: 'token' | 
 	}, [hasToken])
 	const setValues = form.setValues
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: intentional
 	useEffect(() => {
 		if (type === 'otp') {
 			setValues(it => ({ ...it, token: it.token.toUpperCase() }))

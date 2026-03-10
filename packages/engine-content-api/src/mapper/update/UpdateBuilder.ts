@@ -57,7 +57,6 @@ export class UpdateBuilder {
 	}
 
 	public async execute(mapper: Mapper): Promise<UpdateResult> {
-		try {
 			const resolvedData = [...this.rowData.values()]
 			if (Object.keys(resolvedData).length === 0) {
 				return { values: [], affectedRows: null, executed: false }
@@ -142,8 +141,5 @@ export class UpdateBuilder {
 			}
 
 			return { values: resolvedData, affectedRows: result.length, executed: true }
-		} catch (e) {
-			throw e
-		}
 	}
 }

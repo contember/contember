@@ -65,7 +65,6 @@ export class ExportExecutor {
 	}
 
 	private async* exportSchema(db: Client, mapping: TransferMapping): AsyncIterable<Command> {
-		// eslint-disable-next-line @typescript-eslint/no-this-alias
 		const that = this
 		yield* asyncIterableTransaction(db, async function* (db) {
 			await db.query('SET LOCAL statement_timeout = 0')

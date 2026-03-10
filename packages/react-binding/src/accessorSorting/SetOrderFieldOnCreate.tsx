@@ -75,7 +75,7 @@ export const SetOrderFieldOnCreate = Component<SetOrderFieldOnCreateProps>(
 					onBeforePersist={(getAccessor, bindingOperations) => {
 						// We're creating a new entity which adjusts the numbering of the other ones if applicable
 						// and then deleting it again which leaves a hole for newOrderFieldValue that is set above.
-						let newEntityKey: string | undefined = undefined
+						let newEntityKey: string | undefined 
 						addEntityAtIndex(getAccessor(), desugaredOrderField, newOrderFieldValue, getNewEntity => {
 							newEntityKey = getNewEntity().key
 						})

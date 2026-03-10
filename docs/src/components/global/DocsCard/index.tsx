@@ -25,7 +25,6 @@ function DocsCard(props: Props): JSX.Element {
 
 	const content = (
 		<>
-			{/* eslint-disable-next-line react-hooks/rules-of-hooks */}
 			{props.img && <img src={useBaseUrl(props.img)} className="Card-image" />}
 			<div className="Card-container">
 				{props.header && header}

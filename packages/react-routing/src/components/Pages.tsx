@@ -126,7 +126,7 @@ export const Pages = ({ children, layout, ErrorBoundary = Fragment, suspenseFall
 	}
 
 	let pageKey = request.pageName
-	let pageAction = undefined
+	let pageAction 
 	let Page = pageMap.get(pageKey)
 
 	if (Page === undefined) {

@@ -17,17 +17,14 @@ export function useEntitySubTreeParameters(
 	if (typeof qualifiedSingleEntity === 'string') {
 		return qualifiedSingleEntity
 	}
-	// eslint-disable-next-line react-hooks/rules-of-hooks
 	useConstantValueInvariant(qualifiedSingleEntity.isCreating, `EntitySubTree: cannot alternate the 'isCreating' value.`)
 
-	// eslint-disable-next-line react-hooks/rules-of-hooks
 	useConstantValueInvariant(typeof qualifiedSingleEntity.entity, `EntitySubTree: cannot alternate the 'entity' value.`)
 
 	if (qualifiedSingleEntity.isCreating) {
 		const entity = qualifiedSingleEntity.entity
 
 		if (typeof entity === 'string') {
-			// eslint-disable-next-line react-hooks/rules-of-hooks
 			return useMemo(
 				() => ({
 					isCreating: true,
@@ -36,7 +33,6 @@ export function useEntitySubTreeParameters(
 				[entity],
 			)
 		}
-		// eslint-disable-next-line react-hooks/rules-of-hooks
 		return useMemo(
 			() => ({
 				isCreating: true,
@@ -49,10 +45,8 @@ export function useEntitySubTreeParameters(
 	const entity = qualifiedSingleEntity.entity
 
 	if (typeof entity === 'string') {
-		// eslint-disable-next-line react-hooks/rules-of-hooks
 		return useMemo(() => ({ entity: entity }), [entity])
 	}
-	// eslint-disable-next-line react-hooks/rules-of-hooks
 	return useMemo(
 		() => ({
 			entity: {

@@ -61,7 +61,7 @@ export class S3SchemaContributor implements GraphQLSchemaContributor {
 			pattern: it,
 		}))
 
-		if (uploadRules.length === 0 && readRules.length == 0) {
+		if (uploadRules.length === 0 && readRules.length === 0) {
 			return undefined
 		}
 

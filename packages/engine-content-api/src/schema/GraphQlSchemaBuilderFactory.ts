@@ -32,7 +32,6 @@ import { ConnectOrCreateRelationInputProvider } from './mutations/ConnectOrCreat
 import { RefreshViewMutationProvider } from './RefreshViewMutationProvider'
 
 export class GraphQlSchemaBuilderFactory {
-	constructor() {}
 
 	public create(schema: Model.Schema, authorizator: Authorizator): GraphQlSchemaBuilder {
 		return this.createContainerBuilder(schema, authorizator).build().graphQlSchemaBuilder

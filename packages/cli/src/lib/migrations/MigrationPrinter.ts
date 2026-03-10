@@ -1,4 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/triple-slash-reference
 /// <reference path="../../../types/chalk-table/index.d.ts" />
 
 import { Schema } from '@contember/schema'

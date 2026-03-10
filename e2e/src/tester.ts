@@ -23,7 +23,6 @@ beforeEach(() => {
 
 afterEach(() => {
 	// if (latestError !== null && ctx.task.result.state === 'fail') {
-	// 	// eslint-disable-next-line no-console
 	// 	console.error(latestError)
 	// }
 })

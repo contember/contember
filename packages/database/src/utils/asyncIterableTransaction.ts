@@ -5,11 +5,9 @@ interface AsyncIterableX<T, TReturn = any, TNext = undefined> {
 }
 
 export async function* asyncIterableTransaction<T, TReturn = any, TNext = undefined>(db: Client, cb: (db2: Client<Connection.TransactionLike>) => AsyncIterableX<T, TReturn, TNext>): AsyncIterableX<T, TReturn, TNext> {
-	// eslint-disable-next-line promise/param-names
 	return yield* await new Promise(async resolveOuter => {
 		try {
 			await db.transaction((db2: Client<Connection.TransactionLike>) => {
-				// eslint-disable-next-line promise/param-names
 				return new Promise<void>((resolveInner, rejectInner) => {
 					resolveOuter((async function* () {
 						try {

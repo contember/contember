@@ -15,9 +15,9 @@ export interface EnvironmentMiddlewareProps<T extends unknown[]> {
 export const EnvironmentMiddleware = Component<EnvironmentMiddlewareProps<unknown[]>>(
 	({ children, create, args }) => {
 		const env = useEnvironment()
+		// biome-ignore lint/correctness/useExhaustiveDependencies: intentional
 		const envWithExtension = useMemo(
 			() => create(env, args ?? []),
-			// eslint-disable-next-line react-hooks/exhaustive-deps
 			[env, create, ...(args ?? [])],
 		)
 

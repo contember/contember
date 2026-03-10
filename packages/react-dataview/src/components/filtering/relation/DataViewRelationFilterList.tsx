@@ -33,7 +33,6 @@ export interface DataViewRelationFilterListProps {
  */
 export const DataViewRelationFilterList = Component(({ children, name }: DataViewRelationFilterListProps) => {
 	const { options } = useDataViewRelationFilterArgs()
-	// eslint-disable-next-line react-hooks/rules-of-hooks
 	name ??= useDataViewFilterName()
 	const [state] = useDataViewRelationFilterData({ name, options, children })
 

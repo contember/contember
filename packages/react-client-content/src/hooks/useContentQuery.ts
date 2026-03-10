@@ -35,7 +35,6 @@ export function useContentQuery<T>(
 	stateRef.current = state
 	useConstantValueInvariant(query instanceof ContentOperation, 'cannot change between single and multiple queries')
 
-	// eslint-disable-next-line react-hooks/rules-of-hooks
 	const queryMemo = query instanceof ContentOperation ? query : useObjectMemo(query)
 	const optionsMemo = useObjectMemo(options)
 

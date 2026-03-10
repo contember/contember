@@ -58,7 +58,6 @@ export interface DataViewRelationFilterTriggerProps {
  */
 export const DataViewRelationFilterTrigger = forwardRef<HTMLButtonElement, DataViewRelationFilterTriggerProps>(
 	({ name, action = 'include', ...props }: DataViewRelationFilterTriggerProps, ref) => {
-		// eslint-disable-next-line react-hooks/rules-of-hooks
 		name ??= useDataViewFilterName()
 		const entity = useEntity()
 		const [current, setFilter] = useDataViewRelationFilter(name, entity.id)

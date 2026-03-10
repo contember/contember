@@ -27,7 +27,6 @@ export function OrderBy<T>(options: OrderByOptions | OrderByOptions[] | ((keyof 
 		})()
 
 		if (entity.orderBy?.length) {
-			// eslint-disable-next-line no-console
 			console.warn(`DEPRECATED: The "order by" property for the entity ${entity.name} has already been defined. Using multiple decorators can lead to unexpected order. Please provide an array containing all the 'order by' items as an input.`)
 		}
 

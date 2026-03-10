@@ -39,6 +39,7 @@ export const usePasswordlessOtpActivator = ({ otpLength = 6, otpChars = '0123456
 		return { type: 'empty' }
 	})
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: intentional
 	useEffect(() => {
 		(async () => {
 			if (state.type === 'otp_activating') {

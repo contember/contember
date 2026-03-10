@@ -69,7 +69,7 @@ export class ResolverFactory {
 }
 
 const parseValue = (value: any)  => {
-	if ((typeof value === 'string' && value !== '') || typeof value === 'number' && isFinite(value) && Math.floor(value) === value) {
+	if ((typeof value === 'string' && value !== '') || typeof value === 'number' && Number.isFinite(value) && Math.floor(value) === value) {
 		return value
 	}
 	throw new GraphQLError('PrimaryKey cannot represent value: ' + JSON.stringify(value))

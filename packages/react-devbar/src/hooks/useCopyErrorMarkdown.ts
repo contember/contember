@@ -100,6 +100,7 @@ type CopyMarkdownProps = {
 export const useCopyErrorMarkdown = ({ currentError, currentErrorSource }: CopyMarkdownProps) => {
 	const [copyStatus, setCopyStatus] = useState<'idle' | 'copying' | 'success' | 'error'>('idle')
 	
+	// biome-ignore lint/correctness/useExhaustiveDependencies: intentional
 	useEffect(() => {
 		setCopyStatus('idle')
 	}, [currentError])

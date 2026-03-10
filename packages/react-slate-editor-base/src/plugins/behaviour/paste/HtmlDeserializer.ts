@@ -87,9 +87,7 @@ export class HtmlDeserializer {
 					} else if (item.element !== undefined) {
 						return [item.element]
 					}
-					{
 						return []
-					}
 				}),
 			}
 		} else {

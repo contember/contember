@@ -48,6 +48,7 @@ export const useAutoHeightTextArea = (
 		measure(unwrapRefValue(textAreaRef), minRows, maxRows)
 	})
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: intentional
 	useLayoutEffect(() => {
 		measure(unwrapRefValue(textAreaRef), minRows, maxRows)
 	}, [maxRows, measure, minRows, textAreaRef, value])

@@ -160,9 +160,9 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 				renderReference,
 			}))
 
+		// biome-ignore lint/correctness/useExhaustiveDependencies: intentional
 		useEffect(() => {
 			refreshBlocks()
-			// eslint-disable-next-line react-hooks/exhaustive-deps
 		}, [])
 
 		return (

@@ -90,7 +90,7 @@ export class SelectHydrator {
 		for (let { path, getParentValue, data, defaultValue } of resolvedData) {
 			const pathTmp = [...path.path]
 			const last = pathTmp.pop() as string
-			const currentObject = pathTmp.reduce<any>((obj, part) => (obj && obj[part]) || undefined, result)
+			const currentObject = pathTmp.reduce<any>((obj, part) => (obj?.[part]) || undefined, result)
 			const parentValue = getParentValue(row)
 			if (currentObject) {
 				currentObject[last] = (parentValue ? data[parentValue] : undefined) || defaultValue

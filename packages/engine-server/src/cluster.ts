@@ -61,7 +61,6 @@ export class WorkerManager {
 		worker.on('exit', async (code, signal) => {
 			this.workers.delete(worker)
 			if (!this.isTerminating) {
-				// eslint-disable-next-line no-console
 				console.log(`Worker ${worker.process.pid} died with signal ${signal}, restarting`)
 				await timeout(2000)
 				await this.startWorker(env)
@@ -80,7 +79,6 @@ export class WorkerManager {
 			if (!it) {
 				return
 			}
-			// eslint-disable-next-line no-console
 			console.log(`Terminating worker ${it.process.pid}`)
 			const disconnectPromise = new Promise(resolve => it.once('disconnect', resolve))
 			it.disconnect()
@@ -88,7 +86,6 @@ export class WorkerManager {
 			const killPromise = new Promise(resolve => it.once('exit', resolve))
 			it.kill(signal)
 			await killPromise
-			// eslint-disable-next-line no-console
 			console.log(`Worker ${it.process.pid} terminated`)
 		}))
 	}

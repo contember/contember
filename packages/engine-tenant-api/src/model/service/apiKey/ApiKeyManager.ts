@@ -125,7 +125,7 @@ export class VerifyResult {
 	) {}
 }
 
-export const enum VerifyErrorCode {
+export enum VerifyErrorCode {
 	NOT_FOUND = 'not_found',
 	DISABLED = 'disabled',
 	EXPIRED = 'expired',

@@ -29,7 +29,6 @@ export const useCreateElementReference = ({ monolithicReferencesMode, sortedBloc
 }): CreateElementReferences => {
 	const getReferenceList = useGetReferenceEntityList({ monolithicReferencesMode, sortedBlocksRef, referencesField })
 
-	// eslint-disable-next-line react-hooks/rules-of-hooks
 	return useCreateElementReferenceInternal({
 		referenceDiscriminationField: referenceDiscriminationField!,
 		getReferenceList,

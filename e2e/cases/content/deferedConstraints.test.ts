@@ -199,7 +199,7 @@ test('delete with unsuccessfully deferring constraints', async () => {
 				transaction: {
 					ok: false,
 					errorMessage: `Execution has failed:
-unknown field: ForeignKeyConstraintViolation (Cannot delete row ${attachmentId} of entity Attachment, because it is still referenced from Reference::attachment. This is possibly caused by ACL denial or by missing \"on delete cascade\")`,
+unknown field: ForeignKeyConstraintViolation (Cannot delete row ${attachmentId} of entity Attachment, because it is still referenced from Reference::attachment. This is possibly caused by ACL denial or by missing "on delete cascade")`,
 					updatePost: {
 						ok: true,
 						errorMessage: null,

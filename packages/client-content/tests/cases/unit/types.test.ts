@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { describe, expect, test } from 'bun:test'
 import { ContentClientInput } from '../../../src'
 import { ContemberClientEntities, FragmentOf, FragmentType, queryBuilder } from '../../client'
